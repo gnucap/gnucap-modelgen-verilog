@@ -1,0 +1,10 @@
+
+attach ../modelgen_0.so
+
+demo_module mock_error
+
+analog begin
+	bla = 1;
+end
+
+endmodule

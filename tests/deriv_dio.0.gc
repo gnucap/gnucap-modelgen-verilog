@@ -1,0 +1,27 @@
+
+attach ../modelgen_0.so
+
+demo_module test_dio0(np, nn);
+
+analog begin
+	real a;
+	a = 2;
+	I(np,nn) <+ exp(a*V(np,nn));
+end
+
+endmodule
+
+!make test_dio0.so
+
+attach ./test_dio0.so
+
+verilog
+
+test_dio0 dut(2,1);
+vsource #(.dc(1)) v0(2, 0);
+vsource v1(1, 0);
+
+list
+
+print dc v1(dut) v0(dut) i0(dut) i0_d0(dut) i0_d1(dut)
+dc v1 1 2 .1

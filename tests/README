@@ -1,0 +1,5 @@
+== gnucap modelgen tests
+
+Run with "make check", or "./test gnucap '' check ref".
+
+See check/.diffs for results. (no diff == good)

@@ -1,0 +1,27 @@
+
+attach ../modelgen_0.so
+
+demo_module test_cs0(np, nn);
+
+analog begin
+	real i;
+	i = 1;
+	I(np,nn) <+ i;
+end
+
+endmodule
+
+!make test_cs0.so
+
+attach ./test_cs0.so
+
+verilog
+
+test_cs0 dut(1,2);
+vsource v1(1, 0);
+vsource #(.dc(1)) v2(2, 0);
+
+list
+
+print dc i0(dut) v0(dut) v1(dut)
+dc v1 0 1 .1

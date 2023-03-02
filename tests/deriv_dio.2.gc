@@ -1,0 +1,31 @@
+
+attach ../modelgen_0.so
+
+demo_module test_dio2(np, nn);
+
+analog begin
+	real a;
+	real one;
+	real sinsquare;
+	sinsquare = pow(sin(V(np,nn)), 2.);
+	one = sinsquare + cos(V(np,nn))*cos(V(np,nn));
+	a = pow(2.*V(np,nn), one);
+	I(np,nn) <+ pow(2.71, a/2) * exp(a * .5);
+end
+
+endmodule
+
+!make test_dio2.so
+
+attach ./test_dio2.so
+
+verilog
+
+test_dio2 dut(2,1);
+vsource #(.dc(1)) v0(2, 0);
+vsource v1(1, 0);
+
+list
+
+print dc v1(dut) v0(dut) i0(dut) i0_d0(dut) i0_d1(dut)
+dc v1 1 2 .1

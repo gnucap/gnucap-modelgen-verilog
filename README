@@ -1,0 +1,7 @@
+== preliminary gnucap modelgen
+
+For now, compute and test partial derivatives.
+
+Build with "make", requires gnucap >= dev-20230214.
+
+test: see tests/README
