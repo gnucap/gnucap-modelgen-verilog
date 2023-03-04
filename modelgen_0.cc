@@ -80,7 +80,7 @@ static bool is_node(std::string const& n)
 }
 /*--------------------------------------------------------------------------*/
 static bool is_pot_function(std::string const& n)
-{
+{ untested();
   // stub, need discipline.h
   return n == "V";
 }
@@ -189,7 +189,7 @@ void dump(Expression const& e, std::ostream& out)
   for (const_iterator i = e.begin(); i != e.end(); ++i) {
     if (auto var = dynamic_cast<const Token_VARIABLE*>(*i)) {
       idxs.push(++idx);
-      if(idx<idx_alloc) { untested();
+      if(idx<idx_alloc) {
 	// re-use temporary variable
       }else{
 	assert(idx==idx_alloc);
@@ -203,7 +203,7 @@ void dump(Expression const& e, std::ostream& out)
       }
     }else if (dynamic_cast<const Token_CONSTANT*>(*i)) {
       idxs.push(++idx);
-      if(idx<idx_alloc) { untested();
+      if(idx<idx_alloc) {
 	// re-use temporary variable
       }else{
 	assert(idx==idx_alloc);
@@ -235,7 +235,7 @@ void dump(Expression const& e, std::ostream& out)
 	idx = idxs.top();
 
 	out << "(t" << idx << ", t" << idy << ");\n";
-      }else{
+      }else{ untested();
 	unreachable();
       }
     }else if (dynamic_cast<const Token_PARLIST*>(*i)) {
@@ -451,7 +451,7 @@ void Module::set_port_by_index(int num, std::string& ext_name)
 /*--------------------------------------------------------------------------*/
 void Module::parse_ports(CS& cmd)
 {
-  if (!(cmd >> '(')) { untested();
+  if (!(cmd >> '(')) {
     throw Exception("'(' required (parse ports)");
   }else if (cmd.is_alnum()) {
     // by order
@@ -464,12 +464,12 @@ void Module::parse_ports(CS& cmd)
 	set_port_by_index(index, value);
 	if (value == "0"){ untested();
 	  throw Exception("port 0 not allowed");
-	}else if (num_nodes() != index+1) {
+	}else if (num_nodes() != index+1) { untested();
 	  throw Exception("duplicate port");
 	}else{
 	  ++index;
 	}
-      }catch (Exception_Too_Many& e) {
+      }catch (Exception_Too_Many& e) { untested();
 	cmd.warn(bDANGER, here, e.message());
       }
     }
@@ -486,7 +486,7 @@ void Module::parse_ports(CS& cmd)
 Node const* Module::new_node(std::string const& p)
 {
   Node*& cc = _nodes[p];
-  if(cc) {
+  if(cc) { untested();
   }else{
     cc = new Node(p);
   }
@@ -498,7 +498,7 @@ Node const* Module::node(std::string const& p) const
   auto i = _nodes.find(p);
   if(i != _nodes.end()) {
     return i->second;
-  }else{
+  }else{ untested();
     throw Exception("no such node " + p );
   }
 }
@@ -507,7 +507,7 @@ Branch const* Module::new_branch(std::string const& p, std::string const& n)
 {
   std::string k = p + " " + n;
   Branch*& cc = _branches[k];
-  if(cc) {
+  if(cc) { untested();
   }else{
     size_t s = _branches.size() - 1;
     // TODO: resolve k
@@ -542,84 +542,6 @@ void Module::declare_ddouble(std::ostream& o) const
 {
   size_t np = _probes.size();
   o << ind << "typedef ddouble_<"<<np<<"> ddouble;\n";
-  return;
-  o << ind << "struct ddouble {\n";
-  {
-    indent i("  ");
-    o << ind << "double value;\n";
-    for(auto i : _probes) {
-      o << ind << "double _" << i.second->name() << ";\n";
-    }
-    o << ind << "double d(int i) const{return *(&value+i);}\n";
-    o << ind << "operator double&() {\n"
-      << ind << ind << "return value;\n"
-      << ind << "}\n";
-
-    o << ind << "ddouble& operator=(const double& o) {\n"
-      << ind << ind << "value = o;\n";
-    for(auto v : _probes) {
-      std::string const& n = v.second->name();
-      o << ind << ind << "_" << n << " = 0.;\n";
-    }
-    o << ind << ind << "return *this;\n"
-      << ind << "}\n";
-
-    o << ind << "ddouble& operator/=(const ddouble& o) {\n";
-    for(auto v : _probes) {
-      std::string const& n = v.second->name();
-      o << ind << ind << "_" << n << " *= o.value; "
-	<< "_" << n << " -= value * o._" << n << ";\n";
-      o << ind << ind << "_" << n << " /= o.value * o.value;\n";
-    }
-    o << ind << ind << "value /= o.value;\n";
-    o << ind << ind << "return *this;\n"
-      << ind << "}\n";
-
-    o << ind << "ddouble& operator*=(const ddouble& o) {\n";
-    for(auto v : _probes) {
-      std::string const& n = v.second->name();
-      o << ind << ind << "_" << n << " *= o.value; "
-	<< "_" << n << " += value * o._" << n << ";\n";
-    }
-    o << ind << ind << "value *= o.value;\n";
-    o << ind << ind << "return *this;\n"
-      << ind << "}\n";
-
-    o << ind << "ddouble& operator+=(const ddouble& o) {\n"
-      << ind << ind << "value += o.value;\n";
-    for(auto v : _probes) {
-      std::string const& n = v.second->name();
-      o << ind << ind << "_" << n << " += o._" << n << ";\n";
-    }
-    o << ind << ind << "return *this;\n"
-      << ind << "}\n";
-
-    o << ind << "ddouble& operator-=(const ddouble& o) {\n"
-      << ind << ind << "value -= o.value;\n";
-    for(auto v : _probes) {
-      std::string const& n = v.second->name();
-      o << ind << ind << "_" << n << " -= o._" << n << ";\n";
-    }
-    o << ind << ind << "return *this;\n"
-      << ind << "}\n";
-
-    o << ind << "ddouble& chain_rule(double d) {\n";
-    for(auto v : _probes) {
-      std::string const& n = v.second->name();
-      o << ind << ind << "_" << n << " *= d;\n";
-    }
-    o << ind << ind << "return *this;\n";
-    o << ind << "} /*chain*/\n";
-
-    o << ind << "void clear() {\n";
-    o << ind << ind << "value = 0.;\n";
-    for(auto v : _probes) {
-      std::string const& n = v.second->name();
-      o << ind << ind << "_" << n << " = 0.;\n";
-    }
-    o << ind << "} /*clear*/\n";
-  }
-  o << ind << "}; /*ddouble*/\n";
 }
 /*--------------------------------------------------------------------------*/
 void Module::dump(std::ostream& o)const
@@ -655,7 +577,7 @@ void Module::dump(std::ostream& o)const
 
   o << "private: // data\n";
   o << ind << "ddouble _branches;\n";
-  for(auto x : _branches){ untested();
+  for(auto x : _branches){
     assert(x.second);
     o << ind << "ddouble _branch" << x.second->name() << ";\n";
   }
@@ -678,7 +600,7 @@ void Module::dump(std::ostream& o)const
   }
   o << ind << "};\n";
 
-  for(auto x : _probes){ untested();
+  for(auto x : _probes){
     assert(x.second);
     o << ind << "double " << x.second->name() << ";\n";
   }
@@ -687,7 +609,7 @@ void Module::dump(std::ostream& o)const
   o << ind << "bool do_tr() override; // AnalogBlock\n";
   o << ind << "void read_voltages();\n";
   o << ind << "void clear_branch_contributions(){\n";
-  for(auto x : _branches){ untested();
+  for(auto x : _branches){
     assert(x.second);
     o << ind << ind << "_branch" << x.second->name() << ".clear();\n";
   }
@@ -724,7 +646,7 @@ void Module::dump(std::ostream& o)const
     "/*--------------------------------------"
     "------------------------------------*/\n";
   o << "void Module::read_voltages() {\n";
-  for(auto x : _probes){ untested();
+  for(auto x : _probes){
     Probe const* p = x.second;
     assert(p);
     o << ind << p->name() << " = volts_limited(_n[n_"<< p->pname() <<"], _n[n_"<< p->nname() <<"]);\n";
@@ -775,7 +697,7 @@ void Variable::resolve_symbols(Expression const& e, Expression& E)
       Token* cl = i->clone();
       assert(i->name() == cl->name());
       E.push_back(cl);
-    }else if(auto c = dynamic_cast<Token_CONSTANT*>(i)) {
+    }else if(auto c = dynamic_cast<Token_CONSTANT*>(i)) { untested();
       Token* cl = c->clone();
       assert(i->name() == cl->name());
       E.push_back(cl);
@@ -792,7 +714,7 @@ void Variable::resolve_symbols(Expression const& e, Expression& E)
 	E.pop_back();
 	assert(!E.is_empty());
 	std::string arg1;
-	if(dynamic_cast<Token_STOP*>(E.back())) {
+	if(dynamic_cast<Token_STOP*>(E.back())) { untested();
 	  throw Exception("syntax error");
 	}else{
 	}
