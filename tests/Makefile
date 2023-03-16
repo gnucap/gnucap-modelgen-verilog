@@ -3,6 +3,7 @@ CPPFLAGS = -DTRACE_UNTESTED
 REFDIR = ref
 TARGETDIR = check
 GNUCAP = gnucap
+GNUCAP_VERILOG = ../gnucap-verilog
 CXX = g++
 # CXXFLAGS=-O2
 
@@ -22,9 +23,9 @@ CXX = g++
 	${CXX} -g -rdynamic $< ../bd/lib/.libs/libgnucap.so -o $@
 
 check:
-	./test ${GNUCAP} "" ${TARGETDIR} ${REFDIR}
+	GNUCAP=${GNUCAP} ./test ${GNUCAP_VERILOG} "" ${TARGETDIR} ${REFDIR}
 
 clean:
-	rm -rf *.o *.cc *.so *.out *.ps *.pdf
+	rm -rf *.o *.cc *.so *.out *~
 
 .PHONY: check clean

@@ -1,0 +1,48 @@
+
+
+
+
+module subanotherone();
+endmodule;
+
+
+
+
+
+
+
+
+
+
+
+
+nature Current
+    units      = "A";
+    access     = I;
+    idt_nature = Charge;
+abstol     = 17 ;
+endnature
+
+
+nature Charge
+    units      = "coul";
+    access     = Q;
+    ddt_nature = Current;
+abstol     = 1e-14;
+endnature
+
+
+nature Voltage
+   units       = "V";
+   access      = V;
+   idt_nature = Flux;
+abstol      = 1e-6;
+endnature
+
+module conductor0 (p, n);
+	inout p, n;
+	electrical p, n;
+
+	analog
+		I(p,n) <+ V(p,n);
+endmodule

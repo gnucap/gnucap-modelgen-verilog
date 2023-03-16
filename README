@@ -5,3 +5,16 @@ For now, compute and test partial derivatives.
 Build with "make", requires gnucap >= 20230304.
 
 test: see tests/README
+
+== build system notes
+
+There is a configure script, but it does not yet work as intended.
+
+== preprocessor notes
+
+- gnucap-verilog { -I path -D def .. } --pp: preprocesses a file.
+- `include "quoted" works simlar to quoted C #include.
+- -I sets include path.
+- -D defines a symbol. Assign a value with -D"VARIABLE value"..
+- Files are located following logic from gcc implementation.
+- Output is sent to standard out, like cpp.

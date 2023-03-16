@@ -3,15 +3,18 @@
 
 attach ../modelgen_0.so
 
-demo_module test_res0(np, nn);
-
-analog begin
-	real v;
-	v = V(np,nn);
-	I(np,nn) <+ v / 100;
-end
-
+`modelgen test_res0
+module test_res0(np, nn);
+	electrical np, nn;
+	inout np, nn;
+	analog begin
+		real v;
+		v = V(np,nn);
+		I(np,nn) <+ v / 100;
+	end
 endmodule
+
+list
 
 !make test_res0.so
 

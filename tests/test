@@ -1,17 +1,38 @@
 #!/bin/sh
 if [ $# -eq 0 ] ; then
-    echo "usage: ./test gnucap \"testcases\" targetdir refdir"
+    echo "usage: ./test gnucap-verilog \"testcases\" targetdir refdir"
     echo "usual testcases is \"\", usual refdir is =="
-    echo "example: ./test gnucap \"\" myversion =="
+    echo "example: ./test gnucap-verilog \"\" myversion =="
     exit 1
 else
     \mkdir $3
     \rm -f $3/$2.diffs
+    for ii in $2*.sh
+    do
+	echo $ii
+	echo $ii >>$3/$2.diffs
+	./$ii $1 >$3/$ii.out
+	diff -u $4/$ii.out $3/$ii.out >>$3/$2.diffs || echo "**** $ii fails ****"
+    done
+    for ii in $2*.vapp
+    do
+	echo $ii
+	echo $ii >>$3/$2.diffs
+	$1 -I .. --pp $ii >$3/$ii.out
+	diff -u $4/$ii.out $3/$ii.out >>$3/$2.diffs || echo "**** $ii fails ****"
+    done
+    for ii in $2*.vams
+    do
+	echo $ii
+	echo $ii >>$3/$2.diffs
+	$1 -I .. --dump $ii >$3/$ii.out
+	diff -u $4/$ii.out $3/$ii.out >>$3/$2.diffs || echo "**** $ii fails ****"
+    done
     for ii in $2*.gc
     do
 	echo $ii
 	echo $ii >>$3/$2.diffs
-	$1 $ii |tail -n +12 |grep -v ^make >$3/$ii.out
+	gnucap $ii |tail -n +12 |grep -v ^make >$3/$ii.out
 	diff -u $4/$ii.out $3/$ii.out >>$3/$2.diffs || echo "**** $ii fails ****"
     done
     echo done with $1 $2 >>$3/$2.diffs

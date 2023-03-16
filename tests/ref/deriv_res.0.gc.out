@@ -1,6 +1,7 @@
 g++ -DTRACE_UNTESTED -g -O0 -fPIC  -I../include test_res0.cc -o test_res0.o -c
 g++ -shared  -I../include test_res0.o  -o test_res0.so
 rm test_res0.o
+
 demo #() dut ();
 vsource #() v1 (.p(1),.n(0));
 vsource #(.dc(1)) v2 (.p(2),.n(0));

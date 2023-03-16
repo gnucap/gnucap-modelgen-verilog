@@ -1,0 +1,34 @@
+
+
+
+attach ../modelgen_0.so
+
+`modelgen
+module test_res1(np, nn);
+	electrical np, nn;
+	inout np, nn;
+	parameter real r = 100.;
+	analog begin
+		real v;
+		v = V(np,nn);
+		I(np,nn) <+ v / r;
+	end
+endmodule
+
+list
+
+!make test_res1.so
+
+attach ./test_res1.so
+
+verilog
+
+test_res1 #(.r(200)) dut(1,2);
+vsource v1(1, 0);
+vsource #(.dc(1)) v2(2, 0);
+
+list
+
+print dc i0(dut) v0(dut) v1(dut) i0_d0(dut) i0_d1(dut)
+
+dc v1 0 1 .1

@@ -1,0 +1,31 @@
+
+`define thing module
+// `define stuff end`thing
+
+`ifdef thing
+`thing a(1,2);
+endmodule;
+`else
+parse_error
+`endif
+
+`ifdef bla
+parse_error
+`else
+module b(1,2);
+endmodule;
+`endif
+
+`ifndef thing
+parse_error
+`else
+module c(1,2);
+endmodule;
+`endif
+
+`ifndef sth
+module d(1,2);
+endmodule;
+`else
+parse_error
+`endif

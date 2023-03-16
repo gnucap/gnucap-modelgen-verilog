@@ -1,0 +1,9 @@
+// Linear resistor (conductance formulation)
+
+module error0 (p, n);
+	inout p, n;
+	electrical p, n;
+
+	analog
+		I(p,n) <+ V(x,y);
+endmodule

@@ -1,5 +1,6 @@
 == gnucap modelgen tests
 
-Run with "make check", or "./test gnucap '' check ref".
+Run with "make check", or "./test ../gnucap-verilog '' check ref".
 
-See check/.diffs for results. (no diff == good)
+Desired output is stored in ref, actual output will be in check.
+See check/.diffs for results (no diff == good).

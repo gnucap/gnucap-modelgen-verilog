@@ -28,6 +28,8 @@
 
 namespace{
 
+typedef double real;
+
 template<int numderiv>
 class ddouble_ {
 	double _data[1+numderiv];

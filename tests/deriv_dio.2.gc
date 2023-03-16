@@ -1,7 +1,8 @@
 
 attach ../modelgen_0.so
 
-demo_module test_dio2(np, nn);
+`modelgen
+module test_dio2(np, nn);
 
 analog begin
 	real a;

@@ -1,0 +1,17 @@
+  ddt_nature = "Current";
+  abstol = "1e-14";
+endnature
+
+
+
+module device0(p, n);
+  inout p, n;
+  electrical p, n;
+  analog begin
+    I(p, n) <+ V(p, n)
+  end
+
+endmodule
+
+
+

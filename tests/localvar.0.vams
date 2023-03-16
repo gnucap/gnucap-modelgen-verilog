@@ -1,0 +1,12 @@
+`include "sub/disciplines.few"
+
+module test (p, n);
+	inout p, n;
+	electrical p, n;
+
+	analog begin
+		real b;
+		I(p,n) <+ b;
+	end
+
+endmodule

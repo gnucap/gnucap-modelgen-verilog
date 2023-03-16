@@ -1,7 +1,8 @@
 
 attach ../modelgen_0.so
 
-demo_module test_cs0(np, nn);
+`modelgen
+module test_cs0(np, nn);
 
 analog begin
 	real i;
@@ -12,7 +13,6 @@ end
 endmodule
 
 !make test_cs0.so
-
 attach ./test_cs0.so
 
 verilog

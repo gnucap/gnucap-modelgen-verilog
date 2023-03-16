@@ -1,0 +1,55 @@
+/*     -*- verilog -*-
+ * Few disciplines from disciplines.vams to make tests shorter.
+ */
+
+`ifdef DISCIPLINES_H
+`else
+`define DISCIPLINES_H 1
+
+///
+// Natures and Disciplines
+///
+
+/*   Default absolute tolerances may be overriden by setting the
+    appropriate _ABSTOL prior to including this file
+ */
+
+// Electrical
+
+// Current in amperes
+nature Current
+    units      = "A";
+    access     = I;
+    idt_nature = Charge;
+`ifdef CURRENT_ABSTOL
+    abstol     = `CURRENT_ABSTOL;
+`else
+    abstol     = 1e-12;
+`endif
+endnature
+
+// Charge in coulombs
+nature Charge
+    units      = "coul";
+    access     = Q;
+    ddt_nature = Current;
+`ifdef CHARGE_ABSTOL
+    abstol     = `CHARGE_ABSTOL;
+`else
+    abstol     = 1e-14;
+`endif
+endnature
+
+// Potential in volts
+nature Voltage
+   units       = "V";
+   access      = V;
+   idt_nature = Flux;
+`ifdef VOLTAGE_ABSTOL
+   abstol      = `VOLTAGE_ABSTOL;
+`else
+   abstol      = 1e-6;
+`endif
+endnature
+
+`endif

@@ -29,34 +29,12 @@
 #include <set>
 #include <fstream>
 #include "mg_.h"
+#include "mg_out.h"
+#include "m_tokens.h"
 /*--------------------------------------------------------------------------*/
 class Variable;
 class Probe;
 class AnalogBlock;
-/*--------------------------------------------------------------------------*/
-static std::string ind = "  ";
-struct indent{
-  explicit indent(std::string s){
-    _old = ind;
-    ind = ind + s;
-  }
-  ~indent(){
-    ind = _old;
-  }
-  std::string _old;
-};
-/*--------------------------------------------------------------------------*/
-class Token_PROBE : public Token {
-  Probe const* _item;
-public:
-  explicit Token_PROBE(const std::string Name, Probe const* data)
-    : Token(Name, NULL, ""), _item(data) {}
-  explicit Token_PROBE(const Token_PROBE& P) : Token(P) {}
-  Token* clone()const  override{return new Token_PROBE(*this);}
-  void stack_op(Expression* e)const override{
-    e->push_back(clone());
-  }
-};
 /*--------------------------------------------------------------------------*/
 static int is_function(std::string const& n)
 {
@@ -98,6 +76,7 @@ static bool is_xs_function(std::string const& n)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+#if 0
 class Branch : public Base {
   std::string _pname; // TODO: object...
   std::string _nname; // TODO: object...
@@ -155,113 +134,9 @@ public:
 protected:
   void resolve_symbols(Expression const& e, Expression& E);
 };
+#endif
 /*--------------------------------------------------------------------------*/
-class Token_VARIABLE : public Token {
-private:
-  Variable const* _item;
-public:
-  explicit Token_VARIABLE(const std::string Name, Variable const* item)
-    : Token(Name, NULL, ""), _item(item) {}
-  explicit Token_VARIABLE(const Token_VARIABLE& P) : Token(P), _item(P._item) {}
-  Token* clone()const  override{return new Token_VARIABLE(*this);}
-  void stack_op(Expression* e)const override{
-    e->push_back(clone());
-  }
-  Variable const* item()const {assert(_item); return _item;}
-  std::set<Probe const*> const& deps() const{
-    assert(item());
-    return item()->deps();
-  }
-};
-/*--------------------------------------------------------------------------*/
-void dump(Expression const& e, std::ostream& out)
-{
-  typedef Expression::const_iterator const_iterator;
-
-  // The _list is the expression in RPN.
-  // print a program that computes the function and the derivatives.
-  std::stack<int> idxs;
-  int idx = -1;
-  int idx_alloc = 0;
-  for (const_iterator i = e.begin(); i != e.end(); ++i) {
-    trace1("dump", (*i)->name());
-  }
-  for (const_iterator i = e.begin(); i != e.end(); ++i) {
-    if (auto var = dynamic_cast<const Token_VARIABLE*>(*i)) {
-      idxs.push(++idx);
-      if(idx<idx_alloc) {
-	// re-use temporary variable
-      }else{
-	assert(idx==idx_alloc);
-	++idx_alloc;
-	out << ind << "ddouble t" << idx << ";\n";
-      }
-      out << ind << "t" << idx << " = " << (*i)->name() << ".value();\n";
-      for(auto v : var->deps()) {
-//        out << ind << "t" << idx << "._" << v->name() << " = " << (*i)->name() << "._" << v->name() << ";\n";
-        out << ind << "t" << idx << "[p_" << v->name() << "] = " << (*i)->name() << "[p_" << v->name() << "];\n";
-      }
-    }else if (dynamic_cast<const Token_CONSTANT*>(*i)) {
-      idxs.push(++idx);
-      if(idx<idx_alloc) {
-	// re-use temporary variable
-      }else{
-	assert(idx==idx_alloc);
-	++idx_alloc;
-	out << ind << "ddouble t" << idx << ";\n";
-      }
-      out << ind << "t" << idx << " = " << (*i)->name() << ";\n";
-    }else if( dynamic_cast<const Token_PROBE*>(*i)) {
-      idxs.push(++idx);
-      if(idx<idx_alloc) { untested();
-	// re-use temporary variable
-      }else{
-	assert(idx==idx_alloc);
-	++idx_alloc;
-	out << ind << "ddouble t" << idx << ";\n";
-      }
-      out << ind << "t" << idx << " = " << (*i)->name() << ";\n";
-      //out << ind << "t" << idx << "._" << (*i)->name() << " = " << "1.;\n";
-      out << ind << "t" << idx << "[p_" << (*i)->name() << "] = " << "1.;\n";
-    }else if(dynamic_cast<const Token_SYMBOL*>(*i)) {
-      int arity = is_function((*i)->name());
-      assert(arity);
-      out << ind << "t" << idx << " = va::" << (*i)->name();
-      if(arity == 1){
-	out << "(t" << idx << ");\n";
-      }else if(arity == 2){
-	int idy = idx;
-	idxs.pop();
-	idx = idxs.top();
-
-	out << "(t" << idx << ", t" << idy << ");\n";
-      }else{ untested();
-	unreachable();
-      }
-    }else if (dynamic_cast<const Token_PARLIST*>(*i)) {
-    }else if (dynamic_cast<const Token_BINOP*>(*i)) {
-      int idy = idxs.top();
-      assert( idy == idx );
-      idxs.pop();
-      idx = idxs.top();
-      assert((*i)->name().size());
-
-      char op = (*i)->name()[0];
-      switch(op) {
-      case '-':
-      case '+':
-      case '*':
-      case '/':
-	out << ind << "t" << idx << " "<<op<<"= t" << idy << ";\n";
-      default:
-	;
-      }
-      // ++idx;
-    }
-  }
-  assert(!idx);
-}
-/*--------------------------------------------------------------------------*/
+#if 0
 class Assignment : public Variable {
 protected:
   std::string _lhsname;
@@ -409,6 +284,7 @@ public:
   }
 };
 /*--------------------------------------------------------------------------*/
+#if 0
 class Module : public Block {
   std::map<std::string, Probe*> _probes;
   std::map<std::string, Branch*> _branches;
@@ -441,7 +317,8 @@ private:
   size_t num_nodes() const{
     return _n.size();
   }
-};
+}; // Module
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void Module::set_port_by_index(int num, std::string& ext_name)
@@ -532,152 +409,12 @@ Probe const* Module::new_probe(std::string const& xs, std::string const& p, std:
   }
   return prb;
 }
+#endif
 /*--------------------------------------------------------------------------*/
+#if 0
 Branch const* Variable::new_branch(std::string const& a, std::string const& b)
 {
   return _ctx->new_branch(a, b);
-}
-/*--------------------------------------------------------------------------*/
-void Module::declare_ddouble(std::ostream& o) const
-{
-  size_t np = _probes.size();
-  o << ind << "typedef ddouble_<"<<np<<"> ddouble;\n";
-}
-/*--------------------------------------------------------------------------*/
-void Module::dump(std::ostream& o)const
-{
-  o << "class Module : public COMPONENT {\n";
-  o << "public:\n";
-  declare_ddouble(o);
-  o << "private: // data\n";
-  size_t total_nodes = _nodes.size() + 10;
-  // circuit().req_nodes().size() + circuit().opt_nodes().size() + circuit().local_nodes().size();
-  o << ind << "node_t _nodes[" << total_nodes << "];\n";
-  o << "private: // construct\n";
-  o << ind << "explicit Module(Module const&);\n";
-  o << "public:\n";
-  o << ind << "explicit Module() : COMPONENT() { _n = _nodes; }\n";
-  o << ind << "CARD* clone()const override { return new Module(*this); }\n";
-  o << "private: // overrides\n";
-  o << ind << "double tr_probe_num(std::string const&) const;\n";
-  o << ind << "std::string dev_type()const override {return \"demo\";}\n";
-  o << ind << "int max_nodes()const override {return 4;}\n";
-  o << ind << "int min_nodes()const override {return 2;}\n";
-  o << ind << "std::string value_name()const override {untested(); return \"\";}\n";
-  o << ind << "bool print_type_in_spice()const override {untested(); return false;}\n";
-  o << ind << "std::string port_name(int i)const override {\n";
-  o << ind << ind << "assert(i >= 0);\n";
-  o << ind << ind << "assert(i < 4);\n";
-  o << ind << ind << "static std::string names[] = {\"a\", \"b\", \"c\", \"d\", \"\"};\n";
-  o << ind << ind << "return names[i];\n";
-  o << ind << "}\n";
-  o << "private: // impl\n";
-  // o << ind << "void clear_branch_contributions();\n";
-  o << "/* ========== */\n";
-
-  o << "private: // data\n";
-  o << ind << "ddouble _branches;\n";
-  for(auto x : _branches){
-    assert(x.second);
-    o << ind << "ddouble _branch" << x.second->name() << ";\n";
-  }
-
-  std::string comma="";
-  o << "private: // node list\n";
-  o << ind << "enum {";
-  for (auto nn : _nodes){ // BUG: array?
-    o << comma << "n_" << nn.second->name();
-    comma = ", ";
-  }
-  o << ind << "};\n";
-
-  comma="";
-  o << "private: // probe list\n";
-  o << ind << "enum {";
-  for (auto nn : _probes){
-    o << comma << "p_" << nn.second->name();
-    comma = ", ";
-  }
-  o << ind << "};\n";
-
-  for(auto x : _probes){
-    assert(x.second);
-    o << ind << "double " << x.second->name() << ";\n";
-  }
-
-  o << ind << "bool tr_needs_eval() const override{ return true; }\n";
-  o << ind << "bool do_tr() override; // AnalogBlock\n";
-  o << ind << "void read_voltages();\n";
-  o << ind << "void clear_branch_contributions(){\n";
-  for(auto x : _branches){
-    assert(x.second);
-    o << ind << ind << "_branch" << x.second->name() << ".clear();\n";
-  }
-  o << ind << "}\n";
-
-  o << "}m; /* Module */\n"
-    "/*--------------------------------------"
-    "------------------------------------*/\n";
-//  o << "template<>\n"
-//       "Module::ddouble chain_rule(Module::ddouble& x, double d)\n{\n";
-//  o << ind << "return x.chain_rule(d);\n"
-//       "}\n"
-    "/*--------------------------------------"
-    "------------------------------------*/\n";
-  o << "Module::Module(Module const&p) : COMPONENT(p)\n{\n"
-    << ind << "_n = _nodes;\n"
-    << ind << "for (int ii = 0; ii < max_nodes() + int_nodes(); ++ii) {\n"
-    << ind << ind << "_n[ii] = p._n[ii];\n"
-    << ind << "}\n";
-  o << "}\n"
-    "/*--------------------------------------"
-    "------------------------------------*/\n";
-  o << "double Module::tr_probe_num(std::string const& n) const\n{\n";
-  // no range check whatsoever. debugging/testing, remove later.
-  for(int i=0; i<4; ++i){
-    o << ind << "if(n == \"v" << i << "\") return _n[" << i << "].v0();\n";
-    o << ind << "if(n == \"i" << i << "\") return (&_branches+" << i << "+ 1)->value();\n";
-    for(int j=0; j<4; ++j){
-      o << ind << "if(n == \"i" << i << "_d"<<j<<"\") return (&_branches+" << i << "+ 1)->d("<<j<<");\n";
-    }
-  }
-  o << ind << "return NOT_VALID;\n";
-  o << "}\n"
-    "/*--------------------------------------"
-    "------------------------------------*/\n";
-  o << "void Module::read_voltages() {\n";
-  for(auto x : _probes){
-    Probe const* p = x.second;
-    assert(p);
-    o << ind << p->name() << " = volts_limited(_n[n_"<< p->pname() <<"], _n[n_"<< p->nname() <<"]);\n";
-  }
-  o << "}\n"
-    "/*--------------------------------------"
-    "------------------------------------*/\n";
-
-  assert(front());
-  front()->dump(o); // the analog block, for now.
-} // Module::dump
-/*--------------------------------------------------------------------------*/
-void AnalogBlock::dump(std::ostream& o)const
-{
-  o << "bool Module::do_tr(){ // AnalogBlock\n";
-  o << ind << "clear_branch_contributions();\n";
-  o << ind << "read_voltages();\n";
-  for(auto i : *this) {
-    // need commmon baseclass...
-    if(auto v=dynamic_cast<Variable const*>(i)) {
-      v->dump(o);
-    }else if(auto v=dynamic_cast<FlowContribution const*>(i)) { untested();
-      v->dump(o);
-    }else if(auto v=dynamic_cast<PotContribution const*>(i)) { untested();
-      v->dump(o);
-    }else{ untested();
-      incomplete();
-    }
-  }
-  o << ind << "return true;\n";
-  o << "} // AnalogBlock\n";
 }
 /*--------------------------------------------------------------------------*/
 void Variable::resolve_symbols(Expression const& e, Expression& E)
@@ -740,7 +477,7 @@ void Variable::resolve_symbols(Expression const& e, Expression& E)
       }
     }else if(auto v = dynamic_cast<Variable const*>(r)) {
       trace2("resolve: variable", name(), v->name());
-      E.push_back(new Token_VARIABLE(n, v));
+      E.push_back(new Token_VAR_REF(n, v));
       for(auto d : v->deps()) {
 	_deps.insert(d);
       }
@@ -765,36 +502,6 @@ void Variable::resolve_symbols(Expression const& e, Expression& E)
   }
 }
 /*--------------------------------------------------------------------------*/
-void Variable::dump(std::ostream& o)const
-{
-  o << ind << "ddouble " << _name << "; // Variable";
-  for(auto i : _deps) { untested();
-    o << ind << " Dep: " << i->name();
-  }
-  o << ind << "\n";
-}
-/*--------------------------------------------------------------------------*/
-void FlowContribution::dump(std::ostream& o)const
-{
-  o << ind << "{ // FlowContribution " << _lhsname << "\n";
-  {
-    indent x("  ");
-    if(_rhs) {
-      ::dump(*_rhs, o);
-    }else{ untested();
-    }
-
-    assert(_branch);
-    o << ind << ind << "_branch" << _branch->name() << ".value() += t0.value();\n";
-    for(auto v : deps()) {
-      o << ind << ind << "_branch" << _branch->name()
-      // << "._" << v->name() << " += " << "t0._" << v->name() << ";\n";
-	<< "[p_" << v->name() << "] += " << "t0[p_" << v->name() << "];\n";
-    }
-  }
-  o << ind <<  "}\n";
-}
-/*--------------------------------------------------------------------------*/
 void FlowContribution::parse(CS& cmd)
 {
   trace1("FlowContribution::parse", cmd.tail());
@@ -809,32 +516,7 @@ void FlowContribution::parse(CS& cmd)
   trace1("Contribution::parse", cmd.tail());
   Assignment::parse(cmd);
 }
-/*--------------------------------------------------------------------------*/
-void Assignment::dump(std::ostream& o)const
-{
-  // out << "{ // RPN ";
-  // for (const_iterator i = e.begin(); i != e.end(); ++i) { untested();
-  //   out << "" << (*i)->full_name() << " ";
-  // }
-  o << ind << "{ // Assignment '" << _lhsname << "'.";
-  for(auto i : _deps) {
-    o << " Dep: " << i->name();
-  }
-  o << "\n";
-
-  if(_rhs) {
-    indent x("  ");
-    //      _rhs->dump(o);
-    ::dump(*_rhs, o);
-    o << ind << _lhsname << ".value() = t0.value();\n";
-    for(auto v : deps()) {
-      // o << ind << _lhsname << "._" << v->name() << " = " << "t0._" << v->name() << ";\n";
-      o << ind << _lhsname << "[p_" << v->name() << "] = " << "t0[p_" << v->name() << "];\n";
-    }
-  }else{ untested();
-  }
-  o << ind << "}\n";
-}
+#endif
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -842,24 +524,33 @@ namespace {
 class CMD_ : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST*)override {
-    Module mock;
+
+    std::string name;
+
+    std::string module_content;
+    for (;;) {
+      cmd.get_line("verilog-module>");
+      trace1("content", cmd.fullstring());
+
+      module_content += cmd.fullstring();
+      if (cmd >> "endmodule ") {
+	break;
+      }else{
+      }
+    }
+
+
+    CS file(CS::_STRING, "");
+    file = module_content;
+    file >> "module ";
+    size_t here = file.cursor();
+    file >> name;
+    file.reset(here);
+
+    Module mock(file);
 
     std::ofstream o;
-    std::string name;
-    cmd >> name;
     o.open(name + ".cc");
-
-    mock.parse_ports(cmd);
-    cmd.get_line("");
-
-    AnalogBlock* ab = new AnalogBlock();
-    ab->set_ctx(&mock);
-    ab->parse(cmd);
-    mock.push_back(ab);
-
-    cmd.get_line("");
-    cmd >> "endmodule ";
-
     o << "#include <gnucap/globals.h>\n"
          "#include <gnucap/e_compon.h>\n"
          "#include <gnucap/e_node.h>\n"
@@ -869,9 +560,7 @@ public:
     o << "namespace {\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
-    mock.dump(o);
-    o << "DISPATCHER<CMD>::INSTALL d0(&device_dispatcher, \""
-      << name << "\", &m);\n"
+    make_cc_module(o, mock);
     "/*--------------------------------------"
     "------------------------------------*/\n";
     o << "} // namespace\n"
@@ -880,7 +569,7 @@ public:
     o.close();
   }
 } p0;
-DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "demo_module", &p0);
+DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "`modelgen|demo_module", &p0);
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/

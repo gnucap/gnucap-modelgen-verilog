@@ -1,0 +1,14 @@
+// Linear resistor (conductance formulation)
+// kk-3-02.vams
+
+`include "disciplines.vams"
+
+module conductor (p, n);
+	parameter real g=0;	// conductance (Siemens)
+	inout p, n;
+	electrical p, n;
+
+	analog begin
+		I(p,n) <+ g * V(p,n);
+	end
+endmodule
