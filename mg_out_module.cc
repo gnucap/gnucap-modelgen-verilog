@@ -125,7 +125,7 @@ static void make_module_class(std::ostream& o, Module const& m)
   o << "// seq blocks\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
-  for(auto bb : m){ untested();
+  for(auto bb : m){
     assert(bb);
     if(auto ab = dynamic_cast<AnalogBlock const*>(bb)){
       o << "bool MOD_" << m.identifier() << "::do_tr() // Common::tr_eval? AnalogBlock\n{\n";

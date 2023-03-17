@@ -62,12 +62,12 @@ static void dump(const File& in, std::ostream& out)
 }
 /*--------------------------------------------------------------------------*/
 int main(int argc, char** argv)
-{ untested();
+{
   File f;
   --argc;
   ++argv;
   trace1("main", argc);
-  for(; argc>1; --argc, ++argv) try{ untested();
+  for(; argc>1; --argc, ++argv) try{
     trace2("main", argc, argv[0]);
     // if (argc > 2 && strcmp(argv[1],"-h")==0) {
     //   for (int i=2; i<argc; ++i) {
@@ -81,28 +81,28 @@ int main(int argc, char** argv)
       --argc;
       ++argv;
     }else if (strcmp(argv[0],"--pp")==0
-          ||  strcmp(argv[0],"-E")==0) { untested();
+          ||  strcmp(argv[0],"-E")==0) {
       f.read(argv[1]);
       preprocess(f, std::cout);
       --argc;
       ++argv;
-    }else if (argc > 1 && strcmp(argv[0],"-D")==0) { untested();
+    }else if (argc > 1 && strcmp(argv[0],"-D")==0) {
       if(argv[0][2]) { untested();
 	f.define(argv[0]+2);
-      }else{ untested();
+      }else{
 	f.define(argv[1]);
 	--argc;
 	++argv;
       }
-    }else if (argc > 1 && strcmp(argv[0],"-I")==0) { untested();
+    }else if (argc > 1 && strcmp(argv[0],"-I")==0) {
       if(argv[0][2]) { untested();
 	f.add_include_path(argv[0]+2);
-      }else{ untested();
+      }else{
 	f.add_include_path(argv[1]);
 	--argc;
 	++argv;
       }
-    }else if (argc > 1 && strcmp(argv[0],"--dump")==0) { untested();
+    }else if (argc > 1 && strcmp(argv[0],"--dump")==0) {
       trace1("dump", argv[1]);
       f.read(argv[1]);
       dump(f, std::cout);

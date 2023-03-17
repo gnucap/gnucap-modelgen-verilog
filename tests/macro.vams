@@ -1,6 +1,6 @@
 
 `define thing module
-// `define stuff end`thing
+`define samething `thing
 
 `ifdef thing
 `thing a(1,2);
@@ -12,7 +12,7 @@ parse_error
 `ifdef bla
 parse_error
 `else
-module b(1,2);
+`samething b(1,2);
 endmodule;
 `endif
 
@@ -29,3 +29,4 @@ endmodule;
 `else
 parse_error
 `endif
+

@@ -129,19 +129,19 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
   o << "/* RPN ";
   assert(a.rhs());
   auto e = *a.rhs();
-  for (Expression::const_iterator i = e.begin(); i != e.end(); ++i) { untested();
+  for (Expression::const_iterator i = e.begin(); i != e.end(); ++i) {
     o << "" << (*i)->full_name() << " ";
   }
   o << "*/\n";
 
 
   o << ind << "{ // Assignment '" << a.lhsname() << "'.";
-  for(auto i : a.deps()) { untested();
+  for(auto i : a.deps()) {
     o << " Dep: " << i->name();
   }
   o << "\n";
 
-  if(1) { untested();
+  if(1) {
     indent x("  ");
     //      _rhs->dump(o);
     make_cc_expression(o, e);
@@ -185,7 +185,7 @@ void make_cc_analog(std::ostream& o, AnalogBlock const& ab)
 {
   for(auto i : ab) {
     // need commmon baseclass...
-    if(auto fc=dynamic_cast<FlowContribution const*>(i)) { untested();
+    if(auto fc=dynamic_cast<FlowContribution const*>(i)) {
       make_cc_fc(o, *fc);
     }else if(auto pc=dynamic_cast<PotContribution const*>(i)) { untested();
       make_cc_pc(o, *pc);

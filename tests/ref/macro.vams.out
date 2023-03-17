@@ -1,4 +1,5 @@
 `define thing module
+`define samething  module 
 
 
 

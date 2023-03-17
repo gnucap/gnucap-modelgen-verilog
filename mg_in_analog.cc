@@ -71,9 +71,9 @@ static int is_va_function(std::string const& n)
   if (n == "exp"
    || n == "log"
    || n == "cos"
-   || n == "sin") { untested();
+   || n == "sin") {
     return 1;
-  }else if (n == "pow"){ untested();
+  }else if (n == "pow"){
     return 2;
   }else{
     return 0;
@@ -81,7 +81,7 @@ static int is_va_function(std::string const& n)
 }
 /*--------------------------------------------------------------------------*/
 static bool is_pot_function(std::string const& n)
-{ untested();
+{
   // stub, need discipline.h
   return n == "V";
 }
@@ -104,7 +104,7 @@ void AnalogBlock::parse(CS& file)
   bool has_begin = (file >> "begin ");
   trace2("AB parse", file.tail(), has_begin);
 
-  for (;;) { untested();
+  for (;;) {
     // TODO: move parse_seq code here.
     size_t here = file.cursor();
     ONE_OF	// module_item
@@ -115,7 +115,7 @@ void AnalogBlock::parse(CS& file)
     if (!has_begin){
       file.umatch(";");
       break;
-    }else if (file.umatch("end ")) { untested();
+    }else if (file.umatch("end ")) {
       break;
     }else if (!file.more()) {
       file.warn(0, "premature EOF (analog)");
@@ -130,7 +130,7 @@ void AnalogBlock::parse(CS& file)
 }
 /*--------------------------------------------------------------------------*/
 CS& AnalogBlock::parse_real(CS& cmd)
-{ untested();
+{
     trace1("AnalogBlock::parse real", cmd.tail());
 
     std::string name;
@@ -145,18 +145,18 @@ CS& AnalogBlock::parse_real(CS& cmd)
 //    _var_refs[name] = a;
 // analog sequential block
 CS& AnalogBlock::parse_seq(CS& cmd)
-{ untested();
+{
   assert(_ctx);
   std::string what;
   size_t here = cmd.cursor();
   cmd >> what;
-  if(is_pot_function(what)) { untested();
+  if(is_pot_function(what)) {
     assert(_ctx);
     PotContribution* a = new PotContribution(what);
     a->set_ctx(this);
     cmd >> *a;
     push_back(a);
-  }else if(is_flow_function(what)) { untested();
+  }else if(is_flow_function(what)) {
     assert(_ctx);
     FlowContribution* a = new FlowContribution(what);
     a->set_ctx(this);
@@ -168,7 +168,7 @@ CS& AnalogBlock::parse_seq(CS& cmd)
     incomplete();
   }else if(cmd >> "+=") { untested();
     incomplete();
-  }else if(cmd >> "=") { untested();
+  }else if(cmd >> "=") {
     Assignment* a = new Assignment(what);
     a->set_ctx(this);
     a->parse(cmd);
@@ -270,10 +270,10 @@ void Variable::resolve_symbols(Expression const& e, Expression& E)
     }else if(auto p = dynamic_cast<Parameter_Base const*>(r)) {
       trace2("resolve: param", name(), p->name());
       E.push_back(new Token_PAR_REF(n, p));
-    }else if(auto v = dynamic_cast<Variable const*>(r)) { untested();
+    }else if(auto v = dynamic_cast<Variable const*>(r)) {
       trace2("resolve: variable", name(), v->name());
       E.push_back(new Token_VAR_REF(n, v));
-      for(auto d : v->deps()) { untested();
+      for(auto d : v->deps()) {
 	_deps.insert(d);
       }
     }else if(auto pr = dynamic_cast<Probe const*>(r)) { untested();
@@ -283,15 +283,15 @@ void Variable::resolve_symbols(Expression const& e, Expression& E)
     }else if(r) { untested();
       assert(0);
       incomplete(); // unresolved symbol?
-    }else if (strchr("0123456789.", n[0])) { untested();
+    }else if (strchr("0123456789.", n[0])) {
       // a number
       Float* f = new Float(n);
       E.push_back(new Token_CONSTANT(i->name(), f, ""));
-    }else if(is_va_function(i->name())) { untested();
+    }else if(is_va_function(i->name())) {
       E.push_back(i->clone()); // try later?
     }else if(is_node(i->name())) {
       E.push_back(i->clone()); // try later?
-    }else{ untested();
+    }else{
       throw Exception("unresolved symbol: " + n);
     }
   }
@@ -342,7 +342,7 @@ Node const* Module::node(std::string const& p) const
   auto i = _nodes.find(p);
   if(i != _nodes.end()) {
     return i->second;
-  }else{ untested();
+  }else{
     return NULL;
     throw Exception("no such node " + p );
   }

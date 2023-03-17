@@ -161,39 +161,147 @@ The following compiler directives are supported:
 void Define::parse(CS& f)
 {
   f >> _name;
+  f >> _args;
   _value = f.get_to("\n");
-  // TODO: resolve ` in value
-  // TODO: macros with args?
+}
+/*--------------------------------------------------------------------------*/
+void Define::preprocess(Define_List const& d)
+{
+  CS file(CS::_STRING, _value.to_string());
+  std::string stripped_file;
+  size_t here = file.cursor();
+  int if_block = 0;
+  int else_block = 0;
+  for (;;) {
+    stripped_file += file.get_to("\"/`");
+    if (file.match1('\"')) { untested();
+      // quoted string
+      stripped_file += '"' + file.ctos("", "\"", "\"", "") + '"';
+    }else if (file >> "`else"
+	    ||file >> "`endif"
+	    ||file >> "`ifndef"
+	    ||file >> "`ifdef"
+	    ||file >> "`include"
+	    ||file >> "`undef") { untested();
+      throw Exception_CS("not allowed here", file);
+    }else if (file >> "`") {
+      // macro substitution
+      Define_List::const_iterator x = d.find(file);
+      if (x != d.end()) {
+	assert(*x);
+	stripped_file += (*x)->substitute(file) + " ";
+      }else{untested();
+	// error: not defined
+      }
+    }else{
+      // move on, just copy
+    }
+    if (!file.ns_more()) {
+      // proper end of file
+      break;
+    }else if (file.stuck(&here)) {
+      // comment ran to end of file
+      break;
+    }else{
+    }
+  }
+  _value = stripped_file;
 }
 /*--------------------------------------------------------------------------*/
 void Define::dump(std::ostream& f)const
-{ untested();
-  f << "`define " << name() << " " << value() << "\n";
+{
+  f << "`define " << name();
+  if(_args.size()){
+   f << _args;
+  }else{
+  }
+  f << " " << value() << "\n";
+}
+/*--------------------------------------------------------------------------*/
+std::string Define::substitute(CS& f) const
+{
+  String_Arg_List values;
+  values.parse_n(f, _args.size());
+
+  std::map<std::string, String_Arg*> subs;
+  auto j = values.begin();
+  for(auto i : _args){
+    if(j == values.end()){
+      // BUG: positioning seems wrong
+      throw Exception_CS("Need more values", f);
+    }else{
+      subs[i->to_string()] = *j;
+      ++j;
+    }
+  }
+  CS file(CS::_STRING, _value.to_string());
+  std::string stripped_file = "";
+
+  for (;;) {
+    size_t here = file.cursor();
+    std::string more;
+
+    if(file.is_term()){
+      more = file.peek();
+      file.skip(1);
+    }else{
+      auto it = _args.find(file);
+      if(it != _args.end()){
+	auto k = values.begin();
+	for(; it != _args.begin(); --it){
+	  ++k;
+	}
+	more = (*k)->to_string();
+      }else{
+	file >> more;
+      }
+    }
+
+    stripped_file = stripped_file + " " + more;
+
+    if (!file.ns_more()) {
+      break;
+    }else if (file.stuck(&here)) {
+      break;
+    }else{
+    }
+  }
+
+  return stripped_file;
 }
 /*--------------------------------------------------------------------------*/
 std::string File::preprocess(const std::string& file_name)
-{ untested();
+{
   CS file(CS::_WHOLE_FILE, file_name);
 
   std::string stripped_file;
   size_t here = file.cursor();
   int if_block = 0;
   int else_block = 0;
-  for (;;) { untested();
+  for (;;) {
     stripped_file += file.get_to("\"/`");
-    if (file.match1('\"')) { //---------------- quoted string
+    if (file.match1('\"')) {
+      // quoted string
       stripped_file += '"' + file.ctos("", "\"", "\"", "") + '"';
     }else if (file >> "/*") { //---------------- C comment
       file >> dummy_c_comment; //BUG// line count may be wrong
     }else if (file >> "//") { //---------------- C++ comment
       file >> dummy_cxx_comment;
-    }else if (file >> "`define") { untested();
-      file >> _define_list;
+    }else if (file >> "`define") {
+      if(file >> _define_list){
+	auto e = _define_list.end();
+	assert(e!=_define_list.begin());
+	--e;
+	untested();
+	(*e)->preprocess(define_list());
+      }else{
+	unreachable();
+      }
     }else if (file >> "`include") { //---------------- include
       std::string include_file_name;
       file >> include_file_name;
       stripped_file += include(include_file_name);
-    }else if (file >> "`ifdef") { untested();
+    }else if (file >> "`ifdef") {
       Define_List::const_iterator x = define_list().find(file);
       if (x != define_list().end()) {
 	++if_block;
@@ -201,24 +309,24 @@ std::string File::preprocess(const std::string& file_name)
 	file >> skip_block;
 	++else_block;
       }
-    }else if (file >> "`ifndef") { untested();
+    }else if (file >> "`ifndef") {
       Define_List::const_iterator x = define_list().find(file);
-      if (x != define_list().end()) { untested();
+      if (x != define_list().end()) {
 	file >> skip_block;
 	++else_block;
-      }else{ untested();
+      }else{
 	String_Arg s;
 	file >> s; // discard.
 	++if_block;
       }
-    }else if (file >> "`else") { //---------------- else
+    }else if (file >> "`else") {
       if (if_block > 0) {
 	file >> skip_block;
 	--if_block;
       }else{untested();
 	// error
       }
-    }else if (file >> "`endif") { //---------------- endif
+    }else if (file >> "`endif") {
       if (else_block > 0) {
 	--else_block;
       }else if (if_block > 0) {
@@ -226,11 +334,12 @@ std::string File::preprocess(const std::string& file_name)
       }else{untested();
 	// error
       }
-    }else if (file >> "`") { //---------------- macro substitution
+    }else if (file >> "`") {
+      // macro substitution
       Define_List::const_iterator x = define_list().find(file);
       if (x != define_list().end()) {
 	assert(*x);
-	stripped_file += (**x).value().to_string() + " ";
+	stripped_file += (*x)->substitute(file) + " ";
       }else{untested();
 	// error: not defined
       }
@@ -256,21 +365,22 @@ File::File() : _file(CS::_STRING, "")
 /*--------------------------------------------------------------------------*/
 void File::add_include_path(std::string const& what)
 {
-  trace1("add include", what);
-  static std::string colon = "";
+  std::string colon = "";
+  if(_include_path.size()){
+    colon = ":";
+  }else{
+  }
   _include_path = _include_path + colon + what;
-  colon = ":";
 }
 /*--------------------------------------------------------------------------*/
 void File::define(std::string const& what)
 {
-  trace1("define", what);
   CS cmd(CS::_STRING, what);
   cmd >> _define_list;
 }
 /*--------------------------------------------------------------------------*/
 std::string File::include(std::string const& file_name)
-{ untested();
+{
   std::string full_file_name = findfile(file_name, _cwd+":"+_include_path, R_OK);
 
   if(full_file_name == ""){
@@ -317,8 +427,6 @@ void File::read(std::string const& file_name)
     _cwd = file_name.substr(0, sepplace);
   }
   _file = preprocess(file_name);
-//  trace1("=============", _file.fullstring());
-//  trace0("=============");
 
 
   size_t here = _file.cursor();
@@ -339,7 +447,7 @@ void File::read(std::string const& file_name)
       || ((_file >> "cc_direct ")    && (_file >> _cc_direct))
 #endif
       ;
-    if (!_file.more()) { untested();
+    if (!_file.more()) {
       break;
     }else if (_file.stuck(&here)) {untested();
       _file.warn(0, "syntax error, need nature, discipline, or module");

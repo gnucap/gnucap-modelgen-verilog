@@ -243,7 +243,7 @@ void Port_3::dump(std::ostream& out)const
 +		list_of_port_identifiers
 */
 void Module::parse(CS& file)
-{ untested();
+{
   // file >> "module |macromodule |connectmodule "; from caller
   file >> _identifier >> _ports >> ';';
   assert(_parameters.ctx() == this);
@@ -264,13 +264,13 @@ void Module::parse(CS& file)
       || ((file >> "parameter ") && (file >> _parameters))
       || ((file >> "localparam ") && (file >> _local_params))
       ;
-    if (file.stuck(&here)) { untested();
+    if (file.stuck(&here)) {
       break;
-    }else{ untested();
+    }else{
     }
   }
   bool end=false;
-  for (;;) { untested();
+  for (;;) {
     ONE_OF	// non-port module_item
       || file.umatch(";")
       // mi, npmi, mogi, module_or_generate_item_declaration
@@ -282,7 +282,7 @@ void Module::parse(CS& file)
       || ((file >> "endmodule ") && (end = true))
       || (file >> _element_list)	// module_instantiation
       ;
-    if (end){ untested();
+    if (end){
       break;
     }else if (!file.more()) {
       file.warn(0, "premature EOF (module)");
@@ -334,7 +334,7 @@ void Module::dump(std::ostream& o)const
   }else{
   }
 
-  for(auto i: *this){ untested();
+  for(auto i: *this){
     o << *i << "\n";
   }
 
@@ -342,7 +342,7 @@ void Module::dump(std::ostream& o)const
 }
 /*--------------------------------------------------------------------------*/
 CS& Module::parse_analog(CS& cmd)
-{ untested();
+{
   AnalogBlock* ab = new AnalogBlock();
   ab->set_ctx(this);
   ab->parse(cmd);

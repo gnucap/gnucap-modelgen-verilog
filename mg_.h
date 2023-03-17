@@ -82,7 +82,9 @@ class String_Arg :public Base {
 public:
   String_Arg() {}
   String_Arg(const char* s) : _s(s) {}
+  explicit String_Arg(std::string const& s) : _s(s) {}
   //String_Arg(const std::string& s) : _s(s) {}
+  const String_Arg&  key()const	  {return *this;}
   void parse(CS& f)			 {f >> _s;}
   void dump(std::ostream& f)const	 {f << _s;}
   void operator=(const std::string& s)	 {_s = s;}
@@ -93,7 +95,7 @@ public:
   std::string		lower()const	 {return to_lower(_s);}
   const std::string&	to_string()const {return _s;}
   void set_ctx(Block*){
-    incomplete();
+    // incomplete();
   }
 };
 /*--------------------------------------------------------------------------*/
@@ -194,6 +196,7 @@ class LiSt :public List_Base<T> {
   Block* _ctx{NULL};
 //  using List_Base<T>::_list;
 public:
+  using List_Base<T>::size;
   using List_Base<T>::push_back;
   using List_Base<T>::begin;
   using List_Base<T>::end;
@@ -204,7 +207,10 @@ public:
 
   void set_ctx(Block* b){ _ctx = b; }
   Block const* ctx() const{return _ctx;}
-  void parse(CS& file) {
+  void parse(CS& file) override{
+    parse_n(file);
+  }
+  void parse_n(CS& file, unsigned max=-1u) {
     int paren = !BEGIN || file.skip1b(BEGIN);
     size_t here = file.cursor();
     for (;;) {
@@ -219,17 +225,20 @@ public:
 	T* p = new T;
 	p->set_ctx(_ctx);
 	file >> *p;
-	if (!file.stuck(&here)) {
-	  push_back(p);
-	}else{itested();
+	if (file.stuck(&here)) { untested();
 	  delete p;
 	  file.warn(0, "not valid here");
 	  break;
+	}else if (max==size()){
+	  throw Exception_Too_Many(size()+1, max, 0);
+	}else{
+	  push_back(p);
 	}
       }else{ untested();
       }
     }
   }
+public:
   void dump(std::ostream& f)const override {
     if (BEGIN) {
       f << BEGIN;
@@ -252,7 +261,32 @@ public:
     }else{ untested();
     }
   }
+
+  // List_Base? (see Collection)
+  const_iterator find(const String_Arg& s) const {
+    for (const_iterator ii = begin(); ii != end(); ++ii) {
+      assert(ii != end());
+      assert(*ii);
+      if (s == (**ii).key()) {
+	return ii;
+      }else{
+      }
+    }
+    return end();
+  }
+  const_iterator find(CS& file) const {
+    size_t here = file.cursor();
+    String_Arg s;
+    file >> s;
+    const_iterator x = find(s);
+    if (x == end()) {
+      file.reset(here);
+    }else{
+    }
+    return x;
+  }
 };
+typedef LiSt<String_Arg, '(', ',', ')'> String_Arg_List;
 /*--------------------------------------------------------------------------*/
 /* A "Collection" differs from a "LiSt" in how it is parsed.
  * Each parse of a "Collection" created one more object and stores
@@ -277,7 +311,8 @@ public:
     T* m = new T(file);
     if (!file.stuck(&here)) {
       push_back(m);
-    }else{untested();
+      file.skip(0); // set _ok;
+    }else{
       delete m;
       file.warn(0, "what's this??");
     }
@@ -292,7 +327,7 @@ public:
     for (const_iterator ii = begin(); ii != end(); ++ii) {
       assert(ii != end());
       assert(*ii);
-      if (s == (**ii).key()) { untested();
+      if (s == (**ii).key()) {
 	return ii;
       }else{
       }
@@ -306,7 +341,7 @@ public:
     const_iterator x = find(s);
     if (x == end()) {
       file.reset(here);
-    }else{ untested();
+    }else{
     }
     return x;
   }
@@ -630,7 +665,7 @@ public:
   void parse(CS&) override;
   void dump(std::ostream& f)const override;
   Element_2() {}
-  Element_2(CS& f) { untested();
+  Element_2(CS& f) {
     parse(f);
   }
   void set_ctx(Block* b){ untested();
@@ -836,6 +871,7 @@ typedef Collection<Attribute> Attribute_List;
 /*--------------------------------------------------------------------------*/
 class Define :public Base {
   String_Arg _name;
+  String_Arg_List _args;
   String_Arg _value;
 public:
   void parse(CS& f);
@@ -844,6 +880,9 @@ public:
   const String_Arg&  key()const   {return _name;}
   const String_Arg&  name()const  {return _name;}
   const String_Arg&  value()const {return _value;}
+
+  std::string substitute(CS& f) const;
+  void preprocess(Collection<Define> const&);
 };
 typedef Collection<Define> Define_List;
 /*--------------------------------------------------------------------------*/
@@ -1088,7 +1127,7 @@ public:
     assert(_ctx);
     return _ctx->new_probe(xs, p, n);
   }
-  Branch const* new_branch(std::string const& p, std::string const& n)override { untested();
+  Branch const* new_branch(std::string const& p, std::string const& n)override {
     assert(_ctx);
     return _ctx->new_branch(p, n);
   }
