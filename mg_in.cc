@@ -155,7 +155,7 @@ The following compiler directives are supported:
 - `resetall[1364-2005]
 - `timescale[1364-2005]
 - `unconnected_drive[1364-2005]
-- `undef[10.4]
++ `undef[10.4]
 */
 /*--------------------------------------------------------------------------*/
 void Define::parse(CS& f)
@@ -163,11 +163,16 @@ void Define::parse(CS& f)
   f >> _name;
   f >> _args;
   _value = f.get_to("\n");
+  if(_value.is_empty()){
+    _value = std::string("1");
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Define::preprocess(Define_List const& d)
 {
   CS file(CS::_STRING, _value.to_string());
+  trace1("Define::preprocess", _value.to_string());
   std::string stripped_file;
   size_t here = file.cursor();
   int if_block = 0;
@@ -182,7 +187,7 @@ void Define::preprocess(Define_List const& d)
 	    ||file >> "`ifndef"
 	    ||file >> "`ifdef"
 	    ||file >> "`include"
-	    ||file >> "`undef") { untested();
+	    ||file >> "`undef") {
       throw Exception_CS("not allowed here", file);
     }else if (file >> "`") {
       // macro substitution
@@ -288,13 +293,15 @@ std::string File::preprocess(const std::string& file_name)
     }else if (file >> "//") { //---------------- C++ comment
       file >> dummy_cxx_comment;
     }else if (file >> "`define") {
-      if(file >> _define_list){
-	auto e = _define_list.end();
-	assert(e!=_define_list.begin());
-	--e;
-	untested();
-	(*e)->preprocess(define_list());
-      }else{
+      size_t l = file.cursor();
+      if(_define_list.find(file) != _define_list.end()){
+	file.reset(l);
+	std::string def = file.get_to("\n");
+	_file.warn(0, "already defined: " + def);
+      }else if(file >> _define_list){
+	auto e = _define_list.back();
+	e->preprocess(define_list());
+      }else{ untested();
 	unreachable();
       }
     }else if (file >> "`include") { //---------------- include
@@ -333,6 +340,15 @@ std::string File::preprocess(const std::string& file_name)
 	--if_block;
       }else{untested();
 	// error
+      }
+    }else if (file >> "`undef") {
+      Define_List::const_iterator x = define_list().find(file);
+      if (x != define_list().end()) {
+	_define_list.erase(x);
+      }else{ untested();
+	std::string err;
+	file >> err;
+	_file.warn(0, "not defined: " + err);
       }
     }else if (file >> "`") {
       // macro substitution
