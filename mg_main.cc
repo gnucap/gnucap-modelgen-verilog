@@ -86,7 +86,7 @@ int main(int argc, char** argv)
       preprocess(f, std::cout);
       --argc;
       ++argv;
-    }else if (argc > 1 && strcmp(argv[0],"-D")==0) {
+    }else if (argc > 1 && strncmp(argv[0],"-D", 2)==0) {
       if(argv[0][2]) { untested();
 	f.define(argv[0]+2);
       }else{
@@ -94,7 +94,7 @@ int main(int argc, char** argv)
 	--argc;
 	++argv;
       }
-    }else if (argc > 1 && strcmp(argv[0],"-I")==0) {
+    }else if (argc > 1 && strncmp(argv[0], "-I", 2)==0) {
       if(argv[0][2]) { untested();
 	f.add_include_path(argv[0]+2);
       }else{
