@@ -162,6 +162,7 @@ void Define::parse(CS& f)
 {
   f >> _name;
   f >> _args;
+  // BUG: need nonempty macro_text
   _value = f.get_to("\n");
   if(_value.is_empty()){
     _value = std::string("1");
