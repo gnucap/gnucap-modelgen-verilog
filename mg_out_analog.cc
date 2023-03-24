@@ -106,10 +106,24 @@ static void make_cc_expression(std::ostream& out, Expression const& e)
       case '*':
       case '/':
 	out << ind << "t" << idx << " "<< op << "= t" << idy << ";\n";
+	break;
       default:
+	incomplete();
+	unreachable();
 	;
       }
       // ++idx;
+    }else if (dynamic_cast<const Token_UNARY*>(*i)) { untested();
+      int idy = idxs.top();
+      char op = (*i)->name()[0];
+      if(op == '-') { untested();
+	out << ind << "t" << idx << " *= -1.;\n";
+      }else{ untested();
+	incomplete();
+	unreachable();
+      }
+    }else{
+      unreachable();
     }
   }
   assert(!idx);

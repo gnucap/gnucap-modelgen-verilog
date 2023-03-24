@@ -60,7 +60,14 @@ public:
 		}
 		return *this;
 	}
-	ddouble_& operator*=(const ddouble_& o) {
+	ddouble_& operator*=(const double& o) { untested();
+		for(int i=1; i<=numderiv; ++i){ untested();
+			_data[i] *= o;
+		}
+		*_data *= o;
+		return *this;
+	}
+	ddouble_& operator*=(const ddouble_& o) { untested();
 		for(int i=1; i<=numderiv; ++i){
 			_data[i] *= *o._data; _data[i] += *_data * o._data[i];
 		}
