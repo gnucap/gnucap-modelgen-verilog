@@ -1,0 +1,12 @@
+g++ -DTRACE_UNTESTED -g -O0 -fPIC  -I../include portnames0.cc -o portnames0.o -c
+g++ -shared  -I../include portnames0.o  -o portnames0.so
+rm portnames0.o
+
+portnames0 #() dut (.np(0),.nn(1));
+resistor #(.r(1)) r1 (.p(1),.n(0));
+portnames0 #() dut (.np(2),.nn(0));
+portnames0 #() dut (.np(0),.nn(2));
+portnames0 #() dut (.np(0),.nn(2));
+resistor #(.r(1)) r2 (.p(2),.n(0));
+#           v(r1)      v(1)       v(2)      
+ 0.         1.1        1.1        1.1       

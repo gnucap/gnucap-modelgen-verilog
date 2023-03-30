@@ -34,10 +34,22 @@ static void make_header(std::ostream& out, const File& in,
     "#include \"e_node.h\"\n"
     "#include \"e_subckt.h\"\n"
     "#include \"e_model.h\"\n"
+    "#include \"e_elemnt.h\"\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_clear_branch_contributions(std::ostream& o, const Module& m)
+{
+  for(auto x : m.branches()){
+    assert(x.second);
+    if(x.second->has_element()){
+      o____ "_value" << x.second->code_name() << " = 0.;\n";
+      o____ "std::fill_n(_st" << x.second->code_name() << "+1, " << x.second->num_states()-1 << ", 0.);\n";
+    }else{
+    }
+  }
+}
 #if 0
 static void make_model(std::ostream& out, const Model& m)
 {
@@ -111,16 +123,41 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
   std::string comma = "";
 
   o << ind << "enum {";
-  for (auto nn : m.probes()){
-    o << comma << "d_" << nn.second->name();
-    comma = ", ";
+  // for (auto nn : m.probes()){
+  //   o << comma << "d_" << nn.second->name();
+  // }
+  for(auto x : m.branches()){
+    assert(x.second);
+    Branch const* b = x.second;
+    if(b->has_flow_probe()){
+      o__ comma << "d_flow" << b->code_name() << "\n";
+      comma = ",\n";
+    }else{
+    }
+    if(b->has_pot_probe()){
+      o__ comma << "d_potential" << b->code_name() << "\n";
+      comma = ",\n";
+    }else{
+    }
   }
   o << ind << "};\n";
 }
 /*--------------------------------------------------------------------------*/
 static void declare_ddouble(std::ostream& o, Module const& m)
 {
-  size_t np = m.probes().size();
+  size_t np = 0;
+  for(auto x : m.branches()){
+    assert(x.second);
+    Branch const* b = x.second;
+    if(b->has_flow_probe()){
+      ++np;
+    }else{
+    }
+    if(b->has_pot_probe()){
+      ++np;
+    }else{
+    }
+  }
   o << ind << "typedef ddouble_<"<<np<<"> ddouble;\n";
   declare_deriv_enum(o, m);
 }
@@ -186,6 +223,26 @@ static void make_common(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_module_one_branch_state(std::ostream& o, Branch const& br)
+{
+  o << "public: // states, " << br.code_name() << ";\n";
+  o__ "double _value" << br.code_name() << ";\n";
+  o__ "double _st" << br.code_name();
+  size_t k = br.num_states();
+  o__ "[" << k << "];\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_branch_states(std::ostream& o, const Module& m)
+{
+  for(auto x : m.branches()){
+    assert(x.second);
+    if(x.second->has_element()){
+      make_module_one_branch_state(o, *x.second);
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 static void make_module(std::ostream& o, const Module& m)
 {
   std::string class_name = "MOD_" + m.identifier().to_string();
@@ -200,6 +257,16 @@ static void make_module(std::ostream& o, const Module& m)
   size_t total_nodes = m.nodes().size() + 10;
   // circuit().req_nodes().size() + circuit().opt_nodes().size() + circuit().local_nodes().size();
   o << ind << "node_t _nodes[" << total_nodes << "];\n";
+  o << "public: // netlist\n";
+  for (Element_2_List::const_iterator
+       p = m.element_list().begin();
+       p != m.element_list().end();
+       ++p) {
+    o << ind << "COMPONENT* " << (**p).code_name() << "{NULL};\n";
+  }
+  for (auto br : m.branches()){
+    o << ind << "ELEMENT* " << br.second->code_name() << "{NULL}; // branch\n";
+  }
   o << "private: // construct\n";
   o << ind << "explicit MOD_" << m.identifier() << "(MOD_" << m.identifier() << " const&);\n";
   o << "public:\n";
@@ -212,8 +279,9 @@ static void make_module(std::ostream& o, const Module& m)
     << ind << "void      precalc_last()  {COMPONENT::precalc_last(); if(subckt()) subckt()->precalc_last();}\n"
     << ind << "//void    map_nodes();         //BASE_SUBCKT\n"
     << ind << "//void    tr_begin();          //BASE_SUBCKT\n"
-    << ind << "//void    tr_restore();        //BASE_SUBCKT\n";
-  if (m.tr_eval().is_empty()) {
+    << ind << "//void    tr_restore();        //BASE_SUBCKT\n"
+    << ind << "  void    tr_load(){ trace1(\"tr_load\", long_label());BASE_SUBCKT::tr_load();}\n";
+  if (!m.has_analog_block()) {
     o << ind << "//void    dc_advance();        //BASE_SUBCKT\n"
       << ind << "//void    tr_advance();        //BASE_SUBCKT\n"
       << ind << "//void    tr_regress();        //BASE_SUBCKT\n"
@@ -221,59 +289,54 @@ static void make_module(std::ostream& o, const Module& m)
       << ind << "//void    tr_queue_eval();     //BASE_SUBCKT\n"
       << ind << "//bool    do_tr();             //BASE_SUBCKT\n";
   }else{
-    o << ind << "void      dc_advance() {set_not_converged(); BASE_SUBCKT::dc_advance();}\n"
-      << ind << "void      tr_advance() {set_not_converged(); BASE_SUBCKT::tr_advance();}\n"
-      << ind << "void      tr_regress() {set_not_converged(); BASE_SUBCKT::tr_regress();}\n"
-      << ind << "bool      tr_needs_eval()const;\n"
-      << ind << "void      tr_queue_eval()      {if(tr_needs_eval()){q_eval();}}\n"
-      << ind << "bool      do_tr();\n";
+    o << ind << "void      dc_advance()override {set_not_converged(); BASE_SUBCKT::dc_advance();}\n"
+      << ind << "void      tr_advance()override {set_not_converged(); BASE_SUBCKT::tr_advance();}\n"
+      << ind << "void      tr_regress()override {set_not_converged(); BASE_SUBCKT::tr_regress();}\n"
+      << ind << "bool      tr_needs_eval()const override;\n"
+      << ind << "void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }\n"
+      << ind << "bool      do_tr() override;\n";
   }
-  o << ind << "double tr_probe_num(std::string const&) const;\n";
-  o << ind << "std::string dev_type()const override {return \"demo\";}\n";
-  o << ind << "int max_nodes()const override {return 4;}\n";
-  o << ind << "int min_nodes()const override {return 2;}\n";
+  o << ind << "double tr_probe_num(std::string const&)const override;\n";
+//  o << ind << "std::string dev_type()const override {return \"demo\";}\n";
+  o << ind << "int max_nodes()const override {return "<< m.ports().size() <<";}\n";
+  o << ind << "int min_nodes()const override {return "<< m.ports().size() <<";}\n";
   o << ind << "std::string value_name()const override {untested(); return \"\";}\n";
   o << ind << "bool print_type_in_spice()const override {untested(); return false;}\n";
-  o << ind << "std::string port_name(int i)const override {\n";
-  o << ind << ind << "assert(i >= 0);\n";
-  o << ind << ind << "assert(i < 4);\n";
-  o << ind << ind << "static std::string names[] = {\"a\", \"b\", \"c\", \"d\", \"\"};\n";
-  o << ind << ind << "return names[i];\n";
-  o << ind << "}\n";
+  o << ind << "std::string port_name(int i)const override;\n";
   o << "private: // impl\n";
-  // o << ind << "void clear_branch_contributions();\n";
   o << "/* ========== */\n";
 
-  o << "private: // data\n";
-  o << ind << "ddouble _branches;\n";
-  for(auto x : m.branches()){
-    assert(x.second);
-    o << ind << "ddouble _branch" << x.second->name() << ";\n";
-  }
+  o << "private: // branch state\n";
+  make_branch_states(o, m);
 
   std::string comma="";
   o << "private: // node list\n";
   o << ind << "enum {";
-  for (auto nn : m.nodes()){ // BUG: array?
-    o << comma << "n_" << nn.second->name();
+  for (auto nn : m.ports()){ // BUG: array?
+    o << comma << "n_" << nn->name();
     comma = ", ";
   }
   o << ind << "};\n";
-  o << "private: // probe list\n";
-
-  for(auto x : m.probes()){
-    assert(x.second);
-    o << ind << "double _" << x.second->name() << ";\n";
-  }
-
-  o << ind << "bool tr_needs_eval() const override{ return true; }\n";
-  o << ind << "bool do_tr() override; // AnalogBlock\n";
-  o << ind << "void read_voltages();\n";
-  o << ind << "void clear_branch_contributions(){\n";
+  o << "private: // probe values\n";
   for(auto x : m.branches()){
     assert(x.second);
-    o << ind << ind << "_branch" << x.second->name() << ".clear();\n";
+    Branch const* b = x.second;
+    if(b->has_flow_probe()){
+      o << ind << "double _flow" << b->code_name() << ";\n";
+    }else{
+    }
+    if(b->has_pot_probe()){
+      o << ind << "double _potential" << b->code_name() << ";\n";
+    }else{
+    }
   }
+
+//  o << ind << "bool do_tr() override; // AnalogBlock\n";
+  o << "private: // impl\n";
+  o << ind << "void read_probes();\n";
+  o << ind << "void set_branch_contributions();\n";
+  o << ind << "void clear_branch_contributions(){\n";
+  make_clear_branch_contributions(o, m);
   o << ind << "}\n";
   o << ind << "friend class " << common_name << ";\n";
 
@@ -288,6 +351,7 @@ void make_cc_decl(std::ostream& out, const Module& d)
 	make_module(out, d);
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 static void make_device(std::ostream& out, const Device& d)
 {
   std::string class_name = "DEV_" + d.name().to_string();
@@ -325,25 +389,9 @@ static void make_device(std::ostream& out, const Device& d)
     "  //void    map_nodes();         //BASE_SUBCKT\n"
     "  //void    tr_begin();          //BASE_SUBCKT\n"
     "  //void    tr_restore();        //BASE_SUBCKT\n";
-  if (d.tr_eval().is_empty()) {
-    out <<
-      "  //void    dc_advance();        //BASE_SUBCKT\n"
-      "  //void    tr_advance();        //BASE_SUBCKT\n"
-      "  //void    tr_regress();        //BASE_SUBCKT\n"
-      "  //bool    tr_needs_eval()const;//BASE_SUBCKT\n"
-      "  //void    tr_queue_eval();     //BASE_SUBCKT\n"
-      "  //bool    do_tr();             //BASE_SUBCKT\n";
-  }else{
-    out <<
-      "  void      dc_advance() {set_not_converged(); BASE_SUBCKT::dc_advance();}\n"
-      "  void      tr_advance() {set_not_converged(); BASE_SUBCKT::tr_advance();}\n"
-      "  void      tr_regress() {set_not_converged(); BASE_SUBCKT::tr_regress();}\n"
-      "  bool      tr_needs_eval()const;\n"
-      "  void      tr_queue_eval()      {if(tr_needs_eval()){q_eval();}}\n"
-      "  bool      do_tr();\n";
-  }
   out <<
     "  //void    tr_load();           //BASE_SUBCKT\n"
+    "  void    tr_load(){ trace1(\"tr_load\", long_label());BASE_SUBCKT::tr_load();}\n";
     "  //double  tr_review();         //BASE_SUBCKT\n"
     "  //void    tr_accept();         //BASE_SUBCKT\n"
     "  //void    tr_unload();         //BASE_SUBCKT\n"
@@ -380,13 +428,6 @@ static void make_device(std::ostream& out, const Device& d)
        ++p) {
     out << "  " << (**p).type() << " " << (**p).code_name()
 	<< ";\t// " << (**p).comment() << '\n';
-  }
-  out << "public: // netlist\n";
-  for (Element_1_List::const_iterator
-       p = d.circuit().elements().begin();
-       p != d.circuit().elements().end();
-       ++p) {
-    out << "  COMPONENT* _" << (**p).name() << ";\n";
   }
   out << "private: // node list\n"
     "  enum {";
@@ -440,6 +481,7 @@ static void make_device(std::ostream& out, const Device& d)
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
+#endif
 /*--------------------------------------------------------------------------*/
 static void make_eval(std::ostream& out, const Eval& e,
 		      const String_Arg& dev_name)
@@ -465,6 +507,7 @@ static void make_eval(std::ostream& out, const Eval& e,
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 static void make_evals(std::ostream& out, const Device& d)
 {
   for (Eval_List::const_iterator
@@ -474,6 +517,7 @@ static void make_evals(std::ostream& out, const Device& d)
     make_eval(out, **e, d.name());
   }
 }
+#endif
 /*--------------------------------------------------------------------------*/
 static void make_tail(std::ostream& out, const File& in)
 {
@@ -537,3 +581,4 @@ void make_h_file(const File& in)
 #endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet

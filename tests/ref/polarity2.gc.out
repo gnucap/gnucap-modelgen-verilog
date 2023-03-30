@@ -1,0 +1,18 @@
+g++ -DTRACE_UNTESTED -g -O0 -fPIC  -I../include polarity2_0.cc -o polarity2_0.o -c
+g++ -shared  -I../include polarity2_0.o  -o polarity2_0.so
+rm polarity2_0.o
+
+polarity2_0 #() d (.np(3),.nn(0),.cp(0),.cn(1),.vp(2),.vn(0));
+isource #(.dc(1)) i1 (.p(1),.n(0));
+vsource #(.dc(1)) v1 (.p(2),.n(0));
+resistor #(.r(3)) r (.p(3),.n(0));
+#           v(v1)      i(i1)      i(r)      
+ 0.         0.         0.         0.        
+ 1.         1.         0.         2.        
+ 0.         0.         1.        -2.        
+ 1.         1.         1.        -40.u      
+#           v(v1)      i(i1)      i(r)       i(d._b_cp_cn) v(d._b_cp_cn) iter(0)   
+ 0.         0.         0.         0.         0.         0.         3.        
+ 1.         1.         0.         2.         0.         0.         7.        
+ 0.         0.         1.        -2.         1.         10.u       7.        
+ 1.         1.         1.        -40.u       1.         10.u       5.        

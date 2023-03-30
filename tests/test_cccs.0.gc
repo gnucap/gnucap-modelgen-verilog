@@ -1,0 +1,30 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+`modelgen
+module test_cccs0(p, n, cp, cn);
+
+analog begin
+	real gain;
+	gain = 17;
+	I(p,n) <+ gain*I(cp,cn);
+end
+
+endmodule
+
+!make test_cccs0.so
+
+attach ./test_cccs0.so
+
+verilog
+
+test_cccs0 d1(0, 2, 1, 0);
+resistor #(.r(1)) r0(2, 0);
+isource #(.dc(i)) i1(0, 1);
+
+parameter i=1
+list
+
+print dc v(nodes) i(d1.*) i(r0)
+dc i 0 2 .5

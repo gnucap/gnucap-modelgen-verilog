@@ -73,7 +73,7 @@ void make_final_adjust_eval_parameter(std::ostream& out, const Parameter_2& p)
   }else{
     out << "    e_val(&(this->" << p.code_name() << "), ";
     if (!(p.default_val().empty())) {
-      out << p.default_val();
+      out << p.type() << "(" << p.default_val() << ")";
     }else{
       out << "NA";
     }

@@ -207,6 +207,7 @@ public:
 
   void set_ctx(Block* b){ _ctx = b; }
   Block const* ctx() const{return _ctx;}
+  Block* ctx(){return _ctx;}
   void parse(CS& file) override{
     parse_n(file);
   }
@@ -296,9 +297,11 @@ typedef LiSt<String_Arg, '(', ',', ')'> String_Arg_List;
  * A list has opening and closing delimeters, usually {}.
  * A "LiSt" is usually parsed once.
  */
+class File;
 template <class T>
 class Collection :public List_Base<T> {
   Block* _ctx{NULL};
+  File const* _file{NULL};
 public:
   using List_Base<T>::push_back;
   using List_Base<T>::begin;
@@ -306,9 +309,12 @@ public:
   typedef typename List_Base<T>::const_iterator const_iterator;
 
   void set_ctx(Block* c) { _ctx = c; }
+  void set_file(File const* f){ _file = f; }
   void parse(CS& file) {
     size_t here = file.cursor();
-    T* m = new T(file);
+    T* m = new T;
+    m->set_ctx(_ctx);
+    file >> *m;
     if (!file.stuck(&here)) {
       push_back(m);
       file.skip(0); // set _ok;
@@ -508,11 +514,11 @@ class Eval :public Base {
 protected:
   String_Arg _name;
   Code_Block _code;
-  Eval() :_name(), _code() {}
 public:
   void parse(CS& f);
   void dump(std::ostream& f)const override;
   Eval(CS& f) :_name(), _code() {parse(f);}
+  Eval() :_name(), _code() {}
   const String_Arg&	name()const	{return _name;}
   const Code_Block&	code()const	{return _code;}
 };
@@ -520,9 +526,10 @@ typedef Collection<Eval> Eval_List;
 /*--------------------------------------------------------------------------*/
 class Function :public Eval {
 public:
+  void set_ctx(Block const*) { }
   void parse(CS& f);
   void dump(std::ostream& f)const override;
-  Function(CS& f) :Eval() {parse(f);}
+  Function() :Eval() {}
 };
 typedef Collection<Function> Function_List;
 /*--------------------------------------------------------------------------*/
@@ -533,7 +540,7 @@ class Port_1 :public Base {
 public:
   void parse(CS& f);
   void dump(std::ostream& f)const;
-  Port_1() {untested();}
+  Port_1() {}
   const std::string& name()const	{return _name;}
   const std::string& short_to()const 	{return _short_to;}
   const std::string& short_if()const 	{return _short_if;}
@@ -570,21 +577,60 @@ public:
 // list ::= "(" port {"," port} ")"
 typedef LiSt<New_Port, '(', ',', ')'> New_Port_List;
 /*--------------------------------------------------------------------------*/
+class Branch;
+/*--------------------------------------------------------------------------*/
+class Branch_Ref {
+  Branch* _br;
+  bool _r;
+public:
+  explicit Branch_Ref(Branch* b, bool reversed=false) :
+    _br(b), _r(reversed) {}
+  operator Branch*() const{ return _br; }
+  Branch* operator->() const{ return _br; }
+  bool is_reversed() const{return _r;}
+
+  std::string const& pname() const;
+  std::string const& nname() const;
+};
+/*--------------------------------------------------------------------------*/
+#if 0
+class BranchRef {
+  Branch const* _br;
+  bool _r;
+public:
+  explicit BranchRef(Branch const* b, bool reversed=false) :
+    _br(b), _r(reversed) {}
+  operator Branch const*() const{ return _br; }
+  bool reversed() const{return _r;}
+
+  std::string const& pname() const;
+  std::string const& nname() const;
+};
+#endif
+/*--------------------------------------------------------------------------*/
 /// Some kind of sequential block with scope for parameters, variables..
 class Probe;
-class Branch;
+class Deps;
+class Filter;
 class Node;
+class Nature;
 class Block : public List_Base<Base> {
   typedef std::map<std::string, Base const*> map; // set?
   typedef map::const_iterator const_iterator;
 protected:
   map _var_refs;
+private:
   Block* _ctx{NULL};
+public:
+  Block const* ctx() const{ return _ctx;}
+  Block* ctx(){ return _ctx;}
 public:
   template<class T>
   void new_var_ref(T const* what);
-  virtual Probe const* new_probe(std::string const& xs, std::string const& p, std::string const& n) = 0;
-  virtual Branch const* new_branch(std::string const& p, std::string const& n) = 0;
+  virtual Probe const* new_probe(std::string const& xs, std::string const& p, std::string const& n)
+  {unreachable(); return NULL;}
+  virtual Branch_Ref new_branch(std::string const& p, std::string const& n)
+  {unreachable(); return Branch_Ref(NULL);}
   virtual Node const* new_node(std::string const& p){ untested();
     assert(_ctx);
     return _ctx->new_node(p);
@@ -592,6 +638,10 @@ public:
   virtual Node const* node(std::string const& p) const{ untested();
     assert(_ctx);
     return _ctx->new_node(p);
+  }
+  virtual Filter const* new_filter(std::string const& xs, Deps const& d) {
+    assert(_ctx);
+    return _ctx->new_filter(xs, d);
   }
 
   void set_ctx(Block* b){
@@ -632,6 +682,7 @@ class Element_1 :public Base {
   std::string _reverse;
   std::string _state;
 public:
+  void set_ctx(Block const*) { }
   void parse(CS&);
   void dump(std::ostream& f)const;
   Element_1() {untested();}
@@ -644,7 +695,7 @@ public:
   const std::string& args()const 	{return _args;}
   const std::string& omit()const 	{return _omit;}
   const std::string& reverse()const 	{return _reverse;}
-  const std::string& state()const	{return _state;}
+  std::string state()const	{return _state;}
 	size_t	     num_nodes()const	{return ports().size();}
 };
 typedef Collection<Element_1> Element_1_List;
@@ -653,6 +704,7 @@ class Element_2 :public Base {
   std::string _module_or_paramset_identifier;
   std::string _name_of_module_instance;
   Port_3_List_2 _list_of_port_connections;
+  Port_1_List _current_port_list;
   Parameter_3_List _list_of_parameter_assignments;
   std::string _eval;
   std::string _value;
@@ -665,26 +717,34 @@ public:
   void parse(CS&) override;
   void dump(std::ostream& f)const override;
   Element_2() {}
+  virtual ~Element_2() {}
   Element_2(CS& f) {
     parse(f);
   }
-  void set_ctx(Block* b){ untested();
-    _ctx = b;
-  }
-  const std::string& module_or_paramset_identifier()const {return _module_or_paramset_identifier;}
+  void set_ctx(Block* b) { _ctx = b; }
+//  const std::string& module_or_paramset_identifier()const {return _module_or_paramset_identifier;}
+  virtual const std::string& dev_type()const {return _module_or_paramset_identifier;}
+  virtual Nature const* nature()const {return NULL;}
   const Parameter_3_List& 
 		     list_of_parameter_assignments()const {return _list_of_parameter_assignments;}
   const Port_3_List_2& list_of_port_connections()const	  {return _list_of_port_connections;}
+  const Port_3_List_2& ports()const	  {return _list_of_port_connections;}
+  const Port_1_List& current_ports() const{return _current_port_list;}
   const std::string& name_of_module_instance()const 	  {return _name_of_module_instance;}
+  const std::string& short_label()const 	  {return _name_of_module_instance;}
+  virtual std::string code_name()const  {return "_e_" + _name_of_module_instance;}
   const std::string& eval()const 	{return _eval;}
   const std::string& value()const 	{return _value;}
   const std::string& args()const 	{return _args;}
-  const std::string& omit()const 	{return _omit;}
+  virtual const std::string& omit()const 	{return _omit;}
   const std::string& reverse()const 	{return _reverse;}
-  const std::string& state()const	{return _state;}
-	size_t	     num_nodes()const	{return list_of_port_connections().size();}
+  virtual std::string state()const	{return _state;}
+  virtual size_t	     num_nodes()const	{return list_of_port_connections().size();}
+  virtual size_t	     num_states()const	{unreachable(); return 0;}
+//  bool is_reversed() const{return _reverse;}
 };
 typedef Collection<Element_2> Element_2_List;
+typedef Collection<Filter> Filter_List;
 /*--------------------------------------------------------------------------*/
 class Arg :public Base {
   std::string _arg;
@@ -704,11 +764,12 @@ class Args :public Base {
   String_Arg _type;
   Arg_List   _arg_list;
 public:
+  void set_ctx(Block const*){}
   void parse(CS& f) {f >> _name >> _type >> _arg_list;}
   void dump(std::ostream& f)const
   {f << "    args " << name() << " " << type() << "\n"
      << arg_list() << "\n";}
-  Args(CS& f) {parse(f);}
+  Args(){}
   const String_Arg& name()const {return _name;}
   const String_Arg& type()const {return _type;}
   const Arg_List&   arg_list()const {return _arg_list;}
@@ -757,28 +818,34 @@ typedef LiSt<Probe, '{', '#', '}'> Probe_List;
 #endif
 // Name clash
 class Probe : public Base {
-  std::string _name;
-//  Branch const* _p;
-  std::string _pp;
-  std::string _pn;
+  std::string _xs;
+  Branch_Ref _br;
+  bool _is_flow_probe{false};
+  bool _is_pot_probe{false}; // type?
 public:
-  explicit Probe(std::string const& Name, std::string const&, std::string const& p, std::string const& n)
-    : _name(Name), _pp(p), _pn(n) {}
-  std::string const& name()const {return _name;}
+  explicit Probe(std::string const& xs, Branch_Ref b);
+//  std::string const& name()const {return _name;}
   // later.
   void parse(CS&)override {incomplete();}
   void dump(std::ostream&)const override {incomplete();}
 
-  std::string const& pname() const{ return _pp; }
-  std::string const& nname() const{ return _pn; }
-  std::string code_name() const{
-    return "_"+_name;
-  }
+  std::string const& pname() const{ return _br.pname(); }
+  std::string const& nname() const{ return _br.nname(); }
 
+  bool is_flow_probe() const{ return _is_flow_probe;}
+  bool is_pot_probe() const{ return _is_pot_probe;}
+
+  std::string code_name() const;
+  Branch const* branch() const{
+    return _br;
+  }
+  bool is_reversed() const;
+  Nature const* nature() const;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+#if 0
 class Model :public Base {
   String_Arg		_name;
   String_Arg		_level;
@@ -821,7 +888,7 @@ class Device :public Base {
   Parameter_Block	_device;
   Parameter_Block	_common;
   Code_Block		_tr_eval;
-  Eval_List		_eval_list;
+  // Eval_List		_eval_list;
   Function_List		_function_list;
 public:
   void parse(CS& f);
@@ -836,13 +903,14 @@ public:
   const Parameter_Block& device()const		{return _device;}
   const Parameter_Block& common()const		{return _common;}
   const Code_Block&	 tr_eval()const		{return _tr_eval;}
-  const Eval_List&	 eval_list()const	{return _eval_list;}
+  // const Eval_List&	 eval_list()const	{return _eval_list;}
   const Function_List&	 function_list()const	{return _function_list;}
     	size_t		 min_nodes()const	{return circuit().min_nodes();}
     	size_t		 max_nodes()const	{return circuit().max_nodes();}
     	size_t	    net_nodes()const {untested();return circuit().net_nodes();}
 };
 typedef Collection<Device> Device_List;
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class Head :public Base {
@@ -858,10 +926,11 @@ class Attribute :public Base {
   String_Arg _name;
   String_Arg _value;
 public:
+  void set_ctx(Block const*){}
   void parse(CS& f) {f >> _name >> '=' >> _value >> ';';}
   void dump(std::ostream& f)const
 	  {f << "  " << name() << " = \"" << value() << "\";\n";}
-  Attribute(CS& f) {parse(f);}
+  Attribute() {}
   const String_Arg&  key()const	  {return _name;}
   const String_Arg&  name()const  {return _name;}
   const String_Arg&  value()const {return _value;}
@@ -874,9 +943,10 @@ class Define :public Base {
   String_Arg_List _args;
   String_Arg _value;
 public:
+  void set_ctx(Block const*){}
   void parse(CS& f);
   void dump(std::ostream& f)const;
-  Define(CS& f) {parse(f);}
+  Define(){}
   const String_Arg&  key()const   {return _name;}
   const String_Arg&  name()const  {return _name;}
   const String_Arg&  value()const {return _value;}
@@ -892,9 +962,10 @@ class Nature :public Base {
   String_Arg		_parent_nature;
   Attribute_List	_attributes;
 public:
+  void set_ctx(Block const*){}
   void parse(CS& f);
   void dump(std::ostream& f)const override;
-  Nature(CS& f) {parse(f);}
+  Nature() {}
   const String_Arg&	identifier()const	{return _identifier;}
   const String_Arg&	parent_nature()const	{return _parent_nature;}
   const Attribute_List&	attributes()const	{return _attributes;}
@@ -908,34 +979,102 @@ class Discipline :public Base {
   String_Arg	_potential_ident;
   String_Arg	_flow_ident;
 public:
+  void set_ctx(Block const*) { }
   void parse(CS& f);
   void dump(std::ostream& f)const override;
-  Discipline(CS& f) {parse(f);}
+  Discipline() {}
   const String_Arg&  identifier()const	    {return _identifier;}
   const String_Arg&  potential_ident()const {return _potential_ident;}
   const String_Arg&  flow_ident()const	    {return _flow_ident;}
 };
 typedef Collection<Discipline> Discipline_List;
 /*--------------------------------------------------------------------------*/
-class Branch : public Base {
-  std::string _pname; // TODO: object...
-  std::string _nname; // TODO: object...
+class Deps : public std::set<Probe const*>{
+  typedef std::set<Probe const*> S;
+  typedef S::const_iterator const_iterator;
 public:
-  explicit Branch(std::string const& p, std::string const& n)
-    : _pname(p), _nname(n) {}
-  std::string name()const {return _pname+_nname;}
+  std::pair<const_iterator, bool> insert(Probe const* x){
+    return std::set<Probe const*>::insert(x);
+  }
+  void update(Deps const& other){
+    for(auto i : other){
+      insert(i);
+    }
+  }
+};
+/*--------------------------------------------------------------------------*/
+class Branch : public Element_2 {
+  Node const* _p{NULL};
+  Node const* _n{NULL};
+  Deps _deps;
+  bool _has_flow_probe{false};
+  bool _has_pot_probe{false};
+  bool _has_flow_src{false};
+  bool _has_pot_src{false};
+public:
+  explicit Branch(Node const* p, Node const* n)
+    : Element_2(), _p(p), _n(n) {
+    assert(p);
+    assert(n);
+    //_code_name = "_b_" + p->name() + "_" + n->name();
+    }
+  std::string name()const;
   // later.
   void parse(CS&)override {incomplete();}
   void dump(std::ostream&)const override;
+  Node const* p() const{ return _p; }
+  Node const* n() const{ return _n; }
+  std::string code_name() const override;
+  std::string const& omit() const override;
+  const std::string& dev_type()const;
+  Deps const& deps()const { return _deps; }
+  void add_probe(Probe const*);
+  size_t num_nodes()const override;
+  std::string state()const override;
+  bool has_element() const;
+  void set_flow_probe(){ _has_flow_probe=true; }
+  void set_pot_probe(){ _has_pot_probe=true; }
+  void set_flow_source(){ _has_flow_src=true; }
+  void set_pot_source(){ _has_pot_src=true; }
+  bool has_flow_probe() const;
+  bool has_pot_probe() const;
+  bool has_flow_source() const { return _has_flow_src; }
+  bool has_pot_source() const;
+  size_t num_states() const;
+  Nature const* nature() const;
+};
+/*--------------------------------------------------------------------------*/
+class Branch_Map {
+  typedef std::pair<Node const*, Node const*> key;
+  typedef std::map<key, Branch*> map; // set?
+  typedef map::const_iterator const_iterator;
+private:
+  map _m;
+public:
+  explicit Branch_Map(){}
+  ~Branch_Map(){
+    for(auto x : _m){
+      delete x.second;
+      x.second = NULL;
+    }
+  }
+  //BranchRef new_branch(Node const* a, Node const* b, Block* ctx);
+  const_iterator begin() const{ return _m.begin(); }
+  const_iterator end() const{ return _m.end(); }
+
+  Branch_Ref new_branch(Node const* a, Node const* b);
+  void parse(CS& f);
+  void dump(std::ostream& f)const;
 };
 /*--------------------------------------------------------------------------*/
 class Node;
+class File;
 // TODO: decide if it is a Block, or has-a Block aka Scope or whetever.
 class Module :public Block {
   typedef std::map<std::string, Probe*> Probe_Map;
-  typedef std::map<std::string, Branch*> Branch_Map;
   typedef std::map<std::string, Node*> Node_Map;
 private: // verilog input data
+  File const* _file{NULL};
   String_Arg	_identifier;
   New_Port_List	_ports;
   Port_3_List_3	_input;
@@ -947,31 +1086,18 @@ private: // verilog input data
   Parameter_2_List _local_params;
   Element_2_List _element_list;
   Port_1_List	_local_nodes;
-  Code_Block		_tr_eval;
+//  Block_List	_tr_eval;
   Code_Block		_validate;
 private: // elaboration data
+  Filter_List _filters;
   Probe_Map _probes;
   Branch_Map _branches;
   Node_Map _nodes;
 public:
+  File const* file() const{ return _file; }; // ctx?
   void parse(CS& f);
   void dump(std::ostream& f)const;
-  Module(CS& f) {
-    // do we need a second pass? or just connect the dots while reading in?
-    _ports.set_ctx(this);
-    _input.set_ctx(this);
-    _output.set_ctx(this);
-    _inout.set_ctx(this);
-    _ground.set_ctx(this);
-    _electrical.set_ctx(this);
-    _parameters.set_ctx(this);
-    _local_params.set_ctx(this);
-    _element_list.set_ctx(this);
-    _local_nodes.set_ctx(this);
-    _tr_eval.set_ctx(this);
-    _validate.set_ctx(this);
-    parse(f);
-  }
+  Module(){}
   const String_Arg&	  identifier()const	{return _identifier;}
   const New_Port_List&	  ports()const		{return _ports;}
   const Port_3_List_3&	  input()const		{return _input;}
@@ -984,36 +1110,40 @@ public:
   const Element_2_List&	  element_list()const	{return _element_list;}
   const Element_2_List&	  circuit()const	{return _element_list;}
   const Port_1_List&	  local_nodes()const	{return _local_nodes;}
-  const Code_Block&	 tr_eval()const		{return _tr_eval;}
+//  const Code_Block&	 tr_eval()const		{return _tr_eval;}
   const Code_Block&	 validate()const	{return _validate;}
     	size_t		  min_nodes()const	{return ports().size();}
     	size_t		  max_nodes()const	{return ports().size();}
     	size_t		  net_nodes()const	{return ports().size();}
 public:
   const Probe_Map&	 probes()const		{return _probes;}
+  const Filter_List&	 filters()const		{return _filters;}
   const Node_Map&	 nodes()const		{return _nodes;}
   const Branch_Map&	 branches()const	{return _branches;}
+  bool has_analog_block() const;
 private: // misc
   CS& parse_analog(CS& cmd);
 
 private:
   Probe const* new_probe(std::string const&, std::string const&, std::string const&) override;
-  Branch const* new_branch(std::string const&, std::string const&) override;
+  Filter const* new_filter(std::string const&, Deps const&) override;
+  Branch_Ref new_branch(std::string const&, std::string const&) override;
   Node const* new_node(std::string const& p) override;
   Node const* node(std::string const& p) const override;
 }; // Module
 typedef Collection<Module> Module_List;
 /*--------------------------------------------------------------------------*/
+class Token_PROBE; //bug?
 class Expression;
 class Variable : public Base {
 private:
   Block* _ctx{NULL};
   std::string _name;
 protected:
-  std::set<Probe const*> _deps;
+  Deps _deps;
   Block const* ctx() const{ return _ctx; }
 public:
-  std::set<Probe const*> const& deps()const { return _deps; }
+  Deps const& deps()const { return _deps; }
   Variable(std::string const& name)
    :Base()
    ,_name(name)
@@ -1028,7 +1158,7 @@ public:
     incomplete();
   }
   void dump(std::ostream& o)const override { o << "Variable: incomplete\n"; }
-  Branch const* new_branch(std::string const& p, std::string const& n) {
+  virtual Branch_Ref new_branch(std::string const& p, std::string const& n) {
     assert(_ctx);
     return(_ctx->new_branch(p, n));
   }
@@ -1041,6 +1171,9 @@ private:
 
 protected:
   void resolve_symbols(Expression const& e, Expression& E);
+private:
+  Token* resolve_filter_function(Expression& E, std::string const& name, Deps const&);
+  Token_PROBE* resolve_xs_function(Expression& E, std::string const& name, Deps const&);
 };
 /*--------------------------------------------------------------------------*/
 // analog_procedural_assignment
@@ -1065,13 +1198,14 @@ class Contribution : public Assignment {
 protected: // BUG
   std::string _name;
 protected:
-  Branch const* _branch;
+  Branch_Ref _branch;
 public:
   Contribution(std::string const& lhsname)
     : Assignment(lhsname), _branch(NULL) {}
 
   std::string const& name() const{return _name;}
   Branch const* branch() const{return _branch;}
+  bool reversed() const{ return _branch.is_reversed() ;}
 };
 /*--------------------------------------------------------------------------*/
 class PotContribution : public Contribution {
@@ -1095,6 +1229,7 @@ class Node :public Base {
   std::string _name;
   std::string _short_to;
   std::string _short_if;
+  Nature const* _nature{NULL};
 public:
   void parse(CS&)override{};
   void dump(std::ostream&)const{};
@@ -1102,8 +1237,10 @@ public:
   Node(CS& f) {parse(f);}
   Node(std::string const& f) : _name(f) {}
   const std::string& name()const	{return _name;}
+  std::string code_name()const	{return "n_" + _name;}
 //  const std::string& short_to()const 	{return _short_to;}
 //  const std::string& short_if()const 	{return _short_if;}
+  Nature const* nature() const{ return _nature; }
 };
 /*--------------------------------------------------------------------------*/
 class Node_List : public List<Node> {
@@ -1114,31 +1251,35 @@ public:
 /*--------------------------------------------------------------------------*/
 // analog_procedural_block
 class AnalogBlock : public Block {
-public:
-
-  // this is a stub
+private: // this is a stub
   CS& parse_seq(CS& cmd);
+  CS& parse_flow_contrib(CS& cmd, std::string const&);
+  CS& parse_pot_contrib(CS& cmd, std::string const&);
   CS& parse_real(CS& cmd);
 
+public: // this is a stub
 //  void set_ctx(Block* ctx) {_ctx = ctx;}
   void parse(CS& cmd) override;
   void dump(std::ostream& o)const override;
+
+
+//  Block?
   Probe const* new_probe(std::string const& xs, std::string const& p, std::string const& n)override {
-    assert(_ctx);
-    return _ctx->new_probe(xs, p, n);
+    assert(ctx());
+    return ctx()->new_probe(xs, p, n);
   }
-  Branch const* new_branch(std::string const& p, std::string const& n)override {
-    assert(_ctx);
-    return _ctx->new_branch(p, n);
+  Branch_Ref new_branch(std::string const& p, std::string const& n)override {
+    assert(ctx());
+    return ctx()->new_branch(p, n);
   }
   Node const* node(std::string const& n)const override {
-    assert(_ctx);
-    return _ctx->node(n);
+    assert(ctx());
+    return ctx()->node(n);
   }
 /*--------------------------------------------------------------------------*/
 };
 /*--------------------------------------------------------------------------*/
-class File {
+class File : public Block {
   std::string	_name;
   std::string   _cwd;
   std::string   _include_path;
@@ -1146,8 +1287,8 @@ class File {
   Head		_head;
   Code_Block	_h_headers;
   Code_Block	_cc_headers;
-  Model_List	_model_list;
-  Device_List	_device_list;
+  // Model_List	_model_list;
+  // Device_List	_device_list;
   Code_Block	_h_direct;
   Code_Block	_cc_direct;
   Define_List	_define_list;
@@ -1164,6 +1305,7 @@ public: // build
   void read(std::string const&);
   void define(std::string const&);
   void add_include_path(std::string const&);
+  void parse(CS& f) override {unreachable();}
 
 public: // readout
   const std::string& name()const	{return _name;}
@@ -1171,9 +1313,9 @@ public: // readout
   const Head&	     head()const	{return _head;}
   const Code_Block&  h_headers()const	{return _h_headers;}
   const Code_Block&  cc_headers()const	{return _cc_headers;}
-  const Model_List&  models()const	{return _model_list;}
+//  const Model_List&  models()const	{return _model_list;}
   const Module_List&  modules()const	{return _module_list;}
-  const Device_List& devices()const	{return _device_list;}
+//  const Device_List& devices()const	{return _device_list;}
   const Code_Block&  h_direct()const	{return _h_direct;}
   const Code_Block&  cc_direct()const	{return _cc_direct;}
 
@@ -1202,6 +1344,22 @@ void Block::new_var_ref(T const* what)
   }
 }
 /*--------------------------------------------------------------------------*/
+class Filter : public Variable /*?*/ {
+  Deps _deps;
+public:
+  explicit Filter() : Variable("noname") {}
+  explicit Filter(std::string const& name, Deps const& d)
+    : Variable(name), _deps(d) {}
+
+  std::string code_name() const {
+    return "_f_" + name();
+  }
+  Deps const& deps() const { return _deps; }
+
+public: // make it look like an Element_2?
+  std::string omit() const { return ""; }
+  std::string dev_type() const { return "d_cpoly_g"; }
+};
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

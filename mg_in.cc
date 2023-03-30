@@ -84,6 +84,7 @@ void Skip_Block::parse(CS& file)
 /*--------------------------------------------------------------------------*/
 void Port_1::parse(CS& file)
 {
+  trace1("Port_1::parse", file.last_match());
   file >> _name;
   size_t here = file.cursor();
   for (;;) {
@@ -445,6 +446,7 @@ void File::read(std::string const& file_name)
   }
   _file = preprocess(file_name);
 
+  _module_list.set_file(this);
 
   size_t here = _file.cursor();
   for (;;) {

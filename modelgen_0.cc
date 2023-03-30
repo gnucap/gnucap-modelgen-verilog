@@ -137,281 +137,6 @@ protected:
 #endif
 /*--------------------------------------------------------------------------*/
 #if 0
-class Assignment : public Variable {
-protected:
-  std::string _lhsname;
-  Expression* _rhs;
-public:
-  Assignment(std::string const& lhsname, Block* ctx)
-   :Variable(lhsname, ctx)
-   ,_lhsname(lhsname)
-   ,_rhs(NULL) {}
-  ~Assignment() {
-    delete _rhs;
-  }
-public:
-  virtual void parse(CS& cmd) {
-    trace1("Assignment::parse", cmd.tail());
-    Expression rhs(cmd);
-    assert(!_rhs);
-#if 1
-    Expression tmp;
-    resolve_symbols(rhs, tmp);
-    trace1("Assignment::parse resolved", rhs.size());
-    _rhs = new Expression(tmp, &CARD_LIST::card_list);
-#else
-    Expression tmp(rhs, &CARD_LIST::card_list);
-    _rhs = new Expression();
-    resolve_symbols(tmp, *_rhs);
-#endif
-  }
-  virtual void dump(std::ostream& o)const override;
-
-};
-/*--------------------------------------------------------------------------*/
-class Block : public List_Base<Base> {
-  typedef std::map<std::string, Base*> map;
-  typedef map::const_iterator const_iterator;
-protected:
-  map _items;
-public:
-  virtual Probe const* new_probe(std::string const& xs, std::string const& p, std::string const& n) = 0;
-  virtual Branch const* new_branch(std::string const& p, std::string const& n) = 0;
-  Base const* find(std::string const& k) const{
-    const_iterator f = _items.find(k);
-    if(f!=_items.end()) {
-      return f->second;
-    }else{
-      return NULL;
-    }
-  }
-  Base* item(std::string const&name) { untested();
-    const_iterator f = _items.find(name);
-    if(f != _items.end()) { untested();
-      return f->second;
-    }else{ untested();
-      return NULL;
-    }
-  }
-};
-/*--------------------------------------------------------------------------*/
-class Contribution : public Assignment {
-protected: // BUG
-  std::string _name;
-protected:
-  Branch const* _branch;
-public:
-  Contribution(std::string const& lhsname, Block* ctx)
-    : Assignment(lhsname, ctx), _branch(NULL) {}
-
-  std::string const& name() const{return _name;}
-};
-/*--------------------------------------------------------------------------*/
-class PotContribution : public Contribution {
-public:
-  PotContribution(std::string const& lhsname, Block* ctx) : Contribution(lhsname, ctx) {}
-public:
-  void parse(CS& cmd)override {}
-  void dump(std::ostream& o)const override{}
-};
-/*--------------------------------------------------------------------------*/
-class FlowContribution : public Contribution {
-public:
-  FlowContribution(std::string const& lhsname, Block* ctx) : Contribution(lhsname, ctx) {}
-public:
-  virtual void parse(CS& cmd)override;
-  virtual void dump(std::ostream& o)const override;
-};
-/*--------------------------------------------------------------------------*/
-class AnalogBlock : public Block {
-public:
-  Block* _ctx{nullptr};
-public:
-  void set_ctx(Block* ctx) {_ctx = ctx;}
-
-  // this is a stub
-  void parse_item(CS& cmd) {
-    std::string what;
-    cmd >> what;
-    if(is_flow_function(what)) {
-      assert(_ctx);
-      FlowContribution* a = new FlowContribution(what, this);
-      a->parse(cmd);
-      push_back(a);
-    }else if(what == "int") { untested();
-    }else if(what == "real") {
-      trace1("AnalogBlock::parse real", cmd.tail());
-
-      std::string name;
-      cmd >> name >> ';';
-      Variable* a = new Variable(name, this);
-      push_back(a);
-      trace1("AnalogBlock::parse real", name);
-      _items[name] = a;
-
-    }else if(cmd >> "*=") { untested();
-      incomplete();
-    }else if(cmd >> "+=") { untested();
-      incomplete();
-    }else if(cmd >> "=") {
-      Assignment* a = new Assignment(what, this);
-      a->parse(cmd);
-      push_back(a);
-      _items[what] = a;
-    }
-
-  }
-  void parse(CS& cmd) override{
-    cmd >> "begin";
-    for (;;) {
-      cmd.get_line("analogblock>");
-
-      if (cmd >> "end ") {
-	break;
-      }else{
-	parse_item(cmd);
-      }
-    }
-  }
-  void dump(std::ostream& o)const override;
-  Probe const* new_probe(std::string const& xs, std::string const& p, std::string const& n) override {
-    assert(_ctx);
-    return _ctx->new_probe(xs, p, n);
-  }
-  Branch const* new_branch(std::string const& p, std::string const& n) override {
-    assert(_ctx);
-    return _ctx->new_branch(p, n);
-  }
-};
-/*--------------------------------------------------------------------------*/
-#if 0
-class Module : public Block {
-  std::map<std::string, Probe*> _probes;
-  std::map<std::string, Branch*> _branches;
-  std::map<std::string, Node*> _nodes;
-  std::vector<Node const*> _n;
-  Base* _parent;
-public:
-  explicit Module() {}
-  Module(const Module&) = delete;
-  ~Module() {
-    for(auto& i : _probes) {
-      delete i.second;
-      i.second = NULL;
-    }
-  }
-  void parse(CS&cmd)override { untested();
-    parse_ports(cmd);
-    incomplete();
-  }
-  void parse_ports(CS&cmd);
-  void dump(std::ostream& o)const override;
-private:
-  void declare_ddouble(std::ostream& o)const;
-  Branch const* new_branch(std::string const& p, std::string const& n) override;
-  Probe const* new_probe(std::string const& xs, std::string const& p,
-      std::string const& n) override;
-  Node const* new_node(std::string const& p);
-  Node const* node(std::string const& p) const;
-  void set_port_by_index(int num, std::string& ext_name);
-  size_t num_nodes() const{
-    return _n.size();
-  }
-}; // Module
-#endif
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-void Module::set_port_by_index(int num, std::string& ext_name)
-{
-  _n.push_back(new_node(ext_name));
-}
-/*--------------------------------------------------------------------------*/
-void Module::parse_ports(CS& cmd)
-{
-  if (!(cmd >> '(')) {
-    throw Exception("'(' required (parse ports)");
-  }else if (cmd.is_alnum()) {
-    // by order
-    int index = 0;
-    while (cmd.is_alnum()) {
-      size_t here = cmd.cursor();
-      try{
-	std::string value;
-	cmd >> value;
-	set_port_by_index(index, value);
-	if (value == "0"){ untested();
-	  throw Exception("port 0 not allowed");
-	}else if (num_nodes() != index+1) { untested();
-	  throw Exception("duplicate port");
-	}else{
-	  ++index;
-	}
-      }catch (Exception_Too_Many& e) { untested();
-	cmd.warn(bDANGER, here, e.message());
-      }
-    }
-    cmd >> ')';
-  }else if(cmd >> ')'){ untested();
-    // no port?
-  }else{ untested();
-    incomplete();
-    // error. probably
-  }
-}
-/*--------------------------------------------------------------------------*/
-// u_nodemap?
-Node const* Module::new_node(std::string const& p)
-{
-  Node*& cc = _nodes[p];
-  if(cc) { untested();
-  }else{
-    cc = new Node(p);
-  }
-  return cc;
-}
-/*--------------------------------------------------------------------------*/
-Node const* Module::node(std::string const& p) const
-{
-  auto i = _nodes.find(p);
-  if(i != _nodes.end()) {
-    return i->second;
-  }else{ untested();
-    throw Exception("no such node " + p );
-  }
-}
-/*--------------------------------------------------------------------------*/
-Branch const* Module::new_branch(std::string const& p, std::string const& n)
-{
-  std::string k = p + " " + n;
-  Branch*& cc = _branches[k];
-  if(cc) { untested();
-  }else{
-    size_t s = _branches.size() - 1;
-    // TODO: resolve k
-    cc = new Branch(p, n);
-    //      cc->deps().insert(cc)??
-  }
-  return cc;
-}
-/*--------------------------------------------------------------------------*/
-Probe const* Module::new_probe(std::string const& xs, std::string const& p, std::string const& n)
-{
-  std::string k = xs + "_" + p + "_" + n;
-  Node const* pp = node(p);
-  Node const* pn = node(n);
-  Probe*& prb = _probes[k];
-  if(prb) {
-  }else{
-    size_t s = _probes.size() - 1;
-    // TODO: resolve k
-    prb = new Probe("prb_" + std::to_string(s), xs, p, n);
-    //      prb->deps().insert(prb)??
-  }
-  return prb;
-}
-#endif
-/*--------------------------------------------------------------------------*/
-#if 0
 Branch const* Variable::new_branch(std::string const& a, std::string const& b)
 {
   return _ctx->new_branch(a, b);
@@ -547,14 +272,19 @@ public:
     file >> name;
     file.reset(here);
 
-    Module mock(file);
+    Module mock;
+    mock.set_ctx(NULL);
+    file >> mock;
 
     std::ofstream o;
     o.open(name + ".cc");
+    /// BUG: duplicate?
     o << "#include <gnucap/globals.h>\n"
          "#include <gnucap/e_compon.h>\n"
+         "#include <gnucap/e_subckt.h>\n"
          "#include <gnucap/e_node.h>\n"
-         "#include \"../va.h\"\n"
+         "#include <gnucap/e_elemnt.h>\n"
+         "#include \"../m_va.h\"\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
     o << "namespace {\n"
@@ -569,7 +299,7 @@ public:
     o.close();
   }
 } p0;
-DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "`modelgen|demo_module", &p0);
+DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "`modelgen", &p0);
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/

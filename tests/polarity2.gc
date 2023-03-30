@@ -1,0 +1,36 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+`modelgen
+module polarity2_0(np, nn, cp, cn, vp, vn);
+	electrical np, nn, cp, cn, vp, vn;
+	inout np, nn, cp, cn, vp, vn;
+	analog begin
+		I(np,nn) <+ I(cp, cn)
+		I(np,nn) <+ - I(cn, cp)
+		I(np,nn) <+ V(vp, vn)
+		I(np,nn) <+ - V(vn, vp)
+	end
+endmodule
+
+list
+
+!make polarity2_0.so
+
+attach ./polarity2_0.so
+
+verilog
+
+polarity2_0 d(3,0,0,1,2,0);
+isource #(.dc(1)) i1(1, 0);
+vsource #(.dc(1)) v1(2, 0);
+resistor #(.r(3)) r(3, 0);
+
+list
+
+print dc v(v1) i(i1) i(r)
+dc v1 0 1 1 i1 0 1 1
+
+print dc + i(d._b_cp_cn) v(d._b_cp_cn) iter(0)
+dc v1 0 1 1 i1 0 1 1

@@ -1,7 +1,8 @@
 
 attach ../modelgen_0.so
 
-demo_module mock_error
+`modelgen
+module mock_error
 
 analog begin
 	bla = 1;

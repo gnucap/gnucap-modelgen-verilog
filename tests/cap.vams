@@ -1,0 +1,12 @@
+`include "sub/disciplines.few"
+
+module cap(p,n);
+	inout p,n;
+	electrical p,n;
+
+	parameter real c=1.; //  from [0:inf);
+	analog begin
+		I(p,n) <+ c * ddt(V(p,n));
+		// I(p,n) <+ ddt(c);
+	end
+endmodule

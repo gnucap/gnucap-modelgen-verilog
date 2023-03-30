@@ -63,7 +63,7 @@ void Element_2::parse(CS& file)
 /*--------------------------------------------------------------------------*/
 void Element_2::dump(std::ostream& out)const
 {
-  out << "  " << module_or_paramset_identifier()
+  out << "  " << dev_type()
       << " #" << list_of_parameter_assignments() << " "
       << name_of_module_instance()
       << list_of_port_connections() << ";\n";
@@ -143,8 +143,10 @@ void Parameter_2::dump(std::ostream& out)const
 */
 void Port_3::parse(CS& file)
 {
+  trace1("Port_3::parse", file.last_match());
   file >> _name;
 }
+/*--------------------------------------------------------------------------*/
 void New_Port::parse(CS& file)
 {
   Port_3::parse(file); // TODO: port_base?
@@ -244,6 +246,20 @@ void Port_3::dump(std::ostream& out)const
 */
 void Module::parse(CS& file)
 {
+  // do we need a second pass? or just connect the dots while reading in?
+  _ports.set_ctx(this);
+  _input.set_ctx(this);
+  _output.set_ctx(this);
+  _inout.set_ctx(this);
+  _ground.set_ctx(this);
+  _electrical.set_ctx(this);
+  _parameters.set_ctx(this);
+  _local_params.set_ctx(this);
+  _element_list.set_ctx(this);
+  _local_nodes.set_ctx(this);
+  // _tr_eval.set_ctx(this);
+  _validate.set_ctx(this);
+
   // file >> "module |macromodule |connectmodule "; from caller
   file >> _identifier >> _ports >> ';';
   assert(_parameters.ctx() == this);
@@ -260,7 +276,9 @@ void Module::parse(CS& file)
       || ((file >> "inout ") && (file >> _inout))
       // mi, npmi, mogi, mogid, net_declaration
       || ((file >> "ground ") && (file >> _ground))
+      || ((file >> "branch ") && (file >> _branches))
       || ((file >> "electrical ") && (file >> _electrical))
+     // || ((file.find(disciplines) && (parse_net(file))
       || ((file >> "parameter ") && (file >> _parameters))
       || ((file >> "localparam ") && (file >> _local_params))
       ;
@@ -276,7 +294,7 @@ void Module::parse(CS& file)
       // mi, npmi, mogi, module_or_generate_item_declaration
       // mi, npmi, module_or_generate_item
       || ((file >> "localparam ") && (file >> _local_params))
-      || ((file >> "analog ") && parse_analog(file))
+      || ((file >> "analog ") && parse_analog(file)) // TODO:: file >> analog
       // mi, non_port_module_item
       || ((file >> "parameter ") && (file >> _parameters))
       || ((file >> "endmodule ") && (end = true))
@@ -347,7 +365,6 @@ CS& Module::parse_analog(CS& cmd)
   ab->set_ctx(this);
   ab->parse(cmd);
   push_back(ab);
-  untested();
 
   return cmd;
 }
@@ -362,36 +379,6 @@ void AnalogBlock::dump(std::ostream& o)const
   o << ind << "end\n";
 }
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-Branch const* Module::new_branch(std::string const& p, std::string const& n)
-{
-  std::string k = p + " " + n;
-  Branch*& cc = _branches[k];
-  if(cc) { untested();
-  }else{
-    size_t s = _branches.size() - 1;
-    // TODO: resolve k
-    cc = new Branch(p, n);
-    //      cc->deps().insert(cc)??
-  }
-  return cc;
-}
-/*--------------------------------------------------------------------------*/
-Probe const* Module::new_probe(std::string const& xs, std::string const& p, std::string const& n)
-{
-  std::string k = xs + "_" + p + "_" + n;
-  Node const* pp = node(p);
-  Node const* pn = node(n);
-  Probe*& prb = _probes[k];
-  if(prb) {
-  }else{
-    size_t s = _probes.size() - 1;
-    // TODO: resolve k
-    prb = new Probe("prb_" + std::to_string(s), xs, p, n);
-    //      prb->deps().insert(prb)??
-  }
-  return prb;
-}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

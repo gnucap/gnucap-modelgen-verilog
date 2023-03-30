@@ -22,6 +22,10 @@
 #include <fstream>
 #include "mg_.h"
 /*--------------------------------------------------------------------------*/
+#define o__ o << ind <<
+#define o____ o__ "  " <<
+#define o______ o____ "  " <<
+/*--------------------------------------------------------------------------*/
 struct indent{
   explicit indent(size_t i=2){
     _old = ind;
@@ -63,7 +67,7 @@ void make_cc_module(std::ostream&, const Module&);
 /* mg_out_analog.cc */
 void make_cc_analog(std::ostream&, const AnalogBlock&);
 /* mg_out_model.cc */
-void make_cc_model(std::ostream&, const Model&);
+// void make_cc_model(std::ostream&, const Model&);
 /* mg_out_dev.cc */
 //void make_cc_dev(std::ostream&, const Device&);
 /* mg_out_common.cc */
@@ -71,8 +75,8 @@ void make_cc_common(std::ostream&, const Module&);
 /*--------------------------------------------------------------------------*/
 inline std::string baseclass(Module const&)
 {
-  return "COMPONENT";
-  //return "BASE_SUBCKT";
+  return "BASE_SUBCKT";
+  // return "COMPONENT";
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

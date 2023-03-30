@@ -38,7 +38,7 @@ static int is_function(std::string const& n)
     return 0;
   }
 }
-static void make_cc_expression(std::ostream& out, Expression const& e)
+static void make_cc_expression(std::ostream& o, Expression const& e)
 {
   typedef Expression::const_iterator const_iterator;
 
@@ -59,39 +59,49 @@ static void make_cc_expression(std::ostream& out, Expression const& e)
       }else{
 	assert(idx==idx_alloc);
 	++idx_alloc;
-	out << ind << "ddouble t" << idx << ";\n";
+	o << ind << "ddouble t" << idx << ";\n";
       }
     }else{
     }
 
     if (auto var = dynamic_cast<const Token_VAR_REF*>(*i)) {
-      out << ind << "t" << idx << " = _v_" << (*i)->name() << ".value();\n";
+      o__ "t" << idx << " = _v_" << (*i)->name() << ".value();\n";
       for(auto v : var->deps()) {
-        out << ind << "t" << idx << "[d_" << v->name() << "] = _v_" << (*i)->name() << "[d_" << v->name() << "];\n";
+	o__ "t" << idx << "[d" << v->code_name() << "] = _v_" << (*i)->name() << "[d" << v->code_name() << "];\n";
+      }
+    }else if (auto f = dynamic_cast<const Token_FILTER*>(*i)) {
+      o__ "t" << idx << " = p->" << (*i)->name() << "(t" << idx <<" )\n";
+      for(auto v : f->deps()) {
+	o__ "// dep :" << v->code_name() << "\n";
+//	o__ "t" << idx << "[d" << v->code_name() << "] = _v_" << (*i)->name() << "[d" << v->code_name() << "];\n";
       }
     }else if (auto var = dynamic_cast<const Token_PAR_REF*>(*i)) {
-      out << ind << "t" << idx << " = pc->_p_" << (*i)->name() << ";\n";
+      o << ind << "t" << idx << " = pc->_p_" << (*i)->name() << ";\n";
     }else if (dynamic_cast<const Token_CONSTANT*>(*i)) {
-      out << ind << "t" << idx << " = " << (*i)->name() << ";\n";
+      o << ind << "t" << idx << " = " << (*i)->name() << ";\n";
     }else if(auto pp = dynamic_cast<const Token_PROBE*>(*i)) {
-      out << ind << "t" << idx << " = p->" << pp->code_name() << ";// "<< pp->name() <<"\n";
-      out << ind << "t" << idx << "[d" << pp->code_name() << "] = " << "1.;\n";
+      char sign = pp->reversed()?'-':'+';
+
+      o__ "t" << idx << " = "<<sign<<" p->" << pp->code_name() << ";// "<< pp->name() <<"\n";
+      o__ "t" << idx << "[d" << pp->code_name() << "] = " << sign << "1.;\n";
     }else if(dynamic_cast<const Token_SYMBOL*>(*i)) {
       int arity = is_function((*i)->name());
       assert(arity);
-      out << ind << "t" << idx << " = va::" << (*i)->name();
       if(arity == 1){
-	out << "(t" << idx << ");\n";
+	o << ind << "t" << idx << " = va::" << (*i)->name();
+	o << "(t" << idx << ");\n";
       }else if(arity == 2){
 	int idy = idx;
 	idxs.pop();
 	idx = idxs.top();
+	o << ind << "t" << idx << " = va::" << (*i)->name();
 
-	out << "(t" << idx << ", t" << idy << ");\n";
+	o << "(t" << idx << ", t" << idy << ");\n";
       }else{ untested();
 	unreachable();
       }
     }else if (dynamic_cast<const Token_PARLIST*>(*i)) {
+    }else if (dynamic_cast<const Token_STOP*>(*i)) {
     }else if (dynamic_cast<const Token_BINOP*>(*i)) {
       int idy = idxs.top();
       assert( idy == idx );
@@ -105,25 +115,25 @@ static void make_cc_expression(std::ostream& out, Expression const& e)
       case '+':
       case '*':
       case '/':
-	out << ind << "t" << idx << " "<< op << "= t" << idy << ";\n";
+	o__ "t" << idx << " "<< op << "= t" << idy << ";\n";
 	break;
       default:
 	incomplete();
 	unreachable();
 	;
       }
-      // ++idx;
-    }else if (dynamic_cast<const Token_UNARY*>(*i)) { untested();
+    }else if (dynamic_cast<const Token_UNARY*>(*i)) {
       int idy = idxs.top();
       char op = (*i)->name()[0];
-      if(op == '-') { untested();
-	out << ind << "t" << idx << " *= -1.;\n";
+      if(op == '-') {
+	o__ "t" << idx << " *= -1.;\n";
       }else{ untested();
 	incomplete();
 	unreachable();
       }
     }else{
       unreachable();
+      assert(false);
     }
   }
   assert(!idx);
@@ -133,7 +143,7 @@ static void make_cc_variable(std::ostream& o, Variable const& v)
 {
   o << ind << "ddouble _v_" << v.name() << "; // Variable";
   for(auto i : v.deps()) { untested();
-    o << ind << " Dep: " << i->name();
+    o << ind << " Dep: " << i->code_name();
   }
   o << ind << "\n";
 }
@@ -151,19 +161,19 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
 
   o << ind << "{ // Assignment '" << a.lhsname() << "'.";
   for(auto i : a.deps()) {
-    o << " Dep: " << i->name();
+    o << " Dep: " << i->code_name();
   }
   o << "\n";
 
-  if(1) {
+  {
     indent x("  ");
-    //      _rhs->dump(o);
     make_cc_expression(o, e);
     o << ind << "_v_" << a.lhsname() << ".value() = t0.value();\n";
     for(auto v : a.deps()) {
-      o << ind << "_v_" << a.lhsname() << "[d_" << v->name() << "] = " << "t0[d_" << v->name() << "];\n";
+      assert(!v->is_reversed());
+      o__ "_v_" << a.lhsname() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "];\n";
+      o__ "assert(_v_" << a.lhsname() << " == " << "_v_" << a.lhsname() << ");\n";
     }
-  }else{ untested();
   }
   o << ind << "}\n";
 }
@@ -175,7 +185,7 @@ static void make_cc_pc(std::ostream& o, PotContribution const& f)
   o << ind << "}\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_cc_fc(std::ostream& o, FlowContribution const& f)
+static void make_cc_fc(std::ostream& o, Contribution const& f)
 {
   o << ind << "{ // FlowContribution " << f.lhsname() << "\n";
   {
@@ -185,11 +195,28 @@ static void make_cc_fc(std::ostream& o, FlowContribution const& f)
     }else{ untested();
     }
 
+    char sign = f.reversed()?'-':'+';
+
     assert(f.branch());
-    o << ind << ind << "d->_branch" << f.branch()->name() << ".value() += t0.value();\n";
+    o__ "d->_value" << f.branch()->code_name() << " "<<sign<<"= t0.value();\n";
     for(auto v : f.deps()) {
-      o << ind << ind << "d->_branch" << f.branch()->name()
-	<< "[d_" << v->name() << "] += " << "t0[d_" << v->name() << "];\n";
+      if(f.branch() == v->branch()){
+	o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
+	o__ "d->" << f.branch()->state() << "[1]"
+	  " "<<sign<<"= " << "t0[d" << v->code_name() << "];\n";
+      }else{
+      }
+    }
+    size_t k = 2;
+    for(auto v : f.deps()) {
+      o__ "// dep " << v->code_name() << "\n";
+      if(f.branch() == v->branch()){
+      }else{
+	o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
+	o__ "d->" << f.branch()->state() << "[" << k << "]"
+	  " "<<sign<<"= " << "t0[d" << v->code_name() << "];\n";
+	++k;
+      }
     }
   }
   o << ind <<  "}\n";
@@ -201,8 +228,8 @@ void make_cc_analog(std::ostream& o, AnalogBlock const& ab)
     // need commmon baseclass...
     if(auto fc=dynamic_cast<FlowContribution const*>(i)) {
       make_cc_fc(o, *fc);
-    }else if(auto pc=dynamic_cast<PotContribution const*>(i)) { untested();
-      make_cc_pc(o, *pc);
+    }else if(auto pc=dynamic_cast<PotContribution const*>(i)) {
+      make_cc_fc(o, *pc);
     }else if(auto a=dynamic_cast<Assignment const*>(i)) {
       make_cc_assignment(o, *a);
     }else if(auto v=dynamic_cast<Variable const*>(i)) {
@@ -215,5 +242,21 @@ void make_cc_analog(std::ostream& o, AnalogBlock const& ab)
 //  o << "} // AnalogBlock\n";
 }
 /*--------------------------------------------------------------------------*/
+std::string const& Branch::omit() const
+{
+  static std::string const n = "";
+  return n;
+//  return !(_has_contibutions || _has_iprobe);
+}
+/*--------------------------------------------------------------------------*/
+std::string Probe::code_name() const
+{
+    return "_" + _xs + _br->code_name();
+  }
+/*--------------------------------------------------------------------------*/
+std::string Branch::code_name() const
+{
+  return "_b_" + p()->name() + "_" + n()->name();
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

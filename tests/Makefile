@@ -1,4 +1,4 @@
-# CPPFLAGS=-DTRACE_UNTESTED\ -DDO_TRACE
+CPPFLAGS = -DTRACE_UNTESTED -DDO_TRACE
 CPPFLAGS = -DTRACE_UNTESTED
 REFDIR = ref
 TARGETDIR = check
@@ -27,5 +27,8 @@ check:
 
 clean:
 	rm -rf *.o *.cc *.so *.out *~
+
+%.cc: %.vams
+	${GNUCAP_VERILOG} -I .. --cc $< > $@
 
 .PHONY: check clean

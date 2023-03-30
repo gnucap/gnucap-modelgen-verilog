@@ -1,0 +1,12 @@
+vsource #(.dc(v)) v1 (.p(1),.n(0));
+polarity0 #() dut (.np(1),.nn(0));
+vsource #(.dc(v)) v2 (.p(2),.n(0));
+polarity1 #() dut (.np(2),.nn(0));
+vsource #(.dc(v)) v3 (.p(3),.n(0));
+polarity2 #() dut (.np(3),.nn(0));
+vsource #(.dc(v)) v3 (.p(4),.n(0));
+polarity3 #() dut (.np(4),.nn(0));
+#           i(v1)      i(v2)      i(v3)      i(v3)      iter(0)   
+ 0.         0.         0.         0.         0.         3.        
+ 0.5       -0.5       -0.99998   -1.5       -1.9999     3.        
+ 1.        -0.99999   -2.        -2.9999    -3.9998     3.        

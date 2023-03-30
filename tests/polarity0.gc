@@ -1,0 +1,75 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+`modelgen
+module polarity0(np, nn);
+	electrical np, nn;
+	inout np, nn;
+	analog begin
+		I(np,nn) <+ -V(nn,np);
+	end
+endmodule
+
+`modelgen
+module polarity1(np, nn);
+	electrical np, nn;
+	inout np, nn;
+	analog begin
+		I(np,nn) <+ V(np,nn);
+		I(np,nn) <+ -V(nn,np);
+	end
+endmodule
+
+`modelgen
+module polarity2(np, nn);
+	electrical np, nn;
+	inout np, nn;
+	analog begin
+		I(np,nn) <+ -V(nn,np);
+		I(np,nn) <+ V(np,nn);
+		I(np,nn) <+ -V(nn,np);
+	end
+endmodule
+
+`modelgen
+module polarity3(np, nn);
+	electrical np, nn;
+	inout np, nn;
+	analog begin
+		I(np,nn) <+ -V(nn,np);
+		I(nn,np) <+ V(nn,np);
+		I(np,nn) <+ V(np,nn);
+		I(nn,np) <+ -V(np,nn);
+	end
+endmodule
+
+list
+
+!make polarity0.so polarity1.so polarity2.so polarity3.so -j4 > /dev/null
+
+attach ./polarity0.so
+attach ./polarity1.so
+attach ./polarity2.so
+attach ./polarity3.so
+
+verilog
+
+vsource #(.dc(v)) v1(1, 0);
+polarity0 dut(1,0);
+
+vsource #(.dc(v)) v2(2, 0);
+polarity1 dut(2,0);
+
+vsource #(.dc(v)) v3(3, 0);
+polarity2 dut(3,0);
+
+vsource #(.dc(v)) v3(4, 0);
+polarity3 dut(4,0);
+
+list
+parameter v=0
+
+print dc i(v*) iter(0)
+
+dc v .0 1 .5

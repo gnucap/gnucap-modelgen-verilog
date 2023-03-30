@@ -33,8 +33,10 @@ static void make_header(std::ostream& o, const File& in,
   o <<
     "#include <gnucap/globals.h>\n"
     "#include <gnucap/e_compon.h>\n"
+    "#include <gnucap/e_subckt.h>\n"
     "#include <gnucap/e_node.h>\n"
-    "#include \"../va.h\"\n"
+    "#include <gnucap/e_elemnt.h>\n"
+    "#include \"../m_va.h\"\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
     "const double NA(NOT_INPUT);\n"

@@ -1,7 +1,6 @@
 
-
-
 attach ../modelgen_0.so
+attach ../d_vasrc.so
 
 `modelgen test_res0
 module test_res0(np, nn);
@@ -28,6 +27,6 @@ vsource #(.dc(1)) v2(2, 0);
 
 list
 
-print dc i0(dut) v0(dut) v1(dut) i0_d0(dut) i0_d1(dut)
+print dc i0(dut) v0(dut) v1(dut) i0_d0(dut) i0_d1(dut) i(v1) ev(dut._b_np_nn)
 
 dc v1 0 1 .1

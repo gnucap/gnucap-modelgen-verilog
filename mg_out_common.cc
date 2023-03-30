@@ -209,10 +209,10 @@ void make_common_param_is_printable(std::ostream& out, const Module& d)
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-void make_common_param_name(std::ostream& out, const Module& d)
+void make_common_param_name(std::ostream& o, const Module& d)
 {
   make_tag();
-  out <<
+  o <<
     "std::string COMMON_" << d.identifier() << "::param_name(int i)const\n{\n"
     "  switch (COMMON_" << d.identifier() << "::param_count() - 1 - i) {\n";
   size_t i = 0;
@@ -221,7 +221,7 @@ void make_common_param_name(std::ostream& out, const Module& d)
 //       p != d.common().override().end();
 //       ++p) {
 //    if (!((**p).user_name().empty())) {
-//      out << "  case " << i++ << ":  return \"" << to_lower((**p).user_name()) << "\";\n";
+//      o << "  case " << i++ << ":  return \"" << to_lower((**p).user_name()) << "\";\n";
 //    }else{unreachable();
 //    }
 //  }
@@ -230,26 +230,27 @@ void make_common_param_name(std::ostream& out, const Module& d)
        p = d.parameters().begin();
        p != d.parameters().end();
        ++p) {
-    out << "  case " << i++ << ":  return \"" << (**p).name() << "\";\n";
+    o << "  case " << i++ << ":  return \"" << (**p).name() << "\";\n";
   }
 //  assert(i == d.common().override().size() + d.common().raw().size());
-  out <<
+  o <<
     "  default: return COMMON_COMPONENT::param_name(i);\n"
     "  }\n"
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";
-  out <<
+  o <<
     "std::string COMMON_" << d.identifier() << "::param_name(int i, int j)const\n"
-    "{\n"
-    << "if(j==0){\n"
-    << ind << " return param_name(i);\n"
-    << "}else{\n"
-    << ind << "return \"\";\n"
-    << "}\n"
-    "}\n"
+    "{\n";
+  o__ "if(j==0){\n";
+  o____ "return param_name(i);\n";
+  o__ "}else{\n";
+  o____ "return \"\";\n";
+  o__ "}\n";
+  o << "}\n"
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 void make_common_param_name_or_alias(std::ostream& out, const Device& d)
 {
   make_tag();
@@ -290,6 +291,7 @@ void make_common_param_name_or_alias(std::ostream& out, const Device& d)
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";
 }
+#endif
 /*--------------------------------------------------------------------------*/
 void make_common_param_value(std::ostream& out, const Module& d)
 {
@@ -323,10 +325,10 @@ void make_common_param_value(std::ostream& out, const Module& d)
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_common_expand(std::ostream& out, const Module& d)
+static void make_common_expand(std::ostream& o , const Module& d)
 {
   make_tag();
-  out <<
+  o  <<
     "void COMMON_" << d.identifier() << "::expand(const COMPONENT* d)\n{\n"
 
     "}\n";
@@ -364,29 +366,29 @@ static void make_common_expand(std::ostream& out, const Module& d)
     }
     out << "  attach_common(" << (**p).name() << ", &_" << (**p).name() << ");\n\n";
   }
-  out <<
+  o  <<
     "  assert(c == this);\n"
     "}\n"
 
 
 #endif
-  out <<
+  o  <<
     "/*--------------------------------------------------------------------------*/\n"
     "void COMMON_" << d.identifier() << "::precalc_first(const CARD_LIST* par_scope)\n"
     "{\n"
     "  assert(par_scope);\n"
     "  COMMON_COMPONENT::precalc_first(par_scope);\n";
-  make_final_adjust_eval_parameter_list(out, d.parameters());
-    out << "}\n";
+  make_final_adjust_eval_parameter_list(o , d.parameters());
+    o  << "}\n";
 
-  out<<
+  o <<
     "/*--------------------------------------------------------------------------*/\n"
     "void COMMON_" << d.identifier() << "::precalc_last(const CARD_LIST* par_scope)\n"
     "{\n"
     "  assert(par_scope);\n"
-    "  COMMON_COMPONENT::precalc_last(par_scope);\n"
-    " //incomplete();\n"
-    "}\n"
+    "  COMMON_COMPONENT::precalc_last(par_scope);\n";
+  make_final_adjust_eval_parameter_list(o , d.parameters());
+    o << "}\n"
     "/*--------------------------------------------------------------------------*/\n";
 #if 0
     "  COMMON_" << d.name() << "* c = this;\n"
@@ -431,12 +433,12 @@ static void make_common_expand(std::ostream& out, const Module& d)
 static void make_common_tr_eval(std::ostream& o, const Module& m)
 {
   o << "void COMMON_" << m.identifier() << 
-    "::tr_eval_analog(MOD_" << m.identifier() << "* p) const\n{\n";
+    "::tr_eval_analog(MOD_" << m.identifier() << "* d) const\n{\n";
 
   // parameters are here.
-  o << ind << "COMMON_" << m.identifier() << " const* pc = this;\n";
-  // branches and stuff
-  o << ind << "MOD_" << m.identifier() << "* d = p;\n";
+  o__ "assert(d);\n";
+  o__ "MOD_" << m.identifier() << " const* p = d;\n";
+  o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
 
   for(auto bb : m){
     assert(bb);
@@ -453,21 +455,21 @@ static void make_common_tr_eval(std::ostream& o, const Module& m)
   o << "}\n";
 }
 /*--------------------------------------------------------------------------*/
-void make_cc_common(std::ostream& out, const Module& d)
+void make_cc_common(std::ostream& o , const Module& d)
 {
   make_tag();
-  make_common_default_constructor(out, d);
-  make_common_copy_constructor(out, d);
-  make_common_destructor(out, d);
-  make_common_operator_equal(out, d);
-  make_common_set_param_by_index(out, d);
-  make_common_param_is_printable(out, d);
-  make_common_param_name(out, d);
-//  make_common_param_name_or_alias(out, d);
-  make_common_param_value(out, d);
-  make_common_expand(out, d);
-  make_common_tr_eval(out, d);
-  out << "/*--------------------------------------------------------------------------*/\n";
+  make_common_default_constructor(o , d);
+  make_common_copy_constructor(o , d);
+  make_common_destructor(o , d);
+  make_common_operator_equal(o , d);
+  make_common_set_param_by_index(o , d);
+  make_common_param_is_printable(o , d);
+  make_common_param_name(o , d);
+//  make_common_param_name_or_alias(o , d);
+  make_common_param_value(o , d);
+  make_common_expand(o , d);
+  make_common_tr_eval(o , d);
+  o  << "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

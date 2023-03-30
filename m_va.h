@@ -46,7 +46,19 @@ public:
 	ddouble_& operator=(const double& o) {
 		*_data = o;
 		std::fill_n(_data+1, numderiv, 0.);
+		for(int i=0; i<=numderiv; ++i){
+			assert(_data[i] == _data[i]);
+		}
 		return *this;
+	}
+	bool operator==(const ddouble_& o)const {
+		for(int i=0; i<=numderiv; ++i){
+			if(_data[i] != o._data[i]){
+				return false;
+			}else{
+			}
+		}
+		return true;
 	}
 	ddouble_& operator+=(const ddouble_& o) {
 		for(int i=0; i<=numderiv; ++i){
@@ -54,27 +66,32 @@ public:
 		}
 		return *this;
 	}
-	ddouble_& operator-=(const ddouble_& o) { untested();
-		for(int i=0; i<=numderiv; ++i){ untested();
+	ddouble_& operator-=(const ddouble_& o) {
+		for(int i=0; i<=numderiv; ++i){
 			_data[i] -= o._data[i];
 		}
 		return *this;
 	}
-	ddouble_& operator*=(const double& o) { untested();
-		for(int i=1; i<=numderiv; ++i){ untested();
+	ddouble_& operator*=(const double& o) {
+		for(int i=1; i<=numderiv; ++i){
 			_data[i] *= o;
 		}
 		*_data *= o;
 		return *this;
 	}
-	ddouble_& operator*=(const ddouble_& o) { untested();
+	ddouble_& operator*=(const ddouble_& o) {
+		assert(*o._data == *o._data);
+		assert(*_data == *_data);
 		for(int i=1; i<=numderiv; ++i){
+			assert(_data[i] == _data[i]);
+			assert(o._data[i] == o._data[i]);
 			_data[i] *= *o._data; _data[i] += *_data * o._data[i];
 		}
 		*_data *= *o._data;
 		return *this;
 	}
 	ddouble_& operator/=(const ddouble_& o) {
+		assert(*o._data);
 		for(int i=1; i<=numderiv; ++i){
 			_data[i] *= o.value(); _data[i] -= value() * o._data[i];
 			_data[i] /= o.value() * o.value();
@@ -115,7 +132,9 @@ namespace va {
 template<class T>
 T exp(T& d)
 {
+	assert(d.value() == d.value());
 	d.value() = std::exp(d);
+	assert(d.value() == d.value());
 	chain(d, d);
 	return d;
 }
@@ -139,12 +158,19 @@ T cos(T& d)
 template<class T>
 T pow(T& b, T& e)
 {
-	double p = std::pow(b, e);
-	if(b.value()){
+	assert(b==b);
+	assert(e==e);
+	double p;
+	if(b.value()>0){
+		p = std::pow(b, e);
 		chain(b, e.value()/b.value()*p);
 		double l = std::log(b);
+		assert(l==l);
 		chain(e, l*p);
+		assert(e==e);
 	}else{
+		unreachable(); // numerical nonsense.
+		p = 0;
 		chain(b, 0.);
 		chain(e, 0.);
 	}
@@ -152,8 +178,12 @@ T pow(T& b, T& e)
 	b.value() = p;
 	e.value() = 0.;
 	b += e;
+	assert(b==b);
 	return b;
 }
 
 } // va
 #endif
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

@@ -1,5 +1,6 @@
 
 attach ../modelgen_0.so
+attach ../d_vasrc.so
 
 `modelgen
 module test_dio1(np, nn);
@@ -18,11 +19,12 @@ attach ./test_dio1.so
 
 verilog
 
+resistor #(.r(1)) dut(3,2);
 test_dio1 dut(2,1);
-vsource #(.dc(1)) v0(2, 0);
-vsource v1(1, 0);
+test_dio1 dut(1,0);
+vsource v1(3, 0);
 
 list
 
-print dc v1(dut) v0(dut) i0(dut) i0_d0(dut) i0_d1(dut)
-dc v1 1 2 .1
+print dc v(nodes) iter(0)
+dc v1 -10 10 2

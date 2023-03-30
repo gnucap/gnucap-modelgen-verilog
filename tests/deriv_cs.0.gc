@@ -1,5 +1,6 @@
 
 attach ../modelgen_0.so
+attach ../d_vasrc.so
 
 `modelgen
 module test_cs0(np, nn);
@@ -19,9 +20,9 @@ verilog
 
 test_cs0 dut(1,2);
 vsource v1(1, 0);
-vsource #(.dc(1)) v2(2, 0);
+resistor #(.r(10)) v2(2, 0);
 
 list
 
-print dc i0(dut) v0(dut) v1(dut)
+print dc i0(dut) v0(dut) v1(dut) v(nodes)
 dc v1 0 1 .1

@@ -1,0 +1,30 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+`modelgen
+module test_vs0(p, n);
+	parameter real dc = 1.;
+
+	analog begin
+		V(p,n) <+ dc;
+	end
+
+endmodule
+
+!make test_vs0.so
+
+attach ./test_vs0.so
+
+verilog
+
+test_vs0 #(.dc(dc)) dut(1, 0);
+resistor #(.r(2)) r0(1, 0);
+
+list
+
+parameter dc=1
+print dc v(1) i(r0) iter(0)
+dc
+end
+dc dc -1 1 .1

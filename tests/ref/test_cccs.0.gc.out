@@ -1,0 +1,13 @@
+g++ -DTRACE_UNTESTED -g -O0 -fPIC  -I../include test_cccs0.cc -o test_cccs0.o -c
+g++ -shared  -I../include test_cccs0.o  -o test_cccs0.so
+rm test_cccs0.o
+
+test_cccs0 #() d1 (.p(0),.n(2),.cp(1),.cn(0));
+resistor #(.r(1)) r0 (.p(2),.n(0));
+isource #(.dc(i)) i1 (.p(0),.n(1));
+#           v(1)       v(2)       i(d1._b_cp_cn) i(d1._b_p_n) i(r0)     
+ 0.         0.         0.         0.         0.         0.        
+ 0.5        5.u        8.5        0.5        8.5        8.5       
+ 1.         10.u       17.        1.         17.        17.       
+ 1.5        15.u       25.5       1.5        25.5       25.5      
+ 2.         20.u       34.        2.         34.        34.       
