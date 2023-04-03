@@ -448,11 +448,11 @@ void File::parse(CS& file)
   trace1("File::parse", file.fullstring());
   _module_list.set_file(this); // needed?
 			       //
-  _module_list.set_ctx(this);
-  _macromodule_list.set_ctx(this);
-  _connectmodule_list.set_ctx(this);
-  _nature_list.set_ctx(this);
-  _discipline_list.set_ctx(this);
+  _module_list.set_owner(this);
+  _macromodule_list.set_owner(this);
+  _connectmodule_list.set_owner(this);
+  _nature_list.set_owner(this);
+  _discipline_list.set_owner(this);
 
   size_t here = _file.cursor();
   for (;;) {

@@ -109,16 +109,16 @@ public:
 class Block;
 class Variable : public Base {
 private:
-  Block* _ctx;
+  Block* _owner;
   std::string _name;
 protected:
   std::set<Probe const*> _deps;
-  Block const* ctx() const{ return _ctx; }
+  Block const* ctx() const{ return _owner; }
 public:
   std::set<Probe const*> const& deps()const { return _deps; }
   Variable(std::string const& name, Block* ctx)
    :Base()
-   ,_ctx(ctx)
+   ,_owner(ctx)
    ,_name(name)
   {}
   ~Variable() {
@@ -139,7 +139,7 @@ protected:
 #if 0
 Branch const* Variable::new_branch(std::string const& a, std::string const& b)
 {
-  return _ctx->new_branch(a, b);
+  return _owner->new_branch(a, b);
 }
 /*--------------------------------------------------------------------------*/
 void Variable::resolve_symbols(Expression const& e, Expression& E)
@@ -194,7 +194,7 @@ void Variable::resolve_symbols(Expression const& e, Expression& E)
 
 	delete E.back();
 	E.pop_back();
-	Probe const* p = _ctx->new_probe(n, arg1, arg0);
+	Probe const* p = _owner->new_probe(n, arg1, arg0);
 	_deps.insert(p);
 	E.push_back(new Token_PROBE(p->name(), p));
 

@@ -150,8 +150,8 @@ void Port_3::parse(CS& file)
 void New_Port::parse(CS& file)
 {
   Port_3::parse(file); // TODO: port_base?
-  assert(_ctx);
-  _ctx->new_node(name());
+  assert(_owner);
+  _owner->new_node(name());
 }
 /*--------------------------------------------------------------------------*/
 void Port_Discipline_List_Collection::parse(CS& f)
@@ -168,7 +168,7 @@ void Port_Discipline_List_Collection::parse(CS& f)
     Port_Discipline_List* m = new Port_Discipline_List();
     m->set_discipline(*ii);
 
-    m->set_ctx(ctx());
+    m->set_owner(ctx());
     f >> *m;
     for(auto i : *m){
       i->set_discipline(*ii);
@@ -204,8 +204,8 @@ void Port_Discipline_List::dump(std::ostream& o)const
 void Port_Discipline::parse(CS& file)
 {
   Port_3::parse(file); // TODO: port_base?
-  assert(_ctx);
-  _node = _ctx->new_node(name());
+  assert(_owner);
+  _node = _owner->new_node(name());
 }
 /*--------------------------------------------------------------------------*/
 void Port_Discipline::set_discipline(Discipline const* d)
@@ -330,18 +330,18 @@ net_declaration ::=
 void Module::parse(CS& file)
 {
   // do we need a second pass? or just connect the dots while reading in?
-  _ports.set_ctx(this);
-  _input.set_ctx(this);
-  _output.set_ctx(this);
-  _inout.set_ctx(this);
-  _ground.set_ctx(this);
-  _disc_assign.set_ctx(this);
-  _parameters.set_ctx(this);
-  _local_params.set_ctx(this);
-  _element_list.set_ctx(this);
-  _local_nodes.set_ctx(this);
-  // _tr_eval.set_ctx(this);
-  _validate.set_ctx(this);
+  _ports.set_owner(this);
+  _input.set_owner(this);
+  _output.set_owner(this);
+  _inout.set_owner(this);
+  _ground.set_owner(this);
+  _disc_assign.set_owner(this);
+  _parameters.set_owner(this);
+  _local_params.set_owner(this);
+  _element_list.set_owner(this);
+  _local_nodes.set_owner(this);
+  // _tr_eval.set_owner(this);
+  _validate.set_owner(this);
 
   // file >> "module |macromodule |connectmodule "; from caller
   file >> _identifier >> _ports >> ';';
@@ -446,7 +446,7 @@ void Module::dump(std::ostream& o)const
 CS& Module::parse_analog(CS& cmd)
 {
   AnalogBlock* ab = new AnalogBlock();
-  ab->set_ctx(this);
+  ab->set_owner(this);
   ab->parse(cmd);
   push_back(ab);
 

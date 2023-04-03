@@ -201,7 +201,7 @@ CS& AnalogBlock::parse_flow_contrib(CS& cmd, std::string const& what)
 {
   // what==cmd.last_match?
   FlowContribution* a = new FlowContribution(what);
-  a->set_ctx(this);
+  a->set_owner(this);
   cmd >> *a;
   push_back(a);
   return cmd;
@@ -211,7 +211,7 @@ CS& AnalogBlock::parse_pot_contrib(CS& cmd, std::string const& what)
 {
   // what==cmd.last_match?
   PotContribution* a = new PotContribution(what);
-  a->set_ctx(this);
+  a->set_owner(this);
   cmd >> *a;
   push_back(a);
   return cmd;
@@ -237,7 +237,7 @@ CS& AnalogBlock::parse_seq(CS& cmd)
     incomplete();
   }else if(cmd >> "=") {
     Assignment* a = new Assignment(what);
-    a->set_ctx(this);
+    a->set_owner(this);
     a->parse(cmd);
     push_back(a);
     _var_refs[what] = a;
@@ -374,7 +374,7 @@ Token* Variable::resolve_filter_function(Expression& E, std::string const& n, De
 		      //
     assert(!E.is_empty());
 
-    Filter const* f = _ctx->new_filter(n, cdeps);
+    Filter const* f = _owner->new_filter(n, cdeps);
     assert(f);
 
     // arglist
@@ -414,7 +414,7 @@ Token_PROBE* Variable::resolve_xs_function(Expression& E, std::string const& n, 
 
     delete E.back();
     E.pop_back();
-    Probe const* p = _ctx->new_probe(n, arg1, arg0);
+    Probe const* p = _owner->new_probe(n, arg1, arg0);
     std::string name = n+"("+arg1+", "+arg0+")";
 
     trace3("got a probe", name, arg1, this);

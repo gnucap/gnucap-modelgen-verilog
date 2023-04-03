@@ -94,7 +94,7 @@ public:
   bool			is_empty()const	 {return _s.empty();}
   std::string		lower()const	 {return to_lower(_s);}
   const std::string&	to_string()const {return _s;}
-  void set_ctx(Block*){
+  void set_owner(Block*){
     // incomplete();
   }
 };
@@ -200,7 +200,7 @@ public:
  */
 template <class T, char BEGIN, char SEP, char END>
 class LiSt :public List_Base<T> {
-  Block* _ctx{NULL};
+  Block* _owner{NULL};
 //  using List_Base<T>::_list;
 public:
   using List_Base<T>::size;
@@ -212,9 +212,9 @@ public:
 //  const_iterator begin()const	 {return _list.begin();}
 //  const_iterator end()const	 {return _list.end();}
 
-  void set_ctx(Block* b){ _ctx = b; }
-  Block const* ctx() const{return _ctx;}
-  Block* ctx(){return _ctx;}
+  void set_owner(Block* b){ _owner = b; }
+  Block const* ctx() const{return _owner;}
+  Block* ctx(){return _owner;}
   void parse(CS& file) override{
     parse_n(file);
   }
@@ -231,7 +231,7 @@ public:
 	  //file.warn(0, "list");
 	}
 	T* p = new T;
-	p->set_ctx(_ctx);
+	p->set_owner(_owner);
 	file >> *p;
 	if (file.stuck(&here)) { untested();
 	  delete p;
@@ -307,7 +307,7 @@ typedef LiSt<String_Arg, '(', ',', ')'> String_Arg_List;
 class File;
 template <class T>
 class Collection :public List_Base<T> {
-  Block* _ctx{NULL};
+  Block* _owner{NULL};
   File const* _file{NULL};
 public:
   using List_Base<T>::push_back;
@@ -315,14 +315,14 @@ public:
   using List_Base<T>::end;
   typedef typename List_Base<T>::const_iterator const_iterator;
 
-  void set_ctx(Block* c) { _ctx = c; }
-  Block const* ctx() const{return _ctx;}
-  Block* ctx(){return _ctx;}
+  void set_owner(Block* c) { _owner = c; }
+  Block const* ctx() const{return _owner;}
+  Block* ctx(){return _owner;}
   void set_file(File const* f){ _file = f; }
   void parse(CS& file) {
     size_t here = file.cursor();
     T* m = new T;
-    m->set_ctx(_ctx);
+    m->set_owner(_owner);
     file >> *m;
     if (!file.stuck(&here)) {
       push_back(m);
@@ -384,7 +384,7 @@ public:
   const std::string& name()const	{return _name;}
   const std::string& var()const 	{return _var;}
   const std::string& value()const	{return _value;}
-  void set_ctx(Block*){
+  void set_owner(Block*){
     incomplete();
   }
 };
@@ -400,7 +400,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Parameter_Base :public Base {
-  Block* _ctx{NULL};
+  Block* _owner{NULL};
 protected:
   std::string _name;
   std::string _type;
@@ -446,10 +446,10 @@ public:
     }else{ untested();
     }
   }
-  void set_ctx(Block* c) { _ctx = c; }
+  void set_owner(Block* c) { _owner = c; }
   std::string const& name() const{ return _name; }
 protected:
-  Block* ctx(){ return _ctx; }
+  Block* ctx(){ return _owner; }
 };
 // typedef LiSt<Parameter_1, '{', '#', '}'> Parameter_1_List;
 /*--------------------------------------------------------------------------*/
@@ -483,9 +483,9 @@ typedef LiSt<Parameter_3, '(', ',', ')'> Parameter_3_List;
 /*--------------------------------------------------------------------------*/
 class Code_Block :public Base {
   std::string _s;
-  Block* _ctx{NULL};
+  Block* _owner{NULL};
 public:
-  void set_ctx(Block* c) { _ctx = c; }
+  void set_owner(Block* c) { _owner = c; }
   void parse(CS& f);
   void dump(std::ostream& f)const override{f << _s;}
   Code_Block() {}
@@ -535,7 +535,7 @@ typedef Collection<Eval> Eval_List;
 /*--------------------------------------------------------------------------*/
 class Function :public Eval {
 public:
-  void set_ctx(Block const*) { }
+  void set_owner(Block const*) { }
   void parse(CS& f);
   void dump(std::ostream& f)const override;
   Function() :Eval() {}
@@ -553,7 +553,7 @@ public:
   const std::string& name()const	{return _name;}
   const std::string& short_to()const 	{return _short_to;}
   const std::string& short_if()const 	{return _short_if;}
-  void set_ctx(Block*){
+  void set_owner(Block*){
     incomplete();
   }
 };
@@ -568,7 +568,7 @@ public:
   Port_3() {}
   const std::string&  name()const  {return _name;}
 
-  void set_ctx(Block*) { }
+  void set_owner(Block*) { }
 };
 // list ::= "(" port {"," port} ")"
 typedef LiSt<Port_3, '(', ',', ')'> Port_3_List_2;
@@ -577,9 +577,9 @@ typedef LiSt<Port_3, '\0', ',', ';'> Port_3_List_3;
 /*--------------------------------------------------------------------------*/
 // TODO: Port_Base?
 class New_Port :public Port_3 {
-  Block* _ctx{NULL};
+  Block* _owner{NULL};
 public:
-  void set_ctx(Block* c) { _ctx = c; }
+  void set_owner(Block* c) { _owner = c; }
   void parse(CS& f);
   New_Port() : Port_3() {}
 };
@@ -590,10 +590,10 @@ class Discipline;
 // TODO: Port_Base?
 class Node;
 class Port_Discipline :public Port_3 {
-  Block* _ctx{NULL};
+  Block* _owner{NULL};
   Node* _node{NULL};
 public:
-  void set_ctx(Block* c) { _ctx = c; }
+  void set_owner(Block* c) { _owner = c; }
   void parse(CS& f);
   Port_Discipline() : Port_3() {}
   void set_discipline(Discipline const* d);
@@ -642,10 +642,10 @@ class Block : public List_Base<Base> {
 protected:
   map _var_refs;
 private:
-  Block* _ctx{NULL};
+  Block* _owner{NULL};
 public:
-  Block const* ctx() const{ return _ctx;}
-  Block* ctx(){ return _ctx;}
+  Block const* ctx() const{ return _owner;}
+  Block* ctx(){ return _owner;}
 public:
   template<class T>
   void new_var_ref(T const* what);
@@ -654,31 +654,31 @@ public:
   virtual Branch_Ref new_branch(std::string const& p, std::string const& n)
   {unreachable(); return Branch_Ref(NULL);}
   virtual Node* new_node(std::string const& p){ untested();
-    assert(_ctx);
-    return _ctx->new_node(p);
+    assert(_owner);
+    return _owner->new_node(p);
   }
   virtual Node const* node(std::string const& p) const{ untested();
-    assert(_ctx);
-    return _ctx->new_node(p);
+    assert(_owner);
+    return _owner->new_node(p);
   }
   virtual Filter const* new_filter(std::string const& xs, Deps const& d) {
-    assert(_ctx);
-    return _ctx->new_filter(xs, d);
+    assert(_owner);
+    return _owner->new_filter(xs, d);
   }
 
-  void set_ctx(Block* b){
-    _ctx = b;
+  void set_owner(Block* b){
+    _owner = b;
   }
   Base const* resolve(std::string const& k) const{
-    trace2("resolve", _ctx, k);
+    trace2("resolve", _owner, k);
     for(auto x : _var_refs){
       trace1("var_ref", x.first);
     }
     const_iterator f = _var_refs.find(k);
     if(f != _var_refs.end()) {
       return f->second;
-    }else if(_ctx) {
-      return _ctx->resolve(k);
+    }else if(_owner) {
+      return _owner->resolve(k);
     }else{
       return NULL;
     }
@@ -704,7 +704,7 @@ class Element_1 :public Base {
   std::string _reverse;
   std::string _state;
 public:
-  void set_ctx(Block const*) { }
+  void set_owner(Block const*) { }
   void parse(CS&);
   void dump(std::ostream& f)const;
   Element_1() {untested();}
@@ -734,7 +734,7 @@ class Element_2 :public Base {
   std::string _omit;
   std::string _reverse;
   std::string _state;
-  Block* _ctx{NULL};
+  Block* _owner{NULL};
 public:
   void parse(CS&) override;
   void dump(std::ostream& f)const override;
@@ -743,7 +743,7 @@ public:
   Element_2(CS& f) {
     parse(f);
   }
-  void set_ctx(Block* b) { _ctx = b; }
+  void set_owner(Block* b) { _owner = b; }
 //  const std::string& module_or_paramset_identifier()const {return _module_or_paramset_identifier;}
   virtual const std::string& dev_type()const {return _module_or_paramset_identifier;}
   virtual Nature const* nature()const {return NULL;}
@@ -776,7 +776,7 @@ public:
   void dump(std::ostream& f)const override {f << "      " << arg() << ";\n";}
   Arg() {}
   const std::string& arg()const {return _arg;}
-  void set_ctx(Block*){
+  void set_owner(Block*){
     incomplete();
   }
 };
@@ -787,7 +787,7 @@ class Args :public Base {
   String_Arg _type;
   Arg_List   _arg_list;
 public:
-  void set_ctx(Block const*){}
+  void set_owner(Block const*){}
   void parse(CS& f) {f >> _name >> _type >> _arg_list;}
   void dump(std::ostream& f)const
   {f << "    args " << name() << " " << type() << "\n"
@@ -949,7 +949,7 @@ class Attribute :public Base {
   String_Arg _name;
   String_Arg _value;
 public:
-  void set_ctx(Block const*){}
+  void set_owner(Block const*){}
   void parse(CS& f) {f >> _name >> '=' >> _value >> ';';}
   void dump(std::ostream& f)const
 	  {f << "  " << name() << " = \"" << value() << "\";\n";}
@@ -966,7 +966,7 @@ class Define :public Base {
   String_Arg_List _args;
   String_Arg _value;
 public:
-  void set_ctx(Block const*){}
+  void set_owner(Block const*){}
   void parse(CS& f);
   void dump(std::ostream& f)const;
   Define(){}
@@ -985,7 +985,7 @@ class Nature :public Base {
   String_Arg		_parent_nature;
   Attribute_List	_attributes;
 public:
-  void set_ctx(Block const*){}
+  void set_owner(Block const*){}
   void parse(CS& f);
   void dump(std::ostream& f)const override;
   Nature() {}
@@ -1005,10 +1005,10 @@ class Discipline :public Base {
   String_Arg	_flow_ident;
   Nature const* _flow{NULL};
   Nature const* _potential{NULL};
-  Block const* _ctx;
+  Block const* _owner;
 public:
-  void set_ctx(Block const* c) {_ctx=c;}
-  Block const* ctx() {return _ctx;}
+  void set_owner(Block const* c) {_owner=c;}
+  Block const* ctx() {return _owner;}
   const String_Arg&  key()const	  {return _identifier;}
   void parse(CS& f);
   void dump(std::ostream& f)const override;
@@ -1172,11 +1172,11 @@ class Token_PROBE; //bug?
 class Expression;
 class Variable : public Base {
 private:
-  Block* _ctx{NULL};
+  Block* _owner{NULL};
   std::string _name;
 protected:
   Deps _deps;
-  Block const* ctx() const{ return _ctx; }
+  Block const* ctx() const{ return _owner; }
 public:
   Deps const& deps()const { return _deps; }
   Variable(std::string const& name)
@@ -1188,20 +1188,20 @@ public:
 public:
   std::string const& name()const {return _name;}
 
-  void set_ctx(Block* ctx) {_ctx = ctx;}
+  void set_owner(Block* ctx) {_owner = ctx;}
   virtual void parse(CS&) { untested();
     incomplete();
   }
   void dump(std::ostream& o)const override { o << "Variable: incomplete\n"; }
   virtual Branch_Ref new_branch(std::string const& p, std::string const& n) {
-    assert(_ctx);
-    return(_ctx->new_branch(p, n));
+    assert(_owner);
+    return(_owner->new_branch(p, n));
   }
 
 private:
   bool is_node(std::string const& n) const{
-    assert(_ctx);
-    return _ctx->node(n);
+    assert(_owner);
+    return _owner->node(n);
   }
 
 protected:
@@ -1297,7 +1297,7 @@ private: // this is a stub
   CS& parse_real(CS& cmd);
 
 public: // this is a stub
-//  void set_ctx(Block* ctx) {_ctx = ctx;}
+//  void set_owner(Block* ctx) {_owner = ctx;}
   void parse(CS& cmd) override;
   void dump(std::ostream& o)const override;
 
