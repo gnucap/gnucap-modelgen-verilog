@@ -22,14 +22,7 @@
 /*--------------------------------------------------------------------------*/
 bool Module::has_analog_block() const
 {
-  // TODO: stash analogblocks in separate container.
-  for(auto i : *this){
-    if(dynamic_cast<AnalogBlock const*>(i)){
-      return true;
-    }else{
-    }
-  }
-  return false;
+  return !_analog_list.is_empty();
 }
 /*--------------------------------------------------------------------------*/
 //Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& b)

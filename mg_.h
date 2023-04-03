@@ -519,101 +519,6 @@ public:
   void fill_in_default_values();
 };
 /*--------------------------------------------------------------------------*/
-class Eval :public Base {
-protected:
-  String_Arg _name;
-  Code_Block _code;
-public:
-  void parse(CS& f);
-  void dump(std::ostream& f)const override;
-  Eval(CS& f) :_name(), _code() {parse(f);}
-  Eval() :_name(), _code() {}
-  const String_Arg&	name()const	{return _name;}
-  const Code_Block&	code()const	{return _code;}
-};
-typedef Collection<Eval> Eval_List;
-/*--------------------------------------------------------------------------*/
-class Function :public Eval {
-public:
-  void set_owner(Block const*) { }
-  void parse(CS& f);
-  void dump(std::ostream& f)const override;
-  Function() :Eval() {}
-};
-typedef Collection<Function> Function_List;
-/*--------------------------------------------------------------------------*/
-class Port_1 :public Base {
-  std::string _name;
-  std::string _short_to;
-  std::string _short_if;
-public:
-  void parse(CS& f);
-  void dump(std::ostream& f)const;
-  Port_1() {}
-  const std::string& name()const	{return _name;}
-  const std::string& short_to()const 	{return _short_to;}
-  const std::string& short_if()const 	{return _short_if;}
-  void set_owner(Block*){
-    incomplete();
-  }
-};
-typedef LiSt<Port_1, '{', '#', '}'> Port_1_List;
-/*--------------------------------------------------------------------------*/
-// TODO: Port_Base?
-class Port_3 :public Base {
-  std::string _name;
-public:
-  void parse(CS& f);
-  void dump(std::ostream& f)const;
-  Port_3() {}
-  const std::string&  name()const  {return _name;}
-
-  void set_owner(Block*) { }
-};
-// list ::= "(" port {"," port} ")"
-typedef LiSt<Port_3, '(', ',', ')'> Port_3_List_2;
-// list ::= port {"," port} ";"
-typedef LiSt<Port_3, '\0', ',', ';'> Port_3_List_3;
-/*--------------------------------------------------------------------------*/
-// TODO: Port_Base?
-class New_Port :public Port_3 {
-  Block* _owner{NULL};
-public:
-  void set_owner(Block* c) { _owner = c; }
-  void parse(CS& f);
-  New_Port() : Port_3() {}
-};
-// list ::= "(" port {"," port} ")"
-typedef LiSt<New_Port, '(', ',', ')'> New_Port_List;
-/*--------------------------------------------------------------------------*/
-class Discipline;
-// TODO: Port_Base?
-class Node;
-class Port_Discipline :public Port_3 {
-  Block* _owner{NULL};
-  Node* _node{NULL};
-public:
-  void set_owner(Block* c) { _owner = c; }
-  void parse(CS& f);
-  Port_Discipline() : Port_3() {}
-  void set_discipline(Discipline const* d);
-};
-/*--------------------------------------------------------------------------*/
-class Port_Discipline_List : public LiSt<Port_Discipline, '\0', ',', ';'>{
-  Discipline const* _disc{NULL};
-public:
-  void parse(CS& f);
-  void dump(std::ostream& f)const;
-  void set_discipline(Discipline const* d){_disc = d;}
-};
-/*--------------------------------------------------------------------------*/
-// typedef Collection<Port_Discipline_List> Port_Discipline_List_Collection;
-class Port_Discipline_List_Collection : public Collection<Port_Discipline_List>{
-public:
-  void parse(CS& f);
-  void dump(std::ostream& f)const;
-};
-/*--------------------------------------------------------------------------*/
 class Branch;
 /*--------------------------------------------------------------------------*/
 class Branch_Ref {
@@ -692,6 +597,133 @@ public:
 //    }
 //  }
 };
+/*--------------------------------------------------------------------------*/
+// analog_procedural_block
+class AnalogBlock : public Block {
+private: // this is a stub
+  CS& parse_seq(CS& cmd);
+  CS& parse_flow_contrib(CS& cmd, std::string const&);
+  CS& parse_pot_contrib(CS& cmd, std::string const&);
+  CS& parse_real(CS& cmd);
+
+public: // this is a stub
+//  void set_owner(Block* ctx) {_owner = ctx;}
+  void parse(CS& cmd) override;
+  void dump(std::ostream& o)const override;
+
+
+//  Block?
+  Probe const* new_probe(std::string const& xs, std::string const& p, std::string const& n)override {
+    assert(ctx());
+    return ctx()->new_probe(xs, p, n);
+  }
+  Branch_Ref new_branch(std::string const& p, std::string const& n)override {
+    assert(ctx());
+    return ctx()->new_branch(p, n);
+  }
+  Node const* node(std::string const& n)const override {
+    assert(ctx());
+    return ctx()->node(n);
+  }
+};
+typedef Collection<AnalogBlock> AnalogBlock_List;
+#if 0
+class Eval :public Base {
+protected:
+  String_Arg _name;
+  Code_Block _code;
+public:
+  void parse(CS& f);
+  void dump(std::ostream& f)const override;
+  Eval(CS& f) :_name(), _code() {parse(f);}
+  Eval() :_name(), _code() {}
+  const String_Arg&	name()const	{return _name;}
+  const Code_Block&	code()const	{return _code;}
+};
+typedef Collection<Eval> Eval_List;
+/*--------------------------------------------------------------------------*/
+class Function :public Eval {
+public:
+  void set_owner(Block const*) { }
+  void parse(CS& f);
+  void dump(std::ostream& f)const override;
+  Function() :Eval() {}
+};
+typedef Collection<Function> Function_List;
+#endif
+/*--------------------------------------------------------------------------*/
+class Port_1 :public Base {
+  std::string _name;
+  std::string _short_to;
+  std::string _short_if;
+public:
+  void parse(CS& f);
+  void dump(std::ostream& f)const;
+  Port_1() {}
+  const std::string& name()const	{return _name;}
+  const std::string& short_to()const 	{return _short_to;}
+  const std::string& short_if()const 	{return _short_if;}
+  void set_owner(Block*){
+    incomplete();
+  }
+};
+typedef LiSt<Port_1, '{', '#', '}'> Port_1_List;
+/*--------------------------------------------------------------------------*/
+// TODO: Port_Base?
+class Port_3 :public Base {
+  std::string _name;
+public:
+  void parse(CS& f);
+  void dump(std::ostream& f)const;
+  Port_3() {}
+  const std::string&  name()const  {return _name;}
+
+  void set_owner(Block*) { }
+};
+// list ::= "(" port {"," port} ")"
+typedef LiSt<Port_3, '(', ',', ')'> Port_3_List_2;
+// list ::= port {"," port} ";"
+typedef LiSt<Port_3, '\0', ',', ';'> Port_3_List_3;
+/*--------------------------------------------------------------------------*/
+// TODO: Port_Base?
+class New_Port :public Port_3 {
+  Block* _owner{NULL};
+public:
+  void set_owner(Block* c) { _owner = c; }
+  void parse(CS& f);
+  New_Port() : Port_3() {}
+};
+// list ::= "(" port {"," port} ")"
+typedef LiSt<New_Port, '(', ',', ')'> New_Port_List;
+/*--------------------------------------------------------------------------*/
+class Discipline;
+// TODO: Port_Base?
+class Node;
+class Port_Discipline :public Port_3 {
+  Block* _owner{NULL};
+  Node* _node{NULL};
+public:
+  void set_owner(Block* c) { _owner = c; }
+  void parse(CS& f);
+  Port_Discipline() : Port_3() {}
+  void set_discipline(Discipline const* d);
+};
+/*--------------------------------------------------------------------------*/
+class Port_Discipline_List : public LiSt<Port_Discipline, '\0', ',', ';'>{
+  Discipline const* _disc{NULL};
+public:
+  void parse(CS& f);
+  void dump(std::ostream& f)const;
+  void set_discipline(Discipline const* d){_disc = d;}
+};
+/*--------------------------------------------------------------------------*/
+// typedef Collection<Port_Discipline_List> Port_Discipline_List_Collection;
+class Port_Discipline_List_Collection : public Collection<Port_Discipline_List>{
+public:
+  void parse(CS& f);
+  void dump(std::ostream& f)const;
+};
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class Element_1 :public Base {
   std::string _dev_type;
@@ -1121,7 +1153,7 @@ private: // verilog input data
   Element_2_List _element_list;
   Port_1_List	_local_nodes;
   Attribute_Instance _attribute_dummy;
-//  Block_List	_tr_eval;
+  AnalogBlock_List	_analog_list;
   Code_Block		_validate;
 private: // elaboration data
   Filter_List _filters;
@@ -1146,6 +1178,7 @@ public:
   const Element_2_List&	  circuit()const	{return _element_list;}
   const Port_1_List&	  local_nodes()const	{return _local_nodes;}
 //  const Code_Block&	 tr_eval()const		{return _tr_eval;}
+  const AnalogBlock_List& analog_list() const {return _analog_list;}
   const Code_Block&	 validate()const	{return _validate;}
     	size_t		  min_nodes()const	{return ports().size();}
     	size_t		  max_nodes()const	{return ports().size();}
@@ -1288,35 +1321,6 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-// analog_procedural_block
-class AnalogBlock : public Block {
-private: // this is a stub
-  CS& parse_seq(CS& cmd);
-  CS& parse_flow_contrib(CS& cmd, std::string const&);
-  CS& parse_pot_contrib(CS& cmd, std::string const&);
-  CS& parse_real(CS& cmd);
-
-public: // this is a stub
-//  void set_owner(Block* ctx) {_owner = ctx;}
-  void parse(CS& cmd) override;
-  void dump(std::ostream& o)const override;
-
-
-//  Block?
-  Probe const* new_probe(std::string const& xs, std::string const& p, std::string const& n)override {
-    assert(ctx());
-    return ctx()->new_probe(xs, p, n);
-  }
-  Branch_Ref new_branch(std::string const& p, std::string const& n)override {
-    assert(ctx());
-    return ctx()->new_branch(p, n);
-  }
-  Node const* node(std::string const& n)const override {
-    assert(ctx());
-    return ctx()->node(n);
-  }
-/*--------------------------------------------------------------------------*/
-};
 /*--------------------------------------------------------------------------*/
 class File : public Block {
   std::string	_name;

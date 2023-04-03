@@ -196,7 +196,7 @@ void make_module_default_constructor(std::ostream& out, const Module& d)
 /*--------------------------------------------------------------------------*/
 static void make_do_tr(std::ostream& o, const Module& m)
 {
-    o << "bool MOD_" << m.identifier() << "::do_tr() // Common::tr_eval? AnalogBlock\n{\n";
+    o << "bool MOD_" << m.identifier() << "::do_tr()\n{\n";
     o__ "clear_branch_contributions();\n";
     o__ "read_probes();\n";
     o__ "COMMON_" << m.identifier() << " const* c = "

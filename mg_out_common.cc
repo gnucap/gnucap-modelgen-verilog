@@ -440,7 +440,7 @@ static void make_common_tr_eval(std::ostream& o, const Module& m)
   o__ "MOD_" << m.identifier() << " const* p = d;\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
 
-  for(auto bb : m){
+  for(auto bb : m.analog_list()){
     assert(bb);
     if(auto ab = dynamic_cast<AnalogBlock const*>(bb)){
       o << ind << "{\n";

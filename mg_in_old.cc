@@ -183,31 +183,19 @@ void Parameter_Block::dump(std::ostream& out)const
     "  }\n";
 }
 /*--------------------------------------------------------------------------*/
-void Eval::parse(CS& file)
-{
-  file >> _name >> _code;
-}
-/*--------------------------------------------------------------------------*/
-void Eval::dump(std::ostream& out)const
-{
-  out << "  eval " << name() << " {"
-      << code() <<
-    "  }\n";
-}
-/*--------------------------------------------------------------------------*/
-void Function::parse(CS& file)
-{
-  file >> _name;
-  _name += '(' + file.ctos("{", "(", ")") + ')';
-  file >> _code;
-}
-/*--------------------------------------------------------------------------*/
-void Function::dump(std::ostream& out)const
-{
-  out << "  function " << name() << " {"
-      << code() <<
-    "  }\n";
-}
+//void Function::parse(CS& file)
+//{
+//  file >> _name;
+//  _name += '(' + file.ctos("{", "(", ")") + ')';
+//  file >> _code;
+//}
+///*--------------------------------------------------------------------------*/
+//void Function::dump(std::ostream& out)const
+//{
+//  out << "  function " << name() << " {"
+//      << code() <<
+//    "  }\n";
+//}
 /*--------------------------------------------------------------------------*/
 void Element_1::parse(CS& file)
 {

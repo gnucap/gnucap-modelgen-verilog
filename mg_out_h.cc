@@ -481,7 +481,6 @@ static void make_device(std::ostream& out, const Device& d)
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
-#endif
 /*--------------------------------------------------------------------------*/
 static void make_eval(std::ostream& out, const Eval& e,
 		      const String_Arg& dev_name)
@@ -506,6 +505,7 @@ static void make_eval(std::ostream& out, const Eval& e,
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
+#endif
 /*--------------------------------------------------------------------------*/
 #if 0
 static void make_evals(std::ostream& out, const Device& d)

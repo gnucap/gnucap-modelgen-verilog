@@ -425,9 +425,12 @@ void Module::dump(std::ostream& o)const
   }else{
   }
 
-  for(auto i: *this){
+  for(auto i: analog_list()){
     o << *i << "\n";
   }
+//  for(auto i: *this){
+//    o << *i << "\n";
+//  }
 
   o << "endmodule\n";
 }
@@ -437,7 +440,7 @@ CS& Module::parse_analog(CS& cmd)
   AnalogBlock* ab = new AnalogBlock();
   ab->set_owner(this);
   ab->parse(cmd);
-  push_back(ab);
+  _analog_list.push_back(ab);
 
   return cmd;
 }
