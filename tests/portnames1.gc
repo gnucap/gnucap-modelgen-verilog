@@ -4,8 +4,8 @@ attach ../d_vasrc.so
 
 `modelgen
 module portnames1(n0, n1, n2, n3);
-	electrical np, nn;
-	inout np, nn;
+	electrical n0, n1, n2, n3;
+	inout n0, n1, n2, n3;
 	analog begin
 		I(n0,n1) <+ 1.;
 		I(n2,n3) <+ 2.;
@@ -14,8 +14,7 @@ endmodule
 
 list
 
-!make portnames1.so
-
+!make portnames1.so > /dev/null
 attach ./portnames1.so
 
 verilog

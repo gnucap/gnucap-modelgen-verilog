@@ -4,6 +4,7 @@ attach ../d_vasrc.so
 
 `modelgen
 module test_vccs0(np, nn, ncp, ncn);
+electrical np, nn, ncp, ncn;
 
 analog begin
 	real gain;
@@ -13,8 +14,7 @@ end
 
 endmodule
 
-!make test_vccs0.so
-
+!make test_vccs0.so > /dev/null
 attach ./test_vccs0.so
 
 verilog

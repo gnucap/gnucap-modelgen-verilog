@@ -37,6 +37,7 @@ static void make_header(std::ostream& o, const File& in,
     "#include <gnucap/e_node.h>\n"
     "#include <gnucap/e_elemnt.h>\n"
     "#include \"../m_va.h\"\n"
+    "#include \"../e_va.h\"\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
     "const double NA(NOT_INPUT);\n"
@@ -58,10 +59,58 @@ static void make_tail(std::ostream& o, const File& in)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_common_nature(std::ostream& o, const File& f)
+{
+  for(auto i : f.nature_list()) {
+    o << "class NATURE_" << i->identifier() << " : public NATURE {\n";
+    o__ "double abstol()const override {return "<<i->abstol()<<";}\n";
+    o << "}_N_"<<i->identifier()<<";\n";
+  }
+  o << "/*--------------------------------------"
+       "------------------------------------*/\n";
+  o << "/*--------------------------------------"
+       "------------------------------------*/\n";
+  for(auto i : f.discipline_list()) {
+    o << "class DISCIPLINE_" << i->identifier() << " : public DISCIPLINE {\n";
+    o << "public:\n";
+    if(i->flow()){
+      o__ "NATURE const* flow()const override{\n";
+      o____ "return &_N_" << i->flow()->identifier() << ";\n" ;
+      o__ "}\n";
+    }else{
+    }
+    if(i->potential()){
+      o__ "NATURE const* potential()const override{\n";
+      o____ "return &_N_" << i->potential()->identifier() << ";\n" ;
+      o__ "}\n";
+    }else{
+    }
+    o << "}_D_"<<i->identifier()<<";\n";
+    o << "class _COMMON_VASRC_" << i->identifier() << " : public COMMON_VASRC {\n";
+    o << "public:\n";
+    o__ "_COMMON_VASRC_" << i->identifier() << "(int i) : COMMON_VASRC(i){}\n";
+    o << "private:\n";
+    o__ "_COMMON_VASRC_" << i->identifier() << "(_COMMON_VASRC_" << i->identifier() << " const&p)";
+    o____ " : COMMON_VASRC(p){}\n";
+    o__ "COMMON_COMPONENT* clone()const override{\n";
+    o____ "return new _COMMON_VASRC_" << i->identifier() << "(*this);\n";
+    o__ "}\n";
+    o__ "std::string name()const override{untested(); return \""<<i->identifier()<<"\";}\n";
+    o__ "DISCIPLINE const* discipline()const override {return &_D_"<<i->identifier()<<";}\n";
+
+    o << "public:\n";
+    o << "};\n";
+    o << "static _COMMON_VASRC_" << i->identifier() << " _C_V_"<<i->identifier()<<"(CC_STATIC);\n"
+     "/*--------------------------------------"
+     "------------------------------------*/\n";
+  }
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void make_cc(std::ostream& out, const File& in)
 {
   make_header(out, in, "dumpname");
+  make_common_nature(out, in);
   for (Module_List::const_iterator
        m = in.module_list().begin();
        m != in.module_list().end();

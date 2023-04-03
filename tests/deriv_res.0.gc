@@ -15,8 +15,7 @@ endmodule
 
 list
 
-!make test_res0.so
-
+!make test_res0.so > /dev/null
 attach ./test_res0.so
 
 verilog

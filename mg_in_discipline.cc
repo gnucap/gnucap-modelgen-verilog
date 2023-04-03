@@ -126,6 +126,30 @@ void Discipline::parse(CS& file)
     }
   }
   assert(file);
+
+  assert(ctx());
+  File const* f = dynamic_cast<File const*>(ctx());
+  assert(f);
+
+  if(_potential_ident!=""){
+	  auto i = f->nature_list().find(_potential_ident);
+	  if(i != f->nature_list().end()){
+		  _potential = *i;
+	  }else{ untested();
+			file.warn(0, "invalid potential nature: " + _potential_ident.to_string());
+	  }
+	}else{
+	}
+
+  if(_flow_ident!=""){
+	  auto i = f->nature_list().find(_flow_ident);
+	  if(i != f->nature_list().end()){
+		  _flow = *i;
+	  }else{ untested();
+			file.warn(0, "invalid flow nature: " + _flow_ident.to_string());
+	  }
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Discipline::dump(std::ostream& out)const

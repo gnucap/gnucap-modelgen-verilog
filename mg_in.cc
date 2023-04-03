@@ -422,6 +422,15 @@ std::string File::include(std::string const& file_name)
   return ret;
 }
 /*--------------------------------------------------------------------------*/
+void Attribute_Instance::parse(CS& file)
+{
+  if(file>>"(*"){
+    file.skipto1("*)");
+    file.skip(2);
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
 /* A.1.2
 + source_text ::=
 +	  { description }
@@ -434,6 +443,38 @@ std::string File::include(std::string const& file_name)
 +	| discipline_declaration
 -	| connectrules_declaration
 */
+void File::parse(CS& file)
+{
+  trace1("File::parse", file.fullstring());
+  _module_list.set_file(this); // needed?
+			       //
+  _module_list.set_ctx(this);
+  _macromodule_list.set_ctx(this);
+  _connectmodule_list.set_ctx(this);
+  _nature_list.set_ctx(this);
+  _discipline_list.set_ctx(this);
+
+  size_t here = _file.cursor();
+  for (;;) {
+    ONE_OF	// description
+      || (file >> _attribute_dummy)
+      || file.umatch(";")
+      || ((file >> "module ")	     && (file >> _module_list))
+      || ((file >> "macromodule ")   && (file >> _macromodule_list))
+      || ((file >> "connectmodule ") && (file >> _connectmodule_list))
+      || ((file >> "nature ")	     && (file >> _nature_list))
+      || ((file >> "discipline ")    && (file >> _discipline_list))
+      ;
+    if (!file.more()) {
+      break;
+    }else if (file.stuck(&here)) {untested();
+      file.warn(0, "syntax error, need nature, discipline, or module");
+      break;
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 void File::read(std::string const& file_name)
 {
   _name = file_name;
@@ -445,35 +486,7 @@ void File::read(std::string const& file_name)
     _cwd = file_name.substr(0, sepplace);
   }
   _file = preprocess(file_name);
-
-  _module_list.set_file(this);
-
-  size_t here = _file.cursor();
-  for (;;) {
-    ONE_OF	// description
-      || _file.umatch(";")
-      || ((_file >> "module ")	     && (_file >> _module_list))
-      || ((_file >> "macromodule ")  && (_file >> _macromodule_list))
-      || ((_file >> "connectmodule ")&& (_file >> _connectmodule_list))
-      || ((_file >> "nature ")	     && (_file >> _nature_list))
-      || ((_file >> "discipline ")   && (_file >> _discipline_list))
-#if 0
-      || ((_file >> "h_headers ")    && (_file >> _h_headers))
-      || ((_file >> "cc_headers ")   && (_file >> _cc_headers))
-      || ((_file >> "device ")	     && (_file >> _device_list))
-      || ((_file >> "model ") 	     && (_file >> _model_list))
-      || ((_file >> "h_direct ")     && (_file >> _h_direct))
-      || ((_file >> "cc_direct ")    && (_file >> _cc_direct))
-#endif
-      ;
-    if (!_file.more()) {
-      break;
-    }else if (_file.stuck(&here)) {untested();
-      _file.warn(0, "syntax error, need nature, discipline, or module");
-      break;
-    }else{
-    }
-  }
+  parse(_file);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

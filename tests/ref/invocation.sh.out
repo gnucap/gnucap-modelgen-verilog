@@ -39,6 +39,12 @@ nature Voltage
 abstol      = 1e-6;
 endnature
 
+
+discipline electrical
+   flow          Current;
+   potential     Voltage;
+enddiscipline
+
 module conductor0 (p, n);
 	inout p, n;
 	electrical p, n;

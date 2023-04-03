@@ -270,32 +270,15 @@ public:
     file >> "module ";
     size_t here = file.cursor();
     file >> name;
-    file.reset(here);
+    file.reset();
 
-    Module mock;
-    mock.set_ctx(NULL);
-    file >> mock;
+    File F;
+    file = F.preprocess("../disciplines.vams") + " " + module_content;
+    file >> F;
 
     std::ofstream o;
     o.open(name + ".cc");
-    /// BUG: duplicate?
-    o << "#include <gnucap/globals.h>\n"
-         "#include <gnucap/e_compon.h>\n"
-         "#include <gnucap/e_subckt.h>\n"
-         "#include <gnucap/e_node.h>\n"
-         "#include <gnucap/e_elemnt.h>\n"
-         "#include \"../m_va.h\"\n"
-    "/*--------------------------------------"
-    "------------------------------------*/\n";
-    o << "namespace {\n"
-    "/*--------------------------------------"
-    "------------------------------------*/\n";
-    make_cc_module(o, mock);
-    "/*--------------------------------------"
-    "------------------------------------*/\n";
-    o << "} // namespace\n"
-    "/*--------------------------------------"
-    "------------------------------------*/\n";
+    make_cc(o, F);
     o.close();
   }
 } p0;

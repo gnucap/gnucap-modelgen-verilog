@@ -1,7 +1,3 @@
-g++ -DTRACE_UNTESTED -g -O0 -fPIC  -I../include test_cs0.cc -o test_cs0.o -c
-g++ -shared  -I../include test_cs0.o  -o test_cs0.so
-rm test_cs0.o
-
 test_cs0 #() dut (.np(1),.nn(2));
 vsource #() v1 (.p(1),.n(0));
 resistor #(.r(10)) v2 (.p(2),.n(0));

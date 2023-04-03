@@ -4,6 +4,7 @@ attach ../d_vasrc.so
 
 `modelgen
 module test_cccs0(p, n, cp, cn);
+electrical p, n, cp, cn;
 
 analog begin
 	real gain;
@@ -13,8 +14,7 @@ end
 
 endmodule
 
-!make test_cccs0.so
-
+!make test_cccs0.so > /dev/null
 attach ./test_cccs0.so
 
 verilog
@@ -26,5 +26,5 @@ isource #(.dc(i)) i1(0, 1);
 parameter i=1
 list
 
-print dc v(nodes) i(d1.*) i(r0)
+print dc v(nodes) i(d1.*) i(r0) iter(0)
 dc i 0 2 .5

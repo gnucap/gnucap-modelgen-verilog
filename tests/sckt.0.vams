@@ -1,4 +1,6 @@
 
+`include "sub/disciplines.few"
+
 module net(a, b);
 	inout a, b;
 	electrical 0, 1, 2, a, b;

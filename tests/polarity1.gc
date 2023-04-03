@@ -14,8 +14,7 @@ endmodule
 
 list
 
-!make polarity1_0.so
-
+!make polarity1_0.so > /dev/null
 attach ./polarity1_0.so
 
 verilog

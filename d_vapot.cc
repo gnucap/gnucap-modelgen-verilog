@@ -29,6 +29,7 @@
  * node[2] up are inputs.
  * node[2*i] and node[2*i+1] correspond to val[i+1]
  */
+#include "e_va.h"
 #include <gnucap/globals.h>
 #include <gnucap/e_elemnt.h>
 /*--------------------------------------------------------------------------*/
@@ -92,6 +93,11 @@ public:
 		      int node_count, const node_t nodes[])override;
   //		      const double* inputs[]=0);
 protected:
+  double abstol() const{
+    auto cv = prechecked_cast<COMMON_VASRC const*>(common());
+    assert(cv); // TODO: give feedback
+    return cv->potential_abstol();
+  }
   bool do_tr_con_chk_and_q();
 }d;
 /*--------------------------------------------------------------------------*/
@@ -174,11 +180,12 @@ bool DEV_CPOLY_G::do_tr_con_chk_and_q()
   assert(_old_values);
   set_converged(conchk(_time, _sim->_time0));
   _time = _sim->_time0;
-//inline bool conchk(double o, double n,
-//		   double a=OPT::abstol, double r=OPT::reltol)
-  for (int i=0; converged() && i<=_n_ports; ++i) {
-    trace3("DCG::do_tr", i, _values[i], _old_values[i]);
-    set_converged(conchk(_old_values[i], _values[i]));
+  if(converged()){
+    set_converged(conchk(_old_values[0], _values[0], abstol()));
+  }else{
+  }
+  for (int i=1; converged() && i<=_n_ports; ++i) {
+    set_converged(conchk(_old_values[i], _values[i]) /*,0.?*/);
   }
   return converged();
 }

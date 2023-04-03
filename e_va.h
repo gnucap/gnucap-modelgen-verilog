@@ -23,16 +23,45 @@
 
 #ifndef GNUCAP_E_VA_H
 #define GNUCAP_E_VA_H
-
+/*--------------------------------------------------------------------------*/
 #include <gnucap/e_compon.h>
+/*--------------------------------------------------------------------------*/
+class NATURE {
+public:
+  virtual double abstol()const{return 0.;}
+};
+/*--------------------------------------------------------------------------*/
+class DISCIPLINE {
+public:
+  virtual NATURE const* flow()const {return NULL;}
+  virtual NATURE const* potential()const {return NULL;}
+};
+/*--------------------------------------------------------------------------*/
+// tmp kludge. nodes don't have disciplines yet...
 class COMMON_VASRC : public COMMON_COMPONENT {
-  double _abstol{0.};
 public:
   explicit COMMON_VASRC(int i) : COMMON_COMPONENT(i) {}
   ~COMMON_VASRC() {}
 public:
-  double abstol(){return _abstol;}
-  void set_abstol(double a){_abstol = a;}
+  virtual DISCIPLINE const* discipline()const{return NULL;};
+  double flow_abstol() const{ untested();
+    if(!discipline()){ untested();
+      return OPT::abstol;
+    }else if(!discipline()->flow()){ untested();
+      return OPT::abstol;
+    }else{ untested();
+      return discipline()->flow()->abstol();
+    }
+  }
+  double potential_abstol() const{
+    if(!discipline()){ untested();
+      return OPT::abstol;
+    }else if(!discipline()->potential()){
+      return OPT::abstol;
+    }else{ untested();
+      return discipline()->potential()->abstol();
+    }
+  }
 };
 #endif
 /*--------------------------------------------------------------------------*/

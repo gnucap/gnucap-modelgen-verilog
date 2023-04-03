@@ -28,11 +28,13 @@ discipline electrical
 enddiscipline
 
 
-module conductor0(p, n);
+module device(p, n);
   inout p, n;
   electrical p, n;
+  // params
+  parameter real c = 1.;
+;
   analog begin
-    I(p, n) <+ V(p, n)
   end
 
 endmodule

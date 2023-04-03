@@ -92,9 +92,13 @@ public:
 		      int node_count, const node_t nodes[])override;
   //		      const double* inputs[]=0);
 protected:
-  double abstol() const;
+  double abstol() const{
+    auto cv = prechecked_cast<COMMON_VASRC const*>(common());
+    assert(cv); // TODO: give feedback
+    return cv->flow_abstol();
+  }
   bool do_tr_con_chk_and_q();
-}f;
+}f; // DEV_CPOLY_G;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 DEV_CPOLY_G::DEV_CPOLY_G(const DEV_CPOLY_G& p)
@@ -176,11 +180,12 @@ bool DEV_CPOLY_G::do_tr_con_chk_and_q()
   assert(_old_values);
   set_converged(conchk(_time, _sim->_time0));
   _time = _sim->_time0;
-//inline bool conchk(double o, double n,
-//		   double a=OPT::abstol, double r=OPT::reltol)
-  for (int i=0; converged() && i<=_n_ports; ++i) {
-    //set_converged(conchk(_old_values[i], _values[i], abstol()));
-    set_converged(conchk(_old_values[i], _values[i]));
+  if(converged()){
+    set_converged(conchk(_old_values[0], _values[0], abstol()));
+  }else{
+  }
+  for (int i=1; converged() && i<=_n_ports; ++i) {
+    set_converged(conchk(_old_values[i], _values[i]) /*,0.?*/);
   }
   return converged();
 }

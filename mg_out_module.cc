@@ -55,6 +55,34 @@ static int is_function(std::string const& n)
   }
 }
 /*--------------------------------------------------------------------------*/
+static String_Arg const& potential_abstol(Branch const& b)
+{
+  static String_Arg def("OPT::abstol");
+  if(!b.discipline()){
+    incomplete();
+    return def;
+  }else if(!b.discipline()->potential()){ untested();
+    incomplete();
+    return def;
+  }else{
+    return b.discipline()->potential()->abstol();
+  }
+}
+/*--------------------------------------------------------------------------*/
+static String_Arg const& flow_abstol(Branch const& b)
+{
+  static String_Arg def("OPT::abstol");
+  if(!b.discipline()){
+    incomplete();
+    return def;
+  }else if(!b.discipline()->flow()){ untested();
+    incomplete();
+    return def;
+  }else{
+    return b.discipline()->flow()->abstol();
+  }
+}
+/*--------------------------------------------------------------------------*/
 static void make_tr_needs_eval(std::ostream& o, const Module& m)
 {
   o << "bool MOD_" << m.identifier() << "::tr_needs_eval()const\n{\n";
@@ -66,10 +94,23 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
   for(auto x : m.probes()){
     Probe const* p = x.second;
     assert(p);
-    if(!p->is_reversed()){
+    if(p->is_reversed()){
+      // only check once.
+    }else if(p->is_pot_probe()){
       o << " if(!conchk("<< p->code_name() << ", "
-	  "_n[n_"<< p->pname() <<"].v0() - _n[n_"<< p->nname() <<"].v0(),";
-      o << " OPT::vntol)){\n";
+	  "_n[n_"<< p->pname() <<"].v0() - _n[n_"<< p->nname() <<"].v0(), ";
+      o << potential_abstol(*p->branch()) << ")){\n";
+      o____ "trace3(\"need eval\", "<< p->code_name() << ", "
+          "_n[n_"<< p->pname() <<"].v0(), _n[n_"<< p->nname() <<"].v0());\n";
+      o____ "return true;\n" <<ind<<"}else";
+
+      if(p->nature())
+      o__ "/* Nature: " << p->nature()->identifier() << "*/";
+    }else if(p->is_flow_probe()){
+      o << " if(!conchk("<< p->code_name() << ", "
+	<<  p->branch()->code_name() << "->tr_amps(), ";
+      o << flow_abstol(*p->branch()) << ")){\n";
+      o____ "trace2(\"need eval\", "<< p->code_name() << ", " << p->branch()->code_name() << "->tr_amps());\n";
       o____ "return true;\n" <<ind<<"}else";
 
       if(p->nature())
@@ -352,11 +393,10 @@ static void make_set_parameters(std::ostream& o, const Element_2& e)
 {
   make_tag();
   o______ e.code_name() << "->set_parameters(\"" << e.code_name() << "\", this, ";
-  if (e.nature()) {
-    unreachable();
-    incomplete();
-    o << "&_" << e.nature()->identifier();
-  }else{
+  if (e.discipline()) {
+    // incomplete(); need NODE commons (or so)
+    o << "&_C_V_" << e.discipline()->identifier();
+  }else{ untested();
     o << "NULL";
   }
   o << ", 0."; // value
@@ -659,10 +699,13 @@ void make_cc_module(std::ostream& out, const Module& m)
 
   make_cc_decl(out, m);
   make_cc_common(out, m);
-	 out <<
+  out <<
       "int COMMON_" << m.identifier() << "::_count = -1;\n"
       "static COMMON_" << m.identifier() << " Default_" << m.identifier()
 	<< "(CC_STATIC);\n"
+      "/*--------------------------------------"
+      "------------------------------------*/\n";
+  out <<
       "/*--------------------------------------"
       "------------------------------------*/\n";
   make_module_class(out, m);

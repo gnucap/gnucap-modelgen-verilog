@@ -52,4 +52,10 @@ nature Voltage
 `endif
 endnature
 
+// Conservative discipline
+discipline electrical
+   flow          Current;
+   potential     Voltage;
+enddiscipline
+
 `endif

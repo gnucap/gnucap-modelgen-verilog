@@ -22,6 +22,11 @@ nature Voltage
 endnature
 
 
+discipline electrical
+  potential "Voltage";
+  flow "Current";
+enddiscipline
+
 
 module test(p, n);
   inout p, n;

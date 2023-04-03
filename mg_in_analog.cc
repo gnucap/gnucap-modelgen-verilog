@@ -230,7 +230,7 @@ CS& AnalogBlock::parse_seq(CS& cmd)
   }else if(is_flow_xs(what)) {
     parse_flow_contrib(cmd, what);
   }else if(what == "int") { untested();
-
+    incomplete();
   }else if(cmd >> "*=") { untested();
     incomplete();
   }else if(cmd >> "+=") { untested();
@@ -250,8 +250,7 @@ CS& AnalogBlock::parse_seq(CS& cmd)
 /*--------------------------------------------------------------------------*/
 Assignment::~Assignment()
 {
-  // BUG
-  // delete _rhs;
+  delete _rhs;
 }
 /*--------------------------------------------------------------------------*/
 void Assignment::parse(CS& cmd)

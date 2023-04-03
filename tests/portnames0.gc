@@ -13,8 +13,7 @@ endmodule
 
 list
 
-!make portnames0.so
-
+!make portnames0.so > /dev/null
 attach ./portnames0.so
 
 verilog

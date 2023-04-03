@@ -82,7 +82,7 @@ nature Force
   abstol = "1e-6";
 endnature
 
-nature angle
+nature Angle
   units = "rads";
   access = "Theta";
   ddt_nature = "Angular_Velocity";

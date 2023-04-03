@@ -4,6 +4,7 @@ attach ../d_vasrc.so
 
 `modelgen
 module test_vs0(p, n);
+	electrical p, n;
 	parameter real dc = 1.;
 
 	analog begin
@@ -12,8 +13,7 @@ module test_vs0(p, n);
 
 endmodule
 
-!make test_vs0.so
-
+!make test_vs0.so > /dev/null
 attach ./test_vs0.so
 
 verilog

@@ -1,7 +1,3 @@
-g++ -DTRACE_UNTESTED -g -O0 -fPIC  -I../include polarity1_0.cc -o polarity1_0.o -c
-g++ -shared  -I../include polarity1_0.o  -o polarity1_0.so
-rm polarity1_0.o
-
 polarity1_0 #() dut (.np(1),.nn(0));
 vsource #() v1 (.p(1),.n(0));
 #           v(v1)      i(v1)      r(dut._b_np_nn) iter(0)   

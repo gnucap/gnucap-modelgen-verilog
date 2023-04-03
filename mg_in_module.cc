@@ -20,6 +20,7 @@
  * 02110-1301, USA.
  */
 #include "mg_.h"
+#include "mg_out.h"
 /*--------------------------------------------------------------------------*/
 /* A.4.1	6.2.2
 + module_instantiation ::=
@@ -143,7 +144,6 @@ void Parameter_2::dump(std::ostream& out)const
 */
 void Port_3::parse(CS& file)
 {
-  trace1("Port_3::parse", file.last_match());
   file >> _name;
 }
 /*--------------------------------------------------------------------------*/
@@ -152,6 +152,65 @@ void New_Port::parse(CS& file)
   Port_3::parse(file); // TODO: port_base?
   assert(_ctx);
   _ctx->new_node(name());
+}
+/*--------------------------------------------------------------------------*/
+void Port_Discipline_List_Collection::parse(CS& f)
+{
+  assert(ctx()); // Module
+  Block const* root_scope = ctx()->ctx();
+  assert(root_scope);
+  File const* root = prechecked_cast<File const*>(root_scope);
+  assert(root);
+  auto ii = root->discipline_list().find(f);
+
+  if(ii!=root->discipline_list().end()){
+    size_t here = f.cursor();
+    Port_Discipline_List* m = new Port_Discipline_List();
+    m->set_discipline(*ii);
+
+    m->set_ctx(ctx());
+    f >> *m;
+    for(auto i : *m){
+      i->set_discipline(*ii);
+    }
+
+    push_back(m);
+
+  }else{
+    f.umatch("HACKHACK_HACK_UNLIKELY_STRING"); // unset _ok.
+    assert(!f);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Port_Discipline_List_Collection::dump(std::ostream& out)const
+{
+  Collection<Port_Discipline_List>::dump(out);
+}
+/*--------------------------------------------------------------------------*/
+void Port_Discipline_List::parse(CS& f)
+{
+  trace1("Port_Disc_List::parse", f.last_match());
+  return LiSt<Port_Discipline, '\0', ',', ';'>::parse(f);
+}
+/*--------------------------------------------------------------------------*/
+void Port_Discipline_List::dump(std::ostream& o)const
+{
+  assert(_disc);
+  o__ _disc->identifier() << " ";
+  LiSt<Port_Discipline, '\0', ',', ';'>::dump(o);
+  o << "\n";
+}
+/*--------------------------------------------------------------------------*/
+void Port_Discipline::parse(CS& file)
+{
+  Port_3::parse(file); // TODO: port_base?
+  assert(_ctx);
+  _node = _ctx->new_node(name());
+}
+/*--------------------------------------------------------------------------*/
+void Port_Discipline::set_discipline(Discipline const* d)
+{
+  _node->set_discipline(d);
 }
 /*--------------------------------------------------------------------------*/
 void Port_3::dump(std::ostream& out)const
@@ -243,6 +302,30 @@ void Port_3::dump(std::ostream& out)const
 +	| "output"
 -		output_variable_type
 +		list_of_port_identifiers
+
+
+net_declaration ::=
+- net_type [ discipline_identifier ] [ signed ]
+- [ delay3 ] list_of_net_identifiers ;
+- | net_type [ discipline_identifier ] [ drive_strength ] [ signed ]
+- [ delay3 ] list_of_net_decl_assignments ;
+- | net_type [ discipline_identifier ] [ vectored | scalared ] [ signed ]
+- range [ delay3 ] list_of_net_identifiers ;
+- | net_type [ discipline_identifier ] [ drive_strength ] [ vectored | scalared ] [ signed ]
+- range [ delay3 ] list_of_net_decl_assignments ;
+- | trireg [ discipline_identifier ] [ charge_strength ] [ signed ]
+- [ delay3 ] list_of_net_identifiers ;
+- | trireg [ discipline_identifier ] [ drive_strength ] [ signed ]
+- [ delay3 ] list_of_net_decl_assignments ;
+- | trireg [ discipline_identifier ] [ charge_strength ] [ vectored | scalared ] [ signed ]
+- range [ delay3 ] list_of_net_identifiers ;
+- | trireg [ discipline_identifier ] [ drive_strength ] [ vectored | scalared ] [ signed ]
+- range [ delay3 ] list_of_net_decl_assignments ;
+~ | discipline_identifier [ range ] list_of_net_identifiers ;
+- | discipline_identifier [ range ] list_of_net_decl_assignments ;
+- | wreal [ discipline_identifier ] [ range] list_of_net_identifiers ;
+- | wreal [ discipline_identifier ] [ range] list_of_net_decl_assignments ;
+- | ground [ discipline_identifier ] [ range ] list_of_net_identifiers ;
 */
 void Module::parse(CS& file)
 {
@@ -252,7 +335,7 @@ void Module::parse(CS& file)
   _output.set_ctx(this);
   _inout.set_ctx(this);
   _ground.set_ctx(this);
-  _electrical.set_ctx(this);
+  _disc_assign.set_ctx(this);
   _parameters.set_ctx(this);
   _local_params.set_ctx(this);
   _element_list.set_ctx(this);
@@ -264,21 +347,25 @@ void Module::parse(CS& file)
   file >> _identifier >> _ports >> ';';
   assert(_parameters.ctx() == this);
 
-  trace1("Module::parse", _identifier);
+
+  Block* root_scope = ctx();
+  File const* root = prechecked_cast<File const*>(ctx());
+  assert(root);
 
   size_t here = file.cursor();
   for (;;) {
     ONE_OF	// module_item
+      || (file >> _attribute_dummy)
       || file.umatch(";")
       // mi, port_declaration
       || ((file >> "input ") && (file >> _input))
       || ((file >> "output ") && (file >> _output))
       || ((file >> "inout ") && (file >> _inout))
-      // mi, npmi, mogi, mogid, net_declaration
+      // mi, npmi, mogi, mogid
       || ((file >> "ground ") && (file >> _ground))
       || ((file >> "branch ") && (file >> _branches))
-      || ((file >> "electrical ") && (file >> _electrical))
-     // || ((file.find(disciplines) && (parse_net(file))
+      // net_declaration
+      || (file >> _disc_assign)
       || ((file >> "parameter ") && (file >> _parameters))
       || ((file >> "localparam ") && (file >> _local_params))
       ;
@@ -332,10 +419,7 @@ void Module::dump(std::ostream& o)const
     o << "  ground "	    << ground()			<< "\n";
   }else{
   }
-  if(electrical().size()){
-    o << "  electrical "  << electrical()		<< "\n";
-  }else{
-  }
+  o << disc_assign();
   if(parameters().size()){
     o << ind << "// params\n";
     o << parameters() << "\n";

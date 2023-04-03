@@ -1,7 +1,3 @@
-g++ -DTRACE_UNTESTED -g -O0 -fPIC  -I../include test_vs0.cc -o test_vs0.o -c
-g++ -shared  -I../include test_vs0.o  -o test_vs0.so
-rm test_vs0.o
-
 parameter dc not specified, using default
 test_vs0 #(.dc(dc)) dut (.p(1),.n(0));
 resistor #(.r(2)) r0 (.p(1),.n(0));

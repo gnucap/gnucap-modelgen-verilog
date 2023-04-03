@@ -99,6 +99,13 @@ public:
   }
 };
 /*--------------------------------------------------------------------------*/
+// a stub
+class Attribute_Instance :public Base {
+public:
+  void parse(CS& f);
+  void dump(std::ostream& o)const override{}
+};
+/*--------------------------------------------------------------------------*/
 #if 0 // eek, also in m_base.h
 template <class T>
 class List_Base
@@ -309,6 +316,8 @@ public:
   typedef typename List_Base<T>::const_iterator const_iterator;
 
   void set_ctx(Block* c) { _ctx = c; }
+  Block const* ctx() const{return _ctx;}
+  Block* ctx(){return _ctx;}
   void set_file(File const* f){ _file = f; }
   void parse(CS& file) {
     size_t here = file.cursor();
@@ -352,9 +361,9 @@ public:
     return x;
   }
   String_Arg _dummy;
-  const String_Arg& operator[](const String_Arg& s) const { untested();
+  const String_Arg& operator[](const String_Arg& s) const {
     const_iterator x = find(s);
-    if (x != end()) { untested();
+    if (x != end()) {
       assert(*x);
       return (**x).value();
     }else{ untested();
@@ -577,6 +586,34 @@ public:
 // list ::= "(" port {"," port} ")"
 typedef LiSt<New_Port, '(', ',', ')'> New_Port_List;
 /*--------------------------------------------------------------------------*/
+class Discipline;
+// TODO: Port_Base?
+class Node;
+class Port_Discipline :public Port_3 {
+  Block* _ctx{NULL};
+  Node* _node{NULL};
+public:
+  void set_ctx(Block* c) { _ctx = c; }
+  void parse(CS& f);
+  Port_Discipline() : Port_3() {}
+  void set_discipline(Discipline const* d);
+};
+/*--------------------------------------------------------------------------*/
+class Port_Discipline_List : public LiSt<Port_Discipline, '\0', ',', ';'>{
+  Discipline const* _disc{NULL};
+public:
+  void parse(CS& f);
+  void dump(std::ostream& f)const;
+  void set_discipline(Discipline const* d){_disc = d;}
+};
+/*--------------------------------------------------------------------------*/
+// typedef Collection<Port_Discipline_List> Port_Discipline_List_Collection;
+class Port_Discipline_List_Collection : public Collection<Port_Discipline_List>{
+public:
+  void parse(CS& f);
+  void dump(std::ostream& f)const;
+};
+/*--------------------------------------------------------------------------*/
 class Branch;
 /*--------------------------------------------------------------------------*/
 class Branch_Ref {
@@ -592,21 +629,6 @@ public:
   std::string const& pname() const;
   std::string const& nname() const;
 };
-/*--------------------------------------------------------------------------*/
-#if 0
-class BranchRef {
-  Branch const* _br;
-  bool _r;
-public:
-  explicit BranchRef(Branch const* b, bool reversed=false) :
-    _br(b), _r(reversed) {}
-  operator Branch const*() const{ return _br; }
-  bool reversed() const{return _r;}
-
-  std::string const& pname() const;
-  std::string const& nname() const;
-};
-#endif
 /*--------------------------------------------------------------------------*/
 /// Some kind of sequential block with scope for parameters, variables..
 class Probe;
@@ -631,7 +653,7 @@ public:
   {unreachable(); return NULL;}
   virtual Branch_Ref new_branch(std::string const& p, std::string const& n)
   {unreachable(); return Branch_Ref(NULL);}
-  virtual Node const* new_node(std::string const& p){ untested();
+  virtual Node* new_node(std::string const& p){ untested();
     assert(_ctx);
     return _ctx->new_node(p);
   }
@@ -725,6 +747,7 @@ public:
 //  const std::string& module_or_paramset_identifier()const {return _module_or_paramset_identifier;}
   virtual const std::string& dev_type()const {return _module_or_paramset_identifier;}
   virtual Nature const* nature()const {return NULL;}
+  virtual Discipline const* discipline()const {return NULL;}
   const Parameter_3_List& 
 		     list_of_parameter_assignments()const {return _list_of_parameter_assignments;}
   const Port_3_List_2& list_of_port_connections()const	  {return _list_of_port_connections;}
@@ -841,7 +864,7 @@ public:
   }
   bool is_reversed() const;
   Nature const* nature() const;
-};
+}; // Probe
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -967,10 +990,12 @@ public:
   void dump(std::ostream& f)const override;
   Nature() {}
   const String_Arg&	identifier()const	{return _identifier;}
+  const String_Arg&  key()const	  {return _identifier;}
   const String_Arg&	parent_nature()const	{return _parent_nature;}
   const Attribute_List&	attributes()const	{return _attributes;}
   const String_Arg&	operator[](const String_Arg& k)const {return _attributes[k];}
   const String_Arg&	access()const		{return _attributes["access"];}
+  const String_Arg&	abstol()const		{return _attributes["abstol"];}
 };
 typedef Collection<Nature> Nature_List;
 /*--------------------------------------------------------------------------*/
@@ -978,14 +1003,22 @@ class Discipline :public Base {
   String_Arg	_identifier;
   String_Arg	_potential_ident;
   String_Arg	_flow_ident;
+  Nature const* _flow{NULL};
+  Nature const* _potential{NULL};
+  Block const* _ctx;
 public:
-  void set_ctx(Block const*) { }
+  void set_ctx(Block const* c) {_ctx=c;}
+  Block const* ctx() {return _ctx;}
+  const String_Arg&  key()const	  {return _identifier;}
   void parse(CS& f);
   void dump(std::ostream& f)const override;
   Discipline() {}
   const String_Arg&  identifier()const	    {return _identifier;}
   const String_Arg&  potential_ident()const {return _potential_ident;}
   const String_Arg&  flow_ident()const	    {return _flow_ident;}
+
+  Nature const* flow() const{return _flow;}
+  Nature const* potential()const{return _potential;}
 };
 typedef Collection<Discipline> Discipline_List;
 /*--------------------------------------------------------------------------*/
@@ -1041,8 +1074,9 @@ public:
   bool has_flow_source() const { return _has_flow_src; }
   bool has_pot_source() const;
   size_t num_states() const;
-  Nature const* nature() const;
-};
+  Discipline const* discipline() const override;
+  Nature const* nature() const override;
+}; // Branch
 /*--------------------------------------------------------------------------*/
 class Branch_Map {
   typedef std::pair<Node const*, Node const*> key;
@@ -1081,11 +1115,12 @@ private: // verilog input data
   Port_3_List_3	_output;
   Port_3_List_3	_inout;
   Port_3_List_3	_ground;
-  Port_3_List_3	_electrical;
+  Port_Discipline_List_Collection _disc_assign;
   Parameter_2_List _parameters;
   Parameter_2_List _local_params;
   Element_2_List _element_list;
   Port_1_List	_local_nodes;
+  Attribute_Instance _attribute_dummy;
 //  Block_List	_tr_eval;
   Code_Block		_validate;
 private: // elaboration data
@@ -1104,7 +1139,7 @@ public:
   const Port_3_List_3&	  output()const		{return _output;}
   const Port_3_List_3&	  inout()const		{return _inout;}
   const Port_3_List_3&	  ground()const		{return _ground;}
-  const Port_3_List_3&	  electrical()const	{return _electrical;}
+  const Port_Discipline_List_Collection& disc_assign()const{return _disc_assign;}
   const Parameter_2_List& parameters()const	{return _parameters;}
   const Parameter_2_List& local_params()const	{return _local_params;}
   const Element_2_List&	  element_list()const	{return _element_list;}
@@ -1128,7 +1163,7 @@ private:
   Probe const* new_probe(std::string const&, std::string const&, std::string const&) override;
   Filter const* new_filter(std::string const&, Deps const&) override;
   Branch_Ref new_branch(std::string const&, std::string const&) override;
-  Node const* new_node(std::string const& p) override;
+  Node* new_node(std::string const& p) override;
   Node const* node(std::string const& p) const override;
 }; // Module
 typedef Collection<Module> Module_List;
@@ -1229,6 +1264,7 @@ class Node :public Base {
   std::string _name;
   std::string _short_to;
   std::string _short_if;
+  Discipline const* _discipline{NULL};
   Nature const* _nature{NULL};
 public:
   void parse(CS&)override{};
@@ -1240,6 +1276,9 @@ public:
   std::string code_name()const	{return "n_" + _name;}
 //  const std::string& short_to()const 	{return _short_to;}
 //  const std::string& short_if()const 	{return _short_if;}
+  void set_discipline(Discipline const* d){ _discipline = d; }
+
+  Discipline const* discipline() const{  return _discipline; }
   Nature const* nature() const{ return _nature; }
 };
 /*--------------------------------------------------------------------------*/
@@ -1297,7 +1336,8 @@ class File : public Block {
   Module_List	_module_list;
   Module_List	_macromodule_list;
   Module_List	_connectmodule_list;
-private:
+  Attribute_Instance _attribute_dummy;
+public:
   std::string preprocess(const std::string& file_name);
   std::string include(const std::string& file_name);
 public: // build
@@ -1305,23 +1345,21 @@ public: // build
   void read(std::string const&);
   void define(std::string const&);
   void add_include_path(std::string const&);
-  void parse(CS& f) override {unreachable();}
+  void parse(CS& f) override;
 
 public: // readout
   const std::string& name()const	{return _name;}
-  const std::string fullstring()const	{return _file.fullstring();}
+  const std::string  fullstring()const	{return _file.fullstring();}
   const Head&	     head()const	{return _head;}
   const Code_Block&  h_headers()const	{return _h_headers;}
   const Code_Block&  cc_headers()const	{return _cc_headers;}
-//  const Model_List&  models()const	{return _model_list;}
-  const Module_List&  modules()const	{return _module_list;}
-//  const Device_List& devices()const	{return _device_list;}
+  const Module_List& modules()const	{return _module_list;}
   const Code_Block&  h_direct()const	{return _h_direct;}
   const Code_Block&  cc_direct()const	{return _cc_direct;}
 
   const Define_List&	 define_list()const	{return _define_list;}
   const Nature_List&	 nature_list()const	{return _nature_list;}
-  const Discipline_List& discipline_list()const {return _discipline_list;}
+  const Discipline_List& discipline_list()const	{return _discipline_list;}
   const Module_List&	 module_list()const	{return _module_list;}
   const Module_List&	 macromodule_list()const	{return _macromodule_list;}
   const Module_List&	 connectmodule_list()const	{return _connectmodule_list;}

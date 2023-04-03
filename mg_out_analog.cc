@@ -152,7 +152,7 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
 {
   o << "/* RPN ";
   assert(a.rhs());
-  auto e = *a.rhs();
+  auto const& e = *a.rhs();
   for (Expression::const_iterator i = e.begin(); i != e.end(); ++i) {
     o << "" << (*i)->full_name() << " ";
   }

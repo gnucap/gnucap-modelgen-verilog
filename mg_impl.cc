@@ -94,7 +94,7 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
   return _branches.new_branch(pp, nn);
 }
 /*--------------------------------------------------------------------------*/
-Node const* Module::new_node(std::string const& p)
+Node* Module::new_node(std::string const& p)
 {
   Node*& cc = _nodes[p];
   if(cc) {
@@ -120,7 +120,7 @@ size_t Branch::num_nodes() const
   size_t ret=1;
 
   for(auto i : deps()){
-    if(i->is_reversed()){ untested();
+    if(i->is_reversed()){
     }else if(i->branch() == this){
       // self conductance
     }else if(i->is_pot_probe()){
@@ -190,6 +190,7 @@ std::string const& Branch_Ref::nname() const
   }
 }
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 bool Branch::has_element() const
 {
   return has_flow_source() || has_pot_source() || has_flow_probe();
@@ -204,7 +205,7 @@ size_t Branch::num_states() const
 {
   size_t k = 2;
   for(auto i : deps()){
-    if(i->is_reversed()){ untested();
+    if(i->is_reversed()){
     }else if(i->branch() == this){
     }else{
       ++k;
@@ -217,6 +218,22 @@ std::string Branch::state()const
 {
   return "_st" + code_name();
 }
+/*--------------------------------------------------------------------------*/
+Discipline const* Branch::discipline() const
+{
+  assert(_p);
+  assert(_n);
+  if(!_p->discipline()){
+    incomplete();
+    return NULL;
+  }else if(_p->discipline() == _n->discipline()){
+    return _p->discipline();
+  }else{ untested();
+    incomplete();
+    return NULL;
+  }
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 Probe::Probe(std::string const& xs, Branch_Ref b) : _xs(xs), _br(b)
 {
@@ -237,14 +254,8 @@ bool Probe::is_reversed() const
 /*--------------------------------------------------------------------------*/
 Nature const* Branch::nature() const
 {
-  assert(_p);
-  assert(_n);
-  if(_p->nature() == _n->nature()){
-    return _p->nature();
-  }else{
-    incomplete();
-    return NULL;
-  }
+//  source?
+  return NULL;
 }
 /*--------------------------------------------------------------------------*/
 Nature const* Probe::nature() const

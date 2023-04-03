@@ -208,7 +208,7 @@ enddiscipline
 // Rotational
   
 // Angle in radians
-nature angle
+nature Angle
    units      = "rads";
    access     = Theta;
    ddt_nature = Angular_Velocity;

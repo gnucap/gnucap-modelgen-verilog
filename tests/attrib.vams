@@ -1,0 +1,11 @@
+`include "sub/disciplines.few"
+
+(* test=string *)
+module device(p,n);
+	inout p,n;
+	(* desc="normal port" *) electrical p,n;
+
+	parameter real c=1.; //  from [0:inf);
+	analog begin
+	end
+endmodule

@@ -1,0 +1,20 @@
+`define pp endmodule
+`define ports(x, y) (x, y)
+`define macro1(a, b, c) module c
+`define macro2(a, b, c) module c (1 2)
+`define macro3(a, b, c) module c(1, 2)  endmodule 
+`define macro4(a, b, c) module c  ( a b ) 
+
+
+
+module modulename(1, 2);
+endmodule
+module aa(1, 2);
+endmodule
+module bb(1, 2);
+endmodule
+module xx(11, 12);
+endmodule
+
+
+
