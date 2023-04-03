@@ -353,6 +353,7 @@ void Module::parse(CS& file)
   assert(root);
 
   size_t here = file.cursor();
+  bool end = false;
   for (;;) {
     ONE_OF	// module_item
       || (file >> _attribute_dummy)
@@ -366,18 +367,6 @@ void Module::parse(CS& file)
       || ((file >> "branch ") && (file >> _branches))
       // net_declaration
       || (file >> _disc_assign)
-      || ((file >> "parameter ") && (file >> _parameters))
-      || ((file >> "localparam ") && (file >> _local_params))
-      ;
-    if (file.stuck(&here)) {
-      break;
-    }else{
-    }
-  }
-  bool end=false;
-  for (;;) {
-    ONE_OF	// non-port module_item
-      || file.umatch(";")
       // mi, npmi, mogi, module_or_generate_item_declaration
       // mi, npmi, module_or_generate_item
       || ((file >> "localparam ") && (file >> _local_params))
