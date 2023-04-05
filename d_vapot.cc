@@ -38,6 +38,7 @@ namespace {
 class DEV_CPOLY_G : public ELEMENT {
 protected:
   double*  _values;
+  double*  _adj_values; // adjusted
   double*  _old_values;
   int	   _n_ports;
   double   _time;
@@ -185,7 +186,7 @@ bool DEV_CPOLY_G::do_tr_con_chk_and_q()
   }else{
   }
   for (int i=1; converged() && i<=_n_ports; ++i) {
-    set_converged(conchk(_old_values[i], _values[i]) /*,0.?*/);
+    set_converged(conchk(_old_values[i], _adj_values[i]) /*,0.?*/);
   }
   return converged();
 }
@@ -194,11 +195,16 @@ bool DEV_CPOLY_G::do_tr()
 {
   assert(_values);
 
-  // incomplete();
+
+  for (int i=1; i<=_n_ports; ++i) {
+    _adj_values[i] = _values[i] * _loss0;
+  }
+
   _m0.x = 0.;
   _m0.c0 = -_loss0 * _values[0];
   _m0.c1 = 0.;
-  trace3("vapot::do_tr", _values[0], _values[1], _loss0);
+  trace3("vapot::do_tr", _values[0], _adj_values[0], _loss0);
+  trace3("vapot::do_tr", _values[1], _adj_values[1], _loss0);
   // {
   //   _m0 = CPOLY1(0., _values[0], _values[1]);
   return do_tr_con_chk_and_q();
@@ -207,17 +213,18 @@ bool DEV_CPOLY_G::do_tr()
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::tr_load()
 {
-  assert(_n_ports==1); // for now.
+  //assert(_n_ports==1); // for now.
   tr_load_shunt(); // 4 pt +- loss
   trace3("CPG.. ", long_label(), _loss0, _loss1);
   tr_load_source();
  // {
  //   tr_load_passive(); // load_symmetric & load_source
+  trace2("DEV_CPOLY_G::tr_load", _values[0], _values[1]);
     _old_values[0] = _values[0];
-    _old_values[1] = _values[1];
+    _old_values[1] = _adj_values[1];
     for (int i=2; i<=_n_ports; ++i) { untested();
-      incomplete();
- //     tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_values[i]), &(_old_values[i]));
+      trace2("DEV_CPOLY_G::tr_load control", i, _values[i]);
+      tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_adj_values[i]), &(_old_values[i]));
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -234,9 +241,10 @@ double DEV_CPOLY_G::tr_amps()const
   double amps = _m0.c0 + _loss0 * tr_outvolts();
   trace2("tr_amps", long_label(), _m0.c0);
   for (int i=1; i<=_n_ports; ++i) {
-    trace3("tr_amps", _n[2*i-2].v0(), _n[2*i-1].v0(), _values[i]);
+//    trace3("tr_amps", _n[2*i-2].v0(), _n[2*i-1].v0(), _values[i]);
     amps += dn_diff(_n[2*i-2].v0(), _n[2*i-1].v0()) * _values[i];
   }
+  trace3("tr_amps", long_label(), _m0.c0, amps);
   return amps;
 }
 /*--------------------------------------------------------------------------*/
@@ -273,6 +281,7 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
     assert(_n_ports == n_nodes/2 + _current_port_names.size());
 
     assert(!_old_values);
+    _adj_values = new double[n_states];
     _old_values = new double[n_states];
 
     if (net_nodes() > NODES_PER_BRANCH) {

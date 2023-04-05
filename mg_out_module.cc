@@ -248,6 +248,10 @@ static void make_one_branch_contribution(std::ostream& o, Module const& m, const
   o__ b->state() << "[0] = _value" << b->code_name() << ";\n";
   for(auto d : b->deps()){
     if(d->branch() == b){
+      if(b->has_pot_source() && b->has_flow_probe()){ untested();
+	throw Exception("cannot use self as current probe.. yet\n");
+      }else{ untested();
+      }
       o__ "trace2(\"" <<  b->state() << "self\", " << b->state() << "["<<k<<"], "<<  d->code_name() <<");\n";
       o__ b->state() << "[0] -= " << b->state() << "["<<k<<"] * "<< d->code_name() << ";\n";
       break;
@@ -278,7 +282,7 @@ static void make_one_branch_contribution(std::ostream& o, Module const& m, const
 	o__ "trace2(\"flow " <<  b->state() << "\", " << b->state() << "["<<k<<"], "<<  d->code_name() <<");\n";
 	o__ b->state() << "[0] -= " << b->state() << "["<<k<<"] * "<< d->code_name() << ";\n";
 	// BUG? scaling before convcheck?
-	o__ b->state() << "["<<k<<"] *= " << d->branch()->code_name() <<"->_loss0;\n";
+	o__ b->state() << "["<<k<<"] *= " << d->branch()->code_name() <<"->_loss0; // BUG?\n";
 	++k;
 	break;
       }else{
