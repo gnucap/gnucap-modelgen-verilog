@@ -1,0 +1,50 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+`modelgen test_res0
+module test_res0(np, nn);
+	electrical np, nn;
+	inout np, nn;
+	analog begin
+		real v;
+		v = V(np,nn);
+		I(np,nn) <+ v / 100;
+	end
+endmodule
+
+`modelgen
+module test_res1(np, nn);
+	electrical np, nn;
+	inout np, nn;
+	parameter real r = 100.;
+	analog begin
+		real v;
+		v = V(np,nn);
+		I(np,nn) <+ v / r;
+	end
+endmodule
+
+list
+
+!make -j2 test_res0.so test_res1.so > /dev/null
+attach ./test_res0.so
+attach ./test_res1.so
+
+verilog
+parameter r=1
+parameter v=0
+
+test_res0 dut(1,2);
+vsource #(.dc(v)) v1(1, 0);
+vsource #(.dc(1)) v2(2, 0);
+
+test_res1 #(.r(r)) dut(3,4);
+vsource #(.dc(v)) v3(3, 0);
+vsource #(.dc(1)) v4(4, 0);
+
+list
+
+print dc i(v1) i(v3) iter(0)
+
+dc v 0 1 .1 r 100 200 100

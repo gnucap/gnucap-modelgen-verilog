@@ -208,11 +208,11 @@ bool DEV_CPOLY_G::do_tr()
 void DEV_CPOLY_G::tr_load()
 {
   assert(_n_ports==1); // for now.
-  tr_load_shunt();
+  tr_load_shunt(); // 4 pt +- loss
   trace3("CPG.. ", long_label(), _loss0, _loss1);
   tr_load_source();
  // {
- //   tr_load_passive();
+ //   tr_load_passive(); // load_symmetric & load_source
     _old_values[0] = _values[0];
     _old_values[1] = _values[1];
     for (int i=2; i<=_n_ports; ++i) { untested();
