@@ -20,6 +20,12 @@
  */
 #include "mg_.h"
 /*--------------------------------------------------------------------------*/
+bool ConstantMinTypMaxExpression::empty() const
+{
+  assert(_e);
+  return !_e->size();
+}
+/*--------------------------------------------------------------------------*/
 bool Module::has_analog_block() const
 {
   return !_analog_list.is_empty();
@@ -49,7 +55,7 @@ Probe const* Module::new_probe(std::string const& xs, std::string const& p,
 
   if(prb) {
   }else{
-    size_t s = _probes.size() - 1;
+//    size_t s = _probes.size() - 1;
     prb = new Probe(nn, br);
   }
 

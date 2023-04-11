@@ -58,12 +58,17 @@ public:
       return OPT::abstol;
     }else if(!discipline()->potential()){
       return OPT::abstol;
-    }else{ untested();
+    }else{
       return discipline()->potential()->abstol();
     }
   }
 };
 #endif
 /*--------------------------------------------------------------------------*/
+inline void e_val(double* p, const double& x, const CARD_LIST*)
+{
+  assert(p);
+  *p = x;
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

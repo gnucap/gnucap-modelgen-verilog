@@ -4,9 +4,16 @@ module test (p, n);
 	inout p, n;
 	electrical p, n;
 
+	parameter real a = 2.;
+	localparam integer two_a = 2*a;
+
 	analog begin
 		real b;
-		I(p,n) <+ b;
+		real c, d;
+		b = two_a;
+		c = 0;
+		d = 0;
+		I(p,n) <+ b + c + d;
 	end
 
 endmodule

@@ -1,0 +1,15 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+`modelgen
+module test_error2(p, n);
+electrical p, n;
+parameter a=2; // no type
+
+analog begin
+end
+
+endmodule
+
+!make test_error2.so > /dev/null

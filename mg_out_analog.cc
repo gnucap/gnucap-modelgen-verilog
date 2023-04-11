@@ -38,7 +38,8 @@ static int is_function(std::string const& n)
     return 0;
   }
 }
-static void make_cc_expression(std::ostream& o, Expression const& e)
+/*--------------------------------------------------------------------------*/
+void make_cc_expression(std::ostream& o, Expression const& e)
 {
   typedef Expression::const_iterator const_iterator;
 
@@ -75,7 +76,7 @@ static void make_cc_expression(std::ostream& o, Expression const& e)
 	o__ "// dep :" << v->code_name() << "\n";
 //	o__ "t" << idx << "[d" << v->code_name() << "] = _v_" << (*i)->name() << "[d" << v->code_name() << "];\n";
       }
-    }else if (auto var = dynamic_cast<const Token_PAR_REF*>(*i)) {
+    }else if (dynamic_cast<const Token_PAR_REF*>(*i)) {
       o << ind << "t" << idx << " = pc->_p_" << (*i)->name() << ";\n";
     }else if (dynamic_cast<const Token_CONSTANT*>(*i)) {
       o << ind << "t" << idx << " = " << (*i)->name() << ";\n";
@@ -123,7 +124,6 @@ static void make_cc_expression(std::ostream& o, Expression const& e)
 	;
       }
     }else if (dynamic_cast<const Token_UNARY*>(*i)) {
-      int idy = idxs.top();
       char op = (*i)->name()[0];
       if(op == '-') {
 	o__ "t" << idx << " *= -1.;\n";
@@ -148,15 +148,24 @@ static void make_cc_variable(std::ostream& o, Variable const& v)
   o << ind << "\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_cc_block_real_identifier_list(std::ostream& o, ListOfBlockRealIdentifiers const& rl)
+{
+  for(Variable const* v : rl){
+    assert(v);
+    make_cc_variable(o, *v);
+  }
+}
+/*--------------------------------------------------------------------------*/
 static void make_cc_assignment(std::ostream& o, Assignment const& a)
 {
-  o << "/* RPN ";
   assert(a.rhs());
-  auto const& e = *a.rhs();
-  for (Expression::const_iterator i = e.begin(); i != e.end(); ++i) {
-    o << "" << (*i)->full_name() << " ";
-  }
-  o << "*/\n";
+  Expression const& e = *a.rhs();
+//   o << "/* RPN ";
+//   auto const& e = *a.rhs();
+//   for (Expression::const_iterator i = e.begin(); i != e.end(); ++i) {
+//     o << "" << (*i)->full_name() << " ";
+//   }
+//   o << "*/\n";
 
 
   o << ind << "{ // Assignment '" << a.lhsname() << "'.";
@@ -178,14 +187,7 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
   o << ind << "}\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_cc_pc(std::ostream& o, PotContribution const& f)
-{
-  o << ind << "{ // PotContribution " << f.lhsname() << "\n";
-  o << ind << "  incomplete(); \n";
-  o << ind << "}\n";
-}
-/*--------------------------------------------------------------------------*/
-static void make_cc_fc(std::ostream& o, Contribution const& f)
+static void make_cc_contrib(std::ostream& o, Contribution const& f)
 {
   o << ind << "{ // FlowContribution " << f.lhsname() << "\n";
   {
@@ -227,19 +229,20 @@ void make_cc_analog(std::ostream& o, AnalogBlock const& ab)
   for(auto i : ab) {
     // need commmon baseclass...
     if(auto fc=dynamic_cast<FlowContribution const*>(i)) {
-      make_cc_fc(o, *fc);
+      make_cc_contrib(o, *fc);
     }else if(auto pc=dynamic_cast<PotContribution const*>(i)) {
-      make_cc_fc(o, *pc);
+      make_cc_contrib(o, *pc);
     }else if(auto a=dynamic_cast<Assignment const*>(i)) {
       make_cc_assignment(o, *a);
+    }else if(auto rl=dynamic_cast<ListOfBlockRealIdentifiers const*>(i)) {
+      make_cc_block_real_identifier_list(o, *rl);
     }else if(auto v=dynamic_cast<Variable const*>(i)) {
+      unreachable();
       make_cc_variable(o, *v);
     }else{ untested();
       incomplete();
     }
   }
-//  o << ind << "return true;\n";
-//  o << "} // AnalogBlock\n";
 }
 /*--------------------------------------------------------------------------*/
 std::string const& Branch::omit() const

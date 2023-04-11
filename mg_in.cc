@@ -21,6 +21,7 @@
  */
 #include <gnucap/io_.h>
 #include "mg_.h"
+#include <stack>
 /*--------------------------------------------------------------------------*/
 static C_Comment   dummy_c_comment;
 static Cxx_Comment dummy_cxx_comment;
@@ -177,8 +178,6 @@ void Define::preprocess(Define_List const& d)
   trace1("Define::preprocess", _value.to_string());
   std::string stripped_file;
   size_t here = file.cursor();
-  int if_block = 0;
-  int else_block = 0;
   for (;;) {
     stripped_file += file.get_to("\"/`");
     if (file.match1('\"')) { untested();

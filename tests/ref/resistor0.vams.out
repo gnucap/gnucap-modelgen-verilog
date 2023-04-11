@@ -160,11 +160,10 @@ enddiscipline
 module resistor(p, n);
   inout p, n;
   electrical p, n;
-  // params
   parameter real r = 0;
-;
+
   analog begin
-    V(p, n) <+ (r * I(p, n))
+    V(p, n) <+ (r * I(p, n));
   end
 
 endmodule

@@ -36,6 +36,7 @@ class Variable;
 class Probe;
 class AnalogBlock;
 /*--------------------------------------------------------------------------*/
+#if 0
 static int is_function(std::string const& n)
 {
   // stub, need sth.
@@ -76,7 +77,6 @@ static bool is_xs_function(std::string const& n)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-#if 0
 class Branch : public Base {
   std::string _pname; // TODO: object...
   std::string _nname; // TODO: object...
@@ -268,7 +268,7 @@ public:
     CS file(CS::_STRING, "");
     file = module_content;
     file >> "module ";
-    size_t here = file.cursor();
+//    size_t here = file.cursor();
     file >> name;
     file.reset();
 

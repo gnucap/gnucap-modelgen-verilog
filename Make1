@@ -33,6 +33,7 @@ RAW_SRCS = mg_main.cc mg_error.cc \
 mg_func.cc \
 mg_impl.cc \
 mg_in_analog.cc \
+mg_in_expr.cc \
 mg_in_old.cc \
 mg_in.cc mg_in_verilog.cc mg_in_module.cc mg_in_discipline.cc \
 mg_out_dump.cc \

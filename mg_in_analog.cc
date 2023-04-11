@@ -19,9 +19,9 @@
  * 02110-1301, USA.
  */
 #include "mg_.h"
+#include "mg_out.h"
 #include "m_tokens.h"
 #include <gnucap/e_cardlist.h> // TODO: really?
-#include <stack>
 /*--------------------------------------------------------------------------*/
 
 /* So analog initial block shall not contain the fol-
@@ -66,21 +66,6 @@ lowing statements:
 - Syntax 5-1—Syntax for analog procedural block
 */
 /*--------------------------------------------------------------------------*/
-static int is_va_function(std::string const& n)
-{
-  // stub, need sth.
-  if (n == "exp"
-   || n == "log"
-   || n == "cos"
-   || n == "sin") {
-    return 1;
-  }else if (n == "pow"){
-    return 2;
-  }else{
-    return 0;
-  }
-}
-/*--------------------------------------------------------------------------*/
 /*
 - analog_filter_function_call ::=               // from A.8.2
 -   ddt ( analog_expression [ , abstol_expression ] )
@@ -101,14 +86,6 @@ static int is_va_function(std::string const& n)
 - [ , analog_expression [ , constant_expression ] ] )
 */
 /*--------------------------------------------------------------------------*/
-static bool is_filter_function(std::string const& n)
-{
-  if (n == "ddt"){
-    return true;
-  }else{
-    return false;
-  }
-}
 /*--------------------------------------------------------------------------*/
 /* The potential and flow access functions can also be used to contribute to the potential or flow of a
 named or unnamed branch. The example below demonstrates the potential access functions being used
@@ -128,32 +105,6 @@ static bool is_flow_xs(std::string const& n)
   return n == "I" || n == "flow";
 }
 /*--------------------------------------------------------------------------*/
-static bool is_xs_function(std::string const& f, Block const* ctx)
-{
-  assert(ctx);
-  while(!dynamic_cast<Module const*>(ctx)){
-    ctx = ctx->ctx();
-    assert(ctx);
-  }
-  auto m =dynamic_cast<Module const*>(ctx);
-  assert(m);
-  File const* file = m->file();
-  if(!file){
-    // fallback. modelgen_0.cc // incomplete();
-    return f=="V" || f=="I" || f=="flow" || f=="potential";
-  }else{
-  }
-
-  for(auto n: file->nature_list()){
-    if(n->access().to_string() == f){
-      return true;
-    }else{
-    }
-  }
-  // stub, need discipline.h
-  return false;
-}
-/*--------------------------------------------------------------------------*/
 void AnalogBlock::parse(CS& file)
 {
   assert(ctx());
@@ -166,6 +117,7 @@ void AnalogBlock::parse(CS& file)
     ONE_OF	// module_item
       || file.umatch(";")
       || ((file >> "real ") && parse_real(file))
+      || parse_assignment(file)
       || parse_seq(file)
       ;
     if (!has_begin){
@@ -173,28 +125,49 @@ void AnalogBlock::parse(CS& file)
       break;
     }else if (file.umatch("end ")) {
       break;
-    }else if (!file.more()) {
+    }else if (!file.more()) { untested();
       file.warn(0, "premature EOF (analog)");
       break;
     }else if (file.stuck(&here)) {
-      file.warn(0, "bad analog block");
-      break;
+      throw Exception_CS("bad analog block", file);
     }else{
     }
   }
 }
 /*--------------------------------------------------------------------------*/
-CS& AnalogBlock::parse_real(CS& cmd)
+void BlockRealIdentifier::parse(CS& file)
 {
-    trace1("AnalogBlock::parse real", cmd.tail());
+  file >> _name;
+  new_var_ref();
+}
+/*--------------------------------------------------------------------------*/
+void BlockRealIdentifier::dump(std::ostream& o)const
+{
+  o__ name();
+}
+/*--------------------------------------------------------------------------*/
+void ListOfBlockRealIdentifiers::dump(std::ostream& o) const
+{
+  o__ "real ";
+  LiSt<BlockRealIdentifier, '\0', ',', ';'>::dump(o);
+  o << "\n";
+}
+//CS& ListOfBlockRealIdentifiers::parse(CS& file)
+//{
+//    trace1("AnalogBlock::parse real", name);
+//}
+/*--------------------------------------------------------------------------*/
+CS& AnalogBlock::parse_real(CS& file)
+{
+    trace1("AnalogBlock::parse real", file.tail());
 
     std::string name;
-    cmd >> name >> ';';
-    Variable* a = new Variable(name);
-    push_back(a);
-    trace1("AnalogBlock::parse real", name);
-    new_var_ref(a);
-    return cmd;
+    // Variable* a = new Variable(name);
+    ListOfBlockRealIdentifiers* l = new ListOfBlockRealIdentifiers();
+    l->set_owner(this);
+    file >> *l;
+    push_back(l);
+    return file;
 }
 /*--------------------------------------------------------------------------*/
 CS& AnalogBlock::parse_flow_contrib(CS& cmd, std::string const& what)
@@ -217,6 +190,35 @@ CS& AnalogBlock::parse_pot_contrib(CS& cmd, std::string const& what)
   return cmd;
 }
 /*--------------------------------------------------------------------------*/
+bool AnalogBlock::parse_assignment(CS& file)
+{
+  std::string what;
+  size_t here = file.cursor();
+  file >> what;
+  if(what == ""){
+    throw Exception_CS("need name", file);
+  }else{
+  }
+
+  Base const* b = resolve(what);
+  Variable const* v = dynamic_cast<Variable const*>(b);
+  if(!v){ untested();
+    file.reset(here);
+    return false;
+  }else if(file >> "=") { untested();
+    Assignment* a = new Assignment(what);
+    a->set_owner(this);
+    a->parse(file);
+    push_back(a);
+    _var_refs[what] = a;
+    return true;
+  }else{ untested();
+    // += etc.
+    incomplete();
+    throw Exception_CS("need assign op", file);
+  }
+}
+/*--------------------------------------------------------------------------*/
 //    _var_refs[name] = a;
 // analog sequential block
 CS& AnalogBlock::parse_seq(CS& cmd)
@@ -229,6 +231,10 @@ CS& AnalogBlock::parse_seq(CS& cmd)
     parse_pot_contrib(cmd, what);
   }else if(is_flow_xs(what)) {
     parse_flow_contrib(cmd, what);
+//  }else if(is_variable(what)) {
+//    unreachable();
+//    incomplete();
+#if 0
   }else if(what == "int") { untested();
     incomplete();
   }else if(cmd >> "*=") { untested();
@@ -241,6 +247,7 @@ CS& AnalogBlock::parse_seq(CS& cmd)
     a->parse(cmd);
     push_back(a);
     _var_refs[what] = a;
+#endif
   }else{
     cmd.reset(here);
   }
@@ -248,13 +255,34 @@ CS& AnalogBlock::parse_seq(CS& cmd)
   return cmd;
 }
 /*--------------------------------------------------------------------------*/
+void AnalogBlock::dump(std::ostream& o)const
+{
+  o__ "analog begin\n";
+  for(auto i: *this){
+    indent x;
+    o << *i;
+  }
+  o << ind << "end\n";
+}
+/*--------------------------------------------------------------------------*/
+void Assignment::dump(std::ostream& o) const
+{
+  assert(_rhs);
+  o__ lhsname() << " = " << *_rhs << ";\n";
+}
+/*--------------------------------------------------------------------------*/
 Assignment::~Assignment()
 {
   delete _rhs;
 }
 /*--------------------------------------------------------------------------*/
+// void AnalogExpression::parse(CS& cmd)
+// {
+// }
+/*--------------------------------------------------------------------------*/
 void Assignment::parse(CS& cmd)
 {
+  // TODO: rhs is an analog expression
   assert(ctx());
   trace1("Assignment::parse", cmd.tail());
   Expression rhs(cmd);
@@ -274,153 +302,9 @@ void Assignment::parse(CS& cmd)
 /*--------------------------------------------------------------------------*/
 void Variable::resolve_symbols(Expression const& e, Expression& E)
 {
-  trace0("resolve symbols ===========");
-  assert(ctx());
-  Block const* scope = ctx();
-  std::stack<Deps*> depstack;
-  depstack.push(&_deps);
-
-  for(List_Base<Token>::const_iterator ii = e.begin(); ii!=e.end(); ++ii) {
-    trace1("resolve symbols", (*ii)->name());
-  }
-  // resolve symbols
-  for(List_Base<Token>::const_iterator ii = e.begin(); ii!=e.end(); ++ii) {
-    Token* t = *ii;
-    trace1("resolve top:", t->name());
-
-    auto s = dynamic_cast<Token_SYMBOL*>(t);
-    std::string const& n = t->name();
-    Base const* r = scope->resolve(n);
-    trace2("resolve top found:", n, r);
-
-    if(dynamic_cast<Token_STOP*>(t)) {
-      E.push_back(t->clone());
-      trace0("resolve STOP");
-      depstack.push(new Deps);
-    }else if(auto c = dynamic_cast<Token_CONSTANT*>(t)) { untested();
-      Token* cl = c->clone();
-      assert(t->name() == cl->name());
-      E.push_back(cl);
-    }else if(dynamic_cast<Token_PARLIST*>(t)
-           ||dynamic_cast<Token_UNARY*>(t)
-           ||dynamic_cast<Token_BINOP*>(t)) {
-      E.push_back(t->clone());
-    }else if(!s) {
-      unreachable();
-      trace2("huh", name(), t->name());
-      E.push_back(t->clone());
-    }else if(is_xs_function(n, scope)) {
-      trace0("resolve XS");
-      Deps* td = depstack.top();
-      Token_PROBE* t = resolve_xs_function(E, n, *td);
-      E.push_back(t);
-      td->insert(t->prb());
-      depstack.pop();
-      assert(!depstack.empty());
-      depstack.top()->update(*td);
-      delete(td);
-    }else if(auto p = dynamic_cast<Parameter_Base const*>(r)) {
-      E.push_back(new Token_PAR_REF(n, p));
-    }else if(auto v = dynamic_cast<Variable const*>(r)) {
-      E.push_back(new Token_VAR_REF(n, v));
-      depstack.top()->update(v->deps());
-    }else if(auto pr = dynamic_cast<Probe const*>(r)) { untested();
-//      trace1("resolve: probe dep", pr->name());
-      E.push_back(new Token_PROBE(n, pr));
-      Deps* td = depstack.top();
-      delete(td);
-      depstack.pop();
-      depstack.top()->insert(pr);
-    }else if(r) { untested();
-      assert(0);
-      incomplete(); // unresolved symbol?
-    }else if (strchr("0123456789.", n[0])) {
-      // a number
-      Float* f = new Float(n);
-      E.push_back(new Token_CONSTANT(t->name(), f, ""));
-    }else if(is_va_function(t->name())) {
-      assert(dynamic_cast<Token_PARLIST*>(E.back()));
-      Deps* td = depstack.top();
-      depstack.pop();
-      depstack.top()->update(*td);
-      delete(td);
-      E.push_back(t->clone()); // try later?
-    }else if(is_filter_function(n)) {
-      assert(dynamic_cast<Token_PARLIST*>(E.back()));
-      Deps* td = depstack.top();
-      E.push_back(resolve_filter_function(E, n, *td));
-      depstack.pop();
-      assert(!depstack.empty());
-      depstack.top()->update(*td);
-      delete(td);
-    }else if(is_node(t->name())) {
-      E.push_back(t->clone()); // try later?
-    }else{
-      throw Exception("unresolved symbol: " + n);
-    }
-  }
-  trace1("depstack", depstack.size());
-  assert(depstack.size()==1);
-}
-/*--------------------------------------------------------------------------*/
-Token* Variable::resolve_filter_function(Expression& E, std::string const& n, Deps const& cdeps)
-{
-  if(E.is_empty()) { untested();
-    throw Exception("syntax error");
-  }else if(!dynamic_cast<Token_PARLIST*>(E.back())) { untested();
-    throw Exception("syntax error");
-  }else{
-    assert(n=="ddt"); // incomplete.
-		      //
-    assert(!E.is_empty());
-
-    Filter const* f = _owner->new_filter(n, cdeps);
-    assert(f);
-
-    // arglist
-//    delete E.back();
-//    E.pop_back();
-
-    return new Token_FILTER(n, f);
-  }
-}
-/*--------------------------------------------------------------------------*/
-Token_PROBE* Variable::resolve_xs_function(Expression& E, std::string const& n, Deps const& deps)
-{
-  if(E.is_empty()) { untested();
-    throw Exception("syntax error");
-  }else if(!dynamic_cast<Token_PARLIST*>(E.back())) { untested();
-    throw Exception("syntax error");
-  }else{
-    delete E.back();
-    E.pop_back();
-    assert(!E.is_empty());
-    std::string arg1;
-    if(dynamic_cast<Token_STOP*>(E.back())) { untested();
-      throw Exception("syntax error");
-    }else{
-    }
-    std::string arg0 = E.back()->name();
-    delete E.back();
-    E.pop_back();
-    assert(!E.is_empty());
-
-    while(!dynamic_cast<Token_STOP*>(E.back())) {
-      arg1 = E.back()->name();
-      delete E.back();
-      E.pop_back();
-      assert(!E.is_empty());
-    }
-
-    delete E.back();
-    E.pop_back();
-    Probe const* p = _owner->new_probe(n, arg1, arg0);
-    std::string name = n+"("+arg1+", "+arg0+")";
-
-    trace3("got a probe", name, arg1, this);
-    return new Token_PROBE(name, p);
-    // E.push_back(new Token_PROBE(name, p));
-  }
+  Block* scope = owner();
+  assert(scope);
+  return ::resolve_symbols(e, E, scope, &_deps);
 }
 /*--------------------------------------------------------------------------*/
 void PotContribution::parse(CS& cmd)
@@ -492,23 +376,24 @@ static void dump(std::ostream& out, Expression const& e)
 }
 /*--------------------------------------------------------------------------*/
 // common Contribution Base?
-void PotContribution::dump(std::ostream& out)const
+void PotContribution::dump(std::ostream& o)const
 {
   assert(_branch);
-  out << ind << _lhsname << *_branch << " <+ ";
+  o__ lhsname() << *_branch << " <+ ";
   assert(_rhs);
 
-  ::dump(out, *_rhs);
-//  out << "\n";
+  ::dump(o, *_rhs);
+  o << ";\n";
 }
 /*--------------------------------------------------------------------------*/
-void FlowContribution::dump(std::ostream& out)const
+void FlowContribution::dump(std::ostream& o)const
 {
   assert(_branch);
-  out << ind << _lhsname << *_branch << " <+ ";
+  o__ lhsname() << *_branch << " <+ ";
   assert(_rhs);
 
-  ::dump(out, *_rhs);
+  ::dump(o, *_rhs);
+  o << ";\n";
 //  out << "\n";
 }
 /*--------------------------------------------------------------------------*/

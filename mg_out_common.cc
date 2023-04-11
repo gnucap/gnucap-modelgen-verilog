@@ -116,11 +116,16 @@ static void make_common_operator_equal(std::ostream& out, const Module& d)
     "{\n"
     "  const COMMON_" << d.identifier() << "* p = dynamic_cast<const COMMON_" << d.identifier() << "*>(&x);\n"
     "  return (p\n";
-  for (Parameter_2_List::const_iterator
-       p = d.parameters().begin();
-       p != d.parameters().end();
-       ++p) {
-    out << "    && " << (**p).code_name() << " == p->" << (**p).code_name() << '\n';
+  for (Parameter_List_Collection::const_iterator
+       q = d.parameters().begin();
+       q != d.parameters().end();
+       ++q) {
+    for (Parameter_2_List::const_iterator
+	 p = (*q)->begin();
+	 p != (*q)->end();
+	 ++p) {
+      out << "    && " << (**p).code_name() << " == p->" << (**p).code_name() << '\n';
+    }
   }
   out << 
 //    "    && _sdp == p->_sdp\n"
@@ -147,11 +152,17 @@ void make_common_set_param_by_index(std::ostream& out, const Module& m)
 //    }
 //  }
 //  assert(i == d.common().override().size());
-  for (Parameter_2_List::const_iterator
-       p = m.parameters().begin();
-       p != m.parameters().end();
-       ++p) {
-    out << "  case " << i++ << ":  " << (**p).code_name() << " = Value; break;\n";
+  for (Parameter_List_Collection::const_iterator
+       q = m.parameters().begin();
+       q != m.parameters().end();
+       ++q) {
+    if(!(*q)->is_local())
+    for (Parameter_2_List::const_iterator
+	 p = (*q)->begin();
+	 p != (*q)->end();
+	 ++p) {
+      out << "  case " << i++ << ":  " << (**p).code_name() << " = Value; break;\n";
+    }
   }
 
   out <<
@@ -161,17 +172,17 @@ void make_common_set_param_by_index(std::ostream& out, const Module& m)
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-void make_common_param_is_printable(std::ostream& out, const Module& d)
+void make_common_param_is_printable(std::ostream& out, const Module& m)
 {
   make_tag();
   out <<
-    "bool COMMON_" << d.identifier() << "::param_is_printable(int i)const\n"
+    "bool COMMON_" << m.identifier() << "::param_is_printable(int i)const\n"
     "{\n"
-    "  switch (COMMON_" << d.identifier() << "::param_count() - 1 - i) {\n";
+    "  switch (COMMON_" << m.identifier() << "::param_count() - 1 - i) {\n";
   size_t i = 0;
 //  for (Parameter_1_List::const_iterator 
-//       p = d.common().override().begin(); 
-//       p != d.common().override().end();
+//       p = m.common().override().begin(); 
+//       p != m.common().override().end();
 //       ++p) {
 //    if (!((**p).user_name().empty())) {
 //      out << "  case " << i++ << ":  return (";
@@ -185,23 +196,24 @@ void make_common_param_is_printable(std::ostream& out, const Module& d)
 //    }else{unreachable();
 //    }
 //  }
-//  assert(i == d.common().override().size());
-  for (Parameter_2_List::const_iterator
-       p = d.parameters().begin();
-       p != d.parameters().end();
-       ++p) {
+//  assert(i == m.common().override().size());
+  for (auto q = m.parameters().begin();
+       q != m.parameters().end();
+       ++q)
+    if(!(*q)->is_local())
+  for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
     {
       out << "  case " << i++ << ":  return (";
       if (!((**p).print_test().empty())) {
 	out << (**p).print_test() << ");\n";
-      }else if ((**p).default_val() == "NA") {
-	out << (**p).code_name() << " != NA);\n";
+//      }else if ((**p).default_val() == "NA") {
+//	out << (**p).code_name() << " != NA);\n";
       }else{
 	out << "true);\n";
       }
     }
   }
-//  assert(i == d.common().override().size() + d.common().raw().size());
+//  assert(i == m.common().override().size() + m.common().raw().size());
   out <<
     "  default: return COMMON_COMPONENT::param_is_printable(i);\n"
     "  }\n"
@@ -209,37 +221,37 @@ void make_common_param_is_printable(std::ostream& out, const Module& d)
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-void make_common_param_name(std::ostream& o, const Module& d)
+void make_common_param_name(std::ostream& o, const Module& m)
 {
   make_tag();
   o <<
-    "std::string COMMON_" << d.identifier() << "::param_name(int i)const\n{\n"
-    "  switch (COMMON_" << d.identifier() << "::param_count() - 1 - i) {\n";
+    "std::string COMMON_" << m.identifier() << "::param_name(int i)const\n{\n"
+    "  switch (COMMON_" << m.identifier() << "::param_count() - 1 - i) {\n";
   size_t i = 0;
 //  for (Parameter_1_List::const_iterator 
-//       p = d.common().override().begin(); 
-//       p != d.common().override().end();
+//       p = m.common().override().begin(); 
+//       p != m.common().override().end();
 //       ++p) {
 //    if (!((**p).user_name().empty())) {
 //      o << "  case " << i++ << ":  return \"" << to_lower((**p).user_name()) << "\";\n";
 //    }else{unreachable();
 //    }
 //  }
-//  assert(i == d.common().override().size());
-  for (Parameter_2_List::const_iterator
-       p = d.parameters().begin();
-       p != d.parameters().end();
-       ++p) {
+//  assert(i == m.common().override().size());
+  for (auto q = m.parameters().begin();
+       q != m.parameters().end();
+       ++q)
+  for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
     o << "  case " << i++ << ":  return \"" << (**p).name() << "\";\n";
   }
-//  assert(i == d.common().override().size() + d.common().raw().size());
+//  assert(i == m.common().override().size() + m.common().raw().size());
   o <<
     "  default: return COMMON_COMPONENT::param_name(i);\n"
     "  }\n"
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";
   o <<
-    "std::string COMMON_" << d.identifier() << "::param_name(int i, int j)const\n"
+    "std::string COMMON_" << m.identifier() << "::param_name(int i, int j)const\n"
     "{\n";
   o__ "if(j==0){\n";
   o____ "return param_name(i);\n";
@@ -251,7 +263,7 @@ void make_common_param_name(std::ostream& o, const Module& d)
 }
 /*--------------------------------------------------------------------------*/
 #if 0
-void make_common_param_name_or_alias(std::ostream& out, const Device& d)
+void make_common_param_name_or_alias(std::ostream& out, const Device& m)
 {
   make_tag();
   out <<
@@ -293,31 +305,32 @@ void make_common_param_name_or_alias(std::ostream& out, const Device& d)
 }
 #endif
 /*--------------------------------------------------------------------------*/
-void make_common_param_value(std::ostream& out, const Module& d)
+void make_common_param_value(std::ostream& out, const Module& m)
 {
   make_tag();
   out <<
-    "std::string COMMON_" << d.identifier() << "::param_value(int i)const\n"
+    "std::string COMMON_" << m.identifier() << "::param_value(int i)const\n"
     "{\n"
-    "  switch (COMMON_" << d.identifier() << "::param_count() - 1 - i) {\n";
+    "  switch (COMMON_" << m.identifier() << "::param_count() - 1 - i) {\n";
   size_t i = 0;
 //  for (Parameter_1_List::const_iterator 
-//       p = d.common().override().begin(); 
-//       p != d.common().override().end();
+//       p = m.common().override().begin(); 
+//       p != m.common().override().end();
 //       ++p) {
 //    if (!((**p).user_name().empty())) {
 //      out << "  case " << i++ << ":  return " << (**p).code_name() << ".string();\n";
 //    }else{unreachable();
 //    }
 //  }
-//  assert(i == d.common().override().size());
-  for (Parameter_2_List::const_iterator
-       p = d.parameters().begin();
-       p != d.parameters().end();
-       ++p) {
+//  assert(i == m.common().override().size());
+  for (auto q = m.parameters().begin();
+       q != m.parameters().end();
+       ++q)
+    if(!(*q)->is_local())
+  for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
       out << "  case " << i++ << ":  return " << (**p).code_name() << ".string();\n";
   }
-//  assert(i == d.common().override().size() + d.common().raw().size());
+//  assert(i == m.common().override().size() + m.common().raw().size());
   out <<
     "  default: return COMMON_COMPONENT::param_value(i);\n"
     "  }\n"
@@ -325,11 +338,11 @@ void make_common_param_value(std::ostream& out, const Module& d)
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_common_expand(std::ostream& o , const Module& d)
+static void make_common_expand(std::ostream& o , const Module& m)
 {
   make_tag();
   o  <<
-    "void COMMON_" << d.identifier() << "::expand(const COMPONENT* d)\n{\n"
+    "void COMMON_" << m.identifier() << "::expand(const COMPONENT* d)\n{\n"
 
     "}\n";
 #if 0
@@ -374,20 +387,22 @@ static void make_common_expand(std::ostream& o , const Module& d)
 #endif
   o  <<
     "/*--------------------------------------------------------------------------*/\n"
-    "void COMMON_" << d.identifier() << "::precalc_first(const CARD_LIST* par_scope)\n"
+    "void COMMON_" << m.identifier() << "::precalc_first(const CARD_LIST* par_scope)\n"
     "{\n"
     "  assert(par_scope);\n"
     "  COMMON_COMPONENT::precalc_first(par_scope);\n";
-  make_final_adjust_eval_parameter_list(o , d.parameters());
+  o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
+  make_final_adjust_eval_parameter_list(o , m.parameters());
     o  << "}\n";
 
   o <<
     "/*--------------------------------------------------------------------------*/\n"
-    "void COMMON_" << d.identifier() << "::precalc_last(const CARD_LIST* par_scope)\n"
+    "void COMMON_" << m.identifier() << "::precalc_last(const CARD_LIST* par_scope)\n"
     "{\n"
     "  assert(par_scope);\n"
     "  COMMON_COMPONENT::precalc_last(par_scope);\n";
-  make_final_adjust_eval_parameter_list(o , d.parameters());
+  o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
+  make_final_adjust_eval_parameter_list(o , m.parameters());
     o << "}\n"
     "/*--------------------------------------------------------------------------*/\n";
 #if 0

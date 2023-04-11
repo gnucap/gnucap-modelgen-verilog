@@ -1,4 +1,8 @@
-... ne
+... trical p, n, cp, cn;
 
- module mock_error analog begin bla = 1; end endmodu
+analog begin
+	gain = 17;
+end
+
+endm
                                         ^ ? bad analog block

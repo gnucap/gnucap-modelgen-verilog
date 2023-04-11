@@ -66,25 +66,33 @@ void make_final_adjust_value_list(std::ostream& out, const Parameter_2_List& pl)
   }
 }
 /*--------------------------------------------------------------------------*/
-void make_final_adjust_eval_parameter(std::ostream& out, const Parameter_2& p)
+void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2& p)
 {
-  if (!(p.calculate().empty())) {untested();
-    out << "    this->" << p.code_name() << " = " << p.calculate() << ";\n";
+  // if (!(p.calculate().empty())) {untested();
+  //   out << "    this->" << p.code_name() << " = " << p.calculate() << ";\n";
+  // }else{
+  // }
+  o << "{\n";
+//  o__ p.type() << " val = ";
+  if (!(p.default_val().empty())) { untested();
+    // o << p.default_val();
+    make_cc_expression(o, p.default_val().expression());
   }else{
-    out << "    e_val(&(this->" << p.code_name() << "), ";
-    if (!(p.default_val().empty())) {
-      out << p.type() << "(" << p.default_val() << ")";
-    }else{
-      out << "NA";
-    }
-    out << ", par_scope);\n";
+    o << "NA\n";
   }
+  o << ";\n";
+  o << "e_val(&(this->" << p.code_name() << "), ";
+  o << "t0.value() , par_scope);\n";
+  o << "}\n";
 }
 /*--------------------------------------------------------------------------*/
-void make_final_adjust_eval_parameter_list(std::ostream& out, const Parameter_2_List& pl)
+void make_final_adjust_eval_parameter_list(std::ostream& out,
+                                           const Parameter_List_Collection& P)
 {
-  for (Parameter_2_List::const_iterator p = pl.begin(); p != pl.end(); ++p) {
-    make_final_adjust_eval_parameter(out, **p);
+  for(auto const& pl : P){
+    for (Parameter_2_List::const_iterator p=pl->begin(); p!=pl->end(); ++p) {
+      make_final_adjust_eval_parameter(out, **p);
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -97,7 +105,7 @@ void make_final_adjust_parameter(std::ostream& out, const Parameter_1& p)
     if (!(p.final_default().empty())) {
       out << p.final_default();
     }else if (!(p.default_val().empty())) {
-      out << p.default_val();
+      out << " /*default*/ " << p.default_val();
     }else{
       out << "NA";
     }
@@ -145,16 +153,18 @@ void make_final_adjust(std::ostream& out, const Parameter_Block& b)
 static void make_construct_parameter(std::ostream& out, const Parameter_2& p)
 {
   if (!(p.default_val().empty())) {
-    out << ",\n   " << p.code_name() << "(" << p.default_val() << ")";
+    out << ",\n   " << p.code_name() << "(/*default*/)";
   }else{
     out << ",\n   " << p.code_name() << "(NA)";
   }
 }
 /*--------------------------------------------------------------------------*/
-void make_construct_parameter_list(std::ostream& out,const Parameter_2_List& pl)
+void make_construct_parameter_list(std::ostream& out,const Parameter_List_Collection& P)
 {
-  for (Parameter_2_List::const_iterator p = pl.begin(); p != pl.end(); ++p) {
-    make_construct_parameter(out, **p);
+  for(auto const& pl : P){
+    for (Parameter_2_List::const_iterator p = pl->begin(); p != pl->end(); ++p) {
+      make_construct_parameter(out, **p);
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -209,8 +219,8 @@ static void make_print_one_param(std::ostream& out, const Parameter_1& p)
 
     if (!(p.print_test().empty())) {
       out << ", " << p.print_test() << "";
-    }else if (p.default_val() == "NA") {
-      out << ", " << p.code_name() << " != NA";
+//    }else if (p.default_val() == "NA") {
+//      out << ", " << p.code_name() << " != NA";
     }else{
     }
 
@@ -260,11 +270,14 @@ static void make_copy_construct_parameter(std::ostream&out,const Parameter_2&p)
 }
 /*--------------------------------------------------------------------------*/
 void make_copy_construct_parameter_list(std::ostream& out,
-					const Parameter_2_List& pl)
+					const Parameter_List_Collection& P)
 {
-  for (Parameter_2_List::const_iterator p = pl.begin(); p != pl.end(); ++p) {
-    make_copy_construct_parameter(out, **p);
+  for(auto const& pl : P){
+    for (Parameter_2_List::const_iterator p = pl->begin(); p != pl->end(); ++p) {
+      make_copy_construct_parameter(out, **p);
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet

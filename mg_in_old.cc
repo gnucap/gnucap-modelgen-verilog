@@ -200,6 +200,7 @@ void Parameter_Block::dump(std::ostream& out)const
 void Element_1::parse(CS& file)
 {
   file >> _dev_type >> _name >> _port_list;
+	trace2("Element_1::parse", _dev_type, _name);
   size_t here = file.cursor();
   for (;;) {
     ONE_OF

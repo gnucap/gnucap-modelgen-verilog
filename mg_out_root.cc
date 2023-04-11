@@ -40,6 +40,7 @@ static void make_header(std::ostream& o, const File& in,
     "#include \"../e_va.h\"\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
+  o <<
     "const double NA(NOT_INPUT);\n"
     "const double INF(BIGBIG);\n"
     "/*--------------------------------------"

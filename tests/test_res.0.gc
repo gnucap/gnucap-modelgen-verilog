@@ -6,10 +6,11 @@ attach ../d_vasrc.so
 module test_res0(np, nn);
 	electrical np, nn;
 	inout np, nn;
+	parameter real r = 200.;
 	analog begin
-		real v;
-		v = V(np,nn);
-		I(np,nn) <+ v / 100;
+		real i;
+		i = V(np,nn) / r;
+		I(np,nn) <+ i;
 	end
 endmodule
 
@@ -17,7 +18,7 @@ endmodule
 module test_res1(np, nn);
 	electrical np, nn;
 	inout np, nn;
-	parameter real r = 100.;
+	parameter real r = 200.;
 	analog begin
 		real v;
 		v = V(np,nn);
@@ -25,26 +26,43 @@ module test_res1(np, nn);
 	end
 endmodule
 
+`modelgen
+module test_res2(np, nn);
+	electrical np, nn;
+	inout np, nn;
+	parameter real r = 400.;
+	localparam real g = 1./r;
+	parameter real one = r*g;
+	analog begin
+		I(np,nn) <+ g * V(np,nn) * one;
+	end
+endmodule
+
 list
 
-!make -j2 test_res0.so test_res1.so > /dev/null
+!make -j2 test_res0.so test_res1.so test_res2.so > /dev/null
 attach ./test_res0.so
 attach ./test_res1.so
+attach ./test_res2.so
 
 verilog
 parameter r=1
 parameter v=0
 
-test_res0 dut(1,2);
+test_res0 #(.r(r)) dut(1,2);
 vsource #(.dc(v)) v1(1, 0);
 vsource #(.dc(1)) v2(2, 0);
 
-test_res1 #(.r(r)) dut(3,4);
+test_res1 #(.r(2*r)) dut(3,4);
 vsource #(.dc(v)) v3(3, 0);
 vsource #(.dc(1)) v4(4, 0);
 
+test_res2 #(.r(4*r)) dut(5,6);
+vsource #(.dc(v)) v5(5, 0);
+vsource #(.dc(1)) v6(6, 0);
+
 list
 
-print dc i(v1) i(v3) iter(0)
+print dc i(v1) i(v3) i(v5) iter(0)
 
-dc v 0 1 .1 r 100 200 100
+dc v 0 1 .25 r 100 200 100

@@ -1,0 +1,3 @@
+... 2(p, n); electrical p, n; parameter a=2; // no type anal
+                                        ^ ? parameter: need "real", "integer"
+

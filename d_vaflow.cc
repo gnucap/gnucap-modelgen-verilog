@@ -74,7 +74,7 @@ protected: // override virtual
   void expand_current_port(size_t i);
 
   void set_current_port_by_index(int i, const std::string& s) override {
-    if(i<_current_port_names.size()){
+    if(i<int(_current_port_names.size())){
       _current_port_names[i] = s;
     }else{
       throw Exception_Too_Many(i, _current_port_names.size(), 0);
@@ -139,7 +139,7 @@ void DEV_CPOLY_G::expand_current_port(size_t i)
 {
   std::string const& input_label = _current_port_names[i];
   ELEMENT const* input = _input[i];
-  node_t* n = _n + net_nodes() + 2*(i-_input.size()) - IN1;
+//  node_t* n = _n + net_nodes() + 2*(i-_input.size()) - IN1;
 
   assert (input_label != "");
   CARD const* e = find_in_my_scope(input_label);
@@ -256,7 +256,7 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
 
   if (first_time) {
     _n_ports = n_states-1; // set net_nodes
-    assert(_n_ports == n_nodes/2 + _current_port_names.size());
+    assert(size_t(_n_ports) == n_nodes/2 + _current_port_names.size());
 
     assert(!_old_values);
     _old_values = new double[n_states];

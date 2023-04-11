@@ -160,11 +160,10 @@ enddiscipline
 module conductor(p, n);
   inout p, n;
   electrical p, n;
-  // params
   parameter real g = 0;
-;
+
   analog begin
-    I(p, n) <+ (g * V(p, n))
+    I(p, n) <+ (g * V(p, n));
   end
 
 endmodule

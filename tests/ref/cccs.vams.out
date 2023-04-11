@@ -31,11 +31,10 @@ enddiscipline
 module cccs0(p, n, cp, cn);
   inout p, n, cp, cn;
   electrical p, n, cp, cn;
-  // params
   parameter real gain = 1;
-;
+
   analog begin
-    I(p, n) <+ (gain * I(cp, cn))
+    I(p, n) <+ (gain * I(cp, cn));
   end
 
 endmodule

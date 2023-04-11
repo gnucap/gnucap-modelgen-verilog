@@ -201,16 +201,12 @@ public:
 template <class T, char BEGIN, char SEP, char END>
 class LiSt :public List_Base<T> {
   Block* _owner{NULL};
-//  using List_Base<T>::_list;
 public:
   using List_Base<T>::size;
   using List_Base<T>::push_back;
   using List_Base<T>::begin;
   using List_Base<T>::end;
   typedef typename List_Base<T>::const_iterator const_iterator;
-  //BUG//  why not inherited?
-//  const_iterator begin()const	 {return _list.begin();}
-//  const_iterator end()const	 {return _list.end();}
 
   void set_owner(Block* b){ _owner = b; }
   Block const* ctx() const{return _owner;}
@@ -399,6 +395,21 @@ public:
   operator bool()const {return _s;}
 };
 /*--------------------------------------------------------------------------*/
+// class AnalogExpression?
+class ConstantMinTypMaxExpression :public Base {
+  Expression* _e{NULL};
+  Block* _owner{NULL};
+public:
+  explicit ConstantMinTypMaxExpression() : Base(){}
+  ~ConstantMinTypMaxExpression();
+  void set_owner(Block* b){ _owner = b; }
+public:
+  Expression const& expression()const{ assert(_e); return *_e; }
+  bool empty()const;
+  void parse(CS& file)override;
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
 class Parameter_Base :public Base {
   Block* _owner{NULL};
 protected:
@@ -407,7 +418,7 @@ protected:
   std::string _code_name;
   std::string _user_name;
   std::string _alt_name;
-  std::string _default_val;
+  ConstantMinTypMaxExpression _default_val;
   std::string _comment;
   std::string _print_test;
   std::string _calc_print_test;
@@ -419,6 +430,7 @@ protected:
   std::string _final_default;
   bool	      _positive;
   bool	      _octal;
+  Block* owner(){return _owner;}
 public:
   // void parse(CS& f);
   // void print(std::ostream& f)const;
@@ -428,7 +440,7 @@ public:
   const std::string& user_name()const		{return _user_name;}
   const std::string& alt_name()const		{return _alt_name;}
   const std::string& comment()const		{return _comment;}
-  const std::string& default_val()const 	{return _default_val;}
+  const ConstantMinTypMaxExpression& default_val()const 	{return _default_val;}
   const std::string& print_test()const		{return _print_test;}
   const std::string& calc_print_test()const	{return _calc_print_test;}
   const std::string& scale()const		{return _scale;}
@@ -457,7 +469,7 @@ protected:
 class Parameter_1 :public Parameter_Base {
 public:
   void parse(CS& f);
-  void dump(std::ostream& f)const;
+  void dump(std::ostream& f)const override;
   Parameter_1() :Parameter_Base() {}
 };
 typedef LiSt<Parameter_1, '{', '#', '}'> Parameter_1_List;
@@ -465,17 +477,47 @@ typedef LiSt<Parameter_1, '{', '#', '}'> Parameter_1_List;
 // parameter type name = value ;
 class Parameter_2 :public Parameter_Base {
 public:
-  void parse(CS& f);
-  void dump(std::ostream& f)const;
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
   Parameter_2() :Parameter_Base() {}
+  void set_type(std::string const& a){_type=a;}
 };
-typedef LiSt<Parameter_2, '\0', '\0', ';'> Parameter_2_List;
+/*--------------------------------------------------------------------------*/
+class Parameter_2_List : public LiSt<Parameter_2, '\0', ',', ';'> {
+  String_Arg _type;
+  bool _is_local{false};
+public:
+  bool is_local()const {return _is_local;}
+  String_Arg const& type()const {return _type;}
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class Parameter_List_Collection : public Collection<Parameter_2_List>{
+public:
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+// class Localparam :public Parameter_2 {
+// public:
+//   void dump(std::ostream& f)const override;
+//   Localparam() :Parameter_2() {}
+// };
+/*--------------------------------------------------------------------------*/
+typedef Parameter_2_List Localparam_List;
+// class Localparam_List : public LiSt<Parameter_2, '\0', '\0', ';'> {
+// };
+/*--------------------------------------------------------------------------*/
+class Localparam_List_Collection : public Collection<Localparam_List>{
+public:
+  void dump(std::ostream& f)const override;
+};
 /*--------------------------------------------------------------------------*/
 // .name(value)
 // TODO? param_by_index?
 class Parameter_3 :public Parameter_Base {
 public:
-  void parse(CS& f);
+  void parse(CS& f)override;
   void dump(std::ostream& f)const;
   Parameter_3() :Parameter_Base() {}
 };
@@ -486,7 +528,7 @@ class Code_Block :public Base {
   Block* _owner{NULL};
 public:
   void set_owner(Block* c) { _owner = c; }
-  void parse(CS& f);
+  void parse(CS& f)override;
   void dump(std::ostream& f)const override{f << _s;}
   Code_Block() {}
   bool is_empty()const {return _s.length() < 2;}
@@ -501,7 +543,7 @@ class Parameter_Block :public Base {
   Code_Block	 _code_mid;
   Code_Block     _code_post;
 public:
-  void parse(CS& f);
+  void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   const String_Arg&	unnamed_value()const	{return _unnamed_value;}
   const Parameter_1_List& override()const 	{return _override;}
@@ -601,14 +643,15 @@ public:
 // analog_procedural_block
 class AnalogBlock : public Block {
 private: // this is a stub
-  CS& parse_seq(CS& cmd);
+  CS& parse_seq(CS& cmd); // TODO
   CS& parse_flow_contrib(CS& cmd, std::string const&);
   CS& parse_pot_contrib(CS& cmd, std::string const&);
   CS& parse_real(CS& cmd);
+  bool parse_assignment(CS& cmd);
 
 public: // this is a stub
 //  void set_owner(Block* ctx) {_owner = ctx;}
-  void parse(CS& cmd) override;
+  void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
 
 
@@ -1148,8 +1191,8 @@ private: // verilog input data
   Port_3_List_3	_inout;
   Port_3_List_3	_ground;
   Port_Discipline_List_Collection _disc_assign;
-  Parameter_2_List _parameters;
-  Parameter_2_List _local_params;
+  Parameter_List_Collection _parameters;
+//  Localparam_List_Collection _local_params;
   Element_2_List _element_list;
   Port_1_List	_local_nodes;
   Attribute_Instance _attribute_dummy;
@@ -1172,8 +1215,8 @@ public:
   const Port_3_List_3&	  inout()const		{return _inout;}
   const Port_3_List_3&	  ground()const		{return _ground;}
   const Port_Discipline_List_Collection& disc_assign()const{return _disc_assign;}
-  const Parameter_2_List& parameters()const	{return _parameters;}
-  const Parameter_2_List& local_params()const	{return _local_params;}
+  const Parameter_List_Collection& parameters()const	{return _parameters;}
+//  const Localparam_List_Collection& local_params()const	{return _local_params;}
   const Element_2_List&	  element_list()const	{return _element_list;}
   const Element_2_List&	  circuit()const	{return _element_list;}
   const Port_1_List&	  local_nodes()const	{return _local_nodes;}
@@ -1204,14 +1247,16 @@ typedef Collection<Module> Module_List;
 class Token_PROBE; //bug?
 class Expression;
 class Variable : public Base {
-private:
   Block* _owner{NULL};
-  std::string _name;
+private:
+  Block* owner(){ return _owner; }
 protected:
+  std::string _name;
   Deps _deps;
   Block const* ctx() const{ return _owner; }
 public:
   Deps const& deps()const { return _deps; }
+  explicit Variable() : Base() {}
   Variable(std::string const& name)
    :Base()
    ,_name(name)
@@ -1225,7 +1270,7 @@ public:
   virtual void parse(CS&) { untested();
     incomplete();
   }
-  void dump(std::ostream& o)const override { o << "Variable: incomplete\n"; }
+  void dump(std::ostream& o)const override;
   virtual Branch_Ref new_branch(std::string const& p, std::string const& n) {
     assert(_owner);
     return(_owner->new_branch(p, n));
@@ -1238,10 +1283,26 @@ private:
   }
 
 protected:
+  void new_var_ref(){
+    _owner->new_var_ref(this);
+  }
   void resolve_symbols(Expression const& e, Expression& E);
 private:
   Token* resolve_filter_function(Expression& E, std::string const& name, Deps const&);
   Token_PROBE* resolve_xs_function(Expression& E, std::string const& name, Deps const&);
+};
+/*--------------------------------------------------------------------------*/
+class BlockRealIdentifier : public Variable{
+public:
+  explicit BlockRealIdentifier() : Variable() { untested(); }
+public:
+  void parse(CS& cmd) override;
+  void dump(std::ostream&)const override;
+};
+/*--------------------------------------------------------------------------*/
+class ListOfBlockRealIdentifiers : public LiSt<BlockRealIdentifier, '\0', ',', ';'>{
+public:
+  void dump(std::ostream&)const override;
 };
 /*--------------------------------------------------------------------------*/
 // analog_procedural_assignment
@@ -1259,7 +1320,7 @@ public:
   std::string const& lhsname()const {return _lhsname;}
   Expression const* rhs()const {return _rhs;}
   void parse(CS& cmd) override;
-  void dump(std::ostream&)const override { incomplete(); }
+  void dump(std::ostream&)const override;
 };
 /*--------------------------------------------------------------------------*/
 class Contribution : public Assignment {
@@ -1402,6 +1463,10 @@ public: // make it look like an Element_2?
   std::string omit() const { return ""; }
   std::string dev_type() const { return "d_cpoly_g"; }
 };
+/*--------------------------------------------------------------------------*/
+void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps*d=NULL);
+void make_cc_expression(std::ostream& o, Expression const& e);
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

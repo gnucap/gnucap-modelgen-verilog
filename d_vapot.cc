@@ -79,7 +79,7 @@ protected: // override virtual
   void expand_current_port(size_t i);
 
   void set_current_port_by_index(int i, const std::string& s) override {
-    assert(i<_current_port_names.size());
+    assert(size_t(i)<_current_port_names.size());
     _current_port_names[i] = s;
   }
   std::string port_name(int)const override {untested();
@@ -140,7 +140,7 @@ void DEV_CPOLY_G::expand_current_port(size_t i)
 {
   std::string const& input_label = _current_port_names[i];
   ELEMENT const* input = _input[i];
-  node_t* n = _n + net_nodes() + 2*(i-_input.size()) - IN1;
+//  node_t* n = _n + net_nodes() + 2*(i-_input.size()) - IN1;
 
   assert (input_label != "");
   CARD const* e = find_in_my_scope(input_label);
@@ -156,7 +156,7 @@ void DEV_CPOLY_G::expand_current_port(size_t i)
   }else if (input->has_inode()) {untested();
     _n[IN1] = input->n_(IN1);
     _n[IN2].set_to_ground(this);
-  }else if (input->has_iv_probe()) { untested();
+  }else if (input->has_iv_probe()) {
     _n[IN1] = input->n_(OUT1);
     _n[IN2] = input->n_(OUT2);
   }else{ untested();
@@ -222,7 +222,7 @@ void DEV_CPOLY_G::tr_load()
   trace2("DEV_CPOLY_G::tr_load", _values[0], _values[1]);
     _old_values[0] = _values[0];
     _old_values[1] = _adj_values[1];
-    for (int i=2; i<=_n_ports; ++i) { untested();
+    for (int i=2; i<=_n_ports; ++i) {
       trace2("DEV_CPOLY_G::tr_load control", i, _values[i]);
       tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_adj_values[i]), &(_old_values[i]));
   }
@@ -278,7 +278,7 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
 
   if (first_time) {
     _n_ports = n_states-1; // set net_nodes
-    assert(_n_ports == n_nodes/2 + _current_port_names.size());
+    assert(size_t(_n_ports) == n_nodes/2 + _current_port_names.size());
 
     assert(!_old_values);
     _adj_values = new double[n_states];

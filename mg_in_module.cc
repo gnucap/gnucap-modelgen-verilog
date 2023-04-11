@@ -57,6 +57,9 @@
 */
 void Element_2::parse(CS& file)
 {
+  assert(_owner);
+  // assert(owner());
+  _list_of_parameter_assignments.set_owner(_owner);
   file >> _module_or_paramset_identifier
        >> '#' >> _list_of_parameter_assignments
        >> _name_of_module_instance >> _list_of_port_connections >> ';';
@@ -75,13 +78,10 @@ void Element_2::dump(std::ostream& out)const
 + named_parameter_assignment ::=
 +	  "." parameter_identifier "(" [ mintypmax_expression ] ")"
 -	| "." system_parameter_identifier "(" [ constant_expression ] ")"
-// A.8.3
-+ mintypmax_expression ::=
-+	  expression
--	| expression ":" expression ":" expression
 */
 void Parameter_3::parse(CS& file)
 {
+  _default_val.set_owner(owner());
   file >> '.' >> _name >> '(' >> _default_val >> ')' >> ',';
 }
 /*--------------------------------------------------------------------------*/
@@ -116,20 +116,76 @@ void Parameter_3::dump(std::ostream& out)const
 -	| parameter_identifier range "=" constant_arrayinit { value_range }
 */
 void Parameter_2::parse(CS& file)
-{
+{ untested();
   // file >> "parameter "; from caller
-  file >> _type >> _name >> '=' >> _default_val;
+  _default_val.set_owner(owner());
+  file >> ','; // ??
+  file >> _name;
+  trace2("Parameter2", _name, file.tail());
+  file >> '=' >> _default_val;
   assert(ctx());
-  trace1("Parameter2", name());
   ctx()->new_var_ref(this);
   assert(ctx()->resolve(name()));
 }
 /*--------------------------------------------------------------------------*/
-void Parameter_2::dump(std::ostream& out)const
+void Parameter_2::dump(std::ostream& o)const
 {
-  out <<
-    "  parameter " << type() << " " << name() << " = " << default_val() << ";\n";
+  o << name() << " = " << default_val(); // range?
 }
+/*--------------------------------------------------------------------------*/
+/*
++ parameter_declaration ::=
+- parameter [ signed ] [ range ] list_of_param_assignments
++ | parameter parameter_type list_of_param_assignments
+*/
+void Parameter_2_List::parse(CS& file)
+{ untested();
+  _is_local = file.last_match()[0]=='l';
+  if(file.umatch("real")){ untested();
+    _type = std::string("real"); // TODO: enum
+  }else if(file.umatch("integer")){ untested();
+    _type = std::string("integer"); // TODO: enum
+  }else{
+    throw Exception_CS("parameter: need \"real\", \"integer\"\n", file);
+  }
+  std::string type = _type.to_string();
+  trace2("Parameter_2_List", _type, _is_local);
+  LiSt<Parameter_2, '\0', ',', ';'>::parse(file);
+  for(auto& i : *this){ untested();
+    i->set_type(type);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Parameter_2_List::dump(std::ostream& o)const
+{
+  if(is_local()){
+    o__ "localparam";
+  }else{
+    o__ "parameter";
+  }
+  // "specparam" ...
+  o << " " << _type << " ";
+  LiSt<Parameter_2, '\0', ',', ';'>::dump(o);
+  o << "\n";
+}
+/*--------------------------------------------------------------------------*/
+void Parameter_List_Collection::dump(std::ostream& o)const
+{
+  for(auto const& i : *this){
+    // o__ "parameter ";
+    i->dump(o);
+  }
+  // Collection<Parameter_2_List>::dump(o);
+}
+/*--------------------------------------------------------------------------*/
+// void Localparam_List_Collection::dump(std::ostream& o)const
+// {
+//   for(auto const& i : *this){
+//     o__ "localparam ";
+//     i->dump(o);
+//   }
+//   // Collection<Localparam_List>::dump(o);
+// }
 /*--------------------------------------------------------------------------*/
 /* A.1.3	6.2, 6.5
 + port ::=
@@ -164,7 +220,7 @@ void Port_Discipline_List_Collection::parse(CS& f)
   auto ii = root->discipline_list().find(f);
 
   if(ii!=root->discipline_list().end()){
-    size_t here = f.cursor();
+//    size_t here = f.cursor();
     Port_Discipline_List* m = new Port_Discipline_List();
     m->set_discipline(*ii);
 
@@ -337,7 +393,7 @@ void Module::parse(CS& file)
   _ground.set_owner(this);
   _disc_assign.set_owner(this);
   _parameters.set_owner(this);
-  _local_params.set_owner(this);
+  //_local_params.set_owner(this);
   _element_list.set_owner(this);
   _local_nodes.set_owner(this);
   // _tr_eval.set_owner(this);
@@ -348,7 +404,7 @@ void Module::parse(CS& file)
   assert(_parameters.ctx() == this);
 
 
-  Block* root_scope = ctx();
+//  Block* root_scope = ctx();
   File const* root = prechecked_cast<File const*>(ctx());
   assert(root);
 
@@ -366,13 +422,15 @@ void Module::parse(CS& file)
       || ((file >> "ground ") && (file >> _ground))
       || ((file >> "branch ") && (file >> _branches))
       // net_declaration
+//      || (( root->disciplines().match(file) ) && (file >> _disc_assign))
       || (file >> _disc_assign)
       // mi, npmi, mogi, module_or_generate_item_declaration
       // mi, npmi, module_or_generate_item
-      || ((file >> "localparam ") && (file >> _local_params))
+//      || ((file >> "localparam ") && (file >> _local_params))
       || ((file >> "analog ") && parse_analog(file)) // TODO:: file >> analog
       // mi, non_port_module_item
       || ((file >> "parameter ") && (file >> _parameters))
+      || ((file >> "localparam ") && (file >> _parameters))
       || ((file >> "endmodule ") && (end = true))
       || (file >> _element_list)	// module_instantiation
       ;
@@ -410,15 +468,13 @@ void Module::dump(std::ostream& o)const
   }
   o << disc_assign();
   if(parameters().size()){
-    o << ind << "// params\n";
     o << parameters() << "\n";
   }else{
   }
-  if(local_params().size()){
-    o << ind << "// local params\n";
-    o << local_params() << "\n";
-  }else{
-  }
+//  if(local_params().size()){
+//    o << local_params() << "\n";
+//  }else{
+//  }
   if(circuit().size()){
     o << ind << "// circuit\n";
     o << circuit() << "\n";
@@ -445,16 +501,11 @@ CS& Module::parse_analog(CS& cmd)
   return cmd;
 }
 /*--------------------------------------------------------------------------*/
-void AnalogBlock::dump(std::ostream& o)const
+void Variable::dump(std::ostream& o)const
 {
-  o << ind << "analog begin\n";
-  for(auto i: *this){
-    // indent x();
-    o << ind << *i << "\n";
-  }
-  o << ind << "end\n";
+  unreachable(); // ?
+//  o__ _type << " " << name() << ";\n";
 }
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

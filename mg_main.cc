@@ -25,6 +25,7 @@
 /*global*/ int errorcount = 0;
 std::string ind = "  ";
 /*--------------------------------------------------------------------------*/
+#if 0
 static void make_module_file(const File& in, std::string dump_name)
 {
   { // chop prefix path
@@ -45,6 +46,7 @@ static void make_module_file(const File& in, std::string dump_name)
 
   make_cc(out, in);
 }
+#endif
 /*--------------------------------------------------------------------------*/
 static void preprocess(const File& in, std::ostream& of)
 {

@@ -37,7 +37,6 @@ bool Module::sync() const
     unsupported.
   }
 }
-#endif
 /*--------------------------------------------------------------------------*/
 static int is_function(std::string const& n)
 {
@@ -54,6 +53,7 @@ static int is_function(std::string const& n)
     return 0;
   }
 }
+#endif
 /*--------------------------------------------------------------------------*/
 static String_Arg const& potential_abstol(Branch const& b)
 {
@@ -433,7 +433,7 @@ static void make_module_expand_one_element(std::ostream& o, const Element_2& e, 
   o______ "throw Exception(" << "\"Cannot find " << e.dev_type() << ". Load module?\");\n";
   o____ "}else{\n";
   o____ "}\n";
-  if(auto br = dynamic_cast<Branch const*>(&e)){
+  if(dynamic_cast<Branch const*>(&e)){
     o____ e.code_name() << " = dynamic_cast<ELEMENT*>(p->clone());\n";
   }else{
     o____ e.code_name() << " = dynamic_cast<COMPONENT*>(p->clone());\n";
@@ -471,7 +471,7 @@ static void make_module_expand_one_element(std::ostream& o, const Element_2& e, 
     }
     o << "}; // nodes\n";
 
-    Port_1_List::const_iterator p = e.current_ports().begin();
+//    Port_1_List::const_iterator p = e.current_ports().begin();
     make_set_parameters(o, e);
 
     int kk = 0;

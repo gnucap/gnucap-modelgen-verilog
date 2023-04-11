@@ -2,7 +2,8 @@ mg_main.o: mg_main.cc mg_out.h mg_.h
 mg_error.o: mg_error.cc
 mg_func.o: mg_func.cc
 mg_impl.o: mg_impl.cc mg_.h
-mg_in_analog.o: mg_in_analog.cc mg_.h m_tokens.h
+mg_in_analog.o: mg_in_analog.cc mg_.h mg_out.h m_tokens.h
+mg_in_expr.o: mg_in_expr.cc mg_.h m_tokens.h
 mg_in_old.o: mg_in_old.cc mg_.h
 mg_in.o: mg_in.cc mg_.h
 mg_in_verilog.o: mg_in_verilog.cc

@@ -48,17 +48,17 @@ void make_dump_file(const File&);
 void make_cc(std::ostream&, const File&);
 /*--------------------------------------------------------------------------*/
 /* mg_out_lib.cc */
-void make_final_adjust_eval_parameter_list(std::ostream&, const Parameter_2_List&);
+void make_final_adjust_eval_parameter_list(std::ostream&, const Parameter_List_Collection&);
 void make_final_adjust_value(std::ostream&, const Parameter_2&);
-void make_final_adjust_value_list(std::ostream&, const Parameter_2_List&);
+void make_final_adjust_value_list(std::ostream&, const Parameter_List_Collection&);
 void make_final_adjust_parameter(std::ostream&, const Parameter_1&);
 void make_final_adjust_parameter_list(std::ostream&, const Parameter_1_List&);
 void make_final_adjust(std::ostream&, const Parameter_Block&);
-void make_construct_parameter_list(std::ostream&, const Parameter_2_List&);
+void make_construct_parameter_list(std::ostream&, const Parameter_List_Collection&);
 void make_get_param_list(std::ostream&, const Parameter_1_List&);
 void make_print_param_list(std::ostream&, const Parameter_1_List&);
 void make_print_calc_param_list(std::ostream&, const Parameter_1_List&);
-void make_copy_construct_parameter_list(std::ostream&, const Parameter_2_List&);
+void make_copy_construct_parameter_list(std::ostream&, const Parameter_List_Collection&);
 /*--------------------------------------------------------------------------*/
 /* mg_out_h.cc */
 void make_cc_decl(std::ostream&, const Module&);

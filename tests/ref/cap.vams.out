@@ -31,11 +31,10 @@ enddiscipline
 module cap(p, n);
   inout p, n;
   electrical p, n;
-  // params
   parameter real c = 1.;
-;
+
   analog begin
-    I(p, n) <+ (c * ddt(V(p, n)))
+    I(p, n) <+ (c * ddt(V(p, n)));
   end
 
 endmodule

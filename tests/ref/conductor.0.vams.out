@@ -32,7 +32,7 @@ module conductor0(p, n);
   inout p, n;
   electrical p, n;
   analog begin
-    I(p, n) <+ V(p, n)
+    I(p, n) <+ V(p, n);
   end
 
 endmodule
