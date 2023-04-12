@@ -145,6 +145,14 @@ static void make_tr_probe_num(std::ostream& o, const Module& m)
     }else{
     }
   }
+  for(auto const& vl : m.variables()){
+    // todo: only those with desc or unit attribute
+    for (Variable_List::const_iterator p=vl->begin(); p!=vl->end(); ++p) {
+      o__ "if(n == \"" << (*p)->name() << "\"){\n";
+      o__ ind << "return _v_" << (*p)->name() << ".value();\n";
+      o__ "}\n";
+    }
+  }
   o << ind << "return NOT_VALID;\n";
   o << "}\n"
     "/*--------------------------------------"
@@ -250,7 +258,7 @@ static void make_one_branch_contribution(std::ostream& o, Module const& m, const
     if(d->branch() == b){
       if(b->has_pot_source() && b->has_flow_probe()){ untested();
 	throw Exception("cannot use self as current probe.. yet\n");
-      }else{ untested();
+      }else{
       }
       o__ "trace2(\"" <<  b->state() << "self\", " << b->state() << "["<<k<<"], "<<  d->code_name() <<");\n";
       o__ b->state() << "[0] -= " << b->state() << "["<<k<<"] * "<< d->code_name() << ";\n";

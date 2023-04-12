@@ -127,8 +127,8 @@ void Discipline::parse(CS& file)
   }
   assert(file);
 
-  assert(ctx());
-  File const* f = dynamic_cast<File const*>(ctx());
+  assert(owner());
+  File const* f = dynamic_cast<File const*>(owner());
   assert(f);
 
   if(_potential_ident!=""){

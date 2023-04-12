@@ -209,8 +209,8 @@ public:
   typedef typename List_Base<T>::const_iterator const_iterator;
 
   void set_owner(Block* b){ _owner = b; }
-  Block const* ctx() const{return _owner;}
-  Block* ctx(){return _owner;}
+  Block const* owner() const{return _owner;}
+  Block* owner(){return _owner;}
   void parse(CS& file) override{
     parse_n(file);
   }
@@ -312,8 +312,8 @@ public:
   typedef typename List_Base<T>::const_iterator const_iterator;
 
   void set_owner(Block* c) { _owner = c; }
-  Block const* ctx() const{return _owner;}
-  Block* ctx(){return _owner;}
+  Block const* owner() const{return _owner;}
+  Block* owner(){return _owner;}
   void set_file(File const* f){ _file = f; }
   void parse(CS& file) {
     size_t here = file.cursor();
@@ -430,7 +430,6 @@ protected:
   std::string _final_default;
   bool	      _positive;
   bool	      _octal;
-  Block* owner(){return _owner;}
 public:
   // void parse(CS& f);
   // void print(std::ostream& f)const;
@@ -461,7 +460,7 @@ public:
   void set_owner(Block* c) { _owner = c; }
   std::string const& name() const{ return _name; }
 protected:
-  Block* ctx(){ return _owner; }
+  Block* owner(){ return _owner; }
 };
 // typedef LiSt<Parameter_1, '{', '#', '}'> Parameter_1_List;
 /*--------------------------------------------------------------------------*/
@@ -494,6 +493,97 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Parameter_List_Collection : public Collection<Parameter_2_List>{
+public:
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class Probe;
+class Deps : public std::set<Probe const*>{
+  typedef std::set<Probe const*> S;
+  typedef S::const_iterator const_iterator;
+public:
+  std::pair<const_iterator, bool> insert(Probe const* x){
+    return std::set<Probe const*>::insert(x);
+  }
+  void update(Deps const& other){
+    for(auto i : other){
+      insert(i);
+    }
+  }
+};
+/*--------------------------------------------------------------------------*/
+class Branch;
+class Branch_Ref {
+  Branch* _br;
+  bool _r;
+public:
+  explicit Branch_Ref(Branch* b, bool reversed=false) :
+    _br(b), _r(reversed) {}
+  operator Branch*() const{ return _br; }
+  Branch* operator->() const{ return _br; }
+  bool is_reversed() const{return _r;}
+
+  std::string const& pname() const;
+  std::string const& nname() const;
+};
+/*--------------------------------------------------------------------------*/
+class Token_PROBE; //bug?
+class Expression;
+class Variable : public Base {
+  Block* _owner{NULL};
+protected:
+  std::string _name;
+  Deps _deps;
+  Block const* owner() const{ return _owner; }
+public:
+  explicit Variable() : Base() {}
+  Variable(std::string const& name)
+   :Base()
+   ,_name(name)
+  {}
+  ~Variable() {
+  }
+public:
+  Deps const& deps()const { return _deps; }
+  std::string const& name()const {return _name;}
+  virtual bool is_module_variable() const;
+
+  void set_owner(Block* owner) {_owner = owner;}
+  virtual void parse(CS&) { untested();
+    incomplete();
+  }
+  void dump(std::ostream& o)const override;
+  virtual Branch_Ref new_branch(std::string const& p, std::string const& n);
+
+private:
+  bool is_node(std::string const& n)const;
+
+protected:
+  Block* owner(){ return _owner; }
+  void new_var_ref();
+  void resolve_symbols(Expression const& e, Expression& E);
+private:
+  Token* resolve_filter_function(Expression& E, std::string const& name, Deps const&);
+  Token_PROBE* resolve_xs_function(Expression& E, std::string const& name, Deps const&);
+};
+/*--------------------------------------------------------------------------*/
+class Variable_2 :public Variable {
+public:
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+  Variable_2() : Variable() {}
+//   void set_type(std::string const& a){_type=a;}
+};
+/*--------------------------------------------------------------------------*/
+class Variable_List : public LiSt<Variable_2, '\0', ',', ';'> {
+  String_Arg _type; // ENUM?
+public:
+  String_Arg const& type()const {return _type;}
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class Variable_List_Collection : public Collection<Variable_List>{
 public:
   void dump(std::ostream& f)const override;
 };
@@ -561,24 +651,8 @@ public:
   void fill_in_default_values();
 };
 /*--------------------------------------------------------------------------*/
-class Branch;
-/*--------------------------------------------------------------------------*/
-class Branch_Ref {
-  Branch* _br;
-  bool _r;
-public:
-  explicit Branch_Ref(Branch* b, bool reversed=false) :
-    _br(b), _r(reversed) {}
-  operator Branch*() const{ return _br; }
-  Branch* operator->() const{ return _br; }
-  bool is_reversed() const{return _r;}
-
-  std::string const& pname() const;
-  std::string const& nname() const;
-};
 /*--------------------------------------------------------------------------*/
 /// Some kind of sequential block with scope for parameters, variables..
-class Probe;
 class Deps;
 class Filter;
 class Node;
@@ -591,8 +665,8 @@ protected:
 private:
   Block* _owner{NULL};
 public:
-  Block const* ctx() const{ return _owner;}
-  Block* ctx(){ return _owner;}
+  Block const* owner() const{ return _owner;}
+  Block* owner(){ return _owner;}
 public:
   template<class T>
   void new_var_ref(T const* what);
@@ -650,23 +724,23 @@ private: // this is a stub
   bool parse_assignment(CS& cmd);
 
 public: // this is a stub
-//  void set_owner(Block* ctx) {_owner = ctx;}
+//  void set_owner(Block* owner) {_owner = owner;}
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
 
 
 //  Block?
   Probe const* new_probe(std::string const& xs, std::string const& p, std::string const& n)override {
-    assert(ctx());
-    return ctx()->new_probe(xs, p, n);
+    assert(owner());
+    return owner()->new_probe(xs, p, n);
   }
   Branch_Ref new_branch(std::string const& p, std::string const& n)override {
-    assert(ctx());
-    return ctx()->new_branch(p, n);
+    assert(owner());
+    return owner()->new_branch(p, n);
   }
   Node const* node(std::string const& n)const override {
-    assert(ctx());
-    return ctx()->node(n);
+    assert(owner());
+    return owner()->node(n);
   }
 };
 typedef Collection<AnalogBlock> AnalogBlock_List;
@@ -1083,7 +1157,7 @@ class Discipline :public Base {
   Block const* _owner;
 public:
   void set_owner(Block const* c) {_owner=c;}
-  Block const* ctx() {return _owner;}
+  Block const* owner() {return _owner;}
   const String_Arg&  key()const	  {return _identifier;}
   void parse(CS& f);
   void dump(std::ostream& f)const override;
@@ -1096,20 +1170,6 @@ public:
   Nature const* potential()const{return _potential;}
 };
 typedef Collection<Discipline> Discipline_List;
-/*--------------------------------------------------------------------------*/
-class Deps : public std::set<Probe const*>{
-  typedef std::set<Probe const*> S;
-  typedef S::const_iterator const_iterator;
-public:
-  std::pair<const_iterator, bool> insert(Probe const* x){
-    return std::set<Probe const*>::insert(x);
-  }
-  void update(Deps const& other){
-    for(auto i : other){
-      insert(i);
-    }
-  }
-};
 /*--------------------------------------------------------------------------*/
 class Branch : public Element_2 {
   Node const* _p{NULL};
@@ -1167,7 +1227,7 @@ public:
       x.second = NULL;
     }
   }
-  //BranchRef new_branch(Node const* a, Node const* b, Block* ctx);
+  //BranchRef new_branch(Node const* a, Node const* b, Block* owner);
   const_iterator begin() const{ return _m.begin(); }
   const_iterator end() const{ return _m.end(); }
 
@@ -1191,8 +1251,8 @@ private: // verilog input data
   Port_3_List_3	_inout;
   Port_3_List_3	_ground;
   Port_Discipline_List_Collection _disc_assign;
+  Variable_List_Collection _variables;
   Parameter_List_Collection _parameters;
-//  Localparam_List_Collection _local_params;
   Element_2_List _element_list;
   Port_1_List	_local_nodes;
   Attribute_Instance _attribute_dummy;
@@ -1204,7 +1264,7 @@ private: // elaboration data
   Branch_Map _branches;
   Node_Map _nodes;
 public:
-  File const* file() const{ return _file; }; // ctx?
+  File const* file() const{ return _file; }; // owner?
   void parse(CS& f);
   void dump(std::ostream& f)const;
   Module(){}
@@ -1216,7 +1276,7 @@ public:
   const Port_3_List_3&	  ground()const		{return _ground;}
   const Port_Discipline_List_Collection& disc_assign()const{return _disc_assign;}
   const Parameter_List_Collection& parameters()const	{return _parameters;}
-//  const Localparam_List_Collection& local_params()const	{return _local_params;}
+  const Variable_List_Collection& variables()const	{return _variables;}
   const Element_2_List&	  element_list()const	{return _element_list;}
   const Element_2_List&	  circuit()const	{return _element_list;}
   const Port_1_List&	  local_nodes()const	{return _local_nodes;}
@@ -1244,57 +1304,10 @@ private:
 }; // Module
 typedef Collection<Module> Module_List;
 /*--------------------------------------------------------------------------*/
-class Token_PROBE; //bug?
-class Expression;
-class Variable : public Base {
-  Block* _owner{NULL};
-private:
-  Block* owner(){ return _owner; }
-protected:
-  std::string _name;
-  Deps _deps;
-  Block const* ctx() const{ return _owner; }
-public:
-  Deps const& deps()const { return _deps; }
-  explicit Variable() : Base() {}
-  Variable(std::string const& name)
-   :Base()
-   ,_name(name)
-  {}
-  ~Variable() {
-  }
-public:
-  std::string const& name()const {return _name;}
-
-  void set_owner(Block* ctx) {_owner = ctx;}
-  virtual void parse(CS&) { untested();
-    incomplete();
-  }
-  void dump(std::ostream& o)const override;
-  virtual Branch_Ref new_branch(std::string const& p, std::string const& n) {
-    assert(_owner);
-    return(_owner->new_branch(p, n));
-  }
-
-private:
-  bool is_node(std::string const& n) const{
-    assert(_owner);
-    return _owner->node(n);
-  }
-
-protected:
-  void new_var_ref(){
-    _owner->new_var_ref(this);
-  }
-  void resolve_symbols(Expression const& e, Expression& E);
-private:
-  Token* resolve_filter_function(Expression& E, std::string const& name, Deps const&);
-  Token_PROBE* resolve_xs_function(Expression& E, std::string const& name, Deps const&);
-};
 /*--------------------------------------------------------------------------*/
 class BlockRealIdentifier : public Variable{
 public:
-  explicit BlockRealIdentifier() : Variable() { untested(); }
+  explicit BlockRealIdentifier() : Variable() { }
 public:
   void parse(CS& cmd) override;
   void dump(std::ostream&)const override;
@@ -1308,33 +1321,52 @@ public:
 // analog_procedural_assignment
 class Assignment : public Variable {
 protected:
-  std::string _lhsname;
-  Expression* _rhs;
+  Variable const* _lhs{NULL};
+  Expression* _rhs{NULL}; // const?
 public:
-  Assignment(std::string const& lhsname)
-   :Variable(lhsname)
-   ,_lhsname(lhsname)
-   ,_rhs(NULL) {}
+  explicit Assignment() : Variable() {}
   ~Assignment();
 public:
-  std::string const& lhsname()const {return _lhsname;}
+  bool is_module_variable()const override;
+  std::string const& lhsname()const {
+    assert(_lhs);
+    return _lhs->name();
+  }
+  void set_lhs(Variable const* v){_lhs = v;}
   Expression const* rhs()const {return _rhs;}
   void parse(CS& cmd) override;
   void dump(std::ostream&)const override;
 };
 /*--------------------------------------------------------------------------*/
-class Contribution : public Assignment {
+class Contribution : public Base {
+  Block* _owner{NULL};
 protected: // BUG
   std::string _name;
+  Expression* _rhs{NULL}; // const?
+  Deps _deps;
 protected:
   Branch_Ref _branch;
+  void set_pot_source();
+  void set_flow_source();
+  Deps& deps() { return _deps; }
 public:
-  Contribution(std::string const& lhsname)
-    : Assignment(lhsname), _branch(NULL) {}
+  Contribution(std::string const& lhsname /*TODO*/)
+    : Base(), _name(lhsname), _branch(NULL) {}
 
+  void parse(CS&)override;
+  void dump(std::ostream&)const override;
+  void set_owner(Block* c) {_owner=c;}
+  Block const* owner() const{ return _owner; }
+  Block* owner(){ return _owner; }
+  Deps const& deps() const { return _deps; }
+  Expression const* rhs()const {return _rhs;}
   std::string const& name() const{return _name;}
   Branch const* branch() const{return _branch;}
   bool reversed() const{ return _branch.is_reversed() ;}
+  Branch_Ref new_branch(std::string const& p, std::string const& n) {
+    assert(owner());
+    return owner()->new_branch(p, n);
+  }
 };
 /*--------------------------------------------------------------------------*/
 class PotContribution : public Contribution {
@@ -1342,7 +1374,6 @@ public:
   PotContribution(std::string const& lhsname) : Contribution(lhsname) {}
 public:
   void parse(CS&)override;
-  void dump(std::ostream&)const override;
 };
 /*--------------------------------------------------------------------------*/
 class FlowContribution : public Contribution {
@@ -1350,7 +1381,6 @@ public:
   FlowContribution(std::string const& lhsname) : Contribution(lhsname) {}
 public:
   void parse(CS&)override;
-  void dump(std::ostream&)const override;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1467,6 +1497,23 @@ public: // make it look like an Element_2?
 void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps*d=NULL);
 void make_cc_expression(std::ostream& o, Expression const& e);
 /*--------------------------------------------------------------------------*/
+inline Branch_Ref Variable::new_branch(std::string const& p, std::string const& n)
+{
+  assert(_owner);
+  return(_owner->new_branch(p, n));
+}
+/*--------------------------------------------------------------------------*/
+inline bool Variable::is_node(std::string const& n) const
+{
+  assert(_owner);
+  return _owner->node(n);
+}
+/*--------------------------------------------------------------------------*/
+inline void Variable::new_var_ref()
+{
+  assert(_owner);
+  _owner->new_var_ref(this);
+}
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

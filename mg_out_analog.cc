@@ -20,124 +20,7 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_out.h"
-#include <stack>
-#include "m_tokens.h"
-/*--------------------------------------------------------------------------*/
-static int is_function(std::string const& n)
-{
-  // incomplete();
-  // stub, need sth.
-  if (n == "exp"
-   || n == "log"
-   || n == "cos"
-   || n == "sin") {
-    return 1;
-  }else if (n == "pow"){
-    return 2;
-  }else{
-    return 0;
-  }
-}
-/*--------------------------------------------------------------------------*/
-void make_cc_expression(std::ostream& o, Expression const& e)
-{
-  typedef Expression::const_iterator const_iterator;
-
-  // The _list is the expression in RPN.
-  // print a program that computes the function and the derivatives.
-  std::stack<int> idxs;
-  int idx = -1;
-  int idx_alloc = 0;
-  for (const_iterator i = e.begin(); i != e.end(); ++i) {
-    if (dynamic_cast<const Token_VAR_REF*>(*i)
-      ||dynamic_cast<const Token_PAR_REF*>(*i)
-      ||dynamic_cast<const Token_CONSTANT*>(*i)
-      ||dynamic_cast<const Token_PROBE*>(*i)
-      ) {
-      idxs.push(++idx);
-      if(idx<idx_alloc) {
-	// re-use temporary variable
-      }else{
-	assert(idx==idx_alloc);
-	++idx_alloc;
-	o << ind << "ddouble t" << idx << ";\n";
-      }
-    }else{
-    }
-
-    if (auto var = dynamic_cast<const Token_VAR_REF*>(*i)) {
-      o__ "t" << idx << " = _v_" << (*i)->name() << ".value();\n";
-      for(auto v : var->deps()) {
-	o__ "t" << idx << "[d" << v->code_name() << "] = _v_" << (*i)->name() << "[d" << v->code_name() << "];\n";
-      }
-    }else if (auto f = dynamic_cast<const Token_FILTER*>(*i)) {
-      o__ "t" << idx << " = p->" << (*i)->name() << "(t" << idx <<" )\n";
-      for(auto v : f->deps()) {
-	o__ "// dep :" << v->code_name() << "\n";
-//	o__ "t" << idx << "[d" << v->code_name() << "] = _v_" << (*i)->name() << "[d" << v->code_name() << "];\n";
-      }
-    }else if (dynamic_cast<const Token_PAR_REF*>(*i)) {
-      o << ind << "t" << idx << " = pc->_p_" << (*i)->name() << ";\n";
-    }else if (dynamic_cast<const Token_CONSTANT*>(*i)) {
-      o << ind << "t" << idx << " = " << (*i)->name() << ";\n";
-    }else if(auto pp = dynamic_cast<const Token_PROBE*>(*i)) {
-      char sign = pp->reversed()?'-':'+';
-
-      o__ "t" << idx << " = "<<sign<<" p->" << pp->code_name() << ";// "<< pp->name() <<"\n";
-      o__ "t" << idx << "[d" << pp->code_name() << "] = " << sign << "1.;\n";
-    }else if(dynamic_cast<const Token_SYMBOL*>(*i)) {
-      int arity = is_function((*i)->name());
-      assert(arity);
-      if(arity == 1){
-	o << ind << "t" << idx << " = va::" << (*i)->name();
-	o << "(t" << idx << ");\n";
-      }else if(arity == 2){
-	int idy = idx;
-	idxs.pop();
-	idx = idxs.top();
-	o << ind << "t" << idx << " = va::" << (*i)->name();
-
-	o << "(t" << idx << ", t" << idy << ");\n";
-      }else{ untested();
-	unreachable();
-      }
-    }else if (dynamic_cast<const Token_PARLIST*>(*i)) {
-    }else if (dynamic_cast<const Token_STOP*>(*i)) {
-    }else if (dynamic_cast<const Token_BINOP*>(*i)) {
-      int idy = idxs.top();
-      assert( idy == idx );
-      idxs.pop();
-      idx = idxs.top();
-      assert((*i)->name().size());
-
-      char op = (*i)->name()[0];
-      switch(op) {
-      case '-':
-      case '+':
-      case '*':
-      case '/':
-	o__ "t" << idx << " "<< op << "= t" << idy << ";\n";
-	break;
-      default:
-	incomplete();
-	unreachable();
-	;
-      }
-    }else if (dynamic_cast<const Token_UNARY*>(*i)) {
-      char op = (*i)->name()[0];
-      if(op == '-') {
-	o__ "t" << idx << " *= -1.;\n";
-      }else{ untested();
-	incomplete();
-	unreachable();
-      }
-    }else{
-      unreachable();
-      assert(false);
-    }
-  }
-  assert(!idx);
-}
+//#include "m_tokens.h"
 /*--------------------------------------------------------------------------*/
 static void make_cc_variable(std::ostream& o, Variable const& v)
 {
@@ -160,13 +43,6 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
 {
   assert(a.rhs());
   Expression const& e = *a.rhs();
-//   o << "/* RPN ";
-//   auto const& e = *a.rhs();
-//   for (Expression::const_iterator i = e.begin(); i != e.end(); ++i) {
-//     o << "" << (*i)->full_name() << " ";
-//   }
-//   o << "*/\n";
-
 
   o << ind << "{ // Assignment '" << a.lhsname() << "'.";
   for(auto i : a.deps()) {
@@ -175,21 +51,27 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
   o << "\n";
 
   {
-    indent x("  ");
+    indent x;
     make_cc_expression(o, e);
-    o << ind << "_v_" << a.lhsname() << ".value() = t0.value();\n";
+    std::string prefix;
+    if(a.is_module_variable()){ untested();
+      prefix = "/*m*/ d->_v_";
+    }else{
+      prefix = "_v_";
+    }
+    o__ prefix << a.lhsname() << ".value() = t0.value();\n";
     for(auto v : a.deps()) {
       assert(!v->is_reversed());
-      o__ "_v_" << a.lhsname() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "];\n";
-      o__ "assert(_v_" << a.lhsname() << " == " << "_v_" << a.lhsname() << ");\n";
+      o__ prefix << a.lhsname() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "];\n";
+      o__ "assert(" << prefix << a.lhsname() << " == " << prefix << a.lhsname() << ");\n";
     }
   }
-  o << ind << "}\n";
+  o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
 static void make_cc_contrib(std::ostream& o, Contribution const& f)
 {
-  o << ind << "{ // FlowContribution " << f.lhsname() << "\n";
+  o__ "{ // Contribution " << f.name() << "\n";
   {
     indent x("  ");
     if(f.rhs()) {

@@ -116,16 +116,16 @@ void Parameter_3::dump(std::ostream& out)const
 -	| parameter_identifier range "=" constant_arrayinit { value_range }
 */
 void Parameter_2::parse(CS& file)
-{ untested();
+{
   // file >> "parameter "; from caller
   _default_val.set_owner(owner());
   file >> ','; // ??
   file >> _name;
   trace2("Parameter2", _name, file.tail());
   file >> '=' >> _default_val;
-  assert(ctx());
-  ctx()->new_var_ref(this);
-  assert(ctx()->resolve(name()));
+  assert(owner());
+  owner()->new_var_ref(this);
+  assert(owner()->resolve(name()));
 }
 /*--------------------------------------------------------------------------*/
 void Parameter_2::dump(std::ostream& o)const
@@ -139,11 +139,11 @@ void Parameter_2::dump(std::ostream& o)const
 + | parameter parameter_type list_of_param_assignments
 */
 void Parameter_2_List::parse(CS& file)
-{ untested();
+{
   _is_local = file.last_match()[0]=='l';
-  if(file.umatch("real")){ untested();
+  if(file.umatch("real")){
     _type = std::string("real"); // TODO: enum
-  }else if(file.umatch("integer")){ untested();
+  }else if(file.umatch("integer")){
     _type = std::string("integer"); // TODO: enum
   }else{
     throw Exception_CS("parameter: need \"real\", \"integer\"\n", file);
@@ -151,9 +151,15 @@ void Parameter_2_List::parse(CS& file)
   std::string type = _type.to_string();
   trace2("Parameter_2_List", _type, _is_local);
   LiSt<Parameter_2, '\0', ',', ';'>::parse(file);
-  for(auto& i : *this){ untested();
+  for(auto& i : *this){
     i->set_type(type);
   }
+}
+/*--------------------------------------------------------------------------*/
+void Variable_List::parse(CS& file)
+{
+  _type = file.last_match();
+  LiSt<Variable_2, '\0', ',', ';'>::parse(file);
 }
 /*--------------------------------------------------------------------------*/
 void Parameter_2_List::dump(std::ostream& o)const
@@ -169,10 +175,24 @@ void Parameter_2_List::dump(std::ostream& o)const
   o << "\n";
 }
 /*--------------------------------------------------------------------------*/
+void Variable_List::dump(std::ostream& o)const
+{
+  o__ _type << " ";
+  LiSt<Variable_2, '\0', ',', ';'>::dump(o);
+  o << "\n";
+}
+/*--------------------------------------------------------------------------*/
+void Variable_List_Collection::dump(std::ostream& o)const
+{
+  for(auto const& i : *this){ untested();
+    i->dump(o);
+  }
+  // Collection<Parameter_2_List>::dump(o);
+}
+/*--------------------------------------------------------------------------*/
 void Parameter_List_Collection::dump(std::ostream& o)const
 {
   for(auto const& i : *this){
-    // o__ "parameter ";
     i->dump(o);
   }
   // Collection<Parameter_2_List>::dump(o);
@@ -212,8 +232,8 @@ void New_Port::parse(CS& file)
 /*--------------------------------------------------------------------------*/
 void Port_Discipline_List_Collection::parse(CS& f)
 {
-  assert(ctx()); // Module
-  Block const* root_scope = ctx()->ctx();
+  assert(owner()); // Module
+  Block const* root_scope = owner()->owner();
   assert(root_scope);
   File const* root = prechecked_cast<File const*>(root_scope);
   assert(root);
@@ -224,7 +244,7 @@ void Port_Discipline_List_Collection::parse(CS& f)
     Port_Discipline_List* m = new Port_Discipline_List();
     m->set_discipline(*ii);
 
-    m->set_owner(ctx());
+    m->set_owner(owner());
     f >> *m;
     for(auto i : *m){
       i->set_discipline(*ii);
@@ -392,6 +412,7 @@ void Module::parse(CS& file)
   _inout.set_owner(this);
   _ground.set_owner(this);
   _disc_assign.set_owner(this);
+  _variables.set_owner(this);
   _parameters.set_owner(this);
   //_local_params.set_owner(this);
   _element_list.set_owner(this);
@@ -401,11 +422,11 @@ void Module::parse(CS& file)
 
   // file >> "module |macromodule |connectmodule "; from caller
   file >> _identifier >> _ports >> ';';
-  assert(_parameters.ctx() == this);
+  assert(_parameters.owner() == this);
 
 
-//  Block* root_scope = ctx();
-  File const* root = prechecked_cast<File const*>(ctx());
+//  Block* root_scope = owner();
+  File const* root = prechecked_cast<File const*>(owner());
   assert(root);
 
   size_t here = file.cursor();
@@ -423,12 +444,14 @@ void Module::parse(CS& file)
       || ((file >> "branch ") && (file >> _branches))
       // net_declaration
 //      || (( root->disciplines().match(file) ) && (file >> _disc_assign))
+//      || (file >> _node_assignments)
       || (file >> _disc_assign)
       // mi, npmi, mogi, module_or_generate_item_declaration
       // mi, npmi, module_or_generate_item
 //      || ((file >> "localparam ") && (file >> _local_params))
       || ((file >> "analog ") && parse_analog(file)) // TODO:: file >> analog
       // mi, non_port_module_item
+      || ((file >> "real ") && (file >> _variables))
       || ((file >> "parameter ") && (file >> _parameters))
       || ((file >> "localparam ") && (file >> _parameters))
       || ((file >> "endmodule ") && (end = true))
@@ -471,6 +494,10 @@ void Module::dump(std::ostream& o)const
     o << parameters() << "\n";
   }else{
   }
+  if(variables().size()){
+    o << variables() << "\n";
+  }else{
+  }
 //  if(local_params().size()){
 //    o << local_params() << "\n";
 //  }else{
@@ -499,6 +526,18 @@ CS& Module::parse_analog(CS& cmd)
   _analog_list.push_back(ab);
 
   return cmd;
+}
+/*--------------------------------------------------------------------------*/
+void Variable_2::parse(CS& file)
+{ untested();
+  file >> ','; // ??
+  file >> _name;
+  new_var_ref();
+}
+/*--------------------------------------------------------------------------*/
+void Variable_2::dump(std::ostream& o)const
+{
+  o__ name();
 }
 /*--------------------------------------------------------------------------*/
 void Variable::dump(std::ostream& o)const

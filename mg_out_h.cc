@@ -163,6 +163,24 @@ static void make_parameter_decl(std::ostream& o, const Parameter_List_Collection
   }
 }
 /*--------------------------------------------------------------------------*/
+static void make_variable_decl(std::ostream& o, const Variable_List_Collection& P)
+{
+  for (auto q = P.begin(); q != P.end(); ++q) {
+    if(((**q).type()).to_string().substr(0,4) == "real"){
+      o__ "ddouble";
+    }else{
+      o__ (**q).type();
+    }
+    std::string comma=" ";
+    for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
+      o << comma << "_v_" << (**p).name(); // code_name??
+//	  << " /* " << (**p).comment() << " */";
+      comma = ", ";
+    }
+    o << ";\n";
+  }
+}
+/*--------------------------------------------------------------------------*/
 //static void make_parameter_decl(std::ostream& o, const Localparam_List_Collection& P)
 //{
 //  for (auto q = P.begin(); q != P.end(); ++q) {
@@ -311,6 +329,8 @@ static void make_module(std::ostream& o, const Module& m)
   o << "private: // impl\n";
   o << "/* ========== */\n";
 
+  o << "public: // instance vars\n";
+  make_variable_decl(o, m.variables());
   o << "private: // branch state\n";
   make_branch_states(o, m);
 

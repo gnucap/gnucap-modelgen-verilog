@@ -107,7 +107,7 @@ static bool is_flow_xs(std::string const& n)
 /*--------------------------------------------------------------------------*/
 void AnalogBlock::parse(CS& file)
 {
-  assert(ctx());
+  assert(owner());
   bool has_begin = (file >> "begin ");
   trace2("AB parse", file.tail(), has_begin);
 
@@ -202,11 +202,12 @@ bool AnalogBlock::parse_assignment(CS& file)
 
   Base const* b = resolve(what);
   Variable const* v = dynamic_cast<Variable const*>(b);
-  if(!v){ untested();
+  if(!v){
     file.reset(here);
     return false;
-  }else if(file >> "=") { untested();
-    Assignment* a = new Assignment(what);
+  }else if(file >> "=") {
+    Assignment* a = new Assignment();
+    a->set_lhs(v);
     a->set_owner(this);
     a->parse(file);
     push_back(a);
@@ -223,7 +224,7 @@ bool AnalogBlock::parse_assignment(CS& file)
 // analog sequential block
 CS& AnalogBlock::parse_seq(CS& cmd)
 {
-  assert(ctx());
+  assert(owner());
   std::string what;
   size_t here = cmd.cursor();
   cmd >> what;
@@ -283,13 +284,13 @@ Assignment::~Assignment()
 void Assignment::parse(CS& cmd)
 {
   // TODO: rhs is an analog expression
-  assert(ctx());
+  assert(owner());
   trace1("Assignment::parse", cmd.tail());
   Expression rhs(cmd);
   assert(!_rhs);
 #if 1
   Expression tmp;
-  assert(ctx());
+  assert(owner());
   resolve_symbols(rhs, tmp);
   trace1("Assignment::parse resolved", rhs.size());
   _rhs = new Expression(tmp, &CARD_LIST::card_list);
@@ -307,46 +308,54 @@ void Variable::resolve_symbols(Expression const& e, Expression& E)
   return ::resolve_symbols(e, E, scope, &_deps);
 }
 /*--------------------------------------------------------------------------*/
-void PotContribution::parse(CS& cmd)
+void Contribution::parse(CS& cmd)
 {
-  assert(ctx());
-
   cmd >> "(";
   std::string pp = cmd.ctos(",)");
   std::string pn = cmd.ctos(",)");
-  _name = _lhsname + pp + pn;
+  // _name = _lhsname + pp + pn;
   Branch_Ref nb = new_branch(pp, pn);
   _branch = nb;
   assert(_branch);
   cmd >> ")";
   cmd >> "<+";
-  Assignment::parse(cmd);
 
-  for(auto d : deps()) {
-    nb->add_probe(d);
+
+  {// Assignment::parse(cmd);
+    // TODO: rhs is an analog expression
+    assert(owner());
+    trace1("Assignment::parse", cmd.tail());
+    Expression rhs(cmd);
+    assert(!_rhs);
+#if 1
+    Expression tmp;
+    assert(owner());
+    resolve_symbols(rhs, tmp, owner(), &deps());
+    trace1("Assignment::parse resolved", rhs.size());
+    _rhs = new Expression(tmp, &CARD_LIST::card_list);
+#else
+    Expression tmp(rhs, &CARD_LIST::card_list);
+    _rhs = new Expression();
+    resolve_symbols(tmp, *_rhs);
+#endif
+    assert(owner());
+
+    for(auto d : deps()) {
+      nb->add_probe(d);
+    }
   }
-  nb->set_pot_source();
+}
+/*--------------------------------------------------------------------------*/
+void PotContribution::parse(CS& cmd)
+{
+  Contribution::parse(cmd);
+  set_pot_source();
 }
 /*--------------------------------------------------------------------------*/
 void FlowContribution::parse(CS& cmd)
 {
-  assert(ctx());
-
-  cmd >> "(";
-  std::string pp = cmd.ctos(",)");
-  std::string pn = cmd.ctos(",)");
-  _name = _lhsname + pp + pn;
-  Branch_Ref nb = new_branch(pp, pn);
-  _branch = nb;
-  assert(_branch);
-  cmd >> ")";
-  cmd >> "<+";
-  Assignment::parse(cmd);
-
-  for(auto d : deps()) {
-    nb->add_probe(d);
-  }
-  nb->set_flow_source();
+  Contribution::parse(cmd);
+  set_flow_source();
 }
 /*--------------------------------------------------------------------------*/
 void Branch_Map::parse(CS&)
@@ -375,26 +384,14 @@ static void dump(std::ostream& out, Expression const& e)
   e.dump(out);
 }
 /*--------------------------------------------------------------------------*/
-// common Contribution Base?
-void PotContribution::dump(std::ostream& o)const
+void Contribution::dump(std::ostream& o)const
 {
   assert(_branch);
-  o__ lhsname() << *_branch << " <+ ";
+  o__ _name << *_branch << " <+ ";
   assert(_rhs);
 
   ::dump(o, *_rhs);
   o << ";\n";
-}
-/*--------------------------------------------------------------------------*/
-void FlowContribution::dump(std::ostream& o)const
-{
-  assert(_branch);
-  o__ lhsname() << *_branch << " <+ ";
-  assert(_rhs);
-
-  ::dump(o, *_rhs);
-  o << ";\n";
-//  out << "\n";
 }
 /*--------------------------------------------------------------------------*/
 std::string Branch::name()const

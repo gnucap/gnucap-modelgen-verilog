@@ -278,5 +278,33 @@ Filter const* Module::new_filter(std::string const& xs, Deps const&d)
   return f;
 }
 /*--------------------------------------------------------------------------*/
+bool Variable::is_module_variable() const
+{
+  assert(_owner);
+  assert(_owner->owner());
+  if(dynamic_cast<Module const*>(_owner)){ untested();
+    return true;
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Contribution::set_pot_source()
+{
+  assert(_branch);
+  _branch->set_pot_source();
+}
+/*--------------------------------------------------------------------------*/
+void Contribution::set_flow_source()
+{
+  assert(_branch);
+  _branch->set_flow_source();
+}
+/*--------------------------------------------------------------------------*/
+bool Assignment::is_module_variable() const
+{
+  assert(_lhs);
+  return _lhs->is_module_variable();
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

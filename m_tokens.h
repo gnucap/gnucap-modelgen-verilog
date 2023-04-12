@@ -96,6 +96,13 @@ public:
 		 return s;
 	 }
   }
+  bool is_module_variable() const{
+    if(auto v = dynamic_cast<Variable const*>(_item)){
+      return v->is_module_variable();
+    }else{ untested();
+      return false;
+    }
+  }
 };
 /*--------------------------------------------------------------------------*/
 class Token_FILTER : public Token_SYMBOL {

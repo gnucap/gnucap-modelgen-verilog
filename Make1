@@ -37,6 +37,7 @@ mg_in_expr.cc \
 mg_in_old.cc \
 mg_in.cc mg_in_verilog.cc mg_in_module.cc mg_in_discipline.cc \
 mg_out_dump.cc \
+mg_out_expr.cc \
 mg_out_h.cc \
 mg_out_analog.cc \
 mg_out_module.cc \

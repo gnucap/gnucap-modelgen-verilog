@@ -1,3 +1,24 @@
+/*                                      -*- C++ -*-
+ * Copyright (C) 2023 Felix Salfelder
+ *
+ * This file is part of "Gnucap", the Gnu Circuit Analysis Package
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+ */
+/*--------------------------------------------------------------------------*/
 
 #include "mg_.h"
 #include "m_tokens.h"
@@ -50,14 +71,14 @@ static int is_va_function(std::string const& n)
   }
 }
 /*--------------------------------------------------------------------------*/
-static bool is_xs_function(std::string const& f, Block const* ctx)
+static bool is_xs_function(std::string const& f, Block const* owner)
 {
-  assert(ctx);
-  while(!dynamic_cast<Module const*>(ctx)){
-    ctx = ctx->ctx();
-    assert(ctx);
+  assert(owner);
+  while(!dynamic_cast<Module const*>(owner)){
+    owner = owner->owner();
+    assert(owner);
   }
-  auto m =dynamic_cast<Module const*>(ctx);
+  auto m =dynamic_cast<Module const*>(owner);
   assert(m);
   File const* file = m->file();
   if(!file){
@@ -117,7 +138,7 @@ Token_PROBE* resolve_xs_function(Expression& E, std::string const& n, Deps const
 void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* deps)
 {
   trace0("resolve symbols ===========");
-//  assert(ctx());
+//  assert(owner());
   std::stack<Deps*> depstack;
   if(deps){
     depstack.push(deps);
@@ -221,7 +242,7 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
 -	| expression ":" expression ":" expression
 */
 void ConstantMinTypMaxExpression::parse(CS& file)
-{ untested();
+{
   assert(!_e);
   Expression E(file);
   Expression tmp;
