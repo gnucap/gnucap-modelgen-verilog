@@ -99,6 +99,7 @@ static bool is_xs_function(std::string const& f, Block const* owner)
 /*--------------------------------------------------------------------------*/
 Token_PROBE* resolve_xs_function(Expression& E, std::string const& n, Deps const& deps, Block* o)
 {
+  trace1("xsf", n);
   if(E.is_empty()) { untested();
     throw Exception("syntax error");
   }else if(!dynamic_cast<Token_PARLIST*>(E.back())) { untested();
@@ -107,18 +108,19 @@ Token_PROBE* resolve_xs_function(Expression& E, std::string const& n, Deps const
     delete E.back();
     E.pop_back();
     assert(!E.is_empty());
-    std::string arg1;
     if(dynamic_cast<Token_STOP*>(E.back())) { untested();
       throw Exception("syntax error");
     }else{
     }
     std::string arg0 = E.back()->name();
+    std::string arg1;
     delete E.back();
     E.pop_back();
     assert(!E.is_empty());
 
     while(!dynamic_cast<Token_STOP*>(E.back())) {
-      arg1 = E.back()->name();
+      arg1 = arg0;
+      arg0 = E.back()->name();
       delete E.back();
       E.pop_back();
       assert(!E.is_empty());
@@ -126,10 +128,11 @@ Token_PROBE* resolve_xs_function(Expression& E, std::string const& n, Deps const
 
     delete E.back();
     E.pop_back();
-    Probe const* p = o->new_probe(n, arg1, arg0);
-    std::string name = n+"("+arg1+", "+arg0+")";
+    trace3("new_probe", n, arg0, arg1);
+    Probe const* p = o->new_probe(n, arg0, arg1);
+    std::string name = n+"("+arg0+", "+arg1+")";
 
-//    trace3("got a probe", name, arg1, this);
+    trace3("got a probe", name, arg1, arg0);
     return new Token_PROBE(name, p);
     // E.push_back(new Token_PROBE(name, p));
   }
@@ -221,7 +224,11 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
       depstack.top()->update(*td);
       delete(td);
     }else if(scope->node(t->name())) {
-      trace1("unresolved?", t->name());
+      trace1("unresolved node", t->name());
+      incomplete();
+      E.push_back(t->clone()); // try later?
+    }else if(scope->branch(t->name())) {
+      trace1("unresolved branch", t->name());
       incomplete();
       E.push_back(t->clone()); // try later?
     }else{

@@ -63,8 +63,7 @@ inline void os_error(const std::string& name)
 }
 /*--------------------------------------------------------------------------*/
 #if 0 // m_base.h
-class Base
-{ untested();
+class Base {
 public:
   virtual void parse(CS&) = 0;
   virtual void dump(std::ostream& f)const {unreachable(); f << "Base::dump";}
@@ -75,6 +74,18 @@ inline CS&	     operator>>(CS& f, Base& b)
 inline std::ostream& operator<<(std::ostream& f, const Base& d)
 				{d.dump(f); return f;}
 #endif
+class Block;
+class Owned_Base : public Base {
+  Block* _owner{NULL};
+public:
+  explicit Owned_Base() : Base() { untested(); }
+  explicit Owned_Base(Owned_Base const& b) : Base(), _owner(b._owner) { }
+public:
+  void set_owner(Block* b){ untested();  _owner = b; }
+  Block const* owner() const{ untested(); return _owner;}
+protected:
+  Block* owner(){ untested(); return _owner;}
+};
 /*--------------------------------------------------------------------------*/
 class Block;
 class String_Arg :public Base {
@@ -214,7 +225,13 @@ public:
   void parse(CS& file) override{
     parse_n(file);
   }
+// protected:??
   void parse_n(CS& file, unsigned max=-1u) {
+    parse_n_<T>(file, max);
+  }
+protected:
+  template<class TT>
+  void parse_n_(CS& file, unsigned max=-1u) {
     int paren = !BEGIN || file.skip1b(BEGIN);
     size_t here = file.cursor();
     for (;;) {
@@ -226,7 +243,7 @@ public:
 	}else{
 	  //file.warn(0, "list");
 	}
-	T* p = new T;
+	TT* p = new TT;
 	p->set_owner(_owner);
 	file >> *p;
 	if (file.stuck(&here)) { untested();
@@ -309,6 +326,9 @@ public:
   using List_Base<T>::push_back;
   using List_Base<T>::begin;
   using List_Base<T>::end;
+  using List_Base<T>::back;
+  using List_Base<T>::is_empty;
+  using List_Base<T>::pop_back;
   typedef typename List_Base<T>::const_iterator const_iterator;
 
   void set_owner(Block* c) { _owner = c; }
@@ -364,6 +384,13 @@ public:
       return (**x).value();
     }else{ untested();
       return _dummy;
+    }
+  }
+  void clear(){
+    while(!is_empty()){
+      T* b = back();
+      pop_back();
+      delete b;
     }
   }
 };
@@ -502,6 +529,7 @@ class Deps : public std::set<Probe const*>{
   typedef std::set<Probe const*> S;
   typedef S::const_iterator const_iterator;
 public:
+  ~Deps();
   std::pair<const_iterator, bool> insert(Probe const* x){
     return std::set<Probe const*>::insert(x);
   }
@@ -513,12 +541,24 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Branch;
-class Branch_Ref {
-  Branch* _br;
+class Branch_Ref : public Owned_Base {
+  Branch* _br{NULL};
   bool _r;
+protected:
+  std::string _alias;
 public:
-  explicit Branch_Ref(Branch* b, bool reversed=false) :
-    _br(b), _r(reversed) {}
+  Branch_Ref(Branch_Ref&& b);
+  Branch_Ref(Branch_Ref const& b);
+  explicit Branch_Ref() : Owned_Base() {}
+  explicit Branch_Ref(Branch* b, bool reversed=false);
+  ~Branch_Ref();
+  operator bool() const{return _br;}
+  Branch_Ref& operator=(Branch_Ref const& o);
+  Branch_Ref& operator=(Branch_Ref&& o);
+public:
+  void parse(CS&) override;
+  void dump(std::ostream& o)const override;
+
   operator Branch*() const{ return _br; }
   Branch* operator->() const{ return _br; }
   bool is_reversed() const{return _r;}
@@ -549,7 +589,7 @@ public:
   virtual bool is_module_variable() const;
 
   void set_owner(Block* owner) {_owner = owner;}
-  virtual void parse(CS&) { untested();
+  void parse(CS&) override { untested();
     incomplete();
   }
   void dump(std::ostream& o)const override;
@@ -672,19 +712,30 @@ public:
   void new_var_ref(T const* what);
   virtual Probe const* new_probe(std::string const& xs, std::string const& p, std::string const& n)
   {unreachable(); return NULL;}
-  virtual Branch_Ref new_branch(std::string const& p, std::string const& n)
-  {unreachable(); return Branch_Ref(NULL);}
   virtual Node* new_node(std::string const& p){ untested();
     assert(_owner);
     return _owner->new_node(p);
   }
   virtual Node const* node(std::string const& p) const{ untested();
     assert(_owner);
-    return _owner->new_node(p);
+    return _owner->new_node(p); // new??
   }
   virtual Filter const* new_filter(std::string const& xs, Deps const& d) {
     assert(_owner);
     return _owner->new_filter(xs, d);
+  }
+
+  virtual Branch_Ref new_branch(std::string const& p, std::string const& n) {
+    unreachable();
+    return Branch_Ref(NULL);
+  }
+  virtual Branch_Ref branch(std::string const& n)const {
+    assert(_owner);
+    return _owner->branch(n);
+  }
+  virtual Branch_Ref const& new_branch_name(std::string const& p, Branch_Ref const& r) { untested();
+    assert(_owner);
+    return _owner->new_branch_name(p, r);
   }
 
   void set_owner(Block* b){
@@ -741,6 +792,10 @@ public: // this is a stub
   Node const* node(std::string const& n)const override {
     assert(owner());
     return owner()->node(n);
+  }
+  Branch_Ref branch(std::string const& n)const override {
+    assert(owner());
+    return owner()->branch(n);
   }
 };
 typedef Collection<AnalogBlock> AnalogBlock_List;
@@ -816,29 +871,72 @@ typedef LiSt<New_Port, '(', ',', ')'> New_Port_List;
 class Discipline;
 // TODO: Port_Base?
 class Node;
-class Port_Discipline :public Port_3 {
+class Net_Identifier :public Port_3 {
   Block* _owner{NULL};
   Node* _node{NULL};
 public:
+  Net_Identifier() : Port_3() {}
+protected:
+  Block* owner(){return _owner;}
+  void set_node(Node*n){_node = n;}
+public:
   void set_owner(Block* c) { _owner = c; }
   void parse(CS& f);
-  Port_Discipline() : Port_3() {}
   void set_discipline(Discipline const* d);
 };
 /*--------------------------------------------------------------------------*/
-class Port_Discipline_List : public LiSt<Port_Discipline, '\0', ',', ';'>{
+typedef LiSt<Net_Identifier, '\0', ',', ';'> Net_Decl_List;
+/*--------------------------------------------------------------------------*/
+class Net_Identifier_Discipline : public Net_Identifier {
+public:
+   void parse(CS& f)override;
+};
+/*--------------------------------------------------------------------------*/
+class Net_Identifier_Ground : public Net_Identifier {
+public:
+   void parse(CS& f)override;
+};
+/*--------------------------------------------------------------------------*/
+class Net_Decl_List_Discipline : public Net_Decl_List {
   Discipline const* _disc{NULL};
 public:
-  void parse(CS& f);
-  void dump(std::ostream& f)const;
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
   void set_discipline(Discipline const* d){_disc = d;}
 };
 /*--------------------------------------------------------------------------*/
-// typedef Collection<Port_Discipline_List> Port_Discipline_List_Collection;
-class Port_Discipline_List_Collection : public Collection<Port_Discipline_List>{
+class Net_Decl_List_Ground : public Net_Decl_List {
 public:
-  void parse(CS& f);
-  void dump(std::ostream& f)const;
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class Net_Declarations : public Collection<Net_Decl_List>{
+public:
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+typedef String_Arg Branch_Identifier;
+class List_Of_Branch_Identifiers : public LiSt<Branch_Identifier, '\0', ',', ';'>{
+public:
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class Branch_Declaration : public Branch_Ref{
+  List_Of_Branch_Identifiers _list;
+public:
+  explicit Branch_Declaration() : Branch_Ref() {}
+public:
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class Branch_Declarations : public Collection<Branch_Declaration>{
+  Branch_Ref _branch_ref;
+public:
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1016,75 +1114,6 @@ public:
 }; // Probe
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-#if 0
-class Model :public Base {
-  String_Arg		_name;
-  String_Arg		_level;
-  String_Arg		_dev_type;
-  String_Arg		_inherit;
-  Key_List		_public_key_list;
-  Key_List		_private_key_list;
-  Parameter_Block	_independent;
-  Parameter_Block	_size_dependent;
-  Parameter_Block	_temperature;
-  Code_Block		_tr_eval;
-  Code_Block		_validate;
-  Bool_Arg		_hide_base;
-public:
-  void parse(CS& f);
-  void dump(std::ostream& f)const;
-  Model(CS& f) {parse(f);}
-  bool			 hide_base()const	{return _hide_base;}
-  const String_Arg&	 name()const		{return _name;}
-  const String_Arg&	 level()const		{return _level;}
-  const String_Arg&	 dev_type()const	{return _dev_type;}
-  const String_Arg&	 inherit()const		{return _inherit;}
-  const Key_List&	 public_key_list()const	{return _public_key_list;}
-  const Key_List&	 private_key_list()const{return _private_key_list;}
-  const Parameter_Block& independent()const	{return _independent;}
-  const Parameter_Block& size_dependent()const	{return _size_dependent;}
-  const Parameter_Block& temperature()const	{return _temperature;}
-  const Code_Block&	 tr_eval()const		{return _tr_eval;}
-  const Code_Block&	 validate()const	{return _validate;}
-};
-typedef Collection<Model> Model_List;
-/*--------------------------------------------------------------------------*/
-class Device :public Base {
-  String_Arg		_name;
-  String_Arg		_parse_name;
-  String_Arg		_id_letter;
-  String_Arg		_model_type;
-  Circuit		_circuit;
-  // Probe_List		_probes;
-  Parameter_Block	_device;
-  Parameter_Block	_common;
-  Code_Block		_tr_eval;
-  // Eval_List		_eval_list;
-  Function_List		_function_list;
-public:
-  void parse(CS& f);
-  void dump(std::ostream& f)const;
-  Device(CS& f) {parse(f);}
-  const String_Arg&	 name()const		{return _name;}
-  const String_Arg&	 parse_name()const	{return _parse_name;}
-  const String_Arg&	 id_letter()const	{return _id_letter;}
-  const String_Arg&	 model_type()const	{return _model_type;}
-  const Circuit&	 circuit()const		{return _circuit;}
-  // const Probe_List&	 probes()const		{return _probes;}
-  const Parameter_Block& device()const		{return _device;}
-  const Parameter_Block& common()const		{return _common;}
-  const Code_Block&	 tr_eval()const		{return _tr_eval;}
-  // const Eval_List&	 eval_list()const	{return _eval_list;}
-  const Function_List&	 function_list()const	{return _function_list;}
-    	size_t		 min_nodes()const	{return circuit().min_nodes();}
-    	size_t		 max_nodes()const	{return circuit().max_nodes();}
-    	size_t	    net_nodes()const {untested();return circuit().net_nodes();}
-};
-typedef Collection<Device> Device_List;
-#endif
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 class Head :public Base {
   std::string _s;
 public:
@@ -1174,18 +1203,22 @@ typedef Collection<Discipline> Discipline_List;
 class Branch : public Element_2 {
   Node const* _p{NULL};
   Node const* _n{NULL};
-  Deps _deps;
+  Deps _deps; // delete?
   bool _has_flow_probe{false};
   bool _has_pot_probe{false};
   bool _has_flow_src{false};
   bool _has_pot_src{false};
+  std::vector<Branch_Ref*> _refs;
 public:
   explicit Branch(Node const* p, Node const* n)
     : Element_2(), _p(p), _n(n) {
     assert(p);
     assert(n);
     //_code_name = "_b_" + p->name() + "_" + n->name();
-    }
+  }
+  explicit Branch(){}
+  Branch( Branch const&) = delete;
+  ~Branch();
   std::string name()const;
   // later.
   void parse(CS&)override {incomplete();}
@@ -1195,7 +1228,7 @@ public:
   std::string code_name() const override;
   std::string const& omit() const override;
   const std::string& dev_type()const;
-  Deps const& deps()const { return _deps; }
+  Deps const& deps()const { return _deps; } // delete?
   void add_probe(Probe const*);
   size_t num_nodes()const override;
   std::string state()const override;
@@ -1211,8 +1244,27 @@ public:
   size_t num_states() const;
   Discipline const* discipline() const override;
   Nature const* nature() const override;
+public:
+//  bool has(Branch_Ref*) const;
+  void attach(Branch_Ref*);
+  void detach(Branch_Ref*);
 }; // Branch
 /*--------------------------------------------------------------------------*/
+class Branch_Names {
+  typedef std::string key;
+  typedef std::map<key, Branch_Ref> map; // set?
+  typedef map::const_iterator const_iterator;
+private:
+  map _m;
+public:
+  explicit Branch_Names() {}
+  Branch_Ref const& new_name(std::string const&, Branch_Ref const&);
+  Branch_Ref const& lookup(std::string const&) const;
+
+  void clear();
+};
+/*--------------------------------------------------------------------------*/
+// the branches used in the model, in probes and sources, deduplicated.
 class Branch_Map {
   typedef std::pair<Node const*, Node const*> key;
   typedef std::map<key, Branch*> map; // set?
@@ -1242,6 +1294,8 @@ class File;
 class Module :public Block {
   typedef std::map<std::string, Probe*> Probe_Map;
   typedef std::map<std::string, Node*> Node_Map;
+public:
+  ~Module();
 private: // verilog input data
   File const* _file{NULL};
   String_Arg	_identifier;
@@ -1250,7 +1304,8 @@ private: // verilog input data
   Port_3_List_3	_output;
   Port_3_List_3	_inout;
   Port_3_List_3	_ground;
-  Port_Discipline_List_Collection _disc_assign;
+  Net_Declarations _net_decl;
+  Branch_Declarations _branch_decl;
   Variable_List_Collection _variables;
   Parameter_List_Collection _parameters;
   Element_2_List _element_list;
@@ -1261,6 +1316,7 @@ private: // verilog input data
 private: // elaboration data
   Filter_List _filters;
   Probe_Map _probes;
+  Branch_Names _branch_names;
   Branch_Map _branches;
   Node_Map _nodes;
 public:
@@ -1274,7 +1330,8 @@ public:
   const Port_3_List_3&	  output()const		{return _output;}
   const Port_3_List_3&	  inout()const		{return _inout;}
   const Port_3_List_3&	  ground()const		{return _ground;}
-  const Port_Discipline_List_Collection& disc_assign()const{return _disc_assign;}
+  const Net_Declarations& net_declarations()const{return _net_decl;}
+  const Branch_Declarations& branch_declarations()const{return _branch_decl;}
   const Parameter_List_Collection& parameters()const	{return _parameters;}
   const Variable_List_Collection& variables()const	{return _variables;}
   const Element_2_List&	  element_list()const	{return _element_list;}
@@ -1282,15 +1339,16 @@ public:
   const Port_1_List&	  local_nodes()const	{return _local_nodes;}
 //  const Code_Block&	 tr_eval()const		{return _tr_eval;}
   const AnalogBlock_List& analog_list() const {return _analog_list;}
-  const Code_Block&	 validate()const	{return _validate;}
-    	size_t		  min_nodes()const	{return ports().size();}
-    	size_t		  max_nodes()const	{return ports().size();}
-    	size_t		  net_nodes()const	{return ports().size();}
+  const Code_Block&	validate()const	{return _validate;}
+    	size_t		min_nodes()const	{return ports().size();}
+    	size_t		max_nodes()const	{return ports().size();}
+    	size_t		net_nodes()const	{return ports().size();}
 public:
-  const Probe_Map&	 probes()const		{return _probes;}
-  const Filter_List&	 filters()const		{return _filters;}
-  const Node_Map&	 nodes()const		{return _nodes;}
-  const Branch_Map&	 branches()const	{return _branches;}
+  const Probe_Map&	probes()const		{return _probes;}
+  const Filter_List&	filters()const		{return _filters;}
+  const Node_Map&	nodes()const		{return _nodes;}
+  const Branch_Names&	branch_names()const	{return _branch_names;}
+  const Branch_Map&	branches()const		{return _branches;}
   bool has_analog_block() const;
 private: // misc
   CS& parse_analog(CS& cmd);
@@ -1299,8 +1357,10 @@ private:
   Probe const* new_probe(std::string const&, std::string const&, std::string const&) override;
   Filter const* new_filter(std::string const&, Deps const&) override;
   Branch_Ref new_branch(std::string const&, std::string const&) override;
+  Branch_Ref const& new_branch_name(std::string const& n, Branch_Ref const& b) override;
   Node* new_node(std::string const& p) override;
   Node const* node(std::string const& p) const override;
+  Branch_Ref branch(std::string const& p) const override;
 }; // Module
 typedef Collection<Module> Module_List;
 /*--------------------------------------------------------------------------*/
@@ -1352,6 +1412,9 @@ protected:
 public:
   Contribution(std::string const& lhsname /*TODO*/)
     : Base(), _name(lhsname), _branch(NULL) {}
+  ~Contribution(){
+    delete _rhs;
+  }
 
   void parse(CS&)override;
   void dump(std::ostream&)const override;

@@ -230,7 +230,7 @@ void New_Port::parse(CS& file)
   _owner->new_node(name());
 }
 /*--------------------------------------------------------------------------*/
-void Port_Discipline_List_Collection::parse(CS& f)
+void Net_Declarations::parse(CS& f)
 {
   assert(owner()); // Module
   Block const* root_scope = owner()->owner();
@@ -241,7 +241,7 @@ void Port_Discipline_List_Collection::parse(CS& f)
 
   if(ii!=root->discipline_list().end()){
 //    size_t here = f.cursor();
-    Port_Discipline_List* m = new Port_Discipline_List();
+    auto m = new Net_Decl_List_Discipline();
     m->set_discipline(*ii);
 
     m->set_owner(owner());
@@ -252,39 +252,80 @@ void Port_Discipline_List_Collection::parse(CS& f)
 
     push_back(m);
 
+  }else if(f.umatch("ground ")){ untested();
+    auto m = new Net_Decl_List_Ground();
+    m->set_owner(owner());
+    f >> *m;
+    push_back(m);
   }else{
-    f.umatch("HACKHACK_HACK_UNLIKELY_STRING"); // unset _ok.
     assert(!f);
   }
 }
 /*--------------------------------------------------------------------------*/
-void Port_Discipline_List_Collection::dump(std::ostream& out)const
+void Net_Declarations::dump(std::ostream& o) const
 {
-  Collection<Port_Discipline_List>::dump(out);
+  Collection<Net_Decl_List>::dump(o);
 }
 /*--------------------------------------------------------------------------*/
-void Port_Discipline_List::parse(CS& f)
-{
-  trace1("Port_Disc_List::parse", f.last_match());
-  return LiSt<Port_Discipline, '\0', ',', ';'>::parse(f);
+// void Port_Discipline_List_Collection::dump(std::ostream& out)const
+// {
+//   Collection<Port_Discipline_List>::dump(out);
+// }
+/*--------------------------------------------------------------------------*/
+// 3.6.4 Ground declaration
+// Each ground declaration is associated with an already declared net of continuous discipline. The node asso-
+// ciated with the net will be the global reference node in the circuit. The net must be assigned a continuous
+// discipline to be declared ground.
+void Net_Decl_List_Ground::parse(CS& f)
+{ untested();
+  return Net_Decl_List::parse_n_<Net_Identifier_Ground>(f);
 }
 /*--------------------------------------------------------------------------*/
-void Port_Discipline_List::dump(std::ostream& o)const
+void Net_Identifier_Discipline::parse(CS& f)
 {
-  assert(_disc);
-  o__ _disc->identifier() << " ";
-  LiSt<Port_Discipline, '\0', ',', ';'>::dump(o);
+  Net_Identifier::parse(f);
+
+  assert(owner());
+  set_node( owner()->new_node(name()));
+}
+/*--------------------------------------------------------------------------*/
+void Net_Identifier_Ground::parse(CS& f)
+{
+  Net_Identifier::parse(f);
+  if(owner()->node(name())){ untested();
+  }else{ untested();
+    throw Exception_CS("ground: need previously declared net", f);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Net_Decl_List_Ground::dump(std::ostream& o)const
+{
+  o__ "ground ";
+  Net_Decl_List::dump(o);
   o << "\n";
 }
 /*--------------------------------------------------------------------------*/
-void Port_Discipline::parse(CS& file)
+void Net_Decl_List_Discipline::parse(CS& f)
 {
-  Port_3::parse(file); // TODO: port_base?
-  assert(_owner);
-  _node = _owner->new_node(name());
+  trace1("Port_Disc_List::parse", f.last_match());
+  return Net_Decl_List::parse_n_<Net_Identifier_Discipline>(f);
+  // return Net_Identifier, '\0', ',', ';'>::parse(f);
 }
 /*--------------------------------------------------------------------------*/
-void Port_Discipline::set_discipline(Discipline const* d)
+void Net_Decl_List_Discipline::dump(std::ostream& o)const
+{
+  assert(_disc);
+  o__ _disc->identifier() << " ";
+  Net_Decl_List::dump(o);
+  o << "\n";
+}
+/*--------------------------------------------------------------------------*/
+void Net_Identifier::parse(CS& file)
+{
+  Port_3::parse(file); // TODO: port_base?
+}
+/*--------------------------------------------------------------------------*/
+void Net_Identifier::set_discipline(Discipline const* d)
 {
   _node->set_discipline(d);
 }
@@ -338,17 +379,17 @@ void Port_3::dump(std::ostream& out)const
 -	| {attribute_instance}  conditional_generate_construct
 -	| {attribute_instance}  analog_construct
 + module_or_generate_item_declaration ::=
-?	  net_declaration
++	  net_declaration
 -	| reg_declaration
 -	| integer_declaration
--	| real_declaration
++	| real_declaration
 -	| time_declaration
 -	| realtime_declaration
 -	| event_declaration
 -	| genvar_declaration
 -	| task_declaration
 -	| function_declaration
--	| branch_declaration
++	| branch_declaration
 -	| analog_function_declaration
 + non_port_module_item ::=
 +	  module_or_generate_item
@@ -411,7 +452,8 @@ void Module::parse(CS& file)
   _output.set_owner(this);
   _inout.set_owner(this);
   _ground.set_owner(this);
-  _disc_assign.set_owner(this);
+  _net_decl.set_owner(this);
+  _branch_decl.set_owner(this);
   _variables.set_owner(this);
   _parameters.set_owner(this);
   //_local_params.set_owner(this);
@@ -440,20 +482,21 @@ void Module::parse(CS& file)
       || ((file >> "output ") && (file >> _output))
       || ((file >> "inout ") && (file >> _inout))
       // mi, npmi, mogi, mogid
-      || ((file >> "ground ") && (file >> _ground))
-      || ((file >> "branch ") && (file >> _branches))
       // net_declaration
 //      || (( root->disciplines().match(file) ) && (file >> _disc_assign))
 //      || (file >> _node_assignments)
-      || (file >> _disc_assign)
+      || (file >> _net_decl)
+      || ((file >> "ground ") && (file >> _net_decl))
+      || ((file >> "branch ") && (file >> _branch_decl))
+      // mi, non_port_module_item
       // mi, npmi, mogi, module_or_generate_item_declaration
       // mi, npmi, module_or_generate_item
 //      || ((file >> "localparam ") && (file >> _local_params))
-      || ((file >> "analog ") && parse_analog(file)) // TODO:: file >> analog
-      // mi, non_port_module_item
       || ((file >> "real ") && (file >> _variables))
+      // || ((file >> "integer ") && (file >> _variables))
       || ((file >> "parameter ") && (file >> _parameters))
       || ((file >> "localparam ") && (file >> _parameters))
+      || ((file >> "analog ") && parse_analog(file)) // TODO:: file >> analog
       || ((file >> "endmodule ") && (end = true))
       || (file >> _element_list)	// module_instantiation
       ;
@@ -468,6 +511,103 @@ void Module::parse(CS& file)
     }else{
     }
   }
+}
+/*--------------------------------------------------------------------------*/
+/*
+// A.2.1.3
++ branch_declaration ::=
++ branch ( branch_terminal [ , branch_terminal ] ) list_of_branch_identifiers ;
+- | port_branch_declaration
+- 
+- // A.2.3
+- port_branch_declaration ::=
+- branch ( < port_identifier > ) list_of_branch_identifiers ;
+- | branch ( < hierarchical_port_identifier > ) list_of_branch_identifiers ;
+- branch_terminal ::=
+- net_identifier
+- | net_identifier [ constant_expression ]
+- | net_identifier [ constant_range_expression ]
+- | hierarchical_net_identifier
+- | hierarchical_net_identifier [ constant_expression ]
+- | hierarchical_net_identifier [ constant_range_expression ]
+- list_of_branch_identifiers ::=
+- branch_identifier [ range ] { , branch_identifier [ range ] }
+*/
+/*--------------------------------------------------------------------------*/
+void Branch_Declaration::dump(std::ostream& o) const
+{
+  o__ "branch ";
+  Branch_Ref::dump(o);
+  o << " " << _list << "\n";
+}
+/*--------------------------------------------------------------------------*/
+void Branch_Declaration::parse(CS& f)
+{ untested();
+  assert(owner());
+  _list.set_owner(owner());
+  Branch_Ref::parse(f);
+  assert(owner());
+  f >> _list;
+  for(auto const& i : _list) {
+    owner()->new_branch_name(i->to_string(), *this);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Branch_Declarations::parse(CS& f)
+{ untested();
+  Collection<Branch_Declaration>::parse(f);
+}
+/*--------------------------------------------------------------------------*/
+void List_Of_Branch_Identifiers::dump(std::ostream& o)const
+{
+  LiSt<Branch_Identifier, '\0', ',', ';'>::dump(o);
+}
+/*--------------------------------------------------------------------------*/
+void Branch_Declarations::dump(std::ostream& o)const
+{
+  incomplete();
+  Collection<Branch_Declaration>::dump(o);
+}
+/*--------------------------------------------------------------------------*/
+// void Branch_Identifier::dump(std::ostream& out)const
+// {
+//   incomplete();
+//   out << _alias;
+// }
+/*--------------------------------------------------------------------------*/
+// void Branch_Identifier::parse(CS& f)
+// { untested();
+//   assert(owner());
+//   f >> _alias;
+//   trace1("aliasparse", _alias);
+// }
+/*--------------------------------------------------------------------------*/
+void Branch_Ref::parse(CS& f)
+{ untested();
+  incomplete(); // aliases?
+  f >> "(";
+  std::string pp = f.ctos(",)");
+  std::string pn = f.ctos(",)");
+  f >> ")";
+
+  assert(owner());
+  trace3("Branch_Ref::parse", pp, pn, _br);
+  assert(!_br);
+  Branch_Ref b;
+  assert(!b._br);
+  b = owner()->new_branch(pp, pn);
+
+//  assert(b->has(&b));
+  assert(b._br);
+
+  *this = b;
+  assert(owner());
+}
+/*--------------------------------------------------------------------------*/
+void Branch_Ref::dump(std::ostream& o)const
+{ untested();
+  incomplete();
+  o << "(" << pname() << ", " << nname() << ")";
 }
 /*--------------------------------------------------------------------------*/
 void Module::dump(std::ostream& o)const
@@ -489,7 +629,8 @@ void Module::dump(std::ostream& o)const
     o << "  ground "	    << ground()			<< "\n";
   }else{
   }
-  o << disc_assign();
+  o << net_declarations();
+  o << branch_declarations();
   if(parameters().size()){
     o << parameters() << "\n";
   }else{

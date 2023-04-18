@@ -5,7 +5,7 @@ LIBS = -lgnucap
 LDFLAGS = -L/usr/local/lib # ask gnucap-conf?
 MODULES = modelgen_0.so d_vasrc.so
 
-CXXFLAGS = -Wall
+CXXFLAGS = -Wall -std=c++11
 
 %.o: %.cc
 	g++ $(CPPFLAGS) -shared -g -O0 -fPIC ${CXXFLAGS} -I../include $< -o $@ -c

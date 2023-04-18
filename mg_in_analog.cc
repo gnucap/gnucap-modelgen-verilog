@@ -282,7 +282,7 @@ Assignment::~Assignment()
 // }
 /*--------------------------------------------------------------------------*/
 void Assignment::parse(CS& cmd)
-{
+{ untested();
   // TODO: rhs is an analog expression
   assert(owner());
   trace1("Assignment::parse", cmd.tail());
@@ -309,7 +309,8 @@ void Variable::resolve_symbols(Expression const& e, Expression& E)
 }
 /*--------------------------------------------------------------------------*/
 void Contribution::parse(CS& cmd)
-{
+{ untested();
+  // TODO: parse branch_ref?
   cmd >> "(";
   std::string pp = cmd.ctos(",)");
   std::string pn = cmd.ctos(",)");
@@ -358,8 +359,9 @@ void FlowContribution::parse(CS& cmd)
   set_flow_source();
 }
 /*--------------------------------------------------------------------------*/
-void Branch_Map::parse(CS&)
+void Branch_Map::parse(CS& f)
 {
+  trace1("Branch_Map::parse", f.tail());
   incomplete();
 }
 /*--------------------------------------------------------------------------*/

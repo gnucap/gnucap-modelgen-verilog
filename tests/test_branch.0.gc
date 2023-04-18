@@ -1,0 +1,32 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+`modelgen
+module test_branch_0(p, n);
+	electrical p, n;
+	inout p, n;
+	real i;
+	branch (p, n) br, br_alias;
+	branch (n, p) br_reverse;
+	analog begin
+		i = V(br)
+		I(br_alias) <+ i/2;
+		I(br_reverse) <+ - i/2;
+	end
+endmodule
+
+!make -j2 test_branch_0.so > /dev/null
+attach ./test_branch_0.so
+
+verilog
+parameter v=0
+
+test_branch_0 #() dut(1,0);
+vsource #(.dc(v)) v1(1, 0);
+
+list
+
+print dc i(dut)
+
+dc v 0 1 .25

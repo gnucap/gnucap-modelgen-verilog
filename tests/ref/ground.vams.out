@@ -28,22 +28,9 @@ discipline electrical
 enddiscipline
 
 
-module net(a, b);
-  inout a, b;
-  electrical 0, 1, 2, a, b;
-  ground 0;
-  parameter real r = 1.;
-  parameter real c = 1.;
-
-  // circuit
-  resistor #(.r(r)) r1(a, 1);
-  resistor #(.r(r)) r2(1, 2);
-  resistor #(.r(r)) r3(2, b);
-  capacitor #(.c(c)) ca(a, 0);
-  capacitor #(.c(c)) cb(b, 0);
-  capacitor #(.c(c)) c1(1, 0);
-  capacitor #(.c(c)) c2(2, 0);
-
+module gndtest(a, b);
+  electrical a, b, c;
+  ground c;
 endmodule
 
 

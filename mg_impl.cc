@@ -55,7 +55,6 @@ Probe const* Module::new_probe(std::string const& xs, std::string const& p,
 
   if(prb) {
   }else{
-//    size_t s = _probes.size() - 1;
     prb = new Probe(nn, br);
   }
 
@@ -70,27 +69,54 @@ Probe const* Module::new_probe(std::string const& xs, std::string const& p,
 /*--------------------------------------------------------------------------*/
 Branch_Ref Branch_Map::new_branch(Node const* a, Node const* b)
 {
-  std::pair p(a, b);
+  std::pair<Node const*, Node const*> p(a, b);
   const_iterator i = _m.find(p);
   if(i!=_m.end()){
     return Branch_Ref(i->second);
   }else{
-    std::pair r(b, a);
+    std::pair<Node const*, Node const*> r(b, a);
     const_iterator i = _m.find(r);
     if(i!=_m.end()){
       return Branch_Ref(i->second, true);
     }else{
-      _m[p] = new Branch(a,b);
-      return Branch_Ref(_m[p]);
+      _m[p] = new Branch(a, b);
+  	// br.set_owner(this); // eek.
+      return Branch_Ref(_m[p] /*owner?*/);
     }
   }
 }
 /*--------------------------------------------------------------------------*/
+Branch_Ref const& Module::new_branch_name(std::string const& n, Branch_Ref const& b)
+{
+  return _branch_names.new_name(n, b);
+}
+/*--------------------------------------------------------------------------*/
 Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
 {
-  Node const* pp = new_node(p);
-  Node const* nn = new_node(n);
-  return _branches.new_branch(pp, nn);
+  trace2("new_branch", p,n);
+  if(p==""){ untested();
+    throw Exception("syntax error");
+  }else{
+  }
+
+  Branch_Ref a = _branch_names.lookup(p);
+
+  if(a){
+    if(n!=""){
+      throw Exception("syntax error");
+    }else{
+      return a;
+    }
+  }else if(n==""){
+    incomplete();
+    return Branch_Ref();
+  }else{
+    Node const* pp = new_node(p); // BUG: node??
+    Node const* nn = new_node(n); // BUG: node??
+    Branch_Ref br = _branches.new_branch(pp, nn);
+    br.set_owner(this); // eek.
+    return br;
+  }
 }
 /*--------------------------------------------------------------------------*/
 Node* Module::new_node(std::string const& p)
@@ -111,6 +137,37 @@ Node const* Module::node(std::string const& p) const
   }else{
     return NULL;
     throw Exception("no such node " + p );
+  }
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref Module::branch(std::string const& p) const
+{
+  return _branch_names.lookup(p);
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref const& Branch_Names::new_name(std::string const& n, Branch_Ref const& r)
+{
+  Branch_Ref& j = _m[n];
+  if(j){
+    throw Exception("Branch " + n + " already defined\n");
+  }else{
+    return j = r;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Branch_Names::clear()
+{
+  _m.clear();
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref const& Branch_Names::lookup(std::string const& p) const
+{
+  static Branch_Ref none;
+  const_iterator i = _m.find(p);
+  if(i == _m.end()){
+    return none;
+  }else{
+    return i->second;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -162,6 +219,35 @@ const std::string& Branch::dev_type()const
   }else{
     return p;
   }
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref& Branch_Ref::operator=(Branch_Ref&& o)
+{
+  operator=(o);
+
+  if(_br) {
+//    assert(_br->has(this));
+  }else{
+  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref& Branch_Ref::operator=(Branch_Ref const& o)
+{
+  if(_br) { untested();
+    _br->detach(this);
+  }else{
+  }
+
+  _br = o._br;
+  _r = o._r;
+
+  if(_br) {
+    _br->attach(this);
+  }else{ untested();
+  }
+
+  return *this;
 }
 /*--------------------------------------------------------------------------*/
 std::string const& Branch_Ref::pname() const
@@ -262,6 +348,18 @@ Nature const* Probe::nature() const
   return _br->nature();
 }
 /*--------------------------------------------------------------------------*/
+Module::~Module()
+{
+  // cleanup references to branches.
+  _branch_names.clear();
+  _analog_list.clear();
+  _branch_decl.clear();
+  for(auto i: _probes){
+    delete i.second;
+  }
+  _probes.clear();
+}
+/*--------------------------------------------------------------------------*/
 static int n_filters;
 Filter const* Module::new_filter(std::string const& xs, Deps const&d)
 {
@@ -306,5 +404,100 @@ bool Assignment::is_module_variable() const
   assert(_lhs);
   return _lhs->is_module_variable();
 }
+/*--------------------------------------------------------------------------*/
+Branch_Ref::Branch_Ref(Branch_Ref const& b)
+    : Owned_Base(b),
+      _br(b._br),
+      _r(b._r),
+      _alias(b._alias)
+{
+  if(_br){
+    _br->attach(this);
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref::Branch_Ref(Branch_Ref&& b)
+    : Owned_Base(b),
+      _br(b._br),
+      _r(b._r),
+      _alias(b._alias)
+{
+  if(_br){
+    _br->attach(this);
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref::Branch_Ref(Branch* b, bool reversed)
+  : _br(b), _r(reversed)
+{
+  if(_br){
+    _br->attach(this);
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref::~Branch_Ref()
+{
+  if(_br){
+    _br->detach(this);
+    _br = NULL;
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+Branch::~Branch()
+{
+  // no, shutting down, not all Refs tidied up.
+  assert(!_refs.size());
+}
+/*--------------------------------------------------------------------------*/
+void Branch::attach(Branch_Ref* r)
+{
+  assert(r);
+  for(auto i : _refs){
+    assert(i != r);
+  }
+  _refs.push_back(r);
+}
+/*--------------------------------------------------------------------------*/
+#if 0
+bool Branch::has(Branch_Ref* r) const
+{
+  assert(r);
+  for(auto& i : _refs){
+    if(i == r){
+      return true;
+    }else{
+    }
+  }
+  return false;
+}
+#endif
+/*--------------------------------------------------------------------------*/
+void Branch::detach(Branch_Ref* r)
+{
+  assert(r);
+  for(auto& i : _refs){
+    if(i == r){
+      i = _refs.back();
+      _refs.resize(_refs.size()-1);
+      return;
+    }else{
+    }
+  }
+  unreachable(); // cleanup is out of order?
+}
+/*--------------------------------------------------------------------------*/
+Deps::~Deps()
+{
+//  for(auto i : *this){ untested();
+//    delete i;
+//  }
+  std::set<Probe const*>::clear();
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

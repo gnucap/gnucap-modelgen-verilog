@@ -1,0 +1,9 @@
+
+`include "sub/disciplines.few"
+
+module branchtest(a, b);
+	electrical a, b, c;
+	branch (a, b) mybr1, mybr1_alias;
+	branch (c, b) mybr2;
+	branch (b, c) mybr3;
+endmodule
