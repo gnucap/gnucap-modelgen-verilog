@@ -40,7 +40,7 @@ endmodule
 
 list
 
-!make -j2 test_res0.so test_res1.so test_res2.so > /dev/null
+!make test_res0.so test_res1.so test_res2.so > /dev/null
 attach ./test_res0.so
 attach ./test_res1.so
 attach ./test_res2.so

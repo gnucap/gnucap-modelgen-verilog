@@ -46,7 +46,7 @@ endmodule
 
 list
 
-!make polarity0.so polarity1.so polarity2.so polarity3.so -j4 > /dev/null
+!make polarity0.so polarity1.so polarity2.so polarity3.so > /dev/null
 
 attach ./polarity0.so
 attach ./polarity1.so

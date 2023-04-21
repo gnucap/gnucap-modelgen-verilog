@@ -13,7 +13,7 @@ endmodule
 
 list
 
-!make -j2 test_res1_0.so > /dev/null
+!make test_res1_0.so > /dev/null
 attach ./test_res1_0.so
 
 verilog

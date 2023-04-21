@@ -1,0 +1,16 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+`modelgen
+module test_error1(p, n, cp, cn);
+electrical p, n, cp, cn;
+
+analog begin
+	gain = 17;
+end
+
+endmodule
+
+
+!make test_error1.so /dev/null

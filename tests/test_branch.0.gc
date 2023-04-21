@@ -16,7 +16,7 @@ module test_branch_0(p, n);
 	end
 endmodule
 
-!make -j2 test_branch_0.so > /dev/null
+!make test_branch_0.so > /dev/null
 attach ./test_branch_0.so
 
 verilog

@@ -5,8 +5,9 @@ if [ $# -eq 0 ] ; then
     echo "example: ./test gnucap-verilog \"\" myversion =="
     exit 1
 else
-    \mkdir $3
+    \mkdir $3 2> /dev/null || echo re-using directory $3
     \rm -f $3/$2.diffs
+    ls $2*.sh 2>/dev/null >/dev/null && \
     for ii in $2*.sh
     do
 	echo $ii
@@ -14,6 +15,7 @@ else
 	./$ii $1 >$3/$ii.out
 	diff -u $4/$ii.out $3/$ii.out >>$3/$2.diffs || echo "**** $ii fails ****"
     done
+    ls $2*.vapp 2>/dev/null >/dev/null && \
     for ii in $2*.vapp
     do
 	echo $ii
@@ -21,6 +23,7 @@ else
 	$1 -I.. -D__VAMS_GNUCAP --pp $ii >$3/$ii.out
 	diff -u $4/$ii.out $3/$ii.out >>$3/$2.diffs || echo "**** $ii fails ****"
     done
+    ls $2*.vams 2>/dev/null >/dev/null && \
     for ii in $2*.vams
     do
 	echo $ii
@@ -28,6 +31,7 @@ else
 	$1 -I .. --dump $ii >$3/$ii.out
 	diff -u $4/$ii.out $3/$ii.out >>$3/$2.diffs || echo "**** $ii fails ****"
     done
+    ls $2*.gc 2>/dev/null >/dev/null && \
     for ii in $2*.gc
     do
 	echo $ii
