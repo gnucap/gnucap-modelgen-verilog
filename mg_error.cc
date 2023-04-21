@@ -76,7 +76,7 @@ CS & CS::warn(int badness, size_t spot, const std::string& message)
 
     size_t linestart = spot;
     for (;;) {
-      if (linestart == 0) {untested();
+      if (linestart == 0) {
 	break;
       }else if (_cmd[linestart] == '\n') {
 	++linestart;

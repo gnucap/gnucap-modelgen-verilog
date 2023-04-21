@@ -1,0 +1,35 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+attach ../v_instance.so
+
+options trace
+
+`modelgen
+module test_net0(a, b);
+	inout a, b;
+	parameter real r = 1.;
+	
+	resistor #(.r(r)) r1(a, b);
+endmodule;
+
+!make test_net0.so > /dev/null
+attach ./test_net0.so
+
+verilog
+parameter r=1
+parameter c=1
+parameter v=0
+
+test_net0 #(.r(r)) dut(1,2);
+vsource #(.dc(v)) v1(1, 0);
+
+list
+
+print dc v(nodes) v(dut) v(dut.r1) y(dut.r1) v1(dut.r1) v2(dut.r1)
+print dc +v1(dut) v0(dut)
+
+// tran?
+dc v 0 1 .5
+
+status notime

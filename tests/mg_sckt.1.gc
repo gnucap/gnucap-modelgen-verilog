@@ -1,0 +1,66 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+attach ../v_instance.so
+
+spice
+.subckt vsin p n
+.parameter amplitude
+.parameter dc
+V1 p n sin freq=1 amplitude={amplitude} dc=dc
+.ends
+
+.verilog
+
+
+`modelgen
+module test_net1(a, b, gnd);
+	inout a, b;
+	electrical gnd, 1, 2, a, b;
+	parameter real r = 1.;
+	parameter real c = 1.;
+	
+	resistor #(.r(r)) r1(a 1);
+	resistor #(.r(2*r)) r2(1 2);
+	resistor #(.r(r)) r3(2 b);
+	capacitor #(.c(c)) ca(a, gnd);
+	capacitor #(.c(2*c)) cb(b, gnd);
+	capacitor #(.c(c)) c1(1, gnd);
+	capacitor #(.c(c)) c2(2, gnd);
+endmodule;
+
+module net1(a, b, gnd);
+	parameter r = 1.;
+	parameter c = 1.;
+	
+	resistor #(.r(r)) r1(a 1);
+	resistor #(.r(2*r)) r2(1 2);
+	resistor #(.r(r)) r3(2 b);
+	capacitor #(.c(c)) ca(a, gnd);
+	capacitor #(.c(2*c)) cb(b, gnd);
+	capacitor #(.c(c)) c1(1, gnd);
+	capacitor #(.c(c)) c2(2, gnd);
+endmodule;
+
+!make test_net1.so > /dev/null
+attach ./test_net1.so
+
+verilog
+parameter r = 10
+parameter c = 1m
+parameter v = 1
+
+test_net1 #(.r(r), .c(c)) dut(1,2,0);
+net1 #(.r(r), .c(c)) dut(1,3,0);
+vsin #(.amplitude(v) .dc(v)) v1(1, 0);
+
+list
+
+print dc v(nodes)
+
+dc v 0 1 .5
+
+print tran v(nodes)
+tran 1
+
+status notime

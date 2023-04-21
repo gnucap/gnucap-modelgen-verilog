@@ -78,13 +78,13 @@ class Block;
 class Owned_Base : public Base {
   Block* _owner{NULL};
 public:
-  explicit Owned_Base() : Base() { untested(); }
+  explicit Owned_Base() : Base() { }
   explicit Owned_Base(Owned_Base const& b) : Base(), _owner(b._owner) { }
 public:
-  void set_owner(Block* b){ untested();  _owner = b; }
+  void set_owner(Block* b){  _owner = b; }
   Block const* owner() const{ untested(); return _owner;}
 protected:
-  Block* owner(){ untested(); return _owner;}
+  Block* owner(){ return _owner;}
 };
 /*--------------------------------------------------------------------------*/
 class Block;
@@ -936,7 +936,7 @@ class Branch_Declarations : public Collection<Branch_Declaration>{
   Branch_Ref _branch_ref;
 public:
   void parse(CS& f)override;
-  void dump(std::ostream& f)const override;
+  // void dump(std::ostream& f)const override;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -969,6 +969,7 @@ public:
 };
 typedef Collection<Element_1> Element_1_List;
 /*--------------------------------------------------------------------------*/
+// Component?
 class Element_2 :public Base {
   std::string _module_or_paramset_identifier;
   std::string _name_of_module_instance;
@@ -985,7 +986,7 @@ class Element_2 :public Base {
 public:
   void parse(CS&) override;
   void dump(std::ostream& f)const override;
-  Element_2() {}
+  explicit Element_2() {}
   virtual ~Element_2() {}
   Element_2(CS& f) {
     parse(f);
@@ -1000,7 +1001,7 @@ public:
   const Port_3_List_2& list_of_port_connections()const	  {return _list_of_port_connections;}
   const Port_3_List_2& ports()const	  {return _list_of_port_connections;}
   const Port_1_List& current_ports() const{return _current_port_list;}
-  const std::string& name_of_module_instance()const 	  {return _name_of_module_instance;}
+  virtual std::string name_of_module_instance()const  {return _name_of_module_instance;}
   const std::string& short_label()const 	  {return _name_of_module_instance;}
   virtual std::string code_name()const  {return "_e_" + _name_of_module_instance;}
   const std::string& eval()const 	{return _eval;}
@@ -1226,6 +1227,8 @@ public:
   Node const* p() const{ return _p; }
   Node const* n() const{ return _n; }
   std::string code_name() const override;
+  std::string short_label()const 	  {untested(); return code_name();}
+  std::string name_of_module_instance()const  {return code_name();}
   std::string const& omit() const override;
   const std::string& dev_type()const;
   Deps const& deps()const { return _deps; } // delete?
@@ -1288,12 +1291,29 @@ public:
   void dump(std::ostream& f)const;
 };
 /*--------------------------------------------------------------------------*/
+// similar to u_nodemap.h, somewhat more fancy.
+class Node_Map{
+  typedef std::map<std::string, Node*> map; // use set??
+  typedef std::vector<Node*> nodes;
+  typedef nodes::const_iterator const_iterator;
+  nodes _nodes;
+  map _map;
+public:
+  explicit Node_Map();
+  ~Node_Map();
+public:
+  const_iterator begin() const{ return _nodes.begin(); }
+  const_iterator end() const{ return _nodes.end(); }
+  size_t size() const{ return _nodes.size(); }
+  Node* new_node(std::string const&);
+  Node const* operator[](std::string const& key) const;
+};
+/*--------------------------------------------------------------------------*/
 class Node;
 class File;
 // TODO: decide if it is a Block, or has-a Block aka Scope or whetever.
 class Module :public Block {
   typedef std::map<std::string, Probe*> Probe_Map;
-  typedef std::map<std::string, Node*> Node_Map;
 public:
   ~Module();
 private: // verilog input data
@@ -1320,10 +1340,11 @@ private: // elaboration data
   Branch_Map _branches;
   Node_Map _nodes;
 public:
+  Module(){}
+public:
   File const* file() const{ return _file; }; // owner?
   void parse(CS& f);
   void dump(std::ostream& f)const;
-  Module(){}
   const String_Arg&	  identifier()const	{return _identifier;}
   const New_Port_List&	  ports()const		{return _ports;}
   const Port_3_List_3&	  input()const		{return _input;}
@@ -1349,7 +1370,9 @@ public:
   const Node_Map&	nodes()const		{return _nodes;}
   const Branch_Names&	branch_names()const	{return _branch_names;}
   const Branch_Map&	branches()const		{return _branches;}
-  bool has_analog_block() const;
+  bool sync()const;
+  bool has_submodule()const;
+  bool has_analog_block()const;
 private: // misc
   CS& parse_analog(CS& cmd);
 
@@ -1449,6 +1472,7 @@ public:
 /*--------------------------------------------------------------------------*/
 class Node :public Base {
   std::string _name;
+  int _number{-1};
   std::string _short_to;
   std::string _short_if;
   Discipline const* _discipline{NULL};
@@ -1458,9 +1482,10 @@ public:
   void dump(std::ostream&)const{};
   Node() {untested();}
   Node(CS& f) {parse(f);}
-  Node(std::string const& f) : _name(f) {}
+  Node(std::string const& f, int n) : _name(f), _number(n) {}
   const std::string& name()const	{return _name;}
   std::string code_name()const	{return "n_" + _name;}
+  int number()const	{return _number;}
 //  const std::string& short_to()const 	{return _short_to;}
 //  const std::string& short_if()const 	{return _short_if;}
   void set_discipline(Discipline const* d){ _discipline = d; }

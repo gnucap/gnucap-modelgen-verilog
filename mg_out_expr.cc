@@ -69,7 +69,7 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 		  // code_name?
 		  //
       std::string prefix;
-      if(var->is_module_variable()){ untested();
+      if(var->is_module_variable()){
 	prefix = "d->_v_";
       }else{
 	prefix = "_v_";

@@ -338,6 +338,27 @@ void make_common_param_value(std::ostream& out, const Module& m)
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_eval_subdevice_parameters(std::ostream& o , const Element_2& e)
+{
+  for(auto p : e.list_of_parameter_assignments()){
+    o__ "{\n";
+    {
+      indent x;
+      make_cc_expression(o, p->default_val().expression());
+    }
+    o____ "_netlist_params.set(\"["<< e.name_of_module_instance() <<"]"<< p->name() <<"\", t0);\n";
+    o__ "}\n";
+  }
+
+}
+/*--------------------------------------------------------------------------*/
+static void make_eval_netlist_parameters(std::ostream& o , const Module& m)
+{
+  for(auto i : m.element_list()){
+    make_eval_subdevice_parameters(o, *i);
+  }
+}
+/*--------------------------------------------------------------------------*/
 static void make_common_expand(std::ostream& o , const Module& m)
 {
   make_tag();
@@ -385,24 +406,22 @@ static void make_common_expand(std::ostream& o , const Module& m)
 
 
 #endif
-  o  <<
-    "/*--------------------------------------------------------------------------*/\n"
-    "void COMMON_" << m.identifier() << "::precalc_first(const CARD_LIST* par_scope)\n"
-    "{\n"
-    "  assert(par_scope);\n"
-    "  COMMON_COMPONENT::precalc_first(par_scope);\n";
+  o << "/*--------------------------------------------------------------------------*/\n";
+  o << "void COMMON_" << m.identifier() << "::precalc_first(const CARD_LIST* par_scope)\n{\n";
+  o__ "assert(par_scope);\n";
+  o__ "COMMON_COMPONENT::precalc_first(par_scope);\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
   make_final_adjust_eval_parameter_list(o , m.parameters());
-    o  << "}\n";
+  make_eval_netlist_parameters(o , m);
+  o  << "}\n"
+    "/*--------------------------------------------------------------------------*/\n";
 
-  o <<
-    "/*--------------------------------------------------------------------------*/\n"
-    "void COMMON_" << m.identifier() << "::precalc_last(const CARD_LIST* par_scope)\n"
-    "{\n"
-    "  assert(par_scope);\n"
+  o << "void COMMON_" << m.identifier() << "::precalc_last(const CARD_LIST* par_scope)\n{\n";
+  o__ "assert(par_scope);\n"
     "  COMMON_COMPONENT::precalc_last(par_scope);\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
   make_final_adjust_eval_parameter_list(o , m.parameters());
+  make_eval_netlist_parameters(o , m);
     o << "}\n"
     "/*--------------------------------------------------------------------------*/\n";
 #if 0

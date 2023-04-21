@@ -44,12 +44,12 @@ public:
   ~COMMON_VASRC() {}
 public:
   virtual DISCIPLINE const* discipline()const{return NULL;};
-  double flow_abstol() const{ untested();
+  double flow_abstol() const{
     if(!discipline()){ untested();
       return OPT::abstol;
     }else if(!discipline()->flow()){ untested();
       return OPT::abstol;
-    }else{ untested();
+    }else{
       return discipline()->flow()->abstol();
     }
   }

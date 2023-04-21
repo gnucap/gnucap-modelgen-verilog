@@ -74,7 +74,7 @@ void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2& p)
   // }
   o << "{\n";
 //  o__ p.type() << " val = ";
-  if (!(p.default_val().empty())) { untested();
+  if (!(p.default_val().empty())) {
     // o << p.default_val();
     make_cc_expression(o, p.default_val().expression());
   }else{

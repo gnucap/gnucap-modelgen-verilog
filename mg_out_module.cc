@@ -23,20 +23,6 @@
 #include <stack>
 /*--------------------------------------------------------------------------*/
 #if 0
-bool Module::sync() const
-{
-  // need getattr<bool>?
-  if(!has_attr("sync")){
-    true, false? automatic? how
-  }else if(attr("sync") == "1"
-        || attr("sync") == "yes"){
-    return true;
-  }else if(attr("sync") == "0"
-        || attr("sync") == "no"){
-  }else{
-    unsupported.
-  }
-}
 /*--------------------------------------------------------------------------*/
 static int is_function(std::string const& n)
 {
@@ -154,68 +140,224 @@ static void make_tr_probe_num(std::ostream& o, const Module& m)
     }
   }
   o << ind << "return NOT_VALID;\n";
+  o__ "return " <<  baseclass(m) << "::tr_probe_num(n)\n;";
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-void make_module_default_constructor(std::ostream& out, const Module& d)
+static void make_set_parameters(std::ostream& o, const Element_2& e)
 {
   make_tag();
-  out << "MOD_" << d.identifier() << "::MOD_" << d.identifier() << "() :" << baseclass(d) << "()";
+  o______ e.code_name() << "->set_parameters(\"" << e.name_of_module_instance() << "\", this, ";
+  if (e.discipline()) {
+    // incomplete(); need NODE commons (or so)
+    o << "&_C_V_" << e.discipline()->identifier();
+  }else{ untested();
+    o << e.code_name() << "->mutable_common()";
+  }
+  o << ", 0."; // value
+  if (e.state() != "") {
+    o << ", " << e.num_states() << ", " << e.state();
+  }else{
+    o << ", 0, NULL";
+  }
+  o << ", " << e.num_nodes() << ", nodes);\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_renew_sckt(std::ostream& o, Module const& m)
+{
+  o__ "PARAM_LIST PL;\n";
+  for (Element_2_List::const_iterator
+      e = m.element_list().begin();
+      e != m.element_list().end();
+      ++e) {
+  }
+  //o__ "renew_subckt(_parent, &PL);\n";
+  o__ "renew_subckt(_parent, &(c->_netlist_params));\n";
+  //o__ "renew_subckt(_parent, NULL);\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_set_subdevice_parameters(std::ostream& o, const Element_2& e)
+{
+  for(auto p : e.list_of_parameter_assignments()){
+    o____ e.code_name() << "->set_param_by_name(\"" << p->name() << "\", "
+       << "\"[" << e.name_of_module_instance() << "]" << p->name() << "\");\n";
+  }
+}
+/*--------------------------------------------------------------------------*/
+static void make_module_construct_stub(std::ostream& o, const Element_2& e, Module const& m)
+{
+  make_tag();
+  std::string dev_type = "device_stub";
+  assert(!dynamic_cast<Branch const*>(&e));
 
-//  out << ",\n   // input parameters";
-//  make_construct_parameter_list(out, d.parameters());
+  o__ "const CARD* p = device_dispatcher[\"" << dev_type << "\"]; // " << e.dev_type() << "\n";
+  o__ "if(!p){\n";
+  o____ "throw Exception(" << "\"Cannot find " << dev_type << ". Load module?\");\n";
+  o__ "}else{\n";
+  o__ "}\n";
+  o__ "COMPONENT* " << e.code_name() << " = dynamic_cast<COMPONENT*>(p->clone());\n";
+  o__ e.code_name() << "->set_dev_type(\"" << e.dev_type() << "\");\n";
+  o__ e.code_name() << "->set_label(\"" << e.short_label() << "\");\n";
+  o__ e.code_name() << "->set_owner(this);\n";
+  o__ "if(!" << e.code_name() << "){\n";
+  o____ "throw Exception(" << "\"Cannot use " << dev_type << ": wrong type\"" << ");\n";
+  o__ "}else{\n";
+  o__ "}\n";
+  o__ "assert(subckt());\n";
+  o__ "subckt()->push_front(" << e.code_name() << ");\n";
 
-//  out << ",\n   // calculated parameters";
-//  make_construct_parameter_list(out, d.device().calculated());
+  o__ "{\n";
+  
+  assert(!dynamic_cast<Branch const*>(&e));
+  {
+    Port_3_List_2::const_iterator p = e.ports().begin();
+    int i = 0;
+    o____ "std::string tmp;\n";
+    for (;p != e.ports().end(); ++p) {
+      // BUG: what about named ports?
+      o____ "tmp = \"" << (*p)->name()<<"\";\n";
+      o____ e.code_name() << "->set_port_by_index(" << i << ", tmp);\n";
+      ++i;
+    }
+  }
+  o____ "node_t nodes[] = {";
+  {
+    Port_3_List_2::const_iterator p = e.ports().begin();
+    if (p != e.ports().end()) {
+      assert(*p);
+      o << "_n[n_" << (**p).name() << "]";
+      while (++p != e.ports().end()) {
+	o << ", _n[n_" << (**p).name() << "]";
+      }
+    }else{
+    }
+    o << "}; // nodes\n";
+//    make_set_parameters(o, e);
+    make_set_subdevice_parameters(o, e);
+  }
+  
+  o____ "\n";
+  o__ "}\n";
+}
+/*--------------------------------------------------------------------------*/
+void make_module_copy_constructor(std::ostream& o, const Module& m)
+{
+  o << "MOD_" << m.identifier() << "::MOD_" << m.identifier() << "(MOD_" << m.identifier() << " const&p) : "
+    <<  baseclass(m) << "(p)";
+  if(m.has_submodule()){
+    o << ", _parent(p._parent)";
+  }
+    
+  o << "\n{\n"
+    << ind << "_n = _nodes;\n"
+    << ind << "for (int ii = 0; ii < max_nodes() + int_nodes(); ++ii) {\n"
+    << ind << ind << "_n[ii] = p._n[ii];\n"
+    << ind << "}\n";
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_build_netlist(std::ostream& o, const Module& m)
+{
+  o__ "// build netlist\n";
+  if(m.element_list().size()){
+    o__ "new_subckt();\n";
+    for (auto nn : m.nodes()){
+      std::string ext_name = nn->name();
+      int ii = nn->number();
 
-//  out << ",\n   // netlist";
+      if(ii < int(m.ports().size())){
+//	o__ "_n[" << ii << "].new_node(\"" << ext_name << "\", this); // port\n";
+	o__ "{\n";
+	o____ "std::string tmp = \"" << ext_name << "\";\n";
+	o____ "set_port_by_index(" << ii << ", tmp);\n";
+	o__ "}\n";
+      }else{
+	o__ "_n[" << ii << "].new_node(\"" << ext_name << "\", this);\n";
+      }
+    }
+    o << "trace1(\"construct\", subckt()->nodes()->how_many());\n";
+    for (Element_2_List::const_iterator
+	e = m.element_list().begin();
+	e != m.element_list().end();
+	++e) {
+      o__ "{\n";
+      {
+	indent x;
+	make_module_construct_stub(o, **e, m);
+      }
+      o__ "}\n";
+    }
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+void make_module_default_constructor(std::ostream& o, const Module& m)
+{
+  make_tag();
+  o << "MOD_" << m.identifier() << "::MOD_" << m.identifier() << "() :" << baseclass(m) << "()";
+
+//  o << ",\n   // input parameters";
+//  make_construct_parameter_list(o, m.parameters());
+
+//  o << ",\n   // calculated parameters";
+//  make_construct_parameter_list(o, m.device().calculated());
+
+//  o << ",\n   // netlist";
 //  for (Element_1_List::const_iterator
-//       p = d.elements().begin();
-//       p != d..elements().end();
+//       p = m.elements().begin();
+//       p != m..elements().end();
 //       ++p) {
-//    out << ",\n   _" << (**p).name() << "(0)";
+//    o << ",\n   _" << (**p).name() << "(0)";
 //  }
+//
+  
 
-  out << "\n{\n"
+  o << "\n{\n"
     "  _n = _nodes;\n"
-    "  attach_common(&Default_" << d.identifier() << ");\n"
+    "  attach_common(&Default_" << m.identifier() << ");\n"
     "  ++_count;\n";
 
-  out << "  // overrides\n";
+  make_build_netlist(o, m);
+
+  o << "  // overrides\n";
 //  for (Parameter_1_List::const_iterator
-//       p = d.device().override().begin();
-//       p != d.device().override().end();
+//       p = m.device().override().begin();
+//       p != m.device().override().end();
 //       ++p) {untested();
 //    if (!((**p).final_default().empty())) {untested();
-//      out << "  " << (**p).code_name() << " = NA;\n";
+//      o << "  " << (**p).code_name() << " = NA;\n";
 //    }else{untested();
 //    }
 //    if (!((**p).default_val().empty())) {untested();
-//      out << "  " << (**p).code_name() << " = " << (**p).default_val() <<";\n";
+//      o << "  " << (**p).code_name() << " = " << (**p).default_val() <<";\n";
 //    }else{untested();
 //    }
 //  }
-  out << "}\n"
+  o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
 static void make_do_tr(std::ostream& o, const Module& m)
 {
-    o << "bool MOD_" << m.identifier() << "::do_tr()\n{\n";
-    o__ "clear_branch_contributions();\n";
-    o__ "read_probes();\n";
-    o__ "COMMON_" << m.identifier() << " const* c = "
-        "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
-    o__ "assert(c);\n";
-    o__ "c->tr_eval_analog(this);\n";
-    o__ "set_branch_contributions();\n";
-    o__ "assert(subckt());\n";
-    o__ "set_converged(subckt()->do_tr());\n";
-    o__ "return converged();\n";
-    o << "}\n";
+  o << "bool MOD_" << m.identifier() << "::do_tr()\n{\n";
+  o__ "clear_branch_contributions();\n";
+  o__ "read_probes();\n";
+  o__ "COMMON_" << m.identifier() << " const* c = "
+    "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
+  o__ "assert(c);\n";
+  o__ "c->tr_eval_analog(this);\n";
+  o__ "set_branch_contributions();\n";
+  o__ "assert(subckt());\n";
+  o__ "set_converged(subckt()->do_tr());\n";
+  o__ "return converged();\n";
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
 static void make_read_probes(std::ostream& o, const Module& m)
@@ -256,7 +398,7 @@ static void make_one_branch_contribution(std::ostream& o, Module const& m, const
   o__ b->state() << "[0] = _value" << b->code_name() << ";\n";
   for(auto d : b->deps()){
     if(d->branch() == b){
-      if(b->has_pot_source() && b->has_flow_probe()){ untested();
+      if(b->has_pot_source() && b->has_flow_probe()){
 	throw Exception("cannot use self as current probe.. yet\n");
       }else{
       }
@@ -329,21 +471,37 @@ static void make_set_branch_contributions(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_module_class(std::ostream& o, Module const& m)
+static void make_module_clone(std::ostream& o, Module const& m)
 {
-  o << "MOD_" << m.identifier() << "::MOD_" << m.identifier() << "(MOD_" << m.identifier() << " const&p) : "
-    <<  baseclass(m) << "(p)\n{\n"
-    << ind << "_n = _nodes;\n"
-    << ind << "for (int ii = 0; ii < max_nodes() + int_nodes(); ++ii) {\n"
-    << ind << ind << "_n[ii] = p._n[ii];\n"
-    << ind << "}\n";
+  o << "CARD* MOD_" << m.identifier() << "::clone()const\n{\n";
+  o__ "MOD_" << m.identifier() << "* new_instance = new MOD_" << m.identifier() << "(*this);\n";
+  o__ "assert(!new_instance->subckt());\n";
+
+  if(m.element_list().size()){
+    o__ "if(_parent){ untested();\n";
+    o__ "  new_instance->_parent = _parent;\n";
+    o__ "  assert(new_instance->is_device());\n";
+    o__ "}else{\n";
+    o__ "  new_instance->_parent = this;\n";
+    o__ "  assert(new_instance->is_device());\n";
+    o__ "}\n";
+  }else{
+  }
+
+  o__ "return new_instance;\n";
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_module_class(std::ostream& o, Module const& m)
+{
   make_tr_probe_num(o, m);
   make_set_branch_contributions(o, m);
   make_read_probes(o, m);
   make_module_default_constructor(o, m);
+  // make_module_copy_constructor(o, m);
+
   o << "// seq blocks\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -352,6 +510,8 @@ static void make_module_class(std::ostream& o, Module const& m)
     make_do_tr(o, m);
   }else{
   }
+
+  // TODO: set_port_by_name
   o__ "std::string MOD_" << m.identifier() << "::port_name(int i)const\n{\n";
   o____ "assert(i >= 0);\n";
   o____ "assert(i < max_nodes());\n";
@@ -363,7 +523,9 @@ static void make_module_class(std::ostream& o, Module const& m)
   }
   o____ "};\n";
   o____ "return names[i];\n";
-  o__ "}\n";
+  o__ "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
 } // make_module_class
 /*--------------------------------------------------------------------------*/
 static void make_module_allocate_local_node(std::ostream& out, const Port_1& p)
@@ -401,25 +563,6 @@ static void make_module_allocate_local_node(std::ostream& out, const Port_1& p)
 #endif
 }
 /*--------------------------------------------------------------------------*/
-static void make_set_parameters(std::ostream& o, const Element_2& e)
-{
-  make_tag();
-  o______ e.code_name() << "->set_parameters(\"" << e.code_name() << "\", this, ";
-  if (e.discipline()) {
-    // incomplete(); need NODE commons (or so)
-    o << "&_C_V_" << e.discipline()->identifier();
-  }else{ untested();
-    o << "NULL";
-  }
-  o << ", 0."; // value
-  if (e.state() != "") {
-    o << ", " << e.num_states() << ", " << e.state();
-  }else{
-    o << ", 0, NULL";
-  }
-  o << ", " << e.num_nodes() << ", nodes);\n";
-}
-/*--------------------------------------------------------------------------*/
 static void make_module_expand_one_element(std::ostream& o, const Element_2& e, Module const& m)
 {
   make_tag();
@@ -435,19 +578,27 @@ static void make_module_expand_one_element(std::ostream& o, const Element_2& e, 
     o__ "{\n";
   }
 
+  std::string dev_type;
+  if(dynamic_cast<Branch const*>(&e)){
+    dev_type = e.dev_type();
+  }else{
+    dev_type = "device_stub";
+  }
+
   o__ "if (!" << e.code_name() << ") {\n";
-  o____ "const CARD* p = device_dispatcher[\"" << e.dev_type() << "\"];\n";
+  o____ "const CARD* p = device_dispatcher[\"" << dev_type << "\"]; // " << e.dev_type() << "\n";
   o____ "if(!p){\n;";
-  o______ "throw Exception(" << "\"Cannot find " << e.dev_type() << ". Load module?\");\n";
+  o______ "throw Exception(" << "\"Cannot find " << dev_type << ". Load module?\");\n";
   o____ "}else{\n";
   o____ "}\n";
   if(dynamic_cast<Branch const*>(&e)){
     o____ e.code_name() << " = dynamic_cast<ELEMENT*>(p->clone());\n";
   }else{
     o____ e.code_name() << " = dynamic_cast<COMPONENT*>(p->clone());\n";
+    o____ e.code_name() << "->set_dev_type(\"" << e.dev_type() << "\");\n";
   }
   o____ "if(!" << e.code_name() << "){\n";
-  o______ "throw Exception(" << "\"Cannot use " << e.dev_type() << ": wrong type\"" << ");\n";
+  o______ "throw Exception(" << "\"Cannot use " << dev_type << ": wrong type\"" << ");\n";
   o____ "}else{\n";
   o____ "}\n";
   o____ "subckt()->push_front(" << e.code_name() << ");\n";
@@ -484,16 +635,8 @@ static void make_module_expand_one_element(std::ostream& o, const Element_2& e, 
 
     int kk = 0;
     // BUG iterate branches?
-#if 0
-    for(auto i : br->deps()){
-      if(i->branch() == br){
-      }else if(i->is_flow_probe()){
-	assert(i->branch());
-	o______ e.code_name() << "->set_current_port_by_index( "<< kk << ", \"" << i->branch()->code_name() << "\");\n";
-      }else{
-      }
-    }
-#else
+
+    // set_current ports.
     for(auto x : m.branches()){
       Branch const* b = x.second;
       for(auto i : br->deps()){
@@ -507,7 +650,6 @@ static void make_module_expand_one_element(std::ostream& o, const Element_2& e, 
 	}
       }
     }
-#endif
   }else{
     Port_3_List_2::const_iterator p = e.ports().begin();
     if (p != e.ports().end()) {
@@ -520,6 +662,7 @@ static void make_module_expand_one_element(std::ostream& o, const Element_2& e, 
     }
     o << "}; // nodes\n";
     make_set_parameters(o, e);
+    make_set_subdevice_parameters(o, e);
   }
   
   o << "      }\n";
@@ -582,22 +725,90 @@ static void make_module_expand_one_filter(std::ostream& o, const Filter& e)
   o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_module_precalc_first(std::ostream& o, Module const& m)
+{
+  make_tag();
+  String_Arg const& mid = m.identifier();
+  o << "void MOD_" << mid << "::precalc_first()\n{\n";
+  o__ baseclass(m) << "::precalc_first();\n";
+
+  o__ "auto c = static_cast<COMMON_" << mid << "*>(mutable_common());\n";
+  o__ "assert(c);\n";
+
+  o__ "if(subckt()){\n";
+  if(m.element_list().size()){
+    o__ "subckt()->attach_params(&(c->_netlist_params), scope());\n";
+  }else{
+  }
+  o____ "subckt()->precalc_first();\n";
+  o__ "}else{\n";
+  o__ "}\n";
+
+  o << "}\n"
+      "/*--------------------------------------"
+      "------------------------------------*/\n";
+
+ //  assert(!is_constant()); /* because I have more work to do */
+}
+/*--------------------------------------------------------------------------*/
+static void make_module_precalc_last(std::ostream& o, Module const& m)
+{
+  make_tag();
+  String_Arg const& mid = m.identifier();
+  o << "void MOD_" << mid << "::precalc_last()\n{\n";
+  o__ baseclass(m) << "::precalc_last();\n";
+
+  o__ "auto c = static_cast<COMMON_" << mid << "*>(mutable_common());\n";
+  o__ "assert(c);\n";
+
+  if(m.element_list().size()){
+    o__ "assert(subckt());\n";
+    o__ "subckt()->attach_params(&(c->_netlist_params), scope());\n";
+  }else{
+  }
+
+  o__ "if(subckt()){\n";
+  o____ "subckt()->precalc_last();\n";
+  o__ "}else{untested();\n";
+  o__ "}\n";
+
+  o << "}\n"
+      "/*--------------------------------------"
+      "------------------------------------*/\n";
+
+ //  assert(!is_constant()); /* because I have more work to do */
+}
+/*--------------------------------------------------------------------------*/
 static void make_module_expand(std::ostream& o, Module const& m)
 {
   make_tag();
   String_Arg const& mid = m.identifier();
   o << "void MOD_" << mid << "::expand()\n{\n";
-  o << ind << baseclass(m) << "::expand();"
-    << ind << "assert(_n);\n"
-    << ind << "assert(common());\n"
-    "  const COMMON_" << mid << "* c = static_cast<const COMMON_"
-      << mid << "*>(common());\n"
-    "  assert(c);\n"
-    "  if (!subckt()) {\n"
+  o__ baseclass(m) << "::expand();\n";
+  o__ "assert(_n);\n";
+  o__ "assert(common());\n";
+  o__ "auto c = static_cast</*const*/ COMMON_" << mid << "*>(mutable_common());\n"; // const?!
+  o__ "assert(c);\n";
+  o__ "if (!subckt()) {\n"
     "    new_subckt();\n"
     "  }else{\n"
     "  }\n"
-    "\n"
+    "\n";
+  if(m.element_list().size()){
+    o__ "assert(_parent);\n";
+    o__ "assert(_parent->subckt());\n";
+    o__ "assert(_parent->subckt()->nodes());\n";
+    o__ "// trace2(\"\",  _parent->net_nodes(),  _parent->subckt()->nodes()->how_many());\n";
+    o__ "assert(_parent->net_nodes() <= _parent->subckt()->nodes()->how_many());\n";
+    o__ "// assert(_parent->subckt()->params());\n";
+    o__ "PARAM_LIST* pl = const_cast<PARAM_LIST*>(_parent->subckt()->params());\n";
+    o__ "assert(pl);\n";
+
+    // o__ "c->_params.set_try_again(pl);\n";
+    make_renew_sckt(o, m);
+  }else{
+  }
+    o<<
     "  if (_sim->is_first_expand()) {\n"
     "    precalc_first();\n"
     "    precalc_last();\n";
@@ -635,25 +846,29 @@ static void make_module_expand(std::ostream& o, Module const& m)
   }
 
   o << "\n";
-  o__ "// clone subckt elements\n";
-  for (Element_2_List::const_iterator
-       e = m.element_list().begin();
-       e != m.element_list().end();
-       ++e) {
-    indent x;
-    make_module_expand_one_element(o, **e, m);
-  }
   o__ "}else{\n";
   o____ "  //precalc();\n";
   o__ "}\n";
   o__ "//precalc();\n";
+
+  // TODO: deflate
   o__ "subckt()->expand();\n";
   o__ "//subckt()->precalc();\n";
   o__ "assert(!is_constant());\n";
-//  if (m.sync()) {
-//    o << "  subckt()->set_slave();\n";
-//  }else{
-//  }
+  if (m.sync()) {
+    o << "  subckt()->set_slave();\n";
+  }else{
+  }
+  o__ "for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){\n";
+  o__ "  CARD* d = (*i)->deflate();\n";
+
+  o__ "  if(d == (*i)){\n";
+  o__ "  }else{\n";
+  o__ "    assert(d->owner() == this);\n";
+  o__ "    delete *i;\n";
+  o__ "    *i = d;\n";
+  o__ "  }\n";
+  o__ "}\n";
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -705,79 +920,46 @@ static void make_module_probe_num(std::ostream& out, const Module& d)
 }
 #endif
 /*--------------------------------------------------------------------------*/
-void make_cc_module(std::ostream& out, const Module& m)
+void make_cc_module(std::ostream& o, const Module& m)
 {
   make_tag();
 
-  make_cc_decl(out, m);
-  make_cc_common(out, m);
-  out <<
+  make_cc_decl(o, m);
+  make_cc_common(o, m);
+  o <<
       "int COMMON_" << m.identifier() << "::_count = -1;\n"
       "static COMMON_" << m.identifier() << " Default_" << m.identifier()
 	<< "(CC_STATIC);\n"
       "/*--------------------------------------"
       "------------------------------------*/\n";
-  out <<
+  o <<
       "/*--------------------------------------"
       "------------------------------------*/\n";
-  make_module_class(out, m);
-    out << "int MOD_" << m.identifier() << "::_count = -1;\n";
-  make_module_dispatcher(out, m);
-//  make_module_evals(out, m);
-//  make_module_default_constructor(out, m);
-//  make_module_copy_constructor(out, m);
-  make_module_expand(out, m);
-//  make_module_probe(out, m);
-//  make_module_aux(out, m);
-  out << "/*--------------------------------------"
-    "------------------------------------*/\n";
-}
-/*--------------------------------------------------------------------------*/
-#if 0
-void make_module_default_constructor(std::ostream& out, const Module& m)
-{
-  make_tag();
-  out << "MOD_" << m.identifier() << "::MOD_" << m.identifier() << "()" << baseclass(m) << "()";
-
-  out << ",\n   // input parameters";
-  make_construct_parameter_list(out, m.parameters());
-
-//   out << ",\n   // calculated parameters";
-//   make_construct_parameter_list(out, m.device().calculated());
-
-  out << ",\n   // netlist";
-//   for (Element_1_List::const_iterator
-//        p = m.circuit().elements().begin();
-//        p != m.circuit().elements().end();
-//        ++p) {
-//     out << ",\n   _" << (**p).name() << "(0)";
-//   }
-
-  out << "\n{\n"
-    "  _n = _nodes;\n"
-    "  attach_common(&Default_" << d.name() << ");\n"
-    "  ++_count;\n";
-
-  out << "  // overrides\n";
-  for (Parameter_1_List::const_iterator
-       p = d.device().override().begin();
-       p != d.device().override().end();
-       ++p) {untested();
-    if (!((**p).final_default().empty())) {untested();
-      out << "  " << (**p).code_name() << " = NA;\n";
-    }else{untested();
-    }
-    if (!((**p).default_val().empty())) {untested();
-      out << "  " << (**p).code_name() << " = " << (**p).default_val() <<";\n";
-    }else{untested();
-    }
+  make_module_class(o, m);
+    o << "int MOD_" << m.identifier() << "::_count = -1;\n";
+  make_module_dispatcher(o, m);
+  make_module_clone(o, m);
+//  make_module_evals(o, m);
+//  make_module_default_constructor(o, m);
+  make_module_copy_constructor(o, m);
+  make_module_precalc_first(o, m);
+  make_module_expand(o, m);
+  make_module_precalc_last(o, m);
+//  make_module_probe(o, m);
+//  make_module_aux(o, m);
+  if(m.element_list().size()){
+    o << "CARD_LIST* MOD_" << m.identifier() << "::scope()\n{\n";
+    o__ "if(_parent){\n";
+    o__ "  return COMPONENT::scope();\n";
+    o__ "}else{\n";
+    o__ "  return subckt();\n";
+    o__ "}\n";
+    o << "}\n"
+      "/*--------------------------------------"
+      "------------------------------------*/\n";
+  }else{
   }
-  out << "}\n"
-    "/*--------------------------------------"
-    "------------------------------------*/\n";
 }
-/*--------------------------------------------------------------------------*/
-#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

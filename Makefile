@@ -3,7 +3,7 @@
 include Make1
 LIBS = -lgnucap
 LDFLAGS = -L/usr/local/lib # ask gnucap-conf?
-MODULES = modelgen_0.so d_vasrc.so
+MODULES = modelgen_0.so d_vasrc.so v_instance.so
 
 CXXFLAGS = -Wall -std=c++11
 
@@ -30,6 +30,8 @@ include Make.depend
 
 modelgen_0.o: $(OBJS)
 d_vasrc.so: d_vaflow.o d_vapot.o
+	g++ -shared ${CXXFLAGS} -I../include $+ ${LIBS_} -o $@
+v_instance.so: v_instance.o
 	g++ -shared ${CXXFLAGS} -I../include $+ ${LIBS_} -o $@
 
 depend: Make.depend

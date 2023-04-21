@@ -36,6 +36,8 @@ static void make_header(std::ostream& o, const File& in,
     "#include <gnucap/e_subckt.h>\n"
     "#include <gnucap/e_node.h>\n"
     "#include <gnucap/e_elemnt.h>\n"
+    "// #include <gnucap/e_paramlist.h>\n"
+    "#include <gnucap/u_nodemap.h>\n" // if submodules are used anywhere
     "#include \"../m_va.h\"\n"
     "#include \"../e_va.h\"\n"
     "/*--------------------------------------"

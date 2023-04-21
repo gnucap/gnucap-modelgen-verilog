@@ -28,7 +28,12 @@ bool ConstantMinTypMaxExpression::empty() const
 /*--------------------------------------------------------------------------*/
 bool Module::has_analog_block() const
 {
-  return !_analog_list.is_empty();
+  return !analog_list().is_empty();
+}
+/*--------------------------------------------------------------------------*/
+bool Module::has_submodule() const
+{
+  return !element_list().is_empty();
 }
 /*--------------------------------------------------------------------------*/
 //Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& b)
@@ -119,24 +124,49 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
   }
 }
 /*--------------------------------------------------------------------------*/
-Node* Module::new_node(std::string const& p)
+Node* Node_Map::new_node(std::string const& p)
 {
-  Node*& cc = _nodes[p];
+  Node*& cc = _map[p];
   if(cc) {
   }else{
-    cc = new Node(p);
+    cc = new Node(p, _nodes.size());
+    _nodes.push_back(cc);
   }
   return cc;
 }
 /*--------------------------------------------------------------------------*/
-Node const* Module::node(std::string const& p) const
+Node_Map::Node_Map()
 {
-  auto i = _nodes.find(p);
-  if(i != _nodes.end()) {
+}
+/*--------------------------------------------------------------------------*/
+Node_Map::~Node_Map()
+{
+  for(auto i: _nodes){
+    delete i;
+  }
+}
+/*--------------------------------------------------------------------------*/
+Node const* Node_Map::operator[](std::string const& key) const
+{
+  auto i = _map.find(key);
+  if(i != _map.end()) {
     return i->second;
   }else{
+    throw Exception("no such node " + key );
+  }
+}
+/*--------------------------------------------------------------------------*/
+Node* Module::new_node(std::string const& p)
+{
+  return _nodes.new_node(p);
+}
+/*--------------------------------------------------------------------------*/
+Node const* Module::node(std::string const& p) const
+{
+  try{
+    return _nodes[p];
+  }catch(Exception const&){
     return NULL;
-    throw Exception("no such node " + p );
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -380,7 +410,7 @@ bool Variable::is_module_variable() const
 {
   assert(_owner);
   assert(_owner->owner());
-  if(dynamic_cast<Module const*>(_owner)){ untested();
+  if(dynamic_cast<Module const*>(_owner)){
     return true;
   }else{
     return false;
@@ -499,5 +529,27 @@ Deps::~Deps()
   std::set<Probe const*>::clear();
 }
 /*--------------------------------------------------------------------------*/
+bool Module::sync() const
+{
+#if 0
+  // need getattr<bool>?
+  if(!has_attr("sync")){
+    true, false? automatic? how
+  }else if(attr("sync") == "1"
+        || attr("sync") == "yes"){
+    return true;
+  }else if(attr("sync") == "0"
+        || attr("sync") == "no"){
+  }else{
+    unsupported.
+  }
+#endif
+
+  if(has_submodule() && has_analog_block()){ untested();
+    incomplete();
+  }else{
+  }
+  return has_analog_block();
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

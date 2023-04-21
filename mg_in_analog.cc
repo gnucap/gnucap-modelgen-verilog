@@ -282,7 +282,7 @@ Assignment::~Assignment()
 // }
 /*--------------------------------------------------------------------------*/
 void Assignment::parse(CS& cmd)
-{ untested();
+{
   // TODO: rhs is an analog expression
   assert(owner());
   trace1("Assignment::parse", cmd.tail());
@@ -309,7 +309,7 @@ void Variable::resolve_symbols(Expression const& e, Expression& E)
 }
 /*--------------------------------------------------------------------------*/
 void Contribution::parse(CS& cmd)
-{ untested();
+{
   // TODO: parse branch_ref?
   cmd >> "(";
   std::string pp = cmd.ctos(",)");

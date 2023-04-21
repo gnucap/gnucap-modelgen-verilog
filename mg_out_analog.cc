@@ -54,7 +54,7 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
     indent x;
     make_cc_expression(o, e);
     std::string prefix;
-    if(a.is_module_variable()){ untested();
+    if(a.is_module_variable()){
       prefix = "/*m*/ d->_v_";
     }else{
       prefix = "_v_";

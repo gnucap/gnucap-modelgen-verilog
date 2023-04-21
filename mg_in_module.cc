@@ -252,7 +252,7 @@ void Net_Declarations::parse(CS& f)
 
     push_back(m);
 
-  }else if(f.umatch("ground ")){ untested();
+  }else if(f.umatch("ground ")){
     auto m = new Net_Decl_List_Ground();
     m->set_owner(owner());
     f >> *m;
@@ -277,7 +277,7 @@ void Net_Declarations::dump(std::ostream& o) const
 // ciated with the net will be the global reference node in the circuit. The net must be assigned a continuous
 // discipline to be declared ground.
 void Net_Decl_List_Ground::parse(CS& f)
-{ untested();
+{
   return Net_Decl_List::parse_n_<Net_Identifier_Ground>(f);
 }
 /*--------------------------------------------------------------------------*/
@@ -292,7 +292,7 @@ void Net_Identifier_Discipline::parse(CS& f)
 void Net_Identifier_Ground::parse(CS& f)
 {
   Net_Identifier::parse(f);
-  if(owner()->node(name())){ untested();
+  if(owner()->node(name())){
   }else{ untested();
     throw Exception_CS("ground: need previously declared net", f);
   }
@@ -542,7 +542,7 @@ void Branch_Declaration::dump(std::ostream& o) const
 }
 /*--------------------------------------------------------------------------*/
 void Branch_Declaration::parse(CS& f)
-{ untested();
+{
   assert(owner());
   _list.set_owner(owner());
   Branch_Ref::parse(f);
@@ -554,7 +554,7 @@ void Branch_Declaration::parse(CS& f)
 }
 /*--------------------------------------------------------------------------*/
 void Branch_Declarations::parse(CS& f)
-{ untested();
+{
   Collection<Branch_Declaration>::parse(f);
 }
 /*--------------------------------------------------------------------------*/
@@ -563,27 +563,8 @@ void List_Of_Branch_Identifiers::dump(std::ostream& o)const
   LiSt<Branch_Identifier, '\0', ',', ';'>::dump(o);
 }
 /*--------------------------------------------------------------------------*/
-void Branch_Declarations::dump(std::ostream& o)const
-{
-  incomplete();
-  Collection<Branch_Declaration>::dump(o);
-}
-/*--------------------------------------------------------------------------*/
-// void Branch_Identifier::dump(std::ostream& out)const
-// {
-//   incomplete();
-//   out << _alias;
-// }
-/*--------------------------------------------------------------------------*/
-// void Branch_Identifier::parse(CS& f)
-// { untested();
-//   assert(owner());
-//   f >> _alias;
-//   trace1("aliasparse", _alias);
-// }
-/*--------------------------------------------------------------------------*/
 void Branch_Ref::parse(CS& f)
-{ untested();
+{
   incomplete(); // aliases?
   f >> "(";
   std::string pp = f.ctos(",)");
@@ -605,7 +586,7 @@ void Branch_Ref::parse(CS& f)
 }
 /*--------------------------------------------------------------------------*/
 void Branch_Ref::dump(std::ostream& o)const
-{ untested();
+{
   incomplete();
   o << "(" << pname() << ", " << nname() << ")";
 }
@@ -670,7 +651,7 @@ CS& Module::parse_analog(CS& cmd)
 }
 /*--------------------------------------------------------------------------*/
 void Variable_2::parse(CS& file)
-{ untested();
+{
   file >> ','; // ??
   file >> _name;
   new_var_ref();

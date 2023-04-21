@@ -1,6 +1,6 @@
 /*$Id: mg_out_h.cc,v 26.134 2009/11/29 03:44:57 al Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
- * Author: Albert Davis <aldavis@gnu.org>
+ *               2023 Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -19,7 +19,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-//testing=script 2006.11.01
 #include "mg_out.h"
 /*--------------------------------------------------------------------------*/
 static void make_clear_branch_contributions(std::ostream& o, const Module& m)
@@ -33,73 +32,6 @@ static void make_clear_branch_contributions(std::ostream& o, const Module& m)
     }
   }
 }
-#if 0
-static void make_model(std::ostream& out, const Model& m)
-{
-  std::string class_name = "MODEL_" + m.name().to_string();
-  out <<
-    "class " << class_name << "\n"
-    "  :public MODEL_" << m.inherit() << "{\n"
-    "protected:\n"
-    "  explicit " << class_name << "(const " << class_name << "& p);\n"
-    "public:\n"
-    "  explicit " << class_name << "(const BASE_SUBCKT*);\n"
-    "  ~" << class_name << "() {--_count;}\n"
-    "public: // override virtual\n"
-    "  std::string dev_type()const;\n"
-    "  void      set_dev_type(const std::string& nt);\n"
-    "  CARD*     clone()const {return new " << class_name << "(*this);}\n"
-    "  void      precalc_first();\n"
-    "  void      precalc_last();\n"
-    "  SDP_CARD* new_sdp(COMMON_COMPONENT* c)const;\n"
-    "  void      set_param_by_index(int, std::string&, int);\n"
-    "  bool      param_is_printable(int)const;\n"
-    "  std::string param_name(int)const;\n"
-    "  std::string param_name(int,int)const;\n"
-    "  std::string param_value(int)const;\n"
-    "  int param_count()const {return (" << 1 + m.independent().override().size()
-		+ 4 * m.size_dependent().raw().size() + m.independent().raw().size();
-  if (!m.hide_base()) {
-    out << " + MODEL_" << m.inherit() << "::param_count());}\n";
-  }else{
-    out << ");}\n";
-  }
-  out <<
-    "  bool      is_valid(const COMPONENT*)const;\n"
-    "  void      tr_eval(COMPONENT*)const;\n"
-    "public: // not virtual\n"
-    "  static int count() {return _count;}\n"
-    "private: // strictly internal\n";
-  out <<
-    "  static int _count;\n"
-    "public: // input parameters\n";
-  for (Parameter_1_List::const_iterator
-       p = m.size_dependent().raw().begin();
-       p != m.size_dependent().raw().end();
-       ++p) {
-    out << "  " << "SDP" << " " << (**p).code_name()
-	<< ";\t// " << (**p).comment() << '\n';
-  }
-  for (Parameter_1_List::const_iterator
-       p = m.independent().raw().begin();
-       p != m.independent().raw().end();
-       ++p) {
-    out << "  PARAMETER<" << (**p).type() << "> " << (**p).code_name()
-	<< ";\t// " << (**p).comment() << '\n';
-  }
-  out << "public: // calculated parameters\n";
-  for (Parameter_1_List::const_iterator
-       p = m.independent().calculated().begin();
-       p != m.independent().calculated().end();
-       ++p) {
-    out << "  " << (**p).type() << " " << (**p).code_name()
-	<< ";\t// " << (**p).comment() << '\n';
-  }
-  out << "};\n"
-    "/*--------------------------------------"
-    "------------------------------------*/\n";
-}
-#endif
 /*--------------------------------------------------------------------------*/
 static void declare_deriv_enum(std::ostream& o, const Module& m)
 {
@@ -194,12 +126,23 @@ static void make_variable_decl(std::ostream& o, const Variable_List_Collection& 
 static void make_common(std::ostream& o, const Module& m)
 {
   std::string class_name = "COMMON_" + m.identifier().to_string();
+  std::string base_class_name;
+  base_class_name = "COMMON_COMPONENT";
+  // if(m.has_submodule()){
+  //   base_class_name = "COMMON_PARAMLIST";
+  // }else{
+  //   base_class_name = "COMMON_COMPONENT";
+  // }
   o << "class MOD_" << m.identifier() << ";\n";
-  o << "class " << class_name << " :public COMMON_COMPONENT{\n";
+  o << "class " << class_name << " :public " << base_class_name << "{\n";
+  if(m.element_list().size()){
   o << "public:\n";
+    o__ "PARAM_LIST _netlist_params;\n";
+  }else{
+  }
   declare_ddouble(o, m);
-  o << "public:\n"
-    "  explicit " << class_name << "(const " << class_name << "& p);\n"
+  o << "public:\n";
+  o__ "explicit " << class_name << "(const " << class_name << "& p);\n"
     "  explicit " << class_name << "(int c=0);\n"
     "           ~" << class_name << "();\n"
     "  bool     operator==(const COMMON_COMPONENT&)const;\n"
@@ -211,10 +154,10 @@ static void make_common(std::ostream& o, const Module& m)
     "  std::string param_value(int)const;\n"
     "  int param_count()const {return (" 
 	     << m.parameters().size()
-	     << " + COMMON_COMPONENT::param_count());}\n"
-    "  void     precalc_first(const CARD_LIST*);\n"
-    "  void     expand(const COMPONENT*);\n"
-    "  void     precalc_last(const CARD_LIST*);\n"
+	     << " + " << base_class_name << "::param_count());}\n"
+    "  void precalc_first(const CARD_LIST*);\n"
+    "  void expand(const COMPONENT*);\n"
+    "  void precalc_last(const CARD_LIST*);\n"
     "  void tr_eval_analog(MOD_" << m.identifier() << "*)const;\n"
     "  std::string name()const {itested();return \"" << m.identifier() << "\";}\n"
 //    "  const SDP_CARD* sdp()const {return _sdp;}\n"
@@ -272,8 +215,8 @@ static void make_module(std::ostream& o, const Module& m)
   std::string base_name = baseclass(m);
   std::string common_name = "COMMON_" + m.identifier().to_string();
   o << "class " << class_name << " : public " << base_name << " {\n";
-  o << "private:\n"
-    << ind << "static int _count;\n";
+  o << "private:\n";
+  o__ "static int _count;\n";
   o << "public:\n";
   declare_ddouble(o, m);
   o << "private: // data\n";
@@ -285,7 +228,11 @@ static void make_module(std::ostream& o, const Module& m)
        p = m.element_list().begin();
        p != m.element_list().end();
        ++p) {
-    o << ind << "COMPONENT* " << (**p).code_name() << "{NULL};\n";
+    o__ "// COMPONENT* " << (**p).code_name() << "{NULL};\n";
+  }
+  if(m.element_list().size()){
+    o__ "COMPONENT const* _parent{NULL};\n";
+  }else{
   }
   for (auto br : m.branches()){
     o << ind << "ELEMENT* " << br.second->code_name() << "{NULL}; // branch\n";
@@ -294,13 +241,20 @@ static void make_module(std::ostream& o, const Module& m)
   o << ind << "explicit MOD_" << m.identifier() << "(MOD_" << m.identifier() << " const&);\n";
   o << "public:\n";
   o << ind << "explicit MOD_" << m.identifier() << "(); // : "<< base_name <<"() { _n = _nodes; }\n";
-  o << ind << "CARD* clone()const override { return new MOD_" << m.identifier() << "(*this); }\n";
-  o << "private: // overrides\n"
-	 << ind << "void      precalc_first() {COMPONENT::precalc_first(); if(subckt()) subckt()->precalc_first();}\n"
-	 << ind << "void      expand();\n"
-    //<< ind << "void      precalc_last()  {COMPONENT::precalc_last(); assert(subckt()); subckt()->precalc_last();}\n"
-    << ind << "void      precalc_last()  {COMPONENT::precalc_last(); if(subckt()) subckt()->precalc_last();}\n"
-    << ind << "//void    map_nodes();         //BASE_SUBCKT\n"
+  o__ "CARD* clone()const override;\n";
+  o << "private: // overrides\n";
+  if(m.element_list().size()){
+    o__ "bool is_device() const override{return _parent;}\n";
+    o__ "CARD_LIST* scope() override;\n";
+    o__ "const CARD_LIST* scope()const override " <<
+	"{ return const_cast<MOD_" << m.identifier() << "*>(this)->scope();}\n";
+  }else{
+  }
+/*--------------------------------------------------------------------------*/
+  o__ "void precalc_first();\n";
+  o__ "void expand();\n";
+  o__ "void precalc_last();\n";
+  o << ind << "//void    map_nodes();         //BASE_SUBCKT\n"
     << ind << "//void    tr_begin();          //BASE_SUBCKT\n"
     << ind << "//void    tr_restore();        //BASE_SUBCKT\n"
     << ind << "  void    tr_load(){ trace1(\"tr_load\", long_label());BASE_SUBCKT::tr_load();}\n";
@@ -321,11 +275,13 @@ static void make_module(std::ostream& o, const Module& m)
   }
   o << ind << "double tr_probe_num(std::string const&)const override;\n";
 //  o << ind << "std::string dev_type()const override {return \"demo\";}\n";
-  o << ind << "int max_nodes()const override {return "<< m.ports().size() <<";}\n";
-  o << ind << "int min_nodes()const override {return "<< m.ports().size() <<";}\n";
-  o << ind << "std::string value_name()const override {untested(); return \"\";}\n";
-  o << ind << "bool print_type_in_spice()const override {untested(); return false;}\n";
-  o << ind << "std::string port_name(int i)const override;\n";
+  o__ "int max_nodes()const override {return "<< m.ports().size() <<";}\n";
+  o__ "int min_nodes()const override {return "<< m.ports().size() <<";}\n";
+  o__ "int int_nodes()const override    {return "
+      << m.nodes().size() - m.ports().size() << ";}\n";
+  o__ "std::string value_name()const override {untested(); return \"\";}\n";
+  o__ "bool print_type_in_spice()const override {untested(); return false;}\n";
+  o__ "std::string port_name(int i)const override;\n";
   o << "private: // impl\n";
   o << "/* ========== */\n";
 
@@ -337,8 +293,13 @@ static void make_module(std::ostream& o, const Module& m)
   std::string comma="";
   o << "private: // node list\n";
   o << ind << "enum {";
-  for (auto nn : m.ports()){ // BUG: array?
-    o << comma << "n_" << nn->name();
+  for (auto nn : m.nodes()){
+    // TODO: node aliases, shorts etc.
+    if(nn->number() >= int(m.ports().size())){
+      o << comma << "n_" << nn->name() << "/*" << nn->number() << "*/";
+    }else{
+      o << comma << "n_" << nn->name() << "/* port " << nn->number() << "*/";
+    }
     comma = ", ";
   }
   o << ind << "};\n";
@@ -365,7 +326,7 @@ static void make_module(std::ostream& o, const Module& m)
   o << ind << "}\n";
   o << ind << "friend class " << common_name << ";\n";
 
-  o << "}m; /* MOD_" << m.identifier() << " */\n"
+  o << "}; // m_" << m.identifier() << ";\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
@@ -404,8 +365,6 @@ static void make_device(std::ostream& out, const Device& d)
       "  int       net_nodes()const     {return " << d.max_nodes() << ";}\n";
   }
   out << 
-    "  int       int_nodes()const override    {return " 
-      << d.circuit().local_nodes().size() << ";}\n"
     "  CARD*     clone()const override        {return new "
       << class_name << "(*this);}\n"
     "  void      precalc_first()override {COMPONENT::precalc_first(); if(subckt()) subckt()->precalc_first();}\n"
@@ -510,6 +469,8 @@ static void make_device(std::ostream& out, const Device& d)
 static void make_eval(std::ostream& out, const Eval& e,
 		      const String_Arg& dev_name)
 {
+  incomplete();
+  assert(0);
   std::string class_name = "EVAL_" + dev_name.to_string() + '_' 
     + e.name().to_string();
   out <<
