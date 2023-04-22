@@ -244,7 +244,10 @@ protected:
 	  //file.warn(0, "list");
 	}
 	TT* p = new TT;
-	p->set_owner(_owner);
+	if(owner()){
+	}else{
+	}
+	p->set_owner(owner());
 	file >> *p;
 	if (file.stuck(&here)) { untested();
 	  delete p;
@@ -842,20 +845,36 @@ public:
 typedef LiSt<Port_1, '{', '#', '}'> Port_1_List;
 /*--------------------------------------------------------------------------*/
 // TODO: Port_Base?
-class Port_3 :public Base {
+class Port_3 :public Owned_Base {
   std::string _name;
+  std::string _value;
 public:
-  void parse(CS& f);
-  void dump(std::ostream& f)const;
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
   Port_3() {}
-  const std::string&  name()const  {return _name;}
-
-  void set_owner(Block*) { }
+  const std::string& name()const  {return _name;}
+  const std::string& value()const  {
+    if(has_identifier()){
+      return _value;
+    }else{
+      return _name;
+    }
+  }
+  bool has_identifier()const;
 };
 // list ::= "(" port {"," port} ")"
 typedef LiSt<Port_3, '(', ',', ')'> Port_3_List_2;
 // list ::= port {"," port} ";"
 typedef LiSt<Port_3, '\0', ',', ';'> Port_3_List_3;
+/*--------------------------------------------------------------------------*/
+class Port_Connection_List : public LiSt<Port_3, '(', ',', ')'> {
+  bool _has_names{false};
+  // Block* _owner{NULL};
+public:
+  void parse(CS& f)override;
+  bool has_names() const {return _has_names;}
+//  void dump(std::ostream& f)const override;
+};
 /*--------------------------------------------------------------------------*/
 // TODO: Port_Base?
 class New_Port :public Port_3 {
@@ -970,10 +989,10 @@ public:
 typedef Collection<Element_1> Element_1_List;
 /*--------------------------------------------------------------------------*/
 // Component?
-class Element_2 :public Base {
+class Element_2 :public Owned_Base {
   std::string _module_or_paramset_identifier;
   std::string _name_of_module_instance;
-  Port_3_List_2 _list_of_port_connections;
+  Port_Connection_List _list_of_port_connections;
   Port_1_List _current_port_list;
   Parameter_3_List _list_of_parameter_assignments;
   std::string _eval;
@@ -982,7 +1001,7 @@ class Element_2 :public Base {
   std::string _omit;
   std::string _reverse;
   std::string _state;
-  Block* _owner{NULL};
+//  Block* _owner{NULL};
 public:
   void parse(CS&) override;
   void dump(std::ostream& f)const override;
@@ -991,15 +1010,14 @@ public:
   Element_2(CS& f) {
     parse(f);
   }
-  void set_owner(Block* b) { _owner = b; }
+//  void set_owner(Block* b) { _owner = b; }
 //  const std::string& module_or_paramset_identifier()const {return _module_or_paramset_identifier;}
   virtual const std::string& dev_type()const {return _module_or_paramset_identifier;}
   virtual Nature const* nature()const {return NULL;}
   virtual Discipline const* discipline()const {return NULL;}
   const Parameter_3_List& 
 		     list_of_parameter_assignments()const {return _list_of_parameter_assignments;}
-  const Port_3_List_2& list_of_port_connections()const	  {return _list_of_port_connections;}
-  const Port_3_List_2& ports()const	  {return _list_of_port_connections;}
+  const Port_Connection_List& ports()const	  {return _list_of_port_connections;}
   const Port_1_List& current_ports() const{return _current_port_list;}
   virtual std::string name_of_module_instance()const  {return _name_of_module_instance;}
   const std::string& short_label()const 	  {return _name_of_module_instance;}
@@ -1010,7 +1028,7 @@ public:
   virtual const std::string& omit()const 	{return _omit;}
   const std::string& reverse()const 	{return _reverse;}
   virtual std::string state()const	{return _state;}
-  virtual size_t	     num_nodes()const	{return list_of_port_connections().size();}
+  virtual size_t	     num_nodes()const	{return ports().size();}
   virtual size_t	     num_states()const	{unreachable(); return 0;}
 //  bool is_reversed() const{return _reverse;}
 };
@@ -1050,6 +1068,7 @@ public:
 };
 typedef Collection<Args> Args_List;
 /*--------------------------------------------------------------------------*/
+#if 0
 class Circuit :public Base {
   Port_1_List	_required_nodes;
   Port_1_List	_optional_nodes;
@@ -1071,6 +1090,7 @@ public:
         size_t	      max_nodes()const {return opt_nodes().size()+min_nodes();}
 	size_t	      net_nodes()const	 {untested();return max_nodes();}
 };
+#endif
 /*--------------------------------------------------------------------------*/
 #if 0
 class Probe :public Base {

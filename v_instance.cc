@@ -249,7 +249,7 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
     cc->attach(m);
     cc->set_modelname("");
     c->attach_common(cc);
-  }else{ untested();
+  }else{
     c->set_dev_type(modelname);
   }
 
@@ -267,7 +267,7 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
 
       if(v[0] == '*'){
 	c->set_port_by_index(i, v);
-      }else{ untested();
+      }else{
 	c->set_port_by_name(v, v);
       }
     }
@@ -675,7 +675,7 @@ void INSTANCE::set_port_by_index(int Index, std::string& Value)
 }
 /*--------------------------------------------------------------------------*/
 void INSTANCE::set_port_by_name(std::string& name, std::string& ext_name)
-{ untested();
+{
   trace3("INSTANCE::pbn", long_label(), name, ext_name);
 
   int i = net_nodes();
@@ -683,7 +683,7 @@ void INSTANCE::set_port_by_name(std::string& name, std::string& ext_name)
   _port_names[net_nodes()] = name;
 
   if(subckt()){ untested();
-  }else{ untested();
+  }else{
   }
   assert(scope());
 

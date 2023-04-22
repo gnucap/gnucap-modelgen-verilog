@@ -1,6 +1,1 @@
-... ctrical a, b, c;
-ground c; 
-ground x; 
-endmodule
-
-                                        ^ ? ground: need previously declared net
+Cannot mix port connections

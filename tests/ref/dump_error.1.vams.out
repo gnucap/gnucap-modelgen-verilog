@@ -1,8 +1,1 @@
-... trical p, n, cp, cn;
-
-analog begin
-	gain = 17;
-end
-
-endm
-                                        ^ ? bad analog block
+Cannot mix port connections

@@ -57,9 +57,10 @@
 */
 void Element_2::parse(CS& file)
 {
-  assert(_owner);
-  // assert(owner());
-  _list_of_parameter_assignments.set_owner(_owner);
+  assert(owner());
+  _list_of_parameter_assignments.set_owner(owner());
+  _list_of_port_connections.set_owner(owner());
+
   file >> _module_or_paramset_identifier
        >> '#' >> _list_of_parameter_assignments
        >> _name_of_module_instance >> _list_of_port_connections >> ';';
@@ -70,7 +71,7 @@ void Element_2::dump(std::ostream& out)const
   out << "  " << dev_type()
       << " #" << list_of_parameter_assignments() << " "
       << name_of_module_instance()
-      << list_of_port_connections() << ";\n";
+      << ports() << ";\n";
 }
 /*--------------------------------------------------------------------------*/
 /* A.4.1	6.2.2
@@ -220,7 +221,41 @@ void Parameter_List_Collection::dump(std::ostream& o)const
 */
 void Port_3::parse(CS& file)
 {
-  file >> _name;
+  if (file >> '.') {
+    _name  = file.ctos("(", "", "");
+    _value = file.ctos(",)", "(", ")");
+  }else{
+    file >> _name; // value?
+  }
+  if(owner()){
+    owner()->new_node(value());
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Port_Connection_List::parse(CS& f)
+{
+  assert(owner());
+  LiSt<Port_3, '(', ',', ')'>::parse(f);
+
+  auto i = begin();
+  if(i!=end()){
+    _has_names = (*i)->has_identifier();
+    ++i;
+  }else{
+  }
+
+  for(; i!=end(); ++i ){
+    if(_has_names == (*i)->has_identifier()){
+    }else{
+      throw Exception("Cannot mix port connections");
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool Port_3::has_identifier() const
+{
+  return _value != "";
 }
 /*--------------------------------------------------------------------------*/
 void New_Port::parse(CS& file)
@@ -332,7 +367,11 @@ void Net_Identifier::set_discipline(Discipline const* d)
 /*--------------------------------------------------------------------------*/
 void Port_3::dump(std::ostream& out)const
 {
-  out << name();
+  if(has_identifier()){
+    out << "." << name() << "(" << value() << ")";
+  }else{
+    out << name();
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* A.1.2        2.9.1, 6.2

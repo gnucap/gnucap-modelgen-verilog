@@ -1,0 +1,40 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+attach ../v_instance.so
+
+verilog
+
+
+`modelgen
+module test_sckt4a(a, b);
+	inout a, b;
+	parameter real r=1;
+	resistor #(.r(r)) r1(.p(a), .n(i));
+	resistor #(.r(r)) r2(.n(i), .p(b));
+endmodule;
+
+`modelgen
+module test_sckt4(a, b);
+	inout a, b;
+	parameter real r=1;
+	test_sckt4a #(.r(r)) r1(.a(a), .b(i));
+	test_sckt4a #(.r(r)) r2(.b(i), .a(b));
+endmodule;
+
+!make test_sckt4.so test_sckt4a.so > /dev/null
+attach ./test_sckt4.so
+attach ./test_sckt4a.so
+
+verilog
+
+isource #(.dc(1)) i(0, 1);
+test_sckt4 #() dut(1, 0);
+
+list
+
+print dc v(nodes) i(i)
+status notime
+dc
+
+status notime

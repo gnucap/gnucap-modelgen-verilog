@@ -1,0 +1,35 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+attach ../v_instance.so
+
+spice
+.subckt vsin p n
+.parameter amplitude
+.parameter dc
+V1 p n sin freq=1 amplitude={amplitude} dc=dc
+.ends
+
+.verilog
+
+
+`modelgen
+module test_vs0(a, b, gnd);
+	inout a, b, gnd;
+	electrical a, b, gnd;
+	
+	vsource #(.dc(1)) v1(.p(a), .n(gnd));
+	vsource #(.dc(1)) v2(.n(gnd), .p(b));
+endmodule;
+
+!make test_vs0.so > /dev/null
+attach ./test_vs0.so
+
+verilog
+
+test_vs0 #() dut(1,2,0);
+
+list
+
+print dc v(nodes)
+dc

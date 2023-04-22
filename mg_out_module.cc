@@ -209,19 +209,29 @@ static void make_module_construct_stub(std::ostream& o, const Element_2& e, Modu
   o__ "subckt()->push_front(" << e.code_name() << ");\n";
 
   o__ "{\n";
+  o____ "std::string tmp;\n";
   
   assert(!dynamic_cast<Branch const*>(&e));
-  {
-    Port_3_List_2::const_iterator p = e.ports().begin();
-    int i = 0;
-    o____ "std::string tmp;\n";
+  Port_3_List_2::const_iterator p = e.ports().begin();
+  if(e.ports().has_names()){
     for (;p != e.ports().end(); ++p) {
-      // BUG: what about named ports?
+      o____ "tmp = \"" << (*p)->name()<<"\";\n";
+      o____ "{\n";
+      //o____ "std::string val = \"" << (*p)->value()<<"\";\n";
+      o____ "assert(_n[n_" << (*p)->value() << "].short_label() == \"" << (*p)->value() << "\");\n";
+      o____ e.code_name() << "->set_port_by_name(tmp,\n";
+      o____ "   const_cast<std::string&>(_n[n_" << (*p)->value() << "].n_()->short_label()));\n";
+      o____ "}\n";
+    }
+  }else{
+    int i = 0;
+    for (;p != e.ports().end(); ++p) {
       o____ "tmp = \"" << (*p)->name()<<"\";\n";
       o____ e.code_name() << "->set_port_by_index(" << i << ", tmp);\n";
       ++i;
     }
   }
+#if 0
   o____ "node_t nodes[] = {";
   {
     Port_3_List_2::const_iterator p = e.ports().begin();
@@ -234,9 +244,11 @@ static void make_module_construct_stub(std::ostream& o, const Element_2& e, Modu
     }else{
     }
     o << "}; // nodes\n";
+  }
+#endif
+
 //    make_set_parameters(o, e);
     make_set_subdevice_parameters(o, e);
-  }
   
   o____ "\n";
   o__ "}\n";
@@ -249,13 +261,14 @@ void make_module_copy_constructor(std::ostream& o, const Module& m)
   if(m.has_submodule()){
     o << ", _parent(p._parent)";
   }
-    
-  o << "\n{\n"
-    << ind << "_n = _nodes;\n"
-    << ind << "for (int ii = 0; ii < max_nodes() + int_nodes(); ++ii) {\n"
-    << ind << ind << "_n[ii] = p._n[ii];\n"
-    << ind << "}\n";
-  o << "}\n"
+  o << "\n{\n";
+  o__ "_n = _nodes;\n";
+
+  o__ "for (int ii = 0; ii < max_nodes(); ++ii) {\n";
+  o__ ind << "_n[ii] = p._n[ii];\n";
+  o__ ind << "}\n";
+  o << "}\n";
+  o <<
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
@@ -279,7 +292,7 @@ static void make_build_netlist(std::ostream& o, const Module& m)
 	o__ "_n[" << ii << "].new_node(\"" << ext_name << "\", this);\n";
       }
     }
-    o << "trace1(\"construct\", subckt()->nodes()->how_many());\n";
+    o__ "assert(" << m.nodes().size() << " == subckt()->nodes()->how_many());\n";
     for (Element_2_List::const_iterator
 	e = m.element_list().begin();
 	e != m.element_list().end();
@@ -478,7 +491,7 @@ static void make_module_clone(std::ostream& o, Module const& m)
   o__ "assert(!new_instance->subckt());\n";
 
   if(m.element_list().size()){
-    o__ "if(_parent){ untested();\n";
+    o__ "if(_parent){\n";
     o__ "  new_instance->_parent = _parent;\n";
     o__ "  assert(new_instance->is_device());\n";
     o__ "}else{\n";
@@ -500,7 +513,6 @@ static void make_module_class(std::ostream& o, Module const& m)
   make_set_branch_contributions(o, m);
   make_read_probes(o, m);
   make_module_default_constructor(o, m);
-  // make_module_copy_constructor(o, m);
 
   o << "// seq blocks\n"
     "/*--------------------------------------"

@@ -255,6 +255,7 @@ void Arg::parse(CS& file)
   file.skip1b(";");
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 void Circuit::parse(CS& file)
 {
   int paren = file.skip1b("{");
@@ -299,6 +300,7 @@ void Circuit::dump(std::ostream& out)const
 	       << elements() <<
     "}\n";
 }
+#endif
 /*--------------------------------------------------------------------------*/
 #if 0
 void Model::parse(CS& file)

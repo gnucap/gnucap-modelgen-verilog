@@ -1,0 +1,30 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+attach ../v_instance.so
+
+verilog
+
+
+`modelgen
+module test_sckt3(a, b);
+	inout a, b;
+	resistor #(.r(1)) r1(.p(a), .n(i));
+	resistor #(.r(1)) r2(.n(i), .p(b));
+endmodule;
+
+!make test_sckt3.so > /dev/null
+attach ./test_sckt3.so
+
+verilog
+
+isource #(.dc(1)) i(0, 1);
+test_sckt3 #() dut(1, 0);
+
+list
+
+print dc v(nodes) i(i)
+status notime
+dc
+
+status notime

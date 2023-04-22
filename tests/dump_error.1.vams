@@ -1,0 +1,7 @@
+`include "sub/disciplines.few"
+
+module test_vs0(a, b, gnd);
+	inout a, b, gnd;
+	electrical a, b, gnd;
+	vsource #(.dc(1)) v1(.p(a), gnd);
+endmodule;
