@@ -1,10 +1,8 @@
 
 attach ../modelgen_0.so
 attach ../d_vasrc.so
-attach ../v_instance.so
 
 verilog
-
 
 `modelgen
 module test_sckt3(a, b);

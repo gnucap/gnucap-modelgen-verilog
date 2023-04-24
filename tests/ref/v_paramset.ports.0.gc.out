@@ -1,0 +1,24 @@
+>>>>>verilog 
+>>>>>paramset myv vsource; 
+>>>>>module main(1,2,3,4); 
+>>>>>list 
+paramset myv vsource;
+ .dc=1;
+endparamset
+
+module main (1,2,3,4);
+  resistor #(1.) v (3,1);
+  myv #() R1 (.p(3),.n(1));
+endmodule // main
+
+main #() m (.1(0),.2(1),.3(2),.4(4));
+>>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*) 
+main.v: resistor from device_dispatcher
+main.v: 1 candidate found for resistor
+main.R1: myv from top level
+main.R1: 1 candidate found for myv
+print dc v(nodes) i(m.v) y(m.*) y(m.R1.*) 
+                                  ^ ? no match
+>>>>>dc 
+#           v(1)       v(2)       v(4)       i(m.v)     y(m.v)     y(m.R1)   
+ 0.         0.         0.99999    0.         0.99999    1.         0.        

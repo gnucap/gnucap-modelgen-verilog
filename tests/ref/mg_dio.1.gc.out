@@ -1,3 +1,7 @@
+abs: already installed, replacing
+stashing as abs:0
+exp: already installed, replacing
+stashing as exp:0
 resistor #(.r(1)) dut (.p(3),.n(2));
 test_dio1 #() dut (.np(2),.nn(1));
 test_dio1 #() dut (.np(1),.nn(0));

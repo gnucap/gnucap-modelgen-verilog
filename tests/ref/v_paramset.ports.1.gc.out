@@ -1,0 +1,38 @@
+>>>>>verilog 
+>>>>>module myres(a b); 
+>>>>>paramset myres resistor; 
+>>>>>module myres(a b); 
+>>>>>module main(1,2,3,4); 
+>>>>>list 
+module myres (a,b);
+  resistor #(.r(0)) r (a,b);
+endmodule // myres
+
+paramset myres resistor;
+ .r=1;
+endparamset
+
+module myres (a,b);
+  resistor #(.r(0)) r (a,b);
+endmodule // myres
+
+module main (1,2,3,4);
+  vsource #(1.) v (3,1);
+  myres #() R1 (.p(1),.n(3));
+endmodule // main
+
+main #() m (.1(0),.2(1),.3(2),.4(4));
+>>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*) 
+main.v: vsource from device_dispatcher
+main.v: 1 candidate found for vsource
+main.R1: myres from top level
+main.R1 discarded: no match: p
+main.R1: myres from top level
+main.R1: myres from top level
+main.R1 discarded: no match: p
+main.R1: 1 candidate found for myres
+print dc v(nodes) i(m.v) y(m.*) y(m.R1.*) 
+                                  ^ ? no match
+>>>>>dc 
+#           v(1)       v(2)       v(4)       i(m.v)     y(m.v)     y(m.R1)   
+ 0.         0.         0.99999    0.        -0.99999    0.         1.        

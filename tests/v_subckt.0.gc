@@ -1,0 +1,14 @@
+verilog
+
+module m( a b c);
+parameter w=1
+vsource #(.dc(v)) v1(a b);
+vsource #(.dc(w)) v1(c a);
+endmodule
+
+m #(.v(1), .w(2)) mm(.a(0), .b(1), .c(2));
+
+list
+print op v nodes
+op
+end

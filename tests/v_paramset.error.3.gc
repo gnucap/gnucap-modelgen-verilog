@@ -1,0 +1,18 @@
+verilog
+
+paramset vs vsource
+.dc=voltage
+endparamset
+
+module main(1,2);
+vs #() v1(1 2)
+endmodule
+
+main m1(0 1)
+
+print dc v(nodes)
+
+parameter voltage=1
+dc
+parameter voltage=2
+dc

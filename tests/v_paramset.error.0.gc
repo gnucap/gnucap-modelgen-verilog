@@ -1,0 +1,30 @@
+
+options trace
+verilog
+
+paramset res resistor;
+  parameter R from (1:2];
+ .r=R+1k;
+endparamset
+
+paramset res resistor;
+  parameter R=.5 from (0:1];
+ .r=R;
+endparamset
+
+paramset res resistor;
+  parameter R from [100:200];
+ .r=R+1k;
+endparamset
+
+module main(1,2,3,4);
+vsource #(1.) v(3,1);
+res #(.R(201)) R1(3,1);
+endmodule
+
+main m(0,1,2,4);
+
+list
+
+print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
+dc

@@ -1,0 +1,41 @@
+
+options trace
+verilog
+
+module main(1,2,3,4);
+parameter v=0
+C #(.PC(1.)) v1(2,1);
+B #(.PB(2.)) v2(3,1);
+A #(.PA(v)) v3(4,1);
+endmodule
+
+main #(.v(v)) m0(0,1,2,3);
+
+paramset A B;
+  parameter PA;
+ .PB=PA;
+endparamset
+
+paramset B C;
+  parameter PB;
+ .PC=PB;
+endparamset
+
+paramset C D;
+  parameter PC;
+ .PD=PC;
+endparamset
+
+paramset D vsource;
+  parameter PD;
+ .dc=PD;
+endparamset
+
+param v=0
+list
+
+print dc v(nodes) v(m0.*) y(m0.v*.*)
+param v=1
+dc
+param v=2
+dc

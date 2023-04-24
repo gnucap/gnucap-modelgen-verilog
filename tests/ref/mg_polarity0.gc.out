@@ -1,3 +1,7 @@
+abs: already installed, replacing
+stashing as abs:0
+exp: already installed, replacing
+stashing as exp:0
 vsource #(.dc(v)) v1 (.p(1),.n(0));
 polarity0 #() dut (.np(1),.nn(0));
 vsource #(.dc(v)) v2 (.p(2),.n(0));

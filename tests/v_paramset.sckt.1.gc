@@ -1,0 +1,40 @@
+
+verilog
+options trace
+
+module tln0(a, b);
+  parameter RR;
+  resistor #(.r(RR+1e-99)) r(a b);
+endmodule
+
+module tln1(a, b);
+  parameter R;
+  resistor #(.r(2*R+1e-99)) rrrr(a b);
+  // tln0 #(.RR(R+1e-99) ) t(a, b);
+  tln0 #(.RR(2*R+1e-99) ) tttt(a, b);
+endmodule
+
+paramset tln tln1
+  parameter r;
+ .R = r;
+endparamset
+
+module main(1 2);
+  parameter r0=2
+  tln #( .r(r0)) t1(1, 2);
+endmodule
+
+main #() m(1 2);
+
+spice
+.options noinsensitive
+
+V1 1 0 1
+R1 2 0 1
+
+.print dc v(nodes) y(m.t1.tttt.r) y(m.t1.rrrr)
+
+.dc
+.dc
+.status notime
+.end

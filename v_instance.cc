@@ -603,10 +603,11 @@ void INSTANCE::precalc_first()
 {
   assert(common());
   trace3("INSTANCE::precalc_first", long_label(), _parent, common()->modelname());
+  trace1("INSTANCE::precalc_first", _sim->is_first_expand());
 
   if(!owner()){ untested();
     build_proto();
-    _parent=_proto;
+    _parent = _proto; // common->proto?
   }else if(_cloned_from){
     _cloned_from->build_proto();
   }else{ untested();
@@ -621,6 +622,14 @@ void INSTANCE::precalc_first()
 
   assert(!is_constant()); /* because I have more work to do */
 }
+/*--------------------------------------------------------------------------*/
+#if 0
+void INSTANCE::cleanup_proto() const
+{
+  delete _proto;
+  _proto = NULL;
+}
+#endif
 /*--------------------------------------------------------------------------*/
 void INSTANCE::build_proto() const
 {

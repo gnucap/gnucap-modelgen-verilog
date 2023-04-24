@@ -1,0 +1,30 @@
+>>>>>paramset bob resistor; 
+>>>>>paramset zap bob; 
+>>>>>module main(1,2,3,4) 
+>>>>>list 
+paramset bob resistor;
+ .r=10k;
+endparamset
+
+paramset zap bob;
+
+endparamset
+
+module main (1,2,3,4);
+  bob #() r1 (1,2);
+  zap #() r2 (2,0);
+  vsource #(1) v1 (1,0);
+endmodule // main
+
+main #() m (.1(1),.2(2),.3(3),.4(4));
+>>>>>print op v(nodes) 
+main.r1: bob from top level
+main.r1: 1 candidate found for bob
+main.r2: zap from top level
+main.r2: 1 candidate found for zap
+main.v1: vsource from device_dispatcher
+main.v1: 1 candidate found for vsource
+>>>>>op 
+#           v(1)       v(2)       v(3)       v(4)      
+ 27.        1.         0.5        0.         0.        
+>>>>>end 

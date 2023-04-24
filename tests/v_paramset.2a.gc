@@ -1,0 +1,13 @@
+verilog
+
+paramset vs vsource; parameter dc; .dc=dc; endparamset;
+
+module main(1,2);
+vs #(.dc(1)) v1(1 2)
+endmodule
+
+main #() m1(0 1)
+
+list
+print dc v(nodes) v(m1.v1) v(m1.v1.*)
+dc

@@ -1,0 +1,27 @@
+>>>>>module ports(a, b, c) 
+>>>>>module ports(a, b) 
+>>>>>module main(1 2); 
+>>>>>print dc v(nodes) 
+main.p: ports from top level
+main.p discarded: not enough nodes, have 2 need 3
+
+main.p: ports from top level
+main.p: 1 candidate found for ports
+main.p: ports from top level
+main.p: ports from top level
+main.p discarded: too many: requested=3 max=2
+main.p: 1 candidate found for ports
+ports.c: vsource from device_dispatcher
+ports.c: 1 candidate found for vsource
+ports.c: vsource from device_dispatcher
+ports.c: 1 candidate found for vsource
+>>>>>dc 
+#           v(1)       v(2)      
+ 0.         2.         3.        
+>>>>>status notime 
+Gnucap   System status
+iterations: op=0, dc=2, tran=0, fourier=0, total=2
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=50.0%, ac density=50.0%
+>>>>>end 

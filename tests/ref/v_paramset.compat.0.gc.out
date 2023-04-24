@@ -1,0 +1,48 @@
+>>>>>paramset ddd diode/d 
+ddd: diode/d: spice compat mode
+>>>>>parameter area; 
+>>>>>module main(1 2) 
+>>>>>parameter a; 
+>>>>>parameter a=1 
+>>>>>list 
+found 1 models for ddd
+paramset ddd diode/d;
+  parameter area;
+ .area=area;
+endparamset
+
+module main (1,2);
+resistor #(100.k) r (1,2);
+ddd #(.area(a)) d (2,0);
+endmodule // main
+
+main #(.a(a)) m (.1(1),.2(2));
+>>>>>spice 
+>>>>>.print dc v(nodes) 
+main.r: resistor from device_dispatcher
+main.r: 1 candidate found for resistor
+main.d: ddd from top level
+main.d: 1 candidate found for ddd
+>>>>>.dc V1 0 10 2 
+#           v(1)       v(2)      
+ 0.         0.         0.        
+ 2.         2.         0.54568   
+ 4.         4.         0.56789   
+new max = 6, new limit = 6.5
+ 6.         6.         0.5797    
+new max = 8, new limit = 8.5
+ 8.         8.         0.5878    
+new max = 10, new limit = 10.5
+ 10.        10.        0.59396   
+>>>>>.parameter a=10 
+>>>>>.dc V1 0 10 2 
+#           v(1)       v(2)      
+ 0.         0.         0.        
+ 2.         2.         0.48714   
+ 4.         4.         0.50877   
+new max = 6, new limit = 6.5
+ 6.         6.         0.52043   
+new max = 8, new limit = 8.5
+ 8.         8.         0.52845   
+new max = 10, new limit = 10.5
+ 10.        10.        0.53457   

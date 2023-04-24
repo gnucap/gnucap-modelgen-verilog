@@ -22,13 +22,15 @@ CXX = g++
 %: %.o
 	${CXX} -g -rdynamic $< ../bd/lib/.libs/libgnucap.so -o $@
 
-check: check_mg check_dump check_test
+check: check_mg check_dump check_test check_v
 check_mg:
 	+GNUCAP=${GNUCAP} ./test ${GNUCAP_VERILOG} "mg" ${TARGETDIR} ${REFDIR}
 check_dump:
 	+GNUCAP=${GNUCAP} ./test ${GNUCAP_VERILOG} "dump" ${TARGETDIR} ${REFDIR}
 check_test:
 	+GNUCAP=${GNUCAP} ./test ${GNUCAP_VERILOG} "test" ${TARGETDIR} ${REFDIR}
+check_v:
+	+GNUCAP=${GNUCAP} ./test ${GNUCAP_VERILOG} "v" ${TARGETDIR} ${REFDIR}
 
 clean:
 	rm -rf *.o *.cc *.so *.out *~
@@ -36,4 +38,4 @@ clean:
 %.cc: %.vams
 	${GNUCAP_VERILOG} -I .. --cc $< > $@
 
-.PHONY: check check_mg check_dump check_test clean
+.PHONY: check check_mg check_dump check_test check_v clean

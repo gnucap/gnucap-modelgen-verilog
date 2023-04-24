@@ -1,0 +1,68 @@
+
+verilog
+
+module tln0(a, b);
+  parameter r
+  parameter c
+  parameter l
+  resistor #(.r(r)) r(a i);
+  inductor #(.l(l)) l(i, b);
+  capacitor #(.c(c)) c(b, 0);
+endmodule
+
+module tln1(a, b);
+  parameter length
+  parameter r;
+  parameter c;
+  parameter l;
+  resistor #(.r(r)) r(a i);
+  inductor #(.l(l)) l(i, j);
+  capacitor #(.c(c)) c(j, 0);
+  tln #(.length(length - 1) .l(l) .c(c) .r(r)) t(j, b);
+endmodule
+
+paramset tln tln1
+  parameter length from [2:999];
+  parameter r;
+  parameter l;
+  parameter c;
+ .length = length;
+ .r = r;
+ .l = l;
+ .c = c;
+endparamset
+
+paramset tln tln0
+  parameter length from [1:1];
+  parameter l;
+  parameter r;
+  parameter c;
+ .r = r;
+ .l = l;
+ .c = c;
+endparamset
+
+module main(1 2);
+parameter len=10
+parameter r0=1
+parameter c0=1
+parameter l0=.1
+  tln #(.length(len) .c(c0/len) .r(r0/len) .l(l0/len)) t1(1, 2);
+endmodule
+
+main #(.len(5)) m(1 2);
+main #(.len(10)) m(1 3);
+
+spice
+.options noinsensitive
+
+V1 1 0 sin amplitude=1 frequency=1 ac 1
+R1 2 0 1
+R1 3 0 1
+
+.print tran v(nodes)
+.tran 1 basic
+.print ac vm(nodes)
+.ac .001 100 * 10
+.status notime
+.end

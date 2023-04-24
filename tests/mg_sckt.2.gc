@@ -1,7 +1,6 @@
 
 attach ../modelgen_0.so
 attach ../d_vasrc.so
-attach ../v_instance.so
 
 spice
 .subckt vsin p n

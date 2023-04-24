@@ -36,7 +36,7 @@ else
     do
 	echo $ii
 	echo $ii >>$3/$2.diffs
-	gnucap $ii |tail -n +16 |grep -v ^make >$3/$ii.out
+	gnucap -a ../lang_verilog.so $ii |tail -n +28 |grep -v ^make >$3/$ii.out
 	diff -u $4/$ii.out $3/$ii.out >>$3/$2.diffs || echo "**** $ii fails ****"
     done
     echo done with $1 $2 >>$3/$2.diffs

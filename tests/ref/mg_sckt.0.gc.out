@@ -1,3 +1,7 @@
+abs: already installed, replacing
+stashing as abs:0
+exp: already installed, replacing
+stashing as exp:0
 >>>>>`modelgen 
 >>>>>!make test_net0.so > /dev/null 
 >>>>>attach ./test_net0.so 
@@ -6,6 +10,9 @@
 >>>>>parameter c=1 
 >>>>>parameter v=0 
 >>>>>list 
+parameter r=1 
+parameter c=1 
+parameter v=0 
 test_net0 #(.r(r)) dut (.a(1),.b(2));
 vsource #(.dc(v)) v1 (.p(1),.n(0));
 >>>>>print dc v(nodes) v(dut) v(dut.r1) y(dut.r1) v1(dut.r1) v2(dut.r1) 

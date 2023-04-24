@@ -1,0 +1,51 @@
+>>>>>module tln0(a, b); 
+>>>>>parameter RR; 
+>>>>>module tln1(a, b); 
+>>>>>parameter length 
+>>>>>parameter t1=0; 
+>>>>>parameter R; 
+>>>>>paramset tln tln1 
+>>>>>parameter length from [2:99]; 
+>>>>>parameter r=0; 
+>>>>>paramset tln tln0 
+>>>>>parameter length from [1:1]; 
+>>>>>parameter r=0; 
+>>>>>module main(1 2); 
+>>>>>parameter L=5 
+>>>>>spice 
+>>>>>.options noinsensitive 
+>>>>>.print dc v(nodes) y(m.t1.r) y(m.t1.t.r) 
+main.t1: tln from top level
+main.t1: tln from top level
+main.t1: 2 candidates found for tln
+m.t1 dropped invalid candidate.
+tln1.r: resistor from device_dispatcher
+tln1.r: 1 candidate found for resistor
+tln1.t: tln from top level
+tln1.t: tln from top level
+tln1.t: 2 candidates found for tln
+m.t1._.t dropped invalid candidate.
+m.t1._.t._.t dropped invalid candidate.
+m.t1._.t._.t._.t dropped invalid candidate.
+m.t1._.t._.t._.t._.t dropped invalid candidate.
+tln0.r: resistor from device_dispatcher
+tln0.r: 1 candidate found for resistor
+>>>>>.dc 
+#           v(1)       v(2)       y(m.t1.r)  y(m.t1.t.r)
+ 0.         4.         2.         5.         5.        
+>>>>>.dc V1 0 5 1 
+#           v(1)       v(2)       y(m.t1.r)  y(m.t1.t.r)
+ 0.         0.         0.         5.         5.        
+ 1.         1.         0.5        5.         5.        
+ 2.         2.         1.         5.         5.        
+ 3.         3.         1.5        5.         5.        
+ 4.         4.         2.         5.         5.        
+new max = 5, new limit = 5.5
+ 5.         5.         2.5        5.         5.        
+>>>>>.status notime 
+Gnucap   System status
+iterations: op=0, dc=23, tran=0, fourier=0, total=27
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=4, model=0, total=6
+dctran density=66.7%, ac density=66.7%
+>>>>>.end 

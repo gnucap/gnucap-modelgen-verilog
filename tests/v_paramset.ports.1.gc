@@ -1,0 +1,27 @@
+
+options trace
+verilog
+
+module myres(a b);
+ resistor #(.r(0)) r(a b);
+endmodule
+
+paramset myres resistor;
+ .r=1;
+endparamset
+
+module myres(a b);
+ resistor #(.r(0)) r(a b);
+endmodule
+
+module main(1,2,3,4);
+vsource #(1.) v(3,1);
+myres #() R1(.p(1), .n(3));
+endmodule
+
+main #() m(0,1,2,4);
+
+list
+
+print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
+dc

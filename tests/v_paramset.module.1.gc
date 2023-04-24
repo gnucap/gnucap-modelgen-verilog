@@ -1,0 +1,26 @@
+
+verilog
+
+options trace
+
+module ports(a, b, c)
+  vsource #(.dc(3)) c(a, b);
+endmodule
+module ports(a, b)
+  vsource #(.dc(2)) c(a, b);
+endmodule
+module ports(a, B)
+  vsource #(.dc(4)) c(a, b);
+endmodule
+
+module main(1 2);
+  ports p (.a(1) .b(0));
+  ports p (.a(2) .b(0) .c(0));
+endmodule
+
+main #() m(1 2);
+
+print dc v(nodes)
+dc
+status notime
+end

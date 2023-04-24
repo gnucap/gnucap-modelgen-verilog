@@ -1,0 +1,38 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+`modelgen
+module test_short0(p, n);
+electrical p, n;
+analog begin
+	real current;
+	current = I(p,n);
+end
+endmodule
+
+`modelgen
+module test_short1(p, n);
+electrical p, n;
+analog begin
+	V(p,n) <+ 0;
+end
+endmodule
+
+!make test_short0.so test_short1.so > /dev/null
+
+attach ./test_short0.so
+attach ./test_short1.so
+
+verilog
+
+test_short0 d0(1, 0);
+test_short1 d1(2, 0);
+resistor #(.r(1)) r0(3, 1);
+resistor #(.r(1)) r1(3, 2);
+vsource #(.dc(1)) v1(3, 0);
+
+list
+
+print dc v(nodes) i(r*) i(d*.*)
+dc v1 0 2 .5

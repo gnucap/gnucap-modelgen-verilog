@@ -1,0 +1,14 @@
+paramset vs vsource;
+  parameter voltage 
+ .dc=voltage;
+endparamset
+
+module main (1,2);
+  parameter v 
+  vs #(.voltage(v)) v1 (1,2);
+endmodule // main
+
+main #(.v(1)) m1 (.1(0),.2(1));
+main #(.v(2)) m2 (.1(0),.2(2));
+#           v(1)       v(2)      
+ 0.        -1.        -2.        

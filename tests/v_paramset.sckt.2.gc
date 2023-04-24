@@ -1,0 +1,24 @@
+
+simulator lang=verilog
+options trace
+
+module modwrong(A b)
+endmodule
+
+module mod(a b)
+endmodule
+
+paramset bob mod;
+endparamset;
+
+paramset bob modwrong;
+endparamset;
+
+module main(1,2,3,4)
+  bob b1 (.a(1) .b(2));
+endmodule
+
+main m(1,2,3,0);
+
+list
+op

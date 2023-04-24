@@ -1,3 +1,7 @@
+abs: already installed, replacing
+stashing as abs:0
+exp: already installed, replacing
+stashing as exp:0
 portnames0 #() dut (.np(0),.nn(1));
 resistor #(.r(1)) r1 (.p(1),.n(0));
 portnames0 #() dut (.np(2),.nn(0));

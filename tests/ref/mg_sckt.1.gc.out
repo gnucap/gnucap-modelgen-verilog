@@ -1,17 +1,28 @@
+abs: already installed, replacing
+stashing as abs:0
+exp: already installed, replacing
+stashing as exp:0
 module vsin (p,n);
-vsource #(sin.offset(NA( 0.)), .amplitude(amplitude), .frequency( 1.), .delay(NA( 0.)), .damping(NA( 0.))  DC dc) V1 (.p(p),.n(n));
+  .parameter amplitude 
+  .parameter dc 
+  vsource #(sin.offset(NA( 0.)), .amplitude(amplitude), .frequency( 1.), .delay(NA( 0.)), .damping(NA( 0.))  DC dc) V1 (.p(p),.n(n));
 endmodule // vsin
 
 module net1 (a,b,gnd);
-resistor #(.r(r)) r1 (.p(a),.n(1));
-resistor #(.r(2*r)) r2 (.p(1),.n(2));
-resistor #(.r(r)) r3 (.p(2),.n(b));
-capacitor #(.c(c)) ca (.p(a),.n(gnd));
-capacitor #(.c(2*c)) cb (.p(b),.n(gnd));
-capacitor #(.c(c)) c1 (.p(1),.n(gnd));
-capacitor #(.c(c)) c2 (.p(2),.n(gnd));
+  parameter r = 1.; 
+  parameter c = 1.; 
+  resistor #(.r(r)) r1 (a,1);
+  resistor #(.r(2*r)) r2 (1,2);
+  resistor #(.r(r)) r3 (2,b);
+  capacitor #(.c(c)) ca (a,gnd);
+  capacitor #(.c(2*c)) cb (b,gnd);
+  capacitor #(.c(c)) c1 (1,gnd);
+  capacitor #(.c(c)) c2 (2,gnd);
 endmodule // net1
 
+parameter r = 10 
+parameter c = 1m 
+parameter v = 1 
 test_net1 #(.r(r),.c(c)) dut (.a(1),.b(2),.gnd(0));
 net1 #(.c(c),.r(r)) dut (.a(1),.b(3),.gnd(0));
 vsin #(.amplitude(v),.dc(v)) v1 (.p(1),.n(0));

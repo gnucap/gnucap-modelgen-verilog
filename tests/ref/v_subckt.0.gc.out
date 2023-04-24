@@ -1,0 +1,13 @@
+m #(.v(1), .w(2)) mm(.a(0), .b(1), .c(2)); 
+     ^ ? m: bad parameter v ignored
+module m (a,b,c);
+  parameter w=1 
+  vsource #(.dc(v)) v1 (a,b);
+  vsource #(.dc(w)) v1 (c,a);
+endmodule // m
+
+m #(.w(2)) mm (.a(0),.b(1),.c(2));
+parameter v not specified, using default
+#           v(1)       v(2)      
+parameter v not specified, using default
+ 27.        0.         2.        

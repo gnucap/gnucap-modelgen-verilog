@@ -1,0 +1,32 @@
+>>>>>module modwrong(A b) 
+>>>>>module mod(a b) 
+>>>>>paramset bob mod; 
+>>>>>paramset bob modwrong; 
+>>>>>module main(1,2,3,4) 
+>>>>>list 
+module modwrong (A,b);
+endmodule // modwrong
+
+module mod (a,b);
+endmodule // mod
+
+paramset bob mod;
+
+endparamset
+
+paramset bob modwrong;
+
+endparamset
+
+module main (1,2,3,4);
+  bob #() b1 (.a(1),.b(2));
+endmodule // main
+
+main #() m (.1(1),.2(2),.3(3),.4(0));
+>>>>>op 
+main.b1: bob from top level
+main.b1: bob from top level
+main.b1 discarded: no match: a
+main.b1: 1 candidate found for bob
+#          
+ 27.       

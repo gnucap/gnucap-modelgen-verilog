@@ -3,7 +3,23 @@
 include Make1
 LIBS = -lgnucap
 LDFLAGS = -L/usr/local/lib # ask gnucap-conf?
-MODULES = modelgen_0.so d_vasrc.so v_instance.so
+MODULES = \
+  modelgen_0.so \
+  d_vasrc.so \
+  lang_verilog.so
+
+# stuff them all into on plugin, for now.
+LANG_OBJS = \
+	c_param.o \
+	lang_verilog.o \
+	v_instance.o \
+	v_paramset.o \
+	v_module.o
+
+CLEAN_OBJS = \
+	${LANG_OBJS} \
+	d_vaflow.o \
+	d_vapot.o
 
 CXXFLAGS = -Wall -std=c++11
 
@@ -19,7 +35,7 @@ check: all
 	${MAKE} -C tests check
 
 clean:
-	rm -rf *.o ${TARGET} ${MODULES}
+	rm -rf *.o ${TARGET} ${MODULES} ${OBJS} ${CLEAN_OBJS}
 	make -C tests clean
 
 $(TARGET): $(OBJS)
@@ -31,7 +47,8 @@ include Make.depend
 modelgen_0.o: $(OBJS)
 d_vasrc.so: d_vaflow.o d_vapot.o
 	g++ -shared ${CXXFLAGS} -I../include $+ ${LIBS_} -o $@
-v_instance.so: v_instance.o
+
+lang_verilog.so: ${LANG_OBJS}
 	g++ -shared ${CXXFLAGS} -I../include $+ ${LIBS_} -o $@
 
 depend: Make.depend

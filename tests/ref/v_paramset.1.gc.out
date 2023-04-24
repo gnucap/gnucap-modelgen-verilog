@@ -1,0 +1,4 @@
+print dc v(nodes) v(m1.v1) v(m1.v1.*) 
+                             ^ ? no match
+#           v(1)       v(m1.v1)  
+ 0.        -1.         1.        

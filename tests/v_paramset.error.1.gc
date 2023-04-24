@@ -1,0 +1,20 @@
+
+options trace
+verilog
+
+paramset res nonexistant;
+  parameter R
+ .r=R+1k;
+endparamset
+
+module main(1,2,3,4);
+vsource #(1.) v(3,1);
+res #(.R(201)) R1(3,1);
+endmodule
+
+main m(0,1,2,4);
+
+list
+
+print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
+dc

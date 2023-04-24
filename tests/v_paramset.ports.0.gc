@@ -1,0 +1,19 @@
+
+options trace
+verilog
+
+paramset myv vsource;
+ .dc=1;
+endparamset
+
+module main(1,2,3,4);
+resistor #(1.) v(3,1);
+myv #() R1(.p(3), .n(1));
+endmodule
+
+main #() m(0,1,2,4);
+
+list
+
+print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
+dc
