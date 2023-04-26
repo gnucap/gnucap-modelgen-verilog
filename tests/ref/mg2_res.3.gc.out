@@ -1,0 +1,13 @@
+abs: already installed, replacing
+stashing as abs:0
+exp: already installed, replacing
+stashing as exp:0
+parameter v=0 
+test_res3_0 #(.r(.69314718055994530941)) dut (.np(1),.nn(0));
+vsource #(.dc(v)) v1 (.p(1),.n(0));
+#           i(dut)    
+ 0.         0.        
+ 0.25       0.125     
+ 0.5        0.25      
+ 0.75       0.375     
+ 1.         0.5       

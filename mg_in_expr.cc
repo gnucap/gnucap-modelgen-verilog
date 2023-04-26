@@ -141,13 +141,11 @@ Token_PROBE* resolve_xs_function(Expression& E, std::string const& n, Deps const
 void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* deps)
 {
   trace0("resolve symbols ===========");
-//  assert(owner());
   std::stack<Deps*> depstack;
-  if(deps){
-    depstack.push(deps);
+  if(!deps){
+    depstack.push(new Deps);
   }else{
-    // constant expression. BUG: may crash.
-    incomplete();
+    depstack.push(deps);
   }
 
   for(List_Base<Token>::const_iterator ii = e.begin(); ii!=e.end(); ++ii) {
@@ -225,21 +223,27 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
       delete(td);
     }else if(scope->node(t->name())) {
       trace1("unresolved node", t->name());
-      incomplete();
+      // incomplete();
       E.push_back(t->clone()); // try later?
     }else if(scope->branch(t->name())) {
       trace1("unresolved branch", t->name());
-      incomplete();
+      // incomplete();
       E.push_back(t->clone()); // try later?
     }else{
       throw Exception("unresolved symbol: " + n);
     }
   }
   trace1("depstack", depstack.size());
+
+  assert(depstack.size()==1);
   if(deps){
-    assert(depstack.size()==1);
   }else{
-    // incomplete();
+    if(depstack.top()->empty()) {
+      delete depstack.top();
+    }else{ untested();
+      delete depstack.top();
+      throw Exception("need constant expression\n");
+    }
   }
 }
 /*--------------------------------------------------------------------------*/

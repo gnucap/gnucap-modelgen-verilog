@@ -226,11 +226,11 @@ static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 	  cmd.warn(bDANGER, here, "mismatch, ignored");
 	}
       }
-      for (int iii = 0;  iii < x->min_nodes();  ++iii) { untested();
+      for (int iii = 0;  iii < x->min_nodes();  ++iii) {
 	if (!(x->node_is_connected(iii))) {untested();
 	  cmd.warn(bDANGER, x->port_name(iii) + ": port unconnected, grounding");
 	  x->set_port_to_ground(iii);
-	}else{ untested();
+	}else{
 	}
       }
     }
@@ -640,7 +640,7 @@ void LANG_VERILOG::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
 }
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_command(OMSTREAM& o, const DEV_DOT* x)
-{untested();
+{
   assert(x);
   o << x->s() << '\n';
 }

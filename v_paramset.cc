@@ -470,7 +470,7 @@ void resolve_copy(CARD_LIST* t, PARAM_LIST const& p, const CARD_LIST*)
       out.set(i->first, s.str());
       trace2("resolve copy1", i->first, s.str());
 
-    }else{ untested();
+    }else{
     }
   }
 }

@@ -616,7 +616,6 @@ void Branch_Ref::parse(CS& f)
   assert(!b._br);
   b = owner()->new_branch(pp, pn);
 
-//  assert(b->has(&b));
   assert(b._br);
 
   *this = b;
@@ -625,7 +624,7 @@ void Branch_Ref::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 void Branch_Ref::dump(std::ostream& o)const
 {
-  incomplete();
+  // incomplete();
   o << "(" << pname() << ", " << nname() << ")";
 }
 /*--------------------------------------------------------------------------*/
