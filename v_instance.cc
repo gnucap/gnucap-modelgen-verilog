@@ -28,6 +28,8 @@
 #include <gnucap/e_subckt.h>
 #include <gnucap/io_trace.h>
 #include <gnucap/e_model.h>
+#include <gnucap/c_comand.h>
+#include <set>
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
@@ -39,12 +41,12 @@ static void grow_nodes(size_t Index, node_t*& n, size_t& capacity, size_t capaci
   if(Index < capacity){
   }else{
     size_t new_capacity = std::max(capacity, capacity_floor);
-    while(new_capacity <= Index) { untested();
+    while(new_capacity <= Index) {
       assert(new_capacity < new_capacity * 2);
       new_capacity *= 2;
     }
     node_t* new_nodes = new node_t[new_capacity];
-    for(size_t i=0; i<capacity; ++i){ untested();
+    for(size_t i=0; i<capacity; ++i){
       new_nodes[i] = n[i];
     }
     delete[] n;
@@ -53,12 +55,18 @@ static void grow_nodes(size_t Index, node_t*& n, size_t& capacity, size_t capaci
   }
 }
 /*--------------------------------------------------------------------------*/
-static COMMON_PARAMLIST Default_SUBCKT(CC_STATIC);
+class DEV_INSTANCE_PROTO;
+class COMMON_INSTANCE : public COMMON_PARAMLIST {
+public:
+  COMMON_INSTANCE(int x) : COMMON_PARAMLIST(x) {}
+public:
+  DEV_INSTANCE_PROTO* _proto{NULL};
+};
+static COMMON_INSTANCE Default_SUBCKT(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 // looks like INSTANCE from d_subckt.cc, but isnt.
 // this one is never part of a simulation, because of deflation.
 // TODO: cleanup/rename?
-class DEV_INSTANCE_PROTO;
 class INSTANCE : public BASE_SUBCKT {
   friend class DEV_INSTANCE_PROTO; // has to do with _parent.
 protected: // HACK
@@ -75,10 +83,7 @@ protected:
   explicit	INSTANCE(const INSTANCE&);
 public:
   explicit	INSTANCE();
-		~INSTANCE()		{
-		  --_count;
-		  delete (CARD*)_proto;
-		}
+		~INSTANCE();
   CARD*		clone()const		{
     INSTANCE* new_instance = new INSTANCE(*this);
 
@@ -125,7 +130,7 @@ private:
   }
   double	tr_probe_num(const std::string&)const {unreachable(); return 0.;}
   int param_count_dont_print()const {return 0;}
-  int param_count() const override { untested();
+  int param_count() const override {
     return int(_params.size());
   }
 private: // overrides
@@ -141,7 +146,7 @@ private: // overrides
     COMPONENT::set_parameters(Label, Parent, Common, Value, state_count, state,
 	node_count, nodes);
   }
-  bool param_is_printable(int)const override { untested();
+  bool param_is_printable(int)const override {
     return true;
   }
   void set_param_by_name(std::string name, std::string value) override {
@@ -151,19 +156,19 @@ private: // overrides
   std::string param_name(int i, int) const override { untested();
     return param_name(i, 0);
   }
-  std::string param_name(int i) const override { untested();
+  std::string param_name(int i) const override {
     assert(i<int(_params.size()));
     return _params[i].first;
   }
-  std::string param_value(int i) const override { untested();
+  std::string param_value(int i) const override {
     assert(i<int(_params.size()));
     return _params[i].second;
   }
-  void set_param_by_index(int i, std::string& value, int) override { untested();
+  void set_param_by_index(int i, std::string& value, int) override {
     int idx = i+1;
 
     // TODO: use common.
-    if(int(_params.size()) == idx){ untested();
+    if(int(_params.size()) == idx){
       _params.push_back(std::make_pair("", value));
     }else{ untested();
       throw Exception(long_label() + ": param assign out of order");
@@ -185,6 +190,10 @@ DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "instance|device_stub", &p1);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class DEV_INSTANCE_PROTO : public INSTANCE {
+  static std::set<DEV_INSTANCE_PROTO*> & protos(){
+    static std::set<DEV_INSTANCE_PROTO*> p;
+    return p;
+  }
   explicit	DEV_INSTANCE_PROTO(const DEV_INSTANCE_PROTO&p)
    : INSTANCE(p) { untested();
      new_subckt();
@@ -192,8 +201,11 @@ class DEV_INSTANCE_PROTO : public INSTANCE {
 public:
   explicit	DEV_INSTANCE_PROTO() : INSTANCE() {
     new_subckt();
+    protos().insert(this);
   }
-		~DEV_INSTANCE_PROTO(){}
+  ~DEV_INSTANCE_PROTO(){
+    protos().erase(this);
+  }
 private:
   CARD* clone() const override;
   CARD* clone_instance()const override{ untested(); return clone();}
@@ -220,6 +232,7 @@ public:
     trace3("proto:spbn", long_label(), name, value);
   }
 
+  static void cleanup();
 
 }pp; // DEV_INSTANCE_PROTO
 DISPATCHER<CARD>::INSTALL dd(&device_dispatcher, "instance_proto", &pp);
@@ -237,7 +250,7 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
   COMPONENT* c = prechecked_cast<COMPONENT*>(cl);
   assert(c || !cl);
 
-  if(!cl){ untested();
+  if(!cl){
     return;
   }else if(!c->common()){
     c->set_dev_type(modelname);
@@ -271,7 +284,7 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
 	c->set_port_by_name(v, v);
       }
     }
-    if(Proto->net_nodes() < c->min_nodes()){ untested();
+    if(Proto->net_nodes() < c->min_nodes()){
       throw Exception("not enough nodes, have "
 	    + std::to_string(Proto->net_nodes()) + " need "
 	    + std::to_string(c->min_nodes()) +"\n");
@@ -283,7 +296,7 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
     for(int i=0; i<int(_params.size()); ++i){
       trace4("stub param fwd", c->long_label(), i, _params[i].first, _params[i].second);
       std::string value = _params[i].second;
-      if(_params[i].first == ""){ untested();
+      if(_params[i].first == ""){
 	int idx = c->param_count() - i - 1;
 	c->set_param_by_index(idx, value, 0);
       }else{
@@ -291,7 +304,7 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
       }
     }
     Proto->subckt()->push_front(c);
-  }catch(Exception const& e){ untested();
+  }catch(Exception const& e){
     // TODO: include proto name attribute
     error(bLOG, long_label() + " discarded: " + e.message() + "\n");
     delete (CARD*) c;
@@ -329,7 +342,7 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
     CARD_LIST const& toplevel = CARD_LIST::card_list;
 
     CARD_LIST::const_iterator i = toplevel.find_(modelname);
-    while(i != toplevel.end()) { untested();
+    while(i != toplevel.end()) {
       error(bLOG, long_label() + ": " + modelname + " from top level\n");
 
       prepare_overload(*i, modelname, Proto);
@@ -339,7 +352,7 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
     MODEL_CARD* m = model_dispatcher[modelname];
     std::string extended_name = modelname;
     int bin_count = 0;
-    while(m){ untested();
+    while(m){
       error(bLOG, long_label() + ": " + extended_name + " from model_dispatcher\n");
       prepare_overload(m, modelname, Proto);
       extended_name = modelname + ':' + to_string(bin_count++);
@@ -361,7 +374,7 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
   if(size_t s = Proto->subckt()->size()){
     error(bTRACE, long_label() + ": " + std::to_string(s) + " candidate" + (s>1?"s":"") +
 	" found for " +modelname+ "\n");
-  }else{ untested();
+  }else{
     error(bDANGER, long_label() + ": no candidates found for " +modelname+ "\n");
     // not in precalc
     // throw Exception(long_label() + ": no candiates found for " + modelname);
@@ -501,11 +514,17 @@ INSTANCE::INSTANCE(const INSTANCE& p)
   }
 }
 /*--------------------------------------------------------------------------*/
+INSTANCE::~INSTANCE()
+{
+  --_count;
+  delete _proto;
+}
+/*--------------------------------------------------------------------------*/
 std::string INSTANCE::port_name(int i)const
-{ untested();
-  if(size_t(i)<_port_names.size()){ untested();
+{
+  if(size_t(i)<_port_names.size()){
     return _port_names[i];
-  }else{ untested();
+  }else{
     return ""; // it has no name.
   }
 }
@@ -536,7 +555,7 @@ void INSTANCE::expand()
   trace2("expand I: renew", _parent->scope()->nodes(), _parent->scope()->nodes()->how_many());
   trace2("expand I: renew", _parent->scope()->size(), common()->has_model());
   trace2("expand I: renew", _parent->subckt()->size(), common()->has_model());
-  if(!_parent->scope()->size()){ untested();
+  if(!_parent->scope()->size()){
     std::string modelname = c->modelname();
     throw Exception(long_label() + ": no valid prototype found for " + modelname);
   }else {
@@ -562,7 +581,7 @@ void INSTANCE::expand()
     COMPONENT const* d = dynamic_cast<COMPONENT const*>(s);
     CARD_LIST::iterator j = i;
       ++i;
-    if(!d->is_valid()){ untested();
+    if(!d->is_valid()){
       error(bTRACE, long_label() + " dropped invalid candidate.\n");
       subckt()->erase(j);
     }else{
@@ -570,7 +589,7 @@ void INSTANCE::expand()
     }
   }
 
-  if(subckt()->size()==0){ untested();
+  if(subckt()->size()==0){
     // reachable?
     throw Exception(long_label() + ": no candidates " + dev_type());
   }else if(subckt()->size()==1){
@@ -589,7 +608,7 @@ void INSTANCE::expand()
     CARD* d = s->deflate();
 
     if(d == s){
-    }else{ untested();
+    }else{
       assert(d->owner() == owner());
       *i = d;
       delete s;
@@ -622,14 +641,6 @@ void INSTANCE::precalc_first()
 
   assert(!is_constant()); /* because I have more work to do */
 }
-/*--------------------------------------------------------------------------*/
-#if 0
-void INSTANCE::cleanup_proto() const
-{
-  delete _proto;
-  _proto = NULL;
-}
-#endif
 /*--------------------------------------------------------------------------*/
 void INSTANCE::build_proto() const
 {
@@ -706,6 +717,23 @@ void INSTANCE::set_port_by_name(std::string& name, std::string& ext_name)
 
   assert(scope()!=subckt());
 }
+/*--------------------------------------------------------------------------*/
+void DEV_INSTANCE_PROTO::cleanup()
+{
+  for(auto i : protos() ){
+    assert(i);
+    assert(i->subckt());
+    i->subckt()->erase_all();
+  }
+}
+/*--------------------------------------------------------------------------*/
+class CLEANUP : public CMD {
+  void do_it(CS& cmd, CARD_LIST*)override {
+    DEV_INSTANCE_PROTO::cleanup();
+    CMD::command("detach_all:0", &CARD_LIST::card_list);
+  }
+}p3;
+DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "detach_all", &p3);
 /*--------------------------------------------------------------------------*/
 } // namespace
 /*--------------------------------------------------------------------------*/

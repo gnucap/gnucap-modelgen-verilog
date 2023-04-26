@@ -238,9 +238,10 @@ static void make_module(std::ostream& o, const Module& m)
     o << ind << "ELEMENT* " << br.second->code_name() << "{NULL}; // branch\n";
   }
   o << "private: // construct\n";
-  o << ind << "explicit MOD_" << m.identifier() << "(MOD_" << m.identifier() << " const&);\n";
+  o__ "explicit MOD_" << m.identifier() << "(MOD_" << m.identifier() << " const&);\n";
   o << "public:\n";
-  o << ind << "explicit MOD_" << m.identifier() << "(); // : "<< base_name <<"() { _n = _nodes; }\n";
+  o__ "explicit MOD_" << m.identifier() << "(); // : "<< base_name <<"() { _n = _nodes; }\n";
+  // o__ "~MOD_" << m.identifier() << "(){ untested(); }\n";
   o__ "CARD* clone()const override;\n";
   o << "private: // overrides\n";
   if(m.element_list().size()){

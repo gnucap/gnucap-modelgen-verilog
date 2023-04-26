@@ -604,7 +604,6 @@ void List_Of_Branch_Identifiers::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void Branch_Ref::parse(CS& f)
 {
-  incomplete(); // aliases?
   f >> "(";
   std::string pp = f.ctos(",)");
   std::string pn = f.ctos(",)");
