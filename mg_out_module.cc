@@ -729,6 +729,15 @@ static void make_module_expand_one_element(std::ostream& o, const Element_2& e, 
   o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_node_ref(std::ostream& o, const Node& n)
+{
+  if(&n == &mg_ground_node){
+    o << "gnd";
+  }else{
+    o << "_n[" << n.code_name() << "]";
+  }
+}
+/*--------------------------------------------------------------------------*/
 static void make_module_expand_one_filter(std::ostream& o, const Filter& e)
 {
   make_tag();
@@ -739,10 +748,11 @@ static void make_module_expand_one_filter(std::ostream& o, const Filter& e)
     o______ e.code_name() << " = NULL;\n";
     o____ "}else{\n";
     o____ "}\n";
-    o__ "}else{\n";
+    o__ "}else";
   }else{
-    o__ "{\n";
+    o__ "";
   }
+  o << "{ // filter expand\n";
 
   // BUG: duplicate
   o__ "if (!" << e.branch_code_name() << ") {\n";
@@ -774,10 +784,12 @@ static void make_module_expand_one_filter(std::ostream& o, const Filter& e)
     }
     // o << "_n[0]"; // eek
     for(auto i : br->deps()){
-      o << ", _n[" << i->branch()->p()->code_name() << "]";
-      o << ", _n[" << i->branch()->n()->code_name() << "]";
-      //o << ",_n[n_" << i->branch()->p()->name() << "]";
-      //o << ",_n[n_" << i->branch()->n()->name() << "]";
+      o << ", ";
+      make_node_ref(o, *i->branch()->p());
+      o << ", ";
+      make_node_ref(o, *i->branch()->n());
+    //   o << ", _n[" << i->branch()->p()->code_name() << "]";
+    //   o << ", _n[" << i->branch()->n()->code_name() << "]";
     }
   }else{
   }

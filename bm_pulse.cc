@@ -199,39 +199,39 @@ TIME_PAIR EVAL_BM_PULSE::tr_review(COMPONENT* d)const
     double time_offset = raw_time - reltime;
     
       /* past delay 	*/
-    if (reltime < dtmin) { untested();
+    if (reltime < dtmin) {
       d->_time_by.min_event(time_offset + dtmin);
 
       /* rising 	*/
-    }else if (reltime < _rise - dtmin) { untested();
+    }else if (reltime < _rise - dtmin) {
       d->_time_by.min_event(_rise + time_offset - dtmin);
-    }else if (reltime < _rise) { untested();
+    }else if (reltime < _rise) {
        d->_time_by.min_event(_rise + time_offset);
-    }else if (reltime < _rise + dtmin) { untested();
+    }else if (reltime < _rise + dtmin) {
       d->_time_by.min_event(_rise + time_offset + dtmin);
 
       /* pulse val 	*/
 //    }else if (reltime < _rise + _width - dtmin) { untested();
 //      d->_time_by.min_event(_rise + _width + time_offset - dtmin);
-    }else if (reltime < _rise + _width) { untested();
+    }else if (reltime < _rise + _width) {
       d->_time_by.min_event(_rise + _width + time_offset);
-    }else if (reltime < _rise + _width + dtmin) { untested();
+    }else if (reltime < _rise + _width + dtmin) {
       d->_time_by.min_event(_rise + _width + time_offset + dtmin);
-    }else if (reltime < _rise + _width + 2*dtmin) { untested();
+    }else if (reltime < _rise + _width + 2*dtmin) {
       d->_time_by.min_event(_rise + _width + time_offset + 2*dtmin);
 
       /* falling 	*/
 //    }else if (reltime < _rise + _width + _fall - dtmin) { untested();
 //      d->_time_by.min_event(_rise + _width + _fall + time_offset - dtmin);
-    }else if (reltime < _rise + _width + _fall) { untested();
+    }else if (reltime < _rise + _width + _fall) {
       d->_time_by.min_event(_rise + _width + _fall + time_offset);
-    }else if (reltime < _rise + _width + _fall + dtmin) { untested();
+    }else if (reltime < _rise + _width + _fall + dtmin) {
       d->_time_by.min_event(_rise + _width + _fall + time_offset + dtmin);
-    }else if (reltime < _rise + _width + _fall + 2*dtmin) { untested();
+    }else if (reltime < _rise + _width + _fall + 2*dtmin) {
       d->_time_by.min_event(_rise + _width + _fall + time_offset + 2*dtmin);
 
       /* past pulse */
-    }else if (reltime < _period - dtmin) { untested();
+    }else if (reltime < _period - dtmin) {
       d->_time_by.min_event(_period + time_offset - dtmin);
     }else{ untested();
       d->_time_by.min_event(_period + time_offset);

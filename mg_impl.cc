@@ -360,6 +360,8 @@ size_t Filter::num_nodes() const
     if(i->is_reversed()){
 //    }else if(i->branch() == this){
       // self conductance
+    }else if(i->is_filter_probe()){
+      ++ret;
     }else if(i->is_pot_probe()){
       ++ret;
     }else{

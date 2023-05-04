@@ -52,6 +52,9 @@ d_vasrc.so: d_vaflow.o d_vapot.o d_va_filter.o
 lang_verilog.so: ${LANG_OBJS}
 	g++ -shared ${CXXFLAGS} -I../include $+ ${LIBS_} -o $@
 
+bm_pulse.so: bm_pulse.o
+	g++ -shared ${CXXFLAGS} -I../include $+ ${LIBS_} -o $@
+
 depend: Make.depend
 Make.depend: $(SRCS) $(HDRS)
 	$(CXX) -MM $(CXXFLAGS) $(SRCS) > Make.depend
