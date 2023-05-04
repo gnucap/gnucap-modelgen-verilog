@@ -25,14 +25,14 @@
 #include <stack>
 #include <gnucap/e_cardlist.h>
 /*--------------------------------------------------------------------------*/
-static Token* resolve_filter_function(Expression& E, std::string const& n, Deps const& cdeps, Block* o)
+static Token_FILTER* resolve_filter_function(Expression& E, std::string const& n, Deps const& cdeps, Block* o)
 {
   if(E.is_empty()) { untested();
     throw Exception("syntax error");
   }else if(!dynamic_cast<Token_PARLIST*>(E.back())) { untested();
     throw Exception("syntax error");
   }else{
-    assert(n=="ddt"); // incomplete.
+    assert(n=="ddt" || n=="idt"); // incomplete.
 		      //
     assert(!E.is_empty());
 
@@ -50,6 +50,8 @@ static Token* resolve_filter_function(Expression& E, std::string const& n, Deps 
 static bool is_filter_function(std::string const& n)
 {
   if (n == "ddt"){
+    return true;
+  }else if (n == "idt"){
     return true;
   }else{
     return false;
@@ -216,11 +218,14 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
     }else if(is_filter_function(n)) {
       assert(dynamic_cast<Token_PARLIST*>(E.back()));
       Deps* td = depstack.top();
-      E.push_back(resolve_filter_function(E, n, *td, scope));
+      Token_FILTER* t = resolve_filter_function(E, n, *td, scope);
+      E.push_back(t);
       depstack.pop();
       assert(!depstack.empty());
-      depstack.top()->update(*td);
+      // depstack.top()->update(*td);
       delete(td);
+      assert(t->output());
+      depstack.top()->insert(t->output());
     }else if(scope->node(t->name())) {
       trace1("unresolved node", t->name());
       // incomplete();

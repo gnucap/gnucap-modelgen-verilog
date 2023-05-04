@@ -346,7 +346,7 @@ static void make_eval_subdevice_parameters(std::ostream& o , const Element_2& e)
       indent x;
       make_cc_expression(o, p->default_val().expression());
     }
-    o____ "_netlist_params.set(\"["<< e.name_of_module_instance() <<"]"<< p->name() <<"\", t0);\n";
+    o____ "_netlist_params.set(\"["<< e.short_label() <<"]"<< p->name() <<"\", t0);\n";
     o__ "}\n";
   }
 

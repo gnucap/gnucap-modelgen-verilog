@@ -20,6 +20,8 @@
  */
 #include "mg_.h"
 /*--------------------------------------------------------------------------*/
+Node mg_ground_node;
+/*--------------------------------------------------------------------------*/
 bool ConstantMinTypMaxExpression::empty() const
 {
   assert(_e);
@@ -36,26 +38,37 @@ bool Module::has_submodule() const
   return !element_list().is_empty();
 }
 /*--------------------------------------------------------------------------*/
-//Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& b)
 Probe const* Module::new_probe(std::string const& xs, std::string const& p,
     std::string const& n)
 {
   Branch_Ref br = new_branch(p, n);
+  return new_probe(xs, br);
+}
+/*--------------------------------------------------------------------------*/
+Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
+{
 
-  std::string nn;
+
+  std::string nn = xs;
   // incomplete. discipline.h
-  if(xs == "I"){
+  if(xs == "I" || xs == "flow"){
     br->set_flow_probe();
     nn = "flow";
-  }else if( xs == "V" ){
+  }else if( xs == "V" || xs == "potential" ){
     br->set_pot_probe();
     nn = "potential";
-  }else{
+  }else if( xs == "_filter"){
+    br->set_filter();
+    br->set_pot_probe();
+  }else{ untested();
+    unreachable();
     nn = xs;
   }
 
+  // TODO: use new_probe(branch); ?
+
   // TODO: is this needed?
-  std::string k = nn + "_" + p + "_" + n;
+  std::string k = nn + "_" + br.pname() + "_" + br.nname();
   Probe*& prb = _probes[k];
 
   if(prb) {
@@ -63,9 +76,10 @@ Probe const* Module::new_probe(std::string const& xs, std::string const& p,
     prb = new Probe(nn, br);
   }
 
-  if(n==p){
+  // disambiguation hack. cleanup later.
+  if(br.nname()==br.pname()){
   }else if(br.is_reversed()){
-    new_probe(xs, n, p);
+    new_probe(xs, br.nname(), br.pname());
   }else{
   }
 
@@ -96,6 +110,13 @@ Branch_Ref const& Module::new_branch_name(std::string const& n, Branch_Ref const
   return _branch_names.new_name(n, b);
 }
 /*--------------------------------------------------------------------------*/
+Branch_Ref Module::new_branch(Node const* p, Node const* n = NULL)
+{
+  Branch_Ref br = _branches.new_branch(p, n);
+  br.set_owner(this); // eek.
+  return br;
+}
+/*--------------------------------------------------------------------------*/
 Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
 {
   trace2("new_branch", p,n);
@@ -116,11 +137,9 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
     incomplete();
     return Branch_Ref();
   }else{
-    Node const* pp = new_node(p); // BUG: node??
-    Node const* nn = new_node(n); // BUG: node??
-    Branch_Ref br = _branches.new_branch(pp, nn);
-    br.set_owner(this); // eek.
-    return br;
+    Node const* pp = new_node(p); // BUG: existing node??
+    Node const* nn = new_node(n); // BUG: existing node??
+    return new_branch(pp, nn);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -209,6 +228,8 @@ size_t Branch::num_nodes() const
     if(i->is_reversed()){
     }else if(i->branch() == this){
       // self conductance
+    }else if(i->is_filter_probe()){
+      ++ret;
     }else if(i->is_pot_probe()){
       ++ret;
     }else{
@@ -316,10 +337,44 @@ bool Branch::has_pot_source() const
   return _has_pot_src || _has_flow_probe;
 }
 /*--------------------------------------------------------------------------*/
+size_t Filter::num_states() const
+{
+  size_t k = 2; // self conductance and what?
+  // TODO: cleanup
+  for(auto i : deps()){
+    trace1("filter deps", i->code_name());
+    if(i->is_reversed()){
+    }else if(dynamic_cast<Element_2 const*>(i->branch()) == this){
+    }else{
+      ++k;
+    }
+  }
+  return k;
+}
+/*--------------------------------------------------------------------------*/
+size_t Filter::num_nodes() const
+{
+  size_t ret=1;
+
+  for(auto i : deps()){
+    if(i->is_reversed()){
+//    }else if(i->branch() == this){
+      // self conductance
+    }else if(i->is_pot_probe()){
+      ++ret;
+    }else{
+    }
+  }
+  return 2*ret;
+}
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 size_t Branch::num_states() const
 {
   size_t k = 2;
+  // TODO: cleanup
   for(auto i : deps()){
+    assert(i);
     if(i->is_reversed()){
     }else if(i->branch() == this){
     }else{
@@ -344,7 +399,8 @@ Discipline const* Branch::discipline() const
   }else if(_p->discipline() == _n->discipline()){
     return _p->discipline();
   }else{ untested();
-    incomplete();
+    incomplete(); // no default.
+    // Make sure to specify some discipline for now.
     return NULL;
   }
 }
@@ -361,6 +417,12 @@ Probe::Probe(std::string const& xs, Branch_Ref b) : _xs(xs), _br(b)
 //{
 //  ...
 //}
+/*--------------------------------------------------------------------------*/
+bool Probe::is_filter_probe() const
+{
+  assert(_br);
+  return _br->is_filter();
+}
 /*--------------------------------------------------------------------------*/
 bool Probe::is_reversed() const
 {
@@ -388,22 +450,70 @@ Module::~Module()
     delete i.second;
   }
   _probes.clear();
+  _filters.clear();
 }
+/*--------------------------------------------------------------------------*/
+class idt_Filter: public Filter{
+public:
+  explicit idt_Filter(std::string const& name, Deps const& d)
+    : Filter(name, d) {}
+public:
+  std::string const& dev_type()const override{
+    static std::string dt = "va_idt";
+    return dt;
+  }
+};
+/*--------------------------------------------------------------------------*/
+class ddt_Filter: public Filter{
+public:
+  explicit ddt_Filter(std::string const& name, Deps const& d)
+    : Filter(name, d) {}
+public:
+  std::string const& dev_type()const override{
+    static std::string dt = "va_ddt";
+    return dt;
+  }
+};
 /*--------------------------------------------------------------------------*/
 static int n_filters;
 Filter const* Module::new_filter(std::string const& xs, Deps const&d)
 {
   std::string filter_code_name = xs + "_" + std::to_string(n_filters++);
   CS cmd(CS::_STRING, filter_code_name + " short_if=0 short_to=0;");
+
   Port_1* p = new Port_1;
   cmd >> *p;
-  _local_nodes.push_back(p);
+  // _local_nodes.push_back(p);
+  Node* n = new_node(p->name());
 
-  Filter* f = new Filter(filter_code_name, d);
+  // TODO: some kind of dispatch.
+  Filter* f = NULL;
+  if(xs=="ddt"){
+    f = new ddt_Filter(filter_code_name, d);
+  }else if(xs=="idt"){
+    f = new idt_Filter(filter_code_name, d);
+  }else{
+    assert(false);
+    /// . throw..
+  }
+  f->set_owner(this);
+  trace3("new filter", f->name(), f->num_states(), d.size());
+  Branch* br = new_branch(n, &mg_ground_node);
+  f->set_output(Branch_Ref(br));
   _filters.push_back(f);
-  incomplete();
-  //
   return f;
+}
+/*--------------------------------------------------------------------------*/
+inline Branch_Ref Variable::new_branch(std::string const& p, std::string const& n)
+{
+  assert(_owner);
+  return(_owner->new_branch(p, n));
+}
+/*--------------------------------------------------------------------------*/
+inline Branch_Ref Variable::new_branch(Node const* p, Node const* n)
+{
+  assert(_owner);
+  return(_owner->new_branch(p, n));
 }
 /*--------------------------------------------------------------------------*/
 bool Variable::is_module_variable() const
@@ -550,6 +660,37 @@ bool Module::sync() const
   }else{
   }
   return has_analog_block();
+}
+/*--------------------------------------------------------------------------*/
+std::string const& Filter::dev_type() const
+{
+  // incomplete: which filter?
+  static std::string dt = "incomplete";
+  return dt;
+}
+/*--------------------------------------------------------------------------*/
+std::string Filter::state()const
+{
+  return "_st" + branch_code_name();
+}
+/*--------------------------------------------------------------------------*/
+std::string Filter::short_label()const
+{
+  return name();
+}
+/*--------------------------------------------------------------------------*/
+Probe const* Filter::prb() const
+{
+  return _prb;
+}
+/*--------------------------------------------------------------------------*/
+void Filter::set_output(Branch_Ref const& x)
+{
+  _branch = x;
+  assert(owner());
+  _prb = owner()->new_probe("_filter", _branch);
+  // _prb = owner()->new_probe("potential", _branch);
+  assert(_prb);
 }
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

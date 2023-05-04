@@ -44,11 +44,9 @@ public:
 	double& operator[](int i){return _data[i+1];}
 	operator double&() { return *_data; }
 	ddouble_& operator=(const double& o) {
+		assert(o == o);
 		*_data = o;
 		std::fill_n(_data+1, numderiv, 0.);
-		for(int i=0; i<=numderiv; ++i){
-			assert(_data[i] == _data[i]);
-		}
 		return *this;
 	}
 	bool operator==(const ddouble_& o)const {
@@ -186,4 +184,3 @@ T pow(T& b, T& e)
 #endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-// vim:ts=8:sw=2:noet:

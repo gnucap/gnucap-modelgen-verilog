@@ -571,6 +571,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Token_PROBE; //bug?
+class Node;
 class Expression;
 class Variable : public Base {
   Block* _owner{NULL};
@@ -597,6 +598,7 @@ public:
   }
   void dump(std::ostream& o)const override;
   virtual Branch_Ref new_branch(std::string const& p, std::string const& n);
+  virtual Branch_Ref new_branch(Node const* p, Node const* n);
 
 private:
   bool is_node(std::string const& n)const;
@@ -715,6 +717,9 @@ public:
   void new_var_ref(T const* what);
   virtual Probe const* new_probe(std::string const& xs, std::string const& p, std::string const& n)
   {unreachable(); return NULL;}
+  virtual Probe const* new_probe(std::string const& xs, Branch_Ref const&)
+  {unreachable(); return NULL;}
+
   virtual Node* new_node(std::string const& p){ untested();
     assert(_owner);
     return _owner->new_node(p);
@@ -729,6 +734,10 @@ public:
   }
 
   virtual Branch_Ref new_branch(std::string const& p, std::string const& n) {
+    unreachable();
+    return Branch_Ref(NULL);
+  }
+  virtual Branch_Ref new_branch(Node const*, Node const*) {
     unreachable();
     return Branch_Ref(NULL);
   }
@@ -787,6 +796,10 @@ public: // this is a stub
   Probe const* new_probe(std::string const& xs, std::string const& p, std::string const& n)override {
     assert(owner());
     return owner()->new_probe(xs, p, n);
+  }
+  Probe const* new_probe(std::string const& xs, Branch_Ref const& br) override {
+    assert(owner());
+    return owner()->new_probe(xs, br);
   }
   Branch_Ref new_branch(std::string const& p, std::string const& n)override {
     assert(owner());
@@ -1019,8 +1032,8 @@ public:
 		     list_of_parameter_assignments()const {return _list_of_parameter_assignments;}
   const Port_Connection_List& ports()const	  {return _list_of_port_connections;}
   const Port_1_List& current_ports() const{return _current_port_list;}
-  virtual std::string name_of_module_instance()const  {return _name_of_module_instance;}
-  const std::string& short_label()const 	  {return _name_of_module_instance;}
+  virtual std::string instance_name()const  {return _name_of_module_instance;}
+  virtual std::string short_label()const 	  {return _name_of_module_instance;}
   virtual std::string code_name()const  {return "_e_" + _name_of_module_instance;}
   const std::string& eval()const 	{return _eval;}
   const std::string& value()const 	{return _value;}
@@ -1125,6 +1138,7 @@ public:
 
   bool is_flow_probe() const{ return _is_flow_probe;}
   bool is_pot_probe() const{ return _is_pot_probe;}
+  bool is_filter_probe() const;
 
   std::string code_name() const;
   Branch const* branch() const{
@@ -1229,6 +1243,7 @@ class Branch : public Element_2 {
   bool _has_pot_probe{false};
   bool _has_flow_src{false};
   bool _has_pot_src{false};
+  bool _is_filter{false};
   std::vector<Branch_Ref*> _refs;
 public:
   explicit Branch(Node const* p, Node const* n)
@@ -1246,27 +1261,29 @@ public:
   void dump(std::ostream&)const override;
   Node const* p() const{ return _p; }
   Node const* n() const{ return _n; }
-  std::string code_name() const override;
-  std::string short_label()const 	  {untested(); return code_name();}
-  std::string name_of_module_instance()const  {return code_name();}
-  std::string const& omit() const override;
+  virtual std::string code_name() const;
+  std::string short_label()const  { return code_name();}
+//  std::string name_of_module_instance()const  {return code_name();}
+  std::string const& omit()const;
   const std::string& dev_type()const;
   Deps const& deps()const { return _deps; } // delete?
   void add_probe(Probe const*);
-  size_t num_nodes()const override;
-  std::string state()const override;
-  bool has_element() const;
+  size_t num_nodes()const;
+  std::string state()const;
+  virtual bool has_element() const;
   void set_flow_probe(){ _has_flow_probe=true; }
   void set_pot_probe(){ _has_pot_probe=true; }
   void set_flow_source(){ _has_flow_src=true; }
   void set_pot_source(){ _has_pot_src=true; }
+  void set_filter(){ _is_filter=true; }
   bool has_flow_probe() const;
   bool has_pot_probe() const;
   bool has_flow_source() const { return _has_flow_src; }
+  bool is_filter() const { return _is_filter; }
   bool has_pot_source() const;
   size_t num_states() const;
-  Discipline const* discipline() const override;
-  Nature const* nature() const override;
+  Discipline const* discipline() const;
+  Nature const* nature() const;
 public:
 //  bool has(Branch_Ref*) const;
   void attach(Branch_Ref*);
@@ -1398,8 +1415,11 @@ private: // misc
 
 private:
   Probe const* new_probe(std::string const&, std::string const&, std::string const&) override;
+  Probe const* new_probe(std::string const& xs, Branch_Ref const& br) override;
+
   Filter const* new_filter(std::string const&, Deps const&) override;
   Branch_Ref new_branch(std::string const&, std::string const&) override;
+  Branch_Ref new_branch(Node const*, Node const*) override;
   Branch_Ref const& new_branch_name(std::string const& n, Branch_Ref const& b) override;
   Node* new_node(std::string const& p) override;
   Node const* node(std::string const& p) const override;
@@ -1473,6 +1493,10 @@ public:
     assert(owner());
     return owner()->new_branch(p, n);
   }
+  Branch_Ref new_branch(Node const* p, Node const* n) {
+    assert(owner());
+    return owner()->new_branch(p, n);
+  }
 };
 /*--------------------------------------------------------------------------*/
 class PotContribution : public Contribution {
@@ -1500,7 +1524,7 @@ class Node :public Base {
 public:
   void parse(CS&)override{};
   void dump(std::ostream&)const{};
-  Node() {untested();}
+  Node() {}
   Node(CS& f) {parse(f);}
   Node(std::string const& f, int n) : _name(f), _number(n) {}
   const std::string& name()const	{return _name;}
@@ -1513,6 +1537,7 @@ public:
   Discipline const* discipline() const{  return _discipline; }
   Nature const* nature() const{ return _nature; }
 };
+extern Node mg_ground_node;
 /*--------------------------------------------------------------------------*/
 class Node_List : public List<Node> {
 public:
@@ -1585,31 +1610,46 @@ void Block::new_var_ref(T const* what)
   }
 }
 /*--------------------------------------------------------------------------*/
-class Filter : public Variable /*?*/ {
+class Filter : public Element_2 /*?*/ {
+  std::string _name; // BUG?
   Deps _deps;
+  Branch_Ref _branch;
+  Probe const* _prb=NULL;
 public:
-  explicit Filter() : Variable("noname") {}
+  explicit Filter() : Element_2() {}
   explicit Filter(std::string const& name, Deps const& d)
-    : Variable(name), _deps(d) {}
+    : Element_2(), _deps(d) {
+    _name = name;
+    }
 
-  std::string code_name() const {
-    return "_f_" + name();
+  void set_output(Branch_Ref const& x);
+//  Branch_Ref const& branch() const{ return _branch; }
+  std::string name() const {
+    return _name;
   }
-  Deps const& deps() const { return _deps; }
+  std::string branch_code_name() const {
+    assert(_branch);
+    return _branch->code_name();
+  }
+  std::string code_name() const {
+    return "_f_" + _name; // name()?
+  }
+  Deps const& deps()const { return _deps; }
+
+  size_t num_states()const override;
+  size_t num_nodes()const override;
+  std::string state()const override;
+  std::string short_label()const;
+  Probe const* prb() const;
+
 
 public: // make it look like an Element_2?
-  std::string omit() const { return ""; }
-  std::string dev_type() const { return "d_cpoly_g"; }
+//  std::string omit() const { return ""; }
+  std::string const& dev_type() const;
 };
 /*--------------------------------------------------------------------------*/
 void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps*d=NULL);
 void make_cc_expression(std::ostream& o, Expression const& e);
-/*--------------------------------------------------------------------------*/
-inline Branch_Ref Variable::new_branch(std::string const& p, std::string const& n)
-{
-  assert(_owner);
-  return(_owner->new_branch(p, n));
-}
 /*--------------------------------------------------------------------------*/
 inline bool Variable::is_node(std::string const& n) const
 {

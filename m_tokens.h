@@ -118,8 +118,17 @@ private:
 //  }
 public:
   Base const* item()const { return _item; }
+  std::string code_name() const{
+    assert(_item);
+    return _item->code_name();
+  }
   Deps const& deps() const{
+    assert(_item);
     return _item->deps();
+  }
+  Probe const* output() const{
+    assert(_item);
+    return _item->prb();
   }
 };
 /*--------------------------------------------------------------------------*/

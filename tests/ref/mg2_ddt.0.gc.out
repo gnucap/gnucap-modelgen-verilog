@@ -1,0 +1,26 @@
+abs: already installed, replacing
+stashing as abs:0
+exp: already installed, replacing
+stashing as exp:0
+module vsin (p,n);
+  .parameter ampl 
+  .parameter dc 
+  vsource #(sin.offset(NA( 0.)), .amplitude(ampl), .frequency( 1.), .delay(NA( 0.)), .damping(NA( 0.))  DC dc) V1 (.p(p),.n(n));
+endmodule // vsin
+
+parameter r=1 
+parameter v=0 
+test_ddt0_0 #() dut (.np(1),.nn(0));
+vsin #(.ampl(1),.dc(v)) v1 (.p(1),.n(0));
+#Time       v(1)       dv(dut)    i(dut.ddt_0) iter(0)   
+ 0.         0.         0.         0.         2.        
+ 0.1        0.58779    10.191     10.191     45.       
+ 0.2        0.95106    3.8557     3.8557     6.        
+ 0.3        0.95106   -3.9752    -3.9752     6.        
+ 0.4        0.58779   -10.556    -10.556     3.        
+ 0.5        0.        -12.956    -12.956     3.        
+ 0.6       -0.58779   -9.9769    -9.9769     9.        
+ 0.7       -0.95106   -3.6416    -3.6416     6.        
+ 0.8       -0.95106    4.1894     4.1894     6.        
+ 0.9       -0.58779    10.341     10.341     3.        
+ 1.         0.         13.17      13.17      3.        

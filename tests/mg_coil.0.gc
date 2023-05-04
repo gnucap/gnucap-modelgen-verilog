@@ -1,0 +1,33 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module coil0(p,n);
+	inout p,n;
+	electrical p,n;
+
+	parameter real l  = .1;
+
+	analog begin
+		I(p,n) <+ idt(V(p,n)) / l;
+	end
+endmodule
+
+!make coil0.so > /dev/null
+load ./coil0.so
+
+// inductor #(.l(p)) L3(1  2);
+coil0 #(.l(p)) L3(1  2);
+resistor  #(.r(p)) r2( 2  0);
+
+spice
+V1   1  0  sin a=1 f=1
+.parameter p=.01
+
+.print tran v(nodes)
+* .options method=euler
+.tran 1
+

@@ -314,7 +314,9 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
 void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
 {
   if(Proto->subckt()->size()){
-    incomplete();
+    // device has multiple instances
+    // BUG: cleanup cache if is_first_expand()
+    // incomplete();
     return;
   }else{
   }

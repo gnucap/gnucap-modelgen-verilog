@@ -70,7 +70,7 @@ void Element_2::dump(std::ostream& out)const
 {
   out << "  " << dev_type()
       << " #" << list_of_parameter_assignments() << " "
-      << name_of_module_instance()
+      << short_label()
       << ports() << ";\n";
 }
 /*--------------------------------------------------------------------------*/

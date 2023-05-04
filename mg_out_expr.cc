@@ -79,7 +79,7 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 	o__ "t" << idx << "[d" << v->code_name() << "] = " << prefix << (*i)->name() << "[d" << v->code_name() << "];\n";
       }
     }else if (auto f = dynamic_cast<const Token_FILTER*>(*i)) {
-      o__ "t" << idx << " = p->" << (*i)->name() << "(t" << idx <<" )\n";
+      o__ "t" << idx << " = " << f->code_name() << "(t" << idx << ", d);\n";
       for(auto v : f->deps()) {
 	o__ "// dep :" << v->code_name() << "\n";
 //	o__ "t" << idx << "[d" << v->code_name() << "] = _v_" << (*i)->name() << "[d" << v->code_name() << "];\n";

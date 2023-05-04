@@ -72,18 +72,19 @@ void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2& p)
   //   out << "    this->" << p.code_name() << " = " << p.calculate() << ";\n";
   // }else{
   // }
-  o << "{\n";
+  o__ "{\n";
 //  o__ p.type() << " val = ";
   if (!(p.default_val().empty())) {
     // o << p.default_val();
+    indent i2;
     make_cc_expression(o, p.default_val().expression());
   }else{
     o << "NA\n";
   }
   o << ";\n";
-  o << "e_val(&(this->" << p.code_name() << "), ";
-  o << "t0.value() , par_scope);\n";
-  o << "}\n";
+  o____ "e_val(&(this->" << p.code_name() << "), ";
+  o____ "t0.value() , par_scope);\n";
+  o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
 void make_final_adjust_eval_parameter_list(std::ostream& out,

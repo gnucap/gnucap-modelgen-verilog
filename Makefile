@@ -4,9 +4,10 @@ include Make1
 LIBS = -lgnucap
 LDFLAGS = -L/usr/local/lib # ask gnucap-conf?
 MODULES = \
-  modelgen_0.so \
+  bm_pulse.so \
   d_vasrc.so \
-  lang_verilog.so
+  lang_verilog.so \
+  modelgen_0.so
 
 # stuff them all into on plugin, for now.
 LANG_OBJS = \
@@ -45,7 +46,7 @@ $(TARGET): $(OBJS)
 include Make.depend
 
 modelgen_0.o: $(OBJS)
-d_vasrc.so: d_vaflow.o d_vapot.o
+d_vasrc.so: d_vaflow.o d_vapot.o d_va_filter.o
 	g++ -shared ${CXXFLAGS} -I../include $+ ${LIBS_} -o $@
 
 lang_verilog.so: ${LANG_OBJS}

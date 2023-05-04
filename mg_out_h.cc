@@ -31,13 +31,17 @@ static void make_clear_branch_contributions(std::ostream& o, const Module& m)
     }else{
     }
   }
+  for(auto x : m.filters()){
+    assert(x);
+      o____ "// std::fill_n(_st" << x->code_name() << ", " << x->num_states() << ", 0.);\n";
+  }
 }
 /*--------------------------------------------------------------------------*/
 static void declare_deriv_enum(std::ostream& o, const Module& m)
 {
   std::string comma = "";
 
-  o << ind << "enum {";
+  o << ind << "enum {\n";
   // for (auto nn : m.probes()){
   //   o << comma << "d_" << nn.second->name();
   // }
@@ -45,17 +49,21 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
     assert(x.second);
     Branch const* b = x.second;
     if(b->has_flow_probe()){
-      o__ comma << "d_flow" << b->code_name() << "\n";
+      o << comma << "    d_flow" << b->code_name();
       comma = ",\n";
     }else{
     }
-    if(b->has_pot_probe()){
-      o__ comma << "d_potential" << b->code_name() << "\n";
+    if(b->is_filter()){
+      o << comma << "    d__filter" << b->code_name();
+      comma = ",\n";
+    }else if(b->has_pot_probe()){
+      o << comma << "    d_potential" << b->code_name();
       comma = ",\n";
     }else{
     }
   }
-  o << ind << "};\n";
+  o << "\n";
+  o__ "};\n";
 }
 /*--------------------------------------------------------------------------*/
 static void declare_ddouble(std::ostream& o, Module const& m)
@@ -69,6 +77,8 @@ static void declare_ddouble(std::ostream& o, Module const& m)
     }else{
     }
     if(b->has_pot_probe()){
+      ++np;
+    }else if(b->is_filter()){
       ++np;
     }else{
     }
@@ -85,7 +95,7 @@ static void make_parameter_decl(std::ostream& o, const Parameter_List_Collection
     }else{
       o__ "PARAMETER<" << (**q).type() << ">";
     }
-    std::string comma=" ";
+    std::string comma = " ";
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
       o << comma << (**p).code_name()
 	  << " /* " << (**p).comment() << " */";
@@ -103,7 +113,7 @@ static void make_variable_decl(std::ostream& o, const Variable_List_Collection& 
     }else{
       o__ (**q).type();
     }
-    std::string comma=" ";
+    std::string comma = " ";
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
       o << comma << "_v_" << (**p).name(); // code_name??
 //	  << " /* " << (**p).comment() << " */";
@@ -123,6 +133,37 @@ static void make_variable_decl(std::ostream& o, const Variable_List_Collection& 
 //  }
 //}
 /*--------------------------------------------------------------------------*/
+// TODO: split
+static void make_filter_common(std::ostream& o, const Module& m)
+{
+  for(auto f : m.filters()){
+    o__ "class FILTER" << f->code_name() << "{\n";
+    o__ "public:\n";
+    o____ "ddouble operator()(ddouble t0, MOD_" << m.identifier() << "* d) const;\n";
+
+    // o______ "incomplete();\n";
+    // {
+    //   indent a;
+    //   size_t k = 0;
+    //   for(auto v : f->deps()) {
+    //     // char sign = f.reversed()?'-':'+';
+    //     char sign = '+';
+    //     o__ "// dep " << v->code_name() << "\n";
+    //     // if(f->branch() == v->branch()){
+    //     // }else{
+    //       o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
+    //       o__ "d->" << f->state() << "[" << k << "]"
+    //         " "<<sign<<"= " << "t0[d" << v->code_name() << "];\n";
+    //       ++k;
+    //     //}
+    //   }
+    // }
+    // o______ "return 17.;\n";
+    // o____ "}\n";
+    o__  "}" << f->code_name() << ";\n";
+  }
+}
+/*--------------------------------------------------------------------------*/
 static void make_common(std::ostream& o, const Module& m)
 {
   std::string class_name = "COMMON_" + m.identifier().to_string();
@@ -141,6 +182,8 @@ static void make_common(std::ostream& o, const Module& m)
   }else{
   }
   declare_ddouble(o, m);
+  o << "public:\n";
+  make_filter_common(o, m);
   o << "public:\n";
   o__ "explicit " << class_name << "(const " << class_name << "& p);\n"
     "  explicit " << class_name << "(int c=0);\n"
@@ -187,6 +230,22 @@ static void make_common(std::ostream& o, const Module& m)
   o << "};\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_module_one_filter_state(std::ostream& o, Filter const& br)
+{
+  o << "public: // states, " << br.code_name() << ";\n";
+  o__ "double _st" << br.branch_code_name();
+  size_t k = br.num_states();
+  o__ "[" << k << "];\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_filter_state(std::ostream& o, const Module& m)
+{
+  for(auto x : m.filters()){
+    assert(x);
+    make_module_one_filter_state(o, *x);
+  }
 }
 /*--------------------------------------------------------------------------*/
 static void make_module_one_branch_state(std::ostream& o, Branch const& br)
@@ -237,6 +296,9 @@ static void make_module(std::ostream& o, const Module& m)
   for (auto br : m.branches()){
     o << ind << "ELEMENT* " << br.second->code_name() << "{NULL}; // branch\n";
   }
+  // for (auto br : m.filters()){
+  //   o << ind << "ELEMENT* " << br->code_name() << "{NULL}; // branch\n";
+  // }
   o << "private: // construct\n";
   o__ "explicit MOD_" << m.identifier() << "(MOD_" << m.identifier() << " const&);\n";
   o << "public:\n";
@@ -280,8 +342,8 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "int min_nodes()const override {return "<< m.ports().size() <<";}\n";
   o__ "int int_nodes()const override    {return "
       << m.nodes().size() - m.ports().size() << ";}\n";
-  o__ "std::string value_name()const override {untested(); return \"\";}\n";
-  o__ "bool print_type_in_spice()const override {untested(); return false;}\n";
+  o__ "std::string value_name()const override {itested(); return \"\";}\n";
+  o__ "bool print_type_in_spice()const override {itested(); return false;}\n";
   o__ "std::string port_name(int i)const override;\n";
   o << "private: // impl\n";
   o << "/* ========== */\n";
@@ -290,17 +352,19 @@ static void make_module(std::ostream& o, const Module& m)
   make_variable_decl(o, m.variables());
   o << "private: // branch state\n";
   make_branch_states(o, m);
+  o << "private: // filter state\n";
+  make_filter_state(o, m);
 
-  std::string comma="";
   o << "private: // node list\n";
+  std::string comma = "";
   o << ind << "enum {";
   for (auto nn : m.nodes()){
     // TODO: node aliases, shorts etc.
-    if(nn->number() >= int(m.ports().size())){
-      o << comma << "n_" << nn->name() << "/*" << nn->number() << "*/";
+    if(nn->number() == int(m.ports().size())){
+      o << " /* | */";
     }else{
-      o << comma << "n_" << nn->name() << "/* port " << nn->number() << "*/";
     }
+    o << comma << "n_" << nn->name();
     comma = ", ";
   }
   o << ind << "};\n";
