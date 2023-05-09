@@ -282,7 +282,7 @@ std::string Define::substitute(CS& f) const
 /*--------------------------------------------------------------------------*/
 std::string File::preprocess(const std::string& file_name)
 {
-  CS file(CS::_WHOLE_FILE, file_name);
+  CS file(CS::_WHOLE_FILE, file_name); // BUG // need INC_FILE
   trace1("whole file", file.fullstring());
 
   std::string stripped_file;

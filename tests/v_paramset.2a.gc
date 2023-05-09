@@ -1,5 +1,6 @@
 verilog
 
+// BUG // need one token per line
 paramset vs vsource; parameter dc; .dc=dc; endparamset;
 
 module main(1,2);

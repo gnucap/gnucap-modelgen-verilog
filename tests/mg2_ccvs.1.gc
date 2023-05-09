@@ -1,0 +1,30 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_ccvs1(p, n, cp, cn);
+electrical p, n, cp, cn;
+
+analog begin
+	real gain;
+	gain = 3;
+	V(p,n) <+ gain*I(cp,cn);
+end
+
+endmodule
+
+!make test_ccvs1.so > /dev/null
+attach ./test_ccvs1.so
+
+// BUG // does not work!
+test_ccvs1 d1(1, 0, 1, 0);
+vsource #(.dc(i)) v1(1, 0);
+
+parameter i=1
+list
+
+print dc v(nodes) i(v1)
+dc i 0 2 .5
