@@ -122,8 +122,12 @@ void Parameter_2::parse(CS& file)
   _default_val.set_owner(owner());
   file >> ','; // ??
   file >> _name;
-  trace2("Parameter2", _name, file.tail());
   file >> '=' >> _default_val;
+ // if(file.match1(";,")) {
+ // }else
+  {
+    file >> _value_range_list;
+  }
   assert(owner());
   owner()->new_var_ref(this);
   assert(owner()->resolve(name()));
@@ -131,7 +135,13 @@ void Parameter_2::parse(CS& file)
 /*--------------------------------------------------------------------------*/
 void Parameter_2::dump(std::ostream& o)const
 {
-  o << name() << " = " << default_val(); // range?
+  o << name() << " = " << default_val();
+  if(!_value_range_list.is_empty()){
+    o << _value_range_list;
+  }else{
+  }
+  //}else{
+  //}
 }
 /*--------------------------------------------------------------------------*/
 /*
@@ -679,7 +689,7 @@ void Module::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 CS& Module::parse_analog(CS& cmd)
 {
-  AnalogBlock* ab = new AnalogBlock();
+  AnalogConstruct* ab = new AnalogConstruct();
   ab->set_owner(this);
   ab->parse(cmd);
   _analog_list.push_back(ab);
@@ -705,5 +715,88 @@ void Variable::dump(std::ostream& o)const
 //  o__ _type << " " << name() << ";\n";
 }
 /*--------------------------------------------------------------------------*/
+void ValueRangeInterval::parse(CS& file)
+{
+  if(file.last_match() == "["){
+    _lb_is_closed = true;
+  }else if(file.last_match() == "("){
+    _lb_is_closed = false;
+  }else{
+    unreachable();
+  }
+  _lb = file.ctos(":");
+  file.skip1(":");
+  _ub = file.ctos("])");
+
+  if(file.match1(']')) {
+    file.skip1(']');
+    _ub_is_closed = true;
+  }else if(file.match1(')')) {
+    file.skip1(')');
+    _ub_is_closed = false;
+  }else{ untested();
+    throw Exception_CS("need ')' or ']'", file);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void ValueRangeInterval::dump(std::ostream& o)const
+{
+  if(_lb_is_closed){
+    o << "[";
+  }else{
+    o << "(";
+  }
+  o << _lb << ":" << _ub;
+  if(_ub_is_closed){
+    o << "]";
+  }else{
+    o << ")";
+  }
+  incomplete();
+}
+/*--------------------------------------------------------------------------*/
+void ValueRange::parse(CS& file)
+{
+  if (file >> "from "){
+    _type = vr_FROM;
+    if(file >> "[" || file >> "("){
+      _what = new ValueRangeInterval;
+      file >> *_what;
+    }else{
+      incomplete();
+    }
+  }else if(file >> "exclude "){
+    _type = vr_EXCLUDE;
+    if(file >> "[" || file >> "("){ untested();
+      _what = new ValueRangeInterval;
+    }else if(file >> "'{"){ untested();
+      incomplete();
+//      _what = new ValueRangeStrings;
+    }else{
+      _what = new ValueRangeConstant;
+    }
+    file >> *_what;
+    trace1("ValueRange::parse b", file.tail().substr(0,10));
+  }else{
+  }
+
+}
+/*--------------------------------------------------------------------------*/
+void ValueRange::dump(std::ostream& o)const
+{
+  assert(_what);
+  static std::string names[] = {"from", "exclude"};
+  o << " " << names[_type] << " " << *_what;
+}
+/*--------------------------------------------------------------------------*/
+void ValueRangeConstant::parse(CS& file)
+{
+  file >> _cexpr;
+}
+/*--------------------------------------------------------------------------*/
+void ValueRangeConstant::dump(std::ostream& o)const
+{
+  o << _cexpr;
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

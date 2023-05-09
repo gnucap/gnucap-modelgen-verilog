@@ -69,18 +69,18 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 		  // code_name?
 		  //
       std::string prefix;
-      if(var->is_module_variable()){
+      if((*var)->is_module_variable()){
 	prefix = "d->_v_";
       }else{
 	prefix = "_v_";
       }
       o__ "t" << idx << " = " << prefix << (*i)->name() << ".value();\n";
-      for(auto v : var->deps()) {
+      for(auto v : (*var)->deps()) {
 	o__ "t" << idx << "[d" << v->code_name() << "] = " << prefix << (*i)->name() << "[d" << v->code_name() << "];\n";
       }
     }else if (auto f = dynamic_cast<const Token_FILTER*>(*i)) {
-      o__ "t" << idx << " = " << f->code_name() << "(t" << idx << ", d);\n";
-      for(auto v : f->deps()) {
+      o__ "t" << idx << " = " << (*f)->code_name() << "(t" << idx << ", d);\n";
+      for(auto v : (*f)->deps()) {
 	o__ "// dep :" << v->code_name() << "\n";
 //	o__ "t" << idx << "[d" << v->code_name() << "] = _v_" << (*i)->name() << "[d" << v->code_name() << "];\n";
       }
@@ -89,10 +89,10 @@ void make_cc_expression(std::ostream& o, Expression const& e)
     }else if (dynamic_cast<const Token_CONSTANT*>(*i)) {
       o << ind << "t" << idx << " = " << (*i)->name() << ";\n";
     }else if(auto pp = dynamic_cast<const Token_PROBE*>(*i)) {
-      char sign = pp->reversed()?'-':'+';
+      char sign = (*pp)->is_reversed()?'-':'+';
 
-      o__ "t" << idx << " = "<<sign<<" p->" << pp->code_name() << ";// "<< pp->name() <<"\n";
-      o__ "t" << idx << "[d" << pp->code_name() << "] = " << sign << "1.;\n";
+      o__ "t" << idx << " = "<<sign<<" p->" << (*pp)->code_name() << ";// "<< pp->name() <<"\n";
+      o__ "t" << idx << "[d" << (*pp)->code_name() << "] = " << sign << "1.;\n";
     }else if(dynamic_cast<const Token_SYMBOL*>(*i)) {
       int arity = is_function((*i)->name());
       assert(arity);
@@ -125,6 +125,10 @@ void make_cc_expression(std::ostream& o, Expression const& e)
       case '*':
       case '/':
 	o__ "t" << idx << " "<< op << "= t" << idy << ";\n";
+	break;
+      case '>':
+      case '<':
+	o__ "t" << idx << " = t" << idx << " " << op << " t" << idy << ";\n";
 	break;
       default:
 	incomplete();

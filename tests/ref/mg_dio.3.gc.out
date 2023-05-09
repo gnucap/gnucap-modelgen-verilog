@@ -1,0 +1,21 @@
+pow: already installed, replacing
+stashing as pow:0
+abs: already installed, replacing
+stashing as abs:0
+exp: already installed, replacing
+stashing as exp:0
+resistor #(.r(1)) r1 (.p(2),.n(1));
+test_dio3 #() dut (.p(1),.n(0));
+vsource #() v1 (.p(2),.n(0));
+#           v(1)       v(2)       i(r1)      iter(0)   
+-10.       -10.       -10.       -10.001p    4.        
+-8.        -8.        -8.        -8.0007p    4.        
+-6.        -6.        -6.        -6.0005p    4.        
+-4.        -4.        -4.        -4.0004p    4.        
+-2.        -2.        -2.        -2.0002p    4.        
+ 0.         0.         0.         0.         4.        
+ 2.         1.         2.         1.         5.        
+ 4.         2.         4.         2.         4.        
+ 6.         3.         6.         3.         4.        
+ 8.         4.         8.         4.         4.        
+ 10.        5.         10.        5.         4.        

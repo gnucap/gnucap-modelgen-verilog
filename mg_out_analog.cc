@@ -147,24 +147,77 @@ void make_cc_filter(std::ostream& o, const Module& m)
   }
 }
 /*--------------------------------------------------------------------------*/
-void make_cc_analog(std::ostream& o, AnalogBlock const& ab)
+void AnalogConditionalExpression::dump(std::ostream& o)const
 {
-  for(auto i : ab) {
-    // need commmon baseclass...
-    if(auto fc=dynamic_cast<FlowContribution const*>(i)) {
-      make_cc_contrib(o, *fc);
-    }else if(auto pc=dynamic_cast<PotContribution const*>(i)) {
-      make_cc_contrib(o, *pc);
-    }else if(auto a=dynamic_cast<Assignment const*>(i)) {
-      make_cc_assignment(o, *a);
-    }else if(auto rl=dynamic_cast<ListOfBlockRealIdentifiers const*>(i)) {
-      make_cc_block_real_identifier_list(o, *rl);
-    }else if(auto v=dynamic_cast<Variable const*>(i)) {
-      unreachable();
-      make_cc_variable(o, *v);
-    }else{ untested();
-      incomplete();
+  assert(_exp);
+  _exp->dump(o);
+  //    o << ")))";
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_analog_cond(std::ostream& o, AnalogConditionalStmt const& s);
+static void make_cc_analog_seq(std::ostream& o, AnalogSeqBlock const& s);
+static void make_cc_analog_stmt(std::ostream& o, Base const& ab)
+{
+  Base const* i = &ab;
+  if(auto s = dynamic_cast<AnalogSeqBlock const*>(&ab)){
+    make_cc_analog_seq(o, *s);
+  }else if(auto fc=dynamic_cast<FlowContribution const*>(i)) {
+    make_cc_contrib(o, *fc);
+  }else if(auto pc=dynamic_cast<PotContribution const*>(i)) {
+    make_cc_contrib(o, *pc);
+  }else if(auto a=dynamic_cast<Assignment const*>(i)) {
+    make_cc_assignment(o, *a);
+  }else if(auto rl=dynamic_cast<ListOfBlockRealIdentifiers const*>(i)) {
+    make_cc_block_real_identifier_list(o, *rl);
+  }else if(auto v=dynamic_cast<Variable const*>(i)) {
+    unreachable();
+    make_cc_variable(o, *v);
+  }else if(auto v=dynamic_cast<AnalogConditionalStmt const*>(i)) {
+    make_cc_analog_cond(o, *v);
+  }else{ untested();
+    incomplete();
+  }
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_analog_cond(std::ostream& o, AnalogConditionalStmt const& s)
+{
+  o__ "{\n";
+  {
+    indent x;
+    make_cc_expression(o, s.conditional().expression());
+    o__ "if (t0) {\n";
+    if(s.true_part_or_null()) {
+      indent y;
+      make_cc_analog_stmt(o, s.true_part());
+    }else{
     }
+    o__ "}";
+    if(s.false_part_or_null()) {
+      o << "else ";
+      indent y;
+      make_cc_analog_stmt(o, s.false_part());
+    }else{
+    }
+
+    o<<"\n";
+
+  }
+  o__ "}\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_analog_seq(std::ostream& o, AnalogSeqBlock const& s)
+{
+  for(auto i : s.block()) {
+    make_cc_analog_stmt(o, *i);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void make_cc_analog(std::ostream& o, AnalogConstruct const& ab)
+{
+  if(ab.statement_or_null()){
+    make_cc_analog_stmt(o, *ab.statement_or_null());
+  }else{ untested();
+    o << ";\n";
   }
 }
 /*--------------------------------------------------------------------------*/

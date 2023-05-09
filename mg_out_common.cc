@@ -476,14 +476,16 @@ static void make_common_tr_eval(std::ostream& o, const Module& m)
 
   for(auto bb : m.analog_list()){
     assert(bb);
-    if(auto ab = dynamic_cast<AnalogBlock const*>(bb)){
+//    if(auto ab = dynamic_cast<AnalogStmt const*>(bb)){
+//    }else
+    if(auto ab = dynamic_cast<AnalogConstruct const*>(bb)){
       o << ind << "{\n";
       {
 	indent a(2);
 	make_cc_analog(o, *ab);
       }
       o << ind << "}\n";
-    }else{
+    }else{ untested();
     }
   }
   o << "}\n";

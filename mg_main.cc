@@ -77,7 +77,7 @@ int main(int argc, char** argv)
     //     make_h_file(f);
     //   }
     // }else
-    if (strcmp(argv[0],"--cc")==0) { untested();
+    if (strcmp(argv[0],"--cc")==0) { itested();
       f.read(argv[1]);
       make_cc(std::cout, f);
       --argc;

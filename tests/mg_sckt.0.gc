@@ -4,6 +4,8 @@ attach ../d_vasrc.so
 
 options trace
 
+verilog
+
 `modelgen
 module test_net0(a, b);
 	inout a, b;
@@ -15,7 +17,6 @@ endmodule;
 !make test_net0.so > /dev/null
 attach ./test_net0.so
 
-verilog
 parameter r=1
 parameter c=1
 parameter v=0

@@ -42,6 +42,7 @@ Probe const* Module::new_probe(std::string const& xs, std::string const& p,
     std::string const& n)
 {
   Branch_Ref br = new_branch(p, n);
+  assert(br);
   return new_probe(xs, br);
 }
 /*--------------------------------------------------------------------------*/
@@ -113,6 +114,7 @@ Branch_Ref const& Module::new_branch_name(std::string const& n, Branch_Ref const
 Branch_Ref Module::new_branch(Node const* p, Node const* n = NULL)
 {
   Branch_Ref br = _branches.new_branch(p, n);
+  assert(br);
   br.set_owner(this); // eek.
   return br;
 }
@@ -501,6 +503,7 @@ Filter const* Module::new_filter(std::string const& xs, Deps const&d)
   f->set_owner(this);
   trace3("new filter", f->name(), f->num_states(), d.size());
   Branch* br = new_branch(n, &mg_ground_node);
+  assert(br);
   f->set_output(Branch_Ref(br));
   _filters.push_back(f);
   return f;
@@ -693,6 +696,38 @@ void Filter::set_output(Branch_Ref const& x)
   _prb = owner()->new_probe("_filter", _branch);
   // _prb = owner()->new_probe("potential", _branch);
   assert(_prb);
+}
+/*--------------------------------------------------------------------------*/
+void Block::push_back(Base* c)
+{
+  List_Base<Base>::push_back(c);
+  if(auto v=dynamic_cast<Variable const*>(c)){
+      trace1("reg var_ref", v->name());
+    _var_refs[v->name()] = c;
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+Base const* Block::resolve(std::string const& k) const{
+  trace2("resolve", _owner, k);
+  for(auto x : _var_refs){
+    trace1("var_ref", x.first);
+  }
+  const_iterator f = _var_refs.find(k);
+  if(f != _var_refs.end()) {
+    return f->second;
+  }else if(_owner) {
+    return _owner->resolve(k);
+  }else{
+    return NULL;
+  }
+}
+/*--------------------------------------------------------------------------*/
+AnalogConditionalExpression::~AnalogConditionalExpression()
+{
+  delete _exp;
+  _exp = NULL;
 }
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

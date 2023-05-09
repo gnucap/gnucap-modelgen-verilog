@@ -2,6 +2,8 @@
 attach ../modelgen_0.so
 attach ../d_vasrc.so
 
+verilog
+
 `modelgen
 module portnames1(n0, n1, n2, n3);
 	electrical n0, n1, n2, n3;
@@ -16,8 +18,6 @@ list
 
 !make portnames1.so > /dev/null
 attach ./portnames1.so
-
-verilog
 
 portnames1 dut(.n0(0),.n2(2),.n1(1),.n3(3));
 resistor #(.r(1)) r1(1, 0);

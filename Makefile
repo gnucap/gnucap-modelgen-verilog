@@ -9,7 +9,7 @@ MODULES = \
   lang_verilog.so \
   modelgen_0.so
 
-# stuff them all into on plugin, for now.
+# stuff them all into one plugin, for now.
 LANG_OBJS = \
 	c_param.o \
 	lang_verilog.o \

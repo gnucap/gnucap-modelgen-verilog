@@ -19,12 +19,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * mockup component generator for analog block testing
+ * arithmetic tokens
  */
 #ifndef M_TOKENS_H
 #define M_TOKENS_H
 #include <gnucap/m_base.h>
+#include <gnucap/m_expression.h>
 /*--------------------------------------------------------------------------*/
+class Probe;
 
 class Token_PROBE : public Token_SYMBOL {
   Probe const* _prb;
@@ -41,6 +43,8 @@ private:
   }
 
 public:
+  Probe const* operator->() const{ return _prb; }
+#if 0
   bool reversed() const{
 	  assert(_prb);
 	  assert(_prb->branch());
@@ -50,9 +54,35 @@ public:
 	  assert(_prb);
 	  return _prb->code_name();
   }
+#endif
   Probe const* prb() const{return _prb;}
 };
 /*--------------------------------------------------------------------------*/
+#if 0
+class Token_SFCALL : public Token {
+public:
+  explicit Token_SFCALL(const std::string Name)
+    : Token(Name, NULL, "") {}
+private:
+  explicit Token_SFCALL(const Token_SFCALL& P) : Token(P) {}
+  Token* clone()const  override{return new Token_SFCALL(*this);}
+  void stack_op(Expression* e)const override{
+    e->push_back(clone());
+  }
+};
+#else
+class Token_SFCALL : public Token_SYMBOL {
+public:
+  explicit Token_SFCALL(const std::string Name)
+    : Token_SYMBOL(Name, "") {}
+private:
+  explicit Token_SFCALL(const Token_SFCALL& P) : Token_SYMBOL(P) {}
+  Token* clone()const  override{return new Token_SFCALL(*this);}
+  void stack_op(Expression* e)const override;
+};
+#endif
+/*--------------------------------------------------------------------------*/
+class Parameter_Base;
 class Token_PAR_REF : public Token_SYMBOL {
   Parameter_Base const* _item;
 public:
@@ -65,19 +95,22 @@ private:
     e->push_back(clone());
   }
 public:
-  Parameter_Base const* item()const {
+  Parameter_Base const* item()const { untested();
 	  return _item;
   }
 };
 /*--------------------------------------------------------------------------*/
 // ITEM_REF?
+class Variable;
+//class Deps;
+class Filter;
 class Token_VAR_REF : public Token_SYMBOL {
-  Base const* _item;
+  Variable const* _item;
 public:
   explicit Token_VAR_REF(const std::string Name, Variable const* item)
     : Token_SYMBOL(Name, ""), _item(item) {}
-  explicit Token_VAR_REF(const std::string Name, Filter const* item)
-    : Token_SYMBOL(Name, ""), _item(item) {}
+//   explicit Token_VAR_REF(const std::string Name, Filter const* item)
+//     : Token_SYMBOL(Name, ""), _item(item) {}
 private:
   explicit Token_VAR_REF(const Token_VAR_REF& P) : Token_SYMBOL(P), _item(P._item) {}
   Token* clone()const  override{return new Token_VAR_REF(*this);}
@@ -85,24 +118,14 @@ private:
     e->push_back(clone());
   }
 public:
-  Base const* item()const { return _item; }
-  Deps const& deps() const{
-    if(auto v = dynamic_cast<Variable const*>(_item)){
-		 return v->deps();
-	 }else if(auto v = dynamic_cast<Filter const*>(_item)){
-		 return v->deps();
-	 }else{
-		 static Deps s;
-		 return s;
-	 }
-  }
-  bool is_module_variable() const{
-    if(auto v = dynamic_cast<Variable const*>(_item)){
-      return v->is_module_variable();
-    }else{ untested();
-      return false;
-    }
-  }
+  Variable const* item()const { untested(); return _item; }
+  Variable const* operator->() const{ return _item; }
+//  Deps const& deps() const{
+//    return _item->deps();
+//  }
+//  bool is_module_variable() const{
+//    return _item->is_module_variable();
+//  }
 };
 /*--------------------------------------------------------------------------*/
 class Token_FILTER : public Token_SYMBOL {
@@ -117,19 +140,20 @@ private:
 //    e->push_back(clone());
 //  }
 public:
-  Base const* item()const { return _item; }
-  std::string code_name() const{
-    assert(_item);
-    return _item->code_name();
-  }
-  Deps const& deps() const{
-    assert(_item);
-    return _item->deps();
-  }
-  Probe const* output() const{
-    assert(_item);
-    return _item->prb();
-  }
+  Filter const* item()const { untested(); return _item; }
+//  std::string code_name() const{
+//    assert(_item);
+//    return _item->code_name();
+//  }
+  Filter const* operator->() const{ return _item; }
+//   Deps const& deps() const{
+//     assert(_item);
+//     return _item->deps();
+//   }
+//   Probe const* output() const{
+//     assert(_item);
+//     return _item->prb();
+//   }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -8,10 +8,19 @@ namespace{
 class DUMMY : public FUNCTION {
   std::string eval(CS&, const CARD_LIST*)const override{
 	  unreachable();
-	  return "";
+	  return "AAA";
   }
 } dummy;
+DISPATCHER<FUNCTION>::INSTALL d_pow(&function_dispatcher, "pow", &dummy);
 DISPATCHER<FUNCTION>::INSTALL d0(&function_dispatcher, "abs", &dummy);
+DISPATCHER<FUNCTION>::INSTALL d_vt(&function_dispatcher, "$vt", &dummy);
+/*--------------------------------------------------------------------------*/
+class TEMPERATURE : public FUNCTION {
+  std::string eval(CS&, const CARD_LIST*)const override{
+	  return "$$temperature";
+  }
+} temperature;
+DISPATCHER<FUNCTION>::INSTALL d1(&function_dispatcher, "$temperature", &temperature);
 /*--------------------------------------------------------------------------*/
 class exp : public FUNCTION {
 public:

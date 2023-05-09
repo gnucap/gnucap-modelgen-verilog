@@ -1,0 +1,31 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_dio3(p, n);
+electrical p, n;
+
+analog begin
+	real v;
+	v = V(p, n);
+	if(v >= 0.)
+		I(p, n) <+ v;
+end
+
+endmodule
+
+!make test_dio3.so > /dev/null
+
+attach ./test_dio3.so
+
+resistor #(.r(1)) r1(2,1);
+test_dio3 dut(1,0);
+vsource v1(2, 0);
+
+list
+
+print dc v(nodes) i(r1) iter(0)
+dc v1 -10 10 2

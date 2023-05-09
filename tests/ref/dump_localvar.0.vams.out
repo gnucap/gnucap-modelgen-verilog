@@ -35,8 +35,8 @@ module test(p, n);
   localparam integer two_a = (2 * a);
 
   analog begin
-    real     b;
-    real     c,     d;
+    real b;
+    real c, d;
     b = two_a;
     c = 0;
     d = 0;

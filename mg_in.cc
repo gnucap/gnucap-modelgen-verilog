@@ -22,6 +22,7 @@
 #include <gnucap/io_.h>
 #include "mg_.h"
 #include <stack>
+#include <gnucap/u_opt.h>
 /*--------------------------------------------------------------------------*/
 static C_Comment   dummy_c_comment;
 static Cxx_Comment dummy_cxx_comment;
@@ -199,13 +200,16 @@ void Define::preprocess(Define_List const& d)
       }else{untested();
 	// error: not defined
       }
+    }else if (file.skip1('/')) { untested();
+      stripped_file += "/";
     }else{
       // move on, just copy
     }
     if (!file.ns_more()) {
+      trace1("prep", file.tail());
       // proper end of file
       break;
-    }else if (file.stuck(&here)) {
+    }else if (file.stuck(&here)) { untested();
       // comment ran to end of file
       break;
     }else{
@@ -279,6 +283,7 @@ std::string Define::substitute(CS& f) const
 std::string File::preprocess(const std::string& file_name)
 {
   CS file(CS::_WHOLE_FILE, file_name);
+  trace1("whole file", file.fullstring());
 
   std::string stripped_file;
   size_t here = file.cursor();
@@ -360,7 +365,10 @@ std::string File::preprocess(const std::string& file_name)
       }else{untested();
 	// error: not defined
       }
-    }else{ //---------------- plain code, just copy
+    }else if (file.skip1('/')) {
+      stripped_file += "/";
+    }else{
+      trace1("moveon", file.tail());
       // move on, just copy
     }
     if (!file.ns_more()) {
@@ -476,6 +484,9 @@ void File::parse(CS& file)
 /*--------------------------------------------------------------------------*/
 void File::read(std::string const& file_name)
 {
+  if(OPT::case_insensitive == 0){
+  }else{ untested();
+  }
   _name = file_name;
   std::string::size_type sepplace;
   sepplace = file_name.find_last_of("/");

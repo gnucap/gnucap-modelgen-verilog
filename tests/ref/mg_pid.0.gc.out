@@ -1,15 +1,9 @@
+pow: already installed, replacing
+stashing as pow:0
 abs: already installed, replacing
 stashing as abs:0
 exp: already installed, replacing
 stashing as exp:0
-abs: already installed, replacing
-stashing as abs:1
-exp: already installed, replacing
-stashing as exp:1
-ddt: already installed, replacing
-stashing as ddt:0
-idt: already installed, replacing
-stashing as idt:0
 pulse: already installed, replacing
 stashing as pulse:0
 dut ( 0 out n1 0 )  pid0  p=.1 i=100 d=1m

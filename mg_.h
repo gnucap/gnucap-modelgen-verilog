@@ -209,7 +209,7 @@ public:
  * A list has opening and closing delimeters, usually {}.
  * A "LiSt" is usually parsed once.
  */
-template <class T, char BEGIN, char SEP, char END>
+template <class T, char BEGIN, char SEP, char END, char END2='\0', char END3='\0'>
 class LiSt :public List_Base<T> {
   Block* _owner{NULL};
 public:
@@ -240,6 +240,10 @@ protected:
 	if (paren == 0) {
 	  //file.warn(0, "list exit");
 	  break;
+	}else if (END2 && file.peek() == END2) {
+	  break;
+	}else if (END3 && file.peek() == END3) {
+	  break;
 	}else{
 	  //file.warn(0, "list");
 	}
@@ -249,9 +253,11 @@ protected:
 	}
 	p->set_owner(owner());
 	file >> *p;
-	if (file.stuck(&here)) { untested();
+	if (file.stuck(&here)) {
 	  delete p;
 	  file.warn(0, "not valid here");
+	  std::cout.flush();
+	  assert(false);
 	  break;
 	}else if (max==size()){
 	  throw Exception_Too_Many(size()+1, max, 0);
@@ -282,7 +288,7 @@ public:
     }
     if (END) {
       f << END;
-    }else{ untested();
+    }else{
     }
   }
 
@@ -497,14 +503,51 @@ protected:
 // 
 class Parameter_1 :public Parameter_Base {
 public:
-  void parse(CS& f);
+  void parse(CS& f) override;
   void dump(std::ostream& f)const override;
   Parameter_1() :Parameter_Base() {}
 };
 typedef LiSt<Parameter_1, '{', '#', '}'> Parameter_1_List;
 /*--------------------------------------------------------------------------*/
+class ValueRangeSpec :public Base {
+  // incomplete();
+};
+/*--------------------------------------------------------------------------*/
+class ValueRangeConstant :public ValueRangeSpec {
+  std::string _cexpr;
+public:
+  void parse(CS& f) override;
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class ValueRangeStrings :public ValueRangeSpec {
+};
+/*--------------------------------------------------------------------------*/
+class ValueRangeInterval :public ValueRangeSpec {
+  std::string _lb;
+  std::string _ub;
+  bool _ub_is_closed;
+  bool _lb_is_closed;
+public:
+  void parse(CS& f) override;
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class ValueRange :public Owned_Base {
+  enum{
+    vr_FROM,
+    vr_EXCLUDE
+  } _type;
+  ValueRangeSpec* _what{NULL};
+public:
+  void parse(CS& f) override;
+  void dump(std::ostream& f)const override;
+};
+typedef LiSt<ValueRange, '\0', '\0', '\0', ',', ';'> ValueRangeList;
+/*--------------------------------------------------------------------------*/
 // parameter type name = value ;
 class Parameter_2 :public Parameter_Base {
+  ValueRangeList _value_range_list;
 public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
@@ -753,20 +796,8 @@ public:
   void set_owner(Block* b){
     _owner = b;
   }
-  Base const* resolve(std::string const& k) const{
-    trace2("resolve", _owner, k);
-    for(auto x : _var_refs){
-      trace1("var_ref", x.first);
-    }
-    const_iterator f = _var_refs.find(k);
-    if(f != _var_refs.end()) {
-      return f->second;
-    }else if(_owner) {
-      return _owner->resolve(k);
-    }else{
-      return NULL;
-    }
-  }
+  Base const* resolve(std::string const& k) const;
+
 //  Base const* item(std::string const&name) { untested();
 //    const_iterator f = _items.find(name);
 //    if(f != _items.end()) { untested();
@@ -775,22 +806,20 @@ public:
 //      return NULL;
 //    }
 //  }
+  void push_back(Base* x);
 };
 /*--------------------------------------------------------------------------*/
-// analog_procedural_block
-class AnalogBlock : public Block {
-private: // this is a stub
-  CS& parse_seq(CS& cmd); // TODO
-  CS& parse_flow_contrib(CS& cmd, std::string const&);
-  CS& parse_pot_contrib(CS& cmd, std::string const&);
-  CS& parse_real(CS& cmd);
-  bool parse_assignment(CS& cmd);
-
-public: // this is a stub
-//  void set_owner(Block* owner) {_owner = owner;}
-  void parse(CS& cmd)override;
+// analog_procedural_block analog_statement?
+class AnalogStmt : public Base {
+public:
+//  void parse(CS& cmd)override;
+//  void dump(std::ostream& o)const override;
+};
+/*--------------------------------------------------------------------------*/
+class SeqBlock : public Block {
+public:
+  void parse(CS& cmd)override{incomplete();}
   void dump(std::ostream& o)const override;
-
 
 //  Block?
   Probe const* new_probe(std::string const& xs, std::string const& p, std::string const& n)override {
@@ -814,7 +843,73 @@ public: // this is a stub
     return owner()->branch(n);
   }
 };
-typedef Collection<AnalogBlock> AnalogBlock_List;
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+// mg_analog.h?
+class AnalogSeqBlock : public AnalogStmt {
+  SeqBlock _block;
+public:
+  void parse(CS& cmd)override;
+  void dump(std::ostream& o)const override;
+  void set_owner(Block* owner) {_block.set_owner(owner);}
+
+  SeqBlock const& block() const{ return _block; }
+};
+/*--------------------------------------------------------------------------*/
+class AnalogConditionalExpression : public Owned_Base /*expression?*/ {
+  Expression* _exp{NULL};
+public:
+  ~AnalogConditionalExpression();
+  void parse(CS& file) override;
+  void dump(std::ostream& o)const override;
+  Block* owner() {return Owned_Base::owner();}
+  Expression const& expression() const{ assert(_exp); return *_exp;}
+};
+/*--------------------------------------------------------------------------*/
+class AnalogConditionalStmt : public AnalogStmt {
+  AnalogConditionalExpression _cond;
+  Base* _true_part{NULL};
+  Base* _false_part{NULL};
+public:
+  ~AnalogConditionalStmt(){
+    delete _true_part;
+    _true_part = NULL;
+    delete _false_part;
+    _false_part = NULL;
+  }
+public:
+  void parse(CS& file) override;
+  void dump(std::ostream& o)const override;
+  void set_owner(Block* o) {_cond.set_owner(o);}
+  Block* owner() {return _cond.owner();}
+  AnalogConditionalExpression const& conditional() const{return _cond;}
+  const Base* true_part_or_null() const{ return _true_part; }
+  const Base* false_part_or_null() const{ return _false_part; }
+  const Base& true_part() const{assert(_true_part); return *_true_part; }
+  const Base& false_part() const{assert(_false_part); return *_false_part; }
+};
+/*--------------------------------------------------------------------------*/
+class AnalogConstruct : public Owned_Base {
+  Base* _stmt{NULL};
+public:
+  ~AnalogConstruct(){
+    delete _stmt;
+    _stmt = NULL;
+  }
+private: // this is a stub
+  CS& parse_seq(CS& cmd); // TODO
+  CS& parse_flow_contrib(CS& cmd, std::string const&);
+  CS& parse_pot_contrib(CS& cmd, std::string const&);
+  CS& parse_real(CS& cmd);
+  bool parse_assignment(CS& cmd);
+
+public: // this is a stub
+  void parse(CS& cmd)override;
+  void dump(std::ostream& o)const override;
+
+  Base const* statement_or_null() const{ return _stmt; }
+};
+typedef Collection<AnalogConstruct> AnalogList;
 #if 0
 class Eval :public Base {
 protected:
@@ -1368,7 +1463,7 @@ private: // verilog input data
   Element_2_List _element_list;
   Port_1_List	_local_nodes;
   Attribute_Instance _attribute_dummy;
-  AnalogBlock_List	_analog_list;
+  AnalogList	_analog_list;
   Code_Block		_validate;
 private: // elaboration data
   Filter_List _filters;
@@ -1396,7 +1491,7 @@ public:
   const Element_2_List&	  circuit()const	{return _element_list;}
   const Port_1_List&	  local_nodes()const	{return _local_nodes;}
 //  const Code_Block&	 tr_eval()const		{return _tr_eval;}
-  const AnalogBlock_List& analog_list() const {return _analog_list;}
+  const AnalogList& analog_list() const {return _analog_list;}
   const Code_Block&	validate()const	{return _validate;}
     	size_t		min_nodes()const	{return ports().size();}
     	size_t		max_nodes()const	{return ports().size();}
@@ -1455,7 +1550,7 @@ public:
     assert(_lhs);
     return _lhs->name();
   }
-  void set_lhs(Variable const* v){_lhs = v;}
+  void set_lhs(Variable const* v);
   Expression const* rhs()const {return _rhs;}
   void parse(CS& cmd) override;
   void dump(std::ostream&)const override;

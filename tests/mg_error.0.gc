@@ -1,6 +1,8 @@
 
 attach ../modelgen_0.so
 
+verilog
+
 `modelgen
 module mock_error
 

@@ -2,6 +2,8 @@
 attach ../modelgen_0.so
 attach ../d_vasrc.so
 
+verilog
+
 `modelgen
 module test_short0(p, n);
 electrical p, n;
@@ -23,8 +25,6 @@ endmodule
 
 attach ./test_short0.so
 attach ./test_short1.so
-
-verilog
 
 test_short0 d0(1, 0);
 test_short1 d1(2, 0);

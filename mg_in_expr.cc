@@ -58,7 +58,18 @@ static bool is_filter_function(std::string const& n)
   }
 }
 /*--------------------------------------------------------------------------*/
-static int is_va_function(std::string const& n)
+static bool is_system_function_call(std::string const& n)
+{
+  if(n=="$temperature"
+    || n=="$vt"){
+    return true;
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+// BUG: returns arity
+static int is_va_function_call(std::string const& n)
 {
   // stub, need sth.
   if (n == "exp"
@@ -208,7 +219,22 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
       // a number
       Float* f = new Float(n);
       E.push_back(new Token_CONSTANT(t->name(), f, ""));
-    }else if(is_va_function(t->name())) {
+    }else if(is_system_function_call(t->name())) {
+      if(!E.is_empty() && dynamic_cast<Token_PARLIST*>(E.back())){
+	trace1("is_system_function_call w args", t->name());
+	Deps* td = depstack.top();
+//	TODO:: td must be empty??
+	depstack.pop();
+	depstack.top()->update(*td);
+	delete(td);
+      }else{
+	E.push_back(new Token_STOP(".."));
+	E.push_back(new Token_PARLIST("...", NULL));
+	// E.push_back(t->clone()); // try later?
+      }
+	// E.push_back(t->clone()); // try later?
+      E.push_back(new Token_SFCALL(t->name()));
+    }else if(is_va_function_call(t->name())) {
       assert(dynamic_cast<Token_PARLIST*>(E.back()));
       Deps* td = depstack.top();
       depstack.pop();
@@ -224,8 +250,8 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
       assert(!depstack.empty());
       // depstack.top()->update(*td);
       delete(td);
-      assert(t->output());
-      depstack.top()->insert(t->output());
+      assert((*t)->prb());
+      depstack.top()->insert((*t)->prb());
     }else if(scope->node(t->name())) {
       trace1("unresolved node", t->name());
       // incomplete();

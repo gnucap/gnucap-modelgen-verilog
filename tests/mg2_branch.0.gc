@@ -2,6 +2,8 @@
 attach ../modelgen_0.so
 attach ../d_vasrc.so
 
+verilog
+
 `modelgen
 module test_branch_0(p, n);
 	electrical p, n;
@@ -19,7 +21,6 @@ endmodule
 !make test_branch_0.so > /dev/null
 attach ./test_branch_0.so
 
-verilog
 parameter v=0
 
 test_branch_0 #() dut(1,0);

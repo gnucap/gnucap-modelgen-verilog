@@ -2,6 +2,8 @@
 attach ../modelgen_0.so
 attach ../d_vasrc.so
 
+verilog
+
 `modelgen
 module test_ccvs0(p, n, cp, cn);
 electrical p, n, cp, cn;
@@ -16,8 +18,6 @@ endmodule
 
 !make test_ccvs0.so > /dev/null
 attach ./test_ccvs0.so
-
-verilog
 
 test_ccvs0 d1(0, 2, 1, 0);
 resistor #(.r(1)) r1(2, 0);

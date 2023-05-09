@@ -2,6 +2,8 @@
 attach ../modelgen_0.so
 attach ../d_vasrc.so
 
+verilog
+
 `modelgen test_res0
 module test_res0(np, nn);
 	electrical np, nn;
@@ -45,7 +47,6 @@ attach ./test_res0.so
 attach ./test_res1.so
 attach ./test_res2.so
 
-verilog
 parameter r=1
 parameter v=0
 

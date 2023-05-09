@@ -1,11 +1,13 @@
+pow: already installed, replacing
+stashing as pow:0
 abs: already installed, replacing
 stashing as abs:0
 exp: already installed, replacing
 stashing as exp:0
+>>>>>verilog 
 >>>>>`modelgen 
 >>>>>!make test_net0.so > /dev/null 
 >>>>>attach ./test_net0.so 
->>>>>verilog 
 >>>>>parameter r=1 
 >>>>>parameter c=1 
 >>>>>parameter v=0 

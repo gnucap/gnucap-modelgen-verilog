@@ -1,14 +1,41 @@
 == preliminary gnucap modelgen
 
-For now, compute and test partial derivatives.
-
 Build with "make", requires gnucap >= 20230304.
-
-test: see tests/README
 
 == build system notes
 
 There is a configure script, but it does not yet work as intended.
+
+== tests
+
+type "make check" to build and run regression tests.
+see tests/README
+
+== general use
+
+Modelgen-verilog preprocesses, parses and dumps vams files.
+
+$ gnucap-verilog { -I path -D def .. } --dump some_file.vams > some_file.dump
+
+To emits C++ code for use with Gnucap, type
+
+$ gnucap-verilog { -I path -D def .. } --cc some_file.vams > some_file.cc.
+
+Compile and link the output into Gnucap plugin
+
+$ c++ -fPIC -I path_to/include some_file.cc -o some_file.o -c
+$ c++ -shared  some_file.o -o some_file.so
+
+Load into Gnucap
+
+$ gnucap -a ./some_file.so
+gnucap> [..]
+
+or
+
+$ gnucap
+gnucap> load ./some_file
+gnucap> [..]
 
 == preprocessor notes
 

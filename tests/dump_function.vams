@@ -1,0 +1,22 @@
+`include "sub/disciplines.few"
+
+module fct(p,n);
+
+	analog begin
+		real T;
+		real TT;
+		real L;
+		real vj, f1, m, fc;
+		f1 = (vj * 2);
+		f1 = (vj / 2);
+		TT = exp(T);
+		TT = exp(3);
+		TT = $vt(T);
+		TT = $vt(3);
+		TT = 3 + $vt(17);
+		TT = $temperature();
+		TT = $temperature;
+		TT = 3 + $temperature;
+		TT = 3 + $temperature();
+	end
+endmodule

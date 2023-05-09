@@ -2,6 +2,8 @@
 attach ../modelgen_0.so
 attach ../d_vasrc.so
 
+verilog
+
 `modelgen
 module polarity1_0(np, nn);
 	electrical np, nn;
@@ -16,8 +18,6 @@ list
 
 !make polarity1_0.so > /dev/null
 attach ./polarity1_0.so
-
-verilog
 
 polarity1_0 dut(1,0);
 vsource v1(1, 0);

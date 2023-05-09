@@ -41,7 +41,8 @@ mg_out_expr.cc \
 mg_out_h.cc \
 mg_out_analog.cc \
 mg_out_module.cc \
-mg_out_common.cc mg_out_dev.cc mg_out_lib.cc mg_out_root.cc
+mg_out_common.cc mg_out_dev.cc mg_out_lib.cc mg_out_root.cc \
+m_tokens.cc
 #------------------------------------------------------------------------
 RAW_HDRS = mg_.h mg_out.h
 #------------------------------------------------------------------------

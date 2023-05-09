@@ -2,6 +2,8 @@
 attach ../modelgen_0.so
 attach ../d_vasrc.so
 
+verilog
+
 `modelgen
 module test_vs0(p, n);
 	electrical p, n;
@@ -15,8 +17,6 @@ endmodule
 
 !make test_vs0.so > /dev/null
 attach ./test_vs0.so
-
-verilog
 
 test_vs0 #(.dc(dc)) dut(1, 0);
 resistor #(.r(2)) r0(1, 0);
