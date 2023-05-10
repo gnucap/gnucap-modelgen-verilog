@@ -1617,8 +1617,8 @@ class Node :public Base {
   Discipline const* _discipline{NULL};
   Nature const* _nature{NULL};
 public:
-  void parse(CS&)override{};
-  void dump(std::ostream&)const{};
+  void parse(CS&)override {};
+  void dump(std::ostream&)const override {};
   Node() {}
   Node(CS& f) {parse(f);}
   Node(std::string const& f, int n) : _name(f), _number(n) {}
@@ -1757,6 +1757,41 @@ inline void Variable::new_var_ref()
   assert(_owner);
   _owner->new_var_ref(this);
 }
+/*--------------------------------------------------------------------------*/
+/*
+analog_event_control_statement ::= analog_event_control analog_event_statement
+analog_event_control ::=
+@ hierarchical_event_identifier
+| @ ( analog_event_expression )
+analog_event_expression ::=
+...
+- analog_event_statement ::=
+- { attribute_instance } analog_loop_statement
+- | { attribute_instance } analog_case_statement
+- | { attribute_instance } analog_conditional_statement
+- | { attribute_instance } analog_procedural_assignment
+- | { attribute_instance } analog_event_seq_block
+- | { attribute_instance } analog_system_task_enable
+- | { attribute_instance } disable_statement
+- | { attribute_instance } event_trigger
+- | { attribute_instance } ;
+*/
+/*--------------------------------------------------------------------------*/
+class AnalogEvtExpression : public Owned_Base {
+  Base* _expression{NULL};
+public:
+  void parse(CS&)override;
+  void dump(std::ostream&)const override;
+};
+/*--------------------------------------------------------------------------*/
+class AnalogEvtCtlStmt : public Owned_Base {
+  AnalogEvtExpression _ctl;
+  Base* _stmt{NULL};
+public:
+  void parse(CS&)override;
+  void dump(std::ostream&)const override;
+};
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

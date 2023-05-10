@@ -1,3 +1,4 @@
+// BUG // need one token per line 
 paramset vs vsource;
   paramset vs vsource; parameter dc; .dc=dc; endparamset; 
  .dc=dc;

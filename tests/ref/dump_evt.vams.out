@@ -1,0 +1,48 @@
+`define DISCIPLINES_H 1
+
+nature Current
+  units = "A";
+  access = "I";
+  idt_nature = "Charge";
+  abstol = "1e-12";
+endnature
+
+nature Charge
+  units = "coul";
+  access = "Q";
+  ddt_nature = "Current";
+  abstol = "1e-14";
+endnature
+
+nature Voltage
+  units = "V";
+  access = "V";
+  idt_nature = "Flux";
+  abstol = "1e-6";
+endnature
+
+
+discipline electrical
+  potential "Voltage";
+  flow "Current";
+enddiscipline
+
+
+module device(p, n);
+  inout p, n;
+  real    r;
+
+  analog begin
+    @(initial_step)     r = 2;
+  end
+
+  analog begin
+    @(initial_step) begin
+      r = 2;
+    end
+  end
+
+endmodule
+
+
+

@@ -134,6 +134,19 @@ static Base* parse_cond(CS& file, Block* o)
   return cb;
 }
 /*--------------------------------------------------------------------------*/
+static Base* new_evt_ctl_stmt(CS& file, Block* o)
+{
+  auto cb = new AnalogEvtCtlStmt();
+  cb->set_owner(o);
+  try{
+    file >> *cb;
+    return cb;
+  }catch(Exception const& e){
+    delete cb;
+    throw e;
+  }
+}
+/*--------------------------------------------------------------------------*/
 static AnalogStmt* parse_seq(CS& file, Block* owner)
 {
   auto b = new AnalogSeqBlock();
@@ -198,18 +211,19 @@ static Base* parse_contribution(CS& file, Block* owner)
   }
 }
 /*--------------------------------------------------------------------------*/
-static Base* parse_AnalogStmt(CS& file, Block* owner)
+static Base* parse_analog_stmt(CS& file, Block* owner)
 {
   assert(owner);
   Base* ret = NULL;
 
-  trace1("parse_AnalogStmt", file.tail().substr(0,10));
+  trace1("parse_analog_stmt", file.tail().substr(0,10));
 //  size_t here = file.cursor();
   ONE_OF	// module_item
     || file.umatch(";")
     || ((file >> "begin ") && (ret = parse_seq(file, owner)))
     || ((file >> "real ") && (ret = parse_real(file, owner)))
     || ((file >> "if ") && (ret = parse_cond(file, owner)))
+    || ((file >> "@ ") && (ret = new_evt_ctl_stmt(file, owner)))
     || (ret = parse_contribution(file, owner))
     || (ret = parse_assignment(file, owner))
 //    || parse_seq(file)
@@ -223,10 +237,10 @@ void AnalogConditionalStmt::parse(CS& file)
   file >> "(" >> _cond >> ")";
   if(file >> ";"){
   }else{
-    _true_part = parse_AnalogStmt(file, owner());
+    _true_part = parse_analog_stmt(file, owner());
     if(file >> "else "){
       trace1("got else branch", file.tail().substr(0, 1));
-      _false_part = parse_AnalogStmt(file, owner());
+      _false_part = parse_analog_stmt(file, owner());
     }else{
     }
   }
@@ -272,7 +286,7 @@ void AnalogConditionalStmt::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void AnalogConstruct::parse(CS& file)
 {
-  _stmt = parse_AnalogStmt(file, owner());
+  _stmt = parse_analog_stmt(file, owner());
   assert(_stmt); // throw?
 }
 /*--------------------------------------------------------------------------*/
@@ -285,7 +299,7 @@ void AnalogSeqBlock::parse(CS& file)
       break;
     }else{
     }
-    Base* s = parse_AnalogStmt(file, &_block);
+    Base* s = parse_analog_stmt(file, &_block);
     if(!s){
       throw Exception_CS("bad analog block", file);
       break;
@@ -530,6 +544,48 @@ void AnalogConditionalExpression::parse(CS& file)
   Deps ignore;
   resolve_symbols(rhs, tmp, owner(), &ignore);
   _exp = new Expression(tmp, &CARD_LIST::card_list);
+}
+/*--------------------------------------------------------------------------*/
+void AnalogEvtCtlStmt::parse(CS& file)
+{
+  file >> _ctl;
+  assert(owner());
+  _stmt = parse_analog_stmt(file, owner());
+}
+/*--------------------------------------------------------------------------*/
+void AnalogEvtCtlStmt::dump(std::ostream& o) const
+{
+  o__ "@" << _ctl;
+  if(dynamic_cast<AnalogSeqBlock const*>(_stmt)){
+    o << " " << *_stmt;
+  }else if(_stmt){
+#if 0
+    o << " " << *_stmt;
+#else
+    o << "\n";
+    {
+      indent x;
+      o << *_stmt;
+    }
+#endif
+  }else{
+    o << ";";
+  }
+}
+/*--------------------------------------------------------------------------*/
+void AnalogEvtExpression::parse(CS& file)
+{
+  _expression = new Expression(file);
+}
+/*--------------------------------------------------------------------------*/
+void AnalogEvtExpression::dump(std::ostream& o) const
+{
+  o << "(";
+  if(_expression) {
+    o << *_expression;
+  }else{ untested();
+  }
+  o << ")";
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
