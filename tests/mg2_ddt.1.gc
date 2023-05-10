@@ -12,6 +12,7 @@ V1 p n sin freq=1 amplitude={ampl} dc=dc
 
 `modelgen
 module test_ddt1(np, nn);
+	electrical np, nn;
 	real ddtidt;
 	real idtddt;
 	analog begin

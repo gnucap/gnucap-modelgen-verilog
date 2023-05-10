@@ -1,0 +1,37 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen test_valid1
+module test_valid1(p, n);
+	electrical p, n;
+	inout p, n;
+	parameter real ub = 1. from (0:inf);
+	parameter real r = 1. from (0:ub];
+	analog begin
+		I(p,n) <+ V(p,n) / r;
+	end
+endmodule
+
+list
+
+// name clash..
+!make test_valid1.so > /dev/null
+attach ./test_valid1.so
+
+module test(1 2);
+	test_valid1 #(.r(1.)) r0(1,0);
+	test_valid1 #(.r(1.), .ub(2.)) r1(1,2);
+	vsource #(.dc(1.)) v1(2, 0);
+endmodule
+
+test m(1 2)
+
+list
+
+print dc v(nodes)
+
+dc
+end

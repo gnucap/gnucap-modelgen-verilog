@@ -1,0 +1,35 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_af_2(p, n);
+	electrical p, n;
+	parameter real rr = 1;
+
+	analog function real fct;
+		input x;
+		begin
+			fct = exp(x);
+		end
+	endfunction
+
+	analog begin
+		I(p, n) <+ fct(rr) * V(p,n);
+	end
+endmodule
+
+!make test_af_2.so > /dev/null
+attach ./test_af_2.so
+
+parameter rr=0
+isource #(.dc(1)) ii(0, 1);
+test_af_2 #(.rr(rr)) dut(1, 0);
+
+list
+
+print dc v(nodes) iter(0)
+dc rr -5 10 2
+end

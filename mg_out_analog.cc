@@ -20,6 +20,7 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_out.h"
+#include "mg_analog.h"
 //#include "m_tokens.h"
 /*--------------------------------------------------------------------------*/
 static void make_cc_variable(std::ostream& o, Variable const& v)
@@ -29,6 +30,14 @@ static void make_cc_variable(std::ostream& o, Variable const& v)
     o << ind << " Dep: " << i->code_name();
   }
   o << ind << "\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_block_int_identifier_list(std::ostream& o, ListOfBlockIntIdentifiers const& rl)
+{
+  for(Variable const* v : rl){
+    assert(v);
+    make_cc_variable(o, *v);
+  }
 }
 /*--------------------------------------------------------------------------*/
 static void make_cc_block_real_identifier_list(std::ostream& o, ListOfBlockRealIdentifiers const& rl)
@@ -44,7 +53,7 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
   assert(a.rhs());
   Expression const& e = *a.rhs();
 
-  o << ind << "{ // Assignment '" << a.lhsname() << "'.";
+  o << ind << "{ // Assignment " << a.type() <<" '" << a.lhsname() << "'.";
   for(auto i : a.deps()) {
     o << " Dep: " << i->code_name();
   }
@@ -53,54 +62,85 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
   {
     indent x;
     make_cc_expression(o, e);
-    std::string prefix;
-    if(a.is_module_variable()){
-      prefix = "d->_v_";
+    o__ "assert(t0.is_same(t0));\n";
+    if(dynamic_cast<Analog_Function_Arg const*>(&a.lhs())){
+      o__ a.lhs().code_name() << " = t0; // (*)\n";
+    }else if(a.is_int()){
+      o__ a.lhs().code_name() << " = int(t0); // (*)\n";
     }else{
-      prefix = "_v_";
-    }
-    o__ prefix << a.lhsname() << ".value() = t0.value();\n";
-    for(auto v : a.deps()) {
-      if(v->is_reversed()){
-      }else{
+#ifdef PASS_UNUSED_DERIV
+      untested();
+      o__ a.lhs().code_name() << " = t0; // (*)\n";
+      for(auto v : a.deps()) { untested();
+	o__ "// " << a.lhs().code_name() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // 2\n";
       }
-      o__ prefix << a.lhsname() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "];\n";
-      o__ "assert(" << prefix << a.lhsname() << " == " << prefix << a.lhsname() << ");\n";
+#else
+      o__ a.lhs().code_name() << " = t0.value(); // (*)\n";
+
+      for(auto v : a.deps()) {
+	if(v->is_reversed()){
+	}else{
+	}
+	o__ a.lhs().code_name() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // 2\n";
+	o__ "assert(" << a.lhs().code_name() << " == " << a.lhs().code_name() << ");\n";
+      }
+#endif
     }
   }
   o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_cc_contrib(std::ostream& o, Contribution const& f)
+static void make_cc_contrib(std::ostream& o, Contribution const& C)
 {
-  o__ "{ // Contribution " << f.name() << "\n";
+  o__ "{ // Contribution " << C.name() << "\n";
   {
     indent x("  ");
-    if(f.rhs()) {
-      make_cc_expression(o, *f.rhs());
+    if(C.rhs()) {
+      make_cc_expression(o, *C.rhs());
     }else{ untested();
     }
 
-    char sign = f.reversed()?'-':'+';
+    char sign = C.reversed()?'-':'+';
+    std::string bcn = C.branch()->code_name();
+    if(C.branch()->has_pot_source()){
+      if(C.is_pot_contrib()){
+	o__ "if (!d->_pot" << bcn << "){\n";
+	o____ "d->_pot" << bcn << " = true;\n";
+      }else{
+	o__ "if (d->_pot" << bcn << "){\n";
+	o____ "d->_pot" << bcn << " = false;\n";
+      }
 
-    assert(f.branch());
-    o__ "d->_value" << f.branch()->code_name() << " "<<sign<<"= t0.value();\n";
-    for(auto v : f.deps()) {
-      if(f.branch() == v->branch()){
+      // DUP, clear.
+      o____ "d->_value" << bcn << " = 0.;\n";
+      o____ "std::fill_n(d->_st" << bcn << "+1, " << C.branch()->num_states()-1 << ", 0.);\n";
+      o__ "}else{\n";
+      o__ "}\n";
+    }else{
+      // always flow.
+    }
+
+    assert(C.branch());
+    o__ "d->_value" << C.branch()->code_name() << " "<<sign<<"= t0.value();\n";
+    for(auto v : C.deps()) {
+      if(C.branch() == v->branch()){
 	o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
-	o__ "d->" << f.branch()->state() << "[1]"
+	o__ "d->" << C.branch()->state() << "[1]"
 	  " "<<sign<<"= " << "t0[d" << v->code_name() << "];\n";
       }else{
       }
     }
     size_t k = 2;
-    for(auto v : f.deps()) {
+    for(auto v : C.deps()) {
       o__ "// dep " << v->code_name() << "\n";
-      if(f.branch() == v->branch()){
+      if(C.branch() == v->branch()){
       }else{
 	o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
-	o__ "d->" << f.branch()->state() << "[" << k << "]"
-	  " "<<sign<<"= " << "t0[d" << v->code_name() << "];\n";
+	o__ "assert(MOD::" << C.branch()->state() << "_::dep" << v->code_name() << " < "
+	   << C.branch()->num_states() << ");\n";
+	o__ "d->" << C.branch()->state() << "[" // << k << "/*"
+	  << "MOD::" << C.branch()->state() << "_::dep" << v->code_name() << "] "
+	  <<sign<<"= " << "t0[d" << v->code_name() << "]; // (3)\n";
 	++k;
       }
     }
@@ -108,15 +148,60 @@ static void make_cc_contrib(std::ostream& o, Contribution const& f)
   o << ind <<  "}\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_cc_af_args(std::ostream& o, const Analog_Function& f)
+{
+  std::string sep = "";
+  std::string qual = "";
+  for (auto coll : f.args()){
+      if(coll->is_output()){
+	qual = "&";
+      }else{
+	qual = "";
+      }
+    for(auto i : *coll){
+      o << sep << "ddouble " << qual;
+      o << " af_arg_" << i->identifier();
+      sep = ", ";
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_af_body(std::ostream& o, const Analog_Function& f);
+/*--------------------------------------------------------------------------*/
+void make_cc_analog_functions(std::ostream& o, const Module& m)
+{
+  for(auto f : m.analog_functions()){
+    assert(f);
+    o << "COMMON_" << m.identifier() << "::";
+    o << "ddouble COMMON_" << m.identifier() << "::" << f->code_name() << "(\n";
+    o << "            ";
+    make_cc_af_args(o, *f);
+    o << ") const\n{\n";
+    {
+      indent x;
+      o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
+      o__ "(void)pc;\n";
+      make_cc_af_body(o, *f);
+    }
+    o << "}\n"
+      "/*--------------------------------------"
+      "------------------------------------*/\n";
+  }
+}
+/*--------------------------------------------------------------------------*/
 void make_cc_filter(std::ostream& o, const Module& m)
 {
   for(auto f : m.filters()){
-    std::string cn = f->branch_code_name();
     o << "COMMON_" << m.identifier() << "::";
     o << "ddouble COMMON_" << m.identifier() << "::FILTER" << f->code_name() <<
-        "::operator()(ddouble t0, MOD_" << m.identifier() << "* d) const\n{\n";
+        "::operator()(";
+	for(size_t n=0; n<f->num_args(); ++n){
+	    o << " ddouble t" << n << ", ";
+	}
+    o << "MOD_" << m.identifier() << "* d) const\n{\n";
     o______ "// incomplete();\n"; // polarities...
-    {
+
+    if(f->has_branch()) {
       char sign = '+'; // TODO
       indent a;
       o__ "// assert(!d->" << f->state() << "[0]);\n";
@@ -136,43 +221,55 @@ void make_cc_filter(std::ostream& o, const Module& m)
 	  ++k;
 	//}
       }
+    }else{
+      o__ "(void) d;\n";
+      f->make_cc(o, m);
     }
 
-    o__ "d->" << cn << "->do_tr();\n";
-    o__ "t0 = d->" << cn << "->tr_amps();\n";
-    o__ "trace2(\"filt\", t0, d->"<< cn<<"->tr_outvolts());\n";
-    assert(f->prb());
-    o__ "t0[d" << f->prb()->code_name() << "] = 1.;\n";
-    o__ "return t0;\n";
+    if(f->has_branch()){
+      std::string cn = f->branch_code_name();
+      o__ "d->" << cn << "->do_tr();\n";
+//      o__ "d->" << cn << "->q_eval();\n";
+      o__ "t0 = d->" << cn << "->tr_amps();\n";
+      o__ "trace2(\"filt\", t0, d->"<< cn<<"->tr_outvolts());\n";
+      assert(f->prb());
+      o__ "t0[d" << f->prb()->code_name() << "] = 1.;\n";
+      o__ "return t0;\n";
+    }else{
+    }
 
-    o << "}\n";
+    o << "}\n"
+      "/*--------------------------------------"
+      "------------------------------------*/\n";
   }
 }
 /*--------------------------------------------------------------------------*/
-void AnalogConstExpression::dump(std::ostream& o)const
+void AnalogExpression::dump(std::ostream& o)const
 {
   assert(_exp);
   _exp->dump(o);
-  //    o << ")))";
 }
 /*--------------------------------------------------------------------------*/
 static void make_cc_analog_cond(std::ostream& o, AnalogConditionalStmt const& s);
 static void make_cc_analog_switch(std::ostream& o, AnalogSwitchStmt const& s);
+static void make_cc_analog_for(std::ostream& o, AnalogForStmt const& s);
+static void make_cc_analog_while(std::ostream& o, AnalogWhileStmt const& s);
 static void make_cc_analog_seq(std::ostream& o, AnalogSeqBlock const& s);
 static void make_cc_analog_evt(std::ostream& o, AnalogEvtCtlStmt const& s);
+static void make_cc_system_task(std::ostream& o, System_Task const& s);
 static void make_cc_analog_stmt(std::ostream& o, Base const& ab)
 {
   Base const* i = &ab;
   if(auto s = dynamic_cast<AnalogSeqBlock const*>(&ab)){
     make_cc_analog_seq(o, *s);
-  }else if(auto fc=dynamic_cast<FlowContribution const*>(i)) {
+  }else if(auto fc=dynamic_cast<Contribution const*>(i)) {
     make_cc_contrib(o, *fc);
-  }else if(auto pc=dynamic_cast<PotContribution const*>(i)) {
-    make_cc_contrib(o, *pc);
   }else if(auto a=dynamic_cast<Assignment const*>(i)) {
     make_cc_assignment(o, *a);
   }else if(auto rl=dynamic_cast<ListOfBlockRealIdentifiers const*>(i)) {
     make_cc_block_real_identifier_list(o, *rl);
+  }else if(auto rl=dynamic_cast<ListOfBlockIntIdentifiers const*>(i)) {
+    make_cc_block_int_identifier_list(o, *rl);
   }else if(auto v=dynamic_cast<Variable const*>(i)) { untested();
     unreachable();
     make_cc_variable(o, *v);
@@ -180,13 +277,38 @@ static void make_cc_analog_stmt(std::ostream& o, Base const& ab)
     make_cc_analog_cond(o, *v);
   }else if(auto ss=dynamic_cast<AnalogSwitchStmt const*>(i)) {
     make_cc_analog_switch(o, *ss);
-  }else if(auto ss=dynamic_cast<AnalogEvtCtlStmt const*>(i)) {
-    make_cc_analog_evt(o, *ss);
+  }else if(auto ww=dynamic_cast<AnalogForStmt const*>(i)) {
+    make_cc_analog_for(o, *ww);
+  }else if(auto ww=dynamic_cast<AnalogWhileStmt const*>(i)) {
+    make_cc_analog_while(o, *ww);
+  }else if(auto ev=dynamic_cast<AnalogEvtCtlStmt const*>(i)) {
+    make_cc_analog_evt(o, *ev);
     //throw Exception("analogevtctl unsupported");
+  }else if(auto t=dynamic_cast<System_Task const*>(i)) {
+    make_cc_system_task(o, *t);
   }else{ untested();
     incomplete();
     assert(false);
   }
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_af_body(std::ostream& o, const Analog_Function& f)
+{
+  std::string me = f.variable().code_name();
+  o__ "ddouble " << me << "(0.);\n";
+
+  // is-a-block, has-a-block...?
+  for(auto i : f) {
+    make_cc_analog_stmt(o, *i);
+  }
+  o__ "return " << me << ";\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_system_task(std::ostream& o, System_Task const&)
+{
+  o__ "{\n";
+  o____ "// incomplete, system task\n;";
+  o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
 static void make_cc_analog_evt(std::ostream& o, AnalogEvtCtlStmt const& s)
@@ -209,6 +331,47 @@ static void make_cc_analog_evt(std::ostream& o, AnalogEvtCtlStmt const& s)
   o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_cc_analog_loop(std::ostream& o, AnalogWhileStmt const& s)
+{
+  o__ "while(true){\n";
+  {
+    indent x;
+    make_cc_expression(o, s.conditional().expression());
+    o__ "if (t0) {\n";
+    if(s.has_body()) {
+      indent y;
+      make_cc_analog_stmt(o, s.body());
+    }else{ untested();
+    }
+
+    if(s.has_tail()){
+      make_cc_analog_stmt(o, s.tail());
+    }else{
+    }
+
+
+    o__ "}else{\n";
+    o____ "break;\n";
+    o__ "}\n";
+
+  }
+  o__ "}\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_analog_while(std::ostream& o, AnalogWhileStmt const& s)
+{
+  make_cc_analog_loop(o, s);
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_analog_for(std::ostream& o, AnalogForStmt const& s)
+{
+  if(s.has_init()){
+    make_cc_analog_stmt(o, s.init());
+  }else{
+  }
+  make_cc_analog_loop(o, s);
+}
+/*--------------------------------------------------------------------------*/
 static void make_cc_analog_cond(std::ostream& o, AnalogConditionalStmt const& s)
 {
   o__ "{\n";
@@ -224,8 +387,12 @@ static void make_cc_analog_cond(std::ostream& o, AnalogConditionalStmt const& s)
     o__ "}";
     if(s.false_part_or_null()) {
       o << "else ";
-      indent y;
-      make_cc_analog_stmt(o, s.false_part());
+      o__ "{\n";
+      {
+	indent y;
+	make_cc_analog_stmt(o, s.false_part());
+      }
+      o__ "}\n";
     }else{
     }
 
@@ -233,6 +400,23 @@ static void make_cc_analog_cond(std::ostream& o, AnalogConditionalStmt const& s)
 
   }
   o__ "}\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_cond_expressions(std::ostream& o, AnalogConstExpressionList const&l)
+{
+
+  std::string paren="";
+//  o<< "{\n";
+  for(auto e : l){
+    make_cc_expression(o, e->expression());
+
+    o__ "if(t0 == s){\n";
+    o____ "cond=true;\n";
+    o__ "}else{\n";
+      paren += "}";
+  }
+
+  o << paren << "\n";
 }
 /*--------------------------------------------------------------------------*/
 static void make_cc_analog_switch(std::ostream& o, AnalogSwitchStmt const& s)
@@ -256,9 +440,10 @@ static void make_cc_analog_switch(std::ostream& o, AnalogSwitchStmt const& s)
       if(i->cond_or_null()){
 	o << "{\n";
 
-	make_cc_expression(o, i->cond_or_null()->expression());
+	o << "bool cond = false;\n";
+	make_cond_expressions(o, *i->cond_or_null());
 
-	o__ "if (t0 == s) {\n";
+	o__ "if (cond) {\n";
 
 	if(i->code_or_null()){
 	  indent y;
@@ -291,12 +476,15 @@ static void make_cc_analog_switch(std::ostream& o, AnalogSwitchStmt const& s)
 /*--------------------------------------------------------------------------*/
 static void make_cc_analog_seq(std::ostream& o, AnalogSeqBlock const& s)
 {
+  o__ "{ // " << s.identifier() << "\n";
   for(auto i : s.block()) {
+    indent x;
     make_cc_analog_stmt(o, *i);
   }
+  o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
-void make_cc_analog(std::ostream& o, AnalogConstruct const& ab)
+void make_analog_construct(std::ostream& o, AnalogConstruct const& ab)
 {
   if(ab.statement_or_null()){
     make_cc_analog_stmt(o, *ab.statement_or_null());
@@ -321,5 +509,195 @@ std::string Branch::code_name() const
 {
   return "_b_" + p()->name() + "_" + n()->name();
 }
+/*--------------------------------------------------------------------------*/
+std::string Analog_Function_Arg::code_name()const
+{
+  return "af_arg_" + name();
+}
+/*--------------------------------------------------------------------------*/
+static void make_one_branch_contribution(std::ostream& o, Module const& m, const Branch& br)
+{
+  Branch const* b = &br;
+  size_t k = 1;
+  o__ "assert(_value" << b->code_name() << " == _value" << b->code_name() << ");\n";
+  o__ b->state() << "[0] = _value" << b->code_name() << ";\n";
+
+  // self_admittance
+  for(auto d : b->deps()){
+    if(d->branch() == b){
+      if(b->has_pot_source() && b->has_flow_probe()){
+
+	o__ "if (!_pot"<< b->code_name() << "){ itested();\n";
+	o__ "}else if (" << b->state() << "[1] > OPT::shortckt){\n";
+	o____ "_pot"<< b->code_name() << " = false;\n";
+	o____ b->state() << "[0] /= - " << b->state() << "[1];\n";
+	if(br.num_states()<=2){
+	}else{
+	  incomplete(); // the other ones??
+	}
+	o__ "}else{\n";
+	o__ "}\n";
+      }else{
+      }
+      o__ "trace2(\"" <<  b->state() << "self\", " << b->state() << "[1], "<<  d->code_name() <<");\n";
+      o__ b->state() << "[0] -= " << b->state() << "[1] * "<< d->code_name() << ";\n";
+      break;
+    }else{
+    }
+  }
+  k = 2;
+  for(auto i : m.branches()){
+//    o__ "trace1(\"" <<  b->state() << "\", _value" << b->code_name() << ");\n";
+    for(auto d : b->deps()){
+      if(d->branch() == b){
+      }else if(d->branch() != i.second){
+      }else if(d->is_pot_probe()){
+	o__ "trace2(\" pot " <<  b->state() << "\", " << b->state() << "["<<k<<"], "<<  d->code_name() <<");\n";
+	o__ b->state() << "[0] -= " << b->state() << "["<<k<<"] * "<< d->code_name() << ";\n";
+	++k;
+	break;
+      }else if(d->is_filter_probe()){
+	o__ "// trace2(\" filter " <<  b->state() << "\", " << b->state() << "["<<k<<"], "<<  d->code_name() <<");\n";
+	//o__ b->state() << "[0] -= " << b->state() << "["<<k<<"] * _st" << d->branch()->code_name() << "[0];\n";
+	o__ b->state() << "[0] -= " << b->state() << "["<<k<<"] * " << d->branch()->code_name() << "->tr_amps();\n";
+	++k;
+	break;
+      }else if(d->is_flow_probe()){
+	// nothing, handled below.
+      }else{ untested();
+	o__ "// bogus probe " << b->state() << " : " << d->code_name() << "\n";
+      }
+    }
+  }
+  for(auto i : m.branches()){
+    // o__ "trace1(\"" <<  b->state() << "\", _value" << b->code_name() << ");\n";
+    for(auto d : b->deps()){
+      if(d->branch() == b){
+      }else if(d->branch() != i.second){
+      }else if(d->is_flow_probe()){
+	o__ "trace2(\"flow " <<  b->state() << "\", " << b->state() << "["<<k<<"], "<<  d->code_name() <<");\n";
+	o__ b->state() << "[0] -= " << b->state() << "["<<k<<"] * "<< d->code_name() << ";\n";
+	// BUG? scaling before convcheck?
+	o__ b->state() << "["<<k<<"] *= " << d->branch()->code_name() <<"->_loss0; // BUG?\n";
+	++k;
+	break;
+      }else if(d->is_pot_probe()){
+	// nothing, handled above
+      }else if(d->is_filter_probe()){
+	// nothing, handled above
+      }else{ untested();
+      }
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+void make_set_branch_contributions(std::ostream& o, const Module& m)
+{
+  o << "inline void MOD_" << m.identifier() << "::set_branch_contributions()\n{\n";
+  for(auto i : m.branches()){
+    Branch const* b = i.second;
+    // if(b->has_pot_source() && b->has_flow_source()){
+    //  ...
+    // }else
+
+    if(b->has_flow_source() || b->has_pot_source()) {
+      for(auto D : b->deps()){
+	o__ "// DEP " << D->code_name() << "\n";
+      }
+      make_one_branch_contribution(o, m, *b);
+    }else if(b->has_flow_probe()) {
+      o__ "// flow prb " << b->name() << "\n";
+      o__ b->code_name() << "->_loss0 = 1./OPT::shortckt;\n";
+    }else{
+    }
+
+    if(b->has_pot_source()) {
+      o__ "// pot src " << b->name() << "\n";
+      o__ "if(_pot" << b->code_name() << "){\n";
+	o____ b->code_name() << "->_loss0 = 1./OPT::shortckt;\n";
+      o__ "}else{\n";
+	o____ b->code_name() << "->_loss0 = 0.;\n";
+      o__ "}\n";
+    }else if(b->has_flow_source()) {
+      assert(!b->has_pot_source());
+      o__ "// flow src " << b->name() << "\n";
+    }else{
+    }
+  }
+
+  o__ "// filters\n";
+  for(auto x : m.filters()){
+    o__ "// filter " << x->code_name() << "\n";
+  }
+
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_common_tr_eval(std::ostream& o, const Module& m)
+{
+  o << "inline void COMMON_" << m.identifier() << 
+    "::tr_eval_analog(MOD_" << m.identifier() << "* d) const\n{\n";
+
+  // parameters are here.
+  o__ "MOD_" << m.identifier() << " const* p = d;\n";
+  o__ "assert(p);\n";
+  o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
+  o__ "(void)pc;\n";
+
+  for(auto bb : m.analog_list()){
+    assert(bb);
+//    if(auto ab = dynamic_cast<AnalogStmt const*>(bb)){
+//    }else
+    if(auto ab = dynamic_cast<AnalogConstruct const*>(bb)){
+      o << ind << "{\n";
+      {
+	indent a;
+	make_analog_construct(o, *ab);
+      }
+      o << ind << "}\n";
+    }else{ untested();
+    }
+  }
+  o << "}\n";
+}
+/*--------------------------------------------------------------------------*/
+void make_clear_branch_contributions(std::ostream& o, const Module& m)
+{
+  o << "inline void MOD_" << m.identifier() << "::clear_branch_contributions()\n{\n";
+  for(auto x : m.branches()){
+    assert(x.second);
+    if(x.second->has_element()){
+      if(x.second->has_pot_source()){
+	o____ "_pot" << x.second->code_name() << " = false;\n";
+      }else if(x.second->has_pot_source()){ untested();
+	o____ "_pot" << x.second->code_name() << " = true;\n";
+      }else{
+      }
+      o____ "_value" << x.second->code_name() << " = 0.;\n";
+      o____ "std::fill_n(_st" << x.second->code_name() << "+1, " << x.second->num_states()-1 << ", 0.);\n";
+    }else{
+    }
+  }
+  for(auto x : m.filters()){
+    assert(x);
+    if(x->has_branch()){
+      o____ "// std::fill_n(_st" << x->code_name() << ", " << x->num_states() << ", 0.);\n";
+    }else{
+    }
+  }
+  o << "}\n"
+      "/*--------------------------------------"
+      "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+void make_cc_analog(std::ostream& o, const Module& m)
+{
+  make_set_branch_contributions(o, m);
+  make_clear_branch_contributions(o, m);
+  make_common_tr_eval(o, m);
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

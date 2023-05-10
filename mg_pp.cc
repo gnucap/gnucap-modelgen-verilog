@@ -28,32 +28,110 @@ static C_Comment   dummy_c_comment;
 static Cxx_Comment dummy_cxx_comment;
 static Skip_Block  skip_block;
 /*--------------------------------------------------------------------------*/
-static void append_to(CS& file, std::string& to, std::string until)
+// copied in from a_construct.
+static std::string getlines(FILE *fileptr);
+CS& CS::get_line(const std::string& prompt)
 {
-//  trace2("append_to", file.tail(), file.more());
-  if(!file.more()) {
+  ++_line_number;
+  if (is_file()) {
+    _cmd = getlines(_file);
+    _cnt = 0;
+    _length = _cmd.length();
+    _ok = true;
+  }else{itested();
+    assert(_file == stdin);
+    char cmdbuf[BUFLEN];
+    getcmd(prompt.c_str(), cmdbuf, BUFLEN);
+    _cmd = cmdbuf;
+    _cnt = 0;
+    _length = _cmd.length();
+    _ok = true;
+  }
+
+  if (OPT::listing) {
+    IO::mstdout << "\"" << fullstring() << "\"\n";
+  }else{
+  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+static std::string getlines(FILE *fileptr)
+{
+  assert(fileptr);
+  const int buffer_size = BIGBUFLEN;
+  std::string s;
+
+  bool need_to_get_more = true;  // get another line (extend)
+  while (need_to_get_more) {
+    char buffer[buffer_size+1];
+    char* got_something = fgets(buffer, buffer_size, fileptr);
+    if (!got_something) { // probably end of file
+      need_to_get_more = false;
+      if (s == "") {
+	throw Exception_End_Of_Input("");
+      }else{untested();
+      }
+    }else{
+      trim(buffer);
+      size_t count = strlen(buffer);
+      if (buffer[count-1] == '\\') {
+	buffer[count-1] = '\0';
+      }else{
+	// look ahead at next line
+	//int c = fgetc(fileptr);
+	int c;
+	while (isspace(c = fgetc(fileptr))) {
+	  // skip
+	}
+	// if (c == '+') {
+	//   need_to_get_more = true;
+	// }else if (c == '\n') {unreachable();
+	//   need_to_get_more = true;
+	//   ungetc(c,fileptr);
+	// }else
+	{
+	  need_to_get_more = false;
+	  ungetc(c,fileptr);
+	}
+      }
+      s += buffer;
+      s += ' ';
+    }
+  }
+  return s;
+}
+/*--------------------------------------------------------------------------*/
+static void append_to(CS& f, std::string& to, std::string until)
+{
+  trace2("append_to", f.tail(), f.more());
+  if(!f.ns_more()) {
     try{
-      file.get_line("");
-      trace1("got line", file.tail());
+//      to+="\n";
+      f.get_line("");
+      trace2("got line", f.tail(), f.more());
     }catch (Exception_End_Of_Input const&) {
-      assert(!file.more());
+      assert(!f.more());
     }
   }else{
   }
 
-  while (file.more()) {
-    std::string chunk = file.get_to(until);
-    trace3("got_to", until, chunk, file.tail());
+  // while (f.peek() && (!isgraph(f.peek()))) {
+  //   to += f.ctoc();
+  // }
+
+  while (f.more()) {
+    std::string chunk = f.get_to(until);
+    trace3("got_to", until, chunk, f.tail());
     to += chunk;
-    if(file.match1(until)){
+    if(f.match1(until)){
       // match
       return;
     }else{
-      to += "\n";
-      trace2("discard", chunk, file.tail());
+      trace2("discard", chunk, f.tail());
+      to += "\n"; // BUG?
       try{
-	file.get_line("");
-	trace1("got line", file.tail());
+	f.get_line("");
+	trace2("got line2 ", f.tail(), f.more());
       }catch( Exception_End_Of_Input const&){
 	trace1("EOI", chunk);
       }
@@ -100,21 +178,21 @@ void Skip_Block::parse(CS& file)
     if (file >> "`endif") {
       if (nest == 0) {
 	break;  // done with skip_block
-      }else{ untested();untested();
+      }else{ itested();
 	--nest;
       }
     }else if (file >> "`else") {
       if (nest == 0) {
 	break;  // done with skip_block
-      }else{ untested();untested();
+      }else{ itested();
       }
-    }else if (file >> "`ifndef") { untested();untested();
+    }else if (file >> "`ifndef") { untested();
       ++nest;
-    }else if (file >> "`ifdef") { untested();untested();
+    }else if (file >> "`ifdef") { itested();
       ++nest;
     }else if (!file.more()) {
       file.get_line("");
-    //}else if (file.stuck(&here)) { untested();untested();
+    //}else if (file.stuck(&here)) { untested();
     //  file.warn(0, "unterminated ifdef block");
     //  break;
     }else{
@@ -148,32 +226,17 @@ The following compiler directives are supported:
 + `undef[10.4]
 */
 /*--------------------------------------------------------------------------*/
-void Define::parse(CS& f)
+template<class T>
+size_t listpos(T const& l, typename T::const_iterator i)
 {
-  f >> _name;
-  f >> _args;
-
-  _value = f.get_to("/");
-  while (f.match1('/')) {
-    if (f >> "//") {
-      f.get_to("\n"); //  dummy_cxx_comment;
-    }else if (f >> "/*") /* C comment */ {
-      f >> dummy_c_comment; //BUG// line count may be wrong
-      _value += f.get_to("/\n");
-    }else{
-      trace3("defparse", _name, _value, f.tail());
-      _value += "/";
-      f.skip();
-      _value += f.get_to("/\n");
-    }
+  size_t ret = 0;
+  typename T::const_iterator j = l.begin();
+  while(i!=j){
+    ++ret;
+    ++j;
   }
-  if(_value.is_empty()){
-  }else{
-  }
-  trace3("defparse", _name, _value, f.tail());
+  return ret;
 }
-/*--------------------------------------------------------------------------*/
-static String_Arg_List eval_args(CS& f, size_t howmany, Define_List const&);
 /*--------------------------------------------------------------------------*/
 // PP_identifier::parse?
 static std::string get_identifier(CS& f)
@@ -184,35 +247,87 @@ static std::string get_identifier(CS& f)
   }else{
     throw(Exception_CS("syntax error", f));
   }
-  while(f.is_alnum() || f.match1("_[]$")) {
+  while(f.is_alnum() || f.match1("_$")) {
     ret += f.ctoc();
   }
 
   return ret;
 }
 /*--------------------------------------------------------------------------*/
+void Define::stash(std::string const& s, String_Arg_List const& args)
+{
+  CS f(CS::_STRING, s);
+  while(f.ns_more()) {
+    if (f.is_alpha() || f.peek() == '_'){
+      std::string token = get_identifier(f);
+      trace1("stash?", token);
+      String_Arg_List::const_iterator x = args.find(String_Arg(token));
+
+      if(x == args.end()){
+	_value_tpl += token;
+      }else{
+	size_t pos = listpos(args, x);
+	trace2("mark", _value_tpl.size(), pos);
+	_pos.push_back(std::make_pair(_value_tpl.size(), pos));
+      }
+    }else{
+      _value_tpl += f.ctoc();
+    }
+  }
+  trace1("stashed", _value_tpl);
+}
+/*--------------------------------------------------------------------------*/
+void Define::parse(CS& f)
+{
+  _name = get_identifier(f);
+  trace2("define::parse", _name, f.tail().substr(0,10));
+  String_Arg_List args;
+  if(f.peek() == '('){
+    f >> args;
+  }else{
+  }
+
+  stash(f.get_to("/"), args);
+  while (f.match1('/')) {
+    if (f >> "//") {
+      f.get_to("\n"); //  dummy_cxx_comment;
+    }else if (f >> "/*") /* C comment */ {
+      f >> dummy_c_comment; //BUG// line count may be wrong
+      stash(f.get_to("/\n"), args);
+    }else{
+      stash("/", args);
+      f.skip();
+      stash(f.get_to("/\n"), args);
+    }
+  }
+
+  _num_args = args.size();
+}
+/*--------------------------------------------------------------------------*/
+static String_Arg_List eval_args(CS& f, size_t howmany, Define_List const&);
+/*--------------------------------------------------------------------------*/
 static std::string expand_macro(CS& file, Define_List const& d)
 {
   trace1("exmacro", file.tail().substr(0,10));
   std::string stripped_file;
-  if (file >> "`else"
-      ||file >> "`endif"
-      ||file >> "`ifndef"
-      ||file >> "`ifdef"
-      ||file >> "`include"
-      ||file >> "`undef") {
+  if (file >> "else"
+      ||file >> "endif"
+      ||file >> "ifndef"
+      ||file >> "ifdef"
+      ||file >> "include"
+      ||file >> "undef") {
     throw Exception_CS("not allowed here", file);
   }else{
     // macro substitution
-    file.skip1('`');
     std::string token = get_identifier(file);
+    trace1("find", token);
     Define_List::const_iterator x = d.find(String_Arg(token));
     if (x != d.end()) {
       assert(*x);
       auto values = eval_args(file, (*x)->num_args(), d);
       std::string subst = (*x)->substitute(values, d);
       stripped_file += subst; //  + "\n";
-    }else{
+    }else{ untested();
       throw(Exception_CS("undefined macro", file));
     }
   }
@@ -255,16 +370,17 @@ std::string expand_macros(CS& file, Define_List const& d)
 // Define::?
 static String_Arg_List eval_args(CS& f, size_t howmany, Define_List const& d)
 {
-  trace2("eval_args", f.tail(), howmany);
+  trace2("eval_rgs", f.tail().substr(0,20), howmany);
   Raw_String_Arg_List values;
   if(!howmany) {
   }else if(f.match1('(')){
     values.parse_n(f, howmany);
-    if(values.size() == howmany){
-    }else{
-      throw Exception_CS("Need more values", f);
-    }
   }else{
+  }
+
+  if(values.size() == howmany){
+  }else{
+    throw Exception_CS("Need more values", f);
   }
 
   String_Arg_List ret;
@@ -279,97 +395,71 @@ static String_Arg_List eval_args(CS& f, size_t howmany, Define_List const& d)
   return ret;
 }
 /*--------------------------------------------------------------------------*/
-// expand macros in rhs
-void Define::preprocess(Define_List const& d)
+void Define::dump(std::ostream&)const
 { untested();
-  CS file(CS::_STRING, _value.to_string());
-  trace1("Define::preprocess", _value.to_string());
-  _value = expand_macros(file, d);
-}
-/*--------------------------------------------------------------------------*/
-void Define::dump(std::ostream& f)const
-{ untested();
-  f << "`define " << name();
-  if(_args.size()){ untested();
-   f << _args;
-  }else{ untested();
-  }
-  f << " " << value() << "\n";
+//  f << "`define " << name();
+//  if(_args.size()){ untested();
+//   f << _args;
+//  }else{ untested();
+//  }
+//  f << " " << value() << "\n";
 }
 /*--------------------------------------------------------------------------*/
 std::string Define::substitute(String_Arg_List const& values, Define_List const& d) const
 {
-  std::map<std::string, String_Arg*> subs;
-  auto j = values.begin();
-  for(auto i : _args){
-    if(j == values.end()){
-      // BUG: positioning seems wrong
-      // throw Exception_CS("Need more values", f);
-    }else{
-      subs[i->to_string()] = *j;
-      ++j;
-    }
-  }
-  CS file(CS::_STRING, _value.to_string());
-  trace1("substitute", file.fullstring());
+//  trace2("substitute", file.fullstring(), values.size());
   std::string stripped_file = "";
   std::string sep = "";
-  size_t here = file.cursor();
 
-// find [ a-zA-Z_ ] { [ a-zA-Z0-9_$ ] } and substitute
-  for (;;) {
-    trace1("loop", file.tail().substr(0,10));
-    here = file.cursor();
-    bool quote = false;
-
-    char c = file.peek();
-    if(!c){itested();
-    }else if(quote){
-      // TODO: escaped "?
-      stripped_file += file.ctoc();
-      quote = c != '"';
-    }else if(c == '"'){
-      stripped_file += file.ctoc();
-      quote = true;
-    }else if(c == '`'){
-      stripped_file += expand_macro(file, d);
-    }else if(file.is_alpha() || c == '_'){
-      // get_identifier...
-      std::string token(1, file.ctoc());
-      trace2("token0", token, file.tail());
-      while(file.is_alnum() || file.match1("_[]$")) {
-	token += file.ctoc();
-      }
-
-      trace2("token", token, file.tail());
-      auto it = _args.find(String_Arg(token));
-      if(it != _args.end()){
-	auto k = values.begin();
-	for(; it != _args.begin(); --it){
-	  ++k;
-	}
-	stripped_file += (*k)->to_string();
-      }else{
-	stripped_file += token;
-      }
-    }else{
-      stripped_file += file.ctoc();
-    }
-
-    if (!file.ns_more()) {
-      break;
-    }else if (file.stuck(&here)) { untested();
-      break;
-    }else{
-    }
+  size_t seek = 0;
+  for(auto const& p : _pos){
+    auto k = values.begin();
+//    if(p.second < values.size()){ untested();
+//    }else{ untested();
+//      throw Exception_CS("need more values", file);
+//    }
+    std::advance(k, p.second);
+    trace2("place",seek, p.first);
+    stripped_file += _value_tpl.substr(seek, p.first-seek);
+    seek = p.first;
+    stripped_file += (*k)->to_string();
   }
+  stripped_file += _value_tpl.substr(seek, std::string::npos);
 
-  return stripped_file;
+  CS ff(CS::_STRING, stripped_file);
+  return expand_macros(ff, d);
 }
 /*--------------------------------------------------------------------------*/
 Preprocessor::Preprocessor() : CS(CS::_STRING, "")
 {
 }
+/*--------------------------------------------------------------------------*/
+class PP_Quoted_String : public String {
+public:
+  void parse(CS& f) override {
+    _data = "";
+    while(true){
+      while (f.peek() && (!isgraph(f.peek()))) {
+	_data += f.ctoc();
+      }
+
+      append_to(f, _data, "\\\"");
+      if (f.peek() == '"') {
+	f.skip();
+	break;
+      }else if (f.peek() == '\\') {
+	_data += f.ctoc();
+	if(f.peek() == '\"'){
+	  _data += f.ctoc();
+	}else{ itested();
+	}
+      }else{ untested();
+	trace2("qs", _data, f.peek());
+	throw Exception_CS("need '\"'", f);
+      }
+    }
+  }
+} quoted_string;
 /*--------------------------------------------------------------------------*/
 void Preprocessor::parse(CS& file)
 {
@@ -380,13 +470,8 @@ void Preprocessor::parse(CS& file)
     append_to(file, _stripped_file, "\"/`");
     if (!file.more()){
     }else if (file >> '"') {
-      // quoted string
-      _stripped_file += '"' + file.get_to("\"");
-      if (file >> '"') {
-	_stripped_file += '"';
-      }else{ untested();
-	throw Exception_CS("need '\"'", file);
-      }
+      file >> quoted_string;
+      _stripped_file += '"' + quoted_string.val_string() + '"';
     }else if (file >> "/*") /* C comment */ {
       file >> dummy_c_comment; //BUG// line count may be wrong
     }else if (file >> "//") /* C++ comment */ {
@@ -402,7 +487,7 @@ void Preprocessor::parse(CS& file)
       }else{
       }
       if(file >> _define_list) {
-      }else{
+      }else{ untested();
 	throw Exception_CS("expecting macro name", file);
       }
     }else if (file >> "`include") {
@@ -432,15 +517,15 @@ void Preprocessor::parse(CS& file)
       if (if_block > 0) {
 	file >> skip_block;
 	--if_block;
-      }else{ untested();untested();
+      }else{ untested();
 	// error
       }
     }else if (file >> "`endif") {
       if (else_block > 0) {
 	--else_block;
-      }else if (if_block > 0) { untested();
+      }else if (if_block > 0) {
 	--if_block;
-      }else{ untested();untested();
+      }else{ untested();
 	// error
       }
     }else if (file >> "`undef") {
@@ -453,11 +538,9 @@ void Preprocessor::parse(CS& file)
 	file.warn(0, "not defined: " + err);
       }
     }else if (file >> "`") {
-      trace2("match macro?", file.tail(), define_list().size());
-      // macro substitution
-      Define_List::const_iterator x = define_list().find(file);
+      String_Arg id(get_identifier(file));
+      Define_List::const_iterator x = define_list().find(id);
       if (x != define_list().end()) {
-	trace1("match macro", file.tail());
 	assert(*x);
 	auto values = eval_args(file, (*x)->num_args(), define_list());
 	std::string subst = (*x)->substitute(values, define_list());
@@ -469,14 +552,14 @@ void Preprocessor::parse(CS& file)
     }else if (file.skip1('/')) {
       _stripped_file += "/";
     }else{ untested();
-      trace1("moveon", file.tail());
+      unreachable();
       _stripped_file += "\n";
       // move on, just copy
     }
 
-    trace2("more?", file.fullstring(), file.tail());
     if (!file.more()) {
       try {
+	_stripped_file += "\n"; // BUG?
 	file.get_line("");
       }catch (Exception_End_Of_Input const&) {
 	break;

@@ -42,7 +42,6 @@ protected:
   double*  _old_values;
   int	   _n_ports;
   double   _time;
-  const double** _inputs;
   std::vector<std::string> _current_port_names;
   std::vector<ELEMENT const*> _input;
 protected:
@@ -63,7 +62,7 @@ protected: // override virtual
   bool	   do_tr()override;
   void	   tr_load()override;
   void	   tr_begin()override{
-    _loss1 = _loss0 = 1./OPT::shortckt;
+    _loss0 = 1./OPT::shortckt;
   }
   void	   tr_unload()override;
   double   tr_involts()const override	{unreachable(); return NOT_VALID;}
@@ -79,14 +78,18 @@ protected: // override virtual
   void expand_current_port(size_t i);
 
   void set_current_port_by_index(int i, const std::string& s) override {
-    assert(size_t(i)<_current_port_names.size());
-    _current_port_names[i] = s;
+    if(i<int(_current_port_names.size())){
+      _current_port_names[i] = s;
+    }else{
+      throw Exception_Too_Many(i, int(_current_port_names.size()), 0);
+    }
   }
   std::string port_name(int)const override {untested();
     incomplete();
     unreachable();
     return "";
   }
+  double tr_probe_num(const std::string& x)const override;
 public:
   void set_parameters(const std::string& Label, CARD* Parent,
 		      COMMON_COMPONENT* Common, double Value,
@@ -154,11 +157,13 @@ void DEV_CPOLY_G::expand_current_port(size_t i)
     throw Exception(long_label() + ": " + input_label
 		    + " has a subckt, cannot be used as current probe");
   }else if (input->has_inode()) {untested();
+    incomplete(); // wrong N1
     _n[IN1] = input->n_(IN1);
     _n[IN2].set_to_ground(this);
   }else if (input->has_iv_probe()) {
+    size_t IN1 = net_nodes() - 2*_current_port_names.size() + 2*i;
     _n[IN1] = input->n_(OUT1);
-    _n[IN2] = input->n_(OUT2);
+    _n[IN1+1] = input->n_(OUT2);
   }else{ untested();
     throw Exception(long_label() + ": " + input_label + " cannot be used as current probe");
   }
@@ -185,8 +190,17 @@ bool DEV_CPOLY_G::do_tr_con_chk_and_q()
     set_converged(conchk(_old_values[0], _values[0], abstol()));
   }else{
   }
+  if(converged()){
+    trace2("pot?", _loss1, _loss0);
+    set_converged(_loss1 == _loss0);
+  }else{
+  }
   for (int i=1; converged() && i<=_n_ports; ++i) {
-    set_converged(conchk(_old_values[i], _adj_values[i]) /*,0.?*/);
+    if(_loss0){
+      set_converged(conchk(_old_values[i], _adj_values[i]) /*,0.?*/);
+    }else{
+      set_converged(conchk(_old_values[i], _values[i]) /*,0.?*/);
+    }
   }
   return converged();
 }
@@ -195,36 +209,45 @@ bool DEV_CPOLY_G::do_tr()
 {
   assert(_values);
 
-
-  for (int i=1; i<=_n_ports; ++i) {
-    _adj_values[i] = _values[i] * _loss0;
+  if(_loss0){
+    for (int i=1; i<=_n_ports; ++i) {
+      _adj_values[i] = _values[i] * _loss0;
+    }
+    _m0.x = 0.;
+    _m0.c0 = -_loss0 * _values[0];
+    _m0.c1 = 0.; // really?
+  }else{
+    _m0 = CPOLY1(0., _values[0], _values[1]);
   }
-
-  _m0.x = 0.;
-  _m0.c0 = -_loss0 * _values[0];
-  _m0.c1 = 0.;
-  trace3("vapot::do_tr", _values[0], _adj_values[0], _loss0);
-  trace3("vapot::do_tr", _values[1], _adj_values[1], _loss0);
-  // {
-  //   _m0 = CPOLY1(0., _values[0], _values[1]);
   return do_tr_con_chk_and_q();
-  // }
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::tr_load()
 {
-  //assert(_n_ports==1); // for now.
-  tr_load_shunt(); // 4 pt +- loss
-  trace3("CPG.. ", long_label(), _loss0, _loss1);
-  tr_load_source();
- // {
- //   tr_load_passive(); // load_symmetric & load_source
-  trace2("DEV_CPOLY_G::tr_load", _values[0], _values[1]);
-    _old_values[0] = _values[0];
+  _old_values[0] = _values[0];
+  if(_loss0){
+    tr_load_shunt(); // 4 pt +- loss
+    trace3("CPG.. ", long_label(), _loss0, _loss1);
+    tr_load_source();
+
+    trace2("DEV_CPOLY_G::tr_load", _values[0], _values[1]);
     _old_values[1] = _adj_values[1];
     for (int i=2; i<=_n_ports; ++i) {
       trace2("DEV_CPOLY_G::tr_load control", i, _values[i]);
       tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_adj_values[i]), &(_old_values[i]));
+    }
+  }else{
+    if(_loss1){
+      tr_unload_shunt(); // 4 pt +- loss
+    }else{
+    }
+			
+    tr_load_passive();
+    _old_values[1] = _values[1];
+    for (int i=2; i<=_n_ports; ++i) {
+      trace4("tr_load", long_label(), i, _values[i], _old_values[i]);
+      tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_values[i]), &(_old_values[i]));
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -239,12 +262,9 @@ void DEV_CPOLY_G::tr_unload()
 double DEV_CPOLY_G::tr_amps()const
 {
   double amps = _m0.c0 + _loss0 * tr_outvolts();
-  trace2("tr_amps", long_label(), _m0.c0);
   for (int i=1; i<=_n_ports; ++i) {
-//    trace3("tr_amps", _n[2*i-2].v0(), _n[2*i-1].v0(), _values[i]);
     amps += dn_diff(_n[2*i-2].v0(), _n[2*i-1].v0()) * _values[i];
   }
-  trace3("tr_amps", long_label(), _m0.c0, amps);
   return amps;
 }
 /*--------------------------------------------------------------------------*/
@@ -297,14 +317,21 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
     // assert could fail if changing the number of nodes after a run
   }
 
-  //_inputs = inputs;
-  _inputs = 0;
   _values = states;
   std::fill_n(_values, n_states, 0.);
   std::fill_n(_old_values, n_states, 0.);
   assert(n_nodes <= net_nodes());
   notstd::copy_n(nodes, n_nodes, _n); // copy more in expand_last
   assert(net_nodes() == _n_ports * 2);
+}
+/*--------------------------------------------------------------------------*/
+double DEV_CPOLY_G::tr_probe_num(const std::string& x)const
+{
+  if (Umatch(x, "loss ")) {
+    return _loss0;
+  }else{
+    return ELEMENT::tr_probe_num(x);
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -25,17 +25,17 @@
 #if 0
 /*--------------------------------------------------------------------------*/
 static int is_function(std::string const& n)
-{
+{ untested();
   incomplete();
   // stub, need sth.
   if (n == "exp"
    || n == "log"
    || n == "cos"
-   || n == "sin") {
+   || n == "sin") { untested();
     return 1;
-  }else if (n == "pow"){
+  }else if (n == "pow"){ untested();
     return 2;
-  }else{
+  }else{ untested();
     return 0;
   }
 }
@@ -44,7 +44,7 @@ static int is_function(std::string const& n)
 static String_Arg const& potential_abstol(Branch const& b)
 {
   static String_Arg def("OPT::abstol");
-  if(!b.discipline()){
+  if(!b.discipline()){ untested();
     // incomplete(); TODO: what's the default?
     return def;
   }else if(!b.discipline()->potential()){ untested();
@@ -58,7 +58,7 @@ static String_Arg const& potential_abstol(Branch const& b)
 static String_Arg const& flow_abstol(Branch const& b)
 {
   static String_Arg def("OPT::abstol");
-  if(!b.discipline()){
+  if(!b.discipline()){ untested();
     incomplete();
     return def;
   }else if(!b.discipline()->flow()){ untested();
@@ -98,6 +98,14 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
   o__ "}else if (!converged()) {\n";
   o____ "return true;\n";
   o__ "}else";
+
+  if( m.filters().size()){
+    o__ "if(_sim->is_first_iteration()){\n";
+    o____ "return true;\n";
+    o__ "}else";
+  }else{
+  }
+
   for(auto x : m.probes()){
     Probe const* p = x.second;
     assert(p);
@@ -156,7 +164,7 @@ static void make_tr_probe_num(std::ostream& o, const Module& m)
     // todo: only those with desc or unit attribute
     for (Variable_List::const_iterator p=vl->begin(); p!=vl->end(); ++p) {
       o__ "if(n == \"" << (*p)->name() << "\"){\n";
-      o__ ind << "return _v_" << (*p)->name() << ".value();\n";
+      o__ ind << "return _v_" << (*p)->name() << ";\n";
       o__ "}\n";
     }
   }
@@ -185,7 +193,7 @@ static void make_set_parameters(std::ostream& o, const Element_2& e)
   o << ", 0."; // value
   if (e.state() != "") {
     o << ", /*states:*/" << e.num_states() << ", " << e.state();
-  }else{
+  }else{ untested();
     o << ", 0, NULL";
   }
   o << ", " << e.num_nodes() << ", nodes);\n";
@@ -255,15 +263,15 @@ static void make_module_construct_stub(std::ostream& o, const Element_2& e, Modu
   }
 #if 0
   o____ "node_t nodes[] = {";
-  {
+  { untested();
     Port_3_List_2::const_iterator p = e.ports().begin();
-    if (p != e.ports().end()) {
+    if (p != e.ports().end()) { untested();
       assert(*p);
       o << "_n[n_" << (**p).name() << "]";
-      while (++p != e.ports().end()) {
+      while (++p != e.ports().end()) { untested();
 	o << ", _n[n_" << (**p).name() << "]";
       }
-    }else{
+    }else{ untested();
     }
     o << "}; // nodes\n";
   }
@@ -345,7 +353,7 @@ void make_module_default_constructor(std::ostream& o, const Module& m)
 //  for (Element_1_List::const_iterator
 //       p = m.elements().begin();
 //       p != m..elements().end();
-//       ++p) {
+//       ++p) { untested();
 //    o << ",\n   _" << (**p).name() << "(0)";
 //  }
 //
@@ -407,129 +415,37 @@ static void make_read_probes(std::ostream& o, const Module& m)
     assert(b);
     if(b->is_filter()){
       o__ "// filter " <<  b->code_name() << "\n";
-    }else if(b->has_pot_probe()){
-      o__ "_potential" << b->code_name() << " = volts_limited(";
-      make_node_ref(o, *b->p());
-      o << ", ";
-      assert(b->n());
-      make_node_ref(o, *b->n());
-      o << ");\n";
-
-      o__ "trace2(\"potential\", _potential" << b->code_name() << ", _sim->_time0);\n";
-    }else if(b->has_flow_probe()){
-      o__ "assert(" << b->code_name() << ");\n";
-      o__ "_flow" << b->code_name() << " = " << b->code_name() << "->tr_amps();\n";
     }else{
-      trace1("no probe?", b->code_name());
+      if(b->has_pot_probe()){
+	o__ "_potential" << b->code_name() << " = volts_limited(";
+	make_node_ref(o, *b->p());
+	o << ", ";
+	assert(b->n());
+	make_node_ref(o, *b->n());
+	o << ");\n";
+
+	o__ "trace2(\"potential\", _potential" << b->code_name() << ", _sim->_time0);\n";
+      }else{
+      }
+
+      if(b->has_flow_probe()){
+	o__ "assert(" << b->code_name() << ");\n";
+	o__ "_flow" << b->code_name() << " = " << b->code_name() << "->tr_amps();\n";
+      }else{
+	trace1("no probe?", b->code_name());
+      }
     }
   }
 
   for(auto x : m.filters()){
     o__ "// filter " << x->code_name() << "\n";
   }
-//  for(auto x : m.probes()){
+//  for(auto x : m.probes()){ untested();
 //    Probe const* p = x.second;
 //    assert(p);
 //    o << ind << "_" << p->name() << " = volts_limited(_n[n_"<< p->pname() <<"], _n[n_"<< p->nname() <<"]);\n";
 //    // o << "trace1(\"\"," << "_" << p->name() << ");\n";
 //  }
-  o << "}\n"
-    "/*--------------------------------------"
-    "------------------------------------*/\n";
-}
-/*--------------------------------------------------------------------------*/
-static void make_one_branch_contribution(std::ostream& o, Module const& m, const Branch& br)
-{
-  Branch const* b = &br;
-  size_t k = 1;
-  o__ "assert(_value" << b->code_name() << " == _value" << b->code_name() << ");\n";
-  o__ b->state() << "[0] = _value" << b->code_name() << ";\n";
-  for(auto d : b->deps()){
-    if(d->branch() == b){
-      if(b->has_pot_source() && b->has_flow_probe()){
-	throw Exception("cannot use self as current probe.. yet\n");
-      }else{
-      }
-      o__ "trace2(\"" <<  b->state() << "self\", " << b->state() << "["<<k<<"], "<<  d->code_name() <<");\n";
-      o__ b->state() << "[0] -= " << b->state() << "["<<k<<"] * "<< d->code_name() << ";\n";
-      break;
-    }else{
-    }
-  }
-  k = 2;
-  for(auto i : m.branches()){
-    o__ "trace1(\"" <<  b->state() << "\", _value" << b->code_name() << ");\n";
-    for(auto d : b->deps()){
-      if(d->branch() == b){
-      }else if(d->branch() != i.second){
-      }else if(d->is_pot_probe()){
-	o__ "trace2(\" pot " <<  b->state() << "\", " << b->state() << "["<<k<<"], "<<  d->code_name() <<");\n";
-	o__ b->state() << "[0] -= " << b->state() << "["<<k<<"] * "<< d->code_name() << ";\n";
-	++k;
-	break;
-      }else if(d->is_filter_probe()){
-	o__ "// trace2(\" filter " <<  b->state() << "\", " << b->state() << "["<<k<<"], "<<  d->code_name() <<");\n";
-	//o__ b->state() << "[0] -= " << b->state() << "["<<k<<"] * _st" << d->branch()->code_name() << "[0];\n";
-	o__ b->state() << "[0] -= " << b->state() << "["<<k<<"] * " << d->branch()->code_name() << "->tr_amps();\n";
-	++k;
-	break;
-      }else if(d->is_flow_probe()){
-	// nothing
-      }else{ untested();
-	o__ "// bogus probe " << b->state() << " : " << d->code_name() << "\n";
-      }
-    }
-  }
-  for(auto i : m.branches()){
-    o__ "trace1(\"" <<  b->state() << "\", _value" << b->code_name() << ");\n";
-    for(auto d : b->deps()){
-      if(d->branch() == b){
-      }else if(d->branch() != i.second){
-      }else if(d->is_flow_probe()){
-	o__ "trace2(\"flow " <<  b->state() << "\", " << b->state() << "["<<k<<"], "<<  d->code_name() <<");\n";
-	o__ b->state() << "[0] -= " << b->state() << "["<<k<<"] * "<< d->code_name() << ";\n";
-	// BUG? scaling before convcheck?
-	o__ b->state() << "["<<k<<"] *= " << d->branch()->code_name() <<"->_loss0; // BUG?\n";
-	++k;
-	break;
-      }else if(d->is_pot_probe()){
-	// nothing
-      }else if(d->is_filter_probe()){
-	// nothing
-      }else{ untested();
-      }
-    }
-  }
-}
-/*--------------------------------------------------------------------------*/
-static void make_set_branch_contributions(std::ostream& o, const Module& m)
-{
-  o << "inline void MOD_" << m.identifier() << "::set_branch_contributions()\n{\n";
-  for(auto i : m.branches()){
-    Branch const* b = i.second;
-    if(b->has_pot_source()) {
-      assert(!b->has_flow_source());
-      o__ "// pot src " << b->name() << "\n";
-    }else if(b->has_flow_source()) {
-      assert(!b->has_pot_source());
-      o__ "// flow src " << b->name() << "\n";
-    }else{
-    }
-
-    if(b->has_flow_source() || b->has_pot_source()) {
-      for(auto D : b->deps()){
-	o__ "// DEP " << D->code_name() << "\n";
-      }
-      make_one_branch_contribution(o, m, *b);
-    }else{
-    }
-  }
-
-  o__ "// filters\n";
-  for(auto x : m.filters()){
-    o__ "// filter " << x->code_name() << "\n";
-  }
-
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -561,7 +477,6 @@ static void make_module_clone(std::ostream& o, Module const& m)
 static void make_module_class(std::ostream& o, Module const& m)
 {
   make_tr_probe_num(o, m);
-  make_set_branch_contributions(o, m);
   make_read_probes(o, m);
   make_module_default_constructor(o, m);
 
@@ -571,6 +486,7 @@ static void make_module_class(std::ostream& o, Module const& m)
   if(m.has_analog_block()){
     make_tr_needs_eval(o, m);
     make_do_tr(o, m);
+    make_cc_analog(o, m);
   }else{
   }
 
@@ -595,7 +511,7 @@ static void make_module_allocate_local_node(std::ostream& o, const Node& p)
 {
 #if 1
   make_tag();
- // if (p.short_if().empty()) {
+ // if (p.short_if().empty()) { untested();
  //   o <<
  //     "    if (!(_n[n_" << p.name() << "].n_())) {\n"
  //     "      _n[n_" << p.name() << "] = _n[n_" << p.short_to() << "];\n"
@@ -635,7 +551,8 @@ static void make_module_allocate_local_nodes(std::ostream& o, Module const& m)
   if(m.element_list().size()){
     // nodes come from sckt proto
   }else{
-    for (auto nn : m.nodes()){
+    for (auto n=m.nodes().rbegin(); n != m.nodes().rend(); ++ n){
+      auto nn = *n;
       assert(nn);
       // TODO: node aliases, shorts etc.
       if(nn->number() < int(m.ports().size())){
@@ -649,7 +566,7 @@ static void make_module_allocate_local_nodes(std::ostream& o, Module const& m)
 static void make_module_expand_one_element(std::ostream& o, const Element_2& e, Module const& m)
 {
   make_tag();
-  if (!(e.omit().empty())) {
+  if (!(e.omit().empty())) { untested();
     o__ "if (" << e.omit() << ") {\n";
     o____ "if (" << e.code_name() << ") {\n";
     o______ "subckt()->erase(" << e.code_name() << ");\n";
@@ -662,9 +579,9 @@ static void make_module_expand_one_element(std::ostream& o, const Element_2& e, 
   }
 
   std::string dev_type;
-//  if(dynamic_cast<Branch const*>(&e)){
+//  if(dynamic_cast<Branch const*>(&e)){ untested();
     dev_type = e.dev_type();
-//  }else{
+//  }else{ untested();
 //    dev_type = "device_stub";
 //  }
 
@@ -674,9 +591,9 @@ static void make_module_expand_one_element(std::ostream& o, const Element_2& e, 
   o______ "throw Exception(" << "\"Cannot find " << dev_type << ". Load module?\");\n";
   o____ "}else{\n";
   o____ "}\n";
-//  if(dynamic_cast<Branch const*>(&e)){
+//  if(dynamic_cast<Branch const*>(&e)){ untested();
     o____ e.code_name() << " = dynamic_cast<ELEMENT*>(p->clone());\n";
-//  }else{
+//  }else{ untested();
 //    o____ e.code_name() << " = dynamic_cast<COMPONENT*>(p->clone());\n";
 //    o____ e.code_name() << "->set_dev_type(\"" << e.dev_type() << "\");\n";
 //  }
@@ -744,16 +661,16 @@ static void make_module_expand_one_element(std::ostream& o, const Element_2& e, 
 	}
       }
     }
-  }else{
+  }else{ untested();
     unreachable();
 //    Port_3_List_2::const_iterator p = e.ports().begin();
-//    if (p != e.ports().end()) {
+//    if (p != e.ports().end()) { untested();
 //      assert(*p);
 //      o << "_n[n_" << (**p).name() << "]";
-//      while (++p != e.ports().end()) {
+//      while (++p != e.ports().end()) { untested();
 //	o << ", _n[n_" << (**p).name() << "]";
 //      }
-//    }else{
+//    }else{ untested();
 //    }
 //    o << "}; // nodes\n";
 //    make_set_parameters(o, e);
@@ -768,7 +685,7 @@ static void make_module_expand_one_element(std::ostream& o, const Element_2& e, 
 static void make_module_expand_one_filter(std::ostream& o, const Filter& e)
 {
   make_tag();
-  if (!(e.omit().empty())) {
+  if (!(e.omit().empty())) { untested();
     o__ "if (" << e.omit() << ") {\n";
     o____ "if (" << e.code_name() << ") {\n";
     o______ "subckt()->erase(" << e.code_name() << ");\n";
@@ -806,7 +723,7 @@ static void make_module_expand_one_filter(std::ostream& o, const Filter& e)
     if(1) {
 //      o << "gnd, _n[n_" << br->name() << "]";
       o << "_n[n_" << br->name() << "], gnd";
-    }else{
+    }else{ untested();
       o << "gnd, gnd";
     }
     // o << "_n[0]"; // eek
@@ -818,7 +735,7 @@ static void make_module_expand_one_filter(std::ostream& o, const Filter& e)
     //   o << ", _n[" << i->branch()->p()->code_name() << "]";
     //   o << ", _n[" << i->branch()->n()->code_name() << "]";
     }
-  }else{
+  }else{ untested();
   }
   
   o << "};\n";
@@ -921,7 +838,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
 //  for (Port_1_List::const_iterator
 //       p = d.circuit().opt_nodes().begin();
 //       p != d.circuit().opt_nodes().end();
-//       ++p) {
+//       ++p) { untested();
 //    make_dev_allocate_local_nodes(out, **p);
 //  }
   o << ind << "    // local nodes\n";
@@ -940,9 +857,12 @@ static void make_module_expand(std::ostream& o, Module const& m)
   o << "\n";
   o__ "// clone filters\n";
   for (auto i: m.filters()){
-    o__ "// " << i->name() << "\n";
-    indent x;
-    make_module_expand_one_filter(o, *i);
+    if(i->has_branch()){
+      o__ "// " << i->name() << "\n";
+      indent x;
+      make_module_expand_one_filter(o, *i);
+    }else{
+    }
   }
 
   o << "\n";
@@ -985,7 +905,7 @@ static void make_module_dispatcher(std::ostream& o, Module const& m)
 /*--------------------------------------------------------------------------*/
 #if 0
 static void make_module_probe_num(std::ostream& out, const Module& d)
-{
+{ untested();
   make_tag();
   out << "double DEV_" << d.name() << "::tr_probe_num(const std::string& x)const\n"
     "{\n"
@@ -1004,7 +924,7 @@ static void make_module_probe_num(std::ostream& out, const Module& d)
 //   for (Probe_List::const_iterator
 //        p = d.probes().begin();
 //        p != d.probes().end();
-//        ++p) {
+//        ++p) { untested();
 //     assert(*p);
 //     out << "if (Umatch(x, \"" << (**p).name() << " \")) {\n"
 //       "    return " << fix_expression((**p).expression()) << ";\n"
@@ -1047,6 +967,7 @@ void make_cc_module(std::ostream& o, const Module& m)
   make_module_expand(o, m);
   make_module_precalc_last(o, m);
   make_cc_filter(o, m);
+  make_cc_analog_functions(o, m);
 //  make_module_probe(o, m);
 //  make_module_aux(o, m);
   if(m.element_list().size()){

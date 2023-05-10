@@ -40,9 +40,9 @@ module device(p, n);
 endmodule
 module device(p, n);
   inout p, n;
-  parameter real c = 1. from [0.:inf);
-  parameter real d = 1. from [1.:2.] exclude 3.;
-  parameter real e = 1. from [0.:inf), f = 3;
+  parameter real c = 1. from [(0.):(inf));
+  parameter real d = 1. from [(1.):(2.)] exclude 3.;
+  parameter real e = 1. from [(0.):(inf)), f = 3;
 
 endmodule
 

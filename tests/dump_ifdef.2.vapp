@@ -1,0 +1,15 @@
+
+`ifdef AAA
+parse error
+`else
+
+`ifndef AAA
+`define X x
+`endif /* another comment */
+
+`endif // another comment
+
+`define M m
+
+model `M(`X,y)
+endmodule

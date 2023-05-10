@@ -1,2 +1,2 @@
 module mock_error analog begin bla = 1; end endmodule 
-                               ^ ? bad analog block
+                               ^ ? what's this?

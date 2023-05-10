@@ -1,0 +1,51 @@
+nature Current
+  units = "A";
+  access = "I";
+  idt_nature = "Charge";
+  abstol = "1e-12";
+endnature
+
+nature Charge
+  units = "coul";
+  access = "Q";
+  ddt_nature = "Current";
+  abstol = "1e-14";
+endnature
+
+nature Voltage
+  units = "V";
+  access = "V";
+  idt_nature = "Flux";
+  abstol = "1e-6";
+endnature
+
+
+discipline electrical
+  potential "Voltage";
+  flow "Current";
+enddiscipline
+
+
+module test(p, n);
+  electrical p, n;
+  analog begin
+    real a;
+begin : scopename
+      real b;
+    end
+  end
+
+  analog begin : stuff
+    real y, x, sq, p, v, q;
+    y = ddx(V(p), V(n));
+    x = ddx(x, V(n));
+    sq = (V(n) * V(n));
+    y = ddx(sq, V(n));
+    p = (V(p) * V(n));
+    v = ddx(p, V(n));
+  end
+
+endmodule
+
+
+

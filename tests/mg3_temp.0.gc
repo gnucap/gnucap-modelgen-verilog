@@ -1,0 +1,29 @@
+
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_temp0(t)
+	thermal t;
+
+	real tt;
+
+	analog Temp(t) <+ 1;
+
+	analog tt = Temp(t);
+
+endmodule
+
+!make test_temp0.so > /dev/null
+attach ./test_temp0.so
+
+test_temp0 #() dut(1);
+
+list
+
+print dc v(nodes)
+dc
+end

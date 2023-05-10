@@ -1,0 +1,10 @@
+
+
+
+module test() 
+begin analog 
+real var; 
+var  = 1; 
+end 
+endmodule 
+

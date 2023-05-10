@@ -4,6 +4,16 @@ module test(x, y)
 analog begin
 real A, LEVEL;
 case (LEVEL)
+	1 : A = 1;
+	default : A = 2;
+endcase
+
+case (LEVEL)
+	1 : A = 1;
+	default :
+endcase
+
+case (LEVEL)
 	1 : begin
 		 A=1;
 	    end

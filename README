@@ -46,3 +46,11 @@ gnucap> [..]
 - -D defines a symbol. Assign a value with -D"VARIABLE value"..
 - Files are located following logic from gcc implementation.
 - Output is sent to standard out, like cpp.
+
+== language plugin note
+
+This package ships a modified/experimental lang_verilog plugin.
+To make use of new language features in the simulator, load it.
+$ gnucap -a vams/lang_verilog.so
+or
+gnucap > load vams/lang_verilog.so

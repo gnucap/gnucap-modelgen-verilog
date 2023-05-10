@@ -1,0 +1,44 @@
+
+
+module test_af();
+  analog function real limitex;
+    input x;
+    real x;
+begin
+      if ((x > 17.)) begin
+        limitex = (42. * ((1.0 + x) - 17.));
+      end
+      else if ((x < -17.)) begin
+        limitex = 42.;
+      end
+      else begin
+        limitex = exp(x);
+      end
+    end
+  endfunction
+
+  analog function real strange_log;
+    input x;
+    real x;
+begin
+      strange_log = ln(max(x, .1));
+    end
+  endfunction
+
+  analog function real something;
+    input x, y;
+    real x, y;
+begin
+      something = (0.5 * (x + sqrt(((x * x) + ((4.0 * y) * y)))));
+    end
+  endfunction
+
+  analog begin
+    real i;
+    i = something( 26.,  20.0855369231877);
+  end
+
+endmodule
+
+
+

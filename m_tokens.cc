@@ -39,17 +39,47 @@ void Token_SFCALL::stack_op(Expression* E)const
       {
 	// restore argument.
 	E->pop_back();
-	E->push_back(new Token_STOP("stopname"));
+	E->push_back(new Token_STOP("sf_stop"));
 	for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
 	  trace1("stackop restore arg", (**i).name());
 	  (**i).stack_op(E);
 	}
-	E->push_back(new Token_PARLIST(".."));
+	E->push_back(new Token_PARLIST("sf_args"));
 	E->push_back(clone());
       }
       delete T1;
     }
-  }else{
+  }else{ untested();
+    unreachable();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Token_AFCALL::stack_op(Expression* E)const
+{
+  // replace single token with its value
+  if (!E->is_empty() && dynamic_cast<const Token_PARLIST*>(E->back())) {
+    // has parameters (table or function)
+    {
+      const Token* T1 = E->back(); // Token_PARLIST
+      assert(T1->data()); // expression
+      Base const* d = T1->data();
+      auto ee = prechecked_cast<Expression const*>(d);
+      assert(ee);
+
+      {
+	// restore argument.
+	E->pop_back();
+	E->push_back(new Token_STOP("af_stop"));
+	for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
+	  trace1("stackop restore arg", (**i).name());
+	  (**i).stack_op(E);
+	}
+	E->push_back(new Token_PARLIST("af_args"));
+	E->push_back(clone());
+      }
+      delete T1;
+    }
+  }else{ untested();
     unreachable();
   }
 }

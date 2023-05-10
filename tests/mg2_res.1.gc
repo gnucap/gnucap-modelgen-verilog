@@ -8,8 +8,9 @@ verilog
 module test_res1_0(np, nn);
 	electrical np, nn;
 	inout np, nn;
+	parameter real r=1;
 	analog begin
-		V(np,nn) <+ I(np,nn)
+		V(np,nn) <+ I(np,nn) * r;
 	end
 endmodule
 
@@ -21,13 +22,18 @@ attach ./test_res1_0.so
 parameter r=1
 parameter v=0
 
-test_res1_0 dut(1,2);
+test_res1_0 #(.r(1)) dut(1,0);
 vsource #(.dc(v)) v1(1, 0);
-vsource #(.dc(1)) v2(2, 0);
+
+test_res1_0 #(.r(100)) dut(2,0);
+vsource #(.dc(v)) v2(2, 0);
+
+test_res1_0 #(.r(0)) dut(3,0);
+vsource #(.dc(v)) v3(3, 0);
 
 list
 
-print dc i(v1) i(v2) iter(0)
+print dc i(v*) iter(0)
 
 dc v 0 1 .5
 end

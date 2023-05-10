@@ -1,0 +1,34 @@
+
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_sw0(p, n)
+	electrical p, n;
+	real st;
+
+	analog begin
+		if V(p, n) > 0 begin
+			st = 1;
+			I(p, n) <+ V(p,n);
+		end else
+			st = 0;
+	end
+
+endmodule
+
+!make test_sw0.so > /dev/null
+attach ./test_sw0.so
+
+test_sw0 #() dut(1,0);
+parameter v=0
+vsource #(.dc(v)) v1(1,0);
+
+list
+
+print dc v(nodes) i(v1) st(dut) iter(0)
+dc v1 -3 3 1 loop
+end

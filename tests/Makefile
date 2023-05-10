@@ -27,19 +27,10 @@ CXX = g++
 %: %.o
 	${CXX} -g -rdynamic $< ../bd/lib/.libs/libgnucap.so -o $@
 
-check: check_mg0 check_mg1 check_mg2 check_dump check_test check_v
-check_mg0:
-	+GNUCAP=${GNUCAP} ./test ${MODELGEN_VERILOG} "mg0" ${TARGETDIR} ${REFDIR}
-check_mg1:
-	+GNUCAP=${GNUCAP} ./test ${MODELGEN_VERILOG} "mg1" ${TARGETDIR} ${REFDIR}
-check_mg2:
-	+GNUCAP=${GNUCAP} ./test ${MODELGEN_VERILOG} "mg2" ${TARGETDIR} ${REFDIR}
-check_dump:
-	+GNUCAP=${GNUCAP} ./test ${MODELGEN_VERILOG} "dump" ${TARGETDIR} ${REFDIR}
-check_test:
-	+GNUCAP=${GNUCAP} ./test ${MODELGEN_VERILOG} "test" ${TARGETDIR} ${REFDIR}
-check_v:
-	+GNUCAP=${GNUCAP} ./test ${MODELGEN_VERILOG} "v" ${TARGETDIR} ${REFDIR}
+CHECK_TARGETS = check_mg0 check_mg1 check_mg2 check_mg3 check_dump check_test check_v
+check: ${CHECK_TARGETS}
+${CHECK_TARGETS}: check_%:
+	+GNUCAP=${GNUCAP} ./test ${MODELGEN_VERILOG} "$*" ${TARGETDIR} ${REFDIR}
 
 clean:
 	rm -rf *.o *.cc *.so *.out *~
@@ -48,4 +39,4 @@ clean:
 %.cc: %.vams
 	${MODELGEN_VERILOG} -I .. --cc $< > $@
 
-.PHONY: check check_mg check_dump check_test check_v clean
+.PHONY: check ${CHECK_TARGETS} clean

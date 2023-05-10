@@ -21,22 +21,6 @@
  */
 #include "mg_out.h"
 /*--------------------------------------------------------------------------*/
-static void make_clear_branch_contributions(std::ostream& o, const Module& m)
-{
-  for(auto x : m.branches()){
-    assert(x.second);
-    if(x.second->has_element()){
-      o____ "_value" << x.second->code_name() << " = 0.;\n";
-      o____ "std::fill_n(_st" << x.second->code_name() << "+1, " << x.second->num_states()-1 << ", 0.);\n";
-    }else{
-    }
-  }
-  for(auto x : m.filters()){
-    assert(x);
-      o____ "// std::fill_n(_st" << x->code_name() << ", " << x->num_states() << ", 0.);\n";
-  }
-}
-/*--------------------------------------------------------------------------*/
 static void declare_deriv_enum(std::ostream& o, const Module& m)
 {
   std::string comma = "";
@@ -60,6 +44,8 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
       o << comma << "    d_potential" << b->code_name();
       comma = ",\n";
     }else{
+//      o << comma "// no pot probe?   d_potential" << b->code_name();
+//      comma = ",\n";
     }
   }
   o << "\n";
@@ -85,6 +71,35 @@ static void declare_ddouble(std::ostream& o, Module const& m)
   }
   o << ind << "typedef ddouble_<"<<np<<"> ddouble;\n";
   declare_deriv_enum(o, m);
+}
+/*--------------------------------------------------------------------------*/
+static void make_analogfunction_decl(std::ostream& o, const Analog_Function& F)
+{
+  o__ "ddouble " << F.code_name() << "(";
+
+  // BUG? make_cc_af_args
+  std::string sep = "";
+  std::string qual = "";
+  for (auto coll : F.args()){
+      if(coll->is_output()){
+	qual = "/*output*/ &";
+      }else{
+	qual = "";
+      }
+    for(auto i : *coll){
+      o << sep << "ddouble " << qual;
+      o << "/*" << i->identifier() << "*/";
+      sep = ", ";
+    }
+  }
+  o << ") const;\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_analogfunctions_decl(std::ostream& o, const Analog_Functions& P)
+{
+  for (auto q = P.begin(); q != P.end(); ++q) {
+    make_analogfunction_decl(o, **q);
+  }
 }
 /*--------------------------------------------------------------------------*/
 static void make_parameter_decl(std::ostream& o, const Parameter_List_Collection& P)
@@ -139,7 +154,11 @@ static void make_filter_common(std::ostream& o, const Module& m)
   for(auto f : m.filters()){
     o__ "class FILTER" << f->code_name() << "{\n";
     o__ "public:\n";
-    o____ "ddouble operator()(ddouble t0, MOD_" << m.identifier() << "* d) const;\n";
+    o____ "ddouble operator()(";
+      for(size_t n=0; n<f->num_args(); ++n){
+	o << "ddouble t" << n << ", ";
+      }
+    o << "MOD_" << m.identifier() << "* d) const;\n";
 
     // o______ "incomplete();\n";
     // {
@@ -176,6 +195,7 @@ static void make_common(std::ostream& o, const Module& m)
   // }
   o << "class MOD_" << m.identifier() << ";\n";
   o << "class " << class_name << " :public " << base_class_name << "{\n";
+  o__ "typedef MOD_" << m.identifier() << " MOD;\n";
   if(m.element_list().size()){
   o << "public:\n";
     o__ "PARAM_LIST _netlist_params;\n";
@@ -228,6 +248,8 @@ static void make_common(std::ostream& o, const Module& m)
 //       ++p) {
 //    out << "  COMMON_COMPONENT* _" << (**p).name() << ";\n";
 //  }
+  o << "private: // analog functions\n";
+  make_analogfunctions_decl(o, m.analog_functions());
   o << "private: // tmp hack\n";
   o__ "double temp_hack()const {\n";
   o____ "return P_CELSIUS0 + _sim->_temp_c;\n";
@@ -238,6 +260,9 @@ static void make_common(std::ostream& o, const Module& m)
   o__ "double vt_hack(double T)const {\n";
   o____ "assert(T>=-P_CELSIUS0);\n";
   o____ "return P_K * temp_hack() / P_Q;\n";
+  o__ "}\n";
+  o__ "bool param_given(PARA_BASE const& p)const {\n";
+  o____ "return p.has_hard_value();\n";
   o__ "}\n";
 
   o << "};\n"
@@ -257,17 +282,39 @@ static void make_filter_state(std::ostream& o, const Module& m)
 {
   for(auto x : m.filters()){
     assert(x);
-    make_module_one_filter_state(o, *x);
+    if(x->has_branch()){
+      make_module_one_filter_state(o, *x);
+    }else{
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
 static void make_module_one_branch_state(std::ostream& o, Branch const& br)
 {
   o << "public: // states, " << br.code_name() << ";\n";
+  if(br.has_pot_source()){
+    o__ "bool _pot" << br.code_name() << ";\n";
+  }else{
+  }
   o__ "double _value" << br.code_name() << ";\n";
   o__ "double _st" << br.code_name();
   size_t k = br.num_states();
   o__ "[" << k << "];\n";
+
+  o__ "struct _st" << br.code_name() << "_ {\n";
+  o____ "enum { ";
+  std::string comma = "";
+  o____ "VALUE, SELF";
+  for(auto d : br.deps()){
+    assert(d);
+    if(d->is_reversed()){
+    }else{
+      o << ", dep" << d->code_name();
+    }
+  }
+  o____ "};\n";
+  o__ "} _dep" << br.code_name() << ";\n";
+
 }
 /*--------------------------------------------------------------------------*/
 static void make_branch_states(std::ostream& o, const Module& m)
@@ -400,9 +447,7 @@ static void make_module(std::ostream& o, const Module& m)
   o << "private: // impl\n";
   o << ind << "void read_probes();\n";
   o << ind << "void set_branch_contributions();\n";
-  o << ind << "void clear_branch_contributions(){\n";
-  make_clear_branch_contributions(o, m);
-  o << ind << "}\n";
+  o << ind << "void clear_branch_contributions();\n";
   o << ind << "friend class " << common_name << ";\n";
 
   o << "}; // m_" << m.identifier() << ";\n"

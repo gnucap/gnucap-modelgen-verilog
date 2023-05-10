@@ -26,19 +26,16 @@
 #include <stack>
 /*--------------------------------------------------------------------------*/
 // stub...
-static MGVAMS_FUNCTION const* lookup_function(std::string const& n, int& arity)
+static MGVAMS_FUNCTION const* lookup_function(std::string const& n)
 {
   FUNCTION const* f = function_dispatcher[n];
   if (n == "exp"
    || n == "cos"
    || n == "sin") {
-    arity = 1;
     return 0;
   }else if (n == "pow"){
-    arity = 2;
     return 0;
   }else if(auto g=dynamic_cast<MGVAMS_FUNCTION const*>(f)) {
-    arity = g->arity();
     return g;
   }else{itested();
     return 0;
@@ -50,10 +47,12 @@ class RPN_VARS {
   typedef enum{
     t_flt,
     // t_int,
-    t_str
+    t_str,
+    t_ref,
   } type;
   std::stack<type> _types;
   std::stack<int> _args;
+  std::stack<std::string> _refs;
   int _idx_alloc{0};
 
   int _flt_idx{-1};
@@ -64,22 +63,31 @@ public:
   ~RPN_VARS(){
     assert(_flt_idx == -1);
     assert(_str_idx == -1);
+    assert(_refs.empty());
   }
   void pop() {
     assert(!_types.empty());
-    if(_types.top()==t_flt){
+    switch(_types.top()){
+    case t_flt:
       assert(_flt_idx>-1);
       --_flt_idx;
-    }else{
+      break;
+    case t_ref:
+      _refs.pop();
+      break;
+    case t_str:
       assert(_str_idx>-1);
       --_str_idx;
+      break;
+    default:
+      unreachable();
     }
     _types.pop();
   }
-  void new_string(std::ostream& o){
+  void new_string(std::ostream& o){ itested();
     ++_str_idx;
-    if(_str_idx < _str_alloc){
-    }else{
+    if(_str_idx < _str_alloc){ untested();
+    }else{ itested();
       assert(_str_idx==_str_alloc);
       ++_str_alloc;
       o << ind << "std::string s" << _str_idx << ";\n";
@@ -96,13 +104,21 @@ public:
     }
     _types.push(t_flt);
   }
+  bool is_ref() const{
+    assert(!_types.empty());
+    return _types.top() == t_ref;
+  }
+  void new_ref(std::string name){
+    _refs.push(name);
+    _types.push(t_ref);
+  }
   void stop(){
     _args.push(int(_types.size())-1);
   }
   bool have_args()const{
     return !_args.empty();
   }
-  int num_args() const{
+  size_t num_args() const{
     assert(!_args.empty());
     return int(_types.size()) - 1 - _args.top();
   }
@@ -110,11 +126,20 @@ public:
     assert(!_args.empty());
     _args.pop();
   }
+  size_t size() const{
+    return _refs.size();
+  }
   std::string code_name() const{
-    if(_types.top() == t_flt){
+    switch(_types.top()) {
+    case t_flt:
       return "t" + std::to_string(_flt_idx);
-    }else{
+    case t_str:
       return "s" + std::to_string(_str_idx);
+    case t_ref:
+      return _refs.top();
+    default:
+      unreachable();
+      return "";
     }
   }
 };
@@ -124,39 +149,69 @@ void make_cc_expression(std::ostream& o, Expression const& e)
   typedef Expression::const_iterator const_iterator;
 
   RPN_VARS s;
+//  s.new_ref("t0"); // HACK
+//  o__ "ddouble t0; // top\n";
   // The _list is the expression in RPN.
   // print a program that computes the function and the derivatives.
   for (const_iterator i = e.begin(); i != e.end(); ++i) {
+    trace2("mg_out_expr loop", (*i)->name(), s.size());
 
     if (auto var = dynamic_cast<const Token_VAR_REF*>(*i)) {
-      s.new_float(o);
-
       std::string prefix;
       if((*var)->is_module_variable()){
 	prefix = "d->_v_";
       }else{
 	prefix = "_v_";
       }
-      o__ s.code_name() << " = " << prefix << (*i)->name() << ".value();\n";
-      for(auto v : (*var)->deps()) {
-	o__ s.code_name() << "[d" << v->code_name() << "] = " << prefix << (*i)->name() << "[d" << v->code_name() << "];\n";
-      }
+
+// does gcc optimise them out?
+//      s.new_float(o);
+//       o__ s.code_name() << " = " << prefix << (*i)->name() << ".value();\n";
+//       for(auto v : (*var)->deps()) { untested();
+// 	o__ s.code_name() << "[d" << v->code_name() << "] = " << prefix << (*i)->name() << "[d" << v->code_name() << "];\n";
+//       }
+      s.new_ref((*var)->code_name());
     }else if (auto f = dynamic_cast<const Token_FILTER*>(*i)) {
-      o__ s.code_name() << " = " << (*f)->code_name() << "(" << s.code_name() << ", d);\n";
-      for(auto v : (*f)->deps()) {
-	o__ "// dep :" << v->code_name() << "\n";
-//	o__ s.code_name() << "[d" << v->code_name() << "] = _v_" << (*i)->name() << "[d" << v->code_name() << "];\n";
+      trace2("FILTER", s.code_name(), s.num_args());
+
+      std::vector<std::string> argnames(s.num_args());
+      if(s.num_args()==1){
+	o__ s.code_name() << " = " << (*f)->code_name() << "(" << s.code_name() << ", d);\n";
+	for(auto v : (*f)->deps()) {
+	  o__ "// dep :" << v->code_name() << "\n";
+  //	o__ s.code_name() << "[d" << v->code_name() << "] = _v_" << (*i)->name() << "[d" << v->code_name() << "];\n";
+	}
+      }else{
+	for(auto n=argnames.begin(); n!=argnames.end(); ++n){
+	  *n = s.code_name();
+	  s.pop();
+	}
+	s.new_float(o);
+	o__ s.code_name() << " = " << (*f)->code_name();
+	// BUG: see SYMBOL
+	o << "(";
+       	std::string comma = "";
+	for(size_t i=argnames.size(); i; --i){
+	  o << comma << argnames[i-1];
+	  comma = ", ";
+	}
+	o << ", d);\n";
       }
+
     }else if (dynamic_cast<const Token_PAR_REF*>(*i)) {
-      s.new_float(o);
-      o << ind << s.code_name() << " = pc->_p_" << (*i)->name() << ";\n";
+      s.new_ref("pc->_p_" + (*i)->name());
     }else if (dynamic_cast<const Token_CONSTANT*>(*i)) {
       if(dynamic_cast<Float const*>((*i)->data())){
+#if 1
+	s.new_ref((*i)->name());
+#else
 	s.new_float(o);
+	o << ind << s.code_name() << " = " << (*i)->name() << ";\n";
+#endif
       }else{itested();
 	s.new_string(o);
+	o << ind << s.code_name() << " = " << (*i)->name() << ";\n";
       }
-      o << ind << s.code_name() << " = " << (*i)->name() << ";\n";
     }else if(auto pp = dynamic_cast<const Token_PROBE*>(*i)) {
       s.new_float(o);
       char sign = (*pp)->is_reversed()?'-':'+';
@@ -164,33 +219,36 @@ void make_cc_expression(std::ostream& o, Expression const& e)
       o__ s.code_name() << " = "<<sign<<" p->" << (*pp)->code_name() << ";// "<< pp->name() <<"\n";
       o__ s.code_name() << "[d" << (*pp)->code_name() << "] = " << sign << "1.;\n";
     }else if(/*parlist && ??*/dynamic_cast<const Token_SYMBOL*>(*i)) {
-      // incomplete(); // TODO
       assert(s.have_args());
-      int arity=0;
-      MGVAMS_FUNCTION const* f = lookup_function((*i)->name(), arity);
-      if(s.num_args() == 1) {
-// 	assert(arity==1); $vt
+      MGVAMS_FUNCTION const* f = lookup_function((*i)->name());
+      std::vector<std::string> argnames(s.num_args());
+      assert(s.num_args() == argnames.size());
+      for(auto n=argnames.begin(); n!=argnames.end(); ++n){
+	*n = s.code_name();
+	s.pop();
+      }
+
+      if(f && !argnames.size()){
+	s.new_float(o);
+	o << ind << s.code_name() << " = " << f->code_name() << "();\n";
+      }else if(argnames.size()) {
+	s.new_float(o);
+	// o << ind << s.code_name() << " = va::" << (*i)->name();
 	if(f && f->code_name()!=""){
 	  o << ind << s.code_name() << " = " << f->code_name();
+	}else if(auto af = dynamic_cast<Token_AFCALL const*>(*i)){
+	  o << ind << s.code_name() << " = " << af->code_name();
 	}else{
 	  o << ind << s.code_name() << " = va::" << (*i)->name();
 	}
-	o << "(" << s.code_name() << ");\n";
-      }else if(s.num_args() == 2){
-	std::string idy = s.code_name();
-	s.pop();
-	o << ind << s.code_name() << " = va::" << (*i)->name();
-	o << "(" << s.code_name() << ", " << idy << ");\n";
-      }else if(f && !s.num_args()) {
-	s.new_float(o);
-	o << ind << s.code_name() << " = " << f->code_name() << "();\n";
-      }else if(s.num_args() == 3) {
-	std::string idz = s.code_name();
-	s.pop();
-	std::string idy = s.code_name();
-	s.pop();
-	o << ind << s.code_name() << " = va::" << (*i)->name();
-	o << "(" << s.code_name() << ", " << idy << ", " << idz << ");\n";
+
+	o << "(";
+       	std::string comma = "";
+	for(size_t i=argnames.size(); i; --i){
+	  o << comma << argnames[i-1];
+	  comma = ", ";
+	}
+	o << ");\n";
 
       }else{ untested();
 	unreachable();
@@ -201,34 +259,44 @@ void make_cc_expression(std::ostream& o, Expression const& e)
     }else if (dynamic_cast<const Token_STOP*>(*i)) {
       s.stop();
     }else if (dynamic_cast<const Token_BINOP*>(*i)) {
+      assert((*i)->name().size());
       std::string idy = s.code_name();
       s.pop();
-      assert((*i)->name().size());
+      std::string arg1 = s.code_name();
+      s.pop();
+      s.new_float(o);
 
       auto op = (*i)->name()[0];
       if ( op == '-'
 	|| op == '+'
 	|| op == '*'
-	|| op == '/') {
-	o__ s.code_name() << " "<< op << "= " << idy << ";\n";
-      }else if( op == '>'
-	     || op == '<'
-	     || op == '='
-	     || op == '&'
-	     || op == '|'
-	     || op == '!' ) {
-	o__ s.code_name() << " = " << s.code_name() << " " << (*i)->name() << " " << idy << ";\n";
+	|| op == '/'
+	|| op == '<'
+	|| op == '>'
+	|| op == '='
+	|| op == '&'
+	|| op == '|'
+	|| op == '!' ){
+	o__ s.code_name() << " = " << arg1 << " " << (*i)->name() << " " << idy << ";\n";
+      }else if(op == '%'){
+	o__ s.code_name() << " = va::fmod(" << arg1 << ", " << idy << ");\n";
       }else{ untested();
 	unreachable();
+	assert(false);
 	throw Exception("run time error in make_cc_expression: " + (*i)->name());
       }
     }else if (dynamic_cast<const Token_UNARY*>(*i)) {
+      std::string arg1 = s.code_name();
+      s.pop();
+      s.new_float(o);
+
       auto op = (*i)->name()[0];
-      if(op == '-') {
-	o__ s.code_name() << " *= -1.;\n";
+      if(op == '-' || op == '!') {
+	o__ s.code_name() << " = " << op << arg1 << ";\n";
       }else{ untested();
 	incomplete();
 	unreachable();
+	o__ s.code_name() << " INCOMPLETE = " << op << arg1 << ";\n";
       }
     }else if (auto t = dynamic_cast<const Token_TERNARY*>(*i)) {itested();
       o__ "{\n";
@@ -256,6 +324,13 @@ void make_cc_expression(std::ostream& o, Expression const& e)
       assert(false);
     }
   }
+
+  if(s.is_ref()){
+    s.new_float(o);
+    s.pop();
+    o__ "t0 = " << s.code_name() << ";\n";
+  }else{
+  }
   s.pop();
 }
 /*--------------------------------------------------------------------------*/
@@ -268,10 +343,10 @@ void make_cc_event_cond(std::ostream& o, Expression const& e)
   for (const_iterator i = e.begin(); i != e.end(); ++i) {
     if((*i)->name()=="initial_step"){
       o__ "evt = _sim->is_initial_step();\n";
-    }else if((*i)->name()=="initial_model"){
+    }else if((*i)->name()=="initial_model"){ untested();
       std::cerr << "WARNING: ADMS style keyword encountered\n";
       o__ "evt = _sim->is_initial_step();\n";
-    }else{
+    }else{ untested();
       incomplete();
       o << "--> " << (*i)->name() << " <--\n";
     }

@@ -1,0 +1,10 @@
+// If the flow of the branch appears in an expression anywhere in the module, 
+// the branch is a flow probe, otherwise the branch is a potential probe. Using 
+// both the potential and the flow of a probe branch is illegal. 
+test_probe0 #(.sel(NA( 0.))) dut1 (.p(1),.n(0));
+test_probe0 #(.sel(1)) dut2 (.p(2),.n(0));
+parameter v=5 
+vsource #(.dc(v)) v1 (.p(1),.n(0));
+vsource #(.dc(v)) v1 (.p(2),.n(0));
+#           v(1)       v(2)       i(dut1)    i(dut2)    v(dut1)    v(dut2)   
+ 0.         2.5        2.5        99.        250.K      2.5        2.5       

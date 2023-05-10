@@ -1,0 +1,7 @@
+
+module test() 
+analog begin 
+XS(n, p) <+ 17. 
+end 
+endmodul
+                                       ^ ? bad discipline

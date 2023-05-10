@@ -268,6 +268,7 @@ static _COMMON_VASRC_rotational_omega _C_V_rotational_omega(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class MOD_resistor;
 class COMMON_resistor :public COMMON_COMPONENT{
+  typedef MOD_resistor MOD;
   typedef ddouble_<1> ddouble;
   enum {
     d_potential_b_p_n
@@ -296,6 +297,7 @@ private: // strictly internal
   static int _count;
 public: // input parameters
   PARAMETER<real> _p_r /*  */;
+private: // analog functions
 private: // tmp hack
   double temp_hack()const {
     return P_CELSIUS0 + _sim->_temp_c;
@@ -306,6 +308,9 @@ private: // tmp hack
   double vt_hack(double T)const {
     assert(T>=-P_CELSIUS0);
     return P_K * temp_hack() / P_Q;
+  }
+  bool param_given(PARA_BASE const& p)const {
+    return p.has_hard_value();
   }
 };
 /*--------------------------------------------------------------------------*/
@@ -355,6 +360,9 @@ private: // branch state
 public: // states, _b_p_n;
   double _value_b_p_n;
   double _st_b_p_n  [2];
+  struct _st_b_p_n_ {
+    enum {     VALUE, SELF, dep_potential_b_p_n    };
+  } _dep_b_p_n;
 private: // filter state
 private: // node list
   enum {n_p, n_n  };
@@ -363,10 +371,7 @@ private: // probe values
 private: // impl
   void read_probes();
   void set_branch_contributions();
-  void clear_branch_contributions(){
-    _value_b_p_n = 0.;
-    std::fill_n(_st_b_p_n+1, 1, 0.);
-  }
+  void clear_branch_contributions();
   friend class COMMON_resistor;
 }; // m_resistor;
 /*--------------------------------------------------------------------------*/
@@ -440,7 +445,22 @@ std::string COMMON_resistor::param_value(int i)const
 /*--------------------------------------------------------------------------*/
 bool COMMON_resistor::is_valid() const
 {
-  if(!(1e-8<=_p_r && _p_r<inf)){ return false; }else{ }
+  COMMON_resistor const* pc = this;
+  (void)pc;
+  {
+  double lb, ub;
+  {
+  ddouble t0;
+  t0 = 1e-8;
+  lb = t0;
+  }
+  {
+  ddouble t0;
+  t0 = inf;
+  ub = t0;
+  }
+  if(!(lb<=_p_r && _p_r<ub)){ return false; }else{ }
+  }
   return true; //COMMON_COMPONENT::is_valid();
 }
 /*--------------------------------------------------------------------------*/
@@ -477,36 +497,6 @@ void COMMON_resistor::precalc_last(const CARD_LIST* par_scope)
   }
 }
 /*--------------------------------------------------------------------------*/
-inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
-{
-  MOD_resistor const* p = d;
-  assert(p);
-  COMMON_resistor const* pc = this;
-  (void)pc;
-  {
-    ddouble _v_i; // Variable    
-    { // Assignment 'i'. Dep: _potential_b_p_n
-      ddouble t0;
-      t0 = + p->_potential_b_p_n;// V(p, n)
-      t0[d_potential_b_p_n] = +1.;
-      ddouble t1;
-      t1 = pc->_p_r;
-      t0 /= t1;
-      _v_i.value() = t0.value();
-      _v_i[d_potential_b_p_n] = t0[d_potential_b_p_n];
-      assert(_v_i == _v_i);
-    }
-    { // Contribution I
-      ddouble t0;
-      t0 = _v_i.value();
-      t0[d_potential_b_p_n] = _v_i[d_potential_b_p_n];
-      d->_value_b_p_n += t0.value();
-      assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
-      d->_st_b_p_n[1] += t0[d_potential_b_p_n];
-      // dep _potential_b_p_n
-    }
-  }
-}
 /*--------------------------------------------------------------------------*/
 int COMMON_resistor::_count = -1;
 static COMMON_resistor Default_resistor(CC_STATIC);
@@ -526,19 +516,6 @@ double MOD_resistor::tr_probe_num(std::string const& n) const
   return NOT_VALID;
   return BASE_SUBCKT::tr_probe_num(n)
 ;}
-/*--------------------------------------------------------------------------*/
-inline void MOD_resistor::set_branch_contributions()
-{
-  // flow src (p, n)
-  // DEP _potential_b_p_n
-  assert(_value_b_p_n == _value_b_p_n);
-  _st_b_p_n[0] = _value_b_p_n;
-  trace2("_st_b_p_nself", _st_b_p_n[1], _potential_b_p_n);
-  _st_b_p_n[0] -= _st_b_p_n[1] * _potential_b_p_n;
-  trace1("_st_b_p_n", _value_b_p_n);
-  trace1("_st_b_p_n", _value_b_p_n);
-  // filters
-}
 /*--------------------------------------------------------------------------*/
 inline void MOD_resistor::read_probes()
 {
@@ -585,6 +562,53 @@ bool MOD_resistor::do_tr()
   return converged();
 }
 /*--------------------------------------------------------------------------*/
+inline void MOD_resistor::set_branch_contributions()
+{
+  // DEP _potential_b_p_n
+  assert(_value_b_p_n == _value_b_p_n);
+  _st_b_p_n[0] = _value_b_p_n;
+  trace2("_st_b_p_nself", _st_b_p_n[1], _potential_b_p_n);
+  _st_b_p_n[0] -= _st_b_p_n[1] * _potential_b_p_n;
+  // flow src (p, n)
+  // filters
+}
+/*--------------------------------------------------------------------------*/
+inline void MOD_resistor::clear_branch_contributions()
+{
+    _value_b_p_n = 0.;
+    std::fill_n(_st_b_p_n+1, 1, 0.);
+}
+/*--------------------------------------------------------------------------*/
+inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
+{
+  MOD_resistor const* p = d;
+  assert(p);
+  COMMON_resistor const* pc = this;
+  (void)pc;
+  {
+    { // 
+      ddouble _v_i; // Variable      
+      { // Assignment unknown 'i'. Dep: _potential_b_p_n
+        ddouble t0;
+        t0 = + p->_potential_b_p_n;// V(p, n)
+        t0[d_potential_b_p_n] = +1.;
+        t0 = t0 / pc->_p_r;
+        assert(t0.is_same(t0));
+        _v_i = t0.value(); // (*)
+        _v_i[d_potential_b_p_n] = t0[d_potential_b_p_n]; // 2
+        assert(_v_i == _v_i);
+      }
+      { // Contribution I
+        ddouble t0;
+        t0 = _v_i;
+        d->_value_b_p_n += t0.value();
+        assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
+        d->_st_b_p_n[1] += t0[d_potential_b_p_n];
+        // dep _potential_b_p_n
+      }
+    }
+  }
+}
   std::string MOD_resistor::port_name(int i)const
 {
     assert(i >= 0);

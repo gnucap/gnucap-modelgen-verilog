@@ -261,12 +261,30 @@ void make_common_param_name(std::ostream& o, const Module& m)
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_param_eval_range(std::ostream& o, ValueRange const& p)
+{
+  ValueRangeSpec const* spec = p.spec();
+  if(auto ri = dynamic_cast<ValueRangeInterval const*>(spec)){
+    o__ "double lb, ub;\n";
+    o__ "{\n";
+    make_cc_expression(o, ri->lb().expression());
+    o__ "lb = " << "t0" << ";\n";
+    o__ "}\n";
+    o__ "{\n";
+    make_cc_expression(o, ri->ub().expression());
+    o__ "ub = " << "t0" << ";\n";
+    o__ "}\n";
+
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
 static void make_param_check_range(std::ostream& o, ValueRange const& p,
     std::string const& n)
 {
   ValueRangeSpec const* spec = p.spec();
   if(auto ri = dynamic_cast<ValueRangeInterval const*>(spec)){
-       	o << "(" << ri->lb() << "<";
+       	o << "(lb<";
 	if(ri->lb_is_closed()){
 	  o << "=";
 	}else{
@@ -276,7 +294,7 @@ static void make_param_check_range(std::ostream& o, ValueRange const& p,
 	  o << "=";
 	}else{
 	}
-	o << ri->ub() << ")";
+	o << "ub)";
   }else if(auto c = dynamic_cast<ValueRangeConstant const*>(spec)){
     o << "(" << c->expr() << "==" << n << ")";
   }else{
@@ -289,6 +307,8 @@ static void make_common_is_valid(std::ostream& o, const Module& m)
 {
   make_tag();
   o << "bool COMMON_" << m.identifier() << "::is_valid() const\n{\n";
+  o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
+  o__ "(void)pc;\n";
 
   // move to precalc?
   for (Parameter_List_Collection::const_iterator
@@ -302,6 +322,9 @@ static void make_common_is_valid(std::ostream& o, const Module& m)
 	 ++p) {
       for(auto v : (*p)->value_range_list()){
 	assert(v);
+
+	o__ "{\n";
+	make_param_eval_range(o, *v);
 	o__ "if(";
 	if(v->is_from()){
 	  o << "!";
@@ -311,8 +334,8 @@ static void make_common_is_valid(std::ostream& o, const Module& m)
 	}
 	make_param_check_range(o, *v, (*p)->code_name());
 	o << "){ return false; }else{ }\n";
+	o__ "}\n";
       }
-      
     }
   }
 
@@ -524,34 +547,6 @@ static void make_common_expand(std::ostream& o , const Module& m)
 #endif
 }
 /*--------------------------------------------------------------------------*/
-static void make_common_tr_eval(std::ostream& o, const Module& m)
-{
-  o << "inline void COMMON_" << m.identifier() << 
-    "::tr_eval_analog(MOD_" << m.identifier() << "* d) const\n{\n";
-
-  // parameters are here.
-  o__ "MOD_" << m.identifier() << " const* p = d;\n";
-  o__ "assert(p);\n";
-  o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
-  o__ "(void)pc;\n";
-
-  for(auto bb : m.analog_list()){
-    assert(bb);
-//    if(auto ab = dynamic_cast<AnalogStmt const*>(bb)){
-//    }else
-    if(auto ab = dynamic_cast<AnalogConstruct const*>(bb)){
-      o << ind << "{\n";
-      {
-	indent a(2);
-	make_cc_analog(o, *ab);
-      }
-      o << ind << "}\n";
-    }else{ untested();
-    }
-  }
-  o << "}\n";
-}
-/*--------------------------------------------------------------------------*/
 void make_cc_common(std::ostream& o , const Module& m)
 {
   make_tag();
@@ -566,7 +561,6 @@ void make_cc_common(std::ostream& o , const Module& m)
   make_common_param_value(o, m);
   make_common_is_valid(o, m);
   make_common_expand(o, m);
-  make_common_tr_eval(o, m);
   o  << "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/

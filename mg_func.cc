@@ -33,13 +33,17 @@ class DUMMY1 : public MGVAMS_FUNCTION {
 	  unreachable();
 	  return "AAA";
   }
-  int arity()const override {
-	  return 1;
-  }
+//  int arity()const override {
+//	  return 1;
+//  }
 } dummy1;
 DISPATCHER<FUNCTION>::INSTALL d_abs(&function_dispatcher, "abs|$abs", &dummy1);
+DISPATCHER<FUNCTION>::INSTALL d_acosh(&function_dispatcher, "acosh|$acosh", &dummy1);
+DISPATCHER<FUNCTION>::INSTALL d_asinh(&function_dispatcher, "asinh|$asinh", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_atanh(&function_dispatcher, "atanh|$atanh", &dummy1);
+DISPATCHER<FUNCTION>::INSTALL d_atan(&function_dispatcher, "atan|$atan", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_cos(&function_dispatcher, "cos|$cos", &dummy1);
+DISPATCHER<FUNCTION>::INSTALL d_cosh(&function_dispatcher, "cosh|$cosh", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_limexp(&function_dispatcher, "limexp|$limexp", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_sin(&function_dispatcher, "sin|$sin", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_sinh(&function_dispatcher, "sinh|$sinh", &dummy1);
@@ -51,20 +55,50 @@ class DUMMY2 : public MGVAMS_FUNCTION {
 	  unreachable();
 	  return "AAA";
   }
-  int arity()const override {
-	  return 2;
-  }
+//  int arity()const override {
+//	  return 2;
+//  }
 } dummy2;
 DISPATCHER<FUNCTION>::INSTALL d_min(&function_dispatcher, "min|$min", &dummy2);
 DISPATCHER<FUNCTION>::INSTALL d_max(&function_dispatcher, "max|$max", &dummy2);
+/*--------------------------------------------------------------------------*/
+class PARAM_GIVEN : public MGVAMS_FUNCTION {
+  std::string eval(CS&, const CARD_LIST*)const override{
+	  return "$param_given";
+  }
+  std::string code_name()const override{
+	  return "param_given";
+  }
+} pg;
+DISPATCHER<FUNCTION>::INSTALL d_pg(&function_dispatcher, "$param_given", &pg);
+/*--------------------------------------------------------------------------*/
+class SIMPARAM : public MGVAMS_FUNCTION {
+  std::string eval(CS&, const CARD_LIST*)const override{
+	  return "$$simparam";
+  }
+  std::string code_name()const override{
+	  return "va::simparam";
+  }
+} simparam;
+DISPATCHER<FUNCTION>::INSTALL d_simparam(&function_dispatcher, "$simparam", &simparam);
+/*--------------------------------------------------------------------------*/
+class STROBE : public MGVAMS_FUNCTION {
+  std::string eval(CS&, const CARD_LIST*)const override{
+	  return "$$strobe";
+  }
+  std::string code_name()const override{
+	  return "temp_hack";
+  }
+} strobe;
+DISPATCHER<FUNCTION>::INSTALL d_strobe(&function_dispatcher, "$strobe", &strobe);
 /*--------------------------------------------------------------------------*/
 class TEMPERATURE : public MGVAMS_FUNCTION {
   std::string eval(CS&, const CARD_LIST*)const override{
 	  return "$$temperature";
   }
-  int arity()const override {
-	  return 0;
-  }
+//  int arity()const override {
+//	  return 0;
+//  }
   std::string code_name()const override{
 	  return "temp_hack";
   }
@@ -75,9 +109,9 @@ class VT : public MGVAMS_FUNCTION {
   std::string eval(CS&, const CARD_LIST*)const override{
 	  return "$$vt";
   }
-  int arity()const override {
-	  return 0;
-  }
+//  int arity()const override {
+//	  return 0;
+//  }
   std::string code_name()const override{
 	  return "vt_hack";
   }
@@ -93,7 +127,25 @@ public:
     return to_string(std::exp(x));
   }
 } p_exp;
-DISPATCHER<FUNCTION>::INSTALL d_exp(&function_dispatcher, "exp", &p_exp);
+DISPATCHER<FUNCTION>::INSTALL d_exp(&function_dispatcher, "exp|$exp", &p_exp);
+/*--------------------------------------------------------------------------*/
+class floor : public MGVAMS_FUNCTION {
+public:
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {
+    PARAMETER<double> x;
+    Cmd >> x;
+    x.e_val(NOT_INPUT, Scope);
+    return to_string(std::floor(x));
+  }
+  std::string const& name() const{ untested();
+	  static std::string n = "$floor";
+	  return n;
+  }
+  std::string code_name()const override{
+	  return "va::floor";
+  }
+} p_floor;
+DISPATCHER<FUNCTION>::INSTALL d_floor(&function_dispatcher, "floor|$floor", &p_floor);
 /*--------------------------------------------------------------------------*/
 class log : public MGVAMS_FUNCTION {
 public:
@@ -110,9 +162,9 @@ public:
   std::string code_name()const override{
 	  return "va::log10";
   }
-  int arity()const override {
-	  return 1;
-  }
+//  int arity()const override {
+//	  return 1;
+//  }
 } p_log;
 DISPATCHER<FUNCTION>::INSTALL d_log(&function_dispatcher, "log|$log10", &p_log);
 /*--------------------------------------------------------------------------*/
@@ -128,9 +180,9 @@ public:
 	  static std::string n = "$log";
 	  return n;
   }
-  int arity()const override {
-	  return 1;
-  }
+//  int arity()const override {
+//	  return 1;
+//  }
 } p_ln;
 DISPATCHER<FUNCTION>::INSTALL d_ln(&function_dispatcher, "ln|$log", &p_ln);
 /*--------------------------------------------------------------------------*/
@@ -148,9 +200,9 @@ public:
 	  static std::string n = "$log";
 	  return n;
   }
-  int arity()const override {
-	  return 2;
-  }
+//  int arity()const override {
+//	  return 2;
+//  }
 } p_pow;
 DISPATCHER<FUNCTION>::INSTALL d_pow(&function_dispatcher, "pow", &p_pow);
 /*--------------------------------------------------------------------------*/
@@ -162,8 +214,9 @@ class DUMMYFILTER : public FUNCTION {
 	  return "filter";
   }
 } dummyfilter;
-DISPATCHER<FUNCTION>::INSTALL d2(&function_dispatcher, "ddt", &dummyfilter);
-DISPATCHER<FUNCTION>::INSTALL d3(&function_dispatcher, "idt", &dummyfilter);
+DISPATCHER<FUNCTION>::INSTALL d_ddt(&function_dispatcher, "ddt", &dummyfilter);
+DISPATCHER<FUNCTION>::INSTALL d_idt(&function_dispatcher, "idt", &dummyfilter);
+DISPATCHER<FUNCTION>::INSTALL d_ddx(&function_dispatcher, "ddx", &dummyfilter);
 DISPATCHER<FUNCTION>::INSTALL d_white_noise(&function_dispatcher, "white_noise", &dummyfilter);
 DISPATCHER<FUNCTION>::INSTALL d_flicker_noise(&function_dispatcher, "flicker_noise", &dummyfilter);
 

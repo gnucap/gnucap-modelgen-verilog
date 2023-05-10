@@ -1,2 +1,12 @@
-cannot use self as current probe.. yet
-
+parameter r=1 
+parameter v=0 
+test_res1_0 #(.r(1)) dut (.np(1),.nn(0));
+vsource #(.dc(v)) v1 (.p(1),.n(0));
+test_res1_0 #(.r(100)) dut (.np(2),.nn(0));
+vsource #(.dc(v)) v2 (.p(2),.n(0));
+test_res1_0 #(.r(0)) dut (.np(3),.nn(0));
+vsource #(.dc(v)) v3 (.p(3),.n(0));
+#           i(v1)      i(v2)      i(v3)      iter(0)   
+ 0.         0.         0.         0.         3.        
+ 0.5       -0.5       -49.95     -25.K       3.        
+ 1.        -0.99999   -99.9      -50.K       3.        

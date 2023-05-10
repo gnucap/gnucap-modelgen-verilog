@@ -253,7 +253,7 @@ void Element_1::dump(std::ostream& out)const
 void Arg::parse(CS& file)
 {
   file.skipbl();
-  _arg = file.get_to(";");
+  _identifier = file.get_to(";");
   file.skip1b(";");
 }
 /*--------------------------------------------------------------------------*/

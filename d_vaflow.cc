@@ -115,7 +115,6 @@ DEV_CPOLY_G::DEV_CPOLY_G(const DEV_CPOLY_G& p)
   assert(!p._values);
   assert(!p._old_values);
   assert(p._n_ports == 0);
-  assert(!p._input.size());
 }
 /*--------------------------------------------------------------------------*/
 DEV_CPOLY_G::DEV_CPOLY_G()
@@ -153,11 +152,14 @@ void DEV_CPOLY_G::expand_current_port(size_t i)
     throw Exception(long_label() + ": " + input_label
 		    + " has a subckt, cannot be used as current probe");
   }else if (input->has_inode()) {untested();
+    incomplete(); // wrong N1
     _n[IN1] = input->n_(IN1);
     _n[IN2].set_to_ground(this);
   }else if (input->has_iv_probe()) {
+    size_t IN1 = net_nodes() - 2*_current_port_names.size() + 2*i;
+    trace4("flow ecp", i, IN1, net_nodes(), _current_port_names.size());
     _n[IN1] = input->n_(OUT1);
-    _n[IN2] = input->n_(OUT2);
+    _n[IN1+1] = input->n_(OUT2);
   }else{ untested();
     throw Exception(long_label() + ": " + input_label + " cannot be used as current probe");
   }
@@ -222,13 +224,18 @@ double DEV_CPOLY_G::tr_amps()const
 {
   double amps = _m0.c0;
   for (int i=1; i<=_n_ports; ++i) {
-    amps += dn_diff(_n[2*i-2].v0(),_n[2*i-1].v0()) * _values[i];
+    amps += dn_diff(_n[2*i-2].v0(), _n[2*i-1].v0()) * _values[i];
   }
   return amps;
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::ac_load()
 {
+  if(_current_port_names.size()){ untested();
+    incomplete();
+  }else{
+  }
+
   _acg = _values[1];
   ac_load_passive();
   for (int i=2; i<=_n_ports; ++i) {

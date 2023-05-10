@@ -23,6 +23,7 @@
 #include "mg_.h"
 #include <stack>
 #include <u_opt.h>
+#include <e_cardlist.h> // BUG?
 /*--------------------------------------------------------------------------*/
 void Port_1::parse(CS& file)
 {
@@ -137,6 +138,11 @@ void File::parse(CS& file)
     }else{
     }
   }
+
+  // HACK
+  for(auto i: _module_list){
+    i->set_owner(this);
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Preprocessor::read(std::string const& file_name)
@@ -165,7 +171,6 @@ void String_Arg::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 void Raw_String_Arg::parse(CS& f)
 {
-  trace1("RSA in", f.tail().substr(0,10));
   int par = 0;
   assert(_s=="");
   bool quote = false;
@@ -188,7 +193,7 @@ void Raw_String_Arg::parse(CS& f)
     }else if(p == ')') {
       if(!par){
 	break;
-      }else{ untested();
+      }else{ itested();
 	--par;
 	_s += p;
 	f.skip();
@@ -198,7 +203,26 @@ void Raw_String_Arg::parse(CS& f)
       f.skip();
     }
   }
-  trace2("RSA", _s, f.tail().substr(0,10));
+}
+/*--------------------------------------------------------------------------*/
+void ConstExpression::parse(CS& file)
+{
+  assert(owner());
+  Expression ce(file);
+  Expression tmp;
+  assert(owner());
+  resolve_symbols(ce, tmp, owner());
+  _expression = new Expression(tmp, &CARD_LIST::card_list);
+}
+/*--------------------------------------------------------------------------*/
+void ConstExpression::dump(std::ostream& o) const
+{
+  o << "(";
+  if(_expression) {
+    o << *_expression;
+  }else{ untested();
+  }
+  o << ")";
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

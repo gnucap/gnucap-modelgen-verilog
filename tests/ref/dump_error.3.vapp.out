@@ -1,5 +1,2 @@
-dump_error.3.vapp:1:
 `define 
-        ^ ? what's this??
-`define 
-        ^ ? expecting macro name
+        ^ ? syntax error

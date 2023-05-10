@@ -323,12 +323,14 @@ void PARAMSET::set_param_by_name(std::string Name, std::string Value)
   trace3("PARAMSET::spbn", long_label(), Name, Value);
   assert(_parent);
 
-  if(_parent->subckt()){
+  if(Name==""){
+      throw Exception_No_Match("invalid parameter: " + Name);
+  }else if(_parent->subckt()){
     trace2("PARAMSET::spbn", long_label(), _parent->long_label());
     PARAM_LIST const* p = _parent->subckt()->params();
 
     if(p->find(Name) == p->end()){ untested();
-      throw Exception("invalid parameter: " + Name);
+      throw Exception_No_Match("invalid parameter: " + Name);
     }else{
     }
   }else{
@@ -498,7 +500,7 @@ CARD* PARAMSET::deflate()
   resolve_copy(subckt(), c->_params, NULL);
 
   trace4("PARAMSET::deflate args fwd", dev->long_label(), dev->dev_type(), long_label(), dev_type());
-  for(auto i=pc->_params.begin(); i!=pc->_params.end(); ++i){
+  for(auto i=pc->_params.begin(); i!=pc->_params.end(); ++i){ untested();
     CS cmd(CS::_STRING, i->second.string());
     Expression e(cmd);
     Expression r(e, subckt());
@@ -508,6 +510,7 @@ CARD* PARAMSET::deflate()
     std::string value = s.str();
     demangle(value);
     trace3("PARAMSET::deflate args fix", long_label(), i->first, value);
+    assert(i->first!="");
     dev->set_param_by_name(i->first, value);
   }
 
@@ -585,7 +588,10 @@ void PARAMSET::expand()
 
     {
       auto c = prechecked_cast<COMMON_PARAMLIST const*>(proto->common());
-      for(auto i=c->_params.begin(); i!=c->_params.end(); ++i){
+      for(auto i=c->_params.begin(); i!=c->_params.end(); ++i){ untested();
+	trace2("PARAMSET::expand sp", i->first, i->second.string());
+      }
+      for(auto i=c->_params.begin(); i!=c->_params.end(); ++i){ untested();
 	dev->set_param_by_name(i->first, i->second.string());
       }
     }

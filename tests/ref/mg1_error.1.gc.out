@@ -1,2 +1,2 @@
 ... ectrical p, n, cp, cn; analog begin gain = 17; end endmo
-                                        ^ ? bad analog block
+                                        ^ ? what's this?

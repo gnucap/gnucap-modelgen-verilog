@@ -4,6 +4,7 @@ load ../lang_verilog.so
 load ../vams/capacitor.so
 load ../vams/resistor.so
 
+options bypass
 verilog
 
 capacitor #(.c(.5) .m(2)) c1(0, out);

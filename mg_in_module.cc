@@ -22,6 +22,38 @@
 #include "mg_.h"
 #include "mg_out.h"
 /*--------------------------------------------------------------------------*/
+#if 0
+void Name_String::parse(CS& File)
+{ untested();
+  File.skipbl();
+  _data = "";
+  if (File.is_pfloat()) { untested();
+    while (File.is_pfloat()) {
+      _data += File.ctoc();
+    }
+    if (File.match1("eE")) { untested();
+      _data += File.ctoc();
+      if (File.match1("+-")) { untested();
+        _data += File.ctoc();
+      }else{ untested();
+      }
+      while (File.is_digit()) { untested();
+        _data += File.ctoc();
+      }
+    }else{ untested();
+    }
+    while (File.is_alpha()) { untested();
+      _data += File.ctoc();
+    }
+  }else{ untested();
+    while (File.is_alpha() || File.is_pfloat() || File.match1("_$")) { untested();
+      _data += File.ctoc();
+    }
+  }
+  File.skipbl();
+}
+#endif
+/*--------------------------------------------------------------------------*/
 /* A.4.1	6.2.2
 + module_instantiation ::=
 +	  module_or_paramset_identifier [ parameter_value_assignment ] 
@@ -126,6 +158,7 @@ void Parameter_2::parse(CS& file)
  // if(file.match1(";,")) {
  // }else
   {
+    _value_range_list.set_owner(owner());
     file >> _value_range_list;
   }
   assert(owner());
@@ -144,6 +177,23 @@ void Parameter_2::dump(std::ostream& o)const
   //}
 }
 /*--------------------------------------------------------------------------*/
+void Data_Type::parse(CS& file)
+{
+  if(file.umatch("real")){
+    _type = t_real;
+  }else if(file.umatch("integer")){ untested();
+    _type = t_int;
+  }else{ untested();
+    throw Exception_CS("need \"real\", \"integer\"\n", file);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Data_Type::dump(std::ostream& o)const
+{
+  static std::string names[] = {"unknown", "real", "integer"};
+  o << names[_type];
+}
+/*--------------------------------------------------------------------------*/
 /*
 + parameter_declaration ::=
 - parameter [ signed ] [ range ] list_of_param_assignments
@@ -152,6 +202,7 @@ void Parameter_2::dump(std::ostream& o)const
 void Parameter_2_List::parse(CS& file)
 {
   _is_local = file.last_match()[0]=='l';
+//  file >> _type;
   if(file.umatch("real")){
     _type = std::string("real"); // TODO: enum
   }else if(file.umatch("integer")){
@@ -171,6 +222,12 @@ void Variable_List::parse(CS& file)
 {
   _type = file.last_match();
   LiSt<Variable_2, '\0', ',', ';'>::parse(file);
+  if(_type.to_string()[0] == 'i'){
+    for (auto x : *this){
+      x->set_type(Data_Type_Int());
+    }
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Parameter_2_List::dump(std::ostream& o)const
@@ -191,6 +248,18 @@ void Variable_List::dump(std::ostream& o)const
   o__ _type << " ";
   LiSt<Variable_2, '\0', ',', ';'>::dump(o);
   o << "\n";
+}
+/*--------------------------------------------------------------------------*/
+void Variable_List_Collection::parse(CS& f)
+{
+//  char t=f.last_match()[0];
+  Collection<Variable_List>::parse(f);
+//  if(t=='i'){
+//    for(auto x:*this){
+//      x->set_int();
+//    }
+//  }else{
+//  }
 }
 /*--------------------------------------------------------------------------*/
 void Variable_List_Collection::dump(std::ostream& o)const
@@ -439,7 +508,7 @@ void Port_3::dump(std::ostream& out)const
 -	| task_declaration
 -	| function_declaration
 +	| branch_declaration
--	| analog_function_declaration
++	| analog_function_declaration
 + non_port_module_item ::=
 +	  module_or_generate_item
 -	| generate_region
@@ -493,7 +562,7 @@ net_declaration ::=
 - | wreal [ discipline_identifier ] [ range] list_of_net_decl_assignments ;
 - | ground [ discipline_identifier ] [ range ] list_of_net_identifiers ;
 */
-void Module::parse(CS& file)
+void Module::parse(CS& f)
 {
   // do we need a second pass? or just connect the dots while reading in?
   _ports.set_owner(this);
@@ -508,11 +577,12 @@ void Module::parse(CS& file)
   //_local_params.set_owner(this);
   _element_list.set_owner(this);
   _local_nodes.set_owner(this);
+  _analog_functions.set_owner(this);
   // _tr_eval.set_owner(this);
   // _validate.set_owner(this);
 
-  // file >> "module |macromodule |connectmodule "; from caller
-  file >> _identifier >> _ports >> ';';
+  // f >> "module |macromodule |connectmodule "; from caller
+  f >> _identifier >> _ports >> ';';
   assert(_parameters.owner() == this);
 
 
@@ -520,42 +590,43 @@ void Module::parse(CS& file)
   File const* root = prechecked_cast<File const*>(owner());
   assert(root);
 
-  size_t here = file.cursor();
+  size_t here = f.cursor();
   bool end = false;
   for (;;) {
     ONE_OF	// module_item
-      || (file >> _attribute_dummy)
-      || file.umatch(";")
+      || (f >> _attribute_dummy)
+      || f.umatch(";")
       // mi, port_declaration
-      || ((file >> "input ") && (file >> _input))
-      || ((file >> "output ") && (file >> _output))
-      || ((file >> "inout ") && (file >> _inout))
+      || ((f >> "input ") && (f >> _input))
+      || ((f >> "output ") && (f >> _output))
+      || ((f >> "inout ") && (f >> _inout))
       // mi, npmi, mogi, mogid
       // net_declaration
-//      || (( root->disciplines().match(file) ) && (file >> _disc_assign))
-//      || (file >> _node_assignments)
-      || (file >> _net_decl)
-      || ((file >> "ground ") && (file >> _net_decl))
-      || ((file >> "branch ") && (file >> _branch_decl))
+//      || (( root->disciplines().match(f) ) && (f >> _disc_assign))
+//      || (f >> _node_assignments)
+      || (f >> _net_decl)
+      || ((f >> "ground ") && (f >> _net_decl))
       // mi, non_port_module_item
       // mi, npmi, mogi, module_or_generate_item_declaration
+      || ((f >> "branch ") && (f >> _branch_decl))
+      || ((f >> "analog function ") && (f >> _analog_functions))
       // mi, npmi, module_or_generate_item
-//      || ((file >> "localparam ") && (file >> _local_params))
-      || ((file >> "real ") && (file >> _variables))
-      || ((file >> "integer ") && (file >> _variables))
-      || ((file >> "parameter ") && (file >> _parameters))
-      || ((file >> "localparam ") && (file >> _parameters))
-      || ((file >> "analog ") && parse_analog(file)) // TODO:: file >> analog
-      || ((file >> "endmodule ") && (end = true))
-      || (file >> _element_list)	// module_instantiation
+//      || ((f >> "localparam ") && (f >> _local_params))
+      || ((f >> "real ") && (f >> _variables))
+      || ((f >> "integer ") && (f >> _variables))
+      || ((f >> "parameter ") && (f >> _parameters))
+      || ((f >> "localparam ") && (f >> _parameters))
+      || ((f >> "analog ") && parse_analog(f)) // TODO:: f >> analog
+      || ((f >> "endmodule ") && (end = true))
+      || (f >> _element_list)	// module_instantiation
       ;
     if (end){
       break;
-    }else if (!file.more()) {
-      file.warn(0, "premature EOF (module)");
+    }else if (!f.more()) {
+      f.warn(0, "premature EOF (module)");
       break;
-    }else if (file.stuck(&here)) {
-      file.warn(0, "bad module");
+    }else if (f.stuck(&here)) {
+      f.warn(0, "bad module");
       break;
     }else{
     }
@@ -612,32 +683,6 @@ void List_Of_Branch_Identifiers::dump(std::ostream& o)const
   LiSt<Branch_Identifier, '\0', ',', ';'>::dump(o);
 }
 /*--------------------------------------------------------------------------*/
-void Branch_Ref::parse(CS& f)
-{
-  f >> "(";
-  std::string pp = f.ctos(",)");
-  std::string pn = f.ctos(",)");
-  f >> ")";
-
-  assert(owner());
-  trace3("Branch_Ref::parse", pp, pn, _br);
-  assert(!_br);
-  Branch_Ref b;
-  assert(!b._br);
-  b = owner()->new_branch(pp, pn);
-
-  assert(b._br);
-
-  *this = b;
-  assert(owner());
-}
-/*--------------------------------------------------------------------------*/
-void Branch_Ref::dump(std::ostream& o)const
-{
-  // incomplete();
-  o << "(" << pname() << ", " << nname() << ")";
-}
-/*--------------------------------------------------------------------------*/
 void Module::dump(std::ostream& o)const
 {
   o << "module " << identifier() << ports() << ";\n";
@@ -677,6 +722,9 @@ void Module::dump(std::ostream& o)const
   }else{
   }
 
+  for(auto i: analog_functions()){
+    o << *i << "\n";
+  }
   for(auto i: analog_list()){
     o << *i << "\n";
   }
@@ -708,10 +756,9 @@ void Variable_2::dump(std::ostream& o)const
   o__ name();
 }
 /*--------------------------------------------------------------------------*/
-void Variable::dump(std::ostream&)const
+void Variable::dump(std::ostream& o)const
 {
-  unreachable(); // ?
-//  o__ _type << " " << name() << ";\n";
+  o << name();
 }
 /*--------------------------------------------------------------------------*/
 void ValueRangeInterval::parse(CS& file)
@@ -723,9 +770,13 @@ void ValueRangeInterval::parse(CS& file)
   }else{
     unreachable();
   }
-  _lb = file.ctos(":");
+  assert(owner());
+  _lb.set_owner(owner());
+  _ub.set_owner(owner());
+  file >> _lb; //_lb = file.ctos(":");
   file.skip1(":");
-  _ub = file.ctos("])");
+  file >> _ub; // _ub = file.ctos("])");
+  trace1("ValueRangeInterval::parse", file.tail().substr(0,19));
 
   if(file.match1(']')) {
     file.skip1(']');
@@ -755,10 +806,12 @@ void ValueRangeInterval::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void ValueRange::parse(CS& file)
 {
+  assert(owner());
   if (file >> "from"){
     _type = vr_FROM;
     if(file >> "[" || file >> "("){
       _what = new ValueRangeInterval;
+      _what->set_owner(owner());
       file >> *_what;
     }else{
       incomplete();
@@ -767,11 +820,13 @@ void ValueRange::parse(CS& file)
     _type = vr_EXCLUDE;
     if(file >> "[" || file >> "("){ untested();
       _what = new ValueRangeInterval;
+      _what->set_owner(owner());
     }else if(file >> "'{"){ untested();
       incomplete();
 //      _what = new ValueRangeStrings;
     }else{
       _what = new ValueRangeConstant;
+      _what->set_owner(owner());
     }
     file >> *_what;
     trace1("ValueRange::parse b", file.tail().substr(0,10));
@@ -796,5 +851,35 @@ void ValueRangeConstant::dump(std::ostream& o)const
 {
   o << _cexpr;
 }
+/*--------------------------------------------------------------------------*/
+void Block::new_var_ref(Base const* what)
+{
+  assert(what);
+  std::string p;
+  if(auto V = dynamic_cast<Variable const*>(what)){
+    p = V->name();
+  }else if(auto P = dynamic_cast<Parameter_2 const*>(what)){
+    p = P->name();
+  }else{
+    // TODO
+    assert(false);
+  }
+  trace1("new_var_ref", p);
+  Base const* cc = _var_refs[p];
+
+  // yikes.
+  if(dynamic_cast<Analog_Function_Arg const*>(what)
+   &&!dynamic_cast<Analog_Function_Arg const*>(cc)){
+    _var_refs[p] = what;
+  }else if(dynamic_cast<Analog_Function_Arg const*>(cc)
+   &&!dynamic_cast<Analog_Function_Arg const*>(what)){
+    _var_refs[p] = cc;
+  }else if(cc) {
+    throw(Exception("already there: '" + p + "'"));
+  }else{
+    _var_refs[p] = what;
+  }
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

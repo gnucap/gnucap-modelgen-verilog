@@ -1,0 +1,33 @@
+
+verilog
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+`modelgen
+module test_collapse0(P, N)
+	electrical P, PI, N;
+
+	parameter real R=1.;
+
+	analog begin
+		if (R == 0.) begin
+			V(P, PI) <+ 0.0;
+		end else begin
+			I(P, PI) <+ V(P, PI) / R;
+		end
+		V(N, PI) <+ 0.;
+	end
+
+endmodule
+
+!make test_collapse0.so > /dev/null
+attach ./test_collapse0.so
+
+test_collapse0 #(.R(1)) c0(1,2);
+test_collapse0 #(.R(0)) c0(1,0);
+
+vsource #(.dc(100)) v(2, 0);
+
+print dc v(nodes)
+dc

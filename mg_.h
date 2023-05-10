@@ -19,7 +19,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-//testing=script 2006.10.31
 #ifndef GNUCAP_MG_H
 #define GNUCAP_MG_H
 #include <ap.h>
@@ -77,18 +76,19 @@ inline std::ostream& operator<<(std::ostream& f, const Base& d)
 class Block;
 class Owned_Base : public Base {
   Block* _owner{NULL};
-public:
+protected:
   explicit Owned_Base() : Base() { }
   explicit Owned_Base(Owned_Base const& b) : Base(), _owner(b._owner) { }
+  explicit Owned_Base(Block* o) : Base(), _owner(o) { }
 public:
   void set_owner(Block* b){  _owner = b; }
-  Block const* owner() const{ untested(); return _owner;}
+  Block const* owner() const{ return _owner;}
 protected:
   Block* owner(){ return _owner;}
 };
 /*--------------------------------------------------------------------------*/
 class Block;
-class String_Arg :public Base {
+class String_Arg : public Base {
 protected:
   std::string	_s;
 public:
@@ -112,97 +112,31 @@ public:
   }
 };
 /*--------------------------------------------------------------------------*/
-class Raw_String_Arg :public String_Arg {
+class Raw_String_Arg : public String_Arg {
 public:
   void parse(CS& f)override;
 };
 /*--------------------------------------------------------------------------*/
 // a stub
-class Attribute_Instance :public Base {
+class Attribute_Instance : public Base {
 public:
   void parse(CS& f);
   void dump(std::ostream&)const override{}
 };
 /*--------------------------------------------------------------------------*/
-#if 0 // eek, also in m_base.h
-template <class T>
-class List_Base
-  :public Base
-{ untested();
-  //protected:
-public:
-  typedef typename std::list<T*> _Std_List_T;
-  _Std_List_T _list;
-  virtual ~List_Base() { untested();
-    for (typename std::list<T*>::iterator
-	 i = _list.begin();
-	 i != _list.end();
-	 ++i) { untested();
-      delete *i;
-    }
-  }
-public:
-  virtual void parse(CS& f) = 0;
-  typedef typename std::list<T*>::const_iterator const_iterator;
-  const_iterator begin()const	 {return _list.begin();}
-  const_iterator end()const	 {return _list.end();}
-  bool		 is_empty()const {return _list.empty();}
-  size_t	 size()const	 {return _list.size();}
-  const_iterator find(const String_Arg& s) const { untested();
-    for (const_iterator ii = begin(); ii != end(); ++ii) { untested();
-      assert(ii != end());
-      assert(*ii);
-      if (s == (**ii).key()) { untested();
-	return ii;
-      }else{ untested();
-      }
-    }
-    return end();
-  }
-  const_iterator find(CS& file) const { untested();
-    size_t here = file.cursor();
-    String_Arg s;
-    file >> s;
-    const_iterator x = find(s);
-    if (x == end()) { untested();
-      file.reset(here);
-    }else{ untested();
-    }
-    return x;
-  }
-  String_Arg _dummy;
-  const String_Arg& operator[](const String_Arg& s) const { untested();
-    const_iterator x = find(s);
-    if (x != end()) { untested();
-      assert(*x);
-      return (**x).value();
-    }else{ untested();
-      return _dummy;
-    }
-  }
-  
-public:
-  const T* front()const {untested();assert(!is_empty()); return _list.front();}
-  const T* back()const {assert(!is_empty()); return _list.back();}
-  T*   back() {assert(!is_empty()); return _list.back();}
-  void push_back(T* x) {assert(x);       _list.push_back(x);}
-  void pop_back() {assert(!is_empty()); _list.pop_back();}
-};
-#endif
-/*--------------------------------------------------------------------------*/
-class C_Comment :public Base {
+class C_Comment : public Base {
 public:
   void parse(CS& f);
   void dump(std::ostream&)const override{ incomplete();}
 };
 /*--------------------------------------------------------------------------*/
-class Cxx_Comment :public Base {
+class Cxx_Comment : public Base {
 public:
   void parse(CS& f);
   void dump(std::ostream&)const override{ incomplete();}
 };
 /*--------------------------------------------------------------------------*/
-class Skip_Block :public Base {
+class Skip_Block : public Base {
 public:
   void parse(CS& f);
   void dump(std::ostream&)const override{ incomplete();}
@@ -217,7 +151,7 @@ public:
  * A "LiSt" is usually parsed once.
  */
 template <class T, char BEGIN, char SEP, char END, char END2='\0', char END3='\0'>
-class LiSt :public List_Base<T> {
+class LiSt : public List_Base<T> {
   Block* _owner{NULL};
 public:
   using List_Base<T>::size;
@@ -332,7 +266,7 @@ typedef LiSt<Raw_String_Arg, '(', ',', ')'> Raw_String_Arg_List;
  */
 class File;
 template <class T>
-class Collection :public List_Base<T> {
+class Collection : public List_Base<T> {
   Block* _owner{NULL};
   File const* _file{NULL};
 public:
@@ -409,7 +343,7 @@ public:
   }
 };
 /*--------------------------------------------------------------------------*/
-class Key :public Base {
+class Key : public Base {
   std::string _name;
   std::string _var;
   std::string _value;
@@ -427,7 +361,7 @@ public:
 };
 typedef LiSt<Key, '{', '#', '}'> Key_List;
 /*--------------------------------------------------------------------------*/
-class Bool_Arg :public Base {
+class Bool_Arg : public Base {
   bool _s;
 public:
   void parse(CS& f)	{_s = true; f.skip1b(";");}
@@ -437,7 +371,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 // class AnalogExpression?
-class ConstantMinTypMaxExpression :public Base {
+class ConstantMinTypMaxExpression : public Base {
   Expression* _e{NULL};
   Block* _owner{NULL};
 public:
@@ -451,7 +385,7 @@ public:
   void dump(std::ostream& f)const override;
 };
 /*--------------------------------------------------------------------------*/
-class Parameter_Base :public Base {
+class Parameter_Base : public Base {
   Block* _owner{NULL};
 protected:
   std::string _name;
@@ -506,7 +440,7 @@ protected:
 // typedef LiSt<Parameter_1, '{', '#', '}'> Parameter_1_List;
 /*--------------------------------------------------------------------------*/
 // 
-class Parameter_1 :public Parameter_Base {
+class Parameter_1 : public Parameter_Base {
 public:
   void parse(CS& f) override;
   void dump(std::ostream& f)const override;
@@ -514,11 +448,11 @@ public:
 };
 typedef LiSt<Parameter_1, '{', '#', '}'> Parameter_1_List;
 /*--------------------------------------------------------------------------*/
-class ValueRangeSpec :public Base {
+class ValueRangeSpec : public Owned_Base {
   // incomplete();
 };
 /*--------------------------------------------------------------------------*/
-class ValueRangeConstant :public ValueRangeSpec {
+class ValueRangeConstant : public ValueRangeSpec {
   std::string _cexpr;
 public:
   void parse(CS& f) override;
@@ -526,12 +460,20 @@ public:
   std::string const& expr()const {return _cexpr;}
 };
 /*--------------------------------------------------------------------------*/
-class ValueRangeStrings :public ValueRangeSpec {
+class ValueRangeStrings : public ValueRangeSpec {
 };
 /*--------------------------------------------------------------------------*/
-class ValueRangeInterval :public ValueRangeSpec {
-  std::string _lb;
-  std::string _ub;
+class ConstExpression : public Owned_Base {
+  Expression* _expression{NULL};
+public:
+  void parse(CS&)override;
+  void dump(std::ostream&)const override;
+  Expression const& expression() const{assert(_expression); return *_expression;};
+};
+/*--------------------------------------------------------------------------*/
+class ValueRangeInterval : public ValueRangeSpec {
+  ConstExpression _lb;
+  ConstExpression _ub;
   bool _lb_is_closed;
   bool _ub_is_closed;
 public:
@@ -539,11 +481,11 @@ public:
   void dump(std::ostream& f)const override;
   bool lb_is_closed()const {return _lb_is_closed;}
   bool ub_is_closed()const {return _ub_is_closed;}
-  std::string const& lb()const {return _lb;}
-  std::string const& ub()const {return _ub;}
+  ConstExpression const& lb()const {return _lb;}
+  ConstExpression const& ub()const {return _ub;}
 };
 /*--------------------------------------------------------------------------*/
-class ValueRange :public Owned_Base {
+class ValueRange : public Owned_Base {
   enum{
     vr_FROM,
     vr_EXCLUDE
@@ -559,7 +501,7 @@ public:
 typedef LiSt<ValueRange, '\0', '\0', '\0', ',', ';'> ValueRangeList;
 /*--------------------------------------------------------------------------*/
 // parameter type name = value ;
-class Parameter_2 :public Parameter_Base {
+class Parameter_2 : public Parameter_Base {
   ValueRangeList _value_range_list;
 public:
   void parse(CS& f)override;
@@ -627,32 +569,58 @@ public:
   std::string const& nname() const;
 };
 /*--------------------------------------------------------------------------*/
+class Data_Type : public Base{
+protected:
+  typedef enum{ t_default, t_real, t_int } type_t;
+  type_t _type;
+  Data_Type(type_t type) : Base(), _type(type){}
+public:
+  Data_Type(Data_Type const& t) : Base(), _type(t._type){}
+  Data_Type() : Base(), _type(t_default){}
+  Data_Type& operator=(Data_Type const& o){ _type = o._type; return *this;}
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+  bool is_real() const{ return _type==t_real; }
+  bool is_int() const{ return _type==t_int; }
+};
+/*--------------------------------------------------------------------------*/
+class Data_Type_Real : public Data_Type{
+public:
+  Data_Type_Real() : Data_Type(t_real){}
+};
+/*--------------------------------------------------------------------------*/
+class Data_Type_Int : public Data_Type{
+public:
+  Data_Type_Int() : Data_Type(t_int){}
+};
+/*--------------------------------------------------------------------------*/
 class Token_PROBE; //bug?
 class Node;
 class Expression;
-class Variable : public Base {
-  Block* _owner{NULL};
+class Variable : public Owned_Base {
 protected:
-  std::string _name;
+  Data_Type _type;
+  String_Arg _name;
   Deps _deps;
-  Block const* owner() const{ return _owner; }
 public:
-  explicit Variable() : Base() {}
+  explicit Variable() : Owned_Base() {}
   Variable(std::string const& name)
-   :Base()
+   : Owned_Base()
    ,_name(name)
   {}
   ~Variable() {
   }
 public:
+  void set_type(Data_Type d){ _type=d; }
+  Data_Type const& type() const {return _type;}
+  bool is_int() const { return _type.is_int(); }
   Deps const& deps()const { return _deps; }
-  std::string const& name()const {return _name;}
+  String_Arg const& identifier()const {return _name;}
+  std::string const& name()const {return _name.to_string();}
+  virtual std::string code_name()const;
   virtual bool is_module_variable() const;
 
-  void set_owner(Block* owner) {_owner = owner;}
-  void parse(CS&) override { untested();
-    incomplete();
-  }
+  void parse(CS&) override;
   void dump(std::ostream& o)const override;
   virtual Branch_Ref new_branch(std::string const& p, std::string const& n);
   virtual Branch_Ref new_branch(Node const* p, Node const* n);
@@ -661,7 +629,6 @@ private:
   bool is_node(std::string const& n)const;
 
 protected:
-  Block* owner(){ return _owner; }
   void new_var_ref();
   void resolve_symbols(Expression const& e, Expression& E);
 private:
@@ -669,7 +636,7 @@ private:
   Token_PROBE* resolve_xs_function(Expression& E, std::string const& name, Deps const&);
 };
 /*--------------------------------------------------------------------------*/
-class Variable_2 :public Variable {
+class Variable_2 : public Variable {
 public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
@@ -687,10 +654,11 @@ public:
 /*--------------------------------------------------------------------------*/
 class Variable_List_Collection : public Collection<Variable_List>{
 public:
+  void parse(CS& f)override;
   void dump(std::ostream& f)const override;
 };
 /*--------------------------------------------------------------------------*/
-// class Localparam :public Parameter_2 {
+// class Localparam : public Parameter_2 {
 // public:
 //   void dump(std::ostream& f)const override;
 //   Localparam() :Parameter_2() {}
@@ -707,7 +675,7 @@ public:
 /*--------------------------------------------------------------------------*/
 // .name(value)
 // TODO? param_by_index?
-class Parameter_3 :public Parameter_Base {
+class Parameter_3 : public Parameter_Base {
 public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const;
@@ -716,7 +684,7 @@ public:
 typedef LiSt<Parameter_3, '(', ',', ')'> Parameter_3_List;
 /*--------------------------------------------------------------------------*/
 #if 0
-class Code_Block :public Base {
+class Code_Block : public Base {
   std::string _s;
   Block* _owner{NULL};
 public:
@@ -728,7 +696,7 @@ public:
 };
 #endif
 /*--------------------------------------------------------------------------*/
-class Parameter_Block :public Base {
+class Parameter_Block : public Base {
   String_Arg	 _unnamed_value;
   Parameter_1_List _override;
   Parameter_1_List _raw;
@@ -774,8 +742,7 @@ public:
   Block const* owner() const{ return _owner;}
   Block* owner(){ return _owner;}
 public:
-  template<class T>
-  void new_var_ref(T const* what);
+  void new_var_ref(Base const* what);
   virtual Probe const* new_probe(std::string const&, std::string const&, std::string const&)
   {unreachable(); return NULL;}
   virtual Probe const* new_probe(std::string const&, Branch_Ref const&)
@@ -867,98 +834,6 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-// mg_analog.h?
-class AnalogSeqBlock : public AnalogStmt {
-  String_Arg _identifier;
-  SeqBlock _block;
-public:
-  explicit AnalogSeqBlock(CS& cmd, Block* owner){
-    set_owner(owner);
-    parse(cmd);
-  }
-  void parse(CS& cmd)override;
-  void dump(std::ostream& o)const override;
-  void set_owner(Block* owner) {_block.set_owner(owner);}
-
-  String_Arg const& identifier() const{ return _identifier; }
-  SeqBlock const& block() const{ return _block; }
-};
-/*--------------------------------------------------------------------------*/
-class AnalogConstExpression : public Owned_Base /*expression?*/ {
-  Expression* _exp{NULL};
-public:
-  ~AnalogConstExpression();
-  void parse(CS& file) override;
-  void dump(std::ostream& o)const override;
-  Block* owner() {return Owned_Base::owner();}
-  Expression const& expression() const{ assert(_exp); return *_exp;}
-};
-/*--------------------------------------------------------------------------*/
-class AnalogConditionalStmt : public AnalogStmt {
-  AnalogConstExpression _cond;
-  Base* _true_part{NULL};
-  Base* _false_part{NULL};
-public:
-  AnalogConditionalStmt(Block* o, CS& file) {
-    set_owner(o);
-    parse(file);
-  }
-  ~AnalogConditionalStmt(){
-    delete _true_part;
-    _true_part = NULL;
-    delete _false_part;
-    _false_part = NULL;
-  }
-public:
-  void parse(CS& file) override;
-  void dump(std::ostream& o)const override;
-  void set_owner(Block* o) {_cond.set_owner(o);}
-  Block* owner() {return _cond.owner();}
-  AnalogConstExpression const& conditional() const{return _cond;}
-  const Base* true_part_or_null() const{ return _true_part; }
-  const Base* false_part_or_null() const{ return _false_part; }
-  const Base& true_part() const{assert(_true_part); return *_true_part; }
-  const Base& false_part() const{assert(_false_part); return *_false_part; }
-};
-/*--------------------------------------------------------------------------*/
-class CaseGen : public Base{
-  AnalogConstExpression* _cond{NULL};
-  Base* _code{NULL};
-public:
-  CaseGen() : Base(){ unreachable(); }
-  CaseGen(AnalogConstExpression* cond, Base* code) : Base(), _cond(cond), _code(code) {}
-  ~CaseGen(){
-    delete _cond;
-    delete _code;
-  }
-  void set_owner(Block*) { unreachable(); }
-  void parse(CS&)override;
-  void dump(std::ostream& o)const override;
-public:
-  AnalogConstExpression const* cond_or_null()const {return _cond;}
-  Base const* code_or_null()const {return _code;}
-};
-typedef LiSt<CaseGen, '\0', '\0', '\0'> AnalogCaseList;
-/*--------------------------------------------------------------------------*/
-class AnalogSwitchStmt : public AnalogStmt {
-  AnalogConstExpression _cond;
-  AnalogCaseList _cases;
-public:
-  AnalogSwitchStmt(Block* o, CS& file) {
-    set_owner(o);
-    parse(file);
-  }
-  ~AnalogSwitchStmt(){
-  }
-public:
-  void parse(CS& file) override;
-  void dump(std::ostream& o)const override;
-  void set_owner(Block* o) {_cond.set_owner(o);}
-  Block* owner() {return _cond.owner();}
-  AnalogConstExpression const& conditional() const{return _cond;}
-  AnalogCaseList const& cases()const {return _cases;}
-};
-/*--------------------------------------------------------------------------*/
 class AnalogConstruct : public Owned_Base {
   Base* _stmt{NULL};
 public:
@@ -981,7 +856,7 @@ public: // this is a stub
 };
 typedef Collection<AnalogConstruct> AnalogList;
 #if 0
-class Eval :public Base {
+class Eval : public Base {
 protected:
   String_Arg _name;
   Code_Block _code;
@@ -995,7 +870,7 @@ public:
 };
 typedef Collection<Eval> Eval_List;
 /*--------------------------------------------------------------------------*/
-class Function :public Eval {
+class Function : public Eval {
 public:
   void set_owner(Block const*) { }
   void parse(CS& f);
@@ -1005,7 +880,7 @@ public:
 typedef Collection<Function> Function_List;
 #endif
 /*--------------------------------------------------------------------------*/
-class Port_1 :public Base {
+class Port_1 : public Base {
   std::string _name;
   std::string _short_to;
   std::string _short_if;
@@ -1023,7 +898,7 @@ public:
 typedef LiSt<Port_1, '{', '#', '}'> Port_1_List;
 /*--------------------------------------------------------------------------*/
 // TODO: Port_Base?
-class Port_3 :public Owned_Base {
+class Port_3 : public Owned_Base {
   std::string _name;
   std::string _value;
 public:
@@ -1055,7 +930,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 // TODO: Port_Base?
-class New_Port :public Port_3 {
+class New_Port : public Port_3 {
   Block* _owner{NULL};
 public:
   void set_owner(Block* c) { _owner = c; }
@@ -1068,7 +943,7 @@ typedef LiSt<New_Port, '(', ',', ')'> New_Port_List;
 class Discipline;
 // TODO: Port_Base?
 class Node;
-class Net_Identifier :public Port_3 {
+class Net_Identifier : public Port_3 {
   Block* _owner{NULL};
   Node* _node{NULL};
 public:
@@ -1130,14 +1005,14 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Branch_Declarations : public Collection<Branch_Declaration>{
-  Branch_Ref _branch_ref;
+//  Branch_Ref _branch_ref;
 public:
   void parse(CS& f)override;
   // void dump(std::ostream& f)const override;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class Element_1 :public Base {
+class Element_1 : public Base {
   std::string _dev_type;
   std::string _name;
   Port_1_List _port_list;
@@ -1167,7 +1042,7 @@ public:
 typedef Collection<Element_1> Element_1_List;
 /*--------------------------------------------------------------------------*/
 // Component?
-class Element_2 :public Owned_Base {
+class Element_2 : public Owned_Base {
   std::string _module_or_paramset_identifier;
   std::string _name_of_module_instance;
   Port_Connection_List _list_of_port_connections;
@@ -1213,20 +1088,50 @@ public:
 typedef Collection<Element_2> Element_2_List;
 typedef Collection<Filter> Filter_List;
 /*--------------------------------------------------------------------------*/
-class Arg :public Base {
-  std::string _arg;
+class Arg : public Base {
+  String_Arg _identifier;
 public:
-  void parse(CS& f);
-  void dump(std::ostream& f)const override {f << "      " << arg() << ";\n";}
   Arg() {}
-  const std::string& arg()const {return _arg;}
   void set_owner(Block*){
     incomplete();
   }
+  String_Arg const& identifier() const{return _identifier;}
+  void parse(CS& f);
+  void dump(std::ostream& f)const override {f << "      " << identifier() << ";\n";}
 };
 typedef LiSt<Arg, '{', '#', '}'> Arg_List;
 /*--------------------------------------------------------------------------*/
-class Args :public Base {
+class Analog_Function_Arg : public Variable {
+//  String_Arg _identifier;
+public:
+  String_Arg const& identifier()const { return _name; }
+  std::string name()const { return _name.to_string(); }
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+  std::string code_name()const override;
+};
+typedef Collection<Analog_Function_Arg> Analog_Function_Args;
+/*--------------------------------------------------------------------------*/
+class AF_Arg_List : public LiSt<Analog_Function_Arg, '\0', ',', ';'> {
+//  Data_Type _type;
+  enum{
+    a_input,
+    a_output,
+    a_inout
+  } _direction;
+public:
+  bool is_output() const { return _direction >= a_output; }
+//  Data_Type const& type()const {return _type;}
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class AF_Arg_List_Collection : public Collection<AF_Arg_List>{
+public:
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class Args : public Base {
   String_Arg _name;
   String_Arg _type;
   Arg_List   _arg_list;
@@ -1247,7 +1152,7 @@ public:
 typedef Collection<Args> Args_List;
 /*--------------------------------------------------------------------------*/
 #if 0
-class Circuit :public Base {
+class Circuit : public Base {
   Port_1_List	_required_nodes;
   Port_1_List	_optional_nodes;
   Port_1_List	_local_nodes;
@@ -1271,7 +1176,7 @@ public:
 #endif
 /*--------------------------------------------------------------------------*/
 #if 0
-class Probe :public Base {
+class Probe : public Base {
   std::string _name;
   std::string _expression;
 public:
@@ -1314,7 +1219,7 @@ public:
 }; // Probe
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class Head :public Base {
+class Head : public Base {
   std::string _s;
 public:
   void parse(CS& f);
@@ -1323,7 +1228,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class Attribute :public Base {
+class Attribute : public Base {
   String_Arg _name;
   String_Arg _value;
 public:
@@ -1340,10 +1245,12 @@ typedef Collection<Attribute> Attribute_List;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class Define_List;
-class Define :public Base {
+class Define : public Base {
   String_Arg _name;
-  String_Arg_List _args;
-  String_Arg _value;
+  size_t _num_args;
+
+  std::string _value_tpl;
+  std::vector<std::pair<size_t, size_t>> _pos;
 public:
   void set_owner(Block const*){}
   void parse(CS& f)override;
@@ -1351,18 +1258,20 @@ public:
   Define(){}
   const String_Arg&  key()const   {return _name;}
   const String_Arg&  name()const  {return _name;}
-  const String_Arg&  value()const {return _value;}
 
   std::string substitute(String_Arg_List const&, Define_List const&) const; // HERE?
   void preprocess(Define_List const&);
-  size_t num_args()const { return _args.size(); }
+//  size_t num_args()const { return _args.size(); }
+  size_t num_args()const { return _num_args; }
+private:
+  void stash(std::string const&, String_Arg_List const&);
 };
 /*--------------------------------------------------------------------------*/
 class Define_List : public Collection<Define>{
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class Nature :public Base {
+class Nature : public Base {
   String_Arg		_identifier;
   String_Arg		_parent_nature;
   Attribute_List	_attributes;
@@ -1381,7 +1290,7 @@ public:
 };
 typedef Collection<Nature> Nature_List;
 /*--------------------------------------------------------------------------*/
-class Discipline :public Base {
+class Discipline : public Base {
   String_Arg	_identifier;
   String_Arg	_potential_ident;
   String_Arg	_domain_ident;
@@ -1504,12 +1413,15 @@ class Node_Map{
   typedef std::map<std::string, Node*> map; // use set??
   typedef std::vector<Node*> nodes;
   typedef nodes::const_iterator const_iterator;
+  typedef nodes::const_reverse_iterator const_reverse_iterator;
   nodes _nodes;
   map _map;
 public:
   explicit Node_Map();
   ~Node_Map();
 public:
+  const_reverse_iterator rbegin() const{ return _nodes.rbegin(); }
+  const_reverse_iterator rend() const{ return _nodes.rend(); }
   const_iterator begin() const{ return _nodes.begin(); }
   const_iterator end() const{ return _nodes.end(); }
   size_t size() const{ return _nodes.size(); }
@@ -1517,10 +1429,44 @@ public:
   Node const* operator[](std::string const& key) const;
 };
 /*--------------------------------------------------------------------------*/
+class Analog_Function : public Block{
+  Analog_Function_Arg _variable;
+  Data_Type _type;
+  AF_Arg_List_Collection _args;
+public:
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+  String_Arg const& identifier()const { return _variable.identifier(); }
+  std::string code_name()const { return "af_" + identifier().to_string(); }
+public:
+//  Block?
+  Probe const* new_probe(std::string const&, std::string const&, std::string const&)override { untested();
+    return NULL;
+  }
+  Probe const* new_probe(std::string const&, Branch_Ref const&) override { untested();
+    return NULL;
+  }
+  Branch_Ref new_branch(std::string const&, std::string const&)override { untested();
+    return Branch_Ref();
+  }
+  Branch_Ref new_branch(Node const*, Node const*)override {
+    return Branch_Ref();
+  }
+  Node const* node(std::string const&)const override {
+    return NULL;
+  }
+  Branch_Ref branch(std::string const&)const override {
+    return Branch_Ref();
+  }
+  AF_Arg_List_Collection const& args() const{ return _args; }
+  Analog_Function_Arg const& variable() const{ return _variable; }
+};
+typedef Collection<Analog_Function> Analog_Functions;
+/*--------------------------------------------------------------------------*/
 class Node;
 class File;
 // TODO: decide if it is a Block, or has-a Block aka Scope or whetever.
-class Module :public Block {
+class Module : public Block {
   typedef std::map<std::string, Probe*> Probe_Map;
 public:
   ~Module();
@@ -1534,6 +1480,7 @@ private: // verilog input data
   Port_3_List_3	_ground;
   Net_Declarations _net_decl;
   Branch_Declarations _branch_decl;
+  Analog_Functions _analog_functions;
   Variable_List_Collection _variables;
   Parameter_List_Collection _parameters;
   Element_2_List _element_list;
@@ -1568,6 +1515,7 @@ public:
   const Port_1_List&	  local_nodes()const	{return _local_nodes;}
 //  const Code_Block&	 tr_eval()const		{return _tr_eval;}
   const AnalogList& analog_list() const {return _analog_list;}
+  const Analog_Functions& analog_functions() const {return _analog_functions;}
 //   const Code_Block&	validate()const	{return _validate;}
     	size_t		min_nodes()const	{return ports().size();}
     	size_t		max_nodes()const	{return ports().size();}
@@ -1599,62 +1547,95 @@ private:
 typedef Collection<Module> Module_List;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class BlockRealIdentifier : public Variable{
+class BlockVarIdentifier : public Variable{
 public:
-  explicit BlockRealIdentifier() : Variable() { }
+  explicit BlockVarIdentifier() : Variable() { }
 public:
   void parse(CS& cmd) override;
   void dump(std::ostream&)const override;
 };
 /*--------------------------------------------------------------------------*/
-class ListOfBlockRealIdentifiers : public LiSt<BlockRealIdentifier, '\0', ',', ';'>{
+class ListOfBlockIntIdentifiers : public LiSt<BlockVarIdentifier, '\0', ',', ';'>{
 public:
+  ListOfBlockIntIdentifiers(CS& f, Block* o){
+    set_owner(o);
+    parse(f);
+    for(auto i : *this){
+      i->set_type(Data_Type_Int());
+    }
+  }
   void dump(std::ostream&)const override;
 };
 /*--------------------------------------------------------------------------*/
-// analog_procedural_assignment
+class ListOfBlockRealIdentifiers : public LiSt<BlockVarIdentifier, '\0', ',', ';'>{
+public:
+  ListOfBlockRealIdentifiers(CS& f, Block* o){
+    set_owner(o);
+    parse(f);
+    for(auto i : *this){
+      i->set_type(Data_Type_Real());
+    }
+  }
+  void dump(std::ostream&)const override;
+};
+/*--------------------------------------------------------------------------*/
+// analog_assignment
+// VariableAssignment?
 class Assignment : public Variable {
 protected:
-  Variable const* _lhs{NULL};
+  Variable const* _lhs{NULL}; // BUG
+//  Variable_Ref _lhs;
   Expression* _rhs{NULL}; // const?
 public:
+  explicit Assignment(CS& f, Block* o);
   explicit Assignment() : Variable() {}
   ~Assignment();
 public:
   bool is_module_variable()const override;
+  bool is_int() const;
   std::string const& lhsname()const {
     assert(_lhs);
     return _lhs->name();
   }
   void set_lhs(Variable const* v);
   Expression const* rhs()const {return _rhs;}
+  Variable const& lhs() const{
+    assert(_lhs);
+    return *_lhs;
+  }
   void parse(CS& cmd) override;
   void dump(std::ostream&)const override;
 };
 /*--------------------------------------------------------------------------*/
-class Contribution : public Base {
-  Block* _owner{NULL};
-protected: // BUG
+// ContributionStatement?
+class Contribution : public Owned_Base {
   std::string _name;
+  Nature const* _nature{NULL};
   Expression* _rhs{NULL}; // const?
   Deps _deps;
-protected:
   Branch_Ref _branch;
+  enum{
+    t_unknown,
+    t_flow,
+    t_pot
+  } _type;
+private:
   void set_pot_source();
   void set_flow_source();
   Deps& deps() { return _deps; }
 public:
-  Contribution(std::string const& lhsname /*TODO*/)
-    : Base(), _name(lhsname), _branch(NULL) {}
+  Contribution(CS& f, Block* o)
+    : Owned_Base(o), _branch(NULL) {
+    parse(f);
+  }
   ~Contribution(){
     delete _rhs;
   }
 
+  bool is_pot_contrib() const;
+  bool is_flow_contrib() const;
   void parse(CS&)override;
   void dump(std::ostream&)const override;
-  void set_owner(Block* c) {_owner=c;}
-  Block const* owner() const{ return _owner; }
-  Block* owner(){ return _owner; }
   Deps const& deps() const { return _deps; }
   Expression const* rhs()const {return _rhs;}
   std::string const& name() const{return _name;}
@@ -1670,22 +1651,8 @@ public:
   }
 };
 /*--------------------------------------------------------------------------*/
-class PotContribution : public Contribution {
-public:
-  PotContribution(std::string const& lhsname) : Contribution(lhsname) {}
-public:
-  void parse(CS&)override;
-};
 /*--------------------------------------------------------------------------*/
-class FlowContribution : public Contribution {
-public:
-  FlowContribution(std::string const& lhsname) : Contribution(lhsname) {}
-public:
-  void parse(CS&)override;
-};
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-class Node :public Base {
+class Node : public Base {
   std::string _name;
   int _number{-1};
   std::string _short_to;
@@ -1775,21 +1742,6 @@ public: // readout
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-// TODO: clean this up. name in intermediate base class or so.
-template<class T>
-void Block::new_var_ref(T const* what)
-{
-  assert(what);
-  std::string p = what->name();
-  trace1("new_var_ref", p);
-  Base const* cc = _var_refs[p];
-  if(cc) { untested();
-    incomplete(); // already there, error?
-  }else{
-    _var_refs[p] = what;
-  }
-}
-/*--------------------------------------------------------------------------*/
 class Filter : public Element_2 /*?*/ {
   std::string _name; // BUG?
   Deps _deps;
@@ -1821,11 +1773,14 @@ public:
   std::string state()const override;
   std::string short_label()const;
   Probe const* prb() const;
-
-
+  bool has_branch() const {
+    return _branch;
+  }
 public: // make it look like an Element_2?
 //  std::string omit() const { return ""; }
   std::string const& dev_type() const;
+  virtual size_t num_args()const {unreachable(); return 0;}
+  virtual void make_cc(std::ostream&, Module const&)const {unreachable();}
 };
 /*--------------------------------------------------------------------------*/
 void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps*d=NULL);
@@ -1834,14 +1789,14 @@ void make_cc_event_cond(std::ostream& o, Expression const& e);
 /*--------------------------------------------------------------------------*/
 inline bool Variable::is_node(std::string const& n) const
 {
-  assert(_owner);
-  return _owner->node(n);
+  assert(owner());
+  return owner()->node(n);
 }
 /*--------------------------------------------------------------------------*/
 inline void Variable::new_var_ref()
 {
-  assert(_owner);
-  _owner->new_var_ref(this);
+  assert(owner());
+  owner()->new_var_ref(this);
 }
 /*--------------------------------------------------------------------------*/
 /*

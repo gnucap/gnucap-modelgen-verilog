@@ -1,0 +1,35 @@
+
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_ddx0(n)
+	electrical n;
+
+	real dd;
+
+	analog begin
+		real v;
+		real sq;
+		v = V(n);
+		sq = v * v;
+		dd = ddx(sq, V(n));
+	end
+
+endmodule
+
+!make test_ddx0.so > /dev/null
+attach ./test_ddx0.so
+
+test_ddx0 #() dut(1);
+parameter v=0
+vsource #(.dc(v)) v1(1,0);
+
+list
+
+print dc v(nodes) dd(dut) iter(0)
+dc v1 0 4 1
+end

@@ -8,6 +8,13 @@ verilog
 module test_dio2(np, nn);
 electrical np, nn;
 
+analog function real dio
+input x;
+begin
+dio = exp(x / 2.);
+end
+endfunction
+
 analog begin
 	real a;
 	real one;
@@ -15,7 +22,7 @@ analog begin
 	sinsquare = pow(sin(V(np,nn)), 2.);
 	one = sinsquare + cos(V(np,nn))*cos(V(np,nn));
 	a = pow(2.*V(np,nn), 1.);
-	I(np,nn) <+ pow(2.71, a/2) * exp(a * .5) * one;
+	I(np,nn) <+ pow(2.71, a/2) * dio(a) * one;
 end
 
 endmodule

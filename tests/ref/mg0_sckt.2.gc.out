@@ -4,6 +4,6 @@ module vsin (p,n);
   vsource #(sin.offset(NA( 0.)), .amplitude(amplitude), .frequency( 1.), .delay(NA( 0.)), .damping(NA( 0.))  DC dc) V1 (.p(p),.n(n));
 endmodule // vsin
 
-test_vs0 #() dut (.a(1),.b(2),.gnd(0));
+test_net2 #() dut (.a(1),.b(2),.gnd(0));
 #           v(1)       v(2)      
  0.         1.         1.        

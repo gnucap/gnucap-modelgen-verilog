@@ -1,0 +1,10 @@
+
+`include "sub/disciplines.few"
+
+module contrib (p);
+	inout p;
+	electrical p;
+
+	analog
+		I(p) <+ V(p);
+endmodule

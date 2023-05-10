@@ -58,19 +58,22 @@ public:
   Probe const* prb() const{return _prb;}
 };
 /*--------------------------------------------------------------------------*/
-#if 0
-class Token_SFCALL : public Token {
+class Token_AFCALL : public Token_SYMBOL {
 public:
-  explicit Token_SFCALL(const std::string Name)
-    : Token(Name, NULL, "") {}
+  explicit Token_AFCALL(const std::string Name)
+    : Token_SYMBOL(Name, "") {}
 private:
-  explicit Token_SFCALL(const Token_SFCALL& P) : Token(P) {}
-  Token* clone()const  override{return new Token_SFCALL(*this);}
-  void stack_op(Expression* e)const override{
-    e->push_back(clone());
+  explicit Token_AFCALL(const Token_AFCALL& P) : Token_SYMBOL(P) {}
+  Token* clone()const  override{return new Token_AFCALL(*this);}
+  void stack_op(Expression* e)const override;
+public:
+  std::string code_name() const{
+    return "af_" + name();
+//    assert(_item);
+//   return _item->code_name();
   }
 };
-#else
+/*--------------------------------------------------------------------------*/
 class Token_SFCALL : public Token_SYMBOL {
 public:
   explicit Token_SFCALL(const std::string Name)
@@ -80,7 +83,6 @@ private:
   Token* clone()const  override{return new Token_SFCALL(*this);}
   void stack_op(Expression* e)const override;
 };
-#endif
 /*--------------------------------------------------------------------------*/
 class Parameter_Base;
 class Token_PAR_REF : public Token_SYMBOL {
@@ -120,6 +122,10 @@ private:
 public:
   Variable const* item()const { untested(); return _item; }
   Variable const* operator->() const{ return _item; }
+//  std::string code_name() const{ untested();
+//    assert(_item);
+//    return _item->code_name();
+//  }
 //  Deps const& deps() const{
 //    return _item->deps();
 //  }

@@ -13,7 +13,7 @@ V1 p n sin freq=1 amplitude={amplitude} dc=dc
 
 
 `modelgen
-module test_vs0(a, b, gnd);
+module test_net2(a, b, gnd);
 	inout a, b, gnd;
 	electrical a, b, gnd;
 	
@@ -21,12 +21,12 @@ module test_vs0(a, b, gnd);
 	vsource #(.dc(1)) v2(.n(gnd), .p(b));
 endmodule;
 
-!make test_vs0.so > /dev/null
-attach ./test_vs0.so
+!make test_net2.so > /dev/null
+attach ./test_net2.so
 
 verilog
 
-test_vs0 #() dut(1,2,0);
+test_net2 #() dut(1,2,0);
 
 list
 

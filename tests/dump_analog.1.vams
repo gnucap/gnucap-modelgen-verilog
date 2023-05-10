@@ -1,0 +1,27 @@
+
+`include "sub/disciplines.few"
+
+module test(p, n)
+electrical p, n;
+
+ analog begin
+  real a;
+  begin : scopename
+ 	real b;
+  end
+ end
+
+ analog begin : stuff
+  real y, x, sq, p, v, q;
+  y = ddx(V(p), V(n))
+  x = ddx(x, V(n))
+
+  sq = V(n) * V(n);
+  y = ddx(sq, V(n))
+
+  p = V(p) * V(n);
+  v = ddx(p, V(n)); // v = V(p)
+
+ end
+
+endmodule

@@ -7,3 +7,9 @@
 `ifdef A
 error
 `endif
+
+`define y YY
+`define x XX
+`define B(x) `y
+
+`B(x)

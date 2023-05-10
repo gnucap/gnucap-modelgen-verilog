@@ -1,0 +1,20 @@
+`include "sub/disciplines.few"
+
+module while0(p,n);
+	analog begin
+		real S, T, U;
+		while (0);
+		while (S);
+		while (S) begin
+			S = 0;
+		end
+   end
+endmodule
+
+module while1(p,n);
+	analog begin
+		real S;
+		while (S < 10) S = S+1;
+   end
+
+endmodule

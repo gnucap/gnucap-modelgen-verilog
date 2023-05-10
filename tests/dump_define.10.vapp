@@ -1,0 +1,10 @@
+
+`define PARAM(x y) parameter real x=y;
+`define PARAM2(x,y,l,u) parameter real x=y from [l:u];
+
+module test(1 2);
+`PARAM(a, 2.0)
+`PARAM(b, 3.0)
+`PARAM2(c, 1.0, 0, 2)
+
+endmodule

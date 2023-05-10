@@ -277,7 +277,10 @@ DEV_CPOLY_CAP::~DEV_CPOLY_CAP()
 /*--------------------------------------------------------------------------*/
 bool DEV_CPOLY_CAP::do_tr_con_chk_and_q()
 {
-  q_load();
+  if(_load_time != _sim->_time0){
+    q_load();
+  }else{
+  }
 
   assert(_vy1);
   set_converged(conchk(_load_time, _sim->_time0));
@@ -318,7 +321,7 @@ bool DEV_DDT::do_tr()
   assert(_vy0[1] == 0.);
   _y[0].f1 = 0; // _vy0[1]; // another state, capacity.?
   
-  trace6("DEV_DDT::do_tr", _vy0[0], _vy0[1], _vy0[2], _time[0], _time[1], _method_a);
+  trace2("DEV_DDT::do_tr", long_label(), _sim->iteration_tag());
   _i[0] = differentiate(_y, _i, _time, _method_a);
   trace3("DIFFD", _i[0].f0, _i[0].f1, _y[0].f0);
   _vi0[0] = _i[0].f0;
@@ -372,6 +375,7 @@ bool DEV_IDT::do_tr()
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_CAP::tr_load()
 {
+  trace2("tr_load", long_label(), _sim->iteration_tag());
   tr_load_shunt(); // 4 pt +- loss
   for (int i=0; i<=_n_ports; ++i) {
     assert(_vi0[i] == _vi0[i]);

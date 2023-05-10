@@ -1,0 +1,19 @@
+
+`include "sub/disciplines.few"
+
+discipline logic;
+  domain discrete;
+enddiscipline
+
+discipline ddiscrete;
+  domain discrete;
+enddiscipline
+
+module test(p, n, x);
+  input p;
+  output n;
+  inout x;
+  electrical p;
+  voltage n;
+  electrical x, y;
+endmodule

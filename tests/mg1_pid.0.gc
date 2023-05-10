@@ -37,4 +37,5 @@ V1 n1 0 pulse iv=0 pv=1 rise=2m delay=0 width=4m period=12m fall=1m
 .print tran v(nodes) iter(0) timef(dut.ddt_*)
 
 .tran 10m
+.status notime
 .end

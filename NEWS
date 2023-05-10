@@ -11,10 +11,13 @@
 
 2023****-dev
 ============
-* separate out preprocessor
-* bugfix `define vs. comment
-* macro substitution fixes
+* analog functions
+* control structures: while/for/case
+* preprocessor fixes & cleanup
 * support ternary operator
+* add string, integer variable types
+* expressions in parameter bounds
+* ddx (without nested/second derivatives)
 * generate is_valid (overloading)
-* switch statement
 * analog event stub
+* switching branch

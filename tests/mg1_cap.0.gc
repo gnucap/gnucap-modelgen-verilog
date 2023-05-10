@@ -27,8 +27,8 @@ attach ./test_cap0.so
 verilog
 
 resistor #(.r(1)) r(in, out);
-// test_cap0 #(.c(c)) dut(out, 0);
-capacitor #(.c(c)) c(out, 0);
+test_cap0 #(.c(c)) dut(out, 0);
+// capacitor #(.c(c)) c(out, 0);
 
 parameter v=0
 parameter c=1m

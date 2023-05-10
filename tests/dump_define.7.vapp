@@ -1,0 +1,19 @@
+
+`define thing(a,b) module a \
+real b; \
+endmodule
+
+`thing(A,B)
+
+`define TMPHICJ(c_j,vd0,z,w,is_al,vgeff,c_j_t,vd_t,w_t) \
+        vdj0    = 2*vt0*ln(exp(vd0*0.5/vt0)-exp(-0.5*vd0/vt0));
+
+module test()
+
+	begin analog
+		real a,b,c,d,e,f,g,h,i;
+		real vdj0, vdjt, vdt;
+`TMPHICJ(a,b,c,d,e,f,g,h,i)
+	end
+
+endmodule

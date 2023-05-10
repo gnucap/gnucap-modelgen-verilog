@@ -1,0 +1,39 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+// If the flow of the branch appears in an expression anywhere in the module,
+// the branch is a flow probe, otherwise the branch is a potential probe. Using
+// both the potential and the flow of a probe branch is illegal.
+
+`modelgen
+module test_probe0(p,n);
+	inout p, n;
+	electrical p, n;
+	real v, i;
+	parameter real sel = 0;
+	analog begin
+		v = V(p,n);
+ 		if(sel)
+ 			i = I(p,n);
+		else
+			i = 99
+	end
+endmodule
+
+!make test_probe0.so > /dev/null
+attach ./test_probe0.so
+
+test_probe0 #()        dut1(1,0);
+test_probe0 #(.sel(1)) dut2(2,0);
+parameter v=5
+vsource #(.dc(v)) v1(1,0);
+vsource #(.dc(v)) v1(2,0);
+
+list
+
+print dc v(nodes) i(dut*) v(dut*)
+dc
+end

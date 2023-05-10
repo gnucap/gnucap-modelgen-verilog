@@ -1,0 +1,170 @@
+nature Current
+  units = "A";
+  access = "I";
+  idt_nature = "Charge";
+  abstol = "1e-12";
+endnature
+
+nature Charge
+  units = "coul";
+  access = "Q";
+  ddt_nature = "Current";
+  abstol = "1e-14";
+endnature
+
+nature Voltage
+  units = "V";
+  access = "V";
+  idt_nature = "Flux";
+  abstol = "1e-6";
+endnature
+
+nature Flux
+  units = "Wb";
+  access = "Phi";
+  ddt_nature = "Voltage";
+  abstol = "1e-9";
+endnature
+
+nature Magneto_Motive_Force
+  units = "A*turn";
+  access = "MMF";
+  abstol = "1e-12";
+endnature
+
+nature Temperature
+  units = "C";
+  access = "Temp";
+  abstol = "1e-4";
+endnature
+
+nature Power
+  units = "W";
+  access = "Pwr";
+  abstol = "1e-9";
+endnature
+
+nature Position
+  units = "m";
+  access = "Pos";
+  ddt_nature = "Velocity";
+  abstol = "1e-6";
+endnature
+
+nature Velocity
+  units = "m/s";
+  access = "Vel";
+  ddt_nature = "Acceleration";
+  idt_nature = "Position";
+  abstol = "1e-6";
+endnature
+
+nature Acceleration
+  units = "m/s^2";
+  access = "Acc";
+  ddt_nature = "Impulse";
+  idt_nature = "Velocity";
+  abstol = "1e-6";
+endnature
+
+nature Impulse
+  units = "m/s^3";
+  access = "Imp";
+  idt_nature = "Acceleration";
+  abstol = "1e-6";
+endnature
+
+nature Force
+  units = "n";
+  access = "F";
+  abstol = "1e-6";
+endnature
+
+nature Angle
+  units = "rads";
+  access = "Theta";
+  ddt_nature = "Angular_Velocity";
+  abstol = "1e-6";
+endnature
+
+nature Angular_Velocity
+  units = "rads/s";
+  access = "Omega";
+  ddt_nature = "Angular_Acceleration";
+  idt_nature = "Angular_Velocity";
+  abstol = "1e-6";
+endnature
+
+nature Angular_Acceleration
+  units = "rads/s^2";
+  access = "Alpha";
+  ddt_nature = "Angular_Velocity";
+  abstol = "1e-6";
+endnature
+
+nature Angular_Force
+  units = "n/m";
+  access = "Tau";
+  abstol = "1e-6";
+endnature
+
+
+discipline electrical
+  potential "Voltage";
+  flow "Current";
+enddiscipline
+
+discipline voltage
+  potential "Voltage";
+  flow "";
+enddiscipline
+
+discipline current
+  potential "Current";
+  flow "";
+enddiscipline
+
+discipline magnetic
+  potential "Magneto_Motive_Force";
+  flow "Flux";
+enddiscipline
+
+discipline thermal
+  potential "Temperature";
+  flow "Power";
+enddiscipline
+
+discipline kinematic
+  potential "Position";
+  flow "Force";
+enddiscipline
+
+discipline kinematic_v
+  potential "Velocity";
+  flow "Force";
+enddiscipline
+
+discipline rotational
+  potential "Angle";
+  flow "Angular_Force";
+enddiscipline
+
+discipline rotational_omega
+  potential "Angular_Velocity";
+  flow "Angular_Force";
+enddiscipline
+
+
+module heat(t);
+  inout t;
+  thermal t;
+  real    tt;
+
+  analog begin
+    tt = Temp(t);
+  end
+
+endmodule
+
+
+

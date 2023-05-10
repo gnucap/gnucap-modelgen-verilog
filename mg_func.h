@@ -30,7 +30,7 @@ class MGVAMS_FUNCTION : public FUNCTION {
 	  return "AAA";
   }
 public:
-  virtual int arity() const = 0;
+//  virtual int arity() const {unreachable(); return -1;}
   virtual std::string code_name() const{
 	  return "";
   }

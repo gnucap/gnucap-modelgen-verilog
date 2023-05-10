@@ -1,0 +1,32 @@
+
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_pg0(p, n)
+	electrical p, n;
+	parameter real st = 3;
+
+	analog begin
+		if $param_given(st) begin
+			V(p,n) <+ 1;
+		end else
+			V(p,n) <+ 2;
+	end
+
+endmodule
+
+!make test_pg0.so > /dev/null
+attach ./test_pg0.so
+
+test_pg0 #(.st(1)) dut(1,0);
+test_pg0 #() dut(2,0);
+
+list
+
+print dc v(nodes)
+dc
+end
