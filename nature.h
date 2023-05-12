@@ -19,7 +19,7 @@
  * 02110-1301, USA.
  *------------------------------------------------------------------
  */
-#include <gnucap/e_compon.h>
+#include <e_compon.h>
 /*--------------------------------------------------------------------------*/
 // TODO: need COMMON_NODE : public COMMON (or so.)
 class NATURE : public COMMON_COMPONENT {

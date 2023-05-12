@@ -24,7 +24,7 @@
 #ifndef GNUCAP_VA_H
 #define GNUCAP_VA_H
 
-#include <gnucap/md.h>
+#include <md.h>
 
 namespace{
 

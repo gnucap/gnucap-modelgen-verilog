@@ -28,8 +28,8 @@
  * node[2] up are inputs.
  * node[2*i] and node[2*i+1] correspond to val[i+1]
  */
-#include <gnucap/globals.h>
-#include <gnucap/e_storag.h>
+#include <globals.h>
+#include <e_storag.h>
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/

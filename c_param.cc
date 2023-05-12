@@ -21,10 +21,10 @@
  *------------------------------------------------------------------
  */
 //testing=script,complete 2006.07.17
-#include <gnucap/c_comand.h>
-#include <gnucap/u_parameter.h>
-#include <gnucap/globals.h>
-#include <gnucap/d_dot.h>
+#include <c_comand.h>
+#include <u_parameter.h>
+#include <globals.h>
+#include <d_dot.h>
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/

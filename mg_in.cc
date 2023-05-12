@@ -19,10 +19,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <gnucap/io_.h>
+#include <io_.h>
 #include "mg_.h"
 #include <stack>
-#include <gnucap/u_opt.h>
+#include <u_opt.h>
 /*--------------------------------------------------------------------------*/
 static C_Comment   dummy_c_comment;
 static Cxx_Comment dummy_cxx_comment;
@@ -231,7 +231,7 @@ void Define::dump(std::ostream& f)const
 std::string Define::substitute(CS& f) const
 {
   String_Arg_List values;
-  values.parse_n(f, _args.size());
+  values.parse_n(f, int(_args.size()));
 
   std::map<std::string, String_Arg*> subs;
   auto j = values.begin();

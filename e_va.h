@@ -24,7 +24,7 @@
 #ifndef GNUCAP_E_VA_H
 #define GNUCAP_E_VA_H
 /*--------------------------------------------------------------------------*/
-#include <gnucap/e_compon.h>
+#include <e_compon.h>
 /*--------------------------------------------------------------------------*/
 class NATURE {
 public:

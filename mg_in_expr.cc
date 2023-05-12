@@ -23,7 +23,7 @@
 #include "mg_.h"
 #include "m_tokens.h"
 #include <stack>
-#include <gnucap/e_cardlist.h>
+#include <e_cardlist.h>
 /*--------------------------------------------------------------------------*/
 static Token_FILTER* resolve_filter_function(Expression& E, std::string const& n, Deps const& cdeps, Block* o)
 {

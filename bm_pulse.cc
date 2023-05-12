@@ -23,10 +23,10 @@
  * SPICE compatible PULSE with extra time steps.
  * To be phased out once i/v pulse is available.
  */
-#include <gnucap/globals.h>
-#include <gnucap/e_elemnt.h>
-#include <gnucap/u_lang.h>
-#include <gnucap/bm.h>
+#include <globals.h>
+#include <e_elemnt.h>
+#include <u_lang.h>
+#include <bm.h>
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/

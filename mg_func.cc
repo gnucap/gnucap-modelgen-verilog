@@ -1,7 +1,7 @@
 
-#include <gnucap/u_function.h>
-#include <gnucap/globals.h>
-#include <gnucap/u_parameter.h>
+#include <u_function.h>
+#include <globals.h>
+#include <u_parameter.h>
 
 namespace{
 

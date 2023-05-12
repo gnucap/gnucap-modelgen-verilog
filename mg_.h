@@ -22,9 +22,9 @@
 //testing=script 2006.10.31
 #ifndef GNUCAP_MG_H
 #define GNUCAP_MG_H
-#include <gnucap/ap.h>
-#include <gnucap/m_base.h>
-#include <gnucap/m_expression.h>
+#include <ap.h>
+#include <m_base.h>
+#include <m_expression.h>
 #include <set>
 /*--------------------------------------------------------------------------*/
 #ifdef PASS_TRACE_TAGS
@@ -114,7 +114,7 @@ public:
 class Attribute_Instance :public Base {
 public:
   void parse(CS& f);
-  void dump(std::ostream& o)const override{}
+  void dump(std::ostream&)const override{}
 };
 /*--------------------------------------------------------------------------*/
 #if 0 // eek, also in m_base.h
@@ -260,7 +260,7 @@ protected:
 	  assert(false);
 	  break;
 	}else if (max==size()){
-	  throw Exception_Too_Many(size()+1, max, 0);
+	  throw Exception_Too_Many(int(size()+1), max, 0);
 	}else{
 	  push_back(p);
 	}
@@ -758,9 +758,9 @@ public:
 public:
   template<class T>
   void new_var_ref(T const* what);
-  virtual Probe const* new_probe(std::string const& xs, std::string const& p, std::string const& n)
+  virtual Probe const* new_probe(std::string const&, std::string const&, std::string const&)
   {unreachable(); return NULL;}
-  virtual Probe const* new_probe(std::string const& xs, Branch_Ref const&)
+  virtual Probe const* new_probe(std::string const&, Branch_Ref const&)
   {unreachable(); return NULL;}
 
   virtual Node* new_node(std::string const& p){ untested();
@@ -776,7 +776,7 @@ public:
     return _owner->new_filter(xs, d);
   }
 
-  virtual Branch_Ref new_branch(std::string const& p, std::string const& n) {
+  virtual Branch_Ref new_branch(std::string const&, std::string const&) {
     unreachable();
     return Branch_Ref(NULL);
   }
@@ -818,7 +818,7 @@ public:
 /*--------------------------------------------------------------------------*/
 class SeqBlock : public Block {
 public:
-  void parse(CS& cmd)override{incomplete();}
+  void parse(CS&)override{incomplete();}
   void dump(std::ostream& o)const override;
 
 //  Block?
@@ -831,6 +831,10 @@ public:
     return owner()->new_probe(xs, br);
   }
   Branch_Ref new_branch(std::string const& p, std::string const& n)override {
+    assert(owner());
+    return owner()->new_branch(p, n);
+  }
+  Branch_Ref new_branch(Node const* p, Node const* n)override {
     assert(owner());
     return owner()->new_branch(p, n);
   }

@@ -18,12 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <gnucap/e_model.h>
-#include <gnucap/e_subckt.h>
-#include <gnucap/e_node.h>
-#include <gnucap/e_paramlist.h>
-#include <gnucap/globals.h>
-#include <gnucap/u_lang.h>
+#include <e_model.h>
+#include <e_subckt.h>
+#include <e_node.h>
+#include <e_paramlist.h>
+#include <globals.h>
+#include <u_lang.h>
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/

@@ -23,8 +23,8 @@
  */
 #ifndef M_TOKENS_H
 #define M_TOKENS_H
-#include <gnucap/m_base.h>
-#include <gnucap/m_expression.h>
+#include <m_base.h>
+#include <m_expression.h>
 /*--------------------------------------------------------------------------*/
 class Probe;
 

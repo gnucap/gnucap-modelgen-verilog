@@ -19,9 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <gnucap/u_opt.h>
+#include <u_opt.h>
 #include "mg_out.h"
-#include <gnucap/patchlev.h>
+#include <patchlev.h>
 /*global*/ int errorcount = 0;
 std::string ind = "  ";
 /*--------------------------------------------------------------------------*/

@@ -30,8 +30,8 @@
  * node[2*i] and node[2*i+1] correspond to val[i+1]
  */
 #include "e_va.h"
-#include <gnucap/globals.h>
-#include <gnucap/e_elemnt.h>
+#include <globals.h>
+#include <e_elemnt.h>
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -77,7 +77,7 @@ protected: // override virtual
     if(i<int(_current_port_names.size())){
       _current_port_names[i] = s;
     }else{
-      throw Exception_Too_Many(i, _current_port_names.size(), 0);
+      throw Exception_Too_Many(i, int(_current_port_names.size()), 0);
     }
   }
   std::string port_name(int)const override {untested();

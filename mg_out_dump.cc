@@ -20,7 +20,7 @@
  * 02110-1301, USA.
  */
 
-#include <gnucap/md.h>
+#include <md.h>
 #include "mg_out.h"
 /*--------------------------------------------------------------------------*/
 static void make_header(std::ostream& out, const File& in)

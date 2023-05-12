@@ -187,7 +187,7 @@ static void make_set_subdevice_parameters(std::ostream& o, const Element_2& e)
   }
 }
 /*--------------------------------------------------------------------------*/
-static void make_module_construct_stub(std::ostream& o, const Element_2& e, Module const& m)
+static void make_module_construct_stub(std::ostream& o, const Element_2& e, Module const&)
 {
   make_tag();
   std::string dev_type = "device_stub";

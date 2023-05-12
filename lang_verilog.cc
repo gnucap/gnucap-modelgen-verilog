@@ -19,14 +19,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <gnucap/u_nodemap.h>
-#include <gnucap/globals.h>
-#include <gnucap/c_comand.h>
-#include <gnucap/d_dot.h>
-#include <gnucap/d_coment.h>
-#include <gnucap/e_subckt.h>
-#include <gnucap/e_model.h>
-#include <gnucap/u_lang.h>
+#include <u_nodemap.h>
+#include <globals.h>
+#include <c_comand.h>
+#include <d_dot.h>
+#include <d_coment.h>
+#include <e_subckt.h>
+#include <e_model.h>
+#include <u_lang.h>
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/

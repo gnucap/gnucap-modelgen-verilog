@@ -22,7 +22,7 @@
  * Error handler.
  */
 //testing=script,sparse 2006.10.31
-#include <gnucap/ap.h>
+#include <ap.h>
 extern int errorcount;
 /*--------------------------------------------------------------------------*/
 #if 0

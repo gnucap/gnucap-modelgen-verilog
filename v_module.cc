@@ -21,12 +21,12 @@
  *------------------------------------------------------------------
  * module stuff
  */
-#include <gnucap/u_nodemap.h>
-#include <gnucap/e_node.h>
-#include <gnucap/globals.h>
-#include <gnucap/e_paramlist.h>
-#include <gnucap/e_subckt.h>
-#include <gnucap/io_trace.h>
+#include <u_nodemap.h>
+#include <e_node.h>
+#include <globals.h>
+#include <e_paramlist.h>
+#include <e_subckt.h>
+#include <io_trace.h>
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/

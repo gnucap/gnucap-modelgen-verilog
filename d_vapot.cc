@@ -30,8 +30,8 @@
  * node[2*i] and node[2*i+1] correspond to val[i+1]
  */
 #include "e_va.h"
-#include <gnucap/globals.h>
-#include <gnucap/e_elemnt.h>
+#include <globals.h>
+#include <e_elemnt.h>
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/

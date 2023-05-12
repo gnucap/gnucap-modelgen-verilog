@@ -21,8 +21,8 @@
 #include "mg_.h"
 #include "mg_out.h"
 #include "m_tokens.h"
-#include <gnucap/e_cardlist.h> // TODO: really?
-#include <gnucap/u_opt.h>
+#include <e_cardlist.h> // TODO: really?
+#include <u_opt.h>
 /*--------------------------------------------------------------------------*/
 
 /* So analog initial block shall not contain the fol-

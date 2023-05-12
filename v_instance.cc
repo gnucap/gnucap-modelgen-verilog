@@ -21,14 +21,14 @@
  *------------------------------------------------------------------
  * module stuff
  */
-#include <gnucap/u_nodemap.h>
-#include <gnucap/e_node.h>
-#include <gnucap/globals.h>
-#include <gnucap/e_paramlist.h>
-#include <gnucap/e_subckt.h>
-#include <gnucap/io_trace.h>
-#include <gnucap/e_model.h>
-#include <gnucap/c_comand.h>
+#include <u_nodemap.h>
+#include <e_node.h>
+#include <globals.h>
+#include <e_paramlist.h>
+#include <e_subckt.h>
+#include <io_trace.h>
+#include <e_model.h>
+#include <c_comand.h>
 #include <set>
 /*--------------------------------------------------------------------------*/
 namespace{
@@ -730,7 +730,7 @@ void DEV_INSTANCE_PROTO::cleanup()
 }
 /*--------------------------------------------------------------------------*/
 class CLEANUP : public CMD {
-  void do_it(CS& cmd, CARD_LIST*)override {
+  void do_it(CS&, CARD_LIST*)override {
     DEV_INSTANCE_PROTO::cleanup();
     CMD::command("detach_all:0", &CARD_LIST::card_list);
   }

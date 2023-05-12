@@ -150,7 +150,7 @@ Node* Node_Map::new_node(std::string const& p)
   Node*& cc = _map[p];
   if(cc) {
   }else{
-    cc = new Node(p, _nodes.size());
+    cc = new Node(p, int(_nodes.size()));
     _nodes.push_back(cc);
   }
   return cc;

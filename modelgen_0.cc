@@ -21,10 +21,10 @@
  *------------------------------------------------------------------
  * mockup component generator for analog block testing
  */
-#include <gnucap/globals.h>
-#include <gnucap/m_expression.h>
-#include <gnucap/c_comand.h>
-#include <gnucap/e_cardlist.h>
+#include <globals.h>
+#include <m_expression.h>
+#include <c_comand.h>
+#include <e_cardlist.h>
 #include <stack>
 #include <set>
 #include <fstream>
