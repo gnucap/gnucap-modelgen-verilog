@@ -1,3 +1,8 @@
+GNUCAP_CONF = gnucap-conf
+
+CXX = $(shell $(GNUCAP_CONF) --cxx)
+GNUCAP_CPPFLAGS = $(shell $(GNUCAP_CONF) --cppflags) -DADD_VERSION -DPIC
+
 CPPFLAGS = -DTRACE_UNTESTED -DDO_TRACE
 CPPFLAGS = -DTRACE_UNTESTED
 REFDIR = ref
@@ -8,13 +13,13 @@ CXX = g++
 # CXXFLAGS=-O2
 
 %.o: %.cc
-	${CXX} $(CPPFLAGS) -g -O0 -fPIC ${CXXFLAGS} -I../include $< -o $@ -c
+	${CXX} ${GNUCAP_CPPFLAGS} $(CPPFLAGS) -g -O0 -fPIC ${CXXFLAGS} -I../include $< -o $@ -c
 
 %.s: %.cc
-	${CXX} -S $(CPPFLAGS) -g -O2 -fPIC ${CXXFLAGS} -I../include $< -o $@
+	${CXX} -S ${GNUCAP_CPPFLAGS} $(CPPFLAGS) -g -O2 -fPIC ${CXXFLAGS} -I../include $< -o $@
 
 %.s0: %.cc
-	${CXX} -S $(CPPFLAGS) -g -O0 -fPIC ${CXXFLAGS} -I../include $< -o $@
+	${CXX} -S ${GNUCAP_CPPFLAGS} $(CPPFLAGS) -g -O0 -fPIC ${CXXFLAGS} -I../include $< -o $@
 
 %.so: %.o
 	${CXX} -shared ${CXXFLAGS} -I../include $< ${LIBS} -o $@
