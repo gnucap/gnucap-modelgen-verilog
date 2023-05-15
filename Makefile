@@ -41,14 +41,18 @@ CXXFLAGS = -Wall -std=c++11
 %.so: %.o
 	${CXX} -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $(OBJS) $< ${LIBS_} -o $@
 
-all: ${TARGET} ${MODULES}
+all: all-recursive ${TARGET} ${MODULES}
+
+all-recursive: ${TARGET}
+	${MAKE} -C vams
 
 check: all
 	${MAKE} -C tests check
 
 clean:
 	rm -rf *.o ${TARGET} ${MODULES} ${OBJS} ${CLEAN_OBJS}
-	make -C tests clean
+	${MAKE} -C tests clean
+	${MAKE} -C vams clean
 
 $(TARGET): $(OBJS)
 	rm -f $@
@@ -70,4 +74,4 @@ depend: Make.depend
 Make.depend: $(SRCS) $(HDRS)
 	$(CXX) -MM ${GNUCAP_CXXFLAGS} $(CXXFLAGS) $(SRCS) > Make.depend
 
-.PHONY: clean depend
+.PHONY: clean depend all-recursive

@@ -153,8 +153,12 @@ private: // overrides
     _params.push_back(std::make_pair(name, value));
     // mutable_common()->set_param_by_name(name, value); // ?
   }
-  std::string param_name(int i, int) const override { untested();
-    return param_name(i, 0);
+  std::string param_name(int i, int j) const override { untested();
+    if(j==0){ untested();
+      return param_name(i);
+    }else{ untested();
+      return "";
+    }
   }
   std::string param_name(int i) const override {
     assert(i<int(_params.size()));
@@ -303,7 +307,7 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
 	c->set_param_by_name(_params[i].first, value);
       }
     }
-    Proto->subckt()->push_front(c);
+    Proto->subckt()->push_back(c);
   }catch(Exception const& e){
     // TODO: include proto name attribute
     error(bLOG, long_label() + " discarded: " + e.message() + "\n");
@@ -578,6 +582,7 @@ void INSTANCE::expand()
   subckt()->precalc_first(); // here?
 
   // sift. move to CARD_LIST::expand?
+  bool gotit = false;
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ){
     CARD const* s = *i;
     COMPONENT const* d = dynamic_cast<COMPONENT const*>(s);
@@ -586,7 +591,11 @@ void INSTANCE::expand()
     if(!d->is_valid()){
       error(bTRACE, long_label() + " dropped invalid candidate.\n");
       subckt()->erase(j);
+    }else if(gotit){
+      error(bWARNING, long_label() + " ambiguous overload in " + dev_type() + "\n");
+      subckt()->erase(j);
     }else{
+      gotit = true;
       // error(bTRACE, long_label() + " found valid candidate.\n");
     }
   }

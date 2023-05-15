@@ -199,10 +199,23 @@ private: // override virtual
   CARD*	   clone()const override	{return new DEV_IDT(*this);}
   bool	   do_tr()override;
   void	   tr_begin()override;
+  void	   ac_load()override;
   TIME_PAIR tr_review()override;
 }p1;
 DISPATCHER<CARD>::INSTALL
   d1(&device_dispatcher, "va_idt|f_idt0", &p1);
+/*--------------------------------------------------------------------------*/
+void DEV_IDT::ac_load()
+{
+  ac_load_shunt(); // 4 pt +- loss
+  _acg = _vy0[1] * _sim->_jomega;
+  trace4("load", _vy0[0], _vy0[1], _loss0, _loss1);
+  ac_load_passive();
+  for (int i=2; i<=_n_ports; ++i) {
+    trace2("load", i, _vy0[i]);
+    ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _vy0[i] / _sim->_jomega);
+  }
+}
 /*--------------------------------------------------------------------------*/
 TIME_PAIR DEV_IDT::tr_review()
 {
@@ -386,9 +399,12 @@ double DEV_CPOLY_CAP::tr_amps()const
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_CAP::ac_load()
 {
+  ac_load_shunt(); // 4 pt +- loss
   _acg = _vy0[1] * _sim->_jomega;
+  trace4("load", _vy0[0], _vy0[1], _loss0, _loss1);
   ac_load_passive();
   for (int i=2; i<=_n_ports; ++i) {
+    trace2("load", i, _vy0[i]);
     ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _vy0[i] * _sim->_jomega);
   }
 }
