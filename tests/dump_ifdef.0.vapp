@@ -1,0 +1,15 @@
+
+`define MODELGEN 1
+
+`ifndef __VAMS_GNUCAP
+parse error
+`else
+`undef MODELGEN
+`endif
+
+`ifdef MODELGEN
+parse error
+`else
+module a();
+endmodule;
+`endif
