@@ -48,15 +48,9 @@ static void make_module_file(const File& in, std::string dump_name)
 }
 #endif
 /*--------------------------------------------------------------------------*/
-static void preprocess(const File& in, std::ostream& of)
-{
-  of << in.fullstring();
-}
-/*--------------------------------------------------------------------------*/
 static void dump(const File& in, std::ostream& out)
 {
-  out << in.define_list() << '\n'
-      << in.nature_list() << '\n'
+  out << in.nature_list() << '\n'
       << in.discipline_list() << '\n'
       << in.module_list() << '\n'
       << in.macromodule_list() << '\n'
@@ -66,6 +60,7 @@ static void dump(const File& in, std::ostream& out)
 int main(int argc, char** argv)
 {
   File f;
+  Preprocessor p;
   --argc;
   ++argv;
   trace1("main", argc);
@@ -78,35 +73,38 @@ int main(int argc, char** argv)
     //   }
     // }else
     if (strcmp(argv[0],"--cc")==0) { itested();
-      f.read(argv[1]);
+      p.read(argv[1]);
+      f.parse(p);
       make_cc(std::cout, f);
       --argc;
       ++argv;
     }else if (strcmp(argv[0],"--pp")==0
           ||  strcmp(argv[0],"-E")==0) {
-      f.read(argv[1]);
-      preprocess(f, std::cout);
+      p.read(argv[1]);
+      p.dump(std::cout);
       --argc;
       ++argv;
     }else if (argc > 1 && strncmp(argv[0],"-D", 2)==0) {
-      if(argv[0][2]) {
-	f.define(argv[0]+2);
-      }else{
-	f.define(argv[1]);
+      if(argv[0][2]) { untested();
+	p.define(argv[0]+2);
+      }else{ untested();
+	p.define(argv[1]);
 	--argc;
 	++argv;
       }
     }else if (argc > 1 && strncmp(argv[0], "-I", 2)==0) {
-      if(argv[0][2]) {
-	f.add_include_path(argv[0]+2);
-      }else{
-	f.add_include_path(argv[1]);
+      if(argv[0][2]) { untested();
+	p.add_include_path(argv[0]+2);
+      }else{ untested();
+	p.add_include_path(argv[1]);
 	--argc;
 	++argv;
       }
     }else if (argc > 1 && strcmp(argv[0],"--dump")==0) {
       trace1("dump", argv[1]);
-      f.read(argv[1]);
+      p.read(argv[1]);
+      File f;
+      f.parse(p);
       dump(f, std::cout);
       --argc;
       ++argv;

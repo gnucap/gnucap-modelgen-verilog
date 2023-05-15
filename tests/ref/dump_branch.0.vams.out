@@ -1,5 +1,3 @@
-`define DISCIPLINES_H 1 
-
 nature Current
   units = "A";
   access = "I";

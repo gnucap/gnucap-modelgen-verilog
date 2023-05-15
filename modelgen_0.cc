@@ -70,7 +70,11 @@ public:
     file.reset();
 
     File F;
-    file = F.preprocess("../disciplines.vams") + " " + module_content;
+
+    Preprocessor p;
+    p.read("../disciplines.vams");
+    F.parse(p);
+    F.parse(file);
     file >> F;
 
     std::ofstream o;

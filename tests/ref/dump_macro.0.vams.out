@@ -1,6 +1,3 @@
-`define thing module 
-`define samething  module 
-
 
 
 module a(1, 2);

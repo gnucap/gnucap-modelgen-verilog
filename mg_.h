@@ -1642,11 +1642,27 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+class Preprocessor : public CS {
+  Define_List	_define_list;
+  std::string _cwd;
+  std::string _include_path;
+private:
+  std::string _stripped_file; // DUP?
+public:
+  explicit Preprocessor();
+  void read(std::string const& file_name);
+  void define(std::string const&);
+  const Define_List&	 define_list()const	{return _define_list;}
+  void dump(std::ostream&)const;
+  void add_include_path(std::string const&);
+private:
+  void parse(CS& file);
+  void include(const std::string& file_name);
+};
 /*--------------------------------------------------------------------------*/
 class File : public Block {
   std::string	_name;
   std::string   _cwd;
-  std::string   _include_path;
   CS		_file;
   Head		_head;
   Code_Block	_h_headers;
@@ -1655,21 +1671,15 @@ class File : public Block {
   // Device_List	_device_list;
   Code_Block	_h_direct;
   Code_Block	_cc_direct;
-  Define_List	_define_list;
   Nature_List	_nature_list;
   Discipline_List _discipline_list;
   Module_List	_module_list;
   Module_List	_macromodule_list;
   Module_List	_connectmodule_list;
   Attribute_Instance _attribute_dummy;
-public:
-  std::string preprocess(const std::string& file_name);
-  std::string include(const std::string& file_name);
 public: // build
   File();
   void read(std::string const&);
-  void define(std::string const&);
-  void add_include_path(std::string const&);
   void parse(CS& f) override;
 
 public: // readout
@@ -1682,7 +1692,6 @@ public: // readout
   const Code_Block&  h_direct()const	{return _h_direct;}
   const Code_Block&  cc_direct()const	{return _cc_direct;}
 
-  const Define_List&	 define_list()const	{return _define_list;}
   const Nature_List&	 nature_list()const	{return _nature_list;}
   const Discipline_List& discipline_list()const	{return _discipline_list;}
   const Module_List&	 module_list()const	{return _module_list;}

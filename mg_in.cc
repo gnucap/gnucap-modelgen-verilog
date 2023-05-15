@@ -198,7 +198,7 @@ void Define::preprocess(Define_List const& d)
       Define_List::const_iterator x = d.find(file);
       if (x != d.end()) {
 	assert(*x);
-	stripped_file += (*x)->substitute(file) + " ";
+	stripped_file += (*x)->substitute(file) + "\n";
       }else{ untested();untested();
 	// error: not defined
       }
@@ -303,7 +303,7 @@ static void append_to(CS& file, std::string& to, std::string until)
       // match
       return;
     }else{
-      to += " ";
+      to += "\n";
       try{
 	file.get_line("");
 	trace1("got line", file.tail());
@@ -315,22 +315,22 @@ static void append_to(CS& file, std::string& to, std::string until)
 
 }
 /*--------------------------------------------------------------------------*/
-std::string File::preprocess(const std::string& file_name)
+Preprocessor::Preprocessor() : CS(CS::_STRING, "")
 {
-  CS file(CS::_INC_FILE, file_name);
-  trace1("whole file", file.fullstring());
-
-  std::string stripped_file;
+}
+/*--------------------------------------------------------------------------*/
+void Preprocessor::parse(CS& file)
+{
   size_t here = file.cursor();
   int if_block = 0;
   int else_block = 0;
   for (;;) {
-    append_to(file, stripped_file, "\"/`");
-    trace1("appended", stripped_file);
+    append_to(file, _stripped_file, "\"/`");
+    trace1("appended", _stripped_file);
     if (!file.more()){
     }else if (file.match1('\"')) {
       // quoted string
-      stripped_file += '"' + file.ctos("", "\"", "\"", "") + '"';
+      _stripped_file += '"' + file.ctos("", "\"", "\"", "") + '"';
     }else if (file >> "/*") /* C comment */ {
       file >> dummy_c_comment; //BUG// line count may be wrong
     }else if (file >> "//") /* C++ comment */ {
@@ -341,7 +341,7 @@ std::string File::preprocess(const std::string& file_name)
       if(defi != _define_list.end()){
 	file.reset(l);
 	std::string def = file.tail();
-	_file.warn(0, "already defined: " + def);
+	file.warn(0, "already defined: " + def);
 	_define_list.erase(defi);
       }else{
       }
@@ -354,7 +354,8 @@ std::string File::preprocess(const std::string& file_name)
     }else if (file >> "`include") {
       std::string include_file_name;
       file >> include_file_name;
-      stripped_file += include(include_file_name);
+//      _stripped_file += 
+	include(include_file_name);
     }else if (file >> "`ifdef") {
       Define_List::const_iterator x = define_list().find(file);
       if (x != define_list().end()) {
@@ -396,7 +397,7 @@ std::string File::preprocess(const std::string& file_name)
       }else{ untested(); untested();
 	std::string err;
 	file >> err;
-	_file.warn(0, "not defined: " + err);
+	file.warn(0, "not defined: " + err);
       }
     }else if (file >> "`") {
       trace2("match macro?", file.tail(), define_list().size());
@@ -405,16 +406,16 @@ std::string File::preprocess(const std::string& file_name)
       if (x != define_list().end()) {
 	trace1("match macro", file.tail());
 	assert(*x);
-	stripped_file += (*x)->substitute(file) + " ";
+	_stripped_file += (*x)->substitute(file) + " ";
       }else{
 	trace0("mis match macro");
 	// error: not defined
       }
     }else if (file.skip1('/')) {
-      stripped_file += "/";
+      _stripped_file += "/";
     }else{
       trace1("moveon", file.tail());
-      stripped_file += "\n";
+      _stripped_file += "\n";
       // move on, just copy
     }
 
@@ -435,14 +436,19 @@ std::string File::preprocess(const std::string& file_name)
     }else{
     }    
   }
-  return stripped_file;
+  CS::operator=(_stripped_file);
+}
+/*--------------------------------------------------------------------------*/
+void Preprocessor::dump(std::ostream& out)const
+{
+  out << fullstring();
 }
 /*--------------------------------------------------------------------------*/
 File::File() : _file(CS::_STRING, "")
 {
 }
 /*--------------------------------------------------------------------------*/
-void File::add_include_path(std::string const& what)
+void Preprocessor::add_include_path(std::string const& what)
 {
   std::string colon = "";
   if(_include_path.size()){ untested();
@@ -452,13 +458,13 @@ void File::add_include_path(std::string const& what)
   _include_path = _include_path + colon + what;
 }
 /*--------------------------------------------------------------------------*/
-void File::define(std::string const& what)
+void Preprocessor::define(std::string const& what)
 {
   CS cmd(CS::_STRING, what);
   cmd >> _define_list;
 }
 /*--------------------------------------------------------------------------*/
-std::string File::include(std::string const& file_name)
+void Preprocessor::include(std::string const& file_name)
 {
   std::string full_file_name = findfile(file_name, _cwd+":"+_include_path, R_OK);
 
@@ -475,12 +481,10 @@ std::string File::include(std::string const& file_name)
   std::string old_include_path = _include_path;
   std::string old_cwd = _cwd;
 
-  std::string ret = preprocess(full_file_name);
+  read(full_file_name);
 
   _include_path = old_include_path;
   _cwd = old_cwd;
-
-  return ret;
 }
 /*--------------------------------------------------------------------------*/
 void Attribute_Instance::parse(CS& file)
@@ -536,12 +540,12 @@ void File::parse(CS& file)
   }
 }
 /*--------------------------------------------------------------------------*/
-void File::read(std::string const& file_name)
+void Preprocessor::read(std::string const& file_name)
 {
   if(OPT::case_insensitive == 0){
-  }else{ untested(); untested();
+  }else{ untested();
   }
-  _name = file_name;
+  // _name = file_name;
   std::string::size_type sepplace;
   sepplace = file_name.find_last_of("/");
   if(sepplace == std::string::npos){
@@ -549,9 +553,11 @@ void File::read(std::string const& file_name)
   }else{
     _cwd = file_name.substr(0, sepplace);
   }
-  _file = preprocess(file_name);
-  trace1("prepd", _file.fullstring());
-  parse(_file);
+
+  CS file(CS::_INC_FILE, file_name);
+  trace1("whole file", file.fullstring());
+
+  parse(file);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

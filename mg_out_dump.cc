@@ -58,8 +58,7 @@ void make_dump_file(const File& in)
   make_header(out, in);
   
   // in.dump(out) ?
-  out << in.define_list() << '\n'
-      << in.nature_list() << '\n'
+  out << in.nature_list() << '\n'
       << in.discipline_list() << '\n'
       << in.module_list() << '\n'
       << in.macromodule_list() << '\n'
