@@ -1,0 +1,12 @@
+
+`define thing module
+`define DEFAULT 0.
+`define LB 0.
+`define UB 0.
+
+module a(1,2);
+endmodule
+
+`thing a(1,2);
+parameter real a = `DEFAULT from [`LB:`UB);
+endmodule;

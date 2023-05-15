@@ -1,4 +1,4 @@
 
-`define mwa(a, b, c) module c
+`define mwa(a, b, c) module c; endmodule
 
 `mwa(1,1,2,3)

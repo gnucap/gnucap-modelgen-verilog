@@ -1,4 +1,4 @@
-`define DISCIPLINES_H 1
+`define DISCIPLINES_H 1 
 
 nature Current
   units = "A";
@@ -33,7 +33,8 @@ module device(p, n);
   real    r;
 
   analog begin
-    @(initial_step)     r = 2;
+    @(initial_step)
+      r = 2;
   end
 
   analog begin

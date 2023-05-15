@@ -1,0 +1,9 @@
+
+`define A
+`define B 1
+`define B 2
+
+
+module aa
+parameter real b=`B;
+endmodule

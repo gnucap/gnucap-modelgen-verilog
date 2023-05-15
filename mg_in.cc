@@ -30,14 +30,15 @@ static Skip_Block  skip_block;
 /*--------------------------------------------------------------------------*/
 void C_Comment::parse(CS& file)
 {
-  size_t here = file.cursor();
+//  size_t here = file.cursor();
   for (;;) {
-    file.skipto1('*');
-    if (file >> "*/") {
+    trace2("cp", file.tail(), file.fullstring());
+    if(!file.skipto1('*')){ untested(); untested();
+      file.get_line("");
+    }else if (file >> "*/") {
       break;  // done with comment
-    }else if (file.stuck(&here)) {untested();
-      file.warn(0, "unterminated C comment");
-      break;
+    }else if (!file.more()){
+      file.get_line("");
     }else{
       file.skip();
     }
@@ -46,38 +47,36 @@ void C_Comment::parse(CS& file)
 /*--------------------------------------------------------------------------*/
 void Cxx_Comment::parse(CS& file)
 {
-  size_t here = file.cursor();
-  file.skipto1('\n');
-  if (file.stuck(&here)) {untested();
-    file.warn(0, "unterminated C++ comment");
-  }else{
-  }
+  file.get_line("");
 }
 /*--------------------------------------------------------------------------*/
 void Skip_Block::parse(CS& file)
 {
   int nest = 0;
-  size_t here = file.cursor();
+  // size_t here = file.cursor();
   for (;;) {
+    trace1("Skip_Block", file.fullstring());
     file.skipto1('`');
     if (file >> "`endif") {
       if (nest == 0) {
 	break;  // done with skip_block
-      }else{untested();
+      }else{ untested();untested();
 	--nest;
       }
     }else if (file >> "`else") {
       if (nest == 0) {
 	break;  // done with skip_block
-      }else{untested();
+      }else{ untested();untested();
       }
-    }else if (file >> "`ifndef") {untested();
+    }else if (file >> "`ifndef") { untested();untested();
       ++nest;
-    }else if (file >> "`ifdef") {untested();
+    }else if (file >> "`ifdef") { untested();untested();
       ++nest;
-    }else if (file.stuck(&here)) {untested();
-      file.warn(0, "unterminated ifdef block");
-      break;
+    }else if (!file.more()) {
+      file.get_line("");
+    //}else if (file.stuck(&here)) { untested();untested();
+    //  file.warn(0, "unterminated ifdef block");
+    //  break;
     }else{
       file.skip();
     }
@@ -96,10 +95,10 @@ void Port_1::parse(CS& file)
       ;
     if (file.skip1b(";")) {
       break;
-    }else if (!file.more()) {untested();
+    }else if (!file.more()) { untested();untested();
       file.warn(0, "premature EOF (Port_1)");
       break;
-    }else if (file.stuck(&here)) {
+    }else if (file.stuck(&here)) { untested();
       break;
     }else{
     }
@@ -107,29 +106,29 @@ void Port_1::parse(CS& file)
 }
 /*--------------------------------------------------------------------------*/
 void Port_1::dump(std::ostream& out)const
-{
-  if (short_to() != "" || short_if() != "") {
+{ untested();
+  if (short_to() != "" || short_if() != "") { untested();
     out << name() << " short_to=\"" << short_to() 
 	<< "\" short_if=\"" << short_if() << "\";\n";
-  }else{
+  }else{ untested();
     out << name() << "; ";
   }
 }
 /*--------------------------------------------------------------------------*/
 void Head::parse(CS& file)
-{
+{ untested();
   size_t here = file.cursor();
   size_t begin = 0;
   size_t end = here;
-  for (;;) {
+  for (;;) { untested();
     file.skipto1('*');
-    if (file >> "*/") {
+    if (file >> "*/") { untested();
       end = file.cursor();
       break;  // done with head
-    }else if (file.stuck(&here)) {untested();
+    }else if (file.stuck(&here)) { untested();untested();
       file.warn(0, "unterminated head");
       break;
-    }else{
+    }else{ untested();
       file.skip();
     }
   }
@@ -165,6 +164,7 @@ void Define::parse(CS& f)
 {
   f >> _name;
   f >> _args;
+  trace2("DP", _name, _args);
   // BUG: need nonempty macro_text
   _value = f.get_to("\n");
   if(_value.is_empty()){
@@ -179,9 +179,11 @@ void Define::preprocess(Define_List const& d)
   trace1("Define::preprocess", _value.to_string());
   std::string stripped_file;
   size_t here = file.cursor();
+  // int if_block = 0;
+  // int else_block = 0;
   for (;;) {
     stripped_file += file.get_to("\"/`");
-    if (file.match1('\"')) { untested();
+    if (file.match1('\"')) { untested(); untested();
       // quoted string
       stripped_file += '"' + file.ctos("", "\"", "\"", "") + '"';
     }else if (file >> "`else"
@@ -197,10 +199,10 @@ void Define::preprocess(Define_List const& d)
       if (x != d.end()) {
 	assert(*x);
 	stripped_file += (*x)->substitute(file) + " ";
-      }else{untested();
+      }else{ untested();untested();
 	// error: not defined
       }
-    }else if (file.skip1('/')) { untested();
+    }else if (file.skip1('/')) { untested(); untested();
       stripped_file += "/";
     }else{
       // move on, just copy
@@ -209,10 +211,10 @@ void Define::preprocess(Define_List const& d)
       trace1("prep", file.tail());
       // proper end of file
       break;
-    }else if (file.stuck(&here)) { untested();
+    }else if (file.stuck(&here)) { untested(); untested();
       // comment ran to end of file
       break;
-    }else{
+    }else{ untested();
     }
   }
   _value = stripped_file;
@@ -221,7 +223,7 @@ void Define::preprocess(Define_List const& d)
 void Define::dump(std::ostream& f)const
 {
   f << "`define " << name();
-  if(_args.size()){
+  if(_args.size()){ untested();
    f << _args;
   }else{
   }
@@ -231,7 +233,10 @@ void Define::dump(std::ostream& f)const
 std::string Define::substitute(CS& f) const
 {
   String_Arg_List values;
-  values.parse_n(f, int(_args.size()));
+  if(f.match1('(')){
+    values.parse_n(f, int(_args.size()));
+  }else{
+  }
 
   std::map<std::string, String_Arg*> subs;
   auto j = values.begin();
@@ -248,6 +253,7 @@ std::string Define::substitute(CS& f) const
   std::string stripped_file = "";
 
   for (;;) {
+    trace1("loop", file.tail());
     size_t here = file.cursor();
     std::string more;
 
@@ -256,9 +262,9 @@ std::string Define::substitute(CS& f) const
       file.skip(1);
     }else{
       auto it = _args.find(file);
-      if(it != _args.end()){
+      if(it != _args.end()){ untested();
 	auto k = values.begin();
-	for(; it != _args.begin(); --it){
+	for(; it != _args.begin(); --it){ untested();
 	  ++k;
 	}
 	more = (*k)->to_string();
@@ -267,11 +273,12 @@ std::string Define::substitute(CS& f) const
       }
     }
 
+    trace2("loop grow", stripped_file, more);
     stripped_file = stripped_file + " " + more;
 
     if (!file.ns_more()) {
       break;
-    }else if (file.stuck(&here)) {
+    }else if (file.stuck(&here)) { untested();
       break;
     }else{
     }
@@ -280,9 +287,37 @@ std::string Define::substitute(CS& f) const
   return stripped_file;
 }
 /*--------------------------------------------------------------------------*/
+static void append_to(CS& file, std::string& to, std::string until)
+{
+  trace2("append_to", file.tail(), file.more());
+  if(!file.more()){
+    file.get_line("");
+  }else{
+  }
+
+  while (file.more()) {
+    to += file.get_to(until);
+    trace2("got_to", until, file.tail());
+    if(file.match1(until)){
+      trace2("match", to, file.tail());
+      // match
+      return;
+    }else{
+      to += " ";
+      try{
+	file.get_line("");
+	trace1("got line", file.tail());
+      }catch( Exception_End_Of_Input const&){
+	trace0("EOI");
+      }
+    }
+  }
+
+}
+/*--------------------------------------------------------------------------*/
 std::string File::preprocess(const std::string& file_name)
 {
-  CS file(CS::_WHOLE_FILE, file_name); // BUG // need INC_FILE
+  CS file(CS::_INC_FILE, file_name);
   trace1("whole file", file.fullstring());
 
   std::string stripped_file;
@@ -290,27 +325,33 @@ std::string File::preprocess(const std::string& file_name)
   int if_block = 0;
   int else_block = 0;
   for (;;) {
-    stripped_file += file.get_to("\"/`");
-    if (file.match1('\"')) {
+    append_to(file, stripped_file, "\"/`");
+    trace1("appended", stripped_file);
+    if (!file.more()){
+    }else if (file.match1('\"')) {
       // quoted string
       stripped_file += '"' + file.ctos("", "\"", "\"", "") + '"';
-    }else if (file >> "/*") { //---------------- C comment
+    }else if (file >> "/*") /* C comment */ {
       file >> dummy_c_comment; //BUG// line count may be wrong
-    }else if (file >> "//") { //---------------- C++ comment
+    }else if (file >> "//") /* C++ comment */ {
       file >> dummy_cxx_comment;
     }else if (file >> "`define") {
       size_t l = file.cursor();
-      if(_define_list.find(file) != _define_list.end()){
+      auto defi = _define_list.find(file);
+      if(defi != _define_list.end()){
 	file.reset(l);
-	std::string def = file.get_to("\n");
+	std::string def = file.tail();
 	_file.warn(0, "already defined: " + def);
-      }else if(file >> _define_list){
+	_define_list.erase(defi);
+      }else{
+      }
+      if(file >> _define_list){
 	auto e = _define_list.back();
 	e->preprocess(define_list());
-      }else{ untested();
+      }else{ untested(); untested();
 	unreachable();
       }
-    }else if (file >> "`include") { //---------------- include
+    }else if (file >> "`include") {
       std::string include_file_name;
       file >> include_file_name;
       stripped_file += include(include_file_name);
@@ -330,57 +371,70 @@ std::string File::preprocess(const std::string& file_name)
       }else{
 	String_Arg s;
 	file >> s; // discard.
+	trace1("discard", s);
 	++if_block;
       }
     }else if (file >> "`else") {
       if (if_block > 0) {
 	file >> skip_block;
 	--if_block;
-      }else{untested();
+      }else{ untested();untested();
 	// error
       }
     }else if (file >> "`endif") {
       if (else_block > 0) {
 	--else_block;
-      }else if (if_block > 0) {
+      }else if (if_block > 0) { untested();
 	--if_block;
-      }else{untested();
+      }else{ untested();untested();
 	// error
       }
     }else if (file >> "`undef") {
       Define_List::const_iterator x = define_list().find(file);
       if (x != define_list().end()) {
 	_define_list.erase(x);
-      }else{ untested();
+      }else{ untested(); untested();
 	std::string err;
 	file >> err;
 	_file.warn(0, "not defined: " + err);
       }
     }else if (file >> "`") {
+      trace2("match macro?", file.tail(), define_list().size());
       // macro substitution
       Define_List::const_iterator x = define_list().find(file);
       if (x != define_list().end()) {
+	trace1("match macro", file.tail());
 	assert(*x);
 	stripped_file += (*x)->substitute(file) + " ";
-      }else{untested();
+      }else{
+	trace0("mis match macro");
 	// error: not defined
       }
     }else if (file.skip1('/')) {
       stripped_file += "/";
     }else{
       trace1("moveon", file.tail());
+      stripped_file += "\n";
       // move on, just copy
     }
-    if (!file.ns_more()) {
+
+    trace2("more?", file.fullstring(), file.tail());
+    if (!file.more()) {
+      try{
+	file.get_line("");
+      }catch( Exception_End_Of_Input const& ){
+	break;
+      }
+      trace1("got more", file.fullstring());
+    }else if (!file.ns_more()) { untested();
       // proper end of file
       break;
     }else if (file.stuck(&here)) {
       // comment ran to end of file
-      break;
+      // break;
     }else{
     }    
   }
-  //std::cout << stripped_file;
   return stripped_file;
 }
 /*--------------------------------------------------------------------------*/
@@ -391,7 +445,7 @@ File::File() : _file(CS::_STRING, "")
 void File::add_include_path(std::string const& what)
 {
   std::string colon = "";
-  if(_include_path.size()){
+  if(_include_path.size()){ untested();
     colon = ":";
   }else{
   }
@@ -440,7 +494,7 @@ void Attribute_Instance::parse(CS& file)
 /*--------------------------------------------------------------------------*/
 /* A.1.2
 + source_text ::=
-+	  { description }
++	  { untested(); description }
 + description ::=
 +	  module_declaration
 -	| udp_declaration
@@ -474,7 +528,7 @@ void File::parse(CS& file)
       ;
     if (!file.more()) {
       break;
-    }else if (file.stuck(&here)) {untested();
+    }else if (file.stuck(&here)) { untested();untested();
       file.warn(0, "syntax error, need nature, discipline, or module");
       break;
     }else{
@@ -485,7 +539,7 @@ void File::parse(CS& file)
 void File::read(std::string const& file_name)
 {
   if(OPT::case_insensitive == 0){
-  }else{ untested();
+  }else{ untested(); untested();
   }
   _name = file_name;
   std::string::size_type sepplace;
@@ -496,6 +550,7 @@ void File::read(std::string const& file_name)
     _cwd = file_name.substr(0, sepplace);
   }
   _file = preprocess(file_name);
+  trace1("prepd", _file.fullstring());
   parse(_file);
 }
 /*--------------------------------------------------------------------------*/

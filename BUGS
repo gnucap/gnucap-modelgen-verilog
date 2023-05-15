@@ -1,5 +1,4 @@
 == modelgen
-- preprocessor mangles newlines, need INC_FILE
 - V(..) <+ I(..) does not work, see mg2_ccvs.1.gc
 
 == simulator plugins

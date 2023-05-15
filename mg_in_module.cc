@@ -195,7 +195,7 @@ void Variable_List::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void Variable_List_Collection::dump(std::ostream& o)const
 {
-  for(auto const& i : *this){ untested();
+  for(auto const& i : *this){
     i->dump(o);
   }
   // Collection<Parameter_2_List>::dump(o);

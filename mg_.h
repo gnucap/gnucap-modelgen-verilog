@@ -248,12 +248,9 @@ protected:
 	  //file.warn(0, "list");
 	}
 	TT* p = new TT;
-	if(owner()){
-	}else{
-	}
 	p->set_owner(owner());
 	file >> *p;
-	if (file.stuck(&here)) {
+	if (file.stuck(&here)) { untested();
 	  delete p;
 	  file.warn(0, "not valid here");
 	  std::cout.flush();
@@ -377,7 +374,8 @@ public:
   const_iterator find(CS& file) const {
     size_t here = file.cursor();
     String_Arg s;
-    file >> s;
+    s = file.ctos(":,.`()[];");
+    trace1("collectionfind", s);
     const_iterator x = find(s);
     if (x == end()) {
       file.reset(here);
@@ -1279,8 +1277,8 @@ class Define :public Base {
   String_Arg _value;
 public:
   void set_owner(Block const*){}
-  void parse(CS& f);
-  void dump(std::ostream& f)const;
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
   Define(){}
   const String_Arg&  key()const   {return _name;}
   const String_Arg&  name()const  {return _name;}
