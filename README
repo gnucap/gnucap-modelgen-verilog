@@ -15,11 +15,11 @@ see tests/README
 
 Modelgen-verilog preprocesses, parses and dumps vams files.
 
-$ gnucap-verilog { -I path -D def .. } --dump some_file.vams > some_file.dump
+$ modelgen-verilog { -I path -D def .. } --dump some_file.vams > some_file.dump
 
 To emits C++ code for use with Gnucap, type
 
-$ gnucap-verilog { -I path -D def .. } --cc some_file.vams > some_file.cc.
+$ modelgen-verilog { -I path -D def .. } --cc some_file.vams > some_file.cc.
 
 Compile and link the output into Gnucap plugin
 
@@ -39,7 +39,7 @@ gnucap> [..]
 
 == preprocessor notes
 
-- gnucap-verilog { -I path -D def .. } --pp: preprocesses a file.
+- modelgen-verilog { -I path -D def .. } --pp: preprocesses a file.
 - `include "quoted" works simlar to quoted C #include.
 - -I sets include path.
 - -D defines a symbol. Assign a value with -D"VARIABLE value"..

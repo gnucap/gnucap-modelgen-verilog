@@ -8,7 +8,7 @@ CPPFLAGS = -DTRACE_UNTESTED
 REFDIR = ref
 TARGETDIR = check
 GNUCAP = gnucap
-GNUCAP_VERILOG = ../gnucap-verilog
+MODELGEN_VERILOG = ../modelgen-verilog
 CXX = g++
 # CXXFLAGS=-O2
 
@@ -29,18 +29,18 @@ CXX = g++
 
 check: check_mg check_dump check_test check_v
 check_mg:
-	+GNUCAP=${GNUCAP} ./test ${GNUCAP_VERILOG} "mg" ${TARGETDIR} ${REFDIR}
+	+GNUCAP=${GNUCAP} ./test ${MODELGEN_VERILOG} "mg" ${TARGETDIR} ${REFDIR}
 check_dump:
-	+GNUCAP=${GNUCAP} ./test ${GNUCAP_VERILOG} "dump" ${TARGETDIR} ${REFDIR}
+	+GNUCAP=${GNUCAP} ./test ${MODELGEN_VERILOG} "dump" ${TARGETDIR} ${REFDIR}
 check_test:
-	+GNUCAP=${GNUCAP} ./test ${GNUCAP_VERILOG} "test" ${TARGETDIR} ${REFDIR}
+	+GNUCAP=${GNUCAP} ./test ${MODELGEN_VERILOG} "test" ${TARGETDIR} ${REFDIR}
 check_v:
-	+GNUCAP=${GNUCAP} ./test ${GNUCAP_VERILOG} "v" ${TARGETDIR} ${REFDIR}
+	+GNUCAP=${GNUCAP} ./test ${MODELGEN_VERILOG} "v" ${TARGETDIR} ${REFDIR}
 
 clean:
 	rm -rf *.o *.cc *.so *.out *~
 
 %.cc: %.vams
-	${GNUCAP_VERILOG} -I .. --cc $< > $@
+	${MODELGEN_VERILOG} -I .. --cc $< > $@
 
 .PHONY: check check_mg check_dump check_test check_v clean

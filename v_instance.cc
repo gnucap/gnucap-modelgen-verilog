@@ -126,7 +126,7 @@ protected:
 private:
   void		precalc_last()override{
     trace1("INSTANCE::precalc_last", long_label());
-    unreachable();
+    // unreachable();
   }
   double	tr_probe_num(const std::string&)const {unreachable(); return 0.;}
   int param_count_dont_print()const {return 0;}
