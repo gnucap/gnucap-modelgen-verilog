@@ -28,4 +28,8 @@ all: ${TARGET}
 clean:
 	rm -r -f ${TARGET} ${TARGET:.so=.o}
 
-.PHONY: clean
+install:
+	install -d $(DESTDIR)$(GNUCAP_PKGLIBDIR)/vams
+	install $(TARGET) $(DESTDIR)$(GNUCAP_PKGLIBDIR)/vams
+
+.PHONY: clean install

@@ -17,7 +17,7 @@ Modelgen-verilog preprocesses, parses and dumps vams files.
 
 $ modelgen-verilog { -I path -D def .. } --dump some_file.vams > some_file.dump
 
-To emits C++ code for use with Gnucap, type
+To emit C++ code for use with Gnucap, type
 
 $ modelgen-verilog { -I path -D def .. } --cc some_file.vams > some_file.cc.
 

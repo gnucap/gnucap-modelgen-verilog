@@ -3,9 +3,10 @@
 include Make1
 
 GNUCAP_CONF = gnucap-conf
+INSTALL = install
 
 CXX = $(shell $(GNUCAP_CONF) --cxx)
-GNUCAP_CPPFLAGS = $(shell $(GNUCAP_CONF) --cppflags) -DADD_VERSION -DPIC
+GNUCAP_CPPFLAGS = $(shell $(GNUCAP_CONF) --cppflags) -DPIC
 GNUCAP_CXXFLAGS = $(shell $(GNUCAP_CONF) --cxxflags)
 GNUCAP_LDFLAGS = $(shell $(GNUCAP_CONF) --ldflags)
 GNUCAP_LIBDIR = $(shell $(GNUCAP_CONF) --libdir)
@@ -36,7 +37,7 @@ CLEAN_OBJS = \
 CXXFLAGS = -Wall -std=c++11
 
 %.o: %.cc
-	${CXX} $(GNUCAP_CPPFLAGS) $(CPPFLAGS) -shared -g -O0 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@ -c
+	${CXX} $(GNUCAP_CPPFLAGS) $(CPPFLAGS) -shared -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@ -c
 
 %.so: %.o
 	${CXX} -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $(OBJS) $< ${LIBS_} -o $@
@@ -49,8 +50,10 @@ all-recursive: ${TARGET}
 check: all
 	${MAKE} -C tests check
 
-clean:
+clean: clean-recursive
 	rm -rf *.o ${TARGET} ${MODULES} ${OBJS} ${CLEAN_OBJS}
+
+clean-recursive:
 	${MAKE} -C tests clean
 	${MAKE} -C vams clean
 
@@ -74,4 +77,16 @@ depend: Make.depend
 Make.depend: $(SRCS) $(HDRS)
 	$(CXX) -MM ${GNUCAP_CXXFLAGS} $(CXXFLAGS) $(SRCS) > Make.depend
 
-.PHONY: clean depend all-recursive
+install: install-recursive
+	
+install-recursive: install-here
+	${MAKE} -C vams install
+
+install-here: ${TARGET}
+	${INSTALL} ${TARGET} ${DESTDIR}${GNUCAP_EXEC_PREFIX}/bin
+
+	install -d $(DESTDIR)$(GNUCAP_PKGLIBDIR)/vams
+	install $(MODULES) $(DESTDIR)$(GNUCAP_PKGLIBDIR)/vams
+
+RECURSIVE_TARGETS = all-recursive clean-recursive install-recursive
+.PHONY: clean depend ${RECURSIVE_TARGETS} install install-here
