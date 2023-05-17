@@ -1,0 +1,23 @@
+
+load ../d_vasrc.so
+load ../lang_verilog.so
+load ../vams/capacitor.so
+load ../vams/resistor.so
+
+verilog
+
+capacitor #(.c(.5) .m(2)) c1(0, out);
+resistor #(.r(2) .m(2)) r1(in, out)
+
+spice
+
+V1 in 0 ac 1 dc 0.9 tran sin
+
+.print tran v(nodes)
+.print dc v(nodes)
+.print ac vm(nodes) vp(nodes)
+
+.dc
+.tran 1
+.ac 1 10 * 2
+.status notime
