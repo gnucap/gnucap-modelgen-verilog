@@ -168,7 +168,7 @@ void Define::parse(CS& f)
   // BUG: need nonempty macro_text
   _value = f.get_to("\n");
   if(_value.is_empty()){
-    _value = std::string("1");
+//    _value = std::string("");
   }else{
   }
 }
@@ -232,9 +232,11 @@ void Define::dump(std::ostream& f)const
 /*--------------------------------------------------------------------------*/
 std::string Define::substitute(CS& f) const
 {
-  String_Arg_List values;
+  trace2("subs", f.tail(), _args.size());
+  Raw_String_Arg_List values;
   if(f.match1('(')){
     values.parse_n(f, int(_args.size()));
+    trace1("parsed n", values.size());
   }else{
   }
 
@@ -257,10 +259,12 @@ std::string Define::substitute(CS& f) const
     size_t here = file.cursor();
     std::string more;
 
-    if(file.is_term()){
-      more = file.peek();
-      file.skip(1);
+    if(!file.peek()){
+    }else if(file.is_term()){
+      more = file.peek(); // BUG?
+      file.skip(1); // WHAT?
     }else{
+      trace1("arg?", file.tail());
       auto it = _args.find(file);
       if(it != _args.end()){ untested();
 	auto k = values.begin();
@@ -273,7 +277,7 @@ std::string Define::substitute(CS& f) const
       }
     }
 
-    trace2("loop grow", stripped_file, more);
+//    trace2("loop grow", stripped_file, more);
     stripped_file = stripped_file + " " + more;
 
     if (!file.ns_more()) {
@@ -289,9 +293,14 @@ std::string Define::substitute(CS& f) const
 /*--------------------------------------------------------------------------*/
 static void append_to(CS& file, std::string& to, std::string until)
 {
-  trace2("append_to", file.tail(), file.more());
+//  trace2("append_to", file.tail(), file.more());
   if(!file.more()){
-    file.get_line("");
+    try{
+      file.get_line("");
+      trace1("got line", file.tail());
+    }catch( Exception_End_Of_Input const&){
+      assert(!file.more());
+    }
   }else{
   }
 
@@ -299,7 +308,6 @@ static void append_to(CS& file, std::string& to, std::string until)
     to += file.get_to(until);
     trace2("got_to", until, file.tail());
     if(file.match1(until)){
-      trace2("match", to, file.tail());
       // match
       return;
     }else{
@@ -326,7 +334,6 @@ void Preprocessor::parse(CS& file)
   int else_block = 0;
   for (;;) {
     append_to(file, _stripped_file, "\"/`");
-    trace1("appended", _stripped_file);
     if (!file.more()){
     }else if (file.match1('\"')) {
       // quoted string
@@ -558,6 +565,18 @@ void Preprocessor::read(std::string const& file_name)
   trace1("whole file", file.fullstring());
 
   parse(file);
+}
+/*--------------------------------------------------------------------------*/
+void String_Arg::parse(CS& f)
+{
+  f >> _s;
+}
+/*--------------------------------------------------------------------------*/
+void Raw_String_Arg::parse(CS& f)
+{
+  _s = f.get_to(",)");
+  f.skip1(",");
+  trace1("RSA", _s);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

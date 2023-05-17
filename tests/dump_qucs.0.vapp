@@ -1,0 +1,15 @@
+// 
+`include "sub/disciplines.few"
+`include "constants.vams"
+`ifdef INSIDE_ADMS
+ `define attr(txt) (*txt*)
+`else
+ `define attr(txt)
+`endif
+//
+ module log_amp (P_I1, P_Ir, P_Vout);
+ inout P_I1, P_Ir;
+ inout P_Vout;
+//
+// [..]
+ endmodule

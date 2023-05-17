@@ -709,7 +709,7 @@ void Variable_2::dump(std::ostream& o)const
   o__ name();
 }
 /*--------------------------------------------------------------------------*/
-void Variable::dump(std::ostream& o)const
+void Variable::dump(std::ostream&)const
 {
   unreachable(); // ?
 //  o__ _type << " " << name() << ";\n";

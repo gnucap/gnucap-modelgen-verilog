@@ -85,17 +85,17 @@ int main(int argc, char** argv)
       --argc;
       ++argv;
     }else if (argc > 1 && strncmp(argv[0],"-D", 2)==0) {
-      if(argv[0][2]) { untested();
+      if(argv[0][2]) {
 	p.define(argv[0]+2);
-      }else{ untested();
+      }else{
 	p.define(argv[1]);
 	--argc;
 	++argv;
       }
     }else if (argc > 1 && strncmp(argv[0], "-I", 2)==0) {
-      if(argv[0][2]) { untested();
+      if(argv[0][2]) {
 	p.add_include_path(argv[0]+2);
-      }else{ untested();
+      }else{
 	p.add_include_path(argv[1]);
 	--argc;
 	++argv;

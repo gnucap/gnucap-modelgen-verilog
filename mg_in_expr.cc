@@ -110,7 +110,7 @@ static bool is_xs_function(std::string const& f, Block const* owner)
   return false;
 }
 /*--------------------------------------------------------------------------*/
-Token_PROBE* resolve_xs_function(Expression& E, std::string const& n, Deps const& deps, Block* o)
+Token_PROBE* resolve_xs_function(Expression& E, std::string const& n, Deps const&, Block* o)
 {
   trace1("xsf", n);
   if(E.is_empty()) { untested();

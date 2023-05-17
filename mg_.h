@@ -89,6 +89,7 @@ protected:
 /*--------------------------------------------------------------------------*/
 class Block;
 class String_Arg :public Base {
+protected:
   std::string	_s;
 public:
   String_Arg() {}
@@ -96,7 +97,7 @@ public:
   explicit String_Arg(std::string const& s) : _s(s) {}
   //String_Arg(const std::string& s) : _s(s) {}
   const String_Arg&  key()const	  {return *this;}
-  void parse(CS& f)			 {f >> _s;}
+  void parse(CS& f)override;
   void dump(std::ostream& f)const	 {f << _s;}
   void operator=(const std::string& s)	 {_s = s;}
   void operator+=(const std::string& s)	 {_s += s;}
@@ -108,6 +109,11 @@ public:
   void set_owner(Block*){
     // incomplete();
   }
+};
+/*--------------------------------------------------------------------------*/
+class Raw_String_Arg :public String_Arg {
+public:
+  void parse(CS& f)override;
 };
 /*--------------------------------------------------------------------------*/
 // a stub
@@ -314,6 +320,7 @@ public:
   }
 };
 typedef LiSt<String_Arg, '(', ',', ')'> String_Arg_List;
+typedef LiSt<Raw_String_Arg, '(', ',', ')'> Raw_String_Arg_List;
 /*--------------------------------------------------------------------------*/
 /* A "Collection" differs from a "LiSt" in how it is parsed.
  * Each parse of a "Collection" created one more object and stores
