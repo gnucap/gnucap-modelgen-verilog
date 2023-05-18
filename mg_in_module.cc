@@ -509,7 +509,7 @@ void Module::parse(CS& file)
   _element_list.set_owner(this);
   _local_nodes.set_owner(this);
   // _tr_eval.set_owner(this);
-  _validate.set_owner(this);
+  // _validate.set_owner(this);
 
   // file >> "module |macromodule |connectmodule "; from caller
   file >> _identifier >> _ports >> ';';

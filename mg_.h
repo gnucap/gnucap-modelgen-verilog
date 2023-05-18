@@ -706,6 +706,7 @@ public:
 };
 typedef LiSt<Parameter_3, '(', ',', ')'> Parameter_3_List;
 /*--------------------------------------------------------------------------*/
+#if 0
 class Code_Block :public Base {
   std::string _s;
   Block* _owner{NULL};
@@ -716,15 +717,16 @@ public:
   Code_Block() {}
   bool is_empty()const {return _s.length() < 2;}
 };
+#endif
 /*--------------------------------------------------------------------------*/
 class Parameter_Block :public Base {
   String_Arg	 _unnamed_value;
   Parameter_1_List _override;
   Parameter_1_List _raw;
   Parameter_1_List _calculated;
-  Code_Block	 _code_pre;
-  Code_Block	 _code_mid;
-  Code_Block     _code_post;
+  // Code_Block	 _code_pre;
+  // Code_Block	 _code_mid;
+  // Code_Block     _code_post;
 public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
@@ -732,15 +734,17 @@ public:
   const Parameter_1_List& override()const 	{return _override;}
   const Parameter_1_List& raw()const		{return _raw;}
   const Parameter_1_List& calculated()const	{return _calculated;}
-  const Code_Block&	code_pre()const		{return _code_pre;}
-  const Code_Block&	code_mid()const		{return _code_mid;}
-  const Code_Block&	code_post()const	{return _code_post;}
-  bool is_empty()const {return (calculated().is_empty() 
-				&& code_post().is_empty()
-				&& code_mid().is_empty()
+ // const Code_Block&	code_pre()const		{return _code_pre;}
+ // const Code_Block&	code_mid()const		{return _code_mid;}
+ // const Code_Block&	code_post()const	{return _code_post;}
+  bool is_empty()const {untested();
+    return (calculated().is_empty() 
+				// && code_post().is_empty()
+				// && code_mid().is_empty()
 				&& override().is_empty()
 				&& raw().is_empty()
-				&& code_pre().is_empty());}
+				// && code_pre().is_empty());
+    );}
   void fill_in_default_values();
 };
 /*--------------------------------------------------------------------------*/
@@ -1473,7 +1477,7 @@ private: // verilog input data
   Port_1_List	_local_nodes;
   Attribute_Instance _attribute_dummy;
   AnalogList	_analog_list;
-  Code_Block		_validate;
+  // Code_Block		_validate;
 private: // elaboration data
   Filter_List _filters;
   Probe_Map _probes;
@@ -1501,7 +1505,7 @@ public:
   const Port_1_List&	  local_nodes()const	{return _local_nodes;}
 //  const Code_Block&	 tr_eval()const		{return _tr_eval;}
   const AnalogList& analog_list() const {return _analog_list;}
-  const Code_Block&	validate()const	{return _validate;}
+//   const Code_Block&	validate()const	{return _validate;}
     	size_t		min_nodes()const	{return ports().size();}
     	size_t		max_nodes()const	{return ports().size();}
     	size_t		net_nodes()const	{return ports().size();}
@@ -1672,12 +1676,12 @@ class File : public Block {
   std::string   _cwd;
   CS		_file;
   Head		_head;
-  Code_Block	_h_headers;
-  Code_Block	_cc_headers;
+  // Code_Block	_h_headers;
+  // Code_Block	_cc_headers;
   // Model_List	_model_list;
   // Device_List	_device_list;
-  Code_Block	_h_direct;
-  Code_Block	_cc_direct;
+  // Code_Block	_h_direct;
+  // Code_Block	_cc_direct;
   Nature_List	_nature_list;
   Discipline_List _discipline_list;
   Module_List	_module_list;
@@ -1693,11 +1697,11 @@ public: // readout
   const std::string& name()const	{return _name;}
   const std::string  fullstring()const	{return _file.fullstring();}
   const Head&	     head()const	{return _head;}
-  const Code_Block&  h_headers()const	{return _h_headers;}
-  const Code_Block&  cc_headers()const	{return _cc_headers;}
+//  const Code_Block&  h_headers()const	{return _h_headers;}
+//  const Code_Block&  cc_headers()const	{return _cc_headers;}
   const Module_List& modules()const	{return _module_list;}
-  const Code_Block&  h_direct()const	{return _h_direct;}
-  const Code_Block&  cc_direct()const	{return _cc_direct;}
+//  const Code_Block&  h_direct()const	{return _h_direct;}
+//  const Code_Block&  cc_direct()const	{return _cc_direct;}
 
   const Nature_List&	 nature_list()const	{return _nature_list;}
   const Discipline_List& discipline_list()const	{return _discipline_list;}

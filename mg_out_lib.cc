@@ -131,6 +131,7 @@ void make_final_adjust_parameter_list(std::ostream& out, const Parameter_1_List&
   }
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 void make_final_adjust(std::ostream& out, const Parameter_Block& b)
 {
   //out << "    // final adjust: eval\n";
@@ -149,6 +150,7 @@ void make_final_adjust(std::ostream& out, const Parameter_Block& b)
   out << b.code_post();
   out << "    // final adjust: done\n";
 }
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 static void make_construct_parameter(std::ostream& out, const Parameter_2& p)

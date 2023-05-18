@@ -82,6 +82,7 @@ void Parameter_1::dump(std::ostream& out)const
     "final_default=\"" << final_default() << "\";";
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 void Code_Block::parse(CS& file) 
 {
   // skips the code block, delimited by {}
@@ -125,6 +126,7 @@ void Code_Block::parse(CS& file)
   }
   _s = file.substr(begin, end - begin);
 }
+#endif
 /*--------------------------------------------------------------------------*/
 static void fill_in_default_names(Parameter_1_List& pl)
 {
@@ -146,9 +148,9 @@ void Parameter_Block::parse(CS& file)
       || ((file >> "override ")		    && (file >> _override))
       || ((file >> "raw_parameters ")	    && (file >> _raw))
       || ((file >> "calculated_parameters ")&& (file >> _calculated))
-      || ((file >> "code_pre ")		    && (file >> _code_pre))
-      || ((file >> "code_mid ")		    && (file >> _code_mid))
-      || ((file >> "code_post ")	    && (file >> _code_post))
+//      || ((file >> "code_pre ")		    && (file >> _code_pre))
+//      || ((file >> "code_mid ")		    && (file >> _code_mid))
+//      || ((file >> "code_post ")	    && (file >> _code_post))
       ;
     paren -= file.skip1b("}");
     if (paren == 0) {
@@ -177,9 +179,9 @@ void Parameter_Block::dump(std::ostream& out)const
     "    override " << override() << "\n"
     "    raw_parameters " << raw() << "\n"
     "    calculated_parameters " << calculated() << "\n"
-    "    code_pre {" << code_pre() << "  }\n"
-    "    code_mid {" << code_mid() << "  }\n"
-    "    code_post {" << code_post() << "  }\n"
+//    "    code_pre {" << code_pre() << "  }\n"
+//    "    code_mid {" << code_mid() << "  }\n"
+//    "    code_post {" << code_post() << "  }\n"
     "  }\n";
 }
 /*--------------------------------------------------------------------------*/
