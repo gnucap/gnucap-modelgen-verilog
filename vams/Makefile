@@ -33,3 +33,4 @@ install:
 	install $(TARGET) $(DESTDIR)$(GNUCAP_PKGLIBDIR)/vams
 
 .PHONY: clean install
+.SECONDARY: ${TARGET:.so=.cc}

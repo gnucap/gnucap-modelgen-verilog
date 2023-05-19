@@ -14,7 +14,7 @@ GNUCAP_LIBS = $(shell $(GNUCAP_CONF) --libs)
 GNUCAP_PKGLIBDIR = $(shell $(GNUCAP_CONF) --pkglibdir)
 GNUCAP_EXEC_PREFIX = $(shell $(GNUCAP_CONF) --exec-prefix)
 
-LIBS = -lgnucap
+LIBS =
 MODULES = \
   bm_pulse.so \
   d_vasrc.so \
@@ -45,10 +45,10 @@ CXXFLAGS = -Wall -std=c++11
 all: all-recursive ${TARGET} ${MODULES}
 
 all-recursive: ${TARGET}
-	${MAKE} -C vams
+	${MAKE} -C vams GNUCAP_CONF=${GNUCAP_CONF}
 
 check: all
-	${MAKE} -C tests check
+	${MAKE} -C tests check GNUCAP_CONF=${GNUCAP_CONF}
 
 clean: clean-recursive
 	rm -rf *.o ${TARGET} ${MODULES} ${OBJS} ${CLEAN_OBJS}
@@ -80,7 +80,7 @@ Make.depend: $(SRCS) $(HDRS)
 install: install-recursive
 	
 install-recursive: install-here
-	${MAKE} -C vams install
+	${MAKE} -C vams install GNUCAP_CONF=${GNUCAP_CONF}
 
 install-here: ${TARGET}
 	${INSTALL} ${TARGET} ${DESTDIR}${GNUCAP_EXEC_PREFIX}/bin
