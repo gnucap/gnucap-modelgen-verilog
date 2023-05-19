@@ -118,25 +118,21 @@ void make_cc_expression(std::ostream& o, Expression const& e)
       idx = idxs.top();
       assert((*i)->name().size());
 
-      char op = (*i)->name()[0];
-      switch(op) {
-      case '-':
-      case '+':
-      case '*':
-      case '/':
+      auto op = (*i)->name()[0];
+      if ( op == '-'
+	|| op == '+'
+	|| op == '*'
+	|| op == '/') {
 	o__ "t" << idx << " "<< op << "= t" << idy << ";\n";
-	break;
-      case '>':
-      case '<':
+      }else if( op == '>'
+	     || op == '<' ) {
 	o__ "t" << idx << " = t" << idx << " " << op << " t" << idy << ";\n";
-	break;
-      default:
+      }else{
 	incomplete();
 	unreachable();
-	;
       }
     }else if (dynamic_cast<const Token_UNARY*>(*i)) {
-      char op = (*i)->name()[0];
+      auto op = (*i)->name()[0];
       if(op == '-') {
 	o__ "t" << idx << " *= -1.;\n";
       }else{ untested();
