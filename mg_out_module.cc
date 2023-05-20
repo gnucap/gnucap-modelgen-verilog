@@ -950,7 +950,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
 static void make_module_dispatcher(std::ostream& o, Module const& m)
 {
   o << "MOD_" << m.identifier() << " m_" << m.identifier() << ";\n";
-    o << "DISPATCHER<CMD>::INSTALL d0(&device_dispatcher, \""
+    o << "DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, \""
       << m.identifier() << "\", &m_" << m.identifier() << ");\n"
       "/*--------------------------------------"
       "------------------------------------*/\n";
