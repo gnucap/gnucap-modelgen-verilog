@@ -365,37 +365,6 @@ Assignment::~Assignment()
 // {
 // }
 /*--------------------------------------------------------------------------*/
-// hijacked from m_base_in.
-void Name_String::parse(CS& File)
-{
-  File.skipbl();
-  _data = "";
-  if (File.is_pfloat()) {
-    while (File.is_pfloat()) {
-      _data += File.ctoc();
-    }
-    if (File.match1("eE")) {
-      _data += File.ctoc();
-      if (File.match1("+-")) {
-	_data += File.ctoc();
-      }else{
-      }
-      while (File.is_digit()) {
-	_data += File.ctoc();
-      }
-    }else{
-    }
-    while (File.is_alpha()) {
-      _data += File.ctoc();
-    }
-  }else{
-    while (File.is_alpha() || File.is_pfloat() || File.match1("_[]$")) {
-      _data += File.ctoc();
-    }
-  }
-  File.skipbl();
-}
-/*--------------------------------------------------------------------------*/
 void Assignment::parse(CS& cmd)
 {
   // TODO: rhs is an analog expression
