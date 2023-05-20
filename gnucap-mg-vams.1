@@ -1,0 +1,45 @@
+.\" Hey, Emacs!  This is an -*- nroff -*- source file.
+.TH GNUCAP-MG-VAMS 1 "May 2023" "Gnucap Project" "Gnucap Modelgen"
+
+.SH NAME
+gnucap-mg-vams \- GNU Circuit Analysis Package .vams translator
+.SH SYNOPSIS
+.B gnucap-mg-vams [\fBOPTIONS\fP] [input_file]
+.br
+.SH DESCRIPTION
+.B Gnucap-Modelgen
+is a translator tool in the Gnucap suite. It will transform Verilog-AMS models
+into C++ code implementing Gnucap component plugins.
+.PP
+A typical usage can be
+
+gnucap-modelgen \--cc mymodel.vams
+
+.SH OPTIONS
+
+.TP
+\fI-I path\fI
+Set preprocessor include path
+.TP
+\fI-D "name\ value"\fI
+Set preprocessor constant
+.TP
+\fI--pp\fI
+dump preprocessor output
+.TP
+\fI--dump\fI
+dump contents as parsed
+.TP
+\fI--cc\fI
+generate c++ file
+
+.SH BUGS
+This is under construction.
+
+.SH AUTHOR
+Gnucap-mg-vams is being written by Felix Salfelder and Albert Davis with
+financial support from nlnet Next Generation Internet programme.
+.PP
+This manual page was written by Felix Salfelder <felix@salfelder.org>.
+For the full documentation, please visit
+.B http://gnucap.org.

@@ -13,6 +13,9 @@ GNUCAP_LIBDIR = $(shell $(GNUCAP_CONF) --libdir)
 GNUCAP_LIBS = $(shell $(GNUCAP_CONF) --libs)
 GNUCAP_PKGLIBDIR = $(shell $(GNUCAP_CONF) --pkglibdir)
 GNUCAP_EXEC_PREFIX = $(shell $(GNUCAP_CONF) --exec-prefix)
+GNUCAP_DATA = $(shell $(GNUCAP_CONF) --data)
+
+MANDIR = ${GNUCAP_DATA}/man/man1
 
 LIBS =
 MODULES = \
@@ -83,7 +86,11 @@ install-recursive: install-here
 	${MAKE} -C vams install GNUCAP_CONF=${GNUCAP_CONF}
 
 install-here: ${TARGET}
+	-${INSTALL} -d ${DESTDIR}${GNUCAP_EXEC_PREFIX}/bin
 	${INSTALL} ${TARGET} ${DESTDIR}${GNUCAP_EXEC_PREFIX}/bin
+
+	-${INSTALL} -d ${DESTDIR}${MANDIR}
+	${INSTALL} ${MANPAGE} ${DESTDIR}${MANDIR}
 
 	install -d $(DESTDIR)$(GNUCAP_PKGLIBDIR)/vams
 	install $(MODULES) $(DESTDIR)$(GNUCAP_PKGLIBDIR)/vams
