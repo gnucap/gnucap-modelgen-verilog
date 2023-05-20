@@ -36,3 +36,4 @@ list
 
 print dc v(nodes) i(r*) i(d*.*)
 dc v1 0 2 .5
+end

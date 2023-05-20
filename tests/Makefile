@@ -1,7 +1,8 @@
-GNUCAP_CONF = gnucap-conf
+GNUCAP_CONF ?= gnucap-conf
 
 CXX = $(shell $(GNUCAP_CONF) --cxx)
 GNUCAP_CPPFLAGS = $(shell $(GNUCAP_CONF) --cppflags) -DADD_VERSION -DPIC
+GNUCAP_CXXFLAGS = $(shell $(GNUCAP_CONF) --cxxflags) -std=c++11
 
 CPPFLAGS = -DTRACE_UNTESTED -DDO_TRACE
 CPPFLAGS = -DTRACE_UNTESTED
@@ -10,16 +11,15 @@ TARGETDIR = check
 GNUCAP = gnucap
 MODELGEN_VERILOG = ../modelgen-verilog
 CXX = g++
-# CXXFLAGS=-O2
 
 %.o: %.cc
-	${CXX} ${GNUCAP_CPPFLAGS} $(CPPFLAGS) -g -O0 -fPIC ${CXXFLAGS} -I../include $< -o $@ -c
+	${CXX} ${CPPFLAGS} ${GNUCAP_CPPFLAGS} -g -O0 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $< -o $@ -c
 
 %.s: %.cc
-	${CXX} -S ${GNUCAP_CPPFLAGS} $(CPPFLAGS) -g -O2 -fPIC ${CXXFLAGS} -I../include $< -o $@
+	${CXX} -S ${CPPFLAGS} ${GNUCAP_CPPFLAGS} -g -O2 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $< -o $@
 
 %.s0: %.cc
-	${CXX} -S ${GNUCAP_CPPFLAGS} $(CPPFLAGS) -g -O0 -fPIC ${CXXFLAGS} -I../include $< -o $@
+	${CXX} -S ${CPPFLAGS} ${GNUCAP_CPPFLAGS} -g -O0 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $< -o $@
 
 %.so: %.o
 	${CXX} -shared ${CXXFLAGS} -I../include $< ${LIBS} -o $@
@@ -39,6 +39,7 @@ check_v:
 
 clean:
 	rm -rf *.o *.cc *.so *.out *~
+	rm -rf check
 
 %.cc: %.vams
 	${MODELGEN_VERILOG} -I .. --cc $< > $@

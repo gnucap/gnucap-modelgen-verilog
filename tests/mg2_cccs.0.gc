@@ -28,3 +28,4 @@ list
 
 print dc v(nodes) i(d1.*) i(r0) iter(0)
 dc i 0 2 .5
+end

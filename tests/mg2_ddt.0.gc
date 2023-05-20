@@ -33,3 +33,4 @@ list
 print tran v(1) dv(dut) i(dut.ddt_0) iter(0)
 // y(dut.ddt_0) iof(dut.ddt_0) iter(0)
 tran 1 .1 trace=n
+end

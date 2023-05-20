@@ -67,3 +67,4 @@ list
 print dc i(v1) i(v3) i(v5) iter(0)
 
 dc v 0 1 .25 r 100 200 100
+end

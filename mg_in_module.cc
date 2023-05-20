@@ -752,7 +752,6 @@ void ValueRangeInterval::dump(std::ostream& o)const
   }else{
     o << ")";
   }
-  incomplete();
 }
 /*--------------------------------------------------------------------------*/
 void ValueRange::parse(CS& file)

@@ -30,3 +30,4 @@ list
 print dc i(dut)
 
 dc v 0 1 .25 r 100 200 100
+end

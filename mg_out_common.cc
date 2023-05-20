@@ -363,11 +363,10 @@ static void make_common_expand(std::ostream& o , const Module& m)
 {
   make_tag();
   o  <<
-    "void COMMON_" << m.identifier() << "::expand(const COMPONENT* d)\n{\n"
-
+    "void COMMON_" << m.identifier() << "::expand(const COMPONENT* d)\n{\n";
+    o__ "COMMON_COMPONENT::expand(d);\n"
     "}\n";
 #if 0
-    "  COMMON_COMPONENT::expand(d);\n"
     "  attach_model(d);\n"
     "  COMMON_" << d.identifier() << "* c = this;\n"
     "  const MODEL_" << d.model_type() << "* m = dynamic_cast<const MODEL_" 
@@ -411,6 +410,7 @@ static void make_common_expand(std::ostream& o , const Module& m)
   o__ "assert(par_scope);\n";
   o__ "COMMON_COMPONENT::precalc_first(par_scope);\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
+  o__ "USE(pc);\n";
   make_final_adjust_eval_parameter_list(o , m.parameters());
   make_eval_netlist_parameters(o , m);
   o  << "}\n"
@@ -420,6 +420,7 @@ static void make_common_expand(std::ostream& o , const Module& m)
   o__ "assert(par_scope);\n"
     "  COMMON_COMPONENT::precalc_last(par_scope);\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
+  o__ "USE(pc);\n";
   make_final_adjust_eval_parameter_list(o , m.parameters());
   make_eval_netlist_parameters(o , m);
     o << "}\n"
@@ -473,6 +474,7 @@ static void make_common_tr_eval(std::ostream& o, const Module& m)
   o__ "assert(d);\n";
   o__ "MOD_" << m.identifier() << " const* p = d;\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
+  o__ "USE(pc);\n";
 
   for(auto bb : m.analog_list()){
     assert(bb);

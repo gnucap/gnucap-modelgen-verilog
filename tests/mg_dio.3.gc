@@ -29,3 +29,4 @@ list
 
 print dc v(nodes) i(r1) iter(0)
 dc v1 -10 10 2
+end

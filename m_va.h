@@ -116,7 +116,7 @@ T& chain(T& t, double d)
 }
 
 template<>
-double& chain(double& t, double d)
+double& chain(double& t, double)
 { untested();
 	// no-op
 	return t;

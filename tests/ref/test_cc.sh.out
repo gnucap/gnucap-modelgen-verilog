@@ -427,6 +427,7 @@ std::string COMMON_resistor::param_value(int i)const
 /*--------------------------------------------------------------------------*/
 void COMMON_resistor::expand(const COMPONENT* d)
 {
+  COMMON_COMPONENT::expand(d);
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_resistor::precalc_first(const CARD_LIST* par_scope)
@@ -434,6 +435,7 @@ void COMMON_resistor::precalc_first(const CARD_LIST* par_scope)
   assert(par_scope);
   COMMON_COMPONENT::precalc_first(par_scope);
   COMMON_resistor const* pc = this;
+  USE(pc);
   {
     ddouble t0;
     t0 = 200.;
@@ -447,6 +449,7 @@ void COMMON_resistor::precalc_last(const CARD_LIST* par_scope)
   assert(par_scope);
   COMMON_COMPONENT::precalc_last(par_scope);
   COMMON_resistor const* pc = this;
+  USE(pc);
   {
     ddouble t0;
     t0 = 200.;
@@ -460,6 +463,7 @@ void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
   assert(d);
   MOD_resistor const* p = d;
   COMMON_resistor const* pc = this;
+  USE(pc);
   {
     ddouble _v_i; // Variable    
     { // Assignment 'i'. Dep: _potential_b_p_n
@@ -571,7 +575,7 @@ bool MOD_resistor::do_tr()
 /*--------------------------------------------------------------------------*/
 int MOD_resistor::_count = -1;
 MOD_resistor m_resistor;
-DISPATCHER<CMD>::INSTALL d0(&device_dispatcher, "resistor", &m_resistor);
+DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "resistor", &m_resistor);
 /*--------------------------------------------------------------------------*/
 CARD* MOD_resistor::clone()const
 {

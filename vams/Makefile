@@ -26,7 +26,7 @@ GNUCAP_EXEC_PREFIX = $(shell $(GNUCAP_CONF) --exec-prefix)
 all: ${TARGET}
 
 clean:
-	rm -r -f ${TARGET} ${TARGET:.so=.o}
+	rm -r -f ${TARGET} ${TARGET:.so=.o} ${TARGET:.so=.cc}
 
 install:
 	install -d $(DESTDIR)$(GNUCAP_PKGLIBDIR)/vams
