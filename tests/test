@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 GNUCAP=${GNUCAP-gnucap}
 if [ $# -eq 0 ] ; then
     echo "usage: ./test gnucap-verilog \"testcases\" targetdir refdir"

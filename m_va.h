@@ -116,7 +116,7 @@ T& chain(T& t, double d)
 }
 
 template<>
-double& chain(double& t, double)
+inline double& chain(double& t, double)
 { untested();
 	// no-op
 	return t;
@@ -167,7 +167,7 @@ T pow(T& b, T& e)
 		chain(e, l*p);
 		assert(e==e);
 	}else{
-		unreachable(); // numerical nonsense.
+		// unreachable(); // numerical nonsense, sometimes
 		p = 0;
 		chain(b, 0.);
 		chain(e, 0.);

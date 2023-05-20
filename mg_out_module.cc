@@ -45,7 +45,7 @@ static String_Arg const& potential_abstol(Branch const& b)
 {
   static String_Arg def("OPT::abstol");
   if(!b.discipline()){
-    incomplete();
+    // incomplete(); TODO: what's the default?
     return def;
   }else if(!b.discipline()->potential()){ untested();
     incomplete();
@@ -376,7 +376,7 @@ static void make_do_tr(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 static void make_read_probes(std::ostream& o, const Module& m)
 {
-  o << "void MOD_" << m.identifier() << "::read_probes()\n{\n";
+  o << "inline void MOD_" << m.identifier() << "::read_probes()\n{\n";
   for(auto x : m.branches()){
     Branch const* b = x.second;
     assert(b);
@@ -473,7 +473,7 @@ static void make_one_branch_contribution(std::ostream& o, Module const& m, const
 /*--------------------------------------------------------------------------*/
 static void make_set_branch_contributions(std::ostream& o, const Module& m)
 {
-  o << "void MOD_" << m.identifier() << "::set_branch_contributions()\n{\n";
+  o << "inline void MOD_" << m.identifier() << "::set_branch_contributions()\n{\n";
   for(auto i : m.branches()){
     Branch const* b = i.second;
     if(b->has_pot_source()) {

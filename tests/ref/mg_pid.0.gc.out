@@ -6,11 +6,10 @@ exp: already installed, replacing
 stashing as exp:0
 pulse: already installed, replacing
 stashing as pulse:0
-dut ( 0 out n1 0 )  pid0  p=.1 i=100 d=1m
-*// pid0 #(.d(1m)) dut (out, 0, n1, 0); 
-c ( out 0 ) 1u
-r ( out 0 ) 1
-V1 ( n1 0 ) pulse iv= 0. pv= 1. delay= 0. rise= 0.002 fall= 0.001 width= 0.004 period= 0.012
+pid0 #(.p(.1),.i(100),.d(1m)) dut (.sp(0),.sn(out),.cp(n1),.cn(0));
+// pid0 #(.d(1m)) dut (out, 0, n1, 0); 
+capacitor #(.c(1u)) c (.p(out),.n(0));
+resistor #(.r(1)) r (.p(out),.n(0));
 #Time       v(n1)      v(out)     iter(0)    timef(dut.ddt_1)
  0.         0.         0.         3.         Inf       
  20.p       10.n       9.9998u    4.         30.p      

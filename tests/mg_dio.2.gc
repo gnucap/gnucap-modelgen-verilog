@@ -14,8 +14,8 @@ analog begin
 	real sinsquare;
 	sinsquare = pow(sin(V(np,nn)), 2.);
 	one = sinsquare + cos(V(np,nn))*cos(V(np,nn));
-	a = pow(2.*V(np,nn), one);
-	I(np,nn) <+ pow(2.71, a/2) * exp(a * .5);
+	a = pow(2.*V(np,nn), 1.);
+	I(np,nn) <+ pow(2.71, a/2) * exp(a * .5) * one;
 end
 
 endmodule

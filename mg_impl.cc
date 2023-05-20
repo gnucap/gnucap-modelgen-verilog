@@ -398,8 +398,7 @@ Discipline const* Branch::discipline() const
   assert(_p);
   assert(_n);
   if(!_p->discipline()){
-    incomplete();
-    return NULL;
+    return _n->discipline();
   }else if(_p->discipline() == _n->discipline()){
     return _p->discipline();
   }else{ untested();

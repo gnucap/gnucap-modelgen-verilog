@@ -458,10 +458,10 @@ void COMMON_resistor::precalc_last(const CARD_LIST* par_scope)
   }
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
+inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
 {
-  assert(d);
   MOD_resistor const* p = d;
+  assert(p);
   COMMON_resistor const* pc = this;
   USE(pc);
   {
@@ -508,7 +508,7 @@ double MOD_resistor::tr_probe_num(std::string const& n) const
   return BASE_SUBCKT::tr_probe_num(n)
 ;}
 /*--------------------------------------------------------------------------*/
-void MOD_resistor::set_branch_contributions()
+inline void MOD_resistor::set_branch_contributions()
 {
   // flow src (p, n)
   // DEP _potential_b_p_n
@@ -521,7 +521,7 @@ void MOD_resistor::set_branch_contributions()
   // filters
 }
 /*--------------------------------------------------------------------------*/
-void MOD_resistor::read_probes()
+inline void MOD_resistor::read_probes()
 {
   _potential_b_p_n = volts_limited(_n[n_p], _n[n_n]);
   trace2("potential", _potential_b_p_n, _sim->_time0);

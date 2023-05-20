@@ -467,12 +467,12 @@ static void make_common_expand(std::ostream& o , const Module& m)
 /*--------------------------------------------------------------------------*/
 static void make_common_tr_eval(std::ostream& o, const Module& m)
 {
-  o << "void COMMON_" << m.identifier() << 
+  o << "inline void COMMON_" << m.identifier() << 
     "::tr_eval_analog(MOD_" << m.identifier() << "* d) const\n{\n";
 
   // parameters are here.
-  o__ "assert(d);\n";
   o__ "MOD_" << m.identifier() << " const* p = d;\n";
+  o__ "assert(p);\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
   o__ "USE(pc);\n";
 
