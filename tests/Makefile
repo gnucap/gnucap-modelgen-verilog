@@ -9,7 +9,7 @@ CPPFLAGS = -DTRACE_UNTESTED
 REFDIR = ref
 TARGETDIR = check
 GNUCAP = gnucap
-MODELGEN_VERILOG = ../modelgen-verilog
+MODELGEN_VERILOG = ../gnucap-mg-vams
 CXX = g++
 
 %.o: %.cc

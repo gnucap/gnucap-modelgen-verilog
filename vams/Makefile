@@ -1,7 +1,7 @@
 
 include Make1
 
-MODELGEN = ../modelgen-verilog
+MODELGEN = ../gnucap-mg-vams
 GNUCAP_CONF = gnucap-conf
 
 CXX = $(shell $(GNUCAP_CONF) --cxx)
