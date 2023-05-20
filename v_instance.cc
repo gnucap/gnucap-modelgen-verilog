@@ -738,13 +738,14 @@ void DEV_INSTANCE_PROTO::cleanup()
   }
 }
 /*--------------------------------------------------------------------------*/
+// TODO: need a better stash and mechanism
 class CLEANUP : public CMD {
   void do_it(CS&, CARD_LIST*)override {
     DEV_INSTANCE_PROTO::cleanup();
-    CMD::command("detach_all:0", &CARD_LIST::card_list);
+    CMD::command("clear:0", &CARD_LIST::card_list);
   }
 }p3;
-DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "detach_all", &p3);
+DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "clear", &p3);
 /*--------------------------------------------------------------------------*/
 } // namespace
 /*--------------------------------------------------------------------------*/
