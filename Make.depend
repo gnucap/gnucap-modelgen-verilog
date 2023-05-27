@@ -18,4 +18,5 @@ mg_out_common.o: mg_out_common.cc mg_out.h mg_.h
 mg_out_dev.o: mg_out_dev.cc mg_out.h mg_.h m_tokens.h
 mg_out_lib.o: mg_out_lib.cc mg_out.h mg_.h
 mg_out_root.o: mg_out_root.cc mg_out.h mg_.h
+mg_pp.o: mg_pp.cc mg_.h
 m_tokens.o: m_tokens.cc m_tokens.h

@@ -74,6 +74,8 @@ static int is_va_function_call(std::string const& n)
   // stub, need sth.
   if (n == "exp"
    || n == "log"
+   || n == "ln"
+   || n == "limexp"
    || n == "cos"
    || n == "sin") {
     return 1;
