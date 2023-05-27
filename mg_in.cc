@@ -47,7 +47,11 @@ void C_Comment::parse(CS& file)
 /*--------------------------------------------------------------------------*/
 void Cxx_Comment::parse(CS& file)
 {
-  file.get_line("");
+  try{
+    file.get_line("");
+  }catch (Exception_End_Of_Input const&) {
+    assert(!file.more());
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Skip_Block::parse(CS& file)
@@ -164,13 +168,22 @@ void Define::parse(CS& f)
 {
   f >> _name;
   f >> _args;
-  trace2("DP", _name, _args);
-  // BUG: need nonempty macro_text
-  _value = f.get_to("\n");
+
+  _value = f.get_to("/");
+  while (f.match1('/')) {
+    if (f >> "//") {
+      f.get_to("\n"); //  dummy_cxx_comment;
+    }else if (f >> "/*") /* C comment */ {
+      f >> dummy_c_comment; //BUG// line count may be wrong
+      _value += f.get_to("/\n");
+    }else{ untested();
+      _value += f.get_to("/\n");
+    }
+  }
   if(_value.is_empty()){
-//    _value = std::string("");
   }else{
   }
+  trace3("defparse", _name, _value, f.tail());
 }
 /*--------------------------------------------------------------------------*/
 void Define::preprocess(Define_List const& d)
@@ -183,6 +196,7 @@ void Define::preprocess(Define_List const& d)
   // int else_block = 0;
   for (;;) {
     stripped_file += file.get_to("\"/`");
+    trace1("def prep got to", file.tail());
     if (file.match1('\"')) { untested(); untested();
       // quoted string
       stripped_file += '"' + file.ctos("", "\"", "\"", "") + '"';
@@ -198,11 +212,12 @@ void Define::preprocess(Define_List const& d)
       Define_List::const_iterator x = d.find(file);
       if (x != d.end()) {
 	assert(*x);
+	trace1("def prep sub", file.tail());
 	stripped_file += (*x)->substitute(file) + "\n";
       }else{ untested();untested();
 	// error: not defined
       }
-    }else if (file.skip1('/')) { untested(); untested();
+    }else if (file.skip1('/')) { untested();
       stripped_file += "/";
     }else{
       // move on, just copy
@@ -214,7 +229,7 @@ void Define::preprocess(Define_List const& d)
     }else if (file.stuck(&here)) { untested(); untested();
       // comment ran to end of file
       break;
-    }else{ untested();
+    }else{
     }
   }
   _value = stripped_file;
@@ -234,7 +249,8 @@ std::string Define::substitute(CS& f) const
 {
   trace2("subs", f.tail(), _args.size());
   Raw_String_Arg_List values;
-  if(f.match1('(')){
+  if(_args.size() == 0) {
+  }else if(f.match1('(')){
     values.parse_n(f, int(_args.size()));
     trace1("parsed n", values.size());
   }else{
@@ -294,11 +310,11 @@ std::string Define::substitute(CS& f) const
 static void append_to(CS& file, std::string& to, std::string until)
 {
 //  trace2("append_to", file.tail(), file.more());
-  if(!file.more()){
+  if(!file.more()) {
     try{
       file.get_line("");
       trace1("got line", file.tail());
-    }catch( Exception_End_Of_Input const&){
+    }catch (Exception_End_Of_Input const&) {
       assert(!file.more());
     }
   }else{
@@ -352,7 +368,7 @@ void Preprocessor::parse(CS& file)
 	_define_list.erase(defi);
       }else{
       }
-      if(file >> _define_list){
+      if(file >> _define_list) {
 	auto e = _define_list.back();
 	e->preprocess(define_list());
       }else{ untested(); untested();
@@ -414,9 +430,8 @@ void Preprocessor::parse(CS& file)
 	trace1("match macro", file.tail());
 	assert(*x);
 	_stripped_file += (*x)->substitute(file) + " ";
-      }else{
-	trace0("mis match macro");
-	// error: not defined
+      }else{ untested();
+	throw Exception_CS("undefined macro ", file);
       }
     }else if (file.skip1('/')) {
       _stripped_file += "/";
@@ -428,9 +443,9 @@ void Preprocessor::parse(CS& file)
 
     trace2("more?", file.fullstring(), file.tail());
     if (!file.more()) {
-      try{
+      try {
 	file.get_line("");
-      }catch( Exception_End_Of_Input const& ){
+      }catch (Exception_End_Of_Input const&) {
 	break;
       }
       trace1("got more", file.fullstring());
@@ -441,7 +456,7 @@ void Preprocessor::parse(CS& file)
       // comment ran to end of file
       // break;
     }else{
-    }    
+    } untested();
   }
   CS::operator=(_stripped_file);
 }
@@ -539,7 +554,7 @@ void File::parse(CS& file)
       ;
     if (!file.more()) {
       break;
-    }else if (file.stuck(&here)) { untested();untested();
+    }else if (file.stuck(&here)) { untested();
       file.warn(0, "syntax error, need nature, discipline, or module");
       break;
     }else{

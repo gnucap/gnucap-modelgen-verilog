@@ -1,0 +1,15 @@
+// constants for use in verilog-ams
+// essentially a copy of gnucap/include/constants.h (GPLv3+)
+
+// standard physical constants ref:  http://physics.nist.gov
+// `define P_Q	1.6021918e-19   // charge of an electron, (spice)
+`define P_Q	1.60217653e-19     // charge of an electron, (nist)
+// `define P_C	2.99792458e8    // speed of light m/s
+// `define P_K	1.3806226e-23   // Boltzmann's constant J/K (spice)
+`define P_K	1.3806505e-23      // Boltzmann's constant J/K (nist)
+// `define P_H	6.6260693e-34   // Planck's constant J-s
+// `define P_U0 M_PI * 4.0e-7  // permeability of vaccuum H/m
+// `define P_EPS0	8.854214871e-12; // permittivity of air F/m(spice)
+// `define P_EPS0	8.854187817e-12 // permittivity of vaccuum F/m(nist)
+// `define const P_EPS0 1/(P_U0*P_C*P_C);// permittivity of vaccuum F/m(nist)
+`define P_CELSIUS0 273.15	   // 0 Celsius

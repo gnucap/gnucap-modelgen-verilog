@@ -1,0 +1,6 @@
+
+`define PORTS a,b // comment ...
+`define MODULE module /*comment*/ m
+
+`MODULE (`PORTS);
+endmodule

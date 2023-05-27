@@ -135,9 +135,9 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
     }else{
       return a;
     }
-  }else if(n==""){
-    incomplete();
-    return Branch_Ref();
+  }else if(n==""){ untested();
+    Node const* pp = new_node(p); // BUG: existing node??
+    return new_branch(pp, &mg_ground_node);
   }else{
     Node const* pp = new_node(p); // BUG: existing node??
     Node const* nn = new_node(n); // BUG: existing node??

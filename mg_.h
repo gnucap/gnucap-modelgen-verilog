@@ -259,8 +259,6 @@ protected:
 	if (file.stuck(&here)) { untested();
 	  delete p;
 	  file.warn(0, "not valid here");
-	  std::cout.flush();
-	  assert(false);
 	  break;
 	}else if (max==size()){
 	  throw Exception_Too_Many(int(size()+1), max, 0);
@@ -381,7 +379,7 @@ public:
   const_iterator find(CS& file) const {
     size_t here = file.cursor();
     String_Arg s;
-    s = file.ctos(":,.`()[];");
+    s = file.ctos(":,.`()[];*/");
     trace1("collectionfind", s);
     const_iterator x = find(s);
     if (x == end()) {
