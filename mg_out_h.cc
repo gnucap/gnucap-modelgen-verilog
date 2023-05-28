@@ -191,6 +191,7 @@ static void make_common(std::ostream& o, const Module& m)
     "  bool     operator==(const COMMON_COMPONENT&)const;\n"
     "  COMMON_COMPONENT* clone()const {return new "<<class_name<<"(*this);}\n"
     "  void     set_param_by_index(int, std::string&, int);\n"
+    "  bool     is_valid()const;\n"
     "  bool     param_is_printable(int)const;\n"
     "  std::string param_name(int)const;\n"
     "  std::string param_name(int,int)const;\n"
@@ -314,6 +315,7 @@ static void make_module(std::ostream& o, const Module& m)
   }else{
   }
 /*--------------------------------------------------------------------------*/
+  o__ "bool is_valid()const override;\n";
   o__ "void precalc_first();\n";
   o__ "void expand();\n";
   o__ "void precalc_last();\n";

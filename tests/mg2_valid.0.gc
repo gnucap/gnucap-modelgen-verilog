@@ -1,0 +1,36 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen test_valid
+module resistor(p, n);
+	electrical p, n;
+	inout p, n;
+	parameter real r = 1. from (0:inf);
+	analog begin
+		I(p,n) <+ V(p,n) / r;
+	end
+endmodule
+
+list
+
+// name clash..
+!make resistor.so > /dev/null
+attach ./resistor.so
+
+module test(1 2);
+	resistor #(.r(0.)) r0(1,0);
+	resistor #(.r(1.)) r1(1,2);
+	vsource #(.dc(1.)) v1(2, 0);
+endmodule
+
+test m(1 2)
+
+list
+
+print dc v(nodes)
+
+dc
+end

@@ -280,6 +280,7 @@ public:
   bool     operator==(const COMMON_COMPONENT&)const;
   COMMON_COMPONENT* clone()const {return new COMMON_resistor(*this);}
   void     set_param_by_index(int, std::string&, int);
+  bool     is_valid()const;
   bool     param_is_printable(int)const;
   std::string param_name(int)const;
   std::string param_name(int,int)const;
@@ -315,6 +316,7 @@ public:
   explicit MOD_resistor(); // : BASE_SUBCKT() { _n = _nodes; }
   CARD* clone()const override;
 private: // overrides
+  bool is_valid()const override;
   void precalc_first();
   void expand();
   void precalc_last();
@@ -425,6 +427,12 @@ std::string COMMON_resistor::param_value(int i)const
   }
 }
 /*--------------------------------------------------------------------------*/
+bool COMMON_resistor::is_valid() const
+{
+  if(!(1e-8<=_p_r && _p_r<inf)){ return false; }else{ }
+  return true; //COMMON_COMPONENT::is_valid();
+}
+/*--------------------------------------------------------------------------*/
 void COMMON_resistor::expand(const COMPONENT* d)
 {
   COMMON_COMPONENT::expand(d);
@@ -438,7 +446,7 @@ void COMMON_resistor::precalc_first(const CARD_LIST* par_scope)
   USE(pc);
   {
     ddouble t0;
-    t0 = 200.;
+    t0 = 1.;
 ;
     e_val(&(this->_p_r),     t0.value() , par_scope);
   }
@@ -452,7 +460,7 @@ void COMMON_resistor::precalc_last(const CARD_LIST* par_scope)
   USE(pc);
   {
     ddouble t0;
-    t0 = 200.;
+    t0 = 1.;
 ;
     e_val(&(this->_p_r),     t0.value() , par_scope);
   }
@@ -601,6 +609,12 @@ void MOD_resistor::precalc_first()
     subckt()->precalc_first();
   }else{
   }
+}
+/*--------------------------------------------------------------------------*/
+bool MOD_resistor::is_valid()const
+{
+  COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
+  return c->is_valid();
 }
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()

@@ -1,11 +1,13 @@
 == modelgen
 - V(..) <+ I(..) does not work, see mg2_ccvs.1.gc
+- parameter range expressions are passed through
+- missing tiebreak rules in overload
 
 == simulator plugins
 - paramset: requires newlines, v_paramset.2a.gc
 - c_pulse.so: obsolete hack, need discontinuities.
 
 == libgnucap, TODO
-- need dollar in identifiers
 - need string tokens
+- need ternary op
 - MODEL_CARD in lang interface

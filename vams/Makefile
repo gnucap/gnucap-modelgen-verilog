@@ -20,7 +20,7 @@ GNUCAP_EXEC_PREFIX = $(shell $(GNUCAP_CONF) --exec-prefix)
 %.o: %.cc
 	${CXX} $(GNUCAP_CPPFLAGS) $(CPPFLAGS) -shared -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@ -c
 
-%.cc: %.vams
+%.cc: %.vams ${MODELGEN}
 	${MODELGEN} -I .. --cc $< > $@
 
 all: ${TARGET}

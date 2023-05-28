@@ -300,7 +300,7 @@ void AnalogSeqBlock::parse(CS& file)
     }else{
     }
     Base* s = parse_analog_stmt(file, &_block);
-    if(!s){ untested();
+    if(!s){
       trace1("AnalogSeqBlock::parse", file.tail().substr(0,10));
       throw Exception_CS("bad analog block", file);
       break;

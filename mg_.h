@@ -529,11 +529,15 @@ class ValueRangeStrings :public ValueRangeSpec {
 class ValueRangeInterval :public ValueRangeSpec {
   std::string _lb;
   std::string _ub;
-  bool _ub_is_closed;
   bool _lb_is_closed;
+  bool _ub_is_closed;
 public:
   void parse(CS& f) override;
   void dump(std::ostream& f)const override;
+  bool lb_is_closed()const {return _lb_is_closed;}
+  bool ub_is_closed()const {return _ub_is_closed;}
+  std::string const& lb()const {return _lb;}
+  std::string const& ub()const {return _ub;}
 };
 /*--------------------------------------------------------------------------*/
 class ValueRange :public Owned_Base {
@@ -545,6 +549,9 @@ class ValueRange :public Owned_Base {
 public:
   void parse(CS& f) override;
   void dump(std::ostream& f)const override;
+  bool is_from() const{return _type == vr_FROM;}
+  bool is_exclude() const{return _type == vr_EXCLUDE;}
+  ValueRangeSpec const* spec() const{ return _what; }
 };
 typedef LiSt<ValueRange, '\0', '\0', '\0', ',', ';'> ValueRangeList;
 /*--------------------------------------------------------------------------*/
@@ -556,6 +563,7 @@ public:
   void dump(std::ostream& f)const override;
   Parameter_2() :Parameter_Base() {}
   void set_type(std::string const& a){_type=a;}
+  ValueRangeList const& value_range_list()const { return _value_range_list; }
 };
 /*--------------------------------------------------------------------------*/
 class Parameter_2_List : public LiSt<Parameter_2, '\0', ',', ';'> {

@@ -69,6 +69,17 @@ static String_Arg const& flow_abstol(Branch const& b)
   }
 }
 /*--------------------------------------------------------------------------*/
+static void make_module_is_valid(std::ostream& o, const Module& m)
+{
+  o << "bool MOD_" << m.identifier() << "::is_valid()const\n{\n";
+  o__ "COMMON_" << m.identifier() << " const* c = "
+    "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
+  o__ "return c->is_valid();\n";
+
+  o << "}\n"
+    "/*--------------------------------------------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
 static void make_tr_needs_eval(std::ostream& o, const Module& m)
 {
   o << "bool MOD_" << m.identifier() << "::tr_needs_eval()const\n{\n";
@@ -1016,6 +1027,7 @@ void make_cc_module(std::ostream& o, const Module& m)
 //  make_module_default_constructor(o, m);
   make_module_copy_constructor(o, m);
   make_module_precalc_first(o, m);
+  make_module_is_valid(o, m);
   make_module_expand(o, m);
   make_module_precalc_last(o, m);
   make_cc_filter(o, m);

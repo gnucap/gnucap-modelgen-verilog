@@ -1,0 +1,20 @@
+pow: already installed, replacing
+stashing as pow:0
+abs: already installed, replacing
+stashing as abs:0
+exp: already installed, replacing
+stashing as exp:0
+resistor: already installed, replacing
+stashing as resistor:0
+// name clash.. 
+module test (1,2);
+  resistor #(.r(0.)) r0 (1,0);
+  resistor #(.r(1.)) r1 (1,2);
+  vsource #(.dc(1.)) v1 (2,0);
+endmodule // test
+
+test #() m (.1(1),.2(2));
+m.r1 ambiguous overload in resistor
+#           v(1)       v(2)      
+m.r0: short circuit
+ 0.         9.9998u    0.99999   

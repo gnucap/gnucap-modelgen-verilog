@@ -509,56 +509,6 @@ void make_model_param_value(std::ostream& out, const Model& m)
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_model_is_valid(std::ostream& out, const Model& m)
-{
-  out <<
-    "bool MODEL_" << m.name() << "::is_valid(const COMPONENT* d)const\n"
-    "{\n"
-    "  assert(d);\n";
-  if (m.validate().is_empty()) {
-    out << "  return MODEL_" << m.inherit() << "::is_valid(d);\n";
-  }else{
-    out <<
-      "  const COMMON_" << m.dev_type() << "* c = dynamic_cast<const COMMON_"
-	<< m.dev_type() << "*>(d->common());\n"
-      "  if (!c) {\n"
-      "    return MODEL_" << m.inherit() << "::is_valid(d);\n"
-      "  }else{\n"
-      "    const MODEL_" << m.name() << "* m = this;"
-	<< m.validate() <<
-      "  }\n";
-  }
-  out << "}\n"
-    "/*--------------------------------------------------------------------------*/\n";
-}
-/*--------------------------------------------------------------------------*/
-static void make_tr_eval(std::ostream& out, const Model& m)
-{
-  out << "void MODEL_" << m.name() << "::tr_eval(COMPONENT*";
-  if (m.tr_eval().is_empty() && m.temperature().is_empty()) {
-    out << ")const\n{untested();//425\n";
-  }else{
-    out << " brh)const\n{\n"
-      "  DEV_" << m.dev_type() << "* d = prechecked_cast<DEV_" << m.dev_type() << "*>(brh);\n"
-      "  assert(d);\n"
-      "  const COMMON_" << m.dev_type() << "* c = prechecked_cast<const COMMON_"
-	<< m.dev_type() << "*>(d->common());\n"
-      "  assert(c);\n"
-      "  const SDP_" << m.name() << "* s = prechecked_cast<const SDP_" 
-	<< m.name() << "*>(c->sdp());\n"
-      "  assert(s);\n"
-      "  const MODEL_" << m.name() << "* m = this;\n";
-    if (!m.temperature().is_empty()) {
-      out << "  const TDP_" << m.name() << " T(d);\n"
-	"  const TDP_" << m.name() << "* t = &T;\n";
-    }else{
-    }
-    out << m.tr_eval();
-  }
-  out << "}\n"
-    "/*--------------------------------------------------------------------------*/\n";
-}
-/*--------------------------------------------------------------------------*/
 void make_cc_model(std::ostream& out, const Model& m)
 {
   out << "int MODEL_" << m.name() << "::_count = 0;\n"

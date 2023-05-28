@@ -29,6 +29,8 @@
 namespace{
 
 typedef double real;
+// double inf = std::numeric_limits<double>::infinity();
+#define inf std::numeric_limits<double>::infinity()
 
 template<int numderiv>
 class ddouble_ {

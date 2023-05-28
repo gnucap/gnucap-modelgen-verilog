@@ -404,7 +404,7 @@ void Preprocessor::parse(CS& file)
       // comment ran to end of file
       // break;
     }else{
-    } untested();
+    }
   }
   CS::operator=(_stripped_file);
 }

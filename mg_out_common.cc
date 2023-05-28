@@ -134,24 +134,24 @@ static void make_common_operator_equal(std::ostream& out, const Module& d)
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-void make_common_set_param_by_index(std::ostream& out, const Module& m)
+void make_common_set_param_by_name(std::ostream& o, const Module& m)
+{
+  o << "void COMMON_" << m.identifier() << "::set_param_by_name("
+       "std::string Name, std::string Value)\n{ untested();\n";
+
+  o__ "COMMON_COMPONENT::set_param_by_name(N, V);\n";
+  o << "}\n"
+    "/*--------------------------------------------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+void make_common_set_param_by_index(std::ostream& o, const Module& m)
 {
   make_tag();
-  out <<
-    "void COMMON_" << m.identifier() << "::set_param_by_index(int I, std::string& Value, int Offset)\n"
-    "{\n"
-    "  switch (COMMON_" << m.identifier() << "::param_count() - 1 - I) {\n";
+  o << "void COMMON_" << m.identifier() << "::set_param_by_index("
+       "int I, std::string& Value, int Offset)\n{\n";
+  o << "  switch (COMMON_" << m.identifier() << "::param_count() - 1 - I) {\n";
   size_t i = 0;
-//  for (Parameter_1_List::const_iterator 
-//       p = d.common().override().begin(); 
-//       p != d.common().override().end();
-//       ++p) {
-//    if (!((**p).user_name().empty())) {
-//      out << "  case " << i++ << ":  " << (**p).code_name() << " = Value; break;\n";
-//    }else{unreachable();
-//    }
-//  }
-//  assert(i == d.common().override().size());
+
   for (Parameter_List_Collection::const_iterator
        q = m.parameters().begin();
        q != m.parameters().end();
@@ -161,12 +161,11 @@ void make_common_set_param_by_index(std::ostream& out, const Module& m)
 	 p = (*q)->begin();
 	 p != (*q)->end();
 	 ++p) {
-      out << "  case " << i++ << ":  " << (**p).code_name() << " = Value; break;\n";
+      o__ "case " << i++ << ":  " << (**p).code_name() << " = Value; break;\n";
     }
   }
 
-  out <<
-    "  default: COMMON_COMPONENT::set_param_by_index(I, Value, Offset);\n"
+  o << "  default: COMMON_COMPONENT::set_param_by_index(I, Value, Offset);\n"
     "  }\n"
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";
@@ -258,6 +257,63 @@ void make_common_param_name(std::ostream& o, const Module& m)
   o__ "}else{\n";
   o____ "return \"\";\n";
   o__ "}\n";
+  o << "}\n"
+    "/*--------------------------------------------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_param_check_range(std::ostream& o, ValueRange const& p,
+    std::string const& n)
+{
+  ValueRangeSpec const* spec = p.spec();
+  if(auto ri = dynamic_cast<ValueRangeInterval const*>(spec)){
+       	o << "(" << ri->lb() << "<";
+	if(ri->lb_is_closed()){
+	  o << "=";
+	}else{
+	}
+	o << n << " && " << n << "<";
+	if(ri->ub_is_closed()){
+	  o << "=";
+	}else{
+	}
+	o << ri->ub() << ")";
+  }else{
+    incomplete();
+  }
+}
+/*--------------------------------------------------------------------------*/
+static void make_common_is_valid(std::ostream& o, const Module& m)
+{
+  make_tag();
+  o << "bool COMMON_" << m.identifier() << "::is_valid() const\n{\n";
+
+  // move to precalc?
+  for (Parameter_List_Collection::const_iterator
+       q = m.parameters().begin();
+       q != m.parameters().end();
+       ++q) {
+    if(!(*q)->is_local())
+    for (Parameter_2_List::const_iterator
+	 p = (*q)->begin();
+	 p != (*q)->end();
+	 ++p) {
+      for(auto v : (*p)->value_range_list()){
+	assert(v);
+	o__ "if(";
+	if(v->is_from()){
+	  o << "!";
+	}else if(v->is_exclude()){
+	}else{
+	  unreachable();
+	}
+	make_param_check_range(o, *v, (*p)->code_name());
+	o << "){ return false; }else{ }\n";
+      }
+      
+    }
+  }
+
+  o__ "return true; //COMMON_COMPONENT::is_valid();\n";
   o << "}\n"
     "/*--------------------------------------------------------------------------*/\n";
 }
@@ -412,7 +468,7 @@ static void make_common_expand(std::ostream& o , const Module& m)
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
   o__ "USE(pc);\n";
   make_final_adjust_eval_parameter_list(o , m.parameters());
-  make_eval_netlist_parameters(o , m);
+  make_eval_netlist_parameters(o, m);
   o  << "}\n"
     "/*--------------------------------------------------------------------------*/\n";
 
@@ -422,7 +478,7 @@ static void make_common_expand(std::ostream& o , const Module& m)
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
   o__ "USE(pc);\n";
   make_final_adjust_eval_parameter_list(o , m.parameters());
-  make_eval_netlist_parameters(o , m);
+  make_eval_netlist_parameters(o, m);
     o << "}\n"
     "/*--------------------------------------------------------------------------*/\n";
 #if 0
@@ -493,20 +549,21 @@ static void make_common_tr_eval(std::ostream& o, const Module& m)
   o << "}\n";
 }
 /*--------------------------------------------------------------------------*/
-void make_cc_common(std::ostream& o , const Module& d)
+void make_cc_common(std::ostream& o , const Module& m)
 {
   make_tag();
-  make_common_default_constructor(o , d);
-  make_common_copy_constructor(o , d);
-  make_common_destructor(o , d);
-  make_common_operator_equal(o , d);
-  make_common_set_param_by_index(o , d);
-  make_common_param_is_printable(o , d);
-  make_common_param_name(o , d);
-//  make_common_param_name_or_alias(o , d);
-  make_common_param_value(o , d);
-  make_common_expand(o , d);
-  make_common_tr_eval(o , d);
+  make_common_default_constructor(o, m);
+  make_common_copy_constructor(o, m);
+  make_common_destructor(o, m);
+  make_common_operator_equal(o, m);
+  make_common_set_param_by_index(o, m);
+  make_common_param_is_printable(o, m);
+  make_common_param_name(o, m);
+//  make_common_param_name_or_alias(o, m);
+  make_common_param_value(o, m);
+  make_common_is_valid(o, m);
+  make_common_expand(o, m);
+  make_common_tr_eval(o, m);
   o  << "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/

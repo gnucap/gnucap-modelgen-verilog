@@ -1,9 +1,11 @@
 `include "disciplines.vams"
 
+`define SHORT 1e-8
+
 module resistor(p, n);
 	electrical p, n;
 	inout p, n;
-	parameter real r = 200.;
+	parameter real r = 1. from [`SHORT:inf);
 	analog begin
 		real i;
 		i = V(p,n) / r;
