@@ -80,9 +80,19 @@ static void make_module_is_valid(std::ostream& o, const Module& m)
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_node_ref(std::ostream& o, const Node& n)
+{
+  if(&n == &mg_ground_node){
+    o << "gnd";
+  }else{
+    o << "_n[" << n.code_name() << "]";
+  }
+}
+/*--------------------------------------------------------------------------*/
 static void make_tr_needs_eval(std::ostream& o, const Module& m)
 {
   o << "bool MOD_" << m.identifier() << "::tr_needs_eval()const\n{\n";
+  o__ "node_t gnd(&ground_node);\n";
   o__ "if (is_q_for_eval()) { untested();\n";
   o____ "return false;\n";
   o__ "}else if (!converged()) {\n";
@@ -94,11 +104,12 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
     if(p->is_reversed()){
       // only check once.
     }else if(p->is_pot_probe()){
-      o << " if(!conchk("<< p->code_name() << ", "
-	  "_n[n_"<< p->pname() <<"].v0() - _n[n_"<< p->nname() <<"].v0(), ";
+      o << " if(!conchk("<< p->code_name() << ", ";
+      make_node_ref(o, *p->branch()->p());
+      o << ".v0() - ";
+      make_node_ref(o, *p->branch()->n());
+      o << ".v0(), ";
       o << potential_abstol(*p->branch()) << ")){\n";
-      o____ "trace3(\"need eval\", "<< p->code_name() << ", "
-          "_n[n_"<< p->pname() <<"].v0(), _n[n_"<< p->nname() <<"].v0());\n";
       o____ "return true;\n" <<ind<<"}else";
 
       if(p->nature())
@@ -107,7 +118,6 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
       o << " if(!conchk("<< p->code_name() << ", "
 	<<  p->branch()->code_name() << "->tr_amps(), ";
       o << flow_abstol(*p->branch()) << ")){\n";
-      o____ "trace2(\"need eval\", "<< p->code_name() << ", " << p->branch()->code_name() << "->tr_amps());\n";
       o____ "return true;\n" <<ind<<"}else";
 
       if(p->nature())
@@ -388,13 +398,23 @@ static void make_do_tr(std::ostream& o, const Module& m)
 static void make_read_probes(std::ostream& o, const Module& m)
 {
   o << "inline void MOD_" << m.identifier() << "::read_probes()\n{\n";
+  // o__ "node_t gnd;\n";
+  // o__ "gnd.set_to_ground(this);\n";
+  // o__ "(void) gnd;\n";
+  o__ "node_t gnd(&ground_node);\n";
   for(auto x : m.branches()){
     Branch const* b = x.second;
     assert(b);
     if(b->is_filter()){
       o__ "// filter " <<  b->code_name() << "\n";
     }else if(b->has_pot_probe()){
-      o__ "_potential" << b->code_name() << " = volts_limited(_n[n_"<< b->p()->name() <<"], _n[n_"<< b->n()->name() <<"]);\n";
+      o__ "_potential" << b->code_name() << " = volts_limited(";
+      make_node_ref(o, *b->p());
+      o << ", ";
+      assert(b->n());
+      make_node_ref(o, *b->n());
+      o << ");\n";
+
       o__ "trace2(\"potential\", _potential" << b->code_name() << ", _sim->_time0);\n";
     }else if(b->has_flow_probe()){
       o__ "assert(" << b->code_name() << ");\n";
@@ -674,8 +694,9 @@ static void make_module_expand_one_element(std::ostream& o, const Element_2& e, 
   o______ "node_t nodes[] = {";
   
   if(auto br = dynamic_cast<Branch const*>(&e)) {
-    o << "_n[n_" << br->p()->name() << "],";
-    o << "_n[n_" << br->n()->name() << "]";
+    make_node_ref(o, *br->p());
+    o << ", ";
+    make_node_ref(o, *br->n());
     for(auto x : m.branches()){
       Branch const* b = x.second;
       for(auto i : br->deps()){
@@ -689,8 +710,12 @@ static void make_module_expand_one_element(std::ostream& o, const Element_2& e, 
 	  break;
 	}else if(i->is_pot_probe()){
 	  assert(i->branch());
-	  o << ",_n[n_" << i->branch()->p()->name() << "]";
-	  o << ",_n[n_" << i->branch()->n()->name() << "]";
+	  // o << ",_n[n_" << i->branch()->p()->name() << "]";
+	  // o << ",_n[n_" << i->branch()->n()->name() << "]";
+	  o << ", ";
+	  make_node_ref(o, *i->branch()->p());
+	  o << ", ";
+	  make_node_ref(o, *i->branch()->n());
 	  break;
 	}else{
 	  o << "/* nothing " << i->code_name() << " */";
@@ -738,15 +763,6 @@ static void make_module_expand_one_element(std::ostream& o, const Element_2& e, 
   o << "      }\n";
 #endif
   o__ "}\n";
-}
-/*--------------------------------------------------------------------------*/
-static void make_node_ref(std::ostream& o, const Node& n)
-{
-  if(&n == &mg_ground_node){
-    o << "gnd";
-  }else{
-    o << "_n[" << n.code_name() << "]";
-  }
 }
 /*--------------------------------------------------------------------------*/
 static void make_module_expand_one_filter(std::ostream& o, const Filter& e)

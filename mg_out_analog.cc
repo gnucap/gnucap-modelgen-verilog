@@ -61,7 +61,11 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
     }
     o__ prefix << a.lhsname() << ".value() = t0.value();\n";
     for(auto v : a.deps()) {
-      assert(!v->is_reversed());
+      if(v->is_reversed()){ untested();
+	o__ "// reversed??\n";
+	unreachable(); // ?
+      }else{
+      }
       o__ prefix << a.lhsname() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "];\n";
       o__ "assert(" << prefix << a.lhsname() << " == " << prefix << a.lhsname() << ");\n";
     }

@@ -5,7 +5,7 @@ module device(p,n);
 	real r;
 
 	analog begin
-		@(initial_step) r=2;
+		@(initial_step) r=3;
 	end
 	analog begin
 		@(initial_step) begin

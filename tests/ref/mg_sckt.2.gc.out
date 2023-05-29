@@ -1,7 +1,11 @@
+tanh: already installed, replacing
+stashing as tanh:0
 pow: already installed, replacing
 stashing as pow:0
 abs: already installed, replacing
 stashing as abs:0
+sqrt: already installed, replacing
+stashing as sqrt:0
 exp: already installed, replacing
 stashing as exp:0
 module vsin (p,n);

@@ -20,23 +20,31 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_out.h"
+#include "mg_func.h"
 #include "m_tokens.h"
+#include <globals.h>
 #include <stack>
 /*--------------------------------------------------------------------------*/
-static int is_function(std::string const& n)
+// stub...
+static MGVAMS_FUNCTION const* lookup_function(std::string const& n, int& arity)
 {
-  // incomplete();
-  // stub, need sth.
+  FUNCTION const* f = function_dispatcher[n];
   if (n == "exp"
    || n == "log"
    || n == "cos"
    || n == "sin") {
-    return 1;
+    arity = 1;
+    return 0;
   }else if (n == "pow"){
-    return 2;
+    arity = 2;
+    return 0;
+  }else if(auto g=dynamic_cast<MGVAMS_FUNCTION const*>(f)) {
+    arity = g->arity();
+    return g;
   }else{
     return 0;
   }
+
 }
 /*--------------------------------------------------------------------------*/
 void make_cc_expression(std::ostream& o, Expression const& e)
@@ -46,6 +54,7 @@ void make_cc_expression(std::ostream& o, Expression const& e)
   // The _list is the expression in RPN.
   // print a program that computes the function and the derivatives.
   std::stack<int> idxs;
+  std::stack<int> args;
   int idx = -1;
   int idx_alloc = 0;
   for (const_iterator i = e.begin(); i != e.end(); ++i) {
@@ -94,23 +103,39 @@ void make_cc_expression(std::ostream& o, Expression const& e)
       o__ "t" << idx << " = "<<sign<<" p->" << (*pp)->code_name() << ";// "<< pp->name() <<"\n";
       o__ "t" << idx << "[d" << (*pp)->code_name() << "] = " << sign << "1.;\n";
     }else if(dynamic_cast<const Token_SYMBOL*>(*i)) {
-      int arity = is_function((*i)->name());
-      assert(arity);
-      if(arity == 1){
+      assert(args.size());
+      int arity=0;
+      MGVAMS_FUNCTION const* f = lookup_function((*i)->name(), arity);
+      if(args.top()+1 == idx){
+	assert(arity==1);
 	o << ind << "t" << idx << " = va::" << (*i)->name();
 	o << "(t" << idx << ");\n";
       }else if(arity == 2){
+	assert(args.top()+2 == idx);
 	int idy = idx;
 	idxs.pop();
 	idx = idxs.top();
 	o << ind << "t" << idx << " = va::" << (*i)->name();
 
 	o << "(t" << idx << ", t" << idy << ");\n";
+      }else if(f && args.top() == idx){
+	idxs.push(++idx);
+	if(idx<idx_alloc) {
+	  // re-use temporary variable
+	}else{
+	  assert(idx==idx_alloc);
+	  ++idx_alloc;
+	  o << ind << "ddouble t" << idx << ";\n";
+	}
+	o << ind << "t" << idx << " = " << f->code_name() << ";\n";
       }else{ untested();
 	unreachable();
+	std::cerr << "run time error in make_cc_expression: " << (*i)->name() << ": " << idx-args.top() << "\n";
       }
+      args.pop();
     }else if (dynamic_cast<const Token_PARLIST*>(*i)) {
     }else if (dynamic_cast<const Token_STOP*>(*i)) {
+      args.push(idx);
     }else if (dynamic_cast<const Token_BINOP*>(*i)) {
       int idy = idxs.top();
       assert( idy == idx );
@@ -125,9 +150,11 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 	|| op == '/') {
 	o__ "t" << idx << " "<< op << "= t" << idy << ";\n";
       }else if( op == '>'
-	     || op == '<' ) {
+	     || op == '<'
+	     || op == '=' ) {
 	o__ "t" << idx << " = t" << idx << " " << op << " t" << idy << ";\n";
       }else{
+	std::cerr << "run time error in make_cc_expression: " << (*i)->name() << "\n";
 	incomplete();
 	unreachable();
       }
@@ -139,7 +166,28 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 	incomplete();
 	unreachable();
       }
+    }else if (auto t = dynamic_cast<const Token_TERNARY*>(*i)) {
+      o__ "{\n";
+      {
+	indent y;
+	o__ "ddouble& tt0 = t0;\n";
+	o__ "if(t" << idx << "){\n";
+	{
+	  indent x;
+	  make_cc_expression(o, *t->true_part());
+	  o__ "tt0 = t0;\n";
+	}
+	o__ "}else{\n";
+	{
+	  indent x;
+	  make_cc_expression(o, *t->false_part());
+	  o__ "tt0 = t0;\n";
+	}
+	o__ "}\n";
+      }
+      o__ "}\n";
     }else{
+      incomplete();
       unreachable();
       assert(false);
     }

@@ -1,0 +1,8 @@
+
+module warn
+analog begin
+@(initial_step)
+ begin
+ end;
+end
+endmodule

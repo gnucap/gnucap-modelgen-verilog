@@ -1373,8 +1373,8 @@ public:
   // later.
   void parse(CS&)override {incomplete();}
   void dump(std::ostream&)const override;
-  Node const* p() const{ return _p; }
-  Node const* n() const{ return _n; }
+  Node const* p() const{ assert(_p); return _p; }
+  Node const* n() const{ assert(_n); return _n; }
   virtual std::string code_name() const;
   std::string short_label()const  { return code_name();}
 //  std::string name_of_module_instance()const  {return code_name();}

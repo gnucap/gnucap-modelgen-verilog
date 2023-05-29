@@ -130,28 +130,20 @@ namespace va {
 // some builtin numerical functions according to verilog standard
 
 template<class T>
+T cos(T& d)
+{
+	chain(d, -std::sin(d));
+	d.value() = std::cos(d);
+	return d;
+}
+
+template<class T>
 T exp(T& d)
 {
 	assert(d.value() == d.value());
 	d.value() = std::exp(d);
 	assert(d.value() == d.value());
 	chain(d, d);
-	return d;
-}
-
-template<class T>
-T sin(T& d)
-{
-	chain(d, std::cos(d));
-	d.value() = std::sin(d);
-	return d;
-}
-
-template<class T>
-T cos(T& d)
-{
-	chain(d, -std::sin(d));
-	d.value() = std::cos(d);
 	return d;
 }
 
@@ -181,6 +173,24 @@ T pow(T& b, T& e)
 	assert(b==b);
 	return b;
 }
+
+template<class T>
+T sin(T& d)
+{
+	chain(d, std::cos(d));
+	d.value() = std::sin(d);
+	return d;
+}
+
+template<class T>
+T tanh(T& d)
+{
+	incomplete();
+	// chain(d, std::cos(d));
+	d.value() = std::tanh(d);
+	return d;
+}
+
 
 } // va
 #endif

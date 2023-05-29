@@ -22,8 +22,10 @@
 
 #include "mg_.h"
 #include "m_tokens.h"
+#include "mg_func.h"
 #include <stack>
 #include <e_cardlist.h>
+#include <globals.h>
 /*--------------------------------------------------------------------------*/
 static Token_FILTER* resolve_filter_function(Expression& E, std::string const& n, Deps const& cdeps, Block* o)
 {
@@ -72,6 +74,8 @@ static bool is_system_function_call(std::string const& n)
 static int is_va_function_call(std::string const& n)
 {
   // stub, need sth.
+  FUNCTION const* f = function_dispatcher[n];
+
   if (n == "exp"
    || n == "log"
    || n == "ln"
@@ -81,6 +85,11 @@ static int is_va_function_call(std::string const& n)
     return 1;
   }else if (n == "pow"){
     return 2;
+  }else if (n == "white_noise"
+         || n == "flicker_noise" ){ untested();
+    return 2;
+  }else if(auto g=dynamic_cast<MGVAMS_FUNCTION const*>(f)) {
+    return g->arity();
   }else{
     return 0;
   }
@@ -99,13 +108,13 @@ static bool is_xs_function(std::string const& f, Block const* owner)
   if(!file){
     // fallback. modelgen_0.cc // incomplete();
     return f=="V" || f=="I" || f=="flow" || f=="potential";
-  }else{
+  }else{ untested();
   }
 
-  for(auto n: file->nature_list()){
-    if(n->access().to_string() == f){
+  for(auto n: file->nature_list()){ untested();
+    if(n->access().to_string() == f){ untested();
       return true;
-    }else{
+    }else{ untested();
     }
   }
   // stub, need discipline.h
@@ -188,7 +197,22 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
            ||dynamic_cast<Token_UNARY*>(t)
            ||dynamic_cast<Token_BINOP*>(t)) {
       E.push_back(t->clone());
-    }else if(!s) {
+    }else if(auto tt = dynamic_cast<Token_TERNARY const*>(t)){ untested();
+      Expression* tp = new Expression();
+      Expression* fp = new Expression();
+      try{ untested();
+	assert(tt->true_part());
+	assert(tt->false_part());
+	resolve_symbols(*tt->true_part(), *tp, scope, deps);
+	resolve_symbols(*tt->false_part(), *fp, scope, deps);
+      }catch(Exception const& e){ untested();
+	delete tp;
+	delete fp;
+	throw e;
+      }
+
+      E.push_back(new Token_TERNARY(t->name(), tp, fp));
+    }else if(!s) { untested();
       unreachable();
       trace1("huh", t->name());
       E.push_back(t->clone());

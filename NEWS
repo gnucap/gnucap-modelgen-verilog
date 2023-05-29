@@ -1,0 +1,17 @@
+20230520-dev
+============
+* initial development snapshot
+* preprocessing
+* disciplines
+* modules with ports & parameters
+* partial derivatives
+* current/voltage sources
+* ddt/idt filters
+* basic code generation
+
+2023****-dev
+============
+* separate out preprocessor
+* bugfix `define vs. comment
+* support ternary operator
+* generate is_valid (overloading)

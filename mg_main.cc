@@ -134,6 +134,7 @@ int main(int argc, char** argv)
     }
   }catch (Exception const& e) {
     std::cout << e.message() << '\n';
+    exit(1);
   }
   return errorcount;
 }

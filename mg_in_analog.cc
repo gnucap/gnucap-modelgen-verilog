@@ -183,15 +183,16 @@ static Base* parse_assignment(CS& file, Block* o)
   Variable const* v = dynamic_cast<Variable const*>(b);
   if(!v){
     file.reset(here);
-    return NULL;
+    return NULL; // BUG?
     throw Exception_CS("what's this: " + what, file);
   }else if(file >> "=") {
     Assignment* a = new Assignment();
     a->set_lhs(v);
     a->set_owner(o);
+    trace1("pA", file.tail());
     a->parse(file);
     file >> ";";
-    trace1("got semicolon", (bool)file);
+    trace2("got_semicolon", (bool)file, file.tail().substr(0,10));
 //    _var_refs[what] = a;
     return a;
   }else{ untested();
@@ -296,6 +297,12 @@ void AnalogSeqBlock::parse(CS& file)
 //    size_t here = file.cursor();
     trace1("AnalogSeqBlock::parse", file.tail().substr(0,10));
     if(file >> "end "){
+      if(file.peek() == ';') {
+	// error(bWARNING, "// stray semicolon?");
+	std::cerr << "stray semicolon\n";
+      }else{
+      }
+      trace1("AnalogSeqBlock::parse end", file.tail().substr(0,10));
       break;
     }else{
     }

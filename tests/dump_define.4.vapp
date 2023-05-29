@@ -1,0 +1,9 @@
+
+`define A(a) a
+`define B(a) endmodule
+
+`A(module) test
+`B("arg0, arg1")
+
+`A(module) test2
+`B(arg0="arg1")

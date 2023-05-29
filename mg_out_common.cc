@@ -466,7 +466,7 @@ static void make_common_expand(std::ostream& o , const Module& m)
   o__ "assert(par_scope);\n";
   o__ "COMMON_COMPONENT::precalc_first(par_scope);\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
-  o__ "USE(pc);\n";
+  o__ "(void)pc;\n";
   make_final_adjust_eval_parameter_list(o , m.parameters());
   make_eval_netlist_parameters(o, m);
   o  << "}\n"
@@ -476,7 +476,7 @@ static void make_common_expand(std::ostream& o , const Module& m)
   o__ "assert(par_scope);\n"
     "  COMMON_COMPONENT::precalc_last(par_scope);\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
-  o__ "USE(pc);\n";
+  o__ "(void)pc;\n";
   make_final_adjust_eval_parameter_list(o , m.parameters());
   make_eval_netlist_parameters(o, m);
     o << "}\n"
@@ -530,7 +530,7 @@ static void make_common_tr_eval(std::ostream& o, const Module& m)
   o__ "MOD_" << m.identifier() << " const* p = d;\n";
   o__ "assert(p);\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
-  o__ "USE(pc);\n";
+  o__ "(void)pc;\n";
 
   for(auto bb : m.analog_list()){
     assert(bb);

@@ -177,7 +177,7 @@ void Define::preprocess(Define_List const& d)
   for (;;) {
     stripped_file += file.get_to("\"/`");
     trace1("def prep got to", file.tail());
-    if (file.match1('\"')) { untested(); untested();
+    if (file.match1('\"')) { untested();
       // quoted string
       stripped_file += '"' + file.ctos("", "\"", "\"", "") + '"';
     }else if (file >> "`else"
@@ -206,21 +206,21 @@ void Define::preprocess(Define_List const& d)
       trace1("prep", file.tail());
       // proper end of file
       break;
-    }else if (file.stuck(&here)) { untested(); untested();
+    }else if (file.stuck(&here)) { untested();
       // comment ran to end of file
       break;
-    }else{
+    }else{ untested();
     }
   }
   _value = stripped_file;
 }
 /*--------------------------------------------------------------------------*/
 void Define::dump(std::ostream& f)const
-{
+{ untested();
   f << "`define " << name();
   if(_args.size()){ untested();
    f << _args;
-  }else{
+  }else{ untested();
   }
   f << " " << value() << "\n";
 }
@@ -233,7 +233,7 @@ std::string Define::substitute(CS& f) const
   }else if(f.match1('(')){
     values.parse_n(f, int(_args.size()));
     trace1("parsed n", values.size());
-  }else{
+  }else{ untested();
   }
 
   std::map<std::string, String_Arg*> subs;
@@ -255,14 +255,14 @@ std::string Define::substitute(CS& f) const
     size_t here = file.cursor();
     std::string more;
 
-    if(!file.peek()){
+    if(!file.peek()){ untested();
     }else if(file.is_term()){
       more = file.peek(); // BUG?
       file.skip(1); // WHAT?
     }else{
       trace1("arg?", file.tail());
       auto it = _args.find(file);
-      if(it != _args.end()){ untested();
+      if(it != _args.end()){
 	auto k = values.begin();
 	for(; it != _args.begin(); --it){ untested();
 	  ++k;
@@ -383,7 +383,7 @@ void Preprocessor::parse(CS& file)
       }
     }else if (file.skip1('/')) {
       _stripped_file += "/";
-    }else{
+    }else{ untested();
       trace1("moveon", file.tail());
       _stripped_file += "\n";
       // move on, just copy

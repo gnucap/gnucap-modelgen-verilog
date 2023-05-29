@@ -1,0 +1,8 @@
+... egin 
+@(initial_step) 
+begin 
+end; 
+end 
+endmodule 
+
+                                        ^ ? bad analog block

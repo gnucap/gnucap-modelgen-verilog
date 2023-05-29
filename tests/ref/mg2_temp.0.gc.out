@@ -9,7 +9,12 @@ stashing as sqrt:0
 exp: already installed, replacing
 stashing as exp:0
 parameter dc not specified, using default
-test_vs0 #(.dc(dc)) dut (.p(1),.n(0));
+test_temp0 #(.dc(dc)) dut (.p(1),.n(0));
 resistor #(.r(2)) r0 (.p(1),.n(0));
 #           v(1)       i(r0)      iter(0)   
- 0.         1.         0.5        4.        
+ 25.        25.        12.5       6.        
+ 26.        26.        13.        6.        
+ 27.        27.        13.5       6.        
+ 28.        28.        14.        6.        
+ 29.        29.        14.5       6.        
+ 30.        30.        15.        6.        

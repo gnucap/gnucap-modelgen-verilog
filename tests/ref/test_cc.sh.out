@@ -443,7 +443,7 @@ void COMMON_resistor::precalc_first(const CARD_LIST* par_scope)
   assert(par_scope);
   COMMON_COMPONENT::precalc_first(par_scope);
   COMMON_resistor const* pc = this;
-  USE(pc);
+  (void)pc;
   {
     ddouble t0;
     t0 = 1.;
@@ -457,7 +457,7 @@ void COMMON_resistor::precalc_last(const CARD_LIST* par_scope)
   assert(par_scope);
   COMMON_COMPONENT::precalc_last(par_scope);
   COMMON_resistor const* pc = this;
-  USE(pc);
+  (void)pc;
   {
     ddouble t0;
     t0 = 1.;
@@ -471,7 +471,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
   MOD_resistor const* p = d;
   assert(p);
   COMMON_resistor const* pc = this;
-  USE(pc);
+  (void)pc;
   {
     ddouble _v_i; // Variable    
     { // Assignment 'i'. Dep: _potential_b_p_n
@@ -531,6 +531,7 @@ inline void MOD_resistor::set_branch_contributions()
 /*--------------------------------------------------------------------------*/
 inline void MOD_resistor::read_probes()
 {
+  node_t gnd(&ground_node);
   _potential_b_p_n = volts_limited(_n[n_p], _n[n_n]);
   trace2("potential", _potential_b_p_n, _sim->_time0);
 }
@@ -548,12 +549,12 @@ MOD_resistor::MOD_resistor() :BASE_SUBCKT()
 /*--------------------------------------------------------------------------*/
 bool MOD_resistor::tr_needs_eval()const
 {
+  node_t gnd(&ground_node);
   if (is_q_for_eval()) { untested();
     return false;
   }else if (!converged()) {
     return true;
   }else if(!conchk(_potential_b_p_n, _n[n_p].v0() - _n[n_n].v0(), 1e-6)){
-    trace3("need eval", _potential_b_p_n, _n[n_p].v0(), _n[n_n].v0());
     return true;
   }else{
     return false;
@@ -654,7 +655,7 @@ gnd.set_to_ground(this);
     }else{
     }
       {
-        node_t nodes[] = {_n[n_p],_n[n_n]/* self conductance */}; // nodes
+        node_t nodes[] = {_n[n_p], _n[n_n]/* self conductance */}; // nodes
         _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/2, _st_b_p_n, 2, nodes);
       }
     }

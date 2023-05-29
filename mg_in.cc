@@ -162,9 +162,28 @@ void String_Arg::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 void Raw_String_Arg::parse(CS& f)
 {
-  _s = f.get_to(",)");
-  f.skip1(",");
-  trace1("RSA", _s);
+  assert(_s=="");
+  bool quote = false;
+  while(f.ns_more()) {
+    char p = f.peek();
+    if(p == '\"') {
+      quote = !quote;
+      _s += p;
+      f.skip();
+    }else if(quote) {
+      _s += p;
+      f.skip();
+    }else if(p == ',') {
+      f.skip();
+      break;
+    }else if(p == ')') {
+      break;
+    }else {
+      _s += p;
+      f.skip();
+    }
+  }
+  trace2("RSA", _s, f.tail().substr(0,10));
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

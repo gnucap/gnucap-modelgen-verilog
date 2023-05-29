@@ -693,7 +693,6 @@ CS& Module::parse_analog(CS& cmd)
   ab->set_owner(this);
   ab->parse(cmd);
   _analog_list.push_back(ab);
-
   return cmd;
 }
 /*--------------------------------------------------------------------------*/
@@ -756,7 +755,7 @@ void ValueRangeInterval::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void ValueRange::parse(CS& file)
 {
-  if (file >> "from "){
+  if (file >> "from"){
     _type = vr_FROM;
     if(file >> "[" || file >> "("){
       _what = new ValueRangeInterval;
@@ -764,7 +763,7 @@ void ValueRange::parse(CS& file)
     }else{
       incomplete();
     }
-  }else if(file >> "exclude "){
+  }else if(file >> "exclude"){
     _type = vr_EXCLUDE;
     if(file >> "[" || file >> "("){ untested();
       _what = new ValueRangeInterval;

@@ -32,7 +32,7 @@ module device(p, n);
 
   analog begin
     @(initial_step)
-      r = 2;
+      r = 3;
   end
 
   analog begin
