@@ -379,7 +379,7 @@ public:
   const_iterator find(CS& file) const {
     size_t here = file.cursor();
     String_Arg s;
-    s = file.ctos(":,.`()[];*/");
+    s = file.ctos(":,.`()[];*/+-");
     trace1("collectionfind", s);
     const_iterator x = find(s);
     if (x == end()) {

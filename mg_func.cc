@@ -38,10 +38,24 @@ class DUMMY1 : public MGVAMS_FUNCTION {
   }
 } dummy1;
 DISPATCHER<FUNCTION>::INSTALL d_tanh(&function_dispatcher, "tanh", &dummy1);
+DISPATCHER<FUNCTION>::INSTALL d_sinh(&function_dispatcher, "sinh", &dummy1);
+DISPATCHER<FUNCTION>::INSTALL d_atanh(&function_dispatcher, "atanh", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_pow(&function_dispatcher, "pow", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_abs(&function_dispatcher, "abs", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_sqrt(&function_dispatcher, "sqrt|$sqrt", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_limexp(&function_dispatcher, "limexp|$limexp", &dummy1);
+/*--------------------------------------------------------------------------*/
+class DUMMY2 : public MGVAMS_FUNCTION {
+  std::string eval(CS&, const CARD_LIST*)const override{
+	  unreachable();
+	  return "AAA";
+  }
+  int arity()const override {
+	  return 2;
+  }
+} dummy2;
+DISPATCHER<FUNCTION>::INSTALL d_min(&function_dispatcher, "min|$min", &dummy2);
+DISPATCHER<FUNCTION>::INSTALL d_max(&function_dispatcher, "max|$max", &dummy2);
 /*--------------------------------------------------------------------------*/
 class TEMPERATURE : public MGVAMS_FUNCTION {
   std::string eval(CS&, const CARD_LIST*)const override{
@@ -51,7 +65,7 @@ class TEMPERATURE : public MGVAMS_FUNCTION {
 	  return 0;
   }
   std::string code_name()const override{
-	  return "_sim->_temp_c";
+	  return "temp_hack";
   }
 } temperature;
 DISPATCHER<FUNCTION>::INSTALL d1(&function_dispatcher, "$temperature", &temperature);
@@ -64,7 +78,7 @@ class VT : public MGVAMS_FUNCTION {
 	  return 0;
   }
   std::string code_name()const override{
-	  return "vt";
+	  return "vt_hack";
   }
 } vt;
 DISPATCHER<FUNCTION>::INSTALL d_vt(&function_dispatcher, "$vt", &vt);
@@ -79,6 +93,27 @@ public:
   }
 } p_exp;
 DISPATCHER<FUNCTION>::INSTALL d_exp(&function_dispatcher, "exp", &p_exp);
+/*--------------------------------------------------------------------------*/
+class log : public MGVAMS_FUNCTION {
+public:
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
+    PARAMETER<double> x;
+    Cmd >> x;
+    x.e_val(NOT_INPUT, Scope);
+    return to_string(std::log10(x));
+  }
+  std::string const& name() const{ untested();
+	  static std::string n = "$log10";
+	  return n;
+  }
+  std::string code_name()const override{
+	  return "va::log10";
+  }
+  int arity()const override {
+	  return 1;
+  }
+} p_log;
+DISPATCHER<FUNCTION>::INSTALL d_log(&function_dispatcher, "log|$log10", &p_log);
 /*--------------------------------------------------------------------------*/
 class ln : public MGVAMS_FUNCTION {
 public:

@@ -216,8 +216,9 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
       unreachable();
       trace1("huh", t->name());
       E.push_back(t->clone());
-    }else if(is_xs_function(n, scope)) {
-      trace0("resolve XS");
+    }else if(!E.is_empty() && dynamic_cast<Token_PARLIST*>(E.back())
+	  && is_xs_function(n, scope)) {
+      trace1("resolve XS", dynamic_cast<Token_PARLIST*>(E.back()));
       Deps* td = depstack.top();
       Token_PROBE* t = resolve_xs_function(E, n, *td, scope);
       E.push_back(t);

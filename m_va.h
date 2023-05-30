@@ -218,6 +218,24 @@ T sin(T& d)
 }
 
 template<class T>
+T log10(T& d)
+{
+	incomplete();
+	// chain(d, std::cos(d));
+	d.value() = std::log10(d);
+	return d;
+}
+
+template<class T>
+T ln(T& d)
+{
+	incomplete();
+	// chain(d, std::cos(d));
+	d.value() = std::log(d);
+	return d;
+}
+
+template<class T>
 T tanh(T& d)
 {
 	incomplete();
@@ -233,6 +251,13 @@ T sqrt(T& d)
 	// chain(d, std::cos(d));
 	d.value() = std::sqrt(d);
 	return d;
+}
+
+template<class T, class S=T>
+T white_noise(T, S=0.)
+{
+	//incomplete();
+	return T(0.);
 }
 
 template<class T, class S=T>

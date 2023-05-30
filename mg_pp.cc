@@ -156,7 +156,10 @@ void Define::parse(CS& f)
     }else if (f >> "/*") /* C comment */ {
       f >> dummy_c_comment; //BUG// line count may be wrong
       _value += f.get_to("/\n");
-    }else{ untested();
+    }else{
+      trace3("defparse", _name, _value, f.tail());
+      _value += "/";
+      f.skip();
       _value += f.get_to("/\n");
     }
   }
@@ -193,11 +196,13 @@ void Define::preprocess(Define_List const& d)
       if (x != d.end()) {
 	assert(*x);
 	trace1("def prep sub", file.tail());
-	stripped_file += (*x)->substitute(file) + "\n";
+	std::string subst = (*x)->substitute(file);
+	trace1("def prep sub", subst);
+	stripped_file += subst + "\n";
       }else{ untested();untested();
 	// error: not defined
       }
-    }else if (file.skip1('/')) { untested();
+    }else if (file.skip1('/')) {
       stripped_file += "/";
     }else{
       // move on, just copy
@@ -209,7 +214,7 @@ void Define::preprocess(Define_List const& d)
     }else if (file.stuck(&here)) { untested();
       // comment ran to end of file
       break;
-    }else{ untested();
+    }else{
     }
   }
   _value = stripped_file;
@@ -249,6 +254,7 @@ std::string Define::substitute(CS& f) const
   }
   CS file(CS::_STRING, _value.to_string());
   std::string stripped_file = "";
+  std::string sep = "";
 
   for (;;) {
     trace1("loop", file.tail());
@@ -264,7 +270,7 @@ std::string Define::substitute(CS& f) const
       auto it = _args.find(file);
       if(it != _args.end()){
 	auto k = values.begin();
-	for(; it != _args.begin(); --it){ untested();
+	for(; it != _args.begin(); --it){
 	  ++k;
 	}
 	more = (*k)->to_string();
@@ -274,7 +280,8 @@ std::string Define::substitute(CS& f) const
     }
 
 //    trace2("loop grow", stripped_file, more);
-    stripped_file = stripped_file + " " + more;
+    stripped_file = stripped_file + sep + more;
+    sep = " ";
 
     if (!file.ns_more()) {
       break;
@@ -377,7 +384,9 @@ void Preprocessor::parse(CS& file)
       if (x != define_list().end()) {
 	trace1("match macro", file.tail());
 	assert(*x);
-	_stripped_file += (*x)->substitute(file) + " ";
+	std::string subst = (*x)->substitute(file);
+	trace1("match macro", subst);
+	_stripped_file += subst + " ";
       }else{ untested();
 	throw Exception_CS("undefined macro ", file);
       }

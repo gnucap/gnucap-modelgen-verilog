@@ -30,7 +30,6 @@ static MGVAMS_FUNCTION const* lookup_function(std::string const& n, int& arity)
 {
   FUNCTION const* f = function_dispatcher[n];
   if (n == "exp"
-   || n == "log"
    || n == "cos"
    || n == "sin") {
     arity = 1;
@@ -111,7 +110,7 @@ public:
     assert(!_args.empty());
     _args.pop();
   }
-  std::string code_name() const{ untested();
+  std::string code_name() const{
     if(_types.top() == t_flt){
       return "t" + std::to_string(_flt_idx);
     }else{
@@ -152,7 +151,7 @@ void make_cc_expression(std::ostream& o, Expression const& e)
       s.new_float(o);
       o << ind << s.code_name() << " = pc->_p_" << (*i)->name() << ";\n";
     }else if (dynamic_cast<const Token_CONSTANT*>(*i)) {
-      if(dynamic_cast<Float const*>((*i)->data())){ untested();
+      if(dynamic_cast<Float const*>((*i)->data())){
 	s.new_float(o);
       }else{ untested();
 	s.new_string(o);
@@ -164,23 +163,27 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 
       o__ s.code_name() << " = "<<sign<<" p->" << (*pp)->code_name() << ";// "<< pp->name() <<"\n";
       o__ s.code_name() << "[d" << (*pp)->code_name() << "] = " << sign << "1.;\n";
-    }else if(dynamic_cast<const Token_SYMBOL*>(*i)) {
+    }else if(/*parlist && ??*/dynamic_cast<const Token_SYMBOL*>(*i)) {
+      // incomplete(); // TODO
       assert(s.have_args());
       int arity=0;
       MGVAMS_FUNCTION const* f = lookup_function((*i)->name(), arity);
       if(s.num_args() == 1) {
-	assert(arity==1);
-	o << ind << s.code_name() << " = va::" << (*i)->name();
+// 	assert(arity==1); $vt
+	if(f && f->code_name()!=""){
+	  o << ind << s.code_name() << " = " << f->code_name();
+	}else{
+	  o << ind << s.code_name() << " = va::" << (*i)->name();
+	}
 	o << "(" << s.code_name() << ");\n";
-      }else if(arity == 2){
-	assert(s.num_args() == 2);
+      }else if(s.num_args() == 2){
 	std::string idy = s.code_name();
 	s.pop();
 	o << ind << s.code_name() << " = va::" << (*i)->name();
 	o << "(" << s.code_name() << ", " << idy << ");\n";
       }else if(f && !s.num_args()) {
 	s.new_float(o);
-	o << ind << s.code_name() << " = " << f->code_name() << ";\n";
+	o << ind << s.code_name() << " = " << f->code_name() << "();\n";
       }else if(s.num_args() == 3) {
 	std::string idz = s.code_name();
 	s.pop();

@@ -1,13 +1,21 @@
 tanh: already installed, replacing
 stashing as tanh:0
+sinh: already installed, replacing
+stashing as sinh:0
 pow: already installed, replacing
 stashing as pow:0
 abs: already installed, replacing
 stashing as abs:0
 sqrt: already installed, replacing
 stashing as sqrt:0
+min: already installed, replacing
+stashing as min:0
+max: already installed, replacing
+stashing as max:0
 exp: already installed, replacing
 stashing as exp:0
+log: already installed, replacing
+stashing as log:0
 resistor #(.r(1)) r1 (.p(2),.n(1));
 test_dio3 #() dut (.p(1),.n(0));
 vsource #() v1 (.p(2),.n(0));

@@ -1,0 +1,21 @@
+
+`define A module x(1,2) \
+inout 1,2; \
+endmodule
+
+`A
+
+`define B(p, n) I(p,n) <+ V(p,n)
+`define C(X, Y) X = Y; \
+Y = 3 \
+// test
+`define D(A,B) T1 = A/B;
+
+module t(1,2);
+	analog begin
+		`B(1,2);
+		`C(x, y);
+		`D(a, b)
+	end
+endmodule
+

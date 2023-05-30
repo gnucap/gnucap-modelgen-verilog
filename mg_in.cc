@@ -162,6 +162,7 @@ void String_Arg::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 void Raw_String_Arg::parse(CS& f)
 {
+//  f.skipbl();
   assert(_s=="");
   bool quote = false;
   while(f.ns_more()) {

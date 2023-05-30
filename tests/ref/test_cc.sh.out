@@ -296,6 +296,17 @@ private: // strictly internal
   static int _count;
 public: // input parameters
   PARAMETER<real> _p_r /*  */;
+private: // tmp hack
+double temp_hack() const{ untested();
+  return P_CELSIUS0 + _sim->_temp_c;
+}
+double vt_hack() const{ untested();
+  return P_K * temp_hack() / P_Q;
+}
+double vt_hack(double T) const{ untested();
+  assert(T>=-P_CELSIUS0);
+  return P_K * temp_hack() / P_Q;
+}
 };
 /*--------------------------------------------------------------------------*/
 class MOD_resistor : public BASE_SUBCKT {

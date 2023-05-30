@@ -228,6 +228,18 @@ static void make_common(std::ostream& o, const Module& m)
 //       ++p) {
 //    out << "  COMMON_COMPONENT* _" << (**p).name() << ";\n";
 //  }
+  o << "private: // tmp hack\n";
+  o__ "double temp_hack()const {\n";
+  o____ "return P_CELSIUS0 + _sim->_temp_c;\n";
+  o__ "}\n";
+  o__ "double vt_hack()const {\n";
+  o____ "return P_K * temp_hack() / P_Q;\n";
+  o__ "}\n";
+  o__ "double vt_hack(double T)const {\n";
+  o____ "assert(T>=-P_CELSIUS0);\n";
+  o____ "return P_K * temp_hack() / P_Q;\n";
+  o__ "}\n";
+
   o << "};\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
