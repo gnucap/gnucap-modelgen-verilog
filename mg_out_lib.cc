@@ -79,11 +79,12 @@ void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2& p)
     indent i2;
     make_cc_expression(o, p.default_val().expression());
   }else{
-    o << "NA\n";
+    o << "NA;";
   }
-  o << ";\n";
+//  o << ";\n";
+  o____ p.type() << " def = t0.value();\n";
   o____ "e_val(&(this->" << p.code_name() << "), ";
-  o____ "t0.value() , par_scope);\n";
+  o____ "def , par_scope);\n";
   o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/

@@ -29,6 +29,7 @@
 namespace{
 
 typedef double real;
+typedef int integer;
 // double inf = std::numeric_limits<double>::infinity();
 #define inf std::numeric_limits<double>::infinity()
 
@@ -45,6 +46,7 @@ public:
 	double const& operator[](int i) const{return _data[i+1];}
 	double& operator[](int i){return _data[i+1];}
 	operator double&() { return *_data; }
+//	operator integer() const { return *_data; }
 	ddouble_& operator=(const double& o) {
 		assert(o == o);
 		*_data = o;
@@ -52,13 +54,29 @@ public:
 		return *this;
 	}
 	bool operator==(const ddouble_& o)const {
+#if 0 // really?
 		for(int i=0; i<=numderiv; ++i){
 			if(_data[i] != o._data[i]){
 				return false;
 			}else{
 			}
 		}
+#else
+		return *_data == *o._data;
+#endif
 		return true;
+	}
+	bool operator<(const ddouble_& o)const {
+		return *_data < *o._data;
+	}
+	bool operator<=(const ddouble_& o)const { untested();
+		return *_data <= *o._data;
+	}
+	bool operator>(const ddouble_& o)const {
+		return *_data > *o._data;
+	}
+	bool operator>=(const ddouble_& o)const { untested();
+		return *_data >= *o._data;
 	}
 	ddouble_& operator+=(const ddouble_& o) {
 		for(int i=0; i<=numderiv; ++i){
@@ -148,6 +166,23 @@ T exp(T& d)
 }
 
 template<class T>
+T limexp(T& d)
+{ untested();
+	return exp(d);
+}
+
+template<class T>
+T abs(T& d)
+{
+	if(d>=0){ untested();
+		chain(d, 1.);
+	}else{ untested();
+		chain(d, -1.);
+	}
+	d.value() = std::abs(d);
+}
+
+template<class T>
 T pow(T& b, T& e)
 {
 	assert(b==b);
@@ -191,6 +226,21 @@ T tanh(T& d)
 	return d;
 }
 
+template<class T>
+T sqrt(T& d)
+{
+	incomplete();
+	// chain(d, std::cos(d));
+	d.value() = std::sqrt(d);
+	return d;
+}
+
+template<class T, class S=T>
+T flicker_noise(T, T, S=0.)
+{
+	//incomplete();
+	return T(0.);
+}
 
 } // va
 #endif

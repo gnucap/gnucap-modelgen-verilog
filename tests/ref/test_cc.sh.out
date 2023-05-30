@@ -447,8 +447,8 @@ void COMMON_resistor::precalc_first(const CARD_LIST* par_scope)
   {
     ddouble t0;
     t0 = 1.;
-;
-    e_val(&(this->_p_r),     t0.value() , par_scope);
+    real def = t0.value();
+    e_val(&(this->_p_r),     def , par_scope);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -461,8 +461,8 @@ void COMMON_resistor::precalc_last(const CARD_LIST* par_scope)
   {
     ddouble t0;
     t0 = 1.;
-;
-    e_val(&(this->_p_r),     t0.value() , par_scope);
+    real def = t0.value();
+    e_val(&(this->_p_r),     def , par_scope);
   }
 }
 /*--------------------------------------------------------------------------*/

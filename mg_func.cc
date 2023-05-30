@@ -40,7 +40,6 @@ class DUMMY1 : public MGVAMS_FUNCTION {
 DISPATCHER<FUNCTION>::INSTALL d_tanh(&function_dispatcher, "tanh", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_pow(&function_dispatcher, "pow", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_abs(&function_dispatcher, "abs", &dummy1);
-DISPATCHER<FUNCTION>::INSTALL d_vt(&function_dispatcher, "$vt", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_sqrt(&function_dispatcher, "sqrt|$sqrt", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_limexp(&function_dispatcher, "limexp|$limexp", &dummy1);
 /*--------------------------------------------------------------------------*/
@@ -56,6 +55,19 @@ class TEMPERATURE : public MGVAMS_FUNCTION {
   }
 } temperature;
 DISPATCHER<FUNCTION>::INSTALL d1(&function_dispatcher, "$temperature", &temperature);
+/*--------------------------------------------------------------------------*/
+class VT : public MGVAMS_FUNCTION {
+  std::string eval(CS&, const CARD_LIST*)const override{
+	  return "$$vt";
+  }
+  int arity()const override {
+	  return 0;
+  }
+  std::string code_name()const override{
+	  return "vt";
+  }
+} vt;
+DISPATCHER<FUNCTION>::INSTALL d_vt(&function_dispatcher, "$vt", &vt);
 /*--------------------------------------------------------------------------*/
 class exp : public FUNCTION {
 public:
@@ -100,3 +112,5 @@ DISPATCHER<FUNCTION>::INSTALL d_white_noise(&function_dispatcher, "white_noise",
 DISPATCHER<FUNCTION>::INSTALL d_flicker_noise(&function_dispatcher, "flicker_noise", &dummyfilter);
 
 }
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/

@@ -41,106 +41,165 @@ static MGVAMS_FUNCTION const* lookup_function(std::string const& n, int& arity)
   }else if(auto g=dynamic_cast<MGVAMS_FUNCTION const*>(f)) {
     arity = g->arity();
     return g;
-  }else{
+  }else{ untested();
     return 0;
   }
 
 }
 /*--------------------------------------------------------------------------*/
+class RPN_VARS {
+  typedef enum{
+    t_flt,
+    // t_int,
+    t_str
+  } type;
+  std::stack<type> _types;
+  std::stack<int> _args;
+  int _idx_alloc{0};
+
+  int _flt_idx{-1};
+  int _flt_alloc{0};
+  int _str_idx{-1};
+  int _str_alloc{0};
+public:
+  ~RPN_VARS(){
+    assert(_flt_idx == -1);
+    assert(_str_idx == -1);
+  }
+  void pop() {
+    assert(!_types.empty());
+    if(_types.top()==t_flt){
+      assert(_flt_idx>-1);
+      --_flt_idx;
+    }else{
+      assert(_str_idx>-1);
+      --_str_idx;
+    }
+    _types.pop();
+  }
+  void new_string(std::ostream& o){
+    ++_str_idx;
+    if(_str_idx < _str_alloc){
+    }else{
+      assert(_str_idx==_str_alloc);
+      ++_str_alloc;
+      o << ind << "std::string s" << _str_idx << ";\n";
+    }
+    _types.push(t_str);
+  }
+  void new_float(std::ostream& o){
+    ++_flt_idx;
+    if(_flt_idx < _flt_alloc){
+    }else{
+      assert(_flt_idx==_flt_alloc);
+      ++_flt_alloc;
+      o << ind << "ddouble t" << _flt_idx << ";\n";
+    }
+    _types.push(t_flt);
+  }
+  void stop(){
+    _args.push(int(_types.size())-1);
+  }
+  bool have_args()const{
+    return !_args.empty();
+  }
+  int num_args() const{
+    assert(!_args.empty());
+    return int(_types.size()) - 1 - _args.top();
+  }
+  void args_pop(){
+    assert(!_args.empty());
+    _args.pop();
+  }
+  std::string code_name() const{ untested();
+    if(_types.top() == t_flt){
+      return "t" + std::to_string(_flt_idx);
+    }else{
+      return "s" + std::to_string(_str_idx);
+    }
+  }
+};
+/*--------------------------------------------------------------------------*/
 void make_cc_expression(std::ostream& o, Expression const& e)
 {
   typedef Expression::const_iterator const_iterator;
 
+  RPN_VARS s;
   // The _list is the expression in RPN.
   // print a program that computes the function and the derivatives.
-  std::stack<int> idxs;
-  std::stack<int> args;
-  int idx = -1;
-  int idx_alloc = 0;
   for (const_iterator i = e.begin(); i != e.end(); ++i) {
-    if (dynamic_cast<const Token_VAR_REF*>(*i)
-      ||dynamic_cast<const Token_PAR_REF*>(*i)
-      ||dynamic_cast<const Token_CONSTANT*>(*i)
-      ||dynamic_cast<const Token_PROBE*>(*i)
-      ) {
-      idxs.push(++idx);
-      if(idx<idx_alloc) {
-	// re-use temporary variable
-      }else{
-	assert(idx==idx_alloc);
-	++idx_alloc;
-	o << ind << "ddouble t" << idx << ";\n";
-      }
-    }else{
-    }
 
     if (auto var = dynamic_cast<const Token_VAR_REF*>(*i)) {
-		  // code_name?
-		  //
+      s.new_float(o);
+
       std::string prefix;
       if((*var)->is_module_variable()){
 	prefix = "d->_v_";
       }else{
 	prefix = "_v_";
       }
-      o__ "t" << idx << " = " << prefix << (*i)->name() << ".value();\n";
+      o__ s.code_name() << " = " << prefix << (*i)->name() << ".value();\n";
       for(auto v : (*var)->deps()) {
-	o__ "t" << idx << "[d" << v->code_name() << "] = " << prefix << (*i)->name() << "[d" << v->code_name() << "];\n";
+	o__ s.code_name() << "[d" << v->code_name() << "] = " << prefix << (*i)->name() << "[d" << v->code_name() << "];\n";
       }
     }else if (auto f = dynamic_cast<const Token_FILTER*>(*i)) {
-      o__ "t" << idx << " = " << (*f)->code_name() << "(t" << idx << ", d);\n";
+      o__ s.code_name() << " = " << (*f)->code_name() << "(" << s.code_name() << ", d);\n";
       for(auto v : (*f)->deps()) {
 	o__ "// dep :" << v->code_name() << "\n";
-//	o__ "t" << idx << "[d" << v->code_name() << "] = _v_" << (*i)->name() << "[d" << v->code_name() << "];\n";
+//	o__ s.code_name() << "[d" << v->code_name() << "] = _v_" << (*i)->name() << "[d" << v->code_name() << "];\n";
       }
     }else if (dynamic_cast<const Token_PAR_REF*>(*i)) {
-      o << ind << "t" << idx << " = pc->_p_" << (*i)->name() << ";\n";
+      s.new_float(o);
+      o << ind << s.code_name() << " = pc->_p_" << (*i)->name() << ";\n";
     }else if (dynamic_cast<const Token_CONSTANT*>(*i)) {
-      o << ind << "t" << idx << " = " << (*i)->name() << ";\n";
+      if(dynamic_cast<Float const*>((*i)->data())){ untested();
+	s.new_float(o);
+      }else{ untested();
+	s.new_string(o);
+      }
+      o << ind << s.code_name() << " = " << (*i)->name() << ";\n";
     }else if(auto pp = dynamic_cast<const Token_PROBE*>(*i)) {
+      s.new_float(o);
       char sign = (*pp)->is_reversed()?'-':'+';
 
-      o__ "t" << idx << " = "<<sign<<" p->" << (*pp)->code_name() << ";// "<< pp->name() <<"\n";
-      o__ "t" << idx << "[d" << (*pp)->code_name() << "] = " << sign << "1.;\n";
+      o__ s.code_name() << " = "<<sign<<" p->" << (*pp)->code_name() << ";// "<< pp->name() <<"\n";
+      o__ s.code_name() << "[d" << (*pp)->code_name() << "] = " << sign << "1.;\n";
     }else if(dynamic_cast<const Token_SYMBOL*>(*i)) {
-      assert(args.size());
+      assert(s.have_args());
       int arity=0;
       MGVAMS_FUNCTION const* f = lookup_function((*i)->name(), arity);
-      if(args.top()+1 == idx){
+      if(s.num_args() == 1) {
 	assert(arity==1);
-	o << ind << "t" << idx << " = va::" << (*i)->name();
-	o << "(t" << idx << ");\n";
+	o << ind << s.code_name() << " = va::" << (*i)->name();
+	o << "(" << s.code_name() << ");\n";
       }else if(arity == 2){
-	assert(args.top()+2 == idx);
-	int idy = idx;
-	idxs.pop();
-	idx = idxs.top();
-	o << ind << "t" << idx << " = va::" << (*i)->name();
+	assert(s.num_args() == 2);
+	std::string idy = s.code_name();
+	s.pop();
+	o << ind << s.code_name() << " = va::" << (*i)->name();
+	o << "(" << s.code_name() << ", " << idy << ");\n";
+      }else if(f && !s.num_args()) {
+	s.new_float(o);
+	o << ind << s.code_name() << " = " << f->code_name() << ";\n";
+      }else if(s.num_args() == 3) {
+	std::string idz = s.code_name();
+	s.pop();
+	std::string idy = s.code_name();
+	s.pop();
+	o << ind << s.code_name() << " = va::" << (*i)->name();
+	o << "(" << s.code_name() << ", " << idy << ", " << idz << ");\n";
 
-	o << "(t" << idx << ", t" << idy << ");\n";
-      }else if(f && args.top() == idx){
-	idxs.push(++idx);
-	if(idx<idx_alloc) {
-	  // re-use temporary variable
-	}else{
-	  assert(idx==idx_alloc);
-	  ++idx_alloc;
-	  o << ind << "ddouble t" << idx << ";\n";
-	}
-	o << ind << "t" << idx << " = " << f->code_name() << ";\n";
       }else{ untested();
 	unreachable();
-	std::cerr << "run time error in make_cc_expression: " << (*i)->name() << ": " << idx-args.top() << "\n";
+	std::cerr << "run time error in make_cc_expression: " << (*i)->name() << ": " << s.num_args() << "\n";
       }
-      args.pop();
+      s.args_pop();
     }else if (dynamic_cast<const Token_PARLIST*>(*i)) {
     }else if (dynamic_cast<const Token_STOP*>(*i)) {
-      args.push(idx);
+      s.stop();
     }else if (dynamic_cast<const Token_BINOP*>(*i)) {
-      int idy = idxs.top();
-      assert( idy == idx );
-      idxs.pop();
-      idx = idxs.top();
+      std::string idy = s.code_name();
+      s.pop();
       assert((*i)->name().size());
 
       auto op = (*i)->name()[0];
@@ -148,12 +207,12 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 	|| op == '+'
 	|| op == '*'
 	|| op == '/') {
-	o__ "t" << idx << " "<< op << "= t" << idy << ";\n";
+	o__ s.code_name() << " "<< op << "= " << idy << ";\n";
       }else if( op == '>'
 	     || op == '<'
 	     || op == '=' ) {
-	o__ "t" << idx << " = t" << idx << " " << op << " t" << idy << ";\n";
-      }else{
+	o__ s.code_name() << " = " << s.code_name() << " " << (*i)->name() << " " << idy << ";\n";
+      }else{ untested();
 	std::cerr << "run time error in make_cc_expression: " << (*i)->name() << "\n";
 	incomplete();
 	unreachable();
@@ -161,24 +220,24 @@ void make_cc_expression(std::ostream& o, Expression const& e)
     }else if (dynamic_cast<const Token_UNARY*>(*i)) {
       auto op = (*i)->name()[0];
       if(op == '-') {
-	o__ "t" << idx << " *= -1.;\n";
+	o__ s.code_name() << " *= -1.;\n";
       }else{ untested();
 	incomplete();
 	unreachable();
       }
-    }else if (auto t = dynamic_cast<const Token_TERNARY*>(*i)) {
+    }else if (auto t = dynamic_cast<const Token_TERNARY*>(*i)) { untested();
       o__ "{\n";
-      {
+      { untested();
 	indent y;
-	o__ "ddouble& tt0 = t0;\n";
-	o__ "if(t" << idx << "){\n";
-	{
+	o__ "ddouble& tt0 = t0;\n"; // BUG: float??
+	o__ "if(" << s.code_name() << "){\n";
+	{ untested();
 	  indent x;
 	  make_cc_expression(o, *t->true_part());
 	  o__ "tt0 = t0;\n";
 	}
 	o__ "}else{\n";
-	{
+	{ untested();
 	  indent x;
 	  make_cc_expression(o, *t->false_part());
 	  o__ "tt0 = t0;\n";
@@ -186,13 +245,13 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 	o__ "}\n";
       }
       o__ "}\n";
-    }else{
+    }else{ untested();
       incomplete();
       unreachable();
       assert(false);
     }
   }
-  assert(!idx);
+  s.pop();
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
