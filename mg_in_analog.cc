@@ -288,7 +288,10 @@ void AnalogConditionalStmt::dump(std::ostream& o)const
 void AnalogConstruct::parse(CS& file)
 {
   _stmt = parse_analog_stmt(file, owner());
-  assert(_stmt); // throw?
+  if(!_stmt){
+    throw Exception_CS("bad analog construct", file);
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void AnalogSeqBlock::parse(CS& file)

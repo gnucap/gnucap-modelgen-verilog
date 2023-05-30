@@ -1,0 +1,2 @@
+module
+ x ( 1 2 )     inout 1 2 ;     endmodule 

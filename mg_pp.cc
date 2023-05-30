@@ -169,18 +169,16 @@ void Define::parse(CS& f)
   trace3("defparse", _name, _value, f.tail());
 }
 /*--------------------------------------------------------------------------*/
-void Define::preprocess(Define_List const& d)
+static String_Arg_List eval_args(CS& f, size_t howmany, Define_List const&);
+/*--------------------------------------------------------------------------*/
+std::string expand_macros(CS& file, Define_List const& d)
 {
-  CS file(CS::_STRING, _value.to_string());
-  trace1("Define::preprocess", _value.to_string());
   std::string stripped_file;
   size_t here = file.cursor();
-  // int if_block = 0;
-  // int else_block = 0;
   for (;;) {
     stripped_file += file.get_to("\"/`");
     trace1("def prep got to", file.tail());
-    if (file.match1('\"')) { untested();
+    if (file.match1('\"')) {
       // quoted string
       stripped_file += '"' + file.ctos("", "\"", "\"", "") + '"';
     }else if (file >> "`else"
@@ -196,7 +194,8 @@ void Define::preprocess(Define_List const& d)
       if (x != d.end()) {
 	assert(*x);
 	trace1("def prep sub", file.tail());
-	std::string subst = (*x)->substitute(file);
+	auto values = eval_args(file, (*x)->num_args(), d);
+	std::string subst = (*x)->substitute(values);
 	trace1("def prep sub", subst);
 	stripped_file += subst + "\n";
       }else{ untested();untested();
@@ -217,7 +216,43 @@ void Define::preprocess(Define_List const& d)
     }else{
     }
   }
-  _value = stripped_file;
+  return stripped_file;
+}
+/*--------------------------------------------------------------------------*/
+// Define::?
+static String_Arg_List eval_args(CS& f, size_t howmany, Define_List const& d)
+{
+  trace2("eval_args", f.tail(), howmany);
+  Raw_String_Arg_List values;
+  if(!howmany) {
+  }else if(f.match1('(')){
+    values.parse_n(f, howmany);
+    trace1("parsed n", values.size());
+    if(values.size() == howmany){
+    }else{
+      throw Exception_CS("Need more values", f);
+    }
+  }else{ untested();
+  }
+
+  String_Arg_List ret;
+
+  for(auto i : values){
+    CS file(CS::_STRING, i->to_string());
+    std::string value = expand_macros(file, d);
+    trace2("evalarg", i->to_string(), value);
+    ret.push_back(new String_Arg(value));
+  }
+
+  return ret;
+}
+/*--------------------------------------------------------------------------*/
+// expand macros in rhs
+void Define::preprocess(Define_List const& d)
+{
+  CS file(CS::_STRING, _value.to_string());
+  trace1("Define::preprocess", _value.to_string());
+  _value = expand_macros(file, d);
 }
 /*--------------------------------------------------------------------------*/
 void Define::dump(std::ostream& f)const
@@ -230,23 +265,26 @@ void Define::dump(std::ostream& f)const
   f << " " << value() << "\n";
 }
 /*--------------------------------------------------------------------------*/
-std::string Define::substitute(CS& f) const
+std::string Define::substitute(String_Arg_List const& values) const
 {
-  trace2("subs", f.tail(), _args.size());
-  Raw_String_Arg_List values;
-  if(_args.size() == 0) {
-  }else if(f.match1('(')){
-    values.parse_n(f, int(_args.size()));
-    trace1("parsed n", values.size());
-  }else{ untested();
-  }
+//  trace2("subs", f.tail(), _args.size());
+//  Raw_String_Arg_List values;
+//  if(_args.size() == 0) {
+//  }else if(f.match1('(')){
+//    values.parse_n(f, int(_args.size()));
+//    trace1("parsed n", values.size());
+//  }else{ untested();
+//  }
+
+  // TODO: values may contain backticks??
 
   std::map<std::string, String_Arg*> subs;
   auto j = values.begin();
   for(auto i : _args){
     if(j == values.end()){
       // BUG: positioning seems wrong
-      throw Exception_CS("Need more values", f);
+      unreachable();
+      // throw Exception_CS("Need more values", f);
     }else{
       subs[i->to_string()] = *j;
       ++j;
@@ -384,7 +422,8 @@ void Preprocessor::parse(CS& file)
       if (x != define_list().end()) {
 	trace1("match macro", file.tail());
 	assert(*x);
-	std::string subst = (*x)->substitute(file);
+	auto values = eval_args(file, (*x)->num_args(), define_list());
+	std::string subst = (*x)->substitute(values);
 	trace1("match macro", subst);
 	_stripped_file += subst + " ";
       }else{ untested();

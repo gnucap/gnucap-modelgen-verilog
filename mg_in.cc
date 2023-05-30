@@ -162,7 +162,8 @@ void String_Arg::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 void Raw_String_Arg::parse(CS& f)
 {
-//  f.skipbl();
+  trace1("RSA in", f.tail().substr(0,10));
+  int par = 0;
   assert(_s=="");
   bool quote = false;
   while(f.ns_more()) {
@@ -174,11 +175,21 @@ void Raw_String_Arg::parse(CS& f)
     }else if(quote) {
       _s += p;
       f.skip();
+    }else if(p == '(') {
+      ++par;
+      _s += p;
+      f.skip();
     }else if(p == ',') {
       f.skip();
       break;
     }else if(p == ')') {
-      break;
+      if(!par){
+	break;
+      }else{ untested();
+	--par;
+	_s += p;
+	f.skip();
+      }
     }else {
       _s += p;
       f.skip();

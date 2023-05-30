@@ -13,5 +13,6 @@
 ============
 * separate out preprocessor
 * bugfix `define vs. comment
+* macro substitution fixes
 * support ternary operator
 * generate is_valid (overloading)

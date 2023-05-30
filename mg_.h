@@ -95,6 +95,7 @@ public:
   String_Arg() {}
   String_Arg(const char* s) : _s(s) {}
   explicit String_Arg(std::string const& s) : _s(s) {}
+  String_Arg(String_Arg const& o) : Base(), _s(o._s) {untested();} // needed?
   //String_Arg(const std::string& s) : _s(s) {}
   const String_Arg&  key()const	  {return *this;}
   void parse(CS& f)override;
@@ -232,12 +233,12 @@ public:
     parse_n(file);
   }
 // protected:??
-  void parse_n(CS& file, unsigned max=-1u) {
+  void parse_n(CS& file, size_t max=-1ul) {
     parse_n_<T>(file, max);
   }
 protected:
   template<class TT>
-  void parse_n_(CS& file, unsigned max=-1u) {
+  void parse_n_(CS& file, size_t max=-1ul) {
     int paren = !BEGIN || file.skip1b(BEGIN);
     size_t here = file.cursor();
     for (;;) {
@@ -261,7 +262,7 @@ protected:
 	  file.warn(0, "not valid here");
 	  break;
 	}else if (max==size()){
-	  throw Exception_Too_Many(int(size()+1), max, 0);
+	  throw Exception_Too_Many(int(size()+1), int(max), 0);
 	}else{
 	  push_back(p);
 	}
@@ -1301,8 +1302,9 @@ public:
   const String_Arg&  name()const  {return _name;}
   const String_Arg&  value()const {return _value;}
 
-  std::string substitute(CS& f) const;
+  std::string substitute(String_Arg_List const&) const;
   void preprocess(Collection<Define> const&);
+  size_t num_args()const { return _args.size(); }
 };
 typedef Collection<Define> Define_List;
 /*--------------------------------------------------------------------------*/

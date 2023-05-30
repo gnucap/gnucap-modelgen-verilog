@@ -1,6 +1,9 @@
 // constants for use in verilog-ams
 // essentially a copy of gnucap/include/constants.h (GPLv3+)
 
+// standard mathematical constants
+`define M_PI 3.1415926535897932384626433832795028841972
+
 // standard physical constants ref:  http://physics.nist.gov
 // `define P_Q	1.6021918e-19   // charge of an electron, (spice)
 `define P_Q	1.60217653e-19     // charge of an electron, (nist)

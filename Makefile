@@ -45,7 +45,9 @@ CXXFLAGS = -Wall -std=c++11
 %.so: %.o
 	${CXX} -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $(OBJS) $< ${LIBS_} -o $@
 
-all: all-recursive ${TARGET} ${MODULES}
+all: all-recursive all-local
+
+all-local: ${TARGET} ${MODULES}
 
 all-recursive: ${TARGET}
 	${MAKE} -C vams GNUCAP_CONF=${GNUCAP_CONF}
@@ -96,4 +98,4 @@ install-here: ${TARGET}
 	install $(MODULES) $(DESTDIR)$(GNUCAP_PKGLIBDIR)/vams
 
 RECURSIVE_TARGETS = all-recursive clean-recursive install-recursive
-.PHONY: clean depend ${RECURSIVE_TARGETS} install install-here
+.PHONY: clean depend ${RECURSIVE_TARGETS} install install-here all-local
