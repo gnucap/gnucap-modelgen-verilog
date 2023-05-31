@@ -1,0 +1,32 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module polarity3_0(p, n);
+	electrical p, n;
+	inout p, n;
+	real VV;
+	analog begin
+		VV = 2.0 * V(n, p);
+		real i;
+		i = V(p,n);
+		I(p,n) <+ i;
+	end
+endmodule
+
+list
+
+!make polarity3_0.so > /dev/null
+attach ./polarity3_0.so
+
+polarity3_0 dut(1,0);
+vsource v1(1, 0);
+
+list
+
+print dc v(v1) i(v1) r(dut.*) iter(0)
+
+dc v1 0 2 1

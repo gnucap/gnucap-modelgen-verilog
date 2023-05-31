@@ -723,7 +723,7 @@ Base const* Block::resolve(std::string const& k) const{
   }
 }
 /*--------------------------------------------------------------------------*/
-AnalogConditionalExpression::~AnalogConditionalExpression()
+AnalogConstExpression::~AnalogConstExpression()
 {
   delete _exp;
   _exp = NULL;

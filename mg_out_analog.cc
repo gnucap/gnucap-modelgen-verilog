@@ -55,15 +55,13 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
     make_cc_expression(o, e);
     std::string prefix;
     if(a.is_module_variable()){
-      prefix = "/*m*/ d->_v_";
+      prefix = "d->_v_";
     }else{
       prefix = "_v_";
     }
     o__ prefix << a.lhsname() << ".value() = t0.value();\n";
     for(auto v : a.deps()) {
-      if(v->is_reversed()){ untested();
-	o__ "// reversed??\n";
-	unreachable(); // ?
+      if(v->is_reversed()){
       }else{
       }
       o__ prefix << a.lhsname() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "];\n";
@@ -129,8 +127,8 @@ void make_cc_filter(std::ostream& o, const Module& m)
       for(auto v : f->deps()) {
 	// char sign = f.reversed()?'-':'+';
 	o__ "// dep " << v->code_name() << "\n";
-	// if(f->branch() == v->branch()){
-	// }else{
+	// if(f->branch() == v->branch()){ untested();
+	// }else{ untested();
 	  o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
 	  o__ "// assert(!d->" << f->state() << "[" << k << "]);\n";
 	  o__ "d->" << f->state() << "[" << k << "]"
@@ -151,7 +149,7 @@ void make_cc_filter(std::ostream& o, const Module& m)
   }
 }
 /*--------------------------------------------------------------------------*/
-void AnalogConditionalExpression::dump(std::ostream& o)const
+void AnalogConstExpression::dump(std::ostream& o)const
 {
   assert(_exp);
   _exp->dump(o);
@@ -159,7 +157,9 @@ void AnalogConditionalExpression::dump(std::ostream& o)const
 }
 /*--------------------------------------------------------------------------*/
 static void make_cc_analog_cond(std::ostream& o, AnalogConditionalStmt const& s);
+static void make_cc_analog_switch(std::ostream& o, AnalogSwitchStmt const& s);
 static void make_cc_analog_seq(std::ostream& o, AnalogSeqBlock const& s);
+static void make_cc_analog_evt(std::ostream& o, AnalogEvtCtlStmt const& s);
 static void make_cc_analog_stmt(std::ostream& o, Base const& ab)
 {
   Base const* i = &ab;
@@ -173,14 +173,40 @@ static void make_cc_analog_stmt(std::ostream& o, Base const& ab)
     make_cc_assignment(o, *a);
   }else if(auto rl=dynamic_cast<ListOfBlockRealIdentifiers const*>(i)) {
     make_cc_block_real_identifier_list(o, *rl);
-  }else if(auto v=dynamic_cast<Variable const*>(i)) {
+  }else if(auto v=dynamic_cast<Variable const*>(i)) { untested();
     unreachable();
     make_cc_variable(o, *v);
   }else if(auto v=dynamic_cast<AnalogConditionalStmt const*>(i)) {
     make_cc_analog_cond(o, *v);
+  }else if(auto ss=dynamic_cast<AnalogSwitchStmt const*>(i)) {
+    make_cc_analog_switch(o, *ss);
+  }else if(auto ss=dynamic_cast<AnalogEvtCtlStmt const*>(i)) {
+    make_cc_analog_evt(o, *ss);
+    //throw Exception("analogevtctl unsupported");
   }else{ untested();
     incomplete();
+    assert(false);
   }
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_analog_evt(std::ostream& o, AnalogEvtCtlStmt const& s)
+{
+  o__ "{\n";
+  {
+    indent x;
+    make_cc_event_cond(o, s.cond());
+    o__ "if (evt) {\n";
+    if(s.stmt_or_null()) {
+      indent y;
+      make_cc_analog_stmt(o, *s.stmt_or_null());
+    }else{
+    }
+    o__ "}else{\n";
+    o__ "}\n";
+
+    o<<"\n";
+  }
+  o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
 static void make_cc_analog_cond(std::ostream& o, AnalogConditionalStmt const& s)
@@ -205,6 +231,60 @@ static void make_cc_analog_cond(std::ostream& o, AnalogConditionalStmt const& s)
 
     o<<"\n";
 
+  }
+  o__ "}\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_analog_switch(std::ostream& o, AnalogSwitchStmt const& s)
+{
+  // TODO: indent properly
+  o__ "{\n";
+  {
+    indent x;
+    o__ "double s;\n";
+    o__ "{\n";
+    {
+      indent y;
+      make_cc_expression(o, s.conditional().expression());
+      o__ "s = t0;\n";
+    }
+    o__ "}\n";
+    std::string paren="";
+
+    CaseGen const* def = NULL;
+    for(auto& i : s.cases()){
+      if(i->cond_or_null()){
+	o << "{\n";
+
+	make_cc_expression(o, i->cond_or_null()->expression());
+
+	o__ "if (t0 == s) {\n";
+
+	if(i->code_or_null()){
+	  indent y;
+	  make_cc_analog_stmt(o, *i->code_or_null());
+	}else{ untested();
+	}
+
+	o__ "}else";
+	paren += "}";
+
+      }else{
+	def = &*i;
+      }
+
+    }
+
+    o << "{\n";
+    if(!def){
+    }else if(def->code_or_null()){
+      indent y;
+      make_cc_analog_stmt(o, *def->code_or_null());
+    }else{ untested();
+    }
+    o<<paren;
+    o__ "\n";
+    o__ "}\n";
   }
   o__ "}\n";
 }

@@ -1,0 +1,31 @@
+
+
+module test(x, y);
+  analog begin
+    real A, LEVEL;
+    case (LEVEL)
+      1 :
+        begin
+          A = 1;
+        end
+      2 :
+        A = 2;
+      3 :
+        begin
+          A = 3;
+        end
+      4 :
+      default :
+    endcase
+    case (LEVEL)
+      1 :
+        A = 1;
+      2 :
+        A = 2;
+    endcase
+  end
+
+endmodule
+
+
+

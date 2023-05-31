@@ -180,6 +180,7 @@ T abs(T& d)
 		chain(d, -1.);
 	}
 	d.value() = std::abs(d);
+	return d;
 }
 
 template<class T>

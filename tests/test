@@ -3,7 +3,7 @@ GNUCAP=${GNUCAP-gnucap}
 if [ $# -eq 0 ] ; then
     echo "usage: ./test gnucap-verilog \"testcases\" targetdir refdir"
     echo "usual testcases is \"\", usual refdir is =="
-    echo "example: ./test gnucap-verilog \"\" myversion =="
+    echo "example: ./test gnucap-mg-vams \"\" myversion =="
     exit 1
 else
     \mkdir $3 2> /dev/null || echo re-using directory $3

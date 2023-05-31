@@ -32,7 +32,6 @@ class MGVAMS_FUNCTION : public FUNCTION {
 public:
   virtual int arity() const = 0;
   virtual std::string code_name() const{
-	  unreachable();
 	  return "";
   }
 };

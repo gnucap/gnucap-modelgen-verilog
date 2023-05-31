@@ -297,16 +297,16 @@ private: // strictly internal
 public: // input parameters
   PARAMETER<real> _p_r /*  */;
 private: // tmp hack
-double temp_hack() const{ untested();
-  return P_CELSIUS0 + _sim->_temp_c;
-}
-double vt_hack() const{ untested();
-  return P_K * temp_hack() / P_Q;
-}
-double vt_hack(double T) const{ untested();
-  assert(T>=-P_CELSIUS0);
-  return P_K * temp_hack() / P_Q;
-}
+  double temp_hack()const {
+    return P_CELSIUS0 + _sim->_temp_c;
+  }
+  double vt_hack()const {
+    return P_K * temp_hack() / P_Q;
+  }
+  double vt_hack(double T)const {
+    assert(T>=-P_CELSIUS0);
+    return P_K * temp_hack() / P_Q;
+  }
 };
 /*--------------------------------------------------------------------------*/
 class MOD_resistor : public BASE_SUBCKT {
@@ -458,7 +458,7 @@ void COMMON_resistor::precalc_first(const CARD_LIST* par_scope)
   {
     ddouble t0;
     t0 = 1.;
-    real def = t0.value();
+    real def = real(t0.value());
     e_val(&(this->_p_r),     def , par_scope);
   }
 }
@@ -472,7 +472,7 @@ void COMMON_resistor::precalc_last(const CARD_LIST* par_scope)
   {
     ddouble t0;
     t0 = 1.;
-    real def = t0.value();
+    real def = real(t0.value());
     e_val(&(this->_p_r),     def , par_scope);
   }
 }

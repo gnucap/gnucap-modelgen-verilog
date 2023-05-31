@@ -257,5 +257,22 @@ void make_cc_expression(std::ostream& o, Expression const& e)
   s.pop();
 }
 /*--------------------------------------------------------------------------*/
+void make_cc_event_cond(std::ostream& o, Expression const& e)
+{
+  typedef Expression::const_iterator const_iterator;
+  // TODO: var stack.
+  o__ "bool evt = false\n;";
+  o__ "{\n";
+  for (const_iterator i = e.begin(); i != e.end(); ++i) {
+    if((*i)->name()=="initial_step"){
+      o__ "evt = _sim->is_initial_step();\n";
+    }else{
+      incomplete();
+      o << "--> " << (*i)->name() << " <--\n";
+    }
+  }
+  o__ "}\n";
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

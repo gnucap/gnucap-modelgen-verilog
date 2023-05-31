@@ -876,10 +876,10 @@ public:
   SeqBlock const& block() const{ return _block; }
 };
 /*--------------------------------------------------------------------------*/
-class AnalogConditionalExpression : public Owned_Base /*expression?*/ {
+class AnalogConstExpression : public Owned_Base /*expression?*/ {
   Expression* _exp{NULL};
 public:
-  ~AnalogConditionalExpression();
+  ~AnalogConstExpression();
   void parse(CS& file) override;
   void dump(std::ostream& o)const override;
   Block* owner() {return Owned_Base::owner();}
@@ -887,10 +887,14 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class AnalogConditionalStmt : public AnalogStmt {
-  AnalogConditionalExpression _cond;
+  AnalogConstExpression _cond;
   Base* _true_part{NULL};
   Base* _false_part{NULL};
 public:
+  AnalogConditionalStmt(Block* o, CS& file) {
+    set_owner(o);
+    parse(file);
+  }
   ~AnalogConditionalStmt(){
     delete _true_part;
     _true_part = NULL;
@@ -902,11 +906,49 @@ public:
   void dump(std::ostream& o)const override;
   void set_owner(Block* o) {_cond.set_owner(o);}
   Block* owner() {return _cond.owner();}
-  AnalogConditionalExpression const& conditional() const{return _cond;}
+  AnalogConstExpression const& conditional() const{return _cond;}
   const Base* true_part_or_null() const{ return _true_part; }
   const Base* false_part_or_null() const{ return _false_part; }
   const Base& true_part() const{assert(_true_part); return *_true_part; }
   const Base& false_part() const{assert(_false_part); return *_false_part; }
+};
+/*--------------------------------------------------------------------------*/
+class CaseGen : public Base{
+  AnalogConstExpression* _cond{NULL};
+  Base* _code{NULL};
+public:
+  CaseGen() : Base(){ unreachable(); }
+  CaseGen(AnalogConstExpression* cond, Base* code) : Base(), _cond(cond), _code(code) {}
+  ~CaseGen(){
+    delete _cond;
+    delete _code;
+  }
+  void set_owner(Block*) { unreachable(); }
+  void parse(CS&)override;
+  void dump(std::ostream& o)const override;
+public:
+  AnalogConstExpression const* cond_or_null()const {return _cond;}
+  Base const* code_or_null()const {return _code;}
+};
+typedef LiSt<CaseGen, '\0', '\0', '\0'> AnalogCaseList;
+/*--------------------------------------------------------------------------*/
+class AnalogSwitchStmt : public AnalogStmt {
+  AnalogConstExpression _cond;
+  AnalogCaseList _cases;
+public:
+  AnalogSwitchStmt(Block* o, CS& file) {
+    set_owner(o);
+    parse(file);
+  }
+  ~AnalogSwitchStmt(){
+  }
+public:
+  void parse(CS& file) override;
+  void dump(std::ostream& o)const override;
+  void set_owner(Block* o) {_cond.set_owner(o);}
+  Block* owner() {return _cond.owner();}
+  AnalogConstExpression const& conditional() const{return _cond;}
+  AnalogCaseList const& cases()const {return _cases;}
 };
 /*--------------------------------------------------------------------------*/
 class AnalogConstruct : public Owned_Base {
@@ -1775,6 +1817,7 @@ public: // make it look like an Element_2?
 /*--------------------------------------------------------------------------*/
 void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps*d=NULL);
 void make_cc_expression(std::ostream& o, Expression const& e);
+void make_cc_event_cond(std::ostream& o, Expression const& e);
 /*--------------------------------------------------------------------------*/
 inline bool Variable::is_node(std::string const& n) const
 {
@@ -1808,10 +1851,11 @@ analog_event_expression ::=
 */
 /*--------------------------------------------------------------------------*/
 class AnalogEvtExpression : public Owned_Base {
-  Base* _expression{NULL};
+  Expression* _expression{NULL};
 public:
   void parse(CS&)override;
   void dump(std::ostream&)const override;
+  Expression const& expression() const{assert(_expression); return *_expression;};
 };
 /*--------------------------------------------------------------------------*/
 class AnalogEvtCtlStmt : public Owned_Base {
@@ -1820,6 +1864,8 @@ class AnalogEvtCtlStmt : public Owned_Base {
 public:
   void parse(CS&)override;
   void dump(std::ostream&)const override;
+  Base const* stmt_or_null() const{ return _stmt; }
+  Expression const& cond() const{ return _ctl.expression(); }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

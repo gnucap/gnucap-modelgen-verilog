@@ -82,7 +82,7 @@ void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2& p)
     o << "NA;";
   }
 //  o << ";\n";
-  o____ p.type() << " def = t0.value();\n";
+  o____ p.type() << " def = " << p.type() << "(t0.value());\n";
   o____ "e_val(&(this->" << p.code_name() << "), ";
   o____ "def , par_scope);\n";
   o__ "}\n";

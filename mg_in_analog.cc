@@ -126,12 +126,15 @@ static Base* parse_pot_contrib(CS& cmd, std::string const& what, Block* owner)
   return a;
 }
 /*--------------------------------------------------------------------------*/
+static Base* parse_switch(CS& file, Block* o)
+{
+  assert(o);
+  return new AnalogSwitchStmt(o, file);
+}
+/*--------------------------------------------------------------------------*/
 static Base* parse_cond(CS& file, Block* o)
 {
-  auto cb = new AnalogConditionalStmt();
-  cb->set_owner(o);
-  file >> *cb;
-  return cb;
+  return new AnalogConditionalStmt(o, file);
 }
 /*--------------------------------------------------------------------------*/
 static Base* new_evt_ctl_stmt(CS& file, Block* o)
@@ -224,6 +227,7 @@ static Base* parse_analog_stmt(CS& file, Block* owner)
     || ((file >> "begin ") && (ret = parse_seq(file, owner)))
     || ((file >> "real ") && (ret = parse_real(file, owner)))
     || ((file >> "if ") && (ret = parse_cond(file, owner)))
+    || ((file >> "case ") && (ret = parse_switch(file, owner)))
     || ((file >> "@ ") && (ret = new_evt_ctl_stmt(file, owner)))
     || (ret = parse_contribution(file, owner))
     || (ret = parse_assignment(file, owner))
@@ -283,6 +287,72 @@ void AnalogConditionalStmt::dump(std::ostream& o)const
     }
   }else{
   }
+}
+/*--------------------------------------------------------------------------*/
+void CaseGen::parse(CS&)
+{
+}
+/*--------------------------------------------------------------------------*/
+void CaseGen::dump(std::ostream& o)const
+{
+  if(_cond){
+    o__ *_cond;
+  }else{
+    o__ "default";
+  }
+  o << " :";
+
+  o << '\n';
+  if(dynamic_cast<AnalogSeqBlock const*>(_code)){
+    indent x;
+    o__ *_code;
+  }else if(_code){
+    indent x;
+    o << *_code;
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+void AnalogSwitchStmt::parse(CS& file)
+{
+  file >> "(" >> _cond >> ")";
+  AnalogConstExpression* c = new AnalogConstExpression();
+  c->set_owner(owner());
+
+  while(true){
+
+    if(file >> "default"){
+      file >> ":";
+      Base* s = parse_analog_stmt(file, owner());
+      _cases.push_back(new CaseGen(NULL, s));
+    }else if(file >> "endcase"){
+      break;
+    }else if( file >> *c >> ":" ){
+      Base* s = parse_analog_stmt(file, owner());
+      _cases.push_back(new CaseGen(c, s));
+
+      c = new AnalogConstExpression();
+      c->set_owner(owner());
+    }else{
+      throw Exception_CS("bad switch statement", file);
+    }
+  }
+
+  delete c;
+
+  trace2("ASS", (bool) file, file.tail().substr(0,10));
+
+}
+/*--------------------------------------------------------------------------*/
+void AnalogSwitchStmt::dump(std::ostream& o)const
+{
+  o__ "case (" << _cond << ")\n";
+
+  {
+    indent x;
+    o << _cases;
+  }
+  o__ "endcase\n";
 }
 /*--------------------------------------------------------------------------*/
 void AnalogConstruct::parse(CS& file)
@@ -514,7 +584,7 @@ void AnalogSeqBlock::dump(std::ostream& o)const
   o__ "end\n";
 }
 /*--------------------------------------------------------------------------*/
-void AnalogConditionalExpression::parse(CS& file)
+void AnalogConstExpression::parse(CS& file)
 {
   Expression rhs(file);
   Expression tmp;

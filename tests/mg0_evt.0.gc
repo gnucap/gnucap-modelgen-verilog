@@ -1,0 +1,30 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_evt0_0(p, n);
+	electrical p, n;
+	inout p, n;
+	parameter real v=0;
+	real w;
+	analog begin
+		@(initial_step) w = v;
+		V(p,n) <+ w;
+	end
+endmodule
+
+list
+
+!make test_evt0_0.so > /dev/null
+attach ./test_evt0_0.so
+
+test_evt0_0 #(.v(1)) dut(1,0);
+
+list
+
+print dc v(nodes) iter(0)
+dc
+end

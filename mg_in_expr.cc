@@ -154,7 +154,12 @@ Token_PROBE* resolve_xs_function(Expression& E, std::string const& n, Deps const
     E.pop_back();
     trace3("new_probe", n, arg0, arg1);
     Probe const* p = o->new_probe(n, arg0, arg1);
-    std::string name = n+"("+arg0+", "+arg1+")";
+    std::string name = n + "(" + arg0;
+    if(arg1 != ""){
+      name += ", " + arg1;
+    }else{
+    }
+    name += ")";
 
     trace3("got a probe", name, arg1, arg0);
     return new Token_PROBE(name, p);

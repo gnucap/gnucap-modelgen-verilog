@@ -16,3 +16,5 @@
 * macro substitution fixes
 * support ternary operator
 * generate is_valid (overloading)
+* switch statement
+* analog event stub
