@@ -37,13 +37,14 @@ class DUMMY1 : public MGVAMS_FUNCTION {
 	  return 1;
   }
 } dummy1;
-DISPATCHER<FUNCTION>::INSTALL d_tanh(&function_dispatcher, "tanh", &dummy1);
-DISPATCHER<FUNCTION>::INSTALL d_sinh(&function_dispatcher, "sinh", &dummy1);
-DISPATCHER<FUNCTION>::INSTALL d_atanh(&function_dispatcher, "atanh", &dummy1);
-DISPATCHER<FUNCTION>::INSTALL d_pow(&function_dispatcher, "pow", &dummy1);
-DISPATCHER<FUNCTION>::INSTALL d_abs(&function_dispatcher, "abs", &dummy1);
-DISPATCHER<FUNCTION>::INSTALL d_sqrt(&function_dispatcher, "sqrt|$sqrt", &dummy1);
+DISPATCHER<FUNCTION>::INSTALL d_abs(&function_dispatcher, "abs|$abs", &dummy1);
+DISPATCHER<FUNCTION>::INSTALL d_atanh(&function_dispatcher, "atanh|$atanh", &dummy1);
+DISPATCHER<FUNCTION>::INSTALL d_cos(&function_dispatcher, "cos|$cos", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_limexp(&function_dispatcher, "limexp|$limexp", &dummy1);
+DISPATCHER<FUNCTION>::INSTALL d_sin(&function_dispatcher, "sin|$sin", &dummy1);
+DISPATCHER<FUNCTION>::INSTALL d_sinh(&function_dispatcher, "sinh|$sinh", &dummy1);
+DISPATCHER<FUNCTION>::INSTALL d_sqrt(&function_dispatcher, "sqrt|$sqrt", &dummy1);
+DISPATCHER<FUNCTION>::INSTALL d_tanh(&function_dispatcher, "tanh|$tanh", &dummy1);
 /*--------------------------------------------------------------------------*/
 class DUMMY2 : public MGVAMS_FUNCTION {
   std::string eval(CS&, const CARD_LIST*)const override{
@@ -132,6 +133,26 @@ public:
   }
 } p_ln;
 DISPATCHER<FUNCTION>::INSTALL d_ln(&function_dispatcher, "ln|$log", &p_ln);
+/*--------------------------------------------------------------------------*/
+class pow: public MGVAMS_FUNCTION {
+public:
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {itested();
+	  trace1("pow", Cmd.tail());
+    PARAMETER<double> x, y;
+    Cmd >> x >> y;
+    x.e_val(NOT_INPUT, Scope);
+	  trace2("pow", x, y);
+    return to_string(std::pow(x, y));
+  }
+  std::string const& name() const{ untested();
+	  static std::string n = "$log";
+	  return n;
+  }
+  int arity()const override {
+	  return 2;
+  }
+} p_pow;
+DISPATCHER<FUNCTION>::INSTALL d_pow(&function_dispatcher, "pow", &p_pow);
 /*--------------------------------------------------------------------------*/
 
 // not really functions, but syntactically so.

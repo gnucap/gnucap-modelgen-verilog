@@ -42,18 +42,20 @@ static void append_to(CS& file, std::string& to, std::string until)
   }
 
   while (file.more()) {
-    to += file.get_to(until);
-    trace2("got_to", until, file.tail());
+    std::string chunk = file.get_to(until);
+    trace3("got_to", until, chunk, file.tail());
+    to += chunk;
     if(file.match1(until)){
       // match
       return;
     }else{
       to += "\n";
+      trace2("discard", chunk, file.tail());
       try{
 	file.get_line("");
 	trace1("got line", file.tail());
       }catch( Exception_End_Of_Input const&){
-	trace0("EOI");
+	trace1("EOI", chunk);
       }
     }
   }
@@ -64,7 +66,6 @@ void C_Comment::parse(CS& file)
 {
 //  size_t here = file.cursor();
   for (;;) {
-    trace2("cp", file.tail(), file.fullstring());
     if(!file.skipto1('*')){ untested(); untested();
       file.get_line("");
     }else if (file >> "*/") {
@@ -82,7 +83,10 @@ void Cxx_Comment::parse(CS& file)
   try{
     file.get_line("");
   }catch (Exception_End_Of_Input const&) {
-    assert(!file.more());
+    // comment ran to EOF
+    while(file.ns_more()){
+      file.skip();
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -171,43 +175,72 @@ void Define::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 static String_Arg_List eval_args(CS& f, size_t howmany, Define_List const&);
 /*--------------------------------------------------------------------------*/
+// PP_identifier::parse?
+static std::string get_identifier(CS& f)
+{
+  std::string ret;
+  if(f.is_alpha() || f.match1('_')){
+    ret += f.ctoc();
+  }else{
+    throw(Exception_CS("syntax error", f));
+  }
+  while(f.is_alnum() || f.match1("_[]$")) {
+    ret += f.ctoc();
+  }
+
+  return ret;
+}
+/*--------------------------------------------------------------------------*/
+static std::string expand_macro(CS& file, Define_List const& d)
+{
+  trace1("exmacro", file.tail().substr(0,10));
+  std::string stripped_file;
+  if (file >> "`else"
+      ||file >> "`endif"
+      ||file >> "`ifndef"
+      ||file >> "`ifdef"
+      ||file >> "`include"
+      ||file >> "`undef") {
+    throw Exception_CS("not allowed here", file);
+  }else{
+    // macro substitution
+    file.skip1('`');
+    std::string token = get_identifier(file);
+    Define_List::const_iterator x = d.find(String_Arg(token));
+    if (x != d.end()) {
+      assert(*x);
+      auto values = eval_args(file, (*x)->num_args(), d);
+      std::string subst = (*x)->substitute(values, d);
+      stripped_file += subst; //  + "\n";
+    }else{
+      throw(Exception_CS("undefined macro", file));
+    }
+  }
+  return stripped_file;
+}
+/*--------------------------------------------------------------------------*/
 std::string expand_macros(CS& file, Define_List const& d)
 {
   std::string stripped_file;
   size_t here = file.cursor();
   for (;;) {
     stripped_file += file.get_to("\"/`");
-    trace1("def prep got to", file.tail());
-    if (file.match1('\"')) {
+    if (file >> '"') {
       // quoted string
-      stripped_file += '"' + file.ctos("", "\"", "\"", "") + '"';
-    }else if (file >> "`else"
-	    ||file >> "`endif"
-	    ||file >> "`ifndef"
-	    ||file >> "`ifdef"
-	    ||file >> "`include"
-	    ||file >> "`undef") {
-      throw Exception_CS("not allowed here", file);
-    }else if (file >> "`") {
-      // macro substitution
-      Define_List::const_iterator x = d.find(file);
-      if (x != d.end()) {
-	assert(*x);
-	trace1("def prep sub", file.tail());
-	auto values = eval_args(file, (*x)->num_args(), d);
-	std::string subst = (*x)->substitute(values);
-	trace1("def prep sub", subst);
-	stripped_file += subst + "\n";
-      }else{ untested();untested();
-	// error: not defined
+      stripped_file += '"' + file.get_to("\"");
+      if (file >> '"') {
+	stripped_file += '"';
+      }else{ untested();
+	throw Exception_CS("need '\"'", file);
       }
+    }else if (file >> "`") {
+      stripped_file += expand_macro(file, d);
     }else if (file.skip1('/')) {
       stripped_file += "/";
     }else{
       // move on, just copy
     }
     if (!file.ns_more()) {
-      trace1("prep", file.tail());
       // proper end of file
       break;
     }else if (file.stuck(&here)) { untested();
@@ -227,12 +260,11 @@ static String_Arg_List eval_args(CS& f, size_t howmany, Define_List const& d)
   if(!howmany) {
   }else if(f.match1('(')){
     values.parse_n(f, howmany);
-    trace1("parsed n", values.size());
     if(values.size() == howmany){
     }else{
       throw Exception_CS("Need more values", f);
     }
-  }else{ untested();
+  }else{
   }
 
   String_Arg_List ret;
@@ -249,7 +281,7 @@ static String_Arg_List eval_args(CS& f, size_t howmany, Define_List const& d)
 /*--------------------------------------------------------------------------*/
 // expand macros in rhs
 void Define::preprocess(Define_List const& d)
-{
+{ untested();
   CS file(CS::_STRING, _value.to_string());
   trace1("Define::preprocess", _value.to_string());
   _value = expand_macros(file, d);
@@ -265,25 +297,13 @@ void Define::dump(std::ostream& f)const
   f << " " << value() << "\n";
 }
 /*--------------------------------------------------------------------------*/
-std::string Define::substitute(String_Arg_List const& values) const
+std::string Define::substitute(String_Arg_List const& values, Define_List const& d) const
 {
-//  trace2("subs", f.tail(), _args.size());
-//  Raw_String_Arg_List values;
-//  if(_args.size() == 0) {
-//  }else if(f.match1('(')){
-//    values.parse_n(f, int(_args.size()));
-//    trace1("parsed n", values.size());
-//  }else{ untested();
-//  }
-
-  // TODO: values may contain backticks??
-
   std::map<std::string, String_Arg*> subs;
   auto j = values.begin();
   for(auto i : _args){
     if(j == values.end()){
       // BUG: positioning seems wrong
-      unreachable();
       // throw Exception_CS("Need more values", f);
     }else{
       subs[i->to_string()] = *j;
@@ -291,35 +311,50 @@ std::string Define::substitute(String_Arg_List const& values) const
     }
   }
   CS file(CS::_STRING, _value.to_string());
+  trace1("substitute", file.fullstring());
   std::string stripped_file = "";
   std::string sep = "";
+  size_t here = file.cursor();
 
+// find [ a-zA-Z_ ] { [ a-zA-Z0-9_$ ] } and substitute
   for (;;) {
-    trace1("loop", file.tail());
-    size_t here = file.cursor();
-    std::string more;
+    trace1("loop", file.tail().substr(0,10));
+    here = file.cursor();
+    bool quote = false;
 
-    if(!file.peek()){ untested();
-    }else if(file.is_term()){
-      more = file.peek(); // BUG?
-      file.skip(1); // WHAT?
-    }else{
-      trace1("arg?", file.tail());
-      auto it = _args.find(file);
+    char c = file.peek();
+    if(!c){itested();
+    }else if(quote){
+      // TODO: escaped "?
+      stripped_file += file.ctoc();
+      quote = c != '"';
+    }else if(c == '"'){
+      stripped_file += file.ctoc();
+      quote = true;
+    }else if(c == '`'){
+      stripped_file += expand_macro(file, d);
+    }else if(file.is_alpha() || c == '_'){
+      // get_identifier...
+      std::string token(1, file.ctoc());
+      trace2("token0", token, file.tail());
+      while(file.is_alnum() || file.match1("_[]$")) {
+	token += file.ctoc();
+      }
+
+      trace2("token", token, file.tail());
+      auto it = _args.find(String_Arg(token));
       if(it != _args.end()){
 	auto k = values.begin();
 	for(; it != _args.begin(); --it){
 	  ++k;
 	}
-	more = (*k)->to_string();
+	stripped_file += (*k)->to_string();
       }else{
-	file >> more;
+	stripped_file += token;
       }
+    }else{
+      stripped_file += file.ctoc();
     }
-
-//    trace2("loop grow", stripped_file, more);
-    stripped_file = stripped_file + sep + more;
-    sep = " ";
 
     if (!file.ns_more()) {
       break;
@@ -344,9 +379,14 @@ void Preprocessor::parse(CS& file)
   for (;;) {
     append_to(file, _stripped_file, "\"/`");
     if (!file.more()){
-    }else if (file.match1('\"')) {
+    }else if (file >> '"') {
       // quoted string
-      _stripped_file += '"' + file.ctos("", "\"", "\"", "") + '"';
+      _stripped_file += '"' + file.get_to("\"");
+      if (file >> '"') {
+	_stripped_file += '"';
+      }else{ untested();
+	throw Exception_CS("need '\"'", file);
+      }
     }else if (file >> "/*") /* C comment */ {
       file >> dummy_c_comment; //BUG// line count may be wrong
     }else if (file >> "//") /* C++ comment */ {
@@ -362,10 +402,8 @@ void Preprocessor::parse(CS& file)
       }else{
       }
       if(file >> _define_list) {
-	auto e = _define_list.back();
-	e->preprocess(define_list());
-      }else{ untested(); untested();
-	unreachable();
+      }else{
+	throw Exception_CS("expecting macro name", file);
       }
     }else if (file >> "`include") {
       std::string include_file_name;
@@ -388,7 +426,6 @@ void Preprocessor::parse(CS& file)
       }else{
 	String_Arg s;
 	file >> s; // discard.
-	trace1("discard", s);
 	++if_block;
       }
     }else if (file >> "`else") {
@@ -423,11 +460,11 @@ void Preprocessor::parse(CS& file)
 	trace1("match macro", file.tail());
 	assert(*x);
 	auto values = eval_args(file, (*x)->num_args(), define_list());
-	std::string subst = (*x)->substitute(values);
+	std::string subst = (*x)->substitute(values, define_list());
 	trace1("match macro", subst);
 	_stripped_file += subst + " ";
-      }else{ untested();
-	throw Exception_CS("undefined macro ", file);
+      }else{
+	throw Exception_CS("undefined macro", file);
       }
     }else if (file.skip1('/')) {
       _stripped_file += "/";

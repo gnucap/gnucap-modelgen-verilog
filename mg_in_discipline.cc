@@ -107,12 +107,17 @@ void Discipline::parse(CS& file)
 {
   // file >> "discipline "; from caller
   file >> _identifier;
+
+  if(file >> ";"){
+  }else{
+  }
   
   size_t here = file.cursor();
   for (;;) {
     ONE_OF // discipline_item
       || ((file >> "potential") && (file >> _potential_ident >> ';'))
       || ((file >> "flow")	&& (file >> _flow_ident >> ';'))
+      || ((file >> "domain")	&& (file >> _domain_ident >> ';'))
       ;
     if (file.umatch("enddiscipline")) {
       break;
@@ -125,6 +130,7 @@ void Discipline::parse(CS& file)
     }else{
     }
   }
+  trace1("disc", file.tail().substr(0,20));
   assert(file);
 
   assert(owner());

@@ -135,7 +135,7 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
     }else{
       return a;
     }
-  }else if(n==""){ untested();
+  }else if(n==""){itested();
     Node const* pp = new_node(p); // BUG: existing node??
     return new_branch(pp, &mg_ground_node);
   }else{
@@ -401,7 +401,7 @@ Discipline const* Branch::discipline() const
     return _n->discipline();
   }else if(_p->discipline() == _n->discipline()){
     return _p->discipline();
-  }else{ untested();
+  }else{itested();
     incomplete(); // no default.
     // Make sure to specify some discipline for now.
     return NULL;

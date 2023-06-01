@@ -309,7 +309,8 @@ public:
   const_iterator find(CS& file) const {
     size_t here = file.cursor();
     String_Arg s;
-    file >> s;
+    //file >> s;
+    s = file.ctos(":,.`()[];*/+-", "", "");
     const_iterator x = find(s);
     if (x == end()) {
       file.reset(here);
@@ -522,6 +523,7 @@ class ValueRangeConstant :public ValueRangeSpec {
 public:
   void parse(CS& f) override;
   void dump(std::ostream& f)const override;
+  std::string const& expr()const {return _cexpr;}
 };
 /*--------------------------------------------------------------------------*/
 class ValueRangeStrings :public ValueRangeSpec {
@@ -867,12 +869,18 @@ public:
 /*--------------------------------------------------------------------------*/
 // mg_analog.h?
 class AnalogSeqBlock : public AnalogStmt {
+  String_Arg _identifier;
   SeqBlock _block;
 public:
+  explicit AnalogSeqBlock(CS& cmd, Block* owner){
+    set_owner(owner);
+    parse(cmd);
+  }
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
   void set_owner(Block* owner) {_block.set_owner(owner);}
 
+  String_Arg const& identifier() const{ return _identifier; }
   SeqBlock const& block() const{ return _block; }
 };
 /*--------------------------------------------------------------------------*/
@@ -1331,6 +1339,7 @@ public:
 typedef Collection<Attribute> Attribute_List;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+class Define_List;
 class Define :public Base {
   String_Arg _name;
   String_Arg_List _args;
@@ -1344,11 +1353,13 @@ public:
   const String_Arg&  name()const  {return _name;}
   const String_Arg&  value()const {return _value;}
 
-  std::string substitute(String_Arg_List const&) const;
-  void preprocess(Collection<Define> const&);
+  std::string substitute(String_Arg_List const&, Define_List const&) const; // HERE?
+  void preprocess(Define_List const&);
   size_t num_args()const { return _args.size(); }
 };
-typedef Collection<Define> Define_List;
+/*--------------------------------------------------------------------------*/
+class Define_List : public Collection<Define>{
+};
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class Nature :public Base {
@@ -1373,6 +1384,7 @@ typedef Collection<Nature> Nature_List;
 class Discipline :public Base {
   String_Arg	_identifier;
   String_Arg	_potential_ident;
+  String_Arg	_domain_ident;
   String_Arg	_flow_ident;
   Nature const* _flow{NULL};
   Nature const* _potential{NULL};
@@ -1386,6 +1398,7 @@ public:
   Discipline() {}
   const String_Arg&  identifier()const	    {return _identifier;}
   const String_Arg&  potential_ident()const {return _potential_ident;}
+  const String_Arg&  domain_ident()const    {return _domain_ident;}
   const String_Arg&  flow_ident()const	    {return _flow_ident;}
 
   Nature const* flow() const{return _flow;}

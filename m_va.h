@@ -184,6 +184,52 @@ T abs(T& d)
 }
 
 template<class T>
+T atanh(T& d)
+{
+	incomplete();
+	return d;
+}
+
+template<class T>
+T log10(T& d)
+{
+	incomplete();
+	// chain(d, std::cos(d));
+	d.value() = std::log10(d);
+	return d;
+}
+
+template<class T>
+T ln(T& d)
+{
+	incomplete();
+	// chain(d, std::cos(d));
+	d.value() = std::log(d);
+	return d;
+}
+
+
+template<class T>
+T max(T& d, T& e)
+{
+	if(d.value() <= e.value()){ untested();
+		return e;
+	}else{ untested();
+		return d;
+	}
+}
+
+template<class T>
+T min(T& d, T& e)
+{
+	if(d.value() <= e.value()){ untested();
+		return d;
+	}else{ untested();
+		return e;
+	}
+}
+
+template<class T>
 T pow(T& b, T& e)
 {
 	assert(b==b);
@@ -219,29 +265,9 @@ T sin(T& d)
 }
 
 template<class T>
-T log10(T& d)
+T sinh(T& d)
 {
 	incomplete();
-	// chain(d, std::cos(d));
-	d.value() = std::log10(d);
-	return d;
-}
-
-template<class T>
-T ln(T& d)
-{
-	incomplete();
-	// chain(d, std::cos(d));
-	d.value() = std::log(d);
-	return d;
-}
-
-template<class T>
-T tanh(T& d)
-{
-	incomplete();
-	// chain(d, std::cos(d));
-	d.value() = std::tanh(d);
 	return d;
 }
 
@@ -254,6 +280,16 @@ T sqrt(T& d)
 	return d;
 }
 
+template<class T>
+T tanh(T& d)
+{
+	incomplete();
+	// chain(d, std::cos(d));
+	d.value() = std::tanh(d);
+	return d;
+}
+
+/*--------------------------------------------------------------------------*/
 template<class T, class S=T>
 T white_noise(T, S=0.)
 {

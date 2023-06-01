@@ -1,0 +1,5 @@
+
+`define A(x) `endif
+
+// hmm, error only detected here:
+`A(1)

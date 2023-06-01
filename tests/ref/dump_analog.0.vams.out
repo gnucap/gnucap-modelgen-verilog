@@ -1,0 +1,18 @@
+
+
+module test();
+  analog begin
+    real a;
+begin : scopename
+      real b;
+    end
+  end
+
+  analog begin : stuff
+    real x;
+  end
+
+endmodule
+
+
+

@@ -1,2 +1,2 @@
-module m (a b ); 
+module m  (a,b  ); 
 endmodule 

@@ -1,8 +1,12 @@
-... egin 
-@(initial_step) 
-begin 
-end; 
-end 
-endmodule 
 
-                                        ^ ? bad analog block
+
+module warn();
+  analog begin
+    @(initial_step) begin
+    end
+  end
+
+endmodule
+
+
+

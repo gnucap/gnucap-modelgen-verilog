@@ -152,15 +152,12 @@ static Base* new_evt_ctl_stmt(CS& file, Block* o)
 /*--------------------------------------------------------------------------*/
 static AnalogStmt* parse_seq(CS& file, Block* owner)
 {
-  auto b = new AnalogSeqBlock();
-  b->set_owner(owner);
-  file >> *b;
-  return b;
+  return new AnalogSeqBlock(file, owner);
 }
 /*--------------------------------------------------------------------------*/
 static Base* parse_real(CS& file, Block* owner)
 {
-  trace1("AnalogBlock::parse real", file.tail());
+  trace1("AnalogBlock::parse real", file.tail().substr(0,10));
 
   std::string name;
   // Variable* a = new Variable(name);
@@ -186,13 +183,14 @@ static Base* parse_assignment(CS& file, Block* o)
   Variable const* v = dynamic_cast<Variable const*>(b);
   if(!v){
     file.reset(here);
+    trace1("not a variable", file.tail().substr(0,10));
     return NULL; // BUG?
     throw Exception_CS("what's this: " + what, file);
   }else if(file >> "=") {
     Assignment* a = new Assignment();
     a->set_lhs(v);
     a->set_owner(o);
-    trace1("pA", file.tail());
+    trace1("pA", file.tail().substr(0,10));
     a->parse(file);
     file >> ";";
     trace2("got_semicolon", (bool)file, file.tail().substr(0,10));
@@ -224,8 +222,9 @@ static Base* parse_analog_stmt(CS& file, Block* owner)
 //  size_t here = file.cursor();
   ONE_OF	// module_item
     || file.umatch(";")
-    || ((file >> "begin ") && (ret = parse_seq(file, owner)))
+    || ((file >> "begin") && (ret = parse_seq(file, owner)))
     || ((file >> "real ") && (ret = parse_real(file, owner)))
+    || ((file >> "integer ") && (ret = parse_real(file, owner))) // BUG
     || ((file >> "if ") && (ret = parse_cond(file, owner)))
     || ((file >> "case ") && (ret = parse_switch(file, owner)))
     || ((file >> "@ ") && (ret = new_evt_ctl_stmt(file, owner)))
@@ -366,6 +365,10 @@ void AnalogConstruct::parse(CS& file)
 /*--------------------------------------------------------------------------*/
 void AnalogSeqBlock::parse(CS& file)
 {
+  if(file >> ":"){
+    file >> _identifier;
+  }else{
+  }
   for (;;) {
 //    size_t here = file.cursor();
     trace1("AnalogSeqBlock::parse", file.tail().substr(0,10));
@@ -373,17 +376,18 @@ void AnalogSeqBlock::parse(CS& file)
       if(file.peek() == ';') {
 	// error(bWARNING, "// stray semicolon?");
 	std::cerr << "stray semicolon\n";
+	file.skip();
       }else{
       }
       trace1("AnalogSeqBlock::parse end", file.tail().substr(0,10));
       break;
     }else{
     }
+    trace1("AnalogSeqBlock::parse try", file.tail().substr(0,10));
     Base* s = parse_analog_stmt(file, &_block);
     if(!s){
       trace1("AnalogSeqBlock::parse", file.tail().substr(0,10));
       throw Exception_CS("bad analog block", file);
-      break;
     }else{
       _block.push_back(s);
     }
@@ -450,7 +454,7 @@ void Assignment::parse(CS& cmd)
 {
   // TODO: rhs is an analog expression
   assert(owner());
-  trace1("Assignment::parse", cmd.tail());
+  trace1("Assignment::parse", cmd.tail().substr(0,10));
   Expression rhs(cmd);
   assert(!_rhs);
 #if 1
@@ -576,7 +580,12 @@ void Assignment::set_lhs(Variable const* v)
 /*--------------------------------------------------------------------------*/
 void AnalogSeqBlock::dump(std::ostream& o)const
 {
-  o << "begin\n";
+  o << "begin"; // BUG: nest?
+  if(_identifier != ""){
+    o << " : " << _identifier;
+  }else{
+  }
+  o << "\n";
   {
     indent x;
     _block.dump(o);

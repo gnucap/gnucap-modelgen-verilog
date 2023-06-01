@@ -1,6 +1,6 @@
-module x ( 1 2 )     inout 1 2 ;     endmodule module t(1,2); 
+module x(1,2)  inout 1,2;  endmodule  module t(1,2); 
 analog begin 
-I ( 1 2 )   <+ V ( 1 2 )   ; 
-x =   y ;     y =   3 ; 
-T1 =   A/B ;   end 
+I(1,2) <+ V(1,2)  ; 
+x = y;  y = 3   ; 
+T1 = a/b;  end 
 endmodule 

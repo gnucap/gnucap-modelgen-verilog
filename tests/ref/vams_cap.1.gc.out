@@ -1,9 +1,5 @@
 load ../lang_verilog.so 
      ^ ? "../lang_verilog.so": already loaded, replacing
-capacitor: already installed, replacing
-stashing as capacitor:0
-resistor: already installed, replacing
-stashing as resistor:0
 #           v(in)      v(out)    
  0.         0.9        0.9       
 #Time       v(in)      v(out)    

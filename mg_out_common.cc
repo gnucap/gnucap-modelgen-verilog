@@ -277,8 +277,11 @@ static void make_param_check_range(std::ostream& o, ValueRange const& p,
 	}else{
 	}
 	o << ri->ub() << ")";
+  }else if(auto c = dynamic_cast<ValueRangeConstant const*>(spec)){
+    o << "(" << c->expr() << "==" << n << ")";
   }else{
     incomplete();
+    assert(false);
   }
 }
 /*--------------------------------------------------------------------------*/

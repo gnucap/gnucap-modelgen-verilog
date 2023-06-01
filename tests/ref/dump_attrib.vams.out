@@ -30,6 +30,7 @@ module device(p, n);
   inout p, n;
   electrical p, n;
   parameter real c = 1.;
+  parameter real ABSOURCE = 1.0e-12;
 
   analog begin
   end

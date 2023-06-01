@@ -1,4 +1,3 @@
-
 nature Current
   units = "A";
   access = "I";
@@ -26,13 +25,13 @@ discipline electrical
   flow "Current";
 enddiscipline
 
-discipline voltage
-  potential "Voltage";
+discipline logic
+  potential "";
   flow "";
 enddiscipline
 
-discipline current
-  potential "Current";
+discipline ddiscrete
+  potential "";
   flow "";
 enddiscipline
 
@@ -42,8 +41,10 @@ module test(p, n, x);
   output n;
   inout x;
   electrical p;
-  voltage n;
   electrical x, y;
+  // circuit
+  voltage #() n();
+
 endmodule
 
 

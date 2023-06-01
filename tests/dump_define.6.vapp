@@ -1,5 +1,6 @@
 
-`define A(m) m x(1,2) \
+`define x X
+`define A(m) m `x(1,2) \
 inout 1,2; \
 endmodule
 

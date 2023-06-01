@@ -85,8 +85,13 @@ File::File() : _file(CS::_STRING, "")
 void Attribute_Instance::parse(CS& file)
 {
   if(file>>"(*"){
-    file.skipto1("*)");
-    file.skip(2);
+    while(file.skipto1("*")){
+      file.skip(1);
+      if(file >> ")"){
+	break;
+      }else{
+      }
+    }
   }else{
   }
 }
@@ -105,7 +110,6 @@ void Attribute_Instance::parse(CS& file)
 */
 void File::parse(CS& file)
 {
-  trace1("File::parse", file.fullstring());
   _module_list.set_file(this); // needed?
 			       //
   _module_list.set_owner(this);
@@ -150,7 +154,6 @@ void Preprocessor::read(std::string const& file_name)
   }
 
   CS file(CS::_INC_FILE, file_name);
-  trace1("whole file", file.fullstring());
 
   parse(file);
 }

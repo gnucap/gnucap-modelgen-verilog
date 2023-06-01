@@ -40,7 +40,7 @@ static MGVAMS_FUNCTION const* lookup_function(std::string const& n, int& arity)
   }else if(auto g=dynamic_cast<MGVAMS_FUNCTION const*>(f)) {
     arity = g->arity();
     return g;
-  }else{ untested();
+  }else{itested();
     return 0;
   }
 
@@ -153,7 +153,7 @@ void make_cc_expression(std::ostream& o, Expression const& e)
     }else if (dynamic_cast<const Token_CONSTANT*>(*i)) {
       if(dynamic_cast<Float const*>((*i)->data())){
 	s.new_float(o);
-      }else{ untested();
+      }else{itested();
 	s.new_string(o);
       }
       o << ind << s.code_name() << " = " << (*i)->name() << ";\n";
@@ -213,12 +213,14 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 	o__ s.code_name() << " "<< op << "= " << idy << ";\n";
       }else if( op == '>'
 	     || op == '<'
-	     || op == '=' ) {
+	     || op == '='
+	     || op == '&'
+	     || op == '|'
+	     || op == '!' ) {
 	o__ s.code_name() << " = " << s.code_name() << " " << (*i)->name() << " " << idy << ";\n";
       }else{ untested();
-	std::cerr << "run time error in make_cc_expression: " << (*i)->name() << "\n";
-	incomplete();
 	unreachable();
+	throw Exception("run time error in make_cc_expression: " + (*i)->name());
       }
     }else if (dynamic_cast<const Token_UNARY*>(*i)) {
       auto op = (*i)->name()[0];
@@ -228,19 +230,19 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 	incomplete();
 	unreachable();
       }
-    }else if (auto t = dynamic_cast<const Token_TERNARY*>(*i)) { untested();
+    }else if (auto t = dynamic_cast<const Token_TERNARY*>(*i)) {itested();
       o__ "{\n";
-      { untested();
+      {itested();
 	indent y;
 	o__ "ddouble& tt0 = t0;\n"; // BUG: float??
 	o__ "if(" << s.code_name() << "){\n";
-	{ untested();
+	{itested();
 	  indent x;
 	  make_cc_expression(o, *t->true_part());
 	  o__ "tt0 = t0;\n";
 	}
 	o__ "}else{\n";
-	{ untested();
+	{itested();
 	  indent x;
 	  make_cc_expression(o, *t->false_part());
 	  o__ "tt0 = t0;\n";
@@ -265,6 +267,9 @@ void make_cc_event_cond(std::ostream& o, Expression const& e)
   o__ "{\n";
   for (const_iterator i = e.begin(); i != e.end(); ++i) {
     if((*i)->name()=="initial_step"){
+      o__ "evt = _sim->is_initial_step();\n";
+    }else if((*i)->name()=="initial_model"){
+      std::cerr << "WARNING: ADMS style keyword encountered\n";
       o__ "evt = _sim->is_initial_step();\n";
     }else{
       incomplete();

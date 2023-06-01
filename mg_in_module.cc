@@ -542,7 +542,7 @@ void Module::parse(CS& file)
       // mi, npmi, module_or_generate_item
 //      || ((file >> "localparam ") && (file >> _local_params))
       || ((file >> "real ") && (file >> _variables))
-      // || ((file >> "integer ") && (file >> _variables))
+      || ((file >> "integer ") && (file >> _variables))
       || ((file >> "parameter ") && (file >> _parameters))
       || ((file >> "localparam ") && (file >> _parameters))
       || ((file >> "analog ") && parse_analog(file)) // TODO:: file >> analog

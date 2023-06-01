@@ -86,7 +86,7 @@ static int is_va_function_call(std::string const& n)
   }else if (n == "pow"){
     return 2;
   }else if (n == "white_noise"
-         || n == "flicker_noise" ){ untested();
+         || n == "flicker_noise" ){itested();
     return 2;
   }else if(auto g=dynamic_cast<MGVAMS_FUNCTION const*>(f)) {
     return g->arity();
@@ -194,7 +194,7 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
       E.push_back(t->clone());
       trace0("resolve STOP");
       depstack.push(new Deps);
-    }else if(auto c = dynamic_cast<Token_CONSTANT*>(t)) { untested();
+    }else if(auto c = dynamic_cast<Token_CONSTANT*>(t)) {itested();
       Token* cl = c->clone();
       assert(t->name() == cl->name());
       E.push_back(cl);
@@ -202,10 +202,10 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
            ||dynamic_cast<Token_UNARY*>(t)
            ||dynamic_cast<Token_BINOP*>(t)) {
       E.push_back(t->clone());
-    }else if(auto tt = dynamic_cast<Token_TERNARY const*>(t)){ untested();
+    }else if(auto tt = dynamic_cast<Token_TERNARY const*>(t)){itested();
       Expression* tp = new Expression();
       Expression* fp = new Expression();
-      try{ untested();
+      try{itested();
 	assert(tt->true_part());
 	assert(tt->false_part());
 	resolve_symbols(*tt->true_part(), *tp, scope, deps);
