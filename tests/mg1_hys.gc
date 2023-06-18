@@ -1,0 +1,39 @@
+attach ../d_vasrc.so
+attach ../modelgen_0.so
+
+verilog
+
+`modelgen
+module hys(p, n);
+    inout p, n;
+    electrical p, n, ns;
+
+    parameter real R = 1e3 from (0:inf);
+    parameter real k = 1 from (0:inf);
+    parameter real tau = 1e-5 from (0:inf);
+
+    real s;
+
+    analog begin
+        s = V(ns, n);
+        I(p, n)  <+ V(p, n)/R * (1+tanh(k*s));
+        I(ns, n) <+ V(p, n) - pow(s, 3) + s;
+        I(ns, n) <+ - ddt(tau*s);
+    end
+
+endmodule
+
+!make hys.so >/dev/null
+attach ./hys.so
+
+hys #() h1(1 0)
+
+spice
+.options noinsensitive
+V1 1 0 1 sin(0 0.7 1k)
+
+.options noinsensitive
+
+.print tran v(1) i(V1) s(h1)
+.tran 2m
+* > hys.out

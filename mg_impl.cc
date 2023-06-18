@@ -397,7 +397,7 @@ size_t Branch::num_states() const
   // TODO: cleanup
   for(auto i : deps()){
     assert(i);
-    if(i->is_reversed()){
+    if(i->is_reversed()){ untested();
     }else if(i->branch() == this){
     }else{
       ++k;

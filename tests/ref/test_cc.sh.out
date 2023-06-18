@@ -361,7 +361,7 @@ public: // states, _b_p_n;
   double _value_b_p_n;
   double _st_b_p_n  [2];
   struct _st_b_p_n_ {
-    enum {     VALUE, SELF, dep_potential_b_p_n    };
+    enum {     VALUE, SELF    };
   } _dep_b_p_n;
 private: // filter state
 private: // node list

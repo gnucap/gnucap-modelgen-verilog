@@ -308,6 +308,8 @@ static void make_module_one_branch_state(std::ostream& o, Branch const& br)
   for(auto d : br.deps()){
     assert(d);
     if(d->is_reversed()){
+    }else if(d->branch() == &br){
+      // SELF...
     }else{
       o << ", dep" << d->code_name();
     }

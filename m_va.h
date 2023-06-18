@@ -425,7 +425,7 @@ ddouble_<T> operator+(double const& a, ddouble_<T> const& b)
 }
 template<int T>
 ddouble_<T> operator+(int const& a, ddouble_<T> const& b)
-{ untested();
+{ itested();
 	ddouble_<T> c(b);
 	c += a;
 	return c;
@@ -507,7 +507,7 @@ inline double& chain(double& t, double const&)
 }
 template<>
 inline int& chain(int& t, double const&)
-{ untested();
+{
 	// no-op
 	return t;
 }
@@ -681,17 +681,21 @@ typename ddouble_if<T, S>::type pow(T b, S e)
 	assert(b==b);
 	assert(e==e);
 	double p;
-	if(double(b)>0){
+	if(double(b) != 0.){
 		p = std::pow(b, e);
 		chain(b, double(e)/double(b)*p);
+	}else{
+		p = 0;
+		chain(b, 0.);
+	}
+
+	if(double(b) > 0.){
 		double l = std::log(b);
 		assert(l==l);
 		chain(e, l*p);
 		assert(e==e);
 	}else{
 		// unreachable(); // numerical nonsense, sometimes
-		p = 0;
-		chain(b, 0.);
 		chain(e, 0.);
 	}
 
