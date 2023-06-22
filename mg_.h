@@ -527,7 +527,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Probe;
-class Deps : public std::set<Probe const*>{
+class Deps : private std::set<Probe const*>{
   typedef std::set<Probe const*> S;
   typedef S::const_iterator const_iterator;
 public:
@@ -539,6 +539,15 @@ public:
     for(auto i : other){
       insert(i);
     }
+  }
+public:
+  const_iterator begin() const;
+  const_iterator end() const;
+  size_t size() const{
+    return S::size();
+  }
+  bool empty() const{
+    return S::empty();
   }
 };
 /*--------------------------------------------------------------------------*/
@@ -615,6 +624,7 @@ public:
   Data_Type const& type() const {return _type;}
   bool is_int() const { return _type.is_int(); }
   Deps const& deps()const { return _deps; }
+  Deps& deps() { return _deps; }
   String_Arg const& identifier()const {return _name;}
   std::string const& name()const {return _name.to_string();}
   virtual std::string code_name()const;
@@ -625,6 +635,7 @@ public:
   virtual Branch_Ref new_branch(std::string const& p, std::string const& n);
   virtual Branch_Ref new_branch(Node const* p, Node const* n);
 
+  virtual void update_deps(Deps const&);
 private:
   bool is_node(std::string const& n)const;
 
@@ -732,7 +743,7 @@ class Filter;
 class Node;
 class Nature;
 class Block : public List_Base<Base> {
-  typedef std::map<std::string, Base const*> map; // set?
+  typedef std::map<std::string, Base*> map; // set?
   typedef map::const_iterator const_iterator;
 protected:
   map _var_refs;
@@ -742,7 +753,7 @@ public:
   Block const* owner() const{ return _owner;}
   Block* owner(){ return _owner;}
 public:
-  void new_var_ref(Base const* what);
+  void new_var_ref(Base* what);
   virtual Probe const* new_probe(std::string const&, std::string const&, std::string const&)
   {unreachable(); return NULL;}
   virtual Probe const* new_probe(std::string const&, Branch_Ref const&)
@@ -782,6 +793,7 @@ public:
     _owner = b;
   }
   Base const* resolve(std::string const& k) const;
+  Base* resolve(std::string const& k);
 
 //  Base const* item(std::string const&name) { untested();
 //    const_iterator f = _items.find(name);
@@ -1325,9 +1337,10 @@ class Branch : public Element_2 {
   bool _has_pot_src{false};
   bool _is_filter{false};
   std::vector<Branch_Ref*> _refs;
+  size_t _number;
 public:
-  explicit Branch(Node const* p, Node const* n)
-    : Element_2(), _p(p), _n(n) {
+  explicit Branch(Node const* p, Node const* n, size_t number)
+    : Element_2(), _p(p), _n(n), _number(number) {
     assert(p);
     assert(n);
     //_code_name = "_b_" + p->name() + "_" + n->name();
@@ -1368,6 +1381,8 @@ public:
 //  bool has(Branch_Ref*) const;
   void attach(Branch_Ref*);
   void detach(Branch_Ref*);
+  size_t number() const{return _number;}
+  size_t num_branches() const;
 }; // Branch
 /*--------------------------------------------------------------------------*/
 class Branch_Names {
@@ -1402,6 +1417,7 @@ public:
   //BranchRef new_branch(Node const* a, Node const* b, Block* owner);
   const_iterator begin() const{ return _m.begin(); }
   const_iterator end() const{ return _m.end(); }
+  size_t size() const{ return _m.size(); }
 
   Branch_Ref new_branch(Node const* a, Node const* b);
   void parse(CS& f);
@@ -1526,6 +1542,7 @@ public:
   const Node_Map&	nodes()const		{return _nodes;}
   const Branch_Names&	branch_names()const	{return _branch_names;}
   const Branch_Map&	branches()const		{return _branches;}
+  size_t num_branches() const;
   bool sync()const;
   bool has_submodule()const;
   bool has_analog_block()const;
@@ -1583,7 +1600,7 @@ public:
 // VariableAssignment?
 class Assignment : public Variable {
 protected:
-  Variable const* _lhs{NULL}; // BUG
+  Variable* _lhs{NULL}; // BUG
 //  Variable_Ref _lhs;
   Expression* _rhs{NULL}; // const?
 public:
@@ -1597,7 +1614,6 @@ public:
     assert(_lhs);
     return _lhs->name();
   }
-  void set_lhs(Variable const* v);
   Expression const* rhs()const {return _rhs;}
   Variable const& lhs() const{
     assert(_lhs);
@@ -1605,6 +1621,14 @@ public:
   }
   void parse(CS& cmd) override;
   void dump(std::ostream&)const override;
+//private:
+//  Deps& lhsdeps() {
+//    assert(_lhs);
+//    return _lhs->deps();
+//  }
+  void update_deps(Deps const&) override;
+// protected:
+  void set_lhs(Variable* v);
 };
 /*--------------------------------------------------------------------------*/
 // ContributionStatement?
@@ -1649,8 +1673,7 @@ public:
     assert(owner());
     return owner()->new_branch(p, n);
   }
-};
-/*--------------------------------------------------------------------------*/
+}; // Contribution
 /*--------------------------------------------------------------------------*/
 class Node : public Base {
   std::string _name;
@@ -1687,6 +1710,7 @@ class Preprocessor : public CS {
   Define_List	_define_list;
   std::string _cwd;
   std::string _include_path;
+  std::basic_ostream<char>* _diag{NULL};
 private:
   std::string _stripped_file; // DUP?
 public:
@@ -1696,9 +1720,19 @@ public:
   const Define_List&	 define_list()const	{return _define_list;}
   void dump(std::ostream&)const;
   void add_include_path(std::string const&);
+  void set_diag(std::basic_ostream<char>& o){
+    _diag = &o;
+  }
 private:
   void parse(CS& file);
   void include(const std::string& file_name);
+  std::basic_ostream<char>& diag() {
+    if(_diag){
+      return *_diag;
+    }else{
+      return std::cerr;
+    }
+  }
 };
 /*--------------------------------------------------------------------------*/
 class File : public Block {

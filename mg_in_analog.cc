@@ -158,13 +158,13 @@ static Base* parse_system_task(CS& file, Block*)
 }
 /*--------------------------------------------------------------------------*/
 // Variable::Variable
-static Variable const* parse_variable(CS& f, Block* o)
+static Variable* parse_variable(CS& f, Block* o)
 {
   size_t here = f.cursor();
   std::string what;
   f >> what;
-  Base const* b = o->resolve(what);
-  Variable const* v = dynamic_cast<Variable const*>(b);
+  Base* b = o->resolve(what);
+  Variable* v = dynamic_cast<Variable*>(b);
   if(!v){
     f.reset(here);
     trace1("not a variable", f.tail().substr(0,10));
@@ -177,32 +177,45 @@ static Variable const* parse_variable(CS& f, Block* o)
 /*--------------------------------------------------------------------------*/
 Assignment::Assignment(CS& f, Block* o)
 {
+  // unreachable(); // reached from for condition
   set_owner(o);
   // _lhs.set_owner(o);
   // f >> _lhs;
-  _lhs = parse_variable(f,o);
+  Variable* l = parse_variable(f,o);
+  _lhs = l;
 
   if(f >> "="){
   }else{
-    incomplete();
+    throw Exception_No_Match("no assignment");
   }
 
  //   AnalogProceduralAssignment* a = new AnalogProceduralAssignment(file, o);
     // set_lhs(v);
   trace1("pA", f.tail().substr(0,10));
   parse(f);
+
+//  pass deps to lhs??
+  trace1("assign deps?", lhsname());
+  for(auto d: deps()){
+    trace1("assign", d->code_name());
+  }
+  if(l){
+    l->update_deps(deps());
+  }else{
+    unreachable(); // loop statement??
+  }
 }
 /*--------------------------------------------------------------------------*/
 class AnalogProceduralAssignment : public Assignment {
 public:
-  AnalogProceduralAssignment(CS&, Block*) : Assignment() {}
+  AnalogProceduralAssignment(CS&, Block*);
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
 };
 /*--------------------------------------------------------------------------*/
 void AnalogProceduralAssignment::parse(CS& cmd)
 {
-  return Assignment::parse(cmd);
+  Assignment::parse(cmd);
 }
 /*--------------------------------------------------------------------------*/
 void AnalogProceduralAssignment::dump(std::ostream& o)const
@@ -214,6 +227,16 @@ void AnalogProceduralAssignment::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 static Base* parse_proc_assignment(CS& file, Block* o)
 {
+  try{
+    return new AnalogProceduralAssignment(file, o);
+  }catch(Exception_No_Match const&){
+    return NULL;
+  }
+}
+/*--------------------------------------------------------------------------*/
+AnalogProceduralAssignment::AnalogProceduralAssignment(CS& file, Block* o)
+  : Assignment() // BUG?
+{
   size_t here = file.cursor();
   std::string what;
   file >> what;
@@ -224,28 +247,28 @@ static Base* parse_proc_assignment(CS& file, Block* o)
   }else{
   }
 
-  Base const* b = o->resolve(what);
-  Variable const* v = dynamic_cast<Variable const*>(b);
+  Base* b = o->resolve(what);
+  Variable* v = dynamic_cast<Variable*>(b);
   if(!v){
     file.reset(here);
     trace1("not a variable", file.tail().substr(0,10));
-    return NULL; // BUG?
-    throw Exception_CS("what's this: " + what, file);
+    throw Exception_No_Match("what's this: " + what);
   }else if(file >> "=") {
     assert(v->name() != "");
     trace3("got a variable", what, file.tail().substr(0,10), v->name());
-    AnalogProceduralAssignment* a = new AnalogProceduralAssignment(file, o);
-    a->set_lhs(v);
-    a->set_owner(o);
+    set_lhs(v);
+    set_owner(o);
     trace1("pA", file.tail().substr(0,10));
-    a->parse(file);
+    parse(file);
     file >> ";";
     trace2("got_semicolon", (bool)file, file.tail().substr(0,10));
 //    _var_refs[what] = a;
-    return a;
   }else{ untested();
     throw Exception_CS("need assign op", file);
   }
+
+  v->update_deps(deps());
+
 }
 /*--------------------------------------------------------------------------*/
 static Base* parse_contribution(CS& f, Block* owner)
@@ -379,19 +402,18 @@ void AnalogWhileStmt::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void AnalogForStmt::parse(CS& f)
 {
+  assert(owner());
   f >> "(";
   try{
-    _init = new Assignment(f, owner()); // BUG: only variable assignment
-  }catch(Exception const&){
-    incomplete();
+    _init = new Assignment(f, owner());
+  }catch(Exception_No_Match const&){
   }
   f >> ";";
   f >> _cond;
   f >> ";";
   try{
-    _tail = new Assignment(f, owner()); // BUG: only variable assignment
-  }catch(Exception const&){
-    incomplete();
+    _tail = new Assignment(f, owner());
+  }catch(Exception_No_Match const&){ untested();
   }
 
   f >> ")";
@@ -596,7 +618,8 @@ void Assignment::parse(CS& cmd)
 #if 1
   Expression tmp;
   assert(owner());
-  resolve_symbols(rhs, tmp);
+  assert(_deps.empty());
+  resolve_symbols(rhs, tmp); //(, owner(), &_deps);
   trace1("Assignment::parse resolved", rhs.size());
   _rhs = new Expression(tmp, &CARD_LIST::card_list);
   trace1("Assignment::parse gotit", rhs.size());
@@ -758,7 +781,7 @@ std::string Branch::name()const
   return "(" + _p->name()+", "+_n->name()+")";
 }
 /*--------------------------------------------------------------------------*/
-void Assignment::set_lhs(Variable const* v)
+void Assignment::set_lhs(Variable* v)
 {
   _lhs = v;
   assert(v);

@@ -1,0 +1,5 @@
+test_ddx3 #() dut (.cp(1),.cn(0));
+parameter v=0 
+vsource #(.dc(v)) v1 (.p(1),.n(0));
+#           v(1)       zero(dut)  minus(dut) plus(dut)  iter(0)   
+ 0.         0.         0.        -1.         1.         2.        

@@ -37,7 +37,7 @@ static MGVAMS_FUNCTION const* lookup_function(std::string const& n)
     return 0;
   }else if(auto g=dynamic_cast<MGVAMS_FUNCTION const*>(f)) {
     return g;
-  }else{itested();
+  }else{
     return 0;
   }
 

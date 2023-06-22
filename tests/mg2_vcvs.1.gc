@@ -1,0 +1,34 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_vcvs2(p, n, cp, cn, x, y);
+electrical p, n, cp, cn, x, y;
+
+analog begin
+	real gain;
+	gain = .25;
+	V(p,n) <+ gain*I(cp,cn);
+	V(p,n) <+ gain*I(x, y);
+end
+
+endmodule
+
+!make test_vcvs2.so > /dev/null
+attach ./test_vcvs2.so
+
+test_vcvs2 d1(0, 2, a, 0, b, 0);
+resistor #(.r(1)) r1(2, 0);
+
+isource #(.dc(i)) i1(0, a);
+isource #(.dc(3*i)) i2(0, b);
+
+parameter i=1
+list
+
+print dc v(2) i(i*) iter(0)
+dc i 0 2 .5
+end

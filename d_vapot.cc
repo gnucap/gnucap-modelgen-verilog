@@ -329,6 +329,8 @@ double DEV_CPOLY_G::tr_probe_num(const std::string& x)const
 {
   if (Umatch(x, "loss ")) {
     return _loss0;
+  }else if (Umatch(x, "conv ")) {
+    return converged();
   }else{
     return ELEMENT::tr_probe_num(x);
   }

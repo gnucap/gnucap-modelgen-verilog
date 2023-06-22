@@ -4,7 +4,7 @@
 .SH NAME
 gnucap-mg-vams \- GNU Circuit Analysis Package .vams translator
 .SH SYNOPSIS
-.B gnucap-mg-vams [\fBOPTIONS\fP] [input_file]
+.B gnucap-mg-vams \\{{ [\fBOPTIONS\fP] [\fBACTIONS\fP] \\}}
 .br
 .SH DESCRIPTION
 .B Gnucap-Modelgen
@@ -13,7 +13,7 @@ into C++ code implementing Gnucap component plugins.
 .PP
 A typical usage can be
 
-gnucap-modelgen \--cc mymodel.vams
+gnucap-modelgen \-I /path/to/include \--cc mymodel.vams
 
 .SH OPTIONS
 
@@ -23,6 +23,12 @@ Set preprocessor include path
 .TP
 \fI-D "name\ value"\fI
 Set preprocessor constant
+.TP
+\fI-o "filename"\fI
+Send output to filename (default: stdout).
+
+.SH ACTIONS
+
 .TP
 \fI--pp\fI
 dump preprocessor output
@@ -34,7 +40,7 @@ dump contents as parsed
 generate c++ file
 
 .SH BUGS
-This is under construction.
+This is under construction. Expect bugs, see BUGS.
 
 .SH AUTHOR
 Gnucap-mg-vams is being written by Felix Salfelder and Albert Davis with

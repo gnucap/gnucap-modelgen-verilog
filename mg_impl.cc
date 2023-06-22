@@ -43,7 +43,9 @@ Probe const* Module::new_probe(std::string const& xs, std::string const& p,
     std::string const& n)
 {
   Branch_Ref br = new_branch(p, n);
+  br->set_owner(this);
   assert(br);
+  assert(const_cast<Branch const*>(br.operator->())->owner());
   return new_probe(xs, br);
 }
 /*--------------------------------------------------------------------------*/
@@ -110,7 +112,7 @@ Branch_Ref Branch_Map::new_branch(Node const* a, Node const* b)
     if(i!=_m.end()){
       return Branch_Ref(i->second, true);
     }else{
-      _m[p] = new Branch(a, b);
+      _m[p] = new Branch(a, b, _m.size());
   	// br.set_owner(this); // eek.
       return Branch_Ref(_m[p] /*owner?*/);
     }
@@ -126,8 +128,14 @@ Branch_Ref Module::new_branch(Node const* p, Node const* n = NULL)
 {
   Branch_Ref br = _branches.new_branch(p, n);
   assert(br);
+  br->set_owner(this); // eek.
   br.set_owner(this); // eek.
   return br;
+}
+/*--------------------------------------------------------------------------*/
+size_t Module::num_branches() const
+{
+  return branches().size();
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
@@ -146,7 +154,7 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
     }else{
       return a;
     }
-  }else if(n==""){itested();
+  }else if(n==""){
     Node const* pp = new_node(p); // BUG: existing node??
     return new_branch(pp, &mg_ground_node);
   }else{
@@ -231,6 +239,13 @@ Branch_Ref const& Branch_Names::lookup(std::string const& p) const
   }else{
     return i->second;
   }
+}
+/*--------------------------------------------------------------------------*/
+size_t Branch::num_branches() const
+{
+  auto m = prechecked_cast<Module const*>(owner());
+  assert(m);
+  return m->num_branches();
 }
 /*--------------------------------------------------------------------------*/
 size_t Branch::num_nodes() const
@@ -397,7 +412,7 @@ size_t Branch::num_states() const
   // TODO: cleanup
   for(auto i : deps()){
     assert(i);
-    if(i->is_reversed()){ untested();
+    if(i->is_reversed()){
     }else if(i->branch() == this){
     }else{
       ++k;
@@ -524,21 +539,31 @@ void ddx_Filter::make_cc(std::ostream& o, Module const& m) const
   }else{
     incomplete();
   }
-  if(_ddxprobe->branch()->n() == &mg_ground_node){
-  }else{
-    incomplete();
-  }
   Node const* p = _ddxprobe->branch()->p();
+  Node const* n = _ddxprobe->branch()->n();
   o__ "ddouble ret;\n";
   o__ "(void) t1;\n";
   for(auto x : m.branches()){
     if(x.second->has_pot_probe()){
       o__ "// found probe " <<  x.second->code_name() << "\n";
-      if(x.second->p() == p){
+      if(p == &mg_ground_node){ untested();
+      }else if(n != &mg_ground_node){
+      }else if(x.second->p() == p){
 	o__ "ret.value() += t0[d_potential" << x.second->code_name() << "];\n";
       }else if(x.second->n() == p){
 	o__ "ret.value() -= t0[d_potential" << x.second->code_name() << "];\n";
       }else{
+      }
+
+      if(n == &mg_ground_node){
+      }else if(p == &mg_ground_node){ untested();
+      }else if(x.second->p() == p && x.second->n() == n){
+	// oops. what does the standard say about reversed ddx?
+	bool rev = _ddxprobe->is_reversed();
+	o__ "ret.value() " << (rev?'-':'+') << "= t0[d_potential" << x.second->code_name() << "]; // fwd?\n";
+      }else if(x.second->p() == n && x.second->n() == p){ untested();
+	unreachable();
+      }else{ untested();
       }
 
     }else{
@@ -580,6 +605,7 @@ Filter const* Module::new_filter(std::string const& xs, Deps const&d)
     // BUG. filter constructor?
     Branch* br = new_branch(n, &mg_ground_node);
     assert(br);
+    assert(const_cast<Branch const*>(br)->owner());
     f->set_output(Branch_Ref(br));
   }else{
   }
@@ -812,8 +838,13 @@ void Block::push_back(Base* c)
   }
 }
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 Base const* Block::resolve(std::string const& k) const
+{
+  Block* b = const_cast<Block*>(this);
+  return b->resolve(k);
+}
+/*--------------------------------------------------------------------------*/
+Base* Block::resolve(std::string const& k)
 {
   trace2("resolve", _owner, k);
   const_iterator f = _var_refs.find(k);
@@ -825,5 +856,28 @@ Base const* Block::resolve(std::string const& k) const
     return NULL;
   }
 }
+/*--------------------------------------------------------------------------*/
+Deps::const_iterator Deps::begin() const
+{
+  return S::begin();
+}
+/*--------------------------------------------------------------------------*/
+Deps::const_iterator Deps::end() const
+{
+  return S::end();
+}
+/*--------------------------------------------------------------------------*/
+void Variable::update_deps(Deps const& d)
+{
+  deps().update(d);
+}
+/*--------------------------------------------------------------------------*/
+void Assignment::update_deps(Deps const& d)
+{
+  assert(_lhs);
+  _lhs->update_deps(d);
+  deps().update(d);
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

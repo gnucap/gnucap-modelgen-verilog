@@ -1,7 +1,7 @@
 #!/bin/sh
 GNUCAP=${GNUCAP-gnucap}
 if [ $# -eq 0 ] ; then
-    echo "usage: ./test gnucap-verilog \"testcases\" targetdir refdir"
+    echo "usage: ./test gnucap-mg-vams \"testcases\" targetdir refdir"
     echo "usual testcases is \"\", usual refdir is =="
     echo "example: ./test gnucap-mg-vams \"\" myversion =="
     exit 1
@@ -21,7 +21,8 @@ else
     do
 	echo $ii
 	echo $ii >>$3/$2.diffs
-	$1 -I.. -D__VAMS_GNUCAP --pp $ii >$3/$ii.out
+	$1 -d $3/$ii.err -I.. -D__VAMS_GNUCAP --pp $ii >$3/$ii.out
+	cat $3/$ii.err >> $3/$ii.out; rm $3/$ii.err
 	diff -u $4/$ii.out $3/$ii.out >>$3/$2.diffs || echo "**** $ii fails ****"
     done
     ls $2*.vams 2>/dev/null >/dev/null && \
@@ -29,7 +30,8 @@ else
     do
 	echo $ii
 	echo $ii >>$3/$2.diffs
-	$1 -I .. --dump $ii >$3/$ii.out
+	$1 -d $3/$ii.err -I .. --dump $ii >$3/$ii.out
+	cat $3/$ii.err >> $3/$ii.out; rm $3/$ii.err
 	diff -u $4/$ii.out $3/$ii.out >>$3/$2.diffs || echo "**** $ii fails ****"
     done
     ls $2*.gc 2>/dev/null >/dev/null && \

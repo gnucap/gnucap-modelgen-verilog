@@ -27,9 +27,14 @@ CXX = g++
 %: %.o
 	${CXX} -g -rdynamic $< ../bd/lib/.libs/libgnucap.so -o $@
 
-CHECK_TARGETS = check_mg0 check_mg1 check_mg2 check_mg3 check_dump check_test check_v
-check: ${CHECK_TARGETS}
-${CHECK_TARGETS}: check_%:
+CHECK_SECTIONS = mg0 mg1 mg2 mg3 dump test v
+CHECK_TARGETS = ${CHECK_SECTIONS:%=check/%.diffs}
+
+check: check/.diffs
+check/.diffs: ${CHECK_TARGETS}
+	cat $+ > $@
+
+${CHECK_TARGETS}: check/%.diffs:
 	+GNUCAP=${GNUCAP} ./test ${MODELGEN_VERILOG} "$*" ${TARGETDIR} ${REFDIR}
 
 clean:

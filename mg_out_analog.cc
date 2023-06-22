@@ -26,7 +26,7 @@
 static void make_cc_variable(std::ostream& o, Variable const& v)
 {
   o << ind << "ddouble _v_" << v.name() << "; // Variable";
-  for(auto i : v.deps()) { untested();
+  for(auto i : v.deps()) {
     o << ind << " Dep: " << i->code_name();
   }
   o << ind << "\n";
@@ -216,7 +216,8 @@ void make_cc_filter(std::ostream& o, const Module& m)
 	// }else{ untested();
 	  o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
 	  o__ "// assert(!d->" << f->state() << "[" << k << "]);\n";
-	  o__ "d->" << f->state() << "[" << k << "]"
+	  o__ "d->" << f->state() << "[" //  << k << "]"
+	  << "MOD::" << f->state() << "_::dep" << v->code_name() << "] "
 	    " = " << sign << " " << "t0[d" << v->code_name() << "];\n";
 	  ++k;
 	//}
@@ -533,6 +534,8 @@ static void make_one_branch_contribution(std::ostream& o, Module const& m, const
 	o____ b->state() << "[0] /= - " << b->state() << "[1];\n";
 	if(br.num_states()<=2){
 	}else{
+	  o__ "incomplete();\n";
+	  std::cerr << "INCOMPLETE" << "_pot"<< b->code_name() << "\n";
 	  incomplete(); // the other ones??
 	}
 	o__ "}else{\n";
@@ -558,7 +561,7 @@ static void make_one_branch_contribution(std::ostream& o, Module const& m, const
 	break;
       }else if(d->is_filter_probe()){
 	o__ "// trace2(\" filter " <<  b->state() << "\", " << b->state() << "["<<k<<"], "<<  d->code_name() <<");\n";
-	//o__ b->state() << "[0] -= " << b->state() << "["<<k<<"] * _st" << d->branch()->code_name() << "[0];\n";
+	// TODO: k == dep d->branch()->code_name()?
 	o__ b->state() << "[0] -= " << b->state() << "["<<k<<"] * " << d->branch()->code_name() << "->tr_amps();\n";
 	++k;
 	break;

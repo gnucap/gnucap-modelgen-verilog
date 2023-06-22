@@ -85,6 +85,7 @@ protected: // override virtual
     unreachable();
     return "";
   }
+  double tr_probe_num(const std::string& x)const override;
 public:
   void set_parameters(const std::string& Label, CARD* Parent,
 		      COMMON_COMPONENT* Common, double Value,
@@ -184,10 +185,23 @@ bool DEV_CPOLY_G::do_tr_con_chk_and_q()
   _time = _sim->_time0;
   if(converged()){
     set_converged(conchk(_old_values[0], _values[0], abstol()));
+    if(!converged()){
+      trace3("not converged", long_label(), _old_values[0], _values[0]);
+    }else{
+    }
   }else{
   }
   for (int i=1; converged() && i<=_n_ports; ++i) {
-    set_converged(conchk(_old_values[i], _values[i]) /*,0.?*/);
+    // if(i==0){
+    // }else if(_old_values[i] * _values[i] < 0.){ untested();
+    //   trace4("sign change", long_label(), i, _old_values[i], _values[i]);
+    // }else{ itested();
+    // }
+    set_converged(conchk(_old_values[i], _values[i] /*, 0.?*/ ));
+    if(!converged()){
+      trace4("not converged", long_label(), i, _old_values[i], _values[i]);
+    }else{
+    }
   }
   return converged();
 }
@@ -195,7 +209,7 @@ bool DEV_CPOLY_G::do_tr_con_chk_and_q()
 bool DEV_CPOLY_G::do_tr()
 {
   assert(_values);
-  trace2("DCG::do_tr", _values[0], _values[1]);
+  trace3("DCG::do_tr", long_label(), _values[0], _values[1]);
 
   _m0 = CPOLY1(0., _values[0], _values[1]);
   return do_tr_con_chk_and_q();
@@ -207,7 +221,7 @@ void DEV_CPOLY_G::tr_load()
   _old_values[0] = _values[0];
   _old_values[1] = _values[1];
   for (int i=2; i<=_n_ports; ++i) {
-    trace4("tr_load", long_label(), i, _values[i], _old_values[i]);
+//    trace4("tr_load", long_label(), i, _values[i], _old_values[i]);
     tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_values[i]), &(_old_values[i]));
   }
 }
@@ -287,6 +301,25 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
   assert(n_nodes <= net_nodes());
   notstd::copy_n(nodes, n_nodes, _n); // copy more in expand_last
   assert(net_nodes() == _n_ports * 2);
+}
+/*--------------------------------------------------------------------------*/
+double DEV_CPOLY_G::tr_probe_num(const std::string& x)const
+{
+  if (Umatch(x, "loss ")) {
+    return _loss0;
+  }else if (Umatch(x, "conv ")) {
+    return converged();
+  }else if (Umatch(x, "val0 ")) {
+    return _values[0];
+  }else if (Umatch(x, "val1 ")) {
+    return _values[1];
+  }else if (Umatch(x, "val2 ")) {
+    return _values[2];
+  }else if (Umatch(x, "abstol ")) {
+    return abstol();
+  }else{
+    return ELEMENT::tr_probe_num(x);
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

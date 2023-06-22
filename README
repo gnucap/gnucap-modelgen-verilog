@@ -20,7 +20,11 @@ $ modelgen-verilog { -I path -D def .. } --dump some_file.vams > some_file.dump
 
 To emit C++ code for use with Gnucap, type
 
-$ modelgen-verilog { -I path -D def .. } --cc some_file.vams > some_file.cc.
+$ modelgen-verilog { -I path -D def .. } --cc some_file.vams > some_file.cc
+
+or
+
+$ modelgen-verilog { -I path -D def .. } -o some_file.cc --cc some_file.vams.
 
 Compile and link the output into Gnucap plugin
 
@@ -40,12 +44,13 @@ gnucap> [..]
 
 == Preprocessor notes
 
-- modelgen-verilog { -I path -D def .. } --pp: preprocesses a file.
+- modelgen-verilog { -o output -I path -D def .. } --pp file
 - `include "quoted" works simlar to quoted C #include.
 - -I sets include path.
 - -D defines a symbol. Assign a value with -D"VARIABLE value"..
+- -o sets output path.
 - Files are located following logic from gcc implementation.
-- Output is sent to standard out, like cpp.
+- Output is sent to standard out, unless -o is specified.
 
 == language plugin note
 

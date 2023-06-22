@@ -431,6 +431,7 @@ static void make_read_probes(std::ostream& o, const Module& m)
       if(b->has_flow_probe()){
 	o__ "assert(" << b->code_name() << ");\n";
 	o__ "_flow" << b->code_name() << " = " << b->code_name() << "->tr_amps();\n";
+      }else if(b->has_pot_probe()){
       }else{
 	trace1("no probe?", b->code_name());
       }
@@ -551,7 +552,8 @@ static void make_module_allocate_local_nodes(std::ostream& o, Module const& m)
   if(m.element_list().size()){
     // nodes come from sckt proto
   }else{
-    for (auto n=m.nodes().rbegin(); n != m.nodes().rend(); ++ n){
+    //for (auto n=m.nodes().rbegin(); n != m.nodes().rend(); ++ n)
+    for (auto n=m.nodes().begin(); n != m.nodes().end(); ++ n){
       auto nn = *n;
       assert(nn);
       // TODO: node aliases, shorts etc.
@@ -645,7 +647,6 @@ static void make_module_expand_one_element(std::ostream& o, const Element_2& e, 
     make_set_parameters(o, e);
 
     int kk = 0;
-    // BUG iterate branches?
 
     // set_current ports.
     for(auto x : m.branches()){
@@ -656,6 +657,7 @@ static void make_module_expand_one_element(std::ostream& o, const Element_2& e, 
 	}else if(i->is_flow_probe()){
 	  assert(i->branch());
 	  o______ e.code_name() << "->set_current_port_by_index( "<< kk << ", \"" << i->branch()->code_name() << "\");\n";
+	  ++kk;
 	  break;
 	}else{
 	}

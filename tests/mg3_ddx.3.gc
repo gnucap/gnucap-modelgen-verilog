@@ -1,0 +1,30 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_ddx3(cp,cn);
+	inout cp, cn;
+	electrical cp, cn;
+	real vin, plus, minus, zero;
+	analog begin
+		vin = V(cp,cn);
+		minus = ddx(vin, V(cn, cp));
+		plus = ddx(vin, V(cp, cn));
+	end
+endmodule
+
+!make test_ddx3.so > /dev/null
+attach ./test_ddx3.so
+
+test_ddx3 #() dut(1,0);
+parameter v=0
+vsource #(.dc(v)) v1(1,0);
+
+list
+
+print dc v(nodes) zero(dut) minus(dut) plus(dut) iter(0)
+dc
+end

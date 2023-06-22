@@ -852,7 +852,7 @@ void ValueRangeConstant::dump(std::ostream& o)const
   o << _cexpr;
 }
 /*--------------------------------------------------------------------------*/
-void Block::new_var_ref(Base const* what)
+void Block::new_var_ref(Base* what)
 {
   assert(what);
   std::string p;
@@ -865,7 +865,7 @@ void Block::new_var_ref(Base const* what)
     assert(false);
   }
   trace1("new_var_ref", p);
-  Base const* cc = _var_refs[p];
+  Base* cc = _var_refs[p];
 
   // yikes.
   if(dynamic_cast<Analog_Function_Arg const*>(what)

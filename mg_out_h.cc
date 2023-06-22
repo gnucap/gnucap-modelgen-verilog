@@ -270,12 +270,37 @@ static void make_common(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_module_one_filter_state(std::ostream& o, Filter const& br)
+// BUG: duplicate?
+static void make_module_one_filter_state(std::ostream& o, Filter const& F)
 {
-  o << "public: // states, " << br.code_name() << ";\n";
-  o__ "double _st" << br.branch_code_name();
-  size_t k = br.num_states();
+  assert(F.prb());
+  assert(F.prb()->branch());
+  Branch const& br = *F.prb()->branch();
+
+  o << "public: // states, " << F.code_name() << ";\n";
+  o__ "double _st" << F.branch_code_name();
+  size_t k = F.num_states();
   o__ "[" << k << "];\n";
+
+  o__ "struct _st" << F.branch_code_name() << "_ {\n";
+  o____ "enum { ";
+  std::string comma = "";
+  o____ "VALUE, SELF";
+
+  std::vector<char> seen(F.prb()->branch()->num_branches());
+  for(auto d : F.deps()){
+    Branch const* bb = d->branch();
+    assert(bb);
+    if(seen[bb->number()]){
+    }else if(bb == &br){
+    }else{
+      seen[bb->number()] = 1;
+      assert(d);
+      o << ", dep" << d->code_name();
+    }
+  }
+  o____ "};\n";
+  o__ "} _dep" << F.code_name() << ";\n";
 }
 /*--------------------------------------------------------------------------*/
 static void make_filter_state(std::ostream& o, const Module& m)
@@ -305,12 +330,16 @@ static void make_module_one_branch_state(std::ostream& o, Branch const& br)
   o____ "enum { ";
   std::string comma = "";
   o____ "VALUE, SELF";
+  std::vector<char> seen(br.num_branches());
+
   for(auto d : br.deps()){
-    assert(d);
-    if(d->is_reversed()){
-    }else if(d->branch() == &br){
-      // SELF...
+    Branch const* bb = d->branch();
+    assert(bb);
+    if(seen[bb->number()]){
+    }else if(bb == &br){
     }else{
+      seen[bb->number()] = 1;
+      assert(d);
       o << ", dep" << d->code_name();
     }
   }

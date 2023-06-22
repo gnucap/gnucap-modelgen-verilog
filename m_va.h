@@ -220,7 +220,8 @@ public:
 		for(int i=1; i<=numderiv; ++i){
 			assert(_data[i] == _data[i]);
 			assert(o._data[i] == o._data[i]);
-			_data[i] *= *o._data; _data[i] += *_data * o._data[i];
+			_data[i] *= *o._data;
+			_data[i] += *_data * o._data[i];
 		}
 		*_data *= *o._data;
 		return *this;
@@ -256,7 +257,8 @@ public:
 	ddouble_& operator/=(ddouble_ const& o) {
 		if(*o._data){
 			for(int i=1; i<=numderiv; ++i){
-				_data[i] *= o.value(); _data[i] -= value() * o._data[i];
+				_data[i] *= o.value();
+				_data[i] -= value() * o._data[i];
 				_data[i] /= o.value() * o.value();
 			}
 			*_data /= *o._data;
@@ -307,6 +309,10 @@ public:
 		ddouble_ ret = *this;
 		ret /= o;
 		return ret;
+	}
+	bool operator!() const { itested();
+		assert(_data);
+		return *_data == 0.;
 	}
 
 	ddouble_& chain(double const& d) {
@@ -559,7 +565,7 @@ double exp(PARAMETER<double> const& d)
 
 template<class T>
 T atan(T d)
-{ untested();
+{ itested();
 	chain(d, 1./(1.+double(d)*double(d)));
 	set_value(d, std::atan(d));
 	return d;
@@ -632,13 +638,15 @@ T log10(T& d)
 template<class T>
 T ln(T d)
 {itested();
-	double l;
-	if(d>1e-20){itested();
+	double l=-1e99;
+	if(d>1e-40){itested();
 		l = std::log(double(d));
 		chain(d, 1./double(d));
+	}else if(d>0){ untested();
+		l=-1e40;
+		chain(d, 1e40);
 	}else{ untested();
-		l=-1e20;
-		chain(d, 1e20);
+		chain(d, 1e40);
 	}
 	set_value(d, l);
 //	assert(d.is_same(d));
@@ -728,16 +736,16 @@ T sin(T d)
 template<class T>
 T sqrt(T d)
 { itested();
-	if(double(d)>5e-19){ itested();
+	if(double(d)>1e-20){ itested();
 		double s = std::sqrt(d);
 		d.value() = s;
 		chain(d, -.5/s);
 	}else if(d>0){ untested();
-		chain(d, -1e20);
+		chain(d, -5e21);
 		d.value() = std::sqrt(d);
-	}else{itested();
-		chain(d, -1e20);
-		d.value() = 1e-20;
+	}else{ untested();
+		chain(d, -.5e99);
+		d.value() = 1e-99;
 	}
 	return d;
 }

@@ -24,6 +24,7 @@
 #include <patchlev.h>
 /*global*/ int errorcount = 0;
 std::string ind = "  ";
+std::basic_ostream<char>* diag_out; // mg_error.cc
 /*--------------------------------------------------------------------------*/
 #if 0
 static void make_module_file(const File& in, std::string dump_name)
@@ -57,6 +58,38 @@ static void dump(const File& in, std::ostream& out)
       << in.connectmodule_list() << '\n';
 }
 /*--------------------------------------------------------------------------*/
+class OUTPUT {
+  std::basic_ostream<char>& _default;
+  std::basic_ostream<char>* _o{NULL};
+public:
+  explicit OUTPUT(std::basic_ostream<char>& d) : _default(d) {};
+  ~OUTPUT(){
+    delete _o;
+    _o = NULL;
+  }
+  void set(std::string const& name){
+    delete _o;
+    _o = NULL;
+    _o = new std::ofstream(name);
+  }
+
+  operator std::basic_ostream<char>&(){
+    if(_o){
+      return *_o;
+    }else{
+      return _default;
+    }
+  }
+
+  template<class T>
+  OUTPUT& operator<<(T t){
+    (std::basic_ostream<char>&) *this << t;
+    return *this;
+  }
+};
+OUTPUT output(std::cout);
+OUTPUT diag(std::cerr);
+/*--------------------------------------------------------------------------*/
 int main(int argc, char** argv)
 {
   File f;
@@ -66,22 +99,29 @@ int main(int argc, char** argv)
   trace1("main", argc);
   for(; argc>1; --argc, ++argv) try{
     trace2("main", argc, argv[0]);
-    // if (argc > 2 && strcmp(argv[1],"-h")==0) {
-    //   for (int i=2; i<argc; ++i) {
-    //     File f(argv[i]);
-    //     make_h_file(f);
-    //   }
-    // }else
-    if (strcmp(argv[0],"--cc")==0) { itested();
+    if (strcmp(argv[0],"-o")==0) { untested();
+      output.set(argv[1]);
+      --argc;
+      ++argv;
+    }else if (strcmp(argv[0],"-d")==0
+           || strcmp(argv[0],"--diag")==0) {
+      diag.set(argv[1]);
+      --argc;
+      ++argv;
+    }else if (strcmp(argv[0],"--cc")==0) {
+      p.set_diag(diag);
+      diag_out = &(std::basic_ostream<char>&)diag; // mg_error.cc
       p.read(argv[1]);
       f.parse(p);
-      make_cc(std::cout, f);
+      make_cc(output, f);
       --argc;
       ++argv;
     }else if (strcmp(argv[0],"--pp")==0
           ||  strcmp(argv[0],"-E")==0) {
+      p.set_diag(diag);
+      diag_out = &(std::basic_ostream<char>&)diag; // mg_error.cc
       p.read(argv[1]);
-      p.dump(std::cout);
+      p.dump(output);
       --argc;
       ++argv;
     }else if (argc > 1 && strncmp(argv[0],"-D", 2)==0) {
@@ -105,12 +145,12 @@ int main(int argc, char** argv)
       p.read(argv[1]);
       File f;
       f.parse(p);
-      dump(f, std::cout);
+      dump(f, output);
       --argc;
       ++argv;
     }else if (argc > 1 && ( strcmp(argv[0],"-v")==0
 	                 || strcmp(argv[0],"--version")==0 )) {untested();
-      std::cerr <<
+      std::cout <<
 	"Gnucap verilog compiler "  PATCHLEVEL  "\n"
 	"Part of the Gnu Circuit Analysis Package\n"
 	"Never trust any version less than 1.0\n"
@@ -122,18 +162,11 @@ int main(int argc, char** argv)
 	"to redistribute it under certain conditions\n"
 	"according to the GNU General Public License.\n"
 	"See the file \"COPYING\" for details.\n";
-//    }else if (argc > 1) {itested();
-//      for (int i=1; i<argc; ++i) {itested();
-//	File f;
-//	f.read(argv[i]);
-//	make_dump_file(f);
-//	make_module_file(f, f.name()+".cc");
-//      }
     }else{untested();
       throw Exception("no input files");
     }
   }catch (Exception const& e) {
-    std::cout << e.message() << '\n';
+    diag << e.message() << '\n';
     exit(1);
   }
   return errorcount;

@@ -1,0 +1,37 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+// test how deps play with control structures
+
+`modelgen
+module test_ddx2(p,n,cp,cn);
+	inout p, n, cp, cn;
+	electrical p, n, cp, cn;
+	parameter real gm = 1.0;
+	real vin, plus, minus, zero;
+	analog begin
+		real vv;
+		if(1) begin
+			vin = V(cp,cn);
+		end
+		vv = vin;
+		zero = ddx(vv, V(p));
+		minus = ddx(vv, V(cn));
+		plus = ddx(vv, V(cp));
+	end
+endmodule
+
+!make test_ddx2.so > /dev/null
+attach ./test_ddx2.so
+
+test_ddx2 #() dut(1,1,1,0);
+parameter v=0
+vsource #(.dc(v)) v1(1,0);
+
+list
+
+print dc v(nodes) zero(dut) minus(dut) plus(dut) iter(0)
+dc
+end

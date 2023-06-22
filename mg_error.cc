@@ -24,6 +24,7 @@
 //testing=script,sparse 2006.10.31
 #include <ap.h>
 extern int errorcount;
+extern std::basic_ostream<char>* diag_out;
 /*--------------------------------------------------------------------------*/
 #if 0
 void error(int, const std::string& message)
@@ -55,10 +56,19 @@ CS & CS::check(int badness, const std::string& message)
 }
 #endif
 /*--------------------------------------------------------------------------*/
+static std::basic_ostream<char>& diag()
+{
+  if(diag_out){
+    return *diag_out;
+  }else{ untested();
+    return std::cerr;
+  }
+}
+/*--------------------------------------------------------------------------*/
 static void tab(size_t n)
 {
   for (unsigned i=0; i<n; ++i) {
-    std::cout << ' ';
+    diag() << ' ';
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -72,13 +82,12 @@ static void tab(size_t n)
 CS & CS::warn(int badness, size_t spot, const std::string& message)
 {
   if (badness >= 0) {
-    ++errorcount;
 
     size_t linestart = spot;
     for (;;) {
       if (linestart == 0) {
 	break;
-      }else if (_cmd[linestart] == '\n') {
+      }else if (_cmd[linestart] == '\n') { untested();
 	++linestart;
 	break;
       }else{
@@ -87,33 +96,38 @@ CS & CS::warn(int badness, size_t spot, const std::string& message)
     }
 
     int lineno = 1;
-    for (size_t i=0; i<linestart; ++i) {
-      if (_cmd[i] == '\n') {
+    for (size_t i=0; i<linestart; ++i) { untested();
+      if (_cmd[i] == '\n') { untested();
 	++lineno;
-      }else{
+      }else{ untested();
       }
     }
 
-    std::cout << _name << ':' << lineno << ":\n";
+    diag() << _name << ':' << lineno << ":\n";
     if (spot-linestart < 20) {
       for (size_t i=linestart; _cmd[i] && _cmd[i]!='\n'; ++i) {
-	std::cout << _cmd[i];
+	diag() << _cmd[i];
       }
-      std::cout << '\n';
+      diag() << '\n';
       tab(spot-linestart);
-    }else{
-      std::cout << "..";
-      for (size_t i=spot-15; _cmd[i] && _cmd[i]!='\n'; ++i) {
-	std::cout << _cmd[i];
+    }else{ untested();
+      diag() << "..";
+      for (size_t i=spot-15; _cmd[i] && _cmd[i]!='\n'; ++i) { untested();
+	diag() << _cmd[i];
       }
-      std::cout << '\n';
+      diag() << '\n';
       tab(17);
     }
-    std::cout << "^ ? " << message << '\n';
+    diag() << "^ ? " << message << '\n';
   }else{untested();
+  }
+  if(badness >= bDANGER){ untested();
+    exit(1);
+  }else{
   }
   return *this;
 }
 #endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet

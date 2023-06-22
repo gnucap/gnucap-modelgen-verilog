@@ -34,3 +34,4 @@ install:
 
 .PHONY: clean install
 .SECONDARY: ${TARGET:.so=.cc}
+.DELETE_ON_ERROR:
