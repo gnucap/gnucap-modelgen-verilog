@@ -99,7 +99,7 @@ int main(int argc, char** argv)
   trace1("main", argc);
   for(; argc>1; --argc, ++argv) try{
     trace2("main", argc, argv[0]);
-    if (strcmp(argv[0],"-o")==0) { untested();
+    if (strcmp(argv[0],"-o")==0) { itested();
       output.set(argv[1]);
       --argc;
       ++argv;

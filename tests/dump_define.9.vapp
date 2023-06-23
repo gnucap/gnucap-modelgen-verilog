@@ -1,0 +1,9 @@
+
+`define commentMacro \
+    TKD_sq     =  TKD * TKD; \
+    \
+    /*  Parameter for white noise of parasitic resistances */ \
+    nt0        =  4.0 * KBOL * TKD;
+
+
+`commentMacro

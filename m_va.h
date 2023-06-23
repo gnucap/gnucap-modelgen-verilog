@@ -142,7 +142,7 @@ public:
 		return *_data > double(o);
 	}
 
-	bool operator>=(const ddouble_& o)const { untested();
+	bool operator>=(const ddouble_& o)const { itested();
 		return *_data >= *o._data;
 	}
 	bool operator>=(const double& o)const {itested();
@@ -460,7 +460,7 @@ bool operator==(PARAMETER<int> const& b, ddouble_<T> const& a)
 	return double(b) == a.value();
 }
 inline bool operator==(PARAMETER<int> const& b, double const& a)
-{ untested();
+{ itested();
 	return double(b) == a;
 }
 inline bool operator==(PARAMETER<double> const& b, int const& a)
@@ -597,8 +597,8 @@ T abs(T d)
 
 template<class T>
 int floor(T d)
-{untested();
-	return std::floor(d);
+{itested();
+	return int(std::floor(d));
 }
 
 template<class T>

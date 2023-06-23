@@ -96,10 +96,10 @@ CS & CS::warn(int badness, size_t spot, const std::string& message)
     }
 
     int lineno = 1;
-    for (size_t i=0; i<linestart; ++i) { untested();
-      if (_cmd[i] == '\n') { untested();
+    for (size_t i=0; i<linestart; ++i) { itested();
+      if (_cmd[i] == '\n') { itested();
 	++lineno;
-      }else{ untested();
+      }else{ itested();
       }
     }
 

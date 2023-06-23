@@ -48,7 +48,7 @@ CS& CS::get_line(const std::string& prompt)
     _ok = true;
   }
 
-  if (OPT::listing) {
+  if (OPT::listing) { untested();
     IO::mstdout << "\"" << fullstring() << "\"\n";
   }else{
   }
@@ -75,7 +75,7 @@ static std::string getlines(FILE *fileptr)
       trim(buffer);
       size_t count = strlen(buffer);
       if (buffer[count-1] == '\\') {
-	buffer[count-1] = '\0';
+	buffer[count-1] = '\\';
       }else{
 	// look ahead at next line
 	//int c = fgetc(fileptr);
@@ -83,7 +83,7 @@ static std::string getlines(FILE *fileptr)
 	while (isspace(c = fgetc(fileptr))) {
 	  // skip
 	}
-	// if (c == '+') {
+	// if (c == '+') { untested();
 	//   need_to_get_more = true;
 	// }else if (c == '\n') {unreachable();
 	//   need_to_get_more = true;
@@ -115,7 +115,7 @@ static void append_to(CS& f, std::string& to, std::string until)
   }else{
   }
 
-  // while (f.peek() && (!isgraph(f.peek()))) {
+  // while (f.peek() && (!isgraph(f.peek()))) { untested();
   //   to += f.ctoc();
   // }
 
@@ -127,13 +127,13 @@ static void append_to(CS& f, std::string& to, std::string until)
       // match
       return;
     }else{
-      trace2("discard", chunk, f.tail());
+      trace3("no match", until, chunk, f.tail());
       to += "\n"; // BUG?
       try{
 	f.get_line("");
 	trace2("got line2 ", f.tail(), f.more());
       }catch( Exception_End_Of_Input const&){
-	trace1("EOI", chunk);
+	trace2("EOI", to, chunk);
       }
     }
   }
@@ -287,17 +287,29 @@ void Define::parse(CS& f)
   }else{
   }
 
-  stash(f.get_to("/"), args);
-  while (f.match1('/')) {
+  stash(f.get_to("/\\"), args);
+  while (f.match1('/') || f.match1('\\')) {
     if (f >> "//") {
       f.get_to("\n"); //  dummy_cxx_comment;
     }else if (f >> "/*") /* C comment */ {
       f >> dummy_c_comment; //BUG// line count may be wrong
-      stash(f.get_to("/\n"), args);
-    }else{
+      stash(f.get_to("\\/\n"), args);
+    }else if(f >> "\\\n"){
+      incomplete();
+    }else if(f.match1('\\')) {
+      f.skip();
+      stash("\n", args);
+      std::string more = f.get_to("\\/\n"); // BUG
+      trace1("more?", more);
+      stash(more, args);
+    }else if(f.match1('/')){
       stash("/", args);
       f.skip();
-      stash(f.get_to("/\n"), args);
+      std::string more = f.get_to("\\/\n"); // BUG
+      trace1("more?", more);
+      stash(more, args);
+    }else{
+      incomplete();
     }
   }
 
@@ -468,7 +480,7 @@ void Preprocessor::parse(CS& file)
   int else_block = 0;
   for (;;) {
     append_to(file, _stripped_file, "\"/`");
-    if (!file.more()){
+    if (!file.ns_more()){
     }else if (file >> '"') {
       file >> quoted_string;
       _stripped_file += '"' + quoted_string.val_string() + '"';

@@ -13,7 +13,7 @@ module test_af_0(p, n);
 		input x;
 		begin
 			real a;
-			a = .2;
+			a = .2 + 0.*x;
 			fct = exp(a*v);
 		end
 	endfunction
