@@ -1,0 +1,5 @@
+
+`define SMALL 1e-10
+`define POW(x,y) pow( (x+`SMALL) , y )
+
+A = `POW(V(in, X), 4)

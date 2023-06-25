@@ -500,7 +500,7 @@ CARD* PARAMSET::deflate()
   resolve_copy(subckt(), c->_params, NULL);
 
   trace4("PARAMSET::deflate args fwd", dev->long_label(), dev->dev_type(), long_label(), dev_type());
-  for(auto i=pc->_params.begin(); i!=pc->_params.end(); ++i){ untested();
+  for(auto i=pc->_params.begin(); i!=pc->_params.end(); ++i){
     CS cmd(CS::_STRING, i->second.string());
     Expression e(cmd);
     Expression r(e, subckt());
@@ -588,10 +588,10 @@ void PARAMSET::expand()
 
     {
       auto c = prechecked_cast<COMMON_PARAMLIST const*>(proto->common());
-      for(auto i=c->_params.begin(); i!=c->_params.end(); ++i){ untested();
+      for(auto i=c->_params.begin(); i!=c->_params.end(); ++i){
 	trace2("PARAMSET::expand sp", i->first, i->second.string());
       }
-      for(auto i=c->_params.begin(); i!=c->_params.end(); ++i){ untested();
+      for(auto i=c->_params.begin(); i!=c->_params.end(); ++i){
 	dev->set_param_by_name(i->first, i->second.string());
       }
     }

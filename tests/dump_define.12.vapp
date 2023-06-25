@@ -1,0 +1,21 @@
+
+`define AAA(x, y) \
+    T0 = x + y;
+
+
+`AAA(X, \
+Y)
+
+
+`AAA(\
+X, Y)
+
+
+`AAA(X, Y \
+)
+
+`AAA(\
+X\
+,\
+Y\
+)

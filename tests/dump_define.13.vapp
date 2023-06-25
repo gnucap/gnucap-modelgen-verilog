@@ -1,0 +1,4 @@
+
+`define M(a,b,c) \
+        A / b; \
+        thing; \

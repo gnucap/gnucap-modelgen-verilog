@@ -743,7 +743,7 @@ T sqrt(T d)
 	}else if(d>0){ untested();
 		chain(d, -5e21);
 		d.value() = std::sqrt(d);
-	}else{ untested();
+	}else{ itested();
 		chain(d, -.5e99);
 		d.value() = 1e-99;
 	}

@@ -69,13 +69,13 @@ static std::string getlines(FILE *fileptr)
       need_to_get_more = false;
       if (s == "") {
 	throw Exception_End_Of_Input("");
-      }else{untested();
+      }else{
       }
     }else{
       trim(buffer);
       size_t count = strlen(buffer);
       if (buffer[count-1] == '\\') {
-	buffer[count-1] = '\\';
+	buffer[count-1] = '\n';
       }else{
 	// look ahead at next line
 	//int c = fgetc(fileptr);
@@ -288,17 +288,17 @@ void Define::parse(CS& f)
   }
 
   stash(f.get_to("/\\"), args);
-  while (f.match1('/') || f.match1('\\')) {
+  while (f.match1('/') || f.match1('\\') || f.match1('\n')) {
     if (f >> "//") {
       f.get_to("\n"); //  dummy_cxx_comment;
     }else if (f >> "/*") /* C comment */ {
       f >> dummy_c_comment; //BUG// line count may be wrong
       stash(f.get_to("\\/\n"), args);
-    }else if(f >> "\\\n"){
+    }else if(f >> "\\\n"){ untested();
       incomplete();
-    }else if(f.match1('\\')) {
+    }else if(f.match1('\\')) { untested();
       f.skip();
-      stash("\n", args);
+//      stash("\n", args);
       std::string more = f.get_to("\\/\n"); // BUG
       trace1("more?", more);
       stash(more, args);
@@ -308,8 +308,11 @@ void Define::parse(CS& f)
       std::string more = f.get_to("\\/\n"); // BUG
       trace1("more?", more);
       stash(more, args);
-    }else{
-      incomplete();
+    }else if(f.match1('\n')){
+      stash("\n", args);
+      f.skip();
+      trace1("more?", f.tail());
+      stash(f.get_to("\\/\n"), args);
     }
   }
 
@@ -379,6 +382,39 @@ std::string expand_macros(CS& file, Define_List const& d)
   return stripped_file;
 }
 /*--------------------------------------------------------------------------*/
+void Raw_String_Arg::parse(CS& f)
+{
+  int par = 0;
+  assert(_s=="");
+  bool quote = false;
+  while(f.ns_more()) {
+    char p = f.peek();
+    if(p == '\"') {
+      quote = !quote;
+      _s += f.ctoc();
+    }else if(quote) {
+      _s += f.ctoc();
+    }else if(p == '(') {
+      ++par;
+      _s += f.ctoc();
+    }else if(p == ')') {
+      if(!par){
+	break;
+      }else{
+	--par;
+	_s += f.ctoc();
+      }
+    }else if(par) {
+      _s += f.ctoc();
+    }else if(p == ',') {
+      f.skip();
+      break;
+    }else {
+      _s += f.ctoc();
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 // Define::?
 static String_Arg_List eval_args(CS& f, size_t howmany, Define_List const& d)
 {
@@ -386,7 +422,11 @@ static String_Arg_List eval_args(CS& f, size_t howmany, Define_List const& d)
   Raw_String_Arg_List values;
   if(!howmany) {
   }else if(f.match1('(')){
+    trace1("parse_n raw args", f.tail());
     values.parse_n(f, howmany);
+    for(auto i : values){
+      trace1("parse_n dbg", i->to_string());
+    }
   }else{
   }
 
@@ -400,7 +440,6 @@ static String_Arg_List eval_args(CS& f, size_t howmany, Define_List const& d)
   for(auto i : values){
     CS file(CS::_STRING, i->to_string());
     std::string value = expand_macros(file, d);
-    trace2("evalarg", i->to_string(), value);
     ret.push_back(new String_Arg(value));
   }
 

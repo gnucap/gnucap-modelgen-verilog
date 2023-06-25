@@ -385,7 +385,7 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
     }else if (!have_instance && (cmd >> "parameter ")) {
       cmd.reset();
       CMD::cmdproc(cmd, x->subckt());
-    }else if (cmd >> "// ") {
+    }else if (cmd >> "//") {
       cmd.reset();
       new__instance(cmd, x, x->subckt());
     }else if (cmd >> "paramset ") {

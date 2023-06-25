@@ -169,42 +169,6 @@ void String_Arg::parse(CS& f)
   f >> _s;
 }
 /*--------------------------------------------------------------------------*/
-void Raw_String_Arg::parse(CS& f)
-{
-  int par = 0;
-  assert(_s=="");
-  bool quote = false;
-  while(f.ns_more()) {
-    char p = f.peek();
-    if(p == '\"') {
-      quote = !quote;
-      _s += p;
-      f.skip();
-    }else if(quote) {
-      _s += p;
-      f.skip();
-    }else if(p == '(') {
-      ++par;
-      _s += p;
-      f.skip();
-    }else if(p == ',') {
-      f.skip();
-      break;
-    }else if(p == ')') {
-      if(!par){
-	break;
-      }else{ itested();
-	--par;
-	_s += p;
-	f.skip();
-      }
-    }else {
-      _s += p;
-      f.skip();
-    }
-  }
-}
-/*--------------------------------------------------------------------------*/
 void ConstExpression::parse(CS& file)
 {
   assert(owner());

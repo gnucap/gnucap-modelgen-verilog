@@ -303,7 +303,7 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
       if(_params[i].first == ""){
 	int idx = c->param_count() - i - 1;
 	c->set_param_by_index(idx, value, 0);
-      }else{ untested();
+      }else{
 	c->set_param_by_name(_params[i].first, value);
       }
     }
