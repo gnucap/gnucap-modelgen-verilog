@@ -30,22 +30,27 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
   //   o << comma << "d_" << nn.second->name();
   // }
   for(auto x : m.branches()){
-    assert(x.second);
-    Branch const* b = x.second;
-    if(b->has_flow_probe()){
-      o << comma << "    d_flow" << b->code_name();
-      comma = ",\n";
+    assert(x);
+    Branch const* b = x;
+    if(b->is_short()){ untested();
+      // !has_element?
     }else{
-    }
-    if(b->is_filter()){
-      o << comma << "    d__filter" << b->code_name();
-      comma = ",\n";
-    }else if(b->has_pot_probe()){
-      o << comma << "    d_potential" << b->code_name();
-      comma = ",\n";
-    }else{
-//      o << comma "// no pot probe?   d_potential" << b->code_name();
-//      comma = ",\n";
+      if(b->has_flow_probe()){
+	o << comma << "    d_flow" << b->code_name();
+	comma = ",\n";
+      }else{
+      }
+
+      if(b->is_filter()){
+	o << comma << "    d__filter" << b->code_name();
+	comma = ",\n";
+      }else if(b->has_pot_probe()){
+	o << comma << "    d_potential" << b->code_name();
+	comma = ",\n";
+      }else{
+	//      o << comma "// no pot probe?   d_potential" << b->code_name();
+	//      comma = ",\n";
+      }
     }
   }
   o << "\n";
@@ -56,8 +61,8 @@ static void declare_ddouble(std::ostream& o, Module const& m)
 {
   size_t np = 0;
   for(auto x : m.branches()){
-    assert(x.second);
-    Branch const* b = x.second;
+    assert(x);
+    Branch const* b = x;
     if(b->has_flow_probe()){
       ++np;
     }else{
@@ -259,6 +264,7 @@ static void make_common(std::ostream& o, const Module& m)
   o__ "}\n";
   o__ "double vt_hack(double T)const {\n";
   o____ "assert(T>=-P_CELSIUS0);\n";
+  o____ "(void)T;\n";
   o____ "return P_K * temp_hack() / P_Q;\n";
   o__ "}\n";
   o__ "bool param_given(PARA_BASE const& p)const {\n";
@@ -331,12 +337,29 @@ static void make_module_one_branch_state(std::ostream& o, Branch const& br)
   std::string comma = "";
   o____ "VALUE, SELF";
   std::vector<char> seen(br.num_branches());
-
   for(auto d : br.deps()){
     Branch const* bb = d->branch();
     assert(bb);
-    if(seen[bb->number()]){
+    if(bb->is_short()){ untested();
+    }else if(seen[bb->number()]){
     }else if(bb == &br){
+    }else if(bb->has_flow_probe()){
+    }else{
+      seen[bb->number()] = 1;
+      assert(d);
+      o << ", dep" << d->code_name();
+    }
+  }
+  o << "/* | */\n";
+  seen.clear();
+  seen.resize(br.num_branches());
+  for(auto d : br.deps()){
+    Branch const* bb = d->branch();
+    assert(bb);
+    if(bb->is_short()){ untested();
+    }else if(seen[bb->number()]){
+    }else if(bb == &br){
+    }else if(!bb->has_flow_probe()){
     }else{
       seen[bb->number()] = 1;
       assert(d);
@@ -351,9 +374,9 @@ static void make_module_one_branch_state(std::ostream& o, Branch const& br)
 static void make_branch_states(std::ostream& o, const Module& m)
 {
   for(auto x : m.branches()){
-    assert(x.second);
-    if(x.second->has_element()){
-      make_module_one_branch_state(o, *x.second);
+    assert(x);
+    if(x->has_element()){
+      make_module_one_branch_state(o, *x);
     }else{
     }
   }
@@ -385,7 +408,7 @@ static void make_module(std::ostream& o, const Module& m)
   }else{
   }
   for (auto br : m.branches()){
-    o << ind << "ELEMENT* " << br.second->code_name() << "{NULL}; // branch\n";
+    o << ind << "ELEMENT* " << br->code_name() << "{NULL}; // branch\n";
   }
   // for (auto br : m.filters()){
   //   o << ind << "ELEMENT* " << br->code_name() << "{NULL}; // branch\n";
@@ -462,8 +485,8 @@ static void make_module(std::ostream& o, const Module& m)
   o << ind << "};\n";
   o << "private: // probe values\n";
   for(auto x : m.branches()){
-    assert(x.second);
-    Branch const* b = x.second;
+    assert(x);
+    Branch const* b = x;
     if(b->has_flow_probe()){
       o << ind << "double _flow" << b->code_name() << ";\n";
     }else{

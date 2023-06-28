@@ -1,0 +1,10 @@
+
+module test()
+
+analog begin
+	real arg;
+	$strobe("... %f with escaped newline \
+                test.", arg);
+end
+
+endmodule

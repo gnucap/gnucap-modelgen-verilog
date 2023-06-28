@@ -4,6 +4,6 @@
 
 
 
-module a(); 
-endmodule; 
+module a();
+endmodule;
 

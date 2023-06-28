@@ -1,11 +1,11 @@
 
 
-module anotherone() 
-endmodule; 
+module anotherone()
+endmodule;
 
 
 
-module subanotherone(); 
-endmodule; 
+module subanotherone();
+endmodule;
 
 

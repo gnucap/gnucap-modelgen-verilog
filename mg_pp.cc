@@ -95,7 +95,7 @@ static std::string getlines(FILE *fileptr)
 	}
       }
       s += buffer;
-      s += ' ';
+      // s += ' ';
     }
   }
   return s;
@@ -103,14 +103,14 @@ static std::string getlines(FILE *fileptr)
 /*--------------------------------------------------------------------------*/
 static void append_to(CS& f, std::string& to, std::string until)
 {
-  trace2("append_to", f.tail(), f.more());
+  trace2("append_to", f.tail(), f.ns_more());
   if(!f.ns_more()) {
     try{
 //      to+="\n";
       f.get_line("");
-      trace2("got line", f.tail(), f.more());
+      trace2("got line", f.tail(), f.ns_more());
     }catch (Exception_End_Of_Input const&) {
-      assert(!f.more());
+      assert(!f.ns_more());
     }
   }else{
   }
@@ -119,7 +119,7 @@ static void append_to(CS& f, std::string& to, std::string until)
   //   to += f.ctoc();
   // }
 
-  while (f.more()) {
+  while (f.ns_more()) {
     std::string chunk = f.get_to(until);
     trace3("got_to", until, chunk, f.tail());
     to += chunk;
@@ -131,7 +131,7 @@ static void append_to(CS& f, std::string& to, std::string until)
       to += "\n"; // BUG?
       try{
 	f.get_line("");
-	trace2("got line2 ", f.tail(), f.more());
+	trace2("got line2 ", f.tail(), f.ns_more());
       }catch( Exception_End_Of_Input const&){
 	trace2("EOI", to, chunk);
       }
@@ -148,7 +148,7 @@ void C_Comment::parse(CS& file)
       file.get_line("");
     }else if (file >> "*/") {
       break;  // done with comment
-    }else if (!file.more()){
+    }else if (!file.ns_more()){
       file.get_line("");
     }else{
       file.skip();
@@ -431,6 +431,7 @@ static String_Arg_List eval_args(CS& f, size_t howmany, Define_List const& d)
   }
 
   if(values.size() == howmany){
+    trace1("parse_n done", f.tail());
   }else{
     throw Exception_CS("Need more values", f);
   }
@@ -493,24 +494,45 @@ public:
       while (f.peek() && (!isgraph(f.peek()))) {
 	_data += f.ctoc();
       }
+      trace2("qs a1", _data, f.peek());
 
-      append_to(f, _data, "\\\"");
+      append_to(f, _data, "\\\"\n");
+      trace2("qs a2", _data, f.peek());
       if (f.peek() == '"') {
 	f.skip();
 	break;
+      }else if (f.peek() == '\n') {
+	_data += '\\';
+	_data += f.ctoc();
       }else if (f.peek() == '\\') {
 	_data += f.ctoc();
-	if(f.peek() == '\"'){
+	if(f.peek() == '\\'){
 	  _data += f.ctoc();
-	}else{ itested();
+	}else if(f.peek() == '\"'){
+	  _data += f.ctoc();
+	}else if(f.peek() == '\n'){ untested();
+	  _data += f.ctoc();
+	}else{ untested();
 	}
       }else{ untested();
 	trace2("qs", _data, f.peek());
 	throw Exception_CS("need '\"'", f);
       }
     }
+    trace1("PP_Quoted_String", _data);
   }
+  void dump(std::ostream& o)const override;
 } quoted_string;
+/*--------------------------------------------------------------------------*/
+void PP_Quoted_String::dump(std::ostream& o)const{
+  for(char c : _data){ untested();
+    if(c=='\n'){ untested();
+      o << '\\';
+    }else{ untested();
+    }
+    o << c;
+  }
+}
 /*--------------------------------------------------------------------------*/
 void Preprocessor::parse(CS& file)
 {
@@ -608,7 +630,7 @@ void Preprocessor::parse(CS& file)
       // move on, just copy
     }
 
-    if (!file.more()) {
+    if (!file.ns_more()) {
       try {
 	_stripped_file += "\n"; // BUG?
 	file.get_line("");

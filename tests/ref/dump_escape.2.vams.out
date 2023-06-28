@@ -1,0 +1,12 @@
+
+
+module test();
+  analog begin
+    real arg;
+    $strobe("...%fwithescapedescape\\", arg);
+  end
+
+endmodule
+
+
+

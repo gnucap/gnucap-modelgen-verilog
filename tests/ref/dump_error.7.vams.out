@@ -1,0 +1,8 @@
+... e test()
+analog begin
+$strobetypo(0);
+end
+endmodule
+
+
+                                        ^ ? bad discipline

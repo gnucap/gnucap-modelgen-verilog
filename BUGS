@@ -1,16 +1,20 @@
 == modelgen
-- missing tiebreak rules in overload
 - Port currents "I(<a>)" not supported.
+- "ground" statement not implemented.
+- suboptimal diagnostics
 - event control is incomplete
 - ddx is incomplete
 - only one current for each pair of nodes
 - V(..) <+ I(..) does not work, revisit mg2_ccvs.1.gc
+- flow on rhs after contrib doesn't work
 
 == simulator plugins
+- missing tiebreak rules in overload
 - paramset: requires newlines, v_paramset.2a.gc
 - c_pulse.so: obsolete hack, need discontinuities.
 
 == libgnucap, TODO
+- escaped characters in quoted strings
 - u_parameter.h:58:42: warning: overflow in conversion
 - MODEL_CARD in lang interface
 - BUG: padding long lines with whitespace

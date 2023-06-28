@@ -1,0 +1,13 @@
+
+module foo()
+
+real x;
+
+analog begin
+$strobe("some strobe %f.", x);
+end
+
+analog
+$strobe("some strobe %f.", x);
+
+endmodule

@@ -23,6 +23,9 @@ GNUCAP_EXEC_PREFIX = $(shell $(GNUCAP_CONF) --exec-prefix)
 %.cc: %.vams ${MODELGEN}
 	${MODELGEN} -I .. --cc $< > $@
 
+%.pp: %.vams ${MODELGEN}
+	${MODELGEN} -I .. --pp $< > $@
+
 all: ${TARGET}
 
 clean:

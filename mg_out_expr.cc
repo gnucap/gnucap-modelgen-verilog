@@ -144,6 +144,19 @@ public:
   }
 };
 /*--------------------------------------------------------------------------*/
+void make_cc_string(std::ostream& o, String const& e)
+{
+  o << '"';
+  for(char c : e.val_string()){ untested();
+    if(c=='\n'){ untested();
+      o << '\\';
+    }else{ untested();
+    }
+    o << c;
+  }
+  o << '"';
+}
+/*--------------------------------------------------------------------------*/
 void make_cc_expression(std::ostream& o, Expression const& e)
 {
   typedef Expression::const_iterator const_iterator;
@@ -208,17 +221,28 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 	s.new_float(o);
 	o << ind << s.code_name() << " = " << (*i)->name() << ";\n";
 #endif
-      }else{itested();
+      }else if(auto S=dynamic_cast<String const*>((*i)->data())){
 	s.new_string(o);
-	o << ind << s.code_name() << " = " << (*i)->name() << ";\n";
+	o << ind << s.code_name() << " = ";
+	make_cc_string(o, *S);
+	o << ";\n";
+      }else{untested();
+	unreachable();
+	s.new_string(o);
+	o << ind << s.code_name() << " = " << (*i)->name() << "; (u)\n";
       }
     }else if(auto pp = dynamic_cast<const Token_PROBE*>(*i)) {
       s.new_float(o);
-      char sign = (*pp)->is_reversed()?'-':'+';
-
-      o__ s.code_name() << " = "<<sign<<" p->" << (*pp)->code_name() << ";// "<< pp->name() <<"\n";
-      o__ s.code_name() << "[d" << (*pp)->code_name() << "] = " << sign << "1.;\n";
+      assert((*pp)->branch());
+      if((*pp)->branch()->is_short()){ untested();
+	o__ s.code_name() << " = 0.; // short probe\n";
+      }else{
+	char sign = (*pp)->is_reversed()?'-':'+';
+	o__ s.code_name() << " = " << sign << "p->" << (*pp)->code_name() << "; // "<< pp->name() <<"\n";
+	o__ s.code_name() << "[d" << (*pp)->code_name() << "] = " << sign << "1.;\n";
+      }
     }else if(/*parlist && ??*/dynamic_cast<const Token_SYMBOL*>(*i)) {
+      trace1("Symbol", (*i)->name());
       assert(s.have_args());
       MGVAMS_FUNCTION const* f = lookup_function((*i)->name());
       std::vector<std::string> argnames(s.num_args());
@@ -343,7 +367,7 @@ void make_cc_event_cond(std::ostream& o, Expression const& e)
   for (const_iterator i = e.begin(); i != e.end(); ++i) {
     if((*i)->name()=="initial_step"){
       o__ "evt = _sim->is_initial_step();\n";
-    }else if((*i)->name()=="initial_model"){ untested();
+    }else if((*i)->name()=="initial_model"){ itested();
       std::cerr << "WARNING: ADMS style keyword encountered\n";
       o__ "evt = _sim->is_initial_step();\n";
     }else{ untested();

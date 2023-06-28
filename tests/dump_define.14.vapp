@@ -1,0 +1,9 @@
+
+
+`define outer(a) AA \
+    `inner(a, b) BB\
+     BB
+
+`define inner(x, y) XX x
+
+`outer(a)

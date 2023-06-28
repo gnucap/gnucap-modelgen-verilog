@@ -1,0 +1,15 @@
+
+
+module foo();
+  real    x;
+
+  analog begin
+    $strobe("somestrobe%f.", x);
+  end
+
+  analog   $strobe("somestrobe%f.", x);
+
+endmodule
+
+
+

@@ -155,6 +155,8 @@ public:
   //		      const double* inputs[]=0);
 protected:
   bool do_tr_con_chk_and_q();
+private:
+  double tr_probe_num(const std::string& x) const override;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -463,6 +465,17 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
   std::fill_n(_vi1, n_states, 0.);
   notstd::copy_n(nodes, net_nodes(), _n);
   assert(net_nodes() == _n_ports * 2);
+}
+/*--------------------------------------------------------------------------*/
+double DEV_CPOLY_CAP::tr_probe_num(const std::string& x)const
+{
+  if (Umatch(x, "loss ")) {
+    return _loss0;
+  }else if (Umatch(x, "conv ")) {
+    return converged();
+  }else{
+    return STORAGE::tr_probe_num(x);
+  }
 }
 /*--------------------------------------------------------------------------*/
 } // namespace

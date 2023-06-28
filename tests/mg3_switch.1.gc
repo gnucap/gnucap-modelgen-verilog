@@ -1,0 +1,37 @@
+
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_sw1(p, n, cp, cn)
+	electrical p, n, cp, cn;
+	real short;
+
+	analog begin
+		if V(cp, cn) > 0 begin
+			short = 1;
+			V(p, n) <+ 0.
+		end else
+			short = 0;
+	end
+
+endmodule
+
+!make test_sw1.so > /dev/null
+attach ./test_sw1.so
+
+test_sw1 #() dut(1,0,2,0);
+parameter v=0
+vsource #(.dc(v)) v1(2,0);
+
+vsource #(.dc(1)) v1(3,0);
+resistor #(.r(1)) v1(3,1);
+
+list
+
+print dc v(nodes) i(v1) short(dut) iter(0) loss(dut.*)
+dc v1 -3 3 1 loop
+end

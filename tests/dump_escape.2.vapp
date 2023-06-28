@@ -1,0 +1,6 @@
+
+`define macro(x) x
+
+BUG, need different tokenise
+`macro("string with \
+		escaped newline");

@@ -209,6 +209,7 @@ bool DEV_CPOLY_G::do_tr_con_chk_and_q()
 bool DEV_CPOLY_G::do_tr()
 {
   assert(_values);
+  assert(!_loss0);
   trace3("DCG::do_tr", long_label(), _values[0], _values[1]);
 
   _m0 = CPOLY1(0., _values[0], _values[1]);
@@ -221,7 +222,7 @@ void DEV_CPOLY_G::tr_load()
   _old_values[0] = _values[0];
   _old_values[1] = _values[1];
   for (int i=2; i<=_n_ports; ++i) {
-//    trace4("tr_load", long_label(), i, _values[i], _old_values[i]);
+    trace4("tr_load", long_label(), i, _values[i], _old_values[i]);
     tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_values[i]), &(_old_values[i]));
   }
 }
@@ -315,6 +316,8 @@ double DEV_CPOLY_G::tr_probe_num(const std::string& x)const
     return _values[1];
   }else if (Umatch(x, "val2 ")) {
     return _values[2];
+  }else if (Umatch(x, "val3 ")) {
+    return _values[3];
   }else if (Umatch(x, "abstol ")) {
     return abstol();
   }else{

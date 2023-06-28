@@ -177,7 +177,8 @@ protected:
     size_t here = file.cursor();
     for (;;) {
       if (file.stuck(&here)) {
-	paren -= file.skip1b(END);
+  	file.skipbl();
+	paren -= file.skip1(END); //!!
 	if (paren == 0) {
 	  //file.warn(0, "list exit");
 	  break;
@@ -1354,6 +1355,7 @@ public:
   void dump(std::ostream&)const override;
   Node const* p() const{ assert(_p); return _p; }
   Node const* n() const{ assert(_n); return _n; }
+  bool is_short() const{ return _p == _n; }
   virtual std::string code_name() const;
   std::string short_label()const  { return code_name();}
 //  std::string name_of_module_instance()const  {return code_name();}
@@ -1403,7 +1405,10 @@ public:
 class Branch_Map {
   typedef std::pair<Node const*, Node const*> key;
   typedef std::map<key, Branch*> map; // set?
-  typedef map::const_iterator const_iterator;
+				      //
+  typedef std::list<Branch /* const?? */ *> list;
+  typedef list::const_iterator const_iterator;
+  list _brs;
 private:
   map _m;
 public:
@@ -1415,9 +1420,9 @@ public:
     }
   }
   //BranchRef new_branch(Node const* a, Node const* b, Block* owner);
-  const_iterator begin() const{ return _m.begin(); }
-  const_iterator end() const{ return _m.end(); }
-  size_t size() const{ return _m.size(); }
+  const_iterator begin() const{ return _brs.begin(); }
+  const_iterator end() const{ return _brs.end(); }
+  size_t size() const{ return _brs.size(); }
 
   Branch_Ref new_branch(Node const* a, Node const* b);
   void parse(CS& f);
@@ -1797,6 +1802,7 @@ public:
     assert(_branch);
     return _branch->code_name();
   }
+  size_t num_branches() const;
   std::string code_name() const {
     return "_f_" + _name; // name()?
   }

@@ -37,6 +37,7 @@ public:
     if(_stack.size() == 1){
       delete _stack.top();
     }else{
+      // BUG // possibly undeclared variable?
 //      throw Exception("stray dep", _stack.top()->name());
       assert(_stack.empty());
     }
@@ -175,6 +176,7 @@ static bool is_system_function_call(std::string const& n)
   if(n=="$param_given"
     || n=="$monitor"
     || n=="$strobe"
+    || n=="$finish"
     || n=="$simparam"
     || n=="$temperature"
     || n=="$vt"){
@@ -325,9 +327,9 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
   DEP_STACK ds;
   assert(ds.size()==0);
 
-  // for(List_Base<Token>::const_iterator ii = e.begin(); ii!=e.end(); ++ii) {
-  //   trace1("resolve symbols", (*ii)->name());
-  // }
+  for(List_Base<Token>::const_iterator ii = e.begin(); ii!=e.end(); ++ii) {
+    trace1("resolve symbols", (*ii)->name());
+  }
 
   // resolve symbols
   for(List_Base<Token>::const_iterator ii = e.begin(); ii!=e.end(); ++ii) {
@@ -337,7 +339,7 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
     auto s = dynamic_cast<Token_SYMBOL*>(t);
     std::string const& n = t->name();
     Base const* r = scope->resolve(n);
-    trace2("resolve top found:", n, r);
+    trace3("resolve top found:", n, r, s);
 
     if(dynamic_cast<Token_STOP*>(t)) {
       E.push_back(t->clone());
@@ -345,7 +347,7 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
       ds.stop();
       assert(ds.num_args()==0);
       // depstack.push(new Deps);
-    }else if(auto c = dynamic_cast<Token_CONSTANT*>(t)) {itested();
+    }else if(auto c = dynamic_cast<Token_CONSTANT*>(t)) {
       Token* cl = c->clone();
       assert(t->name() == cl->name());
       E.push_back(cl);
@@ -365,10 +367,10 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
       // merge operand deps? depends on operator..
       ds.binop();
 
-    }else if(auto tt = dynamic_cast<Token_TERNARY const*>(t)){itested();
+    }else if(auto tt = dynamic_cast<Token_TERNARY const*>(t)){ untested();
       Expression* tp = new Expression();
       Expression* fp = new Expression();
-      try{itested();
+      try{ untested();
 	assert(tt->true_part());
 	assert(tt->false_part());
 	resolve_symbols(*tt->true_part(), *tp, scope, ds.top());

@@ -755,7 +755,7 @@ T tanh(T d)
 {itested();
 	double t = std::tanh(d);
 	set_value(d, t);
-	chain(d, 1.-double(t)*double(t));
+	chain(d, 1. - t*t);
 	assert(d.is_same(d));
 	return d;
 }

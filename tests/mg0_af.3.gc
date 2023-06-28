@@ -1,0 +1,45 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_af_3(p, n);
+	electrical p, n;
+	parameter real rr = 1;
+
+	analog function real sum;
+		input x;
+		input y;
+		begin
+			sum = x + y;
+		end
+	endfunction
+
+	analog function real prod;
+		input x;
+		input y;
+		begin
+			prod = x * y;
+		end
+	endfunction
+
+	analog begin
+		I(p, n) <+ prod(V(p,n), sum(rr, 4));
+		I(n, p) <+ prod(sum(rr, 4), V(p,n));
+	end
+endmodule
+
+!make test_af_3.so > /dev/null
+attach ./test_af_3.so
+
+parameter rr=0
+vsource #(.dc(1)) vv(1, 0);
+test_af_3 #(.rr(rr)) dut(1, 0);
+
+list
+
+print dc v(nodes) i(vv)  iter(0)
+dc rr -4 10 2
+end

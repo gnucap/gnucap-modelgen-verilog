@@ -1,0 +1,27 @@
+// Test diode model
+
+verilog
+
+attach ../lang_verilog.so
+attach ../d_vasrc.so
+attach ../vams/diode.so
+
+module main(n, g)
+	diode #(.cjo(1pf)) D1(n g);
+endmodule
+
+main m(n,0);
+
+spice
+
+.model dd d cjo=1pf is=1e-15
+
+.parameter v=0
+V1  (0, n) vsource dc=v ac=1
+V2  (0, n2) vsource dc=v ac=1
+D1  (n2 0) dd
+
+.print dc v(nodes) i(V1) i(V2)
+.dc v -2 2 .5
+
+* doAC ac start=-1 stop=0.65 step=1mV dev=V1 freq=1THz/(2*M_PI)

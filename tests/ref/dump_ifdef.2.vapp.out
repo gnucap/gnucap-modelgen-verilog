@@ -4,6 +4,6 @@
 
 
 
-model  m  ( x  ,y) 
-endmodule 
+model  m ( x ,y)
+endmodule
 

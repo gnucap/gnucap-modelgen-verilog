@@ -1,0 +1,8 @@
+
+module test()
+analog begin
+$strobe("... with escaped newline \
+                test.", arg);
+end
+endmodule
+

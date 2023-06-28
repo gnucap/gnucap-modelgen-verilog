@@ -61,14 +61,14 @@ public:
 };
 typedef LiSt<CaseGen, '\0', '\0', '\0'> AnalogCaseList;
 /*--------------------------------------------------------------------------*/
-class System_Task : public AnalogStmt {
-  void parse(CS& o) override{
-    incomplete();
-    o >> ";";
-  }
-  void dump(std::ostream&o)const override{
-    o << "// incomplete\n";
-  }
+class System_Task : public Owned_Base {
+  AnalogExpression _e;
+public:
+  System_Task(CS&, Block*);
+  void parse(CS& o) override;
+  void dump(std::ostream&o)const override;
+
+  AnalogExpression const& expression() const{ return _e; }
 };
 /*--------------------------------------------------------------------------*/
 class AnalogCtrlStmt : public AnalogStmt {

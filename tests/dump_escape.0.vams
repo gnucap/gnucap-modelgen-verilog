@@ -1,0 +1,9 @@
+
+module test()
+
+	analog begin
+		real arg;
+		$strobe("an %f escaped \"`string\" test.", arg);
+	end
+
+endmodule

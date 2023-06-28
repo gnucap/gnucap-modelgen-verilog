@@ -1,0 +1,5 @@
+
+module test()
+	parameter real a=1;
+	parameter real a=1;
+endmodule

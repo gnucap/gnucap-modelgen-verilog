@@ -162,7 +162,11 @@ void Parameter_2::parse(CS& file)
     file >> _value_range_list;
   }
   assert(owner());
-  owner()->new_var_ref(this);
+  try{
+    owner()->new_var_ref(this);
+  }catch(Exception const&){
+    throw Exception_CS("already declared", file);
+  }
   assert(owner()->resolve(name()));
 }
 /*--------------------------------------------------------------------------*/

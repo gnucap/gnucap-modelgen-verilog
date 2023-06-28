@@ -1,0 +1,35 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_while0_0(p, n);
+	electrical p, n;
+	inout p, n;
+	parameter real v=0;
+	analog begin
+		integer i;
+		i = v;
+		while(i>0) begin
+			V(p,n) <+ 1.;
+			i = i - 1;
+		end
+	end
+endmodule
+
+list
+
+!make test_while0_0.so > /dev/null
+attach ./test_while0_0.so
+
+test_while0_0 #(.v(1)) dut(1,0);
+test_while0_0 #(.v(2)) dut(2,0);
+test_while0_0 #(.v(3)) dut(3,0);
+
+list
+
+print dc v(nodes) iter(0)
+dc
+end

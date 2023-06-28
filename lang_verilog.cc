@@ -579,7 +579,7 @@ void LANG_VERILOG::print_items_sckt(OMSTREAM& o, const BASE_SUBCKT* x)
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_paramset(OMSTREAM& o, const CARD* c)
 {
-  if(auto x = prechecked_cast<MODEL_CARD const*>(c)){
+  if(auto x = prechecked_cast<MODEL_CARD const*>(c)){ untested();
     _mode = mPARAMSET;
     o << "paramset " << x->short_label() << ' ' << x->dev_type() << ";\n";
     print_args(o, x);

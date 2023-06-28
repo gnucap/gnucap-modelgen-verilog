@@ -103,18 +103,20 @@ Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
 Branch_Ref Branch_Map::new_branch(Node const* a, Node const* b)
 {
   std::pair<Node const*, Node const*> p(a, b);
-  const_iterator i = _m.find(p);
+  auto i = _m.find(p);
   if(i!=_m.end()){
     return Branch_Ref(i->second);
   }else{
     std::pair<Node const*, Node const*> r(b, a);
-    const_iterator i = _m.find(r);
+    auto i = _m.find(r);
     if(i!=_m.end()){
       return Branch_Ref(i->second, true);
     }else{
-      _m[p] = new Branch(a, b, _m.size());
+      auto nb = new Branch(a, b, _m.size());
+      _brs.push_front(nb); // front?
+      _m[p] = nb;
   	// br.set_owner(this); // eek.
-      return Branch_Ref(_m[p] /*owner?*/);
+      return Branch_Ref(nb);
     }
   }
 }
@@ -241,6 +243,16 @@ Branch_Ref const& Branch_Names::lookup(std::string const& p) const
   }
 }
 /*--------------------------------------------------------------------------*/
+// number of *all* branches in the module.
+size_t Filter::num_branches() const
+{
+  if(has_branch()){
+    return _branch->num_branches();
+  }else{ untested();
+    return 0;
+  }
+}
+/*--------------------------------------------------------------------------*/
 size_t Branch::num_branches() const
 {
   auto m = prechecked_cast<Module const*>(owner());
@@ -251,9 +263,12 @@ size_t Branch::num_branches() const
 size_t Branch::num_nodes() const
 {
   size_t ret=1;
+  std::vector<char> visited(num_branches());
 
   for(auto i : deps()){
-    if(i->is_reversed()){
+    if(i->branch()->is_short()){ untested();
+    }else if(visited[i->branch()->number()]){
+
     }else if(i->branch() == this){
       // self conductance
     }else if(i->is_filter_probe()){
@@ -262,6 +277,7 @@ size_t Branch::num_nodes() const
       ++ret;
     }else{
     }
+    visited[i->branch()->number()] = 1;
   }
   return 2*ret;
 }
@@ -359,7 +375,11 @@ std::string const& Branch_Ref::nname() const
 /*--------------------------------------------------------------------------*/
 bool Branch::has_element() const
 {
-  return has_flow_source() || has_pot_source() || has_flow_probe();
+  if(is_short()){ untested();
+    return false;
+  }else{
+    return has_flow_source() || has_pot_source() || has_flow_probe();
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool Branch::has_pot_source() const
@@ -367,8 +387,10 @@ bool Branch::has_pot_source() const
   return _has_pot_src; //  || _has_flow_probe;
 }
 /*--------------------------------------------------------------------------*/
+// BUG: delegate to branch
 size_t Filter::num_states() const
 {
+  std::vector<char> visited(num_branches());
   size_t k = 2; // self conductance and what?
   // TODO: cleanup
   for(auto i : deps()){
@@ -378,29 +400,36 @@ size_t Filter::num_states() const
     }
 
     if(dynamic_cast<Element_2 const*>(i->branch()) == this){
+    }else if(visited[i->branch()->number()]){
     }else{
       ++k;
     }
+    visited[i->branch()->number()] = 1;
   }
   return k;
 }
 /*--------------------------------------------------------------------------*/
+// BUG: delegate to branch
 size_t Filter::num_nodes() const
 {
   size_t ret=1;
+  std::vector<char> visited(num_branches());
 
   for(auto i : deps()){
     if(i->is_reversed()){
     }else{
     }
-//    }else if(i->branch() == this){
-      // self conductance
-    if(i->is_filter_probe()){
+    if(visited[i->branch()->number()]){
+      // depends on both, flow and potential.
+      // can only use one.
+    }else if(i->is_filter_probe()){
       ++ret;
     }else if(i->is_pot_probe()){
       ++ret;
     }else{
     }
+    visited[i->branch()->number()] = 1;
+
   }
   return 2*ret;
 }
@@ -408,15 +437,23 @@ size_t Filter::num_nodes() const
 /*--------------------------------------------------------------------------*/
 size_t Branch::num_states() const
 {
+  std::vector<char> visited(num_branches());
+
   size_t k = 2;
   // TODO: cleanup
   for(auto i : deps()){
     assert(i);
-    if(i->is_reversed()){
-    }else if(i->branch() == this){
+    // if(i->is_reversed()){ untested();
+    //}else
+    if(i->branch() == this){
+    }else if(i->branch()->is_short()){ untested();
+    }else if(visited[i->branch()->number()]){
+      // depends on both, flow and potential.
+      // can only use one.
     }else{
       ++k;
     }
+    visited[i->branch()->number()] = 1;
   }
   return k;
 }
@@ -544,24 +581,24 @@ void ddx_Filter::make_cc(std::ostream& o, Module const& m) const
   o__ "ddouble ret;\n";
   o__ "(void) t1;\n";
   for(auto x : m.branches()){
-    if(x.second->has_pot_probe()){
-      o__ "// found probe " <<  x.second->code_name() << "\n";
+    if(x->has_pot_probe()){
+      o__ "// found probe " <<  x->code_name() << "\n";
       if(p == &mg_ground_node){ untested();
       }else if(n != &mg_ground_node){
-      }else if(x.second->p() == p){
-	o__ "ret.value() += t0[d_potential" << x.second->code_name() << "];\n";
-      }else if(x.second->n() == p){
-	o__ "ret.value() -= t0[d_potential" << x.second->code_name() << "];\n";
+      }else if(x->p() == p){
+	o__ "ret.value() += t0[d_potential" << x->code_name() << "];\n";
+      }else if(x->n() == p){
+	o__ "ret.value() -= t0[d_potential" << x->code_name() << "];\n";
       }else{
       }
 
       if(n == &mg_ground_node){
       }else if(p == &mg_ground_node){ untested();
-      }else if(x.second->p() == p && x.second->n() == n){
+      }else if(x->p() == p && x->n() == n){
 	// oops. what does the standard say about reversed ddx?
 	bool rev = _ddxprobe->is_reversed();
-	o__ "ret.value() " << (rev?'-':'+') << "= t0[d_potential" << x.second->code_name() << "]; // fwd?\n";
-      }else if(x.second->p() == n && x.second->n() == p){ untested();
+	o__ "ret.value() " << (rev?'-':'+') << "= t0[d_potential" << x->code_name() << "]; // fwd?\n";
+      }else if(x->p() == n && x->n() == p){ untested();
 	unreachable();
       }else{ untested();
       }
@@ -600,7 +637,7 @@ Filter const* Module::new_filter(std::string const& xs, Deps const&d)
     /// . throw..
   }
   f->set_owner(this);
-  trace3("new filter", f->name(), f->num_states(), d.size());
+  // trace3("new filter", f->name(), f->num_states(), d.size());
   if(xs == "ddt" || xs == "idt"){
     // BUG. filter constructor?
     Branch* br = new_branch(n, &mg_ground_node);

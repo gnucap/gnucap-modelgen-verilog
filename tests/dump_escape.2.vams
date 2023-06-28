@@ -1,0 +1,9 @@
+
+module test()
+
+analog begin
+	real arg;
+	$strobe("... %f with escaped escape \\", arg);
+end
+
+endmodule

@@ -1,0 +1,9 @@
+
+// BUG // suboptimal error message
+module test()
+
+	analog begin
+		$strobetypo(0);
+	end
+
+endmodule

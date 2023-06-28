@@ -1,0 +1,30 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_temp0(p, q, n);
+	electrical p, q, n;
+	parameter real dc = 1.;
+	real T;
+
+	analog begin
+		T = $temperature();
+		V(p,n) <+ $temperature();
+		V(q,n) <+ $vt(T) - $vt();
+	end
+
+endmodule
+
+!make test_temp0.so > /dev/null
+attach ./test_temp0.so
+
+test_temp0 #(.dc(dc)) dut(1, 2, 0);
+
+list
+
+parameter dc=1
+print op v(nodes) iter(0) T(dut)
+op 25 30 1

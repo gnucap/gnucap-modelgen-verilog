@@ -1,0 +1,30 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module polarity_ddt0(p, n);
+	electrical p, n;
+	inout p, n;
+	analog begin
+		I(p,n) <+ ddt(V(p,n)) + ddt(V(n,p));
+	end
+endmodule
+
+list
+
+!make polarity_ddt0.so > /dev/null
+attach ./polarity_ddt0.so
+
+polarity_ddt0 dut(1,0);
+
+list
+
+spice
+
+v1 1 0 pulse iv=0 pv=1
+
+.print tran v(nodes)
+.tran 1

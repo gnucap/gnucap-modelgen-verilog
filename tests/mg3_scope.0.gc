@@ -1,0 +1,36 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module scope0(np, nn);
+electrical np, nn;
+
+analog begin
+	begin
+		real i;
+		i = 1;
+		I(np,nn) <+ i;
+	end
+	begin
+		real i;
+		i = 1;
+		I(np,nn) <+ i;
+	end
+end
+
+endmodule
+
+!make scope0.so > /dev/null
+attach ./scope0.so
+
+scope0 dut(1,2);
+vsource v1(1, 0);
+resistor #(.r(10)) v2(2, 0);
+
+list
+
+print dc i0(dut) v0(dut) v1(dut) v(nodes)
+dc v1 0 1 .5

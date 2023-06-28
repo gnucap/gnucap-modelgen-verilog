@@ -1,0 +1,12 @@
+
+
+module test();
+  analog begin
+    real arg;
+    $strobe("...%fwithescapednewline\test.", arg);
+  end
+
+endmodule
+
+
+

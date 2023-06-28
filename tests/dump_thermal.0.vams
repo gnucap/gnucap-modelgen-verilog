@@ -1,0 +1,11 @@
+
+`include "disciplines.vams"
+module heat(t)
+	thermal t;
+	inout t;
+	real tt;
+
+	analog begin
+		tt = Temp(t);
+	end
+endmodule

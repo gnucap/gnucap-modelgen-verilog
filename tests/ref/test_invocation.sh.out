@@ -1,47 +1,47 @@
 
 
-module subanotherone(); 
-endmodule; 
+module subanotherone();
+endmodule;
 
 
 
 
 
 
-nature Current 
-units      = "A"; 
-access     = I; 
-idt_nature = Charge; 
+nature Current
+units      = "A";
+access     = I;
+idt_nature = Charge;
 
-abstol     =  17 ; 
+abstol     =  17 ;
 
-endnature 
-nature Charge 
-units      = "coul"; 
-access     = Q; 
-ddt_nature = Current; 
+endnature
+nature Charge
+units      = "coul";
+access     = Q;
+ddt_nature = Current;
 
-abstol     = 1e-14; 
+abstol     = 1e-14;
 
-endnature 
-nature Voltage 
-units       = "V"; 
-access      = V; 
-idt_nature = Flux; 
+endnature
+nature Voltage
+units       = "V";
+access      = V;
+idt_nature = Flux;
 
-abstol      = 1e-6; 
+abstol      = 1e-6;
 
-endnature 
-discipline electrical 
-flow          Current; 
-potential     Voltage; 
-enddiscipline 
+endnature
+discipline electrical
+flow          Current;
+potential     Voltage;
+enddiscipline
 
 
-module conductor0 (p, n); 
-inout p, n; 
-electrical p, n; 
-analog 
-I(p,n) <+ V(p,n); 
-endmodule 
+module conductor0 (p, n);
+inout p, n;
+electrical p, n;
+analog
+I(p,n) <+ V(p,n);
+endmodule
 
