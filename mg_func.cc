@@ -188,7 +188,7 @@ DISPATCHER<FUNCTION>::INSTALL d_ln(&function_dispatcher, "ln|$log", &p_ln);
 /*--------------------------------------------------------------------------*/
 class pow: public MGVAMS_FUNCTION {
 public:
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {itested();
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {untested();
 	  trace1("pow", Cmd.tail());
     PARAMETER<double> x, y;
     Cmd >> x >> y;

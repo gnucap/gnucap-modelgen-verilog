@@ -214,9 +214,10 @@ void make_cc_expression(std::ostream& o, Expression const& e)
     }else if (dynamic_cast<const Token_PAR_REF*>(*i)) {
       s.new_ref("pc->_p_" + (*i)->name());
     }else if (dynamic_cast<const Token_CONSTANT*>(*i)) {
-      if(dynamic_cast<Float const*>((*i)->data())){
+      if(auto ff=dynamic_cast<Float const*>((*i)->data())){
 #if 1
-	s.new_ref((*i)->name());
+	// s.new_ref((*i)->name());
+	s.new_ref(ftos(ff->value(), 0, 20, ftos_EXP));
 #else
 	s.new_float(o);
 	o << ind << s.code_name() << " = " << (*i)->name() << ";\n";

@@ -453,12 +453,12 @@ bool COMMON_resistor::is_valid() const
   double lb, ub;
   {
   ddouble t0;
-  t0 = 1e-8;
+  t0 =  10.E-9;
   lb = t0;
   }
   {
   ddouble t0;
-  t0 = inf;
+  t0 =  Inf;
   ub = t0;
   }
   if(!(lb<=_p_r && _p_r<ub)){ return false; }else{ }
@@ -479,7 +479,7 @@ void COMMON_resistor::precalc_first(const CARD_LIST* par_scope)
   (void)pc;
   {
     ddouble t0;
-    t0 = 1.;
+    t0 =  1.;
     real def = real(t0.value());
     e_val(&(this->_p_r),     def , par_scope);
   }
@@ -493,7 +493,7 @@ void COMMON_resistor::precalc_last(const CARD_LIST* par_scope)
   (void)pc;
   {
     ddouble t0;
-    t0 = 1.;
+    t0 =  1.;
     real def = real(t0.value());
     e_val(&(this->_p_r),     def , par_scope);
   }
@@ -506,16 +506,9 @@ static COMMON_resistor Default_resistor(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 double MOD_resistor::tr_probe_num(std::string const& n) const
 {
-  if(n == "v0") return _n[0].v0();
-  if(n == "v1") return _n[1].v0();
-  if(n == "v2") return _n[2].v0();
-  if(n == "v3") return _n[3].v0();
-  if(n == "i0") return (_value_b_p_n);
-  if(n == "i0_d0") return (_st_b_p_n[0]);
-  if(n == "i0_d1") return (_st_b_p_n[1]);
-  if(n == "i0_d2") return (_st_b_p_n[2]);
-  if(n == "i0_d3") return (_st_b_p_n[3]);
-  return NOT_VALID;
+  if(n == "conv") {
+    return converged();
+  }
   return BASE_SUBCKT::tr_probe_num(n)
 ;}
 /*--------------------------------------------------------------------------*/
@@ -596,8 +589,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         t0 = t0 / pc->_p_r;
         assert(t0.is_same(t0));
         _v_i = t0.value(); // (*)
-        _v_i[d_potential_b_p_n] = t0[d_potential_b_p_n]; // 2
-        assert(_v_i == _v_i);
+        _v_i[d_potential_b_p_n] = t0[d_potential_b_p_n]; // (2b)
       }
       { // Contribution I
         ddouble t0;
@@ -1202,12 +1194,12 @@ bool COMMON_capacitor::is_valid() const
   double lb, ub;
   {
   ddouble t0;
-  t0 = 0;
+  t0 =  0.;
   lb = t0;
   }
   {
   ddouble t0;
-  t0 = inf;
+  t0 =  Inf;
   ub = t0;
   }
   if(!(lb<=_p_c && _p_c<ub)){ return false; }else{ }
@@ -1228,7 +1220,7 @@ void COMMON_capacitor::precalc_first(const CARD_LIST* par_scope)
   (void)pc;
   {
     ddouble t0;
-    t0 = 1.;
+    t0 =  1.;
     real def = real(t0.value());
     e_val(&(this->_p_c),     def , par_scope);
   }
@@ -1242,7 +1234,7 @@ void COMMON_capacitor::precalc_last(const CARD_LIST* par_scope)
   (void)pc;
   {
     ddouble t0;
-    t0 = 1.;
+    t0 =  1.;
     real def = real(t0.value());
     e_val(&(this->_p_c),     def , par_scope);
   }
@@ -1255,16 +1247,9 @@ static COMMON_capacitor Default_capacitor(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 double MOD_capacitor::tr_probe_num(std::string const& n) const
 {
-  if(n == "v0") return _n[0].v0();
-  if(n == "v1") return _n[1].v0();
-  if(n == "v2") return _n[2].v0();
-  if(n == "v3") return _n[3].v0();
-  if(n == "i0") return (_value_b_p_n);
-  if(n == "i0_d0") return (_st_b_p_n[0]);
-  if(n == "i0_d1") return (_st_b_p_n[1]);
-  if(n == "i0_d2") return (_st_b_p_n[2]);
-  if(n == "i0_d3") return (_st_b_p_n[3]);
-  return NOT_VALID;
+  if(n == "conv") {
+    return converged();
+  }
   return BASE_SUBCKT::tr_probe_num(n)
 ;}
 /*--------------------------------------------------------------------------*/

@@ -1,0 +1,57 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_ddxaf(a);
+	inout a;
+	electrical a;
+	real vin, tst1, tst2, tst3;
+	analog function real fct;
+		input x;
+		begin
+			fct = x*x;
+		end
+	endfunction
+
+	analog function real fct2;
+		inout x;
+		begin
+			fct2 = x;
+			x = x*x;
+		end
+	endfunction
+
+	analog function real fct3;
+		inout x;
+		begin
+			real y; y = x;
+			x = y*x;
+		end
+	endfunction
+
+	analog begin
+		real tmp, tmp2, tmp3;
+		tmp = V(a);
+		vin = fct(tmp);
+		tst1 = ddx(vin, V(a));
+		tmp2 = fct2(tmp);
+		tst2 = ddx(tmp, V(a));
+		tmp3 = fct3(tmp2);
+		tst3 = ddx(tmp2, V(a));
+	end
+endmodule
+
+!make test_ddxaf.so > /dev/null
+attach ./test_ddxaf.so
+
+test_ddxaf #() dut(1);
+vsource #(1) v(1,0);
+
+list
+
+print dc tst1(dut) tst2(dut) tst3(dut)
+dc
+end

@@ -1,0 +1,28 @@
+load ../lang_verilog.so 
+     ^ ? "../lang_verilog.so": already loaded, replacing
+#           v(in)      v(out)     y(vv._b_p_n)
+ 0.         0.9        1.8        0.        
+#Time       v(in)      v(out)    
+ 0.         0.         0.        
+ 0.01       0.062791   0.12558   
+ 0.02       0.12533    0.25067   
+ 0.036333   0.22631    0.45262   
+ 0.12394    0.70238    1.4048    
+ 0.21155    0.97095    1.9419    
+ 0.34295    0.83424    1.6685    
+ 0.47436    0.16038    0.32076   
+ 0.60577   -0.61674   -1.2335    
+ 0.73718   -0.99676   -1.9935    
+ 0.86859   -0.735     -1.47      
+ 1.         0.         0.        
+#Freq       vm(in)     vm(out)    vp(in)     vp(out)   
+ 1.         1.         2.         0.         0.        
+ 2.         1.         2.         0.         0.        
+ 4.         1.         2.         0.         0.        
+ 8.         1.         2.         0.         0.        
+ 16.        1.         2.         0.         0.        
+Gnucap   System status
+iterations: op=0, dc=3, tran=35, fourier=0, total=55
+transient timesteps: accepted=12, rejected=0, total=12
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%

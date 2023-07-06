@@ -835,7 +835,6 @@ void AnalogExpression::parse(CS& file)
   assert(owner());
   Expression tmp;
   assert(owner());
-  untested();
   Deps ignore; // really?
   resolve_symbols(rhs, tmp, owner(), &ignore);
   _exp = new Expression(tmp, &CARD_LIST::card_list);

@@ -14,12 +14,11 @@ vsource #(.dc(v)) v1 (.p(1),.n(0));
 >>>>>print dc v(nodes) v(dut) v(dut.r1) y(dut.r1) v1(dut.r1) v2(dut.r1) 
 .r1: resistor from device_dispatcher
 .r1: 1 candidate found for resistor
->>>>>print dc +v1(dut) v0(dut) 
 >>>>>dc v 0 1 .5 
-#           v(1)       v(2)       v(dut)     v(dut.r1)  y(dut.r1)  v1(dut.r1) v2(dut.r1) v1(dut)    v0(dut)   
- 0.         0.         0.         ??         0.         1.         0.         0.         0.         0.        
- 0.5        0.5        0.5        ??         500.04f    1.         0.5        0.5        0.5        0.5       
- 1.         1.         1.         ??         1.0001p    1.         1.         1.         1.         1.        
+#           v(1)       v(2)       v(dut)     v(dut.r1)  y(dut.r1)  v1(dut.r1) v2(dut.r1)
+ 0.         0.         0.         ??         0.         1.         0.         0.        
+ 0.5        0.5        0.5        ??         500.04f    1.         0.5        0.5       
+ 1.         1.         1.         ??         1.0001p    1.         1.         1.        
 >>>>>status notime 
 Gnucap   System status
 iterations: op=0, dc=7, tran=0, fourier=0, total=7

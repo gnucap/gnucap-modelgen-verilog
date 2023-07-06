@@ -146,6 +146,7 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
 static void make_tr_probe_num(std::ostream& o, const Module& m)
 {
   o << "double MOD_" << m.identifier() << "::tr_probe_num(std::string const& n) const\n{\n";
+#if 0
   // no range check whatsoever. debugging/testing, remove later.
   for(int i=0; i<4; ++i){
     o << ind << "if(n == \"v" << i << "\") return _n[" << i << "].v0();\n";
@@ -162,6 +163,7 @@ static void make_tr_probe_num(std::ostream& o, const Module& m)
     }else{
     }
   }
+#endif
   for(auto const& vl : m.variables()){
     // todo: only those with desc or unit attribute
     for (Variable_List::const_iterator p=vl->begin(); p!=vl->end(); ++p) {
@@ -170,7 +172,9 @@ static void make_tr_probe_num(std::ostream& o, const Module& m)
       o__ "}\n";
     }
   }
-  o << ind << "return NOT_VALID;\n";
+  o__ "if(n == \"conv\") {\n";
+  o____ "return converged();\n";
+  o__ "}\n";
   o__ "return " <<  baseclass(m) << "::tr_probe_num(n)\n;";
   o << "}\n"
     "/*--------------------------------------"

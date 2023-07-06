@@ -1,0 +1,14 @@
+// Copyright 2013, 2023 Felix Salfelder
+// GPLv3+
+// voltage controlled current source
+
+`include "disciplines.vams"
+
+module vccs(sink, src, ps, ns);
+	electrical sink, src, ps, ns;
+	parameter real gm = 1.;
+
+	analog begin
+		I(sink, src) <+ gm * V(ps,ns);
+	end
+endmodule

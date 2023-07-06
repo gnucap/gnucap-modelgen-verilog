@@ -36,9 +36,11 @@ public:
   ~DEP_STACK(){
     if(_stack.size() == 1){
       delete _stack.top();
-    }else{
+    }else if(_stack.empty()) {
       // BUG // possibly undeclared variable?
 //      throw Exception("stray dep", _stack.top()->name());
+    }else{
+      std::cerr << "BUG stray dep " <<  _stack.top()->size() << "\n";
       assert(_stack.empty());
     }
   }
@@ -367,10 +369,10 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
       // merge operand deps? depends on operator..
       ds.binop();
 
-    }else if(auto tt = dynamic_cast<Token_TERNARY const*>(t)){ untested();
+    }else if(auto tt = dynamic_cast<Token_TERNARY const*>(t)){
       Expression* tp = new Expression();
       Expression* fp = new Expression();
-      try{ untested();
+      try{
 	assert(tt->true_part());
 	assert(tt->false_part());
 	resolve_symbols(*tt->true_part(), *tp, scope, ds.top());

@@ -1,0 +1,6 @@
+
+
+BUG, need different tokenise
+ "string with 
+		escaped newline" ;
+

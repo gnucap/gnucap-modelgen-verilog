@@ -769,9 +769,11 @@ Branch::~Branch()
 void Branch::attach(Branch_Ref* r)
 {
   assert(r);
+#ifndef NDEBUG
   for(auto i : _refs){
     assert(i != r);
   }
+#endif
   _refs.push_back(r);
 }
 /*--------------------------------------------------------------------------*/

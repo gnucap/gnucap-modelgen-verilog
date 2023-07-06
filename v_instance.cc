@@ -295,8 +295,8 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
     }else{
     }
 
-    COMMON_PARAMLIST const* cp = prechecked_cast<COMMON_PARAMLIST const*>(Proto->common());
-    assert(cp);
+//    COMMON_PARAMLIST const* cp = prechecked_cast<COMMON_PARAMLIST const*>(Proto->common());
+//    assert(cp);
     for(int i=0; i<int(_params.size()); ++i){
       trace4("stub param fwd", c->long_label(), i, _params[i].first, _params[i].second);
       std::string value = _params[i].second;
@@ -566,8 +566,8 @@ void INSTANCE::expand()
     throw Exception(long_label() + ": no valid prototype found for " + modelname);
   }else {
     assert(_sim->is_first_expand());
-    PARAM_LIST const* pl = _parent->subckt()->params();
-    assert(pl);
+    // PARAM_LIST const* pl = _parent->subckt()->params();
+    // assert(pl);
     // c->_params.set_try_again(pl);
 
     renew_subckt(_parent, &(c->_params)); // pass owner?

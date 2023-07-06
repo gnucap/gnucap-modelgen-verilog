@@ -1,0 +1,37 @@
+
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+// Both the potential and the flow of a source branch are accessible in
+// expressions anywhere in the module.
+// (not sure what their values are supposed to be.)
+
+`modelgen
+module test_iprb0(p, n, cp, cn)
+	electrical p, n, cp, cn;
+	real i;
+
+	analog begin
+		I(p, n) <+ V(cp, cn);
+		i = I(p, n);
+		I(p, n) <+ V(cp, cn);
+	end
+
+endmodule
+
+!make test_iprb0.so > /dev/null
+attach ./test_iprb0.so
+
+test_iprb0 #() dut(0, 1, 2, 0);
+parameter v=0
+vsource #(.dc(v)) v1(2,0);
+resistor #(.r(1)) r1(1,0);
+
+list
+
+print dc v(nodes) i(dut) iter(0)
+dc v1 0 1 .5
+end

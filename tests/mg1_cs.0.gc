@@ -25,5 +25,5 @@ resistor #(.r(10)) v2(2, 0);
 
 list
 
-print dc i0(dut) v0(dut) v1(dut) v(nodes)
+print dc v(nodes)
 dc v1 0 1 .1

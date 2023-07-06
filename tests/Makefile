@@ -25,7 +25,7 @@ CXX = g++
 	${CXX} -shared ${CXXFLAGS} -I../include $< ${LIBS} -o $@
 
 %: %.o
-	${CXX} -g -rdynamic $< ../bd/lib/.libs/libgnucap.so -o $@
+	${CXX} -g -rdynamic $< -lgnucap -o $@
 
 CHECK_SECTIONS = mg0 mg1 mg2 mg3 dump test v
 CHECK_TARGETS = ${CHECK_SECTIONS:%=check/%.diffs}

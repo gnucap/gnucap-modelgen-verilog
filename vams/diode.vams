@@ -1,0 +1,27 @@
+// Junction diode example similar to the one from
+// "The Designer's Guide to Verilog-AMS" by Kundert & Zinke, 2004.
+// Chapter 3, Listing 11.
+
+// Partly implements BUILT_IN_DIODE, Gnucap, 2001, GPLv3+.
+// Possibly too simple to worry about a licence.
+
+`include "disciplines.vams"
+
+module diode (a, c);
+	parameter real is=1e-15 from (0:inf);	// saturation current (A)
+	parameter real tf=0 from [0:inf);	// forward transit time (s)
+	parameter real cjo=0 from [0:inf);	// zero-bias junction capacitance (F)
+	parameter real phi=0.7 exclude 0;	// built-in junction potential (V)
+	inout a, c;
+	electrical a, c;
+	branch (a, c) r, cap;
+	real qd;
+
+	analog begin
+		real i;
+		i = is*(limexp(V(r)/$vt) - 1);
+		I(r) <+ i;
+		qd = tf*i - 2*cjo*phi*sqrt(1 - V(cap)/phi);
+		I(cap) <+ ddt(qd);
+	end
+endmodule

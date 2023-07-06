@@ -1,0 +1,14 @@
+
+
+module ternary();
+  analog begin
+    real one, two;
+    one = 1;
+    one = 1;
+    two = (one)? (2):(0);
+  end
+
+endmodule
+
+
+

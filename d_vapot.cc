@@ -270,11 +270,23 @@ double DEV_CPOLY_G::tr_amps()const
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::ac_load()
 {
-  incomplete(); // current ports
+  if(_loss0){
+    ac_load_shunt(); // 4 pt +- loss
+  }else{
+  }
+  if(_current_port_names.size()){ untested();
+    incomplete();
+  }else{
+  }
   _acg = _values[1];
   ac_load_passive();
+
   for (int i=2; i<=_n_ports; ++i) {
-    ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i]);
+    if(_loss0){
+      ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i] * _loss0);
+    }else{
+      ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i]);
+    }
   }
 }
 /*--------------------------------------------------------------------------*/

@@ -48,6 +48,25 @@ static void make_cc_block_real_identifier_list(std::ostream& o, ListOfBlockRealI
   }
 }
 /*--------------------------------------------------------------------------*/
+static bool within_af(Base const* what)
+{
+  while(what){
+    if(dynamic_cast<Analog_Function const*>(what)){
+      return true;
+    }else if(auto b = dynamic_cast<Block const*>(what)){
+      what = b->owner();
+    }else if(auto ob = dynamic_cast<Owned_Base const*>(what)){
+      what = ob->owner();
+    }else{ untested();
+      unreachable();
+      return false;
+    }
+  }
+  {
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
 static void make_cc_assignment(std::ostream& o, Assignment const& a)
 {
   assert(a.rhs());
@@ -67,12 +86,14 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
       o__ a.lhs().code_name() << " = t0; // (*)\n";
     }else if(a.is_int()){
       o__ a.lhs().code_name() << " = int(t0); // (*)\n";
+    }else if(within_af(&a)){
+      o__ a.lhs().code_name() << " = t0; // (**)\n";
     }else{
 #ifdef PASS_UNUSED_DERIV
       untested();
       o__ a.lhs().code_name() << " = t0; // (*)\n";
       for(auto v : a.deps()) { untested();
-	o__ "// " << a.lhs().code_name() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // 2\n";
+	o__ "// " << a.lhs().code_name() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // (2a)\n";
       }
 #else
       o__ a.lhs().code_name() << " = t0.value(); // (*)\n";
@@ -84,8 +105,7 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
 	assert(v->branch());
 	if(v->branch()->is_short()){ untested();
 	}else{
-	  o__ a.lhs().code_name() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // 2\n";
-	  o__ "assert(" << a.lhs().code_name() << " == " << a.lhs().code_name() << ");\n";
+	  o__ a.lhs().code_name() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // (2b)\n";
 	}
       }
 #endif
@@ -121,12 +141,22 @@ static void make_cc_contrib(std::ostream& o, Contribution const& C)
       o____ "std::fill_n(d->_st" << bcn << "+1, " << C.branch()->num_states()-1 << ", 0.);\n";
       o__ "}else{\n";
       o__ "}\n";
+    }else if(C.branch()->has_flow_probe()){
+
+
     }else{
       // always flow.
     }
 
     assert(C.branch());
-    o__ "d->_value" << C.branch()->code_name() << " "<<sign<<"= t0.value();\n";
+    o__ "d->_value" << C.branch()->code_name() << " " << sign << "= t0.value();\n";
+    if(C.branch()->has_pot_source()) {
+      // incomplete? //
+    }else if(C.branch()->has_flow_probe()) {
+      // BUG? what does the standard say? cf. mg3_iprobe.
+      o__ "d->_flow" << C.branch()->code_name() << " = " <<
+	  "d->_value" << C.branch()->code_name() << "; // (8)\n";
+    }
     for(auto v : C.deps()) {
       if(C.branch() == v->branch()){
 	o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";

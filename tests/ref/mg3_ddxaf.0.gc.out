@@ -1,0 +1,4 @@
+test_ddxaf #() dut (.a(1));
+vsource #(.dc(1)) v (.p(1),.n(0));
+#           tst1(dut)  tst2(dut)  tst3(dut) 
+ 0.         2.         2.         2.        

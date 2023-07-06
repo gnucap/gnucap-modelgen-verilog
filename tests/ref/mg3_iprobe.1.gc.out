@@ -1,0 +1,11 @@
+// Both the potential and the flow of a source branch are accessible in 
+// expressions anywhere in the module. 
+// (not sure what their values are supposed to be.) 
+test_iprb0 #() dut (.p(0),.n(1),.cp(2),.cn(0));
+parameter v=0 
+vsource #(.dc(v)) v1 (.p(2),.n(0));
+resistor #(.r(1)) r1 (.p(1),.n(0));
+#           v(1)       v(2)       i(dut)     iter(0)   
+ 0.         0.         0.         0.         3.        
+ 0.5        0.99999    0.5        0.5        3.        
+ 1.         2.         1.         1.         3.        

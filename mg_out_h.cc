@@ -408,7 +408,11 @@ static void make_module(std::ostream& o, const Module& m)
   }else{
   }
   for (auto br : m.branches()){
-    o << ind << "ELEMENT* " << br->code_name() << "{NULL}; // branch\n";
+    if(br->is_short()){ itested();
+      o__ "// short : " << br->code_name() << "\n";
+    }else{
+      o__ "ELEMENT* " << br->code_name() << "{NULL}; // branch\n";
+    }
   }
   // for (auto br : m.filters()){
   //   o << ind << "ELEMENT* " << br->code_name() << "{NULL}; // branch\n";

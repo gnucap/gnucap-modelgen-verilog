@@ -25,6 +25,7 @@
 #define GNUCAP_VA_H
 
 #include <md.h>
+#include <u_parameter.h>
 #include <l_stlextra.h>
 
 namespace{
@@ -117,7 +118,7 @@ public:
 		return *_data < o;
 	}
 	bool operator<(PARAMETER<double> const& o)const {
-		return *_data < o;
+		return *_data < double(o);
 	}
 
 	bool operator<=(const ddouble_& o)const { itested();
@@ -262,7 +263,7 @@ public:
 				_data[i] /= o.value() * o.value();
 			}
 			*_data /= *o._data;
-		}else{
+		}else{ untested();
 			*this /= (o + 1e-20);
 		}
 		return *this;
@@ -307,7 +308,7 @@ public:
 	ddouble_ operator/(PARAMETER<int> const& o) const {
 		assert(o);
 		ddouble_ ret = *this;
-		ret /= o;
+		ret /= int(o);
 		return ret;
 	}
 	bool operator!() const { itested();
@@ -621,7 +622,7 @@ int fmod(PARAMETER<int> const& d, int e)
 
 template<class T>
 T limexp(T& d)
-{ untested();
+{
 	return exp(d);
 }
 
@@ -719,8 +720,8 @@ typename ddouble_if<T, S>::type pow(T b, S e)
 
 template<class T>
 T asinh(T d)
-{itested();
-	double b = sqrt(1.+double(d)*double(d));
+{ itested();
+	double b = std::sqrt(1.+double(d)*double(d));
 	chain(d, 1./b);
 	set_value(d, std::asinh(d));
 	return d;
@@ -735,17 +736,19 @@ T sin(T d)
 
 template<class T>
 T sqrt(T d)
-{ itested();
+{
 	if(double(d)>1e-20){ itested();
 		double s = std::sqrt(d);
 		d.value() = s;
-		chain(d, -.5/s);
-	}else if(d>0){ untested();
-		chain(d, -5e21);
+		chain(d, .5/s);
+	}else if(d>0){ itested();
+		chain(d, 5e21);
 		d.value() = std::sqrt(d);
-	}else{ itested();
-		chain(d, -.5e99);
+	}else if(d==0){
+		chain(d, .5e99);
 		d.value() = 1e-99;
+	}else{
+		unreachable();
 	}
 	return d;
 }

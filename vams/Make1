@@ -1,5 +1,8 @@
 
 TARGET = \
 	capacitor.so \
+	diode.so \
 	resistor.so \
-	inductor.so
+	inductor.so \
+	vccs.so \
+	vcvs.so

@@ -589,11 +589,6 @@ void Module::parse(CS& f)
   f >> _identifier >> _ports >> ';';
   assert(_parameters.owner() == this);
 
-
-//  Block* root_scope = owner();
-  File const* root = prechecked_cast<File const*>(owner());
-  assert(root);
-
   size_t here = f.cursor();
   bool end = false;
   for (;;) {
@@ -606,8 +601,6 @@ void Module::parse(CS& f)
       || ((f >> "inout ") && (f >> _inout))
       // mi, npmi, mogi, mogid
       // net_declaration
-//      || (( root->disciplines().match(f) ) && (f >> _disc_assign))
-//      || (f >> _node_assignments)
       || (f >> _net_decl)
       || ((f >> "ground ") && (f >> _net_decl))
       // mi, non_port_module_item

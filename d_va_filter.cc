@@ -357,6 +357,7 @@ bool DEV_IDT::do_tr()
   
   _i[0] = integrate(_y, _i, _time, _method_a, _dt);
   trace3("idt do_tr", _y[0].f0, _i[0].f0, _i[1].f0 );
+ 
   _vi0[0] = _i[0].f0;
   _vi0[1] = _i[0].f1;
   assert(_vi0[0] == _vi0[0]);
@@ -382,10 +383,19 @@ void DEV_CPOLY_CAP::tr_load()
   for (int i=0; i<=_n_ports; ++i) {
     assert(_vi0[i] == _vi0[i]);
   }
+  if( CKT_BASE::_sim->analysis_is_static() ) {
+    assert(!_vi0[0]);
+    assert(!_vi0[1]);
+  }else{
+  }
   tr_load_passive();
   _vi1[0] = _vi0[0];
   _vi1[1] = _vi0[1];
   for (int i=2; i<=_n_ports; ++i) {
+    if( CKT_BASE::_sim->analysis_is_static() ) {
+      assert(!_vi0[i]);
+    }else{
+    }
     tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_vi0[i]), &(_vi1[i]));
   }
 }

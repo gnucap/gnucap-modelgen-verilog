@@ -43,6 +43,9 @@ protected:
   double   _time;
   std::vector<std::string> _current_port_names;
   std::vector<ELEMENT const*> _input;
+#ifndef NDEBUG
+  int _reason{0};
+#endif
 protected:
   explicit DEV_CPOLY_G(const DEV_CPOLY_G& p);
 public:
@@ -179,16 +182,22 @@ DEV_CPOLY_G::~DEV_CPOLY_G()
 bool DEV_CPOLY_G::do_tr_con_chk_and_q()
 {
   q_load();
+#ifndef NDEBUG
+  _reason = 0;
+#endif
 
   assert(_old_values);
   set_converged(conchk(_time, _sim->_time0));
   _time = _sim->_time0;
   if(converged()){
     set_converged(conchk(_old_values[0], _values[0], abstol()));
+#ifndef NDEBUG
     if(!converged()){
-      trace3("not converged", long_label(), _old_values[0], _values[0]);
+      _reason = 1;
+      trace4("not converged", long_label(), _old_values[0], _values[0], abstol());
     }else{
     }
+#endif
   }else{
   }
   for (int i=1; converged() && i<=_n_ports; ++i) {
@@ -198,10 +207,13 @@ bool DEV_CPOLY_G::do_tr_con_chk_and_q()
     // }else{ itested();
     // }
     set_converged(conchk(_old_values[i], _values[i] /*, 0.?*/ ));
+#ifndef NDEBUG
     if(!converged()){
+      _reason = i;
       trace4("not converged", long_label(), i, _old_values[i], _values[i]);
     }else{
     }
+#endif
   }
   return converged();
 }
@@ -254,6 +266,7 @@ void DEV_CPOLY_G::ac_load()
   _acg = _values[1];
   ac_load_passive();
   for (int i=2; i<=_n_ports; ++i) {
+    trace3("acload", long_label(), i, _values[i]);
     ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i]);
   }
 }
@@ -308,8 +321,12 @@ double DEV_CPOLY_G::tr_probe_num(const std::string& x)const
 {
   if (Umatch(x, "loss ")) {
     return _loss0;
+#ifndef NDEBUG
   }else if (Umatch(x, "conv ")) {
     return converged();
+  }else if (Umatch(x, "reason ")) {
+    return _reason;
+#endif
   }else if (Umatch(x, "val0 ")) {
     return _values[0];
   }else if (Umatch(x, "val1 ")) {

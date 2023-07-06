@@ -21,3 +21,10 @@
 * generate is_valid (overloading)
 * analog event stub
 * switching branch
+
+202307**-dev
+============
+* string handling
+* systemtask parse/dump
+* handle short branches
+* various bugfixes

@@ -2,26 +2,26 @@
 
 verilog
 
-attach ../lang_verilog.so
 attach ../d_vasrc.so
 attach ../vams/diode.so
 
 module main(n, g)
-	diode #(.cjo(1pf)) D1(n g);
+	diode #(.cjo(1pf) .tf(1u)) D1(n g);
 endmodule
 
-main m(n,0);
+main m(n,m);
+resistor #(.r(1k)) r(m,0);
 
 spice
 
-.model dd d cjo=1pf is=1e-15
 
 .parameter v=0
-V1  (0, n) vsource dc=v ac=1
-V2  (0, n2) vsource dc=v ac=1
-D1  (n2 0) dd
+V1  (n, 0) vsource dc=v ac=1
+* D1  (n m) dd
+* .model dd d cjo=1pf is=1e-15 tt=1u
 
-.print dc v(nodes) i(V1) i(V2)
-.dc v -2 2 .5
+.print dc v(nodes) i(V1)
+.dc v -1.4 .7 .7
 
-* doAC ac start=-1 stop=0.65 step=1mV dev=V1 freq=1THz/(2*M_PI)
+.print ac v(nodes)
+.ac 1 1000k * 10
