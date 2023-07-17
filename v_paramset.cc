@@ -148,7 +148,7 @@ private: // no ops for top level
   double tr_probe_num(const std::string&)const override{untested(); return NOT_VALID;}
   void tr_advance() override{ assert(!is_device());}
   void dc_advance() override{ assert(!is_device());}
-  bool do_tr() override{ untested(); assert(!is_device()); return true;}
+  bool do_tr() override{ assert(!is_device()); return true;}
   void do_ac() override{ assert(!is_device());}
   void ac_load() override{ assert(!is_device());}
 #else
@@ -292,11 +292,15 @@ bool PARAMSET::is_valid() const
 {
   assert(scope());
   assert(_parent);
-  PARAM_LIST const* params = _parent->subckt()->params();
-  PARAMETER<double> v = params->deep_lookup("_..is_valid");
-
-  double x = v.e_val(1., subckt());
-  return x==1.;
+  if(_parent->subckt()){
+    PARAM_LIST const* params = _parent->subckt()->params();
+    PARAMETER<double> v = params->deep_lookup("_..is_valid");
+    double x = v.e_val(1., subckt());
+    trace3("PARAMSET::is_valid", long_label(), x, v.string());
+    return x==1.;
+  }else{ untested();
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void PARAMSET::grow_nodes(size_t Index)
@@ -397,7 +401,13 @@ void PARAMSET::precalc_first()
     }
 
     subckt()->attach_params(&(c->_params), scope());
-    subckt()->params()->set_try_again(scope()->params());
+    if(_parent){
+      assert(_parent->subckt());
+      subckt()->params()->set_try_again(_parent->subckt()->params());
+    }else{ untested();
+      unreachable(); 
+      subckt()->params()->set_try_again(scope()->params());
+    }
 
     subckt()->precalc_first();
   }else{
@@ -407,6 +417,8 @@ void PARAMSET::precalc_first()
     // assert(pl);
     // c->_params.set_try_again(pl);
   }
+
+  trace2("PARAMSET::pf done", long_label(), is_valid());
 
   assert(!is_constant()); /* because I have more work to do */
 } // precalc_first

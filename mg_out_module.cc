@@ -97,7 +97,7 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
   o____ "return false;\n";
   o__ "}else if (!converged()) {\n";
   o____ "return true;\n";
-  o__ "}else";
+  o__ "}else ";
 
   if( m.filters().size()){
     o__ "if(_sim->is_first_iteration()){\n";
@@ -146,30 +146,15 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
 static void make_tr_probe_num(std::ostream& o, const Module& m)
 {
   o << "double MOD_" << m.identifier() << "::tr_probe_num(std::string const& n) const\n{\n";
-#if 0
-  // no range check whatsoever. debugging/testing, remove later.
-  for(int i=0; i<4; ++i){
-    o << ind << "if(n == \"v" << i << "\") return _n[" << i << "].v0();\n";
-  }
-  size_t i = 0;
-  for(auto b : m.branches()){
-    if(b->has_element()){
-      o << ind << "if(n == \"i" << i << "\") return (_value" << b->code_name() << ");\n";
-      for(int j=0; j<4; ++j){
-	o << ind << "if(n == \"i" << i << "_d"<<j<<"\") return ("
-		  << b->state() << "["<<j<<"]);\n";
-      }
-      ++i;
-    }else{
-    }
-  }
-#endif
   for(auto const& vl : m.variables()){
-    // todo: only those with desc or unit attribute
     for (Variable_List::const_iterator p=vl->begin(); p!=vl->end(); ++p) {
-      o__ "if(n == \"" << (*p)->name() << "\"){\n";
-      o__ ind << "return _v_" << (*p)->name() << ";\n";
-      o__ "}\n";
+      if((*p)->has_attributes()){
+	// todo: only desc or unit
+	o__ "if(n == \"" << (*p)->name() << "\"){\n";
+	o__ ind << "return _v_" << (*p)->name() << ";\n";
+	o__ "}\n";
+      }else{
+      }
     }
   }
   o__ "if(n == \"conv\") {\n";

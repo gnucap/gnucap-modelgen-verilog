@@ -604,7 +604,10 @@ void INSTANCE::expand()
     // reachable?
     throw Exception(long_label() + ": no candidates " + dev_type());
   }else if(subckt()->size()==1){
-    (*subckt()->begin())->set_label(short_label());
+    COMPONENT* d = dynamic_cast<COMPONENT*>(*subckt()->begin());
+    assert(d);
+    assert(d->is_valid());
+    d->set_label(short_label());
   }else{ untested();
     // TODO: include name attributes, once available
     throw Exception(long_label() + ": ambiguous overload: " + dev_type());

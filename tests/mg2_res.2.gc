@@ -8,7 +8,7 @@ verilog
 module test_res2_0(np, nn);
 	electrical np, nn;
 	inout np, nn;
-	real i;
+	(* desc="" *) real i;
 	parameter real r = 200.;
 	analog begin
 		i = V(np,nn) / r;

@@ -258,15 +258,10 @@ double DEV_CPOLY_G::tr_amps()const
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::ac_load()
 {
-  if(_current_port_names.size()){ untested();
-    incomplete();
-  }else{
-  }
-
   _acg = _values[1];
   ac_load_passive();
   for (int i=2; i<=_n_ports; ++i) {
-    trace3("acload", long_label(), i, _values[i]);
+    trace4("acload", long_label(), i, _values[i], _old_values[i]);
     ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i]);
   }
 }
@@ -280,16 +275,17 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
   //				 const double* inputs[])
 {
   bool first_time = (net_nodes() == 0);
+//  bool first_time = _sim->is_first_expand();
 
   set_label(Label);
-  trace3("DEV_CPOLY_G::set_parameters", long_label(), n_nodes, n_states);
+  trace4("DEV_CPOLY_G::set_parameters", long_label(), n_nodes, n_states, first_time);
   set_owner(Owner);
   set_value(Value);
   attach_common(Common);
-  _current_port_names.resize(n_states - 1 - n_nodes/2);
-  _input.resize(n_states - 1 - n_nodes/2);
 
   if (first_time) {
+    _current_port_names.resize(n_states - 1 - n_nodes/2);
+    _input.resize(n_states - 1 - n_nodes/2);
     _n_ports = n_states-1; // set net_nodes
     assert(size_t(_n_ports) == n_nodes/2 + _current_port_names.size());
 
@@ -305,8 +301,7 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
   }else{
     assert(_n_ports == n_states-1);
     assert(_old_values);
-    assert(net_nodes() == n_nodes);
-    // assert could fail if changing the number of nodes after a run
+    // assert(net_nodes() == n_nodes); // current ports?
   }
 
   _values = states;

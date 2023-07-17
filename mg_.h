@@ -61,18 +61,6 @@ inline void os_error(const std::string& name)
   error(name + ':' + strerror(errno));
 }
 /*--------------------------------------------------------------------------*/
-#if 0 // m_base.h
-class Base {
-public:
-  virtual void parse(CS&) = 0;
-  virtual void dump(std::ostream& f)const {unreachable(); f << "Base::dump";}
-  virtual ~Base() {}
-};
-inline CS&	     operator>>(CS& f, Base& b)
-				{untested();b.parse(f); return f;}
-inline std::ostream& operator<<(std::ostream& f, const Base& d)
-				{d.dump(f); return f;}
-#endif
 class Block;
 class Owned_Base : public Base {
   Block* _owner{NULL};
@@ -93,7 +81,7 @@ protected:
   std::string	_s;
 public:
   String_Arg() {}
-  String_Arg(const char* s) : _s(s) {}
+  explicit String_Arg(const char* s) : _s(s) {}
   explicit String_Arg(std::string const& s) : _s(s) {}
   String_Arg(String_Arg const& o) : Base(), _s(o._s) {untested();} // needed?
   //String_Arg(const std::string& s) : _s(s) {}
@@ -104,6 +92,7 @@ public:
   void operator+=(const std::string& s)	 {_s += s;}
   bool operator!=(const std::string& s)const {return _s != s;}
   bool operator==(const String_Arg& s)const {return _s == s._s;}
+  bool operator!=(const String_Arg& s)const {return _s != s._s;}
   bool			is_empty()const	 {return _s.empty();}
   std::string		lower()const	 {return to_lower(_s);}
   const std::string&	to_string()const {return _s;}
@@ -117,22 +106,15 @@ public:
   void parse(CS& f)override;
 };
 /*--------------------------------------------------------------------------*/
-// a stub
-class Attribute_Instance : public Base {
-public:
-  void parse(CS& f);
-  void dump(std::ostream&)const override{}
-};
-/*--------------------------------------------------------------------------*/
 class C_Comment : public Base {
 public:
-  void parse(CS& f);
+  void parse(CS& f)override;
   void dump(std::ostream&)const override{ incomplete();}
 };
 /*--------------------------------------------------------------------------*/
 class Cxx_Comment : public Base {
 public:
-  void parse(CS& f);
+  void parse(CS& f)override;
   void dump(std::ostream&)const override{ incomplete();}
 };
 /*--------------------------------------------------------------------------*/
@@ -143,22 +125,29 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 /* A "Collection" differs from a "LiSt" in how it is parsed.
- * Each parse of a "Collection" created one more object and stores
+ * Each parse of a "Collection" creates one more object and stores
  * it in the Collection.  The size of the Collection therefore grows by 1.
  * A "Collection" is often parsed many times.
- * Each parse of a "LiSt" creates a bunch of objects, and storing them.
+ * Each parse of a "LiSt" creates a bunch of objects, and stores them.
  * A list has opening and closing delimeters, usually {}.
  * A "LiSt" is usually parsed once.
  */
+class Attribute_Instance;
 template <class T, char BEGIN, char SEP, char END, char END2='\0', char END3='\0'>
 class LiSt : public List_Base<T> {
   Block* _owner{NULL};
+  Attribute_Instance const* _attributes{NULL};
 public:
   using List_Base<T>::size;
   using List_Base<T>::push_back;
   using List_Base<T>::begin;
   using List_Base<T>::end;
   typedef typename List_Base<T>::const_iterator const_iterator;
+public:
+  ~LiSt(){
+    delete _attributes;
+    _attributes = NULL;
+  }
 
   void set_owner(Block* b){ _owner = b; }
   Block const* owner() const{return _owner;}
@@ -166,6 +155,7 @@ public:
   void parse(CS& file) override{
     parse_n(file);
   }
+
 // protected:??
   void parse_n(CS& file, size_t max=-1ul) {
     parse_n_<T>(file, max);
@@ -206,7 +196,22 @@ protected:
     }
   }
 public:
+  void set_attributes(Attribute_Instance const* a) {
+    assert(!_attributes);
+    _attributes = a;
+  }
+protected: // base class?
+  bool has_attributes() const{
+    return _attributes;
+  }
+  Attribute_Instance const& attributes()const {
+    assert(_attributes);
+    return *_attributes;
+  }
+//  void dump_attributes(std::ostream& f)const;
+public:
   void dump(std::ostream& f)const override {
+    // dump_attributes(f);
     if (BEGIN) {
       f << BEGIN;
     }else{
@@ -221,7 +226,7 @@ public:
 	  f << SEP << ' ';
 	}else{
 	}
-      }      
+      }
     }
     if (END) {
       f << END;
@@ -277,6 +282,7 @@ public:
   using List_Base<T>::back;
   using List_Base<T>::is_empty;
   using List_Base<T>::pop_back;
+  using List_Base<T>::erase;
   typedef typename List_Base<T>::const_iterator const_iterator;
 
   void set_owner(Block* c) { _owner = c; }
@@ -335,11 +341,12 @@ public:
       return _dummy;
     }
   }
-  void clear(){
+  const String_Arg& operator[](const char* s) const {
+    return operator[](String_Arg(s));
+  }
+  void clear() {
     while(!is_empty()){
-      T* b = back();
-      pop_back();
-      delete b;
+      erase(begin());
     }
   }
 };
@@ -440,7 +447,6 @@ protected:
 };
 // typedef LiSt<Parameter_1, '{', '#', '}'> Parameter_1_List;
 /*--------------------------------------------------------------------------*/
-// 
 class Parameter_1 : public Parameter_Base {
 public:
   void parse(CS& f) override;
@@ -467,9 +473,92 @@ class ValueRangeStrings : public ValueRangeSpec {
 class ConstExpression : public Owned_Base {
   Expression* _expression{NULL};
 public:
+  explicit ConstExpression() : Owned_Base() {}
+  ConstExpression(CS& f, Block* o) : Owned_Base(o) { untested();
+    set_owner(o);
+    parse(f);
+  }
   void parse(CS&)override;
   void dump(std::ostream&)const override;
   Expression const& expression() const{assert(_expression); return *_expression;};
+};
+/*--------------------------------------------------------------------------*/
+class Attribute_Spec : public Owned_Base{
+  String_Arg _key;
+//  typedef ConstExpression value_type; TODO
+public:
+//  typedef Raw_String_Arg value_type;
+  // typedef String_Arg value_type;
+  typedef std::string value_type;
+private:
+  value_type* _expr{NULL};
+public:
+  void parse(CS& f)override;
+  void dump(std::ostream&)const override;
+public:
+  Attribute_Spec() : Owned_Base() {untested();}
+  Attribute_Spec(CS& f, Block* o) : Owned_Base(o) {
+    set_owner(o);
+    parse(f);
+  }
+  ~Attribute_Spec(){
+    delete _expr;
+    _expr = NULL;
+  }
+  bool operator==(Attribute_Spec const& o) const{ untested();
+    return o._key == _key;
+  }
+  bool operator!=(String_Arg const& o) const{ untested();
+    return o != _key;
+  }
+
+  String_Arg const& key() const{
+    return _key;
+  }
+  bool has_expression() const{
+    return _expr;
+  }
+  value_type const* expression_or_null() const{
+    return _expr;
+  }
+  value_type const& expression() const{
+    assert(_expr);
+    return *_expr;
+  }
+};
+/*--------------------------------------------------------------------------*/
+class Attribute_Instance : public Collection<Attribute_Spec> {
+//  std::set<Attribute_Spec*, getkey>;
+  typedef Attribute_Spec::value_type value_type;
+public:
+  Attribute_Instance() : Collection<Attribute_Spec>() { untested(); }
+  Attribute_Instance(CS& f, Block* o) : Collection<Attribute_Spec>() {
+    set_owner(o);
+    parse(f);
+  }
+  void parse(CS& f)override;
+  void dump(std::ostream&)const override;
+  void clear();
+//  bool empty() const{ return _m.empty(); }
+  value_type const* find(String_Arg const&) const;
+private:
+};
+/*--------------------------------------------------------------------------*/
+class Attribute_Stash : public Owned_Base {
+  Attribute_Instance* _a{NULL};
+public:
+  Attribute_Stash() : Owned_Base() { }
+  void parse(CS& f)override;
+  void dump(std::ostream&)const override{ unreachable(); }
+  bool is_empty() const{
+    return !_a;
+  }
+  Attribute_Instance const* detach(){
+    Attribute_Instance const* r = _a;
+    _a = NULL;
+    return r;
+  }
+private:
 };
 /*--------------------------------------------------------------------------*/
 class ValueRangeInterval : public ValueRangeSpec {
@@ -515,6 +604,7 @@ public:
 class Parameter_2_List : public LiSt<Parameter_2, '\0', ',', ';'> {
   String_Arg _type;
   bool _is_local{false};
+  Attribute_Instance const* _attributes{NULL};
 public:
   bool is_local()const {return _is_local;}
   String_Arg const& type()const {return _type;}
@@ -649,11 +739,18 @@ private:
 };
 /*--------------------------------------------------------------------------*/
 class Variable_2 : public Variable {
+  Attribute_Instance const* _attributes{NULL};
 public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   Variable_2() : Variable() {}
 //   void set_type(std::string const& a){_type=a;}
+  bool has_attributes() const{
+    return _attributes;
+  }
+  void set_attributes(Attribute_Instance const* a) {
+    _attributes = a;
+  }
 };
 /*--------------------------------------------------------------------------*/
 class Variable_List : public LiSt<Variable_2, '\0', ',', ';'> {
@@ -727,7 +824,7 @@ public:
  // const Code_Block&	code_mid()const		{return _code_mid;}
  // const Code_Block&	code_post()const	{return _code_post;}
   bool is_empty()const {untested();
-    return (calculated().is_empty() 
+    return (calculated().is_empty()
 				// && code_post().is_empty()
 				// && code_mid().is_empty()
 				&& override().is_empty()
@@ -997,6 +1094,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Net_Declarations : public Collection<Net_Decl_List>{
+  Attribute_Instance const* _attributes{NULL};
 public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
@@ -1081,7 +1179,7 @@ public:
   virtual const std::string& dev_type()const {return _module_or_paramset_identifier;}
   virtual Nature const* nature()const {return NULL;}
   virtual Discipline const* discipline()const {return NULL;}
-  const Parameter_3_List& 
+  const Parameter_3_List&
 		     list_of_parameter_assignments()const {return _list_of_parameter_assignments;}
   const Port_Connection_List& ports()const	  {return _list_of_port_connections;}
   const Port_1_List& current_ports() const{return _current_port_list;}
@@ -1489,8 +1587,6 @@ class File;
 // TODO: decide if it is a Block, or has-a Block aka Scope or whetever.
 class Module : public Block {
   typedef std::map<std::string, Probe*> Probe_Map;
-public:
-  ~Module();
 private: // verilog input data
   File const* _file{NULL};
   String_Arg	_identifier;
@@ -1506,7 +1602,8 @@ private: // verilog input data
   Parameter_List_Collection _parameters;
   Element_2_List _element_list;
   Port_1_List	_local_nodes;
-  Attribute_Instance _attribute_dummy;
+  Attribute_Instance const* _attributes{NULL};
+  Attribute_Stash _attribute_stash;
   AnalogList	_analog_list;
   // Code_Block		_validate;
 private: // elaboration data
@@ -1517,6 +1614,7 @@ private: // elaboration data
   Node_Map _nodes;
 public:
   Module(){}
+  ~Module();
 public:
   File const* file() const{ return _file; }; // owner?
   void parse(CS& f);
@@ -1551,6 +1649,20 @@ public:
   bool sync()const;
   bool has_submodule()const;
   bool has_analog_block()const;
+  Attribute_Stash& attribute_stash() {
+    return _attribute_stash;
+  }
+  bool has_attributes() const{
+    return _attributes;
+  }
+  Attribute_Instance const& attributes()const {
+    assert(_attributes);
+    return *_attributes;
+  }
+  void set_attributes(Attribute_Instance const* a) {
+    assert(!_attributes);
+    _attributes = a;
+  }
 private: // misc
   CS& parse_analog(CS& cmd);
 
@@ -1756,11 +1868,20 @@ class File : public Block {
   Module_List	_module_list;
   Module_List	_macromodule_list;
   Module_List	_connectmodule_list;
-  Attribute_Instance _attribute_dummy;
+  Attribute_Instance const* _attributes{NULL};
+  Attribute_Stash _attribute_stash;
 public: // build
   File();
+  ~File(){
+    delete _attributes;
+    _attributes = NULL;
+  }
+
   void read(std::string const&);
   void parse(CS& f) override;
+  Attribute_Stash& attribute_stash() {
+    return _attribute_stash;
+  }
 
 public: // readout
   const std::string& name()const	{return _name;}
@@ -1875,6 +1996,17 @@ public:
   Base const* stmt_or_null() const{ return _stmt; }
   Expression const& cond() const{ return _ctl.expression(); }
 };
+/*--------------------------------------------------------------------------*/
+#if 0
+template <class T, char BEGIN, char SEP, char END, char END2, char END3>
+void LiSt<T, BEGIN, SEP, END, END2, END3>::dump_attributes(std::ostream& f)const
+{
+  if(_attributes){ untested();
+    f << *_attributes;
+  }else{ untested();
+  }
+}
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

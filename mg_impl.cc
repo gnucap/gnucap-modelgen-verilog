@@ -526,6 +526,9 @@ Module::~Module()
   }
   _probes.clear();
   _filters.clear();
+
+  delete _attributes;
+  _attributes = NULL;
 }
 /*--------------------------------------------------------------------------*/
 class idt_Filter: public Filter{

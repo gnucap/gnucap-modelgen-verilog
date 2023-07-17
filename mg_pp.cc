@@ -296,7 +296,7 @@ void Define::parse(CS& f)
       stash(f.get_to("\\/\n"), args);
     }else if(f >> "\\\n"){ untested();
       incomplete();
-    }else if(f.match1('\\')) { untested();
+    }else if(f.match1('\\')) {itested();
       f.skip();
 //      stash("\n", args);
       std::string more = f.get_to("\\/\n"); // BUG
@@ -413,6 +413,7 @@ void Raw_String_Arg::parse(CS& f)
       _s += f.ctoc();
     }
   }
+  trace1("got rsa", _s);
 }
 /*--------------------------------------------------------------------------*/
 // Define::?
@@ -486,6 +487,25 @@ Preprocessor::Preprocessor() : CS(CS::_STRING, "")
 {
 }
 /*--------------------------------------------------------------------------*/
+void Preprocessor::read(std::string const& file_name)
+{
+  if(OPT::case_insensitive == 0){
+  }else{ untested();
+  }
+  // _name = file_name;
+  std::string::size_type sepplace;
+  sepplace = file_name.find_last_of("/");
+  if(sepplace == std::string::npos){
+    _cwd = ".";
+  }else{
+    _cwd = file_name.substr(0, sepplace);
+  }
+
+  CS file(CS::_INC_FILE, file_name);
+
+  parse(file);
+}
+/*--------------------------------------------------------------------------*/
 class PP_Quoted_String : public String {
 public:
   void parse(CS& f) override {
@@ -512,7 +532,7 @@ public:
 	  _data += f.ctoc();
 	}else if(f.peek() == '\n'){ untested();
 	  _data += f.ctoc();
-	}else{ untested();
+	}else{itested();
 	}
       }else{ untested();
 	trace2("qs", _data, f.peek());

@@ -10,7 +10,7 @@ module test_ddx1(p,n,cp,cn);
 	inout p, n, cp, cn;
 	electrical p, n, cp, cn;
 	parameter real gm = 1.0;
-	real vin, plus, minus, zero;
+	(* desc="" *) real vin, plus, minus, zero;
 	analog begin
 		vin = V(cp,cn);
 		zero = ddx(vin, V(p));

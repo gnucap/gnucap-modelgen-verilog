@@ -8,7 +8,7 @@ verilog
 module test_ddx3(cp,cn);
 	inout cp, cn;
 	electrical cp, cn;
-	real vin, plus, minus, zero;
+	(* desc="" *) real vin, plus, minus, zero;
 	analog begin
 		vin = V(cp,cn);
 		minus = ddx(vin, V(cn, cp));

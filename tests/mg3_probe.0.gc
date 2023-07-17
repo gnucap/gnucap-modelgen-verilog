@@ -12,7 +12,7 @@ verilog
 module test_probe0(p,n);
 	inout p, n;
 	electrical p, n;
-	real v, i;
+	(* desc="" *) real v, i;
 	parameter real sel = 0;
 	analog begin
 		v = V(p,n);

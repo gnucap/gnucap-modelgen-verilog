@@ -1,12 +1,14 @@
 `include "sub/disciplines.few"
 
-(* test=string *)
+(* test="string", test2=1 *)
 module device(p,n);
 	inout p,n;
 	(* desc="normal port" *) electrical p,n;
 
 	parameter real c=1.; //  from [0:inf);
-(*units="m^2", type="instance",            desc="Bottom area of source junction"*) parameter real    ABSOURCE       =1.0e-12;
+(*units="m^2", type="instance",            desc="Bottom area of source junction", *) parameter real    ABSOURCE       =1.0e-12;
+
+	(* desc="dummy" *) real x;
 	analog begin
 	end
 endmodule

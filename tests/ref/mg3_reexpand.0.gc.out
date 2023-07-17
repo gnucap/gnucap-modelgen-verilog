@@ -1,0 +1,10 @@
+test_flow0 #() d1 (.p(0),.n(2),.cp(1),.cn(0));
+resistor #(.r(1)) r0 (.p(2),.n(0));
+isource #(.dc(i)) i1 (.p(0),.n(1));
+parameter i=1 
+#           v(1)       v(2)       i(d1._b_p_n) i(d1._b_cp_cn) i(r0)      iter(0)   
+ 0.         10.u       17.        17.        1.         17.        6.        
+#           v(1)       v(2)       i(d1._b_p_n) i(d1._b_cp_cn) i(r0)      iter(0)   
+ 0.         10.u       17.        17.        1.         17.        6.        
+#           v(1)       v(2)       i(d1._b_p_n) i(d1._b_cp_cn) i(r0)      iter(0)   
+ 0.         10.u       16.983     17.        1.         16.983     6.        

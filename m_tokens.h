@@ -27,7 +27,6 @@
 #include <m_expression.h>
 /*--------------------------------------------------------------------------*/
 class Probe;
-
 class Token_PROBE : public Token_SYMBOL {
   Probe const* _prb;
 public:
@@ -44,18 +43,7 @@ private:
 
 public:
   Probe const* operator->() const{ return _prb; }
-#if 0
-  bool reversed() const{
-	  assert(_prb);
-	  assert(_prb->branch());
-	  return _prb->is_reversed();
-  }
-  std::string code_name() const{
-	  assert(_prb);
-	  return _prb->code_name();
-  }
-#endif
-  Probe const* prb() const{return _prb;}
+  Probe const* prb() const{ return _prb;}
 };
 /*--------------------------------------------------------------------------*/
 class Token_AFCALL : public Token_SYMBOL {
@@ -98,7 +86,7 @@ private:
   }
 public:
   Parameter_Base const* item()const { untested();
-	  return _item;
+    return _item;
   }
 };
 /*--------------------------------------------------------------------------*/
@@ -122,16 +110,6 @@ private:
 public:
   Variable const* item()const { untested(); return _item; }
   Variable const* operator->() const{ return _item; }
-//  std::string code_name() const{ untested();
-//    assert(_item);
-//    return _item->code_name();
-//  }
-//  Deps const& deps() const{
-//    return _item->deps();
-//  }
-//  bool is_module_variable() const{
-//    return _item->is_module_variable();
-//  }
 };
 /*--------------------------------------------------------------------------*/
 class Token_FILTER : public Token_SYMBOL {
@@ -147,19 +125,7 @@ private:
 //  }
 public:
   Filter const* item()const { untested(); return _item; }
-//  std::string code_name() const{
-//    assert(_item);
-//    return _item->code_name();
-//  }
   Filter const* operator->() const{ return _item; }
-//   Deps const& deps() const{
-//     assert(_item);
-//     return _item->deps();
-//   }
-//   Probe const* output() const{
-//     assert(_item);
-//     return _item->prb();
-//   }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

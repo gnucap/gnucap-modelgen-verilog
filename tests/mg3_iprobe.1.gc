@@ -12,7 +12,7 @@ verilog
 `modelgen
 module test_iprb0(p, n, cp, cn)
 	electrical p, n, cp, cn;
-	real i;
+	(* desc="" *) real i;
 
 	analog begin
 		I(p, n) <+ V(cp, cn);

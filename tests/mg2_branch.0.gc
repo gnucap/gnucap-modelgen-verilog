@@ -8,7 +8,7 @@ verilog
 module test_branch_0(p, n);
 	electrical p, n;
 	inout p, n;
-	real i;
+	(* desc="current" *) real i;
 	branch (p, n) br, br_alias;
 	branch (n, p) br_reverse;
 	analog begin

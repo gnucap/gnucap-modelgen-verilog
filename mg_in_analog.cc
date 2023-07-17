@@ -977,7 +977,7 @@ void AF_Arg_List::parse(CS& file)
     _direction = a_input;
   }else if(dir=="out"){ untested();
     _direction = a_output;
-  }else if(dir=="ino"){ untested();
+  }else if(dir=="ino"){
     _direction = a_inout;
   }else{ untested();
     trace2("AF_Arg_List::parse", file.tail().substr(0,10), dir);

@@ -112,6 +112,7 @@ static void make_common_nature(std::ostream& o, const File& f)
 /*--------------------------------------------------------------------------*/
 void make_cc(std::ostream& out, const File& in)
 {
+  indent x; // HACK
   make_header(out, in, "dumpname");
   make_common_nature(out, in);
   for (Module_List::const_iterator

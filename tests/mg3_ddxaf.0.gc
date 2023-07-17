@@ -8,7 +8,7 @@ verilog
 module test_ddxaf(a);
 	inout a;
 	electrical a;
-	real vin, tst1, tst2, tst3;
+	(* desc="" *) real vin, tst1, tst2, tst3;
 	analog function real fct;
 		input x;
 		begin

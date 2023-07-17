@@ -1,0 +1,21 @@
+
+options trace
+verilog
+
+paramset test_invalid resistor;
+  parameter R=0 from (1:2];
+ .r=R;
+endparamset
+
+module main(1,2,3,4);
+	vsource #(1.) v(3,1);
+	test_invalid #(.R(1.5)) R1(3,1);
+	test_invalid #() R2(3,1);
+endmodule
+
+main m(0,1,2,4);
+
+list
+
+print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
+dc

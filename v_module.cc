@@ -87,7 +87,7 @@ private: // override virtual
 private: // no ops for prototype
   void map_nodes()override	{if(is_device()){ BASE_SUBCKT::map_nodes();}else{} }
   void tr_begin()override	{if(is_device()){ BASE_SUBCKT::tr_begin();}else{} }
-  void tr_restore()override	{if(is_device()){untested(); BASE_SUBCKT::tr_restore();}else{untested();} }
+  void tr_restore()override	{if(is_device()){ BASE_SUBCKT::tr_restore();}else{untested();} }
   void ac_begin()override	{if(is_device()){ BASE_SUBCKT::ac_begin();}else{} }
   void tr_load()override	{if(is_device()){ BASE_SUBCKT::tr_load();}else{} }
   void tr_accept()override	{if(is_device()){ BASE_SUBCKT::tr_accept();}else{} }
@@ -104,7 +104,7 @@ private: // no ops for prototype
     }else{
     }
   }
-  bool do_tr() override		{if(is_device()){untested(); return BASE_SUBCKT::do_tr();}else{untested(); return true;} }
+  bool do_tr() override		{if(is_device()){ return BASE_SUBCKT::do_tr();}else{untested(); return true;} }
 
   bool tr_needs_eval()const override{
     if(is_device()){untested();

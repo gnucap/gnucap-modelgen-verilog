@@ -170,7 +170,7 @@ DISPATCHER<FUNCTION>::INSTALL d_log(&function_dispatcher, "log|$log10", &p_log);
 /*--------------------------------------------------------------------------*/
 class ln : public MGVAMS_FUNCTION {
 public:
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {itested();
     PARAMETER<double> x;
     Cmd >> x;
     x.e_val(NOT_INPUT, Scope);

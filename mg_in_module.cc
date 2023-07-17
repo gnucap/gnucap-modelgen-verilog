@@ -205,6 +205,14 @@ void Data_Type::dump(std::ostream& o)const
 */
 void Parameter_2_List::parse(CS& file)
 {
+  Module* m = prechecked_cast<Module*>(owner());
+  assert(m);
+  if(m->attribute_stash().is_empty()){
+  }else{
+    assert(!_attributes);
+    set_attributes(m->attribute_stash().detach());
+  }
+
   _is_local = file.last_match()[0]=='l';
 //  file >> _type;
   if(file.umatch("real")){
@@ -224,6 +232,16 @@ void Parameter_2_List::parse(CS& file)
 /*--------------------------------------------------------------------------*/
 void Variable_List::parse(CS& file)
 {
+  assert(owner());
+  Module* mod = prechecked_cast<Module*>(owner());
+  if(mod){
+    if(mod->attribute_stash().is_empty()){
+    }else{
+      set_attributes(mod->attribute_stash().detach());
+    }
+  }else{ untested();
+  }
+
   _type = file.last_match();
   LiSt<Variable_2, '\0', ',', ';'>::parse(file);
   if(_type.to_string()[0] == 'i'){
@@ -232,10 +250,21 @@ void Variable_List::parse(CS& file)
     }
   }else{
   }
+  if(has_attributes()){
+    for (auto x : *this){
+      x->set_attributes(&attributes());
+    }
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Parameter_2_List::dump(std::ostream& o)const
 {
+  if(has_attributes()){
+    o << attributes();
+  }else{
+  }
+
   if(is_local()){
     o__ "localparam";
   }else{
@@ -249,6 +278,11 @@ void Parameter_2_List::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void Variable_List::dump(std::ostream& o)const
 {
+  if(has_attributes()){
+    o << attributes();
+  }else{
+  }
+
   o__ _type << " ";
   LiSt<Variable_2, '\0', ',', ';'>::dump(o);
   o << "\n";
@@ -256,8 +290,21 @@ void Variable_List::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void Variable_List_Collection::parse(CS& f)
 {
+#if 0
+  assert(owner());
+  Module* mod = prechecked_cast<Module*>(owner());
+  if(mod){
+    if(mod->attribute_stash().is_empty()){
+    }else if(size()){
+      set_attributes(mod->attribute_stash().detach());
+    }else{
+    }
+  }else{
+  }
+#endif
 //  char t=f.last_match()[0];
   Collection<Variable_List>::parse(f);
+
 //  if(t=='i'){
 //    for(auto x:*this){
 //      x->set_int();
@@ -356,6 +403,7 @@ void Net_Declarations::parse(CS& f)
   File const* root = prechecked_cast<File const*>(root_scope);
   assert(root);
   auto ii = root->discipline_list().find(f);
+  Net_Decl_List* d = NULL;
 
   if(ii!=root->discipline_list().end()){
 //    size_t here = f.cursor();
@@ -368,15 +416,28 @@ void Net_Declarations::parse(CS& f)
       i->set_discipline(*ii);
     }
 
-    push_back(m);
-
+    d = m;
   }else if(f.umatch("ground ")){
     auto m = new Net_Decl_List_Ground();
     m->set_owner(owner());
     f >> *m;
-    push_back(m);
+    d = m;
   }else{
     assert(!f);
+  }
+
+  Module* mod = prechecked_cast<Module*>(owner());
+  assert(mod);
+  if(d){
+    push_back(d);
+
+    if(mod->attribute_stash().is_empty()){
+    }else if(size()){
+      assert(!_attributes);
+      d->set_attributes(mod->attribute_stash().detach());
+    }else{
+    }
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -433,6 +494,11 @@ void Net_Decl_List_Discipline::parse(CS& f)
 void Net_Decl_List_Discipline::dump(std::ostream& o)const
 {
   assert(_disc);
+  // o__ "";
+  if(has_attributes()){
+    o << attributes();
+  }else{
+  }
   o__ _disc->identifier() << " ";
   Net_Decl_List::dump(o);
   o << "\n";
@@ -568,6 +634,15 @@ net_declaration ::=
 */
 void Module::parse(CS& f)
 {
+  File* o = prechecked_cast<File*>(owner());
+  assert(o);
+  if(o->attribute_stash().is_empty()){
+  }else{
+    assert(!_attributes);
+    set_attributes(o->attribute_stash().detach());
+  }
+
+
   // do we need a second pass? or just connect the dots while reading in?
   _ports.set_owner(this);
   _input.set_owner(this);
@@ -591,9 +666,10 @@ void Module::parse(CS& f)
 
   size_t here = f.cursor();
   bool end = false;
+  _attribute_stash.set_owner(this);
   for (;;) {
+    while (f >> _attribute_stash) { }
     ONE_OF	// module_item
-      || (f >> _attribute_dummy)
       || f.umatch(";")
       // mi, port_declaration
       || ((f >> "input ") && (f >> _input))
@@ -602,7 +678,7 @@ void Module::parse(CS& f)
       // mi, npmi, mogi, mogid
       // net_declaration
       || (f >> _net_decl)
-      || ((f >> "ground ") && (f >> _net_decl))
+      || ((f >> "ground ") && (f >> _net_decl)) // really?
       // mi, non_port_module_item
       // mi, npmi, mogi, module_or_generate_item_declaration
       || ((f >> "branch ") && (f >> _branch_decl))
@@ -617,6 +693,10 @@ void Module::parse(CS& f)
       || ((f >> "endmodule ") && (end = true))
       || (f >> _element_list)	// module_instantiation
       ;
+    if (_attribute_stash.is_empty()){
+    }else{
+      f.warn(0, "dangling attributes");
+    }
     if (end){
       break;
     }else if (!f.more()) {
@@ -682,9 +762,14 @@ void List_Of_Branch_Identifiers::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void Module::dump(std::ostream& o)const
 {
+  if(has_attributes()){
+    o << attributes();
+  }else{
+  }
+  indent x;
   o << "module " << identifier() << ports() << ";\n";
   if(input().size()){
-    o << "  input "	    << input()			<< "\n";
+    o__ "input "	    << input()			<< "\n";
   }else{
   }
   if(output().size()){

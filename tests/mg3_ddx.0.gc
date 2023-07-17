@@ -9,7 +9,7 @@ verilog
 module test_ddx0(n)
 	electrical n;
 
-	real dd;
+	(* desc="" *) real dd;
 
 	analog begin
 		real v;

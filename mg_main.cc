@@ -23,7 +23,7 @@
 #include "mg_out.h"
 #include <patchlev.h>
 /*global*/ int errorcount = 0;
-std::string ind = "  ";
+std::string ind;
 std::basic_ostream<char>* diag_out; // mg_error.cc
 /*--------------------------------------------------------------------------*/
 #if 0

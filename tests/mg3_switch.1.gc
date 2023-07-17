@@ -8,7 +8,7 @@ verilog
 `modelgen
 module test_sw1(p, n, cp, cn)
 	electrical p, n, cp, cn;
-	real short;
+	(* desc="" *) real short;
 
 	analog begin
 		if V(cp, cn) > 0 begin

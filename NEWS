@@ -27,4 +27,5 @@
 * string handling
 * systemtask parse/dump
 * handle short branches
+* probe vars with attribs only
 * various bugfixes

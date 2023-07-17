@@ -429,8 +429,7 @@ static void make_cc_analog_cond(std::ostream& o, AnalogConditionalStmt const& s)
     }
     o__ "}";
     if(s.false_part_or_null()) {
-      o << "else ";
-      o__ "{\n";
+      o << "else {\n";
       {
 	indent y;
 	make_cc_analog_stmt(o, s.false_part());

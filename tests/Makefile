@@ -34,6 +34,7 @@ check: check/.diffs
 check/.diffs: ${CHECK_TARGETS}
 	cat $+ > $@
 
+# BUG. "+" breaks -n
 ${CHECK_TARGETS}: check/%.diffs:
 	+GNUCAP=${GNUCAP} ./test ${MODELGEN_VERILOG} "$*" ${TARGETDIR} ${REFDIR}
 
