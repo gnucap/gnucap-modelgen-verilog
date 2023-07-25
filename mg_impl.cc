@@ -713,11 +713,16 @@ bool Assignment::is_module_variable() const
   return _lhs->is_module_variable();
 }
 /*--------------------------------------------------------------------------*/
-bool Assignment::is_int() const
+Data_Type const& Assignment::type() const
 {
   //assert(_lhs->is_int() == _type.is_int());
   assert(_lhs);
-  return _lhs->is_int();
+  return _lhs->type();
+}
+/*--------------------------------------------------------------------------*/
+bool Assignment::is_int() const
+{
+  return type().is_int();
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref::Branch_Ref(Branch_Ref const& b)

@@ -699,7 +699,6 @@ class Node;
 class Expression;
 class Variable : public Owned_Base {
 protected:
-  Data_Type _type;
   String_Arg _name;
   Deps _deps;
 public:
@@ -711,9 +710,9 @@ public:
   ~Variable() {
   }
 public:
-  void set_type(Data_Type d){ _type=d; }
-  Data_Type const& type() const {return _type;}
-  bool is_int() const { return _type.is_int(); }
+//  void set_type(Data_Type d){ _type=d; }
+  virtual Data_Type const& type() const = 0;
+  // bool is_int() const { return _type.is_int(); }
   Deps const& deps()const { return _deps; }
   Deps& deps() { return _deps; }
   String_Arg const& identifier()const {return _name;}
@@ -738,22 +737,28 @@ private:
   Token_PROBE* resolve_xs_function(Expression& E, std::string const& name, Deps const&);
 };
 /*--------------------------------------------------------------------------*/
-class Variable_2 : public Variable {
+class Variable_Decl : public Variable {
+  Data_Type _type;
   Attribute_Instance const* _attributes{NULL};
 public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
-  Variable_2() : Variable() {}
-//   void set_type(std::string const& a){_type=a;}
+  Variable_Decl() : Variable() {}
   bool has_attributes() const{
     return _attributes;
   }
   void set_attributes(Attribute_Instance const* a) {
     _attributes = a;
   }
+  Data_Type const& type()const override{
+    return _type;
+  }
+  void set_type(Data_Type const& d){ _type=d; }
+protected:
+//  void set_type(std::string const& a){_type=a;}
 };
 /*--------------------------------------------------------------------------*/
-class Variable_List : public LiSt<Variable_2, '\0', ',', ';'> {
+class Variable_List : public LiSt<Variable_Decl, '\0', ',', ';'> {
   String_Arg _type; // ENUM?
 public:
   String_Arg const& type()const {return _type;}
@@ -1220,6 +1225,11 @@ public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   std::string code_name()const override;
+
+  Data_Type const& type()const override{
+    static Data_Type_Real r;
+    return r; // for now.
+  }
 };
 typedef Collection<Analog_Function_Arg> Analog_Function_Args;
 /*--------------------------------------------------------------------------*/
@@ -1681,9 +1691,9 @@ private:
 typedef Collection<Module> Module_List;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class BlockVarIdentifier : public Variable{
+class BlockVarIdentifier : public Variable_Decl{
 public:
-  explicit BlockVarIdentifier() : Variable() { }
+  explicit BlockVarIdentifier() : Variable_Decl() { }
 public:
   void parse(CS& cmd) override;
   void dump(std::ostream&)const override;
@@ -1727,6 +1737,7 @@ public:
 public:
   bool is_module_variable()const override;
   bool is_int() const;
+  Data_Type const& type()const override;
   std::string const& lhsname()const {
     assert(_lhs);
     return _lhs->name();

@@ -148,7 +148,7 @@ void make_cc_string(std::ostream& o, String const& e)
 {
   o << '"';
   for(char c : e.val_string()){itested();
-    if(c=='\n'){ untested();
+    if(c=='\n'){ itested();
       o << '\\';
     }else{itested();
     }

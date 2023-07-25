@@ -243,7 +243,7 @@ void Variable_List::parse(CS& file)
   }
 
   _type = file.last_match();
-  LiSt<Variable_2, '\0', ',', ';'>::parse(file);
+  LiSt<Variable_Decl, '\0', ',', ';'>::parse(file);
   if(_type.to_string()[0] == 'i'){
     for (auto x : *this){
       x->set_type(Data_Type_Int());
@@ -284,7 +284,7 @@ void Variable_List::dump(std::ostream& o)const
   }
 
   o__ _type << " ";
-  LiSt<Variable_2, '\0', ',', ';'>::dump(o);
+  LiSt<Variable_Decl, '\0', ',', ';'>::dump(o);
   o << "\n";
 }
 /*--------------------------------------------------------------------------*/
@@ -826,14 +826,14 @@ CS& Module::parse_analog(CS& cmd)
   return cmd;
 }
 /*--------------------------------------------------------------------------*/
-void Variable_2::parse(CS& file)
+void Variable_Decl::parse(CS& file)
 {
   file >> ','; // ??
   file >> _name;
   new_var_ref();
 }
 /*--------------------------------------------------------------------------*/
-void Variable_2::dump(std::ostream& o)const
+void Variable_Decl::dump(std::ostream& o)const
 {
   o__ name();
 }
