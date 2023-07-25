@@ -233,7 +233,7 @@ TIME_PAIR EVAL_BM_PULSE::tr_review(COMPONENT* d)const
       /* past pulse */
     }else if (reltime < _period - dtmin) {
       d->_time_by.min_event(_period + time_offset - dtmin);
-    }else{ untested();
+    }else{ itested();
       d->_time_by.min_event(_period + time_offset);
     }
   }

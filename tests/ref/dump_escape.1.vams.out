@@ -3,7 +3,8 @@
 module test();
   analog begin
     real arg;
-    $strobe("...%fwithescapednewline\test.", arg);
+    $strobe("... %f with escaped newline \
+                test.", arg);
   end
 
 endmodule

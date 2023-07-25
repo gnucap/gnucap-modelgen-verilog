@@ -263,7 +263,7 @@ public:
 				_data[i] /= o.value() * o.value();
 			}
 			*_data /= *o._data;
-		}else{ untested();
+		}else{ itested();
 			*this /= (o + 1e-20);
 		}
 		return *this;

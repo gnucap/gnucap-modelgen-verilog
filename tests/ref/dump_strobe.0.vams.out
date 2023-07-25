@@ -4,10 +4,10 @@ module foo();
   real    x;
 
   analog begin
-    $strobe("somestrobe%f.", x);
+    $strobe("some strobe %f.", x);
   end
 
-  analog   $strobe("somestrobe%f.", x);
+  analog   $strobe("some strobe %f.", x);
 
 endmodule
 

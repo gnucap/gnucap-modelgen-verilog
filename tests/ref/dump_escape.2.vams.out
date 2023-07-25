@@ -3,7 +3,7 @@
 module test();
   analog begin
     real arg;
-    $strobe("...%fwithescapedescape\\", arg);
+    $strobe("... %f with escaped escape \\", arg);
   end
 
 endmodule

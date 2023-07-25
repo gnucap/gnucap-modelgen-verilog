@@ -1,4 +1,12 @@
-... 
-real arg;
-$strobe("an %f escaped \"`string\" test.", ar
-                                        ^ ? bad analog block
+
+
+module test();
+  analog begin
+    real arg;
+    $strobe("an %f escaped \"`string\" test.", arg);
+  end
+
+endmodule
+
+
+
