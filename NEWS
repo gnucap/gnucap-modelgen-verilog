@@ -29,3 +29,8 @@
 * handle short branches
 * probe vars with attribs only
 * various bugfixes
+* value retention rules stub
+* preliminary attribute_instance
+* tr_probe_num: only include variables with attributes
+* paramset/instance default param fix
+* fix current port re-expansion in vaflow

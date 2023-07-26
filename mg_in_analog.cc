@@ -685,7 +685,9 @@ void Branch_Ref::parse(CS& f)
 void Branch_Ref::dump(std::ostream& o)const
 {
   assert(_br);
-  if(_br->n()==&mg_ground_node){
+  if(has_name()){
+    o << "(" << *_name << ")";
+  }else if(_br->n()==&mg_ground_node){
     o << "(" << pname() << ")";
   }else{
     o << "(" << pname() << ", " << nname() << ")";

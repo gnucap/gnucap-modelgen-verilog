@@ -4,7 +4,8 @@
 - suboptimal diagnostics
 - event control is incomplete
 - ddx is incomplete
-- only one current for each pair of nodes
+- named branch contributions are wonky and incomplete
+- named branch probes missing
 - V(..) <+ I(..) does not work, revisit mg2_ccvs.1.gc
 - flow on rhs after contrib doesn't work
 - ac needs operating point, even if linear: mg2_cccs.0.gc

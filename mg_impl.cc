@@ -223,7 +223,9 @@ Branch_Ref const& Branch_Names::new_name(std::string const& n, Branch_Ref const&
   if(j){
     throw Exception("Branch " + n + " already defined\n");
   }else{
-    return j = r;
+    j = r;
+    j.set_name(n);
+    return j;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -318,6 +320,13 @@ const std::string& Branch::dev_type()const
   }
 }
 /*--------------------------------------------------------------------------*/
+void Branch_Ref::set_name(std::string const& n)
+{
+  assert(!has_name());
+  assert(_br);
+  _name = _br->reg_name(n);
+}
+/*--------------------------------------------------------------------------*/
 Branch_Ref& Branch_Ref::operator=(Branch_Ref&& o)
 {
   operator=(o);
@@ -338,6 +347,7 @@ Branch_Ref& Branch_Ref::operator=(Branch_Ref const& o)
 
   _br = o._br;
   _r = o._r;
+  _name = o._name;
 
   if(_br) {
     _br->attach(this);
@@ -372,6 +382,15 @@ std::string const& Branch_Ref::nname() const
   }
 }
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+std::string const* Branch::reg_name(std::string const&s)
+{
+  for(auto i: _names){
+    assert(i!=s);
+  }
+  _names.push_back(s);
+  return &_names.back();
+}
 /*--------------------------------------------------------------------------*/
 bool Branch::has_element() const
 {
@@ -729,7 +748,7 @@ Branch_Ref::Branch_Ref(Branch_Ref const& b)
     : Owned_Base(b),
       _br(b._br),
       _r(b._r),
-      _alias(b._alias)
+      _name(b._name)
 {
   if(_br){
     _br->attach(this);
@@ -741,7 +760,7 @@ Branch_Ref::Branch_Ref(Branch_Ref&& b)
     : Owned_Base(b),
       _br(b._br),
       _r(b._r),
-      _alias(b._alias)
+      _name(b._name)
 {
   if(_br){
     _br->attach(this);
@@ -764,6 +783,16 @@ Branch_Ref::~Branch_Ref()
     _br->detach(this);
     _br = NULL;
   }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+std::string Branch_Ref::code_name()const
+{
+  assert(_br);
+  if(has_name()){
+    return "_br_" + *_name;
+  }else{
+    return _br->code_name();
   }
 }
 /*--------------------------------------------------------------------------*/

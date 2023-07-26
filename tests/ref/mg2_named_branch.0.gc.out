@@ -1,0 +1,4 @@
+parameter v=0 
+test_nbr0 #() dut (.p(1),.n(0));
+#           v(1)      
+ 0.         1.        

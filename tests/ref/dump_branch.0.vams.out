@@ -34,8 +34,8 @@ module branchtest(a, b);
   analog begin
     I(a, b) <+ 1;
     I(b, a) <+ 2;
-    I(c, b) <+ 3;
-    I(b, c) <+ 4;
+    I(mybr2) <+ 3;
+    I(mybr3) <+ 4;
   end
 
 endmodule

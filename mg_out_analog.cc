@@ -116,7 +116,7 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
 /*--------------------------------------------------------------------------*/
 static void make_cc_contrib(std::ostream& o, Contribution const& C)
 {
-  o__ "{ // Contribution " << C.name() << "\n";
+  o__ "{ // Contribution " << C.name() << C.branch_ref() << "\n";
   if(C.branch()->is_short()){
   }else{
     indent x("  ");
@@ -126,7 +126,7 @@ static void make_cc_contrib(std::ostream& o, Contribution const& C)
     }
 
     char sign = C.reversed()?'-':'+';
-    std::string bcn = C.branch()->code_name();
+    std::string bcn = C.branch_ref().code_name();
     if(C.branch()->has_pot_source()){
       if(C.is_pot_contrib()){
 	o__ "if (!d->_pot" << bcn << "){\n";
@@ -149,7 +149,7 @@ static void make_cc_contrib(std::ostream& o, Contribution const& C)
     }
 
     assert(C.branch());
-    o__ "d->_value" << C.branch()->code_name() << " " << sign << "= t0.value();\n";
+    o__ "d->_value" << bcn << " " << sign << "= t0.value();\n";
     if(C.branch()->has_pot_source()) {
       // incomplete? //
     }else if(C.branch()->has_flow_probe()) {
@@ -557,13 +557,30 @@ std::string Analog_Function_Arg::code_name()const
   return "af_arg_" + name();
 }
 /*--------------------------------------------------------------------------*/
-static void make_one_branch_contribution(std::ostream& o, Module const& m, const Branch& br)
+static void make_set_one_branch_contribution(std::ostream& o, Module const& m, const Branch& br)
 {
   Branch const* b = &br;
   assert(!br.is_short());
   size_t k = 1;
   o__ "assert(_value" << b->code_name() << " == _value" << b->code_name() << ");\n";
+
   o__ b->state() << "[0] = _value" << b->code_name() << ";\n";
+  if(b->has_pot_source()){
+    for(auto n: b->names()){
+	o__ "if(_pot_br_" << n << "){\n";
+	// TODO: pick this one
+	o____ b->state() << "[0] = _value_br_" << n << ";\n";
+	o__ "}else if (!_pot"<< b->code_name() << "){\n";
+	// TODO: sum up derivatives, too
+	o____ b->state() << "[0] += _value_br_" << n << ";\n";
+	o__ "}else{untested();\n";
+	o__ "}\n";
+    }
+  }else{
+    for(auto n: b->names()){
+      o____ b->state() << "[0] += _value_br_" << n << ";\n";
+    }
+  }
 
   // self_admittance
   for(auto d : b->deps()){
@@ -680,7 +697,7 @@ void make_set_branch_contributions(std::ostream& o, const Module& m)
       for(auto D : b->deps()){
 	o__ "// DEP " << D->code_name() << "\n";
       }
-      make_one_branch_contribution(o, m, *b);
+      make_set_one_branch_contribution(o, m, *b);
     }else if(b->has_flow_probe()) {
       o__ "// flow prb " << b->name() << "\n";
       o__ "if(" << b->code_name() << "){\n";
@@ -693,12 +710,18 @@ void make_set_branch_contributions(std::ostream& o, const Module& m)
     if(b->is_short()) {
     }else if(b->has_pot_source()) {
       o__ "// pot src " << b->name() << "\n";
-      o__ "if(!" << b->code_name() << "){\n";
+      o__ "if(!" << b->code_name() << "){ untested();\n";
       o__ "}else if(_pot" << b->code_name() << "){\n";
+      o____ b->code_name() << "->_loss0 = 1./OPT::shortckt;\n";
+      for(auto n: b->names()){
+	o__ "}else if(_pot_br_" << n << "){\n";
 	o____ b->code_name() << "->_loss0 = 1./OPT::shortckt;\n";
+      }
       o__ "}else{\n";
-	o____ b->code_name() << "->_loss0 = 0.;\n";
+      o____ b->code_name() << "->_loss0 = 0.;\n";
       o__ "}\n";
+
+
     }else if(b->has_flow_source()) {
       assert(!b->has_pot_source());
       o__ "// flow src " << b->name() << "\n";
@@ -752,12 +775,17 @@ void make_clear_branch_contributions(std::ostream& o, const Module& m)
     if(x->has_element()){
       if(x->has_pot_source()){
 	o____ "_pot" << x->code_name() << " = false;\n";
-      }else if(x->has_pot_source()){ untested();
-	o____ "_pot" << x->code_name() << " = true;\n";
+	for(auto n: x->names()){
+	  o____ "_pot_br_" << n << " = false;\n";
+	}
       }else{
       }
       o____ "_value" << x->code_name() << " = 0.;\n";
       o____ "std::fill_n(_st" << x->code_name() << "+1, " << x->num_states()-1 << ", 0.);\n";
+      for(auto n: x->names()){
+	o____ "_value_br_" << n << " = 0.;\n";
+	o____ "std::fill_n(_st_br_" << n << "+1, " << x->num_states()-1 << ", 0.);\n";
+      }
     }else{
     }
   }

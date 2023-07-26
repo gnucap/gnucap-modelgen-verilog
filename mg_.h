@@ -646,8 +646,7 @@ class Branch;
 class Branch_Ref : public Owned_Base {
   Branch* _br{NULL};
   bool _r;
-protected:
-  std::string _alias;
+  std::string const* _name{NULL};
 public:
   Branch_Ref(Branch_Ref&& b);
   Branch_Ref(Branch_Ref const& b);
@@ -660,6 +659,11 @@ public:
 public:
   void parse(CS&) override;
   void dump(std::ostream& o)const override;
+  std::string code_name()const;
+  void set_name(std::string const&);
+  bool has_name()const{
+    return _name;
+  }
 
   operator Branch*() const{ return _br; }
   Branch* operator->() const{ return _br; }
@@ -1447,6 +1451,7 @@ class Branch : public Element_2 {
   bool _is_filter{false};
   std::vector<Branch_Ref*> _refs;
   size_t _number;
+  std::list<std::string> _names;
 public:
   explicit Branch(Node const* p, Node const* n, size_t number)
     : Element_2(), _p(p), _n(n), _number(number) {
@@ -1457,10 +1462,14 @@ public:
   explicit Branch(){}
   Branch( Branch const&) = delete;
   ~Branch();
+  std::list<std::string> const& names()const{
+    return _names;
+  }
   std::string name()const;
   // later.
   void parse(CS&)override {incomplete();}
   void dump(std::ostream&)const override;
+  std::string const* reg_name(std::string const&);
   Node const* p() const{ assert(_p); return _p; }
   Node const* n() const{ assert(_n); return _n; }
   bool is_short() const{ return _p == _n; }
@@ -1791,6 +1800,7 @@ public:
   Deps const& deps() const { return _deps; }
   Expression const* rhs()const {return _rhs;}
   std::string const& name() const{return _name;}
+  Branch_Ref const& branch_ref() const{return _branch;}
   Branch const* branch() const{return _branch;}
   bool reversed() const{ return _branch.is_reversed() ;}
   Branch_Ref new_branch(std::string const& p, std::string const& n) {

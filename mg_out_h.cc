@@ -325,12 +325,21 @@ static void make_module_one_branch_state(std::ostream& o, Branch const& br)
   o << "public: // states, " << br.code_name() << ";\n";
   if(br.has_pot_source()){
     o__ "bool _pot" << br.code_name() << ";\n";
+    for(auto n : br.names()){
+      o__ "bool _pot_br_" << n << ";\n";
+    }
   }else{
   }
   o__ "double _value" << br.code_name() << ";\n";
   o__ "double _st" << br.code_name();
   size_t k = br.num_states();
   o__ "[" << k << "];\n";
+
+  for(auto n : br.names()){
+    o__ "double _value_br_" << n << ";\n";
+    o__ "double _st_br_" << n;
+    o__ "[" << k << "];\n";
+  }
 
   o__ "struct _st" << br.code_name() << "_ {\n";
   o____ "enum { ";

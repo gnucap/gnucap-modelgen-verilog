@@ -1,0 +1,5 @@
+parameter v=0 
+test_ret0 #() dut (.p(1),.n(0));
+vsource #(.dc(1)) v1 (.p(1),.n(0));
+#           v(1)      
+ 0.         0.5       
