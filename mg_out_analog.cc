@@ -160,7 +160,7 @@ static void make_cc_contrib(std::ostream& o, Contribution const& C)
     for(auto v : C.deps()) {
       if(C.branch() == v->branch()){
 	o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
-	o__ "d->" << C.branch()->state() << "[1]"
+	o__ "d->_st" << bcn << "[1]"
 	  " "<<sign<<"= " << "t0[d" << v->code_name() << "];\n";
       }else{
       }
@@ -567,18 +567,24 @@ static void make_set_one_branch_contribution(std::ostream& o, Module const& m, c
   o__ b->state() << "[0] = _value" << b->code_name() << ";\n";
   if(b->has_pot_source()){
     for(auto n: b->names()){
-	o__ "if(_pot_br_" << n << "){\n";
-	// TODO: pick this one
+	o__ "if(_pot" << b->code_name() << "){\n";
+	o__ "}else if(_pot_br_" << n << "){\n";
+	o____ "_pot" << b->code_name() << " = true;\n";
 	o____ b->state() << "[0] = _value_br_" << n << ";\n";
-	o__ "}else if (!_pot"<< b->code_name() << "){\n";
+	o____ "notstd::copy_n(_st_br_" << n << "+1, " << b->num_states()-1 << ", " << b->state() <<" + 1);\n";
+	o__ "}else if (!_pot"<< b->code_name() << "){itested();\n";
 	// TODO: sum up derivatives, too
-	o____ b->state() << "[0] += _value_br_" << n << ";\n";
+	o____ b->state() << "[0] += _value_br_" << n << "; // incomplete 577\n";
 	o__ "}else{untested();\n";
 	o__ "}\n";
     }
   }else{
+    o__ "// collect currents from named branches\n";
     for(auto n: b->names()){
-      o____ b->state() << "[0] += _value_br_" << n << ";\n";
+      o__ b->state() << "[0] += _value_br_" << n << ";\n";
+      o__ "for(int k=1; k<" << b->num_states() << "; ++k){\n";
+	o__ b->state() << "[k] += _st_br_" << n << "[k];\n";
+      o__ "}\n;";
     }
   }
 
@@ -587,17 +593,19 @@ static void make_set_one_branch_contribution(std::ostream& o, Module const& m, c
     if(d->branch() == b){
       if(b->has_pot_source() && b->has_flow_probe()){
 
-	o__ "if (!_pot"<< b->code_name() << "){ itested();\n";
+	o__ "if (!_pot"<< b->code_name() << "){ untested();\n";
 	o__ "}else if (" << b->state() << "[1] > OPT::shortckt){\n";
 	o____ "_pot"<< b->code_name() << " = false;\n";
+	o____ "assert(" << b->state() << "[1]);\n";
 	o____ b->state() << "[0] /= - " << b->state() << "[1];\n";
+	o____ b->state() << "[1] = 1./" << b->state() << "[1];\n";
 	if(br.num_states()<=2){
 	}else{
 	  o__ "incomplete();\n";
 	  std::cerr << "INCOMPLETE" << "_pot"<< b->code_name() << "\n";
 	  incomplete(); // the other ones??
 	}
-	o__ "}else{\n";
+	o__ "}else{untested();\n";
 	o__ "}\n";
       }else{
       }
@@ -714,8 +722,8 @@ void make_set_branch_contributions(std::ostream& o, const Module& m)
       o__ "}else if(_pot" << b->code_name() << "){\n";
       o____ b->code_name() << "->_loss0 = 1./OPT::shortckt;\n";
       for(auto n: b->names()){
-	o__ "}else if(_pot_br_" << n << "){\n";
-	o____ b->code_name() << "->_loss0 = 1./OPT::shortckt;\n";
+	o__ "// }else if(_pot_br_" << n << "){\n";
+	o____ "//" << b->code_name() << "->_loss0 = 1./OPT::shortckt;\n";
       }
       o__ "}else{\n";
       o____ b->code_name() << "->_loss0 = 0.;\n";

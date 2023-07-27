@@ -28,9 +28,10 @@
 * systemtask parse/dump
 * handle short branches
 * probe vars with attribs only
-* various bugfixes
-* value retention rules stub
+* named branches
+* preliminary value retention rules
 * preliminary attribute_instance
 * tr_probe_num: only include variables with attributes
 * paramset/instance default param fix
 * fix current port re-expansion in vaflow
+* various bugfixes

@@ -5,35 +5,37 @@ attach ../d_vasrc.so
 verilog
 
 `modelgen
-module test_res1_0(p, n);
+module test_res_5(p, n);
 	electrical p, n;
 	inout p, n;
-	parameter real r=1;
+	branch (p, n) io;
+	parameter real r = 200.;
 	analog begin
-		V(p,n) <+ I(p,n) * r;
+		I(io) <+ V(p, n) / r;
 	end
 endmodule
 
+
 list
 
-!make test_res1_0.so > /dev/null
-attach ./test_res1_0.so
+!make test_res_5.so > /dev/null
+attach ./test_res_5.so
 
 parameter r=1
 parameter v=0
 
-test_res1_0 #(.r(100)) dut(1,0);
+test_res_5 #(.r(100)) dut(1,0);
 vsource #(.dc(v)) v1(1, 0);
 
-test_res1_0 #(.r(1)) dut(2,0);
+test_res_5 #(.r(1)) dut(2,0);
 vsource #(.dc(v)) v2(2, 0);
 
-test_res1_0 #(.r(.01)) dut(3,0);
+test_res_5 #(.r(.01)) dut(3,0);
 vsource #(.dc(v)) v3(3, 0);
 
 list
 
 print dc i(v*) iter(0)
 
-dc v 0 1 .5
+dc v 0 1 .25
 end
