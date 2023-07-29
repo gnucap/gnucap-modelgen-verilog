@@ -45,26 +45,26 @@ public:
   UNITS units()const override {return uSI;}
 
 public: // override virtual, used by callback
-  std::string arg_front()const override {itested();
+  std::string arg_front()const override {
     switch (_mode) {
     case mPARAMSET:untested(); return " .";			    break;
-    case mDEFAULT:itested();  return (arg_count++ > 0) ? ", ." : "."; break;
+    case mDEFAULT:  return (arg_count++ > 0) ? ", ." : "."; break;
     }
     unreachable();
     return "";
   }
-  std::string arg_mid()const override {itested();
+  std::string arg_mid()const override {
     switch (_mode) {
     case mPARAMSET:untested(); return "="; break;
-    case mDEFAULT:itested();  return "("; break;
+    case mDEFAULT:  return "("; break;
     }
     unreachable();
     return "";
   }
-  std::string arg_back()const override {itested();
+  std::string arg_back()const override {
     switch (_mode) {
     case mPARAMSET:untested(); return ";"; break;
-    case mDEFAULT:itested();  return ")"; break;
+    case mDEFAULT:  return ")"; break;
     }
     unreachable();
     return "";
