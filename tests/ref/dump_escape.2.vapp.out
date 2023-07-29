@@ -1,6 +1,4 @@
 
 
-BUG, need different tokenise
- "string with 
+ "string with \
 		escaped newline" ;
-

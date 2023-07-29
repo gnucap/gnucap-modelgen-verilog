@@ -1,9 +1,8 @@
 
 
-
 module test(1 2);
  parameter real a=2.0; 
  parameter real b=3.0; 
  parameter real c=1.0 from [0:2]; 
-endmodule
 
+endmodule

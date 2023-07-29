@@ -1,6 +1,4 @@
 
 
- 
-    TKD_sq     =  TKD * TKD; 
-    
-    nt0        =  4.0 * KBOL * TKD; 
+
+     TKD_sq     =  TKD * TKD;         nt0        =  4.0 * KBOL * TKD; 

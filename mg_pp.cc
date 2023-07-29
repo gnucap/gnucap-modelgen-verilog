@@ -72,32 +72,19 @@ static std::string getlines(FILE *fileptr)
       }else{
       }
     }else{
-      trim(buffer);
+      // trim(buffer);
       size_t count = strlen(buffer);
-      if (buffer[count-1] == '\\') {
-	buffer[count-1] = '\n';
+      if (buffer[count-2] == '\\') {
+	assert(buffer[count-1] == '\n');
+	assert(buffer[count] == '\0');
       }else{
-	// look ahead at next line
-	//int c = fgetc(fileptr);
-	int c;
-	while (isspace(c = fgetc(fileptr))) {
-	  // skip
-	}
-	// if (c == '+') { untested();
-	//   need_to_get_more = true;
-	// }else if (c == '\n') {unreachable();
-	//   need_to_get_more = true;
-	//   ungetc(c,fileptr);
-	// }else
-	{
-	  need_to_get_more = false;
-	  ungetc(c,fileptr);
-	}
+	need_to_get_more = false;
       }
       s += buffer;
       // s += ' ';
     }
   }
+  trace1("getlines", s);
   return s;
 }
 /*--------------------------------------------------------------------------*/
@@ -128,7 +115,7 @@ static void append_to(CS& f, std::string& to, std::string until)
       return;
     }else{
       trace3("no match", until, chunk, f.tail());
-      to += "\n"; // BUG?
+//      to += "\n"; // BUG? BUG1
       try{
 	f.get_line("");
 	trace2("got line2 ", f.tail(), f.ns_more());
@@ -178,17 +165,17 @@ void Skip_Block::parse(CS& file)
     if (file >> "`endif") {
       if (nest == 0) {
 	break;  // done with skip_block
-      }else{ itested();
+      }else{itested();
 	--nest;
       }
     }else if (file >> "`else") {
       if (nest == 0) {
 	break;  // done with skip_block
-      }else{ itested();
+      }else{itested();
       }
     }else if (file >> "`ifndef") { untested();
       ++nest;
-    }else if (file >> "`ifdef") { itested();
+    }else if (file >> "`ifdef") {itested();
       ++nest;
     }else if (!file.more()) {
       file.get_line("");
@@ -274,6 +261,12 @@ void Define::stash(std::string const& s, String_Arg_List const& args)
       _value_tpl += f.ctoc();
     }
   }
+  size_t ts = _value_tpl.size();
+  if(!ts){
+  }else if(_value_tpl[ts-1] == '\n') {
+    _value_tpl.resize(ts-1);
+  }else{
+  }
   trace1("stashed", _value_tpl);
 }
 /*--------------------------------------------------------------------------*/
@@ -294,14 +287,17 @@ void Define::parse(CS& f)
     }else if (f >> "/*") /* C comment */ {
       f >> dummy_c_comment; //BUG// line count may be wrong
       stash(f.get_to("\\/\n"), args);
-    }else if(f >> "\\\n"){ untested();
-      incomplete();
-    }else if(f.match1('\\')) {itested();
+    }else if(f.match1('\\')) {
       f.skip();
-//      stash("\n", args);
-      std::string more = f.get_to("\\/\n"); // BUG
-      trace1("more?", more);
-      stash(more, args);
+      if(f.match1('\n')) {
+	std::string more = f.get_to("\\/\n"); // BUG
+	trace1("more?", more);
+	stash("\n" + more, args);
+      }else{itested();
+	std::string more = f.get_to("\\/\n"); // BUG
+	trace1("more?", more);
+	stash(more, args);
+      }
     }else if(f.match1('/')){
       stash("/", args);
       f.skip();
@@ -406,6 +402,14 @@ void Raw_String_Arg::parse(CS& f)
       }
     }else if(par) {
       _s += f.ctoc();
+    }else if(p == '\\') {
+      f.skip();
+      p = f.peek();
+      if(p=='\n'){
+//	f.skip();
+      }else{ untested();
+	_s += '\\';
+      }
     }else if(p == ',') {
       f.skip();
       break;
@@ -502,6 +506,7 @@ void Preprocessor::read(std::string const& file_name)
   }
 
   CS file(CS::_INC_FILE, file_name);
+  assert(file.fullstring()=="");
 
   parse(file);
 }
@@ -521,7 +526,7 @@ public:
       if (f.peek() == '"') {
 	f.skip();
 	break;
-      }else if (f.peek() == '\n') {
+      }else if (f.peek() == '\n') { untested();
 	_data += '\\';
 	_data += f.ctoc();
       }else if (f.peek() == '\\') {
@@ -530,7 +535,7 @@ public:
 	  _data += f.ctoc();
 	}else if(f.peek() == '\"'){
 	  _data += f.ctoc();
-	}else if(f.peek() == '\n'){ untested();
+	}else if(f.peek() == '\n'){
 	  _data += f.ctoc();
 	}else{itested();
 	}
@@ -544,7 +549,7 @@ public:
   void dump(std::ostream& o)const override;
 } quoted_string;
 /*--------------------------------------------------------------------------*/
-void PP_Quoted_String::dump(std::ostream& o)const{
+void PP_Quoted_String::dump(std::ostream& o)const{ untested();
   for(char c : _data){ untested();
     if(c=='\n'){ untested();
       o << '\\';
@@ -646,13 +651,13 @@ void Preprocessor::parse(CS& file)
       _stripped_file += "/";
     }else{ untested();
       unreachable();
-      _stripped_file += "\n";
+//      _stripped_file += "\n";
       // move on, just copy
     }
 
     if (!file.ns_more()) {
       try {
-	_stripped_file += "\n"; // BUG?
+//	_stripped_file += "\n"; // BUG?
 	file.get_line("");
       }catch (Exception_End_Of_Input const&) {
 	break;

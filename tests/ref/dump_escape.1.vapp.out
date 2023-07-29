@@ -1,8 +1,9 @@
 
 module test()
+
 analog begin
-$strobe("... with escaped newline \
+	$strobe("... with escaped newline \
                 test.", arg);
 end
-endmodule
 
+endmodule

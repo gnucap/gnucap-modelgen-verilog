@@ -3,10 +3,8 @@
 
 
 
-
-
-
   YY 
 dump_define.1.vapp:1:
 `define A 1
         ^ ? already defined: A 1
+

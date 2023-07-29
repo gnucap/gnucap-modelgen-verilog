@@ -1,7 +1,4 @@
 
 
 
-
-  module  X(1,2) 
-inout 1,2; 
-endmodule 
+  module  X(1,2) inout 1,2; endmodule 

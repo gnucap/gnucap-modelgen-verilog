@@ -1,6 +1,5 @@
-... rameter real a=1;
-parameter real a=1;
+... ameter real a=1;
+	parameter real a=1;
 endmodule
-
 
                                         ^ ? already declared

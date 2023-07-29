@@ -1,8 +1,9 @@
-... e test()
-analog begin
-$strobetypo(0);
-end
-endmodule
+... st()
 
+	analog begin
+		$strobetypo(0);
+	end
+
+endmodule
 
                                         ^ ? bad discipline

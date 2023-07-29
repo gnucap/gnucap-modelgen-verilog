@@ -84,10 +84,10 @@ public:
     }
     _types.pop();
   }
-  void new_string(std::ostream& o){ itested();
+  void new_string(std::ostream& o){itested();
     ++_str_idx;
     if(_str_idx < _str_alloc){ untested();
-    }else{ itested();
+    }else{itested();
       assert(_str_idx==_str_alloc);
       ++_str_alloc;
       o << ind << "std::string s" << _str_idx << ";\n";
@@ -148,8 +148,8 @@ void make_cc_string(std::ostream& o, String const& e)
 {
   o << '"';
   for(char c : e.val_string()){itested();
-    if(c=='\n'){ itested();
-      o << '\\';
+    if(c=='\n'){itested();
+//      o << '\\';
     }else{itested();
     }
     o << c;

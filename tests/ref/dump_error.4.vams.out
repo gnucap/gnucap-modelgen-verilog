@@ -1,9 +1,6 @@
-
-module test()
-analog begin
-XS(n, p) <+ 17.
-end
-endmodule
-
-
-                                     ^ ? bad discipline
+... ule test()
+	analog begin
+		XS(n, p) <+ 17.
+	end
+endmodul
+                                        ^ ? bad discipline

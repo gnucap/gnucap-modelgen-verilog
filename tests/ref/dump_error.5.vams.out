@@ -1,6 +1,6 @@
-... ctrical n, p;
-analog begin
-XS(n, p) <+ 17.
-end
-endmodule
+... ical n, p;
+	analog begin
+		XS(n, p) <+ 17.
+	end
+endmodul
                                         ^ ? bad access

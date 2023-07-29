@@ -1,9 +1,11 @@
 
 module foo()
-real tmp, B, T;
-analog begin
-tmp = B / T + B / T
-+ B / (T * T);
-end
-endmodule
 
+	real tmp, B, T;
+
+	analog begin
+		tmp = B / T + B / T
+			+ B / (T * T);
+	end
+
+endmodule
