@@ -32,6 +32,7 @@ DELETED =
 #------------------------------------------------------------------------
 #------------------------------------------------------------------------
 RAW_SRCS = mg_main.cc mg_error.cc \
+mg_filt.cc \
 mg_func.cc \
 mg_impl.cc \
 mg_in_analog.cc \
@@ -48,6 +49,7 @@ mg_out_dev.cc \
 mg_out_lib.cc \
 mg_out_root.cc \
 mg_pp.cc \
+mg_task.cc \
 m_tokens.cc
 #------------------------------------------------------------------------
 RAW_HDRS = mg_.h mg_out.h

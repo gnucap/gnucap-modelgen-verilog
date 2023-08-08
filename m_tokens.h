@@ -112,20 +112,43 @@ public:
   Variable const* operator->() const{ return _item; }
 };
 /*--------------------------------------------------------------------------*/
+class FUNCTION_;
 class Token_FILTER : public Token_SYMBOL {
-  Filter const* _item;
+  FUNCTION_ const* _function{NULL};
 public:
-  explicit Token_FILTER(const std::string Name, Filter const* item)
-    : Token_SYMBOL(Name, ""), _item(item) {}
+  explicit Token_FILTER(const std::string Name, FUNCTION_ const* item)
+    : Token_SYMBOL(Name, ""), _function(item) {}
 private:
-  explicit Token_FILTER(const Token_FILTER& P) : Token_SYMBOL(P), _item(P._item) {}
+  explicit Token_FILTER(const Token_FILTER& P)
+    : Token_SYMBOL(P), _function(P._function){} // , _item(P._item) {}
   Token* clone()const  override{return new Token_FILTER(*this);}
 //  void stack_op(Expression* e)const override{ untested();
 //    e->push_back(clone());
 //  }
 public:
-  Filter const* item()const { untested(); return _item; }
-  Filter const* operator->() const{ return _item; }
+  std::string code_name() const;
+//  Filter const* operator->() const{ return _item; }
+};
+/*--------------------------------------------------------------------------*/
+class Token_TASK : public Token_SYMBOL {
+  FUNCTION_ const* _item;
+  size_t _num_args{size_t(-1)};
+public:
+  explicit Token_TASK(const std::string Name, FUNCTION_ const* item)
+    : Token_SYMBOL(Name, ""), _item(item) {}
+private:
+  explicit Token_TASK(const Token_TASK& P)
+    : Token_SYMBOL(P), _item(P._item), _num_args(P._num_args) {}
+  Token* clone()const override{return new Token_TASK(*this);}
+  void stack_op(Expression* e)const override;
+public:
+  std::string code_name()const;
+  void set_num_args(size_t n){ _num_args = n; }
+  size_t num_args() const { return _num_args; }
+//  void set_num_args(size_t n){_num_args = n;}
+public:
+  FUNCTION_ const* item()const { untested(); return _item; }
+  FUNCTION_ const* operator->() const{ return _item; }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

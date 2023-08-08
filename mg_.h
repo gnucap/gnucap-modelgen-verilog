@@ -847,8 +847,10 @@ public:
 /// Some kind of sequential block with scope for parameters, variables..
 class Deps;
 class Filter;
+class Task;
 class Node;
 class Nature;
+class FUNCTION_;
 class Block : public List_Base<Base> {
   typedef std::map<std::string, Base*> map; // set?
   typedef map::const_iterator const_iterator;
@@ -874,9 +876,10 @@ public:
     assert(_owner);
     return _owner->new_node(p); // new??
   }
-  virtual Filter const* new_filter(std::string const& xs, Deps const& d) {
+
+  virtual Token* new_token(FUNCTION_ const* f, Deps& d, size_t num_args) {
     assert(_owner);
-    return _owner->new_filter(xs, d);
+    return _owner->new_token(f, d, num_args);
   }
 
   virtual Branch_Ref new_branch(std::string const&, std::string const&) {
@@ -1185,6 +1188,7 @@ public:
   }
 //  void set_owner(Block* b) { _owner = b; }
 //  const std::string& module_or_paramset_identifier()const {return _module_or_paramset_identifier;}
+  void set_dev_type(std::string const& s){_module_or_paramset_identifier = s;}
   virtual const std::string& dev_type()const {return _module_or_paramset_identifier;}
   virtual Nature const* nature()const {return NULL;}
   virtual Discipline const* discipline()const {return NULL;}
@@ -1625,8 +1629,12 @@ private: // verilog input data
   Attribute_Stash _attribute_stash;
   AnalogList	_analog_list;
   // Code_Block		_validate;
-private: // elaboration data
+private: // merge?
   Filter_List _filters;
+  std::list<FUNCTION_ const*> _func;
+  std::set<FUNCTION_ const*> _funcs;
+  size_t _num_evt_slots{0};
+private: // elaboration data
   Probe_Map _probes;
   Branch_Names _branch_names;
   Branch_Map _branches;
@@ -1658,6 +1666,8 @@ public:
     	size_t		min_nodes()const	{return ports().size();}
     	size_t		max_nodes()const	{return ports().size();}
     	size_t		net_nodes()const	{return ports().size();}
+  size_t num_evt_slots()const {return _num_evt_slots; }
+  void new_evt_slot() { ++_num_evt_slots; }
 public:
   const Probe_Map&	probes()const		{return _probes;}
   const Filter_List&	filters()const		{return _filters;}
@@ -1682,6 +1692,11 @@ public:
     assert(!_attributes);
     _attributes = a;
   }
+  void push_back(FUNCTION_ const* f);
+  void push_back(Filter /*const*/ * f);
+  void install(FUNCTION_ const* f);
+  std::list<FUNCTION_ const*> const& func()const {return _func;}
+  std::set<FUNCTION_ const*> const& funcs()const {return _funcs;}
 private: // misc
   CS& parse_analog(CS& cmd);
 
@@ -1689,13 +1704,14 @@ private:
   Probe const* new_probe(std::string const&, std::string const&, std::string const&) override;
   Probe const* new_probe(std::string const& xs, Branch_Ref const& br) override;
 
-  Filter const* new_filter(std::string const&, Deps const&) override;
+  Token* new_token(FUNCTION_ const*, Deps&, size_t na) override;
   Branch_Ref new_branch(std::string const&, std::string const&) override;
-  Branch_Ref new_branch(Node const*, Node const*) override;
   Branch_Ref const& new_branch_name(std::string const& n, Branch_Ref const& b) override;
-  Node* new_node(std::string const& p) override;
   Node const* node(std::string const& p) const override;
   Branch_Ref branch(std::string const& p) const override;
+public: //filters may need this..
+  Node* new_node(std::string const& p) override;
+  Branch_Ref new_branch(Node const*, Node const*) override;
 }; // Module
 typedef Collection<Module> Module_List;
 /*--------------------------------------------------------------------------*/
@@ -1878,12 +1894,6 @@ class File : public Block {
   std::string   _cwd;
   CS		_file;
   Head		_head;
-  // Code_Block	_h_headers;
-  // Code_Block	_cc_headers;
-  // Model_List	_model_list;
-  // Device_List	_device_list;
-  // Code_Block	_h_direct;
-  // Code_Block	_cc_direct;
   Nature_List	_nature_list;
   Discipline_List _discipline_list;
   Module_List	_module_list;
@@ -1923,7 +1933,14 @@ public: // readout
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class Filter : public Element_2 /*?*/ {
+class Task : public Owned_Base {
+public:
+  void parse(CS&)override {unreachable();}
+  void dump(std::ostream& o)const {unreachable();}
+};
+/*--------------------------------------------------------------------------*/
+// TODO: merge with Element_2?
+class Filter : public Element_2 {
   std::string _name; // BUG?
   Deps _deps;
   Branch_Ref _branch;
@@ -1934,6 +1951,8 @@ public:
     : Element_2(), _deps(d) {
     _name = name;
     }
+  void parse(CS&) override{unreachable();}
+  void dump(std::ostream& o)const override {unreachable();}
 
   void set_output(Branch_Ref const& x);
 //  Branch_Ref const& branch() const{ return _branch; }
@@ -1950,20 +1969,15 @@ public:
   }
   Deps const& deps()const { return _deps; }
 
-  size_t num_states()const override;
-  size_t num_nodes()const override;
-  std::string state()const override;
+  size_t num_states()const;
+  size_t num_nodes()const;
+  std::string state()const;
   std::string short_label()const;
   Probe const* prb() const;
   bool has_branch() const {
     return _branch;
   }
-public: // make it look like an Element_2?
-//  std::string omit() const { return ""; }
-  std::string const& dev_type() const;
-  virtual size_t num_args()const {unreachable(); return 0;}
-  virtual void make_cc(std::ostream&, Module const&)const {unreachable();}
-};
+}; // Filter
 /*--------------------------------------------------------------------------*/
 void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps*d=NULL);
 void make_cc_expression(std::ostream& o, Expression const& e);

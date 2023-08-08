@@ -551,18 +551,18 @@ T cosh(T d)
 	return set_value(d, std::cosh(d));
 }
 
+#if 0
 template<class T>
 T exp(T d)
 {
 	set_value(d, std::exp(d));
 	return chain(d, d);
 }
-
-// DUP
 double exp(PARAMETER<double> const& d)
 {
 	return std::exp(d);
 }
+#endif
 
 template<class T>
 T atan(T d)
@@ -780,14 +780,22 @@ T flicker_noise(T, T2, S=0.)
 /*--------------------------------------------------------------------------*/
 double simparam(std::string const& what, double def=0)
 {
-	if(what=="gmin") {itested();
+	if(what=="gmin") {
 		return OPT::gmin;
-	}else{ untested();
+	}else if(what=="iteration"){
+		return CKT_BASE::_sim->_iter[sCOUNT];
+	}else{
 		return def;
 	}
 }
-
-} // va
-#endif
 /*--------------------------------------------------------------------------*/
+class EVT{
+public:
+	virtual void operator()() const = 0;
+};
+/*--------------------------------------------------------------------------*/
+} // va
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+#endif
 /*--------------------------------------------------------------------------*/

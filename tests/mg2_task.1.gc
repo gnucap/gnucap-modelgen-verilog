@@ -1,0 +1,29 @@
+
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_task1()
+
+	analog begin
+		if($abstime>0)
+			$finish(0);
+	end
+
+endmodule
+
+!make test_task1.so > /dev/null
+attach ./test_task1.so
+
+test_task1 #() dut();
+
+list
+
+print dc iter(0)
+dc
+print tr iter(0)
+tr 1
+end

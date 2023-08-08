@@ -135,21 +135,22 @@ static Base* parse_int(CS& f, Block* o)
   return new ListOfBlockIntIdentifiers(f, o);
 }
 /*--------------------------------------------------------------------------*/
-static Base* parse_system_task(CS& file, Block* o)
+static Base* parse_system_task(CS& f, Block* o)
 {
-  size_t here = file.cursor();
+  trace1("parse_system_task", f.tail().substr(0,10));
+  size_t here = f.cursor();
   if(ONE_OF
-    || file.umatch("$display ")
-    || file.umatch("$finish ")
-    || file.umatch("$monitor ")
-    || file.umatch("$strobe ")
-    || file.umatch("$write ")
-    || file.umatch("$debug ")
+    || f.umatch("$display ")
+    || f.umatch("$finish ")
+    || f.umatch("$monitor ")
+    || f.umatch("$strobe ")
+    || f.umatch("$write ")
+    || f.umatch("$debug ")
   ){
-    file.reset(here);
+    f.reset(here);
     try{
-      return new System_Task(file, o);
-    }catch(Exception const& e){
+      return new System_Task(f, o);
+    }catch(Exception const& e){ untested();
       return NULL;
     }
   } else{
@@ -167,7 +168,9 @@ void System_Task::parse(CS& f)
 {
   assert(owner());
   _e.set_owner(owner());
+  trace1("====", f.tail().substr(0,10));
   f >> _e;
+  trace1("/====", f.tail().substr(0,10));
   f >> ";";
 }
 /*--------------------------------------------------------------------------*/
@@ -259,7 +262,7 @@ AnalogProceduralAssignment::AnalogProceduralAssignment(CS& file, Block* o)
   size_t here = file.cursor();
   std::string what;
   file >> what;
-  trace2("assignment", what, file.tail().substr(0,10));
+  trace2("assignment?", what, file.tail().substr(0,20));
 //  file >> what;
   if(what == ""){ untested();
     throw Exception_No_Match("need name");
@@ -559,7 +562,7 @@ void AnalogSeqBlock::parse(CS& file)
     }
     trace1("AnalogSeqBlock::parse try", file.tail().substr(0,10));
     Base* s = parse_analog_stmt(file, &_block);
-    if(!s){
+    if(!s){ untested();
       trace1("AnalogSeqBlock::parse", file.tail().substr(0,10));
       throw Exception_CS("bad analog block", file);
     }else{

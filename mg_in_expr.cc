@@ -53,6 +53,7 @@ public:
     assert(_args.size());
     return(_stack.size()-_args.top());
   }
+  // pRop_args?
   void pop_args(){
     assert(_args.size());
     while(_stack.size() > _args.top()){
@@ -116,28 +117,66 @@ public:
   }
 };
 /*--------------------------------------------------------------------------*/
-static Token_FILTER* resolve_filter_function(Expression& E, std::string const& n,
+static Token_SYMBOL* resolve_va_function(Expression& E, MGVAMS_FUNCTION const* t,
+    DEP_STACK& ds, Block* o)
+{
+//  size_t na = ds.num_args(); ??
+  Token* nt = o->new_token(t, *ds.top(), 0);
+  delete nt; // TODO;
+  return NULL;
+}
+/*--------------------------------------------------------------------------*/
+static Token_TASK* resolve_system_task(Expression& E, MGVAMS_TASK const* t,
     DEP_STACK& ds, Block* o)
 {
   if(E.is_empty()) { untested();
     throw Exception("syntax error");
   }else if(!dynamic_cast<Token_PARLIST*>(E.back())) { untested();
     throw Exception("syntax error");
-  }else if(n=="ddt" || n=="idt") {
+  }else{
+    size_t na = ds.num_args();
+    trace2("Token_TASK num_args", na, t->label());
     ds.pop_args();
     assert(ds.top());
 
-    Filter const* f = o->new_filter(n, *ds.top());
-    assert(f);
+    Token* nt = o->new_token(t, *ds.top(), na);
+    assert(nt);
 
-    auto t = new Token_FILTER(n, f);
-    assert((*t)->prb());
+    auto token = dynamic_cast<Token_TASK*>(nt);
+    assert(token);
+    token->set_num_args(na);
 
     Deps outdeps;
-    outdeps.insert((*t)->prb());
+//    outdeps.insert((*t)->prb());
     ds.set(outdeps);
+    return token;
+  }
+}
+/*--------------------------------------------------------------------------*/
+static Token* resolve_filter_function(Expression& E, MGVAMS_FILTER const* filt,
+    DEP_STACK& ds, Block* o)
+{
+  std::string const& n = filt->label();
+
+  if(E.is_empty()) { untested();
+    throw Exception("syntax error");
+  }else if(!dynamic_cast<Token_PARLIST*>(E.back())) { untested();
+    throw Exception("syntax error");
+  }else if(n=="ddt" || n=="idt") {
+    size_t na = ds.num_args();
+    ds.pop_args();
+    assert(ds.top());
+
+    Token* t_ = o->new_token(filt, *ds.top(), na);
+    Token_FILTER * t=dynamic_cast<Token_FILTER*>(t_);
+    assert(t);
+
+//    Deps outdeps;
+//    outdeps.insert((*t)->prb());
+//    ds.set(outdeps);
     return t;
   }else if(n=="ddx") {
+    size_t na = ds.num_args();
     // delete(E.back());
     // E.pop_back();
 
@@ -145,13 +184,24 @@ static Token_FILTER* resolve_filter_function(Expression& E, std::string const& n
     for(auto d : *ds.top()){
       trace1("ddx0 dep", d->code_name());
     }
-    Filter const* f = o->new_filter(n, *ds.top());
+
+#if 0
+    incomplete();
+    Filter const* f = NULL; // o->new_filter(n, *ds.top());
+    auto t = new Token_FILTER(n, f);
+#else
+    Token* t_ = o->new_token(filt, *ds.top(), na);
+    Token_FILTER * t=dynamic_cast<Token_FILTER*>(t_);
+    //assert(t);
+#endif
+
+//    Token* f = o->new_token(n, *ds.top());
 
     ds.pop_args();
     Deps outdeps;
     ds.set(outdeps);
 
-    return new Token_FILTER(n, f);
+    return t;
   }else{
     unreachable();
     incomplete();
@@ -160,25 +210,19 @@ static Token_FILTER* resolve_filter_function(Expression& E, std::string const& n
       // depstack.top()->update(*td);
 }
 /*--------------------------------------------------------------------------*/
-static bool is_filter_function(std::string const& n)
+static MGVAMS_FILTER const* filter_function(std::string const& n)
 {
-  if (n == "ddt"){
-    return true;
-  }else if (n == "idt"){
-    return true;
-  }else if (n == "ddx"){
-    return true;
-  }else{
-    return false;
-  }
+  FUNCTION const* f = function_dispatcher[n];
+  return dynamic_cast<MGVAMS_FILTER const*>(f);
 }
 /*--------------------------------------------------------------------------*/
 static bool is_system_function_call(std::string const& n)
 {
+  // TODO: see is_va_function_call
   if(n=="$param_given"
+    || n=="$abstime"
     || n=="$monitor"
-    || n=="$strobe"
-    || n=="$finish"
+//    || n=="$finish"
     || n=="$simparam"
     || n=="$temperature"
     || n=="$vt"){
@@ -188,28 +232,16 @@ static bool is_system_function_call(std::string const& n)
   }
 }
 /*--------------------------------------------------------------------------*/
-static bool is_va_function_call(std::string const& n)
+static MGVAMS_TASK const* system_task(std::string const& n)
 {
-  // stub, need sth.
   FUNCTION const* f = function_dispatcher[n];
-
-  if (n == "exp"
-   || n == "log"
-   || n == "ln"
-   || n == "limexp"
-   || n == "cos"
-   || n == "sin") {
-    return 1;
-  }else if (n == "pow"){
-    return 2;
-  }else if (n == "white_noise"
-         || n == "flicker_noise" ){itested();
-    return 2;
-  }else if(dynamic_cast<MGVAMS_FUNCTION const*>(f)) {
-    return true;
-  }else{
-    return 0;
-  }
+  return dynamic_cast<MGVAMS_TASK const*>(f);
+}
+/*--------------------------------------------------------------------------*/
+static MGVAMS_FUNCTION const* va_function(std::string const& n)
+{
+  FUNCTION const* f = function_dispatcher[n];
+  return dynamic_cast<MGVAMS_FUNCTION const*>(f);
 }
 /*--------------------------------------------------------------------------*/
 static Module const* to_module(Block const* owner)
@@ -355,8 +387,8 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
       E.push_back(cl);
       ds.new_constant();
     }else if((E.is_empty() || !dynamic_cast<Token_PARLIST*>(E.back()))
-	  &&  dynamic_cast<Token_SYMBOL*>(t)
-	  && t->name() == "inf"){
+          &&  dynamic_cast<Token_SYMBOL*>(t)
+          && t->name() == "inf") {
       Float* f = new Float(std::numeric_limits<double>::infinity());
       E.push_back(new Token_CONSTANT(t->name(), f, ""));
     }else if(dynamic_cast<Token_PARLIST*>(t)){
@@ -436,19 +468,31 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
 	E.push_back(new Token_STOP(".."));
 	E.push_back(new Token_PARLIST("...", NULL));
       }
+      if(MGVAMS_FUNCTION const* vaf = va_function(t->name())) {
+	// ... incomplete();
+	/* Token* t = */ resolve_va_function(E, vaf, ds, scope);
+      }else{ untested();
+      }
       E.push_back(new Token_SFCALL(t->name()));
     }else if(is_analog_function_call(t->name(), scope)) {
       assert(dynamic_cast<Token_PARLIST*>(E.back()));
       ds.pop_args();
       E.push_back(new Token_AFCALL(t->name()));
-    }else if(is_va_function_call(t->name())) {
+///////////////////
+    }else if(MGVAMS_FUNCTION const* vaf = va_function(t->name())) {
       assert(dynamic_cast<Token_PARLIST*>(E.back()));
       ds.pop_args();
+      /* Token* t = */ resolve_va_function(E, vaf, ds, scope);
       E.push_back(t->clone()); // try later?
-    }else if(is_filter_function(n)) {
+    }else if(auto ff = filter_function(n)) {
       assert(dynamic_cast<Token_PARLIST*>(E.back()));
-      Token_FILTER* t = resolve_filter_function(E, n, ds, scope);
+      Token* t = resolve_filter_function(E, ff, ds, scope);
       E.push_back(t);
+    }else if(MGVAMS_TASK const* st = system_task(n)) {
+      assert(dynamic_cast<Token_PARLIST*>(E.back()));
+      Token* tt = resolve_system_task(E, st, ds, scope);
+      E.push_back(tt);
+///////////////////
     }else if(scope->node(t->name())) {
       trace1("unresolved node", t->name());
       // incomplete();
@@ -474,10 +518,9 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
     }
   }else if(ds.size()==1){
     deps->update(*ds.top());
-  }else{
+  }else{ untested();
     assert(ds.size()==0);
   }
-
 } // resolve_symbols
 /*--------------------------------------------------------------------------*/
 /* A.8.3

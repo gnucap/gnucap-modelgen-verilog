@@ -19,7 +19,7 @@
  * 02110-1301, USA.
  */
 #include "mg_.h"
-#include "mg_out.h" // really?
+#include "mg_func.h" // TODO
 /*--------------------------------------------------------------------------*/
 Node mg_ground_node;
 /*--------------------------------------------------------------------------*/
@@ -392,6 +392,7 @@ std::string const* Branch::reg_name(std::string const&s)
   return &_names.back();
 }
 /*--------------------------------------------------------------------------*/
+// has_source? is_source?
 bool Branch::has_element() const
 {
   if(is_short()){ untested();
@@ -406,7 +407,7 @@ bool Branch::has_pot_source() const
   return _has_pot_src; //  || _has_flow_probe;
 }
 /*--------------------------------------------------------------------------*/
-// BUG: delegate to branch
+// BUG: delegate to branch/source
 size_t Filter::num_states() const
 {
   std::vector<char> visited(num_branches());
@@ -418,7 +419,7 @@ size_t Filter::num_states() const
     }else{
     }
 
-    if(dynamic_cast<Element_2 const*>(i->branch()) == this){
+    if(dynamic_cast<Element_2 const*>(i->branch()) == _branch){
     }else if(visited[i->branch()->number()]){
     }else{
       ++k;
@@ -507,10 +508,6 @@ Probe::Probe(std::string const& xs, Branch_Ref b) : _xs(xs), _br(b)
   _is_pot_probe = (_xs == "V") || (_xs == "potential");
   _is_flow_probe = (_xs == "I") || (_xs == "flow");
 }
-//bool Probe::is_pot_probe() const
-//{
-//  ...
-//}
 /*--------------------------------------------------------------------------*/
 bool Probe::is_filter_probe() const
 {
@@ -550,126 +547,21 @@ Module::~Module()
   _attributes = NULL;
 }
 /*--------------------------------------------------------------------------*/
-class idt_Filter: public Filter{
-public:
-  explicit idt_Filter(std::string const& name, Deps const& d)
-    : Filter(name, d) {}
-public:
-  std::string const& dev_type()const override{
-    static std::string dt = "va_idt";
-    return dt;
-  }
-  size_t num_args()const override{return 1;}
-};
-/*--------------------------------------------------------------------------*/
-class ddt_Filter: public Filter{
-public:
-  explicit ddt_Filter(std::string const& name, Deps const& d)
-    : Filter(name, d) {}
-public:
-  std::string const& dev_type()const override{
-    static std::string dt = "va_ddt";
-    return dt;
-  }
-  size_t num_args()const override{return 1;}
-};
-/*--------------------------------------------------------------------------*/
-class ddx_Filter: public Filter{
-  Probe const* _ddxprobe{NULL};
-public:
-  explicit ddx_Filter(std::string const& name, Deps const& d)
-    : Filter(name, d) {
-      assert(d.size()==1);
-      _ddxprobe = *d.begin();
-  }
-public:
-  std::string const& dev_type()const override{
-    static std::string dt = "";
-    return dt;
-  }
-  size_t num_args()const override{return 2;}
-  void make_cc(std::ostream&, Module const&)const override;
-};
-/*--------------------------------------------------------------------------*/
-void ddx_Filter::make_cc(std::ostream& o, Module const& m) const
+Token* Module::new_token(FUNCTION_ const* f, Deps&d, size_t num_args)
 {
-  o__ "// ddx " <<  _ddxprobe->code_name() << "\n";
-  if(_ddxprobe->is_pot_probe()){
-  }else{
+  if(auto vaf = dynamic_cast<MGVAMS_FUNCTION const*>(f)){
+    auto tt = vaf->new_token(*this, num_args /*, d?*/);
+    return tt;
+  }else if(auto t = dynamic_cast<MGVAMS_TASK const*>(f)){
+    auto tt = t->new_token(*this, num_args /*, d?*/);
+    return tt;
+  }else if(auto t = dynamic_cast<MGVAMS_FILTER const*>(f)){
+    auto tt = t->new_token(*this, num_args, d);
+    return tt;
+  }else{ untested();
     incomplete();
   }
-  Node const* p = _ddxprobe->branch()->p();
-  Node const* n = _ddxprobe->branch()->n();
-  o__ "ddouble ret;\n";
-  o__ "(void) t1;\n";
-  for(auto x : m.branches()){
-    if(x->has_pot_probe()){
-      o__ "// found probe " <<  x->code_name() << "\n";
-      if(p == &mg_ground_node){ untested();
-      }else if(n != &mg_ground_node){
-      }else if(x->p() == p){
-	o__ "ret.value() += t0[d_potential" << x->code_name() << "];\n";
-      }else if(x->n() == p){
-	o__ "ret.value() -= t0[d_potential" << x->code_name() << "];\n";
-      }else{
-      }
-
-      if(n == &mg_ground_node){
-      }else if(p == &mg_ground_node){ untested();
-      }else if(x->p() == p && x->n() == n){
-	// oops. what does the standard say about reversed ddx?
-	bool rev = _ddxprobe->is_reversed();
-	o__ "ret.value() " << (rev?'-':'+') << "= t0[d_potential" << x->code_name() << "]; // fwd?\n";
-      }else if(x->p() == n && x->n() == p){ untested();
-	unreachable();
-      }else{ untested();
-      }
-
-    }else{
-    }
-
-  }
-  o__ "return ret;\n";
-}
-/*--------------------------------------------------------------------------*/
-static int n_filters;
-Filter const* Module::new_filter(std::string const& xs, Deps const&d)
-{
-//  size_t n_filters = _filters.size();
-  std::string filter_code_name = xs + "_" + std::to_string(n_filters++);
-  CS cmd(CS::_STRING, filter_code_name + " short_if=0 short_to=0;");
-
-  Port_1* p = new Port_1;
-  cmd >> *p;
-  // _local_nodes.push_back(p);
-  Node* n = NULL;
-
-  // TODO: some kind of dispatch.
-  Filter* f = NULL;
-  if(xs=="ddt"){
-    n = new_node(p->name());
-    f = new ddt_Filter(filter_code_name, d);
-  }else if(xs=="idt"){
-    n = new_node(p->name());
-    f = new idt_Filter(filter_code_name, d);
-  }else if(xs=="ddx"){
-    f = new ddx_Filter(filter_code_name, d);
-  }else{
-    assert(false);
-    /// . throw..
-  }
-  f->set_owner(this);
-  // trace3("new filter", f->name(), f->num_states(), d.size());
-  if(xs == "ddt" || xs == "idt"){
-    // BUG. filter constructor?
-    Branch* br = new_branch(n, &mg_ground_node);
-    assert(br);
-    assert(const_cast<Branch const*>(br)->owner());
-    f->set_output(Branch_Ref(br));
-  }else{
-  }
-  _filters.push_back(f);
-  return f;
+  return NULL;
 }
 /*--------------------------------------------------------------------------*/
 inline Branch_Ref Variable::new_branch(std::string const& p, std::string const& n)
@@ -871,13 +763,6 @@ bool Module::sync() const
   }else{
   }
   return has_analog_block();
-}
-/*--------------------------------------------------------------------------*/
-std::string const& Filter::dev_type() const
-{
-  // incomplete: which filter?
-  static std::string dt = "incomplete";
-  return dt;
 }
 /*--------------------------------------------------------------------------*/
 std::string Filter::state()const

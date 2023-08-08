@@ -22,6 +22,7 @@
  * arithmetic tokens
  */
 #include "m_tokens.h"
+#include "mg_func.h"
 /*--------------------------------------------------------------------------*/
 void Token_SFCALL::stack_op(Expression* E)const
 {
@@ -82,6 +83,39 @@ void Token_AFCALL::stack_op(Expression* E)const
   }else{ untested();
     unreachable();
   }
+}
+/*--------------------------------------------------------------------------*/
+std::string Token_TASK::code_name()const
+{
+  assert(_item);
+  return _item->label();
+}
+/*--------------------------------------------------------------------------*/
+std::string Token_FILTER::code_name()const
+{
+  assert(_function);
+  return "_f_" + _function->label();
+}
+/*--------------------------------------------------------------------------*/
+void Token_TASK::stack_op(Expression* E)const
+{
+  const Token* T1 = E->back(); // Token_PARLIST
+  assert(T1->data()); // expression
+  Base const* d = T1->data();
+  auto ee = prechecked_cast<Expression const*>(d);
+  assert(ee);
+
+  { // restore argument.
+    E->pop_back();
+    E->push_back(new Token_STOP("stopname"));
+    for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
+      trace1("stackop restore arg", (**i).name());
+      (**i).stack_op(E);
+    }
+    E->push_back(new Token_PARLIST(".."));
+    E->push_back(clone());
+  }
+  delete T1;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

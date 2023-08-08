@@ -5,9 +5,15 @@ module foo();
 
   analog begin
     $strobe("some strobe %f.", x);
+    $strobe("some strobe %f.", 0);
+    $finish(1);
   end
 
   analog   $strobe("some strobe %f.", x);
+
+  analog begin
+    $finish();
+  end
 
 endmodule
 

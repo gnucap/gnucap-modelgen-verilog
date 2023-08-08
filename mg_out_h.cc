@@ -20,6 +20,7 @@
  * 02110-1301, USA.
  */
 #include "mg_out.h"
+#include "mg_func.h"
 /*--------------------------------------------------------------------------*/
 static void declare_deriv_enum(std::ostream& o, const Module& m)
 {
@@ -107,6 +108,34 @@ static void make_analogfunctions_decl(std::ostream& o, const Analog_Functions& P
   }
 }
 /*--------------------------------------------------------------------------*/
+static void make_func_dev(std::ostream& o, std::set<FUNCTION_ const*> const& P)
+{
+  for (auto q = P.begin(); q != P.end(); ++q) {
+    if(auto t = dynamic_cast<MGVAMS_TASK const*>(*q)){
+      o<<"//task " << (*q)->label() << "\n";
+      t->make_cc_dev(o);
+    }else{
+      o<<"//func " << (*q)->label() << "\n";
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+static void make_funcs_common(std::ostream& o, std::set<FUNCTION_ const*> const& P)
+{
+  for (auto q = P.begin(); q != P.end(); ++q) {
+    if(auto ff = dynamic_cast<MGVAMS_FUNCTION const*>(*q)){
+      ff->make_cc_common(o);
+    }else if(auto tt = dynamic_cast<MGVAMS_TASK const*>(*q)){
+      tt->make_cc_common(o);
+    }else if(auto ff = dynamic_cast<MGVAMS_FILTER const*>(*q)){
+      ff->make_cc_common(o);
+    }else{
+      unreachable();
+      o<<"//func " << (*q)->label() << "\n";
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 static void make_parameter_decl(std::ostream& o, const Parameter_List_Collection& P)
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
@@ -153,41 +182,6 @@ static void make_variable_decl(std::ostream& o, const Variable_List_Collection& 
 //  }
 //}
 /*--------------------------------------------------------------------------*/
-// TODO: split
-static void make_filter_common(std::ostream& o, const Module& m)
-{
-  for(auto f : m.filters()){
-    o__ "class FILTER" << f->code_name() << "{\n";
-    o__ "public:\n";
-    o____ "ddouble operator()(";
-      for(size_t n=0; n<f->num_args(); ++n){
-	o << "ddouble t" << n << ", ";
-      }
-    o << "MOD_" << m.identifier() << "* d) const;\n";
-
-    // o______ "incomplete();\n";
-    // {
-    //   indent a;
-    //   size_t k = 0;
-    //   for(auto v : f->deps()) {
-    //     // char sign = f.reversed()?'-':'+';
-    //     char sign = '+';
-    //     o__ "// dep " << v->code_name() << "\n";
-    //     // if(f->branch() == v->branch()){
-    //     // }else{
-    //       o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
-    //       o__ "d->" << f->state() << "[" << k << "]"
-    //         " "<<sign<<"= " << "t0[d" << v->code_name() << "];\n";
-    //       ++k;
-    //     //}
-    //   }
-    // }
-    // o______ "return 17.;\n";
-    // o____ "}\n";
-    o__  "}" << f->code_name() << ";\n";
-  }
-}
-/*--------------------------------------------------------------------------*/
 static void make_common(std::ostream& o, const Module& m)
 {
   std::string class_name = "COMMON_" + m.identifier().to_string();
@@ -207,8 +201,6 @@ static void make_common(std::ostream& o, const Module& m)
   }else{
   }
   declare_ddouble(o, m);
-  o << "public:\n";
-  make_filter_common(o, m);
   o << "public:\n";
   o__ "explicit " << class_name << "(const " << class_name << "& p);\n"
     "  explicit " << class_name << "(int c=0);\n"
@@ -255,73 +247,27 @@ static void make_common(std::ostream& o, const Module& m)
 //  }
   o << "private: // analog functions\n";
   make_analogfunctions_decl(o, m.analog_functions());
-  o << "private: // tmp hack\n";
-  o__ "double temp_hack()const {\n";
-  o____ "return P_CELSIUS0 + _sim->_temp_c;\n";
-  o__ "}\n";
-  o__ "double vt_hack()const {\n";
-  o____ "return P_K * temp_hack() / P_Q;\n";
-  o__ "}\n";
-  o__ "double vt_hack(double T)const {\n";
-  o____ "assert(T>=-P_CELSIUS0);\n";
-  o____ "(void)T;\n";
-  o____ "return P_K * temp_hack() / P_Q;\n";
-  o__ "}\n";
-  o__ "bool param_given(PARA_BASE const& p)const {\n";
-  o____ "return p.has_hard_value();\n";
-  o__ "}\n";
+  o << "private: // funcs\n";
+  make_funcs_common(o, m.funcs());
 
-  o << "};\n"
+  o << "}; //" << class_name << "\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
-}
+} // make_common
 /*--------------------------------------------------------------------------*/
-// BUG: duplicate?
-static void make_module_one_filter_state(std::ostream& o, Filter const& F)
+static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
 {
-  assert(F.prb());
-  assert(F.prb()->branch());
-  Branch const& br = *F.prb()->branch();
-
-  o << "public: // states, " << F.code_name() << ";\n";
-  o__ "double _st" << F.branch_code_name();
-  size_t k = F.num_states();
-  o__ "[" << k << "];\n";
-
-  o__ "struct _st" << F.branch_code_name() << "_ {\n";
-  o____ "enum { ";
-  std::string comma = "";
-  o____ "VALUE, SELF";
-
-  std::vector<char> seen(F.prb()->branch()->num_branches());
-  for(auto d : F.deps()){
-    Branch const* bb = d->branch();
-    assert(bb);
-    if(seen[bb->number()]){
-    }else if(bb == &br){
-    }else{
-      seen[bb->number()] = 1;
-      assert(d);
-      o << ", dep" << d->code_name();
-    }
+  Branch const* bb;
+  // if(auto f = dynamic_cast<Filter const*>(&elt)){
+  //   unreachable();
+  //   // make_module_one_filter_state(o, *f);
+  // }else
+  if((bb = dynamic_cast<Branch const*>(&elt))){
+  }else{
+    unreachable();
+    return;
   }
-  o____ "};\n";
-  o__ "} _dep" << F.code_name() << ";\n";
-}
-/*--------------------------------------------------------------------------*/
-static void make_filter_state(std::ostream& o, const Module& m)
-{
-  for(auto x : m.filters()){
-    assert(x);
-    if(x->has_branch()){
-      make_module_one_filter_state(o, *x);
-    }else{
-    }
-  }
-}
-/*--------------------------------------------------------------------------*/
-static void make_module_one_branch_state(std::ostream& o, Branch const& br)
-{
+  Branch const& br = *bb;
   o << "public: // states, " << br.code_name() << ";\n";
   if(br.has_pot_source()){
     o__ "bool _pot" << br.code_name() << ";\n";
@@ -386,7 +332,10 @@ static void make_branch_states(std::ostream& o, const Module& m)
     assert(x);
     if(x->has_element()){
       make_module_one_branch_state(o, *x);
+    }else if(x->is_filter()){
+      make_module_one_branch_state(o, *x);
     }else{
+      o__ "// branch no elt: " << x->code_name() << "\n";
     }
   }
 }
@@ -403,7 +352,6 @@ static void make_module(std::ostream& o, const Module& m)
   declare_ddouble(o, m);
   o << "private: // data\n";
   size_t total_nodes = m.nodes().size() + 10;
-  // circuit().req_nodes().size() + circuit().opt_nodes().size() + circuit().local_nodes().size();
   o << ind << "node_t _nodes[" << total_nodes << "];\n";
   o << "public: // netlist\n";
   for (Element_2_List::const_iterator
@@ -423,14 +371,22 @@ static void make_module(std::ostream& o, const Module& m)
       o__ "ELEMENT* " << br->code_name() << "{NULL}; // branch\n";
     }
   }
-  // for (auto br : m.filters()){
-  //   o << ind << "ELEMENT* " << br->code_name() << "{NULL}; // branch\n";
-  // }
+  o << "private: // func decl\n";
+  make_func_dev(o, m.funcs());
+  // IF m.has_evt
+  o << "private: // evt, tasks\n";
+  o__ "unsigned _evt_seek{0};\n";
+//  o__ "void("<<class_name<<"::*_evt[" << m.num_evt_slots() << "])();\n";
+  o__ "va::EVT const* _evt[" << m.num_evt_slots() << "];\n";
+  o__ "void q_evt(va::EVT const* c){\n";
+//  o__ "void q_evt(void ("<< class_name <<"::*c)()) {\n";
+  o____ "assert(_evt_seek<" << m.num_evt_slots() << ");\n";
+  o____ "_evt[_evt_seek++] = c;\n";
+  o__ "}\n";
   o << "private: // construct\n";
   o__ "explicit MOD_" << m.identifier() << "(MOD_" << m.identifier() << " const&);\n";
   o << "public:\n";
   o__ "explicit MOD_" << m.identifier() << "(); // : "<< base_name <<"() { _n = _nodes; }\n";
-  // o__ "~MOD_" << m.identifier() << "(){ untested(); }\n";
   o__ "CARD* clone()const override;\n";
   o << "private: // overrides\n";
   if(m.element_list().size()){
@@ -445,26 +401,38 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "void precalc_first();\n";
   o__ "void expand();\n";
   o__ "void precalc_last();\n";
-  o << ind << "//void    map_nodes();         //BASE_SUBCKT\n"
-    << ind << "//void    tr_begin();          //BASE_SUBCKT\n"
-    << ind << "//void    tr_restore();        //BASE_SUBCKT\n"
-    << ind << "  void    tr_load(){ trace1(\"tr_load\", long_label());BASE_SUBCKT::tr_load();}\n";
-  if (!m.has_analog_block()) {
-    o << ind << "//void    dc_advance();        //BASE_SUBCKT\n"
-      << ind << "//void    tr_advance();        //BASE_SUBCKT\n"
-      << ind << "//void    tr_regress();        //BASE_SUBCKT\n"
-      << ind << "//bool    tr_needs_eval()const;//BASE_SUBCKT\n"
-      << ind << "//void    tr_queue_eval();     //BASE_SUBCKT\n"
-      << ind << "//bool    do_tr();             //BASE_SUBCKT\n";
+  o__ "//void    map_nodes();         //BASE_SUBCKT\n";
+  o__ "//void    tr_begin();          //BASE_SUBCKT\n";
+  o__ "//void    tr_restore();        //BASE_SUBCKT\n";
+  o__ "void    tr_load(){ trace1(\"tr_load\", long_label());BASE_SUBCKT::tr_load();}\n";
+  if(m.num_evt_slots()){
+    o__ "TIME_PAIR  tr_review()override;         //BASE_SUBCKT\n";
+    o__ "void    tr_accept()override;         //BASE_SUBCKT\n";
   }else{
-    o << ind << "void      dc_advance()override {set_not_converged(); BASE_SUBCKT::dc_advance();}\n"
-      << ind << "void      tr_advance()override {set_not_converged(); BASE_SUBCKT::tr_advance();}\n"
-      << ind << "void      tr_regress()override {set_not_converged(); BASE_SUBCKT::tr_regress();}\n"
-      << ind << "bool      tr_needs_eval()const override;\n"
-      << ind << "void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }\n"
-      << ind << "bool      do_tr() override;\n";
+    o__ "//TIME_PAIR  tr_review()override;         //BASE_SUBCKT\n";
+    o__ "//void    tr_accept()override;         //BASE_SUBCKT\n";
   }
-  o << ind << "double tr_probe_num(std::string const&)const override;\n";
+  o__ "//void    tr_unload();         //BASE_SUBCKT\n";
+  if (!m.has_analog_block()) {
+    o__ "//void    dc_advance();        //BASE_SUBCKT\n";
+    o__ "//void    tr_advance();        //BASE_SUBCKT\n";
+    o__ "//void    tr_regress();        //BASE_SUBCKT\n";
+    o__ "//bool    tr_needs_eval()const;//BASE_SUBCKT\n";
+    o__ "//void    tr_queue_eval();     //BASE_SUBCKT\n";
+    o__ "//bool    do_tr();             //BASE_SUBCKT\n";
+  }else{
+    o__ "void      dc_advance()override {set_not_converged(); BASE_SUBCKT::dc_advance();}\n";
+    o__ "void      tr_advance()override {set_not_converged(); BASE_SUBCKT::tr_advance();}\n";
+    o__ "void      tr_regress()override {set_not_converged(); BASE_SUBCKT::tr_regress();}\n";
+    o__ "bool      tr_needs_eval()const override;\n";
+    o__ "void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }\n";
+    o__ "bool      do_tr() override;\n";
+  }
+  o__ "double tr_probe_num(std::string const&)const override;\n";
+  o__ "  //void    ac_begin();          //BASE_SUBCKT\n";
+  o__ "  //void    do_ac();             //BASE_SUBCKT\n";
+  o__ "  //void    ac_load();           //BASE_SUBCKT\n";
+  o__ "  //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing\n";
 //  o << ind << "std::string dev_type()const override {return \"demo\";}\n";
   o__ "int max_nodes()const override {return "<< m.ports().size() <<";}\n";
   o__ "int min_nodes()const override {return "<< m.ports().size() <<";}\n";
@@ -480,9 +448,6 @@ static void make_module(std::ostream& o, const Module& m)
   make_variable_decl(o, m.variables());
   o << "private: // branch state\n";
   make_branch_states(o, m);
-  o << "private: // filter state\n";
-  make_filter_state(o, m);
-
   o << "private: // node list\n";
   std::string comma = "";
   o << ind << "enum {";
@@ -565,16 +530,6 @@ static void make_device(std::ostream& out, const Device& d)
     "  //void    tr_begin();          //BASE_SUBCKT\n"
     "  //void    tr_restore();        //BASE_SUBCKT\n";
   out <<
-    "  //void    tr_load();           //BASE_SUBCKT\n"
-    "  void    tr_load(){ trace1(\"tr_load\", long_label());BASE_SUBCKT::tr_load();}\n";
-    "  //double  tr_review();         //BASE_SUBCKT\n"
-    "  //void    tr_accept();         //BASE_SUBCKT\n"
-    "  //void    tr_unload();         //BASE_SUBCKT\n"
-    "  double    tr_probe_num(const std::string&)const;\n"
-    "  //void    ac_begin();          //BASE_SUBCKT\n"
-    "  //void    do_ac();             //BASE_SUBCKT\n"
-    "  //void    ac_load();           //BASE_SUBCKT\n"
-    "  //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing\n"
     "public:\n"
     "  static int  count() {return _count;}\n"
     "public: // may be used by models\n";
@@ -681,67 +636,6 @@ static void make_eval(std::ostream& out, const Eval& e,
     "};\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
-}
-#endif
-/*--------------------------------------------------------------------------*/
-#if 0
-static void make_evals(std::ostream& out, const Device& d)
-{
-  for (Eval_List::const_iterator
-       e = d.eval_list().begin();
-       e != d.eval_list().end();
-       ++e) {
-    make_eval(out, **e, d.name());
-  }
-}
-/*--------------------------------------------------------------------------*/
-void make_h_file(const File& in)
-{
-  std::string dump_name = in.name();
-  { // chop prefix path
-    std::string::size_type loc = dump_name.find_last_of(ENDDIR);
-    if (loc != std::string::npos) {
-      dump_name.erase(0, loc+1);
-    }else{itested();
-    }
-  }
-
-  // open file
-  std::ofstream out((dump_name+".h").c_str());
-  if (!out) {untested();
-    os_error(dump_name);
-  }else{
-  }
-
-  make_header(out, in, dump_name);
-
-  for (Module_List::const_iterator
-	 m = in.module_list().begin(); m != in.module_list().end(); ++m) {
-    //make_sdp(out, **m);
-    //make_tdp(out, **m);
-    //make_model(out, **m);
-    //make_common(out, **m);
-    //make_evals(out, **m);
-    //make_device(out, **m);
-  }
-
-  for (Model_List::const_iterator
-       m = in.models().begin();
-       m != in.models().end();
-       ++m) {
-    make_sdp(out, **m);
-    make_tdp(out, **m);
-    make_model(out, **m);
-  }
-  for (Device_List::const_iterator
-       m = in.devices().begin();
-       m != in.devices().end();
-       ++m) {
-    make_common(out, **m);
-    make_evals(out, **m);
-    make_device(out, **m);
-  }
-  make_tail(out, in);
 }
 #endif
 /*--------------------------------------------------------------------------*/

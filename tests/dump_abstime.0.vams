@@ -1,0 +1,8 @@
+
+module test()
+	analog begin
+		real t;
+		t = $abstime;
+		t = $abstime();
+	end
+endmodule

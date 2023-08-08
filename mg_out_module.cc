@@ -19,6 +19,7 @@
  * 02110-1301, USA.
  */
 #include "mg_out.h"
+#include "mg_func.h"
 #include "m_tokens.h"
 #include <stack>
 /*--------------------------------------------------------------------------*/
@@ -380,6 +381,7 @@ static void make_do_tr(std::ostream& o, const Module& m)
 {
   o << "bool MOD_" << m.identifier() << "::do_tr()\n{\n";
   o__ "clear_branch_contributions();\n";
+  o__ "_evt_seek = 0;\n";
   o__ "read_probes();\n";
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
@@ -389,6 +391,33 @@ static void make_do_tr(std::ostream& o, const Module& m)
   o__ "assert(subckt());\n";
   o__ "set_converged(subckt()->do_tr());\n";
   o__ "return converged();\n";
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_tr_review(std::ostream& o, const Module& m)
+{
+  o << "inline TIME_PAIR MOD_" << m.identifier() << "::tr_review()\n{\n";
+  o__ "if(_evt_seek){\n";
+  o____ "q_accept();\n";
+  o__ "}else{untested();\n";
+  o__ "}\n";
+  o__ "return " << baseclass(m) << "::tr_review();\n";
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_tr_accept(std::ostream& o, const Module& m)
+{
+  o << "inline void MOD_" << m.identifier() << "::tr_accept()\n{\n";
+  o__ "for(int i; i<_evt_seek; ++i){\n";
+  o____ "(*_evt[i])();\n";
+  // o____ "(this->*_evt[i])();\n";
+  o__ "}\n";
+  o__ "_evt_seek = 0;"; // needed?
+  o__ "return " << baseclass(m) << "::tr_accept();\n";
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -484,6 +513,11 @@ static void make_module_class(std::ostream& o, Module const& m)
     make_tr_needs_eval(o, m);
     make_do_tr(o, m);
     make_cc_analog(o, m);
+  }else{
+  }
+  if(m.num_evt_slots()){
+    make_tr_accept(o, m);
+    make_tr_review(o, m);
   }else{
   }
 
@@ -695,17 +729,17 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
 static void make_module_expand_one_filter(std::ostream& o, const Filter& e)
 {
   make_tag();
-  if (!(e.omit().empty())) { untested();
-    o__ "if (" << e.omit() << ") {\n";
-    o____ "if (" << e.code_name() << ") {\n";
-    o______ "subckt()->erase(" << e.code_name() << ");\n";
-    o______ e.code_name() << " = NULL;\n";
-    o____ "}else{\n";
-    o____ "}\n";
-    o__ "}else";
-  }else{
-    o__ "";
-  }
+  // if (!(e.omit().empty())) { untested();
+  //   o__ "if (" << e.omit() << ") {\n";
+  //   o____ "if (" << e.code_name() << ") {\n";
+  //   o______ "subckt()->erase(" << e.code_name() << ");\n";
+  //   o______ e.code_name() << " = NULL;\n";
+  //   o____ "}else{\n";
+  //   o____ "}\n";
+  //   o__ "}else";
+  // }else{
+  //   o__ "";
+  // }
   o << "{ // filter expand\n";
 
   // BUG: duplicate
@@ -827,8 +861,8 @@ static void make_module_expand(std::ostream& o, Module const& m)
     "  }else{\n"
     "  }\n"
     "\n";
-     o << " node_t gnd;\n";
-   o << "gnd.set_to_ground(this);\n";
+  o__ "node_t gnd;\n";
+  o__ "gnd.set_to_ground(this);\n";
   if(m.element_list().size()){
     o__ "assert(_parent);\n";
     o__ "assert(_parent->subckt());\n";
@@ -979,7 +1013,7 @@ void make_cc_module(std::ostream& o, const Module& m)
   make_module_is_valid(o, m);
   make_module_expand(o, m);
   make_module_precalc_last(o, m);
-  make_cc_filter(o, m);
+  make_cc_func(o, m);
   make_cc_analog_functions(o, m);
 //  make_module_probe(o, m);
 //  make_module_aux(o, m);
@@ -994,6 +1028,13 @@ void make_cc_module(std::ostream& o, const Module& m)
       "/*--------------------------------------"
       "------------------------------------*/\n";
   }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+void make_cc_func(std::ostream& o, const Module& m)
+{
+  for(auto f : m.funcs()){
+    f->make_cc_impl(o);
   }
 }
 /*--------------------------------------------------------------------------*/

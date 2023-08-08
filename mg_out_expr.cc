@@ -29,18 +29,11 @@
 static MGVAMS_FUNCTION const* lookup_function(std::string const& n)
 {
   FUNCTION const* f = function_dispatcher[n];
-  if (n == "exp"
-   || n == "cos"
-   || n == "sin") {
-    return 0;
-  }else if (n == "pow"){
-    return 0;
-  }else if(auto g=dynamic_cast<MGVAMS_FUNCTION const*>(f)) {
+  if(auto g=dynamic_cast<MGVAMS_FUNCTION const*>(f)) {
     return g;
   }else{
-    return 0;
+    return NULL;
   }
-
 }
 /*--------------------------------------------------------------------------*/
 class RPN_VARS {
@@ -84,9 +77,9 @@ public:
     }
     _types.pop();
   }
-  void new_string(std::ostream& o){itested();
+  void new_string(std::ostream& o){
     ++_str_idx;
-    if(_str_idx < _str_alloc){ untested();
+    if(_str_idx < _str_alloc){
     }else{itested();
       assert(_str_idx==_str_alloc);
       ++_str_alloc;
@@ -162,8 +155,6 @@ void make_cc_expression(std::ostream& o, Expression const& e)
   typedef Expression::const_iterator const_iterator;
 
   RPN_VARS s;
-//  s.new_ref("t0"); // HACK
-//  o__ "ddouble t0; // top\n";
   // The _list is the expression in RPN.
   // print a program that computes the function and the derivatives.
   for (const_iterator i = e.begin(); i != e.end(); ++i) {
@@ -177,33 +168,39 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 	prefix = "_v_";
       }
 
-// does gcc optimise them out?
-//      s.new_float(o);
-//       o__ s.code_name() << " = " << prefix << (*i)->name() << ".value();\n";
-//       for(auto v : (*var)->deps()) { untested();
-// 	o__ s.code_name() << "[d" << v->code_name() << "] = " << prefix << (*i)->name() << "[d" << v->code_name() << "];\n";
-//       }
       s.new_ref((*var)->code_name());
+    }else if (auto tsk = dynamic_cast<const Token_TASK*>(*i)) {
+      std::vector<std::string> argnames(s.num_args());
+
+      for(auto n=argnames.begin(); n!=argnames.end(); ++n){
+	*n = s.code_name();
+	s.pop();
+      }
+      s.new_float(o); // void?
+      o__ "d->" << tsk->code_name() << "(";
+
+      std::string comma;
+      for(size_t i=argnames.size(); i; --i){
+	o << comma << argnames[i-1];
+	comma = ", ";
+      }
+      o << ");\n";
     }else if (auto f = dynamic_cast<const Token_FILTER*>(*i)) {
       trace2("FILTER", s.code_name(), s.num_args());
 
       std::vector<std::string> argnames(s.num_args());
       if(s.num_args()==1){
-	o__ s.code_name() << " = " << (*f)->code_name() << "(" << s.code_name() << ", d);\n";
-	for(auto v : (*f)->deps()) {
-	  o__ "// dep :" << v->code_name() << "\n";
-  //	o__ s.code_name() << "[d" << v->code_name() << "] = _v_" << (*i)->name() << "[d" << v->code_name() << "];\n";
-	}
+	o__ s.code_name() << " = " << f->code_name() << "(" << s.code_name() << ", d);\n";
       }else{
 	for(auto n=argnames.begin(); n!=argnames.end(); ++n){
 	  *n = s.code_name();
 	  s.pop();
 	}
 	s.new_float(o);
-	o__ s.code_name() << " = " << (*f)->code_name();
+	o__ s.code_name() << " = " << f->code_name();
 	// BUG: see SYMBOL
 	o << "(";
-       	std::string comma = "";
+       	std::string comma;
 	for(size_t i=argnames.size(); i; --i){
 	  o << comma << argnames[i-1];
 	  comma = ", ";
@@ -245,7 +242,7 @@ void make_cc_expression(std::ostream& o, Expression const& e)
     }else if(/*parlist && ??*/dynamic_cast<const Token_SYMBOL*>(*i)) {
       trace1("Symbol", (*i)->name());
       assert(s.have_args());
-      MGVAMS_FUNCTION const* f = lookup_function((*i)->name());
+      MGVAMS_FUNCTION const* f = lookup_function((*i)->name()); // BUG
       std::vector<std::string> argnames(s.num_args());
       assert(s.num_args() == argnames.size());
       for(auto n=argnames.begin(); n!=argnames.end(); ++n){
@@ -260,11 +257,11 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 	s.new_float(o);
 	// o << ind << s.code_name() << " = va::" << (*i)->name();
 	if(f && f->code_name()!=""){
-	  o << ind << s.code_name() << " = " << f->code_name();
+	  o__ s.code_name() << " = " << f->code_name();
 	}else if(auto af = dynamic_cast<Token_AFCALL const*>(*i)){
-	  o << ind << s.code_name() << " = " << af->code_name();
+	  o__ s.code_name() << " = " << af->code_name();
 	}else{
-	  o << ind << s.code_name() << " = va::" << (*i)->name();
+	  o__ s.code_name() << " = /* ? */ va::" << (*i)->name();
 	}
 
 	o << "(";
