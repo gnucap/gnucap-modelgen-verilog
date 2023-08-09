@@ -244,7 +244,7 @@ public:
 
     o__  "} _f_" << label() << ";\n";
   }
-  void make_cc_impl(std::ostream& o)const override{
+  void make_cc_impl(std::ostream&)const override{
     // nothing
   }
   std::string eval(CS&, const CARD_LIST*)const override{

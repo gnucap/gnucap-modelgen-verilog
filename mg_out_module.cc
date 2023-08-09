@@ -381,7 +381,10 @@ static void make_do_tr(std::ostream& o, const Module& m)
 {
   o << "bool MOD_" << m.identifier() << "::do_tr()\n{\n";
   o__ "clear_branch_contributions();\n";
-  o__ "_evt_seek = 0;\n";
+  if(m.num_evt_slots()){
+    o__ "_evt_seek = 0;\n";
+  }else{
+  }
   o__ "read_probes();\n";
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
@@ -399,10 +402,13 @@ static void make_do_tr(std::ostream& o, const Module& m)
 static void make_tr_review(std::ostream& o, const Module& m)
 {
   o << "inline TIME_PAIR MOD_" << m.identifier() << "::tr_review()\n{\n";
-  o__ "if(_evt_seek){\n";
-  o____ "q_accept();\n";
-  o__ "}else{untested();\n";
-  o__ "}\n";
+  if(m.num_evt_slots()){
+    o__ "if(_evt_seek){\n";
+    o____ "q_accept();\n";
+    o__ "}else{untested();\n";
+    o__ "}\n";
+  }else{
+  }
   o__ "return " << baseclass(m) << "::tr_review();\n";
   o << "}\n"
     "/*--------------------------------------"

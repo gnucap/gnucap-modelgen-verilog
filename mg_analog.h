@@ -161,7 +161,7 @@ public:
   AnalogExpression const& conditional()const {return _cond;}
   bool has_body() const{ return _body; }
   const Base& body() const{assert(_body); return *_body; }
-  virtual bool has_tail() const{ return NULL; }
+  virtual bool has_tail() const{ return false; }
   virtual Base const& tail() const{ return _cond; }
 };
 /*--------------------------------------------------------------------------*/

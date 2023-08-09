@@ -72,8 +72,8 @@ protected: // override virtual
   COMPLEX  ac_involts()const override	{itested(); return NOT_VALID;}
   COMPLEX  ac_amps()const override	{itested(); return NOT_VALID;}
 
-  bool has_iv_probe() const{return true;}
-  void expand_last() override;
+  bool has_iv_probe()const override {return true;}
+  void expand_last()override;
   void expand_current_port(size_t i);
 
   void set_current_port_by_index(int i, const std::string& s) override {

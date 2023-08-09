@@ -271,26 +271,26 @@ class COMMON_resistor :public COMMON_COMPONENT{
   typedef MOD_resistor MOD;
   typedef ddouble_<1> ddouble;
   enum {
-    d_potential_b_p_n
-  };
+    d_potential_b_p_n,
+     num_branches__  };
 public:
   explicit COMMON_resistor(const COMMON_resistor& p);
   explicit COMMON_resistor(int c=0);
            ~COMMON_resistor();
-  bool     operator==(const COMMON_COMPONENT&)const;
-  COMMON_COMPONENT* clone()const {return new COMMON_resistor(*this);}
-  void     set_param_by_index(int, std::string&, int);
+  bool     operator==(const COMMON_COMPONENT&)const override;
+  COMMON_COMPONENT* clone()const override{return new COMMON_resistor(*this);}
+  void     set_param_by_index(int, std::string&, int)override;
   bool     is_valid()const;
-  bool     param_is_printable(int)const;
-  std::string param_name(int)const;
-  std::string param_name(int,int)const;
-  std::string param_value(int)const;
-  int param_count()const {return (1 + COMMON_COMPONENT::param_count());}
-  void precalc_first(const CARD_LIST*);
-  void expand(const COMPONENT*);
-  void precalc_last(const CARD_LIST*);
+  bool     param_is_printable(int)const override;
+  std::string param_name(int)const override;
+  std::string param_name(int,int)const override;
+  std::string param_value(int)const override;
+  int param_count()const override {return (1 + COMMON_COMPONENT::param_count());}
+  void precalc_first(const CARD_LIST*)override;
+  void expand(const COMPONENT*)override;
+  void precalc_last(const CARD_LIST*)override;
   void tr_eval_analog(MOD_resistor*)const;
-  std::string name()const {itested();return "resistor";}
+  std::string name()const override {itested();return "resistor";}
   static int  count() {return _count;}
 private: // strictly internal
   static int _count;
@@ -306,20 +306,13 @@ private:
 public:
   typedef ddouble_<1> ddouble;
   enum {
-    d_potential_b_p_n
-  };
+    d_potential_b_p_n,
+     num_branches__  };
 private: // data
   node_t _nodes[12];
 public: // netlist
   ELEMENT* _b_p_n{NULL}; // branch
 private: // func decl
-private: // evt, tasks
-  unsigned _evt_seek{0};
-  va::EVT const* _evt[0];
-  void q_evt(va::EVT const* c){
-    assert(_evt_seek<0);
-    _evt[_evt_seek++] = c;
-  }
 private: // construct
   explicit MOD_resistor(MOD_resistor const&);
 public:
@@ -327,13 +320,13 @@ public:
   CARD* clone()const override;
 private: // overrides
   bool is_valid()const override;
-  void precalc_first();
-  void expand();
-  void precalc_last();
+  void precalc_first()override;
+  void expand()override;
+  void precalc_last()override;
   //void    map_nodes();         //BASE_SUBCKT
   //void    tr_begin();          //BASE_SUBCKT
   //void    tr_restore();        //BASE_SUBCKT
-  void    tr_load(){ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
+  void    tr_load()override{ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
   //TIME_PAIR  tr_review()override;         //BASE_SUBCKT
   //void    tr_accept()override;         //BASE_SUBCKT
   //void    tr_unload();         //BASE_SUBCKT
@@ -545,7 +538,6 @@ bool MOD_resistor::tr_needs_eval()const
 bool MOD_resistor::do_tr()
 {
   clear_branch_contributions();
-  _evt_seek = 0;
   read_probes();
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
   assert(c);
@@ -1002,26 +994,26 @@ class COMMON_capacitor :public COMMON_COMPONENT{
   typedef ddouble_<2> ddouble;
   enum {
     d__filter_b_ddt_0_,
-    d_potential_b_p_n
-  };
+    d_potential_b_p_n,
+     num_branches__  };
 public:
   explicit COMMON_capacitor(const COMMON_capacitor& p);
   explicit COMMON_capacitor(int c=0);
            ~COMMON_capacitor();
-  bool     operator==(const COMMON_COMPONENT&)const;
-  COMMON_COMPONENT* clone()const {return new COMMON_capacitor(*this);}
-  void     set_param_by_index(int, std::string&, int);
+  bool     operator==(const COMMON_COMPONENT&)const override;
+  COMMON_COMPONENT* clone()const override{return new COMMON_capacitor(*this);}
+  void     set_param_by_index(int, std::string&, int)override;
   bool     is_valid()const;
-  bool     param_is_printable(int)const;
-  std::string param_name(int)const;
-  std::string param_name(int,int)const;
-  std::string param_value(int)const;
-  int param_count()const {return (1 + COMMON_COMPONENT::param_count());}
-  void precalc_first(const CARD_LIST*);
-  void expand(const COMPONENT*);
-  void precalc_last(const CARD_LIST*);
+  bool     param_is_printable(int)const override;
+  std::string param_name(int)const override;
+  std::string param_name(int,int)const override;
+  std::string param_value(int)const override;
+  int param_count()const override {return (1 + COMMON_COMPONENT::param_count());}
+  void precalc_first(const CARD_LIST*)override;
+  void expand(const COMPONENT*)override;
+  void precalc_last(const CARD_LIST*)override;
   void tr_eval_analog(MOD_capacitor*)const;
-  std::string name()const {itested();return "capacitor";}
+  std::string name()const override {itested();return "capacitor";}
   static int  count() {return _count;}
 private: // strictly internal
   static int _count;
@@ -1042,8 +1034,8 @@ public:
   typedef ddouble_<2> ddouble;
   enum {
     d__filter_b_ddt_0_,
-    d_potential_b_p_n
-  };
+    d_potential_b_p_n,
+     num_branches__  };
 private: // data
   node_t _nodes[13];
 public: // netlist
@@ -1051,13 +1043,6 @@ public: // netlist
   ELEMENT* _b_p_n{NULL}; // branch
 private: // func decl
 //func ddt_0
-private: // evt, tasks
-  unsigned _evt_seek{0};
-  va::EVT const* _evt[0];
-  void q_evt(va::EVT const* c){
-    assert(_evt_seek<0);
-    _evt[_evt_seek++] = c;
-  }
 private: // construct
   explicit MOD_capacitor(MOD_capacitor const&);
 public:
@@ -1065,13 +1050,13 @@ public:
   CARD* clone()const override;
 private: // overrides
   bool is_valid()const override;
-  void precalc_first();
-  void expand();
-  void precalc_last();
+  void precalc_first()override;
+  void expand()override;
+  void precalc_last()override;
   //void    map_nodes();         //BASE_SUBCKT
   //void    tr_begin();          //BASE_SUBCKT
   //void    tr_restore();        //BASE_SUBCKT
-  void    tr_load(){ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
+  void    tr_load()override{ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
   //TIME_PAIR  tr_review()override;         //BASE_SUBCKT
   //void    tr_accept()override;         //BASE_SUBCKT
   //void    tr_unload();         //BASE_SUBCKT
@@ -1295,7 +1280,6 @@ bool MOD_capacitor::tr_needs_eval()const
 bool MOD_capacitor::do_tr()
 {
   clear_branch_contributions();
-  _evt_seek = 0;
   read_probes();
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
@@ -1505,7 +1489,7 @@ void MOD_capacitor::precalc_last()
   }
 }
 /*--------------------------------------------------------------------------*/
-/*NEW*/ COMMON_capacitor::ddouble COMMON_capacitor::FILTER_f_ddt_0::operator()( ddouble t0, COMPONENT* dd) const
+COMMON_capacitor::ddouble COMMON_capacitor::FILTER_f_ddt_0::operator()( ddouble t0, COMPONENT* dd) const
 {
       // incomplete();
   MOD_capacitor* d = prechecked_cast<MOD_capacitor*>(dd);

@@ -37,24 +37,21 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
       // !has_element?
     }else{
       if(b->has_flow_probe()){
-	o << comma << "    d_flow" << b->code_name();
-	comma = ",\n";
+	o << "    d_flow" << b->code_name() << ",\n";
       }else{
       }
 
       if(b->is_filter()){
-	o << comma << "    d__filter" << b->code_name();
-	comma = ",\n";
+	o << "    d__filter" << b->code_name() << ",\n";
       }else if(b->has_pot_probe()){
-	o << comma << "    d_potential" << b->code_name();
-	comma = ",\n";
+	o << "    d_potential" << b->code_name() << ",\n";
       }else{
 	//      o << comma "// no pot probe?   d_potential" << b->code_name();
 	//      comma = ",\n";
       }
     }
   }
-  o << "\n";
+  o << "     num_branches__";
   o__ "};\n";
 }
 /*--------------------------------------------------------------------------*/
@@ -205,22 +202,22 @@ static void make_common(std::ostream& o, const Module& m)
   o__ "explicit " << class_name << "(const " << class_name << "& p);\n"
     "  explicit " << class_name << "(int c=0);\n"
     "           ~" << class_name << "();\n"
-    "  bool     operator==(const COMMON_COMPONENT&)const;\n"
-    "  COMMON_COMPONENT* clone()const {return new "<<class_name<<"(*this);}\n"
-    "  void     set_param_by_index(int, std::string&, int);\n"
+    "  bool     operator==(const COMMON_COMPONENT&)const override;\n"
+    "  COMMON_COMPONENT* clone()const override{return new "<<class_name<<"(*this);}\n"
+    "  void     set_param_by_index(int, std::string&, int)override;\n"
     "  bool     is_valid()const;\n"
-    "  bool     param_is_printable(int)const;\n"
-    "  std::string param_name(int)const;\n"
-    "  std::string param_name(int,int)const;\n"
-    "  std::string param_value(int)const;\n"
-    "  int param_count()const {return (" 
+    "  bool     param_is_printable(int)const override;\n"
+    "  std::string param_name(int)const override;\n"
+    "  std::string param_name(int,int)const override;\n"
+    "  std::string param_value(int)const override;\n"
+    "  int param_count()const override {return (" 
 	     << m.parameters().size()
 	     << " + " << base_class_name << "::param_count());}\n"
-    "  void precalc_first(const CARD_LIST*);\n"
-    "  void expand(const COMPONENT*);\n"
-    "  void precalc_last(const CARD_LIST*);\n"
+    "  void precalc_first(const CARD_LIST*)override;\n"
+    "  void expand(const COMPONENT*)override;\n"
+    "  void precalc_last(const CARD_LIST*)override;\n"
     "  void tr_eval_analog(MOD_" << m.identifier() << "*)const;\n"
-    "  std::string name()const {itested();return \"" << m.identifier() << "\";}\n"
+    "  std::string name()const override {itested();return \"" << m.identifier() << "\";}\n"
 //    "  const SDP_CARD* sdp()const {return _sdp;}\n"
 //    "  bool     has_sdp()const {untested();return _sdp;}\n"
     "  static int  count() {return _count;}\n"
@@ -373,16 +370,18 @@ static void make_module(std::ostream& o, const Module& m)
   }
   o << "private: // func decl\n";
   make_func_dev(o, m.funcs());
-  // IF m.has_evt
-  o << "private: // evt, tasks\n";
-  o__ "unsigned _evt_seek{0};\n";
-//  o__ "void("<<class_name<<"::*_evt[" << m.num_evt_slots() << "])();\n";
-  o__ "va::EVT const* _evt[" << m.num_evt_slots() << "];\n";
-  o__ "void q_evt(va::EVT const* c){\n";
-//  o__ "void q_evt(void ("<< class_name <<"::*c)()) {\n";
-  o____ "assert(_evt_seek<" << m.num_evt_slots() << ");\n";
-  o____ "_evt[_evt_seek++] = c;\n";
-  o__ "}\n";
+  if(m.num_evt_slots()){
+    o << "private: // evt, tasks\n";
+    o__ "unsigned _evt_seek{0};\n";
+  //  o__ "void("<<class_name<<"::*_evt[" << m.num_evt_slots() << "])();\n";
+    o__ "va::EVT const* _evt[" << m.num_evt_slots() << "];\n";
+    o__ "void q_evt(va::EVT const* c){\n";
+  //  o__ "void q_evt(void ("<< class_name <<"::*c)()) {\n";
+    o____ "assert(_evt_seek<" << m.num_evt_slots() << ");\n";
+    o____ "_evt[_evt_seek++] = c;\n";
+    o__ "}\n";
+  }else{
+  }
   o << "private: // construct\n";
   o__ "explicit MOD_" << m.identifier() << "(MOD_" << m.identifier() << " const&);\n";
   o << "public:\n";
@@ -398,13 +397,13 @@ static void make_module(std::ostream& o, const Module& m)
   }
 /*--------------------------------------------------------------------------*/
   o__ "bool is_valid()const override;\n";
-  o__ "void precalc_first();\n";
-  o__ "void expand();\n";
-  o__ "void precalc_last();\n";
+  o__ "void precalc_first()override;\n";
+  o__ "void expand()override;\n";
+  o__ "void precalc_last()override;\n";
   o__ "//void    map_nodes();         //BASE_SUBCKT\n";
   o__ "//void    tr_begin();          //BASE_SUBCKT\n";
   o__ "//void    tr_restore();        //BASE_SUBCKT\n";
-  o__ "void    tr_load(){ trace1(\"tr_load\", long_label());BASE_SUBCKT::tr_load();}\n";
+  o__ "void    tr_load()override{ trace1(\"tr_load\", long_label());BASE_SUBCKT::tr_load();}\n";
   if(m.num_evt_slots()){
     o__ "TIME_PAIR  tr_review()override;         //BASE_SUBCKT\n";
     o__ "void    tr_accept()override;         //BASE_SUBCKT\n";

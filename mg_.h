@@ -87,7 +87,7 @@ public:
   //String_Arg(const std::string& s) : _s(s) {}
   const String_Arg&  key()const	  {return *this;}
   void parse(CS& f)override;
-  void dump(std::ostream& f)const	 {f << _s;}
+  void dump(std::ostream& f)const override{f << _s;}
   void operator=(const std::string& s)	 {_s = s;}
   void operator+=(const std::string& s)	 {_s += s;}
   bool operator!=(const std::string& s)const {return _s != s;}
@@ -120,7 +120,7 @@ public:
 /*--------------------------------------------------------------------------*/
 class Skip_Block : public Base {
 public:
-  void parse(CS& f);
+  void parse(CS& f)override;
   void dump(std::ostream&)const override{ incomplete();}
 };
 /*--------------------------------------------------------------------------*/
@@ -144,10 +144,7 @@ public:
   using List_Base<T>::end;
   typedef typename List_Base<T>::const_iterator const_iterator;
 public:
-  ~LiSt(){
-    delete _attributes;
-    _attributes = NULL;
-  }
+  ~LiSt();
 
   void set_owner(Block* b){ _owner = b; }
   Block const* owner() const{return _owner;}
@@ -372,7 +369,7 @@ typedef LiSt<Key, '{', '#', '}'> Key_List;
 class Bool_Arg : public Base {
   bool _s;
 public:
-  void parse(CS& f)	{_s = true; f.skip1b(";");}
+  void parse(CS& f)override {_s = true; f.skip1b(";");}
   void dump(std::ostream& f)const override {untested();f << _s;}
   Bool_Arg() :_s(false) {}
   operator bool()const {return _s;}
@@ -796,7 +793,7 @@ public:
 class Parameter_3 : public Parameter_Base {
 public:
   void parse(CS& f)override;
-  void dump(std::ostream& f)const;
+  void dump(std::ostream& f)const override;
   Parameter_3() :Parameter_Base() {}
 };
 typedef LiSt<Parameter_3, '(', ',', ')'> Parameter_3_List;
@@ -1220,7 +1217,7 @@ public:
     incomplete();
   }
   String_Arg const& identifier() const{return _identifier;}
-  void parse(CS& f);
+  void parse(CS& f) override;
   void dump(std::ostream& f)const override {f << "      " << identifier() << ";\n";}
 };
 typedef LiSt<Arg, '{', '#', '}'> Arg_List;
@@ -1351,7 +1348,7 @@ public:
 class Head : public Base {
   std::string _s;
 public:
-  void parse(CS& f);
+  void parse(CS& f)override;
   void dump(std::ostream& f)const override {f << _s;}
   Head() {}
 };
@@ -1362,8 +1359,8 @@ class Attribute : public Base {
   String_Arg _value;
 public:
   void set_owner(Block const*){}
-  void parse(CS& f) {f >> _name >> '=' >> _value >> ';';}
-  void dump(std::ostream& f)const
+  void parse(CS& f)override {f >> _name >> '=' >> _value >> ';';}
+  void dump(std::ostream& f)const override
 	  {f << "  " << name() << " = \"" << value() << "\";\n";}
   Attribute() {}
   const String_Arg&  key()const	  {return _name;}
@@ -1406,7 +1403,7 @@ class Nature : public Base {
   Attribute_List	_attributes;
 public:
   void set_owner(Block const*){}
-  void parse(CS& f);
+  void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   Nature() {}
   const String_Arg&	identifier()const	{return _identifier;}
@@ -1431,7 +1428,7 @@ public:
   void set_owner(Block const* c) {_owner=c;}
   Block const* owner() {return _owner;}
   const String_Arg&  key()const	  {return _identifier;}
-  void parse(CS& f);
+  void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   Discipline() {}
   const String_Arg&  identifier()const	    {return _identifier;}
@@ -1477,15 +1474,15 @@ public:
   Node const* p() const{ assert(_p); return _p; }
   Node const* n() const{ assert(_n); return _n; }
   bool is_short() const{ return _p == _n; }
-  virtual std::string code_name() const;
-  std::string short_label()const  { return code_name();}
+  std::string code_name()const override;
+  std::string short_label()const override { return code_name();}
 //  std::string name_of_module_instance()const  {return code_name();}
-  std::string const& omit()const;
-  const std::string& dev_type()const;
+  std::string const& omit()const override;
+  const std::string& dev_type()const override;
   Deps const& deps()const { return _deps; } // delete?
   void add_probe(Probe const*);
-  size_t num_nodes()const;
-  std::string state()const;
+  size_t num_nodes()const override;
+  std::string state()const override;
   virtual bool has_element() const;
   void set_flow_probe(){ _has_flow_probe=true; }
   void set_pot_probe(){ _has_pot_probe=true; }
@@ -1497,9 +1494,9 @@ public:
   bool has_flow_source() const { return _has_flow_src; }
   bool is_filter() const { return _is_filter; }
   bool has_pot_source() const;
-  size_t num_states() const;
-  Discipline const* discipline() const;
-  Nature const* nature() const;
+  size_t num_states() const override;
+  Discipline const* discipline()const override;
+  Nature const* nature()const override;
 public:
 //  bool has(Branch_Ref*) const;
   void attach(Branch_Ref*);
@@ -1644,8 +1641,8 @@ public:
   ~Module();
 public:
   File const* file() const{ return _file; }; // owner?
-  void parse(CS& f);
-  void dump(std::ostream& f)const;
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
   const String_Arg&	  identifier()const	{return _identifier;}
   const New_Port_List&	  ports()const		{return _ports;}
   const Port_3_List_3&	  input()const		{return _input;}
@@ -1936,7 +1933,7 @@ public: // readout
 class Task : public Owned_Base {
 public:
   void parse(CS&)override {unreachable();}
-  void dump(std::ostream& o)const {unreachable();}
+  void dump(std::ostream&)const override {unreachable();}
 };
 /*--------------------------------------------------------------------------*/
 // TODO: merge with Element_2?
@@ -1952,7 +1949,7 @@ public:
     _name = name;
     }
   void parse(CS&) override{unreachable();}
-  void dump(std::ostream& o)const override {unreachable();}
+  void dump(std::ostream&)const override {unreachable();}
 
   void set_output(Branch_Ref const& x);
 //  Branch_Ref const& branch() const{ return _branch; }
@@ -1963,16 +1960,16 @@ public:
     assert(_branch);
     return _branch->code_name();
   }
-  size_t num_branches() const;
-  std::string code_name() const {
+  size_t num_branches()const;
+  std::string code_name()const override{
     return "_f_" + _name; // name()?
   }
   Deps const& deps()const { return _deps; }
 
-  size_t num_states()const;
-  size_t num_nodes()const;
-  std::string state()const;
-  std::string short_label()const;
+  size_t num_states()const override;
+  size_t num_nodes()const override;
+  std::string state()const override;
+  std::string short_label()const override;
   Probe const* prb() const;
   bool has_branch() const {
     return _branch;
@@ -2031,6 +2028,12 @@ public:
   Base const* stmt_or_null() const{ return _stmt; }
   Expression const& cond() const{ return _ctl.expression(); }
 };
+/*--------------------------------------------------------------------------*/
+template <class T, char BEGIN, char SEP, char END, char END2, char END3>
+LiSt<T, BEGIN, SEP, END, END2, END3>::~LiSt(){
+  delete _attributes;
+  _attributes = NULL;
+}
 /*--------------------------------------------------------------------------*/
 #if 0
 template <class T, char BEGIN, char SEP, char END, char END2, char END3>

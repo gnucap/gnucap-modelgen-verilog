@@ -77,7 +77,7 @@ private:
   bool is_device() const override { return owner(); }
   std::string value_name()const override{unreachable(); return "";}
   std::string port_name(int)const override;
-  bool print_type_in_spice()const {unreachable(); return false; }
+  bool print_type_in_spice()const override {unreachable(); return false; }
   void set_port_by_name(std::string& name, std::string& value)override{
     assert(_dev);
     trace4("PARAMSET::spbn", long_label(), name, value, max_nodes());
@@ -133,9 +133,9 @@ private:
 private:
   void precalc_first() override;
   void build_sckt(COMPONENT*);
-  void expand();
-  CARD* deflate() override;
-  void map_nodes() override { /*no-op*/ }
+  void expand()override;
+  CARD* deflate()override;
+  void map_nodes()override { /*no-op*/ }
 private: // no ops for top level
 #if 1
   void precalc_last() override { assert(!is_device());}

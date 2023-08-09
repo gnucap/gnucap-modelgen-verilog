@@ -117,7 +117,7 @@ public:
   }
 };
 /*--------------------------------------------------------------------------*/
-static Token_SYMBOL* resolve_va_function(Expression& E, MGVAMS_FUNCTION const* t,
+static Token_SYMBOL* resolve_va_function(Expression&, MGVAMS_FUNCTION const* t,
     DEP_STACK& ds, Block* o)
 {
 //  size_t na = ds.num_args(); ??

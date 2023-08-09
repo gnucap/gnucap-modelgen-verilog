@@ -94,7 +94,7 @@ private:
   MGVAMS_TASK* clone() const{ untested();
     return new FINISH_TASK(*this);
   }
-  Token* new_token(Module& m, size_t num_args)const override{
+  Token* new_token(Module& m, size_t /* na */)const override{
     m.install(this);
     return new Token_TASK("$finish", this);
   }

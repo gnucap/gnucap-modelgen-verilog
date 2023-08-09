@@ -40,7 +40,7 @@ CLEAN_OBJS = \
 CXXFLAGS = -Wall -std=c++11
 
 %.o: %.cc
-	${CXX} $(GNUCAP_CPPFLAGS) $(CPPFLAGS) -shared -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@ -c
+	${CXX} $(GNUCAP_CPPFLAGS) $(CPPFLAGS) -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@ -c
 
 %.so: %.o
 	${CXX} -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $(OBJS) $< ${LIBS_} -o $@
@@ -76,11 +76,11 @@ lang_verilog.so: ${LANG_OBJS}
 	${CXX} -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $+ ${LIBS_} -o $@
 
 bm_pulse.so: bm_pulse.o
-	g++ -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $+ ${LIBS_} -o $@
+	${CXX} -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $+ ${LIBS_} -o $@
 
 depend: Make.depend
 Make.depend: $(SRCS) $(HDRS)
-	$(CXX) -MM ${GNUCAP_CXXFLAGS} $(CXXFLAGS) $(SRCS) > Make.depend
+	$(CXX) -MM $(GNUCAP_CPPFLAGS) ${GNUCAP_CXXFLAGS} $(CXXFLAGS) $(SRCS) > Make.depend
 
 install: install-recursive
 	

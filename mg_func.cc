@@ -131,7 +131,7 @@ class VT : public MGVAMS_FUNCTION {
   std::string eval(CS&, const CARD_LIST*)const override{
     return "$$vt";
   }
-  Token* new_token(Module& m, size_t na) const{
+  Token* new_token(Module& m, size_t na)const override{
     m.install(&temperature);
     return MGVAMS_FUNCTION::new_token(m, na);
   }
@@ -245,7 +245,7 @@ DISPATCHER<FUNCTION>::INSTALL d_pow(&function_dispatcher, "pow|$pow", &p_pow);
 
 }
 /*--------------------------------------------------------------------------*/
-Token* MGVAMS_FUNCTION::new_token(Module& m, size_t na) const
+Token* MGVAMS_FUNCTION::new_token(Module& m, size_t /*na*/) const
 {
   m.install(this);
   return new Token_SYMBOL("","");

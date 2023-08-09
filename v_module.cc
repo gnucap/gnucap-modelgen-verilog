@@ -68,7 +68,7 @@ private:
   void		set_port_by_index(int Index, std::string& Value) override;
   // void	set_port_by_name(std::string&, std::string&) override;
 private: // override virtual
-  bool		is_device()const		{return _parent;}
+  bool		is_device()const override	{return _parent;}
   char		id_letter()const override	{return 'X';}
   bool		print_type_in_spice()const override {return true;}
   std::string   value_name()const override	{return "#";}
@@ -77,12 +77,12 @@ private: // override virtual
   int		matrix_nodes()const override	{return 0;}
   // int	net_nodes()const override	{return _net_nodes;}
   void		precalc_first()override;
-  bool		makes_own_scope()const override  {return !_parent;}
-  bool		is_valid() const override;
-  CARD_LIST*	   scope() override;
-  const CARD_LIST* scope()const		{return const_cast<DEV_MODULE*>(this)->scope();}
+  bool		makes_own_scope()const override	{return !_parent;}
+  bool		is_valid()const override;
+  CARD_LIST*	   scope()override;
+  const CARD_LIST* scope()const override	{return const_cast<DEV_MODULE*>(this)->scope();}
 
-  void		expand() override;
+  void		expand()override;
 
 private: // no ops for prototype
   void map_nodes()override	{if(is_device()){ BASE_SUBCKT::map_nodes();}else{} }
@@ -116,10 +116,10 @@ private: // no ops for prototype
 private:
   void		precalc_last()override;
   double	tr_probe_num(const std::string&)const override;
-  int param_count_dont_print()const {return common()->COMMON_COMPONENT::param_count();}
+  int param_count_dont_print()const override {return common()->COMMON_COMPONENT::param_count();}
 
-  std::string port_name(int i)const;
-  void set_param_by_name(std::string Name, std::string Value) override;
+  std::string port_name(int i)const override;
+  void set_param_by_name(std::string Name, std::string Value)override;
 } p1;
 DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "module", &p1);
 /*--------------------------------------------------------------------------*/

@@ -46,7 +46,7 @@ class RPN_VARS {
   std::stack<type> _types;
   std::stack<int> _args;
   std::stack<std::string> _refs;
-  int _idx_alloc{0};
+//  int _idx_alloc{0};
 
   int _flt_idx{-1};
   int _flt_alloc{0};
