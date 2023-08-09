@@ -582,7 +582,7 @@ void INSTANCE::expand()
   subckt()->precalc_first(); // here?
 
   // sift. move to CARD_LIST::expand?
-  bool gotit = false;
+  COMPONENT* gotit = NULL;
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ){
     CARD const* s = *i;
     COMPONENT const* d = dynamic_cast<COMPONENT const*>(s);
@@ -590,14 +590,29 @@ void INSTANCE::expand()
       ++i;
     if(!d->is_valid()){
       error(bTRACE, long_label() + " dropped invalid candidate.\n");
-      subckt()->erase(j);
-    }else if(gotit){
-      error(bWARNING, long_label() + " ambiguous overload in " + dev_type() + "\n");
-      subckt()->erase(j);
+    }else if(!gotit){
+//      error(bTRACE, long_label() + " found valid candidate.\n");
+      gotit = prechecked_cast<COMPONENT*>(*j);
+      assert(gotit);
+      *j = NULL;
+    }else if(d->param_count() > gotit->param_count()){
+      error(bDEBUG, long_label() + " tie break: " + to_string(gotit->param_count()) + " vs. " +
+	  to_string((*j)->param_count()) + "\n");
+    }else if(d->param_count() < gotit->param_count()){
+      error(bDEBUG, long_label() + " tie break: " + to_string(gotit->param_count()) + " vs. " +
+	  to_string((*j)->param_count()) + "\n");
+      delete (CARD*) gotit;
+      gotit = prechecked_cast<COMPONENT*>(*j);
+      assert(gotit);
+      *j = NULL;
     }else{
-      gotit = true;
-      // error(bTRACE, long_label() + " found valid candidate.\n");
+      error(bWARNING, long_label() + " ambiguous overload in " + dev_type() + "\n");
     }
+    subckt()->erase(j);
+  }
+  if(gotit){
+    subckt()->push_back(gotit);
+  }else{
   }
 
   if(subckt()->size()==0){

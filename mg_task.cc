@@ -100,6 +100,7 @@ private:
   }
   void make_cc_dev(std::ostream& o)const override {
     o__ "void t_finish(int n=1){\n";
+    o____ "(void)n;\n";
     o____ "throw Exception(\"finish\");\n";
     o__ "}\n";
     o__ "void t_finish(double x){return t_finish(int(x));}\n";

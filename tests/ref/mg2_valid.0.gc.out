@@ -1,3 +1,5 @@
+attach ../lang_verilog.so 
+       ^ ? "../lang_verilog.so": already loaded, replacing
 // name clash.. 
 module test (1,2);
   resistor #(.r(0.)) r0 (1,0);
@@ -6,7 +8,7 @@ module test (1,2);
 endmodule // test
 
 test #() m (.1(1),.2(2));
-m.r1 ambiguous overload in resistor
+m.r1 tie break: 5 vs. 3
 #           v(1)       v(2)      
 m.r0: short circuit
  0.         9.9998u    0.99999   

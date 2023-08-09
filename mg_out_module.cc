@@ -418,7 +418,7 @@ static void make_tr_review(std::ostream& o, const Module& m)
 static void make_tr_accept(std::ostream& o, const Module& m)
 {
   o << "inline void MOD_" << m.identifier() << "::tr_accept()\n{\n";
-  o__ "for(int i; i<_evt_seek; ++i){\n";
+  o__ "for(unsigned i=0; i<_evt_seek; ++i){\n";
   o____ "(*_evt[i])();\n";
   // o____ "(this->*_evt[i])();\n";
   o__ "}\n";

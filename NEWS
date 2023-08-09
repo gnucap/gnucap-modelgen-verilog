@@ -40,3 +40,4 @@
 ============
 * func, task, filter plugins
 * tasks events, $strobe
+* paramset: param_count tie break

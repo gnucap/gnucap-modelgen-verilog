@@ -1,13 +1,11 @@
-// Test diode model
+verilog // Test diode model
 
-verilog
-
-attach ../lang_verilog.so
 attach ../d_vasrc.so
 attach ../vams/diode.so
+//attach ../lang_verilog.so
 
 module main(n, g)
-	diode #(.cjo(1pf)) D1(n g);
+	diode #(.is(1e-15), .cjo(1pf)) D1(n g);
 endmodule
 
 main m(n,0);

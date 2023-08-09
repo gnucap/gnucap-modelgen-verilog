@@ -1,6 +1,9 @@
 
 attach ../modelgen_0.so
 attach ../d_vasrc.so
+attach ../lang_verilog.so
+
+options debug
 
 verilog
 
