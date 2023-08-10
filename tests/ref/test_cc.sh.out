@@ -7,8 +7,8 @@
 #include <e_elemnt.h>
 // #include <e_paramlist.h>
 #include <u_nodemap.h>
-#include "../m_va.h"
-#include "../e_va.h"
+#include <m_va.h>
+#include <e_va.h>
 /*--------------------------------------------------------------------------*/
 const double NA(NOT_INPUT);
 const double INF(BIGBIG);
@@ -729,8 +729,8 @@ void MOD_resistor::precalc_last()
 #include <e_elemnt.h>
 // #include <e_paramlist.h>
 #include <u_nodemap.h>
-#include "../m_va.h"
-#include "../e_va.h"
+#include <m_va.h>
+#include <e_va.h>
 /*--------------------------------------------------------------------------*/
 const double NA(NOT_INPUT);
 const double INF(BIGBIG);

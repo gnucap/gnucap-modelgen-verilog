@@ -12,6 +12,7 @@ GNUCAP_LDFLAGS = $(shell $(GNUCAP_CONF) --ldflags)
 GNUCAP_LIBDIR = $(shell $(GNUCAP_CONF) --libdir)
 GNUCAP_LIBS = $(shell $(GNUCAP_CONF) --libs)
 GNUCAP_PKGLIBDIR = $(shell $(GNUCAP_CONF) --pkglibdir)
+GNUCAP_INCLUDEDIR = $(shell $(GNUCAP_CONF) --includedir)
 GNUCAP_EXEC_PREFIX = $(shell $(GNUCAP_CONF) --exec-prefix)
 GNUCAP_DATA = $(shell $(GNUCAP_CONF) --data)
 
@@ -96,6 +97,8 @@ install-here: ${TARGET}
 
 	install -d $(DESTDIR)$(GNUCAP_PKGLIBDIR)/vams
 	install $(MODULES) $(DESTDIR)$(GNUCAP_PKGLIBDIR)/vams
+
+	install $(INSTALL_HDRS) $(DESTDIR)$(GNUCAP_INCLUDEDIR)
 
 RECURSIVE_TARGETS = all-recursive clean-recursive install-recursive
 .PHONY: clean depend ${RECURSIVE_TARGETS} install install-here all-local

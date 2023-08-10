@@ -10,7 +10,6 @@ REFDIR = ref
 TARGETDIR = check
 GNUCAP = gnucap
 MODELGEN_VERILOG = ../gnucap-mg-vams
-CXX = g++
 
 %.o: %.cc
 	${CXX} ${CPPFLAGS} ${GNUCAP_CPPFLAGS} -g -O0 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $< -o $@ -c
