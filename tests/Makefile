@@ -12,7 +12,7 @@ GNUCAP = gnucap
 MODELGEN_VERILOG = ../gnucap-mg-vams
 
 %.o: %.cc
-	${CXX} ${CPPFLAGS} ${GNUCAP_CPPFLAGS} -g -O0 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $< -o $@ -c
+	${CXX} -I .. ${CPPFLAGS} ${GNUCAP_CPPFLAGS} -g -O0 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $< -o $@ -c
 
 %.s: %.cc
 	${CXX} -S ${CPPFLAGS} ${GNUCAP_CPPFLAGS} -g -O2 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $< -o $@
