@@ -553,7 +553,7 @@ Token* Module::new_token(FUNCTION_ const* f, Deps&d, size_t num_args)
     auto tt = vaf->new_token(*this, num_args /*, d?*/);
     return tt;
   }else if(auto t = dynamic_cast<MGVAMS_TASK const*>(f)){
-    auto tt = t->new_token(*this, num_args /*, d?*/);
+    auto tt = t->new_token(*this, num_args, d);
     return tt;
   }else if(auto t = dynamic_cast<MGVAMS_FILTER const*>(f)){
     auto tt = t->new_token(*this, num_args, d);

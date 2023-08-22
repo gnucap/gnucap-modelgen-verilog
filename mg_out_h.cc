@@ -111,8 +111,10 @@ static void make_func_dev(std::ostream& o, std::set<FUNCTION_ const*> const& P)
     if(auto t = dynamic_cast<MGVAMS_TASK const*>(*q)){
       o<<"//task " << (*q)->label() << "\n";
       t->make_cc_dev(o);
-    }else{
+    }else if(auto f = dynamic_cast<MGVAMS_FUNCTION const*>(*q)) {
       o<<"//func " << (*q)->label() << "\n";
+      f->make_cc_dev(o);
+    }else{
     }
   }
 }
@@ -496,8 +498,8 @@ static void make_module(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 void make_cc_decl(std::ostream& out, const Module& d)
 {
-	make_common(out, d);
-	make_module(out, d);
+  make_common(out, d);
+  make_module(out, d);
 }
 /*--------------------------------------------------------------------------*/
 #if 0

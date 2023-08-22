@@ -174,7 +174,6 @@ public:
     return new DDX(*this);
   }
   Token* new_token(Module& m, size_t na, Deps& d)const override{
-    // _m = &m;
     std::string filter_code_name = "_f_ddx_" + std::to_string(n_filters++);
     DDX* cl = clone();
     cl->_ddxprobe = *d.begin();

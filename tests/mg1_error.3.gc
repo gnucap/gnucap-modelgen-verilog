@@ -1,0 +1,17 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_error3(p, n);
+electrical p, n;
+
+analog begin
+V(p,n) <+ $typo(4);
+end
+
+endmodule
+
+!make test_error3.so > /dev/null

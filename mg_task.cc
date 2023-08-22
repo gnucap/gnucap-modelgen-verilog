@@ -44,11 +44,13 @@ private:
   MGVAMS_TASK* clone() const{
     return new STROBE_TASK(*this);
   }
-  Token* new_token(Module& m, size_t num_args)const override{
+  Token* new_token(Module& m, size_t na, Deps& d)const override{
     m.new_evt_slot();
     MGVAMS_TASK* cl = clone();
-    cl->set_num_args(num_args);
+    cl->set_num_args(na);
     cl->set_label("t_strobe_" + std::to_string(cnt++));
+    Deps outdeps;
+    d = outdeps;
     m.push_back(cl);
     return new Token_TASK("$strobe", cl);
   }
@@ -94,8 +96,10 @@ private:
   MGVAMS_TASK* clone() const{ untested();
     return new FINISH_TASK(*this);
   }
-  Token* new_token(Module& m, size_t /* na */)const override{
+  Token* new_token(Module& m, size_t /* na */, Deps& d)const override{
     m.install(this);
+    Deps outdeps;
+    d = outdeps;
     return new Token_TASK("$finish", this);
   }
   void make_cc_dev(std::ostream& o)const override {
@@ -107,6 +111,48 @@ private:
   }
 } finish;
 DISPATCHER<FUNCTION>::INSTALL d_finish(&function_dispatcher, "$finish", &finish);
+/*--------------------------------------------------------------------------*/
+class LIMIT : public MGVAMS_TASK {
+  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+    return "$limit";
+  }
+  LIMIT* clone()const override{
+    return new LIMIT(*this);
+  }
+  Token* new_token(Module& m, size_t na, Deps&)const override{
+    LIMIT* cl = clone();
+    cl->set_label("t_limit_" + std::to_string(cnt++));
+    cl->set_num_args(na);
+    m.push_back(cl);
+    // d untouched?
+    return new Token_TASK("$limit", cl);
+  }
+  std::string code_name()const override{
+    return "_f_limit";
+  }
+  void make_cc_common(std::ostream&)const override {
+    // nothing.
+  }
+  void make_cc_dev(std::ostream& o)const override {
+    o__ "class " << label() << "{\n";
+    o____ "double _old;\n";
+    o____ "public:\n";
+    o____ "ddouble operator()(ddouble in, std::string const& what, double const& a, double const& b){\n";
+    o______ "double old = in;\n";
+    o______ "assert(what == \"pnjlim\"); // for now\n";
+    o______ "if(_sim->is_initial_step()) {\n";
+    o________ "in = 0.;\n";
+    o______ "}else{\n";
+    o________ "in = pnj_limit(in, _old, a, b);\n";
+    o______ "}\n";
+    o______ "_old = old;\n";
+    o______ "// convcheck old vs in?\n";
+    o______ "return in;\n";
+    o____ "}\n";
+    o__ "} " << label() << ";\n";
+  }
+} limit;
+DISPATCHER<FUNCTION>::INSTALL d_limit(&function_dispatcher, "$limit", &limit);
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/

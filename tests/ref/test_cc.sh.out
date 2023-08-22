@@ -9,6 +9,7 @@
 #include <u_nodemap.h>
 #include <m_va.h>
 #include <e_va.h>
+#include <u_limit.h>
 /*--------------------------------------------------------------------------*/
 const double NA(NOT_INPUT);
 const double INF(BIGBIG);
@@ -569,10 +570,11 @@ bool MOD_resistor::do_tr()
   read_probes();
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
   assert(c);
+  set_converged();
   c->tr_eval_analog(this);
   set_branch_contributions();
   assert(subckt());
-  set_converged(subckt()->do_tr());
+  set_converged(subckt()->do_tr() && converged());
   return converged();
 }
 /*--------------------------------------------------------------------------*/
@@ -760,6 +762,7 @@ void MOD_resistor::precalc_last()
 #include <u_nodemap.h>
 #include <m_va.h>
 #include <e_va.h>
+#include <u_limit.h>
 /*--------------------------------------------------------------------------*/
 const double NA(NOT_INPUT);
 const double INF(BIGBIG);
@@ -1073,7 +1076,6 @@ public: // netlist
   ELEMENT* _b_ddt_0_{NULL}; // branch
   ELEMENT* _b_p_n{NULL}; // branch
 private: // func decl
-//func _f_ddt_0
 private: // construct
   explicit MOD_capacitor(MOD_capacitor const&);
 public:
@@ -1340,10 +1342,11 @@ bool MOD_capacitor::do_tr()
   read_probes();
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
+  set_converged();
   c->tr_eval_analog(this);
   set_branch_contributions();
   assert(subckt());
-  set_converged(subckt()->do_tr());
+  set_converged(subckt()->do_tr() && converged());
   return converged();
 }
 /*--------------------------------------------------------------------------*/
@@ -1380,7 +1383,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
         ddouble t0;
         t0 = +p->_potential_b_p_n; // V(p, n)
         t0[d_potential_b_p_n] = +1.;
-        t0 = _f_ddt_0(t0, d);
+        t0 = _f_ddt_0(t0, d); // (193)
         t0 = pc->_p_c * t0;
         d->_value_b_p_n += t0.value();
         // dep __filter_b_ddt_0_

@@ -1,0 +1,38 @@
+verilog // simplified spice diode with limit
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+// options nobypass
+// options noincmode
+options trtol=1
+options gmin=.01p
+
+`modelgen
+module test_lt0(p, n);
+electrical p, n;
+parameter real is = .5e-14;
+
+analog begin
+	real v;
+   v = $limit(V(p, n), "pnjlim", $vt, 0.7);
+	I(p,n) <+ is * (exp(v/$vt) - 1.);
+end
+endmodule
+
+!make test_lt0.so > /dev/null
+attach ./test_lt0.so
+
+
+resistor #(.r(1)) dut(3,v);
+test_lt0 #(.is(5e-15)) dut(3,2);
+test_lt0 dut(2,1);
+test_lt0 dut(1,0);
+vsource v1(v, 0);
+
+list
+
+print dc v(nodes) i(v1) iter(0)
+dc v1 2.5 5.5 1 loop
+status notime
+end

@@ -190,7 +190,7 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 
       std::vector<std::string> argnames(s.num_args());
       if(s.num_args()==1){
-	o__ s.code_name() << " = " << f->code_name() << "(" << s.code_name() << ", d);\n";
+	o__ s.code_name() << " = " << f->code_name() << "(" << s.code_name() << ", d); // (193)\n";
       }else{
 	for(auto n=argnames.begin(); n!=argnames.end(); ++n){
 	  *n = s.code_name();

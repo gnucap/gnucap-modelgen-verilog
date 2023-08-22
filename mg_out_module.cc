@@ -389,10 +389,11 @@ static void make_do_tr(std::ostream& o, const Module& m)
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
+  o__ "set_converged();\n";
   o__ "c->tr_eval_analog(this);\n";
   o__ "set_branch_contributions();\n";
   o__ "assert(subckt());\n";
-  o__ "set_converged(subckt()->do_tr());\n";
+  o__ "set_converged(subckt()->do_tr() && converged());\n";
   o__ "return converged();\n";
   o << "}\n"
     "/*--------------------------------------"

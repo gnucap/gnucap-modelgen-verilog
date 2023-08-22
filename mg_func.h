@@ -56,7 +56,10 @@ class MGVAMS_FUNCTION : public FUNCTION_ {
 	  return "func";
   }
 public:
-//  virtual int arity() const {unreachable(); return -1;}
+  virtual MGVAMS_FUNCTION* clone()const {
+	  unreachable();
+	  return NULL;
+  }
   virtual std::string code_name() const{
 	  return "";
   }
@@ -86,7 +89,11 @@ class MGVAMS_TASK : public FUNCTION_ {
 	  return "task";
   }
 public:
-  virtual Token* new_token(Module& m, size_t na) const = 0;
+  virtual MGVAMS_TASK* clone()const {
+	  unreachable();
+	  return NULL;
+  }
+  virtual Token* new_token(Module& m, size_t na, Deps& d) const = 0;
   virtual void make_cc_dev(std::ostream&) const = 0;
   virtual void make_cc_common(std::ostream&) const {}
   virtual std::string code_name() const{

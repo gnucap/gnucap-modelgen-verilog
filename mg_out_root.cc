@@ -40,6 +40,7 @@ static void make_header(std::ostream& o, const File& in,
     "#include <u_nodemap.h>\n" // if submodules are used anywhere
     "#include <m_va.h>\n"
     "#include <e_va.h>\n"
+    "#include <u_limit.h>\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
   o <<

@@ -149,7 +149,7 @@ public:
 	bool operator>=(const double& o)const {itested();
 		return *_data >= o;
 	}
-	bool operator>=(PARAMETER<double> const& o)const {untested();
+	bool operator>=(PARAMETER<double> const& o)const {itested();
 		return *_data >= double(o);
 	}
 
@@ -551,19 +551,6 @@ T cosh(T d)
 	return set_value(d, std::cosh(d));
 }
 
-#if 0
-template<class T>
-T exp(T d)
-{
-	set_value(d, std::exp(d));
-	return chain(d, d);
-}
-double exp(PARAMETER<double> const& d)
-{
-	return std::exp(d);
-}
-#endif
-
 template<class T>
 T atan(T d)
 { itested();
@@ -583,16 +570,6 @@ template<class T>
 T sinh(T d)
 { untested();
 	incomplete();
-	return d;
-}
-
-template<class T>
-T abs(T d)
-{itested();
-	if(d>=0.){itested();
-	}else{itested();
-		d *= -1.;
-	}
 	return d;
 }
 
@@ -619,13 +596,6 @@ int fmod(PARAMETER<int> const& d, int e)
 {itested();
 	return d % e;
 }
-
-template<class T>
-T limexp(T& d)
-{
-	return exp(d);
-}
-
 
 template<class T>
 T log10(T& d)
@@ -751,6 +721,8 @@ T sqrt(T d)
 		d.value() = 1e-99;
 	}else{
 		unreachable();
+		chain(d, .5e99);
+		d.value() = 0.;
 	}
 	return d;
 }

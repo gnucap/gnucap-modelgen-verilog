@@ -25,6 +25,7 @@
 #define o__ o << ind <<
 #define o____ o__ "  " <<
 #define o______ o____ "  " <<
+#define o________ o______ "  " <<
 /*--------------------------------------------------------------------------*/
 struct indent{
   explicit indent(size_t i=2){

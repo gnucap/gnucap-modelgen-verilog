@@ -152,9 +152,10 @@ static Token_TASK* resolve_system_task(Expression& E, MGVAMS_TASK const* t,
     assert(token);
     token->set_num_args(na);
 
-    Deps outdeps;
+//     Deps outdeps;
 //    outdeps.insert((*t)->prb());
-    ds.set(outdeps);
+    assert(ds.top());
+//     *ds.top() = outdeps;
     return token;
   }
 }
@@ -381,7 +382,7 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
     Base const* r = scope->resolve(n);
     trace3("resolve top found:", n, r, s);
 
-    if(dynamic_cast<Token_STOP*>(t)) {
+    if(dynamic_cast<Token_STOP*>(t)) { untested();
       E.push_back(t->clone());
       trace0("resolve STOP");
       ds.stop();
@@ -397,11 +398,11 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
           && t->name() == "inf") {
       Float* f = new Float(std::numeric_limits<double>::infinity());
       E.push_back(new Token_CONSTANT(t->name(), f, ""));
-    }else if(dynamic_cast<Token_PARLIST*>(t)){
+    }else if(dynamic_cast<Token_PARLIST*>(t)){ untested();
       E.push_back(t->clone());
-    }else if(dynamic_cast<Token_UNARY*>(t)){
+    }else if(dynamic_cast<Token_UNARY*>(t)){ untested();
       E.push_back(t->clone());
-    }else if(dynamic_cast<Token_BINOP*>(t)){
+    }else if(dynamic_cast<Token_BINOP*>(t)){ untested();
       // t->stack_op(E); // ?
       E.push_back(t->clone());
       // merge operand deps? depends on operator..
@@ -427,7 +428,7 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
       trace1("huh", t->name());
       E.push_back(t->clone());
     }else if(!E.is_empty() && dynamic_cast<Token_PARLIST*>(E.back())
-	  && is_xs_function(n, scope)) {
+	  && is_xs_function(n, scope)) { untested();
       trace2("resolve XS", ds.size(), ds.num_args());
       Token_PROBE* t = resolve_xs_function(E, n, scope);
       E.push_back(t);
@@ -471,7 +472,7 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
 	E.push_back(new Token_STOP(".."));
 	E.push_back(new Token_PARLIST("...", NULL));
       }
-      { untested();
+      {
 	MGVAMS_FUNCTION const* vaf = va_function(t->name());
 	assert(vaf);
 //	Token* tt = resolve_va_function(E, vaf, ds, scope);
@@ -484,13 +485,13 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
       ds.pop_args();
       E.push_back(new Token_AFCALL(t->name()));
 ///////////////////
-    }else if(MGVAMS_FUNCTION const* vaf = va_function(t->name())) {
+    }else if(MGVAMS_FUNCTION const* vaf = va_function(t->name())) { untested();
       assert(dynamic_cast<Token_PARLIST*>(E.back()));
 	trace1("va_function 2", t->name());
       Token* tt = resolve_va_function(E, vaf, ds, scope);
       if(tt){ untested();
 	E.push_back(tt);
-      }else{ untested();
+      }else{
 	E.push_back(t->clone()); // try later?
       }
     }else if(auto ff = filter_function(n)) {
@@ -502,7 +503,7 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
       Token* tt = resolve_system_task(E, st, ds, scope);
       E.push_back(tt);
 ///////////////////
-    }else if(scope->node(t->name())) {
+    }else if(scope->node(t->name())) { untested();
       trace1("unresolved node", t->name());
       // incomplete();
       ds.new_constant();

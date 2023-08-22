@@ -41,7 +41,6 @@ class DUMMY1 : public MGVAMS_FUNCTION {
 //	  return 1;
 //  }
 } dummy1;
-DISPATCHER<FUNCTION>::INSTALL d_abs(&function_dispatcher, "abs|$abs", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_acosh(&function_dispatcher, "acosh|$acosh", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_asinh(&function_dispatcher, "asinh|$asinh", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_atanh(&function_dispatcher, "atanh|$atanh", &dummy1);
@@ -50,7 +49,6 @@ DISPATCHER<FUNCTION>::INSTALL d_cos(&function_dispatcher, "cos|$cos", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_cosh(&function_dispatcher, "cosh|$cosh", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_sin(&function_dispatcher, "sin|$sin", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_sinh(&function_dispatcher, "sinh|$sinh", &dummy1);
-DISPATCHER<FUNCTION>::INSTALL d_sqrt(&function_dispatcher, "sqrt|$sqrt", &dummy1);
 DISPATCHER<FUNCTION>::INSTALL d_tanh(&function_dispatcher, "tanh|$tanh", &dummy1);
 /*--------------------------------------------------------------------------*/
 DISPATCHER<FUNCTION>::INSTALL d_white_noise(&function_dispatcher, "white_noise", &dummy1);
@@ -178,8 +176,72 @@ public:
   }
 /*--------------------------------------------------------------------------*/
 } p_exp;
-DISPATCHER<FUNCTION>::INSTALL d_exp(&function_dispatcher, "exp|$exp|limexp|$limexp", &p_exp);
-//DISPATCHER<FUNCTION>::INSTALL d_limexp(&function_dispatcher, "limexp|$limexp", &p_limexp);
+DISPATCHER<FUNCTION>::INSTALL d_exp(&function_dispatcher, "exp|$exp", &p_exp);
+/*--------------------------------------------------------------------------*/
+class limexp : public MGVAMS_FUNCTION {
+public:
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {
+    PARAMETER<double> x;
+    Cmd >> x;
+    x.e_val(NOT_INPUT, Scope);
+    return to_string(std::exp(x));
+  }
+  void make_cc_common(std::ostream& o)const override{
+    o__ "template<class T>\n";
+    o__ "T " << code_name() << "(T d) const{\n";
+    o____ "const double lt = 38.;\n";
+    o____ "double nv;\n";
+    o____ "double nd;\n";
+    o____ "if(d>lt){\n";
+    o______ "nv = std::exp(lt) * (1.0 + d - lt);\n";
+    o______ "nd = std::exp(lt);\n";
+    o____ "}else if(d<-lt){\n";
+    o______ "nv = std::exp(-lt) * (1.0 + d + lt);\n";
+    o______ "nd = std::exp(-lt);\n";
+    o____ "}else{\n";
+    o______ "nv = nd = std::exp(d);\n";
+    o____ "}\n";
+    // o____ "std::cerr << \"limexp: \" << d << \" \" << nv << \" \" << nd << \"\\n\";";
+    o____ "::set_value(d, nv);\n";
+    o____ "return chain(d, nd);\n";
+    o__ "}\n";
+//    o__ "double " << code_name() << "(double const& d) const{\n";
+//    o____ "return std::exp(d);\n";
+//    o__ "}\n";
+  }
+  std::string code_name()const override{
+    return "_f_limexp";
+  }
+} p_limexp;
+DISPATCHER<FUNCTION>::INSTALL d_limexp(&function_dispatcher, "limexp|$limexp", &p_limexp);
+/*--------------------------------------------------------------------------*/
+class abs : public MGVAMS_FUNCTION {
+public:
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
+    PARAMETER<double> x;
+    Cmd >> x;
+    x.e_val(NOT_INPUT, Scope);
+    return to_string(std::abs(x));
+  }
+  void make_cc_common(std::ostream& o)const override{
+    o__ "template<class T>\n";
+    o____ "T " << code_name() << "(T d)const {untested();\n";
+    o____ "if(d>=0.){untested();\n";
+    o____ "}else{untested();\n";
+    o______ "d *= -1.;\n";
+    o____ "}\n";
+    o____ "return d;\n";
+    o__ "}\n";
+  }
+  std::string code_name()const override{
+    return "_f_abs";
+  }
+  Token* new_token(Module& m, size_t /*na*/)const override{
+    m.install(this);
+    return new Token_SYMBOL("abs", "");
+  }
+} p_abs;
+DISPATCHER<FUNCTION>::INSTALL d_abs(&function_dispatcher, "abs|$abs", &p_abs);
 /*--------------------------------------------------------------------------*/
 class floor : public MGVAMS_FUNCTION {
 public:
@@ -227,7 +289,7 @@ public:
     o << "// dummy " << label() << "\n";
   }
   std::string code_name()const override{
-	  return "va::ln";
+    return "va::ln";
   }
 } p_ln;
 DISPATCHER<FUNCTION>::INSTALL d_ln(&function_dispatcher, "ln|$log", &p_ln);
@@ -246,6 +308,23 @@ public:
   }
 } p_pow;
 DISPATCHER<FUNCTION>::INSTALL d_pow(&function_dispatcher, "pow|$pow", &p_pow);
+/*--------------------------------------------------------------------------*/
+class sqrt : public MGVAMS_FUNCTION {
+public:
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { itested();
+    PARAMETER<double> x;
+    Cmd >> x;
+    x.e_val(NOT_INPUT, Scope);
+    return to_string(std::sqrt(x));
+  }
+  void make_cc_common(std::ostream& o)const override {
+    o << "// dummy " << label() << "\n";
+  }
+  std::string code_name()const override{
+    return "va::sqrt";
+  }
+} p_sqrt;
+DISPATCHER<FUNCTION>::INSTALL d_sqrt(&function_dispatcher, "sqrt|$sqrt", &p_sqrt);
 /*--------------------------------------------------------------------------*/
 
 }
