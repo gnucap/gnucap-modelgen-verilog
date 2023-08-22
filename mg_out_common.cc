@@ -282,15 +282,17 @@ void make_common_param_is_printable(std::ostream& out, const Module& m)
 //  }
 //  assert(i == m.common().override().size());
   for (auto q = m.parameters().begin();
-       q != m.parameters().end();
-       ++q) {
+       q != m.parameters().end(); ++q) {
     if(!(*q)->is_local()) {
       for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
 	out << "  case " << i++ << ":  return (";
 	if (!((**p).print_test().empty())) {
 	  out << (**p).print_test() << ");\n";
+	    //      }else if ((**p).default_val() == "NA") {
+	    //	out << (**p).code_name() << " != NA);\n";
 	}else{
-	  out << "true);\n";
+	  //out << "true);\n";
+	  out << (*p)->code_name() << ".has_hard_value());\n";
 	}
       }
     }

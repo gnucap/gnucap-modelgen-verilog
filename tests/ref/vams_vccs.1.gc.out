@@ -1,4 +1,4 @@
-vccs #(.gm(NA( 1.))) dut (.sink(0),.src(2),.ps(1),.ns(0));
+vccs #() dut (.sink(0),.src(2),.ps(1),.ns(0));
 resistor #(.r(2./17)) r0 (.p(2),.n(0));
 vsource #() v1 (.p(1),.n(0));
 #           v(1)       v(2)      

@@ -6,7 +6,7 @@ vsource #(.dc(1)) v2 (.p(2),.n(0));
 test_res1 #(.r(2*r)) dut (.np(3),.nn(4));
 vsource #(.dc(v)) v3 (.p(3),.n(0));
 vsource #(.dc(1)) v4 (.p(4),.n(0));
-test_res2 #(.r(4*r),.g(NA( 1.))) dut (.np(5),.nn(6));
+test_res2 #(.r(4*r)) dut (.np(5),.nn(6));
 vsource #(.dc(v)) v5 (.p(5),.n(0));
 vsource #(.dc(1)) v6 (.p(6),.n(0));
 #           i(v1)      i(v3)      i(v5)      iter(0)   

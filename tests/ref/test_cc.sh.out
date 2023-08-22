@@ -266,6 +266,7 @@ public:
 };
 static _COMMON_VASRC_rotational_omega _C_V_rotational_omega(CC_STATIC);
 /*--------------------------------------------------------------------------*/
+namespace n0{
 class MOD_resistor;
 class COMMON_resistor :public COMMON_COMPONENT{
   typedef MOD_resistor MOD;
@@ -407,7 +408,7 @@ void COMMON_resistor::set_param_by_index(int I, std::string& Value, int Offset)
 /*--------------------------------------------------------------------------*/
 void COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
 {
-  static std::string names[] = {"r" /* 0 */  };
+  static std::string names[] = {"r"  };
   int lb = 0;
   int ub = 1;
   while(lb < ub) {
@@ -434,7 +435,7 @@ void COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
 bool COMMON_resistor::param_is_printable(int i)const
 {
   switch (COMMON_resistor::param_count() - 1 - i) {
-  case 0:  return (true);
+  case 0:  return (_p_r.has_hard_value());
   default: return COMMON_COMPONENT::param_is_printable(i);
   }
 }
@@ -744,6 +745,7 @@ void MOD_resistor::precalc_last()
   }
 }
 /*--------------------------------------------------------------------------*/
+}
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
@@ -1015,6 +1017,7 @@ public:
 };
 static _COMMON_VASRC_rotational_omega _C_V_rotational_omega(CC_STATIC);
 /*--------------------------------------------------------------------------*/
+namespace n0{
 class MOD_capacitor;
 class COMMON_capacitor :public COMMON_COMPONENT{
   typedef MOD_capacitor MOD;
@@ -1172,7 +1175,7 @@ void COMMON_capacitor::set_param_by_index(int I, std::string& Value, int Offset)
 /*--------------------------------------------------------------------------*/
 void COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
 {
-  static std::string names[] = {"c" /* 0 */  };
+  static std::string names[] = {"c"  };
   int lb = 0;
   int ub = 1;
   while(lb < ub) {
@@ -1199,7 +1202,7 @@ void COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
 bool COMMON_capacitor::param_is_printable(int i)const
 {
   switch (COMMON_capacitor::param_count() - 1 - i) {
-  case 0:  return (true);
+  case 0:  return (_p_c.has_hard_value());
   default: return COMMON_COMPONENT::param_is_printable(i);
   }
 }
@@ -1561,6 +1564,7 @@ COMMON_capacitor::ddouble COMMON_capacitor::FILTER_f_ddt_0::operator()( ddouble 
   return t0;
 }
 /*--------------------------------------------------------------------------*/
+}
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
