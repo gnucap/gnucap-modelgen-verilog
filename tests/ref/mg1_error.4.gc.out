@@ -1,0 +1,9 @@
+attach ../lang_verilog.so 
+       ^ ? "../lang_verilog.so": already loaded, replacing
+module main (1,2);
+  test_alias2 #(.aa(5),.pp(4)) dut4 (1,2);
+endmodule // main
+
+main #() m (.1(0),.2(1));
+main.dut4: no candidates found for test_alias2
+m.dut4: no valid prototype found for test_alias2

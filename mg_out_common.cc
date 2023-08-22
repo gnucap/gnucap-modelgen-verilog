@@ -19,8 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-//testing=script 2006.11.01
 #include "mg_out.h"
+#include <numeric>
 /*--------------------------------------------------------------------------*/
 static void make_common_default_constructor(std::ostream& out, const Module& d)
 {
@@ -137,9 +137,94 @@ static void make_common_operator_equal(std::ostream& out, const Module& d)
 void make_common_set_param_by_name(std::ostream& o, const Module& m)
 {
   o << "void COMMON_" << m.identifier() << "::set_param_by_name("
-       "std::string Name, std::string Value)\n{ untested();\n";
+       "std::string Name, std::string Value)\n{\n";
 
-  o__ "COMMON_COMPONENT::set_param_by_name(N, V);\n";
+  o__ "static std::string names[] = {";
+  int cnt = 0;
+  std::vector<std::string const*> names;
+  std::vector<int> alias;
+  for (Parameter_List_Collection::const_iterator
+      q = m.parameters().begin();
+      q != m.parameters().end(); ++q) {
+    if(!(*q)->is_local()) {
+      for (Parameter_2_List::const_iterator
+	  p = (*q)->begin();
+	  p != (*q)->end();
+	  ++p) {
+	names.push_back(&(*p)->name());
+	if((*p)->aliases().size()) {
+	  alias.push_back(1);
+	  for(auto a : (*p)->aliases()){
+	    alias.push_back(alias.back()+1);
+	    names.push_back(&a->name());
+	  }
+	}else{
+	  alias.push_back(0);
+	}
+      }
+    }
+  }
+
+  std::vector<int> idx(names.size());
+  std::iota(idx.begin(), idx.end(), 0);
+  std::sort(idx.begin(), idx.end(),
+      [&](int A, int B) -> bool {
+      return *names[A] < *names[B];
+      });
+
+
+  std::string comma;
+  for(auto n : idx){
+      o << comma << "\"" << *names[n] << "\"";
+      comma = ", ";
+  }
+  cnt = names.size();
+  o__ "};\n";
+  o__ "int lb = 0;\n";
+  o__ "int ub = " << cnt << ";\n";
+  o__ "while(lb < ub) {\n";
+  o____ "int mid = (lb+ub)/2;\n";
+  o____ "int c = std::strcmp(Name.c_str(), names[mid].c_str());\n";
+  o____ "if(c<0){\n";
+  o______ "ub = mid;\n";
+  o____ "}else if(c>0){\n";
+  o______ "lb = mid+1;\n";
+  o____ "}else{\n";
+  o______ "lb = mid;\n";
+  o______ "ub = " << cnt << ";\n";
+  o______ "assert(lb<ub);\n";
+  o______ "break;\n";
+  o____ "}\n";
+  o__ "}\n";
+  o__ "assert(lb<=ub);\n";
+
+  o__ "switch(ub-lb){\n";
+  for(auto n : idx){
+    std::string cn = "_p_" + *names[n];
+    std::string pn;
+    o____ "case " << cnt << ":";
+    if(alias[n]){
+      pn = "_p_" + *names[n - alias[n] + 1];
+      o << "\n";
+      o____ "if(!" << pn << ".has_hard_value()) {\n";
+      o______ "_s" << pn << " = " << alias[n] << ";\n";
+      o____ "}else if(_s" << pn << " != " << alias[n] << "){\n";
+      o______ "throw Exception_No_Match(\"..\");\n";
+      o____ "}else{\n";
+      o____ "}\n";
+      o____ "";
+    }else{
+      pn = cn;
+    }
+    o << pn << " = Value;";
+    o____ "break; // " << alias[n] << "\n";
+    --cnt;
+  }
+  o____ "case 0: COMMON_COMPONENT::set_param_by_name(Name, Value); break;\n";
+
+
+  o__ "}\n";
+
   o << "}\n"
     "/*--------------------------------------------------------------------------*/\n";
 }
@@ -154,14 +239,14 @@ void make_common_set_param_by_index(std::ostream& o, const Module& m)
 
   for (Parameter_List_Collection::const_iterator
        q = m.parameters().begin();
-       q != m.parameters().end();
-       ++q) {
-    if(!(*q)->is_local())
-    for (Parameter_2_List::const_iterator
-	 p = (*q)->begin();
-	 p != (*q)->end();
-	 ++p) {
-      o__ "case " << i++ << ":  " << (**p).code_name() << " = Value; break;\n";
+       q != m.parameters().end(); ++q) {
+    if(!(*q)->is_local()) {
+      for (Parameter_2_List::const_iterator
+	  p = (*q)->begin();
+	  p != (*q)->end();
+	  ++p) {
+	o__ "case " << i++ << ":  " << (**p).code_name() << " = Value; break;\n";
+      }
     }
   }
 
@@ -198,17 +283,15 @@ void make_common_param_is_printable(std::ostream& out, const Module& m)
 //  assert(i == m.common().override().size());
   for (auto q = m.parameters().begin();
        q != m.parameters().end();
-       ++q)
-    if(!(*q)->is_local())
-  for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
-    {
-      out << "  case " << i++ << ":  return (";
-      if (!((**p).print_test().empty())) {
-	out << (**p).print_test() << ");\n";
-//      }else if ((**p).default_val() == "NA") {
-//	out << (**p).code_name() << " != NA);\n";
-      }else{
-	out << "true);\n";
+       ++q) {
+    if(!(*q)->is_local()) {
+      for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
+	out << "  case " << i++ << ":  return (";
+	if (!((**p).print_test().empty())) {
+	  out << (**p).print_test() << ");\n";
+	}else{
+	  out << "true);\n";
+	}
       }
     }
   }
@@ -555,6 +638,7 @@ void make_cc_common(std::ostream& o , const Module& m)
   make_common_destructor(o, m);
   make_common_operator_equal(o, m);
   make_common_set_param_by_index(o, m);
+  make_common_set_param_by_name(o, m);
   make_common_param_is_printable(o, m);
   make_common_param_name(o, m);
 //  make_common_param_name_or_alias(o, m);

@@ -1,0 +1,31 @@
+
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_alias(p, n)
+  electrical p, n;
+  parameter real pp = 3;
+  parameter real qq = 3;
+  aliasparam aa = pp;
+  (* desc="test" *) real prb;
+  analog prb = pp;
+
+endmodule
+
+!make test_alias.so > /dev/null
+attach ./test_alias.so
+
+test_alias #(.aa(1)) dut1(1,0);
+test_alias #(.pp(2)) dut2(1,0);
+test_alias dut3(1,0);
+test_alias #(.pp(4) .aa(5)) dut4(1,0);
+
+list
+
+print dc prb(dut*)
+dc
+end

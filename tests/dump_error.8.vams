@@ -1,0 +1,9 @@
+
+module test()
+
+	parameter real a = 1.;
+	parameter real b = 1.;
+
+	aliasparam x = y;
+
+endmodule

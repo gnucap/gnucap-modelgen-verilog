@@ -148,6 +148,13 @@ static void make_parameter_decl(std::ostream& o, const Parameter_List_Collection
       comma = ", ";
     }
     o << ";\n";
+
+    for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
+      if( (*p)->aliases().size() ) {
+	o__  "int _s" << (**p).code_name() << ";\n";
+      }else{
+      }
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -203,14 +210,15 @@ static void make_common(std::ostream& o, const Module& m)
     "  explicit " << class_name << "(int c=0);\n"
     "           ~" << class_name << "();\n"
     "  bool     operator==(const COMMON_COMPONENT&)const override;\n"
-    "  COMMON_COMPONENT* clone()const override{return new "<<class_name<<"(*this);}\n"
+    "  COMMON_COMPONENT* clone()const override {return new "<<class_name<<"(*this);}\n"
     "  void     set_param_by_index(int, std::string&, int)override;\n"
+    "  void     set_param_by_name(std::string, std::string)override;\n"
     "  bool     is_valid()const;\n"
     "  bool     param_is_printable(int)const override;\n"
     "  std::string param_name(int)const override;\n"
     "  std::string param_name(int,int)const override;\n"
     "  std::string param_value(int)const override;\n"
-    "  int param_count()const override {return (" 
+    "  int param_count()const override {return ("
 	     << m.parameters().size()
 	     << " + " << base_class_name << "::param_count());}\n"
     "  void precalc_first(const CARD_LIST*)override;\n"

@@ -646,7 +646,9 @@ T ln(T d)
 	}else if(d>0){ untested();
 		l=-1e40;
 		chain(d, 1e40);
-	}else{ untested();
+	}else{
+		unreachable();
+		l=-1e40;
 		chain(d, 1e40);
 	}
 	set_value(d, l);

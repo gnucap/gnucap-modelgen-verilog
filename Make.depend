@@ -99,7 +99,8 @@ mg_in_module.o: mg_in_module.cc mg_.h /usr/local/include/gnucap/ap.h \
  /usr/local/include/gnucap/l_lib.h /usr/local/include/gnucap/ap.h \
  /usr/local/include/gnucap/constant.h \
  /usr/local/include/gnucap/m_expression.h \
- /usr/local/include/gnucap/m_base.h mg_out.h
+ /usr/local/include/gnucap/m_base.h mg_out.h \
+ /usr/local/include/gnucap/l_stlextra.h
 mg_in_discipline.o: mg_in_discipline.cc mg_.h \
  /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/md.h \
  /usr/local/include/gnucap/io_trace.h \

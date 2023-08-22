@@ -1,0 +1,7 @@
+... meter real b = 1.;
+
+	aliasparam x = y;
+
+endmodule
+
+                                        ^ ? no such parameter

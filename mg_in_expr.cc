@@ -44,6 +44,12 @@ public:
       assert(_stack.empty());
     }
   }
+  void clear(){
+    while(_stack.size()){
+      delete _stack.top();
+      _stack.pop();
+    }
+  }
   void stop(){
     _stack.push(new Deps());
     _args.push(int(_stack.size()));
@@ -504,6 +510,7 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
       ds.new_constant();
       E.push_back(t->clone()); // try later?
     }else{
+      ds.clear();
       throw Exception("unresolved symbol: " + n);
     }
     trace1("loopend", ds.size());

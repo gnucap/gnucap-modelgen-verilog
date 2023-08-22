@@ -439,6 +439,7 @@ public:
   }
   void set_owner(Block* c) { _owner = c; }
   std::string const& name() const{ return _name; }
+  bool operator!=(const std::string& s)const {return _name != s;}
 protected:
   Block* owner(){ return _owner; }
 };
@@ -588,14 +589,18 @@ public:
 typedef LiSt<ValueRange, '\0', '\0', '\0', ',', ';'> ValueRangeList;
 /*--------------------------------------------------------------------------*/
 // parameter type name = value ;
+class Aliasparam;
 class Parameter_2 : public Parameter_Base {
   ValueRangeList _value_range_list;
+  std::list<Aliasparam const*> _aliases;
 public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   Parameter_2() :Parameter_Base() {}
   void set_type(std::string const& a){_type=a;}
+  void add_alias(Aliasparam const*);
   ValueRangeList const& value_range_list()const { return _value_range_list; }
+  std::list<Aliasparam const*> const& aliases()const {return _aliases;}
 };
 /*--------------------------------------------------------------------------*/
 class Parameter_2_List : public LiSt<Parameter_2, '\0', ',', ';'> {
@@ -773,11 +778,24 @@ public:
   void dump(std::ostream& f)const override;
 };
 /*--------------------------------------------------------------------------*/
-// class Localparam : public Parameter_2 {
-// public:
-//   void dump(std::ostream& f)const override;
-//   Localparam() :Parameter_2() {}
-// };
+class Aliasparam : public Owned_Base {
+  Parameter_2 const* _param{NULL};
+  std::string _name;
+public:
+  explicit Aliasparam() : Owned_Base() {}
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+  std::string const& name()const {
+    return _name;
+  }
+  bool operator!=(const std::string& s)const {return _name != s;}
+private:
+  std::string param_name()const {
+    assert(_param);
+    return _param->name();
+  }
+};
+typedef  Collection<Aliasparam> Aliasparam_Collection;
 /*--------------------------------------------------------------------------*/
 typedef Parameter_2_List Localparam_List;
 // class Localparam_List : public LiSt<Parameter_2, '\0', '\0', ';'> {
@@ -1620,6 +1638,7 @@ private: // verilog input data
   Analog_Functions _analog_functions;
   Variable_List_Collection _variables;
   Parameter_List_Collection _parameters;
+  Aliasparam_Collection _aliasparam;
   Element_2_List _element_list;
   Port_1_List	_local_nodes;
   Attribute_Instance const* _attributes{NULL};
@@ -1652,6 +1671,7 @@ public:
   const Net_Declarations& net_declarations()const{return _net_decl;}
   const Branch_Declarations& branch_declarations()const{return _branch_decl;}
   const Parameter_List_Collection& parameters()const	{return _parameters;}
+  const Aliasparam_Collection& aliasparam()const	{return _aliasparam;}
   const Variable_List_Collection& variables()const	{return _variables;}
   const Element_2_List&	  element_list()const	{return _element_list;}
   const Element_2_List&	  circuit()const	{return _element_list;}

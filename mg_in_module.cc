@@ -21,6 +21,7 @@
  */
 #include "mg_.h"
 #include "mg_out.h"
+#include "l_stlextra.h"
 /*--------------------------------------------------------------------------*/
 #if 0
 void Name_String::parse(CS& File)
@@ -138,8 +139,8 @@ void Parameter_3::dump(std::ostream& out)const
 -	| "realtime"
 -	| "time"
 -	| "string"
-- aliasparam_declaration ::=
--	  "aliasparam" parameter_identifier "=" parameter_identifier ";"
++ aliasparam_declaration ::=
++	  "aliasparam" parameter_identifier "=" parameter_identifier ";"
 // A.2.3
 + list_of_param_assignments ::=
 +	  param_assignment { "," param_assignment }
@@ -179,6 +180,52 @@ void Parameter_2::dump(std::ostream& o)const
   }
   //}else{
   //}
+}
+/*--------------------------------------------------------------------------*/
+void Parameter_2::add_alias(Aliasparam const* a)
+{
+  _aliases.push_back(a);
+}
+/*--------------------------------------------------------------------------*/
+void Aliasparam::parse(CS& f)
+{
+  std::string paramname;
+  size_t here0 = f.cursor();
+  f >> _name >> "=";
+  size_t here = f.cursor();
+  f >> paramname >> ";";
+  assert(owner());
+  Module* m = prechecked_cast<Module*>(owner());
+  assert(m);
+  auto& p = m->parameters();
+  Parameter_2* pp = NULL;
+  for(auto pl : p){
+    auto it = notstd::find_ptr(pl->begin(), pl->end(), paramname);
+    if(pp){
+    }else if(it != pl->end()){
+      pp = *it;
+    }else{
+    }
+    it = notstd::find_ptr(pl->begin(), pl->end(), _name);
+    if(it != pl->end()){
+      f.reset(here0);
+      throw Exception_CS("already exists", f);
+    }else{
+    }
+  }
+
+  if(pp){
+    pp->add_alias(this);
+    _param = pp;
+  }else{
+    f.reset(here);
+    throw Exception_CS("no such parameter", f);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Aliasparam::dump(std::ostream& o)const
+{
+  o__ "aliasparam " << _name << " = " << param_name() << ";\n";
 }
 /*--------------------------------------------------------------------------*/
 void Data_Type::parse(CS& file)
@@ -585,7 +632,7 @@ void Port_3::dump(std::ostream& out)const
 -	| specify_block
 +	| {attribute_instance}  parameter_declaration  ";"
 -	| {attribute_instance}  specparam_declaration
--	| aliasparam_declaration
++	| aliasparam_declaration
 - parameter_override ::=
 -	  "defparam"  list_of_param_assignments  ";"
 // A.2.1.2
@@ -653,6 +700,7 @@ void Module::parse(CS& f)
   _branch_decl.set_owner(this);
   _variables.set_owner(this);
   _parameters.set_owner(this);
+  _aliasparam.set_owner(this);
   //_local_params.set_owner(this);
   _element_list.set_owner(this);
   _local_nodes.set_owner(this);
@@ -689,6 +737,7 @@ void Module::parse(CS& f)
       || ((f >> "integer ") && (f >> _variables))
       || ((f >> "parameter ") && (f >> _parameters))
       || ((f >> "localparam ") && (f >> _parameters))
+      || ((f >> "aliasparam ") && (f >> _aliasparam))
       || ((f >> "analog ") && parse_analog(f)) // TODO:: f >> analog
       || ((f >> "endmodule ") && (end = true))
       || (f >> _element_list)	// module_instantiation
@@ -788,6 +837,10 @@ void Module::dump(std::ostream& o)const
   o << branch_declarations();
   if(parameters().size()){
     o << parameters() << "\n";
+  }else{
+  }
+  if(aliasparam().size()){
+    o << aliasparam() << "\n";
   }else{
   }
   if(variables().size()){
@@ -942,10 +995,21 @@ void Block::new_var_ref(Base* what)
     p = V->name();
   }else if(auto P = dynamic_cast<Parameter_2 const*>(what)){
     p = P->name();
-  }else{
-    // TODO
+  }else{ untested();
+    incomplete();
     assert(false);
   }
+
+  auto m = dynamic_cast<Module const*>(this);
+  if(!m){
+  }else{
+    auto const& alias = m->aliasparam();
+    if(alias.end() == notstd::find_ptr(alias.begin(), alias.end(), p)){
+    }else{
+      throw(Exception("already there: '" + p + "'"));
+    }
+  }
+
   trace1("new_var_ref", p);
   Base* cc = _var_refs[p];
 

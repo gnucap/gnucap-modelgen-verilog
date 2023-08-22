@@ -278,8 +278,9 @@ public:
   explicit COMMON_resistor(int c=0);
            ~COMMON_resistor();
   bool     operator==(const COMMON_COMPONENT&)const override;
-  COMMON_COMPONENT* clone()const override{return new COMMON_resistor(*this);}
+  COMMON_COMPONENT* clone()const override {return new COMMON_resistor(*this);}
   void     set_param_by_index(int, std::string&, int)override;
+  void     set_param_by_name(std::string, std::string)override;
   bool     is_valid()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
@@ -401,6 +402,32 @@ void COMMON_resistor::set_param_by_index(int I, std::string& Value, int Offset)
   switch (COMMON_resistor::param_count() - 1 - I) {
   case 0:  _p_r = Value; break;
   default: COMMON_COMPONENT::set_param_by_index(I, Value, Offset);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
+{
+  static std::string names[] = {"r" /* 0 */  };
+  int lb = 0;
+  int ub = 1;
+  while(lb < ub) {
+    int mid = (lb+ub)/2;
+    int c = std::strcmp(Name.c_str(), names[mid].c_str());
+    if(c<0){
+      ub = mid;
+    }else if(c>0){
+      lb = mid+1;
+    }else{
+      lb = mid;
+      ub = 1;
+      assert(lb<ub);
+      break;
+    }
+  }
+  assert(lb<=ub);
+  switch(ub-lb){
+    case 1:_p_r = Value;    break; // 0
+    case 0: COMMON_COMPONENT::set_param_by_name(Name, Value); break;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1001,8 +1028,9 @@ public:
   explicit COMMON_capacitor(int c=0);
            ~COMMON_capacitor();
   bool     operator==(const COMMON_COMPONENT&)const override;
-  COMMON_COMPONENT* clone()const override{return new COMMON_capacitor(*this);}
+  COMMON_COMPONENT* clone()const override {return new COMMON_capacitor(*this);}
   void     set_param_by_index(int, std::string&, int)override;
+  void     set_param_by_name(std::string, std::string)override;
   bool     is_valid()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
@@ -1139,6 +1167,32 @@ void COMMON_capacitor::set_param_by_index(int I, std::string& Value, int Offset)
   switch (COMMON_capacitor::param_count() - 1 - I) {
   case 0:  _p_c = Value; break;
   default: COMMON_COMPONENT::set_param_by_index(I, Value, Offset);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
+{
+  static std::string names[] = {"c" /* 0 */  };
+  int lb = 0;
+  int ub = 1;
+  while(lb < ub) {
+    int mid = (lb+ub)/2;
+    int c = std::strcmp(Name.c_str(), names[mid].c_str());
+    if(c<0){
+      ub = mid;
+    }else if(c>0){
+      lb = mid+1;
+    }else{
+      lb = mid;
+      ub = 1;
+      assert(lb<ub);
+      break;
+    }
+  }
+  assert(lb<=ub);
+  switch(ub-lb){
+    case 1:_p_c = Value;    break; // 0
+    case 0: COMMON_COMPONENT::set_param_by_name(Name, Value); break;
   }
 }
 /*--------------------------------------------------------------------------*/
