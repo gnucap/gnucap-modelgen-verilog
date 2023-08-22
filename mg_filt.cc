@@ -35,7 +35,7 @@ static void make_cc_tmp(size_t na, std::string id, std::string fcn, Filter const
 {
   assert(f->has_branch());
   o << "COMMON_" << id << "::";
-  o << "ddouble COMMON_" << id << "::FILTER_f_" << fcn <<
+  o << "ddouble COMMON_" << id << "::FILTER" << fcn <<
     "::operator()(";
 //  assert(na == f->num_args());
   for(size_t n=0; n<na; ++n){
@@ -77,7 +77,7 @@ static void make_cc_tmp(size_t na, std::string id, std::string fcn, Filter const
     //      o__ "d->" << cn << "->q_eval();\n";
     o__ "t0 = d->" << cn << "->tr_amps();\n";
     o__ "trace2(\"filt\", t0, d->"<< cn<<"->tr_outvolts());\n";
-    o__ "t0[d__filter_b_" << fcn << "_] = 1.;\n";
+    o__ "t0[d__filter" << cn << "] = 1.;\n";
     o__ "return t0;\n";
   }
 
@@ -105,10 +105,6 @@ public:
     Filter* f = NULL;
 
     std::string filter_code_name = label() + "_" + std::to_string(n_filters++);
-    CS cmd(CS::_STRING, filter_code_name + " short_if=0 short_to=0;");
-
-    Port_1* p = new Port_1;
-    cmd >> *p;
 
     DDT* cl = clone();
     {
@@ -116,14 +112,14 @@ public:
       f->set_owner(&m);
       f->set_dev_type("va_" + label());
 
-      cl->set_label(filter_code_name);
+      cl->set_label("_f_" + filter_code_name);
       cl->set_num_args(na);
       cl->_f = f;
       cl->_m = &m;
       m.push_back(cl);
     }
 
-    Node* n = m.new_node(p->name());
+    Node* n = m.new_node(filter_code_name);
     {
       Branch* br = m.new_branch(n, &mg_ground_node);
       // br->set_deps(d);
@@ -151,14 +147,14 @@ public:
     make_cc_tmp(num_args(), _m->identifier().to_string(), label(), _f, o);
   }
   void make_cc_common(std::ostream& o)const override{
-    o__ "class FILTER_f_" << label() << "{\n";
+    o__ "class FILTER" << label() << "{\n";
     o__ "public:\n";
     o____ "ddouble operator()(";
       for(size_t n=0; n<num_args(); ++n){
 	o << "ddouble t" << n << ", ";
       }
     o << "COMPONENT*) const;\n";
-    o__ "} _f_" << label() << ";\n";
+    o__ "} " << label() << ";\n";
   }
   std::string eval(CS&, const CARD_LIST*)const override{
     unreachable();
@@ -179,7 +175,7 @@ public:
   }
   Token* new_token(Module& m, size_t na, Deps& d)const override{
     // _m = &m;
-    std::string filter_code_name = "ddx_" + std::to_string(n_filters++);
+    std::string filter_code_name = "_f_ddx_" + std::to_string(n_filters++);
     DDX* cl = clone();
     cl->_ddxprobe = *d.begin();
     cl->set_label(filter_code_name);
@@ -193,7 +189,7 @@ public:
   void make_cc_dev(std::ostream&)const override{
   }
   void make_cc_common(std::ostream& o)const override{
-    o__ "class FILTER_f_" << label() << "{\n";
+    o__ "class FILTER" << label() << "{\n";
     o__ "public:\n";
     o____ "ddouble operator()(";
     for(size_t n=0; n<num_args(); ++n){
@@ -242,7 +238,7 @@ public:
     o__ "return ret;\n";
     o__ "}\n";
 
-    o__  "} _f_" << label() << ";\n";
+    o__  "} " << label() << ";\n";
   }
   void make_cc_impl(std::ostream&)const override{
     // nothing

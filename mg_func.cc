@@ -172,6 +172,11 @@ public:
   std::string code_name()const override{
     return "_f_exp";
   }
+  Token* new_token(Module& m, size_t /*na*/)const override{ untested();
+    m.install(this);
+    return new Token_SYMBOL("exp", "");
+  }
+/*--------------------------------------------------------------------------*/
 } p_exp;
 DISPATCHER<FUNCTION>::INSTALL d_exp(&function_dispatcher, "exp|$exp|limexp|$limexp", &p_exp);
 //DISPATCHER<FUNCTION>::INSTALL d_limexp(&function_dispatcher, "limexp|$limexp", &p_limexp);
@@ -248,7 +253,7 @@ DISPATCHER<FUNCTION>::INSTALL d_pow(&function_dispatcher, "pow|$pow", &p_pow);
 Token* MGVAMS_FUNCTION::new_token(Module& m, size_t /*na*/) const
 {
   m.install(this);
-  return new Token_SYMBOL("","");
+  return NULL;
 }
 /*--------------------------------------------------------------------------*/
 void MGVAMS_FUNCTION::make_cc_dev(std::ostream& o) const

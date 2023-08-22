@@ -125,11 +125,11 @@ public:
 /*--------------------------------------------------------------------------*/
 static Token_SYMBOL* resolve_va_function(Expression&, MGVAMS_FUNCTION const* t,
     DEP_STACK& ds, Block* o)
-{
-//  size_t na = ds.num_args(); ??
-  Token* nt = o->new_token(t, *ds.top(), 0);
-  delete nt; // TODO;
-  return NULL;
+{ untested();
+  size_t na = ds.num_args();
+  ds.pop_args();
+  Token* nt = o->new_token(t, *ds.top(), na);
+  return dynamic_cast<Token_SYMBOL*>(nt);
 }
 /*--------------------------------------------------------------------------*/
 static Token_TASK* resolve_system_task(Expression& E, MGVAMS_TASK const* t,
@@ -461,25 +461,24 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
       E.push_back(new Token_CONSTANT(t->name(), f, ""));
       ds.new_constant();
     }else if(is_system_function_call(t->name())) {
+      size_t na = 0;
       if(!E.is_empty() && dynamic_cast<Token_PARLIST*>(E.back())){
 	trace1("is_system_function_call w args", t->name());
+	na = ds.size();
 	ds.pop_args();
-// :	Deps* td = depstack.top();
-// ://	TODO:: td must be empty??
-// :	depstack.pop();
-// :	depstack.top()->update(*td);
-// :	delete(td);
       }else{
 	ds.new_constant();
 	E.push_back(new Token_STOP(".."));
 	E.push_back(new Token_PARLIST("...", NULL));
       }
-      if(MGVAMS_FUNCTION const* vaf = va_function(t->name())) {
-	// ... incomplete();
-	/* Token* t = */ resolve_va_function(E, vaf, ds, scope);
-      }else{ untested();
+      { untested();
+	MGVAMS_FUNCTION const* vaf = va_function(t->name());
+	assert(vaf);
+//	Token* tt = resolve_va_function(E, vaf, ds, scope);
+	Token* tt = scope->new_token(vaf, *ds.top(), na);
+	delete tt; // TODO: use it?
+	E.push_back(new Token_SFCALL(t->name()));
       }
-      E.push_back(new Token_SFCALL(t->name()));
     }else if(is_analog_function_call(t->name(), scope)) {
       assert(dynamic_cast<Token_PARLIST*>(E.back()));
       ds.pop_args();
@@ -487,9 +486,13 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
 ///////////////////
     }else if(MGVAMS_FUNCTION const* vaf = va_function(t->name())) {
       assert(dynamic_cast<Token_PARLIST*>(E.back()));
-      ds.pop_args();
-      /* Token* t = */ resolve_va_function(E, vaf, ds, scope);
-      E.push_back(t->clone()); // try later?
+	trace1("va_function 2", t->name());
+      Token* tt = resolve_va_function(E, vaf, ds, scope);
+      if(tt){ untested();
+	E.push_back(tt);
+      }else{ untested();
+	E.push_back(t->clone()); // try later?
+      }
     }else if(auto ff = filter_function(n)) {
       assert(dynamic_cast<Token_PARLIST*>(E.back()));
       Token* t = resolve_filter_function(E, ff, ds, scope);

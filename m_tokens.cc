@@ -94,7 +94,7 @@ std::string Token_TASK::code_name()const
 std::string Token_FILTER::code_name()const
 {
   assert(_function);
-  return "_f_" + _function->label();
+  return _function->label();
 }
 /*--------------------------------------------------------------------------*/
 void Token_TASK::stack_op(Expression* E)const

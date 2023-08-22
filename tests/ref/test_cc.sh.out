@@ -1073,7 +1073,7 @@ public: // netlist
   ELEMENT* _b_ddt_0_{NULL}; // branch
   ELEMENT* _b_p_n{NULL}; // branch
 private: // func decl
-//func ddt_0
+//func _f_ddt_0
 private: // construct
   explicit MOD_capacitor(MOD_capacitor const&);
 public:
