@@ -24,10 +24,12 @@ endmodule
 !make test_collapse0.so > /dev/null
 attach ./test_collapse0.so
 
-test_collapse0 #(.R(1)) c0(1,2);
+test_collapse0 #(.R(1)) c1(1,2);
 test_collapse0 #(.R(0)) c0(1,0);
 
 vsource #(.dc(100)) v(2, 0);
 
-print dc v(nodes)
+print dc v(nodes) v(c0._b_P_PI) i(c0._b_P_PI)
 dc
+
+status notime

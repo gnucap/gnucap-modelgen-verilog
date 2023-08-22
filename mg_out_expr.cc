@@ -80,7 +80,7 @@ public:
   void new_string(std::ostream& o){
     ++_str_idx;
     if(_str_idx < _str_alloc){
-    }else{itested();
+    }else{
       assert(_str_idx==_str_alloc);
       ++_str_alloc;
       o << ind << "std::string s" << _str_idx << ";\n";
@@ -140,10 +140,10 @@ public:
 void make_cc_string(std::ostream& o, String const& e)
 {
   o << '"';
-  for(char c : e.val_string()){itested();
+  for(char c : e.val_string()){
     if(c=='\n'){itested();
 //      o << '\\';
-    }else{itested();
+    }else{
     }
     o << c;
   }

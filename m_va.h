@@ -28,6 +28,18 @@
 #include <u_parameter.h>
 #include <l_stlextra.h>
 
+namespace notstd {
+/*--------------------------------------------------------------------------*/
+template <class InputIter, class Size, class OutputIter>
+void add_n(InputIter first, Size count, OutputIter result)
+{
+  for ( ; count > 0; --count) {
+    *result++ += *first++;
+  }
+}
+/*--------------------------------------------------------------------------*/
+}
+
 namespace{
 
 typedef double real;
@@ -651,7 +663,7 @@ typename ddouble_if<T, S>::type min(T d, S e)
 {itested();
 	if(double(d) <= double(e)){itested();
 		return d;
-	}else{ untested();
+	}else{ itested();
 		return e;
 	}
 }

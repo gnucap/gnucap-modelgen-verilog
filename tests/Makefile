@@ -26,7 +26,7 @@ MODELGEN_VERILOG = ../gnucap-mg-vams
 %: %.o
 	${CXX} -g -rdynamic $< -lgnucap -o $@
 
-CHECK_SECTIONS = mg0 mg1 mg2 mg3 dump test v
+CHECK_SECTIONS = mg0 mg1 mg2 mg3 mg4 dump test v
 CHECK_TARGETS = ${CHECK_SECTIONS:%=check/%.diffs}
 
 check: check/.diffs

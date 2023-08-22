@@ -1,0 +1,34 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_sw_3(p, n);
+	electrical p, n;
+	parameter real rr = 1;
+
+	analog begin
+		I(p, n) <+ V(p,n);
+
+		if(0)
+			V(p,n) <+ 0;
+	end
+endmodule
+
+!make test_sw_3.so > /dev/null
+attach ./test_sw_3.so
+
+parameter rr=1
+isource #(.dc(1)) ii(0, 1);
+test_sw_3 #(.rr(rr)) dut(1, 0);
+
+list
+
+print dc v(nodes) iter(0)
+dc
+// rr -5 10 2
+
+status notime
+end

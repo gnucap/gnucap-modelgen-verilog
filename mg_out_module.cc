@@ -406,7 +406,7 @@ static void make_tr_review(std::ostream& o, const Module& m)
   if(m.num_evt_slots()){
     o__ "if(_evt_seek){\n";
     o____ "q_accept();\n";
-    o__ "}else{untested();\n";
+    o__ "}else{itested();\n";
     o__ "}\n";
   }else{
   }
@@ -608,7 +608,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
   auto br = dynamic_cast<Branch const*>(&e);
   assert(br);
 
-  if (br->p() == br->n()){
+  if (br->is_short()) { untested();
     o__ "if(0){ // short\n";
   }else if (!(e.omit().empty())) { untested();
     o__ "if (" << e.omit() << ") {\n";
@@ -622,12 +622,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
     o__ "{\n";
   }
 
-  std::string dev_type;
-//  if(dynamic_cast<Branch const*>(&e)){ untested();
-    dev_type = e.dev_type();
-//  }else{ untested();
-//    dev_type = "device_stub";
-//  }
+  std::string dev_type = e.dev_type();
 
   o__ "if (!" << e.code_name() << ") {\n";
   o____ "const CARD* p = device_dispatcher[\"" << dev_type << "\"]; // " << e.dev_type() << "\n";
@@ -635,17 +630,13 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
   o______ "throw Exception(" << "\"Cannot find " << dev_type << ". Load module?\");\n";
   o____ "}else{\n";
   o____ "}\n";
-//  if(dynamic_cast<Branch const*>(&e)){ untested();
-    o____ e.code_name() << " = dynamic_cast<ELEMENT*>(p->clone());\n";
-//  }else{ untested();
-//    o____ e.code_name() << " = dynamic_cast<COMPONENT*>(p->clone());\n";
-//    o____ e.code_name() << "->set_dev_type(\"" << e.dev_type() << "\");\n";
-//  }
+  o____ e.code_name() << " = dynamic_cast<ELEMENT*>(p->clone());\n";
   o____ "if(!" << e.code_name() << "){\n";
   o______ "throw Exception(" << "\"Cannot use " << dev_type << ": wrong type\"" << ");\n";
   o____ "}else{\n";
   o____ "}\n";
   o____ "subckt()->push_front(" << e.code_name() << ");\n";
+//o____ e.code_name() << "->set_dev_type(\"" << e.dev_type() << "\");\n";
   o__ "}else{\n";
   o__ "}\n";
 
@@ -697,17 +688,19 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
 
     {
       // set_current ports.
-      int kk = 0;
+      int kk = 1;
       std::vector<char> seen(m.num_branches());
       for(auto i : br->deps()){
 	Branch const* bb = i->branch();
 	if(seen[bb->number()]){
+	}else if(!i->is_flow_probe()){
 	}else if(i->branch() == br){
-	}else if(i->is_flow_probe()){
+	  // self control is current
+	  o______ e.code_name() << "->set_current_port_by_index(0,\"\");\n";
+	}else{
 	  assert(i->branch());
 	  o______ e.code_name() << "->set_current_port_by_index( "<< kk << ", \"" << i->branch()->code_name() << "\");\n";
 	  ++kk;
-	}else{
 	}
 	seen[i->branch()->number()] = 1;
       }

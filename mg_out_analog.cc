@@ -515,9 +515,9 @@ static void make_set_one_branch_contribution(std::ostream& o, Module const& m, c
 	o____ "_pot" << b->code_name() << " = true;\n";
 	o____ b->state() << "[0] = _value_br_" << n << ";\n";
 	o____ "notstd::copy_n(_st_br_" << n << "+1, " << b->num_states()-1 << ", " << b->state() <<" + 1);\n";
-	o__ "}else if (!_pot"<< b->code_name() << "){itested();\n";
-	// TODO: sum up derivatives, too
-	o____ b->state() << "[0] += _value_br_" << n << "; // incomplete 577\n";
+	o__ "}else if (!_pot" << b->code_name() << "){itested();\n";
+	o____ b->state() << "[0] += _value_br_" << n << ";\n";
+	o____ "notstd::add_n(_st_br_" << n << "+1, " << b->num_states()-1 << ", " << b->state() <<" + 1);\n";
 	o__ "}else{untested();\n";
 	o__ "}\n";
     }
@@ -531,32 +531,32 @@ static void make_set_one_branch_contribution(std::ostream& o, Module const& m, c
     }
   }
 
-  // self_admittance
   for(auto d : b->deps()){
     if(d->branch() == b){
+      o__ "// self_admittance\n";
       if(b->has_pot_source() && b->has_flow_probe()){
-
-	o__ "if (!_pot"<< b->code_name() << "){ untested();\n";
-	o__ "}else if (" << b->state() << "[1] > OPT::shortckt){\n";
-	o____ "_pot"<< b->code_name() << " = false;\n";
-	o____ "assert(" << b->state() << "[1]);\n";
-	o____ b->state() << "[0] /= - " << b->state() << "[1];\n";
-	o____ b->state() << "[1] = 1./" << b->state() << "[1];\n";
 	if(br.num_states()<=2){
 	}else{
-	  o__ "incomplete();\n";
-	  std::cerr << "INCOMPLETE" << "_pot"<< b->code_name() << "\n";
 	  incomplete(); // the other ones??
 	}
-	o__ "}else{untested();\n";
-	o__ "}\n";
       }else{
       }
       o__ "trace2(\"" <<  b->state() << "self\", " << b->state() << "[1], "<<  d->code_name() <<");\n";
-      o__ b->state() << "[0] -= " << b->state() << "[1] * "<< d->code_name() << ";\n";
+      o__ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
+
       break;
     }else{
     }
+  }
+
+  // TODO: does it work in current mode?
+  if(!br.is_generic()){
+  }else if(br.is_direct()){
+  }else{
+    o__ "if (_pot"<< b->code_name() << "){\n";
+    o____ b->state() << "[1] += 1.; // (4c)\n";
+    o__ "}else{\n";
+    o__ "}\n";
   }
   k = 2;
   for(auto i : m.branches()){

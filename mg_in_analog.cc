@@ -714,14 +714,19 @@ void Contribution::parse(CS& cmd)
 
   if(!_branch->discipline()) {
     throw Exception_CS("bad discipline", cmd);
-  }else if(_branch->discipline()->flow()
-       && _branch->discipline()->flow()->access().to_string() == _name){
-    _nature = _branch->discipline()->flow();
-    set_flow_source();
-  }else if(_branch->discipline()->potential()
-       && _branch->discipline()->potential()->access().to_string() == _name){
-    _nature = _branch->discipline()->potential();
-    set_pot_source();
+  }else{
+  }
+  Discipline const* disc = _branch->discipline();
+  assert(disc);
+
+  if(disc->flow() &&
+      (_name == "flow" || disc->flow()->access().to_string() == _name)) {
+    _nature = disc->flow();
+    set_flow_contrib();
+  }else if(disc->potential() &&
+      (_name == "potential" || disc->potential()->access().to_string() == _name)) {
+    _nature = disc->potential();
+    set_pot_contrib();
   }else{
     throw Exception_CS("bad access", cmd);
   }
@@ -735,6 +740,14 @@ void Contribution::parse(CS& cmd)
   // assert(_branch);
   // cmd >> ")";
   if(cmd >> "<+"){
+    set_direct();
+  }else if(cmd >> ":"){
+    set_direct(false);
+    // std::string xs;
+    // Branch_Ref bb;
+    // bb.set_owner(owner());
+    // trace1("bb?", cmd.tail().substr(0,20));
+    // cmd >> xs >> bb >> "==";
   }else{
     throw Exception_CS("expecting \"<+\"", cmd);
   }
@@ -746,6 +759,18 @@ void Contribution::parse(CS& cmd)
     assert(owner());
     trace1("Assignment::parse", cmd.tail());
     Expression rhs(cmd);
+    trace1("Assignment::parse", rhs.back()->name());
+    if(is_direct()){
+    }else if(rhs.is_empty()){
+      throw Exception_CS("syntax error", cmd);
+    }else if(rhs.back()->name()!="=="){ untested();
+      throw Exception_CS("syntax error", cmd);
+    }else{
+      assert(dynamic_cast<Token_BINOP const*>(rhs.back()));
+      delete(rhs.back());
+      rhs.pop_back();
+      rhs.push_back(new Token_BINOP("-"));
+    }
     assert(!_rhs);
 #if 1
     Expression tmp;
@@ -761,11 +786,21 @@ void Contribution::parse(CS& cmd)
     assert(owner());
 
     for(auto d : deps()) {
+      trace1("contrib dep", d->code_name());
       _branch->add_probe(d);
+
+      if(!is_direct()){
+      }else if(d->branch() != _branch){
+      }else if(is_flow_contrib() && d->is_flow_probe()){ untested();
+	_branch->set_selfdep();
+      }else if(is_pot_contrib() && d->is_pot_probe()){
+	_branch->set_selfdep();
+      }else{
+      }
     }
   }
   cmd >> ";";
-}
+} // Contribution::parse
 /*--------------------------------------------------------------------------*/
 void Branch_Map::parse(CS& f)
 { untested();
@@ -797,9 +832,15 @@ static void dump(std::ostream& out, Expression const& e)
 void Contribution::dump(std::ostream& o)const
 {
   assert(_branch);
-  o__ _name << _branch << " <+ ";
-  assert(_rhs);
+  o__ _name << _branch << " ";
+  if(is_direct()){
+    o << "<+";
+  }else{
+    o << ":";
+  }
+  o << " ";
 
+  assert(_rhs);
   ::dump(o, *_rhs);
   o << ";\n";
 }

@@ -170,7 +170,7 @@ public:
   std::string code_name()const override{
     return "_f_exp";
   }
-  Token* new_token(Module& m, size_t /*na*/)const override{ untested();
+  Token* new_token(Module& m, size_t /*na*/)const override{
     m.install(this);
     return new Token_SYMBOL("exp", "");
   }
@@ -178,6 +178,7 @@ public:
 } p_exp;
 DISPATCHER<FUNCTION>::INSTALL d_exp(&function_dispatcher, "exp|$exp", &p_exp);
 /*--------------------------------------------------------------------------*/
+#if 1
 class limexp : public MGVAMS_FUNCTION {
 public:
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {
@@ -214,6 +215,7 @@ public:
   }
 } p_limexp;
 DISPATCHER<FUNCTION>::INSTALL d_limexp(&function_dispatcher, "limexp|$limexp", &p_limexp);
+#endif
 /*--------------------------------------------------------------------------*/
 class abs : public MGVAMS_FUNCTION {
 public:
@@ -279,7 +281,7 @@ DISPATCHER<FUNCTION>::INSTALL d_log(&function_dispatcher, "log|$log10", &p_log);
 /*--------------------------------------------------------------------------*/
 class ln : public MGVAMS_FUNCTION {
 public:
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { itested();
     PARAMETER<double> x;
     Cmd >> x;
     x.e_val(NOT_INPUT, Scope);

@@ -286,6 +286,10 @@ size_t Branch::num_nodes() const
 /*--------------------------------------------------------------------------*/
 void Branch::add_probe(Probe const* b)
 {
+//  if(b->branch() == this){
+//    _selfdep = true;
+//  }else{
+//  }
   _deps.insert(b);
 }
 /*--------------------------------------------------------------------------*/
@@ -299,6 +303,26 @@ bool Branch::has_flow_probe() const
   return _has_flow_probe;
 }
 /*--------------------------------------------------------------------------*/
+bool Branch::is_generic()const
+{
+  if(!is_direct()){
+    if(has_pot_source()){
+      return true;
+    }else{
+      incomplete();
+    }
+  }else if(has_flow_probe()){
+  }else if(has_pot_source()){
+    if(_selfdep){
+      return true;
+    }else{
+    }
+  }else if(has_flow_source()){
+  }else{
+  }
+  return false;
+}
+/*--------------------------------------------------------------------------*/
 const std::string& Branch::dev_type()const
 {
   if(!has_flow_source() && !has_pot_source() && !has_flow_probe()){
@@ -309,15 +333,31 @@ const std::string& Branch::dev_type()const
 
   static std::string f = "flow_src";
   static std::string p = "va_pot";
-  if(has_flow_probe()){
+  static std::string pb = "va_pot_br";
+
+//  if( .. attribute .. )?
+
+  if(!is_direct()){
+    if(has_pot_source()){
+      return pb;
+    }else{
+      incomplete();
+    }
+  }else if(has_flow_probe()){
     return p;
   }else if(has_pot_source()){
-    return p;
+    if(_selfdep){
+      return pb;
+    }else{
+      return p;
+    }
   }else if(has_flow_source()){
     return f;
   }else{
     return p;
   }
+  static std::string inc = "incomplete";
+  return inc;
 }
 /*--------------------------------------------------------------------------*/
 void Branch_Ref::set_name(std::string const& n)
@@ -594,14 +634,31 @@ std::string Variable::code_name() const
   }
 }
 /*--------------------------------------------------------------------------*/
-void Contribution::set_pot_source()
+void Branch::set_direct(bool d)
+{
+  _direct = d;
+}
+/*--------------------------------------------------------------------------*/
+void Contribution::set_direct(bool d)
+{
+  assert(_branch);
+  _branch->set_direct(d);
+}
+/*--------------------------------------------------------------------------*/
+bool Contribution::is_direct() const
+{
+  assert(_branch);
+  return _branch->is_direct();
+}
+/*--------------------------------------------------------------------------*/
+void Contribution::set_pot_contrib()
 {
   assert(_branch);
   _branch->set_pot_source();
   _type = t_pot;
 }
 /*--------------------------------------------------------------------------*/
-void Contribution::set_flow_source()
+void Contribution::set_flow_contrib()
 {
   assert(_branch);
   _branch->set_flow_source();

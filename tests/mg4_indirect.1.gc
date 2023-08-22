@@ -1,0 +1,37 @@
+
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_ind1(p, n)
+	electrical p, n;
+
+	analog begin
+		V(p) : V(n) == 0.;
+	end
+
+endmodule
+
+!make test_ind1.so > /dev/null
+attach ./test_ind1.so
+
+parameter v = 1.
+
+test_ind1 #() dut(1, 2);
+resistor #(.r(10k)) r1(1,2);
+resistor #(.r(1k)) r1(3,2);
+
+list
+
+print dc v(nodes) iter(0)
+spice
+
+v2 3 0 ac 1 dc 1
+.print ac v(nodes) vp(1)
+.dc
+.ac
+
+.status notime

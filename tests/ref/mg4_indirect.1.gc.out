@@ -1,0 +1,13 @@
+parameter v = 1. 
+test_ind1 #() dut (.p(1),.n(2));
+resistor #(.r(10k)) r1 (.p(1),.n(2));
+resistor #(.r(1k)) r1 (.p(3),.n(2));
+#           v(1)       v(2)       v(3)       iter(0)   
+ 0.        -10.        1.f        1.         3.        
+#Freq       v(1)       v(2)       v(3)       vp(1)     
+ 0.         10.        0.         1.         180.      
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=4
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=3, subckt=0, model=1, total=4
+dctran density=87.5%, ac density=87.5%

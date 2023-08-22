@@ -1,2 +1,7 @@
-#           v(1)       v(2)      
- 0.         0.0019999  99.999    
+#           v(1)       v(2)       v(c0._b_P_PI) i(c0._b_P_PI)
+ 0.         0.0019999  99.999     999.96u    99.996    
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=3
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=2, total=4
+dctran density=75.0%, ac density=75.0%

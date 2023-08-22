@@ -1471,6 +1471,8 @@ class Branch : public Element_2 {
   std::vector<Branch_Ref*> _refs;
   size_t _number;
   std::list<std::string> _names;
+  bool _direct{true};
+  bool _selfdep{false};
 public:
   explicit Branch(Node const* p, Node const* n, size_t number)
     : Element_2(), _p(p), _n(n), _number(number) {
@@ -1492,6 +1494,8 @@ public:
   Node const* p() const{ assert(_p); return _p; }
   Node const* n() const{ assert(_n); return _n; }
   bool is_short() const{ return _p == _n; }
+  bool is_direct() const{ return _direct; }
+  bool is_generic() const;
   std::string code_name()const override;
   std::string short_label()const override { return code_name();}
 //  std::string name_of_module_instance()const  {return code_name();}
@@ -1507,6 +1511,8 @@ public:
   void set_flow_source(){ _has_flow_src=true; }
   void set_pot_source(){ _has_pot_src=true; }
   void set_filter(){ _is_filter=true; }
+  void set_direct(bool d=true);
+  void set_selfdep(bool d=true) {_selfdep = d; }
   bool has_flow_probe() const;
   bool has_pot_probe() const;
   bool has_flow_source() const { return _has_flow_src; }
@@ -1814,8 +1820,9 @@ class Contribution : public Owned_Base {
     t_pot
   } _type;
 private:
-  void set_pot_source();
-  void set_flow_source();
+  void set_pot_contrib();
+  void set_flow_contrib();
+  void set_direct(bool d=true);
   Deps& deps() { return _deps; }
 public:
   Contribution(CS& f, Block* o)
@@ -1828,6 +1835,7 @@ public:
 
   bool is_pot_contrib() const;
   bool is_flow_contrib() const;
+  bool is_direct() const;
   void parse(CS&)override;
   void dump(std::ostream&)const override;
   Deps const& deps() const { return _deps; }

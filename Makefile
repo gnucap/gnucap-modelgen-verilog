@@ -36,6 +36,7 @@ LANG_OBJS = \
 CLEAN_OBJS = \
 	${LANG_OBJS} \
 	d_vaflow.o \
+	d_vapot_br.o \
 	d_vapot.o
 
 CXXFLAGS = -Wall -std=c++11
@@ -70,8 +71,12 @@ $(TARGET): $(OBJS)
 include Make.depend
 
 modelgen_0.o: $(OBJS)
-d_vasrc.so: d_vaflow.o d_vapot.o d_va_filter.o
+d_vasrc.so: d_vaflow.o d_vapot.o d_va_filter.o d_vapot_br.o
 	${CXX} $(GNUCAP_CPPFLAGS) -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $+ ${LIBS_} -o $@
+
+d_vapot.o: d_va.h
+d_vaflow.o: d_va.h
+d_vapot_br.o: d_va.h
 
 lang_verilog.so: ${LANG_OBJS}
 	${CXX} -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $+ ${LIBS_} -o $@
