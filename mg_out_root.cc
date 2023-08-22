@@ -113,15 +113,17 @@ static void make_common_nature(std::ostream& o, const File& f)
 void make_cc(std::ostream& out, const File& in)
 {
   indent x; // HACK
+  int num = 0;
   make_header(out, in, "dumpname");
   make_common_nature(out, in);
   for (Module_List::const_iterator
        m = in.module_list().begin();
        m != in.module_list().end();
        ++m) {
-    // make_cc_common(out, **m);
+    out << "namespace n" << std::to_string(num) << "{\n";
     make_cc_module(out, **m);
-    // make_cc_dev(out, **m);
+    out << "}\n";
+    ++num;
   }
   make_tail(out, in);
 }
