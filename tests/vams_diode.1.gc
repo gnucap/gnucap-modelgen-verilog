@@ -25,3 +25,5 @@ V1  (n, 0) vsource dc=v ac=1
 
 .print ac v(nodes)
 .ac 1 1000k * 10
+
+.status notime
