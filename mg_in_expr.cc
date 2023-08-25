@@ -257,6 +257,7 @@ static Module const* to_module(Block const* owner)
   while(true){
     if(auto m = dynamic_cast<Module const*>(owner)){
       return m;
+    }else{
     }
     owner = owner->owner();
     assert(owner);
@@ -282,16 +283,16 @@ static bool is_analog_function_call(std::string const& f, Block const* owner)
 static bool is_xs_function(std::string const& f, Block const* owner)
 {
   assert(owner);
+  Module const* m = NULL;
   while(true){
     if(dynamic_cast<Analog_Function const*>(owner)){
       return false;
-    }else if(dynamic_cast<Module const*>(owner)){
+    }else if((m = dynamic_cast<Module const*>(owner))){
       break;
     }
     owner = owner->owner();
     assert(owner);
   }
-  auto m = to_module(owner);
   assert(m);
   File const* file = m->file();
   if(!file){
@@ -302,24 +303,28 @@ static bool is_xs_function(std::string const& f, Block const* owner)
   assert(file);
   if(f=="flow" || f=="potential"){ untested();
     return true;
-  }else if(!file){ untested();
-    // fallback. modelgen_0.cc // incomplete();
-    return f=="V" || f=="I" || f=="flow" || f=="potential" || f=="Pwr";
+  }else if(file){
+    // use actual disciplines
+    // auto const& nl = file->nature_list();
+    // return find_ptr(nl.begin(), nl.end(), f);
   }else{
+    // fallback. modelgen_0.cc // incomplete();
+    return f=="V" || f=="I" || f=="Pwr";
   }
 
+  /// TODO ///
   for(auto n: file->nature_list()){
     if(n->access().to_string() == f){
       return true;
     }else{
     }
   }
-  // stub, need discipline.h
   return false;
 }
 /*--------------------------------------------------------------------------*/
-Token_PROBE* resolve_xs_function(Expression& E, std::string const& n, Block* o)
+Token_PROBE* resolve_xs_function(Expression& E, std::string const& n, DEP_STACK& ds, Block* o)
 {
+  ds.pop_args();
   trace1("xsf", n);
   if(E.is_empty()) { untested();
     throw Exception("syntax error");
@@ -360,7 +365,9 @@ Token_PROBE* resolve_xs_function(Expression& E, std::string const& n, Block* o)
     name += ")";
 
     trace3("got a probe", name, arg1, arg0);
-    return new Token_PROBE(name, p);
+    Token_PROBE* nt = new Token_PROBE(name, p);
+    ds.set(nt->prb());
+    return nt;
   }
 } // resolve_xs_function
 /*--------------------------------------------------------------------------*/
@@ -432,10 +439,8 @@ void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps* dep
     }else if(!E.is_empty() && dynamic_cast<Token_PARLIST*>(E.back())
 	  && is_xs_function(n, scope)) {
       trace2("resolve XS", ds.size(), ds.num_args());
-      Token_PROBE* t = resolve_xs_function(E, n, scope);
+      Token_PROBE* t = resolve_xs_function(E, n, ds, scope);
       E.push_back(t);
-      ds.pop_args();
-      ds.set(t->prb());
     }else if(auto p = dynamic_cast<Parameter_Base const*>(r)) {
       ds.new_constant();
       E.push_back(new Token_PAR_REF(n, p));

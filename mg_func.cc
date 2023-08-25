@@ -178,7 +178,6 @@ public:
 } p_exp;
 DISPATCHER<FUNCTION>::INSTALL d_exp(&function_dispatcher, "exp|$exp", &p_exp);
 /*--------------------------------------------------------------------------*/
-#if 1
 class limexp : public MGVAMS_FUNCTION {
 public:
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {
@@ -190,7 +189,7 @@ public:
   void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";
     o__ "T " << code_name() << "(T d) const{\n";
-    o____ "const double lt = 38.;\n";
+    o____ "const double lt = 80.;\n";
     o____ "double nv;\n";
     o____ "double nd;\n";
     o____ "if(d>lt){\n";
@@ -215,7 +214,6 @@ public:
   }
 } p_limexp;
 DISPATCHER<FUNCTION>::INSTALL d_limexp(&function_dispatcher, "limexp|$limexp", &p_limexp);
-#endif
 /*--------------------------------------------------------------------------*/
 class abs : public MGVAMS_FUNCTION {
 public:
@@ -287,11 +285,31 @@ public:
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::log(x));
   }
-  void make_cc_common(std::ostream& o)const override {
-    o << "// dummy " << label() << "\n";
+  void make_cc_common(std::ostream& o)const override{
+    o__ "template<class T>\n";
+    o__ "T " << code_name() << "(T d)const {itested();\n";
+    o____ "double l=-1e99;\n";
+    o____ "if(d>1e-60){itested();\n";
+    o______ "l = std::log(double(d));\n";
+    o______ "chain(d, 1./double(d));\n";
+    o____ "}else if(d>0){ untested();\n";
+    o______ "l=-1e60;\n";
+    o______ "chain(d, 1e60);\n";
+    o____ "}else{\n";
+    o______ "unreachable();\n";
+    o______ "l=-1e40;\n";
+    o______ "chain(d, 1e40);\n";
+    o____ "}\n";
+    o____ "::set_value(d, l);\n";
+    o____ "return d;\n";
+    o____ "}\n";
   }
   std::string code_name()const override{
-    return "va::ln";
+    return "_f_ln";
+  }
+  Token* new_token(Module& m, size_t /*na*/)const override{
+    m.install(this);
+    return new Token_SYMBOL("ln", "");
   }
 } p_ln;
 DISPATCHER<FUNCTION>::INSTALL d_ln(&function_dispatcher, "ln|$log", &p_ln);
@@ -319,11 +337,33 @@ public:
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::sqrt(x));
   }
-  void make_cc_common(std::ostream& o)const override {
-    o << "// dummy " << label() << "\n";
+  void make_cc_common(std::ostream& o)const override{
+    o__ "template<class T>\n";
+    o____ "T " << code_name() << "(T d)const {itested();\n";
+    o______ "if(double(d)>1e-90){ itested();\n";
+    o________ "double s = std::sqrt(d);\n";
+    o________ "d.value() = s;\n";
+    o________ "chain(d, .5/s);\n";
+    o______ "}else if(d>0){ untested();\n";
+    o________ "chain(d, 5e91);\n";
+    o________ "d.value() = std::sqrt(d);\n";
+    o______ "}else if(d==0){ itested();\n";
+    o________ "chain(d, .5e200);\n";
+    o________ "d.value() = 0.;\n";
+    o______ "}else{\n";
+    o________ "unreachable();\n";
+    o________ "chain(d, .5e99);\n";
+    o________ "d.value() = 0.;\n";
+    o______ "}\n";
+    o____ "return d;\n";
+    o__ "}\n";
   }
   std::string code_name()const override{
-    return "va::sqrt";
+    return "_f_sqrt";
+  }
+  Token* new_token(Module& m, size_t /*na*/)const override{
+    m.install(this);
+    return new Token_SYMBOL("sqrt", "");
   }
 } p_sqrt;
 DISPATCHER<FUNCTION>::INSTALL d_sqrt(&function_dispatcher, "sqrt|$sqrt", &p_sqrt);

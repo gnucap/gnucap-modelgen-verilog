@@ -618,34 +618,35 @@ T log10(T& d)
 	return d;
 }
 
-template<class T>
-T ln(T d)
-{itested();
-	double l=-1e99;
-	if(d>1e-40){itested();
-		l = std::log(double(d));
-		chain(d, 1./double(d));
-	}else if(d>0){ untested();
-		l=-1e40;
-		chain(d, 1e40);
-	}else{
-		unreachable();
-		l=-1e40;
-		chain(d, 1e40);
-	}
-	set_value(d, l);
-//	assert(d.is_same(d));
-	return d;
-}
 
 template<class T, class S>
 struct ddouble_if{
 	typedef T type;
 };
 
+template<class S>
+struct ddouble_if<PARAMETER<double>, S>{
+	typedef double type;
+};
+
+template<>
+struct ddouble_if<PARAMETER<double>, double>{
+	typedef double type;
+};
+
 template<class T, int a>
 struct ddouble_if<T, ddouble_<a>>{
 	typedef ddouble_<a> type;
+};
+
+template<>
+struct ddouble_if<double, double>{
+	typedef double type;
+};
+
+template<class T>
+struct ddouble_if<T, double>{
+	typedef typename ddouble_if<double, T>::type type;
 };
 
 template<class S, class T>
@@ -716,27 +717,6 @@ T sin(T d)
 {
 	chain(d, std::cos(d));
 	return set_value(d, std::sin(d));
-}
-
-template<class T>
-T sqrt(T d)
-{
-	if(double(d)>1e-20){ itested();
-		double s = std::sqrt(d);
-		d.value() = s;
-		chain(d, .5/s);
-	}else if(d>0){ itested();
-		chain(d, 5e21);
-		d.value() = std::sqrt(d);
-	}else if(d==0){
-		chain(d, .5e99);
-		d.value() = 1e-99;
-	}else{
-		unreachable();
-		chain(d, .5e99);
-		d.value() = 0.;
-	}
-	return d;
 }
 
 template<class T>

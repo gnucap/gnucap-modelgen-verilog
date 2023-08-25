@@ -664,8 +664,6 @@ void Branch_Ref::parse(CS& f)
   trace1("Branch_Ref::parse", f.tail().substr(0,10));
   if(f >> "("){
   }else{
-    trace1("Branch_Ref::parse BUG", f.tail().substr(0,10));
-    return; // BUG
     throw Exception_No_Match("not a branch");
   }
   std::string pp = f.ctos(",)");
@@ -704,8 +702,9 @@ void Contribution::parse(CS& cmd)
 
   _branch.set_owner(owner());
 
-  if(cmd >> _branch){
-  }else{
+  try{
+    cmd >> _branch;
+  }catch (Exception_No_Match const&){
     cmd.reset(here);
     trace2("not a Contribution", _name, cmd.tail());
     throw Exception_No_Match("not a contribution");

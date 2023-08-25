@@ -34,25 +34,11 @@ namespace{
 static void make_cc_tmp(size_t na, std::string id, std::string fcn, Filter const* f, std::ostream& o)
 {
   assert(f->has_branch());
-  o << "COMMON_" << id << "::";
-  o << "ddouble COMMON_" << id << "::FILTER" << fcn <<
-    "::operator()(";
-//  assert(na == f->num_args());
-  for(size_t n=0; n<na; ++n){
-    o << " ddouble t" << n << ", ";
-  }
-  // o << "MOD_" << m.identifier() << "* d) const\n{\n";
-  o << "COMPONENT* dd) const\n{\n";
-  o______ "// incomplete();\n"; // polarities?
-  o__ "MOD_" << id << "* d = prechecked_cast<MOD_" << id << "*>(dd);\n";
-  o__ "assert(d);\n";
 
   {
-    char sign = '+'; // TODO
+    char sign = '+';
     indent a;
-    o__ "// assert(!d->" << f->state() << "[0]);\n";
     o__ "d->" << f->state() << "[0] = " << sign << " " << "t0.value();\n";
-    //	  o__ "d->" << f->state() << "[1] = 1.;\n";
     size_t k = 2;
 
     for(auto v : f->deps()) {
@@ -73,17 +59,16 @@ static void make_cc_tmp(size_t na, std::string id, std::string fcn, Filter const
 
   {
     std::string cn = f->branch_code_name();
-    o__ "d->" << cn << "->do_tr();\n";
-    //      o__ "d->" << cn << "->q_eval();\n";
+    std::string cn_ = f->code_name();
+    o____ "d->" << cn << "->do_tr();\n";
+    o____ "// ?? d->" << cn_ << "->do_tr();\n";
+    o____ "t0 = d->" << cn << "->tr_amps();\n";
     o__ "t0 = d->" << cn << "->tr_amps();\n";
     o__ "trace2(\"filt\", t0, d->"<< cn<<"->tr_outvolts());\n";
     o__ "t0[d__filter" << cn << "] = 1.;\n";
     o__ "return t0;\n";
   }
 
-  o << "}\n"
-    "/*--------------------------------------"
-    "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
 static int n_filters;
@@ -144,7 +129,20 @@ public:
   void make_cc_impl(std::ostream&o)const override{
     assert(_m); // owner?
     assert(_f);
-    make_cc_tmp(num_args(), _m->identifier().to_string(), label(), _f, o);
+    std::string id = _m->identifier().to_string();
+    o << "COMMON_" << id << "::";
+    o << "ddouble COMMON_" << id << "::FILTER" << label() <<
+      "::operator()(";
+    for(size_t n=0; n<num_args(); ++n){
+      o << " ddouble t" << n << ", ";
+    }
+    o << "COMPONENT* dd) const\n{\n";
+    o__ "MOD_" << id << "* d = prechecked_cast<MOD_" << id << "*>(dd);\n";
+    o__ "assert(d);\n";
+    make_cc_tmp(num_args(), id, label(), _f, o);
+    o << "}\n"
+      "/*--------------------------------------"
+      "------------------------------------*/\n";
   }
   void make_cc_common(std::ostream& o)const override{
     o__ "class FILTER" << label() << "{\n";

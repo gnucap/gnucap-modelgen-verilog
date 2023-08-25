@@ -35,9 +35,11 @@ public:
 
 private:
   explicit Token_PROBE(const Token_PROBE& P)
-	  : Token_SYMBOL(P), _prb(P._prb) {}
-  Token* clone()const  override{return new Token_PROBE(*this);}
-  void stack_op(Expression* e)const override{
+    : Token_SYMBOL(P), _prb(P._prb) {}
+  Token* clone()const override {
+    return new Token_PROBE(*this);
+  }
+  void stack_op(Expression* e)const override {
     e->push_back(clone());
   }
 
@@ -55,7 +57,7 @@ private:
   Token* clone()const  override{return new Token_AFCALL(*this);}
   void stack_op(Expression* e)const override;
 public:
-  std::string code_name() const{
+  std::string code_name()const {
     return "af_" + name();
 //    assert(_item);
 //   return _item->code_name();
@@ -68,7 +70,9 @@ public:
     : Token_SYMBOL(Name, "") {}
 private:
   explicit Token_SFCALL(const Token_SFCALL& P) : Token_SYMBOL(P) {}
-  Token* clone()const  override{return new Token_SFCALL(*this);}
+  Token* clone()const override {
+    return new Token_SFCALL(*this);
+  }
   void stack_op(Expression* e)const override;
 };
 /*--------------------------------------------------------------------------*/
@@ -79,8 +83,11 @@ public:
   explicit Token_PAR_REF(const std::string Name, Parameter_Base const* item)
     : Token_SYMBOL(Name, ""), _item(item) {}
 private:
-  explicit Token_PAR_REF(const Token_PAR_REF& P) : Token_SYMBOL(P), _item(P._item) {}
-  Token* clone()const  override{return new Token_PAR_REF(*this);}
+  explicit Token_PAR_REF(const Token_PAR_REF& P)
+    : Token_SYMBOL(P), _item(P._item) {}
+  Token* clone()const override {
+    return new Token_PAR_REF(*this);
+  }
   void stack_op(Expression* e)const override{
     e->push_back(clone());
   }
