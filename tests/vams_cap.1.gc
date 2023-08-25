@@ -7,15 +7,19 @@ load ../vams/resistor.so
 options bypass
 verilog
 
-capacitor #(.c(.5) .m(2)) c1(0, out);
+module main(in out gnd);
+capacitor #(.c(.5) .m(2)) c1(gnd, out);
 resistor #(.r(2) .m(2)) r1(in, out)
+endmodule
+
+main #() dut(in out 0)
 
 spice
 
 V1 in 0 ac 1 dc 0.9 tran sin
 
-.print tran v(nodes)
-.print dc v(nodes)
+.print tran v(nodes) iter(0)
+.print dc v(nodes) iter(0)
 .print ac vm(nodes) vp(nodes)
 
 .dc
