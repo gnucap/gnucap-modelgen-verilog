@@ -1656,6 +1656,7 @@ private: // merge?
   std::list<FUNCTION_ const*> _func;
   std::set<FUNCTION_ const*> _funcs;
   size_t _num_evt_slots{0};
+  bool _has_analysis{false};
 private: // elaboration data
   Probe_Map _probes;
   Branch_Names _branch_names;
@@ -1689,8 +1690,10 @@ public:
     	size_t		min_nodes()const	{return ports().size();}
     	size_t		max_nodes()const	{return ports().size();}
     	size_t		net_nodes()const	{return ports().size();}
-  size_t num_evt_slots()const {return _num_evt_slots; }
+  bool has_events()const {return _num_evt_slots;}
+  bool has_analysis()const {return _has_analysis;}
   void new_evt_slot() { ++_num_evt_slots; }
+  size_t num_evt_slots()const {return _num_evt_slots; }
 public:
   const Probe_Map&	probes()const		{return _probes;}
   const Filter_List&	filters()const		{return _filters;}
@@ -1711,6 +1714,7 @@ public:
     assert(_attributes);
     return *_attributes;
   }
+  void set_analysis() {_has_analysis = true; }
   void set_attributes(Attribute_Instance const* a) {
     assert(!_attributes);
     _attributes = a;

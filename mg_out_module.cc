@@ -333,24 +333,8 @@ static void make_build_netlist(std::ostream& o, const Module& m)
 void make_module_default_constructor(std::ostream& o, const Module& m)
 {
   make_tag();
-  o << "MOD_" << m.identifier() << "::MOD_" << m.identifier() << "() :" << baseclass(m) << "()";
-
-//  o << ",\n   // input parameters";
-//  make_construct_parameter_list(o, m.parameters());
-
-//  o << ",\n   // calculated parameters";
-//  make_construct_parameter_list(o, m.device().calculated());
-
-//  o << ",\n   // netlist";
-//  for (Element_1_List::const_iterator
-//       p = m.elements().begin();
-//       p != m..elements().end();
-//       ++p) { untested();
-//    o << ",\n   _" << (**p).name() << "(0)";
-//  }
-//
-  
-
+  o << "MOD_" << m.identifier() << "::MOD_" << m.identifier() << "()\n";
+  o << "    :" << baseclass(m) << "()";
   o << "\n{\n"
     "  _n = _nodes;\n"
     "  attach_common(&Default_" << m.identifier() << ");\n"
@@ -400,16 +384,47 @@ static void make_do_tr(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_tr_advance(std::ostream& o, const Module& m)
+{
+  o << "inline void MOD_" << m.identifier() << "::tr_advance()\n{\n";
+  if(m.has_analysis()) {
+    o__ "COMMON_" << m.identifier() << " const* c = "
+      "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
+    o__ "assert(c);\n";
+    o__ "if(_sim->_last_time == 0.){\n";
+    o__ "c->tr_eval_analog(this);\n";
+    o__ "}else{\n";
+    o__ "}\n";
+  }else{
+  }
+  o__ "set_not_converged();\n";
+  o__ "return " << baseclass(m) << "::tr_advance();\n";
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
 static void make_tr_review(std::ostream& o, const Module& m)
 {
   o << "inline TIME_PAIR MOD_" << m.identifier() << "::tr_review()\n{\n";
   if(m.num_evt_slots()){
     o__ "if(_evt_seek){\n";
     o____ "q_accept();\n";
-    o__ "}else{itested();\n";
-    o__ "}\n";
+    o__ "}else ";
   }else{
+    o__ "";
   }
+#if 0
+  if(m.has_analysis()){
+    o << "if(_sim->analysis_is_tran_static()){ untested();\n";
+    o____ "q_accept();\n";
+    o__ "}else ";
+  }else{
+    o__ "";
+  }
+#endif
+  o << "{itested();\n";
+  o__ "}\n";
   o__ "return " << baseclass(m) << "::tr_review();\n";
   o << "}\n"
     "/*--------------------------------------"
@@ -419,11 +434,23 @@ static void make_tr_review(std::ostream& o, const Module& m)
 static void make_tr_accept(std::ostream& o, const Module& m)
 {
   o << "inline void MOD_" << m.identifier() << "::tr_accept()\n{\n";
+  if(m.num_evt_slots()){
   o__ "for(unsigned i=0; i<_evt_seek; ++i){\n";
   o____ "(*_evt[i])();\n";
   // o____ "(this->*_evt[i])();\n";
   o__ "}\n";
-  o__ "_evt_seek = 0;"; // needed?
+  o__ "_evt_seek = 0;\n"; // needed?
+  }else{
+  }
+#if 0
+  if(m.has_analysis()) {
+    o__ "COMMON_" << m.identifier() << " const* c = "
+      "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
+    o__ "assert(c);\n";
+    o__ "c->tr_eval_analog(this);\n";
+  }else{
+  }
+#endif
   o__ "return " << baseclass(m) << "::tr_accept();\n";
   o << "}\n"
     "/*--------------------------------------"
@@ -522,10 +549,19 @@ static void make_module_class(std::ostream& o, Module const& m)
     make_cc_analog(o, m);
   }else{
   }
-  if(m.num_evt_slots()){
-    make_tr_accept(o, m);
+  if(m.has_events()){
     make_tr_review(o, m);
+    make_tr_accept(o, m);
+  }else if(m.has_analysis()){
+    make_tr_review(o, m);
+    make_tr_accept(o, m);
   }else{
+  }
+
+  if(m.has_analog_block()){
+    make_tr_advance(o, m);
+  }else{
+    assert(!m.has_analysis());
   }
 
   // TODO: set_port_by_name
@@ -949,43 +985,6 @@ static void make_module_dispatcher(std::ostream& o, Module const& m)
       "/*--------------------------------------"
       "------------------------------------*/\n";
 }
-/*--------------------------------------------------------------------------*/
-#if 0
-static void make_module_probe_num(std::ostream& out, const Module& d)
-{ untested();
-  make_tag();
-  out << "double DEV_" << d.name() << "::tr_probe_num(const std::string& x)const\n"
-    "{\n"
-    "  assert(_n);\n"
-    "  const COMMON_" << d.name() << "* c = prechecked_cast<const COMMON_"
-      << d.name() << "*>(common());\n"
-    "  assert(c);\n"
-    "  const MODEL_" << d.model_type() << "* m = prechecked_cast<const MODEL_"
-      << d.model_type() << "*>(c->model());\n"
-    "  assert(m);\n"
-    "  const SDP_" << d.model_type() << "* s = prechecked_cast<const SDP_"
-      << d.model_type() << "*>(c->sdp());\n"
-    "  assert(s);\n"
-    "\n"
-    "  ";
-//   for (Probe_List::const_iterator
-//        p = d.probes().begin();
-//        p != d.probes().end();
-//        ++p) { untested();
-//     assert(*p);
-//     out << "if (Umatch(x, \"" << (**p).name() << " \")) {\n"
-//       "    return " << fix_expression((**p).expression()) << ";\n"
-//       "  }else ";
-//   }
-  make_probe_parameter_list(out, d.device().calculated());
-  out << "{\n"
-    "    return BASE_SUBCKT::tr_probe_num(x);\n"
-    "  }\n"
-    "}\n"
-    "/*--------------------------------------"
-    "------------------------------------*/\n";
-}
-#endif
 /*--------------------------------------------------------------------------*/
 void make_cc_module(std::ostream& o, const Module& m)
 {

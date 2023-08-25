@@ -1,0 +1,8 @@
+load ../lang_verilog.so 
+     ^ ? "../lang_verilog.so": already loaded, replacing
+#Time       v(out)     loss(c1.ddt_1) loss(c1._b_p_n) iter(0)   
+ 0.         0.99999    1.         100.K      3.        
+ 0.01       0.99009    1.         0.         3.        
+ 0.0925     0.91164    1.         0.         3.        
+ 0.395      0.6721     1.         0.         3.        
+ 1.         0.35992    1.         0.         3.        

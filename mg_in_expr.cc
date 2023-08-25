@@ -301,7 +301,7 @@ static bool is_xs_function(std::string const& f, Block const* owner)
   }
 
   assert(file);
-  if(f=="flow" || f=="potential"){ untested();
+  if(f=="flow" || f=="potential"){ itested();
     return true;
   }else if(file){
     // use actual disciplines

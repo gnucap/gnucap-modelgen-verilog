@@ -1,0 +1,19 @@
+load ../lang_verilog.so 
+     ^ ? "../lang_verilog.so": already loaded, replacing
+#Time       v(out)     loss(c1.idt_1) loss(c1._b_p_n) iter(0)   
+ 0.        -1.         1.         0.         3.        
+ 1.6745n   -1.         1.         0.         24.       
+ 2.7745n   -1.         1.         0.         3.        
+ 24.248u   -0.99998    1.         0.         3.        
+ 325.26u   -0.99967    1.         0.         3.        
+ 0.026632  -0.97372    1.         0.         3.        
+ 0.13478   -0.87381    1.         0.         3.        
+ 0.30783   -0.73464    1.         0.         3.        
+ 0.53855   -0.58268    1.         0.         3.        
+ 0.76928   -0.46214    1.         0.         3.        
+ 1.        -0.36654    1.         0.         3.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=54, fourier=0, total=72
+transient timesteps: accepted=11, rejected=7, total=18
+nodes: user=1, subckt=0, model=1, total=2
+dctran density=100.0%, ac density=100.0%

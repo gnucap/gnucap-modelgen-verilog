@@ -10,3 +10,16 @@ module inductor(p,n);
 		I(p,n) <+ idt(V(p,n)) / l;
 	end
 endmodule
+
+module inductor(p,n);
+	inout p,n;
+	electrical p,n;
+	
+	parameter real l = 1. from [0.:inf);
+	parameter real ic = 0.;
+	
+	analog begin
+		I(p,n) <+ idt(V(p,n), ic*l) / l;
+	end
+endmodule
+

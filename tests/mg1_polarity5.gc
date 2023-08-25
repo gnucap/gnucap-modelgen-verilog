@@ -1,0 +1,39 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_pol5(p, n, cp, cn);
+	electrical p, n, cp, cn;
+	inout p, n, cp, cn;
+	branch (n, p) br_reverse;
+	branch (p, n) br;
+	branch (cn, cp) in_reverse;
+	branch (cp, cn) in;
+	analog begin
+		I(br) <+ 1.;
+		I(br_reverse) <+ -1.;
+		I(br) <+ V(in)
+		I(br_reverse) <+ V(in_reverse);
+	end
+endmodule
+
+!make test_pol5.so > /dev/null
+attach ./test_pol5.so
+
+parameter v=0
+
+test_pol5 #() dut(1,0,2,0);
+resistor #(1) r(1,0)
+
+spice
+
+v1 2 0 dc 2 ac 1
+
+.print dc v(nodes) iter(0)
+.print ac v(nodes) vp(1) iter(0)
+
+.dc
+.ac

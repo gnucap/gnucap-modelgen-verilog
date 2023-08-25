@@ -66,6 +66,34 @@ class DUMMY2 : public MGVAMS_FUNCTION {
 DISPATCHER<FUNCTION>::INSTALL d_min(&function_dispatcher, "min|$min", &dummy2);
 DISPATCHER<FUNCTION>::INSTALL d_max(&function_dispatcher, "max|$max", &dummy2);
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+class ANALYSIS : public MGVAMS_FUNCTION {
+  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+    return "analysis";
+  }
+  std::string code_name()const override{
+    return "_f_analysis";
+  }
+  Token* new_token(Module& m, size_t na)const override{
+    m.set_analysis();
+    return MGVAMS_FUNCTION::new_token(m, na);
+  }
+  void make_cc_common(std::ostream& o)const override {
+    o__ "double " << code_name() << "(std::string const& what)const {\n";
+    o____ "if(what==\"ic\"){\n";
+    o______ "return _sim->analysis_is_tran_static();\n";
+    o____ "}else if(what==\"static\"){\n";
+    o______ "return _sim->analysis_is_static();\n";
+    o____ "}else{ untested();\n";
+    o______ "incomplete();\n";
+    o______ "return false;\n";
+    o____ "}\n";
+    o__ "}\n";
+  }
+} analysis;
+DISPATCHER<FUNCTION>::INSTALL d_analysis(&function_dispatcher, "analysis", &analysis);
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 class PARAM_GIVEN : public MGVAMS_FUNCTION {
   std::string eval(CS&, const CARD_LIST*)const override{
     return "$param_given";
@@ -82,7 +110,7 @@ class PARAM_GIVEN : public MGVAMS_FUNCTION {
 DISPATCHER<FUNCTION>::INSTALL d_pg(&function_dispatcher, "$param_given", &pg);
 /*--------------------------------------------------------------------------*/
 class SIMPARAM : public MGVAMS_FUNCTION {
-  std::string eval(CS&, const CARD_LIST*)const override{
+  std::string eval(CS&, const CARD_LIST*)const override{ untested();
     return "$$simparam";
   }
   std::string code_name()const override{
@@ -193,10 +221,10 @@ public:
     o____ "double nv;\n";
     o____ "double nd;\n";
     o____ "if(d>lt){\n";
-    o______ "nv = std::exp(lt) * (1.0 + d - lt);\n";
+    o______ "nv = std::exp(lt) * (1.0 - lt + d);\n";
     o______ "nd = std::exp(lt);\n";
     o____ "}else if(d<-lt){\n";
-    o______ "nv = std::exp(-lt) * (1.0 + d + lt);\n";
+    o______ "nv = std::exp(-lt) * (1.0 + lt + d);\n";
     o______ "nd = std::exp(-lt);\n";
     o____ "}else{\n";
     o______ "nv = nd = std::exp(d);\n";
@@ -225,9 +253,9 @@ public:
   }
   void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";
-    o____ "T " << code_name() << "(T d)const {untested();\n";
-    o____ "if(d>=0.){untested();\n";
-    o____ "}else{untested();\n";
+    o____ "T " << code_name() << "(T d)const {itested();\n";
+    o____ "if(d>=0.){itested();\n";
+    o____ "}else{itested();\n";
     o______ "d *= -1.;\n";
     o____ "}\n";
     o____ "return d;\n";

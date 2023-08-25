@@ -179,7 +179,7 @@ DISPATCHER<CARD>::INSTALL d4(&device_dispatcher, "va_ddt|f_ddt0", &p4);
 TIME_PAIR DEV_DDT::tr_review()
 {
   COMPONENT::tr_review(); // skip ELEMENT
-  if (_method_a == mEULER) {
+  if (_method_a == mEULER) { untested();
     // Backward Euler, no step control, take it as it comes
   }else{
     double timestep = tr_review_trunc_error(_y);
@@ -208,12 +208,12 @@ DISPATCHER<CARD>::INSTALL
   d1(&device_dispatcher, "va_idt|f_idt0", &p1);
 /*--------------------------------------------------------------------------*/
 void DEV_IDT::ac_load()
-{
+{ untested();
   ac_load_shunt(); // 4 pt +- loss
   _acg = _vy0[1] * _sim->_jomega;
   trace4("load", _vy0[0], _vy0[1], _loss0, _loss1);
   ac_load_passive();
-  for (int i=2; i<=_n_ports; ++i) {
+  for (int i=2; i<=_n_ports; ++i) { untested();
     trace2("load", i, _vy0[i]);
     ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _vy0[i] / _sim->_jomega);
   }
@@ -222,7 +222,7 @@ void DEV_IDT::ac_load()
 TIME_PAIR DEV_IDT::tr_review()
 {
   COMPONENT::tr_review(); // skip ELEMENT
-  if (_method_a == mEULER) {
+  if (_method_a == mEULER) { untested();
     // Backward Euler, no step control, take it as it comes
   }else{
     double timestep = tr_review_trunc_error(_i);
@@ -265,12 +265,12 @@ DEV_CPOLY_CAP::DEV_CPOLY_CAP()
 {
 }
 /*--------------------------------------------------------------------------*/
-DEV_CPOLY_CAP::~DEV_CPOLY_CAP() 
+DEV_CPOLY_CAP::~DEV_CPOLY_CAP()
 {
   delete [] _vy1;
   delete [] _vi0;
   delete [] _vi1;
-  if (net_nodes() > NODES_PER_BRANCH) {
+  if (net_nodes() > NODES_PER_BRANCH) { untested();
     delete [] _n;
   }else{
     // it is part of a base class
@@ -292,6 +292,7 @@ bool DEV_CPOLY_CAP::do_tr_con_chk_and_q()
   }
   set_converged();
   trace2("DEV_CPOLY_CAP::do_tr_con_chk_and_q", long_label(), converged());
+  trace3("DEV_CPOLY_CAP::do_tr_con_chk_and_q done", long_label(), _y[0].f0, _y[1].f0);
   return converged();
 }
 /*--------------------------------------------------------------------------*/
@@ -306,6 +307,7 @@ void DEV_DDT::tr_begin()
 {
   DEV_CPOLY_CAP::tr_begin();
   _loss1 = _loss0 = 1.;
+  trace4("DEV_DDT::tr_begin", long_label(), _y[0].f0, _y[1].f0, LINEAR);
 }
 /*--------------------------------------------------------------------------*/
 void DEV_IDT::tr_begin()
@@ -323,9 +325,15 @@ bool DEV_DDT::do_tr()
   assert(_vy0[1] == 0.);
   _y[0].f1 = 0; // _vy0[1]; // another state, capacity.?
   
-  trace2("DEV_DDT::do_tr", long_label(), _sim->iteration_tag());
-  _i[0] = differentiate(_y, _i, _time, _method_a);
-  trace3("DIFFD", _i[0].f0, _i[0].f1, _y[0].f0);
+  trace4("DEV_DDT::do_tr", long_label(), _y[0].f0, _y[1].f0, _y1.f0);
+  trace3("DEV_DDT::do_tr", long_label(), _sim->iteration_tag(), _sim->_time0);
+  if(_sim->is_advance_iteration()){
+    // return true;
+  }else{
+    _i[0] = differentiate(_y, _i, _time, _method_a);
+  }
+  trace4("DIFFD", _i[0].f0, _i[0].f1, _y[0].f0, _sim->_time0);
+  assert(_i[0].f0 < 1e99);
   _vi0[0] = _i[0].f0;
   _vi0[1] = _i[0].f1;
   assert(_vi0[0] == _vi0[0]);
@@ -342,7 +350,8 @@ bool DEV_DDT::do_tr()
   }
   
   _m0 = CPOLY1(0., _vi0[0], _vi0[1]);
-  trace3("DEV_DDT::do_tr", _m0.x, _m0.c0, _m0.c1);
+  trace3("DEV_DDT::do_tr done", _m0.x, _m0.c0, _m0.c1);
+  trace3("DEV_DDT::do_tr done", long_label(), _y[0].f0, _y[1].f0);
   return do_tr_con_chk_and_q();
 }
 /*--------------------------------------------------------------------------*/
@@ -410,6 +419,8 @@ void DEV_CPOLY_CAP::tr_unload()
 /*--------------------------------------------------------------------------*/
 double DEV_CPOLY_CAP::tr_amps()const
 {
+  assert(_i[0].f0 == _i[0].f0);
+  assert(_i[0].f0 < 1e99);
   return _i[0].f0;
 }
 /*--------------------------------------------------------------------------*/
@@ -451,7 +462,7 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
     _vi0 = new double[n_states];
     _vi1 = new double[n_states];
 
-    if (net_nodes() > NODES_PER_BRANCH) {
+    if (net_nodes() > NODES_PER_BRANCH) { untested();
       // allocate a bigger node list
       _n = new node_t[net_nodes()];
     }else{
@@ -481,7 +492,7 @@ double DEV_CPOLY_CAP::tr_probe_num(const std::string& x)const
 {
   if (Umatch(x, "loss ")) {
     return _loss0;
-  }else if (Umatch(x, "conv ")) {
+  }else if (Umatch(x, "conv ")) { untested();
     return converged();
   }else{
     return STORAGE::tr_probe_num(x);

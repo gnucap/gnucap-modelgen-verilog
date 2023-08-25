@@ -139,6 +139,9 @@ void make_common_set_param_by_name(std::ostream& o, const Module& m)
   o << "void COMMON_" << m.identifier() << "::set_param_by_name("
        "std::string Name, std::string Value)\n{\n";
 
+  // BUG, mix into name/alias map below
+  o__ "if(Name == \"$mfactor\"){ Name = \"m\"; }\n";
+
   o__ "static std::string names[] = {";
   int cnt = 0;
   std::vector<std::string const*> names;

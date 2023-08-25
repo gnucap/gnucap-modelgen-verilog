@@ -9,7 +9,6 @@
 - V(..) <+ I(..) does not work, revisit mg2_ccvs.1.gc
 - flow on rhs after contrib doesn't work
 - ac needs operating point, even if linear: mg2_cccs.0.gc
-- conditional ddt (and others) does not work
 
 == simulator plugins
 - still missing tiebreak rules in overload

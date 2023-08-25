@@ -1,0 +1,6 @@
+parameter v=0 
+test_pol4 #() dut (.p(1),.n(0),.cp(2),.cn(0));
+vsource #(.dc(2)) v (.p(2),.n(0));
+resistor #(.r(1)) r (.p(1),.n(0));
+#           v(1)       v(2)      
+ 0.        -6.         2.        

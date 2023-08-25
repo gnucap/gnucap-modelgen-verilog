@@ -611,6 +611,7 @@ void INSTANCE::expand()
     subckt()->erase(j);
   }
   if(gotit){
+   // error(bDEBUG, long_label() + " got one: " + to_string(gotit->param_count()) + "\n");
     subckt()->push_back(gotit);
   }else{
   }

@@ -1,0 +1,23 @@
+
+load ../d_vasrc.so
+load ../lang_verilog.so
+load ../vams/inductor.so
+load ../vams/resistor.so
+
+options debug
+
+options bypass
+verilog
+
+inductor #(.ic(1) .l(1) .m(1)) c1(out, 0);
+resistor #(.r(2) .m(2)) r1(0, out)
+
+print tran v(nodes) loss(c1.*) iter(0)
+print dc v(nodes)
+print ac vm(nodes) vp(nodes)
+
+// options method=euler
+// dc
+tran 1 trace=n
+status notime
+end

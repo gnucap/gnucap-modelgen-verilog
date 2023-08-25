@@ -142,10 +142,12 @@ class LIMIT : public MGVAMS_TASK {
     o______ "assert(what == \"pnjlim\"); // for now\n";
     o______ "if(_sim->is_initial_step()) {\n";
     o________ "in = 0.;\n";
+    o________ "_old = 0;\n";
     o______ "}else{\n";
+    // o________ "in = ngspice_pnjlim(in, _old, a, b);\n";
     o________ "in = pnj_limit(in, _old, a, b);\n";
+    o________ "_old = old;\n";
     o______ "}\n";
-    o______ "_old = old;\n";
     o______ "// convcheck old vs in?\n";
     o______ "return in;\n";
     o____ "}\n";

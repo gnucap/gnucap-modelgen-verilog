@@ -57,41 +57,41 @@ static void make_cc_tmp(size_t na, std::string id, std::string fcn, Filter const
     }
   }
 
-  {
+  if(0){
     std::string cn = f->branch_code_name();
-    std::string cn_ = f->code_name();
     o____ "d->" << cn << "->do_tr();\n";
-    o____ "// ?? d->" << cn_ << "->do_tr();\n";
     o____ "t0 = d->" << cn << "->tr_amps();\n";
-    o__ "t0 = d->" << cn << "->tr_amps();\n";
     o__ "trace2(\"filt\", t0, d->"<< cn<<"->tr_outvolts());\n";
     o__ "t0[d__filter" << cn << "] = 1.;\n";
+    o__ "assert(t0 == t0);\n";
     o__ "return t0;\n";
   }
 
 }
 /*--------------------------------------------------------------------------*/
 static int n_filters;
-// TODO: move implementation to filters
-// Token* //
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class DDT : public MGVAMS_FILTER {
+class XDT : public MGVAMS_FILTER {
   Module* _m{NULL};
   Filter const* _f{NULL};
+  // Branch_Ref _br;
+protected:
+  Branch const* _br{NULL};
+protected:
+  explicit XDT() : MGVAMS_FILTER() {
+  }
+  explicit XDT(XDT const& p) : MGVAMS_FILTER(p) {
+  }
+  virtual XDT* clone()const = 0;
+  virtual void make_assign(std::ostream& o) const = 0;
 public:
-  DDT(std::string label="ddt") {
-    set_label(label);
-  }
-  DDT* clone()const /*override*/{
-    return new DDT(*this);
-  }
   Token* new_token(Module& m, size_t na, Deps& d)const override{
     Filter* f = NULL;
 
     std::string filter_code_name = label() + "_" + std::to_string(n_filters++);
 
-    DDT* cl = clone();
+    XDT* cl = clone();
     {
       f = new Filter(filter_code_name, d /*?*/);
       f->set_owner(&m);
@@ -114,6 +114,7 @@ public:
       assert(br);
       assert(const_cast<Branch const*>(br)->owner());
       Branch_Ref prb(br);
+      cl->_br = br;
       f->set_output(prb);
 //	br->set_element(f);
       br->set_filter();
@@ -140,6 +141,8 @@ public:
     o__ "MOD_" << id << "* d = prechecked_cast<MOD_" << id << "*>(dd);\n";
     o__ "assert(d);\n";
     make_cc_tmp(num_args(), id, label(), _f, o);
+
+    make_assign(o);
     o << "}\n"
       "/*--------------------------------------"
       "------------------------------------*/\n";
@@ -158,9 +161,53 @@ public:
     unreachable();
     return "ddt";
   }
+};
+/*--------------------------------------------------------------------------*/
+class DDT : public XDT{
+public:
+  explicit DDT() : XDT() {
+    set_label("ddt");
+  }
+  DDT* clone()const /*override*/{
+    return new DDT(*this);
+  }
+private:
+  void make_assign(std::ostream& o)const {
+    std::string cn = _br->code_name();
+    o____ "d->" << cn << "->do_tr();\n";
+    o____ "t0 = d->" << cn << "->tr_amps();\n";
+    o__ "trace2(\"filt\", t0, d->"<< cn<<"->tr_outvolts());\n";
+    o__ "t0[d__filter" << cn << "] = 1.;\n";
+    o__ "assert(t0 == t0);\n";
+    o__ "return t0;\n";
+  }
 } ddt;
 DISPATCHER<FUNCTION>::INSTALL d_ddt(&function_dispatcher, "ddt", &ddt);
-DDT idt("idt");
+/*--------------------------------------------------------------------------*/
+class IDT : public XDT{
+public:
+  explicit IDT() : XDT() {
+    set_label("idt");
+  }
+  IDT* clone()const /*override*/{
+    return new IDT(*this);
+  }
+
+private:
+  void make_assign(std::ostream& o)const {
+    std::string cn = _br->code_name();
+    o____ "d->" << cn << "->do_tr();\n";
+    o____ "t0 = d->" << cn << "->tr_amps();\n";
+    o__ "trace2(\"filt\", t0, d->"<< cn<<"->tr_outvolts());\n";
+    if(num_args()>1){
+      o__ "t0 += t1.value();\n";
+    }else{
+    }
+    o__ "t0[d__filter" << cn << "] = 1.;\n";
+    o__ "assert(t0 == t0);\n";
+    o__ "return t0;\n";
+  }
+} idt;
 DISPATCHER<FUNCTION>::INSTALL d_idt(&function_dispatcher, "idt", &idt);
 /*--------------------------------------------------------------------------*/
 class DDX : public MGVAMS_FILTER {

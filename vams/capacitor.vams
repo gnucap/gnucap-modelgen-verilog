@@ -9,3 +9,18 @@ module capacitor(p,n);
 		I(p,n) <+ c * ddt(V(p,n));
 	end
 endmodule
+
+module capacitor(p,n);
+	inout p,n;
+	electrical p,n;
+
+	parameter real c = 1. from [0:inf);
+	parameter real ic = 0;
+	analog begin
+		if (analysis("ic"))
+			V(p,n) <+ ic;
+		else
+			I(p,n) <+ c * ddt(V(p,n));
+	end
+endmodule
+

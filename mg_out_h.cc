@@ -178,16 +178,6 @@ static void make_variable_decl(std::ostream& o, const Variable_List_Collection& 
   }
 }
 /*--------------------------------------------------------------------------*/
-//static void make_parameter_decl(std::ostream& o, const Localparam_List_Collection& P)
-//{
-//  for (auto q = P.begin(); q != P.end(); ++q) {
-//    for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
-//      o__ (**p).type() << " " << (**p).code_name()
-//	  << "{0.};\t// " << (**p).comment() << '\n';
-//    }
-//  }
-//}
-/*--------------------------------------------------------------------------*/
 static void make_common(std::ostream& o, const Module& m)
 {
   std::string class_name = "COMMON_" + m.identifier().to_string();
@@ -382,7 +372,7 @@ static void make_module(std::ostream& o, const Module& m)
   }
   o << "private: // func decl\n";
   make_func_dev(o, m.funcs());
-  if(m.num_evt_slots()){
+  if(m.has_events()){
     o << "private: // evt, tasks\n";
     o__ "unsigned _evt_seek{0};\n";
   //  o__ "void("<<class_name<<"::*_evt[" << m.num_evt_slots() << "])();\n";
@@ -416,9 +406,13 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "//void    tr_begin();          //BASE_SUBCKT\n";
   o__ "//void    tr_restore();        //BASE_SUBCKT\n";
   o__ "void    tr_load()override{ trace1(\"tr_load\", long_label());BASE_SUBCKT::tr_load();}\n";
-  if(m.num_evt_slots()){
+  if(m.num_evt_slots() || m.has_analysis() ){
     o__ "TIME_PAIR  tr_review()override;         //BASE_SUBCKT\n";
     o__ "void    tr_accept()override;         //BASE_SUBCKT\n";
+  }else{
+  }
+  if(m.has_analysis()){
+    // o__ "void    tr_advance()override;         //BASE_SUBCKT\n";
   }else{
     o__ "//TIME_PAIR  tr_review()override;         //BASE_SUBCKT\n";
     o__ "//void    tr_accept()override;         //BASE_SUBCKT\n";
@@ -433,7 +427,7 @@ static void make_module(std::ostream& o, const Module& m)
     o__ "//bool    do_tr();             //BASE_SUBCKT\n";
   }else{
     o__ "void      dc_advance()override {set_not_converged(); BASE_SUBCKT::dc_advance();}\n";
-    o__ "void      tr_advance()override {set_not_converged(); BASE_SUBCKT::tr_advance();}\n";
+    o__ "void      tr_advance()override;\n";
     o__ "void      tr_regress()override {set_not_converged(); BASE_SUBCKT::tr_regress();}\n";
     o__ "bool      tr_needs_eval()const override;\n";
     o__ "void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }\n";
