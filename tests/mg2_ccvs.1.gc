@@ -19,7 +19,8 @@ endmodule
 !make test_ccvs1.so > /dev/null
 attach ./test_ccvs1.so
 
-// BUG // does not work!
+// it does work! I(cp,cn) is a short circuit.
+// (circuit doesn't make much sense)
 test_ccvs1 d1(1, 0, 1, 0);
 vsource #(.dc(i)) v1(1, 0);
 

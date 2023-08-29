@@ -1,0 +1,5 @@
+test_vcvs0 #() dut (.p(b),.n(0),.cp(a),.cn(0));
+vsource #(.dc(i)) i1 (.p(a),.n(0));
+parameter i=1 
+#           v(a)       v(b)       vin(dut)   val0(dut._b_p_n) val1(dut._b_p_n) val2(dut._b_p_n)
+ 0.         1.         6.         1.         5.         0.         1.        

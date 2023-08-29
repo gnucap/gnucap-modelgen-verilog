@@ -5,7 +5,7 @@ load ../vams/vcvs.so
 
 verilog
 
-vcvs #(.gain(2)) vv(0, out, in, 0);
+vcvs #(.gain(2)) vv(out, 0, in, 0);
 
 spice
 

@@ -1,0 +1,32 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_vcvs0(p, n, cp, cn);
+electrical p, n, cp, cn;
+
+(* desc="in" *) real vin;
+
+analog begin
+	real gain;
+	vin = V(cp,cn);
+	V(p,n) <+ 5 + vin
+end
+
+endmodule
+
+!make test_vcvs0.so > /dev/null
+attach ./test_vcvs0.so
+
+test_vcvs0 dut(b, 0, a, 0);
+vsource #(.dc(i)) i1(a, 0);
+
+parameter i=1
+list
+
+print dc v(nodes) vin(dut) val0(dut.*) val1(dut.*) val2(dut.*)
+dc
+end

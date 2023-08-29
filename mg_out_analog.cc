@@ -639,20 +639,14 @@ void make_set_branch_contributions(std::ostream& o, const Module& m)
   o << "inline void MOD_" << m.identifier() << "::set_branch_contributions()\n{\n";
   for(auto i : m.branches()){
     Branch const* b = i;
-    // if(b->has_pot_source() && b->has_flow_source()){
-    //  ...
-    // }else
 
     if(b->is_short()) {
     }else if(b->has_flow_source() || b->has_pot_source()) {
-      for(auto D : b->deps()){
-	o__ "// DEP " << D->code_name() << "\n";
-      }
       make_set_one_branch_contribution(o, m, *b);
     }else if(b->has_flow_probe()) {
       o__ "// flow prb " << b->name() << "\n";
       o__ "if(" << b->code_name() << "){\n";
-      o____ b->code_name() << "->_loss0 = 1./OPT::shortckt;\n";
+      o____ b->code_name() << "->_loss0 = 1./OPT::shortckt; // (L0)\n";
       o__ "}else{\n";
       o__ "}\n";
     }else{
@@ -676,6 +670,14 @@ void make_set_branch_contributions(std::ostream& o, const Module& m)
     }else if(b->has_flow_source()) {
       assert(!b->has_pot_source());
       o__ "// flow src " << b->name() << "\n";
+      if(b->has_flow_probe()) {
+	o__ "// not a flow prb? " << b->name() << "\n";
+	o__ "if(" << b->code_name() << "){\n";
+	o____ b->code_name() << "->_loss0 = 0.; // (L1);\n";
+	o__ "}else{\n";
+	o__ "}\n";
+      }else{
+      }
     }else{
     }
   }

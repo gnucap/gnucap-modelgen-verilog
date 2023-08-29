@@ -20,7 +20,7 @@ endmodule
 !make test_vcvs2.so > /dev/null
 attach ./test_vcvs2.so
 
-test_vcvs2 d1(0, 2, a, 0, b, 0);
+test_vcvs2 d1(2, 0, a, 0, b, 0);
 resistor #(.r(1)) r1(2, 0);
 
 isource #(.dc(i)) i1(0, a);

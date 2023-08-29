@@ -5,7 +5,7 @@ attach ../d_vasrc.so
 verilog
 
 `modelgen
-module test_ccvs0(p, n, cp, cn);
+module test_ccvs2(p, n, cp, cn);
 electrical p, n, cp, cn;
 
 (* desc="cin" *) real cin;
@@ -13,15 +13,15 @@ analog begin
 	real gain;
 	gain = 3;
 	cin = I(cp, cn);
-	V(p,n) <+ gain * cin;
+	V(p,n) <+ gain * cin + 1e-9*V(p,n);
 end
 
 endmodule
 
-!make test_ccvs0.so > /dev/null
-attach ./test_ccvs0.so
+!make test_ccvs2.so > /dev/null
+attach ./test_ccvs2.so
 
-test_ccvs0 d1(2, 0, 1, 0);
+test_ccvs2 d1(2, 0, 1, 0);
 resistor #(.r(1)) r1(2, 0);
 
 isource #(.dc(i)) i1(0, 1);

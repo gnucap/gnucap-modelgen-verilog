@@ -92,15 +92,6 @@ bool VAPOT::do_tr_con_chk_and_q()
 /*--------------------------------------------------------------------------*/
 bool VAPOT::do_tr()
 {
-//   if(_self_is_current && _loss0){
-//     _values[0] /= - _values[1];
-//     _values[1] = 1./ _values[1];
-//   }else{
-//   }
-
-//	o__ "}else if (" << b->state() << "[1] > OPT::shortckt){\n";
-//	o____ "_pot"<< b->code_name() << " = false;\n";
-//	o____ "assert(" << b->state() << "[1]);\n";
   assert(_values);
 
   if(!_loss0){
@@ -119,7 +110,7 @@ bool VAPOT::do_tr()
     _loss0 = 0.;
   }else{
     for (int i=1; i<=_n_ports; ++i) {
-      _adj_values[i] = _values[i] * _loss0;
+      _adj_values[i] = -_values[i] * _loss0;
     }
     _m0.x = 0.;
     _m0.c0 = -_loss0 * _values[0];
@@ -197,7 +188,7 @@ void VAPOT::ac_load()
 
   for (int i=2; i<=_n_ports; ++i) {
     if(_loss0){
-      ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i] * _loss0);
+      ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], - _values[i] * _loss0);
     }else{
       ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i]);
     }
