@@ -174,35 +174,15 @@ static Token* resolve_filter_function(Expression& E, MGVAMS_FILTER const* filt,
     ds.pop_args();
     assert(ds.top());
 
-    Token* t_ = o->new_token(filt, *ds.top(), na);
-    Token_FILTER * t=dynamic_cast<Token_FILTER*>(t_);
-    assert(t);
-
-//    Deps outdeps;
-//    outdeps.insert((*t)->prb());
-//    ds.set(outdeps);
+    Token* t = o->new_token(filt, *ds.top(), na);
+    assert(dynamic_cast<Token_FILTER*>(t));
     return t;
+
   }else if(n=="ddx") {
     size_t na = ds.num_args();
-    // delete(E.back());
-    // E.pop_back();
 
-    trace1("ddx0", E.back()->name());
-    for(auto d : *ds.top()){
-      trace1("ddx0 dep", d->code_name());
-    }
-
-#if 0
-    incomplete();
-    Filter const* f = NULL; // o->new_filter(n, *ds.top());
-    auto t = new Token_FILTER(n, f);
-#else
-    Token* t_ = o->new_token(filt, *ds.top(), na);
-    Token_FILTER * t=dynamic_cast<Token_FILTER*>(t_);
-    //assert(t);
-#endif
-
-//    Token* f = o->new_token(n, *ds.top());
+    Token* t = o->new_token(filt, *ds.top(), na);
+    assert(dynamic_cast<Token_FILTER*>(t));
 
     ds.pop_args();
     Deps outdeps;

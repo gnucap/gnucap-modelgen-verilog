@@ -31,7 +31,7 @@
 namespace{
 /*--------------------------------------------------------------------------*/
 // todo: rearrange, avoid Filter
-static void make_cc_tmp(size_t na, std::string id, std::string fcn, Filter const* f, std::ostream& o)
+static void make_cc_tmp(Filter const* f, std::ostream& o)
 {
   assert(f->has_branch());
 
@@ -140,7 +140,7 @@ public:
     o << "COMPONENT* dd) const\n{\n";
     o__ "MOD_" << id << "* d = prechecked_cast<MOD_" << id << "*>(dd);\n";
     o__ "assert(d);\n";
-    make_cc_tmp(num_args(), id, label(), _f, o);
+    make_cc_tmp(_f, o);
 
     make_assign(o);
     o << "}\n"
