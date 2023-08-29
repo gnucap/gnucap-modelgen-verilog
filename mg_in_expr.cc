@@ -63,10 +63,16 @@ public:
   void pop_args(){
     assert(_args.size());
     while(_stack.size() > _args.top()){
+      assert(_stack.top());
       Deps* td = _stack.top();
       _stack.pop();
       assert(_stack.size());
+#if 0
       _stack.top()->update(*td);
+#else
+      td->update(*_stack.top());
+      *_stack.top() = *td;
+#endif
       delete(td);
     }
     _args.pop();
@@ -180,11 +186,12 @@ static Token* resolve_filter_function(Expression& E, MGVAMS_FILTER const* filt,
 
   }else if(n=="ddx") {
     size_t na = ds.num_args();
+    assert(ds.top());
+    ds.pop_args();
 
     Token* t = o->new_token(filt, *ds.top(), na);
     assert(dynamic_cast<Token_FILTER*>(t));
 
-    ds.pop_args();
     Deps outdeps;
     ds.set(outdeps);
 

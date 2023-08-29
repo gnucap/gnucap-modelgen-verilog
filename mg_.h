@@ -641,6 +641,9 @@ public:
       insert(i);
     }
   }
+  Probe const* back(){
+    return _s.back();
+  }
 public:
   const_iterator begin() const;
   const_iterator end() const;

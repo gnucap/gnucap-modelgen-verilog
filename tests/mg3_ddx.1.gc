@@ -10,11 +10,12 @@ module test_ddx1(p,n,cp,cn);
 	inout p, n, cp, cn;
 	electrical p, n, cp, cn;
 	parameter real gm = 1.0;
-	(* desc="" *) real vin, plus, minus, zero;
+	(* desc="" *) real vin, plus, minus1, minus2, zero;
 	analog begin
 		vin = V(cp,cn);
 		zero = ddx(vin, V(p));
-		minus = ddx(vin, V(cn));
+		minus1 = ddx(vin + .1*V(cn), V(cn));
+		minus2 = ddx(.1*V(cn) + vin, V(cn));
 		plus = ddx(vin, V(cp));
 		I(p,n) <+ gm * vin;
 	end
@@ -29,6 +30,6 @@ vsource #(.dc(v)) v1(1,0);
 
 list
 
-print dc v(nodes) zero(dut) minus(dut) plus(dut) iter(0)
+print dc v(nodes) zero(dut) minus1(dut) minus2(dut) plus(dut) iter(0)
 dc
 end

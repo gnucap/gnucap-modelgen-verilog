@@ -221,6 +221,11 @@ public:
   Token* new_token(Module& m, size_t na, Deps& d)const override{
     std::string filter_code_name = "_f_ddx_" + std::to_string(n_filters++);
     DDX* cl = clone();
+    trace0("===");
+    for(auto p : d){
+      trace4("probe", p->pname(), p->nname(), p->code_name(), d.size());
+    }
+    assert(d.size());
     cl->_ddxprobe = *d.begin();
     cl->set_label(filter_code_name);
     cl->set_num_args(na);
