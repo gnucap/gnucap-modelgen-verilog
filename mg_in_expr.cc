@@ -175,33 +175,16 @@ static Token* resolve_filter_function(Expression& E, MGVAMS_FILTER const* filt,
     throw Exception("syntax error");
   }else if(!dynamic_cast<Token_PARLIST*>(E.back())) { untested();
     throw Exception("syntax error");
-  }else if(n=="ddt" || n=="idt") {
-    size_t na = ds.num_args();
-    ds.pop_args();
-    assert(ds.top());
-
-    Token* t = o->new_token(filt, *ds.top(), na);
-    assert(dynamic_cast<Token_FILTER*>(t));
-    return t;
-
-  }else if(n=="ddx") {
-    size_t na = ds.num_args();
-    assert(ds.top());
-    ds.pop_args();
-
-    Token* t = o->new_token(filt, *ds.top(), na);
-    assert(dynamic_cast<Token_FILTER*>(t));
-
-    Deps outdeps;
-    ds.set(outdeps);
-
-    return t;
   }else{
-    unreachable();
-    incomplete();
-    return NULL;
+    size_t na = ds.num_args();
+    assert(ds.top());
+    ds.pop_args();
+
+    Token* t = o->new_token(filt, *ds.top(), na);
+    assert(dynamic_cast<Token_FILTER*>(t));
+
+    return t;
   }
-      // depstack.top()->update(*td);
 }
 /*--------------------------------------------------------------------------*/
 static MGVAMS_FILTER const* filter_function(std::string const& n)

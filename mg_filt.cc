@@ -232,6 +232,9 @@ public:
     m.push_back(cl);
     cl->_m = &m;
 
+    Deps outdeps;
+    d = outdeps;
+
     auto t = new Token_FILTER(label(), cl);
     return t;
   }

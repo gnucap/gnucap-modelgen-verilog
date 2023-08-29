@@ -356,9 +356,9 @@ public: // instance vars
 private: // branch state
 public: // states, _b_p_n;
   double _value_b_p_n;
-  double _st_b_p_n  [2];
+  double _st_b_p_n  [2]; // (s)
   struct _st_b_p_n_ {
-    enum {     VALUE, SELF/* | */
+    enum {     VALUE, SELF/* : */
     };
   } _dep_b_p_n;
 private: // node list
@@ -1064,10 +1064,10 @@ public: // input parameters
   PARAMETER<real> _p_c /*  */;
 private: // analog functions
 private: // funcs
-  class FILTER_f_ddt_0{
+  class FILTER_b_ddt_0{
   public:
     ddouble operator()(ddouble t0, COMPONENT*) const;
-  } _f_ddt_0;
+  } _b_ddt_0;
 }; //COMMON_capacitor
 /*--------------------------------------------------------------------------*/
 class MOD_capacitor : public BASE_SUBCKT {
@@ -1082,9 +1082,11 @@ public:
 private: // data
   node_t _nodes[13];
 public: // netlist
-  ELEMENT* _b_ddt_0_{NULL}; // no element (BUG)?
+  // ELEMENT* _b_ddt_0_{NULL}; // no element (BUG)?
   ELEMENT* _b_p_n{NULL}; // branch
+  ELEMENT* _b_ddt_0_{NULL};
 private: // func decl
+//filt _b_ddt_0
 private: // construct
   explicit MOD_capacitor(MOD_capacitor const&);
 public:
@@ -1125,18 +1127,19 @@ public: // instance vars
 private: // branch state
 public: // states, _b_ddt_0_;
   double _value_b_ddt_0_;
-  double _st_b_ddt_0_  [3];
+  double _st_b_ddt_0_  [3]; // (s)
   struct _st_b_ddt_0__ {
-    enum {     VALUE, SELF, dep_potential_b_p_n/* | */
+    enum {     VALUE, SELF, dep_potential_b_p_n/* : */
     };
   } _dep_b_ddt_0_;
 public: // states, _b_p_n;
   double _value_b_p_n;
-  double _st_b_p_n  [3];
+  double _st_b_p_n  [3]; // (s)
   struct _st_b_p_n_ {
-    enum {     VALUE, SELF, dep__filter_b_ddt_0_/* | */
+    enum {     VALUE, SELF, dep__filter_b_ddt_0_/* : */
     };
   } _dep_b_p_n;
+  // filter_b_ddt_0_
 private: // node list
   enum {n_p, n_n /* | */, n_ddt_0  };
 private: // probe values
@@ -1316,7 +1319,7 @@ inline void MOD_capacitor::read_probes()
   node_t gnd(&ground_node);
   // filter _b_ddt_0_
   _potential_b_p_n = volts_limited(_n[n_p], _n[n_n]);
-  // filter _f_ddt_0
+  // filter _b_ddt_0_
 }
 /*--------------------------------------------------------------------------*/
 MOD_capacitor::MOD_capacitor()
@@ -1372,14 +1375,14 @@ inline void MOD_capacitor::set_branch_contributions()
   _st_b_p_n[0] -= _st_b_p_n[/*MOD::*/_st_b_p_n_::dep__filter_b_ddt_0_] * _b_ddt_0_->tr_amps();
   // flow src (p, n)
   // filters
-  // filter _f_ddt_0
+  // filter _b_ddt_0_
 }
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::clear_branch_contributions()
 {
     _value_b_p_n = 0.;
     std::fill_n(_st_b_p_n+1, 2, 0.);
-    // std::fill_n(_st_f_ddt_0, 3, 0.);
+    // std::fill_n(_st_b_ddt_0_, 3, 0.);
 }
 /*--------------------------------------------------------------------------*/
 inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
@@ -1394,7 +1397,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
         ddouble t0;
         t0 = +p->_potential_b_p_n; // V(p, n)
         t0[d_potential_b_p_n] = +1.;
-        t0 = _f_ddt_0(t0, d); // (193)
+        t0 = _b_ddt_0(t0, d); // (193)
         t0 = pc->_p_c * t0;
         d->_value_b_p_n += t0.value();
         // dep __filter_b_ddt_0_
@@ -1490,6 +1493,7 @@ void MOD_capacitor::expand()
     }
 
   // clone branches
+  // branch no elt (ddt_0, )
   // branch (p, n)
     {
     if (!_b_p_n) {
@@ -1515,6 +1519,7 @@ void MOD_capacitor::expand()
   // clone filters
   // ddt_0
 { // filter expand
+    // code_name _b_ddt_0_
     if (!_b_ddt_0_) {
       const CARD* p = device_dispatcher["va_ddt"];
       if(!p){
@@ -1566,7 +1571,7 @@ void MOD_capacitor::precalc_last()
   }
 }
 /*--------------------------------------------------------------------------*/
-COMMON_capacitor::ddouble COMMON_capacitor::FILTER_f_ddt_0::operator()( ddouble t0, COMPONENT* dd) const
+COMMON_capacitor::ddouble COMMON_capacitor::FILTER_b_ddt_0::operator()( ddouble t0, COMPONENT* dd) const
 {
   MOD_capacitor* d = prechecked_cast<MOD_capacitor*>(dd);
   assert(d);
@@ -1630,10 +1635,10 @@ private: // funcs
       return false;
     }
   }
-  class FILTER_f_ddt_1{
+  class FILTER_b_ddt_1{
   public:
     ddouble operator()(ddouble t0, COMPONENT*) const;
-  } _f_ddt_1;
+  } _b_ddt_1;
 }; //COMMON_capacitor
 /*--------------------------------------------------------------------------*/
 class MOD_capacitor : public BASE_SUBCKT {
@@ -1648,11 +1653,13 @@ public:
 private: // data
   node_t _nodes[13];
 public: // netlist
-  ELEMENT* _b_ddt_1_{NULL}; // no element (BUG)?
+  // ELEMENT* _b_ddt_1_{NULL}; // no element (BUG)?
   ELEMENT* _b_p_n{NULL}; // branch
+  ELEMENT* _b_ddt_1_{NULL};
 private: // func decl
 //func 
   // 
+//filt _b_ddt_1
 private: // construct
   explicit MOD_capacitor(MOD_capacitor const&);
 public:
@@ -1693,19 +1700,20 @@ public: // instance vars
 private: // branch state
 public: // states, _b_ddt_1_;
   double _value_b_ddt_1_;
-  double _st_b_ddt_1_  [3];
+  double _st_b_ddt_1_  [3]; // (s)
   struct _st_b_ddt_1__ {
-    enum {     VALUE, SELF, dep_potential_b_p_n/* | */
+    enum {     VALUE, SELF, dep_potential_b_p_n/* : */
     };
   } _dep_b_ddt_1_;
 public: // states, _b_p_n;
   bool _pot_b_p_n;
   double _value_b_p_n;
-  double _st_b_p_n  [3];
+  double _st_b_p_n  [3]; // (s)
   struct _st_b_p_n_ {
-    enum {     VALUE, SELF, dep__filter_b_ddt_1_/* | */
+    enum {     VALUE, SELF, dep__filter_b_ddt_1_/* : */
     };
   } _dep_b_p_n;
+  // filter_b_ddt_1_
 private: // node list
   enum {n_p, n_n /* | */, n_ddt_1  };
 private: // probe values
@@ -1905,7 +1913,7 @@ inline void MOD_capacitor::read_probes()
   node_t gnd(&ground_node);
   // filter _b_ddt_1_
   _potential_b_p_n = volts_limited(_n[n_p], _n[n_n]);
-  // filter _f_ddt_1
+  // filter _b_ddt_1_
 }
 /*--------------------------------------------------------------------------*/
 MOD_capacitor::MOD_capacitor()
@@ -1966,7 +1974,7 @@ inline void MOD_capacitor::set_branch_contributions()
     _b_p_n->_loss0 = 0.;
   }
   // filters
-  // filter _f_ddt_1
+  // filter _b_ddt_1_
 }
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::clear_branch_contributions()
@@ -1974,7 +1982,7 @@ inline void MOD_capacitor::clear_branch_contributions()
     _pot_b_p_n = false;
     _value_b_p_n = 0.;
     std::fill_n(_st_b_p_n+1, 2, 0.);
-    // std::fill_n(_st_f_ddt_1, 3, 0.);
+    // std::fill_n(_st_b_ddt_1_, 3, 0.);
 }
 /*--------------------------------------------------------------------------*/
 inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
@@ -2007,7 +2015,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
             ddouble t0;
             t0 = +p->_potential_b_p_n; // V(p, n)
             t0[d_potential_b_p_n] = +1.;
-            t0 = _f_ddt_1(t0, d); // (193)
+            t0 = _b_ddt_1(t0, d); // (193)
             t0 = pc->_p_c * t0;
             if (d->_pot_b_p_n){
               d->_pot_b_p_n = false;
@@ -2130,6 +2138,7 @@ void MOD_capacitor::expand()
     }
 
   // clone branches
+  // branch no elt (ddt_1, )
   // branch (p, n)
     {
     if (!_b_p_n) {
@@ -2155,6 +2164,7 @@ void MOD_capacitor::expand()
   // clone filters
   // ddt_1
 { // filter expand
+    // code_name _b_ddt_1_
     if (!_b_ddt_1_) {
       const CARD* p = device_dispatcher["va_ddt"];
       if(!p){
@@ -2206,7 +2216,7 @@ void MOD_capacitor::precalc_last()
   }
 }
 /*--------------------------------------------------------------------------*/
-COMMON_capacitor::ddouble COMMON_capacitor::FILTER_f_ddt_1::operator()( ddouble t0, COMPONENT* dd) const
+COMMON_capacitor::ddouble COMMON_capacitor::FILTER_b_ddt_1::operator()( ddouble t0, COMPONENT* dd) const
 {
   MOD_capacitor* d = prechecked_cast<MOD_capacitor*>(dd);
   assert(d);
