@@ -1215,6 +1215,7 @@ public:
 //  void set_owner(Block* b) { _owner = b; }
 //  const std::string& module_or_paramset_identifier()const {return _module_or_paramset_identifier;}
   void set_dev_type(std::string const& s){_module_or_paramset_identifier = s;}
+  void set_state(std::string const& s){_state = s;}
   virtual const std::string& dev_type()const {return _module_or_paramset_identifier;}
   virtual Nature const* nature()const {return NULL;}
   virtual Discipline const* discipline()const {return NULL;}
@@ -1985,6 +1986,7 @@ class Filter : public Element_2 {
   Deps _deps;
   Branch_Ref _branch;
   Probe const* _prb=NULL;
+  int _num_states{0};
 public:
   explicit Filter() : Element_2() {}
   explicit Filter(std::string const& name, Deps const& d)
@@ -1994,6 +1996,7 @@ public:
   void parse(CS&) override{unreachable();}
   void dump(std::ostream&)const override {unreachable();}
 
+  void set_num_states(int s) {_num_states = s; }
   void set_output(Branch_Ref const& x);
 //  Branch_Ref const& branch() const{ return _branch; }
   std::string name() const {
@@ -2004,9 +2007,7 @@ public:
     return _branch->code_name();
   }
   size_t num_branches()const;
-  std::string code_name()const override{
-    return "_f_" + _name; // name()?
-  }
+  std::string code_name()const override;
   Deps const& deps()const { return _deps; }
 
   size_t num_states()const override;

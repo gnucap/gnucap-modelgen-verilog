@@ -108,14 +108,14 @@ static void make_analogfunctions_decl(std::ostream& o, const Analog_Functions& P
 static void make_func_dev(std::ostream& o, std::set<FUNCTION_ const*> const& P)
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
-    if(auto t = dynamic_cast<MGVAMS_TASK const*>(*q)){
+    if(dynamic_cast<MGVAMS_TASK const*>(*q)){
       o<<"//task " << (*q)->label() << "\n";
-      t->make_cc_dev(o);
-    }else if(auto f = dynamic_cast<MGVAMS_FUNCTION const*>(*q)) {
+    }else if(dynamic_cast<MGVAMS_FUNCTION const*>(*q)) {
       o<<"//func " << (*q)->label() << "\n";
-      f->make_cc_dev(o);
     }else{
+      o<<"//filt " << (*q)->label() << "\n";
     }
+    (*q)->make_cc_dev(o);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -261,7 +261,7 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
   // }else
   if((bb = dynamic_cast<Branch const*>(&elt))){
   }else{
-    unreachable();
+    // yikes. num_states?
     return;
   }
   Branch const& br = *bb;
@@ -276,7 +276,7 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
   o__ "double _value" << br.code_name() << ";\n";
   o__ "double _st" << br.code_name();
   size_t k = br.num_states();
-  o__ "[" << k << "];\n";
+  o__ "[" << k << "]; // (s)\n";
 
   for(auto n : br.names()){
     o__ "double _value_br_" << n << ";\n";
@@ -302,7 +302,7 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
       o << ", dep" << d->code_name();
     }
   }
-  o << "/* | */\n";
+  o << "/* : */\n";
   seen.clear();
   seen.resize(br.num_branches());
   for(auto d : br.deps()){
@@ -334,6 +334,11 @@ static void make_branch_states(std::ostream& o, const Module& m)
     }else{
       o__ "// branch no elt: " << x->code_name() << "\n";
     }
+  }
+  for(auto x : m.filters()){
+    assert(x);
+    o__ "// filter" << x->code_name() << "\n";
+    make_module_one_branch_state(o, *x);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -367,9 +372,14 @@ static void make_module(std::ostream& o, const Module& m)
     }else if(br->is_short()){ untested();
       o__ "// short : " << br->code_name() << "\n";
     }else{
-      o__ "ELEMENT* " << br->code_name() << "{NULL}; // no element (BUG)?\n";
+      o__ "// ELEMENT* " << br->code_name() << "{NULL}; // no element (BUG)?\n";
     }
   }
+  for (auto f : m.filters()){
+    o__ "ELEMENT* " << f->code_name() << "{NULL};\n";
+  }
+  //o << "private: // filt decl\n";
+  // make_cc_filt(o, m);
   o << "private: // func decl\n";
   make_func_dev(o, m.funcs());
   if(m.has_events()){

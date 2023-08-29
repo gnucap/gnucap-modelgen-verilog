@@ -42,6 +42,7 @@ public:
 	size_t num_args() const { return _num_args; }
 
 	virtual void make_cc_impl(std::ostream&)const {}
+	virtual void make_cc_dev(std::ostream&) const {}
 
 	/* TODO: some kind of
 	Expression* eval(Expression const*);
@@ -76,7 +77,6 @@ class MGVAMS_FILTER : public FUNCTION_ {
   }
 public:
   virtual Token* new_token(Module& m, size_t na, Deps& d) const = 0;
-  virtual void make_cc_dev(std::ostream&) const {}
   virtual void make_cc_common(std::ostream&) const {}
   virtual std::string code_name() const{
 	  return "";

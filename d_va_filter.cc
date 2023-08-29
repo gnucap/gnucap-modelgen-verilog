@@ -152,12 +152,13 @@ public:
 		      COMMON_COMPONENT* Common, double Value,
 		      int state_count, double state[],
 		      int node_count, const node_t nodes[])override;
-  //		      const double* inputs[]=0);
 protected:
   bool do_tr_con_chk_and_q();
 private:
   double tr_probe_num(const std::string& x) const override;
 };
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class DEV_DDT : public DEV_CPOLY_CAP {
@@ -174,7 +175,7 @@ private: // override virtual
   void	   tr_begin()override;
   TIME_PAIR tr_review()override; //		{return _time_by.reset();}//BUG//review(_i0.f0, _it1.f0);}
 }p4;
-DISPATCHER<CARD>::INSTALL d4(&device_dispatcher, "va_ddt|f_ddt0", &p4);
+DISPATCHER<CARD>::INSTALL d_ddt(&device_dispatcher, "va_ddt|f_ddt0", &p4);
 /*--------------------------------------------------------------------------*/
 TIME_PAIR DEV_DDT::tr_review()
 {
@@ -451,7 +452,7 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
   set_value(Value);
   attach_common(Common);
 
-  if (first_time) {
+  if (first_time) { untested();
     _n_ports = n_nodes/2; // sets num_nodes() = _n_ports*2
     assert(_n_ports == n_states-1);
 

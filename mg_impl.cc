@@ -245,12 +245,21 @@ Branch_Ref const& Branch_Names::lookup(std::string const& p) const
   }
 }
 /*--------------------------------------------------------------------------*/
+std::string Filter::code_name()const
+{
+  if(has_branch()){
+    return _branch->code_name();
+  }else{
+    return "_f_" + _name; // name()?
+  }
+}
+/*--------------------------------------------------------------------------*/
 // number of *all* branches in the module.
 size_t Filter::num_branches() const
 {
   if(has_branch()){
     return _branch->num_branches();
-  }else{ untested();
+  }else{
     return 0;
   }
 }
@@ -447,9 +456,13 @@ bool Branch::has_pot_source() const
   return _has_pot_src; //  || _has_flow_probe;
 }
 /*--------------------------------------------------------------------------*/
-// BUG: delegate to branch/source
 size_t Filter::num_states() const
 {
+  if(_num_states){
+    return _num_states;
+  }else{
+    // BUG: delegate to branch/source?
+  }
   std::vector<char> visited(num_branches());
   size_t k = 2; // self conductance and what?
   // TODO: cleanup
@@ -472,6 +485,12 @@ size_t Filter::num_states() const
 // BUG: delegate to branch
 size_t Filter::num_nodes() const
 {
+  trace2("Filter::num_nodes", code_name(), num_branches());
+  if(num_branches()){
+//  }else if(num_states()){
+  }else{
+    return 0;
+  }
   size_t ret=1;
   std::vector<char> visited(num_branches());
 
@@ -824,7 +843,12 @@ bool Module::sync() const
 /*--------------------------------------------------------------------------*/
 std::string Filter::state()const
 {
-  return "_st" + branch_code_name();
+  if(Element_2::state().size()){
+    return Element_2::state();
+  }else{
+    // BUG?
+    return "_st" + branch_code_name();
+  }
 }
 /*--------------------------------------------------------------------------*/
 std::string Filter::short_label()const

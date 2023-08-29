@@ -33,6 +33,8 @@ DELETED =
 #------------------------------------------------------------------------
 RAW_SRCS = mg_main.cc mg_error.cc \
 mg_filt.cc \
+mg_filt_ddx.cc \
+mg_filt_slew.cc \
 mg_func.cc \
 mg_impl.cc \
 mg_in_analog.cc \

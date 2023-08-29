@@ -171,8 +171,8 @@ static void make_set_parameters(std::ostream& o, const Element_2& e)
 {
   make_tag();
   std::string cn = e.code_name();
-  if(auto f=dynamic_cast<Filter const*>(&e)){
-    cn = f->branch_code_name();
+  if(dynamic_cast<Filter const*>(&e)){
+//    cn = f->branch_code_name();
   }else{
   }
   o______ cn << "->set_parameters(\"" << e.short_label() << "\", this, ";
@@ -681,7 +681,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
   
   o______ "node_t nodes[] = {";
   
-  if(1){
+  if(e.num_nodes()){
     make_node_ref(o, *br->p());
     o << ", ";
     make_node_ref(o, *br->n());
@@ -742,7 +742,6 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
       }
     }
   }else{ untested();
-    unreachable();
 //    Port_3_List_2::const_iterator p = e.ports().begin();
 //    if (p != e.ports().end()) { untested();
 //      assert(*p);
@@ -779,18 +778,20 @@ static void make_module_expand_one_filter(std::ostream& o, const Filter& e)
   o << "{ // filter expand\n";
 
   // BUG: duplicate
-  o__ "if (!" << e.branch_code_name() << ") {\n";
+  o__ "// code_name " << e.code_name() << "\n";
+  // o__ "// branch_code_name " << e.branch_code_name() << "\n";
+  o__ "if (!" << e.code_name() << ") {\n";
   o____ "const CARD* p = device_dispatcher[\"" << e.dev_type() << "\"];\n";
   o____ "if(!p){\n;";
   o______ "throw Exception(" << "\"Cannot find " << e.dev_type() << ". Load module?\");\n";
   o____ "}else{\n";
   o____ "}\n";
-  o____ e.branch_code_name() << " = dynamic_cast<ELEMENT*>(p->clone());\n";
-  o____ "if(!" << e.branch_code_name() << "){\n";
+  o____ e.code_name() << " = dynamic_cast<ELEMENT*>(p->clone());\n";
+  o____ "if(!" << e.code_name() << "){\n";
   o______ "throw Exception(" << "\"Cannot use " << e.dev_type() << ": wrong type\"" << ");\n";
   o____ "}else{\n";
   o____ "}\n";
-  o____ "subckt()->push_front(" << e.branch_code_name() << ");\n";
+  o____ "subckt()->push_front(" << e.code_name() << ");\n";
   o__ "}else{\n";
   o__ "}\n";
 
@@ -800,18 +801,22 @@ static void make_module_expand_one_filter(std::ostream& o, const Filter& e)
   o______ "node_t nodes[] = {";
   
   if(auto br = dynamic_cast<Filter const*>(&e)) {
-    if(1) {
+    if(e.num_nodes()) {
 //      o << "gnd, _n[n_" << br->name() << "]";
       o << "_n[n_" << br->name() << "], gnd";
-    }else{ untested();
+    }else{
       o << "gnd, gnd";
     }
     // o << "_n[0]"; // eek
     for(auto i : br->deps()){
-      o << ", ";
-      make_node_ref(o, *i->branch()->p());
-      o << ", ";
-      make_node_ref(o, *i->branch()->n());
+      if(i->branch()){
+	o << ", ";
+	make_node_ref(o, *i->branch()->p());
+	o << ", ";
+	make_node_ref(o, *i->branch()->n());
+      }else{
+	o << "/* dep w/o branch? */ ";
+      }
     //   o << ", _n[" << i->branch()->p()->code_name() << "]";
     //   o << ", _n[" << i->branch()->n()->code_name() << "]";
     }
@@ -934,6 +939,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
       indent x;
       make_module_expand_one_branch(o, *i, m);
     }else{
+      o__ "// branch no elt " << i->name() << "\n";
     }
   }
 
@@ -945,6 +951,8 @@ static void make_module_expand(std::ostream& o, Module const& m)
       indent x;
       make_module_expand_one_filter(o, *i);
     }else{
+      o__ "// no branch? " << i->name() << "\n";
+      make_module_expand_one_filter(o, *i);
     }
   }
 
@@ -984,6 +992,13 @@ static void make_module_dispatcher(std::ostream& o, Module const& m)
       << m.identifier() << "\", &m_" << m.identifier() << ");\n"
       "/*--------------------------------------"
       "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_func(std::ostream& o, const Module& m)
+{
+  for(auto f : m.funcs()){
+    f->make_cc_impl(o);
+  }
 }
 /*--------------------------------------------------------------------------*/
 void make_cc_module(std::ostream& o, const Module& m)
@@ -1027,13 +1042,6 @@ void make_cc_module(std::ostream& o, const Module& m)
       "/*--------------------------------------"
       "------------------------------------*/\n";
   }else{
-  }
-}
-/*--------------------------------------------------------------------------*/
-void make_cc_func(std::ostream& o, const Module& m)
-{
-  for(auto f : m.funcs()){
-    f->make_cc_impl(o);
   }
 }
 /*--------------------------------------------------------------------------*/

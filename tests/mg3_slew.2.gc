@@ -1,0 +1,29 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+// ddx test case inspired by LRM 4.5.6
+
+`modelgen
+module test_slw2(p,c);
+	inout p, c;
+	electrical p, c;
+	parameter real gm = 1.0;
+	(* desc="in" *) real vin;
+	analog begin
+		vin = V(c);
+		V(p) <+ slew(vin, 1);
+	end
+endmodule
+
+!make test_slw2.so > /dev/null
+attach ./test_slw2.so
+
+test_slw2 #() dut(2,1);
+
+spice
+
+Vin 1 0 sin f=1 a=.2 delay={-.1} samples=13
+.print tran v(nodes)
+.tran 1

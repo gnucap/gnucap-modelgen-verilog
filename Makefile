@@ -71,7 +71,7 @@ $(TARGET): $(OBJS)
 include Make.depend
 
 modelgen_0.o: $(OBJS)
-d_vasrc.so: d_vaflow.o d_vapot.o d_va_filter.o d_vapot_br.o
+d_vasrc.so: d_vaflow.o d_vapot.o d_va_filter.o d_vapot_br.o d_va_slew.o
 	${CXX} $(GNUCAP_CPPFLAGS) -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $+ ${LIBS_} -o $@
 
 d_vapot.o: d_va.h

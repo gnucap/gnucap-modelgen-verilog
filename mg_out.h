@@ -67,7 +67,7 @@ void make_cc_decl(std::ostream&, const Module&);
 void make_cc_module(std::ostream&, const Module&);
 /* mg_out_analog.cc */
 void make_cc_analog(std::ostream&, const Module&);
-void make_cc_func(std::ostream&, const Module&);
+//void make_cc_func(std::ostream&, const Module&); // ?
 void make_cc_analog_functions(std::ostream&, const Module&);
 /* mg_out_common.cc */
 void make_cc_common(std::ostream&, const Module&);
