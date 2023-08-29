@@ -1,14 +1,11 @@
 == modelgen
 - Port currents "I(<a>)" not supported.
 - "ground" statement not implemented.
-- suboptimal diagnostics
-- event control is incomplete
-- ddx is incomplete
-- named branch contributions are wonky and incomplete
-- named branch probes missing
-- V(..) <+ I(..) does not work, revisit mg2_ccvs.1.gc
-- flow on rhs after contrib doesn't work
+- $limit: only "pnjlimit"
 - ac needs operating point, even if linear: mg2_cccs.0.gc
+- analysis("ic"): need more testing
+- ddx is incomplete
+- event control is incomplete
 
 == simulator plugins
 - still missing tiebreak rules in overload
@@ -17,7 +14,9 @@
 - llvm build: sometimes crashes during shutown
 
 == libgnucap, TODO
+- parse identifiers in port probes.
 - MODEL_CARD in lang interface
 - BUG: padding long lines with whitespace
 - m vs M vs $mfactor.
 - newline handling in cmd.warn
+- branch node order is suboptimal

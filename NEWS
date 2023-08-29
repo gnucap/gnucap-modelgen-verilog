@@ -36,8 +36,15 @@
 * fix current port re-expansion in vaflow
 * various bugfixes
 
-202308**-dev
+20230829-dev
 ============
-* func, task, filter plugins
+* aliasparam
+* func, task plugins
 * tasks events, $strobe
+* filter plugins
+* slew filter stub
 * paramset: param_count tie break
+* sign bug fix in vsource
+* indirect contribution
+* limiting
+* initial conditions

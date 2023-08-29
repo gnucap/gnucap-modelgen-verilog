@@ -634,7 +634,7 @@ public:
       }
     }
     _s.push_back(x);
-    return std::make_pair(begin()+(size()-1), true);
+    return std::make_pair(begin()+(int(size())-1), true);
   }
   void update(Deps const& other){
     for(auto i : other){

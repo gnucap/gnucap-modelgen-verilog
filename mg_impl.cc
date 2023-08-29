@@ -459,7 +459,7 @@ bool Branch::has_pot_source() const
 size_t Filter::num_states() const
 {
   if(_num_states){
-    return _num_states;
+    return size_t(_num_states);
   }else{
     // BUG: delegate to branch/source?
   }

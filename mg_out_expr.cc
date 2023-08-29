@@ -113,7 +113,7 @@ public:
   }
   size_t num_args() const{
     assert(!_args.empty());
-    return int(_types.size()) - 1 - _args.top();
+    return _types.size() - 1 - size_t(_args.top());
   }
   void args_pop(){
     assert(!_args.empty());

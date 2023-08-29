@@ -582,7 +582,6 @@ bool MOD_resistor::do_tr()
 /*--------------------------------------------------------------------------*/
 inline void MOD_resistor::set_branch_contributions()
 {
-  // DEP _potential_b_p_n
   assert(_value_b_p_n == _value_b_p_n);
   _st_b_p_n[0] = _value_b_p_n;
   // collect currents from named branches
@@ -1366,7 +1365,6 @@ bool MOD_capacitor::do_tr()
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::set_branch_contributions()
 {
-  // DEP __filter_b_ddt_0_
   assert(_value_b_p_n == _value_b_p_n);
   _st_b_p_n[0] = _value_b_p_n;
   // collect currents from named branches
@@ -1960,7 +1958,6 @@ bool MOD_capacitor::do_tr()
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::set_branch_contributions()
 {
-  // DEP __filter_b_ddt_1_
   assert(_value_b_p_n == _value_b_p_n);
   _st_b_p_n[0] = _value_b_p_n;
   // trace2(" filter _st_b_p_n", _st_b_p_n[2], __filter_b_ddt_1_);

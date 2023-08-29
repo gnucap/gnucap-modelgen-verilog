@@ -64,7 +64,7 @@ public:
   virtual std::string code_name() const{
 	  return "";
   }
-  virtual void make_cc_dev(std::ostream& o) const;
+  virtual void make_cc_dev(std::ostream& o)const override;
   virtual void make_cc_common(std::ostream& o) const = 0;
   virtual Token* new_token(Module& m, size_t na) const;
 };
@@ -94,7 +94,6 @@ public:
 	  return NULL;
   }
   virtual Token* new_token(Module& m, size_t na, Deps& d) const = 0;
-  virtual void make_cc_dev(std::ostream&) const = 0;
   virtual void make_cc_common(std::ostream&) const {}
   virtual std::string code_name() const{
 	  return "";

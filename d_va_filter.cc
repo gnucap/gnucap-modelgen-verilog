@@ -271,7 +271,7 @@ DEV_CPOLY_CAP::~DEV_CPOLY_CAP()
   delete [] _vy1;
   delete [] _vi0;
   delete [] _vi1;
-  if (net_nodes() > NODES_PER_BRANCH) { untested();
+  if (net_nodes() > NODES_PER_BRANCH) { itested();
     delete [] _n;
   }else{
     // it is part of a base class
@@ -452,7 +452,7 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
   set_value(Value);
   attach_common(Common);
 
-  if (first_time) { untested();
+  if (first_time) {
     _n_ports = n_nodes/2; // sets num_nodes() = _n_ports*2
     assert(_n_ports == n_states-1);
 
@@ -463,7 +463,7 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
     _vi0 = new double[n_states];
     _vi1 = new double[n_states];
 
-    if (net_nodes() > NODES_PER_BRANCH) { untested();
+    if (net_nodes() > NODES_PER_BRANCH) { itested();
       // allocate a bigger node list
       _n = new node_t[net_nodes()];
     }else{

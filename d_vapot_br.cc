@@ -50,7 +50,7 @@ protected: // override virtual
   }
 
   bool is_vs() const{
-    return _loss0; // HACK.
+    return bool(_loss0); // HACK.
   }
 
   double   tr_involts()const override	{unreachable(); return NOT_VALID;}

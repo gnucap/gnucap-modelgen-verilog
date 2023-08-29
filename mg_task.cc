@@ -41,7 +41,7 @@ private:
   std::string eval(CS&, const CARD_LIST*)const override{ untested();
     return "$$strobe";
   }
-  MGVAMS_TASK* clone() const{
+  MGVAMS_TASK* clone()const override {
     return new STROBE_TASK(*this);
   }
   Token* new_token(Module& m, size_t na, Deps& d)const override{
@@ -93,7 +93,7 @@ private:
   std::string eval(CS& cmd, const CARD_LIST*)const override{ untested();
     return "$finish" + cmd.fullstring();
   }
-  MGVAMS_TASK* clone() const{ untested();
+  MGVAMS_TASK* clone()const override{ untested();
     return new FINISH_TASK(*this);
   }
   Token* new_token(Module& m, size_t /* na */, Deps& d)const override{
