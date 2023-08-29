@@ -181,7 +181,7 @@ void make_common_set_param_by_name(std::ostream& o, const Module& m)
       o << comma << "\"" << *names[n] << "\"";
       comma = ", ";
   }
-  cnt = names.size();
+  cnt = int(names.size());
   o__ "};\n";
   o__ "int lb = 0;\n";
   o__ "int ub = " << cnt << ";\n";

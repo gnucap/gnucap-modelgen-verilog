@@ -620,13 +620,21 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Probe;
-class Deps : private std::set<Probe const*>{
-  typedef std::set<Probe const*> S;
+class Deps {
+  typedef std::vector<Probe const*> S;
   typedef S::const_iterator const_iterator;
+  S _s;
 public:
   ~Deps();
   std::pair<const_iterator, bool> insert(Probe const* x){
-    return std::set<Probe const*>::insert(x);
+    for(auto s = begin(); s!=end(); ++s){
+      if (*s == x){
+	return std::make_pair(s, false);
+      }else{
+      }
+    }
+    _s.push_back(x);
+    return std::make_pair(begin()+(size()-1), true);
   }
   void update(Deps const& other){
     for(auto i : other){
@@ -637,10 +645,10 @@ public:
   const_iterator begin() const;
   const_iterator end() const;
   size_t size() const{
-    return S::size();
+    return _s.size();
   }
   bool empty() const{
-    return S::empty();
+    return _s.empty();
   }
 };
 /*--------------------------------------------------------------------------*/

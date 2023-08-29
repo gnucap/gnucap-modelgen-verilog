@@ -796,7 +796,7 @@ Deps::~Deps()
 //  for(auto i : *this){ untested();
 //    delete i;
 //  }
-  std::set<Probe const*>::clear();
+  _s.resize(0);
 }
 /*--------------------------------------------------------------------------*/
 bool Module::sync() const
@@ -877,12 +877,12 @@ Base* Block::resolve(std::string const& k)
 /*--------------------------------------------------------------------------*/
 Deps::const_iterator Deps::begin() const
 {
-  return S::begin();
+  return _s.begin();
 }
 /*--------------------------------------------------------------------------*/
 Deps::const_iterator Deps::end() const
 {
-  return S::end();
+  return _s.end();
 }
 /*--------------------------------------------------------------------------*/
 void Variable::update_deps(Deps const& d)
