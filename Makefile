@@ -52,7 +52,7 @@ all: all-recursive all-local
 all-local: ${TARGET} ${MODULES}
 
 all-recursive: ${TARGET}
-	${MAKE} -C vams GNUCAP_CONF=${GNUCAP_CONF}
+	${MAKE} -C vams GNUCAP_CONF=${GNUCAP_CONF} CXXFLAGS="${CXXFLAGS}"
 
 check: all
 	${MAKE} -C tests check GNUCAP_CONF=${GNUCAP_CONF}
