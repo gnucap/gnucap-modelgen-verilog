@@ -57,6 +57,7 @@ CS& CS::get_line(const std::string& prompt)
 /*--------------------------------------------------------------------------*/
 static std::string getlines(FILE *fileptr)
 {
+  const bool spice_style_line_continuation = false; // arg? flag?
   assert(fileptr);
   const int buffer_size = BIGBUFLEN;
   std::string s;
@@ -71,8 +72,29 @@ static std::string getlines(FILE *fileptr)
 	throw Exception_End_Of_Input("");
       }else{
       }
+    }else if(spice_style_line_continuation) { untested();
+      trim(buffer);
+      size_t count = strlen(buffer);
+      if (count && buffer[count-1] == '\\') { untested();
+	buffer[count-1] = '\0';
+      }else{ untested();
+	// look ahead at next line
+	//int c = fgetc(fileptr);
+	int c;
+	while (isspace(c = fgetc(fileptr))) { untested();
+	  // skip
+	}
+	if (c == '+') { untested();
+	  need_to_get_more = true;
+	}else if (c == '\n') {unreachable();
+	  need_to_get_more = true;
+	  ungetc(c,fileptr);
+	}else{ untested();
+	  need_to_get_more = false;
+	  ungetc(c,fileptr);
+	}
+      }
     }else{
-      // trim(buffer);
       size_t count = strlen(buffer);
       if (buffer[count-2] == '\\') {
 	assert(buffer[count-1] == '\n');
@@ -81,7 +103,6 @@ static std::string getlines(FILE *fileptr)
 	need_to_get_more = false;
       }
       s += buffer;
-      // s += ' ';
     }
   }
   trace1("getlines", s);
