@@ -1,0 +1,40 @@
+
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_deriv0(p, c)
+	electrical p, c;
+
+	analog begin
+		I(p) <+ 17.*( V(c) );
+		I(p) <+ - 17. / V(c);
+	end
+
+endmodule
+
+!make test_deriv0.so > /dev/null
+attach ./test_deriv0.so
+
+test_deriv0 #() dut(1, 2);
+
+parameter v=0
+// vsource #(.dc(v)) v1(2,0);
+resistor #(.r(100)) r1(1,0);
+
+list
+
+spice
+.options noinsensitive
+V1 2 0 ac 1 dc v
+
+.store dc v(nodes)
+.print dc v(nodes) iter(0)
+.dc v 0.49 0.51 .001 > /dev/null
+.measure gain=at(probe="v(1)" x=".5" deriv)
+.dc v .5 .5 0
+.print ac vm(1) vp(1)
+.ac 1

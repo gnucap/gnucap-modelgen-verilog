@@ -1,0 +1,9 @@
+test_deriv2 #() dut (.p(1),.c(2));
+parameter v=0 
+// vsource #(.dc(v)) v1(2,0); 
+resistor #(.r(100)) r1 (.p(1),.n(0));
+gain=-70.7460688502266
+#           v(1)       v(2)       iter(0)   
+ 0.5       -70.711     0.5        5.        
+#Freq       vm(1)      vp(1)     
+ 1.         70.711     180.      
