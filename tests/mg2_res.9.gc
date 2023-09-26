@@ -1,0 +1,33 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_res_9(p, n);
+	electrical p, n;
+	inout p, n;
+	real a;
+	parameter real c = 1.;
+	analog begin
+		a = V(p, n);
+		I(p,n) <+ c?a:a;
+	end
+endmodule
+
+
+list
+
+!make test_res_9.so > /dev/null
+attach ./test_res_9.so
+
+parameter v=1
+
+test_res_9 #() dut(1,0);
+vsource #(.dc(v)) v1(1, 0);
+
+print dc v(nodes) i(v1)
+
+dc
+end

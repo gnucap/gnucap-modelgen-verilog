@@ -321,6 +321,10 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 	o__ s.code_name() << " INCOMPLETE = " << op << arg1 << ";\n";
       }
     }else if (auto t = dynamic_cast<const Token_TERNARY*>(*i)) {itested();
+      std::string arg1 = s.code_name();
+      s.pop();
+      s.new_float(o);
+
       o__ "{\n";
       {itested();
 	indent y;
