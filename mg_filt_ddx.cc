@@ -57,8 +57,11 @@ public:
     Deps outdeps;
     d = outdeps;
 
-    auto t = new Token_FILTER(label(), cl);
+    auto t = new Token_CALL(label(), cl);
     return t;
+  }
+  std::string code_name()const override{
+    return "/*DDX*/" + label();
   }
   void make_cc_dev(std::ostream&)const override{
   }
@@ -66,10 +69,12 @@ public:
     o__ "class FILTER" << label() << "{\n";
     o__ "public:\n";
     o____ "ddouble operator()(";
+    std::string comma;
     for(size_t n=0; n<num_args(); ++n){
-      o << "ddouble t" << n << ", ";
+      o << comma << "ddouble t" << n;
+      comma = ", ";
     }
-    o << "COMPONENT*) const\n";
+    o << ") const\n";
 
     assert(_ddxprobe);
     o__ "{ // NEW  ddx " <<  _ddxprobe->code_name() << "\n";

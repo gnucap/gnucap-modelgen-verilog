@@ -65,6 +65,7 @@ class XDT : public MGVAMS_FILTER {
   Module* _m{NULL};
   Filter const* _f{NULL};
   // Branch_Ref _br;
+  Probe const* _prb{NULL};
 protected:
   Branch const* _br{NULL};
 protected:
@@ -72,10 +73,16 @@ protected:
   }
   explicit XDT(XDT const& p) : MGVAMS_FILTER(p) {
   }
+  ~XDT(){
+//    delete _prb;
+  }
   virtual XDT* clone()const = 0;
   virtual void make_assign(std::ostream& o) const = 0;
+  std::string code_name()const override{
+    return "/*XDT*/ d->" + label();
+  }
 public:
-  Token* new_token(Module& m, size_t na, Deps& d)const override{
+  Token* new_token(Module& m, size_t na, Deps& d)const override {
     Filter* f = NULL;
 
     std::string filter_code_name = label() + "_" + std::to_string(n_filters++);
@@ -96,6 +103,7 @@ public:
     Node* n = m.new_node(filter_code_name);
     {
       Branch* br = m.new_branch(n, &mg_ground_node);
+      br->set_filter();
       // br->set_deps(d);
       for(auto x : d) {
 	br->add_probe(x);
@@ -105,18 +113,40 @@ public:
       Branch_Ref prb(br);
       cl->_br = br;
       f->set_output(prb);
+      f->set_state( "_st" + prb.code_name() );
+
+      cl->_prb = m.new_probe("potential", prb);
 //	br->set_element(f);
       br->set_filter();
       m.push_back(f);
 
       Deps outdeps;
-      outdeps.insert(f->prb()); // prb?
+      outdeps.insert(Dep(cl->_prb));
       d = outdeps;
     }
 
-    return new Token_FILTER(label(), cl);
+    return new Token_CALL(label(), cl);
   }
-  void make_cc_impl(std::ostream&o)const override{
+  void make_cc_common(std::ostream& o)const override{
+    o__ "class FILTER" << label() << "{\n";
+    o__ "public:\n";
+    o____ "ddouble operator()(";
+      for(size_t n=0; n<num_args(); ++n){
+	o << "ddouble t" << n << ", ";
+      }
+    o << "COMPONENT*) const;\n";
+    o__ "} " << label() << ";\n";
+  }
+  void make_cc_dev(std::ostream& o)const override{
+    o__ "ddouble " << label() << "(";
+      std::string comma;
+      for(size_t n=0; n<num_args(); ++n){
+	o << comma << "ddouble t" << n;
+	comma = ", ";
+      }
+    o << ");\n";
+  }
+  void make_cc_impl_comm(std::ostream&o)const{
     assert(_m); // owner?
     assert(_f);
     std::string id = _m->identifier().to_string();
@@ -136,15 +166,22 @@ public:
       "/*--------------------------------------"
       "------------------------------------*/\n";
   }
-  void make_cc_common(std::ostream& o)const override{
-    o__ "class FILTER" << label() << "{\n";
-    o__ "public:\n";
-    o____ "ddouble operator()(";
-      for(size_t n=0; n<num_args(); ++n){
-	o << "ddouble t" << n << ", ";
-      }
-    o << "COMPONENT*) const;\n";
-    o__ "} " << label() << ";\n";
+  void make_cc_impl(std::ostream&o)const override{
+//    make_cc_impl_comm(o);
+    std::string id = _m->identifier().to_string();
+    o << "MOD_"<< id <<"::ddouble MOD_" << id << "::" << label() << "(";
+    std::string comma;
+    for(size_t n=0; n<num_args(); ++n){
+      o << comma << "ddouble t" << n;
+      comma = ", ";
+    }
+    o << ")\n{\n";
+    o__ "MOD_" << id << "* d = this;\n";
+    o__ "typedef MOD_" << id << " MOD;\n";
+    make_cc_tmp(_f, o);
+
+    make_assign(o);
+    o << "}\n";
   }
   std::string eval(CS&, const CARD_LIST*)const override{
     unreachable();
@@ -163,10 +200,11 @@ public:
 private:
   void make_assign(std::ostream& o)const {
     std::string cn = _br->code_name();
-    o____ "d->" << cn << "->do_tr();\n";
-    o____ "t0 = d->" << cn << "->tr_amps();\n";
+    o__ "d->" << cn << "->do_tr();\n";
+    o__ "t0 = d->" << cn << "->tr_amps();\n";
+    o__ "d->_potential" << cn << " = - t0;\n";
     o__ "trace2(\"filt\", t0, d->"<< cn<<"->tr_outvolts());\n";
-    o__ "t0[d__filter" << cn << "] = -1.;\n";
+    o__ "t0[d_potential" << cn << "] = -1.;\n";
     o__ "assert(t0 == t0);\n";
     o__ "return t0;\n";
   }
@@ -185,14 +223,15 @@ public:
 private:
   void make_assign(std::ostream& o)const {
     std::string cn = _br->code_name();
-    o____ "d->" << cn << "->do_tr();\n";
-    o____ "t0 = d->" << cn << "->tr_amps();\n";
+    o__ "d->" << cn << "->do_tr();\n";
+    o__ "t0 = d->" << cn << "->tr_amps();\n";
+    o__ "d->_potential" << cn << " = - t0;\n";
     o__ "trace2(\"filt\", t0, d->"<< cn<<"->tr_outvolts());\n";
     if(num_args()>1){
       o__ "t0 += t1.value();\n";
     }else{
     }
-    o__ "t0[d__filter" << cn << "] = -1.;\n";
+    o__ "t0[d_potential" << cn << "] = -1.;\n";
     o__ "assert(t0 == t0);\n";
     o__ "return t0;\n";
   }

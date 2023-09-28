@@ -1,0 +1,41 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_res_7(p, n);
+	electrical p, n;
+	inout p, n;
+	parameter real r = 200.;
+	branch (p, n) io;
+	analog begin
+		V(io) <+ I(p, n) * r;
+	end
+endmodule
+
+
+list
+
+!make test_res_7.so > /dev/null
+attach ./test_res_7.so
+
+parameter r=1
+parameter v=0
+
+test_res_7 #(.r(100)) dut(1,0);
+vsource #(.dc(v)) v1(1, 0);
+
+test_res_7 #(.r(1)) dut(2,0);
+vsource #(.dc(v)) v2(2, 0);
+
+test_res_7 #(.r(.01)) dut(3,0);
+vsource #(.dc(v)) v3(3, 0);
+
+list
+
+print dc i(v*) iter(0)
+
+dc v 0 1 .25
+end

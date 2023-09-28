@@ -24,7 +24,10 @@
 
 #include <u_function.h>
 /*--------------------------------------------------------------------------*/
-// TODO: move upstream
+class Token;
+class Module;
+class Deps;
+// TODO: move upstream, partly?
 class FUNCTION_ : public FUNCTION {
 	std::string _label;
 	size_t _num_args{size_t(-1)};
@@ -47,10 +50,14 @@ public:
 	/* TODO: some kind of
 	Expression* eval(Expression const*);
 	*/
+  virtual Token* new_token(Module& m, size_t na, Deps& d) const = 0;
+  virtual bool returns_void() const { return false; }
+  virtual std::string code_name() const{ itested();
+	  // incomplete();
+	  return "";
+  }
 };
 /*--------------------------------------------------------------------------*/
-class Token;
-class Module;
 class MGVAMS_FUNCTION : public FUNCTION_ {
   std::string eval(CS&, const CARD_LIST*)const override{
 	  unreachable();
@@ -61,22 +68,18 @@ public:
 	  unreachable();
 	  return NULL;
   }
-  virtual std::string code_name() const{
-	  return "";
-  }
   virtual void make_cc_dev(std::ostream& o)const override;
   virtual void make_cc_common(std::ostream& o) const = 0;
-  virtual Token* new_token(Module& m, size_t na) const;
+  Token* new_token(Module& m, size_t na, Deps& d) const override;
 };
 /*--------------------------------------------------------------------------*/
-class Deps;
 class MGVAMS_FILTER : public FUNCTION_ {
   std::string eval(CS&, const CARD_LIST*)const override{
 	  unreachable();
 	  return "filt";
   }
 public:
-  virtual Token* new_token(Module& m, size_t na, Deps& d) const = 0;
+  // Token* new_token(Module& m, size_t na, Deps& d) const override;
   virtual void make_cc_common(std::ostream&) const {}
   virtual std::string code_name() const{
 	  return "";
@@ -93,9 +96,8 @@ public:
 	  unreachable();
 	  return NULL;
   }
-  virtual Token* new_token(Module& m, size_t na, Deps& d) const = 0;
-  virtual void make_cc_common(std::ostream&) const {}
-  virtual std::string code_name() const{
+  virtual void make_cc_common(std::ostream&)const {} //up?
+  std::string code_name()const override{
 	  return "";
   }
 };

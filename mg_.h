@@ -25,6 +25,7 @@
 #include <m_base.h>
 #include <m_expression.h>
 #include <set>
+#include "mg_deps.h" // BUG, Deps
 /*--------------------------------------------------------------------------*/
 #ifdef PASS_TRACE_TAGS
 #define make_tag() (out << "//" << __func__ << ":" << __LINE__ << "\n")
@@ -375,6 +376,29 @@ public:
   operator bool()const {return _s;}
 };
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+class Probe; // Dep?
+class DEP_STACK;
+class FUNCTION_;
+class Branch_Ref;
+class Symbolic_Expression : public Expression {
+  Block* _owner{NULL};
+  Deps _deps;
+public:
+  explicit Symbolic_Expression() : Expression() {}
+  ~Symbolic_Expression();
+  void resolve_symbols(Expression const& e, Block* scope, Deps* deps=NULL);
+  Symbolic_Expression& operator=(Symbolic_Expression const&);
+public:
+  Deps const& deps()const { return _deps; }
+  Deps& deps() { return _deps; }
+private: // all the same eventually?
+  Token* resolve_xs_function(std::string const& n, DEP_STACK& ds, Block* o);
+  Token* resolve_function(FUNCTION_ const* filt, DEP_STACK& ds, Block* o);
+  Token* resolve_system_task(FUNCTION_ const* t, DEP_STACK& ds, Block* o);
+  Probe const* new_probe(std::string const& xs, Branch_Ref const& br);
+};
+/*--------------------------------------------------------------------------*/
 // class AnalogExpression?
 class ConstantMinTypMaxExpression : public Base {
   Expression* _e{NULL};
@@ -619,42 +643,6 @@ public:
   void dump(std::ostream& f)const override;
 };
 /*--------------------------------------------------------------------------*/
-class Probe;
-class Deps {
-  typedef std::vector<Probe const*> S;
-  typedef S::const_iterator const_iterator;
-  S _s;
-public:
-  ~Deps();
-  std::pair<const_iterator, bool> insert(Probe const* x){
-    for(auto s = begin(); s!=end(); ++s){
-      if (*s == x){
-	return std::make_pair(s, false);
-      }else{
-      }
-    }
-    _s.push_back(x);
-    return std::make_pair(begin()+(int(size())-1), true);
-  }
-  void update(Deps const& other){
-    for(auto i : other){
-      insert(i);
-    }
-  }
-  Probe const* back(){
-    return _s.back();
-  }
-public:
-  const_iterator begin() const;
-  const_iterator end() const;
-  size_t size() const{
-    return _s.size();
-  }
-  bool empty() const{
-    return _s.empty();
-  }
-};
-/*--------------------------------------------------------------------------*/
 class Branch;
 class Branch_Ref : public Owned_Base {
   Branch* _br{NULL};
@@ -680,6 +668,7 @@ public:
 
   operator Branch*() const{ return _br; }
   Branch* operator->() const{ return _br; }
+  bool operator==(Branch_Ref const& o) const{ return _br==o._br && _r==o._r; }
   bool is_reversed() const{return _r;}
 
   std::string const& pname() const;
@@ -717,7 +706,6 @@ class Expression;
 class Variable : public Owned_Base {
 protected:
   String_Arg _name;
-  Deps _deps;
 public:
   explicit Variable() : Owned_Base() {}
   Variable(std::string const& name)
@@ -730,31 +718,25 @@ public:
 //  void set_type(Data_Type d){ _type=d; }
   virtual Data_Type const& type() const = 0;
   // bool is_int() const { return _type.is_int(); }
-  Deps const& deps()const { return _deps; }
-  Deps& deps() { return _deps; }
+  virtual Deps const& deps()const = 0;
+  virtual Deps& deps() = 0;
   String_Arg const& identifier()const {return _name;}
   std::string const& name()const {return _name.to_string();}
   virtual std::string code_name()const;
   virtual bool is_module_variable() const;
 
-  void parse(CS&) override;
-  void dump(std::ostream& o)const override;
+  // void parse(CS&) override;
+  // void dump(std::ostream& o)const override;
   virtual Branch_Ref new_branch(std::string const& p, std::string const& n);
   virtual Branch_Ref new_branch(Node const* p, Node const* n);
 
   virtual void update_deps(Deps const&);
-private:
-  bool is_node(std::string const& n)const;
-
 protected:
   void new_var_ref();
-  void resolve_symbols(Expression const& e, Expression& E);
-private:
-  Token* resolve_filter_function(Expression& E, std::string const& name, Deps const&);
-  Token_PROBE* resolve_xs_function(Expression& E, std::string const& name, Deps const&);
 };
 /*--------------------------------------------------------------------------*/
 class Variable_Decl : public Variable {
+  Deps _deps;
   Data_Type _type;
   Attribute_Instance const* _attributes{NULL};
 public:
@@ -771,6 +753,9 @@ public:
     return _type;
   }
   void set_type(Data_Type const& d){ _type=d; }
+  Deps const& deps()const override { return _deps; }
+  Deps& deps()override { return _deps; }
+
 protected:
 //  void set_type(std::string const& a){_type=a;}
 };
@@ -871,7 +856,6 @@ public:
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /// Some kind of sequential block with scope for parameters, variables..
-class Deps;
 class Filter;
 class Task;
 class Node;
@@ -898,10 +882,6 @@ public:
     return *_attributes;
   }
   void new_var_ref(Base* what);
-  virtual Probe const* new_probe(std::string const&, std::string const&, std::string const&)
-  {unreachable(); return NULL;}
-  virtual Probe const* new_probe(std::string const&, Branch_Ref const&)
-  {unreachable(); return NULL;}
 
   virtual Node* new_node(std::string const& p){ untested();
     assert(_owner);
@@ -963,15 +943,6 @@ public:
   void parse(CS&)override{incomplete();}
   void dump(std::ostream& o)const override;
 
-//  Block?
-  Probe const* new_probe(std::string const& xs, std::string const& p, std::string const& n)override {
-    assert(owner());
-    return owner()->new_probe(xs, p, n);
-  }
-  Probe const* new_probe(std::string const& xs, Branch_Ref const& br) override {
-    assert(owner());
-    return owner()->new_probe(xs, br);
-  }
   Branch_Ref new_branch(std::string const& p, std::string const& n)override {
     assert(owner());
     return owner()->new_branch(p, n);
@@ -1263,12 +1234,15 @@ typedef LiSt<Arg, '{', '#', '}'> Arg_List;
 /*--------------------------------------------------------------------------*/
 class Analog_Function_Arg : public Variable {
 //  String_Arg _identifier;
+  Deps _deps; // really?
 public:
   String_Arg const& identifier()const { return _name; }
   std::string name()const { return _name.to_string(); }
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   std::string code_name()const override;
+  Deps const& deps()const { return _deps; }
+  Deps& deps() { return _deps; }
 
   Data_Type const& type()const override{
     static Data_Type_Real r;
@@ -1357,10 +1331,12 @@ typedef LiSt<Probe, '{', '#', '}'> Probe_List;
 #endif
 // Name clash
 class Probe : public Base {
-  std::string _xs;
   Branch_Ref _br;
-  bool _is_flow_probe{false};
-  bool _is_pot_probe{false}; // type?
+  enum{
+    t_unknown = 0,
+    t_flow,
+    t_pot
+  } _type;
 public:
   explicit Probe(std::string const& xs, Branch_Ref b);
 //  std::string const& name()const {return _name;}
@@ -1371,9 +1347,8 @@ public:
   std::string const& pname() const{ return _br.pname(); }
   std::string const& nname() const{ return _br.nname(); }
 
-  bool is_flow_probe() const{ return _is_flow_probe;}
-  bool is_pot_probe() const{ return _is_pot_probe;}
-  bool is_filter_probe() const;
+  bool is_flow_probe() const{ return _type == t_flow;}
+  bool is_pot_probe() const{ return _type == t_pot;}
 
   std::string code_name() const;
   Branch const* branch() const{
@@ -1381,6 +1356,13 @@ public:
   }
   bool is_reversed() const;
   Nature const* nature() const;
+
+  bool operator==(Probe const& o) const{
+    return _br == o._br && _type == o._type;
+  }
+  bool operator!=(Probe const& o) const{
+    return !operator==(o);
+  }
 }; // Probe
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1565,7 +1547,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 // the branches used in the model, in probes and sources, deduplicated.
-class Branch_Map {
+class Branch_Map : public Owned_Base {
   typedef std::pair<Node const*, Node const*> key;
   typedef std::map<key, Branch*> map; // set?
 				      //
@@ -1623,13 +1605,6 @@ public:
   String_Arg const& identifier()const { return _variable.identifier(); }
   std::string code_name()const { return "af_" + identifier().to_string(); }
 public:
-//  Block?
-  Probe const* new_probe(std::string const&, std::string const&, std::string const&)override { untested();
-    return NULL;
-  }
-  Probe const* new_probe(std::string const&, Branch_Ref const&) override { untested();
-    return NULL;
-  }
   Branch_Ref new_branch(std::string const&, std::string const&)override { untested();
     return Branch_Ref();
   }
@@ -1666,9 +1641,9 @@ private: // verilog input data
   Parameter_List_Collection _parameters;
   Aliasparam_Collection _aliasparam;
   Element_2_List _element_list;
-  Port_1_List	_local_nodes;
+  Port_1_List _local_nodes;
   Attribute_Stash _attribute_stash;
-  AnalogList	_analog_list;
+  AnalogList _analog_list;
   // Code_Block		_validate;
 private: // merge?
   Filter_List _filters;
@@ -1714,7 +1689,7 @@ public:
   void new_evt_slot() { ++_num_evt_slots; }
   size_t num_evt_slots()const {return _num_evt_slots; }
 public:
-  const Probe_Map&	probes()const		{return _probes;}
+//  const Probe_Map&	probes()const		{return _probes;}
   const Filter_List&	filters()const		{return _filters;}
   const Node_Map&	nodes()const		{return _nodes;}
   const Branch_Names&	branch_names()const	{return _branch_names;}
@@ -1739,12 +1714,13 @@ public:
 private: // misc
   CS& parse_analog(CS& cmd);
 
+public: // BUG
+  Probe const* new_probe(std::string const&, std::string const&, std::string const&);
+  Probe const* new_probe(std::string const& xs, Branch_Ref const& br);
+  Branch_Ref new_branch(std::string const&, std::string const&) override;
 private:
-  Probe const* new_probe(std::string const&, std::string const&, std::string const&) override;
-  Probe const* new_probe(std::string const& xs, Branch_Ref const& br) override;
 
   Token* new_token(FUNCTION_ const*, Deps&, size_t na) override;
-  Branch_Ref new_branch(std::string const&, std::string const&) override;
   Branch_Ref const& new_branch_name(std::string const& n, Branch_Ref const& b) override;
   Node const* node(std::string const& p) const override;
   Branch_Ref branch(std::string const& p) const override;
@@ -1809,9 +1785,8 @@ public:
 // VariableAssignment?
 class Assignment : public Variable {
 protected:
-  Variable* _lhs{NULL}; // BUG
-//  Variable_Ref _lhs;
-  Expression* _rhs{NULL}; // const?
+  Variable* _lhs{NULL};
+  Symbolic_Expression _rhs;
 public:
   explicit Assignment(CS& f, Block* o);
   explicit Assignment() : Variable() {}
@@ -1819,23 +1794,20 @@ public:
 public:
   bool is_module_variable()const override;
   bool is_int() const;
-  Data_Type const& type()const override;
+  Data_Type const& type()const;
   std::string const& lhsname()const {
     assert(_lhs);
     return _lhs->name();
   }
-  Expression const* rhs()const {return _rhs;}
+  Symbolic_Expression const& rhs()const {return _rhs;}
   Variable const& lhs() const{
     assert(_lhs);
     return *_lhs;
   }
+  Deps const& deps()const { return _rhs.deps(); }
+  Deps& deps() { return _rhs.deps(); }
   void parse(CS& cmd) override;
   void dump(std::ostream&)const override;
-//private:
-//  Deps& lhsdeps() {
-//    assert(_lhs);
-//    return _lhs->deps();
-//  }
   void update_deps(Deps const&) override;
 // protected:
   void set_lhs(Variable* v);
@@ -1845,8 +1817,7 @@ public:
 class Contribution : public Owned_Base {
   std::string _name;
   Nature const* _nature{NULL};
-  Expression* _rhs{NULL}; // const?
-  Deps _deps;
+  Symbolic_Expression _rhs;
   Branch_Ref _branch;
   enum{
     t_unknown,
@@ -1857,14 +1828,13 @@ private:
   void set_pot_contrib();
   void set_flow_contrib();
   void set_direct(bool d=true);
-  Deps& deps() { return _deps; }
+  Deps& deps() { return _rhs.deps(); }
 public:
   Contribution(CS& f, Block* o)
     : Owned_Base(o), _branch(NULL) {
     parse(f);
   }
   ~Contribution(){
-    delete _rhs;
   }
 
   bool is_pot_contrib() const;
@@ -1872,8 +1842,8 @@ public:
   bool is_direct() const;
   void parse(CS&)override;
   void dump(std::ostream&)const override;
-  Deps const& deps() const { return _deps; }
-  Expression const* rhs()const {return _rhs;}
+  Deps const& deps() const { return _rhs.deps(); }
+  Expression const& rhs()const {return _rhs;}
   std::string const& name() const{return _name;}
   Branch_Ref const& branch_ref() const{return _branch;}
   Branch const* branch() const{return _branch;}
@@ -1886,6 +1856,8 @@ public:
     assert(owner());
     return owner()->new_branch(p, n);
   }
+private:
+  Expression& rhs() {return _rhs;}
 }; // Contribution
 /*--------------------------------------------------------------------------*/
 class Node : public Base {
@@ -2035,21 +2007,14 @@ public:
   size_t num_nodes()const override;
   std::string state()const override;
   std::string short_label()const override;
-  Probe const* prb() const;
+//  Probe const* prb() const;
   bool has_branch() const {
     return _branch;
   }
 }; // Filter
 /*--------------------------------------------------------------------------*/
-void resolve_symbols(Expression const& e, Expression& E, Block* scope, Deps*d=NULL);
 void make_cc_expression(std::ostream& o, Expression const& e);
 void make_cc_event_cond(std::ostream& o, Expression const& e);
-/*--------------------------------------------------------------------------*/
-inline bool Variable::is_node(std::string const& n) const
-{
-  assert(owner());
-  return owner()->node(n);
-}
 /*--------------------------------------------------------------------------*/
 inline void Variable::new_var_ref()
 {

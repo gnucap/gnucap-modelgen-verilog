@@ -25,17 +25,6 @@
 #include <globals.h>
 #include <stack>
 /*--------------------------------------------------------------------------*/
-// stub...
-static MGVAMS_FUNCTION const* lookup_function(std::string const& n)
-{
-  FUNCTION const* f = function_dispatcher[n];
-  if(auto g=dynamic_cast<MGVAMS_FUNCTION const*>(f)) {
-    return g;
-  }else{
-    return NULL;
-  }
-}
-/*--------------------------------------------------------------------------*/
 class RPN_VARS {
   typedef enum{
     t_flt,
@@ -83,7 +72,7 @@ public:
     }else{
       assert(_str_idx==_str_alloc);
       ++_str_alloc;
-      o << ind << "std::string s" << _str_idx << ";\n";
+      o__ "std::string s" << _str_idx << ";\n";
     }
     _types.push(t_str);
   }
@@ -93,7 +82,7 @@ public:
     }else{
       assert(_flt_idx==_flt_alloc);
       ++_flt_alloc;
-      o << ind << "ddouble t" << _flt_idx << ";\n";
+      o__ "ddouble t" << _flt_idx << ";\n";
     }
     _types.push(t_flt);
   }
@@ -119,7 +108,7 @@ public:
     assert(!_args.empty());
     _args.pop();
   }
-  size_t size() const{
+  size_t size() const{ untested();
     return _refs.size();
   }
   std::string code_name() const{
@@ -137,7 +126,7 @@ public:
   }
 };
 /*--------------------------------------------------------------------------*/
-void make_cc_string(std::ostream& o, String const& e)
+static void make_cc_string(std::ostream& o, String const& e)
 {
   o << '"';
   for(char c : e.val_string()){
@@ -154,82 +143,25 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 {
   typedef Expression::const_iterator const_iterator;
 
+  if(auto se = dynamic_cast<Symbolic_Expression const*>(&e)){
+    o << "//";
+    for(auto i : se->deps()) {
+      o << " Dep: " << i->code_name();
+    }
+    o << "\n";
+  }else{
+  }
+
   RPN_VARS s;
+  int have_parlist = false;
   // The _list is the expression in RPN.
   // print a program that computes the function and the derivatives.
   for (const_iterator i = e.begin(); i != e.end(); ++i) {
     trace2("mg_out_expr loop", (*i)->name(), s.size());
 
     if (auto var = dynamic_cast<const Token_VAR_REF*>(*i)) {
-      std::string prefix;
-      if((*var)->is_module_variable()){
-	prefix = "d->_v_";
-      }else{
-	prefix = "_v_";
-      }
-
       s.new_ref((*var)->code_name());
-    }else if (auto tsk = dynamic_cast<const Token_TASK*>(*i)) {
-      std::vector<std::string> argnames(s.num_args());
-
-      for(auto n=argnames.begin(); n!=argnames.end(); ++n){
-	*n = s.code_name();
-	s.pop();
-      }
-      s.new_float(o); // void?
-      o__ "d->" << tsk->code_name() << "(";
-
-      std::string comma;
-      for(size_t i=argnames.size(); i; --i){
-	o << comma << argnames[i-1];
-	comma = ", ";
-      }
-      o << ");\n";
-    }else if (auto f = dynamic_cast<const Token_FILTER*>(*i)) {
-      trace2("FILTER", s.code_name(), s.num_args());
-
-      std::vector<std::string> argnames(s.num_args());
-      if(s.num_args()==1){
-	o__ s.code_name() << " = " << f->code_name() << "(" << s.code_name() << ", d); // (193)\n";
-      }else{
-	for(auto n=argnames.begin(); n!=argnames.end(); ++n){
-	  *n = s.code_name();
-	  s.pop();
-	}
-	s.new_float(o);
-	o__ s.code_name() << " = " << f->code_name();
-	// BUG: see SYMBOL
-	o << "(";
-       	std::string comma;
-	for(size_t i=argnames.size(); i; --i){
-	  o << comma << argnames[i-1];
-	  comma = ", ";
-	}
-	o << ", d);\n";
-      }
-
-    }else if (dynamic_cast<const Token_PAR_REF*>(*i)) {
-      s.new_ref("pc->_p_" + (*i)->name());
-    }else if (dynamic_cast<const Token_CONSTANT*>(*i)) {
-      if(auto ff=dynamic_cast<Float const*>((*i)->data())){
-#if 1
-	// s.new_ref((*i)->name());
-	s.new_ref(ftos(ff->value(), 0, 20, ftos_EXP));
-#else
-	s.new_float(o);
-	o << ind << s.code_name() << " = " << (*i)->name() << ";\n";
-#endif
-      }else if(auto S=dynamic_cast<String const*>((*i)->data())){
-	s.new_string(o);
-	o << ind << s.code_name() << " = ";
-	make_cc_string(o, *S);
-	o << ";\n";
-      }else{untested();
-	unreachable();
-	s.new_string(o);
-	o << ind << s.code_name() << " = " << (*i)->name() << "; (u)\n";
-      }
-    }else if(auto pp = dynamic_cast<const Token_PROBE*>(*i)) {
+    }else if(auto pp = dynamic_cast<const Token_ACCESS*>(*i)) {
       s.new_float(o);
       assert((*pp)->branch());
       if((*pp)->branch()->is_short()){ untested();
@@ -239,30 +171,56 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 	o__ s.code_name() << " = " << sign << "p->" << (*pp)->code_name() << "; // "<< pp->name() <<"\n";
 	o__ s.code_name() << "[d" << (*pp)->code_name() << "] = " << sign << "1.;\n";
       }
-    }else if(/*parlist && ??*/dynamic_cast<const Token_SYMBOL*>(*i)) {
-      trace1("Symbol", (*i)->name());
-      assert(s.have_args());
-      MGVAMS_FUNCTION const* f = lookup_function((*i)->name()); // BUG
-      std::vector<std::string> argnames(s.num_args());
-      assert(s.num_args() == argnames.size());
-      for(auto n=argnames.begin(); n!=argnames.end(); ++n){
-	*n = s.code_name();
-	s.pop();
+    }else if (auto p = dynamic_cast<const Token_PAR_REF*>(*i)) {
+      s.new_ref("pc->" + p->code_name());
+    }else if (auto c = dynamic_cast<const Token_CONSTANT*>(*i)) {
+      if(auto ff=dynamic_cast<Float const*>(c->data())){
+#if 1
+	// s.new_ref((*i)->name());
+	s.new_ref(ftos(ff->value(), 0, 20, ftos_EXP));
+#else
+	s.new_float(o);
+	o << ind << s.code_name() << " = " << (*i)->name() << ";\n";
+#endif
+      }else if(auto S=dynamic_cast<String const*>(c->data())){
+	s.new_string(o);
+	o__ s.code_name() << " = ";
+	make_cc_string(o, *S);
+	o << ";\n";
+      }else{untested();
+	unreachable();
+	s.new_string(o);
+	o__ s.code_name() << " = " << (*i)->name() << "; (u)\n";
+      }
+    }else if(auto F = dynamic_cast<const Token_CALL*>(*i)) {
+      o__ "// function " << (*i)->name() << " " << s.have_args() << "\n";
+      std::vector<std::string> argnames;
+      if(have_parlist){
+	assert(s.have_args());
+	argnames.resize(s.num_args());
+	for(auto n=argnames.begin(); n!=argnames.end(); ++n){
+	  *n = s.code_name();
+	  s.pop();
+	}
+      }else{
       }
 
-      if(f && !argnames.size()){
+      if(F->returns_void()) {
+	s.new_float(o); // TODO
+	o__ "/*void*/ ";
+      }else{
 	s.new_float(o);
-	o << ind << s.code_name() << " = " << f->code_name() << "();\n";
-      }else if(argnames.size()) {
-	s.new_float(o);
-	// o << ind << s.code_name() << " = va::" << (*i)->name();
-	if(f && f->code_name()!=""){
-	  o__ s.code_name() << " = " << f->code_name();
-	}else if(auto af = dynamic_cast<Token_AFCALL const*>(*i)){
-	  o__ s.code_name() << " = " << af->code_name();
-	}else{
-	  o__ s.code_name() << " = /* ? */ va::" << (*i)->name();
-	}
+	o__ s.code_name() << " = ";
+      }
+
+      if(!have_parlist){
+	o << F->code_name() << "(); // no parlist\n";
+      }else if(!argnames.size()){
+	o << F->code_name() << "(); // no args\n";
+	s.args_pop();
+      }else{
+	assert(F->code_name()!="");
+	o << " /*(312)*/ " << F->code_name();
 
 	o << "(";
        	std::string comma = "";
@@ -271,12 +229,11 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 	  comma = ", ";
 	}
 	o << ");\n";
-
-      }else{ untested();
-	unreachable();
-	std::cerr << "run time error in make_cc_expression: " << (*i)->name() << ": " << s.num_args() << "\n";
+	s.args_pop();
       }
-      s.args_pop();
+    }else if(dynamic_cast<const Token_SYMBOL*>(*i)) { untested();
+      o__ "// incomplete:symbol " << (*i)->name() << "\n";
+      unreachable();
     }else if (dynamic_cast<const Token_PARLIST*>(*i)) {
     }else if (dynamic_cast<const Token_STOP*>(*i)) {
       s.stop();
@@ -300,7 +257,7 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 	|| op == '|'
 	|| op == '!' ){
 	o__ s.code_name() << " = " << arg1 << " " << (*i)->name() << " " << idy << ";\n";
-      }else if(op == '%'){
+      }else if(op == '%'){ itested();
 	o__ s.code_name() << " = va::fmod(" << arg1 << ", " << idy << ");\n";
       }else{ untested();
 	unreachable();
@@ -348,6 +305,13 @@ void make_cc_expression(std::ostream& o, Expression const& e)
       incomplete();
       unreachable();
       assert(false);
+    }
+
+    // TODO: use token.
+    if (dynamic_cast<const Token_PARLIST*>(*i)) {
+      have_parlist = true;
+    }else{
+      have_parlist = false;
     }
   }
 

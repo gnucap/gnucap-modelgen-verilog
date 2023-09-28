@@ -108,32 +108,25 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
   }
 
   // BUG this is incomplete.
-  for(auto x : m.probes()){
-    Probe const* p = x.second;
-    assert(p);
-    if(p->is_reversed()){
-      // only check once.
-    }else if(p->branch()->is_short()){ untested();
-    }else if(p->is_pot_probe()){
-      o << " if( !conchk("<< p->code_name() << ", ";
-      make_node_ref(o, *p->branch()->p());
+  for(auto br : m.branches()){
+    assert(br);
+    if(br->is_short()){ untested();
+    }else if(br->is_filter()){
+    }else if(br->has_flow_probe()){
+      o << " if( " << br->code_name() << " && !conchk(_flow"<< br->code_name() << ", "
+	<<  br->code_name() << "->tr_amps(), ";
+      o << flow_abstol(*br) << ")){\n";
+      o____ "return true;\n" <<ind<<"}else";
+    }else if(br->has_pot_probe()){
+      o << " if( !conchk(_potential"<< br->code_name() << ", ";
+      make_node_ref(o, *br->p());
       o << ".v0() - ";
-      make_node_ref(o, *p->branch()->n());
+      make_node_ref(o, *br->n());
       o << ".v0(), ";
-      o << potential_abstol(*p->branch()) << ")){\n";
+      o << potential_abstol(*br) << ")){\n";
       o____ "return true;\n" <<ind<<"}else";
-
-      if(p->nature())
-      o__ "/* Nature: " << p->nature()->identifier() << "*/";
-    }else if(p->is_flow_probe()){
-      o << " if( " << p->branch()->code_name() << " && !conchk("<< p->code_name() << ", "
-	<<  p->branch()->code_name() << "->tr_amps(), ";
-      o << flow_abstol(*p->branch()) << ")){\n";
-      o____ "return true;\n" <<ind<<"}else";
-
-      if(p->nature())
-      o__ "/* Nature: " << p->nature()->identifier() << "*/";
     }else{
+      assert(!br->has_flow_probe());
     }
   }
   o << "{\n";
@@ -364,6 +357,7 @@ void make_module_default_constructor(std::ostream& o, const Module& m)
 static void make_do_tr(std::ostream& o, const Module& m)
 {
   o << "bool MOD_" << m.identifier() << "::do_tr()\n{\n";
+  o__ "trace0(\"" << m.identifier() <<"::to_tr\");\n";
   o__ "clear_branch_contributions();\n";
   if(m.num_evt_slots()){
     o__ "_evt_seek = 0;\n";
@@ -460,6 +454,7 @@ static void make_tr_accept(std::ostream& o, const Module& m)
 static void make_read_probes(std::ostream& o, const Module& m)
 {
   o << "inline void MOD_" << m.identifier() << "::read_probes()\n{\n";
+  o__ "trace0(\"" << m.identifier() <<"::read_probes\");\n";
   // o__ "node_t gnd;\n";
   // o__ "gnd.set_to_ground(this);\n";
   // o__ "(void) gnd;\n";
@@ -693,13 +688,9 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
 	  // o << "/* short " << i->code_name() << " */";
 	}else if(seen[bb->number()]){
 	  // o << "/* seen " << i->code_name() << " */";
-	  assert(!i->is_filter_probe());
+//	  assert(!i->is_filter_probe());
 	}else if(bb == br){
 	  // o << "/* self conductance */" << "";
-	}else if(i->is_filter_probe()){
-	  assert(i->branch());
-	  o << ", _n[n_" << i->branch()->p()->name() << "]";
-	  o << ", gnd";
 	}else if(i->is_pot_probe()){
 	  assert(i->branch());
 	  // o << ",_n[n_" << i->branch()->p()->name() << "]";
@@ -708,6 +699,10 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
 	  make_node_ref(o, *i->branch()->p());
 	  o << ", ";
 	  make_node_ref(o, *i->branch()->n());
+// 	}else if(i->is_filter_probe()){
+// 	  assert(i->branch());
+// 	  o << ", gnd";
+// 	  o << ", _n[n_" << i->branch()->p()->name() << "]";
 	}else if(i->is_flow_probe()){
 	  // o << "/* flow " << i->code_name() << " */";
 	}else{ untested();
@@ -871,6 +866,11 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   if(m.element_list().size()){
     o__ "assert(subckt());\n";
     o__ "subckt()->attach_params(&(c->_netlist_params), scope());\n";
+  }else{
+  }
+
+  if(m.has_analog_block()){
+    o__ "zero_filter_readout();\n";
   }else{
   }
 

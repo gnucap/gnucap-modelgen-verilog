@@ -36,12 +36,13 @@ mg_filt.cc \
 mg_filt_ddx.cc \
 mg_filt_slew.cc \
 mg_func.cc \
+mg_func_math.cc \
+mg_func_sys.cc \
 mg_impl.cc \
 mg_in_analog.cc \
 mg_in.cc \
 mg_in_discipline.cc \
 mg_in_expr.cc \
-mg_in_old.cc \
 mg_in_module.cc \
 mg_in_paramset.cc \
 mg_in_verilog.cc \

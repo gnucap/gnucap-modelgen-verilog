@@ -81,6 +81,10 @@ private:
     o____ "q_evt(&__" << label() << ");\n";
     o__ "}\n";
   }
+  std::string code_name()const override{
+    return "d->" + label();
+  }
+  bool returns_void()const override { return true; }
 } strobe;
 DISPATCHER<FUNCTION>::INSTALL d_strobe(&function_dispatcher, "$strobe", &strobe);
 /*--------------------------------------------------------------------------*/
@@ -96,11 +100,13 @@ private:
   MGVAMS_TASK* clone()const override{ untested();
     return new FINISH_TASK(*this);
   }
-  Token* new_token(Module& m, size_t /* na */, Deps& d)const override{
+  Token* new_token(Module& m, size_t na, Deps& d)const override{
     m.install(this);
     Deps outdeps;
     d = outdeps;
-    return new Token_TASK("$finish", this);
+    Token_TASK* t = new Token_TASK("$finish", this);
+    t->set_num_args(na);
+    return t;
   }
   void make_cc_dev(std::ostream& o)const override {
     o__ "void t_finish(int n=1){\n";
@@ -109,6 +115,10 @@ private:
     o__ "}\n";
     o__ "void t_finish(double x){return t_finish(int(x));}\n";
   }
+  std::string code_name()const override{
+    return "d->" + label();
+  }
+  bool returns_void()const override { return true; }
 } finish;
 DISPATCHER<FUNCTION>::INSTALL d_finish(&function_dispatcher, "$finish", &finish);
 /*--------------------------------------------------------------------------*/
@@ -128,7 +138,7 @@ class LIMIT : public MGVAMS_TASK {
     return new Token_TASK("$limit", cl);
   }
   std::string code_name()const override{
-    return "_f_limit";
+    return "d->" + label() + "/*133*/";
   }
   void make_cc_common(std::ostream&)const override {
     // nothing.
@@ -141,11 +151,12 @@ class LIMIT : public MGVAMS_TASK {
     o______ "double old = in;\n";
     o______ "assert(what == \"pnjlim\"); // for now\n";
     o______ "if(_sim->is_initial_step()) {\n";
-    o________ "in = 0.;\n";
+    o________ "in.set_value(0.);\n";
     o________ "_old = 0;\n";
     o______ "}else{\n";
     // o________ "in = ngspice_pnjlim(in, _old, a, b);\n";
-    o________ "in = pnj_limit(in, _old, a, b);\n";
+    // BUG: what about the derivatives?
+    o________ "in.set_value(pnj_limit(in, _old, a, b));\n";
     o________ "_old = old;\n";
     o______ "}\n";
     o______ "// convcheck old vs in?\n";

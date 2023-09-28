@@ -250,9 +250,9 @@ void ConstExpression::parse(CS& file)
   trace1("ConstExpression::parse", file.tail().substr(0,19));
   assert(owner());
   Expression ce(file);
-  Expression tmp;
+  Symbolic_Expression tmp;
   assert(owner());
-  resolve_symbols(ce, tmp, owner());
+  tmp.resolve_symbols(ce, owner());
   _expression = new Expression(tmp, &CARD_LIST::card_list);
 }
 /*--------------------------------------------------------------------------*/

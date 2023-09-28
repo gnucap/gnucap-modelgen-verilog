@@ -326,6 +326,7 @@ private: // overrides
   void precalc_first()override;
   void expand()override;
   void precalc_last()override;
+  void zero_filter_readout();
   //void    map_nodes();         //BASE_SUBCKT
   //void    tr_begin();          //BASE_SUBCKT
   //void    tr_restore();        //BASE_SUBCKT
@@ -536,6 +537,7 @@ double MOD_resistor::tr_probe_num(std::string const& n) const
 /*--------------------------------------------------------------------------*/
 inline void MOD_resistor::read_probes()
 {
+  trace0("resistor::read_probes");
   node_t gnd(&ground_node);
   _potential_b_p_n = volts_limited(_n[n_p], _n[n_n]);
 }
@@ -568,6 +570,7 @@ bool MOD_resistor::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 bool MOD_resistor::do_tr()
 {
+  trace0("resistor::to_tr");
   clear_branch_contributions();
   read_probes();
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
@@ -578,6 +581,10 @@ bool MOD_resistor::do_tr()
   assert(subckt());
   set_converged(subckt()->do_tr() && converged());
   return converged();
+}
+/*--------------------------------------------------------------------------*/
+inline void MOD_resistor::zero_filter_readout()
+{
 }
 /*--------------------------------------------------------------------------*/
 inline void MOD_resistor::set_branch_contributions()
@@ -600,6 +607,7 @@ inline void MOD_resistor::clear_branch_contributions()
 /*--------------------------------------------------------------------------*/
 inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
 {
+  trace0("resistor::tr_eval_analog");
   MOD_resistor const* p = d;
   assert(p);
   COMMON_resistor const* pc = this;
@@ -607,7 +615,8 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
   {
     { // 
       ddouble _v_i; // Variable       Dep: _potential_b_p_n      
-      { // Assignment real 'i'. Dep: _potential_b_p_n
+      { // Assignment real 'i'.
+// Dep: _potential_b_p_n
         ddouble t0;
         t0 = +p->_potential_b_p_n; // V(p, n)
         t0[d_potential_b_p_n] = +1.;
@@ -617,6 +626,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         _v_i[d_potential_b_p_n] = t0[d_potential_b_p_n]; // (2b)
       }
       { // Contribution I(p, n)
+// Dep: _potential_b_p_n
         ddouble t0;
         t0 = _v_i;
         d->_value_b_p_n += t0.value();
@@ -749,6 +759,7 @@ void MOD_resistor::precalc_last()
   auto c = static_cast<COMMON_resistor*>(mutable_common());
   assert(c);
   (void)c;
+  zero_filter_readout();
   if(subckt()){
     subckt()->precalc_last();
   }else{untested();
@@ -1034,7 +1045,7 @@ class COMMON_capacitor :public COMMON_COMPONENT{
   typedef MOD_capacitor MOD;
   typedef ddouble_<2> ddouble;
   enum {
-    d__filter_b_ddt_0_,
+    d_potential_b_ddt_0_,
     d_potential_b_p_n,
      num_branches__  };
 public:
@@ -1075,7 +1086,7 @@ private:
 public:
   typedef ddouble_<2> ddouble;
   enum {
-    d__filter_b_ddt_0_,
+    d_potential_b_ddt_0_,
     d_potential_b_p_n,
      num_branches__  };
 private: // data
@@ -1086,6 +1097,7 @@ public: // netlist
   ELEMENT* _b_ddt_0_{NULL};
 private: // func decl
 //filt _b_ddt_0
+  ddouble _b_ddt_0(ddouble t0);
 private: // construct
   explicit MOD_capacitor(MOD_capacitor const&);
 public:
@@ -1096,6 +1108,7 @@ private: // overrides
   void precalc_first()override;
   void expand()override;
   void precalc_last()override;
+  void zero_filter_readout();
   //void    map_nodes();         //BASE_SUBCKT
   //void    tr_begin();          //BASE_SUBCKT
   //void    tr_restore();        //BASE_SUBCKT
@@ -1135,7 +1148,7 @@ public: // states, _b_p_n;
   double _value_b_p_n;
   double _st_b_p_n  [3]; // (s)
   struct _st_b_p_n_ {
-    enum {     VALUE, SELF, dep__filter_b_ddt_0_/* : */
+    enum {     VALUE, SELF, dep_potential_b_ddt_0_/* : */
     };
   } _dep_b_p_n;
   // filter_b_ddt_0_
@@ -1315,6 +1328,7 @@ double MOD_capacitor::tr_probe_num(std::string const& n) const
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::read_probes()
 {
+  trace0("capacitor::read_probes");
   node_t gnd(&ground_node);
   // filter _b_ddt_0_
   _potential_b_p_n = volts_limited(_n[n_p], _n[n_n]);
@@ -1351,6 +1365,7 @@ bool MOD_capacitor::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 bool MOD_capacitor::do_tr()
 {
+  trace0("capacitor::to_tr");
   clear_branch_contributions();
   read_probes();
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
@@ -1363,14 +1378,17 @@ bool MOD_capacitor::do_tr()
   return converged();
 }
 /*--------------------------------------------------------------------------*/
+inline void MOD_capacitor::zero_filter_readout()
+{
+  _potential_b_ddt_0_ = 0.
+;}
+/*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::set_branch_contributions()
 {
   assert(_value_b_p_n == _value_b_p_n);
   _st_b_p_n[0] = _value_b_p_n;
   // collect currents from named branches
-  // trace2(" filter _st_b_p_n", _st_b_p_n[2], __filter_b_ddt_0_);
-  // assert(2  ==  /*MOD::*/_st_b_p_n_::dep__filter_b_ddt_0_);
-  _st_b_p_n[0] += _st_b_p_n[/*MOD::*/_st_b_p_n_::dep__filter_b_ddt_0_] * _b_ddt_0_->tr_amps();
+  _st_b_p_n[0] -= _st_b_p_n[/*MOD::*/_st_b_p_n_::dep_potential_b_ddt_0_] * _potential_b_ddt_0_;
   // flow src (p, n)
   // filters
   // filter _b_ddt_0_
@@ -1385,6 +1403,7 @@ inline void MOD_capacitor::clear_branch_contributions()
 /*--------------------------------------------------------------------------*/
 inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
 {
+  trace0("capacitor::tr_eval_analog");
   MOD_capacitor const* p = d;
   assert(p);
   COMMON_capacitor const* pc = this;
@@ -1392,16 +1411,18 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
   {
     { // 
       { // Contribution I(p, n)
+// Dep: _potential_b_ddt_0_
         ddouble t0;
         t0 = +p->_potential_b_p_n; // V(p, n)
         t0[d_potential_b_p_n] = +1.;
-        t0 = _b_ddt_0(t0, d); // (193)
+        // function ddt 1
+        t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_0(t0);
         t0 = pc->_p_c * t0;
         d->_value_b_p_n += t0.value();
-        // dep __filter_b_ddt_0_
-        assert(t0[d__filter_b_ddt_0_] == t0[d__filter_b_ddt_0_]);
-        assert(MOD::_st_b_p_n_::dep__filter_b_ddt_0_ < 3);
-        d->_st_b_p_n[MOD::_st_b_p_n_::dep__filter_b_ddt_0_] += t0[d__filter_b_ddt_0_]; // (3)
+        // dep _potential_b_ddt_0_
+        assert(t0[d_potential_b_ddt_0_] == t0[d_potential_b_ddt_0_]);
+        assert(MOD::_st_b_p_n_::dep_potential_b_ddt_0_ < 3);
+        d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_ddt_0_] += t0[d_potential_b_ddt_0_]; // (3)
       }
     }
   }
@@ -1563,29 +1584,30 @@ void MOD_capacitor::precalc_last()
   auto c = static_cast<COMMON_capacitor*>(mutable_common());
   assert(c);
   (void)c;
+  zero_filter_readout();
   if(subckt()){
     subckt()->precalc_last();
   }else{untested();
   }
 }
 /*--------------------------------------------------------------------------*/
-COMMON_capacitor::ddouble COMMON_capacitor::FILTER_b_ddt_0::operator()( ddouble t0, COMPONENT* dd) const
+MOD_capacitor::ddouble MOD_capacitor::_b_ddt_0(ddouble t0)
 {
-  MOD_capacitor* d = prechecked_cast<MOD_capacitor*>(dd);
-  assert(d);
+  MOD_capacitor* d = this;
+  typedef MOD_capacitor MOD;
     d->_st_b_ddt_0_[0] = + t0.value();
     // dep _potential_b_p_n
     assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
     // assert(!d->_st_b_ddt_0_[2]);
     d->_st_b_ddt_0_[MOD::_st_b_ddt_0__::dep_potential_b_p_n]  = + t0[d_potential_b_p_n]; // (4)
-    d->_b_ddt_0_->do_tr();
-    t0 = d->_b_ddt_0_->tr_amps();
+  d->_b_ddt_0_->do_tr();
+  t0 = d->_b_ddt_0_->tr_amps();
+  d->_potential_b_ddt_0_ = - t0;
   trace2("filt", t0, d->_b_ddt_0_->tr_outvolts());
-  t0[d__filter_b_ddt_0_] = -1.;
+  t0[d_potential_b_ddt_0_] = -1.;
   assert(t0 == t0);
   return t0;
 }
-/*--------------------------------------------------------------------------*/
 }
 namespace n1{
 class MOD_capacitor;
@@ -1593,7 +1615,7 @@ class COMMON_capacitor :public COMMON_COMPONENT{
   typedef MOD_capacitor MOD;
   typedef ddouble_<2> ddouble;
   enum {
-    d__filter_b_ddt_1_,
+    d_potential_b_ddt_1_,
     d_potential_b_p_n,
      num_branches__  };
 public:
@@ -1645,7 +1667,7 @@ private:
 public:
   typedef ddouble_<2> ddouble;
   enum {
-    d__filter_b_ddt_1_,
+    d_potential_b_ddt_1_,
     d_potential_b_p_n,
      num_branches__  };
 private: // data
@@ -1655,9 +1677,10 @@ public: // netlist
   ELEMENT* _b_p_n{NULL}; // branch
   ELEMENT* _b_ddt_1_{NULL};
 private: // func decl
-//func 
-  // 
+//func analysis
+  // analysis
 //filt _b_ddt_1
+  ddouble _b_ddt_1(ddouble t0);
 private: // construct
   explicit MOD_capacitor(MOD_capacitor const&);
 public:
@@ -1668,6 +1691,7 @@ private: // overrides
   void precalc_first()override;
   void expand()override;
   void precalc_last()override;
+  void zero_filter_readout();
   //void    map_nodes();         //BASE_SUBCKT
   //void    tr_begin();          //BASE_SUBCKT
   //void    tr_restore();        //BASE_SUBCKT
@@ -1708,7 +1732,7 @@ public: // states, _b_p_n;
   double _value_b_p_n;
   double _st_b_p_n  [3]; // (s)
   struct _st_b_p_n_ {
-    enum {     VALUE, SELF, dep__filter_b_ddt_1_/* : */
+    enum {     VALUE, SELF, dep_potential_b_ddt_1_/* : */
     };
   } _dep_b_p_n;
   // filter_b_ddt_1_
@@ -1908,6 +1932,7 @@ double MOD_capacitor::tr_probe_num(std::string const& n) const
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::read_probes()
 {
+  trace0("capacitor::read_probes");
   node_t gnd(&ground_node);
   // filter _b_ddt_1_
   _potential_b_p_n = volts_limited(_n[n_p], _n[n_n]);
@@ -1944,6 +1969,7 @@ bool MOD_capacitor::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 bool MOD_capacitor::do_tr()
 {
+  trace0("capacitor::to_tr");
   clear_branch_contributions();
   read_probes();
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
@@ -1956,13 +1982,16 @@ bool MOD_capacitor::do_tr()
   return converged();
 }
 /*--------------------------------------------------------------------------*/
+inline void MOD_capacitor::zero_filter_readout()
+{
+  _potential_b_ddt_1_ = 0.
+;}
+/*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::set_branch_contributions()
 {
   assert(_value_b_p_n == _value_b_p_n);
   _st_b_p_n[0] = _value_b_p_n;
-  // trace2(" filter _st_b_p_n", _st_b_p_n[2], __filter_b_ddt_1_);
-  // assert(2  ==  /*MOD::*/_st_b_p_n_::dep__filter_b_ddt_1_);
-  _st_b_p_n[0] += _st_b_p_n[/*MOD::*/_st_b_p_n_::dep__filter_b_ddt_1_] * _b_ddt_1_->tr_amps();
+  _st_b_p_n[0] -= _st_b_p_n[/*MOD::*/_st_b_p_n_::dep_potential_b_ddt_1_] * _potential_b_ddt_1_;
   // pot src (p, n)
   if(!_b_p_n){ untested();
   }else if(_pot_b_p_n){
@@ -1984,6 +2013,7 @@ inline void MOD_capacitor::clear_branch_contributions()
 /*--------------------------------------------------------------------------*/
 inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
 {
+  trace0("capacitor::tr_eval_analog");
   MOD_capacitor const* p = d;
   assert(p);
   COMMON_capacitor const* pc = this;
@@ -1993,10 +2023,12 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
       {
         std::string s0;
         s0 = "ic";
+        // function analysis 1
         ddouble t0;
-        t0 = _f_analysis(s0);
+        t0 =  /*(312)*/ /*call1*/_f_analysis(s0);
         if (t0) {
           { // Contribution V(p, n)
+//
             ddouble t0;
             t0 = pc->_p_ic;
             if (!d->_pot_b_p_n){
@@ -2009,10 +2041,12 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
           }
         }else {
           { // Contribution I(p, n)
+// Dep: _potential_b_ddt_1_
             ddouble t0;
             t0 = +p->_potential_b_p_n; // V(p, n)
             t0[d_potential_b_p_n] = +1.;
-            t0 = _b_ddt_1(t0, d); // (193)
+            // function ddt 1
+            t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_1(t0);
             t0 = pc->_p_c * t0;
             if (d->_pot_b_p_n){
               d->_pot_b_p_n = false;
@@ -2021,10 +2055,10 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
             }else{
             }
             d->_value_b_p_n += t0.value();
-            // dep __filter_b_ddt_1_
-            assert(t0[d__filter_b_ddt_1_] == t0[d__filter_b_ddt_1_]);
-            assert(MOD::_st_b_p_n_::dep__filter_b_ddt_1_ < 3);
-            d->_st_b_p_n[MOD::_st_b_p_n_::dep__filter_b_ddt_1_] += t0[d__filter_b_ddt_1_]; // (3)
+            // dep _potential_b_ddt_1_
+            assert(t0[d_potential_b_ddt_1_] == t0[d_potential_b_ddt_1_]);
+            assert(MOD::_st_b_p_n_::dep_potential_b_ddt_1_ < 3);
+            d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_ddt_1_] += t0[d_potential_b_ddt_1_]; // (3)
           }
         }
 
@@ -2207,29 +2241,30 @@ void MOD_capacitor::precalc_last()
   auto c = static_cast<COMMON_capacitor*>(mutable_common());
   assert(c);
   (void)c;
+  zero_filter_readout();
   if(subckt()){
     subckt()->precalc_last();
   }else{untested();
   }
 }
 /*--------------------------------------------------------------------------*/
-COMMON_capacitor::ddouble COMMON_capacitor::FILTER_b_ddt_1::operator()( ddouble t0, COMPONENT* dd) const
+MOD_capacitor::ddouble MOD_capacitor::_b_ddt_1(ddouble t0)
 {
-  MOD_capacitor* d = prechecked_cast<MOD_capacitor*>(dd);
-  assert(d);
+  MOD_capacitor* d = this;
+  typedef MOD_capacitor MOD;
     d->_st_b_ddt_1_[0] = + t0.value();
     // dep _potential_b_p_n
     assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
     // assert(!d->_st_b_ddt_1_[2]);
     d->_st_b_ddt_1_[MOD::_st_b_ddt_1__::dep_potential_b_p_n]  = + t0[d_potential_b_p_n]; // (4)
-    d->_b_ddt_1_->do_tr();
-    t0 = d->_b_ddt_1_->tr_amps();
+  d->_b_ddt_1_->do_tr();
+  t0 = d->_b_ddt_1_->tr_amps();
+  d->_potential_b_ddt_1_ = - t0;
   trace2("filt", t0, d->_b_ddt_1_->tr_outvolts());
-  t0[d__filter_b_ddt_1_] = -1.;
+  t0[d_potential_b_ddt_1_] = -1.;
   assert(t0 == t0);
   return t0;
 }
-/*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
 }

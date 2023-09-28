@@ -226,11 +226,11 @@ Assignment::Assignment(CS& f, Block* o)
   }else{
     unreachable(); // loop statement??
   }
-}
+} // Assignment::Assignment
 /*--------------------------------------------------------------------------*/
 class AnalogProceduralAssignment : public Assignment {
 public:
-  AnalogProceduralAssignment(CS&, Block*);
+  explicit AnalogProceduralAssignment(CS&, Block*);
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
 };
@@ -621,42 +621,27 @@ void AnalogConstruct::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void Assignment::dump(std::ostream& o) const
 {
-  assert(_rhs);
-  o << lhsname() << " = " << *_rhs;
+  o << lhsname() << " = " << _rhs;
 }
 /*--------------------------------------------------------------------------*/
 Assignment::~Assignment()
 {
-  delete _rhs;
 }
 /*--------------------------------------------------------------------------*/
 void Assignment::parse(CS& cmd)
 {
-  // TODO: rhs is an analog expression
   assert(owner());
   trace1("Assignment::parse", cmd.tail().substr(0,10));
   Expression rhs(cmd);
-  assert(!_rhs);
-#if 1
-  Expression tmp;
+  assert(_rhs.is_empty());
+
+  Symbolic_Expression tmp;
   assert(owner());
-  assert(_deps.empty());
-  resolve_symbols(rhs, tmp); //(, owner(), &_deps);
+  assert(deps().empty());
+  tmp.resolve_symbols(rhs, owner(), &deps());
   trace1("Assignment::parse resolved", rhs.size());
-  _rhs = new Expression(tmp, &CARD_LIST::card_list);
+  _rhs = tmp;
   trace1("Assignment::parse gotit", rhs.size());
-#else
-  Expression tmp(rhs, &CARD_LIST::card_list);
-  _rhs = new Expression();
-  resolve_symbols(tmp, *_rhs);
-#endif
-}
-/*--------------------------------------------------------------------------*/
-void Variable::resolve_symbols(Expression const& e, Expression& E)
-{
-  Block* scope = owner();
-  assert(scope);
-  return ::resolve_symbols(e, E, scope, &_deps);
 }
 /*--------------------------------------------------------------------------*/
 void Branch_Ref::parse(CS& f)
@@ -754,34 +739,30 @@ void Contribution::parse(CS& cmd)
 
   {
     // Assignment::parse(cmd);
-    // TODO: rhs is an analog expression
     assert(owner());
     trace1("Assignment::parse", cmd.tail());
-    Expression rhs(cmd);
-    trace1("Assignment::parse", rhs.back()->name());
+    Expression rhs_(cmd);
+    assert(_rhs.is_empty());
+
+    Symbolic_Expression tmp;
+    assert(owner());
+    tmp.resolve_symbols(rhs_, owner(), &deps());
+    trace1("Assignment::parse resolved", rhs_.size());
+//    _rhs = Expression(tmp, &CARD_LIST::card_list);
+    _rhs = tmp;
+
+    trace1("Assignment::parse", rhs().back()->name());
     if(is_direct()){
-    }else if(rhs.is_empty()){
+    }else if(rhs().is_empty()){
       throw Exception_CS("syntax error", cmd);
-    }else if(rhs.back()->name()!="=="){ untested();
+    }else if(rhs().back()->name()!="=="){ untested();
       throw Exception_CS("syntax error", cmd);
     }else{
-      assert(dynamic_cast<Token_BINOP const*>(rhs.back()));
-      delete(rhs.back());
-      rhs.pop_back();
-      rhs.push_back(new Token_BINOP("-"));
+      assert(dynamic_cast<Token_BINOP const*>(rhs().back()));
+      delete(rhs().back());
+      rhs().pop_back();
+      rhs().push_back(new Token_BINOP("-"));
     }
-    assert(!_rhs);
-#if 1
-    Expression tmp;
-    assert(owner());
-    resolve_symbols(rhs, tmp, owner(), &deps());
-    trace1("Assignment::parse resolved", rhs.size());
-    _rhs = new Expression(tmp, &CARD_LIST::card_list);
-#else
-    Expression tmp(rhs, &CARD_LIST::card_list);
-    _rhs = new Expression();
-    resolve_symbols(tmp, *_rhs);
-#endif
     assert(owner());
 
     for(auto d : deps()) {
@@ -839,8 +820,8 @@ void Contribution::dump(std::ostream& o)const
   }
   o << " ";
 
-  assert(_rhs);
-  ::dump(o, *_rhs);
+  /// assert(_rhs);
+  ::dump(o, _rhs);
   o << ";\n";
 }
 /*--------------------------------------------------------------------------*/
@@ -878,10 +859,10 @@ void AnalogExpression::parse(CS& file)
   Expression rhs(file);
   file >> ","; // LiSt??
   assert(owner());
-  Expression tmp;
+  Symbolic_Expression tmp;
   assert(owner());
   Deps ignore; // really?
-  resolve_symbols(rhs, tmp, owner(), &ignore);
+  tmp.resolve_symbols(rhs, owner(), &ignore);
   _exp = new Expression(tmp, &CARD_LIST::card_list);
 }
 /*--------------------------------------------------------------------------*/
@@ -919,10 +900,10 @@ void AnalogEvtCtlStmt::dump(std::ostream& o) const
   }
 }
 /*--------------------------------------------------------------------------*/
-void Variable::parse(CS& f)
-{
-  f >> _name;
-}
+// void Variable_Decl::parse(CS& f)
+// {
+//   f >> _name;
+// }
 /*--------------------------------------------------------------------------*/
 void Analog_Function::parse(CS& f)
 {

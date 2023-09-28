@@ -43,6 +43,9 @@ public:
     return new SLEW(*this);
   }
 
+  std::string code_name()const override{
+    return "/*SLW*/ d->" + label();
+  }
 private:
   Token* new_token(Module& m, size_t na, Deps& d)const override{
     Filter* f = NULL;
@@ -55,7 +58,7 @@ private:
       f->set_owner(&m);
       f->set_dev_type("va_" + label());
 
-      cl->set_label("_f_" + filter_code_name);
+      cl->set_label("_" + filter_code_name);
       cl->set_num_args(na);
       cl->_m = &m;
       m.push_back(cl);
@@ -69,13 +72,14 @@ private:
     m.push_back(f);
     cl->_f = f;
 
-    auto t = new Token_FILTER(label(), cl);
+    auto t = new Token_CALL(label(), cl);
     return t;
   }
   void make_cc_dev(std::ostream& o)const override{
     assert(_f);
     std::string cn = _f->code_name();
     o__ "double " << cn << "state[" << _f->num_states() << "]\n;"; // filter/num_states?
+    make_cc_dev_(o);
   }
   void make_assign(std::ostream& o)const {
     assert(_f);
@@ -104,7 +108,19 @@ private:
     o__ "assert(t0 == t0);\n";
     o__ "return t0;\n";
   }
-  void make_cc_common(std::ostream& o)const override{
+  void make_cc_common(std::ostream& o)const override{}
+  void make_cc_dev_(std::ostream& o)const{
+    o__ " /*dev*/ ddouble " << label() << "(";
+      std::string comma;
+      for(size_t n=0; n<num_args(); ++n){
+	o << comma << "ddouble t" << n;
+	comma = ", ";
+      }
+    o << ");\n";
+//    o__ "};\n";
+  }
+#if 0
+  void make_cc_dev_(std::ostream& o)const{
     o__ "class FILTER" << label() << "{\n";
     o__ "public:\n";
     o____ "ddouble operator()(";
@@ -114,18 +130,23 @@ private:
     o << "COMPONENT*) const;\n";
     o__ "} " << label() << ";\n";
   }
+#endif
   void make_cc_impl(std::ostream&o)const override{
     assert(_m); // owner?
     assert(_f);
     std::string id = _m->identifier().to_string();
-    o << "COMMON_" << id << "::";
-    o << "ddouble COMMON_" << id << "::FILTER" << label() <<
-      "::operator()(";
+    // o << "COMMON_" << id << "::";
+    // o << "ddouble COMMON_" << id << "::FILTER" << label() <<
+    //   "::operator()(";
+    o << "MOD_" << id << "::ddouble";
+    o << " MOD_" << id << "::" << label() << "(";
+    std::string comma;
     for(size_t n=0; n<num_args(); ++n){
-      o << " ddouble t" << n << ", ";
+      o << comma << "ddouble t" << n;
+      comma = ", ";
     }
-    o << "COMPONENT* dd) const\n{\n";
-    o__ "MOD_" << id << "* d = prechecked_cast<MOD_" << id << "*>(dd);\n";
+    o << ")\n{\n";
+    o__ "MOD_" << id << "* d = prechecked_cast<MOD_" << id << "*>(this);\n";
     o__ "assert(d);\n";
     make_assign(o);
     o << "}\n"

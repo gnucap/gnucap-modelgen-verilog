@@ -40,8 +40,8 @@ module fct(p, n);
     TT = $vt(3);
     TT = (3 + $vt(17));
     TT = $temperature();
-    TT = $temperature();
-    TT = (3 + $temperature());
+    TT = $temperature;
+    TT = (3 + $temperature);
     TT = (3 + $temperature());
   end
 

@@ -41,10 +41,11 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
       }else{
       }
 
-      if(b->is_filter()){
-	o << "    d__filter" << b->code_name() << ",\n";
-      }else if(b->has_pot_probe()){
+      if(b->has_pot_probe()){
 	o << "    d_potential" << b->code_name() << ",\n";
+      }else if(b->is_filter()){
+	unreachable();
+	o << "    d__filter" << b->code_name() << ",\n";
       }else{
 	//      o << comma "// no pot probe?   d_potential" << b->code_name();
 	//      comma = ",\n";
@@ -412,6 +413,7 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "void precalc_first()override;\n";
   o__ "void expand()override;\n";
   o__ "void precalc_last()override;\n";
+  o__ "void zero_filter_readout();\n";
   o__ "//void    map_nodes();         //BASE_SUBCKT\n";
   o__ "//void    tr_begin();          //BASE_SUBCKT\n";
   o__ "//void    tr_restore();        //BASE_SUBCKT\n";

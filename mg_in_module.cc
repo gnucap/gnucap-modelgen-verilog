@@ -689,7 +689,6 @@ void Module::parse(CS& f)
     set_attributes(o->attribute_stash().detach());
   }
 
-
   // do we need a second pass? or just connect the dots while reading in?
   _ports.set_owner(this);
   _input.set_owner(this);
@@ -698,6 +697,7 @@ void Module::parse(CS& f)
   _ground.set_owner(this);
   _net_decl.set_owner(this);
   _branch_decl.set_owner(this);
+  _branches.set_owner(this);
   _variables.set_owner(this);
   _parameters.set_owner(this);
   _aliasparam.set_owner(this);
@@ -889,11 +889,6 @@ void Variable_Decl::parse(CS& file)
 void Variable_Decl::dump(std::ostream& o)const
 {
   o__ name();
-}
-/*--------------------------------------------------------------------------*/
-void Variable::dump(std::ostream& o)const
-{
-  o << name();
 }
 /*--------------------------------------------------------------------------*/
 void ValueRangeInterval::parse(CS& file)

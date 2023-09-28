@@ -6,15 +6,15 @@ test_lt0 #() dut (.p(2),.n(1));
 test_lt0 #() dut (.p(1),.n(0));
 vsource #() v1 (.p(v),.n(0));
 #           v(1)       v(2)       v(3)       v(v)       i(v1)      iter(0)   
- 2.5        0.79545    1.5909     2.3863     2.5       -0.11366    11.       
- 3.5        0.85034    1.7007     2.551      3.5       -0.94898    10.       
+ 2.5        0.79545    1.5909     2.3863     2.5       -0.11366    12.       
+ 3.5        0.85034    1.7007     2.551      3.5       -0.94898    11.       
  4.5        0.86823    1.7365     2.6047     4.5       -1.8953     6.        
  5.5        0.8789     1.7578     2.6367     5.5       -2.8633     6.        
  4.5        0.86823    1.7365     2.6047     4.5       -1.8953     6.        
  3.5        0.85034    1.7007     2.551      3.5       -0.94898    6.        
  2.5        0.79545    1.5909     2.3863     2.5       -0.11366    7.        
 Gnucap   System status
-iterations: op=0, dc=52, tran=0, fourier=0, total=52
+iterations: op=0, dc=54, tran=0, fourier=0, total=54
 transient timesteps: accepted=0, rejected=0, total=0
 nodes: user=4, subckt=0, model=0, total=4
 dctran density=62.5%, ac density=62.5%
