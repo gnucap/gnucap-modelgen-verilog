@@ -299,7 +299,6 @@ private: // strictly internal
   static int _count;
 public: // input parameters
   PARAMETER<real> _p_r /*  */;
-private: // analog functions
 private: // funcs
 }; //COMMON_resistor
 /*--------------------------------------------------------------------------*/
@@ -1070,7 +1069,6 @@ private: // strictly internal
   static int _count;
 public: // input parameters
   PARAMETER<real> _p_c /*  */;
-private: // analog functions
 private: // funcs
   class FILTER_b_ddt_0{
   public:
@@ -1640,7 +1638,6 @@ private: // strictly internal
 public: // input parameters
   PARAMETER<real> _p_c /*  */;
   PARAMETER<real> _p_ic /*  */;
-private: // analog functions
 private: // funcs
   double _f_analysis(std::string const& what)const {
     if(what=="ic"){

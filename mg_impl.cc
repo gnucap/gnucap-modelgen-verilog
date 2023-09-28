@@ -594,10 +594,11 @@ Nature const* Probe::nature() const
 }
 /*--------------------------------------------------------------------------*/
 Module::~Module()
-{
-  // cleanup references to branches.
+{ untested();
+  // cleanup
   _branch_names.clear();
   _analog_list.clear();
+  _analog_functions.clear();
   _branch_decl.clear();
   for(auto i: _probes){
     delete i.second;
@@ -607,7 +608,7 @@ Module::~Module()
 }
 /*--------------------------------------------------------------------------*/
 Block::~Block()
-{
+{ untested();
   delete _attributes;
   _attributes = NULL;
 }
@@ -689,7 +690,7 @@ bool Contribution::is_pot_contrib() const
 }
 /*--------------------------------------------------------------------------*/
 Contribution::~Contribution()
-{
+{ untested();
   if(!_branch) {
     incomplete();
   }else if (is_flow_contrib()) {

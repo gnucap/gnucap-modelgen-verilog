@@ -1028,7 +1028,6 @@ void make_cc_module(std::ostream& o, const Module& m)
   make_module_expand(o, m);
   make_module_precalc_last(o, m);
   make_cc_func(o, m);
-  make_cc_analog_functions(o, m);
 //  make_module_probe(o, m);
 //  make_module_aux(o, m);
   if(m.element_list().size()){

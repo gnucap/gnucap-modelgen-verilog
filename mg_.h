@@ -1628,7 +1628,9 @@ class Analog_Function : public Block{
   Analog_Function_Arg _variable;
   Data_Type _type;
   AF_Arg_List_Collection _args;
+  FUNCTION_ const* _function{NULL};
 public:
+  ~Analog_Function();
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   String_Arg const& identifier()const { return _variable.identifier(); }
@@ -1646,6 +1648,7 @@ public:
   Branch_Ref branch(std::string const&)const override {
     return Branch_Ref();
   }
+  FUNCTION_ const* function() const{return _function;}
   AF_Arg_List_Collection const& args() const{ return _args; }
   Analog_Function_Arg const& variable() const{ return _variable; }
 };

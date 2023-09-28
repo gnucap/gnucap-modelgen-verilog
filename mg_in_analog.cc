@@ -901,6 +901,122 @@ void AnalogEvtCtlStmt::dump(std::ostream& o) const
 //   f >> _name;
 // }
 /*--------------------------------------------------------------------------*/
+void make_cc_af_body(std::ostream& o, const Analog_Function& f); // BUG
+namespace{
+/*--------------------------------------------------------------------------*/
+Module const* to_module(Block const* owner)
+{
+  assert(owner);
+  while(true){
+    if(auto m = dynamic_cast<Module const*>(owner)){
+      return m;
+    }else{
+    }
+    owner = owner->owner();
+    assert(owner);
+  }
+  unreachable();
+  return NULL;
+}
+/*--------------------------------------------------------------------------*/
+void make_cc_af_args(std::ostream& o, const Analog_Function& f)
+{
+  std::string sep = "";
+  std::string qual = "";
+  for (auto coll : f.args()){
+      if(coll->is_output()){
+	qual = "&";
+      }else{
+	qual = "";
+      }
+    for(auto i : *coll){
+      o << sep << "ddouble " << qual;
+      o << " af_arg_" << i->identifier();
+      sep = ", ";
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+// analog_in? analog_out?
+class AF : public MGVAMS_FUNCTION {
+  Analog_Function const* _af{NULL};
+public:
+  explicit AF(Analog_Function const* af) : _af(af) { untested();
+    assert(_af);
+    set_label(af->identifier().to_string());
+  }
+
+#if 0
+  Token* new_token(Module& m, size_t /*na*/) const override {
+    trace1("AF::new_token", label());
+    m.install(this);
+    if(code_name() != ""){
+      return new Token_CALL(label(), this);
+    }else if(label() != ""){
+      return new Token_CALL(label(), this);
+    }else{
+      incomplete();
+      return NULL;
+    }
+  }
+#endif
+  std::string code_name()const override {
+    return "af_" + label();
+  }
+  void make_cc_impl(std::ostream& o)const override {
+    o << "//incomplete: af impl\n";
+    assert(_af);
+    auto mp = to_module(_af->owner());
+    assert(mp);
+    auto& m = *mp;
+#if 1
+    auto f = _af;
+    assert(f);
+    o << "COMMON_" << m.identifier() << "::";
+    o << "ddouble COMMON_" << m.identifier() << "::" << f->code_name() << "(\n";
+    o << "            ";
+    make_cc_af_args(o, *f);
+    o << ") const\n{\n";
+    {
+      indent x;
+      o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
+      o__ "(void)pc;\n";
+      make_cc_af_body(o, *f);
+    }
+    o << "}\n"
+      "/*--------------------------------------"
+      "------------------------------------*/\n";
+#endif
+  }
+
+  void make_cc_common(std::ostream& o)const override {
+    o << "//incomplete: af common\n";
+    assert(_af);
+    auto& F = *_af;
+    o__ "ddouble " << F.code_name() << "(";
+    trace1("af::make_cc_common", label());
+    // BUG? make_cc_af_args
+    std::string sep = "";
+    std::string qual = "";
+    for (auto coll : F.args()){
+      if(coll->is_output()){
+	qual = "/*output*/ &";
+      }else{
+	qual = "";
+      }
+      for(auto i : *coll){
+	o << sep << "ddouble " << qual;
+	o << "/*" << i->identifier() << "*/";
+	sep = ", ";
+      }
+    }
+    o << ") const;\n";
+  }
+
+};
+/*--------------------------------------------------------------------------*/
+} // namespace
+/*--------------------------------------------------------------------------*/
 void Analog_Function::parse(CS& f)
 {
 //  f >> _type >> _identifier; // VARIABLE
@@ -937,6 +1053,15 @@ void Analog_Function::parse(CS& f)
     }else{
     }
   }
+
+  assert(!_function);
+  _function = new AF(this);
+}
+/*--------------------------------------------------------------------------*/
+Analog_Function::~Analog_Function()
+{ untested();
+  delete _function;
+  _function = NULL;
 }
 /*--------------------------------------------------------------------------*/
 void Analog_Function::dump(std::ostream& o) const

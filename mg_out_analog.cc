@@ -85,6 +85,9 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
     }else if(within_af(&a)){
       o__ lhsname << " = t0; // (**)\n";
     }else{
+#ifdef TRACE_ASSIGN
+#endif
+
 #ifdef PASS_UNUSED_DERIV
       untested();
       o__ lhsname << " = t0; // (*)\n";
@@ -93,6 +96,9 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
       }
 #else
       o__ lhsname << " = t0.value(); // (*)\n";
+#ifdef TRACE_ASSIGN
+      o__ "trace1(\"assign\", " << lhsname << ");\n";
+#endif
 
       for(auto v : a.deps()) {
 	assert(v->branch());
@@ -100,6 +106,9 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
 	}else{
 	  o__ lhsname << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // (2b)\n";
 	}
+#ifdef TRACE_ASSIGN
+      o__ "trace1(\"assign\", " << lhsname << "[d" << v->code_name() << "]);\n";
+#endif
       }
 #endif
     }
@@ -177,47 +186,6 @@ static void make_cc_contrib(std::ostream& o, Contribution const& C)
   o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_cc_af_args(std::ostream& o, const Analog_Function& f)
-{
-  std::string sep = "";
-  std::string qual = "";
-  for (auto coll : f.args()){
-      if(coll->is_output()){
-	qual = "&";
-      }else{
-	qual = "";
-      }
-    for(auto i : *coll){
-      o << sep << "ddouble " << qual;
-      o << " af_arg_" << i->identifier();
-      sep = ", ";
-    }
-  }
-}
-/*--------------------------------------------------------------------------*/
-static void make_cc_af_body(std::ostream& o, const Analog_Function& f);
-/*--------------------------------------------------------------------------*/
-void make_cc_analog_functions(std::ostream& o, const Module& m)
-{
-  for(auto f : m.analog_functions()){
-    assert(f);
-    o << "COMMON_" << m.identifier() << "::";
-    o << "ddouble COMMON_" << m.identifier() << "::" << f->code_name() << "(\n";
-    o << "            ";
-    make_cc_af_args(o, *f);
-    o << ") const\n{\n";
-    {
-      indent x;
-      o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
-      o__ "(void)pc;\n";
-      make_cc_af_body(o, *f);
-    }
-    o << "}\n"
-      "/*--------------------------------------"
-      "------------------------------------*/\n";
-  }
-}
-/*--------------------------------------------------------------------------*/
 void AnalogExpression::dump(std::ostream& o)const
 {
   _exp.dump(o);
@@ -265,7 +233,7 @@ static void make_cc_analog_stmt(std::ostream& o, Base const& ab)
   }
 }
 /*--------------------------------------------------------------------------*/
-static void make_cc_af_body(std::ostream& o, const Analog_Function& f)
+void make_cc_af_body(std::ostream& o, const Analog_Function& f)
 {
   std::string me = f.variable().code_name();
   o__ "ddouble " << me << "(0.);\n";

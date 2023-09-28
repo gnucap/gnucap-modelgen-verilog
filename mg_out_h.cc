@@ -77,35 +77,6 @@ static void declare_ddouble(std::ostream& o, Module const& m)
   declare_deriv_enum(o, m);
 }
 /*--------------------------------------------------------------------------*/
-static void make_analogfunction_decl(std::ostream& o, const Analog_Function& F)
-{
-  o__ "ddouble " << F.code_name() << "(";
-
-  // BUG? make_cc_af_args
-  std::string sep = "";
-  std::string qual = "";
-  for (auto coll : F.args()){
-      if(coll->is_output()){
-	qual = "/*output*/ &";
-      }else{
-	qual = "";
-      }
-    for(auto i : *coll){
-      o << sep << "ddouble " << qual;
-      o << "/*" << i->identifier() << "*/";
-      sep = ", ";
-    }
-  }
-  o << ") const;\n";
-}
-/*--------------------------------------------------------------------------*/
-static void make_analogfunctions_decl(std::ostream& o, const Analog_Functions& P)
-{
-  for (auto q = P.begin(); q != P.end(); ++q) {
-    make_analogfunction_decl(o, **q);
-  }
-}
-/*--------------------------------------------------------------------------*/
 static void make_func_dev(std::ostream& o, std::set<FUNCTION_ const*> const& P)
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
@@ -123,7 +94,7 @@ static void make_func_dev(std::ostream& o, std::set<FUNCTION_ const*> const& P)
 static void make_funcs_common(std::ostream& o, std::set<FUNCTION_ const*> const& P)
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
-    if( (*q)->has_refs() ){
+    if( (*q)->has_refs() ){ untested();
       (*q)->make_cc_common(o);
     }else if(dynamic_cast<MGVAMS_FUNCTION const*>(*q)){
       o<<"// FUNCTION no refs: " << (*q)->label() << "\n";
@@ -245,8 +216,6 @@ static void make_common(std::ostream& o, const Module& m)
 //       ++p) {
 //    out << "  COMMON_COMPONENT* _" << (**p).name() << ";\n";
 //  }
-  o << "private: // analog functions\n";
-  make_analogfunctions_decl(o, m.analog_functions());
   o << "private: // funcs\n";
   make_funcs_common(o, m.funcs());
 

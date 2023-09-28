@@ -17,10 +17,23 @@ module test_af_0(p, n);
 			fct = exp(a*v);
 		end
 	endfunction
+	analog function real unused0;
+		input x;
+		begin
+			unused0 = x;
+		end
+	endfunction
+	analog function real unused1;
+		input x;
+		begin
+			unused1 = x;
+		end
+	endfunction
 
 	analog begin
 		real v;
 		V(p, n) <+ fct(v);
+		if(0.) v = unused1(v+2);
 	end
 endmodule
 

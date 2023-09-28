@@ -181,14 +181,15 @@ static Module const* to_module(Block const* owner)
   return NULL;
 }
 /*--------------------------------------------------------------------------*/
-static Analog_Function const* is_analog_function_call(std::string const& f, Block const* owner)
+static FUNCTION_ const* is_analog_function_call(std::string const& f, Block const* owner)
 {
   Module const* m = to_module(owner);
 
   for(auto n: m->analog_functions()){
     trace2("is_afcall", n->identifier(), f);
     if(n->identifier().to_string() == f){
-      return n;
+      assert(n->function());
+      return n->function();
     }else{
     }
   }
@@ -420,12 +421,21 @@ void Expression_::resolve_symbols_(Expression const& e, Deps* deps)
       Float* f = new Float(n);
       E.push_back(new Token_CONSTANT(n, f, ""));
       ds.new_constant();
-    }else if(Analog_Function const* af = is_analog_function_call(n, scope)) {
+    }else if(FUNCTION_ const* af = is_analog_function_call(n, scope)) {
       assert(dynamic_cast<Token_PARLIST*>(E.back()));
       ds.pop_args();
-      Token_AFCALL a(n, af);
-      a.stack_op(&E);
+
+      Token* tt = resolve_function(af, ds);
+      // Token_AFCALL a(n, af);
+      assert(tt);
+      tt->stack_op(&E);
+      delete tt;
     }else if(FUNCTION_ const* vaf = va_function(n)) {
+      // move to stack_op?
+      if(E.is_empty()){ untested();
+      }else if(dynamic_cast<Token_PARLIST const*>(E.back())){
+      }else{
+      }
       Token* tt = resolve_function(vaf, ds);
       // trace1("va_function no token?", t->name());
       assert(tt);

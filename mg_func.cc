@@ -104,7 +104,7 @@ FUNCTION_::~FUNCTION_()
     std::cerr << "stale ref " << _label << "\n";
   }else{
   }
-//  assert(has_refs());
+//  assert(!has_refs()); // base class
 }
 /*--------------------------------------------------------------------------*/
 Token* VAMS_ACCESS::new_token(Module& m, size_t na, Deps& d)const

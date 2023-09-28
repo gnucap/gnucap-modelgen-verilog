@@ -26,6 +26,7 @@
 #include <m_base.h>
 #include <m_expression.h>
 /*--------------------------------------------------------------------------*/
+class Probe;
 class Token_PARLIST_ : public Token_PARLIST {
 public:
   explicit Token_PARLIST_(Token_PARLIST const& p)
@@ -44,7 +45,7 @@ public:
   Token_BINOP_(Token_BINOP const& b) : Token_BINOP(b) {}
   Token* clone()const override{return new Token_BINOP_(*this);}
 
-  void stack_op(Expression* E)const;
+  // void stack_op(Expression* E)const; not yet
 };
 /*--------------------------------------------------------------------------*/
 class Token_SYMBOL_ : public Token_SYMBOL {
@@ -157,24 +158,6 @@ public:
   virtual /*?*/ std::string code_name() const;
   FUNCTION_ const* f() const{ return _function; }
   bool returns_void() const;
-};
-/*--------------------------------------------------------------------------*/
-class Analog_Function;
-// same as Token_CALL? Analog_Function is not a FUNCTION_ (yet?)
-class Token_AFCALL : public Token_CALL {
-  Analog_Function const* _f{NULL};
-public:
-  explicit Token_AFCALL(const std::string Name, Analog_Function const* f = NULL)
-    : Token_CALL(Name, NULL), _f(f) {}
-private:
-  explicit Token_AFCALL(const Token_AFCALL& P) : Token_CALL(P), _f(P._f) {}
-  Token* clone()const  override{return new Token_AFCALL(*this);}
-public:
-  std::string code_name()const {
-    return "af_" + name();
-//    assert(_f);
-//   return _f->code_name();
-  }
 };
 /*--------------------------------------------------------------------------*/
 class Token_SFCALL : public Token_CALL {
