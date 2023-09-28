@@ -105,18 +105,18 @@ static std::string getlines(FILE *fileptr)
       s += buffer;
     }
   }
-  trace1("getlines", s);
+  trace1("getlines", s.substr(0, 30));
   return s;
 }
 /*--------------------------------------------------------------------------*/
 static void append_to(CS& f, std::string& to, std::string until)
 {
-  trace2("append_to", f.tail(), f.ns_more());
+  trace2("append_to", f.tail().substr(0,10), f.ns_more());
   if(!f.ns_more()) {
     try{
 //      to+="\n";
       f.get_line("");
-      trace2("got line", f.tail(), f.ns_more());
+      trace2("got line", f.tail().substr(0,10), f.ns_more());
     }catch (Exception_End_Of_Input const&) {
       assert(!f.ns_more());
     }
@@ -138,7 +138,7 @@ static void append_to(CS& f, std::string& to, std::string until)
 //      to += "\n"; // BUG? BUG1
       try{
 	f.get_line("");
-	trace2("got line2 ", f.tail(), f.ns_more());
+	trace2("got line2 ", f.tail().substr(0,10), f.ns_more());
       }catch( Exception_End_Of_Input const&){
 	trace2("EOI", to.substr(0,20), chunk);
       }
@@ -334,7 +334,6 @@ void Define::parse(CS& f)
     }else if(f.match1('\n')){
       stash("\n", args);
       f.skip();
-      trace1("more?", f.tail());
       stash(f.get_to("\\/\n"), args);
     }
   }
@@ -454,7 +453,6 @@ static String_Arg_List eval_args(CS& f, size_t howmany, Define_List const& d)
   Raw_String_Arg_List values;
   if(!howmany) {
   }else if(f.match1('(')){
-    trace1("parse_n raw args", f.tail());
     values.parse_n(f, howmany);
     for(auto i : values){
       trace1("parse_n dbg", i->to_string());
@@ -463,7 +461,6 @@ static String_Arg_List eval_args(CS& f, size_t howmany, Define_List const& d)
   }
 
   if(values.size() == howmany){
-    trace1("parse_n done", f.tail());
   }else{
     throw Exception_CS("Need more values", f);
   }
@@ -709,7 +706,7 @@ void Preprocessor::parse(CS& file)
       }catch (Exception_End_Of_Input const&) {
 	break;
       }
-      trace1("got more", file.fullstring());
+      trace1("got more", file.fullstring().substr(0,10));
     }else if (!file.ns_more()) { untested();
       // proper end of file
       break;
@@ -726,6 +723,7 @@ void Preprocessor::dump(std::ostream& out)const
 {
   out << fullstring();
 }
+/*--------------------------------------------------------------------------*/
 void Preprocessor::add_include_path(std::string const& what)
 {
   std::string colon = "";

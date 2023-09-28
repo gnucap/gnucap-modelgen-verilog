@@ -47,14 +47,14 @@ public:
     return "/*SLW*/ d->" + label();
   }
 private:
-  Token* new_token(Module& m, size_t na, Deps& d)const override{
+  Token* new_token(Module& m, size_t na)const override{
     Filter* f = NULL;
 
     std::string filter_code_name = label() + "_" + std::to_string(n_filters++);
 
     SLEW* cl = clone();
     {
-      f = new Filter(filter_code_name, d /*?*/);
+      f = new Filter(filter_code_name);
       f->set_owner(&m);
       f->set_dev_type("va_" + label());
 
@@ -64,7 +64,6 @@ private:
       m.push_back(cl);
     }
 
-    f = new Filter(filter_code_name, d /*?*/);
     f->set_state("_f_" + filter_code_name + "state");
     f->set_num_states(int(na)+2);
     f->set_owner(&m);

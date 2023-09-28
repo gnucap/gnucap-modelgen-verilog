@@ -41,9 +41,9 @@ public:
   std::string code_name()const override{
     return "_f_analysis";
   }
-  Token* new_token(Module& m, size_t na, Deps& d)const override{
+  Token* new_token(Module& m, size_t na)const override{
     m.set_analysis();
-    return MGVAMS_FUNCTION::new_token(m, na, d);
+    return MGVAMS_FUNCTION::new_token(m, na);
     m.install(this);
     return new Token_CALL(label(), this);
   }
@@ -64,7 +64,7 @@ DISPATCHER<FUNCTION>::INSTALL d_analysis(&function_dispatcher, "analysis", &anal
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class ABSTIME : public MGVAMS_FUNCTION {
-  Token* new_token(Module& m, size_t, Deps&)const override {
+  Token* new_token(Module& m, size_t)const override {
     m.install(this);
     return new Token_SFCALL("$abstime", this);
   }
@@ -86,7 +86,7 @@ class TEMPERATURE : public MGVAMS_FUNCTION {
 public:
   ~TEMPERATURE(){ }
 private:
-  Token* new_token(Module& m, size_t, Deps&)const override {
+  Token* new_token(Module& m, size_t)const override {
     m.install(this);
     return new Token_SFCALL("$temperature", this);
   }
@@ -118,7 +118,7 @@ private:
     unreachable(); // SFCALL won't eval
     return "$$vt";
   }
-  Token* new_token(Module& m, size_t na, Deps&)const override {
+  Token* new_token(Module& m, size_t na)const override {
     m.install(&temperature);
     ++_temp; temperature.inc_refs(); // hack.
     m.install(this);
@@ -150,7 +150,7 @@ private:
 DISPATCHER<FUNCTION>::INSTALL d_vt(&function_dispatcher, "$vt", &vt);
 /*--------------------------------------------------------------------------*/
 class PARAM_GIVEN : public MGVAMS_FUNCTION {
-  Token* new_token(Module& m, size_t, Deps&)const override {
+  Token* new_token(Module& m, size_t)const override {
     m.install(this);
     return new Token_SFCALL("$param_given", this);
   }
@@ -169,7 +169,7 @@ class PARAM_GIVEN : public MGVAMS_FUNCTION {
 DISPATCHER<FUNCTION>::INSTALL d_pg(&function_dispatcher, "$param_given", &pg);
 /*--------------------------------------------------------------------------*/
 class SIMPARAM : public MGVAMS_FUNCTION {
-  Token* new_token(Module& m, size_t, Deps&)const override {
+  Token* new_token(Module& m, size_t)const override {
     m.install(this);
     return new Token_SFCALL("$simparam", this);
   }

@@ -32,31 +32,49 @@ namespace{
 /*--------------------------------------------------------------------------*/
 static int n_filters;
 /*--------------------------------------------------------------------------*/
+class Token_DDX : public Token_CALL {
+public:
+  explicit Token_DDX(const std::string Name, FUNCTION_ const* f)
+    : Token_CALL(Name, f) {}
+private:
+  explicit Token_DDX(const Token_DDX& P, Base const* data, Expression_ const* e = NULL)
+    : Token_CALL(P, data, e) {} // , _item(P._item) {}
+  Token* clone()const override {untested(); return new Token_DDX(*this);}
+
+  void stack_op(Expression* e)const override;
+
+  Probe const* ddxprobe()const {
+    auto ee = prechecked_cast<Expression const*>(args());
+    assert(ee);
+    Token const* t = ee->back();
+    assert(t);
+    auto dd = prechecked_cast<Deps const*>(t->data());
+    assert(dd);
+    assert(dd->size()==1);
+    return *dd->begin();
+  }
+
+};
+/*--------------------------------------------------------------------------*/
 class DDX : public MGVAMS_FILTER {
-  Probe const* _ddxprobe{NULL};
   Module* _m{NULL};
+  mutable Probe const* _ddxprobe{NULL}; // hack.
 public:
   explicit DDX(){ set_label("ddx"); }
   DDX* clone()const /*override*/{
     return new DDX(*this);
   }
-  Token* new_token(Module& m, size_t na, Deps& d)const override{
+  Token* new_token(Module& m, size_t na)const override{
     std::string filter_code_name = "_b_ddx_" + std::to_string(n_filters++);
     DDX* cl = clone();
     trace0("===");
-    for(auto p : d){
-      trace4("probe", p->pname(), p->nname(), p->code_name(), d.size());
-    }
-    assert(d.size());
-    cl->_ddxprobe = *d.begin();
+    // cl->_ddxprobe = *d.begin();
     cl->set_label(filter_code_name);
     cl->set_num_args(na);
     m.push_back(cl);
     cl->_m = &m;
 
-    d.clear();
-
-    auto t = new Token_CALL(label(), cl);
+    auto t = new Token_DDX(label(), cl);
     return t;
   }
   std::string code_name()const override{
@@ -74,9 +92,9 @@ public:
       comma = ", ";
     }
     o << ") const\n";
-
     assert(_ddxprobe);
-    o__ "{ // NEW  ddx " <<  _ddxprobe->code_name() << "\n";
+
+    o__ "{ // NEW  ddx " <<  code_name() << "\n";
     if(_ddxprobe->is_pot_probe()){
     }else{
       incomplete();
@@ -125,8 +143,43 @@ public:
     unreachable();
     return "ddx";
   }
+  void set_ddxprobe(Probe const* d) const {
+    _ddxprobe = d;
+  }
 } ddx;
 DISPATCHER<FUNCTION>::INSTALL d_ddx(&function_dispatcher, "ddx", &ddx);
+/*--------------------------------------------------------------------------*/
+void Token_DDX::stack_op(Expression* e)const
+{
+  assert(e);
+  Token_CALL::stack_op(e);
+  assert(!e->is_empty());
+  auto cc = prechecked_cast<Token_CALL const*>(e->back());
+  assert(cc);
+
+  auto ff = prechecked_cast<DDX const*>(f());
+  assert(ff);
+
+  auto ee = prechecked_cast<Expression const*>(cc->args());
+  assert(ee);
+  Token const* t = ee->back();
+  assert(t);
+  auto dd = prechecked_cast<Deps const*>(t->data());
+  assert(dd);
+  assert(dd->size());
+
+  auto d = new Deps; // incomplete. second order derivatives?
+  auto N = new Token_DDX(*this, d, cc->args()?cc->args()->clone():NULL);
+  assert(N->args());
+
+  ff->set_ddxprobe(N->ddxprobe());
+
+  { // just stick to Token_CALL?
+    e->pop_back();
+    e->push_back(N);
+    delete(cc);
+  }
+}
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/

@@ -9,11 +9,28 @@ module test(d, g, s, b);
 		T = 0 * P;
 		T = 0 * U;
 		T = exp(V(d, g)*0.+1);
+		T = exp(0.*V(d, g)+1);
 		T = pow(exp(3)+U, T+2);
 		T = 1+exp(U)+42.;
 		T = 1*exp(U);
 		T = exp(U)*1;
 		T = 2*exp(U)*42.;
+		T = 2*exp(U)/4.;
+		T = exp(U)/2/4.;
+		U = 2.*U/4.;
+		T = 2*exp(U)/4.;
+		T = 2/exp(U)*4.;
+		T = 2/exp(U)/4.;
+		T = 2-exp(U)-42.;
+		T = 2-exp(U)+42.;
+		T = (2-exp(U)) / 1.;
+		T = (2-exp(U)) * 1.;
+		T = exp(U)-42.;
+		T = 2+exp(U)-42.;
+		T = 2.0 * U * 3.0 / 5.;
+		T = 2.0 * P * 3.0 / 5.;
+		T = 2.0 * U * 3.0 / 5. * ln(1.0 + 0.4e-6 / T);
+		T = 2.0 * P * 3.0 / 5. * ln(1.0 + 0.4e-6 / T);
 	end
 endmodule
 

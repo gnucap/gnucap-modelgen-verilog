@@ -22,7 +22,7 @@
  * mockup component generator for analog block testing
  */
 #include <globals.h>
-#include <m_expression.h>
+#include "mg_expression.h"
 #include <c_comand.h>
 #include <e_cardlist.h>
 #include <stack>

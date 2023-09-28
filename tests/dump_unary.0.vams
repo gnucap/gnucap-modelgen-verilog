@@ -1,0 +1,13 @@
+`include "sub/disciplines.few"
+
+module test_res_8(p, n);
+	electrical p, n;
+	inout p, n;
+	real a, b;
+	parameter real p = 1.;
+	analog begin
+		a = V(n, p);
+		b = -a*b*b;
+		I(p,n) <+ ln(exp(-a * b));
+	end
+endmodule

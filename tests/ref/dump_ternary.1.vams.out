@@ -26,24 +26,16 @@ discipline electrical
 enddiscipline
 
 
-module test(d, g, s, b);
-  electrical d, g;
-  real    T;
-  real    U;
+module ternary(p, n);
+  inout p, n;
+  electrical p, n;
+  parameter real c = 1.;
+
+  real    a;
 
   analog begin
-    T = 0.;
-    T = 0.;
-    T = 0.;
-    T =  0.;
-    T =  0.;
-    T =  0.;
-    T =  0.;
-    T =  0.;
-    T =  0.;
-    T =  0.;
-    T = 0.;
-    T = 0.;
+    a = V(n, p);
+    I(p, n) <+ (c)? (a):(a);
   end
 
 endmodule

@@ -6,7 +6,7 @@ module test_af();
     real x;
 begin
       if ((x > 17.)) begin
-        limitex = (42. * ((x + 1.0) - 17.));
+        limitex = (((x + 1.0) - 17.) * 42.);
       end
       else if ((x < -17.)) begin
         limitex = 42.;
@@ -29,7 +29,7 @@ begin
     input x, y;
     real x, y;
 begin
-      something = (0.5 * (x + sqrt(((x * x) + ((y * 4.0) * y)))));
+      something = ((x + sqrt(((x * x) + ((y * 4.0) * y)))) * 0.5);
     end
   endfunction
 

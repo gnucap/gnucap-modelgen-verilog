@@ -57,7 +57,7 @@ class Deps : public Base {
   /* mutable */ S _s;
 public:
   explicit Deps() : Base() {}
-  explicit Deps(Deps const& d) : Base(), _s(d._s) { }
+  explicit Deps(Deps const& d) : Base(), _s(d._s) { untested(); }
   ~Deps();
   Deps* clone()const {
     return new Deps(*this);
@@ -76,7 +76,7 @@ public:
   }
 private:
   void parse(CS&)override {unreachable();}
-  void dump(std::ostream& o)const override {unreachable();}
+  void dump(std::ostream&)const override {unreachable();}
 public:
   Deps& operator=(Deps const& d){
     clear();
@@ -91,7 +91,7 @@ public:
   bool empty() const{
     return _s.empty();
   }
-  Base* multiply(const Base* X)const override	{
+  Base* multiply(const Base* X)const override	{ untested();
     auto n = clone();
     auto o = prechecked_cast<Deps const*>(X);
     assert(o);

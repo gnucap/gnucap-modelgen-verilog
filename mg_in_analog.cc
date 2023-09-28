@@ -59,7 +59,7 @@ lowing statements:
 + | { attribute_instance } analog_seq_block
 - | { attribute_instance } analog_system_task_enable
 + | { attribute_instance } contribution_statement
-- | { attribute_instance } indirect_contribution_statement
++ | { attribute_instance } indirect_contribution_statement
 - | { attribute_instance } analog_event_control_statement// from A.6.4
 + analog_statement_or_null ::=
 + analog_statement
@@ -188,10 +188,9 @@ static Variable* parse_variable(CS& f, Block* o)
   Base* b = o->resolve(what);
   Variable* v = dynamic_cast<Variable*>(b);
   if(!v){
-    f.reset(here);
+    f.reset_fail(here);
     trace1("not a variable", f.tail().substr(0,10));
     return NULL; // BUG
-    throw Exception_CS("what's this: " + what, f);
   }else{
   }
   return v;
@@ -208,6 +207,7 @@ Assignment::Assignment(CS& f, Block* o)
 
   if(f >> "="){
   }else{
+    // reset_fail
     throw Exception_No_Match("no assignment");
   }
 
@@ -262,7 +262,7 @@ AnalogProceduralAssignment::AnalogProceduralAssignment(CS& file, Block* o)
   size_t here = file.cursor();
   std::string what;
   file >> what;
-  trace2("assignment?", what, file.tail().substr(0,20));
+  trace3("assignment?", what, file.tail().substr(0,20), o);
 //  file >> what;
   if(what == ""){ untested();
     throw Exception_No_Match("need name");
@@ -277,7 +277,8 @@ AnalogProceduralAssignment::AnalogProceduralAssignment(CS& file, Block* o)
     throw Exception_No_Match("what's this: " + what);
   }else if(file >> "=") {
     assert(v->name() != "");
-    trace3("got a variable", what, file.tail().substr(0,10), v->name());
+    Variable const* cv=v;
+    trace4("got a variable", what, file.tail().substr(0,10), v->name(), cv->owner());
     set_lhs(v);
     set_owner(o);
     trace1("pA", file.tail().substr(0,10));
@@ -289,7 +290,9 @@ AnalogProceduralAssignment::AnalogProceduralAssignment(CS& file, Block* o)
     throw Exception_CS("need assign op", file);
   }
 
+  trace4("dep variable", v->name(), deps().size(), rhs().deps().size(), v->deps().size());
   v->update_deps(deps());
+  trace4("dep variable", v->name(), deps().size(), rhs().deps().size(), v->deps().size());
 
 }
 /*--------------------------------------------------------------------------*/
@@ -626,6 +629,8 @@ void Assignment::dump(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 Assignment::~Assignment()
 {
+  delete _deps;
+  _deps = NULL;
 }
 /*--------------------------------------------------------------------------*/
 void Assignment::parse(CS& cmd)
@@ -688,7 +693,7 @@ void Contribution::parse(CS& cmd)
     cmd >> _branch;
   }catch (Exception_No_Match const&){
     cmd.reset(here);
-    trace2("not a Contribution", _name, cmd.tail());
+    trace2("not a Contribution", _name, cmd.tail().substr(0,20));
     throw Exception_No_Match("not a contribution");
   }
   trace1("Contribution", _name);
@@ -737,7 +742,7 @@ void Contribution::parse(CS& cmd)
   {
     // Assignment::parse(cmd);
     assert(owner());
-    trace1("Assignment::parse", cmd.tail());
+    trace1("Assignment::parse", cmd.tail().substr(0,20));
     Expression rhs_(cmd);
     assert(_rhs.is_empty());
 
@@ -752,10 +757,13 @@ void Contribution::parse(CS& cmd)
     }else if(rhs().back()->name()!="=="){ untested();
       throw Exception_CS("syntax error", cmd);
     }else{
-      assert(dynamic_cast<Token_BINOP const*>(rhs().back()));
-      delete(rhs().back());
+      auto b = dynamic_cast<Token_BINOP_*>(rhs().back());
+      assert(b);
+      auto dd = deps().clone();
       rhs().pop_back();
-      rhs().push_back(new Token_BINOP("-"));
+      rhs().push_back(new Token_BINOP_("-", b->op1(), b->op2(), dd));
+      b->pop();
+      delete b;
     }
     assert(owner());
 
@@ -778,7 +786,7 @@ void Contribution::parse(CS& cmd)
 /*--------------------------------------------------------------------------*/
 void Branch_Map::parse(CS& f)
 { untested();
-  trace1("Branch_Map::parse", f.tail());
+  trace1("Branch_Map::parse", f.tail().substr(0,20));
   incomplete();
 }
 /*--------------------------------------------------------------------------*/
@@ -941,12 +949,12 @@ void make_cc_af_args(std::ostream& o, const Analog_Function& f)
 class AF : public MGVAMS_FUNCTION {
   Analog_Function const* _af{NULL};
 public:
-  explicit AF(Analog_Function const* af) : _af(af) { untested();
+  explicit AF(Analog_Function const* af) : _af(af) {
     assert(_af);
     set_label(af->identifier().to_string());
   }
 
-#if 0
+#if 1
   Token* new_token(Module& m, size_t /*na*/) const override {
     trace1("AF::new_token", label());
     m.install(this);
@@ -1059,7 +1067,7 @@ void Analog_Function::parse(CS& f)
 }
 /*--------------------------------------------------------------------------*/
 Analog_Function::~Analog_Function()
-{ untested();
+{
   delete _function;
   _function = NULL;
 }
@@ -1141,5 +1149,19 @@ void AF_Arg_List::dump(std::ostream& o)const
   LiSt<Analog_Function_Arg, '\0', ',', ';'>::dump(o);
   o << "\n";
 }
+/*--------------------------------------------------------------------------*/
+void Assignment::update_deps(Deps const& d)
+{
+  assert(_lhs);
+  _lhs->update_deps(d);
+  if(_deps) {
+  }else{
+    _deps = rhs().deps().clone();
+  }
+  _deps->update(d);
+//  assert(&deps() != &d);
+//  deps().update(d);
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

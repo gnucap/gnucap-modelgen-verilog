@@ -29,7 +29,7 @@
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-Token* MGVAMS_FUNCTION::new_token(Module& m, size_t /*na*/, Deps&) const
+Token* MGVAMS_FUNCTION::new_token(Module& m, size_t /*na*/) const
 {
   m.install(this);
   if(code_name() != ""){
@@ -107,7 +107,7 @@ FUNCTION_::~FUNCTION_()
 //  assert(!has_refs()); // base class
 }
 /*--------------------------------------------------------------------------*/
-Token* VAMS_ACCESS::new_token(Module& m, size_t na, Deps& d)const
+Token* VAMS_ACCESS::new_token(Module& m, size_t na)const
 {
   // use na?
   Branch_Ref br = m.new_branch(_arg0, _arg1);
@@ -119,10 +119,10 @@ Token* VAMS_ACCESS::new_token(Module& m, size_t na, Deps& d)const
   // install clone?
   FUNCTION_ const* p = m.new_probe(_name, br);
 
-  return p->new_token(m, na, d);
+  return p->new_token(m, na);
 }
 /*--------------------------------------------------------------------------*/
-Token* Probe::new_token(Module& m, size_t na, Deps& d)const
+Token* Probe::new_token(Module&, size_t na)const
 {
   std::string name;
   if(discipline()){
@@ -157,9 +157,11 @@ Token* Probe::new_token(Module& m, size_t na, Deps& d)const
   }
   name += ")";
 
-  Token_ACCESS* nt = new Token_ACCESS(name, this);
-  assert(d.empty());
-  d.insert(Dep(nt->prb(), Dep::_LINEAR));
+  Deps* deps = new Deps;
+  deps->insert(Dep(this, Dep::_LINEAR));
+
+  Token_ACCESS* nt = new Token_ACCESS(name, deps, this);
+  // d.insert(Dep(nt->prb(), Dep::_LINEAR));
   return nt;
 }
 /*--------------------------------------------------------------------------*/

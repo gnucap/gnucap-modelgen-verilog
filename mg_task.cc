@@ -44,15 +44,13 @@ private:
   MGVAMS_TASK* clone()const override {
     return new STROBE_TASK(*this);
   }
-  Token* new_token(Module& m, size_t na, Deps& d)const override{
+  Token* new_token(Module& m, size_t na)const override{
     m.new_evt_slot();
     MGVAMS_TASK* cl = clone();
     cl->set_num_args(na);
     cl->set_label("t_strobe_" + std::to_string(cnt++));
-    Deps outdeps;
-    d = outdeps;
     m.push_back(cl);
-    return new Token_TASK("$strobe", cl);
+    return new Token_CALL("$strobe", cl);
   }
   void make_cc_dev(std::ostream& o)const override {
     o__ "struct _" << label() << " : public va::EVT {\n";
@@ -100,12 +98,10 @@ private:
   MGVAMS_TASK* clone()const override{ untested();
     return new FINISH_TASK(*this);
   }
-  Token* new_token(Module& m, size_t na, Deps& d)const override{
+  Token* new_token(Module& m, size_t na)const override{
     m.install(this);
-    Deps outdeps;
-    d = outdeps;
-    Token_TASK* t = new Token_TASK("$finish", this);
-    t->set_num_args(na);
+    Token_CALL* t = new Token_CALL("$finish", this);
+    t->set_num_args(na); // still needed?
     return t;
   }
   void make_cc_dev(std::ostream& o)const override {
@@ -129,13 +125,13 @@ class LIMIT : public MGVAMS_TASK {
   LIMIT* clone()const override{
     return new LIMIT(*this);
   }
-  Token* new_token(Module& m, size_t na, Deps&)const override{
+  Token* new_token(Module& m, size_t na)const override{
     LIMIT* cl = clone();
     cl->set_label("t_limit_" + std::to_string(cnt++));
     cl->set_num_args(na);
     m.push_back(cl);
     // d untouched?
-    return new Token_TASK("$limit", cl);
+    return new Token_CALL("$limit", cl);
   }
   std::string code_name()const override{
     return "d->" + label() + "/*133*/";

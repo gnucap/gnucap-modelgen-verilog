@@ -25,6 +25,14 @@
 #include "m_tokens.h"
 #include "mg_.h"
 /*--------------------------------------------------------------------------*/
+static void dump_token(Token const* t, std::ostream& out)
+{
+  assert(t);
+  Expression_ e;
+  e.push_back(const_cast<Token*>(t));
+  e.dump(out);
+  e.pop_back();
+}
 // void Token::dump(std::ostream& out)const
 // {itested();
 //   out << _name << ' ';
@@ -37,6 +45,7 @@ void Expression_::dump(std::ostream& out)const
   // The _list is the expression in RPN.
   // Un-parse it -- back to infix.
   for (const_iterator i = begin(); i != end(); ++i) {
+    trace1("dump", (*i)->name());
     if (dynamic_cast<const Token_STOP*>(*i)) {
       stack.push_back(*i);
     }else if (dynamic_cast<const Token_PARLIST*>(*i)
@@ -79,7 +88,21 @@ void Expression_::dump(std::ostream& out)const
       locals.push_back(t);
       stack.push_back(t);
     }else if (dynamic_cast<const Token_CONSTANT*>(*i)|| dynamic_cast<const Token_SYMBOL*>(*i)) {
-      if (!stack.empty() && (dynamic_cast<const Token_PARLIST*>(stack.back()))) {
+      if (auto call = dynamic_cast<const Token_CALL*>(*i)) {
+	if (auto args = dynamic_cast<const Expression_*>(call->args())) {
+	  std::stringstream tmp;
+	  tmp << (**i).name() << '(';
+	  args->dump(tmp);
+	  tmp << ')';
+	  Token* n = new Token_SYMBOL(tmp.str(), "");
+
+//	  stack.pop_back();
+	  locals.push_back(n);
+	  stack.push_back(n);
+	}else{
+	  stack.push_back(*i);
+	}
+      }else if (!stack.empty() && (dynamic_cast<const Token_PARLIST*>(stack.back()))) { untested();
 	// has parameters (table or function)
 	// pop op push
 	const Token* t1 = stack.back();
@@ -91,7 +114,33 @@ void Expression_::dump(std::ostream& out)const
 	// has no parameters (scalar)
 	stack.push_back(*i);
       }
+    }else if (auto b = dynamic_cast<const Token_BINOP_*>(*i)) {
+      const Token* t2 = b->op2();
+      if(t2){
+	std::stringstream s2;
+	dump_token(t2, s2);
+	const Token* t1 = b->op1();
+	std::stringstream s1;
+	dump_token(t1, s1);
+	std::string tmp('(' + s1.str() + ' ' + (**i).name() + ' ' + s2.str() + ')');
+	Token* t = new Token_SYMBOL(tmp, "");
+	locals.push_back(t);
+	stack.push_back(t);
+      }else{
+	// upstream
+	assert(!stack.empty());
+	const Token* t2 = stack.back();
+	stack.pop_back();
+	assert(!stack.empty());
+	const Token* t1 = stack.back();
+	stack.pop_back();
+	std::string tmp('(' + t1->full_name() + ' ' + (**i).name() + ' ' + t2->full_name() + ')');
+	Token* t = new Token_SYMBOL(tmp, "");
+	locals.push_back(t);
+	stack.push_back(t);
+      }
     }else if (dynamic_cast<const Token_BINOP*>(*i)) {
+      unreachable();
       // pop pop op push
       assert(!stack.empty());
       const Token* t2 = stack.back();
@@ -103,32 +152,57 @@ void Expression_::dump(std::ostream& out)const
       Token* t = new Token_SYMBOL(tmp, "");
       locals.push_back(t);
       stack.push_back(t);
-    }else if (dynamic_cast<const Token_UNARY*>(*i)) {
+    }else if (auto u = dynamic_cast<const Token_UNARY_*>(*i)) {
       // pop op push
-      assert(!stack.empty());
-      const Token* t1 = stack.back();
-      stack.pop_back();
-      std::string tmp('(' + (**i).name() + ' ' + t1->full_name() + ')');
+      std::string fn;
+      if(u->op1()){
+	std::stringstream tmp;
+	dump_token(u->op1(), tmp);
+	fn = tmp.str();
+      }else if(stack.empty()){
+	fn = "BUG";
+	unreachable();
+      }else{
+	const Token* t1 = stack.back();
+	stack.pop_back();
+	fn = t1->full_name();
+      }
+      std::string tmp('(' + (**i).name() + ' ' + fn + ')');
       Token* t = new Token_SYMBOL(tmp, "");
       locals.push_back(t);
       stack.push_back(t);
-    }else if (auto t = dynamic_cast<const Token_TERNARY*>(*i)) {
-      assert(!stack.empty());
-      const Token* cond = stack.back();
-      stack.pop_back();
+    }else if (auto t = dynamic_cast<const Token_TERNARY_*>(*i)) {
       std::stringstream tmp;
+      tmp << '(';
+      if(t->cond()){
+	dump_token(t->cond(), tmp);
+      }else if(stack.empty()){ untested();
+	unreachable();
+      }else{ untested();
+	const Token* cond = stack.back();
+	unreachable();
+	tmp << cond->full_name();
+	stack.pop_back();
+      }
 
-      tmp << '(' << cond->full_name() << ")? (";
+      tmp << ")? (";
+      assert(t->true_part());
       t->true_part()->dump(tmp);
       tmp << "):(";
+      assert(t->false_part());
       t->false_part()->dump(tmp);
       tmp << ')';
+      std::string s = tmp.str();
 
-      Token* n = new Token_SYMBOL(tmp.str(), "");
+      Token* n = new Token_SYMBOL(s, "");
+      trace2("", locals.size(), stack.size());
+      trace1("", tmp.str());
       locals.push_back(n);
       stack.push_back(n);
     }else{
       unreachable();
+      assert(!dynamic_cast<const Token_TERNARY*>(*i));
+      assert(!dynamic_cast<const Token_UNARY*>(*i));
     }
   }
   std::string comma;

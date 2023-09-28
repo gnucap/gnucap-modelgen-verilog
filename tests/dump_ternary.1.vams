@@ -1,0 +1,12 @@
+`include "sub/disciplines.few"
+
+module ternary(p, n);
+	electrical p, n;
+	inout p, n;
+	real a;
+	parameter real c = 1.;
+	analog begin
+		a = V(n, p);
+		I(p,n) <+ c?a:a;
+	end
+endmodule

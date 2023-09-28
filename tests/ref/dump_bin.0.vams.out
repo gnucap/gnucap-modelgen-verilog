@@ -1,0 +1,13 @@
+
+
+module test(d, g, s, b);
+  real    T;
+
+  analog begin
+    T =  6.;
+  end
+
+endmodule
+
+
+

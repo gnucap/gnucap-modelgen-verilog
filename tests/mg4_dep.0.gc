@@ -1,0 +1,44 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_dep0(p, n);
+	electrical p, n;
+	inout p, n;
+	real i;
+	localparam real p0 = 0;
+	localparam real p1 = 1;
+	analog begin
+		i = 0;
+		
+		if(p0) begin
+			i = p0?0:max(0,V(p));
+		end else if(p1) begin
+			i = V(p,n);
+		end else begin
+			i = p1?max(V(n),0):0;
+		end
+
+		real j;
+		j = i;
+		I(p,n) <+ j;
+	end
+endmodule
+
+!make test_dep0.so > /dev/null
+attach ./test_dep0.so
+
+parameter v=1
+
+test_dep0 #() dut(1,0);
+vsource #(.dc(v)) v1(1, 0);
+
+list
+
+print dc i(v1)
+
+dc
+end

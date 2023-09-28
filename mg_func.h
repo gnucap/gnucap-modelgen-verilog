@@ -23,12 +23,13 @@
  */
 
 #include <u_function.h>
-#include <m_expression.h>
+//#include <m_expression.h>
 /*--------------------------------------------------------------------------*/
 #ifndef MG_FUNCTION_H
 #define MG_FUNCTION_H
 /*--------------------------------------------------------------------------*/
 class Token;
+class Expression;
 class Module;
 class Deps;
 // TODO: move upstream, partly?
@@ -53,7 +54,7 @@ public:
   virtual void make_cc_common(std::ostream&)const {}
   virtual void make_cc_dev(std::ostream&)const {}
 
-  virtual Token* new_token(Module& m, size_t na, Deps& d)const = 0;
+  virtual Token* new_token(Module& m, size_t na)const = 0;
   virtual bool returns_void()const { return false; }
   virtual std::string code_name()const { itested();
 	  // incomplete();
@@ -80,7 +81,7 @@ public:
   }
   virtual void make_cc_dev(std::ostream& o)const override;
   virtual void make_cc_common(std::ostream& o) const = 0;
-  Token* new_token(Module& m, size_t na, Deps& d) const override;
+  Token* new_token(Module& m, size_t na) const override;
 };
 /*--------------------------------------------------------------------------*/
 class MGVAMS_FILTER : public FUNCTION_ {
@@ -122,7 +123,7 @@ public:
   }
 private:
   std::string eval(CS&, const CARD_LIST*)const override {unreachable(); return "";}
-  Token* new_token(Module& m, size_t na, Deps& d)const override;
+  Token* new_token(Module& m, size_t na)const override;
   void make_cc_common(std::ostream&)const override { unreachable(); }
 };
 /*--------------------------------------------------------------------------*/

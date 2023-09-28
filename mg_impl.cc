@@ -20,8 +20,10 @@
  */
 #include "mg_.h"
 #include "mg_func.h" // TODO
+#include "m_tokens.h" // Deps
 /*--------------------------------------------------------------------------*/
 Node mg_ground_node;
+Dep mg_offset(NULL);
 /*--------------------------------------------------------------------------*/
 bool ConstantMinTypMaxExpression::empty() const
 {
@@ -226,6 +228,39 @@ Branch_Ref const& Branch_Names::lookup(std::string const& p) const
   }
 }
 /*--------------------------------------------------------------------------*/
+void Filter::new_deps()
+{
+  assert(!_deps);
+  _deps = new Deps;
+}
+/*--------------------------------------------------------------------------*/
+Filter::Filter(std::string const& name)
+  : Element_2(), _name(name)
+{
+  new_deps();
+}
+/*--------------------------------------------------------------------------*/
+Filter::~Filter()
+{
+  delete _deps;
+  _deps = NULL;
+}
+/*--------------------------------------------------------------------------*/
+void Filter::set_deps(Deps const& d)
+{
+  trace2("set filter deps", code_name(), d.size());
+  for(auto i:d){
+    trace1("set filter deps", i->code_name());
+  }
+  deps().clear();
+  deps() = d;
+
+  // BUG, why both?
+  assert(_branch);
+  _branch->deps().clear();
+  _branch->deps() = d;
+}
+/*--------------------------------------------------------------------------*/
 std::string Filter::code_name()const
 {
   if(has_branch()){
@@ -243,6 +278,12 @@ size_t Filter::num_branches() const
   }else{
     return 0;
   }
+}
+/*--------------------------------------------------------------------------*/
+void Branch::new_deps()
+{
+  assert(!_deps);
+  _deps = new Deps;
 }
 /*--------------------------------------------------------------------------*/
 size_t Branch::num_branches() const
@@ -282,7 +323,7 @@ void Branch::add_probe(Probe const* b)
 //    _selfdep = true;
 //  }else{
 //  }
-  _deps.insert(Dep(b));
+  deps().insert(Dep(b));
 }
 /*--------------------------------------------------------------------------*/
 bool Branch::has_pot_probe() const
@@ -352,6 +393,57 @@ const std::string& Branch::dev_type()const
   return inc;
 }
 /*--------------------------------------------------------------------------*/
+Branch_Ref::Branch_Ref(Branch_Ref const& b)
+    : Owned_Base(b),
+      _br(b._br),
+      _r(b._r),
+      _name(b._name)
+{
+  if(_br){
+    _br->attach(this);
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref::Branch_Ref(Branch_Ref&& b)
+    : Owned_Base(b),
+      _br(b._br),
+      _r(b._r),
+      _name(b._name)
+{
+  if(_br){
+    _br->attach(this);
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref::Branch_Ref(Branch* b, bool reversed)
+  : _br(b), _r(reversed)
+{
+  if(_br){
+    _br->attach(this);
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref::~Branch_Ref()
+{
+  if(_br){
+    _br->detach(this);
+    _br = NULL;
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+std::string Branch_Ref::code_name()const
+{
+  assert(_br);
+  if(has_name()){
+    return "_br_" + *_name;
+  }else{
+    return _br->code_name();
+  }
+}
 void Branch_Ref::set_name(std::string const& n)
 {
   assert(!has_name());
@@ -468,7 +560,7 @@ size_t Filter::num_states() const
 // BUG: delegate to branch
 size_t Filter::num_nodes() const
 {
-  trace2("Filter::num_nodes", code_name(), num_branches());
+  trace3("Filter::num_nodes", code_name(), num_branches(), deps().size());
   if(num_branches()){
 //  }else if(num_states()){
   }else{
@@ -594,7 +686,7 @@ Nature const* Probe::nature() const
 }
 /*--------------------------------------------------------------------------*/
 Module::~Module()
-{ untested();
+{
   // cleanup
   _branch_names.clear();
   _analog_list.clear();
@@ -608,14 +700,14 @@ Module::~Module()
 }
 /*--------------------------------------------------------------------------*/
 Block::~Block()
-{ untested();
+{
   delete _attributes;
   _attributes = NULL;
 }
 /*--------------------------------------------------------------------------*/
-Token* Module::new_token(FUNCTION_ const* f, Deps&d, size_t num_args)
+Token* Module::new_token(FUNCTION_ const* f, size_t num_args)
 {
-  return f->new_token(*this, num_args, d);
+  return f->new_token(*this, num_args);
 }
 /*--------------------------------------------------------------------------*/
 inline Branch_Ref Variable::new_branch(std::string const& p, std::string const& n)
@@ -690,7 +782,7 @@ bool Contribution::is_pot_contrib() const
 }
 /*--------------------------------------------------------------------------*/
 Contribution::~Contribution()
-{ untested();
+{
   if(!_branch) {
     incomplete();
   }else if (is_flow_contrib()) {
@@ -718,57 +810,6 @@ bool Assignment::is_int() const
   return type().is_int();
 }
 /*--------------------------------------------------------------------------*/
-Branch_Ref::Branch_Ref(Branch_Ref const& b)
-    : Owned_Base(b),
-      _br(b._br),
-      _r(b._r),
-      _name(b._name)
-{
-  if(_br){
-    _br->attach(this);
-  }else{
-  }
-}
-/*--------------------------------------------------------------------------*/
-Branch_Ref::Branch_Ref(Branch_Ref&& b)
-    : Owned_Base(b),
-      _br(b._br),
-      _r(b._r),
-      _name(b._name)
-{
-  if(_br){
-    _br->attach(this);
-  }else{
-  }
-}
-/*--------------------------------------------------------------------------*/
-Branch_Ref::Branch_Ref(Branch* b, bool reversed)
-  : _br(b), _r(reversed)
-{
-  if(_br){
-    _br->attach(this);
-  }else{
-  }
-}
-/*--------------------------------------------------------------------------*/
-Branch_Ref::~Branch_Ref()
-{
-  if(_br){
-    _br->detach(this);
-    _br = NULL;
-  }else{
-  }
-}
-/*--------------------------------------------------------------------------*/
-std::string Branch_Ref::code_name()const
-{
-  assert(_br);
-  if(has_name()){
-    return "_br_" + *_name;
-  }else{
-    return _br->code_name();
-  }
-}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 Branch::~Branch()
@@ -787,6 +828,8 @@ Branch::~Branch()
     unreachable();
   }else{
   }
+  delete _deps;
+  _deps = NULL;
 }
 /*--------------------------------------------------------------------------*/
 void Branch::attach(Branch_Ref* r)
@@ -920,6 +963,7 @@ Base* Block::resolve(std::string const& k)
   }else if(_owner) {
     return _owner->resolve(k);
   }else{
+    assert(dynamic_cast<File const*>(this));
     return NULL;
   }
 }
@@ -934,17 +978,21 @@ Deps::const_iterator Deps::end() const
   return _s.end();
 }
 /*--------------------------------------------------------------------------*/
+Variable_Decl::~Variable_Decl()
+{
+  delete _deps;
+  _deps = NULL;
+}
+/*--------------------------------------------------------------------------*/
+void Variable_Decl::new_deps()
+{
+  assert(!_deps);
+  _deps = new Deps;
+}
+/*--------------------------------------------------------------------------*/
 void Variable_Decl::update_deps(Deps const& d)
 {
   assert(&deps() != &d);
-  deps().update(d);
-}
-/*--------------------------------------------------------------------------*/
-void Assignment::update_deps(Deps const& d)
-{
-  assert(&deps() != &d);
-  assert(_lhs);
-  _lhs->update_deps(d);
   deps().update(d);
 }
 /*--------------------------------------------------------------------------*/
@@ -960,6 +1008,7 @@ bool is_false(Expression const& x)
   return e == 0.;
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 Probe const* Expression_::new_probe(std::string const& xs, Branch_Ref const& br)
 { untested();
   std::string flow_xs;
@@ -992,7 +1041,7 @@ Probe const* Expression_::new_probe(std::string const& xs, Branch_Ref const& br)
   }
 
   Probe const* prb = new Probe(nn, br);
-  bool exists = _deps.insert(Dep(prb)).second;
+  bool exists = deps().insert(Dep(prb)).second;
 
   if (exists) { untested();
     delete prb;
@@ -1000,27 +1049,20 @@ Probe const* Expression_::new_probe(std::string const& xs, Branch_Ref const& br)
   }
 
 
-#if 0
-  // TODO: use new_probe(branch); ?
-
-  // TODO: is this needed?
-  std::string k = nn + "_" + br.pname() + "_" + br.nname();
-  Probe*& prb = _probes[k];
-
-  if(prb) {
-  }else{
-    prb = new Probe(nn, br);
-  }
-
-  // disambiguation hack. cleanup later.
-  //if(br.nname()==br.pname()){
-  //}else if(br.is_reversed()){
-  //  new_probe(xs, br.nname(), br.pname());
-  //}else{
-  //}
-
-#endif
   return prb;
+}
+#endif
+/*--------------------------------------------------------------------------*/
+Deps const& Expression_::deps() const
+{
+  static Deps no_deps;
+  if(is_empty()){
+    return no_deps;
+  }else if(auto d = dynamic_cast<Deps const*>(back()->data())){
+    return *d;
+  }else{
+    return no_deps;
+  }
 }
 /*--------------------------------------------------------------------------*/
 Expression_::~Expression_()
@@ -1028,6 +1070,17 @@ Expression_::~Expression_()
 //  for(auto i : _deps){
 //    delete i;
 //  }
+}
+/*--------------------------------------------------------------------------*/
+Deps* copy_deps(Base const* b)
+{
+  if(auto t=dynamic_cast<Deps const*>(b)){
+    return t->clone();
+  }else{
+    incomplete();
+    unreachable();
+    return NULL;
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

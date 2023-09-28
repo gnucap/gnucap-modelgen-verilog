@@ -21,6 +21,7 @@
  */
 #include "mg_out.h"
 #include "mg_func.h"
+#include "m_tokens.h" // Deps
 /*--------------------------------------------------------------------------*/
 static void declare_deriv_enum(std::ostream& o, const Module& m)
 {
@@ -94,7 +95,7 @@ static void make_func_dev(std::ostream& o, std::set<FUNCTION_ const*> const& P)
 static void make_funcs_common(std::ostream& o, std::set<FUNCTION_ const*> const& P)
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
-    if( (*q)->has_refs() ){ untested();
+    if( (*q)->has_refs() ){
       (*q)->make_cc_common(o);
     }else if(dynamic_cast<MGVAMS_FUNCTION const*>(*q)){
       o<<"// FUNCTION no refs: " << (*q)->label() << "\n";
@@ -227,17 +228,14 @@ static void make_common(std::ostream& o, const Module& m)
 static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
 {
   Branch const* bb;
-  // if(auto f = dynamic_cast<Filter const*>(&elt)){
-  //   unreachable();
-  //   // make_module_one_filter_state(o, *f);
-  // }else
   if((bb = dynamic_cast<Branch const*>(&elt))){
   }else{
     // yikes. num_states?
     return;
   }
   Branch const& br = *bb;
-  o << "public: // states, " << br.code_name() << ";\n";
+  trace2("states", br.code_name(), br.deps().size());
+  o << "public: // states, " << br.code_name() << ";\n"; //  << br.deps().size()<<";\n";
   if(br.has_pot_source()){
     o__ "bool _pot" << br.code_name() << ";\n";
     for(auto n : br.names()){
@@ -262,6 +260,7 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
   o____ "VALUE, SELF";
   std::vector<char> seen(br.num_branches());
   for(auto d : br.deps()){
+//      o << "/* found " << d->code_name() << "*/";
     Branch const* bb = d->branch();
     assert(bb);
     if(bb->is_short()){ untested();

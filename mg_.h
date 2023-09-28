@@ -23,7 +23,7 @@
 #define GNUCAP_MG_H
 #include <ap.h>
 #include <m_base.h>
-#include <m_expression.h>
+#include "mg_expression.h"
 #include <set>
 #include "mg_deps.h" // BUG, Deps
 #include "mg_func.h" // BUG, Probe
@@ -379,17 +379,15 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Probe; // Dep?
-class DEP_STACK;
 class FUNCTION_;
 class Branch_Ref;
 class Expression_ : public Expression {
   Block* _owner{NULL};
-  Deps _deps;
 public:
   explicit Expression_() : Expression() {}
   ~Expression_();
   void resolve_symbols(Expression const& e){
-    return resolve_symbols_(e, &_deps);
+    return resolve_symbols_(e);
   }
   void set_owner(Block* b){ _owner = b; }
   void dump(std::ostream& out)const override;
@@ -398,12 +396,15 @@ public:
 private:
   void resolve_symbols_(Expression const& e, Deps* deps=NULL);
 public:
-  Deps const& deps()const { return _deps; }
-  Deps& deps() { return _deps; }
+  Expression_* clone() const;
+  Deps const& deps()const;
+//  Deps& deps();
+//  Deps const& deps()const { return _deps; }
+//  Deps& deps() { return _deps; }
 private: // all the same eventually?
-  Token* resolve_xs_function(std::string const& n, DEP_STACK& ds);
-  Token* resolve_function(FUNCTION_ const* filt, DEP_STACK& ds);
-  Token* resolve_system_task(FUNCTION_ const* t, DEP_STACK& ds);
+  Token* resolve_xs_function(std::string const& n);
+  Token* resolve_function(FUNCTION_ const* filt, size_t na);
+  Token* resolve_system_task(FUNCTION_ const* t);
   Probe const* new_probe(std::string const& xs, Branch_Ref const& br);
 };
 /*--------------------------------------------------------------------------*/
@@ -739,7 +740,6 @@ public:
 //  void set_type(Data_Type d){ _type=d; }
   virtual Data_Type const& type() const = 0;
   // bool is_int() const { return _type.is_int(); }
-  virtual Deps const& deps()const = 0;
   String_Arg const& identifier()const {return _name;}
   std::string const& name()const {return _name.to_string();}
   virtual std::string code_name()const;
@@ -751,18 +751,20 @@ public:
   virtual Branch_Ref new_branch(Node const* p, Node const* n);
 
   virtual void update_deps(Deps const&) = 0;
+  virtual Deps const& deps()const = 0;
 protected:
   void new_var_ref();
 };
 /*--------------------------------------------------------------------------*/
 class Variable_Decl : public Variable {
-  Deps _deps;
+  Deps* _deps{NULL};
   Data_Type _type;
   Attribute_Instance const* _attributes{NULL};
 public:
+  Variable_Decl() : Variable() { new_deps(); }
+  ~Variable_Decl();
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
-  Variable_Decl() : Variable() {}
   bool has_attributes() const{
     return _attributes;
   }
@@ -773,11 +775,11 @@ public:
     return _type;
   }
   void set_type(Data_Type const& d){ _type=d; }
-  Deps const& deps()const override { return _deps; }
+  Deps const& deps()const override { assert(_deps); return *_deps; }
   void update_deps(Deps const&)override;
-
-protected:
-  Deps& deps() { return _deps; }
+private:
+  Deps& deps() { assert(_deps); return *_deps; }
+  void new_deps();
 //  void set_type(std::string const& a){_type=a;}
 };
 /*--------------------------------------------------------------------------*/
@@ -913,9 +915,9 @@ public:
     return _owner->new_node(p); // new??
   }
 
-  virtual Token* new_token(FUNCTION_ const* f, Deps& d, size_t num_args) {
+  virtual Token* new_token(FUNCTION_ const* f, size_t num_args) {
     assert(_owner);
-    return _owner->new_token(f, d, num_args);
+    return _owner->new_token(f, num_args);
   }
 
   virtual Branch_Ref new_branch(std::string const&, std::string const&) {
@@ -1254,8 +1256,6 @@ public:
 typedef LiSt<Arg, '{', '#', '}'> Arg_List;
 /*--------------------------------------------------------------------------*/
 class Analog_Function_Arg : public Variable_Decl {
-//  String_Arg _identifier;
-  Deps _deps; // really?
 public:
   explicit Analog_Function_Arg() : Variable_Decl() {}
   String_Arg const& identifier()const { return _name; }
@@ -1263,8 +1263,6 @@ public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   std::string code_name()const override;
-  Deps const& deps()const { return _deps; }
-  Deps& deps() { return _deps; }
 
   Data_Type const& type()const override{
     static Data_Type_Real r;
@@ -1387,7 +1385,7 @@ public:
   }
 private:
   std::string eval(CS&, const CARD_LIST*)const override {unreachable(); return "";}
-  Token* new_token(Module&, size_t, Deps&)const;
+  Token* new_token(Module&, size_t)const;
 }; // Probe
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1490,7 +1488,7 @@ typedef Collection<Discipline> Discipline_List;
 class Branch : public Element_2 {
   Node const* _p{NULL};
   Node const* _n{NULL};
-  Deps _deps; // delete?
+  Deps *_deps{NULL}; // delete?
   size_t _has_flow_probe{0};
   size_t _has_pot_probe{0};
   size_t _has_flow_src{0};
@@ -1506,9 +1504,10 @@ public:
     : Element_2(), _p(p), _n(n), _number(number) {
     assert(p);
     assert(n);
+    new_deps();
     //_code_name = "_b_" + p->name() + "_" + n->name();
   }
-  explicit Branch(){}
+  explicit Branch(){ new_deps(); }
   Branch( Branch const&) = delete;
   ~Branch();
   std::list<std::string> const& names()const{
@@ -1529,7 +1528,6 @@ public:
 //  std::string name_of_module_instance()const  {return code_name();}
   std::string const& omit()const override;
   const std::string& dev_type()const override;
-  Deps const& deps()const { return _deps; } // delete?
   void add_probe(Probe const*);
   size_t num_nodes()const override;
   std::string state()const override;
@@ -1559,6 +1557,11 @@ public:
   void detach(Branch_Ref*);
   size_t number() const{return _number;}
   size_t num_branches() const;
+
+  Deps const& deps()const { assert(_deps); return *_deps; } // delete?
+  Deps& deps() { assert(_deps); return *_deps; } // delete?
+private:
+  void new_deps();
 }; // Branch
 /*--------------------------------------------------------------------------*/
 class Branch_Names {
@@ -1751,7 +1754,7 @@ public: // BUG
   Branch_Ref new_branch(std::string const&, std::string const&) override;
 private:
 
-  Token* new_token(FUNCTION_ const*, Deps&, size_t na) override;
+  Token* new_token(FUNCTION_ const*, size_t na) override;
   Branch_Ref const& new_branch_name(std::string const& n, Branch_Ref const& b) override;
   Node const* node(std::string const& p) const override;
   Branch_Ref branch(std::string const& p) const override;
@@ -1818,6 +1821,7 @@ class Assignment : public Variable {
 protected:
   Variable* _lhs{NULL};
   Expression_ _rhs;
+  Deps* _deps{NULL};
 public:
   explicit Assignment(CS& f, Block* o);
   explicit Assignment() : Variable() {}
@@ -1835,14 +1839,22 @@ public:
     assert(_lhs);
     return *_lhs;
   }
-  Deps const& deps()const { return _rhs.deps(); }
-  Deps& deps() { return _rhs.deps(); }
   void parse(CS& cmd) override;
   void dump(std::ostream&)const override;
   void update_deps(Deps const&) override;
 // protected:
   void set_lhs(Variable* v);
-};
+
+  Deps const& deps()const override{
+    if(_deps){
+      return *_deps;
+    }else{
+      return _rhs.deps();
+    }
+  }
+private:
+//  Deps& deps()override { return _rhs.deps(); }
+}; // Assignment
 /*--------------------------------------------------------------------------*/
 // ContributionStatement?
 class Contribution : public Owned_Base {
@@ -1859,7 +1871,8 @@ private:
   void set_pot_contrib();
   void set_flow_contrib();
   void set_direct(bool d=true);
-  Deps& deps() { return _rhs.deps(); }
+//  Deps& deps() { return _rhs.deps(); }
+  Deps const& deps() { return _rhs.deps(); }
 public:
   Contribution(CS& f, Block* o)
     : Owned_Base(o), _branch(NULL) {
@@ -2006,17 +2019,14 @@ public:
 // TODO: merge with Element_2?
 class Filter : public Element_2 {
   std::string _name; // BUG?
-  Deps _deps;
+  Deps* _deps{NULL};
   Branch_Ref _branch;
   Probe const* _prb=NULL;
   int _num_states{0};
 public:
-  explicit Filter() : Element_2() {}
-  explicit Filter(std::string const& name, Deps const& d)
-    : Element_2(), _deps() {
-      _deps.update(d);
-      _name = name;
-    }
+  explicit Filter(std::string const& name);
+  explicit Filter() : Element_2() { new_deps(); }
+  ~Filter();
   void parse(CS&) override{unreachable();}
   void dump(std::ostream&)const override {unreachable();}
 
@@ -2032,7 +2042,7 @@ public:
   }
   size_t num_branches()const;
   std::string code_name()const override;
-  Deps const& deps()const { return _deps; }
+  Deps const& deps()const { assert(_deps); return *_deps; }
 
   size_t num_states()const override;
   size_t num_nodes()const override;
@@ -2042,6 +2052,10 @@ public:
   bool has_branch() const {
     return _branch;
   }
+  void set_deps(Deps const&);
+private:
+  Deps& deps() { assert(_deps); return *_deps; }
+  void new_deps();
 }; // Filter
 /*--------------------------------------------------------------------------*/
 void make_cc_expression(std::ostream& o, Expression const& e);

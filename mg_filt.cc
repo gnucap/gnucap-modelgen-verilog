@@ -60,12 +60,27 @@ static void make_cc_tmp(Filter const* f, std::ostream& o)
 /*--------------------------------------------------------------------------*/
 static int n_filters;
 /*--------------------------------------------------------------------------*/
+class Token_XDT : public Token_CALL {
+//  XDT* _xdt{NULL};
+public:
+  explicit Token_XDT(const std::string Name, FUNCTION_ const* f)
+    : Token_CALL(Name, f) {}
+private:
+  explicit Token_XDT(const Token_XDT& P, Base const* data, Expression_ const* e = NULL)
+    : Token_CALL(P, data, e) {} // , _item(P._item) {}
+  Token* clone()const override {untested(); return new Token_XDT(*this);}
+
+  void stack_op(Expression* e)const override;
+};
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class XDT : public MGVAMS_FILTER {
   Module* _m{NULL};
-  Filter const* _f{NULL};
+  Token_CALL const* _token{NULL};
   // Branch_Ref _br;
   Probe const* _prb{NULL};
+public: // HACK
+  Filter* _f{NULL};
 protected:
   Branch const* _br{NULL};
 protected:
@@ -82,18 +97,20 @@ protected:
     return "/*XDT*/ d->" + label();
   }
 public:
-  Token* new_token(Module& m, size_t na, Deps& d)const override {
+  Token* new_token(Module& m, size_t na)const override {
+    assert(na != size_t(-1));
     Filter* f = NULL;
 
     std::string filter_code_name = label() + "_" + std::to_string(n_filters++);
 
     XDT* cl = clone();
     {
-      f = new Filter(filter_code_name, d /*?*/);
+      f = new Filter(filter_code_name);
       f->set_owner(&m);
       f->set_dev_type("va_" + label());
 
       cl->set_label("_b_" + filter_code_name);
+      assert(na<3);
       cl->set_num_args(na);
       cl->_f = f;
       cl->_m = &m;
@@ -104,10 +121,6 @@ public:
     {
       Branch* br = m.new_branch(n, &mg_ground_node);
       br->set_filter();
-      // br->set_deps(d);
-      for(auto x : d) {
-	br->add_probe(x);
-      }
       assert(br);
       assert(const_cast<Branch const*>(br)->owner());
       Branch_Ref prb(br);
@@ -119,15 +132,12 @@ public:
 //	br->set_element(f);
       br->set_filter();
       m.push_back(f);
-
-      Deps outdeps;
-      outdeps.insert(Dep(cl->_prb)); // prb?
-      d = outdeps;
     }
 
-    return new Token_CALL(label(), cl);
+    return new Token_XDT(label(), cl);
   }
   void make_cc_common(std::ostream& o)const override{
+    assert(num_args()!=size_t(-1));
     o__ "class FILTER" << label() << "{\n";
     o__ "public:\n";
     o____ "ddouble operator()(";
@@ -140,6 +150,7 @@ public:
   void make_cc_dev(std::ostream& o)const override{
     o__ "ddouble " << label() << "(";
       std::string comma;
+      assert(num_args() < 3);
       for(size_t n=0; n<num_args(); ++n){
 	o << comma << "ddouble t" << n;
 	comma = ", ";
@@ -153,6 +164,7 @@ public:
     o << "COMMON_" << id << "::";
     o << "ddouble COMMON_" << id << "::FILTER" << label() <<
       "::operator()(";
+    assert(num_args() < 3);
     for(size_t n=0; n<num_args(); ++n){
       o << " ddouble t" << n << ", ";
     }
@@ -187,6 +199,7 @@ public:
     unreachable();
     return "ddt";
   }
+  Probe const* prb() const{return _prb;}
 };
 /*--------------------------------------------------------------------------*/
 class DDT : public XDT{
@@ -237,6 +250,43 @@ private:
   }
 } idt;
 DISPATCHER<FUNCTION>::INSTALL d_idt(&function_dispatcher, "idt", &idt);
+/*--------------------------------------------------------------------------*/
+void Token_XDT::stack_op(Expression* e)const
+{
+  assert(e);
+  Token_CALL::stack_op(e);
+  assert(!e->is_empty());
+  auto cc = prechecked_cast<Token_CALL const*>(e->back());
+  assert(cc);
+  e->pop_back();
+  // assert(!e->is_empty());
+
+  auto ff = prechecked_cast<XDT const*>(f());
+  assert(ff);
+
+  if(auto dd = prechecked_cast<Deps const*>(cc->data())){
+    assert(dd);
+
+    assert(ff->_f);
+    ff->_f->set_deps(*dd); // HACK
+
+    auto d = new Deps;
+    d->insert(Dep(ff->prb())); // BUG?
+    auto N = new Token_XDT(*this, d, cc->args()?cc->args()->clone():NULL);
+    e->push_back(N);
+    assert(f()==N->f());
+    delete(cc);
+  }else if(!e->size()) {
+    unreachable();
+  }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) {
+    auto d = new Deps;
+    d->insert(Dep(ff->prb())); // BUG?
+    auto N = new Token_XDT(*this, d);
+    e->push_back(N);
+  }else{
+    unreachable();
+  }
+}
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/

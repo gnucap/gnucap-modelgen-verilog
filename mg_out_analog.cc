@@ -21,7 +21,7 @@
 /*--------------------------------------------------------------------------*/
 #include "mg_out.h"
 #include "mg_analog.h"
-//#include "m_tokens.h"
+#include "m_tokens.h" // Deps
 /*--------------------------------------------------------------------------*/
 static void make_cc_variable(std::ostream& o, Variable const& v)
 {

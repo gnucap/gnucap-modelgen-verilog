@@ -40,7 +40,7 @@ public:
   }
 public:
   void parse(CS& cmd){
-    trace1("parse", cmd.fullstring());
+//    trace1("parse", cmd.fullstring());
     double new_val;
     cmd >> new_val;
     if (cmd) {

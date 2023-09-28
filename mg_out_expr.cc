@@ -35,15 +35,15 @@ static char* ftos_(double num, int fieldwidth, int len, int fmt)
 	// len = max length of new string
 	// fmt = how to format it
 {
-  if (len < 3) {
+  if (len < 3) { untested();
     untested();
     len = 3;
   }
-  if (len > MAXLENGTH-6) {
+  if (len > MAXLENGTH-6) { untested();
     untested();
     len = MAXLENGTH-6;
   }
-  if (fieldwidth > MAXLENGTH-1) {
+  if (fieldwidth > MAXLENGTH-1) { untested();
     untested();
     fieldwidth = MAXLENGTH-1;
   }
@@ -56,7 +56,7 @@ static char* ftos_(double num, int fieldwidth, int len, int fmt)
     static char strpool[POOLSIZE][MAXLENGTH];
     static int poolindex = 0;
     ++poolindex;
-    if (poolindex >= POOLSIZE) {
+    if (poolindex >= POOLSIZE) { untested();
       poolindex = 0;
     }
     str = strpool[poolindex];
@@ -73,29 +73,29 @@ static char* ftos_(double num, int fieldwidth, int len, int fmt)
   }
   
 #ifdef HAS_NUMERIC_LIMITS
-  if (num == std::numeric_limits<double>::infinity()) {
+  if (num == std::numeric_limits<double>::infinity()) { untested();
     untested();
     memcpy(str, " Over", 5);
-  }else if (num == -std::numeric_limits<double>::infinity()) {
+  }else if (num == -std::numeric_limits<double>::infinity()) { untested();
     untested();
     memcpy(str, "-Over", 5);
-  }else if (num == std::numeric_limits<double>::quiet_NaN()) {
+  }else if (num == std::numeric_limits<double>::quiet_NaN()) { untested();
     untested();
     memcpy(str, " NaN", 4);
-  }else if (num == std::numeric_limits<double>::signaling_NaN()) {
+  }else if (num == std::numeric_limits<double>::signaling_NaN()) { untested();
     untested();
     memcpy(str, " NaN", 4);
   }else
 #endif
-  if (num == NOT_VALID) {
+  if (num == NOT_VALID) { untested();
     memcpy(str, " ??", 3);
-  }else if (num == NOT_INPUT) {
+  }else if (num == NOT_INPUT) { untested();
     memcpy(str, " NA", 3);
   }else if (num >= BIGBIG) {
     memcpy(str, " Inf", 4);
-  }else if (num <= -BIGBIG) {
+  }else if (num <= -BIGBIG) { untested();
     memcpy(str, "-Inf", 4);
-  }else if (num != num) {
+  }else if (num != num) { untested();
     memcpy(str, " NaN", 4);
   }else{
     if (std::abs(num) < ftos_floor) {	/* hide noise */
@@ -116,7 +116,7 @@ static char* ftos_(double num, int fieldwidth, int len, int fmt)
 	if (num < 0.) {
 	  str[0] = '-';
 	  num = -num;
-	}else if (fmt & ftos_SIGN) {
+	}else if (fmt & ftos_SIGN) { untested();
 	  untested();
 	  str[0] = '+';
 	}else{
@@ -138,7 +138,7 @@ static char* ftos_(double num, int fieldwidth, int len, int fmt)
 	if ((fmt&ftos_EXP && expo<-9) || expo>10 || expo<-16) {
 	  --len;			/* one less digit if 'e' notation */
 	}				/* and exp is 2 digits */
-	if (len < 3) {
+	if (len < 3) { untested();
 	  untested();
 	  ++len;
 	}
@@ -151,7 +151,7 @@ static char* ftos_(double num, int fieldwidth, int len, int fmt)
 	  rnd /= 10.;
 	}
 	num += rnd;			/* add it */
-	if (num >= 1.) {
+	if (num >= 1.) { untested();
 	  num *= .001;			/* created an extra digit: rescale */
 	  expo += 3;
 	}
@@ -198,7 +198,7 @@ static char* ftos_(double num, int fieldwidth, int len, int fmt)
 	  str[nnn] = static_cast<char>((nnn < fieldwidth) ? ' ' : '\0');
 	}
 	++nnn;
-      }else{
+      }else{ untested();
 	untested();
       }
     }
@@ -219,7 +219,7 @@ static char* ftos_(double num, int fieldwidth, int len, int fmt)
 				/* not valid if exp not divisible by 3.     */
 				/* This is not trapped, since it supposedly */
 				/* cant happen.				    */
-      if (str[nnn-1] == 'M') {
+      if (str[nnn-1] == 'M') { untested();
 	str[nnn++] = 'e';	/* Spice kluge "MEG" */
 	str[nnn++] = 'g';
       }
@@ -317,10 +317,11 @@ public:
     assert(!_args.empty());
     _args.pop();
   }
-  size_t size() const{
+  size_t size() const{ untested();
     return _refs.size();
   }
   std::string code_name() const{
+    assert(_types.size());
     switch(_types.top()) {
     case t_flt:
       return "t" + std::to_string(_flt_idx);
@@ -339,7 +340,7 @@ static void make_cc_string(std::ostream& o, String const& e)
 {
   o << '"';
   for(char c : e.val_string()){
-    if(c=='\n'){itested();
+    if(c=='\n'){untested();
 //      o << '\\';
     }else{
     }
@@ -348,29 +349,38 @@ static void make_cc_string(std::ostream& o, String const& e)
   o << '"';
 }
 /*--------------------------------------------------------------------------*/
+static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& s);
+/*--------------------------------------------------------------------------*/
+static void make_cc_expression_(std::ostream& o, Token const* t, RPN_VARS& s)
+{
+  Expression_ e;
+  e.push_back(const_cast<Token*>(t));
+  make_cc_expression_(o, e, s);
+  e.pop_back();
+}
+/*--------------------------------------------------------------------------*/
 static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& s)
 {
   typedef Expression::const_iterator const_iterator;
 
 #if 0
-  if(auto se = dynamic_cast<Expression_ const*>(&e)){
+  if(auto se = dynamic_cast<Expression_ const*>(&e)){ untested();
     o << "/* ";
     se->dump(o);
     o << "\n";
-    for(auto i : se->deps()) {
+    for(auto i : se->deps()) { untested();
       o << "// Dep: " << i->code_name();
       o << "\n";
     }
     o << "*/\n";
-  }else{
+  }else{ untested();
   }
 #endif
 
-  int have_parlist = false;
   // The _list is the expression in RPN.
   // print a program that computes the function and the derivatives.
   for (const_iterator i = e.begin(); i != e.end(); ++i) {
-    trace2("mg_out_expr loop", (*i)->name(), s.size());
+    trace3("mg_out_expr loop", (*i)->name(), (*i)->data(), s.size());
 
     if (auto var = dynamic_cast<const Token_VAR_REF*>(*i)) {
       s.new_ref((*var)->code_name());
@@ -406,9 +416,18 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
 	o__ s.code_name() << " = " << (*i)->name() << "; (u)\n";
       }
     }else if(auto F = dynamic_cast<const Token_CALL*>(*i)) {
+
+      if(F->args()){
+	auto se = prechecked_cast<Expression const*>(F->args());
+	assert(se);
+	s.stop();
+	make_cc_expression_(o, *se, s);
+      }else{
+      }
+
       o__ "// function " << (*i)->name() << " " << s.have_args() << "\n";
       std::vector<std::string> argnames;
-      if(have_parlist){
+      if(F->args()) { untested();
 	assert(s.have_args());
 	argnames.resize(s.num_args());
 	for(auto n=argnames.begin(); n!=argnames.end(); ++n){
@@ -426,8 +445,9 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
 	o__ s.code_name() << " = ";
       }
 
-      if(!have_parlist){
+      if(!F->args()) {
 	o << F->code_name() << "(); // no parlist\n";
+	assert(!argnames.size());
       }else if(!argnames.size()){
 	o << F->code_name() << "(); // no args\n";
 	s.args_pop();
@@ -447,17 +467,25 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
     }else if(dynamic_cast<const Token_SYMBOL*>(*i)) { untested();
       o__ "// incomplete:symbol " << (*i)->name() << "\n";
       unreachable();
-    }else if (dynamic_cast<const Token_PARLIST_*>(*i)) {
-      if(auto se = dynamic_cast<Expression const*>((*i)->data())){
+    }else if (dynamic_cast<const Token_PARLIST_*>(*i)) { untested();
+      if(auto se = dynamic_cast<Expression const*>((*i)->data())){ untested();
+	o__ "// start parlist\n";
 	s.stop();
 	make_cc_expression_(o, *se, s);
+	o__ "// end parlist\n";
       }else{ untested();
 	unreachable(); // ?
       }
-    }else if (dynamic_cast<const Token_PARLIST*>(*i)) {
-    }else if (dynamic_cast<const Token_STOP*>(*i)) {
-      s.stop();
-    }else if (dynamic_cast<const Token_BINOP*>(*i)) {
+    }else if (auto bo = dynamic_cast<const Token_BINOP_*>(*i)) {
+
+      if(bo->op1()){
+	assert(bo->op2());
+	make_cc_expression_(o, bo->op1(), s);
+	make_cc_expression_(o, bo->op2(), s);
+      }else{ untested();
+	assert(!bo->op2());
+      }
+
       assert((*i)->name().size());
       std::string idy = s.code_name();
       s.pop();
@@ -477,14 +505,21 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
 	|| op == '|'
 	|| op == '!' ){
 	o__ s.code_name() << " = " << arg1 << " " << (*i)->name() << " " << idy << ";\n";
-      }else if(op == '%'){ itested();
+      }else if(op == '%'){ untested();
 	o__ s.code_name() << " = va::fmod(" << arg1 << ", " << idy << ");\n";
       }else{ untested();
 	unreachable();
 	assert(false);
 	throw Exception("run time error in make_cc_expression: " + (*i)->name());
       }
-    }else if (dynamic_cast<const Token_UNARY*>(*i)) {
+    }else if (dynamic_cast<const Token_BINOP*>(*i)) { untested();
+      unreachable();
+    }else if (auto u = dynamic_cast<const Token_UNARY_*>(*i)) {
+      if(u->op1()){
+	make_cc_expression_(o, u->op1(), s);
+      }else{ untested();
+      }
+
       std::string arg1 = s.code_name();
       s.pop();
       s.new_float(o);
@@ -497,23 +532,28 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
 	unreachable();
 	o__ s.code_name() << " INCOMPLETE = " << op << arg1 << ";\n";
       }
-    }else if (auto t = dynamic_cast<const Token_TERNARY*>(*i)) {itested();
+    }else if (auto t = dynamic_cast<const Token_TERNARY_*>(*i)) {
+      if(t->cond()){
+	make_cc_expression_(o, t->cond(), s);
+      }else{ untested();
+      }
+
       std::string arg1 = s.code_name();
       s.pop();
       s.new_float(o);
 
       o__ "{\n";
-      {itested();
+      {
 	indent y;
 	o__ "ddouble& tt0 = t0;\n"; // BUG: float??
-	o__ "if(" << s.code_name() << "){\n";
-	{itested();
+	o__ "if(" << arg1 << "){\n";
+	{
 	  indent x;
 	  make_cc_expression(o, *t->true_part());
 	  o__ "tt0 = t0;\n";
 	}
 	o__ "}else{\n";
-	{itested();
+	{
 	  indent x;
 	  make_cc_expression(o, *t->false_part());
 	  o__ "tt0 = t0;\n";
@@ -522,16 +562,13 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
       }
       o__ "}\n";
     }else{ untested();
+      assert(!dynamic_cast<const Token_UNARY*>(*i));
+      assert(!dynamic_cast<const Token_TERNARY*>(*i));
+      assert(!dynamic_cast<const Token_PARLIST*>(*i));
+      assert(!dynamic_cast<const Token_STOP*>(*i));
+      s.stop();
       incomplete();
       unreachable();
-      assert(false);
-    }
-
-    // TODO: use token.
-    if (dynamic_cast<const Token_PARLIST*>(*i)) {
-      have_parlist = true;
-    }else{
-      have_parlist = false;
     }
   }
 }
@@ -551,15 +588,15 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 }
 /*--------------------------------------------------------------------------*/
 void make_cc_event_cond(std::ostream& o, Expression const& e)
-{
+{ untested();
   typedef Expression::const_iterator const_iterator;
   // TODO: var stack.
   o__ "bool evt = false\n;";
   o__ "{\n";
-  for (const_iterator i = e.begin(); i != e.end(); ++i) {
-    if((*i)->name()=="initial_step"){
+  for (const_iterator i = e.begin(); i != e.end(); ++i) { untested();
+    if((*i)->name()=="initial_step"){ untested();
       o__ "evt = _sim->is_initial_step();\n";
-    }else if((*i)->name()=="initial_model"){ itested();
+    }else if((*i)->name()=="initial_model"){ untested();
       std::cerr << "WARNING: ADMS style keyword encountered\n";
       o__ "evt = _sim->is_initial_step();\n";
     }else{ untested();
