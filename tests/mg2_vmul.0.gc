@@ -1,0 +1,34 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_vmul0(p, n, x, y);
+electrical p, n, x, y;
+
+analog begin
+	real gain;
+	gain = 1.;
+	V(p,n) <+ gain*V(x)*V(y);
+end
+
+endmodule
+
+!make test_vmul0.so > /dev/null
+attach ./test_vmul0.so
+
+test_vmul0 d1(2, 0, a, b);
+resistor #(.r(1)) r1(2, 0);
+
+vsource #(.dc(va)) v1(a, 0);
+vsource #(.dc(vb)) v2(b, 0);
+
+parameter va=1
+parameter vb=1
+list
+
+print dc v(nodes) iter(0)
+dc va 0 2 .5 vb 0 2 1
+end
