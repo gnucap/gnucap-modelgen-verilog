@@ -1,0 +1,17 @@
+
+`define thing
+
+`ifdef thing
+module reached0;
+endmodule
+`ifdef thing
+module reached1;
+endmodule
+`else
+notreached
+`endif
+module reached2;
+endmodule
+`else
+notreached
+`endif

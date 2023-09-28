@@ -1,0 +1,35 @@
+
+`define thing
+
+`ifndef sth
+module e(1,2);
+endmodule;
+`elsif FOO
+parse_error1
+`else
+parse_error2
+`endif
+
+`ifdef sth
+notreached
+`elsif sth
+notreached2
+`elsif sth
+notreached2
+`elsif sth
+notreached2
+`elsif thing
+module f(1,2);
+endmodule;
+`elsif sth
+notreached3
+`elsif thing
+notreached3
+`elsif thing
+notreached3
+`elsif thing
+notreached3
+`else
+parse_error2
+`endif
+

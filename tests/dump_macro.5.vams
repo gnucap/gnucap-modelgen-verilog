@@ -1,0 +1,16 @@
+
+`define STUFF
+
+`ifdef notdefined
+unreachable
+`endif
+
+`ifdef STUFF
+module stuff;
+`endif // STUFF
+
+`ifdef notdefined // (1)
+unreachable
+`else
+endmodule
+`endif

@@ -129,19 +129,18 @@ static void append_to(CS& f, std::string& to, std::string until)
 
   while (f.ns_more()) {
     std::string chunk = f.get_to(until);
-    trace3("got_to", until, chunk, f.tail());
     to += chunk;
     if(f.match1(until)){
       // match
       return;
     }else{
-      trace3("no match", until, chunk, f.tail());
+      trace3("no match", until, chunk, f.tail().substr(0,30));
 //      to += "\n"; // BUG? BUG1
       try{
 	f.get_line("");
 	trace2("got line2 ", f.tail(), f.ns_more());
       }catch( Exception_End_Of_Input const&){
-	trace2("EOI", to, chunk);
+	trace2("EOI", to.substr(0,20), chunk);
       }
     }
   }
@@ -179,9 +178,8 @@ void Cxx_Comment::parse(CS& file)
 void Skip_Block::parse(CS& file)
 {
   int nest = 0;
-  // size_t here = file.cursor();
   for (;;) {
-    trace1("Skip_Block", file.fullstring());
+    size_t here = file.cursor();
     file.skipto1('`');
     if (file >> "`endif") {
       if (nest == 0) {
@@ -190,9 +188,17 @@ void Skip_Block::parse(CS& file)
 	--nest;
       }
     }else if (file >> "`else") {
+      trace1("else in SB", nest);
       if (nest == 0) {
+	file.reset(here);
 	break;  // done with skip_block
-      }else{itested();
+      }else{
+      }
+    }else if (file >> "`elsif") {
+      if(!nest) {
+	file.reset(here);
+	break;
+      }else{
       }
     }else if (file >> "`ifndef") { untested();
       ++nest;
@@ -634,18 +640,38 @@ void Preprocessor::parse(CS& file)
       }
     }else if (file >> "`else") {
       if (if_block > 0) {
+	trace3("else skip", file.tail(), if_block, else_block);
 	file >> skip_block;
 	--if_block;
-      }else{ untested();
+	--else_block;
+      }else{
 	// error
       }
     }else if (file >> "`endif") {
+      trace3("endif", file.tail(), if_block, else_block);
       if (else_block > 0) {
 	--else_block;
-      }else if (if_block > 0) {
+      }else{
+      }
+      if (if_block > 0) {
 	--if_block;
-      }else{ untested();
+      }else{
 	// error
+      }
+    }else if (file >> "`elsif") {
+      Define_List::const_iterator x = define_list().find(file);
+      trace3("elsif", if_block, else_block, file.tail());
+      if (if_block == else_block) {
+	file >> skip_block;
+      }else if (else_block == 0) {
+	file >> skip_block;
+	++else_block;
+      }else if (x != define_list().end()) {
+	++if_block;
+	--else_block;
+      }else{
+	file >> skip_block;
+	// ++else_block;
       }
     }else if (file >> "`undef") {
       Define_List::const_iterator x = define_list().find(file);

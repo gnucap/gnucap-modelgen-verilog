@@ -224,7 +224,7 @@ void File::parse(CS& file)
     }
     if (!file.more()) {
       break;
-    }else if (file.stuck(&here)) { untested();
+    }else if (file.stuck(&here)) {
       file.warn(0, "syntax error, need nature, discipline, or module");
       break;
     }else{

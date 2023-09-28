@@ -1,0 +1,19 @@
+
+`define thing
+
+`ifdef thing
+module reached1
+endmodule
+`elsif FOO
+notreached0
+`ifdef thing
+notreached1
+`elsif FOO
+notreached2
+`else
+notreached3
+`endif
+notreached4
+`else
+parse_error2
+`endif

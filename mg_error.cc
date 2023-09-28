@@ -60,7 +60,7 @@ static std::basic_ostream<char>& diag()
 {
   if(diag_out){
     return *diag_out;
-  }else{ untested();
+  }else{
     return std::cerr;
   }
 }
@@ -87,7 +87,7 @@ CS & CS::warn(int badness, size_t spot, const std::string& message)
     for (;;) {
       if (linestart == 0) {
 	break;
-      }else if (_cmd[linestart] == '\n') { untested();
+      }else if (_cmd[linestart] == '\n') {
 	++linestart;
 	break;
       }else{
