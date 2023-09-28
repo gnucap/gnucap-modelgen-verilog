@@ -23,61 +23,7 @@
  */
 #include "m_tokens.h"
 #include "mg_func.h"
-/*--------------------------------------------------------------------------*/
-void Token_SFCALL::stack_op(Expression* E)const
-{
-  assert(E);
-  // replace single token with its value
-  if (!E->is_empty() && dynamic_cast<const Token_PARLIST*>(E->back())) {
-    const Token* T1 = E->back(); // Token_PARLIST
-    assert(T1->data()); // expression
-    Base const* d = T1->data();
-    auto ee = prechecked_cast<Expression const*>(d);
-    assert(ee);
-
-    {
-      // restore argument.
-      E->pop_back();
-      E->push_back(new Token_STOP("sf_stop"));
-      for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
-	trace1("stackop restore arg", (**i).name());
-	(**i).stack_op(E);
-      }
-      E->push_back(new Token_PARLIST("sf_args"));
-      E->push_back(clone());
-    }
-    delete T1;
-  }else{
-    E->push_back(clone());
-  }
-}
-/*--------------------------------------------------------------------------*/
-void Token_AFCALL::stack_op(Expression* E)const
-{
-  // replace single token with its value
-  if (!E->is_empty() && dynamic_cast<const Token_PARLIST*>(E->back())) {
-    const Token* T1 = E->back(); // Token_PARLIST
-    assert(T1->data()); // expression
-    Base const* d = T1->data();
-    auto ee = prechecked_cast<Expression const*>(d);
-    assert(ee);
-
-    {
-      // restore argument.
-      E->pop_back();
-      E->push_back(new Token_STOP("af_stop"));
-      for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
-	trace1("stackop restore arg", (**i).name());
-	(**i).stack_op(E);
-      }
-      E->push_back(new Token_PARLIST("af_args"));
-      E->push_back(clone());
-    }
-    delete T1;
-  }else{ untested();
-    unreachable();
-  }
-}
+#include "mg_.h" // BUG, Probe
 /*--------------------------------------------------------------------------*/
 std::string Token_TASK::code_name()const
 {
@@ -103,6 +49,7 @@ void Token_CALL::detach()
 /*--------------------------------------------------------------------------*/
 bool Token_CALL::returns_void() const
 {
+//  assert(_function);
   if(_function){
     return _function->returns_void();
   }else{
@@ -125,62 +72,203 @@ std::string Token_CALL::code_name()const
   }
 }
 /*--------------------------------------------------------------------------*/
-void Token_TASK::stack_op(Expression* E)const
+static bool is_constant(Token const* t, double val=NOT_VALID)
 {
-  const Token* T1 = E->back(); // Token_PARLIST
-  assert(T1->data()); // expression
-  Base const* d = T1->data();
-  auto ee = prechecked_cast<Expression const*>(d);
-  assert(ee);
-
-  { // restore argument.
-    E->pop_back();
-    E->push_back(new Token_STOP("ta_stop"));
-    for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
-      trace1("stackop restore arg", (**i).name());
-      (**i).stack_op(E);
-    }
-    E->push_back(new Token_PARLIST("ta_args"));
-    E->push_back(clone());
+  auto tt = dynamic_cast<Token_CONSTANT const*>(t);
+  if(!tt){
+    return false;
+  }else if(val == NOT_VALID){
+    return tt;
+  }else if(auto f = dynamic_cast<const Float*>(tt->data())){
+    return f->value() == val;
+  }else{ untested();
+    return false;
   }
-  delete T1;
+}
+/*--------------------------------------------------------------------------*/
+namespace {
+/*--------------------------------------------------------------------------*/
+class stash_op{
+  Token* _op{NULL};
+  Token* _args{NULL};
+public:
+  stash_op(Expression* E){
+    assert(!E->is_empty());
+    _op = E->back();
+    E->pop_back();
+    if(E->is_empty()){
+    }else if(dynamic_cast<Token_PARLIST_*>(E->back())){
+      _args = E->back();
+      E->pop_back();
+    }else{
+      assert(!dynamic_cast<Token_PARLIST*>(E->back()));
+    }
+  }
+  bool is_constant(double val=NOT_VALID) const {
+    assert(_op);
+    return !_args && ::is_constant(_op, val);
+  }
+  void restore(Expression* E){
+    if(_args){
+      E->push_back(_args);
+    }else{
+    }
+    E->push_back(_op);
+  }
+  void drop(){
+    delete(_op);
+    delete(_args);
+    _op = _args = NULL;
+  }
+
+};
+/*--------------------------------------------------------------------------*/
+}
+/*--------------------------------------------------------------------------*/
+static void delete_one(Expression& E)
+{
+  Token* t1 = E.back();
+  delete(E.back());
+  E.pop_back();
+
+  if(E.is_empty()){
+  }else if(dynamic_cast<Token_PARLIST_*>(E.back())) {
+    t1 = E.back();
+    E.pop_back();
+    delete t1;
+  }else if(dynamic_cast<Token_PARLIST*>(E.back())) {
+    t1 = E.back();
+    E.pop_back();
+    delete t1;
+
+    int arg = 1;
+    if(E.back()->data()){ untested();
+      --arg;
+    }else{
+    }
+    while(arg){
+      assert(!E.is_empty());
+      t1 = E.back();
+
+      if(dynamic_cast<Token_PARLIST*>(t1)) { untested();
+	++arg;
+      }else if(dynamic_cast<Token_STOP*>(t1)) {
+	--arg;
+      }else{
+      }
+
+      E.pop_back();
+      delete t1;
+    }
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Token_BINOP_::stack_op(Expression* E)const
+{ untested();
+  assert(E);
+  Token* t1 = E->back();
+  stash_op op1(E);
+
+  char n = name()[0];
+  if(n=='*' && op1.is_constant(0.)){ untested();
+    // -ffinite-math?
+    delete_one(*E);
+    op1.restore(E);
+  }else if(n=='+' && op1.is_constant(0.)) { untested();
+    op1.drop();
+  }else if(n=='*' && op1.is_constant(1.)) { untested();
+    op1.drop();
+  }else if (n=='+' && ( ONE_OF
+	 || dynamic_cast<Token_CALL*>(t1)
+	 || dynamic_cast<Token_PAR_REF*>(t1)
+	 || dynamic_cast<Token_VAR_REF*>(t1)
+	 || dynamic_cast<Token_ACCESS*>(t1))) { untested();
+    if(is_constant(E->back(), 0.)) { untested();
+      delete E->back();
+      E->pop_back();
+      op1.restore(E);
+    }else if(is_constant(E->back())) { untested();
+      // -fassociative_add?
+      t1 = E->back();
+      E->pop_back();
+      op1.restore(E);
+      E->push_back(t1);
+      E->push_back(clone());
+    }else{ untested();
+      op1.restore(E);
+      E->push_back(clone());
+    }
+  }else if (n=='*' && ( ONE_OF
+	 || dynamic_cast<Token_CALL*>(t1)
+	 || dynamic_cast<Token_PAR_REF*>(t1)
+	 || dynamic_cast<Token_VAR_REF*>(t1)
+	 || dynamic_cast<Token_ACCESS*>(t1))) { untested();
+    if(is_constant(E->back(), 0.)){ untested();
+      // -ffinite-math?
+      op1.drop();
+    }else if(is_constant(E->back(), 1.)) { untested();
+      delete E->back();
+      E->pop_back();
+      op1.restore(E);
+    }else if(is_constant(E->back())) { untested();
+      // -fassociative_mul?
+      t1 = E->back();
+      E->pop_back();
+      op1.restore(E);
+      E->push_back(t1);
+      E->push_back(clone());
+    }else{ untested();
+      op1.restore(E);
+      E->push_back(clone());
+    }
+  }else{ untested();
+    op1.restore(E);
+    return Token_BINOP::stack_op(E);
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Token_CALL::stack_op(Expression* E)const
 {
   assert(E);
+
   if (E->is_empty()){
-    unreachable();
-  }else if (dynamic_cast<const Token_PARLIST*>(E->back())) {
-    const Token* T1 = E->back(); // Token_PARLIST
+    // SFCALL
+      E->push_back(clone());
+  }else if(!dynamic_cast<const Token_PARLIST*>(E->back())) {
+    // SFCALL
+      E->push_back(clone());
+  }else if (E->back()->data()) {
+    const Token* T1 = E->back(); // Token_PARLIST?
     assert(T1->data()); // expression
     Base const* d = T1->data();
     auto ee = prechecked_cast<Expression const*>(d);
     assert(ee);
 
-    // Expression fee = f->ev(ee); ?
+    FUNCTION_ const* f = _function;
+    assert(ee);
 
-    bool all_float = false;
-    for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
-      trace1("float?", (**i).name());
-      all_float = dynamic_cast<Float const*>((**i).data());
-      if(!all_float){
-	break;
-      }else{
+    E->pop_back();
+    if(f){
+      try{
+	f->stack_op(*ee, E);
+      }catch(Exception const&){
+	f = NULL;
       }
-    }
-
-    if(all_float){
-      FUNCTION_ const* f = _function;
-      // function call as usual
-      CS cmd(CS::_STRING, T1->name());
-      std::string value = f->eval(cmd, E->_scope); // TODO: pass Expression
-      E->pop_back();
-      const Float* v = new Float(value);
-      E->push_back(new Token_CONSTANT(value, v, ""));
     }else{
-      // restore argument.
-      E->pop_back();
+    }
+    if(f){
+    }else if(1){
+      auto EE = new Expression_;
+      for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
+	trace1("stackop restore arg", (**i).name());
+	(**i).stack_op(EE);
+      }
+      E->push_back(new Token_PARLIST_("fn_args", EE));
+      E->push_back(clone());
+
+    }else{
+      // put it back.
       E->push_back(new Token_STOP("fn_stop"));
       for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
 	trace1("stackop restore arg", (**i).name());
@@ -189,10 +277,104 @@ void Token_CALL::stack_op(Expression* E)const
       E->push_back(new Token_PARLIST("fn_args"));
       E->push_back(clone());
     }
+
     delete T1;
-  }else{
-    assert(0);
   }
+}
+/*--------------------------------------------------------------------------*/
+void Token_ACCESS::stack_op(Expression* e) const
+{
+  Expression& E = *e;
+  auto SE = prechecked_cast<Expression_*>(e);
+  assert(SE);
+
+  if(_prb){
+    // already resolved
+    assert(e->is_empty() || !dynamic_cast<Token_PARLIST const*>(e->back()));
+    e->push_back(clone());
+  }else{
+    assert(!e->is_empty() && dynamic_cast<Token_PARLIST const*>(e->back()));
+
+    delete E.back(); // PARLIST
+    E.pop_back();
+    assert(!E.is_empty());
+    if(dynamic_cast<Token_STOP*>(E.back())) { untested();
+      throw Exception("syntax error");
+    }else{
+    }
+    std::string arg0 = E.back()->name();
+    size_t na=1;
+    std::string arg1;
+    delete E.back();
+    E.pop_back();
+    assert(!E.is_empty());
+
+    while(!dynamic_cast<Token_STOP*>(E.back())) {
+      arg1 = arg0;
+      ++na;
+      arg0 = E.back()->name();
+      delete E.back();
+      E.pop_back();
+      assert(!E.is_empty());
+    }
+
+    delete E.back();
+    E.pop_back();
+    // BUG: push dep?
+    //
+    VAMS_ACCESS f(name(), arg0, arg1);
+//    assert(ds.top());
+    assert(SE->owner());
+    Deps dd;
+    Token* t = SE->owner()->new_token(&f, dd, na);
+
+#if 0
+  Branch_Ref br = m.new_branch(_arg0, _arg1);
+  //  br->set_owner(this);
+  assert(br);
+  assert(const_cast<Branch const*>(br.operator->())->owner());
+  // Probe const* p = m.new_probe(_name, _arg0, _arg1);
+  //
+  // install clone?
+  FUNCTION_ const* p = m.new_probe(_name, br);
+
+  return p->new_token(m, na, d);
+#endif
+
+    assert(dd.size() == 1);
+    _prb = *dd.begin();
+    assert(t);
+    e->push_back(t);
+  }
+}
+/*--------------------------------------------------------------------------*/
+Probe const* Token_ACCESS::prb() const
+{
+  auto p = prechecked_cast<Probe const*>(_prb);
+  assert(p);
+  return p;
+}
+/*--------------------------------------------------------------------------*/
+bool Token_ACCESS::is_reversed() const
+{
+  auto p = prb();
+  assert(p);
+  return p->is_reversed();
+}
+/*--------------------------------------------------------------------------*/
+std::string Token_ACCESS::code_name() const
+{
+  auto p = prb();
+  assert(p);
+  return p->code_name();
+}
+/*--------------------------------------------------------------------------*/
+bool Token_ACCESS::is_short() const
+{
+  auto p = prb();
+  assert(p);
+  assert(p->branch());
+  return p->branch()->is_short();
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

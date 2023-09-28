@@ -6,7 +6,7 @@ module test_af();
     real x;
 begin
       if ((x > 17.)) begin
-        limitex = (42. * ((1.0 + x) - 17.));
+        limitex = (42. * ((x + 1.0) - 17.));
       end
       else if ((x < -17.)) begin
         limitex = 42.;
@@ -29,13 +29,14 @@ begin
     input x, y;
     real x, y;
 begin
-      something = (0.5 * (x + sqrt(((x * x) + ((4.0 * y) * y)))));
+      something = (0.5 * (x + sqrt(((x * x) + ((y * 4.0) * y)))));
     end
   endfunction
 
   analog begin
     real i;
     i = something( 26.,  20.0855369231877);
+    i = something( 26.,  1.);
   end
 
 endmodule

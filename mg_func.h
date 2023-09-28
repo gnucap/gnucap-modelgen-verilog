@@ -23,6 +23,7 @@
  */
 
 #include <u_function.h>
+#include <m_expression.h>
 /*--------------------------------------------------------------------------*/
 #ifndef MG_FUNCTION_H
 #define MG_FUNCTION_H
@@ -52,15 +53,14 @@ public:
   virtual void make_cc_common(std::ostream&)const {}
   virtual void make_cc_dev(std::ostream&)const {}
 
-  /* TODO: some kind of
-  Expression* eval(Expression const*);
-  */
   virtual Token* new_token(Module& m, size_t na, Deps& d)const = 0;
   virtual bool returns_void()const { return false; }
   virtual std::string code_name()const { itested();
 	  // incomplete();
 	  return "";
   }
+  void stack_op(Expression const& args, Expression* out) const;
+  virtual double evalf(double const*)const;
 public: // use refcounter in e_base
   void	      inc_refs()const	{inc_probes();}
   void	      dec_refs()const	{dec_probes();}
@@ -112,6 +112,18 @@ public:
   std::string code_name()const override{
 	  return "";
   }
+};
+/*--------------------------------------------------------------------------*/
+class VAMS_ACCESS : public FUNCTION_ {
+  std::string _name, _arg0, _arg1;
+public:
+  VAMS_ACCESS(std::string n, std::string a0, std::string a1)
+    : _name(n), _arg0(a0), _arg1(a1) {
+  }
+private:
+  std::string eval(CS&, const CARD_LIST*)const override {unreachable(); return "";}
+  Token* new_token(Module& m, size_t na, Deps& d)const override;
+  void make_cc_common(std::ostream&)const override { unreachable(); }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -26,12 +26,49 @@
 #include <m_base.h>
 #include <m_expression.h>
 /*--------------------------------------------------------------------------*/
+class Token_PARLIST_ : public Token_PARLIST {
+public:
+  explicit Token_PARLIST_(Token_PARLIST const& p)
+    : Token_PARLIST(p) { }
+  explicit Token_PARLIST_(const std::string Name, Base* L=NULL)
+    : Token_PARLIST(Name, L) {}
+public:
+  void stack_op(Expression* E)const override;
+  Token* clone()const override{
+    return new Token_PARLIST_(*this);
+  }
+};
+/*--------------------------------------------------------------------------*/
+class Token_BINOP_ : public Token_BINOP {
+public:
+  Token_BINOP_(Token_BINOP const& b) : Token_BINOP(b) {}
+  Token* clone()const override{return new Token_BINOP_(*this);}
+
+  void stack_op(Expression* E)const;
+};
+/*--------------------------------------------------------------------------*/
+class Token_SYMBOL_ : public Token_SYMBOL {
+public:
+  explicit Token_SYMBOL_(Token_SYMBOL const& p)
+    : Token_SYMBOL(p) { untested();
+  }
+  ~Token_SYMBOL_(){
+//    _data?
+    incomplete();
+  }
+public:
+  void stack_op(Expression* E)const override;
+  Token* clone()const override{ untested();
+    return new Token_SYMBOL(*this);
+  }
+};
+/*--------------------------------------------------------------------------*/
 class Probe;
 class FUNCTION_;
 class Token_ACCESS : public Token_SYMBOL {
-  Probe const* _prb;
+  mutable /*BUG*/ FUNCTION_ const* _prb;
 public:
-  explicit Token_ACCESS(const std::string Name, Probe const* data)
+  explicit Token_ACCESS(const std::string Name, FUNCTION_ const* data=NULL)
     : Token_SYMBOL(Name, ""), _prb(data) {}
 
 private:
@@ -40,13 +77,14 @@ private:
   Token* clone()const override {
     return new Token_ACCESS(*this);
   }
-  void stack_op(Expression* e)const override {
-    e->push_back(clone());
-  }
+
+  void stack_op(Expression* e)const override;
 
 public:
-  Probe const* operator->() const{ return _prb; }
-  Probe const* prb() const{ return _prb;}
+  Probe const* prb() const;
+  bool is_short() const;
+  bool is_reversed() const;
+  std::string code_name() const;
 };
 /*--------------------------------------------------------------------------*/
 class Parameter_Base;
@@ -109,11 +147,11 @@ protected:
     , _num_args(P._num_args) { attach(); }
 private:
   Token* clone()const override {return new Token_CALL(*this);}
-  void stack_op(Expression* e)const override;
 private:
   void attach();
   void detach();
 public:
+  void stack_op(Expression* e)const override;
   void set_num_args(size_t n){ _num_args = n; }
   size_t num_args() const;
   virtual /*?*/ std::string code_name() const;
@@ -131,7 +169,6 @@ public:
 private:
   explicit Token_AFCALL(const Token_AFCALL& P) : Token_CALL(P), _f(P._f) {}
   Token* clone()const  override{return new Token_AFCALL(*this);}
-  void stack_op(Expression* e)const override;
 public:
   std::string code_name()const {
     return "af_" + name();
@@ -149,7 +186,6 @@ private:
   Token* clone()const override {
     return new Token_SFCALL(*this);
   }
-  void stack_op(Expression* e)const override;
 };
 /*--------------------------------------------------------------------------*/
 #if 0
@@ -163,7 +199,6 @@ private:
   explicit Token_TASK(const Token_TASK& P)
     : Token_CALL(P) {}
   Token* clone()const override{return new Token_TASK(*this);}
-  void stack_op(Expression* e)const override;
   std::string code_name()const override;
 };
 #endif

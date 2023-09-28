@@ -317,7 +317,7 @@ public:
     assert(!_args.empty());
     _args.pop();
   }
-  size_t size() const{ untested();
+  size_t size() const{
     return _refs.size();
   }
   std::string code_name() const{
@@ -348,20 +348,24 @@ static void make_cc_string(std::ostream& o, String const& e)
   o << '"';
 }
 /*--------------------------------------------------------------------------*/
-void make_cc_expression(std::ostream& o, Expression const& e)
+static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& s)
 {
   typedef Expression::const_iterator const_iterator;
 
-  if(auto se = dynamic_cast<Symbolic_Expression const*>(&e)){
-    o << "//";
-    for(auto i : se->deps()) {
-      o << " Dep: " << i->code_name();
-    }
+#if 0
+  if(auto se = dynamic_cast<Expression_ const*>(&e)){
+    o << "/* ";
+    se->dump(o);
     o << "\n";
+    for(auto i : se->deps()) {
+      o << "// Dep: " << i->code_name();
+      o << "\n";
+    }
+    o << "*/\n";
   }else{
   }
+#endif
 
-  RPN_VARS s;
   int have_parlist = false;
   // The _list is the expression in RPN.
   // print a program that computes the function and the derivatives.
@@ -372,13 +376,13 @@ void make_cc_expression(std::ostream& o, Expression const& e)
       s.new_ref((*var)->code_name());
     }else if(auto pp = dynamic_cast<const Token_ACCESS*>(*i)) {
       s.new_float(o);
-      assert((*pp)->branch());
-      if((*pp)->branch()->is_short()){ untested();
+//      assert((*pp)->branch());
+      if(pp->is_short()){ untested();
 	o__ s.code_name() << " = 0.; // short probe\n";
       }else{
-	char sign = (*pp)->is_reversed()?'-':'+';
-	o__ s.code_name() << " = " << sign << "p->" << (*pp)->code_name() << "; // "<< pp->name() <<"\n";
-	o__ s.code_name() << "[d" << (*pp)->code_name() << "] = " << sign << "1.;\n";
+	char sign = pp->is_reversed()?'-':'+';
+	o__ s.code_name() << " = " << sign << "p->" << pp->code_name() << "; // "<< pp->name() <<"\n";
+	o__ s.code_name() << "[d" << pp->code_name() << "] = " << sign << "1.;\n";
       }
     }else if (auto p = dynamic_cast<const Token_PAR_REF*>(*i)) {
       s.new_ref("pc->" + p->code_name());
@@ -443,6 +447,13 @@ void make_cc_expression(std::ostream& o, Expression const& e)
     }else if(dynamic_cast<const Token_SYMBOL*>(*i)) { untested();
       o__ "// incomplete:symbol " << (*i)->name() << "\n";
       unreachable();
+    }else if (dynamic_cast<const Token_PARLIST_*>(*i)) {
+      if(auto se = dynamic_cast<Expression const*>((*i)->data())){
+	s.stop();
+	make_cc_expression_(o, *se, s);
+      }else{ untested();
+	unreachable(); // ?
+      }
     }else if (dynamic_cast<const Token_PARLIST*>(*i)) {
     }else if (dynamic_cast<const Token_STOP*>(*i)) {
       s.stop();
@@ -523,6 +534,12 @@ void make_cc_expression(std::ostream& o, Expression const& e)
       have_parlist = false;
     }
   }
+}
+/*--------------------------------------------------------------------------*/
+void make_cc_expression(std::ostream& o, Expression const& e)
+{
+  RPN_VARS s;
+  make_cc_expression_(o, e, s);
 
   if(s.is_ref()){
     s.new_float(o);

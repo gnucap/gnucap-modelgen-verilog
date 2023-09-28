@@ -54,8 +54,7 @@ public:
     m.push_back(cl);
     cl->_m = &m;
 
-    Deps outdeps;
-    d = outdeps;
+    d.clear();
 
     auto t = new Token_CALL(label(), cl);
     return t;

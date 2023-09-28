@@ -1,0 +1,17 @@
+
+module test()
+
+analog begin
+	real i;
+	i = exp(3);
+	i = ln(3);
+	i = 2 + exp(ln(1));
+	i = 0 + pow(2.,3.);
+	i = 1 + pow(2.,3);
+	i = 2 + pow(2,3);
+	i = 3 + pow(2,3.);
+end
+
+endmodule
+
+

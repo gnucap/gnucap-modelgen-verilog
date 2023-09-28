@@ -1,0 +1,18 @@
+
+`include "sub/disciplines.few"
+
+module test(d, g, s, b);
+	electrical d, g;
+	real T;
+	real U;
+	analog begin
+		T = V(d, g) + 0.;
+		T = 0. + V(d, g);
+		T = 1. + V(d, g);
+	end
+endmodule
+
+
+
+
+

@@ -26,23 +26,21 @@ discipline electrical
 enddiscipline
 
 
-module test(p, n);
-  inout p, n;
-  electrical p, n;
-  parameter real a = 2.;
-  localparam integer two_a = (a * 2);
+module test(d, g, s, b);
+  electrical d, g;
+  parameter real P = 3;
+
+  real    T,   U;
 
   analog begin
-    real b;
-    real c, d;
-    b = two_a;
-    c = 0;
-    d = 0;
-    I(p, n) <+ ((b + c) + d);
-begin : second
-      real b;
-      real c, d;
-    end
+    T = 0;
+    T = 0;
+    T =  2.71828182845905;
+    T = pow((U +  20.0855369231877), (T + 2));
+    T = (exp(U) +  43.);
+    T = exp(U);
+    T = exp(U);
+    T = (exp(U) *  84.);
   end
 
 endmodule

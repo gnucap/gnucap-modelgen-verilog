@@ -616,7 +616,6 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
     { // 
       ddouble _v_i; // Variable       Dep: _potential_b_p_n      
       { // Assignment real 'i'.
-// Dep: _potential_b_p_n
         ddouble t0;
         t0 = +p->_potential_b_p_n; // V(p, n)
         t0[d_potential_b_p_n] = +1.;
@@ -626,7 +625,6 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         _v_i[d_potential_b_p_n] = t0[d_potential_b_p_n]; // (2b)
       }
       { // Contribution I(p, n)
-// Dep: _potential_b_p_n
         ddouble t0;
         t0 = _v_i;
         d->_value_b_p_n += t0.value();
@@ -1411,7 +1409,6 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
   {
     { // 
       { // Contribution I(p, n)
-// Dep: _potential_b_ddt_0_
         ddouble t0;
         t0 = +p->_potential_b_p_n; // V(p, n)
         t0[d_potential_b_p_n] = +1.;
@@ -2021,7 +2018,6 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
   {
     { // 
       {
-//
         std::string s0;
         s0 = "ic";
         // function analysis 1
@@ -2029,7 +2025,6 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
         t0 =  /*(312)*/ /*call1*/_f_analysis(s0);
         if (t0) {
           { // Contribution V(p, n)
-//
             ddouble t0;
             t0 = pc->_p_ic;
             if (!d->_pot_b_p_n){
@@ -2042,7 +2037,6 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
           }
         }else {
           { // Contribution I(p, n)
-// Dep: _potential_b_ddt_1_
             ddouble t0;
             t0 = +p->_potential_b_p_n; // V(p, n)
             t0[d_potential_b_p_n] = +1.;

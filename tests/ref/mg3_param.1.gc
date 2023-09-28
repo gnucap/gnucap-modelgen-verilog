@@ -1,0 +1,3 @@
+test_ppow0 #(.pp(2)) dut2 (.p(1),.n(0));
+#           prb(dut2) 
+ 0.         4.        

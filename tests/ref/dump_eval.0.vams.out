@@ -1,0 +1,18 @@
+
+
+module test();
+  analog begin
+    real i;
+    i =  20.0855369231877;
+    i =  1.09861228866811;
+    i =  3.;
+    i =  8.;
+    i =  9.;
+    i =  10.;
+    i =  11.;
+  end
+
+endmodule
+
+
+

@@ -1,0 +1,23 @@
+
+`include "sub/disciplines.few"
+
+module test(d, g, s, b);
+	electrical d, g;
+	real T, U;
+	parameter real P = 3;
+	analog begin
+		T = 0 * P;
+		T = 0 * U;
+		T = exp(V(d, g)*0.+1);
+		T = pow(exp(3)+U, T+2);
+		T = 1+exp(U)+42.;
+		T = 1*exp(U);
+		T = exp(U)*1;
+		T = 2*exp(U)*42.;
+	end
+endmodule
+
+
+
+
+

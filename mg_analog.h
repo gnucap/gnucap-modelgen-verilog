@@ -26,7 +26,7 @@
 /*--------------------------------------------------------------------------*/
 class AnalogExpression : public Owned_Base {
 protected:
-  Symbolic_Expression _exp;
+  Expression_ _exp;
 public:
   ~AnalogExpression();
   void parse(CS& file) override;

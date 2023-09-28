@@ -30,7 +30,7 @@ module cond0(p, n);
   analog begin
     real S, T, U;
     if (1.);
-    if (((1 + S) == 3));
+    if (((S + 1) == 3));
     if ( 1.);
   end
 

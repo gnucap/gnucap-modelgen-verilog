@@ -1,0 +1,4 @@
+attach ../lang_verilog.so 
+       ^ ? "../lang_verilog.so": already loaded, replacing
+#           v(in)      v(n)       v(out)     iter(0)    vin(op)    i(v)       i(r1)      i(r2)     
+ 0.         2.         1.         1.n        5.         ??        -100.u      100.u     -100.u     

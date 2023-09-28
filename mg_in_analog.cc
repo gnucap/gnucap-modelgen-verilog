@@ -635,13 +635,10 @@ void Assignment::parse(CS& cmd)
   Expression rhs(cmd);
   assert(_rhs.is_empty());
 
-  Symbolic_Expression tmp;
   assert(owner());
   assert(deps().empty());
-  tmp.resolve_symbols(rhs, owner(), &deps());
-  trace1("Assignment::parse resolved", rhs.size());
-  _rhs = tmp;
-  trace1("Assignment::parse gotit", rhs.size());
+  _rhs.set_owner(owner());
+  _rhs.resolve_symbols(rhs);
 }
 /*--------------------------------------------------------------------------*/
 void Branch_Ref::parse(CS& f)
@@ -744,12 +741,9 @@ void Contribution::parse(CS& cmd)
     Expression rhs_(cmd);
     assert(_rhs.is_empty());
 
-    Symbolic_Expression tmp;
     assert(owner());
-    tmp.resolve_symbols(rhs_, owner(), &deps());
-    trace1("Assignment::parse resolved", rhs_.size());
-//    _rhs = Expression(tmp, &CARD_LIST::card_list);
-    _rhs = tmp;
+    _rhs.set_owner(owner());
+    _rhs.resolve_symbols(rhs_);
 
     trace1("Assignment::parse", rhs().back()->name());
     if(is_direct()){
@@ -852,6 +846,7 @@ void AnalogSeqBlock::dump(std::ostream& o)const
   o__ "end\n";
 }
 /*--------------------------------------------------------------------------*/
+#if 1
 void AnalogExpression::parse(CS& file)
 {
   trace1("AnalogExpression::parse", file.tail().substr(0,40));
@@ -859,22 +854,20 @@ void AnalogExpression::parse(CS& file)
   Expression rhs(file);
   file >> ","; // LiSt??
   assert(owner());
-  Symbolic_Expression tmp;
-  assert(owner());
-  Deps ignore; // really?
-  tmp.resolve_symbols(rhs, owner(), &ignore);
-  _exp = tmp;
+  _exp.set_owner(owner());
+  _exp.resolve_symbols(rhs);
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogExpression::is_true() const
 {
-  return _exp.is_true();
+  return ::is_true(_exp);
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogExpression::is_false() const
 {
-  return _exp.is_false();
+  return ::is_false(_exp);
 }
+#endif
 /*--------------------------------------------------------------------------*/
 void AnalogEvtCtlStmt::parse(CS& file)
 {

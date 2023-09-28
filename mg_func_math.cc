@@ -89,10 +89,15 @@ public:
     set_label("exp");
   }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {
+    unreachable();
     PARAMETER<double> x;
     Cmd >> x;
+    trace1("exp", x);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::exp(x));
+  }
+  double evalf(double const* x)const override {
+    return std::exp(*x);
   }
   void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";
@@ -224,11 +229,14 @@ public:
   explicit ln() : MGVAMS_FUNCTION(){
     set_label("ln");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { itested();
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     PARAMETER<double> x;
     Cmd >> x;
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::log(x));
+  }
+  double evalf(double const* x)const override {
+    return std::log(*x);
   }
   void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";
@@ -268,6 +276,9 @@ public:
     Cmd >> x >> y;
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::pow(x, y));
+  }
+  double evalf(double const* x)const override {
+    return std::pow(x[0], x[1]);
   }
   void make_cc_common(std::ostream& o)const override {
     o << "// dummy " << label() << "\n";

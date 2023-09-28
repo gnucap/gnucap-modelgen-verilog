@@ -34,6 +34,7 @@ endfunction
 analog begin
 	real i;
 	i = something(1+5*5, exp(3));
+	i = something(1+5*5, exp(ln(1)));
 end
 
 endmodule

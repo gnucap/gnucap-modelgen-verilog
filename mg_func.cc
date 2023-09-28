@@ -52,6 +52,51 @@ void MGVAMS_FUNCTION::make_cc_common(std::ostream& o) const
   o__ "// " << label() << "\n";
 }
 /*--------------------------------------------------------------------------*/
+void FUNCTION_::stack_op(Expression const& arg, Expression* E) const
+{
+  Expression const* ee = &arg;
+  bool all_float = false;
+  double argv[5];
+  argv[0] = NOT_VALID;
+  argv[1] = NOT_VALID;
+  argv[2] = NOT_VALID;
+  argv[3] = NOT_VALID;
+  argv[4] = NOT_VALID;
+  double* seek = argv;
+  for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
+    trace1("float?", (**i).name());
+    auto F = dynamic_cast<Float const*>((**i).data());
+    all_float = F;
+    if(!all_float){
+      break;
+    }else{
+      *seek = F->value();
+      ++seek;
+      assert(seek<argv+5);
+    }
+  }
+
+  if(!all_float){
+    throw Exception("invalid");
+    // restore argument.
+  }else if(arg.size()==1){
+    double value = evalf(argv);
+    const Float* v = new Float(value);
+    E->push_back(new Token_CONSTANT(to_string(value), v, ""));
+  }else if(arg.size()==2){
+    double value = evalf(argv);
+    const Float* v = new Float(value);
+    E->push_back(new Token_CONSTANT(to_string(value), v, ""));
+  }else{
+    incomplete();
+  }
+}
+/*--------------------------------------------------------------------------*/
+double FUNCTION_::evalf(double const*)const
+{
+  throw Exception("not implemented");
+}
+/*--------------------------------------------------------------------------*/
 FUNCTION_::~FUNCTION_()
 {
   if(has_refs()){
@@ -60,6 +105,62 @@ FUNCTION_::~FUNCTION_()
   }else{
   }
 //  assert(has_refs());
+}
+/*--------------------------------------------------------------------------*/
+Token* VAMS_ACCESS::new_token(Module& m, size_t na, Deps& d)const
+{
+  // use na?
+  Branch_Ref br = m.new_branch(_arg0, _arg1);
+  //  br->set_owner(this);
+  assert(br);
+  assert(const_cast<Branch const*>(br.operator->())->owner());
+  // Probe const* p = m.new_probe(_name, _arg0, _arg1);
+  //
+  // install clone?
+  FUNCTION_ const* p = m.new_probe(_name, br);
+
+  return p->new_token(m, na, d);
+}
+/*--------------------------------------------------------------------------*/
+Token* Probe::new_token(Module& m, size_t na, Deps& d)const
+{
+  std::string name;
+  if(discipline()){
+    if(_type==t_pot){
+      assert(discipline()->potential());
+      name = discipline()->potential()->access().to_string();
+    }else if(_type==t_flow){
+      assert(discipline()->flow());
+      name = discipline()->flow()->access().to_string();
+    }else{
+      name = "UNKNOWN";
+    }
+  }else if(_type==t_pot){ untested();
+    name = "potential";
+  }else if(_type==t_flow){ untested();
+    name = "flow";
+  }else{ untested();
+    unreachable();
+    name = "UNKNOWN";
+  }
+
+  trace4("got a probe", name, na, pname(), nname());
+  name += "(";
+  if(_br.has_name()){
+    name += "alias";
+  }else if(nname() != ""){
+    assert(na==2);
+    name += pname() + ", " + nname();
+  }else{
+    name += pname();
+    assert(na==1);
+  }
+  name += ")";
+
+  Token_ACCESS* nt = new Token_ACCESS(name, this);
+  assert(d.empty());
+  d.insert(Dep(nt->prb(), Dep::_LINEAR));
+  return nt;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

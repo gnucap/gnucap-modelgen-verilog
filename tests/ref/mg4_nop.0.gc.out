@@ -1,0 +1,4 @@
+test_nop0 #() dut (.np(1),.n(0));
+vsource #(.dc(1)) v1 (.p(1),.n(0));
+#           i(v1)      v(dut._b_p_n)
+ 0.         0.         0.        

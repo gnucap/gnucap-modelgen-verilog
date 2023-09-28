@@ -378,34 +378,48 @@ public:
   operator bool()const {return _s;}
 };
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 class Probe; // Dep?
 class DEP_STACK;
 class FUNCTION_;
 class Branch_Ref;
-class Symbolic_Expression : public Expression {
+class Expression_ : public Expression {
   Block* _owner{NULL};
   Deps _deps;
 public:
-  explicit Symbolic_Expression() : Expression() {}
-  ~Symbolic_Expression();
-  void resolve_symbols(Expression const& e, Block* scope, Deps* deps=NULL);
-  Symbolic_Expression& operator=(Symbolic_Expression const&);
+  explicit Expression_() : Expression() {}
+  ~Expression_();
+  void resolve_symbols(Expression const& e){
+    return resolve_symbols_(e, &_deps);
+  }
+  void set_owner(Block* b){ _owner = b; }
+  void dump(std::ostream& out)const override;
+// private:
+  Block* owner(){ return _owner; }
+private:
+  void resolve_symbols_(Expression const& e, Deps* deps=NULL);
 public:
   Deps const& deps()const { return _deps; }
   Deps& deps() { return _deps; }
-  bool is_true() const;
-  bool is_false() const;
 private: // all the same eventually?
-  Token* resolve_xs_function(std::string const& n, DEP_STACK& ds, Block* o);
-  Token* resolve_function(FUNCTION_ const* filt, DEP_STACK& ds, Block* o);
-  Token* resolve_system_task(FUNCTION_ const* t, DEP_STACK& ds, Block* o);
+  Token* resolve_xs_function(std::string const& n, DEP_STACK& ds);
+  Token* resolve_function(FUNCTION_ const* filt, DEP_STACK& ds);
+  Token* resolve_system_task(FUNCTION_ const* t, DEP_STACK& ds);
   Probe const* new_probe(std::string const& xs, Branch_Ref const& br);
 };
 /*--------------------------------------------------------------------------*/
+bool is_true(Expression const& x);
+bool is_false(Expression const& x);
+/*--------------------------------------------------------------------------*/
+#if 0
+class Const_Expression : public Expression_ {
+public:
+  explicit Const_Expression() : Expression_() {}
+};
+#endif
+/*--------------------------------------------------------------------------*/
 // class AnalogExpression?
 class ConstantMinTypMaxExpression : public Base {
-  Expression* _e{NULL};
+  Expression_* _e{NULL};
   Block* _owner{NULL};
 public:
   explicit ConstantMinTypMaxExpression() : Base(){}
@@ -414,8 +428,8 @@ public:
 public:
   Expression const& expression()const{ assert(_e); return *_e; }
   bool empty()const;
-  void parse(CS& file)override;
-  void dump(std::ostream& f)const override;
+  void parse(CS& f)override;
+  void dump(std::ostream& o)const override;
 };
 /*--------------------------------------------------------------------------*/
 class Parameter_Base : public Base {
@@ -726,7 +740,6 @@ public:
   virtual Data_Type const& type() const = 0;
   // bool is_int() const { return _type.is_int(); }
   virtual Deps const& deps()const = 0;
-  virtual Deps& deps() = 0;
   String_Arg const& identifier()const {return _name;}
   std::string const& name()const {return _name.to_string();}
   virtual std::string code_name()const;
@@ -737,7 +750,7 @@ public:
   virtual Branch_Ref new_branch(std::string const& p, std::string const& n);
   virtual Branch_Ref new_branch(Node const* p, Node const* n);
 
-  virtual void update_deps(Deps const&);
+  virtual void update_deps(Deps const&) = 0;
 protected:
   void new_var_ref();
 };
@@ -761,9 +774,10 @@ public:
   }
   void set_type(Data_Type const& d){ _type=d; }
   Deps const& deps()const override { return _deps; }
-  Deps& deps()override { return _deps; }
+  void update_deps(Deps const&)override;
 
 protected:
+  Deps& deps() { return _deps; }
 //  void set_type(std::string const& a){_type=a;}
 };
 /*--------------------------------------------------------------------------*/
@@ -1239,10 +1253,11 @@ public:
 };
 typedef LiSt<Arg, '{', '#', '}'> Arg_List;
 /*--------------------------------------------------------------------------*/
-class Analog_Function_Arg : public Variable {
+class Analog_Function_Arg : public Variable_Decl {
 //  String_Arg _identifier;
   Deps _deps; // really?
 public:
+  explicit Analog_Function_Arg() : Variable_Decl() {}
   String_Arg const& identifier()const { return _name; }
   std::string name()const { return _name.to_string(); }
   void parse(CS& f)override;
@@ -1336,7 +1351,7 @@ public:
 };
 typedef LiSt<Probe, '{', '#', '}'> Probe_List;
 #endif
-// Name clash
+// Name clash, VAMS_ACCESS == Probe?
 class Probe : public FUNCTION_ {
   Branch_Ref _br;
   enum{
@@ -1346,6 +1361,7 @@ class Probe : public FUNCTION_ {
   } _type;
 public:
   explicit Probe(std::string const& xs, Branch_Ref b);
+  ~Probe();
 //  std::string const& name()const {return _name;}
   // later.
 
@@ -1361,6 +1377,7 @@ public:
   }
   bool is_reversed() const;
   Nature const* nature() const;
+  Discipline const* discipline() const;
 
   bool operator==(Probe const& o) const{
     return _br == o._br && _type == o._type;
@@ -1370,7 +1387,7 @@ public:
   }
 private:
   std::string eval(CS&, const CARD_LIST*)const override {unreachable(); return "";}
-  Token* new_token(Module&, size_t, Deps&)const {incomplete(); return NULL;}
+  Token* new_token(Module&, size_t, Deps&)const;
 }; // Probe
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1521,10 +1538,10 @@ public:
   void set_pot_probe(){ ++_has_pot_probe; }
   void set_flow_source(){ ++_has_flow_src; }
   void set_pot_source(){ ++_has_pot_src; }
-  void dec_flow_probe(){untested(); --_has_flow_probe; }
-  void dec_pot_probe(){untested(); --_has_pot_probe; }
-  void dec_flow_source(){untested(); --_has_flow_src; }
-  void dec_pot_source(){untested(); --_has_pot_src; }
+  void dec_flow_probe(){ --_has_flow_probe; }
+  void dec_pot_probe(){ --_has_pot_probe; }
+  void dec_flow_source(){ --_has_flow_src; }
+  void dec_pot_source(){ --_has_pot_src; }
   void set_filter(){ _is_filter=true; }
   void set_direct(bool d=true);
   void set_selfdep(bool d=true) {_selfdep = d; }
@@ -1797,7 +1814,7 @@ public:
 class Assignment : public Variable {
 protected:
   Variable* _lhs{NULL};
-  Symbolic_Expression _rhs;
+  Expression_ _rhs;
 public:
   explicit Assignment(CS& f, Block* o);
   explicit Assignment() : Variable() {}
@@ -1810,7 +1827,7 @@ public:
     assert(_lhs);
     return _lhs->name();
   }
-  Symbolic_Expression const& rhs()const {return _rhs;}
+  Expression_ const& rhs()const {return _rhs;}
   Variable const& lhs() const{
     assert(_lhs);
     return *_lhs;
@@ -1828,7 +1845,7 @@ public:
 class Contribution : public Owned_Base {
   std::string _name;
   Nature const* _nature{NULL};
-  Symbolic_Expression _rhs;
+  Expression_ _rhs;
   Branch_Ref _branch;
   enum{
     t_unknown,
@@ -1845,8 +1862,7 @@ public:
     : Owned_Base(o), _branch(NULL) {
     parse(f);
   }
-  ~Contribution(){
-  }
+  ~Contribution();
 
   bool is_pot_contrib() const;
   bool is_flow_contrib() const;
@@ -1994,8 +2010,9 @@ class Filter : public Element_2 {
 public:
   explicit Filter() : Element_2() {}
   explicit Filter(std::string const& name, Deps const& d)
-    : Element_2(), _deps(d) {
-    _name = name;
+    : Element_2(), _deps() {
+      _deps.update(d);
+      _name = name;
     }
   void parse(CS&) override{unreachable();}
   void dump(std::ostream&)const override {unreachable();}

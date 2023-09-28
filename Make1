@@ -57,6 +57,7 @@ mg_out_lib.cc \
 mg_out_root.cc \
 mg_pp.cc \
 mg_task.cc \
+m_expression_dump.cc \
 m_tokens.cc
 #------------------------------------------------------------------------
 RAW_HDRS = mg_.h mg_out.h

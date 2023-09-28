@@ -15,11 +15,11 @@ mg_error.o: mg_error.cc /usr/local/include/gnucap/ap.h \
 mg_filt.o: mg_filt.cc mg_func.h /usr/local/include/gnucap/u_function.h \
  /usr/local/include/gnucap/e_base.h /usr/local/include/gnucap/md.h \
  /usr/local/include/gnucap/io_trace.h \
- /usr/local/include/gnucap/io_error.h mg_out.h mg_.h \
- /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/m_base.h \
- /usr/local/include/gnucap/l_lib.h /usr/local/include/gnucap/ap.h \
- /usr/local/include/gnucap/constant.h \
+ /usr/local/include/gnucap/io_error.h \
  /usr/local/include/gnucap/m_expression.h \
+ /usr/local/include/gnucap/m_base.h /usr/local/include/gnucap/l_lib.h \
+ /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/constant.h \
+ mg_out.h mg_.h /usr/local/include/gnucap/ap.h \
  /usr/local/include/gnucap/m_base.h mg_deps.h m_tokens.h \
  /usr/local/include/gnucap/globals.h \
  /usr/local/include/gnucap/l_dispatcher.h \
@@ -32,11 +32,11 @@ mg_filt_ddx.o: mg_filt_ddx.cc mg_func.h \
  /usr/local/include/gnucap/u_function.h \
  /usr/local/include/gnucap/e_base.h /usr/local/include/gnucap/md.h \
  /usr/local/include/gnucap/io_trace.h \
- /usr/local/include/gnucap/io_error.h mg_out.h mg_.h \
- /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/m_base.h \
- /usr/local/include/gnucap/l_lib.h /usr/local/include/gnucap/ap.h \
- /usr/local/include/gnucap/constant.h \
+ /usr/local/include/gnucap/io_error.h \
  /usr/local/include/gnucap/m_expression.h \
+ /usr/local/include/gnucap/m_base.h /usr/local/include/gnucap/l_lib.h \
+ /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/constant.h \
+ mg_out.h mg_.h /usr/local/include/gnucap/ap.h \
  /usr/local/include/gnucap/m_base.h mg_deps.h m_tokens.h \
  /usr/local/include/gnucap/globals.h \
  /usr/local/include/gnucap/l_dispatcher.h \
@@ -49,11 +49,11 @@ mg_filt_slew.o: mg_filt_slew.cc mg_func.h \
  /usr/local/include/gnucap/u_function.h \
  /usr/local/include/gnucap/e_base.h /usr/local/include/gnucap/md.h \
  /usr/local/include/gnucap/io_trace.h \
- /usr/local/include/gnucap/io_error.h mg_out.h mg_.h \
- /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/m_base.h \
- /usr/local/include/gnucap/l_lib.h /usr/local/include/gnucap/ap.h \
- /usr/local/include/gnucap/constant.h \
+ /usr/local/include/gnucap/io_error.h \
  /usr/local/include/gnucap/m_expression.h \
+ /usr/local/include/gnucap/m_base.h /usr/local/include/gnucap/l_lib.h \
+ /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/constant.h \
+ mg_out.h mg_.h /usr/local/include/gnucap/ap.h \
  /usr/local/include/gnucap/m_base.h mg_deps.h m_tokens.h \
  /usr/local/include/gnucap/globals.h \
  /usr/local/include/gnucap/l_dispatcher.h \
@@ -65,11 +65,11 @@ mg_filt_slew.o: mg_filt_slew.cc mg_func.h \
 mg_func.o: mg_func.cc mg_func.h /usr/local/include/gnucap/u_function.h \
  /usr/local/include/gnucap/e_base.h /usr/local/include/gnucap/md.h \
  /usr/local/include/gnucap/io_trace.h \
- /usr/local/include/gnucap/io_error.h m_tokens.h \
+ /usr/local/include/gnucap/io_error.h \
+ /usr/local/include/gnucap/m_expression.h \
  /usr/local/include/gnucap/m_base.h /usr/local/include/gnucap/l_lib.h \
  /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/constant.h \
- /usr/local/include/gnucap/m_expression.h \
- /usr/local/include/gnucap/m_base.h mg_out.h mg_.h \
+ m_tokens.h /usr/local/include/gnucap/m_base.h mg_out.h mg_.h \
  /usr/local/include/gnucap/ap.h mg_deps.h \
  /usr/local/include/gnucap/globals.h \
  /usr/local/include/gnucap/l_dispatcher.h \
@@ -82,11 +82,11 @@ mg_func_math.o: mg_func_math.cc mg_func.h \
  /usr/local/include/gnucap/u_function.h \
  /usr/local/include/gnucap/e_base.h /usr/local/include/gnucap/md.h \
  /usr/local/include/gnucap/io_trace.h \
- /usr/local/include/gnucap/io_error.h mg_out.h mg_.h \
- /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/m_base.h \
- /usr/local/include/gnucap/l_lib.h /usr/local/include/gnucap/ap.h \
- /usr/local/include/gnucap/constant.h \
+ /usr/local/include/gnucap/io_error.h \
  /usr/local/include/gnucap/m_expression.h \
+ /usr/local/include/gnucap/m_base.h /usr/local/include/gnucap/l_lib.h \
+ /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/constant.h \
+ mg_out.h mg_.h /usr/local/include/gnucap/ap.h \
  /usr/local/include/gnucap/m_base.h mg_deps.h \
  /usr/local/include/gnucap/globals.h \
  /usr/local/include/gnucap/l_dispatcher.h \
@@ -99,11 +99,11 @@ mg_func_sys.o: mg_func_sys.cc mg_func.h \
  /usr/local/include/gnucap/u_function.h \
  /usr/local/include/gnucap/e_base.h /usr/local/include/gnucap/md.h \
  /usr/local/include/gnucap/io_trace.h \
- /usr/local/include/gnucap/io_error.h mg_out.h mg_.h \
- /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/m_base.h \
- /usr/local/include/gnucap/l_lib.h /usr/local/include/gnucap/ap.h \
- /usr/local/include/gnucap/constant.h \
+ /usr/local/include/gnucap/io_error.h \
  /usr/local/include/gnucap/m_expression.h \
+ /usr/local/include/gnucap/m_base.h /usr/local/include/gnucap/l_lib.h \
+ /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/constant.h \
+ mg_out.h mg_.h /usr/local/include/gnucap/ap.h \
  /usr/local/include/gnucap/m_base.h mg_deps.h m_tokens.h \
  /usr/local/include/gnucap/globals.h \
  /usr/local/include/gnucap/l_dispatcher.h \
@@ -292,19 +292,27 @@ mg_pp.o: mg_pp.cc /usr/local/include/gnucap/io_.h \
 mg_task.o: mg_task.cc mg_func.h /usr/local/include/gnucap/u_function.h \
  /usr/local/include/gnucap/e_base.h /usr/local/include/gnucap/md.h \
  /usr/local/include/gnucap/io_trace.h \
- /usr/local/include/gnucap/io_error.h mg_.h \
- /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/m_base.h \
- /usr/local/include/gnucap/l_lib.h /usr/local/include/gnucap/ap.h \
- /usr/local/include/gnucap/constant.h \
+ /usr/local/include/gnucap/io_error.h \
  /usr/local/include/gnucap/m_expression.h \
- /usr/local/include/gnucap/m_base.h mg_deps.h mg_out.h m_tokens.h \
- /usr/local/include/gnucap/globals.h \
+ /usr/local/include/gnucap/m_base.h /usr/local/include/gnucap/l_lib.h \
+ /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/constant.h \
+ mg_.h /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/m_base.h \
+ mg_deps.h mg_out.h m_tokens.h /usr/local/include/gnucap/globals.h \
  /usr/local/include/gnucap/l_dispatcher.h \
  /usr/local/include/gnucap/l_stlextra.h /usr/local/include/gnucap/u_opt.h \
  /usr/local/include/gnucap/mode.h /usr/local/include/gnucap/io_.h \
  /usr/local/include/gnucap/u_parameter.h \
  /usr/local/include/gnucap/m_expression.h \
  /usr/local/include/gnucap/e_cardlist.h
+m_expression_dump.o: m_expression_dump.cc m_tokens.h \
+ /usr/local/include/gnucap/m_base.h /usr/local/include/gnucap/l_lib.h \
+ /usr/local/include/gnucap/md.h /usr/local/include/gnucap/io_trace.h \
+ /usr/local/include/gnucap/io_error.h /usr/local/include/gnucap/ap.h \
+ /usr/local/include/gnucap/constant.h \
+ /usr/local/include/gnucap/m_expression.h \
+ /usr/local/include/gnucap/m_base.h mg_.h /usr/local/include/gnucap/ap.h \
+ mg_deps.h mg_func.h /usr/local/include/gnucap/u_function.h \
+ /usr/local/include/gnucap/e_base.h
 m_tokens.o: m_tokens.cc m_tokens.h /usr/local/include/gnucap/m_base.h \
  /usr/local/include/gnucap/l_lib.h /usr/local/include/gnucap/md.h \
  /usr/local/include/gnucap/io_trace.h \
@@ -313,4 +321,5 @@ m_tokens.o: m_tokens.cc m_tokens.h /usr/local/include/gnucap/m_base.h \
  /usr/local/include/gnucap/m_expression.h \
  /usr/local/include/gnucap/m_base.h mg_func.h \
  /usr/local/include/gnucap/u_function.h \
- /usr/local/include/gnucap/e_base.h
+ /usr/local/include/gnucap/e_base.h mg_.h /usr/local/include/gnucap/ap.h \
+ mg_deps.h

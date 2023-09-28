@@ -38,11 +38,11 @@ module fct(p, n);
     TT =  20.0855369231877;
     TT = $vt(T);
     TT = $vt(3);
-    TT = (3 + $vt(17));
+    TT = ($vt(17) + 3);
     TT = $temperature();
     TT = $temperature;
-    TT = (3 + $temperature);
-    TT = (3 + $temperature());
+    TT = ($temperature + 3);
+    TT = ($temperature() + 3);
   end
 
 endmodule

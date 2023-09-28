@@ -39,18 +39,6 @@ bool Module::has_submodule() const
   return !element_list().is_empty();
 }
 /*--------------------------------------------------------------------------*/
-#if 0
-Probe const* Module::new_probe(std::string const& xs, std::string const& p,
-    std::string const& n)
-{
-  Branch_Ref br = new_branch(p, n);
-//  br->set_owner(this);
-  assert(br);
-  assert(const_cast<Branch const*>(br.operator->())->owner());
-  return new_probe(xs, br);
-}
-#endif
-/*--------------------------------------------------------------------------*/
 #if 1
 Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
 {
@@ -66,26 +54,19 @@ Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
   }
 
   std::string nn = xs;
-  // incomplete. discipline.h
   if(xs == flow_xs || xs == "flow"){
-    br->set_flow_probe();
-    assert(br->has_flow_probe());
     nn = "flow";
   }else if( xs == pot_xs || xs == "potential" ){
-    br->set_pot_probe();
     nn = "potential";
-  }else if( xs == "_filter"){
-    br->set_filter();
-    br->set_pot_probe();
+//  }else if( xs == "_filter"){ untested();
+//   // obsolete?
+//    br->set_filter();
   }else{ untested();
     trace1("new_probe", xs);
     unreachable();
     nn = xs;
   }
 
-  // TODO: use new_probe(branch); ?
-
-  // TODO: is this needed?
   std::string k = nn + "_" + br.pname() + "_" + br.nname();
   Probe*& prb = _probes[k];
 
@@ -93,13 +74,6 @@ Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
   }else{
     prb = new Probe(nn, br);
   }
-
-  // disambiguation hack. cleanup later.
-  //if(br.nname()==br.pname()){
-  //}else if(br.is_reversed()){
-  //  new_probe(xs, br.nname(), br.pname());
-  //}else{
-  //}
 
   return prb;
 }
@@ -577,27 +551,26 @@ Probe::Probe(std::string const& xs, Branch_Ref b) : _br(b)
   // TODO: disciplines.h
   if( (xs == "V") || (xs == "potential") ){
     _type = t_pot;
+    _br->set_pot_probe();
   }else if( (xs == "I") || (xs == "flow") ){
     _type = t_flow;
+    _br->set_flow_probe();
   }else{ untested();
     unreachable();
   }
 }
 /*--------------------------------------------------------------------------*/
-#if 0
-bool Probe::is_filter_probe() const
+Probe::~Probe()
 {
-  assert(_br);
-  if(_br->is_filter()){
-    incomplete();
-  }
-  if(_br->is_filter() == (_type == t_filt)){
+  if(is_flow_probe()){
+    _br->dec_flow_probe();
   }else{
-    incomplete();
   }
-  return _br->is_filter();
+  if(is_pot_probe()){
+    _br->dec_pot_probe();
+  }else{
+  }
 }
-#endif
 /*--------------------------------------------------------------------------*/
 bool Probe::is_reversed() const
 {
@@ -610,8 +583,13 @@ Nature const* Branch::nature() const
   return NULL;
 }
 /*--------------------------------------------------------------------------*/
-Nature const* Probe::nature() const
+Discipline const* Probe::discipline() const
 {
+  return _br->discipline();
+}
+/*--------------------------------------------------------------------------*/
+Nature const* Probe::nature() const
+{ untested();
   return _br->nature();
 }
 /*--------------------------------------------------------------------------*/
@@ -710,6 +688,17 @@ bool Contribution::is_pot_contrib() const
   return _type == t_pot;
 }
 /*--------------------------------------------------------------------------*/
+Contribution::~Contribution()
+{
+  if(!_branch) {
+    incomplete();
+  }else if (is_flow_contrib()) {
+    _branch->dec_flow_source();
+  }else if(is_pot_contrib()) {
+    _branch->dec_pot_source();
+  }
+}
+/*--------------------------------------------------------------------------*/
 bool Assignment::is_module_variable() const
 {
   assert(_lhs);
@@ -785,6 +774,18 @@ Branch::~Branch()
 {
   // no, shutting down, not all Refs tidied up.
   assert(!_refs.size());
+
+  // Contributions tidied up
+  assert(!_has_pot_src);
+  assert(!_has_flow_src);
+
+  // Probes tidied up
+  if(_has_pot_probe){
+    unreachable();
+  }else if(_has_flow_probe){ untested();
+    unreachable();
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Branch::attach(Branch_Ref* r)
@@ -828,9 +829,6 @@ void Branch::detach(Branch_Ref* r)
 /*--------------------------------------------------------------------------*/
 Deps::~Deps()
 {
-//  for(auto i : *this){ untested();
-//    delete i;
-//  }
   _s.clear();
 }
 /*--------------------------------------------------------------------------*/
@@ -935,7 +933,7 @@ Deps::const_iterator Deps::end() const
   return _s.end();
 }
 /*--------------------------------------------------------------------------*/
-void Variable::update_deps(Deps const& d)
+void Variable_Decl::update_deps(Deps const& d)
 {
   assert(&deps() != &d);
   deps().update(d);
@@ -949,20 +947,20 @@ void Assignment::update_deps(Deps const& d)
   deps().update(d);
 }
 /*--------------------------------------------------------------------------*/
-bool Symbolic_Expression::is_true() const
+bool is_true(Expression const& x)
 {
-  double e = eval();
+  double e = x.eval();
   return e == 1.;
 }
 /*--------------------------------------------------------------------------*/
-bool Symbolic_Expression::is_false() const
+bool is_false(Expression const& x)
 {
-  double e = eval();
+  double e = x.eval();
   return e == 0.;
 }
 /*--------------------------------------------------------------------------*/
-Probe const* Symbolic_Expression::new_probe(std::string const& xs, Branch_Ref const& br)
-{
+Probe const* Expression_::new_probe(std::string const& xs, Branch_Ref const& br)
+{ untested();
   std::string flow_xs;
   std::string pot_xs;
 
@@ -1024,7 +1022,7 @@ Probe const* Symbolic_Expression::new_probe(std::string const& xs, Branch_Ref co
   return prb;
 }
 /*--------------------------------------------------------------------------*/
-Symbolic_Expression::~Symbolic_Expression()
+Expression_::~Expression_()
 {
 //  for(auto i : _deps){
 //    delete i;

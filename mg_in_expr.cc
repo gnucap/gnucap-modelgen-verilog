@@ -87,18 +87,19 @@ public:
   void new_var(){ untested();
     _stack.push(new Deps());
   }
-  void new_var(Probe const* d){ untested();
+  void new_var(Dep d){ untested();
     _stack.push(new Deps());
     _stack.top()->insert(Dep(d));
   }
   void new_var(Deps const& d){
-    _stack.push(new Deps(d));
+    _stack.push(new Deps());
+    _stack.top()->update(d);
   }
   void set(Deps const& d){ untested();
     assert(_stack.size());
     *_stack.top() = d;
   }
-  void set(Probe const* p){ untested();
+  void set(Dep p){ untested();
     assert(_stack.size());
     assert(_stack.top()->empty());
     _stack.top()->insert(Dep(p));
@@ -129,8 +130,7 @@ public:
   }
 };
 /*--------------------------------------------------------------------------*/
-Token* Symbolic_Expression::resolve_function(FUNCTION_ const* f,
-    DEP_STACK& ds, Block* o)
+Token* Expression_::resolve_function(FUNCTION_ const* f, DEP_STACK& ds)
 {
   Expression& E = *this;
 
@@ -155,7 +155,8 @@ Token* Symbolic_Expression::resolve_function(FUNCTION_ const* f,
   }
 #endif
 
-  Token* t = o->new_token(f, *ds.top(), na);
+  assert(owner());
+  Token* t = owner()->new_token(f, *ds.top(), na);
   return t;
 }
 /*--------------------------------------------------------------------------*/
@@ -194,6 +195,7 @@ static Analog_Function const* is_analog_function_call(std::string const& f, Bloc
   return NULL;
 }
 /*--------------------------------------------------------------------------*/
+// use dispatcher?
 static bool is_xs_function(std::string const& f, Block const* owner)
 {
   Module const* m = to_module(owner);
@@ -226,44 +228,8 @@ static bool is_xs_function(std::string const& f, Block const* owner)
   return false;
 }
 /*--------------------------------------------------------------------------*/
-class VAMS_ACCESS : public FUNCTION_ {
-  std::string _name, _arg0, _arg1;
-public:
-  VAMS_ACCESS(std::string n, std::string a0, std::string a1)
-    : _name(n), _arg0(a0), _arg1(a1) {
-  }
-private:
-  std::string eval(CS&, const CARD_LIST*)const override {unreachable(); return "";}
-  Token* new_token(Module& m, size_t na, Deps& d)const override {
-    // use na?
-    Branch_Ref br = m.new_branch(_arg0, _arg1);
-  //  br->set_owner(this);
-    assert(br);
-    assert(const_cast<Branch const*>(br.operator->())->owner());
-    // Probe const* p = m.new_probe(_name, _arg0, _arg1);
-    //
-     // install clone?
-    Probe const* p = m.new_probe(_name, br);
-
-    std::string name = _name + "(" + _arg0;
-    if(_arg1 != ""){
-      assert(na==2);
-      name += ", " + _arg1;
-    }else{
-      assert(na==1);
-    }
-    name += ")";
-
-    trace3("got a probe", name, _arg1, _arg0);
-    Token_ACCESS* nt = new Token_ACCESS(name, p);
-    assert(d.empty());
-    d.insert(Dep(nt->prb()));
-    return nt;
-  }
-  void make_cc_common(std::ostream&)const override { unreachable(); }
-};
-/*--------------------------------------------------------------------------*/
-Token* Symbolic_Expression::resolve_xs_function(std::string const& n, DEP_STACK& ds, Block* o)
+// XS::stack_op?
+Token* Expression_::resolve_xs_function(std::string const& n, DEP_STACK& ds)
 {
   Expression& E = *this;
   size_t na = ds.num_args();
@@ -273,6 +239,21 @@ Token* Symbolic_Expression::resolve_xs_function(std::string const& n, DEP_STACK&
     throw Exception("syntax error");
   }else if(!dynamic_cast<Token_PARLIST*>(E.back())) { untested();
     throw Exception("syntax error");
+  }else if(E.back()->data()){
+    auto back = E.back();
+    E.pop_back();
+    Base const* d = back->data();
+    auto ee = prechecked_cast<Expression const*>(d);
+    assert(ee);
+    E.push_back(new Token_STOP("fn_stop"));
+    for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
+      E.push_back((*i)->clone());
+//      (**i).stack_op(&E);
+    }
+    E.push_back(new Token_PARLIST("fn_args"));
+    trace1("restored args", size());
+    delete back;
+    return new Token_ACCESS(n);
   }else{
     delete E.back();
     E.pop_back();
@@ -301,18 +282,56 @@ Token* Symbolic_Expression::resolve_xs_function(std::string const& n, DEP_STACK&
     //
     VAMS_ACCESS f(n, arg0, arg1);
     assert(ds.top());
-    Token* t = o->new_token(&f, *ds.top(), na);
+    assert(owner());
+    Token* t = owner()->new_token(&f, *ds.top(), na);
     assert(t);
     return t;
   }
 } // resolve_xs_function
 /*--------------------------------------------------------------------------*/
-void Symbolic_Expression::resolve_symbols(Expression const& e, Block* scope, Deps* deps)
+void Token_PARLIST_::stack_op(Expression* E)const
+{
+  assert(E);
+  if(auto ee = dynamic_cast<Expression const*>(data())){
+    auto arg_exp = new Expression_();
+    for(auto const& i : *ee){
+      i->stack_op(arg_exp);
+    }
+    auto parlist = new Token_PARLIST("", arg_exp);
+    E->push_back(parlist);
+  }else{
+    assert(!E->is_empty());
+    std::stack<Token*> stack;
+    auto arg_exp = new Expression();
+    // replace multiple tokens of a PARLIST with a single token
+    for (;;) {
+      Token* t = E->back();
+      E->pop_back();
+      if (dynamic_cast<const Token_STOP*>(t)) {
+	delete t;
+	break;
+      }else{
+	stack.push(t);
+      }
+    }
+    // turn over (there is no push_front, maybe on purpose)
+    while(!stack.empty()){
+      trace1("pushing", stack.top()->name());
+      arg_exp->push_back(stack.top());
+      stack.pop();
+    }
+    auto parlist = new Token_PARLIST("", arg_exp);
+    E->push_back(parlist);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Expression_::resolve_symbols_(Expression const& e, Deps* deps)
 {
   Expression& E = *this;
   trace0("resolve symbols ===========");
   DEP_STACK ds;
   assert(ds.size()==0);
+  Block* scope = owner();
 
 //   for(List_Base<Token>::const_iterator ii = e.begin(); ii!=e.end(); ++ii) { untested();
 //     trace1("resolve symbols", (*ii)->name());
@@ -321,7 +340,7 @@ void Symbolic_Expression::resolve_symbols(Expression const& e, Block* scope, Dep
   // resolve symbols
   for(List_Base<Token>::const_iterator ii = e.begin(); ii!=e.end(); ++ii) {
     Token* t = *ii;
-    trace2("loop top:", t->name(), ds.size());
+    trace3("loop top:", t->name(), ds.size(), size());
 
     auto symbol = dynamic_cast<Token_SYMBOL*>(t);
     std::string const& n = t->name();
@@ -329,58 +348,67 @@ void Symbolic_Expression::resolve_symbols(Expression const& e, Block* scope, Dep
     trace3("resolve top found:", n, r, symbol);
 
     if(dynamic_cast<Token_STOP*>(t)) {
-      E.push_back(t->clone());
       trace0("resolve STOP");
+      t->stack_op(&E);
       ds.stop();
       assert(ds.num_args()==0);
-      // depstack.push(new Deps);
-    }else if(auto c = dynamic_cast<Token_CONSTANT*>(t)) {
-      Token* cl = c->clone();
-      assert(t->name() == cl->name());
-      E.push_back(cl);
+    }else if(dynamic_cast<Token_CONSTANT*>(t)) {
+      t->stack_op(&E);
       ds.new_constant();
     }else if((E.is_empty() || !dynamic_cast<Token_PARLIST*>(E.back()))
           && symbol && t->name() == "inf") {
       Float* f = new Float(std::numeric_limits<double>::infinity());
       E.push_back(new Token_CONSTANT(t->name(), f, ""));
-    }else if(dynamic_cast<Token_PARLIST*>(t)){
-      E.push_back(t->clone());
+    }else if(auto pl = dynamic_cast<Token_PARLIST*>(t)){
+      Token_PARLIST_ tt(*pl);
+      tt.stack_op(&E);
     }else if(dynamic_cast<Token_UNARY*>(t)){
-      E.push_back(t->clone());
-    }else if(dynamic_cast<Token_BINOP*>(t)){
+      t->stack_op(&E);
+    }else if(auto b = dynamic_cast<Token_BINOP*>(t)){
+      Token_BINOP_ bb(*b);
       ds.binop();
-#if 0
-      t->stack_op(&E); // ?
-#else
-      E.push_back(t->clone());
-#endif
+      bb.stack_op(&E);
     }else if(auto tt = dynamic_cast<Token_TERNARY const*>(t)){
-      auto tp = new Symbolic_Expression();
-      auto fp = new Symbolic_Expression();
+      auto tp = new Expression_();
+      auto fp = new Expression_();
+      tp->set_owner(owner());
+      fp->set_owner(owner());
       try{
 	assert(tt->true_part());
 	assert(tt->false_part());
-	tp->resolve_symbols(*tt->true_part(), scope, ds.top());
-	fp->resolve_symbols(*tt->false_part(), scope, ds.top());
+	tp->resolve_symbols_(*tt->true_part(), ds.top());
+	fp->resolve_symbols_(*tt->false_part(), ds.top());
       }catch(Exception const& e){ untested();
 	delete tp;
 	delete fp;
 	throw e;
       }
 
-      E.push_back(new Token_TERNARY(t->name(), tp, fp));
-    }else if(!symbol) { untested();
-      unreachable();
-      trace1("huh", t->name());
-      E.push_back(t->clone());
+      Token_TERNARY t3(t->name(), tp, fp);
+      t3.stack_op(&E);
     }else if(!E.is_empty() && dynamic_cast<Token_PARLIST*>(E.back())
 	  && is_xs_function(n, scope)) {
-      trace2("resolve XS", ds.size(), ds.num_args());
-      Token* t = resolve_xs_function(n, ds, scope);
-      E.push_back(t);
+      trace3("resolve XS", ds.size(), ds.num_args(), size());
+
+      ds.stop();
+      Token* t = resolve_xs_function(n, ds);
+      t->stack_op(&E);
+      ds.pop_args();
+
+      // not here...
+      auto ta = dynamic_cast<Token_ACCESS const*>(t);
+      assert(ta);
+      ds.top()->insert(Dep(ta->prb()));
+      assert(ds.top()->size()==1);
+      //
+
+      delete t;
+
+      trace2("resolved XS", ds.size(), size());
     }else if(auto p = dynamic_cast<Parameter_Base const*>(r)) {
       ds.new_constant();
       E.push_back(new Token_PAR_REF(n, p));
+      trace2("pushed par ref", n, size());
     }else if(auto aa = dynamic_cast<Analog_Function_Arg const*>(r)) {
       E.push_back(new Token_VAR_REF(n, aa));
       ds.new_var(aa->deps());
@@ -395,12 +423,14 @@ void Symbolic_Expression::resolve_symbols(Expression const& e, Block* scope, Dep
     }else if(Analog_Function const* af = is_analog_function_call(n, scope)) {
       assert(dynamic_cast<Token_PARLIST*>(E.back()));
       ds.pop_args();
-      E.push_back(new Token_AFCALL(n, af));
+      Token_AFCALL a(n, af);
+      a.stack_op(&E);
     }else if(FUNCTION_ const* vaf = va_function(n)) {
-      Token* tt = resolve_function(vaf, ds, scope);
+      Token* tt = resolve_function(vaf, ds);
       // trace1("va_function no token?", t->name());
       assert(tt);
-      E.push_back(tt);
+      tt->stack_op(&E);
+      delete tt;
     }else if(scope->node(t->name())) {
       trace1("unresolved node", t->name());
       // incomplete();
@@ -415,7 +445,7 @@ void Symbolic_Expression::resolve_symbols(Expression const& e, Block* scope, Dep
       ds.clear();
       throw Exception("unresolved symbol: " + n);
     }
-    trace1("loopend", ds.size());
+    trace2("loopend", ds.size(), E.size());
   }
   trace1("depstack", ds.size());
 
@@ -427,7 +457,7 @@ void Symbolic_Expression::resolve_symbols(Expression const& e, Block* scope, Dep
     }
   }else if(ds.size()==1){
     deps->update(*ds.top());
-  }else{ untested();
+  }else{
     assert(ds.size()==0);
   }
 } // resolve_symbols
@@ -441,10 +471,10 @@ void ConstantMinTypMaxExpression::parse(CS& file)
 {
   assert(!_e);
   Expression E(file);
-  Symbolic_Expression tmp;
   assert(_owner);
-  tmp.resolve_symbols(E, _owner);
-  _e = new Expression(tmp, &CARD_LIST::card_list);
+  _e = new Expression_();
+  _e->set_owner(_owner);
+  _e->resolve_symbols(E);
 }
 /*--------------------------------------------------------------------------*/
 void ConstantMinTypMaxExpression::dump(std::ostream& o)const
@@ -459,21 +489,5 @@ ConstantMinTypMaxExpression::~ConstantMinTypMaxExpression()
   _e = NULL;
 }
 /*--------------------------------------------------------------------------*/
-Symbolic_Expression& Symbolic_Expression::operator=(Symbolic_Expression const& Proto)
-{
-  _scope = &CARD_LIST::card_list;
-  { // reduce_copy(Proto);
-    for (const_iterator i = Proto.begin(); i != Proto.end(); ++i) {
-      (**i).stack_op(this);
-    }
-    if (is_empty()) {untested();
-      assert(Proto.is_empty());
-    }else{
-    }
-  }
-  return *this;
-}
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-// vim:ts=8:sw=2:noet
 // vim:ts=8:sw=2:noet
