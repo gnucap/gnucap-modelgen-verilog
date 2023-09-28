@@ -220,8 +220,7 @@ void make_cc_analog_functions(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 void AnalogExpression::dump(std::ostream& o)const
 {
-  assert(_exp);
-  _exp->dump(o);
+  _exp.dump(o);
 }
 /*--------------------------------------------------------------------------*/
 static void make_cc_analog_cond(std::ostream& o, AnalogConditionalStmt const& s);
@@ -348,7 +347,19 @@ static void make_cc_analog_for(std::ostream& o, AnalogForStmt const& s)
 static void make_cc_analog_cond(std::ostream& o, AnalogConditionalStmt const& s)
 {
   o__ "{\n";
-  {
+  if(s.conditional().is_true()) {
+    if(s.true_part_or_null()) {
+      indent y;
+      make_cc_analog_stmt(o, s.true_part());
+    }else{ untested();
+    }
+  }else if(s.conditional().is_false()){
+    if(s.false_part_or_null()) { untested();
+      indent y;
+      make_cc_analog_stmt(o, s.false_part());
+    }else{
+    }
+  }else{
     indent x;
     make_cc_expression(o, s.conditional().expression());
     o__ "if (t0) {\n";

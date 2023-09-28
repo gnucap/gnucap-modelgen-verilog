@@ -108,7 +108,7 @@ private:
     o__ "assert(t0 == t0);\n";
     o__ "return t0;\n";
   }
-  void make_cc_common(std::ostream& o)const override{}
+  void make_cc_common(std::ostream&)const override{}
   void make_cc_dev_(std::ostream& o)const{
     o__ " /*dev*/ ddouble " << label() << "(";
       std::string comma;

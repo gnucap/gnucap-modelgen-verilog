@@ -26,6 +26,7 @@
 #include <m_expression.h>
 #include <set>
 #include "mg_deps.h" // BUG, Deps
+#include "mg_func.h" // BUG, Probe
 /*--------------------------------------------------------------------------*/
 #ifdef PASS_TRACE_TAGS
 #define make_tag() (out << "//" << __func__ << ":" << __LINE__ << "\n")
@@ -392,6 +393,8 @@ public:
 public:
   Deps const& deps()const { return _deps; }
   Deps& deps() { return _deps; }
+  bool is_true() const;
+  bool is_false() const;
 private: // all the same eventually?
   Token* resolve_xs_function(std::string const& n, DEP_STACK& ds, Block* o);
   Token* resolve_function(FUNCTION_ const* filt, DEP_STACK& ds, Block* o);
@@ -499,6 +502,9 @@ public:
   ConstExpression(CS& f, Block* o) : Owned_Base(o) { untested();
     set_owner(o);
     parse(f);
+  }
+  ~ConstExpression(){
+    delete _expression;
   }
   void parse(CS&)override;
   void dump(std::ostream&)const override;
@@ -1330,7 +1336,7 @@ public:
 typedef LiSt<Probe, '{', '#', '}'> Probe_List;
 #endif
 // Name clash
-class Probe : public Base {
+class Probe : public FUNCTION_ {
   Branch_Ref _br;
   enum{
     t_unknown = 0,
@@ -1341,8 +1347,6 @@ public:
   explicit Probe(std::string const& xs, Branch_Ref b);
 //  std::string const& name()const {return _name;}
   // later.
-  void parse(CS&)override {incomplete();}
-  void dump(std::ostream&)const override {incomplete();}
 
   std::string const& pname() const{ return _br.pname(); }
   std::string const& nname() const{ return _br.nname(); }
@@ -1363,6 +1367,9 @@ public:
   bool operator!=(Probe const& o) const{
     return !operator==(o);
   }
+private:
+  std::string eval(CS&, const CARD_LIST*)const override {unreachable(); return "";}
+  Token* new_token(Module&, size_t, Deps&)const {incomplete(); return NULL;}
 }; // Probe
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1466,10 +1473,10 @@ class Branch : public Element_2 {
   Node const* _p{NULL};
   Node const* _n{NULL};
   Deps _deps; // delete?
-  bool _has_flow_probe{false};
-  bool _has_pot_probe{false};
-  bool _has_flow_src{false};
-  bool _has_pot_src{false};
+  size_t _has_flow_probe{0};
+  size_t _has_pot_probe{0};
+  size_t _has_flow_src{0};
+  size_t _has_pot_src{0};
   bool _is_filter{false};
   std::vector<Branch_Ref*> _refs;
   size_t _number;
@@ -1509,10 +1516,14 @@ public:
   size_t num_nodes()const override;
   std::string state()const override;
   virtual bool has_element() const;
-  void set_flow_probe(){ _has_flow_probe=true; }
-  void set_pot_probe(){ _has_pot_probe=true; }
-  void set_flow_source(){ _has_flow_src=true; }
-  void set_pot_source(){ _has_pot_src=true; }
+  void set_flow_probe(){ ++_has_flow_probe; }
+  void set_pot_probe(){ ++_has_pot_probe; }
+  void set_flow_source(){ ++_has_flow_src; }
+  void set_pot_source(){ ++_has_pot_src; }
+  void dec_flow_probe(){untested(); --_has_flow_probe; }
+  void dec_pot_probe(){untested(); --_has_pot_probe; }
+  void dec_flow_source(){untested(); --_has_flow_src; }
+  void dec_pot_source(){untested(); --_has_pot_src; }
   void set_filter(){ _is_filter=true; }
   void set_direct(bool d=true);
   void set_selfdep(bool d=true) {_selfdep = d; }
@@ -1715,7 +1726,6 @@ private: // misc
   CS& parse_analog(CS& cmd);
 
 public: // BUG
-  Probe const* new_probe(std::string const&, std::string const&, std::string const&);
   Probe const* new_probe(std::string const& xs, Branch_Ref const& br);
   Branch_Ref new_branch(std::string const&, std::string const&) override;
 private:
@@ -2044,6 +2054,9 @@ analog_event_expression ::=
 class AnalogEvtExpression : public Owned_Base {
   Expression* _expression{NULL};
 public:
+  ~AnalogEvtExpression(){
+    delete _expression;
+  }
   void parse(CS&)override;
   void dump(std::ostream&)const override;
   Expression const& expression() const{assert(_expression); return *_expression;};
@@ -2053,6 +2066,9 @@ class AnalogEvtCtlStmt : public Owned_Base {
   AnalogEvtExpression _ctl;
   Base* _stmt{NULL};
 public:
+  ~AnalogEvtCtlStmt() {
+    delete _stmt;
+  }
   void parse(CS&)override;
   void dump(std::ostream&)const override;
   Base const* stmt_or_null() const{ return _stmt; }

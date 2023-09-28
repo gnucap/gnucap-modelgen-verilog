@@ -2021,6 +2021,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
   {
     { // 
       {
+//
         std::string s0;
         s0 = "ic";
         // function analysis 1

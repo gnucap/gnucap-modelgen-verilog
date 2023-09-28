@@ -863,15 +863,18 @@ void AnalogExpression::parse(CS& file)
   assert(owner());
   Deps ignore; // really?
   tmp.resolve_symbols(rhs, owner(), &ignore);
-  _exp = new Expression(tmp, &CARD_LIST::card_list);
+  _exp = tmp;
 }
 /*--------------------------------------------------------------------------*/
-#if 0
-void AnalogConstExpression::parse(CS& file)
-{ untested();
-  ...
+bool AnalogExpression::is_true() const
+{
+  return _exp.is_true();
 }
-#endif
+/*--------------------------------------------------------------------------*/
+bool AnalogExpression::is_false() const
+{
+  return _exp.is_false();
+}
 /*--------------------------------------------------------------------------*/
 void AnalogEvtCtlStmt::parse(CS& file)
 {
@@ -971,8 +974,6 @@ void AnalogEvtExpression::dump(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 AnalogExpression::~AnalogExpression()
 {
-  delete _exp;
-  _exp = NULL;
 }
 /*--------------------------------------------------------------------------*/
 void AF_Arg_List_Collection::dump(std::ostream& o)const

@@ -39,6 +39,7 @@ bool Module::has_submodule() const
   return !element_list().is_empty();
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 Probe const* Module::new_probe(std::string const& xs, std::string const& p,
     std::string const& n)
 {
@@ -48,6 +49,7 @@ Probe const* Module::new_probe(std::string const& xs, std::string const& p,
   assert(const_cast<Branch const*>(br.operator->())->owner());
   return new_probe(xs, br);
 }
+#endif
 /*--------------------------------------------------------------------------*/
 #if 1
 Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
@@ -945,6 +947,18 @@ void Assignment::update_deps(Deps const& d)
   assert(_lhs);
   _lhs->update_deps(d);
   deps().update(d);
+}
+/*--------------------------------------------------------------------------*/
+bool Symbolic_Expression::is_true() const
+{
+  double e = eval();
+  return e == 1.;
+}
+/*--------------------------------------------------------------------------*/
+bool Symbolic_Expression::is_false() const
+{
+  double e = eval();
+  return e == 0.;
 }
 /*--------------------------------------------------------------------------*/
 Probe const* Symbolic_Expression::new_probe(std::string const& xs, Branch_Ref const& br)

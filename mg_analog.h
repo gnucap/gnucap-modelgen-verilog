@@ -26,13 +26,15 @@
 /*--------------------------------------------------------------------------*/
 class AnalogExpression : public Owned_Base {
 protected:
-  Expression* _exp{NULL};
+  Symbolic_Expression _exp;
 public:
   ~AnalogExpression();
   void parse(CS& file) override;
   void dump(std::ostream& o)const override;
   Block* owner() {return Owned_Base::owner();}
-  Expression const& expression() const{ assert(_exp); return *_exp;}
+  Expression const& expression() const{ return _exp;}
+  bool is_true() const;
+  bool is_false() const;
 };
 /*--------------------------------------------------------------------------*/
 class AnalogConstExpression : public AnalogExpression {
@@ -83,7 +85,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class AnalogSwitchStmt : public AnalogCtrlStmt {
-  AnalogConstExpression _cond;
+  AnalogConstExpression _cond; // Const??
   AnalogCaseList _cases;
 public:
   AnalogSwitchStmt(Block* o, CS& file) {
@@ -118,7 +120,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class AnalogConditionalStmt : public AnalogCtrlStmt {
-  AnalogConstExpression _cond;
+  AnalogConstExpression _cond; // Const??
   Base* _false_part{NULL};
 public:
   AnalogConditionalStmt(Block* o, CS& file) {

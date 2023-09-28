@@ -100,15 +100,19 @@ class Token_CALL : public Token_SYMBOL {
   FUNCTION_ const* _function{NULL};
   size_t _num_args{size_t(-1)};
 public:
-  explicit Token_CALL(const std::string Name, FUNCTION_ const* item)
-    : Token_SYMBOL(Name, ""), _function(item) {}
+  explicit Token_CALL(const std::string Name, FUNCTION_ const* f)
+    : Token_SYMBOL(Name, ""), _function(f) { attach(); }
+  ~Token_CALL() { detach(); }
 protected:
   explicit Token_CALL(const Token_CALL& P)
     : Token_SYMBOL(P), _function(P._function)
-    , _num_args(P._num_args) {}
+    , _num_args(P._num_args) { attach(); }
 private:
   Token* clone()const override {return new Token_CALL(*this);}
   void stack_op(Expression* e)const override;
+private:
+  void attach();
+  void detach();
 public:
   void set_num_args(size_t n){ _num_args = n; }
   size_t num_args() const;

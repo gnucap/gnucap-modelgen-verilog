@@ -196,17 +196,7 @@ static Analog_Function const* is_analog_function_call(std::string const& f, Bloc
 /*--------------------------------------------------------------------------*/
 static bool is_xs_function(std::string const& f, Block const* owner)
 {
-  assert(owner);
-  Module const* m = NULL;
-  while(true){
-    if(dynamic_cast<Analog_Function const*>(owner)){
-      return false;
-    }else if((m = dynamic_cast<Module const*>(owner))){
-      break;
-    }
-    owner = owner->owner();
-    assert(owner);
-  }
+  Module const* m = to_module(owner);
   assert(m);
   File const* file = m->file();
   if(!file){
@@ -251,6 +241,8 @@ private:
     assert(br);
     assert(const_cast<Branch const*>(br.operator->())->owner());
     // Probe const* p = m.new_probe(_name, _arg0, _arg1);
+    //
+     // install clone?
     Probe const* p = m.new_probe(_name, br);
 
     std::string name = _name + "(" + _arg0;
@@ -268,6 +260,7 @@ private:
     d.insert(Dep(nt->prb()));
     return nt;
   }
+  void make_cc_common(std::ostream&)const override { unreachable(); }
 };
 /*--------------------------------------------------------------------------*/
 Token* Symbolic_Expression::resolve_xs_function(std::string const& n, DEP_STACK& ds, Block* o)
@@ -355,11 +348,12 @@ void Symbolic_Expression::resolve_symbols(Expression const& e, Block* scope, Dep
     }else if(dynamic_cast<Token_UNARY*>(t)){
       E.push_back(t->clone());
     }else if(dynamic_cast<Token_BINOP*>(t)){
-      // t->stack_op(E); // ?
-      E.push_back(t->clone());
-      // merge operand deps? depends on operator..
       ds.binop();
-
+#if 0
+      t->stack_op(&E); // ?
+#else
+      E.push_back(t->clone());
+#endif
     }else if(auto tt = dynamic_cast<Token_TERNARY const*>(t)){
       auto tp = new Symbolic_Expression();
       auto fp = new Symbolic_Expression();
@@ -481,4 +475,5 @@ Symbolic_Expression& Symbolic_Expression::operator=(Symbolic_Expression const& P
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet
 // vim:ts=8:sw=2:noet

@@ -85,6 +85,22 @@ std::string Token_TASK::code_name()const
   return "/*task*/ " + f()->code_name();
 }
 /*--------------------------------------------------------------------------*/
+void Token_CALL::attach()
+{
+  if(_function) {
+    _function->inc_refs();
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Token_CALL::detach()
+{
+  if(_function) {
+    _function->dec_refs();
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
 bool Token_CALL::returns_void() const
 {
   if(_function){

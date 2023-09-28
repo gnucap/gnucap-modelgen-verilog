@@ -24,38 +24,47 @@
 
 #include <u_function.h>
 /*--------------------------------------------------------------------------*/
+#ifndef MG_FUNCTION_H
+#define MG_FUNCTION_H
+/*--------------------------------------------------------------------------*/
 class Token;
 class Module;
 class Deps;
 // TODO: move upstream, partly?
 class FUNCTION_ : public FUNCTION {
-	std::string _label;
-	size_t _num_args{size_t(-1)};
+  std::string _label;
+  size_t _num_args{size_t(-1)};
 public:
-	explicit FUNCTION_() : FUNCTION() {}
-	explicit FUNCTION_(FUNCTION_ const& o)
-		: FUNCTION(o), _label(o._label), _num_args(o._num_args) {}
-	void set_label(std::string const& l){
-		_label = l;
-	}
-	std::string label() const{
-		return _label;
-	}
-	void set_num_args(size_t n){ _num_args = n; }
-	size_t num_args() const { return _num_args; }
+  explicit FUNCTION_() : FUNCTION() {}
+  explicit FUNCTION_(FUNCTION_ const& o)
+  	: FUNCTION(o), _label(o._label), _num_args(o._num_args) {}
+  void set_label(std::string const& l){
+  	_label = l;
+  }
+  ~FUNCTION_();
+  std::string label() const{
+  	return _label;
+  }
+  void set_num_args(size_t n){ _num_args = n; }
+  size_t num_args() const { return _num_args; }
 
-	virtual void make_cc_impl(std::ostream&)const {}
-	virtual void make_cc_dev(std::ostream&) const {}
+  virtual void make_cc_impl(std::ostream&)const {}
+  virtual void make_cc_common(std::ostream&)const {}
+  virtual void make_cc_dev(std::ostream&)const {}
 
-	/* TODO: some kind of
-	Expression* eval(Expression const*);
-	*/
-  virtual Token* new_token(Module& m, size_t na, Deps& d) const = 0;
-  virtual bool returns_void() const { return false; }
-  virtual std::string code_name() const{ itested();
+  /* TODO: some kind of
+  Expression* eval(Expression const*);
+  */
+  virtual Token* new_token(Module& m, size_t na, Deps& d)const = 0;
+  virtual bool returns_void()const { return false; }
+  virtual std::string code_name()const { itested();
 	  // incomplete();
 	  return "";
   }
+public: // use refcounter in e_base
+  void	      inc_refs()const	{inc_probes();}
+  void	      dec_refs()const	{dec_probes();}
+  bool	      has_refs()const	{return has_probes();}
 };
 /*--------------------------------------------------------------------------*/
 class MGVAMS_FUNCTION : public FUNCTION_ {
@@ -64,6 +73,7 @@ class MGVAMS_FUNCTION : public FUNCTION_ {
 	  return "func";
   }
 public:
+  ~MGVAMS_FUNCTION() {}
   virtual MGVAMS_FUNCTION* clone()const {
 	  unreachable();
 	  return NULL;
@@ -79,6 +89,7 @@ class MGVAMS_FILTER : public FUNCTION_ {
 	  return "filt";
   }
 public:
+  ~MGVAMS_FILTER() {}
   // Token* new_token(Module& m, size_t na, Deps& d) const override;
   virtual void make_cc_common(std::ostream&) const {}
   virtual std::string code_name() const{
@@ -92,6 +103,7 @@ class MGVAMS_TASK : public FUNCTION_ {
 	  return "task";
   }
 public:
+  ~MGVAMS_TASK() {}
   virtual MGVAMS_TASK* clone()const {
 	  unreachable();
 	  return NULL;
@@ -103,3 +115,5 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+#endif
+// vim:ts=8:sw=2:noet

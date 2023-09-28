@@ -34,6 +34,7 @@ public:
   explicit STUB(std::string const l) : MGVAMS_FUNCTION() {
     set_label(l);
   }
+  ~STUB() { }
 private:
   std::string code_name()const override{
     if(label()!=""){
@@ -114,6 +115,7 @@ public:
   explicit limexp() : MGVAMS_FUNCTION(){
     set_label("limexp");
   }
+  ~limexp() { }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {
     PARAMETER<double> x;
     Cmd >> x;
@@ -154,6 +156,7 @@ public:
   explicit abs() : MGVAMS_FUNCTION(){
     set_label("abs");
   }
+  ~abs() { }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     PARAMETER<double> x;
     Cmd >> x;
@@ -257,6 +260,7 @@ public:
   explicit pow() : MGVAMS_FUNCTION(){
     set_label("pow");
   }
+  ~pow() { }
   std::string code_name()const override{ return "va::" + label(); }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {untested();
     trace1("pow", Cmd.tail());

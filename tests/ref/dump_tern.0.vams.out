@@ -1,0 +1,14 @@
+
+
+module test(d, g, s, b);
+  real    T;
+
+  analog begin
+    T = $temperature;
+    T = ($temperature)? ($temperature):(4);
+  end
+
+endmodule
+
+
+

@@ -83,11 +83,14 @@ class ABSTIME : public MGVAMS_FUNCTION {
 DISPATCHER<FUNCTION>::INSTALL d_abstime(&function_dispatcher, "$abstime", &abstime);
 /*--------------------------------------------------------------------------*/
 class TEMPERATURE : public MGVAMS_FUNCTION {
+public:
+  ~TEMPERATURE(){ }
+private:
   Token* new_token(Module& m, size_t, Deps&)const override {
     m.install(this);
     return new Token_SFCALL("$temperature", this);
   }
-  std::string eval(CS&, const CARD_LIST*)const override{
+  std::string eval(CS&, const CARD_LIST*)const override{ unreachable();
     return "$$temperature";
   }
   void make_cc_common(std::ostream& o)const override {
@@ -103,12 +106,21 @@ public:
 DISPATCHER<FUNCTION>::INSTALL d1(&function_dispatcher, "$temperature", &temperature);
 /*--------------------------------------------------------------------------*/
 class VT : public MGVAMS_FUNCTION {
+  mutable size_t _temp{0};
+public:
+  ~VT(){
+    while(_temp){
+      --_temp; temperature.dec_refs(); // hack
+    }
+  }
+private:
   std::string eval(CS&, const CARD_LIST*)const override{ untested();
     unreachable(); // SFCALL won't eval
     return "$$vt";
   }
   Token* new_token(Module& m, size_t na, Deps&)const override {
     m.install(&temperature);
+    ++_temp; temperature.inc_refs(); // hack.
     m.install(this);
     if(na == 0) {
     }else if(na == size_t(-1)) {
