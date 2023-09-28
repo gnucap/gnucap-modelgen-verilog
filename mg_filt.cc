@@ -166,7 +166,7 @@ private:
     o____ "d->" << cn << "->do_tr();\n";
     o____ "t0 = d->" << cn << "->tr_amps();\n";
     o__ "trace2(\"filt\", t0, d->"<< cn<<"->tr_outvolts());\n";
-    o__ "t0[d__filter" << cn << "] = 1.;\n";
+    o__ "t0[d__filter" << cn << "] = -1.;\n";
     o__ "assert(t0 == t0);\n";
     o__ "return t0;\n";
   }
@@ -192,7 +192,7 @@ private:
       o__ "t0 += t1.value();\n";
     }else{
     }
-    o__ "t0[d__filter" << cn << "] = 1.;\n";
+    o__ "t0[d__filter" << cn << "] = -1.;\n";
     o__ "assert(t0 == t0);\n";
     o__ "return t0;\n";
   }

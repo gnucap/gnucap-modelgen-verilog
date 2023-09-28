@@ -210,10 +210,10 @@ void VAPOT::set_parameters(const std::string& Label, CARD *Owner,
   set_owner(Owner);
   set_value(Value);
   attach_common(Common);
-  _current_port_names.resize(n_states - 1 - n_nodes/2);
-  _input.resize(n_states - 1 - n_nodes/2);
 
   if (first_time) {
+    _current_port_names.resize(n_states - 1 - n_nodes/2);
+    _input.resize(n_states - 1 - n_nodes/2);
     _n_ports = n_states-1; // set net_nodes
     assert(size_t(_n_ports) == n_nodes/2 + _current_port_names.size());
 
@@ -231,6 +231,7 @@ void VAPOT::set_parameters(const std::string& Label, CARD *Owner,
     assert(_n_ports == n_states-1);
     assert(_old_values);
     assert(net_nodes() == n_nodes);
+    assert(int(_input.size()) == n_states - 1 - n_nodes/2);
     // assert could fail if changing the number of nodes after a run
   }
 

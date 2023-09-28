@@ -581,7 +581,7 @@ static void make_set_one_branch_contribution(std::ostream& o, Module const& m, c
       }else if(d->is_filter_probe()){
 	o__ "// trace2(\" filter " <<  b->state() << "\", " << b->state() << "["<<k<<"], "<<  d->code_name() <<");\n";
 	o__ "// assert(" << k << "  ==  /*MOD::*/" << b->state() << "_::dep" << d->code_name() << ");\n";
-	o__ b->state() << "[0] -= " << b->state() << "["
+	o__ b->state() << "[0] += " << b->state() << "["
 	  << "/*MOD::*/" << b->state() << "_::dep" << d->code_name()
 	  << "] * " << d->branch()->code_name() << "->tr_amps();\n";
 	++k;

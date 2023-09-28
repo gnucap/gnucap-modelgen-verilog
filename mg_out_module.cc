@@ -698,8 +698,8 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
 	  // o << "/* self conductance */" << "";
 	}else if(i->is_filter_probe()){
 	  assert(i->branch());
-	  o << ", gnd";
 	  o << ", _n[n_" << i->branch()->p()->name() << "]";
+	  o << ", gnd";
 	}else if(i->is_pot_probe()){
 	  assert(i->branch());
 	  // o << ",_n[n_" << i->branch()->p()->name() << "]";

@@ -180,7 +180,7 @@ DISPATCHER<CARD>::INSTALL d_ddt(&device_dispatcher, "va_ddt|f_ddt0", &p4);
 TIME_PAIR DEV_DDT::tr_review()
 {
   COMPONENT::tr_review(); // skip ELEMENT
-  if (_method_a == mEULER) { untested();
+  if (_method_a == mEULER) { itested();
     // Backward Euler, no step control, take it as it comes
   }else{
     double timestep = tr_review_trunc_error(_y);

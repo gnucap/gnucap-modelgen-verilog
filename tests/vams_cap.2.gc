@@ -12,7 +12,7 @@ verilog
 capacitor #(.ic(1) .c(1) .m(1)) c1(out, 0);
 resistor #(.r(2) .m(2)) r1(0, out)
 
-print tran v(nodes) loss(c1.*) iter(0)
+print tran v(nodes) iter(0)
 print dc v(nodes)
 print ac vm(nodes) vp(nodes)
 

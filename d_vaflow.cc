@@ -25,9 +25,6 @@
 namespace {
 /*--------------------------------------------------------------------------*/
 class VAFLOW : public DEV_CPOLY_G {
-#ifndef NDEBUG
-  int _reason{0};
-#endif
 protected:
   explicit VAFLOW(const VAFLOW& p) : DEV_CPOLY_G(p) {}
 public:
@@ -67,38 +64,16 @@ protected:
 bool VAFLOW::do_tr_con_chk_and_q()
 {
   q_load();
-#ifndef NDEBUG
-  _reason = 0;
-#endif
 
   assert(_old_values);
   set_converged(conchk(_time, _sim->_time0));
   _time = _sim->_time0;
   if(converged()){
     set_converged(conchk(_old_values[0], _values[0], abstol()));
-#ifndef NDEBUG
-    if(!converged()){
-      _reason = 1;
-      trace4("not converged", long_label(), _old_values[0], _values[0], abstol());
-    }else{
-    }
-#endif
   }else{
   }
   for (int i=1; converged() && i<=_n_ports; ++i) {
-    // if(i==0){
-    // }else if(_old_values[i] * _values[i] < 0.){ untested();
-    //   trace4("sign change", long_label(), i, _old_values[i], _values[i]);
-    // }else{ itested();
-    // }
     set_converged(conchk(_old_values[i], _values[i] /*, 0.?*/ ));
-#ifndef NDEBUG
-    if(!converged()){
-      _reason = i;
-      trace4("not converged", long_label(), i, _old_values[i], _values[i]);
-    }else{
-    }
-#endif
   }
   return converged();
 }
@@ -107,7 +82,7 @@ bool VAFLOW::do_tr()
 {
   assert(_values);
   assert(!_loss0);
-  trace3("DCG::do_tr", long_label(), _values[0], _values[1]);
+  trace4("VAFLOW::do_tr", _values, long_label(), _values[0], _values[1]);
 
   _m0 = CPOLY1(0., _values[0], _values[1]);
   return do_tr_con_chk_and_q();
@@ -152,7 +127,6 @@ void VAFLOW::set_parameters(const std::string& Label, CARD *Owner,
   //				 const double* inputs[])
 {
   bool first_time = (net_nodes() == 0);
-//  bool first_time = _sim->is_first_expand();
 
   set_label(Label);
   trace4("VAFLOW::set_parameters", long_label(), n_nodes, n_states, first_time);
@@ -178,7 +152,8 @@ void VAFLOW::set_parameters(const std::string& Label, CARD *Owner,
   }else{
     assert(_n_ports == n_states-1);
     assert(_old_values);
-    // assert(net_nodes() == n_nodes); // current ports?
+    assert(int(_input.size()) == n_states - 1 - n_nodes/2);
+    // assert could fail if changing the number of nodes after a run
   }
 
   _values = states;
