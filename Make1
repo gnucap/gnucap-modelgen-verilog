@@ -38,9 +38,13 @@ mg_filt_slew.cc \
 mg_func.cc \
 mg_impl.cc \
 mg_in_analog.cc \
+mg_in.cc \
+mg_in_discipline.cc \
 mg_in_expr.cc \
 mg_in_old.cc \
-mg_in.cc mg_in_verilog.cc mg_in_module.cc mg_in_discipline.cc \
+mg_in_module.cc \
+mg_in_paramset.cc \
+mg_in_verilog.cc \
 mg_out_dump.cc \
 mg_out_expr.cc \
 mg_out_h.cc \

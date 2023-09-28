@@ -200,12 +200,14 @@ void File::parse(CS& file)
 {
   _module_list.set_file(this); // needed?
 			       //
+  _attribute_stash.set_owner(this);
+
   _module_list.set_owner(this);
   _macromodule_list.set_owner(this);
   _connectmodule_list.set_owner(this);
   _nature_list.set_owner(this);
   _discipline_list.set_owner(this);
-  _attribute_stash.set_owner(this);
+  _paramset_list.set_owner(this);
 
   size_t here = _file.cursor();
   for (;;) {
@@ -217,6 +219,7 @@ void File::parse(CS& file)
       || ((file >> "connectmodule ") && (file >> _connectmodule_list))
       || ((file >> "nature ")	     && (file >> _nature_list))
       || ((file >> "discipline ")    && (file >> _discipline_list))
+      || ((file >> "paramset ")      && (file >> _paramset_list))
       ;
     if (_attribute_stash.is_empty()){
     }else{
@@ -225,7 +228,7 @@ void File::parse(CS& file)
     if (!file.more()) {
       break;
     }else if (file.stuck(&here)) {
-      file.warn(0, "syntax error, need nature, discipline, or module");
+      file.warn(0, "syntax error, need nature, discipline, module or paramset");
       break;
     }else{
     }

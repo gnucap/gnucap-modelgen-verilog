@@ -1,0 +1,20 @@
+
+`include "sub/disciplines.few"
+
+(* attribute="proto" *)
+module resistor(a,b)
+	electrical a, b;
+
+	parameter real r=1;
+
+	analog begin
+		I(a,b) <+ V(a,b)/r;
+	end
+endmodule
+
+(* attribute="stub" *)
+paramset const_res resistor;
+//	.r = 1;
+endparamset;
+
+

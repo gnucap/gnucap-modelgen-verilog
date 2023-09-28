@@ -49,13 +49,19 @@ static void make_module_file(const File& in, std::string dump_name)
 }
 #endif
 /*--------------------------------------------------------------------------*/
-static void dump(const File& in, std::ostream& out)
+void File::dump(std::ostream& o) const
 {
-  out << in.nature_list() << '\n'
-      << in.discipline_list() << '\n'
-      << in.module_list() << '\n'
-      << in.macromodule_list() << '\n'
-      << in.connectmodule_list() << '\n';
+  o << nature_list() << '\n'
+    << discipline_list() << '\n'
+      // keep modules in order?
+    << module_list() << '\n'
+    << macromodule_list() << '\n'
+    << connectmodule_list() << '\n';
+
+  if(paramset_list().is_empty()){
+  }else{
+    o << paramset_list() << '\n';
+  }
 }
 /*--------------------------------------------------------------------------*/
 class OUTPUT {
@@ -145,7 +151,7 @@ int main(int argc, char** argv)
       p.read(argv[1]);
       File f;
       f.parse(p);
-      dump(f, output);
+      f.dump(output);
       --argc;
       ++argv;
     }else if (argc > 1 && ( strcmp(argv[0],"-v")==0

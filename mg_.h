@@ -192,7 +192,7 @@ protected:
       }
     }
   }
-public:
+public: // Block?
   void set_attributes(Attribute_Instance const* a) {
     assert(!_attributes);
     _attributes = a;
@@ -881,13 +881,22 @@ class Block : public List_Base<Base> {
   typedef std::map<std::string, Base*> map; // set?
   typedef map::const_iterator const_iterator;
 protected:
+  Attribute_Instance const* _attributes{NULL}; // Base class?
   map _var_refs;
 private:
   Block* _owner{NULL};
 public:
   Block const* owner() const{ return _owner;}
   Block* owner(){ return _owner;}
+  ~Block();
 public:
+  bool has_attributes() const{
+    return _attributes;
+  }
+  Attribute_Instance const& attributes()const {
+    assert(_attributes);
+    return *_attributes;
+  }
   void new_var_ref(Base* what);
   virtual Probe const* new_probe(std::string const&, std::string const&, std::string const&)
   {unreachable(); return NULL;}
@@ -1640,7 +1649,6 @@ typedef Collection<Analog_Function> Analog_Functions;
 /*--------------------------------------------------------------------------*/
 class Node;
 class File;
-// TODO: decide if it is a Block, or has-a Block aka Scope or whetever.
 class Module : public Block {
   typedef std::map<std::string, Probe*> Probe_Map;
 private: // verilog input data
@@ -1659,7 +1667,6 @@ private: // verilog input data
   Aliasparam_Collection _aliasparam;
   Element_2_List _element_list;
   Port_1_List	_local_nodes;
-  Attribute_Instance const* _attributes{NULL};
   Attribute_Stash _attribute_stash;
   AnalogList	_analog_list;
   // Code_Block		_validate;
@@ -1719,13 +1726,6 @@ public:
   Attribute_Stash& attribute_stash() {
     return _attribute_stash;
   }
-  bool has_attributes() const{
-    return _attributes;
-  }
-  Attribute_Instance const& attributes()const {
-    assert(_attributes);
-    return *_attributes;
-  }
   void set_analysis() {_has_analysis = true; }
   void set_attributes(Attribute_Instance const* a) {
     assert(!_attributes);
@@ -1753,6 +1753,24 @@ public: //filters may need this..
   Branch_Ref new_branch(Node const*, Node const*) override;
 }; // Module
 typedef Collection<Module> Module_List;
+/*--------------------------------------------------------------------------*/
+class Paramset : public Block {
+  std::string _name;
+  std::string _proto_name;
+  Attribute_Stash _attribute_stash;
+public:
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+public: // Block?
+  void set_attributes(Attribute_Instance const* a) {
+    assert(!_attributes);
+    _attributes = a;
+  }
+  bool has_attributes() const{
+    return _attributes;
+  }
+};
+typedef Collection<Paramset> Paramset_List;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class BlockVarIdentifier : public Variable_Decl{
@@ -1940,6 +1958,7 @@ class File : public Block {
   Module_List	_module_list;
   Module_List	_macromodule_list;
   Module_List	_connectmodule_list;
+  Paramset_List _paramset_list;
   Attribute_Instance const* _attributes{NULL};
   Attribute_Stash _attribute_stash;
 public: // build
@@ -1954,6 +1973,7 @@ public: // build
   Attribute_Stash& attribute_stash() {
     return _attribute_stash;
   }
+  void dump(std::ostream&)const override;
 
 public: // readout
   const std::string& name()const	{return _name;}
@@ -1970,6 +1990,7 @@ public: // readout
   const Module_List&	 module_list()const	{return _module_list;}
   const Module_List&	 macromodule_list()const	{return _macromodule_list;}
   const Module_List&	 connectmodule_list()const	{return _connectmodule_list;}
+  const Paramset_List&	 paramset_list()const	{return _paramset_list;}
 
 };
 /*--------------------------------------------------------------------------*/

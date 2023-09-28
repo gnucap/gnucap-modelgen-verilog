@@ -601,7 +601,10 @@ Module::~Module()
   }
   _probes.clear();
   _filters.clear();
-
+}
+/*--------------------------------------------------------------------------*/
+Block::~Block()
+{
   delete _attributes;
   _attributes = NULL;
 }
