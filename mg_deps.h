@@ -57,7 +57,7 @@ class Deps : public Base {
   /* mutable */ S _s;
 public:
   explicit Deps() : Base() {}
-  explicit Deps(Deps const& d) : Base(), _s(d._s) { untested(); }
+  explicit Deps(Deps const& d) : Base(), _s(d._s) { }
   ~Deps();
   Deps* clone()const {
     return new Deps(*this);
@@ -91,7 +91,7 @@ public:
   bool empty() const{
     return _s.empty();
   }
-  Base* multiply(const Base* X)const override	{ untested();
+  Base* multiply(const Base* X)const override	{
     auto n = clone();
     auto o = prechecked_cast<Deps const*>(X);
     assert(o);

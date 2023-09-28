@@ -364,8 +364,7 @@ public: // states, _b_p_n;
 private: // node list
   enum {n_p, n_n  };
 private: // probe values
-  // double _potential_b_p_n;
-  double _prb[1];
+  double _potential_b_p_n;
 private: // impl
   void read_probes();
   void set_branch_contributions();
@@ -539,7 +538,7 @@ inline void MOD_resistor::read_probes()
 {
   trace0("resistor::read_probes");
   node_t gnd(&ground_node);
-  _prb[d_potential_b_p_n] = volts_limited(_n[n_p], _n[n_n]);
+  _potential_b_p_n = volts_limited(_n[n_p], _n[n_n]);
 }
 /*--------------------------------------------------------------------------*/
 MOD_resistor::MOD_resistor()
@@ -561,7 +560,7 @@ bool MOD_resistor::tr_needs_eval()const
     return false;
   }else if (!converged()) {
     return true;
-  }else  if( !conchk(_prb[d_potential_b_p_n], _n[n_p].v0() - _n[n_n].v0(), 1e-6)){
+  }else  if( !conchk(_potential_b_p_n, _n[n_p].v0() - _n[n_n].v0(), 1e-6)){
     return true;
   }else{
     return false;
@@ -593,7 +592,8 @@ inline void MOD_resistor::set_branch_contributions()
   _st_b_p_n[0] = _value_b_p_n;
   // collect currents from named branches
   // self_admittance
-  _st_b_p_n[0] -= _st_b_p_n[1] * _prb[d_potential_b_p_n]; // (4)
+  trace2("_st_b_p_nself", _st_b_p_n[1], _potential_b_p_n);
+  _st_b_p_n[0] -= _st_b_p_n[1] * _potential_b_p_n; // (4)
   // flow src (p, n)
   // filters
 }
@@ -616,7 +616,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
       ddouble _v_i; // Variable       Dep: _potential_b_p_n      
       { // Assignment real 'i'.
         ddouble t0;
-        t0 = +p->_prb[d_potential_b_p_n]; // V(p, n)
+        t0 = +p->_potential_b_p_n; // V(p, n)
         t0[d_potential_b_p_n] = +1.;
         t0 = t0 / pc->_p_r;
         assert(t0.is_same(t0));
@@ -1151,9 +1151,8 @@ public: // states, _b_p_n;
 private: // node list
   enum {n_p, n_n /* | */, n_ddt_0  };
 private: // probe values
-  // double _potential_b_ddt_0_;
-  // double _potential_b_p_n;
-  double _prb[2];
+  double _potential_b_ddt_0_;
+  double _potential_b_p_n;
 private: // impl
   void read_probes();
   void set_branch_contributions();
@@ -1328,7 +1327,7 @@ inline void MOD_capacitor::read_probes()
   trace0("capacitor::read_probes");
   node_t gnd(&ground_node);
   // filter _b_ddt_0_
-  _prb[d_potential_b_p_n] = volts_limited(_n[n_p], _n[n_n]);
+  _potential_b_p_n = volts_limited(_n[n_p], _n[n_n]);
   // filter _b_ddt_0_
 }
 /*--------------------------------------------------------------------------*/
@@ -1353,7 +1352,7 @@ bool MOD_capacitor::tr_needs_eval()const
     return true;
   }else   if(_sim->is_first_iteration()){
     return true;
-  }else if( !conchk(_prb[d_potential_b_p_n], _n[n_p].v0() - _n[n_n].v0(), 1e-6)){
+  }else if( !conchk(_potential_b_p_n, _n[n_p].v0() - _n[n_n].v0(), 1e-6)){
     return true;
   }else{
     return false;
@@ -1377,7 +1376,7 @@ bool MOD_capacitor::do_tr()
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::zero_filter_readout()
 {
-  _prb[d_potential_b_ddt_0_] = 0.
+  _potential_b_ddt_0_ = 0.
 ;}
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::set_branch_contributions()
@@ -1385,21 +1384,7 @@ inline void MOD_capacitor::set_branch_contributions()
   assert(_value_b_p_n == _value_b_p_n);
   _st_b_p_n[0] = _value_b_p_n;
   // collect currents from named branches
-<<<<<<< HEAD
   _st_b_p_n[0] -= _st_b_p_n[/*MOD::*/_st_b_p_n_::dep_potential_b_ddt_0_] * _potential_b_ddt_0_;
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-  // trace2(" filter _st_b_p_n", _st_b_p_n[2], __filter_b_ddt_0_);
-  // assert(2  ==  /*MOD::*/_st_b_p_n_::dep__filter_b_ddt_0_);
-  _st_b_p_n[0] += _st_b_p_n[/*MOD::*/_st_b_p_n_::dep__filter_b_ddt_0_] * _b_ddt_0_->tr_amps();
-=======
-  _st_b_p_n[0] -= _st_b_p_n[/*MOD::*/_st_b_p_n_::dep_potential_b_ddt_0_] * _potential_b_ddt_0_;
->>>>>>> 9c868e1 (refactor probes)
-=======
-  _st_b_p_n[0] -= _st_b_p_n[_st_b_p_n_::dep_potential_b_ddt_0_] * _prb[d_potential_b_ddt_0_]; // (583)
->>>>>>> 2ad80d5 (cont'd)
->>>>>>> 3bcebea (cont'd)
   // flow src (p, n)
   // filters
   // filter _b_ddt_0_
@@ -1423,7 +1408,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
     { // 
       { // Contribution I(p, n)
         ddouble t0;
-        t0 = +p->_prb[d_potential_b_p_n]; // V(p, n)
+        t0 = +p->_potential_b_p_n; // V(p, n)
         t0[d_potential_b_p_n] = +1.;
         // function ddt 1
         t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_0(t0);
@@ -1612,11 +1597,7 @@ MOD_capacitor::ddouble MOD_capacitor::_b_ddt_0(ddouble t0)
     d->_st_b_ddt_0_[MOD::_st_b_ddt_0__::dep_potential_b_p_n]  = + t0[d_potential_b_p_n]; // (4)
   d->_b_ddt_0_->do_tr();
   t0 = d->_b_ddt_0_->tr_amps();
-<<<<<<< HEAD
   d->_potential_b_ddt_0_ = - t0;
-=======
-  d->_prb[d_potential_b_ddt_0_] = t0;
->>>>>>> 3bcebea (cont'd)
   trace2("filt", t0, d->_b_ddt_0_->tr_outvolts());
   t0[d_potential_b_ddt_0_] = -1.;
   assert(t0 == t0);
@@ -1752,9 +1733,8 @@ public: // states, _b_p_n;
 private: // node list
   enum {n_p, n_n /* | */, n_ddt_1  };
 private: // probe values
-  // double _potential_b_ddt_1_;
-  // double _potential_b_p_n;
-  double _prb[2];
+  double _potential_b_ddt_1_;
+  double _potential_b_p_n;
 private: // impl
   void read_probes();
   void set_branch_contributions();
@@ -1949,7 +1929,7 @@ inline void MOD_capacitor::read_probes()
   trace0("capacitor::read_probes");
   node_t gnd(&ground_node);
   // filter _b_ddt_1_
-  _prb[d_potential_b_p_n] = volts_limited(_n[n_p], _n[n_n]);
+  _potential_b_p_n = volts_limited(_n[n_p], _n[n_n]);
   // filter _b_ddt_1_
 }
 /*--------------------------------------------------------------------------*/
@@ -1974,7 +1954,7 @@ bool MOD_capacitor::tr_needs_eval()const
     return true;
   }else   if(_sim->is_first_iteration()){
     return true;
-  }else if( !conchk(_prb[d_potential_b_p_n], _n[n_p].v0() - _n[n_n].v0(), 1e-6)){
+  }else if( !conchk(_potential_b_p_n, _n[n_p].v0() - _n[n_n].v0(), 1e-6)){
     return true;
   }else{
     return false;
@@ -1998,28 +1978,14 @@ bool MOD_capacitor::do_tr()
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::zero_filter_readout()
 {
-  _prb[d_potential_b_ddt_1_] = 0.
+  _potential_b_ddt_1_ = 0.
 ;}
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::set_branch_contributions()
 {
   assert(_value_b_p_n == _value_b_p_n);
   _st_b_p_n[0] = _value_b_p_n;
-<<<<<<< HEAD
   _st_b_p_n[0] -= _st_b_p_n[/*MOD::*/_st_b_p_n_::dep_potential_b_ddt_1_] * _potential_b_ddt_1_;
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-  // trace2(" filter _st_b_p_n", _st_b_p_n[2], __filter_b_ddt_1_);
-  // assert(2  ==  /*MOD::*/_st_b_p_n_::dep__filter_b_ddt_1_);
-  _st_b_p_n[0] += _st_b_p_n[/*MOD::*/_st_b_p_n_::dep__filter_b_ddt_1_] * _b_ddt_1_->tr_amps();
-=======
-  _st_b_p_n[0] -= _st_b_p_n[/*MOD::*/_st_b_p_n_::dep_potential_b_ddt_1_] * _potential_b_ddt_1_;
->>>>>>> 9c868e1 (refactor probes)
-=======
-  _st_b_p_n[0] -= _st_b_p_n[_st_b_p_n_::dep_potential_b_ddt_1_] * _prb[d_potential_b_ddt_1_]; // (583)
->>>>>>> 2ad80d5 (cont'd)
->>>>>>> 3bcebea (cont'd)
   // pot src (p, n)
   if(!_b_p_n){ untested();
   }else if(_pot_b_p_n){
@@ -2069,7 +2035,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
         }else {
           { // Contribution I(p, n)
             ddouble t0;
-            t0 = +p->_prb[d_potential_b_p_n]; // V(p, n)
+            t0 = +p->_potential_b_p_n; // V(p, n)
             t0[d_potential_b_p_n] = +1.;
             // function ddt 1
             t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_1(t0);
@@ -2285,11 +2251,7 @@ MOD_capacitor::ddouble MOD_capacitor::_b_ddt_1(ddouble t0)
     d->_st_b_ddt_1_[MOD::_st_b_ddt_1__::dep_potential_b_p_n]  = + t0[d_potential_b_p_n]; // (4)
   d->_b_ddt_1_->do_tr();
   t0 = d->_b_ddt_1_->tr_amps();
-<<<<<<< HEAD
   d->_potential_b_ddt_1_ = - t0;
-=======
-  d->_prb[d_potential_b_ddt_1_] = t0;
->>>>>>> 3bcebea (cont'd)
   trace2("filt", t0, d->_b_ddt_1_->tr_outvolts());
   t0[d_potential_b_ddt_1_] = -1.;
   assert(t0 == t0);

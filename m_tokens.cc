@@ -118,7 +118,7 @@ public:
   operator Token const*()const {
     return _op;
   }
-  Token const* operator->()const {
+  Token const* operator->()const { untested();
     return _op;
   }
   Token* op() {
@@ -137,11 +137,11 @@ static bool is_constant(stash_op const& o)
 /*--------------------------------------------------------------------------*/
 #if 0
 void Token_TASK::stack_op(Expression* e)const
-{
+{ untested();
   assert(e);
   Token_CALL::stack_op(e);
   assert(e->back());
-  if(auto cc=dynamic_cast<Token_TASK const*>(e->back())){
+  if(auto cc=dynamic_cast<Token_TASK const*>(e->back())){ untested();
     Base const* dd = cc->data();
     Deps const* deps = prechecked_cast<Deps const*>(dd);
     assert(deps);
@@ -215,7 +215,7 @@ Deps const* Token_BINOP_::op_deps(Token const* t1, Token const* t2)const
     if(b){
       ret = prechecked_cast<Deps const*>(b);
       assert(ret);
-    }else{
+    }else{ untested();
     }
   }else if(d1) {
     ret = d1->clone();
@@ -265,7 +265,7 @@ void Token_UNARY_::stack_op(Expression* E)const
     Deps const* deps = NULL;
     if(d1) {
       deps = d1->clone();
-    }else{
+    }else{itested();
     }
 //    E->push_back(t1);
     E->push_back(new Token_UNARY_(name(), t1, deps));
@@ -350,7 +350,7 @@ void Token_BINOP_::stack_op(Expression* E)const
     }else if(n=='*' && is_constant(t1, 1.)) {
       t1.erase();
       t2.push();
-    }else if(n=='-' && is_constant(t1, 0.)) {
+    }else if(n=='-' && is_constant(t1, 0.)) {itested();
       t1.erase();
       t2.push();
     }else if(n=='+' && is_constant(t1, 0.)) {
@@ -461,7 +461,7 @@ void Token_BINOP_::stack_op(Expression* E)const
 void Token_TERNARY_::stack_op(Expression* E)const
 {
   Token const* cond;
-  if(_cond){ untested();
+  if(_cond){itested();
     _cond->stack_op(E);
   }else{
   }
@@ -583,10 +583,10 @@ void Token_CALL::stack_op(Expression* E)const
       E->push_back(new Token_CALL(*this, deps, EE));
     }
     delete T1;
-  }else if (E->is_empty()){ untested();
+  }else if (E->is_empty()){
     // SFCALL?
       E->push_back(clone());
-  }else if(!dynamic_cast<const Token_PARLIST*>(E->back())) { untested();
+  }else if(!dynamic_cast<const Token_PARLIST*>(E->back())) {
     // SFCALL
       E->push_back(clone());
   }else if(auto PL = dynamic_cast<const Token_PARLIST*>(E->back())) { untested();

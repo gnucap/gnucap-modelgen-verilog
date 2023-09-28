@@ -63,7 +63,7 @@ Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
 //  }else if( xs == "_filter"){ untested();
 //   // obsolete?
 //    br->set_filter();
-  }else{ untested();
+  }else{
     trace1("new_probe", xs);
     unreachable();
     nn = xs;

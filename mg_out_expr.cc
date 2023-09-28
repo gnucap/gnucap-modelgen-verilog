@@ -56,7 +56,7 @@ static char* ftos_(double num, int fieldwidth, int len, int fmt)
     static char strpool[POOLSIZE][MAXLENGTH];
     static int poolindex = 0;
     ++poolindex;
-    if (poolindex >= POOLSIZE) { untested();
+    if (poolindex >= POOLSIZE) {itested();
       poolindex = 0;
     }
     str = strpool[poolindex];
@@ -93,7 +93,7 @@ static char* ftos_(double num, int fieldwidth, int len, int fmt)
     memcpy(str, " NA", 3);
   }else if (num >= BIGBIG) {
     memcpy(str, " Inf", 4);
-  }else if (num <= -BIGBIG) { untested();
+  }else if (num <= -BIGBIG) {itested();
     memcpy(str, "-Inf", 4);
   }else if (num != num) { untested();
     memcpy(str, " NaN", 4);
@@ -340,7 +340,7 @@ static void make_cc_string(std::ostream& o, String const& e)
 {
   o << '"';
   for(char c : e.val_string()){
-    if(c=='\n'){untested();
+    if(c=='\n'){itested();
 //      o << '\\';
     }else{
     }
@@ -427,7 +427,7 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
 
       o__ "// function " << (*i)->name() << " " << s.have_args() << "\n";
       std::vector<std::string> argnames;
-      if(F->args()) { untested();
+      if(F->args()) {
 	assert(s.have_args());
 	argnames.resize(s.num_args());
 	for(auto n=argnames.begin(); n!=argnames.end(); ++n){
@@ -505,7 +505,7 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
 	|| op == '|'
 	|| op == '!' ){
 	o__ s.code_name() << " = " << arg1 << " " << (*i)->name() << " " << idy << ";\n";
-      }else if(op == '%'){ untested();
+      }else if(op == '%'){itested();
 	o__ s.code_name() << " = va::fmod(" << arg1 << ", " << idy << ");\n";
       }else{ untested();
 	unreachable();
@@ -588,13 +588,13 @@ void make_cc_expression(std::ostream& o, Expression const& e)
 }
 /*--------------------------------------------------------------------------*/
 void make_cc_event_cond(std::ostream& o, Expression const& e)
-{ untested();
+{
   typedef Expression::const_iterator const_iterator;
   // TODO: var stack.
   o__ "bool evt = false\n;";
   o__ "{\n";
-  for (const_iterator i = e.begin(); i != e.end(); ++i) { untested();
-    if((*i)->name()=="initial_step"){ untested();
+  for (const_iterator i = e.begin(); i != e.end(); ++i) {
+    if((*i)->name()=="initial_step"){
       o__ "evt = _sim->is_initial_step();\n";
     }else if((*i)->name()=="initial_model"){ untested();
       std::cerr << "WARNING: ADMS style keyword encountered\n";

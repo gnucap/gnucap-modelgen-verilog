@@ -244,7 +244,7 @@ protected:
     : Token_SYMBOL(P.name(), data), _function(P._function), _args(e)
     , _num_args(P._num_args) { attach(); }
 private:
-  Token* clone()const override { untested();
+  Token* clone()const override {
     return new Token_CALL(*this);
   }
 /*--------------------------------------------------------------------------*/

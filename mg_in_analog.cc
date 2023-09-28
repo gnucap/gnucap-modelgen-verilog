@@ -218,12 +218,12 @@ Assignment::Assignment(CS& f, Block* o)
 
 //  pass deps to lhs??
   trace1("assign deps?", lhsname());
-  for(auto d: deps()){
+  for(auto d: deps()){ untested();
     trace1("assign", d->code_name());
   }
   if(l){
     l->update_deps(deps());
-  }else{
+  }else{ untested();
     unreachable(); // loop statement??
   }
 } // Assignment::Assignment
@@ -442,7 +442,7 @@ void AnalogForStmt::parse(CS& f)
   }
 
   f >> ")";
-  if(f >> ";"){
+  if(f >> ";"){ untested();
   }else{
     _body = parse_analog_stmt_or_null(f, owner());
   }
@@ -458,7 +458,7 @@ void AnalogForStmt::dump(std::ostream& o)const
   o << "; " << _cond << "; ";
   if(has_tail()){
     o << tail();
-  }else{
+  }else{ untested();
   }
   o << ")";
   AnalogCtrlStmt::dump(o);
@@ -598,7 +598,7 @@ void BlockVarIdentifier::dump(std::ostream& o)const
 }
 /*--------------------------------------------------------------------------*/
 void ListOfBlockIntIdentifiers::dump(std::ostream& o) const
-{
+{ untested();
   o__ "integer ";
   LiSt<BlockVarIdentifier, '\0', ',', ';'>::dump(o);
   o << "\n";
@@ -734,7 +734,7 @@ void Contribution::parse(CS& cmd)
     // bb.set_owner(owner());
     // trace1("bb?", cmd.tail().substr(0,20));
     // cmd >> xs >> bb >> "==";
-  }else{
+  }else{ untested();
     throw Exception_CS("expecting \"<+\"", cmd);
   }
 
@@ -752,7 +752,7 @@ void Contribution::parse(CS& cmd)
 
     trace1("Assignment::parse", rhs().back()->name());
     if(is_direct()){
-    }else if(rhs().is_empty()){
+    }else if(rhs().is_empty()){ untested();
       throw Exception_CS("syntax error", cmd);
     }else if(rhs().back()->name()!="=="){ untested();
       throw Exception_CS("syntax error", cmd);
@@ -797,7 +797,7 @@ void Branch_Map::dump(std::ostream&)const
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void Branch::dump(std::ostream& o)const
-{
+{ untested();
   o << "(" << _p->name() << ", " << _n->name() << ")";
 }
 /*--------------------------------------------------------------------------*/
@@ -905,7 +905,7 @@ void AnalogEvtCtlStmt::dump(std::ostream& o) const
 }
 /*--------------------------------------------------------------------------*/
 // void Variable_Decl::parse(CS& f)
-// {
+// { untested();
 //   f >> _name;
 // }
 /*--------------------------------------------------------------------------*/
@@ -918,7 +918,7 @@ Module const* to_module(Block const* owner)
   while(true){
     if(auto m = dynamic_cast<Module const*>(owner)){
       return m;
-    }else{
+    }else{ untested();
     }
     owner = owner->owner();
     assert(owner);
@@ -960,9 +960,9 @@ public:
     m.install(this);
     if(code_name() != ""){
       return new Token_CALL(label(), this);
-    }else if(label() != ""){
+    }else if(label() != ""){ untested();
       return new Token_CALL(label(), this);
-    }else{
+    }else{ untested();
       incomplete();
       return NULL;
     }

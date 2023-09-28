@@ -141,13 +141,13 @@ Token* Expression_::resolve_xs_function(std::string const& n)
     trace1("restored args", size());
     delete back;
     return new Token_ACCESS(n, NULL);
-  }else{
+  }else{ untested();
     delete E.back();
     E.pop_back();
     assert(!E.is_empty());
     if(dynamic_cast<Token_STOP*>(E.back())) { untested();
       throw Exception("syntax error");
-    }else{
+    }else{ untested();
     }
     std::string arg0 = E.back()->name();
     std::string arg1;
@@ -155,7 +155,7 @@ Token* Expression_::resolve_xs_function(std::string const& n)
     E.pop_back();
     assert(!E.is_empty());
 
-    while(!dynamic_cast<Token_STOP*>(E.back())) {
+    while(!dynamic_cast<Token_STOP*>(E.back())) { untested();
       arg1 = arg0;
       arg0 = E.back()->name();
       delete E.back();

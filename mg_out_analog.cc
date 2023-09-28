@@ -322,7 +322,7 @@ static void make_cc_analog_cond(std::ostream& o, AnalogConditionalStmt const& s)
     }else{ untested();
     }
   }else if(s.conditional().is_false()){
-    if(s.false_part_or_null()) { untested();
+    if(s.false_part_or_null()) {itested();
       indent y;
       make_cc_analog_stmt(o, s.false_part());
     }else{
