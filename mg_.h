@@ -27,6 +27,7 @@
 #include <set>
 #include "mg_deps.h" // BUG, Deps
 #include "mg_func.h" // BUG, Probe
+#include "mg_deps.h" // BUG, Deps
 /*--------------------------------------------------------------------------*/
 #ifdef PASS_TRACE_TAGS
 #define make_tag() (out << "//" << __func__ << ":" << __LINE__ << "\n")
