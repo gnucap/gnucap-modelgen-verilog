@@ -1,61 +1,47 @@
-/*     -*- verilog -*-
- * Few disciplines from disciplines.vams to make tests shorter.
- */
+/*
+This file is part of adms - http://sourceforge.net/projects/mot-adms.
 
-`ifdef DISCIPLINES_H
+adms is a code generator for the Verilog-AMS language.
+
+Copyright (C) 2016 Guilherme Brondani Torri <guitorri@gmail.com>
+              2016 Felix Salfelder <felix@salfelder.org>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+`ifdef DISCIPLINES_VAMS
 `else
-`define DISCIPLINES_H 1
+`define DISCIPLINES_VAMS 1
 
-///
-// Natures and Disciplines
-///
-
-/*   Default absolute tolerances may be overriden by setting the
-    appropriate _ABSTOL prior to including this file
- */
-
-// Electrical
-
-// Current in amperes
-nature Current
-    units      = "A";
-    access     = I;
-    idt_nature = Charge;
-`ifdef CURRENT_ABSTOL
-    abstol     = `CURRENT_ABSTOL;
-`else
-    abstol     = 1e-12;
-`endif
+// Electrical current
+nature current
+  access = I;
+  units = "A";
+  abstol = 0.001234;
 endnature
 
-// Charge in coulombs
-nature Charge
-    units      = "coul";
-    access     = Q;
-    ddt_nature = Current;
-`ifdef CHARGE_ABSTOL
-    abstol     = `CHARGE_ABSTOL;
-`else
-    abstol     = 1e-14;
-`endif
+// Electrical potential
+nature voltage
+  access = V;
+  units = "V";
+  abstol = 0.0004321;
 endnature
 
-// Potential in volts
-nature Voltage
-   units       = "V";
-   access      = V;
-   idt_nature = Flux;
-`ifdef VOLTAGE_ABSTOL
-   abstol      = `VOLTAGE_ABSTOL;
-`else
-   abstol      = 1e-6;
-`endif
-endnature
-
-// Conservative discipline
+// Electrical discipline
 discipline electrical
-   flow          Current;
-   potential     Voltage;
+  potential voltage;
+  flow current;
 enddiscipline
 
 `endif
