@@ -52,10 +52,17 @@ gnucap> [..]
 - Files are located following logic from gcc implementation.
 - Output is sent to standard out, unless -o is specified.
 
-== language plugin note
+== Language plugin note
 
 This package ships a modified/experimental lang_verilog plugin.
 To make use of new language features in the simulator, load it.
 $ gnucap -a vams/lang_verilog.so
 or
 gnucap > load vams/lang_verilog.so
+
+== Header note
+
+We use the free discipline.vams header from the ADMS project. Similarly the
+included constants.vams header is based on constants.h from Gnucap and equally
+free. Using restricted versions is not recommended, but possible. Invoke
+modelgen with "-I/path/to/non-free/stuff".
