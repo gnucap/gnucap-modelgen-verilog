@@ -16,149 +16,30 @@ const double INF(BIGBIG);
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-class NATURE_Current : public NATURE {
+class NATURE_current : public NATURE {
   double abstol()const override {return 1e-12;}
-}_N_Current;
-class NATURE_Charge : public NATURE {
-  double abstol()const override {return 1e-14;}
-}_N_Charge;
-class NATURE_Voltage : public NATURE {
+}_N_current;
+class NATURE_voltage : public NATURE {
   double abstol()const override {return 1e-6;}
-}_N_Voltage;
-class NATURE_Flux : public NATURE {
-  double abstol()const override {return 1e-9;}
-}_N_Flux;
-class NATURE_Magneto_Motive_Force : public NATURE {
-  double abstol()const override {return 1e-12;}
-}_N_Magneto_Motive_Force;
-class NATURE_Temperature : public NATURE {
-  double abstol()const override {return 1e-4;}
-}_N_Temperature;
-class NATURE_Power : public NATURE {
-  double abstol()const override {return 1e-9;}
-}_N_Power;
-class NATURE_Position : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Position;
-class NATURE_Velocity : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Velocity;
-class NATURE_Acceleration : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Acceleration;
-class NATURE_Impulse : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Impulse;
-class NATURE_Force : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Force;
-class NATURE_Angle : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Angle;
-class NATURE_Angular_Velocity : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Angular_Velocity;
-class NATURE_Angular_Acceleration : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Angular_Acceleration;
-class NATURE_Angular_Force : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Angular_Force;
+}_N_voltage;
+class NATURE_power : public NATURE {
+  double abstol()const override {return 0.00101010;}
+}_N_power;
+class NATURE_flux : public NATURE {
+  double abstol()const override {return 1e-5;}
+}_N_flux;
+class NATURE_temperature : public NATURE {
+  double abstol()const override {return 3.14;}
+}_N_temperature;
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-class DISCIPLINE_electrical : public DISCIPLINE {
-public:
-  NATURE const* flow()const override{
-    return &_N_Current;
-  }
-  NATURE const* potential()const override{
-    return &_N_Voltage;
-  }
-}_D_electrical;
-class _COMMON_VASRC_electrical : public COMMON_VASRC {
-public:
-  _COMMON_VASRC_electrical(int i) : COMMON_VASRC(i){}
-private:
-  _COMMON_VASRC_electrical(_COMMON_VASRC_electrical const&p)     : COMMON_VASRC(p){}
-  COMMON_COMPONENT* clone()const override{
-    return new _COMMON_VASRC_electrical(*this);
-  }
-  std::string name()const override{untested(); return "electrical";}
-  DISCIPLINE const* discipline()const override {return &_D_electrical;}
-public:
-};
-static _COMMON_VASRC_electrical _C_V_electrical(CC_STATIC);
-/*--------------------------------------------------------------------------*/
-class DISCIPLINE_voltage : public DISCIPLINE {
-public:
-  NATURE const* potential()const override{
-    return &_N_Voltage;
-  }
-}_D_voltage;
-class _COMMON_VASRC_voltage : public COMMON_VASRC {
-public:
-  _COMMON_VASRC_voltage(int i) : COMMON_VASRC(i){}
-private:
-  _COMMON_VASRC_voltage(_COMMON_VASRC_voltage const&p)     : COMMON_VASRC(p){}
-  COMMON_COMPONENT* clone()const override{
-    return new _COMMON_VASRC_voltage(*this);
-  }
-  std::string name()const override{untested(); return "voltage";}
-  DISCIPLINE const* discipline()const override {return &_D_voltage;}
-public:
-};
-static _COMMON_VASRC_voltage _C_V_voltage(CC_STATIC);
-/*--------------------------------------------------------------------------*/
-class DISCIPLINE_current : public DISCIPLINE {
-public:
-  NATURE const* potential()const override{
-    return &_N_Current;
-  }
-}_D_current;
-class _COMMON_VASRC_current : public COMMON_VASRC {
-public:
-  _COMMON_VASRC_current(int i) : COMMON_VASRC(i){}
-private:
-  _COMMON_VASRC_current(_COMMON_VASRC_current const&p)     : COMMON_VASRC(p){}
-  COMMON_COMPONENT* clone()const override{
-    return new _COMMON_VASRC_current(*this);
-  }
-  std::string name()const override{untested(); return "current";}
-  DISCIPLINE const* discipline()const override {return &_D_current;}
-public:
-};
-static _COMMON_VASRC_current _C_V_current(CC_STATIC);
-/*--------------------------------------------------------------------------*/
-class DISCIPLINE_magnetic : public DISCIPLINE {
-public:
-  NATURE const* flow()const override{
-    return &_N_Flux;
-  }
-  NATURE const* potential()const override{
-    return &_N_Magneto_Motive_Force;
-  }
-}_D_magnetic;
-class _COMMON_VASRC_magnetic : public COMMON_VASRC {
-public:
-  _COMMON_VASRC_magnetic(int i) : COMMON_VASRC(i){}
-private:
-  _COMMON_VASRC_magnetic(_COMMON_VASRC_magnetic const&p)     : COMMON_VASRC(p){}
-  COMMON_COMPONENT* clone()const override{
-    return new _COMMON_VASRC_magnetic(*this);
-  }
-  std::string name()const override{untested(); return "magnetic";}
-  DISCIPLINE const* discipline()const override {return &_D_magnetic;}
-public:
-};
-static _COMMON_VASRC_magnetic _C_V_magnetic(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class DISCIPLINE_thermal : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
-    return &_N_Power;
+    return &_N_power;
   }
   NATURE const* potential()const override{
-    return &_N_Temperature;
+    return &_N_temperature;
   }
 }_D_thermal;
 class _COMMON_VASRC_thermal : public COMMON_VASRC {
@@ -175,82 +56,59 @@ public:
 };
 static _COMMON_VASRC_thermal _C_V_thermal(CC_STATIC);
 /*--------------------------------------------------------------------------*/
-class DISCIPLINE_kinematic : public DISCIPLINE {
+class DISCIPLINE_electrical : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
-    return &_N_Force;
+    return &_N_current;
   }
   NATURE const* potential()const override{
-    return &_N_Position;
+    return &_N_voltage;
   }
-}_D_kinematic;
-class _COMMON_VASRC_kinematic : public COMMON_VASRC {
+}_D_electrical;
+class _COMMON_VASRC_electrical : public COMMON_VASRC {
 public:
-  _COMMON_VASRC_kinematic(int i) : COMMON_VASRC(i){}
+  _COMMON_VASRC_electrical(int i) : COMMON_VASRC(i){}
 private:
-  _COMMON_VASRC_kinematic(_COMMON_VASRC_kinematic const&p)     : COMMON_VASRC(p){}
+  _COMMON_VASRC_electrical(_COMMON_VASRC_electrical const&p)     : COMMON_VASRC(p){}
   COMMON_COMPONENT* clone()const override{
-    return new _COMMON_VASRC_kinematic(*this);
+    return new _COMMON_VASRC_electrical(*this);
   }
-  std::string name()const override{untested(); return "kinematic";}
-  DISCIPLINE const* discipline()const override {return &_D_kinematic;}
+  std::string name()const override{untested(); return "electrical";}
+  DISCIPLINE const* discipline()const override {return &_D_electrical;}
 public:
 };
-static _COMMON_VASRC_kinematic _C_V_kinematic(CC_STATIC);
+static _COMMON_VASRC_electrical _C_V_electrical(CC_STATIC);
 /*--------------------------------------------------------------------------*/
-class DISCIPLINE_kinematic_v : public DISCIPLINE {
+class DISCIPLINE_magnetic : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
-    return &_N_Force;
+    return &_N_current;
   }
   NATURE const* potential()const override{
-    return &_N_Velocity;
+    return &_N_voltage;
   }
-}_D_kinematic_v;
-class _COMMON_VASRC_kinematic_v : public COMMON_VASRC {
+}_D_magnetic;
+class _COMMON_VASRC_magnetic : public COMMON_VASRC {
 public:
-  _COMMON_VASRC_kinematic_v(int i) : COMMON_VASRC(i){}
+  _COMMON_VASRC_magnetic(int i) : COMMON_VASRC(i){}
 private:
-  _COMMON_VASRC_kinematic_v(_COMMON_VASRC_kinematic_v const&p)     : COMMON_VASRC(p){}
+  _COMMON_VASRC_magnetic(_COMMON_VASRC_magnetic const&p)     : COMMON_VASRC(p){}
   COMMON_COMPONENT* clone()const override{
-    return new _COMMON_VASRC_kinematic_v(*this);
+    return new _COMMON_VASRC_magnetic(*this);
   }
-  std::string name()const override{untested(); return "kinematic_v";}
-  DISCIPLINE const* discipline()const override {return &_D_kinematic_v;}
+  std::string name()const override{untested(); return "magnetic";}
+  DISCIPLINE const* discipline()const override {return &_D_magnetic;}
 public:
 };
-static _COMMON_VASRC_kinematic_v _C_V_kinematic_v(CC_STATIC);
-/*--------------------------------------------------------------------------*/
-class DISCIPLINE_rotational : public DISCIPLINE {
-public:
-  NATURE const* flow()const override{
-    return &_N_Angular_Force;
-  }
-  NATURE const* potential()const override{
-    return &_N_Angle;
-  }
-}_D_rotational;
-class _COMMON_VASRC_rotational : public COMMON_VASRC {
-public:
-  _COMMON_VASRC_rotational(int i) : COMMON_VASRC(i){}
-private:
-  _COMMON_VASRC_rotational(_COMMON_VASRC_rotational const&p)     : COMMON_VASRC(p){}
-  COMMON_COMPONENT* clone()const override{
-    return new _COMMON_VASRC_rotational(*this);
-  }
-  std::string name()const override{untested(); return "rotational";}
-  DISCIPLINE const* discipline()const override {return &_D_rotational;}
-public:
-};
-static _COMMON_VASRC_rotational _C_V_rotational(CC_STATIC);
+static _COMMON_VASRC_magnetic _C_V_magnetic(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class DISCIPLINE_rotational_omega : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
-    return &_N_Angular_Force;
+    return &_N_current;
   }
   NATURE const* potential()const override{
-    return &_N_Angular_Velocity;
+    return &_N_voltage;
   }
 }_D_rotational_omega;
 class _COMMON_VASRC_rotational_omega : public COMMON_VASRC {
@@ -785,149 +643,30 @@ const double INF(BIGBIG);
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-class NATURE_Current : public NATURE {
+class NATURE_current : public NATURE {
   double abstol()const override {return 1e-12;}
-}_N_Current;
-class NATURE_Charge : public NATURE {
-  double abstol()const override {return 1e-14;}
-}_N_Charge;
-class NATURE_Voltage : public NATURE {
+}_N_current;
+class NATURE_voltage : public NATURE {
   double abstol()const override {return 1e-6;}
-}_N_Voltage;
-class NATURE_Flux : public NATURE {
-  double abstol()const override {return 1e-9;}
-}_N_Flux;
-class NATURE_Magneto_Motive_Force : public NATURE {
-  double abstol()const override {return 1e-12;}
-}_N_Magneto_Motive_Force;
-class NATURE_Temperature : public NATURE {
-  double abstol()const override {return 1e-4;}
-}_N_Temperature;
-class NATURE_Power : public NATURE {
-  double abstol()const override {return 1e-9;}
-}_N_Power;
-class NATURE_Position : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Position;
-class NATURE_Velocity : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Velocity;
-class NATURE_Acceleration : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Acceleration;
-class NATURE_Impulse : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Impulse;
-class NATURE_Force : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Force;
-class NATURE_Angle : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Angle;
-class NATURE_Angular_Velocity : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Angular_Velocity;
-class NATURE_Angular_Acceleration : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Angular_Acceleration;
-class NATURE_Angular_Force : public NATURE {
-  double abstol()const override {return 1e-6;}
-}_N_Angular_Force;
+}_N_voltage;
+class NATURE_power : public NATURE {
+  double abstol()const override {return 0.00101010;}
+}_N_power;
+class NATURE_flux : public NATURE {
+  double abstol()const override {return 1e-5;}
+}_N_flux;
+class NATURE_temperature : public NATURE {
+  double abstol()const override {return 3.14;}
+}_N_temperature;
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-class DISCIPLINE_electrical : public DISCIPLINE {
-public:
-  NATURE const* flow()const override{
-    return &_N_Current;
-  }
-  NATURE const* potential()const override{
-    return &_N_Voltage;
-  }
-}_D_electrical;
-class _COMMON_VASRC_electrical : public COMMON_VASRC {
-public:
-  _COMMON_VASRC_electrical(int i) : COMMON_VASRC(i){}
-private:
-  _COMMON_VASRC_electrical(_COMMON_VASRC_electrical const&p)     : COMMON_VASRC(p){}
-  COMMON_COMPONENT* clone()const override{
-    return new _COMMON_VASRC_electrical(*this);
-  }
-  std::string name()const override{untested(); return "electrical";}
-  DISCIPLINE const* discipline()const override {return &_D_electrical;}
-public:
-};
-static _COMMON_VASRC_electrical _C_V_electrical(CC_STATIC);
-/*--------------------------------------------------------------------------*/
-class DISCIPLINE_voltage : public DISCIPLINE {
-public:
-  NATURE const* potential()const override{
-    return &_N_Voltage;
-  }
-}_D_voltage;
-class _COMMON_VASRC_voltage : public COMMON_VASRC {
-public:
-  _COMMON_VASRC_voltage(int i) : COMMON_VASRC(i){}
-private:
-  _COMMON_VASRC_voltage(_COMMON_VASRC_voltage const&p)     : COMMON_VASRC(p){}
-  COMMON_COMPONENT* clone()const override{
-    return new _COMMON_VASRC_voltage(*this);
-  }
-  std::string name()const override{untested(); return "voltage";}
-  DISCIPLINE const* discipline()const override {return &_D_voltage;}
-public:
-};
-static _COMMON_VASRC_voltage _C_V_voltage(CC_STATIC);
-/*--------------------------------------------------------------------------*/
-class DISCIPLINE_current : public DISCIPLINE {
-public:
-  NATURE const* potential()const override{
-    return &_N_Current;
-  }
-}_D_current;
-class _COMMON_VASRC_current : public COMMON_VASRC {
-public:
-  _COMMON_VASRC_current(int i) : COMMON_VASRC(i){}
-private:
-  _COMMON_VASRC_current(_COMMON_VASRC_current const&p)     : COMMON_VASRC(p){}
-  COMMON_COMPONENT* clone()const override{
-    return new _COMMON_VASRC_current(*this);
-  }
-  std::string name()const override{untested(); return "current";}
-  DISCIPLINE const* discipline()const override {return &_D_current;}
-public:
-};
-static _COMMON_VASRC_current _C_V_current(CC_STATIC);
-/*--------------------------------------------------------------------------*/
-class DISCIPLINE_magnetic : public DISCIPLINE {
-public:
-  NATURE const* flow()const override{
-    return &_N_Flux;
-  }
-  NATURE const* potential()const override{
-    return &_N_Magneto_Motive_Force;
-  }
-}_D_magnetic;
-class _COMMON_VASRC_magnetic : public COMMON_VASRC {
-public:
-  _COMMON_VASRC_magnetic(int i) : COMMON_VASRC(i){}
-private:
-  _COMMON_VASRC_magnetic(_COMMON_VASRC_magnetic const&p)     : COMMON_VASRC(p){}
-  COMMON_COMPONENT* clone()const override{
-    return new _COMMON_VASRC_magnetic(*this);
-  }
-  std::string name()const override{untested(); return "magnetic";}
-  DISCIPLINE const* discipline()const override {return &_D_magnetic;}
-public:
-};
-static _COMMON_VASRC_magnetic _C_V_magnetic(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class DISCIPLINE_thermal : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
-    return &_N_Power;
+    return &_N_power;
   }
   NATURE const* potential()const override{
-    return &_N_Temperature;
+    return &_N_temperature;
   }
 }_D_thermal;
 class _COMMON_VASRC_thermal : public COMMON_VASRC {
@@ -944,82 +683,59 @@ public:
 };
 static _COMMON_VASRC_thermal _C_V_thermal(CC_STATIC);
 /*--------------------------------------------------------------------------*/
-class DISCIPLINE_kinematic : public DISCIPLINE {
+class DISCIPLINE_electrical : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
-    return &_N_Force;
+    return &_N_current;
   }
   NATURE const* potential()const override{
-    return &_N_Position;
+    return &_N_voltage;
   }
-}_D_kinematic;
-class _COMMON_VASRC_kinematic : public COMMON_VASRC {
+}_D_electrical;
+class _COMMON_VASRC_electrical : public COMMON_VASRC {
 public:
-  _COMMON_VASRC_kinematic(int i) : COMMON_VASRC(i){}
+  _COMMON_VASRC_electrical(int i) : COMMON_VASRC(i){}
 private:
-  _COMMON_VASRC_kinematic(_COMMON_VASRC_kinematic const&p)     : COMMON_VASRC(p){}
+  _COMMON_VASRC_electrical(_COMMON_VASRC_electrical const&p)     : COMMON_VASRC(p){}
   COMMON_COMPONENT* clone()const override{
-    return new _COMMON_VASRC_kinematic(*this);
+    return new _COMMON_VASRC_electrical(*this);
   }
-  std::string name()const override{untested(); return "kinematic";}
-  DISCIPLINE const* discipline()const override {return &_D_kinematic;}
+  std::string name()const override{untested(); return "electrical";}
+  DISCIPLINE const* discipline()const override {return &_D_electrical;}
 public:
 };
-static _COMMON_VASRC_kinematic _C_V_kinematic(CC_STATIC);
+static _COMMON_VASRC_electrical _C_V_electrical(CC_STATIC);
 /*--------------------------------------------------------------------------*/
-class DISCIPLINE_kinematic_v : public DISCIPLINE {
+class DISCIPLINE_magnetic : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
-    return &_N_Force;
+    return &_N_current;
   }
   NATURE const* potential()const override{
-    return &_N_Velocity;
+    return &_N_voltage;
   }
-}_D_kinematic_v;
-class _COMMON_VASRC_kinematic_v : public COMMON_VASRC {
+}_D_magnetic;
+class _COMMON_VASRC_magnetic : public COMMON_VASRC {
 public:
-  _COMMON_VASRC_kinematic_v(int i) : COMMON_VASRC(i){}
+  _COMMON_VASRC_magnetic(int i) : COMMON_VASRC(i){}
 private:
-  _COMMON_VASRC_kinematic_v(_COMMON_VASRC_kinematic_v const&p)     : COMMON_VASRC(p){}
+  _COMMON_VASRC_magnetic(_COMMON_VASRC_magnetic const&p)     : COMMON_VASRC(p){}
   COMMON_COMPONENT* clone()const override{
-    return new _COMMON_VASRC_kinematic_v(*this);
+    return new _COMMON_VASRC_magnetic(*this);
   }
-  std::string name()const override{untested(); return "kinematic_v";}
-  DISCIPLINE const* discipline()const override {return &_D_kinematic_v;}
+  std::string name()const override{untested(); return "magnetic";}
+  DISCIPLINE const* discipline()const override {return &_D_magnetic;}
 public:
 };
-static _COMMON_VASRC_kinematic_v _C_V_kinematic_v(CC_STATIC);
-/*--------------------------------------------------------------------------*/
-class DISCIPLINE_rotational : public DISCIPLINE {
-public:
-  NATURE const* flow()const override{
-    return &_N_Angular_Force;
-  }
-  NATURE const* potential()const override{
-    return &_N_Angle;
-  }
-}_D_rotational;
-class _COMMON_VASRC_rotational : public COMMON_VASRC {
-public:
-  _COMMON_VASRC_rotational(int i) : COMMON_VASRC(i){}
-private:
-  _COMMON_VASRC_rotational(_COMMON_VASRC_rotational const&p)     : COMMON_VASRC(p){}
-  COMMON_COMPONENT* clone()const override{
-    return new _COMMON_VASRC_rotational(*this);
-  }
-  std::string name()const override{untested(); return "rotational";}
-  DISCIPLINE const* discipline()const override {return &_D_rotational;}
-public:
-};
-static _COMMON_VASRC_rotational _C_V_rotational(CC_STATIC);
+static _COMMON_VASRC_magnetic _C_V_magnetic(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class DISCIPLINE_rotational_omega : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
-    return &_N_Angular_Force;
+    return &_N_current;
   }
   NATURE const* potential()const override{
-    return &_N_Angular_Velocity;
+    return &_N_voltage;
   }
 }_D_rotational_omega;
 class _COMMON_VASRC_rotational_omega : public COMMON_VASRC {
