@@ -1,0 +1,16 @@
+verilog
+load vams/lang_verilog.so
+load vams/capacitor.so
+load vams/d_vasrc.so
+
+// the model we just compiled
+load ./rc.so
+
+parameter ic=1
+
+// instanciate it.
+rc #(.ic(ic)) myrc2(1, 2, 0);
+resistor #(.r(1k)) r1(2, 0);
+
+print tran v(nodes)
+tran 1m

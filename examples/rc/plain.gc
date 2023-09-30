@@ -1,0 +1,32 @@
+verilog
+load vams/lang_verilog.so
+load vams/capacitor.so
+load vams/d_vasrc.so
+
+module rc(1, 2, gnd)
+	parameter ic=1
+	capacitor #(.c(1u), .ic(ic)) c(1 gnd);
+	resistor #(.r(1k)) r(1 2);
+endmodule
+
+parameter ic=2
+
+// Verilog does not define instances or nodes at top level. Gnucap only
+// simulates what is instanciated. The node denotes ground node.
+// (at the time of writing, the "ground" declarator is not implemented.)
+
+rc #(.ic(ic)) myrc(1, 2, 0);
+
+print tran v(nodes)
+tran 1m
+
+// can have multiple instances at top level.
+capacitor #(.c(1u)) c1(2, 0);
+
+tran 0 1m
+
+// or blend with SPICE components
+spice
+V1 2 0 .5
+
+.tran 0 1m

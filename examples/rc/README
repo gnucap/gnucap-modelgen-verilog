@@ -1,0 +1,19 @@
+== plain.gc
+
+Basic instanciation and transient. Run with "gnucap plain.gc".
+
+== compiled.gc
+
+Same as plain.gc, but using a compiled model. Compile with
+
+$ gnucap-mg-vams --cc rc.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o rc.so
+
+Run with "gnucap compiled.gc"
+
+== behavioural.gc
+
+TODO
+
+== paramset.gc
+
+TODO
