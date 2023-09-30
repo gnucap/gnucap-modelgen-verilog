@@ -604,6 +604,30 @@ void Token_CALL::stack_op(Expression* E)const
 void Token_ACCESS::stack_op(Expression* e) const
 {
   Expression& E = *e;
+
+  if(_prb){
+  }else if(E.is_empty()) { untested();
+    throw Exception("syntax error");
+  }else if(!dynamic_cast<Token_PARLIST*>(E.back())) { untested();
+    throw Exception("syntax error");
+  }else if(E.back()->data()) {
+    auto back = E.back();
+    E.pop_back();
+    Base const* d = back->data();
+    auto ee = prechecked_cast<Expression const*>(d);
+    assert(ee);
+    E.push_back(new Token_STOP("fn_stop"));
+    for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
+      E.push_back((*i)->clone());
+      //      (**i).stack_op(&E);
+    }
+    E.push_back(new Token_PARLIST("fn_args"));
+    delete back;
+  }else{ untested();
+    // repeat elab?
+    unreachable();
+  }
+
   auto SE = prechecked_cast<Expression_*>(e);
   assert(SE);
 
@@ -641,6 +665,8 @@ void Token_ACCESS::stack_op(Expression* e) const
     E.pop_back();
     // BUG: push dep?
     //
+    trace4("xs", name(), arg0, arg1, na);
+    // bug: upside down
     VAMS_ACCESS f(name(), arg0, arg1);
 //    assert(ds.top());
     assert(SE->owner());

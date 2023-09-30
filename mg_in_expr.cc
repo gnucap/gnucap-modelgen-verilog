@@ -115,66 +115,6 @@ static bool is_xs_function(std::string const& f, Block const* owner)
   return false;
 }
 /*--------------------------------------------------------------------------*/
-// XS::stack_op?
-Token* Expression_::resolve_xs_function(std::string const& n)
-{
-  Expression& E = *this;
-  size_t na = -1; // ds.num_args();
-  //ds.pop_args();
-  trace2("xsf", n, na);
-  if(E.is_empty()) { untested();
-    throw Exception("syntax error");
-  }else if(!dynamic_cast<Token_PARLIST*>(E.back())) { untested();
-    throw Exception("syntax error");
-  }else if(E.back()->data()){
-    auto back = E.back();
-    E.pop_back();
-    Base const* d = back->data();
-    auto ee = prechecked_cast<Expression const*>(d);
-    assert(ee);
-    E.push_back(new Token_STOP("fn_stop"));
-    for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
-      E.push_back((*i)->clone());
-//      (**i).stack_op(&E);
-    }
-    E.push_back(new Token_PARLIST("fn_args"));
-    trace1("restored args", size());
-    delete back;
-    return new Token_ACCESS(n, NULL);
-  }else{ untested();
-    delete E.back();
-    E.pop_back();
-    assert(!E.is_empty());
-    if(dynamic_cast<Token_STOP*>(E.back())) { untested();
-      throw Exception("syntax error");
-    }else{ untested();
-    }
-    std::string arg0 = E.back()->name();
-    std::string arg1;
-    delete E.back();
-    E.pop_back();
-    assert(!E.is_empty());
-
-    while(!dynamic_cast<Token_STOP*>(E.back())) { untested();
-      arg1 = arg0;
-      arg0 = E.back()->name();
-      delete E.back();
-      E.pop_back();
-      assert(!E.is_empty());
-    }
-
-    delete E.back();
-    E.pop_back();
-    // BUG: push dep?
-    //
-    VAMS_ACCESS f(n, arg0, arg1);
-    assert(owner());
-    Token* t = owner()->new_token(&f, na);
-    assert(t);
-    return t;
-  }
-} // resolve_xs_function
-/*--------------------------------------------------------------------------*/
 void Expression_::resolve_symbols_(Expression const& e, Deps*)
 {
   Expression& E = *this;
@@ -233,17 +173,6 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
 
       Token_TERNARY_ t3(t->name(), NULL, tp, fp, NULL);
       t3.stack_op(&E);
-    }else if(!E.is_empty() && dynamic_cast<Token_PARLIST*>(E.back())
-	  && is_xs_function(n, scope)) {
-      Token* t = resolve_xs_function(n);
-      t->stack_op(&E);
-
-      // not here...
-      auto ta = dynamic_cast<Token_ACCESS const*>(t);
-      assert(ta);
-
-      delete t;
-
     }else if(auto p = dynamic_cast<Parameter_Base const*>(r)) {
       E.push_back(new Token_PAR_REF(n, p));
       trace2("pushed par ref", n, size());
@@ -253,6 +182,10 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
     }else if(auto v = dynamic_cast<Variable const*>(r)) {
       Token_VAR_REF a(n, v);
       a.stack_op(&E);
+    }else if(!E.is_empty() && dynamic_cast<Token_PARLIST*>(E.back())
+	  && is_xs_function(n, scope)) {
+      Token_ACCESS t(n, NULL);
+      t.stack_op(&E);
     }else if (strchr("0123456789.", n[0])) {
       // a number
       Float* f = new Float(n);

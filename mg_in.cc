@@ -21,6 +21,7 @@
  */
 #include <io_.h>
 #include "mg_.h"
+#include "mg_error.h"
 #include "mg_out.h"
 #include <stack>
 #include <u_opt.h>
@@ -223,13 +224,12 @@ void File::parse(CS& file)
       ;
     if (_attribute_stash.is_empty()){
     }else{
-      file.warn(0, "dangling attributes");
+      file.warn(bWARNING, "dangling attributes");
     }
     if (!file.more()) {
       break;
     }else if (file.stuck(&here)) {
-      file.warn(0, "syntax error, need nature, discipline, module or paramset");
-      break;
+      throw Exception_CS_("syntax error, need nature, discipline, module or paramset", file);
     }else{
     }
   }

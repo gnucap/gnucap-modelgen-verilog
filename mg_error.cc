@@ -1,6 +1,6 @@
-/*$Id: mg_error.cc 2016/05/15 al $ -*- C++ -*-
+/*                   -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
- * Author: Albert Davis <aldavis@gnu.org>
+ *               2023 Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -21,8 +21,8 @@
  *------------------------------------------------------------------
  * Error handler.
  */
-//testing=script,sparse 2006.10.31
 #include <ap.h>
+#include "mg_error.h"
 extern int errorcount;
 extern std::basic_ostream<char>* diag_out;
 /*--------------------------------------------------------------------------*/
@@ -128,6 +128,36 @@ CS & CS::warn(int badness, size_t spot, const std::string& message)
   return *this;
 }
 #endif
+/*--------------------------------------------------------------------------*/
+Exception_CS_::Exception_CS_(const std::string& Message, const CS& cmd)
+  :Exception(Message)
+{
+  if(cmd.cursor() < 40) {
+    _cmd = cmd.fullstring().substr(0,60);
+    _cursor = cmd.cursor();
+  }else{
+    _cmd = "... " + cmd.fullstring().substr(cmd.cursor()-36, 56);
+    _cursor = 40;
+  }
+  std::string::size_type l = _cmd.find_last_of('\n', _cursor);
+  if( l != std::string::npos ) { itested();
+    std::string::size_type line_end = _cmd.find_first_of('\n', _cursor);
+    _cursor -= l-1;
+    if( line_end != std::string::npos ) { itested();
+      _cmd = _cmd.substr(0, line_end);
+    }else{
+    }
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+const std::string Exception_CS_::message()const
+{itested();
+  std::string s;
+  s = _cmd
+    + '\n' + std::string(_cursor, ' ') + "^ ? " + Exception::message();
+  return s;
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

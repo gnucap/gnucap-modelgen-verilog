@@ -299,7 +299,7 @@ public:
       file.skip(0); // set _ok;
     }else{
       delete m;
-      file.warn(0, "what's this??");
+      file.warn(bWARNING, "what's this??");
     }
   }
   void dump(std::ostream& f)const {

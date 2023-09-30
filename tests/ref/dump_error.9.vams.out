@@ -1,7 +1,4 @@
 ... parameter real b = 1.;
 
 	aliasparam b = a;
-
-endmodule
-
-                                        ^ ? already exists
+              ^ ? already exists

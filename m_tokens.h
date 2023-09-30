@@ -176,9 +176,8 @@ private:
     return new Token_ACCESS(*this);
   }
 
-  void stack_op(Expression* e)const override;
-
 public:
+  void stack_op(Expression* e)const override;
   Probe const* prb() const;
   bool is_short() const;
   bool is_reversed() const;

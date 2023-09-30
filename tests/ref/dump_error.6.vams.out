@@ -1,5 +1,3 @@
 ... ameter real a=1;
 	parameter real a=1;
-endmodule
-
-                                        ^ ? already declared
+                     ^ ? already declared

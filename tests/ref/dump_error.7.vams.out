@@ -2,8 +2,4 @@
 
 	analog begin
 		$strobetypo(0);
-	end
-
-endmodule
-
-                                        ^ ? bad discipline
+                  ^ ? bad discipline

@@ -1,6 +1,3 @@
 ... sparam b = a;
 	parameter real b = 1.;
-
-endmodule
-
-                                        ^ ? already declared
+                        ^ ? already declared

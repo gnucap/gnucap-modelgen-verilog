@@ -317,7 +317,7 @@ public:
     assert(!_args.empty());
     _args.pop();
   }
-  size_t size() const{ untested();
+  size_t size() const{
     return _refs.size();
   }
   std::string code_name() const{

@@ -20,6 +20,7 @@
  */
 #include "mg_analog.h"
 #include "mg_out.h"
+#include "mg_error.h"
 #include "m_tokens.h"
 #include <e_cardlist.h> // TODO: really?
 #include <u_opt.h>
@@ -286,14 +287,12 @@ AnalogProceduralAssignment::AnalogProceduralAssignment(CS& file, Block* o)
     file >> ";";
     trace2("got_semicolon", (bool)file, file.tail().substr(0,10));
 //    _var_refs[what] = a;
+    trace4("dep variable", v->name(), deps().size(), rhs().deps().size(), v->deps().size());
+    v->update_deps(deps());
+    trace4("dep variable", v->name(), deps().size(), rhs().deps().size(), v->deps().size());
   }else{ untested();
-    throw Exception_CS("need assign op", file);
+    throw Exception_CS_("need assign op", file);
   }
-
-  trace4("dep variable", v->name(), deps().size(), rhs().deps().size(), v->deps().size());
-  v->update_deps(deps());
-  trace4("dep variable", v->name(), deps().size(), rhs().deps().size(), v->deps().size());
-
 }
 /*--------------------------------------------------------------------------*/
 static Base* parse_contribution(CS& f, Block* owner)
@@ -336,7 +335,9 @@ static Base* parse_analog_stmt(CS& file, Block* owner)
   size_t here = file.cursor();
   Base* a = parse_analog_stmt_or_null(file, owner);
   if(file.stuck(&here)) {
-    throw Exception_CS("what's this?", file);
+    throw Exception_CS_("what's this?", file);
+    file.reset_fail(here);
+    return NULL;
   }else{
     return a;
   }
@@ -514,7 +515,7 @@ void AnalogSwitchStmt::parse(CS& file)
       c->set_owner(owner());
     }else{ untested();
       delete c;
-      throw Exception_CS("bad switch statement", file);
+      throw Exception_CS_("bad switch statement", file);
     }
   }
 
@@ -539,7 +540,7 @@ void AnalogConstruct::parse(CS& file)
 {
   _stmt = parse_analog_stmt_or_null(file, owner());
   if(!_stmt){ untested();
-    throw Exception_CS("bad analog construct", file);
+    throw Exception_CS_("bad analog construct", file);
   }else{
   }
 }
@@ -699,7 +700,7 @@ void Contribution::parse(CS& cmd)
   trace1("Contribution", _name);
 
   if(!_branch->discipline()) {
-    throw Exception_CS("bad discipline", cmd);
+    throw Exception_CS_("bad discipline", cmd);
   }else{
   }
   Discipline const* disc = _branch->discipline();
@@ -714,7 +715,7 @@ void Contribution::parse(CS& cmd)
     _nature = disc->potential();
     set_pot_contrib();
   }else{
-    throw Exception_CS("bad access", cmd);
+    throw Exception_CS_("bad access", cmd);
   }
 
   // TODO: parse branch_ref?
@@ -735,7 +736,7 @@ void Contribution::parse(CS& cmd)
     // trace1("bb?", cmd.tail().substr(0,20));
     // cmd >> xs >> bb >> "==";
   }else{ untested();
-    throw Exception_CS("expecting \"<+\"", cmd);
+    throw Exception_CS_("expecting \"<+\"", cmd);
   }
 
 
@@ -753,9 +754,9 @@ void Contribution::parse(CS& cmd)
     trace1("Assignment::parse", rhs().back()->name());
     if(is_direct()){
     }else if(rhs().is_empty()){ untested();
-      throw Exception_CS("syntax error", cmd);
+      throw Exception_CS_("syntax error", cmd);
     }else if(rhs().back()->name()!="=="){ untested();
-      throw Exception_CS("syntax error", cmd);
+      throw Exception_CS_("syntax error", cmd);
     }else{
       auto b = dynamic_cast<Token_BINOP_*>(rhs().back());
       assert(b);

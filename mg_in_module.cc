@@ -20,6 +20,7 @@
  * 02110-1301, USA.
  */
 #include "mg_.h"
+#include "mg_error.h"
 #include "mg_out.h"
 #include "l_stlextra.h"
 /*--------------------------------------------------------------------------*/
@@ -166,7 +167,7 @@ void Parameter_2::parse(CS& file)
   try{
     owner()->new_var_ref(this);
   }catch(Exception const&){
-    throw Exception_CS("already declared", file);
+    throw Exception_CS_("already declared", file);
   }
   assert(owner()->resolve(name()));
 }
@@ -209,7 +210,7 @@ void Aliasparam::parse(CS& f)
     it = notstd::find_ptr(pl->begin(), pl->end(), _name);
     if(it != pl->end()){
       f.reset(here0);
-      throw Exception_CS("already exists", f);
+      throw Exception_CS_("already exists", f);
     }else{
     }
   }
@@ -219,7 +220,7 @@ void Aliasparam::parse(CS& f)
     _param = pp;
   }else{
     f.reset(here);
-    throw Exception_CS("no such parameter", f);
+    throw Exception_CS_("no such parameter", f);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -235,7 +236,7 @@ void Data_Type::parse(CS& file)
   }else if(file.umatch("integer")){ untested();
     _type = t_int;
   }else{ untested();
-    throw Exception_CS("need \"real\", \"integer\"\n", file);
+    throw Exception_CS_("need \"real\", \"integer\"\n", file);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -267,7 +268,7 @@ void Parameter_2_List::parse(CS& file)
   }else if(file.umatch("integer")){
     _type = std::string("integer"); // TODO: enum
   }else{
-    throw Exception_CS("parameter: need \"real\", \"integer\"\n", file);
+    throw Exception_CS_("parameter: need \"real\", \"integer\"\n", file);
   }
   std::string type = _type.to_string();
   trace2("Parameter_2_List", _type, _is_local);
@@ -520,7 +521,7 @@ void Net_Identifier_Ground::parse(CS& f)
   Net_Identifier::parse(f);
   if(owner()->node(name())){
   }else{ untested();
-    throw Exception_CS("ground: need previously declared net", f);
+    throw Exception_CS_("ground: need previously declared net", f);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -752,8 +753,7 @@ void Module::parse(CS& f)
       f.warn(0, "premature EOF (module)");
       break;
     }else if (f.stuck(&here)) {
-      f.warn(0, "bad module");
-      break;
+      throw Exception_CS_("bad module", f);
     }else{
     }
   }
@@ -915,7 +915,7 @@ void ValueRangeInterval::parse(CS& file)
     file.skip1(')');
     _ub_is_closed = false;
   }else{ untested();
-    throw Exception_CS("need ')' or ']'", file);
+    throw Exception_CS_("need ')' or ']'", file);
   }
 }
 /*--------------------------------------------------------------------------*/

@@ -17,7 +17,12 @@ enddiscipline
 module error0 (p, n);
 	inout p, n;
 	electrical p, n;
+	real v;
 
 	analog
-		I(p,n) <+ X(x,y);
+		I(p,n) <+ X(p,n);
+
+	analog
+		real X;
+		v = X(x,y);
 endmodule
