@@ -84,7 +84,7 @@ static FUNCTION_ const* is_analog_function_call(std::string const& f, Block cons
 /*--------------------------------------------------------------------------*/
 // use dispatcher?
 static bool is_xs_function(std::string const& f, Block const* owner)
-{
+{ untested();
   Module const* m = to_module(owner);
   assert(m);
   File const* file = m->file();
@@ -96,7 +96,7 @@ static bool is_xs_function(std::string const& f, Block const* owner)
   assert(file);
   if(f=="flow" || f=="potential"){ itested();
     return true;
-  }else if(file){
+  }else if(file){ untested();
     // use actual disciplines
     // auto const& nl = file->nature_list();
     // return find_ptr(nl.begin(), nl.end(), f);
@@ -106,7 +106,7 @@ static bool is_xs_function(std::string const& f, Block const* owner)
   }
 
   /// TODO ///
-  for(auto n: file->nature_list()){
+  for(auto n: file->nature_list()){ untested();
     if(n->access().to_string() == f){
       return true;
     }else{

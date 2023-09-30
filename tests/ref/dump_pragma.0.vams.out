@@ -1,0 +1,8 @@
+dump_pragma.0.vams:1:
+`pragma warn "message"
+             ^ ? "message"
+
+dump_pragma.0.vams:1:
+`pragma error "message, fatal"
+              ^ ? "message, fatal"
+

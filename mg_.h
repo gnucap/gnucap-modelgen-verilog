@@ -27,7 +27,6 @@
 #include <set>
 #include "mg_deps.h" // BUG, Deps
 #include "mg_func.h" // BUG, Probe
-#include "mg_deps.h" // BUG, Deps
 /*--------------------------------------------------------------------------*/
 #ifdef PASS_TRACE_TAGS
 #define make_tag() (out << "//" << __func__ << ":" << __LINE__ << "\n")
@@ -36,6 +35,8 @@
 #endif
 /*--------------------------------------------------------------------------*/
 extern std::string ind;
+class Options;
+Base& modelgen_opts();
 /*--------------------------------------------------------------------------*/
 inline std::string to_lower(std::string s)
 { untested();
@@ -107,24 +108,6 @@ public:
 class Raw_String_Arg : public String_Arg {
 public:
   void parse(CS& f)override;
-};
-/*--------------------------------------------------------------------------*/
-class C_Comment : public Base {
-public:
-  void parse(CS& f)override;
-  void dump(std::ostream&)const override{ incomplete();}
-};
-/*--------------------------------------------------------------------------*/
-class Cxx_Comment : public Base {
-public:
-  void parse(CS& f)override;
-  void dump(std::ostream&)const override{ incomplete();}
-};
-/*--------------------------------------------------------------------------*/
-class Skip_Block : public Base {
-public:
-  void parse(CS& f)override;
-  void dump(std::ostream&)const override{ incomplete();}
 };
 /*--------------------------------------------------------------------------*/
 /* A "Collection" differs from a "LiSt" in how it is parsed.
@@ -1938,35 +1921,6 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class Preprocessor : public CS {
-  Define_List	_define_list;
-  std::string _cwd;
-  std::string _include_path;
-  std::basic_ostream<char>* _diag{NULL};
-private:
-  std::string _stripped_file; // DUP?
-public:
-  explicit Preprocessor();
-  void read(std::string const& file_name);
-  void define(std::string const&);
-  const Define_List&	 define_list()const	{return _define_list;}
-  void dump(std::ostream&)const;
-  void add_include_path(std::string const&);
-  void set_diag(std::basic_ostream<char>& o){
-    _diag = &o;
-  }
-private:
-  void parse(CS& file);
-  void include(const std::string& file_name);
-  std::basic_ostream<char>& diag() {
-    if(_diag){
-      return *_diag;
-    }else{
-      return std::cerr;
-    }
-  }
-};
-/*--------------------------------------------------------------------------*/
 class File : public Block {
   std::string	_name;
   std::string   _cwd;
@@ -2004,7 +1958,7 @@ public: // readout
 //  const Code_Block&  h_direct()const	{return _h_direct;}
 //  const Code_Block&  cc_direct()const	{return _cc_direct;}
 
-  const Nature_List&	 nature_list()const	{return _nature_list;}
+  const Nature_List&	 nature_list()const	{ untested(); return _nature_list;}
   const Discipline_List& discipline_list()const	{return _discipline_list;}
   const Module_List&	 module_list()const	{return _module_list;}
   const Module_List&	 macromodule_list()const	{return _macromodule_list;}

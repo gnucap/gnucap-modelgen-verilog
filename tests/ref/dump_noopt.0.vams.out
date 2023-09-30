@@ -1,0 +1,24 @@
+
+
+module test(d, g, s, b);
+  parameter real P = 3;
+
+  real    T,   U;
+
+  // circuit
+  electrical #() d();
+  g #() ();
+
+  analog begin
+    T = (0 * P);
+    T = (0 * U);
+    T = (((2.0 * U) * 3.0) / 5.);
+    T = (((2.0 * P) * 3.0) / 5.);
+    T = ((((2.0 * U) * 3.0) / 5.) * ln((1.0 + (0.4e-6 / T))));
+    T = ((((2.0 * P) * 3.0) / 5.) * ln((1.0 + (0.4e-6 / T))));
+  end
+
+endmodule
+
+
+

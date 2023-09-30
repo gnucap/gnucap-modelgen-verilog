@@ -1,0 +1,5 @@
+
+
+`pragma warn "message"
+`pragma error "message, fatal"
+`pragma warn "message2"

@@ -29,6 +29,7 @@
 #include <set>
 #include <fstream>
 #include "mg_.h"
+#include "mg_pp.h"
 #include "mg_out.h"
 #include "m_tokens.h"
 /*--------------------------------------------------------------------------*/
@@ -38,11 +39,16 @@ class AnalogBlock;
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
+Preprocessor& pp()
+{
+  static Preprocessor p;
+  return p;
+}
 /*--------------------------------------------------------------------------*/
 class CMD_ : public CMD {
 public:
-  void do_it(CS& cmd, CARD_LIST*)override {
-    if(OPT::case_insensitive == 0){
+  void do_it(CS& cmd, CARD_LIST*)override { untested();
+    if(OPT::case_insensitive == 0){ untested();
     }else{ untested();
       error(bWARNING, "running modelgen in insensitive mode\n");
     }
@@ -50,14 +56,14 @@ public:
     std::string name;
 
     std::string module_content;
-    for (;;) {
+    for (;;) { untested();
       cmd.get_line("verilog-module>");
       trace1("content", cmd.fullstring());
 
       module_content += cmd.fullstring();
-      if (cmd >> "endmodule ") {
+      if (cmd >> "endmodule ") { untested();
 	break;
-      }else{
+      }else{ untested();
       }
     }
 
@@ -71,10 +77,12 @@ public:
 
     File F;
 
-    Preprocessor p;
-    p.read("../disciplines.vams");
-    F.parse(p);
-    F.parse(file);
+    { untested();
+      Preprocessor& p = pp();
+      p.read("../disciplines.vams");
+      F.parse(p);
+    }
+
     file >> F;
 
     std::ofstream o;

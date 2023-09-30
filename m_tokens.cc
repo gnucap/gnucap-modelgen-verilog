@@ -24,11 +24,8 @@
 #include "mg_expression.h"
 #include "m_tokens.h"
 #include "mg_func.h"
-#include "mg_.h" // BUG, Probe
+#include "mg_options.h"
 #include <stack>
-/*--------------------------------------------------------------------------*/
-static const bool optimize_binop = true;
-static const bool swap_binop = true;
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -314,7 +311,7 @@ void Token_BINOP_::stack_op(Expression* E)const
   Deps const* deps = op_deps(t1, t2);
 
   char n = name()[0];
-  if(!optimize_binop) { itested();
+  if(!options().optimize_binop()) { untested();
     E->push_back(new Token_BINOP_(name(), t2, t1, deps));
     t1.pop();
     t2.pop();
@@ -440,7 +437,7 @@ void Token_BINOP_::stack_op(Expression* E)const
       // -ffinite-math?
       t1.erase();
       t2.push();
-    }else if( swap_binop && is_constant(t2)){
+    }else if( options().optimize_swap() && is_constant(t2)){
       if(n=='*' || n=='+'){
 	E->push_back(new Token_BINOP_(name(), t1, t2, deps));
       }else{

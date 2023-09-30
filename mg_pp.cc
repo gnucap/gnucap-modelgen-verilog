@@ -21,12 +21,40 @@
  */
 #include <io_.h>
 #include "mg_.h"
+#include "mg_pp.h"
 #include <stack>
 #include <u_opt.h>
 /*--------------------------------------------------------------------------*/
-static C_Comment   dummy_c_comment;
-static Cxx_Comment dummy_cxx_comment;
-static Skip_Block  skip_block;
+class C_Comment : public Base {
+public:
+  void parse(CS& f)override;
+  void dump(std::ostream&)const override{ incomplete();}
+} dummy_c_comment;
+/*--------------------------------------------------------------------------*/
+class Cxx_Comment : public Base {
+public:
+  void parse(CS& f)override;
+  void dump(std::ostream&)const override{ incomplete();}
+} dummy_cxx_comment;
+/*--------------------------------------------------------------------------*/
+class Skip_Block : public Base {
+public:
+  void parse(CS& f)override;
+  void dump(std::ostream&)const override{ incomplete();}
+} skip_block;
+/*--------------------------------------------------------------------------*/
+class Pragma : public Base {
+public:
+  void parse(CS& f)override;
+  void dump(std::ostream&)const override{ incomplete();}
+} pragma;
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+// static Define_List& define_list()
+// {
+//   static Define_List _define_list;
+//   return _define_list;
+// }
 /*--------------------------------------------------------------------------*/
 // copied in from a_construct.
 static std::string getlines(FILE *fileptr);
@@ -215,6 +243,37 @@ void Skip_Block::parse(CS& file)
   }
 }
 /*--------------------------------------------------------------------------*/
+void Pragma::parse(CS& f)
+{ untested();
+  size_t here = f.cursor();
+  if (f >> "reset{all}") { untested();
+    // reset pragmas by name
+    if (f >> "modelgen") { untested();
+      //  modelgen_opts().reset(f); or so.
+      incomplete();
+    }else{
+      incomplete();
+    }
+  }else if (f >> "resetall") {
+    // reset all pragmas recognised by implementation
+    //  modelgen_opts().reset(f); or so.
+    incomplete();
+  }else if (f >> "warn") { untested();
+    f.warn(bWARNING, f.tail());
+    f >> dummy_cxx_comment;
+  }else if (f >> "error") { untested();
+    f.warn(bDANGER, f.tail());
+    f >> dummy_cxx_comment;
+    throw Exception("pragma error");
+  }else if (f >> "modelgen") { untested();
+    f >> modelgen_opts();
+  }else{ untested();
+    f.reset(here);
+    f.warn(bWARNING, "ignoring unrecognised pragma");
+    f >> dummy_cxx_comment;
+  }
+}
+/*--------------------------------------------------------------------------*/
 /*
 The following compiler directives are supported:
 - `begin_keywords[1364-2005]
@@ -229,11 +288,11 @@ The following compiler directives are supported:
 - `endcelldefine[1364-2005]
 + `endif[1364-2005]
 + `ifdef[1364-2005]
-- `ifndef[1364-2005]
++ `ifndef[1364-2005]
 + `include[1364-2005]
 - `line[1364-2005]
 - `nounconnected_drive [1364-2005]
-- `pragma[1364-2005]
++ `pragma[1364-2005]
 - `resetall[1364-2005]
 - `timescale[1364-2005]
 - `unconnected_drive[1364-2005]
@@ -600,15 +659,15 @@ void Preprocessor::parse(CS& file)
       file >> dummy_cxx_comment;
     }else if (file >> "`define") {
       size_t l = file.cursor();
-      auto defi = _define_list.find(file);
-      if(defi != _define_list.end()){
+      auto defi = define_list().find(file);
+      if(defi != define_list().end()){
 	file.reset(l);
 	std::string def = file.tail();
 	file.warn(0, "already defined: " + def);
-	_define_list.erase(defi);
+	define_list().erase(defi);
       }else{
       }
-      if(file >> _define_list) {
+      if(file >> define_list()) {
       }else{ untested();
 	throw Exception_CS("expecting macro name", file);
       }
@@ -673,12 +732,14 @@ void Preprocessor::parse(CS& file)
     }else if (file >> "`undef") {
       Define_List::const_iterator x = define_list().find(file);
       if (x != define_list().end()) {
-	_define_list.erase(x);
+	define_list().erase(x);
       }else{ untested(); untested();
 	std::string err;
 	file >> err;
 	file.warn(0, "not defined: " + err);
       }
+    }else if (file >> "`pragma") {
+      file >> pragma;
     }else if (file >> "`") {
       String_Arg id(get_identifier(file));
       Define_List::const_iterator x = define_list().find(id);
@@ -737,7 +798,7 @@ void Preprocessor::add_include_path(std::string const& what)
 void Preprocessor::define(std::string const& what)
 {
   CS cmd(CS::_STRING, what);
-  cmd >> _define_list;
+  cmd >> define_list();
 }
 /*--------------------------------------------------------------------------*/
 void Preprocessor::include(std::string const& file_name)

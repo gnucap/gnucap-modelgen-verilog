@@ -22,6 +22,7 @@
 #include <io_.h>
 #include "mg_.h"
 #include "mg_error.h"
+#include "mg_options.h"
 #include "mg_out.h"
 #include <stack>
 #include <u_opt.h>
@@ -237,6 +238,26 @@ void File::parse(CS& file)
   // HACK
   for(auto i: _module_list){
     i->set_owner(this);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void File::dump(std::ostream& o) const
+{
+  o << nature_list() << '\n'
+    << discipline_list() << '\n';
+      // keep modules in order?
+      //
+  if (options().dump_module()){ untested();
+    o << module_list() << '\n'
+      << macromodule_list() << '\n'
+      << connectmodule_list() << '\n';
+  }else{ untested();
+  }
+
+  if(paramset_list().is_empty()) { untested();
+  }else if (options().dump_paramset()) { untested();
+    o << paramset_list() << '\n';
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/

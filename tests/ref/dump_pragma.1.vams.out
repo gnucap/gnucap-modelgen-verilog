@@ -1,0 +1,22 @@
+nature current
+  access = "I";
+  units = "A";
+  abstol = "0.001234";
+endnature
+
+nature voltage
+  access = "V";
+  units = "V";
+  abstol = "0.0004321";
+endnature
+
+
+discipline electrical
+  potential "voltage";
+  flow "current";
+enddiscipline
+
+
+paramset const_res resistor;
+endparamset;
+

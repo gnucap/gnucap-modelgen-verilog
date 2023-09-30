@@ -21,6 +21,7 @@
  */
 #include <u_opt.h>
 #include "mg_out.h"
+#include "mg_pp.h"
 #include <patchlev.h>
 /*global*/ int errorcount = 0;
 std::string ind;
@@ -48,21 +49,6 @@ static void make_module_file(const File& in, std::string dump_name)
   make_cc(out, in);
 }
 #endif
-/*--------------------------------------------------------------------------*/
-void File::dump(std::ostream& o) const
-{
-  o << nature_list() << '\n'
-    << discipline_list() << '\n'
-      // keep modules in order?
-    << module_list() << '\n'
-    << macromodule_list() << '\n'
-    << connectmodule_list() << '\n';
-
-  if(paramset_list().is_empty()){
-  }else{
-    o << paramset_list() << '\n';
-  }
-}
 /*--------------------------------------------------------------------------*/
 class OUTPUT {
   std::basic_ostream<char>& _default;
@@ -148,6 +134,7 @@ int main(int argc, char** argv)
       }
     }else if (argc > 1 && strcmp(argv[0],"--dump")==0) {
       trace1("dump", argv[1]);
+      diag_out = &(std::basic_ostream<char>&)diag; // mg_error.cc
       p.read(argv[1]);
       File f;
       f.parse(p);
@@ -168,6 +155,9 @@ int main(int argc, char** argv)
 	"to redistribute it under certain conditions\n"
 	"according to the GNU General Public License.\n"
 	"See the file \"COPYING\" for details.\n";
+    }else if (argc && strncmp(argv[0], "--", 2) == 0) { untested();
+      CS cmd(CS::_STRING, argv[0]+2); // command line
+      modelgen_opts().parse(cmd);
     }else{untested();
       throw Exception("no input files");
     }
