@@ -459,7 +459,6 @@ inline void MOD_resistor::set_branch_contributions()
     _st_b_p_n[0] -= sp;
     }
   // flow src (p, n)
-  // filters
 }
 /*--------------------------------------------------------------------------*/
 inline void MOD_resistor::clear_branch_contributions()
@@ -810,9 +809,8 @@ public:
 private: // data
   node_t _nodes[13];
 public: // netlist
-  // ELEMENT* _b_ddt_0_{NULL}; // no element (BUG)?
+  ELEMENT* _b_ddt_0_{NULL}; // filter
   ELEMENT* _b_p_n{NULL}; // branch
-  ELEMENT* _b_ddt_0_{NULL};
 private: // func decl
 //filt _b_ddt_0
   ddouble _b_ddt_0(ddouble t0);
@@ -869,7 +867,6 @@ public: // states, _b_p_n;
     enum {     VALUE, SELF, dep_potential_b_ddt_0_/* : */
     };
   } _dep_b_p_n;
-  // filter_b_ddt_0_
 private: // node list
   enum {n_p, n_n /* | */, n_ddt_0  };
 private: // probe values
@@ -1050,7 +1047,6 @@ inline void MOD_capacitor::read_probes()
   node_t gnd(&ground_node);
   // filter _b_ddt_0_
   _potential_b_p_n = volts_limited(_n[n_p], _n[n_n]);
-  // filter _b_ddt_0_
 }
 /*--------------------------------------------------------------------------*/
 MOD_capacitor::MOD_capacitor()
@@ -1114,15 +1110,12 @@ inline void MOD_capacitor::set_branch_contributions()
     _st_b_p_n[0] -= sp;
     }
   // flow src (p, n)
-  // filters
-  // filter _b_ddt_0_
 }
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::clear_branch_contributions()
 {
     _value_b_p_n = 0.;
     std::fill_n(_st_b_p_n+1, 2, 0.);
-    // std::fill_n(_st_b_ddt_0_, 3, 0.);
 }
 /*--------------------------------------------------------------------------*/
 inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
@@ -1235,7 +1228,7 @@ void MOD_capacitor::expand()
     }
 
   // clone branches
-  // branch no elt (ddt_0, )
+  // filter (ddt_0, )
   // branch (p, n)
     {
     if (!_b_p_n) {
@@ -1395,9 +1388,8 @@ public:
 private: // data
   node_t _nodes[13];
 public: // netlist
-  // ELEMENT* _b_ddt_1_{NULL}; // no element (BUG)?
+  ELEMENT* _b_ddt_1_{NULL}; // filter
   ELEMENT* _b_p_n{NULL}; // branch
-  ELEMENT* _b_ddt_1_{NULL};
 private: // func decl
 //func analysis
   // analysis
@@ -1457,7 +1449,6 @@ public: // states, _b_p_n;
     enum {     VALUE, SELF, dep_potential_b_ddt_1_/* : */
     };
   } _dep_b_p_n;
-  // filter_b_ddt_1_
 private: // node list
   enum {n_p, n_n /* | */, n_ddt_1  };
 private: // probe values
@@ -1658,7 +1649,6 @@ inline void MOD_capacitor::read_probes()
   node_t gnd(&ground_node);
   // filter _b_ddt_1_
   _potential_b_p_n = volts_limited(_n[n_p], _n[n_n]);
-  // filter _b_ddt_1_
 }
 /*--------------------------------------------------------------------------*/
 MOD_capacitor::MOD_capacitor()
@@ -1727,8 +1717,6 @@ inline void MOD_capacitor::set_branch_contributions()
   }else{
     _b_p_n->_loss0 = 0.;
   }
-  // filters
-  // filter _b_ddt_1_
 }
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::clear_branch_contributions()
@@ -1736,7 +1724,6 @@ inline void MOD_capacitor::clear_branch_contributions()
     _pot_b_p_n = false;
     _value_b_p_n = 0.;
     std::fill_n(_st_b_p_n+1, 2, 0.);
-    // std::fill_n(_st_b_ddt_1_, 3, 0.);
 }
 /*--------------------------------------------------------------------------*/
 inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
@@ -1895,7 +1882,7 @@ void MOD_capacitor::expand()
     }
 
   // clone branches
-  // branch no elt (ddt_1, )
+  // filter (ddt_1, )
   // branch (p, n)
     {
     if (!_b_p_n) {

@@ -651,11 +651,6 @@ void make_set_branch_contributions(std::ostream& o, const Module& m)
     }
   }
 
-  o__ "// filters\n";
-  for(auto x : m.filters()){
-    o__ "// filter " << x->code_name() << "\n";
-  }
-
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -711,13 +706,6 @@ void make_clear_branch_contributions(std::ostream& o, const Module& m)
 	o____ "_value_br_" << n << " = 0.;\n";
 	o____ "std::fill_n(_st_br_" << n << "+1, " << x->num_states()-1 << ", 0.);\n";
       }
-    }else{
-    }
-  }
-  for(auto x : m.filters()){
-    assert(x);
-    if(x->has_branch()){
-      o____ "// std::fill_n(_st" << x->code_name() << ", " << x->num_states() << ", 0.);\n";
     }else{
     }
   }

@@ -1727,8 +1727,8 @@ public:
   void new_evt_slot() { ++_num_evt_slots; }
   size_t num_evt_slots()const {return _num_evt_slots; }
 public:
-//  const Probe_Map&	probes()const		{return _probes;}
-  const Filter_List&	filters()const		{return _filters;}
+  const Filter_List&	filters()const		{return _filters;} // incomplete();
+  bool	has_filters()const		{return _filters.size();}
   const Node_Map&	nodes()const		{return _nodes;}
   const Branch_Names&	branch_names()const	{return _branch_names;}
   const Branch_Map&	branches()const		{return _branches;}

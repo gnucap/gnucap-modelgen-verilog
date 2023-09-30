@@ -44,12 +44,7 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
 
       if(b->has_pot_probe()){
 	o << "    d_potential" << b->code_name() << ",\n";
-      }else if(b->is_filter()){ untested();
-	unreachable();
-	o << "    d__filter" << b->code_name() << ",\n";
       }else{
-	//      o << comma "// no pot probe?   d_potential" << b->code_name();
-	//      comma = ",\n";
       }
     }
   }
@@ -68,8 +63,6 @@ static void declare_ddouble(std::ostream& o, Module const& m)
     }else{
     }
     if(b->has_pot_probe()){
-      ++np;
-    }else if(b->is_filter()){ untested();
       ++np;
     }else{
     }
@@ -230,7 +223,7 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
   Branch const* bb;
   if((bb = dynamic_cast<Branch const*>(&elt))){
   }else{
-    // yikes. num_states?
+    o__ "// not a branch...\n";
     return;
   }
   Branch const& br = *bb;
@@ -293,16 +286,11 @@ static void make_branch_states(std::ostream& o, const Module& m)
     assert(x);
     if(x->has_element()){
       make_module_one_branch_state(o, *x);
-    }else if(x->is_filter()){
+    }else if (x->is_filter()) {
       make_module_one_branch_state(o, *x);
     }else{
       o__ "// branch no elt: " << x->code_name() << "\n";
     }
-  }
-  for(auto x : m.filters()){
-    assert(x);
-    o__ "// filter" << x->code_name() << "\n";
-    make_module_one_branch_state(o, *x);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -335,15 +323,16 @@ static void make_module(std::ostream& o, const Module& m)
       o__ "ELEMENT* " << br->code_name() << "{NULL}; // branch\n";
     }else if(br->is_short()){ untested();
       o__ "// short : " << br->code_name() << "\n";
+    }else if(br->is_filter()){
+      // TODO
+      // o__ "ELEMENT* " << br->code_name() << "{NULL}; // filter\n";
     }else{
       o__ "// ELEMENT* " << br->code_name() << "{NULL}; // no element (BUG)?\n";
     }
   }
   for (auto f : m.filters()){
-    o__ "ELEMENT* " << f->code_name() << "{NULL};\n";
+    o__ "ELEMENT* " << f->code_name() << "{NULL}; // filter\n";
   }
-  //o << "private: // filt decl\n";
-  // make_cc_filt(o, m);
   o << "private: // func decl\n";
   make_func_dev(o, m.funcs());
   if(m.has_events()){
@@ -472,152 +461,6 @@ void make_cc_decl(std::ostream& out, const Module& d)
   make_common(out, d);
   make_module(out, d);
 }
-/*--------------------------------------------------------------------------*/
-#if 0
-static void make_device(std::ostream& out, const Device& d)
-{ untested();
-  std::string class_name = "DEV_" + d.name().to_string();
-  out <<
-    "class " << class_name << " : public BASE_SUBCKT {\n"
-    "private:\n"
-    "  explicit " << class_name << "(const " << class_name << "& p);\n"
-    "public:\n"
-    "  explicit " << class_name << "();\n"
-    "           ~" << class_name << "() {--_count;}\n"
-    "private: // override virtual\n"
-    "  char      id_letter()const     {untested();return '" << d.id_letter() << "';}\n"
-    "  bool      print_type_in_spice()const {return true;}\n"
-    "  std::string value_name()const  {return \"area\";}\n"
-    "  //std::string dev_type()const;   //BASE_SUBCKT\n"
-    "  int       max_nodes()const     {return " << d.max_nodes() << ";}\n"
-    "  int       min_nodes()const     {return " << d.min_nodes() << ";}\n";
-  if (d.max_nodes() != d.min_nodes()) { untested();
-    out <<
-      "  //int     matrix_nodes()const; //BASE_SUBCKT\n"
-      "  //int     net_nodes()const;    //BASE_SUBCKT\n";
-  }else{ untested();
-    out <<
-      "  //int     matrix_nodes()const; //BASE_SUBCKT\n"
-      "  int       net_nodes()const     {return " << d.max_nodes() << ";}\n";
-  }
-  out << 
-    "  CARD*     clone()const override        {return new "
-      << class_name << "(*this);}\n"
-    "  void      precalc_first()override {COMPONENT::precalc_first(); if(subckt()) subckt()->precalc_first();}\n"
-    "  void      expand()override;\n"
-    "  void      precalc_last() override {COMPONENT::precalc_last(); assert(subckt()); subckt()->precalc_last();}\n"
-    "  //void    map_nodes();         //BASE_SUBCKT\n"
-    "  //void    tr_begin();          //BASE_SUBCKT\n"
-    "  //void    tr_restore();        //BASE_SUBCKT\n";
-  out <<
-    "public:\n"
-    "  static int  count() {return _count;}\n"
-    "public: // may be used by models\n";
-  for (Function_List::const_iterator
-       p = d.function_list().begin();
-       p != d.function_list().end();
-       ++p) { untested();
-    out << "  void " << (**p).name() << ";\n";
-  }
-  out << 
-    "private: // not available even to models\n"
-    "  static int _count;\n";
-  out <<  "public: // input parameters\n";
-  for (Parameter_1_List::const_iterator
-       p = d.device().raw().begin();
-       p != d.device().raw().end();
-       ++p) {untested();
-    untested();
-    out << "  PARAMETER<" << (**p).type() << "> " << (**p).code_name()
-	<< ";\t// " << (**p).comment() << '\n';
-  }
-  out << "public: // calculated parameters\n";
-  for (Parameter_1_List::const_iterator
-       p = d.device().calculated().begin();
-       p != d.device().calculated().end();
-       ++p) { untested();
-    out << "  " << (**p).type() << " " << (**p).code_name()
-	<< ";\t// " << (**p).comment() << '\n';
-  }
-  out << "private: // node list\n"
-    "  enum {";
-  for (Port_1_List::const_iterator
-       p = d.circuit().req_nodes().begin();
-       p != d.circuit().req_nodes().end();
-       ++p) { untested();
-    if (p != d.circuit().req_nodes().begin()) { untested();
-      out << ", ";
-    }else{ untested();
-    }
-    out << "n_" << (**p).name();
-  }
-  for (Port_1_List::const_iterator
-       p = d.circuit().opt_nodes().begin();
-       p != d.circuit().opt_nodes().end();
-       ++p) { untested();
-    out << ", ";
-    out << "n_" << (**p).name();
-  }
-  for (Port_1_List::const_iterator
-       p = d.circuit().local_nodes().begin();
-       p != d.circuit().local_nodes().end();
-       ++p) { untested();
-    out << ", n_" << (**p).name();
-  }
-  size_t total_nodes = d.circuit().req_nodes().size() + d.circuit().opt_nodes().size()
-    + d.circuit().local_nodes().size();
-  out << "};\n"
-    "  node_t _nodes[" << total_nodes << "];\n"
-    "  std::string port_name(int i)const {\n"
-    "    assert(i >= 0);\n"
-    "    assert(i < " << d.circuit().req_nodes().size() + d.circuit().opt_nodes().size() << ");\n"
-    "    static std::string names[] = {";
-  for (Port_1_List::const_iterator
-	 p = d.circuit().req_nodes().begin();
-       p != d.circuit().req_nodes().end();
-       ++p) { untested();
-    out << '"' << (**p).name() << "\", ";
-  }
-  for (Port_1_List::const_iterator
-       p = d.circuit().opt_nodes().begin();
-       p != d.circuit().opt_nodes().end();
-       ++p) { untested();
-    out << '"' << (**p).name() << "\", ";
-  }
-  out << "\"\"};\n"
-    "    return names[i];\n"
-    "  }\n"
-    "};\n"
-    "/*--------------------------------------"
-    "------------------------------------*/\n";
-}
-/*--------------------------------------------------------------------------*/
-static void make_eval(std::ostream& out, const Eval& e,
-		      const String_Arg& dev_name)
-{ untested();
-  incomplete();
-  assert(0);
-  std::string class_name = "EVAL_" + dev_name.to_string() + '_' 
-    + e.name().to_string();
-  out <<
-    "class " << class_name << " : public COMMON_COMPONENT {\n"
-    "private:\n"
-    "  explicit "<< class_name << "(const "<< class_name << "& p)\n"
-    "    :COMMON_COMPONENT(p) {}\n"
-    "public:\n"
-    "  explicit "<< class_name << "(int c=0) :COMMON_COMPONENT(c) {}\n"
-    "  bool operator==(const COMMON_COMPONENT& x)const "
-		"{return COMMON_COMPONENT::operator==(x);}\n"
-    "  COMMON_COMPONENT* clone()const {return new "<<class_name<<"(*this);}\n"
-    "  std::string name()const {untested(); return \""<< class_name << "\";}\n"
-    "  void tr_eval(ELEMENT*d)const;\n"
-    "  bool has_tr_eval()const {return true;}\n"
-    "  bool has_ac_eval()const {return false;}\n"
-    "};\n"
-    "/*--------------------------------------"
-    "------------------------------------*/\n";
-}
-#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

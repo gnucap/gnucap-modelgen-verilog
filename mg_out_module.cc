@@ -100,7 +100,7 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
   o____ "return true;\n";
   o__ "}else ";
 
-  if( m.filters().size()){
+  if( m.has_filters()) {
     o__ "if(_sim->is_first_iteration()){\n";
     o____ "return true;\n";
     o__ "}else";
@@ -492,9 +492,6 @@ static void make_read_probes(std::ostream& o, const Module& m)
     }
   }
 
-  for(auto x : m.filters()){
-    o__ "// filter " << x->code_name() << "\n";
-  }
 //  for(auto x : m.probes()){ untested();
 //    Probe const* p = x;
 //    assert(p);
@@ -920,6 +917,10 @@ static void make_module_expand(std::ostream& o, Module const& m)
       o__ "// branch " << i->name() << "\n";
       indent x;
       make_module_expand_one_branch(o, *i, m);
+    }else if(i->is_filter()) {
+      o__ "// filter " << i->name() << "\n";
+      // incomplete();
+      // make_module_expand_one_branch(o, *i, m);
     }else{
       o__ "// branch no elt " << i->name() << "\n";
     }
@@ -927,6 +928,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
 
   o << "\n";
   o__ "// clone filters\n";
+#if 1
   for (auto i: m.filters()){
     if(i->has_branch()){
       o__ "// " << i->name() << "\n";
@@ -937,6 +939,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
       make_module_expand_one_filter(o, *i);
     }
   }
+#endif
 
   o << "\n";
   o__ "}else{\n";
