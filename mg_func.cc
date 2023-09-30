@@ -109,6 +109,7 @@ FUNCTION_::~FUNCTION_()
 /*--------------------------------------------------------------------------*/
 Token* VAMS_ACCESS::new_token(Module& m, size_t na)const
 {
+  unreachable(); // obsolete.
   // use na?
   Branch_Ref br = m.new_branch(_arg0, _arg1);
   //  br->set_owner(this);
@@ -144,10 +145,10 @@ Token* Probe::new_token(Module&, size_t na)const
     name = "UNKNOWN";
   }
 
-  trace4("got a probe", name, na, pname(), nname());
+  trace5("got a probe", name, na, pname(), nname(), _br.has_name());
   name += "(";
   if(_br.has_name()){
-    name += "alias";
+    name += _br.name();
   }else if(nname() != ""){
     assert(na==2);
     name += pname() + ", " + nname();

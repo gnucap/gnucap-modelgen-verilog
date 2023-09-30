@@ -1,0 +1,15 @@
+`include "sub/disciplines.few"
+
+module test (p,n)
+	
+	electrical p, n;
+
+	branch          (p,n)         br_pn;
+
+	(*desc=v*) real v;
+	analog begin
+			  v = V(p,n);
+			  I(br_pn)      <+     V(br_pn);
+	end
+endmodule
+

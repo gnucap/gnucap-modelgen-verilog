@@ -44,6 +44,7 @@ bool Module::has_submodule() const
 #if 1
 Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
 {
+    trace1("new_probe", br.has_name());
   std::string flow_xs;
   std::string pot_xs;
 
@@ -70,6 +71,10 @@ Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
   }
 
   std::string k = nn + "_" + br.pname() + "_" + br.nname();
+  if(br.has_name()){
+    k = nn + "_" + br.name();
+  }else{
+  }
   Probe*& prb = _probes[k];
 
   if(prb) {
@@ -77,6 +82,7 @@ Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
     prb = new Probe(nn, br);
   }
 
+  trace1("new_probe", br.has_name());
   return prb;
 }
 #endif
@@ -639,7 +645,7 @@ Discipline const* Branch::discipline() const
 /*--------------------------------------------------------------------------*/
 Probe::Probe(std::string const& xs, Branch_Ref b) : _br(b)
 {
-  trace2("::Probe", xs, code_name());
+  trace3("::Probe", xs, code_name(), b.has_name());
   // TODO: disciplines.h
   if( (xs == "V") || (xs == "potential") ){
     _type = t_pot;

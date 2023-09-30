@@ -601,6 +601,22 @@ void Token_CALL::stack_op(Expression* E)const
   }
 }
 /*--------------------------------------------------------------------------*/
+// BUG
+static Module* to_module(Block* owner)
+{
+  assert(owner);
+  while(true){
+    if(auto m = dynamic_cast<Module *>(owner)){
+      return m;
+    }else{
+    }
+    owner = owner->owner();
+    assert(owner);
+  }
+  unreachable();
+  return NULL;
+}
+/*--------------------------------------------------------------------------*/
 void Token_ACCESS::stack_op(Expression* e) const
 {
   Expression& E = *e;
@@ -618,6 +634,7 @@ void Token_ACCESS::stack_op(Expression* e) const
     assert(ee);
     E.push_back(new Token_STOP("fn_stop"));
     for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
+      trace1("xs stack", (*i)->name());
       E.push_back((*i)->clone());
       //      (**i).stack_op(&E);
     }
@@ -656,6 +673,8 @@ void Token_ACCESS::stack_op(Expression* e) const
       arg1 = arg0;
       ++na;
       arg0 = E.back()->name();
+      trace2("xs stack again", arg0, arg1);
+
       delete E.back();
       E.pop_back();
       assert(!E.is_empty());
@@ -667,10 +686,29 @@ void Token_ACCESS::stack_op(Expression* e) const
     //
     trace4("xs", name(), arg0, arg1, na);
     // bug: upside down
-    VAMS_ACCESS f(name(), arg0, arg1);
+  //  VAMS_ACCESS f(name(), arg0, arg1);
 //    assert(ds.top());
     assert(SE->owner());
+#if 0
     Token* t = SE->owner()->new_token(&f, na);
+#else
+     // was: Token* VAMS_ACCESS::new_token(Module& m, size_t na)const
+    Module* m = to_module(SE->owner()); // dynamic_cast<Module*>(SE->owner());
+    assert(m);
+    // use na?
+    Branch_Ref br = m->new_branch(arg0, arg1);
+    trace5("br", name(), arg0, arg1, na, br.has_name());
+
+    //  br->set_owner(this);
+    assert(br);
+    assert(const_cast<Branch const*>(br.operator->())->owner());
+    // Probe const* p = m.new_probe(_name, _arg0, _arg1);
+    //
+    // install clone?
+    FUNCTION_ const* p = m->new_probe(name(), br);
+
+    Token* t = p->new_token(*m, na);
+#endif
 
     assert(t);
     e->push_back(t);

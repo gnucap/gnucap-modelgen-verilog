@@ -695,6 +695,7 @@ public:
 
   std::string const& pname() const;
   std::string const& nname() const;
+  std::string const& name() const{ assert(_name); return *_name; }
 };
 /*--------------------------------------------------------------------------*/
 class Data_Type : public Base{

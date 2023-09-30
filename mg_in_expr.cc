@@ -184,6 +184,7 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
       a.stack_op(&E);
     }else if(!E.is_empty() && dynamic_cast<Token_PARLIST*>(E.back())
 	  && is_xs_function(n, scope)) {
+      // this is upside down...
       Token_ACCESS t(n, NULL);
       t.stack_op(&E);
     }else if (strchr("0123456789.", n[0])) {
