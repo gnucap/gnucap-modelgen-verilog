@@ -17,6 +17,7 @@ GNUCAP_EXEC_PREFIX = $(shell $(GNUCAP_CONF) --exec-prefix)
 GNUCAP_DATA = $(shell $(GNUCAP_CONF) --data)
 
 MANDIR = ${GNUCAP_DATA}/man/man1
+EMBED_HEADERS = e_va.raw m_va.raw
 
 LIBS =
 MODULES = \
@@ -58,7 +59,7 @@ check: all
 	${MAKE} -C tests check GNUCAP_CONF=${GNUCAP_CONF}
 
 clean: clean-recursive
-	rm -rf *.o ${TARGET} ${MODULES} ${OBJS} ${CLEAN_OBJS}
+	rm -rf *.o ${TARGET} ${MODULES} ${OBJS} ${CLEAN_OBJS} ${EMBED_HEADERS}
 
 clean-recursive:
 	${MAKE} -C tests clean
@@ -69,6 +70,11 @@ $(TARGET): $(OBJS)
 	$(CXX) ${GNUCAP_CXXFLAGS} $(CXXFLAGS) $(OBJS) -o $@ $(GNUCAP_LDFLAGS) ${LDFLAGS} $(GNUCAP_LIBS)
 
 include Make.depend
+
+# temporary workaround, see source
+%.raw: %.h
+	sed -e 's/^/"/' -e 's/$$/\\n"/' $< > $@
+mg_out_root.o: ${EMBED_HEADERS}
 
 modelgen_0.o: $(OBJS)
 d_vasrc.so: d_vaflow.o d_vapot.o d_va_filter.o d_vapot_br.o d_va_slew.o
@@ -85,7 +91,7 @@ bm_pulse.so: bm_pulse.o
 	${CXX} -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $+ ${LIBS_} -o $@
 
 depend: Make.depend
-Make.depend: $(SRCS) $(HDRS)
+Make.depend: $(SRCS) $(HDRS) ${EMBED_HEADERS}
 	$(CXX) -MM $(GNUCAP_CPPFLAGS) ${GNUCAP_CXXFLAGS} $(CXXFLAGS) $(SRCS) > Make.depend
 
 install: install-recursive

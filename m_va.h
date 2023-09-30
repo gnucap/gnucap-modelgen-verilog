@@ -2,7 +2,7 @@
  * Copyright (C) 2023 Felix Salfelder
  * Author: Felix Salfelder
  *
- * This file is part of "Gnucap", the Gnu Circuit Analysis Package
+ * This file is part of \"Gnucap\", the Gnu Circuit Analysis Package
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -229,7 +229,6 @@ public:
 	}
 
 	ddouble_& operator*=(const ddouble_& o) {
-//		trace2("op*", *o._data, *_data);
 		assert(*o._data == *o._data);
 		assert(*_data == *_data);
 		for(int i=1; i<=numderiv; ++i){
@@ -747,17 +746,6 @@ T flicker_noise(T, T2, S=0.)
 { itested();
   //incomplete();
   return T(0.);
-}
-/*--------------------------------------------------------------------------*/
-inline double simparam(std::string const& what, double def=0)
-{
-  if(what=="gmin") {
-    return OPT::gmin;
-  }else if(what=="iteration"){
-    return CKT_BASE::_sim->_iter[sCOUNT];
-  }else{
-    return def;
-  }
 }
 /*--------------------------------------------------------------------------*/
 class EVT{

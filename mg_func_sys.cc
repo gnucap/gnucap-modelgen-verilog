@@ -177,10 +177,18 @@ class SIMPARAM : public MGVAMS_FUNCTION {
     return "$$simparam";
   }
   std::string code_name()const override{
-    return "va::simparam";
+    return "_f_simparam";
   }
   void make_cc_common(std::ostream& o)const override {
-    o << "// dummy " << label() << "\n";
+    o__ "double " << code_name() << "(std::string const& what, double def=0)const {\n";
+    o____ "if(what==\"gmin\") {\n";
+    o______ "return OPT::gmin;\n";
+    o____ "}else if(what==\"iteration\") {\n";
+    o______ "return CKT_BASE::_sim->_iter[sCOUNT];\n";
+    o____ "}else{\n";
+    o______ "return def;\n";
+    o____ "}\n";
+    o__ "}\n";
   }
 } simparam;
 DISPATCHER<FUNCTION>::INSTALL d_simparam(&function_dispatcher, "$simparam", &simparam);

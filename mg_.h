@@ -1958,7 +1958,7 @@ public: // readout
 //  const Code_Block&  h_direct()const	{return _h_direct;}
 //  const Code_Block&  cc_direct()const	{return _cc_direct;}
 
-  const Nature_List&	 nature_list()const	{ untested(); return _nature_list;}
+  const Nature_List&	 nature_list()const	{ return _nature_list;}
   const Discipline_List& discipline_list()const	{return _discipline_list;}
   const Module_List&	 module_list()const	{return _module_list;}
   const Module_List&	 macromodule_list()const	{return _macromodule_list;}

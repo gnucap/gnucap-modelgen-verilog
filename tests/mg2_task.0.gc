@@ -30,6 +30,8 @@ list
 
 print dc iter(0)
 dc
+
+options gmin 1e-6
 print tr iter(0)
 tr 1
 end

@@ -37,9 +37,19 @@ static void make_header(std::ostream& o, const File& in,
     "#include <e_node.h>\n"
     "#include <e_elemnt.h>\n"
     "// #include <e_paramlist.h>\n"
-    "#include <u_nodemap.h>\n" // if submodules are used anywhere
+    "#include <u_nodemap.h>\n"; // if submodules are used anywhere
+#if 0
     "#include <m_va.h>\n"
     "#include <e_va.h>\n"
+#else
+  o <<
+#include "m_va.raw"
+     ;
+  o <<
+#include "e_va.raw"
+     ;
+#endif
+  o <<
     "#include <u_limit.h>\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";

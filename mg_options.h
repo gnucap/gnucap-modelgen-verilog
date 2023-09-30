@@ -35,8 +35,8 @@ public:
   void parse(CS& f) override;
   void dump(std::ostream&)const override{unreachable();}
 public:
-  bool optimize_binop()   const{ untested(); return _optimize_binop; }
-  bool optimize_swap()    const{ untested(); return _optimize_swap; }
+  bool optimize_binop()   const{ return _optimize_binop; }
+  bool optimize_swap()    const{ return _optimize_swap; }
   bool gen_module()       const{ untested(); return _gen_module; }
   bool gen_paramset()     const{ untested(); return _gen_paramset; }
   bool dump_module()      const{ untested(); return _dump_module; }

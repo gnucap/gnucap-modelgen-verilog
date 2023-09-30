@@ -18,10 +18,10 @@ GNUCAP_EXEC_PREFIX = $(shell $(GNUCAP_CONF) --exec-prefix)
 	${CXX} -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@
 
 %.o: %.cc
-	${CXX} -I .. $(GNUCAP_CPPFLAGS) $(CPPFLAGS) -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@ -c
+	${CXX} $(GNUCAP_CPPFLAGS) $(CPPFLAGS) -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@ -c
 
 %.s: %.cc
-	${CXX} -I .. -S ${GNUCAP_CPPFLAGS} ${CPPFLAGS} -DNDEBUG -O2 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@
+	${CXX} -S ${GNUCAP_CPPFLAGS} ${CPPFLAGS} -DNDEBUG -O2 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@
 
 %.cc: %.vams ${MODELGEN}
 	${MODELGEN} -I .. --cc $< > $@

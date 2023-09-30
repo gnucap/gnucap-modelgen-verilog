@@ -24,7 +24,7 @@
 /*--------------------------------------------------------------------------*/
 // global?
 Base& modelgen_opts()
-{ untested();
+{
   static Options opt;
   return opt;
 }

@@ -2,7 +2,7 @@
  * Copyright (C) 2023 Felix Salfelder
  * Author: Felix Salfelder
  *
- * This file is part of "Gnucap", the Gnu Circuit Analysis Package
+ * This file is part of \"Gnucap\", the Gnu Circuit Analysis Package
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
