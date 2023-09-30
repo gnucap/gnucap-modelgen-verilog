@@ -244,7 +244,7 @@ void Skip_Block::parse(CS& file)
 }
 /*--------------------------------------------------------------------------*/
 void Pragma::parse(CS& f)
-{ untested();
+{
   size_t here = f.cursor();
   if (f >> "reset{all}") { untested();
     // reset pragmas by name
@@ -258,14 +258,14 @@ void Pragma::parse(CS& f)
     // reset all pragmas recognised by implementation
     //  modelgen_opts().reset(f); or so.
     incomplete();
-  }else if (f >> "warn") { untested();
+  }else if (f >> "warn") {
     f.warn(bWARNING, f.tail());
     f >> dummy_cxx_comment;
-  }else if (f >> "error") { untested();
+  }else if (f >> "error") {
     f.warn(bDANGER, f.tail());
     f >> dummy_cxx_comment;
     throw Exception("pragma error");
-  }else if (f >> "modelgen") { untested();
+  }else if (f >> "modelgen") {
     f >> modelgen_opts();
   }else{ untested();
     f.reset(here);

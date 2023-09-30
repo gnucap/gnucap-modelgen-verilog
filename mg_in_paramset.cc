@@ -25,7 +25,7 @@ void Paramset::parse(CS& f)
 {
   File* o = prechecked_cast<File*>(owner());
   assert(o);
-  if(o->attribute_stash().is_empty()){ untested();
+  if(o->attribute_stash().is_empty()){
   }else{
     assert(!_attributes);
     set_attributes(o->attribute_stash().detach());

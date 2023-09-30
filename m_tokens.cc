@@ -311,7 +311,7 @@ void Token_BINOP_::stack_op(Expression* E)const
   Deps const* deps = op_deps(t1, t2);
 
   char n = name()[0];
-  if(!options().optimize_binop()) { untested();
+  if(!options().optimize_binop()) {
     E->push_back(new Token_BINOP_(name(), t2, t1, deps));
     t1.pop();
     t2.pop();
@@ -414,8 +414,8 @@ void Token_BINOP_::stack_op(Expression* E)const
 	  t2.pop();
 	}
 
-      }else{
-	incomplete(); // why?
+      }else{ itested();
+	// incomplete();
 	E->push_back(new Token_BINOP_(name(), t2, t1, deps));
 	t1.pop();
 	t2.pop();

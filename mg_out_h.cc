@@ -133,7 +133,7 @@ static void make_variable_decl(std::ostream& o, const Variable_List_Collection& 
   for (auto q = P.begin(); q != P.end(); ++q) {
     if(((**q).type()).to_string().substr(0,4) == "real"){
       o__ "ddouble";
-    }else{ untested();
+    }else{ itested();
       o__ (**q).type();
     }
     std::string comma = " ";

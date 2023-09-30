@@ -1289,7 +1289,7 @@ inline void MOD_resistor::set_branch_contributions()
     long double sp = 0.;
     // voltage sources...
     // current sources...
-    _st_b_p_n[0] -= sp;
+    _st_b_p_n[0] = double(_st_b_p_n[0] - sp);
     }
   // flow src (p, n)
 }
@@ -2475,8 +2475,8 @@ public:
 private: // data
   node_t _nodes[13];
 public: // netlist
-  ELEMENT* _b_ddt_0_{NULL}; // filter
   ELEMENT* _b_p_n{NULL}; // branch
+  ELEMENT* _b_ddt_0_{NULL}; // filter
 private: // func decl
 //filt _b_ddt_0
   ddouble _b_ddt_0(ddouble t0);
@@ -2773,7 +2773,7 @@ inline void MOD_capacitor::set_branch_contributions()
     // voltage sources...
       sp += (long double)(_st_b_p_n[/*MOD::*/_st_b_p_n_::dep_potential_b_ddt_0_] * _potential_b_ddt_0_);
     // current sources...
-    _st_b_p_n[0] -= sp;
+    _st_b_p_n[0] = double(_st_b_p_n[0] - sp);
     }
   // flow src (p, n)
 }
@@ -3054,8 +3054,8 @@ public:
 private: // data
   node_t _nodes[13];
 public: // netlist
-  ELEMENT* _b_ddt_1_{NULL}; // filter
   ELEMENT* _b_p_n{NULL}; // branch
+  ELEMENT* _b_ddt_1_{NULL}; // filter
 private: // func decl
 //func analysis
   // analysis
@@ -3374,7 +3374,7 @@ inline void MOD_capacitor::set_branch_contributions()
     // voltage sources...
       sp += (long double)(_st_b_p_n[/*MOD::*/_st_b_p_n_::dep_potential_b_ddt_1_] * _potential_b_ddt_1_);
     // current sources...
-    _st_b_p_n[0] -= sp;
+    _st_b_p_n[0] = double(_st_b_p_n[0] - sp);
     }
   // pot src (p, n)
   if(!_b_p_n){ untested();

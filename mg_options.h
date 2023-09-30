@@ -39,8 +39,8 @@ public:
   bool optimize_swap()    const{ return _optimize_swap; }
   bool gen_module()       const{ untested(); return _gen_module; }
   bool gen_paramset()     const{ untested(); return _gen_paramset; }
-  bool dump_module()      const{ untested(); return _dump_module; }
-  bool dump_paramset()    const{ untested(); return _dump_paramset; }
+  bool dump_module()      const{ return _dump_module; }
+  bool dump_paramset()    const{ return _dump_paramset; }
   bool dump_unreachable() const{ untested(); return _dump_unreachable; }
 };
 /*--------------------------------------------------------------------------*/

@@ -30,10 +30,10 @@ Base& modelgen_opts()
 }
 /*--------------------------------------------------------------------------*/
 void Options::parse(CS& f)
-{ untested();
+{
   bool changed = false;
   size_t here = f.cursor();
-  do{ untested();
+  do{
     ONE_OF
       || Get(f, "optimize-binop",  &_optimize_binop)
       || Get(f, "optimize-swap",   &_optimize_swap)
@@ -44,7 +44,7 @@ void Options::parse(CS& f)
       || Get(f, "dump-unreachable",&_dump_unreachable)
       ;
 
-    if (!f.stuck(&here)) { untested();
+    if (!f.stuck(&here)) {
       changed = true;
     }
   }while (f.more() && changed);

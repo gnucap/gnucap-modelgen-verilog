@@ -47,8 +47,8 @@ Preprocessor& pp()
 /*--------------------------------------------------------------------------*/
 class CMD_ : public CMD {
 public:
-  void do_it(CS& cmd, CARD_LIST*)override { untested();
-    if(OPT::case_insensitive == 0){ untested();
+  void do_it(CS& cmd, CARD_LIST*)override {
+    if(OPT::case_insensitive == 0){
     }else{ untested();
       error(bWARNING, "running modelgen in insensitive mode\n");
     }
@@ -56,14 +56,14 @@ public:
     std::string name;
 
     std::string module_content;
-    for (;;) { untested();
+    for (;;) {
       cmd.get_line("verilog-module>");
       trace1("content", cmd.fullstring());
 
       module_content += cmd.fullstring();
-      if (cmd >> "endmodule ") { untested();
+      if (cmd >> "endmodule ") {
 	break;
-      }else{ untested();
+      }else{
       }
     }
 
@@ -77,7 +77,7 @@ public:
 
     File F;
 
-    { untested();
+    {
       Preprocessor& p = pp();
       p.read("../disciplines.vams");
       F.parse(p);

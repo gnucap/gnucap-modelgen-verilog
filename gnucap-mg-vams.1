@@ -11,9 +11,18 @@ gnucap-mg-vams \- GNU Circuit Analysis Package .vams translator
 is a translator tool in the Gnucap suite. It will transform Verilog-AMS models
 into C++ code implementing Gnucap component plugins.
 .PP
-A typical usage can be
+A basic usage (with bash, on a posix system) may look like the following.
 
-gnucap-modelgen \-I /path/to/include \--cc mymodel.vams
+$ gnucap-mg-vams \-I /path/to/include \--cc mymodel.vams\ -o mymodel.cc
+.br
+$ g++ `gnucap-conf --cppflags` -fPIC -shared mymodel.cc -o mymodel.so
+.br
+$ gnucap -a ./mymodel.so
+.br
+gnucap> ...
+
+Consider adding the usual compiler flags for optimisation, troubleshooting and
+debugging.
 
 .SH OPTIONS
 

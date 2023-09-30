@@ -48,3 +48,19 @@
 * indirect contribution
 * limiting
 * initial conditions
+
+20230930-dev
+============
+* embed custom headers into output
+* GPL compatible vams header from ADMS
+* preprocessor: `elif
+* unify FUNCTION and Token use
+* revisit probe and dependency equality
+* Token based dependecy tracking
+* skip code generation for unused functions
+* same for (some) unreachable conditional blocks
+* simplify state and contribution code
+* more binary operator optimisations
+* provide (simple) examples
+* fix contribution bug, mg1_polarity1.gc
+* fix getlines memory issue

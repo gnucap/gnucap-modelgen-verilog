@@ -121,7 +121,7 @@ CS & CS::warn(int badness, size_t spot, const std::string& message)
     diag() << "^ ? " << message << '\n';
   }else{untested();
   }
-  if(badness >= bDANGER){ untested();
+  if(badness >= bDANGER){
     exit(1);
   }else{
   }

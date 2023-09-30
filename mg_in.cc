@@ -247,15 +247,15 @@ void File::dump(std::ostream& o) const
     << discipline_list() << '\n';
       // keep modules in order?
       //
-  if (options().dump_module()){ untested();
+  if (options().dump_module()){
     o << module_list() << '\n'
       << macromodule_list() << '\n'
       << connectmodule_list() << '\n';
-  }else{ untested();
+  }else{
   }
 
-  if(paramset_list().is_empty()) { untested();
-  }else if (options().dump_paramset()) { untested();
+  if(paramset_list().is_empty()) {
+  }else if (options().dump_paramset()) {
     o << paramset_list() << '\n';
   }else{ untested();
   }
