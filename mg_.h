@@ -1380,6 +1380,9 @@ public:
   bool operator==(Probe const& o) const{
     return _br == o._br && _type == o._type;
   }
+  bool same_data(Probe const& o) const{
+    return branch() == o.branch() && _type == o._type;
+  }
   bool operator!=(Probe const& o) const{
     return !operator==(o);
   }

@@ -6,7 +6,7 @@ module test_af();
     real x;
 begin
       if ((x > 17.)) begin
-        limitex = (((x + 1.0) - 17.) * 42.);
+        limitex = ((x + -16.) * 42.);
       end
       else if ((x < -17.)) begin
         limitex = 42.;

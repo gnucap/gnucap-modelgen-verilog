@@ -360,9 +360,9 @@ void Token_BINOP_::stack_op(Expression* E)const
       char m = bb->name()[0];
       if(auto t3 = dynamic_cast<Token_CONSTANT const*>(bb->op2())) {
 	if(( (m == '+' && n == '+')
-//	  || (m == '+' && n == '-')
+	  || (m == '+' && n == '-')
 	  || (m == '*' && n == '*')
-//	  || (m == '*' && n == '/') // (a * B) / C == a * (B/C)
+	  || (m == '*' && n == '/') // (a * B) / C == a * (B/C)
 	  )) {
 	  Token* t = op(t3, t1);
 	  assert(t);

@@ -28,7 +28,7 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
   std::string comma = "";
 
   o << ind << "enum {\n";
-  // for (auto nn : m.probes()){
+  // for (auto nn : m.probes()){ untested();
   //   o << comma << "d_" << nn.second->name();
   // }
   for(auto x : m.branches()){
@@ -44,7 +44,7 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
 
       if(b->has_pot_probe()){
 	o << "    d_potential" << b->code_name() << ",\n";
-      }else if(b->is_filter()){
+      }else if(b->is_filter()){ untested();
 	unreachable();
 	o << "    d__filter" << b->code_name() << ",\n";
       }else{
@@ -69,7 +69,7 @@ static void declare_ddouble(std::ostream& o, Module const& m)
     }
     if(b->has_pot_probe()){
       ++np;
-    }else if(b->is_filter()){
+    }else if(b->is_filter()){ untested();
       ++np;
     }else{
     }
@@ -97,13 +97,13 @@ static void make_funcs_common(std::ostream& o, std::set<FUNCTION_ const*> const&
   for (auto q = P.begin(); q != P.end(); ++q) {
     if( (*q)->has_refs() ){
       (*q)->make_cc_common(o);
-    }else if(dynamic_cast<MGVAMS_FUNCTION const*>(*q)){
+    }else if(dynamic_cast<MGVAMS_FUNCTION const*>(*q)){ untested();
       o<<"// FUNCTION no refs: " << (*q)->label() << "\n";
     }else if(dynamic_cast<MGVAMS_TASK const*>(*q)){ untested();
       o<<"// TASK no refs: " << (*q)->label() << "\n";
     }else if(dynamic_cast<MGVAMS_FILTER const*>(*q)){ untested();
       o<<"// FILTER no refs: " << (*q)->label() << "\n";
-    }else{
+    }else{ untested();
       unreachable();
       o<<"//func " << (*q)->label() << "\n";
     }
@@ -140,7 +140,7 @@ static void make_variable_decl(std::ostream& o, const Variable_List_Collection& 
   for (auto q = P.begin(); q != P.end(); ++q) {
     if(((**q).type()).to_string().substr(0,4) == "real"){
       o__ "ddouble";
-    }else{
+    }else{ untested();
       o__ (**q).type();
     }
     std::string comma = " ";
@@ -158,9 +158,9 @@ static void make_common(std::ostream& o, const Module& m)
   std::string class_name = "COMMON_" + m.identifier().to_string();
   std::string base_class_name;
   base_class_name = "COMMON_COMPONENT";
-  // if(m.has_submodule()){
+  // if(m.has_submodule()){ untested();
   //   base_class_name = "COMMON_PARAMLIST";
-  // }else{
+  // }else{ untested();
   //   base_class_name = "COMMON_COMPONENT";
   // }
   o << "class MOD_" << m.identifier() << ";\n";
@@ -206,7 +206,7 @@ static void make_common(std::ostream& o, const Module& m)
 //  for (Parameter_1_List::const_iterator
 //       p = d.common().calculated().begin();
 //       p != d.common().calculated().end();
-//       ++p) {
+//       ++p) { untested();
 //    out << "  " << (**p).type() << " " << (**p).code_name()
 //	<< ";\t// " << (**p).comment() << '\n';
 //  }
@@ -214,7 +214,7 @@ static void make_common(std::ostream& o, const Module& m)
 //  for (Args_List::const_iterator
 //       p = d.circuit().args_list().begin();
 //       p != d.circuit().args_list().end();
-//       ++p) {
+//       ++p) { untested();
 //    out << "  COMMON_COMPONENT* _" << (**p).name() << ";\n";
 //  }
   o << "private: // funcs\n";
@@ -258,33 +258,26 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
   o____ "enum { ";
   std::string comma = "";
   o____ "VALUE, SELF";
-  std::vector<char> seen(br.num_branches());
   for(auto d : br.deps()){
 //      o << "/* found " << d->code_name() << "*/";
     Branch const* bb = d->branch();
     assert(bb);
     if(bb->is_short()){ untested();
-    }else if(seen[bb->number()]){
     }else if(bb == &br){
     }else if(bb->has_flow_probe()){
     }else{
-      seen[bb->number()] = 1;
       assert(d);
       o << ", dep" << d->code_name();
     }
   }
   o << "/* : */\n";
-  seen.clear();
-  seen.resize(br.num_branches());
   for(auto d : br.deps()){
     Branch const* bb = d->branch();
     assert(bb);
     if(bb->is_short()){ untested();
-    }else if(seen[bb->number()]){
     }else if(bb == &br){
     }else if(!bb->has_flow_probe()){
     }else{
-      seen[bb->number()] = 1;
       assert(d);
       o << ", dep" << d->code_name();
     }
@@ -482,7 +475,7 @@ void make_cc_decl(std::ostream& out, const Module& d)
 /*--------------------------------------------------------------------------*/
 #if 0
 static void make_device(std::ostream& out, const Device& d)
-{
+{ untested();
   std::string class_name = "DEV_" + d.name().to_string();
   out <<
     "class " << class_name << " : public BASE_SUBCKT {\n"
@@ -498,11 +491,11 @@ static void make_device(std::ostream& out, const Device& d)
     "  //std::string dev_type()const;   //BASE_SUBCKT\n"
     "  int       max_nodes()const     {return " << d.max_nodes() << ";}\n"
     "  int       min_nodes()const     {return " << d.min_nodes() << ";}\n";
-  if (d.max_nodes() != d.min_nodes()) {
+  if (d.max_nodes() != d.min_nodes()) { untested();
     out <<
       "  //int     matrix_nodes()const; //BASE_SUBCKT\n"
       "  //int     net_nodes()const;    //BASE_SUBCKT\n";
-  }else{
+  }else{ untested();
     out <<
       "  //int     matrix_nodes()const; //BASE_SUBCKT\n"
       "  int       net_nodes()const     {return " << d.max_nodes() << ";}\n";
@@ -523,7 +516,7 @@ static void make_device(std::ostream& out, const Device& d)
   for (Function_List::const_iterator
        p = d.function_list().begin();
        p != d.function_list().end();
-       ++p) {
+       ++p) { untested();
     out << "  void " << (**p).name() << ";\n";
   }
   out << 
@@ -542,7 +535,7 @@ static void make_device(std::ostream& out, const Device& d)
   for (Parameter_1_List::const_iterator
        p = d.device().calculated().begin();
        p != d.device().calculated().end();
-       ++p) {
+       ++p) { untested();
     out << "  " << (**p).type() << " " << (**p).code_name()
 	<< ";\t// " << (**p).comment() << '\n';
   }
@@ -551,24 +544,24 @@ static void make_device(std::ostream& out, const Device& d)
   for (Port_1_List::const_iterator
        p = d.circuit().req_nodes().begin();
        p != d.circuit().req_nodes().end();
-       ++p) {
-    if (p != d.circuit().req_nodes().begin()) {
+       ++p) { untested();
+    if (p != d.circuit().req_nodes().begin()) { untested();
       out << ", ";
-    }else{
+    }else{ untested();
     }
     out << "n_" << (**p).name();
   }
   for (Port_1_List::const_iterator
        p = d.circuit().opt_nodes().begin();
        p != d.circuit().opt_nodes().end();
-       ++p) {
+       ++p) { untested();
     out << ", ";
     out << "n_" << (**p).name();
   }
   for (Port_1_List::const_iterator
        p = d.circuit().local_nodes().begin();
        p != d.circuit().local_nodes().end();
-       ++p) {
+       ++p) { untested();
     out << ", n_" << (**p).name();
   }
   size_t total_nodes = d.circuit().req_nodes().size() + d.circuit().opt_nodes().size()
@@ -582,13 +575,13 @@ static void make_device(std::ostream& out, const Device& d)
   for (Port_1_List::const_iterator
 	 p = d.circuit().req_nodes().begin();
        p != d.circuit().req_nodes().end();
-       ++p) {
+       ++p) { untested();
     out << '"' << (**p).name() << "\", ";
   }
   for (Port_1_List::const_iterator
        p = d.circuit().opt_nodes().begin();
        p != d.circuit().opt_nodes().end();
-       ++p) {
+       ++p) { untested();
     out << '"' << (**p).name() << "\", ";
   }
   out << "\"\"};\n"
@@ -601,7 +594,7 @@ static void make_device(std::ostream& out, const Device& d)
 /*--------------------------------------------------------------------------*/
 static void make_eval(std::ostream& out, const Eval& e,
 		      const String_Arg& dev_name)
-{
+{ untested();
   incomplete();
   assert(0);
   std::string class_name = "EVAL_" + dev_name.to_string() + '_' 

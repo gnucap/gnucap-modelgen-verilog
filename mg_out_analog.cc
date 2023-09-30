@@ -469,11 +469,10 @@ std::string Analog_Function_Arg::code_name()const
   return "af_arg_" + name();
 }
 /*--------------------------------------------------------------------------*/
-static void make_set_one_branch_contribution(std::ostream& o, Module const& m, const Branch& br)
+static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
 {
   Branch const* b = &br;
   assert(!br.is_short());
-  size_t k = 1;
   o__ "assert(_value" << b->code_name() << " == _value" << b->code_name() << ");\n";
 
   o__ b->state() << "[0] = _value" << b->code_name() << ";\n";
@@ -496,7 +495,7 @@ static void make_set_one_branch_contribution(std::ostream& o, Module const& m, c
       o__ b->state() << "[0] += _value_br_" << n << ";\n";
       o__ "for(int k=1; k<" << b->num_states() << "; ++k){\n";
 	o__ b->state() << "[k] += _st_br_" << n << "[k];\n";
-      o__ "}\n;";
+      o__ "}\n";
     }
   }
 
@@ -527,70 +526,57 @@ static void make_set_one_branch_contribution(std::ostream& o, Module const& m, c
     o__ "}else{\n";
     o__ "}\n";
   }
-  k = 2;
-  for(auto i : m.branches()){
-    if(i->is_short()){
-      continue;  // incomplete
-    }else{
+  if (b->deps().size()) {
+//    o__ "typedef long double D;\n";
+    o__ "long double sp = 0.;\n";
+  }else{
+  }
+  o__ "// voltage sources...\n";
+  {
+    indent ii;
 
-    }
-
-//    o__ "trace1(\"" <<  b->state() << "\", _value" << b->code_name() << ");\n";
     for(auto d : b->deps()){
       if(d->branch() == b){
-      }else if(d->branch() != i){
+      }else if(d->branch()->is_short()) {
       }else if(d->is_pot_probe()){
-	o__ b->state() << "[0] -= " << b->state() << "["
+	o__ "sp += (long double)(" << b->state() << "["
 	 << "/*MOD::*/" << b->state() << "_::dep" << d->code_name()
-	 << "] * "<< d->code_name() << ";\n";
-	++k;
-	break;
+	 << "] * "<< d->code_name() << ");\n";
       }else if(d->is_flow_probe()){
 	// nothing, handled below.
       }else{ untested();
 	o__ "// bogus probe " << b->state() << " : " << d->code_name() << "\n";
       }
       if(d->branch() == b){
-      }else if(d->branch() != i){
       }else if(d->is_flow_probe()){
-	// todo.
+	// todo?
       }
     }
   }
-#if 1
-  for(auto i : m.branches()){
-    // o__ "trace1(\"" <<  b->state() << "\", _value" << b->code_name() << ");\n";
-    if(i->is_short()){
-      continue;  // incomplete
-    }else{
 
-    }
+  o__ "// current sources...\n";
+  {
+    indent ii;
     for(auto d : b->deps()){
       if(d->branch() == b){
-      }else if(d->branch()->is_short()){ untested();
-      }else if(d->branch() != i){
+      }else if(d->branch()->is_short()) {
       }else if(d->is_flow_probe()){
-	o__ "trace2(\"flow " <<  b->state() << "\", " << b->state() << "["<<k<<"], "<<  d->code_name() <<");\n";
-	o__ b->state() << "[0] -= " << b->state() << "["
+	o__ "sp += (long double)(" << b->state() << "["
 	 << "/*MOD::*/" << b->state() << "_::dep" << d->code_name()
-	// << k
-	 << "] * "<< d->code_name() << "; // (5)\n";
-	// BUG? scaling before convcheck?
+	 << "] * "<< d->code_name() << "); // (5)\n";
 	o__ b->state() << "["
 	 << "/*MOD::*/" << b->state() << "_::dep" << d->code_name()
-	// << k
 	 <<"] *= " << d->branch()->code_name() <<"->_loss0; // BUG?\n";
-	++k;
-	break;
       }else if(d->is_pot_probe()){
-	// nothing, handled above
-//      }else if(d->is_filter_probe()){
-//	// nothing, handled above
+	// nothing, handled above.
       }else{ untested();
       }
     }
   }
-#endif
+  if (b->deps().size()) {
+    o__ b->state() << "[0] = double(" << b->state() << "[0] - sp);\n";
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 // some filters are not reached in do_tr. set output is zero.
@@ -604,7 +590,7 @@ void make_zero_filter_readout(std::ostream& o, const Module& m)
     }else{
       if(b->is_short()){
       }else if(b->has_pot_probe()){
-	o__ "_potential" << b->code_name() << " = 0.\n;";
+	o__ "_potential" << b->code_name() << " = 0.;\n";
       }
     }
   }
@@ -622,7 +608,10 @@ void make_set_branch_contributions(std::ostream& o, const Module& m)
 
     if(b->is_short()) {
     }else if(b->has_flow_source() || b->has_pot_source()) {
-      make_set_one_branch_contribution(o, m, *b);
+      indent ii;
+      o__ "{\n";
+      make_set_one_branch_contribution(o, *b);
+      o__ "}\n";
     }else if(b->has_flow_probe()) {
       o__ "// flow prb " << b->name() << "\n";
       o__ "if(" << b->code_name() << "){\n";

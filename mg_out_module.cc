@@ -633,7 +633,7 @@ static void make_module_allocate_local_nodes(std::ostream& o, Module const& m)
   }
 }
 /*--------------------------------------------------------------------------*/
-static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, Module const& m)
+static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, Module const&)
 {
   make_tag();
   auto br = dynamic_cast<Branch const*>(&e);
@@ -681,34 +681,20 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
     o << ", ";
     make_node_ref(o, *br->n());
     {
-      std::vector<char> seen(m.num_branches());
       for(auto i : br->deps()){
 	Branch const* bb = i->branch();
       	if(bb->is_short()){
-	  // o << "/* short " << i->code_name() << " */";
-	}else if(seen[bb->number()]){
-	  // o << "/* seen " << i->code_name() << " */";
-//	  assert(!i->is_filter_probe());
 	}else if(bb == br){
-	  // o << "/* self conductance */" << "";
 	}else if(i->is_pot_probe()){
 	  assert(i->branch());
-	  // o << ",_n[n_" << i->branch()->p()->name() << "]";
-	  // o << ",_n[n_" << i->branch()->n()->name() << "]";
 	  o << ", ";
 	  make_node_ref(o, *i->branch()->p());
 	  o << ", ";
 	  make_node_ref(o, *i->branch()->n());
-// 	}else if(i->is_filter_probe()){
-// 	  assert(i->branch());
-// 	  o << ", gnd";
-// 	  o << ", _n[n_" << i->branch()->p()->name() << "]";
 	}else if(i->is_flow_probe()){
-	  // o << "/* flow " << i->code_name() << " */";
 	}else{ untested();
 	  o << "/* nothing " << i->code_name() << " */";
 	}
-	seen[i->branch()->number()] = 1;
       }
     }
 
@@ -720,11 +706,8 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
     {
       // set_current ports.
       int kk = 1;
-      std::vector<char> seen(m.num_branches());
       for(auto i : br->deps()){
-	Branch const* bb = i->branch();
-	if(seen[bb->number()]){
-	}else if(!i->is_flow_probe()){
+	if(!i->is_flow_probe()){
 	}else if(i->branch() == br){
 	  // self control is current
 	  o______ e.code_name() << "->set_current_port_by_index(0,\"\");\n";
@@ -733,7 +716,6 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
 	  o______ e.code_name() << "->set_current_port_by_index( "<< kk << ", \"" << i->branch()->code_name() << "\");\n";
 	  ++kk;
 	}
-	seen[i->branch()->number()] = 1;
       }
     }
   }else{ untested();

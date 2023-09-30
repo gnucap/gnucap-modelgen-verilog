@@ -45,6 +45,8 @@ public:
   bool is_linear() const{ return _order<=_LINEAR; }
   bool is_quadratic() const{ return _order<=_QUADRATIC; }
 
+  bool same_data(Dep const& o)const;
+
 public:
   Probe const* operator->() const{ return _prb; }
   Probe const* operator*() const{ return _prb; }

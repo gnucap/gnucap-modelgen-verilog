@@ -876,10 +876,17 @@ Deps::~Deps()
   _s.clear();
 }
 /*--------------------------------------------------------------------------*/
+bool Dep::same_data(Dep const& o) const
+{
+  assert(_prb);
+  assert(o._prb);
+  return _prb->same_data(*o._prb);
+}
+/*--------------------------------------------------------------------------*/
 std::pair<Deps::const_iterator, bool> Deps::insert(Dep const& x)
 {
   for(auto s = begin(); s!=end(); ++s){
-    if (**s == *x){
+    if (s->same_data(x)){
       return std::make_pair(s, false);
     }else{
     }
