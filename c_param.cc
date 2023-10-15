@@ -42,8 +42,8 @@ public:
   void parse(CS& cmd){
 //    trace1("parse", cmd.fullstring());
     double new_val;
-    cmd >> new_val;
-    if (cmd) {
+//    cmd >> new_val;
+    if (0 && cmd) {
       PARAMETER<double>::operator=(new_val);
       assert(_s == "#");
     }else{
