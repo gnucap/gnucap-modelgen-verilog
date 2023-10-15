@@ -325,7 +325,7 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
     if (cmd >> "parameter ") {
       cmd.reset(here);
       CMD::cmdproc(cmd, x->subckt());
-    }else if (cmd >> "// ") { untested();
+    }else if (cmd >> "//") {
       cmd.reset(here);
       // new__instance(cmd, x, x->subckt()); // BUG
       cmd.get_line("verilog-paramset>");

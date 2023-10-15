@@ -2,6 +2,8 @@ verilog
 
 paramset vs vsource
   parameter voltage
+//comment
+// comment
  .dc=voltage
 endparamset
 
