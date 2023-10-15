@@ -26,7 +26,7 @@ module ternary(p, n);
 
   analog begin
     a = V(n, p);
-    I(p, n) <+ (c)? (a):(a);
+    I(p, n) <+ ((c)? (a):(a));
   end
 
 endmodule

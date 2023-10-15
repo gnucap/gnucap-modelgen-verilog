@@ -173,7 +173,7 @@ void Expression_::dump(std::ostream& out)const
       stack.push_back(t);
     }else if (auto t = dynamic_cast<const Token_TERNARY_*>(*i)) {
       std::stringstream tmp;
-      tmp << '(';
+      tmp << "((";
       if(t->cond()){
 	dump_token(t->cond(), tmp);
       }else if(stack.empty()){ untested();
@@ -191,7 +191,7 @@ void Expression_::dump(std::ostream& out)const
       tmp << "):(";
       assert(t->false_part());
       t->false_part()->dump(tmp);
-      tmp << ')';
+      tmp << "))";
       std::string s = tmp.str();
 
       Token* n = new Token_SYMBOL(s, "");
