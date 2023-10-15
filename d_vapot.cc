@@ -36,6 +36,7 @@ protected: // override virtual
   bool	   do_tr()override;
   void	   tr_load()override;
   void	   tr_begin()override{
+    DEV_CPOLY_G::tr_begin();
     _loss0 = 1./OPT::shortckt;
   }
   double   tr_involts()const override	{unreachable(); return NOT_VALID;}

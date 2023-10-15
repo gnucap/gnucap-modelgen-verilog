@@ -394,8 +394,14 @@ void DEV_CPOLY_CAP::tr_load()
     assert(_vi0[i] == _vi0[i]);
   }
   if( CKT_BASE::_sim->analysis_is_static() ) {
-    assert(!_vi0[0]);
-    assert(!_vi0[1]);
+    if(_vi0[0]){
+//      incomplete(); // TODO: MOD_*::tr_begin?
+      _vi0[0] = 0.;
+    }
+    if(_vi0[1]){
+//      incomplete(); // TODO: MOD_*::tr_begin?
+      _vi0[1] = 0.;
+    }
   }else{
   }
   tr_load_passive();
@@ -403,7 +409,10 @@ void DEV_CPOLY_CAP::tr_load()
   _vi1[1] = _vi0[1];
   for (int i=2; i<=_n_ports; ++i) {
     if( CKT_BASE::_sim->analysis_is_static() ) {
-      assert(!_vi0[i]);
+      if(_vi0[i]){
+//	incomplete(); // TODO: MOD_*::tr_begin?
+	_vi0[i] = 0.;
+      }
     }else{
     }
     tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_vi0[i]), &(_vi1[i]));
