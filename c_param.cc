@@ -80,7 +80,7 @@ public:
       IO::mstdout << '\n';
     }else{
       trace1("parameterparse", cmd.tail());
-      parse(cmd, pl);
+      parse(cmd, Scope);
       DEV_DOT* dd = new DEV_DOT();
       assert(dd);
       dd->set(cmd.fullstring());
@@ -88,7 +88,8 @@ public:
     }
   }
 
-  void parse(CS& cmd, PARAM_LIST* pl) {
+  void parse(CS& cmd, CARD_LIST* Scope) {
+    PARAM_LIST* pl = Scope->params();
     (cmd >> "real |integer "); // ignore type
     size_t here = cmd.cursor();
     for (;;) {
@@ -132,14 +133,38 @@ public:
 	}
 
 	if(range){
-	  lb = cmd.ctos(":");
+	  {
+	    Expression L;
+	    cmd >> L;
+	    // lb = cmd.ctos(":");
+	    Expression LL(L, Scope); // reduce_copy.
+	    double lb_ = LL.eval();
+	    if(lb_ == NOT_VALID){
+	      incomplete();
+	    }else{
+	    }
+	    lb = to_string(lb_);
+	  }
+
 	  cmd.skip1(":");
-	  ub = cmd.ctos("])");
+//	  ub = cmd.ctos("])");
+	  {
+	    Expression L;
+	    cmd >> L;
+	    // lb = cmd.ctos(":");
+	    Expression LL(L, Scope); // reduce_copy.
+	    double lb_ = LL.eval();
+	    if(lb_ == NOT_VALID){
+	      incomplete();
+	    }else{
+	    }
+	    ub = to_string(lb_);
+	  }
 	  trace2("bounds", lb, ub);
 
 	  if(cmd.skip1(']')){
 	    uo = "<=";
-	  }else if(cmd.skip1(')')){ untested();
+	  }else if(cmd.skip1(')')){
 	    uo = "<";
 	  }else{ untested();
 	  }
