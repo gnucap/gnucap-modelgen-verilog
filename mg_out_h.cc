@@ -305,8 +305,8 @@ static void make_module(std::ostream& o, const Module& m)
   o << "public:\n";
   declare_ddouble(o, m);
   o << "private: // data\n";
-  size_t total_nodes = m.nodes().size() + 10;
-  o << ind << "node_t _nodes[" << total_nodes << "];\n";
+  size_t total_nodes = m.nodes().size();
+  o__ "node_t _nodes[" << total_nodes << "];\n";
   o << "public: // netlist\n";
   for (Element_2_List::const_iterator
        p = m.element_list().begin();

@@ -1002,7 +1002,7 @@ public:
     d_potential_b_p_n,
      num_branches__  };
 private: // data
-  node_t _nodes[12];
+  node_t _nodes[2];
 public: // netlist
   ELEMENT* _b_p_n{NULL}; // branch
 private: // func decl
@@ -2473,7 +2473,7 @@ public:
     d_potential_b_p_n,
      num_branches__  };
 private: // data
-  node_t _nodes[13];
+  node_t _nodes[3];
 public: // netlist
   ELEMENT* _b_p_n{NULL}; // branch
   ELEMENT* _b_ddt_0_{NULL}; // filter
@@ -3052,7 +3052,7 @@ public:
     d_potential_b_p_n,
      num_branches__  };
 private: // data
-  node_t _nodes[13];
+  node_t _nodes[3];
 public: // netlist
   ELEMENT* _b_p_n{NULL}; // branch
   ELEMENT* _b_ddt_1_{NULL}; // filter
