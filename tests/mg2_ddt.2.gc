@@ -29,3 +29,4 @@ R2  3  0  1.
 * .tcap C2  3  0  1  0  1.
 .print tran v nodes
 .tran 1
+.status notime

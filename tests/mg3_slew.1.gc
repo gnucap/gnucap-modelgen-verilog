@@ -26,4 +26,5 @@ spice
 
 Vin 1 0 sin f=1 a=1 delay={-.1}
 .print tran v(nodes)
+.status notime
 .tran 1

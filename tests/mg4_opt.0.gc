@@ -1,0 +1,36 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_opt_0(a, b);
+	electrical a, b;
+	inout a, b;
+	localparam real x = 0.;
+	analog begin
+		if(0)
+			V(a,b) <+ 0;
+		if(0==1)
+			V(a,b) <+ 0;
+		if(1==x)
+			V(a,b) <+ 0;
+	end
+endmodule
+
+!make test_opt_0.so > /dev/null
+attach ./test_opt_0.so
+
+parameter r=1
+parameter v=0
+
+test_opt_0 #() dut(0,0);
+
+list
+
+print dc v(dut.*)
+
+dc
+status notime
+end

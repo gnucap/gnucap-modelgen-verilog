@@ -20,3 +20,8 @@ vsin #(.ampl(1),.dc(v)) v1 (.p(1),.n(0));
  0.8       -0.95106    4.1894     4.1894     6.        
  0.9       -0.58779    10.341     10.341     3.        
  1.         0.         13.17      13.17      3.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=92, fourier=0, total=123
+transient timesteps: accepted=24, rejected=7, total=31
+nodes: user=1, subckt=0, model=1, total=2
+dctran density=100.0%, ac density=100.0%

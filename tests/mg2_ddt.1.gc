@@ -35,4 +35,5 @@ list
 
 print tran v(1) idtddt(dut) ddtidt(dut) i(dut.ddt_*) i(dut.idt_*) iter(0)
 tran 1 .1 trace=n
+status notime
 end
