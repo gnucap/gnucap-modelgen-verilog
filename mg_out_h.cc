@@ -172,7 +172,7 @@ static void make_common(std::ostream& o, const Module& m)
     "  bool     operator==(const COMMON_COMPONENT&)const override;\n"
     "  COMMON_COMPONENT* clone()const override {return new "<<class_name<<"(*this);}\n"
     "  void     set_param_by_index(int, std::string&, int)override;\n"
-    "  void     set_param_by_name(std::string, std::string)override;\n"
+    "  aidx     set_param_by_name(std::string, std::string)override;\n"
     "  bool     is_valid()const;\n"
     "  bool     param_is_printable(int)const override;\n"
     "  std::string param_name(int)const override;\n"

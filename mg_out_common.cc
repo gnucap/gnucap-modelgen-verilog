@@ -136,7 +136,7 @@ static void make_common_operator_equal(std::ostream& out, const Module& d)
 /*--------------------------------------------------------------------------*/
 void make_common_set_param_by_name(std::ostream& o, const Module& m)
 {
-  o << "void COMMON_" << m.identifier() << "::set_param_by_name("
+  o << "aidx COMMON_" << m.identifier() << "::set_param_by_name("
        "std::string Name, std::string Value)\n{\n";
 
   // BUG, mix into name/alias map below
@@ -223,10 +223,11 @@ void make_common_set_param_by_name(std::ostream& o, const Module& m)
     o____ "break; // " << alias[n] << "\n";
     --cnt;
   }
-  o____ "case 0: COMMON_COMPONENT::set_param_by_name(Name, Value); break;\n";
+  o____ "case 0: return COMMON_COMPONENT::set_param_by_name(Name, Value); break;\n";
 
 
   o__ "}\n";
+  o__ "return lb;\n";
 
   o << "}\n"
     "/*--------------------------------------------------------------------------*/\n";

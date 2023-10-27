@@ -78,10 +78,10 @@ private:
   std::string value_name()const override{unreachable(); return "";}
   std::string port_name(int)const override;
   bool print_type_in_spice()const override {unreachable(); return false; }
-  void set_port_by_name(std::string& name, std::string& value)override{
+  int set_port_by_name(std::string& name, std::string& value)override{
     assert(_dev);
     trace4("PARAMSET::spbn", long_label(), name, value, max_nodes());
-    BASE_SUBCKT::set_port_by_name(name, value);
+    return BASE_SUBCKT::set_port_by_name(name, value);
   }
   void set_port_by_index(int Index, std::string& Value)override{
     grow_nodes(Index);
@@ -95,7 +95,7 @@ private:
   bool is_valid() const override;
 /*--------------------------------------------------------------------------*/
 
-  void set_param_by_name(std::string Name, std::string Value) override;
+  int set_param_by_name(std::string Name, std::string Value) override;
 
 //  CARD_LIST* scope() override{ untested();
 //    return COMPONENT::scope();
@@ -322,7 +322,7 @@ void PARAMSET::grow_nodes(size_t Index)
   }
 }
 /*--------------------------------------------------------------------------*/
-void PARAMSET::set_param_by_name(std::string Name, std::string Value)
+int PARAMSET::set_param_by_name(std::string Name, std::string Value)
 {
   trace3("PARAMSET::spbn", long_label(), Name, Value);
   assert(_parent);

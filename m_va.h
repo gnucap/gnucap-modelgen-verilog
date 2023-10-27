@@ -30,6 +30,9 @@
 #include <e_base.h> // CKT_BASE
 #include <u_sim_data.h> // see simparam
 
+// attribute index
+typedef int aidx;
+
 namespace notstd {
 /*--------------------------------------------------------------------------*/
 template <class InputIter, class Size, class OutputIter>

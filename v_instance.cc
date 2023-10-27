@@ -110,7 +110,7 @@ protected:
   void set_port_by_index(int Index, std::string& Value)override;
 
   // override. the base class does not know about _parent.
-  void set_port_by_name(std::string& name, std::string& ext_name)override;
+  int set_port_by_name(std::string& name, std::string& ext_name)override;
   int		min_nodes()const override	{return 0;}
   int		ext_nodes()const override	{return net_nodes();}
   int		matrix_nodes()const override	{return 0;}
@@ -149,9 +149,10 @@ private: // overrides
   bool param_is_printable(int)const override {
     return true;
   }
-  void set_param_by_name(std::string name, std::string value) override {
+  int set_param_by_name(std::string name, std::string value) override {
     _params.push_back(std::make_pair(name, value));
     // mutable_common()->set_param_by_name(name, value); // ?
+    return 0.; // incomplete.
   }
   std::string param_name(int i, int j) const override { untested();
     if(j==0){ untested();
@@ -227,13 +228,15 @@ public:
     BASE_SUBCKT::set_port_by_index(Index, Value);
   }
 
-  void set_port_by_name(std::string&, std::string&)override { untested();
+  int set_port_by_name(std::string&, std::string&)override { untested();
     unreachable();
+    return 0.;
   }
 //  int		max_nodes()const	{ return int(_nodes.size());}
 
-  void set_param_by_name(std::string name, std::string value)override { untested();
+  int set_param_by_name(std::string name, std::string value)override { untested();
     trace3("proto:spbn", long_label(), name, value);
+    return 0.; // incomplete.
   }
 
   static void cleanup();
@@ -724,7 +727,7 @@ void INSTANCE::set_port_by_index(int Index, std::string& Value)
   }
 }
 /*--------------------------------------------------------------------------*/
-void INSTANCE::set_port_by_name(std::string& name, std::string& ext_name)
+int INSTANCE::set_port_by_name(std::string& name, std::string& ext_name)
 {
   trace3("INSTANCE::pbn", long_label(), name, ext_name);
 
@@ -746,6 +749,7 @@ void INSTANCE::set_port_by_name(std::string& name, std::string& ext_name)
   _proto->set_port_by_index(i, name);
 
   assert(scope()!=subckt());
+  return i; // really?
 }
 /*--------------------------------------------------------------------------*/
 void DEV_INSTANCE_PROTO::cleanup()

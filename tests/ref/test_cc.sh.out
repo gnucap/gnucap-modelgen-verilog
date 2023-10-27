@@ -39,6 +39,9 @@
 #include <e_base.h> // CKT_BASE
 #include <u_sim_data.h> // see simparam
 
+// attribute index
+typedef int aidx;
+
 namespace notstd {
 /*--------------------------------------------------------------------------*/
 template <class InputIter, class Size, class OutputIter>
@@ -973,7 +976,7 @@ public:
   bool     operator==(const COMMON_COMPONENT&)const override;
   COMMON_COMPONENT* clone()const override {return new COMMON_resistor(*this);}
   void     set_param_by_index(int, std::string&, int)override;
-  void     set_param_by_name(std::string, std::string)override;
+  aidx     set_param_by_name(std::string, std::string)override;
   bool     is_valid()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
@@ -1098,7 +1101,7 @@ void COMMON_resistor::set_param_by_index(int I, std::string& Value, int Offset)
   }
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
+aidx COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
 {
   if(Name == "$mfactor"){ Name = "m"; }
   static std::string names[] = {"r"  };
@@ -1121,8 +1124,9 @@ void COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
   assert(lb<=ub);
   switch(ub-lb){
     case 1:_p_r = Value;    break; // 0
-    case 0: COMMON_COMPONENT::set_param_by_name(Name, Value); break;
+    case 0: return COMMON_COMPONENT::set_param_by_name(Name, Value); break;
   }
+  return lb;
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_resistor::param_is_printable(int i)const
@@ -1503,6 +1507,9 @@ void MOD_resistor::precalc_last()
 #include <l_stlextra.h>
 #include <e_base.h> // CKT_BASE
 #include <u_sim_data.h> // see simparam
+
+// attribute index
+typedef int aidx;
 
 namespace notstd {
 /*--------------------------------------------------------------------------*/
@@ -2439,7 +2446,7 @@ public:
   bool     operator==(const COMMON_COMPONENT&)const override;
   COMMON_COMPONENT* clone()const override {return new COMMON_capacitor(*this);}
   void     set_param_by_index(int, std::string&, int)override;
-  void     set_param_by_name(std::string, std::string)override;
+  aidx     set_param_by_name(std::string, std::string)override;
   bool     is_valid()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
@@ -2580,7 +2587,7 @@ void COMMON_capacitor::set_param_by_index(int I, std::string& Value, int Offset)
   }
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
+aidx COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
 {
   if(Name == "$mfactor"){ Name = "m"; }
   static std::string names[] = {"c"  };
@@ -2603,8 +2610,9 @@ void COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
   assert(lb<=ub);
   switch(ub-lb){
     case 1:_p_c = Value;    break; // 0
-    case 0: COMMON_COMPONENT::set_param_by_name(Name, Value); break;
+    case 0: return COMMON_COMPONENT::set_param_by_name(Name, Value); break;
   }
+  return lb;
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_capacitor::param_is_printable(int i)const
@@ -3007,7 +3015,7 @@ public:
   bool     operator==(const COMMON_COMPONENT&)const override;
   COMMON_COMPONENT* clone()const override {return new COMMON_capacitor(*this);}
   void     set_param_by_index(int, std::string&, int)override;
-  void     set_param_by_name(std::string, std::string)override;
+  aidx     set_param_by_name(std::string, std::string)override;
   bool     is_valid()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
@@ -3166,7 +3174,7 @@ void COMMON_capacitor::set_param_by_index(int I, std::string& Value, int Offset)
   }
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
+aidx COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
 {
   if(Name == "$mfactor"){ Name = "m"; }
   static std::string names[] = {"c", "ic"  };
@@ -3190,8 +3198,9 @@ void COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
   switch(ub-lb){
     case 2:_p_c = Value;    break; // 0
     case 1:_p_ic = Value;    break; // 0
-    case 0: COMMON_COMPONENT::set_param_by_name(Name, Value); break;
+    case 0: return COMMON_COMPONENT::set_param_by_name(Name, Value); break;
   }
+  return lb;
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_capacitor::param_is_printable(int i)const
