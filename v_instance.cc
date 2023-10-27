@@ -352,7 +352,13 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
 
     CARD_LIST::const_iterator i = toplevel.find_(modelname);
     while(i != toplevel.end()) {
-      error(bLOG, long_label() + ": " + modelname + " from top level\n");
+      std::string desc = ((*i)->attributes(*i))[std::string("desc")];
+      if(desc == "0"){
+	desc = "";
+      }else{
+	desc = ": " + desc;
+      }
+      error(bLOG, long_label() + ": " + modelname + " from top level" + desc + "\n");
 
       prepare_overload(*i, modelname, Proto);
       i = toplevel.find_again(modelname, ++i);
@@ -592,7 +598,14 @@ void INSTANCE::expand()
     CARD_LIST::iterator j = i;
       ++i;
     if(!d->is_valid()){
-      error(bTRACE, long_label() + " dropped invalid candidate.\n");
+      std::string desc = (d->attributes(d))[std::string("desc")];
+      if(desc == "0"){
+	desc = "";
+      }else{ untested();
+	desc = ": " + desc;
+      }
+
+      error(bTRACE, long_label() + " dropped invalid candidate"+desc+".\n");
     }else if(!gotit){
 //      error(bTRACE, long_label() + " found valid candidate.\n");
       gotit = prechecked_cast<COMPONENT*>(*j);

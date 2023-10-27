@@ -64,3 +64,8 @@
 * provide (simple) examples
 * fix contribution bug, mg1_polarity1.gc
 * fix getlines memory issue
+
+202310**-dev
+============
+* hotfixes/bugfixes (see git).
+* partial attribute instance in lang_verilog

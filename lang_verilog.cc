@@ -80,6 +80,14 @@ public: // override virtual, called by commands
   BASE_SUBCKT*  parse_module(CS&, BASE_SUBCKT*)override;
   COMPONENT*	parse_instance(CS&, COMPONENT*)override;
   std::string	find_type_in_string(CS&)override;
+private: // local
+  void skip_attributes(CS& cmd);
+  void parse_attributes(CS& cmd, void* x);
+  void parse_type(CS& cmd, CARD* x);
+  void parse_args_paramset(CS& cmd, /* MODEL_*/ CARD* x);
+  void parse_args_instance(CS& cmd, CARD* x);
+  void parse_label(CS& cmd, CARD* x);
+  void parse_ports(CS& cmd, COMPONENT* x, bool all_new);
 
 private: // TODO, transition, stale pure virtuals...
   MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*)
@@ -92,20 +100,44 @@ private: // override virtual, called by print_item
   void print_module(OMSTREAM&, const BASE_SUBCKT*)override;
   void print_instance(OMSTREAM&, const COMPONENT*)override;
   void print_comment(OMSTREAM&, const DEV_COMMENT*)override;
-  void print_command(OMSTREAM& o, const DEV_DOT* c)override;
+  void print_command(OMSTREAM& o, const DEV_DOT*)override;
 private: // local
+  void print_attributes(OMSTREAM&, const void*);
   void print_args(OMSTREAM&, const MODEL_CARD*);
   void print_args(OMSTREAM&, const COMPONENT*);
   template<class T>
   void print_args_paramset(OMSTREAM&, const T*);
   void print_items_sckt(OMSTREAM&, const BASE_SUBCKT*);
+  void print_type(OMSTREAM& o, const COMPONENT* x);
+  void print_label(OMSTREAM& o, const COMPONENT* x);
+  void print_ports_long(OMSTREAM& o, const COMPONENT* x);
+  void print_ports_short(OMSTREAM& o, const COMPONENT* x);
 } lang_verilog;
 
 DISPATCHER<LANGUAGE>::INSTALL
 	d(&language_dispatcher, lang_verilog.name(), &lang_verilog);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-static void parse_type(CS& cmd, CARD* x)
+void LANG_VERILOG::skip_attributes(CS& cmd)
+{
+  while (cmd >> "(*") {
+    cmd.skipto1('*') && (cmd >> "*)");
+  }
+}
+/*--------------------------------------------------------------------------*/
+void LANG_VERILOG::parse_attributes(CS& cmd, void* x)
+{
+  assert(x);
+  while (cmd >> "(*") {
+    std::string attrib_string;
+    while(cmd.ns_more() && !(cmd >> "*)")) {
+      attrib_string += cmd.ctoc();
+    }
+    attributes(x).add_to(attrib_string, x);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void LANG_VERILOG::parse_type(CS& cmd, CARD* x)
 {
   assert(x);
   std::string new_type;
@@ -113,7 +145,7 @@ static void parse_type(CS& cmd, CARD* x)
   x->set_dev_type(new_type);
 }
 /*--------------------------------------------------------------------------*/
-static void parse_args_paramset(CS& cmd, CARD* x)
+void LANG_VERILOG::parse_args_paramset(CS& cmd, CARD* x)
 {
   assert(x);
 
@@ -129,7 +161,7 @@ static void parse_args_paramset(CS& cmd, CARD* x)
   }
 }
 /*--------------------------------------------------------------------------*/
-static void parse_args_instance(CS& cmd, CARD* x)
+void LANG_VERILOG::parse_args_instance(CS& cmd, CARD* x)
 {
   assert(x);
 
@@ -166,7 +198,7 @@ static void parse_args_instance(CS& cmd, CARD* x)
   }
 }
 /*--------------------------------------------------------------------------*/
-static void parse_label(CS& cmd, CARD* x)
+void LANG_VERILOG::parse_label(CS& cmd, CARD* x)
 {
   assert(x);
   std::string my_name;
@@ -178,7 +210,7 @@ static void parse_label(CS& cmd, CARD* x)
   }
 }
 /*--------------------------------------------------------------------------*/
-static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
+void LANG_VERILOG::parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 {
   assert(x);
 
@@ -261,8 +293,8 @@ DEV_DOT* LANG_VERILOG::parse_command(CS& cmd, DEV_DOT* x)
   assert(x);
   x->set(cmd.fullstring());
   CARD_LIST* scope = (x->owner()) ? x->owner()->subckt() : &CARD_LIST::card_list;
-
   cmd.reset();
+  parse_attributes(cmd, x);
   CMD::cmdproc(cmd, scope);
   delete x;
   return NULL;
@@ -315,6 +347,7 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
   assert(x);
 
   cmd.reset();
+  parse_attributes(cmd, x);
   cmd >> "paramset ";
   parse_label(cmd, x);
   parse_type(cmd, x);
@@ -369,6 +402,7 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
 
   // header
   cmd.reset();
+  parse_attributes(cmd, x);
   (cmd >> "module |macromodule ");
   parse_label(cmd, x);
   parse_ports(cmd, x, true/*all new*/);
@@ -413,6 +447,7 @@ COMPONENT* LANG_VERILOG::parse_instance(CS& cmd, COMPONENT* x)
 {
   assert(x);
   cmd.reset();
+  parse_attributes(cmd, x);
   parse_type(cmd, x);
   parse_args_instance(cmd, x);
   parse_label(cmd, x);
@@ -424,10 +459,11 @@ COMPONENT* LANG_VERILOG::parse_instance(CS& cmd, COMPONENT* x)
 /*--------------------------------------------------------------------------*/
 std::string LANG_VERILOG::find_type_in_string(CS& cmd)
 {
+  skip_attributes(cmd);
   size_t here = cmd.cursor();
   std::string type;
   if ((cmd >> "//")) {
-    assert(here == 0);
+    //assert(here == 0);
     type = "dev_comment";
   }else{
     cmd >> type;
@@ -443,6 +479,15 @@ void LANG_VERILOG::parse_top_item(CS& cmd, CARD_LIST* Scope)
   new__instance(cmd, NULL, Scope);
 }
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+void LANG_VERILOG::print_attributes(OMSTREAM& o, const void* x)
+{
+  assert(x);
+  if (attributes(x)) {
+    o << "(* " << attributes(x).string(NULL) << " *) ";
+  }else{
+  }
+}
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_args(OMSTREAM& o, const MODEL_CARD* x)
 {
@@ -477,7 +522,7 @@ void LANG_VERILOG::print_args_paramset(OMSTREAM& o, const T* x)
     { // slow? use common->_params..?
       for (int ii = x->param_count() - 1;  ii >= 0;  --ii) {
 	if (x->param_is_printable(ii)) {
-	  o << " ." << x->param_name(ii) << "=" << x->param_value(ii) << ";";
+	  o << " ." << x->param_name(ii) << '=' << x->param_value(ii) << ";";
 //	  o << arg;
 	}else{
 	}
@@ -514,19 +559,19 @@ void LANG_VERILOG::print_args(OMSTREAM& o, const COMPONENT* x)
   o << ") ";
 }
 /*--------------------------------------------------------------------------*/
-static void print_type(OMSTREAM& o, const COMPONENT* x)
+void LANG_VERILOG::print_type(OMSTREAM& o, const COMPONENT* x)
 {
   assert(x);
   o << x->dev_type();
 }
 /*--------------------------------------------------------------------------*/
-static void print_label(OMSTREAM& o, const COMPONENT* x)
+void LANG_VERILOG::print_label(OMSTREAM& o, const COMPONENT* x)
 {
   assert(x);
   o << x->short_label();
 }
 /*--------------------------------------------------------------------------*/
-static void print_ports_long(OMSTREAM& o, const COMPONENT* x)
+void LANG_VERILOG::print_ports_long(OMSTREAM& o, const COMPONENT* x)
 {
   // print in long form ...    .name(value)
   assert(x);
@@ -549,7 +594,7 @@ static void print_ports_long(OMSTREAM& o, const COMPONENT* x)
   o << ")";
 }
 /*--------------------------------------------------------------------------*/
-static void print_ports_short(OMSTREAM& o, const COMPONENT* x)
+void LANG_VERILOG::print_ports_short(OMSTREAM& o, const COMPONENT* x)
 {
   // print in short form ...   value only
   assert(x);
@@ -581,12 +626,14 @@ void LANG_VERILOG::print_paramset(OMSTREAM& o, const CARD* c)
 {
   if(auto x = prechecked_cast<MODEL_CARD const*>(c)){ untested();
     _mode = mPARAMSET;
+    print_attributes(o, x);
     o << "paramset " << x->short_label() << ' ' << x->dev_type() << ";\n";
     print_args(o, x);
     o << "\n"
       "endparamset\n\n";
     _mode = mDEFAULT;
   }else if(auto x = prechecked_cast<BASE_SUBCKT const*>(c)){
+    print_attributes(o, x);
     o << "paramset " << x->short_label() << ' ' << c->dev_type() << ";\n";
     print_items_sckt(o, x);
     print_args_paramset(o, x);
@@ -607,6 +654,7 @@ void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
   assert(x);
   assert(x->subckt());
 
+  print_attributes(o, x);
   o << "module " << x->short_label();
   print_ports_short(o, x);
   o << ";\n";
@@ -616,6 +664,7 @@ void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_instance(OMSTREAM& o, const COMPONENT* x)
 {
+  print_attributes(o, x);
   if(x->is_device()){
     print_type(o, x);
     print_args(o, x);

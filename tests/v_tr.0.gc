@@ -1,7 +1,7 @@
-verilog
 load ../lang_verilog.so
 load ../vams/capacitor.so
 load ../d_vasrc.so
+verilog
 
 module rc(1, 2, gnd)
 	parameter ic=1
