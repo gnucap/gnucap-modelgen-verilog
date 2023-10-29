@@ -778,6 +778,14 @@ void DEV_INSTANCE_PROTO::cleanup()
 class CLEANUP : public CMD {
   void do_it(CS&, CARD_LIST*)override {
     DEV_INSTANCE_PROTO::cleanup();
+    for(auto i : device_dispatcher){
+      auto s = dynamic_cast<BASE_SUBCKT *>(i.second);
+      if(!s){
+      }else if(s->subckt()){
+	s->subckt()->erase_all();
+      }else{
+      }
+    }
     CMD::command("clear:0", &CARD_LIST::card_list);
   }
 }p3;
