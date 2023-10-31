@@ -6,7 +6,7 @@ module capacitor(p,n);
 
 	parameter real c = 1. from [0:inf);
 	analog begin
-		I(p,n) <+ c * ddt(V(p,n));
+		I(p,n) <+ ddt(c * V(p,n));
 	end
 endmodule
 
@@ -20,7 +20,7 @@ module capacitor(p,n);
 		if (analysis("ic"))
 			V(p,n) <+ ic;
 		else
-			I(p,n) <+ c * ddt(V(p,n));
+			I(p,n) <+ ddt(c * V(p,n));
 	end
 endmodule
 
