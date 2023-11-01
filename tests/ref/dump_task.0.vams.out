@@ -9,7 +9,9 @@ module foo();
     $finish(1);
   end
 
-  analog   $strobe("some strobe %f.", x);
+  analog begin
+    $strobe("some strobe %f.", x);
+  end
 
   analog begin
     $finish();

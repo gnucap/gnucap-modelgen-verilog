@@ -1,0 +1,8 @@
+`include "sub/disciplines.few"
+
+module test()
+  real i;
+  analog begin
+  for(i=0; 0; j=i+1) begin
+  end
+endmodule;

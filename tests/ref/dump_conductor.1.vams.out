@@ -55,7 +55,9 @@ module conductor(p, n);
   electrical p, n;
   parameter real g = 0;
 
-  analog   I(p, n) <+ (g * V(p, n));
+  analog begin
+    I(p, n) <+ (g * V(p, n));
+  end
 
 endmodule
 

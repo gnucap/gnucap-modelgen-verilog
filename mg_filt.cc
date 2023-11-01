@@ -147,7 +147,7 @@ public:
       }
     o << ");\n";
   }
-  void make_cc_impl_comm(std::ostream&o)const{ untested();
+  void make_cc_impl_comm(std::ostream&)const{ untested();
     unreachable();
 #if 0
     assert(_m); // owner?
@@ -258,7 +258,7 @@ void Token_XDT::stack_op(Expression* e)const
   auto ff = prechecked_cast<XDT const*>(f());
   assert(ff);
 
-  if(auto dd = prechecked_cast<Deps const*>(cc->data())){
+  if(auto dd = prechecked_cast<Deps const*>(cc->data())) {
     assert(dd);
 
     ff->_br->deps().clear();
@@ -267,17 +267,21 @@ void Token_XDT::stack_op(Expression* e)const
     auto d = new Deps;
     d->insert(Dep(ff->prb())); // BUG?
     auto N = new Token_XDT(*this, d, cc->args()?cc->args()->clone():NULL);
+    assert(N->data());
+    assert(dynamic_cast<Deps const*>(N->data()));
     e->push_back(N);
     assert(f()==N->f());
     delete(cc);
-  }else if(!e->size()) {
+  }else if(!e->size()) { untested();
     unreachable();
-  }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) {
+  }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) { untested();
     auto d = new Deps;
     d->insert(Dep(ff->prb())); // BUG?
     auto N = new Token_XDT(*this, d);
+    assert(N->data());
+    assert(dynamic_cast<Deps const*>(N->data()));
     e->push_back(N);
-  }else{
+  }else{ untested();
     unreachable();
   }
 }

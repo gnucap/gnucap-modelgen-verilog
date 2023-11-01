@@ -21,14 +21,14 @@
 #include "mg_.h"
 #include "mg_func.h" // TODO
 #include "m_tokens.h" // Deps
+#include "mg_options.h" // Deps
 /*--------------------------------------------------------------------------*/
 Node mg_ground_node;
-Dep mg_offset(NULL);
+Dep mg_const_dep(NULL);
 /*--------------------------------------------------------------------------*/
 bool ConstantMinTypMaxExpression::empty() const
 {
-  assert(_e);
-  return !_e->size();
+  return _e.is_empty();
 }
 /*--------------------------------------------------------------------------*/
 bool Module::has_analog_block() const
@@ -267,6 +267,7 @@ void Branch::new_deps()
 {
   assert(!_deps);
   _deps = new Deps;
+  assert(_deps->is_linear());
 }
 /*--------------------------------------------------------------------------*/
 size_t Branch::num_branches() const
@@ -296,13 +297,14 @@ size_t Branch::num_nodes() const
   return 2*ret;
 }
 /*--------------------------------------------------------------------------*/
-void Branch::add_probe(Probe const* b)
+void Branch::add_dep(Dep const& b)
 {
 //  if(b->branch() == this){ untested();
 //    _selfdep = true;
 //  }else{ untested();
 //  }
-  deps().insert(Dep(b));
+  // TODO incomplete(); // linear?
+  deps().insert(b);
 }
 /*--------------------------------------------------------------------------*/
 bool Branch::has_pot_probe() const
@@ -664,51 +666,9 @@ void Branch::set_direct(bool d)
   _direct = d;
 }
 /*--------------------------------------------------------------------------*/
-void Contribution::set_direct(bool d)
+double Assignment::eval() const
 {
-  assert(_branch);
-  _branch->set_direct(d);
-}
-/*--------------------------------------------------------------------------*/
-bool Contribution::is_direct() const
-{
-  assert(_branch);
-  return _branch->is_direct();
-}
-/*--------------------------------------------------------------------------*/
-void Contribution::set_pot_contrib()
-{
-  assert(_branch);
-  _branch->set_pot_source();
-  _type = t_pot;
-}
-/*--------------------------------------------------------------------------*/
-void Contribution::set_flow_contrib()
-{
-  assert(_branch);
-  _branch->set_flow_source();
-  _type = t_flow;
-}
-/*--------------------------------------------------------------------------*/
-bool Contribution::is_flow_contrib() const
-{
-  return _type == t_flow;
-}
-/*--------------------------------------------------------------------------*/
-bool Contribution::is_pot_contrib() const
-{
-  return _type == t_pot;
-}
-/*--------------------------------------------------------------------------*/
-Contribution::~Contribution()
-{
-  if(!_branch) { untested();
-    incomplete();
-  }else if (is_flow_contrib()) {
-    _branch->dec_flow_source();
-  }else if(is_pot_contrib()) {
-    _branch->dec_pot_source();
-  }
+  return rhs().eval();
 }
 /*--------------------------------------------------------------------------*/
 bool Assignment::is_module_variable() const
@@ -862,20 +822,20 @@ void Block::push_back(Base* c)
   }
 }
 /*--------------------------------------------------------------------------*/
-Base const* Block::resolve(std::string const& k) const
-{ untested();
+Base const* Block::lookup(std::string const& k, bool) const
+{
   Block* b = const_cast<Block*>(this);
-  return b->resolve(k);
+  return b->lookup(k);
 }
 /*--------------------------------------------------------------------------*/
-Base* Block::resolve(std::string const& k)
+Base* Block::lookup(std::string const& k, bool)
 {
-  trace2("resolve", _owner, k);
+  trace2("lookup", _owner, k);
   const_iterator f = _var_refs.find(k);
   if(f != _var_refs.end()) {
     return f->second;
   }else if(_owner) {
-    return _owner->resolve(k);
+    return _owner->lookup(k);
   }else{
     assert(dynamic_cast<File const*>(this));
     return NULL;
@@ -923,7 +883,7 @@ bool is_false(Expression const& x)
 }
 /*--------------------------------------------------------------------------*/
 bool is_zero(Expression const& x)
-{ untested();
+{
   double e = x.eval();
   return e == 0.;
 }
@@ -951,10 +911,42 @@ Deps* copy_deps(Base const* b)
 {
   if(auto t=dynamic_cast<Deps const*>(b)){
     return t->clone();
-  }else{ untested();
+  }else{
     incomplete();
     unreachable();
     return NULL;
+  }
+}
+/*--------------------------------------------------------------------------*/
+// bool ValueRangeSpec::is_constant() const
+// {
+//   if(!_what){
+//     return false;
+//   }else{
+//     return _what->is_constant();
+//   }
+// }
+/*--------------------------------------------------------------------------*/
+bool ConstExpression::operator==(ConstExpression const& o) const
+{
+  double a = _expression.eval();
+  if(a == NOT_INPUT){
+    return false;
+  }else{
+    return a == o._expression.eval();
+  }
+}
+/*--------------------------------------------------------------------------*/
+double ValueRangeInterval::eval() const
+{
+  if(!lb_is_closed()){
+    return NOT_INPUT;
+  }else if(!ub_is_closed()){
+    return NOT_INPUT;
+  }else if(_ub == _lb){
+    return _ub.expression().eval();
+  }else{ untested();
+    return NOT_INPUT;
   }
 }
 /*--------------------------------------------------------------------------*/

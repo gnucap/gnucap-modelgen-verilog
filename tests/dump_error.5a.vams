@@ -1,0 +1,9 @@
+
+`include "sub/disciplines.few"
+
+module test(n, p)
+electrical n, p;
+	analog begin
+		V(n, p) 17.
+	end
+endmodule

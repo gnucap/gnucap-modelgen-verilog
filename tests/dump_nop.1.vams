@@ -1,18 +1,19 @@
 
 `include "sub/disciplines.few"
+`pragma modelgen dump-unreachable
 
-module test(d, g, s, b);
-	electrical d, g;
+module test(a, b);
+	electrical a, b;
+	parameter real arg=0 from [0.:0.];
 	real T;
 	real U;
 	analog begin
-		T = V(d, g) + 0.;
-		T = 0. + V(d, g);
-		T = 1. + V(d, g);
+		if(0)
+			V(a) <+ 1;
+		else
+			V(a) <+ 2;
+
+		if(arg)
+			V(b) <+ 1;
 	end
 endmodule
-
-
-
-
-

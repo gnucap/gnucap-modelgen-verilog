@@ -42,8 +42,9 @@ public:
   explicit Dep(Probe const* p) : _prb(p) {}
   explicit Dep(Probe const* p, dep_order) : _prb(p), _order() {}
 
-  bool is_linear() const{ return _order<=_LINEAR; }
-  bool is_quadratic() const{ return _order<=_QUADRATIC; }
+  int order()const {return _order;}
+  bool is_linear()const { return _order<=_LINEAR; }
+  bool is_quadratic()const { return _order<=_QUADRATIC; }
 
   bool same_data(Dep const& o)const;
 
@@ -52,14 +53,18 @@ public:
   Probe const* operator*() const{ return _prb; }
   operator Probe const*() const{ return _prb; }
 };
+extern Dep mg_const_dep; // REMOVE?
 /*--------------------------------------------------------------------------*/
 class Deps : public Base {
   typedef std::vector<Dep> S;
   typedef S::const_iterator const_iterator;
   /* mutable */ S _s;
+  bool _offset{false};
+public:
+  static Deps _no_deps;
 public:
   explicit Deps() : Base() {}
-  explicit Deps(Deps const& d) : Base(), _s(d._s) { }
+  explicit Deps(Deps const& o) : Base(), _s(o._s), _offset(o._offset) { }
   ~Deps();
   Deps* clone()const {
     return new Deps(*this);
@@ -76,6 +81,10 @@ public:
   void clear(){
     _s.clear();
   }
+  void set_offset(bool v = true){_offset = v;}
+  bool is_offset() const {return _offset;}
+  bool is_linear() const;
+  bool is_quadratic() const;
 private:
   void parse(CS&)override {unreachable();}
   void dump(std::ostream&)const override {unreachable();}
@@ -93,11 +102,87 @@ public:
   bool empty() const{
     return _s.empty();
   }
+  Base* combine(const Base* X)const;
+  Deps* multiply(const Base* X)const override; // {incomplete(); return NULL;}
+  Base* subtract(const Base*)const override	{incomplete(); return NULL;}
+  Base* r_subtract(const Base*)const override	{incomplete(); return NULL;}
+  Base* divide(const Base* X)const override;  //{incomplete(); return NULL;}
+  Base* r_divide(const Base*)const override   {incomplete(); return NULL;}	
+  Base* modulo(const Base*)const override     {incomplete(); return NULL;}	
+
+  Base* multiply(const Float*)const override	{unreachable(); return NULL;}
+  Base* subtract(const Float*)const override	{unreachable(); return NULL;}
+  Base* r_subtract(const Float*)const override	{unreachable(); return NULL;}
+  Base* divide(const Float*)const override	{unreachable(); return NULL;}
+  Base* r_divide(const Float*)const override    {unreachable(); return NULL;}	
+  Base* modulo(const Float*)const override      {unreachable(); return NULL;}	
+
+  Base* multiply(const String*)const override	{unreachable(); return NULL;}
+  Base* subtract(const String*)const override	{unreachable(); return NULL;}
+  Base* r_subtract(const String*)const override	{unreachable(); return NULL;}
+  Base* divide(const String*)const override	{unreachable(); return NULL;}
+  Base* r_divide(const String*)const override   {unreachable(); return NULL;}	
+  Base* modulo(const String*)const override     {unreachable(); return NULL;}	
+};
+/*--------------------------------------------------------------------------*/
+// use ValueRange from mg_.h?
+class Range : public Base {
+public:
+  static Range _unknown;
+  explicit Range() : Base() {}
+public:
+  Range* multiply(const Base*)const override {
+    return NULL;
+  }
+  Base* multiply(const Float*)const override	{untested(); return NULL;}
+  Base* multiply(const String*)const override	{untested(); return NULL;}
+
+private:
+  void parse(CS&)override {unreachable();}
+  void dump(std::ostream&)const override {unreachable();}
+};
+/*--------------------------------------------------------------------------*/
+class Attrib : public Base {
+  Deps const* _deps{NULL};
+  Range const* _range{NULL};
+//  DataType _type;?
+public:
+  explicit Attrib() : Base() {}
+  ~Attrib();
+private:
+  explicit Attrib(Attrib const&) : Base() { }
+  Attrib* clone()const {
+    return new Attrib(*this);
+  }
+  void set_deps(Deps const* d) { assert(!_deps); _deps=d; }
+  void set_range(Range const* r) { assert(!_range); _range=r; }
+  Deps const& deps() const{
+    if(_deps){
+      return *_deps;
+    }else{
+      return Deps::_no_deps;
+    }
+  }
+  Range const& range() const{
+    if(_range){
+      return *_range;
+    }else{
+      return Range::_unknown;
+    }
+  }
+private:
+  void parse(CS&)override {unreachable();}
+  void dump(std::ostream&)const override {unreachable();}
+public:
+//  Attrib& operator=(Attrib const& o){
+//    _deps = o._deps;
+//    _range = o._range;
+//    return *this;
+//  }
   Base* multiply(const Base* X)const override	{
-    auto n = clone();
-    auto o = prechecked_cast<Deps const*>(X);
-    assert(o);
-    n->update(*o);
+    Attrib* n = clone();
+    n->set_deps(deps().multiply(X));
+    n->set_range(range().multiply(X));
     return n;
   }
   Base* subtract(const Base*)const override	{incomplete(); return NULL;}

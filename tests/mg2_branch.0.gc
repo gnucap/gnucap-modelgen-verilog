@@ -12,7 +12,7 @@ module test_branch_0(p, n);
 	branch (p, n) br, br_alias;
 	branch (n, p) br_reverse;
 	analog begin
-		i = V(br)
+		i = V(br);
 		I(br_alias) <+ i/2;
 		I(br_reverse) <+ - i/2;
 	end

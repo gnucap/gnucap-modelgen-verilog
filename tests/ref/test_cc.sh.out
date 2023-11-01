@@ -1257,7 +1257,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         _v_i = t0.value(); // (*)
         _v_i[d_potential_b_p_n] = t0[d_potential_b_p_n]; // (2b)
       }
-      { // Contribution I(p, n)
+      { // Contribution I(p, n) lin: 1
         ddouble t0;
         t0 = _v_i;
         d->_value_b_p_n += t0.value();
@@ -1346,7 +1346,11 @@ void MOD_resistor::expand()
     if (!_b_p_n) {
       const CARD* p = device_dispatcher["va_flow"]; // va_flow
       if(!p){
+<<<<<<< HEAD
 ;        throw Exception("Cannot find va_flow. Load module?");
+=======
+        throw Exception("Cannot find va_flow. Load module?");
+>>>>>>> 9700f18e (cleanup, refactor..)
       }else{
       }
       _b_p_n = dynamic_cast<ELEMENT*>(p->clone());
@@ -2669,7 +2673,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
   (void)pc;
   {
     { // 
-      { // Contribution I(p, n)
+      { // Contribution I(p, n) lin: 0
         ddouble t0;
         t0 = +p->_potential_b_p_n; // V(p, n)
         t0[d_potential_b_p_n] = +1.;
@@ -2775,7 +2779,7 @@ void MOD_capacitor::expand()
   if (!_b_ddt_0_) {
     const CARD* p = device_dispatcher["va_ddt"]; // va_ddt
     if(!p){
-;      throw Exception("Cannot find va_ddt. Load module?");
+      throw Exception("Cannot find va_ddt. Load module?");
     }else{
     }
     _b_ddt_0_ = dynamic_cast<ELEMENT*>(p->clone());
@@ -2796,7 +2800,11 @@ void MOD_capacitor::expand()
     if (!_b_p_n) {
       const CARD* p = device_dispatcher["va_flow"]; // va_flow
       if(!p){
+<<<<<<< HEAD
 ;        throw Exception("Cannot find va_flow. Load module?");
+=======
+        throw Exception("Cannot find va_flow. Load module?");
+>>>>>>> 9700f18e (cleanup, refactor..)
       }else{
       }
       _b_p_n = dynamic_cast<ELEMENT*>(p->clone());
@@ -3283,36 +3291,40 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
         ddouble t0;
         t0 =  /*(312)*/ /*call1*/_f_analysis(s0);
         if (t0) {
-          { // Contribution V(p, n)
-            ddouble t0;
-            t0 = pc->_p_ic;
-            if (!d->_pot_b_p_n){
-              d->_pot_b_p_n = true;
-              d->_value_b_p_n = 0.;
-              std::fill_n(d->_st_b_p_n+1, 2, 0.);
-            }else{
+          { // 
+            { // Contribution V(p, n) lin: 1
+              ddouble t0;
+              t0 = pc->_p_ic;
+              if (!d->_pot_b_p_n){
+                d->_pot_b_p_n = true;
+                d->_value_b_p_n = 0.;
+                std::fill_n(d->_st_b_p_n+1, 2, 0.);
+              }else{
+              }
+              d->_value_b_p_n += t0.value();
             }
-            d->_value_b_p_n += t0.value();
           }
         }else {
-          { // Contribution I(p, n)
-            ddouble t0;
-            t0 = +p->_potential_b_p_n; // V(p, n)
-            t0[d_potential_b_p_n] = +1.;
-            // function ddt 1
-            t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_1(t0);
-            t0 = pc->_p_c * t0;
-            if (d->_pot_b_p_n){
-              d->_pot_b_p_n = false;
-              d->_value_b_p_n = 0.;
-              std::fill_n(d->_st_b_p_n+1, 2, 0.);
-            }else{
+          { // 
+            { // Contribution I(p, n) lin: 0
+              ddouble t0;
+              t0 = +p->_potential_b_p_n; // V(p, n)
+              t0[d_potential_b_p_n] = +1.;
+              // function ddt 1
+              t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_1(t0);
+              t0 = pc->_p_c * t0;
+              if (d->_pot_b_p_n){
+                d->_pot_b_p_n = false;
+                d->_value_b_p_n = 0.;
+                std::fill_n(d->_st_b_p_n+1, 2, 0.);
+              }else{
+              }
+              d->_value_b_p_n += t0.value();
+              // dep _potential_b_ddt_1_
+              assert(t0[d_potential_b_ddt_1_] == t0[d_potential_b_ddt_1_]);
+              assert(MOD::_st_b_p_n_::dep_potential_b_ddt_1_ < 3);
+              d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_ddt_1_] += t0[d_potential_b_ddt_1_]; // (3)
             }
-            d->_value_b_p_n += t0.value();
-            // dep _potential_b_ddt_1_
-            assert(t0[d_potential_b_ddt_1_] == t0[d_potential_b_ddt_1_]);
-            assert(MOD::_st_b_p_n_::dep_potential_b_ddt_1_ < 3);
-            d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_ddt_1_] += t0[d_potential_b_ddt_1_]; // (3)
           }
         }
 
@@ -3428,7 +3440,7 @@ void MOD_capacitor::expand()
   if (!_b_ddt_1_) {
     const CARD* p = device_dispatcher["va_ddt"]; // va_ddt
     if(!p){
-;      throw Exception("Cannot find va_ddt. Load module?");
+      throw Exception("Cannot find va_ddt. Load module?");
     }else{
     }
     _b_ddt_1_ = dynamic_cast<ELEMENT*>(p->clone());
@@ -3449,7 +3461,7 @@ void MOD_capacitor::expand()
     if (!_b_p_n) {
       const CARD* p = device_dispatcher["va_pot"]; // va_pot
       if(!p){
-;        throw Exception("Cannot find va_pot. Load module?");
+        throw Exception("Cannot find va_pot. Load module?");
       }else{
       }
       _b_p_n = dynamic_cast<ELEMENT*>(p->clone());

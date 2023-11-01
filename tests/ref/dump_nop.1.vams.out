@@ -17,15 +17,23 @@ discipline electrical
 enddiscipline
 
 
-module test(d, g, s, b);
-  electrical d, g;
+module test(a, b);
+  electrical a, b;
+  parameter real arg = 0 from [(0.):(0.)];
+
   real    T;
   real    U;
 
   analog begin
-    T = V(d, g);
-    T = V(d, g);
-    T = (V(d, g) + 1.);
+    if (0) begin
+      V(a) <+ 1;
+    end
+    else begin
+      V(a) <+ 2;
+    end
+    if (arg) begin
+      V(b) <+ 1;
+    end
   end
 
 endmodule

@@ -7,7 +7,7 @@ module test_portbranch(p, n)
 
 	analog begin
 		V(n, p) <+ 0.;
-		i = I(<p>)
+		i = I(<p>);
 	end
 
 endmodule

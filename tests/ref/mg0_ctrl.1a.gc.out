@@ -1,0 +1,4 @@
+test_while0a #(.r(2)) dut (.p(1),.n(0));
+vsource #(.dc(1)) v (.p(1),.n(0));
+#           i(v)       iter(0)   
+ 0.        -0.99999    3.        

@@ -14,7 +14,6 @@
 - llvm build: sometimes crashes during shutown
 
 == libgnucap, TODO
-- parse identifiers in port probes.
 - MODEL_CARD in lang interface
 - BUG: padding long lines with whitespace
 - m vs M vs $mfactor.

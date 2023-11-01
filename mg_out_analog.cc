@@ -21,7 +21,7 @@
 /*--------------------------------------------------------------------------*/
 #include "mg_out.h"
 #include "mg_analog.h"
-#include "m_tokens.h" // Deps
+#include "mg_options.h"
 /*--------------------------------------------------------------------------*/
 static void make_cc_variable(std::ostream& o, Variable const& v)
 {
@@ -84,17 +84,12 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
       o__ lhsname << " = int(t0); // (*)\n";
     }else if(within_af(&a)){
       o__ lhsname << " = t0; // (**)\n";
-    }else{
-#ifdef TRACE_ASSIGN
-#endif
-
-#ifdef PASS_UNUSED_DERIV
-      untested();
+    }else if(!options().optimize_deriv()) { untested();
       o__ lhsname << " = t0; // (*)\n";
-      for(auto v : a.deps()) { untested();
+      for(auto v : a.deps()) {
 	o__ "// " << a.lhs().code_name() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // (2a)\n";
       }
-#else
+    }else{
       o__ lhsname << " = t0.value(); // (*)\n";
 #ifdef TRACE_ASSIGN
       o__ "trace1(\"assign\", " << lhsname << ");\n";
@@ -102,15 +97,27 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
 
       for(auto v : a.deps()) {
 	assert(v->branch());
-	if(v->branch()->is_short()){ untested();
+	if(v.is_linear()){
+	  incomplete();
+	}else if(v.is_quadratic()){
+	  incomplete();
+	}else{
+	  incomplete();
+	}
+
+	if(a.deps().is_linear()) {
+//	}else if(v.is_linear()){ incomplete(); // later.
+	}else{
+	}
+
+	if(v->branch()->is_short()) { untested();
 	}else{
 	  o__ lhsname << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // (2b)\n";
 	}
 #ifdef TRACE_ASSIGN
-      o__ "trace1(\"assign\", " << lhsname << "[d" << v->code_name() << "]);\n";
+	o__ "trace1(\"assign\", " << lhsname << "[d" << v->code_name() << "]);\n";
 #endif
       }
-#endif
     }
   }
   o__ "}\n";
@@ -120,8 +127,10 @@ static void make_cc_contrib(std::ostream& o, Contribution const& C)
 {
   Expression const& e = C.rhs();
 
-  o__ "{ // Contribution " << C.name() << C.branch_ref() << "\n";
-  if(C.branch()->is_short()){
+  o__ "{ // Contribution " << C.name() << C.branch_ref() << " lin: " << C.deps().is_linear() << "\n";
+  if(!C.is_pot_contrib() && is_zero(e)){
+    incomplete(); // ?
+  }else if(C.branch()->is_short()){
   }else{
     indent x("  ");
     make_cc_expression(o, e);
@@ -150,6 +159,16 @@ static void make_cc_contrib(std::ostream& o, Contribution const& C)
     }
 
     assert(C.branch());
+    if(C.branch()->deps().is_linear()) {
+    }else{
+      trace1("nonlinear branch deps", C.branch()->code_name());
+    }
+
+    if(C.deps().is_linear()) {
+      trace1("linear C deps", C.branch()->code_name());
+    }else{
+    }
+
     o__ "d->_value" << bcn << " " << sign << "= t0.value();\n";
     if(C.branch()->has_pot_source()) {
       // incomplete? //
@@ -166,7 +185,6 @@ static void make_cc_contrib(std::ostream& o, Contribution const& C)
       }else{
       }
     }
-    size_t k = 2;
     for(auto v : C.deps()) {
       o__ "// dep " << v->code_name() << "\n";
       assert(v->branch());
@@ -176,10 +194,9 @@ static void make_cc_contrib(std::ostream& o, Contribution const& C)
 	o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
 	o__ "assert(MOD::" << C.branch()->state() << "_::dep" << v->code_name() << " < "
 	   << C.branch()->num_states() << ");\n";
-	o__ "d->" << C.branch()->state() << "[" // << k << "/*"
+	o__ "d->" << C.branch()->state() << "["
 	   << "MOD::" << C.branch()->state() << "_::dep" << v->code_name() << "] "
 	   << sign << "= " << "t0[d" << v->code_name() << "]; // (3)\n";
-	++k;
       }
     }
   }
@@ -196,6 +213,7 @@ static void make_cc_analog_switch(std::ostream& o, AnalogSwitchStmt const& s);
 static void make_cc_analog_for(std::ostream& o, AnalogForStmt const& s);
 static void make_cc_analog_while(std::ostream& o, AnalogWhileStmt const& s);
 static void make_cc_analog_seq(std::ostream& o, AnalogSeqBlock const& s);
+static void make_cc_analog_ctrl(std::ostream& o, AnalogCtrlBlock const& s);
 static void make_cc_analog_evt(std::ostream& o, AnalogEvtCtlStmt const& s);
 static void make_cc_system_task(std::ostream& o, System_Task const& s);
 static void make_cc_analog_stmt(std::ostream& o, Base const& ab)
@@ -203,8 +221,12 @@ static void make_cc_analog_stmt(std::ostream& o, Base const& ab)
   Base const* i = &ab;
   if(auto s = dynamic_cast<AnalogSeqBlock const*>(&ab)){
     make_cc_analog_seq(o, *s);
+  }else if(auto s = dynamic_cast<AnalogCtrlBlock const*>(&ab)){
+    make_cc_analog_ctrl(o, *s);
   }else if(auto fc=dynamic_cast<Contribution const*>(i)) {
     make_cc_contrib(o, *fc);
+  }else if(auto a=dynamic_cast<AnalogProceduralAssignment const*>(i)) {
+    make_cc_assignment(o, a->assignment());
   }else if(auto a=dynamic_cast<Assignment const*>(i)) {
     make_cc_assignment(o, *a);
   }else if(auto rl=dynamic_cast<ListOfBlockRealIdentifiers const*>(i)) {
@@ -316,13 +338,13 @@ static void make_cc_analog_cond(std::ostream& o, AnalogConditionalStmt const& s)
 {
   o__ "{\n";
   if(s.conditional().is_true()) {
-    if(s.true_part_or_null()) {
+    if(s.true_part()) {
       indent y;
       make_cc_analog_stmt(o, s.true_part());
     }else{ untested();
     }
   }else if(s.conditional().is_false()){
-    if(s.false_part_or_null()) {itested();
+    if(s.false_part()) {itested();
       indent y;
       make_cc_analog_stmt(o, s.false_part());
     }else{
@@ -331,13 +353,13 @@ static void make_cc_analog_cond(std::ostream& o, AnalogConditionalStmt const& s)
     indent x;
     make_cc_expression(o, s.conditional().expression());
     o__ "if (t0) {\n";
-    if(s.true_part_or_null()) {
+    if(s.true_part()) {
       indent y;
       make_cc_analog_stmt(o, s.true_part());
     }else{
     }
     o__ "}";
-    if(s.false_part_or_null()) {
+    if(s.false_part()) {
       o << "else {\n";
       {
 	indent y;
@@ -376,7 +398,7 @@ static void make_cc_analog_switch(std::ostream& o, AnalogSwitchStmt const& s)
     o__ "{\n";
     {
       indent y;
-      make_cc_expression(o, s.conditional().expression());
+      make_cc_expression(o, s.control().expression());
       o__ "s = t0;\n";
     }
     o__ "}\n";
@@ -384,7 +406,8 @@ static void make_cc_analog_switch(std::ostream& o, AnalogSwitchStmt const& s)
 
     CaseGen const* def = NULL;
     for(auto& i : s.cases()){
-      if(i->cond_or_null()){
+      if(i->is_never()){
+      }else if(i->cond_or_null()){
 	o << "{\n";
 
 	o << "bool cond = false;\n";
@@ -404,7 +427,6 @@ static void make_cc_analog_switch(std::ostream& o, AnalogSwitchStmt const& s)
       }else{
 	def = &*i;
       }
-
     }
 
     o << "{\n";
@@ -417,6 +439,16 @@ static void make_cc_analog_switch(std::ostream& o, AnalogSwitchStmt const& s)
     o<<paren;
     o__ "\n";
     o__ "}\n";
+  }
+  o__ "}\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_analog_ctrl(std::ostream& o, AnalogCtrlBlock const& s)
+{
+  o__ "{ // " << s.identifier() << "\n";
+  for(auto i : s.block()) {
+    indent x;
+    make_cc_analog_stmt(o, *i);
   }
   o__ "}\n";
 }
@@ -436,6 +468,7 @@ void make_analog_construct(std::ostream& o, AnalogConstruct const& ab)
   if(ab.statement_or_null()){
     make_cc_analog_stmt(o, *ab.statement_or_null());
   }else{ untested();
+    unreachable();
     o << ";\n";
   }
 }
@@ -497,6 +530,12 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
 	o__ b->state() << "[k] += _st_br_" << n << "[k];\n";
       o__ "}\n";
     }
+  }
+
+  if(b->deps().is_linear()){
+    incomplete();
+    // o__ b->state() << "[0] = 0.;\n";
+  }else{
   }
 
   for(auto d : b->deps()){

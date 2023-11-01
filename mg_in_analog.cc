@@ -21,6 +21,7 @@
 #include "mg_analog.h"
 #include "mg_out.h"
 #include "mg_error.h"
+#include "mg_options.h"
 #include "m_tokens.h"
 #include <e_cardlist.h> // TODO: really?
 #include <u_opt.h>
@@ -119,9 +120,9 @@ static Base* new_evt_ctl_stmt(CS& file, Block* o)
   }
 }
 /*--------------------------------------------------------------------------*/
-static AnalogStmt* parse_seq(CS& file, Block* owner)
+static Base* pArse_seq(CS& f, Block* owner)
 {
-  return new AnalogSeqBlock(file, owner);
+  return new AnalogSeqBlock(f, owner);
 }
 /*--------------------------------------------------------------------------*/
 static Base* parse_real(CS& f, Block* o)
@@ -186,7 +187,8 @@ static Variable* parse_variable(CS& f, Block* o)
   size_t here = f.cursor();
   std::string what;
   f >> what;
-  Base* b = o->resolve(what);
+  trace1("parse_variable", what);
+  Base* b = o->lookup(what);
   Variable* v = dynamic_cast<Variable*>(b);
   if(!v){
     f.reset_fail(here);
@@ -201,98 +203,127 @@ Assignment::Assignment(CS& f, Block* o)
 {
   // unreachable(); // reached from for condition
   set_owner(o);
-  // _lhs.set_owner(o);
-  // f >> _lhs;
-  Variable* l = parse_variable(f,o);
-  _lhs = l;
-
-  if(f >> "="){
-  }else{
-    // reset_fail
-    throw Exception_No_Match("no assignment");
-  }
-
- //   AnalogProceduralAssignment* a = new AnalogProceduralAssignment(file, o);
-    // set_lhs(v);
-  trace1("pA", f.tail().substr(0,10));
   parse(f);
-
-//  pass deps to lhs??
-  trace1("assign deps?", lhsname());
-  for(auto d: deps()){ untested();
-    trace1("assign", d->code_name());
-  }
-  if(l){
-    l->update_deps(deps());
-  }else{ untested();
-    unreachable(); // loop statement??
-  }
 } // Assignment::Assignment
 /*--------------------------------------------------------------------------*/
-class AnalogProceduralAssignment : public Assignment {
-public:
-  explicit AnalogProceduralAssignment(CS&, Block*);
-  void parse(CS& cmd)override;
-  void dump(std::ostream& o)const override;
-};
-/*--------------------------------------------------------------------------*/
-void AnalogProceduralAssignment::parse(CS& cmd)
+void Assignment::parse(CS& f)
 {
-  Assignment::parse(cmd);
+  assert(owner());
+  size_t here = f.cursor();
+  // _lhs.set_owner(o);
+  // TODO: LhsRef?
+  // f >> _lhs;
+  Variable* l = parse_variable(f, owner());
+  // assert(l->name() == name());?
+
+  if(!f){
+    assert(!_lhs);
+    f.reset_fail(here);
+  }else if(f >> "="){
+    _lhs = l;
+    assert(_lhs);
+    parse_rhs(f);
+
+    if(!is_reachable()) {
+    }else if(l){
+      l->update_deps(deps());
+    }else{ untested();
+      unreachable(); // loop statement??
+    }
+
+  }else{ untested();
+    f.reset_fail(here);
+//    throw Exception_CS_("no assignment", f);
+  }
+}
+/*--------------------------------------------------------------------------*/
+// void Assignment::parse(CS& f)?
+void AnalogProceduralAssignment::parse(CS& f)
+{
+  assert(_a.owner());
+  size_t here = f.cursor();
+
+  trace2("Proc assignment?", f.tail().substr(0,20), _a.owner());
+  std::string what;
+  f >> what;
+//  f >> what;
+  if(what == ""){ untested();
+    f.reset_fail(here);
+    throw Exception_No_Match("need name");
+  }else{
+    f.reset(here);
+  }
+  if(f >> _a){
+    if(f >> ";"){
+    }else{ itested();
+      f.warn(bWARNING, "missing semicolon?");
+    }
+  }else{
+  }
+  return;
+
+  {
+
+#if 0
+    f >> _a;
+#else
+
+    Base* b = _a.owner()->lookup(what);
+    Variable* v = dynamic_cast<Variable*>(b);
+    if(!v){
+      f.reset(here);
+      trace1("not a variable", f.tail().substr(0,10));
+      throw Exception_No_Match("what's this: " + what);
+    }else if(f >> "=") {
+      assert(v->name() != "");
+      Variable const* cv=v;
+      trace4("got a variable", what, f.tail().substr(0,10), v->name(), cv->owner());
+      _a.set_lhs(v);
+      trace1("pA", f.tail().substr(0,10));
+      _a.parse_rhs(f);
+      f >> ";";
+
+      // if reachable?
+      if(_a.is_reachable()) {
+	v->update_deps(_a.deps());
+      }else{
+      }
+
+    }else{ untested();
+      throw Exception_CS_("need assign op", f);
+    }
+#endif
+  }
 }
 /*--------------------------------------------------------------------------*/
 void AnalogProceduralAssignment::dump(std::ostream& o)const
 {
   o__ "";
-  Assignment::dump(o);
+  _a.dump(o);
   o << ";\n";
 }
 /*--------------------------------------------------------------------------*/
-static Base* parse_proc_assignment(CS& file, Block* o)
+static Base* parse_proc_assignment(CS& f, Block* o)
 {
+  f.skipbl();
+  trace1("parse_proc_assignment", f.tail().substr(0,30));
   try{
-    return new AnalogProceduralAssignment(file, o);
-  }catch(Exception_No_Match const&){
-    return NULL;
+    auto n = new AnalogProceduralAssignment(f, o);
+    if(f){
+      return n;
+    }else{
+      delete n;
+    }
+  }catch(Exception_No_Match const&){ untested();
   }
+  return NULL;
 }
 /*--------------------------------------------------------------------------*/
 AnalogProceduralAssignment::AnalogProceduralAssignment(CS& file, Block* o)
-  : Assignment() // BUG?
+  : AnalogStmt()
 {
-  size_t here = file.cursor();
-  std::string what;
-  file >> what;
-  trace3("assignment?", what, file.tail().substr(0,20), o);
-//  file >> what;
-  if(what == ""){ untested();
-    throw Exception_No_Match("need name");
-  }else{
-  }
-
-  Base* b = o->resolve(what);
-  Variable* v = dynamic_cast<Variable*>(b);
-  if(!v){
-    file.reset(here);
-    trace1("not a variable", file.tail().substr(0,10));
-    throw Exception_No_Match("what's this: " + what);
-  }else if(file >> "=") {
-    assert(v->name() != "");
-    Variable const* cv=v;
-    trace4("got a variable", what, file.tail().substr(0,10), v->name(), cv->owner());
-    set_lhs(v);
-    set_owner(o);
-    trace1("pA", file.tail().substr(0,10));
-    parse(file);
-    file >> ";";
-    trace2("got_semicolon", (bool)file, file.tail().substr(0,10));
-//    _var_refs[what] = a;
-    trace4("dep variable", v->name(), deps().size(), rhs().deps().size(), v->deps().size());
-    v->update_deps(deps());
-    trace4("dep variable", v->name(), deps().size(), rhs().deps().size(), v->deps().size());
-  }else{ untested();
-    throw Exception_CS_("need assign op", file);
-  }
+  _a.set_owner(o);
+  parse(file);
 }
 /*--------------------------------------------------------------------------*/
 static Base* parse_contribution(CS& f, Block* owner)
@@ -309,11 +340,11 @@ static Base* parse_analog_stmt_or_null(CS& file, Block* owner)
   assert(owner);
   Base* ret = NULL;
 
-  trace1("parse_analog_stmt_or_null", file.tail().substr(0,10));
+  trace1("parse_analog_stmt_or_null", file.tail().substr(0,30));
 //  size_t here = file.cursor();
   ONE_OF	// module_item
-    || file.umatch(";")
-    || ((file >> "begin") && (ret = parse_seq(file, owner)))
+    || (file >> ";")
+    || ((file >> "begin") && (ret = pArse_seq(file, owner)))
     || ((file >> "real ") && (ret = parse_real(file, owner)))
     || ((file >> "integer ") && (ret = parse_int(file, owner)))
     || ((file >> "if ") && (ret = parse_cond(file, owner)))
@@ -321,10 +352,9 @@ static Base* parse_analog_stmt_or_null(CS& file, Block* owner)
     || ((file >> "while ") && (ret = new AnalogWhileStmt(file, owner)))
     || ((file >> "for ") && (ret = new AnalogForStmt(file, owner)))
     || ((file >> "@ ") && (ret = new_evt_ctl_stmt(file, owner)))
+    || (ret = parse_proc_assignment(file, owner))
     || (ret = parse_system_task(file, owner))
     || (ret = parse_contribution(file, owner))
-    || (ret = parse_proc_assignment(file, owner))
-//    || parse_seq(file)
     ;
 
   return ret;
@@ -345,13 +375,36 @@ static Base* parse_analog_stmt(CS& file, Block* owner)
 /*--------------------------------------------------------------------------*/
 void AnalogConditionalStmt::parse(CS& file)
 {
+  _body.set_owner(owner());
+  _false_part.set_owner(owner());
+
   file >> "(" >> _cond >> ")";
+  // set reachabilities here!
   if(file >> ";"){
   }else{
-    _body = parse_analog_stmt_or_null(file, owner());
+
+    if(owner()->is_never()) {
+      _body.set_never();
+      _false_part.set_never();
+    }else if(_cond.is_true()) {
+      if(owner()->is_always()) { untested();
+	_body.set_always();
+      }else{
+      }
+      _false_part.set_never();
+    }else if(_cond.is_false()) {
+      if(owner()->is_always()) { untested();
+	_false_part.set_always();
+      }else{
+      }
+      _body.set_never();
+    }else{
+    }
+
+    file >> _body;
     if(file >> "else "){
       trace1("got else branch", file.tail().substr(0, 1));
-      _false_part = parse_analog_stmt_or_null(file, owner());
+      file >> _false_part;
     }else{
     }
   }
@@ -359,38 +412,47 @@ void AnalogConditionalStmt::parse(CS& file)
 /*--------------------------------------------------------------------------*/
 void AnalogConditionalStmt::dump(std::ostream& o)const
 {
-  static bool cont;
-  if(cont){
+  // TODO revisit indentation logic.
+  static bool cont; // yikes. recurse.
+
+  bool omit_true = !options().dump_unreachable() && _cond.is_false(); // _body->is_reachable?
+  bool omit_false = !options().dump_unreachable() && _cond.is_true();
+  bool omit_cond = omit_true || omit_false;
+
+  if(omit_cond) {
+  }else if(cont){ untested();
   }else{
     o__ "";
   }
-  o << "if (" << _cond << ")";
-  cont = false;
-  if(!_body){
-    o << ";\n";
+
+  if(omit_cond) {
   }else{
-    if(dynamic_cast<AnalogSeqBlock const*>(_body)){
-      o << " ";
-      _body->dump(o);
+    o << "if (" << _cond << ") ";
+    cont = false;
+  }
+  {
+    if(omit_true) {
+    }else if(omit_cond){
+       o__ "";
+      _body.dump(o);
     }else{
-      indent m;
-      o << "\n";
-      _body->dump(o);
+      _body.dump(o);
     }
   }
-  if(_false_part){
-    o__ "else";
-    if(dynamic_cast<AnalogConditionalStmt const*>(_false_part)){
-      o << " ";
-      cont = true;
-      _false_part->dump(o);
-    }else if(dynamic_cast<AnalogSeqBlock const*>(_false_part)){
-      o << " ";
-      _false_part->dump(o);
+  if(omit_false){
+  }else if(_false_part){
+    if(omit_true){
+      cont = false;
     }else{
-      o << "\n";
-      _false_part->dump(o);
+      o__ "else ";
     }
+    // indent?
+    if(omit_cond){
+      o__ "";
+    }else{
+     // o << "X";
+    }
+    _false_part.dump(o);
   }else{
   }
 }
@@ -400,15 +462,22 @@ void AnalogCtrlStmt::dump(std::ostream& o)const
   if(!_body){
     o << ";\n";
   }else{
-    if(dynamic_cast<AnalogSeqBlock const*>(_body)){
-      o << " ";
-      _body->dump(o);
+    o << " ";
+    _body.dump(o);
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool AnalogWhileStmt::update()
+{
+  bool ret = false;
+  while(true){
+    if (_body.update()){
+      ret = true;
     }else{
-      indent m;
-      o << "\n";
-      _body->dump(o);
+      break;
     }
   }
+  return ret;
 }
 /*--------------------------------------------------------------------------*/
 void AnalogWhileStmt::parse(CS& file)
@@ -416,8 +485,11 @@ void AnalogWhileStmt::parse(CS& file)
   file >> "(" >> _cond >> ")";
   if(file >> ";"){
   }else{
-    _body = parse_analog_stmt_or_null(file, owner());
+    _body.set_owner(owner());
+    file >> _body;
   }
+
+  update();
 }
 /*--------------------------------------------------------------------------*/
 void AnalogWhileStmt::dump(std::ostream& o)const
@@ -426,27 +498,80 @@ void AnalogWhileStmt::dump(std::ostream& o)const
   AnalogCtrlStmt::dump(o);
 }
 /*--------------------------------------------------------------------------*/
+static Assignment* parse_assignment_or_null(CS& f, Block* owner)
+{
+  auto a = new Assignment(f, owner);
+  if(f) {
+  }else{
+    delete a;
+    a = NULL;
+  }
+  return a;
+}
+/*--------------------------------------------------------------------------*/
+bool AnalogForStmt::update()
+{
+  auto init_ = dynamic_cast<Assignment*>(_init);
+  auto tail_ = dynamic_cast<Assignment*>(_tail);
+
+  bool ret = false;
+  while(true){
+    if ( init_ && init_->update() ){ untested();
+      ret = true;
+//    }else if(_cond.update()){
+    }else if (_body.update()){
+      ret = true;
+    }else if ( tail_ && tail_->update() ) { untested();
+      ret = true;
+    }else{
+      break;
+    }
+  }
+  return ret;
+}
+/*--------------------------------------------------------------------------*/
 void AnalogForStmt::parse(CS& f)
 {
   assert(owner());
   f >> "(";
-  try{
-    _init = new Assignment(f, owner());
-  }catch(Exception_No_Match const&){
+  Assignment* init = parse_assignment_or_null(f, owner());
+  _init = init;
+  if(!f){
+    delete _init;
+    _init = NULL;
+  }else{
   }
   f >> ";";
   f >> _cond;
   f >> ";";
-  try{
-    _tail = new Assignment(f, owner());
-  }catch(Exception_No_Match const&){ untested();
-  }
+  Assignment* tail = parse_assignment_or_null(f, owner());
+  _tail = tail;
 
   f >> ")";
   if(f >> ";"){ untested();
   }else{
-    _body = parse_analog_stmt_or_null(f, owner());
+    _body.set_owner(owner()); // needed?
+    f >> _body;
   }
+
+  update();
+}
+/*--------------------------------------------------------------------------*/
+bool AnalogSeqBlock::update()
+{
+  bool ret = false;
+  for(auto i: _block){
+    if(auto s = dynamic_cast<AnalogStmt*>(i)){
+      ret |= s->update();
+    }else{
+    }
+  }
+  return ret;
+}
+/*--------------------------------------------------------------------------*/
+bool AnalogProceduralAssignment::update()
+{
+  return _a.update();
 }
 /*--------------------------------------------------------------------------*/
 void AnalogForStmt::dump(std::ostream& o)const
@@ -465,69 +590,159 @@ void AnalogForStmt::dump(std::ostream& o)const
   AnalogCtrlStmt::dump(o);
 }
 /*--------------------------------------------------------------------------*/
+void CaseGen::calc_reach(Expression const& ctrl)
+{
+  Expression_ result;
+  
+  if(!ctrl.size()){ untested();
+    incomplete();
+  }else if(_cond && _cond->size()){
+    bool all_never = true;
+    for(auto j : *_cond){
+      trace2("==", ctrl.back()->name(), j->expression().back()->name());
+      Token_BINOP_ b("==", ctrl.back(), j->expression().back(), NULL);
+      b.stack_op(&result);
+      b.pop();
+      assert(result.size());
+
+      if(is_false(result)) { untested();
+      }else{
+	all_never = false;
+      }
+      if(is_true(result)) {
+	set_always();
+	break;
+      }else{
+      }
+    }
+    if(all_never){ untested();
+      set_never();
+    }else{
+    }
+  }else if(_cond){ untested();
+    set_never();
+  }else{
+    // default?
+  }
+}
+/*--------------------------------------------------------------------------*/
 void CaseGen::parse(CS&)
 { untested();
 }
 /*--------------------------------------------------------------------------*/
 void CaseGen::dump(std::ostream& o)const
 {
-  if(_cond){
-    o__ *_cond;
+  if(!options().dump_unreachable() && is_never()){
   }else{
-    o__ "default";
-  }
-  o << " :";
 
-  o << '\n';
-  if(dynamic_cast<AnalogSeqBlock const*>(_code)){
-    indent x;
-    o__ *_code;
-  }else if(_code){
-    indent x;
-    o << *_code;
+    if(_cond){
+      o__ *_cond;
+  //    o << " :";
+    }else{
+      o__ "default:";
+    }
+
+    o << ' ' << _code;
+  }
+}
+/*--------------------------------------------------------------------------*/
+CaseGen::CaseGen(CS& f, Block* owner, Expression const& ctrl, bool have_r, bool have_a)
+{
+  trace1("CaseGen", f.tail().substr(0,20));
+  AnalogConstExpressionList* c = new AnalogConstExpressionList();
+  c->set_owner(owner);
+
+//  parse(f); 
+
+  if (f >> "default"){
+    delete c;
+    f >> ":"; // is optional..
+    size_t here = f.cursor();
+    if(f >> "endcase") {
+      f.reset_fail(here);
+    }else{
+      f.reset(here);
+    }
+  }else if(f >> *c) {
+    trace1("CaseGen2", f.tail().substr(0,20));
+    _cond = c;
+  }else{ untested();
+    delete c;
+    throw Exception_CS_("bad switch statement", f);
+  }
+
+//  size_t here = f.cursor();
+//  if(f >> "endcase") { untested();
+//    assert(!_cond);
+//    f.reset_fail(here);
+//  }else
+  if(have_a){
+    set_never();
+  }else if(!have_r){
+    // default?
+    calc_reach(ctrl);
+  }else{
+    calc_reach(ctrl);
+  }
+  if(f){
+    _code.set_owner(owner);
+    f >> _code;
+    if(f){
+    }else{ untested();
+      incomplete();
+    }
   }else{
   }
 }
 /*--------------------------------------------------------------------------*/
-void AnalogSwitchStmt::parse(CS& file)
+void AnalogSwitchStmt::parse(CS& f)
 {
-  file >> "(" >> _cond >> ")";
-  AnalogConstExpressionList* c = new AnalogConstExpressionList();
-  c->set_owner(owner());
+  f >> "(" >> _ctrl >> ")";
+  CaseGen* def = NULL;
+  bool have_reachable = false;
+  bool have_always = false;
 
   while(true){
-    if(file >> "endcase"){
+    if(f >> "endcase"){
       break;
-    }else if(file >> "default"){
-      file >> ":";
-      if(file >> "endcase"){
-	_cases.push_back(new CaseGen(NULL, NULL));
-	break;
+    }else{
+      if(def){
+	// default is out of order. reachability messed up.
+	// CS.warn ...
       }else{
-	Base* s = parse_analog_stmt_or_null(file, owner());
-	_cases.push_back(new CaseGen(NULL, s));
       }
-    }else if( file >> *c){
-      Base* s = parse_analog_stmt_or_null(file, owner());
-      _cases.push_back(new CaseGen(c, s));
 
-      c = new AnalogConstExpressionList();
-      c->set_owner(owner());
-    }else{ untested();
-      delete c;
-      throw Exception_CS_("bad switch statement", file);
+      size_t here = f.cursor();
+      CaseGen* g = new CaseGen(f, owner(), _ctrl.expression(),
+	  have_reachable, have_always);
+//      g->set_owner(owner());
+//      g->set_ctrl(&_ctrl.expression());
+//      f >> *g;
+//
+      if(g->is_always()){
+	have_always = true;
+      }else if(g->is_reachable()){
+	have_reachable = true;
+      }else{
+      }
+
+      if(!g->is_default()) {
+      }else if(def){ untested();
+	f.reset_fail(here);
+	delete g;
+	throw Exception_CS_("multiple default: not allowed", f);
+      }else{
+	def = g;
+      }
+
+      _cases.push_back(g);
     }
   }
-
-  delete c;
-
-  trace2("ASS", (bool) file, file.tail().substr(0,10));
-
 }
 /*--------------------------------------------------------------------------*/
 void AnalogSwitchStmt::dump(std::ostream& o)const
 {
-  o__ "case (" << _cond << ")\n";
+  o__ "case (" << _ctrl << ")\n";
 
   {
     indent x;
@@ -536,50 +751,51 @@ void AnalogSwitchStmt::dump(std::ostream& o)const
   o__ "endcase\n";
 }
 /*--------------------------------------------------------------------------*/
-void AnalogConstruct::parse(CS& file)
+void AnalogConstruct::parse(CS& f)
 {
-  _stmt = parse_analog_stmt_or_null(file, owner());
-  if(!_stmt){ untested();
-    throw Exception_CS_("bad analog construct", file);
-  }else{
-  }
+  assert(!_stmt);
+  _stmt = new AnalogCtrlBlock(f, owner());
 }
 /*--------------------------------------------------------------------------*/
-void AnalogSeqBlock::parse(CS& file)
+void AnalogSeqBlock::parse(CS& f)
 {
-  if(file >> ":"){
-    file >> _identifier;
+  if(f >> ":"){
+    _block.parse_identifier(f);
   }else{
   }
   for (;;) {
-    trace1("AnalogSeqBlock::parse", file.tail().substr(0,10));
-    if(file >> "end "){
-      if(file.peek() == ';') {
+    if(f >> "end "){
+      if(f.peek() == ';') {
 	// error(bWARNING, "// stray semicolon?");
 	std::cerr << "stray semicolon\n";
-	file.skip();
+	f.skip();
       }else{
       }
-      trace1("AnalogSeqBlock::parse end", file.tail().substr(0,10));
       break;
     }else{
     }
-    trace1("AnalogSeqBlock::parse try", file.tail().substr(0,10));
-    Base* s = parse_analog_stmt(file, &_block);
+    Base* s = parse_analog_stmt(f, &_block);
     if(!s){ untested();
-      trace1("AnalogSeqBlock::parse", file.tail().substr(0,10));
-      throw Exception_CS("bad analog block", file);
+      throw Exception_CS_("bad analog block", f);
     }else{
       _block.push_back(s);
     }
   }
-
-#if 0
-    if (!file.more()) { untested();
-      file.warn(0, "premature EOF (analog)");
-      break;
+}
+/*--------------------------------------------------------------------------*/
+void AnalogCtrlBlock::parse(CS& f)
+{
+  assert(block().owner());
+  if(f >> ";"){ untested();
+  }else if(f >> "begin"){
+    AnalogSeqBlock::parse(f);
+  }else{
+    Base* b = parse_analog_stmt_or_null(f, &_block);
+    if(b) {
+      _block.push_back(b);
+    }else{
     }
-#endif
+  }
 }
 /*--------------------------------------------------------------------------*/
 void SeqBlock::dump(std::ostream& o)const
@@ -634,10 +850,10 @@ Assignment::~Assignment()
   _deps = NULL;
 }
 /*--------------------------------------------------------------------------*/
-void Assignment::parse(CS& cmd)
+void Assignment::parse_rhs(CS& cmd)
 {
   assert(owner());
-  trace1("Assignment::parse", cmd.tail().substr(0,10));
+  trace1("Assignment::parse_rhs", cmd.tail().substr(0,10));
   Expression rhs(cmd);
   assert(_rhs.is_empty());
 
@@ -645,6 +861,8 @@ void Assignment::parse(CS& cmd)
   assert(deps().empty());
   _rhs.set_owner(owner());
   _rhs.resolve_symbols(rhs);
+  cmd.reset(cmd.cursor());
+  trace1("Assignment::parse_rhs", bool(cmd));
 }
 /*--------------------------------------------------------------------------*/
 void Branch_Ref::parse(CS& f)
@@ -689,6 +907,10 @@ void Contribution::parse(CS& cmd)
   cmd >> _name;
 
   _branch.set_owner(owner());
+  if(!owner()->is_reachable()){
+    // set_never();
+  }else{
+  }
 
   try{
     cmd >> _branch;
@@ -698,6 +920,10 @@ void Contribution::parse(CS& cmd)
     throw Exception_No_Match("not a contribution");
   }
   trace1("Contribution", _name);
+  if(_branch->deps().is_linear()){
+  }else{
+  }
+
 
   if(!_branch->discipline()) {
     throw Exception_CS_("bad discipline", cmd);
@@ -709,7 +935,6 @@ void Contribution::parse(CS& cmd)
   if(disc->flow() &&
       (_name == "flow" || disc->flow()->access().to_string() == _name)) {
     _nature = disc->flow();
-    set_flow_contrib();
   }else if(disc->potential() &&
       (_name == "potential" || disc->potential()->access().to_string() == _name)) {
     _nature = disc->potential();
@@ -735,13 +960,12 @@ void Contribution::parse(CS& cmd)
     // bb.set_owner(owner());
     // trace1("bb?", cmd.tail().substr(0,20));
     // cmd >> xs >> bb >> "==";
-  }else{ untested();
-    throw Exception_CS_("expecting \"<+\"", cmd);
+  }else{
+    throw Exception_CS_("expecting \"<+\" or \":\"", cmd);
   }
 
 
-  {
-    // Assignment::parse(cmd);
+  { // cmd >> _rhs;
     assert(owner());
     trace1("Assignment::parse", cmd.tail().substr(0,20));
     Expression rhs_(cmd);
@@ -750,6 +974,8 @@ void Contribution::parse(CS& cmd)
     assert(owner());
     _rhs.set_owner(owner());
     _rhs.resolve_symbols(rhs_);
+  }
+  {
 
     trace1("Assignment::parse", rhs().back()->name());
     if(is_direct()){
@@ -768,9 +994,17 @@ void Contribution::parse(CS& cmd)
     }
     assert(owner());
 
-    for(auto d : deps()) {
-      trace1("contrib dep", d->code_name());
-      _branch->add_probe(d);
+    if(_branch->deps().is_linear()){
+    }else{
+    }
+
+    for(const Dep& d : deps()) {
+      trace3("contrib dep", d->code_name(), d.is_linear(), _branch->deps().is_linear());
+      _branch->add_dep(d);
+
+      if(_branch->deps().is_linear()){
+      }else{
+      }
 
       if(!is_direct()){
       }else if(d->branch() != _branch){
@@ -783,6 +1017,16 @@ void Contribution::parse(CS& cmd)
     }
   }
   cmd >> ";";
+
+  if(is_zero(_rhs)){
+  }else if(_nature == disc->flow()){
+    set_flow_contrib();
+  }
+
+  if(_branch->deps().is_linear()){
+  }else{
+  }
+
 } // Contribution::parse
 /*--------------------------------------------------------------------------*/
 void Branch_Map::parse(CS& f)
@@ -840,11 +1084,30 @@ void Assignment::set_lhs(Variable* v)
   _name = v->name(); // BUG?
 }
 /*--------------------------------------------------------------------------*/
+void AnalogCtrlBlock::dump(std::ostream& o)const
+{
+  if(size() || identifier() != ""){
+    o << "begin";
+    if(identifier() != ""){
+      o << " : " << identifier();
+    }else{
+    }
+    o << "\n";
+    {
+      indent x;
+      _block.dump(o);
+    }
+    o__ "end\n";
+  }else{
+    o << ";\n";
+  }
+}
+/*--------------------------------------------------------------------------*/
 void AnalogSeqBlock::dump(std::ostream& o)const
 {
-  o << "begin"; // BUG: nest?
-  if(_identifier != ""){
-    o << " : " << _identifier;
+  o__ "begin";
+  if(_block.identifier() != ""){
+    o << " : " << _block.identifier();
   }else{
   }
   o << "\n";
@@ -882,6 +1145,8 @@ void AnalogEvtCtlStmt::parse(CS& file)
 {
   file >> _ctl;
   assert(owner());
+  // _stmt.set_owner(owner);
+  // f >> _stmt;
   _stmt = parse_analog_stmt(file, owner());
 }
 /*--------------------------------------------------------------------------*/
@@ -1044,7 +1309,7 @@ void Analog_Function::parse(CS& f)
       || ((f >> "inout ") && (f >> _args))
 //      || (f >> _attribute_dummy)
       || ((f >> "endfunction ") && (end = true))
-      || (s = parse_analog_stmt(f, this))
+      || (s = parse_analog_stmt_or_null(f, this))
       ;
     if(s){
       push_back(s);
@@ -1054,10 +1319,10 @@ void Analog_Function::parse(CS& f)
     if (end){
       break;
     }else if (!f.more()) { untested();
-      f.warn(0, "premature EOF (anlog function)");
+      f.warn(bWARNING, "premature EOF (analog function)");
       break;
-    }else if (f.stuck(&here)) { untested();
-      f.warn(0, "bad analog function");
+    }else if (f.stuck(&here)) {
+      f.warn(bWARNING, "bad analog function");
       break;
     }else{
     }
@@ -1151,8 +1416,31 @@ void AF_Arg_List::dump(std::ostream& o)const
   o << "\n";
 }
 /*--------------------------------------------------------------------------*/
+// update_deps?
+bool Assignment::update()
+{
+  incomplete();
+  size_t n = _rhs.deps().size();
+
+  auto i=_rhs.begin();
+  for(size_t n=_rhs.size(); n--;){
+    (*i)->stack_op(&_rhs);
+    i = _rhs.erase(i);
+  }
+
+  if(n == _rhs.deps().size()){
+    return false;
+  }else{
+    update_deps(deps());
+    return true;
+  }
+}
+/*--------------------------------------------------------------------------*/
+// propagate_deps?
 void Assignment::update_deps(Deps const& d)
 {
+  // TODO: attrib.
+  // TODO: only if reachable.
   assert(_lhs);
   _lhs->update_deps(d);
   if(_deps) {
@@ -1162,6 +1450,74 @@ void Assignment::update_deps(Deps const& d)
   _deps->update(d);
 //  assert(&deps() != &d);
 //  deps().update(d);
+}
+/*--------------------------------------------------------------------------*/
+CS& Module::parse_analog(CS& f)
+{
+  if(f >> "function "){
+     f >> _analog_functions;
+  }else{
+    AnalogConstruct* ab = new AnalogConstruct();
+    ab->set_owner(this);
+    ab->parse(f);
+    _analog_list.push_back(ab);
+  }
+  return f;
+}
+/*--------------------------------------------------------------------------*/
+void Contribution::set_direct(bool d)
+{
+  assert(_branch);
+  _branch->set_direct(d);
+}
+/*--------------------------------------------------------------------------*/
+bool Contribution::is_direct() const
+{
+  assert(_branch);
+  return _branch->is_direct();
+}
+/*--------------------------------------------------------------------------*/
+void Contribution::set_pot_contrib()
+{
+  assert(_branch);
+  assert(owner());
+  if(options().optimize_unused() && !owner()->is_reachable()) {
+  }else{
+    _branch->set_pot_source();
+  }
+  _type = t_pot;
+}
+/*--------------------------------------------------------------------------*/
+void Contribution::set_flow_contrib()
+{
+  assert(_branch);
+  if(options().optimize_unused() && !owner()->is_reachable()) {
+  }else{
+    _branch->set_flow_source();
+  }
+  _type = t_flow;
+}
+/*--------------------------------------------------------------------------*/
+bool Contribution::is_flow_contrib() const
+{
+  return _type == t_flow;
+}
+/*--------------------------------------------------------------------------*/
+bool Contribution::is_pot_contrib() const
+{
+  return _type == t_pot;
+}
+/*--------------------------------------------------------------------------*/
+Contribution::~Contribution()
+{
+  if(!_branch) {
+    incomplete();
+  }else if(options().optimize_unused() && !owner()->is_reachable()) {
+  }else if (is_flow_contrib()) {
+    _branch->dec_flow_source();
+  }else if(is_pot_contrib()) {
+    _branch->dec_pot_source();
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

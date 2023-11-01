@@ -656,7 +656,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
 
   o__ "if (!" << e.code_name() << ") {\n";
   o____ "const CARD* p = device_dispatcher[\"" << dev_type << "\"]; // " << e.dev_type() << "\n";
-  o____ "if(!p){\n;";
+  o____ "if(!p){\n";
   o______ "throw Exception(" << "\"Cannot find " << dev_type << ". Load module?\");\n";
   o____ "}else{\n";
   o____ "}\n";

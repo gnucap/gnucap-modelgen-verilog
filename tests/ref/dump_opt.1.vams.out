@@ -1,0 +1,17 @@
+
+
+module test(d, g, s, b);
+  parameter real P = 3 from [(0):(0)];
+  parameter real Q = 3 from [(1):(1)];
+
+  real    T;
+
+  analog begin
+    T =  0.;
+    T =  5.;
+  end
+
+endmodule
+
+
+

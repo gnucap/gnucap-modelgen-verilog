@@ -23,8 +23,11 @@
 #include "mg_.h"
 /*--------------------------------------------------------------------------*/
 class Options : public Base {
-  bool _optimize_binop{true};
-  bool _optimize_swap{true};
+  bool _optimize_binop{true}; // fold binary operators
+  bool _optimize_swap{true};  // swap operands.
+  bool _optimize_deriv{true}; // suppress zero derivative propagation
+  bool _optimize_deps{true};  // consider dependency order
+  bool _optimize_unused{true};// dont emit unused sources
   bool _gen_module{true};
   bool _gen_paramset{true};
   bool _dump_module{true};
@@ -37,11 +40,14 @@ public:
 public:
   bool optimize_binop()   const{ return _optimize_binop; }
   bool optimize_swap()    const{ return _optimize_swap; }
+  bool optimize_deriv()   const{ return _optimize_deriv; }
+  bool optimize_deps()    const{ return _optimize_deps; }
+  bool optimize_unused()  const{ return _optimize_unused; }
   bool gen_module()       const{ untested(); return _gen_module; }
   bool gen_paramset()     const{ untested(); return _gen_paramset; }
   bool dump_module()      const{ return _dump_module; }
   bool dump_paramset()    const{ return _dump_paramset; }
-  bool dump_unreachable() const{ untested(); return _dump_unreachable; }
+  bool dump_unreachable() const{ return _dump_unreachable; }
 };
 /*--------------------------------------------------------------------------*/
 inline Options& options()

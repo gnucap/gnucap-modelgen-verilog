@@ -1,0 +1,40 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_while0a(p, n);
+	electrical p, n;
+	inout p, n;
+	parameter real r=0;
+	analog begin
+		integer i;
+		real x, y;
+		x = 0.;
+		y = 0.;
+		i = r;
+		while(i>0) begin
+			i = i - 1;
+			x = y;
+			y = x + V(p, n);
+		end
+
+		I(p, n) <+ x;
+	end
+endmodule
+
+list
+
+!make test_while0a.so > /dev/null
+attach ./test_while0a.so
+
+test_while0a #(.r(2)) dut(1,0);
+vsource #(.dc(1)) v(1,0);
+
+list
+
+print dc i(v) iter(0)
+dc
+end

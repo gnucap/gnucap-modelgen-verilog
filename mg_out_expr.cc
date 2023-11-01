@@ -299,6 +299,11 @@ public:
     assert(!_types.empty());
     return _types.top() == t_ref;
   }
+  void new_rhs(Token_VAR_REF const* v){
+    // TODO: linear?
+    _refs.push((*v)->code_name());
+    _types.push(t_ref);
+  }
   void new_ref(std::string name){
     _refs.push(name);
     _types.push(t_ref);
@@ -364,16 +369,17 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
   typedef Expression::const_iterator const_iterator;
 
 #if 0
-  if(auto se = dynamic_cast<Expression_ const*>(&e)){ untested();
+  if(auto se = dynamic_cast<Expression_ const*>(&e)){
     o << "/* ";
     se->dump(o);
     o << "\n";
-    for(auto i : se->deps()) { untested();
-      o << "// Dep: " << i->code_name();
+    o << "offset " << se->deps().is_offset() << "\n";
+    for(auto i : se->deps()) {
+      o << "// Dep: " << i->code_name() << " order: " << i.order() << " ";
       o << "\n";
     }
     o << "*/\n";
-  }else{ untested();
+  }else{
   }
 #endif
 
@@ -383,7 +389,7 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
     trace3("mg_out_expr loop", (*i)->name(), (*i)->data(), s.size());
 
     if (auto var = dynamic_cast<const Token_VAR_REF*>(*i)) {
-      s.new_ref((*var)->code_name());
+      s.new_rhs(var); // if linear?
     }else if(auto pp = dynamic_cast<const Token_ACCESS*>(*i)) {
       s.new_float(o);
 //      assert((*pp)->branch());
@@ -478,13 +484,10 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
       }
     }else if (auto bo = dynamic_cast<const Token_BINOP_*>(*i)) {
 
-      if(bo->op1()){
-	assert(bo->op2());
-	make_cc_expression_(o, bo->op1(), s);
-	make_cc_expression_(o, bo->op2(), s);
-      }else{ untested();
-	assert(!bo->op2());
-      }
+      assert(bo->op1());
+      assert(bo->op2());
+      make_cc_expression_(o, bo->op1(), s);
+      make_cc_expression_(o, bo->op2(), s);
 
       assert((*i)->name().size());
       std::string idy = s.code_name();
@@ -515,10 +518,8 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
     }else if (dynamic_cast<const Token_BINOP*>(*i)) { untested();
       unreachable();
     }else if (auto u = dynamic_cast<const Token_UNARY_*>(*i)) {
-      if(u->op1()){
-	make_cc_expression_(o, u->op1(), s);
-      }else{ untested();
-      }
+      assert(u->op1());
+      make_cc_expression_(o, u->op1(), s);
 
       std::string arg1 = s.code_name();
       s.pop();
@@ -533,10 +534,8 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
 	o__ s.code_name() << " INCOMPLETE = " << op << arg1 << ";\n";
       }
     }else if (auto t = dynamic_cast<const Token_TERNARY_*>(*i)) {
-      if(t->cond()){
-	make_cc_expression_(o, t->cond(), s);
-      }else{ untested();
-      }
+      assert(t->cond());
+      make_cc_expression_(o, t->cond(), s);
 
       std::string arg1 = s.code_name();
       s.pop();

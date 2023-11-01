@@ -2,7 +2,7 @@
 
 module warn();
   analog begin
-    @(initial_step) begin
+    @(initial_step)     begin
     end
   end
 

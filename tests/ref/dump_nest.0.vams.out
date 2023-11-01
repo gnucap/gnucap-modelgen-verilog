@@ -4,23 +4,23 @@ module test();
   integer    a;
 
   analog begin
-begin : scopename
+    begin : scopename
       a = 1;
     end
   end
 
   analog begin
-begin
-begin
+    begin
+      begin
         a = 1;
       end
     end
   end
 
   analog begin
-begin
-begin
-begin
+    begin
+      begin
+        begin
           a = 1;
         end
       end

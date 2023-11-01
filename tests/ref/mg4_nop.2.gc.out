@@ -1,0 +1,6 @@
+test_nop2 #() dut (.np(1),.n(0));
+vsource #(.dc(1)) v1 (.p(1),.n(0));
+print dc i(v1) v(dut.*) 
+                 ^ ? no match
+#           i(v1)     
+ 0.         0.        

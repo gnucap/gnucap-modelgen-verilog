@@ -1,0 +1,28 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_nop0(p, n);
+	electrical p, n;
+	inout p, n;
+	analog begin
+		I(p,n) <+ 0. * V(p,n);
+		if(0.) $strobe("nothing");
+	end
+endmodule
+
+!make test_nop0.so > /dev/null
+attach ./test_nop0.so
+
+test_nop0 #() dut(1,0);
+vsource #(.dc(1)) v1(1, 0);
+
+list
+
+print dc i(v1) v(dut.*)
+
+dc
+end

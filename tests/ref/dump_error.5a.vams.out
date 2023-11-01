@@ -1,0 +1,4 @@
+... rical n, p;
+	analog begin
+		V(n, p) 17.
+            ^ ? expecting "<+" or ":"

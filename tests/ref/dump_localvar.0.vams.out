@@ -30,7 +30,7 @@ module test(p, n);
     c = 0;
     d = 0;
     I(p, n) <+ ((b + c) + d);
-begin : second
+    begin : second
       real b;
       real c, d;
     end

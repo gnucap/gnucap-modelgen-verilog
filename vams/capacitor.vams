@@ -17,6 +17,7 @@ module capacitor(p,n);
 	parameter real c = 1. from [0:inf);
 	parameter real ic = 0;
 	analog begin
+      // if param_given(ic)?
 		if (analysis("ic"))
 			V(p,n) <+ ic;
 		else

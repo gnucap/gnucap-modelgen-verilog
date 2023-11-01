@@ -1,0 +1,10 @@
+
+module test(d, g, s, b);
+	real T;
+	parameter real P = 3 from [0:0];
+	parameter real Q = 3 from [1:1];
+	analog begin
+		T = 5 * P;
+		T = Q * 5;
+	end
+endmodule

@@ -25,8 +25,9 @@ module test_pg0(p, n);
     if ($param_given(st)) begin
       V(p, n) <+ 1;
     end
-    else
-    V(p, n) <+ 2;
+    else begin
+      V(p, n) <+ 2;
+    end
   end
 
 endmodule

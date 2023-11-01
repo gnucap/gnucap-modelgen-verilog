@@ -271,20 +271,16 @@ void ConstExpression::parse(CS& file)
   trace1("ConstExpression::parse", file.tail().substr(0,19));
   assert(owner());
   Expression ce(file);
-  Expression_ tmp;
-  assert(owner());
-  tmp.set_owner(owner());
-  tmp.resolve_symbols(ce);
-  _expression = new Expression(tmp, &CARD_LIST::card_list);
+//  Expression_ tmp;
+//  assert(owner());
+  _expression.set_owner(owner());
+  _expression.resolve_symbols(ce);
 }
 /*--------------------------------------------------------------------------*/
 void ConstExpression::dump(std::ostream& o) const
 {
   o << "(";
-  if(_expression) {
-    o << *_expression;
-  }else{ untested();
-  }
+  o << _expression;
   o << ")";
 }
 /*--------------------------------------------------------------------------*/

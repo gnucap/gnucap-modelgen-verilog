@@ -1,0 +1,41 @@
+
+`pragma modelgen nodump-unreachable
+
+module test(d, g, s, b);
+	real T;
+	analog begin
+
+		if(T)
+			T = 1;
+		else
+			T = 2;
+
+		if(0)
+			T = 1;
+		else
+			T = 2;
+
+		if(1)
+			T = 1;
+		else
+			T = 2;
+
+		if(T) begin
+			T = 1;
+		end else begin
+			T = 2;
+		end
+
+		if(0) begin
+			T = 1;
+		end else begin
+			T = 2;
+		end
+
+		if(1) begin
+			T = 1;
+		end else begin
+			T = 2;
+		end
+	end
+endmodule

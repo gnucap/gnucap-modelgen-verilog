@@ -20,7 +20,9 @@ enddiscipline
 module conductor0(p, n);
   inout p, n;
   electrical p, n;
-  analog   I(p, n) <+ V(p, n);
+  analog begin
+    I(p, n) <+ V(p, n);
+  end
 
 endmodule
 

@@ -31,10 +31,9 @@ namespace {
 /*--------------------------------------------------------------------------*/
 static bool is_constant(Token const* t, bool val)
 { untested();
-  auto tt = dynamic_cast<Token_CONSTANT const*>(t);
-  if(!tt){ untested();
-    return false;
-  }else if(auto f = dynamic_cast<const Float*>(tt->data())){ untested();
+  if(auto f = dynamic_cast<const Float*>(t->data())){ untested();
+    assert(dynamic_cast<Token_CONSTANT const*>(t)
+	  ||dynamic_cast<Token_PAR_REF const*>(t));
     if(f->value() == NOT_VALID){ untested();
       return false;
     }else if(val){ untested();
@@ -49,14 +48,15 @@ static bool is_constant(Token const* t, bool val)
 /*--------------------------------------------------------------------------*/
 static bool is_constant(Token const* t, double val=NOT_VALID)
 {
-  auto tt = dynamic_cast<Token_CONSTANT const*>(t);
-  if(!tt){
-    return false;
-  }else if(val == NOT_VALID){
-    return tt;
-  }else if(auto f = dynamic_cast<const Float*>(tt->data())){
-    return f->value() == val;
-  }else{ untested();
+  if(auto f = dynamic_cast<const Float*>(t->data())){
+    assert(dynamic_cast<Token_CONSTANT const*>(t)
+	  ||dynamic_cast<Token_PAR_REF const*>(t));
+    if(val == NOT_VALID){
+      return true;
+    }else{
+      return f->value() == val;
+    }
+  }else{
     return false;
   }
 }
@@ -200,30 +200,62 @@ std::string Token_CALL::code_name()const
   }
 }
 /*--------------------------------------------------------------------------*/
+namespace {
+/*--------------------------------------------------------------------------*/
+class CD : public Deps{
+public:
+  explicit CD(){
+    set_offset();
+  }
+}const_deps;
+/*--------------------------------------------------------------------------*/
+}
+/*--------------------------------------------------------------------------*/
 Deps const* Token_BINOP_::op_deps(Token const* t1, Token const* t2)const
 {
   Deps const* d1 = dynamic_cast<Deps const*>(t1->data());
   Deps const* d2 = dynamic_cast<Deps const*>(t2->data());
+  // op asserts CONSTANT here. otherwise: similar.
 
-  Deps const* ret = NULL;
-
-  if(d1 && d2){
-    Base* b = d2->multiply(d1);
-    if(b){
-      ret = prechecked_cast<Deps const*>(b);
-      assert(ret);
-    }else{ untested();
-    }
-  }else if(d1) {
-    ret = d1->clone();
-  }else if(d2) {
-    ret = d2->clone();
+  if(!d1){
+    assert(dynamic_cast<Token_CONSTANT const*>(t1)
+         ||dynamic_cast<Token_PAR_REF const*>(t1)
+         ||dynamic_cast<Token_UNARY const*>(t1));
+    d1 = &const_deps;
+    assert(!d1->is_linear());
+  }else if(d1->is_linear()){
   }else{
   }
 
-  auto r = prechecked_cast<Deps const*>(ret);
-  assert(r || !ret);
-  return r;
+  if(!d2){
+    assert(dynamic_cast<Token_CONSTANT const*>(t2)
+         ||dynamic_cast<Token_PAR_REF const*>(t2)
+         ||dynamic_cast<Token_UNARY const*>(t2));
+    d2 = &const_deps;
+    assert(!d2->is_linear());
+  }else if(d2->is_linear()){
+  }else{
+  }
+
+  Base const* b;
+  if (name() == "*") {
+    b = d2->multiply(d1);
+  }else if (name() == "/") {
+    b = d2->divide(d1);
+  }else if (name() == "+") {
+    b = d2->combine(d1);
+  }else{
+    b = d2->combine(d1);
+  }
+
+  Deps const* ret = NULL;
+  if(b){
+    ret = prechecked_cast<Deps const*>(b);
+    assert(ret);
+  }else{
+    ret = const_deps.clone();
+  }
+  return ret;
 }
 /*--------------------------------------------------------------------------*/
 void Token_UNARY_::stack_op(Expression* E)const
@@ -247,7 +279,7 @@ void Token_UNARY_::stack_op(Expression* E)const
   Token const* t1 = E->back();
   E->pop_back();
 
-  if (dynamic_cast<Token_CONSTANT const*>(t1)) {
+  if (is_constant(t1)) {
     assert(!dynamic_cast<Deps const*>(t1->data()));
     Token* t = op(t1);
     assert(t);
@@ -284,21 +316,13 @@ void Token_BINOP_::stack_op(Expression* E)const
     assert(op2());
 
     op1()->stack_op(E); // clone??
-    Token* t1 = E->back();
-    E->pop_back();
-    trace2("BINOP1a", name(), t1->name());
     op2()->stack_op(E); // clone??
-    Token* t2 = E->back();
-    E->pop_back();
 
-    trace3("BINOP1b", name(), t1->name(), t2->name());
-
-    Deps const* deps = op_deps(t1, t2);
-
-    E->push_back(new Token_BINOP_(name(), t1, t2, deps));
-    trace2("BINOP pushed", name(), E->size());
-
+    Token_BINOP_ T(name(), copy_deps(data()));
+    T.stack_op(E);
     return;
+//    E->push_back(new Token_BINOP_(name(), t1, t2, deps));
+//    trace2("BINOP pushed", name(), E->size());
   }else{
     trace2("BINOP1c", name(), E->size());
     assert(!op2());
@@ -353,9 +377,13 @@ void Token_BINOP_::stack_op(Expression* E)const
     }else if(n=='+' && is_constant(t1, 0.)) {
       t1.erase();
       t2.push();
+    }else if(name()=="&&" && is_constant(t1, 0.)){
+      t2.erase();
+      t1.push();
     }else if(auto bb = dynamic_cast<Token_BINOP_*>(t2.op())) {
       char m = bb->name()[0];
-      if(auto t3 = dynamic_cast<Token_CONSTANT const*>(bb->op2())) {
+      if(is_constant(bb->op2())) {
+	auto t3 = bb->op2();
 	if(( (m == '+' && n == '+')
 	  || (m == '+' && n == '-')
 	  || (m == '*' && n == '*')
@@ -386,7 +414,8 @@ void Token_BINOP_::stack_op(Expression* E)const
 	  t1.pop();
 	  t2.pop();
 	}
-      }else if(auto t3 = dynamic_cast<Token_CONSTANT const*>(bb->op1())) {
+      }else if(is_constant(bb->op1())) {
+	auto t3 = bb->op1();
 	if(( (m == '/' && n == '*') // (A / b) * C = (A*C) / b
 	  || (m == '-' && n == '+')
 	  || (m == '/' && n == '/')
@@ -425,6 +454,7 @@ void Token_BINOP_::stack_op(Expression* E)const
       t1.pop();
       t2.pop();
     }
+//  }else if(t1==t2, '-'){ ...
   }else{
     // t2 is constant?
     if(n=='+' && is_constant(t2, 0.)){
@@ -435,6 +465,9 @@ void Token_BINOP_::stack_op(Expression* E)const
       t1.push();
     }else if(n=='*' && is_constant(t2, 0.)){
       // -ffinite-math?
+      t1.erase();
+      t2.push();
+    }else if(name()=="&&" && is_constant(t2, 0.)){
       t1.erase();
       t2.push();
     }else if( options().optimize_swap() && is_constant(t2)){
@@ -475,7 +508,7 @@ void Token_TERNARY_::stack_op(Expression* E)const
     cond = NULL;
     Expression const* sel;
 
-    if(select){ untested();
+    if(select){
       sel = true_part();
     }else{
       sel = false_part();
@@ -582,10 +615,10 @@ void Token_CALL::stack_op(Expression* E)const
     delete T1;
   }else if (E->is_empty()){
     // SFCALL?
-      E->push_back(clone());
+    E->push_back(new Token_CALL(*this, const_deps.clone()));
   }else if(!dynamic_cast<const Token_PARLIST*>(E->back())) {
     // SFCALL
-      E->push_back(clone());
+    E->push_back(new Token_CALL(*this, const_deps.clone()));
   }else if(auto PL = dynamic_cast<const Token_PARLIST*>(E->back())) { untested();
     assert(0); // doesnt work
     trace2("collect deps?", name(), E->back()->name());
@@ -702,9 +735,9 @@ void Token_ACCESS::stack_op(Expression* e) const
     // Probe const* p = m.new_probe(_name, _arg0, _arg1);
     //
     // install clone?
-    FUNCTION_ const* p = m->new_probe(name(), br);
+    FUNCTION_ const* p = m->new_probe(name(), br); // Probe
 
-    Token* t = p->new_token(*m, na);
+    Token* t = p->new_token(*m, na); // Token_ACCESS
 #endif
 
     assert(t);
@@ -744,15 +777,29 @@ bool Token_ACCESS::is_short() const
 void Token_PAR_REF::stack_op(Expression* e)const
 {
   assert(_item);
-  e->push_back(new Token_PAR_REF(*this, NULL/*TODO*/));
+  double ev = _item->eval();
+  trace2("stack_op PAR_REF", name(), ev);
+  if(ev!=NOT_INPUT) {
+    Float* f = new Float(ev);
+    // e->push_back(new Token_CONSTANT(name(), f, ""));
+    e->push_back(new Token_PAR_REF(*this, f));
+  }else{
+    e->push_back(new Token_PAR_REF(*this, NULL/*TODO*/));
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Token_VAR_REF::stack_op(Expression* e)const
 {
   assert(_item);
-  auto deps = _item->deps().clone();
-  trace2("var::stack_op", name(), _item->deps().size());
-  e->push_back(new Token_VAR_REF(*this, deps));
+  double ev = _item->eval();
+  if(0&&ev!=NOT_INPUT) { untested();
+    Float* f = new Float(ev);
+    e->push_back(new Token_CONSTANT(name(), f, ""));
+  }else{
+    auto deps = _item->deps().clone();
+    trace2("var::stack_op", name(), _item->deps().size());
+    e->push_back(new Token_VAR_REF(*this, deps));
+  }
 }
 /*--------------------------------------------------------------------------*/
 Deps* Token_PARLIST_::new_deps()const

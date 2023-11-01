@@ -31,8 +31,9 @@ endmodule
 module while1(p, n);
   analog begin
     real S;
-    while ((S < 10))
+    while ((S < 10)) begin
       S = (S + 1);
+    end
   end
 
 endmodule

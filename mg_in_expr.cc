@@ -94,7 +94,7 @@ static bool is_xs_function(std::string const& f, Block const* owner)
   }
 
   assert(file);
-  if(f=="flow" || f=="potential"){ itested();
+  if(f=="flow" || f=="potential") { itested();
     return true;
   }else if(file){
     // use actual disciplines
@@ -113,6 +113,8 @@ static bool is_xs_function(std::string const& f, Block const* owner)
     }
   }
   return false;
+
+  // TODO: return FUNCTION_*, VAMS_XS* from nature
 }
 /*--------------------------------------------------------------------------*/
 void Expression_::resolve_symbols_(Expression const& e, Deps*)
@@ -131,7 +133,7 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
 
     auto symbol = dynamic_cast<Token_SYMBOL*>(t);
     std::string const& n = t->name();
-    Base const* r = scope->resolve(n);
+    Base const* r = scope->lookup(n);
     trace3("resolve top found:", n, r, symbol);
 
     if(dynamic_cast<Token_STOP*>(t)) {
@@ -174,7 +176,9 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
       Token_TERNARY_ t3(t->name(), NULL, tp, fp, NULL);
       t3.stack_op(&E);
     }else if(auto p = dynamic_cast<Parameter_Base const*>(r)) {
-      E.push_back(new Token_PAR_REF(n, p));
+//       owner()->new_token(p, 0);??
+      Token_PAR_REF PP(n, p);
+      PP.stack_op(&E);
       trace2("pushed par ref", n, size());
     }else if(auto aa = dynamic_cast<Analog_Function_Arg const*>(r)) {
       Token_VAR_REF a(n, aa);
@@ -237,24 +241,50 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
 */
 void ConstantMinTypMaxExpression::parse(CS& file)
 {
-  assert(!_e);
+  assert(_e.is_empty());
   Expression E(file);
   assert(_owner);
-  _e = new Expression_();
-  _e->set_owner(_owner);
-  _e->resolve_symbols(E);
+//  _e = new Expression_();
+  _e.set_owner(_owner);
+  _e.resolve_symbols(E);
 }
 /*--------------------------------------------------------------------------*/
 void ConstantMinTypMaxExpression::dump(std::ostream& o)const
 {
-  assert(_e);
-  _e->dump(o);
+  _e.dump(o);
 }
 /*--------------------------------------------------------------------------*/
 ConstantMinTypMaxExpression::~ConstantMinTypMaxExpression()
 {
-  delete _e;
-  _e = NULL;
+}
+/*--------------------------------------------------------------------------*/
+bool Parameter_2_List::is_local()const
+{
+  // really? ask *begin?
+  return _is_local;
+}
+/*--------------------------------------------------------------------------*/
+double /*?*/ Parameter_2::eval() const
+{
+  if (value_range_list().size() == 1) {
+    return (*value_range_list().begin())->eval();
+  }else{
+    return NOT_INPUT;
+  }
+}
+/*--------------------------------------------------------------------------*/
+double ConstantMinTypMaxExpression::value() const
+{
+  return _e.eval();
+}
+/*--------------------------------------------------------------------------*/
+double ValueRange::eval() const
+{
+  if(spec()){
+    return spec()->eval();
+  }else{ untested();
+    return NOT_INPUT;
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

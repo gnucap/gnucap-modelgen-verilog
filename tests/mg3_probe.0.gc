@@ -19,7 +19,7 @@ module test_probe0(p,n);
  		if(sel)
  			i = I(p,n);
 		else
-			i = 99
+			i = 99;
 	end
 endmodule
 

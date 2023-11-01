@@ -4,15 +4,17 @@ module test_af();
   analog function real limitex;
     input x;
     real x;
-begin
+    begin
       if ((x > 17.)) begin
         limitex = ((x + -16.) * 42.);
       end
-      else if ((x < -17.)) begin
-        limitex = 42.;
-      end
       else begin
-        limitex = exp(x);
+        if ((x < -17.)) begin
+          limitex = 42.;
+        end
+        else begin
+          limitex = exp(x);
+        end
       end
     end
   endfunction
@@ -20,7 +22,7 @@ begin
   analog function real strange_log;
     input x;
     real x;
-begin
+    begin
       strange_log = ln(max(x, .1));
     end
   endfunction
@@ -28,7 +30,7 @@ begin
   analog function real something;
     input x, y;
     real x, y;
-begin
+    begin
       something = ((x + sqrt(((x * x) + ((y * 4.0) * y)))) * 0.5);
     end
   endfunction

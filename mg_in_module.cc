@@ -169,7 +169,7 @@ void Parameter_2::parse(CS& file)
   }catch(Exception const&){
     throw Exception_CS_("already declared", file);
   }
-  assert(owner()->resolve(name()));
+  assert(owner()->lookup(name()));
 }
 /*--------------------------------------------------------------------------*/
 void Parameter_2::dump(std::ostream& o)const
@@ -731,7 +731,7 @@ void Module::parse(CS& f)
       // mi, non_port_module_item
       // mi, npmi, mogi, module_or_generate_item_declaration
       || ((f >> "branch ") && (f >> _branch_decl))
-      || ((f >> "analog function ") && (f >> _analog_functions))
+//      || ((f >> "analog function ") && (f >> _analog_functions))
       // mi, npmi, module_or_generate_item
 //      || ((f >> "localparam ") && (f >> _local_params))
       || ((f >> "real ") && (f >> _variables))
@@ -868,15 +868,6 @@ void Module::dump(std::ostream& o)const
 //  }
 
   o << "endmodule\n";
-}
-/*--------------------------------------------------------------------------*/
-CS& Module::parse_analog(CS& cmd)
-{
-  AnalogConstruct* ab = new AnalogConstruct();
-  ab->set_owner(this);
-  ab->parse(cmd);
-  _analog_list.push_back(ab);
-  return cmd;
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::parse(CS& file)
