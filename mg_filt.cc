@@ -30,27 +30,25 @@
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
-// todo: rearrange, avoid Filter
-static void make_cc_tmp(Filter const* f, std::ostream& o)
+static void make_cc_tmp(std::ostream& o, std::string state, Deps const& deps)
 {
-  assert(f->has_branch());
 
   {
     char sign = '+';
     indent a;
-    o__ "d->" << f->state() << "[0] = " << sign << " " << "t0.value();\n";
+    o__ "d->" << state << "[0] = " << sign << " " << "t0.value();\n";
     size_t k = 2;
 
-    for(auto v : f->deps()) {
+    for(auto v : deps) {
       // char sign = f.reversed()?'-':'+';
       o__ "// dep " << v->code_name() << "\n";
       // if(f->branch() == v->branch()){ untested(); }
       if(v->branch()->is_short()){ untested();
       }else{
 	o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
-	o__ "// assert(!d->" << f->state() << "[" << k << "]);\n";
-	o__ "d->" << f->state() << "[" //  << k << "]"
-	  << "MOD::" << f->state() << "_::dep" << v->code_name() << "] "
+	o__ "// assert(!d->" << state << "[" << k << "]);\n";
+	o__ "d->" << state << "[" //  << k << "]"
+	  << "MOD::" << state << "_::dep" << v->code_name() << "] "
 	  " = " << sign << " " << "t0[d" << v->code_name() << "]; // (4)\n";
 	++k;
       }
@@ -77,12 +75,10 @@ private:
 class XDT : public MGVAMS_FILTER {
   Module* _m{NULL};
   Token_CALL const* _token{NULL};
-  // Branch_Ref _br;
   Probe const* _prb{NULL};
+  std::string _code_name;
 public: // HACK
-  Filter* _f{NULL};
-protected:
-  Branch const* _br{NULL};
+  Branch* _br{NULL};
 protected:
   explicit XDT() : MGVAMS_FILTER() {
   }
@@ -93,26 +89,24 @@ protected:
   }
   virtual XDT* clone()const = 0;
   virtual void make_assign(std::ostream& o) const = 0;
+  void set_code_name(std::string x){
+    _code_name = x;
+  }
   std::string code_name()const override{
-    return "/*XDT*/ d->" + label();
+    return "/*XDT*/ d->" + _code_name;
   }
 public:
   Token* new_token(Module& m, size_t na)const override {
     assert(na != size_t(-1));
-    Filter* f = NULL;
 
     std::string filter_code_name = label() + "_" + std::to_string(n_filters++);
 
     XDT* cl = clone();
     {
-      f = new Filter(filter_code_name);
-      f->set_owner(&m);
-      f->set_dev_type("va_" + label());
-
-      cl->set_label("_b_" + filter_code_name);
+      cl->set_label(label()); // "_b_" + filter_code_name);
+      cl->set_code_name("_b_" + filter_code_name);
       assert(na<3);
       cl->set_num_args(na);
-      cl->_f = f;
       cl->_m = &m;
       m.push_back(cl);
     }
@@ -120,35 +114,31 @@ public:
     Node* n = m.new_node(filter_code_name);
     {
       Branch* br = m.new_branch(n, &mg_ground_node);
-      br->set_filter();
       assert(br);
       assert(const_cast<Branch const*>(br)->owner());
       Branch_Ref prb(br);
       cl->_br = br;
-      f->set_output(prb);
-      f->set_state( "_st" + prb.code_name() );
 
       cl->_prb = m.new_probe("potential", prb);
-//	br->set_element(f);
-      br->set_filter();
-      m.push_back(f);
+      br->set_filter(cl);
+      m.new_filter();
     }
 
     return new Token_XDT(label(), cl);
   }
   void make_cc_common(std::ostream& o)const override{
     assert(num_args()!=size_t(-1));
-    o__ "class FILTER" << label() << "{\n";
+    o__ "class FILTER__" << _code_name << "{\n";
     o__ "public:\n";
     o____ "ddouble operator()(";
-      for(size_t n=0; n<num_args(); ++n){
-	o << "ddouble t" << n << ", ";
-      }
+    for(size_t n=0; n<num_args(); ++n){
+      o << "ddouble t" << n << ", ";
+    }
     o << "COMPONENT*) const;\n";
-    o__ "} " << label() << ";\n";
+    o__ "} " << _code_name << ";\n";
   }
   void make_cc_dev(std::ostream& o)const override{
-    o__ "ddouble " << label() << "(";
+    o__ "ddouble " << _code_name << "(";
       std::string comma;
       assert(num_args() < 3);
       for(size_t n=0; n<num_args(); ++n){
@@ -157,12 +147,14 @@ public:
       }
     o << ");\n";
   }
-  void make_cc_impl_comm(std::ostream&o)const{
+  void make_cc_impl_comm(std::ostream&o)const{ untested();
+    unreachable();
+#if 0
     assert(_m); // owner?
     assert(_f);
     std::string id = _m->identifier().to_string();
     o << "COMMON_" << id << "::";
-    o << "ddouble COMMON_" << id << "::FILTER" << label() <<
+    o << "ddouble COMMON_" << id << "::FILTER__" << _code_name <<
       "::operator()(";
     assert(num_args() < 3);
     for(size_t n=0; n<num_args(); ++n){
@@ -177,11 +169,12 @@ public:
     o << "}\n"
       "/*--------------------------------------"
       "------------------------------------*/\n";
+#endif
   }
-  void make_cc_impl(std::ostream&o)const override{
+  void make_cc_impl(std::ostream&o)const override {
 //    make_cc_impl_comm(o);
     std::string id = _m->identifier().to_string();
-    o << "MOD_"<< id <<"::ddouble MOD_" << id << "::" << label() << "(";
+    o << "MOD_"<< id <<"::ddouble MOD_" << id << "::" << _code_name << "(";
     std::string comma;
     for(size_t n=0; n<num_args(); ++n){
       o << comma << "ddouble t" << n;
@@ -190,7 +183,8 @@ public:
     o << ")\n{\n";
     o__ "MOD_" << id << "* d = this;\n";
     o__ "typedef MOD_" << id << " MOD;\n";
-    make_cc_tmp(_f, o);
+    make_cc_tmp(o, "_st"+_br->code_name()+"", _br->deps());
+
 
     make_assign(o);
     o << "}\n";
@@ -200,7 +194,7 @@ public:
     return "ddt";
   }
   Probe const* prb() const{return _prb;}
-};
+}; // XDT
 /*--------------------------------------------------------------------------*/
 class DDT : public XDT{
 public:
@@ -267,8 +261,8 @@ void Token_XDT::stack_op(Expression* e)const
   if(auto dd = prechecked_cast<Deps const*>(cc->data())){
     assert(dd);
 
-    assert(ff->_f);
-    ff->_f->set_deps(*dd); // HACK
+    ff->_br->deps().clear();
+    ff->_br->deps() = *dd; // HACK
 
     auto d = new Deps;
     d->insert(Dep(ff->prb())); // BUG?

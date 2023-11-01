@@ -2,7 +2,7 @@ pid0 #(.p(.1),.i(100),.d(1m)) dut (.sp(0),.sn(out),.cp(n1),.cn(0));
 // pid0 #(.d(1m)) dut (out, 0, n1, 0); 
 capacitor #(.c(1u)) c (.p(out),.n(0));
 resistor #(.r(1)) r (.p(out),.n(0));
-#Time       v(n1)      v(out)     iter(0)    timef(dut.ddt_1) timef(dut.idt_0)
+#Time       v(n1)      v(out)     iter(0)    timef(dut._b_ddt_1_) timef(dut._b_idt_0_)
  0.         0.         0.         3.         Inf        Inf       
  20.p       10.n       9.9998u    3.         30.p       84.u      
  31.p       15.5n      15.5u      3.         421.32u    68.839n   
@@ -196,7 +196,7 @@ iterations: op=0, dc=0, tran=524, fourier=0, total=715
 transient timesteps: accepted=188, rejected=3, total=191
 nodes: user=2, subckt=0, model=2, total=4
 dctran density=100.0%, ac density=100.0%
-#Time       v(n1)      v(out)     iter(0)    timef(dut.ddt_1) timef(dut.idt_0) timef(dut._b_sp_sn)
+#Time       v(n1)      v(out)     iter(0)    timef(dut._b_ddt_1_) timef(dut._b_idt_0_) timef(dut._b_sp_sn)
  0.         0.         0.         3.         Inf        Inf        Inf       
  20.p       10.n       9.9998u    3.         30.p       12.u       Inf       
  31.p       15.5n      15.5u      3.         159.25u    26.038n    Inf       

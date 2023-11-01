@@ -1,6 +1,6 @@
 polarity_ddt3 #() dut (.p(1),.n(0));
 resistor #(.r(1)) r (.p(1),.n(2));
-#Time       v(1)       v(2)       i(dut.ddt_1) i(dut.ddt_0) iter(0)    timef(dut.ddt_1) timef(dut.ddt_0) timef(v1)  timef(dut._b_p_n) timef(r)  
+#Time       v(1)       v(2)       i(dut._b_ddt_1_) i(dut._b_ddt_0_) iter(0)    timef(dut._b_ddt_0_) timef(dut._b_ddt_1_) timef(v1)  timef(dut._b_p_n) timef(r)  
  0.         0.         0.         0.         0.         3.         Inf        Inf        1.n        Inf        Inf       
  2.n        1.         1.        -500.Meg    500.Meg    3.         3.n        3.n        4.688n     Inf        Inf       
  3.1n       1.         1.         500.Meg   -500.Meg    3.         4.1n       4.1n       Inf        Inf        Inf       

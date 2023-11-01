@@ -1344,14 +1344,14 @@ void MOD_resistor::expand()
   // branch (p, n)
     {
     if (!_b_p_n) {
-      const CARD* p = device_dispatcher["flow_src"]; // flow_src
+      const CARD* p = device_dispatcher["va_flow"]; // va_flow
       if(!p){
-;        throw Exception("Cannot find flow_src. Load module?");
+;        throw Exception("Cannot find va_flow. Load module?");
       }else{
       }
       _b_p_n = dynamic_cast<ELEMENT*>(p->clone());
       if(!_b_p_n){
-        throw Exception("Cannot use flow_src: wrong type");
+        throw Exception("Cannot use va_flow: wrong type");
       }else{
       }
       subckt()->push_front(_b_p_n);
@@ -2332,7 +2332,7 @@ private: // strictly internal
 public: // input parameters
   PARAMETER<real> _p_c /*  */;
 private: // funcs
-  class FILTER_b_ddt_0{
+  class FILTER___b_ddt_0{
   public:
     ddouble operator()(ddouble t0, COMPONENT*) const;
   } _b_ddt_0;
@@ -2350,10 +2350,10 @@ public:
 private: // data
   node_t _nodes[3];
 public: // netlist
-  ELEMENT* _b_p_n{NULL}; // branch
   ELEMENT* _b_ddt_0_{NULL}; // filter
+  ELEMENT* _b_p_n{NULL}; // branch
 private: // func decl
-//filt _b_ddt_0
+//filt ddt
   ddouble _b_ddt_0(ddouble t0);
 private: // construct
   explicit MOD_capacitor(MOD_capacitor const&);
@@ -2771,17 +2771,37 @@ void MOD_capacitor::expand()
 
   // clone branches
   // filter (ddt_0, )
+  {
+  if (!_b_ddt_0_) {
+    const CARD* p = device_dispatcher["va_ddt"]; // va_ddt
+    if(!p){
+;      throw Exception("Cannot find va_ddt. Load module?");
+    }else{
+    }
+    _b_ddt_0_ = dynamic_cast<ELEMENT*>(p->clone());
+    if(!_b_ddt_0_){
+      throw Exception("Cannot use va_ddt: wrong type");
+    }else{
+    }
+    subckt()->push_front(_b_ddt_0_);
+  }else{
+  }
+    {
+      node_t nodes[] = {_n[n_ddt_0], gnd, _n[n_p], _n[n_n]}; // nodes
+      _b_ddt_0_->set_parameters("_b_ddt_0_", this, _b_ddt_0_->mutable_common(), 0., /*states:*/3, _st_b_ddt_0_, 4, nodes);
+      }
+  }
   // branch (p, n)
     {
     if (!_b_p_n) {
-      const CARD* p = device_dispatcher["flow_src"]; // flow_src
+      const CARD* p = device_dispatcher["va_flow"]; // va_flow
       if(!p){
-;        throw Exception("Cannot find flow_src. Load module?");
+;        throw Exception("Cannot find va_flow. Load module?");
       }else{
       }
       _b_p_n = dynamic_cast<ELEMENT*>(p->clone());
       if(!_b_p_n){
-        throw Exception("Cannot use flow_src: wrong type");
+        throw Exception("Cannot use va_flow: wrong type");
       }else{
       }
       subckt()->push_front(_b_p_n);
@@ -2794,28 +2814,6 @@ void MOD_capacitor::expand()
     }
 
   // clone filters
-  // ddt_0
-{ // filter expand
-    // code_name _b_ddt_0_
-    if (!_b_ddt_0_) {
-      const CARD* p = device_dispatcher["va_ddt"];
-      if(!p){
-;        throw Exception("Cannot find va_ddt. Load module?");
-      }else{
-      }
-      _b_ddt_0_ = dynamic_cast<ELEMENT*>(p->clone());
-      if(!_b_ddt_0_){
-        throw Exception("Cannot use va_ddt: wrong type");
-      }else{
-      }
-      subckt()->push_front(_b_ddt_0_);
-    }else{
-    }
-      {
-        node_t nodes[] = {_n[n_ddt_0], gnd, _n[n_p], _n[n_n]};
-        _b_ddt_0_->set_parameters("ddt_0", this, _b_ddt_0_->mutable_common(), 0., /*states:*/3, _st_b_ddt_0_, 4, nodes);
-      }
-    }
 
   }else{
       //precalc();
@@ -2912,7 +2910,7 @@ private: // funcs
       return false;
     }
   }
-  class FILTER_b_ddt_1{
+  class FILTER___b_ddt_1{
   public:
     ddouble operator()(ddouble t0, COMPONENT*) const;
   } _b_ddt_1;
@@ -2930,12 +2928,12 @@ public:
 private: // data
   node_t _nodes[3];
 public: // netlist
-  ELEMENT* _b_p_n{NULL}; // branch
   ELEMENT* _b_ddt_1_{NULL}; // filter
+  ELEMENT* _b_p_n{NULL}; // branch
 private: // func decl
 //func analysis
   // analysis
-//filt _b_ddt_1
+//filt ddt
   ddouble _b_ddt_1(ddouble t0);
 private: // construct
   explicit MOD_capacitor(MOD_capacitor const&);
@@ -3426,6 +3424,26 @@ void MOD_capacitor::expand()
 
   // clone branches
   // filter (ddt_1, )
+  {
+  if (!_b_ddt_1_) {
+    const CARD* p = device_dispatcher["va_ddt"]; // va_ddt
+    if(!p){
+;      throw Exception("Cannot find va_ddt. Load module?");
+    }else{
+    }
+    _b_ddt_1_ = dynamic_cast<ELEMENT*>(p->clone());
+    if(!_b_ddt_1_){
+      throw Exception("Cannot use va_ddt: wrong type");
+    }else{
+    }
+    subckt()->push_front(_b_ddt_1_);
+  }else{
+  }
+    {
+      node_t nodes[] = {_n[n_ddt_1], gnd, _n[n_p], _n[n_n]}; // nodes
+      _b_ddt_1_->set_parameters("_b_ddt_1_", this, _b_ddt_1_->mutable_common(), 0., /*states:*/3, _st_b_ddt_1_, 4, nodes);
+      }
+  }
   // branch (p, n)
     {
     if (!_b_p_n) {
@@ -3449,28 +3467,6 @@ void MOD_capacitor::expand()
     }
 
   // clone filters
-  // ddt_1
-{ // filter expand
-    // code_name _b_ddt_1_
-    if (!_b_ddt_1_) {
-      const CARD* p = device_dispatcher["va_ddt"];
-      if(!p){
-;        throw Exception("Cannot find va_ddt. Load module?");
-      }else{
-      }
-      _b_ddt_1_ = dynamic_cast<ELEMENT*>(p->clone());
-      if(!_b_ddt_1_){
-        throw Exception("Cannot use va_ddt: wrong type");
-      }else{
-      }
-      subckt()->push_front(_b_ddt_1_);
-    }else{
-    }
-      {
-        node_t nodes[] = {_n[n_ddt_1], gnd, _n[n_p], _n[n_n]};
-        _b_ddt_1_->set_parameters("ddt_1", this, _b_ddt_1_->mutable_common(), 0., /*states:*/3, _st_b_ddt_1_, 4, nodes);
-      }
-    }
 
   }else{
       //precalc();

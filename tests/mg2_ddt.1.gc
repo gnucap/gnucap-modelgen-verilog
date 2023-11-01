@@ -33,7 +33,12 @@ vsin #(.dc(v), .ampl(1)) v1(1, 0);
 
 list
 
-print tran v(1) idtddt(dut) ddtidt(dut) i(dut.ddt_*) i(dut.idt_*) iter(0)
+print tran v(1) idtddt(dut) ddtidt(dut)
+print tran + i(dut._b_ddt_2*)
+print tran + i(dut._b_ddt_1*)
+print tran + i(dut._b_idt_3*)
+print tran + i(dut._b_idt_0*)
+print tran + iter(0)
 tran 1 .1 trace=n
 status notime
 end

@@ -324,14 +324,10 @@ static void make_module(std::ostream& o, const Module& m)
     }else if(br->is_short()){ untested();
       o__ "// short : " << br->code_name() << "\n";
     }else if(br->is_filter()){
-      // TODO
-      // o__ "ELEMENT* " << br->code_name() << "{NULL}; // filter\n";
+      o__ "ELEMENT* " << br->code_name() << "{NULL}; // filter\n";
     }else{
       o__ "// ELEMENT* " << br->code_name() << "{NULL}; // no element (BUG)?\n";
     }
-  }
-  for (auto f : m.filters()){
-    o__ "ELEMENT* " << f->code_name() << "{NULL}; // filter\n";
   }
   o << "private: // func decl\n";
   make_func_dev(o, m.funcs());

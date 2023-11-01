@@ -1164,7 +1164,7 @@ public:
   void dump(std::ostream& f)const;
   Element_1() {untested();}
   Element_1(CS& f) {parse(f);}
-  const std::string& dev_type()const	{return _dev_type;}
+  std::string dev_type()const	{return _dev_type;}
   const Port_1_List& ports()const 	{return _port_list;}
   const std::string& name()const 	{return _name;}
   const std::string& eval()const 	{return _eval;}
@@ -1203,7 +1203,7 @@ public:
 //  const std::string& module_or_paramset_identifier()const {return _module_or_paramset_identifier;}
   void set_dev_type(std::string const& s){_module_or_paramset_identifier = s;}
   void set_state(std::string const& s){_state = s;}
-  virtual const std::string& dev_type()const {return _module_or_paramset_identifier;}
+  virtual std::string dev_type()const {return _module_or_paramset_identifier;}
   virtual Nature const* nature()const {return NULL;}
   virtual Discipline const* discipline()const {return NULL;}
   const Parameter_3_List&
@@ -1480,7 +1480,7 @@ class Branch : public Element_2 {
   size_t _has_pot_probe{0};
   size_t _has_flow_src{0};
   size_t _has_pot_src{0};
-  bool _is_filter{false};
+  FUNCTION_ const* _ctrl{NULL};
   std::vector<Branch_Ref*> _refs;
   size_t _number;
   std::list<std::string> _names;
@@ -1514,7 +1514,7 @@ public:
   std::string short_label()const override { return code_name();}
 //  std::string name_of_module_instance()const  {return code_name();}
   std::string const& omit()const override;
-  const std::string& dev_type()const override;
+  std::string dev_type()const override;
   void add_probe(Probe const*);
   size_t num_nodes()const override;
   std::string state()const override;
@@ -1527,13 +1527,13 @@ public:
   void dec_pot_probe(){ --_has_pot_probe; }
   void dec_flow_source(){ --_has_flow_src; }
   void dec_pot_source(){ --_has_pot_src; }
-  void set_filter(){ _is_filter=true; }
+  void set_filter(FUNCTION_ const* f){ _ctrl=f; }
   void set_direct(bool d=true);
   void set_selfdep(bool d=true) {_selfdep = d; }
   bool has_flow_probe() const;
   bool has_pot_probe() const;
   bool has_flow_source() const { return _has_flow_src; }
-  bool is_filter() const { return _is_filter; }
+  bool is_filter() const { return _ctrl; }
   bool has_pot_source() const;
   size_t num_states() const override;
   Discipline const* discipline()const override;
@@ -1672,6 +1672,7 @@ private: // merge?
   std::list<FUNCTION_ const*> _func;
   std::set<FUNCTION_ const*> _funcs;
   size_t _num_evt_slots{0};
+  size_t _num_filters{0};
   bool _has_analysis{false};
 private: // elaboration data
   Probe_Map _probes;
@@ -1709,10 +1710,11 @@ public:
   bool has_events()const {return _num_evt_slots;}
   bool has_analysis()const {return _has_analysis;}
   void new_evt_slot() { ++_num_evt_slots; }
+  void new_filter() { ++_num_filters; }
   size_t num_evt_slots()const {return _num_evt_slots; }
 public:
   const Filter_List&	filters()const		{return _filters;} // incomplete();
-  bool	has_filters()const		{return _filters.size();}
+  bool	has_filters()const		{return _filters.size() || _num_filters;}
   const Node_Map&	nodes()const		{return _nodes;}
   const Branch_Names&	branch_names()const	{return _branch_names;}
   const Branch_Map&	branches()const		{return _branches;}

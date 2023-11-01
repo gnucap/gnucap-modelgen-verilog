@@ -8,7 +8,7 @@ parameter r=1
 parameter v=0 
 test_ddt0_0 #() dut (.np(1),.nn(0));
 vsin #(.ampl(1),.dc(v)) v1 (.p(1),.n(0));
-#Time       v(1)       dv(dut)    i(dut.ddt_0) iter(0)   
+#Time       v(1)       dv(dut)    i(dut._b_ddt_0_) iter(0)   
  0.         0.         0.         0.         2.        
  0.1        0.58779    10.191     10.191     45.       
  0.2        0.95106    3.8557     3.8557     6.        

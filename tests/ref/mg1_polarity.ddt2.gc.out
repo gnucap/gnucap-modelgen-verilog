@@ -1,6 +1,6 @@
 polarity_ddt2 #() dut (.p(1),.n(0));
 resistor #(.r(1)) r (.p(1),.n(2));
-#Time       v(1)       v(2)       i(dut.ddt_1) i(dut.ddt_0) iter(0)   
+#Time       v(1)       v(2)       i(dut._b_ddt_1_) i(dut._b_ddt_0_) iter(0)   
  0.         0.         0.         0.         0.         3.        
  2.n        1.         1.        -500.Meg    500.Meg    3.        
  3.1n       1.         1.         500.Meg   -500.Meg    3.        

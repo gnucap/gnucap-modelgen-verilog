@@ -33,7 +33,7 @@ spice
 
 V1 n1 0 sin amplitude=1 freq=100
 
-.print tran v(nodes) iter(0) timef(dut.ddt_*)
+.print tran v(nodes) iter(0) timef(dut._b_ddt_*)
 
 .tran 10m
 .end

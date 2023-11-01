@@ -44,7 +44,7 @@ public:
   	_label = l;
   }
   ~FUNCTION_();
-  std::string label() const{
+  std::string const& label() const{
   	return _label;
   }
   void set_num_args(size_t n){ _num_args = n; }

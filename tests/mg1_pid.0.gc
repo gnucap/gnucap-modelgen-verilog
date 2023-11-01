@@ -35,8 +35,8 @@ spice
 V1 n1 0 pulse iv=0 pv=1 rise=2m delay=0 width=4m period=12m fall=1m
 
 .print tran v(nodes) iter(0)
-.print tran + timef(dut.d*)
-.print tran + timef(dut.i*)
+.print tran + timef(dut._b_d*)
+.print tran + timef(dut._b_i*)
 
 .tran 10m
 .status notime
@@ -45,7 +45,9 @@ V1 n1 0 pulse iv=0 pv=1 rise=2m delay=0 width=4m period=12m fall=1m
 .options trtol 1
 
 .print tran v(nodes) iter(0)
-.print tran + timef(dut.*)
+.print tran + timef(dut._b_d*)
+.print tran + timef(dut._b_i*)
+.print tran + timef(dut._b_sp_sn)
 .tran 0 10m
 .status notime
 .end

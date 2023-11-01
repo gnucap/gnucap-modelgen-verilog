@@ -78,6 +78,7 @@ private:
     assert(_f);
     std::string cn = _f->code_name();
     o__ "double " << cn << "state[" << _f->num_states() << "]\n;"; // filter/num_states?
+    o__ "ELEMENT* _f" << label() << "{NULL};\n";
     make_cc_dev_(o);
   }
   void make_assign(std::ostream& o)const {

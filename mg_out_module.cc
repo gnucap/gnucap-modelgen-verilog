@@ -634,9 +634,11 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
 {
   make_tag();
   auto br = dynamic_cast<Branch const*>(&e);
-  assert(br);
+  if(br){
+  }else{
+  }
 
-  if (br->is_short()) { untested();
+  if (br && br->is_short()) { untested();
     o__ "if(0){ // short\n";
   }else if (!(e.omit().empty())) { untested();
     o__ "if (" << e.omit() << ") {\n";
@@ -681,6 +683,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
       for(auto i : br->deps()){
 	Branch const* bb = i->branch();
       	if(bb->is_short()){
+	  // ...
 	}else if(bb == br){
 	}else if(i->is_pot_probe()){
 	  assert(i->branch());
@@ -715,7 +718,10 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
 	}
       }
     }
-  }else{ untested();
+  }else{
+    o << "gnd, gnd"; // filt subs hack.
+    o << "}; // nodes\n";
+    make_set_parameters(o, e);
 //    Port_3_List_2::const_iterator p = e.ports().begin();
 //    if (p != e.ports().end()) { untested();
 //      assert(*p);
@@ -730,75 +736,6 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
 //    make_set_subdevice_parameters(o, e);
   }
   
-  o << "      }\n";
-#endif
-  o__ "}\n";
-}
-/*--------------------------------------------------------------------------*/
-static void make_module_expand_one_filter(std::ostream& o, const Filter& e)
-{
-  make_tag();
-  // if (!(e.omit().empty())) { untested();
-  //   o__ "if (" << e.omit() << ") {\n";
-  //   o____ "if (" << e.code_name() << ") {\n";
-  //   o______ "subckt()->erase(" << e.code_name() << ");\n";
-  //   o______ e.code_name() << " = NULL;\n";
-  //   o____ "}else{\n";
-  //   o____ "}\n";
-  //   o__ "}else";
-  // }else{
-  //   o__ "";
-  // }
-  o << "{ // filter expand\n";
-
-  // BUG: duplicate
-  o__ "// code_name " << e.code_name() << "\n";
-  // o__ "// branch_code_name " << e.branch_code_name() << "\n";
-  o__ "if (!" << e.code_name() << ") {\n";
-  o____ "const CARD* p = device_dispatcher[\"" << e.dev_type() << "\"];\n";
-  o____ "if(!p){\n;";
-  o______ "throw Exception(" << "\"Cannot find " << e.dev_type() << ". Load module?\");\n";
-  o____ "}else{\n";
-  o____ "}\n";
-  o____ e.code_name() << " = dynamic_cast<ELEMENT*>(p->clone());\n";
-  o____ "if(!" << e.code_name() << "){\n";
-  o______ "throw Exception(" << "\"Cannot use " << e.dev_type() << ": wrong type\"" << ");\n";
-  o____ "}else{\n";
-  o____ "}\n";
-  o____ "subckt()->push_front(" << e.code_name() << ");\n";
-  o__ "}else{\n";
-  o__ "}\n";
-
-#if 1
-  o____ "{\n";
-  
-  o______ "node_t nodes[] = {";
-  
-  if(auto br = dynamic_cast<Filter const*>(&e)) {
-    if(e.num_nodes()) {
-//      o << "gnd, _n[n_" << br->name() << "]";
-      o << "_n[n_" << br->name() << "], gnd";
-    }else{
-      o << "gnd, gnd";
-    }
-    // o << "_n[0]"; // eek
-    for(auto i : br->deps()){
-      if(i->branch()){
-	o << ", ";
-	make_node_ref(o, *i->branch()->p());
-	o << ", ";
-	make_node_ref(o, *i->branch()->n());
-      }else{
-	o << "/* dep w/o branch? */ ";
-      }
-    //   o << ", _n[" << i->branch()->p()->code_name() << "]";
-    //   o << ", _n[" << i->branch()->n()->code_name() << "]";
-    }
-  }else{ untested();
-  }
-  
-  o << "};\n";
-  make_set_parameters(o, e);
   o << "      }\n";
 #endif
   o__ "}\n";
@@ -919,8 +856,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
       make_module_expand_one_branch(o, *i, m);
     }else if(i->is_filter()) {
       o__ "// filter " << i->name() << "\n";
-      // incomplete();
-      // make_module_expand_one_branch(o, *i, m);
+      make_module_expand_one_branch(o, *i, m);
     }else{
       o__ "// branch no elt " << i->name() << "\n";
     }
@@ -931,12 +867,13 @@ static void make_module_expand(std::ostream& o, Module const& m)
 #if 1
   for (auto i: m.filters()){
     if(i->has_branch()){
-      o__ "// " << i->name() << "\n";
-      indent x;
-      make_module_expand_one_filter(o, *i);
+      unreachable();
     }else{
+      incomplete();
       o__ "// no branch? " << i->name() << "\n";
-      make_module_expand_one_filter(o, *i);
+      make_module_expand_one_branch(o, *i, m);
+      // make_module_expand_one_filter(o, *i);
+      o__ "// =====/no branch===== // \n";
     }
   }
 #endif

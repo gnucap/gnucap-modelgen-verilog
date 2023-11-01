@@ -28,5 +28,7 @@ spice
 
 v1 2 0 pulse iv=0 pv=1 rise=1n
 
-.print tran v(nodes) i(dut.ddt*) iter(0)
+.print tran v(nodes) i(dut._b_ddt_1*)
+.print tran +        i(dut._b_ddt_0*)
+.print tran + iter(0)
 .tran 1

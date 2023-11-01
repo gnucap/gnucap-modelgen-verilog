@@ -140,7 +140,7 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
   Branch_Ref a = _branch_names.lookup(p);
 
   if(a){
-    if(n!=""){
+    if(n!=""){ untested();
       throw Exception("syntax error");
     }else{
       return a;
@@ -209,7 +209,7 @@ Branch_Ref Module::branch(std::string const& p) const
 Branch_Ref const& Branch_Names::new_name(std::string const& n, Branch_Ref const& r)
 {
   Branch_Ref& j = _m[n];
-  if(j){
+  if(j){ untested();
     throw Exception("Branch " + n + " already defined\n");
   }else{
     j = r;
@@ -252,38 +252,15 @@ Filter::~Filter()
   _deps = NULL;
 }
 /*--------------------------------------------------------------------------*/
-void Filter::set_deps(Deps const& d)
-{
-  trace2("set filter deps", code_name(), d.size());
-  for(auto i:d){
-    trace1("set filter deps", i->code_name());
-  }
-  deps().clear();
-  deps() = d;
-
-  // BUG, why both?
-  assert(_branch);
-  _branch->deps().clear();
-  _branch->deps() = d;
-}
-/*--------------------------------------------------------------------------*/
 std::string Filter::code_name()const
 {
-  if(has_branch()){
-    return _branch->code_name();
-  }else{
-    return "_f_" + _name; // name()?
-  }
+  return "_f_" + _name; // name()?
 }
 /*--------------------------------------------------------------------------*/
 // number of *all* branches in the module.
 size_t Filter::num_branches() const
 {
-  if(has_branch()){
-    return _branch->num_branches();
-  }else{
-    return 0;
-  }
+  return 0;
 }
 /*--------------------------------------------------------------------------*/
 void Branch::new_deps()
@@ -302,32 +279,28 @@ size_t Branch::num_branches() const
 size_t Branch::num_nodes() const
 {
   size_t ret=1;
-  std::vector<char> visited(num_branches());
 
   for(auto i : deps()){
     if(i->branch()->is_short()){ untested();
-    }else if(visited[i->branch()->number()]){
-
     }else if(i->branch() == this){
       // self conductance
     }else if(i->is_pot_probe()){
       ++ret;
-//     }else if(i->is_filter_probe()){
+//     }else if(i->is_filter_probe()){ untested();
 //       assert(i->is_pot_probe());
 //       unreachable();
 //       ++ret;
     }else{
     }
-    visited[i->branch()->number()] = 1;
   }
   return 2*ret;
 }
 /*--------------------------------------------------------------------------*/
 void Branch::add_probe(Probe const* b)
 {
-//  if(b->branch() == this){
+//  if(b->branch() == this){ untested();
 //    _selfdep = true;
-//  }else{
+//  }else{ untested();
 //  }
   deps().insert(Dep(b));
 }
@@ -347,7 +320,7 @@ bool Branch::is_generic()const
   if(!is_direct()){
     if(has_pot_source()){
       return true;
-    }else{
+    }else{ untested();
       incomplete();
     }
   }else if(has_flow_probe()){
@@ -357,30 +330,24 @@ bool Branch::is_generic()const
     }else{
     }
   }else if(has_flow_source()){
-  }else{
+  }else{ untested();
   }
   return false;
 }
 /*--------------------------------------------------------------------------*/
-const std::string& Branch::dev_type()const
+std::string Branch::dev_type()const
 {
-  if(!has_flow_source() && !has_pot_source() && !has_flow_probe()){
-    incomplete();
-    assert(0);
-  }else if(has_flow_source() && has_pot_source()){
-  }
-
-  static std::string f = "flow_src";
+//  if( .. attribute .. )?
   static std::string p = "va_pot";
   static std::string pb = "va_pot_br";
 
-//  if( .. attribute .. )?
-
-  if(!is_direct()){
+  if(is_filter()) {
+    return "va_" + _ctrl->label();
+  }else if(!is_direct()){
     if(has_pot_source()){
       return pb;
-    }else{
-      incomplete();
+    }else{ untested();
+      return "incomplete_dev_type";
     }
   }else if(has_flow_probe()){
     return p;
@@ -391,12 +358,12 @@ const std::string& Branch::dev_type()const
       return p;
     }
   }else if(has_flow_source()){
-    return f;
-  }else{
+    return "va_flow";
+  }else{ untested();
     return p;
   }
-  static std::string inc = "incomplete";
-  return inc;
+  unreachable();
+  return "";
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref::Branch_Ref(Branch_Ref const& b)
@@ -419,7 +386,7 @@ Branch_Ref::Branch_Ref(Branch_Ref&& b)
 {
   if(_br){
     _br->attach(this);
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -463,7 +430,7 @@ Branch_Ref& Branch_Ref::operator=(Branch_Ref&& o)
 
   if(_br) {
 //    assert(_br->has(this));
-  }else{
+  }else{ untested();
   }
   return *this;
 }
@@ -539,68 +506,18 @@ bool Branch::has_pot_source() const
 /*--------------------------------------------------------------------------*/
 size_t Filter::num_states() const
 {
-  if(_num_states){
-    return size_t(_num_states);
-  }else{
-    // BUG: delegate to branch/source?
-  }
-  std::vector<char> visited(num_branches());
-  size_t k = 2; // self conductance and what?
-  // TODO: cleanup
-  for(auto i : deps()){
-    trace1("filter deps", i->code_name());
-    if(i->is_reversed()){
-    }else{
-    }
-
-    if(dynamic_cast<Element_2 const*>(i->branch()) == _branch){
-    }else if(visited[i->branch()->number()]){
-    }else{
-      ++k;
-    }
-    visited[i->branch()->number()] = 1;
-  }
-  return k;
+  return size_t(_num_states);
 }
 /*--------------------------------------------------------------------------*/
 // BUG: delegate to branch
 size_t Filter::num_nodes() const
 {
-  trace3("Filter::num_nodes", code_name(), num_branches(), deps().size());
-  if(num_branches()){
-//  }else if(num_states()){
-  }else{
     return 0;
-  }
-  size_t ret=1;
-  std::vector<char> visited(num_branches());
-
-  for(auto i : deps()){
-    if(i->is_reversed()){
-    }else{
-    }
-    if(visited[i->branch()->number()]){
-      // depends on both, flow and potential.
-      // can only use one.
-    }else if(i->is_pot_probe()){
-      ++ret;
-//    }else if(i->is_filter_probe()){
-//      assert(i->is_pot_probe());
-//      unreachable();
-//      ++ret;
-    }else{
-    }
-    visited[i->branch()->number()] = 1;
-
-  }
-  return 2*ret;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 size_t Branch::num_states() const
 {
-  std::vector<char> visited(num_branches());
-
   size_t k = 2;
   // TODO: cleanup
   for(auto i : deps()){
@@ -609,13 +526,9 @@ size_t Branch::num_states() const
     //}else
     if(i->branch() == this){
     }else if(i->branch()->is_short()){ untested();
-    }else if(visited[i->branch()->number()]){
-      // depends on both, flow and potential.
-      // can only use one.
     }else{
       ++k;
     }
-    visited[i->branch()->number()] = 1;
   }
   return k;
 }
@@ -676,7 +589,7 @@ bool Probe::is_reversed() const
 }
 /*--------------------------------------------------------------------------*/
 Nature const* Branch::nature() const
-{
+{ untested();
 //  source?
   return NULL;
 }
@@ -717,13 +630,13 @@ Token* Module::new_token(FUNCTION_ const* f, size_t num_args)
 }
 /*--------------------------------------------------------------------------*/
 inline Branch_Ref Variable::new_branch(std::string const& p, std::string const& n)
-{
+{ untested();
   assert(owner());
   return(owner()->new_branch(p, n));
 }
 /*--------------------------------------------------------------------------*/
 inline Branch_Ref Variable::new_branch(Node const* p, Node const* n)
-{
+{ untested();
   assert(owner());
   return(owner()->new_branch(p, n));
 }
@@ -789,7 +702,7 @@ bool Contribution::is_pot_contrib() const
 /*--------------------------------------------------------------------------*/
 Contribution::~Contribution()
 {
-  if(!_branch) {
+  if(!_branch) { untested();
     incomplete();
   }else if (is_flow_contrib()) {
     _branch->dec_flow_source();
@@ -828,7 +741,7 @@ Branch::~Branch()
   assert(!_has_flow_src);
 
   // Probes tidied up
-  if(_has_pot_probe){
+  if(_has_pot_probe){ untested();
     unreachable();
   }else if(_has_flow_probe){ untested();
     unreachable();
@@ -851,12 +764,12 @@ void Branch::attach(Branch_Ref* r)
 /*--------------------------------------------------------------------------*/
 #if 0
 bool Branch::has(Branch_Ref* r) const
-{
+{ untested();
   assert(r);
-  for(auto& i : _refs){
-    if(i == r){
+  for(auto& i : _refs){ untested();
+    if(i == r){ untested();
       return true;
-    }else{
+    }else{ untested();
     }
   }
   return false;
@@ -905,19 +818,19 @@ bool Module::sync() const
 {
 #if 0
   // need getattr<bool>?
-  if(!has_attr("sync")){
+  if(!has_attr("sync")){ untested();
     true, false? automatic? how
   }else if(attr("sync") == "1"
-        || attr("sync") == "yes"){
+        || attr("sync") == "yes"){ untested();
     return true;
   }else if(attr("sync") == "0"
-        || attr("sync") == "no"){
-  }else{
+        || attr("sync") == "no"){ untested();
+  }else{ untested();
     unsupported.
   }
 #endif
 
-  if(has_submodule() && has_analog_block()){ untested();
+  if(has_submodule() && has_analog_block()){
     incomplete();
   }else{
   }
@@ -928,7 +841,7 @@ std::string Filter::state()const
 {
   if(Element_2::state().size()){
     return Element_2::state();
-  }else{
+  }else{ untested();
     // BUG?
     return "_st" + branch_code_name();
   }
@@ -937,18 +850,6 @@ std::string Filter::state()const
 std::string Filter::short_label()const
 {
   return name();
-}
-/*--------------------------------------------------------------------------*/
-#if 0
-Probe const* Filter::prb() const
-{
-  return _prb;
-}
-#endif
-/*--------------------------------------------------------------------------*/
-void Filter::set_output(Branch_Ref const& x)
-{
-  _branch = x;
 }
 /*--------------------------------------------------------------------------*/
 void Block::push_back(Base* c)
@@ -962,7 +863,7 @@ void Block::push_back(Base* c)
 }
 /*--------------------------------------------------------------------------*/
 Base const* Block::resolve(std::string const& k) const
-{
+{ untested();
   Block* b = const_cast<Block*>(this);
   return b->resolve(k);
 }
@@ -1021,50 +922,11 @@ bool is_false(Expression const& x)
   return e == 0.;
 }
 /*--------------------------------------------------------------------------*/
-#if 0
-Probe const* Expression_::new_probe(std::string const& xs, Branch_Ref const& br)
+bool is_zero(Expression const& x)
 { untested();
-  std::string flow_xs;
-  std::string pot_xs;
-
-  if(br->discipline()){
-    trace2("new_probe", xs, br->discipline()->identifier());
-    flow_xs = br->discipline()->flow()->access().to_string();
-    pot_xs = br->discipline()->potential()->access().to_string();
-  }else{
-    // huh?
-  }
-
-  std::string nn = xs;
-  // incomplete. discipline.h
-  if(xs == flow_xs || xs == "flow"){
-    br->set_flow_probe();
-    assert(br->has_flow_probe());
-    nn = "flow";
-  }else if( xs == pot_xs || xs == "potential" ){
-    br->set_pot_probe();
-    nn = "potential";
-  }else if( xs == "_filter"){
-    br->set_filter();
-    br->set_pot_probe();
-  }else{ untested();
-    trace1("new_probe", xs);
-    unreachable();
-    nn = xs;
-  }
-
-  Probe const* prb = new Probe(nn, br);
-  bool exists = deps().insert(Dep(prb)).second;
-
-  if (exists) { untested();
-    delete prb;
-  } else { untested();
-  }
-
-
-  return prb;
+  double e = x.eval();
+  return e == 0.;
 }
-#endif
 /*--------------------------------------------------------------------------*/
 Deps const& Expression_::deps() const
 {
@@ -1080,7 +942,7 @@ Deps const& Expression_::deps() const
 /*--------------------------------------------------------------------------*/
 Expression_::~Expression_()
 {
-//  for(auto i : _deps){
+//  for(auto i : _deps){ untested();
 //    delete i;
 //  }
 }
@@ -1089,7 +951,7 @@ Deps* copy_deps(Base const* b)
 {
   if(auto t=dynamic_cast<Deps const*>(b)){
     return t->clone();
-  }else{
+  }else{ untested();
     incomplete();
     unreachable();
     return NULL;
