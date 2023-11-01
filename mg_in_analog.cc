@@ -1029,6 +1029,12 @@ void Contribution::parse(CS& cmd)
 
 } // Contribution::parse
 /*--------------------------------------------------------------------------*/
+bool Contribution::update()
+{
+  // TODO incomplete();
+  return false;
+}
+/*--------------------------------------------------------------------------*/
 void Branch_Map::parse(CS& f)
 { untested();
   trace1("Branch_Map::parse", f.tail().substr(0,20));
@@ -1419,20 +1425,11 @@ void AF_Arg_List::dump(std::ostream& o)const
 // update_deps?
 bool Assignment::update()
 {
-  incomplete();
-  size_t n = _rhs.deps().size();
-
-  auto i=_rhs.begin();
-  for(size_t n=_rhs.size(); n--;){
-    (*i)->stack_op(&_rhs);
-    i = _rhs.erase(i);
-  }
-
-  if(n == _rhs.deps().size()){
-    return false;
-  }else{
+  if(_rhs.update()){
     update_deps(deps());
     return true;
+  }else{
+    return false;
   }
 }
 /*--------------------------------------------------------------------------*/

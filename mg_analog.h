@@ -285,7 +285,7 @@ public:
   }
 private:
   Expression& rhs() {return _rhs;}
-  bool update()override {incomplete(); return false;}
+  bool update()override;
 }; // Contribution
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

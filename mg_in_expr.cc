@@ -234,6 +234,19 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
   }
 } // resolve_symbols
 /*--------------------------------------------------------------------------*/
+bool Expression_::update()
+{
+  size_t n = deps().size();
+
+  auto i = begin();
+  for(size_t n=size(); n--;){
+    (*i)->stack_op(this);
+    i = erase(i);
+  }
+
+  return n != deps().size();
+}
+/*--------------------------------------------------------------------------*/
 /* A.8.3
 + mintypmax_expression ::=
 +	  expression

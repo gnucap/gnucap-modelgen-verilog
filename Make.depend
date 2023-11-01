@@ -16,7 +16,7 @@ mg_filt.o: mg_filt.cc mg_func.h /usr/local/include/gnucap/u_function.h \
  /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/m_base.h \
  /usr/local/include/gnucap/l_lib.h /usr/local/include/gnucap/constant.h \
  mg_expression.h /usr/local/include/gnucap/m_expression.h \
- /usr/local/include/gnucap/m_base.h mg_deps.h m_tokens.h \
+ /usr/local/include/gnucap/m_base.h mg_deps.h mg_analog.h m_tokens.h \
  /usr/local/include/gnucap/globals.h \
  /usr/local/include/gnucap/l_dispatcher.h \
  /usr/local/include/gnucap/l_stlextra.h /usr/local/include/gnucap/u_opt.h \

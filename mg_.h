@@ -372,6 +372,7 @@ public:
 class Probe; // Dep?
 class FUNCTION_;
 class Branch_Ref;
+// m_expression.h?
 class Expression_ : public Expression {
   Block* _owner{NULL};
 public:
@@ -390,6 +391,7 @@ public:
   Expression_* clone() const;
   Deps const& deps()const;
   Attrib const& attrib()const;
+  bool update();
 //  Deps& deps();
 //  Deps const& deps()const { return _deps; }
 //  Deps& deps() { return _deps; }

@@ -869,7 +869,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
     if(i->has_branch()){
       unreachable();
     }else{
-      incomplete();
+      // TODO incomplete();
       o__ "// no branch? " << i->name() << "\n";
       make_module_expand_one_branch(o, *i, m);
       // make_module_expand_one_filter(o, *i);

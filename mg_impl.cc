@@ -66,7 +66,7 @@ Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
 //    br->set_filter();
   }else{
     trace1("new_probe", xs);
-    unreachable();
+    incomplete(); // port branch?
     nn = xs;
   }
 
@@ -912,8 +912,8 @@ Deps* copy_deps(Base const* b)
   if(auto t=dynamic_cast<Deps const*>(b)){
     return t->clone();
   }else{
-    incomplete();
-    unreachable();
+    // TODO incomplete();
+    // unreachable();
     return NULL;
   }
 }
@@ -945,7 +945,7 @@ double ValueRangeInterval::eval() const
     return NOT_INPUT;
   }else if(_ub == _lb){
     return _ub.expression().eval();
-  }else{ untested();
+  }else{ itested();
     return NOT_INPUT;
   }
 }

@@ -98,11 +98,11 @@ static void make_cc_assignment(std::ostream& o, Assignment const& a)
       for(auto v : a.deps()) {
 	assert(v->branch());
 	if(v.is_linear()){
-	  incomplete();
+	  // TODO incomplete();
 	}else if(v.is_quadratic()){
 	  incomplete();
 	}else{
-	  incomplete();
+	  // TODO incomplete();
 	}
 
 	if(a.deps().is_linear()) {
@@ -129,7 +129,7 @@ static void make_cc_contrib(std::ostream& o, Contribution const& C)
 
   o__ "{ // Contribution " << C.name() << C.branch_ref() << " lin: " << C.deps().is_linear() << "\n";
   if(!C.is_pot_contrib() && is_zero(e)){
-    incomplete(); // ?
+    // TODO incomplete(); // optimize out?
   }else if(C.branch()->is_short()){
   }else{
     indent x("  ");
@@ -533,7 +533,7 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
   }
 
   if(b->deps().is_linear()){
-    incomplete();
+    // TODO incomplete();
     // o__ b->state() << "[0] = 0.;\n";
   }else{
   }
