@@ -55,15 +55,27 @@ typedef int integer;
 
 template<int numderiv>
 class ddouble_ {
+protected:
 	double _data[1+numderiv];
 public:
 	ddouble_(ddouble_ const& o) {
 		notstd::copy_n(o._data, numderiv+1, _data);
 	}
 	explicit ddouble_() { clear(); }
+	// fixme: implicit conversion in af args..
 	/*explicit*/ ddouble_(int const& d) { clear(); value() = d; }
 	/*explicit*/ ddouble_(double const& d) { clear(); value() = d; }
 	/*explicit*/ ddouble_(PARAMETER<double> const& d) { clear(); value() = d; }
+	void	set_all_deps() {
+	  std::fill_n(_data+1, numderiv, 0.);
+	}
+	void	set_no_deps() {
+	  std::fill_n(_data+1, numderiv, std::numeric_limits<double>::quiet_NaN());
+	}
+private:
+	void	reset_deriv(){
+	  set_all_deps();
+	}
 public:
 	double const& value() const{return _data[0];}
 	double& value(){return _data[0];}
@@ -86,18 +98,23 @@ public:
 	ddouble_& operator=(PARAMETER<double> const& o) {
 		assert(o == o);
 		*_data = o;
-		std::fill_n(_data+1, numderiv, 0.);
+		reset_deriv();
 		return *this;
 	}
 	ddouble_& operator=(const double& o) {
 		assert(o == o);
 		*_data = o;
-		std::fill_n(_data+1, numderiv, 0.);
+		reset_deriv();
 		return *this;
 	}
 	bool is_same(const ddouble_& o)const {
 		for(int i=0; i<=numderiv; ++i){
-			if(_data[i] != o._data[i]){ untested();
+			if(_data[i] != _data[i]){ itested();
+			  if( o._data[i] == o._data[i] ){
+				return false;
+			  }else{
+			  }
+			}else if(_data[i] != o._data[i]){ untested();
 				return false;
 			}else{
 			}
@@ -210,7 +227,7 @@ public:
 	}
 	ddouble_ operator-(double const& o) const {
 		ddouble_ ret = *this;
-		ret -= o;
+		ret -= ddouble_(o);
 		return ret;
 	}
 	ddouble_ operator-(int const& o) const {
@@ -220,7 +237,7 @@ public:
 	}
 	ddouble_ operator-(PARAMETER<double> const& o) const {
 		ddouble_ ret = *this;
-		ret -= o;
+		ret -= double(o);
 		return ret;
 	}
 	ddouble_ operator-() const {
@@ -235,8 +252,8 @@ public:
 		assert(*o._data == *o._data);
 		assert(*_data == *_data);
 		for(int i=1; i<=numderiv; ++i){
-			assert(_data[i] == _data[i]);
-			assert(o._data[i] == o._data[i]);
+			// assert(_data[i] == _data[i]);
+			// assert(o._data[i] == o._data[i]);
 			_data[i] *= *o._data;
 			_data[i] += *_data * o._data[i];
 		}
@@ -443,22 +460,19 @@ template<int T>
 ddouble_<T> operator+(double const& a, ddouble_<T> const& b)
 { itested();
 	ddouble_<T> c(b);
-	c += a;
-	return c;
+	return c + a;
 }
 template<int T>
 ddouble_<T> operator+(int const& a, ddouble_<T> const& b)
 { itested();
 	ddouble_<T> c(b);
-	c += a;
-	return c;
+	return c + a;
 }
 template<int T>
 ddouble_<T> operator+(PARAMETER<double> const& a, ddouble_<T> const& b)
 { itested();
 	ddouble_<T> c(b);
-	c += a;
-	return c;
+	return c + a;
 }
 template<int T>
 ddouble_<T> operator+(PARAMETER<int> const& a, ddouble_<T> const& b)
@@ -492,7 +506,8 @@ inline bool operator==(PARAMETER<double> const& b, int const& a)
 template<class T>
 T& set_value(T& t, double const& d)
 {
-	return t.set_value(d);
+	t.set_value(d);
+	return t;
 }
 template<>
 inline int& set_value(int& t, double const& v)
@@ -520,7 +535,8 @@ inline PARAMETER<double>& set_value(PARAMETER<double>& t, double const& v)
 template<class T>
 T& chain(T& t, double const& d)
 {
-	return t.chain(d);
+	t.chain(d);
+	return t;
 }
 template<>
 inline double& chain(double& t, double const&)
@@ -555,48 +571,6 @@ namespace va {
 // some builtin numerical functions according to verilog standard
 /*--------------------------------------------------------------------------*/
 template<class T>
-T cos(T d)
-{
-  chain(d, -std::sin(d));
-  return set_value(d, std::cos(d));
-}
-/*--------------------------------------------------------------------------*/
-template<class T>
-T cosh(T d)
-{itested();
-  chain(d, std::sinh(d));
-  return set_value(d, std::cosh(d));
-}
-/*--------------------------------------------------------------------------*/
-template<class T>
-T atan(T d)
-{ itested();
-  chain(d, 1./(1.+double(d)*double(d)));
-  set_value(d, std::atan(d));
-  return d;
-}
-/*--------------------------------------------------------------------------*/
-template<class T>
-T atanh(T d)
-{ untested();
-  incomplete();
-  return d;
-}
-/*--------------------------------------------------------------------------*/
-template<class T>
-T sinh(T d)
-{ untested();
-  incomplete();
-  return d;
-}
-/*--------------------------------------------------------------------------*/
-template<class T>
-int floor(T d)
-{itested();
-  return int(std::floor(d));
-}
-/*--------------------------------------------------------------------------*/
-template<class T>
 T fmod(T d, T e)
 { untested();
   return std::fmod(d, e);
@@ -626,9 +600,27 @@ inline int fmod(PARAMETER<int> const& d, int e)
   return d;
 }
 /*--------------------------------------------------------------------------*/
-template<class T, class S>
+template<class T, class S, class X=void>
 struct ddouble_if{
   typedef T type;
+};
+/*--------------------------------------------------------------------------*/
+struct ddouble_tag{};
+/*--------------------------------------------------------------------------*/
+template<class T, class S>
+struct ddouble_if<S, T, typename std::enable_if< std::is_same<typename T::base_tag, ddouble_tag>::value >::type > {
+  // typedef typename T::base type;
+  typedef T type;
+};
+/*--------------------------------------------------------------------------*/
+template<class T, class S>
+struct ddouble_if<T, S, typename T::base> {
+  typedef typename T::base type;
+};
+/*--------------------------------------------------------------------------*/
+template<class T, class S>
+struct ddouble_if<T, S, typename S::base> {
+  typedef typename S::base type;
 };
 /*--------------------------------------------------------------------------*/
 template<class S>
@@ -660,81 +652,23 @@ struct ddouble_if<T, double>{
 template<class S, class T>
 typename ddouble_if<T, S>::type max(T d, S e)
 {
+  typedef typename ddouble_if<T, S>::type ret_t;
   if(double(d) <= double(e)){ itested();
-    return e;
+    return ret_t(e);
   }else{itested();
-    return d;
+    return ret_t(d);
   }
 }
 /*--------------------------------------------------------------------------*/
 template<class T, class S>
 typename ddouble_if<T, S>::type min(T d, S e)
 {itested();
-  if(double(d) <= double(e)){itested();
-    return d;
-  }else{ itested();
-    return e;
-  }
-}
-/*--------------------------------------------------------------------------*/
-template<class T, class S>
-typename ddouble_if<T, S>::type pow(T b, S e)
-{
-  assert(b==b);
-  assert(e==e);
-  double p;
-  if(double(b) != 0.){
-    p = std::pow(b, e);
-    chain(b, double(e)/double(b)*p);
-  }else{
-    p = 0;
-    chain(b, 0.);
-  }
-
-  if(double(b) > 0.){
-    double l = std::log(b);
-    assert(l==l);
-    chain(e, l*p);
-    assert(e==e);
-  }else{
-    // unreachable(); // numerical nonsense, sometimes
-    chain(e, 0.);
-  }
-
-  set_value(b, p);
-  set_value(e, 0.);
   typedef typename ddouble_if<T, S>::type ret_t;
-  ret_t ret;
-  ret = b;
-  ret += ret_t(e);
-  assert(b==b);
-  return ret;
-}
-/*--------------------------------------------------------------------------*/
-template<class T>
-T asinh(T d)
-{ itested();
-  double b = std::sqrt(1.+double(d)*double(d));
-  chain(d, 1./b);
-  set_value(d, std::asinh(d));
-  return d;
-}
-/*--------------------------------------------------------------------------*/
-template<class T>
-T sin(T d)
-{
-  chain(d, std::cos(d));
-  return set_value(d, std::sin(d));
-}
-/*--------------------------------------------------------------------------*/
-template<class T>
-T tanh(T d)
-{itested();
-  double t = std::tanh(d);
-  set_value(d, t);
-  chain(d, 1. - t*t);
-  assert(d.is_same(d));
-  return d;
+  if(double(d) <= double(e)){itested();
+    return ret_t(d);
+  }else{ itested();
+    return ret_t(e);
+  }
 }
 /*--------------------------------------------------------------------------*/
 template<class T, class S=T>

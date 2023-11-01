@@ -241,7 +241,7 @@ private:
     o__ "d->_potential" << cn << " = - t0;\n";
     o__ "trace2(\"filt\", t0, d->"<< cn<<"->tr_outvolts());\n";
     if(num_args()>1){
-      o__ "t0 += t1.value();\n";
+      o__ "t0 = t0 + t1.value();\n";
     }else{
     }
     o__ "t0[d_potential" << cn << "] = -1.;\n";

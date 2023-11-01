@@ -381,7 +381,7 @@ void Token_BINOP_::stack_op(Expression* E)const
 	  t1.pop();
 	  t2.pop();
 	}else{
-	  incomplete();
+	  // incomplete();
 	  E->push_back(new Token_BINOP_(name(), t2, t1, deps));
 	  t1.pop();
 	  t2.pop();
