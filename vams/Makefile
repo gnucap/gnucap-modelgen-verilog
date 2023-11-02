@@ -34,7 +34,7 @@ all: ${TARGET}
 clean:
 	rm -r -f ${TARGET} ${TARGET:.so=.o} ${TARGET:.so=.cc}
 
-install:
+install: ${TARGET}
 	install -d $(DESTDIR)$(GNUCAP_PKGLIBDIR)/vams
 	install $(TARGET) $(DESTDIR)$(GNUCAP_PKGLIBDIR)/vams
 

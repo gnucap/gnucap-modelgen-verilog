@@ -99,7 +99,7 @@ install: install-recursive
 install-recursive: install-here
 	${MAKE} -C vams install GNUCAP_CONF=${GNUCAP_CONF}
 
-install-here: ${TARGET}
+install-here: ${TARGET} ${MODULES}
 	-${INSTALL} -d ${DESTDIR}${GNUCAP_EXEC_PREFIX}/bin
 	${INSTALL} ${TARGET} ${DESTDIR}${GNUCAP_EXEC_PREFIX}/bin
 
