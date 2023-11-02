@@ -1,0 +1,13 @@
+load ../lang_verilog.so 
+     ^ ? "../lang_verilog.so": already loaded, replacing
+resistor #(.r(r) .$mfactor(2)) r1(1, 0); 
+^ ? what's this?
+resistor #(.r(1k)) r1(1, 0); 
+^ ? what's this?
+vsource #(.dc(1)) v(1, 0); 
+^ ? what's this?
+print dc i(v) 
+           ^ ? no match
+#          
+ 1.        
+ 2.        

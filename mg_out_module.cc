@@ -750,13 +750,15 @@ static void make_module_precalc_first(std::ostream& o, Module const& m)
 
   o__ "auto c = static_cast<COMMON_" << mid << "*>(mutable_common());\n";
   o__ "assert(c);\n";
-  o__ "(void)c;\n";
+  o__ "auto cc = c->clone();\n";
 
   o__ "if(subckt()){\n";
   if(m.element_list().size()){
     o__ "subckt()->attach_params(&(c->_netlist_params), scope());\n";
   }else{
   }
+  o__ "attach_common(NULL);\n";
+  o__ "attach_common(cc);\n";
   o____ "subckt()->precalc_first();\n";
   o__ "}else{\n";
   o__ "}\n";

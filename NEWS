@@ -67,7 +67,8 @@
 
 202310**-dev
 ============
-* hotfixes/bugfixes (see git).
+* commons hotfix
+* fix shutdown crash
 * partial attribute instance in lang_verilog
 * bunch of optimisations
 * paramset stub, vams/cap
