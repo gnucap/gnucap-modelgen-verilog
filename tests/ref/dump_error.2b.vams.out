@@ -1,0 +1,4 @@
+... eal i;
+  analog begin
+  for(i=0; 0; j=i+1) begin
+                ^ ? what's this?

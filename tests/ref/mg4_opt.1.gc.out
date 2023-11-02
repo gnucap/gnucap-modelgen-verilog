@@ -1,0 +1,7 @@
+parameter r=1 
+parameter v=0 
+test_opt_1 #() dut (.a(0),.b(0));
+print dc v(dut.*) 
+           ^ ? no match
+#          
+ 0.        

@@ -65,7 +65,7 @@
 * fix contribution bug, mg1_polarity1.gc
 * fix getlines memory issue
 
-202310**-dev
+20231031-dev
 ============
 * commons hotfix
 * fix shutdown crash

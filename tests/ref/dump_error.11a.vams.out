@@ -1,0 +1,5 @@
+... r();
+endmodule;
+
+paramset const_res resistor;
+                     ^ ? too many

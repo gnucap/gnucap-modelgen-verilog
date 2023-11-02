@@ -1307,8 +1307,10 @@ void MOD_resistor::precalc_first()
   BASE_SUBCKT::precalc_first();
   auto c = static_cast<COMMON_resistor*>(mutable_common());
   assert(c);
-  (void)c;
+  auto cc = c->clone();
   if(subckt()){
+  attach_common(NULL);
+  attach_common(cc);
     subckt()->precalc_first();
   }else{
   }
@@ -2334,6 +2336,9 @@ public: // input parameters
   real _p___c /*  */;
   real _p___ic /*  */;
 private: // funcs
+  bool param_given(PARA_BASE const& p)const {
+    return p.has_hard_value();
+  }
   double _f_analysis(std::string const& what)const {
     if(what=="ic"){
       return _sim->analysis_is_tran_static();
@@ -2343,9 +2348,6 @@ private: // funcs
       incomplete();
       return false;
     }
-  }
-  bool param_given(PARA_BASE const& p)const {
-    return p.has_hard_value();
   }
   class FILTER___b_ddt_1{
   public:
@@ -2368,10 +2370,10 @@ public: // netlist
   ELEMENT* _b_ddt_1_{NULL}; // filter
   ELEMENT* _b_p_n{NULL}; // branch
 private: // func decl
-//func analysis
-  // analysis
 //func 
   // 
+//func analysis
+  // analysis
 //filt ddt
   ddouble _b_ddt_1(ddouble t0);
 private: // construct
@@ -2791,8 +2793,10 @@ void MOD_capacitor::precalc_first()
   BASE_SUBCKT::precalc_first();
   auto c = static_cast<COMMON_capacitor*>(mutable_common());
   assert(c);
-  (void)c;
+  auto cc = c->clone();
   if(subckt()){
+  attach_common(NULL);
+  attach_common(cc);
     subckt()->precalc_first();
   }else{
   }
@@ -2968,6 +2972,9 @@ public: // input parameters
   PARAMETER<real> _p_ic /*  */;
   real _p___c /*  */, _p___ic /*  */;
 private: // funcs
+  bool param_given(PARA_BASE const& p)const {
+    return p.has_hard_value();
+  }
   double _f_analysis(std::string const& what)const {
     if(what=="ic"){
       return _sim->analysis_is_tran_static();
@@ -2977,9 +2984,6 @@ private: // funcs
       incomplete();
       return false;
     }
-  }
-  bool param_given(PARA_BASE const& p)const {
-    return p.has_hard_value();
   }
   class FILTER___b_ddt_2{
   public:
@@ -3002,10 +3006,10 @@ public: // netlist
   ELEMENT* _b_ddt_2_{NULL}; // filter
   ELEMENT* _b_p_n{NULL}; // branch
 private: // func decl
-//func analysis
-  // analysis
 //func 
   // 
+//func analysis
+  // analysis
 //filt ddt
   ddouble _b_ddt_2(ddouble t0);
 private: // construct
@@ -3481,8 +3485,10 @@ void MOD_capacitor::precalc_first()
   BASE_SUBCKT::precalc_first();
   auto c = static_cast<COMMON_capacitor*>(mutable_common());
   assert(c);
-  (void)c;
+  auto cc = c->clone();
   if(subckt()){
+  attach_common(NULL);
+  attach_common(cc);
     subckt()->precalc_first();
   }else{
   }

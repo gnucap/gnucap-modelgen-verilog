@@ -1,0 +1,5 @@
+... ;
+  default : A = 2;
+  2 : A = 3;
+  default : A = 2;
+    ^ ? multiple default: not allowed
