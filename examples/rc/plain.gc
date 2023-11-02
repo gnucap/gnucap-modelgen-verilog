@@ -12,7 +12,7 @@ endmodule
 parameter ic=2
 
 // Verilog does not define instances or nodes at top level. Gnucap only
-// simulates what is instanciated. The node denotes ground node.
+// simulates what is instanciated. The 0 node denotes ground.
 // (at the time of writing, the "ground" declarator is not implemented.)
 
 rc #(.ic(ic)) myrc(1, 2, 0);

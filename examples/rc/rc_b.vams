@@ -1,0 +1,32 @@
+
+nature current
+  access = I;
+  units = "A";
+  abstol = 1e-12; // OPT::abstol
+endnature
+
+// Electrical potential
+nature voltage
+  access = V;
+  units = "V";
+  abstol = 1e-6; // OPT::vntol
+endnature
+
+// Electrical discipline
+discipline electrical
+  potential voltage;
+  flow current;
+enddiscipline
+
+module rc(p, n, gnd)
+	parameter real ic=1;
+	electrical p,n,gnd;
+
+	analog begin
+		if(analysis("ic"))
+			V(p, gnd) <+ ic;
+		else
+			I(p, gnd) <+ ddt(1e-6* V(p, gnd));
+		I(p, n) <+ V(p, n) / 1e3;
+	end
+endmodule

@@ -6,6 +6,7 @@
 - analysis("ic"): need more testing
 - ddx is incomplete
 - event control is incomplete
+- numerical port names don't work
 
 == simulator plugins
 - still missing tiebreak rules in overload

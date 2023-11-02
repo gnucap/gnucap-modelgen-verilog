@@ -12,7 +12,11 @@ Run with "gnucap compiled.gc"
 
 == behavioural.gc
 
-TODO
+Same, formulated as behavioural model in rc_b.vams. Uses "analog" block.
+
+$ gnucap-mg-vams --cc rc_b.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o rc_b.so
+
+Run with "gnucap behavioural.gc"
 
 == paramset.gc
 
