@@ -14,7 +14,7 @@ case (LEVEL)
 endcase
 
 case (LEVEL)
-	1 : begin
+	0, 1 : begin
 		 A=1;
 	    end
 	2 : A = 2;
@@ -28,6 +28,17 @@ endcase
 case (LEVEL)
 	1 : A = 1;
 	2 : A = 2;
+endcase
+
+case (LEVEL)
+	1,
+	2 : A = 2;
+endcase
+
+case (LEVEL)
+	1 :
+	2 : ;
+	3 : A = 2;
 endcase
 end
 

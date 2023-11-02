@@ -22,6 +22,7 @@
 #include "mg_.h"
 #include "mg_error.h"
 #include "mg_out.h"
+#include "mg_options.h"
 #include "l_stlextra.h"
 /*--------------------------------------------------------------------------*/
 #if 0
@@ -30,7 +31,7 @@ void Name_String::parse(CS& File)
   File.skipbl();
   _data = "";
   if (File.is_pfloat()) { untested();
-    while (File.is_pfloat()) {
+    while (File.is_pfloat()) { untested();
       _data += File.ctoc();
     }
     if (File.match1("eE")) { untested();
@@ -118,6 +119,7 @@ void Parameter_3::parse(CS& file)
 {
   _default_val.set_owner(owner());
   file >> '.' >> _name >> '(' >> _default_val >> ')' >> ',';
+  _default_val.resolve();
 }
 /*--------------------------------------------------------------------------*/
 void Parameter_3::dump(std::ostream& out)const
@@ -134,9 +136,9 @@ void Parameter_3::dump(std::ostream& out)const
 +	| "parameter" parameter_type list_of_param_assignments
 - specparam_declaration ::=
 -	  "specparam" [range] list_of_specparam_assignments
-- parameter_type ::=
--	  "integer"
--	| "real"
++ parameter_type ::=
++	  "integer"
++	| "real"
 -	| "realtime"
 -	| "time"
 -	| "string"
@@ -150,26 +152,47 @@ void Parameter_3::dump(std::ostream& out)const
 +	  parameter_identifier "=" constant_mintypmax_expression { value_range }
 -	| parameter_identifier range "=" constant_arrayinit { value_range }
 */
-void Parameter_2::parse(CS& file)
+void Parameter_2::parse(CS& f)
 {
+  assert(owner());
+  //assert(dynamic_cast<Parameter_2_List const*>(owner()));
   // file >> "parameter "; from caller
   _default_val.set_owner(owner());
-  file >> ','; // ??
-  file >> _name;
-  file >> '=' >> _default_val;
- // if(file.match1(";,")) {
- // }else
-  {
-    _value_range_list.set_owner(owner());
-    file >> _value_range_list;
+  _value_range_list.set_owner(owner());
+
+  f >> ','; // ??
+//  size_t here = f.cursor();
+  f >> _name;
+
+  assert(dynamic_cast<Module const*>(owner()));
+  if(owner()->lookup(_name, false)){
+    throw Exception_CS_("already declared", f);
+  }else{
+    trace3("not there", _name, name(), dynamic_cast<Module const*>(owner()) );
   }
+
+  f >> '=' >> _default_val;
+  f >> _value_range_list;
+
   assert(owner());
+}
+/*--------------------------------------------------------------------------*/
+void Parameter_2::resolve()
+{
+  _default_val.resolve();
+
+#if 1
   try{
-    owner()->new_var_ref(this);
+     owner()->new_var_ref(this);
   }catch(Exception const&){
-    throw Exception_CS_("already declared", file);
+    //unreachable();
+    //  assert(owner()->lookup(name()));
+     throw Exception("resolve: already declared " + name()); // , file); // BUG: cs?
   }
-  assert(owner()->lookup(name()));
+#endif
+
+  assert(owner()->lookup(name())
+       ||owner()->lookup(name().substr(2)));
 }
 /*--------------------------------------------------------------------------*/
 void Parameter_2::dump(std::ostream& o)const
@@ -179,7 +202,7 @@ void Parameter_2::dump(std::ostream& o)const
     o << _value_range_list;
   }else{
   }
-  //}else{
+  //}else{ untested();
   //}
 }
 /*--------------------------------------------------------------------------*/
@@ -218,6 +241,7 @@ void Aliasparam::parse(CS& f)
   if(pp){
     pp->add_alias(this);
     _param = pp;
+    // owner()->new_var_ref(this); // nope. does not create symbol acc to LRM
   }else{
     f.reset(here);
     throw Exception_CS_("no such parameter", f);
@@ -261,6 +285,8 @@ void Parameter_2_List::parse(CS& file)
     set_attributes(m->attribute_stash().detach());
   }
 
+  assert(file.last_match().size());
+
   _is_local = file.last_match()[0]=='l';
 //  file >> _type;
   if(file.umatch("real")){
@@ -272,9 +298,12 @@ void Parameter_2_List::parse(CS& file)
   }
   std::string type = _type.to_string();
   trace2("Parameter_2_List", _type, _is_local);
+
   LiSt<Parameter_2, '\0', ',', ';'>::parse(file);
   for(auto& i : *this){
     i->set_type(type);
+    i->set_local(_is_local);
+    i->resolve();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -341,23 +370,23 @@ void Variable_List_Collection::parse(CS& f)
 #if 0
   assert(owner());
   Module* mod = prechecked_cast<Module*>(owner());
-  if(mod){
-    if(mod->attribute_stash().is_empty()){
-    }else if(size()){
+  if(mod){ untested();
+    if(mod->attribute_stash().is_empty()){ untested();
+    }else if(size()){ untested();
       set_attributes(mod->attribute_stash().detach());
-    }else{
+    }else{ untested();
     }
-  }else{
+  }else{ untested();
   }
 #endif
 //  char t=f.last_match()[0];
   Collection<Variable_List>::parse(f);
 
-//  if(t=='i'){
-//    for(auto x:*this){
+//  if(t=='i'){ untested();
+//    for(auto x:*this){ untested();
 //      x->set_int();
 //    }
-//  }else{
+//  }else{ untested();
 //  }
 }
 /*--------------------------------------------------------------------------*/
@@ -369,6 +398,18 @@ void Variable_List_Collection::dump(std::ostream& o)const
   // Collection<Parameter_2_List>::dump(o);
 }
 /*--------------------------------------------------------------------------*/
+size_t Parameter_List_Collection::count_nonlocal() const
+{
+  size_t sum = 0;
+  for(auto const& i : *this){
+    if(i->is_local()){
+    }else{
+      sum += i->size();
+    }
+  }
+  return sum;
+}
+/*--------------------------------------------------------------------------*/
 void Parameter_List_Collection::dump(std::ostream& o)const
 {
   for(auto const& i : *this){
@@ -378,8 +419,8 @@ void Parameter_List_Collection::dump(std::ostream& o)const
 }
 /*--------------------------------------------------------------------------*/
 // void Localparam_List_Collection::dump(std::ostream& o)const
-// {
-//   for(auto const& i : *this){
+// { untested();
+//   for(auto const& i : *this){ untested();
 //     o__ "localparam ";
 //     i->dump(o);
 //   }
@@ -449,7 +490,14 @@ void Net_Declarations::parse(CS& f)
   Block const* root_scope = owner()->owner();
   assert(root_scope);
   File const* root = prechecked_cast<File const*>(root_scope);
-  assert(root);
+  if(root){
+  }else{
+    //incomplete();
+    //f.reset_fail(f.cursor());
+    //return;
+
+    root = prechecked_cast<File const*>(root_scope->owner());
+  }
   auto ii = root->discipline_list().find(f);
   Net_Decl_List* d = NULL;
 
@@ -483,7 +531,7 @@ void Net_Declarations::parse(CS& f)
     }else if(size()){
       assert(!_attributes);
       d->set_attributes(mod->attribute_stash().detach());
-    }else{
+    }else{ untested();
     }
   }else{
   }
@@ -495,7 +543,7 @@ void Net_Declarations::dump(std::ostream& o) const
 }
 /*--------------------------------------------------------------------------*/
 // void Port_Discipline_List_Collection::dump(std::ostream& out)const
-// {
+// { untested();
 //   Collection<Port_Discipline_List>::dump(out);
 // }
 /*--------------------------------------------------------------------------*/
@@ -683,15 +731,29 @@ net_declaration ::=
 void Module::parse(CS& f)
 {
   File* o = prechecked_cast<File*>(owner());
-  assert(o);
-  if(o->attribute_stash().is_empty()){
+  if(!o){ untested();
+    incomplete();
+  }else if(o->attribute_stash().is_empty()){
   }else{
     assert(!_attributes);
     set_attributes(o->attribute_stash().detach());
   }
-
-  // do we need a second pass? or just connect the dots while reading in?
+  // f >> "module |macromodule |connectmodule "; from caller
+  f >> _identifier;
+  parse_ports(f);
+  f >> ';';
+  parse_body(f);
+}
+/*--------------------------------------------------------------------------*/
+void Module::parse_ports(CS& f)
+{
   _ports.set_owner(this);
+  f >> _ports;
+}
+/*--------------------------------------------------------------------------*/
+void Module::parse_body(CS& f)
+{
+  // do we need a second pass? or just connect the dots while reading in?
   _input.set_owner(this);
   _output.set_owner(this);
   _inout.set_owner(this);
@@ -709,14 +771,12 @@ void Module::parse(CS& f)
   // _tr_eval.set_owner(this);
   // _validate.set_owner(this);
 
-  // f >> "module |macromodule |connectmodule "; from caller
-  f >> _identifier >> _ports >> ';';
-  assert(_parameters.owner() == this);
 
   size_t here = f.cursor();
   bool end = false;
   _attribute_stash.set_owner(this);
   for (;;) {
+    trace1("module body parse", f.tail().substr(0,20));
     while (f >> _attribute_stash) { }
     ONE_OF	// module_item
       || f.umatch(";")
@@ -744,12 +804,12 @@ void Module::parse(CS& f)
       || (f >> _element_list)	// module_instantiation
       ;
     if (_attribute_stash.is_empty()){
-    }else{
+    }else{ untested();
       f.warn(0, "dangling attributes");
     }
     if (end){
       break;
-    }else if (!f.more()) {
+    }else if (!f.more()) { untested();
       f.warn(0, "premature EOF (module)");
       break;
     }else if (f.stuck(&here)) {
@@ -811,6 +871,18 @@ void List_Of_Branch_Identifiers::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void Module::dump(std::ostream& o)const
 {
+  if(dynamic_cast<Paramset const*>(this)){
+    if (!options().dump_paramset()) { untested();
+      o << "// omit ps\n";
+      return;
+    }else{
+    }
+  }else if (!options().dump_module()) { untested();
+    o << "// omit module\n";
+    return;
+  }else{
+  }
+
   if(has_attributes()){
     o << attributes();
   }else{
@@ -829,7 +901,7 @@ void Module::dump(std::ostream& o)const
     o << "  inout "	    << inout()			<< "\n";
   }else{
   }
-  if(ground().size()){
+  if(ground().size()){ untested();
     o << "  ground "	    << ground()			<< "\n";
   }else{
   }
@@ -847,9 +919,9 @@ void Module::dump(std::ostream& o)const
     o << variables() << "\n";
   }else{
   }
-//  if(local_params().size()){
+//  if(local_params().size()){ untested();
 //    o << local_params() << "\n";
-//  }else{
+//  }else{ untested();
 //  }
   if(circuit().size()){
     o << ind << "// circuit\n";
@@ -863,7 +935,7 @@ void Module::dump(std::ostream& o)const
   for(auto i: analog_list()){
     o << *i << "\n";
   }
-//  for(auto i: *this){
+//  for(auto i: *this){ untested();
 //    o << *i << "\n";
 //  }
 
@@ -874,6 +946,7 @@ void Variable_Decl::parse(CS& file)
 {
   file >> ','; // ??
   file >> _name;
+  trace1("variable decl", _name);
   new_var_ref();
 }
 /*--------------------------------------------------------------------------*/
@@ -888,7 +961,7 @@ void ValueRangeInterval::parse(CS& file)
     _lb_is_closed = true;
   }else if(file.last_match() == "("){
     _lb_is_closed = false;
-  }else{
+  }else{ untested();
     unreachable();
   }
   assert(owner());
@@ -934,7 +1007,7 @@ void ValueRange::parse(CS& file)
       _what = new ValueRangeInterval;
       _what->set_owner(owner());
       file >> *_what;
-    }else{
+    }else{ untested();
       incomplete();
     }
   }else if(file >> "exclude"){
@@ -951,7 +1024,7 @@ void ValueRange::parse(CS& file)
     }
     file >> *_what;
     trace1("ValueRange::parse b", file.tail().substr(0,10));
-  }else{
+  }else{ untested();
   }
 
 }
@@ -973,6 +1046,7 @@ void ValueRangeConstant::dump(std::ostream& o)const
   o << _cexpr;
 }
 /*--------------------------------------------------------------------------*/
+/// set_vr_ref?
 void Block::new_var_ref(Base* what)
 {
   assert(what);
@@ -981,6 +1055,10 @@ void Block::new_var_ref(Base* what)
     p = V->name();
   }else if(auto P = dynamic_cast<Parameter_2 const*>(what)){
     p = P->name();
+  }else if(auto A = dynamic_cast<Aliasparam const*>(what)){
+    p = A->name();
+  }else if(auto A = dynamic_cast<Paramset_Stmt const*>(what)){
+    p = "."+A->name();
   }else{ untested();
     incomplete();
     assert(false);
@@ -990,13 +1068,14 @@ void Block::new_var_ref(Base* what)
   if(!m){
   }else{
     auto const& alias = m->aliasparam();
+    // alias.find(p)?
     if(alias.end() == notstd::find_ptr(alias.begin(), alias.end(), p)){
     }else{
-      throw(Exception("already there: '" + p + "'"));
+      throw(Exception("alias already there: '" + p + "'"));
     }
   }
 
-  trace1("new_var_ref", p);
+  trace3("new_var_ref, stashing", p, this, dynamic_cast<Module const*>(this));
   Base* cc = _var_refs[p];
 
   // yikes.
@@ -1006,7 +1085,13 @@ void Block::new_var_ref(Base* what)
   }else if(dynamic_cast<Analog_Function_Arg const*>(cc)
    &&!dynamic_cast<Analog_Function_Arg const*>(what)){
     _var_refs[p] = cc;
-  }else if(cc) {
+  }else if(p.substr(0,2)==PS_MANGLE_PREFIX) {
+    p = p.substr(2);
+    _var_refs[p] = what;
+  }else if(dynamic_cast<Paramset_Stmt const*>(what)){
+    _var_refs[p] = what;
+  }else if(cc) { untested();
+    _var_refs[p] = what;
     throw(Exception("already there: '" + p + "'"));
   }else{
     _var_refs[p] = what;

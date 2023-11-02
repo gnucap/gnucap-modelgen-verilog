@@ -22,6 +22,7 @@
 
 #include <md.h>
 #include "mg_out.h"
+#include "mg_options.h"
 /*--------------------------------------------------------------------------*/
 static void make_header(std::ostream& o, const File& in,
 			const std::string& /*dump_name*/)
@@ -127,14 +128,28 @@ void make_cc(std::ostream& out, const File& in)
   int num = 0;
   make_header(out, in, "dumpname");
   make_common_nature(out, in);
-  for (Module_List::const_iterator
-       m = in.module_list().begin();
-       m != in.module_list().end();
-       ++m) {
-    out << "namespace n" << std::to_string(num) << "{\n";
-    make_cc_module(out, **m);
-    out << "}\n";
-    ++num;
+  if(options().gen_module()){
+    for (Module_List::const_iterator
+	 m = in.module_list().begin();
+	 m != in.module_list().end();
+	 ++m) {
+      out << "namespace n" << std::to_string(num) << "{\n";
+      make_cc_module(out, **m);
+      out << "}\n";
+      ++num;
+    }
+  }else if(!options().expand_paramset()){
+  }else if(options().gen_paramset()){
+    for (Paramset_List::const_iterator
+	 m = in.paramset_list().begin();
+	 m != in.paramset_list().end();
+	 ++m) {
+      out << "namespace n" << std::to_string(num) << "{\n";
+      make_cc_module(out, **m);
+      out << "}\n";
+      ++num;
+    }
+
   }
   make_tail(out, in);
 }

@@ -1,0 +1,80 @@
+// paramsets
+module d1(a, b);
+  electrical a, b;
+  parameter real p = 1.;
+  localparam real __p = p;
+  localparam real __P = 0;
+
+  analog begin
+    if (1.) begin
+      V(a, b) <+ __p;
+    end
+    if (0.) begin
+      V(a, b) <+ __P;
+    end
+  end
+
+endmodule
+module d2(a, b);
+  electrical a, b;
+  parameter real P = 1.;
+  localparam real __p = P;
+  localparam real __P = 0;
+
+  analog begin
+    if (1.) begin
+      V(a, b) <+ __p;
+    end
+    if (0.) begin
+      V(a, b) <+ __P;
+    end
+  end
+
+endmodule
+module d2a(a, b);
+  electrical a, b;
+  parameter real P = 1.;
+  localparam real __P = P;
+  localparam real __p = 0;
+
+  analog begin
+    if (0.) begin
+      V(a, b) <+ __p;
+    end
+    if (1.) begin
+      V(a, b) <+ __P;
+    end
+  end
+
+endmodule
+module d3(a, b);
+  electrical a, b;
+  localparam real __p = 1;
+  localparam real __P = 0;
+
+  analog begin
+    if (1.) begin
+      V(a, b) <+ __p;
+    end
+    if (0.) begin
+      V(a, b) <+ __P;
+    end
+  end
+
+endmodule
+module d4(a, b);
+  electrical a, b;
+  localparam real __p = 0;
+  localparam real __P = 0;
+
+  analog begin
+    if (0.) begin
+      V(a, b) <+ __p;
+    end
+    if (0.) begin
+      V(a, b) <+ __P;
+    end
+  end
+
+endmodule
+

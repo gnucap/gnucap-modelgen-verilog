@@ -27,6 +27,14 @@
 #include <e_cardlist.h>
 #include <globals.h>
 /*--------------------------------------------------------------------------*/
+void Expression_::clear()
+{
+  while (!is_empty()){
+    delete back();
+    pop_back();
+  }
+}
+/*--------------------------------------------------------------------------*/
 Expression_* Expression_::clone() const
 {
   Expression_* n = new Expression_;
@@ -67,6 +75,24 @@ static Module const* to_module(Block const* owner)
   return NULL;
 }
 /*--------------------------------------------------------------------------*/
+static File const* to_file(Block const* owner)
+{
+  assert(owner);
+  while(true){
+    if(auto m = dynamic_cast<File const*>(owner)){
+      return m;
+    }else{
+    }
+    owner = owner->owner();
+    if(!owner){ untested();
+      return NULL;
+    }else{
+    }
+  }
+  unreachable();
+  return NULL;
+}
+/*--------------------------------------------------------------------------*/
 static FUNCTION_ const* is_analog_function_call(std::string const& f, Block const* owner)
 {
   Module const* m = to_module(owner);
@@ -87,10 +113,10 @@ static bool is_xs_function(std::string const& f, Block const* owner)
 {
   Module const* m = to_module(owner);
   assert(m);
-  File const* file = m->file();
+  File const* file = to_file(owner);
   if(!file){
     file = dynamic_cast<File const*>(m->owner());
-  }else{ untested();
+  }else{
   }
 
   assert(file);
@@ -127,14 +153,14 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
     trace1("resolve in", (*ii)->name());
   }
 
-  // resolve symbols
+  // lookup symbols
   for(List_Base<Token>::const_iterator ii = e.begin(); ii!=e.end(); ++ii) {
     Token* t = *ii;
 
     auto symbol = dynamic_cast<Token_SYMBOL*>(t);
     std::string const& n = t->name();
     Base const* r = scope->lookup(n);
-    trace3("resolve top found:", n, r, symbol);
+    trace3("lookup top found:", n, r, symbol);
 
     if(dynamic_cast<Token_STOP*>(t)) {
       trace0("resolve STOP");
@@ -175,16 +201,23 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
 
       Token_TERNARY_ t3(t->name(), NULL, tp, fp, NULL);
       t3.stack_op(&E);
+#if 0
+      // no. aliases are not supposed to be used here
+    }else if(auto a = dynamic_cast<Aliasparam const*>(r)) {
+      Token_PAR_REF PP(a->param_name(), a->param()); // BUG? use code name.
+      PP.stack_op(&E);
+#endif
     }else if(auto p = dynamic_cast<Parameter_Base const*>(r)) {
 //       owner()->new_token(p, 0);??
-      Token_PAR_REF PP(n, p);
+//      Token_PAR_REF PP(n, p);
+      Token_PAR_REF PP(p->name(), p);
       PP.stack_op(&E);
-      trace2("pushed par ref", n, size());
-    }else if(auto aa = dynamic_cast<Analog_Function_Arg const*>(r)) {
-      Token_VAR_REF a(n, aa);
-      a.stack_op(&E);
+      trace3("pushed par ref", n, size(), E.back()->name());
     }else if(auto v = dynamic_cast<Variable const*>(r)) {
-      Token_VAR_REF a(n, v);
+      if(n == v->name()){
+      }else{
+      }
+      Token_VAR_REF a(v->name(), v);
       a.stack_op(&E);
     }else if(!E.is_empty() && dynamic_cast<Token_PARLIST*>(E.back())
 	  && is_xs_function(n, scope)) {
@@ -255,11 +288,27 @@ bool Expression_::update()
 void ConstantMinTypMaxExpression::parse(CS& file)
 {
   assert(_e.is_empty());
-  Expression E(file);
+//  Expression_ E;
+  file >> _e;
   assert(_owner);
-//  _e = new Expression_();
+//  = new Expression_();
   _e.set_owner(_owner);
-  _e.resolve_symbols(E);
+//  _e.resolve_symbols(E);
+}
+/*--------------------------------------------------------------------------*/
+void ConstantMinTypMaxExpression::resolve()
+{
+  Expression_ tmp;
+  tmp.set_owner(_owner);
+  tmp.resolve_symbols(_e);
+  _e.clear();
+
+  for(auto j : tmp){
+    _e.push_back(j);
+  }
+  while(tmp.size()){
+    tmp.pop_back();
+  }
 }
 /*--------------------------------------------------------------------------*/
 void ConstantMinTypMaxExpression::dump(std::ostream& o)const
@@ -279,7 +328,9 @@ bool Parameter_2_List::is_local()const
 /*--------------------------------------------------------------------------*/
 double /*?*/ Parameter_2::eval() const
 {
-  if (value_range_list().size() == 1) {
+  if(is_local()) {
+    return _default_val.value();
+  }else if (value_range_list().size() == 1) {
     return (*value_range_list().begin())->eval();
   }else{
     return NOT_INPUT;

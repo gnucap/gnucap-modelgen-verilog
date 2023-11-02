@@ -45,6 +45,9 @@ void Options::parse(CS& f)
       || Get(f, "dump-module",     &_dump_module)
       || Get(f, "dump-paramset",   &_dump_paramset)
       || Get(f, "dump-unreachable",&_dump_unreachable)
+      || Get(f, "dump-discipline", &_dump_discipline)
+      || Get(f, "dump-nature",     &_dump_nature)
+      || Get(f, "expand-paramset", &_expand_paramset)
       ;
 
     if (!f.stuck(&here)) {

@@ -66,7 +66,7 @@ void make_final_adjust_value_list(std::ostream& out, const Parameter_2_List& pl)
   }
 }
 /*--------------------------------------------------------------------------*/
-void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2& p)
+static void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2& p)
 {
   // if (!(p.calculate().empty())) {untested();
   //   out << "    this->" << p.code_name() << " = " << p.calculate() << ";\n";
@@ -88,12 +88,39 @@ void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2& p)
   o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_final_adjust_eval_local_parameter(std::ostream& o, const Parameter_2& p)
+{
+  // if (!(p.calculate().empty())) {untested();
+  //   out << "    this->" << p.code_name() << " = " << p.calculate() << ";\n";
+  // }else{
+  // }
+  o__ "{\n";
+//  o__ p.type() << " val = ";
+  if (!(p.default_val().empty())) {
+    // o << p.default_val();
+    indent i2;
+    make_cc_expression(o, p.default_val().expression());
+  }else{
+    o << "NA;";
+  }
+//  o << ";\n";
+  o____ p.type() << " def = " << p.type() << "(t0.value());\n";
+  o____ "this->" << p.code_name() << " = def;\n";
+  o__ "}\n";
+}
+/*--------------------------------------------------------------------------*/
 void make_final_adjust_eval_parameter_list(std::ostream& out,
                                            const Parameter_List_Collection& P)
 {
   for(auto const& pl : P){
-    for (Parameter_2_List::const_iterator p=pl->begin(); p!=pl->end(); ++p) {
-      make_final_adjust_eval_parameter(out, **p);
+    if(!pl->is_local()){
+      for (Parameter_2_List::const_iterator p=pl->begin(); p!=pl->end(); ++p) {
+	make_final_adjust_eval_parameter(out, **p);
+      }
+    }else{
+      for (Parameter_2_List::const_iterator p=pl->begin(); p!=pl->end(); ++p) {
+	make_final_adjust_eval_local_parameter(out, **p);
+      }
     }
   }
 }
@@ -277,8 +304,11 @@ void make_copy_construct_parameter_list(std::ostream& out,
 					const Parameter_List_Collection& P)
 {
   for(auto const& pl : P){
-    for (Parameter_2_List::const_iterator p = pl->begin(); p != pl->end(); ++p) {
-      make_copy_construct_parameter(out, **p);
+    if(!pl->is_local()) {
+      for (Parameter_2_List::const_iterator p = pl->begin(); p != pl->end(); ++p) {
+	make_copy_construct_parameter(out, **p);
+      }
+    }else{
     }
   }
 }

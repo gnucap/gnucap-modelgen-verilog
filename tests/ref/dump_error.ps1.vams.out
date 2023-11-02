@@ -1,0 +1,4 @@
+... sistor;
+  parameter real rr = 0.;
+  .r = 1;
+    ^ ? parameter does not exist

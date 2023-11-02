@@ -149,10 +149,69 @@ private:
 } vt;
 DISPATCHER<FUNCTION>::INSTALL d_vt(&function_dispatcher, "$vt", &vt);
 /*--------------------------------------------------------------------------*/
+class Token_PG : public Token_CALL {
+public:
+  explicit Token_PG(const std::string Name, FUNCTION_ const* f = NULL)
+    : Token_CALL(Name, f) {}
+private:
+  explicit Token_PG(const Token_PG& P, Base const* data=NULL)
+    : Token_CALL(P, data) {}
+  Token* clone()const override {
+    return new Token_PG(*this);
+  }
+  void stack_op(Expression* e)const override{
+    Token const* arg=NULL;
+
+    if(!e->size()){ untested();
+      assert(e);
+      Token_CALL::stack_op(e);
+    }else if(auto p = dynamic_cast<Token_PARLIST_ const*>(e->back())){
+      if(auto ee = dynamic_cast<Expression const*>(p->data())){
+	arg = ee->back();
+      }else{ untested();
+	unreachable();
+      }
+    }else{
+      unreachable();
+    }
+
+    if(auto p = dynamic_cast<Token_PAR_REF const*>(arg)){
+      assert(p->item());
+      if(auto p2 = dynamic_cast<Parameter_2 const*>(p->item())) {
+	if(p2->is_given()){
+	  delete e->back();
+	  e->pop_back();
+	  Float* f = new Float(1.);
+	  e->push_back(new Token_CONSTANT("1.", f, ""));
+	}else if(p2->is_local()){
+	  delete e->back();
+	  e->pop_back();
+	  Float* f = new Float(0.);
+	  e->push_back(new Token_CONSTANT("0.", f, ""));
+	}else{
+	  Token_CALL::stack_op(e);
+	}
+      }else{
+	Token_CALL::stack_op(e);
+      }
+    }else if(dynamic_cast<Token_CONSTANT const*>(arg)){ untested();
+      assert(0);
+      delete e->back();
+      e->pop_back();
+      Float* f = new Float(0.);
+      e->push_back(new Token_CONSTANT("0.", f, ""));
+    }else if(arg) {
+      incomplete(); // error?
+    }else{
+      incomplete(); // error?
+    }
+  }
+};
+/*--------------------------------------------------------------------------*/
 class PARAM_GIVEN : public MGVAMS_FUNCTION {
   Token* new_token(Module& m, size_t)const override {
     m.install(this);
-    return new Token_SFCALL("$param_given", this);
+    return new Token_PG("$param_given", this);
   }
   std::string eval(CS&, const CARD_LIST*)const override{ untested();
     return "$param_given";
@@ -160,6 +219,9 @@ class PARAM_GIVEN : public MGVAMS_FUNCTION {
   std::string code_name()const override{
     return "param_given";
   }
+//   void stack_op(Expression const& args, Expression* out) const override {
+//     incomplete();
+//   }
   void make_cc_common(std::ostream& o)const override {
     o__ "bool " << code_name() << "(PARA_BASE const& p)const {\n";
     o____ "return p.has_hard_value();\n";

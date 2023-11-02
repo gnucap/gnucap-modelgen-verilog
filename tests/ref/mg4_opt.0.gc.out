@@ -1,10 +1,12 @@
 parameter r=1 
 parameter v=0 
 test_opt_0 #() dut (.a(0),.b(0));
-#           v(dut._b_a_b)
- 0.         0.        
+print dc v(dut.*) 
+           ^ ? no match
+#          
+ 0.        
 Gnucap   System status
-iterations: op=0, dc=3, tran=0, fourier=0, total=3
+iterations: op=0, dc=2, tran=0, fourier=0, total=2
 transient timesteps: accepted=0, rejected=0, total=0
 nodes: user=0, subckt=0, model=0, total=0
 dctran density=0.0%, ac density=0.0%

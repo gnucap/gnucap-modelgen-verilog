@@ -1,6 +1,7 @@
 
 `include "sub/disciplines.few"
 `pragma modelgen nodump-module
+`pragma modelgen noexpand-paramset
 
 module resistor(a,b)
 	electrical a, b;

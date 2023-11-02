@@ -17,5 +17,5 @@
 - MODEL_CARD in lang interface
 - BUG: padding long lines with whitespace
 - m vs M vs $mfactor.
-- newline handling in cmd.warn
+- tab/newline handling in cmd.warn Exception_CS
 - branch node order is suboptimal

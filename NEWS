@@ -69,3 +69,6 @@
 ============
 * hotfixes/bugfixes (see git).
 * partial attribute instance in lang_verilog
+* bunch of optimisations
+* paramset stub, vams/cap
+* more pragmas options

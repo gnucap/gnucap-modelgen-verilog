@@ -1,0 +1,24 @@
+
+`include "disciplines.vams"
+`pragma modelgen noexpand-paramset
+`pragma modelgen nodump-discipline
+`pragma modelgen nodump-module
+`pragma modelgen nodump-nature
+
+module resistor(a,b)
+	electrical a, b;
+
+	parameter real rrr = 1. from (0:inf);
+
+	analog begin
+		I(a,b) <+ V(a,b)/rrr;
+	end
+endmodule
+
+paramset my_res resistor;
+  parameter real R0 = 1.;
+  parameter real R1 = 1.;
+ .rrr = R0;
+ .rrr = R1;
+endparamset;
+

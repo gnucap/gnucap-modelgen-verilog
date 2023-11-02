@@ -1,0 +1,6 @@
+parameter r=2 
+parameter v=1 
+test_res1a_0 #(.r(r)) dut (.p(1),.n(0));
+vsource #(.dc(v)) v1 (.p(1),.n(0));
+#           i(v1)      iter(0)   
+ 0.        -0.5        3.        

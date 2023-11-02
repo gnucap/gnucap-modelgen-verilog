@@ -373,7 +373,7 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
     o << "/* ";
     se->dump(o);
     o << "\n";
-    o << "offset " << se->deps().is_offset() << "\n";
+    o << "is_offset " << se->deps().is_offset() << "\n";
     for(auto i : se->deps()) {
       o << "// Dep: " << i->code_name() << " order: " << i.order() << " ";
       o << "\n";

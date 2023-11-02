@@ -9,6 +9,7 @@ module test_opt_0(a, b);
 	electrical a, b;
 	inout a, b;
 	localparam real x = 0.;
+	localparam integer y = 0.;
 	analog begin
 		if(0)
 			V(a,b) <+ 0;

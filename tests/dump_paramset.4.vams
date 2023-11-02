@@ -1,0 +1,44 @@
+
+`include "disciplines.vams"
+`pragma modelgen expand-paramset
+`pragma modelgen nodump-module
+`pragma modelgen nodump-nature
+`pragma modelgen nodump-discipline
+`pragma modelgen dump-paramset
+
+module p_(a,b);
+	inout a,b;
+	electrical a,b;
+
+	parameter real p = 0;
+	parameter real P = 0;
+	analog begin
+      if ($param_given(p))
+			V(a,b) <+ p;
+      if ($param_given(P))
+			V(a,b) <+ P;
+	end
+endmodule
+
+paramset d1 p_;
+	parameter real p = 1.;
+	.p(p);
+endparamset;
+
+paramset d2 p_;
+	parameter real P = 1.;
+	.p(P);
+endparamset;
+
+paramset d2a p_;
+	parameter real P = 1.;
+	.P(P);
+endparamset;
+
+
+paramset d3 p_;
+	.p(1);
+endparamset;
+
+paramset d4 p_;
+endparamset;

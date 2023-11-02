@@ -3,8 +3,16 @@ module test(d, g, s, b);
 	real T;
 	parameter real P = 3 from [0:0];
 	parameter real Q = 3 from [1:1];
+	localparam real R0 = Q + 0;
+	localparam real R1 = Q;
+	localparam real R2 = 2;
 	analog begin
 		T = 5 * P;
 		T = Q * 5;
+		T = R0 * 5;
+		T = R1 * 5;
+		T = R2;
+		T = R2 + 1;
+		T = T - T;
 	end
 endmodule

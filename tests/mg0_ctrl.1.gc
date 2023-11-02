@@ -24,9 +24,12 @@ list
 !make test_for0_0.so > /dev/null
 attach ./test_for0_0.so
 
-test_for0_0 #(.v(1)) dut(1,0);
-test_for0_0 #(.v(2)) dut(2,0);
-test_for0_0 #(.v(3)) dut(3,0);
+test_for0_0 #(.v(0)) dut(n0,0);
+test_for0_0 #(.v(1)) dut(n1,0);
+test_for0_0 #(.v(2)) dut(n2,0);
+test_for0_0 #(.v(3)) dut(n3,0);
+
+resistor #(1k) r(n0 n1);
 
 list
 

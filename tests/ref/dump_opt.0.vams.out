@@ -49,6 +49,9 @@ module test(d, g, s, b);
     T = (P *  1.2);
     T = ((U *  1.2) * ln(((0.4e-6 / T) + 1.0)));
     T = ((P *  1.2) * ln(((0.4e-6 / T) + 1.0)));
+    T =  0.;
+    T = 0.;
+    T = 0.;
   end
 
 endmodule

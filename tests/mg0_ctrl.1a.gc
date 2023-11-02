@@ -5,34 +5,34 @@ attach ../d_vasrc.so
 verilog
 
 `modelgen
-module test_while0a(p, n);
-	electrical p, n;
-	inout p, n;
-	parameter real r=0;
-	analog begin
-		integer i;
-		real x, y;
-		x = 0.;
-		y = 0.;
-		for(i=r; i>0; i=i-1) begin
-			x = y;
-			y = x + V(p, n);
-		end
-
-		I(p, n) <+ x;
-	end
+module test_for0_0(p, n);
+  electrical p, n;
+  inout p, n;
+  parameter real v=0;
+  analog begin
+    integer i;
+    i = 0;
+    for(i=v; i>0; ) begin
+      V(p,n) <+ 1.;
+      i = i - 1;
+    end
+  end
 endmodule
 
 list
 
-!make test_while0a.so > /dev/null
-attach ./test_while0a.so
+!make test_for0_0.so > /dev/null
+attach ./test_for0_0.so
 
-test_while0a #(.r(2)) dut(1,0);
-vsource #(.dc(1)) v(1,0);
+test_for0_0 #(.v(0)) dut(n0,0);
+test_for0_0 #(.v(1)) dut(n1,0);
+test_for0_0 #(.v(2)) dut(n2,0);
+test_for0_0 #(.v(3)) dut(n3,0);
+
+resistor #(1k) r(n0 n1);
 
 list
 
-print dc i(v) iter(0)
+print dc v(nodes) iter(0)
 dc
 end

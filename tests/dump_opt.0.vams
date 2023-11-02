@@ -31,5 +31,8 @@ module test(d, g, s, b);
 		T = 2.0 * P * 3.0 / 5.;
 		T = 2.0 * U * 3.0 / 5. * ln(1.0 + 0.4e-6 / T);
 		T = 2.0 * P * 3.0 / 5. * ln(1.0 + 0.4e-6 / T);
+		T = 1. && 0.;
+		T = analysis("ic") && 0.;
+		T = 0. && analysis("ic");
 	end
 endmodule

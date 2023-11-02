@@ -1,0 +1,7 @@
+
+paramset const_res resistor;
+	parameter real rr = 0.;
+	// .r = 1;
+endparamset;
+
+

@@ -631,18 +631,6 @@ Token* Module::new_token(FUNCTION_ const* f, size_t num_args)
   return f->new_token(*this, num_args);
 }
 /*--------------------------------------------------------------------------*/
-inline Branch_Ref Variable::new_branch(std::string const& p, std::string const& n)
-{ untested();
-  assert(owner());
-  return(owner()->new_branch(p, n));
-}
-/*--------------------------------------------------------------------------*/
-inline Branch_Ref Variable::new_branch(Node const* p, Node const* n)
-{ untested();
-  assert(owner());
-  return(owner()->new_branch(p, n));
-}
-/*--------------------------------------------------------------------------*/
 bool Variable::is_module_variable() const
 {
   if(dynamic_cast<Module const*>(owner())){
@@ -822,20 +810,37 @@ void Block::push_back(Base* c)
   }
 }
 /*--------------------------------------------------------------------------*/
-Base const* Block::lookup(std::string const& k, bool) const
+Base const* Block::lookup(CS& f) const
 {
-  Block* b = const_cast<Block*>(this);
-  return b->lookup(k);
+  std::string name;
+  size_t here = f.cursor();
+  f >> name;
+  Base const* b = lookup(name, true);
+  if(b){
+  }else{
+    trace1("cannot lookup", name);
+    f.reset_fail(here);
+  }
+  return b;
 }
 /*--------------------------------------------------------------------------*/
-Base* Block::lookup(std::string const& k, bool)
+Base const* Block::lookup(std::string const& k, bool recurse) const
+{
+  Block* b = const_cast<Block*>(this);
+  return b->lookup(k, recurse);
+}
+/*--------------------------------------------------------------------------*/
+Base* Block::lookup(std::string const& k, bool recurse)
 {
   trace2("lookup", _owner, k);
   const_iterator f = _var_refs.find(k);
   if(f != _var_refs.end()) {
     return f->second;
+  }else if(!recurse) {
+    assert(dynamic_cast<Module const*>(this));
+    return NULL;
   }else if(_owner) {
-    return _owner->lookup(k);
+    return _owner->lookup(k, true);
   }else{
     assert(dynamic_cast<File const*>(this));
     return NULL;
@@ -888,6 +893,18 @@ bool is_zero(Expression const& x)
   return e == 0.;
 }
 /*--------------------------------------------------------------------------*/
+Attrib const& Expression_::attrib() const
+{
+  static Attrib no_attrib;
+  if(is_empty()){
+    return no_attrib;
+  }else if(auto d = dynamic_cast<Attrib const*>(back()->data())){
+    return *d;
+  }else{
+    return no_attrib;
+  }
+}
+/*--------------------------------------------------------------------------*/
 Deps const& Expression_::deps() const
 {
   static Deps no_deps;
@@ -895,6 +912,8 @@ Deps const& Expression_::deps() const
     return no_deps;
   }else if(auto d = dynamic_cast<Deps const*>(back()->data())){
     return *d;
+  }else if(auto d = dynamic_cast<Attrib const*>(back()->data())){ untested();
+    return d->deps();
   }else{
     return no_deps;
   }
@@ -911,11 +930,14 @@ Deps* copy_deps(Base const* b)
 {
   if(auto t=dynamic_cast<Deps const*>(b)){
     return t->clone();
+  }else if(!b) {
+    // unary(par_ref)?
   }else{
-    // TODO incomplete();
-    // unreachable();
-    return NULL;
+    incomplete();
+    unreachable();
+    assert(0);
   }
+  return NULL;
 }
 /*--------------------------------------------------------------------------*/
 // bool ValueRangeSpec::is_constant() const

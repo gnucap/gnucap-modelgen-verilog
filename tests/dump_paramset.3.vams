@@ -1,0 +1,31 @@
+
+`include "sub/disciplines.few"
+`pragma modelgen expand-paramset
+`pragma modelgen nodump-module
+`pragma modelgen dump-paramset
+
+module resistor(a,b)
+	electrical a, b;
+
+	parameter real r = 1.;
+
+	analog begin
+		I(a,b) <+ V(a,b)/r;
+	end
+endmodule
+
+paramset my_res resistor;
+	parameter real r = 1.;
+	.r = r;
+endparamset;
+
+paramset my_res resistor;
+	parameter real R = 1k from [1k:1k];
+	.r = R;
+endparamset;
+
+paramset my_res resistor;
+	parameter real R0 = 1.;
+	parameter real R1 = 1.;
+	.r = R0 + R1;
+endparamset;

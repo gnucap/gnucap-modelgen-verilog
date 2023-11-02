@@ -1,0 +1,18 @@
+
+`include "sub/disciplines.few"
+`pragma modelgen expand-paramset
+
+module resistor(a,b)
+	electrical a, b;
+
+	parameter real r = 1.;
+
+	analog begin
+		I(a,b) <+ V(a,b)/r;
+	end
+endmodule
+
+paramset my_res resistor;
+	parameter real r = 1.;
+	.r = r;
+endparamset;

@@ -120,11 +120,14 @@ static void make_common_operator_equal(std::ostream& out, const Module& d)
        q = d.parameters().begin();
        q != d.parameters().end();
        ++q) {
-    for (Parameter_2_List::const_iterator
-	 p = (*q)->begin();
-	 p != (*q)->end();
-	 ++p) {
-      out << "    && " << (**p).code_name() << " == p->" << (**p).code_name() << '\n';
+    if(!(*q)->is_local()) {
+      for (Parameter_2_List::const_iterator
+	   p = (*q)->begin();
+	   p != (*q)->end();
+	   ++p) {
+	out << "    && " << (**p).code_name() << " == p->" << (**p).code_name() << '\n';
+      }
+    }else{
     }
   }
   out << 
@@ -328,9 +331,13 @@ void make_common_param_name(std::ostream& o, const Module& m)
 //  assert(i == m.common().override().size());
   for (auto q = m.parameters().begin();
        q != m.parameters().end();
-       ++q)
-  for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
-    o << "  case " << i++ << ":  return \"" << (**p).name() << "\";\n";
+       ++q){
+    if((*q)->is_local()){
+    }else{
+      for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
+	o << "  case " << i++ << ":  return \"" << (**p).name() << "\";\n";
+      }
+    }
   }
 //  assert(i == m.common().override().size() + m.common().raw().size());
   o <<
@@ -496,11 +503,15 @@ void make_common_param_value(std::ostream& out, const Module& m)
 //  assert(i == m.common().override().size());
   for (auto q = m.parameters().begin();
        q != m.parameters().end();
-       ++q)
-    if(!(*q)->is_local())
-  for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
-      out << "  case " << i++ << ":  return " << (**p).code_name() << ".string();\n";
+       ++q){
+    if(!(*q)->is_local()){
+      for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
+	  out << "  case " << i++ << ":  return " << (**p).code_name() << ".string();\n";
+      }
+    }else{
+    }
   }
+
 //  assert(i == m.common().override().size() + m.common().raw().size());
   out <<
     "  default: return COMMON_COMPONENT::param_value(i);\n"

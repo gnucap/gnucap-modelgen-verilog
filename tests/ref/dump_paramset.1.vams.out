@@ -1,0 +1,44 @@
+nature current
+  access = "I";
+  units = "A";
+  abstol = "0.001234";
+endnature
+
+nature voltage
+  access = "V";
+  units = "V";
+  abstol = "0.0004321";
+endnature
+
+
+discipline electrical
+  potential "voltage";
+  flow "current";
+enddiscipline
+
+
+module resistor(a, b);
+  electrical a, b;
+  parameter real r = 1. from ((0):(inf));
+
+  analog begin
+    I(a, b) <+ (V(a, b) / r);
+  end
+
+endmodule
+
+
+
+// paramsets
+paramset my_res resistor;
+  parameter real R = 1.;
+
+  .r = R
+endparamset;
+paramset my_res resistor;
+  parameter real R0 = 1.;
+  parameter real R1 = 1.;
+
+  .r = (R0 + R1)
+endparamset;
+

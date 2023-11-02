@@ -179,7 +179,7 @@ static void make_common(std::ostream& o, const Module& m)
     "  std::string param_name(int,int)const override;\n"
     "  std::string param_value(int)const override;\n"
     "  int param_count()const override {return ("
-	     << m.parameters().size()
+	     << m.parameters().count_nonlocal()
 	     << " + " << base_class_name << "::param_count());}\n"
     "  void precalc_first(const CARD_LIST*)override;\n"
     "  void expand(const COMPONENT*)override;\n"

@@ -1,27 +1,29 @@
 `include "disciplines.vams"
+`pragma modelgen expand-paramset
+`pragma modelgen nogen-module
 
-module capacitor(p,n);
-	inout p,n;
-	electrical p,n;
-
-	parameter real c = 1. from [0:inf);
-	analog begin
-		I(p,n) <+ ddt(c * V(p,n));
-	end
-endmodule
-
-module capacitor(p,n);
+module capacitor_(p,n);
 	inout p,n;
 	electrical p,n;
 
 	parameter real c = 1. from [0:inf);
 	parameter real ic = 0;
 	analog begin
-      // if param_given(ic)?
-		if (analysis("ic"))
-			V(p,n) <+ ic;
-		else
-			I(p,n) <+ ddt(c * V(p,n));
+	if($param_given(ic) && analysis("ic"))
+		V(p,n) <+ ic;
+	else
+		I(p,n) <+ ddt(c * V(p,n));
 	end
 endmodule
 
+paramset capacitor capacitor_
+	parameter real c = 1. from [0:inf);
+	.c = c;
+endparamset
+
+paramset capacitor capacitor_
+	parameter real c = 1. from [0:inf);
+	parameter real ic = 0;
+	.c = c;
+	.ic = ic;
+endparamset

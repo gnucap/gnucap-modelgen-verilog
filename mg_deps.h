@@ -148,7 +148,12 @@ class Attrib : public Base {
 //  DataType _type;?
 public:
   explicit Attrib() : Base() {}
-  ~Attrib();
+  ~Attrib() {
+    delete _deps;
+    _deps = NULL;
+    delete _range;
+    _range = NULL;
+  }
 private:
   explicit Attrib(Attrib const&) : Base() { }
   Attrib* clone()const {
@@ -156,6 +161,7 @@ private:
   }
   void set_deps(Deps const* d) { assert(!_deps); _deps=d; }
   void set_range(Range const* r) { assert(!_range); _range=r; }
+public:
   Deps const& deps() const{
     if(_deps){
       return *_deps;

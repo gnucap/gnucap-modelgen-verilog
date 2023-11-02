@@ -20,7 +20,9 @@ enddiscipline
 (* attribute="proto" *)
 module resistor(a, b);
   electrical a, b;
-  parameter real r = 1;
+  (* attrib=yes *)
+  parameter real r = 0.;
+  parameter real a = 0, b = 0.;
 
   analog begin
     I(a, b) <+ (V(a, b) / r);
@@ -30,7 +32,15 @@ endmodule
 
 
 
+// paramsets
 (* attribute="stub" *)
 paramset const_res resistor;
+  parameter real rr = 0., RR = 0.;
+  localparam real ll = rr;
+  (* attrib=yes *)
+  parameter real xx = 0.;
+
+  .r = 1
+  .a = (xx + ll)
 endparamset;
 

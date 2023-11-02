@@ -110,9 +110,9 @@ CS & CS::warn(int badness, size_t spot, const std::string& message)
       }
       diag() << '\n';
       tab(spot-linestart);
-    }else{ untested();
+    }else{
       diag() << "..";
-      for (size_t i=spot-15; _cmd[i] && _cmd[i]!='\n'; ++i) { untested();
+      for (size_t i=spot-15; _cmd[i] && _cmd[i]!='\n'; ++i) {
 	diag() << _cmd[i];
       }
       diag() << '\n';

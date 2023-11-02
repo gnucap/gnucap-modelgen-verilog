@@ -185,7 +185,7 @@ mg_in_module.o: mg_in_module.cc mg_.h /usr/local/include/gnucap/ap.h \
  /usr/local/include/gnucap/u_function.h \
  /usr/local/include/gnucap/e_base.h /usr/local/include/gnucap/u_attrib.h \
  /usr/local/include/gnucap/l_indirect.h mg_error.h \
- /usr/local/include/gnucap/io_error.h mg_out.h \
+ /usr/local/include/gnucap/io_error.h mg_out.h mg_options.h \
  /usr/local/include/gnucap/l_stlextra.h
 mg_in_paramset.o: mg_in_paramset.cc mg_.h /usr/local/include/gnucap/ap.h \
  /usr/local/include/gnucap/md.h /usr/local/include/gnucap/io_trace.h \
@@ -196,7 +196,8 @@ mg_in_paramset.o: mg_in_paramset.cc mg_.h /usr/local/include/gnucap/ap.h \
  /usr/local/include/gnucap/m_base.h mg_deps.h mg_func.h \
  /usr/local/include/gnucap/u_function.h \
  /usr/local/include/gnucap/e_base.h /usr/local/include/gnucap/u_attrib.h \
- /usr/local/include/gnucap/l_indirect.h mg_out.h
+ /usr/local/include/gnucap/l_indirect.h mg_out.h mg_options.h mg_error.h \
+ /usr/local/include/gnucap/io_error.h
 mg_in_verilog.o: mg_in_verilog.cc
 mg_main.o: mg_main.cc /usr/local/include/gnucap/u_opt.h \
  /usr/local/include/gnucap/mode.h /usr/local/include/gnucap/io_.h \
@@ -321,7 +322,7 @@ mg_out_root.o: mg_out_root.cc /usr/local/include/gnucap/md.h \
  /usr/local/include/gnucap/m_base.h mg_deps.h mg_func.h \
  /usr/local/include/gnucap/u_function.h \
  /usr/local/include/gnucap/e_base.h /usr/local/include/gnucap/u_attrib.h \
- /usr/local/include/gnucap/l_indirect.h m_va.raw e_va.raw
+ /usr/local/include/gnucap/l_indirect.h mg_options.h m_va.raw e_va.raw
 mg_pp.o: mg_pp.cc /usr/local/include/gnucap/io_.h \
  /usr/local/include/gnucap/l_lib.h /usr/local/include/gnucap/md.h \
  /usr/local/include/gnucap/io_trace.h \

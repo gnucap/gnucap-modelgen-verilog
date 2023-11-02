@@ -239,12 +239,46 @@ void File::parse(CS& file)
   for(auto i: _module_list){
     i->set_owner(this);
   }
+
+#if 1
+  std::vector<Module*> tmp;
+  for(auto i = _paramset_list.begin(); i!=_paramset_list.end();){
+    auto j = i;
+    ++j;
+    Module* m = (*i)->deflate();
+    if(m == *i){
+      trace1("undeflated paramset", m->identifier());
+    }else{
+      trace1("deflated paramset", m->identifier());
+      _paramset_list.erase(i);
+      tmp.push_back(m); 
+//       _module_list.push_back(m);
+    }
+    i = j;
+  }
+   for(auto i: tmp){
+     if(auto pp = dynamic_cast<Paramset*>(i)){
+       trace1("undeflated paramset1", i->identifier());
+       _paramset_list.push_back(pp);
+     }else{ untested();
+       trace1("deflated paramset1", i->identifier());
+       _module_list.push_back(i);
+     }
+   }
+#endif
 }
 /*--------------------------------------------------------------------------*/
 void File::dump(std::ostream& o) const
 {
-  o << nature_list() << '\n'
-    << discipline_list() << '\n';
+  if (options().dump_nature()){
+    o << nature_list() << '\n';
+  }else{
+  }
+
+  if (options().dump_discipline()){
+    o << discipline_list() << '\n';
+  }else{
+  }
       // keep modules in order?
       //
   if (options().dump_module()){
@@ -256,6 +290,7 @@ void File::dump(std::ostream& o) const
 
   if(paramset_list().is_empty()) {
   }else if (options().dump_paramset()) {
+    o << "// paramsets\n";
     o << paramset_list() << '\n';
   }else{ untested();
   }

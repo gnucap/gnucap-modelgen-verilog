@@ -34,6 +34,9 @@
 #define make_tag()
 #endif
 /*--------------------------------------------------------------------------*/
+// TODO: better prefix
+#define PS_MANGLE_PREFIX "__"
+/*--------------------------------------------------------------------------*/
 extern std::string ind;
 class Options;
 Base& modelgen_opts();
@@ -275,6 +278,7 @@ public:
   using List_Base<T>::pop_back;
   using List_Base<T>::erase;
   typedef typename List_Base<T>::const_iterator const_iterator;
+//  typedef typename List_Base<T>::iterator iterator;
 
   void set_owner(Block* c) { _owner = c; }
   Block const* owner() const{return _owner;}
@@ -300,7 +304,10 @@ public:
   }
   // List_Base?
   const_iterator find(const String_Arg& s) const {
-    for (const_iterator ii = begin(); ii != end(); ++ii) {
+    return find_again(begin(), s);
+  }
+  const_iterator find_again(const_iterator beg, const String_Arg& s) const {
+    for (const_iterator ii = beg; ii != end(); ++ii) {
       assert(ii != end());
       assert(*ii);
       if (s == (**ii).key()) {
@@ -388,6 +395,7 @@ public:
 private:
   void resolve_symbols_(Expression const& e, Deps* deps=NULL);
 public:
+  void clear();
   Expression_* clone() const;
   Deps const& deps()const;
   Attrib const& attrib()const;
@@ -675,6 +683,7 @@ public:
 class Parameter_List_Collection : public Collection<Parameter_2_List>{
 public:
   void dump(std::ostream& f)const override;
+  size_t count_nonlocal() const;
 };
 /*--------------------------------------------------------------------------*/
 class Branch;
@@ -756,12 +765,7 @@ public:
   String_Arg const& identifier()const {return _name;}
   std::string const& name()const {return _name.to_string();}
   virtual std::string code_name()const;
-  virtual bool is_module_variable() const;
-
-  // void parse(CS&) override;
-  // void dump(std::ostream& o)const override;
-  virtual Branch_Ref new_branch(std::string const& p, std::string const& n);
-  virtual Branch_Ref new_branch(Node const* p, Node const* n);
+  virtual bool is_module_variable()const;
 
   virtual void update_deps(Deps const&) = 0;
   virtual Deps const& deps()const = 0;
@@ -822,7 +826,10 @@ public:
     return _name;
   }
   bool operator!=(const std::string& s)const {return _name != s;}
-private:
+  Parameter_2 const* param()const {
+    assert(_param);
+    return _param;
+  }
   std::string param_name()const {
     assert(_param);
     return _param->name();
@@ -1698,7 +1705,6 @@ class Module : public Block {
   typedef std::map<std::string, Probe*> Probe_Map;
 private: // verilog input data
   File const* _file{NULL};
-  String_Arg   _identifier;
   New_Port_List	_ports;
   Port_3_List_3	_input;
   Port_3_List_3	_output;
@@ -1707,16 +1713,19 @@ private: // verilog input data
   Net_Declarations _net_decl;
   Branch_Declarations _branch_decl;
   Variable_List_Collection _variables;
-  Parameter_List_Collection _parameters;
   Aliasparam_Collection _aliasparam;
   Element_2_List _element_list;
   Port_1_List _local_nodes;
-  Attribute_Stash _attribute_stash;
 
   // decouple?
   Analog_Functions _analog_functions;
   AnalogList _analog_list;
+protected:
+  Attribute_Stash _attribute_stash;
+  Parameter_List_Collection _parameters;
   // Code_Block		_validate;
+  String_Arg	_identifier;
+  Module const* _proto{NULL};
 private: // merge?
   Filter_List _filters;
   std::list<FUNCTION_ const*> _func;
@@ -1783,11 +1792,19 @@ public:
   }
   void push_back(FUNCTION_ const* f);
   void push_back(Filter /*const*/ * f);
+  void push_back(Base* x){
+    return Block::push_back(x);
+  }
   void install(FUNCTION_ const* f);
   std::list<FUNCTION_ const*> const& func()const {return _func;}
   std::set<FUNCTION_ const*> const& funcs()const {return _funcs;}
 private: // misc
   CS& parse_analog(CS& cmd);
+public: // for now.
+  void parse_body(CS& f);
+  void parse_ports(CS& f);
+  virtual Module* deflate() {return this;}
+  Parameter_List_Collection& parameters()	{return _parameters;}
 
 public: // BUG
   Probe const* new_probe(std::string const& xs, Branch_Ref const& br);
@@ -1804,10 +1821,25 @@ public: //filters may need this..
 }; // Module
 typedef Collection<Module> Module_List;
 /*--------------------------------------------------------------------------*/
-class Paramset : public Block {
-  std::string _name;
-  std::string _proto_name;
-  Attribute_Stash _attribute_stash;
+class Paramset_Stmt : public Owned_Base {
+  Parameter_Base const* _what{NULL};
+  Expression_ _rhs;
+  bool _overridden{false};
+public:
+  explicit Paramset_Stmt() : Owned_Base() {}
+  void set_parameter(Parameter_Base const* b) {_what = b;}
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+  void set_overridden() {_overridden = true;}
+  bool is_overridden()const {return _overridden;}
+public:
+  std::string name()const;
+  Expression_ const& value()const;
+};
+/*--------------------------------------------------------------------------*/
+class Paramset : public Module {
+  // std::string _proto_name; // needed?
+  Paramset* _sub{NULL};
 public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
@@ -1819,6 +1851,10 @@ public: // Block?
   bool has_attributes() const{
     return _attributes;
   }
+  Module* deflate() override;
+private:
+  CS& parse_stmt(CS& f);
+  void expand();
 };
 typedef Collection<Paramset> Paramset_List;
 /*--------------------------------------------------------------------------*/
@@ -1942,7 +1978,7 @@ class File : public Block {
   Module_List	_module_list;
   Module_List	_macromodule_list;
   Module_List	_connectmodule_list;
-  Paramset_List _paramset_list;
+  Paramset_List   _paramset_list;
   Attribute_Instance const* _attributes{NULL};
   Attribute_Stash _attribute_stash;
 public: // build

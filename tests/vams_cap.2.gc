@@ -5,12 +5,15 @@ load ../vams/capacitor.so
 load ../vams/resistor.so
 
 options debug
-
 options bypass
 verilog
 
-capacitor #(.ic(1) .c(1) .m(1)) c1(out, 0);
-resistor #(.r(2) .m(2)) r1(0, out)
+module rc(out, gnd);
+	capacitor #(.ic(1) .c(1)) c1(out, gnd);
+	resistor #(.r(2) .m(2)) r1(gnd, out);
+endmodule
+
+rc myrc(out, 0);
 
 print tran v(nodes) iter(0)
 print dc v(nodes)
