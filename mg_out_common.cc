@@ -210,12 +210,15 @@ void make_common_set_param_by_name(std::ostream& o, const Module& m)
     std::string pn;
     o____ "case " << cnt << ":";
     if(alias[n]){
-      pn = "_p_" + *names[n - alias[n] + 1];
+      cn = *names[n - alias[n] + 1];
+      pn = "_p_" + cn;
       o << "\n";
       o____ "if(!" << pn << ".has_hard_value()) {\n";
       o______ "_s" << pn << " = " << alias[n] << ";\n";
+      o____ "}else if(! _s" << pn << ") { untested();\n";
+      o______ "_s" << pn << " = " << alias[n] << ";\n";
       o____ "}else if(_s" << pn << " != " << alias[n] << "){\n";
-      o______ "throw Exception_No_Match(\"..\");\n";
+      o______ "throw Exception_No_Match(\"" + *names[n] + ": unavailable alias for "+ cn +".\");\n";
       o____ "}else{\n";
       o____ "}\n";
       o____ "";

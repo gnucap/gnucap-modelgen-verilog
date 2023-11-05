@@ -298,6 +298,10 @@ void make_print_calc_param_list(std::ostream& out, const Parameter_1_List& pl)
 static void make_copy_construct_parameter(std::ostream&out,const Parameter_2&p)
 {
   out << ",\n   " << p.code_name() << "(p." << p.code_name() << ")";
+  if(p.aliases().size()) {
+    out << ",\n   _s" << p.code_name() << "(p._s" << p.code_name() << ")";
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void make_copy_construct_parameter_list(std::ostream& out,

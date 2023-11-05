@@ -121,7 +121,7 @@ static void make_parameter_decl(std::ostream& o, const Parameter_List_Collection
 
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
       if( (*p)->aliases().size() ) {
-	o__  "int _s" << (**p).code_name() << ";\n";
+	o__  "int _s" << (**p).code_name() << "{0};\n";
       }else{
       }
     }
