@@ -9,7 +9,7 @@ module reached1;
 endmodule
 `else
 notreached
-`endif
+`endif // B
 module reached2;
 endmodule
 `else

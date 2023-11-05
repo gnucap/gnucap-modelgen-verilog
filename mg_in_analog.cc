@@ -584,7 +584,7 @@ void AnalogForStmt::dump(std::ostream& o)const
   o << "; " << _cond << "; ";
   if(has_tail()){
     o << tail();
-  }else{ untested();
+  }else{
   }
   o << ")";
   AnalogCtrlStmt::dump(o);
@@ -727,7 +727,7 @@ void AnalogSwitchStmt::parse(CS& f)
       }
 
       if(!g->is_default()) {
-      }else if(def){ untested();
+      }else if(def){
 	f.reset_fail(here);
 	delete g;
 	throw Exception_CS_("multiple default: not allowed", f);
@@ -786,7 +786,7 @@ void AnalogSeqBlock::parse(CS& f)
 void AnalogCtrlBlock::parse(CS& f)
 {
   assert(block().owner());
-  if(f >> ";"){ untested();
+  if(f >> ";"){
   }else if(f >> "begin"){
     AnalogSeqBlock::parse(f);
   }else{

@@ -139,12 +139,12 @@ static std::string getlines(FILE *fileptr)
 /*--------------------------------------------------------------------------*/
 static void append_to(CS& f, std::string& to, std::string until)
 {
-  trace2("append_to", f.tail().substr(0,10), f.ns_more());
+//  trace2("append_to", f.tail().substr(0,10), f.ns_more());
   if(!f.ns_more()) {
     try{
 //      to+="\n";
       f.get_line("");
-      trace2("got line", f.tail().substr(0,10), f.ns_more());
+//      trace2("got line", f.tail().substr(0,10), f.ns_more());
     }catch (Exception_End_Of_Input const&) {
       assert(!f.ns_more());
     }
@@ -230,7 +230,7 @@ void Skip_Block::parse(CS& file)
       }
     }else if (file >> "`ifndef") { untested();
       ++nest;
-    }else if (file >> "`ifdef") {itested();
+    }else if (file >> "`ifdef") {
       ++nest;
     }else if (!file.more()) {
       file.get_line("");
@@ -695,12 +695,13 @@ void Preprocessor::parse(CS& file)
 	++if_block;
       }
     }else if (file >> "`else") {
-      if (if_block > 0) {
-	trace3("else skip", file.tail(), if_block, else_block);
+      if (if_block > else_block) {
+	trace3("else skip", file.tail().substr(0,20), if_block, else_block);
 	file >> skip_block;
+	assert(if_block);
 	--if_block;
-	--else_block;
       }else{
+	trace3("else noskip", file.tail().substr(0,20), if_block, else_block);
 	// error
       }
     }else if (file >> "`endif") {
@@ -717,17 +718,16 @@ void Preprocessor::parse(CS& file)
     }else if (file >> "`elsif") {
       Define_List::const_iterator x = define_list().find(file);
       trace3("elsif", if_block, else_block, file.tail());
-      if (if_block == else_block) {
+      if (if_block == else_block) { untested();
 	file >> skip_block;
       }else if (else_block == 0) {
 	file >> skip_block;
-	++else_block;
       }else if (x != define_list().end()) {
 	++if_block;
+	assert(else_block);
 	--else_block;
       }else{
 	file >> skip_block;
-	// ++else_block;
       }
     }else if (file >> "`undef") {
       Define_List::const_iterator x = define_list().find(file);

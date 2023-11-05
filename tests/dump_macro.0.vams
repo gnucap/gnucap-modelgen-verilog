@@ -29,3 +29,14 @@ endmodule;
 `else
 parse_error
 `endif
+
+`ifndef bla
+module e(1,2);
+endmodule;
+ `ifdef bla
+	parse_error
+ `else
+module f(1,2);
+endmodule;
+ `endif
+`endif

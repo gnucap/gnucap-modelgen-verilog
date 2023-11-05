@@ -29,7 +29,7 @@ notreached3
 notreached3
 `elsif thing
 notreached3
-`else
+`else // A
 parse_error2
 `endif
 
