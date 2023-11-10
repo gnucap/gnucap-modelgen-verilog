@@ -2344,6 +2344,8 @@ private: // funcs
       return _sim->analysis_is_tran_static();
     }else if(what=="static"){
       return _sim->analysis_is_static();
+    }else if(what=="noise"){ itested();
+      return false; // later
     }else{ untested();
       incomplete();
       return false;
@@ -2980,6 +2982,8 @@ private: // funcs
       return _sim->analysis_is_tran_static();
     }else if(what=="static"){
       return _sim->analysis_is_static();
+    }else if(what=="noise"){ itested();
+      return false; // later
     }else{ untested();
       incomplete();
       return false;

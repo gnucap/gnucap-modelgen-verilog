@@ -53,6 +53,8 @@ public:
     o______ "return _sim->analysis_is_tran_static();\n";
     o____ "}else if(what==\"static\"){\n";
     o______ "return _sim->analysis_is_static();\n";
+    o____ "}else if(what==\"noise\"){ itested();\n";
+    o______ "return false; // later\n";
     o____ "}else{ untested();\n";
     o______ "incomplete();\n";
     o______ "return false;\n";
