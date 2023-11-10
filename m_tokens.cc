@@ -132,33 +132,6 @@ static bool is_constant(stash_op const& o)
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
-#if 0
-void Token_TASK::stack_op(Expression* e)const
-{ untested();
-  assert(e);
-  Token_CALL::stack_op(e);
-  assert(e->back());
-  if(auto cc=dynamic_cast<Token_TASK const*>(e->back())){ untested();
-    Base const* dd = cc->data();
-    Deps const* deps = prechecked_cast<Deps const*>(dd);
-    assert(deps);
-    auto t = new Token_TASK(*cc, deps->clone());
-    delete(e->back());
-    e->pop_back();
-    e->push_back(t);
-  }else{ untested();
-    unreachable();
-  }
-}
-/*--------------------------------------------------------------------------*/
-std::string Token_TASK::code_name()const
-{ untested();
-  unreachable();
-  assert(f());
-  return "/*task*/ " + f()->code_name();
-}
-#endif
-/*--------------------------------------------------------------------------*/
 Token_CALL::~Token_CALL()
 {
   detach();
