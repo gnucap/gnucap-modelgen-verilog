@@ -605,7 +605,7 @@ void CaseGen::calc_reach(Expression const& ctrl)
       b.pop();
       assert(result.size());
 
-      if(is_false(result)) { untested();
+      if(is_false(result)) {
       }else{
 	all_never = false;
       }
@@ -615,7 +615,7 @@ void CaseGen::calc_reach(Expression const& ctrl)
       }else{
       }
     }
-    if(all_never){ untested();
+    if(all_never){
       set_never();
     }else{
     }

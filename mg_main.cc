@@ -29,13 +29,13 @@ std::basic_ostream<char>* diag_out; // mg_error.cc
 /*--------------------------------------------------------------------------*/
 #if 0
 static void make_module_file(const File& in, std::string dump_name)
-{
+{ untested();
   { // chop prefix path
     std::string::size_type loc = dump_name.find_last_of(ENDDIR);
-    if (loc != std::string::npos) {
+    if (loc != std::string::npos) { untested();
       dump_name.erase(0, loc+1);
-    }else{
-      itested();
+    }else{ untested();
+      untested();
     }
   }
 
@@ -43,7 +43,7 @@ static void make_module_file(const File& in, std::string dump_name)
   std::ofstream out(dump_name);
   if (!out) { untested();
     os_error(dump_name);
-  }else{
+  }else{ untested();
   }
 
   make_cc(out, in);
@@ -91,7 +91,7 @@ int main(int argc, char** argv)
   trace1("main", argc);
   for(; argc>1; --argc, ++argv) try{
     trace2("main", argc, argv[0]);
-    if (strcmp(argv[0],"-o")==0) { itested();
+    if (strcmp(argv[0],"-o")==0) { untested();
       output.set(argv[1]);
       --argc;
       ++argv;
@@ -155,7 +155,7 @@ int main(int argc, char** argv)
 	"to redistribute it under certain conditions\n"
 	"according to the GNU General Public License.\n"
 	"See the file \"COPYING\" for details.\n";
-    }else if (argc && strncmp(argv[0], "--", 2) == 0) { itested();
+    }else if (argc && strncmp(argv[0], "--", 2) == 0) { untested();
       CS cmd(CS::_STRING, argv[0]+2); // command line
       modelgen_opts().parse(cmd);
     }else{untested();
@@ -165,6 +165,7 @@ int main(int argc, char** argv)
     diag << e.message() << '\n';
     exit(1);
   }
+
   return errorcount;
 }
 /*--------------------------------------------------------------------------*/

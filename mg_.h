@@ -181,8 +181,10 @@ protected:
 	  file.warn(0, "not valid here");
 	  break;
 	}else if (max==size()){
+	  delete p;
 	  throw Exception_Too_Many(int(size()+1), int(max), 0);
 	}else{
+	  trace1("insert", p->key());
 	  push_back(p);
 	}
       }else{ untested();
@@ -229,7 +231,7 @@ public:
   }
 
   // List_Base? (see Collection)
-  const_iterator find(const String_Arg& s) const {
+  const_iterator find(String_Arg const& s)const {
     for (const_iterator ii = begin(); ii != end(); ++ii) {
       assert(ii != end());
       assert(*ii);
@@ -268,7 +270,7 @@ class File;
 template <class T>
 class Collection : public List_Base<T> {
   Block* _owner{NULL};
-  File const* _file{NULL};
+//  File const* _file{NULL};
 public:
   using List_Base<T>::push_back;
   using List_Base<T>::begin;
@@ -283,7 +285,8 @@ public:
   void set_owner(Block* c) { _owner = c; }
   Block const* owner() const{return _owner;}
   Block* owner(){return _owner;}
-  void set_file(File const* f){ _file = f; }
+//  void set_file(File const* f){ _file = f; }
+//  File const* file() const{untested(); return _file;}
   void parse(CS& file) {
     size_t here = file.cursor();
     T* m = new T;
@@ -478,6 +481,7 @@ public:
   const std::string& final_default()const	{return _final_default;}
   bool		positive()const			{return _positive;}
   bool		octal()const			{return _octal;}
+  String_Arg key()const { return String_Arg(_name); }
 
   void fill_in_default_name() { untested();
     if (_user_name.empty()) { untested();
@@ -634,7 +638,7 @@ class ValueRange : public Owned_Base {
   enum{
     vr_FROM,
     vr_EXCLUDE
-  } _type;
+  } _type{vr_FROM};
   ValueRangeSpec* _what{NULL};
 public:
   void parse(CS& f) override;
@@ -643,6 +647,8 @@ public:
   bool is_exclude() const{return _type == vr_EXCLUDE;}
   ValueRangeSpec const* spec() const{ return _what; }
   double eval()const;
+
+  String_Arg key()const { return String_Arg("ValueRange"); }
 };
 typedef LiSt<ValueRange, '\0', '\0', '\0', ',', ';'> ValueRangeList;
 /*--------------------------------------------------------------------------*/
@@ -759,6 +765,7 @@ public:
   ~Variable() {
   }
 public:
+  String_Arg key()const { return _name; }
 //  void set_type(Data_Type d){ _type=d; }
   virtual Data_Type const& type() const = 0;
   // bool is_int() const { return _type.is_int(); }
@@ -1083,6 +1090,7 @@ public:
   void set_owner(Block*){
     incomplete();
   }
+  String_Arg key()const { return String_Arg(_name); }
 };
 typedef LiSt<Port_1, '{', '#', '}'> Port_1_List;
 /*--------------------------------------------------------------------------*/
@@ -1103,6 +1111,7 @@ public:
     }
   }
   bool has_identifier()const;
+  String_Arg key()const { return String_Arg(_name); }
 };
 // list ::= "(" port {"," port} ")"
 typedef LiSt<Port_3, '(', ',', ')'> Port_3_List_2;
@@ -1289,6 +1298,7 @@ public:
   String_Arg const& identifier() const{return _identifier;}
   void parse(CS& f) override;
   void dump(std::ostream& f)const override {f << "      " << identifier() << ";\n";}
+  String_Arg const& key()const { return _identifier; }
 };
 typedef LiSt<Arg, '{', '#', '}'> Arg_List;
 /*--------------------------------------------------------------------------*/
@@ -1298,6 +1308,7 @@ class Analog_Function_Arg : public Variable_Decl {
 public:
   explicit Analog_Function_Arg() : Variable_Decl() {}
   String_Arg const& identifier()const { return _name; }
+  String_Arg const& key()const { return _name; }
   std::string name()const { return _name.to_string(); }
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
@@ -1395,21 +1406,19 @@ class Probe : public FUNCTION_ {
     t_unknown = 0,
     t_flow,
     t_pot
-  } _type;
+  } _type{t_unknown};
 public:
   explicit Probe(std::string const& xs, Branch_Ref b);
   ~Probe();
-//  std::string const& name()const {return _name;}
-  // later.
 
-  std::string const& pname() const{ return _br.pname(); }
-  std::string const& nname() const{ return _br.nname(); }
+  std::string const& pname()const { return _br.pname(); }
+  std::string const& nname()const { return _br.nname(); }
 
-  bool is_flow_probe() const{ return _type == t_flow;}
-  bool is_pot_probe() const{ return _type == t_pot;}
+  bool is_flow_probe()const { return _type == t_flow;}
+  bool is_pot_probe()const { return _type == t_pot;}
 
-  std::string code_name() const;
-  Branch const* branch() const{
+  std::string code_name()const;
+  Branch const* branch()const {
     return _br;
   }
   bool is_reversed() const;
@@ -1509,14 +1518,14 @@ class Discipline : public Base {
   String_Arg	_flow_ident;
   Nature const* _flow{NULL};
   Nature const* _potential{NULL};
-  Block const* _owner;
+  Block const* _owner{NULL};
 public:
   void set_owner(Block const* c) {_owner=c;}
   Block const* owner() {return _owner;}
   const String_Arg&  key()const	  {return _identifier;}
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
-  Discipline() {}
+  explicit Discipline() {}
   const String_Arg&  identifier()const	    {return _identifier;}
   const String_Arg&  potential_ident()const {return _potential_ident;}
   const String_Arg&  domain_ident()const    {return _domain_ident;}
@@ -1841,6 +1850,7 @@ class Paramset : public Module {
   // std::string _proto_name; // needed?
   Paramset* _sub{NULL};
 public:
+  explicit Paramset() : Module() {}
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
 public: // Block?

@@ -74,8 +74,10 @@ public:
     E->pop_back();
     if(E->is_empty()){
     }else if(auto u = dynamic_cast<Token_UNARY_*>(_op)) {
+      (void)u;
       assert(u->op1());
     }else if(auto b = dynamic_cast<Token_BINOP_*>(_op)) {
+      (void)b;
       assert(b->op1());
       assert(b->op2());
     }else{

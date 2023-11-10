@@ -41,6 +41,7 @@ class AnalogConstExpression : public AnalogExpression {
 public:
 //  void parse(CS& file) override;
 //  void dump(std::ostream& o)const override;
+  String_Arg key() const{return String_Arg("ACE");}
 };
 typedef LiSt<AnalogConstExpression, '\0', ',', ':'> AnalogConstExpressionList;
 /*--------------------------------------------------------------------------*/
@@ -113,6 +114,8 @@ public:
   bool is_reachable()const {return _code.is_reachable() ;}
   bool is_always()const {return _code.is_always() ;}
   void calc_reach(Expression const& cond);
+
+  String_Arg key() const{return String_Arg("CaseGen");}
 };
 typedef LiSt<CaseGen, '\0', '\0', '\0'> AnalogCaseList;
 /*--------------------------------------------------------------------------*/
@@ -244,7 +247,7 @@ class Contribution : public AnalogStmt {
     t_unknown,
     t_flow,
     t_pot
-  } _type;
+  } _type{t_unknown};
   Block* _owner{NULL};
 private:
   void set_pot_contrib();

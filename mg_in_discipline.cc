@@ -58,10 +58,10 @@ void Nature::parse(CS& file)
       ;
     if (file.umatch("endnature")) {
       break;
-    }else if (!file.more()) {
+    }else if (!file.more()) { untested();
       file.warn(0, "premature EOF (nature)");
       break;
-    }else if (file.stuck(&here)) {
+    }else if (file.stuck(&here)) { untested();
       file.warn(0, "bad nature");
       break;
     }else{
@@ -73,7 +73,7 @@ void Nature::parse(CS& file)
 void Nature::dump(std::ostream& out)const
 {
   out << "nature " << identifier();
-  if (parent_nature() != "") {
+  if (parent_nature() != "") { untested();
     out << " : " << parent_nature();
   }
   out << "\n"
@@ -121,10 +121,10 @@ void Discipline::parse(CS& file)
       ;
     if (file.umatch("enddiscipline")) {
       break;
-    }else if (!file.more()) {
+    }else if (!file.more()) { untested();
       file.warn(0, "premature EOF (discipline)");
       break;
-    }else if (file.stuck(&here)) {
+    }else if (file.stuck(&here)) { untested();
       file.warn(0, "bad discipline");
       break;
     }else{
@@ -152,7 +152,7 @@ void Discipline::parse(CS& file)
 	  if(i != f->nature_list().end()){
 		  _flow = *i;
 	  }else{ untested();
-			file.warn(0, "invalid flow nature: " + _flow_ident.to_string());
+			file.warn(bWARNING, "invalid flow nature: " + _flow_ident.to_string());
 	  }
   }else{
   }

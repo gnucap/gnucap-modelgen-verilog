@@ -45,7 +45,7 @@ CS& Paramset::parse_stmt(CS& f)
     if((dup = lookup("." + s->name()))){
       if(auto dd = dynamic_cast<Paramset_Stmt*>(dup)){
 	dd->set_overridden();
-      }else{
+      }else{ untested();
 	unreachable();
       }
       f.warn(bWARNING, "duplicate parameter assignment");
@@ -54,7 +54,7 @@ CS& Paramset::parse_stmt(CS& f)
 
     try{
       new_var_ref(s);
-    }catch (Exception const& s){
+    }catch (Exception const& s){ untested();
       f.reset_fail(here);
       throw Exception_CS_(s.message(), f);
     }
@@ -176,7 +176,7 @@ void Paramset::parse(CS& f)
   trace0("paramset body done ========");
 }
 /*--------------------------------------------------------------------------*/
-static void import_dot_params(Module* sub, Module const* proto, Block* thiS)
+static void import_dot_params(Module* sub, Module const*, Block* thiS)
 {
   auto dots = new Parameter_2_List;
   dots->set_owner(sub);
@@ -236,7 +236,7 @@ static void import_proto_params(Module* sub, Module const* proto)
     std::string comma = "";
     for (auto y : *x) {
       auto p = sub->lookup(y->name(), false);
-      auto q = prechecked_cast<Parameter_2 const*>(p);
+      auto q = dynamic_cast<Parameter_2 const*>(p);
       assert(q||!p);
 
       if(q && q->is_given()){
@@ -289,14 +289,14 @@ static void import_proto_vars(Module* sub, Module const* proto)
     for (auto y : *x) {
       trace1("import_var", y->name());
       auto p = sub->lookup(y->name(), false);
-      auto q = prechecked_cast<Variable_Decl const*>(p);
-      auto P = prechecked_cast<Parameter_2 const*>(p);
+      auto q = dynamic_cast<Variable_Decl const*>(p);
+      auto P = dynamic_cast<Parameter_2 const*>(p);
       assert(q||!p||P);
 
       if(P){
       }else{
       }
-      if(q){
+      if(q){ untested();
 	unreachable();
 	assert(0);
       } else {
@@ -312,7 +312,7 @@ static void import_proto_vars(Module* sub, Module const* proto)
     if(comma.size()){
       CS cmd(CS::_STRING, o.str());
       sub->parse_body(cmd);
-    }else{
+    }else{ untested();
     }
   }
 
@@ -345,6 +345,8 @@ void Paramset::expand()
   assert(_proto);
   _sub = new Paramset(); // new Module();?
   _sub->set_owner(this);
+  assert(_sub->file() == file());
+//  _sub->set_file(file());
   _sub->_identifier = _identifier;
   {
     trace1("1. copyparams ========", _identifier);

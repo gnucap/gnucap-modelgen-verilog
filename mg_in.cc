@@ -200,7 +200,7 @@ void Attribute_Instance::dump(std::ostream& o)const
 */
 void File::parse(CS& file)
 {
-  _module_list.set_file(this); // needed?
+//  _module_list.set_file(this); // needed?
 			       //
   _attribute_stash.set_owner(this);
 

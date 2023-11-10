@@ -489,7 +489,7 @@ void Net_Declarations::parse(CS& f)
   assert(owner()); // Module
   Block const* root_scope = owner()->owner();
   assert(root_scope);
-  File const* root = prechecked_cast<File const*>(root_scope);
+  File const* root = dynamic_cast<File const*>(root_scope);
   if(root){
   }else{
     //incomplete();
@@ -497,6 +497,7 @@ void Net_Declarations::parse(CS& f)
     //return;
 
     root = prechecked_cast<File const*>(root_scope->owner());
+    assert(root);
   }
   auto ii = root->discipline_list().find(f);
   Net_Decl_List* d = NULL;
@@ -1012,7 +1013,7 @@ void ValueRange::parse(CS& file)
     }
   }else if(file >> "exclude"){
     _type = vr_EXCLUDE;
-    if(file >> "[" || file >> "("){ untested();
+    if(file >> "[" || file >> "("){
       _what = new ValueRangeInterval;
       _what->set_owner(owner());
     }else if(file >> "'{"){ untested();

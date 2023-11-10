@@ -165,6 +165,7 @@ void Token_DDX::stack_op(Expression* e)const
   Token const* t = ee->back();
   assert(t);
   auto dd = prechecked_cast<Deps const*>(t->data());
+  (void)dd;
   assert(dd);
   assert(dd->size());
 

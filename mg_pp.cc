@@ -51,7 +51,7 @@ public:
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // static Define_List& define_list()
-// {
+// { untested();
 //   static Define_List _define_list;
 //   return _define_list;
 // }
@@ -66,7 +66,7 @@ CS& CS::get_line(const std::string& prompt)
     _cnt = 0;
     _length = _cmd.length();
     _ok = true;
-  }else{itested();
+  }else{untested();
     assert(_file == stdin);
     char cmdbuf[BUFLEN];
     getcmd(prompt.c_str(), cmdbuf, BUFLEN);
@@ -212,7 +212,7 @@ void Skip_Block::parse(CS& file)
     if (file >> "`endif") {
       if (nest == 0) {
 	break;  // done with skip_block
-      }else{itested();
+      }else{
 	--nest;
       }
     }else if (file >> "`else") {
@@ -251,10 +251,10 @@ void Pragma::parse(CS& f)
     if (f >> "modelgen") { untested();
       //  modelgen_opts().reset(f); or so.
       incomplete();
-    }else{
+    }else{ untested();
       incomplete();
     }
-  }else if (f >> "resetall") {
+  }else if (f >> "resetall") { untested();
     // reset all pragmas recognised by implementation
     //  modelgen_opts().reset(f); or so.
     incomplete();
@@ -379,7 +379,7 @@ void Define::parse(CS& f)
 	std::string more = f.get_to("\\/\n"); // BUG
 	trace1("more?", more);
 	stash("\n" + more, args);
-      }else{itested();
+      }else{untested();
 	std::string more = f.get_to("\\/\n"); // BUG
 	trace1("more?", more);
 	stash(more, args);
@@ -620,7 +620,7 @@ public:
 	  _data += f.ctoc();
 	}else if(f.peek() == '\n'){
 	  _data += f.ctoc();
-	}else{itested();
+	}else{untested();
 	}
       }else{ untested();
 	trace2("qs", _data, f.peek());
