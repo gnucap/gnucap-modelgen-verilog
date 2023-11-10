@@ -1198,7 +1198,7 @@ bool MOD_resistor::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 bool MOD_resistor::do_tr()
 {
-  trace0("resistor::to_tr");
+  trace0("resistor::do_tr");
   clear_branch_contributions();
   read_probes();
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
@@ -2670,7 +2670,7 @@ bool MOD_capacitor::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 bool MOD_capacitor::do_tr()
 {
-  trace0("capacitor::to_tr");
+  trace0("capacitor::do_tr");
   clear_branch_contributions();
   read_probes();
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
@@ -3329,7 +3329,7 @@ bool MOD_capacitor::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 bool MOD_capacitor::do_tr()
 {
-  trace0("capacitor::to_tr");
+  trace0("capacitor::do_tr");
   clear_branch_contributions();
   read_probes();
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());

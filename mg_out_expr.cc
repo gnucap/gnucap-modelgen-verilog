@@ -586,6 +586,7 @@ void make_cc_expression(std::ostream& o, Expression const& e)
   s.pop();
 }
 /*--------------------------------------------------------------------------*/
+// TODO: use FUNCTION_?
 void make_cc_event_cond(std::ostream& o, Expression const& e)
 {
   typedef Expression::const_iterator const_iterator;
@@ -594,7 +595,8 @@ void make_cc_event_cond(std::ostream& o, Expression const& e)
   o__ "{\n";
   for (const_iterator i = e.begin(); i != e.end(); ++i) {
     if((*i)->name()=="initial_step"){
-      o__ "evt = _sim->is_initial_step();\n";
+      o__ "evt = _sim->_phase == p_INIT_DC;\n";
+//    o__ "evt = _sim->vams_initial_step();\n"; // TODO
     }else if((*i)->name()=="initial_model"){ untested();
       std::cerr << "WARNING: ADMS style keyword encountered\n";
       o__ "evt = _sim->is_initial_step();\n";

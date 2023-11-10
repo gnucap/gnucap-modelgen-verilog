@@ -1,0 +1,33 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+// the initial_step global event is active during the solution of the first
+// point (or initial DC analysis) of every analysis.
+
+`modelgen
+module test_evt0a(p, n);
+	electrical p, n;
+	inout p, n;
+	parameter real v=0;
+	real w;
+		
+	analog begin
+		@(initial_step) w = v;
+		V(p,n) <+ w;
+		@(initial_step) w = w + 1;
+	end
+endmodule
+
+!make test_evt0a.so > /dev/null
+attach ./test_evt0a.so
+
+test_evt0a #(.v(1)) dut(1,0);
+
+list
+
+print tran v(nodes) iter(0)
+tran 1
+end
