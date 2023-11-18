@@ -7,7 +7,7 @@ module test(d, g, s, b);
   localparam real R1 = Q;
   localparam real R2 = 2;
 
-  real    T;
+  real   T;
 
   analog begin
     T =  0.;

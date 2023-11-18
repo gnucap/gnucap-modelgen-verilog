@@ -22,7 +22,7 @@ module test_res_8(p, n);
   electrical p, n;
   parameter real p = 1.;
 
-  real    a,   b;
+  real   a,   b;
 
   analog begin
     a = V(n, p);

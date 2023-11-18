@@ -1,7 +1,7 @@
 
 
 module foo();
-  real    x;
+  real   x;
 
   analog begin
     $strobe("some strobe %f.", x);

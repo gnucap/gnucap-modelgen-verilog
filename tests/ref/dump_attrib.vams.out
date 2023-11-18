@@ -27,7 +27,7 @@ module device(p, n);
   parameter real ABSOURCE = 1.0e-12;
 
   (* desc="dummy" *)
-  real    x;
+  real   x;
 
   analog ;
 

@@ -809,9 +809,9 @@ private:
 };
 /*--------------------------------------------------------------------------*/
 class Variable_List : public LiSt<Variable_Decl, '\0', ',', ';'> {
-  String_Arg _type; // ENUM?
+  Data_Type _type;
 public:
-  String_Arg const& type()const {return _type;}
+  Data_Type const& type()const {return _type;}
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
 };

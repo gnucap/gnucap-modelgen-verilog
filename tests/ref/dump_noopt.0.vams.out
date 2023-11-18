@@ -3,7 +3,7 @@
 module test(d, g, s, b);
   parameter real P = 3;
 
-  real    T,   U;
+  real   T,   U;
 
   // circuit
   electrical #() d();

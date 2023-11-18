@@ -53,7 +53,7 @@ enddiscipline
 module heat(t);
   inout t;
   thermal t;
-  real    tt;
+  real   tt;
 
   analog begin
     tt = Temp(t);

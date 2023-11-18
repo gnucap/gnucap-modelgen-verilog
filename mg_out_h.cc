@@ -131,7 +131,7 @@ static void make_parameter_decl(std::ostream& o, const Parameter_List_Collection
 static void make_variable_decl(std::ostream& o, const Variable_List_Collection& P)
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
-    if(((**q).type()).to_string().substr(0,4) == "real"){
+    if((**q).type().is_real()) {
       o__ "ddouble";
     }else{ itested();
       o__ (**q).type();

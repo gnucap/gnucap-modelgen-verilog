@@ -319,9 +319,17 @@ void Variable_List::parse(CS& file)
   }else{ untested();
   }
 
-  _type = file.last_match();
+  char t = file.last_match()[0];
+  if(t=='r') {
+    _type = Data_Type_Real();
+  }else if(t=='i') {
+    _type = Data_Type_Int();
+  }else{
+    throw Exception_CS_("What type? " + t, file);
+  }
+
   LiSt<Variable_Decl, '\0', ',', ';'>::parse(file);
-  if(_type.to_string()[0] == 'i'){
+  if(_type.is_int()) {
     for (auto x : *this){
       x->set_type(Data_Type_Int());
     }
