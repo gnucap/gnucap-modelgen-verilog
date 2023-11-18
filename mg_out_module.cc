@@ -836,10 +836,8 @@ static void make_module_expand(std::ostream& o, Module const& m)
     make_renew_sckt(o, m);
   }else{
   }
-    o<<
-    "  if (_sim->is_first_expand()) {\n"
-    "    precalc_first();\n"
-    "    precalc_last();\n";
+    o__ "if (_sim->is_first_expand()) {\n";
+    o____ "precalc_first();\n";
 //    "    // optional nodes\n";
 //  for (Port_1_List::const_iterator
 //       p = d.circuit().opt_nodes().begin();

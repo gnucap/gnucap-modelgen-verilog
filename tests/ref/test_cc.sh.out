@@ -1339,7 +1339,6 @@ void MOD_resistor::expand()
   gnd.set_to_ground(this);
   if (_sim->is_first_expand()) {
     precalc_first();
-    precalc_last();
       // local nodes
 
   // clone branches
@@ -2827,7 +2826,6 @@ void MOD_capacitor::expand()
   gnd.set_to_ground(this);
   if (_sim->is_first_expand()) {
     precalc_first();
-    precalc_last();
       // local nodes
     //assert(!(_n[n_ddt_1].n_()));
     //BUG// this assert fails on a repeat elaboration after a change.
@@ -3521,7 +3519,6 @@ void MOD_capacitor::expand()
   gnd.set_to_ground(this);
   if (_sim->is_first_expand()) {
     precalc_first();
-    precalc_last();
       // local nodes
     //assert(!(_n[n_ddt_2].n_()));
     //BUG// this assert fails on a repeat elaboration after a change.
