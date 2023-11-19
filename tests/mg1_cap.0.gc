@@ -12,11 +12,11 @@ V1 p n sin freq=1 amplitude={ampl} dc=dc
 .verilog
 
 `modelgen
-module test_cap0(np, nn);
-  electrical np, nn;
+module test_cap0(p, n);
+  electrical p, n;
 parameter real c=1;
   analog begin
-    I(np,nn) <+ ddt(c*V(np,nn));
+    I(p,n) <+ ddt(c*V(p,n));
   end
 endmodule
 
@@ -38,5 +38,5 @@ print dc v(nodes) iter(0)
 dc v -10 10 2
 
 print tran v(nodes) iter(0)
-
 tran .5
+status notime

@@ -11,17 +11,17 @@ V1 p n sin freq=1 amplitude={ampl} dc=dc
 .verilog
 
 `modelgen
-module test_tcap0(p, n, cp, cn);
+module test_tcap0a(p, n, cp, cn);
 	electrical p, n, cp, cn;
 	analog begin
-		I(p,n) <+ ddt(V(cp,cn));
+		I(p,n) <+ 2*ddt(.5*V(cp,cn));
 	end
 endmodule
 
-!make test_tcap0.so > /dev/null
-attach ./test_tcap0.so
+!make test_tcap0a.so > /dev/null
+attach ./test_tcap0a.so
 
-test_tcap0 #() dut(3,0,1,0);
+test_tcap0a #() dut(3,0,1,0);
 
 spice
 V1  1  0  SIN  offset= 0.  amplitude= 1.  frequency= 1.  delay= 0.  damping= 0. ac 1

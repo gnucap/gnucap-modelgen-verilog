@@ -1,0 +1,38 @@
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+spice
+.subckt vsin p n
+.parameter ampl
+.parameter dc
+V1 p n sin freq=1 amplitude={ampl} dc=dc
+.ends
+
+.verilog
+
+`modelgen
+module test_ddt0a(p, n);
+	(* desc="" *) real dv;
+	electrical p, n;
+	analog begin
+		dv = 2 * ddt(V(p,n));
+	end
+endmodule
+
+!make test_ddt0a.so > /dev/null
+attach ./test_ddt0a.so
+
+verilog
+parameter r=1
+parameter v=0
+
+test_ddt0a #() dut(1,0);
+vsin #(.dc(v), .ampl(1)) v1(1, 0);
+
+list
+
+print tran v(1) dv(dut) i(dut._b*) iter(0)
+// y(dut.ddt_0) iof(dut.ddt_0) iter(0)
+tran 1 .1 trace=n
+status notime
+end
