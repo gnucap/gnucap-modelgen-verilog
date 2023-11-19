@@ -2,7 +2,13 @@ mg_deps.o: mg_deps.cc /usr/local/include/gnucap/m_base.h \
  /usr/local/include/gnucap/l_lib.h /usr/local/include/gnucap/md.h \
  /usr/local/include/gnucap/io_trace.h \
  /usr/local/include/gnucap/io_error.h /usr/local/include/gnucap/ap.h \
- /usr/local/include/gnucap/constant.h mg_deps.h
+ /usr/local/include/gnucap/constant.h mg_.h \
+ /usr/local/include/gnucap/ap.h mg_expression.h \
+ /usr/local/include/gnucap/m_expression.h \
+ /usr/local/include/gnucap/m_base.h mg_deps.h mg_func.h \
+ /usr/local/include/gnucap/u_function.h \
+ /usr/local/include/gnucap/e_base.h /usr/local/include/gnucap/u_attrib.h \
+ /usr/local/include/gnucap/l_indirect.h
 mg_error.o: mg_error.cc /usr/local/include/gnucap/ap.h \
  /usr/local/include/gnucap/md.h /usr/local/include/gnucap/io_trace.h \
  /usr/local/include/gnucap/io_error.h mg_error.h \
@@ -244,7 +250,7 @@ mg_out_expr.o: mg_out_expr.cc mg_out.h mg_.h \
  /usr/local/include/gnucap/m_base.h mg_deps.h mg_func.h \
  /usr/local/include/gnucap/u_function.h \
  /usr/local/include/gnucap/e_base.h /usr/local/include/gnucap/u_attrib.h \
- /usr/local/include/gnucap/l_indirect.h m_tokens.h \
+ /usr/local/include/gnucap/l_indirect.h m_tokens.h mg_options.h \
  /usr/local/include/gnucap/globals.h \
  /usr/local/include/gnucap/l_dispatcher.h \
  /usr/local/include/gnucap/l_stlextra.h /usr/local/include/gnucap/u_opt.h \
@@ -258,7 +264,7 @@ mg_out_h.o: mg_out_h.cc mg_out.h mg_.h /usr/local/include/gnucap/ap.h \
  /usr/local/include/gnucap/m_base.h mg_deps.h mg_func.h \
  /usr/local/include/gnucap/u_function.h \
  /usr/local/include/gnucap/e_base.h /usr/local/include/gnucap/u_attrib.h \
- /usr/local/include/gnucap/l_indirect.h m_tokens.h
+ /usr/local/include/gnucap/l_indirect.h mg_options.h m_tokens.h
 mg_out_analog.o: mg_out_analog.cc mg_out.h mg_.h \
  /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/md.h \
  /usr/local/include/gnucap/io_trace.h \

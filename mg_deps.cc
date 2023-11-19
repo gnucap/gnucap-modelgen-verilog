@@ -22,6 +22,7 @@
  * dependencies in expressions
  */
 #include <m_base.h>
+#include "mg_.h" // Probe
 #include "mg_deps.h"
 /*--------------------------------------------------------------------------*/
 Deps Deps::_no_deps;
@@ -111,6 +112,37 @@ Base* Deps::divide(const Base* X)const
   }else{
   }
   return n;
+}
+/*--------------------------------------------------------------------------*/
+void Deps::update(Deps const& other)
+{
+  for(auto& i : other){
+    insert(i);
+  }
+}
+/*--------------------------------------------------------------------------*/
+Deps::~Deps()
+{
+  _s.clear();
+}
+/*--------------------------------------------------------------------------*/
+std::pair<Deps::const_iterator, bool> Deps::insert(Dep const& x)
+{
+  for(auto s = begin(); s!=end(); ++s){
+    if (s->same_data(x)){
+      return std::make_pair(s, false);
+    }else{
+    }
+  }
+  _s.push_back(x);
+  return std::make_pair(begin()+(int(size())-1), true);
+}
+/*--------------------------------------------------------------------------*/
+bool Dep::same_data(Dep const& o) const
+{
+  assert(_prb);
+  assert(o._prb);
+  return _prb->same_data(*o._prb);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -21,6 +21,7 @@
  */
 #include "mg_out.h"
 #include "mg_func.h"
+#include "mg_options.h"
 #include "m_tokens.h" // Deps
 /*--------------------------------------------------------------------------*/
 static void declare_deriv_enum(std::ostream& o, const Module& m)
@@ -128,21 +129,63 @@ static void make_parameter_decl(std::ostream& o, const Parameter_List_Collection
   }
 }
 /*--------------------------------------------------------------------------*/
+// lib?
+void make_one_variable_decl(std::ostream& o, const Variable_Decl& V)
+{
+  if(V.type().is_real()) {
+      o__ "double ";
+   if(!V.has_attributes()){
+#if 0
+   }else if(options().optimize_deriv()) {
+      o__ "struct _V_" << V.name() << " : ddouble {\n";
+      o____ "typedef ddouble base;\n";
+      o____ "typedef va::ddouble_tag base_tag;\n";
+      o____ "_V_" << V.name() << "(ddouble x) : ddouble(x){}\n";
+      o____ "template<class A>\n";
+      o____ "explicit _V_" << V.name() << "(A x) : ddouble(x){}\n";
+      o____ "_V_" << V.name() << "(){ zeroderiv(); }\n";
+      o____ "void zeroderiv(){\n";
+      for(auto d : V.deps()){itested();
+	o______ "set_no_deps();\n";
+	o______ "_data[1+d" << d->code_name() << "] = 0.; // " << d.order() << "\n";
+      }
+      o____ "}\n";
+      o____ "ddouble& operator=(ddouble t){\n";
+      o______ "ddouble::operator=(t);\n";
+      o______ "return *this;\n";
+      o____ "}\n";
+      o____ "ddouble& operator=(double t){\n";
+      o______ "ddouble::operator=(t);\n";
+      o______ "return *this;\n";
+      o____ "}\n";
+      o__ "}";
+#endif
+    }else{ itested();
+//      o__ "ddouble ";
+    }
+  }else if(V.type().is_int()) {
+    o__ "int";
+  }else{
+    incomplete();
+    o__ "unknown";
+  }
+  o << " _v_" << V.name(); // code_name??
+			    //	  << " /* " << (**p).comment() << " */";
+  o << ";\n";
+}
+/*--------------------------------------------------------------------------*/
 static void make_variable_decl(std::ostream& o, const Variable_List_Collection& P)
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
-    if((**q).type().is_real()) {
-      o__ "ddouble";
-    }else{ itested();
-      o__ (**q).type();
-    }
-    std::string comma = " ";
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
-      o << comma << "_v_" << (**p).name(); // code_name??
-//	  << " /* " << (**p).comment() << " */";
-      comma = ", ";
+      Variable_Decl const* V = *p;
+      assert(V);
+      //if(V->has_attributes()) {
+	make_one_variable_decl(o, *V);
+      //}else{
+//	tr_eval_analog local
+      //}
     }
-    o << ";\n";
   }
 }
 /*--------------------------------------------------------------------------*/

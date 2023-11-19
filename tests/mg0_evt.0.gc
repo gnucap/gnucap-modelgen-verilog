@@ -10,8 +10,9 @@ module test_evt0_0(p, n);
 	inout p, n;
 	parameter real v=0;
 	real w;
+	analog @(initial_step) w = 1;
 	analog begin
-		@(initial_step) w = v;
+		@(initial_step) w = w + v;
 		V(p,n) <+ w;
 	end
 endmodule

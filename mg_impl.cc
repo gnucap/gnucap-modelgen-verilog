@@ -642,7 +642,18 @@ bool Variable::is_module_variable() const
 /*--------------------------------------------------------------------------*/
 std::string Variable::code_name() const
 {
-  if(is_module_variable()){
+  incomplete();
+  return name(); //?
+}
+/*--------------------------------------------------------------------------*/
+std::string Variable_Decl::code_name() const
+{
+//  if(!has_attributes()){ untested();
+//    return "_v_" + name();
+//  }else
+  if(is_real()){
+    return "_v_" + name();
+  }else if(is_module_variable()){
     return "d->_v_" + name();
   }else{
     return "_v_" + name();
@@ -736,30 +747,6 @@ void Branch::detach(Branch_Ref* r)
     }
   }
   unreachable(); // cleanup is out of order?
-}
-/*--------------------------------------------------------------------------*/
-Deps::~Deps()
-{
-  _s.clear();
-}
-/*--------------------------------------------------------------------------*/
-bool Dep::same_data(Dep const& o) const
-{
-  assert(_prb);
-  assert(o._prb);
-  return _prb->same_data(*o._prb);
-}
-/*--------------------------------------------------------------------------*/
-std::pair<Deps::const_iterator, bool> Deps::insert(Dep const& x)
-{
-  for(auto s = begin(); s!=end(); ++s){
-    if (s->same_data(x)){
-      return std::make_pair(s, false);
-    }else{
-    }
-  }
-  _s.push_back(x);
-  return std::make_pair(begin()+(int(size())-1), true);
 }
 /*--------------------------------------------------------------------------*/
 bool Module::sync() const

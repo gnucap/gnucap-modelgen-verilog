@@ -40,7 +40,7 @@ private:
 public:
   Dep(Dep const& p) : _prb(p._prb), _order(p._order) {}
   explicit Dep(Probe const* p) : _prb(p) {}
-  explicit Dep(Probe const* p, dep_order) : _prb(p), _order() {}
+  explicit Dep(Probe const* p, dep_order d) : _prb(p), _order(d) {}
 
   int order()const {return _order;}
   bool is_linear()const { return _order<=_LINEAR; }
@@ -70,11 +70,7 @@ public:
     return new Deps(*this);
   }
   std::pair<const_iterator, bool> insert(Dep const&);
-  void update(Deps const& other){
-    for(auto& i : other){
-      insert(i);
-    }
-  }
+  void update(Deps const& other);
   Dep back(){
     return _s.back();
   }

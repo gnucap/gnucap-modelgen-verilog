@@ -709,6 +709,7 @@ void AnalogSwitchStmt::parse(CS& f)
       if(def){
 	// default is out of order. reachability messed up.
 	// CS.warn ...
+	// use update() to fix reachability?
       }else{
       }
 

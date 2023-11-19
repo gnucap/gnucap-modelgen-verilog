@@ -329,11 +329,16 @@ void Variable_List::parse(CS& file)
   }
 
   LiSt<Variable_Decl, '\0', ',', ';'>::parse(file);
-  if(_type.is_int()) {
+  if(_type.is_real()) {
+    for (auto x : *this){
+      x->set_type(Data_Type_Real());
+    }
+  }else if(_type.is_int()) {
     for (auto x : *this){
       x->set_type(Data_Type_Int());
     }
-  }else{
+  }else{ untested();
+    unreachable();
   }
   if(has_attributes()){
     for (auto x : *this){

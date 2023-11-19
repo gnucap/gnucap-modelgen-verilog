@@ -205,6 +205,7 @@ public:
   Parameter_Base const* item()const {
     return _item;
   }
+  Parameter_Base const* operator->() const{ return _item; }
 };
 /*--------------------------------------------------------------------------*/
 // ITEM_REF?

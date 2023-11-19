@@ -52,6 +52,7 @@ void Options::parse(CS& f)
 
     if (!f.stuck(&here)) {
       changed = true;
+    }else{
     }
   }while (f.more() && changed);
 }

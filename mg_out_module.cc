@@ -357,7 +357,7 @@ void make_module_default_constructor(std::ostream& o, const Module& m)
 static void make_do_tr(std::ostream& o, const Module& m)
 {
   o << "bool MOD_" << m.identifier() << "::do_tr()\n{\n";
-  o__ "trace0(\"" << m.identifier() <<"::do_tr\");\n";
+  o__ "trace2(\"" << m.identifier() <<"::do_tr\", this, long_label());\n";
   o__ "clear_branch_contributions();\n";
   if(m.num_evt_slots()){
     o__ "_evt_seek = 0;\n";

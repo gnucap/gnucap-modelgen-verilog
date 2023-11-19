@@ -23,11 +23,11 @@
 #include "mg_.h"
 /*--------------------------------------------------------------------------*/
 class Options : public Base {
-  bool _optimize_binop{true}; // fold binary operators
-  bool _optimize_swap{true};  // swap operands.
-  bool _optimize_deriv{true}; // suppress zero derivative propagation
-  bool _optimize_deps{true};  // consider dependency order
-  bool _optimize_unused{true};// dont emit unused sources
+  bool _optimize_binop{true};  // fold binary operators
+  bool _optimize_swap{true};   // swap operands.
+  bool _optimize_deriv{true};  // suppress zero derivative propagation
+  bool _optimize_deps{true};  // consider dependency types
+  bool _optimize_unused{true}; // dont emit unused sources
   bool _gen_module{true};
   bool _gen_paramset{true};
   bool _dump_module{true};

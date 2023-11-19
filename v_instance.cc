@@ -762,7 +762,7 @@ int INSTANCE::set_port_by_name(std::string& name, std::string& ext_name)
   _proto->set_port_by_index(i, name);
 
   assert(scope()!=subckt());
-  return i; // really?
+  return i; // TODO: test.
 }
 /*--------------------------------------------------------------------------*/
 void DEV_INSTANCE_PROTO::cleanup()

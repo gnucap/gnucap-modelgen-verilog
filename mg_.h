@@ -768,6 +768,7 @@ public:
   String_Arg key()const { return _name; }
 //  void set_type(Data_Type d){ _type=d; }
   virtual Data_Type const& type() const = 0;
+  bool is_real() const{ return type().is_real(); }
   // bool is_int() const { return _type.is_int(); }
   String_Arg const& identifier()const {return _name;}
   std::string const& name()const {return _name.to_string();}
@@ -799,6 +800,7 @@ public:
   Data_Type const& type()const override{
     return _type;
   }
+  std::string code_name()const override;
   void set_type(Data_Type const& d){ _type=d; }
   Deps const& deps()const override { assert(_deps); return *_deps; }
   void update_deps(Deps const&)override;

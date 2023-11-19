@@ -7,6 +7,7 @@
 - ddx is incomplete
 - event control is incomplete
 - numerical port names don't work
+- initial_step: mg0_evt.bug0.gc
 
 == simulator plugins
 - still missing tiebreak rules in overload

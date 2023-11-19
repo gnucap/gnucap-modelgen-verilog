@@ -1248,18 +1248,22 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
   {
     { // 
       ddouble _v_i; // Variable       Dep: _potential_b_p_n      
+      _v_i.set_all_deps();
       { // Assignment real 'i'.
         ddouble t0;
+        t0[d_potential_b_p_n] = 0.; // (output dep)
         t0 = +p->_potential_b_p_n; // V(p, n)
         t0[d_potential_b_p_n] = +1.;
-        t0 = t0 / pc->_p_r;
+        t0 = t0 / (_p_r) /*rhspar*/;
         assert(t0.is_same(t0));
         _v_i = t0.value(); // (*)
         _v_i[d_potential_b_p_n] = t0[d_potential_b_p_n]; // (2b)
+        assert(_v_i[d_potential_b_p_n] == t0[d_potential_b_p_n]); // (2b2)
       }
       { // Contribution I(p, n) lin: 1
         ddouble t0;
-        t0 = _v_i;
+        t0[d_potential_b_p_n] = 0.; // (output dep)
+        t0 = _v_i/*rhsvar*/;
         d->_value_b_p_n += t0.value();
         assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
         d->_st_b_p_n[1] += t0[d_potential_b_p_n];
@@ -2580,7 +2584,7 @@ void COMMON_capacitor::precalc_first(const CARD_LIST* par_scope)
   }
   {
     ddouble t0;
-    t0 = pc->_p_c;
+    t0 = (_p_c) /*rhspar*/;
     real def = real(t0.value());
     this->_p___c = def;
   }
@@ -2606,7 +2610,7 @@ void COMMON_capacitor::precalc_last(const CARD_LIST* par_scope)
   }
   {
     ddouble t0;
-    t0 = pc->_p_c;
+    t0 = (_p_c) /*rhspar*/;
     real def = real(t0.value());
     this->_p___c = def;
   }
@@ -2721,9 +2725,10 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
         { // 
           { // Contribution I(p, n) lin: 0
             ddouble t0;
+            t0[d_potential_b_ddt_1_] = 0.; // (output dep)
             t0 = +p->_potential_b_p_n; // V(p, n)
             t0[d_potential_b_p_n] = +1.;
-            t0 = pc->_p___c * t0;
+            t0 = (_p___c) /*rhspar*/ * t0;
             // function ddt 1
             t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_1(t0);
             d->_value_b_p_n += t0.value();
@@ -3232,13 +3237,13 @@ void COMMON_capacitor::precalc_first(const CARD_LIST* par_scope)
   }
   {
     ddouble t0;
-    t0 = pc->_p_c;
+    t0 = (_p_c) /*rhspar*/;
     real def = real(t0.value());
     this->_p___c = def;
   }
   {
     ddouble t0;
-    t0 = pc->_p_ic;
+    t0 = (_p_ic) /*rhspar*/;
     real def = real(t0.value());
     this->_p___ic = def;
   }
@@ -3264,13 +3269,13 @@ void COMMON_capacitor::precalc_last(const CARD_LIST* par_scope)
   }
   {
     ddouble t0;
-    t0 = pc->_p_c;
+    t0 = (_p_c) /*rhspar*/;
     real def = real(t0.value());
     this->_p___c = def;
   }
   {
     ddouble t0;
-    t0 = pc->_p_ic;
+    t0 = (_p_ic) /*rhspar*/;
     real def = real(t0.value());
     this->_p___ic = def;
   }
@@ -3392,7 +3397,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
           { // 
             { // Contribution V(p, n) lin: 1
               ddouble t0;
-              t0 = pc->_p___ic;
+              t0 = (_p___ic) /*rhspar*/;
               if (!d->_pot_b_p_n){
                 d->_pot_b_p_n = true;
                 d->_value_b_p_n = 0.;
@@ -3406,9 +3411,10 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
           { // 
             { // Contribution I(p, n) lin: 0
               ddouble t0;
+              t0[d_potential_b_ddt_2_] = 0.; // (output dep)
               t0 = +p->_potential_b_p_n; // V(p, n)
               t0[d_potential_b_p_n] = +1.;
-              t0 = pc->_p___c * t0;
+              t0 = (_p___c) /*rhspar*/ * t0;
               // function ddt 1
               t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_2(t0);
               if (d->_pot_b_p_n){
