@@ -63,9 +63,9 @@ public:
 	}
 	explicit ddouble_() { clear(); }
 	// fixme: implicit conversion in af args..
-	/*explicit*/ ddouble_(int const& d) { clear(); value() = d; }
-	/*explicit*/ ddouble_(double const& d) { clear(); value() = d; }
-	/*explicit*/ ddouble_(PARAMETER<double> const& d) { clear(); value() = d; }
+	/*explicit*/ ddouble_(int const& d) { clear(); *_data = d; }
+	/*explicit*/ ddouble_(double const& d) { clear(); *_data = d; }
+	/*explicit*/ ddouble_(PARAMETER<double> const& d) { clear(); *_data = d; }
 	void	set_all_deps() {
 	  std::fill_n(_data+1, numderiv, 0.);
 	}
@@ -77,24 +77,24 @@ private:
 	  set_all_deps();
 	}
 public:
-	double const& value() const{return _data[0];}
-	double& value(){return _data[0];}
-	double d(int i) const{return _data[i];}
-	double const& operator[](int i) const{return _data[i+1];}
+	virtual double const& value()const {return _data[0];}
+	double d(int i)const {return _data[i];}
+	double const& operator[](int i)const {return _data[i+1];}
 	double& operator[](int i){return _data[i+1];}
-	operator double() const { return *_data; }
-//	operator double() { return *_data; }
-//	operator integer() const { return *_data; }
-// 	ddouble_& operator=(ddouble_ const& o) { untested();
-// 		assert(o == o);
-// 		notstd::copy_n(o._data, numderiv+1, _data);
-// 		return *this;
-// 	}
+	operator double()const { return *_data; }
+#if 1
+ 	ddouble_& operator=(ddouble_ const& o) {
+ 		assert(o == o);
+ 		notstd::copy_n(o._data, numderiv+1, _data);
+ 		return *this;
+ 	}
+#else
 	ddouble_& operator=(ddouble_ o) {
 		assert(o == o);
 		notstd::copy_n(o._data, numderiv+1, _data);
 		return *this;
 	}
+#endif
 	ddouble_& operator=(PARAMETER<double> const& o) {
 		assert(o == o);
 		*_data = o;
@@ -200,17 +200,17 @@ public:
 	}
 	ddouble_ operator+(double const& o) const {
 		ddouble_ ret = *this;
-		ret.value() += o;
+		*ret._data += o;
 		return ret;
 	}
 	ddouble_ operator+(int const& o) const {
 		ddouble_ ret = *this;
-		ret.value() += o;
+		*ret._data += o;
 		return ret;
 	}
 	ddouble_ operator+(PARAMETER<double> const& o) const {
 		ddouble_ ret = *this;
-		ret.value() += o;
+		*ret._data += o;
 		return ret;
 	}
 
@@ -569,6 +569,7 @@ inline PARAMETER<int>& chain(PARAMETER<int>& t, double const&)
 /*--------------------------------------------------------------------------*/
 namespace va {
 // some builtin numerical functions according to verilog standard
+// TODO: move to plugins, like the others.
 /*--------------------------------------------------------------------------*/
 template<class T>
 T fmod(T d, T e)
@@ -596,7 +597,7 @@ inline int fmod(PARAMETER<int> const& d, int e)
 { untested();
   incomplete();
   // chain(d, std::cos(d));
-  d.value() = std::log10(double(d));
+  set_value(d, std::log10(double(d)));
   return d;
 }
 /*--------------------------------------------------------------------------*/

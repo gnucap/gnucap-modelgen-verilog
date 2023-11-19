@@ -72,9 +72,9 @@ public:
 	}
 	explicit ddouble_() { clear(); }
 	// fixme: implicit conversion in af args..
-	/*explicit*/ ddouble_(int const& d) { clear(); value() = d; }
-	/*explicit*/ ddouble_(double const& d) { clear(); value() = d; }
-	/*explicit*/ ddouble_(PARAMETER<double> const& d) { clear(); value() = d; }
+	/*explicit*/ ddouble_(int const& d) { clear(); *_data = d; }
+	/*explicit*/ ddouble_(double const& d) { clear(); *_data = d; }
+	/*explicit*/ ddouble_(PARAMETER<double> const& d) { clear(); *_data = d; }
 	void	set_all_deps() {
 	  std::fill_n(_data+1, numderiv, 0.);
 	}
@@ -86,24 +86,24 @@ private:
 	  set_all_deps();
 	}
 public:
-	double const& value() const{return _data[0];}
-	double& value(){return _data[0];}
-	double d(int i) const{return _data[i];}
-	double const& operator[](int i) const{return _data[i+1];}
+	virtual double const& value()const {return _data[0];}
+	double d(int i)const {return _data[i];}
+	double const& operator[](int i)const {return _data[i+1];}
 	double& operator[](int i){return _data[i+1];}
-	operator double() const { return *_data; }
-//	operator double() { return *_data; }
-//	operator integer() const { return *_data; }
-// 	ddouble_& operator=(ddouble_ const& o) { untested();
-// 		assert(o == o);
-// 		notstd::copy_n(o._data, numderiv+1, _data);
-// 		return *this;
-// 	}
+	operator double()const { return *_data; }
+#if 1
+ 	ddouble_& operator=(ddouble_ const& o) {
+ 		assert(o == o);
+ 		notstd::copy_n(o._data, numderiv+1, _data);
+ 		return *this;
+ 	}
+#else
 	ddouble_& operator=(ddouble_ o) {
 		assert(o == o);
 		notstd::copy_n(o._data, numderiv+1, _data);
 		return *this;
 	}
+#endif
 	ddouble_& operator=(PARAMETER<double> const& o) {
 		assert(o == o);
 		*_data = o;
@@ -209,17 +209,17 @@ public:
 	}
 	ddouble_ operator+(double const& o) const {
 		ddouble_ ret = *this;
-		ret.value() += o;
+		*ret._data += o;
 		return ret;
 	}
 	ddouble_ operator+(int const& o) const {
 		ddouble_ ret = *this;
-		ret.value() += o;
+		*ret._data += o;
 		return ret;
 	}
 	ddouble_ operator+(PARAMETER<double> const& o) const {
 		ddouble_ ret = *this;
-		ret.value() += o;
+		*ret._data += o;
 		return ret;
 	}
 
@@ -578,6 +578,7 @@ inline PARAMETER<int>& chain(PARAMETER<int>& t, double const&)
 /*--------------------------------------------------------------------------*/
 namespace va {
 // some builtin numerical functions according to verilog standard
+// TODO: move to plugins, like the others.
 /*--------------------------------------------------------------------------*/
 template<class T>
 T fmod(T d, T e)
@@ -605,7 +606,7 @@ inline int fmod(PARAMETER<int> const& d, int e)
 { untested();
   incomplete();
   // chain(d, std::cos(d));
-  d.value() = std::log10(double(d));
+  set_value(d, std::log10(double(d)));
   return d;
 }
 /*--------------------------------------------------------------------------*/
@@ -1198,7 +1199,7 @@ bool MOD_resistor::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 bool MOD_resistor::do_tr()
 {
-  trace0("resistor::do_tr");
+  trace2("resistor::do_tr", this, long_label());
   clear_branch_contributions();
   read_probes();
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
@@ -1238,9 +1239,14 @@ inline void MOD_resistor::clear_branch_contributions()
     std::fill_n(_st_b_p_n+1, 1, 0.);
 }
 /*--------------------------------------------------------------------------*/
+typedef MOD_resistor::ddouble ddouble;
 inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
 {
-  trace0("resistor::tr_eval_analog");
+  trace1("resistor::tr_eval_analog", d);
+  trace1("resistor::tr_eval_analog", d->long_label());
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+#pragma GCC diagnostic pop
   MOD_resistor const* p = d;
   assert(p);
   COMMON_resistor const* pc = this;
@@ -1251,6 +1257,8 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
       _v_i.set_all_deps();
       { // Assignment real 'i'.
         ddouble t0;
+        t0[d_potential_b_p_n] = 0.; // (output dep)
+        t0.set_no_deps();
         t0[d_potential_b_p_n] = 0.; // (output dep)
         t0 = +p->_potential_b_p_n; // V(p, n)
         t0[d_potential_b_p_n] = +1.;
@@ -1480,9 +1488,9 @@ public:
 	}
 	explicit ddouble_() { clear(); }
 	// fixme: implicit conversion in af args..
-	/*explicit*/ ddouble_(int const& d) { clear(); value() = d; }
-	/*explicit*/ ddouble_(double const& d) { clear(); value() = d; }
-	/*explicit*/ ddouble_(PARAMETER<double> const& d) { clear(); value() = d; }
+	/*explicit*/ ddouble_(int const& d) { clear(); *_data = d; }
+	/*explicit*/ ddouble_(double const& d) { clear(); *_data = d; }
+	/*explicit*/ ddouble_(PARAMETER<double> const& d) { clear(); *_data = d; }
 	void	set_all_deps() {
 	  std::fill_n(_data+1, numderiv, 0.);
 	}
@@ -1494,24 +1502,24 @@ private:
 	  set_all_deps();
 	}
 public:
-	double const& value() const{return _data[0];}
-	double& value(){return _data[0];}
-	double d(int i) const{return _data[i];}
-	double const& operator[](int i) const{return _data[i+1];}
+	virtual double const& value()const {return _data[0];}
+	double d(int i)const {return _data[i];}
+	double const& operator[](int i)const {return _data[i+1];}
 	double& operator[](int i){return _data[i+1];}
-	operator double() const { return *_data; }
-//	operator double() { return *_data; }
-//	operator integer() const { return *_data; }
-// 	ddouble_& operator=(ddouble_ const& o) { untested();
-// 		assert(o == o);
-// 		notstd::copy_n(o._data, numderiv+1, _data);
-// 		return *this;
-// 	}
+	operator double()const { return *_data; }
+#if 1
+ 	ddouble_& operator=(ddouble_ const& o) {
+ 		assert(o == o);
+ 		notstd::copy_n(o._data, numderiv+1, _data);
+ 		return *this;
+ 	}
+#else
 	ddouble_& operator=(ddouble_ o) {
 		assert(o == o);
 		notstd::copy_n(o._data, numderiv+1, _data);
 		return *this;
 	}
+#endif
 	ddouble_& operator=(PARAMETER<double> const& o) {
 		assert(o == o);
 		*_data = o;
@@ -1617,17 +1625,17 @@ public:
 	}
 	ddouble_ operator+(double const& o) const {
 		ddouble_ ret = *this;
-		ret.value() += o;
+		*ret._data += o;
 		return ret;
 	}
 	ddouble_ operator+(int const& o) const {
 		ddouble_ ret = *this;
-		ret.value() += o;
+		*ret._data += o;
 		return ret;
 	}
 	ddouble_ operator+(PARAMETER<double> const& o) const {
 		ddouble_ ret = *this;
-		ret.value() += o;
+		*ret._data += o;
 		return ret;
 	}
 
@@ -1986,6 +1994,7 @@ inline PARAMETER<int>& chain(PARAMETER<int>& t, double const&)
 /*--------------------------------------------------------------------------*/
 namespace va {
 // some builtin numerical functions according to verilog standard
+// TODO: move to plugins, like the others.
 /*--------------------------------------------------------------------------*/
 template<class T>
 T fmod(T d, T e)
@@ -2013,7 +2022,7 @@ inline int fmod(PARAMETER<int> const& d, int e)
 { untested();
   incomplete();
   // chain(d, std::cos(d));
-  d.value() = std::log10(double(d));
+  set_value(d, std::log10(double(d)));
   return d;
 }
 /*--------------------------------------------------------------------------*/
@@ -2673,7 +2682,7 @@ bool MOD_capacitor::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 bool MOD_capacitor::do_tr()
 {
-  trace0("capacitor::do_tr");
+  trace2("capacitor::do_tr", this, long_label());
   clear_branch_contributions();
   read_probes();
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
@@ -2712,9 +2721,14 @@ inline void MOD_capacitor::clear_branch_contributions()
     std::fill_n(_st_b_p_n+1, 2, 0.);
 }
 /*--------------------------------------------------------------------------*/
+typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
 {
-  trace0("capacitor::tr_eval_analog");
+  trace1("capacitor::tr_eval_analog", d);
+  trace1("capacitor::tr_eval_analog", d->long_label());
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+#pragma GCC diagnostic pop
   MOD_capacitor const* p = d;
   assert(p);
   COMMON_capacitor const* pc = this;
@@ -2725,6 +2739,8 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
         { // 
           { // Contribution I(p, n) lin: 0
             ddouble t0;
+            t0[d_potential_b_ddt_1_] = 0.; // (output dep)
+            t0.set_no_deps();
             t0[d_potential_b_ddt_1_] = 0.; // (output dep)
             t0 = +p->_potential_b_p_n; // V(p, n)
             t0[d_potential_b_p_n] = +1.;
@@ -3332,7 +3348,7 @@ bool MOD_capacitor::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 bool MOD_capacitor::do_tr()
 {
-  trace0("capacitor::do_tr");
+  trace2("capacitor::do_tr", this, long_label());
   clear_branch_contributions();
   read_probes();
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
@@ -3377,9 +3393,14 @@ inline void MOD_capacitor::clear_branch_contributions()
     std::fill_n(_st_b_p_n+1, 2, 0.);
 }
 /*--------------------------------------------------------------------------*/
+typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
 {
-  trace0("capacitor::tr_eval_analog");
+  trace1("capacitor::tr_eval_analog", d);
+  trace1("capacitor::tr_eval_analog", d->long_label());
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+#pragma GCC diagnostic pop
   MOD_capacitor const* p = d;
   assert(p);
   COMMON_capacitor const* pc = this;
@@ -3411,6 +3432,8 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
           { // 
             { // Contribution I(p, n) lin: 0
               ddouble t0;
+              t0[d_potential_b_ddt_2_] = 0.; // (output dep)
+              t0.set_no_deps();
               t0[d_potential_b_ddt_2_] = 0.; // (output dep)
               t0 = +p->_potential_b_p_n; // V(p, n)
               t0[d_potential_b_p_n] = +1.;

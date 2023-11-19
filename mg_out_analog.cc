@@ -352,7 +352,7 @@ static void make_cc_analog_cond(std::ostream& o, AnalogConditionalStmt const& s)
     }else{ untested();
     }
   }else if(s.conditional().is_false()){
-    if(s.false_part()) {untested();
+    if(s.false_part()) {
       indent y;
       make_cc_analog_stmt(o, s.false_part());
     }else{
@@ -703,53 +703,44 @@ void make_set_branch_contributions(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-// void make_one_variable_decl(std::ostream& o, const Variable_Decl& V);
-// static void make_variable_decl(std::ostream& o, const Variable_List_Collection& P)
-// {
-//   for (auto q = P.begin(); q != P.end(); ++q) {
-//     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
-//       Variable_Decl const* V = *p;
-//       assert(V);
-//       if(V->has_attributes()) {
-// 	// global device
-//       }else{
-// 	make_one_variable_decl(o, *V);
-//       }
-//     }
-//   }
-// }
+static void make_one_variable_proxy(std::ostream& o, const Variable_Decl& V, Module const& m)
+{
+  o__ "class _V_" << V.name() << " : public ddouble {\n";
+  o____ "MOD_" << m.identifier() << " * const _m;\n";
+  o__ "public:\n";
+  o____ "typedef ddouble base;\n";
+  o____ "typedef va::ddouble_tag base_tag;\n";
+  o____ "_V_" << V.name() << "(ddouble const& p) : ddouble(p), _m(NULL) { itested(); }\n";
+  o____ "_V_" << V.name() << "(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}\n";
+  o____ "_V_" << V.name() << "(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}\n";
+  o____ "_V_" << V.name() << "(_V_" << V.name() << " const& p) : ddouble(p), _m(NULL) {}\n";
+  o____ "explicit _V_" << V.name() << "() : ddouble(), _m(NULL) {set_all_deps();}\n";
+  o____ "_V_" << V.name() << "(MOD_" << m.identifier() << " * m) : "
+    << "ddouble(m->" << V.code_name() << "), _m(m) {}\n";
+  o____ "~_V_" << V.name() << "() {\n"
+    << "	if(_m){\n";
+  o______ "_m->" << V.code_name() << " = value();\n";
+  o____ "}else{itested(); }}\n";
+  o____ "ddouble& operator=(double t){\n";
+  o______ "ddouble::operator=(t);\n";
+  o______ "return *this;\n";
+  o____ "}\n";
+  o____ "ddouble& operator=(ddouble t){\n";
+  o______ "ddouble::operator=(t);\n";
+  o______ "return *this;\n";
+  o____ "}\n";
+  o__ "}";
+}
 /*--------------------------------------------------------------------------*/
 void make_one_variable_load(std::ostream& o, const Variable_Decl& V, Module const& m)
 {
   if(V.type().is_real()) {
-    if(!V.is_module_variable()){
-//    }else if(!V.has_attributes()){
+    if(!V.is_module_variable()){ untested();
     }else if(V.deps().size() == 0){
       o__ "double& " << V.code_name() << "(d->" << V.code_name() << ");\n";
-    }else if(0 && options().optimize_deriv()) { untested();
-      o__ "class _V_" << V.name() << " : public ddouble {\n";
-      o____ "MOD_" << m.identifier() << " * const _m;\n";
-      o__ "public:\n";
-      o____ "typedef ddouble base;\n";
-      o____ "typedef va::ddouble_tag base_tag;\n";
-      o____ "_V_" << V.name() << "(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}\n";
-      o____ "_V_" << V.name() << "(_V_" << V.name() << " const& p) : ddouble(p), _m(NULL) {set_all_deps();}\n";
-      o____ "explicit _V_" << V.name() << "() : ddouble(), _m(NULL) {set_all_deps();}\n";
-      o____ "_V_" << V.name() << "(MOD_" << m.identifier() << " * m) : "
-         << "ddouble(m->" << V.code_name() << "), _m(m) {}\n";
-      o____ "~_V_" << V.name() << "() {\n"
-          << "	if(_m){\n";
-      o______ "_m->" << V.code_name() << " = *_data;\n";
-      o____ "}else{itested(); }}\n";
-      o____ "ddouble& operator=(double t){\n";
-      o______ "ddouble::operator=(t);\n";
-      o______ "return *this;\n";
-      o____ "}\n";
-      o____ "ddouble& operator=(ddouble t){\n";
-      o______ "ddouble::operator=(t);\n";
-      o______ "return *this;\n";
-      o____ "}\n";
-      o__ "}" << V.code_name() << "(d);\n";
+    }else if(options().optimize_deriv()) {
+      make_one_variable_proxy(o, V, m);
+      o << V.code_name() << "(d);\n";
     }else{ untested();
       o__ "ddouble " << V.code_name() << "(d->" << V.code_name() << ");\n";
     }
@@ -759,33 +750,37 @@ void make_one_variable_load(std::ostream& o, const Variable_Decl& V, Module cons
 /*--------------------------------------------------------------------------*/
 void make_one_variable_store(std::ostream& o, const Variable_Decl& V)
 {
-  if(V.type().is_real()) {
-    if(!V.is_module_variable()){
-//    }else if(!V.has_attributes()){
-    }else if(V.deps().size() == 0){ untested();
-    }else{ untested();
-      // destructor?
-      o__ "d->" << V.code_name() << " = " << V.code_name() << ";\n";
-    }
-  }else{
+  if(!V.type().is_real()) {
+  }else if(!V.is_module_variable()){ untested();
+    unreachable();
+  }else if(V.deps().size() == 0){ itested();
+    // it's a reference.
+  }else if(options().optimize_deriv()) {
+    // use destructor
+  }else{ untested();
+    o__ "d->" << V.code_name() << " = " << V.code_name() << ".value();\n";
   }
 }
 /*--------------------------------------------------------------------------*/
 static void make_load_variables(std::ostream& o, const
     Variable_List_Collection& P, const Module& m)
 {
+  // not sure if these are actually unused. GCC bug?
+  o << "#pragma GCC diagnostic push\n";
+  o << "#pragma GCC diagnostic ignored \"-Wunused-local-typedefs\"\n";
+
   for (auto q = P.begin(); q != P.end(); ++q) {
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
       Variable_Decl const* V = *p;
       assert(V);
       if(!V->is_module_variable()){
-//    }else if(!V.has_attributes()){
-	// global device
       }else{
 	make_one_variable_load(o, *V, m);
       }
     }
   }
+
+  o << "#pragma GCC diagnostic pop\n";
 }
 /*--------------------------------------------------------------------------*/
 static void make_store_variables(std::ostream& o, const Variable_List_Collection& P)
@@ -794,9 +789,7 @@ static void make_store_variables(std::ostream& o, const Variable_List_Collection
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
       Variable_Decl const* V = *p;
       assert(V);
-      if(!V->is_module_variable()){
-      // if(V->has_attributes()) {
-	// global device
+      if(!V->is_module_variable()) { untested();
       }else{
 	make_one_variable_store(o, *V);
       }
@@ -806,6 +799,7 @@ static void make_store_variables(std::ostream& o, const Variable_List_Collection
 /*--------------------------------------------------------------------------*/
 static void make_common_tr_eval(std::ostream& o, const Module& m)
 {
+  o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
   o << "inline void COMMON_" << m.identifier() << 
     "::tr_eval_analog(MOD_" << m.identifier() << "* d) const\n{\n";
   o__ "trace1(\"" << m.identifier() <<"::tr_eval_analog\", d);\n";

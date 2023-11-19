@@ -101,7 +101,7 @@ public:
     }
     Node const* p = _ddxprobe->branch()->p();
     Node const* n = _ddxprobe->branch()->n();
-    o__ "ddouble ret;\n";
+    o__ "double ret;\n";
     o__ "(void) t1;\n";
     assert(_m);
     for(auto x : _m->branches()){
@@ -110,9 +110,9 @@ public:
 	if(p == &mg_ground_node){ untested();
 	}else if(n != &mg_ground_node){
 	}else if(x->p() == p){
-	  o__ "ret.value() += t0[d_potential" << x->code_name() << "];\n";
+	  o__ "ret += t0[d_potential" << x->code_name() << "];\n";
 	}else if(x->n() == p){
-	  o__ "ret.value() -= t0[d_potential" << x->code_name() << "];\n";
+	  o__ "ret -= t0[d_potential" << x->code_name() << "];\n";
 	}else{
 	}
 
@@ -121,7 +121,7 @@ public:
 	}else if(x->p() == p && x->n() == n){
 	  // oops. what does the standard say about reversed ddx?
 	  bool rev = _ddxprobe->is_reversed();
-	  o__ "ret.value() " << (rev?'-':'+') << "= t0[d_potential" << x->code_name() << "]; // fwd?\n";
+	  o__ "ret " << (rev?'-':'+') << "= t0[d_potential" << x->code_name() << "]; // fwd?\n";
 	}else if(x->p() == n && x->n() == p){ untested();
 	  unreachable();
 	}else{ untested();
@@ -131,6 +131,8 @@ public:
       }
 
     }
+
+    // incomplete(); no second derivatives..
     o__ "return ret;\n";
     o__ "}\n";
 

@@ -463,7 +463,7 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
       s.new_rhs(var); // if linear?
     }else if(auto pp = dynamic_cast<const Token_ACCESS*>(*i)) {
       s.new_ddouble(o);
-      if(options().optimize_deriv()){ untested();
+      if(options().optimize_deriv()){
 	o__ s.code_name() << ".set_no_deps();\n";
 	for(auto i: s.deps()){
 	  o__ s.code_name() << "[d" << i->code_name() << "] = 0.; // (output dep)\n";
