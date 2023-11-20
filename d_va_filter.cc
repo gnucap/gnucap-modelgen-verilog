@@ -167,6 +167,7 @@ private:
     :DEV_CPOLY_CAP(p) {}
 public:
   explicit DEV_DDT() :DEV_CPOLY_CAP() {}
+  // explicit DEV_DDT(isrc) :DEV_CPOLY_CAP() {...} // TODO
 private: // override virtual
   char	   id_letter()const override	{unreachable(); return '\0';}
   std::string dev_type()const override	{unreachable(); return "ddt";}
@@ -176,6 +177,8 @@ private: // override virtual
   TIME_PAIR tr_review()override; //		{return _time_by.reset();}//BUG//review(_i0.f0, _it1.f0);}
 }p4;
 DISPATCHER<CARD>::INSTALL d_ddt(&device_dispatcher, "va_ddt|f_ddt0", &p4);
+// DEV_DDT p4i(I);
+// DISPATCHER<CARD>::INSTALL d_ddt_i(&device_dispatcher, "va_ddt_i", &p4i); // TODO
 /*--------------------------------------------------------------------------*/
 TIME_PAIR DEV_DDT::tr_review()
 {
@@ -211,7 +214,8 @@ DISPATCHER<CARD>::INSTALL
 void DEV_IDT::ac_load()
 { untested();
   ac_load_shunt(); // 4 pt +- loss
-  _acg = _vy0[1] * _sim->_jomega;
+  assert(!_vy0[1]); // for now.
+  _acg = _vy0[1] / _sim->_jomega;
   trace4("load", _vy0[0], _vy0[1], _loss0, _loss1);
   ac_load_passive();
   for (int i=2; i<=_n_ports; ++i) { untested();
@@ -252,6 +256,9 @@ DEV_CPOLY_CAP::DEV_CPOLY_CAP(const DEV_CPOLY_CAP& p)
   assert(!p._vi1);
   assert(p._n_ports == 0);
   assert(!p._inputs);
+
+  // configure output nodes
+  _loss1 = _loss0 = 1.;
 }
 /*--------------------------------------------------------------------------*/
 DEV_CPOLY_CAP::DEV_CPOLY_CAP()
@@ -307,14 +314,12 @@ bool DEV_CPOLY_CAP::do_tr()
 void DEV_DDT::tr_begin()
 {
   DEV_CPOLY_CAP::tr_begin();
-  _loss1 = _loss0 = 1.;
   trace4("DEV_DDT::tr_begin", long_label(), _y[0].f0, _y[1].f0, LINEAR);
 }
 /*--------------------------------------------------------------------------*/
 void DEV_IDT::tr_begin()
 {
   DEV_CPOLY_CAP::tr_begin();
-  _loss1 = _loss0 = 1.;
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_DDT::do_tr()
@@ -438,6 +443,7 @@ void DEV_CPOLY_CAP::ac_load()
 {
   ac_load_shunt(); // 4 pt +- loss
   _acg = _vy0[1] * _sim->_jomega;
+  assert(!_vy0[1]); // for now.
   trace4("load", _vy0[0], _vy0[1], _loss0, _loss1);
   ac_load_passive();
   for (int i=2; i<=_n_ports; ++i) {
