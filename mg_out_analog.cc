@@ -27,10 +27,10 @@ static void make_cc_variable(std::ostream& o, Variable const& v)
 {
   o << ind << "ddouble _v_" << v.name() << "; // Variable";
 
-  for(auto i : v.deps()) {
-    o << ind << " Dep: " << i->code_name();
+  for(auto const& i : v.deps()) {
+    o__ " Dep: " << i->code_name() << " lin: " << i.is_linear();
   }
-  o << ind << "\n";
+  o << "\n";
   //if(options().fpi()){
   //}else
   o << ind << "_v_" << v.name() << ".set_all_deps();\n";
@@ -546,9 +546,9 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
   }else{
   }
 
-  for(auto d : b->deps()){
+  for(auto const& d : b->deps()){
     if(d->branch() == b){
-      o__ "// self_admittance\n";
+      o__ "// self_admittance lin: " << d.is_linear() << "\n";
       if(b->has_pot_source() && b->has_flow_probe()){
 	if(br.num_states()<=2){
 	}else{
@@ -578,11 +578,12 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
     o__ "long double sp = 0.;\n";
   }else{
   }
-  o__ "// voltage sources...\n";
+  o__ "// sources...\n";
   {
     indent ii;
 
-    for(auto d : b->deps()){
+    for(auto const& d : b->deps()){
+      o__ "// " << d->code_name() << " lin: " <<  d.is_linear() << "\n";
       if(d->branch() == b){
       }else if(d->branch()->is_short()) {
       }else if(d->is_pot_probe()){
@@ -590,7 +591,12 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
 	 << "/*MOD::*/" << b->state() << "_::dep" << d->code_name()
 	 << "] * "<< d->code_name() << ");\n";
       }else if(d->is_flow_probe()){
-	// nothing, handled below.
+	o__ "sp += (long double)(" << b->state() << "["
+	 << "/*MOD::*/" << b->state() << "_::dep" << d->code_name()
+	 << "] * "<< d->code_name() << "); // (5)\n";
+	o__ b->state() << "["
+	 << "/*MOD::*/" << b->state() << "_::dep" << d->code_name()
+	 <<"] *= " << d->branch()->code_name() <<"->_loss0; // BUG?\n";
       }else{ untested();
 	o__ "// bogus probe " << b->state() << " : " << d->code_name() << "\n";
       }
@@ -601,25 +607,6 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
     }
   }
 
-  o__ "// current sources...\n";
-  {
-    indent ii;
-    for(auto d : b->deps()){
-      if(d->branch() == b){
-      }else if(d->branch()->is_short()) {
-      }else if(d->is_flow_probe()){
-	o__ "sp += (long double)(" << b->state() << "["
-	 << "/*MOD::*/" << b->state() << "_::dep" << d->code_name()
-	 << "] * "<< d->code_name() << "); // (5)\n";
-	o__ b->state() << "["
-	 << "/*MOD::*/" << b->state() << "_::dep" << d->code_name()
-	 <<"] *= " << d->branch()->code_name() <<"->_loss0; // BUG?\n";
-      }else if(d->is_pot_probe()){
-	// nothing, handled above.
-      }else{ untested();
-      }
-    }
-  }
   if (b->deps().size()) {
     o__ b->state() << "[0] = double(" << b->state() << "[0] - sp);\n";
   }else{

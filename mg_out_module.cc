@@ -369,6 +369,7 @@ static void make_do_tr(std::ostream& o, const Module& m)
   o__ "assert(c);\n";
   o__ "set_converged();\n";
   o__ "c->tr_eval_analog(this);\n";
+  // if analog?
   o__ "set_branch_contributions();\n";
   o__ "assert(subckt());\n";
   o__ "set_converged(subckt()->do_tr() && converged());\n";
