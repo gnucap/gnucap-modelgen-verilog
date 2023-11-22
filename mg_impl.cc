@@ -865,13 +865,13 @@ void Variable_Decl::update_deps(Deps const& d)
 bool is_true(Expression const& x)
 {
   double e = x.eval();
-  return e == 1.;
+  return e != NOT_INPUT && e;
 }
 /*--------------------------------------------------------------------------*/
 bool is_false(Expression const& x)
 {
   double e = x.eval();
-  return e == 0.;
+  return e != NOT_INPUT && !e;
 }
 /*--------------------------------------------------------------------------*/
 bool is_zero(Expression const& x)

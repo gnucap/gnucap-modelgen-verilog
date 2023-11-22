@@ -18,7 +18,7 @@ enddiscipline
 
 
 module cond0(p, n);
-  analog begin
+  analog begin // always
     real S, T, U;
     if (1.) ;
     if (((S + 1) == 3)) ;
@@ -27,29 +27,35 @@ module cond0(p, n);
 
 endmodule
 module cond1(p, n);
-  analog begin
+  analog begin // always
     real S;
-    if ( 1.) begin
+    if ( 1.) begin // always
       S = 3;
     end
-    else begin : bla
+    else begin : bla // never
+      S = 1;
+    end
+    if ( 0.) begin // never
+      S = 3;
+    end
+    else begin : bla // always
       S = 1;
     end
   end
 
 endmodule
 module cond2(p, n);
-  analog begin
+  analog begin // always
     real S;
     real T;
-    if ( 0.) begin
+    if ( 0.) begin // never
       S = 1;
     end
-    if ( 1.) begin
+    if ( 1.) begin // always
       T = 1;
     end
-    else begin
-      if ( 0.) begin
+    else begin // never
+      if ( 0.) begin // never
         T = 2;
       end
     end
@@ -57,24 +63,46 @@ module cond2(p, n);
 
 endmodule
 module cond3(p, n);
-  analog begin
+  analog begin // always
     real S;
     real T;
-    if (1) begin
-      if (2) begin
-        if (3) begin
-          if (4) begin
-            if (5) begin
+    if (1) begin // always
+      if (2) begin // always
+        S = 2;
+      end
+    end
+    if (1) begin // always
+      if (2) begin // always
+        if (3) begin // always
+          if (4) begin // always
+            if (5) begin // always
               T = 1;
             end
-            else begin
-              if (5) begin
+            else begin // never
+              if (5) begin // never
                 T = 3;
               end
             end
           end
         end
       end
+    end
+    if (T) begin
+      T = 0;
+    end
+    else begin
+      T = 2;
+    end
+    if (1) begin // always
+      if (2) begin // always
+        S = 2;
+      end
+      else begin // never
+        S = 1;
+      end
+    end
+    else begin // never
+      S = 1;
     end
   end
 

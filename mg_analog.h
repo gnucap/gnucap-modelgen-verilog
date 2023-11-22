@@ -89,6 +89,7 @@ public:
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
   operator bool()const{ return size() || identifier() !=""; }
+  void set_owner(Block* owner) { _block.set_owner_raw(owner); }
 };
 /*--------------------------------------------------------------------------*/
 class CaseGen : public Base{

@@ -97,7 +97,7 @@ public:
   String_Arg() {}
   explicit String_Arg(const char* s) : _s(s) {}
   explicit String_Arg(std::string const& s) : _s(s) {}
-  String_Arg(String_Arg const& o) : Base(), _s(o._s) {untested();} // needed?
+  String_Arg(String_Arg const& o) : Base(), _s(o._s) {} // needed?
   String_Arg& operator=(String_Arg const& o) { _s = o._s; return *this; }
   //String_Arg(const std::string& s) : _s(s) {}
   const String_Arg&  key()const	  {return *this;}
@@ -980,6 +980,9 @@ public:
     return _owner->new_branch_name(p, r);
   }
 
+  void set_owner_raw(Block* b) {
+    _owner = b;
+  }
   void set_owner(Block* b){
     assert(!b || !_owner || _owner == b);
     _owner = b;

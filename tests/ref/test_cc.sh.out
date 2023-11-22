@@ -1222,12 +1222,12 @@ inline void MOD_resistor::set_branch_contributions()
     assert(_value_b_p_n == _value_b_p_n);
     _st_b_p_n[0] = _value_b_p_n;
     // collect currents from named branches
-    // self_admittance
+    // self_admittance lin: 1
     trace2("_st_b_p_nself", _st_b_p_n[1], _potential_b_p_n);
     _st_b_p_n[0] -= _st_b_p_n[1] * _potential_b_p_n; // (4)
     long double sp = 0.;
-    // voltage sources...
-    // current sources...
+    // sources...
+      // _potential_b_p_n lin: 1
     _st_b_p_n[0] = double(_st_b_p_n[0] - sp);
     }
   // flow src (p, n)
@@ -1253,7 +1253,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
   (void)pc;
   {
     { // 
-      ddouble _v_i; // Variable       Dep: _potential_b_p_n      
+      ddouble _v_i; // Variable       Dep: _potential_b_p_n lin: 1
       _v_i.set_all_deps();
       { // Assignment real 'i'.
         ddouble t0;
@@ -2707,9 +2707,9 @@ inline void MOD_capacitor::set_branch_contributions()
     _st_b_p_n[0] = _value_b_p_n;
     // collect currents from named branches
     long double sp = 0.;
-    // voltage sources...
+    // sources...
+      // _potential_b_ddt_1_ lin: 0
       sp += (long double)(_st_b_p_n[/*MOD::*/_st_b_p_n_::dep_potential_b_ddt_1_] * _potential_b_ddt_1_);
-    // current sources...
     _st_b_p_n[0] = double(_st_b_p_n[0] - sp);
     }
   // flow src (p, n)
@@ -3372,9 +3372,9 @@ inline void MOD_capacitor::set_branch_contributions()
     assert(_value_b_p_n == _value_b_p_n);
     _st_b_p_n[0] = _value_b_p_n;
     long double sp = 0.;
-    // voltage sources...
+    // sources...
+      // _potential_b_ddt_2_ lin: 0
       sp += (long double)(_st_b_p_n[/*MOD::*/_st_b_p_n_::dep_potential_b_ddt_2_] * _potential_b_ddt_2_);
-    // current sources...
     _st_b_p_n[0] = double(_st_b_p_n[0] - sp);
     }
   // pot src (p, n)

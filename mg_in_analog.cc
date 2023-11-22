@@ -375,8 +375,13 @@ static Base* parse_analog_stmt(CS& file, Block* owner)
 /*--------------------------------------------------------------------------*/
 void AnalogConditionalStmt::parse(CS& file)
 {
+  assert(owner());
   _body.set_owner(owner());
+  assert(!_body.is_always());
+  assert(!_body.is_never());
   _false_part.set_owner(owner());
+
+  assert(_cond.owner() == owner());
 
   file >> "(" >> _cond >> ")";
   // set reachabilities here!
@@ -387,13 +392,13 @@ void AnalogConditionalStmt::parse(CS& file)
       _body.set_never();
       _false_part.set_never();
     }else if(_cond.is_true()) {
-      if(owner()->is_always()) { untested();
+      if(owner()->is_always()) {
 	_body.set_always();
       }else{
       }
       _false_part.set_never();
     }else if(_cond.is_false()) {
-      if(owner()->is_always()) { untested();
+      if(owner()->is_always()) {
 	_false_part.set_always();
       }else{
       }
@@ -401,7 +406,9 @@ void AnalogConditionalStmt::parse(CS& file)
     }else{
     }
 
+    trace1("pp0", _body.is_always());
     file >> _body;
+    trace3("pp1", _body.is_always(), _cond.is_true(), owner()->is_always());
     if(file >> "else "){
       trace1("got else branch", file.tail().substr(0, 1));
       file >> _false_part;
@@ -598,7 +605,7 @@ void CaseGen::calc_reach(Expression const& ctrl)
     incomplete();
   }else if(_cond && _cond->size()){
     bool all_never = true;
-    for(auto j : *_cond){
+    for(auto const& j : *_cond){
       trace2("==", ctrl.back()->name(), j->expression().back()->name());
       Token_BINOP_ b("==", ctrl.back(), j->expression().back(), NULL);
       b.stack_op(&result);
@@ -633,7 +640,10 @@ void CaseGen::parse(CS&)
 void CaseGen::dump(std::ostream& o)const
 {
   if(!options().dump_unreachable() && is_never()){
+//    o__ "// not reached\n";
   }else{
+//    o__ "// is_never: " << is_never() << "\n";
+//    o__ "// is_always " << is_always() << "\n";
 
     if(_cond){
       o__ *_cond;
@@ -648,9 +658,12 @@ void CaseGen::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 CaseGen::CaseGen(CS& f, Block* owner, Expression const& ctrl, bool have_r, bool have_a)
 {
-  trace1("CaseGen", f.tail().substr(0,20));
+  trace2("CaseGen", f.tail().substr(0,20), have_a);
+  assert(!dynamic_cast<Module const*>(owner));
   AnalogConstExpressionList* c = new AnalogConstExpressionList();
   c->set_owner(owner);
+  _code.set_owner(owner);
+  trace2("CaseGen", _code.is_always(), _code.is_never());
 
 //  parse(f); 
 
@@ -676,8 +689,9 @@ CaseGen::CaseGen(CS& f, Block* owner, Expression const& ctrl, bool have_r, bool 
 //    assert(!_cond);
 //    f.reset_fail(here);
 //  }else
-  if(have_a){
+  if(have_a) {
     set_never();
+    assert(is_never());
   }else if(!have_r){
     // default?
     calc_reach(ctrl);
@@ -685,7 +699,6 @@ CaseGen::CaseGen(CS& f, Block* owner, Expression const& ctrl, bool have_r, bool 
     calc_reach(ctrl);
   }
   if(f){
-    _code.set_owner(owner);
     f >> _code;
     if(f){
     }else{ untested();
@@ -693,10 +706,13 @@ CaseGen::CaseGen(CS& f, Block* owner, Expression const& ctrl, bool have_r, bool 
     }
   }else{
   }
+  trace2("CaseGen done", have_a, is_never());
 }
 /*--------------------------------------------------------------------------*/
 void AnalogSwitchStmt::parse(CS& f)
 {
+  assert(!dynamic_cast<Module const*>(owner()));
+
   f >> "(" >> _ctrl >> ")";
   CaseGen* def = NULL;
   bool have_reachable = false;
@@ -764,6 +780,10 @@ void AnalogSeqBlock::parse(CS& f)
     _block.parse_identifier(f);
   }else{
   }
+  if(dynamic_cast<Module const*>(_block.owner())) {
+  //  set_always();
+  }else{
+  }
   for (;;) {
     if(f >> "end "){
       if(f.peek() == ';') {
@@ -786,6 +806,10 @@ void AnalogSeqBlock::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 void AnalogCtrlBlock::parse(CS& f)
 {
+  if(dynamic_cast<Module const*>(_block.owner())) {
+    set_always();
+  }else{
+  }
   assert(block().owner());
   if(f >> ";"){
   }else if(f >> "begin"){
@@ -1097,6 +1121,13 @@ void AnalogCtrlBlock::dump(std::ostream& o)const
     o << "begin";
     if(identifier() != ""){
       o << " : " << identifier();
+    }else{
+    }
+    if(!options().dump_annotate()){
+    }else if(is_always()){
+      o << " // always";
+    }else if(is_never()){
+      o << " // never";
     }else{
     }
     o << "\n";

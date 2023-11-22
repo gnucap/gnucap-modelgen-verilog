@@ -35,6 +35,7 @@ class Options : public Base {
   bool _dump_unreachable{true};
   bool _dump_discipline{true};
   bool _dump_nature{true};
+  bool _dump_annotate{false};
   bool _expand_paramset{true};
 public:
   explicit Options(){ }
@@ -53,6 +54,7 @@ public:
   bool dump_unreachable() const{ return _dump_unreachable; }
   bool dump_discipline()  const{ return _dump_discipline; }
   bool dump_nature()      const{ return _dump_nature; }
+  bool dump_annotate()    const{ return _dump_annotate; }
   bool expand_paramset()  const{ return _expand_paramset; }
 };
 /*--------------------------------------------------------------------------*/

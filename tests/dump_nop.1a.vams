@@ -1,6 +1,8 @@
 
-`include "sub/disciplines.few"
+`include "disciplines.vams"
 `pragma modelgen nodump-unreachable
+`pragma modelgen nodump-nature
+`pragma modelgen nodump-discipline
 
 module test(a, b);
 	electrical a, b;
@@ -11,10 +13,22 @@ module test(a, b);
 		if(0)
 			V(a) <+ 1.;
 		else
-			V(a) <+ 2.;
+			V(a) <+ 1.1;
+
+		if(!arg)
+			V(b) <+ 2.;
+		else
+			V(b) <+ 2.1;
 
 		if(arg)
 			V(b) <+ 3.;
+		else
+			V(b) <+ 3.1;
+
+		if(T)
+			V(b) <+ 3.9;
+		else
+			V(b) <+ 3.7;
 
 		if(0==1)
 			V(a) <+ 4.;

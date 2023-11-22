@@ -47,6 +47,7 @@ void Options::parse(CS& f)
       || Get(f, "dump-unreachable",&_dump_unreachable)
       || Get(f, "dump-discipline", &_dump_discipline)
       || Get(f, "dump-nature",     &_dump_nature)
+      || Get(f, "dump-annotate",   &_dump_annotate)
       || Get(f, "expand-paramset", &_expand_paramset)
       ;
 
