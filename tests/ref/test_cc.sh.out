@@ -1352,6 +1352,8 @@ void MOD_resistor::expand()
   if (_sim->is_first_expand()) {
     precalc_first();
       // local nodes
+  // port p 1
+  // port n 2
 
   // clone branches
   // branch (p, n)
@@ -2848,6 +2850,9 @@ void MOD_capacitor::expand()
   if (_sim->is_first_expand()) {
     precalc_first();
       // local nodes
+  // port p 1
+  // port n 2
+  // node ddt_1 3
     //assert(!(_n[n_ddt_1].n_()));
     //BUG// this assert fails on a repeat elaboration after a change.
     //not sure of consequences when new_model_node called twice.
@@ -3549,6 +3554,9 @@ void MOD_capacitor::expand()
   if (_sim->is_first_expand()) {
     precalc_first();
       // local nodes
+  // port p 1
+  // port n 2
+  // node ddt_2 3
     //assert(!(_n[n_ddt_2].n_()));
     //BUG// this assert fails on a repeat elaboration after a change.
     //not sure of consequences when new_model_node called twice.

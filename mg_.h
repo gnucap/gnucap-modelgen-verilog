@@ -1549,6 +1549,7 @@ class Branch : public Element_2 {
   size_t _has_pot_probe{0};
   size_t _has_flow_src{0};
   size_t _has_pot_src{0};
+  size_t _has_short{0};
   FUNCTION_ const* _ctrl{NULL};
   std::vector<Branch_Ref*> _refs;
   size_t _number;
@@ -1576,7 +1577,8 @@ public:
   std::string const* reg_name(std::string const&);
   Node const* p() const{ assert(_p); return _p; }
   Node const* n() const{ assert(_n); return _n; }
-  bool is_short() const{ return _p == _n; }
+  bool req_short()const;
+  bool is_short()const;
   bool is_direct() const{ return _direct; }
   bool is_generic() const;
   std::string code_name()const override;
@@ -1588,20 +1590,26 @@ public:
   size_t num_nodes()const override;
   std::string state()const override;
   virtual bool has_element() const;
-  void set_flow_probe(){ ++_has_flow_probe; }
-  void set_pot_probe(){ ++_has_pot_probe; }
-  void set_flow_source(){ ++_has_flow_src; }
-  void set_pot_source(){ ++_has_pot_src; }
-  void dec_flow_probe(){ --_has_flow_probe; }
-  void dec_pot_probe(){ --_has_pot_probe; }
-  void dec_flow_source(){ --_has_flow_src; }
-  void dec_pot_source(){ --_has_pot_src; }
+
+  void inc_flow_probe(){ ++_has_flow_probe; }
+  void inc_pot_probe(){ ++_has_pot_probe; }
+  void inc_flow_source(){ ++_has_flow_src; }
+  void inc_pot_source(){ ++_has_pot_src; }
+  void inc_short(){ ++_has_short; }
+
+  void dec_flow_probe() { assert(_has_flow_probe); --_has_flow_probe; }
+  void dec_pot_probe() { assert(_has_pot_probe); --_has_pot_probe; }
+  void dec_flow_source() { assert(_has_flow_src); --_has_flow_src; }
+  void dec_pot_source() { assert(_has_pot_src); --_has_pot_src; }
+  void dec_short(){ assert(_has_short); --_has_short; }
+
   void set_filter(FUNCTION_ const* f){ _ctrl=f; }
   void set_direct(bool d=true);
   void set_selfdep(bool d=true) {_selfdep = d; }
   bool has_flow_probe() const;
   bool has_pot_probe() const;
   bool has_flow_source() const { return _has_flow_src; }
+  bool has_short() const { return _has_short; }
   bool is_filter() const { return _ctrl; }
   bool has_pot_source() const;
   size_t num_states() const override;
@@ -1671,6 +1679,8 @@ class Node_Map{
   nodes _nodes;
   map _map;
 public:
+  static Node mg_ground_node;
+public:
   explicit Node_Map();
   ~Node_Map();
 public:
@@ -1678,9 +1688,11 @@ public:
   const_reverse_iterator rend() const{ return _nodes.rend(); }
   const_iterator begin() const{ return _nodes.begin(); }
   const_iterator end() const{ return _nodes.end(); }
-  size_t size() const{ return _nodes.size(); }
+  size_t size() const{ return _map.size(); }
   Node* new_node(std::string const&);
   Node const* operator[](std::string const& key) const;
+  Node const* operator[](int key) const{ return _nodes[key]; }
+  void set_short(Node const*, Node const*);
 };
 /*--------------------------------------------------------------------------*/
 class Analog_Function : public Block{
@@ -1819,6 +1831,7 @@ public: // for now.
   void parse_ports(CS& f);
   virtual Module* deflate() {return this;}
   Parameter_List_Collection& parameters()	{return _parameters;}
+  void setup_nodes();
 
 public: // BUG
   Probe const* new_probe(std::string const& xs, Branch_Ref const& br);
@@ -1959,23 +1972,26 @@ class Node : public Base {
   std::string _short_if;
   Discipline const* _discipline{NULL};
   Nature const* _nature{NULL};
+  Node* _next{NULL};
 public:
   void parse(CS&)override {};
   void dump(std::ostream&)const override {};
-  Node() {}
-  Node(CS& f) {parse(f);}
-  Node(std::string const& f, int n) : _name(f), _number(n) {}
+  Node(int n) : _number(n){ assert(!n); _next=this; }
+  Node() {untested(); _next=this;}
+  Node(CS& f) {parse(f); _next=this;}
+  Node(std::string const& f, int n) : _name(f), _number(n) { _next=this;}
   const std::string& name()const	{return _name;}
   std::string code_name()const	{return "n_" + _name;}
   int number()const	{return _number;}
 //  const std::string& short_to()const 	{return _short_to;}
 //  const std::string& short_if()const 	{return _short_if;}
   void set_discipline(Discipline const* d){ _discipline = d; }
+  void set_to(Node*);
 
   Discipline const* discipline() const{  return _discipline; }
   Nature const* nature() const{ return _nature; }
-};
-extern Node mg_ground_node;
+  bool is_ground() const{ return !_number; }
+}; // Node
 /*--------------------------------------------------------------------------*/
 class Node_List : public List<Node> {
 public:

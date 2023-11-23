@@ -919,7 +919,7 @@ void Branch_Ref::dump(std::ostream& o)const
   assert(_br);
   if(has_name()){
     o << "(" << *_name << ")";
-  }else if(_br->n()==&mg_ground_node){
+  }else if(_br->n()->is_ground()) {
     o << "(" << pname() << ")";
   }else{
     o << "(" << pname() << ", " << nname() << ")";
@@ -1043,7 +1043,11 @@ void Contribution::parse(CS& cmd)
   }
   cmd >> ";";
 
-  if(is_zero(_rhs)){
+  if(is_zero(_rhs)) {
+    if(_nature == disc->potential()){
+      set_short();
+    }else{
+    }
   }else if(_nature == disc->flow()){
     set_flow_contrib();
   }
@@ -1103,9 +1107,27 @@ void Contribution::dump(std::ostream& o)const
   o << ";\n";
 }
 /*--------------------------------------------------------------------------*/
-std::string Branch::name()const
+std::string Branch::name() const
 {
   return "(" + _p->name()+", "+_n->name()+")";
+}
+/*--------------------------------------------------------------------------*/
+bool Branch::is_short() const
+{
+  assert(_p);
+  assert(_n);
+  return _p->number() == _n->number();
+}
+/*--------------------------------------------------------------------------*/
+bool Branch::req_short() const
+{
+  if(has_flow_source()){
+    return false;
+  }else if(_has_short){
+    return _has_pot_src == _has_short;
+  }else{
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Assignment::set_lhs(Variable* v)
@@ -1512,9 +1534,21 @@ void Contribution::set_pot_contrib()
   assert(owner());
   if(options().optimize_unused() && !owner()->is_reachable()) {
   }else{
-    _branch->set_pot_source();
+    _branch->inc_pot_source();
   }
   _type = t_pot;
+}
+/*--------------------------------------------------------------------------*/
+void Contribution::set_short()
+{
+  assert(_branch);
+  if(!options().optimize_nodes()) { untested();
+  }else if(owner()->is_always()) {
+    _branch->inc_short();
+  }else{
+  }
+  assert(_type == t_pot);
+  _short = true;
 }
 /*--------------------------------------------------------------------------*/
 void Contribution::set_flow_contrib()
@@ -1522,7 +1556,7 @@ void Contribution::set_flow_contrib()
   assert(_branch);
   if(options().optimize_unused() && !owner()->is_reachable()) {
   }else{
-    _branch->set_flow_source();
+    _branch->inc_flow_source();
   }
   _type = t_flow;
 }
@@ -1539,13 +1573,22 @@ bool Contribution::is_pot_contrib() const
 /*--------------------------------------------------------------------------*/
 Contribution::~Contribution()
 {
-  if(!_branch) {
-    incomplete();
-  }else if(options().optimize_unused() && !owner()->is_reachable()) {
-  }else if (is_flow_contrib()) {
-    _branch->dec_flow_source();
-  }else if(is_pot_contrib()) {
-    _branch->dec_pot_source();
+  assert(_branch); //?
+  if(!options().optimize_nodes()){ untested();
+  }else if(!owner()->is_always()) {
+  }else if(is_short()) {
+    _branch->dec_short();
+  }else{
+  }
+
+  if(options().optimize_unused() && !owner()->is_reachable()) {
+  }else{
+    if (is_flow_contrib()) {
+      _branch->dec_flow_source();
+    }else if(is_pot_contrib()) {
+      _branch->dec_pot_source();
+    }else{
+    }
   }
 }
 /*--------------------------------------------------------------------------*/

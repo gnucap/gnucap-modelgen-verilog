@@ -26,8 +26,9 @@ class Options : public Base {
   bool _optimize_binop{true};  // fold binary operators
   bool _optimize_swap{true};   // swap operands.
   bool _optimize_deriv{true};  // suppress zero derivative propagation
-  bool _optimize_deps{true};  // consider dependency types
+  bool _optimize_deps{true};   // consider dependency types
   bool _optimize_unused{true}; // dont emit unused sources
+  bool _optimize_nodes{true};  // prune unused nodes
   bool _gen_module{true};
   bool _gen_paramset{true};
   bool _dump_module{true};
@@ -47,6 +48,7 @@ public:
   bool optimize_deriv()   const{ return _optimize_deriv; }
   bool optimize_deps()    const{ return _optimize_deps; }
   bool optimize_unused()  const{ return _optimize_unused; }
+  bool optimize_nodes()   const{ return _optimize_nodes; }
   bool gen_module()       const{ return _gen_module; }
   bool gen_paramset()     const{ return _gen_paramset; }
   bool dump_module()      const{ return _dump_module; }

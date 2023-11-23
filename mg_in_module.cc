@@ -757,6 +757,7 @@ void Module::parse(CS& f)
   parse_ports(f);
   f >> ';';
   parse_body(f);
+  setup_nodes();
 }
 /*--------------------------------------------------------------------------*/
 void Module::parse_ports(CS& f)

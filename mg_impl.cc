@@ -23,7 +23,7 @@
 #include "m_tokens.h" // Deps
 #include "mg_options.h" // Deps
 /*--------------------------------------------------------------------------*/
-Node mg_ground_node;
+Node Node_Map::mg_ground_node(0);
 Dep mg_const_dep(NULL);
 /*--------------------------------------------------------------------------*/
 bool ConstantMinTypMaxExpression::empty() const
@@ -147,7 +147,7 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
     }
   }else if(n==""){
     Node const* pp = new_node(p); // BUG: existing node??
-    return new_branch(pp, &mg_ground_node);
+    return new_branch(pp, &Node_Map::mg_ground_node);
   }else{
     Node const* pp = new_node(p); // BUG: existing node??
     Node const* nn = new_node(n); // BUG: existing node??
@@ -168,12 +168,14 @@ Node* Node_Map::new_node(std::string const& p)
 /*--------------------------------------------------------------------------*/
 Node_Map::Node_Map()
 {
+  _nodes.push_back(&Node_Map::mg_ground_node);
 }
 /*--------------------------------------------------------------------------*/
 Node_Map::~Node_Map()
 {
-  for(auto i: _nodes){
-    delete i;
+  size_t i = 1;
+  for(; i < _nodes.size(); ++i){
+    delete _nodes[i];
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -544,7 +546,7 @@ Discipline const* Branch::discipline() const
 {
   assert(_p);
   assert(_n);
-  if(_n == &mg_ground_node){
+  if(_n == &Node_Map::mg_ground_node){
     return _p->discipline();
   }else if(!_p->discipline()){
     return _n->discipline();
@@ -564,10 +566,10 @@ Probe::Probe(std::string const& xs, Branch_Ref b) : _br(b)
   // TODO: disciplines.h
   if( (xs == "V") || (xs == "potential") ){
     _type = t_pot;
-    _br->set_pot_probe();
+    _br->inc_pot_probe();
   }else if( (xs == "I") || (xs == "flow") ){
     _type = t_flow;
-    _br->set_flow_probe();
+    _br->inc_flow_probe();
   }else{ untested();
     unreachable();
   }
@@ -624,6 +626,53 @@ Block::~Block()
 {
   delete _attributes;
   _attributes = NULL;
+}
+/*--------------------------------------------------------------------------*/
+void Node::set_to(Node* p)
+{
+  if(number()==p->number()) {
+  }else{
+    _number = p->number();
+    Node* n = _next;
+    _next = p->_next;
+    p->_next = this;
+    n->set_to(p);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Node_Map::set_short(Node const* p, Node const* n)
+{
+  if(p->number() > n->number()){
+    std::swap(p, n);
+  }else{
+  }
+
+  if(p->number() == n->number()){ untested();
+  }else{
+    int j = n->number();
+    int i = p->number();
+    assert(i < j);
+
+    _nodes[j]->set_to(_nodes[i]);
+
+    assert(p->number() == n->number());
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Module::setup_nodes()
+{
+  for(auto& br : branches()){
+    if(br->is_short()) { untested();
+    }else if(br->req_short()) {
+      trace4("short", br->name(), br->p()->number(), br->n()->number(), net_nodes());
+      if(br->p()->number() > int(net_nodes())
+       ||br->n()->number() > int(net_nodes())) {
+	_nodes.set_short(br->p(), br->n());
+      }else{
+      }
+    }else{
+    }
+  }
 }
 /*--------------------------------------------------------------------------*/
 Token* Module::new_token(FUNCTION_ const* f, size_t num_args)
@@ -698,14 +747,12 @@ Branch::~Branch()
   // Contributions tidied up
   assert(!_has_pot_src);
   assert(!_has_flow_src);
+  assert(!_has_short);
 
   // Probes tidied up
-  if(_has_pot_probe){ untested();
-    unreachable();
-  }else if(_has_flow_probe){ untested();
-    unreachable();
-  }else{
-  }
+  assert(!_has_pot_probe);
+  assert(!_has_flow_probe);
+
   delete _deps;
   _deps = NULL;
 }

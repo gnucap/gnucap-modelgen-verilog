@@ -1,0 +1,27 @@
+
+verilog
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+`modelgen
+module short_to0(p, n)
+	electrical p, PI, n;
+
+	analog begin
+		V(p, PI) <+ 0.;
+		V(n, PI) <+ I(n, PI);
+	end
+
+endmodule
+
+!make short_to0.so > /dev/null
+attach ./short_to0.so
+
+short_to0 #() s1(1,0);
+vsource #(.dc(1)) v(1, 0);
+
+print dc v(nodes)
+dc
+
+status notime

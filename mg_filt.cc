@@ -114,7 +114,7 @@ public:
 
     Node* n = m.new_node(filter_code_name);
     {
-      Branch* br = m.new_branch(n, &mg_ground_node);
+      Branch* br = m.new_branch(n, &Node_Map::mg_ground_node);
       assert(br);
       assert(const_cast<Branch const*>(br)->owner());
       Branch_Ref prb(br);

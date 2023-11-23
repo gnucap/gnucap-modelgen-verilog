@@ -249,10 +249,12 @@ class Contribution : public AnalogStmt {
     t_flow,
     t_pot
   } _type{t_unknown};
+  bool _short{false};
   Block* _owner{NULL};
 private:
   void set_pot_contrib();
   void set_flow_contrib();
+  void set_short();
   void set_direct(bool d=true);
 //  Deps& deps() { return _rhs.deps(); }
   Deps const& deps() { return _rhs.deps(); }
@@ -270,6 +272,7 @@ public:
 
   bool is_pot_contrib() const;
   bool is_flow_contrib() const;
+  bool is_short() const { return _short; }
   bool is_direct() const;
   void parse(CS&)override;
   void dump(std::ostream&)const override;

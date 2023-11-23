@@ -83,7 +83,7 @@ static void make_module_is_valid(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 static void make_node_ref(std::ostream& o, const Node& n)
 {
-  if(&n == &mg_ground_node){
+  if(n.is_ground()) {
     o << "gnd";
   }else{
     o << "_n[" << n.code_name() << "]";
@@ -297,14 +297,15 @@ static void make_build_netlist(std::ostream& o, const Module& m)
       std::string ext_name = nn->name();
       int ii = nn->number();
 
-      if(ii < int(m.ports().size())){
+      if(!ii){
+      }else if(ii <= int(m.ports().size())){
 //	o__ "_n[" << ii << "].new_node(\"" << ext_name << "\", this); // port\n";
 	o__ "{\n";
 	o____ "std::string tmp = \"" << ext_name << "\";\n";
-	o____ "set_port_by_index(" << ii << ", tmp);\n";
+	o____ "set_port_by_index(" << ii-1 << ", tmp);\n";
 	o__ "}\n";
       }else{
-	o__ "_n[" << ii << "].new_node(\"" << ext_name << "\", this);\n";
+	o__ "_n[" << ii-1 << "].new_node(\"" << ext_name << "\", this);\n";
       }
     }
     o__ "assert(" << m.nodes().size() << " == subckt()->nodes()->how_many());\n";
@@ -578,6 +579,7 @@ static void make_module_allocate_local_node(std::ostream& o, const Node& p)
 {
 #if 1
   make_tag();
+  o__ "// node " << p.name() << " " << p.number() << "\n";
  // if (p.short_if().empty()) { untested();
  //   o <<
  //     "    if (!(_n[n_" << p.name() << "].n_())) {\n"
@@ -619,11 +621,15 @@ static void make_module_allocate_local_nodes(std::ostream& o, Module const& m)
     // nodes come from sckt proto
   }else{
     //for (auto n=m.nodes().rbegin(); n != m.nodes().rend(); ++ n)
-    for (auto n=m.nodes().begin(); n != m.nodes().end(); ++ n){
-      auto nn = *n;
+    int n = 1;
+    for (; n <= int(m.nodes().size()); ++n) {
+      Node const* nn = m.nodes()[n];
       assert(nn);
       // TODO: node aliases, shorts etc.
-      if(nn->number() < int(m.ports().size())){
+      if(nn->number() < n){
+	o__ "_n[" << n - 1 << "] = _n[" << nn->number() - 1 << "];\n";
+      }else if(n <= int(m.ports().size())){
+	o__ "// port " << nn->name() << " " << nn->number() << "\n";
       }else{
 	make_module_allocate_local_node(o, *nn);
       }

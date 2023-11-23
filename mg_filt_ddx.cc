@@ -107,8 +107,8 @@ public:
     for(auto x : _m->branches()){
       if(x->has_pot_probe()){
 	o__ "// found probe " <<  x->code_name() << "\n";
-	if(p == &mg_ground_node){ untested();
-	}else if(n != &mg_ground_node){
+	if(p->is_ground()){ untested();
+	}else if(n != &Node_Map::mg_ground_node){
 	}else if(x->p() == p){
 	  o__ "ret += t0[d_potential" << x->code_name() << "];\n";
 	}else if(x->n() == p){
@@ -116,8 +116,8 @@ public:
 	}else{
 	}
 
-	if(n == &mg_ground_node){
-	}else if(p == &mg_ground_node){ untested();
+	if(n->is_ground()) {
+	}else if(p->is_ground()) { untested();
 	}else if(x->p() == p && x->n() == n){
 	  // oops. what does the standard say about reversed ddx?
 	  bool rev = _ddxprobe->is_reversed();
