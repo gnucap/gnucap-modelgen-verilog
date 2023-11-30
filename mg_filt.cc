@@ -70,6 +70,7 @@ private:
   Token* clone()const override {untested(); return new Token_XDT(*this);}
 
   void stack_op(Expression* e)const override;
+  Branch* branch() const;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -80,6 +81,9 @@ class XDT : public MGVAMS_FILTER {
   std::string _code_name;
 public: // HACK
   Branch* _br{NULL};
+  mutable Branch const* _output{NULL};
+  Node const* _p{NULL};
+  Node const* _n{NULL};
 protected:
   explicit XDT() : MGVAMS_FILTER() {
     set_label("XDT");
@@ -164,6 +168,7 @@ public:
   }
   void make_cc_impl(std::ostream&o)const override {
 //    make_cc_impl_comm(o);
+    std::string cn = _br->code_name();
     std::string id = _m->identifier().to_string();
     o << "MOD_"<< id <<"::ddouble MOD_" << id << "::" << _code_name << "(";
     std::string comma;

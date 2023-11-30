@@ -139,7 +139,7 @@ public:
   ~AnalogCtrlStmt(){ }
   void dump(std::ostream&)const override;
 private:
-  bool update()override {incomplete(); return false;}
+  bool update()override {return _body.update();}
 };
 /*--------------------------------------------------------------------------*/
 class AnalogSwitchStmt : public AnalogCtrlStmt {
@@ -251,13 +251,14 @@ class Contribution : public AnalogStmt {
   } _type{t_unknown};
   bool _short{false};
   Block* _owner{NULL};
+  Deps* _deps{NULL};
 private:
   void set_pot_contrib();
   void set_flow_contrib();
   void set_short();
   void set_direct(bool d=true);
 //  Deps& deps() { return _rhs.deps(); }
-  Deps const& deps() { return _rhs.deps(); }
+  Deps const& deps();
 public:
   Contribution(CS& f, Block* o)
     : AnalogStmt(), _branch(NULL) {
@@ -286,14 +287,41 @@ public:
     assert(owner());
     return owner()->new_branch(p, n);
   }
-  Branch_Ref new_branch(Node const* p, Node const* n) {
+  Branch_Ref new_branch(Node* p, Node* n) {
     assert(owner());
     return owner()->new_branch(p, n);
   }
 private:
   Expression& rhs() {return _rhs;}
   bool update()override;
+  void add_dep(Dep const&);
 }; // Contribution
+/*--------------------------------------------------------------------------*/
+// AnalogDecl?
+class AnalogRealDecl : public AnalogStmt{
+  ListOfBlockRealIdentifiers _l;
+public:
+  explicit AnalogRealDecl(CS& f, Block* o){
+    _l.set_owner(o);
+    parse(f);
+
+    for(auto i : _l){
+      i->set_type(Data_Type_Real());
+    }
+  }
+  void parse(CS& f)override {
+    f >> _l;
+  }
+  void dump(std::ostream& o)const {
+    _l.dump(o);
+  }
+  ListOfBlockRealIdentifiers const& list() const{
+    return _l;
+  }
+
+private:
+  bool update()override;
+};
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

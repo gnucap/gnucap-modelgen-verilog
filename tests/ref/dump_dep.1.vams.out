@@ -4,10 +4,10 @@ module dep0(d, g);
   analog begin // always
     real c;
     real T;
-    c = T;
-    T = V(g); // dep: _potential_b_g_
-    I(d) <+ c;
-    I(g) <+ V(g); // dep: _potential_b_g_
+    while (1) begin
+      c = T; // dep: _potential_b_g_
+      T = V(g); // dep: _potential_b_g_
+    end
   end
 
 endmodule

@@ -197,7 +197,9 @@ static void make_cc_contrib(std::ostream& o, Contribution const& C)
       o__ "// dep " << v->code_name() << "\n";
       assert(v->branch());
       if(C.branch() == v->branch()){
+	o__ "// same " << v->code_name() << "\n";
       }else if(v->branch()->is_short()) { untested();
+	o__ "// short: " << v->code_name() << "\n";
       }else{
 	o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
 	o__ "assert(MOD::" << C.branch()->state() << "_::dep" << v->code_name() << " < "
@@ -237,6 +239,8 @@ static void make_cc_analog_stmt(std::ostream& o, Base const& ab)
     make_cc_assignment(o, a->assignment());
   }else if(auto a=dynamic_cast<Assignment const*>(i)) {
     make_cc_assignment(o, *a);
+  }else if(auto rl=dynamic_cast<AnalogRealDecl const*>(i)) {
+    make_cc_block_real_identifier_list(o, rl->list());
   }else if(auto rl=dynamic_cast<ListOfBlockRealIdentifiers const*>(i)) {
     make_cc_block_real_identifier_list(o, *rl);
   }else if(auto rl=dynamic_cast<ListOfBlockIntIdentifiers const*>(i)) {
@@ -821,7 +825,7 @@ static void make_common_tr_eval(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-void make_clear_branch_contributions(std::ostream& o, const Module& m)
+static void make_clear_branch_contributions(std::ostream& o, const Module& m)
 {
   o << "inline void MOD_" << m.identifier() << "::clear_branch_contributions()\n{\n";
   for(auto x : m.branches()){

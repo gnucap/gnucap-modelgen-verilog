@@ -1129,5 +1129,99 @@ void Module::install(FUNCTION_ const* f)
   _funcs.insert(f);
 }
 /*--------------------------------------------------------------------------*/
+Branch::Branch(Node* p, Node* n, size_t number)
+    : Element_2(), _p(p), _n(n), _number(number)
+{
+  assert(p);
+  assert(n);
+  new_deps();
+  //_code_name = "_b_" + p->name() + "_" + n->name();
+  n->connect(this);
+  p->connect(this);
+
+  // p->inc_use();
+  // n->inc_use();
+}
+/*--------------------------------------------------------------------------*/
+void Branch::set_used_in(Base const* b)
+{
+  for(auto& i : _used_in){
+    if(i == b){
+      return;
+    }else{
+    }
+  }
+  _used_in.push_back(b);
+}
+/*--------------------------------------------------------------------------*/
+void Branch::unset_used_in(Base const* b)
+{
+  for(auto& i : _used_in){
+    if(i == b){
+      i = NULL;
+      return;
+    }else{
+    }
+  }
+  unreachable();
+  throw std::logic_error("cleanup " + code_name());
+}
+/*--------------------------------------------------------------------------*/
+Branch::~Branch()
+{
+  // no, shutting down, not all Refs tidied up.
+  assert(!_refs.size());
+
+  // Contributions tidied up
+  assert(!_has_pot_src);
+  assert(!_has_flow_src);
+
+  // Probes tidied up
+  if(_has_pot_probe){ untested();
+    unreachable();
+  }else if(_has_flow_probe){ untested();
+    unreachable();
+  }else{
+  }
+
+  delete _deps;
+  _deps = NULL;
+
+  for(auto i : _used_in){
+    if(i){
+      std::cerr << "logic error. " << name() << " still used in. " << i << "\n";
+    }else{
+    }
+    assert(!i);
+  }
+  if(_use){
+    unreachable();
+    std::cerr << "logic error. " << name() << " still used.\n";
+    assert(false);
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool Node::is_used() const
+{
+  for(auto e : _fanout){
+    if(e->is_used()){
+      return true;
+    }else{
+    }
+  }
+  return false;
+}
+/*--------------------------------------------------------------------------*/
+void Node::connect(Element_2 const* e)
+{
+  _fanout.push_back(e);
+}
+/*--------------------------------------------------------------------------*/
+Node::~Node()
+{
+  trace1("~Node", code_name());
+  // assert(!is_used()); incomplete.
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

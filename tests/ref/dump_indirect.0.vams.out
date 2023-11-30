@@ -20,7 +20,7 @@ enddiscipline
 module test_ind1(out, in);
   electrical out, in;
   analog begin
-    V(out) : (V(in) - 0.);
+    V(out) : V(in);
   end
 
 endmodule

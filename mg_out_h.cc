@@ -323,6 +323,25 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
 
 }
 /*--------------------------------------------------------------------------*/
+static void make_node_decl(std::ostream& o, const Module& m)
+{
+  std::string comma = "";
+  o__ "enum {\n";
+  int n = 1;
+  for (; n <= int(m.nodes().size()); ++n) {
+    Node const* nn = m.nodes()[n];
+    // TODO: node aliases, shorts etc.
+    if(nn->number() == int(1+m.ports().size())){
+      o << "\n    /* ---- */";
+    }else{
+    }
+    o << comma << "    n_" << nn->name() << " /* used: " << nn->is_used() << " */";
+    comma = ",\n";
+  }
+  o << "\n";
+  o__ "};\n";
+}
+/*--------------------------------------------------------------------------*/
 static void make_branch_states(std::ostream& o, const Module& m)
 {
   for(auto x : m.branches()){
@@ -457,20 +476,7 @@ static void make_module(std::ostream& o, const Module& m)
   o << "private: // branch state\n";
   make_branch_states(o, m);
   o << "private: // node list\n";
-  std::string comma = "";
-  o << ind << "enum {";
-  int n = 1;
-  for (; n <= int(m.nodes().size()); ++n) {
-    Node const* nn = m.nodes()[n];
-    // TODO: node aliases, shorts etc.
-    if(nn->number() == int(1+m.ports().size())){
-      o << " /* | */";
-    }else{
-    }
-    o << comma << "n_" << nn->name();
-    comma = ", ";
-  }
-  o << ind << "};\n";
+  make_node_decl(o, m);
   o << "private: // probe values\n";
   for(auto x : m.branches()){
     assert(x);

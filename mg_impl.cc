@@ -87,7 +87,7 @@ Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
 }
 #endif
 /*--------------------------------------------------------------------------*/
-Branch_Ref Branch_Map::new_branch(Node const* a, Node const* b)
+Branch_Ref Branch_Map::new_branch(Node* a, Node* b)
 {
   std::pair<Node const*, Node const*> p(a, b);
   auto i = _m.find(p);
@@ -114,7 +114,7 @@ Branch_Ref const& Module::new_branch_name(std::string const& n, Branch_Ref const
   return _branch_names.new_name(n, b);
 }
 /*--------------------------------------------------------------------------*/
-Branch_Ref Module::new_branch(Node const* p, Node const* n = NULL)
+Branch_Ref Module::new_branch(Node* p, Node* n = NULL)
 {
   Branch_Ref br = _branches.new_branch(p, n);
   assert(br);
@@ -146,11 +146,11 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
       return a;
     }
   }else if(n==""){
-    Node const* pp = new_node(p); // BUG: existing node??
+    Node* pp = new_node(p); // BUG: existing node??
     return new_branch(pp, &Node_Map::mg_ground_node);
   }else{
-    Node const* pp = new_node(p); // BUG: existing node??
-    Node const* nn = new_node(n); // BUG: existing node??
+    Node* pp = new_node(p); // BUG: existing node??
+    Node* nn = new_node(n); // BUG: existing node??
     return new_branch(pp, nn);
   }
 }
@@ -168,7 +168,8 @@ Node* Node_Map::new_node(std::string const& p)
 /*--------------------------------------------------------------------------*/
 Node_Map::Node_Map()
 {
-  _nodes.push_back(&Node_Map::mg_ground_node);
+  assert(mg_ground_node.number() == 0);
+  _nodes.push_back(&mg_ground_node);
 }
 /*--------------------------------------------------------------------------*/
 Node_Map::~Node_Map()
@@ -317,6 +318,17 @@ bool Branch::has_pot_probe() const
 bool Branch::has_flow_probe() const
 {
   return _has_flow_probe;
+}
+/*--------------------------------------------------------------------------*/
+bool Branch::is_used()const
+{
+  if(_use){
+    return true;
+  }else if(_has_flow_probe) {
+    return true;
+  }else{
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool Branch::is_generic()const
@@ -483,6 +495,16 @@ std::string const& Branch_Ref::nname() const
   }
 }
 /*--------------------------------------------------------------------------*/
+void Branch_Ref::set_used_in(Base const* b) const
+{
+  return _br->set_used_in(b);
+}
+/*--------------------------------------------------------------------------*/
+void Branch_Ref::unset_used_in(Base const* b) const
+{
+  return _br->unset_used_in(b);
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 std::string const* Branch::reg_name(std::string const&s)
 {
@@ -516,7 +538,8 @@ size_t Filter::num_states() const
 // BUG: delegate to branch
 size_t Filter::num_nodes() const
 {
-    return 0;
+  // slew? BUG
+  return 0;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -585,6 +608,8 @@ Probe::~Probe()
     _br->dec_pot_probe();
   }else{
   }
+
+//  assert(!_use);
 }
 /*--------------------------------------------------------------------------*/
 bool Probe::is_reversed() const
@@ -620,6 +645,11 @@ Module::~Module()
   }
   _probes.clear();
   _filters.clear();
+  _branches.clear();
+
+  {
+//    _nodes.clear();
+  }
 }
 /*--------------------------------------------------------------------------*/
 Block::~Block()
@@ -739,6 +769,7 @@ bool Assignment::is_int() const
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+#if 0 // mg_in_module?
 Branch::~Branch()
 {
   // no, shutting down, not all Refs tidied up.
@@ -756,6 +787,7 @@ Branch::~Branch()
   delete _deps;
   _deps = NULL;
 }
+#endif
 /*--------------------------------------------------------------------------*/
 void Branch::attach(Branch_Ref* r)
 {
@@ -903,10 +935,24 @@ void Variable_Decl::new_deps()
   _deps = new Deps;
 }
 /*--------------------------------------------------------------------------*/
-void Variable_Decl::update_deps(Deps const& d)
+void BlockVarIdentifier::update()
 {
+  clear_deps();
+}
+/*--------------------------------------------------------------------------*/
+void Variable_Decl::clear_deps()
+{
+  trace2("Variable_Decl::clear_deps", name(), deps().size());
+  deps().clear();
+}
+/*--------------------------------------------------------------------------*/
+bool Variable_Decl::propagate_deps(Deps const& d)
+{
+  trace3("Variable_Decl::propagate_deps", name(), deps().size(), d.size());
   assert(&deps() != &d);
   deps().update(d);
+  assert(deps().size() >= d.size());
+  return false;
 }
 /*--------------------------------------------------------------------------*/
 bool is_true(Expression const& x)
@@ -1004,6 +1050,39 @@ double ValueRangeInterval::eval() const
   }else{ itested();
     return NOT_INPUT;
   }
+}
+/*--------------------------------------------------------------------------*/
+#if 0
+Branch const* Branch::output() const
+{
+  if(auto f = dynamic_cast<MGVAMS_FILTER const*>(_ctrl)){
+    return f->output();
+  }else{
+  }
+  return this;
+}
+#endif
+/*--------------------------------------------------------------------------*/
+Node const* Branch::p() const
+{
+#if 0
+  if(auto f = dynamic_cast<MGVAMS_FILTER const*>(_ctrl)){
+    return f->p();
+  }else{
+  }
+#endif
+  assert(_p); return _p;
+}
+/*--------------------------------------------------------------------------*/
+Node const* Branch::n() const
+{
+#if 0
+  if(auto f = dynamic_cast<MGVAMS_FILTER const*>(_ctrl)){
+    return f->n();
+  }else{
+  }
+#endif
+  assert(_n); return _n;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

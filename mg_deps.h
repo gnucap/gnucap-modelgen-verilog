@@ -95,6 +95,9 @@ public:
   size_t size() const{
     return _s.size();
   }
+  Dep const& operator[](size_t i) const{
+    return _s[i];
+  }
   bool empty() const{
     return _s.empty();
   }

@@ -991,7 +991,10 @@ public: // states, _b_p_n;
     };
   } _dep_b_p_n;
 private: // node list
-  enum {n_p, n_n  };
+  enum {
+    n_p /* used: 1 */,
+    n_n /* used: 1 */
+  };
 private: // probe values
   double _potential_b_p_n;
 private: // impl
@@ -1276,6 +1279,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
         d->_st_b_p_n[1] += t0[d_potential_b_p_n];
         // dep _potential_b_p_n
+        // same _potential_b_p_n
       }
     }
   }
@@ -2442,7 +2446,12 @@ public: // states, _b_p_n;
     };
   } _dep_b_p_n;
 private: // node list
-  enum {n_p, n_n /* | */, n_ddt_1  };
+  enum {
+    n_p /* used: 1 */,
+    n_n /* used: 1 */
+    /* ---- */,
+    n_ddt_1 /* used: 1 */
+  };
 private: // probe values
   double _potential_b_ddt_1_;
   double _potential_b_p_n;
@@ -3087,7 +3096,12 @@ public: // states, _b_p_n;
     };
   } _dep_b_p_n;
 private: // node list
-  enum {n_p, n_n /* | */, n_ddt_2  };
+  enum {
+    n_p /* used: 1 */,
+    n_n /* used: 1 */
+    /* ---- */,
+    n_ddt_2 /* used: 1 */
+  };
 private: // probe values
   double _potential_b_ddt_2_;
   double _potential_b_p_n;

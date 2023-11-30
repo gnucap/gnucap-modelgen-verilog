@@ -277,6 +277,10 @@ bool Expression_::update()
     i = erase(i);
   }
 
+  trace2("Expression_::update", size(), n);
+  if(n<=deps().size()){
+  }else{
+  }
   return n != deps().size();
 }
 /*--------------------------------------------------------------------------*/

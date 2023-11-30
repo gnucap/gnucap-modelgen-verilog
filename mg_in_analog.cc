@@ -125,12 +125,6 @@ static Base* pArse_seq(CS& f, Block* owner)
   return new AnalogSeqBlock(f, owner);
 }
 /*--------------------------------------------------------------------------*/
-static Base* parse_real(CS& f, Block* o)
-{
-  trace1("AnalogBlock::parse real", f.tail().substr(0,10));
-  return new ListOfBlockRealIdentifiers(f, o);
-}
-/*--------------------------------------------------------------------------*/
 static Base* parse_int(CS& f, Block* o)
 {
   trace1("AnalogBlock::parse int", f.tail().substr(0,10));
@@ -225,10 +219,9 @@ void Assignment::parse(CS& f)
     parse_rhs(f);
 
     if(!is_reachable()) {
-    }else if(l){
-      l->update_deps(deps());
-    }else{ untested();
-      unreachable(); // loop statement??
+    }else{
+      assert(!_deps);
+      propagate_deps(deps());
     }
 
   }else{ untested();
@@ -266,7 +259,19 @@ void AnalogProceduralAssignment::dump(std::ostream& o)const
 {
   o__ "";
   _a.dump(o);
-  o << ";\n";
+  o << ";";
+  if(options().dump_annotate()){
+    if(_a.deps().size()){
+      o << " //";
+    }else{
+    }
+    for(const Dep& d : _a.deps()) {
+      o << " dep: ";
+      o << d->code_name();
+    }
+  }else{
+  }
+  o << "\n";
 }
 /*--------------------------------------------------------------------------*/
 static Base* parse_proc_assignment(CS& f, Block* o)
@@ -311,7 +316,7 @@ static Base* parse_analog_stmt_or_null(CS& file, Block* owner)
   ONE_OF	// module_item
     || (file >> ";")
     || ((file >> "begin") && (ret = pArse_seq(file, owner)))
-    || ((file >> "real ") && (ret = parse_real(file, owner)))
+    || ((file >> "real ") && (ret = new AnalogRealDecl(file, owner)))
     || ((file >> "integer ") && (ret = parse_int(file, owner)))
     || ((file >> "if ") && (ret = parse_cond(file, owner)))
     || ((file >> "case ") && (ret = parse_switch(file, owner)))
@@ -360,13 +365,13 @@ void AnalogConditionalStmt::parse(CS& file)
     }else if(_cond.is_true()) {
       if(owner()->is_always()) {
 	_body.set_always();
-      }else{
+      }else{ untested();
       }
       _false_part.set_never();
     }else if(_cond.is_false()) {
       if(owner()->is_always()) {
 	_false_part.set_always();
-      }else{
+      }else{ untested();
       }
       _body.set_never();
     }else{
@@ -442,14 +447,17 @@ void AnalogCtrlStmt::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 bool AnalogWhileStmt::update()
 {
+  trace0("while::update");
   bool ret = false;
   while(true){
     if (_body.update()){
+      trace0("while::update again");
       ret = true;
     }else{
       break;
     }
   }
+  trace1("while::update", ret);
   return ret;
 }
 /*--------------------------------------------------------------------------*/
@@ -491,8 +499,8 @@ bool AnalogForStmt::update()
   while(true){
     if ( init_ && init_->update() ){ untested();
       ret = true;
-//    }else if(_cond.update()){
-    }else if (_body.update()){
+//    }else if(_cond.update()){ untested();
+    }else if (_body.update()){ untested();
       ret = true;
     }else if ( tail_ && tail_->update() ) { untested();
       ret = true;
@@ -533,11 +541,14 @@ void AnalogForStmt::parse(CS& f)
 bool AnalogSeqBlock::update()
 {
   bool ret = false;
-  for(auto i: _block){
-    if(auto s = dynamic_cast<AnalogStmt*>(i)){
-      ret |= s->update();
-    }else{
+  if(is_reachable()){
+    for(auto i: _block){
+      if(auto s = dynamic_cast<AnalogStmt*>(i)){
+	ret |= s->update();
+      }else{
+      }
     }
+  }else{
   }
   return ret;
 }
@@ -737,7 +748,9 @@ void AnalogSwitchStmt::dump(std::ostream& o)const
 void AnalogConstruct::parse(CS& f)
 {
   assert(!_stmt);
-  _stmt = new AnalogCtrlBlock(f, owner());
+  auto ab = new AnalogCtrlBlock(f, owner());
+  ab->update(); // why?
+  _stmt = ab;
 }
 /*--------------------------------------------------------------------------*/
 void AnalogSeqBlock::parse(CS& f)
@@ -806,7 +819,7 @@ void BlockVarIdentifier::dump(std::ostream& o)const
 }
 /*--------------------------------------------------------------------------*/
 void ListOfBlockIntIdentifiers::dump(std::ostream& o) const
-{ untested();
+{
   o__ "integer ";
   LiSt<BlockVarIdentifier, '\0', ',', ';'>::dump(o);
   o << "\n";
@@ -837,6 +850,22 @@ void Assignment::dump(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 Assignment::~Assignment()
 {
+  if(_lhs){
+    trace3("~Assignment", lhsname(), this, deps().size());
+  }else{
+  }
+  if(options().optimize_unused() && !owner()->is_reachable()) {
+  }else{
+    try{
+      for(Dep d : deps()) {
+	(*d)->unset_used_in(this);
+      }
+    }catch(std::logic_error const& e){ untested();
+      std::cerr << " logic error in " << lhsname() << ": ";
+      std::cerr << e.what() << "\n";
+      assert(0);
+    }
+  }
   delete _deps;
   _deps = NULL;
 }
@@ -958,7 +987,7 @@ void Contribution::parse(CS& cmd)
 
   { // cmd >> _rhs;
     assert(owner());
-    trace1("Assignment::parse", cmd.tail().substr(0,20));
+    trace1("Contrib::parse", cmd.tail().substr(0,20));
     Expression rhs_(cmd);
     assert(_rhs.is_empty());
 
@@ -968,7 +997,7 @@ void Contribution::parse(CS& cmd)
   }
   {
 
-    trace1("Assignment::parse", rhs().back()->name());
+    trace1("Contrib::parse", rhs().back()->name());
     if(is_direct()){
     }else if(rhs().is_empty()){ untested();
       throw Exception_CS_("syntax error", cmd);
@@ -985,27 +1014,11 @@ void Contribution::parse(CS& cmd)
     }
     assert(owner());
 
-    if(_branch->deps().is_linear()){
-    }else{
-    }
-
     for(const Dep& d : deps()) {
-      trace3("contrib dep", d->code_name(), d.is_linear(), _branch->deps().is_linear());
-      _branch->add_dep(d);
-
-      if(_branch->deps().is_linear()){
-      }else{
-      }
-
-      if(!is_direct()){
-      }else if(d->branch() != _branch){
-      }else if(is_flow_contrib() && d->is_flow_probe()){ untested();
-	_branch->set_selfdep();
-      }else if(is_pot_contrib() && d->is_pot_probe()){
-	_branch->set_selfdep();
-      }else{
-      }
+      add_dep(d);
     }
+    assert(!_deps);
+    _deps = _rhs.deps().clone();
   }
   cmd >> ";";
 
@@ -1022,12 +1035,77 @@ void Contribution::parse(CS& cmd)
   }else{
   }
 
+  if(owner()->is_reachable()){
+    update();
+  }else{
+  }
+
+  if(options().optimize_unused() && !owner()->is_reachable()) {
+  }else{
+    trace2("inc_use0", name(), branch()->name());
+    _branch->inc_use();
+  }
+
 } // Contribution::parse
+/*--------------------------------------------------------------------------*/
+void Contribution::add_dep(Dep const& d)
+{
+  trace3("contrib dep", d->code_name(), d.is_linear(), _branch->deps().is_linear());
+  _branch->add_dep(d);
+
+  if(!is_direct()){
+  }else if(d->branch() != _branch){
+  }else if(is_flow_contrib() && d->is_flow_probe()){ untested();
+    _branch->set_selfdep();
+  }else if(is_pot_contrib() && d->is_pot_probe()){
+    _branch->set_selfdep();
+  }else{
+  }
+
+
+  if(owner()->is_reachable()){
+    d->branch()->inc_use();
+    (*d)->set_used_in(this);
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+Deps const& Contribution::deps()
+{
+  if(_deps){
+    return *_deps;
+  }else{
+    return _rhs.deps();
+  }
+}
 /*--------------------------------------------------------------------------*/
 bool Contribution::update()
 {
-  // TODO incomplete();
-  return false;
+  assert(owner()->is_reachable());
+  trace1("Contribution::update", name());
+  Deps const* D = &_rhs.deps();
+
+  _rhs.update();
+  D = &_rhs.deps();
+  if(!_deps){ untested();
+    _deps = new Deps;
+  }else{
+  }
+  size_t s = _deps->size();
+  _deps->update(*D);
+  bool ret = (s != _deps->size());
+
+  if(options().optimize_unused() && !owner()->is_reachable()) { untested();
+  }else{
+    trace1("Contribution::update more", name());
+    for(; s < _deps->size(); ++s) {
+      Dep const& d = deps()[s];
+      trace3("inc_use", name(), branch()->name(), d->code_name());
+      add_dep(d);
+    }
+  }
+
+  return ret || (_deps->size() != D->size());
 }
 /*--------------------------------------------------------------------------*/
 void Branch_Map::parse(CS& f)
@@ -1109,7 +1187,7 @@ bool Branch::req_short() const
 }
 /*--------------------------------------------------------------------------*/
 void Assignment::set_lhs(Variable* v)
-{
+{ untested();
   _lhs = v;
   assert(v);
   _name = v->name(); // BUG?
@@ -1454,31 +1532,57 @@ void AF_Arg_List::dump(std::ostream& o)const
   o << "\n";
 }
 /*--------------------------------------------------------------------------*/
-// update_deps?
 bool Assignment::update()
 {
-  if(_rhs.update()){
-    update_deps(deps());
-    return true;
+  Deps const* D = &_rhs.deps();
+  assert(D);
+  size_t s = D->size();
+  bool ret;
+
+  _rhs.update();
+  D = &_rhs.deps();
+  trace4("Assignment::update", lhsname(), s, D->size(), this);
+  // assert(s<=D->size());
+  if( propagate_deps(_rhs.deps())) {
+    assert(_lhs);
+    ret = true; // owner() != ((const Variable*)_lhs)->owner();
+    trace3("Assignment::update prop", _rhs.deps().size(), _lhs->deps().size(), ret);
   }else{
-    return false;
+    trace2("Assignment::update no prop", _rhs.deps().size(), _lhs->deps().size());
+    ret = false;
   }
+
+  return ret;
 }
 /*--------------------------------------------------------------------------*/
-// propagate_deps?
-void Assignment::update_deps(Deps const& d)
+bool Assignment::propagate_deps(Deps const& d)
 {
   // TODO: attrib.
   // TODO: only if reachable.
   assert(_lhs);
-  _lhs->update_deps(d);
+  size_t s = _lhs->deps().size();
+  assert(s <= _lhs->deps().size());
   if(_deps) {
   }else{
-    _deps = rhs().deps().clone();
+    _deps = new Deps;
   }
+  size_t ii = _deps->size();
   _deps->update(d);
-//  assert(&deps() != &d);
-//  deps().update(d);
+  assert(ii <= _deps->size());
+  bool ret = false;
+  if(owner()->is_reachable()){
+    for(; ii < _deps->size(); ++ii) {
+      ret = true;
+      Dep const& d = (*_deps)[ii];
+      (*d)->set_used_in(this);
+    }
+    ret |= _lhs->propagate_deps(*_deps);
+  }else{ untested();
+  }
+
+  trace3("Assignment::propagate_deps", d.size(), _deps->size(), ret);
+  assert(d.size() <= _deps->size());
+  return ret;
 }
 /*--------------------------------------------------------------------------*/
 CS& Module::parse_analog(CS& f)
@@ -1552,6 +1656,7 @@ bool Contribution::is_pot_contrib() const
 Contribution::~Contribution()
 {
   assert(_branch); //?
+  trace4("~Contribution", name(), branch()->name(), this, deps().size());
   if(!options().optimize_nodes()){ untested();
   }else if(!owner()->is_always()) {
   }else if(is_short()) {
@@ -1561,14 +1666,40 @@ Contribution::~Contribution()
 
   if(options().optimize_unused() && !owner()->is_reachable()) {
   }else{
+    trace2("dec_use0", name(), branch()->name());
+    _branch->dec_use();
     if (is_flow_contrib()) {
       _branch->dec_flow_source();
     }else if(is_pot_contrib()) {
       _branch->dec_pot_source();
     }else{
     }
+
+    for(Dep const& i : deps()){
+      trace3("dec_use", name(), branch()->name(), i->code_name());
+      assert(i->branch());
+      i->branch()->dec_use();
+      try{
+	(*i)->unset_used_in(this);
+      }catch(std::logic_error const& e){ untested();
+	std::cerr << " logic error in " << name() << ": ";
+	std::cerr << e.what() << "\n";
+	assert(0);
+      }
+    }
+
   }
+  delete _deps;
+  _deps = NULL;
 }
 /*--------------------------------------------------------------------------*/
+bool AnalogRealDecl::update()
+{
+  for(auto& i : _l){
+    assert(i);
+    i->update();
+  }
+  return false;
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

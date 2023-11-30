@@ -1,0 +1,13 @@
+module test_dep5(np, n);
+  inout p, n;
+  electrical p, n;
+  analog begin // always
+    real AA;
+    AA = V(p, n); // dep: _potential_b_p_n
+    I(p, n) <+ ddt((AA * V(p, n))); // dep: _potential_b_ddt_0_
+  end
+
+endmodule
+
+
+

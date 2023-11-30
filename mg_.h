@@ -749,6 +749,8 @@ public:
   std::string const& pname() const;
   std::string const& nname() const;
   std::string const& name() const{ assert(_name); return *_name; }
+  void set_used_in(Base const*)const;
+  void unset_used_in(Base const*)const;
 };
 /*--------------------------------------------------------------------------*/
 class Data_Type : public Base{
@@ -801,7 +803,7 @@ public:
   virtual std::string code_name()const;
   virtual bool is_module_variable()const;
 
-  virtual void update_deps(Deps const&) = 0;
+  virtual bool propagate_deps(Deps const&) = 0;
   virtual Deps const& deps()const = 0;
   virtual double eval()const { return NOT_INPUT;}
 protected:
@@ -829,7 +831,9 @@ public:
   std::string code_name()const override;
   void set_type(Data_Type const& d){ _type=d; }
   Deps const& deps()const override { assert(_deps); return *_deps; }
-  void update_deps(Deps const&)override;
+  bool propagate_deps(Deps const&)override;
+protected:
+  void clear_deps();
 private:
   Deps& deps() { assert(_deps); return *_deps; }
   void new_deps();
@@ -993,7 +997,7 @@ public:
     unreachable();
     return Branch_Ref(NULL);
   }
-  virtual Branch_Ref new_branch(Node const*, Node const*) {
+  virtual Branch_Ref new_branch(Node*, Node*) {
     unreachable();
     return Branch_Ref(NULL);
   }
@@ -1046,7 +1050,7 @@ public:
     assert(owner());
     return owner()->new_branch(p, n);
   }
-  Branch_Ref new_branch(Node const* p, Node const* n)override {
+  Branch_Ref new_branch(Node* p, Node* n)override {
     assert(owner());
     return owner()->new_branch(p, n);
   }
@@ -1314,7 +1318,7 @@ public:
   virtual std::string state()const	{return _state;}
   virtual size_t	     num_nodes()const	{return ports().size();}
   virtual size_t	     num_states()const	{unreachable(); return 0;}
-//  bool is_reversed() const{return _reverse;}
+  virtual bool is_used()const {return true;} // incomplete.
 };
 typedef Collection<Element_2> Element_2_List;
 typedef Collection<Filter> Filter_List;
@@ -1468,6 +1472,13 @@ public:
 private:
   std::string eval(CS&, const CARD_LIST*)const override {unreachable(); return "";}
   Token* new_token(Module&, size_t)const;
+public:
+  void set_used_in(Base const*b)const{
+    return _br.set_used_in(b);
+  }
+  void unset_used_in(Base const*b)const{
+    return _br.unset_used_in(b);
+  }
 }; // Probe
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1582,15 +1593,19 @@ class Branch : public Element_2 {
   std::list<std::string> _names;
   bool _direct{true};
   bool _selfdep{false};
+  mutable /*really?*/ int _use{0};
+//  std::vector<Branch const*> _controlled_by; // move to FUNCTION_
+  std::vector<Base const*> _used_in; //?
+public: // use in contributions
+  bool is_used()const override;
+  void inc_use()const {++_use;}
+  void dec_use()const {assert(_use); --_use;}
+  void set_used_in(Base const*);
+  void unset_used_in(Base const*);
+  std::vector<Base const*> const& used_in() {return _used_in;}
 public:
-  explicit Branch(Node const* p, Node const* n, size_t number)
-    : Element_2(), _p(p), _n(n), _number(number) {
-    assert(p);
-    assert(n);
-    new_deps();
-    //_code_name = "_b_" + p->name() + "_" + n->name();
-  }
-  explicit Branch(){ new_deps(); }
+  explicit Branch(Node* p, Node* n, size_t number);
+  // explicit Branch(){ new_deps(); }
   Branch( Branch const&) = delete;
   ~Branch();
   std::list<std::string> const& names()const{
@@ -1601,10 +1616,10 @@ public:
   void parse(CS&)override {incomplete();}
   void dump(std::ostream&)const override;
   std::string const* reg_name(std::string const&);
-  Node const* p() const{ assert(_p); return _p; }
-  Node const* n() const{ assert(_n); return _n; }
+  Node const* p() const; // really?
+  Node const* n() const; // really?
   bool req_short()const;
-  bool is_short()const;
+  bool is_short() const;
   bool is_direct() const{ return _direct; }
   bool is_generic() const;
   std::string code_name()const override;
@@ -1650,6 +1665,7 @@ public:
 
   Deps const& deps()const { assert(_deps); return *_deps; } // delete?
   Deps& deps() { assert(_deps); return *_deps; } // delete?
+  Branch const* output() const;
 private:
   void new_deps();
 }; // Branch
@@ -1681,19 +1697,24 @@ private:
 public:
   explicit Branch_Map(){}
   ~Branch_Map(){
-    for(auto x : _m){
-      delete x.second;
-      x.second = NULL;
-    }
+    assert(!_m.size());
   }
   //BranchRef new_branch(Node const* a, Node const* b, Block* owner);
   const_iterator begin() const{ return _brs.begin(); }
   const_iterator end() const{ return _brs.end(); }
   size_t size() const{ return _brs.size(); }
 
-  Branch_Ref new_branch(Node const* a, Node const* b);
+  Branch_Ref new_branch(Node* a, Node* b);
   void parse(CS& f);
   void dump(std::ostream& f)const;
+  void clear() {
+    for(auto x : _brs){
+      delete x;
+      x = NULL;
+    }
+    _m.clear();
+    _brs.clear();
+  }
 };
 /*--------------------------------------------------------------------------*/
 // similar to u_nodemap.h, somewhat more fancy.
@@ -1736,7 +1757,7 @@ public:
   Branch_Ref new_branch(std::string const&, std::string const&)override { untested();
     return Branch_Ref();
   }
-  Branch_Ref new_branch(Node const*, Node const*)override {
+  Branch_Ref new_branch(Node*, Node*)override {
     return Branch_Ref();
   }
   Node const* node(std::string const&)const override {
@@ -1870,7 +1891,8 @@ private:
   Branch_Ref branch(std::string const& p) const override;
 public: //filters may need this..
   Node* new_node(std::string const& p) override;
-  Branch_Ref new_branch(Node const*, Node const*) override;
+  Branch_Ref new_branch(Node*, Node*) override;
+  void set_to_ground(Node const*);
 }; // Module
 typedef Collection<Module> Module_List;
 /*--------------------------------------------------------------------------*/
@@ -1919,6 +1941,7 @@ public:
 public:
   void parse(CS& cmd) override;
   void dump(std::ostream&)const override;
+  void update();
 };
 /*--------------------------------------------------------------------------*/
 class ListOfBlockIntIdentifiers : public LiSt<BlockVarIdentifier, '\0', ',', ';'>{
@@ -1935,6 +1958,7 @@ public:
 /*--------------------------------------------------------------------------*/
 class ListOfBlockRealIdentifiers : public LiSt<BlockVarIdentifier, '\0', ',', ';'>{
 public:
+  ListOfBlockRealIdentifiers() {}
   ListOfBlockRealIdentifiers(CS& f, Block* o){
     set_owner(o);
     parse(f);
@@ -1971,7 +1995,7 @@ public:
   }
   void parse(CS& cmd) override;
   void dump(std::ostream&)const override;
-  void update_deps(Deps const&) override;
+  bool propagate_deps(Deps const&) override;
   bool update();
 // protected:
   void set_lhs(Variable* v);
@@ -1987,7 +2011,6 @@ public:
   void parse_rhs(CS& cmd);
   double eval()const override;
   Block* owner(){ return Variable::owner();}
-private:
 //  Deps& deps()override { return _rhs.deps(); }
 }; // Assignment
 /*--------------------------------------------------------------------------*/
@@ -1999,6 +2022,8 @@ class Node : public Base {
   Discipline const* _discipline{NULL};
   Nature const* _nature{NULL};
   Node* _next{NULL};
+  mutable int _use{0};
+  std::vector<Element_2 const*> _fanout;
 public:
   void parse(CS&)override {};
   void dump(std::ostream&)const override {};
@@ -2006,16 +2031,25 @@ public:
   Node() {untested(); _next=this;}
   Node(CS& f) {parse(f); _next=this;}
   Node(std::string const& f, int n) : _name(f), _number(n) { _next=this;}
+public:
+  ~Node();
   const std::string& name()const	{return _name;}
   std::string code_name()const	{return "n_" + _name;}
   int number()const	{return _number;}
 //  const std::string& short_to()const 	{return _short_to;}
 //  const std::string& short_if()const 	{return _short_if;}
   void set_discipline(Discipline const* d){ _discipline = d; }
+
+  void set_to_ground(Module*);
   void set_to(Node*);
 
   Discipline const* discipline() const{  return _discipline; }
   Nature const* nature() const{ return _nature; }
+public:
+  bool is_used()const;
+  void inc_use()const {++_use;}
+  void dec_use()const {assert(_use); --_use;}
+  void connect(Element_2 const*);
   bool is_ground() const{ return !_number; }
 }; // Node
 /*--------------------------------------------------------------------------*/

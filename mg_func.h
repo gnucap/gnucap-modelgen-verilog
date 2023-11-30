@@ -89,6 +89,8 @@ public:
   Token* new_token(Module& m, size_t na) const override;
 };
 /*--------------------------------------------------------------------------*/
+class Node;
+class Branch;
 class MGVAMS_FILTER : public FUNCTION_ {
   std::string eval(CS&, const CARD_LIST*)const override{
 	  unreachable();
@@ -99,8 +101,13 @@ public:
   // Token* new_token(Module& m, size_t na, Deps& d) const override;
   virtual void make_cc_common(std::ostream&) const {}
   virtual std::string code_name() const{
-	  return "";
+    return "";
   }
+#if 0
+  virtual Node const* p() const; // really?
+  virtual Node const* n() const; // really?
+  virtual Branch const* output()const{return NULL;}
+#endif
 };
 /*--------------------------------------------------------------------------*/
 class MGVAMS_TASK : public FUNCTION_ {

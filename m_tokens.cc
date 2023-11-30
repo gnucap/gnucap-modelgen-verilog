@@ -622,6 +622,16 @@ static Module* to_module(Block* owner)
   return NULL;
 }
 /*--------------------------------------------------------------------------*/
+size_t Token_ACCESS::num_deps() const
+{
+  if(auto t=dynamic_cast<Deps const*>(data())){
+    return t->size();
+  }else{
+    // incomplete();
+    return 0;
+  }
+}
+/*--------------------------------------------------------------------------*/
 void Token_ACCESS::stack_op(Expression* e) const
 {
   Expression& E = *e;
@@ -763,6 +773,16 @@ void Token_PAR_REF::stack_op(Expression* e)const
   }
 }
 /*--------------------------------------------------------------------------*/
+size_t Token_VAR_REF::num_deps() const
+{
+  if(auto t=dynamic_cast<Deps const*>(data())){
+    return t->size();
+  }else{
+    // incomplete();
+    return 0;
+  }
+}
+/*--------------------------------------------------------------------------*/
 void Token_VAR_REF::stack_op(Expression* e)const
 {
   assert(_item);
@@ -772,8 +792,12 @@ void Token_VAR_REF::stack_op(Expression* e)const
     e->push_back(new Token_CONSTANT(name(), f, ""));
   }else{
     auto deps = _item->deps().clone();
-    trace2("var::stack_op", name(), _item->deps().size());
-    e->push_back(new Token_VAR_REF(*this, deps));
+    trace4("var::stack_op", name(), _item->deps().size(), _item->name(), _item);
+    assert(deps->size() == _item->deps().size());
+    auto nn = new Token_VAR_REF(*this, deps);
+    assert(nn->num_deps() == deps->size());
+    e->push_back(nn);
+    assert(nn->_item == _item);
   }
 }
 /*--------------------------------------------------------------------------*/

@@ -81,14 +81,26 @@ static void make_module_is_valid(std::ostream& o, const Module& m)
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_node_ref(std::ostream& o, const Node& n)
+static void make_node_ref(std::ostream& o, const Node& n, bool used=true)
 {
   if(n.is_ground()) {
+    o << "gnd";
+  }else if(!used){
     o << "gnd";
   }else{
     o << "_n[" << n.code_name() << "]";
   }
 }
+/*--------------------------------------------------------------------------*/
+#if 0
+static void make_cc_branch_output(std::ostream& o, Branch const* br)
+{
+  Branch const* out = br->output();
+  make_node_ref(o, *out->p(), br->is_used());
+  o << ", ";
+  make_node_ref(o, *out->n(), br->is_used());
+}
+#endif
 /*--------------------------------------------------------------------------*/
 static void make_tr_needs_eval(std::ostream& o, const Module& m)
 {
@@ -293,9 +305,10 @@ static void make_build_netlist(std::ostream& o, const Module& m)
   o__ "// build netlist\n";
   if(m.element_list().size()){
     o__ "new_subckt();\n";
-    for (auto nn : m.nodes()){
-      std::string ext_name = nn->name();
-      int ii = nn->number();
+    auto nn = m.nodes().begin();
+    for (++nn; nn!=m.nodes().end(); ++nn){
+      std::string ext_name = (*nn)->name();
+      int ii = (*nn)->number();
 
       if(!ii){
       }else if(ii <= int(m.ports().size())){

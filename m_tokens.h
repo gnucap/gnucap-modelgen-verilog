@@ -182,6 +182,8 @@ public:
   bool is_short() const;
   bool is_reversed() const;
   std::string code_name() const;
+private:
+  size_t num_deps() const;
 };
 /*--------------------------------------------------------------------------*/
 class Parameter_Base;
@@ -225,6 +227,8 @@ public:
   void stack_op(Expression* e)const override;
   Variable const* item()const { untested(); return _item; }
   Variable const* operator->() const{ return _item; }
+private:
+  size_t num_deps() const;
 };
 /*--------------------------------------------------------------------------*/
 class Expression_;

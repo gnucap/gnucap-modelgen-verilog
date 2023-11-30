@@ -33,6 +33,7 @@ class Options : public Base {
   bool _gen_paramset{true};
   bool _dump_module{true};
   bool _dump_paramset{true};
+  bool _store_unreachable{true}; // ignore unreachable structures (TODO)
   bool _dump_unreachable{true};
   bool _dump_discipline{true};
   bool _dump_nature{true};
@@ -53,6 +54,7 @@ public:
   bool gen_paramset()     const{ return _gen_paramset; }
   bool dump_module()      const{ return _dump_module; }
   bool dump_paramset()    const{ return _dump_paramset; }
+  bool store_unreachable()const{ untested(); return _store_unreachable; }
   bool dump_unreachable() const{ return _dump_unreachable; }
   bool dump_discipline()  const{ return _dump_discipline; }
   bool dump_nature()      const{ return _dump_nature; }

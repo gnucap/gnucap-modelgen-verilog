@@ -1,0 +1,24 @@
+module test_while0a(p, n);
+  inout p, n;
+  electrical p, n;
+  parameter real r = 0;
+
+  analog begin // always
+    integer i;
+    real x, y;
+    x = 0.;
+    y = 0.;
+    i = r;
+    while ((i > 0)) begin
+      i = (i - 1);
+      x = y; // dep: _potential_b_p_n
+      y = (x + V(p, n)); // dep: _potential_b_p_n
+    end
+    x = x; // dep: _potential_b_p_n
+    I(p, n) <+ x; // dep: _potential_b_p_n
+  end
+
+endmodule
+
+
+
