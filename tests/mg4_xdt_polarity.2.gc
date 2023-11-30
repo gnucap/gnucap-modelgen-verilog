@@ -12,31 +12,27 @@ V1 p n sin freq=1 amplitude={ampl} dc=dc
 .verilog
 
 `modelgen
-module test_cap1(p, n);
-  electrical p, n;
+module test_xdt2(out, n, in);
+  electrical out, in, n;
   parameter real c=1;
   analog begin
-    I(p,n) <+ - ddt(c*V(n,p));
+    I(out,n) <+ -ddt(-c*V(in,n));
   end
 endmodule
 
-!make test_cap1.so > /dev/null
+!make test_xdt2.so > /dev/null
 
-attach ./test_cap1.so
+attach ./test_xdt2.so
 
 verilog
 
-resistor #(.r(1)) r(in, out);
-test_cap1 #(.c(c)) dut(out, 0);
-// capacitor #(.c(c)) c(out, 0);
+test_xdt2 #(.c(c)) dut(out, 0, in);
+resistor #(.r(1)) r(0, out);
 
 parameter v=0
 parameter c=1m
 vsin #(.dc(v), .ampl(1)) v1(in, 0);
 
-print dc v(nodes) iter(0)
-dc v -10 10 2 trace=i
-
-print tran v(nodes) iter(0)
+print tran v(in) v(r) iter(0)
 tran .5
 status notime

@@ -1,0 +1,53 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+attach ../bm_pulse.so
+
+verilog
+options trsteporder 1
+
+`modelgen
+module pid0(sp,sn,cp,cn);
+	inout sp,sn,cp,cn;
+	electrical sp,sn,cp,cn;
+
+	parameter real p = 1.;
+	parameter real i = 1.;
+	parameter real d = 1.;
+
+	analog begin
+		I(sp,sn) <+ p * V(cp,cn);
+		I(sp,sn) <+ idt(i * V(cp,cn));
+		I(sp,sn) <+ ddt(d * V(cp,cn));
+   end
+endmodule
+
+!make pid0.so > /dev/null
+load ./pid0.so
+
+pid0 #(.d(1m) .i(100) .p(.1)) dut (0, out, n1, 0);
+// pid0 #(.d(1m)) dut (out, 0, n1, 0);
+capacitor #(.c(1u)) c(out 0);
+resistor #(.r(1)) r(out 0);
+list
+spice
+
+V1 n1 0 pulse iv=0 pv=1 rise=2m delay=0 width=4m period=12m fall=1m
+
+.print tran v(nodes) iter(0)
+.print tran + timef(dut._b_d*)
+.print tran + timef(dut._b_i*)
+
+.tran 10m
+.status notime
+
+.options trsteporder 3
+.options trtol 1
+
+.print tran v(nodes) iter(0)
+.print tran + timef(dut._b_d*)
+.print tran + timef(dut._b_i*)
+.print tran + timef(dut._b_sp_sn)
+.tran 0 10m
+.status notime
+.end

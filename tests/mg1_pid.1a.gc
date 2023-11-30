@@ -17,8 +17,8 @@ module pid1(sp,sn,cp,cn);
 
 	analog begin
 		I(sp,sn) <+ p * V(cp,cn);
-		I(sp,sn) <+ i * idt(V(cp,cn));
-		I(sp,sn) <+ d * ddt(V(cp,cn));
+		I(sp,sn) <+ idt(i * V(cp,cn));
+		I(sp,sn) <+ ddt(d * V(cp,cn));
    end
 endmodule
 

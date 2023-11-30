@@ -165,3 +165,8 @@ resistor #(.r(1)) r (.p(out),.n(0));
  0.0095863581 -0.25698284    0.58660288    3.            0.010109981  
  0.009793179  -0.12958401    0.61158475    3.            0.010244652  
  0.01          0.            0.62817598    3.            0.010355225  
+Gnucap   System status
+iterations: op=0, dc=0, tran=507, fourier=0, total=676
+transient timesteps: accepted=163, rejected=6, total=169
+nodes: user=2, subckt=0, model=2, total=4
+dctran density=100.0%, ac density=100.0%

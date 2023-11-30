@@ -1,0 +1,16 @@
+parameter v=0 
+test_an2 #() dut (.np(1),.nn(0));
+resistor #(.r(1)) c1 (.p(1),.n(0));
+#           v(1)       iter(0)   
+ 0.         0.         3.        
+#Time       v(1)       iter(0)   
+ 0.         0.99999    3.        
+ 0.01       0.99009    3.        
+ 0.0925     0.91164    3.        
+ 0.395      0.6721     3.        
+ 1.         0.35992    3.        
+Gnucap   System status
+iterations: op=0, dc=3, tran=15, fourier=0, total=23
+transient timesteps: accepted=5, rejected=0, total=5
+nodes: user=1, subckt=0, model=1, total=2
+dctran density=100.0%, ac density=100.0%
