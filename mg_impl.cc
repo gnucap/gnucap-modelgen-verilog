@@ -732,6 +732,8 @@ std::string Variable_Decl::code_name() const
 //  }else
   if(is_real()){
     return "_v_" + name();
+  }else if(is_int()){
+    return "_v_" + name();
   }else if(is_module_variable()){
     return "d->_v_" + name();
   }else{

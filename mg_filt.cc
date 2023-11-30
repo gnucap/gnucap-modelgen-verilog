@@ -132,6 +132,21 @@ public:
 
     return new Token_XDT(label(), cl);
   }
+  void make_cc_precalc(std::ostream& o)const override{
+    o__ "ddouble " << _code_name << "(";
+      std::string comma;
+      assert(num_args() < 3);
+      for(size_t n=0; n<num_args(); ++n){
+	o << comma << "ddouble";
+	comma = ", ";
+      }
+    o << "){\n";
+    o__ "ddouble ret;\n";
+    std::string cn = _br->code_name();
+    o__ "ret[d_potential" << cn << "] = -1.;\n";
+    o__ "return ret;\n";
+    o << "}\n";
+  }
   void make_cc_dev(std::ostream& o)const override{
     o__ "ddouble " << _code_name << "(";
       std::string comma;

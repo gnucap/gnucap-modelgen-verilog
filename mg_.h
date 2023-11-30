@@ -796,8 +796,8 @@ public:
   String_Arg key()const { return _name; }
 //  void set_type(Data_Type d){ _type=d; }
   virtual Data_Type const& type() const = 0;
-  bool is_real() const{ return type().is_real(); }
-  // bool is_int() const { return _type.is_int(); }
+  bool is_real()const { return type().is_real(); }
+  bool is_int()const { return type().is_int(); }
   String_Arg const& identifier()const {return _name;}
   std::string const& name()const {return _name.to_string();}
   virtual std::string code_name()const;
@@ -2154,7 +2154,7 @@ private:
   void new_deps();
 }; // Filter
 /*--------------------------------------------------------------------------*/
-void make_cc_expression(std::ostream& o, Expression const& e);
+void make_cc_expression(std::ostream& o, Expression const& e, bool deriv=true);
 void make_cc_event_cond(std::ostream& o, Expression const& e);
 /*--------------------------------------------------------------------------*/
 inline void Variable::new_var_ref()

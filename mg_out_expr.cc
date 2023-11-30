@@ -303,14 +303,18 @@ public:
       assert(_ddo_idx==_ddo_alloc);
       ++_ddo_alloc;
       assert(_ddo_idx>=0);
-      o__ "ddouble t" << _ddo_idx << ";\n";
-      if(!options().optimize_deriv()){
+      if(_deps){
+	o__ "ddouble t" << _ddo_idx << ";\n";
+      }else{
+	o__ "ddouble t" << _ddo_idx << ";\n"; // TODO? some deps?
+      }
+      if(!_deps){
+      }else if(!options().optimize_deriv()){
 	o__ "t" << _ddo_idx << ".set_all_deps(); // (all deriv)\n"; // code_name??
-      }else if(_deps){
+      }else{
 	for(auto i: *_deps){
 	  o__ "t" << _ddo_idx << "[d" << i->code_name() << "] = 0.; // (output dep)\n";
 	}
-      }else{ untested();
       }
     }
     _types.push(t_ddo);
@@ -384,10 +388,8 @@ public:
       return "";
     }
   }
-  Deps const& deps() const{
-    assert(_deps);
-    return *_deps;
-  };
+  bool has_deps()const { return _deps; }
+  Deps const& deps()const { assert(_deps); return *_deps; }
 }; // RPN_VARS
 /*--------------------------------------------------------------------------*/
 static void make_cc_string(std::ostream& o, String const& e)
@@ -463,7 +465,8 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
       s.new_rhs(var); // if linear?
     }else if(auto pp = dynamic_cast<const Token_ACCESS*>(*i)) {
       s.new_ddouble(o);
-      if(options().optimize_deriv()){
+      if(!s.has_deps()){
+      }else if(options().optimize_deriv()){
 	o__ s.code_name() << ".set_no_deps();\n";
 	for(auto i: s.deps()){
 	  o__ s.code_name() << "[d" << i->code_name() << "] = 0.; // (output dep)\n";
@@ -471,7 +474,12 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
       }else{ untested();
       }
 //      assert((*pp)->branch());
-      if(pp->is_short()){ untested();
+     // if(s.is_precalc()){
+     //   o__ s.code_name() << " = 0.; // precalc\n";
+     // }else
+      if(!s.has_deps()){
+	o__ s.code_name() << " = 0.; // static?\n";
+      }else if(pp->is_short()){ untested();
 	o__ s.code_name() << " = 0.; // short probe\n";
       }else{
 	char sign = pp->is_reversed()?'-':'+';
@@ -630,10 +638,11 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
   }
 }
 /*--------------------------------------------------------------------------*/
-void make_cc_expression(std::ostream& o, Expression const& e)
+void make_cc_expression(std::ostream& o, Expression const& e, bool dynamic)
 {
   Deps const* deps = NULL;
-  if(auto ex = dynamic_cast<Expression_ const*>(&e)){
+  if(!dynamic){
+  }else if(auto ex = dynamic_cast<Expression_ const*>(&e)){
     deps = &ex->deps();
   }else{
   }

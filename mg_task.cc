@@ -52,6 +52,14 @@ private:
     m.push_back(cl);
     return new Token_CALL("$strobe", cl);
   }
+  void make_cc_precalc(std::ostream& o)const override {
+    o__ "void " << label() << "(std::string const&";
+    for(size_t i=1; i<num_args(); ++i) {
+      o << ", double";
+    }
+    o << "){\n";
+    o__ "}\n";
+  }
   void make_cc_dev(std::ostream& o)const override {
     o__ "struct _" << label() << " : public va::EVT {\n";
     o____ "std::string _a0;\n";
@@ -104,6 +112,12 @@ private:
     t->set_num_args(na); // still needed?
     return t;
   }
+  void make_cc_precalc(std::ostream& o)const override {
+    o__ "void t_finish(int n=1){\n";
+    o____ "(void)n;\n";
+    o__ "}\n";
+    o__ "void t_finish(double x){return t_finish(int(x));}\n";
+  }
   void make_cc_dev(std::ostream& o)const override {
     o__ "void t_finish(int n=1){\n";
     o____ "(void)n;\n";
@@ -134,10 +148,15 @@ class LIMIT : public MGVAMS_TASK {
     return new Token_CALL("$limit", cl);
   }
   std::string code_name()const override{
-    return "d->" + label() + "/*133*/";
+    return "d->" + label();
   }
   void make_cc_common(std::ostream&)const override {
     // nothing.
+  }
+  void make_cc_precalc(std::ostream& o)const override {
+    o__ "ddouble " << label() << "(ddouble in, std::string const& what, double const& a, double const& b){\n";
+    o____ "return 0.;\n";
+    o__ "}\n";
   }
   void make_cc_dev(std::ostream& o)const override {
     o__ "class " << label() << "{\n";

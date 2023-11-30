@@ -134,6 +134,7 @@ void make_one_variable_decl(std::ostream& o, const Variable_Decl& V)
 {
   if(V.type().is_real()) {
       o__ "double ";
+      o << " _v_" << V.name() << "{0.}";
    if(!V.has_attributes()){
 #if 0
    }else if(options().optimize_deriv()) {
@@ -160,17 +161,16 @@ void make_one_variable_decl(std::ostream& o, const Variable_Decl& V)
       o____ "}\n";
       o__ "}";
 #endif
-    }else{ itested();
+    }else{
 //      o__ "ddouble ";
     }
   }else if(V.type().is_int()) {
     o__ "int";
+    o << " _v_" << V.name() << "{0}";
   }else{
     incomplete();
     o__ "unknown";
   }
-  o << " _v_" << V.name(); // code_name??
-			    //	  << " /* " << (**p).comment() << " */";
   o << ";\n";
 }
 /*--------------------------------------------------------------------------*/
@@ -227,7 +227,9 @@ static void make_common(std::ostream& o, const Module& m)
     "  void precalc_first(const CARD_LIST*)override;\n"
     "  void expand(const COMPONENT*)override;\n"
     "  void precalc_last(const CARD_LIST*)override;\n"
+    // if has_analog?
     "  void tr_eval_analog(MOD_" << m.identifier() << "*)const;\n"
+    "  void precalc_analog(MOD_" << m.identifier() << "*)const;\n"
     "  std::string name()const override {itested();return \"" << m.identifier() << "\";}\n"
 //    "  const SDP_CARD* sdp()const {return _sdp;}\n"
 //    "  bool     has_sdp()const {untested();return _sdp;}\n"
@@ -356,6 +358,26 @@ static void make_branch_states(std::ostream& o, const Module& m)
   }
 }
 /*--------------------------------------------------------------------------*/
+static void make_precalc(std::ostream& o, Module const& m)
+{
+  std::string class_name = "PRECALC_" + m.identifier().to_string();
+  o << "class " << class_name << "{\n";
+  o__ "MOD_" <<  m.identifier() << "* _d{NULL};\n";
+  o << "public:\n";
+  declare_ddouble(o, m);
+  o << "public:\n";
+  o__ "explicit " << class_name << "(MOD_" <<  m.identifier() << "*d) : _d(d) {}\n";
+  // ... functions->make_cc_precalc?
+  for(auto const& i : m.funcs()) {
+    indent x;
+    i->make_cc_precalc(o);
+  }
+
+  o << "};\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
 static void make_module(std::ostream& o, const Module& m)
 {
   std::string class_name = "MOD_" + m.identifier().to_string();
@@ -454,10 +476,10 @@ static void make_module(std::ostream& o, const Module& m)
     o__ "bool      tr_needs_eval()const override;\n";
     o__ "void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }\n";
     o__ "bool      do_tr() override;\n";
+//    o__ "void      ac_begin() override;\n";
+//    o__ " void    do_ac();\n";
   }
   o__ "double tr_probe_num(std::string const&)const override;\n";
-  o__ "  //void    ac_begin();          //BASE_SUBCKT\n";
-  o__ "  //void    do_ac();             //BASE_SUBCKT\n";
   o__ "  //void    ac_load();           //BASE_SUBCKT\n";
   o__ "  //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing\n";
 //  o << ind << "std::string dev_type()const override {return \"demo\";}\n";
@@ -506,6 +528,7 @@ static void make_module(std::ostream& o, const Module& m)
 void make_cc_decl(std::ostream& out, const Module& d)
 {
   make_common(out, d);
+  make_precalc(out, d);
   make_module(out, d);
 }
 /*--------------------------------------------------------------------------*/

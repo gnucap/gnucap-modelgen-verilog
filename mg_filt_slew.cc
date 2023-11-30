@@ -74,6 +74,17 @@ private:
     auto t = new Token_CALL(label(), cl);
     return t;
   }
+  void make_cc_precalc(std::ostream& o)const override{
+    o__ "ddouble " << label() << "(";
+      std::string comma;
+      for(size_t n=0; n<num_args(); ++n){
+	o << comma << "ddouble";
+	comma = ", ";
+      }
+    o << "){\n";
+    o____ "return 0.;\n";
+    o__ "}\n";
+  }
   void make_cc_dev(std::ostream& o)const override{
     assert(_f);
     std::string cn = _f->code_name();

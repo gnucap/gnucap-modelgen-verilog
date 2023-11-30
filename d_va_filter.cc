@@ -287,7 +287,8 @@ DEV_CPOLY_CAP::~DEV_CPOLY_CAP()
 /*--------------------------------------------------------------------------*/
 bool DEV_CPOLY_CAP::do_tr_con_chk_and_q()
 {
-  if(_load_time != _sim->_time0){
+  if(!_sim->_v0){
+  }else if(_load_time != _sim->_time0){
     q_load();
   }else{
   }
@@ -326,7 +327,11 @@ bool DEV_DDT::do_tr()
 {
   assert((_time[0] == 0) || (_vy0[0] == _vy0[0]));
 
-  _y[0].x  = tr_outvolts();
+  if(_sim->_v0) {
+    _y[0].x = tr_outvolts();
+  }else{ untested();
+    _y[0].x = 0.;
+  }
   _y[0].f0 = _vy0[0]; // state, from owner, "charge".
   assert(_vy0[1] == 0.);
   _y[0].f1 = 0; // _vy0[1]; // another state, capacity.?
@@ -335,8 +340,9 @@ bool DEV_DDT::do_tr()
   trace3("DEV_DDT::do_tr", long_label(), _sim->iteration_tag(), _sim->_time0);
   if(_sim->is_advance_iteration()){
     // return true;
-  }else{
+  }else if(_sim->_v0){
     _i[0] = differentiate(_y, _i, _time, _method_a);
+  }else{
   }
   trace4("DIFFD", _i[0].f0, _i[0].f1, _y[0].f0, _sim->_time0);
   assert(_i[0].f0 < 1e99);
@@ -344,15 +350,18 @@ bool DEV_DDT::do_tr()
   _vi0[1] = _i[0].f1;
   assert(_vi0[0] == _vi0[0]);
   
-  for (int i=2; i<=_n_ports; ++i) {
-    _vi0[i] = tr_c_to_g(_vy0[i], _vi0[i]);
-    trace4("DEV_DDT::do_tr", i, _vi0[0], volts_limited(_n[2*i-2],_n[2*i-1]), _vi0[i]);
-    _vi0[0] -= volts_limited(_n[2*i-2],_n[2*i-1]) * _vi0[i];
-    assert(_vi0[i] == _vi0[i]);
-    assert(_vi0[0] == _vi0[0]);
-  }
-  for (int i=0; i<=_n_ports; ++i) {
-    assert(_vi0[i] == _vi0[i]);
+  if(_sim->_v0){
+    for (int i=2; i<=_n_ports; ++i) {
+      _vi0[i] = tr_c_to_g(_vy0[i], _vi0[i]);
+      trace4("DEV_DDT::do_tr", i, _vi0[0], volts_limited(_n[2*i-2],_n[2*i-1]), _vi0[i]);
+      _vi0[0] -= volts_limited(_n[2*i-2],_n[2*i-1]) * _vi0[i];
+      assert(_vi0[i] == _vi0[i]);
+      assert(_vi0[0] == _vi0[0]);
+    }
+    for (int i=0; i<=_n_ports; ++i) {
+      assert(_vi0[i] == _vi0[i]);
+    }
+  }else{
   }
   
   _m0 = CPOLY1(0., _vi0[0], _vi0[1]);
@@ -365,7 +374,11 @@ bool DEV_IDT::do_tr()
 {
   assert((_time[0] == 0) || (_vy0[0] == _vy0[0]));
 
-  _y[0].x  = tr_outvolts();
+  if(_sim->_v0){
+    _y[0].x = tr_outvolts();
+  }else{
+    _y[0].x = 0.;
+  }
   _y[0].f0 = _vy0[0]; // state, from owner, "input voltage".
   assert(_vy0[1] == 0.);
   _y[0].f1 = 0; // _vy0[1]; // another state, capacity.?
@@ -377,16 +390,19 @@ bool DEV_IDT::do_tr()
   _vi0[1] = _i[0].f1;
   assert(_vi0[0] == _vi0[0]);
   
-  for (int i=2; i<=_n_ports; ++i) {
-    _vi0[i] = tr_l_to_g(_vy0[i], _vi0[i], _time, _method_a, _dt);
-    _vi0[0] -= volts_limited(_n[2*i-2],_n[2*i-1]) * _vi0[i];
-    assert(_vi0[i] == _vi0[i]);
-    assert(_vi0[0] == _vi0[0]);
+  if(_sim->_v0){
+    for (int i=2; i<=_n_ports; ++i) {
+      _vi0[i] = tr_l_to_g(_vy0[i], _vi0[i], _time, _method_a, _dt);
+      _vi0[0] -= volts_limited(_n[2*i-2],_n[2*i-1]) * _vi0[i];
+      assert(_vi0[i] == _vi0[i]);
+      assert(_vi0[0] == _vi0[0]);
+    }
+    for (int i=0; i<=_n_ports; ++i) {
+      assert(_vi0[i] == _vi0[i]);
+    }
+  }else{
   }
-  for (int i=0; i<=_n_ports; ++i) {
-    assert(_vi0[i] == _vi0[i]);
-  }
-  
+
   _m0 = CPOLY1(0., _vi0[0], _vi0[1]);
   return do_tr_con_chk_and_q();
 }

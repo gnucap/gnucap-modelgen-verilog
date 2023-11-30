@@ -135,7 +135,9 @@ void make_cc(std::ostream& out, const File& in)
 	 ++m) {
       out << "namespace n" << std::to_string(num) << "{\n";
       make_cc_module(out, **m);
-      out << "}\n";
+      out << "}\n" <<
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
       ++num;
     }
   }else if(!options().expand_paramset()){ untested();

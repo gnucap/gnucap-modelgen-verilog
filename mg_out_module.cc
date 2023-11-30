@@ -812,6 +812,12 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   }else{
   }
 
+  if(m.has_analog_block()){
+    incomplete();
+    o__ "c->precalc_analog(this);\n"; // call through COMPONENT::precalc?
+  }else{
+  }
+
   o__ "if(subckt()){\n";
   o____ "subckt()->precalc_last();\n";
   o__ "}else{untested();\n";
@@ -955,6 +961,10 @@ void make_cc_module(std::ostream& o, const Module& m)
 	<< "(CC_STATIC);\n"
       "/*--------------------------------------"
       "------------------------------------*/\n";
+  o <<
+      "/*--------------------------------------"
+      "------------------------------------*/\n";
+  //make_precalc_class(o, m);
   o <<
       "/*--------------------------------------"
       "------------------------------------*/\n";

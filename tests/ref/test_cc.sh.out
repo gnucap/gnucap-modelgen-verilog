@@ -922,6 +922,7 @@ public:
   void expand(const COMPONENT*)override;
   void precalc_last(const CARD_LIST*)override;
   void tr_eval_analog(MOD_resistor*)const;
+  void precalc_analog(MOD_resistor*)const;
   std::string name()const override {itested();return "resistor";}
   static int  count() {return _count;}
 private: // strictly internal
@@ -930,6 +931,17 @@ public: // input parameters
   PARAMETER<real> _p_r /*  */;
 private: // funcs
 }; //COMMON_resistor
+/*--------------------------------------------------------------------------*/
+class PRECALC_resistor{
+  MOD_resistor* _d{NULL};
+public:
+  typedef ddouble_<1> ddouble;
+  enum {
+    d_potential_b_p_n,
+     num_branches__  };
+public:
+  explicit PRECALC_resistor(MOD_resistor*d) : _d(d) {}
+};
 /*--------------------------------------------------------------------------*/
 class MOD_resistor : public BASE_SUBCKT {
 private:
@@ -969,8 +981,6 @@ private: // overrides
   void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }
   bool      do_tr() override;
   double tr_probe_num(std::string const&)const override;
-    //void    ac_begin();          //BASE_SUBCKT
-    //void    do_ac();             //BASE_SUBCKT
     //void    ac_load();           //BASE_SUBCKT
     //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing
   int max_nodes()const override {return 2;}
@@ -1159,6 +1169,7 @@ int COMMON_resistor::_count = -1;
 static COMMON_resistor Default_resistor(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 double MOD_resistor::tr_probe_num(std::string const& n) const
 {
   if(n == "conv") {
@@ -1266,7 +1277,6 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         t0 = +p->_potential_b_p_n; // V(p, n)
         t0[d_potential_b_p_n] = +1.;
         t0 = t0 / (_p_r) /*rhspar*/;
-        assert(t0.is_same(t0));
         _v_i = t0.value(); // (*)
         _v_i[d_potential_b_p_n] = t0[d_potential_b_p_n]; // (2b)
         assert(_v_i[d_potential_b_p_n] == t0[d_potential_b_p_n]); // (2b2)
@@ -1280,6 +1290,34 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         d->_st_b_p_n[1] += t0[d_potential_b_p_n];
         // dep _potential_b_p_n
         // same _potential_b_p_n
+      }
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
+{
+  MOD_resistor const* p = m;
+  assert(p);
+  (void)p;
+  COMMON_resistor const* pc = this;
+  (void)pc;
+  PRECALC_resistor P(m);
+  PRECALC_resistor* d = &P;
+  (void)d;
+  {
+    { // 
+      ddouble _v_i; // Variable       Dep: _potential_b_p_n lin: 1
+      _v_i.set_all_deps();
+      { // Assignment real 'i'.
+        ddouble t0;
+        t0 = 0.; // static?
+        t0 = t0 / (_p_r) /*rhspar*/;
+        _v_i = t0; // (prec)
+      }
+      { // Contribution I(p, n) lin: 1
+        ddouble t0;
+        t0 = _v_i/*rhsvar*/;
       }
     }
   }
@@ -1414,9 +1452,11 @@ void MOD_resistor::precalc_last()
     subckt()->precalc_last();
   }else{untested();
   }
+  c->precalc_analog(this);
 }
 /*--------------------------------------------------------------------------*/
 }
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
@@ -2345,6 +2385,7 @@ public:
   void expand(const COMPONENT*)override;
   void precalc_last(const CARD_LIST*)override;
   void tr_eval_analog(MOD_capacitor*)const;
+  void precalc_analog(MOD_capacitor*)const;
   std::string name()const override {itested();return "capacitor";}
   static int  count() {return _count;}
 private: // strictly internal
@@ -2370,6 +2411,23 @@ private: // funcs
     return p.has_hard_value();
   }
 }; //COMMON_capacitor
+/*--------------------------------------------------------------------------*/
+class PRECALC_capacitor{
+  MOD_capacitor* _d{NULL};
+public:
+  typedef ddouble_<2> ddouble;
+  enum {
+    d_potential_b_ddt_1_,
+    d_potential_b_p_n,
+     num_branches__  };
+public:
+  explicit PRECALC_capacitor(MOD_capacitor*d) : _d(d) {}
+    ddouble _b_ddt_1(ddouble){
+    ddouble ret;
+    ret[d_potential_b_ddt_1_] = -1.;
+    return ret;
+}
+};
 /*--------------------------------------------------------------------------*/
 class MOD_capacitor : public BASE_SUBCKT {
 private:
@@ -2417,8 +2475,6 @@ private: // overrides
   void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }
   bool      do_tr() override;
   double tr_probe_num(std::string const&)const override;
-    //void    ac_begin();          //BASE_SUBCKT
-    //void    do_ac();             //BASE_SUBCKT
     //void    ac_load();           //BASE_SUBCKT
     //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing
   int max_nodes()const override {return 2;}
@@ -2643,6 +2699,7 @@ int COMMON_capacitor::_count = -1;
 static COMMON_capacitor Default_capacitor(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 double MOD_capacitor::tr_probe_num(std::string const& n) const
 {
   if(n == "conv") {
@@ -2759,6 +2816,33 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
             assert(t0[d_potential_b_ddt_1_] == t0[d_potential_b_ddt_1_]);
             assert(MOD::_st_b_p_n_::dep_potential_b_ddt_1_ < 3);
             d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_ddt_1_] += t0[d_potential_b_ddt_1_]; // (3)
+          }
+        }
+      }
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
+{
+  MOD_capacitor const* p = m;
+  assert(p);
+  (void)p;
+  COMMON_capacitor const* pc = this;
+  (void)pc;
+  PRECALC_capacitor P(m);
+  PRECALC_capacitor* d = &P;
+  (void)d;
+  {
+    { // 
+      {
+        { // 
+          { // Contribution I(p, n) lin: 0
+            ddouble t0;
+            t0 = 0.; // static?
+            t0 = (_p___c) /*rhspar*/ * t0;
+            // function ddt 1
+            t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_1(t0);
           }
         }
       }
@@ -2947,6 +3031,7 @@ void MOD_capacitor::precalc_last()
     subckt()->precalc_last();
   }else{untested();
   }
+  c->precalc_analog(this);
 }
 /*--------------------------------------------------------------------------*/
 MOD_capacitor::ddouble MOD_capacitor::_b_ddt_1(ddouble t0)
@@ -2994,6 +3079,7 @@ public:
   void expand(const COMPONENT*)override;
   void precalc_last(const CARD_LIST*)override;
   void tr_eval_analog(MOD_capacitor*)const;
+  void precalc_analog(MOD_capacitor*)const;
   std::string name()const override {itested();return "capacitor";}
   static int  count() {return _count;}
 private: // strictly internal
@@ -3019,6 +3105,23 @@ private: // funcs
     return p.has_hard_value();
   }
 }; //COMMON_capacitor
+/*--------------------------------------------------------------------------*/
+class PRECALC_capacitor{
+  MOD_capacitor* _d{NULL};
+public:
+  typedef ddouble_<2> ddouble;
+  enum {
+    d_potential_b_ddt_2_,
+    d_potential_b_p_n,
+     num_branches__  };
+public:
+  explicit PRECALC_capacitor(MOD_capacitor*d) : _d(d) {}
+    ddouble _b_ddt_2(ddouble){
+    ddouble ret;
+    ret[d_potential_b_ddt_2_] = -1.;
+    return ret;
+}
+};
 /*--------------------------------------------------------------------------*/
 class MOD_capacitor : public BASE_SUBCKT {
 private:
@@ -3066,8 +3169,6 @@ private: // overrides
   void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }
   bool      do_tr() override;
   double tr_probe_num(std::string const&)const override;
-    //void    ac_begin();          //BASE_SUBCKT
-    //void    do_ac();             //BASE_SUBCKT
     //void    ac_load();           //BASE_SUBCKT
     //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing
   int max_nodes()const override {return 2;}
@@ -3313,6 +3414,7 @@ int COMMON_capacitor::_count = -1;
 static COMMON_capacitor Default_capacitor(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 double MOD_capacitor::tr_probe_num(std::string const& n) const
 {
   if(n == "conv") {
@@ -3462,6 +3564,49 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
               assert(t0[d_potential_b_ddt_2_] == t0[d_potential_b_ddt_2_]);
               assert(MOD::_st_b_p_n_::dep_potential_b_ddt_2_ < 3);
               d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_ddt_2_] += t0[d_potential_b_ddt_2_]; // (3)
+            }
+          }
+        }
+
+      }
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
+{
+  MOD_capacitor const* p = m;
+  assert(p);
+  (void)p;
+  COMMON_capacitor const* pc = this;
+  (void)pc;
+  PRECALC_capacitor P(m);
+  PRECALC_capacitor* d = &P;
+  (void)d;
+  {
+    { // 
+      {
+        std::string s0;
+        s0 = "ic";
+        // function analysis 1
+        ddouble t0;
+        t0 =  /*(312)*/ /*call1*/_f_analysis(s0);
+        t0 =  1. && t0;
+        if (t0) {
+          { // 
+            { // Contribution V(p, n) lin: 1
+              ddouble t0;
+              t0 = (_p___ic) /*rhspar*/;
+            }
+          }
+        }else {
+          { // 
+            { // Contribution I(p, n) lin: 0
+              ddouble t0;
+              t0 = 0.; // static?
+              t0 = (_p___c) /*rhspar*/ * t0;
+              // function ddt 1
+              t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_2(t0);
             }
           }
         }
@@ -3652,6 +3797,7 @@ void MOD_capacitor::precalc_last()
     subckt()->precalc_last();
   }else{untested();
   }
+  c->precalc_analog(this);
 }
 /*--------------------------------------------------------------------------*/
 MOD_capacitor::ddouble MOD_capacitor::_b_ddt_2(ddouble t0)
