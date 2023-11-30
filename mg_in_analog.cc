@@ -1070,7 +1070,19 @@ void Contribution::dump(std::ostream& o)const
 
   /// assert(_rhs);
   ::dump(o, _rhs);
-  o << ";\n";
+  o << ";";
+  if(options().dump_annotate()){
+    if(deps().size()){
+      o << " //";
+    }else{
+    }
+    for(const Dep& d : deps()) {
+      o << " dep: ";
+      o << d->code_name();
+    }
+  }else{
+  }
+  o << "\n";
 }
 /*--------------------------------------------------------------------------*/
 std::string Branch::name() const

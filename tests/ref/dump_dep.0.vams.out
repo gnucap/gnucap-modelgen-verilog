@@ -1,0 +1,16 @@
+module dep0(d, g);
+  inout d, g;
+  electrical d, g;
+  analog begin // always
+    real c;
+    real T;
+    c = T;
+    T = V(g);
+    I(d) <+ c;
+    I(g) <+ V(g); // dep: _potential_b_g_
+  end
+
+endmodule
+
+
+
