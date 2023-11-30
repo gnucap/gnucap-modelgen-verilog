@@ -127,17 +127,6 @@ public:
 
     return new Token_XDT(label(), cl);
   }
-  void make_cc_common(std::ostream& o)const override{
-    assert(num_args()!=size_t(-1));
-    o__ "class FILTER__" << _code_name << "{\n";
-    o__ "public:\n";
-    o____ "ddouble operator()(";
-    for(size_t n=0; n<num_args(); ++n){
-      o << "ddouble t" << n << ", ";
-    }
-    o << "COMPONENT*) const;\n";
-    o__ "} " << _code_name << ";\n";
-  }
   void make_cc_dev(std::ostream& o)const override{
     o__ "ddouble " << _code_name << "(";
       std::string comma;

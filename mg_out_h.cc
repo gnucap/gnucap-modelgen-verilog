@@ -459,8 +459,8 @@ static void make_module(std::ostream& o, const Module& m)
   o << "private: // node list\n";
   std::string comma = "";
   o << ind << "enum {";
-  size_t n = 1;
-  for (; n <= m.nodes().size(); ++n) {
+  int n = 1;
+  for (; n <= int(m.nodes().size()); ++n) {
     Node const* nn = m.nodes()[n];
     // TODO: node aliases, shorts etc.
     if(nn->number() == int(1+m.ports().size())){

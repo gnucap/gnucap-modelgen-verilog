@@ -2350,9 +2350,6 @@ public: // input parameters
   real _p___c /*  */;
   real _p___ic /*  */;
 private: // funcs
-  bool param_given(PARA_BASE const& p)const {
-    return p.has_hard_value();
-  }
   double _f_analysis(std::string const& what)const {
     if(what=="ic"){
       return _sim->analysis_is_tran_static();
@@ -2365,10 +2362,9 @@ private: // funcs
       return false;
     }
   }
-  class FILTER___b_ddt_1{
-  public:
-    ddouble operator()(ddouble t0, COMPONENT*) const;
-  } _b_ddt_1;
+  bool param_given(PARA_BASE const& p)const {
+    return p.has_hard_value();
+  }
 }; //COMMON_capacitor
 /*--------------------------------------------------------------------------*/
 class MOD_capacitor : public BASE_SUBCKT {
@@ -2386,10 +2382,10 @@ public: // netlist
   ELEMENT* _b_ddt_1_{NULL}; // filter
   ELEMENT* _b_p_n{NULL}; // branch
 private: // func decl
-//func 
-  // 
 //func analysis
   // analysis
+//func 
+  // 
 //filt ddt
   ddouble _b_ddt_1(ddouble t0);
 private: // construct
@@ -2998,9 +2994,6 @@ public: // input parameters
   PARAMETER<real> _p_ic /*  */;
   real _p___c /*  */, _p___ic /*  */;
 private: // funcs
-  bool param_given(PARA_BASE const& p)const {
-    return p.has_hard_value();
-  }
   double _f_analysis(std::string const& what)const {
     if(what=="ic"){
       return _sim->analysis_is_tran_static();
@@ -3013,10 +3006,9 @@ private: // funcs
       return false;
     }
   }
-  class FILTER___b_ddt_2{
-  public:
-    ddouble operator()(ddouble t0, COMPONENT*) const;
-  } _b_ddt_2;
+  bool param_given(PARA_BASE const& p)const {
+    return p.has_hard_value();
+  }
 }; //COMMON_capacitor
 /*--------------------------------------------------------------------------*/
 class MOD_capacitor : public BASE_SUBCKT {
@@ -3034,10 +3026,10 @@ public: // netlist
   ELEMENT* _b_ddt_2_{NULL}; // filter
   ELEMENT* _b_p_n{NULL}; // branch
 private: // func decl
-//func 
-  // 
 //func analysis
   // analysis
+//func 
+  // 
 //filt ddt
   ddouble _b_ddt_2(ddouble t0);
 private: // construct

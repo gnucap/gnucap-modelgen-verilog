@@ -260,40 +260,6 @@ void AnalogProceduralAssignment::parse(CS& f)
     }
   }else{
   }
-  return;
-
-  {
-
-#if 0
-    f >> _a;
-#else
-
-    Base* b = _a.owner()->lookup(what);
-    Variable* v = dynamic_cast<Variable*>(b);
-    if(!v){
-      f.reset(here);
-      trace1("not a variable", f.tail().substr(0,10));
-      throw Exception_No_Match("what's this: " + what);
-    }else if(f >> "=") {
-      assert(v->name() != "");
-      Variable const* cv=v;
-      trace4("got a variable", what, f.tail().substr(0,10), v->name(), cv->owner());
-      _a.set_lhs(v);
-      trace1("pA", f.tail().substr(0,10));
-      _a.parse_rhs(f);
-      f >> ";";
-
-      // if reachable?
-      if(_a.is_reachable()) {
-	v->update_deps(_a.deps());
-      }else{
-      }
-
-    }else{ untested();
-      throw Exception_CS_("need assign op", f);
-    }
-#endif
-  }
 }
 /*--------------------------------------------------------------------------*/
 void AnalogProceduralAssignment::dump(std::ostream& o)const
