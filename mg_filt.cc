@@ -120,9 +120,12 @@ public:
     Node* np = m.new_node(filter_code_name + "_p");
     cl->_p = np;
     Node* nn = m.new_node(filter_code_name + "_n"); // &mg_ground_node
+   // np->set_to(nn, "_short_"+code_name()+"()");
+    nn->set_to(np, "_short_b_"+filter_code_name+"()");
     cl->_n = nn;
     {
-      Branch* br = m.new_branch(np, &Node_Map::mg_ground_node);
+      // Branch* br = m.new_branch(np, &Node_Map::mg_ground_node);
+      Branch* br = m.new_branch(&Node_Map::mg_ground_node, nn);
       assert(br);
       assert(const_cast<Branch const*>(br)->owner());
       Branch_Ref prb(br);
@@ -159,6 +162,7 @@ public:
 	comma = ", ";
       }
     o << ");\n";
+    o__ "bool _short"+_code_name+"()const {return " << bool(_output) << ";}\n";
   }
   void make_cc_impl_comm(std::ostream&)const{ untested();
     unreachable();
@@ -203,26 +207,20 @@ public:
 
     if(_output){
       o__ "// subdevice\n";
-      o__ "t0.set_value(0.);\n";
+      o__ "t0 = 0.;\n";
     }else{
       o__ "d->" << cn << "->do_tr();\n";
       o__ "t0 = d->" << cn << "->tr_amps();\n";
       o__ "d->_potential" << cn << " = - t0;\n";
     }
-    o__ "trace2(\"filt\", t0, d->"<< cn<<"->tr_outvolts());\n";
+    o__ "trace2(\"filt\", t0, d->"<< cn <<"->tr_outvolts());\n";
 
     make_assign(o);
 
     if(_output){
-      // d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_ddt_1_p_ddt_1_n] += t0[d_potential_b_ddt_1_p_ddt_1_n]; // (3)
-      o__ "return t0; // (A)\n";
-      o__ "{\n";
-      o____ "double A = d->" << _output->state() << "["
-	  << "MOD::" << _output->state() <<"_::dep_potential" << _br->code_name() << "];\n";
-      o____ "return A*t0; // (A)\n";
-      o__ "}\n";
+      o__ "return t0; // (output)\n";
     }else{
-      o__ "return t0; // (B)\n";
+      o__ "return t0; // (node)\n";
     }
 
     o << "}\n"
@@ -236,7 +234,7 @@ public:
   Probe const* prb()const {return _prb;}
   void set_n_to_gnd()const {
     assert(_m);
-    _m->set_to_ground(_br->n());
+    _m->set_to_ground(_br->p());
   }
 private:
   Branch const* output()const;
@@ -348,7 +346,7 @@ void Token_XDT::stack_op(Expression* e)const
   int c_cnt = 0;
   bool assigned = false;
   bool always = false;
-  Contribution const* cont;
+  Contribution const* cont=NULL;
   for(auto b : branch()->used_in()) {
     if(auto c = dynamic_cast<Contribution const*>(b)){
       if(c->is_flow_contrib()) {
@@ -368,17 +366,17 @@ void Token_XDT::stack_op(Expression* e)const
     }
   }
   func->_output = NULL;
-  if(assigned==1){
-  }else if(!always){
-  }else if(c_cnt==1){
+  if(c_cnt!=1){
+  }else if(assigned){
+  }else if(cont->has_sensitivities()) { itested();
+  }else if(always){
     for(auto d : cont->deps()){
-      trace2("xdt cont", cont->branch()->code_name(), branch()->code_name());
-      trace2("xdt cont", d.is_linear(), d->branch() == branch());
       if(d->branch() != branch()){untested();
       }else if(d.is_linear()){
-    //  // TODO if voltage probe?
-    incomplete();
+	// incomplete();
 	func->_output = cont->branch(); // polarity?
+      }
+      if(cont->reversed()){
       }else{
       }
     }

@@ -119,6 +119,8 @@ void Deps::update(Deps const& other)
   for(auto& i : other){
     insert(i);
   }
+  trace1("update", other.sensitivities().empty());
+  _sens.merge(other.sensitivities());
 }
 /*--------------------------------------------------------------------------*/
 Deps::~Deps()

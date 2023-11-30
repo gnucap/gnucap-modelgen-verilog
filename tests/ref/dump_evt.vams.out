@@ -21,14 +21,15 @@ module device(p, n);
   inout p, n;
   real   r;
 
-  analog begin
-    @(initial_step)
-      r = 3;
+  analog begin // always
+    @(initial_step) begin
+      r = 3; // s
+    end
   end
 
-  analog begin
-    @(initial_step)     begin
-      r = 2;
+  analog begin // always
+    @(initial_step) begin
+      r = 2; // s
     end
   end
 

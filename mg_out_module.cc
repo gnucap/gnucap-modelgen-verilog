@@ -605,10 +605,15 @@ static void make_module_allocate_local_node(std::ostream& o, const Node& p)
       "    //BUG// this assert fails on a repeat elaboration after a change.\n"
       "    //not sure of consequences when new_model_node called twice.\n"
       "    if (!(_n[n_" << p.name() << "].n_())) {\n";
-//      "      if (" << p.short_if() << ") {\n"
-//      "        _n[n_" << p.name() << "] = _n[n_" << p.short_to() << "];\n"
-//      "      }else:
-    o____ "{\n";
+    if(p.short_to()){
+      assert(!p.short_if().empty());
+      o____ "if (" << p.short_if() << ") {\n";
+      o______ "_n[n_" << p.name() << "] = _n[n_" << p.short_to()->name() << "];\n";
+      o____ "}else";
+    }else{
+      o____ "";
+    }
+    o << "{\n";
     o______ "_n[n_" << p.name() << "].new_model_node(\".\" + long_label() + \"." << p.name() 
 			   << "\", this);\n";
     o______ "}\n";

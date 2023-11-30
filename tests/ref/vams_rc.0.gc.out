@@ -40,5 +40,5 @@ dut.c1 tie break: 6 vs. 5
 Gnucap   System status
 iterations: op=0, dc=3, tran=92, fourier=0, total=131
 transient timesteps: accepted=27, rejected=4, total=31
-nodes: user=2, subckt=0, model=1, total=3
-dctran density=77.8%, ac density=77.8%
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%

@@ -1,0 +1,21 @@
+module dep6(d, g);
+  inout d, g;
+  electrical d, g;
+  analog begin // always
+    real c;
+    @(initial_step) begin
+      c = 1.; // s
+    end
+    @(initial_step) begin
+      c = 2.; // s
+    end
+    real T, S, U;
+    T = c; // s
+    S = (T * T); // s
+    U = exp(c); // s
+  end
+
+endmodule
+
+
+

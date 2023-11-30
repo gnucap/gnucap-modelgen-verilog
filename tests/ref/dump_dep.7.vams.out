@@ -1,0 +1,22 @@
+module dep7(d, g);
+  inout d, g;
+  electrical d, g;
+  parameter real p = 0.;
+
+  real   T;
+
+  analog begin // always
+    real c;
+    @(initial_step) begin
+      if ((! $param_given(p))) begin
+        c = 1.; // s
+      end
+    end
+    T = c; // s
+    I(d, g) <+ c; // s
+  end
+
+endmodule
+
+
+

@@ -2449,6 +2449,7 @@ private: // func decl
   // analysis
 //filt ddt_1
   ddouble _b_ddt_1(ddouble t0);
+  bool _short_b_ddt_1()const {return 1;}
 //func param_given
   // param_given
 private: // construct
@@ -2505,10 +2506,9 @@ public: // states, _b_p_n;
 private: // node list
   enum {
     n_p /* used: 1 */,
-    n_n /* used: 1 */
-    /* ---- */,
-    n_ddt_1_p /* used: 1 */,
-    n_ddt_1_n /* used: 0 */
+    n_n /* used: 1 */,
+    n_ddt_1_p /* used: 0 */,
+    n_ddt_1_n /* used: 1 */
   };
 private: // probe values
   double _potential_b_ddt_1_p_ddt_1_n;
@@ -2945,25 +2945,27 @@ void MOD_capacitor::expand()
       // local nodes
   // port p 1
   // port n 2
-  // internal ddt_1_p : 3
-  // node ddt_1_p 3
-    //assert(!(_n[n_ddt_1_p].n_()));
+  // ground
+  _n[n_ddt_1_p].set_to_ground(this);
+  // internal ddt_1_n : 4
+  // node ddt_1_n 4
+    //assert(!(_n[n_ddt_1_n].n_()));
     //BUG// this assert fails on a repeat elaboration after a change.
     //not sure of consequences when new_model_node called twice.
-    if (!(_n[n_ddt_1_p].n_())) {
-    {
-      _n[n_ddt_1_p].new_model_node("." + long_label() + ".ddt_1_p", this);
+    if (!(_n[n_ddt_1_n].n_())) {
+    if (_short_b_ddt_1()) {
+      _n[n_ddt_1_n] = _n[n_ddt_1_p];
+    }else{
+      _n[n_ddt_1_n].new_model_node("." + long_label() + ".ddt_1_n", this);
       }
     }else{
     {
-       //_n[n_ddt_1_p].new_model_node("ddt_1_p." + long_label(), this);
+       //_n[n_ddt_1_n].new_model_node("ddt_1_n." + long_label(), this);
     }
   }
-  // ground
-  _n[n_ddt_1_n].set_to_ground(this);
 
   // clone branches
-  // filter (ddt_1_p, )
+  // filter (, ddt_1_n)
   {
   if (!_b_ddt_1_p_ddt_1_n) {
     const CARD* p = device_dispatcher["va_ddt"]; // va_ddt
@@ -3003,7 +3005,7 @@ void MOD_capacitor::expand()
     }else{
     }
       {
-        node_t nodes[] = {_n[n_p], _n[n_n], _n[n_ddt_1_p], gnd}; // nodes
+        node_t nodes[] = {_n[n_p], _n[n_n], gnd, _n[n_ddt_1_n]}; // nodes
         _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/3, _st_b_p_n, 4, nodes);
       }
     }
@@ -3053,15 +3055,11 @@ MOD_capacitor::ddouble MOD_capacitor::_b_ddt_1(ddouble t0)
     // assert(!d->_st_b_ddt_1_p_ddt_1_n[2]);
     d->_st_b_ddt_1_p_ddt_1_n[MOD::_st_b_ddt_1_p_ddt_1_n_::dep_potential_b_p_n]  = + t0[d_potential_b_p_n]; // (4)
   // subdevice
-  t0.set_value(0.);
+  t0 = 0.;
   trace2("filt", t0, d->_b_ddt_1_p_ddt_1_n->tr_outvolts());
   t0[d_potential_b_ddt_1_p_ddt_1_n] = -1.;
   assert(t0 == t0);
-  return t0; // (A)
-  {
-    double A = d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_ddt_1_p_ddt_1_n];
-    return A*t0; // (A)
-  }
+  return t0; // (output)
 }
 /*--------------------------------------------------------------------------*/
 }
@@ -3155,6 +3153,7 @@ private: // func decl
   // analysis
 //filt ddt_2
   ddouble _b_ddt_2(ddouble t0);
+  bool _short_b_ddt_2()const {return 0;}
 //func param_given
   // param_given
 private: // construct
@@ -3212,10 +3211,9 @@ public: // states, _b_p_n;
 private: // node list
   enum {
     n_p /* used: 1 */,
-    n_n /* used: 1 */
-    /* ---- */,
-    n_ddt_2_p /* used: 1 */,
-    n_ddt_2_n /* used: 0 */
+    n_n /* used: 1 */,
+    n_ddt_2_p /* used: 0 */,
+    n_ddt_2_n /* used: 1 */
   };
 private: // probe values
   double _potential_b_ddt_2_p_ddt_2_n;
@@ -3723,25 +3721,27 @@ void MOD_capacitor::expand()
       // local nodes
   // port p 1
   // port n 2
-  // internal ddt_2_p : 3
-  // node ddt_2_p 3
-    //assert(!(_n[n_ddt_2_p].n_()));
+  // ground
+  _n[n_ddt_2_p].set_to_ground(this);
+  // internal ddt_2_n : 4
+  // node ddt_2_n 4
+    //assert(!(_n[n_ddt_2_n].n_()));
     //BUG// this assert fails on a repeat elaboration after a change.
     //not sure of consequences when new_model_node called twice.
-    if (!(_n[n_ddt_2_p].n_())) {
-    {
-      _n[n_ddt_2_p].new_model_node("." + long_label() + ".ddt_2_p", this);
+    if (!(_n[n_ddt_2_n].n_())) {
+    if (_short_b_ddt_2()) {
+      _n[n_ddt_2_n] = _n[n_ddt_2_p];
+    }else{
+      _n[n_ddt_2_n].new_model_node("." + long_label() + ".ddt_2_n", this);
       }
     }else{
     {
-       //_n[n_ddt_2_p].new_model_node("ddt_2_p." + long_label(), this);
+       //_n[n_ddt_2_n].new_model_node("ddt_2_n." + long_label(), this);
     }
   }
-  // ground
-  _n[n_ddt_2_n].set_to_ground(this);
 
   // clone branches
-  // filter (ddt_2_p, )
+  // filter (, ddt_2_n)
   {
   if (!_b_ddt_2_p_ddt_2_n) {
     const CARD* p = device_dispatcher["va_ddt"]; // va_ddt
@@ -3758,7 +3758,7 @@ void MOD_capacitor::expand()
   }else{
   }
     {
-      node_t nodes[] = {_n[n_ddt_2_p], gnd, _n[n_p], _n[n_n]}; // nodes
+      node_t nodes[] = {gnd, _n[n_ddt_2_n], _n[n_p], _n[n_n]}; // nodes
       _b_ddt_2_p_ddt_2_n->set_parameters("_b_ddt_2_p_ddt_2_n", this, _b_ddt_2_p_ddt_2_n->mutable_common(), 0., /*states:*/3, _st_b_ddt_2_p_ddt_2_n, 4, nodes);
       }
   }
@@ -3779,7 +3779,7 @@ void MOD_capacitor::expand()
     }else{
     }
       {
-        node_t nodes[] = {_n[n_p], _n[n_n], _n[n_ddt_2_p], gnd}; // nodes
+        node_t nodes[] = {_n[n_p], _n[n_n], gnd, _n[n_ddt_2_n]}; // nodes
         _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/3, _st_b_p_n, 4, nodes);
       }
     }
@@ -3834,7 +3834,7 @@ MOD_capacitor::ddouble MOD_capacitor::_b_ddt_2(ddouble t0)
   trace2("filt", t0, d->_b_ddt_2_p_ddt_2_n->tr_outvolts());
   t0[d_potential_b_ddt_2_p_ddt_2_n] = -1.;
   assert(t0 == t0);
-  return t0; // (B)
+  return t0; // (node)
 }
 /*--------------------------------------------------------------------------*/
 }

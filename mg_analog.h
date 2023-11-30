@@ -24,6 +24,11 @@
 /*--------------------------------------------------------------------------*/
 #include "mg_.h"
 /*--------------------------------------------------------------------------*/
+class AnalogStmt : public Base {
+public:
+  virtual bool update() = 0;
+};
+/*--------------------------------------------------------------------------*/
 class AnalogExpression : public Owned_Base {
 protected:
   Expression_ _exp;
@@ -70,12 +75,14 @@ public:
   size_t size()const {
     return _block.size();
   }
+public: // sensitivities?
   void set_never() { _block.set_never(); }
   void set_always() { _block.set_always(); }
   bool is_never()const {return _block.is_never() ;}
   bool is_reachable()const {return _block.is_reachable() ;}
   bool is_always()const {return _block.is_always() ;}
   bool update()override;
+  void set_sens(Base const* s) {_block.set_sens(s);}
 };
 /*--------------------------------------------------------------------------*/
 class AnalogCtrlBlock : public AnalogSeqBlock {
@@ -89,8 +96,8 @@ public:
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
   operator bool()const{ return size() || identifier() !=""; }
-  void set_owner(Block* owner) { _block.set_owner_raw(owner); }
-};
+  void set_owner(Block* owner);
+}; // AnalogCtrlBlock
 /*--------------------------------------------------------------------------*/
 class CaseGen : public Base{
   AnalogConstExpressionList* _cond{NULL};
@@ -140,6 +147,20 @@ public:
   void dump(std::ostream&)const override;
 private:
   bool update()override {return _body.update();}
+};
+/*--------------------------------------------------------------------------*/
+class AnalogEvtCtlStmt : public AnalogCtrlStmt {
+  AnalogEvtExpression _ctrl;
+public:
+  ~AnalogEvtCtlStmt() { }
+  void set_owner(Block* o) {_ctrl.set_owner(o);}
+//  Block const* owner()const {return _ctrl.owner();}
+  void parse(CS&)override;
+  void dump(std::ostream&)const override;
+  Expression const& cond()const{ return _ctrl.expression(); }
+  const AnalogCtrlBlock& code() const{ return _body; }
+protected:
+  Block* owner() {return _ctrl.owner();}
 };
 /*--------------------------------------------------------------------------*/
 class AnalogSwitchStmt : public AnalogCtrlStmt {
@@ -252,6 +273,7 @@ class Contribution : public AnalogStmt {
   bool _short{false};
   Block* _owner{NULL};
   Deps* _deps{NULL};
+  Sensitivities _sens;
 private:
   void set_pot_contrib();
   void set_flow_contrib();
@@ -272,6 +294,7 @@ private:
   Block const* owner()const {return _owner;}
 public:
 
+  bool has_sensitivities()const { return !_sens.empty(); }
   bool is_pot_contrib() const;
   bool is_flow_contrib() const;
   bool is_short() const { return _short; }

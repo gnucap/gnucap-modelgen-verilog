@@ -951,7 +951,7 @@ void Variable_Decl::clear_deps()
 /*--------------------------------------------------------------------------*/
 bool Variable_Decl::propagate_deps(Deps const& d)
 {
-  trace3("Variable_Decl::propagate_deps", name(), deps().size(), d.size());
+  trace4("Variable_Decl::propagate_deps", name(), deps().size(), d.size(), d.has_sensitivities());
   assert(&deps() != &d);
   deps().update(d);
   assert(deps().size() >= d.size());
@@ -976,6 +976,7 @@ bool is_zero(Expression const& x)
   return e == 0.;
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 Attrib const& Expression_::attrib() const
 {
   static Attrib no_attrib;
@@ -987,6 +988,7 @@ Attrib const& Expression_::attrib() const
     return no_attrib;
   }
 }
+#endif
 /*--------------------------------------------------------------------------*/
 Deps const& Expression_::deps() const
 {
@@ -995,8 +997,8 @@ Deps const& Expression_::deps() const
     return no_deps;
   }else if(auto d = dynamic_cast<Deps const*>(back()->data())){
     return *d;
-  }else if(auto d = dynamic_cast<Attrib const*>(back()->data())){ untested();
-    return d->deps();
+//  }else if(auto d = dynamic_cast<Attrib const*>(back()->data())){ untested();
+//    return d->deps();
   }else{
     return no_deps;
   }

@@ -24,9 +24,10 @@
 #ifndef MG_DEPS_H
 #define MG_DEPS_H
 #include <m_base.h>
+#include "mg_lib.h"
 /*--------------------------------------------------------------------------*/
 class Probe;
-class Dep {
+class Dep /*Dynamic_Dep, DDep?*/{
 public: // types
   typedef enum {
     _NONE = 0,
@@ -57,16 +58,34 @@ public:
   operator Probe const*() const{ return _prb; }
 };
 /*--------------------------------------------------------------------------*/
+class Sensitivities {
+  pSet<Base const> _s;
+public:
+  Sensitivities(Sensitivities const& o) : _s(o._s) {}
+  explicit Sensitivities(){}
+  ~Sensitivities(){}
+public:
+  void add(Base const* x) { _s.insert(x); }
+  void merge(Sensitivities const& s) { _s.merge(s._s); }
+  bool empty()const {return !_s.size();}
+};
+/*--------------------------------------------------------------------------*/
 class Deps : public Base {
-  typedef std::vector<Dep> S;
-  typedef S::const_iterator const_iterator;
-  /* mutable */ S _s;
-  bool _offset{false};
+  typedef std::vector<Dep> D;
+  typedef D::const_iterator const_iterator; // BUG
+  /* mutable */ D _s; // dynamic_deps?
+  Sensitivities _sens; // sensitivities
+  // V _sens; // discrete_deps?
+  // R _range; // discrete_deps?
+  bool _offset{false}; // -> dynamic_deps.
+  bool _constant{false};
 public:
   static Deps _no_deps;
 public:
   explicit Deps() : Base() {}
-  explicit Deps(Deps const& o) : Base(), _s(o._s), _offset(o._offset) { }
+  explicit Deps(Deps const& o) : Base(), _s(o._s),
+    _sens(o._sens),
+    _offset(o._offset), _constant(o._constant) { }
   ~Deps();
   Deps* clone()const {
     return new Deps(*this);
@@ -80,7 +99,9 @@ public:
     _s.clear();
   }
   void set_offset(bool v = true){_offset = v;}
+  void set_constant(bool v = true){_constant = v;} // attrib/sens?
   bool is_offset() const {return _offset;}
+  bool is_constant() const {return _constant;}
   bool is_linear() const;
   bool is_quadratic() const;
   void set_any() {
@@ -88,6 +109,12 @@ public:
       d.set_any();
     }
   }
+public: // sens
+  void add_sens(Sensitivities const& s){
+    _sens.merge(s);
+  }
+  bool has_sensitivities()const {return !_sens.empty(); }
+  Sensitivities const& sensitivities()const {return _sens; }
 private:
   void parse(CS&)override {unreachable();}
   void dump(std::ostream&)const override {unreachable();}
@@ -148,6 +175,8 @@ private:
   void dump(std::ostream&)const override {unreachable();}
 };
 /*--------------------------------------------------------------------------*/
+#if 0
+// merge into Deps?
 class Attrib : public Base {
   Deps const* _deps{NULL};
   Range const* _range{NULL};
@@ -217,6 +246,7 @@ public:
   Base* r_divide(const String*)const override   {unreachable(); return NULL;}	
   Base* modulo(const String*)const override     {unreachable(); return NULL;}	
 };
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

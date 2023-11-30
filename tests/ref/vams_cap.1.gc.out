@@ -34,5 +34,5 @@ load ../lang_verilog.so
 Gnucap   System status
 iterations: op=0, dc=4, tran=99, fourier=0, total=133
 transient timesteps: accepted=22, rejected=3, total=25
-nodes: user=3, subckt=0, model=1, total=4
-dctran density=75.0%, ac density=75.0%
+nodes: user=3, subckt=0, model=0, total=3
+dctran density=77.8%, ac density=77.8%

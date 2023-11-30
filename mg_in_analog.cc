@@ -221,7 +221,7 @@ void Assignment::parse(CS& f)
     if(!is_reachable()) {
     }else{
       assert(!_deps);
-      propagate_deps(deps());
+      propagate_deps(deps()); // sens?
     }
 
   }else{ untested();
@@ -255,13 +255,12 @@ void AnalogProceduralAssignment::parse(CS& f)
   }
 }
 /*--------------------------------------------------------------------------*/
-void AnalogProceduralAssignment::dump(std::ostream& o)const
+template<class A>
+void dump_annotate(std::ostream& o, A const& _a)
 {
-  o__ "";
-  _a.dump(o);
-  o << ";";
-  if(options().dump_annotate()){
     if(_a.deps().size()){
+      o << " //";
+    }else if(_a.has_sensitivities()){
       o << " //";
     }else{
     }
@@ -269,6 +268,19 @@ void AnalogProceduralAssignment::dump(std::ostream& o)const
       o << " dep: ";
       o << d->code_name();
     }
+    if(_a.has_sensitivities()){
+      o << " s";
+    }else{
+    }
+}
+/*--------------------------------------------------------------------------*/
+void AnalogProceduralAssignment::dump(std::ostream& o)const
+{
+  o__ "";
+  _a.dump(o);
+  o << ";";
+  if(options().dump_annotate()){
+    dump_annotate(o, _a);
   }else{
   }
   o << "\n";
@@ -353,9 +365,8 @@ void AnalogConditionalStmt::parse(CS& file)
   _false_part.set_owner(owner());
 
   assert(_cond.owner() == owner());
-
   file >> "(" >> _cond >> ")";
-  // set reachabilities here!
+
   if(file >> ";"){
   }else{
 
@@ -377,11 +388,8 @@ void AnalogConditionalStmt::parse(CS& file)
     }else{
     }
 
-    trace1("pp0", _body.is_always());
     file >> _body;
-    trace3("pp1", _body.is_always(), _cond.is_true(), owner()->is_always());
     if(file >> "else "){
-      trace1("got else branch", file.tail().substr(0, 1));
       file >> _false_part;
     }else{
     }
@@ -783,6 +791,18 @@ void AnalogSeqBlock::parse(CS& f)
   }
 }
 /*--------------------------------------------------------------------------*/
+void AnalogCtrlBlock::set_owner(Block* owner)
+{
+  if(auto x = dynamic_cast<SeqBlock const*>(owner)) {
+    if(x->has_sensitivities()){
+      _block.merge_sens(*x->sensitivities());
+    }else{
+    }
+  }else{
+  }
+  _block.set_owner_raw(owner);
+}
+/*--------------------------------------------------------------------------*/
 void AnalogCtrlBlock::parse(CS& f)
 {
   if(dynamic_cast<Module const*>(_block.owner())) {
@@ -1103,6 +1123,7 @@ bool Contribution::update()
       add_dep(d);
     }
   }
+  _sens.merge(_deps->sensitivities());
 
   return ret || (_deps->size() != D->size());
 }
@@ -1149,14 +1170,7 @@ void Contribution::dump(std::ostream& o)const
   ::dump(o, _rhs);
   o << ";";
   if(options().dump_annotate()){
-    if(deps().size()){
-      o << " //";
-    }else{
-    }
-    for(const Dep& d : deps()) {
-      o << " dep: ";
-      o << d->code_name();
-    }
+    dump_annotate(o, *this);
   }else{
   }
   o << "\n";
@@ -1258,16 +1272,25 @@ bool AnalogExpression::is_false() const
 /*--------------------------------------------------------------------------*/
 void AnalogEvtCtlStmt::parse(CS& file)
 {
-  file >> _ctl;
+  file >> _ctrl;
   assert(owner());
   // _stmt.set_owner(owner);
   // f >> _stmt;
+  // HERE
+#if 0
   _stmt = parse_analog_stmt(file, owner());
+#else
+  _body.set_owner(owner());
+  _body.set_sens(this);
+  file >> _body;
+#endif
 }
 /*--------------------------------------------------------------------------*/
 void AnalogEvtCtlStmt::dump(std::ostream& o) const
 {
-  o__ "@" << _ctl;
+  o__ "@" << _ctrl;
+  AnalogCtrlStmt::dump(o);
+#if 0
   if(dynamic_cast<AnalogSeqBlock const*>(_stmt)){
     o << " " << *_stmt;
   }else if(_stmt){
@@ -1283,6 +1306,7 @@ void AnalogEvtCtlStmt::dump(std::ostream& o) const
   }else{ untested();
     o << ";";
   }
+#endif
 }
 /*--------------------------------------------------------------------------*/
 // void Variable_Decl::parse(CS& f)
@@ -1569,6 +1593,15 @@ bool Assignment::propagate_deps(Deps const& d)
   _deps->update(d);
   assert(ii <= _deps->size());
   bool ret = false;
+
+  if(auto x = dynamic_cast<SeqBlock const*>(owner())) {
+    if(x->has_sensitivities()) {
+      _deps->add_sens(*x->sensitivities());
+    }else{
+    }
+  }else{
+  }
+
   if(owner()->is_reachable()){
     for(; ii < _deps->size(); ++ii) {
       ret = true;
@@ -1706,5 +1739,6 @@ bool AnalogRealDecl::update()
   }
   return false;
 }
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

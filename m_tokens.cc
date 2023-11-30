@@ -787,19 +787,14 @@ size_t Token_VAR_REF::num_deps() const
 void Token_VAR_REF::stack_op(Expression* e)const
 {
   assert(_item);
-  double ev = _item->eval();
-  if(0&&ev!=NOT_INPUT) { untested();
-    Float* f = new Float(ev);
-    e->push_back(new Token_CONSTANT(name(), f, ""));
-  }else{
-    auto deps = _item->deps().clone();
-    trace4("var::stack_op", name(), _item->deps().size(), _item->name(), _item);
-    assert(deps->size() == _item->deps().size());
-    auto nn = new Token_VAR_REF(*this, deps);
-    assert(nn->num_deps() == deps->size());
-    e->push_back(nn);
-    assert(nn->_item == _item);
-  }
+//  double ev = _item->eval();
+  auto deps = _item->deps().clone();
+  trace4("var::stack_op", name(), _item->deps().size(), _item->name(), _item);
+  assert(deps->size() == _item->deps().size());
+  auto nn = new Token_VAR_REF(*this, deps);
+  assert(nn->num_deps() == deps->size());
+  e->push_back(nn);
+  assert(nn->_item == _item);
 }
 /*--------------------------------------------------------------------------*/
 Deps* Token_PARLIST_::new_deps()const

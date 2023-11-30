@@ -24,9 +24,9 @@
 #include <ap.h>
 #include <m_base.h>
 #include "mg_expression.h"
-#include <set>
 #include "mg_deps.h" // BUG, Deps
 #include "mg_func.h" // BUG, Probe
+// #include "mg_lib.h"
 /*--------------------------------------------------------------------------*/
 #ifdef PASS_TRACE_TAGS
 #define make_tag() (out << "//" << __func__ << ":" << __LINE__ << "\n")
@@ -119,32 +119,6 @@ public:
 class Raw_String_Arg : public String_Arg {
 public:
   void parse(CS& f)override;
-};
-/*--------------------------------------------------------------------------*/
-template<class T>
-struct ptrCmp {
-  bool operator()( T const* a, T const* b ) const {
-    assert(a);
-    assert(b);
-    assert(a->key().size());
-    assert(b->key().size());
-    assert(a==b || (a->key() != b->key()));
-    return a->key() < b->key();
-  }
-};
-/*--------------------------------------------------------------------------*/
-template<class T>
-class pSet {
-  typedef std::set<T*, ptrCmp<T>> set;
-  set _s;
-public:
-  typedef typename set::iterator iterator;
-  typedef typename set::const_iterator const_iterator;
-public:
-  explicit pSet(){}
-  const_iterator begin()const { return _s.begin(); }
-  const_iterator end()const { return _s.end(); }
-  std::pair<iterator, bool> insert(T* t) { return _s.insert(t); }
 };
 /*--------------------------------------------------------------------------*/
 /* A "Collection" differs from a "LiSt" in how it is parsed.
@@ -427,7 +401,7 @@ public:
   void clear();
   Expression_* clone() const;
   Deps const& deps()const;
-  Attrib const& attrib()const;
+  // Attrib const& attrib()const;
   bool update();
 //  Deps& deps();
 //  Deps const& deps()const { return _deps; }
@@ -721,7 +695,7 @@ public:
 class Branch;
 class Branch_Ref : public Owned_Base {
   Branch* _br{NULL};
-  bool _r;
+  bool _r{false};
   std::string const* _name{NULL};
 public:
   Branch_Ref(Branch_Ref&& b);
@@ -1039,9 +1013,13 @@ public:
   void push_back(Base* x);
 };
 /*--------------------------------------------------------------------------*/
+class Sensitivities;
 class SeqBlock : public Block {
   String_Arg _identifier;
+  Sensitivities* _sens{NULL};
 public:
+  explicit SeqBlock() : Block() {}
+  ~SeqBlock();
   void parse(CS&)override{incomplete();}
   void dump(std::ostream& o)const override;
   void parse_identifier(CS& f) { f >> _identifier; }
@@ -1063,17 +1041,16 @@ public:
     return owner()->branch(n);
   }
   String_Arg const& identifier() const{ return _identifier; }
-};
+  bool has_sensitivities()const {return _sens;}
+  Sensitivities const* sensitivities()const {return _sens;}
+  void set_sens(Base const* s);
+  void merge_sens(Sensitivities const& s);
+}; // SeqBlock
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // analog_procedural_block analog_statement?
-class AnalogStmt : public Base {
-public:
-  virtual bool update() = 0;
-};
-/*--------------------------------------------------------------------------*/
 class AnalogConstruct : public Owned_Base {
-  Base* _stmt{NULL};
+  Base* _stmt{NULL}; // is a ControlBlock
 public:
   ~AnalogConstruct(){
     delete _stmt;
@@ -2014,13 +1991,14 @@ public:
   void parse_rhs(CS& cmd);
   double eval()const override;
   Block* owner(){ return Variable::owner();}
+  bool has_sensitivities()const {return deps().has_sensitivities();}
 //  Deps& deps()override { return _rhs.deps(); }
 }; // Assignment
 /*--------------------------------------------------------------------------*/
 class Node : public Base {
   std::string _name;
   int _number{-1};
-  std::string _short_to;
+  Node const* _short_to{NULL};
   std::string _short_if;
   Discipline const* _discipline{NULL};
   Nature const* _nature{NULL};
@@ -2039,12 +2017,17 @@ public:
   const std::string& name()const	{return _name;}
   std::string code_name()const	{return "n_" + _name;}
   int number()const	{return _number;}
-//  const std::string& short_to()const 	{return _short_to;}
-//  const std::string& short_if()const 	{return _short_if;}
-  void set_discipline(Discipline const* d){ _discipline = d; }
+  Node const* short_to()const {return _short_to;}
+  std::string const& short_if()const {return _short_if;}
+  void set_discipline(Discipline const* d) {_discipline = d;}
 
   void set_to_ground(Module*);
   void set_to(Node*);
+  void set_to(Node const* n, std::string condition) {
+    assert(!_short_to);
+    _short_to = n;
+    _short_if = condition;
+  }
 
   Discipline const* discipline() const{  return _discipline; }
   Nature const* nature() const{ return _nature; }
@@ -2194,19 +2177,7 @@ public:
   void parse(CS&)override;
   void dump(std::ostream&)const override;
   Expression const& expression() const{assert(_expression); return *_expression;};
-};
-/*--------------------------------------------------------------------------*/
-class AnalogEvtCtlStmt : public Owned_Base {
-  AnalogEvtExpression _ctl;
-  Base* _stmt{NULL};
-public:
-  ~AnalogEvtCtlStmt() {
-    delete _stmt;
-  }
-  void parse(CS&)override;
-  void dump(std::ostream&)const override;
-  Base const* stmt_or_null() const{ return _stmt; }
-  Expression const& cond() const{ return _ctl.expression(); }
+  Block* owner() {return Owned_Base::owner();}
 };
 /*--------------------------------------------------------------------------*/
 template <class T, char BEGIN, char SEP, char END, char END2, char END3>

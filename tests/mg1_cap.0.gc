@@ -14,7 +14,7 @@ V1 p n sin freq=1 amplitude={ampl} dc=dc
 `modelgen
 module test_cap0(p, n);
   electrical p, n;
-parameter real c=1;
+  parameter real c=1;
   analog begin
     I(p,n) <+ ddt(c*V(p,n));
   end

@@ -374,10 +374,9 @@ void OUT_ANALOG::make_evt(std::ostream& o, AnalogEvtCtlStmt const& s) const
     indent x;
     make_cc_event_cond(o, s.cond());
     o__ "if (evt) {\n";
-    if(s.stmt_or_null()) {
+    {
       indent y;
-      make_stmt(o, *s.stmt_or_null());
-    }else{
+      make_stmt(o, s.code());
     }
     o__ "}else{\n";
     o__ "}\n";

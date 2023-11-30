@@ -1224,4 +1224,28 @@ Node::~Node()
   // assert(!is_used()); incomplete.
 }
 /*--------------------------------------------------------------------------*/
+void SeqBlock::merge_sens(Sensitivities const& s)
+{
+  if(_sens){
+  }else{
+    _sens = new Sensitivities;
+  }
+  _sens->merge(s);
+}
+/*--------------------------------------------------------------------------*/
+void SeqBlock::set_sens(Base const* s)
+{
+  if(_sens){
+  }else{
+    _sens = new Sensitivities;
+  }
+  _sens->add(s);
+}
+/*--------------------------------------------------------------------------*/
+SeqBlock::~SeqBlock()
+{
+  delete _sens;
+  _sens = NULL;
+}
+/*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet
