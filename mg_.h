@@ -121,6 +121,32 @@ public:
   void parse(CS& f)override;
 };
 /*--------------------------------------------------------------------------*/
+template<class T>
+struct ptrCmp {
+  bool operator()( T const* a, T const* b ) const {
+    assert(a);
+    assert(b);
+    assert(a->key().size());
+    assert(b->key().size());
+    assert(a==b || (a->key() != b->key()));
+    return a->key() < b->key();
+  }
+};
+/*--------------------------------------------------------------------------*/
+template<class T>
+class pSet {
+  typedef std::set<T*, ptrCmp<T>> set;
+  set _s;
+public:
+  typedef typename set::iterator iterator;
+  typedef typename set::const_iterator const_iterator;
+public:
+  explicit pSet(){}
+  const_iterator begin()const { return _s.begin(); }
+  const_iterator end()const { return _s.end(); }
+  std::pair<iterator, bool> insert(T* t) { return _s.insert(t); }
+};
+/*--------------------------------------------------------------------------*/
 /* A "Collection" differs from a "LiSt" in how it is parsed.
  * Each parse of a "Collection" creates one more object and stores
  * it in the Collection.  The size of the Collection therefore grows by 1.
@@ -1755,7 +1781,7 @@ protected:
 private: // merge?
   Filter_List _filters;
   std::list<FUNCTION_ const*> _func;
-  std::set<FUNCTION_ const*> _funcs; // TODO: order?
+  pSet<FUNCTION_ const> _funcs;
   size_t _num_evt_slots{0};
   size_t _num_filters{0};
   bool _has_analysis{false};
@@ -1823,7 +1849,7 @@ public:
   }
   void install(FUNCTION_ const* f);
   std::list<FUNCTION_ const*> const& func()const {return _func;}
-  std::set<FUNCTION_ const*> const& funcs()const {return _funcs;}
+  pSet<FUNCTION_ const> const& funcs()const {return _funcs;}
 private: // misc
   CS& parse_analog(CS& cmd);
 public: // for now.

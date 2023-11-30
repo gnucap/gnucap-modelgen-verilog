@@ -82,6 +82,7 @@ public: // HACK
   Branch* _br{NULL};
 protected:
   explicit XDT() : MGVAMS_FILTER() {
+    set_label("XDT");
   }
   explicit XDT(XDT const& p) : MGVAMS_FILTER(p) {
   }
@@ -104,7 +105,7 @@ public:
 
     XDT* cl = clone();
     {
-      cl->set_label(label()); // "_b_" + filter_code_name);
+      cl->set_label(filter_code_name); // label()); // "_b_" + filter_code_name);
       cl->set_code_name("_b_" + filter_code_name);
       assert(na<3);
       cl->set_num_args(na);

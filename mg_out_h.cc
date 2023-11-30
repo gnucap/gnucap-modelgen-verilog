@@ -35,7 +35,7 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
   for(auto x : m.branches()){
     assert(x);
     Branch const* b = x;
-    if(b->is_short()){ untested();
+    if(b->is_short()){
       // !has_element?
     }else{
       if(b->has_flow_probe()){
@@ -72,7 +72,7 @@ static void declare_ddouble(std::ostream& o, Module const& m)
   declare_deriv_enum(o, m);
 }
 /*--------------------------------------------------------------------------*/
-static void make_func_dev(std::ostream& o, std::set<FUNCTION_ const*> const& P)
+static void make_func_dev(std::ostream& o, pSet<FUNCTION_ const> const& P)
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
     if(dynamic_cast<MGVAMS_TASK const*>(*q)){
@@ -86,7 +86,7 @@ static void make_func_dev(std::ostream& o, std::set<FUNCTION_ const*> const& P)
   }
 }
 /*--------------------------------------------------------------------------*/
-static void make_funcs_common(std::ostream& o, std::set<FUNCTION_ const*> const& P)
+static void make_funcs_common(std::ostream& o, pSet<FUNCTION_ const> const& P)
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
     if( (*q)->has_refs() ){
@@ -364,7 +364,7 @@ static void make_module(std::ostream& o, const Module& m)
   for (auto br : m.branches()){
     if(br->has_element()){
       o__ "ELEMENT* " << br->code_name() << "{NULL}; // branch\n";
-    }else if(br->is_short()){ untested();
+    }else if(br->is_short()){
       o__ "// short : " << br->code_name() << "\n";
     }else if(br->is_filter()){
       o__ "ELEMENT* " << br->code_name() << "{NULL}; // filter\n";

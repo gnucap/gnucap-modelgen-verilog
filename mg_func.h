@@ -34,18 +34,23 @@ class Module;
 class Deps;
 // TODO: move upstream, partly?
 class FUNCTION_ : public FUNCTION {
-  std::string _label;
+//  std::string _label; // e_base.
   size_t _num_args{size_t(-1)};
 public:
   explicit FUNCTION_() : FUNCTION() {}
   explicit FUNCTION_(FUNCTION_ const& o)
-  	: FUNCTION(o), _label(o._label), _num_args(o._num_args) {}
-  void set_label(std::string const& l){
-  	_label = l;
+  	: FUNCTION(o), _num_args(o._num_args) {
+	  set_label(o.short_label()); // base?
   }
+//  void set_label(std::string const& l){
+//  	_label = l;
+//  }
   ~FUNCTION_();
-  std::string const& label() const{
-  	return _label;
+  std::string const& label()const {
+    return short_label();
+  }
+  std::string const& key()const { // free?
+    return label();
   }
   void set_num_args(size_t n){ _num_args = n; }
   size_t num_args() const { return _num_args; }

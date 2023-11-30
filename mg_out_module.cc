@@ -110,7 +110,7 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
   // BUG this is incomplete.
   for(auto br : m.branches()){
     assert(br);
-    if(br->is_short()){ untested();
+    if(br->is_short()){
     }else if(br->is_filter()){
     }else if(br->has_flow_probe()){
       o << " if( " << br->code_name() << " && !conchk(_flow"<< br->code_name() << ", "

@@ -346,7 +346,7 @@ std::string Branch::dev_type()const
   static std::string pb = "va_pot_br";
 
   if(is_filter()) {
-    return "va_" + _ctrl->label();
+    return "va_" + _ctrl->label().substr(0,3); // HACK
   }else if(!is_direct()){
     if(has_pot_source()){
       return pb;
@@ -496,7 +496,7 @@ std::string const* Branch::reg_name(std::string const&s)
 // has_source? is_source?
 bool Branch::has_element() const
 {
-  if(is_short()){ untested();
+  if(is_short()){
     return false;
   }else{
     return has_flow_source() || has_pot_source() || has_flow_probe();

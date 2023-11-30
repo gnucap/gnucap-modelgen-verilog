@@ -66,6 +66,12 @@ DISPATCHER<FUNCTION>::INSTALL d_analysis(&function_dispatcher, "analysis", &anal
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class ABSTIME : public MGVAMS_FUNCTION {
+public:
+  explicit ABSTIME() {
+    set_label("abstime");
+  }
+  ~ABSTIME() { }
+private:
   Token* new_token(Module& m, size_t)const override {
     m.install(this);
     return new Token_SFCALL("$abstime", this);
@@ -86,6 +92,9 @@ DISPATCHER<FUNCTION>::INSTALL d_abstime(&function_dispatcher, "$abstime", &absti
 /*--------------------------------------------------------------------------*/
 class TEMPERATURE : public MGVAMS_FUNCTION {
 public:
+  explicit TEMPERATURE() {
+    set_label("temperature");
+  }
   ~TEMPERATURE(){ }
 private:
   Token* new_token(Module& m, size_t)const override {
@@ -110,6 +119,9 @@ DISPATCHER<FUNCTION>::INSTALL d1(&function_dispatcher, "$temperature", &temperat
 class VT : public MGVAMS_FUNCTION {
   mutable size_t _temp{0};
 public:
+  explicit VT() {
+    set_label("vt");
+  }
   ~VT(){
     while(_temp){
       --_temp; temperature.dec_refs(); // hack
@@ -211,6 +223,12 @@ private:
 };
 /*--------------------------------------------------------------------------*/
 class PARAM_GIVEN : public MGVAMS_FUNCTION {
+public:
+  explicit PARAM_GIVEN() {
+    set_label("param_given");
+  }
+  ~PARAM_GIVEN(){ }
+private:
   Token* new_token(Module& m, size_t)const override {
     m.install(this);
     return new Token_PG("$param_given", this);
@@ -233,6 +251,12 @@ class PARAM_GIVEN : public MGVAMS_FUNCTION {
 DISPATCHER<FUNCTION>::INSTALL d_pg(&function_dispatcher, "$param_given", &pg);
 /*--------------------------------------------------------------------------*/
 class SIMPARAM : public MGVAMS_FUNCTION {
+public:
+  explicit SIMPARAM() {
+    set_label("simparam");
+  }
+  ~SIMPARAM(){ }
+private:
   Token* new_token(Module& m, size_t)const override {
     m.install(this);
     return new Token_SFCALL("$simparam", this);

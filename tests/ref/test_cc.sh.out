@@ -2384,10 +2384,10 @@ public: // netlist
 private: // func decl
 //func analysis
   // analysis
-//func 
-  // 
-//filt ddt
+//filt ddt_1
   ddouble _b_ddt_1(ddouble t0);
+//func param_given
+  // param_given
 private: // construct
   explicit MOD_capacitor(MOD_capacitor const&);
 public:
@@ -3028,10 +3028,10 @@ public: // netlist
 private: // func decl
 //func analysis
   // analysis
-//func 
-  // 
-//filt ddt
+//filt ddt_2
   ddouble _b_ddt_2(ddouble t0);
+//func param_given
+  // param_given
 private: // construct
   explicit MOD_capacitor(MOD_capacitor const&);
 public:
