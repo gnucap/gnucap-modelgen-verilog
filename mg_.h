@@ -1581,7 +1581,8 @@ typedef Collection<Discipline> Discipline_List;
 class Branch : public Element_2 {
   Node const* _p{NULL};
   Node const* _n{NULL};
-  Deps *_deps{NULL}; // delete?
+  Deps *_deps{NULL}; // delete? move to _ctrl.
+  // TODO: refactor into _ctrl
   size_t _has_flow_probe{0};
   size_t _has_pot_probe{0};
   size_t _has_flow_src{0};
@@ -1665,6 +1666,7 @@ public:
 
   Deps const& deps()const { assert(_deps); return *_deps; } // delete?
   Deps& deps() { assert(_deps); return *_deps; } // delete?
+						 //
   Branch const* output() const;
 private:
   void new_deps();
@@ -1736,6 +1738,7 @@ public:
   const_iterator begin() const{ return _nodes.begin(); }
   const_iterator end() const{ return _nodes.end(); }
   size_t size() const{ return _map.size(); }
+//   size_t how_many() const{ return _nodes.size() - 1; }
   Node* new_node(std::string const&);
   Node const* operator[](std::string const& key) const;
   Node const* operator[](int key) const{ return _nodes[key]; }

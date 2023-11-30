@@ -1045,7 +1045,6 @@ void Contribution::parse(CS& cmd)
     trace2("inc_use0", name(), branch()->name());
     _branch->inc_use();
   }
-
 } // Contribution::parse
 /*--------------------------------------------------------------------------*/
 void Contribution::add_dep(Dep const& d)
@@ -1594,6 +1593,11 @@ CS& Module::parse_analog(CS& f)
     ab->set_owner(this);
     ab->parse(f);
     _analog_list.push_back(ab);
+
+//    if(auto s = dynamic_cast<AnalogStmt*>(ab->statement_or_null())){ untested();
+//      s->update();
+//    }else{ untested();
+//    }
   }
   return f;
 }
@@ -1674,6 +1678,7 @@ Contribution::~Contribution()
       _branch->dec_pot_source();
     }else{
     }
+//    }
 
     for(Dep const& i : deps()){
       trace3("dec_use", name(), branch()->name(), i->code_name());

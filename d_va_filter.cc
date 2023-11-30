@@ -130,7 +130,8 @@ protected: // override virtual
   int	   net_nodes()const override	{return _n_ports*2;}
   CARD*	   clone()const override        {unreachable();return new DEV_CPOLY_CAP(*this);}
   void	   tr_iwant_matrix()override	{tr_iwant_matrix_extended();}
-  bool	   tr_needs_eval()const override	{/*assert(!is_q_for_eval());*/ return false;}
+  void     precalc_last() override;
+  bool	   tr_needs_eval()const override;
   bool	   do_tr()override;
   void	   tr_load()override;
   void	   tr_unload()override;
@@ -192,6 +193,17 @@ TIME_PAIR DEV_DDT::tr_review()
   return _time_by;
 }
 /*--------------------------------------------------------------------------*/
+bool DEV_CPOLY_CAP::tr_needs_eval()const
+{
+  /*assert(!is_q_for_eval());*/
+
+  if(_loss0 == 0.){
+    // more work to do...
+    return true;
+  }else{
+    return false;
+  }
+}
 /*--------------------------------------------------------------------------*/
 class DEV_IDT : public DEV_CPOLY_CAP {
 private:
@@ -214,8 +226,14 @@ DISPATCHER<CARD>::INSTALL
 void DEV_IDT::ac_load()
 { untested();
   ac_load_shunt(); // 4 pt +- loss
-  assert(!_vy0[1]); // for now.
-  _acg = _vy0[1] / _sim->_jomega;
+		   //
+  if(1){
+    // abusing _vy[1] for mfactor.
+  }else{
+    assert(!_vy0[1]); // for now.
+    _acg = _vy0[1] / _sim->_jomega;
+  }
+
   trace4("load", _vy0[0], _vy0[1], _loss0, _loss1);
   ac_load_passive();
   for (int i=2; i<=_n_ports; ++i) { untested();
@@ -333,7 +351,7 @@ bool DEV_DDT::do_tr()
     _y[0].x = 0.;
   }
   _y[0].f0 = _vy0[0]; // state, from owner, "charge".
-  assert(_vy0[1] == 0.);
+  // assert(_vy0[1] == 0.); // mfactor abuse.
   _y[0].f1 = 0; // _vy0[1]; // another state, capacity.?
   
   trace4("DEV_DDT::do_tr", long_label(), _y[0].f0, _y[1].f0, _y1.f0);
@@ -380,7 +398,7 @@ bool DEV_IDT::do_tr()
     _y[0].x = 0.;
   }
   _y[0].f0 = _vy0[0]; // state, from owner, "input voltage".
-  assert(_vy0[1] == 0.);
+  // assert(_vy0[1] == 0.);
   _y[0].f1 = 0; // _vy0[1]; // another state, capacity.?
   
   _i[0] = integrate(_y, _i, _time, _method_a, _dt);
@@ -458,8 +476,12 @@ double DEV_CPOLY_CAP::tr_amps()const
 void DEV_CPOLY_CAP::ac_load()
 {
   ac_load_shunt(); // 4 pt +- loss
-  _acg = _vy0[1] * _sim->_jomega;
-  assert(!_vy0[1]); // for now.
+  if(1){
+    // abusing _vy[1] for mfactor.
+  }else{
+    assert(!_vy0[1]); // for now.
+    _acg = _vy0[1] * _sim->_jomega;
+  }
   trace4("load", _vy0[0], _vy0[1], _loss0, _loss1);
   ac_load_passive();
   for (int i=2; i<=_n_ports; ++i) {
@@ -528,6 +550,17 @@ double DEV_CPOLY_CAP::tr_probe_num(const std::string& x)const
     return converged();
   }else{
     return STORAGE::tr_probe_num(x);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void DEV_CPOLY_CAP::precalc_last()
+{
+  assert(!common());
+  if(_loss0){
+  }else{
+    assert(_vy0);
+    _mfactor = _vy0[1];
+    COMPONENT::precalc_first();
   }
 }
 /*--------------------------------------------------------------------------*/

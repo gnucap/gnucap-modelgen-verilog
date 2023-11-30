@@ -6,9 +6,9 @@ endmodule // vsin
 
 parameter r=1 
 parameter v=0 
-test_ddt0_0 #() dut (.np(1),.nn(0));
+test_ddt0_0 #() dut (.p(1),.n(0));
 vsin #(.ampl(1),.dc(v)) v1 (.p(1),.n(0));
-#Time       v(1)       dv(dut)    i(dut._b_ddt_0_) iter(0)   
+#Time       v(1)       dv(dut)    i(dut._b_ddt_0_p_ddt_0_n) iter(0)   
  0.         0.         0.         0.         2.        
  0.1        0.58779    10.191     10.191     45.       
  0.2        0.95106    3.8557     3.8557     6.        
@@ -23,5 +23,5 @@ vsin #(.ampl(1),.dc(v)) v1 (.p(1),.n(0));
 Gnucap   System status
 iterations: op=0, dc=0, tran=92, fourier=0, total=123
 transient timesteps: accepted=24, rejected=7, total=31
-nodes: user=1, subckt=0, model=1, total=2
+nodes: user=1, subckt=0, model=0, total=1
 dctran density=100.0%, ac density=100.0%

@@ -11,11 +11,11 @@ V1 p n sin freq=1 amplitude={ampl} dc=dc
 .verilog
 
 `modelgen
-module test_ddt0_0(np, nn);
+module test_ddt0_0(p, n);
 	(* desc="" *) real dv;
-	electrical np, nn;
+	electrical p, n;
 	analog begin
-		dv = ddt(2*V(np,nn));
+		dv = ddt(2*V(p,n));
 	end
 endmodule
 

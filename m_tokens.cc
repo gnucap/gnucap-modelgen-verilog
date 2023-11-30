@@ -584,7 +584,8 @@ void Token_CALL::stack_op(Expression* E)const
       }
 
       // here?
-      auto deps = new_deps(arg_expr);
+      Deps* deps = new_deps(arg_expr);
+      deps->set_any();
       E->push_back(new Token_CALL(*this, deps, EE));
     }
     delete T1;

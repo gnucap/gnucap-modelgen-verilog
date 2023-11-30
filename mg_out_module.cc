@@ -92,7 +92,6 @@ static void make_node_ref(std::ostream& o, const Node& n, bool used=true)
   }
 }
 /*--------------------------------------------------------------------------*/
-#if 0
 static void make_cc_branch_output(std::ostream& o, Branch const* br)
 {
   Branch const* out = br->output();
@@ -100,7 +99,6 @@ static void make_cc_branch_output(std::ostream& o, Branch const* br)
   o << ", ";
   make_node_ref(o, *out->n(), br->is_used());
 }
-#endif
 /*--------------------------------------------------------------------------*/
 static void make_tr_needs_eval(std::ostream& o, const Module& m)
 {
@@ -610,20 +608,20 @@ static void make_module_allocate_local_node(std::ostream& o, const Node& p)
 //      "      if (" << p.short_if() << ") {\n"
 //      "        _n[n_" << p.name() << "] = _n[n_" << p.short_to() << "];\n"
 //      "      }else:
-    o__  "{\n"
-      "        _n[n_" << p.name() << "].new_model_node(\".\" + long_label() + \"." << p.name() 
-			   << "\", this);\n"
-      "      }\n"
-      "    }else{\n";
+    o____ "{\n";
+    o______ "_n[n_" << p.name() << "].new_model_node(\".\" + long_label() + \"." << p.name() 
+			   << "\", this);\n";
+    o______ "}\n";
+    o____ "}else{\n";
 
       // "      if (" << p.short_if() << ") {\n"
       // "        assert(_n[n_" << p.name() << "] == _n[n_" << p.short_to() << "]);\n"
       // "      }else"
-    o__  "{\n"
-      "        //_n[n_" << p.name() << "].new_model_node(\"" << p.name() 
-		 << ".\" + long_label(), this);\n"
-      "      }\n"
-      "    }\n";
+    o____ "{\n";
+    o______ " //_n[n_" << p.name() << "].new_model_node(\"" << p.name()
+		 << ".\" + long_label(), this);\n";
+    o____ "}\n";
+    o__ "}\n";
   }
 #endif
 }
@@ -638,13 +636,19 @@ static void make_module_allocate_local_nodes(std::ostream& o, Module const& m)
     for (; n <= int(m.nodes().size()); ++n) {
       Node const* nn = m.nodes()[n];
       assert(nn);
-      // TODO: node aliases, shorts etc.
-      if(nn->number() < n){
+      if(nn->number() == 0) {
+	o__ "// ground\n";
+	o__ "_n[n_" << nn->name() << "].set_to_ground(this);\n";
+      }else if(nn->number() < n){
 	o__ "_n[" << n - 1 << "] = _n[" << nn->number() - 1 << "];\n";
       }else if(n <= int(m.ports().size())){
 	o__ "// port " << nn->name() << " " << nn->number() << "\n";
-      }else{
+      }else if(nn->is_used()){
+	o__ "// internal " << nn->name() << " : " << nn->number() << "\n";
 	make_module_allocate_local_node(o, *nn);
+      }else{
+	o__ "// unused " << nn->name() << " : " << nn->number() << "\n";
+	o__ "_n[n_" << nn->name() << "].set_to_ground(this);\n"; // for now.
       }
     }
   }
@@ -696,14 +700,12 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
   o______ "node_t nodes[] = {";
   
   if(e.num_nodes()){
-    make_node_ref(o, *br->p());
-    o << ", ";
-    make_node_ref(o, *br->n());
+    make_cc_branch_output(o, br);
     {
       for(auto i : br->deps()){
 	Branch const* bb = i->branch();
       	if(bb->is_short()){
-	  // ...
+	  // here: skip filter dependency.
 	}else if(bb == br){
 	}else if(i->is_pot_probe()){
 	  assert(i->branch());
@@ -722,6 +724,11 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
 
 //    Port_1_List::const_iterator p = e.current_ports().begin();
     make_set_parameters(o, e);
+    if(br == br->output()){
+    }else{
+      o______ e.code_name() << "->_loss0 = 0.;\n";
+      o______ e.code_name() << "->_loss1 = 0.;\n";
+    }
 
     {
       // set_current ports.
@@ -813,7 +820,7 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   }
 
   if(m.has_analog_block()){
-    incomplete();
+    // incomplete();
     o__ "c->precalc_analog(this);\n"; // call through COMPONENT::precalc?
   }else{
   }

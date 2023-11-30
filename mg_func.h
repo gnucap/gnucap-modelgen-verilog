@@ -104,11 +104,9 @@ public:
   virtual std::string code_name() const{
     return "";
   }
-#if 0
   virtual Node const* p() const; // really?
   virtual Node const* n() const; // really?
   virtual Branch const* output()const{return NULL;}
-#endif
 };
 /*--------------------------------------------------------------------------*/
 class MGVAMS_TASK : public FUNCTION_ {

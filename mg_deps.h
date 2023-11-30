@@ -47,13 +47,15 @@ public:
   bool is_quadratic()const { return _order<=_QUADRATIC; }
 
   bool same_data(Dep const& o)const;
+  void set_any(){
+    _order = _ANY;
+  }
 
 public:
   Probe const* operator->() const{ return _prb; }
   Probe const* operator*() const{ return _prb; }
   operator Probe const*() const{ return _prb; }
 };
-extern Dep mg_const_dep; // REMOVE?
 /*--------------------------------------------------------------------------*/
 class Deps : public Base {
   typedef std::vector<Dep> S;
@@ -81,6 +83,11 @@ public:
   bool is_offset() const {return _offset;}
   bool is_linear() const;
   bool is_quadratic() const;
+  void set_any() {
+    for(auto& d: _s) {
+      d.set_any();
+    }
+  }
 private:
   void parse(CS&)override {unreachable();}
   void dump(std::ostream&)const override {unreachable();}

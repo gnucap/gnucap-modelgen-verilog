@@ -187,6 +187,10 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 {
   Expression const& e = C.rhs();
 
+  for(auto v : C.deps()) {
+    trace2("contrib dep", C.name(), v->code_name());
+  }
+
   o__ "{ // Contribution " << C.name() << C.branch_ref() << " lin: " << C.deps().is_linear() << "\n";
   if(!C.is_pot_contrib() && is_zero(e)){
     // TODO incomplete(); // optimize out?
@@ -213,8 +217,6 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
       o__ "}else{\n";
       o__ "}\n";
     }else if(C.branch()->has_flow_probe()){
-
-
     }else{
       // always flow.
     }
@@ -269,11 +271,30 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	     << sign << "= " << "t0[d" << v->code_name() << "]; // (3)\n";
 	}
       }
-    }else{
+    }else if(is_precalc()) {
+      for(auto v : C.deps()) {
+	assert(v->branch());
+	if(C.branch() == v->branch()) {
+	  o__ "// same " << v->code_name() << "\n";
+	}else if(v->branch()->is_short()) { untested();
+	  o__ "// short: " << v->code_name() << "\n";
+	}else if(v->branch()->has_element()){
+	  o__ "// elt? " << v->code_name() << "\n";
+	}else if(v->branch()->is_filter()){
+	  // TODO? element?
+	  o__ "// dep " << v->code_name() << "\n";
+	  char sign = C.reversed()?'+':'-';
+	  o__ "m->" << v->branch()->state() << "[1] = "
+	     << sign << " t0[d" << v->code_name() << "]; // (3p)\n";
+	}else{
+	  o__ "//noelt: " << v->code_name() << "\n";
+	}
+      }
+
     }
   }
   o__ "}\n";
-}
+} // make_contrib
 /*--------------------------------------------------------------------------*/
 void AnalogExpression::dump(std::ostream& o)const
 {

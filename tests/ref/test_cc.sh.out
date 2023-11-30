@@ -1318,6 +1318,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
       { // Contribution I(p, n) lin: 1
         ddouble t0;
         t0 = _v_i/*rhsvar*/;
+        // same _potential_b_p_n
       }
     }
   }
@@ -1448,11 +1449,11 @@ void MOD_resistor::precalc_last()
   assert(c);
   (void)c;
   zero_filter_readout();
+  c->precalc_analog(this);
   if(subckt()){
     subckt()->precalc_last();
   }else{untested();
   }
-  c->precalc_analog(this);
 }
 /*--------------------------------------------------------------------------*/
 }
@@ -2364,7 +2365,7 @@ class COMMON_capacitor :public COMMON_COMPONENT{
   typedef MOD_capacitor MOD;
   typedef ddouble_<2> ddouble;
   enum {
-    d_potential_b_ddt_1_,
+    d_potential_b_ddt_1_p_ddt_1_n,
     d_potential_b_p_n,
      num_branches__  };
 public:
@@ -2417,14 +2418,14 @@ class PRECALC_capacitor{
 public:
   typedef ddouble_<2> ddouble;
   enum {
-    d_potential_b_ddt_1_,
+    d_potential_b_ddt_1_p_ddt_1_n,
     d_potential_b_p_n,
      num_branches__  };
 public:
   explicit PRECALC_capacitor(MOD_capacitor*d) : _d(d) {}
     ddouble _b_ddt_1(ddouble){
     ddouble ret;
-    ret[d_potential_b_ddt_1_] = -1.;
+    ret[d_potential_b_ddt_1_p_ddt_1_n] = -1.;
     return ret;
 }
 };
@@ -2435,13 +2436,13 @@ private:
 public:
   typedef ddouble_<2> ddouble;
   enum {
-    d_potential_b_ddt_1_,
+    d_potential_b_ddt_1_p_ddt_1_n,
     d_potential_b_p_n,
      num_branches__  };
 private: // data
-  node_t _nodes[3];
+  node_t _nodes[4];
 public: // netlist
-  ELEMENT* _b_ddt_1_{NULL}; // filter
+  ELEMENT* _b_ddt_1_p_ddt_1_n{NULL}; // filter
   ELEMENT* _b_p_n{NULL}; // branch
 private: // func decl
 //func analysis
@@ -2479,7 +2480,7 @@ private: // overrides
     //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing
   int max_nodes()const override {return 2;}
   int min_nodes()const override {return 2;}
-  int int_nodes()const override    {return 1;}
+  int int_nodes()const override    {return 2;}
   std::string value_name()const override {itested(); return "";}
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
@@ -2487,18 +2488,18 @@ private: // impl
 /* ========== */
 public: // instance vars
 private: // branch state
-public: // states, _b_ddt_1_;
-  double _value_b_ddt_1_;
-  double _st_b_ddt_1_  [3]; // (s)
-  struct _st_b_ddt_1__ {
+public: // states, _b_ddt_1_p_ddt_1_n;
+  double _value_b_ddt_1_p_ddt_1_n;
+  double _st_b_ddt_1_p_ddt_1_n  [3]; // (s)
+  struct _st_b_ddt_1_p_ddt_1_n_ {
     enum {     VALUE, SELF, dep_potential_b_p_n/* : */
     };
-  } _dep_b_ddt_1_;
+  } _dep_b_ddt_1_p_ddt_1_n;
 public: // states, _b_p_n;
   double _value_b_p_n;
   double _st_b_p_n  [3]; // (s)
   struct _st_b_p_n_ {
-    enum {     VALUE, SELF, dep_potential_b_ddt_1_/* : */
+    enum {     VALUE, SELF, dep_potential_b_ddt_1_p_ddt_1_n/* : */
     };
   } _dep_b_p_n;
 private: // node list
@@ -2506,10 +2507,11 @@ private: // node list
     n_p /* used: 1 */,
     n_n /* used: 1 */
     /* ---- */,
-    n_ddt_1 /* used: 1 */
+    n_ddt_1_p /* used: 1 */,
+    n_ddt_1_n /* used: 0 */
   };
 private: // probe values
-  double _potential_b_ddt_1_;
+  double _potential_b_ddt_1_p_ddt_1_n;
   double _potential_b_p_n;
 private: // impl
   void read_probes();
@@ -2712,7 +2714,7 @@ inline void MOD_capacitor::read_probes()
 {
   trace0("capacitor::read_probes");
   node_t gnd(&ground_node);
-  // filter _b_ddt_1_
+  // filter _b_ddt_1_p_ddt_1_n
   _potential_b_p_n = volts_limited(_n[n_p], _n[n_n]);
 }
 /*--------------------------------------------------------------------------*/
@@ -2761,7 +2763,7 @@ bool MOD_capacitor::do_tr()
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::zero_filter_readout()
 {
-  _potential_b_ddt_1_ = 0.;
+  _potential_b_ddt_1_p_ddt_1_n = 0.;
 }
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::set_branch_contributions()
@@ -2772,8 +2774,8 @@ inline void MOD_capacitor::set_branch_contributions()
     // collect currents from named branches
     long double sp = 0.;
     // sources...
-      // _potential_b_ddt_1_ lin: 0
-      sp += (long double)(_st_b_p_n[/*MOD::*/_st_b_p_n_::dep_potential_b_ddt_1_] * _potential_b_ddt_1_);
+      // _potential_b_ddt_1_p_ddt_1_n lin: 1
+      sp += (long double)(_st_b_p_n[/*MOD::*/_st_b_p_n_::dep_potential_b_ddt_1_p_ddt_1_n] * _potential_b_ddt_1_p_ddt_1_n);
     _st_b_p_n[0] = double(_st_b_p_n[0] - sp);
     }
   // flow src (p, n)
@@ -2801,21 +2803,21 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
     { // 
       {
         { // 
-          { // Contribution I(p, n) lin: 0
+          { // Contribution I(p, n) lin: 1
             ddouble t0;
-            t0[d_potential_b_ddt_1_] = 0.; // (output dep)
+            t0[d_potential_b_ddt_1_p_ddt_1_n] = 0.; // (output dep)
             t0.set_no_deps();
-            t0[d_potential_b_ddt_1_] = 0.; // (output dep)
+            t0[d_potential_b_ddt_1_p_ddt_1_n] = 0.; // (output dep)
             t0 = +p->_potential_b_p_n; // V(p, n)
             t0[d_potential_b_p_n] = +1.;
             t0 = (_p___c) /*rhspar*/ * t0;
             // function ddt 1
             t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_1(t0);
             d->_value_b_p_n += t0.value();
-            // dep _potential_b_ddt_1_
-            assert(t0[d_potential_b_ddt_1_] == t0[d_potential_b_ddt_1_]);
-            assert(MOD::_st_b_p_n_::dep_potential_b_ddt_1_ < 3);
-            d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_ddt_1_] += t0[d_potential_b_ddt_1_]; // (3)
+            // dep _potential_b_ddt_1_p_ddt_1_n
+            assert(t0[d_potential_b_ddt_1_p_ddt_1_n] == t0[d_potential_b_ddt_1_p_ddt_1_n]);
+            assert(MOD::_st_b_p_n_::dep_potential_b_ddt_1_p_ddt_1_n < 3);
+            d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_ddt_1_p_ddt_1_n] += t0[d_potential_b_ddt_1_p_ddt_1_n]; // (3)
           }
         }
       }
@@ -2837,12 +2839,14 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
     { // 
       {
         { // 
-          { // Contribution I(p, n) lin: 0
+          { // Contribution I(p, n) lin: 1
             ddouble t0;
             t0 = 0.; // static?
             t0 = (_p___c) /*rhspar*/ * t0;
             // function ddt 1
             t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_1(t0);
+            // dep _potential_b_ddt_1_p_ddt_1_n
+            m->_st_b_ddt_1_p_ddt_1_n[1] = - t0[d_potential_b_ddt_1_p_ddt_1_n]; // (3p)
           }
         }
       }
@@ -2941,40 +2945,45 @@ void MOD_capacitor::expand()
       // local nodes
   // port p 1
   // port n 2
-  // node ddt_1 3
-    //assert(!(_n[n_ddt_1].n_()));
+  // internal ddt_1_p : 3
+  // node ddt_1_p 3
+    //assert(!(_n[n_ddt_1_p].n_()));
     //BUG// this assert fails on a repeat elaboration after a change.
     //not sure of consequences when new_model_node called twice.
-    if (!(_n[n_ddt_1].n_())) {
-  {
-        _n[n_ddt_1].new_model_node("." + long_label() + ".ddt_1", this);
+    if (!(_n[n_ddt_1_p].n_())) {
+    {
+      _n[n_ddt_1_p].new_model_node("." + long_label() + ".ddt_1_p", this);
       }
     }else{
-  {
-        //_n[n_ddt_1].new_model_node("ddt_1." + long_label(), this);
-      }
+    {
+       //_n[n_ddt_1_p].new_model_node("ddt_1_p." + long_label(), this);
     }
+  }
+  // ground
+  _n[n_ddt_1_n].set_to_ground(this);
 
   // clone branches
-  // filter (ddt_1, )
+  // filter (ddt_1_p, )
   {
-  if (!_b_ddt_1_) {
+  if (!_b_ddt_1_p_ddt_1_n) {
     const CARD* p = device_dispatcher["va_ddt"]; // va_ddt
     if(!p){
       throw Exception("Cannot find va_ddt. Load module?");
     }else{
     }
-    _b_ddt_1_ = dynamic_cast<ELEMENT*>(p->clone());
-    if(!_b_ddt_1_){
+    _b_ddt_1_p_ddt_1_n = dynamic_cast<ELEMENT*>(p->clone());
+    if(!_b_ddt_1_p_ddt_1_n){
       throw Exception("Cannot use va_ddt: wrong type");
     }else{
     }
-    subckt()->push_front(_b_ddt_1_);
+    subckt()->push_front(_b_ddt_1_p_ddt_1_n);
   }else{
   }
     {
-      node_t nodes[] = {_n[n_ddt_1], gnd, _n[n_p], _n[n_n]}; // nodes
-      _b_ddt_1_->set_parameters("_b_ddt_1_", this, _b_ddt_1_->mutable_common(), 0., /*states:*/3, _st_b_ddt_1_, 4, nodes);
+      node_t nodes[] = {_n[n_p], _n[n_n], _n[n_p], _n[n_n]}; // nodes
+      _b_ddt_1_p_ddt_1_n->set_parameters("_b_ddt_1_p_ddt_1_n", this, _b_ddt_1_p_ddt_1_n->mutable_common(), 0., /*states:*/3, _st_b_ddt_1_p_ddt_1_n, 4, nodes);
+      _b_ddt_1_p_ddt_1_n->_loss0 = 0.;
+      _b_ddt_1_p_ddt_1_n->_loss1 = 0.;
       }
   }
   // branch (p, n)
@@ -2994,7 +3003,7 @@ void MOD_capacitor::expand()
     }else{
     }
       {
-        node_t nodes[] = {_n[n_p], _n[n_n], _n[n_ddt_1], gnd}; // nodes
+        node_t nodes[] = {_n[n_p], _n[n_n], _n[n_ddt_1_p], gnd}; // nodes
         _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/3, _st_b_p_n, 4, nodes);
       }
     }
@@ -3027,30 +3036,34 @@ void MOD_capacitor::precalc_last()
   assert(c);
   (void)c;
   zero_filter_readout();
+  c->precalc_analog(this);
   if(subckt()){
     subckt()->precalc_last();
   }else{untested();
   }
-  c->precalc_analog(this);
 }
 /*--------------------------------------------------------------------------*/
 MOD_capacitor::ddouble MOD_capacitor::_b_ddt_1(ddouble t0)
 {
   MOD_capacitor* d = this;
   typedef MOD_capacitor MOD;
-    d->_st_b_ddt_1_[0] = + t0.value();
+    d->_st_b_ddt_1_p_ddt_1_n[0] = + t0.value();
     // dep _potential_b_p_n
     assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
-    // assert(!d->_st_b_ddt_1_[2]);
-    d->_st_b_ddt_1_[MOD::_st_b_ddt_1__::dep_potential_b_p_n]  = + t0[d_potential_b_p_n]; // (4)
-  d->_b_ddt_1_->do_tr();
-  t0 = d->_b_ddt_1_->tr_amps();
-  d->_potential_b_ddt_1_ = - t0;
-  trace2("filt", t0, d->_b_ddt_1_->tr_outvolts());
-  t0[d_potential_b_ddt_1_] = -1.;
+    // assert(!d->_st_b_ddt_1_p_ddt_1_n[2]);
+    d->_st_b_ddt_1_p_ddt_1_n[MOD::_st_b_ddt_1_p_ddt_1_n_::dep_potential_b_p_n]  = + t0[d_potential_b_p_n]; // (4)
+  // subdevice
+  t0.set_value(0.);
+  trace2("filt", t0, d->_b_ddt_1_p_ddt_1_n->tr_outvolts());
+  t0[d_potential_b_ddt_1_p_ddt_1_n] = -1.;
   assert(t0 == t0);
-  return t0;
+  return t0; // (A)
+  {
+    double A = d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_ddt_1_p_ddt_1_n];
+    return A*t0; // (A)
+  }
 }
+/*--------------------------------------------------------------------------*/
 }
 namespace n1{
 class MOD_capacitor;
@@ -3058,7 +3071,7 @@ class COMMON_capacitor :public COMMON_COMPONENT{
   typedef MOD_capacitor MOD;
   typedef ddouble_<2> ddouble;
   enum {
-    d_potential_b_ddt_2_,
+    d_potential_b_ddt_2_p_ddt_2_n,
     d_potential_b_p_n,
      num_branches__  };
 public:
@@ -3111,14 +3124,14 @@ class PRECALC_capacitor{
 public:
   typedef ddouble_<2> ddouble;
   enum {
-    d_potential_b_ddt_2_,
+    d_potential_b_ddt_2_p_ddt_2_n,
     d_potential_b_p_n,
      num_branches__  };
 public:
   explicit PRECALC_capacitor(MOD_capacitor*d) : _d(d) {}
     ddouble _b_ddt_2(ddouble){
     ddouble ret;
-    ret[d_potential_b_ddt_2_] = -1.;
+    ret[d_potential_b_ddt_2_p_ddt_2_n] = -1.;
     return ret;
 }
 };
@@ -3129,13 +3142,13 @@ private:
 public:
   typedef ddouble_<2> ddouble;
   enum {
-    d_potential_b_ddt_2_,
+    d_potential_b_ddt_2_p_ddt_2_n,
     d_potential_b_p_n,
      num_branches__  };
 private: // data
-  node_t _nodes[3];
+  node_t _nodes[4];
 public: // netlist
-  ELEMENT* _b_ddt_2_{NULL}; // filter
+  ELEMENT* _b_ddt_2_p_ddt_2_n{NULL}; // filter
   ELEMENT* _b_p_n{NULL}; // branch
 private: // func decl
 //func analysis
@@ -3173,7 +3186,7 @@ private: // overrides
     //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing
   int max_nodes()const override {return 2;}
   int min_nodes()const override {return 2;}
-  int int_nodes()const override    {return 1;}
+  int int_nodes()const override    {return 2;}
   std::string value_name()const override {itested(); return "";}
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
@@ -3181,19 +3194,19 @@ private: // impl
 /* ========== */
 public: // instance vars
 private: // branch state
-public: // states, _b_ddt_2_;
-  double _value_b_ddt_2_;
-  double _st_b_ddt_2_  [3]; // (s)
-  struct _st_b_ddt_2__ {
+public: // states, _b_ddt_2_p_ddt_2_n;
+  double _value_b_ddt_2_p_ddt_2_n;
+  double _st_b_ddt_2_p_ddt_2_n  [3]; // (s)
+  struct _st_b_ddt_2_p_ddt_2_n_ {
     enum {     VALUE, SELF, dep_potential_b_p_n/* : */
     };
-  } _dep_b_ddt_2_;
+  } _dep_b_ddt_2_p_ddt_2_n;
 public: // states, _b_p_n;
   bool _pot_b_p_n;
   double _value_b_p_n;
   double _st_b_p_n  [3]; // (s)
   struct _st_b_p_n_ {
-    enum {     VALUE, SELF, dep_potential_b_ddt_2_/* : */
+    enum {     VALUE, SELF, dep_potential_b_ddt_2_p_ddt_2_n/* : */
     };
   } _dep_b_p_n;
 private: // node list
@@ -3201,10 +3214,11 @@ private: // node list
     n_p /* used: 1 */,
     n_n /* used: 1 */
     /* ---- */,
-    n_ddt_2 /* used: 1 */
+    n_ddt_2_p /* used: 1 */,
+    n_ddt_2_n /* used: 0 */
   };
 private: // probe values
-  double _potential_b_ddt_2_;
+  double _potential_b_ddt_2_p_ddt_2_n;
   double _potential_b_p_n;
 private: // impl
   void read_probes();
@@ -3427,7 +3441,7 @@ inline void MOD_capacitor::read_probes()
 {
   trace0("capacitor::read_probes");
   node_t gnd(&ground_node);
-  // filter _b_ddt_2_
+  // filter _b_ddt_2_p_ddt_2_n
   _potential_b_p_n = volts_limited(_n[n_p], _n[n_n]);
 }
 /*--------------------------------------------------------------------------*/
@@ -3476,7 +3490,7 @@ bool MOD_capacitor::do_tr()
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::zero_filter_readout()
 {
-  _potential_b_ddt_2_ = 0.;
+  _potential_b_ddt_2_p_ddt_2_n = 0.;
 }
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::set_branch_contributions()
@@ -3486,8 +3500,8 @@ inline void MOD_capacitor::set_branch_contributions()
     _st_b_p_n[0] = _value_b_p_n;
     long double sp = 0.;
     // sources...
-      // _potential_b_ddt_2_ lin: 0
-      sp += (long double)(_st_b_p_n[/*MOD::*/_st_b_p_n_::dep_potential_b_ddt_2_] * _potential_b_ddt_2_);
+      // _potential_b_ddt_2_p_ddt_2_n lin: 1
+      sp += (long double)(_st_b_p_n[/*MOD::*/_st_b_p_n_::dep_potential_b_ddt_2_p_ddt_2_n] * _potential_b_ddt_2_p_ddt_2_n);
     _st_b_p_n[0] = double(_st_b_p_n[0] - sp);
     }
   // pot src (p, n)
@@ -3543,11 +3557,11 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
           }
         }else {
           { // 
-            { // Contribution I(p, n) lin: 0
+            { // Contribution I(p, n) lin: 1
               ddouble t0;
-              t0[d_potential_b_ddt_2_] = 0.; // (output dep)
+              t0[d_potential_b_ddt_2_p_ddt_2_n] = 0.; // (output dep)
               t0.set_no_deps();
-              t0[d_potential_b_ddt_2_] = 0.; // (output dep)
+              t0[d_potential_b_ddt_2_p_ddt_2_n] = 0.; // (output dep)
               t0 = +p->_potential_b_p_n; // V(p, n)
               t0[d_potential_b_p_n] = +1.;
               t0 = (_p___c) /*rhspar*/ * t0;
@@ -3560,10 +3574,10 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
               }else{
               }
               d->_value_b_p_n += t0.value();
-              // dep _potential_b_ddt_2_
-              assert(t0[d_potential_b_ddt_2_] == t0[d_potential_b_ddt_2_]);
-              assert(MOD::_st_b_p_n_::dep_potential_b_ddt_2_ < 3);
-              d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_ddt_2_] += t0[d_potential_b_ddt_2_]; // (3)
+              // dep _potential_b_ddt_2_p_ddt_2_n
+              assert(t0[d_potential_b_ddt_2_p_ddt_2_n] == t0[d_potential_b_ddt_2_p_ddt_2_n]);
+              assert(MOD::_st_b_p_n_::dep_potential_b_ddt_2_p_ddt_2_n < 3);
+              d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_ddt_2_p_ddt_2_n] += t0[d_potential_b_ddt_2_p_ddt_2_n]; // (3)
             }
           }
         }
@@ -3601,12 +3615,14 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
           }
         }else {
           { // 
-            { // Contribution I(p, n) lin: 0
+            { // Contribution I(p, n) lin: 1
               ddouble t0;
               t0 = 0.; // static?
               t0 = (_p___c) /*rhspar*/ * t0;
               // function ddt 1
               t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_2(t0);
+              // dep _potential_b_ddt_2_p_ddt_2_n
+              m->_st_b_ddt_2_p_ddt_2_n[1] = - t0[d_potential_b_ddt_2_p_ddt_2_n]; // (3p)
             }
           }
         }
@@ -3707,40 +3723,43 @@ void MOD_capacitor::expand()
       // local nodes
   // port p 1
   // port n 2
-  // node ddt_2 3
-    //assert(!(_n[n_ddt_2].n_()));
+  // internal ddt_2_p : 3
+  // node ddt_2_p 3
+    //assert(!(_n[n_ddt_2_p].n_()));
     //BUG// this assert fails on a repeat elaboration after a change.
     //not sure of consequences when new_model_node called twice.
-    if (!(_n[n_ddt_2].n_())) {
-  {
-        _n[n_ddt_2].new_model_node("." + long_label() + ".ddt_2", this);
+    if (!(_n[n_ddt_2_p].n_())) {
+    {
+      _n[n_ddt_2_p].new_model_node("." + long_label() + ".ddt_2_p", this);
       }
     }else{
-  {
-        //_n[n_ddt_2].new_model_node("ddt_2." + long_label(), this);
-      }
+    {
+       //_n[n_ddt_2_p].new_model_node("ddt_2_p." + long_label(), this);
     }
+  }
+  // ground
+  _n[n_ddt_2_n].set_to_ground(this);
 
   // clone branches
-  // filter (ddt_2, )
+  // filter (ddt_2_p, )
   {
-  if (!_b_ddt_2_) {
+  if (!_b_ddt_2_p_ddt_2_n) {
     const CARD* p = device_dispatcher["va_ddt"]; // va_ddt
     if(!p){
       throw Exception("Cannot find va_ddt. Load module?");
     }else{
     }
-    _b_ddt_2_ = dynamic_cast<ELEMENT*>(p->clone());
-    if(!_b_ddt_2_){
+    _b_ddt_2_p_ddt_2_n = dynamic_cast<ELEMENT*>(p->clone());
+    if(!_b_ddt_2_p_ddt_2_n){
       throw Exception("Cannot use va_ddt: wrong type");
     }else{
     }
-    subckt()->push_front(_b_ddt_2_);
+    subckt()->push_front(_b_ddt_2_p_ddt_2_n);
   }else{
   }
     {
-      node_t nodes[] = {_n[n_ddt_2], gnd, _n[n_p], _n[n_n]}; // nodes
-      _b_ddt_2_->set_parameters("_b_ddt_2_", this, _b_ddt_2_->mutable_common(), 0., /*states:*/3, _st_b_ddt_2_, 4, nodes);
+      node_t nodes[] = {_n[n_ddt_2_p], gnd, _n[n_p], _n[n_n]}; // nodes
+      _b_ddt_2_p_ddt_2_n->set_parameters("_b_ddt_2_p_ddt_2_n", this, _b_ddt_2_p_ddt_2_n->mutable_common(), 0., /*states:*/3, _st_b_ddt_2_p_ddt_2_n, 4, nodes);
       }
   }
   // branch (p, n)
@@ -3760,7 +3779,7 @@ void MOD_capacitor::expand()
     }else{
     }
       {
-        node_t nodes[] = {_n[n_p], _n[n_n], _n[n_ddt_2], gnd}; // nodes
+        node_t nodes[] = {_n[n_p], _n[n_n], _n[n_ddt_2_p], gnd}; // nodes
         _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/3, _st_b_p_n, 4, nodes);
       }
     }
@@ -3793,30 +3812,31 @@ void MOD_capacitor::precalc_last()
   assert(c);
   (void)c;
   zero_filter_readout();
+  c->precalc_analog(this);
   if(subckt()){
     subckt()->precalc_last();
   }else{untested();
   }
-  c->precalc_analog(this);
 }
 /*--------------------------------------------------------------------------*/
 MOD_capacitor::ddouble MOD_capacitor::_b_ddt_2(ddouble t0)
 {
   MOD_capacitor* d = this;
   typedef MOD_capacitor MOD;
-    d->_st_b_ddt_2_[0] = + t0.value();
+    d->_st_b_ddt_2_p_ddt_2_n[0] = + t0.value();
     // dep _potential_b_p_n
     assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
-    // assert(!d->_st_b_ddt_2_[2]);
-    d->_st_b_ddt_2_[MOD::_st_b_ddt_2__::dep_potential_b_p_n]  = + t0[d_potential_b_p_n]; // (4)
-  d->_b_ddt_2_->do_tr();
-  t0 = d->_b_ddt_2_->tr_amps();
-  d->_potential_b_ddt_2_ = - t0;
-  trace2("filt", t0, d->_b_ddt_2_->tr_outvolts());
-  t0[d_potential_b_ddt_2_] = -1.;
+    // assert(!d->_st_b_ddt_2_p_ddt_2_n[2]);
+    d->_st_b_ddt_2_p_ddt_2_n[MOD::_st_b_ddt_2_p_ddt_2_n_::dep_potential_b_p_n]  = + t0[d_potential_b_p_n]; // (4)
+  d->_b_ddt_2_p_ddt_2_n->do_tr();
+  t0 = d->_b_ddt_2_p_ddt_2_n->tr_amps();
+  d->_potential_b_ddt_2_p_ddt_2_n = - t0;
+  trace2("filt", t0, d->_b_ddt_2_p_ddt_2_n->tr_outvolts());
+  t0[d_potential_b_ddt_2_p_ddt_2_n] = -1.;
   assert(t0 == t0);
-  return t0;
+  return t0; // (B)
 }
+/*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
 }

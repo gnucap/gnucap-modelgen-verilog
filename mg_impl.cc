@@ -307,6 +307,7 @@ void Branch::add_dep(Dep const& b)
 //  }else{ untested();
 //  }
   // TODO incomplete(); // linear?
+//  b->branch()->inc_use();
   deps().insert(b);
 }
 /*--------------------------------------------------------------------------*/
@@ -1054,7 +1055,22 @@ double ValueRangeInterval::eval() const
   }
 }
 /*--------------------------------------------------------------------------*/
-#if 0
+void Node::set_to_ground(Module*)
+{
+  _number = 0;
+}
+/*--------------------------------------------------------------------------*/
+void Module::set_to_ground(Node const* n)
+{
+  trace1("stc", n->number());
+  if(n->number()){
+    assert(*(nodes().begin() + n->number()) == n);
+    (*(nodes().begin() + n->number()))->set_to_ground(this);
+  }else{
+    // already ground
+  }
+}
+/*--------------------------------------------------------------------------*/
 Branch const* Branch::output() const
 {
   if(auto f = dynamic_cast<MGVAMS_FILTER const*>(_ctrl)){
@@ -1063,27 +1079,22 @@ Branch const* Branch::output() const
   }
   return this;
 }
-#endif
 /*--------------------------------------------------------------------------*/
 Node const* Branch::p() const
 {
-#if 0
   if(auto f = dynamic_cast<MGVAMS_FILTER const*>(_ctrl)){
     return f->p();
   }else{
   }
-#endif
   assert(_p); return _p;
 }
 /*--------------------------------------------------------------------------*/
 Node const* Branch::n() const
 {
-#if 0
   if(auto f = dynamic_cast<MGVAMS_FILTER const*>(_ctrl)){
     return f->n();
   }else{
   }
-#endif
   assert(_n); return _n;
 }
 /*--------------------------------------------------------------------------*/

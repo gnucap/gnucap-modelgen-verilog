@@ -16,7 +16,10 @@ module test_cap1(p, n);
   electrical p, n;
   parameter real c=1;
   analog begin
-    I(p,n) <+ - ddt(c*V(n,p));
+    I(p,n) <+ - ddt(c*V(n,p)/4);
+    I(n,p) <+   ddt(c*V(n,p)/4);
+    I(p,n) <+   ddt(c*V(p,n)/4);
+    I(n,p) <+ - ddt(c*V(p,n)/4);
   end
 endmodule
 

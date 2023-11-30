@@ -117,9 +117,12 @@ public:
       m.push_back(cl);
     }
 
-    Node* n = m.new_node(filter_code_name);
+    Node* np = m.new_node(filter_code_name + "_p");
+    cl->_p = np;
+    Node* nn = m.new_node(filter_code_name + "_n"); // &mg_ground_node
+    cl->_n = nn;
     {
-      Branch* br = m.new_branch(n, &Node_Map::mg_ground_node);
+      Branch* br = m.new_branch(np, &Node_Map::mg_ground_node);
       assert(br);
       assert(const_cast<Branch const*>(br)->owner());
       Branch_Ref prb(br);
@@ -194,17 +197,53 @@ public:
     o << ")\n{\n";
     o__ "MOD_" << id << "* d = this;\n";
     o__ "typedef MOD_" << id << " MOD;\n";
-    make_cc_tmp(o, "_st"+_br->code_name()+"", _br->deps());
+    std::string state = "_st" + cn;
+    make_cc_tmp(o, state, _br->deps());
+    trace2("xdt use", _br->code_name(), _br->is_used());
 
+    if(_output){
+      o__ "// subdevice\n";
+      o__ "t0.set_value(0.);\n";
+    }else{
+      o__ "d->" << cn << "->do_tr();\n";
+      o__ "t0 = d->" << cn << "->tr_amps();\n";
+      o__ "d->_potential" << cn << " = - t0;\n";
+    }
+    o__ "trace2(\"filt\", t0, d->"<< cn<<"->tr_outvolts());\n";
 
     make_assign(o);
-    o << "}\n";
+
+    if(_output){
+      // d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_ddt_1_p_ddt_1_n] += t0[d_potential_b_ddt_1_p_ddt_1_n]; // (3)
+      o__ "return t0; // (A)\n";
+      o__ "{\n";
+      o____ "double A = d->" << _output->state() << "["
+	  << "MOD::" << _output->state() <<"_::dep_potential" << _br->code_name() << "];\n";
+      o____ "return A*t0; // (A)\n";
+      o__ "}\n";
+    }else{
+      o__ "return t0; // (B)\n";
+    }
+
+    o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
   }
   std::string eval(CS&, const CARD_LIST*)const override{
     unreachable();
     return "ddt";
   }
-  Probe const* prb() const{return _prb;}
+  Probe const* prb()const {return _prb;}
+  void set_n_to_gnd()const {
+    assert(_m);
+    _m->set_to_ground(_br->n());
+  }
+private:
+  Branch const* output()const;
+
+  // really?
+  Node const* p()const override;
+  Node const* n()const override;
 }; // XDT
 /*--------------------------------------------------------------------------*/
 class DDT : public XDT{
@@ -218,13 +257,8 @@ public:
 private:
   void make_assign(std::ostream& o)const {
     std::string cn = _br->code_name();
-    o__ "d->" << cn << "->do_tr();\n";
-    o__ "t0 = d->" << cn << "->tr_amps();\n";
-    o__ "d->_potential" << cn << " = - t0;\n";
-    o__ "trace2(\"filt\", t0, d->"<< cn<<"->tr_outvolts());\n";
     o__ "t0[d_potential" << cn << "] = -1.;\n";
     o__ "assert(t0 == t0);\n";
-    o__ "return t0;\n";
   }
 } ddt;
 DISPATCHER<FUNCTION>::INSTALL d_ddt(&function_dispatcher, "ddt", &ddt);
@@ -241,20 +275,24 @@ public:
 private:
   void make_assign(std::ostream& o)const {
     std::string cn = _br->code_name();
-    o__ "d->" << cn << "->do_tr();\n";
-    o__ "t0 = d->" << cn << "->tr_amps();\n";
-    o__ "d->_potential" << cn << " = - t0;\n";
-    o__ "trace2(\"filt\", t0, d->"<< cn<<"->tr_outvolts());\n";
     if(num_args()>1){
       o__ "t0 = t0 + t1.value();\n";
     }else{
     }
     o__ "t0[d_potential" << cn << "] = -1.;\n";
     o__ "assert(t0 == t0);\n";
-    o__ "return t0;\n";
   }
 } idt;
 DISPATCHER<FUNCTION>::INSTALL d_idt(&function_dispatcher, "idt", &idt);
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+Branch* Token_XDT::branch() const
+{
+  auto func = prechecked_cast<XDT const*>(f());
+  assert( func);
+  assert( func->_br);
+  return func->_br;
+}
 /*--------------------------------------------------------------------------*/
 void Token_XDT::stack_op(Expression* e)const
 {
@@ -266,17 +304,27 @@ void Token_XDT::stack_op(Expression* e)const
   e->pop_back();
   // assert(!e->is_empty());
 
-  auto ff = prechecked_cast<XDT const*>(f());
-  assert(ff);
+  auto func = prechecked_cast<XDT const*>(f());
+  assert(func);
 
   if(auto dd = prechecked_cast<Deps const*>(cc->data())) {
     assert(dd);
+    for(auto i : *dd){
+      trace1("xdt arg deps", i->code_name());
+    }
 
-    ff->_br->deps().clear();
-    ff->_br->deps() = *dd; // HACK
+    branch()->deps().clear();
+    branch()->deps() = *dd; // HACK
+    if(1){
+      func->set_n_to_gnd();
+    }else if(0 /*sth linear*/){
+      // somehow set loss=0 and output ports to target.
+    }else{
+    }
 
     auto d = new Deps;
-    d->insert(Dep(ff->prb())); // BUG?
+    trace1("xdt output dep", func->prb()->code_name());
+    d->insert(Dep(func->prb(), Dep::_LINEAR)); // BUG?
     auto N = new Token_XDT(*this, d, cc->args()?cc->args()->clone():NULL);
     assert(N->data());
     assert(dynamic_cast<Deps const*>(N->data()));
@@ -287,7 +335,7 @@ void Token_XDT::stack_op(Expression* e)const
     unreachable();
   }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) { untested();
     auto d = new Deps;
-    d->insert(Dep(ff->prb())); // BUG?
+    d->insert(Dep(func->prb())); // BUG?
     auto N = new Token_XDT(*this, d);
     assert(N->data());
     assert(dynamic_cast<Deps const*>(N->data()));
@@ -295,9 +343,71 @@ void Token_XDT::stack_op(Expression* e)const
   }else{ untested();
     unreachable();
   }
+
+  trace0("xdt use?");
+  int c_cnt = 0;
+  bool assigned = false;
+  bool always = false;
+  Contribution const* cont;
+  for(auto b : branch()->used_in()) {
+    if(auto c = dynamic_cast<Contribution const*>(b)){
+      if(c->is_flow_contrib()) {
+	trace1("xdt used_in", c->name());
+	++c_cnt;
+	cont = c;
+      }else{untested();
+	incomplete();
+      }
+      if(c->is_always()){
+	always = true;
+      }else{
+      }
+    }else if(dynamic_cast<Assignment const*>(b)){
+      assigned = true;
+    }else{untested();
+    }
+  }
+  func->_output = NULL;
+  if(assigned==1){
+  }else if(!always){
+  }else if(c_cnt==1){
+    for(auto d : cont->deps()){
+      trace2("xdt cont", cont->branch()->code_name(), branch()->code_name());
+      trace2("xdt cont", d.is_linear(), d->branch() == branch());
+      if(d->branch() != branch()){untested();
+      }else if(d.is_linear()){
+    //  // TODO if voltage probe?
+    incomplete();
+	func->_output = cont->branch(); // polarity?
+      }else{
+      }
+    }
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
+Branch const* XDT::output() const
+{ itested();
+  if(_output){
+    return _output;
+  }else{
+    return _br;
+  }
 }
+/*--------------------------------------------------------------------------*/
+#if 1
+Node const* XDT::p() const
+{ itested();
+  return _p;
+}
+/*--------------------------------------------------------------------------*/
+Node const* XDT::n() const
+{ itested();
+  return _n;
+}
+#endif
+/*--------------------------------------------------------------------------*/
+} // namespace
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

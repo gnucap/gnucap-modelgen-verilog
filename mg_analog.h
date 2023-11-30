@@ -269,12 +269,14 @@ public:
 private:
   void set_owner(Block* owner) { _owner = owner; }
   Block* owner() {return _owner;}
+  Block const* owner()const {return _owner;}
 public:
 
   bool is_pot_contrib() const;
   bool is_flow_contrib() const;
   bool is_short() const { return _short; }
   bool is_direct() const;
+  bool is_always() const{ assert(owner()); return owner()->is_always(); }
   void parse(CS&)override;
   void dump(std::ostream&)const override;
   Deps const& deps() const { return _rhs.deps(); }

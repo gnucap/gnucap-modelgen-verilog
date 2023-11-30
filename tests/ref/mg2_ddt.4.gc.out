@@ -39,5 +39,5 @@ vsin #(.ampl(1),.dc(v)) v1 (.p(1),.n(0));
 Gnucap   System status
 iterations: op=0, dc=0, tran=101, fourier=0, total=135
 transient timesteps: accepted=27, rejected=7, total=34
-nodes: user=1, subckt=0, model=3, total=4
-dctran density=62.5%, ac density=62.5%
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%
