@@ -384,13 +384,13 @@ void AnalogConditionalStmt::parse(CS& f)
     }else if(_cond.is_true()) {
       if(owner()->is_always()) {
 	_body.set_always();
-      }else{ untested();
+      }else{itested();
       }
       _false_part.set_never();
     }else if(_cond.is_false()) {
       if(owner()->is_always()) {
 	_false_part.set_always();
-      }else{ untested();
+      }else{itested();
       }
       _body.set_never();
     }else{
@@ -521,7 +521,7 @@ bool AnalogForStmt::update()
     if ( init_ && init_->update() ){ untested();
       ret = true;
 //    }else if(_cond.update()){ untested();
-    }else if (_body.update()){ untested();
+    }else if (_body.update()){itested();
       ret = true;
     }else if ( tail_ && tail_->update() ) { untested();
       ret = true;

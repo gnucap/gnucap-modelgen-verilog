@@ -72,4 +72,21 @@
 * partial attribute instance in lang_verilog
 * bunch of optimisations
 * paramset stub, vams/cap
+* deps: fixed point iteration (fpi) stub
 * more pragmas options
+
+20231130-dev
+============
+* bugfix aliasparam
+* bugfix pp nested conditional
+* bugfix production build, casts.
+* drop module variable derivatives
+* refine (reverse) dependency tracking, fpi
+* dump-annotate dependencies and reachability
+* node equivalence, hard and conditional.
+* keep track of event sensitivities
+* deterministic output
+* handle parametric constants in precalc_last
+* ddt/idt: avoid internal nodes
+* do not allocate unused filter nodes
+* misc small fixes (see git)
