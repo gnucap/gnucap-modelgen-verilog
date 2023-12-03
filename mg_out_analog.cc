@@ -136,7 +136,7 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
       o__ lhsname << " = int(t0); // (*)\n";
     }else if(within_af(&a)){
       o__ lhsname << " = t0; // (1a)\n";
-    }else if(!options().optimize_deriv()) { untested();
+    }else if(!options().optimize_deriv()) {itested();
       o__ lhsname << " = t0; // (*)\n";
       for(auto v : a.deps()) {
 	o__ "// " << a.lhs().code_name() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // (2a)\n";
@@ -824,7 +824,7 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Variable_Decl&
     }else if(options().optimize_deriv()) {
       make_one_variable_proxy(o, V, m);
       o << V.code_name() << "(d);\n";
-    }else{ untested();
+    }else{itested();
       o__ "ddouble " << V.code_name() << "(d->" << V.code_name() << ");\n";
     }
   }else{
@@ -842,7 +842,7 @@ void OUT_ANALOG::make_one_variable_store(std::ostream& o, const Variable_Decl& V
     // it's a reference.
   }else if(options().optimize_deriv()) {
     // use destructor
-  }else{ untested();
+  }else{itested();
     o__ "d->" << V.code_name() << " = " << V.code_name() << ".value();\n";
   }
 }

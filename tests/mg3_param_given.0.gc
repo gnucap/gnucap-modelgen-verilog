@@ -11,7 +11,7 @@ module test_pg0(p, n)
 	parameter real st = 3;
 
 	analog begin
-		if $param_given(st) begin
+		if ($param_given(st)) begin
 			V(p,n) <+ 1;
 		end else
 			V(p,n) <+ 2;

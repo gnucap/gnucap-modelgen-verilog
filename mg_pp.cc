@@ -379,7 +379,7 @@ void Define::parse(CS& f)
 	std::string more = f.get_to("\\/\n"); // BUG
 	trace1("more?", more);
 	stash("\n" + more, args);
-      }else{untested();
+      }else{itested();
 	std::string more = f.get_to("\\/\n"); // BUG
 	trace1("more?", more);
 	stash(more, args);

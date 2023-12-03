@@ -92,13 +92,13 @@ static void make_common_nature(std::ostream& o, const File& f)
       o__ "NATURE const* flow()const override{\n";
       o____ "return &_N_" << i->flow()->identifier() << ";\n" ;
       o__ "}\n";
-    }else{ untested();
+    }else{itested();
     }
     if(i->potential()){
       o__ "NATURE const* potential()const override{\n";
       o____ "return &_N_" << i->potential()->identifier() << ";\n" ;
       o__ "}\n";
-    }else{ untested();
+    }else{itested();
     }
     o << "}_D_"<<i->identifier()<<";\n";
     o << "class _COMMON_VASRC_" << i->identifier() << " : public COMMON_VASRC {\n";

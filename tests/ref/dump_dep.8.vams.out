@@ -1,0 +1,64 @@
+module dep7(a, g);
+  inout a, g;
+  electrical a, g;
+  parameter real p = 0.;
+
+  real   T;
+
+  analog begin // always
+    real c, d;
+    c = V(a); // dep: _potential_b_a_
+    if ((V(g) > 1)) begin
+      real t;
+      t = 4;
+    end
+    else begin
+      d = c; // dep: _potential_b_a_
+    end
+    begin : stuff
+      if ((c > 0)) begin
+        I(g) <+ d; // dep: _potential_b_a_
+        real f;
+        f = d; // dep: _potential_b_a_
+      end
+      else begin
+        I(g) <+ 1;
+      end
+    end
+  end
+
+endmodule
+
+
+
+// paramsets
+module dep7p(a, g);
+  electrical a, g;
+  localparam real __p = 0.;
+
+  real   __T;
+
+  analog begin // always
+    real c, d;
+    c = V(a); // dep: _potential_b_a_
+    if ((V(g) > 1)) begin
+      real t;
+      t = 4;
+    end
+    else begin
+      d = c; // dep: _potential_b_a_
+    end
+    begin : stuff
+      if ((c > 0)) begin
+        I(g) <+ d; // dep: _potential_b_a_
+        real f;
+        f = d; // dep: _potential_b_a_
+      end
+      else begin
+        I(g) <+ 1;
+      end
+    end
+  end
+
+endmodule
+

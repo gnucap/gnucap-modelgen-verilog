@@ -302,7 +302,9 @@ public:
   bool is_always() const{ assert(owner()); return owner()->is_always(); }
   void parse(CS&)override;
   void dump(std::ostream&)const override;
-  Deps const& deps() const { return _rhs.deps(); }
+  Deps const& deps() const {
+    if(_deps) {return *_deps;} else {return _rhs.deps();}
+  }
   Expression const& rhs()const {return _rhs;}
   std::string const& name() const{return _name;}
   Branch_Ref const& branch_ref() const{return _branch;}

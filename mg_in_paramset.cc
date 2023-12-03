@@ -342,6 +342,7 @@ static void import_proto_impl(Module* sub, Module const* proto)
 /*--------------------------------------------------------------------------*/
 void Paramset::expand()
 {
+  option_nodump_annotate while_expanding_ps;
   assert(_proto);
   _sub = new Paramset(); // new Module();?
   _sub->set_owner(this);

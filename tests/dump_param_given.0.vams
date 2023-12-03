@@ -6,14 +6,14 @@ module test_pg0(p, n)
    localparam real l = 5.;
 
    analog begin
-      if $param_given(st) begin
+      if ($param_given(st)) begin
          V(p,n) <+ 1.0;
       end else
          V(p,n) <+ 1.1;
 
       // is this plain 0. or an error?
       // maybe a warning...
-      if $param_given(l) begin
+      if ($param_given(l)) begin
          V(p,n) <+ 2.0;
       end else
          V(p,n) <+ 2.1;

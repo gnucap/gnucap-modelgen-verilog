@@ -1,4 +1,4 @@
 ... ical n, p;
-	analog begin
-		XS(n, p) <+ 17.
+ analog begin
+  XS(n, p) <+ 17.
              ^ ? bad access

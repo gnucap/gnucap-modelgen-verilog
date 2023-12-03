@@ -1,4 +1,5 @@
-... ule test()
-	analog begin
-		XS(n, p) <+ 17.
-             ^ ? bad discipline
+
+module test()
+ analog begin
+  XS(n, p) <+ 17.
+    ^ ? bad discipline.

@@ -2424,7 +2424,7 @@ public:
 public:
   explicit PRECALC_capacitor(MOD_capacitor*d) : _d(d) {}
     ddouble _b_ddt_1(ddouble){
-    ddouble ret;
+    ddouble ret = 0.;
     ret[d_potential_b_ddt_1_p_ddt_1_n] = -1.;
     return ret;
 }
@@ -3128,7 +3128,7 @@ public:
 public:
   explicit PRECALC_capacitor(MOD_capacitor*d) : _d(d) {}
     ddouble _b_ddt_2(ddouble){
-    ddouble ret;
+    ddouble ret = 0.;
     ret[d_potential_b_ddt_2_p_ddt_2_n] = -1.;
     return ret;
 }

@@ -147,7 +147,7 @@ public:
 	comma = ", ";
       }
     o << "){\n";
-    o__ "ddouble ret;\n";
+    o__ "ddouble ret = 0.;\n";
     std::string cn = _br->code_name();
     o__ "ret[d_potential" << cn << "] = -1.;\n";
     o__ "return ret;\n";
@@ -371,7 +371,7 @@ void Token_XDT::stack_op(Expression* e)const
   }else if(cont->has_sensitivities()) { itested();
   }else if(always){
     for(auto d : cont->deps()){
-      if(d->branch() != branch()){untested();
+      if(d->branch() != branch()) {
       }else if(d.is_linear()){
 	// incomplete();
 	func->_output = cont->branch(); // polarity?

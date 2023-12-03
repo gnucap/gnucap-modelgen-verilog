@@ -320,6 +320,7 @@ static Base* parse_contribution(CS& f, Block* owner)
 /*--------------------------------------------------------------------------*/
 static Base* parse_analog_stmt_or_null(CS& file, Block* owner)
 {
+  size_t here = file.cursor();
   assert(owner);
   Base* ret = NULL;
 
@@ -340,6 +341,12 @@ static Base* parse_analog_stmt_or_null(CS& file, Block* owner)
     || (ret = parse_contribution(file, owner))
     ;
 
+  trace1("parse_analog_stmt_or_null?", file.tail().substr(0,30));
+  if(file.stuck(&here)) {
+    file.reset_fail(here);
+  }else{
+  }
+
   return ret;
 }
 /*--------------------------------------------------------------------------*/
@@ -356,7 +363,7 @@ static Base* parse_analog_stmt(CS& file, Block* owner)
   }
 }
 /*--------------------------------------------------------------------------*/
-void AnalogConditionalStmt::parse(CS& file)
+void AnalogConditionalStmt::parse(CS& f)
 {
   assert(owner());
   _body.set_owner(owner());
@@ -365,11 +372,12 @@ void AnalogConditionalStmt::parse(CS& file)
   _false_part.set_owner(owner());
 
   assert(_cond.owner() == owner());
-  file >> "(" >> _cond >> ")";
-
-  if(file >> ";"){
+  if(f >> "(" >> _cond >> ")"){
   }else{
+    throw Exception_CS_("expecting conditional", f);
+  }
 
+  {
     if(owner()->is_never()) {
       _body.set_never();
       _false_part.set_never();
@@ -388,10 +396,15 @@ void AnalogConditionalStmt::parse(CS& file)
     }else{
     }
 
-    file >> _body;
-    if(file >> "else "){
-      file >> _false_part;
+    if(f >> _body){
     }else{
+      throw Exception_CS_("expecting statement", f);
+    }
+    size_t here = f.cursor();
+    if(f >> "else "){
+      f >> _false_part;
+    }else{
+      f.reset(here);
     }
   }
 }
@@ -399,14 +412,12 @@ void AnalogConditionalStmt::parse(CS& file)
 void AnalogConditionalStmt::dump(std::ostream& o)const
 {
   // TODO revisit indentation logic.
-  static bool cont; // yikes. recurse.
 
   bool omit_true = !options().dump_unreachable() && _cond.is_false(); // _body->is_reachable?
   bool omit_false = !options().dump_unreachable() && _cond.is_true();
   bool omit_cond = omit_true || omit_false;
 
   if(omit_cond) {
-  }else if(cont){ untested();
   }else{
     o__ "";
   }
@@ -414,9 +425,11 @@ void AnalogConditionalStmt::dump(std::ostream& o)const
   if(omit_cond) {
   }else{
     o << "if (" << _cond << ") ";
-    cont = false;
   }
+
   {
+   // if(!_body.size()) {
+   // }else
     if(omit_true) {
     }else if(omit_cond){
        o__ "";
@@ -425,10 +438,10 @@ void AnalogConditionalStmt::dump(std::ostream& o)const
       _body.dump(o);
     }
   }
+
   if(omit_false){
   }else if(_false_part){
     if(omit_true){
-      cont = false;
     }else{
       o__ "else ";
     }
@@ -810,12 +823,13 @@ void AnalogCtrlBlock::parse(CS& f)
   }else{
   }
   assert(block().owner());
-  if(f >> ";"){
-  }else if(f >> "begin"){
+//  size_t here = f.cursor();
+  if(f >> "begin"){
     AnalogSeqBlock::parse(f);
   }else{
     Base* b = parse_analog_stmt_or_null(f, &_block);
-    if(b) {
+    if(!f) {
+    }else if(b){
       _block.push_back(b);
     }else{
     }
@@ -966,7 +980,8 @@ void Contribution::parse(CS& cmd)
 
 
   if(!_branch->discipline()) {
-    throw Exception_CS_("bad discipline", cmd);
+    cmd.reset(here);
+    throw Exception_CS_("bad discipline.", cmd);
   }else{
   }
   Discipline const* disc = _branch->discipline();

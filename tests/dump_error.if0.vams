@@ -1,0 +1,16 @@
+`include "disciplines.vams"
+`include "constants.vams"
+`pragma modelgen nodump-nature
+`pragma modelgen nodump-discipline
+
+module ctrl(a, g);
+  inout      a, g;
+  electrical a, g;
+  analog begin
+    real d;
+    if(V(g)>1)
+    else begin
+      d = 4;
+    end
+  end
+endmodule

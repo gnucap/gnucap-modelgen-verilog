@@ -1,5 +1,6 @@
-... st()
 
-	analog begin
-		$strobetypo(0);
-                  ^ ? bad discipline
+module test()
+
+ analog begin
+  $strobetypo(0);
+    ^ ? bad discipline.

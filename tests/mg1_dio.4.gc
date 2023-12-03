@@ -11,7 +11,7 @@ electrical p, n;
 analog begin
 	real v;
 	v = V(p, n);
-	if(v < 0.)
+	if(v < 0.) ;
 	else
 		I(p, n) <+ v;
 end

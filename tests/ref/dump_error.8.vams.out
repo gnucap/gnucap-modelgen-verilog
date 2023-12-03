@@ -1,4 +1,4 @@
 ... meter real b = 1.;
 
-	aliasparam x = y;
+ aliasparam x = y;
                   ^ ? no such parameter

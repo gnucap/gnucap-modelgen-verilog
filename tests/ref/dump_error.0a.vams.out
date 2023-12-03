@@ -3,7 +3,7 @@
     ^ ? what's this??
 ... ) <+ X(p,n);
 
-	analog
-		real X;
-		v = X(x,y);
+ analog
+  real X;
+  v = X(x,y);
       ^ ? bad module

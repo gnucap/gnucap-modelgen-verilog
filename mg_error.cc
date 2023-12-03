@@ -154,8 +154,14 @@ Exception_CS_::Exception_CS_(const std::string& Message, const CS& cmd)
 const std::string Exception_CS_::message()const
 {itested();
   std::string s;
-  s = _cmd
-    + '\n' + std::string(_cursor, ' ') + "^ ? " + Exception::message();
+  for(auto i : _cmd){
+    if(i=='\t'){
+      s += ' ';
+    }else{
+      s += i;
+    }
+  }
+  s += '\n' + std::string(_cursor, ' ') + "^ ? " + Exception::message();
   return s;
 }
 /*--------------------------------------------------------------------------*/

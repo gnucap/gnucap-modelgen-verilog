@@ -101,7 +101,7 @@ public:
     }
     Node const* p = _ddxprobe->branch()->p();
     Node const* n = _ddxprobe->branch()->n();
-    o__ "double ret;\n";
+    o__ "double ret = 0.;\n";
     o__ "(void) t1;\n";
     assert(_m);
     for(auto x : _m->branches()){

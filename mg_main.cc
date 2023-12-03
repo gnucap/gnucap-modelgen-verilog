@@ -155,7 +155,7 @@ int main(int argc, char** argv)
 	"to redistribute it under certain conditions\n"
 	"according to the GNU General Public License.\n"
 	"See the file \"COPYING\" for details.\n";
-    }else if (argc && strncmp(argv[0], "--", 2) == 0) { untested();
+    }else if (argc && strncmp(argv[0], "--", 2) == 0) {itested();
       CS cmd(CS::_STRING, argv[0]+2); // command line
       modelgen_opts().parse(cmd);
     }else{untested();

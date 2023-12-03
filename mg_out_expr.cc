@@ -471,7 +471,7 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
 	for(auto i: s.deps()){
 	  o__ s.code_name() << "[d" << i->code_name() << "] = 0.; // (output dep)\n";
 	}
-      }else{ untested();
+      }else{itested();
       }
 //      assert((*pp)->branch());
      // if(s.is_precalc()){

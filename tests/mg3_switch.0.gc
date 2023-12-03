@@ -11,7 +11,7 @@ module test_sw0(p, n)
 	(* desc="" *) real st;
 
 	analog begin
-		if V(p, n) > 0 begin
+		if (V(p, n) > 0) begin
 			st = 1;
 			I(p, n) <+ V(p,n);
 		end else

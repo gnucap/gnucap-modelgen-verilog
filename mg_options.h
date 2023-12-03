@@ -60,11 +60,25 @@ public:
   bool dump_nature()      const{ return _dump_nature; }
   bool dump_annotate()    const{ return _dump_annotate; }
   bool expand_paramset()  const{ return _expand_paramset; }
+public:
+  friend class option_nodump_annotate;
 };
 /*--------------------------------------------------------------------------*/
 inline Options& options()
 {
   return prechecked_cast<Options&>(modelgen_opts());
 }
+/*--------------------------------------------------------------------------*/
+class option_nodump_annotate{
+  bool _prev;
+public:
+  explicit option_nodump_annotate(){
+    _prev = options().dump_annotate();
+    options()._dump_annotate = false;
+  }
+  ~option_nodump_annotate(){
+    options()._dump_annotate = _prev;
+  }
+};
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

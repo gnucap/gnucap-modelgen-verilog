@@ -1,4 +1,4 @@
 ... parameter real b = 1.;
 
-	aliasparam b = a;
+ aliasparam b = a;
               ^ ? already exists

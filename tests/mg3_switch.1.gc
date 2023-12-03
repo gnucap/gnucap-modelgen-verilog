@@ -11,7 +11,7 @@ module test_sw1(p, n, cp, cn)
 	(* desc="" *) real short;
 
 	analog begin
-		if V(cp, cn) > 0 begin
+		if (V(cp, cn) > 0) begin
 			short = 1;
 			V(p, n) <+ 0.
 		end else
