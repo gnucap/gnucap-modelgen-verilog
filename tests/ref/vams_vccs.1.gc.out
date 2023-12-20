@@ -1,9 +1,25 @@
-vccs #() dut (.sink(0),.src(2),.ps(1),.ns(0));
-resistor #(.r(2./17)) r0 (.p(2),.n(0));
-vsource #() v1 (.p(1),.n(0));
-#           v(1)       v(2)      
+load ../lang_verilog.so 
+     ^ ? "../lang_verilog.so": already loaded, replacing
+#           v(in)      v(out)     y(vv._b_sink_src)
+ 0.         0.9        6.3        0.        
+#Time       v(in)      v(out)    
  0.         0.         0.        
- 0.5        0.5        0.058824  
- 1.         1.         0.11765   
- 1.5        1.5        0.17647   
- 2.         2.         0.23529   
+ 0.01       0.062791   0.43953   
+ 0.02       0.12533    0.87733   
+ 0.036333   0.22631    1.5842    
+ 0.12394    0.70238    4.9167    
+ 0.21155    0.97095    6.7967    
+ 0.34295    0.83424    5.8397    
+ 0.47436    0.16038    1.1227    
+ 0.60577   -0.61674   -4.3172    
+ 0.73718   -0.99676   -6.9773    
+ 0.86859   -0.735     -5.145     
+ 1.         0.         0.        
+#Freq       vm(in)     vm(out)    vp(in)     vp(out)   
+ 1.         1.         7.         0.         0.        
+ 2.         1.         7.         0.         0.        
+Gnucap   System status
+iterations: op=0, dc=3, tran=35, fourier=0, total=52
+transient timesteps: accepted=12, rejected=0, total=12
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%

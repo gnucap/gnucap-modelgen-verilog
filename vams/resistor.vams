@@ -6,9 +6,27 @@ module resistor(p, n);
 	electrical p, n;
 	inout p, n;
 	parameter real r = 1. from [`SHORT:inf);
+	(* desc="i" *) real i;
 	analog begin
-		real i;
 		i = V(p,n) / r;
 		I(p,n) <+ i;
 	end
 endmodule
+
+`ifdef LATER
+module resistor(p, n);
+	electrical p, n;
+	inout p, n;
+	parameter real r = 1. from [`SHORT:inf);
+	parameter real tc1 = 0., tc2 = 0.;
+	localparam real g = 1 / r / (1+(tc1+tc2*T)*T;
+	analog begin
+		I(p,n) <+ V(p,n) * g;
+	end
+endmodule
+
+paramset resistor resistor
+	parameter real r = 1. from [`SHORT:inf);
+	.r(r);
+endparamset
+`endif

@@ -1,0 +1,47 @@
+// simple diode test, d_diode.1.ckt
+attach ../lang_verilog.so
+attach ../vams/diode.so
+attach ../d_vasrc.so
+verilog
+
+paramset ddd diode;
+  parameter real area=1;
+ .area= area;
+ .level=0;
+ .is= 10.f;
+ .rs= 0.;
+ .n= 1.;
+ .tt= 0.;
+ .cjo= 1.p;
+ .vj= 1.;
+ .m= 0.5 ;
+ .eg= 1.11;
+ .xti= 3.;
+ .kf= 0.;
+ .af= 1.;
+ .fc= 0.5;
+ .bv= 50;
+ .ibv= 0.001;
+endparamset;
+
+module main(1 2)
+  ddd #(.area(1.)) d1 (1  2);
+endmodule
+
+main m(2 0);
+
+spice
+
+V1   1  0  10. AC 1
+R1   1  2  100.K
+*>.list
+*>.print op v(1) v(2) i(v1) 
+*>.print op + i(r1) id(m.d1) vd(m.d1) req(m.d1) cd(m.d1) z(m.d1) zraw(m.d1) gd(m.d1) z(2) iter(0) region(m.d1)
+.op
+.print dc v(1) v(2) i(v1) 
+*>.print dc + i(r1) id(m.d1) vd(m.d1) req(m.d1) cd(m.d1) z(m.d1) zraw(m.d1) gd(m.d1) z(2) iter(0) region(m.d1)
+.dc v1 -10 10 2
+*>.stat notime
+*>.op
+*>.stat notime
+.end

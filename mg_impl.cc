@@ -157,7 +157,6 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
   }else{
   }
 
-  incomplete();
   Branch_Ref a(branches().lookup(p) /*, polarity?*/);
 
   if(a){

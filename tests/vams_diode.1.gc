@@ -6,7 +6,7 @@ attach ../d_vasrc.so
 attach ../vams/diode.so
 
 module main(n, g)
-	diode #(.cjo(1pf) .tf(1u)) D1(n g);
+	diode #(.cjo(1pf) .tf(1u) .is(1e-15)) D1(n g);
 endmodule
 
 main m(n,m);
@@ -17,11 +17,13 @@ spice
 
 .parameter v=0
 V1  (n, 0) vsource dc=v ac=1
+
+* compare: BUILT_IN_DIODE
 * D1  (n m) dd
 * .model dd d cjo=1pf is=1e-15 tt=1u
 
-.print dc v(nodes) i(V1) iter(0)
-.dc v -1.4 .7 .7
+.print dc v(nodes) i(V1) region(m.D1) iter(0)
+.dc v -1.4 .7 .7 trace=i
 
 .print ac v(nodes)
 .ac 1 1000k * 10

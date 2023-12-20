@@ -1,27 +1,141 @@
-// Junction diode example similar to the one from
-// "The Designer's Guide to Verilog-AMS" by Kundert & Zinke, 2004.
-// Chapter 3, Listing 11.
+// Verilog-A/MS port of d_diode.model,
+// BUILT_IN_DIODE, Gnucap, 2001, GPLv3+.
 
-// Partly implements BUILT_IN_DIODE, Gnucap, 2001, GPLv3+.
-// Possibly too simple to worry about a licence.
+// (c) 2023 Felix Salfelder, still GPLv3+
 
 `include "disciplines.vams"
+`include "constants.vams"
 
 module diode (a, c);
 	parameter real is=1e-15 from (0:inf);	// saturation current (A)
-	parameter real tf=0 from [0:inf);	// forward transit time (s)
+	parameter real tf=0. from [0:inf);	// forward transit time (s)
 	parameter real cjo=0 from [0:inf);	// zero-bias junction capacitance (F)
+	parameter real pb=1. from (0:inf);
+	parameter real pbsw=pb from (0:inf);
+	parameter real cjsw=0 from [0:inf);	// zero-bias sw capacitance (F)
 	parameter real phi=0.7 exclude 0;	// built-in junction potential (V)
+
+	parameter real tnom = 27. from (0:inf); // duplicate in COMMON_COMPONENT...
+	parameter real n = 1.; // why not use $mfactor?
+
+	parameter real area=1;
+	parameter real perim=1;
+	parameter real rs= 0.;
+	parameter real tt= 0.;
+	parameter real vj= 1.;
+	parameter real m= 0.5 ;
+	parameter real eg= 1.11;
+	parameter real xti= 3.;
+	parameter real kf= 0.;
+	parameter real af= 1.;
+	parameter real fc= 0.5;
+	parameter real bv= 50;
+	parameter real ibv= 0.001;
+	parameter real js= 0.;
+	parameter real mj= .5;
+	parameter real mjsw= .33;
+	
+	parameter integer level = 0. from [0:5];
+
+	localparam real is_adjusted = $param_given(is)? is : (js*area);
+	localparam real cj_adjusted = cjo * area;
+	localparam real cjsw_adjusted = cjsw * perim;
+
 	inout a, c;
 	electrical a, c;
 	branch (a, c) r, cap;
 	real qd;
+   (* desc="region" *) integer region;
 
 	analog begin
+		real volts, amps, g;
+
+		real tempratio;
+		if($param_given(tnom))
+			tempratio = $temperature / tnom + `P_CELSIUS0;
+		else
+			tempratio = 1.;
+
+		real vt;
+		vt = $vt * n;
+    	// region_t oldregion = region;
+		real p_isat;
+		p_isat = is_adjusted * pow(tempratio, xti) * exp((eg/vt) *(tempratio-1));
 		real i;
-		i = is*(limexp(V(r)/$vt) - 1);
-		I(r) <+ i;
-		qd = tf*i - 2*cjo*phi*sqrt(1 - V(cap)/phi);
+
+		volts = V(r);
+		case(level)
+			0: begin // gnucap model
+				if (volts <= 0.) begin
+					region = -1;
+					i = p_isat * (exp(volts/vt) - 1.);	
+					I(r) <+ i;
+				end else begin
+					amps = I(r);
+					if (amps >= 0.) begin
+						region = 1;
+						V(r) <+ vt * ln(amps/p_isat + 1.);
+					end else begin
+						region = 0;
+						i = volts * p_isat/vt;
+						I(r) <+ i;
+					end
+				end
+			end
+		   1,2,3,4,5: begin // spice model, WIP
+				if (volts <= 0.) begin
+					region = -1;
+					g = ( p_isat / vt + $simparam("gmin") );
+				end else begin
+					region = 1;
+					real ev;
+					ev = exp(volts/vt);
+					g = ( p_isat * ( ev - 1.) + $simparam("gmin") );
+				end
+				I(r) <+ g*volts;
+			end
+		endcase
+
+		real qb;
+		if (volts < fc * pb) begin
+			qb = cj_adjusted * pb * pow(1.-(volts/pb), 1.-mj) / (1.-mj);
+// 			cb = cj_adjusted * pow(1. - (volts / pb),  -mj); // Cj
+ 		end else begin
+         // untested...
+			qb = cj_adjusted * ((pb* ( pow(1.-fc, 1.-mj) - 1.) / (1.-mj)) // qb0
+                            + pow(1.-fc, - 1. - mj)
+                            + volts * ( (1.-fc*(1.+mj)) + .5 * (volts/pb) * mj));
+// 			cb = cj_adjusted / pow(1. - fc, 1. + mj) * (1. - fc*(1.+mj) + (volts/pb)*mj); // Cj
+ 		end
+
+		real qsw;
+ 		if (volts < fc * pbsw) begin
+			qsw = cjsw_adjusted * pbsw * pow(1.-(volts/pbsw), 1.-mjsw) / (1.-mjsw);
+// 			csw = cjsw_adjusted / pow(1. - (volts / pbsw),  mjsw); // Cj
+ 		end else begin
+			qsw = cjsw_adjusted * ((pbsw* ( pow(1.-fc, 1.-mjsw) - 1.) / (1.-mjsw)) // qsw0
+                               + pow(1.-fc, - 1. - mjsw)
+                               + volts * ( (1.-fc*(1.+mjsw)) + .5 * (volts/pbsw) * mjsw));
+// 			csw = cjsw_adjusted / pow(1. - fc, 1. + mjsw) * (1. - fc*(1.+mjsw) + (volts/pbsw)*mjsw); // Cj
+ 		end
+//     
+//     double ctt;
+//     if (m->tt != 0.) {
+//       ctt = p->_gd * m->tt;
+//     }else{
+//       ctt = 0.;
+//     }
+//     assert(ctt >= 0.);
+//     
+//     trace4("", cb, csw, ctt, cb+csw+ctt);
+//     d->_y[0].f1 = cb + csw + ctt;
+
+      // Cj TODO
+		// qd = tf*amps - 2*cjo*phi*sqrt(1 - V(cap)/phi);
+		real ii;
+		 ii = is*(limexp(V(r)/$vt) - 1);
+		// qd = tf*ii - 2.*cjo*phi*sqrt(1. - V(cap)/phi);
+		qd = tf*ii - qb - qsw;// * V(cap); //  * (csw); // wrong.
 		I(cap) <+ ddt(qd);
 	end
 endmodule

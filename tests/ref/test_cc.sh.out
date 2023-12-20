@@ -1006,6 +1006,7 @@ private: // overrides
 private: // impl
 /* ========== */
 public: // instance vars
+  double  _v_i{0.};
 private: // branch state
 public: // states, _b_p_n;
   double _value_b_p_n;
@@ -1186,6 +1187,9 @@ static COMMON_resistor Default_resistor(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 double MOD_resistor::tr_probe_num(std::string const& n) const
 {
+  if(n == "i"){
+    return _v_i;
+  }
   if(n == "conv") {
     return converged();
   }
@@ -1277,6 +1281,30 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
   trace1("resistor::tr_eval_analog", d->long_label());
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+  class _V_i : public ddouble {
+    MOD_resistor * const _m;
+  public:
+    typedef ddouble base;
+    typedef va::ddouble_tag base_tag;
+    _V_i(ddouble const& p) : ddouble(p), _m(NULL) { itested(); }
+    _V_i(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}
+    _V_i(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}
+    _V_i(_V_i const& p) : ddouble(p), _m(NULL) {}
+    explicit _V_i() : ddouble(), _m(NULL) {set_all_deps();}
+    _V_i(MOD_resistor * m) : ddouble(m->_v_i), _m(m) {}
+    ~_V_i() {
+	if(_m){
+      _m->_v_i = value();
+    }else{itested(); }}
+    ddouble& operator=(double t){
+      ddouble::operator=(t);
+      return *this;
+    }
+    ddouble& operator=(ddouble t){
+      ddouble::operator=(t);
+      return *this;
+    }
+  }_v_i(d);
 #pragma GCC diagnostic pop
   MOD_resistor const* p = d;
   assert(p);
@@ -1284,8 +1312,6 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
   (void)pc;
   {
     { // 
-      ddouble _v_i; // Variable       Dep: _potential_b_p_n lin: 1
-      _v_i.set_all_deps();
       { // Assignment real 'i'.
         ddouble t0;
         t0[d_potential_b_p_n] = 0.; // (output dep)
@@ -1320,10 +1346,10 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
   PRECALC_resistor P(m);
   PRECALC_resistor* d = &P;
   (void)d;
+  ddouble _v_i(m->_v_i);
+  (void) _v_i;
   {
     { // 
-      ddouble _v_i; // Variable       Dep: _potential_b_p_n lin: 1
-      _v_i.set_all_deps();
       { // Assignment real 'i'.
         ddouble t0;
         t0 = 0.; // static?

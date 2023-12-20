@@ -3,17 +3,18 @@ load ../d_vasrc.so
 load ../lang_verilog.so
 load ../vams/resistor.so
 
-options bypass
+// options bypass
 verilog
 
 resistor #(.r(2) .m(2)) r1(in, 0)
+resistor #(.r(5) .$mfactor(5)) r2(in, 0)
 
 spice
 
 V1 in 0 ac 1 dc 0.9 tran sin
 
-.print tran v(nodes)
-.print dc v(nodes)
+.print tran v(nodes) i(V1) i(r*)
+.print dc v(nodes) i(V1) i(r*)
 .print ac vm(nodes) vp(nodes)
 
 .dc

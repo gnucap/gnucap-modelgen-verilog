@@ -12,11 +12,11 @@ spice
 
 V1 in 0 ac 1 dc 0.9 tran sin
 
-.print tran v(nodes)
-.print dc v(nodes)
+.print tran v(nodes) iter(0)
+.print dc v(nodes) iter(0)
 .print ac vm(nodes) vp(nodes)
 
 .dc
 .tran 1
-.ac 1 10 * 2
+.ac 1 2 * 2
 .status notime

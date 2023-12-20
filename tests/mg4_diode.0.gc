@@ -5,8 +5,8 @@ attach ../d_vasrc.so
 
 // options nobypass
 // options noincmode
-options trtol=1
-options gmin=.01p
+// options trtol=1
+// options gmin=.01p
 
 `modelgen
 module test_diode0(a, c);
