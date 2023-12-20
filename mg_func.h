@@ -86,7 +86,6 @@ public:
 	  return NULL;
   }
   virtual void make_cc_dev(std::ostream& o)const override;
-  virtual void make_cc_common(std::ostream& o) const = 0;
   Token* new_token(Module& m, size_t na) const override;
 };
 /*--------------------------------------------------------------------------*/
@@ -100,8 +99,8 @@ class MGVAMS_FILTER : public FUNCTION_ {
 public:
   ~MGVAMS_FILTER() {}
   // Token* new_token(Module& m, size_t na, Deps& d) const override;
-  virtual void make_cc_common(std::ostream&) const {}
-  virtual std::string code_name() const{
+  void make_cc_common(std::ostream&)const override {}
+  std::string code_name()const override{
     return "";
   }
   virtual Node const* p() const; // really?
@@ -120,7 +119,6 @@ public:
 	  unreachable();
 	  return NULL;
   }
-  virtual void make_cc_common(std::ostream&)const {} //up?
   std::string code_name()const override{
 	  return "";
   }

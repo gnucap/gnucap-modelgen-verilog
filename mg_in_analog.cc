@@ -1089,7 +1089,7 @@ void Contribution::add_dep(Dep const& d)
 
   if(!is_direct()){
   }else if(d->branch() != _branch){
-  }else if(is_flow_contrib() && d->is_flow_probe()){ untested();
+  }else if(is_flow_contrib() && d->is_flow_probe()){
     _branch->set_selfdep();
   }else if(is_pot_contrib() && d->is_pot_probe()){
     _branch->set_selfdep();
@@ -1734,7 +1734,7 @@ Contribution::~Contribution()
       i->branch()->dec_use();
       try{
 	(*i)->unset_used_in(this);
-      }catch(std::logic_error const& e){ untested();
+      }catch(std::logic_error const& e){
 	std::cerr << " logic error in " << name() << ": ";
 	std::cerr << e.what() << "\n";
 	assert(0);

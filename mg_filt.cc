@@ -237,7 +237,7 @@ public:
     _m->set_to_ground(_br->p());
   }
 private:
-  Branch const* output()const;
+  Branch const* output()const override;
 
   // really?
   Node const* p()const override;
@@ -249,11 +249,11 @@ public:
   explicit DDT() : XDT() {
     set_label("ddt");
   }
-  DDT* clone()const /*override*/{
+  DDT* clone()const override{
     return new DDT(*this);
   }
 private:
-  void make_assign(std::ostream& o)const {
+  void make_assign(std::ostream& o)const override{
     std::string cn = _br->code_name();
     o__ "t0[d_potential" << cn << "] = -1.;\n";
     o__ "assert(t0 == t0);\n";
@@ -266,12 +266,12 @@ public:
   explicit IDT() : XDT() {
     set_label("idt");
   }
-  IDT* clone()const /*override*/{
+  IDT* clone()const override {
     return new IDT(*this);
   }
 
 private:
-  void make_assign(std::ostream& o)const {
+  void make_assign(std::ostream& o)const override {
     std::string cn = _br->code_name();
     if(num_args()>1){
       o__ "t0 = t0 + t1.value();\n";
@@ -353,7 +353,7 @@ void Token_XDT::stack_op(Expression* e)const
 	trace1("xdt used_in", c->name());
 	++c_cnt;
 	cont = c;
-      }else{untested();
+      }else{
 	incomplete();
       }
       if(c->is_always()){

@@ -47,11 +47,6 @@ void MGVAMS_FUNCTION::make_cc_dev(std::ostream& o) const
   o__ "// " << label() << "\n";
 }
 /*--------------------------------------------------------------------------*/
-void MGVAMS_FUNCTION::make_cc_common(std::ostream& o) const
-{
-  o__ "// " << label() << "\n";
-}
-/*--------------------------------------------------------------------------*/
 void FUNCTION_::stack_op(Expression const& arg, Expression* E) const
 {
   Expression const* ee = &arg;

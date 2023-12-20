@@ -287,7 +287,7 @@ public:
   Block* owner(){return _owner;}
 //  void set_file(File const* f){ _file = f; }
 //  File const* file() const{untested(); return _file;}
-  void parse(CS& file) {
+  void parse(CS& file)override {
     size_t here = file.cursor();
     T* m = new T;
     m->set_owner(_owner);
@@ -300,7 +300,7 @@ public:
       file.warn(bWARNING, "what's this??");
     }
   }
-  void dump(std::ostream& f)const {
+  void dump(std::ostream& f)const override{
     for (const_iterator i = begin(); i != end(); ++i) {
       f << (**i);
     }
@@ -357,8 +357,8 @@ class Key : public Base {
   std::string _var;
   std::string _value;
 public:
-  void parse(CS& f) {f >> _name >> _var >> '=' >> _value >> ';';}
-  void dump(std::ostream& f)const
+  void parse(CS& f)override {f >> _name >> _var >> '=' >> _value >> ';';}
+  void dump(std::ostream& f)const override
   {f << name() << " " << var() << "=" << value() << "; ";}
   Key() : Base() {}
   const std::string& name()const	{return _name;}
@@ -1093,8 +1093,8 @@ class Port_1 : public Base {
   std::string _short_to;
   std::string _short_if;
 public:
-  void parse(CS& f);
-  void dump(std::ostream& f)const;
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
   Port_1() {}
   const std::string& name()const	{return _name;}
   const std::string& short_to()const 	{return _short_to;}
@@ -1144,7 +1144,7 @@ class New_Port : public Port_3 {
   Block* _owner{NULL};
 public:
   void set_owner(Block* c) { _owner = c; }
-  void parse(CS& f);
+  void parse(CS& f) override;
   New_Port() : Port_3() {}
 };
 // list ::= "(" port {"," port} ")"
@@ -1163,7 +1163,7 @@ protected:
   void set_node(Node*n){_node = n;}
 public:
   void set_owner(Block* c) { _owner = c; }
-  void parse(CS& f);
+  void parse(CS& f) override;
   void set_discipline(Discipline const* d);
 };
 /*--------------------------------------------------------------------------*/
@@ -1234,8 +1234,8 @@ class Element_1 : public Base {
   std::string _state;
 public:
   void set_owner(Block const*) { }
-  void parse(CS&);
-  void dump(std::ostream& f)const;
+  void parse(CS&) override;
+  void dump(std::ostream& f)const override;
   Element_1() {untested();}
   Element_1(CS& f) {parse(f);}
   std::string dev_type()const	{return _dev_type;}
@@ -1358,8 +1358,8 @@ class Args : public Base {
   Arg_List   _arg_list;
 public:
   void set_owner(Block const*){}
-  void parse(CS& f) {f >> _name >> _type >> _arg_list;}
-  void dump(std::ostream& f)const
+  void parse(CS& f)override {f >> _name >> _type >> _arg_list;}
+  void dump(std::ostream& f)const override
   {f << "    args " << name() << " " << type() << "\n"
      << arg_list() << "\n";}
   Args(){}
@@ -1429,7 +1429,7 @@ public:
   bool is_flow_probe()const { return _type == t_flow;}
   bool is_pot_probe()const { return _type == t_pot;}
 
-  std::string code_name()const;
+  std::string code_name()const override;
   Branch const* branch()const {
     return _br;
   }
@@ -1448,7 +1448,7 @@ public:
   }
 private:
   std::string eval(CS&, const CARD_LIST*)const override {unreachable(); return "";}
-  Token* new_token(Module&, size_t)const;
+  Token* new_token(Module&, size_t)const override;
 public:
   void set_used_in(Base const*b)const{
     return _br.set_used_in(b);
@@ -1684,8 +1684,8 @@ public:
   size_t size() const{ return _brs.size(); }
 
   Branch_Ref new_branch(Node* a, Node* b);
-  void parse(CS& f);
-  void dump(std::ostream& f)const;
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
   void clear() {
     for(auto x : _brs){
       delete x;
@@ -1963,7 +1963,7 @@ public:
 public:
   bool is_module_variable()const override;
   bool is_int() const;
-  Data_Type const& type()const;
+  Data_Type const& type()const override;
   std::string const& lhsname()const {
     assert(_lhs);
     return _lhs->name();

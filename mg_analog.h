@@ -339,7 +339,7 @@ public:
   void parse(CS& f)override {
     f >> _l;
   }
-  void dump(std::ostream& o)const {
+  void dump(std::ostream& o)const override {
     _l.dump(o);
   }
   ListOfBlockRealIdentifiers const& list() const{
