@@ -32,6 +32,6 @@ resistor #(.r(1)) r1(1,0);
 
 list
 
-print dc v(nodes) i(dut) iter(0) loss(dut.*) i(r1)
+print dc v(nodes) i(dut) iter(0) i(dut.*) i(r1)
 dc v1 0 1 .5
 end

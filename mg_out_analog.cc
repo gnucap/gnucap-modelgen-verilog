@@ -262,6 +262,12 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	  o__ "// same " << v->code_name() << "\n";
 	}else if(v->branch()->is_short()) { untested();
 	  o__ "// short: " << v->code_name() << "\n";
+#if 1
+	}else if(v->is_flow_probe() && v->branch()->has_flow_source()) {
+	  // incomplete untested(); mg4_current2,3
+	  // copy dep values from source?
+	  o__ "// source " << v->code_name() << "\n";
+#endif
 	}else{
 	  o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
 	  o__ "assert(MOD::" << C.branch()->state() << "_::dep" << v->code_name() << " < "
@@ -1123,10 +1129,19 @@ void Probe::make_cc_dev(std::ostream& o) const
 {
   o__ "ddouble xs" << code_name_() << "() const { // " << label() << "\n";
   o____ "ddouble t;\n";
+  std::string bcn = _br->code_name();
 
-  if(is_flow_probe() && _br->has_flow_source()) {
+  if(_br->is_source() && is_flow_probe()) {
     o____ "if(" << _br->code_name() << "){\n";
-    o______ "t = " << _br->code_name() << "->tr_amps();\n";
+    if(_br->has_pot_source()) {
+      o______ "t = " << bcn << "->tr_amps();\n";
+      // o__ "if (!_pot" << bcn << "){\n";
+      // o______ "t = " << "_value" << bcn << ";\n";
+      // o__ "}else{ untested();\n";
+      // o__ "}\n";
+    }else{
+      o______ "t = " << "_value" << bcn << ";\n";
+    }
     o____ "}else{\n";
     o______ "t = 0.;\n";
     o____ "}\n";

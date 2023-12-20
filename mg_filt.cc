@@ -126,6 +126,7 @@ public:
     {
       // Branch* br = m.new_branch(np, &Node_Map::mg_ground_node);
       Branch* br = m.new_branch(&Node_Map::mg_ground_node, nn);
+//      br->set_source();
       assert(br);
       assert(const_cast<Branch const*>(br)->owner());
       Branch_Ref prb(br);

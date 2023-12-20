@@ -183,7 +183,7 @@ void VAPOT::tr_load()
 double VAPOT::tr_amps()const
 {
   double amps = 0.;
-  if(_loss0){ untested();
+  if(_loss0){
     // voltage src mode
     // d_vs/elt/admit: fixzero((_loss0 * tr_outvolts() + _m0.c1 * tr_involts()(==0) + _m0.c0), _m0.c0);
     amps = fixzero((_loss0 * tr_outvolts() /* + _m0.c1 * tr_involts() */ + _m0.c0), _m0.c0);
@@ -192,7 +192,7 @@ double VAPOT::tr_amps()const
     amps = fixzero((_m0.c1 * tr_involts() + _m0.c0), _m0.c0);
   }
   trace3("tr_amps", long_label(), _loss0, amps);
-  for (int i=2; i<=_n_ports; ++i) { untested();
+  for (int i=2; i<=_n_ports; ++i) {
     amps += dn_diff(_n[2*i-2].v0(), _n[2*i-1].v0()) * _values[i];
   }
   return amps;

@@ -1528,6 +1528,7 @@ class Branch : public Element_2 {
   std::list<std::string> _names;
   bool _direct{true};
   bool _selfdep{false};
+  bool _source{false};
   mutable /*really?*/ int _use{0};
 //  std::vector<Branch const*> _controlled_by; // move to FUNCTION_
   std::vector<Base const*> _used_in; //?
@@ -1582,6 +1583,7 @@ public:
 //  void dec_always_pot(){ assert(_has_always_pot); --_has_always_pot; }
 
   void set_filter(FUNCTION_ const* f){ _ctrl=f; }
+  void set_source(bool d=true) {_source = d; }
   void set_direct(bool d=true);
   void set_selfdep(bool d=true) {_selfdep = d; }
   bool has_flow_probe() const;
@@ -1590,8 +1592,10 @@ public:
   bool has_short() const { return _has_short; }
   bool has_always_pot() const { return _has_always_pot; }
   bool is_filter() const { return _ctrl; }
-  bool has_pot_source() const;
-  size_t num_states() const override;
+  bool has_pot_source()const;
+  bool is_source()const {return _source || has_pot_source() || has_flow_source();}
+  bool is_shadow_source()const {return _source && !has_pot_source() && !has_flow_source();}
+  size_t num_states()const override;
   Discipline const* discipline()const override;
   Nature const* nature()const override;
 public:
@@ -2112,6 +2116,7 @@ private:
 /*--------------------------------------------------------------------------*/
 void make_cc_expression(std::ostream& o, Expression const& e, bool deriv=true);
 void make_cc_event_cond(std::ostream& o, Expression const& e);
+void dump_analog(std::ostream& o, Module const& m);
 /*--------------------------------------------------------------------------*/
 inline void Variable::new_var_ref()
 {

@@ -944,15 +944,7 @@ void Module::dump(std::ostream& o)const
   }else{
   }
 
-  for(auto i: analog_functions()){
-    o << *i << "\n";
-  }
-  for(auto i: analog_list()){
-    o << *i << "\n";
-  }
-//  for(auto i: *this){ untested();
-//    o << *i << "\n";
-//  }
+  dump_analog(o, *this);
 
   o << "endmodule\n";
 }
@@ -1244,5 +1236,6 @@ SeqBlock::~SeqBlock()
   delete _sens;
   _sens = NULL;
 }
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

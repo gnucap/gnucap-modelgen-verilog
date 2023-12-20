@@ -549,7 +549,7 @@ Discipline const* Branch::discipline() const
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 Nature const* Branch::nature() const
-{ untested();
+{
 //  source?
   return NULL;
 }

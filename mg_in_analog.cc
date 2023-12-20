@@ -1164,8 +1164,12 @@ void Branch_Map::dump(std::ostream&)const
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void Branch::dump(std::ostream& o)const
-{ untested();
-  o << "(" << _p->name() << ", " << _n->name() << ")";
+{
+  if(_n->is_ground()){
+    o << "(" << _p->name() << ")";
+  }else{
+    o << "(" << _p->name() << ", " << _n->name() << ")";
+  }
 }
 /*--------------------------------------------------------------------------*/
 static void dump(std::ostream& out, Expression const& e)
@@ -1735,6 +1739,8 @@ void Contribution::set_flow_contrib()
     _branch->inc_flow_source();
   }
   _type = t_flow;
+
+  _branch->set_source();
 }
 /*--------------------------------------------------------------------------*/
 bool Contribution::is_flow_contrib() const
@@ -1931,5 +1937,52 @@ void Module::install(Probe const* f)
   _funcs.insert(f);
 }
 /*--------------------------------------------------------------------------*/
+static void dump_shadow_src(std::ostream& o, Module const& m)
+{
+  bool has_shadow_src = false;
+  for(auto i: m.branches()) {
+    if(i->is_shadow_source()){
+      has_shadow_src = true;
+      break;
+    }else{
+    }
+  }
+  if(has_shadow_src){
+    o__ "analog begin\n";
+    for(auto i: m.branches()) {
+      if(i->is_shadow_source()){
+	o____ "";
+	if(i->nature()){ untested();
+	  i->nature()->dump(o);
+	}else{
+	  o << "I";
+	}
+	i->dump(o);
+	o << " <+ 0.\n";
+      }else{ untested();
+      }
+    }
+    o__ "end\n";
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+void dump_analog(std::ostream& o, Module const& m)
+{
+  for(auto i: m.analog_functions()){
+    o << *i << "\n";
+  }
+
+  if(!options().dump_unreachable()) {
+    dump_shadow_src(o, m);
+  }else if (options().optimize_unused()) {
+    dump_shadow_src(o, m);
+  }else{ untested();
+  }
+
+  for(auto i: m.analog_list()){
+    o << *i << "\n";
+  }
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet
