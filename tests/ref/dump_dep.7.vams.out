@@ -3,7 +3,8 @@ module dep7(d, g);
   electrical d, g;
   parameter real p = 0.;
 
-  real   T;
+  real   T
+;
 
   analog begin // always
     real c;

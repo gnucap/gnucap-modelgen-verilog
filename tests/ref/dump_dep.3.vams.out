@@ -3,11 +3,16 @@ module test_while0a(p, n);
   electrical p, n;
   parameter real r = 0;
 
+  real   z
+;
+
   analog begin // always
     integer i;
     real x, y;
     x = 0.;
-    y = 0.;
+    x = 0.; // dep: _potential_b_p_n
+    z = x;
+    y = 0.; // dep: _potential_b_p_n
     i = r;
     while ((i > 0)) begin
       i = (i - 1);

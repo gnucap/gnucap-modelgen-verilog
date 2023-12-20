@@ -777,7 +777,7 @@ public:
   virtual std::string code_name()const;
   virtual bool is_module_variable()const;
 
-  virtual bool propagate_deps(Deps const&) = 0;
+  virtual bool propagate_deps(Variable const&) = 0;
   virtual Deps const& deps()const = 0;
   virtual double eval()const { return NOT_INPUT;}
 protected:
@@ -802,10 +802,10 @@ public:
   Data_Type const& type()const override{
     return _type;
   }
-  std::string code_name()const override;
+//  std::string code_name()const override;
   void set_type(Data_Type const& d){ _type=d; }
   Deps const& deps()const override { assert(_deps); return *_deps; }
-  bool propagate_deps(Deps const&)override;
+  bool propagate_deps(Variable const&)override;
 protected:
   void clear_deps();
 private:
@@ -1975,7 +1975,7 @@ public:
   }
   void parse(CS& cmd) override;
   void dump(std::ostream&)const override;
-  bool propagate_deps(Deps const&) override;
+  bool propagate_deps(Variable const&) override;
   bool update();
 // protected:
   void set_lhs(Variable* v);
@@ -1993,6 +1993,8 @@ public:
   Block* owner(){ return Variable::owner();}
   bool has_sensitivities()const {return deps().has_sensitivities();}
 //  Deps& deps()override { return _rhs.deps(); }
+private: // implementation
+  bool store_deps(Deps const&);
 }; // Assignment
 /*--------------------------------------------------------------------------*/
 class Node : public Base {

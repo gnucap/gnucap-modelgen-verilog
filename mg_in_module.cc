@@ -965,11 +965,6 @@ void Variable_Decl::parse(CS& file)
   new_var_ref();
 }
 /*--------------------------------------------------------------------------*/
-void Variable_Decl::dump(std::ostream& o)const
-{
-  o__ name();
-}
-/*--------------------------------------------------------------------------*/
 void ValueRangeInterval::parse(CS& file)
 {
   if(file.last_match() == "["){
@@ -1066,7 +1061,8 @@ void Block::new_var_ref(Base* what)
 {
   assert(what);
   std::string p;
-  if(auto V = dynamic_cast<Variable const*>(what)){
+  auto V = dynamic_cast<Variable const*>(what);
+  if(V){
     p = V->name();
   }else if(auto P = dynamic_cast<Parameter_2 const*>(what)){
     p = P->name();
@@ -1105,9 +1101,13 @@ void Block::new_var_ref(Base* what)
     _var_refs[p] = what;
   }else if(dynamic_cast<Paramset_Stmt const*>(what)){
     _var_refs[p] = what;
-  }else if(cc) { untested();
+  }else if(cc) {
     _var_refs[p] = what;
-    throw(Exception("already there: '" + p + "'"));
+    if(V){
+      // updating variable...
+    }else{
+      throw(Exception("already there: '" + p + "'"));
+    }
   }else{
     _var_refs[p] = what;
   }

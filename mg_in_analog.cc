@@ -221,12 +221,21 @@ void Assignment::parse(CS& f)
     if(!is_reachable()) {
     }else{
       assert(!_deps);
-      propagate_deps(deps()); // sens?
+      store_deps(_rhs.deps());
+      _lhs->propagate_deps(*this);
     }
 
   }else{ untested();
     f.reset_fail(here);
 //    throw Exception_CS_("no assignment", f);
+  }
+
+  if(l){
+    _name = l->name();
+  //  new_var_ref();
+    owner()->new_var_ref(this);
+  }else{
+    // why?
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -770,7 +779,7 @@ void AnalogConstruct::parse(CS& f)
 {
   assert(!_stmt);
   auto ab = new AnalogCtrlBlock(f, owner());
-  ab->update(); // why?
+  // ab->update(); // why?
   _stmt = ab;
 }
 /*--------------------------------------------------------------------------*/
@@ -865,11 +874,6 @@ void ListOfBlockRealIdentifiers::dump(std::ostream& o) const
   LiSt<BlockVarIdentifier, '\0', ',', ';'>::dump(o);
   o << "\n";
 }
-//CS& ListOfBlockVarIdentifiers::parse(CS& file)
-//{ untested();
-//    trace1("AnalogBlock::parse real", name);
-//}
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void AnalogConstruct::dump(std::ostream& o)const
 {
@@ -894,7 +898,7 @@ Assignment::~Assignment()
       for(Dep d : deps()) {
 	(*d)->unset_used_in(this);
       }
-    }catch(std::logic_error const& e){ untested();
+    }catch(std::logic_error const& e){
       std::cerr << " logic error in " << lhsname() << ": ";
       std::cerr << e.what() << "\n";
       assert(0);
@@ -1580,20 +1584,39 @@ bool Assignment::update()
   _rhs.update();
   D = &_rhs.deps();
   trace4("Assignment::update", lhsname(), s, D->size(), this);
-  // assert(s<=D->size());
-  if( propagate_deps(_rhs.deps())) {
+
+  if (store_deps(_rhs.deps())) {
     assert(_lhs);
-    ret = true; // owner() != ((const Variable*)_lhs)->owner();
-    trace3("Assignment::update prop", _rhs.deps().size(), _lhs->deps().size(), ret);
+    trace2("Assignment::update prop", _rhs.deps().size(), _lhs->deps().size());
+    _lhs->propagate_deps(*this);
+    ret = true;
   }else{
     trace2("Assignment::update no prop", _rhs.deps().size(), _lhs->deps().size());
     ret = false;
+//    ret = _lhs->propagate_deps(*this);
   }
 
+  // new_var_ref();
   return ret;
 }
 /*--------------------------------------------------------------------------*/
-bool Assignment::propagate_deps(Deps const& d)
+bool Assignment::propagate_deps(Variable const& from)
+{
+  Deps const& d = from.deps();
+  if(&from == this) { untested();
+    assert(false);
+    return false;
+  // reachablefrom
+  }else if(from.owner() == owner()) {
+    // pass on.
+    return _lhs->propagate_deps(from);
+  }else{
+    bool ret = store_deps(d);
+    return _lhs->propagate_deps(*this) || ret;
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool Assignment::store_deps(Deps const& d)
 {
   // TODO: attrib.
   // TODO: only if reachable.
@@ -1608,6 +1631,7 @@ bool Assignment::propagate_deps(Deps const& d)
   _deps->update(d);
   assert(ii <= _deps->size());
   bool ret = false;
+  Owned_Base const* L = _lhs;
 
   if(auto x = dynamic_cast<SeqBlock const*>(owner())) {
     if(x->has_sensitivities()) {
@@ -1618,13 +1642,21 @@ bool Assignment::propagate_deps(Deps const& d)
   }
 
   if(owner()->is_reachable()){
+    trace2("Assignment::propagate_deps fwd 2", name(), _lhs->name());
     for(; ii < _deps->size(); ++ii) {
       ret = true;
       Dep const& d = (*_deps)[ii];
       (*d)->set_used_in(this);
     }
-    ret |= _lhs->propagate_deps(*_deps);
+    if(1 ||  L->owner()!=owner()){
+      assert(&deps() == _deps);
+//      ret |= _lhs->propagate_deps(*this);
+//    }else if(&from != this){ untested();
+//      ret |= _lhs->propagate_deps(from);
+    }else{
+    }
   }else{ untested();
+    trace3("Assignment::propagate_deps unreachable", d.size(), _deps->size(), ret);
   }
 
   trace3("Assignment::propagate_deps", d.size(), _deps->size(), ret);
@@ -1746,9 +1778,32 @@ Contribution::~Contribution()
   _deps = NULL;
 }
 /*--------------------------------------------------------------------------*/
+void Variable_Decl::dump(std::ostream& o)const
+{
+  o__ name();
+  if(options().dump_annotate()){
+    for(auto d : deps()){
+      o << "// dep " << d->code_name();
+    }
+    o << "\n";
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool Variable_Decl::propagate_deps(Variable const& v)
+{
+  Deps const& incoming = v.deps();
+  trace4("Variable_Decl::propagate_deps", name(), deps().size(), incoming.size(), incoming.has_sensitivities());
+  assert(&deps() != &incoming);
+  deps().update(incoming);
+  assert(deps().size() >= incoming.size());
+  trace2("Variable_Decl::propagate_deps done", name(), deps().size());
+  return false;
+}
+/*--------------------------------------------------------------------------*/
 bool AnalogRealDecl::update()
 {
-  for(auto& i : _l){
+  for(BlockVarIdentifier* i : _l){
     assert(i);
     i->update();
   }

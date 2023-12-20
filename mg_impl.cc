@@ -720,17 +720,9 @@ bool Variable::is_module_variable() const
   }
 }
 /*--------------------------------------------------------------------------*/
+// std::string Variable_Decl::code_name() const
 std::string Variable::code_name() const
 {
-  incomplete();
-  return name(); //?
-}
-/*--------------------------------------------------------------------------*/
-std::string Variable_Decl::code_name() const
-{
-//  if(!has_attributes()){ untested();
-//    return "_v_" + name();
-//  }else
   if(is_real()){
     return "_v_" + name();
   }else if(is_int()){
@@ -740,6 +732,8 @@ std::string Variable_Decl::code_name() const
   }else{
     return "_v_" + name();
   }
+  incomplete();
+  return name(); //?
 }
 /*--------------------------------------------------------------------------*/
 void Branch::set_direct(bool d)
@@ -941,21 +935,13 @@ void Variable_Decl::new_deps()
 void BlockVarIdentifier::update()
 {
   clear_deps();
+  new_var_ref();
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::clear_deps()
 {
   trace2("Variable_Decl::clear_deps", name(), deps().size());
   deps().clear();
-}
-/*--------------------------------------------------------------------------*/
-bool Variable_Decl::propagate_deps(Deps const& d)
-{
-  trace4("Variable_Decl::propagate_deps", name(), deps().size(), d.size(), d.has_sensitivities());
-  assert(&deps() != &d);
-  deps().update(d);
-  assert(deps().size() >= d.size());
-  return false;
 }
 /*--------------------------------------------------------------------------*/
 bool is_true(Expression const& x)

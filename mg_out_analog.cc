@@ -820,12 +820,12 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Variable_Decl&
     o__ "int& " << V.code_name() << "(d->" << V.code_name() << ");\n";
   }else if(V.type().is_real()) {
     if(V.deps().size() == 0){
-      o__ "double& " << V.code_name() << "(d->" << V.code_name() << ");\n";
+      o__ "double& " << V.code_name() << "(d->" << V.code_name() << "); // (823)\n";
     }else if(options().optimize_deriv()) {
       make_one_variable_proxy(o, V, m);
       o << V.code_name() << "(d);\n";
     }else{itested();
-      o__ "ddouble " << V.code_name() << "(d->" << V.code_name() << ");\n";
+      o__ "ddouble " << V.code_name() << "(d->" << V.code_name() << "); // (828)\n";
     }
   }else{
   }

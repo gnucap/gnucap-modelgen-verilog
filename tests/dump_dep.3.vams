@@ -8,10 +8,13 @@ module test_while0a(p, n);
    electrical p, n;
    inout p, n;
    parameter real r=0;
+	real z;
    analog begin
       integer i;
       real x, y;
       x = 0.;
+      x = 0.;
+		z = x;
       y = 0.;
       i = r;
       while(i>0) begin

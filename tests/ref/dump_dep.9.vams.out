@@ -1,0 +1,20 @@
+module test_diode1(a, c);
+  inout a, c;
+  electrical a, c;
+  parameter real x = 0;
+
+  analog begin // always
+    real a, b;
+    if ((x <= 0.)) begin
+      a = V(a, c); // dep: _potential_b_a_c
+    end
+    else begin
+      a = I(a, c); // dep: _flow_b_a_c
+      b = a; // dep: _flow_b_a_c
+    end
+  end
+
+endmodule
+
+
+

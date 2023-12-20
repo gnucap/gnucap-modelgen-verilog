@@ -19,7 +19,8 @@ enddiscipline
 
 module device(p, n);
   inout p, n;
-  real   r;
+  real   r
+;
 
   analog begin // always
     @(initial_step) begin
