@@ -127,7 +127,10 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
 	<<  br->code_name() << "->tr_amps(), ";
       o << flow_abstol(*br) << ")){\n";
       o____ "return true;\n" <<ind<<"}else";
-    }else if(br->has_pot_probe()){
+    }else{
+    }
+
+    if(br->has_pot_probe()){
       o << " if( !conchk(_potential"<< br->code_name() << ", ";
       make_node_ref(o, *br->p());
       o << ".v0() - ";
@@ -136,7 +139,7 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
       o << potential_abstol(*br) << ")){\n";
       o____ "return true;\n" <<ind<<"}else";
     }else{
-      assert(!br->has_flow_probe());
+    //  assert(!br->has_flow_probe());
     }
   }
   o << "{\n";
