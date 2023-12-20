@@ -45,7 +45,7 @@ static int is_function(std::string const& n)
 static String_Arg const& potential_abstol(Branch const& b)
 {
   static String_Arg def("OPT::abstol");
-  if(!b.discipline()){ untested();
+  if(!b.discipline()){
     // incomplete(); TODO: what's the default?
     return def;
   }else if(!b.discipline()->potential()){ untested();

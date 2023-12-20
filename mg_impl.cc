@@ -352,7 +352,7 @@ std::string Branch::dev_type()const
   }else if(has_flow_probe()){
     return "va_sw";
   }else if(has_pot_source()){
-    if(_selfdep){ untested();
+    if(_selfdep){
       return "va_pot_br";
     }else if(has_always_pot() && !has_flow_source()) {
       return "va_pot";

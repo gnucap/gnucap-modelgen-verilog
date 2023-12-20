@@ -3806,14 +3806,14 @@ void MOD_capacitor::expand()
   // branch (p, n)
     {
     if (!_b_p_n) {
-      const CARD* p = device_dispatcher["va_pot"]; // va_pot
+      const CARD* p = device_dispatcher["va_sw"]; // va_sw
       if(!p){
-        throw Exception("Cannot find va_pot. Load module?");
+        throw Exception("Cannot find va_sw. Load module?");
       }else{
       }
       _b_p_n = dynamic_cast<ELEMENT*>(p->clone());
       if(!_b_p_n){
-        throw Exception("Cannot use va_pot: wrong type");
+        throw Exception("Cannot use va_sw: wrong type");
       }else{
       }
       subckt()->push_front(_b_p_n);
