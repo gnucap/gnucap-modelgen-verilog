@@ -118,28 +118,26 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
   }
 
   // BUG this is incomplete.
-  for(auto br : m.branches()){
+  for(auto br : m.branches()) {
     assert(br);
-    if(br->is_short()){
-    }else if(br->is_filter()){
-    }else if(br->has_flow_probe()){
-      o << " if( " << br->code_name() << " && !conchk(_flow"<< br->code_name() << ", "
-	<<  br->code_name() << "->tr_amps(), ";
-      o << flow_abstol(*br) << ")){\n";
-      o____ "return true;\n" <<ind<<"}else";
+    if(br->is_short()) {
+    }else if(br->is_filter()) {
     }else{
-    }
-
-    if(br->has_pot_probe()){
-      o << " if( !conchk(_potential"<< br->code_name() << ", ";
-      make_node_ref(o, *br->p());
-      o << ".v0() - ";
-      make_node_ref(o, *br->n());
-      o << ".v0(), ";
-      o << potential_abstol(*br) << ")){\n";
-      o____ "return true;\n" <<ind<<"}else";
-    }else{
-    //  assert(!br->has_flow_probe());
+      if(br->has_pot_probe()) {
+	o << " if( !conchk(_potential"<< br->code_name() << ", ";
+	make_node_ref(o, *br->p());
+	o << ".v0() - ";
+	make_node_ref(o, *br->n());
+	o << ".v0(), ";
+	o << potential_abstol(*br) << ")){\n";
+	o____ "return true;\n" <<ind<<"}else";
+      }else if(br->has_flow_probe()) {
+	o << " if( " << br->code_name() << " && !conchk(_flow"<< br->code_name() << ", "
+	  <<  br->code_name() << "->tr_amps(), ";
+	o << flow_abstol(*br) << ")) {\n";
+	o____ "return true;\n" <<ind<<"}else";
+      }else{
+      }
     }
   }
   o << "{\n";
