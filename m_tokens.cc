@@ -25,7 +25,7 @@
 #include "m_tokens.h"
 #include "mg_func.h"
 #include "mg_options.h"
-#include "mg_analog.h"
+#include "mg_analog.h" // BUG
 #include <stack>
 /*--------------------------------------------------------------------------*/
 namespace {

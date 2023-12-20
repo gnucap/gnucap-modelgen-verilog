@@ -121,6 +121,52 @@ public:
   void parse(CS& f)override;
 };
 /*--------------------------------------------------------------------------*/
+template <class T>
+class Keyed_List : public List_Base<T> {
+public:
+  using List_Base<T>::begin;
+  using List_Base<T>::end;
+private:
+  void parse(CS&) override {unreachable();}
+public:
+  typedef typename List_Base<T>::const_iterator const_iterator;
+
+  // List_Base? (see Collection)
+  const_iterator find(std::string const& s)const {
+    for (const_iterator ii = begin(); ii != end(); ++ii) {
+      assert(ii != end());
+      assert(*ii);
+      if (s == (**ii).key()) {
+	return ii;
+      }else{
+      }
+    }
+    return end();
+  }
+  const_iterator find(String_Arg const& s)const {
+    for (const_iterator ii = begin(); ii != end(); ++ii) {
+      assert(ii != end());
+      assert(*ii);
+      if (s == (**ii).key()) {
+	return ii;
+      }else{
+      }
+    }
+    return end();
+  }
+  const_iterator find(CS& file) const {
+    size_t here = file.cursor();
+    String_Arg s;
+    //file >> s;
+    s = file.ctos(":,.`()[];*/+-", "", "");
+    const_iterator x = find(s);
+    if (x == end()) {
+      file.reset(here);
+    }else{
+    }
+    return x;
+  }
+};
 /* A "Collection" differs from a "LiSt" in how it is parsed.
  * Each parse of a "Collection" creates one more object and stores
  * it in the Collection.  The size of the Collection therefore grows by 1.
@@ -131,7 +177,7 @@ public:
  */
 class Attribute_Instance;
 template <class T, char BEGIN, char SEP, char END, char END2='\0', char END3='\0'>
-class LiSt : public List_Base<T> {
+class LiSt : public Keyed_List<T> {
   Block* _owner{NULL};
   Attribute_Instance const* _attributes{NULL};
 public:
@@ -229,31 +275,6 @@ public:
     }else{
     }
   }
-
-  // List_Base? (see Collection)
-  const_iterator find(String_Arg const& s)const {
-    for (const_iterator ii = begin(); ii != end(); ++ii) {
-      assert(ii != end());
-      assert(*ii);
-      if (s == (**ii).key()) {
-	return ii;
-      }else{
-      }
-    }
-    return end();
-  }
-  const_iterator find(CS& file) const {
-    size_t here = file.cursor();
-    String_Arg s;
-    //file >> s;
-    s = file.ctos(":,.`()[];*/+-", "", "");
-    const_iterator x = find(s);
-    if (x == end()) {
-      file.reset(here);
-    }else{
-    }
-    return x;
-  }
 };
 typedef LiSt<String_Arg, '(', ',', ')'> String_Arg_List;
 typedef LiSt<Raw_String_Arg, '(', ',', ')'> Raw_String_Arg_List;
@@ -268,7 +289,7 @@ typedef LiSt<Raw_String_Arg, '(', ',', ')'> Raw_String_Arg_List;
  */
 class File;
 template <class T>
-class Collection : public List_Base<T> {
+class Collection : public List_Base<T> { // Keyed_List?
   Block* _owner{NULL};
 //  File const* _file{NULL};
 public:
@@ -305,7 +326,7 @@ public:
       f << (**i);
     }
   }
-  // List_Base?
+  // List_Base? Keyed_List?
   const_iterator find(const String_Arg& s) const {
     return find_again(begin(), s);
   }
@@ -692,16 +713,35 @@ public:
   size_t count_nonlocal() const;
 };
 /*--------------------------------------------------------------------------*/
+class Node;
+class Node_Ref {
+  Node* _node{NULL};
+public:
+  explicit Node_Ref() {}
+  Node_Ref(Node* n) : _node(n){}
+  Node const* operator->() const{ assert(_node); return _node; }
+  operator bool() const{ return _node; }
+  operator Node const*() const{ return _node; }
+private:
+  friend class Module;
+  Node* mutable_node(Module&) const{
+    assert(_node);
+    // assert(_node owned by m);
+    return _node;
+  }
+};
+/*--------------------------------------------------------------------------*/
 class Branch;
+class Named_Branch;
 class Branch_Ref : public Owned_Base {
   Branch* _br{NULL};
   bool _r{false};
-  std::string const* _name{NULL};
 public:
   Branch_Ref(Branch_Ref&& b);
   Branch_Ref(Branch_Ref const& b);
   explicit Branch_Ref() : Owned_Base() {}
   explicit Branch_Ref(Branch* b, bool reversed=false);
+  explicit Branch_Ref(Named_Branch* b);
   ~Branch_Ref();
   operator bool() const{return _br;}
   Branch_Ref& operator=(Branch_Ref const& o);
@@ -712,9 +752,7 @@ public:
   std::string code_name()const;
   std::string code_name_()const;
   void set_name(std::string const&);
-  bool has_name()const{
-    return _name;
-  }
+  bool has_name()const;
 
   operator Branch*() const{ return _br; }
   Branch* operator->() const{ return _br; }
@@ -723,7 +761,7 @@ public:
 
   std::string const& pname() const;
   std::string const& nname() const;
-  std::string const& name() const{ assert(_name); return *_name; }
+  std::string const& name() const;
   void set_used_in(Base const*)const;
   void unset_used_in(Base const*)const;
 };
@@ -970,17 +1008,17 @@ public:
 
   virtual Branch_Ref new_branch(std::string const&, std::string const&) {
     unreachable();
-    return Branch_Ref(NULL);
+    return Branch_Ref(NULL, false);
   }
   virtual Branch_Ref new_branch(Node*, Node*) {
     unreachable();
-    return Branch_Ref(NULL);
+    return Branch_Ref(NULL, false);
   }
-  virtual Branch_Ref branch(std::string const& n)const {
+  virtual Branch_Ref lookup_branch(std::string const& n)const {
     assert(_owner);
-    return _owner->branch(n);
+    return _owner->lookup_branch(n);
   }
-  virtual Branch_Ref const& new_branch_name(std::string const& p, Branch_Ref const& r) { untested();
+  virtual Branch_Ref new_branch_name(std::string const& p, Branch_Ref const& r) { untested();
     assert(_owner);
     return _owner->new_branch_name(p, r);
   }
@@ -1037,9 +1075,9 @@ public:
     assert(owner());
     return owner()->node(n);
   }
-  Branch_Ref branch(std::string const& n)const override {
+  Branch_Ref lookup_branch(std::string const& n)const override {
     assert(owner());
-    return owner()->branch(n);
+    return owner()->lookup_branch(n);
   }
   String_Arg const& identifier() const{ return _identifier; }
   bool has_sensitivities()const {return _sens;}
@@ -1413,6 +1451,8 @@ public:
 typedef LiSt<Probe, '{', '#', '}'> Probe_List;
 #endif
 // Name clash, VAMS_ACCESS == Probe?
+// mg_analog.h?
+class Probe;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class Head : public Base {
@@ -1512,8 +1552,9 @@ public:
 typedef Collection<Discipline> Discipline_List;
 /*--------------------------------------------------------------------------*/
 class Branch : public Element_2 {
-  Node const* _p{NULL};
-  Node const* _n{NULL};
+ // TerminalPair _ports;
+  Node_Ref _p;
+  Node_Ref _n;
   Deps *_deps{NULL}; // delete? move to _ctrl.
   // TODO: refactor into _ctrl
   size_t _has_flow_probe{0};
@@ -1525,7 +1566,7 @@ class Branch : public Element_2 {
   FUNCTION_ const* _ctrl{NULL};
   std::vector<Branch_Ref*> _refs;
   size_t _number;
-  std::list<std::string> _names;
+//  std::list<std::string> _names;
   bool _direct{true};
   bool _selfdep{false};
   bool _source{false};
@@ -1540,20 +1581,17 @@ public: // use in contributions
   void unset_used_in(Base const*);
   std::vector<Base const*> const& used_in() {return _used_in;}
 public:
-  explicit Branch(Node* p, Node* n, size_t number);
-  // explicit Branch(){ new_deps(); }
+  explicit Branch(Node_Ref p, Node_Ref n, Module* m);
+  explicit Branch(Branch_Ref p, Module* m);
   Branch( Branch const&) = delete;
   ~Branch();
-  std::list<std::string> const& names()const{
-    return _names;
-  }
-  std::string name()const;
+  std::string name()const; // ?
   // later.
   void parse(CS&)override {incomplete();}
   void dump(std::ostream&)const override;
-  std::string const* reg_name(std::string const&);
-  Node const* p() const; // really?
-  Node const* n() const; // really?
+  std::string const* reg_name(std::string const&); //?
+  Node_Ref p() const;
+  Node_Ref n() const;
   bool req_short()const;
   bool is_short() const;
   bool is_direct() const{ return _direct; }
@@ -1566,17 +1604,18 @@ public:
   void add_dep(Dep const&);
   size_t num_nodes()const override;
   std::string state()const override;
+  std::string state(std::string const& n)const;
   virtual bool has_element() const;
 
   void inc_flow_probe(){ ++_has_flow_probe; }
-  void inc_pot_probe(){ ++_has_pot_probe; }
+  virtual void inc_pot_probe(){ ++_has_pot_probe; }
   void inc_flow_source(){ ++_has_flow_src; }
   void inc_pot_source(){ ++_has_pot_src; }
   void inc_short(){ ++_has_short; }
   void inc_always_pot(){ ++_has_always_pot; }
 
   void dec_flow_probe() { assert(_has_flow_probe); --_has_flow_probe; }
-  void dec_pot_probe() { assert(_has_pot_probe); --_has_pot_probe; }
+  virtual void dec_pot_probe() { assert(_has_pot_probe); --_has_pot_probe; }
   void dec_flow_source() { assert(_has_flow_src); --_has_flow_src; }
   void dec_pot_source() { assert(_has_pot_src); --_has_pot_src; }
   void dec_short(){ assert(_has_short); --_has_short; }
@@ -1609,10 +1648,56 @@ public:
   Deps& deps() { assert(_deps); return *_deps; } // delete?
 						 //
   Branch const* output() const;
+  virtual bool has_name()const{return false;}
 private:
   void new_deps();
 }; // Branch
 /*--------------------------------------------------------------------------*/
+class Named_Branch : public Branch {
+  size_t _num_states;
+  Branch_Ref _br;
+  std::string _name;
+public:
+  // explicit Named_Branch(std::string n) : Branch(NULL, NULL, NULL), _name(n){} // BUG: no transparent compare in c++<14
+  explicit Named_Branch(Branch_Ref a, std::string n, Module* m)
+     : Branch(a, m), _br(a), _name(n) {
+     //  set_label("NBTODO");
+//     if(n==""){
+//       n = b.state();
+//       _sl = b.code_name();
+//     }else{
+//       n = "_st" + n;
+//       _sl = "_br" + n;
+//     }
+//    set_state(n);
+//    _num_states = b.num_states();
+//    set_label(b.short_label());
+  }
+//  size_t num_states()const override {return _num_states;}
+  std::string const& name()const {return _name;}
+  bool has_name()const override {return true;}
+  std::string code_name()const override;
+//  size_t num_nodes()const override {return _base.num_nodes();}
+  std::string key()const {return _name;}
+  Branch const* base()const {return _br;}
+  bool is_reversed()const {return _br.is_reversed(); }
+//  std::string short_label()const override  {return _sl;}
+//  Discipline const* discipline()const override { return _base.discipline(); }
+private:
+  void inc_pot_probe()override {
+    Branch::inc_pot_probe();
+    assert(_br);
+    _br->inc_pot_probe();
+  }
+  void dec_pot_probe()override {
+    assert(_br);
+    Branch::dec_pot_probe();
+    _br->dec_pot_probe();
+  }
+
+};
+/*--------------------------------------------------------------------------*/
+#if 0
 class Branch_Names {
   typedef std::string key;
   typedef std::map<key, Branch_Ref> map; // set?
@@ -1622,41 +1707,52 @@ private:
 public:
   explicit Branch_Names() {}
   Branch_Ref const& new_name(std::string const&, Branch_Ref const&);
-  Branch_Ref const& lookup(std::string const&) const;
+  Branch_Ref lookup(std::string const&) const;
 
   void clear();
 };
+#endif
 /*--------------------------------------------------------------------------*/
 // the branches used in the model, in probes and sources, deduplicated.
 class Branch_Map : public Owned_Base {
   typedef std::pair<Node const*, Node const*> key;
-  typedef std::map<key, Branch*> map; // set?
+  typedef std::map<key, Branch*> unmap; // set?
 				      //
   typedef std::list<Branch /* const?? */ *> list;
   typedef list::const_iterator const_iterator;
-  list _brs;
 private:
-  map _m;
+  unmap _m;
+  Keyed_List<Named_Branch> _names;
+  list _brs;
 public:
   explicit Branch_Map(){}
   ~Branch_Map(){
     assert(!_m.size());
+    assert(!_brs.size());
   }
-  //BranchRef new_branch(Node const* a, Node const* b, Block* owner);
+  //Branch_Ref new_branch(Node const* a, Node const* b, Block* owner);
   const_iterator begin() const{ return _brs.begin(); }
   const_iterator end() const{ return _brs.end(); }
   size_t size() const{ return _brs.size(); }
+  Branch_Ref lookup(std::string const&);
+  Branch_Ref lookup(std::string const&) const;
 
-  Branch_Ref new_branch(Node* a, Node* b);
+  Branch_Ref new_branch(Node_Ref a, Node_Ref b);
+  Branch_Ref new_branch(Branch_Ref const& b, std::string name);
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   void clear() {
-    for(auto x : _brs){
-      delete x;
-      x = NULL;
+    while(!_names.is_empty()){
+      delete _names.back();
+      _names.pop_back();
+    }
+    for(auto& x : _m){
+      delete x.second;
+//      x = NULL;
     }
     _m.clear();
     _brs.clear();
+    // _names.clear();
   }
 };
 /*--------------------------------------------------------------------------*/
@@ -1707,7 +1803,7 @@ public:
   Node const* node(std::string const&)const override {
     return NULL;
   }
-  Branch_Ref branch(std::string const&)const override {
+  Branch_Ref lookup_branch(std::string const&)const override {
     return Branch_Ref();
   }
   FUNCTION_ const* function() const{return _function;}
@@ -1761,7 +1857,6 @@ private: // elaboration data
   void new_probe_map(); // analog?
   void new_analog();
   void delete_analog();
-  Branch_Names _branch_names;
   Branch_Map _branches;
   Node_Map _nodes;
 public:
@@ -1806,7 +1901,6 @@ public:
   const Filter_List&	filters()const		{return _filters;} // incomplete();
   bool	has_filters()const		{return _filters.size() || _num_filters;}
   const Node_Map&	nodes()const		{return _nodes;}
-  const Branch_Names&	branch_names()const	{return _branch_names;}
   const Branch_Map&	branches()const		{return _branches;}
   size_t num_branches() const;
   bool sync()const;
@@ -1844,9 +1938,11 @@ public: // BUG
 private:
 
   Token* new_token(FUNCTION_ const*, size_t na) override;
-  Branch_Ref const& new_branch_name(std::string const& n, Branch_Ref const& b) override;
+  Branch_Ref new_branch_name(std::string const& n, Branch_Ref const& b) override;
   Node const* node(std::string const& p) const override;
-  Branch_Ref branch(std::string const& p) const override;
+  Branch_Ref lookup_branch(std::string const& p) const override;
+public:
+  Node* node(Node_Ref r) { return r.mutable_node(*this); }
 public: //filters may need this..
   Node* new_node(std::string const& p) override;
   Branch_Ref new_branch(Node*, Node*) override;
@@ -2190,6 +2286,16 @@ inline bool Owned_Base::is_reachable() const
   return _owner->is_reachable();
 }
 /*--------------------------------------------------------------------------*/
+inline bool Branch_Ref::has_name()const
+{
+  return dynamic_cast<Named_Branch const*>(_br);
+}
+/*--------------------------------------------------------------------------*/
+inline std::string const& Branch_Ref::name() const
+{
+  auto bb = dynamic_cast<Named_Branch const*>(_br);
+  return bb->name();
+}
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

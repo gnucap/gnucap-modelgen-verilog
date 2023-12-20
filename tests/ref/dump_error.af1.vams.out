@@ -19,7 +19,6 @@ enddiscipline
 
 module test_af(a, b);
   electrical a, b;
-  // circuit
   error #() y();
   endfunction #() analog();
   begin #() end();

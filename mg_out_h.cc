@@ -22,7 +22,7 @@
 #include "mg_out.h"
 #include "mg_func.h"
 #include "mg_options.h"
-#include "mg_analog.h" // Probe
+#include "mg_analog.h" // BUG. Probe
 #include "m_tokens.h" // Deps
 /*--------------------------------------------------------------------------*/
 static void declare_deriv_enum(std::ostream& o, const Module& m)
@@ -44,8 +44,27 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
       }else{
       }
 
-      if(b->has_pot_probe()){
+      if(b->has_name()){
+	o << " // named:   d_potential" << b->code_name() << ",\n";
+      }else if(b->has_pot_probe()){
 	o << "    d_potential" << b->code_name() << ",\n";
+      }else{
+      }
+    }
+  }
+  for(auto x : m.branches()){
+    assert(x);
+    Branch const* b = x;
+    if(b->is_short()){
+      // !has_element?
+    }else{
+      if(!b->has_name()){
+	o << "// not named: " << b->code_name() << "\n";
+      }else if(b->has_pot_probe()){
+	auto x=prechecked_cast<Named_Branch const*>(b);
+	assert(x);
+	o << "    d_potential" << x->code_name()
+	  << " = d_potential" << x->base()->code_name() << ",\n";
       }else{
       }
     }
@@ -64,7 +83,9 @@ static void declare_ddouble(std::ostream& o, Module const& m)
       ++np;
     }else{
     }
-    if(b->has_pot_probe()){
+    if(b->has_name()){
+    }else if(b->has_pot_probe()){
+      // BUG
       ++np;
     }else{
     }
@@ -80,8 +101,12 @@ static void make_func_dev(std::ostream& o, pSet<FUNCTION_ const> const& P)
       o<<"//task " << (*q)->label() << "\n";
     }else if(dynamic_cast<MGVAMS_FUNCTION const*>(*q)) {
       o<<"//func " << (*q)->label() << "\n";
-    }else{
+    }else if(dynamic_cast<Probe const*>(*q)) {
+      o<<"//probe " << (*q)->label() << "\n";
+    }else if(dynamic_cast<MGVAMS_FILTER const*>(*q)) {
       o<<"//filt " << (*q)->label() << "\n";
+    }else{ untested();
+      o<<"//other: " << (*q)->label() << "\n";
     }
     (*q)->make_cc_dev(o);
   }
@@ -283,9 +308,9 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
   o << "public: // states, " << br.code_name() << ";\n"; //  << br.deps().size()<<";\n";
   if(br.has_pot_source()){
     o__ "bool _pot" << br.code_name() << ";\n";
-    for(auto n : br.names()){
-      o__ "bool _pot_br_" << n << ";\n";
-    }
+//    for(auto n : br.names()){
+//      o__ "bool _pot_br_" << n << ";\n";
+//    }
   }else{
   }
   o__ "double _value" << br.code_name() << ";\n";
@@ -293,11 +318,11 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
   size_t k = br.num_states();
   o__ "[" << k << "]; // (s)\n";
 
-  for(auto n : br.names()){
-    o__ "double _value_br_" << n << ";\n";
-    o__ "double _st_br_" << n;
-    o__ "[" << k << "];\n";
-  }
+//  for(auto n : br.names()){
+//    o__ "double _value_br_" << n << ";\n";
+//    o__ "double _st_br_" << n;
+//    o__ "[" << k << "];\n";
+//  }
 
   o__ "struct _st" << br.code_name() << "_ {\n";
   o____ "enum { ";
@@ -412,6 +437,10 @@ static void make_module(std::ostream& o, const Module& m)
   for (auto br : m.branches()){
     if(br->has_element()){
       o__ "ELEMENT* " << br->code_name() << "{NULL}; // branch\n";
+//      for(auto bn : br->names()){
+/////	bn->code_name(); ...
+//	o__ "ELEMENT* _br_" << bn << "{NULL}; // named branch\n";
+//      }
     }else if(br->is_short()){
       o__ "// short : " << br->code_name() << "\n";
     }else if(br->is_filter()){

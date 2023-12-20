@@ -362,7 +362,7 @@ private:
   Deps const& deps();
 public:
   Contribution(CS& f, Block* o)
-    : AnalogStmt(), _branch(NULL) {
+    : AnalogStmt(), _branch(NULL, false) {
     set_owner(o);
     parse(f);
   }

@@ -4,6 +4,9 @@ attach ../d_vasrc.so
 
 verilog
 
+// not sure what this is supposed to to
+// I(p,n) is a short. V(io) is nonzero?
+
 `modelgen
 module test_res_7(p, n);
 	electrical p, n;
@@ -14,9 +17,6 @@ module test_res_7(p, n);
 		V(io) <+ I(p, n) * r;
 	end
 endmodule
-
-
-list
 
 !make test_res_7.so > /dev/null
 attach ./test_res_7.so

@@ -82,8 +82,8 @@ class XDT : public MGVAMS_FILTER {
 public: // HACK
   Branch* _br{NULL};
   mutable Branch const* _output{NULL};
-  Node const* _p{NULL};
-  Node const* _n{NULL};
+  Node_Ref _p;
+  Node_Ref _n;
 protected:
   explicit XDT() : MGVAMS_FILTER() {
     set_label("XDT");
@@ -241,8 +241,8 @@ private:
   Branch const* output()const override;
 
   // really?
-  Node const* p()const override;
-  Node const* n()const override;
+  Node_Ref p()const override;
+  Node_Ref n()const override;
 }; // XDT
 /*--------------------------------------------------------------------------*/
 class DDT : public XDT{
@@ -395,12 +395,12 @@ Branch const* XDT::output() const
 }
 /*--------------------------------------------------------------------------*/
 #if 1
-Node const* XDT::p() const
+Node_Ref XDT::p() const
 { itested();
   return _p;
 }
 /*--------------------------------------------------------------------------*/
-Node const* XDT::n() const
+Node_Ref XDT::n() const
 { itested();
   return _n;
 }

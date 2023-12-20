@@ -469,15 +469,12 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
       if(!s.has_deps()){
       }else if(options().optimize_deriv()){
 	o__ s.code_name() << ".set_no_deps();\n";
-	for(auto i: s.deps()){
-	  o__ s.code_name() << "[d" << i->code_name() << "] = 0.; // (output dep)\n";
-	}
+	// for(auto i: s.deps()){
+	//   o__ s.code_name() << "[d" << i->code_name() << "] = 0.; // (output dep)\n";
+	// }
       }else{itested();
       }
-//      assert((*pp)->branch());
-     // if(s.is_precalc()){
-     //   o__ s.code_name() << " = 0.; // precalc\n";
-     // }else
+
       if(!s.has_deps()){
 	o__ s.code_name() << " = 0.; // static?\n";
       }else if(pp->is_short()){ untested();

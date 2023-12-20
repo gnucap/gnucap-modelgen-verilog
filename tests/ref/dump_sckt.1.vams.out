@@ -20,7 +20,6 @@ enddiscipline
 module test_vs0(a, b, gnd);
   inout a, b, gnd;
   electrical a, b, gnd;
-  // circuit
   vsource #(.dc(1)) v1(.p(a), .n(gnd));
   vsource #(.dc(1)) v2(.n(gnd), .p(a));
 

@@ -250,7 +250,7 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
       trace1("unresolved node", t->name());
       // incomplete();
       E.push_back(t->clone()); // try later?
-    }else if(scope->branch(t->name())) {
+    }else if(scope->lookup_branch(t->name())) {
       trace1("unresolved branch", t->name());
       // incomplete();
       E.push_back(t->clone()); // try later?

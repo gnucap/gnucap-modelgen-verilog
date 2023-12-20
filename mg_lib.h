@@ -54,6 +54,7 @@ public:
   typedef typename set::const_iterator const_iterator;
 public:
   explicit pSet(){}
+  ~pSet(){}
   const_iterator begin()const { return _s.begin(); }
   const_iterator end()const { return _s.end(); }
   std::pair<iterator, bool> insert(T* t) { return _s.insert(t); }
@@ -63,6 +64,14 @@ public:
        _s.insert(x);
      }
   }
+//  T*& operator[](std::string const& k){
+//    T K(k);
+//    auto p = _s.insert(&K);
+//    if(p.second){
+//      *p.first = NULL;
+//    }else{
+//    }
+//  }
   size_t size()const {return _s.size();}
   bool empty()const {return _s.empty();}
 };

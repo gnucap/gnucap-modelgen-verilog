@@ -162,14 +162,14 @@ Token* Probe::new_token(Module&, size_t na)const
   return nt;
 }
 /*--------------------------------------------------------------------------*/
-Node const* MGVAMS_FILTER::p() const
+Node_Ref MGVAMS_FILTER::p() const
 { untested();
-  return &Node_Map::mg_ground_node;
+  return Node_Ref(&Node_Map::mg_ground_node);
 }
 /*--------------------------------------------------------------------------*/
-Node const* MGVAMS_FILTER::n() const
+Node_Ref MGVAMS_FILTER::n() const
 { untested();
-  return &Node_Map::mg_ground_node;
+  return Node_Ref(&Node_Map::mg_ground_node);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -1,0 +1,43 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+spice
+.subckt vsin p n
+.parameter ampl
+.parameter dc
+V1 p n sin freq=1 amplitude={ampl} dc=dc
+.ends
+
+.verilog
+
+`modelgen
+module test_cap2(p, n);
+  electrical p, n;
+  parameter real c=1;
+  branch (p,n) B;
+  analog begin
+    I(B) <+  ddt(c*V(B));
+  end
+endmodule
+
+!make test_cap2.so > /dev/null
+
+attach ./test_cap2.so
+
+verilog
+
+resistor #(.r(1)) r(in, out);
+test_cap2 #(.c(c)) dut(out, 0);
+// capacitor #(.c(c)) c(out, 0);
+
+parameter v=0
+parameter c=1m
+vsin #(.dc(v), .ampl(1)) v1(in, 0);
+
+print dc v(nodes) i(dut.*) iter(0)
+dc v -10 10 2 trace=n
+
+print tran v(nodes) iter(0)
+tran .5
+status notime

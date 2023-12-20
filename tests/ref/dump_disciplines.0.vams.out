@@ -33,7 +33,6 @@ module test(p, n, x);
   inout x;
   electrical p;
   electrical x, y;
-  // circuit
   voltage #() n();
 
 endmodule

@@ -87,9 +87,34 @@ Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
 }
 #endif
 /*--------------------------------------------------------------------------*/
-Branch_Ref Branch_Map::new_branch(Node* a, Node* b)
+Branch_Ref Branch_Map::new_branch(Branch_Ref const& b, std::string name)
+{
+  assert(name!="");
+  assert(b);
+  //return new_branch(b->p(), b->n(), name);
+  auto m = prechecked_cast<Module*>(owner());
+  assert(m);
+
+  auto n = _names.find(name);
+  if(n != _names.end()){
+    throw Exception("already there" + name);
+  }else{
+    auto n = new Named_Branch(b, name, m);
+    _names.push_back(n);
+    _brs.push_back(n);
+    if(b.is_reversed()){
+    }else{
+    }
+    return Branch_Ref(n, b.is_reversed());
+  }
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref Branch_Map::new_branch(Node_Ref a, Node_Ref b)
 {
   std::pair<Node const*, Node const*> p(a, b);
+  auto m = prechecked_cast<Module*>(owner());
+  assert(m);
+
   auto i = _m.find(p);
   if(i!=_m.end()){
     return Branch_Ref(i->second);
@@ -99,19 +124,14 @@ Branch_Ref Branch_Map::new_branch(Node* a, Node* b)
     if(i!=_m.end()){
       return Branch_Ref(i->second, true);
     }else{
-      auto nb = new Branch(a, b, _m.size());
+      auto nb = new Branch(a, b, m);
       nb->set_owner(owner());
       _brs.push_front(nb); // front?
       _m[p] = nb;
-  	// br.set_owner(this); // eek.
+      // br.set_owner(this); // eek.
       return Branch_Ref(nb);
     }
   }
-}
-/*--------------------------------------------------------------------------*/
-Branch_Ref const& Module::new_branch_name(std::string const& n, Branch_Ref const& b)
-{
-  return _branch_names.new_name(n, b);
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref Module::new_branch(Node* p, Node* n = NULL)
@@ -137,12 +157,14 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
   }else{
   }
 
-  Branch_Ref a = _branch_names.lookup(p);
+  incomplete();
+  Branch_Ref a(branches().lookup(p) /*, polarity?*/);
 
   if(a){
     if(n!=""){ untested();
       throw Exception("syntax error");
     }else{
+      // polarity??
       return a;
     }
   }else if(n==""){
@@ -204,11 +226,12 @@ Node const* Module::node(std::string const& p) const
   }
 }
 /*--------------------------------------------------------------------------*/
-Branch_Ref Module::branch(std::string const& p) const
+Branch_Ref Module::lookup_branch(std::string const& p) const
 {
-  return _branch_names.lookup(p);
+  return _branches.lookup(p);
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 Branch_Ref const& Branch_Names::new_name(std::string const& n, Branch_Ref const& r)
 {
   Branch_Ref& j = _m[n];
@@ -220,22 +243,23 @@ Branch_Ref const& Branch_Names::new_name(std::string const& n, Branch_Ref const&
     return j;
   }
 }
+#endif
 /*--------------------------------------------------------------------------*/
-void Branch_Names::clear()
-{
-  _m.clear();
-}
-/*--------------------------------------------------------------------------*/
-Branch_Ref const& Branch_Names::lookup(std::string const& p) const
-{
-  static Branch_Ref none;
-  const_iterator i = _m.find(p);
-  if(i == _m.end()){
-    return none;
-  }else{
-    return i->second;
-  }
-}
+// void Branch_Names::clear()
+// {
+//   _m.clear();
+// }
+// /*--------------------------------------------------------------------------*/
+// Branch_Ref const& Branch_Names::lookup(std::string const& p) const
+// {
+//   static Branch_Ref none;
+//   const_iterator i = _m.find(p);
+//   if(i == _m.end()){
+//     return none;
+//   }else{
+//     return i->second;
+//   }
+// }
 /*--------------------------------------------------------------------------*/
 void Filter::new_deps()
 {
@@ -344,7 +368,7 @@ std::string Branch::dev_type()const
     }else{ untested();
       return "incomplete_dev_type";
     }
-  }else if(has_flow_probe()){
+  }else if(has_flow_probe()) {
     return "va_sw";
   }else if(has_pot_source()){
     if(_selfdep){
@@ -366,8 +390,7 @@ std::string Branch::dev_type()const
 Branch_Ref::Branch_Ref(Branch_Ref const& b)
     : Owned_Base(b),
       _br(b._br),
-      _r(b._r),
-      _name(b._name)
+      _r(b._r)
 {
   if(_br){
     _br->attach(this);
@@ -378,8 +401,7 @@ Branch_Ref::Branch_Ref(Branch_Ref const& b)
 Branch_Ref::Branch_Ref(Branch_Ref&& b)
     : Owned_Base(b),
       _br(b._br),
-      _r(b._r),
-      _name(b._name)
+      _r(b._r)
 {
   if(_br){
     _br->attach(this);
@@ -389,6 +411,15 @@ Branch_Ref::Branch_Ref(Branch_Ref&& b)
 /*--------------------------------------------------------------------------*/
 Branch_Ref::Branch_Ref(Branch* b, bool reversed)
   : _br(b), _r(reversed)
+{
+  if(_br){
+    _br->attach(this);
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref::Branch_Ref(Named_Branch* b)
+  : _br(b), _r(b->is_reversed())
 {
   if(_br){
     _br->attach(this);
@@ -408,19 +439,19 @@ Branch_Ref::~Branch_Ref()
 std::string Branch_Ref::code_name()const
 {
   assert(_br);
-  if(has_name()){
-    return "_br_" + *_name;
-  }else{
-    return _br->code_name();
-  }
+//  if(has_name()){
+//    return "_br_" + *_name;
+//  }else{
+  return _br->code_name();
+//  }
 }
 /*--------------------------------------------------------------------------*/
-void Branch_Ref::set_name(std::string const& n)
-{
-  assert(!has_name());
-  assert(_br);
-  _name = _br->reg_name(n);
-}
+// void Branch_Ref::set_name(std::string const& n)
+// {
+//   assert(!has_name());
+//   assert(_br);
+//   _name = _br->reg_name(n);
+// }
 /*--------------------------------------------------------------------------*/
 Branch_Ref& Branch_Ref::operator=(Branch_Ref&& o)
 {
@@ -442,7 +473,7 @@ Branch_Ref& Branch_Ref::operator=(Branch_Ref const& o)
 
   _br = o._br;
   _r = o._r;
-  _name = o._name;
+  //_name = o._name;
 
   if(_br) {
     _br->attach(this);
@@ -488,14 +519,14 @@ void Branch_Ref::unset_used_in(Base const* b) const
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-std::string const* Branch::reg_name(std::string const&s)
-{
-  for(auto i: _names){
-    assert(i!=s);
-  }
-  _names.push_back(s);
-  return &_names.back();
-}
+//std::string const* Branch::reg_name(std::string const&s)
+//{
+//  for(auto i: _names){
+//    assert(i!=s);
+//  }
+//  _names.push_back(s);
+//  return &_names.back();
+//}
 /*--------------------------------------------------------------------------*/
 // has_source? is_source?
 bool Branch::has_element() const
@@ -547,23 +578,6 @@ Nature const* Branch::nature() const
 {
 //  source?
   return NULL;
-}
-/*--------------------------------------------------------------------------*/
-Module::~Module()
-{
-  // cleanup
-  _branch_names.clear();
-//  _analog_list.clear();
-//  _analog_functions.clear();
-  delete_analog();
-  _branch_decl.clear();
-  delete _probes; // .clear();
-  _filters.clear();
-  _branches.clear();
-
-  {
-//    _nodes.clear();
-  }
 }
 /*--------------------------------------------------------------------------*/
 Block::~Block()
@@ -714,6 +728,7 @@ void Branch::detach(Branch_Ref* r)
     }else{
     }
   }
+  assert(0);
   unreachable(); // cleanup is out of order?
 }
 /*--------------------------------------------------------------------------*/
@@ -960,7 +975,7 @@ Branch const* Branch::output() const
   return this;
 }
 /*--------------------------------------------------------------------------*/
-Node const* Branch::p() const
+Node_Ref Branch::p() const
 {
   if(auto f = dynamic_cast<MGVAMS_FILTER const*>(_ctrl)){
     return f->p();
@@ -969,7 +984,7 @@ Node const* Branch::p() const
   assert(_p); return _p;
 }
 /*--------------------------------------------------------------------------*/
-Node const* Branch::n() const
+Node_Ref Branch::n() const
 {
   if(auto f = dynamic_cast<MGVAMS_FILTER const*>(_ctrl)){
     return f->n();

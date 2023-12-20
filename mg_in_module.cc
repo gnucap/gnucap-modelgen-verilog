@@ -863,6 +863,11 @@ void Branch_Declaration::dump(std::ostream& o) const
   o << " " << _list << "\n";
 }
 /*--------------------------------------------------------------------------*/
+Branch_Ref Module::new_branch_name(std::string const& n, Branch_Ref const& b)
+{
+  return _branches.new_branch(b, n);
+}
+/*--------------------------------------------------------------------------*/
 void Branch_Declaration::parse(CS& f)
 {
   assert(owner());
@@ -1123,15 +1128,32 @@ void Module::install(FUNCTION_ const* f)
   _funcs.insert(f);
 }
 /*--------------------------------------------------------------------------*/
-Branch::Branch(Node* p, Node* n, size_t number)
-    : Element_2(), _p(p), _n(n), _number(number)
+Branch::Branch(Branch_Ref b, Module* m)
+    : Element_2(), _p(b->p()), _n(b->n())
 {
+  set_owner(m);
+  new_deps();
+
+  if(b.is_reversed()) {
+//      std::swap(_p, _n); // ??
+  } else {
+  }
+  m->node(_n)->connect(this);
+  m->node(_p)->connect(this);
+}
+/*--------------------------------------------------------------------------*/
+Branch::Branch(Node_Ref p, Node_Ref n, Module* m)
+    : Element_2(), _p(p), _n(n)
+{
+  set_owner(m);
   assert(p);
   assert(n);
   new_deps();
   //_code_name = "_b_" + p->name() + "_" + n->name();
-  n->connect(this);
-  p->connect(this);
+  //
+//  incomplete();
+  m->node(n)->connect(this);
+  m->node(p)->connect(this);
 
   // p->inc_use();
   // n->inc_use();
@@ -1159,6 +1181,22 @@ void Branch::unset_used_in(Base const* b)
   }
   unreachable();
   throw std::logic_error("cleanup " + code_name());
+}
+/*--------------------------------------------------------------------------*/
+Module::~Module()
+{
+  // cleanup
+//  _analog_list.clear();
+//  _analog_functions.clear();
+  delete_analog();
+  _branch_decl.clear();
+  delete _probes; // .clear();
+  _filters.clear();
+  _branches.clear();
+
+  {
+//    _nodes.clear();
+  }
 }
 /*--------------------------------------------------------------------------*/
 Branch::~Branch()

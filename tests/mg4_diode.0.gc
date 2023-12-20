@@ -1,0 +1,57 @@
+verilog // simplified spice diode with limit
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+// options nobypass
+// options noincmode
+options trtol=1
+options gmin=.01p
+
+`modelgen
+module test_diode0(a, c);
+	parameter real is=1e-15 from (0:inf);
+	parameter real tf=0 from [0:inf);
+	parameter real cjo=0 from [0:inf);
+	parameter real phi=0.7 exclude 0;
+	inout a, c;
+	electrical a, c;
+	branch (a, c) r, cap;
+	real qd;
+
+	analog begin
+		real i;
+		i = is*(limexp(V(r)/$vt) - 1);
+		I(r) <+ i;
+		qd = tf*i - 2*cjo*phi*sqrt(1 - V(cap)/phi);
+		I(cap) <+ ddt(qd);
+	end
+endmodule
+
+!make test_diode0.so > /dev/null
+attach ./test_diode0.so
+
+module main(n, g)
+	test_diode0 #(.cjo(1pf) .tf(1u)) D1(n g);
+endmodule
+
+main m(n,m);
+resistor #(.r(1k)) r(m,0);
+
+spice
+
+
+.parameter v=0
+V1  (n, 0) vsource dc=v ac=1
+* D1  (n m) dd
+* .model dd d cjo=1pf is=1e-15 tt=1u
+
+.print dc v(nodes) i(V1) i(m.D1.*) iter(0)
+.dc v -1.4 .7 .35 trace=n
+
+.print ac v(nodes)
+.ac 1 1000k * 10
+
+.dc v 0 2 .1 trace=n
+
+.status notime

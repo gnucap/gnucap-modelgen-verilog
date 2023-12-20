@@ -923,8 +923,11 @@ void Assignment::parse_rhs(CS& cmd)
   trace1("Assignment::parse_rhs", bool(cmd));
 }
 /*--------------------------------------------------------------------------*/
+// in_module?
 void Branch_Ref::parse(CS& f)
 {
+  assert(!_br);
+
   trace1("Branch_Ref::parse", f.tail().substr(0,10));
   if(f >> "("){
   }else{
@@ -936,9 +939,7 @@ void Branch_Ref::parse(CS& f)
 
   assert(owner());
   trace3("Branch_Ref::parse", pp, pn, _br);
-  assert(!_br);
   Branch_Ref b;
-  assert(!b._br);
   b = owner()->new_branch(pp, pn);
 
   assert(b._br);
@@ -950,8 +951,8 @@ void Branch_Ref::parse(CS& f)
 void Branch_Ref::dump(std::ostream& o)const
 {
   assert(_br);
-  if(has_name()){
-    o << "(" << *_name << ")";
+  if(auto x = dynamic_cast<Named_Branch const*>(_br)) {
+    o << "(" << x->name() << ")";
   }else if(_br->n()->is_ground()) {
     o << "(" << pname() << ")";
   }else{
@@ -982,6 +983,9 @@ void Contribution::parse(CS& cmd)
   }else{
   }
 
+  if(_branch.is_reversed()){
+  }else{
+  }
 
   if(!_branch->discipline()) {
     cmd.reset(here);
@@ -1919,7 +1923,7 @@ bool Module::has_analog_block() const
 }
 /*--------------------------------------------------------------------------*/
 Analog::Analog()
-{ untested();
+{
 }
 /*--------------------------------------------------------------------------*/
 Analog::~Analog()
@@ -2036,6 +2040,20 @@ void Analog::parse(CS& f)
   }
 //  return f;
 }
+/*--------------------------------------------------------------------------*/
+Branch_Ref Branch_Map::lookup(std::string const& n)const
+{
+  auto it = _names.find(n);
+  if(it != _names.end()) {
+    return Branch_Ref(*it);
+  }else{
+    return Branch_Ref(NULL, false);
+  }
+}
+// Branch_Ref Branch_Names::lookup(std::string const&) const
+// {
+//   ...
+// }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

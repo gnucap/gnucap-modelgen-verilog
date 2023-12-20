@@ -24,7 +24,6 @@ module net(a, b);
   parameter real r = 1.;
   parameter real c = 1.;
 
-  // circuit
   resistor #(.r(r)) r1(a, 1);
   resistor #(.r(r)) r2(1, 2);
   resistor #(.r(r)) r3(2, b);

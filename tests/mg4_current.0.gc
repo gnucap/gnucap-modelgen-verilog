@@ -1,0 +1,37 @@
+
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+
+verilog
+
+`modelgen
+module test_current0(p, n);
+	electrical p, n;
+	inout p, n;
+	(* desc="" *) real i;
+	(* desc="" *) real iA;
+	(* desc="" *) real iB;
+	branch (p,n) A;
+	branch (p,n) B;
+	analog begin
+		iA = I(A);
+		iB = I(B);
+		I(A) <+ 1.;
+		I(B) <+ 2.;
+	end
+endmodule
+
+!make test_current0.so > /dev/null
+attach ./test_current0.so
+
+parameter v=0
+
+test_current0 dut(1,0);
+resistor #(1) r1(1, 0);
+
+list
+
+print dc i(r1) iA(dut) iB(dut) v(nodes) i(dut.*)
+
+dc r1 1 2 .5 trace=i
+end

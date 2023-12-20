@@ -5,7 +5,6 @@ module test(d, g, s, b);
 
   real   T,   U;
 
-  // circuit
   electrical #() d();
   g #() ();
 

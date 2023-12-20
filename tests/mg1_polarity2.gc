@@ -5,14 +5,16 @@ attach ../d_vasrc.so
 verilog
 
 `modelgen
-module polarity2_0(np, nn, cp, cn, vp, vn);
-	electrical np, nn, cp, cn, vp, vn;
-	inout np, nn, cp, cn, vp, vn;
+module polarity2_0(p, n, cp, cn, vp, vn);
+	electrical p, n, cp, cn, vp, vn;
+	inout p, n, cp, cn, vp, vn;
+	parameter real cv = 1;
+	parameter real ci = 1;
 	analog begin
-		I(np,nn) <+ I(cp, cn)
-		I(np,nn) <+ - I(cn, cp)
-		I(np,nn) <+ V(vp, vn)
-		I(np,nn) <+ - V(vn, vp)
+		I(p,n) <+   ci * I(cp, cn)
+		I(p,n) <+ - ci * I(cn, cp)
+		I(p,n) <+   cv * V(vp, vn)
+		I(p,n) <+ - cv * V(vn, vp)
 	end
 endmodule
 
@@ -21,15 +23,21 @@ list
 !make polarity2_0.so > /dev/null
 attach ./polarity2_0.so
 
-polarity2_0 d(3,0,1,0,2,0);
+polarity2_0             d(3,0,1,0,2,0);
+polarity2_0 #(.cv(0.)) d4(4,0,1,0,2,0);
+polarity2_0 #(.ci(0.)) d5(5,0,1,0,2,0);
+
 isource #(.dc(1)) i1(1, 0);
 vsource #(.dc(1)) v1(2, 0);
-resistor #(.r(3)) r(3, 0);
+
+resistor #(.r(1)) r3(3, 0);
+resistor #(.r(1)) r4(4, 0);
+resistor #(.r(1)) r5(5, 0);
 
 list
 
-print dc v(v1) i(i1) i(r)
-dc v1 0 1 1 i1 0 1 1
+print dc v(v1) i(i1) i(r3) i(r4) i(r5)
+dc v1 0 1 1 i1 0 3 3
 
-print dc + i(d._b_cp_cn) v(d._b_cp_cn) iter(0)
-dc v1 0 1 1 i1 0 1 1
+print dc i(d._b_cp_cn) v(d._b_cp_cn) iter(0)
+dc v1 0 1 1 i1 0 3 3

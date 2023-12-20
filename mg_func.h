@@ -89,7 +89,7 @@ public:
   Token* new_token(Module& m, size_t na) const override;
 };
 /*--------------------------------------------------------------------------*/
-class Node;
+class Node_Ref;
 class Branch;
 class MGVAMS_FILTER : public FUNCTION_ {
   std::string eval(CS&, const CARD_LIST*)const override{
@@ -103,8 +103,8 @@ public:
   std::string code_name()const override{
     return "";
   }
-  virtual Node const* p() const; // really?
-  virtual Node const* n() const; // really?
+  virtual Node_Ref p() const;
+  virtual Node_Ref n() const;
   virtual Branch const* output()const{return NULL;}
 };
 /*--------------------------------------------------------------------------*/
