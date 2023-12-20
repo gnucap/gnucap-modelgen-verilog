@@ -586,6 +586,20 @@ std::string Analog_Function_Arg::code_name()const
   return "af_arg_" + name();
 }
 /*--------------------------------------------------------------------------*/
+static void make_set_self_contribution(std::ostream& o, Dep const& d)
+{
+  Branch const* b = d->branch();
+    // pot or current src?
+  o__ "trace2(\"" <<  b->state() << "self\", " << b->state() << "[1], "<<  d->code_name() <<");\n";
+  o__ " // pot probe: " << d->is_pot_probe() << "\n";
+  o__ " // flow probe: " << d->is_flow_probe() << "\n";
+  o__ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
+// not yet.
+//  for(auto n : b->names()){
+//    o__ b->state(n) << "[0] -= " << b->state(n) << "[1] * " << d->code_name() << "; // (4n)\n";
+//  }
+}
+/*--------------------------------------------------------------------------*/
 static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
 {
   Branch const* b = &br;
@@ -594,6 +608,7 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
 
   o__ b->state() << "[0] = _value" << b->code_name() << ";\n";
   if(b->has_pot_source()){
+    o__ "// 1 pot src: names.\n";
     for(auto n: b->names()){
 	o__ "if(_pot" << b->code_name() << "){\n";
 	o__ "}else if(_pot_br_" << n << "){\n";
@@ -624,7 +639,7 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
 
   for(auto const& d : b->deps()){
     if(d->branch() == b){
-      o__ "// self_admittance lin: " << d.is_linear() << "\n";
+      o__ "// same " << d->code_name() << "\n";
       if(b->has_pot_source() && b->has_flow_probe()){
 	if(br.num_states()<=2){
 	}else{
@@ -632,10 +647,8 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
 	}
       }else{
       }
-      o__ "trace2(\"" <<  b->state() << "self\", " << b->state() << "[1], "<<  d->code_name() <<");\n";
-      o__ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
 
-      break;
+      make_set_self_contribution(o, d);
     }else{
     }
   }
@@ -664,14 +677,14 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
       }else if(d->branch()->is_short()) {
       }else if(d->is_pot_probe()){
 	o__ "sp += (long double)(" << b->state() << "["
-	 << "/*MOD::*/" << b->state() << "_::dep" << d->code_name()
+	 << b->state() << "_::dep" << d->code_name()
 	 << "] * "<< d->code_name() << ");\n";
       }else if(d->is_flow_probe()){
 	o__ "sp += (long double)(" << b->state() << "["
-	 << "/*MOD::*/" << b->state() << "_::dep" << d->code_name()
+	 << b->state() << "_::dep" << d->code_name()
 	 << "] * "<< d->code_name() << "); // (5)\n";
 	o__ b->state() << "["
-	 << "/*MOD::*/" << b->state() << "_::dep" << d->code_name()
+	 << b->state() << "_::dep" << d->code_name()
 	 <<"] *= " << d->branch()->code_name() <<"->_loss0; // BUG?\n";
       }else{ untested();
 	o__ "// bogus probe " << b->state() << " : " << d->code_name() << "\n";
@@ -719,7 +732,7 @@ static void make_cc_set_branch_contributions(std::ostream& o, const Module& m)
     if(b->is_short()) {
     }else if(b->has_flow_source() || b->has_pot_source()) {
       indent ii;
-      o__ "{\n";
+      o__ "{ // 1\n";
       make_set_one_branch_contribution(o, *b);
       o__ "}\n";
     }else if(b->has_flow_probe()) {
@@ -1091,6 +1104,7 @@ void Probe::make_cc_dev(std::ostream& o) const
   o__ "ddouble xs" << code_name_() << "() const { // " << label() << "\n";
   o____ "ddouble t = " << code_name() << ";\n";
   o____ "t[d" << code_name() << "] = 1;\n";
+
   if(_br.is_reversed()) {
     o____ "return -t;\n";
   }else{
