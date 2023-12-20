@@ -90,6 +90,42 @@ private:
 } abstime;
 DISPATCHER<FUNCTION>::INSTALL d_abstime(&function_dispatcher, "$abstime", &abstime);
 /*--------------------------------------------------------------------------*/
+class MFACTOR : public MGVAMS_FUNCTION {
+  mutable Module const* _m{NULL};
+public:
+  explicit MFACTOR() {
+    set_label("mfactor");
+  }
+private:
+  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+    unreachable(); // SFCALL won't eval
+    return "$$mfactor";
+  }
+  Token* new_token(Module& m, size_t na)const override {
+    _m = &m;
+    m.install(this);
+    return new Token_SFCALL("$mfactor", this);
+  }
+  std::string code_name()const override{
+    return "d->_f_mfactor";
+  }
+ void make_cc_precalc(std::ostream& o)const override {
+   o__ "double " << "_f_mfactor()const;\n";
+ }
+ void make_cc_impl(std::ostream& o)const override {
+   assert(_m);
+   o << "double " << "PRECALC_" << _m->identifier() << "::_f_mfactor()const {\n";
+   o__ "return _d->mfactor();\n";
+   o << "}\n";
+ }
+ void make_cc_dev(std::ostream& o)const override {
+   o__ "double " << "_f_mfactor()const {\n";
+   o____ "return mfactor();\n";
+   o__ "}\n";
+ }
+} mfactor;
+DISPATCHER<FUNCTION>::INSTALL d_mfactor(&function_dispatcher, "$mfactor", &mfactor);
+/*--------------------------------------------------------------------------*/
 class TEMPERATURE : public MGVAMS_FUNCTION {
 public:
   explicit TEMPERATURE() {

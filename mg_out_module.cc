@@ -107,6 +107,7 @@ void make_cc_current_ports(std::ostream& o, Branch const* br, Element_2 const&);
 static void make_tr_needs_eval(std::ostream& o, const Module& m)
 {
   o << "bool MOD_" << m.identifier() << "::tr_needs_eval()const\n{\n";
+  o__ "trace1(\"" << m.identifier() <<"::needs_eval?\", long_label());\n";
   o__ "node_t gnd(&ground_node);\n";
   o__ "if (is_q_for_eval()) { untested();\n";
   o____ "return false;\n";
@@ -756,6 +757,7 @@ static void make_module_precalc_first(std::ostream& o, Module const& m)
   String_Arg const& mid = m.identifier();
   o << "void MOD_" << mid << "::precalc_first()\n{\n";
   o__ baseclass(m) << "::precalc_first();\n";
+  o__ "trace2(\"" << m.identifier() <<"::pf\", long_label(), mfactor());\n";
 
   o__ "auto c = static_cast<COMMON_" << mid << "*>(mutable_common());\n";
   o__ "assert(c);\n";
@@ -908,7 +910,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
   o__ "//subckt()->precalc();\n";
   o__ "assert(!is_constant());\n";
   if (m.sync()) {
-    o << "  subckt()->set_slave();\n";
+//    o << "  subckt()->set_slave();\n";
   }else{
   }
   o__ "for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){\n";

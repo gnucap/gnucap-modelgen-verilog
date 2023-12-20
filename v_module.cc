@@ -226,11 +226,22 @@ int DEV_MODULE::set_param_by_name(std::string Name, std::string Value)
   assert(_parent);
   assert(_parent->subckt());
 
-  PARAM_LIST::const_iterator p = _parent->subckt()->params()->find(Name);
-  if(p != _parent->subckt()->params()->end()){
-    return BASE_SUBCKT::set_param_by_name(Name,Value);
+  if (Umatch(Name, "$mfactor ")) {
+//    return BASE_SUBCKT::set_param_by_name("m",Value);
+    assert(common());
+    COMMON_COMPONENT* m = common()->clone();
+    m->COMMON_COMPONENT::set_param_by_index(3, Value, 0); // BUG
+    m->set_param_by_name("m", Value); // BUG
+    attach_common(m);
+    trace2("DEV_MODULE::spbn", long_label(), Value);
+    return 1; //?
   }else{
-    throw Exception_No_Match(Name);
+    PARAM_LIST::const_iterator p = _parent->subckt()->params()->find(Name);
+    if(p != _parent->subckt()->params()->end()){
+      return BASE_SUBCKT::set_param_by_name(Name,Value);
+    }else{
+      throw Exception_No_Match(Name);
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -289,6 +300,7 @@ void DEV_MODULE::expand()
 void DEV_MODULE::precalc_first()
 {
   BASE_SUBCKT::precalc_first();
+  trace2("DEV_MODULE::precalc_first", long_label(), _mfactor);
 
   if (subckt()) {
   }else{

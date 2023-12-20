@@ -749,7 +749,8 @@ bool Module::sync() const
 
   if(has_submodule() && has_analog_block()){
     incomplete();
-  }else{
+  }else if(has_analog_block()) {
+  }else if(has_submodule()) {
   }
   return has_analog_block();
 }

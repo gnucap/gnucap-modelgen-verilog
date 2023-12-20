@@ -1027,6 +1027,7 @@ private: // impl
   void set_branch_contributions();
   void clear_branch_contributions();
   friend class COMMON_resistor;
+  friend class PRECALC_resistor;
 }; // m_resistor;
 /*--------------------------------------------------------------------------*/
 COMMON_resistor::COMMON_resistor(int c)
@@ -1217,6 +1218,7 @@ MOD_resistor::MOD_resistor()
 /*--------------------------------------------------------------------------*/
 bool MOD_resistor::tr_needs_eval()const
 {
+  trace1("resistor::needs_eval?", long_label());
   node_t gnd(&ground_node);
   if (is_q_for_eval()) { untested();
     return false;
@@ -1401,6 +1403,7 @@ MOD_resistor::MOD_resistor(MOD_resistor const&p) : BASE_SUBCKT(p)
 void MOD_resistor::precalc_first()
 {
   BASE_SUBCKT::precalc_first();
+  trace2("resistor::pf", long_label(), mfactor());
   auto c = static_cast<COMMON_resistor*>(mutable_common());
   assert(c);
   auto cc = c->clone();
@@ -1471,7 +1474,6 @@ void MOD_resistor::expand()
   subckt()->expand();
   //subckt()->precalc();
   assert(!is_constant());
-  subckt()->set_slave();
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();
     if(d == (*i)){
@@ -2584,6 +2586,7 @@ private: // impl
   void set_branch_contributions();
   void clear_branch_contributions();
   friend class COMMON_capacitor;
+  friend class PRECALC_capacitor;
 }; // m_capacitor;
 /*--------------------------------------------------------------------------*/
 COMMON_capacitor::COMMON_capacitor(int c)
@@ -2798,6 +2801,7 @@ MOD_capacitor::MOD_capacitor()
 /*--------------------------------------------------------------------------*/
 bool MOD_capacitor::tr_needs_eval()const
 {
+  trace1("capacitor::needs_eval?", long_label());
   node_t gnd(&ground_node);
   if (is_q_for_eval()) { untested();
     return false;
@@ -2972,6 +2976,7 @@ MOD_capacitor::MOD_capacitor(MOD_capacitor const&p) : BASE_SUBCKT(p)
 void MOD_capacitor::precalc_first()
 {
   BASE_SUBCKT::precalc_first();
+  trace2("capacitor::pf", long_label(), mfactor());
   auto c = static_cast<COMMON_capacitor*>(mutable_common());
   assert(c);
   auto cc = c->clone();
@@ -3083,7 +3088,6 @@ void MOD_capacitor::expand()
   subckt()->expand();
   //subckt()->precalc();
   assert(!is_constant());
-  subckt()->set_slave();
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();
     if(d == (*i)){
@@ -3309,6 +3313,7 @@ private: // impl
   void set_branch_contributions();
   void clear_branch_contributions();
   friend class COMMON_capacitor;
+  friend class PRECALC_capacitor;
 }; // m_capacitor;
 /*--------------------------------------------------------------------------*/
 COMMON_capacitor::COMMON_capacitor(int c)
@@ -3543,6 +3548,7 @@ MOD_capacitor::MOD_capacitor()
 /*--------------------------------------------------------------------------*/
 bool MOD_capacitor::tr_needs_eval()const
 {
+  trace1("capacitor::needs_eval?", long_label());
   node_t gnd(&ground_node);
   if (is_q_for_eval()) { untested();
     return false;
@@ -3769,6 +3775,7 @@ MOD_capacitor::MOD_capacitor(MOD_capacitor const&p) : BASE_SUBCKT(p)
 void MOD_capacitor::precalc_first()
 {
   BASE_SUBCKT::precalc_first();
+  trace2("capacitor::pf", long_label(), mfactor());
   auto c = static_cast<COMMON_capacitor*>(mutable_common());
   assert(c);
   auto cc = c->clone();
@@ -3878,7 +3885,6 @@ void MOD_capacitor::expand()
   subckt()->expand();
   //subckt()->precalc();
   assert(!is_constant());
-  subckt()->set_slave();
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();
     if(d == (*i)){

@@ -1,0 +1,45 @@
+
+load ../modelgen_0.so
+load ../d_vasrc.so
+load ../lang_verilog.so
+
+verilog
+
+`modelgen
+module test_mfactor(p, n);
+	electrical p, n;
+	inout p, n;
+	(* desc="" *) real m;
+	analog m = $mfactor;
+endmodule
+
+`modelgen
+module test_mfactor_(p, n);
+	electrical p, n;
+	inout p, n;
+	(*desc="mfactor"*)real m;
+	test_mfactor #(.$mfactor(7)) m(p,n);
+	analog m = $mfactor;
+endmodule
+
+
+!make test_mfactor.so test_mfactor_.so > /dev/null
+attach ./test_mfactor.so
+attach ./test_mfactor_.so
+
+parameter v=0
+
+module mm(a)
+test_mfactor #(.$mfactor(2)) d(1,0);
+endmodule
+
+test_mfactor d1(1,0);
+test_mfactor #(.$mfactor(2)) d2(1,0);
+test_mfactor_ #(.$mfactor(6)) d3(1,0);
+
+mm m1(a);
+mm #(.$mfactor(3)) m2(a);
+
+print dc m(d*) m(m*.d) m(d3.m)
+dc
+end

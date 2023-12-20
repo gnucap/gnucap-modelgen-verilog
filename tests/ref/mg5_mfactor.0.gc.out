@@ -1,0 +1,4 @@
+load ../lang_verilog.so 
+     ^ ? "../lang_verilog.so": already loaded, replacing
+#           m(d1)      m(d2)      m(d3)      m(m1.d)    m(m2.d)    m(d3.m)   
+ 0.         1.         2.         6.         2.         6.         42.       
