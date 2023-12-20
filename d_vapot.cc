@@ -39,8 +39,8 @@ protected: // override virtual
     DEV_CPOLY_G::tr_begin();
     _loss0 = 1./OPT::shortckt;
   }
-  double   tr_involts()const override	{unreachable(); return NOT_VALID;}
-  double   tr_involts_limited()const override {unreachable(); return NOT_VALID;}
+  double   tr_involts()const override	{untested(); return tr_outvolts();}
+  double   tr_involts_limited()const override {return tr_outvolts_limited();}
   double   tr_amps()const override;
   void	   ac_iwant_matrix()override	{ac_iwant_matrix_extended();}
   void	   ac_load()override;
@@ -93,27 +93,44 @@ bool VAPOT::do_tr_con_chk_and_q()
 /*--------------------------------------------------------------------------*/
 bool VAPOT::do_tr()
 {
+  trace6("do_tr", long_label(), _self_is_current, _loss0, _values[0], _values[1], tr_amps());
   assert(_values);
+
   assert(_loss0);
-  if(_self_is_current && fabs(_values[1]) > OPT::shortckt){
-    // loss but CS mode.
-    _values[0] /= - _values[1];
+  if(_self_is_current && fabs(_values[1]) > OPT::shortckt){ untested();
+    _loss0 = 0.;
+    // loss but switch to CS mode.
+    // V(br) <+ f(I(br) ...)
+
     _adj_values[1] = 1./ _values[1];
 
-    for (int i=2; i<=_n_ports; ++i) {
-      _adj_values[i] = _values[i]; //  *_loss0;
-    }
     _m0.x = 0.;
-    _m0.c0 = 0.; // - _values[0]; // *_loss0;
-    _m0.c1 = _adj_values[1]; // really?
-    _loss0 = 0.;
+    _m0.c0 = tr_amps() - _values[0] / _values[1]; // ; // *_loss0;
+    _m0.c1 = _adj_values[1];
+
+	/* y.f0 = amps - r.f0*y.f1 + volts*y.f1; */  // amps - v[0]/v[1] + volts/v[1]
+    // admit: _y[0].x = _m0.x = tr_involts_limited();
+    // y.c0
+  //double   c0()const		
+  //{assert(f0==f0); assert(f1==f1); assert(x==x); assert(f0!=LINEAR); return (f0 - x * f1);}
+  // ==  amps - v[0]/v[1] + volts/v[1] -  tr_involts_limited() * v1 = amps - v[0]/v[1]
+
+
+    _values[0] = _m0.c0;
+    _values[1] = _m0.c1;
+    for (int i=2; i<=_n_ports; ++i) { untested();
+      _adj_values[i] = _values[i];
+    }
+
   }else{
     for (int i=1; i<=_n_ports; ++i) {
       _adj_values[i] = -_values[i] * _loss0;
     }
     _m0.x = 0.;
+    // _m0.c0 = -_loss0 * _y[0].f1; // d_vs.
     _m0.c0 = -_loss0 * _values[0];
     _m0.c1 = 0.; // really?
+    assert(_m0.c1 == 0.); // d_vs
   }
   return do_tr_con_chk_and_q();
 }
@@ -165,8 +182,17 @@ void VAPOT::tr_load()
 /*--------------------------------------------------------------------------*/
 double VAPOT::tr_amps()const
 {
-  double amps = _m0.c0 + _loss0 * tr_outvolts();
-  for (int i=1; i<=_n_ports; ++i) {
+  double amps = 0.;
+  if(_loss0){ untested();
+    // voltage src mode
+    // d_vs/elt/admit: fixzero((_loss0 * tr_outvolts() + _m0.c1 * tr_involts()(==0) + _m0.c0), _m0.c0);
+    amps = fixzero((_loss0 * tr_outvolts() /* + _m0.c1 * tr_involts() */ + _m0.c0), _m0.c0);
+  }else{ untested();
+    // amps = _m0.c0 + _m0.c1 * tr_outvolts();
+    amps = fixzero((_m0.c1 * tr_involts() + _m0.c0), _m0.c0);
+  }
+  trace3("tr_amps", long_label(), _loss0, amps);
+  for (int i=2; i<=_n_ports; ++i) { untested();
     amps += dn_diff(_n[2*i-2].v0(), _n[2*i-1].v0()) * _values[i];
   }
   return amps;

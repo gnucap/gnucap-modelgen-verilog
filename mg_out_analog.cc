@@ -588,16 +588,36 @@ std::string Analog_Function_Arg::code_name()const
 /*--------------------------------------------------------------------------*/
 static void make_set_self_contribution(std::ostream& o, Dep const& d)
 {
+  // geting here if V(br) <+ .. I(br) or
+  //                I(br) <+ .. V(br)
+  //    .. what if both?
   Branch const* b = d->branch();
-    // pot or current src?
   o__ "trace2(\"" <<  b->state() << "self\", " << b->state() << "[1], "<<  d->code_name() <<");\n";
-  o__ " // pot probe: " << d->is_pot_probe() << "\n";
-  o__ " // flow probe: " << d->is_flow_probe() << "\n";
-  o__ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
-// not yet.
-//  for(auto n : b->names()){
-//    o__ b->state(n) << "[0] -= " << b->state(n) << "[1] * " << d->code_name() << "; // (4n)\n";
-//  }
+  o__ "// generic: " << b->is_generic() << "\n";
+  bool both = b->has_flow_source() && b->has_pot_source();
+
+  if(both && d->is_pot_probe()) {
+    o__ "// self pot\n";
+    o__ "if (_pot"<< b->code_name() << "){\n";
+    o__ "}else{\n";
+    o____ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
+    o__ "}\n";
+  }else if(both && d->is_flow_probe()) {
+    o__ "// self flow\n";
+    o__ "if (_pot"<< b->code_name() << "){\n";
+    o____ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
+    // for(auto n : b->names()){
+    //   o__ b->state(n) << "[0] -= " << b->state(n) << "[1] * " << d->code_name() << "; // (4n)\n";
+    // }
+    o__ "}else{\n";
+    o__ "}\n";
+  }else{
+    o__ "// self\n";
+    o__ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
+    // for(auto n : b->names()){
+    //   o__ b->state(n) << "[0] -= " << b->state(n) << "[1] * " << d->code_name() << "; // (4n)\n";
+    // }
+  }
 }
 /*--------------------------------------------------------------------------*/
 static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
@@ -1102,7 +1122,17 @@ void Probe::make_cc_common(std::ostream&) const{}
 void Probe::make_cc_dev(std::ostream& o) const
 {
   o__ "ddouble xs" << code_name_() << "() const { // " << label() << "\n";
-  o____ "ddouble t = " << code_name() << ";\n";
+  o____ "ddouble t;\n";
+
+  if(is_flow_probe() && _br->has_flow_source()) {
+    o____ "if(" << _br->code_name() << "){\n";
+    o______ "t = " << _br->code_name() << "->tr_amps();\n";
+    o____ "}else{\n";
+    o______ "t = 0.;\n";
+    o____ "}\n";
+  }else{
+    o____ "t = " << code_name() << ";\n";
+  }
   o____ "t[d" << code_name() << "] = 1;\n";
 
   if(_br.is_reversed()) {
