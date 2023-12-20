@@ -22,6 +22,7 @@
 #include "mg_out.h"
 #include "mg_func.h"
 #include "mg_options.h"
+#include "mg_analog.h" // Probe
 #include "m_tokens.h" // Deps
 /*--------------------------------------------------------------------------*/
 static void declare_deriv_enum(std::ostream& o, const Module& m)
@@ -89,7 +90,9 @@ static void make_func_dev(std::ostream& o, pSet<FUNCTION_ const> const& P)
 static void make_funcs_common(std::ostream& o, pSet<FUNCTION_ const> const& P)
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
-    if( (*q)->has_refs() ){
+    if(!*q){
+      o<<"// NULL\n";
+    }else if( (*q)->has_refs() ){
       (*q)->make_cc_common(o);
     }else if(dynamic_cast<MGVAMS_FUNCTION const*>(*q)){ untested();
       o<<"// FUNCTION no refs: " << (*q)->label() << "\n";
@@ -97,9 +100,13 @@ static void make_funcs_common(std::ostream& o, pSet<FUNCTION_ const> const& P)
       o<<"// TASK no refs: " << (*q)->label() << "\n";
     }else if(dynamic_cast<MGVAMS_FILTER const*>(*q)){ untested();
       o<<"// FILTER no refs: " << (*q)->label() << "\n";
-    }else{ untested();
+    }else if(dynamic_cast<VAMS_ACCESS const*>(*q)){ untested();
+      o<<"// XS no refs: " << (*q)->label() << "\n";
+    }else if(dynamic_cast<Probe const*>(*q)){
+      o<<"// Probe no refs: " << (*q)->label() << "\n";
+    }else{
       unreachable();
-      o<<"//func " << (*q)->label() << "\n";
+      o<<"// func no refs " << (*q)->label() << "\n";
     }
   }
 }

@@ -933,6 +933,7 @@ private: // strictly internal
 public: // input parameters
   PARAMETER<real> _p_r /*  */;
 private: // funcs
+// Probe no refs: potential_p_n
 }; //COMMON_resistor
 /*--------------------------------------------------------------------------*/
 class PRECALC_resistor{
@@ -959,6 +960,12 @@ private: // data
 public: // netlist
   ELEMENT* _b_p_n{NULL}; // branch
 private: // func decl
+//filt potential_p_n
+  ddouble xs_potential_b_p_n() const { // potential_p_n
+    ddouble t = _potential_b_p_n;
+    t[d_potential_b_p_n] = 1;
+    return t;
+  }
 private: // construct
   explicit MOD_resistor(MOD_resistor const&);
 public:
@@ -1277,8 +1284,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0[d_potential_b_p_n] = 0.; // (output dep)
-        t0 = +p->_potential_b_p_n; // V(p, n)
-        t0[d_potential_b_p_n] = +1.;
+        t0 = p->xs_potential_b_p_n();
         t0 = t0 / (_p_r) /*rhspar*/;
         _v_i = t0.value(); // (*)
         _v_i[d_potential_b_p_n] = t0[d_potential_b_p_n]; // (2b)
@@ -2417,6 +2423,8 @@ private: // funcs
   bool param_given(PARA_BASE const& p)const {
     return p.has_hard_value();
   }
+// Probe no refs: potential__ddt_1_n
+// Probe no refs: potential_p_n
 }; //COMMON_capacitor
 /*--------------------------------------------------------------------------*/
 class PRECALC_capacitor{
@@ -2458,6 +2466,18 @@ private: // func decl
   bool _short_b_ddt_1()const {return 1;}
 //func param_given
   // param_given
+//filt potential__ddt_1_n
+  ddouble xs_potential_b_ddt_1_p_ddt_1_n() const { // potential__ddt_1_n
+    ddouble t = _potential_b_ddt_1_p_ddt_1_n;
+    t[d_potential_b_ddt_1_p_ddt_1_n] = 1;
+    return t;
+  }
+//filt potential_p_n
+  ddouble xs_potential_b_p_n() const { // potential_p_n
+    ddouble t = _potential_b_p_n;
+    t[d_potential_b_p_n] = 1;
+    return t;
+  }
 private: // construct
   explicit MOD_capacitor(MOD_capacitor const&);
 public:
@@ -2814,8 +2834,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
             t0[d_potential_b_ddt_1_p_ddt_1_n] = 0.; // (output dep)
             t0.set_no_deps();
             t0[d_potential_b_ddt_1_p_ddt_1_n] = 0.; // (output dep)
-            t0 = +p->_potential_b_p_n; // V(p, n)
-            t0[d_potential_b_p_n] = +1.;
+            t0 = p->xs_potential_b_p_n();
             t0 = (_p___c) /*rhspar*/ * t0;
             // function ddt 1
             t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_1(t0);
@@ -3121,6 +3140,8 @@ private: // funcs
   bool param_given(PARA_BASE const& p)const {
     return p.has_hard_value();
   }
+// Probe no refs: potential__ddt_2_n
+// Probe no refs: potential_p_n
 }; //COMMON_capacitor
 /*--------------------------------------------------------------------------*/
 class PRECALC_capacitor{
@@ -3162,6 +3183,18 @@ private: // func decl
   bool _short_b_ddt_2()const {return 0;}
 //func param_given
   // param_given
+//filt potential__ddt_2_n
+  ddouble xs_potential_b_ddt_2_p_ddt_2_n() const { // potential__ddt_2_n
+    ddouble t = _potential_b_ddt_2_p_ddt_2_n;
+    t[d_potential_b_ddt_2_p_ddt_2_n] = 1;
+    return t;
+  }
+//filt potential_p_n
+  ddouble xs_potential_b_p_n() const { // potential_p_n
+    ddouble t = _potential_b_p_n;
+    t[d_potential_b_p_n] = 1;
+    return t;
+  }
 private: // construct
   explicit MOD_capacitor(MOD_capacitor const&);
 public:
@@ -3566,8 +3599,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
               t0[d_potential_b_ddt_2_p_ddt_2_n] = 0.; // (output dep)
               t0.set_no_deps();
               t0[d_potential_b_ddt_2_p_ddt_2_n] = 0.; // (output dep)
-              t0 = +p->_potential_b_p_n; // V(p, n)
-              t0[d_potential_b_p_n] = +1.;
+              t0 = p->xs_potential_b_p_n();
               t0 = (_p___c) /*rhspar*/ * t0;
               // function ddt 1
               t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_2(t0);

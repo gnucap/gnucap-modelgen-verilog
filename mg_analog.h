@@ -24,6 +24,57 @@
 /*--------------------------------------------------------------------------*/
 #include "mg_.h"
 /*--------------------------------------------------------------------------*/
+// class access_function?
+class Probe : public FUNCTION_ {
+  Branch_Ref _br;
+  enum{
+    t_unknown = 0,
+    t_flow,
+    t_pot
+  } _type{t_unknown};
+public:
+  explicit Probe(std::string const& xs, Branch_Ref b);
+  ~Probe();
+
+  std::string const& pname()const { return _br.pname(); }
+  std::string const& nname()const { return _br.nname(); }
+
+  bool is_flow_probe()const { return _type == t_flow;}
+  bool is_pot_probe()const { return _type == t_pot;}
+
+  std::string code_name()const override;
+  std::string code_name_()const; // TODO.
+  Branch const* branch()const {
+    return _br;
+  }
+  bool is_reversed() const;
+  Nature const* nature() const;
+  Discipline const* discipline() const;
+
+  bool operator==(Probe const& o) const{
+    return _br == o._br && _type == o._type;
+  }
+  bool same_data(Probe const& o) const{
+    return branch() == o.branch() && _type == o._type;
+  }
+  bool operator!=(Probe const& o) const{
+    return !operator==(o);
+  }
+private:
+  std::string eval(CS&, const CARD_LIST*)const override {unreachable(); return "";}
+  Token* new_token(Module&, size_t)const override;
+public:
+  void set_used_in(Base const*b)const{
+    return _br.set_used_in(b);
+  }
+  void unset_used_in(Base const*b)const{
+    return _br.unset_used_in(b);
+  }
+private:
+  void make_cc_dev(std::ostream&)const override;
+  void make_cc_common(std::ostream&)const override;
+}; // Probe
+/*--------------------------------------------------------------------------*/
 class AnalogStmt : public Base {
 public:
   virtual bool update() = 0;

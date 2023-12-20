@@ -22,7 +22,7 @@
  * dependencies in expressions
  */
 #include <m_base.h>
-#include "mg_.h" // Probe
+#include "mg_analog.h" // Probe
 #include "mg_deps.h"
 /*--------------------------------------------------------------------------*/
 Deps Deps::_no_deps;

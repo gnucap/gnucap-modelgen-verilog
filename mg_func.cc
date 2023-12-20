@@ -25,6 +25,7 @@
 #include "mg_func.h"
 #include "m_tokens.h"
 #include "mg_out.h"
+#include "mg_analog.h" // Probe
 #include <globals.h>
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/

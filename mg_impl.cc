@@ -42,6 +42,7 @@ bool Module::has_submodule() const
 }
 /*--------------------------------------------------------------------------*/
 #if 1
+Probe* new_Probe(std::string const& xs, Branch_Ref const& br);
 Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
 {
     trace1("new_probe", br.has_name());
@@ -75,11 +76,15 @@ Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
     k = nn + "_" + br.name();
   }else{
   }
-  Probe*& prb = _probes[k];
+
+  assert(_probes);
+  Probe*& prb = (*_probes)[k];
 
   if(prb) {
   }else{
-    prb = new Probe(nn, br);
+    prb = ::new_Probe(nn, br);
+//    prb->set_label(k);
+    install(prb); // duplicate reference..?
   }
 
   trace1("new_probe", br.has_name());
@@ -280,26 +285,6 @@ size_t Branch::num_branches() const
   return m->num_branches();
 }
 /*--------------------------------------------------------------------------*/
-size_t Branch::num_nodes() const
-{
-  size_t ret=1;
-
-  for(auto i : deps()){
-    if(i->branch()->is_short()){ untested();
-    }else if(i->branch() == this){
-      // self conductance
-    }else if(i->is_pot_probe()){
-      ++ret;
-//     }else if(i->is_filter_probe()){ untested();
-//       assert(i->is_pot_probe());
-//       unreachable();
-//       ++ret;
-    }else{
-    }
-  }
-  return 2*ret;
-}
-/*--------------------------------------------------------------------------*/
 void Branch::add_dep(Dep const& b)
 {
 //  if(b->branch() == this){ untested();
@@ -341,6 +326,7 @@ bool Branch::is_generic()const
       incomplete();
     }
   }else if(has_flow_probe()){
+    // return _selfdep;
   }else if(has_pot_source()){
     if(_selfdep){
       return true;
@@ -434,6 +420,7 @@ std::string Branch_Ref::code_name()const
     return _br->code_name();
   }
 }
+/*--------------------------------------------------------------------------*/
 void Branch_Ref::set_name(std::string const& n)
 {
   assert(!has_name());
@@ -544,28 +531,6 @@ size_t Filter::num_nodes() const
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-size_t Branch::num_states() const
-{
-  size_t k = 2;
-  // TODO: cleanup
-  for(auto i : deps()){
-    assert(i);
-    // if(i->is_reversed()){ untested();
-    //}else
-    if(i->branch() == this){
-    }else if(i->branch()->is_short()){ untested();
-    }else{
-      ++k;
-    }
-  }
-  return k;
-}
-/*--------------------------------------------------------------------------*/
-std::string Branch::state()const
-{
-  return "_st" + code_name();
-}
-/*--------------------------------------------------------------------------*/
 Discipline const* Branch::discipline() const
 {
   assert(_p);
@@ -584,54 +549,10 @@ Discipline const* Branch::discipline() const
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-Probe::Probe(std::string const& xs, Branch_Ref b) : _br(b)
-{
-  trace3("::Probe", xs, code_name(), b.has_name());
-  // TODO: disciplines.h
-  if( (xs == "V") || (xs == "potential") ){
-    _type = t_pot;
-    _br->inc_pot_probe();
-  }else if( (xs == "I") || (xs == "flow") ){
-    _type = t_flow;
-    _br->inc_flow_probe();
-  }else{ untested();
-    unreachable();
-  }
-}
-/*--------------------------------------------------------------------------*/
-Probe::~Probe()
-{
-  if(is_flow_probe()){
-    _br->dec_flow_probe();
-  }else{
-  }
-  if(is_pot_probe()){
-    _br->dec_pot_probe();
-  }else{
-  }
-
-//  assert(!_use);
-}
-/*--------------------------------------------------------------------------*/
-bool Probe::is_reversed() const
-{
-  return _br.is_reversed();
-}
-/*--------------------------------------------------------------------------*/
 Nature const* Branch::nature() const
 { untested();
 //  source?
   return NULL;
-}
-/*--------------------------------------------------------------------------*/
-Discipline const* Probe::discipline() const
-{
-  return _br->discipline();
-}
-/*--------------------------------------------------------------------------*/
-Nature const* Probe::nature() const
-{ untested();
-  return _br->nature();
 }
 /*--------------------------------------------------------------------------*/
 Module::~Module()
@@ -641,10 +562,7 @@ Module::~Module()
   _analog_list.clear();
   _analog_functions.clear();
   _branch_decl.clear();
-  for(auto i: _probes){
-    delete i.second;
-  }
-  _probes.clear();
+  delete _probes; // .clear();
   _filters.clear();
   _branches.clear();
 

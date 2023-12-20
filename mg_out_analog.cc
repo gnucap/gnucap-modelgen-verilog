@@ -564,23 +564,16 @@ void OUT_ANALOG::make_construct(std::ostream& o, AnalogConstruct const& ab) cons
   }
 }
 /*--------------------------------------------------------------------------*/
+std::string Branch::state()const
+{
+  return "_st" + code_name();
+}
+/*--------------------------------------------------------------------------*/
 std::string const& Branch::omit() const
 {
   static std::string const n = "";
   return n;
 //  return !(_has_contibutions || _has_iprobe);
-}
-/*--------------------------------------------------------------------------*/
-std::string Probe::code_name() const
-{
-  if ( _type == t_flow ){
-    return "_flow" + _br->code_name();
-  }else if (_type == t_pot){
-    return "_potential" + _br->code_name();
-  }else{
-    unreachable();
-    return("unreachable_probe");
-  }
 }
 /*--------------------------------------------------------------------------*/
 std::string Branch::code_name() const
@@ -1012,6 +1005,98 @@ void make_cc_analog(std::ostream& o, const Module& m)
 //  make_cc_ac_begin(o, m);
   make_cc_common_tr_eval(o, m);
   make_cc_common_precalc(o, m);
+}
+/*--------------------------------------------------------------------------*/
+void make_node_ref(std::ostream& o, const Node& n, bool used=true);
+void make_cc_branch_ctrl(std::ostream& o, Branch const* br)
+{
+  for(auto i : br->deps()){
+    Branch const* bb = i->branch();
+    if(bb->is_short()){
+      // here: skip filter dependency.
+    }else if(bb == br){
+    }else if(i->is_pot_probe()){
+      assert(i->branch());
+      o << ", ";
+      make_node_ref(o, *i->branch()->p());
+      o << ", ";
+      make_node_ref(o, *i->branch()->n());
+    }else if(i->is_flow_probe()){
+    }else{ untested();
+      o << "/* nothing " << i->code_name() << " */";
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+void make_cc_current_ports(std::ostream& o, Branch const* br, Element_2 const& e)
+{
+  // set_current ports.
+  int kk = 1;
+  for(auto i : br->deps()){
+    if(!i->is_flow_probe()){
+    }else if(i->branch() == br){
+      // self control is current
+      o______ e.code_name() << "->set_current_port_by_index(0,\"\");\n";
+    }else{
+      assert(i->branch());
+      o______ e.code_name() << "->set_current_port_by_index( "<< kk << ", \"" << i->branch()->code_name() << "\");\n";
+      ++kk;
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+std::string Probe::code_name() const
+{
+  if ( _type == t_flow ){
+    return "_flow" + _br->code_name(); // BUG. named_branch.
+  }else if (_type == t_pot){
+    return "_potential" + _br->code_name();
+  }else{
+    unreachable();
+    return("unreachable_probe");
+  }
+}
+/*--------------------------------------------------------------------------*/
+std::string Branch_Ref::code_name_() const
+{
+  if(has_name()){
+    return "_br_" + name();
+  }else if(is_reversed()){
+    return "_b_" + _br->n()->name() + "_" + _br->p()->name();
+  }else{
+    return "_b_" + _br->p()->name() + "_" + _br->n()->name();
+  }
+}
+/*--------------------------------------------------------------------------*/
+std::string Probe::code_name_() const
+{
+  std::string cn = _br.code_name_();
+
+  std::string xsname;
+  if (is_flow_probe()) {
+    xsname = "_flow";
+  }else if (is_pot_probe()) {
+    xsname = "_potential";
+  }else{
+    unreachable();
+    xsname = "unreachable_probe";
+  }
+
+  return xsname + cn;
+}
+/*--------------------------------------------------------------------------*/
+void Probe::make_cc_common(std::ostream&) const{}
+void Probe::make_cc_dev(std::ostream& o) const
+{
+  o__ "ddouble xs" << code_name_() << "() const { // " << label() << "\n";
+  o____ "ddouble t = " << code_name() << ";\n";
+  o____ "t[d" << code_name() << "] = 1;\n";
+  if(_br.is_reversed()) {
+    o____ "return -t;\n";
+  }else{
+    o____ "return t;\n";
+  }
+  o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

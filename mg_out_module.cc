@@ -81,7 +81,7 @@ static void make_module_is_valid(std::ostream& o, const Module& m)
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_node_ref(std::ostream& o, const Node& n, bool used=true)
+void make_node_ref(std::ostream& o, const Node& n, bool used=true)
 {
   if(n.is_ground()) {
     o << "gnd";
@@ -99,6 +99,10 @@ static void make_cc_branch_output(std::ostream& o, Branch const* br)
   o << ", ";
   make_node_ref(o, *out->n(), br->is_used());
 }
+/*--------------------------------------------------------------------------*/
+// TODO: mg_out_analog.cc
+void make_cc_branch_ctrl(std::ostream& o, Branch const* br);
+void make_cc_current_ports(std::ostream& o, Branch const* br, Element_2 const&);
 /*--------------------------------------------------------------------------*/
 static void make_tr_needs_eval(std::ostream& o, const Module& m)
 {
@@ -707,24 +711,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
   
   if(e.num_nodes()){
     make_cc_branch_output(o, br);
-    {
-      for(auto i : br->deps()){
-	Branch const* bb = i->branch();
-      	if(bb->is_short()){
-	  // here: skip filter dependency.
-	}else if(bb == br){
-	}else if(i->is_pot_probe()){
-	  assert(i->branch());
-	  o << ", ";
-	  make_node_ref(o, *i->branch()->p());
-	  o << ", ";
-	  make_node_ref(o, *i->branch()->n());
-	}else if(i->is_flow_probe()){
-	}else{ untested();
-	  o << "/* nothing " << i->code_name() << " */";
-	}
-      }
-    }
+    make_cc_branch_ctrl(o, br);
 
     o << "}; // nodes\n";
 
@@ -736,21 +723,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
       o______ e.code_name() << "->_loss1 = 0.;\n";
     }
 
-    {
-      // set_current ports.
-      int kk = 1;
-      for(auto i : br->deps()){
-	if(!i->is_flow_probe()){
-	}else if(i->branch() == br){
-	  // self control is current
-	  o______ e.code_name() << "->set_current_port_by_index(0,\"\");\n";
-	}else{
-	  assert(i->branch());
-	  o______ e.code_name() << "->set_current_port_by_index( "<< kk << ", \"" << i->branch()->code_name() << "\");\n";
-	  ++kk;
-	}
-      }
-    }
+    make_cc_current_ports(o, br, e);
   }else{
     o << "gnd, gnd"; // filt subs hack.
     o << "}; // nodes\n";

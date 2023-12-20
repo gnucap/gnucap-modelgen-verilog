@@ -181,7 +181,8 @@ public:
   Probe const* prb() const;
   bool is_short() const;
   bool is_reversed() const;
-  std::string code_name() const;
+  std::string code_name()const;
+  std::string code_name_()const;
 private:
   size_t num_deps() const;
 };

@@ -710,6 +710,7 @@ public:
   void parse(CS&) override;
   void dump(std::ostream& o)const override;
   std::string code_name()const;
+  std::string code_name_()const;
   void set_name(std::string const&);
   bool has_name()const{
     return _name;
@@ -1412,51 +1413,6 @@ public:
 typedef LiSt<Probe, '{', '#', '}'> Probe_List;
 #endif
 // Name clash, VAMS_ACCESS == Probe?
-class Probe : public FUNCTION_ {
-  Branch_Ref _br;
-  enum{
-    t_unknown = 0,
-    t_flow,
-    t_pot
-  } _type{t_unknown};
-public:
-  explicit Probe(std::string const& xs, Branch_Ref b);
-  ~Probe();
-
-  std::string const& pname()const { return _br.pname(); }
-  std::string const& nname()const { return _br.nname(); }
-
-  bool is_flow_probe()const { return _type == t_flow;}
-  bool is_pot_probe()const { return _type == t_pot;}
-
-  std::string code_name()const override;
-  Branch const* branch()const {
-    return _br;
-  }
-  bool is_reversed() const;
-  Nature const* nature() const;
-  Discipline const* discipline() const;
-
-  bool operator==(Probe const& o) const{
-    return _br == o._br && _type == o._type;
-  }
-  bool same_data(Probe const& o) const{
-    return branch() == o.branch() && _type == o._type;
-  }
-  bool operator!=(Probe const& o) const{
-    return !operator==(o);
-  }
-private:
-  std::string eval(CS&, const CARD_LIST*)const override {unreachable(); return "";}
-  Token* new_token(Module&, size_t)const override;
-public:
-  void set_used_in(Base const*b)const{
-    return _br.set_used_in(b);
-  }
-  void unset_used_in(Base const*b)const{
-    return _br.unset_used_in(b);
-  }
-}; // Probe
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class Head : public Base {
@@ -1752,10 +1708,14 @@ public:
 };
 typedef Collection<Analog_Function> Analog_Functions;
 /*--------------------------------------------------------------------------*/
+class Probe_Map : public std::map<std::string, Probe*> {
+public:
+  ~Probe_Map();
+};
+/*--------------------------------------------------------------------------*/
 class Node;
 class File;
 class Module : public Block {
-  typedef std::map<std::string, Probe*> Probe_Map;
 private: // verilog input data
   File const* _file{NULL};
   New_Port_List	_ports;
@@ -1787,12 +1747,15 @@ private: // merge?
   size_t _num_filters{0};
   bool _has_analysis{false};
 private: // elaboration data
-  Probe_Map _probes;
+  Probe_Map* _probes{NULL};
+  void new_probe_map();
   Branch_Names _branch_names;
   Branch_Map _branches;
   Node_Map _nodes;
 public:
-  Module(){}
+  Module() {
+    new_probe_map();
+  }
   ~Module();
 public:
   String_Arg const& key()const	  {return _identifier;}
@@ -1849,6 +1812,7 @@ public:
     return Block::push_back(x);
   }
   void install(FUNCTION_ const* f);
+  void install(Probe const* f);// ?
   std::list<FUNCTION_ const*> const& func()const {return _func;}
   pSet<FUNCTION_ const> const& funcs()const {return _funcs;}
 private: // misc

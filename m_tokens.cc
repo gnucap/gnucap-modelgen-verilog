@@ -25,6 +25,7 @@
 #include "m_tokens.h"
 #include "mg_func.h"
 #include "mg_options.h"
+#include "mg_analog.h"
 #include <stack>
 /*--------------------------------------------------------------------------*/
 namespace {
@@ -750,6 +751,13 @@ std::string Token_ACCESS::code_name() const
   auto p = prb();
   assert(p);
   return p->code_name();
+}
+/*--------------------------------------------------------------------------*/
+std::string Token_ACCESS::code_name_() const
+{
+  auto p = prb();
+  assert(p);
+  return p->code_name_();
 }
 /*--------------------------------------------------------------------------*/
 bool Token_ACCESS::is_short() const

@@ -1810,5 +1810,116 @@ bool AnalogRealDecl::update()
   return false;
 }
 /*--------------------------------------------------------------------------*/
+Probe* new_Probe(std::string const& xs, Branch_Ref const& br)
+{
+  return new Probe(xs, br);
+}
+/*--------------------------------------------------------------------------*/
+size_t Branch::num_nodes() const
+{
+  size_t ret=1;
+
+  for(auto i : deps()){
+    if(i->branch()->is_short()){ untested();
+    }else if(i->branch() == this){
+      // self conductance
+    }else if(i->is_pot_probe()){
+      ++ret;
+//     }else if(i->is_filter_probe()){ untested();
+//       assert(i->is_pot_probe());
+//       unreachable();
+//       ++ret;
+    }else{
+    }
+  }
+  return 2*ret;
+}
+/*--------------------------------------------------------------------------*/
+size_t Branch::num_states() const
+{
+  size_t k = 2;
+  // TODO: cleanup
+  for(auto i : deps()){
+    assert(i);
+    // if(i->is_reversed()){ untested();
+    //}else
+    if(i->branch() == this){
+    }else if(i->branch()->is_short()){ untested();
+    }else{
+      ++k;
+    }
+  }
+  return k;
+}
+/*--------------------------------------------------------------------------*/
+Probe::Probe(std::string const& xs, Branch_Ref br) : _br(br)
+{
+  trace3("::Probe", xs, code_name(), br.has_name());
+  // TODO: disciplines.h
+  if( (xs == "V") || (xs == "potential") ){
+    _type = t_pot;
+    _br->inc_pot_probe();
+  }else if( (xs == "I") || (xs == "flow") ){
+    _type = t_flow;
+    _br->inc_flow_probe();
+  }else{ untested();
+    unreachable();
+  }
+
+  std::string k = xs + "_" + br.pname() + "_" + br.nname();
+  if(br.has_name()){
+    k = xs + "_" + br.name();
+  }else{
+  }
+
+  set_label(k);
+}
+/*--------------------------------------------------------------------------*/
+Probe::~Probe()
+{
+  if(is_flow_probe()){
+    _br->dec_flow_probe();
+  }else{
+  }
+  if(is_pot_probe()){
+    _br->dec_pot_probe();
+  }else{
+  }
+
+//  assert(!_use);
+}
+/*--------------------------------------------------------------------------*/
+bool Probe::is_reversed() const
+{
+  return _br.is_reversed();
+}
+/*--------------------------------------------------------------------------*/
+Discipline const* Probe::discipline() const
+{
+  return _br->discipline();
+}
+/*--------------------------------------------------------------------------*/
+Nature const* Probe::nature() const
+{ untested();
+  return _br->nature();
+}
+/*--------------------------------------------------------------------------*/
+void Module::new_probe_map()
+{
+  _probes = new Probe_Map;
+}
+/*--------------------------------------------------------------------------*/
+Probe_Map::~Probe_Map()
+{
+  for(auto i: *this) {
+    delete i.second;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Module::install(Probe const* f)
+{
+  _funcs.insert(f);
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

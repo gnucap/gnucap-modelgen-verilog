@@ -23,6 +23,7 @@
 #include "mg_func.h"
 #include "m_tokens.h"
 #include "mg_options.h"
+#include "mg_analog.h" // BUG. Probe
 #include <globals.h>
 #include <stack>
 //#include <iomanip>
@@ -482,9 +483,7 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
       }else if(pp->is_short()){ untested();
 	o__ s.code_name() << " = 0.; // short probe\n";
       }else{
-	char sign = pp->is_reversed()?'-':'+';
-	o__ s.code_name() << " = " << sign << "p->" << pp->code_name() << "; // "<< pp->name() <<"\n";
-	o__ s.code_name() << "[d" << pp->code_name() << "] = " << sign << "1.;\n";
+	o__ s.code_name() << " = p->xs" << pp->code_name_() << "();\n";
       }
     }else if (auto p = dynamic_cast<const Token_PAR_REF*>(*i)) {
       s.new_rhs(p);
