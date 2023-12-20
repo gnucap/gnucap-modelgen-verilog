@@ -1175,14 +1175,11 @@ Branch::~Branch()
   // Contributions tidied up
   assert(!_has_pot_src);
   assert(!_has_flow_src);
+  // assert(!_has_always_pot);
 
   // Probes tidied up
-  if(_has_pot_probe){ untested();
-    unreachable();
-  }else if(_has_flow_probe){ untested();
-    unreachable();
-  }else{
-  }
+  assert(!_has_pot_probe);
+  assert(!_has_flow_probe);
 
   delete _deps;
   _deps = NULL;

@@ -329,6 +329,7 @@ private:
   void set_pot_contrib();
   void set_flow_contrib();
   void set_short();
+  void set_always_pot();
   void set_direct(bool d=true);
 //  Deps& deps() { return _rhs.deps(); }
   Deps const& deps();

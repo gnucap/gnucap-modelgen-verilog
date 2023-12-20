@@ -1521,6 +1521,7 @@ class Branch : public Element_2 {
   size_t _has_flow_src{0};
   size_t _has_pot_src{0};
   size_t _has_short{0};
+  size_t _has_always_pot{0};
   FUNCTION_ const* _ctrl{NULL};
   std::vector<Branch_Ref*> _refs;
   size_t _number;
@@ -1571,12 +1572,14 @@ public:
   void inc_flow_source(){ ++_has_flow_src; }
   void inc_pot_source(){ ++_has_pot_src; }
   void inc_short(){ ++_has_short; }
+  void inc_always_pot(){ ++_has_always_pot; }
 
   void dec_flow_probe() { assert(_has_flow_probe); --_has_flow_probe; }
   void dec_pot_probe() { assert(_has_pot_probe); --_has_pot_probe; }
   void dec_flow_source() { assert(_has_flow_src); --_has_flow_src; }
   void dec_pot_source() { assert(_has_pot_src); --_has_pot_src; }
   void dec_short(){ assert(_has_short); --_has_short; }
+//  void dec_always_pot(){ assert(_has_always_pot); --_has_always_pot; }
 
   void set_filter(FUNCTION_ const* f){ _ctrl=f; }
   void set_direct(bool d=true);
@@ -1585,6 +1588,7 @@ public:
   bool has_pot_probe() const;
   bool has_flow_source() const { return _has_flow_src; }
   bool has_short() const { return _has_short; }
+  bool has_always_pot() const { return _has_always_pot; }
   bool is_filter() const { return _ctrl; }
   bool has_pot_source() const;
   size_t num_states() const override;

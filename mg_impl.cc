@@ -341,29 +341,28 @@ bool Branch::is_generic()const
 std::string Branch::dev_type()const
 {
 //  if( .. attribute .. )?
-  static std::string p = "va_pot";
-  static std::string pb = "va_pot_br";
-
   if(is_filter()) {
     return "va_" + _ctrl->label().substr(0,3); // HACK
   }else if(!is_direct()){
     if(has_pot_source()){
-      return pb;
+      return "va_pot_br";
     }else{ untested();
       return "incomplete_dev_type";
     }
   }else if(has_flow_probe()){
-    return p;
+    return "va_sw";
   }else if(has_pot_source()){
-    if(_selfdep){
-      return pb;
+    if(_selfdep){ untested();
+      return "va_pot_br";
+    }else if(has_always_pot() && !has_flow_source()) {
+      return "va_pot";
     }else{
-      return p;
+      return "va_sw";
     }
   }else if(has_flow_source()){
     return "va_flow";
   }else{ untested();
-    return p;
+    return "va_sw";
   }
   unreachable();
   return "";
@@ -682,27 +681,6 @@ bool Assignment::is_int() const
   return type().is_int();
 }
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-#if 0 // mg_in_module?
-Branch::~Branch()
-{
-  // no, shutting down, not all Refs tidied up.
-  assert(!_refs.size());
-
-  // Contributions tidied up
-  assert(!_has_pot_src);
-  assert(!_has_flow_src);
-  assert(!_has_short);
-
-  // Probes tidied up
-  assert(!_has_pot_probe);
-  assert(!_has_flow_probe);
-
-  delete _deps;
-  _deps = NULL;
-}
-#endif
 /*--------------------------------------------------------------------------*/
 void Branch::attach(Branch_Ref* r)
 {

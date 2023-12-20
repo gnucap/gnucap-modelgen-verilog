@@ -1061,13 +1061,17 @@ void Contribution::parse(CS& cmd)
   }
   cmd >> ";";
 
-  if(is_zero(_rhs)) {
-    if(_nature == disc->potential()){
+  if(_nature == disc->potential()){
+    if(is_zero(_rhs)) {
       set_short();
-    }else{
+    }else if(owner()->is_always()) {
+      set_always_pot();
     }
   }else if(_nature == disc->flow()){
-    set_flow_contrib();
+    if(is_zero(_rhs)) {
+    }else{
+      set_flow_contrib();
+    }
   }
 
   if(_branch->deps().is_linear()){
@@ -1703,6 +1707,12 @@ void Contribution::set_pot_contrib()
     _branch->inc_pot_source();
   }
   _type = t_pot;
+}
+/*--------------------------------------------------------------------------*/
+void Contribution::set_always_pot()
+{
+  assert(_type == t_pot);
+  _branch->inc_always_pot();
 }
 /*--------------------------------------------------------------------------*/
 void Contribution::set_short()

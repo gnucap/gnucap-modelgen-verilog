@@ -94,8 +94,10 @@ bool VAPOT::do_tr_con_chk_and_q()
 bool VAPOT::do_tr()
 {
   assert(_values);
-  assert(_loss0);
-  if(_self_is_current && fabs(_values[1]) > OPT::shortckt){
+
+  if(!_loss0){
+    _m0 = CPOLY1(0., _values[0], _values[1]);
+  }else if(_self_is_current && fabs(_values[1]) > OPT::shortckt){
     // loss but CS mode.
     _values[0] /= - _values[1];
     _adj_values[1] = 1./ _values[1];
@@ -243,7 +245,7 @@ void VAPOT::set_parameters(const std::string& Label, CARD *Owner,
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-DISPATCHER<CARD>::INSTALL d2(&device_dispatcher, "va_pot", &d);
+DISPATCHER<CARD>::INSTALL d2(&device_dispatcher, "va_sw", &d);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
