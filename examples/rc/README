@@ -1,6 +1,9 @@
 == plain.gc
 
-Basic instanciation and transient. Run with "gnucap plain.gc".
+Basic instanciation and transient. Run with
+
+$ gnucap plain.gc
+[..]
 
 == compiled.gc
 
@@ -8,16 +11,37 @@ Same as plain.gc, but using a compiled model. Compile with
 
 $ gnucap-mg-vams --cc rc.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o rc.so
 
-Run with "gnucap compiled.gc"
+Now run
+
+$ gnucap compiled.gc
+[..]
 
 == behavioural.gc
 
 Same, formulated as behavioural model in rc_b.vams. Uses "analog" block.
 
 $ gnucap-mg-vams --cc rc_b.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o rc_b.so
-
-Run with "gnucap behavioural.gc"
+$ gnucap behavioural.gc
 
 == paramset.gc
 
-TODO
+Sometimes it is useful to create a new prototype that has parameters fixed in
+one way or another. With rc_b.so compiled as above, run
+
+$ gnucap paramset.gc
+[..] model=2 [..]
+
+You see two instances of rc, with an initial value ic=2 in each of them.
+
+== compiled_ps.gc
+
+Sometimes it is useful to know constants during compilation. For this purpose,
+Verilog-AMS defines "paramset".
+
+$ gnucap-mg-vams --cc rc_ps.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o rc_ps.so
+$ gnucap compiled_ps.gc
+[..] model=1 [..]
+
+Note the second instance of rc_ps, without "ic" set. It does not use an
+internal node, because it resolves to the simpler one that does not take an
+"ic" parameter.

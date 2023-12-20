@@ -1,0 +1,21 @@
+verilog
+load vams/lang_verilog.so
+load vams/d_vasrc.so
+
+// the models we just compiled
+load ./rc_ps.so
+
+parameter ic=1
+
+module main(1,2,3);
+	rc_ps #(.ic(2)) myrc1(1, 2, 3);
+	rc_ps #()       myrc2(1, 2, 3);
+	resistor #(.r(1k)) r1(2, 0);
+endmodule
+
+// instanciate it
+main m(1,2,0);
+
+print tran v(nodes)
+tran 1m
+status notime

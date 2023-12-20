@@ -23,7 +23,7 @@ module rc(p, n, gnd)
 	electrical p,n,gnd;
 
 	analog begin
-		if(analysis("ic"))
+		if(analysis("ic") && $param_given(ic))
 			V(p, gnd) <+ ic;
 		else
 			I(p, gnd) <+ ddt(1e-6* V(p, gnd));

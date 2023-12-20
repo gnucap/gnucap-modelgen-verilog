@@ -414,7 +414,7 @@ void Define::parse(CS& f)
 
   stash(f.get_to("/\\\""), args);
   while (f.match1("/\\\n\"")) {
-    if (f >> quoted_string) { untested();
+    if (f >> quoted_string) {
       _value_tpl += quoted_string.val_string();
       stash(f.get_to("\\/\n\""), args); // here?
     }else if (f >> "//") {

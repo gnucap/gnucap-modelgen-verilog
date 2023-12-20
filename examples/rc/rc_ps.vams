@@ -1,0 +1,15 @@
+`include "rc_b.vams"
+`pragma modelgen expand-paramset
+`pragma modelgen nogen-module
+
+// no ic, no voltage source, no internal node
+paramset rc_ps rc
+endparamset
+
+// ic as usual
+// note that we don't strictly need different names for rc_ps and rc,
+// but the LRM requires it for some reason.
+paramset rc_ps rc
+	parameter real ic=1;
+	.ic = ic;
+endparamset
