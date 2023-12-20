@@ -213,6 +213,9 @@ public:
 		*ret._data += o;
 		return ret;
 	}
+	ddouble_ operator+()const {
+		return ddouble_(*this);
+	}
 
 	ddouble_& operator-=(const ddouble_& o) {
 		for(int i=0; i<=numderiv; ++i){

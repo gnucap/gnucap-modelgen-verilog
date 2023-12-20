@@ -590,7 +590,7 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
       s.new_ddouble(o);
 
       auto op = (*i)->name()[0];
-      if(op == '-' || op == '!') {
+      if(op == '-' || op == '!' || op == '+') {
 	o__ s.code_name() << " = " << op << arg1 << ";\n";
       }else{ untested();
 	incomplete();
