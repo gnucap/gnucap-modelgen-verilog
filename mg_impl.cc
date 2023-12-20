@@ -31,11 +31,6 @@ bool ConstantMinTypMaxExpression::empty() const
   return _e.is_empty();
 }
 /*--------------------------------------------------------------------------*/
-bool Module::has_analog_block() const
-{
-  return !analog_list().is_empty();
-}
-/*--------------------------------------------------------------------------*/
 bool Module::has_submodule() const
 {
   return !element_list().is_empty();
@@ -558,8 +553,9 @@ Module::~Module()
 {
   // cleanup
   _branch_names.clear();
-  _analog_list.clear();
-  _analog_functions.clear();
+//  _analog_list.clear();
+//  _analog_functions.clear();
+  delete_analog();
   _branch_decl.clear();
   delete _probes; // .clear();
   _filters.clear();

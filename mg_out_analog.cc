@@ -952,7 +952,7 @@ static void make_cc_common_tr_eval(std::ostream& o, const Module& m)
   o__ "(void)pc;\n";
 
 
-  for(auto bb : m.analog_list()){
+  for(auto bb : analog_list(m)){
     assert(bb);
 //    if(auto ab = dynamic_cast<AnalogStmt const*>(bb)){
 //    }else
@@ -991,7 +991,7 @@ static void make_cc_common_precalc(std::ostream& o, const Module& m)
   OUT_ANALOG oo(OUT_ANALOG::modePRECALC);
   oo.make_load_variables(o, m.variables(), m);
 
-  for(auto bb : m.analog_list()){
+  for(auto bb : analog_list(m)){
     assert(bb);
     if(auto ab = dynamic_cast<AnalogConstruct const*>(bb)){
       o__ "{\n";

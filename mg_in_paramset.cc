@@ -275,6 +275,17 @@ void streamcp(Module* sub, T const& t)
   }
 }
 /*--------------------------------------------------------------------------*/
+void streamcp(Module* sub, Owned_Base const& t)
+{
+  std::stringstream o;
+  t.dump(o);
+  o << "endmodule;";
+
+  CS cmd(CS::_STRING, o.str());
+  //    trace1("streamcp", cmd.fullstring());
+  sub->parse_body(cmd);
+}
+/*--------------------------------------------------------------------------*/
 static void import_proto_vars(Module* sub, Module const* proto)
 {
   // streamcp(sub, proto->variables());
@@ -336,8 +347,7 @@ static void import_proto_impl(Module* sub, Module const* proto)
   streamcp(sub, proto->net_declarations());
   streamcp(sub, proto->branch_declarations());
   import_proto_vars(sub, proto);
-  streamcp(sub, proto->analog_functions());
-  streamcp(sub, proto->analog_list());
+  streamcp(sub, proto->analog());
 }
 /*--------------------------------------------------------------------------*/
 void Paramset::expand()

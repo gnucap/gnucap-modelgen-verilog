@@ -1723,6 +1723,7 @@ public:
 /*--------------------------------------------------------------------------*/
 class Node;
 class File;
+class Analog;
 class Module : public Block {
 private: // verilog input data
   File const* _file{NULL};
@@ -1739,8 +1740,9 @@ private: // verilog input data
   Port_1_List _local_nodes;
 
   // decouple?
-  Analog_Functions _analog_functions;
-  AnalogList _analog_list;
+  // Analog_Functions _analog_functions;
+  // AnalogList _analog_list;
+  Owned_Base* _analog{NULL};
 protected:
   Attribute_Stash _attribute_stash;
   Parameter_List_Collection _parameters;
@@ -1756,13 +1758,16 @@ private: // merge?
   bool _has_analysis{false};
 private: // elaboration data
   Probe_Map* _probes{NULL};
-  void new_probe_map();
+  void new_probe_map(); // analog?
+  void new_analog();
+  void delete_analog();
   Branch_Names _branch_names;
   Branch_Map _branches;
   Node_Map _nodes;
 public:
   Module() {
     new_probe_map();
+    new_analog();
   }
   ~Module();
 public:
@@ -1785,8 +1790,9 @@ public:
   const Element_2_List&	  circuit()const	{return _element_list;}
   const Port_1_List&	  local_nodes()const	{return _local_nodes;}
 //  const Code_Block&	 tr_eval()const		{return _tr_eval;}
-  const AnalogList& analog_list() const {return _analog_list;}
-  const Analog_Functions& analog_functions() const {return _analog_functions;}
+//  const AnalogList& analog_list() const {return _analog_list;}
+//  const Analog_Functions& analog_functions() const {return _analog_functions;}
+  const Owned_Base& analog() const {assert(_analog); return *_analog;}
 //   const Code_Block&	validate()const	{return _validate;}
     	size_t		min_nodes()const	{return ports().size();}
     	size_t		max_nodes()const	{return ports().size();}

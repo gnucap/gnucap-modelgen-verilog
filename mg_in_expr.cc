@@ -93,19 +93,12 @@ static File const* to_file(Block const* owner)
   return NULL;
 }
 /*--------------------------------------------------------------------------*/
+FUNCTION_ const* analog_function_call(std::string const& f, Module const& owner);
 static FUNCTION_ const* is_analog_function_call(std::string const& f, Block const* owner)
 {
   Module const* m = to_module(owner);
-
-  for(auto n: m->analog_functions()){
-    trace2("is_afcall", n->identifier(), f);
-    if(n->identifier().to_string() == f){
-      assert(n->function());
-      return n->function();
-    }else{
-    }
-  }
-  return NULL;
+  assert(m);
+  return analog_function_call(f, *m);
 }
 /*--------------------------------------------------------------------------*/
 // use dispatcher?

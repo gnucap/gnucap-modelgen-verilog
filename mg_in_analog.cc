@@ -1072,6 +1072,7 @@ void Contribution::parse(CS& cmd)
     }else{
       set_flow_contrib();
     }
+    _branch->set_source();
   }
 
   if(_branch->deps().is_linear()){
@@ -1672,24 +1673,6 @@ bool Assignment::store_deps(Deps const& d)
   return ret;
 }
 /*--------------------------------------------------------------------------*/
-CS& Module::parse_analog(CS& f)
-{
-  if(f >> "function "){
-     f >> _analog_functions;
-  }else{
-    AnalogConstruct* ab = new AnalogConstruct();
-    ab->set_owner(this);
-    ab->parse(f);
-    _analog_list.push_back(ab);
-
-//    if(auto s = dynamic_cast<AnalogStmt*>(ab->statement_or_null())){ untested();
-//      s->update();
-//    }else{ untested();
-//    }
-  }
-  return f;
-}
-/*--------------------------------------------------------------------------*/
 void Contribution::set_direct(bool d)
 {
   assert(_branch);
@@ -1739,8 +1722,6 @@ void Contribution::set_flow_contrib()
     _branch->inc_flow_source();
   }
   _type = t_flow;
-
-  _branch->set_source();
 }
 /*--------------------------------------------------------------------------*/
 bool Contribution::is_flow_contrib() const
@@ -1920,6 +1901,38 @@ Nature const* Probe::nature() const
   return _br->nature();
 }
 /*--------------------------------------------------------------------------*/
+void Module::new_analog()
+{
+  assert(!_analog);
+  _analog = new Analog;
+}
+/*--------------------------------------------------------------------------*/
+void Module::delete_analog()
+{
+  delete _analog;
+  _analog = NULL;
+}
+/*--------------------------------------------------------------------------*/
+bool Module::has_analog_block() const
+{
+  return ::analog(*this).has_block();
+}
+/*--------------------------------------------------------------------------*/
+Analog::Analog()
+{ untested();
+}
+/*--------------------------------------------------------------------------*/
+Analog::~Analog()
+{
+  _list.clear();
+  _functions.clear();
+}
+/*--------------------------------------------------------------------------*/
+bool Analog::has_block() const
+{
+  return !list().is_empty();
+}
+/*--------------------------------------------------------------------------*/
 void Module::new_probe_map()
 {
   _probes = new Probe_Map;
@@ -1958,31 +1971,71 @@ static void dump_shadow_src(std::ostream& o, Module const& m)
 	  o << "I";
 	}
 	i->dump(o);
-	o << " <+ 0.\n";
+	o << " <+ 0.;\n";
       }else{ untested();
       }
     }
     o__ "end\n";
   }else{
+//    o__ "// no shadow src\n";
   }
 }
 /*--------------------------------------------------------------------------*/
-void dump_analog(std::ostream& o, Module const& m)
+void Analog::dump(std::ostream& o) const
 {
-  for(auto i: m.analog_functions()){
+  for(auto const& i: functions()){
     o << *i << "\n";
   }
 
+  Module const* m = to_module(owner());
+  assert(m);
   if(!options().dump_unreachable()) {
-    dump_shadow_src(o, m);
+    dump_shadow_src(o, *m);
   }else if (options().optimize_unused()) {
-    dump_shadow_src(o, m);
+    dump_shadow_src(o, *m);
   }else{ untested();
   }
 
-  for(auto i: m.analog_list()){
+  for(auto const& i: blocks()){
     o << *i << "\n";
   }
 }
+/*--------------------------------------------------------------------------*/
+FUNCTION_ const* analog_function_call(std::string const& f, Module const& m)
+{
+  for(auto n: ::analog(m).functions()){
+    trace2("is_afcall", n->identifier(), f);
+    if(n->identifier().to_string() == f){
+      assert(n->function());
+      return n->function();
+    }else{
+    }
+  }
+  return NULL;
+}
+/*--------------------------------------------------------------------------*/
+void Analog::parse(CS& f)
+{
+  if(f >> "function "){
+    _functions.set_owner(owner());
+    f >> _functions;
+  }else{
+    AnalogConstruct* ab = new AnalogConstruct();
+    // AnalogConstruct* ab = new AnalogConstruct(f, owner());
+
+    assert(owner());
+    ab->set_owner(owner());
+    ab->parse(f);
+    _list.set_owner(owner()); // needed?
+    _list.push_back(ab);
+
+//    if(auto s = dynamic_cast<AnalogStmt*>(ab->statement_or_null())){ untested();
+//      s->update();
+//    }else{ untested();
+//    }
+  }
+//  return f;
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

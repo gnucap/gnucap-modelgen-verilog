@@ -75,6 +75,33 @@ private:
   void make_cc_common(std::ostream&)const override;
 }; // Probe
 /*--------------------------------------------------------------------------*/
+class Analog : public Owned_Base {
+  AnalogList _list;
+  Analog_Functions _functions;
+public:
+  explicit Analog();
+  ~Analog();
+  void parse(CS& file) override;
+  void dump(std::ostream& o)const override;
+
+  bool has_block() const;
+  AnalogList const& list()const { return _list; }
+  AnalogList const& blocks()const { return _list; }
+  Analog_Functions const& functions()const { return _functions; }
+};
+/*--------------------------------------------------------------------------*/
+inline Analog const& analog(Module const& m)
+{
+  Analog const* a = prechecked_cast<Analog const*>(&m.analog());
+  assert(a);
+  return *a;
+}
+/*--------------------------------------------------------------------------*/
+inline AnalogList const& analog_list(Module const& m)
+{
+  return analog(m).list();
+}
+/*--------------------------------------------------------------------------*/
 class AnalogStmt : public Base {
 public:
   virtual bool update() = 0;
