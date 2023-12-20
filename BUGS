@@ -7,7 +7,7 @@
 - ddx is incomplete
 - event control is incomplete
 - numerical port names don't work
-- initial_step: mg0_evt.bug0.gc
+- string type is missing (breaks "%s" in strobe etc.).
 
 == simulator plugins
 - still missing tiebreak rules in overload

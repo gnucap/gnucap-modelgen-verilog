@@ -1,0 +1,5 @@
+
+
+
+ $write("abc1.\n"); 
+ $write("abc2.\n"); 

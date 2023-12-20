@@ -92,7 +92,8 @@ private:
   }
   bool returns_void()const override { return true; }
 } strobe;
-DISPATCHER<FUNCTION>::INSTALL d_strobe(&function_dispatcher, "$strobe", &strobe);
+// TODO: $write is $strobe, "but with no newline".
+DISPATCHER<FUNCTION>::INSTALL d_strobe(&function_dispatcher, "$strobe|$write", &strobe);
 /*--------------------------------------------------------------------------*/
 class FINISH_TASK : public MGVAMS_TASK {
 public:

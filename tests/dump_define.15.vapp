@@ -1,0 +1,8 @@
+
+`define STRING1(a,b,c) $write("abc1.\n");
+
+`define STRING2(a,b,c) \
+$write("abc2.\n");
+
+`STRING1(1,2,3)
+`STRING2(1,2,3)

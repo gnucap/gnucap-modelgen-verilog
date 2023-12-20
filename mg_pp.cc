@@ -327,10 +327,59 @@ static std::string get_identifier(CS& f)
   return ret;
 }
 /*--------------------------------------------------------------------------*/
+class PP_Quoted_String : public String {
+public:
+  void parse(CS& f) override {
+    if(f >> "\"") {
+      _data = "\"";
+      parse_(f);
+      _data += "\"";
+    }else{
+    }
+  }
+
+private:
+  void parse_(CS& f) {
+    while(true){
+      while (f.peek() && (!isgraph(f.peek()))) {
+	_data += f.ctoc();
+      }
+      trace2("qs a1", _data, f.peek());
+
+      append_to(f, _data, "\\\"\n");
+      trace2("qs a2", _data, f.peek());
+      if (f.peek() == '"') {
+	f.skip();
+	break;
+      }else if (f.peek() == '\n') { untested();
+	_data += '\\';
+	_data += f.ctoc();
+      }else if (f.peek() == '\\') {
+	_data += f.ctoc();
+	if(f.peek() == '\\'){
+	  _data += f.ctoc();
+	}else if(f.peek() == '\"'){
+	  _data += f.ctoc();
+	}else if(f.peek() == '\n'){
+	  _data += f.ctoc();
+	}else{itested();
+	}
+      }else{ untested();
+	trace2("qs", _data, f.peek());
+	throw Exception_CS("need '\"'", f);
+      }
+    }
+    trace1("PP_Quoted_String", _data);
+  }
+  void dump(std::ostream& o)const override;
+} quoted_string;
+/*--------------------------------------------------------------------------*/
 void Define::stash(std::string const& s, String_Arg_List const& args)
 {
+  trace1("Def::stash", s);
   CS f(CS::_STRING, s);
   while(f.ns_more()) {
+    trace2("stash more?", f.peek(), f.tail().substr(0,20));
     if (f.is_alpha() || f.peek() == '_'){
       std::string token = get_identifier(f);
       trace1("stash?", token);
@@ -340,7 +389,6 @@ void Define::stash(std::string const& s, String_Arg_List const& args)
 	_value_tpl += token;
       }else{
 	size_t pos = listpos(args, x);
-	trace2("mark", _value_tpl.size(), pos);
 	_pos.push_back(std::make_pair(_value_tpl.size(), pos));
       }
     }else{
@@ -353,22 +401,23 @@ void Define::stash(std::string const& s, String_Arg_List const& args)
     _value_tpl.resize(ts-1);
   }else{
   }
-  trace1("stashed", _value_tpl);
 }
 /*--------------------------------------------------------------------------*/
 void Define::parse(CS& f)
 {
   _name = get_identifier(f);
-  trace2("define::parse", _name, f.tail().substr(0,10));
   String_Arg_List args;
   if(f.peek() == '('){
     f >> args;
   }else{
   }
 
-  stash(f.get_to("/\\"), args);
-  while (f.match1('/') || f.match1('\\') || f.match1('\n')) {
-    if (f >> "//") {
+  stash(f.get_to("/\\\""), args);
+  while (f.match1("/\\\n\"")) {
+    if (f >> quoted_string) { untested();
+      _value_tpl += quoted_string.val_string();
+      stash(f.get_to("\\/\n\""), args); // here?
+    }else if (f >> "//") {
       f.get_to("\n"); //  dummy_cxx_comment;
     }else if (f >> "/*") /* C comment */ {
       f >> dummy_c_comment; //BUG// line count may be wrong
@@ -377,28 +426,25 @@ void Define::parse(CS& f)
       f.skip();
       if(f.match1('\n')) {
 	std::string more = f.get_to("\\/\n"); // BUG
-	trace1("more?", more);
 	stash("\n" + more, args);
-      }else{itested();
+      }else{ untested();
 	std::string more = f.get_to("\\/\n"); // BUG
-	trace1("more?", more);
 	stash(more, args);
       }
     }else if(f.match1('/')){
       stash("/", args);
       f.skip();
       std::string more = f.get_to("\\/\n"); // BUG
-      trace1("more?", more);
       stash(more, args);
     }else if(f.match1('\n')){
       stash("\n", args);
       f.skip();
-      stash(f.get_to("\\/\n"), args);
+      stash(f.get_to("\\/\n\""), args); // here?
     }
   }
 
   _num_args = args.size();
-}
+} // Define::parse
 /*--------------------------------------------------------------------------*/
 static String_Arg_List eval_args(CS& f, size_t howmany, Define_List const&);
 /*--------------------------------------------------------------------------*/
@@ -594,44 +640,6 @@ void Preprocessor::read(std::string const& file_name)
   parse(file);
 }
 /*--------------------------------------------------------------------------*/
-class PP_Quoted_String : public String {
-public:
-  void parse(CS& f) override {
-    _data = "";
-    while(true){
-      while (f.peek() && (!isgraph(f.peek()))) {
-	_data += f.ctoc();
-      }
-      trace2("qs a1", _data, f.peek());
-
-      append_to(f, _data, "\\\"\n");
-      trace2("qs a2", _data, f.peek());
-      if (f.peek() == '"') {
-	f.skip();
-	break;
-      }else if (f.peek() == '\n') { untested();
-	_data += '\\';
-	_data += f.ctoc();
-      }else if (f.peek() == '\\') {
-	_data += f.ctoc();
-	if(f.peek() == '\\'){
-	  _data += f.ctoc();
-	}else if(f.peek() == '\"'){
-	  _data += f.ctoc();
-	}else if(f.peek() == '\n'){
-	  _data += f.ctoc();
-	}else{itested();
-	}
-      }else{ untested();
-	trace2("qs", _data, f.peek());
-	throw Exception_CS("need '\"'", f);
-      }
-    }
-    trace1("PP_Quoted_String", _data);
-  }
-  void dump(std::ostream& o)const override;
-} quoted_string;
-/*--------------------------------------------------------------------------*/
 void PP_Quoted_String::dump(std::ostream& o)const{ untested();
   for(char c : _data){ untested();
     if(c=='\n'){ untested();
@@ -650,9 +658,8 @@ void Preprocessor::parse(CS& file)
   for (;;) {
     append_to(file, _stripped_file, "\"/`");
     if (!file.ns_more()){
-    }else if (file >> '"') {
-      file >> quoted_string;
-      _stripped_file += '"' + quoted_string.val_string() + '"';
+    }else if (file >> quoted_string) {
+      _stripped_file += quoted_string.val_string();
     }else if (file >> "/*") /* C comment */ {
       file >> dummy_c_comment; //BUG// line count may be wrong
     }else if (file >> "//") /* C++ comment */ {
