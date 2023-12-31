@@ -382,7 +382,7 @@ void AnalogConditionalStmt::parse(CS& f)
 
   assert(_cond.owner() == owner());
   if(f >> "(" >> _cond >> ")"){
-  }else{
+  }else{ untested();
     throw Exception_CS_("expecting conditional", f);
   }
 
@@ -437,7 +437,7 @@ void AnalogConditionalStmt::dump(std::ostream& o)const
   }
 
   {
-   // if(!_body.size()) {
+   // if(!_body.size()) { untested();
    // }else
     if(omit_true) {
     }else if(omit_cond){
@@ -575,10 +575,10 @@ bool AnalogSeqBlock::update()
     for(auto i: _block){
       if(auto s = dynamic_cast<AnalogStmt*>(i)){
 	ret |= s->update();
-      }else{
+      }else{ untested();
       }
     }
-  }else{
+  }else{ untested();
   }
   return ret;
 }
@@ -1102,7 +1102,7 @@ void Contribution::add_dep(Dep const& d)
 
   if(!is_direct()){
   }else if(d->branch() != _branch){
-  }else if(is_flow_contrib() && d->is_flow_probe()){
+  }else if(is_flow_contrib() && d->is_flow_probe()){ untested();
     _branch->set_selfdep();
   }else if(is_pot_contrib() && d->is_pot_probe()){
     _branch->set_selfdep();
@@ -1170,7 +1170,7 @@ void Branch_Map::dump(std::ostream&)const
 /*--------------------------------------------------------------------------*/
 void Branch::dump(std::ostream& o)const
 {
-  if(_n->is_ground()){
+  if(_n->is_ground()){ untested();
     o << "(" << _p->name() << ")";
   }else{
     o << "(" << _p->name() << ", " << _n->name() << ")";
@@ -1323,14 +1323,14 @@ void AnalogEvtCtlStmt::dump(std::ostream& o) const
   o__ "@" << _ctrl;
   AnalogCtrlStmt::dump(o);
 #if 0
-  if(dynamic_cast<AnalogSeqBlock const*>(_stmt)){
+  if(dynamic_cast<AnalogSeqBlock const*>(_stmt)){ untested();
     o << " " << *_stmt;
-  }else if(_stmt){
+  }else if(_stmt){ untested();
 #if 0
     o << " " << *_stmt;
 #else
     o << "\n";
-    {
+    { untested();
       indent x;
       o << *_stmt;
     }
@@ -1651,7 +1651,7 @@ bool Assignment::store_deps(Deps const& d)
       _deps->add_sens(*x->sensitivities());
     }else{
     }
-  }else{
+  }else{ untested();
   }
 
   if(owner()->is_reachable()){
@@ -1666,7 +1666,7 @@ bool Assignment::store_deps(Deps const& d)
 //      ret |= _lhs->propagate_deps(*this);
 //    }else if(&from != this){ untested();
 //      ret |= _lhs->propagate_deps(from);
-    }else{
+    }else{ untested();
     }
   }else{ untested();
     trace3("Assignment::propagate_deps unreachable", d.size(), _deps->size(), ret);
@@ -1767,7 +1767,7 @@ Contribution::~Contribution()
       i->branch()->dec_use();
       try{
 	(*i)->unset_used_in(this);
-      }catch(std::logic_error const& e){
+      }catch(std::logic_error const& e){ untested();
 	std::cerr << " logic error in " << name() << ": ";
 	std::cerr << e.what() << "\n";
 	assert(0);
@@ -1803,8 +1803,8 @@ bool Variable_Decl::propagate_deps(Variable const& v)
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogRealDecl::update()
-{
-  for(BlockVarIdentifier* i : _l){
+{ untested();
+  for(BlockVarIdentifier* i : _l){ untested();
     assert(i);
     i->update();
   }
@@ -1863,6 +1863,7 @@ Probe::Probe(std::string const& xs, Branch_Ref br) : _br(br)
   }else if( (xs == "I") || (xs == "flow") ){
     _type = t_flow;
     _br->inc_flow_probe();
+    _br->set_probe(); // shadow
   }else{ untested();
     unreachable();
   }
@@ -1954,32 +1955,49 @@ void Module::install(Probe const* f)
   _funcs.insert(f);
 }
 /*--------------------------------------------------------------------------*/
-static void dump_shadow_src(std::ostream& o, Module const& m)
+bool Branch::is_shadow_source()const
 {
-  bool has_shadow_src = false;
-  for(auto i: m.branches()) {
-    if(i->is_shadow_source()){
-      has_shadow_src = true;
-      break;
+  if (_source && _probe && !has_pot_source() && !has_flow_source()) {
+    return true;
+  }else if (_probe && has_flow_probe() && !is_source()){
+    if(has_pot_probe()){
+      // BUG: not the right place. need another pass in Module::parse?
+      throw Exception("cannot have both flow and potential probes on a probe branch\n");
     }else{
     }
+    return true;
+  }else{
+    return false;
   }
-  if(has_shadow_src){
-    o__ "analog begin\n";
+}
+/*--------------------------------------------------------------------------*/
+static void dump_shadow_src(std::ostream& o, Module const& m)
+{
+  if(!options().dump_unreachable()){
     for(auto i: m.branches()) {
       if(i->is_shadow_source()){
+	o__ "analog begin\n";
 	o____ "";
-	if(i->nature()){ untested();
-	  i->nature()->dump(o);
+	if(i->is_source()) {
+	  if(i->discipline() && i->discipline()->flow()){
+	    o << i->discipline()->flow()->access();
+	  }else{
+	    o << "I";
+	  }
 	}else{
-	  o << "I";
+	  // shadow flow probe
+	  if(i->discipline() && i->discipline()->potential()){
+	    o << i->discipline()->potential()->access();
+	  }else{ untested();
+	    o << "V";
+	  }
 	}
 	i->dump(o);
 	o << " <+ 0.;\n";
-      }else{ untested();
+	o__ "end\n";
+      }else{
       }
     }
-    o__ "end\n";
   }else{
 //    o__ "// no shadow src\n";
   }
@@ -2051,7 +2069,7 @@ Branch_Ref Branch_Map::lookup(std::string const& n)const
   }
 }
 // Branch_Ref Branch_Names::lookup(std::string const&) const
-// {
+// { untested();
 //   ...
 // }
 /*--------------------------------------------------------------------------*/

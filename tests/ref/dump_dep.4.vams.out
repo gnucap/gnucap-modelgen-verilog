@@ -1,15 +1,9 @@
 module test_nop2(np, n);
   inout p, n;
   electrical p, n;
-  analog begin
-    I(p, n) <+ 0.;
-  end
   analog begin // always
-    if (1.) begin // always
+    begin // always
       I(p, n) <+ 0.;
-    end
-    else begin // never
-      I(p, n) <+ V(p, n); // dep: _potential_b_p_n
     end
   end
 

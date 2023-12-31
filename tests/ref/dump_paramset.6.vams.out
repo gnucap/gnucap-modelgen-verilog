@@ -1,0 +1,30 @@
+module shadow(a, b);
+  electrical a, b;
+  (* desc="i" *)
+  real   i;
+
+  analog begin
+    if (0) begin
+      I(a, b) <+ 0.;
+    end
+    i = I(a, b);
+  end
+
+endmodule
+
+
+
+// paramsets
+module my_sh(a, b);
+  electrical a, b;
+  real   __i;
+
+  analog begin
+    if (0) begin
+      I(a, b) <+ 0.;
+    end
+    __i = I(a, b);
+  end
+
+endmodule
+

@@ -324,7 +324,7 @@ void Variable_List::parse(CS& file)
     _type = Data_Type_Real();
   }else if(t=='i') {
     _type = Data_Type_Int();
-  }else{
+  }else{ untested();
     throw Exception_CS_("What type? " + t, file);
   }
 
@@ -1021,7 +1021,7 @@ void ValueRange::parse(CS& file)
     }
   }else if(file >> "exclude"){
     _type = vr_EXCLUDE;
-    if(file >> "[" || file >> "("){
+    if(file >> "[" || file >> "("){ untested();
       _what = new ValueRangeInterval;
       _what->set_owner(owner());
     }else if(file >> "'{"){ untested();
@@ -1065,7 +1065,7 @@ void Block::new_var_ref(Base* what)
     p = V->name();
   }else if(auto P = dynamic_cast<Parameter_2 const*>(what)){
     p = P->name();
-  }else if(auto A = dynamic_cast<Aliasparam const*>(what)){
+  }else if(auto A = dynamic_cast<Aliasparam const*>(what)){ untested();
     p = A->name();
   }else if(auto A = dynamic_cast<Paramset_Stmt const*>(what)){
     p = "."+A->name();
@@ -1104,7 +1104,7 @@ void Block::new_var_ref(Base* what)
     _var_refs[p] = what;
     if(V){
       // updating variable...
-    }else{
+    }else{ untested();
       throw(Exception("already there: '" + p + "'"));
     }
   }else{
@@ -1217,13 +1217,13 @@ Branch::~Branch()
   _deps = NULL;
 
   for(auto i : _used_in){
-    if(i){
+    if(i){ untested();
       std::cerr << "logic error. " << name() << " still used in. " << i << "\n";
     }else{
     }
     assert(!i);
   }
-  if(_use){
+  if(_use){ untested();
     unreachable();
     std::cerr << "logic error. " << name() << " still used.\n";
     assert(false);
@@ -1255,7 +1255,7 @@ Node::~Node()
 /*--------------------------------------------------------------------------*/
 void SeqBlock::merge_sens(Sensitivities const& s)
 {
-  if(_sens){
+  if(_sens){ untested();
   }else{
     _sens = new Sensitivities;
   }
@@ -1264,7 +1264,7 @@ void SeqBlock::merge_sens(Sensitivities const& s)
 /*--------------------------------------------------------------------------*/
 void SeqBlock::set_sens(Base const* s)
 {
-  if(_sens){
+  if(_sens){ untested();
   }else{
     _sens = new Sensitivities;
   }

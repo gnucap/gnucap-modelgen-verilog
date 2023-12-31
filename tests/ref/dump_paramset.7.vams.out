@@ -1,0 +1,29 @@
+module shadow(p, n);
+  inout p, n;
+  electrical p, n;
+  (* desc="1" *)
+  real   i;
+
+  analog begin
+    if (0) begin
+      i = I(p, n);
+    end
+  end
+
+endmodule
+
+
+
+// paramsets
+module my_sh(p, n);
+  electrical p, n;
+  real   __i;
+
+  analog begin
+    if (0) begin
+      __i = I(p, n);
+    end
+  end
+
+endmodule
+

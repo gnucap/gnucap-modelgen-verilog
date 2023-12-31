@@ -1,0 +1,20 @@
+
+`include "sub/disciplines.few"
+`pragma modelgen expand-paramset
+`pragma modelgen nodump-unreachable
+//`pragma modelgen nodump-module
+`pragma modelgen nodump-nature
+`pragma modelgen nodump-discipline
+// `pragma modelgen dump-annotate
+
+module shadow(p, n);
+	electrical p, n;
+	inout p, n;
+	(* desc="1" *) real i;
+	analog begin
+		if(0) i = I(p, n);
+	end
+endmodule
+
+paramset my_sh shadow;
+endparamset;

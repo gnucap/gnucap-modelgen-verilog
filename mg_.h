@@ -1570,6 +1570,7 @@ class Branch : public Element_2 {
   bool _direct{true};
   bool _selfdep{false};
   bool _source{false};
+  bool _probe{false};
   mutable /*really?*/ int _use{0};
 //  std::vector<Branch const*> _controlled_by; // move to FUNCTION_
   std::vector<Base const*> _used_in; //?
@@ -1623,6 +1624,7 @@ public:
 
   void set_filter(FUNCTION_ const* f){ _ctrl=f; }
   void set_source(bool d=true) {_source = d; }
+  void set_probe(bool d=true) {_probe = d; }
   void set_direct(bool d=true);
   void set_selfdep(bool d=true) {_selfdep = d; }
   bool has_flow_probe() const;
@@ -1633,7 +1635,7 @@ public:
   bool is_filter() const { return _ctrl; }
   bool has_pot_source()const;
   bool is_source()const {return _source || has_pot_source() || has_flow_source();}
-  bool is_shadow_source()const {return _source && !has_pot_source() && !has_flow_source();}
+  bool is_shadow_source()const;
   size_t num_states()const override;
   Discipline const* discipline()const override;
   Nature const* nature()const override;

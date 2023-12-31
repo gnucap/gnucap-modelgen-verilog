@@ -1,0 +1,7 @@
+module test_probe(a, c);
+  inout a, c;
+  electrical a, c;
+  parameter real x = 0;
+
+cannot have both flow and potential probes on a probe branch
+
