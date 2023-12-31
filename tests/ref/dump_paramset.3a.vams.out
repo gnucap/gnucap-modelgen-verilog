@@ -35,7 +35,7 @@ module my_res(a, b);
     I(a, b) <+ (V(a, b) * __g);
     begin
       __i = 3.;
-      if (1) begin
+      begin
         __i = 4;
       end
     end

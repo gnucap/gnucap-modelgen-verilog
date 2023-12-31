@@ -62,6 +62,7 @@ public:
   bool expand_paramset()  const{ return _expand_paramset; }
 public:
   friend class option_nodump_annotate;
+  friend class option_nodump_unreachable;
 };
 /*--------------------------------------------------------------------------*/
 inline Options& options()
@@ -78,6 +79,18 @@ public:
   }
   ~option_nodump_annotate(){
     options()._dump_annotate = _prev;
+  }
+};
+/*--------------------------------------------------------------------------*/
+class option_nodump_unreachable{
+  bool _prev;
+public:
+  explicit option_nodump_unreachable(){
+    _prev = options().dump_unreachable();
+    options()._dump_unreachable = false;
+  }
+  ~option_nodump_unreachable(){
+    options()._dump_unreachable = _prev;
   }
 };
 /*--------------------------------------------------------------------------*/

@@ -20,10 +20,10 @@ module my_sh(p, n);
   real   __i;
 
   analog begin
-    if (0) begin
-      __i = I(p, n);
-    end
+    V(p, n) <+ 0.;
   end
+
+  analog ;
 
 endmodule
 

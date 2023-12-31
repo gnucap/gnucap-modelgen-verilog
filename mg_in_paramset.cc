@@ -352,6 +352,7 @@ static void import_proto_impl(Module* sub, Module const* proto)
 /*--------------------------------------------------------------------------*/
 void Paramset::expand()
 {
+  option_nodump_unreachable while_expanding_ps_and;
   option_nodump_annotate while_expanding_ps;
   assert(_proto);
   _sub = new Paramset(); // new Module();?
