@@ -115,8 +115,7 @@ bool VAPOT::do_tr()
     _m0.c0 = - _values[0] * _m0.c1;
     trace7("do_tr", long_label(), _self_is_current, _loss0, _values[0], _values[1], tr_amps(), amps);
 
-    // _values[0] = _m0.c0;
-     _values[1] = _m0.c1;
+     // _values[1] = _m0.c1;
     for (int i=2; i<=_n_ports; ++i) {
       _m0_[i-2] = _values[i];
     }
@@ -147,11 +146,6 @@ void VAPOT::tr_load()
     }
 
     tr_load_passive();
-    for (int i=2; i<=_n_ports; ++i) {
-      trace4("tr_load1", long_label(), i, _values[i], _old_values[i]);
-      tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_m0_[i-2]), &(_m1_[i-2]));
-    }
-
   }else if(_self_is_current && fabs(_values[1]) > OPT::shortckt){ untested();
     // loss but CS mode.
     //
@@ -159,24 +153,15 @@ void VAPOT::tr_load()
       tr_unload_shunt(); // 4 pt +- loss
     }else{
     }
-			
     tr_load_passive();
-   // _old_values[1] = _values[1];
-    for (int i=2; i<=_n_ports; ++i) {
-      trace4("tr_load2", long_label(), i, _values[i], _old_values[i]);
-      tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_m0_[i-2]), &(_m1_[i-2]));
-    }
-
   }else{
     tr_load_shunt(); // 4 pt +- loss
     trace3("CPG.. ", long_label(), _loss0, _loss1);
     tr_load_source();
+  }
 
-    trace4("VAPOT::tr_load", _values[0], _values[1], tr_involts(), tr_amps());
-    for (int i=2; i<=_n_ports; ++i) {
-      trace2("VAPOT::tr_load control", i, _values[i]);
-      tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_m0_[i-2]), &(_m1_[i-2]));
-    }
+  for (int i=2; i<=_n_ports; ++i) {
+    tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_m0_[i-2]), &(_m1_[i-2]));
   }
 }
 /*--------------------------------------------------------------------------*/

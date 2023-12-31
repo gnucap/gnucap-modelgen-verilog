@@ -109,16 +109,6 @@ bool VAPOT::do_tr()
     _m0.c0 = tr_amps() - _values[0] / _values[1]; // ; // *_loss0;
     _m0.c1 = 1. / _values[1];
 
-	/* y.f0 = amps - r.f0*y.f1 + volts*y.f1; */  // amps - v[0]/v[1] + volts/v[1]
-    // admit: _y[0].x = _m0.x = tr_involts_limited();
-    // y.c0
-  //double   c0()const		
-  //{assert(f0==f0); assert(f1==f1); assert(x==x); assert(f0!=LINEAR); return (f0 - x * f1);}
-  // ==  amps - v[0]/v[1] + volts/v[1] -  tr_involts_limited() * v1 = amps - v[0]/v[1]
-
-
-    // _values[0] = _m0.c0;
-    // _values[1] = _m0.c1;
     for (int i=2; i<=_n_ports; ++i) { untested();
       _m0_[i-2] = _values[i];
     }
@@ -150,10 +140,6 @@ void VAPOT::tr_load()
     }
 
     tr_load_passive();
-    for (int i=2; i<=_n_ports; ++i) {
-      tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_m0_[i-2]), &(_m1_[i-2]));
-    }
-
   }else if(_self_is_current && fabs(_values[1]) > OPT::shortckt){ untested();
     assert(!_loss0);
     // loss but CS mode.
@@ -164,10 +150,6 @@ void VAPOT::tr_load()
     }
 			
     tr_load_passive();
-    for (int i=2; i<=_n_ports; ++i) {
-      tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_m0_[i-2]), &(_m1_[i-2]));
-    }
-
   }else{
     assert(_loss0);
     tr_load_shunt(); // 4 pt +- loss
@@ -175,10 +157,10 @@ void VAPOT::tr_load()
     tr_load_source();
 
     trace2("VAPOT::tr_load", _values[0], _values[1]);
-    for (int i=2; i<=_n_ports; ++i) {
-      trace2("VAPOT::tr_load control", i, _values[i]);
-      tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_m0_[i-2]), &(_m1_[i-2]));
-    }
+  }
+
+  for (int i=2; i<=_n_ports; ++i) {
+    tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_m0_[i-2]), &(_m1_[i-2]));
   }
 }
 /*--------------------------------------------------------------------------*/
