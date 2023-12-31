@@ -94,8 +94,12 @@
 2023123*-dev
 ============
 * preprocessor conditional fix
-* diode model port
+* preprocessor quoted string fix
+* diode.model port with switches
 * $bound_step
 * ac_stim
 * sine sources
+* $mfactor function and fixes
+* fix dump: preserve unreachable shorts and probes
+* netlist with analog blocks
 * bugfix pragma parser

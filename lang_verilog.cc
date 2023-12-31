@@ -380,7 +380,7 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
       cmd.get_line("verilog-paramset>");
     }else if (!cmd.more()) {
       cmd.get_line("verilog-paramset>");
-    }else{untested();
+    }else{
       cmd.check(bWARNING, "what's this?");
       break;
     }

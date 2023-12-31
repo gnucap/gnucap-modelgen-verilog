@@ -23,25 +23,6 @@
 #include "m_tokens.h"
 #include <stack>
 /*--------------------------------------------------------------------------*/
-#if 0
-/*--------------------------------------------------------------------------*/
-static int is_function(std::string const& n)
-{ untested();
-  incomplete();
-  // stub, need sth.
-  if (n == "exp"
-   || n == "log"
-   || n == "cos"
-   || n == "sin") { untested();
-    return 1;
-  }else if (n == "pow"){ untested();
-    return 2;
-  }else{ untested();
-    return 0;
-  }
-}
-#endif
-/*--------------------------------------------------------------------------*/
 static String_Arg const& potential_abstol(Branch const& b)
 {
   static String_Arg def("OPT::abstol");
@@ -307,25 +288,10 @@ static void make_module_construct_stub(std::ostream& o, const Element_2& e, Modu
       ++i;
     }
   }
-#if 0
-  o____ "node_t nodes[] = {";
-  { untested();
-    Port_3_List_2::const_iterator p = e.ports().begin();
-    if (p != e.ports().end()) { untested();
-      assert(*p);
-      o << "_n[n_" << (**p).name() << "]";
-      while (++p != e.ports().end()) { untested();
-	o << ", _n[n_" << (**p).name() << "]";
-      }
-    }else{ untested();
-    }
-    o << "}; // nodes\n";
-  }
-#endif
 
 //    make_set_parameters(o, e);
-    make_set_subdevice_parameters(o, e);
-  
+  make_set_subdevice_parameters(o, e);
+
   o____ "\n";
   o__ "}\n";
 } // construct_stub
@@ -355,38 +321,18 @@ static void make_build_netlist(std::ostream& o, const Module& m)
   o__ "// ports:" << m.ports().size() << "\n";
   if(m.element_list().size()){
     o__ "new_subckt();\n";
-    o__ "#if 0\n";
-    auto nn = m.nodes().begin();
-    for (++nn; nn!=m.nodes().end(); ++nn){
-      std::string ext_name = (*nn)->name();
-      int ii = (*nn)->number();
-
-      if(!ii){
-      }else if(ii <= int(m.ports().size())){
-//	o__ "_n[" << ii << "].new_node(\"" << ext_name << "\", this); // port\n";
-	o__ "{\n";
-	o____ "std::string tmp = \"" << ext_name << "\";\n";
-	o____ "set_port_by_index(" << ii-1 << ", tmp);\n";
-	o__ "}\n";
-      }else{
-	o__ " // netlist node\n";
-	o__ "_n[n_" << (*nn)->name() << "].new_node(\"" << ext_name << "\", this);\n";
-      }
-    }
-    o__ "#endif\n";
-//    o__ "assert(" << m.nodes().size() << " == subckt()->nodes()->how_many());\n";
-    for (Element_2_List::const_iterator
-	e = m.element_list().begin();
-	e != m.element_list().end();
-	++e) {
-      o__ "{\n";
-      {
-	indent x;
-	make_module_construct_stub(o, **e, m);
-      }
-      o__ "}\n";
-    }
   }else{
+  }
+  for (Element_2_List::const_iterator
+      e = m.element_list().begin();
+      e != m.element_list().end();
+      ++e) {
+    o__ "{\n";
+    {
+      indent x;
+      make_module_construct_stub(o, **e, m);
+    }
+    o__ "}\n";
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -653,7 +599,6 @@ static void make_module_class(std::ostream& o, Module const& m)
 /*--------------------------------------------------------------------------*/
 static void make_module_allocate_local_node(std::ostream& o, const Node& p)
 {
-#if 1
   make_tag();
   o__ "// node " << p.name() << " " << p.number() << "\n";
  // if (p.short_if().empty()) { untested();
@@ -693,33 +638,27 @@ static void make_module_allocate_local_node(std::ostream& o, const Node& p)
     o____ "}\n";
     o__ "}\n";
   }
-#endif
 }
 /*--------------------------------------------------------------------------*/
 static void make_module_allocate_local_nodes(std::ostream& o, Module const& m)
 {
-  if(0 && m.element_list().size()){ untested();
-    // nodes come from sckt proto
-  }else{
-    //for (auto n=m.nodes().rbegin(); n != m.nodes().rend(); ++ n)
-    int n = 1;
-    for (; n <= int(m.nodes().size()); ++n) {
-      Node const* nn = m.nodes()[n];
-      assert(nn);
-      if(nn->number() == 0) {
-	o__ "// ground\n";
-	o__ "_n[n_" << nn->name() << "].set_to_ground(this);\n";
-      }else if(nn->number() < n){
-	o__ "_n[" << n - 1 << "] = _n[" << nn->number() - 1 << "];\n";
-      }else if(n <= int(m.ports().size())){
-	o__ "// port " << nn->name() << " " << nn->number() << "\n";
-      }else if(nn->is_used()){
-	o__ "// internal " << nn->name() << " : " << nn->number() << "\n";
-	make_module_allocate_local_node(o, *nn);
-      }else{
-	o__ "// unused " << nn->name() << " : " << nn->number() << "\n";
-	o__ "_n[n_" << nn->name() << "].set_to_ground(this);\n"; // for now.
-      }
+  int n = 1;
+  for (; n <= int(m.nodes().size()); ++n) {
+    Node const* nn = m.nodes()[n];
+    assert(nn);
+    if(nn->number() == 0) {
+      o__ "// ground\n";
+      o__ "_n[n_" << nn->name() << "].set_to_ground(this);\n";
+    }else if(nn->number() < n){
+      o__ "_n[" << n - 1 << "] = _n[" << nn->number() - 1 << "];\n";
+    }else if(n <= int(m.ports().size())){
+      o__ "// port " << nn->name() << " " << nn->number() << "\n";
+    }else if(nn->is_used()){
+      o__ "// internal " << nn->name() << " : " << nn->number() << "\n";
+      make_module_allocate_local_node(o, *nn);
+    }else{
+      o__ "// unused " << nn->name() << " : " << nn->number() << "\n";
+      o__ "_n[n_" << nn->name() << "].set_to_ground(this);\n"; // for now.
     }
   }
 }
