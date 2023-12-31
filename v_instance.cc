@@ -74,7 +74,7 @@ protected: // HACK
 
 protected: // stub stuff
   INSTANCE const* _cloned_from; // use common/mutable_common instead?
-  const COMPONENT* _parent;
+  const COMPONENT* _parent{NULL};
   mutable DEV_INSTANCE_PROTO* _proto; // use common->proto?
   std::vector<std::pair<std::string, std::string>> _params;
   std::vector<std::string> _port_names;
@@ -137,8 +137,8 @@ private: // overrides
   void set_parameters(const std::string& Label, CARD* Parent,
 			      COMMON_COMPONENT* Common, double Value,
 			      int state_count, double state[],
-			      int node_count, const node_t nodes[]) override{ untested();
-    if(node_count){ untested();
+			      int node_count, const node_t nodes[]) override{
+    if(node_count){
       grow_nodes(node_count-1, _n, _node_capacity, node_capacity_floor);
       _net_nodes = node_count;
     }else{ untested();
@@ -334,7 +334,6 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
   std::string modelname = c->modelname();
   trace3("co", long_label(), c->modelname(), Proto->long_label());
 
-  assert(!_parent);
   assert(Proto->scope()==Proto->subckt());
   assert(!Proto->scope()->size());
 
@@ -342,7 +341,9 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
     trace1("node", n.first);
   }
 
-  if (modelname == "") { untested();
+  if (_parent){ untested();
+    // getting here in modelgen...?
+  }else if (modelname == "") { untested();
     throw Exception(Proto->long_label() + ": missing args -- need model name");
   }else if(Proto->subckt()->size()){ untested();
     // how to make reruns safe?
@@ -554,7 +555,11 @@ void INSTANCE::expand()
   assert(_parent->subckt());
   assert(_parent->subckt()->nodes());
   trace3("INSTANCE::expand", long_label(), _parent->net_nodes(),  _parent->subckt()->nodes()->how_many());
-  assert(_parent->net_nodes() <= _parent->subckt()->nodes()->how_many());
+  if(_parent->net_nodes() <= _parent->subckt()->nodes()->how_many()){
+    // module
+  }else{ untested();
+    // modelgen
+  }
   assert(_parent->subckt()->params());
 
 #if 0
@@ -726,6 +731,7 @@ CARD* DEV_INSTANCE_PROTO::clone()const
 /*--------------------------------------------------------------------------*/
 void INSTANCE::set_port_by_index(int Index, std::string& Value)
 {
+  trace3("instance spbi", long_label(), Index, Value);
   grow_nodes(Index, _n, _node_capacity, node_capacity_floor);
   BASE_SUBCKT::set_port_by_index(Index, Value);
 
@@ -733,8 +739,8 @@ void INSTANCE::set_port_by_index(int Index, std::string& Value)
     assert(_proto);
 
     std::string n = "*unnamed_port_" + std::to_string(Index);
-    trace4("proto fwd", long_label(), Index, Value, n);
     _proto->set_port_by_index(Index, n);
+    trace2("proto fwd", long_label(), net_nodes());
   }else{ untested();
     incomplete();
   }

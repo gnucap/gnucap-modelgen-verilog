@@ -1148,7 +1148,8 @@ typedef LiSt<Port_1, '{', '#', '}'> Port_1_List;
 // TODO: Port_Base?
 class Port_3 : public Owned_Base {
   std::string _name;
-  std::string _value;
+  std::string _value; // needed?
+  Node_Ref _node;
 public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
@@ -1158,11 +1159,12 @@ public:
     if(has_identifier()){
       return _value;
     }else{
-      return _name;
+      return _name; // _node->name?
     }
   }
   bool has_identifier()const;
   String_Arg key()const { return String_Arg(_name); }
+  Node_Ref const& node()const {return _node;}
 };
 // list ::= "(" port {"," port} ")"
 typedef LiSt<Port_3, '(', ',', ')'> Port_3_List_2;

@@ -3,12 +3,12 @@ test_sckt3 #() dut (.a(1),.b(0));
 Gnucap   System status
 iterations: op=0, dc=0, tran=0, fourier=0, total=0
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=1, subckt=1, model=0, total=2
+nodes: user=1, subckt=0, model=1, total=2
 dctran density=100.0%, ac density=100.0%
 #           v(1)       i(i)      
  0.         2.         1.        
 Gnucap   System status
 iterations: op=0, dc=2, tran=0, fourier=0, total=2
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=1, subckt=1, model=0, total=2
+nodes: user=1, subckt=0, model=1, total=2
 dctran density=100.0%, ac density=100.0%

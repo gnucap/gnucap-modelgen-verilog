@@ -90,6 +90,7 @@ void Name_String::parse(CS& File)
 + paramset_identifier ::=
 +	  identifier
 */
+/*--------------------------------------------------------------------------*/
 void Element_2::parse(CS& file)
 {
   assert(owner());
@@ -99,6 +100,17 @@ void Element_2::parse(CS& file)
   file >> _module_or_paramset_identifier
        >> '#' >> _list_of_parameter_assignments
        >> _name_of_module_instance >> _list_of_port_connections >> ';';
+
+  Module* mod = dynamic_cast<Module*>(owner());
+  if(mod /* && owner()->is_always() */){
+    for(auto const& p : _list_of_port_connections){
+      assert(mod->node(p->node()));
+      mod->node(p->node())->connect(this);
+    }
+  }else{
+    assert(0);
+    incomplete();
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Element_2::dump(std::ostream& out)const
@@ -460,7 +472,7 @@ void Port_3::parse(CS& file)
     file >> _name; // value?
   }
   if(owner()){
-    owner()->new_node(value());
+    _node = owner()->new_node(value());
   }else{
   }
 }

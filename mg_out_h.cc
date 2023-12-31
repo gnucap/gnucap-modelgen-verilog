@@ -410,6 +410,18 @@ static void make_precalc(std::ostream& o, Module const& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_cc_elements(std::ostream& o, Element_2_List const& L)
+{
+  o__ "COMPONENT const* _parent{NULL};\n";
+  for (Element_2_List::const_iterator e = L.begin(); e != L.end();
+      ++e) {
+    {
+      assert(*e);
+      o__ "COMPONENT const* " << (*e)->code_name() << "{NULL};\n";
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 static void make_module(std::ostream& o, const Module& m)
 {
   std::string class_name = "MOD_" + m.identifier().to_string();
@@ -425,23 +437,13 @@ static void make_module(std::ostream& o, const Module& m)
   size_t total_nodes = m.nodes().size();
   o__ "node_t _nodes[" << total_nodes << "];\n";
   o << "public: // netlist\n";
-  for (Element_2_List::const_iterator
-       p = m.element_list().begin();
-       p != m.element_list().end();
-       ++p) {
-    o__ "// COMPONENT* " << (**p).code_name() << "{NULL};\n";
-  }
   if(m.element_list().size()){
-    o__ "COMPONENT const* _parent{NULL};\n";
+    make_cc_elements(o, m.element_list());
   }else{
   }
   for (auto br : m.branches()){
     if(br->has_element()){
       o__ "ELEMENT* " << br->code_name() << "{NULL}; // branch\n";
-//      for(auto bn : br->names()){
-/////	bn->code_name(); ...
-//	o__ "ELEMENT* _br_" << bn << "{NULL}; // named branch\n";
-//      }
     }else if(br->is_short()){
       o__ "// short : " << br->code_name() << "\n";
     }else if(br->is_filter()){

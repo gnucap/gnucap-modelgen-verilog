@@ -45,7 +45,7 @@ static int is_function(std::string const& n)
 static String_Arg const& potential_abstol(Branch const& b)
 {
   static String_Arg def("OPT::abstol");
-  if(!b.discipline()){
+  if(!b.discipline()){ untested();
     // incomplete(); TODO: what's the default?
     return def;
   }else if(!b.discipline()->potential()){ untested();
@@ -179,7 +179,7 @@ static void make_tr_probe_num(std::ostream& o, const Module& m)
 static void make_set_parameters(std::ostream& o, const Element_2& e, std::string cn)
 {
   make_tag();
-  if(cn==""){
+  if(cn==""){ untested();
     cn = e.code_name();
   }else{
   }
@@ -203,19 +203,60 @@ static void make_set_parameters(std::ostream& o, const Element_2& e, std::string
   o << ", " << e.num_nodes() << ", nodes);\n";
 }
 /*--------------------------------------------------------------------------*/
+static void map_subdev_nodes(std::ostream& o, const Element_2& e)
+{
+  o____ "node_t nodes[] = {";
+  std::string comma;
+  // yikes, name vs. value
+  if(e.ports().has_names()){
+    Port_3_List_2::const_iterator p = e.ports().begin();
+    for (;p != e.ports().end(); ++p) {
+      o << comma << "_n[n_" << (**p).value() << "]";
+      comma = ",";
+    }
+  }else{
+    Port_3_List_2::const_iterator p = e.ports().begin();
+    for (;p != e.ports().end(); ++p) {
+      o << comma << "_n[n_" << (**p).name() << "]";
+      comma = ",";
+    }
+  }
+  {
+    o << "};\n";
+    o____ "c->set_parameters(c->short_label(), this";
+    o << ", c->mutable_common()";
+    o << ", 0."; // value
+    o << ", 0, NULL";
+    o << ", " << e.num_nodes() << ", nodes);\n";
+  }
+}
+/*--------------------------------------------------------------------------*/
 static void make_renew_sckt(std::ostream& o, Module const& m)
 {
-  if(m.element_list().size()){
-    o__ "renew_subckt(_parent, &(c->_netlist_params));\n";
-  }else{ untested();
-    // o__ "renew_subckt(_parent, NULL);\n";
+ //    o__ "renew_subckt(_parent, &(c->_netlist_params));\n";
+  o__ "auto pp = prechecked_cast<MOD_" << m.identifier() << " const*>(_parent);\n";
+  o__ "assert(pp);\n";
+  o__ "assert(subckt());\n";
+  for (auto const& e : m.element_list()) {
+    assert(e);
+    o__ "assert(!" << e->code_name() << ");\n";
+    o__ "assert(pp->" << e->code_name() << ");\n";
+    o__ "{\n";
+    o____ "auto c = prechecked_cast<COMPONENT*>(pp->" << e->code_name() << "->clone());\n";
+    o____ "assert(c);\n";
+    o____ "subckt()->push_back(c);\n";
+    o____ "c->set_owner(this);\n";
+    o____ e->code_name() << " = c;\n";
+    o____ "trace1(\"renew\", " << e->code_name() << "->long_label());\n";
+    map_subdev_nodes(o, *e);
+    o__ "}\n";
   }
 }
 /*--------------------------------------------------------------------------*/
 static void make_set_subdevice_parameters(std::ostream& o, const Element_2& e)
 {
   for(auto p : e.list_of_parameter_assignments()){
-    o____ e.code_name() << "->set_param_by_name(\"" << p->name() << "\", "
+    o____ "compon->set_param_by_name(\"" << p->name() << "\", "
        << "\"[" << e.short_label() << "]" << p->name() << "\");\n";
   }
 }
@@ -223,7 +264,8 @@ static void make_set_subdevice_parameters(std::ostream& o, const Element_2& e)
 static void make_module_construct_stub(std::ostream& o, const Element_2& e, Module const&)
 {
   make_tag();
-  std::string dev_type = "device_stub";
+  // std::string dev_type = "instance_proto";
+  std::string dev_type = "instance";
   assert(!dynamic_cast<Branch const*>(&e));
 
   o__ "const CARD* p = device_dispatcher[\"" << dev_type << "\"]; // " << e.dev_type() << "\n";
@@ -231,37 +273,37 @@ static void make_module_construct_stub(std::ostream& o, const Element_2& e, Modu
   o____ "throw Exception(" << "\"Cannot find " << dev_type << ". Load module?\");\n";
   o__ "}else{\n";
   o__ "}\n";
-  o__ "COMPONENT* " << e.code_name() << " = dynamic_cast<COMPONENT*>(p->clone());\n";
-  o__ e.code_name() << "->set_dev_type(\"" << e.dev_type() << "\");\n";
-  o__ e.code_name() << "->set_label(\"" << e.short_label() << "\");\n";
-  o__ e.code_name() << "->set_owner(this);\n";
-  o__ "if(!" << e.code_name() << "){\n";
+  o__ "auto compon = dynamic_cast<COMPONENT*>(p->clone());\n";
+  o__ "compon->set_dev_type(\"" << e.dev_type() << "\");\n";
+  o__ "compon->set_label(\"" << e.short_label() << "\");\n";
+  o__ "compon->set_owner(this);\n";
+  o__ "if(!compon){\n";
   o____ "throw Exception(" << "\"Cannot use " << dev_type << ": wrong type\"" << ");\n";
   o__ "}else{\n";
   o__ "}\n";
   o__ "assert(subckt());\n";
-  o__ "subckt()->push_front(" << e.code_name() << ");\n";
+  o__ "// subckt()->push_front(" << e.code_name() << ");\n";
+  o__ e.code_name() << " = compon;\n";
 
   o__ "{\n";
-  o____ "std::string tmp;\n";
   
   assert(!dynamic_cast<Branch const*>(&e));
   Port_3_List_2::const_iterator p = e.ports().begin();
+  int i=0;
+  o____ "std::string tmp;\n";
   if(e.ports().has_names()){
+    o____ "std::string name;\n";
     for (;p != e.ports().end(); ++p) {
-      o____ "tmp = \"" << (*p)->name()<<"\";\n";
-      o____ "{\n";
-      //o____ "std::string val = \"" << (*p)->value()<<"\";\n";
-      o____ "assert(_n[n_" << (*p)->value() << "].short_label() == \"" << (*p)->value() << "\");\n";
-      o____ e.code_name() << "->set_port_by_name(tmp,\n";
-      o____ "   const_cast<std::string&>(_n[n_" << (*p)->value() << "].n_()->short_label()));\n";
-      o____ "}\n";
+      o____ "name = \"" << (*p)->name()<<"\";\n";
+      o____ "tmp = \""<< ++i <<"\";\n";
+      o____ "compon->set_port_by_name(name, tmp);\n";
     }
   }else{
     int i = 0;
     for (;p != e.ports().end(); ++p) {
-      o____ "tmp = \"" << (*p)->name()<<"\";\n";
-      o____ e.code_name() << "->set_port_by_index(" << i << ", tmp);\n";
+      o____ "tmp = \""<< i <<"\";\n";
+      o____ "trace1(\"spbi " << i << "\", tmp);\n";
+      o____ "compon->set_port_by_index(" << i << ", tmp);\n";
       ++i;
     }
   }
@@ -310,8 +352,10 @@ void make_module_copy_constructor(std::ostream& o, const Module& m)
 static void make_build_netlist(std::ostream& o, const Module& m)
 {
   o__ "// build netlist\n";
+  o__ "// ports:" << m.ports().size() << "\n";
   if(m.element_list().size()){
     o__ "new_subckt();\n";
+    o__ "#if 0\n";
     auto nn = m.nodes().begin();
     for (++nn; nn!=m.nodes().end(); ++nn){
       std::string ext_name = (*nn)->name();
@@ -325,10 +369,12 @@ static void make_build_netlist(std::ostream& o, const Module& m)
 	o____ "set_port_by_index(" << ii-1 << ", tmp);\n";
 	o__ "}\n";
       }else{
-	o__ "_n[" << ii-1 << "].new_node(\"" << ext_name << "\", this);\n";
+	o__ " // netlist node\n";
+	o__ "_n[n_" << (*nn)->name() << "].new_node(\"" << ext_name << "\", this);\n";
       }
     }
-    o__ "assert(" << m.nodes().size() << " == subckt()->nodes()->how_many());\n";
+    o__ "#endif\n";
+//    o__ "assert(" << m.nodes().size() << " == subckt()->nodes()->how_many());\n";
     for (Element_2_List::const_iterator
 	e = m.element_list().begin();
 	e != m.element_list().end();
@@ -434,11 +480,11 @@ static void make_tr_review(std::ostream& o, const Module& m)
     o__ "";
   }
 #if 0
-  if(m.has_analysis()){
+  if(m.has_analysis()){ untested();
     o << "if(_sim->analysis_is_tran_static()){ untested();\n";
     o____ "q_accept();\n";
     o__ "}else ";
-  }else{
+  }else{ untested();
     o__ "";
   }
 #endif
@@ -466,12 +512,12 @@ static void make_tr_accept(std::ostream& o, const Module& m)
   }else{
   }
 #if 0
-  if(m.has_analysis()) {
+  if(m.has_analysis()) { untested();
     o__ "COMMON_" << m.identifier() << " const* c = "
       "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
     o__ "assert(c);\n";
     o__ "c->tr_eval_analog(this);\n";
-  }else{
+  }else{ untested();
   }
 #endif
   o__ "return " << baseclass(m) << "::tr_accept();\n";
@@ -652,7 +698,7 @@ static void make_module_allocate_local_node(std::ostream& o, const Node& p)
 /*--------------------------------------------------------------------------*/
 static void make_module_allocate_local_nodes(std::ostream& o, Module const& m)
 {
-  if(m.element_list().size()){
+  if(0 && m.element_list().size()){ untested();
     // nodes come from sckt proto
   }else{
     //for (auto n=m.nodes().rbegin(); n != m.nodes().rend(); ++ n)
@@ -684,7 +730,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
   std::string cn;
   if(cn_==""){
     cn = e.code_name();
-  }else{
+  }else{ untested();
     cn = cn_;
   }
 
@@ -778,8 +824,8 @@ static void make_module_precalc_first(std::ostream& o, Module const& m)
     o__ "subckt()->attach_params(&(c->_netlist_params), scope());\n";
   }else{
   }
-  o__ "attach_common(NULL);\n";
-  o__ "attach_common(cc);\n";
+  o____ "attach_common(NULL);\n";
+  o____ "attach_common(cc);\n";
   o____ "subckt()->precalc_first();\n";
   o__ "}else{\n";
   o__ "}\n";
@@ -836,6 +882,8 @@ static void make_module_expand(std::ostream& o, Module const& m)
   make_tag();
   String_Arg const& mid = m.identifier();
   o << "void MOD_" << mid << "::expand()\n{\n";
+  o__ "trace1(\"expand\", long_label());\n";
+
   o__ baseclass(m) << "::expand();\n";
   o__ "assert(_n);\n";
   o__ "assert(common());\n";
@@ -849,6 +897,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
     "\n";
   o__ "node_t gnd;\n";
   o__ "gnd.set_to_ground(this);\n";
+  make_module_allocate_local_nodes(o, m);
   if(m.element_list().size()){
     o__ "assert(_parent);\n";
     o__ "assert(_parent->subckt());\n";
@@ -860,10 +909,14 @@ static void make_module_expand(std::ostream& o, Module const& m)
     o__ "assert(pl);\n";
 
     // o__ "c->_params.set_try_again(pl);\n";
-    make_renew_sckt(o, m);
   }else{
   }
-    o__ "if (_sim->is_first_expand()) {\n";
+  o__ "if (_sim->is_first_expand()) {\n";
+
+    if(m.element_list().size()){
+      make_renew_sckt(o, m);
+    }else{
+    }
     o____ "precalc_first();\n";
 //    "    // optional nodes\n";
 //  for (Port_1_List::const_iterator
@@ -872,8 +925,6 @@ static void make_module_expand(std::ostream& o, Module const& m)
 //       ++p) { untested();
 //    make_dev_allocate_local_nodes(out, **p);
 //  }
-  o << ind << "    // local nodes\n";
-  make_module_allocate_local_nodes(o, m);
   o << "\n";
   o__ "// clone branches\n";
   for(auto i: m.branches()){
@@ -881,7 +932,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
       o__ "// branch " << i->name() << "\n";
       indent x;
       make_module_expand_one_branch(o, *i, m, "");
-//      for(auto n : i->names()){
+//      for(auto n : i->names()){ untested();
 //	make_module_expand_one_branch(o, *i, m, "_br_" + n);
 //      }
     }else if(i->is_filter()) {
@@ -897,7 +948,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
   o__ "// clone filters\n";
 #if 1
   for (auto i: m.filters()){
-    if(i->has_branch()){
+    if(i->has_branch()){ untested();
       unreachable();
     }else{
       // TODO incomplete();

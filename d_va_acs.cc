@@ -44,7 +44,7 @@ protected: // override virtual
   void	   tr_iwant_matrix()override	{tr_iwant_matrix_extended();}
   double   tr_involts()const override	{untested(); return tr_outvolts();}
   double   tr_involts_limited()const override {return tr_outvolts_limited();}
-  double   tr_amps()const override{unreachable(); return 0.;}
+  double   tr_amps()const override{return 0.;}
   void	   ac_iwant_matrix()override	{ac_iwant_matrix_extended();}
   void	   ac_load()override;
   COMPLEX  ac_involts()const override	{itested(); return NOT_VALID;}

@@ -1211,6 +1211,7 @@ MOD_resistor::MOD_resistor()
   attach_common(&Default_resistor);
   ++_count;
   // build netlist
+  // ports:2
   // overrides
 }
 /*--------------------------------------------------------------------------*/
@@ -1408,8 +1409,8 @@ void MOD_resistor::precalc_first()
   assert(c);
   auto cc = c->clone();
   if(subckt()){
-  attach_common(NULL);
-  attach_common(cc);
+    attach_common(NULL);
+    attach_common(cc);
     subckt()->precalc_first();
   }else{
   }
@@ -1423,6 +1424,7 @@ bool MOD_resistor::is_valid()const
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
 {
+  trace1("expand", long_label());
   BASE_SUBCKT::expand();
   assert(_n);
   assert(common());
@@ -1436,11 +1438,10 @@ void MOD_resistor::expand()
 
   node_t gnd;
   gnd.set_to_ground(this);
-  if (_sim->is_first_expand()) {
-    precalc_first();
-      // local nodes
   // port p 1
   // port n 2
+  if (_sim->is_first_expand()) {
+    precalc_first();
 
   // clone branches
   // branch (p, n)
@@ -2794,6 +2795,7 @@ MOD_capacitor::MOD_capacitor()
   attach_common(&Default_capacitor);
   ++_count;
   // build netlist
+  // ports:2
   // overrides
 }
 /*--------------------------------------------------------------------------*/
@@ -2982,8 +2984,8 @@ void MOD_capacitor::precalc_first()
   assert(c);
   auto cc = c->clone();
   if(subckt()){
-  attach_common(NULL);
-  attach_common(cc);
+    attach_common(NULL);
+    attach_common(cc);
     subckt()->precalc_first();
   }else{
   }
@@ -2997,6 +2999,7 @@ bool MOD_capacitor::is_valid()const
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
 {
+  trace1("expand", long_label());
   BASE_SUBCKT::expand();
   assert(_n);
   assert(common());
@@ -3010,9 +3013,6 @@ void MOD_capacitor::expand()
 
   node_t gnd;
   gnd.set_to_ground(this);
-  if (_sim->is_first_expand()) {
-    precalc_first();
-      // local nodes
   // port p 1
   // port n 2
   // ground
@@ -3033,6 +3033,8 @@ void MOD_capacitor::expand()
        //_n[n_ddt_1_n].new_model_node("ddt_1_n." + long_label(), this);
     }
   }
+  if (_sim->is_first_expand()) {
+    precalc_first();
 
   // clone branches
   // filter (, ddt_1_n)
@@ -3542,6 +3544,7 @@ MOD_capacitor::MOD_capacitor()
   attach_common(&Default_capacitor);
   ++_count;
   // build netlist
+  // ports:2
   // overrides
 }
 /*--------------------------------------------------------------------------*/
@@ -3782,8 +3785,8 @@ void MOD_capacitor::precalc_first()
   assert(c);
   auto cc = c->clone();
   if(subckt()){
-  attach_common(NULL);
-  attach_common(cc);
+    attach_common(NULL);
+    attach_common(cc);
     subckt()->precalc_first();
   }else{
   }
@@ -3797,6 +3800,7 @@ bool MOD_capacitor::is_valid()const
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
 {
+  trace1("expand", long_label());
   BASE_SUBCKT::expand();
   assert(_n);
   assert(common());
@@ -3810,9 +3814,6 @@ void MOD_capacitor::expand()
 
   node_t gnd;
   gnd.set_to_ground(this);
-  if (_sim->is_first_expand()) {
-    precalc_first();
-      // local nodes
   // port p 1
   // port n 2
   // ground
@@ -3833,6 +3834,8 @@ void MOD_capacitor::expand()
        //_n[n_ddt_2_n].new_model_node("ddt_2_n." + long_label(), this);
     }
   }
+  if (_sim->is_first_expand()) {
+    precalc_first();
 
   // clone branches
   // filter (, ddt_2_n)
