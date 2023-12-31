@@ -90,3 +90,7 @@
 * ddt/idt: avoid internal nodes
 * do not allocate unused filter nodes
 * misc small fixes (see git)
+
+2023123*-dev
+============
+* preprocessor conditional fix

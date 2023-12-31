@@ -340,9 +340,9 @@ mg_pp.o: mg_pp.cc /usr/local/include/gnucap/io_.h \
  /usr/local/include/gnucap/m_base.h mg_deps.h mg_lib.h mg_func.h \
  /usr/local/include/gnucap/u_function.h \
  /usr/local/include/gnucap/e_base.h /usr/local/include/gnucap/u_attrib.h \
- /usr/local/include/gnucap/l_indirect.h mg_pp.h \
- /usr/local/include/gnucap/u_opt.h /usr/local/include/gnucap/mode.h \
- /usr/local/include/gnucap/io_.h
+ /usr/local/include/gnucap/l_indirect.h mg_pp.h mg_error.h \
+ /usr/local/include/gnucap/io_error.h /usr/local/include/gnucap/u_opt.h \
+ /usr/local/include/gnucap/mode.h /usr/local/include/gnucap/io_.h
 mg_task.o: mg_task.cc mg_func.h /usr/local/include/gnucap/u_function.h \
  /usr/local/include/gnucap/e_base.h /usr/local/include/gnucap/u_attrib.h \
  /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/md.h \

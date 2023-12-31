@@ -1,0 +1,18 @@
+
+
+`define A
+
+`ifdef B
+	UNREACHEABLE1;
+`endif
+
+`ifdef A
+	REACHED1;
+`else
+	UNREACHEABLE2;
+`endif
+
+`ifdef A
+AAA
+`else
+BBB

@@ -22,6 +22,7 @@
 #include <io_.h>
 #include "mg_.h"
 #include "mg_pp.h"
+#include "mg_error.h"
 #include <stack>
 #include <u_opt.h>
 /*--------------------------------------------------------------------------*/
@@ -211,20 +212,24 @@ void Skip_Block::parse(CS& file)
     file.skipto1('`');
     if (file >> "`endif") {
       if (nest == 0) {
+	file.reset(here);
+	--nest;
 	break;  // done with skip_block
       }else{
 	--nest;
       }
     }else if (file >> "`else") {
       trace1("else in SB", nest);
-      if (nest == 0) {
+      if (!nest) {
 	file.reset(here);
+	--nest;
 	break;  // done with skip_block
       }else{
       }
     }else if (file >> "`elsif") {
       if(!nest) {
 	file.reset(here);
+	--nest;
 	break;
       }else{
       }
@@ -233,11 +238,13 @@ void Skip_Block::parse(CS& file)
     }else if (file >> "`ifdef") {
       ++nest;
     }else if (!file.more()) {
-      file.get_line("");
-    //}else if (file.stuck(&here)) { untested();
-    //  file.warn(0, "unterminated ifdef block");
-    //  break;
-    }else{
+      try{
+	file.get_line("");
+      }catch (Exception_End_Of_Input const& e) {
+	file.warn(bDANGER, "unterminated conditional block");
+	throw e;
+      }
+    }else {
       file.skip();
     }
   }
@@ -623,7 +630,7 @@ Preprocessor::Preprocessor() : CS(CS::_STRING, "")
 void Preprocessor::read(std::string const& file_name)
 {
   if(OPT::case_insensitive == 0){
-  }else{ untested();
+  }else{
   }
   // _name = file_name;
   std::string::size_type sepplace;
@@ -652,9 +659,8 @@ void PP_Quoted_String::dump(std::ostream& o)const{ untested();
 /*--------------------------------------------------------------------------*/
 void Preprocessor::parse(CS& file)
 {
+  std::stack<int> _cond;
   size_t here = file.cursor();
-  int if_block = 0;
-  int else_block = 0;
   for (;;) {
     append_to(file, _stripped_file, "\"/`");
     if (!file.ns_more()){
@@ -676,7 +682,7 @@ void Preprocessor::parse(CS& file)
       }
       if(file >> define_list()) {
       }else{ untested();
-	throw Exception_CS("expecting macro name", file);
+	throw Exception_CS_("expecting macro name", file);
       }
     }else if (file >> "`include") {
       std::string include_file_name;
@@ -686,53 +692,44 @@ void Preprocessor::parse(CS& file)
     }else if (file >> "`ifdef") {
       Define_List::const_iterator x = define_list().find(file);
       if (x != define_list().end()) {
-	++if_block;
+	_cond.push(1);
       }else{
+	_cond.push(0);
 	file >> skip_block;
-	++else_block;
       }
     }else if (file >> "`ifndef") {
       Define_List::const_iterator x = define_list().find(file);
       if (x != define_list().end()) {
 	file >> skip_block;
-	++else_block;
+	_cond.push(0);
       }else{
 	String_Arg s;
 	file >> s; // discard.
-	++if_block;
+	_cond.push(1);
       }
     }else if (file >> "`else") {
-      if (if_block > else_block) {
-	trace3("else skip", file.tail().substr(0,20), if_block, else_block);
-	file >> skip_block;
-	assert(if_block);
-	--if_block;
-      }else{
-	trace3("else noskip", file.tail().substr(0,20), if_block, else_block);
-	// error
+      if (_cond.empty()){ untested();
+	throw Exception_CS_("not allowed here", file);
+      }else if (_cond.top() != 1) {
+      }else if( file >> skip_block ){
+      }else{ untested();
       }
     }else if (file >> "`endif") {
-      trace3("endif", file.tail(), if_block, else_block);
-      if (else_block > 0) {
-	--else_block;
+      if (_cond.empty()){ untested();
+	throw Exception_CS_("not allowed here", file);
       }else{
-      }
-      if (if_block > 0) {
-	--if_block;
-      }else{
-	// error
+	_cond.pop();
       }
     }else if (file >> "`elsif") {
+      if (_cond.empty()){ untested();
+	throw Exception_CS_("not allowed here", file);
+      }else{
+      }
       Define_List::const_iterator x = define_list().find(file);
-      trace3("elsif", if_block, else_block, file.tail());
-      if (if_block == else_block) { untested();
-	file >> skip_block;
-      }else if (else_block == 0) {
+      if (_cond.top() == 1) {
 	file >> skip_block;
       }else if (x != define_list().end()) {
-	++if_block;
-	assert(else_block);
-	--else_block;
+	_cond.top() = 1;
       }else{
 	file >> skip_block;
       }
@@ -785,6 +782,10 @@ void Preprocessor::parse(CS& file)
     }
   }
   CS::operator=(_stripped_file);
+  if (_cond.empty()){
+  }else{
+    file.warn(bDANGER, "unmatched `ifdef\n");
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Preprocessor::dump(std::ostream& out)const
