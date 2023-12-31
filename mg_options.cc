@@ -49,11 +49,12 @@ void Options::parse(CS& f)
       || Get(f, "dump-nature",     &_dump_nature)
       || Get(f, "dump-annotate",   &_dump_annotate)
       || Get(f, "expand-paramset", &_expand_paramset)
+      || (f.check(bWARNING, "what's this?"), f.skiparg());
       ;
 
     if (!f.stuck(&here)) {
       changed = true;
-    }else{
+    }else{ untested();
     }
   }while (f.more() && changed);
 }
