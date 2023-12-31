@@ -39,7 +39,7 @@ protected: // override virtual
     DEV_CPOLY_G::tr_begin();
     _loss0 = 1./OPT::shortckt;
   }
-  double   tr_involts()const override	{untested(); return tr_outvolts();}
+  double   tr_involts()const override	{ return tr_outvolts();}
   double   tr_involts_limited()const override {return tr_outvolts_limited();}
   double   tr_amps()const override;
   void	   ac_iwant_matrix()override	{ac_iwant_matrix_extended();}
@@ -80,12 +80,13 @@ bool VAPOT::do_tr_con_chk_and_q()
     trace3("pot?", _loss1, _loss0, converged());
   }else{
   }
-  for (int i=1; converged() && i<=_n_ports; ++i) {
-    if(_loss0){
-      set_converged(conchk(_old_values[i], _adj_values[i]) /*,0.?*/);
-    }else{
-      set_converged(conchk(_old_values[i], _values[i]) /*,0.?*/);
-    }
+  if(converged()){
+    set_converged(conchk(_old_values[1], _values[1]) /*,0.?*/);
+  }else{
+  }
+  for (int i=2; converged() && i<=_n_ports; ++i) {
+    // assert(_loss0);
+    set_converged(conchk(_m1_[i-2], _m0_[i-2]) /*,0.?*/);
     trace3("ctrl ", _loss1, _loss0, converged());
   }
   return converged();
@@ -102,11 +103,11 @@ bool VAPOT::do_tr()
     // loss but switch to CS mode.
     // V(br) <+ f(I(br) ...)
 
-    _adj_values[1] = 1./ _values[1];
+    // adj_values[1] = 1./ _values[1]; // used?
 
     _m0.x = 0.;
     _m0.c0 = tr_amps() - _values[0] / _values[1]; // ; // *_loss0;
-    _m0.c1 = _adj_values[1];
+    _m0.c1 = 1. / _values[1];
 
 	/* y.f0 = amps - r.f0*y.f1 + volts*y.f1; */  // amps - v[0]/v[1] + volts/v[1]
     // admit: _y[0].x = _m0.x = tr_involts_limited();
@@ -116,20 +117,22 @@ bool VAPOT::do_tr()
   // ==  amps - v[0]/v[1] + volts/v[1] -  tr_involts_limited() * v1 = amps - v[0]/v[1]
 
 
-    _values[0] = _m0.c0;
-    _values[1] = _m0.c1;
+    // _values[0] = _m0.c0;
+    // _values[1] = _m0.c1;
     for (int i=2; i<=_n_ports; ++i) { untested();
-      _adj_values[i] = _values[i];
+      _m0_[i-2] = _values[i];
     }
 
   }else{
-    for (int i=1; i<=_n_ports; ++i) {
-      _adj_values[i] = -_values[i] * _loss0;
+    // _adj_values[1] = -_values[1] * _loss0;
+    for (int i=2; i<=_n_ports; ++i) {
+      _m0_[i-2] = -_values[i] * _loss0;
     }
     _m0.x = 0.;
     // _m0.c0 = -_loss0 * _y[0].f1; // d_vs.
     _m0.c0 = -_loss0 * _values[0];
     _m0.c1 = 0.; // really?
+    _m0.c1 = - _values[1] * _loss0;
     assert(_m0.c1 == 0.); // d_vs
   }
   return do_tr_con_chk_and_q();
@@ -137,7 +140,9 @@ bool VAPOT::do_tr()
 /*--------------------------------------------------------------------------*/
 void VAPOT::tr_load()
 {
-  _old_values[0] = _values[0];
+  for (int i=0; i<=_n_ports; ++i) {
+    _old_values[i] = _values[i];
+  }
   if(!_loss0){
     if(_loss1){
       tr_unload_shunt(); // 4 pt +- loss
@@ -145,13 +150,12 @@ void VAPOT::tr_load()
     }
 
     tr_load_passive();
-    _old_values[1] = _values[1];
     for (int i=2; i<=_n_ports; ++i) {
-      trace4("tr_load", long_label(), i, _values[i], _old_values[i]);
-      tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_values[i]), &(_old_values[i]));
+      tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_m0_[i-2]), &(_m1_[i-2]));
     }
 
   }else if(_self_is_current && fabs(_values[1]) > OPT::shortckt){ untested();
+    assert(!_loss0);
     // loss but CS mode.
     //
     if(_loss1){
@@ -160,22 +164,20 @@ void VAPOT::tr_load()
     }
 			
     tr_load_passive();
-    _old_values[1] = _values[1];
     for (int i=2; i<=_n_ports; ++i) {
-      trace4("tr_load", long_label(), i, _values[i], _old_values[i]);
-      tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_values[i]), &(_old_values[i]));
+      tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_m0_[i-2]), &(_m1_[i-2]));
     }
 
   }else{
+    assert(_loss0);
     tr_load_shunt(); // 4 pt +- loss
     trace3("CPG.. ", long_label(), _loss0, _loss1);
     tr_load_source();
 
     trace2("VAPOT::tr_load", _values[0], _values[1]);
-    _old_values[1] = _adj_values[1];
     for (int i=2; i<=_n_ports; ++i) {
       trace2("VAPOT::tr_load control", i, _values[i]);
-      tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_adj_values[i]), &(_old_values[i]));
+      tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_m0_[i-2]), &(_m1_[i-2]));
     }
   }
 }
@@ -184,17 +186,15 @@ double VAPOT::tr_amps()const
 {
   double amps = 0.;
   if(_loss0){
-    // voltage src mode
-    // d_vs/elt/admit: fixzero((_loss0 * tr_outvolts() + _m0.c1 * tr_involts()(==0) + _m0.c0), _m0.c0);
-    amps = fixzero((_loss0 * tr_outvolts() /* + _m0.c1 * tr_involts() */ + _m0.c0), _m0.c0);
-  }else{ untested();
-    // amps = _m0.c0 + _m0.c1 * tr_outvolts();
-    amps = fixzero((_m0.c1 * tr_involts() + _m0.c0), _m0.c0);
+  }else{
   }
-  trace3("tr_amps", long_label(), _loss0, amps);
+  // amps = fixzero((_loss0 * tr_outvolts() + _m0.c1 * tr_involts() + _m0.c0), _m0.c0);
+  amps = _loss0 * tr_outvolts() + _m0.c1 * tr_involts() + _m0.c0;
+
   for (int i=2; i<=_n_ports; ++i) {
-    amps += dn_diff(_n[2*i-2].v0(), _n[2*i-1].v0()) * _values[i];
+    amps += (_n[2*i-2].v0() - _n[2*i-1].v0()) * _m0_[i-2];
   }
+  trace3("tr_amps4", long_label(), _loss0, amps);
   return amps;
 }
 /*--------------------------------------------------------------------------*/
@@ -212,11 +212,8 @@ void VAPOT::ac_load()
   ac_load_passive();
 
   for (int i=2; i<=_n_ports; ++i) {
-    if(_loss0){
-      ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], - _values[i] * _loss0);
-    }else{
-      ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i]);
-    }
+    assert(_loss0);
+    ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], - _values[i] * _loss0);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -243,8 +240,10 @@ void VAPOT::set_parameters(const std::string& Label, CARD *Owner,
     assert(size_t(_n_ports) == n_nodes/2 + _current_port_names.size());
 
     assert(!_old_values);
-    _adj_values = new double[n_states];
     _old_values = new double[n_states];
+    assert(n_states > 1);
+    _m0_ = new double[n_states-2];
+    _m1_ = new double[n_states-2];
 
     if (matrix_nodes() > NODES_PER_BRANCH) {
       // allocate a bigger node list

@@ -1,0 +1,31 @@
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+attach ../vams/isine.so
+
+verilog
+
+`modelgen
+module test_ddt5(p, n);
+	(* desc="" *) real d0, d1;
+	electrical p, n;
+	analog begin
+		d0 = ddt(I(p,n));
+	end
+endmodule
+
+!make test_ddt5.so > /dev/null
+attach ./test_ddt5.so
+
+verilog
+parameter r=1
+parameter v=0
+
+test_ddt5 #() dut(1,0);
+isine #(.offset(v), .ampl(1)) v1(0, 1);
+
+list
+
+print tran v(1) d0(dut) d1(dut) iter(0)
+tran 1 trace=n
+status notime
+end

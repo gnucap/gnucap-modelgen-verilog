@@ -114,7 +114,8 @@ protected:
   double*  _vi1; // vector form of _i1
   int	   _n_ports;
   double   _load_time;
-  const double** _inputs;
+  std::vector<std::string> _current_port_names;
+  std::vector<ELEMENT const*> _input;
 protected:
   explicit DEV_CPOLY_CAP(const DEV_CPOLY_CAP& p);
 public:
@@ -147,6 +148,18 @@ protected: // override virtual
     incomplete();
     unreachable();
     return "";
+  }
+
+  void expand_last()override;
+  void expand_current_port(size_t i);
+  void set_current_port_by_index(int i, const std::string& s) override {
+    if(i==0){ untested();
+      // _self_is_current = true;
+    }else if(i<=int(_current_port_names.size())){
+      _current_port_names[i-1] = s;
+    }else{ untested();
+      throw Exception_Too_Many(i, int(_current_port_names.size()), 0);
+    }
   }
 public:
   void set_parameters(const std::string& Label, CARD* Parent,
@@ -261,8 +274,7 @@ DEV_CPOLY_CAP::DEV_CPOLY_CAP(const DEV_CPOLY_CAP& p)
    _vi0(NULL),
    _vi1(NULL),
    _n_ports(p._n_ports),
-   _load_time(NOT_VALID),
-   _inputs(NULL)
+   _load_time(NOT_VALID)
 {
   // not really a copy .. only valid to copy a default
   // too lazy to do it right, and that's all that is being used
@@ -273,7 +285,6 @@ DEV_CPOLY_CAP::DEV_CPOLY_CAP(const DEV_CPOLY_CAP& p)
   assert(!p._vi0);
   assert(!p._vi1);
   assert(p._n_ports == 0);
-  assert(!p._inputs);
 
   // configure output nodes
   _loss1 = _loss0 = 1.;
@@ -286,8 +297,7 @@ DEV_CPOLY_CAP::DEV_CPOLY_CAP()
    _vi0(NULL),
    _vi1(NULL),
    _n_ports(0),
-   _load_time(NOT_VALID),
-   _inputs(NULL)
+   _load_time(NOT_VALID)
 {
 }
 /*--------------------------------------------------------------------------*/
@@ -352,7 +362,7 @@ bool DEV_DDT::do_tr()
   }
   _y[0].f0 = _vy0[0]; // state, from owner, "charge".
   // assert(_vy0[1] == 0.); // mfactor abuse.
-  _y[0].f1 = 0; // _vy0[1]; // another state, capacity.?
+  _y[0].f1 = 0; // _vy0[1]; // "self" capacity. later.
   
   trace4("DEV_DDT::do_tr", long_label(), _y[0].f0, _y[1].f0, _y1.f0);
   trace3("DEV_DDT::do_tr", long_label(), _sim->iteration_tag(), _sim->_time0);
@@ -369,13 +379,34 @@ bool DEV_DDT::do_tr()
   assert(_vi0[0] == _vi0[0]);
   
   if(_sim->_v0){
-    for (int i=2; i<=_n_ports; ++i) {
+    size_t i = 2;
+    for (; i<=_n_ports - _input.size(); ++i) {
       _vi0[i] = tr_c_to_g(_vy0[i], _vi0[i]);
+
       trace4("DEV_DDT::do_tr", i, _vi0[0], volts_limited(_n[2*i-2],_n[2*i-1]), _vi0[i]);
       _vi0[0] -= volts_limited(_n[2*i-2],_n[2*i-1]) * _vi0[i];
       assert(_vi0[i] == _vi0[i]);
       assert(_vi0[0] == _vi0[0]);
     }
+
+    assert( i == _n_ports - _input.size() + 1);
+    for (; int(i)<=_n_ports; ++i) {
+      int k = i-(_n_ports - _input.size() + 1);
+      assert(_input[k]->has_iv_probe()); // for now.
+      // _m0.c0 += _y[0].f1 * _input->_m0.c0;
+      // _m0.c1  = _y[0].f1 * (_input->_loss0 + _input->_m0.c1);
+      double scale = _input[k]->_loss0 + _input[k]->_m0.c1 ;
+      if(_input[k]->_m0.c1){
+      }else{
+      }
+      if(_input[k]->_loss0){
+      }else{
+      }
+
+      _vi0[i] = tr_c_to_g(scale*_vy0[i], _vi0[i]);
+      _vi0[0] -= volts_limited(_n[2*i-2],_n[2*i-1]) * _vi0[i];
+    }
+
     for (int i=0; i<=_n_ports; ++i) {
       assert(_vi0[i] == _vi0[i]);
     }
@@ -506,8 +537,14 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
   attach_common(Common);
 
   if (first_time) {
+    _current_port_names.resize(n_states - 1 - n_nodes/2);
+    _input.resize(n_states - 1 - n_nodes/2);
     _n_ports = n_nodes/2; // sets num_nodes() = _n_ports*2
-    assert(_n_ports == n_states-1);
+    trace3("DEV_CPOLY_CAP::set_parameters", _n_ports, n_nodes, n_states);
+
+    _n_ports = n_states-1; // set net_nodes
+    // assert(_n_ports == n_states-1);
+    assert(size_t(_n_ports) == n_nodes/2 + _current_port_names.size());
 
     assert(!_vy1);
     assert(!_vi0);
@@ -531,8 +568,6 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
     // assert could fail if changing the number of nodes after a run
   }
 
-  //_inputs = inputs;
-  _inputs = 0;
   _vy0 = states;
   std::fill_n(_vy0, n_states, 0.);
   std::fill_n(_vy1, n_states, 0.);
@@ -564,6 +599,46 @@ void DEV_CPOLY_CAP::precalc_last()
   }
 }
 /*--------------------------------------------------------------------------*/
+void DEV_CPOLY_CAP::expand_last()
+{
+  ELEMENT::expand_last();
+  for(size_t i=0; i<_current_port_names.size(); ++i){
+    expand_current_port(i);
+    // expand_current_port(&_input[i], _current_port_names[i], this); // or so.
+  }
+}
+/*--------------------------------------------------------------------------*/
+// !! duplicate in d_va.h
+void DEV_CPOLY_CAP::expand_current_port(size_t i)
+{
+  std::string const& input_label = _current_port_names[i];
+  ELEMENT const*& input = _input[i];
+//  node_t* n = _n + net_nodes() + 2*(i-_input.size()) - IN1;
+
+  assert (input_label != "");
+  CARD const* e = find_in_my_scope(input_label);
+  input = dynamic_cast<const ELEMENT*>(e);
+
+  if (!e) {untested();
+    throw Exception(long_label() + ": " + input_label + " does not exist");
+  }else if (!input) {untested();
+    throw Exception(long_label() + ": " + input_label + " cannot be used as current probe");
+  }else if (input->subckt()) {untested();
+    throw Exception(long_label() + ": " + input_label
+		    + " has a subckt, cannot be used as current probe");
+  }else if (input->has_inode()) {untested();
+    incomplete(); // wrong N1
+    _n[IN1] = input->n_(IN1);
+    _n[IN2].set_to_ground(this);
+  }else if (input->has_iv_probe()) {
+    size_t IN1 = net_nodes() - 2*_current_port_names.size() + 2*i;
+    trace4("flow ecp", i, IN1, net_nodes(), _current_port_names.size());
+    _n[IN1] = input->n_(OUT1);
+    _n[IN1+1] = input->n_(OUT2);
+  }else{ untested();
+    throw Exception(long_label() + ": " + input_label + " cannot be used as current probe");
+  }
+}
 } // namespace
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

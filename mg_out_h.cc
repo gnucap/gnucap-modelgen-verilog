@@ -123,7 +123,7 @@ static void make_funcs_common(std::ostream& o, pSet<FUNCTION_ const> const& P)
       o<<"// FUNCTION no refs: " << (*q)->label() << "\n";
     }else if(dynamic_cast<MGVAMS_TASK const*>(*q)){ untested();
       o<<"// TASK no refs: " << (*q)->label() << "\n";
-    }else if(dynamic_cast<MGVAMS_FILTER const*>(*q)){ untested();
+    }else if(dynamic_cast<MGVAMS_FILTER const*>(*q)){
       o<<"// FILTER no refs: " << (*q)->label() << "\n";
     }else if(dynamic_cast<VAMS_ACCESS const*>(*q)){ untested();
       o<<"// XS no refs: " << (*q)->label() << "\n";

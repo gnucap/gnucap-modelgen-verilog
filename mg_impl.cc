@@ -368,7 +368,7 @@ std::string Branch::dev_type()const
       return "incomplete_dev_type";
     }
   }else if(has_flow_probe()) {
-    return "va_sw";
+    return "va_sw"; // ?
   }else if(has_pot_source()){
     if(_selfdep){
       return "va_pot_br";

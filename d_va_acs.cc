@@ -140,7 +140,7 @@ void VAACS::set_parameters(const std::string& Label, CARD *Owner,
     assert(size_t(_n_ports) == n_nodes/2 + _current_port_names.size());
 
     assert(!_old_values);
-    _adj_values = new double[n_states];
+    // _adj_values = new double[n_states];
     _old_values = new double[n_states];
 
     if (matrix_nodes() > NODES_PER_BRANCH) {

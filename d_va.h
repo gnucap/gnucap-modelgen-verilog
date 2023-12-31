@@ -38,8 +38,9 @@ namespace {
 class DEV_CPOLY_G : public ELEMENT {
 protected:
   double*  _values{NULL};
-  double*  _adj_values{NULL};
   double*  _old_values{NULL};
+  double*  _m0_{NULL};
+  double*  _m1_{NULL};
   int	   _n_ports{0};
   double   _time;
   std::vector<std::string> _current_port_names;
@@ -176,6 +177,8 @@ void DEV_CPOLY_G::expand_current_port(size_t i)
 DEV_CPOLY_G::~DEV_CPOLY_G()
 {
   delete [] _old_values;
+  delete [] _m0_;
+  delete [] _m1_;
   if (net_nodes() > NODES_PER_BRANCH) {
     delete [] _n;
   }else{
