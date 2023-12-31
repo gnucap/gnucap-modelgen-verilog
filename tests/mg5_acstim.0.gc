@@ -1,0 +1,41 @@
+
+load ../modelgen_0.so
+load ../d_vasrc.so
+load ../lang_verilog.so
+
+verilog
+
+`modelgen
+module acstim0(p, n);
+	electrical p, n;
+	inout p, n;
+	analog begin
+		I(p,n) <+ ac_stim("ac", 1.);
+	end
+endmodule
+
+
+!make acstim0.so > /dev/null
+attach ./acstim0.so
+
+parameter v=0
+
+module mm(1, gnd)
+	acstim0 d(1,gnd);
+	resistor #(1.) r(1,gnd);
+endmodule
+
+mm m1(a, 0);
+
+spice
+
+Iac 2 0 ac 1
+Rac 2 0 1
+
+.print dc v(nodes) loss(m1.d.*)
+.dc
+
+.print ac v(nodes) loss(m1.d.*)
+.ac 1 100 * 10
+.status notime
+.end

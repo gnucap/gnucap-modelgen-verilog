@@ -1,0 +1,18 @@
+`include "disciplines.vams"
+`include "constants.vams"
+
+module isine(p, n);
+	output p, n;
+	electrical p, n;
+	parameter real freq  =1. from [0:inf);
+	parameter real ampl  =1.;
+	parameter real offset=0.;
+	parameter real phase =0.;
+	parameter real mag   =0.;
+	parameter real samples = 4. from (0:inf);
+	analog begin
+		I(p, n) <+ ampl*sin(`M_TWO_PI*freq*$abstime) + offset;
+		I(p, n) <+ ac_stim("ac", mag);
+		$bound_step(1./(freq*samples));
+	end
+endmodule

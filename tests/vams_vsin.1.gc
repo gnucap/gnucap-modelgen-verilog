@@ -1,0 +1,25 @@
+
+load ../d_vasrc.so
+load ../lang_verilog.so
+load ../vams/vsine.so
+
+verilog
+
+module main(a, gnd);
+  vsine #(.mag(1.)) v1(a, gnd);
+endmodule
+
+main #() dut(1, 0)
+
+spice
+
+* Vac 1 0 ac 1
+R1 1 2 1
+C1 0 2 1
+
+.print dc v(nodes) iter(0)
+.print ac v(nodes) iter(0)
+
+.dc
+.ac 1 1000 * 10
+.status notime

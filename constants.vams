@@ -3,6 +3,7 @@
 
 // standard mathematical constants
 `define M_PI 3.1415926535897932384626433832795028841972
+`define M_TWO_PI (`M_PI * 2.)
 //double const M_E	= 2.7182818284590452354;
 //double const M_LOG2E	= 1.4426950408889634074;  // log2(M_E)
 //double const M_LOG10E	= 0.43429448190325182765; // log10(M_E)

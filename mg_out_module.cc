@@ -414,6 +414,9 @@ static void make_tr_advance(std::ostream& o, const Module& m)
   }else{
   }
   o__ "set_not_converged();\n";
+  for(auto f : m.funcs()){
+    f->make_cc_tr_advance(o);
+  }
   o__ "return " << baseclass(m) << "::tr_advance();\n";
   o << "}\n"
     "/*--------------------------------------"
@@ -441,7 +444,11 @@ static void make_tr_review(std::ostream& o, const Module& m)
 #endif
   o << "{itested();\n";
   o__ "}\n";
-  o__ "return " << baseclass(m) << "::tr_review();\n";
+  o__ "TIME_PAIR time_by = BASE_SUBCKT::tr_review();\n";
+  for(auto f : m.funcs()){
+    f->make_cc_tr_review(o);
+  }
+  o__ "return time_by;\n";
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -569,6 +576,9 @@ static void make_module_class(std::ostream& o, Module const& m)
   }else if(m.has_analysis()){
     make_tr_review(o, m);
     make_tr_accept(o, m);
+  }else if(m.has_tr_review()){
+    make_tr_review(o, m);
+    // make_tr_advance(o, m);
   }else{
   }
 

@@ -1,0 +1,26 @@
+
+load ../d_vasrc.so
+load ../lang_verilog.so
+load ../vams/isine.so
+
+verilog
+
+module main(a, gnd);
+  isine #(.mag(1.)) v1(gnd, a);
+endmodule
+
+main #() dut(1, 0);
+resistor #(1) ra(a,0);
+
+spice
+
+* Vac 1 0 ac 1
+R1 1 2 1
+C1 0 2 1
+
+.print dc v(nodes) iter(0)
+.print ac v(nodes) iter(0)
+
+.dc
+.ac 1 1000 * 10
+.status notime

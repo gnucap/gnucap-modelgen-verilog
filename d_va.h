@@ -40,7 +40,7 @@ protected:
   double*  _values{NULL};
   double*  _adj_values{NULL};
   double*  _old_values{NULL};
-  int	   _n_ports;
+  int	   _n_ports{0};
   double   _time;
   std::vector<std::string> _current_port_names;
   std::vector<ELEMENT const*> _input;
@@ -233,7 +233,7 @@ bool DEV_CPOLY_G::do_tr()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::tr_load()
-{ untested();
+{
   tr_load_passive();
   _old_values[0] = _values[0];
   _old_values[1] = _values[1];

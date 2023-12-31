@@ -1836,10 +1836,6 @@ private: // verilog input data
   Aliasparam_Collection _aliasparam;
   Element_2_List _element_list;
   Port_1_List _local_nodes;
-
-  // decouple?
-  // Analog_Functions _analog_functions;
-  // AnalogList _analog_list;
   Owned_Base* _analog{NULL};
 protected:
   Attribute_Stash _attribute_stash;
@@ -1854,6 +1850,7 @@ private: // merge?
   size_t _num_evt_slots{0};
   size_t _num_filters{0};
   bool _has_analysis{false};
+  bool _has_tr_review{false};
 private: // elaboration data
   Probe_Map* _probes{NULL};
   void new_probe_map(); // analog?
@@ -1896,6 +1893,7 @@ public:
     	size_t		net_nodes()const	{return ports().size();}
   bool has_events()const {return _num_evt_slots;}
   bool has_analysis()const {return _has_analysis;}
+  bool has_tr_review()const {return _has_tr_review;}
   void new_evt_slot() { ++_num_evt_slots; }
   void new_filter() { ++_num_filters; }
   size_t num_evt_slots()const {return _num_evt_slots; }
@@ -1911,6 +1909,7 @@ public:
   Attribute_Stash& attribute_stash() {
     return _attribute_stash;
   }
+  void set_tr_review() {_has_tr_review = true; }
   void set_analysis() {_has_analysis = true; }
   void set_attributes(Attribute_Instance const* a) {
     assert(!_attributes);

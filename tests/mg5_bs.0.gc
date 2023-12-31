@@ -1,0 +1,33 @@
+
+load ../modelgen_0.so
+load ../d_vasrc.so
+load ../lang_verilog.so
+
+verilog
+
+`modelgen
+module test_bs(p, n);
+	electrical p, n;
+	inout p, n;
+	analog begin
+		$bound_step(2.);
+		$bound_step(1.);
+		$bound_step(3.);
+	end
+endmodule
+
+
+
+!make test_bs.so > /dev/null
+attach ./test_bs.so
+
+parameter v=0
+
+module mm(a)
+	test_bs d(1,0);
+endmodule
+
+mm m1(a);
+
+tran 5.5
+end

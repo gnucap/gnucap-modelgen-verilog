@@ -4,5 +4,7 @@ TARGET = \
 	diode.so \
 	resistor.so \
 	inductor.so \
+	isine.so \
 	vccs.so \
-	vcvs.so
+	vcvs.so \
+	vsine.so

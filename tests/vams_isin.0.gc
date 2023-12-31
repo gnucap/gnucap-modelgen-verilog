@@ -1,0 +1,25 @@
+
+load ../d_vasrc.so
+load ../lang_verilog.so
+load ../vams/isine.so
+
+verilog
+
+module main(a, b gnd);
+  isine #(.freq(1.)) v1(gnd, a);
+  isine #(.offset(1.), .freq(.5), .samples(8)) v1(gnd, b);
+endmodule
+
+main #() dut(a, b 0)
+resistor #(1) ra(a 0);
+resistor #(1) rb(b 0);
+
+spice
+
+.print tran v(nodes) iter(0)
+.print dc v(nodes) iter(0)
+
+.dc
+.tran 0 1 trace=n
+.tran 1 2 .1 trace=n
+.status notime

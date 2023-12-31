@@ -2535,8 +2535,8 @@ private: // overrides
   //void    tr_begin();          //BASE_SUBCKT
   //void    tr_restore();        //BASE_SUBCKT
   void    tr_load()override{ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
-  TIME_PAIR  tr_review()override;         //BASE_SUBCKT
-  void    tr_accept()override;         //BASE_SUBCKT
+  TIME_PAIR  tr_review()override;
+  void    tr_accept()override;
   //void    tr_unload();         //BASE_SUBCKT
   void      dc_advance()override {set_not_converged(); BASE_SUBCKT::dc_advance();}
   void      tr_advance()override;
@@ -2926,7 +2926,8 @@ inline TIME_PAIR MOD_capacitor::tr_review()
 {
   {itested();
   }
-  return BASE_SUBCKT::tr_review();
+  TIME_PAIR time_by = BASE_SUBCKT::tr_review();
+  return time_by;
 }
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::tr_accept()
@@ -3261,8 +3262,8 @@ private: // overrides
   //void    tr_begin();          //BASE_SUBCKT
   //void    tr_restore();        //BASE_SUBCKT
   void    tr_load()override{ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
-  TIME_PAIR  tr_review()override;         //BASE_SUBCKT
-  void    tr_accept()override;         //BASE_SUBCKT
+  TIME_PAIR  tr_review()override;
+  void    tr_accept()override;
   //void    tr_unload();         //BASE_SUBCKT
   void      dc_advance()override {set_not_converged(); BASE_SUBCKT::dc_advance();}
   void      tr_advance()override;
@@ -3725,7 +3726,8 @@ inline TIME_PAIR MOD_capacitor::tr_review()
 {
   {itested();
   }
-  return BASE_SUBCKT::tr_review();
+  TIME_PAIR time_by = BASE_SUBCKT::tr_review();
+  return time_by;
 }
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::tr_accept()

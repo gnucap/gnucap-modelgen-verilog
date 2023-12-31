@@ -34,6 +34,7 @@ DELETED =
 RAW_SRCS = \
 mg_deps.cc \
 mg_error.cc \
+mg_filt_acstim.cc \
 mg_filt.cc \
 mg_filt_ddx.cc \
 mg_filt_slew.cc \

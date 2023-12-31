@@ -59,6 +59,8 @@ public:
   virtual void make_cc_common(std::ostream&)const {}
   virtual void make_cc_dev(std::ostream&)const {}
   virtual void make_cc_precalc(std::ostream&)const {}
+  virtual void make_cc_tr_advance(std::ostream&)const {}
+  virtual void make_cc_tr_review(std::ostream&)const {}
 
   virtual Token* new_token(Module& m, size_t na)const = 0;
   virtual bool returns_void()const { return false; }

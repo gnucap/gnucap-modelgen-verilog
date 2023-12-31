@@ -25,6 +25,7 @@
 #include "m_tokens.h"
 #include <e_cardlist.h> // TODO: really?
 #include <u_opt.h>
+#include "globals.h"
 /*--------------------------------------------------------------------------*/
 
 /* So analog initial block shall not contain the fol-
@@ -135,6 +136,7 @@ static Base* parse_system_task(CS& f, Block* o)
 {
   trace1("parse_system_task", f.tail().substr(0,10));
   size_t here = f.cursor();
+#if 0
   if(ONE_OF
     || f.umatch("$display ")
     || f.umatch("$finish ")
@@ -149,8 +151,22 @@ static Base* parse_system_task(CS& f, Block* o)
     }catch(Exception const& e){ untested();
       return NULL;
     }
-  } else{
-    return NULL;
+  }else
+#endif
+  {
+    std::string name;
+    f >> name;
+    f.reset(here);
+
+    if(dynamic_cast<MGVAMS_TASK const*>(function_dispatcher[name])){
+      try{
+	return new System_Task(f, o);
+      }catch(Exception const& e){ untested();
+	return NULL;
+      }
+    }else{
+      return NULL;
+    }
   }
 }
 /*--------------------------------------------------------------------------*/

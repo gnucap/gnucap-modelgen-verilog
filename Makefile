@@ -76,10 +76,13 @@ include Make.depend
 	sed -e 's/^/"/' -e 's/$$/\\n"/' $< > $@
 mg_out_root.o: ${EMBED_HEADERS}
 
+VASRC_OBJS = d_vaflow.o d_vapot.o d_va_filter.o d_vapot_br.o d_va_slew.o d_vasw.o d_va_acs.o
+
 modelgen_0.o: $(OBJS)
-d_vasrc.so: d_vaflow.o d_vapot.o d_va_filter.o d_vapot_br.o d_va_slew.o d_vasw.o
+d_vasrc.so: ${VASRC_OBJS}
 	${CXX} $(GNUCAP_CPPFLAGS) -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $+ ${LIBS_} -o $@
 
+d_va_acs.o: d_va.h
 d_vasw.o: d_va.h
 d_vapot.o: d_va.h
 d_vaflow.o: d_va.h

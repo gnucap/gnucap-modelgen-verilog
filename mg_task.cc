@@ -31,6 +31,43 @@
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
+class BOUND_STEP : public MGVAMS_TASK {
+public:
+  explicit BOUND_STEP() : MGVAMS_TASK() {
+    set_label("bound_step");
+  }
+private:
+  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+    unreachable(); // SFCALL won't eval
+    return "$$bound_step";
+  }
+  Token* new_token(Module& m, size_t na)const override {
+    m.install(this);
+    m.set_tr_review();
+    return new Token_SFCALL("$bound_step", this);
+  }
+  std::string code_name()const override{
+    return "d->_f_bound_step";
+  }
+ void make_cc_precalc(std::ostream& o)const override {
+   o__ "void " << "_f_bound_step(double)const{}\n";
+ }
+ void make_cc_dev(std::ostream& o)const override {
+   o__ "double _bound_step{NEVER};\n";
+   o__ "void " << "_f_bound_step(double d) {\n";
+   o____ "_bound_step = std::min(_bound_step, d);\n";
+   o__ "}\n";
+ }
+ void make_cc_tr_review(std::ostream& o)const override {
+   o__ "time_by.min_error_estimate(_sim->_time0 + _bound_step);\n";
+ }
+ void make_cc_tr_advance(std::ostream& o)const override {
+   o__ "_bound_step = NEVER;\n";
+ }
+ bool returns_void()const override { return true; }
+} bound_step;
+DISPATCHER<FUNCTION>::INSTALL d_bound_step(&function_dispatcher, "$bound_step", &bound_step);
+/*--------------------------------------------------------------------------*/
 static size_t cnt;
 class STROBE_TASK : public MGVAMS_TASK {
 public:

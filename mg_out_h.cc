@@ -488,8 +488,10 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "//void    tr_restore();        //BASE_SUBCKT\n";
   o__ "void    tr_load()override{ trace1(\"tr_load\", long_label());BASE_SUBCKT::tr_load();}\n";
   if(m.num_evt_slots() || m.has_analysis() ){
-    o__ "TIME_PAIR  tr_review()override;         //BASE_SUBCKT\n";
-    o__ "void    tr_accept()override;         //BASE_SUBCKT\n";
+    o__ "TIME_PAIR  tr_review()override;\n";
+    o__ "void    tr_accept()override;\n";
+  }else if(m.has_tr_review()){
+    o__ "TIME_PAIR  tr_review()override;\n";
   }else{
   }
   if(m.has_analysis()){

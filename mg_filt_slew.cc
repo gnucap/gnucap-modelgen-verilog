@@ -42,9 +42,8 @@ public:
   SLEW* clone()const /*override*/{
     return new SLEW(*this);
   }
-
-  std::string code_name()const override{
-    return "/*SLW*/ d->" + label();
+  std::string code_name()const override {
+    return "d->" + label();
   }
 private:
   Token* new_token(Module& m, size_t na)const override{
@@ -114,8 +113,6 @@ private:
     o__ "t0.chain(st[1]);\n";
     o__ "trace3(\"slew\", st[0], st[1], st[2]);\n";
 
-
-    // o__ "t0[d__filter" << cn << "] = 1.;\n";
     o__ "assert(t0 == t0);\n";
     o__ "return t0;\n";
   }
@@ -128,27 +125,11 @@ private:
 	comma = ", ";
       }
     o << ");\n";
-//    o__ "};\n";
   }
-#if 0
-  void make_cc_dev_(std::ostream& o)const{
-    o__ "class FILTER" << label() << "{\n";
-    o__ "public:\n";
-    o____ "ddouble operator()(";
-      for(size_t n=0; n<num_args(); ++n){
-	o << "ddouble t" << n << ", ";
-      }
-    o << "COMPONENT*) const;\n";
-    o__ "} " << label() << ";\n";
-  }
-#endif
   void make_cc_impl(std::ostream&o)const override{
     assert(_m); // owner?
     assert(_f);
     std::string id = _m->identifier().to_string();
-    // o << "COMMON_" << id << "::";
-    // o << "ddouble COMMON_" << id << "::FILTER" << label() <<
-    //   "::operator()(";
     o << "MOD_" << id << "::ddouble";
     o << " MOD_" << id << "::" << label() << "(";
     std::string comma;

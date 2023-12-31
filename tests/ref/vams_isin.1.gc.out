@@ -1,0 +1,14 @@
+load ../lang_verilog.so 
+     ^ ? "../lang_verilog.so": already loaded, replacing
+#           v(1)       v(2)       v(a)       iter(0)   
+ 0.         0.         0.         0.         3.        
+#Freq       v(1)       v(2)       v(a)       iter(0)   
+ 1.         1.0126     0.15915    0.         0.        
+ 10.        1.0001     0.015915   0.         0.        
+ 100.       1.         0.0015915  0.         0.        
+ 1.K        1.         159.15u    0.         0.        
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=7
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=3, subckt=0, model=0, total=3
+dctran density=77.8%, ac density=77.8%

@@ -1,0 +1,13 @@
+load ../lang_verilog.so 
+     ^ ? "../lang_verilog.so": already loaded, replacing
+#           v(2)       v(a)       loss(m1.d._b_p_n) loss(m1.d._b_acs_0_p_acs_0_n)
+ 0.         0.         0.         100.K      1.        
+#Freq       v(2)       v(a)       loss(m1.d._b_p_n) loss(m1.d._b_acs_0_p_acs_0_n)
+ 1.         0.99999    0.99999    ??         1.        
+ 10.        0.99999    0.99999    ??         1.        
+ 100.       0.99999    0.99999    ??         1.        
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=6
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=1, total=3
+dctran density=77.8%, ac density=77.8%
