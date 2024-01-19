@@ -391,7 +391,7 @@ bool DEV_DDT::do_tr()
 
     assert( i == _n_ports - _input.size() + 1);
     for (; int(i)<=_n_ports; ++i) {
-      int k = i-(_n_ports - _input.size() + 1);
+      int k = int(i)-int(_n_ports - _input.size() + 1);
       assert(_input[k]->has_iv_probe()); // for now.
       // _m0.c0 += _y[0].f1 * _input->_m0.c0;
       // _m0.c1  = _y[0].f1 * (_input->_loss0 + _input->_m0.c1);

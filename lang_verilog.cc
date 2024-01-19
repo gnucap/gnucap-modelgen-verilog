@@ -90,9 +90,9 @@ private: // local
   void parse_ports(CS& cmd, COMPONENT* x, bool all_new);
 
 private: // TODO, transition, stale pure virtuals...
-  MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*)
+  MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*)override
   { incomplete(); unreachable(); return NULL; }
-  void print_paramset(OMSTREAM&, const MODEL_CARD*)
+  void print_paramset(OMSTREAM&, const MODEL_CARD*)override
   { incomplete(); unreachable(); }
 
 private: // override virtual, called by print_item
@@ -695,7 +695,7 @@ void LANG_VERILOG::print_command(OMSTREAM& o, const DEV_DOT* x)
 }
 /*--------------------------------------------------------------------------*/
 class CMD_PARAMSET : public CMD {
-  void do_it(CS& cmd, CARD_LIST* Scope) {
+  void do_it(CS& cmd, CARD_LIST* Scope) override {
     if(Scope == &CARD_LIST::card_list){
     }else{
       // allowed?

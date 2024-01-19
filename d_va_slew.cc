@@ -36,10 +36,10 @@ public:
   explicit DEV_SLEW() :ELEMENT() {}
 private: // override virtual
   char	   id_letter()const override	{unreachable(); return '\0';}
-  std::string value_name()const {unreachable(); return "";}
+  std::string value_name()const override {unreachable(); return "";}
   std::string dev_type()const override	{unreachable(); return "slew";}
   CARD*	   clone()const override	{return new DEV_SLEW(*this);}
-  std::string port_name(int)const{unreachable(); return "";}
+  std::string port_name(int)const override {unreachable(); return "";}
   int max_nodes()const override {return 0.;}
   int min_nodes()const override {return 0.;}
   void set_parameters(const std::string& Label, CARD* Parent,
@@ -60,10 +60,10 @@ private: // override virtual
 /*--------------------------------------------------------------------------*/
   TIME_PAIR tr_review()override; //		{return _time_by.reset();}//BUG//review(_i0.f0, _it1.f0);}
 				 //
-  double  tr_involts()const {unreachable(); return 0.;}
-  double  tr_involts_limited()const {unreachable(); return 0.;}
-  COMPLEX ac_involts()const {unreachable(); return 0.;}
-  void dc_advance() {
+  double  tr_involts()const override {unreachable(); return 0.;}
+  double  tr_involts_limited()const override {unreachable(); return 0.;}
+  COMPLEX ac_involts()const override {unreachable(); return 0.;}
+  void dc_advance() override {
     ELEMENT::dc_advance();
 
     for (int i = 1;  i < OPT::_keep_time_steps;  ++i) {

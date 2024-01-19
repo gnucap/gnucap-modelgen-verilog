@@ -101,7 +101,7 @@ private:
     unreachable(); // SFCALL won't eval
     return "$$mfactor";
   }
-  Token* new_token(Module& m, size_t na)const override {
+  Token* new_token(Module& m, size_t)const override {
     _m = &m;
     m.install(this);
     return new Token_SFCALL("$mfactor", this);

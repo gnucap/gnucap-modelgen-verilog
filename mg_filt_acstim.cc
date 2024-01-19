@@ -95,7 +95,7 @@ protected:
   ACSTIM* clone()const {
     return new ACSTIM(*this);
   }
-  void make_assign(std::ostream& o)const {
+  void make_assign(std::ostream&)const {
   }
   void set_code_name(std::string x){
     _code_name = x;
@@ -177,6 +177,7 @@ public:
       o << ", ddouble t" << n;
     }
     o << ")\n{\n";
+    o__ "if(what != \"ac\"){incomplete();}\n";
     o__ "MOD_" << id << "* d = this;\n";
     o__ "typedef MOD_" << id << " MOD;\n";
     std::string state = "_st" + cn;

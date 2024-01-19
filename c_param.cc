@@ -35,11 +35,11 @@ class PARAM_PARSE : public PARAMETER<double> {
 public:
   explicit PARAM_PARSE() : PARAMETER<double>() { }
 public:
-  void	operator=(const std::string& s) { untested();
+  void	operator=(const std::string& s)override { untested();
     PARAMETER<double>::operator=(s);
   }
 public:
-  void parse(CS& cmd){
+  void parse(CS& cmd)override {
 //    trace1("parse", cmd.fullstring());
     double new_val;
 //    cmd >> new_val;

@@ -41,7 +41,7 @@ private:
     unreachable(); // SFCALL won't eval
     return "$$bound_step";
   }
-  Token* new_token(Module& m, size_t na)const override {
+  Token* new_token(Module& m, size_t)const override {
     m.install(this);
     m.set_tr_review();
     return new Token_SFCALL("$bound_step", this);
