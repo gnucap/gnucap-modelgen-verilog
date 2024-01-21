@@ -469,7 +469,7 @@ void resolve_copy(CARD_LIST* t, PARAM_LIST const& p, const CARD_LIST*)
 	  skip1 = false;
 	}else if(dynamic_cast<Token_CONSTANT*>(*i)
 	    && !dynamic_cast<const Float*>((*i)->data())) {
-	  E.push_back(new Token_CONSTANT("_." + (*i)->name(), NULL, (*i)->aRgs()));
+	  E.push_back(new Token_CONSTANT("_." + (*i)->name(), NULL, ""));
 	  delete(*i);
 	}else{
 	  E.push_back(*i);
