@@ -136,8 +136,8 @@ protected: // override virtual
   bool	   do_tr()override;
   void	   tr_load()override;
   void	   tr_unload()override;
-  double   tr_involts()const override	{unreachable(); return NOT_VALID;}
-  double   tr_involts_limited()const override {unreachable(); return NOT_VALID;}
+  double   tr_involts()const override	{return dn_diff(_n[IN1].v0(), _n[IN2].v0());}
+  double   tr_involts_limited()const override {return volts_limited(_n[IN1],_n[IN2]);}
   double   tr_amps()const override;
   void	   ac_iwant_matrix()override	{ac_iwant_matrix_extended();}
   void	   ac_load()override;
@@ -190,7 +190,7 @@ private: // override virtual
   void	   tr_begin()override;
   TIME_PAIR tr_review()override; //		{return _time_by.reset();}//BUG//review(_i0.f0, _it1.f0);}
 }p4;
-DISPATCHER<CARD>::INSTALL d_ddt(&device_dispatcher, "va_ddt|f_ddt0", &p4);
+DISPATCHER<CARD>::INSTALL d_ddt(&device_dispatcher, "va_ddt", &p4);
 // DEV_DDT p4i(I);
 // DISPATCHER<CARD>::INSTALL d_ddt_i(&device_dispatcher, "va_ddt_i", &p4i); // TODO
 /*--------------------------------------------------------------------------*/
@@ -214,6 +214,7 @@ bool DEV_CPOLY_CAP::tr_needs_eval()const
     // more work to do...
     return true;
   }else{
+    return true;
     return false;
   }
 }
@@ -234,24 +235,30 @@ private: // override virtual
   TIME_PAIR tr_review()override;
 }p1;
 DISPATCHER<CARD>::INSTALL
-  d1(&device_dispatcher, "va_idt|f_idt0", &p1);
+  d1(&device_dispatcher, "va_idt", &p1);
 /*--------------------------------------------------------------------------*/
 void DEV_IDT::ac_load()
-{ untested();
+{
   ac_load_shunt(); // 4 pt +- loss
+		   //
+  COMPLEX omg = _sim->_jomega;
+  if(_loss0){
+    omg /= - _loss0;
+  }else{
+  }
 		   //
   if(1){
     // abusing _vy[1] for mfactor.
   }else{
     assert(!_vy0[1]); // for now.
-    _acg = _vy0[1] / _sim->_jomega;
+    _acg = _vy0[1] / omg;
   }
 
   trace4("load", _vy0[0], _vy0[1], _loss0, _loss1);
   ac_load_passive();
-  for (int i=2; i<=_n_ports; ++i) { untested();
+  for (int i=2; i<=_n_ports; ++i) {
     trace2("load", i, _vy0[i]);
-    ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _vy0[i] / _sim->_jomega);
+    ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _vy0[i] / omg);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -334,8 +341,15 @@ bool DEV_CPOLY_CAP::do_tr_con_chk_and_q()
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_CPOLY_CAP::do_tr()
-{untested();
+{
   _m0 = CPOLY1(0., _vi0[0], _vi0[1]);
+#if 0
+  if(_loss0){
+    _m0 = - _loss0 * CPOLY1(0., _vi0[0], _vi0[1]);
+  }else{ untested();
+    _m0 = CPOLY1(0., _vi0[0], _vi0[1]);
+  }
+#endif
   return do_tr_con_chk_and_q();
 }
 /*--------------------------------------------------------------------------*/
@@ -373,14 +387,23 @@ bool DEV_DDT::do_tr()
   }
   trace4("DIFFD", _i[0].f0, _i[0].f1, _y[0].f0, _sim->_time0);
   assert(_i[0].f0 < 1e99);
-  _vi0[0] = _i[0].f0;
-  _vi0[1] = _i[0].f1;
+  if(_loss0){
+    _vi0[0] = - _loss0 * _i[0].f0;
+    _vi0[1] = - _loss0 * _i[0].f1;
+  }else{
+    _vi0[0] = _i[0].f0;
+    _vi0[1] = _i[0].f1;
+  }
   assert(_vi0[0] == _vi0[0]);
   
   if(_sim->_v0){
     size_t i = 2;
     for (; i<=_n_ports - _input.size(); ++i) {
-      _vi0[i] = tr_c_to_g(_vy0[i], _vi0[i]);
+      if(_loss0){
+	_vi0[i] = -_loss0 * tr_c_to_g(_vy0[i], _vi0[i]);
+      }else{
+	_vi0[i] = tr_c_to_g(_vy0[i], _vi0[i]);
+      }
 
       trace4("DEV_DDT::do_tr", i, _vi0[0], volts_limited(_n[2*i-2],_n[2*i-1]), _vi0[i]);
       _vi0[0] -= volts_limited(_n[2*i-2],_n[2*i-1]) * _vi0[i];
@@ -402,7 +425,13 @@ bool DEV_DDT::do_tr()
       }else{
       }
 
-      _vi0[i] = tr_c_to_g(scale*_vy0[i], _vi0[i]);
+     // _vi0[i] = tr_c_to_g(scale*_vy0[i], _vi0[i]);
+      if(_loss0){
+	_vi0[i] = -_loss0 * scale * tr_c_to_g(_vy0[i], _vi0[i]);
+      }else{
+	_vi0[i] = scale * tr_c_to_g(_vy0[i], _vi0[i]);
+      }
+
       _vi0[0] -= volts_limited(_n[2*i-2],_n[2*i-1]) * _vi0[i];
     }
 
@@ -431,13 +460,23 @@ bool DEV_IDT::do_tr()
   _i[0] = integrate(_y, _i, _time, _method_a, _dt);
   trace3("idt do_tr", _y[0].f0, _i[0].f0, _i[1].f0 );
  
-  _vi0[0] = _i[0].f0;
-  _vi0[1] = _i[0].f1;
+  if(_loss0){
+    _vi0[0] = - _loss0 * _i[0].f0;
+    _vi0[1] = - _loss0 * _i[0].f1;
+  }else{
+    _vi0[0] = _i[0].f0;
+    _vi0[1] = _i[0].f1;
+  }
+
   assert(_vi0[0] == _vi0[0]);
   
   if(_sim->_v0){
     for (int i=2; i<=_n_ports; ++i) {
       _vi0[i] = tr_l_to_g(_vy0[i], _vi0[i], _time, _method_a, _dt);
+      if(_loss0){
+	_vi0[i] *= -_loss0;
+      }else{
+      }
       _vi0[0] -= volts_limited(_n[2*i-2],_n[2*i-1]) * _vi0[i];
       assert(_vi0[i] == _vi0[i]);
       assert(_vi0[0] == _vi0[0]);
@@ -496,23 +535,32 @@ double DEV_CPOLY_CAP::tr_amps()const
 {
   assert(_i[0].f0 == _i[0].f0);
   assert(_i[0].f0 < 1e99);
-  return _i[0].f0;
+  if(_loss0 && 0){
+    return -_loss0 * _i[0].f0;
+  }else{
+    return _i[0].f0;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_CAP::ac_load()
 {
   ac_load_shunt(); // 4 pt +- loss
+  COMPLEX omg = _sim->_jomega;
+  if(_loss0){
+    omg *= - _loss0;
+  }else{
+  }
   if(1){
     // abusing _vy[1] for mfactor.
   }else{
     assert(!_vy0[1]); // for now.
-    _acg = _vy0[1] * _sim->_jomega;
+      _acg = _vy0[1] * omg;
   }
   trace4("load", _vy0[0], _vy0[1], _loss0, _loss1);
   ac_load_passive();
   for (int i=2; i<=_n_ports; ++i) {
     trace2("load", i, _vy0[i]);
-    ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _vy0[i] * _sim->_jomega);
+    ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _vy0[i] * omg);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -586,7 +634,7 @@ double DEV_CPOLY_CAP::tr_probe_num(const std::string& x)const
 void DEV_CPOLY_CAP::precalc_last()
 {
   assert(!common());
-  if(_loss0){
+  if(0 && _loss0){
   }else{
     assert(_vy0);
     _mfactor = _vy0[1];

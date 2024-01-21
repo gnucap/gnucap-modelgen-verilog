@@ -1,0 +1,22 @@
+
+
+load ../vams/vccs.so
+load ../mgsim/d_vaflow.so
+
+verilog
+
+vccs #(.gm(2) .$mfactor(1)) vv(0, out, in, 0);
+resistor #(.r(1)) r(0, out);
+
+spice
+
+V1 in 0 ac 1 dc 0.9 tran sin
+
+.print tran v(nodes)
+.print dc v(nodes) y(vv.*)
+.print ac vm(nodes) vp(nodes)
+
+.dc
+.tran 1
+.ac 1 10 * 2
+.status notime

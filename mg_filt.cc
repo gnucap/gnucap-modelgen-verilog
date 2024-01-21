@@ -121,11 +121,12 @@ public:
     cl->_p = np;
     Node* nn = m.new_node(filter_code_name + "_n"); // &mg_ground_node
    // np->set_to(nn, "_short_"+code_name()+"()");
-    nn->set_to(np, "_short_b_"+filter_code_name+"()");
+    // np->set_to(nn, "_short_b_"+filter_code_name+"()");
+    np->set_to(&Node_Map::mg_ground_node, "_short_b_"+filter_code_name+"()");
     cl->_n = nn;
     {
-      // Branch* br = m.new_branch(np, &Node_Map::mg_ground_node);
-      Branch* br = m.new_branch(&Node_Map::mg_ground_node, nn);
+      Branch* br = m.new_branch(np, &Node_Map::mg_ground_node);
+      // Branch* br = m.new_branch(&Node_Map::mg_ground_node, nn);
 //      br->set_source();
       assert(br);
       assert(const_cast<Branch const*>(br)->owner());
@@ -212,7 +213,8 @@ public:
     }else{
       o__ "d->" << cn << "->do_tr();\n";
       o__ "t0 = d->" << cn << "->tr_amps();\n";
-      o__ "d->_potential" << cn << " = - t0;\n";
+      // o__ "d->_potential" << cn << " = - t0;\n";
+      o__ "d->_potential" << cn << " = t0; // xx\n";
     }
     o__ "trace2(\"filt\", t0, d->"<< cn <<"->tr_outvolts());\n";
 
@@ -235,7 +237,7 @@ public:
   Probe const* prb()const {return _prb;}
   void set_n_to_gnd()const {
     assert(_m);
-    _m->set_to_ground(_br->p());
+    _m->set_to_ground(_br->n());
   }
 private:
   Branch const* output()const override;
@@ -256,7 +258,7 @@ public:
 private:
   void make_assign(std::ostream& o)const override{
     std::string cn = _br->code_name();
-    o__ "t0[d_potential" << cn << "] = -1.;\n";
+    o__ "t0[d_potential" << cn << "] = 1.;\n";
     o__ "assert(t0 == t0);\n";
   }
 } ddt;

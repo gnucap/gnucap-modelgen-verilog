@@ -16,11 +16,15 @@ endmodule
 main m(1 2 0)
 
 spice
-V1   1  0  sin a=1 f=1
+V1   1  0  sin a=1 f=1 ac 1
 .parameter p=.01
 
 .print tran v(nodes)
 * .options method=euler
 .tran 1
+
+.print ac v(nodes)
+.ac .1 100 * 10
+
 
 .status notime

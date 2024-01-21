@@ -13,8 +13,10 @@ V1 p n sin freq=1 amplitude={ampl} dc=dc
 `modelgen
 module test_expcap0(p, n, cp, cn);
 	electrical p, n, cp, cn;
+	(*desc="dd"*) real dd;
 	analog begin
-		I(p,n) <+ exp(ddt(V(cp,cn)));
+		dd = ddt(V(cp,cn));
+		I(p,n) <+ ln(exp(ddt(V(cp,cn))));
 	end
 endmodule
 
@@ -27,6 +29,7 @@ spice
 V1  1  0  SIN  offset= 0.  amplitude= 1.  frequency= 1.  delay= 0.  damping= 0. ac 1
 R2  3  0  1.
 .print tran v nodes iter(0)
+ * loss(dut._b_ddt_1_p_ddt_1_n) i(dut._b_ddt_1_p_ddt_1_n) dd(dut) iter(0)
 .print ac vm(3) vp(3)
 .tran 1
 .ac 1 10 * 2

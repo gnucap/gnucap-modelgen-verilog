@@ -57,6 +57,7 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
     Branch const* b = x;
     if(b->is_short()){
       // !has_element?
+	o << "// short " << b->code_name() << "\n";
     }else{
       if(!b->has_name()){
 	o << "// not named: " << b->code_name() << "\n";

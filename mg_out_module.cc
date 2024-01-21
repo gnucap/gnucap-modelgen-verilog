@@ -618,7 +618,9 @@ static void make_module_allocate_local_node(std::ostream& o, const Node& p)
     if(p.short_to()){
       assert(!p.short_if().empty());
       o____ "if (" << p.short_if() << ") {\n";
-      o______ "_n[n_" << p.name() << "] = _n[n_" << p.short_to()->name() << "];\n";
+      o______ "_n[n_" << p.name() << "] = "; // _n[n_" << p.short_to()->name() << "];\n";
+	make_node_ref(o, *p.short_to());
+	o << ";\n";
       o____ "}else";
     }else{
       o____ "";
@@ -642,15 +644,13 @@ static void make_module_allocate_local_node(std::ostream& o, const Node& p)
 /*--------------------------------------------------------------------------*/
 static void make_module_allocate_local_nodes(std::ostream& o, Module const& m)
 {
-  int n = 1;
-  for (; n <= int(m.nodes().size()); ++n) {
+  for (int n=1; n<=int(m.nodes().size()); ++n) {
     Node const* nn = m.nodes()[n];
     assert(nn);
     if(nn->number() == 0) {
       o__ "// ground\n";
       o__ "_n[n_" << nn->name() << "].set_to_ground(this);\n";
     }else if(nn->number() < n){
-      o__ "_n[" << n - 1 << "] = _n[" << nn->number() - 1 << "];\n";
     }else if(n <= int(m.ports().size())){
       o__ "// port " << nn->name() << " " << nn->number() << "\n";
     }else if(nn->is_used()){
@@ -659,6 +659,16 @@ static void make_module_allocate_local_nodes(std::ostream& o, Module const& m)
     }else{
       o__ "// unused " << nn->name() << " : " << nn->number() << "\n";
       o__ "_n[n_" << nn->name() << "].set_to_ground(this);\n"; // for now.
+    }
+  }
+
+  for (int n=1; n<=int(m.nodes().size()); ++n) {
+    Node const* nn = m.nodes()[n];
+    assert(nn);
+    if(nn->number() == 0) {
+    }else if(nn->number() < n){
+      o__ "_n[" << n - 1 << "] = _n[" << nn->number() - 1 << "]; // (a)\n";
+    }else{
     }
   }
 }

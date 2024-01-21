@@ -28,8 +28,13 @@ attach ../lang_verilog.so
  0.91306   -0.5195    -0.077143  
  0.95653   -0.26975   -0.09065   
  1.         925.32n   -0.092532  
+#Freq       v(1)       v(2)      
+ 0.1        0.99999    0.84673   
+ 1.         1.         0.15718   
+ 10.        1.         0.015913  
+ 100.       1.         0.0015915 
 Gnucap   System status
-iterations: op=0, dc=0, tran=93, fourier=0, total=124
+iterations: op=0, dc=0, tran=93, fourier=0, total=128
 transient timesteps: accepted=27, rejected=4, total=31
 nodes: user=2, subckt=0, model=0, total=2
 dctran density=100.0%, ac density=100.0%
