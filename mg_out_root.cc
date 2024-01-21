@@ -22,7 +22,10 @@
 
 #include <md.h>
 #include "mg_out.h"
+#include "mg_in.h"
 #include "mg_options.h"
+#include "mg_discipline.h"
+#include "mg_.h" // TODO
 /*--------------------------------------------------------------------------*/
 static void make_header(std::ostream& o, const File& in,
 			const std::string& /*dump_name*/)

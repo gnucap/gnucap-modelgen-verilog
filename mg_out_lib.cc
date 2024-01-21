@@ -1,6 +1,6 @@
-/*$Id: mg_out_lib.cc,v 26.128 2009/11/10 04:21:03 al Exp $ -*- C++ -*-
+/*                          -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
- * Author: Albert Davis <aldavis@gnu.org>
+ *               2023, 2024 Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -19,52 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-//testing=script 2006.11.01
 #include "mg_out.h"
+#include "mg_.h" // TODO
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-void make_final_adjust_value(std::ostream& out, const Parameter_2& p)
-{
-  if (!(p.calculate().empty())) {
-    out << "    " << p.code_name() << " = " << p.calculate() << ";\n";
-  }else{
-  }
-  if (!(p.final_default().empty())) {
-    out << "    if (" << p.code_name() << " == NA) {\n"
-      "      " << p.code_name() << " = " << p.final_default() << ";\n"
-      "    }else{\n"
-      "    }\n";
-    //out << "      e_val(&(" << p.code_name() << "), " << p.final_default()
-    //    << ", par_scope);\n";
-#if 0
-  }else if (!(p.default_val().empty())) {
-    out << "    if (" << p.code_name() << " == NA) {\n"
-      "      " << p.code_name() << " = " << p.default_val() << ";\n"
-      "    }else{\n"
-      "    }\n";
-    //out << "      e_val(&(" << p.code_name() << "), " << p.default_val()
-    //    << ", par_scope);\n";
-#endif
-  }else{
-  }
-  if (!(p.quiet_min().empty())) {
-    out << "    //" << p.code_name() << " = std::max(" 
-	<< p.code_name() << ", " << p.quiet_min() << ");\n";
-  }else{
-  }
-  if (!(p.quiet_max().empty())) {
-    out << "    //" << p.code_name() << " = std::min(" 
-	<< p.code_name() << ", " << p.quiet_max() << ");\n";
-  }else{
-  }
-}
-/*--------------------------------------------------------------------------*/
-void make_final_adjust_value_list(std::ostream& out, const Parameter_2_List& pl)
-{
-  for (Parameter_2_List::const_iterator p = pl.begin(); p != pl.end(); ++p) {
-    make_final_adjust_value(out, **p);
-  }
-}
 /*--------------------------------------------------------------------------*/
 static void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2& p)
 {
@@ -125,60 +82,10 @@ void make_final_adjust_eval_parameter_list(std::ostream& out,
   }
 }
 /*--------------------------------------------------------------------------*/
-void make_final_adjust_parameter(std::ostream& out, const Parameter_1& p)
+void make_final_adjust_parameter_list(std::ostream&, const Parameter_1_List&)
 {
-  if (!(p.calculate().empty())) {
-    out << "    this->" << p.code_name() << " = " << p.calculate() << ";\n";
-  }else{
-    out << "    e_val(&(this->" << p.code_name() << "), ";
-    if (!(p.final_default().empty())) {
-      out << p.final_default();
-    }else if (!(p.default_val().empty())) {
-      out << " /*default*/ " << p.default_val();
-    }else{
-      out << "NA";
-    }
-    out << ", par_scope);\n";
-  }
-  if (!(p.quiet_min().empty())) {
-    out << "    //this->" << p.code_name() << " = std::max(" 
-	<< p.code_name() << ", " << p.quiet_min() << ");\n";
-  }else{
-  }
-  if (!(p.quiet_max().empty())) {
-    out << "    //this->" << p.code_name() << " = std::min(" 
-	<< p.code_name() << ", " << p.quiet_max() << ");\n";
-  }else{
-  }
+  unreachable();
 }
-/*--------------------------------------------------------------------------*/
-void make_final_adjust_parameter_list(std::ostream& out, const Parameter_1_List& pl)
-{
-  for (Parameter_1_List::const_iterator p = pl.begin(); p != pl.end(); ++p) {
-    make_final_adjust_parameter(out, **p);
-  }
-}
-/*--------------------------------------------------------------------------*/
-#if 0
-void make_final_adjust(std::ostream& out, const Parameter_Block& b)
-{
-  //out << "    // final adjust: eval\n";
-  //make_final_adjust_eval_parameter_list(out, b.raw());
-  out << "    // final adjust: code_pre\n";
-  out << b.code_pre();
-//  out << "    // final adjust: override\n";
-//  make_final_adjust_value_list(out, b.override());
-  out << "    // final adjust: raw\n";
-//  make_final_adjust_parameter_list(out, b.raw());
-//  out << "    // final adjust: mid\n";
-  out << b.code_mid();
-//  out << "    // final adjust: calculated\n";
-//  make_final_adjust_value_list(out, b.calculated());
-  out << "    // final adjust: post\n";
-  out << b.code_post();
-  out << "    // final adjust: done\n";
-}
-#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 static void make_construct_parameter(std::ostream& out, const Parameter_2& p)

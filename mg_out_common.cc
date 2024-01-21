@@ -20,6 +20,8 @@
  * 02110-1301, USA.
  */
 #include "mg_out.h"
+#include "mg_circuit.h"
+#include "mg_.h" // TODO
 #include <numeric>
 /*--------------------------------------------------------------------------*/
 static void make_common_default_constructor(std::ostream& out, const Module& d)
@@ -539,7 +541,7 @@ static void make_eval_subdevice_parameters(std::ostream& o , const Element_2& e)
 /*--------------------------------------------------------------------------*/
 static void make_eval_netlist_parameters(std::ostream& o , const Module& m)
 {
-  for(auto i : m.element_list()){
+  for(auto i : m.circuit()->element_list()){
     make_eval_subdevice_parameters(o, *i);
   }
 }

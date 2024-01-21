@@ -23,12 +23,20 @@
 #define MG_OUT_H
 /*--------------------------------------------------------------------------*/
 #include <fstream>
-#include "mg_.h"
+#include "mg_base.h"
+//#include "mg_.h"
 /*--------------------------------------------------------------------------*/
+extern std::string ind;
 #define o__ o << ind <<
 #define o____ o__ "  " <<
 #define o______ o____ "  " <<
 #define o________ o______ "  " <<
+/*--------------------------------------------------------------------------*/
+#ifdef PASS_TRACE_TAGS
+#define make_tag() (out << "//" << __func__ << ":" << __LINE__ << "\n")
+#else
+#define make_tag()
+#endif
 /*--------------------------------------------------------------------------*/
 struct indent{
   explicit indent(size_t i=2){
@@ -45,6 +53,7 @@ struct indent{
   std::string _old;
 };
 /*--------------------------------------------------------------------------*/
+class File;
 /* mg_out_root.cc */
 //void make_h_file(const File&);
 void make_cc_file(const File&);
@@ -52,6 +61,11 @@ void make_dump_file(const File&);
 void make_cc(std::ostream&, const File&);
 /*--------------------------------------------------------------------------*/
 /* mg_out_lib.cc */
+class Parameter_List_Collection;
+class Parameter_1;
+typedef LiSt<Parameter_1, '{', '#', '}'> Parameter_1_List;
+class Parameter_2;
+class Parameter_Block;
 void make_final_adjust_eval_parameter_list(std::ostream&, const Parameter_List_Collection&);
 void make_final_adjust_value(std::ostream&, const Parameter_2&);
 void make_final_adjust_value_list(std::ostream&, const Parameter_List_Collection&);
@@ -65,6 +79,7 @@ void make_print_calc_param_list(std::ostream&, const Parameter_1_List&);
 void make_copy_construct_parameter_list(std::ostream&, const Parameter_List_Collection&);
 /*--------------------------------------------------------------------------*/
 /* mg_out_h.cc */
+class Module;
 void make_cc_decl(std::ostream&, const Module&);
 /* mg_out_module.cc */
 void make_cc_module(std::ostream&, const Module&);

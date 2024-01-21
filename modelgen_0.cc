@@ -29,6 +29,7 @@
 #include <set>
 #include <fstream>
 #include "mg_.h"
+#include "mg_in.h" // File
 #include "mg_pp.h"
 #include "mg_out.h"
 #include "m_tokens.h"

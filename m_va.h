@@ -595,15 +595,6 @@ inline int fmod(PARAMETER<int> const& d, int e)
   return d % e;
 }
 /*--------------------------------------------------------------------------*/
-  template<class T>
-  T log10(T& d)
-{ untested();
-  incomplete();
-  // chain(d, std::cos(d));
-  set_value(d, std::log10(double(d)));
-  return d;
-}
-/*--------------------------------------------------------------------------*/
 template<class T, class S, class X=void>
 struct ddouble_if{
   typedef T type;

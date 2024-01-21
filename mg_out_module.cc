@@ -20,8 +20,10 @@
  */
 #include "mg_out.h"
 #include "mg_func.h"
+#include "mg_circuit.h"
 #include "m_tokens.h"
 #include <stack>
+#include "mg_.h" // TODO
 /*--------------------------------------------------------------------------*/
 static String_Arg const& potential_abstol(Branch const& b)
 {
@@ -96,7 +98,7 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
   o____ "return true;\n";
   o__ "}else ";
 
-  if( m.has_filters()) {
+  if( m.circuit()->has_filters()) {
     o__ "if(_sim->is_first_iteration()){\n";
     o____ "return true;\n";
     o__ "}else";
@@ -104,7 +106,7 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
   }
 
   // BUG this is incomplete.
-  for(auto br : m.branches()) {
+  for(auto br : m.circuit()->branches()) {
     assert(br);
     if(br->is_short()) {
     }else if(br->is_filter()) {
@@ -218,7 +220,7 @@ static void make_renew_sckt(std::ostream& o, Module const& m)
   o__ "auto pp = prechecked_cast<MOD_" << m.identifier() << " const*>(_parent);\n";
   o__ "assert(pp);\n";
   o__ "assert(subckt());\n";
-  for (auto const& e : m.element_list()) {
+  for (auto const& e : m.circuit()->element_list()) {
     assert(e);
     o__ "assert(!" << e->code_name() << ");\n";
     o__ "assert(pp->" << e->code_name() << ");\n";
@@ -318,14 +320,14 @@ void make_module_copy_constructor(std::ostream& o, const Module& m)
 static void make_build_netlist(std::ostream& o, const Module& m)
 {
   o__ "// build netlist\n";
-  o__ "// ports:" << m.ports().size() << "\n";
-  if(m.element_list().size()){
+  o__ "// ports:" << m.circuit()->ports().size() << "\n";
+  if(m.circuit()->element_list().size()){
     o__ "new_subckt();\n";
   }else{
   }
   for (Element_2_List::const_iterator
-      e = m.element_list().begin();
-      e != m.element_list().end();
+      e = m.circuit()->element_list().begin();
+      e != m.circuit()->element_list().end();
       ++e) {
     o__ "{\n";
     {
@@ -480,7 +482,7 @@ static void make_read_probes(std::ostream& o, const Module& m)
   // o__ "gnd.set_to_ground(this);\n";
   // o__ "(void) gnd;\n";
   o__ "node_t gnd(&ground_node);\n";
-  for(auto x : m.branches()){
+  for(auto x : m.circuit()->branches()){
     Branch const* b = x;
     assert(b);
     if(b->is_filter()){
@@ -530,7 +532,7 @@ static void make_module_clone(std::ostream& o, Module const& m)
   o__ "MOD_" << m.identifier() << "* new_instance = new MOD_" << m.identifier() << "(*this);\n";
   o__ "assert(!new_instance->subckt());\n";
 
-  if(m.element_list().size()){
+  if(m.circuit()->element_list().size()){
     o__ "if(_parent){\n";
     o__ "  new_instance->_parent = _parent;\n";
     o__ "  assert(new_instance->is_device());\n";
@@ -586,7 +588,7 @@ static void make_module_class(std::ostream& o, Module const& m)
   o____ "assert(i < max_nodes());\n";
   o____ "static std::string names[] = {";
   std::string comma = "";
-  for (auto nn : m.ports()){ // BUG: array?
+  for (auto nn : m.circuit()->ports()){ // BUG: array?
     o << comma << '"' << nn->name() << '"';
     comma = ", ";
   }
@@ -644,14 +646,14 @@ static void make_module_allocate_local_node(std::ostream& o, const Node& p)
 /*--------------------------------------------------------------------------*/
 static void make_module_allocate_local_nodes(std::ostream& o, Module const& m)
 {
-  for (int n=1; n<=int(m.nodes().size()); ++n) {
-    Node const* nn = m.nodes()[n];
+  for (int n=1; n<=int(m.circuit()->nodes().size()); ++n) {
+    Node const* nn = m.circuit()->nodes()[n];
     assert(nn);
     if(nn->number() == 0) {
       o__ "// ground\n";
       o__ "_n[n_" << nn->name() << "].set_to_ground(this);\n";
     }else if(nn->number() < n){
-    }else if(n <= int(m.ports().size())){
+    }else if(n <= int(m.circuit()->ports().size())){
       o__ "// port " << nn->name() << " " << nn->number() << "\n";
     }else if(nn->is_used()){
       o__ "// internal " << nn->name() << " : " << nn->number() << "\n";
@@ -662,8 +664,8 @@ static void make_module_allocate_local_nodes(std::ostream& o, Module const& m)
     }
   }
 
-  for (int n=1; n<=int(m.nodes().size()); ++n) {
-    Node const* nn = m.nodes()[n];
+  for (int n=1; n<=int(m.circuit()->nodes().size()); ++n) {
+    Node const* nn = m.circuit()->nodes()[n];
     assert(nn);
     if(nn->number() == 0) {
     }else if(nn->number() < n){
@@ -769,7 +771,7 @@ static void make_module_precalc_first(std::ostream& o, Module const& m)
   o__ "auto cc = c->clone();\n";
 
   o__ "if(subckt()){\n";
-  if(m.element_list().size()){
+  if(m.circuit()->element_list().size()){
     o__ "subckt()->attach_params(&(c->_netlist_params), scope());\n";
   }else{
   }
@@ -797,7 +799,7 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   o__ "assert(c);\n";
   o__ "(void)c;\n";
 
-  if(m.element_list().size()){
+  if(m.circuit()->element_list().size()){
     o__ "assert(subckt());\n";
     o__ "subckt()->attach_params(&(c->_netlist_params), scope());\n";
   }else{
@@ -847,7 +849,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
   o__ "node_t gnd;\n";
   o__ "gnd.set_to_ground(this);\n";
   make_module_allocate_local_nodes(o, m);
-  if(m.element_list().size()){
+  if(m.circuit()->element_list().size()){
     o__ "assert(_parent);\n";
     o__ "assert(_parent->subckt());\n";
     o__ "assert(_parent->subckt()->nodes());\n";
@@ -862,7 +864,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
   }
   o__ "if (_sim->is_first_expand()) {\n";
 
-    if(m.element_list().size()){
+    if(m.circuit()->element_list().size()){
       make_renew_sckt(o, m);
     }else{
     }
@@ -876,7 +878,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
 //  }
   o << "\n";
   o__ "// clone branches\n";
-  for(auto i: m.branches()){
+  for(auto i: m.circuit()->branches()){
     if(i->has_element()) {
       o__ "// branch " << i->name() << "\n";
       indent x;
@@ -896,7 +898,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
   o << "\n";
   o__ "// clone filters\n";
 #if 1
-  for (auto i: m.filters()){
+  for (auto i: m.circuit()->filters()){
     if(i->has_branch()){ untested();
       unreachable();
     }else{
@@ -987,7 +989,7 @@ void make_cc_module(std::ostream& o, const Module& m)
   make_cc_func(o, m);
 //  make_module_probe(o, m);
 //  make_module_aux(o, m);
-  if(m.element_list().size()){
+  if(m.circuit()->element_list().size()){
     o << "CARD_LIST* MOD_" << m.identifier() << "::scope()\n{\n";
     o__ "if(_parent){\n";
     o__ "  return COMPONENT::scope();\n";

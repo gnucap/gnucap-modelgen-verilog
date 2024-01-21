@@ -604,15 +604,6 @@ inline int fmod(PARAMETER<int> const& d, int e)
   return d % e;
 }
 /*--------------------------------------------------------------------------*/
-  template<class T>
-  T log10(T& d)
-{ untested();
-  incomplete();
-  // chain(d, std::cos(d));
-  set_value(d, std::log10(double(d)));
-  return d;
-}
-/*--------------------------------------------------------------------------*/
 template<class T, class S, class X=void>
 struct ddouble_if{
   typedef T type;
@@ -2111,15 +2102,6 @@ inline int fmod(PARAMETER<int> const& d, int e)
   return d % e;
 }
 /*--------------------------------------------------------------------------*/
-  template<class T>
-  T log10(T& d)
-{ untested();
-  incomplete();
-  // chain(d, std::cos(d));
-  set_value(d, std::log10(double(d)));
-  return d;
-}
-/*--------------------------------------------------------------------------*/
 template<class T, class S, class X=void>
 struct ddouble_if{
   typedef T type;
@@ -2445,6 +2427,9 @@ public: // input parameters
   real _p___c /*  */;
   real _p___ic /*  */;
 private: // funcs
+  bool param_given(PARA_BASE const& p)const {
+    return p.has_hard_value();
+  }
   double _f_analysis(std::string const& what)const {
     if(what=="ic"){
       return _sim->analysis_is_tran_static();
@@ -2458,9 +2443,6 @@ private: // funcs
       incomplete();
       return false;
     }
-  }
-  bool param_given(PARA_BASE const& p)const {
-    return p.has_hard_value();
   }
 // Probe no refs: potential_ddt_1_p_
 // Probe no refs: potential_p_n
@@ -2502,13 +2484,11 @@ public: // netlist
   ELEMENT* _b_ddt_1_p_ddt_1_n{NULL}; // filter
   ELEMENT* _b_p_n{NULL}; // branch
 private: // func decl
-//func analysis
-  // analysis
+//other: $param_given
+//other: analysis
 //filt ddt_1
   ddouble _b_ddt_1(ddouble t0);
   bool _short_b_ddt_1()const {return 1;}
-//func param_given
-  // param_given
 //probe potential_ddt_1_p_
   ddouble xs_potential_b_ddt_1_p_ddt_1_n() const { // potential_ddt_1_p_
     ddouble t;
@@ -3176,6 +3156,9 @@ public: // input parameters
   PARAMETER<real> _p_ic /*  */;
   real _p___c /*  */, _p___ic /*  */;
 private: // funcs
+  bool param_given(PARA_BASE const& p)const {
+    return p.has_hard_value();
+  }
   double _f_analysis(std::string const& what)const {
     if(what=="ic"){
       return _sim->analysis_is_tran_static();
@@ -3189,9 +3172,6 @@ private: // funcs
       incomplete();
       return false;
     }
-  }
-  bool param_given(PARA_BASE const& p)const {
-    return p.has_hard_value();
   }
 // Probe no refs: potential_ddt_2_p_
 // Probe no refs: potential_p_n
@@ -3233,13 +3213,11 @@ public: // netlist
   ELEMENT* _b_ddt_2_p_ddt_2_n{NULL}; // filter
   ELEMENT* _b_p_n{NULL}; // branch
 private: // func decl
-//func analysis
-  // analysis
+//other: $param_given
+//other: analysis
 //filt ddt_2
   ddouble _b_ddt_2(ddouble t0);
   bool _short_b_ddt_2()const {return 0;}
-//func param_given
-  // param_given
 //probe potential_ddt_2_p_
   ddouble xs_potential_b_ddt_2_p_ddt_2_n() const { // potential_ddt_2_p_
     ddouble t;

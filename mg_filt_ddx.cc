@@ -55,6 +55,15 @@ private:
     return *dd->begin();
   }
 
+  Expression_ const* args() const{
+    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){
+      return a;
+    }else{
+      assert(!Token_CALL::args());
+      return NULL;
+    }
+  }
+
 };
 /*--------------------------------------------------------------------------*/
 class DDX : public MGVAMS_FILTER {
@@ -105,7 +114,7 @@ public:
     o__ "double ret = 0.;\n";
     o__ "(void) t1;\n";
     assert(_m);
-    for(auto x : _m->branches()){
+    for(auto x : _m->circuit()->branches()){
       if(x->has_pot_probe()){
 	o__ "// found probe " <<  x->code_name() << "\n";
 	if(p->is_ground()){ untested();
@@ -152,6 +161,16 @@ public:
 } ddx;
 DISPATCHER<FUNCTION>::INSTALL d_ddx(&function_dispatcher, "ddx", &ddx);
 /*--------------------------------------------------------------------------*/
+static Expression_* clone_args(Base const* e)
+{
+  if(auto e_ = dynamic_cast<Expression_ const*>(e)) {
+    return e_->clone();
+  }else{ untested();
+    unreachable();
+    return NULL;
+  }
+}
+/*--------------------------------------------------------------------------*/
 void Token_DDX::stack_op(Expression* e)const
 {
   assert(e);
@@ -173,7 +192,7 @@ void Token_DDX::stack_op(Expression* e)const
   assert(dd->size());
 
   auto d = new Deps; // incomplete. second order derivatives?
-  auto N = new Token_DDX(*this, d, cc->args()?cc->args()->clone():NULL);
+  auto N = new Token_DDX(*this, d, clone_args(cc->args()));
   assert(N->args());
 
   ff->set_ddxprobe(N->ddxprobe());

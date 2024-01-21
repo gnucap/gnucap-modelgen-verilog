@@ -477,7 +477,7 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
 
       if(!s.has_deps()){
 	o__ s.code_name() << " = 0.; // static?\n";
-      }else if(pp->is_short()){ untested();
+      }else if(pp->is_short()){
 	o__ s.code_name() << " = 0.; // short probe\n";
       }else{
 	o__ s.code_name() << " = p->xs" << pp->code_name_() << "();\n";

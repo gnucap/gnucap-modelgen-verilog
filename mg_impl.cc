@@ -18,12 +18,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "mg_.h"
+#include "mg_.h" //BUG
+#include "mg_in.h"
 #include "mg_func.h" // TODO
+#include "mg_discipline.h"
 #include "m_tokens.h" // Deps
 #include "mg_options.h" // Deps
 /*--------------------------------------------------------------------------*/
-Node Node_Map::mg_ground_node(0);
 Dep mg_const_dep(NULL);
 /*--------------------------------------------------------------------------*/
 bool ConstantMinTypMaxExpression::empty() const
@@ -33,7 +34,8 @@ bool ConstantMinTypMaxExpression::empty() const
 /*--------------------------------------------------------------------------*/
 bool Module::has_submodule() const
 {
-  return !element_list().is_empty();
+  assert(circuit());
+  return !circuit()->element_list().is_empty();
 }
 /*--------------------------------------------------------------------------*/
 #if 1
@@ -136,7 +138,8 @@ Branch_Ref Branch_Map::new_branch(Node_Ref a, Node_Ref b)
 /*--------------------------------------------------------------------------*/
 Branch_Ref Module::new_branch(Node* p, Node* n = NULL)
 {
-  Branch_Ref br = _branches.new_branch(p, n);
+  assert(_circuit);
+  Branch_Ref br = _circuit->branches().new_branch(p, n);
   assert(br);
   assert(((Branch const*) br)->owner() == this);
   return br;
@@ -144,7 +147,8 @@ Branch_Ref Module::new_branch(Node* p, Node* n = NULL)
 /*--------------------------------------------------------------------------*/
 size_t Module::num_branches() const
 {
-  return branches().size();
+  assert(_circuit);
+  return _circuit->branches().size();
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
@@ -157,7 +161,8 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
   }else{
   }
 
-  Branch_Ref a(branches().lookup(p) /*, polarity?*/);
+  assert(_circuit);
+  Branch_Ref a(_circuit->branches().lookup(p) /*, polarity?*/);
 
   if(a){
     if(n!=""){ untested();
@@ -213,13 +218,15 @@ Node_Ref Node_Map::operator[](std::string const& key) const
 /*--------------------------------------------------------------------------*/
 Node* Module::new_node(std::string const& p)
 {
-  return _nodes.new_node(p);
+  assert(_circuit);
+  return _circuit->nodes().new_node(p);
 }
 /*--------------------------------------------------------------------------*/
 Node_Ref Module::node(std::string const& p) const
 {
   try{
-    return _nodes[p];
+    assert(_circuit);
+    return _circuit->nodes()[p];
   }catch(Exception const&){
     return NULL;
   }
@@ -227,7 +234,8 @@ Node_Ref Module::node(std::string const& p) const
 /*--------------------------------------------------------------------------*/
 Branch_Ref Module::lookup_branch(std::string const& p) const
 {
-  return _branches.lookup(p);
+  assert(_circuit);
+  return _circuit->branches().lookup(p);
 }
 /*--------------------------------------------------------------------------*/
 #if 0
@@ -387,7 +395,7 @@ std::string Branch::dev_type()const
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref::Branch_Ref(Branch_Ref const& b)
-    : Owned_Base(b),
+    : Base(),
       _br(b._br),
       _r(b._r)
 {
@@ -398,7 +406,7 @@ Branch_Ref::Branch_Ref(Branch_Ref const& b)
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref::Branch_Ref(Branch_Ref&& b)
-    : Owned_Base(b),
+    : Base(),
       _br(b._br),
       _r(b._r)
 {
@@ -458,7 +466,7 @@ Branch_Ref& Branch_Ref::operator=(Branch_Ref&& o)
 
   if(_br) {
 //    assert(_br->has(this));
-  }else{ untested();
+  }else{
   }
   return *this;
 }
@@ -476,7 +484,7 @@ Branch_Ref& Branch_Ref::operator=(Branch_Ref const& o)
 
   if(_br) {
     _br->attach(this);
-  }else{ untested();
+  }else{
   }
 
   return *this;
@@ -579,12 +587,6 @@ Nature const* Branch::nature() const
   return NULL;
 }
 /*--------------------------------------------------------------------------*/
-Block::~Block()
-{
-  delete _attributes;
-  _attributes = NULL;
-}
-/*--------------------------------------------------------------------------*/
 void Node::set_to(Node* p)
 {
   if(number()==p->number()) {
@@ -616,15 +618,17 @@ void Node_Map::set_short(Node const* p, Node const* n)
   }
 }
 /*--------------------------------------------------------------------------*/
+// void Circuit::setup_nodes()?
 void Module::setup_nodes()
 {
-  for(auto& br : branches()){
+  assert(_circuit);
+  for(auto& br : _circuit->branches()){
     if(br->is_short()) { untested();
     }else if(br->req_short()) {
-      trace4("short", br->name(), br->p()->number(), br->n()->number(), net_nodes());
-      if(br->p()->number() > int(net_nodes())
-       ||br->n()->number() > int(net_nodes())) {
-	_nodes.set_short(br->p(), br->n());
+      trace4("short", br->name(), br->p()->number(), br->n()->number(), _circuit->net_nodes());
+      if(br->p()->number() > int(_circuit->net_nodes())
+       ||br->n()->number() > int(_circuit->net_nodes())) {
+	_circuit->nodes().set_short(br->p(), br->n());
       }else{
       }
     }else{
@@ -634,7 +638,18 @@ void Module::setup_nodes()
 /*--------------------------------------------------------------------------*/
 Token* Module::new_token(FUNCTION_ const* f, size_t num_args)
 {
-  return f->new_token(*this, num_args);
+  assert(f);
+//  if(dynamic_cast<MGVAMS_FUNCTION const*>(f)){
+    if(f->static_code()){
+      // return f->new_token(*this, num_args);
+      install(f);
+      return new Token_CALL(f->label(), f);
+    }else{
+      return f->new_token(*this, num_args);
+    }
+//   }else{
+//     return f->new_token(*this, num_args);
+//   }
 }
 /*--------------------------------------------------------------------------*/
 bool Variable::is_module_variable() const
@@ -826,18 +841,6 @@ Deps::const_iterator Deps::end() const
   return _s.end();
 }
 /*--------------------------------------------------------------------------*/
-Variable_Decl::~Variable_Decl()
-{
-  delete _deps;
-  _deps = NULL;
-}
-/*--------------------------------------------------------------------------*/
-void Variable_Decl::new_deps()
-{
-  assert(!_deps);
-  _deps = new Deps;
-}
-/*--------------------------------------------------------------------------*/
 void BlockVarIdentifier::update()
 {
   clear_deps();
@@ -957,9 +960,10 @@ void Node::set_to_ground(Module*)
 void Module::set_to_ground(Node const* n)
 {
   trace1("stc", n->number());
+  assert(_circuit);
   if(n->number()){
-    assert(*(nodes().begin() + n->number()) == n);
-    (*(nodes().begin() + n->number()))->set_to_ground(this);
+    assert(*(_circuit->nodes().begin() + n->number()) == n);
+    (*(_circuit->nodes().begin() + n->number()))->set_to_ground(this);
   }else{
     // already ground
   }
@@ -990,6 +994,88 @@ Node_Ref Branch::n() const
   }else{
   }
   assert(_n); return _n;
+}
+/*--------------------------------------------------------------------------*/
+bool Assignment::has_sensitivities()const
+{
+  return deps().has_sensitivities();
+}
+/*--------------------------------------------------------------------------*/
+void Variable::new_var_ref()
+{
+  assert(owner());
+  owner()->new_var_ref(this);
+}
+/*--------------------------------------------------------------------------*/
+bool Parameter_2_List::is_local()const
+{
+  // really? ask *begin?
+  return _is_local;
+}
+/*--------------------------------------------------------------------------*/
+double /*?*/ Parameter_2::eval() const
+{
+  if(is_local()) {
+    return _default_val.value();
+  }else if (value_range_list().size() == 1) {
+    return (*value_range_list().begin())->eval();
+  }else{
+    return NOT_INPUT;
+  }
+}
+/*--------------------------------------------------------------------------*/
+double ValueRange::eval() const
+{
+  if(spec()){
+    return spec()->eval();
+  }else{ untested();
+    return NOT_INPUT;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Module::parse_ports(CS& f)
+{
+  assert(_circuit);
+  _circuit->parse_ports(f);
+}
+/*--------------------------------------------------------------------------*/
+void Module::new_circuit()
+{
+  assert(!_circuit);
+  _circuit = new Circuit();
+}
+/*--------------------------------------------------------------------------*/
+void Module::new_filter()
+{
+  assert(_circuit);
+  _circuit->new_filter();
+}
+/*--------------------------------------------------------------------------*/
+Circuit::~Circuit()
+{
+  _filters.clear();
+  _branch_decl.clear();
+  _branches.clear();
+}
+/*--------------------------------------------------------------------------*/
+// Branch_Map& Module::branches()const
+// {
+//   assert(_circuit);
+//   return _circuit->branches();
+// }
+/*--------------------------------------------------------------------------*/
+void Branch_Map::clear() {
+  while(!_names.is_empty()){
+    delete _names.back();
+    _names.pop_back();
+  }
+  for(auto& x : _m){
+    delete x.second;
+//      x = NULL;
+  }
+  _m.clear();
+  _brs.clear();
+  // _names.clear();
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

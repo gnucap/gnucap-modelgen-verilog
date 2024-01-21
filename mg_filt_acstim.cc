@@ -70,6 +70,14 @@ private:
 
   void stack_op(Expression* e)const override;
   Branch* branch() const;
+  Expression_ const* args() const{
+    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){
+      return a;
+    }else{
+      assert(!Token_CALL::args());
+      return NULL;
+    }
+  }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -91,6 +99,7 @@ public: // HACK
   ~ACSTIM(){
 //    delete _prb;
   }
+  bool static_code()const override {return false;}
 protected:
   ACSTIM* clone()const {
     return new ACSTIM(*this);
@@ -236,6 +245,16 @@ Branch* Token_ACSTIM::branch() const
   return func->_br;
 }
 /*--------------------------------------------------------------------------*/
+static Expression_* clone_args(Base const* e)
+{
+  if(auto e_ = dynamic_cast<Expression_ const*>(e)) {
+    return e_->clone();
+  }else{ untested();
+    unreachable();
+    return NULL;
+  }
+}
+/*--------------------------------------------------------------------------*/
 void Token_ACSTIM::stack_op(Expression* e)const
 {
   assert(e);
@@ -267,7 +286,7 @@ void Token_ACSTIM::stack_op(Expression* e)const
     auto d = new Deps;
     trace1("acstim output dep", func->prb()->code_name());
     d->insert(Dep(func->prb(), Dep::_LINEAR)); // BUG?
-    auto N = new Token_ACSTIM(*this, d, cc->args()?cc->args()->clone():NULL);
+    auto N = new Token_ACSTIM(*this, d, clone_args(cc->args()));
     assert(N->data());
     assert(dynamic_cast<Deps const*>(N->data()));
     e->push_back(N);

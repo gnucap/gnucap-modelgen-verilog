@@ -23,14 +23,29 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"
-#include "mg_out.h"
-// #include "mg_func.cc"
-// #include "mg_out.cc"
+#include "mg_out.cc"
+#include "mg_token.h"
+#include "mg_module.h"
 #include <globals.h>
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/
-namespace{
+// void Token_CALL::stack_op(Expression* e)const{
+//   assert(0);
+// }
+// /*--------------------------------------------------------------------------*/
+// inline Token* MGVAMS_FUNCTION::new_token(Module& m, size_t na) const
+// {
+//      incomplete();
+//      return NULL;
+// }
+//MGVAMS_FUNCTION::~MGVAMS_FUNCTION()
+//{ unreachable();
+//}
 /*--------------------------------------------------------------------------*/
+namespace{
+#if 1
+/*--------------------------------------------------------------------------*/
+
 class STUB : public MGVAMS_FUNCTION {
 public:
   explicit STUB(std::string const l) : MGVAMS_FUNCTION() {
@@ -62,6 +77,8 @@ DISPATCHER<FUNCTION>::INSTALL d_min(&function_dispatcher, "min|$min", &min);
 STUB max("max");
 DISPATCHER<FUNCTION>::INSTALL d_max(&function_dispatcher, "max|$max", &max);
 /*--------------------------------------------------------------------------*/
+#endif
+#if 1
 // TODO: implement small signal noise
 STUB white_noise("white_noise");
 DISPATCHER<FUNCTION>::INSTALL d_white_noise(&function_dispatcher, "white_noise", &white_noise);
@@ -248,10 +265,8 @@ public:
     set_label("exp");
   }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {
-    unreachable();
     PARAMETER<double> x;
     Cmd >> x;
-    trace1("exp", x);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::exp(x));
   }
@@ -350,10 +365,26 @@ public:
     return to_string(std::log10(x));
   }
   std::string code_name()const override{
-    return "va::log10";
+    return "_f_log10";
   }
-  void make_cc_common(std::ostream& o)const override {
-    o << "// dummy " << label() << "\n";
+  void make_cc_common(std::ostream& o)const override{
+    o__ "template<class T>\n";
+    o__ "T " << code_name() << "(T d)const {itested();\n";
+    o____ "double l=-1e99;\n";
+    o____ "if(d>1e-60){itested();\n";
+    o______ "l = std::log10(double(d));\n";
+    o______ "chain(d, 1./double(d));incomplete();\n"; // scale.
+    o____ "}else if(d>0){ untested();\n";
+    o______ "l=-1e60;\n";
+    o______ "chain(d, 1e60);\n";
+    o____ "}else{\n";
+    o______ "unreachable();\n";
+    o______ "l=-1e40;\n";
+    o______ "chain(d, 1e40);\n";
+    o____ "}\n";
+    o____ "::set_value(d, l);\n";
+    o____ "return d;\n";
+    o____ "}\n";
   }
 } p_log;
 DISPATCHER<FUNCTION>::INSTALL d_log(&function_dispatcher, "log|$log10", &p_log);
@@ -363,7 +394,7 @@ public:
   explicit ln() : MGVAMS_FUNCTION(){
     set_label("ln");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {
     PARAMETER<double> x;
     Cmd >> x;
     x.e_val(NOT_INPUT, Scope);
@@ -395,7 +426,7 @@ public:
     return "_f_ln";
   }
 } p_ln;
-DISPATCHER<FUNCTION>::INSTALL d_ln(&function_dispatcher, "ln|$log", &p_ln);
+DISPATCHER<FUNCTION>::INSTALL d_ln(&function_dispatcher, "ln|$ln|$log", &p_ln);
 /*--------------------------------------------------------------------------*/
 class pow: public MGVAMS_FUNCTION {
 public:
@@ -576,6 +607,7 @@ public:
 } p_tanh;
 DISPATCHER<FUNCTION>::INSTALL d_tanh(&function_dispatcher, "tanh|$tanh", &p_tanh);
 /*--------------------------------------------------------------------------*/
+#endif
 } // namespace
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

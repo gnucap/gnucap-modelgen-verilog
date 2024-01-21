@@ -23,16 +23,18 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"
+#include "mg_filter.h" // BUG?
 #include "mg_out.h"
 #include "m_tokens.h"
 #include <globals.h>
 #include <u_parameter.h>
+#include "mg_.h" // BUG
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
 static int n_filters;
 /*--------------------------------------------------------------------------*/
-class SLEW : public MGVAMS_FILTER{
+class SLEW : public MGVAMS_FILTER {
   Module* _m{NULL};
   Filter const* _f{NULL};
 public:

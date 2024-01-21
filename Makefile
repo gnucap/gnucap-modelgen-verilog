@@ -5,7 +5,7 @@ include Make1
 GNUCAP_CONF = gnucap-conf
 INSTALL = install
 MKDIR_P = mkdir -p
-SUBDIRS = mgsim vams
+SUBDIRS = mgvams mgsim vams
 
 CXX = $(shell $(GNUCAP_CONF) --cxx)
 GNUCAP_CPPFLAGS = $(shell $(GNUCAP_CONF) --cppflags) -DPIC

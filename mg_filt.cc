@@ -71,6 +71,14 @@ private:
 
   void stack_op(Expression* e)const override;
   Branch* branch() const;
+  Expression_ const* args() const{
+    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){
+      return a;
+    }else{
+      assert(!Token_CALL::args());
+      return NULL;
+    }
+  }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -135,6 +143,7 @@ public:
 
       cl->_prb = m.new_probe("potential", prb);
       br->set_filter(cl);
+      assert(m.circuit());
       m.new_filter();
     }
 
@@ -295,6 +304,16 @@ Branch* Token_XDT::branch() const
   return func->_br;
 }
 /*--------------------------------------------------------------------------*/
+static Expression_* clone_args(Base const* e)
+{
+  if(auto e_ = dynamic_cast<Expression_ const*>(e)) {
+    return e_->clone();
+  }else{ untested();
+    unreachable();
+    return NULL;
+  }
+}
+/*--------------------------------------------------------------------------*/
 void Token_XDT::stack_op(Expression* e)const
 {
   assert(e);
@@ -326,7 +345,7 @@ void Token_XDT::stack_op(Expression* e)const
     auto d = new Deps;
     trace1("xdt output dep", func->prb()->code_name());
     d->insert(Dep(func->prb(), Dep::_LINEAR)); // BUG?
-    auto N = new Token_XDT(*this, d, cc->args()?cc->args()->clone():NULL);
+    auto N = new Token_XDT(*this, d, clone_args(cc->args()));
     assert(N->data());
     assert(dynamic_cast<Deps const*>(N->data()));
     e->push_back(N);

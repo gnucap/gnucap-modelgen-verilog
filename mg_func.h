@@ -23,6 +23,7 @@
  */
 
 #include <u_function.h>
+#include "mg_token.h" // BUG?
 //#include <m_expression.h>
 /*--------------------------------------------------------------------------*/
 #ifndef MG_FUNCTION_H
@@ -62,14 +63,18 @@ public:
   virtual void make_cc_tr_advance(std::ostream&)const {}
   virtual void make_cc_tr_review(std::ostream&)const {}
 
-  virtual Token* new_token(Module& m, size_t na)const = 0;
+  virtual Token* new_token(Module&, size_t)const {unreachable(); return NULL;}
+  virtual bool static_code()const {return false;}
   virtual bool returns_void()const { return false; }
   virtual std::string code_name()const { itested();
 	  // incomplete();
 	  return "";
   }
   void stack_op(Expression const& args, Expression* out) const;
-  virtual double evalf(double const*)const;
+  virtual double evalf(double const*)const {
+    throw Exception("not implemented");
+  }
+/*--------------------------------------------------------------------------*/
 public: // use refcounter in e_base
   void	      inc_refs()const	{inc_probes();}
   void	      dec_refs()const	{dec_probes();}
@@ -87,8 +92,9 @@ public:
 	  unreachable();
 	  return NULL;
   }
-  virtual void make_cc_dev(std::ostream& o)const override;
-  Token* new_token(Module& m, size_t na) const override;
+  virtual void make_cc_dev(std::ostream&)const override {}
+//  Token* new_token(Module& m, size_t na) const override;
+  bool static_code()const override {return true;}
 };
 /*--------------------------------------------------------------------------*/
 class Node_Ref;
@@ -137,6 +143,21 @@ private:
   Token* new_token(Module& m, size_t na)const override;
   void make_cc_common(std::ostream&)const override { unreachable(); }
 };
+/*--------------------------------------------------------------------------*/
+// inline void MGVAMS_FUNCTION::make_cc_dev(std::ostream& o) const
+// {
+// //   o__ "// " << label() << "\n";
+// }
+/*--------------------------------------------------------------------------*/
+inline FUNCTION_::~FUNCTION_()
+{
+  if(has_refs()){
+    incomplete();
+    std::cerr << "stale ref " << label() << "\n";
+  }else{
+  }
+//  assert(!has_refs()); // base class
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

@@ -33,7 +33,8 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
   // for (auto nn : m.probes()){ untested();
   //   o << comma << "d_" << nn.second->name();
   // }
-  for(auto x : m.branches()){
+  assert(m.circuit());
+  for(auto x : m.circuit()->branches()){
     assert(x);
     Branch const* b = x;
     if(b->is_short()){
@@ -52,7 +53,7 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
       }
     }
   }
-  for(auto x : m.branches()){
+  for(auto x : m.circuit()->branches()){
     assert(x);
     Branch const* b = x;
     if(b->is_short()){
@@ -77,7 +78,7 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
 static void declare_ddouble(std::ostream& o, Module const& m)
 {
   size_t np = 0;
-  for(auto x : m.branches()){
+  for(auto x : m.circuit()->branches()){
     assert(x);
     Branch const* b = x;
     if(b->has_flow_probe()){
@@ -106,7 +107,7 @@ static void make_func_dev(std::ostream& o, pSet<FUNCTION_ const> const& P)
       o<<"//probe " << (*q)->label() << "\n";
     }else if(dynamic_cast<MGVAMS_FILTER const*>(*q)) {
       o<<"//filt " << (*q)->label() << "\n";
-    }else{ untested();
+    }else{
       o<<"//other: " << (*q)->label() << "\n";
     }
     (*q)->make_cc_dev(o);
@@ -224,6 +225,7 @@ static void make_variable_decl(std::ostream& o, const Variable_List_Collection& 
 /*--------------------------------------------------------------------------*/
 static void make_common(std::ostream& o, const Module& m)
 {
+  assert(m.circuit());
   std::string class_name = "COMMON_" + m.identifier().to_string();
   std::string base_class_name;
   base_class_name = "COMMON_COMPONENT";
@@ -235,7 +237,7 @@ static void make_common(std::ostream& o, const Module& m)
   o << "class MOD_" << m.identifier() << ";\n";
   o << "class " << class_name << " :public " << base_class_name << "{\n";
   o__ "typedef MOD_" << m.identifier() << " MOD;\n";
-  if(m.element_list().size()){
+  if(m.circuit()->element_list().size()){
   o << "public:\n";
     o__ "PARAM_LIST _netlist_params;\n";
   }else{
@@ -363,10 +365,10 @@ static void make_node_decl(std::ostream& o, const Module& m)
   std::string comma = "";
   o__ "enum {\n";
   int n = 1;
-  for (; n <= int(m.nodes().size()); ++n) {
-    Node const* nn = m.nodes()[n];
+  for (; n <= int(m.circuit()->nodes().size()); ++n) {
+    Node const* nn = m.circuit()->nodes()[n];
     // TODO: node aliases, shorts etc.
-    if(nn->number() == int(1+m.ports().size())){
+    if(nn->number() == int(1+m.circuit()->ports().size())){
       o << "\n    /* ---- */";
     }else{
     }
@@ -379,7 +381,7 @@ static void make_node_decl(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 static void make_branch_states(std::ostream& o, const Module& m)
 {
-  for(auto x : m.branches()){
+  for(auto x : m.circuit()->branches()){
     assert(x);
     if(x->has_element()){
       make_module_one_branch_state(o, *x);
@@ -435,14 +437,14 @@ static void make_module(std::ostream& o, const Module& m)
   o << "public:\n";
   declare_ddouble(o, m);
   o << "private: // data\n";
-  size_t total_nodes = m.nodes().size();
+  size_t total_nodes = m.circuit()->nodes().size();
   o__ "node_t _nodes[" << total_nodes << "];\n";
   o << "public: // netlist\n";
-  if(m.element_list().size()){
-    make_cc_elements(o, m.element_list());
+  if(m.circuit()->element_list().size()){
+    make_cc_elements(o, m.circuit()->element_list());
   }else{
   }
-  for (auto br : m.branches()){
+  for (auto br : m.circuit()->branches()){
     if(br->has_element()){
       o__ "ELEMENT* " << br->code_name() << "{NULL}; // branch\n";
     }else if(br->is_short()){
@@ -473,7 +475,7 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "explicit MOD_" << m.identifier() << "(); // : "<< base_name <<"() { _n = _nodes; }\n";
   o__ "CARD* clone()const override;\n";
   o << "private: // overrides\n";
-  if(m.element_list().size()){
+  if(m.circuit()->element_list().size()){
     o__ "bool is_device() const override{return _parent;}\n";
     o__ "CARD_LIST* scope() override;\n";
     o__ "const CARD_LIST* scope()const override " <<
@@ -525,10 +527,10 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "  //void    ac_load();           //BASE_SUBCKT\n";
   o__ "  //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing\n";
 //  o << ind << "std::string dev_type()const override {return \"demo\";}\n";
-  o__ "int max_nodes()const override {return "<< m.ports().size() <<";}\n";
-  o__ "int min_nodes()const override {return "<< m.ports().size() <<";}\n";
+  o__ "int max_nodes()const override {return "<< m.circuit()->ports().size() <<";}\n";
+  o__ "int min_nodes()const override {return "<< m.circuit()->ports().size() <<";}\n";
   o__ "int int_nodes()const override    {return "
-      << m.nodes().size() - m.ports().size() << ";}\n";
+      << m.circuit()->nodes().size() - m.circuit()->ports().size() << ";}\n";
   o__ "std::string value_name()const override {itested(); return \"\";}\n";
   o__ "bool print_type_in_spice()const override {itested(); return false;}\n";
   o__ "std::string port_name(int i)const override;\n";
@@ -542,7 +544,7 @@ static void make_module(std::ostream& o, const Module& m)
   o << "private: // node list\n";
   make_node_decl(o, m);
   o << "private: // probe values\n";
-  for(auto x : m.branches()){
+  for(auto x : m.circuit()->branches()){
     assert(x);
     Branch const* b = x;
     if(b->has_flow_probe()){

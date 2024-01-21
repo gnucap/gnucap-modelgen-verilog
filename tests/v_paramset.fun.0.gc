@@ -6,8 +6,8 @@ parameter voltage
 endparamset
 
 module main(1,2);
-parameter v
-vs #(.voltage({log(exp(v))})) v1(2 1)
+  parameter v
+  vs #(.voltage({ln(exp(v))})) v1(2 1)
 endmodule
 
 main #(.v(1)) m1(0 1)

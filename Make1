@@ -32,14 +32,15 @@ DELETED =
 #------------------------------------------------------------------------
 #------------------------------------------------------------------------
 RAW_SRCS = \
+mg_code.cc \
 mg_deps.cc \
 mg_error.cc \
+mg_file.cc \
 mg_filt_acstim.cc \
 mg_filt.cc \
 mg_filt_ddx.cc \
 mg_filt_slew.cc \
 mg_func.cc \
-mg_func_math.cc \
 mg_func_sys.cc \
 mg_impl.cc \
 mg_in_analog.cc \
@@ -49,7 +50,10 @@ mg_in_expr.cc \
 mg_in_module.cc \
 mg_in_paramset.cc \
 mg_in_verilog.cc \
+mg_in_circuit.cc \
+mg_block.cc \
 mg_main.cc \
+mg_nodes.cc \
 mg_options.cc \
 mg_out.cc \
 mg_out_dump.cc \

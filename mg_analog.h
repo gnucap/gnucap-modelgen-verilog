@@ -23,6 +23,7 @@
 #define GNUCAP_MG_ANALOG_H
 /*--------------------------------------------------------------------------*/
 #include "mg_.h"
+#include "mg_code.h"
 /*--------------------------------------------------------------------------*/
 // class access_function?
 class Probe : public FUNCTION_ {
@@ -74,6 +75,72 @@ private:
   void make_cc_dev(std::ostream&)const override;
   void make_cc_common(std::ostream&)const override;
 }; // Probe
+/*--------------------------------------------------------------------------*/
+class Analog_Function_Arg : public Variable_Decl {
+public:
+  explicit Analog_Function_Arg() : Variable_Decl() {}
+  String_Arg const& identifier()const { return _name; }
+  String_Arg const& key()const { return _name; }
+  std::string name()const { return _name.to_string(); }
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+  std::string code_name()const override;
+
+  Data_Type const& type()const override{
+    static Data_Type_Real r;
+    return r; // for now.
+  }
+};
+typedef Collection<Analog_Function_Arg> Analog_Function_Args;
+/*--------------------------------------------------------------------------*/
+class AF_Arg_List : public LiSt<Analog_Function_Arg, '\0', ',', ';'> {
+//  Data_Type _type;
+  enum{
+    a_input,
+    a_output,
+    a_inout
+  } _direction;
+public:
+  bool is_output() const { return _direction >= a_output; }
+//  Data_Type const& type()const {return _type;}
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class AF_Arg_List_Collection : public Collection<AF_Arg_List>{
+public:
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class Analog_Function : public Block {
+  Analog_Function_Arg _variable;
+  Data_Type _type;
+  AF_Arg_List_Collection _args;
+  FUNCTION_ const* _function{NULL};
+public:
+  ~Analog_Function();
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+  String_Arg const& identifier()const { return _variable.identifier(); }
+  std::string code_name()const { return "af_" + identifier().to_string(); }
+public:
+  Branch_Ref new_branch(std::string const&, std::string const&)override { untested();
+    return Branch_Ref();
+  }
+  Branch_Ref new_branch(Node*, Node*)override {
+    return Branch_Ref();
+  }
+  Node_Ref node(std::string const&)const override {
+    return Node_Ref();
+  }
+  Branch_Ref lookup_branch(std::string const&)const override {
+    return Branch_Ref();
+  }
+  FUNCTION_ const* function() const{return _function;}
+  AF_Arg_List_Collection const& args() const{ return _args; }
+  Analog_Function_Arg const& variable() const{ return _variable; }
+};
+typedef Collection<Analog_Function> Analog_Functions;
 /*--------------------------------------------------------------------------*/
 class Analog : public Owned_Base {
   AnalogList _list;

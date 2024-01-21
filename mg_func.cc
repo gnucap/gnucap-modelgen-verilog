@@ -26,26 +26,9 @@
 #include "m_tokens.h"
 #include "mg_out.h"
 #include "mg_analog.h" // Probe
+#include "mg_discipline.h" // Probe
 #include <globals.h>
 #include <u_parameter.h>
-/*--------------------------------------------------------------------------*/
-inline Token* MGVAMS_FUNCTION::new_token(Module& m, size_t /*na*/) const
-{
-  m.install(this);
-  if(code_name() != ""){
-    return new Token_CALL(label(), this);
-  }else if(label() != ""){
-    return new Token_CALL(label(), this);
-  }else{
-    incomplete();
-    return NULL;
-  }
-}
-/*--------------------------------------------------------------------------*/
-inline void MGVAMS_FUNCTION::make_cc_dev(std::ostream& o) const
-{
-  o__ "// " << label() << "\n";
-}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void FUNCTION_::stack_op(Expression const& arg, Expression* E) const
@@ -88,89 +71,30 @@ void FUNCTION_::stack_op(Expression const& arg, Expression* E) const
   }
 }
 /*--------------------------------------------------------------------------*/
-double FUNCTION_::evalf(double const*)const
-{
-  throw Exception("not implemented");
-}
-/*--------------------------------------------------------------------------*/
-FUNCTION_::~FUNCTION_()
-{
-  if(has_refs()){
-    incomplete();
-    std::cerr << "stale ref " << label() << "\n";
-  }else{
-  }
-//  assert(!has_refs()); // base class
-}
-/*--------------------------------------------------------------------------*/
-Token* VAMS_ACCESS::new_token(Module& m, size_t na)const
-{
-  unreachable(); // obsolete.
-  // use na?
-  Branch_Ref br = m.new_branch(_arg0, _arg1);
-  //  br->set_owner(this);
-  assert(br);
-  assert(const_cast<Branch const*>(br.operator->())->owner());
-  // Probe const* p = m.new_probe(_name, _arg0, _arg1);
-  //
-  // install clone?
-  FUNCTION_ const* p = m.new_probe(_name, br);
-
-  return p->new_token(m, na);
-}
-/*--------------------------------------------------------------------------*/
-Token* Probe::new_token(Module&, size_t na)const
-{
-  std::string name;
-  if(discipline()){
-    if(_type==t_pot){
-      assert(discipline()->potential());
-      name = discipline()->potential()->access().to_string();
-    }else if(_type==t_flow){
-      assert(discipline()->flow());
-      name = discipline()->flow()->access().to_string();
-    }else{
-      name = "UNKNOWN";
-    }
-  }else if(_type==t_pot){ untested();
-    name = "potential";
-  }else if(_type==t_flow){
-    name = "flow";
-  }else{ untested();
-    unreachable();
-    name = "UNKNOWN";
-  }
-
-  trace5("got a probe", name, na, pname(), nname(), _br.has_name());
-  name += "(";
-  if(_br.has_name()){
-    name += _br.name();
-  }else if(nname() != ""){
-    assert(na==2);
-    name += pname() + ", " + nname();
-  }else{
-    name += pname();
-    assert(na==1);
-  }
-  name += ")";
-
-  Deps* deps = new Deps;
-  deps->insert(Dep(this, Dep::_LINEAR));
-
-  Token_ACCESS* nt = new Token_ACCESS(name, deps, this);
-  // d.insert(Dep(nt->prb(), Dep::_LINEAR));
-  return nt;
-}
 /*--------------------------------------------------------------------------*/
 Node_Ref MGVAMS_FILTER::p() const
 { untested();
-  return Node_Ref(&Node_Map::mg_ground_node);
+  return Node_Ref(); // (&Node_Map::mg_ground_node);
 }
 /*--------------------------------------------------------------------------*/
 Node_Ref MGVAMS_FILTER::n() const
 { untested();
-  return Node_Ref(&Node_Map::mg_ground_node);
+  return Node_Ref(); // (&Node_Map::mg_ground_node);
 }
 /*--------------------------------------------------------------------------*/
+#if 0
+Token* MGVAMS_FUNCTION::new_token(Module& m, size_t na) const
+{
+  m.install(this);
+  if(code_name() != ""){
+    return new Token_CALL(label(), this);
+  }else if(label() != ""){
+    return new Token_CALL(label(), this);
+  }else{
+    incomplete();
+    return NULL;
+  }
+}
+#endif
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

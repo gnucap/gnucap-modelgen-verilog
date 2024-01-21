@@ -20,46 +20,15 @@
  * 02110-1301, USA.
  */
 #include <io_.h>
-#include "mg_.h"
 #include "mg_error.h"
 #include "mg_options.h"
 #include "mg_out.h"
+#include "mg_in.h"
 #include <stack>
 #include <u_opt.h>
 #include <e_cardlist.h> // BUG?
 #include <l_stlextra.h>
-/*--------------------------------------------------------------------------*/
-void Port_1::parse(CS& file)
-{
-  trace1("Port_1::parse", file.last_match());
-  file >> _name;
-  size_t here = file.cursor();
-  for (;;) {
-    ONE_OF
-      || ((file >> "short_to =") && (file >> _short_to))
-      || ((file >> "short_if =") && (file >> _short_if))
-      ;
-    if (file.skip1b(";")) {
-      break;
-    }else if (!file.more()) { untested();untested();
-      file.warn(0, "premature EOF (Port_1)");
-      break;
-    }else if (file.stuck(&here)) { untested();
-      break;
-    }else{
-    }
-  }
-}
-/*--------------------------------------------------------------------------*/
-void Port_1::dump(std::ostream& out)const
-{ untested();
-  if (short_to() != "" || short_if() != "") { untested();
-    out << name() << " short_to=\"" << short_to() 
-	<< "\" short_if=\"" << short_if() << "\";\n";
-  }else{ untested();
-    out << name() << "; ";
-  }
-}
+#include "mg_.h" // TODO
 /*--------------------------------------------------------------------------*/
 void Head::parse(CS& file)
 { untested();
@@ -81,10 +50,6 @@ void Head::parse(CS& file)
   _s = file.substr(begin, end-begin);
 }
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-File::File() : _file(CS::_STRING, "")
-{
-}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void Attribute_Spec::parse(CS& f)
@@ -184,139 +149,6 @@ void Attribute_Instance::dump(std::ostream& o)const
     }
     o << " *)\n";
   }
-}
-/*--------------------------------------------------------------------------*/
-/* A.1.2
-+ source_text ::=
-+	  { untested(); description }
-+ description ::=
-+	  module_declaration
--	| udp_declaration
--	| config_declaration
--	| paramset_declaration
-+	| nature_declaration
-+	| discipline_declaration
--	| connectrules_declaration
-*/
-void File::parse(CS& file)
-{
-//  _module_list.set_file(this); // needed?
-			       //
-  _attribute_stash.set_owner(this);
-
-  _module_list.set_owner(this);
-  _macromodule_list.set_owner(this);
-  _connectmodule_list.set_owner(this);
-  _nature_list.set_owner(this);
-  _discipline_list.set_owner(this);
-  _paramset_list.set_owner(this);
-
-  size_t here = _file.cursor();
-  for (;;) {
-    while(file >> _attribute_stash){ }
-    ONE_OF	// description
-      || file.umatch(";")
-      || ((file >> "module ")	     && (file >> _module_list))
-      || ((file >> "macromodule ")   && (file >> _macromodule_list))
-      || ((file >> "connectmodule ") && (file >> _connectmodule_list))
-      || ((file >> "nature ")	     && (file >> _nature_list))
-      || ((file >> "discipline ")    && (file >> _discipline_list))
-      || ((file >> "paramset ")      && (file >> _paramset_list))
-      ;
-    if (_attribute_stash.is_empty()){
-    }else{
-      file.warn(bWARNING, "dangling attributes");
-    }
-    if (!file.more()) {
-      break;
-    }else if (file.stuck(&here)) {
-      throw Exception_CS_("syntax error, need nature, discipline, module or paramset", file);
-    }else{
-    }
-  }
-
-  // HACK
-  for(auto i: _module_list){
-    i->set_owner(this);
-  }
-
-#if 1
-  std::vector<Module*> tmp;
-  for(auto i = _paramset_list.begin(); i!=_paramset_list.end();){
-    auto j = i;
-    ++j;
-    Module* m = (*i)->deflate();
-    if(m == *i){
-      trace1("undeflated paramset", m->identifier());
-    }else{
-      trace1("deflated paramset", m->identifier());
-      _paramset_list.erase(i);
-      tmp.push_back(m); 
-//       _module_list.push_back(m);
-    }
-    i = j;
-  }
-   for(auto i: tmp){
-     if(auto pp = dynamic_cast<Paramset*>(i)){
-       trace1("undeflated paramset1", i->identifier());
-       _paramset_list.push_back(pp);
-     }else{ untested();
-       trace1("deflated paramset1", i->identifier());
-       _module_list.push_back(i);
-     }
-   }
-#endif
-}
-/*--------------------------------------------------------------------------*/
-void File::dump(std::ostream& o) const
-{
-  if (options().dump_nature()){
-    o << nature_list() << '\n';
-  }else{
-  }
-
-  if (options().dump_discipline()){
-    o << discipline_list() << '\n';
-  }else{
-  }
-      // keep modules in order?
-      //
-  if (options().dump_module()){
-    o << module_list() << '\n'
-      << macromodule_list() << '\n'
-      << connectmodule_list() << '\n';
-  }else{
-  }
-
-  if(paramset_list().is_empty()) {
-  }else if (options().dump_paramset()) {
-    o << "// paramsets\n";
-    o << paramset_list() << '\n';
-  }else{ untested();
-  }
-}
-/*--------------------------------------------------------------------------*/
-void String_Arg::parse(CS& f)
-{
-  f >> _s;
-}
-/*--------------------------------------------------------------------------*/
-void ConstExpression::parse(CS& file)
-{
-  trace1("ConstExpression::parse", file.tail().substr(0,19));
-  assert(owner());
-  Expression ce(file);
-//  Expression_ tmp;
-//  assert(owner());
-  _expression.set_owner(owner());
-  _expression.resolve_symbols(ce);
-}
-/*--------------------------------------------------------------------------*/
-void ConstExpression::dump(std::ostream& o) const
-{
-  o << "(";
-  o << _expression;
-  o << ")";
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

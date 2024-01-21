@@ -26,6 +26,7 @@
 #include "mg_expression.h"
 #include <m_base.h>
 #include "mg_deps.h" // BUG?
+#include "mg_token.h"
 /*--------------------------------------------------------------------------*/
 class Deps;
 /*--------------------------------------------------------------------------*/
@@ -232,45 +233,9 @@ private:
   size_t num_deps() const;
 };
 /*--------------------------------------------------------------------------*/
-class Expression_;
-class FUNCTION_;
-class Token_CALL : public Token_SYMBOL {
-private: // stuff into data?
-  FUNCTION_ const* _function{NULL};
-  Expression_ const* _args{NULL};
-  size_t _num_args{size_t(-1)};
-public:
-  explicit Token_CALL(const std::string Name, FUNCTION_ const* f, Expression_ const* e=NULL)
-    : Token_SYMBOL(Name, ""), _function(f), _args(e) { attach(); }
-  ~Token_CALL(); //  { detach(); delete _args; }
-protected:
-  explicit Token_CALL(const Token_CALL& P)
-    : Token_SYMBOL(P.name(), ""), _function(P._function), _num_args(P._num_args) { attach(); }
-  explicit Token_CALL(const Token_CALL& P, Base const* data, Expression_ const* e=NULL)
-    : Token_SYMBOL(P.name(), data), _function(P._function), _args(e)
-    , _num_args(P._num_args) { attach(); }
-private:
-  Token* clone()const override {
-    return new Token_CALL(*this);
-  }
-/*--------------------------------------------------------------------------*/
-private:
-  void attach();
-  void detach();
-public:
-  void pop(){ assert(_args); _args = NULL; }
-  void push(Expression_ const* e){ assert(!_args); _args = e; }
-  void stack_op(Expression* e)const override;
-  void set_num_args(size_t n){ _num_args = n; } // expression size?
-  size_t num_args() const;
-  Expression_ const* args()const { return _args; }
-  virtual /*?*/ std::string code_name() const;
-  FUNCTION_ const* f() const{ return _function; }
-  bool returns_void() const;
-}; // Token_CALL
 /*--------------------------------------------------------------------------*/
 #if 1
-typedef Token_CALL Token_SFCALL;
+// typedef Token_CALL Token_SFCALL;
 #else
 class Token_SFCALL : public Token_CALL {
 public:

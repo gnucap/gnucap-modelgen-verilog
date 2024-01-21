@@ -168,7 +168,7 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
 	}else{
 	}
 
-	if(v->branch()->is_short()) { untested();
+	if(v->branch()->is_short()) {
 	// }else if(a.lhs().is_module_variable()){
 	}else{
 	  o__ lhsname << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // (2b)\n";
@@ -718,7 +718,7 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
 static void make_cc_zero_filter_readout(std::ostream& o, const Module& m)
 {
   o << "inline void MOD_" << m.identifier() << "::zero_filter_readout()\n{\n";
-  for(auto x : m.branches()){
+  for(auto x : m.circuit()->branches()){
     Branch const* b = x;
     assert(b);
     if(!b->is_filter()){
@@ -738,7 +738,7 @@ static void make_cc_zero_filter_readout(std::ostream& o, const Module& m)
 static void make_cc_set_branch_contributions(std::ostream& o, const Module& m)
 {
   o << "inline void MOD_" << m.identifier() << "::set_branch_contributions()\n{\n";
-  for(auto i : m.branches()){
+  for(auto i : m.circuit()->branches()){
     Branch const* b = i;
 
     if(b->is_short()) {
@@ -995,7 +995,7 @@ static void make_cc_common_precalc(std::ostream& o, const Module& m)
 static void make_clear_branch_contributions(std::ostream& o, const Module& m)
 {
   o << "inline void MOD_" << m.identifier() << "::clear_branch_contributions()\n{\n";
-  for(auto x : m.branches()){
+  for(auto x : m.circuit()->branches()){
     assert(x);
     if(x->has_element()){
       if(x->has_pot_source()){

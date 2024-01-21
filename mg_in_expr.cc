@@ -21,11 +21,13 @@
 /*--------------------------------------------------------------------------*/
 
 #include "m_tokens.h" // $vt
-#include "mg_.h"
+#include "mg_in.h"
 #include "mg_func.h"
+#include "mg_code.h"
 #include <stack>
 #include <e_cardlist.h>
 #include <globals.h>
+#include "mg_.h" // TODO
 /*--------------------------------------------------------------------------*/
 void Expression_::clear()
 {
@@ -60,81 +62,18 @@ static FUNCTION_ const* va_function(std::string const& n)
   return dynamic_cast<FUNCTION_ const*>(f);
 }
 /*--------------------------------------------------------------------------*/
-static Module const* to_module(Block const* owner)
-{
-  assert(owner);
-  while(true){
-    if(auto m = dynamic_cast<Module const*>(owner)){
-      return m;
-    }else{
-    }
-    owner = owner->owner();
-    assert(owner);
-  }
-  unreachable();
-  return NULL;
-}
-/*--------------------------------------------------------------------------*/
-static File const* to_file(Block const* owner)
-{
-  assert(owner);
-  while(true){
-    if(auto m = dynamic_cast<File const*>(owner)){
-      return m;
-    }else{
-    }
-    owner = owner->owner();
-    if(!owner){ untested();
-      return NULL;
-    }else{
-    }
-  }
-  unreachable();
-  return NULL;
-}
-/*--------------------------------------------------------------------------*/
-FUNCTION_ const* analog_function_call(std::string const& f, Module const& owner);
+FUNCTION_ const* analog_function_call(std::string const& f, Block const* owner);
 static FUNCTION_ const* is_analog_function_call(std::string const& f, Block const* owner)
 {
-  Module const* m = to_module(owner);
-  assert(m);
-  return analog_function_call(f, *m);
+  return analog_function_call(f, owner);
 }
 /*--------------------------------------------------------------------------*/
-// use dispatcher?
+FUNCTION_ const* xs_function_call(std::string const& f, Block const* owner);
 static bool is_xs_function(std::string const& f, Block const* owner)
 {
-  Module const* m = to_module(owner);
-  assert(m);
-  File const* file = to_file(owner);
-  if(!file){
-    file = dynamic_cast<File const*>(m->owner());
-  }else{
-  }
-
-  assert(file);
-  if(f=="flow" || f=="potential") { itested();
-    return true;
-  }else if(file){
-    // use actual disciplines
-    // auto const& nl = file->nature_list();
-    // return find_ptr(nl.begin(), nl.end(), f);
-  }else{ untested();
-    // fallback. modelgen_0.cc // incomplete();
-    return f=="V" || f=="I" || f=="Pwr";
-  }
-
-  /// TODO ///
-  for(auto n: file->nature_list()){
-    if(n->access().to_string() == f){
-      return true;
-    }else{
-    }
-  }
-  return false;
-
-  // TODO: return FUNCTION_*, VAMS_XS* from nature
+  return xs_function_call(f, owner);
 }
+
 /*--------------------------------------------------------------------------*/
 void Expression_::resolve_symbols_(Expression const& e, Deps*)
 {
@@ -317,35 +256,27 @@ ConstantMinTypMaxExpression::~ConstantMinTypMaxExpression()
 {
 }
 /*--------------------------------------------------------------------------*/
-bool Parameter_2_List::is_local()const
-{
-  // really? ask *begin?
-  return _is_local;
-}
-/*--------------------------------------------------------------------------*/
-double /*?*/ Parameter_2::eval() const
-{
-  if(is_local()) {
-    return _default_val.value();
-  }else if (value_range_list().size() == 1) {
-    return (*value_range_list().begin())->eval();
-  }else{
-    return NOT_INPUT;
-  }
-}
-/*--------------------------------------------------------------------------*/
 double ConstantMinTypMaxExpression::value() const
 {
   return _e.eval();
 }
 /*--------------------------------------------------------------------------*/
-double ValueRange::eval() const
+void ConstExpression::parse(CS& file)
 {
-  if(spec()){
-    return spec()->eval();
-  }else{ untested();
-    return NOT_INPUT;
-  }
+  trace1("ConstExpression::parse", file.tail().substr(0,19));
+  assert(owner());
+  Expression ce(file);
+//  Expression_ tmp;
+//  assert(owner());
+  _expression.set_owner(owner());
+  _expression.resolve_symbols(ce);
+}
+/*--------------------------------------------------------------------------*/
+void ConstExpression::dump(std::ostream& o) const
+{
+  o << "(";
+  o << _expression;
+  o << ")";
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

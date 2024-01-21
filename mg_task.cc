@@ -44,7 +44,7 @@ private:
   Token* new_token(Module& m, size_t)const override {
     m.install(this);
     m.set_tr_review();
-    return new Token_SFCALL("$bound_step", this);
+    return new Token_CALL("$bound_step", this);
   }
   std::string code_name()const override{
     return "d->_f_bound_step";

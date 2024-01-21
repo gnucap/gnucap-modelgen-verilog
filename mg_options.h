@@ -19,8 +19,8 @@
  * 02110-1301, USA.
  */
 /*--------------------------------------------------------------------------*/
+//#include "mg_base.h"
 #include <m_base.h>
-#include "mg_.h"
 /*--------------------------------------------------------------------------*/
 class Options : public Base {
   bool _optimize_binop{true};  // fold binary operators
@@ -65,6 +65,7 @@ public:
   friend class option_nodump_unreachable;
 };
 /*--------------------------------------------------------------------------*/
+Base& modelgen_opts(); //?
 inline Options& options()
 {
   return prechecked_cast<Options&>(modelgen_opts());

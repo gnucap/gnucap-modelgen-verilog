@@ -27,12 +27,13 @@
 #include "m_tokens.h"
 #include <globals.h>
 //#include <u_parameter.h>
+#include "mg_.h" // BUG
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
-class ANALYSIS : public MGVAMS_FUNCTION {
+class ANALYSIS : public FUNCTION_ {
 public:
-  explicit ANALYSIS() : MGVAMS_FUNCTION(){
+  explicit ANALYSIS() : FUNCTION_(){
     set_label("analysis");
   }
   std::string eval(CS&, const CARD_LIST*)const override{ untested();
@@ -41,9 +42,9 @@ public:
   std::string code_name()const override{
     return "_f_analysis";
   }
-  Token* new_token(Module& m, size_t na)const override{
+  bool static_code()const override {return false;}
+  Token* new_token(Module& m, size_t)const override {
     m.set_analysis();
-    return MGVAMS_FUNCTION::new_token(m, na);
     m.install(this);
     return new Token_CALL(label(), this);
   }
@@ -67,35 +68,10 @@ public:
 DISPATCHER<FUNCTION>::INSTALL d_analysis(&function_dispatcher, "analysis", &analysis);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class ABSTIME : public MGVAMS_FUNCTION {
-public:
-  explicit ABSTIME() {
-    set_label("abstime");
-  }
-  ~ABSTIME() { }
-private:
-  Token* new_token(Module& m, size_t)const override {
-    m.install(this);
-    return new Token_SFCALL("$abstime", this);
-  }
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
-    return "$$abstime";
-  }
-  std::string code_name()const override{
-    return "_f_abstime";
-  }
-  void make_cc_common(std::ostream& o)const override {
-    o__ "double " << code_name() << "()const {\n";
-    o____ "return _sim->_time0;\n";
-    o__ "}\n";
-  }
-} abstime;
-DISPATCHER<FUNCTION>::INSTALL d_abstime(&function_dispatcher, "$abstime", &abstime);
-/*--------------------------------------------------------------------------*/
-class MFACTOR : public MGVAMS_FUNCTION {
+class MFACTOR : public FUNCTION_ {
   mutable Module const* _m{NULL};
 public:
-  explicit MFACTOR() {
+  explicit MFACTOR() : FUNCTION_() {
     set_label("mfactor");
   }
 private:
@@ -106,7 +82,7 @@ private:
   Token* new_token(Module& m, size_t)const override {
     _m = &m;
     m.install(this);
-    return new Token_SFCALL("$mfactor", this);
+    return new Token_CALL("$mfactor", this);
   }
   std::string code_name()const override{
     return "d->_f_mfactor";
@@ -131,14 +107,11 @@ DISPATCHER<FUNCTION>::INSTALL d_mfactor(&function_dispatcher, "$mfactor", &mfact
 class TEMPERATURE : public MGVAMS_FUNCTION {
 public:
   explicit TEMPERATURE() {
-    set_label("temperature");
+    set_label("$temperature");
   }
   ~TEMPERATURE(){ }
 private:
-  Token* new_token(Module& m, size_t)const override {
-    m.install(this);
-    return new Token_SFCALL("$temperature", this);
-  }
+  bool static_code()const override {return true;}
   std::string eval(CS&, const CARD_LIST*)const override{ unreachable();
     return "$$temperature";
   }
@@ -154,11 +127,11 @@ public:
 } temperature;
 DISPATCHER<FUNCTION>::INSTALL d1(&function_dispatcher, "$temperature", &temperature);
 /*--------------------------------------------------------------------------*/
-class VT : public MGVAMS_FUNCTION {
+class VT : public FUNCTION_ {
   mutable size_t _temp{0};
 public:
-  explicit VT() {
-    set_label("vt");
+  explicit VT() : FUNCTION_() {
+    set_label("$vt");
   }
   ~VT(){
     while(_temp){
@@ -170,6 +143,7 @@ private:
     unreachable(); // SFCALL won't eval
     return "$$vt";
   }
+  bool static_code()const override {return false;}
   Token* new_token(Module& m, size_t na)const override {
     m.install(&temperature);
     ++_temp; temperature.inc_refs(); // hack.
@@ -183,7 +157,7 @@ private:
       // syntax error
     }
 
-    return new Token_SFCALL("$vt", this); // na?
+    return new Token_CALL("$vt", this); // na?
   }
   std::string code_name()const override{
     return "_f_vt";
@@ -260,16 +234,17 @@ private:
   }
 };
 /*--------------------------------------------------------------------------*/
-class PARAM_GIVEN : public MGVAMS_FUNCTION {
+class PARAM_GIVEN : public FUNCTION_ {
 public:
-  explicit PARAM_GIVEN() {
-    set_label("param_given");
+  explicit PARAM_GIVEN() : FUNCTION_() {
+    set_label("$param_given");
   }
   ~PARAM_GIVEN(){ }
 private:
+  bool static_code()const override {return false;}
   Token* new_token(Module& m, size_t)const override {
     m.install(this);
-    return new Token_PG("$param_given", this);
+    return new Token_PG(label(), this);
   }
   std::string eval(CS&, const CARD_LIST*)const override{ untested();
     return "$param_given";
@@ -287,37 +262,6 @@ private:
   }
 } pg;
 DISPATCHER<FUNCTION>::INSTALL d_pg(&function_dispatcher, "$param_given", &pg);
-/*--------------------------------------------------------------------------*/
-class SIMPARAM : public MGVAMS_FUNCTION {
-public:
-  explicit SIMPARAM() {
-    set_label("simparam");
-  }
-  ~SIMPARAM(){ }
-private:
-  Token* new_token(Module& m, size_t)const override {
-    m.install(this);
-    return new Token_SFCALL("$simparam", this);
-  }
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
-    return "$$simparam";
-  }
-  std::string code_name()const override{
-    return "_f_simparam";
-  }
-  void make_cc_common(std::ostream& o)const override {
-    o__ "double " << code_name() << "(std::string const& what, double def=0)const {\n";
-    o____ "if(what==\"gmin\") {\n";
-    o______ "return OPT::gmin;\n";
-    o____ "}else if(what==\"iteration\") {\n";
-    o______ "return CKT_BASE::_sim->_iter[sCOUNT];\n";
-    o____ "}else{\n";
-    o______ "return def;\n";
-    o____ "}\n";
-    o__ "}\n";
-  }
-} simparam;
-DISPATCHER<FUNCTION>::INSTALL d_simparam(&function_dispatcher, "$simparam", &simparam);
 /*--------------------------------------------------------------------------*/
 } // namespace
 /*--------------------------------------------------------------------------*/

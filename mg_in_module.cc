@@ -22,7 +22,9 @@
 #include "mg_.h"
 #include "mg_error.h"
 #include "mg_out.h"
+#include "mg_in.h"
 #include "mg_options.h"
+#include "mg_analog.h" // BUG: Analog_Function_Arg
 #include "l_stlextra.h"
 /*--------------------------------------------------------------------------*/
 #if 0
@@ -766,6 +768,8 @@ net_declaration ::=
 */
 void Module::parse(CS& f)
 {
+  assert(_circuit);
+  _circuit->set_owner(this);
   File* o = prechecked_cast<File*>(owner());
   if(!o){ untested();
     incomplete();
@@ -776,34 +780,45 @@ void Module::parse(CS& f)
   }
   // f >> "module |macromodule |connectmodule "; from caller
   f >> _identifier;
-  parse_ports(f);
+  f >> *_circuit; // HACK
+  _circuit->parse_ports(f);
   f >> ';';
   parse_body(f);
   setup_nodes();
 }
 /*--------------------------------------------------------------------------*/
-void Module::parse_ports(CS& f)
+void Circuit::parse_ports(CS& f)
 {
-  _ports.set_owner(this);
   f >> _ports;
+}
+/*--------------------------------------------------------------------------*/
+void Circuit::parse(CS&)
+{
+  assert(owner());
+  _ports.set_owner(owner());
+  _input.set_owner(owner());
+  _output.set_owner(owner());
+  _inout.set_owner(owner());
+  _ground.set_owner(owner());
+  _net_decl.set_owner(owner());
+  _branch_decl.set_owner(owner());
+  _local_nodes.set_owner(owner());
+  _net_decl.set_owner(owner());
+  _branches.set_owner(owner());
+  _element_list.set_owner(owner());
 }
 /*--------------------------------------------------------------------------*/
 void Module::parse_body(CS& f)
 {
-  // do we need a second pass? or just connect the dots while reading in?
-  _input.set_owner(this);
-  _output.set_owner(this);
-  _inout.set_owner(this);
-  _ground.set_owner(this);
-  _net_decl.set_owner(this);
-  _branch_decl.set_owner(this);
-  _branches.set_owner(this);
+  assert(_circuit);
+  _circuit->set_owner(this);
+  f >> *_circuit; // todo;
+		 //
   _variables.set_owner(this);
   _parameters.set_owner(this);
   _aliasparam.set_owner(this);
   //_local_params.set_owner(this);
-  _element_list.set_owner(this);
-  _local_nodes.set_owner(this);
+  //_local_nodes.set_owner(this);
   assert(_analog);
   _analog->set_owner(this);
   // _tr_eval.set_owner(this);
@@ -819,16 +834,17 @@ void Module::parse_body(CS& f)
     ONE_OF	// module_item
       || f.umatch(";")
       // mi, port_declaration
-      || ((f >> "input ") && (f >> _input))
-      || ((f >> "output ") && (f >> _output))
-      || ((f >> "inout ") && (f >> _inout))
+      // || (f >> _circuit)
+      || ((f >> "input ") && (f >> _circuit->input()))
+      || ((f >> "output ") && (f >> _circuit->output()))
+      || ((f >> "inout ") && (f >> _circuit->inout()))
       // mi, npmi, mogi, mogid
       // net_declaration
-      || (f >> _net_decl)
-      || ((f >> "ground ") && (f >> _net_decl)) // really?
+      || (f >> _circuit->net_decl())
+      || ((f >> "ground ") && (f >> _circuit->net_decl())) // really?
       // mi, non_port_module_item
       // mi, npmi, mogi, module_or_generate_item_declaration
-      || ((f >> "branch ") && (f >> _branch_decl))
+      || ((f >> "branch ") && (f >> _circuit->branch_decl()))
 //      || ((f >> "analog function ") && (f >> _analog_functions))
       // mi, npmi, module_or_generate_item
 //      || ((f >> "localparam ") && (f >> _local_params))
@@ -839,7 +855,7 @@ void Module::parse_body(CS& f)
       || ((f >> "aliasparam ") && (f >> _aliasparam))
       || ((f >> "analog ") && f >> *_analog)
       || ((f >> "endmodule ") && (end = true))
-      || (f >> _element_list)	// module_instantiation
+      || (f >> _circuit->element_list())	// module_instantiation
       ;
     if (_attribute_stash.is_empty()){
     }else{ untested();
@@ -880,26 +896,27 @@ void Module::parse_body(CS& f)
 /*--------------------------------------------------------------------------*/
 void Branch_Declaration::dump(std::ostream& o) const
 {
-  o__ "branch ";
-  Branch_Ref::dump(o);
+  o__ "branch " << _br; // dump(o);
   o << " " << _list << "\n";
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref Module::new_branch_name(std::string const& n, Branch_Ref const& b)
 {
-  return _branches.new_branch(b, n);
+  return _circuit->branches().new_branch(b, n);
 }
 /*--------------------------------------------------------------------------*/
+Branch_Ref parse_branch(Block* owner, CS& f); // mg_in_analog.
 void Branch_Declaration::parse(CS& f)
 {
   assert(owner());
   _list.set_owner(owner());
-  Branch_Ref::parse(f);
-  assert(owner());
+//   Branch_Ref::parse(f);
+  _br = parse_branch(owner(), f);
   f >> _list;
   for(auto const& i : _list) {
-    owner()->new_branch_name(i->to_string(), *this);
+    owner()->new_branch_name(i->to_string(), _br);
   }
+  trace2("BD::parse", f.tail().substr(0,20), (bool)f);
 }
 /*--------------------------------------------------------------------------*/
 void Branch_Declarations::parse(CS& f)
@@ -931,25 +948,25 @@ void Module::dump(std::ostream& o)const
   }else{
   }
   indent x;
-  o << "module " << identifier() << ports() << ";\n";
-  if(input().size()){
-    o__ "input "	    << input()			<< "\n";
+  o << "module " << identifier() << _circuit->ports() << ";\n";
+  if(_circuit->input().size()){
+    o__ "input " << circuit()->input() << "\n";
   }else{
   }
-  if(output().size()){
-    o << "  output "	    << output()			<< "\n";
+  if(_circuit->output().size()){
+    o__ "output " << circuit()->output() << "\n";
   }else{
   }
-  if(inout().size()){
-    o << "  inout "	    << inout()			<< "\n";
+  if(_circuit->inout().size()){
+    o__ "inout " << circuit()->inout() << "\n";
   }else{
   }
-  if(ground().size()){ untested();
-    o << "  ground "	    << ground()			<< "\n";
+  if(_circuit->ground().size()){ untested();
+    o__ "ground " << circuit()->ground() << "\n";
   }else{
   }
-  o << net_declarations();
-  o << branch_declarations();
+  o << _circuit->net_decl();
+  o << _circuit->branch_decl();
   if(parameters().size()){
     o << parameters() << "\n";
   }else{
@@ -966,9 +983,9 @@ void Module::dump(std::ostream& o)const
 //    o << local_params() << "\n";
 //  }else{ untested();
 //  }
-  if(circuit().size()){
+  if(circuit()->element_list().size()){
 //    o__ "// circuit\n";
-    o << circuit() << "\n";
+    o << circuit()->element_list() << "\n";
   }else{
   }
 
@@ -1136,6 +1153,12 @@ void Block::new_var_ref(Base* what)
 /*--------------------------------------------------------------------------*/
 void Module::push_back(Filter /*const?*/ * f)
 {
+  assert(_circuit);
+  _circuit->push_back(f);
+}
+/*--------------------------------------------------------------------------*/
+void Circuit::push_back(Filter /*const?*/ * f)
+{
   _filters.push_back(f);
 }
 /*--------------------------------------------------------------------------*/
@@ -1143,11 +1166,6 @@ void Module::push_back(FUNCTION_ const* f)
 {
   _func.push_back(f);
   install(f);
-}
-/*--------------------------------------------------------------------------*/
-void Module::install(FUNCTION_ const* f)
-{
-  _funcs.insert(f);
 }
 /*--------------------------------------------------------------------------*/
 Branch::Branch(Branch_Ref b, Module* m)
@@ -1207,18 +1225,10 @@ void Branch::unset_used_in(Base const* b)
 /*--------------------------------------------------------------------------*/
 Module::~Module()
 {
-  // cleanup
-//  _analog_list.clear();
-//  _analog_functions.clear();
   delete_analog();
-  _branch_decl.clear();
   delete _probes; // .clear();
-  _filters.clear();
-  _branches.clear();
 
-  {
-//    _nodes.clear();
-  }
+  delete_circuit();
 }
 /*--------------------------------------------------------------------------*/
 Branch::~Branch()
@@ -1298,6 +1308,13 @@ SeqBlock::~SeqBlock()
   delete _sens;
   _sens = NULL;
 }
+/*--------------------------------------------------------------------------*/
+void Module::delete_circuit()
+{
+  delete _circuit;
+  _circuit = NULL;
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

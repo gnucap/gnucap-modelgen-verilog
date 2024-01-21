@@ -20,8 +20,10 @@
  */
 #include "mg_analog.h"
 #include "mg_out.h"
+#include "mg_in.h"
 #include "mg_error.h"
 #include "mg_options.h"
+#include "mg_discipline.h"
 #include "m_tokens.h"
 #include <e_cardlist.h> // TODO: really?
 #include <u_opt.h>
@@ -894,29 +896,48 @@ void Assignment::parse_rhs(CS& cmd)
   trace1("Assignment::parse_rhs", bool(cmd));
 }
 /*--------------------------------------------------------------------------*/
-// in_module?
-void Branch_Ref::parse(CS& f)
+Branch_Ref parse_branch(Block* owner, CS& f)
 {
-  assert(!_br);
-
-  trace1("Branch_Ref::parse", f.tail().substr(0,10));
+  size_t here = f.cursor();
   if(f >> "("){
   }else{
+    f.reset_fail(here);
+    return Branch_Ref();
     throw Exception_No_Match("not a branch");
   }
   std::string pp = f.ctos(",)");
   std::string pn = f.ctos(",)");
   f >> ")";
 
+  assert(owner);
+  Branch_Ref b = owner->new_branch(pp, pn);
+  // assert(b._br);
+  return b;
+}
+/*--------------------------------------------------------------------------*/
+// in_module?
+void Branch_Ref::parse(CS& f)
+{
+  assert(!_br);
+
+  trace1("Branch_Ref::parse", f.tail().substr(0,10));
+  if(f >> "("){ untested();
+  }else{ untested();
+    throw Exception_No_Match("not a branch");
+  }
+  std::string pp = f.ctos(",)");
+  std::string pn = f.ctos(",)");
+  f >> ")";
+
+  assert(0); // incomplete. parse Branch_Decl?
+#if 0
   assert(owner());
   trace3("Branch_Ref::parse", pp, pn, _br);
   Branch_Ref b;
   b = owner()->new_branch(pp, pn);
-
   assert(b._br);
-
   *this = b;
-  assert(owner());
+#endif
 }
 /*--------------------------------------------------------------------------*/
 void Branch_Ref::dump(std::ostream& o)const
@@ -936,15 +957,10 @@ void Contribution::parse(CS& cmd)
   size_t here = cmd.cursor();
   cmd >> _name;
 
-  _branch.set_owner(owner());
-  if(!owner()->is_reachable()){
-    // set_never();
-  }else{
-  }
+  _branch = parse_branch(owner(), cmd);
 
-  try{
-    cmd >> _branch;
-  }catch (Exception_No_Match const&){
+  if(_branch){
+  }else{
     cmd.reset(here);
     trace2("not a Contribution", _name, cmd.tail().substr(0,20));
     throw Exception_No_Match("not a contribution");
@@ -1295,6 +1311,22 @@ void AnalogEvtCtlStmt::dump(std::ostream& o) const
 void make_cc_af_body(std::ostream& o, const Analog_Function& f); // BUG
 namespace{
 /*--------------------------------------------------------------------------*/
+static Module const* to_module(Block const* owner)
+{
+  assert(owner);
+  while(true){
+    if(auto m = dynamic_cast<Module const*>(owner)){
+      return m;
+    }else{
+    }
+    owner = owner->owner();
+    assert(owner);
+  }
+  unreachable();
+  return NULL;
+}
+/*--------------------------------------------------------------------------*/
+#if 0
 Module const* to_module(Block const* owner)
 {
   assert(owner);
@@ -1309,6 +1341,7 @@ Module const* to_module(Block const* owner)
   unreachable();
   return NULL;
 }
+#endif
 /*--------------------------------------------------------------------------*/
 void make_cc_af_args(std::ostream& o, const Analog_Function& f)
 {
@@ -1920,7 +1953,7 @@ bool Branch::is_shadow_source()const
 static void dump_shadow_src(std::ostream& o, Module const& m)
 {
   if(!options().dump_unreachable()){
-    for(auto i: m.branches()) {
+    for(auto i: m.circuit()->branches()) {
       if(i->is_shadow_source()){
 	o__ "analog begin\n";
 	o____ "";
@@ -1969,13 +2002,73 @@ void Analog::dump(std::ostream& o) const
   }
 }
 /*--------------------------------------------------------------------------*/
-FUNCTION_ const* analog_function_call(std::string const& f, Module const& m)
+FUNCTION_ const* analog_function_call(std::string const& f, Block const* scope)
 {
-  for(auto n: ::analog(m).functions()){
+  Module const* m = to_module(scope);
+  assert(m);
+  for(auto n: ::analog(*m).functions()){
     trace2("is_afcall", n->identifier(), f);
     if(n->identifier().to_string() == f){
       assert(n->function());
       return n->function();
+    }else{
+    }
+  }
+  return NULL;
+}
+/*--------------------------------------------------------------------------*/
+static File const* to_file(Block const* owner)
+{
+  assert(owner);
+  while(true){
+    if(auto m = dynamic_cast<File const*>(owner)){
+      return m;
+    }else{
+    }
+    owner = owner->owner();
+    if(!owner){ untested();
+      return NULL;
+    }else{
+    }
+  }
+  unreachable();
+  return NULL;
+}
+/*--------------------------------------------------------------------------*/
+FUNCTION_ const* xs_function_call(std::string const& f, Block const* owner)
+{
+  Module const* m = to_module(owner);
+  assert(m);
+  File const* file = to_file(owner);
+  if(!file){
+    file = dynamic_cast<File const*>(m->owner());
+  }else{
+  }
+
+  assert(file);
+  if(f=="flow" || f=="potential") { itested();
+    // TODO: return FUNCTION_*, VAMS_XS* from nature
+    return (FUNCTION_*)(1); // TODO true;
+  }else if(file){
+    // use actual disciplines
+    // auto const& nl = file->nature_list();
+    // return find_ptr(nl.begin(), nl.end(), f);
+  }else if(f=="V") { untested();
+    // fallback. modelgen_0.cc // incomplete();
+    return (FUNCTION_*)(1); // TODO true;
+  }else if(f=="I") { untested();
+    // fallback. modelgen_0.cc // incomplete();
+    return (FUNCTION_*)(1); // TODO true;
+  }else if(f=="Pwr") { untested();
+    // fallback. modelgen_0.cc // incomplete();
+    return (FUNCTION_*)(1); // TODO true;
+  }
+
+  /// TODO ///
+  for(auto n: file->nature_list()){
+    if(n->access().to_string() == f){
+      // TODO: return FUNCTION_*, VAMS_XS* from nature
+      return (FUNCTION_*)(1); // TODO true;
     }else{
     }
   }

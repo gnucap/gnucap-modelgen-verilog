@@ -1,0 +1,13 @@
+
+PACKAGE = mgvams
+
+TARGET = \
+  mg_func_math.so \
+  mg_func_sys.so
+
+NOTYET_TARGET = \
+  mg_task.so
+
+MAKE_CPPFLAGS = -I ..
+
+SRCS = ${TARGET:%.so=%.cc}

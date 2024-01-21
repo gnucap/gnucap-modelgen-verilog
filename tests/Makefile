@@ -10,6 +10,8 @@ REFDIR = ref
 TARGETDIR = check
 GNUCAP = gnucap
 MODELGEN_VERILOG = ../gnucap-mg-vams
+TEST_ENV = GNUCAP_PLUGPATH=..:$(shell $(GNUCAP_CONF) --pkglibdir) \
+           GNUCAP=${GNUCAP}
 
 %.o: %.cc
 	${CXX} -I .. ${CPPFLAGS} ${GNUCAP_CPPFLAGS} -g -O0 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $< -o $@ -c
@@ -35,7 +37,7 @@ check/.diffs: ${CHECK_TARGETS}
 
 # BUG. "+" breaks -n
 ${CHECK_TARGETS}: check/%.diffs:
-	+GNUCAP=${GNUCAP} ./test ${MODELGEN_VERILOG} "$*" ${TARGETDIR} ${REFDIR}
+	+${TEST_ENV} ./test ${MODELGEN_VERILOG} "$*" ${TARGETDIR} ${REFDIR}
 
 clean:
 	rm -rf *.o *.cc *.so *.out *~

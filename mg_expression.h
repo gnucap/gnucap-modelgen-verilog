@@ -75,5 +75,40 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+class Deps;
+class FUNCTION_;
+class Probe;
+class Branch_Ref;
+class Block;
+class Expression_ : public Expression {
+  Block* _owner{NULL};
+public:
+  explicit Expression_() : Expression() {}
+  ~Expression_();
+  void resolve_symbols(Expression const& e){
+    return resolve_symbols_(e);
+  }
+  void set_owner(Block* b){ _owner = b; }
+  void dump(std::ostream& out)const override;
+// private:
+  Block* owner(){ return _owner; }
+private:
+  void resolve_symbols_(Expression const& e, Deps* deps=NULL);
+public:
+  void clear();
+  Expression_* clone() const;
+  Deps const& deps()const;
+  // Attrib const& attrib()const;
+  bool update();
+//  Deps& deps();
+//  Deps const& deps()const { return _deps; }
+//  Deps& deps() { return _deps; }
+private: // all the same eventually?
+  Token* resolve_xs_function(std::string const& n);
+  Token* resolve_function(FUNCTION_ const* filt, size_t na);
+  Token* resolve_system_task(FUNCTION_ const* t);
+  Probe const* new_probe(std::string const& xs, Branch_Ref const& br);
+};
+/*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

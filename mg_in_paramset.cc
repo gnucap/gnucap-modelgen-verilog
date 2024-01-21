@@ -20,6 +20,7 @@
  */
 #include "mg_.h"
 #include "mg_out.h"
+#include "mg_in.h"
 #include "mg_options.h"
 #include "mg_error.h"
 /*--------------------------------------------------------------------------*/
@@ -332,20 +333,22 @@ static void import_proto_vars(Module* sub, Module const* proto)
 static void import_proto_impl(Module* sub, Module const* proto)
 {
   assert(proto);
+  assert(proto->circuit());
   assert(sub);
 
 //  CS c(CS::_STRING, proto->identifier().to_string());
 //  sub->parse(c);
 
   std::stringstream s;
-  proto->ports().dump(s);
+  proto->circuit()->ports().dump(s);
 //  s << "endmodule;";
   CS cmd(CS::_STRING, s.str());
   sub->parse_ports(cmd);
 
-  streamcp(sub, proto->local_nodes());
-  streamcp(sub, proto->net_declarations());
-  streamcp(sub, proto->branch_declarations());
+  streamcp(sub, proto->circuit()->local_nodes());
+  streamcp(sub, proto->circuit()->net_decl());
+  streamcp(sub, proto->circuit()->branch_decl());
+
   import_proto_vars(sub, proto);
   streamcp(sub, proto->analog());
 }

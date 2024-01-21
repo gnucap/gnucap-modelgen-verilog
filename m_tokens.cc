@@ -135,47 +135,13 @@ static bool is_constant(stash_op const& o)
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 Token_CALL::~Token_CALL()
 {
   detach();
   delete _args;
 }
-/*--------------------------------------------------------------------------*/
-void Token_CALL::attach()
-{
-  assert(_function);
-  _function->inc_refs();
-}
-/*--------------------------------------------------------------------------*/
-void Token_CALL::detach()
-{
-  assert(_function);
-  _function->dec_refs();
-}
-/*--------------------------------------------------------------------------*/
-bool Token_CALL::returns_void() const
-{
-//  assert(_function);
-  if(_function){
-    return _function->returns_void();
-  }else{ untested();
-    return false;
-  }
-}
-/*--------------------------------------------------------------------------*/
-std::string Token_CALL::code_name()const
-{
-  assert(_function);
-  if(_function->code_name()!=""){
-    return "/*call1*/" + _function->code_name();
-  }else if(_function->label()!=""){
-    // incomplete(); // m_va.h, TODO
-    return "/*INCOMPLETE*/ va::" + _function->label();
-  }else{ untested();
-    return "Token_CALL::code_name: incomplete";
-  }
-}
-/*--------------------------------------------------------------------------*/
+#endif
 namespace {
 /*--------------------------------------------------------------------------*/
 class CD : public Deps{
@@ -847,6 +813,66 @@ void Token_PARLIST_::stack_op(Expression* E)const
     E->push_back(parlist);
   }
 }
+/*--------------------------------------------------------------------------*/
+Token* VAMS_ACCESS::new_token(Module& m, size_t na)const
+{
+  unreachable(); // obsolete.
+  // use na?
+  Branch_Ref br = m.new_branch(_arg0, _arg1);
+  //  br->set_owner(this);
+  assert(br);
+  assert(const_cast<Branch const*>(br.operator->())->owner());
+  // Probe const* p = m.new_probe(_name, _arg0, _arg1);
+  //
+  // install clone?
+  FUNCTION_ const* p = m.new_probe(_name, br);
+
+  return p->new_token(m, na);
+}
+/*--------------------------------------------------------------------------*/
+Token* Probe::new_token(Module&, size_t na)const
+{
+  std::string name;
+  if(discipline()){
+    if(_type==t_pot){
+      assert(discipline()->potential());
+      name = discipline()->potential()->access().to_string();
+    }else if(_type==t_flow){
+      assert(discipline()->flow());
+      name = discipline()->flow()->access().to_string();
+    }else{
+      name = "UNKNOWN";
+    }
+  }else if(_type==t_pot){ untested();
+    name = "potential";
+  }else if(_type==t_flow){
+    name = "flow";
+  }else{ untested();
+    unreachable();
+    name = "UNKNOWN";
+  }
+
+  trace5("got a probe", name, na, pname(), nname(), _br.has_name());
+  name += "(";
+  if(_br.has_name()){
+    name += _br.name();
+  }else if(nname() != ""){
+    assert(na==2);
+    name += pname() + ", " + nname();
+  }else{
+    name += pname();
+    assert(na==1);
+  }
+  name += ")";
+
+  Deps* deps = new Deps;
+  deps->insert(Dep(this, Dep::_LINEAR));
+
+  Token_ACCESS* nt = new Token_ACCESS(name, deps, this);
+  // d.insert(Dep(nt->prb(), Dep::_LINEAR));
+  return nt;
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

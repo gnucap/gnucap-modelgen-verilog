@@ -1,6 +1,5 @@
 verilog
-load vams/lang_verilog.so
-load vams/d_vasrc.so
+load mgsim
 
 // the model we just compiled
 load ./rc_b.so

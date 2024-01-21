@@ -11,29 +11,29 @@ gnucap-mg-vams \- GNU Circuit Analysis Package .vams translator
 is a translator tool in the Gnucap suite. It will transform Verilog-AMS models
 into C++ code implementing Gnucap component plugins.
 .PP
-A basic usage (with bash, on a posix system) may look like the following.
+Basic usage (with bash, on a posix system) may look as follows.
+For more examples, see the \fIexamples\fP directory.
 
 $ gnucap-mg-vams \-I /path/to/include \--cc mymodel.vams\ -o mymodel.cc
 .br
 $ g++ `gnucap-conf --cppflags` -fPIC -shared mymodel.cc -o mymodel.so
 .br
-$ gnucap -a ./mymodel.so
+$ gnucap -a ./mymodel.so -a mgsim
 .br
 gnucap> ...
 
-Consider adding the usual compiler flags for optimisation, troubleshooting and
-debugging.
+The \fImgsim\fP directory contains the plugins used in modelgen models.
 
 .SH OPTIONS
 
 .TP
-\fI-I path\fI
+\fI-I path
 Set preprocessor include path
 .TP
-\fI-D "name\ value"\fI
+\fI-D "name\ value"
 Set preprocessor constant
 .TP
-\fI-o "filename"\fI
+\fI-o "filename"
 Send output to filename (default: stdout).
 .TP
 \fI--flag | --noflag
@@ -51,13 +51,37 @@ dump contents as parsed
 \fI--cc\fI
 generate c++ file
 
+.SH COMPILER FLAGS
+These may be passed to the compiler supplementing `gnucap-conf --cppflags`.
+.TP
+\fI-O0, -O2
+Turn on, off optimisation respectively. For details, consult your compiler manual.
+.TP
+\fI-g
+Include debugging symbols. For details, consult your compiler manual.
+.TP
+\fI-DNDEBUG
+Drop debugging code, essentially run time assertions. This will speed up execution significantly.
+.TP
+\fI-DTRACE_UNTESTED
+Discover test status. Untested code notification will be printed to standard error output.
+.TP
+\fI-DTRACE_ITESTED
+Similar, but notify about interactively tested code.
+
+.SH EXAMPLES
+Basic Verilog-AMS models are included with this package, covering some of the
+primitives listed in Table E.1 of the LRM 2.4.0.
+
+For general usage, see \fIexamples\fP directory shipped with modelgen-verilog source code.
+
 .SH BUGS
-This is under construction. Expect bugs, see BUGS.
+This is under construction. Expect bugs, see \fIBUGS\fP.
 
 .SH AUTHOR
 Gnucap-mg-vams is being written by Felix Salfelder and Albert Davis with
-financial support from nlnet Next Generation Internet programme.
+financial support from NLnet Next Generation Internet programme.
 .PP
 This manual page was written by Felix Salfelder <felix@salfelder.org>.
-For the full documentation, please visit
-.B http://gnucap.org.
+For the full documentation, visit
+.B http://gnucap.org\fP.

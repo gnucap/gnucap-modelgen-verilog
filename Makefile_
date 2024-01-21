@@ -1,5 +1,6 @@
 
 MODELGEN = ../gnucap-mg-vams
+MG_ENV = GNUCAP_PLUGPATH=..
 GNUCAP_CONF = gnucap-conf
 
 CXX = $(shell $(GNUCAP_CONF) --cxx)
@@ -16,16 +17,16 @@ GNUCAP_EXEC_PREFIX = $(shell $(GNUCAP_CONF) --exec-prefix)
 	${CXX} -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@
 
 %.o: %.cc
-	${CXX} $(GNUCAP_CPPFLAGS) $(CPPFLAGS) -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@ -c
+	${CXX} $(GNUCAP_CPPFLAGS) $(CPPFLAGS) ${MAKE_CPPFLAGS} -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@ -c
 
 %.s: %.cc
-	${CXX} -S ${GNUCAP_CPPFLAGS} ${CPPFLAGS} -DNDEBUG -O2 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@
+	${CXX} -S ${GNUCAP_CPPFLAGS} ${CPPFLAGS} ${MAKE_CPPFLAGS} -DNDEBUG -O2 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@
 
 %.cc: %.vams ${MODELGEN}
-	${MODELGEN} -I .. --cc $< > $@
+	${MG_ENV} ${MODELGEN} -I .. --cc $< > $@
 
 %.pp: %.vams ${MODELGEN}
-	${MODELGEN} -I .. --pp $< > $@
+	${MG_ENV} ${MODELGEN} -I .. --pp $< > $@
 
 all: ${TARGET}
 

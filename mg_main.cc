@@ -21,10 +21,13 @@
  */
 #include <u_opt.h>
 #include "mg_out.h"
+#include "mg_in.h"
 #include "mg_pp.h"
 #include <patchlev.h>
 #include <c_comand.h>
 #include <e_cardlist.h>
+#include "mg_.h" // TODO
+#include "mg_config.h"
 /*global*/ int errorcount = 0;
 std::basic_ostream<char>* diag_out; // mg_error.cc
 /*--------------------------------------------------------------------------*/
@@ -83,6 +86,7 @@ public:
 OUTPUT output(std::cout);
 OUTPUT diag(std::cerr);
 /*--------------------------------------------------------------------------*/
+Base& modelgen_opts();
 int main(int argc, char** argv)
 {
   File f;
@@ -90,21 +94,26 @@ int main(int argc, char** argv)
   --argc;
   ++argv;
   trace1("main", argc);
+  try {
+    CMD::command(std::string("load " DEFAULT_PLUGINS), &CARD_LIST::card_list);
+  }catch (Exception& e) {untested();
+    error(bDANGER, e.message() + '\n');
+    exit(1);
+  }
+
   for(; argc>1; --argc, ++argv) try{
     trace2("main", argc, argv[0]);
     if (strcmp(argv[0],"-o")==0) { untested();
       output.set(argv[1]);
       --argc;
       ++argv;
-    }else if (strcasecmp(argv[0], "-a") == 0) {
+    }else if (strcasecmp(argv[0], "-a") == 0) { untested();
       --argc;
       ++argv;
       if (argc) {
 	CMD::command(std::string("attach ") + argv[0], &CARD_LIST::card_list);
       }else{untested();
       }
-      --argc;
-      ++argv;
     }else if (strcmp(argv[0],"-d")==0
            || strcmp(argv[0],"--diag")==0) {
       diag.set(argv[1]);
