@@ -35,6 +35,11 @@ echo "" >>Make.libs
 
 cat <<CAT_EOF >Make.sys
 #------------------------------------------------------------------------
+pkglibdir='${prefix}/lib/gnucap'
+pkglibdir_expanded="${prefix}/lib/gnucap"
+sed -e "s#@pkglibdir_expanded@#$pkglibdir_expanded#" \
+	       < config.h.in > config.h.in
+#------------------------------------------------------------------------
 VPATH = .:..
 CCC = g++
 TARGET_EXT =

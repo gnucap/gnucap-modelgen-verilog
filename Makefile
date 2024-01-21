@@ -50,7 +50,8 @@ check: all
 
 clean: clean-recursive
 	rm -rf *.o ${TARGET} ${MODULES} ${OBJS} ${CLEAN_OBJS} ${EMBED_HEADERS}
-
+	rm -rf ${CLEANFILES}
+	
 clean-recursive:
 	${MAKE} -C tests clean
 	for i in ${SUBDIRS}; do \
@@ -68,6 +69,16 @@ include Make.depend
 	sed -e 's/^/"/' -e 's/$$/\\n"/' $< > $@
 mg_out_root.o: ${EMBED_HEADERS}
 
+mg_main.o: config.h
+
+pkglibdir='${prefix}/lib/gnucap'
+pkglibdir_expanded="${prefix}/lib/gnucap"
+
+CLEANFILES = config.h
+
+config.h: config.h.in
+	sed -e "s#@pkglibdir_expanded@#${GNUCAP_PKGLIBDIR}#" < $< > $@
+
 modelgen_0.o: $(OBJS)
 
 bm_pulse.so: bm_pulse.o
@@ -78,7 +89,7 @@ depend: Make.depend
 		${MAKE} -C $${i} depend; \
 	done
 
-Make.depend: $(SRCS) $(HDRS) ${EMBED_HEADERS}
+Make.depend: $(SRCS) $(HDRS) ${EMBED_HEADERS} config.h
 	$(CXX) -MM $(GNUCAP_CPPFLAGS) ${GNUCAP_CXXFLAGS} $(CXXFLAGS) $(SRCS) > Make.depend
 
 install: install-recursive

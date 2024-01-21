@@ -27,7 +27,7 @@
 #include <c_comand.h>
 #include <e_cardlist.h>
 #include "mg_.h" // TODO
-#include "mg_config.h"
+#include "config.h"
 /*global*/ int errorcount = 0;
 std::basic_ostream<char>* diag_out; // mg_error.cc
 /*--------------------------------------------------------------------------*/
@@ -86,9 +86,18 @@ public:
 OUTPUT output(std::cout);
 OUTPUT diag(std::cerr);
 /*--------------------------------------------------------------------------*/
+static void prepare_env()
+{
+  static const char* plugpath="PLUGPATH=" GNUCAP_PLUGPATH
+                              "\0         (reserved space)                 ";
+  assert(strlen("PLUGPATH=") == 9);
+  OS::setenv("GNUCAP_PLUGPATH", plugpath+9, false);
+}
+/*--------------------------------------------------------------------------*/
 Base& modelgen_opts();
 int main(int argc, char** argv)
 {
+  prepare_env();
   File f;
   Preprocessor p;
   --argc;

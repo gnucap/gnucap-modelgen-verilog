@@ -289,7 +289,7 @@ mg_main.o: mg_main.cc /usr/local/include/gnucap/u_opt.h \
  /usr/local/include/gnucap/m_expression.h \
  /usr/local/include/gnucap/m_base.h mg_deps.h mg_lib.h mg_func.h \
  /usr/local/include/gnucap/u_function.h mg_token.h m_tokens.h mg_code.h \
- mg_filter.h mg_circuit.h mg_discipline.h mg_module.h mg_config.h
+ mg_filter.h mg_circuit.h mg_discipline.h mg_module.h config.h
 mg_nodes.o: mg_nodes.cc mg_.h /usr/local/include/gnucap/ap.h \
  /usr/local/include/gnucap/md.h /usr/local/include/gnucap/io_trace.h \
  /usr/local/include/gnucap/io_error.h /usr/local/include/gnucap/m_base.h \
