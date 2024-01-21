@@ -335,7 +335,6 @@ bool DEV_CPOLY_CAP::do_tr_con_chk_and_q()
 /*--------------------------------------------------------------------------*/
 bool DEV_CPOLY_CAP::do_tr()
 {untested();
-  incomplete();
   _m0 = CPOLY1(0., _vi0[0], _vi0[1]);
   return do_tr_con_chk_and_q();
 }
@@ -413,10 +412,7 @@ bool DEV_DDT::do_tr()
   }else{
   }
   
-  _m0 = CPOLY1(0., _vi0[0], _vi0[1]);
-  trace3("DEV_DDT::do_tr done", _m0.x, _m0.c0, _m0.c1);
-  trace3("DEV_DDT::do_tr done", long_label(), _y[0].f0, _y[1].f0);
-  return do_tr_con_chk_and_q();
+  return DEV_CPOLY_CAP::do_tr();
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_IDT::do_tr()
@@ -452,8 +448,7 @@ bool DEV_IDT::do_tr()
   }else{
   }
 
-  _m0 = CPOLY1(0., _vi0[0], _vi0[1]);
-  return do_tr_con_chk_and_q();
+  return DEV_CPOLY_CAP::do_tr();
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_CAP::tr_load()

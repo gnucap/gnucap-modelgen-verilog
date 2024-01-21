@@ -505,13 +505,15 @@ bool Port_3::has_identifier() const
 void New_Port::parse(CS& file)
 {
   Port_3::parse(file); // TODO: port_base?
-  assert(_owner);
-  _owner->new_node(name());
+  assert(owner());
+  owner()->new_node(name());
 }
 /*--------------------------------------------------------------------------*/
 void Net_Declarations::parse(CS& f)
 {
   assert(owner()); // Module
+  Module* mod = prechecked_cast<Module*>(owner());
+  assert(mod);
   Block const* root_scope = owner()->owner();
   assert(root_scope);
   File const* root = dynamic_cast<File const*>(root_scope);
@@ -535,7 +537,7 @@ void Net_Declarations::parse(CS& f)
     m->set_owner(owner());
     f >> *m;
     for(auto i : *m){
-      i->set_discipline(*ii);
+      i->set_discipline(*ii, mod);
     }
 
     d = m;
@@ -548,8 +550,6 @@ void Net_Declarations::parse(CS& f)
     assert(!f);
   }
 
-  Module* mod = prechecked_cast<Module*>(owner());
-  assert(mod);
   if(d){
     push_back(d);
 
@@ -592,11 +592,21 @@ void Net_Identifier_Discipline::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 void Net_Identifier_Ground::parse(CS& f)
 {
+  assert(owner());
   Net_Identifier::parse(f);
-  if(owner()->node(name())){
+  Module* mod = prechecked_cast<Module*>(owner());
+  assert(mod);
+  Node_Ref const& nn = owner()->node(name());
+  if(nn) {
+    set_node(mod->node(nn));
   }else{ untested();
     throw Exception_CS_("ground: need previously declared net", f);
   }
+
+  Module* m = prechecked_cast<Module*>(owner());
+  assert(m);
+  assert(node());
+  m->set_to_ground(node());
 }
 /*--------------------------------------------------------------------------*/
 void Net_Decl_List_Ground::dump(std::ostream& o)const
@@ -631,9 +641,9 @@ void Net_Identifier::parse(CS& file)
   Port_3::parse(file); // TODO: port_base?
 }
 /*--------------------------------------------------------------------------*/
-void Net_Identifier::set_discipline(Discipline const* d)
+void Port_3::set_discipline(Discipline const* d, Module* owner)
 {
-  _node->set_discipline(d);
+  owner->node(_node)->set_discipline(d);
 }
 /*--------------------------------------------------------------------------*/
 void Port_3::dump(std::ostream& out)const

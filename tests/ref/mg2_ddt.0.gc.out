@@ -1,27 +1,21 @@
-module vsin (p,n);
-  .parameter ampl 
-  .parameter dc 
-  vsource #(sin.offset(NA( 0.)), .amplitude(ampl), .frequency( 1.), .delay(NA( 0.)), .damping(NA( 0.))  DC dc) V1 (.p(p),.n(n));
-endmodule // vsin
-
 parameter r=1 
 parameter v=0 
 test_ddt0_0 #() dut (.p(1),.n(0));
-vsin #(.ampl(1),.dc(v)) v1 (.p(1),.n(0));
+vsine #(.ampl(1),.dc(v)) v1 (.p(1),.n(0));
 #Time       v(1)       dv(dut)    i(dut._b_ddt_0_p_ddt_0_n) iter(0)   
- 0.         0.         0.         0.         2.        
- 0.1        0.58779    10.191     10.191     45.       
- 0.2        0.95106    3.8557     3.8557     6.        
- 0.3        0.95106   -3.9752    -3.9752     6.        
- 0.4        0.58779   -10.556    -10.556     3.        
- 0.5        0.        -12.956    -12.956     3.        
- 0.6       -0.58779   -9.9769    -9.9769     9.        
- 0.7       -0.95106   -3.6416    -3.6416     6.        
- 0.8       -0.95106    4.1894     4.1894     6.        
- 0.9       -0.58779    10.341     10.341     3.        
- 1.         0.         13.17      13.17      3.        
+ 0.         0.         0.         0.         3.        
+ 0.1        0.58779    10.2       10.2       42.       
+ 0.2        0.95106    3.8644     3.8644     6.        
+ 0.3        0.95106   -3.9666    -3.9666     6.        
+ 0.4        0.58779   -10.564    -10.564     3.        
+ 0.5       -7.f       -12.947    -12.947     3.        
+ 0.6       -0.58779   -9.9856    -9.9856     9.        
+ 0.7       -0.95106   -3.6503    -3.6503     6.        
+ 0.8       -0.95106    4.1807     4.1807     6.        
+ 0.9       -0.58779    10.35      10.35      3.        
+ 1.         13.f       13.161     13.161     3.        
 Gnucap   System status
-iterations: op=0, dc=0, tran=92, fourier=0, total=123
-transient timesteps: accepted=24, rejected=7, total=31
-nodes: user=1, subckt=0, model=0, total=1
+iterations: op=0, dc=0, tran=90, fourier=0, total=120
+transient timesteps: accepted=23, rejected=7, total=30
+nodes: user=1, subckt=0, model=1, total=2
 dctran density=100.0%, ac density=100.0%

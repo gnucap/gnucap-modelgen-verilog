@@ -201,7 +201,7 @@ Node_Map::~Node_Map()
   }
 }
 /*--------------------------------------------------------------------------*/
-Node const* Node_Map::operator[](std::string const& key) const
+Node_Ref Node_Map::operator[](std::string const& key) const
 {
   auto i = _map.find(key);
   if(i != _map.end()) {
@@ -216,7 +216,7 @@ Node* Module::new_node(std::string const& p)
   return _nodes.new_node(p);
 }
 /*--------------------------------------------------------------------------*/
-Node const* Module::node(std::string const& p) const
+Node_Ref Module::node(std::string const& p) const
 {
   try{
     return _nodes[p];

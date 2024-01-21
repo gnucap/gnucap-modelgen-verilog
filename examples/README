@@ -2,7 +2,7 @@
 
 See README files in subdirectories.
 
-== prerequisites
+== Prerequisites
 
 For this to work, gnucap, gnucap-modelgen-verilog and g++ are generally
-required to be installed in the usual places.
+required and assumed to be installed in the usual places.

@@ -996,7 +996,7 @@ public:
     assert(_owner);
     return _owner->new_node(p);
   }
-  virtual Node const* node(std::string const& p) const{ untested();
+  virtual Node_Ref node(std::string const& p) const{ untested();
     assert(_owner);
     return _owner->new_node(p); // new??
   }
@@ -1071,7 +1071,7 @@ public:
     assert(owner());
     return owner()->new_branch(p, n);
   }
-  Node const* node(std::string const& n)const override {
+  Node_Ref node(std::string const& n)const override {
     assert(owner());
     return owner()->node(n);
   }
@@ -1145,6 +1145,7 @@ public:
 };
 typedef LiSt<Port_1, '{', '#', '}'> Port_1_List;
 /*--------------------------------------------------------------------------*/
+class Discipline;
 // TODO: Port_Base?
 class Port_3 : public Owned_Base {
   std::string _name;
@@ -1165,6 +1166,8 @@ public:
   bool has_identifier()const;
   String_Arg key()const { return String_Arg(_name); }
   Node_Ref const& node()const {return _node;}
+  void set_node(Node*n){_node = n;}
+  void set_discipline(Discipline const* d, Module* owner);
 };
 // list ::= "(" port {"," port} ")"
 typedef LiSt<Port_3, '(', ',', ')'> Port_3_List_2;
@@ -1182,9 +1185,9 @@ public:
 /*--------------------------------------------------------------------------*/
 // TODO: Port_Base?
 class New_Port : public Port_3 {
-  Block* _owner{NULL};
+//  Block* _owner{NULL};
 public:
-  void set_owner(Block* c) { _owner = c; }
+//  void set_owner(Block* c) { _owner = c; }
   void parse(CS& f) override;
   New_Port() : Port_3() {}
 };
@@ -1196,16 +1199,13 @@ class Discipline;
 class Node;
 class Net_Identifier : public Port_3 {
   Block* _owner{NULL};
-  Node* _node{NULL};
 public:
   Net_Identifier() : Port_3() {}
 protected:
   Block* owner(){return _owner;}
-  void set_node(Node*n){_node = n;}
 public:
   void set_owner(Block* c) { _owner = c; }
   void parse(CS& f) override;
-  void set_discipline(Discipline const* d);
 };
 /*--------------------------------------------------------------------------*/
 typedef LiSt<Net_Identifier, '\0', ',', ';'> Net_Decl_List;
@@ -1781,8 +1781,8 @@ public:
   size_t size() const{ return _map.size(); }
 //   size_t how_many() const{ return _nodes.size() - 1; }
   Node* new_node(std::string const&);
-  Node const* operator[](std::string const& key) const;
-  Node const* operator[](int key) const{ return _nodes[key]; }
+  Node_Ref operator[](std::string const& key) const;
+  Node_Ref operator[](int key) const{ return _nodes[key]; }
   void set_short(Node const*, Node const*);
 };
 /*--------------------------------------------------------------------------*/
@@ -1804,8 +1804,8 @@ public:
   Branch_Ref new_branch(Node*, Node*)override {
     return Branch_Ref();
   }
-  Node const* node(std::string const&)const override {
-    return NULL;
+  Node_Ref node(std::string const&)const override {
+    return Node_Ref();
   }
   Branch_Ref lookup_branch(std::string const&)const override {
     return Branch_Ref();
@@ -1942,7 +1942,7 @@ private:
 
   Token* new_token(FUNCTION_ const*, size_t na) override;
   Branch_Ref new_branch_name(std::string const& n, Branch_Ref const& b) override;
-  Node const* node(std::string const& p) const override;
+  Node_Ref node(std::string const& p) const override;
   Branch_Ref lookup_branch(std::string const& p) const override;
 public:
   Node* node(Node_Ref r) { return r.mutable_node(*this); }

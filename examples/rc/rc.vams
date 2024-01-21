@@ -1,6 +1,6 @@
 
 module rc(1, 2, gnd)
 	parameter real ic=1;
-	capacitor #(.c(1u), .ic(ic)) c(1 gnd);
-	resistor #(.r(1k)) r(1 2);
+	capacitor #(.c(1u), .ic(ic)) c(1, gnd);
+	resistor #(.r(1k)) r(1, 2);
 endmodule

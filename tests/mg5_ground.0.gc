@@ -1,0 +1,30 @@
+
+attach ../lang_verilog.so
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_gnd0(in, out);
+  inout in, out;
+  electrical in, out, g, h, i, j;
+  (*desc="p"*) real p;
+  ground g;
+  analog begin
+    V(g,h) <+ 0.;
+    V(i,h) <+ 0.;
+    V(i,j) <+ 0.;
+    p = V(j);
+  end
+endmodule
+
+!make test_gnd0.so > /dev/null
+
+attach ./test_gnd0.so
+
+test_gnd0 #() dut(in, out);
+
+dc
+status notime

@@ -9,6 +9,7 @@
 - event control is incomplete
 - numerical port names don't work
 - string type is missing (breaks "%s" in strobe etc.).
+- types don't work. 1/2 equals .5
 
 == simulator plugins
 - still missing tiebreak rules in overload

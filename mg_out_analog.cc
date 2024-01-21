@@ -1124,7 +1124,9 @@ void Probe::make_cc_dev(std::ostream& o) const
     o____ "}\n";
     o____ "t[d" << code_name() << "] = 1;\n";
   }else if(is_pot_probe()) {
-    if (auto nn = dynamic_cast<Named_Branch const*>(&*_br)) {
+    if(_br->is_short()){
+      o______ "t = 0.;\n";
+    }else if (auto nn = dynamic_cast<Named_Branch const*>(&*_br)) {
       // assert(!_br.is_reversed());
       std::string pn = nn->base()->code_name();
       o____ "t = _potential" << pn << "; // named\n";

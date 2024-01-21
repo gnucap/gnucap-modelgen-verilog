@@ -2450,6 +2450,8 @@ private: // funcs
       return _sim->analysis_is_tran_static();
     }else if(what=="static"){
       return _sim->analysis_is_static();
+    }else if(what=="dc"){
+      return _sim->analysis_is_dcop();
     }else if(what=="noise"){ itested();
       return false; // later
     }else{ untested();
@@ -3178,6 +3180,8 @@ private: // funcs
       return _sim->analysis_is_tran_static();
     }else if(what=="static"){
       return _sim->analysis_is_static();
+    }else if(what=="dc"){
+      return _sim->analysis_is_dcop();
     }else if(what=="noise"){ itested();
       return false; // later
     }else{ untested();

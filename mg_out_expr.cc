@@ -314,7 +314,7 @@ public:
 	o__ "t" << _ddo_idx << ".set_all_deps(); // (all deriv)\n"; // code_name??
       }else{
 	for(auto i: *_deps){
-	  o__ "t" << _ddo_idx << "[d" << i->code_name() << "] = 0.; // (output dep)\n";
+	  o__ "// t" << _ddo_idx << "[d" << i->code_name() << "] = 0.; // (output dep)\n";
 	}
       }
     }

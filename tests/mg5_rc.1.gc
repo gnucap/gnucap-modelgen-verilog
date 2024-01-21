@@ -1,0 +1,39 @@
+
+attach ../lang_verilog.so
+attach ../modelgen_0.so
+attach ../d_vasrc.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_rc1(in, out);
+  inout in, out;
+  electrical in, out, g;
+  ground g;
+  resistor #(.r(1)) r(in, out);
+  analog begin
+    I(g,out) <+ ddt(V(g,out));
+    if(analysis("static")) begin
+      $strobe("%f %f\n", V(in), V(out));
+    end else begin
+      $strobe("%f %f %f\n", $abstime, V(in), V(out));
+    end
+  end
+endmodule
+
+!make test_rc1.so > /dev/null
+
+attach ./test_rc1.so
+
+test_rc1 #() dut(in, out);
+parameter v=0;
+vsine #(.freq(1), .ampl(v), .dc(v)) v1(in, 0);
+
+// print dc v(nodes) iter(0)
+dc v -1 2 1
+parameter v=1;
+
+print tran iter(0)
+tran .5
+status notime

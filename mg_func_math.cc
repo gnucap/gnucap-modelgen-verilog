@@ -494,9 +494,10 @@ public:
   }
   void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";
-    o____ "T " << code_name() << "(T d)const {itested();\n";
+    o____ "T " << code_name() << "(T d)const { untested();\n";
     o____ "chain(d, std::cosh(d));\n";
-    o______ "return set_value(d, std::sinh(d));\n";
+    o____ "::set_value(d, std::sinh(d));\n";
+    o____ "return d;\n";
     o__ "}\n";
   }
   std::string code_name()const override{
