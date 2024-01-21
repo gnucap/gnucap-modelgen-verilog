@@ -782,20 +782,31 @@ void DEV_INSTANCE_PROTO::cleanup()
 /*--------------------------------------------------------------------------*/
 // TODO: need a better stash and mechanism
 class CLEANUP : public CMD {
-  void do_it(CS&, CARD_LIST*)override {
-    DEV_INSTANCE_PROTO::cleanup();
-    for(auto i : device_dispatcher){
-      auto s = dynamic_cast<BASE_SUBCKT *>(i.second);
-      if(!s){
-      }else if(s->subckt()){
-	s->subckt()->erase_all();
-      }else{
-      }
+  void do_it(CS&, CARD_LIST* Scope)override {
+    DEV_INSTANCE_PROTO::cleanup(); // TODO: more generic approach
+    switch (ENV::run_mode) {
+    case rPRE_MAIN:
+      // unreachable(); // call from DETACH_HACK
+      exit(0);
+      break;
+    case rINTERACTIVE:
+    case rSCRIPT:
+    case rBATCH:        command("clear", Scope); exit(0); break;
+    case rPRESET:       untested(); /*nothing*/ break;
     }
-    CMD::command("clear:0", &CARD_LIST::card_list);
   }
 }p3;
-DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "clear", &p3);
+DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "quit|exit", &p3);
+/*--------------------------------------------------------------------------*/
+// need this, because "quit" is not called from main.cc
+// this effectively breaks "detach_all". don't use it for now.
+class DETACH_HACK : public CMD {
+  void do_it(CS&, CARD_LIST* Scope)override {
+    // CMD::command("detach_all:0", Scope); segfault, currently executed code
+    CMD::command("quit", Scope);
+  }
+}p3b;
+DISPATCHER<CMD>::INSTALL d3_hack(&command_dispatcher, "detach_all", &p3b);
 /*--------------------------------------------------------------------------*/
 } // namespace
 /*--------------------------------------------------------------------------*/

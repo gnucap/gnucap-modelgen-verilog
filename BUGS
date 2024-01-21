@@ -1,6 +1,5 @@
 == modelgen
 - Port currents "I(<a>)" not supported.
-- "ground" statement not implemented.
 - $limit: only "pnjlimit"
 - ac needs operating point, even if linear: mg2_cccs.0.gc
 - analysis("ic"): need more testing
@@ -10,8 +9,10 @@
 - numerical port names don't work
 - string type is missing (breaks "%s" in strobe etc.).
 - types don't work. 1/2 equals .5
+- cleanup hack breaks detach_all
 
 == simulator plugins
+- "ground" statement not implemented.
 - still missing tiebreak rules in overload
 - paramset: requires newlines, v_paramset.2a.gc
 - c_pulse.so: obsolete hack, need discontinuities.
