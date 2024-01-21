@@ -1,5 +1,5 @@
 attach ../modelgen_0.so
-attach ../d_vasrc.so
+
 
 spice
 .subckt vsin p n
@@ -16,7 +16,7 @@ module test_expcap0(p, n, cp, cn);
 	(*desc="dd"*) real dd;
 	analog begin
 		dd = ddt(V(cp,cn));
-		I(p,n) <+ ln(exp(ddt(V(cp,cn))));
+		I(p,n) <+ exp(ddt(V(cp,cn)));
 	end
 endmodule
 

@@ -1,7 +1,6 @@
 
 
 load ../vams/vccs.so
-load ../mgsim/d_vaflow.so
 
 verilog
 

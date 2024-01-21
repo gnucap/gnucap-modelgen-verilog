@@ -1,5 +1,3 @@
-load ../lang_verilog.so 
-     ^ ? "../lang_verilog.so": already loaded, replacing
 #           v(in)      v(out)     y(vv._b_sink_src)
  0.         0.9        6.3        0.        
 #Time       v(in)      v(out)    

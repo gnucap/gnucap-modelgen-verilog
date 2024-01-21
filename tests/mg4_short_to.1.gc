@@ -2,7 +2,7 @@
 verilog
 
 attach ../modelgen_0.so
-attach ../d_vasrc.so
+
 
 `modelgen
 module short_to1(p, n)

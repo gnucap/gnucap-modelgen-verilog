@@ -2,7 +2,7 @@
 
 verilog
 
-attach ../d_vasrc.so
+
 attach ../vams/diode.so
 
 module main(n, g)

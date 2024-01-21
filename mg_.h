@@ -761,7 +761,7 @@ public:
 
   std::string const& pname() const;
   std::string const& nname() const;
-  std::string const& name() const;
+  std::string name() const;
   void set_used_in(Base const*)const;
   void unset_used_in(Base const*)const;
 };
@@ -1588,7 +1588,7 @@ public:
   explicit Branch(Branch_Ref p, Module* m);
   Branch( Branch const&) = delete;
   ~Branch();
-  std::string name()const; // ?
+  virtual std::string name()const; // use label?
   // later.
   void parse(CS&)override {incomplete();}
   void dump(std::ostream&)const override;
@@ -1678,7 +1678,7 @@ public:
 //    set_label(b.short_label());
   }
 //  size_t num_states()const override {return _num_states;}
-  std::string const& name()const {return _name;}
+  std::string name()const override{return _name;} // label?
   bool has_name()const override {return true;}
   std::string code_name()const override;
 //  size_t num_nodes()const override {return _base.num_nodes();}
@@ -2291,13 +2291,14 @@ inline bool Owned_Base::is_reachable() const
 /*--------------------------------------------------------------------------*/
 inline bool Branch_Ref::has_name()const
 {
-  return dynamic_cast<Named_Branch const*>(_br);
+  assert(_br);
+  return _br->has_name();
 }
 /*--------------------------------------------------------------------------*/
-inline std::string const& Branch_Ref::name() const
+inline std::string Branch_Ref::name() const
 {
-  auto bb = dynamic_cast<Named_Branch const*>(_br);
-  return bb->name();
+  assert(_br);
+  return _br->name();
 }
 /*--------------------------------------------------------------------------*/
 #endif

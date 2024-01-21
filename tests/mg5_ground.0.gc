@@ -1,7 +1,7 @@
 
-attach ../lang_verilog.so
+
 attach ../modelgen_0.so
-attach ../d_vasrc.so
+
 attach ../vams/vsine.so
 
 verilog

@@ -1,6 +1,5 @@
 
-load ../d_vasrc.so
-load ../lang_verilog.so
+
 load ../vams/capacitor.so
 load ../vams/resistor.so
 

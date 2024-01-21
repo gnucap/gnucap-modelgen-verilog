@@ -1,0 +1,25 @@
+== Simulation components used in modelgen models
+
+Used during modelgen subcircuit expansion.
+
+Generally, these are parameterised using COMPONENT::set_parameters.
+Stand-alone operation is intended but incomplete.
+
+- d_va_flow: flow source
+- potential
+- switch
+- ddt/idt
+- slew
+- (laplace_*)
+- (z_*)
+
+== Simulator extensions
+
+Overlay plugins, staged for upstream inclusion.
+Currently bundled with components above, for convenience.
+
+- lang_verilog: modified version, to be symchronised
+- c_param: parameters with ranges
+- v_paramset: interpreted paramset
+- v_instance: paramset resolution
+- v_module: modified from d_subckt

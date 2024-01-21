@@ -1,5 +1,3 @@
-load ../lang_verilog.so 
-     ^ ? "../lang_verilog.so": already loaded, replacing
 #           v(in)      v(out)     v(s)       iter(0)   
  0.         0.9        0.9        0.9        4.        
 #Time       v(in)      v(out)     v(s)       timef(C1)  timef(dut.c1) iter(0)   

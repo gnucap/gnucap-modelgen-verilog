@@ -29,8 +29,7 @@
 #include <globals.h>
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-Token* MGVAMS_FUNCTION::new_token(Module& m, size_t /*na*/) const
+inline Token* MGVAMS_FUNCTION::new_token(Module& m, size_t /*na*/) const
 {
   m.install(this);
   if(code_name() != ""){
@@ -43,10 +42,11 @@ Token* MGVAMS_FUNCTION::new_token(Module& m, size_t /*na*/) const
   }
 }
 /*--------------------------------------------------------------------------*/
-void MGVAMS_FUNCTION::make_cc_dev(std::ostream& o) const
+inline void MGVAMS_FUNCTION::make_cc_dev(std::ostream& o) const
 {
   o__ "// " << label() << "\n";
 }
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void FUNCTION_::stack_op(Expression const& arg, Expression* E) const
 {

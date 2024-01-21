@@ -1,0 +1,26 @@
+
+PACKAGE = mgsim
+
+TARGET = \
+  c_param.so \
+  d_va_acs.so \
+  d_va_filter.so \
+  d_va_slew.so \
+  d_vaflow.so \
+  d_vapot_br.so \
+  d_vapot.so \
+  d_vasw.so \
+  lang_verilog.so \
+  v_instance.so \
+  v_paramset.so \
+  v_module.so
+
+
+# stuff them all into one plugin, for now.
+TARGET += \
+	c_param.so \
+	lang_verilog.so
+
+SRCS = ${TARGET:%.so=%.cc}
+
+MAKE_CPPFLAGS = -I ..

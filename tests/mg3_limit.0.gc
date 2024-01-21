@@ -1,7 +1,7 @@
 verilog // simplified spice diode with limit
 
 attach ../modelgen_0.so
-attach ../d_vasrc.so
+
 
 // options nobypass
 // options noincmode

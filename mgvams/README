@@ -1,0 +1,58 @@
+== modelgen vams extensions
+
+Semantics and code generation for functions and tasks
+
+(parenthesized: not yet)
+
+- A.8.2 Function calls
+  - ln, log.. (see Table 9-11)
+  - ddt
+  - ddx
+  - idt
+  - limexp
+  - slew
+  - (laplace_*)
+  - (zi_*)
+  - (white_noise)
+  - potential
+  - flow
+  - ..
+- Syntax 9-1 -- Display Tasks
+  - $strobe
+  - ($display)
+  - ($monitor)
+  - $write
+  - ($debug)
+- Table 9-4 -- Simulation control system tasks
+  - ($finish)
+  - ($stop)
+  - ($fatal)
+  - ($warning)
+  - ($error)
+  - ($info)
+- Table 9-7 -- Simulation time system functions
+  - ($realtime)
+  - $time
+  - ($stime)
+  - ($abstime)
+- Table 9-11 -- Math system functions
+  - atan
+  - exp
+  - cos
+  - sin
+  - .. more
+- Table 9-12 -- Analog kernel parameter system functions
+  - $temperature
+  - $vt
+  - $simparam
+  - ($simparam$str)
+- Table 9-15 -- Hierarchical parameter system functions
+  - $mfactor
+  - ($xposition)
+  - ($yposition)
+  - ($angle)
+  - ($hflip)
+  - ($vflip)
+- Table 9-16 -- Explicit binding detection system functions
+  - $param_given
+  - ($port_connected)

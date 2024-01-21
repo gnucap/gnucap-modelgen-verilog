@@ -1,4 +1,6 @@
 
+PACKAGE = vams
+
 TARGET = \
 	capacitor.so \
 	diode.so \
@@ -8,3 +10,6 @@ TARGET = \
 	vccs.so \
 	vcvs.so \
 	vsine.so
+
+SRCS = ${TARGET:%.so=%.vams}
+CLEANFILES = ${TARGET:%.so=%.cc}

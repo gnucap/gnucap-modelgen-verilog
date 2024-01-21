@@ -4,6 +4,8 @@ include Make1
 
 GNUCAP_CONF = gnucap-conf
 INSTALL = install
+MKDIR_P = mkdir -p
+SUBDIRS = mgsim vams
 
 CXX = $(shell $(GNUCAP_CONF) --cxx)
 GNUCAP_CPPFLAGS = $(shell $(GNUCAP_CONF) --cppflags) -DPIC
@@ -20,25 +22,11 @@ MANDIR = ${GNUCAP_DATA}/man/man1
 EMBED_HEADERS = e_va.raw m_va.raw
 
 LIBS =
+
+# these are hacks, only used in tests, not installed, ignore.
 MODULES = \
   bm_pulse.so \
-  d_vasrc.so \
-  lang_verilog.so \
   modelgen_0.so
-
-# stuff them all into one plugin, for now.
-LANG_OBJS = \
-	c_param.o \
-	lang_verilog.o \
-	v_instance.o \
-	v_paramset.o \
-	v_module.o
-
-CLEAN_OBJS = \
-	${LANG_OBJS} \
-	d_vaflow.o \
-	d_vapot_br.o \
-	d_vapot.o
 
 CXXFLAGS = -Wall -std=c++11
 
@@ -53,7 +41,9 @@ all: all-recursive all-local
 all-local: ${TARGET} ${MODULES}
 
 all-recursive: ${TARGET}
-	${MAKE} -C vams GNUCAP_CONF=${GNUCAP_CONF} CXXFLAGS="${CXXFLAGS}"
+	for i in ${SUBDIRS}; do \
+		${MAKE} -C $${i} GNUCAP_CONF=${GNUCAP_CONF} CXXFLAGS="${CXXFLAGS}"; \
+	done
 
 check: all
 	${MAKE} -C tests check GNUCAP_CONF=${GNUCAP_CONF}
@@ -63,7 +53,9 @@ clean: clean-recursive
 
 clean-recursive:
 	${MAKE} -C tests clean
-	${MAKE} -C vams clean
+	for i in ${SUBDIRS}; do \
+		${MAKE} -C $${i} clean; \
+	done
 
 $(TARGET): $(OBJS)
 	rm -f $@
@@ -76,43 +68,38 @@ include Make.depend
 	sed -e 's/^/"/' -e 's/$$/\\n"/' $< > $@
 mg_out_root.o: ${EMBED_HEADERS}
 
-VASRC_OBJS = d_vaflow.o d_vapot.o d_va_filter.o d_vapot_br.o d_va_slew.o d_vasw.o d_va_acs.o
-
 modelgen_0.o: $(OBJS)
-d_vasrc.so: ${VASRC_OBJS}
-	${CXX} $(GNUCAP_CPPFLAGS) -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $+ ${LIBS_} -o $@
-
-d_va_acs.o: d_va.h
-d_vasw.o: d_va.h
-d_vapot.o: d_va.h
-d_vaflow.o: d_va.h
-d_vapot_br.o: d_va.h
-
-lang_verilog.so: ${LANG_OBJS}
-	${CXX} -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $+ ${LIBS_} -o $@
 
 bm_pulse.so: bm_pulse.o
 	${CXX} -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $+ ${LIBS_} -o $@
 
 depend: Make.depend
+	for i in ${SUBDIRS}; do \
+		${MAKE} -C $${i} depend; \
+	done
+
 Make.depend: $(SRCS) $(HDRS) ${EMBED_HEADERS}
 	$(CXX) -MM $(GNUCAP_CPPFLAGS) ${GNUCAP_CXXFLAGS} $(CXXFLAGS) $(SRCS) > Make.depend
 
 install: install-recursive
 	
 install-recursive: install-here
-	${MAKE} -C vams install GNUCAP_CONF=${GNUCAP_CONF}
+	for i in ${SUBDIRS}; do \
+		${MAKE} -C $${i} install GNUCAP_CONF=${GNUCAP_CONF}; \
+	done
 
 install-here: ${TARGET} ${MODULES}
-	-${INSTALL} -d ${DESTDIR}${GNUCAP_EXEC_PREFIX}/bin
+	-${MKDIR_P} ${DESTDIR}${GNUCAP_EXEC_PREFIX}/bin
 	${INSTALL} ${TARGET} ${DESTDIR}${GNUCAP_EXEC_PREFIX}/bin
 
-	-${INSTALL} -d ${DESTDIR}${MANDIR}
+	-${MKDIR_P} ${DESTDIR}${MANDIR}
 	${INSTALL} ${MANPAGE} ${DESTDIR}${MANDIR}
 
-	install -d $(DESTDIR)$(GNUCAP_PKGLIBDIR)/vams
-	install $(MODULES) $(DESTDIR)$(GNUCAP_PKGLIBDIR)/vams
+	for i in ${SUBDIRS}; do \
+		install -d $(DESTDIR)$(GNUCAP_PKGLIBDIR)/$${i}; \
+	done
 
+	-${MKDIR_P} $(DESTDIR)$(GNUCAP_INCLUDEDIR)
 	install $(INSTALL_HDRS) $(DESTDIR)$(GNUCAP_INCLUDEDIR)
 
 RECURSIVE_TARGETS = all-recursive clean-recursive install-recursive

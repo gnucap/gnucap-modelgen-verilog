@@ -1,0 +1,30 @@
+Verilog-AMS device library
+
+This is a work in progress
+
+- primitives from LRM, Table E.1
+  - resistor
+  - capacitor
+  - inductor
+  - (iexp)
+  - (ipulse)
+  - ipwl
+  - isine
+  - (vexp)
+  - (vpulse)
+  - (vpwl)
+  - vsine
+  - (tline)
+  - vccs
+  - vcvs
+  - diode (from gnucap)
+  - (mosfet)
+  - (jfet)
+  - (mesfet)
+- gnucap .model ports
+  - diode
+  - (mos1,2,5)
+- misc
+  - cccs
+  - ccvs
+  - opamp

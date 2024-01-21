@@ -24,6 +24,8 @@
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"
 #include "mg_out.h"
+// #include "mg_func.cc"
+// #include "mg_out.cc"
 #include <globals.h>
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/

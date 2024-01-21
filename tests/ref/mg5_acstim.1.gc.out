@@ -1,5 +1,3 @@
-load ../lang_verilog.so 
-     ^ ? "../lang_verilog.so": already loaded, replacing
 #           v(2)       v(a)       loss(m1.d._b_p_n) loss(m1.d._b_acs_0_p_acs_0_n)
  0.         0.         0.         100.K      1.        
 #Freq       v(2)       v(a)       loss(m1.d._b_p_n) loss(m1.d._b_acs_0_p_acs_0_n)

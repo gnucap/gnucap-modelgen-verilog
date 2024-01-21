@@ -1,6 +1,6 @@
 
 attach ../modelgen_0.so
-attach ../d_vasrc.so
+
 
 verilog
 // ddx test case inspired by LRM 4.5.6

@@ -51,6 +51,7 @@ mg_in_paramset.cc \
 mg_in_verilog.cc \
 mg_main.cc \
 mg_options.cc \
+mg_out.cc \
 mg_out_dump.cc \
 mg_out_expr.cc \
 mg_out_h.cc \

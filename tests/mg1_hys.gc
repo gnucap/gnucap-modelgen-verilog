@@ -1,4 +1,4 @@
-attach ../d_vasrc.so
+
 attach ../modelgen_0.so
 
 verilog

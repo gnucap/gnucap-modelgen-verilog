@@ -1,7 +1,7 @@
 // simple diode test, d_diode.1.ckt
-attach ../lang_verilog.so
+verilog
 attach ../vams/diode.so
-attach ../d_vasrc.so
+
 verilog
 
 paramset ddd diode;

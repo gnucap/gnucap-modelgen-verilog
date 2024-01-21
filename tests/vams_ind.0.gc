@@ -1,8 +1,8 @@
 
 attach ../modelgen_0.so
-attach ../d_vasrc.so
+
 attach ../vams/inductor.so
-attach ../lang_verilog.so
+
 
 verilog
 

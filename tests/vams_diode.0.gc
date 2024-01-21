@@ -1,8 +1,8 @@
 verilog // Test diode model
 
-attach ../d_vasrc.so
+
 attach ../vams/diode.so
-//attach ../lang_verilog.so
+//
 
 module main(n, g)
 	diode #(.is(1e-15) .tf(1u) .cjo(1pf) .level(0)) D1(n g);
