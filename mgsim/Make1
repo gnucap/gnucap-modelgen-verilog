@@ -15,12 +15,11 @@ TARGET = \
   v_paramset.so \
   v_module.so
 
-
-# stuff them all into one plugin, for now.
-TARGET += \
-	c_param.so \
-	lang_verilog.so
-
 SRCS = ${TARGET:%.so=%.cc}
 
+INSTALL_FILES = $(TARGET)
+INSTALL_DIR = $(PREFIX)/lib/gnucap/${PACKAGE}
+
 MAKE_CPPFLAGS = -I ..
+
+CLEANFILES = ${TARGET}

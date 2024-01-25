@@ -1,5 +1,7 @@
 GNUCAP_CONF ?= gnucap-conf
 
+include Make1
+
 CXX = $(shell $(GNUCAP_CONF) --cxx)
 GNUCAP_CPPFLAGS = $(shell $(GNUCAP_CONF) --cppflags) -DADD_VERSION -DPIC
 GNUCAP_CXXFLAGS = $(shell $(GNUCAP_CONF) --cxxflags) -std=c++11
@@ -9,21 +11,23 @@ CPPFLAGS = -DTRACE_UNTESTED
 REFDIR = ref
 TARGETDIR = check
 GNUCAP = gnucap
-MODELGEN_VERILOG = ../gnucap-mg-vams
+MODELGEN_VERILOG = ../src/gnucap-mg-vams
 TEST_ENV = GNUCAP_PLUGPATH=..:$(shell $(GNUCAP_CONF) --pkglibdir) \
            GNUCAP=${GNUCAP}
 
+all: ${TEST_PLUGINS}
+
 %.o: %.cc
-	${CXX} -I .. ${CPPFLAGS} ${GNUCAP_CPPFLAGS} -g -O0 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $< -o $@ -c
+	${CXX} -I .. ${CPPFLAGS} ${GNUCAP_CPPFLAGS} -g -O0 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../src $< -o $@ -c
 
 %.s: %.cc
-	${CXX} -S ${CPPFLAGS} ${GNUCAP_CPPFLAGS} -g -O2 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $< -o $@
+	${CXX} -S ${CPPFLAGS} ${GNUCAP_CPPFLAGS} -g -O2 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../src $< -o $@
 
 %.s0: %.cc
-	${CXX} -S ${CPPFLAGS} ${GNUCAP_CPPFLAGS} -g -O0 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../include $< -o $@
+	${CXX} -S ${CPPFLAGS} ${GNUCAP_CPPFLAGS} -g -O0 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} -I../src $< -o $@
 
 %.so: %.o
-	${CXX} -shared ${CXXFLAGS} -I../include $< ${LIBS} -o $@
+	${CXX} -shared ${CXXFLAGS} -I../src $< ${LIBS} -o $@
 
 %: %.o
 	${CXX} -g -rdynamic $< -lgnucap -o $@
@@ -36,11 +40,14 @@ check/.diffs: ${CHECK_TARGETS}
 	cat $+ > $@
 
 # BUG. "+" breaks -n
-${CHECK_TARGETS}: check/%.diffs:
+${CHECK_TARGETS}: check/%.diffs: ${TEST_PLUGINS}
 	+${TEST_ENV} ./test ${MODELGEN_VERILOG} "$*" ${TARGETDIR} ${REFDIR}
 
+modelgen_0.so: modelgen_0.o
+	${CXX} -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} ../src/*.o $< ${LIBS_} -o $@
+
 clean:
-	rm -rf *.o *.cc *.so *.out *~
+	rm -rf *.o t*.cc *.so *.out *~
 	rm -rf check
 
 %.cc: %.vams

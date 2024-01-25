@@ -8,6 +8,11 @@ TARGET = \
 NOTYET_TARGET = \
   mg_task.so
 
-MAKE_CPPFLAGS = -I ..
+MAKE_CPPFLAGS = -I ${SRCDIR}/../src
+
+INSTALL_FILES = $(TARGET)
+INSTALL_DIR = $(PREFIX)/lib/gnucap/${PACKAGE}
 
 SRCS = ${TARGET:%.so=%.cc}
+
+CLEANFILES = ${TARGET}

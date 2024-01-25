@@ -1,0 +1,65 @@
+
+#perhaps synchronise with gnucap/include/Make3?
+
+MODELGEN = ../src/gnucap-mg-vams
+GNUCAP_CONF = gnucap-conf
+
+# move to Make2?
+CXX = $(shell $(GNUCAP_CONF) --cxx)
+GNUCAP_CPPFLAGS = $(shell $(GNUCAP_CONF) --cppflags) -DPIC
+GNUCAP_CXXFLAGS = $(shell $(GNUCAP_CONF) --cxxflags)
+GNUCAP_LDFLAGS = $(shell $(GNUCAP_CONF) --ldflags)
+GNUCAP_LIBDIR = $(shell $(GNUCAP_CONF) --libdir)
+GNUCAP_LIBS = $(shell $(GNUCAP_CONF) --libs)
+GNUCAP_PKGLIBDIR = $(shell $(GNUCAP_CONF) --pkglibdir)
+GNUCAP_INCLUDEDIR = $(shell $(GNUCAP_CONF) --includedir)
+GNUCAP_EXEC_PREFIX = $(shell $(GNUCAP_CONF) --exec-prefix)
+
+install : $(INSTALL_FILES)  $(INSTALL_FILES_1)  $(INSTALL_FILES_2)
+	[ -z "$(INSTALL_DIR)" ]   || mkdir -p $(DESTDIR)$(INSTALL_DIR) # Make3
+	[ -z "$(INSTALL_DIR_1)" ] || mkdir -p $(DESTDIR)$(INSTALL_DIR_1)
+	[ -z "$(INSTALL_DIR_2)" ] || mkdir -p $(DESTDIR)$(INSTALL_DIR_2)
+	[ -z "$(INSTALL_FILES)" ]   || cp $(INSTALL_FILES) $(DESTDIR)$(INSTALL_DIR)
+	[ -z "$(INSTALL_FILES_1)" ] || cp $(INSTALL_FILES_1) $(DESTDIR)$(INSTALL_DIR_1)
+	[ -z "$(INSTALL_FILES_2)" ] || cp $(INSTALL_FILES_2) $(DESTDIR)$(INSTALL_DIR_2)
+
+
+# these seem to belong to Make2...
+%.so: %.o
+	${CXX} -shared ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@ # Make3
+
+%.o: %.cc
+	${CXX} -I . -I ${SRCDIR}/../src $(GNUCAP_CPPFLAGS) $(CPPFLAGS) ${MAKE_CPPFLAGS} -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@ -c # Make3
+
+%.s: %.cc
+	${CXX} -S ${GNUCAP_CPPFLAGS} ${CPPFLAGS} ${MAKE_CPPFLAGS} -DNDEBUG -O2 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@ # Make3
+
+all: ${TARGET}
+
+depend: Make.depend
+Make.depend: $(SRCS) $(HDRS)
+	$(CXX) -MM $(CXXFLAGS) -isystem ${GNUCAP_INCLUDEDIR} ${CPPFLAGS} ${MAKE_CPPFLAGS} $(SRCS) > Make.depend
+#-----------------------------------------------------------------------------
+clean:
+	rm -rf $(CLEANFILES)
+	rm -f *.o *.obj *~
+mostlyclean: clean
+	rm -rf $(MOSTLYCLEANFILES)
+distclean: clean
+	rm -rf $(DISTCLEANFILES)
+
+# maintainer-clean:
+#	rm -rf $(MAINTAINERCLEANFILES)
+#	rm -f */*.o */*.obj */*.h */*.cc
+#	rm -f *~ \#*\#
+#-----------------------------------------------------------------------------
+MAKE_EXE = $(CXX) $(CCFLAGS) $(OBJS) $(TARGET_LIBS) $(LDFLAGS) -o
+MAKE_LIB = $(CXX) $(CCFLAGS) $(OBJS) $(TARGET_LIBS) $(LDFLAGS) -shared -o
+
+# supposedly "Make3" (?)
+# work in progress...
+
+
+.PHONY: clean distclean install all uninstall
+.SECONDARY: ${TARGET:.so=.cc}
+.DELETE_ON_ERROR:

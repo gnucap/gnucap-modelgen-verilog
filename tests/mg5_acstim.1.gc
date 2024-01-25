@@ -1,5 +1,5 @@
 
-load ../modelgen_0.so
+load ./modelgen_0.so
 
 verilog
 

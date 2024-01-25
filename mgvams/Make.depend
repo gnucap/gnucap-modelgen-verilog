@@ -1,38 +1,16 @@
-mg_func_math.o: mg_func_math.cc ../mg_func.h \
- /usr/local/include/gnucap/u_function.h \
- /usr/local/include/gnucap/e_base.h /usr/local/include/gnucap/u_attrib.h \
- /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/md.h \
- /usr/local/include/gnucap/io_trace.h \
- /usr/local/include/gnucap/io_error.h \
- /usr/local/include/gnucap/l_indirect.h ../mg_token.h ../m_tokens.h \
- ../mg_expression.h /usr/local/include/gnucap/m_expression.h \
- /usr/local/include/gnucap/m_base.h /usr/local/include/gnucap/l_lib.h \
- /usr/local/include/gnucap/constant.h /usr/local/include/gnucap/m_base.h \
- ../mg_deps.h ../mg_lib.h ../mg_func.h ../mg_out.cc ../mg_out.h \
- ../mg_base.h ../mg_token.h ../mg_module.h ../mg_code.h ../mg_attrib.h \
- /usr/local/include/gnucap/globals.h \
- /usr/local/include/gnucap/l_dispatcher.h \
- /usr/local/include/gnucap/l_stlextra.h /usr/local/include/gnucap/u_opt.h \
- /usr/local/include/gnucap/mode.h /usr/local/include/gnucap/io_.h \
- /usr/local/include/gnucap/u_parameter.h \
- /usr/local/include/gnucap/m_expression.h \
- /usr/local/include/gnucap/e_cardlist.h
-mg_func_sys.o: mg_func_sys.cc ../mg_func.h \
- /usr/local/include/gnucap/u_function.h \
- /usr/local/include/gnucap/e_base.h /usr/local/include/gnucap/u_attrib.h \
- /usr/local/include/gnucap/ap.h /usr/local/include/gnucap/md.h \
- /usr/local/include/gnucap/io_trace.h \
- /usr/local/include/gnucap/io_error.h \
- /usr/local/include/gnucap/l_indirect.h ../mg_token.h ../m_tokens.h \
- ../mg_expression.h /usr/local/include/gnucap/m_expression.h \
- /usr/local/include/gnucap/m_base.h /usr/local/include/gnucap/l_lib.h \
- /usr/local/include/gnucap/constant.h /usr/local/include/gnucap/m_base.h \
- ../mg_deps.h ../mg_lib.h ../mg_func.h ../mg_out.cc ../mg_out.h \
- ../mg_base.h ../mg_token.h ../mg_module.h ../mg_code.h ../mg_attrib.h \
- /usr/local/include/gnucap/globals.h \
- /usr/local/include/gnucap/l_dispatcher.h \
- /usr/local/include/gnucap/l_stlextra.h /usr/local/include/gnucap/u_opt.h \
- /usr/local/include/gnucap/mode.h /usr/local/include/gnucap/io_.h \
- /usr/local/include/gnucap/u_parameter.h \
- /usr/local/include/gnucap/m_expression.h \
- /usr/local/include/gnucap/e_cardlist.h
+mg_func_math.o: mg_func_math.cc ../mgvams/../src/mg_func.h \
+ ../mgvams/../src/mg_token.h ../mgvams/../src/m_tokens.h \
+ ../mgvams/../src/mg_expression.h ../mgvams/../src/mg_deps.h \
+ ../mgvams/../src/mg_lib.h ../mgvams/../src/mg_func.h \
+ ../mgvams/../src/mg_out.cc ../mgvams/../src/mg_out.h \
+ ../mgvams/../src/mg_base.h ../mgvams/../src/mg_token.h \
+ ../mgvams/../src/mg_module.h ../mgvams/../src/mg_code.h \
+ ../mgvams/../src/mg_attrib.h
+mg_func_sys.o: mg_func_sys.cc ../mgvams/../src/mg_func.h \
+ ../mgvams/../src/mg_token.h ../mgvams/../src/m_tokens.h \
+ ../mgvams/../src/mg_expression.h ../mgvams/../src/mg_deps.h \
+ ../mgvams/../src/mg_lib.h ../mgvams/../src/mg_func.h \
+ ../mgvams/../src/mg_out.cc ../mgvams/../src/mg_out.h \
+ ../mgvams/../src/mg_base.h ../mgvams/../src/mg_token.h \
+ ../mgvams/../src/mg_module.h ../mgvams/../src/mg_code.h \
+ ../mgvams/../src/mg_attrib.h

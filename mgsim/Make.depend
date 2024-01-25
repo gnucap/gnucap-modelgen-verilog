@@ -1,0 +1,12 @@
+c_param.o: c_param.cc
+d_va_acs.o: d_va_acs.cc d_va.h
+d_va_filter.o: d_va_filter.cc
+d_va_slew.o: d_va_slew.cc
+d_vaflow.o: d_vaflow.cc d_va.h
+d_vapot_br.o: d_vapot_br.cc d_va.h
+d_vapot.o: d_vapot.cc d_va.h
+d_vasw.o: d_vasw.cc d_va.h
+lang_verilog.o: lang_verilog.cc
+v_instance.o: v_instance.cc
+v_paramset.o: v_paramset.cc
+v_module.o: v_module.cc

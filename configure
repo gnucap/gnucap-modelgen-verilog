@@ -1,7 +1,13 @@
 #!/bin/sh
-# configure for executable
+# top level configure
+gnucap_conf=gnucap-conf
 
-mkdir -p O
+SUBDIRS="src mgvams mgsim vams" # BUG, already in Make1.
+
+echo -n '# ' > config.log
+date >> config.log
+echo $0 "$@" >> config.log
+
 #-------------  Stuff added to enable --prefix  --------------
 if test "x$1" != "x"; then
     # echo Found input parameter -- $1
@@ -9,6 +15,7 @@ if test "x$1" != "x"; then
     if test "x${1#--prefix=}" != "x$1"; then
         # echo "Found --prefix in input args.  Setting prefix directory."
         prefix=${1#--prefix=}
+	     prefix_given=yes
     else
         # echo "Found unrecognized parameter in input args."
         #  Just use the default prefix dir.
@@ -18,44 +25,75 @@ if test "x$1" != "x"; then
 else
     # echo "No input parameter found."
     #  Just use the default prefix dir
-    prefix=/usr/local
+	 prefix=/usr/local
 fi
 
-sed -e "s#/usr/local#$prefix#" ../Makefile.template > makefile
+echo prefix is $prefix
 
+srcdir=$(dirname $0)
+# abs_srcdir=$(cd $srcdir; pwd)
+if [ ! -f $srcdir/NEWS ]; then
+	echo could not find source directory
+	exit 1
+fi
+
+echo \# created by $PWD/$0. do not edit >makefile
+echo \#------------------------------------------------------------------------ >>makefile
+echo "SRCDIR = $srcdir" >> makefile
+echo "VPATH = $${SRCDIR}" >> makefile
+cat $srcdir/makefile.in >> makefile
 #----------------------------------------------------------------
 echo "CCFLAGS = \\" >Make.ccflags
 echo "-DUNIX -O2 -DNDEBUG -I. -I../include -I../../include -W" >>Make.ccflags
 
-echo "LIBS = \\" >Make.libs
-echo "-lgnucap \\" >>Make.libs
-echo "" >>Make.libs
-echo "PREFIX = " $prefix >>Make.libs
-echo "" >>Make.libs
-
+#------------------------------------------------------------------------
+# LDFLAGS="-rdynamic"
+#------------------------------------------------------------------------
 cat <<CAT_EOF >Make.sys
 #------------------------------------------------------------------------
-pkglibdir='${prefix}/lib/gnucap'
-pkglibdir_expanded="${prefix}/lib/gnucap"
-sed -e "s#@pkglibdir_expanded@#$pkglibdir_expanded#" \
-	       < config.h.in > config.h.in
-#------------------------------------------------------------------------
-VPATH = .:..
-CCC = g++
+CXX = g++
 TARGET_EXT =
 
-LDFLAGS = -rdynamic
 
 .SUFFIXES : .o .cc
-.cc.o:; \$(CCC) \$(CCFLAGS) -c \$<
-#------------------------------------------------------------------------
-\$(TARGET): \$(OBJS)
-	rm -f \$@
-	\$(CCC) \$(CCFLAGS) \$(OBJS) -o \$@ \$(LIBS) \$(LDFLAGS)
+.cc.o:; \$(CXX) \$(CCFLAGS) -c \$< # configure/Make2
 #------------------------------------------------------------------------
 CAT_EOF
 
-cat Make.ccflags Make.libs Make.sys >Make2
-rm Make.ccflags Make.libs Make.sys
+echo \# created by $PWD/$0. do not edit >Make2
+echo \#------------------------------------------------------------------------ >>Make2
+echo "CXX = c++" >>Make2
+echo "PREFIX = " $prefix >>Make2
+echo "LDFLAGS = $LDFLAGS "`${gnucap_conf} --ldflags` >>Make2
+cat Make.ccflags Make.sys >>Make2
+rm Make.ccflags Make.sys
+#------------------------------------------------------------------------
+sub_configure() {
+	echo sub_configure $1
+	(
+		cd $1
+		$srcdir/../$i/configure --prefix="$prefix" --srcdir="$srcdir/../$i"
+	)
+}
+#------------------------------------------------------------------------
+sub_makefile() {
+	echo sub_makefile $1
+	echo \# created by $0 do not edit >$1
+	echo \#------------------------------------------------------------------------ >>Make2
+	echo "SRCDIR = $srcdir/../$i" >> $1
+	echo "VPATH = \${SRCDIR}" >> $1
+	echo "include \${SRCDIR}/Make1" >> $1
+	echo "include ../Make2" >> $1
+	echo "include $srcdir/../Make3" >> $1
+}
+#------------------------------------------------------------------------
+for i in ${SUBDIRS}; do
+	mkdir -p $i;
+	if [ -f $srcdir/$i/configure ]; then
+		sub_configure $i;
+	else
+		sub_makefile $i/makefile;
+	fi
+done
 
 exit 0

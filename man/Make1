@@ -1,0 +1,4 @@
+
+INSTALL_FILES = gnucap-mg-vams.1
+GNUCAP_DATA = $(shell $(GNUCAP_CONF) --data)
+INSTALL_DIR = ${GNUCAP_DATA}/man/man1

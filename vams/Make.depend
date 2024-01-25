@@ -1,0 +1,8 @@
+capacitor.o: capacitor.cc
+diode.o: diode.cc
+resistor.o: resistor.cc
+inductor.o: inductor.cc
+isine.o: isine.cc
+vccs.o: vccs.cc
+vcvs.o: vcvs.cc
+vsine.o: vsine.cc

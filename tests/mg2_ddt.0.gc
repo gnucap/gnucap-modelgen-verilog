@@ -1,4 +1,4 @@
-attach ../modelgen_0.so
+attach ./modelgen_0.so
 
 attach ../vams/vsine.so
 

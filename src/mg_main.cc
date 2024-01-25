@@ -88,6 +88,7 @@ OUTPUT diag(std::cerr);
 /*--------------------------------------------------------------------------*/
 static void prepare_env()
 {
+  assert(strlen(GNUCAP_PLUGPATH));
   static const char* plugpath="PLUGPATH=" GNUCAP_PLUGPATH
                               "\0         (reserved space)                 ";
   assert(strlen("PLUGPATH=") == 9);
@@ -119,7 +120,7 @@ int main(int argc, char** argv)
     }else if (strcasecmp(argv[0], "-a") == 0) { untested();
       --argc;
       ++argv;
-      if (argc) {
+      if (argc) { untested();
 	CMD::command(std::string("attach ") + argv[0], &CARD_LIST::card_list);
       }else{untested();
       }

@@ -1,0 +1,5 @@
+
+# these are hacks, only used in tests, not installed, ignore.
+TEST_PLUGINS = \
+  bm_pulse.so \
+  modelgen_0.so

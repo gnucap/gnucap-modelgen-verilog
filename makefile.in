@@ -1,0 +1,24 @@
+# Makefile fragment for modelgen-verilog
+# ... for use with configure & GNU Make aka. "gmake"
+# Author: Felix Salfelder 2024
+#-----------------------------------------------------------------------------
+include ${SRCDIR}/Make1
+RECURSIVE_TARGETS=all install clean depend
+#-----------------------------------------------------------------------------
+${RECURSIVE_TARGETS:%=%-recursive}: %-recursive:
+	for i in ${SUBDIRS}; do \
+	  $(MAKE) -C $${i} $*; \
+	done
+#-----------------------------------------------------------------------------
+${RECURSIVE_TARGETS}: %: %-recursive
+#-----------------------------------------------------------------------------
+check:
+	@if [ "${SRCDIR}" = "." ]; then \
+		${MAKE} -C tests check; \
+	else \
+		echo INCOMPLETE: check rule requires in-tree build.; \
+		echo run manually for now.; \
+	fi
+#-----------------------------------------------------------------------------
+.PHONY: ${RECURSIVE_TARGETS} ${RECURSIVE_TARGETS:%=%-recursive} \
+        install install-here check
