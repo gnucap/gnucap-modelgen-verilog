@@ -68,11 +68,23 @@ echo "LDFLAGS = $LDFLAGS "`${gnucap_conf} --ldflags` >>Make2
 cat Make.ccflags Make.sys >>Make2
 rm Make.ccflags Make.sys
 #------------------------------------------------------------------------
+case $srcdir in
+	[\\/]* | ?:[\\/]*)
+		top_srcdir_="$srcdir"
+		;;
+	\.)
+		top_srcdir_=".."
+		;;
+	*)
+		top_srcdir_="../$srcdir"
+		;;
+esac
+#------------------------------------------------------------------------
 sub_configure() {
 	echo sub_configure $1
 	(
 		cd $1
-		$srcdir/../$i/configure --prefix="$prefix" --srcdir="$srcdir/../$i"
+		$top_srcdir_/$1/configure --prefix="$prefix" --srcdir="$top_srcdir_/$1"
 	)
 }
 #------------------------------------------------------------------------
@@ -80,11 +92,12 @@ sub_makefile() {
 	echo sub_makefile $1
 	echo \# created by $0 do not edit >$1
 	echo \#------------------------------------------------------------------------ >>Make2
-	echo "SRCDIR = $srcdir/../$i" >> $1
+	echo "TOP_SRCDIR = $top_srcdir_" >> $1
+	echo "SRCDIR = $top_srcdir_/$i" >> $1
 	echo "VPATH = \${SRCDIR}" >> $1
 	echo "include \${SRCDIR}/Make1" >> $1
 	echo "include ../Make2" >> $1
-	echo "include $srcdir/../Make3" >> $1
+	echo "include $top_srcdir_/Make3" >> $1
 }
 #------------------------------------------------------------------------
 for i in ${SUBDIRS}; do

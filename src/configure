@@ -1,5 +1,9 @@
 #!/bin/sh
 
+echo -n '# ' > config.log
+date >> config.log
+echo $0 "$@" >> config.log
+
 #-------------  Stuff added to enable --prefix  --------------
 if test "x$1" != "x"; then
     # echo Found input parameter -- $1
