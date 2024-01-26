@@ -370,7 +370,7 @@ class Task;
 class Node;
 class Nature;
 class Token;
-class FUNCTION_;
+class FUNCTION;
 class Block : public List_Base<Base> /* is Base_,  has-A List? */ {
   typedef std::map<std::string, Base*> map; // set?
   typedef map::const_iterator const_iterator;
@@ -415,7 +415,7 @@ public:
     return _owner->new_node(p); // new??
   }
 
-  virtual Token* new_token(FUNCTION_ const* f, size_t num_args) {
+  virtual Token* new_token(FUNCTION const* f, size_t num_args) {
     assert(_owner);
     return _owner->new_token(f, num_args);
   }

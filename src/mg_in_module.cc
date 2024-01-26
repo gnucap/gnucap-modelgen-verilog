@@ -27,37 +27,6 @@
 #include "mg_analog.h" // BUG: Analog_Function_Arg
 #include "l_stlextra.h"
 /*--------------------------------------------------------------------------*/
-#if 0
-void Name_String::parse(CS& File)
-{ untested();
-  File.skipbl();
-  _data = "";
-  if (File.is_pfloat()) { untested();
-    while (File.is_pfloat()) { untested();
-      _data += File.ctoc();
-    }
-    if (File.match1("eE")) { untested();
-      _data += File.ctoc();
-      if (File.match1("+-")) { untested();
-        _data += File.ctoc();
-      }else{ untested();
-      }
-      while (File.is_digit()) { untested();
-        _data += File.ctoc();
-      }
-    }else{ untested();
-    }
-    while (File.is_alpha()) { untested();
-      _data += File.ctoc();
-    }
-  }else{ untested();
-    while (File.is_alpha() || File.is_pfloat() || File.match1("_$")) { untested();
-      _data += File.ctoc();
-    }
-  }
-  File.skipbl();
-}
-#endif
 /*--------------------------------------------------------------------------*/
 /* A.4.1	6.2.2
 + module_instantiation ::=
@@ -174,13 +143,13 @@ void Parameter_2::parse(CS& f)
   _default_val.set_owner(owner());
   _value_range_list.set_owner(owner());
 
+  size_t here = f.cursor();
   f >> ','; // ??
-//  size_t here = f.cursor();
   f >> _name;
 
   assert(dynamic_cast<Module const*>(owner()));
   if(owner()->lookup(_name, false)){
-    throw Exception_CS_("already declared", f);
+    throw Exception_CS_("already declared", f, here);
   }else{
     trace3("not there", _name, name(), dynamic_cast<Module const*>(owner()) );
   }
@@ -479,6 +448,12 @@ void Port_3::parse(CS& file)
   }
 }
 /*--------------------------------------------------------------------------*/
+Port_3* Module::find_port(std::string const& s)
+{
+  assert(_circuit);
+  return _circuit->find_port(s);
+}
+/*--------------------------------------------------------------------------*/
 void Port_Connection_List::parse(CS& f)
 {
   assert(owner());
@@ -502,67 +477,6 @@ void Port_Connection_List::parse(CS& f)
 bool Port_3::has_identifier() const
 {
   return _value != "";
-}
-/*--------------------------------------------------------------------------*/
-void New_Port::parse(CS& file)
-{
-  Port_3::parse(file); // TODO: port_base?
-  assert(owner());
-  owner()->new_node(name());
-}
-/*--------------------------------------------------------------------------*/
-void Net_Declarations::parse(CS& f)
-{
-  assert(owner()); // Module
-  Module* mod = prechecked_cast<Module*>(owner());
-  assert(mod);
-  Block const* root_scope = owner()->owner();
-  assert(root_scope);
-  File const* root = dynamic_cast<File const*>(root_scope);
-  if(root){
-  }else{
-    //incomplete();
-    //f.reset_fail(f.cursor());
-    //return;
-
-    root = prechecked_cast<File const*>(root_scope->owner());
-    assert(root);
-  }
-  auto ii = root->discipline_list().find(f);
-  Net_Decl_List* d = NULL;
-
-  if(ii!=root->discipline_list().end()){
-//    size_t here = f.cursor();
-    auto m = new Net_Decl_List_Discipline();
-    m->set_discipline(*ii);
-
-    m->set_owner(owner());
-    f >> *m;
-    for(auto i : *m){
-      i->set_discipline(*ii, mod);
-    }
-
-    d = m;
-  }else if(f.umatch("ground ")){
-    auto m = new Net_Decl_List_Ground();
-    m->set_owner(owner());
-    f >> *m;
-    d = m;
-  }else{
-    assert(!f);
-  }
-
-  if(d){
-    push_back(d);
-
-    if(mod->attribute_stash().is_empty()){
-    }else if(size()){
-      assert(!_attributes);
-      d->set_attributes(mod->attribute_stash().detach());
-    }else{ untested();
-    }
-  }else{
-  }
 }
 /*--------------------------------------------------------------------------*/
 void Net_Declarations::dump(std::ostream& o) const
@@ -785,27 +699,6 @@ void Module::parse(CS& f)
   f >> ';';
   parse_body(f);
   setup_nodes();
-}
-/*--------------------------------------------------------------------------*/
-void Circuit::parse_ports(CS& f)
-{
-  f >> _ports;
-}
-/*--------------------------------------------------------------------------*/
-void Circuit::parse(CS&)
-{
-  assert(owner());
-  _ports.set_owner(owner());
-  _input.set_owner(owner());
-  _output.set_owner(owner());
-  _inout.set_owner(owner());
-  _ground.set_owner(owner());
-  _net_decl.set_owner(owner());
-  _branch_decl.set_owner(owner());
-  _local_nodes.set_owner(owner());
-  _net_decl.set_owner(owner());
-  _branches.set_owner(owner());
-  _element_list.set_owner(owner());
 }
 /*--------------------------------------------------------------------------*/
 void Module::parse_body(CS& f)
@@ -1108,6 +1001,8 @@ void Block::new_var_ref(Base* what)
     p = A->name();
   }else if(auto A = dynamic_cast<Paramset_Stmt const*>(what)){
     p = "."+A->name();
+  }else if(auto A = dynamic_cast<Node const*>(what)){
+    p = A->name();
   }else{ untested();
     incomplete();
     assert(false);

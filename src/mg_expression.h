@@ -104,8 +104,8 @@ public:
 //  Deps const& deps()const { return _deps; }
 //  Deps& deps() { return _deps; }
 private: // all the same eventually?
+//  Token* resolve_function(FUNCTION_ const* filt, Block* owner) const;
   Token* resolve_xs_function(std::string const& n);
-  Token* resolve_function(FUNCTION_ const* filt, size_t na);
   Token* resolve_system_task(FUNCTION_ const* t);
   Probe const* new_probe(std::string const& xs, Branch_Ref const& br);
 };

@@ -132,11 +132,16 @@ CS & CS::warn(int badness, size_t spot, const std::string& message)
 Exception_CS_::Exception_CS_(const std::string& Message, const CS& cmd)
   :Exception(Message)
 {
-  if(cmd.cursor() < 40) {
+  construct(cmd, cmd.cursor());
+}
+/*--------------------------------------------------------------------------*/
+void Exception_CS_::construct(const CS& cmd, size_t here)
+{
+  if(here < 40) {
     _cmd = cmd.fullstring().substr(0,60);
-    _cursor = cmd.cursor();
+    _cursor = here;
   }else{
-    _cmd = "... " + cmd.fullstring().substr(cmd.cursor()-36, 56);
+    _cmd = "... " + cmd.fullstring().substr(here-36, 56);
     _cursor = 40;
   }
   std::string::size_type l = _cmd.find_last_of('\n', _cursor);
@@ -149,6 +154,12 @@ Exception_CS_::Exception_CS_(const std::string& Message, const CS& cmd)
     }
   }else{
   }
+}
+/*--------------------------------------------------------------------------*/
+Exception_CS_::Exception_CS_(const std::string& Message, const CS& cmd, size_t here)
+  :Exception(Message)
+{
+  construct(cmd, here);
 }
 /*--------------------------------------------------------------------------*/
 const std::string Exception_CS_::message()const

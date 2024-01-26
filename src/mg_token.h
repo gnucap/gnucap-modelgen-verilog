@@ -4,6 +4,7 @@
 #include "m_tokens.h"
 #include <m_expression.h>
 #include "mg_func.h"
+#include "mg_base.h"
 class FUNCTION_;
 class Token_CALL : public Token_SYMBOL {
 private: // stuff into data?
@@ -32,12 +33,44 @@ public:
   void push(Expression const* e){ assert(!_args); _args = e; }
   void stack_op(Expression* e)const override;
   void set_num_args(size_t n){ _num_args = n; } // expression size?
+  void set_args(Expression* e){ assert(!_args); _args = e; } // needed?
  // size_t num_args() const;
   Expression const* args()const { return _args; }
   virtual /*?*/ std::string code_name() const;
   FUNCTION_ const* f() const{ return _function; }
   bool returns_void() const;
 }; // Token_CALL
+/*--------------------------------------------------------------------------*/
+class Port_3; // New_Port?
+class Token_PORT_BRANCH : public Token_SYMBOL {
+  Port_3 const* _port{NULL}; // use _data?
+public:
+  Token_PORT_BRANCH(Token_PORT_BRANCH const& s)
+    : Token_SYMBOL(s), _port(s._port) {}
+  Token_PORT_BRANCH(Token_SYMBOL const& s, Port_3 const* p)
+    : Token_SYMBOL(s), _port(p) {}
+
+  Token_PORT_BRANCH* clone()const override { return new Token_PORT_BRANCH(*this); }
+
+  void stack_op(Expression* E)const override{
+    E->push_back(clone());
+  }
+};
+/*--------------------------------------------------------------------------*/
+class Token_NODE : public Token_SYMBOL {
+  Node_Ref const _node;
+public:
+  Token_NODE(Token_NODE const& s)
+    : Token_SYMBOL(s), _node(s._node) {}
+  Token_NODE(Token_SYMBOL const& s, Node_Ref p)
+    : Token_SYMBOL(s), _node(p) {}
+
+  Token_NODE* clone()const override { return new Token_NODE(*this); }
+
+  void stack_op(Expression* E)const override{
+    E->push_back(clone());
+  }
+};
 /*--------------------------------------------------------------------------*/
 inline void Token_CALL::attach()
 {

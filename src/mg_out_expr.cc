@@ -484,6 +484,9 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
       }
     }else if (auto p = dynamic_cast<const Token_PAR_REF*>(*i)) {
       s.new_rhs(p);
+    }else if (auto p = dynamic_cast<const Token_PORT_BRANCH*>(*i)) {
+      incomplete();
+      s.new_ref("0"); //port number here?
     }else if (auto c = dynamic_cast<const Token_CONSTANT*>(*i)) {
       s.new_constant(o, *c);
     }else if(auto F = dynamic_cast<const Token_CALL*>(*i)) {

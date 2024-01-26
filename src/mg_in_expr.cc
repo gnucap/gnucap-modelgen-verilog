@@ -49,10 +49,22 @@ Expression_* Expression_::clone() const
   return n;
 }
 /*--------------------------------------------------------------------------*/
-Token* Expression_::resolve_function(FUNCTION_ const* f, size_t na)
+static Token* resolve_function(FUNCTION_ const* f, Expression const* e, Block* owner)
 {
-  assert(owner());
-  Token* t = owner()->new_token(f, na);
+  assert(f);
+  assert(e);
+  assert(owner);
+  size_t na=-1;
+  if(e->is_empty()){
+  }else if(auto p = dynamic_cast<Token_PARLIST_ const*>(e->back())){
+    if(auto d = dynamic_cast<Expression const*>(p->data())){
+      na = d->size();
+    }else{ untested();
+    }
+  }else if(dynamic_cast<Token_PARLIST const*>(e->back())){ untested();
+  }else{
+  }
+  Token* t = owner->new_token(f, na);
   return t;
 }
 /*--------------------------------------------------------------------------*/
@@ -98,6 +110,7 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
       trace0("resolve STOP");
       t->stack_op(&E);
     }else if(dynamic_cast<Token_CONSTANT*>(t)) {
+      trace1("Token_CONSTANT", t->name());
       t->stack_op(&E);
     }else if((E.is_empty() || !dynamic_cast<Token_PARLIST*>(E.back()))
           && symbol && t->name() == "inf") {
@@ -135,7 +148,7 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
       t3.stack_op(&E);
 #if 0
       // no. aliases are not supposed to be used here
-    }else if(auto a = dynamic_cast<Aliasparam const*>(r)) {
+    }else if(auto a = dynamic_cast<Aliasparam const*>(r)) { untested();
       Token_PAR_REF PP(a->param_name(), a->param()); // BUG? use code name.
       PP.stack_op(&E);
 #endif
@@ -151,6 +164,9 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
       }
       Token_VAR_REF a(v->name(), v);
       a.stack_op(&E);
+    }else if(auto v = dynamic_cast<Port_3 const*>(r)) {
+      Token_PORT_BRANCH a(*symbol, v);
+      a.stack_op(&E);
     }else if(!E.is_empty() && dynamic_cast<Token_PARLIST*>(E.back())
 	  && is_xs_function(n, scope)) {
       // this is upside down...
@@ -162,7 +178,7 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
       E.push_back(new Token_CONSTANT(n, f, ""));
     }else if(FUNCTION_ const* af = is_analog_function_call(n, scope)) {
       assert(dynamic_cast<Token_PARLIST*>(E.back()));
-      Token* tt = resolve_function(af, size_t(-1));
+      Token* tt = resolve_function(af, &E, owner());
       // Token_AFCALL a(n, af);
       assert(tt);
       tt->stack_op(&E);
@@ -181,18 +197,21 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
 	assert(!dynamic_cast<Token_PARLIST const*>(E.back()));
       }
       trace2("va_function?", n, na);
-      Token* tt = resolve_function(vaf, na);
+      Token* tt = resolve_function(vaf, &E, owner());
       assert(tt);
       tt->stack_op(&E);
       delete tt;
-    }else if(scope->node(t->name())) {
-      trace1("unresolved node", t->name());
-      // incomplete();
-      E.push_back(t->clone()); // try later?
+    }else if(Node_Ref a = scope->node(t->name())) {
+      Token_NODE n(*symbol, a);
+      n.stack_op(&E);
     }else if(scope->lookup_branch(t->name())) {
       trace1("unresolved branch", t->name());
       // incomplete();
       E.push_back(t->clone()); // try later?
+    }else if(symbol && n[0] == '<') { untested();
+      incomplete();
+//      Token_PORT p(t);
+//      p.stack_op(E);
     }else{
       throw Exception("unresolved symbol: " + n);
     }
@@ -211,7 +230,7 @@ bool Expression_::update()
 
   trace2("Expression_::update", size(), n);
   if(n<=deps().size()){
-  }else{
+  }else{ untested();
   }
   return n != deps().size();
 }

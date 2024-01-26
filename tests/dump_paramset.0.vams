@@ -7,7 +7,7 @@ module resistor(a,b)
 	electrical a, b;
 
 	(*attrib=yes*) parameter real r = 0.;
-	parameter real a = 0, b = 0.;
+	parameter real aa = 0, bb = 0.;
 
 	analog begin
 		I(a,b) <+ V(a,b)/r;
@@ -20,7 +20,7 @@ paramset const_res resistor;
 	localparam real ll = rr;
 	(*attrib=yes*) parameter real xx = 0.;
 	.r = 1;
-	.a = xx + ll;
+	.aa = xx + ll;
 endparamset;
 
 

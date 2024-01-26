@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * Verilog-AMS filters
+ * Verilog-AMS ddx function
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"

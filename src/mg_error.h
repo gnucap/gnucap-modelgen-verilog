@@ -28,8 +28,10 @@ struct Exception_CS_ :public Exception {
   std::string _cmd;
   size_t _cursor;
   const std::string message() const override;
-  //Exception_CS(const std::string& Message, const CS& cmd, size_t cursor);
+  Exception_CS_(const std::string& Message, const CS& cmd, size_t cursor);
   Exception_CS_(const std::string& Message, const CS& cmd);
+private:
+  void construct(const CS& cmd, size_t here);
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

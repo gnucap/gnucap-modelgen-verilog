@@ -46,10 +46,10 @@ void Expression_::dump(std::ostream& out)const
   // Un-parse it -- back to infix.
   for (const_iterator i = begin(); i != end(); ++i) {
     trace1("dump", (*i)->name());
-    if (dynamic_cast<const Token_STOP*>(*i)) {
+    if (dynamic_cast<const Token_STOP*>(*i)) { untested();
       stack.push_back(*i);
     }else if (dynamic_cast<const Token_PARLIST*>(*i)
-	&& dynamic_cast<const Expression*>((*i)->data())) {
+	&& dynamic_cast<const Expression*>((*i)->data())) { untested();
       auto de = prechecked_cast<const Expression*>((*i)->data());
       std::stringstream o;
       o << "(";
@@ -58,29 +58,29 @@ void Expression_::dump(std::ostream& out)const
       Token* t = new Token_PARLIST(o.str());
       locals.push_back(t);
       stack.push_back(t);
-    }else if (dynamic_cast<const Token_PARLIST*>(*i)) {
+    }else if (dynamic_cast<const Token_PARLIST*>(*i)) { untested();
       // pop*n  push
       bool been_here = false;
       std::string tmp(")");
-      for (;;) {
+      for (;;) { untested();
 	if (stack.empty()) {untested();
 	  throw Exception("bad expression");
-	}else{
+	}else{ untested();
 	}
 	const Token* t = stack.back();
 	stack.pop_back();
-	if (dynamic_cast<const Token_STOP*>(t)) {
+	if (dynamic_cast<const Token_STOP*>(t)) { untested();
 	  tmp = "(" + tmp;
 	  break;
 	}else if (dynamic_cast<const Token_SYMBOL*>(t)
-	      ||  dynamic_cast<const Token_CONSTANT*>(t)) {
-	  if (been_here) {
+	      ||  dynamic_cast<const Token_CONSTANT*>(t)) { untested();
+	  if (been_here) { untested();
 	    tmp = ", " + tmp;
-	  }else{
+	  }else{ untested();
 	    been_here = true;
 	  }
 	  tmp = t->full_name() + tmp;
-	}else{
+	}else{ untested();
 	  unreachable();
 	}
       }
@@ -89,7 +89,7 @@ void Expression_::dump(std::ostream& out)const
       stack.push_back(t);
     }else if (dynamic_cast<const Token_CONSTANT*>(*i)|| dynamic_cast<const Token_SYMBOL*>(*i)) {
       if (auto call = dynamic_cast<const Token_CALL*>(*i)) {
-	if (auto args = dynamic_cast<const Expression_*>(call->args())) {
+	if (auto args = dynamic_cast<const Expression_* /*_?*/>(call->args())) {
 	  std::stringstream tmp;
 	  tmp << (**i).name() << '(';
 	  args->dump(tmp);
@@ -126,7 +126,7 @@ void Expression_::dump(std::ostream& out)const
 	Token* t = new Token_SYMBOL(tmp, "");
 	locals.push_back(t);
 	stack.push_back(t);
-      }else{
+      }else{ untested();
 	// upstream
 	assert(!stack.empty());
 	const Token* t2 = stack.back();
@@ -139,7 +139,7 @@ void Expression_::dump(std::ostream& out)const
 	locals.push_back(t);
 	stack.push_back(t);
       }
-    }else if (dynamic_cast<const Token_BINOP*>(*i)) {
+    }else if (dynamic_cast<const Token_BINOP*>(*i)) { untested();
       unreachable();
       // pop pop op push
       assert(!stack.empty());
@@ -159,10 +159,10 @@ void Expression_::dump(std::ostream& out)const
 	std::stringstream tmp;
 	dump_token(u->op1(), tmp);
 	fn = tmp.str();
-      }else if(stack.empty()){
+      }else if(stack.empty()){ untested();
 	fn = "BUG";
 	unreachable();
-      }else{
+      }else{ untested();
 	const Token* t1 = stack.back();
 	stack.pop_back();
 	fn = t1->full_name();
@@ -199,7 +199,7 @@ void Expression_::dump(std::ostream& out)const
       trace1("", tmp.str());
       locals.push_back(n);
       stack.push_back(n);
-    }else{
+    }else{ untested();
       unreachable();
       assert(!dynamic_cast<const Token_TERNARY*>(*i));
       assert(!dynamic_cast<const Token_UNARY*>(*i));

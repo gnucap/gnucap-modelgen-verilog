@@ -20,7 +20,7 @@ enddiscipline
 module test_res_8(p, n);
   inout p, n;
   electrical p, n;
-  parameter real p = 1.;
+  parameter real pp = 1.;
 
   real   a,   b;
 

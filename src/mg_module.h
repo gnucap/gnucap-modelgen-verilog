@@ -193,6 +193,7 @@ public: // TODO
   void new_evt_slot() { ++_num_evt_slots; }
   void new_filter();
   size_t num_evt_slots()const {return _num_evt_slots; }
+  Port_3* find_port(std::string const&);
 public:
   size_t num_branches() const;
   bool sync()const;
@@ -230,7 +231,7 @@ public: // BUG
   Branch_Ref new_branch(std::string const&, std::string const&) override;
 private:
 
-  Token* new_token(FUNCTION_ const*, size_t na) override;
+  Token* new_token(FUNCTION const*, size_t na) override;
   Branch_Ref new_branch_name(std::string const& n, Branch_Ref const& b) override;
   Node_Ref node(std::string const& p) const override;
   Branch_Ref lookup_branch(std::string const& p) const override;

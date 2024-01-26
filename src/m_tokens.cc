@@ -27,6 +27,7 @@
 #include "mg_options.h"
 #include "mg_analog.h" // BUG
 #include <stack>
+#include <globals.h> // TODO: Expression->resolve?
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -600,6 +601,7 @@ size_t Token_ACCESS::num_deps() const
   }
 }
 /*--------------------------------------------------------------------------*/
+// TODO: plug-in.
 void Token_ACCESS::stack_op(Expression* e) const
 {
   Expression& E = *e;
@@ -630,6 +632,7 @@ void Token_ACCESS::stack_op(Expression* e) const
 
   auto SE = prechecked_cast<Expression_*>(e);
   assert(SE);
+  Block* owner=SE->owner();
 
   if(_prb){
     // already resolved
@@ -641,60 +644,75 @@ void Token_ACCESS::stack_op(Expression* e) const
     delete E.back(); // PARLIST
     E.pop_back();
     assert(!E.is_empty());
-    if(dynamic_cast<Token_STOP*>(E.back())) { untested();
+    if(dynamic_cast<Token_CONSTANT*>(E.back())) { untested();
+      trace1("constant?", E.back()->name());
+      assert(0);
+      // constant string, possibly.
+    }else if(dynamic_cast<Token_PORT_BRANCH*>(E.back())) {
+      assert(owner);
+
+      FUNCTION const* f = function_dispatcher[".port_flow"];
+      if(!f){ untested();
+	throw Exception("need .port_flow plugin to access port flow\n");
+      }else{
+      }
+      Token* t = owner->new_token(f, 1);
+      t->stack_op(&E);
+      delete t;
+    }else if(dynamic_cast<Token_STOP*>(E.back())) { untested();
       throw Exception("syntax error");
     }else{
-    }
-    std::string arg0 = E.back()->name();
-    size_t na=1;
-    std::string arg1;
-    delete E.back();
-    E.pop_back();
-    assert(!E.is_empty());
-
-    while(!dynamic_cast<Token_STOP*>(E.back())) {
-      arg1 = arg0;
-      ++na;
-      arg0 = E.back()->name();
-      trace2("xs stack again", arg0, arg1);
-
+      std::string arg0 = E.back()->name();
+      size_t na=1;
+      std::string arg1;
       delete E.back();
       E.pop_back();
       assert(!E.is_empty());
-    }
 
-    delete E.back();
-    E.pop_back();
-    // BUG: push dep?
-    //
-    trace4("xs", name(), arg0, arg1, na);
-    // bug: upside down
-  //  VAMS_ACCESS f(name(), arg0, arg1);
-//    assert(ds.top());
-    assert(SE->owner());
+      while(!dynamic_cast<Token_STOP*>(E.back())) {
+	arg1 = arg0;
+	++na;
+	arg0 = E.back()->name();
+	trace2("xs stack again", arg0, arg1);
+
+	delete E.back();
+	E.pop_back();
+	assert(!E.is_empty());
+      }
+
+      delete E.back();
+      E.pop_back();
+      // BUG: push dep?
+      //
+      trace4("xs", name(), arg0, arg1, na);
+      // bug: upside down
+      //  VAMS_ACCESS f(name(), arg0, arg1);
+      //    assert(ds.top());
+      assert(owner);
 #if 0
-    Token* t = SE->owner()->new_token(&f, na);
+      Token* t = SE->owner()->new_token(&f, na);
 #else
-     // was: Token* VAMS_ACCESS::new_token(Module& m, size_t na)const
-    Module* m = to_module(SE->owner()); // dynamic_cast<Module*>(SE->owner());
-    assert(m);
-    // use na?
-    Branch_Ref br = m->new_branch(arg0, arg1);
-    trace5("br", name(), arg0, arg1, na, br.has_name());
+      // was: Token* VAMS_ACCESS::new_token(Module& m, size_t na)const
+      Module* m = to_module(owner); // dynamic_cast<Module*>(SE->owner());
+      assert(m);
+      // use na?
+      Branch_Ref br = m->new_branch(arg0, arg1);
+      trace5("br", name(), arg0, arg1, na, br.has_name());
 
-    //  br->set_owner(this);
-    assert(br);
-    assert(const_cast<Branch const*>(br.operator->())->owner());
-    // Probe const* p = m.new_probe(_name, _arg0, _arg1);
-    //
-    // install clone?
-    FUNCTION_ const* p = m->new_probe(name(), br); // Probe
+      //  br->set_owner(this);
+      assert(br);
+      assert(const_cast<Branch const*>(br.operator->())->owner());
+      // Probe const* p = m.new_probe(_name, _arg0, _arg1);
+      //
+      // install clone?
+      FUNCTION_ const* p = m->new_probe(name(), br); // Probe
 
-    Token* t = p->new_token(*m, na); // Token_ACCESS
+      Token* t = p->new_token(*m, na); // Token_ACCESS
 #endif
 
-    assert(t);
-    e->push_back(t);
+      assert(t);
+      e->push_back(t);
+    }
   }
 }
 /*--------------------------------------------------------------------------*/

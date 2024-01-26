@@ -158,6 +158,7 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
     throw Exception("syntax error");
   }else if(p[0] == '<'){
     incomplete();
+    assert(0); // wrong place.
   }else{
   }
 
@@ -181,12 +182,14 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
   }
 }
 /*--------------------------------------------------------------------------*/
-Node* Node_Map::new_node(std::string const& p)
+Node* Node_Map::new_node(std::string const& p, Block* owner)
 {
   Node*& cc = _map[p];
   if(cc) {
   }else{
+    // new_ref here?
     cc = new Node(p, int(_nodes.size()));
+    owner->new_var_ref(cc);
     _nodes.push_back(cc);
   }
   return cc;
@@ -219,7 +222,9 @@ Node_Ref Node_Map::operator[](std::string const& key) const
 Node* Module::new_node(std::string const& p)
 {
   assert(_circuit);
-  return _circuit->nodes().new_node(p);
+  Node* n = _circuit->nodes().new_node(p, this);
+  // new_var_ref(n);
+  return n;
 }
 /*--------------------------------------------------------------------------*/
 Node_Ref Module::node(std::string const& p) const
@@ -636,8 +641,9 @@ void Module::setup_nodes()
   }
 }
 /*--------------------------------------------------------------------------*/
-Token* Module::new_token(FUNCTION_ const* f, size_t num_args)
+Token* Module::new_token(FUNCTION const* f_, size_t num_args)
 {
+  auto f = prechecked_cast<FUNCTION_ const*>(f_);
   assert(f);
 //  if(dynamic_cast<MGVAMS_FUNCTION const*>(f)){
     if(f->static_code()){
@@ -823,12 +829,19 @@ Base* Block::lookup(std::string const& k, bool recurse)
   }else if(!recurse) {
     assert(dynamic_cast<Module const*>(this));
     return NULL;
+  }else if(k[0] == '<'){
+    if(auto m = dynamic_cast<Module*>(this)){
+      std::string portname = k.substr(1, k.size()-2);
+      return m->find_port(portname);
+    }else{
+      return _owner->lookup(k, true);
+    }
   }else if(_owner) {
     return _owner->lookup(k, true);
   }else{
     assert(dynamic_cast<File const*>(this));
-    return NULL;
   }
+  return NULL;
 }
 /*--------------------------------------------------------------------------*/
 Deps::const_iterator Deps::begin() const

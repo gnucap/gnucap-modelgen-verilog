@@ -49,7 +49,7 @@ public:
     }
   }
   bool has_identifier()const;
-  String_Arg key()const { return String_Arg(_name); }
+  String_Arg key()const { return String_Arg(value()); }
   Node_Ref const& node()const {return _node;}
   void set_node(Node*n){_node = n;}
   void set_discipline(Discipline const* d, Module* owner);
@@ -371,7 +371,7 @@ public:
   const_iterator end() const{ return _nodes.end(); }
   size_t size() const{ return _map.size(); }
 //   size_t how_many() const{ return _nodes.size() - 1; }
-  Node* new_node(std::string const&);
+  Node* new_node(std::string const&, Block* owner);
   Node_Ref operator[](std::string const& key) const;
   Node_Ref operator[](int key) const{ return _nodes[key]; }
   void set_short(Node const*, Node const*);
@@ -401,6 +401,8 @@ public:
   ~Circuit();
   void parse(CS&) override;
   void dump(std::ostream&)const override{incomplete();}
+
+  Port_3* find_port(std::string const& n);
 
   size_t		min_nodes()const	{return ports().size();}
   size_t		max_nodes()const	{return ports().size();}

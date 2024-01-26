@@ -4,7 +4,7 @@ module test_res_8(p, n);
 	electrical p, n;
 	inout p, n;
 	real a, b;
-	parameter real p = 1.;
+	parameter real pp = 1.;
 	analog begin
 		a = V(n, p);
 		b = -a*b*b;

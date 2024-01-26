@@ -1,0 +1,6 @@
+... 
+ electrical p, n;
+
+ analog begin
+  i = I(<x>);
+    ^ ? what's this?
