@@ -127,21 +127,21 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
     }else if(auto b = dynamic_cast<Token_BINOP*>(t)){
       Token_BINOP_ bb(*b);
       bb.stack_op(&E);
-    }else if(auto tt = dynamic_cast<Token_TERNARY const*>(t)){
+    }else if(auto tern = dynamic_cast<Token_TERNARY const*>(t)){
       // BUG, move to stackop
       auto tp = new Expression_();
       auto fp = new Expression_();
       tp->set_owner(owner());
       fp->set_owner(owner());
       try{
-	assert(tt->true_part());
-	assert(tt->false_part());
-	tp->resolve_symbols_(*tt->true_part());
-	fp->resolve_symbols_(*tt->false_part());
-      }catch(Exception const& e){ untested();
+	assert(tern->true_part());
+	assert(tern->false_part());
+	tp->resolve_symbols_(*tern->true_part());
+	fp->resolve_symbols_(*tern->false_part());
+      }catch(Exception const& ee){ untested();
 	delete tp;
 	delete fp;
-	throw e;
+	throw ee;
       }
 
       Token_TERNARY_ t3(t->name(), NULL, tp, fp, NULL);
@@ -164,14 +164,14 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
       }
       Token_VAR_REF a(v->name(), v);
       a.stack_op(&E);
-    }else if(auto v = dynamic_cast<Port_3 const*>(r)) {
-      Token_PORT_BRANCH a(*symbol, v);
+    }else if(auto pp = dynamic_cast<Port_3 const*>(r)) {
+      Token_PORT_BRANCH a(*symbol, pp);
       a.stack_op(&E);
     }else if(!E.is_empty() && dynamic_cast<Token_PARLIST*>(E.back())
 	  && is_xs_function(n, scope)) {
       // this is upside down...
-      Token_ACCESS t(n, NULL);
-      t.stack_op(&E);
+      Token_ACCESS tta(n, NULL);
+      tta.stack_op(&E);
     }else if (strchr("0123456789.", n[0])) {
       // a number
       Float* f = new Float(n);
@@ -188,9 +188,9 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
 
       // move to stack_op?
       if(E.is_empty()){
-      }else if(auto p = dynamic_cast<Token_PARLIST_ const*>(E.back())){
-	if(auto e = dynamic_cast<Expression const*>(p->data())){
-	  na = e->size();
+      }else if(auto parlist = dynamic_cast<Token_PARLIST_ const*>(E.back())){
+	if(auto pd = dynamic_cast<Expression const*>(parlist->data())){
+	  na = pd->size();
 	}else{ untested();
 	}
       }else{
@@ -202,8 +202,8 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
       tt->stack_op(&E);
       delete tt;
     }else if(Node_Ref a = scope->node(t->name())) {
-      Token_NODE n(*symbol, a);
-      n.stack_op(&E);
+      Token_NODE tn(*symbol, a);
+      tn.stack_op(&E);
     }else if(scope->lookup_branch(t->name())) {
       trace1("unresolved branch", t->name());
       // incomplete();
@@ -223,7 +223,7 @@ bool Expression_::update()
   size_t n = deps().size();
 
   auto i = begin();
-  for(size_t n=size(); n--;){
+  for(size_t nn=size(); nn--;){
     (*i)->stack_op(this);
     i = erase(i);
   }

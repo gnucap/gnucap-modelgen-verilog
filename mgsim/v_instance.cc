@@ -441,15 +441,15 @@ CARD* INSTANCE::deflate()
     assert(c);
     int h = _parent->subckt()->nodes()->how_many();
     trace2("rewire", long_label(), h);
-    for(int i=0; i<net_nodes(); ++i){
-      std::string nn = _n[i].n_()->short_label();
-      trace4("rewire", long_label(), i, nn, c->n_(i).n_()->short_label());
-      trace4("rewire", long_label(), i, c->n_(i).t_(), n_(i).t_());
-      trace4("rewire", long_label(), i, c->n_(i).e_(), n_(i).e_());
+    for(int ii=0; ii<net_nodes(); ++ii){
+      std::string nn = _n[ii].n_()->short_label();
+      trace4("rewire", long_label(), ii, nn, c->n_(ii).n_()->short_label());
+      trace4("rewire", long_label(), ii, c->n_(ii).t_(), n_(ii).t_());
+      trace4("rewire", long_label(), ii, c->n_(ii).e_(), n_(ii).e_());
     }
-    for(int i=0; i<net_nodes(); ++i){
-      assert(c->n_(i).t_() == n_(c->n_(i).e_()-1).t_());
-      c->n_(i) = n_(c->n_(i).e_()-1);
+    for(int ii=0; ii<net_nodes(); ++ii){
+      assert(c->n_(ii).t_() == n_(c->n_(ii).e_()-1).t_());
+      c->n_(ii) = n_(c->n_(ii).e_()-1);
     }
 
     assert(r->dev_type()!="");

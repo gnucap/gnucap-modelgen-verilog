@@ -272,10 +272,10 @@ static void make_module_construct_stub(std::ostream& o, const Element_2& e, Modu
   
   assert(!dynamic_cast<Branch const*>(&e));
   Port_3_List_2::const_iterator p = e.ports().begin();
-  int i=0;
   o____ "std::string tmp;\n";
   if(e.ports().has_names()){
     o____ "std::string name;\n";
+    int i = 0;
     for (;p != e.ports().end(); ++p) {
       o____ "name = \"" << (*p)->name()<<"\";\n";
       o____ "tmp = \""<< ++i <<"\";\n";

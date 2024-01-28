@@ -457,22 +457,22 @@ void resolve_copy(CARD_LIST* t, PARAM_LIST const& p, const CARD_LIST*)
       Expression E;
 	
       bool skip1 = false;
-      for(auto i=e.begin(); i!=e.end(); ++i){
-	trace2("EXP", (*i)->name(), dynamic_cast<Token_SYMBOL*>(*i));
-	trace2("EXP", (*i)->name(), dynamic_cast<Token_CONSTANT*>(*i));
-	if(dynamic_cast<Token_PARLIST*>(*i)){
+      for(auto ii=e.begin(); ii!=e.end(); ++ii){
+	trace2("EXP", (*ii)->name(), dynamic_cast<Token_SYMBOL*>(*ii));
+	trace2("EXP", (*ii)->name(), dynamic_cast<Token_CONSTANT*>(*ii));
+	if(dynamic_cast<Token_PARLIST*>(*ii)){
 	  skip1 = true;
-	  E.push_back(*i);
+	  E.push_back(*ii);
 	}else if(skip1){
-	  assert(dynamic_cast<Token_SYMBOL*>(*i));
-	  E.push_back(*i);
+	  assert(dynamic_cast<Token_SYMBOL*>(*ii));
+	  E.push_back(*ii);
 	  skip1 = false;
-	}else if(dynamic_cast<Token_CONSTANT*>(*i)
-	    && !dynamic_cast<const Float*>((*i)->data())) {
-	  E.push_back(new Token_CONSTANT("_." + (*i)->name(), NULL, ""));
-	  delete(*i);
+	}else if(dynamic_cast<Token_CONSTANT*>(*ii)
+	    && !dynamic_cast<const Float*>((*ii)->data())) {
+	  E.push_back(new Token_CONSTANT("_." + (*ii)->name(), NULL, ""));
+	  delete(*ii);
 	}else{
-	  E.push_back(*i);
+	  E.push_back(*ii);
 	}
       }
       while(e.size()){
@@ -512,8 +512,8 @@ CARD* PARAMSET::deflate()
   resolve_copy(subckt(), c->_params, NULL);
 
   trace4("PARAMSET::deflate args fwd", dev->long_label(), dev->dev_type(), long_label(), dev_type());
-  for(auto i=pc->_params.begin(); i!=pc->_params.end(); ++i){
-    CS cmd(CS::_STRING, i->second.string());
+  for(auto pi=pc->_params.begin(); pi!=pc->_params.end(); ++pi){
+    CS cmd(CS::_STRING, pi->second.string());
     Expression e(cmd);
     Expression r(e, subckt());
     std::stringstream s;
@@ -521,9 +521,9 @@ CARD* PARAMSET::deflate()
 
     std::string value = s.str();
     demangle(value);
-    trace3("PARAMSET::deflate args fix", long_label(), i->first, value);
-    assert(i->first!="");
-    dev->set_param_by_name(i->first, value);
+    trace3("PARAMSET::deflate args fix", long_label(), pi->first, value);
+    assert(pi->first!="");
+    dev->set_param_by_name(pi->first, value);
   }
 
   *i = NULL;
@@ -599,11 +599,11 @@ void PARAMSET::expand()
     assert(dev->owner() == this);
 
     {
-      auto c = prechecked_cast<COMMON_PARAMLIST const*>(proto->common());
-      for(auto i=c->_params.begin(); i!=c->_params.end(); ++i){
+      auto cp = prechecked_cast<COMMON_PARAMLIST const*>(proto->common());
+      for(auto i=cp->_params.begin(); i!=cp->_params.end(); ++i){
 	trace2("PARAMSET::expand sp", i->first, i->second.string());
       }
-      for(auto i=c->_params.begin(); i!=c->_params.end(); ++i){
+      for(auto i=cp->_params.begin(); i!=cp->_params.end(); ++i){
 	dev->set_param_by_name(i->first, i->second.string());
       }
     }

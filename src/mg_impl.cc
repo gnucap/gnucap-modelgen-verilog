@@ -97,8 +97,8 @@ Branch_Ref Branch_Map::new_branch(Branch_Ref const& b, std::string name)
   auto m = prechecked_cast<Module*>(owner());
   assert(m);
 
-  auto n = _names.find(name);
-  if(n != _names.end()){
+  auto it = _names.find(name);
+  if(it != _names.end()){
     throw Exception("already there" + name);
   }else{
     auto n = new Named_Branch(b, name, m);
@@ -117,9 +117,9 @@ Branch_Ref Branch_Map::new_branch(Node_Ref a, Node_Ref b)
   auto m = prechecked_cast<Module*>(owner());
   assert(m);
 
-  auto i = _m.find(p);
-  if(i!=_m.end()){
-    return Branch_Ref(i->second);
+  auto ii = _m.find(p);
+  if(ii!=_m.end()){
+    return Branch_Ref(ii->second);
   }else{
     std::pair<Node const*, Node const*> r(b, a);
     auto i = _m.find(r);

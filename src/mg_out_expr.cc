@@ -484,7 +484,7 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
       }
     }else if (auto p = dynamic_cast<const Token_PAR_REF*>(*i)) {
       s.new_rhs(p);
-    }else if (auto p = dynamic_cast<const Token_PORT_BRANCH*>(*i)) {
+    }else if (auto pb = dynamic_cast<const Token_PORT_BRANCH*>(*i)) {
       incomplete();
       s.new_ref("0"); //port number here?
     }else if (auto c = dynamic_cast<const Token_CONSTANT*>(*i)) {
@@ -531,8 +531,8 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
 
 	o << "(";
        	std::string comma = "";
-	for(size_t i=argnames.size(); i; --i){
-	  o << comma << argnames[i-1];
+	for(size_t ii=argnames.size(); ii; --ii){
+	  o << comma << argnames[ii-1];
 	  comma = ", ";
 	}
 	o << ");\n";

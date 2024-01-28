@@ -632,11 +632,11 @@ void LANG_VERILOG::print_paramset(OMSTREAM& o, const CARD* c)
     o << "\n"
       "endparamset\n\n";
     _mode = mDEFAULT;
-  }else if(auto x = dynamic_cast<BASE_SUBCKT const*>(c)){
-    print_attributes(o, x);
-    o << "paramset " << x->short_label() << ' ' << c->dev_type() << ";\n";
-    print_items_sckt(o, x);
-    print_args_paramset(o, x);
+  }else if(auto bs = dynamic_cast<BASE_SUBCKT const*>(c)){
+    print_attributes(o, bs);
+    o << "paramset " << bs->short_label() << ' ' << c->dev_type() << ";\n";
+    print_items_sckt(o, bs);
+    print_args_paramset(o, bs);
     o << "\nendparamset\n\n";
   }else{ untested();
     incomplete();

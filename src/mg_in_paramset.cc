@@ -55,9 +55,9 @@ CS& Paramset::parse_stmt(CS& f)
 
     try{
       new_var_ref(s);
-    }catch (Exception const& s){ untested();
+    }catch (Exception const& eee){ untested();
       f.reset_fail(here);
-      throw Exception_CS_(s.message(), f);
+      throw Exception_CS_(eee.message(), f);
     }
 
     s->set_owner(this);
@@ -290,9 +290,9 @@ void streamcp(Module* sub, Owned_Base const& t)
 static void import_proto_vars(Module* sub, Module const* proto)
 {
   // streamcp(sub, proto->variables());
-  auto& P = proto->variables();
+  auto& pv = proto->variables();
 
-  for(auto const& x : P) {
+  for(auto const& x : pv) {
     std::stringstream o;
 
     o << x->type() << " ";

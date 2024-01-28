@@ -63,10 +63,10 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
       if(!b->has_name()){
 	o << "// not named: " << b->code_name() << "\n";
       }else if(b->has_pot_probe()){
-	auto x=prechecked_cast<Named_Branch const*>(b);
-	assert(x);
-	o << "    d_potential" << x->code_name()
-	  << " = d_potential" << x->base()->code_name() << ",\n";
+	auto nb = prechecked_cast<Named_Branch const*>(b);
+	assert(nb);
+	o << "    d_potential" << nb->code_name()
+	  << " = d_potential" << nb->base()->code_name() << ",\n";
       }else{
       }
     }
@@ -333,11 +333,11 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
   o____ "VALUE, SELF";
   for(auto d : br.deps()){
 //      o << "/* found " << d->code_name() << "*/";
-    Branch const* bb = d->branch();
-    assert(bb);
-    if(bb->is_short()){ untested();
-    }else if(bb == &br){
-    }else if(bb->has_flow_probe()){
+    Branch const* bbb = d->branch();
+    assert(bbb);
+    if(bbb->is_short()){ untested();
+    }else if(bbb == &br){
+    }else if(bbb->has_flow_probe()){
     }else{
       assert(d);
       o << ", dep" << d->code_name();
@@ -345,11 +345,11 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
   }
   o << "/* : */\n";
   for(auto d : br.deps()){
-    Branch const* bb = d->branch();
-    assert(bb);
-    if(bb->is_short()){ untested();
-    }else if(bb == &br){
-    }else if(!bb->has_flow_probe()){
+    Branch const* bbb = d->branch();
+    assert(bbb);
+    if(bbb->is_short()){ untested();
+    }else if(bbb == &br){
+    }else if(!bbb->has_flow_probe()){
     }else{
       assert(d);
       o << ", dep" << d->code_name();

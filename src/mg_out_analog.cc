@@ -200,6 +200,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
     make_cc_expression(o, e, is_dynamic());
 
     char sign = C.reversed()?'-':'+';
+    char neg_sign = C.reversed()?'+':'-';
     std::string bcn = C.branch_ref().code_name();
     if(!is_dynamic()) {
     }else if(C.branch()->has_pot_source()){
@@ -288,9 +289,8 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	}else if(v->branch()->is_filter()){
 	  // TODO? element?
 	  o__ "// dep " << v->code_name() << "\n";
-	  char sign = C.reversed()?'+':'-';
 	  o__ "m->" << v->branch()->state() << "[1] = "
-	     << sign << " t0[d" << v->code_name() << "]; // (3p)\n";
+	     << neg_sign << " t0[d" << v->code_name() << "]; // (3p)\n";
 	}else{
 	  o__ "//noelt: " << v->code_name() << "\n";
 	}
@@ -310,31 +310,31 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Base const& ab) const
 {
   if(auto s = dynamic_cast<AnalogSeqBlock const*>(&ab)){
     make_seq(o, *s);
-  }else if(auto s = dynamic_cast<AnalogCtrlBlock const*>(&ab)){
-    make_ctrl(o, *s);
+  }else if(auto bl = dynamic_cast<AnalogCtrlBlock const*>(&ab)){
+    make_ctrl(o, *bl);
   }else if(auto fc=dynamic_cast<Contribution const*>(&ab)) {
     make_contrib(o, *fc);
   }else if(auto a=dynamic_cast<AnalogProceduralAssignment const*>(&ab)) {
     make_assignment(o, a->assignment());
-  }else if(auto a=dynamic_cast<Assignment const*>(&ab)) {
-    make_assignment(o, *a);
-  }else if(auto rl=dynamic_cast<AnalogRealDecl const*>(&ab)) {
-    make_block_real_identifier_list(o, rl->list());
+  }else if(auto assign=dynamic_cast<Assignment const*>(&ab)) {
+    make_assignment(o, *assign);
+  }else if(auto ard=dynamic_cast<AnalogRealDecl const*>(&ab)) {
+    make_block_real_identifier_list(o, ard->list());
   }else if(auto rl=dynamic_cast<ListOfBlockRealIdentifiers const*>(&ab)) {
     make_block_real_identifier_list(o, *rl);
-  }else if(auto rl=dynamic_cast<ListOfBlockIntIdentifiers const*>(&ab)) {
-    make_block_int_identifier_list(o, *rl);
+  }else if(auto il=dynamic_cast<ListOfBlockIntIdentifiers const*>(&ab)) {
+    make_block_int_identifier_list(o, *il);
   }else if(auto v=dynamic_cast<Variable const*>(&ab)) { untested();
     unreachable();
     make_variable(o, *v);
-  }else if(auto v=dynamic_cast<AnalogConditionalStmt const*>(&ab)) {
-    make_cond(o, *v);
+  }else if(auto cs=dynamic_cast<AnalogConditionalStmt const*>(&ab)) {
+    make_cond(o, *cs);
   }else if(auto ss=dynamic_cast<AnalogSwitchStmt const*>(&ab)) {
     make_switch(o, *ss);
   }else if(auto ww=dynamic_cast<AnalogForStmt const*>(&ab)) {
     make_for(o, *ww);
-  }else if(auto ww=dynamic_cast<AnalogWhileStmt const*>(&ab)) {
-    make_while(o, *ww);
+  }else if(auto aws=dynamic_cast<AnalogWhileStmt const*>(&ab)) {
+    make_while(o, *aws);
   }else if(auto ev=dynamic_cast<AnalogEvtCtlStmt const*>(&ab)) {
     make_evt(o, *ev);
     //throw Exception("analogevtctl unsupported");

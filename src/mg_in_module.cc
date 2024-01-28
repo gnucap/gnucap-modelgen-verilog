@@ -999,10 +999,10 @@ void Block::new_var_ref(Base* what)
     p = P->name();
   }else if(auto A = dynamic_cast<Aliasparam const*>(what)){ untested();
     p = A->name();
-  }else if(auto A = dynamic_cast<Paramset_Stmt const*>(what)){
-    p = "."+A->name();
-  }else if(auto A = dynamic_cast<Node const*>(what)){
-    p = A->name();
+  }else if(auto ps = dynamic_cast<Paramset_Stmt const*>(what)){
+    p = "."+ps->name();
+  }else if(auto nn = dynamic_cast<Node const*>(what)){
+    p = nn->name();
   }else{ untested();
     incomplete();
     assert(false);

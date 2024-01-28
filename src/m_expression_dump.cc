@@ -129,12 +129,12 @@ void Expression_::dump(std::ostream& out)const
       }else{ untested();
 	// upstream
 	assert(!stack.empty());
-	const Token* t2 = stack.back();
+	const Token* bt = stack.back();
 	stack.pop_back();
 	assert(!stack.empty());
 	const Token* t1 = stack.back();
 	stack.pop_back();
-	std::string tmp('(' + t1->full_name() + ' ' + (**i).name() + ' ' + t2->full_name() + ')');
+	std::string tmp('(' + t1->full_name() + ' ' + (**i).name() + ' ' + bt->full_name() + ')');
 	Token* t = new Token_SYMBOL(tmp, "");
 	locals.push_back(t);
 	stack.push_back(t);

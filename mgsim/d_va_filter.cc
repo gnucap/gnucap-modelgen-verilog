@@ -435,8 +435,8 @@ bool DEV_DDT::do_tr()
       _vi0[0] -= volts_limited(_n[2*i-2],_n[2*i-1]) * _vi0[i];
     }
 
-    for (int i=0; i<=_n_ports; ++i) {
-      assert(_vi0[i] == _vi0[i]);
+    for (int ii=0; ii<=_n_ports; ++ii) {
+      assert(_vi0[ii] == _vi0[ii]);
     }
   }else{
   }

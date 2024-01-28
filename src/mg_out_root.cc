@@ -57,12 +57,16 @@ static void make_header(std::ostream& o, const File& in,
     "#include <u_limit.h>\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
+
+  // Wunused is adding noise in nested temporaries. None of them is
+  // actually wrong.
+  o << "#pragma GCC diagnostic ignored \"-Wshadow\"\n";
   o <<
     "const double NA(NOT_INPUT);\n"
     "const double INF(BIGBIG);\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
-    o << "namespace {\n"
+  o << "namespace {\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }

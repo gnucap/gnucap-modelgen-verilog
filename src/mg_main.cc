@@ -165,9 +165,9 @@ int main(int argc, char** argv)
       trace1("dump", argv[1]);
       diag_out = &(std::basic_ostream<char>&)diag; // mg_error.cc
       p.read(argv[1]);
-      File f;
-      f.parse(p);
-      f.dump(output);
+      File ff;
+      ff.parse(p);
+      ff.dump(output);
       --argc;
       ++argv;
     }else if (argc > 1 && ( strcmp(argv[0],"-v")==0

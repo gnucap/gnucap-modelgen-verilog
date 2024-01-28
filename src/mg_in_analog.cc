@@ -1637,8 +1637,8 @@ bool Assignment::store_deps(Deps const& d)
     trace2("Assignment::propagate_deps fwd 2", name(), _lhs->name());
     for(; ii < _deps->size(); ++ii) {
       ret = true;
-      Dep const& d = (*_deps)[ii];
-      (*d)->set_used_in(this);
+      Dep const& dd = (*_deps)[ii];
+      (*dd)->set_used_in(this);
     }
     if(1 ||  L->owner()!=owner()){
       assert(&deps() == _deps);
