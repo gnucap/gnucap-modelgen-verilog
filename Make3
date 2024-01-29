@@ -58,6 +58,11 @@ MAKE_LIB = $(CXX) $(CCFLAGS) $(OBJS) $(TARGET_LIBS) $(LDFLAGS) -shared -o
 
 # supposedly "Make3" (?)
 # work in progress...
+#
+# temporary workaround, see source
+%.raw: %.h
+	sed -e 's/^/"/' -e 's/$$/\\n"/' $< > $@
+mg_out_root.o: ${EMBED_HEADERS}
 
 
 .PHONY: clean distclean install all uninstall

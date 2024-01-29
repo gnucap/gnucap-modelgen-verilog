@@ -55,11 +55,6 @@ include \${SRCDIR}/Make1
 \$(TARGET): \$(OBJS)
 	\$(CXX) \$(MAKE_CXXFLAGS) \$(CXXFLAGS) \$(MAKE_CPPFLAGS) \$(CPPFLAGS) \$(OBJS) -o \$@ \$(TARGET_LIBS) \$(LDFLAGS)
 
-# BUG: rules don't go here
-# temporary workaround, see source
-%.raw: %.h
-	sed -e 's/^/"/' -e 's/\$\$/\\n"/' \$< > \$@
-mg_out_root.o: ${EMBED_HEADERS}
 
 include ../Make2
 include $top_srcdir/Make3 # use from gnucap?
