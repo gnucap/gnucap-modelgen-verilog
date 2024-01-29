@@ -776,6 +776,7 @@ inline void e_val(double* p, const double& x, const CARD_LIST*)
 // vim:ts=8:sw=2:noet:
 #include <u_limit.h>
 /*--------------------------------------------------------------------------*/
+#pragma GCC diagnostic ignored "-Wshadow"
 const double NA(NOT_INPUT);
 const double INF(BIGBIG);
 /*--------------------------------------------------------------------------*/
@@ -2274,6 +2275,7 @@ inline void e_val(double* p, const double& x, const CARD_LIST*)
 // vim:ts=8:sw=2:noet:
 #include <u_limit.h>
 /*--------------------------------------------------------------------------*/
+#pragma GCC diagnostic ignored "-Wshadow"
 const double NA(NOT_INPUT);
 const double INF(BIGBIG);
 /*--------------------------------------------------------------------------*/
