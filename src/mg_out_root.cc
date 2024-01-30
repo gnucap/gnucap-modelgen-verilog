@@ -58,6 +58,8 @@ static void make_header(std::ostream& o, const File& in,
     "/*--------------------------------------"
     "------------------------------------*/\n";
 
+  // this warning does not help.
+  o << "#pragma GCC diagnostic ignored \"-Wunused-local-typedefs\"\n";
   // Wunused is adding noise in nested temporaries. None of them is
   // actually wrong.
   o << "#pragma GCC diagnostic ignored \"-Wshadow\"\n";
