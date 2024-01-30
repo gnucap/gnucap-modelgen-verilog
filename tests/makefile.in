@@ -1,0 +1,105 @@
+# makefile for mgvams tests
+#TODO
+#srcdir = @SRCDIR@
+#top_srcdir = @TOP_SRCDIR@
+
+CXX = $(shell $(GNUCAP_CONF) --cxx)
+GNUCAP_CPPFLAGS = $(shell $(GNUCAP_CONF) --cppflags) -DADD_VERSION -DPIC
+GNUCAP_CXXFLAGS = $(shell $(GNUCAP_CONF) --cxxflags) -std=c++11
+MAKE_CPPFLAGS = -I${top_srcdir}/src
+SYMLINKS = ${PWD}/disciplines.vams ${PWD}/constants.vams
+LN_S = ln -sf
+DIFF = diff -rup
+
+include ${srcdir}/Make1
+# include Make3?
+all: ${TEST_PLUGINS}
+TESTCASES =
+REFDIR = ref
+
+# untested;
+TARGETDIR = check
+
+ref = ${REFDIR}
+
+ENV = GNUCAP_PLUGPATH=${top_builddir}:$(plugpath)
+
+glob_dump = $(shell cd ${srcdir}; ls dump*.vams)
+glob_v = $(shell cd ${srcdir}; ls v*.gc)
+glob_mg = $(shell cd ${srcdir}; ls mg*.gc)
+
+filt_dump = $(filter ${TESTCASES}%, ${glob_dump})
+filt_v    = $(filter ${TESTCASES}%, ${glob_v})
+filt_mg   = $(filter ${TESTCASES}%, ${glob_mg})
+
+dump_out = ${filt_dump:%=${TARGETDIR}/%.out}
+dump_diff = ${filt_dump:%=${TARGETDIR}/%.diff}
+
+v_out = ${filt_v:%=${TARGETDIR}/%.out}
+mg_out = ${filt_mg:%=${TARGETDIR}/%.out}
+
+gc_out = ${v_out} ${mg_out}
+gc_diff = ${gc_out:%.out=%.diff}
+
+diff = ${dump_diff} ${gc_diff}
+
+# TODO: maybe cat the diff, so it can be logged?
+check: ${TARGETDIR}/${TESTCASES}.diff
+	@find ${TARGETDIR} -size 0 -delete;
+	@echo ==
+	@if [ -s ${TARGETDIR}/${TESTCASES}.diff ]; then \
+		echo test failures:; \
+		ls -larS ${TARGETDIR}/${TESTCASES}*.diff; \
+	else \
+		echo all ${TESTCASES} passed; \
+	fi
+
+${TARGETDIR}/${TESTCASES}.diff : ${diff}
+	@cat $+ > $@
+
+${gc_out}: ${TEST_PLUGINS} ${SYMLINKS}
+
+# this is a hack: link *.o
+modelgen_0.so: modelgen_0.cc
+	${CXX} -shared -fPIC ${GNUCAP_CPPFLAGS} ${CPPFLAGS} ${MAKE_CPPFLAGS} ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< ../src/*.o -o $@ # makefile.in
+
+${diff}: ${TARGETDIR}/%.diff: ${TARGETDIR}/%.out
+	@if [ ! -f ${ref}/$*.out ]; then \
+	  echo MISS: $*; \
+	elif ${DIFF} ${ref}/$*.out ${TARGETDIR}/$*.out > $@; then \
+	  echo pass: $*; \
+	else \
+	  echo FAIL: $*; \
+	fi
+
+# makefile: makefile.in
+# 	source config.log
+#
+prep: ${SYMLINKS}
+	# @[ ! -s "${TARGETDIR}" ]
+	-mkdir -p ${TARGETDIR}
+
+${v_out}: ${TARGETDIR}/v%.gc.out: prep
+	@${ENV} ${GNUCAP} ${GNUCAP_ARGS} ${srcdir}/v$*.gc |tail -n +12 | \
+		grep -v '^stashing\ as' | grep -v 'already\ installed' | grep -v ^make > $@
+
+${mg_out}: ${TARGETDIR}/mg%.gc.out: prep
+	@${ENV} ${GNUCAP} ${GNUCAP_ARGS} ${MG_ARGS} ${srcdir}/mg$*.gc |tail -n +12 | \
+		grep -v '^stashing\ as' | grep -v 'already\ installed' | grep -v ^make > $@
+
+${dump_out}: ${TARGETDIR}/%.vams.out: prep
+	@[ x${srcdir} = x. ] || ln -sf ${srcdir}/$*.vams;
+	@${ENV} ${MODELGEN} -d ${TARGETDIR}/$*.err -I${top_srcdir}/vams --dump $*.vams | cat > $@
+	@[ x${srcdir} = x. ] || rm $*.vams;
+	@cat ${TARGETDIR}/$*.err >> $@
+	@rm ${TARGETDIR}/$*.err
+
+${PWD}/disciplines.vams:
+	-${LN_S} ${top_srcdir}/vams/disciplines.vams
+${PWD}/constants.vams:
+	-${LN_S} ${top_srcdir}/vams/constants.vams
+
+include ${top_srcdir}/Make3
+
+.PHONY: ${diff} ${v_out} ${gc_out} ${dump_out} check diff prep
+.DELETE_ON_ERROR:

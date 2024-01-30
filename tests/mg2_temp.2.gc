@@ -6,7 +6,7 @@ attach ./modelgen_0.so
 verilog
 
 `modelgen
-module test_temp0(t)
+module test_temp2(t)
 	thermal t;
 
 	real tt;
@@ -17,10 +17,10 @@ module test_temp0(t)
 
 endmodule
 
-!make test_temp0.so > /dev/null
-attach ./test_temp0.so
+!make test_temp2.so > /dev/null
+attach ./test_temp2.so
 
-test_temp0 #() dut(1);
+test_temp2 #() dut(1);
 
 list
 

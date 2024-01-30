@@ -80,7 +80,7 @@ public:
 
     {
       Preprocessor& p = pp();
-      p.read("../vams/disciplines.vams");
+      p.read("disciplines.vams");
       F.parse(p);
     }
 

@@ -3,3 +3,10 @@
 TEST_PLUGINS = \
   bm_pulse.so \
   modelgen_0.so
+
+GNUCAP = gnucap
+GNUCAP_ARGS = -a mgsim
+MG_ARGS = -a mgvams
+MODELGEN = ../src/gnucap-mg-vams
+
+CLEANFILES = ${SYMLINKS} ${TEST_PLUGINS}

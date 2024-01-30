@@ -12,13 +12,8 @@ ${RECURSIVE_TARGETS:%=%-recursive}: %-recursive:
 #-----------------------------------------------------------------------------
 ${RECURSIVE_TARGETS}: %: %-recursive
 #-----------------------------------------------------------------------------
-check:
-	@if [ "${SRCDIR}" = "." ]; then \
-		${MAKE} -C tests check; \
-	else \
-		echo INCOMPLETE: check rule requires in-tree build.; \
-		echo run manually for now.; \
-	fi
+check: all
+	${MAKE} -C tests check
 #-----------------------------------------------------------------------------
 .PHONY: ${RECURSIVE_TARGETS} ${RECURSIVE_TARGETS:%=%-recursive} \
-        install install-here check
+        install install-here check all

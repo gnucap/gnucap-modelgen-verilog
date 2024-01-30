@@ -12,7 +12,7 @@ V1 p n sin freq=1 amplitude={ampl} dc=dc
 .verilog
 
 `modelgen
-module test_cap1(np, nn);
+module test_pc0(np, nn);
   electrical np, nn;
   parameter real c=1;
   analog begin
@@ -20,14 +20,14 @@ module test_cap1(np, nn);
   end
 endmodule
 
-!make test_cap1.so > /dev/null
+!make test_pc0.so > /dev/null
 
-attach ./test_cap1.so
+attach ./test_pc0.so
 
 verilog
 
 resistor #(.r(1)) r(in, out);
-test_cap1 #(.c(c)) dut(out, 0);
+test_pc0 #(.c(c)) dut(out, 0);
 // capacitor #(.c(c)) c(out, 0);
 
 parameter v=0

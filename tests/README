@@ -1,6 +1,13 @@
 == gnucap modelgen tests
 
-Run with "make check", or "./test ../gnucap-verilog '' check ref".
+Run with "make check". Optionally a TESTSELECT may be specified to subselect
+tests
 
-Desired output is stored in ref, actual output will be in check.
-See check/.diffs for results (no diff == good).
+$ make check TESTSELECT=dump # will only test "dump*"
+
+Desired output is stored in ref, actual output will be in check/*.out
+See check/${TESTSELECT}.diffs for results (no diff == good).
+
+== run old test script (untested)
+
+$ ./test ../gnucap-verilog '' check ref

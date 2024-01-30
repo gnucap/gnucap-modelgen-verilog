@@ -1,5 +1,5 @@
-pid0 #(.p(.1),.i(100),.d(1m)) dut (.sp(0),.sn(out),.cp(n1),.cn(0));
-// pid0 #(.d(1m)) dut (out, 0, n1, 0); 
+pid0a #(.p(.1),.i(100),.d(1m)) dut (.sp(0),.sn(out),.cp(n1),.cn(0));
+// pid0a #(.d(1m)) dut (out, 0, n1, 0); 
 capacitor #(.c(1u)) c (.p(out),.n(0));
 resistor #(.r(1)) r (.p(out),.n(0));
 #Time       v(n1)      v(out)     iter(0)    timef(dut._b_ddt_1_p_ddt_1_n) timef(dut._b_idt_0_p_idt_0_n)

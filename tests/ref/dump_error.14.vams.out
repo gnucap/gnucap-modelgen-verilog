@@ -1,0 +1,4 @@
+... t p, n;
+ real a, b;
+ parameter real p = 1.;
+                  ^ ? already declared

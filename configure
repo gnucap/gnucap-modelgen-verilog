@@ -2,7 +2,7 @@
 # top level configure
 gnucap_conf=gnucap-conf
 
-SUBDIRS="src mgvams mgsim vams" # BUG, already in Make1.
+SUBDIRS="src mgvams mgsim vams tests" # BUG, already in Make1.
 
 echo -n '# ' > config.log
 date >> config.log
@@ -40,7 +40,7 @@ fi
 echo \# created by $PWD/$0. do not edit >makefile
 echo \#------------------------------------------------------------------------ >>makefile
 echo "SRCDIR = $srcdir" >> makefile
-echo "VPATH = $${SRCDIR}" >> makefile
+echo "VPATH = \${SRCDIR}" >> makefile
 cat $srcdir/makefile.in >> makefile
 #----------------------------------------------------------------
 echo "CCFLAGS = \\" >Make.ccflags
@@ -82,9 +82,14 @@ esac
 #------------------------------------------------------------------------
 sub_configure() {
 	echo sub_configure $1
+	if [ "$top_srcdir_" = ".." ]; then
+		srcdir_=".";
+	else
+		srcdir_="$top_srcdir_/$1";
+	fi
 	(
 		cd $1
-		$top_srcdir_/$1/configure --prefix="$prefix" --srcdir="$top_srcdir_/$1"
+		$top_srcdir_/$1/configure --prefix="$prefix" --srcdir="$srcdir_"
 	)
 }
 #------------------------------------------------------------------------

@@ -2,3 +2,17 @@
 *.so
 *~
 gnucap-mg-vams
+config.log
+src/config.h
+
+Make2
+makefile
+mgsim/makefile
+mgvams/makefile
+vams/makefile
+tests/makefile
+src/makefile
+src/*.raw
+
+tests/constants.vams
+tests/disciplines.vams

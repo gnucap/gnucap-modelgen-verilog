@@ -5,7 +5,7 @@ attach ./modelgen_0.so
 verilog
 
 `modelgen
-module test_for0_0(p, n);
+module test_for1a(p, n);
   electrical p, n;
   inout p, n;
   parameter real v=0;
@@ -21,13 +21,13 @@ endmodule
 
 list
 
-!make test_for0_0.so > /dev/null
-attach ./test_for0_0.so
+!make test_for1a.so > /dev/null
+attach ./test_for1a.so
 
-test_for0_0 #(.v(0)) dut(n0,0);
-test_for0_0 #(.v(1)) dut(n1,0);
-test_for0_0 #(.v(2)) dut(n2,0);
-test_for0_0 #(.v(3)) dut(n3,0);
+test_for1a #(.v(0)) dut(n0,0);
+test_for1a #(.v(1)) dut(n1,0);
+test_for1a #(.v(2)) dut(n2,0);
+test_for1a #(.v(3)) dut(n3,0);
 
 resistor #(1k) r(n0 n1);
 
