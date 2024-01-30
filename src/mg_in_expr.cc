@@ -57,8 +57,10 @@ static Token* resolve_function(FUNCTION_ const* f, Expression const* e, Block* o
   size_t na=-1;
   if(e->is_empty()){
   }else if(auto p = dynamic_cast<Token_PARLIST_ const*>(e->back())){
-    if(auto d = dynamic_cast<Expression const*>(p->data())){
+    if(auto d = dynamic_cast<Expression const*>(p->args())){
       na = d->size();
+    }else if(auto ex = dynamic_cast<Expression const*>(p->data())){
+      na = ex->size();
     }else{ untested();
     }
   }else if(dynamic_cast<Token_PARLIST const*>(e->back())){ untested();
@@ -127,6 +129,9 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
     }else if(auto b = dynamic_cast<Token_BINOP*>(t)){
       Token_BINOP_ bb(*b);
       bb.stack_op(&E);
+    }else if(auto arr = dynamic_cast<Token_ARRAY*>(t)){
+      Token_ARRAY_ bb(*arr);
+      bb.stack_op(&E);
     }else if(auto tern = dynamic_cast<Token_TERNARY const*>(t)){
       // BUG, move to stackop
       auto tp = new Expression_();
@@ -189,8 +194,10 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
       // move to stack_op?
       if(E.is_empty()){
       }else if(auto parlist = dynamic_cast<Token_PARLIST_ const*>(E.back())){
-	if(auto pd = dynamic_cast<Expression const*>(parlist->data())){
-	  na = pd->size();
+	if(auto ed = dynamic_cast<Expression const*>(parlist->data())){ untested();
+	  na = ed->size();
+	}else if(parlist->args()){
+	  na = parlist->args()->size();
 	}else{ untested();
 	}
       }else{

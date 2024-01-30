@@ -243,6 +243,7 @@ class RPN_VARS {
     // t_int,
     t_str,
     t_ref,
+    t_arr,
   } type;
   std::stack<type> _types;
   std::stack<int> _args;
@@ -255,12 +256,15 @@ class RPN_VARS {
   int _ddo_alloc{0};
   int _str_idx{-1};
   int _str_alloc{0};
+  int _arr_idx{-1};
+  int _arr_alloc{0};
   Deps const* _deps;
 public:
   explicit RPN_VARS(Deps const* d) : _deps(d) {}
   ~RPN_VARS(){
     assert(_flt_idx == -1);
     assert(_ddo_idx == -1);
+    assert(_arr_idx == -1);
     assert(_str_idx == -1);
     assert(_refs.empty());
   }
@@ -270,6 +274,10 @@ public:
     case t_flt:
       assert(_flt_idx>-1);
       --_flt_idx;
+      break;
+    case t_arr:
+      assert(_arr_idx>-1);
+      --_arr_idx;
       break;
     case t_ddo:
       assert(_ddo_idx>-1);
@@ -296,6 +304,17 @@ public:
       o__ "std::string s" << _str_idx << ";\n";
     }
     _types.push(t_str);
+  }
+  void new_array(std::ostream& o, Token_ARRAY_ const& /*TODO*/){
+    ++_arr_idx;
+    _types.push(t_arr);
+    if(_arr_idx < _arr_alloc){
+//      o__ "a" << _arr_idx << "= array_";
+      o__ code_name() << "= array_";
+    }else{
+      o__ "array_ " << code_name();
+      ++_arr_alloc;
+    }
   }
   void new_ddouble(std::ostream& o){
     ++_ddo_idx;
@@ -380,6 +399,8 @@ public:
       return "f" + std::to_string(_flt_idx);
     case t_ddo:
       return "t" + std::to_string(_ddo_idx);
+    case t_arr:
+      return "a" + std::to_string(_arr_idx);
     case t_str:
       return "s" + std::to_string(_str_idx);
     case t_ref:
@@ -487,10 +508,49 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
     }else if (auto pb = dynamic_cast<const Token_PORT_BRANCH*>(*i)) {
       incomplete();
       s.new_ref("0"); //port number here?
+    }else if (auto A = dynamic_cast<const Token_ARRAY_*>(*i)) {
+      if(A->args()){
+	auto se = prechecked_cast<Expression const*>(A->args());
+	assert(se);
+	s.stop();
+	make_cc_expression_(o, *se, s);
+      }else{
+      }
+      o__ "// array " << (*i)->name() << " " << s.have_args() << "\n";
+      // o__ s.code_name() << " = ";
+      std::vector<std::string> argnames;
+      if(A->args()) {
+	assert(s.have_args());
+	argnames.resize(s.num_args());
+	for(auto n=argnames.begin(); n!=argnames.end(); ++n){
+	  *n = s.code_name();
+	  s.pop();
+	}
+      }else{
+      }
+      s.new_array(o, *A);
+
+      if(!A->args()) { untested();
+//	o << A->code_name() << "(); // no parlist\n";
+	assert(!argnames.size());
+      }else if(!argnames.size()){
+//	o << A->code_name() << "(); // no args\n";
+	s.args_pop();
+      }else{
+	o << " /*(312)*/ "; //  << A->code_name();
+
+	o << "(";
+       	std::string comma = "";
+	for(size_t ii=argnames.size(); ii; --ii){
+	  o << comma << argnames[ii-1];
+	  comma = ", ";
+	}
+	o << ");\n";
+	s.args_pop();
+      }
     }else if (auto c = dynamic_cast<const Token_CONSTANT*>(*i)) {
       s.new_constant(o, *c);
     }else if(auto F = dynamic_cast<const Token_CALL*>(*i)) {
-
       if(F->args()){
 	auto se = prechecked_cast<Expression const*>(F->args());
 	assert(se);
@@ -538,11 +598,16 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
 	o << ");\n";
 	s.args_pop();
       }
-    }else if (dynamic_cast<const Token_PARLIST_*>(*i)) { untested();
-      if(auto se = dynamic_cast<Expression const*>((*i)->data())){ untested();
+    }else if (auto pl=dynamic_cast<const Token_PARLIST_*>(*i)) { untested();
+      if(auto se = dynamic_cast<Expression const*>(pl->args())){ untested();
 	o__ "// start parlist\n";
 	s.stop();
 	make_cc_expression_(o, *se, s);
+	o__ "// end parlist\n";
+      }else if(auto eee = dynamic_cast<Expression const*>((*i)->data())){ untested();
+	o__ "// start parlist\n";
+	s.stop();
+	make_cc_expression_(o, *eee, s);
 	o__ "// end parlist\n";
       }else{ untested();
 	unreachable(); // ?

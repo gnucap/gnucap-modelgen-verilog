@@ -119,7 +119,11 @@ public:
     {
       cl->set_label(filter_code_name); // label()); // "_b_" + filter_code_name);
       cl->set_code_name("_b_" + filter_code_name);
-      assert(na<3);
+      if(na<3){
+      }else{ untested();
+	incomplete();
+	error(bDANGER, "too many arguments\n");
+      }
       cl->set_num_args(na);
       cl->_m = &m;
       m.push_back(cl);
@@ -407,7 +411,7 @@ void Token_XDT::stack_op(Expression* e)const
 }
 /*--------------------------------------------------------------------------*/
 Branch const* XDT::output() const
-{ itested();
+{
   if(_output){
     return _output;
   }else{
@@ -417,12 +421,12 @@ Branch const* XDT::output() const
 /*--------------------------------------------------------------------------*/
 #if 1
 Node_Ref XDT::p() const
-{ itested();
+{
   return _p;
 }
 /*--------------------------------------------------------------------------*/
 Node_Ref XDT::n() const
-{ itested();
+{
   return _n;
 }
 #endif

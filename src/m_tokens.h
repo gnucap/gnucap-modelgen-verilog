@@ -43,19 +43,48 @@ static Token* copy(Token const* b)
   }
 }
 /*--------------------------------------------------------------------------*/
+class Expression_;
 class Token_PARLIST_ : public Token_PARLIST {
+  Expression const* _args{NULL};
 public:
   explicit Token_PARLIST_(Token_PARLIST const& p)
-    : Token_PARLIST(p) { }
+    : Token_PARLIST(p) { assert(!_args); }
+  explicit Token_PARLIST_(Token_PARLIST_ const& p)
+    : Token_PARLIST(p) { assert(!_args); }
   explicit Token_PARLIST_(const std::string Name, Base* L=NULL)
-    : Token_PARLIST(Name, L) {}
+    : Token_PARLIST(Name, L) { assert(!L); assert(!_args); }
+  ~Token_PARLIST_();
 public:
   void stack_op(Expression* E)const override;
-  Token* clone()const override{
+  Token_PARLIST_* clone()const override{
     return new Token_PARLIST_(*this);
   }
   Deps* new_deps()const;
+  Expression const* args()const { return _args; }
+  void set_args(Expression const* e) {assert(!(_args && e)); _args = e;}
 };
+/*--------------------------------------------------------------------------*/
+#if 1
+class Token_ARRAY_ : public Token_ARRAY {
+  Expression const* _args{NULL};
+public:
+  explicit Token_ARRAY_(Token_ARRAY const& p)
+    : Token_ARRAY(p) { assert(!args()); }
+  explicit Token_ARRAY_(Token_ARRAY_ const& p)
+    : Token_ARRAY(p) { assert(!args()); }
+  explicit Token_ARRAY_(const std::string Name, Base* L=NULL)
+    : Token_ARRAY(Name, L) { assert(!args()); }
+public:
+  void stack_op(Expression* E)const override;
+  Token_ARRAY_* clone()const override{
+    auto t = new Token_ARRAY_(*this);
+    assert(!t->args());
+    return t;
+  }
+  Expression const* args()const { return _args; }
+  void set_args(Expression const* e) {assert(!(_args && e)); _args = e;}
+};
+#endif
 /*--------------------------------------------------------------------------*/
 class Token_UNARY_ : public Token_UNARY {
   Token const* _op{NULL}; // stuff into data?
@@ -230,60 +259,6 @@ public:
 private:
   size_t num_deps() const;
 };
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-#if 1
-// typedef Token_CALL Token_SFCALL;
-#else
-class Token_SFCALL : public Token_CALL {
-public:
-  explicit Token_SFCALL(const std::string Name, FUNCTION_ const* f = NULL)
-    : Token_CALL(Name, f) {}
-private:
-  explicit Token_SFCALL(const Token_SFCALL& P, Base const* data=NULL)
-    : Token_CALL(P, data) {}
-  Token* clone()const override {
-    return new Token_SFCALL(*this);
-  }
-  void stack_op(Expression* e)const override{
-    assert(e);
-    Token_CALL::stack_op(e);
-    assert(e->back());
-    Base const* dd = e->back()->data();
-    if(auto cc=dynamic_cast<Token_SFCALL const*>(e->back())){
-      if(auto tt=dynamic_cast<Token const*>(dd)){
-	dd = tt->clone();
-      }else{
-      }
-      auto t = new Token_SFCALL(*cc, dd);
-      delete(e->back());
-      e->pop_back();
-      e->push_back(t);
-    }else{
-      // reachable?
-    }
-  }
-};
-#endif
-/*--------------------------------------------------------------------------*/
-#if 0
-class Token_FILTER : public Token_CALL {
-public:
-  explicit Token_FILTER(const std::string Name, FUNCTION_ const* item)
-    : Token_CALL(Name, item) {}
-private:
-  explicit Token_FILTER(const Token_FILTER& P)
-    : Token_CALL(P) {} // , _item(P._item) {}
-  Token* clone()const override {return new Token_FILTER(*this);}
-
-  // incomplete.
-//  void stack_op(Expression* e)const override{ untested();
-//    e->push_back(clone());
-//  }
-public:
-  std::string code_name() const;
-};
-#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

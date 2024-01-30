@@ -348,7 +348,7 @@ void Token_ACSTIM::stack_op(Expression* e)const
 }
 /*--------------------------------------------------------------------------*/
 Branch const* ACSTIM::output() const
-{ itested();
+{
   if(_output){
     return _output;
   }else{
@@ -358,12 +358,12 @@ Branch const* ACSTIM::output() const
 /*--------------------------------------------------------------------------*/
 #if 1
 Node_Ref ACSTIM::p() const
-{ itested();
+{
   return _p;
 }
 /*--------------------------------------------------------------------------*/
 Node_Ref ACSTIM::n() const
-{ itested();
+{
   return _n;
 }
 #endif

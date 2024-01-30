@@ -1,0 +1,14 @@
+module test_array(p, n);
+  electrical p, n;
+  (* desc="" *)
+  real   dv;
+
+  analog begin
+    dv = '{1, 2, 3};
+    dv = ddt(V(p, n), '{1, 0});
+  end
+
+endmodule
+
+
+

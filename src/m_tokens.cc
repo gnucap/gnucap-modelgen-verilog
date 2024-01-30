@@ -138,7 +138,7 @@ static bool is_constant(stash_op const& o)
 /*--------------------------------------------------------------------------*/
 #if 0
 Token_CALL::~Token_CALL()
-{
+{ untested();
   detach();
   delete _args;
 }
@@ -195,7 +195,7 @@ Deps const* Token_BINOP_::op_deps(Token const* t1, Token const* t2)const
   if(b){
     ret = prechecked_cast<Deps const*>(b);
     assert(ret);
-  }else{
+  }else{ untested();
     ret = const_deps.clone();
   }
   return ret;
@@ -204,17 +204,14 @@ Deps const* Token_BINOP_::op_deps(Token const* t1, Token const* t2)const
 void Token_UNARY_::stack_op(Expression* E)const
 {
   if(op1()){
-
     op1()->stack_op(E); // clone??
     Token* t1 = E->back();
     E->pop_back();
     Deps const* d1 = dynamic_cast<Deps const*>(t1->data());
-
     E->push_back(new Token_UNARY_(name(), t1, copy_deps(d1)));
 
     return;
   }else{
-    assert(!op1());
   }
 
   assert(E);
@@ -237,7 +234,7 @@ void Token_UNARY_::stack_op(Expression* E)const
     Deps const* deps = NULL;
     if(d1) {
       deps = d1->clone();
-    }else{itested();
+    }else{
     }
 //    E->push_back(t1);
     E->push_back(new Token_UNARY_(name(), t1, deps));
@@ -314,10 +311,10 @@ void Token_BINOP_::stack_op(Expression* E)const
     }else if(n=='*' && is_constant(t1, 1.)) {
       t1.erase();
       t2.push();
-    }else if(n=='-' && is_constant(t1, 0.)) {itested();
+    }else if(n=='-' && is_constant(t1, 0.)) {
       t1.erase();
       t2.push();
-    }else if(n=='+' && is_constant(t1, 0.)) {
+    }else if(n=='+' && is_constant(t1, 0.)) { untested();
       t1.erase();
       t2.push();
     }else if(name()=="&&" && is_constant(t1, 0.)){
@@ -386,7 +383,7 @@ void Token_BINOP_::stack_op(Expression* E)const
 	  t2.pop();
 	}
 
-      }else{ itested();
+      }else{
 	// incomplete();
 	E->push_back(new Token_BINOP_(name(), t2, t1, deps));
 	t1.pop();
@@ -400,7 +397,7 @@ void Token_BINOP_::stack_op(Expression* E)const
 //  }else if(t1==t2, '-'){ ...
   }else{
     // t2 is constant?
-    if(n=='+' && is_constant(t2, 0.)){
+    if(n=='+' && is_constant(t2, 0.)){ untested();
       t2.erase();
       t1.push();
     }else if(n=='*' && is_constant(t2, 1.)){
@@ -434,7 +431,7 @@ void Token_BINOP_::stack_op(Expression* E)const
 void Token_TERNARY_::stack_op(Expression* E)const
 {
   Token const* cond;
-  if(_cond){itested();
+  if(_cond){
     _cond->stack_op(E);
   }else{
   }
@@ -510,23 +507,27 @@ void Token_CALL::stack_op(Expression* E)const
   Expression const* arg_expr = args();
 
   Token const* T1 = NULL;
+  bool del_args = false;
   if (arg_expr) {
-    // repeat stack-op. why?
-    // assert(false); // obsolete
-    trace2("call stackop", name(), arg_expr->size());
   }else if (E->is_empty()) {
-  }else if(dynamic_cast<Token_PARLIST const*>(E->back())) {
+  }else if(auto pl=dynamic_cast<Token_PARLIST_*>(E->back())) {
+    del_args = true;
+    arg_expr = pl->args();
+    if(arg_expr){
+      pl->set_args(NULL);
+      E->pop_back();
+      delete(pl);
+    }else{ untested();
+    }
+  }else if(dynamic_cast<Token_PARLIST const*>(E->back())) { untested();
     T1 = E->back(); // Token_PARLIST?
     assert(T1);
     Base const* d = T1->data();
 
-#if 1 // stuff Expression into args()
     E->pop_back();
     arg_expr = prechecked_cast<Expression const*>(d);
     assert(arg_expr || !d);
-#endif
   }else{
-    // finish task w/o args gets here.
   }
 
   if (arg_expr) {
@@ -557,6 +558,10 @@ void Token_CALL::stack_op(Expression* E)const
       E->push_back(new Token_CALL(*this, deps, EE));
     }
     delete T1;
+    if(del_args){
+      delete(arg_expr); // really?
+    }else{
+    }
   }else if (E->is_empty()){
     // SFCALL?
     E->push_back(new Token_CALL(*this, const_deps.clone()));
@@ -592,10 +597,10 @@ static Module* to_module(Block* owner)
 }
 /*--------------------------------------------------------------------------*/
 size_t Token_ACCESS::num_deps() const
-{
-  if(auto t=dynamic_cast<Deps const*>(data())){
+{ untested();
+  if(auto t=dynamic_cast<Deps const*>(data())){ untested();
     return t->size();
-  }else{
+  }else{ untested();
     // incomplete();
     return 0;
   }
@@ -611,14 +616,32 @@ void Token_ACCESS::stack_op(Expression* e) const
     throw Exception("syntax error");
   }else if(!dynamic_cast<Token_PARLIST*>(E.back())) { untested();
     throw Exception("syntax error");
-  }else if(E.back()->data()) {
+  }else if(auto pl = dynamic_cast<Token_PARLIST_*>(E.back())) {
+    Expression const* ee = pl->args();
+    if(ee){
+      E.pop_back();
+      E.push_back(new Token_STOP("fn_stop"));
+
+      // attach args?
+      for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
+	trace1("xs stack", (*i)->name());
+	E.push_back((*i)->clone());
+	//      (**i).stack_op(&E);
+      }
+      E.push_back(new Token_PARLIST("fn_args"));
+      delete(pl);
+    }else{ untested();
+      incomplete();
+    }
+  }else if(E.back()->data()) { untested();
+    unreachable(); // using args
     auto back = E.back();
     E.pop_back();
     Base const* d = back->data();
     auto ee = prechecked_cast<Expression const*>(d);
     assert(ee);
     E.push_back(new Token_STOP("fn_stop"));
-    for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
+    for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) { untested();
       trace1("xs stack", (*i)->name());
       E.push_back((*i)->clone());
       //      (**i).stack_op(&E);
@@ -724,14 +747,14 @@ Probe const* Token_ACCESS::prb() const
 }
 /*--------------------------------------------------------------------------*/
 bool Token_ACCESS::is_reversed() const
-{
+{ untested();
   auto p = prb();
   assert(p);
   return p->is_reversed();
 }
 /*--------------------------------------------------------------------------*/
 std::string Token_ACCESS::code_name() const
-{
+{ untested();
   auto p = prb();
   assert(p);
   return p->code_name();
@@ -770,7 +793,7 @@ size_t Token_VAR_REF::num_deps() const
 {
   if(auto t=dynamic_cast<Deps const*>(data())){
     return t->size();
-  }else{
+  }else{ untested();
     // incomplete();
     return 0;
   }
@@ -791,10 +814,73 @@ void Token_VAR_REF::stack_op(Expression* e)const
 /*--------------------------------------------------------------------------*/
 Deps* Token_PARLIST_::new_deps()const
 { untested();
+  incomplete();
   return ::new_deps(data());
 }
 /*--------------------------------------------------------------------------*/
-void Token_PARLIST_::stack_op(Expression* E)const
+Token_PARLIST_::~Token_PARLIST_()
+{
+  delete _args;
+  _args = NULL;
+}
+/*--------------------------------------------------------------------------*/
+static Expression* new_arglist(Expression* E)
+{
+  assert(!E->is_empty());
+  std::stack<Token*> stack; // needed?
+  auto arg_exp = new Expression_();
+  // replace multiple tokens of a PARLIST with a single token
+  for (;;) {
+    Token* t = E->back();
+    E->pop_back();
+    if (dynamic_cast<const Token_STOP*>(t)) {
+      delete t;
+      break;
+    }else{
+      stack.push(t);
+    }
+  }
+  // turn over (there is no push_front, maybe on purpose)
+  while(!stack.empty()){
+    trace1("pushing", stack.top()->name());
+    arg_exp->push_back(stack.top());
+    stack.pop();
+  }
+  return arg_exp;
+}
+/*--------------------------------------------------------------------------*/
+void Token_ARRAY_::stack_op(Expression* E) const
+{
+  assert(E);
+  if(auto ee = dynamic_cast<Expression const*>(data())){ untested();
+    unreachable();
+    auto arg_exp = new Expression_();
+    for(auto const& i : *ee){ untested();
+      // just clone?
+      i->stack_op(arg_exp);
+    }
+    auto argl = new Token_ARRAY("", arg_exp);
+    E->push_back(argl);
+  }else if(args()){
+    auto arg_exp = new Expression_();
+    for(auto const& i : *args()){
+      // just clone?
+      i->stack_op(arg_exp);
+    }
+    auto* pl = clone();
+    pl->set_args(arg_exp);
+    E->push_back(pl);
+  }else{
+    Expression* arg_exp = new_arglist(E);
+    trace0("new PARLIST_");
+    Token_ARRAY_* n = clone(); // new Token_PARLIST_("", arg_exp);
+    assert(n);
+    n->set_args(arg_exp);
+    E->push_back(n);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Token_PARLIST_::stack_op(Expression* E) const
 {
   assert(E);
   if(auto ee = dynamic_cast<Expression const*>(data())){ untested();
@@ -806,34 +892,28 @@ void Token_PARLIST_::stack_op(Expression* E)const
     }
     auto parlist = new Token_PARLIST("", arg_exp);
     E->push_back(parlist);
+  }else if(args()){ untested();
+    auto arg_exp = new Expression_();
+    for(auto const& i : *args()){ untested();
+      // just clone?
+      i->stack_op(arg_exp);
+    }
+    auto* pl = clone();
+    pl->set_args(arg_exp);
+    E->push_back(pl);
   }else{
-    assert(!E->is_empty());
-    std::stack<Token*> stack; // needed?
-    auto arg_exp = new Expression();
-    // replace multiple tokens of a PARLIST with a single token
-    for (;;) {
-      Token* t = E->back();
-      E->pop_back();
-      if (dynamic_cast<const Token_STOP*>(t)) {
-	delete t;
-	break;
-      }else{
-	stack.push(t);
-      }
-    }
-    // turn over (there is no push_front, maybe on purpose)
-    while(!stack.empty()){
-      trace1("pushing", stack.top()->name());
-      arg_exp->push_back(stack.top());
-      stack.pop();
-    }
-    auto parlist = new Token_PARLIST_("", arg_exp);
+    Expression* arg_exp = new_arglist(E);
+    trace0("new PARLIST_");
+    auto parlist = clone(); // new Token_PARLIST_("", arg_exp);
+    auto n = prechecked_cast<Token_PARLIST_*>(parlist);
+    assert(n);
+    n->set_args(arg_exp);
     E->push_back(parlist);
   }
 }
 /*--------------------------------------------------------------------------*/
 Token* VAMS_ACCESS::new_token(Module& m, size_t na)const
-{
+{ untested();
   unreachable(); // obsolete.
   // use na?
   Branch_Ref br = m.new_branch(_arg0, _arg1);
@@ -858,7 +938,7 @@ Token* Probe::new_token(Module&, size_t na)const
     }else if(_type==t_flow){
       assert(discipline()->flow());
       name = discipline()->flow()->access().to_string();
-    }else{
+    }else{ untested();
       name = "UNKNOWN";
     }
   }else if(_type==t_pot){ untested();

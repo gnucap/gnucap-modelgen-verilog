@@ -58,6 +58,33 @@ void Expression_::dump(std::ostream& out)const
       Token* t = new Token_PARLIST(o.str());
       locals.push_back(t);
       stack.push_back(t);
+    }else if (auto tarr = dynamic_cast<const Token_ARRAY_*>(*i)){
+      auto de = tarr->args();
+      std::stringstream o;
+      if(tarr->name() == "}"){
+	o << "'{";
+      }else{ untested();
+	o << "(";
+      }
+      de->dump(o);
+      o << tarr->name();
+      Token* t = new Token_ARRAY(o.str());
+      locals.push_back(t);
+      stack.push_back(t);
+    }else if (auto pl = dynamic_cast<const Token_PARLIST_*>(*i)) {
+      unreachable(); // PARLIST_ absorbed into CALL or so
+      auto de = pl->args();
+      std::stringstream o;
+      if(pl->name() == "}"){
+	o << "'{";
+      }else{ untested();
+	o << "(";
+      }
+      de->dump(o);
+      o << pl->name();
+      Token* t = new Token_PARLIST(o.str());
+      locals.push_back(t);
+      stack.push_back(t);
     }else if (dynamic_cast<const Token_PARLIST*>(*i)) { untested();
       // pop*n  push
       bool been_here = false;
@@ -214,7 +241,7 @@ void Expression_::dump(std::ostream& out)const
     delete locals.back();
     locals.pop_back();
   }
-}
+} // Expression_::dump
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

@@ -194,6 +194,8 @@ private:
     }else if(auto p = dynamic_cast<Token_PARLIST_ const*>(e->back())){
       if(auto ee = dynamic_cast<Expression const*>(p->data())){
 	arg = ee->back();
+      }else if(p->args()){
+	arg = p->args()->back();
       }else{ untested();
 	unreachable();
       }

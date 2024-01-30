@@ -369,7 +369,7 @@ private:
 	  _data += f.ctoc();
 	}else if(f.peek() == '\n'){
 	  _data += f.ctoc();
-	}else{itested();
+	}else{
 	}
       }else{ untested();
 	trace2("qs", _data, f.peek());

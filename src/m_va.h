@@ -567,6 +567,21 @@ inline PARAMETER<int>& chain(PARAMETER<int>& t, double const&)
 }
 
 
+/*--------------------------------------------------------------------------*/
+class array_{
+  std::vector<double> _v;
+public:
+  array_() {}
+  array_(double a0) {
+    _v.push_back(a0);
+  }
+  array_(double a0, double a1) {
+    _v.push_back(a0);
+    _v.push_back(a1);
+  }
+  size_t size() const{return _v.size();}
+  double const& operator[](int x)const {return _v[x];}
+};
 }
 
 /*--------------------------------------------------------------------------*/

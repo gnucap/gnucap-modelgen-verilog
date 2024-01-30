@@ -853,7 +853,7 @@ void OUT_ANALOG::make_one_variable_store(std::ostream& o, const Variable_Decl& V
     unreachable();
   }else if(_mode == modePRECALC){
     o__ "// d->" << V.code_name() << " = " << V.code_name() << ";\n";
-  }else if(V.deps().size() == 0){ itested();
+  }else if(V.deps().size() == 0){
     // it's a reference.
   }else if(options().optimize_deriv()) {
     // use destructor

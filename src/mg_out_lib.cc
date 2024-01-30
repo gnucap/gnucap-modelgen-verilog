@@ -27,7 +27,7 @@ static void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2&
 {
   // if (!(p.calculate().empty())) {untested();
   //   out << "    this->" << p.code_name() << " = " << p.calculate() << ";\n";
-  // }else{
+  // }else{ untested();
   // }
   o__ "{\n";
 //  o__ p.type() << " val = ";
@@ -35,7 +35,7 @@ static void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2&
     // o << p.default_val();
     indent i2;
     make_cc_expression(o, p.default_val().expression());
-  }else{
+  }else{ untested();
     o << "NA;";
   }
 //  o << ";\n";
@@ -49,7 +49,7 @@ static void make_final_adjust_eval_local_parameter(std::ostream& o, const Parame
 {
   // if (!(p.calculate().empty())) {untested();
   //   out << "    this->" << p.code_name() << " = " << p.calculate() << ";\n";
-  // }else{
+  // }else{ untested();
   // }
   o__ "{\n";
 //  o__ p.type() << " val = ";
@@ -57,7 +57,7 @@ static void make_final_adjust_eval_local_parameter(std::ostream& o, const Parame
     // o << p.default_val();
     indent i2;
     make_cc_expression(o, p.default_val().expression());
-  }else{
+  }else{ untested();
     o << "NA;";
   }
 //  o << ";\n";
@@ -92,7 +92,7 @@ static void make_construct_parameter(std::ostream& out, const Parameter_2& p)
 {
   if (!(p.default_val().empty())) {
     out << ",\n   " << p.code_name() << "(/*default*/)";
-  }else{
+  }else{ untested();
     out << ",\n   " << p.code_name() << "(NA)";
   }
 }
@@ -109,13 +109,13 @@ void make_construct_parameter_list(std::ostream& out,const Parameter_List_Collec
 /*--------------------------------------------------------------------------*/
 static void make_get_one_param(std::ostream& out, const Parameter_1& p,
 		     const std::string& name)
-{
-  if (!(name.empty())) {
+{ untested();
+  if (!(name.empty())) { untested();
     out << "    || get(cmd, \"" << name << "\", &" << p.code_name();
     if (!(p.offset().empty())) {untested();
       incomplete();
       out << ", m_OFFSET, " << p.offset();
-    }else if (p.positive()) {
+    }else if (p.positive()) { untested();
       //incomplete();
       //out << ", mPOSITIVE";
     }else if (p.octal()) {untested();
@@ -124,16 +124,16 @@ static void make_get_one_param(std::ostream& out, const Parameter_1& p,
     }else if (!(p.scale().empty())) {untested();
       incomplete();       
       out << ", m_SCALE, " << p.scale();
-    }else{
+    }else{ untested();
     }
     out << ")\n";
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
 void make_get_param_list(std::ostream& out, const Parameter_1_List& pl)
-{
-  for (Parameter_1_List::const_iterator p = pl.begin(); p != pl.end(); ++p) {
+{ untested();
+  for (Parameter_1_List::const_iterator p = pl.begin(); p != pl.end(); ++p) { untested();
     make_get_one_param(out, **p, (**p).user_name());
     make_get_one_param(out, **p, (**p).alt_name());
   }
@@ -141,62 +141,62 @@ void make_get_param_list(std::ostream& out, const Parameter_1_List& pl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 static void make_print_one_param(std::ostream& out, const Parameter_1& p)
-{
-  if (!(p.user_name().empty())) {
+{ untested();
+  if (!(p.user_name().empty())) { untested();
     out << "  print_pair(o, lang, \"" << to_lower(p.user_name()) << "\", "
     	<< p.code_name();
 
     if (!(p.offset().empty())) {untested();
       out << "-(" << p.offset() << ")";
-    }else{
+    }else{ untested();
     }
     if (!(p.scale().empty())) {untested();
       out << "/(" << p.scale() << ")";
-    }else{
+    }else{ untested();
     }
 
-    if (!(p.print_test().empty())) {
+    if (!(p.print_test().empty())) { untested();
       out << ", " << p.print_test() << "";
-//    }else if (p.default_val() == "NA") {
+//    }else if (p.default_val() == "NA") { untested();
 //      out << ", " << p.code_name() << " != NA";
-    }else{
+    }else{ untested();
     }
 
     out << ");\n";
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
 void make_print_param_list(std::ostream& out, const Parameter_1_List& pl)
-{
-  for (Parameter_1_List::const_iterator p = pl.begin(); p != pl.end(); ++p) {
+{ untested();
+  for (Parameter_1_List::const_iterator p = pl.begin(); p != pl.end(); ++p) { untested();
     make_print_one_param(out, **p);
   }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 static void make_print_one_calc_param(std::ostream& out, const Parameter_1& p)
-{
-  if (!(p.user_name().empty()) && !(p.calc_print_test().empty())) {
+{ untested();
+  if (!(p.user_name().empty()) && !(p.calc_print_test().empty())) { untested();
     out << "  if (" << p.calc_print_test() << ")\n  "
       "  o << \"* " << to_lower(p.user_name()) << "=\" "
 	<< p.code_name();
     if (!(p.offset().empty())) {untested();
       out << "-(" << p.offset() << ")";
-    }else{
+    }else{ untested();
     }
     if (!(p.scale().empty())) {untested();
       out << "/(" << p.scale() << ")";
-    }else{
+    }else{ untested();
     }
     out << ";\n";
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
 void make_print_calc_param_list(std::ostream& out, const Parameter_1_List& pl)
-{
-  for (Parameter_1_List::const_iterator p = pl.begin(); p != pl.end(); ++p) {
+{ untested();
+  for (Parameter_1_List::const_iterator p = pl.begin(); p != pl.end(); ++p) { untested();
     make_print_one_calc_param(out, **p);
   }
 }
