@@ -1,79 +1,28 @@
-20230520-dev
-============
-* initial development snapshot
-* preprocessing
-* disciplines
-* modules with ports & parameters
-* partial derivatives
-* current/voltage sources
-* ddt/idt filters
-* basic code generation
+NEWS for modelgen-verilog.
 
-20230623-dev
-============
-* analog functions
-* control structures: while/for/case
-* preprocessor fixes & cleanup
-* support ternary operator
-* add string, integer variable types
-* expressions in parameter bounds
-* ddx (without nested/second derivatives)
-* generate is_valid (overloading)
-* analog event stub
-* switching branch
+This file summarizes new features and important changes between snapshots.
 
-20230729-dev
-============
-* string handling
-* systemtask parse/dump
-* handle short branches
-* probe vars with attribs only
-* named branches
-* preliminary value retention rules
-* preliminary attribute_instance
-* tr_probe_num: only include variables with attributes
-* paramset/instance default param fix
-* fix current port re-expansion in vaflow
-* various bugfixes
+20240130-dev, release candidate.
+================================
+* array parse/dump
+* ground statement code generation
+* port flow stub (dummy code generated, zero flow.)
+* new build system: out-of-tree build etc.
+* parallel testing
+* load plugins by directory, at startup
 
-20230829-dev
+20231231-dev
 ============
-* aliasparam
-* func, task plugins
-* tasks events, $strobe
-* filter plugins
-* slew filter stub
-* paramset: param_count tie break
-* sign bug fix in vsource
-* indirect contribution
-* limiting
-* initial conditions
-
-20230930-dev
-============
-* embed custom headers into output
-* GPL compatible vams header from ADMS
-* preprocessor: `elif
-* unify FUNCTION and Token use
-* revisit probe and dependency equality
-* Token based dependecy tracking
-* skip code generation for unused functions
-* same for (some) unreachable conditional blocks
-* simplify state and contribution code
-* more binary operator optimisations
-* provide (simple) examples
-* fix contribution bug, mg1_polarity1.gc
-* fix getlines memory issue
-
-20231031-dev
-============
-* commons hotfix
-* fix shutdown crash
-* partial attribute instance in lang_verilog
-* bunch of optimisations
-* paramset stub, vams/cap
-* deps: fixed point iteration (fpi) stub
-* more pragmas options
+* preprocessor conditional fix
+* preprocessor quoted string fix
+* diode.model port with switches
+* $bound_step
+* ac_stim
+* sine sources
+* $mfactor function and fixes
+* fix dump: preserve unreachable shorts and probes
+* netlist with analog blocks
+* bugfix pragma parser
 
 20231130-dev
 ============
@@ -91,15 +40,79 @@
 * do not allocate unused filter nodes
 * misc small fixes (see git)
 
-2023123*-dev
+20231031-dev
 ============
-* preprocessor conditional fix
-* preprocessor quoted string fix
-* diode.model port with switches
-* $bound_step
-* ac_stim
-* sine sources
-* $mfactor function and fixes
-* fix dump: preserve unreachable shorts and probes
-* netlist with analog blocks
-* bugfix pragma parser
+* commons hotfix
+* fix shutdown crash
+* partial attribute instance in lang_verilog
+* bunch of optimisations
+* paramset stub, vams/cap
+* deps: fixed point iteration (fpi) stub
+* more pragmas options
+
+20230930-dev
+============
+* embed custom headers into output
+* GPL compatible vams header from ADMS
+* preprocessor: `elif
+* unify FUNCTION and Token use
+* revisit probe and dependency equality
+* Token based dependecy tracking
+* skip code generation for unused functions
+* same for (some) unreachable conditional blocks
+* simplify state and contribution code
+* more binary operator optimisations
+* provide (simple) examples
+* fix contribution bug, mg1_polarity1.gc
+* fix getlines memory issue
+
+20230829-dev
+============
+* aliasparam
+* func, task plugins
+* tasks events, $strobe
+* filter plugins
+* slew filter stub
+* paramset: param_count tie break
+* sign bug fix in vsource
+* indirect contribution
+* limiting
+* initial conditions
+
+20230729-dev
+============
+* string handling
+* systemtask parse/dump
+* handle short branches
+* probe vars with attribs only
+* named branches
+* preliminary value retention rules
+* preliminary attribute_instance
+* tr_probe_num: only include variables with attributes
+* paramset/instance default param fix
+* fix current port re-expansion in vaflow
+* various bugfixes
+
+20230623-dev
+============
+* analog functions
+* control structures: while/for/case
+* preprocessor fixes & cleanup
+* support ternary operator
+* add string, integer variable types
+* expressions in parameter bounds
+* ddx (without nested/second derivatives)
+* generate is_valid (overloading)
+* analog event stub
+* switching branch
+
+20230520-dev
+============
+* initial development snapshot
+* preprocessing
+* disciplines
+* modules with ports & parameters
+* partial derivatives
+* current/voltage sources
+* ddt/idt filters
+* basic code generation

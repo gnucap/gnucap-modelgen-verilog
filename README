@@ -1,4 +1,18 @@
-gnucap-modelgen-verilog
+This directory contains the model generator for Gnucap
+
+== Summary
+
+Gnucap is a modular mixed-signal circuit simulator that partially implements
+Verilog-AMS, that aspires to eventually implement the complete language. This
+package adds support for the behavioural modelling section.
+
+== Funding
+
+Combined with Gnucap, this release concludes the project on Verilog-AMS funded
+through the NGI0 Entrust Fund, a fund established by NLnet with financial
+support from the European Commission's Next Generation Internet programme,
+under the aegis of DG Communications Networks, Content and Technology under
+grant agreement No 101069594. See https://nlnet.nl/project/Gnucap-VerilogAMS/
 
 == Preliminaries
 
@@ -89,3 +103,7 @@ We use the free discipline.vams header from the ADMS project. Similarly the
 included constants.vams header is based on constants.h from Gnucap and equally
 free. Using restricted versions is not recommended, but possible. Invoke
 modelgen with "-I/path/to/non-free/stuff".
+
+== LICENSE
+
+All code in this package is licensed under GPL 3 or any later version.
