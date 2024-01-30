@@ -123,10 +123,8 @@ public:
   explicit Token_TERNARY_(std::string const& b, Base const* d)
     : Token_TERNARY(b, d) { }
   explicit Token_TERNARY_(std::string const& b, Token const* Cond,
-      Expression const* t1, Expression const* t2, Base const* d)
-    : Token_TERNARY(b, t1, t2, d), _cond(Cond) { }
-//  explicit Token_TERNARY_(Token_TERNARY const& b)
-//    : Token_TERNARY(b.name(), copy(b.data())) { }
+      Expression const* t1, Expression const* t2, Base const* d=NULL)
+    : Token_TERNARY(b, t1, t2, d), _cond(Cond) {}
   ~Token_TERNARY_(){
     delete _cond;
     _cond = NULL;
