@@ -7,7 +7,7 @@ CXX = $(shell $(GNUCAP_CONF) --cxx)
 GNUCAP_CPPFLAGS = $(shell $(GNUCAP_CONF) --cppflags) -DADD_VERSION -DPIC
 GNUCAP_CXXFLAGS = $(shell $(GNUCAP_CONF) --cxxflags) -std=c++11
 MAKE_CPPFLAGS = -I${top_srcdir}/src
-SYMLINKS = ${PWD}/disciplines.vams ${PWD}/constants.vams
+SYMLINKS = ${PWD}/disciplines.vams ${PWD}/constants.vams ${PWD}/sub
 LN_S = ln -sf
 DIFF = diff -rup
 
@@ -98,6 +98,8 @@ ${PWD}/disciplines.vams:
 	-${LN_S} ${top_srcdir}/vams/disciplines.vams
 ${PWD}/constants.vams:
 	-${LN_S} ${top_srcdir}/vams/constants.vams
+${PWD}/sub:
+	-${LN_S} ${srcdir}/sub
 
 include ${top_srcdir}/Make3
 
