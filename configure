@@ -39,8 +39,8 @@ fi
 
 echo \# created by $PWD/$0. do not edit >makefile
 echo \#------------------------------------------------------------------------ >>makefile
-echo "SRCDIR = $srcdir" >> makefile
-echo "VPATH = \${SRCDIR}" >> makefile
+echo "srcdir = $srcdir" >> makefile
+echo "VPATH = \${srcdir}" >> makefile
 cat $srcdir/makefile.in >> makefile
 #----------------------------------------------------------------
 echo "CCFLAGS = \\" >Make.ccflags
@@ -97,10 +97,10 @@ sub_makefile() {
 	echo sub_makefile $1
 	echo \# created by $0 do not edit >$1
 	echo \#------------------------------------------------------------------------ >>Make2
-	echo "TOP_SRCDIR = $top_srcdir_" >> $1
-	echo "SRCDIR = $top_srcdir_/$i" >> $1
-	echo "VPATH = \${SRCDIR}" >> $1
-	echo "include \${SRCDIR}/Make1" >> $1
+	echo "top_srcdir = $top_srcdir_" >> $1
+	echo "srcdir = $top_srcdir_/$i" >> $1
+	echo "VPATH = \${srcdir}" >> $1
+	echo "include \${srcdir}/Make1" >> $1
 	echo "include ../Make2" >> $1
 	echo "include $top_srcdir_/Make3" >> $1
 }

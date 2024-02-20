@@ -8,7 +8,7 @@ TARGET = \
 NOTYET_TARGET = \
   mg_task.so
 
-MAKE_CPPFLAGS = -I ${TOP_SRCDIR}/src
+MAKE_CPPFLAGS = -I ${top_srcdir}/src
 
 INSTALL_FILES = $(TARGET)
 INSTALL_DIR = $(PREFIX)/lib/gnucap/${PACKAGE}
