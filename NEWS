@@ -2,8 +2,8 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
-20240130-dev, release candidate.
-================================
+20240220
+========
 * array parse/dump
 * ground statement code generation
 * port flow stub (dummy code generated, zero flow.)
