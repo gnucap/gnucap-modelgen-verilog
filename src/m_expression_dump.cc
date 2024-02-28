@@ -71,11 +71,11 @@ void Expression_::dump(std::ostream& out)const
       Token* t = new Token_ARRAY(o.str());
       locals.push_back(t);
       stack.push_back(t);
-    }else if (auto pl = dynamic_cast<const Token_PARLIST_*>(*i)) {
+    }else if (auto pl = dynamic_cast<const Token_PARLIST_*>(*i)) { untested();
       unreachable(); // PARLIST_ absorbed into CALL or so
       auto de = pl->args();
       std::stringstream o;
-      if(pl->name() == "}"){
+      if(pl->name() == "}"){ untested();
 	o << "'{";
       }else{ untested();
 	o << "(";

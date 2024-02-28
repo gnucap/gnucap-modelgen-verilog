@@ -27,30 +27,30 @@
 /*--------------------------------------------------------------------------*/
 #if 0
 static std::string fix_expression(const std::string& in)
-{
+{ untested();
   std::string out;
   out[0] = '\0';
   
   CS x(CS::_STRING, in);
-  for (;;) {
-    if (x.peek() == '@') {
+  for (;;) { untested();
+    if (x.peek() == '@') { untested();
       x.skip1('@');
       std::string object(x.ctos("[,"));
       x.skip1('[');
       std::string attrib(x.ctos("]"));
       x.skip1(']');
-      if (object[0] == 'n') {
+      if (object[0] == 'n') { untested();
 	out += " _n[" + object + "]";
-	if (attrib != "") {
+	if (attrib != "") { untested();
 	  out += ".v0()";
-	}else{
+	}else{ untested();
 	}
-      }else{
+      }else{ untested();
 	out += " CARD::probe(_" + object + ",\"" + attrib + "\")";
       }
-    }else if (x.more()) {
+    }else if (x.more()) { untested();
       out += ' ' + x.ctos("@");
-    }else{
+    }else{ untested();
       break;
     }
   }
@@ -60,7 +60,7 @@ static std::string fix_expression(const std::string& in)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 static void make_probe_parameter(std::ostream& out, const Parameter_1& p)
-{
+{ untested();
   make_tag();
   out << "if (Umatch(x, \"";
   if (!(p.alt_name().empty())) {untested();
@@ -72,12 +72,12 @@ static void make_probe_parameter(std::ostream& out, const Parameter_1& p)
 }
 /*--------------------------------------------------------------------------*/
 void make_probe_parameter_list(std::ostream& out,const Parameter_1_List& pl)
-{
+{ untested();
   make_tag();
   for (Parameter_1_List::const_iterator
        p = pl.begin();
        p != pl.end();
-       ++p) {
+       ++p) { untested();
     make_probe_parameter(out, **p);
   }
 }
@@ -85,12 +85,12 @@ void make_probe_parameter_list(std::ostream& out,const Parameter_1_List& pl)
 #if 0
 /*--------------------------------------------------------------------------*/
 static void make_dev_aux(std::ostream& out, const Device& d)
-{
+{ untested();
   make_tag();
   for (Function_List::const_iterator
        p = d.function_list().begin();
        p != d.function_list().end();
-       ++p) {
+       ++p) { untested();
     out << "void DEV_" << d.name() << "::" << (**p).name() << "\n"
       "{\n"
 	<< (**p).code() <<

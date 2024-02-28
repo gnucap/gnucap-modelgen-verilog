@@ -83,7 +83,7 @@ void make_final_adjust_eval_parameter_list(std::ostream& out,
 }
 /*--------------------------------------------------------------------------*/
 void make_final_adjust_parameter_list(std::ostream&, const Parameter_1_List&)
-{
+{ untested();
   unreachable();
 }
 /*--------------------------------------------------------------------------*/

@@ -943,7 +943,7 @@ Token* Probe::new_token(Module&, size_t na)const
     }
   }else if(_type==t_pot){ untested();
     name = "potential";
-  }else if(_type==t_flow){
+  }else if(_type==t_flow){ untested();
     name = "flow";
   }else{ untested();
     unreachable();

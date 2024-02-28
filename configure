@@ -94,15 +94,18 @@ sub_configure() {
 }
 #------------------------------------------------------------------------
 sub_makefile() {
-	echo sub_makefile $1
-	echo \# created by $0 do not edit >$1
-	echo \#------------------------------------------------------------------------ >>Make2
-	echo "top_srcdir = $top_srcdir_" >> $1
-	echo "srcdir = $top_srcdir_/$i" >> $1
-	echo "VPATH = \${srcdir}" >> $1
-	echo "include \${srcdir}/Make1" >> $1
-	echo "include ../Make2" >> $1
-	echo "include $top_srcdir_/Make3" >> $1
+	m=$1/makefile
+	echo sub_makefile $m
+	echo \# created by $0 do not edit >$m
+	echo \#------------------------------------------------------------------------ >> $m
+	echo "top_srcdir = $top_srcdir_" >> $m
+	echo "srcdir = $top_srcdir_/$1" >> $m
+	echo "VPATH = \${srcdir}" >> $m
+	echo "include \${srcdir}/Make1" >> $m
+	echo "include ../Make2" >> $m
+	echo "include $top_srcdir_/Make3" >> $m
+	[ -f ${srcdir}/${1}/Make.depend ] && \
+	echo "include \${srcdir}/Make.depend" >> $m
 }
 #------------------------------------------------------------------------
 for i in ${SUBDIRS}; do
@@ -110,7 +113,7 @@ for i in ${SUBDIRS}; do
 	if [ -f $srcdir/$i/configure ]; then
 		sub_configure $i;
 	else
-		sub_makefile $i/makefile;
+		sub_makefile $i;
 	fi
 done
 

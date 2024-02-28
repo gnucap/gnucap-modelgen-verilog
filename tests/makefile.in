@@ -7,6 +7,7 @@ CXX = $(shell $(GNUCAP_CONF) --cxx)
 GNUCAP_CPPFLAGS = $(shell $(GNUCAP_CONF) --cppflags) -DADD_VERSION -DPIC
 GNUCAP_CXXFLAGS = $(shell $(GNUCAP_CONF) --cxxflags) -std=c++11
 MAKE_CPPFLAGS = -I${top_srcdir}/src
+CPPFLAGS = -DTRACE_UNTESTED
 SYMLINKS = ${PWD}/disciplines.vams ${PWD}/constants.vams ${PWD}/sub
 LN_S = ln -sf
 DIFF = diff -rup
@@ -25,15 +26,20 @@ ref = ${REFDIR}
 ENV = GNUCAP_PLUGPATH=${top_builddir}:$(plugpath)
 
 glob_dump = $(shell cd ${srcdir}; ls dump*.vams)
+glob_pp = $(shell cd ${srcdir}; ls *.vapp)
 glob_v = $(shell cd ${srcdir}; ls v*.gc)
 glob_mg = $(shell cd ${srcdir}; ls mg*.gc)
 
 filt_dump = $(filter ${TESTCASES}%, ${glob_dump})
+filt_pp   = $(filter ${TESTCASES}%, ${glob_pp})
 filt_v    = $(filter ${TESTCASES}%, ${glob_v})
 filt_mg   = $(filter ${TESTCASES}%, ${glob_mg})
 
 dump_out = ${filt_dump:%=${TARGETDIR}/%.out}
 dump_diff = ${filt_dump:%=${TARGETDIR}/%.diff}
+
+pp_out = ${filt_pp:%=${TARGETDIR}/%.out}
+pp_diff = ${filt_pp:%=${TARGETDIR}/%.diff}
 
 v_out = ${filt_v:%=${TARGETDIR}/%.out}
 mg_out = ${filt_mg:%=${TARGETDIR}/%.out}
@@ -41,7 +47,7 @@ mg_out = ${filt_mg:%=${TARGETDIR}/%.out}
 gc_out = ${v_out} ${mg_out}
 gc_diff = ${gc_out:%.out=%.diff}
 
-diff = ${dump_diff} ${gc_diff}
+diff = ${dump_diff} ${gc_diff} ${pp_diff}
 
 # TODO: maybe cat the diff, so it can be logged?
 check: ${TARGETDIR}/${TESTCASES}.diff
@@ -60,12 +66,13 @@ ${TARGETDIR}/${TESTCASES}.diff : ${diff}
 ${gc_out}: ${TEST_PLUGINS} ${SYMLINKS}
 
 # this is a hack: link *.o
-modelgen_0.so: modelgen_0.cc
+modelgen_0.so: modelgen_0.cc ../src/gnucap-mg-vams
 	${CXX} -shared -fPIC ${GNUCAP_CPPFLAGS} ${CPPFLAGS} ${MAKE_CPPFLAGS} ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< ../src/*.o -o $@ # makefile.in
 
 ${diff}: ${TARGETDIR}/%.diff: ${TARGETDIR}/%.out
 	@if [ ! -f ${ref}/$*.out ]; then \
 	  echo MISS: $*; \
+	  echo "missing: $*.out" > $@; \
 	elif ${DIFF} ${ref}/$*.out ${TARGETDIR}/$*.out > $@; then \
 	  echo pass: $*; \
 	else \
@@ -87,6 +94,13 @@ ${mg_out}: ${TARGETDIR}/mg%.gc.out: prep
 	@${ENV} ${GNUCAP} ${GNUCAP_ARGS} ${MG_ARGS} ${srcdir}/mg$*.gc |tail -n +12 | \
 		grep -v '^stashing\ as' | grep -v 'already\ installed' | grep -v ^make > $@
 
+${pp_out}: ${TARGETDIR}/%.vapp.out: prep
+	@[ x${srcdir} = x. ] || ln -sf ${srcdir}/$*.vapp;
+	@${ENV} ${MODELGEN} -d ${TARGETDIR}/$*.err -I${srcdir} -D__VAMS_GNUCAP --pp $*.vapp | cat > $@
+	@[ x${srcdir} = x. ] || rm $*.vapp;
+	@cat ${TARGETDIR}/$*.err >> $@
+	@rm ${TARGETDIR}/$*.err
+
 ${dump_out}: ${TARGETDIR}/%.vams.out: prep
 	@[ x${srcdir} = x. ] || ln -sf ${srcdir}/$*.vams;
 	@${ENV} ${MODELGEN} -d ${TARGETDIR}/$*.err -I${top_srcdir}/vams --dump $*.vams | cat > $@
@@ -103,5 +117,5 @@ ${PWD}/sub:
 
 include ${top_srcdir}/Make3
 
-.PHONY: ${diff} ${v_out} ${gc_out} ${dump_out} check diff prep
+.PHONY: ${diff} ${v_out} ${gc_out} ${pp_out} ${dump_out} check diff prep
 .DELETE_ON_ERROR:

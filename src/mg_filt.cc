@@ -71,10 +71,10 @@ private:
 
   void stack_op(Expression* e)const override;
   Branch* branch() const;
-  Expression_ const* args() const{
-    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){
+  Expression_ const* args() const{ untested();
+    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){ untested();
       return a;
-    }else{
+    }else{ untested();
       assert(!Token_CALL::args());
       return NULL;
     }
@@ -189,7 +189,7 @@ public:
     o << "ddouble COMMON_" << id << "::FILTER__" << _code_name <<
       "::operator()(";
     assert(num_args() < 3);
-    for(size_t n=0; n<num_args(); ++n){
+    for(size_t n=0; n<num_args(); ++n){ untested();
       o << " ddouble t" << n << ", ";
     }
     o << "COMPONENT* dd) const\n{\n";
@@ -243,7 +243,7 @@ public:
     "/*--------------------------------------"
     "------------------------------------*/\n";
   }
-  std::string eval(CS&, const CARD_LIST*)const override{
+  std::string eval(CS&, const CARD_LIST*)const override{ untested();
     unreachable();
     return "ddt";
   }
@@ -289,7 +289,7 @@ public:
 private:
   void make_assign(std::ostream& o)const override {
     std::string cn = _br->code_name();
-    if(num_args()>1){
+    if(num_args()>1){ untested();
       o__ "t0 = t0 + t1.value();\n";
     }else{
     }
@@ -341,9 +341,9 @@ void Token_XDT::stack_op(Expression* e)const
     branch()->deps() = *dd; // HACK
     if(1){
       func->set_n_to_gnd();
-    }else if(0 /*sth linear*/){
+    }else if(0 /*sth linear*/){ untested();
       // somehow set loss=0 and output ports to target.
-    }else{
+    }else{ untested();
     }
 
     auto d = new Deps;
@@ -386,14 +386,14 @@ void Token_XDT::stack_op(Expression* e)const
 	always = true;
       }else{
       }
-    }else if(dynamic_cast<Assignment const*>(b)){
+    }else if(dynamic_cast<Assignment const*>(b)){ untested();
       assigned = true;
     }else{untested();
     }
   }
   func->_output = NULL;
   if(c_cnt!=1){
-  }else if(assigned){
+  }else if(assigned){ untested();
   }else if(cont->has_sensitivities()) { itested();
   }else if(always){
     for(auto d : cont->deps()){

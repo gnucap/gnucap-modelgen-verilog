@@ -3,7 +3,7 @@
 # Author: Felix Salfelder 2024
 #-----------------------------------------------------------------------------
 include ${srcdir}/Make1
-RECURSIVE_TARGETS=all install clean depend
+RECURSIVE_TARGETS = all install clean depend
 #-----------------------------------------------------------------------------
 ${RECURSIVE_TARGETS:%=%-recursive}: %-recursive:
 	for i in ${SUBDIRS}; do \
@@ -14,6 +14,9 @@ ${RECURSIVE_TARGETS}: %: %-recursive
 #-----------------------------------------------------------------------------
 check: all
 	${MAKE} -C tests check
+#-----------------------------------------------------------------------------
+retest: check-git
+	${MAKE} -f Makefile $@
 #-----------------------------------------------------------------------------
 .PHONY: ${RECURSIVE_TARGETS} ${RECURSIVE_TARGETS:%=%-recursive} \
         install install-here check all

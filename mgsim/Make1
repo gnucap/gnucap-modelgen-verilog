@@ -15,7 +15,8 @@ TARGET = \
   v_paramset.so \
   v_module.so
 
-SRCS = ${TARGET:%.so=%.cc}
+RAW_SRCS = ${TARGET:%.so=%.cc}
+SRCS = ${RAW_SRCS}
 
 INSTALL_FILES = $(TARGET)
 INSTALL_DIR = $(PREFIX)/lib/gnucap/${PACKAGE}

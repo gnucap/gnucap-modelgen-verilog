@@ -305,13 +305,13 @@ public:
     }
     _types.push(t_str);
   }
-  void new_array(std::ostream& o, Token_ARRAY_ const& /*TODO*/){
+  void new_array(std::ostream& o, Token_ARRAY_ const& /*TODO*/){ untested();
     ++_arr_idx;
     _types.push(t_arr);
-    if(_arr_idx < _arr_alloc){
+    if(_arr_idx < _arr_alloc){ untested();
 //      o__ "a" << _arr_idx << "= array_";
       o__ code_name() << "= array_";
-    }else{
+    }else{ untested();
       o__ "array_ " << code_name();
       ++_arr_alloc;
     }
@@ -329,7 +329,7 @@ public:
 	o__ "ddouble t" << _ddo_idx << ";\n"; // TODO? some deps?
       }
       if(!_deps){
-      }else if(!options().optimize_deriv()){
+      }else if(!options().optimize_deriv()){ untested();
 	o__ "t" << _ddo_idx << ".set_all_deps(); // (all deriv)\n"; // code_name??
       }else{
 	for(auto i: *_deps){
@@ -341,7 +341,7 @@ public:
   }
   void new_float(std::ostream& o){
     ++_flt_idx;
-    if(_flt_idx < _flt_alloc){
+    if(_flt_idx < _flt_alloc){ untested();
     }else{
       assert(_flt_idx==_flt_alloc);
       ++_flt_alloc;
@@ -357,7 +357,7 @@ public:
   void new_constant(std::ostream& o, Token_CONSTANT const& c);
   void new_rhs(Token_VAR_REF const* v){
     // TODO: linear?
-    if(0 && (*v)->is_real()){
+    if(0 && (*v)->is_real()){ untested();
       // crash?
       _refs.push("ddouble(" + (*v)->code_name() + ")/*rhsvar*/");
     }else{
@@ -389,7 +389,7 @@ public:
     assert(!_args.empty());
     _args.pop();
   }
-  size_t size() const{
+  size_t size() const{ untested();
     return _refs.size();
   }
   std::string code_name() const{
@@ -464,17 +464,17 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
   typedef Expression::const_iterator const_iterator;
 
 #if 0
-  if(auto se = dynamic_cast<Expression_ const*>(&e)){
+  if(auto se = dynamic_cast<Expression_ const*>(&e)){ untested();
     o << "/* ";
     se->dump(o);
     o << "\n";
     o << "is_offset " << se->deps().is_offset() << "\n";
-    for(auto i : se->deps()) {
+    for(auto i : se->deps()) { untested();
       o << "// Dep: " << i->code_name() << " order: " << i.order() << " ";
       o << "\n";
     }
     o << "*/\n";
-  }else{
+  }else{ untested();
   }
 #endif
 
@@ -490,7 +490,7 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
       if(!s.has_deps()){
       }else if(options().optimize_deriv()){
 	o__ s.code_name() << ".set_no_deps();\n";
-	// for(auto i: s.deps()){
+	// for(auto i: s.deps()){ untested();
 	//   o__ s.code_name() << "[d" << i->code_name() << "] = 0.; // (output dep)\n";
 	// }
       }else{itested();
@@ -505,43 +505,43 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
       }
     }else if (auto p = dynamic_cast<const Token_PAR_REF*>(*i)) {
       s.new_rhs(p);
-    }else if (auto pb = dynamic_cast<const Token_PORT_BRANCH*>(*i)) {
+    }else if (auto pb = dynamic_cast<const Token_PORT_BRANCH*>(*i)) { untested();
       incomplete();
       s.new_ref("0"); //port number here?
-    }else if (auto A = dynamic_cast<const Token_ARRAY_*>(*i)) {
-      if(A->args()){
+    }else if (auto A = dynamic_cast<const Token_ARRAY_*>(*i)) { untested();
+      if(A->args()){ untested();
 	auto se = prechecked_cast<Expression const*>(A->args());
 	assert(se);
 	s.stop();
 	make_cc_expression_(o, *se, s);
-      }else{
+      }else{ untested();
       }
       o__ "// array " << (*i)->name() << " " << s.have_args() << "\n";
       // o__ s.code_name() << " = ";
       std::vector<std::string> argnames;
-      if(A->args()) {
+      if(A->args()) { untested();
 	assert(s.have_args());
 	argnames.resize(s.num_args());
-	for(auto n=argnames.begin(); n!=argnames.end(); ++n){
+	for(auto n=argnames.begin(); n!=argnames.end(); ++n){ untested();
 	  *n = s.code_name();
 	  s.pop();
 	}
-      }else{
+      }else{ untested();
       }
       s.new_array(o, *A);
 
       if(!A->args()) { untested();
 //	o << A->code_name() << "(); // no parlist\n";
 	assert(!argnames.size());
-      }else if(!argnames.size()){
+      }else if(!argnames.size()){ untested();
 //	o << A->code_name() << "(); // no args\n";
 	s.args_pop();
-      }else{
+      }else{ untested();
 	o << " /*(312)*/ "; //  << A->code_name();
 
 	o << "(";
        	std::string comma = "";
-	for(size_t ii=argnames.size(); ii; --ii){
+	for(size_t ii=argnames.size(); ii; --ii){ untested();
 	  o << comma << argnames[ii-1];
 	  comma = ", ";
 	}
@@ -708,7 +708,7 @@ void make_cc_expression(std::ostream& o, Expression const& e, bool dynamic)
   if(!dynamic){
   }else if(auto ex = dynamic_cast<Expression_ const*>(&e)){
     deps = &ex->deps();
-  }else{
+  }else{ untested();
   }
   RPN_VARS s(deps);
   make_cc_expression_(o, e, s);

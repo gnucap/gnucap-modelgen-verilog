@@ -26,12 +26,12 @@
 #include "mg_.h" // TODO
 /*--------------------------------------------------------------------------*/
 static void make_header(std::ostream& out, const File& in)
-{
+{ untested();
   out << in.head();
 }
 /*--------------------------------------------------------------------------*/
 static void make_tail(std::ostream& out)
-{
+{ untested();
   out <<
     "/*--------------------------------------------------------------------------*/\n"
     "/*--------------------------------------------------------------------------*/\n";
@@ -44,20 +44,20 @@ inline void os_error(const std::string& name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void make_dump_file(const File& in)
-{
+{ untested();
   std::string dump_name = in.name();
   { // chop prefix path
     std::string::size_type loc = dump_name.find_last_of(ENDDIR);
-    if (loc != std::string::npos) {
+    if (loc != std::string::npos) { untested();
       dump_name.erase(0, loc+1);
-    }else{
+    }else{ untested();
     }
   }
   
   // open file
   dump_name += ".dump";
   std::ofstream out((dump_name).c_str());
-  if (!out) {
+  if (!out) { untested();
     untested();
     os_error(dump_name);
   }

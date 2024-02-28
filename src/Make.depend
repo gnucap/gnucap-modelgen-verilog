@@ -66,7 +66,7 @@ mg_block.o: mg_block.cc mg_.h mg_expression.h mg_attrib.h mg_base.h \
  mg_circuit.h mg_discipline.h mg_module.h
 mg_main.o: mg_main.cc mg_out.h mg_base.h mg_in.h mg_attrib.h mg_pp.h \
  mg_.h mg_expression.h mg_deps.h mg_lib.h mg_func.h mg_token.h m_tokens.h \
- mg_code.h mg_filter.h mg_circuit.h mg_discipline.h mg_module.h config.h
+ mg_code.h mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
 mg_nodes.o: mg_nodes.cc mg_.h mg_expression.h mg_attrib.h mg_base.h \
  mg_deps.h mg_lib.h mg_func.h mg_token.h m_tokens.h mg_code.h mg_filter.h \
  mg_circuit.h mg_discipline.h mg_module.h
@@ -102,7 +102,7 @@ mg_out_lib.o: mg_out_lib.cc mg_out.h mg_base.h mg_.h mg_expression.h \
 mg_out_root.o: mg_out_root.cc mg_out.h mg_base.h mg_in.h mg_attrib.h \
  mg_options.h mg_discipline.h mg_.h mg_expression.h mg_deps.h mg_lib.h \
  mg_func.h mg_token.h m_tokens.h mg_code.h mg_filter.h mg_circuit.h \
- mg_module.h m_va.raw e_va.raw
+ mg_module.h
 mg_pp.o: mg_pp.cc mg_.h mg_expression.h mg_attrib.h mg_base.h mg_deps.h \
  mg_lib.h mg_func.h mg_token.h m_tokens.h mg_code.h mg_filter.h \
  mg_circuit.h mg_discipline.h mg_module.h mg_pp.h mg_error.h

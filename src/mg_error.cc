@@ -60,7 +60,7 @@ static std::basic_ostream<char>& diag()
 {
   if(diag_out){
     return *diag_out;
-  }else{
+  }else{ untested();
     return std::cerr;
   }
 }
@@ -150,7 +150,7 @@ void Exception_CS_::construct(const CS& cmd, size_t here)
     _cursor -= l-1;
     if( line_end != std::string::npos ) { itested();
       _cmd = _cmd.substr(0, line_end);
-    }else{
+    }else{ untested();
     }
   }else{
   }

@@ -36,7 +36,7 @@ static void make_common_default_constructor(std::ostream& out, const Module& d)
 //  for (Args_List::const_iterator
 //       p = d.circuit().args_list().begin();
 //       p != d.circuit().args_list().end();
-//       ++p) {
+//       ++p) { untested();
 //    out << ",\n   _" << (**p).name() << "(0)";
 //  }
   out <<
@@ -73,7 +73,7 @@ static void make_common_copy_constructor(std::ostream& out, const Module& d)
 //  for (Args_List::const_iterator
 //       p = d.circuit().args_list().begin();
 //       p != d.circuit().args_list().end();
-//       ++p) {
+//       ++p) { untested();
 //    out << ",\n   _" << (**p).name() << "(0)";
 //  }
   out << 
@@ -100,7 +100,7 @@ static void make_common_destructor(std::ostream& out, const Module& d)
 //   for (Args_List::const_iterator
 //        p = d.circuit().args_list().begin();
 //        p != d.circuit().args_list().end();
-//        ++p) {
+//        ++p) { untested();
 //     out << "  detach_common(&_" << (**p).name() << ");\n";
 //   }
   out <<
@@ -279,14 +279,14 @@ void make_common_param_is_printable(std::ostream& out, const Module& m)
 //  for (Parameter_1_List::const_iterator 
 //       p = m.common().override().begin(); 
 //       p != m.common().override().end();
-//       ++p) {
-//    if (!((**p).user_name().empty())) {
+//       ++p) { untested();
+//    if (!((**p).user_name().empty())) { untested();
 //      out << "  case " << i++ << ":  return (";
-//      if (!((**p).print_test().empty())) {
+//      if (!((**p).print_test().empty())) { untested();
 //	out << (**p).print_test() << ");\n";
-//      }else if ((**p).default_val() == "NA") {
+//      }else if ((**p).default_val() == "NA") { untested();
 //	out << (**p).code_name() << " != NA);\n";
-//      }else{
+//      }else{ untested();
 //	out << "true);\n";
 //      }
 //    }else{unreachable();
@@ -298,9 +298,9 @@ void make_common_param_is_printable(std::ostream& out, const Module& m)
     if(!(*q)->is_local()) {
       for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
 	out << "  case " << i++ << ":  return (";
-	if (!((**p).print_test().empty())) {
+	if (!((**p).print_test().empty())) { untested();
 	  out << (**p).print_test() << ");\n";
-	    //      }else if ((**p).default_val() == "NA") {
+	    //      }else if ((**p).default_val() == "NA") { untested();
 	    //	out << (**p).code_name() << " != NA);\n";
 	}else{
 	  //out << "true);\n";
@@ -327,8 +327,8 @@ void make_common_param_name(std::ostream& o, const Module& m)
 //  for (Parameter_1_List::const_iterator 
 //       p = m.common().override().begin(); 
 //       p != m.common().override().end();
-//       ++p) {
-//    if (!((**p).user_name().empty())) {
+//       ++p) { untested();
+//    if (!((**p).user_name().empty())) { untested();
 //      o << "  case " << i++ << ":  return \"" << to_lower((**p).user_name()) << "\";\n";
 //    }else{unreachable();
 //    }
@@ -398,7 +398,7 @@ static void make_param_check_range(std::ostream& o, ValueRange const& p,
 	o << "ub)";
   }else if(auto c = dynamic_cast<ValueRangeConstant const*>(spec)){
     o << "(" << c->expr() << "==" << n << ")";
-  }else{
+  }else{ untested();
     incomplete();
     assert(false);
   }
@@ -430,7 +430,7 @@ static void make_common_is_valid(std::ostream& o, const Module& m)
 	if(v->is_from()){
 	  o << "!";
 	}else if(v->is_exclude()){
-	}else{
+	}else{ untested();
 	  unreachable();
 	}
 	make_param_check_range(o, *v, (*p)->code_name());
@@ -447,7 +447,7 @@ static void make_common_is_valid(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 #if 0
 void make_common_param_name_or_alias(std::ostream& out, const Device& m)
-{
+{ untested();
   make_tag();
   out <<
     "std::string COMMON_" << d.name() << "::param_name(int i, int j)const\n"
@@ -460,8 +460,8 @@ void make_common_param_name_or_alias(std::ostream& out, const Device& m)
   for (Parameter_1_List::const_iterator 
        p = d.common().override().begin(); 
        p != d.common().override().end();
-       ++p) {
-    if (!((**p).user_name().empty())) {
+       ++p) { untested();
+    if (!((**p).user_name().empty())) { untested();
       out << "    case " << i++ << ":  return \"" << to_lower((**p).alt_name()) << "\";\n";
     }else{unreachable();
     }
@@ -470,8 +470,8 @@ void make_common_param_name_or_alias(std::ostream& out, const Device& m)
   for (Parameter_1_List::const_iterator 
        p = d.common().raw().begin(); 
        p != d.common().raw().end();
-       ++p) {
-    if (!((**p).user_name().empty())) {
+       ++p) { untested();
+    if (!((**p).user_name().empty())) { untested();
       out << "    case " << i++ << ":  return \"" << to_lower((**p).alt_name()) << "\";\n";
     }else{unreachable();
     }
@@ -499,8 +499,8 @@ void make_common_param_value(std::ostream& out, const Module& m)
 //  for (Parameter_1_List::const_iterator 
 //       p = m.common().override().begin(); 
 //       p != m.common().override().end();
-//       ++p) {
-//    if (!((**p).user_name().empty())) {
+//       ++p) { untested();
+//    if (!((**p).user_name().empty())) { untested();
 //      out << "  case " << i++ << ":  return " << (**p).code_name() << ".string();\n";
 //    }else{unreachable();
 //    }
@@ -575,13 +575,13 @@ static void make_common_expand(std::ostream& o , const Module& m)
   for (Args_List::const_iterator
        p = d.circuit().args_list().begin();
        p != d.circuit().args_list().end();
-       ++p) {
+       ++p) { untested();
     out << "  COMMON_" << (**p).type() << "* " << (**p).name() 
 	<< " = new COMMON_" << (**p).type() << ";\n";
     for (Arg_List::const_iterator
 	 a = (**p).begin();
 	 a != (**p).end();
-	 ++a) {
+	 ++a) { untested();
       out << "  " << (**p).name() << "->" << (**a).arg() << ";\n";
     }
     out << "  attach_common(" << (**p).name() << ", &_" << (**p).name() << ");\n\n";
@@ -633,13 +633,13 @@ static void make_common_expand(std::ostream& o , const Module& m)
   for (Args_List::const_iterator
        p = d.circuit().args_list().begin();
        p != d.circuit().args_list().end();
-       ++p) {
+       ++p) { untested();
     out << "  COMMON_" << (**p).type() << "* " << (**p).name() 
 	<< " = new COMMON_" << (**p).type() << ";\n";
     for (Arg_List::const_iterator
 	 a = (**p).begin();
 	 a != (**p).end();
-	 ++a) {
+	 ++a) { untested();
       out << "  " << (**p).name() << "->" << (**a).arg() << ";\n";
     }
     out << "  attach_common(" << (**p).name() << ", &_" << (**p).name() << ");\n\n";

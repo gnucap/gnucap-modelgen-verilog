@@ -74,12 +74,12 @@ void File::parse(CS& file)
       || ((file >> "paramset ")      && (file >> _paramset_list))
       ;
     if (_attribute_stash.is_empty()){
-    }else{
+    }else{ untested();
       file.warn(bWARNING, "dangling attributes");
     }
     if (!file.more()) {
       break;
-    }else if (file.stuck(&here)) {
+    }else if (file.stuck(&here)) { untested();
       throw Exception_CS_("syntax error, need nature, discipline, module or paramset", file);
     }else{
     }

@@ -58,7 +58,7 @@ private:
   Expression_ const* args() const{
     if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){
       return a;
-    }else{
+    }else{ untested();
       assert(!Token_CALL::args());
       return NULL;
     }
@@ -106,7 +106,7 @@ public:
 
     o__ "{ // NEW  ddx " <<  code_name() << "\n";
     if(_ddxprobe->is_pot_probe()){
-    }else{
+    }else{ untested();
       incomplete();
     }
     Node const* p = _ddxprobe->branch()->p();
@@ -151,7 +151,7 @@ public:
   void make_cc_impl(std::ostream&)const override{
     // nothing
   }
-  std::string eval(CS&, const CARD_LIST*)const override{
+  std::string eval(CS&, const CARD_LIST*)const override{ untested();
     unreachable();
     return "ddx";
   }

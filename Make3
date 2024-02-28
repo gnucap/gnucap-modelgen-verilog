@@ -15,6 +15,8 @@ GNUCAP_PKGLIBDIR = $(shell $(GNUCAP_CONF) --pkglibdir)
 GNUCAP_INCLUDEDIR = $(shell $(GNUCAP_CONF) --includedir)
 GNUCAP_EXEC_PREFIX = $(shell $(GNUCAP_CONF) --exec-prefix)
 
+all: ${TARGET}
+
 install : $(INSTALL_FILES)  $(INSTALL_FILES_1)  $(INSTALL_FILES_2)
 	[ -z "$(INSTALL_DIR)" ]   || mkdir -p $(DESTDIR)$(INSTALL_DIR) # Make3
 	[ -z "$(INSTALL_DIR_1)" ] || mkdir -p $(DESTDIR)$(INSTALL_DIR_1)
@@ -22,7 +24,6 @@ install : $(INSTALL_FILES)  $(INSTALL_FILES_1)  $(INSTALL_FILES_2)
 	[ -z "$(INSTALL_FILES)" ]   || cp $(INSTALL_FILES) $(DESTDIR)$(INSTALL_DIR)
 	[ -z "$(INSTALL_FILES_1)" ] || cp $(INSTALL_FILES_1) $(DESTDIR)$(INSTALL_DIR_1)
 	[ -z "$(INSTALL_FILES_2)" ] || cp $(INSTALL_FILES_2) $(DESTDIR)$(INSTALL_DIR_2)
-
 
 # these seem to belong to Make2...
 %.so: %.o
@@ -34,11 +35,19 @@ install : $(INSTALL_FILES)  $(INSTALL_FILES_1)  $(INSTALL_FILES_2)
 %.s: %.cc
 	${CXX} -S ${GNUCAP_CPPFLAGS} ${CPPFLAGS} ${MAKE_CPPFLAGS} -DNDEBUG -O2 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@ # Make3
 
-all: ${TARGET}
-
-depend: Make.depend
-Make.depend: $(SRCS) $(HDRS)
-	$(CXX) -MM $(CXXFLAGS) -isystem ${GNUCAP_INCLUDEDIR} ${CPPFLAGS} ${MAKE_CPPFLAGS} $(SRCS) > Make.depend
+// BUG/FEATURE/HACK: store Make.depend in $srcdir
+depend ${srcdir}/Make.depend: # $(SRCS) ${GENERATED_SRCS} $(HDRS)
+	: > ${srcdir}/Make.depend
+	if [ -n "$(RAW_SRCS)" ]; then \
+		( cd ${srcdir}; $(CXX) -MM $(CXXFLAGS) -I../src -isystem ${GNUCAP_INCLUDEDIR} ${CPPFLAGS} \
+		${MAKE_CPPFLAGS} ${RAW_SRCS} -DDEPEND ) \
+		>> ${srcdir}/Make.depend; \
+	fi
+	if [ -n "$(GENERATED_SRCS)" ]; then \
+		$(CXX) -MM $(CXXFLAGS) -isystem ${GNUCAP_INCLUDEDIR} ${CPPFLAGS} \
+		${MAKE_CPPFLAGS} $(GENERATED_SRCS) -DDEPEND \
+		>> ${srcdir}/Make.depend; \
+	fi
 #-----------------------------------------------------------------------------
 clean:
 	rm -rf $(CLEANFILES)
@@ -65,6 +74,6 @@ MAKE_LIB = $(CXX) $(CCFLAGS) $(OBJS) $(TARGET_LIBS) $(LDFLAGS) -shared -o
 mg_out_root.o: ${EMBED_HEADERS}
 
 
-.PHONY: clean distclean install all uninstall
+.PHONY: clean distclean install all uninstall depend
 .SECONDARY: ${TARGET:.so=.cc}
 .DELETE_ON_ERROR:

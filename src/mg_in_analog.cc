@@ -917,7 +917,7 @@ Branch_Ref parse_branch(Block* owner, CS& f)
 /*--------------------------------------------------------------------------*/
 // in_module?
 void Branch_Ref::parse(CS& f)
-{
+{ untested();
   assert(!_br);
 
   trace1("Branch_Ref::parse", f.tail().substr(0,10));
@@ -1328,10 +1328,10 @@ static Module const* to_module(Block const* owner)
 /*--------------------------------------------------------------------------*/
 #if 0
 Module const* to_module(Block const* owner)
-{
+{ untested();
   assert(owner);
-  while(true){
-    if(auto m = dynamic_cast<Module const*>(owner)){
+  while(true){ untested();
+    if(auto m = dynamic_cast<Module const*>(owner)){ untested();
       return m;
     }else{ untested();
     }
@@ -1371,10 +1371,10 @@ public:
   }
 
 #if 1
-  Token* new_token(Module& m, size_t /*na*/) const override {
+  Token* new_token(Module& m, size_t /*na*/) const override { untested();
     trace1("AF::new_token", label());
     m.install(this);
-    if(code_name() != ""){
+    if(code_name() != ""){ untested();
       return new Token_CALL(label(), this);
     }else if(label() != ""){ untested();
       return new Token_CALL(label(), this);
@@ -1762,7 +1762,7 @@ void Variable_Decl::dump(std::ostream& o)const
 {
   o__ name();
   if(options().dump_annotate()){
-    for(auto d : deps()){
+    for(auto d : deps()){ untested();
       o << "// dep " << d->code_name();
     }
     o << "\n";
@@ -2040,7 +2040,7 @@ FUNCTION_ const* xs_function_call(std::string const& f, Block const* owner)
   Module const* m = to_module(owner);
   assert(m);
   File const* file = to_file(owner);
-  if(!file){
+  if(!file){ untested();
     file = dynamic_cast<File const*>(m->owner());
   }else{
   }

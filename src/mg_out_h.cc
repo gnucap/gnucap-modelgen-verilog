@@ -117,7 +117,7 @@ static void make_func_dev(std::ostream& o, pSet<FUNCTION_ const> const& P)
 static void make_funcs_common(std::ostream& o, pSet<FUNCTION_ const> const& P)
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
-    if(!*q){
+    if(!*q){ untested();
       o<<"// NULL\n";
     }else if( (*q)->has_refs() ){
       (*q)->make_cc_common(o);
@@ -125,13 +125,13 @@ static void make_funcs_common(std::ostream& o, pSet<FUNCTION_ const> const& P)
       o<<"// FUNCTION no refs: " << (*q)->label() << "\n";
     }else if(dynamic_cast<MGVAMS_TASK const*>(*q)){ untested();
       o<<"// TASK no refs: " << (*q)->label() << "\n";
-    }else if(dynamic_cast<MGVAMS_FILTER const*>(*q)){
+    }else if(dynamic_cast<MGVAMS_FILTER const*>(*q)){ untested();
       o<<"// FILTER no refs: " << (*q)->label() << "\n";
     }else if(dynamic_cast<VAMS_ACCESS const*>(*q)){ untested();
       o<<"// XS no refs: " << (*q)->label() << "\n";
     }else if(dynamic_cast<Probe const*>(*q)){
       o<<"// Probe no refs: " << (*q)->label() << "\n";
-    }else{
+    }else{ untested();
       unreachable();
       o<<"// func no refs " << (*q)->label() << "\n";
     }
@@ -171,7 +171,7 @@ void make_one_variable_decl(std::ostream& o, const Variable_Decl& V)
       o << " _v_" << V.name() << "{0.}";
    if(!V.has_attributes()){
 #if 0
-   }else if(options().optimize_deriv()) {
+   }else if(options().optimize_deriv()) { untested();
       o__ "struct _V_" << V.name() << " : ddouble {\n";
       o____ "typedef ddouble base;\n";
       o____ "typedef va::ddouble_tag base_tag;\n";
@@ -198,10 +198,10 @@ void make_one_variable_decl(std::ostream& o, const Variable_Decl& V)
     }else{
 //      o__ "ddouble ";
     }
-  }else if(V.type().is_int()) {
+  }else if(V.type().is_int()) { untested();
     o__ "int";
     o << " _v_" << V.name() << "{0}";
-  }else{
+  }else{ untested();
     incomplete();
     o__ "unknown";
   }
@@ -214,9 +214,9 @@ static void make_variable_decl(std::ostream& o, const Variable_List_Collection& 
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
       Variable_Decl const* V = *p;
       assert(V);
-      //if(V->has_attributes()) {
+      //if(V->has_attributes()) { untested();
 	make_one_variable_decl(o, *V);
-      //}else{
+      //}else{ untested();
 //	tr_eval_analog local
       //}
     }
@@ -302,7 +302,7 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
 {
   Branch const* bb;
   if((bb = dynamic_cast<Branch const*>(&elt))){
-  }else{
+  }else{ untested();
     o__ "// not a branch...\n";
     return;
   }
@@ -311,7 +311,7 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
   o << "public: // states, " << br.code_name() << ";\n"; //  << br.deps().size()<<";\n";
   if(br.has_pot_source()){
     o__ "bool _pot" << br.code_name() << ";\n";
-//    for(auto n : br.names()){
+//    for(auto n : br.names()){ untested();
 //      o__ "bool _pot_br_" << n << ";\n";
 //    }
   }else{
@@ -321,7 +321,7 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
   size_t k = br.num_states();
   o__ "[" << k << "]; // (s)\n";
 
-//  for(auto n : br.names()){
+//  for(auto n : br.names()){ untested();
 //    o__ "double _value_br_" << n << ";\n";
 //    o__ "double _st_br_" << n;
 //    o__ "[" << k << "];\n";

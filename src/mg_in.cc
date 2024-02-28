@@ -72,7 +72,7 @@ void Attribute_Spec::parse(CS& f)
 }
 /*--------------------------------------------------------------------------*/
 void Attribute_Spec::dump(std::ostream& o)const
-{
+{ untested();
   o << _key;
   if(has_expression()){ untested();
     o << "=" << expression();
@@ -118,7 +118,7 @@ void Attribute_Instance::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 #if 0
 Attribute_Instance::value_type const* Attribute_Instance::find(String_Arg const& key) const
-{
+{ untested();
   auto i = notstd::find_ptr(begin(), end(), key);
   if(i == end()){ untested();
     return NULL;
@@ -129,13 +129,13 @@ Attribute_Instance::value_type const* Attribute_Instance::find(String_Arg const&
 #endif
 /*--------------------------------------------------------------------------*/
 void Attribute_Instance::clear()
-{
+{ untested();
   Collection<Attribute_Spec>::clear();
 }
 /*--------------------------------------------------------------------------*/
 void Attribute_Instance::dump(std::ostream& o)const
 {
-  if(is_empty()){
+  if(is_empty()){ untested();
   }else{
     o__ "(*";
     std::string comma;
@@ -143,7 +143,7 @@ void Attribute_Instance::dump(std::ostream& o)const
       o << comma << " " << i->key();
       if(i->has_expression()){
 	o << "=" << i->expression();
-      }else{
+      }else{ untested();
       }
       comma = ",";
     }

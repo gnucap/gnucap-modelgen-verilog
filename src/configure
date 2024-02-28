@@ -59,6 +59,7 @@ include \${srcdir}/Make1
 
 include ../Make2
 include $top_srcdir/Make3 # use from gnucap?
+include \${srcdir}/Make.depend
 
 .DELETE_ON_ERROR:
 #------------------------------------------------------------------------

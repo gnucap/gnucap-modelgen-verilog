@@ -78,7 +78,7 @@ void Element_2::parse(CS& file)
       assert(mod->node(p->node()));
       mod->node(p->node())->connect(this);
     }
-  }else{
+  }else{ untested();
     assert(0);
     incomplete();
   }
@@ -1097,7 +1097,7 @@ Branch::Branch(Node_Ref p, Node_Ref n, Module* m)
 void Branch::set_used_in(Base const* b)
 {
   for(auto& i : _used_in){
-    if(i == b){
+    if(i == b){ untested();
       return;
     }else{
     }

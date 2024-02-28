@@ -7,19 +7,19 @@ void Port_1::parse(CS& file)
   trace1("Port_1::parse", file.last_match());
   file >> _name;
   size_t here = file.cursor();
-  for (;;) {
+  for (;;) { untested();
     ONE_OF
       || ((file >> "short_to =") && (file >> _short_to))
       || ((file >> "short_if =") && (file >> _short_if))
       ;
-    if (file.skip1b(";")) {
+    if (file.skip1b(";")) { untested();
       break;
     }else if (!file.more()) { untested();untested();
       file.warn(0, "premature EOF (Port_1)");
       break;
     }else if (file.stuck(&here)) { untested();
       break;
-    }else{
+    }else{ untested();
     }
   }
 }

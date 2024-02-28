@@ -182,7 +182,7 @@ public:
 private:
   explicit Token_PG(const Token_PG& P, Base const* data=NULL)
     : Token_CALL(P, data) {}
-  Token* clone()const override {
+  Token* clone()const override { untested();
     return new Token_PG(*this);
   }
   void stack_op(Expression* e)const override{
@@ -192,14 +192,14 @@ private:
       assert(e);
       Token_CALL::stack_op(e);
     }else if(auto p = dynamic_cast<Token_PARLIST_ const*>(e->back())){
-      if(auto ee = dynamic_cast<Expression const*>(p->data())){
+      if(auto ee = dynamic_cast<Expression const*>(p->data())){ untested();
 	arg = ee->back();
       }else if(p->args()){
 	arg = p->args()->back();
       }else{ untested();
 	unreachable();
       }
-    }else{
+    }else{ untested();
       unreachable();
     }
 
@@ -219,7 +219,7 @@ private:
 	}else{
 	  Token_CALL::stack_op(e);
 	}
-      }else{
+      }else{ untested();
 	Token_CALL::stack_op(e);
       }
     }else if(dynamic_cast<Token_CONSTANT const*>(arg)){ untested();
@@ -228,9 +228,9 @@ private:
       e->pop_back();
       Float* f = new Float(0.);
       e->push_back(new Token_CONSTANT("0.", f, ""));
-    }else if(arg) {
+    }else if(arg) { untested();
       incomplete(); // error?
-    }else{
+    }else{ untested();
       incomplete(); // error?
     }
   }
@@ -254,7 +254,7 @@ private:
   std::string code_name()const override{
     return "param_given";
   }
-//   void stack_op(Expression const& args, Expression* out) const override {
+//   void stack_op(Expression const& args, Expression* out) const override { untested();
 //     incomplete();
 //   }
   void make_cc_common(std::ostream& o)const override {

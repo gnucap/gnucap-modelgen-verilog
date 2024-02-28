@@ -59,7 +59,7 @@ static Token* resolve_function(FUNCTION_ const* f, Expression const* e, Block* o
   }else if(auto p = dynamic_cast<Token_PARLIST_ const*>(e->back())){
     if(auto d = dynamic_cast<Expression const*>(p->args())){
       na = d->size();
-    }else if(auto ex = dynamic_cast<Expression const*>(p->data())){
+    }else if(auto ex = dynamic_cast<Expression const*>(p->data())){ untested();
       na = ex->size();
     }else{ untested();
     }

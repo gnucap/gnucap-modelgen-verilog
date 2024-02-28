@@ -129,7 +129,7 @@ int main(int argc, char** argv)
       diag.set(argv[1]);
       --argc;
       ++argv;
-    }else if (strcmp(argv[0],"--cc")==0) {
+    }else if (strcmp(argv[0],"--cc")==0) { untested();
       p.set_diag(diag);
       diag_out = &(std::basic_ostream<char>&)diag; // mg_error.cc
       p.read(argv[1]);
@@ -148,7 +148,7 @@ int main(int argc, char** argv)
     }else if (argc > 1 && strncmp(argv[0],"-D", 2)==0) {
       if(argv[0][2]) {
 	p.define(argv[0]+2);
-      }else{
+      }else{ untested();
 	p.define(argv[1]);
 	--argc;
 	++argv;
@@ -156,7 +156,7 @@ int main(int argc, char** argv)
     }else if (argc > 1 && strncmp(argv[0], "-I", 2)==0) {
       if(argv[0][2]) {
 	p.add_include_path(argv[0]+2);
-      }else{
+      }else{ untested();
 	p.add_include_path(argv[1]);
 	--argc;
 	++argv;

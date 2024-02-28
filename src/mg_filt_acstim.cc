@@ -40,12 +40,12 @@ static void make_cc_tmp(std::ostream& o, std::string state, Deps const& deps)
     o__ "d->" << state << "[0] = " << sign << " " << "t1.value();\n";
     size_t k = 2;
 
-    for(auto v : deps) {
+    for(auto v : deps) { untested();
       // char sign = f.reversed()?'-':'+';
       o__ "// dep " << v->code_name() << "\n";
       // if(f->branch() == v->branch()){ untested(); }
       if(v->branch()->is_short()){ untested();
-      }else{
+      }else{ untested();
 	o__ "assert(" << "t1[d" << v->code_name() << "] == t1[d" << v->code_name() << "]" << ");\n";
 	o__ "// assert(!d->" << state << "[" << k << "]);\n";
 	o__ "d->" << state << "[" //  << k << "]"
@@ -70,10 +70,10 @@ private:
 
   void stack_op(Expression* e)const override;
   Branch* branch() const;
-  Expression_ const* args() const{
-    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){
+  Expression_ const* args() const{ untested();
+    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){ untested();
       return a;
-    }else{
+    }else{ untested();
       assert(!Token_CALL::args());
       return NULL;
     }
@@ -104,7 +104,7 @@ protected:
   ACSTIM* clone()const {
     return new ACSTIM(*this);
   }
-  void make_assign(std::ostream&)const {
+  void make_assign(std::ostream&)const { untested();
   }
   void set_code_name(std::string x){
     _code_name = x;
@@ -217,7 +217,7 @@ public:
     "/*--------------------------------------"
     "------------------------------------*/\n";
   }
-  std::string eval(CS&, const CARD_LIST*)const override{
+  std::string eval(CS&, const CARD_LIST*)const override{ untested();
     unreachable();
     return "ac_stim";
   }
@@ -270,7 +270,7 @@ void Token_ACSTIM::stack_op(Expression* e)const
 
   if(auto dd = prechecked_cast<Deps const*>(cc->data())) {
     assert(dd);
-    for(auto i : *dd){
+    for(auto i : *dd){ untested();
       trace1("acstim arg deps", i->code_name());
     }
 
@@ -278,9 +278,9 @@ void Token_ACSTIM::stack_op(Expression* e)const
     branch()->deps() = *dd; // HACK
     if(1){
       func->set_n_to_gnd();
-    }else if(0 /*sth linear*/){
+    }else if(0 /*sth linear*/){ untested();
       // somehow set loss=0 and output ports to target.
-    }else{
+    }else{ untested();
     }
 
     auto d = new Deps;
@@ -321,29 +321,29 @@ void Token_ACSTIM::stack_op(Expression* e)const
       }
       if(c->is_always()){
 	always = true;
-      }else{
+      }else{ untested();
       }
-    }else if(dynamic_cast<Assignment const*>(b)){
+    }else if(dynamic_cast<Assignment const*>(b)){ untested();
       assigned = true;
     }else{untested();
     }
   }
   func->_output = NULL;
   if(c_cnt!=1){
-  }else if(assigned){
+  }else if(assigned){ untested();
   }else if(cont->has_sensitivities()) { itested();
   }else if(always){
     for(auto d : cont->deps()){
-      if(d->branch() != branch()) {
+      if(d->branch() != branch()) { untested();
       }else if(d.is_linear()){
 	// incomplete();
 	func->_output = cont->branch(); // polarity?
       }
-      if(cont->reversed()){
+      if(cont->reversed()){ untested();
       }else{
       }
     }
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/

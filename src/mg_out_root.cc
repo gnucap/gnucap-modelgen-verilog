@@ -42,7 +42,9 @@ static void make_header(std::ostream& o, const File& in,
     "#include <e_elemnt.h>\n"
     "// #include <e_paramlist.h>\n"
     "#include <u_nodemap.h>\n"; // if submodules are used anywhere
-#if 0
+#ifdef DEPEND
+  // nothing. just compute deps.
+#elif 0
     "#include <m_va.h>\n"
     "#include <e_va.h>\n"
 #else
@@ -150,11 +152,11 @@ void make_cc(std::ostream& out, const File& in)
       ++num;
     }
   }else if(!options().expand_paramset()){ untested();
-  }else if(options().gen_paramset()){
+  }else if(options().gen_paramset()){ untested();
     for (Paramset_List::const_iterator
 	 m = in.paramset_list().begin();
 	 m != in.paramset_list().end();
-	 ++m) {
+	 ++m) { untested();
       out << "namespace n" << std::to_string(num) << "{\n";
       make_cc_module(out, **m);
       out << "}\n";

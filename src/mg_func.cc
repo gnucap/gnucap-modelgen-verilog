@@ -66,7 +66,7 @@ void FUNCTION_::stack_op(Expression const& arg, Expression* E) const
     double value = evalf(argv);
     const Float* v = new Float(value);
     E->push_back(new Token_CONSTANT(to_string(value), v, ""));
-  }else{
+  }else{ untested();
     incomplete();
   }
 }
@@ -84,13 +84,13 @@ Node_Ref MGVAMS_FILTER::n() const
 /*--------------------------------------------------------------------------*/
 #if 0
 Token* MGVAMS_FUNCTION::new_token(Module& m, size_t na) const
-{
+{ untested();
   m.install(this);
-  if(code_name() != ""){
+  if(code_name() != ""){ untested();
     return new Token_CALL(label(), this);
-  }else if(label() != ""){
+  }else if(label() != ""){ untested();
     return new Token_CALL(label(), this);
-  }else{
+  }else{ untested();
     incomplete();
     return NULL;
   }

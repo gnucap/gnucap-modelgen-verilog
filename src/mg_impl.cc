@@ -62,7 +62,7 @@ Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
 //  }else if( xs == "_filter"){ untested();
 //   // obsolete?
 //    br->set_filter();
-  }else{
+  }else{ untested();
     trace1("new_probe", xs);
     incomplete(); // port branch?
     nn = xs;
@@ -98,7 +98,7 @@ Branch_Ref Branch_Map::new_branch(Branch_Ref const& b, std::string name)
   assert(m);
 
   auto it = _names.find(name);
-  if(it != _names.end()){
+  if(it != _names.end()){ untested();
     throw Exception("already there" + name);
   }else{
     auto n = new Named_Branch(b, name, m);
@@ -146,7 +146,7 @@ Branch_Ref Module::new_branch(Node* p, Node* n = NULL)
 }
 /*--------------------------------------------------------------------------*/
 size_t Module::num_branches() const
-{
+{ untested();
   assert(_circuit);
   return _circuit->branches().size();
 }
@@ -156,7 +156,7 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
   trace2("new_branch", p,n);
   if(p==""){ untested();
     throw Exception("syntax error");
-  }else if(p[0] == '<'){
+  }else if(p[0] == '<'){ untested();
     incomplete();
     assert(0); // wrong place.
   }else{
@@ -245,11 +245,11 @@ Branch_Ref Module::lookup_branch(std::string const& p) const
 /*--------------------------------------------------------------------------*/
 #if 0
 Branch_Ref const& Branch_Names::new_name(std::string const& n, Branch_Ref const& r)
-{
+{ untested();
   Branch_Ref& j = _m[n];
   if(j){ untested();
     throw Exception("Branch " + n + " already defined\n");
-  }else{
+  }else{ untested();
     j = r;
     j.set_name(n);
     return j;
@@ -258,17 +258,17 @@ Branch_Ref const& Branch_Names::new_name(std::string const& n, Branch_Ref const&
 #endif
 /*--------------------------------------------------------------------------*/
 // void Branch_Names::clear()
-// {
+// { untested();
 //   _m.clear();
 // }
 // /*--------------------------------------------------------------------------*/
 // Branch_Ref const& Branch_Names::lookup(std::string const& p) const
-// {
+// { untested();
 //   static Branch_Ref none;
 //   const_iterator i = _m.find(p);
-//   if(i == _m.end()){
+//   if(i == _m.end()){ untested();
 //     return none;
-//   }else{
+//   }else{ untested();
 //     return i->second;
 //   }
 // }
@@ -298,7 +298,7 @@ std::string Filter::code_name()const
 /*--------------------------------------------------------------------------*/
 // number of *all* branches in the module.
 size_t Filter::num_branches() const
-{
+{ untested();
   return 0;
 }
 /*--------------------------------------------------------------------------*/
@@ -310,7 +310,7 @@ void Branch::new_deps()
 }
 /*--------------------------------------------------------------------------*/
 size_t Branch::num_branches() const
-{
+{ untested();
   auto m = prechecked_cast<Module const*>(owner());
   assert(m);
   return m->num_branches();
@@ -406,7 +406,7 @@ Branch_Ref::Branch_Ref(Branch_Ref const& b)
 {
   if(_br){
     _br->attach(this);
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -435,7 +435,7 @@ Branch_Ref::Branch_Ref(Named_Branch* b)
 {
   if(_br){
     _br->attach(this);
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -451,15 +451,15 @@ Branch_Ref::~Branch_Ref()
 std::string Branch_Ref::code_name()const
 {
   assert(_br);
-//  if(has_name()){
+//  if(has_name()){ untested();
 //    return "_br_" + *_name;
-//  }else{
+//  }else{ untested();
   return _br->code_name();
 //  }
 }
 /*--------------------------------------------------------------------------*/
 // void Branch_Ref::set_name(std::string const& n)
-// {
+// { untested();
 //   assert(!has_name());
 //   assert(_br);
 //   _name = _br->reg_name(n);
@@ -532,8 +532,8 @@ void Branch_Ref::unset_used_in(Base const* b) const
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 //std::string const* Branch::reg_name(std::string const&s)
-//{
-//  for(auto i: _names){
+//{ untested();
+//  for(auto i: _names){ untested();
 //    assert(i!=s);
 //  }
 //  _names.push_back(s);
@@ -587,7 +587,7 @@ Discipline const* Branch::discipline() const
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 Nature const* Branch::nature() const
-{
+{ untested();
 //  source?
   return NULL;
 }
@@ -645,7 +645,7 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args)
 {
   auto f = prechecked_cast<FUNCTION_ const*>(f_);
   assert(f);
-//  if(dynamic_cast<MGVAMS_FUNCTION const*>(f)){
+//  if(dynamic_cast<MGVAMS_FUNCTION const*>(f)){ untested();
     if(f->static_code()){
       // return f->new_token(*this, num_args);
       install(f);
@@ -653,7 +653,7 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args)
     }else{
       return f->new_token(*this, num_args);
     }
-//   }else{
+//   }else{ untested();
 //     return f->new_token(*this, num_args);
 //   }
 }
@@ -662,7 +662,7 @@ bool Variable::is_module_variable() const
 {
   if(dynamic_cast<Module const*>(owner())){
     return true;
-  }else{
+  }else{ untested();
     return false;
   }
 }
@@ -674,9 +674,9 @@ std::string Variable::code_name() const
     return "_v_" + name();
   }else if(is_int()){
     return "_v_" + name();
-  }else if(is_module_variable()){
+  }else if(is_module_variable()){ untested();
     return "d->_v_" + name();
-  }else{
+  }else{ untested();
     return "_v_" + name();
   }
   incomplete();
@@ -689,12 +689,12 @@ void Branch::set_direct(bool d)
 }
 /*--------------------------------------------------------------------------*/
 double Assignment::eval() const
-{
+{ untested();
   return rhs().eval();
 }
 /*--------------------------------------------------------------------------*/
 bool Assignment::is_module_variable() const
-{
+{ untested();
   assert(_lhs);
   return _lhs->is_module_variable();
 }
@@ -793,7 +793,7 @@ std::string Filter::short_label()const
 void Block::push_back(Base* c)
 {
   List_Base<Base>::push_back(c);
-  if(auto v=dynamic_cast<Variable const*>(c)){
+  if(auto v=dynamic_cast<Variable const*>(c)){ untested();
       trace1("reg var_ref", v->name());
     _var_refs[v->name()] = c;
   }else{
@@ -855,13 +855,13 @@ Deps::const_iterator Deps::end() const
 }
 /*--------------------------------------------------------------------------*/
 void BlockVarIdentifier::update()
-{
+{ untested();
   clear_deps();
   new_var_ref();
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::clear_deps()
-{
+{ untested();
   trace2("Variable_Decl::clear_deps", name(), deps().size());
   deps().clear();
 }
@@ -886,13 +886,13 @@ bool is_zero(Expression const& x)
 /*--------------------------------------------------------------------------*/
 #if 0
 Attrib const& Expression_::attrib() const
-{
+{ untested();
   static Attrib no_attrib;
-  if(is_empty()){
+  if(is_empty()){ untested();
     return no_attrib;
-  }else if(auto d = dynamic_cast<Attrib const*>(back()->data())){
+  }else if(auto d = dynamic_cast<Attrib const*>(back()->data())){ untested();
     return *d;
-  }else{
+  }else{ untested();
     return no_attrib;
   }
 }
@@ -925,7 +925,7 @@ Deps* copy_deps(Base const* b)
     return t->clone();
   }else if(!b) {
     // unary(par_ref)?
-  }else{
+  }else{ untested();
     incomplete();
     unreachable();
     assert(0);
@@ -934,10 +934,10 @@ Deps* copy_deps(Base const* b)
 }
 /*--------------------------------------------------------------------------*/
 // bool ValueRangeSpec::is_constant() const
-// {
-//   if(!_what){
+// { untested();
+//   if(!_what){ untested();
 //     return false;
-//   }else{
+//   }else{ untested();
 //     return _what->is_constant();
 //   }
 // }
@@ -945,7 +945,7 @@ Deps* copy_deps(Base const* b)
 bool ConstExpression::operator==(ConstExpression const& o) const
 {
   double a = _expression.eval();
-  if(a == NOT_INPUT){
+  if(a == NOT_INPUT){ untested();
     return false;
   }else{
     return a == o._expression.eval();
@@ -960,7 +960,7 @@ double ValueRangeInterval::eval() const
     return NOT_INPUT;
   }else if(_ub == _lb){
     return _ub.expression().eval();
-  }else{
+  }else{ untested();
     return NOT_INPUT;
   }
 }
@@ -1072,7 +1072,7 @@ Circuit::~Circuit()
 }
 /*--------------------------------------------------------------------------*/
 // Branch_Map& Module::branches()const
-// {
+// { untested();
 //   assert(_circuit);
 //   return _circuit->branches();
 // }
