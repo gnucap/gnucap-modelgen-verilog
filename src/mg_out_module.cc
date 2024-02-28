@@ -90,11 +90,13 @@ void make_cc_current_ports(std::ostream& o, Branch const* br, Element_2 const&);
 static void make_tr_needs_eval(std::ostream& o, const Module& m)
 {
   o << "bool MOD_" << m.identifier() << "::tr_needs_eval()const\n{\n";
-  o__ "trace1(\"" << m.identifier() <<"::needs_eval?\", long_label());\n";
+  o__ "trace2(\"" << m.identifier() <<"::needs_eval?\", long_label(), has_probes());\n";
   o__ "node_t gnd(&ground_node);\n";
   o__ "if (is_q_for_eval()) { untested();\n";
   o____ "return false;\n";
   o__ "}else if (!converged()) {\n";
+  o____ "return true;\n";
+  o__ "}else if (has_probes()) {\n";
   o____ "return true;\n";
   o__ "}else ";
 
@@ -372,7 +374,7 @@ void make_module_default_constructor(std::ostream& o, const Module& m)
 static void make_do_tr(std::ostream& o, const Module& m)
 {
   o << "bool MOD_" << m.identifier() << "::do_tr()\n{\n";
-  o__ "trace2(\"" << m.identifier() <<"::do_tr\", this, long_label());\n";
+  o__ "trace3(\"" << m.identifier() <<"::do_tr\", this, long_label(), _sim->iteration_number());\n";
   o__ "clear_branch_contributions();\n";
   if(m.num_evt_slots()){
     o__ "_evt_seek = 0;\n";
@@ -388,6 +390,7 @@ static void make_do_tr(std::ostream& o, const Module& m)
   o__ "set_branch_contributions();\n";
   o__ "assert(subckt());\n";
   o__ "set_converged(subckt()->do_tr() && converged());\n";
+  // o__ "return converged() && _sim->iteration_number() > 3;\n";
   o__ "return converged();\n";
   o << "}\n"
     "/*--------------------------------------"

@@ -1,0 +1,35 @@
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_idt0(p, n);
+	electrical p, n;
+	(* desc="" *) real idt1;
+	(* desc="" *) real idt2;
+	analog begin
+		idt1 = idt(V(p,n));
+		idt2 = idt(idt1-1);
+	end
+endmodule
+
+!make test_idt0.so > /dev/null
+attach ./test_idt0.so
+
+verilog
+parameter r=1
+parameter v=0
+parameter pi=3.1415926535897932384626433832795028841972
+
+test_idt0 #() dut(1,0);
+vsine #(.freq(1/6.28), .dc(v), .ampl(1)) v1(1, 0);
+
+list
+
+print tran v(1) idt1(dut) idt2(dut)
+print tran + iter(0)
+tran 0 {2*pi} {.2*pi} trace=n
+tran 0 {2*pi} {.2*pi} skip=100 trace=n
+status notime
+end

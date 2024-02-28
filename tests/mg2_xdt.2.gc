@@ -11,36 +11,32 @@ V1 p n sin freq=1 amplitude={ampl} dc=dc
 .verilog
 
 `modelgen
-module test_xdt0(p, n);
+module test_xdt2(p, n);
 	electrical p, n;
-	(* desc="" *) real ddtidt;
 	(* desc="" *) real idtddt;
+	(* desc="" *) real dd;
 	analog begin
-		ddtidt = ddt(idt(V(p,n)));
+		dd = ddt(V(p,n));
 		idtddt = idt(ddt(V(p,n)));
 	end
 endmodule
 
-!make test_xdt0.so > /dev/null
-attach ./test_xdt0.so
+!make test_xdt2.so > /dev/null
+attach ./test_xdt2.so
 
 verilog
 parameter r=1
 parameter v=0
 
-test_xdt0 #() dut(1,0);
+test_xdt2 #() dut(1,0);
 vsin #(.dc(v), .ampl(1)) v1(1, 0);
 
 list
 
-print tran v(1) iter(0)
-tran 0 1 .1 trace=n
 print tran v(1) idtddt(dut) ddtidt(dut)
-print tran + i(dut._b_ddt_2*)
-print tran + i(dut._b_ddt_1*)
-print tran + i(dut._b_idt_3*)
-print tran + i(dut._b_idt_0*)
+print tran + i(dut._b_ddt_*)
+print tran + i(dut._b_idt_*)
 print tran + iter(0)
-tran 0 1 .1 trace=n
+tran 1 .1 trace=n
 status notime
 end

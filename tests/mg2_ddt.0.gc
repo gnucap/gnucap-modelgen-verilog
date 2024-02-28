@@ -1,11 +1,10 @@
 attach ./modelgen_0.so
-
 attach ../vams/vsine.so
 
 verilog
 
 `modelgen
-module test_ddt0_0(p, n);
+module test_ddt0(p, n);
 	(* desc="" *) real dv;
 	electrical p, n;
 	analog begin
@@ -13,20 +12,21 @@ module test_ddt0_0(p, n);
 	end
 endmodule
 
-!make test_ddt0_0.so > /dev/null
-attach ./test_ddt0_0.so
+!make test_ddt0.so > /dev/null
+attach ./test_ddt0.so
 
 verilog
 parameter r=1
 parameter v=0
 
-test_ddt0_0 #() dut(1,0);
+test_ddt0 #() dut(1,0);
 vsine #(.dc(v), .ampl(1)) v1(1, 0);
 
 list
 
-print tran v(1) dv(dut) i(dut._b*) iter(0)
-// y(dut.ddt_0) iof(dut.ddt_0) iter(0)
+print tran v(1) i(dut._b*) iter(0)
 tran 1 .1 trace=n
+print tran + dv(dut)
+tran 0 1 .1 trace=n
 status notime
 end

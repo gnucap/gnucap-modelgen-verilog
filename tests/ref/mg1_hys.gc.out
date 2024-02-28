@@ -69,7 +69,7 @@
  0.0016921 -0.65421    101.99u   -1.2353    
  0.0017361 -0.69733    106.17u   -1.2481    
  0.0018681 -0.51611    86.005u   -1.199     
- 0.002      0.        -205.61f   -1.0099    
+ 0.002      0.        -562.18f   -1.0099    
 Gnucap   System status
 iterations: op=0, dc=0, tran=497, fourier=0, total=577
 transient timesteps: accepted=71, rejected=12, total=83

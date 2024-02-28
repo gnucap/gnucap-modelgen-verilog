@@ -3,7 +3,7 @@
 load ../vams/capacitor.so
 load ../vams/resistor.so
 
-options nobypass
+options bypass
 verilog
 
 module main(in out gnd);

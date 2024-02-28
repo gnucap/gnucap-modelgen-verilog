@@ -15,7 +15,7 @@ module vsine(p, n);
 		if(analysis("dc") && $param_given(dc))
 			V(p, n) <+ dc;
 		else
-			V(p, n) <+ ampl*sin(`M_TWO_PI*freq*$abstime) + offset;
+			V(p, n) <+ ampl*sin(`M_TWO_PI*freq*$abstime - phase) + offset;
 			$bound_step(1./(freq*samples));
 
 		V(p, n) <+ ac_stim("ac", mag);

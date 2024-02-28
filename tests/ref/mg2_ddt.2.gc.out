@@ -1,33 +1,36 @@
+parameter v not specified, using default
+parameter v not specified, using default
+parameter v not specified, using default
+parameter v not specified, using default
+parameter v not specified, using default
 #Time       v(1)       v(3)       iter(0)   
  0.         0.         0.         3.        
- 1.6745n    10.521n   -6.2832     24.       
- 2.7745n    17.433n   -6.2832     3.        
- 1.037u     6.5154u   -6.2832     3.        
- 0.001293   0.0081242 -6.283      3.        
- 0.012149   0.076257  -6.2697     3.        
- 0.041203   0.256     -6.1034     3.        
- 0.084785   0.50788   -5.4553     3.        
- 0.12837    0.7219    -4.3666     3.        
- 0.17195    0.88214   -2.9866     3.        
- 0.24095    0.99838   -0.38265    3.        
- 0.30996    0.92988    2.3683     3.        
- 0.40853    0.54358    5.4692     3.        
- 0.50711   -0.044671   6.4656     3.        
- 0.56872   -0.41851    5.6697     3.        
- 0.63033   -0.7304     4.455      3.        
- 0.69194   -0.93421    2.1607     3.        
- 0.75356   -0.99975   -0.033036   3.        
- 0.81517   -0.91734   -2.6422     3.        
- 0.90758   -0.54858   -5.338      3.        
- 1.         0.        -6.534      3.        
+ 1.6745n    10.521n    6.2832     24.       
+ 2.7745n    17.433n    6.2832     3.        
+ 0.021277   0.13329    6.2458     3.        
+ 0.056231   0.34601    5.9254     3.        
+ 0.091185   0.5421     5.2947     3.        
+ 0.14799    0.80152    3.8395     3.        
+ 0.20479    0.95992    1.738      3.        
+ 0.26159    0.99735   -0.42007    3.        
+ 0.34363    0.83187   -3.6137     3.        
+ 0.50773   -0.048521  -7.1169     3.        
+ 0.58977   -0.53461   -4.7324     3.        
+ 0.64838   -0.80297   -4.4261     3.        
+ 0.70698   -0.96369   -1.0587     3.        
+ 0.76558   -0.99521   -0.017056   3.        
+ 0.84372   -0.83157    4.2056     3.        
+ 1.         14.f       6.4366     3.        
+parameter v not specified, using default
+parameter v not specified, using default
 #Freq       vm(1)      vm(3)      vp(1)      vp(3)     
- 1.         1.         6.2832     0.        -90.       
- 2.         1.         12.566     0.        -90.       
- 4.         1.         25.133     0.        -90.       
- 8.         1.         50.265     0.        -90.       
- 16.        1.         100.53     0.        -90.       
+ 1.         1.         6.2832     0.         90.       
+ 2.         1.         12.566     0.         90.       
+ 4.         1.         25.133     0.         90.       
+ 8.         1.         50.265     0.         90.       
+ 16.        1.         100.53     0.         90.       
 Gnucap   System status
-iterations: op=0, dc=0, tran=84, fourier=0, total=117
-transient timesteps: accepted=21, rejected=7, total=28
-nodes: user=2, subckt=0, model=0, total=2
-dctran density=100.0%, ac density=100.0%
+iterations: op=0, dc=0, tran=72, fourier=0, total=101
+transient timesteps: accepted=17, rejected=7, total=24
+nodes: user=2, subckt=0, model=1, total=3
+dctran density=77.8%, ac density=77.8%

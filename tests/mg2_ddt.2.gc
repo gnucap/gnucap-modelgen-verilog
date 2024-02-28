@@ -1,32 +1,25 @@
 attach ./modelgen_0.so
+attach ../vams/vsine.so
 
-
-spice
-.subckt vsin p n
-.parameter ampl
-.parameter dc
-V1 p n sin freq=1 amplitude={ampl} dc=dc
-.ends
-
-.verilog
+verilog
 
 `modelgen
-module test_tcap0(p, n, cp, cn);
+module test_ddt2(p, n, cp, cn);
 	electrical p, n, cp, cn;
 	analog begin
 		I(p,n) <+ ddt(V(cp,cn));
 	end
 endmodule
 
-!make test_tcap0.so > /dev/null
-attach ./test_tcap0.so
+!make test_ddt2.so > /dev/null
+attach ./test_ddt2.so
 
-test_tcap0 #() dut(3,0,1,0);
+test_ddt2 #() dut(0,3,1,0);
+vsine #(.dc(v), .ampl(1)) v1(1, 0);
 
 spice
-V1  1  0  SIN  offset= 0.  amplitude= 1.  frequency= 1.  delay= 0.  damping= 0. ac 1
 R2  3  0  1.
-* .tcap C2  3  0  1  0  1.
+* .tcap C2  0 3  1  0  1.
 .print tran v nodes iter(0)
 .print ac vm(nodes) vp(nodes)
 .tran 1

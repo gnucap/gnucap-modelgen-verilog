@@ -1,6 +1,6 @@
 /*                     -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
- *               2023 Felix Salfelder
+ *               2023, 2024 Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -188,6 +188,7 @@ private: // override virtual
   CARD*	   clone()const override	{return new DEV_DDT(*this);}
   bool	   do_tr()override;
   void	   tr_begin()override;
+  void	   tr_advance()override;
   TIME_PAIR tr_review()override; //		{return _time_by.reset();}//BUG//review(_i0.f0, _it1.f0);}
 }p4;
 DISPATCHER<CARD>::INSTALL d_ddt(&device_dispatcher, "va_ddt", &p4);
@@ -205,6 +206,7 @@ TIME_PAIR DEV_DDT::tr_review()
   }
   return _time_by;
 }
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 bool DEV_CPOLY_CAP::tr_needs_eval()const
 {
@@ -230,7 +232,9 @@ private: // override virtual
   std::string dev_type()const override	{unreachable(); return "idt";}
   CARD*	   clone()const override	{return new DEV_IDT(*this);}
   bool	   do_tr()override;
+  double   tr_amps()const override; // HACK
   void	   tr_begin()override;
+  // void	   tr_advance()override;
   void	   ac_load()override;
   TIME_PAIR tr_review()override;
 }p1;
@@ -259,6 +263,22 @@ void DEV_IDT::ac_load()
   for (int i=2; i<=_n_ports; ++i) {
     trace2("load", i, _vy0[i]);
     ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _vy0[i] / omg);
+  }
+}
+/*--------------------------------------------------------------------------*/
+double DEV_IDT::tr_amps() const
+{
+  // return fixzero((_loss0 * tr_outvolts() + _m0.c1 * tr_involts() + _m0.c0), _m0.c0);
+  double amps = _m0.c0;
+  for (int i=2; i<=_n_ports; ++i) {
+    amps += dn_diff(_n[2*i-2].v0(),_n[2*i-1].v0()) * _vi0[i];
+  }
+  if(_loss0){
+    assert(_loss0==1.);
+    // return -loss0 * amps;
+    return - amps;
+  }else{
+    return amps;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -335,14 +355,15 @@ bool DEV_CPOLY_CAP::do_tr_con_chk_and_q()
     set_converged(conchk(_vy1[i], _vy0[i]));
   }
   set_converged();
-  trace2("DEV_CPOLY_CAP::do_tr_con_chk_and_q", long_label(), converged());
-  trace3("DEV_CPOLY_CAP::do_tr_con_chk_and_q done", long_label(), _y[0].f0, _y[1].f0);
+//  trace2("DEV_CPOLY_CAP::do_tr_con_chk_and_q", long_label(), converged());
+//  trace3("DEV_CPOLY_CAP::do_tr_con_chk_and_q done", long_label(), _y[0].f0, _y[1].f0);
   return converged();
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_CPOLY_CAP::do_tr()
 {
-  _m0 = CPOLY1(0., _vi0[0], _vi0[1]);
+  unreachable();
+
 #if 0
   if(_loss0){
     _m0 = - _loss0 * CPOLY1(0., _vi0[0], _vi0[1]);
@@ -350,7 +371,23 @@ bool DEV_CPOLY_CAP::do_tr()
     _m0 = CPOLY1(0., _vi0[0], _vi0[1]);
   }
 #endif
-  return do_tr_con_chk_and_q();
+ bool ret = do_tr_con_chk_and_q();
+
+ _m0 = CPOLY1(0., _vi0[0], 0.); // _vi0[1]);
+
+  trace2("DEV_CPOLY_CAP::do_tr", long_label(), tr_amps());
+  return ret;
+}
+/*--------------------------------------------------------------------------*/
+void DEV_DDT::tr_advance()
+{
+   if(_sim->_last_time == 0.) {
+     // breaks idt..
+     _y[0].x = tr_outvolts();
+     _y[0].f0 = _vy0[0]; // state, from owner, "charge".
+   }else{
+   }
+  STORAGE::tr_advance();
 }
 /*--------------------------------------------------------------------------*/
 void DEV_DDT::tr_begin()
@@ -366,6 +403,7 @@ void DEV_IDT::tr_begin()
 /*--------------------------------------------------------------------------*/
 bool DEV_DDT::do_tr()
 {
+  double tramps1 = tr_amps();
   assert((_time[0] == 0) || (_vy0[0] == _vy0[0]));
 
   if(_sim->_v0) {
@@ -438,14 +476,17 @@ bool DEV_DDT::do_tr()
     for (int ii=0; ii<=_n_ports; ++ii) {
       assert(_vi0[ii] == _vi0[ii]);
     }
-  }else{
+  }else{ untested();
   }
-  
-  return DEV_CPOLY_CAP::do_tr();
+
+  trace4("trampsdbg", _sim->_time0, tramps1, tr_amps(), _i[0].f0);
+  _m0 = CPOLY1(0., _vi0[0], 0.); // _vi0[1]);
+  return do_tr_con_chk_and_q();
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_IDT::do_tr()
 {
+  double oldtramps = tr_amps();
   assert((_time[0] == 0) || (_vy0[0] == _vy0[0]));
 
   if(_sim->_v0){
@@ -487,12 +528,17 @@ bool DEV_IDT::do_tr()
   }else{
   }
 
-  return DEV_CPOLY_CAP::do_tr();
+  trace2("idttramp", oldtramps, tr_amps());
+  //_m0 = CPOLY1(0., _vi0[0], _vi0[1]);
+//  _vi0[0] = 0;
+//  _vi0[1] = 0;
+  _m0 = CPOLY1(0., _vi0[0], 0.); // _vi0[1]);
+  return do_tr_con_chk_and_q();
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_CAP::tr_load()
 {
-  trace2("tr_load", long_label(), _sim->iteration_tag());
+  trace4("tr_load", long_label(), _sim->iteration_tag(), _m0.c0, _loss0);
   tr_load_shunt(); // 4 pt +- loss
   for (int i=0; i<=_n_ports; ++i) {
     assert(_vi0[i] == _vi0[i]);
@@ -531,15 +577,22 @@ void DEV_CPOLY_CAP::tr_unload()
   tr_load();
 }
 /*--------------------------------------------------------------------------*/
-double DEV_CPOLY_CAP::tr_amps()const
+double DEV_CPOLY_CAP::tr_amps() const
 {
-  assert(_i[0].f0 == _i[0].f0);
-  assert(_i[0].f0 < 1e99);
-  if(_loss0 && 0){
-    return -_loss0 * _i[0].f0;
+  // return fixzero((_loss0 * tr_outvolts() + _m0.c1 * tr_involts() + _m0.c0), _m0.c0);
+  double amps = _m0.c0;
+  if(_loss0){
+    amps = -_m0.c0;
+    assert(_loss0 == 1.);
+    for (int i=2; i<=_n_ports; ++i) {
+      amps -= dn_diff(_n[2*i-2].v0(),_n[2*i-1].v0()) * _vi0[i];
+    }
   }else{
-    return _i[0].f0;
+    for (int i=2; i<=_n_ports; ++i) {
+      amps += dn_diff(_n[2*i-2].v0(),_n[2*i-1].v0()) * _vi0[i];
+    }
   }
+  return amps;
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_CAP::ac_load()
@@ -626,6 +679,8 @@ double DEV_CPOLY_CAP::tr_probe_num(const std::string& x)const
     return _loss0;
   }else if (Umatch(x, "conv ")) { untested();
     return converged();
+  }else if (Umatch(x, "st0 ")) { untested();
+    return _vy0[0];
   }else{
     return STORAGE::tr_probe_num(x);
   }

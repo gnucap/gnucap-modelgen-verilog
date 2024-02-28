@@ -1,0 +1,23 @@
+#Time       v(1)       v(3)       iter(0)   
+ 0.         0.         0.         3.        
+ 0.01       0.031395   0.         3.        
+ 0.2575     0.49944    0.         3.        
+ 0.505     -0.015705   0.         3.        
+ 0.7525    -0.49994    0.         3.        
+ 1.         7.f        0.         3.        
+#Freq       vm(1)      vm(3)      vp(1)      vp(3)     
+open circuit: internal node 3
+ 1.         0.5        0.         0.         0.        
+open circuit: internal node 3
+ 2.         0.5        0.         0.         0.        
+open circuit: internal node 3
+ 4.         0.5        0.         0.         0.        
+open circuit: internal node 3
+ 8.         0.5        0.         0.         0.        
+open circuit: internal node 3
+ 16.        0.5        0.         0.         0.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=18, fourier=0, total=29
+transient timesteps: accepted=6, rejected=0, total=6
+nodes: user=2, subckt=0, model=2, total=4
+dctran density=75.0%, ac density=75.0%

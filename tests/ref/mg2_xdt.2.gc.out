@@ -1,0 +1,27 @@
+module vsin (p,n);
+  .parameter ampl 
+  .parameter dc 
+  vsource #(sin.offset(NA( 0.)), .amplitude(ampl), .frequency( 1.), .delay(NA( 0.)), .damping(NA( 0.))  DC dc) V1 (.p(p),.n(n));
+endmodule // vsin
+
+parameter r=1 
+parameter v=0 
+test_xdt2 #() dut (.p(1),.n(0));
+vsin #(.ampl(1),.dc(v)) v1 (.p(1),.n(0));
+#Time       v(1)       idtddt(dut) ddtidt(dut) i(dut._b_ddt_0_p_ddt_0_n) i(dut._b_ddt_1_p_ddt_1_n) i(dut._b_idt_2_p_idt_2_n) iter(0)   
+ 0.         0.         0.         ??         0.         0.         0.         2.        
+ 0.1        0.58779    0.58779    ??         5.0955     5.0955     0.58779    45.       
+ 0.2        0.95106    0.95106    ??         1.9279     1.9279     0.95106    6.        
+ 0.3        0.95106    0.95106    ??        -1.9876    -1.9876     0.95106    6.        
+ 0.4        0.58779    0.58779    ??        -5.2778    -5.2778     0.58779    3.        
+ 0.5        0.        -444.1E-18  ??        -6.4779    -6.4779    -444.1E-18  3.        
+ 0.6       -0.58779   -0.58779    ??        -4.9885    -4.9885    -0.58779    9.        
+ 0.7       -0.95106   -0.95106    ??        -1.8208    -1.8208    -0.95106    6.        
+ 0.8       -0.95106   -0.95106    ??         2.0947     2.0947    -0.95106    6.        
+ 0.9       -0.58779   -0.58779    ??         5.1707     5.1707    -0.58779    3.        
+ 1.         0.        -333.1E-18  ??         6.585      6.585     -333.1E-18  3.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=92, fourier=0, total=123
+transient timesteps: accepted=24, rejected=7, total=31
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%

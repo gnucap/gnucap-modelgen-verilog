@@ -40,6 +40,7 @@ static void make_header(std::ostream& o, const File& in,
     "#include <e_subckt.h>\n"
     "#include <e_node.h>\n"
     "#include <e_elemnt.h>\n"
+    "#include <e_storag.h>\n"
     "// #include <e_paramlist.h>\n"
     "#include <u_nodemap.h>\n"; // if submodules are used anywhere
 #ifdef DEPEND

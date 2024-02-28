@@ -224,12 +224,10 @@ public:
       o__ "// subdevice\n";
       o__ "t0 = 0.;\n";
     }else{
-      o__ "d->" << cn << "->do_tr();\n";
-      o__ "t0 = d->" << cn << "->tr_amps();\n";
-      // o__ "d->_potential" << cn << " = - t0;\n";
-      o__ "d->_potential" << cn << " = t0; // xx\n";
+      o__ "auto e = prechecked_cast<ELEMENT const*>(d->"<< cn << ");\n";
+      o__ "assert(e);\n";
+      o__ "d->_potential" << cn << " = t0 = e->tr_amps(); // (236)\n";
     }
-    o__ "trace2(\"filt\", t0, d->"<< cn <<"->tr_outvolts());\n";
 
     make_assign(o);
 
