@@ -31,7 +31,7 @@
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
-static void make_cc_tmp(std::ostream& o, std::string state, Deps const& deps)
+static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
 {
 
   {
@@ -40,7 +40,7 @@ static void make_cc_tmp(std::ostream& o, std::string state, Deps const& deps)
     o__ "d->" << state << "[0] = " << sign << " " << "t0.value();\n";
     size_t k = 2;
 
-    for(auto v : deps) {
+    for(auto v : deps.ddeps()) {
       // char sign = f.reversed()?'-':'+';
       o__ "// dep " << v->code_name() << "\n";
       // if(f->branch() == v->branch()){ untested(); }
@@ -331,9 +331,9 @@ void Token_XDT::stack_op(Expression* e)const
   auto func = prechecked_cast<XDT const*>(f());
   assert(func);
 
-  if(auto dd = prechecked_cast<Deps const*>(cc->data())) {
+  if(auto dd = prechecked_cast<TData const*>(cc->data())) {
     assert(dd);
-    for(auto i : *dd){
+    for(auto i : dd->ddeps()){
       trace1("xdt arg deps", i->code_name());
     }
 
@@ -346,23 +346,23 @@ void Token_XDT::stack_op(Expression* e)const
     }else{ untested();
     }
 
-    auto d = new Deps;
+    auto d = new TData;
     trace1("xdt output dep", func->prb()->code_name());
     d->insert(Dep(func->prb(), Dep::_LINEAR)); // BUG?
     auto N = new Token_XDT(*this, d, clone_args(cc->args()));
     assert(N->data());
-    assert(dynamic_cast<Deps const*>(N->data()));
+    assert(dynamic_cast<TData const*>(N->data()));
     e->push_back(N);
     assert(f()==N->f());
     delete(cc);
   }else if(!e->size()) { untested();
     unreachable();
   }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) { untested();
-    auto d = new Deps;
+    auto d = new TData;
     d->insert(Dep(func->prb())); // BUG?
     auto N = new Token_XDT(*this, d);
     assert(N->data());
-    assert(dynamic_cast<Deps const*>(N->data()));
+    assert(dynamic_cast<TData const*>(N->data()));
     e->push_back(N);
   }else{ untested();
     unreachable();
@@ -396,7 +396,7 @@ void Token_XDT::stack_op(Expression* e)const
   }else if(assigned){ untested();
   }else if(cont->has_sensitivities()) { itested();
   }else if(always){
-    for(auto d : cont->deps()){
+    for(auto d : cont->ddeps()){
       if(d->branch() != branch()) {
       }else if(d.is_linear()){
 	// incomplete();

@@ -22,8 +22,8 @@
 #include "mg_in.h"
 #include "mg_func.h" // TODO
 #include "mg_discipline.h"
-#include "m_tokens.h" // Deps
-#include "mg_options.h" // Deps
+#include "m_tokens.h" // TData
+#include "mg_options.h" // TData
 /*--------------------------------------------------------------------------*/
 Dep mg_const_dep(NULL);
 /*--------------------------------------------------------------------------*/
@@ -276,7 +276,7 @@ Branch_Ref const& Branch_Names::new_name(std::string const& n, Branch_Ref const&
 void Filter::new_deps()
 {
   assert(!_deps);
-  _deps = new Deps;
+  _deps = new TData;
 }
 /*--------------------------------------------------------------------------*/
 Filter::Filter(std::string const& name)
@@ -305,7 +305,7 @@ size_t Filter::num_branches() const
 void Branch::new_deps()
 {
   assert(!_deps);
-  _deps = new Deps;
+  _deps = new TData;
   assert(_deps->is_linear());
 }
 /*--------------------------------------------------------------------------*/
@@ -844,12 +844,12 @@ Base* Block::lookup(std::string const& k, bool recurse)
   return NULL;
 }
 /*--------------------------------------------------------------------------*/
-Deps::const_iterator Deps::begin() const
+DDeps::const_iterator DDeps::begin() const
 {
   return _s.begin();
 }
 /*--------------------------------------------------------------------------*/
-Deps::const_iterator Deps::end() const
+DDeps::const_iterator DDeps::end() const
 {
   return _s.end();
 }
@@ -862,7 +862,7 @@ void BlockVarIdentifier::update()
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::clear_deps()
 { untested();
-  trace2("Variable_Decl::clear_deps", name(), deps().size());
+  trace2("Variable_Decl::clear_deps", name(), deps().ddeps().size());
   deps().clear();
 }
 /*--------------------------------------------------------------------------*/
@@ -898,12 +898,12 @@ Attrib const& Expression_::attrib() const
 }
 #endif
 /*--------------------------------------------------------------------------*/
-Deps const& Expression_::deps() const
+TData const& Expression_::deps() const
 {
-  static Deps no_deps;
+  static TData no_deps;
   if(is_empty()){
     return no_deps;
-  }else if(auto d = dynamic_cast<Deps const*>(back()->data())){
+  }else if(auto d = dynamic_cast<TData const*>(back()->data())){
     return *d;
 //  }else if(auto d = dynamic_cast<Attrib const*>(back()->data())){ untested();
 //    return d->deps();
@@ -919,9 +919,9 @@ Expression_::~Expression_()
 //  }
 }
 /*--------------------------------------------------------------------------*/
-Deps* copy_deps(Base const* b)
+TData* copy_deps(Base const* b)
 {
-  if(auto t=dynamic_cast<Deps const*>(b)){
+  if(auto t=dynamic_cast<TData const*>(b)){
     return t->clone();
   }else if(!b) {
     // unary(par_ref)?
@@ -1071,12 +1071,6 @@ Circuit::~Circuit()
   _branches.clear();
 }
 /*--------------------------------------------------------------------------*/
-// Branch_Map& Module::branches()const
-// { untested();
-//   assert(_circuit);
-//   return _circuit->branches();
-// }
-/*--------------------------------------------------------------------------*/
 void Branch_Map::clear() {
   while(!_names.is_empty()){
     delete _names.back();
@@ -1089,6 +1083,12 @@ void Branch_Map::clear() {
   _m.clear();
   _brs.clear();
   // _names.clear();
+}
+/*--------------------------------------------------------------------------*/
+DDeps const& Branch::ddeps()const
+{
+  assert(_deps);
+  return _deps->ddeps();
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

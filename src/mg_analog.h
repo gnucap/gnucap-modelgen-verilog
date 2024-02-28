@@ -417,7 +417,7 @@ class Contribution : public AnalogStmt {
   } _type{t_unknown};
   bool _short{false};
   Block* _owner{NULL};
-  Deps* _deps{NULL};
+  TData* _deps{NULL};
   Sensitivities _sens;
 private:
   void set_pot_contrib();
@@ -425,8 +425,8 @@ private:
   void set_short();
   void set_always_pot();
   void set_direct(bool d=true);
-//  Deps& deps() { return _rhs.deps(); }
-  Deps const& deps();
+//  TData& deps() { return _rhs.deps(); }
+  TData const& deps();
 public:
   Contribution(CS& f, Block* o)
     : AnalogStmt(), _branch(NULL, false) {
@@ -440,6 +440,7 @@ private:
   Block const* owner()const {return _owner;}
 public:
 
+  DDeps const& ddeps() const;
   bool has_sensitivities()const { return !_sens.empty(); }
   bool is_pot_contrib() const;
   bool is_flow_contrib() const;
@@ -448,7 +449,7 @@ public:
   bool is_always() const{ assert(owner()); return owner()->is_always(); }
   void parse(CS&)override;
   void dump(std::ostream&)const override;
-  Deps const& deps() const {
+  TData const& deps() const {
     if(_deps) {return *_deps;} else {return _rhs.deps();}
   }
   Expression const& rhs()const {return _rhs;}

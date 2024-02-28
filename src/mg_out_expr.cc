@@ -258,9 +258,9 @@ class RPN_VARS {
   int _str_alloc{0};
   int _arr_idx{-1};
   int _arr_alloc{0};
-  Deps const* _deps;
+  TData const* _deps;
 public:
-  explicit RPN_VARS(Deps const* d) : _deps(d) {}
+  explicit RPN_VARS(TData const* d) : _deps(d) {}
   ~RPN_VARS(){
     assert(_flt_idx == -1);
     assert(_ddo_idx == -1);
@@ -332,7 +332,7 @@ public:
       }else if(!options().optimize_deriv()){ untested();
 	o__ "t" << _ddo_idx << ".set_all_deps(); // (all deriv)\n"; // code_name??
       }else{
-	for(auto i: *_deps){
+	for(auto i: _deps->ddeps()){
 	  o__ "// t" << _ddo_idx << "[d" << i->code_name() << "] = 0.; // (output dep)\n";
 	}
       }
@@ -411,7 +411,7 @@ public:
     }
   }
   bool has_deps()const { return _deps; }
-  Deps const& deps()const { assert(_deps); return *_deps; }
+  TData const& deps()const { assert(_deps); return *_deps; }
 }; // RPN_VARS
 /*--------------------------------------------------------------------------*/
 static void make_cc_string(std::ostream& o, String const& e)
@@ -704,7 +704,7 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
 /*--------------------------------------------------------------------------*/
 void make_cc_expression(std::ostream& o, Expression const& e, bool dynamic)
 {
-  Deps const* deps = NULL;
+  TData const* deps = NULL;
   if(!dynamic){
   }else if(auto ex = dynamic_cast<Expression_ const*>(&e)){
     deps = &ex->deps();

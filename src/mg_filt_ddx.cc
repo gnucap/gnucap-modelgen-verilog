@@ -49,10 +49,10 @@ private:
     assert(ee);
     Token const* t = ee->back();
     assert(t);
-    auto dd = prechecked_cast<Deps const*>(t->data());
+    auto dd = prechecked_cast<TData const*>(t->data());
     assert(dd);
-    assert(dd->size()==1);
-    return *dd->begin();
+    assert(dd->ddeps().size()==1);
+    return *dd->ddeps().begin();
   }
 
   Expression_ const* args() const{
@@ -186,12 +186,12 @@ void Token_DDX::stack_op(Expression* e)const
   assert(ee);
   Token const* t = ee->back();
   assert(t);
-  auto dd = prechecked_cast<Deps const*>(t->data());
+  auto dd = prechecked_cast<TData const*>(t->data());
   (void)dd;
   assert(dd);
-  assert(dd->size());
+  assert(dd->ddeps().size());
 
-  auto d = new Deps; // incomplete. second order derivatives?
+  auto d = new TData; // incomplete. second order derivatives?
   auto N = new Token_DDX(*this, d, clone_args(cc->args()));
   assert(N->args());
 

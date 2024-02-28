@@ -148,11 +148,12 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Dep;
+class DDeps;
 class Branch : public Element_2 {
  // TerminalPair _ports;
   Node_Ref _p;
   Node_Ref _n;
-  Deps *_deps{NULL}; // delete? move to _ctrl.
+  TData *_deps{NULL}; // delete? move to _ctrl.
   // TODO: refactor into _ctrl
   size_t _has_flow_probe{0};
   size_t _has_pot_probe{0};
@@ -243,8 +244,9 @@ public:
   size_t number() const{return _number;}
   size_t num_branches() const;
 
-  Deps const& deps()const { assert(_deps); return *_deps; } // delete?
-  Deps& deps() { assert(_deps); return *_deps; } // delete?
+  TData const& deps()const { assert(_deps); return *_deps; } // delete?
+  DDeps const& ddeps()const;
+  TData& deps() { assert(_deps); return *_deps; } // delete?
 						 //
   Branch const* output() const;
   virtual bool has_name()const{return false;}

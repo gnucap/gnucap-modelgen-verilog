@@ -70,60 +70,12 @@ public:
   bool empty()const {return !_s.size();}
 };
 /*--------------------------------------------------------------------------*/
-class Deps : public Base {
+class DDeps {
   typedef std::vector<Dep> D;
-  typedef D::const_iterator const_iterator; // BUG
-  /* mutable */ D _s; // dynamic_deps?
-  Sensitivities _sens; // sensitivities
-  // V _sens; // discrete_deps?
-  // R _range; // discrete_deps?
-  bool _offset{false}; // -> dynamic_deps.
-  bool _constant{false};
+  D _s;
 public:
-  static Deps _no_deps;
-public:
-  explicit Deps() : Base() {}
-  explicit Deps(Deps const& o) : Base(), _s(o._s),
-    _sens(o._sens),
-    _offset(o._offset), _constant(o._constant) { }
-  ~Deps();
-  Deps* clone()const {
-    return new Deps(*this);
-  }
-  std::pair<const_iterator, bool> insert(Dep const&);
-  void update(Deps const& other);
-  Dep back(){
-    return _s.back();
-  }
-  void clear(){
-    _s.clear();
-  }
-  void set_offset(bool v = true){_offset = v;}
-  void set_constant(bool v = true){_constant = v;} // attrib/sens?
-  bool is_offset() const {return _offset;}
-  bool is_constant() const {return _constant;}
-  bool is_linear() const;
-  bool is_quadratic() const;
-  void set_any() {
-    for(auto& d: _s) {
-      d.set_any();
-    }
-  }
-public: // sens
-  void add_sens(Sensitivities const& s){
-    _sens.merge(s);
-  }
-  bool has_sensitivities()const {return !_sens.empty(); }
-  Sensitivities const& sensitivities()const {return _sens; }
-private:
-  void parse(CS&)override {unreachable();}
-  void dump(std::ostream&)const override {unreachable();}
-public:
-  Deps& operator=(Deps const& d){
-    clear();
-    update(d);
-    return *this;
-  }
+  typedef D::const_iterator const_iterator;
+
   const_iterator begin() const;
   const_iterator end() const;
   size_t size() const{
@@ -135,8 +87,93 @@ public:
   bool empty() const{
     return _s.empty();
   }
+  Dep back(){
+    return _s.back();
+  }
+  void clear(){
+    _s.clear();
+  }
+  void set_any() {
+    for(auto& d: _s) {
+      d.set_any();
+    }
+  }
+  std::pair<DDeps::const_iterator, bool> insert(Dep const&);
+};
+/*--------------------------------------------------------------------------*/
+// use ValueRange from mg_.h?
+class Range : public Base {
+public:
+  static Range _unknown;
+  explicit Range() : Base() {}
+public:
+  Range* multiply(const Base*)const override {
+    return NULL;
+  }
+  Base* multiply(const Float*)const override	{untested(); return NULL;}
+  Base* multiply(const String*)const override	{untested(); return NULL;}
+
+private:
+  void parse(CS&)override {unreachable();}
+  void dump(std::ostream&)const override {unreachable();}
+};
+/*--------------------------------------------------------------------------*/
+class TData : public Base {
+  DDeps _s; // dynamic_deps?
+  Sensitivities _sens; // sensitivities
+  // V _sens; // discrete_deps?
+  // R _range; // discrete_deps?
+  bool _offset{false}; // -> dynamic_deps.
+  bool _constant{false};
+public:
+  static TData _no_deps;
+public:
+  explicit TData() : Base() {}
+  explicit TData(TData const& o) : Base(), _s(o._s),
+    _sens(o._sens),
+    _offset(o._offset), _constant(o._constant) { }
+  ~TData();
+  TData* clone()const {
+    return new TData(*this);
+  }
+  std::pair<DDeps::const_iterator, bool> insert(Dep const& d){
+    return _s.insert(d);
+  }
+  void update(TData const& other);
+  Dep back(){
+    return _s.back();
+  }
+  void clear(){
+    _s.clear();
+  }
+  DDeps& ddeps() {return _s;}
+  DDeps const& ddeps()const {return _s;}
+  void set_offset(bool v = true){_offset = v;}
+  void set_constant(bool v = true){_constant = v;} // attrib/sens?
+  bool is_offset() const {return _offset;}
+  bool is_constant() const {return _constant;}
+  bool is_linear() const;
+  bool is_quadratic() const;
+  void set_any() {
+    _s.set_any();
+  }
+public: // sens
+  void add_sens(Sensitivities const& s){
+    _sens.merge(s);
+  }
+  bool has_sensitivities()const {return !_sens.empty(); }
+  Sensitivities const& sensitivities()const {return _sens; }
+private:
+  void parse(CS&)override {unreachable();}
+  void dump(std::ostream&)const override {unreachable();}
+public:
+  TData& operator=(TData const& d){
+    clear();
+    update(d);
+    return *this;
+  }
   Base* combine(const Base* X)const;
-  Deps* multiply(const Base* X)const override; // {incomplete(); return NULL;}
+  TData* multiply(const Base* X)const override; // {incomplete(); return NULL;}
   Base* subtract(const Base*)const override	{incomplete(); return NULL;}
   Base* r_subtract(const Base*)const override	{incomplete(); return NULL;}
   Base* divide(const Base* X)const override;  //{incomplete(); return NULL;}
@@ -157,96 +194,6 @@ public:
   Base* r_divide(const String*)const override   {unreachable(); return NULL;}	
   Base* modulo(const String*)const override     {unreachable(); return NULL;}	
 };
-/*--------------------------------------------------------------------------*/
-// use ValueRange from mg_.h?
-class Range : public Base {
-public:
-  static Range _unknown;
-  explicit Range() : Base() {}
-public:
-  Range* multiply(const Base*)const override {
-    return NULL;
-  }
-  Base* multiply(const Float*)const override	{untested(); return NULL;}
-  Base* multiply(const String*)const override	{untested(); return NULL;}
-
-private:
-  void parse(CS&)override {unreachable();}
-  void dump(std::ostream&)const override {unreachable();}
-};
-/*--------------------------------------------------------------------------*/
-#if 0
-// merge into Deps?
-class Attrib : public Base {
-  Deps const* _deps{NULL};
-  Range const* _range{NULL};
-//  DataType _type;?
-public:
-  explicit Attrib() : Base() {}
-  ~Attrib() {
-    delete _deps;
-    _deps = NULL;
-    delete _range;
-    _range = NULL;
-  }
-private:
-  explicit Attrib(Attrib const&) : Base() { }
-  Attrib* clone()const {
-    return new Attrib(*this);
-  }
-  void set_deps(Deps const* d) { assert(!_deps); _deps=d; }
-  void set_range(Range const* r) { assert(!_range); _range=r; }
-public:
-  Deps const& deps() const{
-    if(_deps){
-      return *_deps;
-    }else{
-      return Deps::_no_deps;
-    }
-  }
-  Range const& range() const{
-    if(_range){
-      return *_range;
-    }else{
-      return Range::_unknown;
-    }
-  }
-private:
-  void parse(CS&)override {unreachable();}
-  void dump(std::ostream&)const override {unreachable();}
-public:
-//  Attrib& operator=(Attrib const& o){
-//    _deps = o._deps;
-//    _range = o._range;
-//    return *this;
-//  }
-  Base* multiply(const Base* X)const override	{
-    Attrib* n = clone();
-    n->set_deps(deps().multiply(X));
-    n->set_range(range().multiply(X));
-    return n;
-  }
-  Base* subtract(const Base*)const override	{incomplete(); return NULL;}
-  Base* r_subtract(const Base*)const override	{incomplete(); return NULL;}
-  Base* divide(const Base*)const override	{incomplete(); return NULL;}
-  Base* r_divide(const Base*)const override   {incomplete(); return NULL;}	
-  Base* modulo(const Base*)const override     {incomplete(); return NULL;}	
-
-  Base* multiply(const Float*)const override	{unreachable(); return NULL;}
-  Base* subtract(const Float*)const override	{unreachable(); return NULL;}
-  Base* r_subtract(const Float*)const override	{unreachable(); return NULL;}
-  Base* divide(const Float*)const override	{unreachable(); return NULL;}
-  Base* r_divide(const Float*)const override    {unreachable(); return NULL;}	
-  Base* modulo(const Float*)const override      {unreachable(); return NULL;}	
-
-  Base* multiply(const String*)const override	{unreachable(); return NULL;}
-  Base* subtract(const String*)const override	{unreachable(); return NULL;}
-  Base* r_subtract(const String*)const override	{unreachable(); return NULL;}
-  Base* divide(const String*)const override	{unreachable(); return NULL;}
-  Base* r_divide(const String*)const override   {unreachable(); return NULL;}	
-  Base* modulo(const String*)const override     {unreachable(); return NULL;}	
-};
-#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

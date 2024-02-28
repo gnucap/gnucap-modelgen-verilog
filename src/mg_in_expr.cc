@@ -89,7 +89,7 @@ static bool is_xs_function(std::string const& f, Block const* owner)
 }
 
 /*--------------------------------------------------------------------------*/
-void Expression_::resolve_symbols_(Expression const& e, Deps*)
+void Expression_::resolve_symbols_(Expression const& e, TData*)
 {
   Expression& E = *this;
   trace0("resolve symbols ===========");
@@ -227,7 +227,7 @@ void Expression_::resolve_symbols_(Expression const& e, Deps*)
 /*--------------------------------------------------------------------------*/
 bool Expression_::update()
 {
-  size_t n = deps().size();
+  size_t n = deps().ddeps().size();
 
   auto i = begin();
   for(size_t nn=size(); nn--;){
@@ -236,10 +236,10 @@ bool Expression_::update()
   }
 
   trace2("Expression_::update", size(), n);
-  if(n<=deps().size()){
+  if(n<=deps().ddeps().size()){
   }else{ untested();
   }
-  return n != deps().size();
+  return n != deps().ddeps().size();
 }
 /*--------------------------------------------------------------------------*/
 /* A.8.3

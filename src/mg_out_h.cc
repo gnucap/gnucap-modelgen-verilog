@@ -307,7 +307,7 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
     return;
   }
   Branch const& br = *bb;
-  trace2("states", br.code_name(), br.deps().size());
+  trace2("states", br.code_name(), br.deps().ddeps().size());
   o << "public: // states, " << br.code_name() << ";\n"; //  << br.deps().size()<<";\n";
   if(br.has_pot_source()){
     o__ "bool _pot" << br.code_name() << ";\n";
@@ -331,7 +331,7 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
   o____ "enum { ";
   std::string comma = "";
   o____ "VALUE, SELF";
-  for(auto d : br.deps()){
+  for(auto d : br.ddeps()){
 //      o << "/* found " << d->code_name() << "*/";
     Branch const* bbb = d->branch();
     assert(bbb);
@@ -344,7 +344,7 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
     }
   }
   o << "/* : */\n";
-  for(auto d : br.deps()){
+  for(auto d : br.ddeps()){
     Branch const* bbb = d->branch();
     assert(bbb);
     if(bbb->is_short()){ untested();

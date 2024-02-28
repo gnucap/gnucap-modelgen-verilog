@@ -73,7 +73,7 @@ void OUT_ANALOG::make_variable(std::ostream& o, Variable const& v) const
   }else{
     o__ "ddouble _v_" << v.name() << "; // Variable";
 
-    for(auto const& i : v.deps()) {
+    for(auto const& i : v.deps().ddeps()) {
       o__ " Dep: " << i->code_name() << " lin: " << i.is_linear();
     }
     o << "\n";
@@ -138,7 +138,7 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
       o__ lhsname << " = t0; // (1a)\n";
     }else if(!options().optimize_deriv()) {itested();
       o__ lhsname << " = t0; // (*)\n";
-      for(auto v : a.deps()) { untested();
+      for(auto v : a.deps().ddeps()) { untested();
 	o__ "// " << a.lhs().code_name() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // (2a)\n";
 	o__ "assert(" << a.lhs().code_name() << "[d" << v->code_name() << "] == " << "t0[d" << v->code_name() << "]); // (2a2)\n";
       }
@@ -153,7 +153,7 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
       o__ "trace1(\"assign\", " << lhsname << ");\n";
 #endif
 
-      for(auto v : a.deps()) {
+      for(auto v : a.deps().ddeps()) {
 	assert(v->branch());
 	if(v.is_linear()){
 	  // TODO incomplete();
@@ -187,7 +187,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 {
   Expression const& e = C.rhs();
 
-  for(auto v : C.deps()) {
+  for(auto v : C.deps().ddeps()) {
     trace2("contrib dep", C.name(), v->code_name());
   }
 
@@ -248,7 +248,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
     }
 
     if(is_dynamic()) {
-      for(auto v : C.deps()) {
+      for(auto v : C.deps().ddeps()) {
 	if(C.branch() == v->branch()){
 	  o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
 	  o__ "d->_st" << bcn << "[1]"
@@ -256,7 +256,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	}else{
 	}
       }
-      for(auto v : C.deps()) {
+      for(auto v : C.deps().ddeps()) {
 	o__ "// dep " << v->code_name() << "\n";
 	assert(v->branch());
 	if(C.branch() == v->branch()){
@@ -278,7 +278,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	}
       }
     }else if(is_precalc()) {
-      for(auto v : C.deps()) {
+      for(auto v : C.deps().ddeps()) {
 	assert(v->branch());
 	if(C.branch() == v->branch()) {
 	  o__ "// same " << v->code_name() << "\n";
@@ -631,12 +631,12 @@ static void make_set_self_contribution(std::ostream& o, Dep const& d)
 static void make_cc_set_state(std::ostream& o, Branch const& b, std::string cn)
 {
   o__ "{ // set state " << cn << "\n";
-  if (b.deps().size()) {
+  if (b.deps().ddeps().size()) {
     //    o__ "typedef long double D;\n";
     o__ "long double sp = 0.;\n";
   }else{
   }
-  for(auto const& d : b.deps()){
+  for(auto const& d : b.deps().ddeps()){
     o__ "// " << d->code_name() << " lin: " <<  d.is_linear() << "\n";
     if(d->branch() == &b){
       // move make_set_self_contribution here?
@@ -660,7 +660,7 @@ static void make_cc_set_state(std::ostream& o, Branch const& b, std::string cn)
       // todo?
     }
   }
-  if (b.deps().size()) {
+  if (b.deps().ddeps().size()) {
     o__ b.state(cn) << "[0] = double(" << b.state(cn) << "[0] - sp);\n";
   }else{
   }
@@ -681,7 +681,7 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
   }else{
   }
 
-  for(auto const& d : b->deps()){
+  for(auto const& d : b->deps().ddeps()){
     if(d->branch() == b){
       o__ "// same " << d->code_name() << "\n";
       if(b->has_pot_source() && b->has_flow_probe()){
@@ -834,7 +834,7 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Variable_Decl&
   }else if(V.type().is_int()) { untested();
     o__ "int& " << V.code_name() << "(d->" << V.code_name() << ");\n";
   }else if(V.type().is_real()) {
-    if(V.deps().size() == 0){
+    if(V.deps().ddeps().size() == 0){
       o__ "double& " << V.code_name() << "(d->" << V.code_name() << "); // (823)\n";
     }else if(options().optimize_deriv()) {
       make_one_variable_proxy(o, V, m);
@@ -853,7 +853,7 @@ void OUT_ANALOG::make_one_variable_store(std::ostream& o, const Variable_Decl& V
     unreachable();
   }else if(_mode == modePRECALC){ untested();
     o__ "// d->" << V.code_name() << " = " << V.code_name() << ";\n";
-  }else if(V.deps().size() == 0){
+  }else if(V.deps().ddeps().size() == 0){
     // it's a reference.
   }else if(options().optimize_deriv()) {
     // use destructor
@@ -1025,7 +1025,7 @@ void make_cc_analog(std::ostream& o, const Module& m)
 void make_node_ref(std::ostream& o, const Node& n, bool used=true);
 void make_cc_branch_ctrl(std::ostream& o, Branch const* br)
 {
-  for(auto i : br->deps()){
+  for(auto i : br->ddeps()){
     Branch const* bb = i->branch();
     if(bb->is_short()){ untested();
       // here: skip filter dependency.
@@ -1047,7 +1047,7 @@ void make_cc_current_ports(std::ostream& o, Branch const* br, Element_2 const& e
 {
   // set_current ports.
   int kk = 1;
-  for(auto i : br->deps()){
+  for(auto i : br->ddeps()){
     if(!i->is_flow_probe()){
     }else if(i->branch() == br){
       // self control is current

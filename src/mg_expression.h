@@ -46,7 +46,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class Deps;
+class TData;
 class FUNCTION_;
 class Probe;
 class Branch_Ref;
@@ -64,16 +64,13 @@ public:
 // private:
   Block* owner(){ return _owner; }
 private:
-  void resolve_symbols_(Expression const& e, Deps* deps=NULL);
+  void resolve_symbols_(Expression const& e, TData* deps=NULL);
 public:
   void clear();
   Expression_* clone() const;
-  Deps const& deps()const;
+  TData const& deps()const;
   // Attrib const& attrib()const;
   bool update();
-//  Deps& deps();
-//  Deps const& deps()const { return _deps; }
-//  Deps& deps() { return _deps; }
 private: // all the same eventually?
 //  Token* resolve_function(FUNCTION_ const* filt, Block* owner) const;
   Token* resolve_xs_function(std::string const& n);

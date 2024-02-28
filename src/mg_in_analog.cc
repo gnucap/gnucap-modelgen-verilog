@@ -264,13 +264,13 @@ void AnalogProceduralAssignment::parse(CS& f)
 template<class A>
 void dump_annotate(std::ostream& o, A const& _a)
 {
-    if(_a.deps().size()){
+    if(_a.deps().ddeps().size()){
       o << " //";
     }else if(_a.has_sensitivities()){
       o << " //";
     }else{
     }
-    for(const Dep& d : _a.deps()) {
+    for(const Dep& d : _a.deps().ddeps()) {
       o << " dep: ";
       o << d->code_name();
     }
@@ -862,13 +862,13 @@ void Assignment::dump(std::ostream& o) const
 Assignment::~Assignment()
 {
   if(_lhs){
-    trace3("~Assignment", lhsname(), this, deps().size());
+    trace3("~Assignment", lhsname(), this, deps().ddeps().size());
   }else{
   }
   if(options().optimize_unused() && !owner()->is_reachable()) {
   }else{
     try{
-      for(Dep d : deps()) {
+      for(Dep d : deps().ddeps()) {
 	(*d)->unset_used_in(this);
       }
     }catch(std::logic_error const& e){ untested();
@@ -889,7 +889,7 @@ void Assignment::parse_rhs(CS& cmd)
   assert(_rhs.is_empty());
 
   assert(owner());
-  assert(deps().empty());
+  assert(deps().ddeps().empty());
   _rhs.set_owner(owner());
   _rhs.resolve_symbols(rhs);
   cmd.reset(cmd.cursor());
@@ -1036,7 +1036,7 @@ void Contribution::parse(CS& cmd)
     }
     assert(owner());
 
-    for(const Dep& d : deps()) {
+    for(const Dep& d : deps().ddeps()) {
       add_dep(d);
     }
     assert(!_deps);
@@ -1096,7 +1096,12 @@ void Contribution::add_dep(Dep const& d)
   }
 }
 /*--------------------------------------------------------------------------*/
-Deps const& Contribution::deps()
+DDeps const& Contribution::ddeps() const
+{
+  return deps().ddeps();
+}
+/*--------------------------------------------------------------------------*/
+TData const& Contribution::deps()
 {
   if(_deps){
     return *_deps;
@@ -1109,30 +1114,30 @@ bool Contribution::update()
 {
   assert(owner()->is_reachable());
   trace1("Contribution::update", name());
-  Deps const* D = &_rhs.deps();
+  TData const* D = &_rhs.deps();
 
   _rhs.update();
   D = &_rhs.deps();
   if(!_deps){ untested();
-    _deps = new Deps;
+    _deps = new TData;
   }else{
   }
-  size_t s = _deps->size();
+  size_t s = _deps->ddeps().size();
   _deps->update(*D);
-  bool ret = (s != _deps->size());
+  bool ret = (s != _deps->ddeps().size());
 
   if(options().optimize_unused() && !owner()->is_reachable()) { untested();
   }else{
     trace1("Contribution::update more", name());
-    for(; s < _deps->size(); ++s) {
-      Dep const& d = deps()[s];
+    for(; s < _deps->ddeps().size(); ++s) {
+      Dep const& d = deps().ddeps()[s];
       trace3("inc_use", name(), branch()->name(), d->code_name());
       add_dep(d);
     }
   }
   _sens.merge(_deps->sensitivities());
 
-  return ret || (_deps->size() != D->size());
+  return ret || (_deps->ddeps().size() != D->ddeps().size());
 }
 /*--------------------------------------------------------------------------*/
 void Branch_Map::parse(CS& f)
@@ -1568,22 +1573,22 @@ void AF_Arg_List::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 bool Assignment::update()
 {
-  Deps const* D = &_rhs.deps();
+  TData const* D = &_rhs.deps();
   assert(D);
-  size_t s = D->size();
+  size_t s = D->ddeps().size();
   bool ret;
 
   _rhs.update();
   D = &_rhs.deps();
-  trace4("Assignment::update", lhsname(), s, D->size(), this);
+  trace4("Assignment::update", lhsname(), s, D->ddeps().size(), this);
 
   if (store_deps(_rhs.deps())) {
     assert(_lhs);
-    trace2("Assignment::update prop", _rhs.deps().size(), _lhs->deps().size());
+    trace2("Assignment::update prop", _rhs.deps().ddeps().size(), _lhs->deps().ddeps().size());
     _lhs->propagate_deps(*this);
     ret = true;
   }else{
-    trace2("Assignment::update no prop", _rhs.deps().size(), _lhs->deps().size());
+    trace2("Assignment::update no prop", _rhs.deps().ddeps().size(), _lhs->deps().ddeps().size());
     ret = false;
 //    ret = _lhs->propagate_deps(*this);
   }
@@ -1594,7 +1599,7 @@ bool Assignment::update()
 /*--------------------------------------------------------------------------*/
 bool Assignment::propagate_deps(Variable const& from)
 {
-  Deps const& d = from.deps();
+  TData const& d = from.deps();
   if(&from == this) { untested();
     assert(false);
     return false;
@@ -1608,22 +1613,21 @@ bool Assignment::propagate_deps(Variable const& from)
   }
 }
 /*--------------------------------------------------------------------------*/
-bool Assignment::store_deps(Deps const& d)
+bool Assignment::store_deps(TData const& d)
 {
   // TODO: attrib.
   // TODO: only if reachable.
   assert(_lhs);
-  size_t s = _lhs->deps().size();
-  assert(s <= _lhs->deps().size());
+  size_t s = _lhs->deps().ddeps().size();
+  assert(s <= _lhs->deps().ddeps().size());
   if(_deps) {
   }else{
-    _deps = new Deps;
+    _deps = new TData;
   }
-  size_t ii = _deps->size();
+  size_t ii = _deps->ddeps().size();
   _deps->update(d);
-  assert(ii <= _deps->size());
+  assert(ii <= _deps->ddeps().size());
   bool ret = false;
-  Owned_Base const* L = _lhs;
 
   if(auto x = dynamic_cast<SeqBlock const*>(owner())) {
     if(x->has_sensitivities()) {
@@ -1634,25 +1638,16 @@ bool Assignment::store_deps(Deps const& d)
   }
 
   if(owner()->is_reachable()){
-    trace2("Assignment::propagate_deps fwd 2", name(), _lhs->name());
-    for(; ii < _deps->size(); ++ii) {
+    for(; ii < _deps->ddeps().size(); ++ii) {
       ret = true;
-      Dep const& dd = (*_deps)[ii];
+      Dep const& dd = _deps->ddeps()[ii];
       (*dd)->set_used_in(this);
     }
-    if(1 ||  L->owner()!=owner()){
-      assert(&deps() == _deps);
-//      ret |= _lhs->propagate_deps(*this);
-//    }else if(&from != this){ untested();
-//      ret |= _lhs->propagate_deps(from);
-    }else{ untested();
-    }
+    assert(&deps() == _deps);
   }else{ untested();
-    trace3("Assignment::propagate_deps unreachable", d.size(), _deps->size(), ret);
   }
 
-  trace3("Assignment::propagate_deps", d.size(), _deps->size(), ret);
-  assert(d.size() <= _deps->size());
+  assert(d.ddeps().size() <= _deps->ddeps().size());
   return ret;
 }
 /*--------------------------------------------------------------------------*/
@@ -1720,7 +1715,6 @@ bool Contribution::is_pot_contrib() const
 Contribution::~Contribution()
 {
   assert(_branch); //?
-  trace4("~Contribution", name(), branch()->name(), this, deps().size());
   if(!options().optimize_nodes()){ untested();
   }else if(!owner()->is_always()) {
   }else if(is_short()) {
@@ -1740,8 +1734,7 @@ Contribution::~Contribution()
     }
 //    }
 
-    for(Dep const& i : deps()){
-      trace3("dec_use", name(), branch()->name(), i->code_name());
+    for(Dep const& i : deps().ddeps()){
       assert(i->branch());
       i->branch()->dec_use();
       try{
@@ -1762,7 +1755,7 @@ void Variable_Decl::dump(std::ostream& o)const
 {
   o__ name();
   if(options().dump_annotate()){
-    for(auto d : deps()){ untested();
+    for(auto d : deps().ddeps()){ untested();
       o << "// dep " << d->code_name();
     }
     o << "\n";
@@ -1772,12 +1765,10 @@ void Variable_Decl::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 bool Variable_Decl::propagate_deps(Variable const& v)
 {
-  Deps const& incoming = v.deps();
-  trace4("Variable_Decl::propagate_deps", name(), deps().size(), incoming.size(), incoming.has_sensitivities());
+  TData const& incoming = v.deps();
   assert(&deps() != &incoming);
   deps().update(incoming);
-  assert(deps().size() >= incoming.size());
-  trace2("Variable_Decl::propagate_deps done", name(), deps().size());
+  assert(deps().ddeps().size() >= incoming.ddeps().size());
   return false;
 }
 /*--------------------------------------------------------------------------*/
@@ -1799,7 +1790,7 @@ size_t Branch::num_nodes() const
 {
   size_t ret=1;
 
-  for(auto i : deps()){
+  for(auto i : ddeps()){
     if(i->branch()->is_short()){ untested();
     }else if(i->branch() == this){
       // self conductance
@@ -1819,7 +1810,7 @@ size_t Branch::num_states() const
 {
   size_t k = 2;
   // TODO: cleanup
-  for(auto i : deps()){
+  for(auto i : ddeps()){
     assert(i);
     // if(i->is_reversed()){ untested();
     //}else

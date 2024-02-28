@@ -5,7 +5,7 @@
 // TODO: merge into Element_2?
 class Filter : public Element_2 {
   std::string _name; // BUG?
-  Deps* _deps{NULL};
+  TData* _deps{NULL};
   Branch_Ref _branch;
   Probe const* _prb=NULL;
   int _num_states{0};
@@ -28,7 +28,7 @@ public:
   }
   size_t num_branches()const;
   std::string code_name()const override;
-  Deps const& deps()const { assert(_deps); return *_deps; }
+  TData const& deps()const { assert(_deps); return *_deps; }
 
   size_t num_states()const override;
   size_t num_nodes()const override;
@@ -38,9 +38,9 @@ public:
   bool has_branch() const {
     return _branch;
   }
-  void set_deps(Deps const&);
+  void set_deps(TData const&);
 private:
-  Deps& deps() { assert(_deps); return *_deps; }
+  TData& deps() { assert(_deps); return *_deps; }
   void new_deps();
 }; // Filter
 #endif

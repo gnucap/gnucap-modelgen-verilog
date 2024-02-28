@@ -28,9 +28,9 @@
 #include "mg_deps.h" // BUG?
 #include "mg_token.h"
 /*--------------------------------------------------------------------------*/
-class Deps;
+class TData;
 /*--------------------------------------------------------------------------*/
-Deps* copy_deps(Base const* b);
+TData* copy_deps(Base const* b);
 /*--------------------------------------------------------------------------*/
 static Token* copy(Token const* b)
 {
@@ -59,7 +59,7 @@ public:
   Token_PARLIST_* clone()const override{
     return new Token_PARLIST_(*this);
   }
-  Deps* new_deps()const;
+  TData* new_deps()const;
   Expression const* args()const { return _args; }
   void set_args(Expression const* e) {assert(!(_args && e)); _args = e;}
 };
@@ -138,8 +138,8 @@ public:
   Token const* op2()const { return _op2; };
 
   void stack_op(Expression* E)const override;
-//  Deps const* op_deps(Base const* t1, Base const* t2)const;
-  Deps const* op_deps(Token const* d1, Token const* d2)const;
+//  TData const* op_deps(Base const* t1, Base const* t2)const;
+  TData const* op_deps(Token const* d1, Token const* d2)const;
 private:
   void stack_op_(Expression* E)const;
 };
@@ -166,7 +166,7 @@ public:
   }
 
   void stack_op(Expression* E)const override;
-//  Deps const* op_deps(Base const* t1, Base const* t2)const;
+//  TData const* op_deps(Base const* t1, Base const* t2)const;
   Token const* op_deps(Token const* d1, Token const* d2)const;
   Token const* cond()const {return _cond; }
 private:
@@ -241,7 +241,6 @@ public:
 /*--------------------------------------------------------------------------*/
 // ITEM_REF?
 class Variable;
-//class Deps;
 class Token_VAR_REF : public Token_SYMBOL {
   Variable const* _item;
 public:

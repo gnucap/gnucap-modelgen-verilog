@@ -1,4 +1,23 @@
-
+/*                       -*- C++ -*-
+ * Copyright (C) 2023, 2024 Felix Salfelder
+ *
+ * This file is part of "Gnucap", the Gnu Circuit Analysis Package
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+ */
 /*--------------------------------------------------------------------------*/
 #ifndef MG_CODE_H
 #define MG_CODE_H
@@ -34,7 +53,7 @@ public:
 
 class Token_PROBE; //bug?
 class Node;
-class Deps;
+class TData;
 class Expression;
 class Variable : public Owned_Base {
 protected:
@@ -59,14 +78,14 @@ public:
   virtual bool is_module_variable()const;
 
   virtual bool propagate_deps(Variable const&) = 0;
-  virtual Deps const& deps()const = 0;
+  virtual TData const& deps()const = 0;
   virtual double eval()const { return NOT_INPUT;}
 protected:
   void new_var_ref();
 }; // Variable
 /*--------------------------------------------------------------------------*/
 class Variable_Decl : public Variable {
-  Deps* _deps{NULL};
+  TData* _deps{NULL};
   Data_Type _type;
   Attribute_Instance const* _attributes{NULL};
 public:
@@ -85,12 +104,12 @@ public:
   }
 //  std::string code_name()const override;
   void set_type(Data_Type const& d){ _type=d; }
-  Deps const& deps()const override { assert(_deps); return *_deps; }
+  TData const& deps()const override { assert(_deps); return *_deps; }
   bool propagate_deps(Variable const&)override;
 protected:
   void clear_deps();
 private:
-  Deps& deps() { assert(_deps); return *_deps; }
+  TData& deps() { assert(_deps); return *_deps; }
   void new_deps();
 //  void set_type(std::string const& a){_type=a;}
 };
@@ -141,7 +160,7 @@ class Assignment : public Variable {
 protected:
   Variable* _lhs{NULL};
   Expression_ _rhs;
-  Deps* _deps{NULL};
+  TData* _deps{NULL};
 public:
   explicit Assignment(CS& f, Block* o);
   explicit Assignment() : Variable() {}
@@ -166,7 +185,7 @@ public:
 // protected:
   void set_lhs(Variable* v);
 
-  Deps const& deps()const override{
+  TData const& deps()const override{
     if(_deps){
       return *_deps;
     }else{
@@ -178,9 +197,9 @@ public:
   double eval()const override;
   Block* owner(){ return Variable::owner();}
   bool has_sensitivities()const;
-//  Deps& deps()override { return _rhs.deps(); }
+//  TData& deps()override { return _rhs.deps(); }
 private: // implementation
-  bool store_deps(Deps const&);
+  bool store_deps(TData const&);
 }; // Assignment
 /*--------------------------------------------------------------------------*/
 // class AnalogExpression?
@@ -202,3 +221,4 @@ public:
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet

@@ -25,17 +25,17 @@
 #include "mg_analog.h" // Probe
 #include "mg_deps.h"
 /*--------------------------------------------------------------------------*/
-Deps Deps::_no_deps;
+TData TData::_no_deps;
 Range Range::_unknown;
 /*--------------------------------------------------------------------------*/
 // is linear, as in "map"
-bool Deps::is_linear() const
+bool TData::is_linear() const
 {
   if(is_offset()) {
     return false;
   }else{
   }
-  for(auto const& i : *this) {
+  for(auto const& i : ddeps()) {
     if (i.is_linear()) {
     }else{
       return false;
@@ -45,13 +45,13 @@ bool Deps::is_linear() const
 }
 /*--------------------------------------------------------------------------*/
 // is quadratic, as in "form"
-bool Deps::is_quadratic() const
+bool TData::is_quadratic() const
 { untested();
   if(is_offset()) { untested();
     return false;
   }else{ untested();
   }
-  for(auto const& i : *this) { untested();
+  for(auto const& i : ddeps()) { untested();
     if (i.is_quadratic()) { untested();
     }else{ untested();
       return false;
@@ -60,20 +60,20 @@ bool Deps::is_quadratic() const
   return true;
 }
 /*--------------------------------------------------------------------------*/
-Base* Deps::combine(const Base* X)const
+Base* TData::combine(const Base* X)const
 {
   auto n = clone();
-  auto o = prechecked_cast<Deps const*>(X);
+  auto o = prechecked_cast<TData const*>(X);
   assert(o);
   n->update(*o);
   n->set_offset();
   return n;
 }
 /*--------------------------------------------------------------------------*/
-Deps* Deps::multiply(const Base* X)const
+TData* TData::multiply(const Base* X)const
 {
   auto n = clone();
-  auto o = prechecked_cast<Deps const*>(X);
+  auto o = prechecked_cast<TData const*>(X);
   assert(o);
   n->update(*o);
   if (o->is_offset()){
@@ -93,10 +93,10 @@ Deps* Deps::multiply(const Base* X)const
   return n;
 }
 /*--------------------------------------------------------------------------*/
-Base* Deps::divide(const Base* X)const
+Base* TData::divide(const Base* X)const
 {
   auto n = clone();
-  auto o = prechecked_cast<Deps const*>(X);
+  auto o = prechecked_cast<TData const*>(X);
   assert(o);
   n->update(*o);
   if (is_offset()){
@@ -106,7 +106,7 @@ Base* Deps::divide(const Base* X)const
   }else{
   }
 
-  if(o->size()==0){
+  if(o->ddeps().size()==0){
     // divide by constant...
     assert(is_linear() == n->is_linear());
   }else{
@@ -114,21 +114,21 @@ Base* Deps::divide(const Base* X)const
   return n;
 }
 /*--------------------------------------------------------------------------*/
-void Deps::update(Deps const& other)
+void TData::update(TData const& other)
 {
-  for(auto& i : other){
+  for(auto& i : other.ddeps()){
     insert(i);
   }
   trace1("update", other.sensitivities().empty());
   _sens.merge(other.sensitivities());
 }
 /*--------------------------------------------------------------------------*/
-Deps::~Deps()
+TData::~TData()
 {
   _s.clear();
 }
 /*--------------------------------------------------------------------------*/
-std::pair<Deps::const_iterator, bool> Deps::insert(Dep const& x)
+std::pair<DDeps::const_iterator, bool> DDeps::insert(Dep const& x)
 {
   for(auto s = begin(); s!=end(); ++s){
     if (s->same_data(x)){

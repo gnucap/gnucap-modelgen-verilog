@@ -32,7 +32,7 @@
 class Token;
 class Expression;
 class Module;
-class Deps;
+class TData;
 // TODO: move upstream, partly?
 class FUNCTION_ : public FUNCTION {
 //  std::string _label; // e_base.

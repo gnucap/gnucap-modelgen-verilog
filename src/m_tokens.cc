@@ -145,7 +145,7 @@ Token_CALL::~Token_CALL()
 #endif
 namespace {
 /*--------------------------------------------------------------------------*/
-class CD : public Deps{
+class CD : public TData{
 public:
   explicit CD(){
     set_offset();
@@ -154,10 +154,10 @@ public:
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
-Deps const* Token_BINOP_::op_deps(Token const* t1, Token const* t2)const
+TData const* Token_BINOP_::op_deps(Token const* t1, Token const* t2)const
 {
-  Deps const* d1 = dynamic_cast<Deps const*>(t1->data());
-  Deps const* d2 = dynamic_cast<Deps const*>(t2->data());
+  TData const* d1 = dynamic_cast<TData const*>(t1->data());
+  TData const* d2 = dynamic_cast<TData const*>(t2->data());
   // op asserts CONSTANT here. otherwise: similar.
 
   if(!d1){
@@ -191,9 +191,9 @@ Deps const* Token_BINOP_::op_deps(Token const* t1, Token const* t2)const
     b = d2->combine(d1);
   }
 
-  Deps const* ret = NULL;
+  TData const* ret = NULL;
   if(b){
-    ret = prechecked_cast<Deps const*>(b);
+    ret = prechecked_cast<TData const*>(b);
     assert(ret);
   }else{ untested();
     ret = const_deps.clone();
@@ -207,7 +207,7 @@ void Token_UNARY_::stack_op(Expression* E)const
     op1()->stack_op(E); // clone??
     Token* t1 = E->back();
     E->pop_back();
-    Deps const* d1 = dynamic_cast<Deps const*>(t1->data());
+    TData const* d1 = dynamic_cast<TData const*>(t1->data());
     E->push_back(new Token_UNARY_(name(), t1, copy_deps(d1)));
 
     return;
@@ -220,7 +220,7 @@ void Token_UNARY_::stack_op(Expression* E)const
   E->pop_back();
 
   if (is_constant(t1)) {
-    assert(!dynamic_cast<Deps const*>(t1->data()));
+    assert(!dynamic_cast<TData const*>(t1->data()));
     Token* t = op(t1);
     assert(t);
     if (t->data()) {
@@ -230,8 +230,8 @@ void Token_UNARY_::stack_op(Expression* E)const
       delete t;
     }
   }else{
-    Deps const* d1 = dynamic_cast<Deps const*>(t1->data());
-    Deps const* deps = NULL;
+    TData const* d1 = dynamic_cast<TData const*>(t1->data());
+    TData const* deps = NULL;
     if(d1) {
       deps = d1->clone();
     }else{
@@ -272,7 +272,7 @@ void Token_BINOP_::stack_op(Expression* E)const
   stash_op t1(E);
   stash_op t2(E);
 
-  Deps const* deps = op_deps(t1, t2);
+  TData const* deps = op_deps(t1, t2);
 
   char n = name()[0];
   if(!options().optimize_binop()) {
@@ -459,7 +459,7 @@ void Token_TERNARY_::stack_op(Expression* E)const
     }
 
   }else{
-    Deps* deps = new Deps;
+    TData* deps = new TData;
 
     Expression_* t = new Expression_;
     for (Expression::const_iterator i = true_part()->begin(); i != true_part()->end(); ++i) {
@@ -481,14 +481,14 @@ void Token_TERNARY_::stack_op(Expression* E)const
   }
 }
 /*--------------------------------------------------------------------------*/
-static Deps* new_deps(Base const* data)
+static TData* new_deps(Base const* data)
 {
   if(auto ee = dynamic_cast<Expression const*>(data)){
-    auto d = new Deps;
+    auto d = new TData;
     for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
       trace1("stackop get deps", (**i).name());
-      if(auto dd=dynamic_cast<Deps const*>((*i)->data())){
-	trace1("stackop get deps", dd->size());
+      if(auto dd=dynamic_cast<TData const*>((*i)->data())){
+	trace1("stackop get deps", dd->ddeps().size());
 	d->update(*dd);
       }else{
       }
@@ -496,7 +496,7 @@ static Deps* new_deps(Base const* data)
     return d;
   }else{ untested();
     assert(0);
-    return new Deps;
+    return new TData;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -553,7 +553,7 @@ void Token_CALL::stack_op(Expression* E)const
       }
 
       // here?
-      Deps* deps = new_deps(arg_expr);
+      TData* deps = new_deps(arg_expr);
       deps->set_any();
       E->push_back(new Token_CALL(*this, deps, EE));
     }
@@ -598,8 +598,8 @@ static Module* to_module(Block* owner)
 /*--------------------------------------------------------------------------*/
 size_t Token_ACCESS::num_deps() const
 { untested();
-  if(auto t=dynamic_cast<Deps const*>(data())){ untested();
-    return t->size();
+  if(auto t=dynamic_cast<TData const*>(data())){ untested();
+    return t->ddeps().size();
   }else{ untested();
     // incomplete();
     return 0;
@@ -791,8 +791,8 @@ void Token_PAR_REF::stack_op(Expression* e)const
 /*--------------------------------------------------------------------------*/
 size_t Token_VAR_REF::num_deps() const
 {
-  if(auto t=dynamic_cast<Deps const*>(data())){
-    return t->size();
+  if(auto t=dynamic_cast<TData const*>(data())){
+    return t->ddeps().size();
   }else{ untested();
     // incomplete();
     return 0;
@@ -804,15 +804,15 @@ void Token_VAR_REF::stack_op(Expression* e)const
   assert(_item);
 //  double ev = _item->eval();
   auto deps = _item->deps().clone();
-  trace4("var::stack_op", name(), _item->deps().size(), _item->name(), _item);
-  assert(deps->size() == _item->deps().size());
+  trace4("var::stack_op", name(), _item->deps().ddeps().size(), _item->name(), _item);
+  assert(deps->ddeps().size() == _item->deps().ddeps().size());
   auto nn = new Token_VAR_REF(*this, deps);
-  assert(nn->num_deps() == deps->size());
+  assert(nn->num_deps() == deps->ddeps().size());
   e->push_back(nn);
   assert(nn->_item == _item);
 }
 /*--------------------------------------------------------------------------*/
-Deps* Token_PARLIST_::new_deps()const
+TData* Token_PARLIST_::new_deps()const
 { untested();
   incomplete();
   return ::new_deps(data());
@@ -963,7 +963,7 @@ Token* Probe::new_token(Module&, size_t na)const
   }
   name += ")";
 
-  Deps* deps = new Deps;
+  TData* deps = new TData;
   deps->insert(Dep(this, Dep::_LINEAR));
 
   Token_ACCESS* nt = new Token_ACCESS(name, deps, this);
