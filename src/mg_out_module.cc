@@ -155,7 +155,7 @@ static void make_tr_probe_num(std::ostream& o, const Module& m)
   o__ "if(n == \"conv\") {\n";
   o____ "return converged();\n";
   o__ "}\n";
-  o__ "return " <<  baseclass(m) << "::tr_probe_num(n)\n;";
+  o__ "return " <<  baseclass(m) << "::tr_probe_num(n);\n";
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -168,12 +168,10 @@ static void make_set_parameters(std::ostream& o, const Element_2& e, std::string
     cn = e.code_name();
   }else{
   }
-  if(dynamic_cast<Filter const*>(&e)){
-//    cn = f->branch_code_name();
-  }else{
-  }
   o______ cn << "->set_parameters(\"" << e.short_label() << "\", this, ";
-  if (e.discipline()) {
+  if (e.eval() != "") {
+    o << "&" << e.eval();
+  }else if (e.discipline()) {
     // incomplete(); need NODE commons (or so)
     o << "&_C_V_" << e.discipline()->identifier();
   }else{
@@ -716,7 +714,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
   o______ "throw Exception(" << "\"Cannot find " << dev_type << ". Load module?\");\n";
   o____ "}else{\n";
   o____ "}\n";
-  o____ cn << " = dynamic_cast<ELEMENT*>(p->clone());\n";
+  o____ cn << " = dynamic_cast<ELEMENT*>(p->clone()); // elt\n";
   o____ "if(!" << cn << "){\n";
   o______ "throw Exception(" << "\"Cannot use " << dev_type << ": wrong type\"" << ");\n";
   o____ "}else{\n";
@@ -744,8 +742,11 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
     make_set_parameters(o, e, cn);
     if(br == br->output()){
     }else{
-      o______ cn << "->_loss0 = 0.;\n";
-      o______ cn << "->_loss1 = 0.;\n";
+      o______ "if(auto e = dynamic_cast<ELEMENT*>(" << cn << ")){\n";
+      o________ "e->_loss0 = 0.;\n";
+      o________ "e->_loss1 = 0.;\n";
+      o______ "}else{\n";
+      o______ "}\n";
     }
 
     make_cc_current_ports(o, br, e);
@@ -772,6 +773,11 @@ static void make_module_precalc_first(std::ostream& o, Module const& m)
   o__ "auto c = static_cast<COMMON_" << mid << "*>(mutable_common());\n";
   o__ "assert(c);\n";
   o__ "auto cc = c->clone();\n";
+
+  if(m.has_analog_block()){
+    // o__ "c->precalc_analog(this);\n";
+  }else{
+  }
 
   o__ "if(subckt()){\n";
   if(m.circuit()->element_list().size()){

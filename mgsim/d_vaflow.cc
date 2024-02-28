@@ -59,11 +59,18 @@ protected:
   }
   bool do_tr_con_chk_and_q();
 }f; // VAFLOW;
+DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "flow_src|va_flow", &f);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 bool VAFLOW::do_tr_con_chk_and_q()
 {
-  q_load();
+  trace1("VAFLOW::do_tr_con_chk", long_label());
+  if(!_sim->_v0){ untested();
+  }else if(_loaditer != _sim->iteration_tag()){
+
+    q_load();
+  }else{ untested();
+  }
 
   assert(_old_values);
   set_converged(conchk(_time, _sim->_time0));
@@ -90,11 +97,12 @@ bool VAFLOW::do_tr()
 /*--------------------------------------------------------------------------*/
 void VAFLOW::tr_load()
 {
+  trace2("VAFLOW::tr_load", long_label(), _n_ports);
   tr_load_passive();
   _old_values[0] = _values[0];
   _old_values[1] = _values[1];
   for (int i=2; i<=_n_ports; ++i) {
-    trace4("tr_load", long_label(), i, _values[i], _old_values[i]);
+    // trace4("VAFLOW::tr_load", long_label(), i, _values[i], _old_values[i]);
     tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_values[i]), &(_old_values[i]));
   }
 }
@@ -165,7 +173,43 @@ void VAFLOW::set_parameters(const std::string& Label, CARD *Owner,
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "flow_src|va_flow", &f);
+class DEV_FPOLY_G : public VAFLOW {
+private:
+  explicit DEV_FPOLY_G(const DEV_FPOLY_G& p)
+    :VAFLOW(p) {}
+public:
+  explicit DEV_FPOLY_G() :VAFLOW() {}
+private: // override virtual
+  char	   id_letter()const override {unreachable(); return '\0';}
+  std::string dev_type()const override {unreachable(); return "va_fpoly_g";}
+  CARD*	   clone()const override { return new DEV_FPOLY_G(*this);}
+  bool	   do_tr() override;
+}ff;
+DISPATCHER<CARD>::INSTALL dff(&device_dispatcher, "va_fpoly_g", &ff);
+/*--------------------------------------------------------------------------*/
+bool DEV_FPOLY_G::do_tr()
+{
+  assert(_values);
+  double c0 = _values[0];
+  // if (_inputs) {untested();
+  //   untested();
+  //   for (int i=1; i<=_n_ports; ++i) {untested();
+  //     c0 -= *(_inputs[i]) * _values[i];
+  //     trace4("", i, *(_inputs[i]), _values[i], *(_inputs[i]) * _values[i]);
+  //   }
+  // }else
+  {
+    for (int i=1; i<=_n_ports; ++i) {
+      c0 -= volts_limited(_n[2*i-2],_n[2*i-1]) * _values[i];
+      trace4("", i, volts_limited(_n[2*i-2],_n[2*i-1]), _values[i],
+	     volts_limited(_n[2*i-2],_n[2*i-1]) * _values[i]);
+    }
+  }
+  trace2("", _values[0], c0);
+  _m0 = CPOLY1(0., c0, _values[1]);
+
+  return do_tr_con_chk_and_q();
+}
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

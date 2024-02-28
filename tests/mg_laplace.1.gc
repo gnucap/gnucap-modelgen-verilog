@@ -1,0 +1,44 @@
+
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+// H(s) = (n2*s^2 + n1*s + n0) / (d2*s^2 + d1*s + d0)
+// (more or less)
+
+`modelgen
+module test_lap1(in, out);
+  inout in, out;
+  electrical in, out, s, s2;
+  parameter real n0 = 0.;
+  parameter real n1 = 0.;
+  parameter real n2 = 0.;
+  parameter real d0 = 1. from [0:inf);
+  parameter real d1 = 1. from [0:inf);
+  parameter real d2 = 1. from [1:1];
+  analog begin
+    I(s) <+ idt(V(s, in) + V(s2)) + V(s);
+    I(s2) <+ -idt(V(s)) + V(s2);
+	 V(out) <+ n2 * V(in, s) + n1 * V(s) + n0 * V(s2);
+  end
+endmodule
+
+!make test_lap1.so > /dev/null
+
+attach ./test_lap1.so
+
+verilog
+
+test_lap1 #(.d0(1) .n0(1), .n1(0)) lp(in, p2);
+resistor #(1.) r1(in, nl);
+inductor #(1.) n1(nl, nc);
+capacitor #(1.) n1(nc, 0);
+
+spice
+
+V1 in 0 pulse iv=0 pv=1 rise=.1 fall=.1 width=1
+
+.print tran v(nodes)
+.tran 10.
+.status notime

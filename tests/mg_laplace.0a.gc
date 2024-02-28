@@ -1,0 +1,44 @@
+
+attach ../vams/vsine.so
+attach ./modelgen_0.so
+
+verilog
+
+/// implement H(s) = (n1*s + n0) / (d1*s + d0)
+
+`modelgen
+module test_lap2(in, out);
+  inout in, out;
+  electrical in, out, s;
+  parameter real n0 = 0.;
+  parameter real n1 = 0.;
+  parameter real d0 = 1. from [0:inf);
+  parameter real d1 = 1. from (0:inf);
+  analog begin
+    I(s) <+ ddt(V(s, in)) + d0/d1 * V(s);
+	 V(out) <+ n0/d1 * V(in, s) + n1/d1 * V(s);
+  end
+endmodule
+
+!make test_lap2.so > /dev/null
+
+attach ./test_lap2.so
+
+verilog
+
+
+vsine #(.freq(1), .ampl(1), .mag(1.)) v1(in, 0);
+
+test_lap2 #(.d0(1) .n0(1), .n1(0)) lp(in, lo);
+resistor #(1.) r1(in, lo1);
+capacitor #(1.) n1(0, lo1);
+
+test_lap2 #(.d0(1) .d1(1) .n0(0), .n1(1)) hp(in, hi);
+resistor #(1.) r1(0, hi1);
+capacitor #(1.) n1(in, hi1);
+
+print tran v(nodes) iter(0)
+tran 1.
+print ac vm(nodes) iter(0)
+ac .1 10 * 10
+status notime

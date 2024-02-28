@@ -66,7 +66,12 @@ protected:
 /*--------------------------------------------------------------------------*/
 bool VAPOT::do_tr_con_chk_and_q()
 {
-  q_load();
+  if(!_sim->_v0){
+  // }else if(_loaditer != _sim->iteration_tag()){
+  }else if(_loaditer != _sim->iteration_tag()){
+    q_load();
+  }else{
+  }
 
   assert(_old_values);
   set_converged(conchk(_time, _sim->_time0));
@@ -94,10 +99,20 @@ bool VAPOT::do_tr_con_chk_and_q()
 /*--------------------------------------------------------------------------*/
 bool VAPOT::do_tr()
 {
-  trace6("do_tr", long_label(), _self_is_current, _loss0, _values[0], _values[1], tr_amps());
+  trace6("VAPOT::do_tr", long_label(), _self_is_current, _loss0, _values[0], _values[1], tr_amps());
   assert(_values);
 
   assert(_loss0);
+#if 0
+  if(_values[0] == LINEAR) {
+    // tmp hack
+    _m0.x = 0.;
+    // _m0.c0 = -_loss0 * _y[0].f1; // d_vs.
+    _m0.c0 = 0.; // -_loss0 * _values[0];
+    _m0.c1 = - _values[1] * _loss0;
+    assert(_m0.c1 == 0.); // d_vs
+  }else
+#endif
   if(_self_is_current && fabs(_values[1]) > OPT::shortckt){ untested();
     _loss0 = 0.;
     // loss but switch to CS mode.
@@ -130,6 +145,7 @@ bool VAPOT::do_tr()
 /*--------------------------------------------------------------------------*/
 void VAPOT::tr_load()
 {
+  trace1("VAPOT::tr_load", long_label());
   for (int i=0; i<=_n_ports; ++i) {
     _old_values[i] = _values[i];
   }
@@ -156,10 +172,13 @@ void VAPOT::tr_load()
     trace3("CPG.. ", long_label(), _loss0, _loss1);
     tr_load_source();
 
-    trace2("VAPOT::tr_load", _values[0], _values[1]);
   }
 
   for (int i=2; i<=_n_ports; ++i) {
+    trace2("load port", long_label(), i);
+    trace2("load port", long_label(), _m0_[i-2]);
+    trace2("load port", long_label(), _n[2*i-2]->short_label());
+    trace2("load port", long_label(), _n[2*i-1]->short_label());
     tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_m0_[i-2]), &(_m1_[i-2]));
   }
 }
@@ -190,12 +209,15 @@ void VAPOT::ac_load()
     incomplete();
   }else{
   }
-  _acg = _values[1];
+  _acg = _values[1]; // loss?
   ac_load_passive();
 
   for (int i=2; i<=_n_ports; ++i) {
-    assert(_loss0);
-    ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], - _values[i] * _loss0);
+    if(_loss0){
+      ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], - _values[i] * _loss0);
+    }else{
+      ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i]);
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -226,6 +248,10 @@ void VAPOT::set_parameters(const std::string& Label, CARD *Owner,
     assert(n_states > 1);
     _m0_ = new double[n_states-2];
     _m1_ = new double[n_states-2];
+#ifndef NDEBUG
+    std::fill_n(_m0_, n_states-2, 0.);
+    std::fill_n(_m1_, n_states-2, 0.);
+#endif
 
     if (matrix_nodes() > NODES_PER_BRANCH) {
       // allocate a bigger node list

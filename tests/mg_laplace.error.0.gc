@@ -1,0 +1,13 @@
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_lap_e0(p, n);
+	(* desc="" *) real dv;
+	electrical p, n;
+	analog begin
+		dv = laplace_nd(V(p,n), '{1}, 17.);
+	end
+endmodule

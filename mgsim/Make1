@@ -5,6 +5,7 @@ TARGET = \
   c_param.so \
   d_va_acs.so \
   d_va_filter.so \
+  d_va_laplace.so \
   d_va_slew.so \
   d_vaflow.so \
   d_vapot_br.so \

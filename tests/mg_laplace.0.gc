@@ -1,0 +1,77 @@
+
+attach ../vams/vsine.so
+attach ./modelgen_0.so
+
+verilog
+
+// H(s) = (n1*s + n0) / (d1*s + d0)
+// compare various rc and cr passes.
+
+`modelgen
+module test_lap0(in, out);
+  inout in, out;
+  electrical in, out, s0, s1;
+  parameter real n0 = 0.;
+  parameter real n1 = 0.;
+  parameter real d0 = 1. from (0:inf);
+  parameter real d1 = 1. from (0:inf);
+  analog begin
+    I(s0) <+ V(s0) - V(in);
+    I(s0) <+ V(s1) * d1/d0;
+    I(s1) <+ V(s1) - ddt(V(s0));
+	 V(out) <+ ( n1 * V(s1) + n0 * V(s0) ) / d0;
+  end
+endmodule
+
+!make test_lap0.so > /dev/null
+
+attach ./test_lap0.so
+
+verilog
+
+
+test_lap0 #(.d0(1.), .d1(1.), .n0(1.), .n1(0)) lp(in, lo0);
+resistor #(1) r1(in, lo0_);
+capacitor #(1.) n1(0, lo0_);
+admittance #(0) pl0(lo0, lo0_);
+
+test_lap0 #(.d0(.5), .d1(1), .n0(.5), .n1(0)) lp(in, lo1);
+resistor #(1) r1(in, lo1_);
+capacitor #(2.) n1(0, lo1_);
+admittance #(0) pl1(lo1, lo1_);
+
+test_lap0 #(.d0(1), .d1(2), .n0(1), .n1(0)) lp(in, lo2);
+resistor #(1) r1(in, lo2_);
+capacitor #(2.) n1(0, lo2_);
+admittance #(0) pl2(lo2, lo2_);
+
+
+test_lap0 #(.d0(1) .d1(1.) .n0(0), .n1(1.)) hp(in, hi0);
+capacitor #(1.) n1(in, hi0_);
+resistor #(1.) r1(0, hi0_);
+admittance #(0) ph0(hi0, hi0_);
+
+test_lap0 #(.d0(.5) .d1(1) .n0(0), .n1(1.)) hp(in, hi1);
+capacitor #(2.) n1(in, hi1_);
+resistor #(1.) r1(0, hi1_);
+admittance #(0) ph1(hi1, hi1_);
+
+test_lap0 #(.d0(.5) .d1(5.) .n0(0), .n1(5.)) hp(in, hi2);
+capacitor #(2.) n1(in, hi2_);
+resistor #(5.) r1(0, hi2_);
+admittance #(0) ph2(hi2, hi2_);
+
+vsine #(.freq(1), .ampl(1), .mag(1.)) v1(in, 0);
+
+print tran v(hi*)
+print ac vm(hi*)
+print tran v(lo*)
+print ac vm(lo*)
+
+print tran v(p*)
+print ac vm(p*)
+
+print tran +iter(0)
+tran 1.
+ac .1 10 * 10
+status notime

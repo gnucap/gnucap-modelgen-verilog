@@ -1,0 +1,23 @@
+
+attach ../vams/vsine.so
+
+verilog
+
+//va_laplace_nd #() a(1,2,3,4);
+
+va_laplace_nd #(.n0(0), .n1(1), .d0(1), .d1(0)) b0(0,1,in,0);
+va_laplace_nd #(.n0(0), .n1(1), .d0(1),       ) b0(0,2,in,0);
+
+vsine #(.ampl(1), .freq(1), .phase(-3.14159/2.)) v1(in, 0);
+resistor #(1) r1(1,0);
+resistor #(1) r1(2,0);
+
+list
+
+print tran v(nodes)
+tran 1 .1 basic
+
+print ac vm(nodes) vp(nodes)
+ac .01 100 * 10
+
+status notime

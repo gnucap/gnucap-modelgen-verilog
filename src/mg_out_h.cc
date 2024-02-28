@@ -404,7 +404,7 @@ static void make_precalc(std::ostream& o, Module const& m)
   o__ "explicit " << class_name << "(MOD_" <<  m.identifier() << "*d) : _d(d) {}\n";
   // ... functions->make_cc_precalc?
   for(auto const& i : m.funcs()) {
-    indent x;
+    // indent x;
     i->make_cc_precalc(o);
   }
 

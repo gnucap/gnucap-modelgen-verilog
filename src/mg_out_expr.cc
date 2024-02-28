@@ -305,13 +305,13 @@ public:
     }
     _types.push(t_str);
   }
-  void new_array(std::ostream& o, Token_ARRAY_ const& /*TODO*/){ untested();
+  void new_array(std::ostream& o, Token_ARRAY_ const& /*TODO*/){
     ++_arr_idx;
     _types.push(t_arr);
     if(_arr_idx < _arr_alloc){ untested();
 //      o__ "a" << _arr_idx << "= array_";
       o__ code_name() << "= array_";
-    }else{ untested();
+    }else{
       o__ "array_ " << code_name();
       ++_arr_alloc;
     }
@@ -508,21 +508,21 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
     }else if (auto pb = dynamic_cast<const Token_PORT_BRANCH*>(*i)) { untested();
       incomplete();
       s.new_ref("0"); //port number here?
-    }else if (auto A = dynamic_cast<const Token_ARRAY_*>(*i)) { untested();
-      if(A->args()){ untested();
+    }else if (auto A = dynamic_cast<const Token_ARRAY_*>(*i)) {
+      if(A->args()){
 	auto se = prechecked_cast<Expression const*>(A->args());
 	assert(se);
 	s.stop();
 	make_cc_expression_(o, *se, s);
       }else{ untested();
       }
-      o__ "// array " << (*i)->name() << " " << s.have_args() << "\n";
+      // o__ "// array " << (*i)->name() << " " << s.have_args() << "\n";
       // o__ s.code_name() << " = ";
       std::vector<std::string> argnames;
-      if(A->args()) { untested();
+      if(A->args()) {
 	assert(s.have_args());
 	argnames.resize(s.num_args());
-	for(auto n=argnames.begin(); n!=argnames.end(); ++n){ untested();
+	for(auto n=argnames.begin(); n!=argnames.end(); ++n){
 	  *n = s.code_name();
 	  s.pop();
 	}
@@ -536,12 +536,12 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
       }else if(!argnames.size()){ untested();
 //	o << A->code_name() << "(); // no args\n";
 	s.args_pop();
-      }else{ untested();
+      }else{
 	o << " /*(312)*/ "; //  << A->code_name();
 
 	o << "(";
        	std::string comma = "";
-	for(size_t ii=argnames.size(); ii; --ii){ untested();
+	for(size_t ii=argnames.size(); ii; --ii){
 	  o << comma << argnames[ii-1];
 	  comma = ", ";
 	}

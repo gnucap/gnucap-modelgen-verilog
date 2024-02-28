@@ -1,0 +1,12 @@
+`include "disciplines.vams"
+`pragma modelgen nodump-nature
+`pragma modelgen nodump-discipline
+
+module test_lap0(p, n);
+	(* desc="" *) real dv;
+	electrical p, n;
+	analog begin
+		dv = '{1,2,3};
+		dv = laplace_nd(V(p,n), '{1}, '{1, 0});
+	end
+endmodule

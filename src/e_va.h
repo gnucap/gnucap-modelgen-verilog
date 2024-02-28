@@ -63,7 +63,15 @@ public:
     }
   }
 };
-#endif
+/*--------------------------------------------------------------------------*/
+class COMMON_FILT : public COMMON_COMPONENT {
+public:
+  explicit COMMON_FILT(int i=CC_STATIC) : COMMON_COMPONENT(i) {}
+  ~COMMON_FILT() {}
+public:
+  //virtual DISCIPLINE const* discipline()const{untested(); return NULL;};
+  virtual int args(int) const{ return 0; }
+};
 /*--------------------------------------------------------------------------*/
 inline void e_val(double* p, const double& x, const CARD_LIST*)
 {
@@ -71,4 +79,7 @@ inline void e_val(double* p, const double& x, const CARD_LIST*)
   *p = x;
 }
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+#endif
 // vim:ts=8:sw=2:noet:

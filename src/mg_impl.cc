@@ -373,7 +373,9 @@ std::string Branch::dev_type()const
 {
 //  if( .. attribute .. )?
   if(is_filter()) {
-    return "va_" + _ctrl->label().substr(0,3); // HACK
+    std::string label = "va_" + _ctrl->label();
+    auto pos = label.find_last_of("_");
+    return label.substr(0, pos);
   }else if(!is_direct()){
     if(has_pot_source()){
       return "va_pot_br";
@@ -545,8 +547,14 @@ bool Branch::has_element() const
 {
   if(is_short()){
     return false;
+  }else if( has_flow_source() ){
+    return true;
+  }else if( has_pot_source() ){
+    return true;
+  }else if( has_flow_probe() ){
+    return true;
   }else{
-    return has_flow_source() || has_pot_source() || has_flow_probe();
+    return false;
   }
 }
 /*--------------------------------------------------------------------------*/

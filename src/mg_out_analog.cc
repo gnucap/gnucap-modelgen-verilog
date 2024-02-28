@@ -763,7 +763,7 @@ static void make_cc_set_branch_contributions(std::ostream& o, const Module& m)
       o__ "}else if(_pot" << b->code_name() << "){\n";
       o____ b->code_name() << "->_loss0 = 1./OPT::shortckt;\n";
       o__ "}else{\n";
-      o____ b->code_name() << "->_loss0 = 0.;\n";
+      o____ b->code_name() << "->_loss0 = 0.; // AA\n";
       o__ "}\n";
 
 

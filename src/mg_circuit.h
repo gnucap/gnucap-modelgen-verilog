@@ -125,6 +125,7 @@ public:
 //  void set_owner(Block* b) { _owner = b; }
 //  const std::string& module_or_paramset_identifier()const {return _module_or_paramset_identifier;}
   void set_dev_type(std::string const& s){_module_or_paramset_identifier = s;}
+  void set_eval(std::string const& s){_eval = s;}
   void set_state(std::string const& s){_state = s;}
   virtual std::string dev_type()const {return _module_or_paramset_identifier;}
   virtual Nature const* nature()const {return NULL;}

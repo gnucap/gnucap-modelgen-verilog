@@ -576,6 +576,21 @@ inline PARAMETER<int>& chain(PARAMETER<int>& t, double const&)
 }
 
 
+/*--------------------------------------------------------------------------*/
+class array_{
+  std::vector<double> _v;
+public:
+  array_() {}
+  array_(double a0) {
+    _v.push_back(a0);
+  }
+  array_(double a0, double a1) {
+    _v.push_back(a0);
+    _v.push_back(a1);
+  }
+  size_t size() const{return _v.size();}
+  double const& operator[](int x)const {return _v[x];}
+};
 }
 
 /*--------------------------------------------------------------------------*/
@@ -1186,8 +1201,8 @@ double MOD_resistor::tr_probe_num(std::string const& n) const
   if(n == "conv") {
     return converged();
   }
-  return BASE_SUBCKT::tr_probe_num(n)
-;}
+  return BASE_SUBCKT::tr_probe_num(n);
+}
 /*--------------------------------------------------------------------------*/
 inline void MOD_resistor::read_probes()
 {
@@ -2075,6 +2090,21 @@ inline PARAMETER<int>& chain(PARAMETER<int>& t, double const&)
 }
 
 
+/*--------------------------------------------------------------------------*/
+class array_{
+  std::vector<double> _v;
+public:
+  array_() {}
+  array_(double a0) {
+    _v.push_back(a0);
+  }
+  array_(double a0, double a1) {
+    _v.push_back(a0);
+    _v.push_back(a1);
+  }
+  size_t size() const{return _v.size();}
+  double const& operator[](int x)const {return _v[x];}
+};
 }
 
 /*--------------------------------------------------------------------------*/
@@ -2762,8 +2792,8 @@ double MOD_capacitor::tr_probe_num(std::string const& n) const
   if(n == "conv") {
     return converged();
   }
-  return BASE_SUBCKT::tr_probe_num(n)
-;}
+  return BASE_SUBCKT::tr_probe_num(n);
+}
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::read_probes()
 {
@@ -3512,8 +3542,8 @@ double MOD_capacitor::tr_probe_num(std::string const& n) const
   if(n == "conv") {
     return converged();
   }
-  return BASE_SUBCKT::tr_probe_num(n)
-;}
+  return BASE_SUBCKT::tr_probe_num(n);
+}
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::read_probes()
 {

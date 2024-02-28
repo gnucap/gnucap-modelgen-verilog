@@ -119,9 +119,14 @@ void Expression_::resolve_symbols_(Expression const& e, TData*)
       Float* f = new Float(std::numeric_limits<double>::infinity());
       E.push_back(new Token_CONSTANT(t->name(), f, ""));
     }else if(auto pl = dynamic_cast<Token_PARLIST*>(t)) {
-      trace0("resolve PARLIST");
-      Token_PARLIST_ tt(*pl);
-      tt.stack_op(&E);
+      trace1("resolve PARLIST", t->name());
+      if(t->name() == "}") {
+	Token_ARRAY_ tt(t->name());
+	tt.stack_op(&E);
+      }else{
+	Token_PARLIST_ tt(*pl);
+	tt.stack_op(&E);
+      }
       assert(E.size());
     }else if(auto u = dynamic_cast<Token_UNARY*>(t)){
       Token_UNARY_ bb(*u);
@@ -219,6 +224,9 @@ void Expression_::resolve_symbols_(Expression const& e, TData*)
       incomplete();
 //      Token_PORT p(t);
 //      p.stack_op(E);
+//    }else if(auto a = dynamic_cast<Token_ARRAY*>(t)) { untested();
+//      Token_ARRAY_ A(*a);
+//      A.stack_op(&E);
     }else{
       throw Exception("unresolved symbol: " + n);
     }

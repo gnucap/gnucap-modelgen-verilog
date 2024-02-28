@@ -1,0 +1,31 @@
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_lap_nd1(p, n);
+	(* desc="" *) real dv;
+	electrical p, n;
+	analog begin
+		dv = laplace_nd(V(p) - V(n), '{1}, '{1});
+	end
+endmodule
+
+!make test_lap_nd1.so > /dev/null
+attach ./test_lap_nd1.so
+
+verilog
+parameter r=1
+parameter v=0
+
+test_lap_nd1 #() dut(1,0);
+vsine #(.dc(v), .ampl(1)) v1(1, 0);
+
+list
+
+print tran v(1) dv(dut) i(dut._b*) vin(dut.*) iter(0)
+// y(dut.ddt_0) iof(dut.ddt_0) iter(0)
+tran 1 .1 trace=n
+status notime
+end

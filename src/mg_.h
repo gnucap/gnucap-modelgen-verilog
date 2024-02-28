@@ -415,22 +415,6 @@ private:
 
 };
 /*--------------------------------------------------------------------------*/
-#if 0
-class Branch_Names {
-  typedef std::string key;
-  typedef std::map<key, Branch_Ref> map; // set?
-  typedef map::const_iterator const_iterator;
-private:
-  map _m;
-public:
-  explicit Branch_Names() {}
-  Branch_Ref const& new_name(std::string const&, Branch_Ref const&);
-  Branch_Ref lookup(std::string const&) const;
-
-  void clear();
-};
-#endif
-/*--------------------------------------------------------------------------*/
 class Probe_Map : public std::map<std::string, Probe*> {
 public:
   ~Probe_Map();

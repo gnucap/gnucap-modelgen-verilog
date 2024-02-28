@@ -82,6 +82,7 @@ public:
     return t;
   }
   Expression const* args()const { return _args; }
+  size_t size()const { return _args?_args->size():0; }
   void set_args(Expression const* e) {assert(!(_args && e)); _args = e;}
 };
 #endif
