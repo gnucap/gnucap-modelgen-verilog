@@ -993,9 +993,11 @@ void Block::new_var_ref(Base* what)
   assert(what);
   std::string p;
   auto V = dynamic_cast<Variable const*>(what);
+  auto P = dynamic_cast<Parameter_2 const*>(what);
+
   if(V){
     p = V->name();
-  }else if(auto P = dynamic_cast<Parameter_2 const*>(what)){
+  }else if(P){
     p = P->name();
   }else if(auto A = dynamic_cast<Aliasparam const*>(what)){ untested();
     p = A->name();
@@ -1007,6 +1009,8 @@ void Block::new_var_ref(Base* what)
     incomplete();
     assert(false);
   }
+
+  trace3("new_var_ref", V, p, dynamic_cast<Paramset const*>(this));
 
   auto m = dynamic_cast<Module const*>(this);
   if(!m){
@@ -1029,8 +1033,22 @@ void Block::new_var_ref(Base* what)
   }else if(dynamic_cast<Analog_Function_Arg const*>(cc)
    &&!dynamic_cast<Analog_Function_Arg const*>(what)){
     _var_refs[p] = cc;
+//   }else if(V && V->is_mangled()){ untested();
+//     p = p.substr(2);
+//     _var_refs[p] = what;
   }else if(p.substr(0,2)==PS_MANGLE_PREFIX) {
-    p = p.substr(2);
+    if(P && dynamic_cast<Paramset const*>(this)){
+      p = p.substr(2);
+    }else if(V && dynamic_cast<Paramset const*>(V->owner())){
+      assert(V->owner()==this);
+      p = p.substr(2);
+    }else if(V && !V->owner()){ untested();
+      p = p.substr(2);
+    }else if(!V){
+      // not applicable
+    }else{
+      // user requested PS_MANGLE_PREFIX
+    }
     _var_refs[p] = what;
   }else if(dynamic_cast<Paramset_Stmt const*>(what)){
     _var_refs[p] = what;

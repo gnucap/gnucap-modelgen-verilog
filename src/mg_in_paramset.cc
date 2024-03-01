@@ -301,21 +301,13 @@ static void import_proto_vars(Module* sub, Module const* proto)
     for (auto y : *x) {
       trace1("import_var", y->name());
       auto p = sub->lookup(y->name(), false);
-      auto q = dynamic_cast<Variable_Decl const*>(p);
+      assert(!dynamic_cast<Variable_Decl const*>(p));
       auto P = dynamic_cast<Parameter_2 const*>(p);
-      assert(q||!p||P);
+      assert(!p||P);
 
-      if(P){
-      }else{
-      }
-      if(q){ untested();
-	unreachable();
-	assert(0);
-      } else {
-	trace2("import_var2", x->type(), y->name());
-	o << comma << PS_MANGLE_PREFIX << y->name() << "";
-	comma = ", ";
-      }
+      trace2("import_var2", x->type(), y->name());
+      o << comma << PS_MANGLE_PREFIX << y->name();
+      comma = ", ";
     }
 
     o << ";";

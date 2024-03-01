@@ -1,0 +1,35 @@
+
+
+module underscore0();
+  real   __V;
+
+  analog begin
+    __V = 1;
+  end
+
+  analog begin
+    begin
+      __V = 1;
+    end
+  end
+
+endmodule
+module underscore1();
+  localparam real __L = 0.;
+
+  analog begin
+    real R;
+    R = __L;
+  end
+
+  analog begin
+    begin
+      real R;
+      R = __L;
+    end
+  end
+
+endmodule
+
+
+
