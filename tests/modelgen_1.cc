@@ -98,7 +98,7 @@ public:
       file.reset(here);
       file.reset();
       trace1("paramset", name);
-    }else{ untested();
+    }else{
     }
 
     cmd >> "`endmodelgen";

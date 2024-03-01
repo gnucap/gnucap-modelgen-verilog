@@ -243,6 +243,7 @@ void VAPOT::set_parameters(const std::string& Label, CARD *Owner,
 
     _m0_ = new double[n_states-2];
     _m1_ = new double[n_states-2];
+    std::fill_n(_m1_, _n_ports-1, 0.);
 
     if (matrix_nodes() > NODES_PER_BRANCH) {
       // allocate a bigger node list
