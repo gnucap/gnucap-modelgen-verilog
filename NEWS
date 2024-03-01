@@ -2,6 +2,11 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
+20240229-dev
+============
+* laplace_nd
+* $debug
+
 20240220
 ========
 * array parse/dump

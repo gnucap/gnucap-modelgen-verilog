@@ -1,0 +1,28 @@
+
+attach ./modelgen_1.so
+
+verilog
+
+`modelgen
+module test_debug0(p, n);
+  electrical p, n;
+  parameter real r=1;
+  analog begin
+		$debug("test %f\n", V(p,n));
+		I(p,n) <+ V(p,n)/r;
+	end
+endmodule
+`endmodelgen
+
+!make test_debug0.so > /dev/null
+
+attach ./test_debug0.so
+
+verilog
+
+test_debug0 #(.r(2)) r(1, 0);
+isource #(.dc(5)) i(0, 1);
+
+print dc v(nodes) iter(0)
+dc
+status notime

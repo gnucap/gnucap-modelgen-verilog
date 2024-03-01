@@ -69,6 +69,52 @@ private:
 DISPATCHER<FUNCTION>::INSTALL d_bound_step(&function_dispatcher, "$bound_step", &bound_step);
 /*--------------------------------------------------------------------------*/
 static size_t cnt;
+class DEBUG_TASK : public MGVAMS_TASK {
+public:
+  explicit DEBUG_TASK() : MGVAMS_TASK(){
+  }
+private:
+  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+    return "$$debug";
+  }
+  MGVAMS_TASK* clone()const override {
+    return new DEBUG_TASK(*this);
+  }
+  Token* new_token(Module& m, size_t na)const override{
+    MGVAMS_TASK* cl = clone();
+    cl->set_num_args(na);
+    cl->set_label("t_debug_" + std::to_string(cnt++));
+    m.push_back(cl);
+    return new Token_CALL("$debug", cl);
+  }
+  void make_cc_precalc(std::ostream& o)const override {
+    o__ "void " << label() << "(std::string const&";
+    for(size_t i=1; i<num_args(); ++i) {
+      o << ", double";
+    }
+    o << "){\n";
+    o__ "}\n";
+  }
+  void make_cc_dev(std::ostream& o)const override {
+    o__ "void " << label() << "(std::string const& a0";
+    for(size_t i=1; i<num_args(); ++i) {
+      o << ", double a" << i;
+    }
+    o << "){\n";
+    o______ "fprintf(stdout, a0.c_str()";
+    for(size_t i=1; i<num_args(); ++i) {
+      o << ", a" << i;
+    }
+    o << ");\n";
+    o__ "}\n";
+  }
+  std::string code_name()const override{
+    return "d->" + label();
+  }
+  bool returns_void()const override { return true; }
+} debug;
+DISPATCHER<FUNCTION>::INSTALL d_debug(&function_dispatcher, "$debug", &debug);
+/*--------------------------------------------------------------------------*/
 class STROBE_TASK : public MGVAMS_TASK {
 public:
   explicit STROBE_TASK() : MGVAMS_TASK(){
