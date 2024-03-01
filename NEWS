@@ -4,8 +4,12 @@ This file summarizes new features and important changes between snapshots.
 
 20240229-dev
 ============
-* laplace_nd
-* $debug
+* build system improvements
+* un-hack filter evaluation in do_tr
+* laplace_nd filter
+* $debug task
+* bugfix uninitialised state in sources
+* hotfix name unmangling
 
 20240220
 ========
