@@ -1,0 +1,19 @@
+options trace
+verilog
+
+// va_laplace_nd #(.n0(1.), .d0(2.), .d1(1.)) b(0,out1,in,0); // pole -2
+// va_laplace_nd #(.n0(1.), .n1(2.), .d0(1.)) b(0,out1,in,0);
+// va_laplace_nd #(.n0(-1.), .n1(1.), .d0(1.)) b(0,out1,in,0); // ??
+va_laplace_nd #(.n0(1.), .d0(0.5), .d2(-1.)) b(0,out1,in,0);
+resistor #(1.) r1(out1,0);
+resistor #(1.) r1(in,0);
+
+list
+spice
+
+i1 in 0 ac 1
+
+.print op v(nodes)
+.op
+
+.end

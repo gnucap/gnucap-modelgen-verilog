@@ -129,8 +129,8 @@ public:
     _st_b_out_ = NULL;
     delete[] _state;
     _state = NULL;
-    // if(_set_parameters){
-    // }else{
+    // if(_set_parameters){ untested();
+    // }else{ untested();
     //   delete[] _st_b_in_;
     //   _st_b_in_ = NULL;
     // }
@@ -513,7 +513,7 @@ LAPLACE::LAPLACE(LAPLACE const&p) : ELEMENT(p)
     assert(_n);
     assert(int_nodes() + max_nodes() <= NODES_PER_BRANCH); // not expanded yet.
 //    _n = new node_t[int_nodes() + max_nodes()];
-//    for (int ii = 0; ii < p.net_nodes(); ++ii) {
+//    for (int ii = 0; ii < p.net_nodes(); ++ii) { untested();
 //      _n[ii] = p._n[ii];
 //    }
   }else{ untested();
@@ -679,7 +679,7 @@ void LAPLACE::expand()
       }else{ untested();
       }
 
-      std::vector<node_t> nodes(num_num*2 + 2);
+      std::vector<node_t> nodes(num_s*2 + 2);
       nodes[0] = _n[n_out0];
       nodes[1] = _n[n_out1];
       int jj;
