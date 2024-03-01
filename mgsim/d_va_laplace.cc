@@ -118,7 +118,7 @@ private: // construct
 public:
   explicit LAPLACE();
   ~LAPLACE() {
-    if (net_nodes() > NODES_PER_BRANCH) { untested();
+    if (net_nodes() > NODES_PER_BRANCH) {
       delete [] _n;
     }else{
       // it is part of a base class

@@ -1,0 +1,29 @@
+
+attach ./modelgen_1.so
+
+verilog
+
+`modelgen
+module base(p, n);
+  electrical p, n;
+  parameter real r=1;
+  analog I(p,n) <+ V(p,n)/r;
+endmodule
+paramset test_ps1 base
+  parameter real r=1;
+  .r = r;
+endparamset
+`endmodelgen
+
+!make test_ps1.so > /dev/null
+
+attach ./test_ps1.so
+
+verilog
+
+test_ps1 #(.r(2)) r(1, 0);
+isource #(.dc(5)) i(0, 1);
+
+print dc v(nodes) iter(0)
+dc
+status notime

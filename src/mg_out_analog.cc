@@ -616,7 +616,7 @@ static void make_set_self_contribution(std::ostream& o, Dep const& d)
     o__ "}else{\n";
     o____ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
     o__ "}\n";
-  }else if(both && d->is_flow_probe()) { untested();
+  }else if(both && d->is_flow_probe()) {
     o__ "// self flow\n";
     o__ "if (_pot"<< b->code_name() << "){\n";
     o____ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
@@ -820,7 +820,7 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Variable_Decl&
     V, Module const& m) const
 {
   if(_mode == modePRECALC){
-    if(V.type().is_int()) { untested();
+    if(V.type().is_int()) {
       o__ "int";
     }else if(V.type().is_real()) {
       o__ "ddouble";
@@ -831,7 +831,7 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Variable_Decl&
     o << " " << V.code_name() << "(m->" << V.code_name() << ");\n";
     o__ "(void) " << V.code_name() << ";\n";
   }else if(!V.is_module_variable()){ untested();
-  }else if(V.type().is_int()) { untested();
+  }else if(V.type().is_int()) {
     o__ "int& " << V.code_name() << "(d->" << V.code_name() << ");\n";
   }else if(V.type().is_real()) {
     if(V.deps().ddeps().size() == 0){
@@ -848,7 +848,7 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Variable_Decl&
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_one_variable_store(std::ostream& o, const Variable_Decl& V) const
 {
-  if(!V.type().is_real()) { untested();
+  if(!V.type().is_real()) {
   }else if(!V.is_module_variable()){ untested();
     unreachable();
   }else if(_mode == modePRECALC){ untested();

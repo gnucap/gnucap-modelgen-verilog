@@ -68,6 +68,8 @@ ${gc_out}: ${TEST_PLUGINS} ${SYMLINKS}
 # this is a hack: link *.o
 modelgen_0.so: modelgen_0.cc ../src/gnucap-mg-vams
 	${CXX} -shared -fPIC ${GNUCAP_CPPFLAGS} ${CPPFLAGS} ${MAKE_CPPFLAGS} ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< ../src/*.o -o $@ # makefile.in
+modelgen_1.so: modelgen_1.cc ../src/gnucap-mg-vams
+	${CXX} -shared -fPIC ${GNUCAP_CPPFLAGS} ${CPPFLAGS} ${MAKE_CPPFLAGS} ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< ../src/*.o -o $@ # makefile.in
 
 ${diff}: ${TARGETDIR}/%.diff: ${TARGETDIR}/%.out
 	@if [ ! -f ${ref}/$*.out ]; then \

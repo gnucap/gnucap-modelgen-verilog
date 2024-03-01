@@ -1,0 +1,41 @@
+
+attach ./modelgen_1.so
+
+verilog
+
+`modelgen
+module base(p, n);
+  electrical p, n;
+  parameter real r=1;
+  parameter real s=1;
+  analog begin
+		if($param_given(r)) begin
+			$strobe("r given\n");
+		end else begin
+			$strobe("r not given\n");
+		end
+		if($param_given(s)) begin
+			$strobe("s given\n");
+		end else begin
+			$strobe("s not given\n");
+		end
+  end
+endmodule
+paramset test_ps2 base
+  parameter real r=1;
+  .r = r;
+endparamset
+`endmodelgen
+
+!make test_ps2.so > /dev/null
+
+attach ./test_ps2.so
+
+verilog
+
+test_ps2 #(.r(2)) r(1, 0);
+test_ps2 #() r(1, 0);
+
+print dc v(nodes) iter(0)
+dc
+status notime
