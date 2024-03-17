@@ -649,10 +649,10 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
     _vi0 = new double[n_states];
     _vi1 = new double[n_states];
 
-    if (net_nodes() > NODES_PER_BRANCH) { itested();
+    if (net_nodes() > NODES_PER_BRANCH) { untested();
       // allocate a bigger node list
       _n = new node_t[net_nodes()];
-    }else{
+    }else{ untested();
       // use the default node list, already set
     }      
   }else{itested();
@@ -669,7 +669,8 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
   std::fill_n(_vy1, n_states, 0.);
   std::fill_n(_vi0, n_states, 0.);
   std::fill_n(_vi1, n_states, 0.);
-  notstd::copy_n(nodes, net_nodes(), _n);
+  trace3("set_parameters", n_nodes, net_nodes(), _n_ports);
+  notstd::copy_n(nodes, n_nodes, _n);
   assert(net_nodes() == _n_ports * 2);
 }
 /*--------------------------------------------------------------------------*/

@@ -6,6 +6,7 @@ This file summarizes new features and important changes between snapshots.
 ============
 * fix allocation in laplace
 * revisit build system
+* fix uninitialised access in *dt filter
 * ..
 
 20240229-dev
