@@ -5,6 +5,7 @@
 #include <e_subckt.h>
 #include <e_node.h>
 #include <e_elemnt.h>
+#include <e_storag.h>
 // #include <e_paramlist.h>
 #include <u_nodemap.h>
 /*                        -*- C++ -*-
@@ -36,6 +37,7 @@
 #include <md.h>
 #include <u_parameter.h>
 #include <l_stlextra.h>
+#include <e_storag.h>
 #include <e_base.h> // CKT_BASE
 #include <u_sim_data.h> // see simparam
 
@@ -711,6 +713,11 @@ public:
 /*--------------------------------------------------------------------------*/
 } // va
 /*--------------------------------------------------------------------------*/
+class FILTER {
+public:
+   virtual double read_filter()const {unreachable(); return 0;}
+};
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 /*--------------------------------------------------------------------------*/
@@ -780,7 +787,15 @@ public:
     }
   }
 };
-#endif
+/*--------------------------------------------------------------------------*/
+class COMMON_FILT : public COMMON_COMPONENT {
+public:
+  explicit COMMON_FILT(int i=CC_STATIC) : COMMON_COMPONENT(i) {}
+  ~COMMON_FILT() {}
+public:
+  //virtual DISCIPLINE const* discipline()const{untested(); return NULL;};
+  virtual int args(int) const{ return 0; }
+};
 /*--------------------------------------------------------------------------*/
 inline void e_val(double* p, const double& x, const CARD_LIST*)
 {
@@ -788,9 +803,13 @@ inline void e_val(double* p, const double& x, const CARD_LIST*)
   *p = x;
 }
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+#endif
 // vim:ts=8:sw=2:noet:
 #include <u_limit.h>
 /*--------------------------------------------------------------------------*/
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #pragma GCC diagnostic ignored "-Wshadow"
 const double NA(NOT_INPUT);
 const double INF(BIGBIG);
@@ -1226,11 +1245,13 @@ MOD_resistor::MOD_resistor()
 /*--------------------------------------------------------------------------*/
 bool MOD_resistor::tr_needs_eval()const
 {
-  trace1("resistor::needs_eval?", long_label());
+  trace2("resistor::needs_eval?", long_label(), has_probes());
   node_t gnd(&ground_node);
   if (is_q_for_eval()) { untested();
     return false;
   }else if (!converged()) {
+    return true;
+  }else if (has_probes()) {
     return true;
   }else  if( !conchk(_potential_b_p_n, _n[n_p].v0() - _n[n_n].v0(), 1e-6)){
     return true;
@@ -1241,7 +1262,7 @@ bool MOD_resistor::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 bool MOD_resistor::do_tr()
 {
-  trace2("resistor::do_tr", this, long_label());
+  trace3("resistor::do_tr", this, long_label(), _sim->iteration_number());
   clear_branch_contributions();
   read_probes();
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
@@ -1459,7 +1480,7 @@ void MOD_resistor::expand()
         throw Exception("Cannot find va_flow. Load module?");
       }else{
       }
-      _b_p_n = dynamic_cast<ELEMENT*>(p->clone());
+      _b_p_n = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_p_n){
         throw Exception("Cannot use va_flow: wrong type");
       }else{
@@ -1519,6 +1540,7 @@ void MOD_resistor::precalc_last()
 #include <e_subckt.h>
 #include <e_node.h>
 #include <e_elemnt.h>
+#include <e_storag.h>
 // #include <e_paramlist.h>
 #include <u_nodemap.h>
 /*                        -*- C++ -*-
@@ -1550,6 +1572,7 @@ void MOD_resistor::precalc_last()
 #include <md.h>
 #include <u_parameter.h>
 #include <l_stlextra.h>
+#include <e_storag.h>
 #include <e_base.h> // CKT_BASE
 #include <u_sim_data.h> // see simparam
 
@@ -2225,6 +2248,11 @@ public:
 /*--------------------------------------------------------------------------*/
 } // va
 /*--------------------------------------------------------------------------*/
+class FILTER {
+public:
+   virtual double read_filter()const {unreachable(); return 0;}
+};
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 /*--------------------------------------------------------------------------*/
@@ -2294,7 +2322,15 @@ public:
     }
   }
 };
-#endif
+/*--------------------------------------------------------------------------*/
+class COMMON_FILT : public COMMON_COMPONENT {
+public:
+  explicit COMMON_FILT(int i=CC_STATIC) : COMMON_COMPONENT(i) {}
+  ~COMMON_FILT() {}
+public:
+  //virtual DISCIPLINE const* discipline()const{untested(); return NULL;};
+  virtual int args(int) const{ return 0; }
+};
 /*--------------------------------------------------------------------------*/
 inline void e_val(double* p, const double& x, const CARD_LIST*)
 {
@@ -2302,9 +2338,13 @@ inline void e_val(double* p, const double& x, const CARD_LIST*)
   *p = x;
 }
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+#endif
 // vim:ts=8:sw=2:noet:
 #include <u_limit.h>
 /*--------------------------------------------------------------------------*/
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #pragma GCC diagnostic ignored "-Wshadow"
 const double NA(NOT_INPUT);
 const double INF(BIGBIG);
@@ -2492,10 +2532,10 @@ public:
      num_branches__  };
 public:
   explicit PRECALC_capacitor(MOD_capacitor*d) : _d(d) {}
-    ddouble _b_ddt_1(ddouble){
-    ddouble ret = 0.;
-    ret[d_potential_b_ddt_1_p_ddt_1_n] = -1.;
-    return ret;
+  ddouble _b_ddt_1(ddouble){
+  ddouble ret = 0.;
+  ret[d_potential_b_ddt_1_p_ddt_1_n] = -1.;
+  return ret;
 }
 };
 /*--------------------------------------------------------------------------*/
@@ -2818,11 +2858,13 @@ MOD_capacitor::MOD_capacitor()
 /*--------------------------------------------------------------------------*/
 bool MOD_capacitor::tr_needs_eval()const
 {
-  trace1("capacitor::needs_eval?", long_label());
+  trace2("capacitor::needs_eval?", long_label(), has_probes());
   node_t gnd(&ground_node);
   if (is_q_for_eval()) { untested();
     return false;
   }else if (!converged()) {
+    return true;
+  }else if (has_probes()) {
     return true;
   }else   if(_sim->is_first_iteration()){
     return true;
@@ -2835,7 +2877,7 @@ bool MOD_capacitor::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 bool MOD_capacitor::do_tr()
 {
-  trace2("capacitor::do_tr", this, long_label());
+  trace3("capacitor::do_tr", this, long_label(), _sim->iteration_number());
   clear_branch_contributions();
   read_probes();
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
@@ -3060,7 +3102,7 @@ void MOD_capacitor::expand()
         throw Exception("Cannot find va_ddt. Load module?");
       }else{
       }
-      _b_ddt_1_p_ddt_1_n = dynamic_cast<ELEMENT*>(p->clone());
+      _b_ddt_1_p_ddt_1_n = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_ddt_1_p_ddt_1_n){
         throw Exception("Cannot use va_ddt: wrong type");
       }else{
@@ -3071,8 +3113,11 @@ void MOD_capacitor::expand()
       {
         node_t nodes[] = {_n[n_p], _n[n_n], _n[n_p], _n[n_n]}; // nodes
         _b_ddt_1_p_ddt_1_n->set_parameters("_b_ddt_1_p_ddt_1_n", this, _b_ddt_1_p_ddt_1_n->mutable_common(), 0., /*states:*/3, _st_b_ddt_1_p_ddt_1_n, 4, nodes);
-        _b_ddt_1_p_ddt_1_n->_loss0 = 0.;
-        _b_ddt_1_p_ddt_1_n->_loss1 = 0.;
+        if(auto e = dynamic_cast<ELEMENT*>(_b_ddt_1_p_ddt_1_n)){
+          e->_loss0 = 0.;
+          e->_loss1 = 0.;
+        }else{
+        }
       }
     }
   // branch (p, n)
@@ -3083,7 +3128,7 @@ void MOD_capacitor::expand()
         throw Exception("Cannot find va_flow. Load module?");
       }else{
       }
-      _b_p_n = dynamic_cast<ELEMENT*>(p->clone());
+      _b_p_n = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_p_n){
         throw Exception("Cannot use va_flow: wrong type");
       }else{
@@ -3142,7 +3187,6 @@ MOD_capacitor::ddouble MOD_capacitor::_b_ddt_1(ddouble t0)
     d->_st_b_ddt_1_p_ddt_1_n[MOD::_st_b_ddt_1_p_ddt_1_n_::dep_potential_b_p_n]  = + t0[d_potential_b_p_n]; // (4)
   // subdevice
   t0 = 0.;
-  trace2("filt", t0, d->_b_ddt_1_p_ddt_1_n->tr_outvolts());
   t0[d_potential_b_ddt_1_p_ddt_1_n] = 1.;
   assert(t0 == t0);
   return t0; // (output)
@@ -3221,10 +3265,10 @@ public:
      num_branches__  };
 public:
   explicit PRECALC_capacitor(MOD_capacitor*d) : _d(d) {}
-    ddouble _b_ddt_2(ddouble){
-    ddouble ret = 0.;
-    ret[d_potential_b_ddt_2_p_ddt_2_n] = -1.;
-    return ret;
+  ddouble _b_ddt_2(ddouble){
+  ddouble ret = 0.;
+  ret[d_potential_b_ddt_2_p_ddt_2_n] = -1.;
+  return ret;
 }
 };
 /*--------------------------------------------------------------------------*/
@@ -3568,11 +3612,13 @@ MOD_capacitor::MOD_capacitor()
 /*--------------------------------------------------------------------------*/
 bool MOD_capacitor::tr_needs_eval()const
 {
-  trace1("capacitor::needs_eval?", long_label());
+  trace2("capacitor::needs_eval?", long_label(), has_probes());
   node_t gnd(&ground_node);
   if (is_q_for_eval()) { untested();
     return false;
   }else if (!converged()) {
+    return true;
+  }else if (has_probes()) {
     return true;
   }else   if(_sim->is_first_iteration()){
     return true;
@@ -3585,7 +3631,7 @@ bool MOD_capacitor::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 bool MOD_capacitor::do_tr()
 {
-  trace2("capacitor::do_tr", this, long_label());
+  trace3("capacitor::do_tr", this, long_label(), _sim->iteration_number());
   clear_branch_contributions();
   read_probes();
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
@@ -3621,7 +3667,7 @@ inline void MOD_capacitor::set_branch_contributions()
   }else if(_pot_b_p_n){
     _b_p_n->_loss0 = 1./OPT::shortckt;
   }else{
-    _b_p_n->_loss0 = 0.;
+    _b_p_n->_loss0 = 0.; // AA
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -3862,7 +3908,7 @@ void MOD_capacitor::expand()
         throw Exception("Cannot find va_ddt. Load module?");
       }else{
       }
-      _b_ddt_2_p_ddt_2_n = dynamic_cast<ELEMENT*>(p->clone());
+      _b_ddt_2_p_ddt_2_n = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_ddt_2_p_ddt_2_n){
         throw Exception("Cannot use va_ddt: wrong type");
       }else{
@@ -3883,7 +3929,7 @@ void MOD_capacitor::expand()
         throw Exception("Cannot find va_sw. Load module?");
       }else{
       }
-      _b_p_n = dynamic_cast<ELEMENT*>(p->clone());
+      _b_p_n = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_p_n){
         throw Exception("Cannot use va_sw: wrong type");
       }else{
@@ -3940,10 +3986,9 @@ MOD_capacitor::ddouble MOD_capacitor::_b_ddt_2(ddouble t0)
     assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
     // assert(!d->_st_b_ddt_2_p_ddt_2_n[2]);
     d->_st_b_ddt_2_p_ddt_2_n[MOD::_st_b_ddt_2_p_ddt_2_n_::dep_potential_b_p_n]  = + t0[d_potential_b_p_n]; // (4)
-  d->_b_ddt_2_p_ddt_2_n->do_tr();
-  t0 = d->_b_ddt_2_p_ddt_2_n->tr_amps();
-  d->_potential_b_ddt_2_p_ddt_2_n = t0; // xx
-  trace2("filt", t0, d->_b_ddt_2_p_ddt_2_n->tr_outvolts());
+  auto e = prechecked_cast<ELEMENT const*>(d->_b_ddt_2_p_ddt_2_n);
+  assert(e);
+  d->_potential_b_ddt_2_p_ddt_2_n = t0 = e->tr_amps(); // (236)
   t0[d_potential_b_ddt_2_p_ddt_2_n] = 1.;
   assert(t0 == t0);
   return t0; // (node)

@@ -1,39 +1,18 @@
-# makefile for mgvams tests
-#TODO
-#srcdir = @SRCDIR@
-#top_srcdir = @TOP_SRCDIR@
-
-CXX = $(shell $(GNUCAP_CONF) --cxx)
-GNUCAP_CPPFLAGS = $(shell $(GNUCAP_CONF) --cppflags) -DADD_VERSION -DPIC
-GNUCAP_CXXFLAGS = $(shell $(GNUCAP_CONF) --cxxflags) -std=c++11
-MAKE_CPPFLAGS = -I${top_srcdir}/src
-CPPFLAGS = -DTRACE_UNTESTED
-SYMLINKS = ${PWD}/disciplines.vams ${PWD}/constants.vams ${PWD}/sub
-LN_S = ln -sf
-DIFF = diff -rup
-
-include ${srcdir}/Make1
-# include Make3?
-all: ${TEST_PLUGINS}
-TESTCASES =
-REFDIR = ref
-
-# untested;
-TARGETDIR = check
-
-ref = ${REFDIR}
-
-ENV = GNUCAP_PLUGPATH=${top_builddir}:$(plugpath)
+# tests Make3
+#
+ENV = GNUCAP_PLUGPATH=${top_builddir}:$(plugpath) top_srcdir=${top_srcdir} srcdir=${srcdir}
 
 glob_dump = $(shell cd ${srcdir}; ls dump*.vams)
 glob_pp = $(shell cd ${srcdir}; ls *.vapp)
 glob_v = $(shell cd ${srcdir}; ls v*.gc)
 glob_mg = $(shell cd ${srcdir}; ls mg*.gc)
+glob_sh = $(shell cd ${srcdir}; ls *.sh)
 
 filt_dump = $(filter ${TESTCASES}%, ${glob_dump})
 filt_pp   = $(filter ${TESTCASES}%, ${glob_pp})
 filt_v    = $(filter ${TESTCASES}%, ${glob_v})
 filt_mg   = $(filter ${TESTCASES}%, ${glob_mg})
+filt_sh   = $(filter ${TESTCASES}%, ${glob_sh})
 
 dump_out = ${filt_dump:%=${TARGETDIR}/%.out}
 dump_diff = ${filt_dump:%=${TARGETDIR}/%.diff}
@@ -47,7 +26,10 @@ mg_out = ${filt_mg:%=${TARGETDIR}/%.out}
 gc_out = ${v_out} ${mg_out}
 gc_diff = ${gc_out:%.out=%.diff}
 
-diff = ${dump_diff} ${gc_diff} ${pp_diff}
+sh_out = ${filt_sh:%=${TARGETDIR}/%.out}
+sh_diff = ${filt_sh:%=${TARGETDIR}/%.diff}
+
+diff = ${dump_diff} ${gc_diff} ${pp_diff} ${sh_diff}
 
 # TODO: maybe cat the diff, so it can be logged?
 check: ${TARGETDIR}/${TESTCASES}.diff
@@ -89,11 +71,11 @@ prep: ${SYMLINKS}
 	-mkdir -p ${TARGETDIR}
 
 ${v_out}: ${TARGETDIR}/v%.gc.out: prep
-	@${ENV} ${GNUCAP} ${GNUCAP_ARGS} ${srcdir}/v$*.gc |tail -n +12 | \
+	-@${ENV} ${GNUCAP} ${GNUCAP_ARGS} ${srcdir}/v$*.gc |tail -n +12 | \
 		grep -v '^stashing\ as' | grep -v 'already\ installed' | grep -v ^make > $@
 
 ${mg_out}: ${TARGETDIR}/mg%.gc.out: prep
-	@${ENV} ${GNUCAP} ${GNUCAP_ARGS} ${MG_ARGS} ${srcdir}/mg$*.gc |tail -n +12 | \
+	-@${ENV} ${GNUCAP} ${GNUCAP_ARGS} ${MG_ARGS} ${srcdir}/mg$*.gc |tail -n +12 | \
 		grep -v '^stashing\ as' | grep -v 'already\ installed' | grep -v ^make > $@
 
 ${pp_out}: ${TARGETDIR}/%.vapp.out: prep
@@ -110,14 +92,12 @@ ${dump_out}: ${TARGETDIR}/%.vams.out: prep
 	@cat ${TARGETDIR}/$*.err >> $@
 	@rm ${TARGETDIR}/$*.err
 
+${sh_out}: ${TARGETDIR}/%.sh.out: prep
+	-@${ENV} ${srcdir}/$*.sh ${MODELGEN} > $@
+
 ${PWD}/disciplines.vams:
 	-${LN_S} ${top_srcdir}/vams/disciplines.vams
 ${PWD}/constants.vams:
 	-${LN_S} ${top_srcdir}/vams/constants.vams
 ${PWD}/sub:
 	-${LN_S} ${srcdir}/sub
-
-include ${top_srcdir}/Make3
-
-.PHONY: ${diff} ${v_out} ${gc_out} ${pp_out} ${dump_out} check diff prep
-.DELETE_ON_ERROR:

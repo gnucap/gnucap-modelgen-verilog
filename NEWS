@@ -2,6 +2,12 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
+2024033*-dev
+============
+* fix allocation in laplace
+* revisit build system
+* ..
+
 20240229-dev
 ============
 * build system improvements

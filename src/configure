@@ -24,13 +24,17 @@ else
 fi
 
 shift
+srcdir=$(dirname $0)
 
 if test "x${1#--srcdir=}" != "x$1"; then
     srcdir=${1#--srcdir=}
-    # echo "Found --srcdir in input args.  Setting srcdir $srcdir."
-else
-    echo need srcdir >&2
-    exit 1
+    # echo "Found --srcdir in input args."
+fi
+
+# abs_srcdir=$(cd $srcdir; pwd)
+if [ ! -f $srcdir/config.h.in ]; then
+	echo could not find source directory
+	exit 1
 fi
 
 top_srcdir=$srcdir/..
@@ -65,3 +69,6 @@ include \${srcdir}/Make.depend
 #------------------------------------------------------------------------
 
 CAT_EOF
+
+echo src configure done.
+echo srcdir is \"$srcdir\".

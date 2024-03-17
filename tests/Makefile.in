@@ -1,0 +1,30 @@
+# makefile for mgvams tests
+#TODO
+#srcdir = @SRCDIR@
+#top_srcdir = @TOP_SRCDIR@
+
+CXX = $(shell $(GNUCAP_CONF) --cxx)
+GNUCAP_CPPFLAGS = $(shell $(GNUCAP_CONF) --cppflags) -DADD_VERSION -DPIC
+GNUCAP_CXXFLAGS = $(shell $(GNUCAP_CONF) --cxxflags) -std=c++11
+MAKE_CPPFLAGS = -I${top_srcdir}/src
+CPPFLAGS = -DTRACE_UNTESTED
+SYMLINKS = ${PWD}/disciplines.vams ${PWD}/constants.vams ${PWD}/sub
+LN_S = ln -sf
+DIFF = diff -rup
+
+include ${srcdir}/Make1
+# include Make3?
+all: ${TEST_PLUGINS}
+TESTCASES =
+REFDIR = ref
+
+# untested;
+TARGETDIR = check
+
+ref = ${REFDIR}
+
+include ${srcdir}/Make3
+include ${top_srcdir}/Make3
+
+.PHONY: ${diff} ${v_out} ${gc_out} ${pp_out} ${dump_out} check diff prep
+.DELETE_ON_ERROR:

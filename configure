@@ -8,6 +8,9 @@ echo -n '# ' > config.log
 date >> config.log
 echo $0 "$@" >> config.log
 
+#-------------  transition
+# stale. from previous snapshot.
+find . -name makefile -delete
 #-------------  Stuff added to enable --prefix  --------------
 if test "x$1" != "x"; then
     # echo Found input parameter -- $1
@@ -37,11 +40,11 @@ if [ ! -f $srcdir/NEWS ]; then
 	exit 1
 fi
 
-echo \# created by $PWD/$0. do not edit >makefile
-echo \#------------------------------------------------------------------------ >>makefile
-echo "srcdir = $srcdir" >> makefile
-echo "VPATH = \${srcdir}" >> makefile
-cat $srcdir/makefile.in >> makefile
+echo \# created by $PWD/$0. do not edit >Makefile
+echo \#------------------------------------------------------------------------ >>Makefile
+echo "srcdir = $srcdir" >> Makefile
+echo "VPATH = \${srcdir}" >> Makefile
+cat $srcdir/Makefile.in >> Makefile
 #----------------------------------------------------------------
 echo "CCFLAGS = \\" >Make.ccflags
 echo "-DUNIX -O2 -DNDEBUG -I. -I../include -I../../include -W" >>Make.ccflags
@@ -82,19 +85,22 @@ esac
 #------------------------------------------------------------------------
 sub_configure() {
 	echo sub_configure $1
+	m="$1/Makefile"
 	if [ "$top_srcdir_" = ".." ]; then
 		srcdir_=".";
 	else
 		srcdir_="$top_srcdir_/$1";
 	fi
-	(
-		cd $1
-		$top_srcdir_/$1/configure --prefix="$prefix" --srcdir="$srcdir_"
-	)
+	echo '#stub. need to run configure first' > $m
+	echo "srcdir = $top_srcdir_/$1" >> $m
+	echo "prefix = $prefix" >> $m
+	echo '%: ; ${srcdir}/configure --prefix="${prefix}" --srcdir="${srcdir}" && ${MAKE} $@' >> $m
+	echo 'all: ; ${srcdir}/configure --prefix="${prefix}" --srcdir="${srcdir}" && ${MAKE}' >> $m
+	echo '.PHONY: all' >> $m
 }
 #------------------------------------------------------------------------
 sub_makefile() {
-	m=$1/makefile
+	m="$1/Makefile"
 	echo sub_makefile $m
 	echo \# created by $0 do not edit >$m
 	echo \#------------------------------------------------------------------------ >> $m
