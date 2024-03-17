@@ -150,6 +150,7 @@ public:
   DDeps const& ddeps()const {return _s;}
   void set_offset(bool v = true){_offset = v;}
   void set_constant(bool v = true){_constant = v;} // attrib/sens?
+  size_t size()const {return _s.size();} //  + _rdeps.size(); }
   bool is_offset() const {return _offset;}
   bool is_constant() const {return _constant;}
   bool is_linear() const;

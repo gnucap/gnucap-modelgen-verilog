@@ -148,7 +148,7 @@ int main(int argc, char** argv)
     }else if (argc > 1 && strncmp(argv[0],"-D", 2)==0) {
       if(argv[0][2]) {
 	p.define(argv[0]+2);
-      }else{ untested();
+      }else{
 	p.define(argv[1]);
 	--argc;
 	++argv;

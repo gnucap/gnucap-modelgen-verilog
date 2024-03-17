@@ -649,10 +649,10 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
     _vi0 = new double[n_states];
     _vi1 = new double[n_states];
 
-    if (net_nodes() > NODES_PER_BRANCH) { untested();
+    if (net_nodes() > NODES_PER_BRANCH) {
       // allocate a bigger node list
       _n = new node_t[net_nodes()];
-    }else{ untested();
+    }else{
       // use the default node list, already set
     }      
   }else{itested();

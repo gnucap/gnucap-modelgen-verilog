@@ -8,15 +8,13 @@ module dep0(d, g);
   inout      d, g;
   electrical d, g;
   analog begin
-    real c;
     real T;
     real S;
-    S = T;
     while(1) begin
-      c = T;
+      T = T;
+		S = T;
       T = V(g);
     end
-    S = T;
   end
 
 endmodule

@@ -1578,17 +1578,18 @@ bool Assignment::update()
   size_t s = D->ddeps().size();
   bool ret;
 
+  trace5("Assignment::update1", lhsname(), s, D->ddeps().size(), this, _deps->size());
   _rhs.update();
   D = &_rhs.deps();
-  trace4("Assignment::update", lhsname(), s, D->ddeps().size(), this);
+  trace5("Assignment::update2", lhsname(), s, D->ddeps().size(), this, _deps->size());
 
   if (store_deps(_rhs.deps())) {
     assert(_lhs);
-    trace2("Assignment::update prop", _rhs.deps().ddeps().size(), _lhs->deps().ddeps().size());
+    trace3("Assignment::update prop", _rhs.deps().size(), _lhs->deps().size(), _deps->size());
     _lhs->propagate_deps(*this);
     ret = true;
   }else{
-    trace2("Assignment::update no prop", _rhs.deps().ddeps().size(), _lhs->deps().ddeps().size());
+    trace3("Assignment::update no prop", _rhs.deps().size(), _lhs->deps().size(), _deps->size());
     ret = false;
 //    ret = _lhs->propagate_deps(*this);
   }
