@@ -1,0 +1,35 @@
+
+attach ./modelgen_0.so
+
+
+verilog
+
+`modelgen
+module test_af_4a(p, n);
+	electrical p, n;
+	parameter real v = 1;
+
+  analog function real fct;
+    real x, c;
+    input x, c;
+    begin
+      fct = (x + c);
+    end
+  endfunction
+
+	analog begin
+		V(p, n) <+ fct(v, 3);
+	end
+endmodule
+
+!make test_af_4a.so > /dev/null
+attach ./test_af_4a.so
+
+parameter v1=0
+test_af_4a #(.v(v1)) dut(1,0);
+
+list
+
+print dc v(nodes) iter(0)
+dc v1 -5 10 2
+end
