@@ -150,6 +150,7 @@ public:
 /*--------------------------------------------------------------------------*/
 class Dep;
 class DDeps;
+class AnalogStmt;
 class Branch : public Element_2 {
  // TerminalPair _ports;
   Node_Ref _p;
@@ -164,6 +165,7 @@ class Branch : public Element_2 {
   size_t _has_always_pot{0};
   FUNCTION_ const* _ctrl{NULL};
   std::vector<Branch_Ref*> _refs;
+  std::vector<AnalogStmt const*> _stmts;
   size_t _number;
 //  std::list<std::string> _names;
   bool _direct{true};
@@ -179,7 +181,7 @@ public: // use in contributions
   void dec_use()const {assert(_use); --_use;}
   void set_used_in(Base const*);
   void unset_used_in(Base const*);
-  std::vector<Base const*> const& used_in() {return _used_in;}
+  std::vector<Base const*> const& used_in(/*Base const*?*/) {return _used_in;}
 public:
   explicit Branch(Node_Ref p, Node_Ref n, Module* m);
   explicit Branch(Branch_Ref p, Module* m);
@@ -242,6 +244,8 @@ public:
 //  bool has(Branch_Ref*) const;
   void attach(Branch_Ref*);
   void detach(Branch_Ref*);
+  void reg_stmt(AnalogStmt const*);
+  void dereg_stmt(AnalogStmt const*);
   size_t number() const{return _number;}
   size_t num_branches() const;
 

@@ -1,5 +1,5 @@
 /*                       -*- C++ -*-
- * Copyright (C) 2023 Felix Salfelder
+ * Copyright (C) 2023, 2024 Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -23,6 +23,7 @@
 #include "mg_in.h"
 #include "mg_options.h"
 #include "mg_error.h"
+#include "l_stlextra.h"
 /*--------------------------------------------------------------------------*/
 CS& Paramset::parse_stmt(CS& f)
 {
@@ -153,7 +154,7 @@ void Paramset::parse(CS& f)
       ;
 
     if (_attribute_stash.is_empty()){
-    }else{ untested();
+    }else{
       f.warn(0, "dangling attributes");
     }
     if (end){
@@ -166,7 +167,7 @@ void Paramset::parse(CS& f)
       // throw?
       f.warn(0, "premature EOF (paramset)");
       break;
-    }else if (f.stuck(&here)) { untested();
+    }else if (f.stuck(&here)) {
       // throw?
       f.warn(0, "bad module");
       break;
@@ -440,5 +441,58 @@ void Paramset::dump(std::ostream& o) const
   }
   o << "endparamset;\n";
 }
+/*--------------------------------------------------------------------------*/
+void Paramset::new_var_ref(Base* what)
+{
+  auto V = dynamic_cast<Variable const*>(what);
+  auto P = dynamic_cast<Parameter_2 const*>(what);
+  auto T = dynamic_cast<Token const*>(what);
+ // auto T = dynamic_cast<Token const*>(what);
+  std::string p;
+  if(auto A = dynamic_cast<Aliasparam const*>(what)){ untested();
+    p = A->name();
+  }else if(auto nn = dynamic_cast<Node const*>(what)){
+    p = nn->name();
+  }else if(auto tt = dynamic_cast<Token const*>(what)){
+    p = tt->name();
+  }else if(V){ untested();
+    p = V->name();
+  }else if(P){
+    p = P->name();
+  }else if(T){ untested();
+    incomplete();
+  }
+
+  if(p!=""){
+    auto const& alias = aliasparam();
+    // alias.find(p)?
+    if(alias.end() == notstd::find_ptr(alias.begin(), alias.end(), p)){
+    }else{ untested();
+      throw(Exception("alias already there: '" + p + "'"));
+    }
+  }else{
+  }
+
+
+  if(auto ps = dynamic_cast<Paramset_Stmt const*>(what)){
+    p = "."+ps->name();
+    _var_refs[p] = what;
+  }else if(p.substr(0,2)==PS_MANGLE_PREFIX) {
+    if(P) {
+      p = p.substr(2);
+    }else if(V) { untested();
+      assert(V->owner()==this);
+      p = p.substr(2);
+    }else if(V && !V->owner()){ untested();
+    }else if(T){
+      p = p.substr(2);
+    }else{ untested();
+    }
+    _var_refs[p] = what;
+  }else{
+    return Module::new_var_ref(what);
+  }
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

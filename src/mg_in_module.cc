@@ -890,10 +890,17 @@ void Module::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::parse(CS& file)
 {
-  file >> ','; // ??
-  file >> _name;
-  trace1("variable decl", _name);
-  new_var_ref();
+  file >> ','; // ?? BUG.
+  assert(owner());
+  assert(!_data);
+  assert(!_token);
+  std::string name;
+  file >> name;
+
+  _data = new TData();
+  _token = new Token_VAR_REF(name, this, _data);
+  trace1("variable decl", name);
+  owner()->new_var_ref(_token);
 }
 /*--------------------------------------------------------------------------*/
 void ValueRangeInterval::parse(CS& file)
@@ -987,6 +994,44 @@ void ValueRangeConstant::dump(std::ostream& o)const
   o << _cexpr;
 }
 /*--------------------------------------------------------------------------*/
+void Module::new_var_ref(Base* what)
+{
+  auto P = dynamic_cast<Parameter_2 const*>(what);
+  auto T = dynamic_cast<Token const*>(what);
+
+  std::string p;
+  if(auto A = dynamic_cast<Aliasparam const*>(what)){ untested();
+    p = A->name();
+  }else if(auto nn = dynamic_cast<Node const*>(what)){
+    p = nn->name();
+  }else if(P){
+    p = P->name();
+  }else if(T){
+    p = T->name();
+  }
+
+  if(p!=""){
+    auto const& alias = aliasparam();
+    // alias.find(p)?
+    if(alias.end() == notstd::find_ptr(alias.begin(), alias.end(), p)){
+    }else{
+      throw(Exception("alias already there: '" + p + "'"));
+    }
+  }else{ untested();
+  }
+
+  return Block::new_var_ref(what);
+}
+/*--------------------------------------------------------------------------*/
+void Block::clear_vars()
+{
+      // for(Dep d : deps().ddeps()) { untested();
+      //   (*d)->unset_used_in(this);
+      // }
+  // detach?
+  _var_refs.clear();
+}
+/*--------------------------------------------------------------------------*/
 /// set_vr_ref?
 void Block::new_var_ref(Base* what)
 {
@@ -994,14 +1039,19 @@ void Block::new_var_ref(Base* what)
   std::string p;
   auto V = dynamic_cast<Variable const*>(what);
   auto P = dynamic_cast<Parameter_2 const*>(what);
+  auto T = dynamic_cast<Token const*>(what);
 
-  if(V){
+  if(T){
+    p = T->name();
+    // assert(T->data());
+  }else if(V){ untested();
     p = V->name();
   }else if(P){
     p = P->name();
   }else if(auto A = dynamic_cast<Aliasparam const*>(what)){ untested();
     p = A->name();
-  }else if(auto ps = dynamic_cast<Paramset_Stmt const*>(what)){
+  }else if(auto ps = dynamic_cast<Paramset_Stmt const*>(what)){ untested();
+    unreachable();
     p = "."+ps->name();
   }else if(auto nn = dynamic_cast<Node const*>(what)){
     p = nn->name();
@@ -1012,54 +1062,42 @@ void Block::new_var_ref(Base* what)
 
   trace3("new_var_ref", V, p, dynamic_cast<Paramset const*>(this));
 
-  auto m = dynamic_cast<Module const*>(this);
-  if(!m){
-  }else{
-    auto const& alias = m->aliasparam();
-    // alias.find(p)?
-    if(alias.end() == notstd::find_ptr(alias.begin(), alias.end(), p)){
-    }else{
-      throw(Exception("alias already there: '" + p + "'"));
-    }
-  }
-
   trace3("new_var_ref, stashing", p, this, dynamic_cast<Module const*>(this));
   Base* cc = _var_refs[p];
 
   // yikes.
   if(dynamic_cast<Analog_Function_Arg const*>(what)
-   &&!dynamic_cast<Analog_Function_Arg const*>(cc)){
+   &&!dynamic_cast<Analog_Function_Arg const*>(cc)){ untested();
     _var_refs[p] = what;
   }else if(dynamic_cast<Analog_Function_Arg const*>(cc)
-   &&!dynamic_cast<Analog_Function_Arg const*>(what)){
+   &&!dynamic_cast<Analog_Function_Arg const*>(what)){ untested();
     _var_refs[p] = cc;
-//   }else if(V && V->is_mangled()){ untested();
-//     p = p.substr(2);
-//     _var_refs[p] = what;
-  }else if(p.substr(0,2)==PS_MANGLE_PREFIX) {
-    if(P && dynamic_cast<Paramset const*>(this)){
-      p = p.substr(2);
-    }else if(V && dynamic_cast<Paramset const*>(V->owner())){
-      assert(V->owner()==this);
-      p = p.substr(2);
-    }else if(V && !V->owner()){ untested();
-      p = p.substr(2);
-    }else if(!V){
-      // not applicable
-    }else{
-      // user requested PS_MANGLE_PREFIX
-    }
-    _var_refs[p] = what;
-  }else if(dynamic_cast<Paramset_Stmt const*>(what)){
+  }else if(dynamic_cast<Paramset_Stmt const*>(what)){ untested();
+    unreachable();
     _var_refs[p] = what;
   }else if(cc) {
     _var_refs[p] = what;
-    if(V){
+    if(V){ untested();
       // updating variable...
+    }else if(T){
+      // updating variable...
+      if(auto VT = dynamic_cast<Token_VAR_REF const*>(T)){
+	trace2("new_var_ref, update token", p, VT->deps().size());
+      }else{ untested();
+	trace1("new_var_ref, update token", p);
+      }
     }else{ untested();
       throw(Exception("already there: '" + p + "'"));
     }
+  }else if(T){
+    if(auto VT = dynamic_cast<Token_VAR_REF const*>(T)){
+      trace2("new_var_ref, reg new token", p, VT->deps().size());
+    }else{ untested();
+      trace1("new_var_ref, reg new token", p);
+    }
+    _var_refs[p] = what;
   }else{
+    trace1("new_var_ref, reg new", p);
     _var_refs[p] = what;
   }
 }
@@ -1112,68 +1150,12 @@ Branch::Branch(Node_Ref p, Node_Ref n, Module* m)
   // n->inc_use();
 }
 /*--------------------------------------------------------------------------*/
-void Branch::set_used_in(Base const* b)
-{
-  for(auto& i : _used_in){
-    if(i == b){ untested();
-      return;
-    }else{
-    }
-  }
-  _used_in.push_back(b);
-}
-/*--------------------------------------------------------------------------*/
-void Branch::unset_used_in(Base const* b)
-{
-  for(auto& i : _used_in){
-    if(i == b){
-      i = NULL;
-      return;
-    }else{
-    }
-  }
-  unreachable();
-  throw std::logic_error("cleanup " + code_name());
-}
-/*--------------------------------------------------------------------------*/
 Module::~Module()
 {
   delete_analog();
   delete _probes; // .clear();
 
   delete_circuit();
-}
-/*--------------------------------------------------------------------------*/
-Branch::~Branch()
-{
-  // no, shutting down, not all Refs tidied up.
-  assert(!_refs.size());
-
-  // Contributions tidied up
-  assert(!_has_pot_src);
-  assert(!_has_flow_src);
-  // assert(!_has_always_pot);
-
-  // Probes tidied up
-  assert(!_has_pot_probe);
-  assert(!_has_flow_probe);
-
-  delete _deps;
-  _deps = NULL;
-
-  for(auto i : _used_in){
-    if(i){ untested();
-      std::cerr << "logic error. " << name() << " still used in. " << i << "\n";
-    }else{
-    }
-    assert(!i);
-  }
-  if(_use){ untested();
-    unreachable();
-    std::cerr << "logic error. " << name() << " still used.\n";
-    assert(false);
-  }else{
-  }
 }
 /*--------------------------------------------------------------------------*/
 bool Node::is_used() const

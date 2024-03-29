@@ -79,9 +79,6 @@ private:
 class Analog_Function_Arg : public Variable_Decl {
 public:
   explicit Analog_Function_Arg() : Variable_Decl() {}
-  String_Arg const& identifier()const { return _name; }
-  String_Arg const& key()const { return _name; }
-  std::string name()const { return _name.to_string(); }
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   std::string code_name()const override;
@@ -121,8 +118,8 @@ public:
   ~Analog_Function();
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
-  String_Arg const& identifier()const { return _variable.identifier(); }
-  std::string code_name()const { return "af_" + identifier().to_string(); }
+  std::string const& identifier()const { return _variable.identifier(); }
+  std::string code_name()const { return "af_" + identifier(); }
 public:
   Branch_Ref new_branch(std::string const&, std::string const&)override { untested();
     return Branch_Ref();
@@ -139,6 +136,7 @@ public:
   FUNCTION_ const* function() const{return _function;}
   AF_Arg_List_Collection const& args() const{ return _args; }
   Analog_Function_Arg const& variable() const{ return _variable; }
+  void new_var_ref(Base* what)override;
 };
 typedef Collection<Analog_Function> Analog_Functions;
 /*--------------------------------------------------------------------------*/
@@ -170,8 +168,16 @@ inline AnalogList const& analog_list(Module const& m)
 }
 /*--------------------------------------------------------------------------*/
 class AnalogStmt : public Base {
+  std::vector<Base const*> _used_in;
 public:
   virtual bool update() = 0;
+  void set_used_in(Base const*b); // const;
+  void unset_used_in(Base const*b); // const;
+  ~AnalogStmt();
+//  bool used_in(Base const*)const;
+  bool is_used_in(Base const*)const;
+
+  virtual TData const& deps() = 0;
 };
 /*--------------------------------------------------------------------------*/
 class AnalogExpression : public Owned_Base {
@@ -199,6 +205,7 @@ typedef LiSt<AnalogConstExpression, '\0', ',', ':'> AnalogConstExpressionList;
 class AnalogSeqBlock : public AnalogStmt {
 protected: // BUG?
   SeqBlock _block;
+  TData _deps;
 public:
   explicit AnalogSeqBlock() : AnalogStmt() {}
   explicit AnalogSeqBlock(CS& cmd, Block* owner) : AnalogStmt() {
@@ -228,6 +235,9 @@ public: // sensitivities?
   bool is_always()const {return _block.is_always() ;}
   bool update()override;
   void set_sens(Base const* s) {_block.set_sens(s);}
+  void clear_vars();
+
+  TData const& deps(){ return _deps;};
 };
 /*--------------------------------------------------------------------------*/
 class AnalogCtrlBlock : public AnalogSeqBlock {
@@ -284,6 +294,7 @@ public:
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class AnalogCtrlStmt : public AnalogStmt /* : AnalogSeqBlock? */ {
+  TData _deps; // here?
 protected:
   AnalogCtrlBlock _body; // use AnalogSeqBlock::_block?
 public:
@@ -292,6 +303,7 @@ public:
   void dump(std::ostream&)const override;
 private:
   bool update()override {return _body.update();}
+  TData const& deps(){ return _deps;};
 };
 /*--------------------------------------------------------------------------*/
 class AnalogEvtCtlStmt : public AnalogCtrlStmt {
@@ -395,6 +407,7 @@ private:
 /*--------------------------------------------------------------------------*/
 class AnalogProceduralAssignment : public AnalogStmt {
   Assignment _a;
+  TData _deps;
 public:
   explicit AnalogProceduralAssignment(CS&, Block*);
   void parse(CS& cmd)override;
@@ -402,6 +415,7 @@ public:
   Assignment const& assignment()const {return _a;}
 private:
   bool update()override;
+  TData const& deps()override {return _deps;};
 }; // AnalogProceduralAssignment
 /*--------------------------------------------------------------------------*/
 // ContributionStatement?
@@ -447,11 +461,13 @@ public:
   bool is_short() const { return _short; }
   bool is_direct() const;
   bool is_always() const{ assert(owner()); return owner()->is_always(); }
+  bool is_reachable()const {return owner()->is_reachable() ;}
   void parse(CS&)override;
   void dump(std::ostream&)const override;
   TData const& deps() const {
     if(_deps) {return *_deps;} else {return _rhs.deps();}
   }
+  bool has_deps()const {return true;}
   Expression const& rhs()const {return _rhs;}
   std::string const& name() const{return _name;}
   Branch_Ref const& branch_ref() const{return _branch;}
@@ -472,8 +488,9 @@ private:
 }; // Contribution
 /*--------------------------------------------------------------------------*/
 // AnalogDecl?
-class AnalogRealDecl : public AnalogStmt{
+class AnalogRealDecl : public AnalogStmt {
   ListOfBlockRealIdentifiers _l;
+  TData _deps;
 public:
   explicit AnalogRealDecl(CS& f, Block* o){
     _l.set_owner(o);
@@ -495,6 +512,7 @@ public:
 
 private:
   bool update()override;
+  TData const& deps(){ return _deps;};
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

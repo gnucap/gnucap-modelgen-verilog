@@ -252,7 +252,7 @@ public:
     "/*--------------------------------------"
     "------------------------------------*/\n";
   }
-  std::string eval(CS&, const CARD_LIST*)const override{
+  std::string eval(CS&, const CARD_LIST*)const override{ untested();
     unreachable();
     return "ddt";
   }
@@ -318,7 +318,7 @@ void Token_LAP::stack_op(Expression* e)const
   auto func = prechecked_cast<LAP const*>(f());
   assert(func);
 
-  if(cc->args()->size() != 3){
+  if(cc->args()->size() != 3){ untested();
     throw Exception("syntax error, need 3 args");
   }else{
   }
@@ -327,7 +327,7 @@ void Token_LAP::stack_op(Expression* e)const
   if(auto num = dynamic_cast<Token_ARRAY_ const*>(*argi)){
     trace1("array0", num->size());
     func->_nums = int(num->size());
-  }else{
+  }else{ untested();
     throw Exception("syntax error, need array");
   }
   ++argi;
@@ -350,9 +350,9 @@ void Token_LAP::stack_op(Expression* e)const
     branch()->deps() = *dd; // HACK
     if(1){
       func->set_n_to_gnd();
-    }else if(0 /*sth linear*/){
+    }else if(0 /*sth linear*/){ untested();
       // somehow set loss=0 and output ports to target.
-    }else{
+    }else{ untested();
     }
 
     auto d = new TData;
@@ -393,29 +393,29 @@ void Token_LAP::stack_op(Expression* e)const
       }
       if(c->is_always()){
 	always = true;
-      }else{
+      }else{ untested();
       }
-    }else if(dynamic_cast<Assignment const*>(b)){
+    }else if(dynamic_cast<Assignment const*>(b)){ untested();
       assigned = true;
     }else{untested();
     }
   }
   func->_output = NULL;
   if(c_cnt!=1){
-  }else if(assigned){
+  }else if(assigned){ untested();
   }else if(cont->has_sensitivities()) { itested();
   }else if(always){
     for(auto d : cont->deps().ddeps()){
-      if(d->branch() != branch()) {
+      if(d->branch() != branch()) { untested();
       }else if(d.is_linear()){
 	// incomplete();
 	func->_output = cont->branch(); // polarity?
       }
-      if(cont->reversed()){
+      if(cont->reversed()){ untested();
       }else{
       }
     }
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/

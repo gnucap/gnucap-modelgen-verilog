@@ -497,41 +497,6 @@ Branch_Ref& Branch_Ref::operator=(Branch_Ref const& o)
   return *this;
 }
 /*--------------------------------------------------------------------------*/
-std::string const& Branch_Ref::pname() const
-{
-  assert(_br);
-  assert(_br);
-  if(_r){
-    assert(_br->n());
-    return _br->n()->name();
-  }else{
-    assert(_br->p());
-    return _br->p()->name();
-  }
-}
-/*--------------------------------------------------------------------------*/
-std::string const& Branch_Ref::nname() const
-{
-  assert(_br);
-  if(_r){
-    assert(_br->n());
-    return _br->p()->name();
-  }else{
-    assert(_br->p());
-    return _br->n()->name();
-  }
-}
-/*--------------------------------------------------------------------------*/
-void Branch_Ref::set_used_in(Base const* b) const
-{
-  return _br->set_used_in(b);
-}
-/*--------------------------------------------------------------------------*/
-void Branch_Ref::unset_used_in(Base const* b) const
-{
-  return _br->unset_used_in(b);
-}
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 //std::string const* Branch::reg_name(std::string const&s)
 //{ untested();
@@ -680,7 +645,7 @@ std::string Variable::code_name() const
 {
   if(is_real()){
     return "_v_" + name();
-  }else if(is_int()){
+  }else if(is_int()){ untested();
     return "_v_" + name();
   }else if(is_module_variable()){ untested();
     return "d->_v_" + name();
@@ -703,15 +668,15 @@ double Assignment::eval() const
 /*--------------------------------------------------------------------------*/
 bool Assignment::is_module_variable() const
 { untested();
-  assert(_lhs);
-  return _lhs->is_module_variable();
+  assert(_lhsref);
+  return _lhsref->is_module_variable();
 }
 /*--------------------------------------------------------------------------*/
 Data_Type const& Assignment::type() const
 {
   //assert(_lhs->is_int() == _type.is_int());
-  assert(_lhs);
-  return _lhs->type();
+  assert(_lhsref);
+  return _lhsref->type();
 }
 /*--------------------------------------------------------------------------*/
 bool Assignment::is_int() const
@@ -730,20 +695,6 @@ void Branch::attach(Branch_Ref* r)
 #endif
   _refs.push_back(r);
 }
-/*--------------------------------------------------------------------------*/
-#if 0
-bool Branch::has(Branch_Ref* r) const
-{ untested();
-  assert(r);
-  for(auto& i : _refs){ untested();
-    if(i == r){ untested();
-      return true;
-    }else{ untested();
-    }
-  }
-  return false;
-}
-#endif
 /*--------------------------------------------------------------------------*/
 void Branch::detach(Branch_Ref* r)
 {
@@ -868,12 +819,6 @@ void BlockVarIdentifier::update()
   new_var_ref();
 }
 /*--------------------------------------------------------------------------*/
-void Variable_Decl::clear_deps()
-{ untested();
-  trace2("Variable_Decl::clear_deps", name(), deps().ddeps().size());
-  deps().clear();
-}
-/*--------------------------------------------------------------------------*/
 bool is_true(Expression const& x)
 {
   double e = x.eval();
@@ -890,34 +835,6 @@ bool is_zero(Expression const& x)
 {
   double e = x.eval();
   return e == 0.;
-}
-/*--------------------------------------------------------------------------*/
-#if 0
-Attrib const& Expression_::attrib() const
-{ untested();
-  static Attrib no_attrib;
-  if(is_empty()){ untested();
-    return no_attrib;
-  }else if(auto d = dynamic_cast<Attrib const*>(back()->data())){ untested();
-    return *d;
-  }else{ untested();
-    return no_attrib;
-  }
-}
-#endif
-/*--------------------------------------------------------------------------*/
-TData const& Expression_::deps() const
-{
-  static TData no_deps;
-  if(is_empty()){
-    return no_deps;
-  }else if(auto d = dynamic_cast<TData const*>(back()->data())){
-    return *d;
-//  }else if(auto d = dynamic_cast<Attrib const*>(back()->data())){ untested();
-//    return d->deps();
-  }else{
-    return no_deps;
-  }
 }
 /*--------------------------------------------------------------------------*/
 Expression_::~Expression_()
@@ -968,7 +885,7 @@ double ValueRangeInterval::eval() const
     return NOT_INPUT;
   }else if(_ub == _lb){
     return _ub.expression().eval();
-  }else{
+  }else{ untested();
     return NOT_INPUT;
   }
 }
@@ -1020,12 +937,6 @@ Node_Ref Branch::n() const
 bool Assignment::has_sensitivities()const
 {
   return deps().has_sensitivities();
-}
-/*--------------------------------------------------------------------------*/
-void Variable::new_var_ref()
-{
-  assert(owner());
-  owner()->new_var_ref(this);
 }
 /*--------------------------------------------------------------------------*/
 bool Parameter_2_List::is_local()const
@@ -1097,6 +1008,32 @@ DDeps const& Branch::ddeps()const
 {
   assert(_deps);
   return _deps->ddeps();
+}
+/*--------------------------------------------------------------------------*/
+void Branch::reg_stmt(AnalogStmt const* r)
+{
+  assert(r);
+#ifndef NDEBUG
+  for(auto i : _stmts){
+    assert(i != r);
+  }
+#endif
+  _stmts.push_back(r);
+}
+/*--------------------------------------------------------------------------*/
+void Branch::dereg_stmt(AnalogStmt const* r)
+{
+  assert(r);
+  for(auto& i : _stmts){
+    if(i == r){
+      i = _stmts.back();
+      _stmts.resize(_stmts.size()-1);
+      return;
+    }else{
+    }
+  }
+  assert(0);
+  unreachable(); // cleanup is out of order?
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -1,5 +1,5 @@
 /*                        -*- C++ -*-
- * Copyright (C) 2023 Felix Salfelder
+ * Copyright (C) 2023, 2024 Felix Salfelder
  * Author: Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
@@ -124,6 +124,11 @@ void TData::update(TData const& other)
 }
 /*--------------------------------------------------------------------------*/
 TData::~TData()
+{
+  _s.clear();
+}
+/*--------------------------------------------------------------------------*/
+void TData::clear()
 {
   _s.clear();
 }

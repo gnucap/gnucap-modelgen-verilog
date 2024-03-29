@@ -1260,6 +1260,22 @@ bool MOD_resistor::tr_needs_eval()const
   }
 };
 /*--------------------------------------------------------------------------*/
+#if 0
+// tr_eval_branch _b_p_n
+static EVAL__b_p_n_ Eval_(p, n)(CC_STATIC);
+void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
+{
+  assert(d);
+  auto* p = prechecked_cast<DEV_resistor*>(d->owner());
+  assert(p);
+  const COMMON_resistor* c = prechecked_cast<const COMMON_resistor*>(p->common());
+  assert(c);
+  {
+// omit statement
+  }
+}
+/*--------------------------------------------------------------------------*/
+#endif
 bool MOD_resistor::do_tr()
 {
   trace3("resistor::do_tr", this, long_label(), _sim->iteration_number());
@@ -2875,6 +2891,36 @@ bool MOD_capacitor::tr_needs_eval()const
   }
 };
 /*--------------------------------------------------------------------------*/
+#if 0
+// tr_eval_branch _b_ddt_1_p_ddt_1_n
+static EVAL__b_ddt_1_p_ddt_1_n_ Eval_(ddt_1_p, )(CC_STATIC);
+void EVAL__b_ddt_1_p_ddt_1_n_::tr_eval(ELEMENT* d)const
+{
+  assert(d);
+  auto* p = prechecked_cast<DEV_capacitor*>(d->owner());
+  assert(p);
+  const COMMON_capacitor* c = prechecked_cast<const COMMON_capacitor*>(p->common());
+  assert(c);
+  {
+// omit statement
+  }
+}
+/*--------------------------------------------------------------------------*/
+// tr_eval_branch _b_p_n
+static EVAL__b_p_n_ Eval_(p, n)(CC_STATIC);
+void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
+{
+  assert(d);
+  auto* p = prechecked_cast<DEV_capacitor*>(d->owner());
+  assert(p);
+  const COMMON_capacitor* c = prechecked_cast<const COMMON_capacitor*>(p->common());
+  assert(c);
+  {
+// omit statement
+  }
+}
+/*--------------------------------------------------------------------------*/
+#endif
 bool MOD_capacitor::do_tr()
 {
   trace3("capacitor::do_tr", this, long_label(), _sim->iteration_number());
@@ -3629,6 +3675,36 @@ bool MOD_capacitor::tr_needs_eval()const
   }
 };
 /*--------------------------------------------------------------------------*/
+#if 0
+// tr_eval_branch _b_ddt_2_p_ddt_2_n
+static EVAL__b_ddt_2_p_ddt_2_n_ Eval_(ddt_2_p, )(CC_STATIC);
+void EVAL__b_ddt_2_p_ddt_2_n_::tr_eval(ELEMENT* d)const
+{
+  assert(d);
+  auto* p = prechecked_cast<DEV_capacitor*>(d->owner());
+  assert(p);
+  const COMMON_capacitor* c = prechecked_cast<const COMMON_capacitor*>(p->common());
+  assert(c);
+  {
+// omit statement
+  }
+}
+/*--------------------------------------------------------------------------*/
+// tr_eval_branch _b_p_n
+static EVAL__b_p_n_ Eval_(p, n)(CC_STATIC);
+void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
+{
+  assert(d);
+  auto* p = prechecked_cast<DEV_capacitor*>(d->owner());
+  assert(p);
+  const COMMON_capacitor* c = prechecked_cast<const COMMON_capacitor*>(p->common());
+  assert(c);
+  {
+// omit statement
+  }
+}
+/*--------------------------------------------------------------------------*/
+#endif
 bool MOD_capacitor::do_tr()
 {
   trace3("capacitor::do_tr", this, long_label(), _sim->iteration_number());

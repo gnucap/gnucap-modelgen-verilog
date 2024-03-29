@@ -7,17 +7,22 @@ module dep7(a, g);
 ;
 
   analog begin // always
+    // c : 1
+    // d : 1
     real c, d;
     c = V(a); // dep: _potential_b_a_
     if ((V(g) > 1)) begin
+      // t : 0
       real t;
       t = 4;
     end
     else begin
+      // d : 1
       d = c; // dep: _potential_b_a_
     end
     begin : stuff
       if ((c > 0)) begin
+        // f : 1
         I(g) <+ d; // dep: _potential_b_a_
         real f;
         f = d; // dep: _potential_b_a_
@@ -41,17 +46,22 @@ module dep7p(a, g);
 ;
 
   analog begin // always
+    // c : 1
+    // d : 1
     real c, d;
     c = V(a); // dep: _potential_b_a_
     if ((V(g) > 1)) begin
+      // t : 0
       real t;
       t = 4;
     end
     else begin
+      // d : 1
       d = c; // dep: _potential_b_a_
     end
     begin : stuff
       if ((c > 0)) begin
+        // f : 1
         I(g) <+ d; // dep: _potential_b_a_
         real f;
         f = d; // dep: _potential_b_a_

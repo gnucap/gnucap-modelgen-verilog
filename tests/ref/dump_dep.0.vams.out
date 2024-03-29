@@ -2,6 +2,8 @@ module dep0(d, g);
   inout d, g;
   electrical d, g;
   analog begin // always
+    // T : 1
+    // c : 0
     real c;
     real T;
     c = T;

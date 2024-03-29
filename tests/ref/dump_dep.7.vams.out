@@ -7,9 +7,12 @@ module dep7(d, g);
 ;
 
   analog begin // always
+    // T : 0
+    // c : 0
     real c;
     @(initial_step) begin
       if ((! $param_given(p))) begin
+        // c : 0
         c = 1.; // s
       end
     end

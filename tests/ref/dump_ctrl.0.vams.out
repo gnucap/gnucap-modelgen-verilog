@@ -19,6 +19,9 @@ enddiscipline
 
 module cond0(p, n);
   analog begin // always
+    // S : 0
+    // T : 0
+    // U : 0
     real S, T, U;
     if (1.) ;
     if (((S + 1) == 3)) ;
@@ -28,17 +31,24 @@ module cond0(p, n);
 endmodule
 module cond1(p, n);
   analog begin // always
+    // S : 0
     real S;
     if ( 1.) begin // always
+      // S : 0
       S = 3;
     end
     else begin : bla // never
-      S = 1;
+      // S???
+      S = 1; // --
+
     end
     if ( 0.) begin // never
-      S = 3;
+      // S???
+      S = 3; // --
+
     end
     else begin : bla // always
+      // S : 0
       S = 1;
     end
   end
@@ -46,17 +56,24 @@ module cond1(p, n);
 endmodule
 module cond2(p, n);
   analog begin // always
+    // S : 0
+    // T : 0
     real S;
     real T;
     if ( 0.) begin // never
-      S = 1;
+      // S???
+      S = 1; // --
+
     end
     if ( 1.) begin // always
+      // T : 0
       T = 1;
     end
     else begin // never
       if ( 0.) begin // never
-        T = 2;
+        // T???
+        T = 2; // --
+
       end
     end
   end
@@ -64,10 +81,13 @@ module cond2(p, n);
 endmodule
 module cond3(p, n);
   analog begin // always
+    // S : 0
+    // T : 0
     real S;
     real T;
     if (1) begin // always
       if (2) begin // always
+        // S : 0
         S = 2;
       end
     end
@@ -76,11 +96,14 @@ module cond3(p, n);
         if (3) begin // always
           if (4) begin // always
             if (5) begin // always
+              // T : 0
               T = 1;
             end
             else begin // never
               if (5) begin // never
-                T = 3;
+                // T???
+                T = 3; // --
+
               end
             end
           end
@@ -88,21 +111,28 @@ module cond3(p, n);
       end
     end
     if (T) begin
+      // T : 0
       T = 0;
     end
     else begin
+      // T : 0
       T = 2;
     end
     if (1) begin // always
       if (2) begin // always
+        // S : 0
         S = 2;
       end
       else begin // never
-        S = 1;
+        // S???
+        S = 1; // --
+
       end
     end
     else begin // never
-      S = 1;
+      // S???
+      S = 1; // --
+
     end
   end
 

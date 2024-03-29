@@ -79,7 +79,7 @@ void File::parse(CS& file)
     }
     if (!file.more()) {
       break;
-    }else if (file.stuck(&here)) { untested();
+    }else if (file.stuck(&here)) {
       throw Exception_CS_("syntax error, need nature, discipline, module or paramset", file);
     }else{
     }

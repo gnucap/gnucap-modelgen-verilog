@@ -230,11 +230,12 @@ public: // BUG
   Probe const* new_probe(std::string const& xs, Branch_Ref const& br);
   Branch_Ref new_branch(std::string const&, std::string const&) override;
 private:
-
   Token* new_token(FUNCTION const*, size_t na) override;
   Branch_Ref new_branch_name(std::string const& n, Branch_Ref const& b) override;
   Node_Ref node(std::string const& p) const override;
   Branch_Ref lookup_branch(std::string const& p) const override;
+protected:
+  void new_var_ref(Base* what) override;
 public:
   Node* node(Node_Ref r) { return r.mutable_node(*this); }
 public: //filters may need this..
@@ -248,6 +249,31 @@ inline void Module::install(FUNCTION_ const* f)
 {
   _funcs.insert(f);
 }
+/*--------------------------------------------------------------------------*/
+class Paramset : public Module {
+  // std::string _proto_name; // needed?
+  Paramset* _sub{NULL};
+public:
+  explicit Paramset() : Module() {}
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+public: // Block?
+  void set_attributes(Attribute_Instance const* a) {
+    assert(!_attributes);
+    _attributes = a;
+  }
+  bool has_attributes() const{
+    return _attributes;
+  }
+  Module* deflate() override;
+private:
+  CS& parse_stmt(CS& f);
+  void expand();
+protected:
+  void new_var_ref(Base* what) override;
+};
+typedef Collection<Paramset> Paramset_List;
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

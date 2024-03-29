@@ -25,6 +25,11 @@
 #include "mg_attrib.h"
 #include "mg_expression.h"
 /*--------------------------------------------------------------------------*/
+class Statement : public Base {
+public:
+  virtual bool propagate_deps(Token const&) = 0;
+};
+/*--------------------------------------------------------------------------*/
 class Data_Type : public Base{
 protected:
   typedef enum{ t_default, t_real, t_int } type_t;
@@ -50,46 +55,51 @@ public:
   Data_Type_Int() : Data_Type(t_int){}
 };
 /*--------------------------------------------------------------------------*/
-
+class Token_VAR_REF;
+/*--------------------------------------------------------------------------*/
 class Token_PROBE; //bug?
 class Node;
 class TData;
 class Expression;
 class Variable : public Owned_Base {
 protected:
-  String_Arg _name;
+  TData* _data{NULL};
+//  String_Arg _name;
+  Token_VAR_REF* _token{NULL};
 public:
   explicit Variable() : Owned_Base() {}
-  Variable(std::string const& name)
-   : Owned_Base()
-   ,_name(name)
-  {}
+//  Variable(std::string const& name)
+//   : Owned_Base()
+//   ,_name(name) {untested();
+//  }
   ~Variable() {
   }
 public:
-  String_Arg key()const { return _name; }
+  String_Arg key()const { return String_Arg(name()); }
 //  void set_type(Data_Type d){ _type=d; }
   virtual Data_Type const& type() const = 0;
   bool is_real()const { return type().is_real(); }
   bool is_int()const { return type().is_int(); }
-  String_Arg const& identifier()const {return _name;}
-  std::string const& name()const {return _name.to_string();}
+  std::string const& identifier()const {return name();}
+  std::string const& name()const; //  {return name();}
   virtual std::string code_name()const;
   virtual bool is_module_variable()const;
 
-  virtual bool propagate_deps(Variable const&) = 0;
-  virtual TData const& deps()const = 0;
+//  virtual bool propagate_deps(Variable const&) = 0;
   virtual double eval()const { return NOT_INPUT;}
+  Block const* scope() const;
+  bool has_deps()const { return _data; }
+  TData const& deps()const { assert(_data); return *_data; }
 protected:
+  TData& data() { assert(_data); return *_data; }
   void new_var_ref();
 }; // Variable
 /*--------------------------------------------------------------------------*/
 class Variable_Decl : public Variable {
-  TData* _deps{NULL};
   Data_Type _type;
   Attribute_Instance const* _attributes{NULL};
 public:
-  Variable_Decl() : Variable() { new_deps(); }
+  Variable_Decl() : Variable() { } // {new_deps(); }
   ~Variable_Decl();
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
@@ -104,12 +114,11 @@ public:
   }
 //  std::string code_name()const override;
   void set_type(Data_Type const& d){ _type=d; }
-  TData const& deps()const override { assert(_deps); return *_deps; }
-  bool propagate_deps(Variable const&)override;
+  bool propagate_deps(Token_VAR_REF const&);
 protected:
   void clear_deps();
 private:
-  TData& deps() { assert(_deps); return *_deps; }
+//  TData& deps() { assert(_deps); return *_deps; }
   void new_deps();
 //  void set_type(std::string const& a){_type=a;}
 };
@@ -156,11 +165,11 @@ public:
   void dump(std::ostream& f)const override;
 };
 /*--------------------------------------------------------------------------*/
+// class Assignment : public Expression_ ? (later)
 class Assignment : public Variable {
 protected:
-  Variable* _lhs{NULL};
+  Token_VAR_REF* _lhsref{NULL};
   Expression_ _rhs;
-  TData* _deps{NULL};
 public:
   explicit Assignment(CS& f, Block* o);
   explicit Assignment() : Variable() {}
@@ -169,37 +178,34 @@ public:
   bool is_module_variable()const override;
   bool is_int() const;
   Data_Type const& type()const override;
-  std::string const& lhsname()const {
-    assert(_lhs);
-    return _lhs->name();
-  }
+//  std::string const& lhsname()const {
+//    assert(_lhsref);
+//    return _lhsref->name();
+//  }
   Expression_ const& rhs()const {return _rhs;}
-  Variable const& lhs() const{
-    assert(_lhs);
-    return *_lhs;
+  Token_VAR_REF const& lhs() const{
+    assert(_lhsref);
+    return *_lhsref;
   }
   void parse(CS& cmd) override;
   void dump(std::ostream&)const override;
-  bool propagate_deps(Variable const&) override;
+  bool propagate_deps(Token_VAR_REF const&);
   bool update();
 // protected:
   void set_lhs(Variable* v);
 
-  TData const& deps()const override{
-    if(_deps){
-      return *_deps;
-    }else{
-      return _rhs.deps();
-    }
-  }
+//  TData const& deps()const override;
 //private: // ?
   void parse_rhs(CS& cmd);
   double eval()const override;
   Block* owner(){ return Variable::owner();}
+  Block const* owner() const{ return Variable::owner();}
   bool has_sensitivities()const;
 //  TData& deps()override { return _rhs.deps(); }
+  Block const* scope() const;
 private: // implementation
   bool store_deps(TData const&);
+  std::string code_name()const;
 }; // Assignment
 /*--------------------------------------------------------------------------*/
 // class AnalogExpression?

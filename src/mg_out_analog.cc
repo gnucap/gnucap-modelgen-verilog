@@ -28,13 +28,20 @@ public:
   enum mode{
     modePRECALC = 0,
     modeSTATIC = 1,
-    modeDYNAMIC = 2
+    modeDYNAMIC = 2,
+    modePROBE = 3
   }_mode;
-  explicit OUT_ANALOG(mode m) : _mode(m){}
+  Branch const* _src{NULL};
+
+public:
+  explicit OUT_ANALOG(mode m, Branch const* src=NULL)
+    : _mode(m),
+      _src(src){}
 
 public:
   bool is_dynamic()const { return _mode==modeDYNAMIC; }
   bool is_precalc()const { return _mode==modePRECALC; }
+  bool is_probe()const { return _mode==modePROBE; }
 public:
   void make_construct  (std::ostream& o, AnalogConstruct const& ab)const;
   void make_af_body    (std::ostream& o, const Analog_Function& f)const;
@@ -124,13 +131,13 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
 {
   Expression_ const& e = a.rhs();
 
-  o__ "{ // Assignment " << a.type() <<" '" << a.lhsname() << "'.\n";
+  o__ "{ // Assignment " << a.type() << " '" << a.name() << "'.\n";
   std::string lhsname = a.lhs().code_name();
 
   {
     indent x;
     make_cc_expression(o, e, _mode==modeDYNAMIC);
-    if(dynamic_cast<Analog_Function_Arg const*>(&a.lhs())){
+    if(dynamic_cast<Analog_Function_Arg const*>(&a.lhs())){ untested();
       o__ lhsname << " = t0; // (*)\n";
     }else if(a.is_int()){
       o__ lhsname << " = int(t0); // (*)\n";
@@ -308,7 +315,12 @@ void AnalogExpression::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_stmt(std::ostream& o, Base const& ab) const
 {
-  if(auto s = dynamic_cast<AnalogSeqBlock const*>(&ab)){
+  auto st = dynamic_cast<AnalogStmt const*>(&ab);
+  // assert(st);
+
+  if(_src && st && !st->is_used_in(_src)){
+    o << "// omit statement\n";
+  }else if(auto s = dynamic_cast<AnalogSeqBlock const*>(&ab)){
     make_seq(o, *s);
   }else if(auto bl = dynamic_cast<AnalogCtrlBlock const*>(&ab)){ untested();
     make_ctrl(o, *bl);
@@ -561,6 +573,8 @@ void OUT_ANALOG::make_seq(std::ostream& o, AnalogSeqBlock const& s) const
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_construct(std::ostream& o, AnalogConstruct const& ab) const
 {
+ // if(_src && !ab.used_in(*_src)){ untested();
+ // }else
   if(ab.statement_or_null()){
     make_stmt(o, *ab.statement_or_null());
   }else{ untested();
@@ -597,7 +611,27 @@ std::string Branch::code_name() const
 /*--------------------------------------------------------------------------*/
 std::string Analog_Function_Arg::code_name()const
 {
+  return "_v_" + name(); // code_name?
   return "af_arg_" + name();
+}
+/*--------------------------------------------------------------------------*/
+void make_cc_af_args(std::ostream& o, const Analog_Function& f)
+{
+  std::string sep = "";
+  std::string qual = "";
+  for (auto coll : f.args()){
+      if(coll->is_output()){
+	qual = "&";
+      }else{
+	qual = "";
+      }
+    for(auto i : *coll){
+      o << sep << "ddouble " << qual;
+      //o << " af_arg_" << i->identifier();
+      o << " _v_" << i->identifier(); // code_name?
+      sep = ", ";
+    }
+  }
 }
 /*--------------------------------------------------------------------------*/
 static void make_set_self_contribution(std::ostream& o, Dep const& d)
@@ -616,7 +650,7 @@ static void make_set_self_contribution(std::ostream& o, Dep const& d)
     o__ "}else{\n";
     o____ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
     o__ "}\n";
-  }else if(both && d->is_flow_probe()) {
+  }else if(both && d->is_flow_probe()) { untested();
     o__ "// self flow\n";
     o__ "if (_pot"<< b->code_name() << "){\n";
     o____ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
@@ -820,7 +854,7 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Variable_Decl&
     V, Module const& m) const
 {
   if(_mode == modePRECALC){
-    if(V.type().is_int()) {
+    if(V.type().is_int()) { untested();
       o__ "int";
     }else if(V.type().is_real()) {
       o__ "ddouble";
@@ -831,7 +865,7 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Variable_Decl&
     o << " " << V.code_name() << "(m->" << V.code_name() << ");\n";
     o__ "(void) " << V.code_name() << ";\n";
   }else if(!V.is_module_variable()){ untested();
-  }else if(V.type().is_int()) {
+  }else if(V.type().is_int()) { untested();
     o__ "int& " << V.code_name() << "(d->" << V.code_name() << ");\n";
   }else if(V.type().is_real()) {
     if(V.deps().ddeps().size() == 0){
@@ -848,7 +882,7 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Variable_Decl&
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_one_variable_store(std::ostream& o, const Variable_Decl& V) const
 {
-  if(!V.type().is_real()) {
+  if(!V.type().is_real()) { untested();
   }else if(!V.is_module_variable()){ untested();
     unreachable();
   }else if(_mode == modePRECALC){ untested();
@@ -916,29 +950,16 @@ static void make_cc_ac_begin(std::ostream& o, const Module& m)
 }
 #endif
 /*--------------------------------------------------------------------------*/
-static void make_cc_common_tr_eval(std::ostream& o, const Module& m)
+void make_cc_analog_list(std::ostream& o, const Module& m, Branch const*
+    src=NULL)
 {
-  o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
-  o << "inline void COMMON_" << m.identifier() << 
-    "::tr_eval_analog(MOD_" << m.identifier() << "* d) const\n{\n";
-  o__ "trace1(\"" << m.identifier() <<"::tr_eval_analog\", d);\n";
-  o__ "trace1(\"" << m.identifier() <<"::tr_eval_analog\", d->long_label());\n";
-
-//  make_variable_decl(o, m.variables());
-  OUT_ANALOG oo(OUT_ANALOG::modeDYNAMIC);
-  oo.make_load_variables(o, m.variables(), m);
-
-  // parameters are here.
-  o__ "MOD_" << m.identifier() << " const* p = d;\n";
-  o__ "assert(p);\n";
-  o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
-  o__ "(void)pc;\n";
-
-
+  OUT_ANALOG oo(OUT_ANALOG::modeDYNAMIC, src);
   for(auto bb : analog_list(m)){
     assert(bb);
 //    if(auto ab = dynamic_cast<AnalogStmt const*>(bb)){ untested();
 //    }else
+    // if(src && !bb->used_in(src)){ untested();
+    // }else
     if(auto ab = dynamic_cast<AnalogConstruct const*>(bb)){
       o__ "{\n";
       {
@@ -949,6 +970,26 @@ static void make_cc_common_tr_eval(std::ostream& o, const Module& m)
     }else{ untested();
     }
   }
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_common_tr_eval(std::ostream& o, const Module& m)
+{
+  o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
+  o << "inline void COMMON_" << m.identifier() << 
+    "::tr_eval_analog(MOD_" << m.identifier() << "* d) const\n{\n";
+  o__ "trace1(\"" << m.identifier() <<"::tr_eval_analog\", d);\n";
+  o__ "trace1(\"" << m.identifier() <<"::tr_eval_analog\", d->long_label());\n";
+
+  OUT_ANALOG oo(OUT_ANALOG::modeDYNAMIC);
+  oo.make_load_variables(o, m.variables(), m);
+
+  // parameters are here.
+  o__ "MOD_" << m.identifier() << " const* p = d;\n";
+  o__ "assert(p);\n";
+  o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
+  o__ "(void)pc;\n";
+
+  make_cc_analog_list(o, m);
   oo.make_store_variables(o, m.variables());
   o << "}\n"
     "/*--------------------------------------"

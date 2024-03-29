@@ -285,7 +285,7 @@ public:
 private:
   void make_assign(std::ostream& o)const override {
     std::string cn = _br->code_name();
-    if(num_args()>1){
+    if(num_args()>1){ untested();
       o__ "t0 = t0 + t1.value();\n";
     }else{
     }

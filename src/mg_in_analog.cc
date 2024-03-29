@@ -174,20 +174,25 @@ void System_Task::dump(std::ostream&o)const
   o__ _e << ";\n";
 }
 /*--------------------------------------------------------------------------*/
-// Variable::Variable
-static Variable* parse_variable(CS& f, Block* o)
+// void Lhs_Ref::parse()
+static Token_VAR_REF* parse_variable(CS& f, Block* o)
 {
   size_t here = f.cursor();
   std::string what;
   f >> what;
   trace1("parse_variable", what);
   Base* b = o->lookup(what);
-  Variable* v = dynamic_cast<Variable*>(b);
-  if(!v){
+  Token_VAR_REF* v = dynamic_cast<Token_VAR_REF*>(b);
+  if(v){
+    assert(f);
+    assert(v->data());
+  }else if (b) { untested();
     f.reset_fail(here);
     trace1("not a variable", f.tail().substr(0,10));
-    return NULL; // BUG
+    assert(0);
   }else{
+    f.reset_fail(here);
+    trace1("not found", f.tail().substr(0,10));
   }
   return v;
 }
@@ -203,36 +208,38 @@ void Assignment::parse(CS& f)
 {
   assert(owner());
   size_t here = f.cursor();
-  // _lhs.set_owner(o);
-  // TODO: LhsRef?
-  // f >> _lhs;
-  Variable* l = parse_variable(f, owner());
+  Token_VAR_REF* l = parse_variable(f, owner());
   // assert(l->name() == name());?
 
-  if(!f){
-    assert(!_lhs);
-    f.reset_fail(here);
-  }else if(f >> "="){
-    _lhs = l;
-    assert(_lhs);
+  if(f && f >> "="){
+    _lhsref = l;
+    assert(_lhsref);
     parse_rhs(f);
 
-    if(!is_reachable()) {
-    }else{
-      assert(!_deps);
-      store_deps(_rhs.deps());
-      _lhs->propagate_deps(*this);
-    }
-
-  }else{ untested();
+  }else{
+    assert(!_lhsref);
     f.reset_fail(here);
 //    throw Exception_CS_("no assignment", f);
   }
 
-  if(l){
-    _name = l->name();
-    owner()->new_var_ref(this);
+  if(_lhsref) {
+    assert(l->data());
+    assert(!_token);
+    store_deps(_rhs.deps());
+    assert(_token);
+    if(options().optimize_unused() && !is_reachable()) {
+    }else{
+      assert(_token->data());
+      trace1("parse prop", name());
+      _lhsref->propagate_deps(*_token);
+      // _name = l->name();
+      assert(_lhsref->name() == _token->name());
+    }
+    assert(_token);
+    owner()->new_var_ref(_token);
+    trace2("parsedone", name(), deps().size());
   }else{
+    // possibly not a variable..
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -264,6 +271,9 @@ void AnalogProceduralAssignment::parse(CS& f)
 template<class A>
 void dump_annotate(std::ostream& o, A const& _a)
 {
+  if(!_a.is_reachable()){
+    o << " // --\n";
+  }else{
     if(_a.deps().ddeps().size()){
       o << " //";
     }else if(_a.has_sensitivities()){
@@ -278,6 +288,7 @@ void dump_annotate(std::ostream& o, A const& _a)
       o << " s";
     }else{
     }
+  }
 }
 /*--------------------------------------------------------------------------*/
 void AnalogProceduralAssignment::dump(std::ostream& o)const
@@ -463,6 +474,7 @@ bool AnalogWhileStmt::update()
 {
   bool ret = false;
   while(true){
+    _body.clear_vars();
     if (_body.update()){
       ret = true;
     }else{
@@ -786,6 +798,11 @@ void AnalogSeqBlock::parse(CS& f)
   }
 }
 /*--------------------------------------------------------------------------*/
+void AnalogSeqBlock::clear_vars()
+{
+  _block.clear_vars();
+}
+/*--------------------------------------------------------------------------*/
 void AnalogCtrlBlock::set_owner(Block* owner)
 {
   if(auto x = dynamic_cast<SeqBlock const*>(owner)) {
@@ -823,10 +840,19 @@ void SeqBlock::dump(std::ostream& o)const
   Block::dump(o);
 }
 /*--------------------------------------------------------------------------*/
+// Variable_Decl::parse?
 void BlockVarIdentifier::parse(CS& file)
 {
-  file >> _name;
-  new_var_ref();
+  assert(owner());
+  assert(!_data);
+  assert(!_token);
+  std::string name;
+  file >> name;
+
+  _data = new TData();
+  _token = new Token_VAR_REF(name, this, _data);
+  trace1("variable decl", name);
+  owner()->new_var_ref(_token);
 }
 /*--------------------------------------------------------------------------*/
 void BlockVarIdentifier::dump(std::ostream& o)const
@@ -856,29 +882,34 @@ void AnalogConstruct::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void Assignment::dump(std::ostream& o) const
 {
-  o << lhsname() << " = " << _rhs;
+  if(_token){
+    o << _token->name() << " = " << _rhs;
+  }else{ untested();
+    o << "/// unreachable?\n";
+  }
 }
 /*--------------------------------------------------------------------------*/
 Assignment::~Assignment()
 {
-  if(_lhs){
-    trace3("~Assignment", lhsname(), this, deps().ddeps().size());
+  if(_token){
+    trace3("~Assignment", name(), this, deps().ddeps().size());
   }else{
   }
   if(options().optimize_unused() && !owner()->is_reachable()) {
-  }else{
+  }else if(_data){
     try{
       for(Dep d : deps().ddeps()) {
 	(*d)->unset_used_in(this);
       }
     }catch(std::logic_error const& e){ untested();
-      std::cerr << " logic error in " << lhsname() << ": ";
+      std::cerr << " logic error in Assignment " << name() << ": ";
       std::cerr << e.what() << "\n";
       assert(0);
     }
+  }else{
   }
-  delete _deps;
-  _deps = NULL;
+  delete _token;
+  _token = NULL;
 }
 /*--------------------------------------------------------------------------*/
 void Assignment::parse_rhs(CS& cmd)
@@ -889,8 +920,9 @@ void Assignment::parse_rhs(CS& cmd)
   assert(_rhs.is_empty());
 
   assert(owner());
-  assert(deps().ddeps().empty());
-  _rhs.set_owner(owner());
+  assert(!_data);
+  // assert(deps().ddeps().empty());
+  _rhs.set_owner(owner()); // this? AssignmentStatement?
   _rhs.resolve_symbols(rhs);
   cmd.reset(cmd.cursor());
   trace1("Assignment::parse_rhs", bool(cmd));
@@ -950,6 +982,41 @@ void Branch_Ref::dump(std::ostream& o)const
   }else{
     o << "(" << pname() << ", " << nname() << ")";
   }
+}
+/*--------------------------------------------------------------------------*/
+std::string const& Branch_Ref::pname() const
+{
+  assert(_br);
+  assert(_br);
+  if(_r){
+    assert(_br->n());
+    return _br->n()->name();
+  }else{
+    assert(_br->p());
+    return _br->p()->name();
+  }
+}
+/*--------------------------------------------------------------------------*/
+std::string const& Branch_Ref::nname() const
+{
+  assert(_br);
+  if(_r){
+    assert(_br->n());
+    return _br->p()->name();
+  }else{
+    assert(_br->p());
+    return _br->n()->name();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Branch_Ref::set_used_in(Base const* b) const
+{
+  return _br->set_used_in(b);
+}
+/*--------------------------------------------------------------------------*/
+void Branch_Ref::unset_used_in(Base const* b) const
+{
+  return _br->unset_used_in(b);
 }
 /*--------------------------------------------------------------------------*/
 void Contribution::parse(CS& cmd)
@@ -1070,7 +1137,9 @@ void Contribution::parse(CS& cmd)
   if(options().optimize_unused() && !owner()->is_reachable()) {
   }else{
     trace2("inc_use0", name(), branch()->name());
-    _branch->inc_use();
+    _branch->inc_use(); // ??
+    _branch->reg_stmt(this);
+    set_used_in(_branch);
   }
 } // Contribution::parse
 /*--------------------------------------------------------------------------*/
@@ -1091,6 +1160,7 @@ void Contribution::add_dep(Dep const& d)
 
   if(owner()->is_reachable()){
     d->branch()->inc_use();
+    trace2("inc_use1", name(), branch()->name());
     (*d)->set_used_in(this);
   }else{
   }
@@ -1114,26 +1184,27 @@ bool Contribution::update()
 {
   assert(owner()->is_reachable());
   trace1("Contribution::update", name());
-  TData const* D = &_rhs.deps();
 
   _rhs.update();
-  D = &_rhs.deps();
+  TData const* D = &_rhs.deps();
   if(!_deps){ untested();
     _deps = new TData;
+    _deps->rdeps().push_back(_branch);
   }else{
   }
   size_t s = _deps->ddeps().size();
+
   _deps->update(*D);
   bool ret = (s != _deps->ddeps().size());
 
   if(options().optimize_unused() && !owner()->is_reachable()) { untested();
   }else{
-    trace1("Contribution::update more", name());
     for(; s < _deps->ddeps().size(); ++s) {
       Dep const& d = deps().ddeps()[s];
-      trace3("inc_use", name(), branch()->name(), d->code_name());
       add_dep(d);
     }
+
+    _rhs.add_rdeps(*_deps);
   }
   _sens.merge(_deps->sensitivities());
 
@@ -1151,6 +1222,71 @@ void Branch_Map::dump(std::ostream&)const
   incomplete();
 }
 /*--------------------------------------------------------------------------*/
+Branch::~Branch()
+{
+  // no, shutting down, not all Refs tidied up.
+  assert(!_refs.size());
+
+  // Contributions tidied up
+  assert(!_has_pot_src);
+  assert(!_has_flow_src);
+  // assert(!_has_always_pot);
+
+  // Probes tidied up
+  assert(!_has_pot_probe);
+  assert(!_has_flow_probe);
+
+  delete _deps;
+  _deps = NULL;
+
+  for(auto i : _used_in){
+    if(i){ untested();
+      std::cerr << "logic error. " << name() << " still used in. " << i << "\n";
+      assert(0);
+    }else{
+    }
+    assert(!i);
+  }
+  if(_use){ untested();
+    unreachable();
+    std::cerr << "logic error. " << name() << " still used.\n";
+    assert(false);
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Branch::set_used_in(Base const* b)
+{
+  for(auto& i : _used_in){
+    if(i == b){ untested();
+      return;
+    }else{
+    }
+  }
+  _used_in.push_back(b);
+}
+/*--------------------------------------------------------------------------*/
+void Branch::unset_used_in(Base const* b)
+{
+  int found = 0;
+  for(auto& i : _used_in){
+    if(i == b){
+      i = NULL;
+      ++found;
+#ifndef NDEBUG
+      return;
+#endif
+    }else{
+    }
+  }
+  if(!found){ untested();
+    unreachable();
+    throw std::logic_error("cleanup " + code_name());
+  }else if(found>1){ untested();
+    throw std::logic_error("cleanup1 " + code_name());
+  }else{ untested();
+  }
+}
 /*--------------------------------------------------------------------------*/
 void Branch::dump(std::ostream& o)const
 {
@@ -1210,13 +1346,6 @@ bool Branch::req_short() const
   }
 }
 /*--------------------------------------------------------------------------*/
-void Assignment::set_lhs(Variable* v)
-{ untested();
-  _lhs = v;
-  assert(v);
-  _name = v->name(); // BUG?
-}
-/*--------------------------------------------------------------------------*/
 void AnalogCtrlBlock::dump(std::ostream& o)const
 {
   if(size() || identifier() != ""){
@@ -1235,6 +1364,21 @@ void AnalogCtrlBlock::dump(std::ostream& o)const
     o << "\n";
     {
       indent x;
+      if(options().dump_annotate()){
+	for(auto i : _block.variables()){
+	  if(auto v = dynamic_cast<Token_VAR_REF const*>(i.second)){
+	    o__ "// " << v->name();
+	    if(v->data()){
+	      o << " : " << v->deps().size() << "\n";
+	    }else{
+	      o << "???\n";
+	    }
+	  }else{ untested();
+	    o__ "// " << i.first << "\n";
+	  }
+	}
+      }else{
+      }
       _block.dump(o);
     }
     o__ "end\n";
@@ -1251,6 +1395,16 @@ void AnalogSeqBlock::dump(std::ostream& o)const
   }else{
   }
   o << "\n";
+  if(options().dump_annotate()){
+    for(auto i : _block.variables()){
+      if(auto v = dynamic_cast<Token_VAR_REF const*>(i.second)){
+	o__ "// " << v->name() << " : " << v->deps().size() << "\n";
+      }else{ untested();
+	o__ "// " << i.first << "\n";
+      }
+    }
+  }else{
+  }
   {
     indent x;
     _block.dump(o);
@@ -1314,6 +1468,7 @@ void AnalogEvtCtlStmt::dump(std::ostream& o) const
 }
 /*--------------------------------------------------------------------------*/
 void make_cc_af_body(std::ostream& o, const Analog_Function& f); // BUG
+void make_cc_af_args(std::ostream& o, const Analog_Function& f); // BUG
 namespace{
 /*--------------------------------------------------------------------------*/
 static Module const* to_module(Block const* owner)
@@ -1348,31 +1503,13 @@ Module const* to_module(Block const* owner)
 }
 #endif
 /*--------------------------------------------------------------------------*/
-void make_cc_af_args(std::ostream& o, const Analog_Function& f)
-{
-  std::string sep = "";
-  std::string qual = "";
-  for (auto coll : f.args()){
-      if(coll->is_output()){
-	qual = "&";
-      }else{
-	qual = "";
-      }
-    for(auto i : *coll){
-      o << sep << "ddouble " << qual;
-      o << " af_arg_" << i->identifier();
-      sep = ", ";
-    }
-  }
-}
-/*--------------------------------------------------------------------------*/
 // analog_in? analog_out?
 class AF : public MGVAMS_FUNCTION {
   Analog_Function const* _af{NULL};
 public:
   explicit AF(Analog_Function const* af) : _af(af) {
     assert(_af);
-    set_label(af->identifier().to_string());
+    set_label(af->identifier());
   }
 
 #if 1
@@ -1489,6 +1626,9 @@ void Analog_Function::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 Analog_Function::~Analog_Function()
 {
+  for(auto x : _var_refs){
+    trace1("~AF", x.first);
+  }
   delete _function;
   _function = NULL;
 }
@@ -1502,6 +1642,14 @@ void Analog_Function::dump(std::ostream& o) const
     Block::dump(o); // TODO: indentation
   }
   o__ "endfunction\n";
+}
+/*--------------------------------------------------------------------------*/
+void Analog_Function::new_var_ref(Base* b)
+{
+  auto t = prechecked_cast<Token*>(b);
+  assert(t);
+  trace1("AF::nvr", t->name());
+  return Block::new_var_ref(b);
 }
 /*--------------------------------------------------------------------------*/
 void AnalogEvtExpression::parse(CS& file)
@@ -1533,9 +1681,8 @@ void AF_Arg_List_Collection::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void Analog_Function_Arg::parse(CS& f)
 {
-  f >> _name;
-  assert(owner());
-  owner()->new_var_ref(this);
+  trace1("Analog_Function_Arg::parse", f.tail().substr(0,10));
+  Variable_Decl::parse(f);
 }
 /*--------------------------------------------------------------------------*/
 void Analog_Function_Arg::dump(std::ostream& o)const
@@ -1578,79 +1725,93 @@ bool Assignment::update()
   size_t s = D->ddeps().size();
   bool ret;
 
-  trace5("Assignment::update1", lhsname(), s, D->ddeps().size(), this, _deps->size());
+  trace5("Assignment::update1", name(), s, D->ddeps().size(), this, _data->size());
   _rhs.update();
   D = &_rhs.deps();
-  trace5("Assignment::update2", lhsname(), s, D->ddeps().size(), this, _deps->size());
+  trace4("Assignment::update2", name(), s, D->ddeps().size(), this);
 
+  assert(_token);
   if (store_deps(_rhs.deps())) {
-    assert(_lhs);
-    trace3("Assignment::update prop", _rhs.deps().size(), _lhs->deps().size(), _deps->size());
-    _lhs->propagate_deps(*this);
+    assert(_lhsref);
+    trace2("Assignment::update prop", _rhs.deps().ddeps().size(), _lhsref->deps().ddeps().size());
+    _lhsref->propagate_deps(*_token);
+    assert(_token->operator->());
     ret = true;
+    assert(_token->data());
   }else{
-    trace3("Assignment::update no prop", _rhs.deps().size(), _lhs->deps().size(), _deps->size());
+    trace4("Assignment::update no prop", name(), _rhs.deps().size(), _lhsref->deps().size(), _token->deps().size());
     ret = false;
-//    ret = _lhs->propagate_deps(*this);
+    assert(_token->data());
+    assert(_token->deps().size() >= _rhs.deps().size());
   }
+  owner()->new_var_ref(_token); // ??
 
   // new_var_ref();
   return ret;
 }
 /*--------------------------------------------------------------------------*/
-bool Assignment::propagate_deps(Variable const& from)
+bool Assignment::propagate_deps(Token_VAR_REF const& from)
 {
   TData const& d = from.deps();
-  if(&from == this) { untested();
-    assert(false);
-    return false;
-  // reachablefrom
-  }else if(from.owner() == owner()) {
-    // pass on.
-    return _lhs->propagate_deps(from);
+  if(from.scope() == scope()) {
+    return _lhsref->propagate_deps(from);
   }else{
     bool ret = store_deps(d);
-    return _lhs->propagate_deps(*this) || ret;
+    assert(_lhsref);
+    return _lhsref->propagate_deps(*_token) || ret;
   }
 }
 /*--------------------------------------------------------------------------*/
+// bool Assignment::sync_data(TData const& d)
 bool Assignment::store_deps(TData const& d)
 {
-  // TODO: attrib.
-  // TODO: only if reachable.
-  assert(_lhs);
-  size_t s = _lhs->deps().ddeps().size();
-  assert(s <= _lhs->deps().ddeps().size());
-  if(_deps) {
-  }else{
-    _deps = new TData;
-  }
-  size_t ii = _deps->ddeps().size();
-  _deps->update(d);
-  assert(ii <= _deps->ddeps().size());
+  assert(_lhsref);
+  size_t ii = 0;
   bool ret = false;
 
-  if(auto x = dynamic_cast<SeqBlock const*>(owner())) {
-    if(x->has_sensitivities()) {
-      _deps->add_sens(*x->sensitivities());
+  if(options().optimize_unused() && !owner()->is_reachable()) {
+    _token = new Token_VAR_REF(_lhsref->name(), NULL);
+  }else{
+
+    if(_token) {
+      assert(_data);
+      ii = _data->ddeps().size();
+      _data->update(d);
+//      _token = new Token_VAR_REF(_lhsref->name(), NULL);
     }else{
+      assert(!_data);
+      _data = new TData();
+      _token = new Token_VAR_REF(_lhsref->name(), this, _data);
+      assert(_token->data());
+  //    _deps = new TData;
+      _data->update(d);
     }
-  }else{ untested();
+
+    assert(ii <= _data->ddeps().size());
+
+    if(auto x = dynamic_cast<SeqBlock const*>(owner())) {
+      if(x->has_sensitivities()) {
+	_data->add_sens(*x->sensitivities());
+      }else{
+      }
+    }else{ untested();
+    }
   }
 
-  if(owner()->is_reachable()){
-    for(; ii < _deps->ddeps().size(); ++ii) {
+  if(options().optimize_unused() && !owner()->is_reachable()){
+  }else{
+    for(; ii < _data->ddeps().size(); ++ii) {
       ret = true;
-      Dep const& dd = _deps->ddeps()[ii];
+      Dep const& dd = _data->ddeps()[ii];
+      trace2("inc_use2", (*dd)->code_name(), this);
       (*dd)->set_used_in(this);
     }
-    assert(&deps() == _deps);
-  }else{ untested();
+    assert(&deps() == _data);
+    assert(d.ddeps().size() <= _data->ddeps().size());
   }
 
-  assert(d.ddeps().size() <= _deps->ddeps().size());
   return ret;
-}
+} // Assignment::store_deps
 /*--------------------------------------------------------------------------*/
 void Contribution::set_direct(bool d)
 {
@@ -1747,6 +1908,8 @@ Contribution::~Contribution()
       }
     }
 
+    _branch->dereg_stmt(this);
+    unset_used_in(_branch);
   }
   delete _deps;
   _deps = NULL;
@@ -1756,7 +1919,7 @@ void Variable_Decl::dump(std::ostream& o)const
 {
   o__ name();
   if(options().dump_annotate()){
-    for(auto d : deps().ddeps()){ untested();
+    for(auto d : deps().ddeps()){
       o << "// dep " << d->code_name();
     }
     o << "\n";
@@ -1764,11 +1927,16 @@ void Variable_Decl::dump(std::ostream& o)const
   }
 }
 /*--------------------------------------------------------------------------*/
-bool Variable_Decl::propagate_deps(Variable const& v)
+bool Variable_Decl::propagate_deps(Token_VAR_REF const& v)
 {
+  if(!v.data()){ untested();
+    incomplete();
+    return false;
+  }else{
+  }
   TData const& incoming = v.deps();
   assert(&deps() != &incoming);
-  deps().update(incoming);
+  data().update(incoming);
   assert(deps().ddeps().size() >= incoming.ddeps().size());
   return false;
 }
@@ -2000,7 +2168,7 @@ FUNCTION_ const* analog_function_call(std::string const& f, Block const* scope)
   assert(m);
   for(auto n: ::analog(*m).functions()){
     trace2("is_afcall", n->identifier(), f);
-    if(n->identifier().to_string() == f){
+    if(n->identifier() == f){
       assert(n->function());
       return n->function();
     }else{
@@ -2103,6 +2271,47 @@ Branch_Ref Branch_Map::lookup(std::string const& n)const
 // { untested();
 //   ...
 // }
+/*--------------------------------------------------------------------------*/
+void AnalogStmt::set_used_in(Base const* b)
+{
+  for(auto& i : _used_in){ untested();
+    if(i == b){ untested();
+      return;
+    }else{ untested();
+    }
+  }
+  _used_in.push_back(b);
+}
+/*--------------------------------------------------------------------------*/
+void AnalogStmt::unset_used_in(Base const* b)
+{
+  for(auto& i : _used_in){
+    if(i == b){
+      i = NULL;
+      return;
+    }else{ untested();
+    }
+  }
+  unreachable();
+}
+/*--------------------------------------------------------------------------*/
+bool AnalogStmt::is_used_in(Base const* b)const
+{
+  for(auto& i : _used_in){ untested();
+    if(i == b){ untested();
+      return true;
+    }else{ untested();
+    }
+  }
+  return false;
+}
+/*--------------------------------------------------------------------------*/
+AnalogStmt::~AnalogStmt()
+{
+  for(auto n :_used_in){
+    assert(!n);
+  }
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

@@ -122,7 +122,7 @@ Port_3* Circuit::find_port(std::string const& n)
   if (p != _ports.end()){
     assert(*p);
     return *p;
-  }else{
+  }else{ untested();
     trace1("port not found", n);
     return NULL;
   }

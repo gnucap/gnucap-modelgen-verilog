@@ -364,6 +364,7 @@ public:
   std::string name() const;
   void set_used_in(Base const*)const;
   void unset_used_in(Base const*)const;
+//  bool is_used_in(..);
 };
 /// Some kind of ordered block with scope for parameters, variables..
 class Task;
@@ -372,7 +373,9 @@ class Nature;
 class Token;
 class FUNCTION;
 class Block : public List_Base<Base> /* is Base_,  has-A List? */ {
+public:
   typedef std::map<std::string, Base*> map; // set?
+private:
   typedef map::const_iterator const_iterator;
   typedef enum{
     r_unknown = -1,
@@ -404,7 +407,8 @@ public:
 //  void set_reachable() { untested(); _reachable = r_unknown; }
   void set_always() { _reachable = r_always; }
   void set_never() { _reachable = r_never; }
-  void new_var_ref(Base* what);
+  virtual void new_var_ref(Base* what);
+  void clear_vars();
 
   virtual Node* new_node(std::string const& p){ untested();
     assert(_owner);

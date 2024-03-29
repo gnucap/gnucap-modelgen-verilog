@@ -357,11 +357,12 @@ public:
   void new_constant(std::ostream& o, Token_CONSTANT const& c);
   void new_rhs(Token_VAR_REF const* v){
     // TODO: linear?
-    if(0 && (*v)->is_real()){ untested();
-      // crash?
-      _refs.push("ddouble(" + (*v)->code_name() + ")/*rhsvar*/");
-    }else{
-      _refs.push("" + (*v)->code_name() + "/*rhsvar*/");
+    // if(0 && (*v)->is_real()){ untested();
+    //   // crash?
+    //   _refs.push("ddouble(" + (*v)->code_name() + ")/*rhsvar*/");
+    // }else
+    {
+      _refs.push("" + v->code_name() + "/*rhsvar*/");
     }
     _types.push(t_ref);
   }

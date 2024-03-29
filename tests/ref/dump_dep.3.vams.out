@@ -7,6 +7,10 @@ module test_while0a(p, n);
 ;
 
   analog begin // always
+    // i : 0
+    // x : 1
+    // y : 1
+    // z : 0
     integer i;
     real x, y;
     x = 0.;
@@ -15,6 +19,9 @@ module test_while0a(p, n);
     y = 0.; // dep: _potential_b_p_n
     i = r;
     while ((i > 0)) begin
+      // i : 0
+      // x : 1
+      // y : 1
       i = (i - 1);
       x = y; // dep: _potential_b_p_n
       y = (x + V(p, n)); // dep: _potential_b_p_n

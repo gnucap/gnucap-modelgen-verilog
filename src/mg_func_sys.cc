@@ -196,7 +196,7 @@ private:
 	arg = ee->back();
       }else if(p->args()){
 	arg = p->args()->back();
-      }else{
+      }else{ untested();
 	unreachable();
       }
     }else{ untested();

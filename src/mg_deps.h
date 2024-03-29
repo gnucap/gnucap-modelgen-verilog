@@ -118,9 +118,12 @@ private:
   void dump(std::ostream&)const override {unreachable();}
 };
 /*--------------------------------------------------------------------------*/
+class Branch;
 class TData : public Base {
   DDeps _s; // dynamic_deps?
   Sensitivities _sens; // sensitivities
+  mutable std::vector<Branch const*> _rdeps;
+//   RDeps _rdeps;
   // V _sens; // discrete_deps?
   // R _range; // discrete_deps?
   bool _offset{false}; // -> dynamic_deps.
@@ -143,21 +146,18 @@ public:
   Dep back(){
     return _s.back();
   }
-  void clear(){
-    _s.clear();
-  }
+  void clear();
   DDeps& ddeps() {return _s;}
+  std::vector<Branch const*>& rdeps()const {return _rdeps;}
   DDeps const& ddeps()const {return _s;}
   void set_offset(bool v = true){_offset = v;}
   void set_constant(bool v = true){_constant = v;} // attrib/sens?
-  size_t size()const {return _s.size();} //  + _rdeps.size(); }
-  bool is_offset() const {return _offset;}
-  bool is_constant() const {return _constant;}
-  bool is_linear() const;
-  bool is_quadratic() const;
-  void set_any() {
-    _s.set_any();
-  }
+  size_t size()const {return _s.size() + _rdeps.size(); }
+  bool is_offset()const {return _offset;}
+  bool is_constant()const {return _constant;}
+  bool is_linear()const;
+  bool is_quadratic()const;
+  void set_any() { _s.set_any(); }
 public: // sens
   void add_sens(Sensitivities const& s){
     _sens.merge(s);

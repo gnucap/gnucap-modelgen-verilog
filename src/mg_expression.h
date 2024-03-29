@@ -56,27 +56,25 @@ class Expression_ : public Expression {
 public:
   explicit Expression_() : Expression() {}
   ~Expression_();
-  void resolve_symbols(Expression const& e){
-    return resolve_symbols_(e);
-  }
+  void resolve_symbols(Expression const& e);
   void set_owner(Block* b){ _owner = b; }
   void dump(std::ostream& out)const override;
 // private:
   Block* owner(){ return _owner; }
-private:
-  void resolve_symbols_(Expression const& e, TData* deps=NULL);
 public:
   void clear();
   Expression_* clone() const;
-  TData const& deps()const;
+  TData const& data()const;
+  TData const& deps()const {return data();} // remove?
   // Attrib const& attrib()const;
   bool update();
+  bool add_rdeps(TData const&);
 private: // all the same eventually?
 //  Token* resolve_function(FUNCTION_ const* filt, Block* owner) const;
   Token* resolve_xs_function(std::string const& n);
   Token* resolve_system_task(FUNCTION_ const* t);
   Probe const* new_probe(std::string const& xs, Branch_Ref const& br);
-};
+}; // Expression_
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

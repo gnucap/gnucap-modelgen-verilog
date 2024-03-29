@@ -475,6 +475,41 @@ static void make_tr_accept(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+void make_cc_analog_list(std::ostream& o, const Module& m, Branch const*
+    src=NULL);
+/*--------------------------------------------------------------------------*/
+// move to analog.cc?
+static void make_tr_eval_branch(std::ostream& o, Module const& m,
+		Branch const& br)
+{
+  make_tag();
+  std::string class_name = "EVAL_" + br.code_name() + '_';
+  o << "static " << class_name << " Eval_" << br.name()
+      << "(CC_STATIC);\n"
+    "void " << class_name << "::tr_eval(ELEMENT* d)const\n{\n";
+  o__ "assert(d);\n"
+    "  auto* p = prechecked_cast<DEV_"
+      << m.identifier() << "*>(d->owner());\n"
+    "  assert(p);\n"
+    "  const COMMON_" << m.identifier() << "* c = prechecked_cast<const COMMON_"
+      << m.identifier() << "*>(p->common());\n"
+    "  assert(c);\n";
+    make_cc_analog_list(o, m, &br);
+    o<< "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_tr_eval_branches(std::ostream& o, const Module& m)
+{
+  o << "#if 0\n";
+  for(auto br : m.circuit()->branches()) {
+    o << "// tr_eval_branch " << br->code_name() << "\n";
+    make_tr_eval_branch(o, m, *br);
+  }
+  o << "#endif\n";
+}
+/*--------------------------------------------------------------------------*/
 static void make_read_probes(std::ostream& o, const Module& m)
 {
   o << "inline void MOD_" << m.identifier() << "::read_probes()\n{\n";
@@ -561,6 +596,7 @@ static void make_module_class(std::ostream& o, Module const& m)
     "------------------------------------*/\n";
   if(m.has_analog_block()){
     make_tr_needs_eval(o, m);
+    make_tr_eval_branches(o, m);
     make_do_tr(o, m);
     make_cc_analog(o, m);
   }else{

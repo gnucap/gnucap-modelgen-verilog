@@ -183,6 +183,7 @@ public:
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class Sensitivities;
+// code.h?
 class SeqBlock : public Block {
   String_Arg _identifier;
   Sensitivities* _sens{NULL};
@@ -214,6 +215,7 @@ public:
   Sensitivities const* sensitivities()const {return _sens;}
   void set_sens(Base const* s);
   void merge_sens(Sensitivities const& s);
+  map const& variables()const {return _var_refs;}
 }; // SeqBlock
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -435,28 +437,6 @@ public:
   std::string name()const;
   Expression_ const& value()const;
 };
-/*--------------------------------------------------------------------------*/
-class Paramset : public Module {
-  // std::string _proto_name; // needed?
-  Paramset* _sub{NULL};
-public:
-  explicit Paramset() : Module() {}
-  void parse(CS& f)override;
-  void dump(std::ostream& f)const override;
-public: // Block?
-  void set_attributes(Attribute_Instance const* a) {
-    assert(!_attributes);
-    _attributes = a;
-  }
-  bool has_attributes() const{
-    return _attributes;
-  }
-  Module* deflate() override;
-private:
-  CS& parse_stmt(CS& f);
-  void expand();
-};
-typedef Collection<Paramset> Paramset_List;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
