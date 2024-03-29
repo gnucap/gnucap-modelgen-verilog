@@ -232,6 +232,7 @@ public:
   AnalogList const& list()const { return _list; }
   AnalogList const& blocks()const { return _list; }
   Analog_Functions const& functions()const { return _functions; }
+  void push_back(Base*);
 };
 /*--------------------------------------------------------------------------*/
 inline Analog const& analog(Module const& m)
@@ -419,10 +420,15 @@ private:
   bool update()override;
 };
 /*--------------------------------------------------------------------------*/
+// just AssignStatement?
 class AnalogProceduralAssignment : public AnalogStmt {
   Assignment _a;
   TData _deps;
 public:
+  // explicit AnalogProceduralAssignment(Block* o) {
+  //   set_owner(o);
+  //   _a.set_owner(o);
+  // }
   explicit AnalogProceduralAssignment(CS&, Block*);
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
@@ -430,6 +436,7 @@ public:
   bool is_used_in(Base const*b)const override{
     return _a.is_used_in(b) || AnalogStmt::is_used_in(b);
   }
+  Statement* deep_copy(Base* no)const override;
 private:
   bool update()override;
   TData const& deps()override {return _deps;};

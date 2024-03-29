@@ -53,20 +53,12 @@ class File : public Block {
   Module_List	_macromodule_list;
   Module_List	_connectmodule_list;
   Paramset_List   _paramset_list;
-  Attribute_Instance const* _attributes{NULL};
-  Attribute_Stash _attribute_stash;
 public: // build
   File();
-  ~File(){
-    delete _attributes;
-    _attributes = NULL;
-  }
+  ~File(){ }
 
   void read(std::string const&);
   void parse(CS& f) override;
-  Attribute_Stash& attribute_stash() {
-    return _attribute_stash;
-  }
   void dump(std::ostream&)const override;
 
 public: // readout
@@ -87,6 +79,20 @@ public: // readout
   const Paramset_List&	 paramset_list()const	{return _paramset_list;}
 
 };
+/*--------------------------------------------------------------------------*/
+void parse_attributes(CS& cmd, void const* x);
+inline void parse_attributes(CS& cmd, intptr_t x)
+{
+  parse_attributes(cmd, (void const*) x);
+}
+/*--------------------------------------------------------------------------*/
+bool has_attributes(void const* x);
+inline bool has_attributes(intptr_t x)
+{
+  return has_attributes((void const*)x);
+}
+void print_attributes(std::ostream& o, const void* x);
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

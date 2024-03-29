@@ -240,6 +240,7 @@ void Assignment::parse(CS& f)
       trace2("parsedone", _token->name(), data().size());
     }
     assert(_token);
+    assert(scope());
     scope()->new_var_ref(_token);
   }else{
     // possibly not a variable..
@@ -270,6 +271,21 @@ void AnalogProceduralAssignment::parse(CS& f)
     }
   }else{
   }
+}
+/*--------------------------------------------------------------------------*/
+Statement* AnalogProceduralAssignment::deep_copy(Base* owner) const
+{
+//  return new AnalogProceduralAssignment(this);
+  auto b = prechecked_cast<Block*>(owner);
+  assert(b);
+  std::stringstream s;
+  dump(s);
+  CS f(CS::_STRING, s.str());
+  trace1("AP::deep_cp", s.str());
+  auto a = new AnalogProceduralAssignment(f, b);
+  assert(a->scope());
+  //a->dump(s);
+  return a;
 }
 /*--------------------------------------------------------------------------*/
 template<class A>
@@ -307,7 +323,7 @@ void AnalogProceduralAssignment::dump(std::ostream& o)const
   o << "\n";
 }
 /*--------------------------------------------------------------------------*/
-static Base* parse_proc_assignment(CS& f, Block* o)
+Base* parse_proc_assignment(CS& f, Block* o)
 {
   assert(o);
   f.skipbl();
@@ -797,6 +813,19 @@ void AnalogSwitchStmt::dump(std::ostream& o)const
     o << _body;
   }
   o__ "endcase\n";
+}
+/*--------------------------------------------------------------------------*/
+void AnalogConstruct::new_block()
+{
+  assert(!_block);
+  _block = new AnalogCtrlBlock();
+  _block->set_owner(this);
+}
+/*--------------------------------------------------------------------------*/
+void AnalogConstruct::push_back(Statement*s)
+{
+  assert(_block);
+  _block->push_back(s);
 }
 /*--------------------------------------------------------------------------*/
 void AnalogConstruct::parse(CS& f)
@@ -2403,6 +2432,15 @@ FUNCTION_ const* xs_function_call(std::string const& f, Block const* owner)
   return NULL;
 }
 /*--------------------------------------------------------------------------*/
+void Analog::push_back(Base* ab)
+{
+  if(auto c = dynamic_cast<AnalogConstruct*>(ab)){
+    _list.push_back(c);
+  }else{
+    unreachable();
+  }
+}
+/*--------------------------------------------------------------------------*/
 void Analog::parse(CS& f)
 {
   if(f >> "function "){
@@ -2416,7 +2454,7 @@ void Analog::parse(CS& f)
     ab->set_owner(owner());
     ab->parse(f);
     _list.set_owner(owner()); // needed?
-    _list.push_back(ab);
+    push_back(ab);
 
 //    if(auto s = dynamic_cast<AnalogStmt*>(ab->statement_or_null())){ untested();
 //      s->update();

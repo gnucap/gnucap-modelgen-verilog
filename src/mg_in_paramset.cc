@@ -24,7 +24,9 @@
 #include "mg_options.h"
 #include "mg_error.h"
 #include "l_stlextra.h"
+#include "mg_analog.h"
 /*--------------------------------------------------------------------------*/
+Base* parse_proc_assignment(CS& f, Block* o); // in_analog.cc
 CS& Paramset::parse_stmt(CS& f)
 {
   f.skipbl();
@@ -72,6 +74,10 @@ CS& Paramset::parse_stmt(CS& f)
 
     // delete dup;
 
+  }else if(Base* ret=parse_proc_assignment(f, this)){
+    move_attributes(&f, ret);
+    push_back(ret);
+    // ...
   }else{
     // incomplete(); // analog_function_statement...
   }
@@ -110,13 +116,10 @@ void Paramset::parse(CS& f)
 {
   File* o = prechecked_cast<File*>(owner());
   assert(o);
-  if(o->attribute_stash().is_empty()){
-  }else{
-    assert(!_attributes);
-    set_attributes(o->attribute_stash().detach());
-  }
-  _attribute_stash.set_owner(this); // use base class?
+
+  move_attributes(&f, this);
   _parameters.set_owner(this);
+  _variables.set_owner(this);
 
   f >> _identifier;
   size_t here = f.cursor();
@@ -144,18 +147,21 @@ void Paramset::parse(CS& f)
 
   trace0("paramset body ========");
   for (;;) {
-    while (f >> _attribute_stash) { }
+    parse_attributes(f, &f);
     ONE_OF
       || f.umatch(";")
       || ((f >> "parameter ") && (f >> _parameters))
       || ((f >> "localparam ") && (f >> _parameters))
+      || ((f >> "real ") && (f >> _variables))
+      || ((f >> "integer ") && (f >> _variables))
       || parse_stmt(f)
       || ((f >> "endparamset ") && (end = true))
       ;
 
-    if (_attribute_stash.is_empty()){
+    if (has_attributes(&f)){
+      f.warn(bWARNING, "dangling attributes "
+	   + attributes(&f).string(NULL));
     }else{
-      f.warn(0, "dangling attributes");
     }
     if (end){
       if(options().expand_paramset()){
@@ -178,6 +184,15 @@ void Paramset::parse(CS& f)
   trace0("paramset body done ========");
 }
 /*--------------------------------------------------------------------------*/
+static void copy_ps_params(Module* sub, Paramset const* thiS)
+{
+  std::stringstream s;
+  thiS->parameters().dump(s);
+  s << "endmodule;";
+  CS cmd(CS::_STRING, s.str());
+  sub->parse_body(cmd);
+}
+/*--------------------------------------------------------------------------*/
 static void import_dot_params(Module* sub, Module const*, Block* thiS)
 {
   auto dots = new Parameter_2_List;
@@ -189,7 +204,7 @@ static void import_dot_params(Module* sub, Module const*, Block* thiS)
   s << "l real "; // TODO: type.
   for(auto i : *thiS) {
     auto dot=dynamic_cast<Paramset_Stmt*>(i);
-    if(!dot){ untested();
+    if(!dot){
     }else if(dot->is_overridden()){ untested();
     }else{
 //       dot->value().dump(std::cerr);
@@ -290,8 +305,15 @@ void streamcp(Module* sub, Owned_Base const& t)
 /*--------------------------------------------------------------------------*/
 static void import_proto_vars(Module* sub, Module const* proto)
 {
-  // streamcp(sub, proto->variables());
   auto& pv = proto->variables();
+
+  for(auto const& x : pv) {
+    auto copy = x->deep_copy(sub, PS_MANGLE_PREFIX);
+    assert(copy->owner() == sub);
+    sub->push_back(copy);
+  }
+
+  return;
 
   for(auto const& x : pv) {
     std::stringstream o;
@@ -343,8 +365,40 @@ static void import_proto_impl(Module* sub, Module const* proto)
   streamcp(sub, proto->circuit()->net_decl());
   streamcp(sub, proto->circuit()->branch_decl());
 
-  import_proto_vars(sub, proto);
   streamcp(sub, proto->analog());
+}
+/*--------------------------------------------------------------------------*/
+static void import_ps_vars(Module* sub, Module const* ps)
+{
+  auto& pv = ps->variables();
+
+  for(auto const& x : pv) {
+    auto copy = x->deep_copy(sub);
+    assert(copy->owner() == sub);
+    sub->push_back(copy);
+  }
+}
+/*--------------------------------------------------------------------------*/
+static void import_assignments(Module* sub, Module const* ps)
+{
+  auto ac = new AnalogConstruct;
+  ac->set_owner(sub);
+  ac->new_block();
+//  sub->new_analog();
+  for(auto x : *ps){
+    if(dynamic_cast<Paramset_Stmt const*>(x)){
+      // todo?
+    }else if(auto a = dynamic_cast<Statement const*>(x)){
+      ac->push_back(a->deep_copy(ac->block()));
+    }else{
+      assert(false);
+    }
+  }
+  if(ac->block()->size()){
+    sub->push_back(ac);
+  }else{
+    delete(ac);
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Paramset::expand()
@@ -357,19 +411,22 @@ void Paramset::expand()
   assert(_sub->file() == file());
 //  _sub->set_file(file());
   _sub->_identifier = _identifier;
-  {
-    trace1("1. copyparams ========", _identifier);
-    std::stringstream s;
-    parameters().dump(s);
-    s << "endmodule;";
-    CS cmd(CS::_STRING, s.str());
-    _sub->parse_body(cmd);
-  }
 
+  trace1("1. copyparams ========", _identifier);
+  copy_ps_params(_sub, this);
   trace0("2. dotparams ========");
   import_dot_params(_sub, _proto, this);
   trace0("3. protoparams ========");
   import_proto_params(_sub, _proto);
+
+  trace0("3b. proto vars ========");
+  import_proto_vars(_sub, _proto);
+  trace0("5. variables ========");
+  import_ps_vars(_sub, this);
+
+  trace0("6. assignments ========");
+  import_assignments(_sub, this);
+
   trace0("4. implementation ========");
   import_proto_impl(_sub, _proto);
 }
@@ -421,26 +478,24 @@ void Paramset_Stmt::dump(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 void Paramset::dump(std::ostream& o) const
 {
+  print_attributes(o, this);
   if(!_proto){
     return Module::dump(o);
   }else{
+    o << "paramset " << _identifier << " " << _proto->identifier() << ";\n";
+    {
+      indent a;
+      dump_parameters(o);
+      dump_variables(o);
+
+      // dump_body..?
+      for(auto i : *this) {
+	assert(i);
+	o << *i;
+      }
+    }
+    o << "endparamset;\n";
   }
-  if(has_attributes()){
-    o << attributes();
-  }else{
-  }
-  o << "paramset " << _identifier << " " << _proto->identifier() << ";\n";
-  if(parameters().size()){
-    indent a;
-    o << parameters() << "\n";
-  }else{
-  }
-  for(auto i : *this){
-    indent a;
-    assert(i);
-    o << *i;
-  }
-  o << "endparamset;\n";
 }
 /*--------------------------------------------------------------------------*/
 void Paramset::new_var_ref(Base* what)

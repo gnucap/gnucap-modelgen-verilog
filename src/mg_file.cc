@@ -48,12 +48,8 @@ File::File() : _file(CS::_STRING, "")
 +	| discipline_declaration
 -	| connectrules_declaration
 */
-void File::parse(CS& file)
+void File::parse(CS& f)
 {
-//  _module_list.set_file(this); // needed?
-			       //
-  _attribute_stash.set_owner(this);
-
   _module_list.set_owner(this);
   _macromodule_list.set_owner(this);
   _connectmodule_list.set_owner(this);
@@ -63,24 +59,24 @@ void File::parse(CS& file)
 
   size_t here = _file.cursor();
   for (;;) {
-    while(file >> _attribute_stash){ }
+    parse_attributes(f, &f);
     ONE_OF	// description
-      || file.umatch(";")
-      || ((file >> "module ")	     && (file >> _module_list))
-      || ((file >> "macromodule ")   && (file >> _macromodule_list))
-      || ((file >> "connectmodule ") && (file >> _connectmodule_list))
-      || ((file >> "nature ")	     && (file >> _nature_list))
-      || ((file >> "discipline ")    && (file >> _discipline_list))
-      || ((file >> "paramset ")      && (file >> _paramset_list))
+      || f.umatch(";")
+      || ((f >> "module ")	     && (f >> _module_list))
+      || ((f >> "macromodule ")   && (f >> _macromodule_list))
+      || ((f >> "connectmodule ") && (f >> _connectmodule_list))
+      || ((f >> "nature ")	     && (f >> _nature_list))
+      || ((f >> "discipline ")    && (f >> _discipline_list))
+      || ((f >> "paramset ")      && (f >> _paramset_list))
       ;
-    if (_attribute_stash.is_empty()){
+    if (has_attributes(&f)){
+      f.warn(bWARNING, "dangling attributes");
     }else{ untested();
-      file.warn(bWARNING, "dangling attributes");
     }
-    if (!file.more()) {
+    if (!f.more()) {
       break;
-    }else if (file.stuck(&here)) {
-      throw Exception_CS_("syntax error, need nature, discipline, module or paramset", file);
+    }else if (f.stuck(&here)) { untested();
+      throw Exception_CS_("syntax error, need nature, discipline, module or paramset", f);
     }else{
     }
   }
@@ -102,6 +98,7 @@ void File::parse(CS& file)
       trace1("deflated paramset", m->identifier());
       _paramset_list.erase(i);
       tmp.push_back(m); 
+//		m->dump(std::cout);
 //       _module_list.push_back(m);
     }
     i = j;

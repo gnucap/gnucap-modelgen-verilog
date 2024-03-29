@@ -1,0 +1,37 @@
+module resistor(p, n);
+  electrical p, n;
+  (* desc="x" *)
+  real x;
+  real y;
+
+  analog begin
+    x = 1.;
+    y = 2.;
+  end
+
+endmodule
+
+
+
+// paramsets
+module const_res(p, n);
+  electrical p, n;
+  (* desc="x" *)
+  real __x;
+  real __y;
+  (* desc="a" *)
+  real a, b;
+  real c, d;
+
+  analog begin
+    a = 1;
+    b = (__y + 1);
+  end
+
+  analog begin
+    __x = 1.;
+    __y = 2.;
+  end
+
+endmodule
+

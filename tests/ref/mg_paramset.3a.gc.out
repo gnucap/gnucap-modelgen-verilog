@@ -1,0 +1,17 @@
+#           y(r)      
+ 0.        -1.        
+ 0.1       -0.9       
+ 0.2       -0.8       
+ 0.3       -0.7       
+ 0.4       -0.6       
+ 0.5       -0.5       
+ 0.6       -0.4       
+ 0.7       -0.3       
+ 0.8       -0.2       
+ 0.9       -0.1       
+ 1.         0.        
+Gnucap   System status
+iterations: op=0, dc=22, tran=0, fourier=0, total=22
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%

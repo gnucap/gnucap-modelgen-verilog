@@ -97,7 +97,6 @@ public:
 class Parameter_2_List : public LiSt<Parameter_2, '\0', ',', ';'> {
   String_Arg _type;
   bool _is_local{false};
-  Attribute_Instance const* _attributes{NULL};
 public:
   bool is_local()const;
   String_Arg const& type()const {return _type;}
@@ -142,7 +141,6 @@ class Circuit;
 class Module : public Block {
 private: // verilog input data
   File const* _file{NULL};
-  Variable_List_Collection _variables;
   Aliasparam_Collection _aliasparam;
   // Element_2_List _element_list;
   // Port_1_List _local_nodes;
@@ -150,7 +148,7 @@ private: // verilog input data
   Circuit* _circuit{NULL};
 //  Block _module_body;
 protected:
-  Attribute_Stash _attribute_stash;
+  Variable_List_Collection _variables;
   Parameter_List_Collection _parameters;
   // Code_Block		_validate;
   String_Arg	_identifier;
@@ -181,6 +179,9 @@ public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   const String_Arg&	  identifier()const	{return _identifier;}
+protected:
+  void dump_parameters(std::ostream& f)const;
+  void dump_variables(std::ostream& f)const;
 public: // TODO
 
   const Parameter_List_Collection& parameters()const	{return _parameters;}
@@ -200,20 +201,12 @@ public:
   bool sync()const;
   bool has_submodule()const;
   bool has_analog_block()const;
-  Attribute_Stash& attribute_stash() {
-    return _attribute_stash;
-  }
   void set_tr_review() {_has_tr_review = true; }
   void set_analysis() {_has_analysis = true; }
-  void set_attributes(Attribute_Instance const* a) {
-    assert(!_attributes);
-    _attributes = a;
-  }
   void push_back(FUNCTION_ const* f);
   void push_back(Filter /*const*/ * f);
-  void push_back(Base* x){
-    return Block::push_back(x);
-  }
+  void push_back(Token* x);
+  void push_back(Base* x);
   void install(FUNCTION_ const* f);
   void install(Probe const* f);// ?
   std::list<FUNCTION_ const*> const& func()const {return _func;}
@@ -258,13 +251,6 @@ public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
 public: // Block?
-  void set_attributes(Attribute_Instance const* a) {
-    assert(!_attributes);
-    _attributes = a;
-  }
-  bool has_attributes() const{
-    return _attributes;
-  }
   Module* deflate() override;
 private:
   CS& parse_stmt(CS& f);

@@ -104,14 +104,8 @@ void Net_Declarations::parse(CS& f)
   }
 
   if(d){
+    move_attributes(&f, d);
     push_back(d);
-
-    if(mod->attribute_stash().is_empty()){
-    }else if(size()){
-      assert(!_attributes);
-      d->set_attributes(mod->attribute_stash().detach());
-    }else{ untested();
-    }
   }else{
   }
 }

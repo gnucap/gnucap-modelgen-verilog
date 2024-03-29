@@ -1,0 +1,18 @@
+module resistor(a, b);
+  electrical a, b;
+  (* desc="x" *)
+  real x;
+
+endmodule
+
+
+
+// paramsets
+paramset const_res resistor;
+  (* desc="a" *)
+  real a;
+  real b;
+
+  a = (.x + 1);
+endparamset;
+

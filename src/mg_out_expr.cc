@@ -486,6 +486,10 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
 
     if (auto var = dynamic_cast<const Token_VAR_REF*>(*i)) {
       s.new_rhs(var); // if linear?
+//    }else if (auto t = dynamic_cast<const Token_OUT_VAR*>(*i)) {
+//      s.new_rhs(t); // if linear?
+//      //incomplete();
+//      //o__ "0.; // OUTVAR?!\n";
     }else if(auto pp = dynamic_cast<const Token_ACCESS*>(*i)) {
       s.new_ddouble(o);
       if(!s.has_deps()){

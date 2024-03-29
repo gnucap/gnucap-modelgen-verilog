@@ -188,6 +188,8 @@ class Sensitivities;
 class AnalogConstruct : public Statement {
   Block* _block{NULL};
 public:
+  AnalogConstruct(){
+  }
   ~AnalogConstruct(){
     delete _block;
     _block = NULL;
@@ -196,7 +198,10 @@ public:
 public:
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
+  void new_block();
   Base const* statement_or_null() const{ return _block; }
+  Block* block(){ return _block; }
+  void push_back(Statement*);
 };
 typedef Collection<AnalogConstruct> AnalogList;
 #if 0
@@ -499,23 +504,6 @@ public:
   Block* owner() {return Owned_Base::owner();}
 };
 /*--------------------------------------------------------------------------*/
-template <class T, char BEGIN, char SEP, char END, char END2, char END3>
-LiSt<T, BEGIN, SEP, END, END2, END3>::~LiSt(){
-  delete _attributes;
-  _attributes = NULL;
-}
-/*--------------------------------------------------------------------------*/
-#if 0
-template <class T, char BEGIN, char SEP, char END, char END2, char END3>
-void LiSt<T, BEGIN, SEP, END, END2, END3>::dump_attributes(std::ostream& f)const
-{
-  if(_attributes){ untested();
-    f << *_attributes;
-  }else{ untested();
-  }
-}
-#endif
-/*--------------------------------------------------------------------------*/
 // inline void Owned_Base::set_reachable()
 // {
 //   assert(_owner);
@@ -540,10 +528,16 @@ inline std::string Branch_Ref::name() const
   return _br->name();
 }
 /*--------------------------------------------------------------------------*/
-inline ATTRIB_LIST_p& attributes(const void* x)
+inline ATTRIB_LIST_p& attributes(void const* x)
 {
   assert(CKT_BASE::_attribs);
   return (*CKT_BASE::_attribs)[x];
+}
+/*--------------------------------------------------------------------------*/
+inline ATTRIB_LIST_p& attributes(intptr_t x)
+{
+  assert(CKT_BASE::_attribs);
+  return (*CKT_BASE::_attribs)[(void*)x];
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

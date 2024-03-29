@@ -638,8 +638,8 @@ std::string Variable_Decl::code_name() const
     return "_v_" + name();
   }else if(is_int()){ untested();
     return "_v_" + name();
-  }else if(is_module_variable()){ untested();
-    return "d->_v_" + name();
+//  }else if(is_module_variable()){ untested();
+//    return "d->_v_" + name();
   }else{ untested();
     return "_v_" + name();
   }

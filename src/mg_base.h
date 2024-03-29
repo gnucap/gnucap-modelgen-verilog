@@ -30,10 +30,6 @@ public:
     assert(CKT_BASE::_attribs);
     return CKT_BASE::_attribs->at(this);
   }
-  bool has_attributes() const{
-    assert(CKT_BASE::_attribs);
-    return CKT_BASE::_attribs->count(this);
-  }
 //  void set_attributes(Attribute_Instance const* a) {
 //    _attributes = a;
 //  }
@@ -121,11 +117,11 @@ public:
   }
 };
 /*--------------------------------------------------------------------------*/
-class Attribute_Instance;
+// class Attribute_Instance;
 template <class T, char BEGIN, char SEP, char END, char END2='\0', char END3='\0'>
 class LiSt : public Keyed_List<T> {
   Block* _owner{NULL};
-  Attribute_Instance const* _attributes{NULL};
+//   Attribute_Instance const* _attributes{NULL};
 public:
   using List_Base<T>::size;
   using List_Base<T>::push_back;
@@ -183,20 +179,11 @@ protected:
       }
     }
   }
-public: // Block?
-  void set_attributes(Attribute_Instance const* a) {
-    assert(!_attributes);
-    _attributes = a;
-  }
 protected: // base class?
-  bool has_attributes() const{
-    return _attributes;
+  bool has_attributes() const{ untested();
+    assert(CKT_BASE::_attribs);
+    return CKT_BASE::_attribs->count(this);
   }
-  Attribute_Instance const& attributes()const {
-    assert(_attributes);
-    return *_attributes;
-  }
-//  void dump_attributes(std::ostream& f)const;
 public:
   void dump(std::ostream& f)const override {
     // dump_attributes(f);
@@ -221,7 +208,7 @@ public:
     }else{
     }
   }
-};
+}; // LiSt
 /*--------------------------------------------------------------------------*/
 class Block;
 class Raw_String_Arg : public String_Arg {
@@ -400,7 +387,6 @@ private:
   } block_reach_t;
   block_reach_t _reachable{r_unknown};
 protected:
-  Attribute_Instance const* _attributes{NULL}; // Base class?
   map _var_refs;
 private:
   Base* _owner{NULL};
@@ -411,13 +397,6 @@ public:
   Base* owner(){ return _owner;}
   ~Block();
 public:
-  bool has_attributes() const{
-    return _attributes;
-  }
-  Attribute_Instance const& attributes()const {
-    assert(_attributes);
-    return *_attributes;
-  }
   bool is_reachable()const { return _reachable; }
   bool is_always()const { return _reachable == r_always; }
   bool is_never()const { return _reachable == r_never; }
@@ -564,6 +543,12 @@ protected:
 inline void String_Arg::parse(CS& f)
 {
   f >> _s;
+}
+/*--------------------------------------------------------------------------*/
+template <class T, char BEGIN, char SEP, char END, char END2, char END3>
+LiSt<T, BEGIN, SEP, END, END2, END3>::~LiSt()
+{
+  CKT_BASE::_attribs->erase(this, this);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

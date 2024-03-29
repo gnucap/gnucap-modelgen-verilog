@@ -1,0 +1,38 @@
+
+attach ./modelgen_1.so
+
+verilog
+
+`modelgen
+module base(p, n);
+  electrical p, n;
+  (*desc="b"*) real b;
+  (*desc="y"*) real y;
+  analog begin
+    b = 2;
+    y = V(p,n) - 1;
+  end
+endmodule
+paramset test_ps3 base
+  (*desc="a"*) real a;
+  (*desc="c"*) real c;
+  (*desc="x"*) real x;
+  a = 1;
+  c = 1 + .b;
+  x = 1 + .y;
+endparamset
+`endmodelgen
+
+!make test_ps3.so > /dev/null
+
+attach ./test_ps3.so
+
+verilog
+parameter v=1
+
+test_ps3 #() r(1, 0);
+vsource #(.dc(v)) v1(1, 0);
+
+print dc a(r) b(r) c(r) y(r) x(r) __y(r)
+dc v 0 1 .1
+status notime

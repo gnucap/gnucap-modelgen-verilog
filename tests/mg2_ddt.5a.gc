@@ -1,17 +1,11 @@
 attach ./modelgen_0.so
+attach ../vams/isine.so
 
 
 * BUG
 * options noincmode
 
-spice
-.subckt isin p n
-.parameter ampl
-.parameter dc
-I1 p n sin offset=-1 freq=1 amplitude={ampl} delay=-.25 dc=dc
-.ends
-
-.verilog
+verilog
 
 `modelgen
 module test_ddt5a(p, n, x);
@@ -31,12 +25,11 @@ parameter r=1
 parameter v=0
 
 test_ddt5a #() dut(1,0,x);
-isin #(.dc(v), .ampl(1)) i1(0, 1);
-// resistor #(1.) r(0,1);
+isine #(.offset(-1), .phase(-3.141592/2), .ampl(1)) i1(0, 1);
 
 list
 
-print tran i(i1.*) v(nodes) d0(dut) d1(dut) iter(0)
+print tran i(i1) v(nodes) d0(dut) d1(dut) iter(0)
 tran 1  trace=n
 status notime
 end

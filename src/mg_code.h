@@ -31,6 +31,8 @@ protected:
 protected:
   explicit Statement() : Owned_Base() {}
 public:
+  virtual Statement* deep_copy(Base*)const
+    {unreachable();return NULL;}
   virtual bool propagate_rdeps(TData const&){
     incomplete();
     return false;
@@ -109,7 +111,6 @@ public:
   std::string const& identifier()const {return name();}
   std::string const& name()const; //  {return name();}
   virtual std::string code_name()const;
-  virtual bool is_module_variable()const;
 
 //  virtual bool propagate_deps(Variable const&) = 0;
   virtual double eval()const { return NOT_INPUT;}
@@ -149,6 +150,7 @@ public:
   Data_Type const& type()const {return _type;}
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
+  Variable_List* deep_copy(Block* owner, std::string prefix="") const;
 };
 /*--------------------------------------------------------------------------*/
 // class Assignment : public Expression_ ? (later)
@@ -166,7 +168,6 @@ public:
 public:
   //bool has_deps()const { return _data; }
   TData const& data()const { assert(_data); return *_data; }
-  bool is_module_variable()const;
   bool is_int() const;
   Data_Type const& type()const;
   Expression_ const& rhs()const {return *this;}

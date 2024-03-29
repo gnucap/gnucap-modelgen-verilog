@@ -17,6 +17,7 @@ endmodule
 // paramsets
 module my_sh(a, b);
   electrical a, b;
+  (* desc="i" *)
   real __i;
 
   analog begin

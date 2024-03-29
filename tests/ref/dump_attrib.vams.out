@@ -23,7 +23,7 @@ module device(p, n);
   (* desc="normal port" *)
   electrical p, n;
   parameter real c = 1.;
-  (* units="m^2", type="instance", desc="Bottom area of source junction" *)
+  (* units="m^2", type="instance",            desc="Bottom area of source junction", *)
   parameter real ABSOURCE = 1.0e-12;
 
   (* desc="dummy" *)

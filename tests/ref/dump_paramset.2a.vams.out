@@ -17,19 +17,6 @@ discipline electrical
 enddiscipline
 
 
-module resistor(a, b);
-  electrical a, b;
-  parameter real r = 1.;
-  localparam real l = r;
-
-  analog begin
-    I(a, b) <+ (V(a, b) / l);
-  end
-
-endmodule
-
-
-
 // paramsets
 module my_res(a, b);
   electrical a, b;

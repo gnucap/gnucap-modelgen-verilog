@@ -1214,6 +1214,7 @@ static COMMON_resistor Default_resistor(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 double MOD_resistor::tr_probe_num(std::string const& n) const
 {
+  //i:i
   if(n == "i"){
     return _v_i;
   }

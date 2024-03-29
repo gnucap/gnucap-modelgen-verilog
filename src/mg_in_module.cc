@@ -24,7 +24,7 @@
 #include "mg_out.h"
 #include "mg_in.h"
 #include "mg_options.h"
-#include "mg_analog.h" // BUG: Analog_Function_Arg
+#include "mg_analog.h" // BUG: Analog_Function_Arg, push_back
 #include "l_stlextra.h"
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -262,11 +262,7 @@ void Parameter_2_List::parse(CS& file)
 {
   Module* m = prechecked_cast<Module*>(owner());
   assert(m);
-  if(m->attribute_stash().is_empty()){
-  }else{
-    assert(!_attributes);
-    set_attributes(m->attribute_stash().detach());
-  }
+  move_attributes(&file, this);
 
   assert(file.last_match().size());
 
@@ -301,10 +297,7 @@ void Variable_List::parse(CS& f)
   Module* mod = prechecked_cast<Module*>(owner());
   assert(mod);
 
-  if(!mod->attribute_stash().is_empty()){
-    set_attributes(mod->attribute_stash().detach());
-  }else{
-  }
+  move_attributes(&f, this);
 
   char t = f.last_match()[0];
   if(t=='r') {
@@ -337,20 +330,17 @@ void Variable_List::parse(CS& f)
   }else{ untested();
     unreachable();
   }
-  if(has_attributes()){
+  if(has_attributes()){ untested();
     for (auto x : *this){
       ::attributes(x) = ::attributes(this);
     }
-  }else{
+  }else{ untested();
   }
-}
+} // Variable_List::parse
 /*--------------------------------------------------------------------------*/
 void Parameter_2_List::dump(std::ostream& o)const
 {
-  if(has_attributes()){
-    o << attributes();
-  }else{
-  }
+  print_attributes(o, this);
 
   if(is_local()){
     o__ "localparam";
@@ -365,10 +355,7 @@ void Parameter_2_List::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void Variable_List::dump(std::ostream& o)const
 {
-  if(has_attributes()){
-    o << attributes();
-  }else{
-  }
+  print_attributes(o, this);
 
   o__ _type << " ";
   LiSt<Token_VAR_REF, '\0', ',', ';'>::dump(o);
@@ -537,10 +524,8 @@ void Net_Decl_List_Discipline::dump(std::ostream& o)const
 {
   assert(_disc);
   // o__ "";
-  if(has_attributes()){
-    o << attributes();
-  }else{
-  }
+  print_attributes(o, this);
+
   o__ _disc->identifier() << " ";
   Net_Decl_List::dump(o);
   o << "\n";
@@ -679,13 +664,9 @@ void Module::parse(CS& f)
   assert(_circuit);
   _circuit->set_owner(this);
   File* o = prechecked_cast<File*>(owner());
-  if(!o){ untested();
-    incomplete();
-  }else if(o->attribute_stash().is_empty()){
-  }else{
-    assert(!_attributes);
-    set_attributes(o->attribute_stash().detach());
-  }
+  assert(o);
+  move_attributes(&f, this);
+
   // f >> "module |macromodule |connectmodule "; from caller
   f >> _identifier;
   f >> *_circuit; // HACK
@@ -714,10 +695,9 @@ void Module::parse_body(CS& f)
 
   size_t here = f.cursor();
   bool end = false;
-  _attribute_stash.set_owner(this);
   for (;;) {
     trace1("module body parse", f.tail().substr(0,20));
-    while (f >> _attribute_stash) { }
+    parse_attributes(f, &f);
     ONE_OF	// module_item
       || f.umatch(";")
       // mi, port_declaration
@@ -744,9 +724,10 @@ void Module::parse_body(CS& f)
       || ((f >> "endmodule ") && (end = true))
       || (f >> _circuit->element_list())	// module_instantiation
       ;
-    if (_attribute_stash.is_empty()){
+    if (has_attributes(&f)) { untested();
+      f.warn(0, "dangling attributesxx");
+      print_attributes(std::cerr, &f);
     }else{ untested();
-      f.warn(0, "dangling attributes");
     }
     if (end){
       break;
@@ -820,7 +801,7 @@ static void dump_annotate(Module const& m, std::ostream& o)
 {
   return;
   for(auto x: m.var_refs()){ untested();
-    o__ "// " << x.first << "\n";
+    o__ "// var_ref: " << x.first << "\n";
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -838,10 +819,7 @@ void Module::dump(std::ostream& o)const
   }else{
   }
 
-  if(has_attributes()){
-    o << attributes();
-  }else{
-  }
+  print_attributes(o, this);
   indent x;
   o << "module " << identifier() << _circuit->ports() << ";\n";
   if(options().dump_annotate()){
@@ -866,18 +844,8 @@ void Module::dump(std::ostream& o)const
   }
   o << _circuit->net_decl();
   o << _circuit->branch_decl();
-  if(parameters().size()){
-    o << parameters() << "\n";
-  }else{
-  }
-  if(aliasparam().size()){
-    o << aliasparam() << "\n";
-  }else{
-  }
-  if(variables().size()){
-    o << variables() << "\n";
-  }else{
-  }
+  dump_parameters(o);
+  dump_variables(o);
 //  if(local_params().size()){ untested();
 //    o << local_params() << "\n";
 //  }else{ untested();
@@ -1121,6 +1089,34 @@ void Module::push_back(FUNCTION_ const* f)
   install(f);
 }
 /*--------------------------------------------------------------------------*/
+// TODO always push into body?
+void Module::push_back(Base* x)
+{
+  if(auto vl = dynamic_cast<Variable_List*>(x)){
+    _variables.push_back(vl);
+  }else if(auto a = dynamic_cast<AnalogConstruct*>(x)){
+    auto A = prechecked_cast<Analog*>(_analog); // needed? use LiSt?
+    assert(A);
+    A->push_back(a);
+  }else{
+    Block::push_back(x);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Module::push_back(Token* f)
+{
+  if(auto t = dynamic_cast<Token_VAR_REF*>(f)) { untested();
+    auto vl = new Variable_List;
+    vl->set_owner(this);
+    vl->push_back(t);
+    move_attributes(f, vl);
+//    attributes(f) = attributes(vl);
+    _variables.push_back(vl);
+  }else{
+    unreachable();
+  }
+}
+/*--------------------------------------------------------------------------*/
 Branch::Branch(Branch_Ref b, Module* m)
     : Element_2(), _p(b->p()), _n(b->n())
 {
@@ -1212,6 +1208,25 @@ void Module::delete_circuit()
   _circuit = NULL;
 }
 /*--------------------------------------------------------------------------*/
+void Module::dump_parameters(std::ostream& o) const
+{
+  if(parameters().size()){
+    o << parameters() << "\n";
+  }else{
+  }
+  if(aliasparam().size()){
+    o << aliasparam() << "\n";
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Module::dump_variables(std::ostream& o) const
+{
+  if(variables().size()){
+    o << variables() << "\n";
+  }else{
+  }
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

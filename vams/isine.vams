@@ -11,7 +11,7 @@ module isine(p, n);
 	parameter real mag   =0.;
 	parameter real samples = 4. from (0:inf);
 	analog begin
-		I(p, n) <+ ampl*sin(`M_TWO_PI*freq*$abstime) + offset;
+		I(p, n) <+ ampl*sin(`M_TWO_PI*freq*$abstime - phase) + offset;
 		I(p, n) <+ ac_stim("ac", mag);
 		$bound_step(1./(freq*samples));
 	end

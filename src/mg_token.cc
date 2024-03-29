@@ -162,6 +162,7 @@ TData const* Token_BINOP_::op_deps(Token const* t1, Token const* t2)const
 
   if(!d1){
     assert(dynamic_cast<Token_CONSTANT const*>(t1)
+         ||dynamic_cast<Token_OUT_VAR const*>(t1)
          ||dynamic_cast<Token_PAR_REF const*>(t1)
          ||dynamic_cast<Token_UNARY const*>(t1));
     d1 = &const_deps;
@@ -172,6 +173,7 @@ TData const* Token_BINOP_::op_deps(Token const* t1, Token const* t2)const
 
   if(!d2){
     assert(dynamic_cast<Token_CONSTANT const*>(t2)
+         ||dynamic_cast<Token_OUT_VAR const*>(t2)
          ||dynamic_cast<Token_PAR_REF const*>(t2)
          ||dynamic_cast<Token_UNARY const*>(t2));
     d2 = &const_deps;
@@ -1018,18 +1020,23 @@ TData const& Token_VAR_REF::deps() const
 }
 /*--------------------------------------------------------------------------*/
 bool Token_VAR_REF::is_module_variable() const
-{
-  if(auto it=dynamic_cast<Assignment const*>(_item)){
-    return it->is_module_variable();
-  }else if( auto p = prechecked_cast<Variable_Decl const*>(_item)) { untested();
-    return p->is_module_variable();
-  }else{
+{ untested();
+    unreachable();
     return false;
-  }
+//  if(auto it=dynamic_cast<Assignment const*>(_item)){ untested();
+//    return it->is_module_variable();
+//  }else{ untested();
+//    unreachable();
+//    return false;
+//    auto p = prechecked_cast<Variable_Decl const*>(_item);
+//    assert(p);
+//    return p->is_module_variable();
+//  }
 }
 /*--------------------------------------------------------------------------*/
 Data_Type const& Token_VAR_REF::type() const
 {
+  // if(auto it=dynamic_cast<Expression_ const*>(_item))
   if(auto it=dynamic_cast<Assignment const*>(_item)){
     return it->type();
   }else if(auto p = dynamic_cast<Variable_Decl const*>(_item)){
@@ -1227,5 +1234,46 @@ void Token_VAR_INT::dump(std::ostream& o) const
 // 
 //   return false;
 // }
+/*--------------------------------------------------------------------------*/
+Token_VAR_REF* Token_VAR_REF::clone()const
+{
+  return new Token_VAR_REF(*this);
+}
+/*--------------------------------------------------------------------------*/
+Token_VAR_REF* Token_VAR_REF::deep_copy(Base* /*owner*/, std::string prefix)const
+{
+//  return new Token_VAR_REF(this, owner);
+  if(dynamic_cast<TData const*>(_item)) {
+//    auto cl = data->clone();
+    auto cl = new TData;
+    auto n = new Token_VAR_REF(prefix + name(), cl, cl);
+    attributes(n) = attributes(this);
+    return n;
+  }else{
+    unreachable();
+    return new Token_VAR_REF(*this);
+  }
+}
+/*--------------------------------------------------------------------------*/
+Token_VAR_REAL* Token_VAR_REAL::deep_copy(Base* /*owner*/, std::string prefix)const
+{
+//  return new Token_VAR_REF(this, owner);
+  if(auto data=dynamic_cast<TData const*>(_item)) {
+//    auto cl = data->clone();
+    auto cl = new TData;
+    auto n = new Token_VAR_REAL(prefix + name(), cl, cl);
+    attributes(n) = attributes(this);
+    return n;
+  }else{
+    unreachable();
+    return new Token_VAR_REAL(*this);
+  }
+}
+// Token_VAR_REF::Token_VAR_REF(Token_VAR_REF const*p, Base* owner) :
+//   Token_SYMBOL(name, NULL);
+// {
+//   incomplete();
+// }
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

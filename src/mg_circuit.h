@@ -287,7 +287,6 @@ class Net_Identifier;
 typedef LiSt<Net_Identifier, '\0', ',', ';'> Net_Decl_List;
 /*--------------------------------------------------------------------------*/
 class Net_Declarations : public Collection<Net_Decl_List>{
-  Attribute_Instance const* _attributes{NULL};
 public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;

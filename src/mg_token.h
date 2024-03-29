@@ -340,6 +340,22 @@ public:
   Parameter_Base const* operator->() const{ return _item; }
 };
 /*--------------------------------------------------------------------------*/
+class Token_OUT_VAR : public Token_SYMBOL {
+public:
+  explicit Token_OUT_VAR(std::string Name)
+    : Token_SYMBOL(Name, "") {}
+private:
+  explicit Token_OUT_VAR(Token_OUT_VAR const& p)
+    : Token_SYMBOL(p.name(), "") {}
+  Token_OUT_VAR* clone()const override{
+    return new Token_OUT_VAR(*this);
+  }
+  // std::string code_name() const { return "_v_"+name(); }
+  void dump(std::ostream& o)const override {
+    o << "." << name();
+  }
+};
+/*--------------------------------------------------------------------------*/
 class Data_Type;
 class Token_ARGUMENT : public Token_SYMBOL {
 public:
@@ -367,8 +383,14 @@ public:
   explicit Token_VAR_REF(const Token_VAR_REF& P, Base* d=NULL)
     : Token_SYMBOL(P.name(), d), _item(P._item) {}
   explicit Token_VAR_REF() : Token_SYMBOL("","")  { unreachable(); }
-private:
-  Token* clone()const override { return new Token_VAR_REF(*this);}
+  ~Token_VAR_REF() {
+    trace1("~Token_VAR_REF", name());
+    untested();}
+protected:
+  Token_VAR_REF(Token_VAR_REF const*p, Base* owner);
+public:
+  Token_VAR_REF* clone()const override;
+  virtual Token_VAR_REF* deep_copy(Base* owner, std::string prefix="")const;
 public:
   void stack_op(Expression* e)const override;
   virtual bool is_module_variable()const;
@@ -391,10 +413,12 @@ private:
 // class Token_VAR_DECL : public Token_VARIABLE
 class Token_VAR_REAL : public Token_VAR_REF {
   Block const* _owner{NULL};
+  // type //
 public:
   explicit Token_VAR_REAL() : Token_VAR_REF("",NULL,NULL) {unreachable();}
   explicit Token_VAR_REAL(std::string Name, Base* item, Base const* data)
     : Token_VAR_REF(Name, item, data) {}
+  Token_VAR_REAL* deep_copy(Base* owner, std::string prefix)const override;
   Data_Type const& type()const override;
 
   void set_owner(Block const* b){_owner = b;}

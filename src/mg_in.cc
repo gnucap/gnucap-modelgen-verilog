@@ -80,22 +80,7 @@ void Attribute_Spec::dump(std::ostream& o)const
   }
 }
 /*--------------------------------------------------------------------------*/
-void Attribute_Stash::parse(CS& f)
-{
-  assert(owner());
-  if(_a){
-    assert(owner() == _a->owner());
-    _a->parse(f);
-  }else{
-    _a = new Attribute_Instance(f, owner());
-  }
-  if(_a->is_empty()){
-    delete _a;
-    _a = NULL;
-  }else{
-  }
-}
-/*--------------------------------------------------------------------------*/
+#if 0
 void Attribute_Instance::parse(CS& f)
 {
   size_t here = f.cursor();
@@ -115,40 +100,47 @@ void Attribute_Instance::parse(CS& f)
   }else{
   }
 }
-/*--------------------------------------------------------------------------*/
-#if 0
-Attribute_Instance::value_type const* Attribute_Instance::find(String_Arg const& key) const
-{ untested();
-  auto i = notstd::find_ptr(begin(), end(), key);
-  if(i == end()){ untested();
-    return NULL;
-  }else{ untested();
-    return (*i)->expression_or_null();
-  }
-}
 #endif
 /*--------------------------------------------------------------------------*/
-void Attribute_Instance::clear()
-{ untested();
-  Collection<Attribute_Spec>::clear();
+void parse_attributes(CS& cmd, void const* x)
+{
+  assert(x);
+  while (cmd >> "(*") {
+    std::string attrib_string;
+    while(cmd.ns_more() && !(cmd >> "*)")) {
+      attrib_string += cmd.ctoc();
+    }
+    attributes(x).add_to(attrib_string, x);
+  }
 }
 /*--------------------------------------------------------------------------*/
-void Attribute_Instance::dump(std::ostream& o)const
+void print_attributes(std::ostream& o, const void* x)
 {
-  if(is_empty()){ untested();
+  assert(x);
+  if (has_attributes(x)) {
+    o__ "";
+    o << "(* " << attributes(x).string(NULL) << " *)\n";
   }else{
-    o__ "(*";
-    std::string comma;
-    for(auto const& i : *this){
-      o << comma << " " << i->key();
-      if(i->has_expression()){
-	o << "=" << i->expression();
-      }else{ untested();
-      }
-      comma = ",";
-    }
-    o << " *)\n";
   }
+}
+/*--------------------------------------------------------------------------*/
+bool has_attributes(void const* x)
+{ untested();
+  assert(CKT_BASE::_attribs);
+  return CKT_BASE::_attribs->at(x);
+}
+/*--------------------------------------------------------------------------*/
+void move_attributes(void* from, void* to)
+{
+  assert(CKT_BASE::_attribs);
+  std::stringstream s;
+  print_attributes(s, from);
+  CKT_BASE::_attribs->erase(from, from);
+  CKT_BASE::_attribs->erase(to, to);
+  CS cmd(CS::_STRING, s.str());
+  trace3("ma", from, to, s.str());
+  parse_attributes(cmd, to);
+  assert(!has_attributes(from));
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

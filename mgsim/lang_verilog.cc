@@ -102,7 +102,7 @@ private: // override virtual, called by print_item
   void print_comment(OMSTREAM&, const DEV_COMMENT*)override;
   void print_command(OMSTREAM& o, const DEV_DOT*)override;
 private: // local
-  void print_attributes(OMSTREAM&, const void*);
+  void print_attributes(OMSTREAM&, const void*) const;
   void print_args(OMSTREAM&, const MODEL_CARD*);
   void print_args(OMSTREAM&, const COMPONENT*);
   template<class T>
@@ -480,10 +480,11 @@ void LANG_VERILOG::parse_top_item(CS& cmd, CARD_LIST* Scope)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-void LANG_VERILOG::print_attributes(OMSTREAM& o, const void* x)
+void LANG_VERILOG::print_attributes(OMSTREAM& o, const void* x) const
 {
   assert(x);
   if (attributes(x)) {
+    trace1("pa", x);
     o << "(* " << attributes(x).string(NULL) << " *) ";
   }else{
   }

@@ -9,6 +9,7 @@ module test_branch_0(p, n);
 	electrical p, n;
 	inout p, n;
 	(* desc="current" *) real i;
+	(* xdesc="no current" *) real j;
 	branch (p, n) br, br_alias;
 	branch (n, p) br_reverse;
 	analog begin
@@ -28,7 +29,7 @@ vsource #(.dc(v)) v1(1, 0);
 
 list
 
-print dc i(dut)
+print dc i(dut) j(dut)
 
 dc v 0 1 .25
 end

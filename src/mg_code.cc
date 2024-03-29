@@ -92,34 +92,6 @@ bool Assignment::is_int() const
   return type().is_int();
 }
 /*--------------------------------------------------------------------------*/
-bool Assignment::is_module_variable() const
-{
-  assert(_lhsref);
-  return _lhsref->is_module_variable();
-}
-/*--------------------------------------------------------------------------*/
-bool Variable_Decl::is_module_variable() const
-{
-  if(dynamic_cast<Module const*>(owner())){
-    return true;
-  }else{ untested();
-    return false;
-  }
-}
-/*--------------------------------------------------------------------------*/
-// TData const& Assignment::data() const
-// { untested();
-//   incomplete();
-//   if(_my_lhs){ untested();
-// //    assert(_my_lhs->deps());
-//     return _my_lhs->deps();
-// //  }else if(_deps){ untested();
-// //    return *_deps;
-//   }else{ untested();
-//     return _rhs.deps();
-//   }
-// }
-/*--------------------------------------------------------------------------*/
 bool Statement::update()
 {
 //  if(dynamic_cast<Block*>(parent_stmt())){
@@ -175,5 +147,24 @@ bool Statement::is_never() const
   assert(scope());
   return scope()->is_never();
 }
+/*--------------------------------------------------------------------------*/
+// generic?
+Variable_List* Variable_List::deep_copy(Block* owner, std::string prefix) const
+{
+  // return new Variable_List(this);
+  // auto n = new Variable_List(*this);
+  auto n = new Variable_List();
+  attributes(n) = attributes(this);
+  n->_type = type();
+  n->set_owner(owner);
+  for(auto i : *this){
+    auto j = i->deep_copy(n, prefix);
+    attributes(j) = attributes(n);
+    owner->new_var_ref(j);
+    n->push_back(j);
+  }
+  return n;
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

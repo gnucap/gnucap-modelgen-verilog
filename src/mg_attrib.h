@@ -19,19 +19,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * use <u_attrib.h> instead?
  */
 //
 #ifndef MG_ATTRIB_H
 #define MG_ATTRIB_H
 #include "mg_base.h"
+// <u_attrib.h> instead?
 /*--------------------------------------------------------------------------*/
 class Attribute_Spec : public Owned_Base {
   String_Arg _key;
-//  typedef ConstExpression value_type; TODO
 public:
-//  typedef Raw_String_Arg value_type;
-  // typedef String_Arg value_type;
   typedef std::string value_type;
 private:
   value_type* _expr{NULL};
@@ -70,40 +67,6 @@ public:
   }
 };
 /*--------------------------------------------------------------------------*/
-class Attribute_Instance : public Collection<Attribute_Spec> {
-//  std::set<Attribute_Spec*, getkey>;
-  typedef Attribute_Spec::value_type value_type;
-public:
-  Attribute_Instance() : Collection<Attribute_Spec>() { untested(); }
-  Attribute_Instance(CS& f, Block* o) : Collection<Attribute_Spec>() {
-    set_owner(o);
-    parse(f);
-  }
-  void parse(CS& f)override;
-  void dump(std::ostream&)const override;
-  void clear();
-//  bool empty() const{ return _m.empty(); }
-  value_type const* find(String_Arg const&) const;
-private:
-};
-/*--------------------------------------------------------------------------*/
-class Attribute_Stash : public Owned_Base {
-  Attribute_Instance* _a{NULL};
-public:
-  Attribute_Stash() : Owned_Base() { }
-  void parse(CS& f)override;
-  void dump(std::ostream&)const override{ unreachable(); }
-  bool is_empty() const{
-    return !_a;
-  }
-  Attribute_Instance const* detach(){
-    Attribute_Instance const* r = _a;
-    _a = NULL;
-    return r;
-  }
-private:
-};
-/*--------------------------------------------------------------------------*/
 class Attribute : public Base {
   String_Arg _name;
   String_Arg _value;
@@ -118,6 +81,8 @@ public:
   const String_Arg&  value()const {return _value;}
 };
 typedef Collection<Attribute> Attribute_List;
+/*--------------------------------------------------------------------------*/
+void move_attributes(void* from, void* to);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

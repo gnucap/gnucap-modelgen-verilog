@@ -61,7 +61,7 @@ mg_in_module.o: mg_in_module.cc mg_.h mg_expression.h mg_attrib.h \
 mg_in_paramset.o: mg_in_paramset.cc mg_.h mg_expression.h mg_attrib.h \
  mg_base.h mg_deps.h mg_lib.h mg_func.h mg_token.h m_tokens.h mg_code.h \
  mg_filter.h mg_circuit.h mg_discipline.h mg_module.h mg_out.h mg_in.h \
- mg_options.h mg_error.h
+ mg_options.h mg_error.h mg_analog.h
 mg_in_verilog.o: mg_in_verilog.cc
 mg_in_circuit.o: mg_in_circuit.cc mg_circuit.h mg_base.h mg_discipline.h \
  mg_attrib.h mg_code.h mg_expression.h mg_in.h mg_.h mg_deps.h mg_lib.h \
@@ -118,6 +118,7 @@ mg_token.o: mg_token.cc mg_expression.h m_tokens.h mg_deps.h mg_lib.h \
  mg_token.h mg_func.h mg_base.h mg_options.h mg_analog.h mg_.h \
  mg_attrib.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
  mg_module.h
+m_tokens.o: m_tokens.cc
 m_expression_dump.o: m_expression_dump.cc m_tokens.h mg_expression.h \
  mg_deps.h mg_lib.h mg_token.h mg_func.h mg_base.h mg_.h mg_attrib.h \
  mg_code.h mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
