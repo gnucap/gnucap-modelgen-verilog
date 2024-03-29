@@ -183,44 +183,9 @@ public:
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class Sensitivities;
-// code.h?
-class SeqBlock : public Block {
-  String_Arg _identifier;
-  Sensitivities* _sens{NULL};
-public:
-  explicit SeqBlock() : Block() {}
-  ~SeqBlock();
-  void parse(CS&)override{incomplete();}
-  void dump(std::ostream& o)const override;
-  void parse_identifier(CS& f) { f >> _identifier; }
-
-  Branch_Ref new_branch(std::string const& p, std::string const& n)override {
-    assert(owner());
-    return owner()->new_branch(p, n);
-  }
-  Branch_Ref new_branch(Node* p, Node* n)override {
-    assert(owner());
-    return owner()->new_branch(p, n);
-  }
-  Node_Ref node(std::string const& n)const override {
-    assert(owner());
-    return owner()->node(n);
-  }
-  Branch_Ref lookup_branch(std::string const& n)const override {
-    assert(owner());
-    return owner()->lookup_branch(n);
-  }
-  String_Arg const& identifier() const{ return _identifier; }
-  bool has_sensitivities()const {return _sens;}
-  Sensitivities const* sensitivities()const {return _sens;}
-  void set_sens(Base const* s);
-  void merge_sens(Sensitivities const& s);
-  map const& variables()const {return _var_refs;}
-}; // SeqBlock
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-// analog_procedural_block analog_statement?
-class AnalogConstruct : public Owned_Base {
+class AnalogConstruct : public Statement {
   Base* _stmt{NULL}; // is a ControlBlock
 public:
   ~AnalogConstruct(){

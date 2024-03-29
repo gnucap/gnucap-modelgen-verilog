@@ -13,13 +13,10 @@ protected:
 public:
   void set_owner(Block* b){  _owner = b; }
   Block const* owner()const { return _owner; }
+  Block* scope()const { return _owner; }
   bool is_reachable()const;
   bool is_always()const;
   bool is_never()const;
-public: // virtual
-//  virtual void set_reachable();
-//  virtual void set_never();
-//  virtual void set_always();
 protected:
   Block* owner(){ return _owner;}
 };
@@ -372,6 +369,7 @@ class Node;
 class Nature;
 class Token;
 class FUNCTION;
+class Statement;
 class Block : public List_Base<Base> /* is Base_,  has-A List? */ {
 public:
   typedef std::map<std::string, Base*> map; // set?
@@ -387,10 +385,12 @@ protected:
   Attribute_Instance const* _attributes{NULL}; // Base class?
   map _var_refs;
 private:
-  Block* _owner{NULL};
+  Base* _owner{NULL};
 public:
-  Block const* owner() const{ return _owner;}
-  Block* owner(){ return _owner;}
+  Block* scope() const;
+  Block* scope();
+  Base const* owner() const{ return _owner;}
+  Base* owner(){ return _owner;}
   ~Block();
 public:
   bool has_attributes() const{
@@ -412,16 +412,16 @@ public:
 
   virtual Node* new_node(std::string const& p){ untested();
     assert(_owner);
-    return _owner->new_node(p);
+    return scope()->new_node(p);
   }
   virtual Node_Ref node(std::string const& p) const{ untested();
     assert(_owner);
-    return _owner->new_node(p); // new??
+    return scope()->new_node(p); // new??
   }
 
   virtual Token* new_token(FUNCTION const* f, size_t num_args) {
     assert(_owner);
-    return _owner->new_token(f, num_args);
+    return scope()->new_token(f, num_args);
   }
 
 #if 1
@@ -435,17 +435,25 @@ public:
   }
   virtual Branch_Ref lookup_branch(std::string const& n)const {
     assert(_owner);
-    return _owner->lookup_branch(n);
+    return scope()->lookup_branch(n);
   }
   virtual Branch_Ref new_branch_name(std::string const& p, Branch_Ref const& r) { untested();
     assert(_owner);
-    return _owner->new_branch_name(p, r);
+    return scope()->new_branch_name(p, r);
   }
 #endif
 
+  void set_owner_raw(Statement* b) {
+    _owner = (Base*)(b);
+  }
   void set_owner_raw(Block* b) {
     _owner = b;
   }
+  void set_owner(Base* b){
+    _owner = b;
+  }
+
+  // BUG TODO // statement, seqBlock?
   void set_owner(Block* b){
     assert(!b || !_owner || _owner == b);
     _owner = b;

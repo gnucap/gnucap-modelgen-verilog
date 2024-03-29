@@ -388,8 +388,8 @@ Module* Paramset::deflate()
 {
   if(_sub){
     Paramset* sub = _sub;
-    _sub->set_owner(NULL);
-    _sub->set_owner(owner());
+    _sub->set_owner((Base*)NULL);
+    _sub->set_owner(scope());
     assert(dynamic_cast<Paramset*>(_sub));
     _sub = NULL;
     return sub;

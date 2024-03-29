@@ -45,6 +45,13 @@ struct ptrCmp<Base const> {
   }
 };
 /*--------------------------------------------------------------------------*/
+template<>
+struct ptrCmp<Base> {
+  bool operator()( Base const* a, Base const* b ) const {
+    return a < b;
+  }
+};
+/*--------------------------------------------------------------------------*/
 template<class T>
 class pSet {
   typedef std::set<T*, ptrCmp<T>> set;

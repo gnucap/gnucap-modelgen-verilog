@@ -59,15 +59,32 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Sensitivities {
-  pSet<Base const> _s;
+  typedef pSet<Base> set;
+  typedef set::iterator iterator;
+  typedef set::const_iterator const_iterator;
+  set _s;
 public:
   Sensitivities(Sensitivities const& o) : _s(o._s) {}
   explicit Sensitivities(){}
   ~Sensitivities(){}
 public:
-  void add(Base const* x) { _s.insert(x); }
+  void add(Base* x) { _s.insert(x); }
   void merge(Sensitivities const& s) { _s.merge(s._s); }
   bool empty()const {return !_s.size();}
+
+  iterator begin() {
+    return _s.begin();
+  }
+  iterator end() {
+    return _s.end();
+  }
+
+  const_iterator begin()const {
+    return _s.begin();
+  }
+  const_iterator end()const {
+    return _s.end();
+  }
 };
 /*--------------------------------------------------------------------------*/
 class DDeps {
@@ -121,7 +138,7 @@ private:
 class Branch;
 class TData : public Base {
   DDeps _s; // dynamic_deps?
-  Sensitivities _sens; // sensitivities
+  Sensitivities _sens;
   mutable std::vector<Branch const*> _rdeps;
 //   RDeps _rdeps;
   // V _sens; // discrete_deps?
@@ -159,11 +176,15 @@ public:
   bool is_quadratic()const;
   void set_any() { _s.set_any(); }
 public: // sens
+  void add_sens(Base* x) {
+    _sens.add(x);
+  }
   void add_sens(Sensitivities const& s){
     _sens.merge(s);
   }
-  bool has_sensitivities()const {return !_sens.empty(); }
+  bool has_sensitivities()const;
   Sensitivities const& sensitivities()const {return _sens; }
+  Sensitivities& sensitivities() {return _sens; }
 private:
   void parse(CS&)override {unreachable();}
   void dump(std::ostream&)const override {unreachable();}

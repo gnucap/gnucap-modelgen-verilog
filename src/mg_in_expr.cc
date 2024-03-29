@@ -167,9 +167,9 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 	}
 	Token_VAR_REF a(v->name(), v);
 	a.stack_op(&E);
-      }else if(auto variable = dynamic_cast<Token_VAR_REF*>(r)) {
-	trace2("resolve VAR_REF", n, variable->deps().size());
-	variable->stack_op(&E);
+      }else if(auto vt = dynamic_cast<Token_VAR_REF*>(r)) {
+	trace2("resolve VAR_REF", n, vt->deps().size());
+	vt->stack_op(&E);
       }else if(auto pp = dynamic_cast<Port_3 const*>(r)) {
 	assert(symbol);
 	Token_PORT_BRANCH a(*symbol, pp);
@@ -323,16 +323,31 @@ TData const& Expression_::data() const
   }
 }
 /*--------------------------------------------------------------------------*/
-bool Expression_::add_rdeps(TData const&)
+void Expression_::set_dep(Base*)
 {
-  for(auto t : *this) {
-    trace1("add_rdeps", t->name());
-  }
-  if(back()){
-  //  add_rdeps(back());
-  }else{ untested();
-  }
-  return false;
+  incomplete();
 }
+/*--------------------------------------------------------------------------*/
+bool Expression_::propagate_rdeps(TData const& dep)
+{
+  Sensitivities const& sens = data().sensitivities();
+  bool ret = false;
+  for(auto s : sens){
+    trace1("rdep sens", s);
+    if(auto st = dynamic_cast<Statement*>(s)){
+      ret |= st->propagate_rdeps(dep);
+    }else{
+    }
+  }
+  return ret;
+}
+/*--------------------------------------------------------------------------*/
+Expression_::~Expression_()
+{
+//  for(auto i : _deps){ untested();
+//    delete i;
+//  }
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

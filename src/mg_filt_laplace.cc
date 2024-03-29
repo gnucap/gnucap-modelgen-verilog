@@ -405,8 +405,8 @@ void Token_LAP::stack_op(Expression* e)const
   }else if(assigned){ untested();
   }else if(cont->has_sensitivities()) { itested();
   }else if(always){
-    for(auto d : cont->deps().ddeps()){
-      if(d->branch() != branch()) { untested();
+    for(auto d : cont->data().ddeps()){
+      if(d->branch() != branch()) {
       }else if(d.is_linear()){
 	// incomplete();
 	func->_output = cont->branch(); // polarity?

@@ -148,6 +148,7 @@ private: // verilog input data
   // Port_1_List _local_nodes;
   Owned_Base* _analog{NULL};
   Circuit* _circuit{NULL};
+//  Block _module_body;
 protected:
   Attribute_Stash _attribute_stash;
   Parameter_List_Collection _parameters;

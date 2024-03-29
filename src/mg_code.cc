@@ -18,9 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+// #include "mg_base.h"
+#include "mg_.h" // BUG? branch.
 #include "mg_code.h"
 #include "mg_deps.h" // BUG?
 #include "mg_token.h"
+#include "mg_module.h"
 /*--------------------------------------------------------------------------*/
 Variable_Decl::~Variable_Decl()
 {
@@ -57,6 +60,20 @@ void Variable::new_var_ref()
   owner()->new_var_ref(this);
 }
 /*--------------------------------------------------------------------------*/
+bool Variable::is_used_in(Base const*) const
+{
+  // return _token->is_used_in(b);
+  incomplete();
+  return false;
+}
+/*--------------------------------------------------------------------------*/
+bool Assignment::is_used_in(Base const*) const
+{
+  // return _expression->is_used_in(b);
+  incomplete();
+  return false;
+}
+/*--------------------------------------------------------------------------*/
 std::string Assignment::code_name() const
 { untested();
   assert(_lhsref);
@@ -68,6 +85,33 @@ Block const* Assignment::scope() const
   auto b = prechecked_cast<Block const*>(owner());
   assert(b);
   return b;
+}
+/*--------------------------------------------------------------------------*/
+Data_Type const& Assignment::type() const
+{
+  //assert(_lhs->is_int() == _type.is_int());
+  assert(_lhsref);
+  return _lhsref->type();
+}
+/*--------------------------------------------------------------------------*/
+bool Assignment::is_int() const
+{
+  return type().is_int();
+}
+/*--------------------------------------------------------------------------*/
+bool Assignment::is_module_variable() const
+{ untested();
+  assert(_lhsref);
+  return _lhsref->is_module_variable();
+}
+/*--------------------------------------------------------------------------*/
+bool Variable::is_module_variable() const
+{
+  if(dynamic_cast<Module const*>(owner())){
+    return true;
+  }else{ untested();
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 // TData const& Assignment::data() const
@@ -82,6 +126,38 @@ Block const* Assignment::scope() const
 //     return _rhs.deps();
 //   }
 // }
+/*--------------------------------------------------------------------------*/
+bool Statement::update()
+{
+  if(dynamic_cast<Block*>(parent_stmt())){
+    incomplete();
+  }else{
+    incomplete();
+  }
+  return false;
+}
+/*--------------------------------------------------------------------------*/
+void Statement::set_rdeps(TData const& t)
+{
+  for(auto x : t.sensitivities()){
+    if(auto b = dynamic_cast<Branch*>(x)){
+      _rdeps.push_back(b);
+    }else{
+      incomplete();
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+Statement* Statement::parent_stmt()
+{
+  Block* b = scope();
+  if(auto x = dynamic_cast<Statement*>(b->owner())){
+    return x;
+  }else{
+    incomplete();
+    return NULL;
+  }
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

@@ -167,7 +167,7 @@ inline AnalogList const& analog_list(Module const& m)
   return analog(m).list();
 }
 /*--------------------------------------------------------------------------*/
-class AnalogStmt : public Base {
+class AnalogStmt : public Statement {
   std::vector<Base const*> _used_in;
 public:
   virtual bool update() = 0;
@@ -175,9 +175,14 @@ public:
   void unset_used_in(Base const*b); // const;
   ~AnalogStmt();
 //  bool used_in(Base const*)const;
-  bool is_used_in(Base const*)const;
+  virtual /*?*/ bool is_used_in(Base const*)const;
+  bool propagate_rdeps(TData const&)override;
 
   virtual TData const& deps() = 0;
+  Statement* parent_stmt()override {
+    incomplete();
+    return NULL;
+  }
 };
 /*--------------------------------------------------------------------------*/
 class AnalogExpression : public Owned_Base {
@@ -187,7 +192,7 @@ public:
   ~AnalogExpression();
   void parse(CS& file) override;
   void dump(std::ostream& o)const override;
-  Block* owner() {return Owned_Base::owner();}
+//  Block* owner() {return Owned_Base::owner();}
   Expression const& expression() const{ return _exp;}
   bool is_true() const;
   bool is_false() const;
@@ -201,49 +206,39 @@ public:
 };
 typedef LiSt<AnalogConstExpression, '\0', ',', ':'> AnalogConstExpressionList;
 /*--------------------------------------------------------------------------*/
-// AnalogConstruct but Stmt..?
-class AnalogSeqBlock : public AnalogStmt {
+class AnalogSeqBlock : public SeqBlock {
 protected: // BUG?
-  SeqBlock _block;
   TData _deps;
+protected:
 public:
-  explicit AnalogSeqBlock() : AnalogStmt() {}
-  explicit AnalogSeqBlock(CS& cmd, Block* owner) : AnalogStmt() {
+  explicit AnalogSeqBlock() : SeqBlock() {}
+  explicit AnalogSeqBlock(CS& cmd, Block* owner) : SeqBlock() {
     set_owner(owner);
     parse(cmd);
   }
+public:
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
-  void set_owner(Block* owner) {
-    _block.set_owner(owner);
-  }
-
-  String_Arg const& identifier()const {
-    return _block.identifier();
-  }
   SeqBlock const& block()const {
-    return _block;
-  }
-  size_t size()const {
-    return _block.size();
+    return *this;
   }
 public: // sensitivities?
-  void set_never() { _block.set_never(); }
-  void set_always() { _block.set_always(); }
-  bool is_never()const {return _block.is_never() ;}
-  bool is_reachable()const {return _block.is_reachable() ;}
-  bool is_always()const {return _block.is_always() ;}
-  bool update()override;
-  void set_sens(Base const* s) {_block.set_sens(s);}
-  void clear_vars();
+//  void set_never() { _block.set_never(); }
+//  void set_always() { _block.set_always(); }
+//  bool is_never()const {return _block.is_never() ;}
+//  bool is_reachable()const {return _block.is_reachable() ;}
+//  bool is_always()const {return _block.is_always() ;}
+  bool update(); // SeqBlock?
+//  void set_sens(Base* s) {_block.set_sens(s);}
+//  void clear_vars();
 
   TData const& deps(){ return _deps;};
-};
+}; // AnalogSeqBlock
 /*--------------------------------------------------------------------------*/
 class AnalogCtrlBlock : public AnalogSeqBlock {
 public:
   explicit AnalogCtrlBlock() : AnalogSeqBlock() {}
-  explicit AnalogCtrlBlock(CS& f, Block* o) : AnalogSeqBlock() {
+  explicit AnalogCtrlBlock(CS& f, Statement* o) : AnalogSeqBlock() {
     set_owner(o);
     parse(f);
   }
@@ -251,36 +246,52 @@ public:
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
   operator bool()const{ return size() || identifier() !=""; }
-  void set_owner(Block* owner);
+  void set_owner(Statement* owner);
 }; // AnalogCtrlBlock
 /*--------------------------------------------------------------------------*/
-class CaseGen : public Base{
-  AnalogConstExpressionList* _cond{NULL};
-  AnalogCtrlBlock _code;
-  // Expression const* _ctrl{NULL};
+class AnalogCtrlStmt : public AnalogStmt {
+  TData _deps; // here?
+protected:
+  AnalogCtrlBlock _body;
 public:
-  CaseGen() : Base(){ unreachable(); }
+  AnalogCtrlStmt() : _body() { }
+  ~AnalogCtrlStmt(){ }
+  void dump(std::ostream&)const override;
+  void parse(CS& cmd)override;
+  AnalogCtrlBlock const& body()const { return _body; }
+private:
+//  bool update()override {return _body.update();}
+  TData const& deps(){ return _deps;};
+  bool update()override {
+    incomplete();
+    return false;
+  }
+}; // AnalogCtrlStmt
+/*--------------------------------------------------------------------------*/
+class CaseGen : public AnalogCtrlStmt {
+  AnalogConstExpressionList* _cond{NULL};
+private:
+  CaseGen() : AnalogCtrlStmt(){ unreachable(); }
+public:
   CaseGen(CS&, Block*, Expression const&, bool, bool);
   ~CaseGen(){
     delete _cond;
   }
-  void set_owner(Block*) { unreachable(); }
   void parse(CS&)override;
   void dump(std::ostream& o)const override;
 public:
   AnalogConstExpressionList const* cond_or_null()const {return _cond;}
-  Base const* code_or_null()const {return &_code;}
   bool is_default()const {return !_cond;}
-  void set_never() {return _code.set_never() ;}
-  void set_always() {return _code.set_always() ;}
-  bool is_never()const {return _code.is_never() ;}
-  bool is_reachable()const {return _code.is_reachable() ;}
-  bool is_always()const {return _code.is_always() ;}
+  void set_never() {return _body.set_never() ;}
+  void set_always() {return _body.set_always() ;}
+  bool is_never()const {return _body.is_never() ;}
+  bool is_reachable()const {return _body.is_reachable() ;}
+  bool is_always()const {return _body.is_always() ;}
   void calc_reach(Expression const& cond);
 
   String_Arg key() const{return String_Arg("CaseGen");}
+//  bool update() override { incomplete(); }
 };
-typedef LiSt<CaseGen, '\0', '\0', '\0'> AnalogCaseList;
 /*--------------------------------------------------------------------------*/
 class System_Task : public Owned_Base {
   AnalogExpression _e;
@@ -293,88 +304,56 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class AnalogCtrlStmt : public AnalogStmt /* : AnalogSeqBlock? */ {
-  TData _deps; // here?
-protected:
-  AnalogCtrlBlock _body; // use AnalogSeqBlock::_block?
-public:
-  AnalogCtrlStmt() : _body() {}
-  ~AnalogCtrlStmt(){ }
-  void dump(std::ostream&)const override;
-private:
-  bool update()override {return _body.update();}
-  TData const& deps(){ return _deps;};
-};
-/*--------------------------------------------------------------------------*/
 class AnalogEvtCtlStmt : public AnalogCtrlStmt {
   AnalogEvtExpression _ctrl;
 public:
   ~AnalogEvtCtlStmt() { }
-  void set_owner(Block* o) {_ctrl.set_owner(o);}
-//  Block const* owner()const {return _ctrl.owner();}
   void parse(CS&)override;
   void dump(std::ostream&)const override;
   Expression const& cond()const{ return _ctrl.expression(); }
   const AnalogCtrlBlock& code() const{ return _body; }
-protected:
-  Block* owner() {return _ctrl.owner();}
-};
+}; // AnalogEvtCtlStmt
 /*--------------------------------------------------------------------------*/
-class AnalogSwitchStmt : public AnalogCtrlStmt {
+class AnalogSwitchStmt : public AnalogStmt {
+  TData _deps; // here?
   AnalogConstExpression _ctrl; // Const??
-  AnalogCaseList _cases; // use _body?
+  SeqBlock _body;
 public:
-  AnalogSwitchStmt(Block* o, CS& file) {
-    set_owner(o);
-    parse(file);
-  }
-  ~AnalogSwitchStmt(){
-  }
+  AnalogSwitchStmt(Block* o, CS& file);
+  ~AnalogSwitchStmt() { }
 public:
   void parse(CS& file) override;
   void dump(std::ostream& o)const override;
-  void set_owner(Block* o) {_ctrl.set_owner(o);}
-  Block* owner() {return _ctrl.owner();}
   AnalogConstExpression const& control() const{return _ctrl;}
-  AnalogCaseList const& cases()const {return _cases;}
-};
+  SeqBlock const& cases()const {return _body;}
+  bool update()override {incomplete(); return false;}
+  TData const& deps(){ return _deps;};
+}; // AnalogSwitchStmt
 /*--------------------------------------------------------------------------*/
 class AnalogConditionalStmt : public AnalogCtrlStmt {
   AnalogConstExpression _cond; // Const??
   AnalogCtrlBlock _false_part;
 public:
-  AnalogConditionalStmt(Block* o, CS& file) {
-    set_owner(o);
-    parse(file);
-  }
+  explicit AnalogConditionalStmt(Block* o, CS& file);
   ~AnalogConditionalStmt(){ }
 public:
   void parse(CS& file) override;
   void dump(std::ostream& o)const override;
-  void set_owner(Block* o) {_cond.set_owner(o);}
-  Block* owner() {return _cond.owner();}
   AnalogConstExpression const& conditional() const{return _cond;}
   const AnalogCtrlBlock& true_part() const{ return _body; }
   const AnalogCtrlBlock& false_part() const{ return _false_part; }
-};
+}; // AnalogConditionalStmt
 /*--------------------------------------------------------------------------*/
 class AnalogWhileStmt : public AnalogCtrlStmt {
 protected:
   AnalogExpression _cond;
-  AnalogWhileStmt(){
-  }
+  explicit AnalogWhileStmt() { }
 public:
-  AnalogWhileStmt(CS& file, Block* o) {
-    set_owner(o);
-    parse(file);
-  }
-  ~AnalogWhileStmt(){
-  }
+  explicit AnalogWhileStmt(CS& file, Block* o);
+  ~AnalogWhileStmt() { }
 public:
   void parse(CS& file) override;
   void dump(std::ostream& o)const override;
-  void set_owner(Block* o) {_cond.set_owner(o);}
-  Block* owner() {return _cond.owner();}
   AnalogExpression const& conditional()const {return _cond;}
   bool has_body() const{ return _body; }
   const Base& body() const{assert(_body); return _body; }
@@ -388,7 +367,7 @@ class AnalogForStmt : public AnalogWhileStmt {
   Base* _init{NULL};
   Base* _tail{NULL};
 public:
-  AnalogForStmt(CS& file, Block* o) : AnalogWhileStmt() {
+  explicit AnalogForStmt(CS& file, Block* o) : AnalogWhileStmt() {
     set_owner(o);
     parse(file);
   }
@@ -413,6 +392,9 @@ public:
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
   Assignment const& assignment()const {return _a;}
+  bool is_used_in(Base const*b)const override{
+    return _a.is_used_in(b) || AnalogStmt::is_used_in(b);
+  }
 private:
   bool update()override;
   TData const& deps()override {return _deps;};
@@ -448,10 +430,6 @@ public:
     parse(f);
   }
   ~Contribution();
-private:
-  void set_owner(Block* owner) { _owner = owner; }
-  Block* owner() {return _owner;}
-  Block const* owner()const {return _owner;}
 public:
 
   DDeps const& ddeps() const;
@@ -464,7 +442,7 @@ public:
   bool is_reachable()const {return owner()->is_reachable() ;}
   void parse(CS&)override;
   void dump(std::ostream&)const override;
-  TData const& deps() const {
+  TData const& data() const {
     if(_deps) {return *_deps;} else {return _rhs.deps();}
   }
   bool has_deps()const {return true;}

@@ -41,7 +41,7 @@ module test(a, b);
       0: begin
         V(b) <+ 2.2;
       end
-      default: ;
+      default:;
     endcase
   end
 

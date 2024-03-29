@@ -68,8 +68,10 @@ public:
   TData const& deps()const {return data();} // remove?
   // Attrib const& attrib()const;
   bool update();
-  bool add_rdeps(TData const&);
+  bool propagate_rdeps(TData const&);
+  void set_dep(Base*);
 private: // all the same eventually?
+//  TData& data();
 //  Token* resolve_function(FUNCTION_ const* filt, Block* owner) const;
   Token* resolve_xs_function(std::string const& n);
   Token* resolve_system_task(FUNCTION_ const* t);

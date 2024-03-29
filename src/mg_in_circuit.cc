@@ -67,7 +67,7 @@ void Net_Declarations::parse(CS& f)
   assert(owner()); // Module
   Module* mod = prechecked_cast<Module*>(owner());
   assert(mod);
-  Block const* root_scope = owner()->owner();
+  Block const* root_scope = owner()->scope();
   assert(root_scope);
   File const* root = dynamic_cast<File const*>(root_scope);
   if(root){

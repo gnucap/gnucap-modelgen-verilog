@@ -631,15 +631,6 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args)
 //   }
 }
 /*--------------------------------------------------------------------------*/
-bool Variable::is_module_variable() const
-{
-  if(dynamic_cast<Module const*>(owner())){
-    return true;
-  }else{ untested();
-    return false;
-  }
-}
-/*--------------------------------------------------------------------------*/
 // std::string Variable_Decl::code_name() const
 std::string Variable::code_name() const
 {
@@ -661,28 +652,10 @@ void Branch::set_direct(bool d)
   _direct = d;
 }
 /*--------------------------------------------------------------------------*/
-double Assignment::eval() const
-{ untested();
-  return rhs().eval();
-}
-/*--------------------------------------------------------------------------*/
-bool Assignment::is_module_variable() const
-{ untested();
-  assert(_lhsref);
-  return _lhsref->is_module_variable();
-}
-/*--------------------------------------------------------------------------*/
-Data_Type const& Assignment::type() const
-{
-  //assert(_lhs->is_int() == _type.is_int());
-  assert(_lhsref);
-  return _lhsref->type();
-}
-/*--------------------------------------------------------------------------*/
-bool Assignment::is_int() const
-{
-  return type().is_int();
-}
+// double Assignment::eval() const
+// { untested();
+//   return rhs().eval();
+// }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void Branch::attach(Branch_Ref* r)
@@ -749,6 +722,36 @@ std::string Filter::short_label()const
   return name();
 }
 /*--------------------------------------------------------------------------*/
+Block* Block::scope() const
+{
+  if(auto ob = dynamic_cast<Owned_Base*>(_owner)){
+    return ob->scope();
+  }else if(auto b = dynamic_cast<Block*>(_owner)){
+    // incomplete?
+    return b;
+  }else{
+    unreachable();
+    return NULL;
+  }
+}
+/*--------------------------------------------------------------------------*/
+Block* Block::scope()
+{
+  if(auto ob = dynamic_cast<Owned_Base*>(_owner)){
+    return ob->scope();
+  }else if(auto b = dynamic_cast<Block*>(_owner)){
+    // incomplete?
+    return b;
+  }else if(dynamic_cast<File const*>(_owner)){
+    return NULL;
+  }else if(!_owner){
+    return NULL;
+  }else{
+    assert(0);
+    return NULL;
+  }
+}
+/*--------------------------------------------------------------------------*/
 void Block::push_back(Base* c)
 {
   List_Base<Base>::push_back(c);
@@ -793,10 +796,14 @@ Base* Block::lookup(std::string const& k, bool recurse)
       std::string portname = k.substr(1, k.size()-2);
       return m->find_port(portname);
     }else{
-      return _owner->lookup(k, true);
+      return scope()->lookup(k, true);
     }
-  }else if(_owner) {
-    return _owner->lookup(k, true);
+  }else if(scope()) {
+    return scope()->lookup(k, true);
+  }else if(dynamic_cast<File const*>(this)){
+  }else if(auto st = dynamic_cast<Statement*>(owner())){
+    assert(st->scope());
+    return st->scope()->lookup(k, true);
   }else{
     assert(dynamic_cast<File const*>(this));
   }
@@ -835,13 +842,6 @@ bool is_zero(Expression const& x)
 {
   double e = x.eval();
   return e == 0.;
-}
-/*--------------------------------------------------------------------------*/
-Expression_::~Expression_()
-{
-//  for(auto i : _deps){ untested();
-//    delete i;
-//  }
 }
 /*--------------------------------------------------------------------------*/
 TData* copy_deps(Base const* b)
@@ -936,7 +936,7 @@ Node_Ref Branch::n() const
 /*--------------------------------------------------------------------------*/
 bool Assignment::has_sensitivities()const
 {
-  return deps().has_sensitivities();
+  return data().has_sensitivities();
 }
 /*--------------------------------------------------------------------------*/
 bool Parameter_2_List::is_local()const

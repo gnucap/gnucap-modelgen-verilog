@@ -1091,7 +1091,7 @@ void Block::new_var_ref(Base* what)
     }
   }else if(T){
     if(auto VT = dynamic_cast<Token_VAR_REF const*>(T)){
-      trace2("new_var_ref, reg new token", p, VT->deps().size());
+      //trace2("new_var_ref, reg new token", p, VT->deps().size());
     }else{ untested();
       trace1("new_var_ref, reg new token", p);
     }
@@ -1189,7 +1189,7 @@ void SeqBlock::merge_sens(Sensitivities const& s)
   _sens->merge(s);
 }
 /*--------------------------------------------------------------------------*/
-void SeqBlock::set_sens(Base const* s)
+void SeqBlock::set_sens(Base* s)
 {
   if(_sens){ untested();
   }else{

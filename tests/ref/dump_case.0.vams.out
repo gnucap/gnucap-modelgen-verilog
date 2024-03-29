@@ -15,7 +15,7 @@ module test(x, y);
       1: begin
         A = 1;
       end
-      default: ;
+      default:;
     endcase
     case (LEVEL)
       0, 1: begin
@@ -27,8 +27,8 @@ module test(x, y);
       3: begin
         A = 3;
       end
-      4: ;
-      default: ;
+      4:;
+      default:;
     endcase
     case (LEVEL)
       1: begin
@@ -44,8 +44,8 @@ module test(x, y);
       end
     endcase
     case (LEVEL)
-      1: ;
-      2: ;
+      1:;
+      2:;
       3: begin
         A = 2;
       end

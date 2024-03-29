@@ -1271,7 +1271,19 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
   const COMMON_resistor* c = prechecked_cast<const COMMON_resistor*>(p->common());
   assert(c);
   {
-// omit statement
+    { // 
+// omit Assignment..
+      { // Contribution I(p, n) lin: 1
+        ddouble t0;
+        // t0[d_potential_b_p_n] = 0.; // (output dep)
+        t0 = _v_i/*rhsvar*/;
+        d->_value_b_p_n /* contrib sign: */ += t0.value();
+        assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
+        d->_st_b_p_n[1] += t0[d_potential_b_p_n];
+        // dep _potential_b_p_n
+        // same _potential_b_p_n
+      }
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -2902,7 +2914,9 @@ void EVAL__b_ddt_1_p_ddt_1_n_::tr_eval(ELEMENT* d)const
   const COMMON_capacitor* c = prechecked_cast<const COMMON_capacitor*>(p->common());
   assert(c);
   {
+    { // 
 // omit statement
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -2916,7 +2930,9 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
   const COMMON_capacitor* c = prechecked_cast<const COMMON_capacitor*>(p->common());
   assert(c);
   {
+    { // 
 // omit statement
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -3686,7 +3702,9 @@ void EVAL__b_ddt_2_p_ddt_2_n_::tr_eval(ELEMENT* d)const
   const COMMON_capacitor* c = prechecked_cast<const COMMON_capacitor*>(p->common());
   assert(c);
   {
+    { // 
 // omit statement
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -3700,7 +3718,9 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
   const COMMON_capacitor* c = prechecked_cast<const COMMON_capacitor*>(p->common());
   assert(c);
   {
+    { // 
 // omit statement
+    }
   }
 }
 /*--------------------------------------------------------------------------*/

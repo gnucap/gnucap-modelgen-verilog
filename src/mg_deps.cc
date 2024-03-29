@@ -152,5 +152,17 @@ bool Dep::same_data(Dep const& o) const
   return _prb->same_data(*o._prb);
 }
 /*--------------------------------------------------------------------------*/
+bool TData::has_sensitivities()const
+{
+  return !_sens.empty(); // incomplete.
+  for(auto x : _sens){
+    if(dynamic_cast<AnalogEvtExpression const*>(x)){
+      return true;
+    }else{
+    }
+  }
+  return false;//!_sens.empty();
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

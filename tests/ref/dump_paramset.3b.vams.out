@@ -1,0 +1,24 @@
+// paramsets
+module my_res(a, b);
+  electrical a, b;
+  parameter real g = 1;
+  localparam real __r = (1. / g);
+
+  real   __i// dep _potential_b_a_b
+;
+
+  analog begin // always
+    // __i : 1
+    begin
+    // __i : 0
+      __i = 3.;
+      begin
+      // __i : 1
+        __i = V(a, b); // dep: _potential_b_a_b
+      end
+    end
+    __i = __i; // dep: _potential_b_a_b
+  end
+
+endmodule
+

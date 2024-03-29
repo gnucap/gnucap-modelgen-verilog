@@ -1,0 +1,13 @@
+module test_array(p, n);
+  electrical p, n;
+  (* desc="" *)
+  real   dv;
+
+  analog begin
+    dv = exp('{1, 2, 3,  3., '{"nest", 17}});
+  end
+
+endmodule
+
+
+

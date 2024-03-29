@@ -589,7 +589,7 @@ static Module* to_module(Block* owner)
       return m;
     }else{
     }
-    owner = owner->owner();
+    owner = owner->scope();
     assert(owner);
   }
   unreachable();
@@ -801,6 +801,8 @@ size_t Token_VAR_REF::num_deps() const
 /*--------------------------------------------------------------------------*/
 void Token_VAR_REF::stack_op(Expression* e)const
 {
+  auto E = prechecked_cast<Expression_*>(e);
+  assert(E);
   assert(_item);
   auto oi = prechecked_cast<Owned_Base const*>(_item);
   assert(oi);
@@ -814,27 +816,31 @@ void Token_VAR_REF::stack_op(Expression* e)const
     assert(dynamic_cast<Paramset const*>(scope)); // ?
   }else if(r==this){
   }else if(auto x = dynamic_cast<Token_VAR_REF const*>(r)){
-    return x->stack_op(e);
+    return x->stack_op(e); // BUG.
   }else{ untested();
   }
 
-  assert(oi->owner());
-  if(auto a = dynamic_cast<Assignment const*>(_item)){
-    nd = a->deps().clone();
-    trace3("var::stackop a", name(), nd->size(), deps().size());
-  }else if(auto dd = dynamic_cast<TData const*>(data())){
-    nd = dd->clone();
-  }else{ untested();
-    incomplete();
-    trace1("var::stackop no assignment", name());
+  {
+    assert(oi->owner());
+    if(auto a = dynamic_cast<Assignment const*>(_item)){
+      nd = a->data().clone();
+//      nd->add_sens(_item); not yet.
+      trace3("var::stackop a", name(), nd->size(), deps().size());
+    }else if(auto dd = dynamic_cast<TData const*>(data())){
+      nd = dd->clone();
+//      nd->add_sens(_item); not yet.
+    }else{ untested();
+      incomplete();
+      trace1("var::stackop no assignment", name());
+    }
+
+    auto nn = new Token_VAR_REF(*this, nd);
+    nn->deps();
+    assert(nn->num_deps() == nd->ddeps().size());
+    e->push_back(nn);
+    assert(nn->_item == _item);
+
   }
-//  trace4("var::stack_op", name(), _item->deps().ddeps().size(), _item->name(), _item);
-//  assert(nd->ddeps().size() == _item->deps().ddeps().size());
-  auto nn = new Token_VAR_REF(*this, nd);
-  nn->deps();
-  assert(nn->num_deps() == nd->ddeps().size());
-  e->push_back(nn);
-  assert(nn->_item == _item);
 }
 /*--------------------------------------------------------------------------*/
 TData* Token_PARLIST_::new_deps()const
@@ -1028,7 +1034,6 @@ Data_Type const& Token_VAR_REF::type() const
 bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
 {
   // TODO //
-  //
   if(auto it=dynamic_cast<Assignment*>(_item)){
     return it->propagate_deps(from);
   }else{

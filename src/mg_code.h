@@ -25,9 +25,25 @@
 #include "mg_attrib.h"
 #include "mg_expression.h"
 /*--------------------------------------------------------------------------*/
-class Statement : public Base {
+class Statement : public Owned_Base {
+protected:
+  std::vector<Base*> _rdeps;
+protected:
+  explicit Statement() : Owned_Base() {}
 public:
-  virtual bool propagate_deps(Token const&) = 0;
+  virtual bool propagate_rdeps(TData const&){
+    incomplete();
+    return false;
+  }
+  virtual bool propagate_deps(Token const&){
+    incomplete();
+    return false;
+  }
+  void set_rdeps(TData const&);
+  virtual bool update();
+  virtual Statement* parent_stmt();
+  virtual Block* scope() { return Owned_Base::owner(); }
+  virtual Block const* scope() const { return Owned_Base::owner(); }
 };
 /*--------------------------------------------------------------------------*/
 class Data_Type : public Base{
@@ -64,16 +80,10 @@ class Expression;
 class Variable : public Owned_Base {
 protected:
   TData* _data{NULL};
-//  String_Arg _name;
   Token_VAR_REF* _token{NULL};
 public:
-  explicit Variable() : Owned_Base() {}
-//  Variable(std::string const& name)
-//   : Owned_Base()
-//   ,_name(name) {untested();
-//  }
-  ~Variable() {
-  }
+  explicit Variable() : Owned_Base() { }
+  ~Variable() { }
 public:
   String_Arg key()const { return String_Arg(name()); }
 //  void set_type(Data_Type d){ _type=d; }
@@ -90,6 +100,7 @@ public:
   Block const* scope() const;
   bool has_deps()const { return _data; }
   TData const& deps()const { assert(_data); return *_data; }
+  bool is_used_in(Base const*b)const;
 protected:
   TData& data() { assert(_data); return *_data; }
   void new_var_ref();
@@ -166,22 +177,23 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 // class Assignment : public Expression_ ? (later)
-class Assignment : public Variable {
+class Assignment : public Owned_Base {
+protected: // from Variable
+  TData* _data{NULL};
+  Token_VAR_REF* _token{NULL};
 protected:
   Token_VAR_REF* _lhsref{NULL};
   Expression_ _rhs;
 public:
   explicit Assignment(CS& f, Block* o);
-  explicit Assignment() : Variable() {}
+  explicit Assignment() : Owned_Base() {}
   ~Assignment();
 public:
-  bool is_module_variable()const override;
+  //bool has_deps()const { return _data; }
+  TData const& data()const { assert(_data); return *_data; }
+  bool is_module_variable()const;
   bool is_int() const;
-  Data_Type const& type()const override;
-//  std::string const& lhsname()const {
-//    assert(_lhsref);
-//    return _lhsref->name();
-//  }
+  Data_Type const& type()const;
   Expression_ const& rhs()const {return _rhs;}
   Token_VAR_REF const& lhs() const{
     assert(_lhsref);
@@ -194,15 +206,10 @@ public:
 // protected:
   void set_lhs(Variable* v);
 
-//  TData const& deps()const override;
-//private: // ?
   void parse_rhs(CS& cmd);
-  double eval()const override;
-  Block* owner(){ return Variable::owner();}
-  Block const* owner() const{ return Variable::owner();}
   bool has_sensitivities()const;
-//  TData& deps()override { return _rhs.deps(); }
   Block const* scope() const;
+  bool is_used_in(Base const*b)const;
 private: // implementation
   bool store_deps(TData const&);
   std::string code_name()const;
@@ -224,6 +231,42 @@ public:
   double value() const;
   void resolve();
 };
+/*--------------------------------------------------------------------------*/
+class Sensitivities;
+// code.h?
+class SeqBlock : public Block {
+  String_Arg _identifier;
+  Sensitivities* _sens{NULL};
+public:
+  explicit SeqBlock() : Block() {}
+  ~SeqBlock();
+  void parse(CS&)override{incomplete();}
+//  void dump(std::ostream& o)const override;
+  void parse_identifier(CS& f) { f >> _identifier; }
+
+  Branch_Ref new_branch(std::string const& p, std::string const& n)override {
+    assert(owner());
+    return scope()->new_branch(p, n);
+  }
+  Branch_Ref new_branch(Node* p, Node* n)override {
+    assert(owner());
+    return scope()->new_branch(p, n);
+  }
+  Node_Ref node(std::string const& n)const override {
+    assert(owner());
+    return scope()->node(n);
+  }
+  Branch_Ref lookup_branch(std::string const& n)const override {
+    assert(owner());
+    return scope()->lookup_branch(n);
+  }
+  String_Arg const& identifier() const{ return _identifier; }
+  bool has_sensitivities()const {return _sens;}
+  Sensitivities const* sensitivities()const {return _sens;}
+  void set_sens(Base* s);
+  void merge_sens(Sensitivities const& s);
+  map const& variables()const {return _var_refs;}
+}; // SeqBlock
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

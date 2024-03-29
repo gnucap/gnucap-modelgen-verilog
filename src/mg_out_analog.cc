@@ -131,8 +131,9 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
 {
   Expression_ const& e = a.rhs();
 
-  o__ "{ // Assignment " << a.type() << " '" << a.name() << "'.\n";
   std::string lhsname = a.lhs().code_name();
+  std::string name = a.lhs().name();
+  o__ "{ // Assignment " << a.type() << " '" << name << "'.\n";
 
   {
     indent x;
@@ -145,7 +146,7 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
       o__ lhsname << " = t0; // (1a)\n";
     }else if(!options().optimize_deriv()) {itested();
       o__ lhsname << " = t0; // (*)\n";
-      for(auto v : a.deps().ddeps()) { untested();
+      for(auto v : a.data().ddeps()) { untested();
 	o__ "// " << a.lhs().code_name() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // (2a)\n";
 	o__ "assert(" << a.lhs().code_name() << "[d" << v->code_name() << "] == " << "t0[d" << v->code_name() << "]); // (2a2)\n";
       }
@@ -160,7 +161,7 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
       o__ "trace1(\"assign\", " << lhsname << ");\n";
 #endif
 
-      for(auto v : a.deps().ddeps()) {
+      for(auto v : a.data().ddeps()) {
 	assert(v->branch());
 	if(v.is_linear()){
 	  // TODO incomplete();
@@ -170,7 +171,7 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
 	  // TODO incomplete();
 	}
 
-	if(a.deps().is_linear()) {
+	if(a.data().is_linear()) {
 //	}else if(v.is_linear()){ incomplete(); // later.
 	}else{
 	}
@@ -194,11 +195,11 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 {
   Expression const& e = C.rhs();
 
-  for(auto v : C.deps().ddeps()) {
+  for(auto v : C.data().ddeps()) {
     trace2("contrib dep", C.name(), v->code_name());
   }
 
-  o__ "{ // Contribution " << C.name() << C.branch_ref() << " lin: " << C.deps().is_linear() << "\n";
+  o__ "{ // Contribution " << C.name() << C.branch_ref() << " lin: " << C.data().is_linear() << "\n";
   if(!C.is_pot_contrib() && is_zero(e)){
     // TODO incomplete(); // optimize out?
   }else if(C.branch()->is_short()){
@@ -235,7 +236,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
       trace1("nonlinear branch deps", C.branch()->code_name());
     }
 
-    if(C.deps().is_linear()) {
+    if(C.data().is_linear()) {
       trace1("linear C deps", C.branch()->code_name());
     }else{
     }
@@ -255,7 +256,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
     }
 
     if(is_dynamic()) {
-      for(auto v : C.deps().ddeps()) {
+      for(auto v : C.data().ddeps()) {
 	if(C.branch() == v->branch()){
 	  o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
 	  o__ "d->_st" << bcn << "[1]"
@@ -263,7 +264,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	}else{
 	}
       }
-      for(auto v : C.deps().ddeps()) {
+      for(auto v : C.data().ddeps()) {
 	o__ "// dep " << v->code_name() << "\n";
 	assert(v->branch());
 	if(C.branch() == v->branch()){
@@ -285,7 +286,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	}
       }
     }else if(is_precalc()) {
-      for(auto v : C.deps().ddeps()) {
+      for(auto v : C.data().ddeps()) {
 	assert(v->branch());
 	if(C.branch() == v->branch()) {
 	  o__ "// same " << v->code_name() << "\n";
@@ -319,7 +320,16 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Base const& ab) const
   // assert(st);
 
   if(_src && st && !st->is_used_in(_src)){
-    o << "// omit statement\n";
+    if(dynamic_cast<Contribution const*>(&ab)){
+      o << "// omit Contibution..\n";
+    }else if(dynamic_cast<AnalogProceduralAssignment const*>(&ab)) {
+      o << "// omit Assignment..\n";
+    }else if(auto sb = dynamic_cast<AnalogSeqBlock const*>(&ab)){
+      // incomplete();
+      make_seq(o, *sb);
+    }else{
+      o << "// omit statement\n";
+    }
   }else if(auto s = dynamic_cast<AnalogSeqBlock const*>(&ab)){
     make_seq(o, *s);
   }else if(auto bl = dynamic_cast<AnalogCtrlBlock const*>(&ab)){ untested();
@@ -329,6 +339,7 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Base const& ab) const
   }else if(auto a=dynamic_cast<AnalogProceduralAssignment const*>(&ab)) {
     make_assignment(o, a->assignment());
   }else if(auto assign=dynamic_cast<Assignment const*>(&ab)) {
+    // incomplete.
     make_assignment(o, *assign);
   }else if(auto ard=dynamic_cast<AnalogRealDecl const*>(&ab)) {
     make_block_real_identifier_list(o, ard->list());
@@ -350,6 +361,8 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Base const& ab) const
   }else if(auto ev=dynamic_cast<AnalogEvtCtlStmt const*>(&ab)) {
     make_evt(o, *ev);
     //throw Exception("analogevtctl unsupported");
+  }else if(auto ct = dynamic_cast<AnalogCtrlStmt const*>(&ab)){
+    make_ctrl(o, ct->body());
   }else if(auto t=dynamic_cast<System_Task const*>(&ab)) {
     make_system_task(o, *t);
   }else{ untested();
@@ -513,7 +526,9 @@ void OUT_ANALOG::make_switch(std::ostream& o, AnalogSwitchStmt const& s) const
     std::string paren="";
 
     CaseGen const* def = NULL;
-    for(auto& i : s.cases()){
+    for(auto c : s.cases()){
+      auto i = prechecked_cast<CaseGen*>(c);
+      assert(i);
       if(i->is_never()){
       }else if(i->cond_or_null()){
 	o << "{\n";
@@ -523,11 +538,11 @@ void OUT_ANALOG::make_switch(std::ostream& o, AnalogSwitchStmt const& s) const
 
 	o__ "if (cond) {\n";
 
-	if(i->code_or_null()){
+//	if(i->code_or_null()){
 	  indent y;
-	  make_stmt(o, *i->code_or_null());
-	}else{ untested();
-	}
+	  make_stmt(o, *i); // ->code_or_null());
+//	}else{ untested();
+//	}
 
 	o__ "}else";
 	paren += "}";
@@ -539,10 +554,10 @@ void OUT_ANALOG::make_switch(std::ostream& o, AnalogSwitchStmt const& s) const
 
     o << "{\n";
     if(!def){
-    }else if(def->code_or_null()){
+    }else{ // } if(def->code_or_null()){
       indent y;
-      make_stmt(o, *def->code_or_null());
-    }else{ untested();
+      make_stmt(o, *def);
+//    }else{ untested();
     }
     o<<paren;
     o__ "\n";
@@ -552,9 +567,9 @@ void OUT_ANALOG::make_switch(std::ostream& o, AnalogSwitchStmt const& s) const
 }
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_ctrl(std::ostream& o, AnalogCtrlBlock const& s) const
-{ untested();
+{
   o__ "{ // " << s.identifier() << "\n";
-  for(auto i : s.block()) { untested();
+  for(auto i : s.block()) {
     indent x;
     make_stmt(o, *i);
   }
