@@ -164,12 +164,12 @@ static void make_parameter_decl(std::ostream& o, const Parameter_List_Collection
 }
 /*--------------------------------------------------------------------------*/
 // lib?
-void make_one_variable_decl(std::ostream& o, const Variable_Decl& V)
+void make_one_variable_decl(std::ostream& o, Token_VAR_REF const& V)
 {
   if(V.type().is_real()) {
       o__ "double ";
       o << " _v_" << V.name() << "{0.}";
-   if(!V.has_attributes()){
+   if(attributes(&V)){
 #if 0
    }else if(options().optimize_deriv()) { untested();
       o__ "struct _V_" << V.name() << " : ddouble {\n";
@@ -212,7 +212,7 @@ static void make_variable_decl(std::ostream& o, const Variable_List_Collection& 
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
-      Variable_Decl const* V = *p;
+      Token_VAR_REF const* V = *p;
       assert(V);
       //if(V->has_attributes()) { untested();
 	make_one_variable_decl(o, *V);

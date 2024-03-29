@@ -179,21 +179,19 @@ public:
   bool propagate_rdeps(TData const&)override;
 
   virtual TData const& deps() = 0;
-  Statement* parent_stmt()override {
-    incomplete();
-    return NULL;
-  }
+//  Statement* parent_stmt()override {
+//    incomplete();
+//    return NULL;
+//  }
 };
 /*--------------------------------------------------------------------------*/
-class AnalogExpression : public Owned_Base {
-protected:
-  Expression_ _exp;
+class AnalogExpression : public Expression_ {
 public:
   ~AnalogExpression();
   void parse(CS& file) override;
-  void dump(std::ostream& o)const override;
+//  void dump(std::ostream& o)const override;
 //  Block* owner() {return Owned_Base::owner();}
-  Expression const& expression() const{ return _exp;}
+  Expression const& expression() const{ return *this;}
   bool is_true() const;
   bool is_false() const;
 };
@@ -293,10 +291,11 @@ public:
 //  bool update() override { incomplete(); }
 };
 /*--------------------------------------------------------------------------*/
-class System_Task : public Owned_Base {
+// code?
+class System_Task : public Statement {
   AnalogExpression _e;
 public:
-  System_Task(CS&, Block*);
+  explicit System_Task(CS&, Block*);
   void parse(CS& o) override;
   void dump(std::ostream&o)const override;
 
@@ -465,26 +464,32 @@ private:
   void add_dep(Dep const&);
 }; // Contribution
 /*--------------------------------------------------------------------------*/
-// AnalogDecl?
-class AnalogRealDecl : public AnalogStmt {
-  ListOfBlockRealIdentifiers _l;
-  TData _deps;
+class ListOfBlockRealIdentifiers : public LiSt<BlockVarIdentifier, '\0', ',', ';'>{
 public:
-  explicit AnalogRealDecl(CS& f, Block* o){
-    _l.set_owner(o);
+  ListOfBlockRealIdentifiers() {}
+  ListOfBlockRealIdentifiers(CS& f, Block* o){
+    set_owner(o);
     parse(f);
-
-    for(auto i : _l){
+    for(auto i : *this){
       i->set_type(Data_Type_Real());
     }
   }
-  void parse(CS& f)override {
-    f >> _l;
+  void dump(std::ostream&)const override;
+};
+/*--------------------------------------------------------------------------*/
+// AnalogDecl?
+class AnalogRealDecl : public AnalogStmt {
+  typedef LiSt<Token_VAR_REAL, '\0', ',', ';'> list_t;
+  list_t _l;
+  TData _deps;
+public:
+  explicit AnalogRealDecl(CS& f, Block* o){
+    set_owner(o);
+    parse(f);
   }
-  void dump(std::ostream& o)const override {
-    _l.dump(o);
-  }
-  ListOfBlockRealIdentifiers const& list() const{
+  void parse(CS& f)override;
+  void dump(std::ostream& o)const override;
+  list_t const& list() const{
     return _l;
   }
 

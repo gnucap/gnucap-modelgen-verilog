@@ -2,8 +2,8 @@ module test(a, b);
   electrical a, b;
   parameter real arg = 0 from [(0.):(0.)];
 
-  real   T;
-  real   U;
+  real T;
+  real U;
 
   analog begin
     begin

@@ -461,7 +461,11 @@ void Token_TERNARY_::stack_op(Expression* E)const
   }else{
     TData* deps = new TData;
 
+    auto SE = prechecked_cast<Expression_*>(E);
+    assert(SE);
+
     Expression_* t = new Expression_;
+    t->set_owner(SE->owner());
     for (Expression::const_iterator i = true_part()->begin(); i != true_part()->end(); ++i) {
       trace1("stackop stash arg", (**i).name());
       // already stackopped? just clone..
@@ -470,6 +474,7 @@ void Token_TERNARY_::stack_op(Expression* E)const
     deps->update(t->deps());
 
     Expression_* f = new Expression_;
+    f->set_owner(SE->owner());
     for (Expression::const_iterator i = false_part()->begin(); i != false_part()->end(); ++i) {
       trace1("stackop stash arg", (**i).name());
       // already stackopped? just clone..
@@ -546,7 +551,10 @@ void Token_CALL::stack_op(Expression* E)const
     if(f){
       trace2("CALL stackopped", name(), E->back()->name());
     }else{
+      auto SE = prechecked_cast<Expression_*>(E);
       auto EE = new Expression_;
+      EE->set_owner(SE->owner());
+      assert(EE->scope());
       for (Expression::const_iterator i = arg_expr->begin(); i != arg_expr->end(); ++i) {
 	trace1("stackop stash arg", (**i).name());
 	(**i).stack_op(EE);
@@ -655,7 +663,7 @@ void Token_ACCESS::stack_op(Expression* e) const
 
   auto SE = prechecked_cast<Expression_*>(e);
   assert(SE);
-  Block* owner=SE->owner();
+  Block* Scope = SE->scope();
 
   if(_prb){
     // already resolved
@@ -672,14 +680,14 @@ void Token_ACCESS::stack_op(Expression* e) const
       assert(0);
       // constant string, possibly.
     }else if(dynamic_cast<Token_PORT_BRANCH*>(E.back())) {
-      assert(owner);
+      assert(Scope);
 
       FUNCTION const* f = function_dispatcher[".port_flow"];
       if(!f){ untested();
 	throw Exception("need .port_flow plugin to access port flow\n");
       }else{
       }
-      Token* t = owner->new_token(f, 1);
+      Token* t = Scope->new_token(f, 1);
       t->stack_op(&E);
       delete t;
     }else if(dynamic_cast<Token_STOP*>(E.back())) { untested();
@@ -711,12 +719,12 @@ void Token_ACCESS::stack_op(Expression* e) const
       // bug: upside down
       //  VAMS_ACCESS f(name(), arg0, arg1);
       //    assert(ds.top());
-      assert(owner);
+      assert(Scope);
 #if 0
       Token* t = SE->owner()->new_token(&f, na);
 #else
       // was: Token* VAMS_ACCESS::new_token(Module& m, size_t na)const
-      Module* m = to_module(owner); // dynamic_cast<Module*>(SE->owner());
+      Module* m = to_module(Scope); // dynamic_cast<Module*>(SE->owner());
       assert(m);
       // use na?
       Branch_Ref br = m->new_branch(arg0, arg1);
@@ -804,15 +812,15 @@ void Token_VAR_REF::stack_op(Expression* e)const
   auto E = prechecked_cast<Expression_*>(e);
   assert(E);
   assert(_item);
-  auto oi = prechecked_cast<Owned_Base const*>(_item);
-  assert(oi);
-  auto scope = prechecked_cast<Block const*>(oi->owner());
+//  auto oi = prechecked_cast<Owned_Base const*>(_item);
+//  assert(oi);
+  auto scope = E->scope(); // prechecked_cast<Block const*>(oi->owner());
   assert(scope);
 //  assert(deps());
   auto nd = deps().clone();
 
   Base const* r = scope->lookup(name());
-  if(!r){
+  if(!r){ untested();
     assert(dynamic_cast<Paramset const*>(scope)); // ?
   }else if(r==this){
   }else if(auto x = dynamic_cast<Token_VAR_REF const*>(r)){
@@ -821,7 +829,7 @@ void Token_VAR_REF::stack_op(Expression* e)const
   }
 
   {
-    assert(oi->owner());
+//    assert(oi->owner());
     if(auto a = dynamic_cast<Assignment const*>(_item)){
       nd = a->data().clone();
 //      nd->add_sens(_item); not yet.
@@ -1034,17 +1042,23 @@ Data_Type const& Token_VAR_REF::type() const
 bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
 {
   // TODO //
-  if(auto it=dynamic_cast<Assignment*>(_item)){
+  if(auto dd=dynamic_cast<TData*>(_item)){
+    TData const& incoming = from.deps();
+    // assert(&deps() != &incoming);
+    dd->update(incoming);
+    assert(deps().ddeps().size() >= incoming.ddeps().size());
+  }else if(auto it=dynamic_cast<Assignment*>(_item)){
+    assert(it->scope());
+    assert(from.scope());
     return it->propagate_deps(from);
+  }else if(auto pa=dynamic_cast<AnalogProceduralAssignment*>(_item)){ untested();
+    // does not make sense.
+    assert(false);
   }else{
-    if(options().optimize_unused() && !scope()->is_reachable()) { untested();
-      unreachable();
-    }else{
-      trace2("parse prop -> decl", name(), deps().ddeps().size());
-      auto p = prechecked_cast<Variable_Decl*>(_item);
-      assert(p);
-      return p->propagate_deps(from);
-    }
+//    assert(!(options().optimize_unused() && !scope()->is_reachable()));
+    auto p = prechecked_cast<Variable_Decl*>(_item);
+    assert(p);
+    return p->propagate_deps(from);
   }
 
   return false;
@@ -1053,13 +1067,127 @@ bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
 Block const* Token_VAR_REF::scope() const
 {
   // TODO //
-  if(auto it=dynamic_cast<Assignment*>(_item)){
+  if(auto b=dynamic_cast<Block*>(_item)){
+    return b;
+  }else if(auto it=dynamic_cast<Owned_Base*>(_item)){ untested();
     return it->scope();
-  }else{
+  }else if(auto ex=dynamic_cast<Expression_*>(_item)){
+    return ex->scope();
+  }else{ untested();
+    return NULL;
+    unreachable();
     auto p = prechecked_cast<Variable_Decl*>(_item);
     assert(p);
     return p->scope();
   }
 }
+/*--------------------------------------------------------------------------*/
+void Token_VAR_REAL::clear_deps()
+{
+  if(auto it=dynamic_cast<TData*>(_item)){
+    it->clear();
+  }else{ untested();
+    assert(false);
+  }
+}
+/*--------------------------------------------------------------------------*/
+Data_Type const& Token_VAR_REAL::type() const
+{
+  static Data_Type_Real t;
+  return t;
+};
+/*--------------------------------------------------------------------------*/
+void Token_VAR_REAL::stack_op(Expression* e)const
+{
+  auto E = prechecked_cast<Expression_*>(e);
+  assert(E);
+  auto xx = dynamic_cast<Statement*>(E->owner());
+  auto mm = dynamic_cast<Module*>(E->owner());
+  auto af = dynamic_cast<Analog_Function*>(E->owner());// BUG?
+  assert(xx||mm||af);
+  assert(_item);
+  auto oi = prechecked_cast<TData const*>(_item);
+  assert(oi);
+//  assert(deps());
+  auto nd = deps().clone();
+
+//  Base const* r = scope->lookup(name());
+//  if(!r){ untested();
+//    assert(dynamic_cast<Paramset const*>(scope)); // ?
+//  }else if(r==this){ untested();
+//  }else if(auto x = dynamic_cast<Token_VAR_REF const*>(r)){ untested();
+//    return x->stack_op(e); // BUG.
+//  }else{ untested();
+//  }
+
+  {
+//    assert(oi->owner());
+    if(auto a = dynamic_cast<Assignment const*>(_item)){ untested();
+      nd = a->data().clone();
+//      nd->add_sens(_item); not yet.
+      trace3("var::stackop a", name(), nd->size(), deps().size());
+    }else if(auto dd = dynamic_cast<TData const*>(data())){
+      nd = dd->clone();
+//      nd->add_sens(_item); not yet.
+    }else{ untested();
+      incomplete();
+      trace1("var::stackop no assignment", name());
+    }
+
+//    assert(xx);
+    auto nn = new Token_VAR_REF(name(), E->scope(), nd);
+    assert(nn->scope());
+    nn->deps();
+//    assert(nn->num_deps() == nd->ddeps().size());
+    e->push_back(nn);
+//    assert(nn->_item == _item);
+
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Token_VAR_REAL::dump(std::ostream& o) const
+{
+  o << name();
+  if(!options().dump_annotate()){
+  }else if(deps().ddeps().size()){
+    for(auto d : deps().ddeps()){
+      o << "// dep " << d->code_name();
+    }
+    o << "\n";
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+Data_Type const& Token_VAR_INT::type() const
+{
+  static Data_Type_Int t;
+  return t;
+};
+/*--------------------------------------------------------------------------*/
+void Token_VAR_INT::stack_op(Expression* e)const
+{
+  incomplete();
+  Token_VAR_REF::stack_op(e);
+}
+/*--------------------------------------------------------------------------*/
+void Token_VAR_INT::dump(std::ostream& o) const
+{
+  o << name();
+}
+/*--------------------------------------------------------------------------*/
+// bool Token_VAR_REAL::propagate_deps(Token_VAR_REF const& from)
+// { untested();
+//     assert(!(options().optimize_unused() && !scope()->is_reachable()));
+//   // TODO //
+//   if(auto it=dynamic_cast<Assignment*>(_item)){ untested();
+//     return it->propagate_deps(from);
+//   }else{ untested();
+//     auto p = prechecked_cast<Variable_Decl*>(_item);
+//     assert(p);
+//     return p->propagate_deps(from);
+//   }
+// 
+//   return false;
+// }
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

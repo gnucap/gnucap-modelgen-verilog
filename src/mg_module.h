@@ -235,9 +235,8 @@ private:
   Branch_Ref new_branch_name(std::string const& n, Branch_Ref const& b) override;
   Node_Ref node(std::string const& p) const override;
   Branch_Ref lookup_branch(std::string const& p) const override;
-protected:
-  void new_var_ref(Base* what) override;
 public:
+  void new_var_ref(Base* what) override;
   Node* node(Node_Ref r) { return r.mutable_node(*this); }
 public: //filters may need this..
   Node* new_node(std::string const& p) override;

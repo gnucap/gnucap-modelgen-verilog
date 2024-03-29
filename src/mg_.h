@@ -186,17 +186,17 @@ class Sensitivities;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class AnalogConstruct : public Statement {
-  Base* _stmt{NULL}; // is a ControlBlock
+  Block* _block{NULL};
 public:
   ~AnalogConstruct(){
-    delete _stmt;
-    _stmt = NULL;
+    delete _block;
+    _block = NULL;
   }
 
 public:
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
-  Base const* statement_or_null() const{ return _stmt; }
+  Base const* statement_or_null() const{ return _block; }
 };
 typedef Collection<AnalogConstruct> AnalogList;
 #if 0
@@ -522,11 +522,11 @@ void LiSt<T, BEGIN, SEP, END, END2, END3>::dump_attributes(std::ostream& f)const
 //   _owner->set_reachable();
 // }
 /*--------------------------------------------------------------------------*/
-inline bool Owned_Base::is_reachable() const
-{
-  assert(_owner);
-  return _owner->is_reachable();
-}
+// inline bool Owned_Base::is_reachable() const
+// {
+//   assert(_owner);
+//   return _owner->is_reachable();
+// }
 /*--------------------------------------------------------------------------*/
 inline bool Branch_Ref::has_name()const
 {
@@ -539,6 +539,13 @@ inline std::string Branch_Ref::name() const
   assert(_br);
   return _br->name();
 }
+/*--------------------------------------------------------------------------*/
+inline ATTRIB_LIST_p& attributes(const void* x)
+{
+  assert(CKT_BASE::_attribs);
+  return (*CKT_BASE::_attribs)[x];
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

@@ -19,7 +19,7 @@ enddiscipline
 
 module test_portbranch(p, n);
   electrical p, n;
-  real   i;
+  real i;
 
   analog begin
     V(n, p) <+ 0.;

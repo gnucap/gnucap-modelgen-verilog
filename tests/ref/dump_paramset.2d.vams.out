@@ -21,7 +21,7 @@ module resistor(a, b);
   electrical a, b;
   parameter real r = 0.;
 
-  real   R;
+  real R;
 
   analog begin
     R = r;
@@ -37,7 +37,7 @@ module const_res(a, b);
   electrical a, b;
   localparam real __r = 1;
 
-  real   __R;
+  real __R;
 
   analog begin
     __R = __r;

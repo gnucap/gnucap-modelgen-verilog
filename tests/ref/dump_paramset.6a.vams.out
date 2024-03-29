@@ -1,7 +1,7 @@
 module shadow(a, b);
   electrical a, b;
   (* desc="i" *)
-  real   i;
+  real i;
 
   analog begin
     I(a, b) <+ 0.;
@@ -17,7 +17,7 @@ endmodule
 // paramsets
 module my_sh(a, b);
   electrical a, b;
-  real   __i;
+  real __i;
 
   analog begin
     I(a, b) <+ 0.;

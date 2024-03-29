@@ -130,7 +130,9 @@ TData::~TData()
 /*--------------------------------------------------------------------------*/
 void TData::clear()
 {
+  incomplete();
   _s.clear();
+  assert(!_s.size());
 }
 /*--------------------------------------------------------------------------*/
 std::pair<DDeps::const_iterator, bool> DDeps::insert(Dep const& x)

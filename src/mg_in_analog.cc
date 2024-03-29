@@ -107,6 +107,7 @@ static Base* parse_cond(CS& file, Block* o)
 static Base* parse_switch(CS& file, Block* o)
 {
   assert(o);
+  assert(!dynamic_cast<Module const*>(o));
   return new AnalogSwitchStmt(o, file);
 }
 /*--------------------------------------------------------------------------*/
@@ -153,7 +154,7 @@ static Base* parse_system_task(CS& f, Block* o)
   }
 }
 /*--------------------------------------------------------------------------*/
-System_Task::System_Task(CS& f, Block* o)
+System_Task::System_Task(CS& f, Block* o) : Statement()
 {
   set_owner(o);
   parse(f);
@@ -162,7 +163,7 @@ System_Task::System_Task(CS& f, Block* o)
 void System_Task::parse(CS& f)
 {
   assert(owner());
-  _e.set_owner(owner());
+  _e.set_owner(this);
   trace1("====", f.tail().substr(0,10));
   f >> _e;
   trace1("/====", f.tail().substr(0,10));
@@ -197,7 +198,7 @@ static Token_VAR_REF* parse_variable(CS& f, Block* o)
   return v;
 }
 /*--------------------------------------------------------------------------*/
-Assignment::Assignment(CS& f, Block* o)
+Assignment::Assignment(CS& f, Base* o)
 {
   // unreachable(); // reached from for condition
   set_owner(o);
@@ -207,8 +208,9 @@ Assignment::Assignment(CS& f, Block* o)
 void Assignment::parse(CS& f)
 {
   assert(owner());
+  assert(scope());
   size_t here = f.cursor();
-  Token_VAR_REF* l = parse_variable(f, owner());
+  Token_VAR_REF* l = parse_variable(f, scope());
   // assert(l->name() == name());?
 
   if(f && f >> "="){
@@ -225,19 +227,20 @@ void Assignment::parse(CS& f)
   if(_lhsref) {
     assert(l->data());
     assert(!_token);
-    store_deps(_rhs.deps());
+    store_deps(Expression_::deps());
     assert(_token);
-    if(options().optimize_unused() && !is_reachable()) {
+    if(options().optimize_unused() && !scope()->is_reachable()) {
     }else{
       assert(_token->data());
+      assert(_token->scope());
 //      trace1("parse prop", name());
       _lhsref->propagate_deps(*_token);
       // _name = l->name();
       assert(_lhsref->name() == _token->name());
+      trace2("parsedone", _token->name(), data().size());
     }
     assert(_token);
-    owner()->new_var_ref(_token);
-    // trace2("parsedone", _token->name(), data().size());
+    scope()->new_var_ref(_token);
   }else{
     // possibly not a variable..
   }
@@ -246,7 +249,8 @@ void Assignment::parse(CS& f)
 // void Assignment::parse(CS& f)?
 void AnalogProceduralAssignment::parse(CS& f)
 {
-//  assert(_a.owner());
+  // assert(owner()); ?
+  _a.set_owner(this);
   size_t here = f.cursor();
 
 //  trace2("Proc assignment?", f.tail().substr(0,20), _a.owner());
@@ -271,7 +275,7 @@ void AnalogProceduralAssignment::parse(CS& f)
 template<class A>
 void dump_annotate(std::ostream& o, A const& _a)
 {
-  if(!_a.is_reachable()){
+  if(!_a.scope()->is_reachable()){
     o << " // --\n";
   }else{
     if(_a.data().ddeps().size()){
@@ -305,6 +309,7 @@ void AnalogProceduralAssignment::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 static Base* parse_proc_assignment(CS& f, Block* o)
 {
+  assert(o);
   f.skipbl();
   trace1("parse_proc_assignment", f.tail().substr(0,30));
   try{
@@ -322,7 +327,8 @@ static Base* parse_proc_assignment(CS& f, Block* o)
 AnalogProceduralAssignment::AnalogProceduralAssignment(CS& file, Block* o)
   : AnalogStmt()
 {
-  _a.set_owner(o);
+  set_owner(o);
+  _a.set_owner(this);
   parse(file);
 }
 /*--------------------------------------------------------------------------*/
@@ -383,7 +389,8 @@ static Base* parse_analog_stmt(CS& file, Block* owner)
 void AnalogConditionalStmt::parse(CS& f)
 {
   assert(owner());
-  _cond.set_owner(owner());
+  //_cond.set_owner(owner());
+  _cond.set_owner(this);
   _body.set_owner(this);
   assert(!_body.is_always());
   assert(!_body.is_never());
@@ -395,17 +402,17 @@ void AnalogConditionalStmt::parse(CS& f)
   }
 
   {
-    if(owner()->is_never()) {
+    if(is_never()) {
       _body.set_never();
       _false_part.set_never();
     }else if(_cond.is_true()) {
-      if(owner()->is_always()) {
+      if(is_always()) {
 	_body.set_always();
       }else{untested();
       }
       _false_part.set_never();
     }else if(_cond.is_false()) {
-      if(owner()->is_always()) {
+      if(is_always()) {
 	_false_part.set_always();
       }else{untested();
       }
@@ -504,7 +511,8 @@ bool AnalogWhileStmt::update()
 /*--------------------------------------------------------------------------*/
 void AnalogWhileStmt::parse(CS& file)
 {
-  _cond.set_owner(scope());
+  //_cond.set_owner(scope());
+  _cond.set_owner(this);
   file >> "(" >> _cond >> ")";
   if(file >> ";"){
   }else{
@@ -521,7 +529,7 @@ void AnalogWhileStmt::dump(std::ostream& o)const
   AnalogCtrlStmt::dump(o);
 }
 /*--------------------------------------------------------------------------*/
-static Assignment* parse_assignment_or_null(CS& f, Block* owner)
+static Assignment* parse_assignment_or_null(CS& f, Statement* owner)
 {
   auto a = new Assignment(f, owner);
   if(f) {
@@ -557,7 +565,7 @@ void AnalogForStmt::parse(CS& f)
   assert(owner());
   _cond.set_owner(owner());
   f >> "(";
-  Assignment* init = parse_assignment_or_null(f, owner());
+  Assignment* init = parse_assignment_or_null(f, this);
   _init = init;
   if(!f){
     delete _init;
@@ -568,7 +576,7 @@ void AnalogForStmt::parse(CS& f)
   f >> _cond;
   f >> ";";
 
-  _tail = parse_assignment_or_null(f, owner());
+  _tail = parse_assignment_or_null(f, this);
 
   f >> ")";
   if(f >> ";"){ untested();
@@ -619,6 +627,7 @@ void AnalogForStmt::dump(std::ostream& o)const
 void CaseGen::calc_reach(Expression const& ctrl)
 {
   Expression_ result;
+  result.set_owner(this);
 
   if(!ctrl.size()){ untested();
     incomplete();
@@ -732,7 +741,8 @@ void AnalogSwitchStmt::parse(CS& f)
 {
   assert(owner());
   assert(!dynamic_cast<Module const*>(owner()));
-  _ctrl.set_owner(owner());
+  //_ctrl.set_owner(scope());
+  _ctrl.set_owner(this);
   _body.set_owner(this);
 
   f >> "(" >> _ctrl >> ")";
@@ -782,7 +792,6 @@ void AnalogSwitchStmt::parse(CS& f)
 void AnalogSwitchStmt::dump(std::ostream& o)const
 {
   o__ "case (" << _ctrl << ")\n";
-
   {
     indent x;
     o << _body;
@@ -793,10 +802,9 @@ void AnalogSwitchStmt::dump(std::ostream& o)const
 void AnalogConstruct::parse(CS& f)
 {
   assert(owner());
-  assert(!_stmt);
-  auto ab = new AnalogCtrlBlock(f, this);
+  assert(!_block);
+  _block = new AnalogCtrlBlock(f, this);
   // ab->update();
-  _stmt = ab;
 }
 /*--------------------------------------------------------------------------*/
 void AnalogSeqBlock::parse(CS& f)
@@ -806,7 +814,7 @@ void AnalogSeqBlock::parse(CS& f)
     parse_identifier(f);
   }else{
   }
-  if(dynamic_cast<Module const*>(owner())) {
+  if(dynamic_cast<Module const*>(owner())) { untested();
     set_always();
   }else if(dynamic_cast<Module const*>(scope())) {
     set_always();
@@ -832,7 +840,7 @@ void AnalogSeqBlock::parse(CS& f)
 }
 /*--------------------------------------------------------------------------*/
 //void AnalogSeqBlock::clear_vars()
-//{
+//{ untested();
 //  _block.clear_vars();
 //}
 /*--------------------------------------------------------------------------*/
@@ -855,7 +863,7 @@ void AnalogCtrlBlock::set_owner(Statement* st)
 /*--------------------------------------------------------------------------*/
 void AnalogCtrlBlock::parse(CS& f)
 {
-  if(dynamic_cast<Module const*>(owner())) {
+  if(dynamic_cast<Module const*>(owner())) { untested();
     set_always();
   }else{
   }
@@ -903,7 +911,7 @@ void ListOfBlockIntIdentifiers::dump(std::ostream& o) const
 }
 /*--------------------------------------------------------------------------*/
 void ListOfBlockRealIdentifiers::dump(std::ostream& o) const
-{
+{ untested();
   o__ "real ";
   LiSt<BlockVarIdentifier, '\0', ',', ';'>::dump(o);
   o << "\n";
@@ -912,13 +920,15 @@ void ListOfBlockRealIdentifiers::dump(std::ostream& o) const
 void AnalogConstruct::dump(std::ostream& o)const
 {
   o__ "analog ";
-  _stmt->dump(o);
+  Base* b = _block;
+  b->dump(o);
 }
 /*--------------------------------------------------------------------------*/
 void Assignment::dump(std::ostream& o) const
 {
   if(_token){
-    o << _token->name() << " = " << _rhs;
+    o << _token->name() << " = ";
+    Expression_::dump(o);
   }else{ untested();
     o << "/// unreachable?\n";
   }
@@ -926,12 +936,9 @@ void Assignment::dump(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 Assignment::~Assignment()
 {
-  if(_token){
-    // trace3("~Assignment", _token->name(), this, data().ddeps().size());
-  }else{
-  }
   if(options().optimize_unused() && !owner()->is_reachable()) {
   }else if(_data){
+    trace3("~Assignment", _token->name(), this, data().ddeps().size());
     try{
       for(Dep d : data().ddeps()) {
 	(*d)->unset_used_in(this);
@@ -950,15 +957,16 @@ Assignment::~Assignment()
 void Assignment::parse_rhs(CS& cmd)
 {
   assert(owner());
+  assert(scope());
+  assert(dynamic_cast<Statement*>(owner()));
   trace1("Assignment::parse_rhs", cmd.tail().substr(0,10));
   Expression rhs(cmd);
-  assert(_rhs.is_empty());
+  assert(Expression_::is_empty());
 
-  assert(owner());
   assert(!_data);
   // assert(deps().ddeps().empty());
-  _rhs.set_owner(owner()); // this? AssignmentStatement?
-  _rhs.resolve_symbols(rhs);
+  //_rhs.set_owner(owner()); // this? AssignmentStatement?
+  resolve_symbols(rhs);
   cmd.reset(cmd.cursor());
   trace1("Assignment::parse_rhs", bool(cmd));
 }
@@ -1116,7 +1124,7 @@ void Contribution::parse(CS& cmd)
     assert(_rhs.is_empty());
 
     assert(owner());
-    _rhs.set_owner(owner());
+    _rhs.set_owner(this);
     _rhs.resolve_symbols(rhs_);
   }
   {
@@ -1455,18 +1463,18 @@ void AnalogExpression::parse(CS& file)
   Expression rhs(file);
   file >> ","; // LiSt??
   assert(owner());
-  _exp.set_owner(owner());
-  _exp.resolve_symbols(rhs);
+  // Expression_::set_owner(scope());
+  resolve_symbols(rhs);
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogExpression::is_true() const
 {
-  return ::is_true(_exp);
+  return ::is_true(expression());
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogExpression::is_false() const
 {
-  return ::is_false(_exp);
+  return ::is_false(expression());
 }
 #endif
 /*--------------------------------------------------------------------------*/
@@ -1509,15 +1517,15 @@ namespace{
 /*--------------------------------------------------------------------------*/
 static Module const* to_module(Block const* owner)
 {
-  assert(owner);
   while(true){
+    assert(owner);
     if(auto m = dynamic_cast<Module const*>(owner)){
       return m;
     }else if(auto b = dynamic_cast<Block const*>(owner->owner())){
       owner = b;
     }else if(auto st = dynamic_cast<Statement const*>(owner->owner())){
       owner = st->scope();
-    }else{
+    }else{ untested();
       assert(false);
       return NULL;
     }
@@ -1742,18 +1750,18 @@ void AF_Arg_List::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 bool Assignment::update()
 {
-  TData const* D = &_rhs.deps();
+  TData const* D = &Expression_::deps();
   assert(D);
 //  size_t s = D->ddeps().size();
   bool ret;
 
 //  trace5("Assignment::update1", name(), s, D->ddeps().size(), this, _data->size());
-  _rhs.update();
-  D = &_rhs.deps();
+  Expression_::update();
+  D = &Expression_::deps();
 //  trace4("Assignment::update2", name(), s, D->ddeps().size(), this);
 
   assert(_token);
-  if (store_deps(_rhs.deps())) {
+  if (store_deps(Expression_::deps())) {
     assert(_lhsref);
 //    trace2("Assignment::update prop", _rhs.deps().ddeps().size(), _lhsref->deps().ddeps().size());
     _lhsref->propagate_deps(*_token);
@@ -1764,9 +1772,9 @@ bool Assignment::update()
 //    trace4("Assignment::update no prop", name(), _rhs.deps().size(), _lhsref->deps().size(), _token->deps().size());
     ret = false;
     assert(_token->data());
-    assert(_token->deps().size() >= _rhs.deps().size());
+    assert(_token->deps().size() >= Expression_::deps().size());
   }
-  owner()->new_var_ref(_token); // ??
+  scope()->new_var_ref(_token); // ??
 
   // new_var_ref();
   return ret;
@@ -1781,6 +1789,7 @@ bool AnalogStmt::propagate_rdeps(TData const&)
 bool Assignment::propagate_deps(Token_VAR_REF const& from)
 {
   TData const& d = from.deps();
+  assert(from.scope());
   if(from.scope() == scope()) {
     return _lhsref->propagate_deps(from);
   }else{
@@ -1797,7 +1806,7 @@ bool Assignment::store_deps(TData const& d)
   size_t ii = 0;
   bool ret = false;
 
-  if(options().optimize_unused() && !owner()->is_reachable()) {
+  if(options().optimize_unused() && !scope()->is_reachable()) {
     _token = new Token_VAR_REF(_lhsref->name(), NULL);
   }else{
 
@@ -1808,18 +1817,21 @@ bool Assignment::store_deps(TData const& d)
       assert(!_data);
       _data = new TData();
       _token = new Token_VAR_REF(_lhsref->name(), this, _data);
+//      _token = new Token_VAR_REF(_lhsref->name(), owner(), _data);
+//      _token = new Token_VAR_REF(_lhsref->name(), _data, owner());
       assert(_token->data());
+      assert(_token->scope());
     }
     _data->update(d);
 
     assert(ii <= _data->ddeps().size());
 
-    if(auto x = dynamic_cast<SeqBlock const*>(owner())) {
+    if(auto x = dynamic_cast<SeqBlock const*>(scope())) {
       if(x->has_sensitivities()) {
 	_data->add_sens(*x->sensitivities());
       }else{
       }
-    }else{ untested();
+    }else{
     }
 
     for(; ii < _data->ddeps().size(); ++ii) {
@@ -1963,11 +1975,32 @@ bool Variable_Decl::propagate_deps(Token_VAR_REF const& v)
   return false;
 }
 /*--------------------------------------------------------------------------*/
+void AnalogRealDecl::parse(CS& f)
+{
+  LiSt<String_Arg, '\0', ',', ';'> l;
+  l.parse(f);
+  for(auto i : l){
+    auto data = new TData;
+    //      data->set_type(Data_Type_Real());
+    auto t = new Token_VAR_REAL(i->to_string(), data, data);
+    _l.push_back(t);
+  }
+  update();
+}
+/*--------------------------------------------------------------------------*/
+void AnalogRealDecl::dump(std::ostream& o) const
+{
+  o__ "real ";
+  _l.dump(o);
+  o << "\n";
+}
+/*--------------------------------------------------------------------------*/
 bool AnalogRealDecl::update()
-{ untested();
-  for(BlockVarIdentifier* i : _l){ untested();
+{
+  for(Token_VAR_REAL* i : _l){
     assert(i);
-    i->update();
+    i->clear_deps();
+    owner()->new_var_ref(i);
   }
   return false;
 }

@@ -341,33 +341,74 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Data_Type;
-class Variable;
 class Token_VAR_REF : public Token_SYMBOL {
+protected:
   Base* _item;
 public:
-  explicit Token_VAR_REF(const std::string Name, Base* item)
+  explicit Token_VAR_REF(std::string Name, Base* item)
     : Token_SYMBOL(Name, ""), _item(item) {}
-  explicit Token_VAR_REF(const std::string Name, Base* item, Base const* data)
+  explicit Token_VAR_REF(std::string Name, Base* item, Base const* data)
     : Token_SYMBOL(Name, data), _item(item) {}
-private:
+// protected: //??
   explicit Token_VAR_REF(const Token_VAR_REF& P, Base* d=NULL)
     : Token_SYMBOL(P.name(), d), _item(P._item) {}
+  explicit Token_VAR_REF() : Token_SYMBOL("","")  { unreachable(); }
 private:
   Token* clone()const override { return new Token_VAR_REF(*this);}
 public:
   void stack_op(Expression* e)const override;
-  bool is_module_variable()const;
-//  Variable const* item()const { untested(); return _item; }
+  virtual bool is_module_variable()const;
   Base const* operator->() const{ return _item; }
-  Data_Type const& type()const;
+  virtual Data_Type const& type()const;
   bool propagate_deps(Token_VAR_REF const&);
   TData const& deps()const;
   Block const* scope() const;
   std::string code_name() const { return "_v_"+name(); }
+
+  // LiSt
+  std::string key() const {unreachable();return "";}
+  void set_owner(Base*){unreachable();}
 private:
   size_t num_deps() const;
 };
 /*--------------------------------------------------------------------------*/
+// VAR_DECL :: SYMBOL?
+/*--------------------------------------------------------------------------*/
+class Token_VAR_REAL : public Token_VAR_REF {
+  Block const* _owner{NULL};
+public:
+  explicit Token_VAR_REAL() : Token_VAR_REF("",NULL,NULL) {unreachable();}
+  explicit Token_VAR_REAL(std::string Name, Base* item, Base const* data)
+    : Token_VAR_REF(Name, item, data) {}
+  Data_Type const& type()const override;
+
+  void set_owner(Block const* b){_owner = b;}
+  bool is_module_variable()const override{
+    return _owner;
+  }
+  std::string key() const {unreachable();return "";}
+
+  void clear_deps();
+  void stack_op(Expression* e)const override;
+
+  void dump(std::ostream& o)const override;
+};
+/*--------------------------------------------------------------------------*/
+class Token_VAR_INT : public Token_VAR_REF {
+public:
+  explicit Token_VAR_INT() : Token_VAR_REF("",NULL,NULL) {unreachable();}
+  explicit Token_VAR_INT(std::string Name, Base* item, Base const* data)
+    : Token_VAR_REF(Name, item, data) {}
+  Data_Type const& type()const override;
+
+  void set_owner(Base*){unreachable();}
+  std::string key() const {unreachable();return "";}
+
+  void clear_deps();
+  void stack_op(Expression* e)const override;
+
+  void dump(std::ostream& o)const override;
+};
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

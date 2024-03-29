@@ -61,24 +61,45 @@ private:
   void make_stmt       (std::ostream& o, Base const& a)const;
   void make_system_task(std::ostream& o, System_Task const& s)const;
   void make_task       (std::ostream& o, System_Task const& s)const;
-  void make_variable   (std::ostream& o, Variable const& v)const;
+  void make_variable   (std::ostream& o, Variable_Decl const& v)const;
+  void make_variable   (std::ostream& o, Token_VAR_REAL const& v)const;
 private:
   void make_block_int_identifier_list(std::ostream& o, ListOfBlockIntIdentifiers const& rl)const;
   void make_block_real_identifier_list(std::ostream& o, ListOfBlockRealIdentifiers const& rl)const;
+  void make_block_variables(std::ostream& o, AnalogRealDecl const& rl)const;
 private:
-  void make_one_variable_load(std::ostream& o, const Variable_Decl& V, Module const& m)const;
-  void make_one_variable_store(std::ostream& o, const Variable_Decl& V)const;
+  void make_one_variable_load(std::ostream& o, Token_VAR_REF const& V, Module const& m)const;
+  void make_one_variable_store(std::ostream& o, Token_VAR_REF const& V)const;
 }; // OUT_ANALOG
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_variable(std::ostream& o, Variable const& v) const
+void OUT_ANALOG::make_variable(std::ostream& o, Token_VAR_REAL const& v) const
 {
   // type?
   //
   if(_mode==modeSTATIC){ untested();
-    o__ "double _v_" << v.name() << "; // Variable";
+    o__ "double _v_" << v.name() << "; // Variable_Decl";
   }else{
-    o__ "ddouble _v_" << v.name() << "; // Variable";
+    o__ "ddouble _v_" << v.name() << "; // Variable_Decl";
+
+    for(auto const& i : v.deps().ddeps()) {
+      o__ " Dep: " << i->code_name() << " lin: " << i.is_linear();
+    }
+    o << "\n";
+    //if(options().fpi()){ untested();
+    //}else
+    o << ind << "_v_" << v.name() << ".set_all_deps();\n";
+  }
+}
+/*--------------------------------------------------------------------------*/
+// obsolete.?
+void OUT_ANALOG::make_variable(std::ostream& o, Variable_Decl const& v) const
+{
+  // type?
+  //
+  if(_mode==modeSTATIC){ untested();
+    o__ "double _v_" << v.name() << "; // Variable_Decl";
+  }else{
+    o__ "ddouble _v_" << v.name() << "; // Variable_Decl";
 
     for(auto const& i : v.deps().ddeps()) {
       o__ " Dep: " << i->code_name() << " lin: " << i.is_linear();
@@ -93,7 +114,16 @@ void OUT_ANALOG::make_variable(std::ostream& o, Variable const& v) const
 void OUT_ANALOG::make_block_int_identifier_list(std::ostream& o,
     ListOfBlockIntIdentifiers const& rl) const
 {
-  for(Variable const* v : rl){
+  for(Variable_Decl const* v : rl){
+    assert(v);
+    make_variable(o, *v);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void OUT_ANALOG::make_block_variables(std::ostream& o,
+    AnalogRealDecl const& rl) const
+{
+  for(auto v : rl.list()){
     assert(v);
     make_variable(o, *v);
   }
@@ -102,7 +132,7 @@ void OUT_ANALOG::make_block_int_identifier_list(std::ostream& o,
 void OUT_ANALOG::make_block_real_identifier_list(std::ostream& o,
     ListOfBlockRealIdentifiers const& rl) const
 {
-  for(Variable const* v : rl){
+  for(Variable_Decl const* v : rl){
     assert(v);
     make_variable(o, *v);
   }
@@ -117,8 +147,11 @@ static bool within_af(Base const* what)
       what = b->owner();
     }else if(auto ob = dynamic_cast<Owned_Base const*>(what)){
       what = ob->owner();
+    }else if(auto ex = dynamic_cast<Expression_ const*>(what)){
+      what = ex->scope();
     }else{ untested();
       unreachable();
+      assert(0);
       return false;
     }
   }
@@ -309,10 +342,10 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
   o__ "}\n";
 } // make_contrib
 /*--------------------------------------------------------------------------*/
-void AnalogExpression::dump(std::ostream& o)const
-{
-  _exp.dump(o);
-}
+//void AnalogExpression::dump(std::ostream& o)const
+//{
+//  _exp.dump(o);
+//}
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_stmt(std::ostream& o, Base const& ab) const
 {
@@ -342,12 +375,12 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Base const& ab) const
     // incomplete.
     make_assignment(o, *assign);
   }else if(auto ard=dynamic_cast<AnalogRealDecl const*>(&ab)) {
-    make_block_real_identifier_list(o, ard->list());
+    make_block_variables(o, *ard);
   }else if(auto rl=dynamic_cast<ListOfBlockRealIdentifiers const*>(&ab)) { untested();
     make_block_real_identifier_list(o, *rl);
   }else if(auto il=dynamic_cast<ListOfBlockIntIdentifiers const*>(&ab)) {
     make_block_int_identifier_list(o, *il);
-  }else if(auto v=dynamic_cast<Variable const*>(&ab)) { untested();
+  }else if(auto v=dynamic_cast<Variable_Decl const*>(&ab)) { untested();
     unreachable();
     make_variable(o, *v);
   }else if(auto cs=dynamic_cast<AnalogConditionalStmt const*>(&ab)) {
@@ -392,7 +425,7 @@ void make_cc_af_body(std::ostream& o, const Analog_Function& f)
 void OUT_ANALOG::make_system_task(std::ostream& o, System_Task const& s) const
 {
   o__ "{\n";
-  make_cc_expression(o, s.expression().expression());
+  make_cc_expression(o, s.expression());
   o << "\n";
   o__ "}\n";
 }
@@ -421,7 +454,7 @@ void OUT_ANALOG::make_loop(std::ostream& o, AnalogWhileStmt const& s) const
   o__ "while(true) {\n";
   {
     indent x;
-    make_cc_expression(o, s.conditional().expression());
+    make_cc_expression(o, s.conditional());
     o__ "if (t0) {\n";
     if(s.has_body()) {
       indent y;
@@ -472,7 +505,7 @@ void OUT_ANALOG::make_cond(std::ostream& o, AnalogConditionalStmt const& s) cons
     }
   }else{
     indent x;
-    make_cc_expression(o, s.conditional().expression());
+    make_cc_expression(o, s.conditional());
     o__ "if (t0) {\n";
     if(s.true_part()) {
       indent y;
@@ -498,7 +531,8 @@ static void make_cond_expressions(std::ostream& o, AnalogConstExpressionList con
 {
   std::string paren="";
   for(auto e : l){
-    make_cc_expression(o, e->expression(), false);
+    assert(e);
+    make_cc_expression(o, *e, false);
 
     o__ "if(t0 == s){\n";
     o____ "cond = true;\n";
@@ -519,7 +553,7 @@ void OUT_ANALOG::make_switch(std::ostream& o, AnalogSwitchStmt const& s) const
     o__ "{\n";
     {
       indent y;
-      make_cc_expression(o, s.control().expression(), false);
+      make_cc_expression(o, s.control(), false);
       o__ "s = t0;\n";
     }
     o__ "}\n";
@@ -836,7 +870,8 @@ static void make_cc_set_branch_contributions(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_one_variable_proxy(std::ostream& o, const Variable_Decl& V, Module const& m)
+static void make_one_variable_proxy(std::ostream& o, Token_VAR_REF const& V,
+    Module const& m)
 {
   o__ "class _V_" << V.name() << " : public ddouble {\n";
   o____ "MOD_" << m.identifier() << " * const _m;\n";
@@ -865,7 +900,7 @@ static void make_one_variable_proxy(std::ostream& o, const Variable_Decl& V, Mod
   o__ "}";
 }
 /*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Variable_Decl&
+void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Token_VAR_REF&
     V, Module const& m) const
 {
   if(_mode == modePRECALC){
@@ -879,8 +914,8 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Variable_Decl&
 
     o << " " << V.code_name() << "(m->" << V.code_name() << ");\n";
     o__ "(void) " << V.code_name() << ";\n";
-  }else if(!V.is_module_variable()){ untested();
-  }else if(V.type().is_int()) { untested();
+  // }else if(!V.is_module_variable()){ untested();
+  }else if(V.type().is_int()) {
     o__ "int& " << V.code_name() << "(d->" << V.code_name() << ");\n";
   }else if(V.type().is_real()) {
     if(V.deps().ddeps().size() == 0){
@@ -895,7 +930,7 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Variable_Decl&
   }
 }
 /*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_one_variable_store(std::ostream& o, const Variable_Decl& V) const
+void OUT_ANALOG::make_one_variable_store(std::ostream& o, Token_VAR_REF const& V) const
 {
   if(!V.type().is_real()) { untested();
   }else if(!V.is_module_variable()){ untested();
@@ -923,10 +958,11 @@ void OUT_ANALOG::make_load_variables(std::ostream& o, const
 
   for (auto q = P.begin(); q != P.end(); ++q) {
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
-      Variable_Decl const* V = *p;
+      auto const* V = *p;
       assert(V);
-      if(!V->is_module_variable()){ untested();
-      }else{
+     // if(!V->is_module_variable()){ untested();
+     // }else
+      {
 	make_one_variable_load(o, *V, m);
       }
     }
@@ -942,10 +978,11 @@ void OUT_ANALOG::make_store_variables(std::ostream& o, const Variable_List_Colle
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
-      Variable_Decl const* V = *p;
+      Token_VAR_REF const* V = *p;
       assert(V);
-      if(!V->is_module_variable()) { untested();
-      }else{
+     // if(!V->is_module_variable()) { untested();
+     // }else
+      {
 	make_one_variable_store(o, *V);
       }
     }

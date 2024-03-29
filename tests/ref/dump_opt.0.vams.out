@@ -21,7 +21,7 @@ module test(d, g, s, b);
   electrical d, g;
   parameter real P = 3;
 
-  real   T,   U;
+  real T, U;
 
   analog begin
     T = 0;

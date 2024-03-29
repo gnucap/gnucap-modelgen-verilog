@@ -2,6 +2,9 @@
 #ifndef MG_BASE_H
 #define MG_BASE_H
 #include <m_base.h>
+#include <e_base.h>
+#include <l_indirect.h>
+#include <u_attrib.h>
 /*--------------------------------------------------------------------------*/
 class Block;
 class Owned_Base : public Base {
@@ -14,11 +17,26 @@ public:
   void set_owner(Block* b){  _owner = b; }
   Block const* owner()const { return _owner; }
   Block* scope()const { return _owner; }
-  bool is_reachable()const;
-  bool is_always()const;
-  bool is_never()const;
 protected:
   Block* owner(){ return _owner;}
+
+public:
+//  Attribute_Instance const* _attributes{NULL};
+  ATTRIB_LIST_p& attributes() {
+    assert(CKT_BASE::_attribs);
+    return (*CKT_BASE::_attribs)[this];
+  }
+  const ATTRIB_LIST_p& attributes()const {
+    assert(CKT_BASE::_attribs);
+    return CKT_BASE::_attribs->at(this);
+  }
+  bool has_attributes() const{
+    assert(CKT_BASE::_attribs);
+    return CKT_BASE::_attribs->count(this);
+  }
+//  void set_attributes(Attribute_Instance const* a) {
+//    _attributes = a;
+//  }
 };
 /*--------------------------------------------------------------------------*/
 inline std::string to_lower(std::string s)
@@ -478,6 +496,9 @@ public:
 //    }
 //  }
   void push_back(Base* x);
+  map const& var_refs()const {
+    return _var_refs;
+  }
 };
 /*--------------------------------------------------------------------------*/
 class Parameter_Base : public Base {

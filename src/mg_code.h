@@ -41,9 +41,13 @@ public:
   }
   void set_rdeps(TData const&);
   virtual bool update();
-  virtual Statement* parent_stmt();
+//  virtual Statement* parent_stmt();
   virtual Block* scope() { return Owned_Base::owner(); }
   virtual Block const* scope() const { return Owned_Base::owner(); }
+public:
+  bool is_reachable()const;
+  bool is_always()const;
+  bool is_never()const;
 };
 /*--------------------------------------------------------------------------*/
 class Data_Type : public Base{
@@ -77,17 +81,29 @@ class Token_PROBE; //bug?
 class Node;
 class TData;
 class Expression;
-class Variable : public Owned_Base {
+class Variable_Decl : public Owned_Base {
+  Data_Type _type;
+public:
+  Variable_Decl() : Owned_Base() { } // {new_deps(); }
+  ~Variable_Decl();
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+  virtual /*?*/ Data_Type const& type()const { return _type; }
+//  std::string code_name()const override;
+  void set_type(Data_Type const& d){ _type=d; }
+  bool propagate_deps(Token_VAR_REF const&);
+protected:
+  void clear_deps();
+private:
+//  TData& deps() { assert(_deps); return *_deps; }
+  void new_deps();
+//  void set_type(std::string const& a){_type=a;}
 protected:
   TData* _data{NULL};
   Token_VAR_REF* _token{NULL};
 public:
-  explicit Variable() : Owned_Base() { }
-  ~Variable() { }
-public:
   String_Arg key()const { return String_Arg(name()); }
 //  void set_type(Data_Type d){ _type=d; }
-  virtual Data_Type const& type() const = 0;
   bool is_real()const { return type().is_real(); }
   bool is_int()const { return type().is_int(); }
   std::string const& identifier()const {return name();}
@@ -104,34 +120,6 @@ public:
 protected:
   TData& data() { assert(_data); return *_data; }
   void new_var_ref();
-}; // Variable
-/*--------------------------------------------------------------------------*/
-class Variable_Decl : public Variable {
-  Data_Type _type;
-  Attribute_Instance const* _attributes{NULL};
-public:
-  Variable_Decl() : Variable() { } // {new_deps(); }
-  ~Variable_Decl();
-  void parse(CS& f)override;
-  void dump(std::ostream& f)const override;
-  bool has_attributes() const{
-    return _attributes;
-  }
-  void set_attributes(Attribute_Instance const* a) {
-    _attributes = a;
-  }
-  Data_Type const& type()const override{
-    return _type;
-  }
-//  std::string code_name()const override;
-  void set_type(Data_Type const& d){ _type=d; }
-  bool propagate_deps(Token_VAR_REF const&);
-protected:
-  void clear_deps();
-private:
-//  TData& deps() { assert(_deps); return *_deps; }
-  void new_deps();
-//  void set_type(std::string const& a){_type=a;}
 };
 /*--------------------------------------------------------------------------*/
 class BlockVarIdentifier : public Variable_Decl {
@@ -155,20 +143,7 @@ public:
   void dump(std::ostream&)const override;
 };
 /*--------------------------------------------------------------------------*/
-class ListOfBlockRealIdentifiers : public LiSt<BlockVarIdentifier, '\0', ',', ';'>{
-public:
-  ListOfBlockRealIdentifiers() {}
-  ListOfBlockRealIdentifiers(CS& f, Block* o){
-    set_owner(o);
-    parse(f);
-    for(auto i : *this){
-      i->set_type(Data_Type_Real());
-    }
-  }
-  void dump(std::ostream&)const override;
-};
-/*--------------------------------------------------------------------------*/
-class Variable_List : public LiSt<Variable_Decl, '\0', ',', ';'> {
+class Variable_List : public LiSt<Token_VAR_REF, '\0', ',', ';'> {
   Data_Type _type;
 public:
   Data_Type const& type()const {return _type;}
@@ -177,16 +152,16 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 // class Assignment : public Expression_ ? (later)
-class Assignment : public Owned_Base {
+class Assignment : public Expression_ {
 protected: // from Variable
   TData* _data{NULL};
   Token_VAR_REF* _token{NULL};
 protected:
   Token_VAR_REF* _lhsref{NULL};
-  Expression_ _rhs;
+//  Expression_ _rhs;
 public:
-  explicit Assignment(CS& f, Block* o);
-  explicit Assignment() : Owned_Base() {}
+  explicit Assignment(CS& f, Base* o);
+  explicit Assignment() : Expression_() {}
   ~Assignment();
 public:
   //bool has_deps()const { return _data; }
@@ -194,7 +169,7 @@ public:
   bool is_module_variable()const;
   bool is_int() const;
   Data_Type const& type()const;
-  Expression_ const& rhs()const {return _rhs;}
+  Expression_ const& rhs()const {return *this;}
   Token_VAR_REF const& lhs() const{
     assert(_lhsref);
     return *_lhsref;
@@ -204,11 +179,11 @@ public:
   bool propagate_deps(Token_VAR_REF const&);
   bool update();
 // protected:
-  void set_lhs(Variable* v);
+  void set_lhs(Variable_Decl* v);
 
   void parse_rhs(CS& cmd);
   bool has_sensitivities()const;
-  Block const* scope() const;
+//  Block const* scope() const;
   bool is_used_in(Base const*b)const;
 private: // implementation
   bool store_deps(TData const&);

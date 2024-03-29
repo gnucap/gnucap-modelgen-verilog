@@ -22,7 +22,7 @@ module ternary(p, n);
   electrical p, n;
   parameter real c = 1.;
 
-  real   a;
+  real a;
 
   analog begin
     a = V(n, p);

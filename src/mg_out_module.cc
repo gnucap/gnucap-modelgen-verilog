@@ -143,8 +143,8 @@ static void make_tr_probe_num(std::ostream& o, const Module& m)
   o << "double MOD_" << m.identifier() << "::tr_probe_num(std::string const& n) const\n{\n";
   for(auto const& vl : m.variables()){
     for (Variable_List::const_iterator p=vl->begin(); p!=vl->end(); ++p) {
-      if((*p)->has_attributes()){
-	// todo: only desc or unit
+      if(attributes(*p)[std::string("desc")]!="0"
+      || attributes(*p)[std::string("units")]!="0" ){
 	o__ "if(n == \"" << (*p)->name() << "\"){\n";
 	o__ ind << "return _v_" << (*p)->name() << ";\n";
 	o__ "}\n";

@@ -284,7 +284,7 @@ void streamcp(Module* sub, Owned_Base const& t)
   o << "endmodule;";
 
   CS cmd(CS::_STRING, o.str());
-  //    trace1("streamcp", cmd.fullstring());
+  trace1("streamcp", cmd.fullstring());
   sub->parse_body(cmd);
 }
 /*--------------------------------------------------------------------------*/
@@ -315,6 +315,7 @@ static void import_proto_vars(Module* sub, Module const* proto)
     o << "endmodule;";
 
     if(comma.size()){
+      trace1("command", o.str());
       CS cmd(CS::_STRING, o.str());
       sub->parse_body(cmd);
     }else{ untested();
@@ -444,17 +445,20 @@ void Paramset::dump(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 void Paramset::new_var_ref(Base* what)
 {
-  auto V = dynamic_cast<Variable const*>(what);
+  auto V = dynamic_cast<Variable_Decl const*>(what);
   auto P = dynamic_cast<Parameter_2 const*>(what);
   auto T = dynamic_cast<Token const*>(what);
+  auto R = dynamic_cast<Token_VAR_REF const*>(what);
  // auto T = dynamic_cast<Token const*>(what);
   std::string p;
   if(auto A = dynamic_cast<Aliasparam const*>(what)){ untested();
     p = A->name();
   }else if(auto nn = dynamic_cast<Node const*>(what)){
     p = nn->name();
-  }else if(auto tt = dynamic_cast<Token const*>(what)){
-    p = tt->name();
+  }else if(T){
+    p = T->name();
+  }else if(R){ untested();
+    p = R->name();
   }else if(V){ untested();
     p = V->name();
   }else if(P){
@@ -462,6 +466,7 @@ void Paramset::new_var_ref(Base* what)
   }else if(T){ untested();
     incomplete();
   }
+  trace1("PS::nvr", p);
 
   if(p!=""){
     auto const& alias = aliasparam();
@@ -485,9 +490,12 @@ void Paramset::new_var_ref(Base* what)
       p = p.substr(2);
     }else if(V && !V->owner()){ untested();
     }else if(T){
+      _var_refs[p] = what;
       p = p.substr(2);
+    }else if(R){ untested();
     }else{ untested();
     }
+    trace1("PS::nvr mangle", p);
     _var_refs[p] = what;
   }else{
     return Module::new_var_ref(what);

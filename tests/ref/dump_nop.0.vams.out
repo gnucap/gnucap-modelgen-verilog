@@ -19,8 +19,8 @@ enddiscipline
 
 module test(d, g, s, b);
   electrical d, g;
-  real   T;
-  real   U;
+  real T;
+  real U;
 
   analog begin
     T = 0.;

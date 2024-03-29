@@ -40,6 +40,7 @@ void Expression_::clear()
 Expression_* Expression_::clone() const
 {
   Expression_* n = new Expression_;
+  n->set_owner(_owner);
 
   for (Expression::const_iterator i = begin(); i != end(); ++i) {
     // n->push_back((*i)->clone()); // BUG
@@ -93,7 +94,14 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 {
   Expression& E = *this;
   trace0("resolve symbols ===========");
-  Block* scope = owner();
+  Block* Scope = scope();
+  Base* Owner = owner();
+  if(Scope){
+  }else if(auto st = dynamic_cast<Statement*>(Owner)){ untested();
+    Scope = st->scope();
+  }else{ untested();
+    assert(0);
+  }
 
   for(List_Base<Token>::const_iterator ii = e.begin(); ii!=e.end(); ++ii) {
     trace1("resolve in", (*ii)->name());
@@ -153,14 +161,13 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       // a number. BUG: integer?
       Float* f = new Float(n);
       E.push_back(new Token_CONSTANT(n, f, ""));
-    }else{
-      Base* r = scope->lookup(n);
+    }else if(Base* r = Scope->lookup(n)){
       trace3("lookup top found:", n, r, symbol);
       if(auto p = dynamic_cast<Parameter_Base const*>(r)) {
 //	p->stack_op(&E); // ?
 	Token_PAR_REF PP(p->name(), p);
 	PP.stack_op(&E);
-      }else if(auto v = dynamic_cast<Variable*>(r)) { untested();
+      }else if(auto v = dynamic_cast<Variable_Decl*>(r)) { untested();
 	unreachable();
 	if(n == v->name()){ untested();
 	}else{ untested();
@@ -174,56 +181,82 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 	assert(symbol);
 	Token_PORT_BRANCH a(*symbol, pp);
 	a.stack_op(&E);
-      }else if(!E.is_empty() && dynamic_cast<Token_PARLIST*>(E.back())
-	    && is_xs_function(n, scope)) {
-	// this is upside down...
-	Token_ACCESS tta(n, NULL);
-	tta.stack_op(&E);
-      }else if(FUNCTION_ const* af = is_analog_function_call(n, scope)) {
-	// TODO: use "r"
-	assert(dynamic_cast<Token_PARLIST*>(E.back()));
-	Token* tt = resolve_function(af, &E, owner());
-	// Token_AFCALL a(n, af);
-	assert(tt);
-	tt->stack_op(&E);
-	delete tt;
-      }else if(FUNCTION_ const* vaf = va_function(n)) {
-	size_t na = -1;
-
-	// move to stack_op?
-	if(E.is_empty()){
-	}else if(auto parlist = dynamic_cast<Token_PARLIST_ const*>(E.back())){
-	  if(auto ed = dynamic_cast<Expression const*>(parlist->data())){ untested();
-	    na = ed->size();
-	  }else if(parlist->args()){
-	    na = parlist->args()->size();
-	  }else{ untested();
-	  }
-	}else{
-	  assert(!dynamic_cast<Token_PARLIST const*>(E.back()));
-	}
-	trace2("va_function?", n, na);
-	Token* tt = resolve_function(vaf, &E, owner());
-	assert(tt);
-	tt->stack_op(&E);
-	delete tt;
-      }else if(Node_Ref a = scope->node(t->name())) {
+      }else if(Node_Ref a = Scope->node(t->name())) {
+	// use r??
 	Token_NODE tn(*symbol, a);
 	tn.stack_op(&E);
-      }else if(scope->lookup_branch(t->name())) {
-	trace1("unresolved branch", t->name());
-	// incomplete();
-	E.push_back(t->clone()); // try later?
-      }else if(symbol && n[0] == '<') { untested();
-	incomplete();
-  //      Token_PORT p(t);
-  //      p.stack_op(E);
       }else{
 	throw Exception("unresolved symbol: " + n);
       }
+    }else if(!E.is_empty() && dynamic_cast<Token_PARLIST*>(E.back())
+	  && is_xs_function(n, Scope)) {
+      // this is upside down...
+      Token_ACCESS tta(n, NULL);
+      tta.stack_op(&E);
+    }else if(FUNCTION_ const* af = is_analog_function_call(n, Scope)) {
+      // TODO: use "r"
+      assert(dynamic_cast<Token_PARLIST*>(E.back()));
+      Token* tt = resolve_function(af, &E, scope());
+      // Token_AFCALL a(n, af);
+      assert(tt);
+      tt->stack_op(&E);
+      delete tt;
+    }else if(FUNCTION_ const* vaf = va_function(n)) {
+      size_t na = -1;
+
+      // move to stack_op?
+      if(E.is_empty()){
+      }else if(auto parlist = dynamic_cast<Token_PARLIST_ const*>(E.back())){
+	if(auto ed = dynamic_cast<Expression const*>(parlist->data())){ untested();
+	  na = ed->size();
+	}else if(parlist->args()){
+	  na = parlist->args()->size();
+	}else{ untested();
+	}
+      }else{
+	assert(!dynamic_cast<Token_PARLIST const*>(E.back()));
+      }
+      trace2("va_function?", n, na);
+      Token* tt = resolve_function(vaf, &E, scope());
+      assert(tt);
+      tt->stack_op(&E);
+      delete tt;
+    }else if(Node_Ref a = Scope->node(t->name())) { untested();
+      Token_NODE tn(*symbol, a);
+      tn.stack_op(&E);
+    }else if(Scope->lookup_branch(t->name())) {
+      trace1("unresolved branch", t->name());
+      // incomplete();
+      E.push_back(t->clone()); // try later?
+    }else if(symbol && n[0] == '<') { untested();
+      incomplete();
+//      Token_PORT p(t);
+//      p.stack_op(E);
+    }else{
+      throw Exception("unresolved symbol: " + n);
     }
   }
 } // resolve_symbols
+/*--------------------------------------------------------------------------*/
+// TODO: remove _owner?
+void Expression_::set_owner(Base* o)
+{
+  if(auto m = dynamic_cast<Module*>(o)){
+    _scope = m;
+    _owner = m;
+  }else if(auto b = dynamic_cast<Block*>(o)){
+    // assert(0); incomplete
+    _scope = b;
+    _owner = b->owner();
+  }else if(auto s = dynamic_cast<Statement*>(o)){
+    _owner = s;
+    _scope = s->scope();
+  }else{ untested();
+    incomplete();
+    _owner = o;
+//    _scope = o->owner();
+  }
+}
 /*--------------------------------------------------------------------------*/
 bool Expression_::update()
 {
@@ -324,7 +357,7 @@ TData const& Expression_::data() const
 }
 /*--------------------------------------------------------------------------*/
 void Expression_::set_dep(Base*)
-{
+{ untested();
   incomplete();
 }
 /*--------------------------------------------------------------------------*/
@@ -336,10 +369,23 @@ bool Expression_::propagate_rdeps(TData const& dep)
     trace1("rdep sens", s);
     if(auto st = dynamic_cast<Statement*>(s)){
       ret |= st->propagate_rdeps(dep);
-    }else{
+    }else{ untested();
     }
   }
   return ret;
+}
+/*--------------------------------------------------------------------------*/
+Block* Expression_::scope()
+{
+  if(_scope) {
+    return _scope;
+  }else if(auto s=dynamic_cast<Block*>(_owner)){ untested();
+    return s;
+  }else{ untested();
+    incomplete();
+    assert(0);
+    return NULL;
+  }
 }
 /*--------------------------------------------------------------------------*/
 Expression_::~Expression_()

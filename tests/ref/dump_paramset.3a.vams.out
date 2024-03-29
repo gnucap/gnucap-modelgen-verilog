@@ -23,9 +23,9 @@ module my_res(a, b);
   parameter real g = 1;
   localparam real __r = (1. / g);
 
-  real   __g;
-  real   __i;
-  real   __alpha;
+  real __g;
+  real __i;
+  real __alpha;
 
   analog begin
     __alpha = 1.;

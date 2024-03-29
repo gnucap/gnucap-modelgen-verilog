@@ -52,15 +52,19 @@ class Probe;
 class Branch_Ref;
 class Block;
 class Expression_ : public Expression {
-  Block* _owner{NULL};
+  Base* _owner{NULL};
+  Block* _scope{NULL}; // remove. later.
 public:
   explicit Expression_() : Expression() {}
   ~Expression_();
   void resolve_symbols(Expression const& e);
-  void set_owner(Block* b){ _owner = b; }
+  void set_owner(Base* b);
+//  void set_scope(Block* b){ _scope = b; }
   void dump(std::ostream& out)const override;
 // private:
-  Block* owner(){ return _owner; }
+  Base* owner(){ return _owner; }
+  Block* scope();
+  Block const* scope()const { return const_cast<Expression_*>(this)->scope(); }
 public:
   void clear();
   Expression_* clone() const;

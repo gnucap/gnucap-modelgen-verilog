@@ -4,7 +4,7 @@ module my_res(a, b);
   parameter real g = 1;
   localparam real __r = (1. / g);
 
-  real   __i// dep _potential_b_a_b
+  real __i// dep _potential_b_a_b
 ;
 
   analog begin // always

@@ -41,26 +41,26 @@ void Variable_Decl::clear_deps()
 //   _deps = new TData;
 // }
 /*--------------------------------------------------------------------------*/
-std::string const& Variable::name() const
+std::string const& Variable_Decl::name() const
 {
   assert(_token);
   return _token->name();
 }
 /*--------------------------------------------------------------------------*/
-Block const* Variable::scope() const
+Block const* Variable_Decl::scope() const
 {
   auto b = prechecked_cast<Block const*>(owner());
   assert(b);
   return b;
 }
 /*--------------------------------------------------------------------------*/
-void Variable::new_var_ref()
+void Variable_Decl::new_var_ref()
 { untested();
   assert(owner());
   owner()->new_var_ref(this);
 }
 /*--------------------------------------------------------------------------*/
-bool Variable::is_used_in(Base const*) const
+bool Variable_Decl::is_used_in(Base const*) const
 {
   // return _token->is_used_in(b);
   incomplete();
@@ -78,13 +78,6 @@ std::string Assignment::code_name() const
 { untested();
   assert(_lhsref);
   return _lhsref->code_name();
-}
-/*--------------------------------------------------------------------------*/
-Block const* Assignment::scope() const
-{
-  auto b = prechecked_cast<Block const*>(owner());
-  assert(b);
-  return b;
 }
 /*--------------------------------------------------------------------------*/
 Data_Type const& Assignment::type() const
@@ -105,7 +98,7 @@ bool Assignment::is_module_variable() const
   return _lhsref->is_module_variable();
 }
 /*--------------------------------------------------------------------------*/
-bool Variable::is_module_variable() const
+bool Variable_Decl::is_module_variable() const
 {
   if(dynamic_cast<Module const*>(owner())){
     return true;
@@ -129,11 +122,11 @@ bool Variable::is_module_variable() const
 /*--------------------------------------------------------------------------*/
 bool Statement::update()
 {
-  if(dynamic_cast<Block*>(parent_stmt())){
-    incomplete();
-  }else{
-    incomplete();
-  }
+//  if(dynamic_cast<Block*>(parent_stmt())){
+//    incomplete();
+//  }else{
+//    incomplete();
+//  }
   return false;
 }
 /*--------------------------------------------------------------------------*/
@@ -148,16 +141,39 @@ void Statement::set_rdeps(TData const& t)
   }
 }
 /*--------------------------------------------------------------------------*/
-Statement* Statement::parent_stmt()
-{
-  Block* b = scope();
-  if(auto x = dynamic_cast<Statement*>(b->owner())){
-    return x;
-  }else{
-    incomplete();
-    return NULL;
-  }
+//Statement* Statement::parent_stmt()
+//{
+//  Block* b = scope();
+//  if(auto x = dynamic_cast<Statement*>(b->owner())){
+//    return x;
+//  }else{
+//    incomplete();
+//    return NULL;
+//  }
+//}
+/*--------------------------------------------------------------------------*/
+void BlockVarIdentifier::update()
+{ untested();
+  clear_deps();
+  new_var_ref();
 }
 /*--------------------------------------------------------------------------*/
+bool Statement::is_reachable() const
+{ untested();
+  assert(scope());
+  return scope()->is_reachable();
+}
+/*--------------------------------------------------------------------------*/
+bool Statement::is_always() const
+{
+  assert(scope());
+  return scope()->is_always();
+}
+/*--------------------------------------------------------------------------*/
+bool Statement::is_never() const
+{
+  assert(scope());
+  return scope()->is_never();
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

@@ -48,6 +48,8 @@ depend ${srcdir}/Make.depend: # $(SRCS) ${GENERATED_SRCS} $(HDRS)
 		${MAKE_CPPFLAGS} $(GENERATED_SRCS) -DDEPEND \
 		>> ${srcdir}/Make.depend; \
 	fi
+
+.PRECIOUS: ${srcdir}/Make.depend
 #-----------------------------------------------------------------------------
 clean:
 	rm -rf $(CLEANFILES)

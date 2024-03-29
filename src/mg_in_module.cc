@@ -290,42 +290,56 @@ void Parameter_2_List::parse(CS& file)
   }
 }
 /*--------------------------------------------------------------------------*/
-void Variable_List::parse(CS& file)
+// ATTRIB_LIST_p& attributes(void const* x) {
+//   assert(CKT_BASE::_attribs);
+//   return (*CKT_BASE::_attribs)[x];
+// }
+/*--------------------------------------------------------------------------*/
+void Variable_List::parse(CS& f)
 {
   assert(owner());
   Module* mod = prechecked_cast<Module*>(owner());
-  if(mod){
-    if(mod->attribute_stash().is_empty()){
-    }else{
-      set_attributes(mod->attribute_stash().detach());
-    }
-  }else{ untested();
+  assert(mod);
+
+  if(!mod->attribute_stash().is_empty()){
+    set_attributes(mod->attribute_stash().detach());
+  }else{
   }
 
-  char t = file.last_match()[0];
+  char t = f.last_match()[0];
   if(t=='r') {
     _type = Data_Type_Real();
   }else if(t=='i') {
     _type = Data_Type_Int();
   }else{ untested();
-    throw Exception_CS_("What type? " + t, file);
+    throw Exception_CS_("What type? " + t, f);
   }
 
-  LiSt<Variable_Decl, '\0', ',', ';'>::parse(file);
+  // TODO: use Tokens.
+  LiSt<String_Arg, '\0', ',', ';'> l;
+  l.parse(f);
+  // LiSt<Variable_Decl, '\0', ',', ';'>::parse(f);
   if(_type.is_real()) {
-    for (auto x : *this){
-      x->set_type(Data_Type_Real());
+    for(auto i : l){
+      auto data = new TData;
+      auto r = new Token_VAR_REAL(i->to_string(), data, data);
+      r->set_owner(mod);
+      push_back(r);
+      mod->new_var_ref(r);
     }
   }else if(_type.is_int()) {
-    for (auto x : *this){
-      x->set_type(Data_Type_Int());
+    for(auto i : l){
+      auto data = new TData;
+      auto I = new Token_VAR_INT(i->to_string(), data, data);
+      push_back(I);
+      mod->new_var_ref(I);
     }
   }else{ untested();
     unreachable();
   }
   if(has_attributes()){
     for (auto x : *this){
-      x->set_attributes(&attributes());
+      ::attributes(x) = ::attributes(this);
     }
   }else{
   }
@@ -357,33 +371,13 @@ void Variable_List::dump(std::ostream& o)const
   }
 
   o__ _type << " ";
-  LiSt<Variable_Decl, '\0', ',', ';'>::dump(o);
+  LiSt<Token_VAR_REF, '\0', ',', ';'>::dump(o);
   o << "\n";
 }
 /*--------------------------------------------------------------------------*/
 void Variable_List_Collection::parse(CS& f)
 {
-#if 0
-  assert(owner());
-  Module* mod = prechecked_cast<Module*>(owner());
-  if(mod){ untested();
-    if(mod->attribute_stash().is_empty()){ untested();
-    }else if(size()){ untested();
-      set_attributes(mod->attribute_stash().detach());
-    }else{ untested();
-    }
-  }else{ untested();
-  }
-#endif
-//  char t=f.last_match()[0];
   Collection<Variable_List>::parse(f);
-
-//  if(t=='i'){ untested();
-//    for(auto x:*this){ untested();
-//      x->set_int();
-//    }
-//  }else{ untested();
-//  }
 }
 /*--------------------------------------------------------------------------*/
 void Variable_List_Collection::dump(std::ostream& o)const
@@ -822,6 +816,14 @@ void List_Of_Branch_Identifiers::dump(std::ostream& o)const
   LiSt<Branch_Identifier, '\0', ',', ';'>::dump(o);
 }
 /*--------------------------------------------------------------------------*/
+static void dump_annotate(Module const& m, std::ostream& o)
+{
+  return;
+  for(auto x: m.var_refs()){ untested();
+    o__ "// " << x.first << "\n";
+  }
+}
+/*--------------------------------------------------------------------------*/
 void Module::dump(std::ostream& o)const
 {
   if(dynamic_cast<Paramset const*>(this)){
@@ -842,6 +844,10 @@ void Module::dump(std::ostream& o)const
   }
   indent x;
   o << "module " << identifier() << _circuit->ports() << ";\n";
+  if(options().dump_annotate()){
+    dump_annotate(*this, o);
+  }else{
+  }
   if(_circuit->input().size()){
     o__ "input " << circuit()->input() << "\n";
   }else{
@@ -1037,7 +1043,7 @@ void Block::new_var_ref(Base* what)
 {
   assert(what);
   std::string p;
-  auto V = dynamic_cast<Variable const*>(what);
+  auto V = dynamic_cast<Variable_Decl const*>(what);
   auto P = dynamic_cast<Parameter_2 const*>(what);
   auto T = dynamic_cast<Token const*>(what);
 

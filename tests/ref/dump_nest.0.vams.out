@@ -1,7 +1,7 @@
 
 
 module test();
-  integer   a;
+  integer a;
 
   analog begin
     begin : scopename

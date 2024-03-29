@@ -3,13 +3,14 @@ module dep7(a, g);
   electrical a, g;
   parameter real p = 0.;
 
-  real   T
-;
+  real T;
 
   analog begin // always
     // c : 1
     // d : 1
-    real c, d;
+    real c// dep _potential_b_a_
+, d// dep _potential_b_a_
+;
     c = V(a); // dep: _potential_b_a_
     if ((V(g) > 1)) begin
       // t : 0
@@ -24,7 +25,8 @@ module dep7(a, g);
       if ((c > 0)) begin
         // f : 1
         I(g) <+ d; // dep: _potential_b_a_
-        real f;
+        real f// dep _potential_b_a_
+;
         f = d; // dep: _potential_b_a_
       end
       else begin
@@ -42,13 +44,14 @@ module dep7p(a, g);
   electrical a, g;
   localparam real __p = 0.;
 
-  real   __T
-;
+  real __T;
 
   analog begin // always
     // c : 1
     // d : 1
-    real c, d;
+    real c// dep _potential_b_a_
+, d// dep _potential_b_a_
+;
     c = V(a); // dep: _potential_b_a_
     if ((V(g) > 1)) begin
       // t : 0
@@ -63,7 +66,8 @@ module dep7p(a, g);
       if ((c > 0)) begin
         // f : 1
         I(g) <+ d; // dep: _potential_b_a_
-        real f;
+        real f// dep _potential_b_a_
+;
         f = d; // dep: _potential_b_a_
       end
       else begin

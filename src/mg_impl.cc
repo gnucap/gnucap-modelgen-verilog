@@ -632,7 +632,7 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args)
 }
 /*--------------------------------------------------------------------------*/
 // std::string Variable_Decl::code_name() const
-std::string Variable::code_name() const
+std::string Variable_Decl::code_name() const
 {
   if(is_real()){
     return "_v_" + name();
@@ -755,7 +755,7 @@ Block* Block::scope()
 void Block::push_back(Base* c)
 {
   List_Base<Base>::push_back(c);
-  if(auto v=dynamic_cast<Variable const*>(c)){ untested();
+  if(auto v=dynamic_cast<Variable_Decl const*>(c)){ untested();
       trace1("reg var_ref", v->name());
     _var_refs[v->name()] = c;
   }else{
@@ -818,12 +818,6 @@ DDeps::const_iterator DDeps::begin() const
 DDeps::const_iterator DDeps::end() const
 {
   return _s.end();
-}
-/*--------------------------------------------------------------------------*/
-void BlockVarIdentifier::update()
-{ untested();
-  clear_deps();
-  new_var_ref();
 }
 /*--------------------------------------------------------------------------*/
 bool is_true(Expression const& x)

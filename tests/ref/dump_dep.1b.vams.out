@@ -5,8 +5,10 @@ module dep0(d, g);
     // S : 1
     // T : 1
     // U : 0
-    real T;
-    real S;
+    real T// dep _potential_b_g_
+;
+    real S// dep _potential_b_g_
+;
     real U;
     T = T; // dep: _potential_b_g_
     U = T;

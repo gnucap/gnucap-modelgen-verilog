@@ -1,7 +1,7 @@
 
 
 module underscore0();
-  real   __V;
+  real __V;
 
   analog begin
     __V = 1;

@@ -26,10 +26,12 @@
 #include <patchlev.h>
 #include <c_comand.h>
 #include <e_cardlist.h>
+#include <e_base.h>
 #include "mg_.h" // TODO
 #include "config.h"
 /*global*/ int errorcount = 0;
 std::basic_ostream<char>* diag_out; // mg_error.cc
+INDIRECT<ATTRIB_LIST_p>* CKT_BASE::_attribs = new INDIRECT<ATTRIB_LIST_p>;
 /*--------------------------------------------------------------------------*/
 #if 0
 static void make_module_file(const File& in, std::string dump_name)
