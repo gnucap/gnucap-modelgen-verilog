@@ -31,3 +31,4 @@ v1 2 0 pulse iv=0 pv=1 rise=1n
 .print tran +        i(dut._b_ddt_0*)
 .print tran + iter(0)
 .tran 1
+.status notime

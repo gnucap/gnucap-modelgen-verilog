@@ -5,10 +5,18 @@ verilog
 
 `modelgen
 module test_lap_nd1(p, n);
-	(* desc="" *) real dv;
+	(* desc="" *) real dv1;
+	(* desc="" *) real dv2;
+	(* desc="" *) real dv3;
+	(* desc="" *) real dv4;
+	(* desc="" *) real dv5;
 	electrical p, n;
 	analog begin
-		dv = laplace_nd(V(p) - V(n), '{1}, '{1});
+		dv1 =       laplace_nd(V(p) - V(n), '{1}, '{1,2});
+		dv2 = - 2 * laplace_nd(V(n) - V(p), '{1}, '{1,2});
+		dv3 = - 3 * laplace_nd(-V(p,n), '{1}, '{1,2});
+		dv4 = - 4 * laplace_nd(V(p,n), '{1}, '{-1,-2});
+		dv5 = - 5 * laplace_nd(-V(n,p), '{-1}, '{1,2});
 	end
 endmodule
 
@@ -24,8 +32,7 @@ vsine #(.dc(v), .ampl(1)) v1(1, 0);
 
 list
 
-print tran v(1) dv(dut) i(dut._b*) vin(dut.*) iter(0)
-// y(dut.ddt_0) iof(dut.ddt_0) iter(0)
+print tran v(1) dv1(dut) dv2(dut) dv3(dut) dv4(dut) dv5(dut)
 tran 1 .1 trace=n
 status notime
 end

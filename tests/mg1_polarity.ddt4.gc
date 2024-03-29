@@ -1,0 +1,33 @@
+
+attach ./modelgen_0.so
+attach vams/vsine.so
+
+verilog
+
+`modelgen
+module polarity_ddt4(p, n);
+	electrical p, n;
+	inout p, n;
+	(*desc="x"*) real x;
+	(*desc="y"*) real y;
+	analog begin
+		x = ddt(V(p,n));
+		y = -2 * ddt(V(n,p));
+	end
+endmodule
+
+list
+
+!make polarity_ddt4.so > /dev/null
+attach ./polarity_ddt4.so
+
+polarity_ddt4 dut(1,0);
+// vsine #(.phase(-3.1415/2), .ampl(1), .freq(1)) v(1,0);
+vsine #(.phase(0), .ampl(1), .freq(1)) v(1,0);
+
+list
+
+print tran v(nodes) x(dut) y(dut) i(dut.*)
+print tran + iter(0)
+tran 1 trace=a
+status notime
