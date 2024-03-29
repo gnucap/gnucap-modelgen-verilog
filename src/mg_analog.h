@@ -76,6 +76,8 @@ private:
   void make_cc_common(std::ostream&)const override;
 }; // Probe
 /*--------------------------------------------------------------------------*/
+// Token?
+#if 0
 class Analog_Function_Arg : public Variable_Decl {
 public:
   explicit Analog_Function_Arg() : Variable_Decl() {}
@@ -89,38 +91,84 @@ public:
   }
 };
 typedef Collection<Analog_Function_Arg> Analog_Function_Args;
+#endif
 /*--------------------------------------------------------------------------*/
-class AF_Arg_List : public LiSt<Analog_Function_Arg, '\0', ',', ';'> {
+class AF_Arg_List : public Owned_Base { // was : public LiSt<Analog_Function_Arg, '\0', ',', ';'> 
 //  Data_Type _type;
+  typedef LiSt<Token_ARGUMENT, '\0', ',', ';'> list_t;
+  typedef list_t::const_iterator const_iterator;
   enum{
     a_input,
     a_output,
     a_inout
   } _direction;
+  list_t _l;
 public:
+  explicit AF_Arg_List(CS& cmd, Block* owner) : Owned_Base() {
+    set_owner(owner);
+    parse(cmd);
+  }
   bool is_output() const { return _direction >= a_output; }
 //  Data_Type const& type()const {return _type;}
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
+  const_iterator begin()const { return _l.begin(); }
+  const_iterator end()const { return _l.end(); }
 };
 /*--------------------------------------------------------------------------*/
-class AF_Arg_List_Collection : public Collection<AF_Arg_List>{
+class AnalogSeqBlock : public SeqBlock {
+protected: // BUG?
+  TData _deps;
+protected:
 public:
+  explicit AnalogSeqBlock() : SeqBlock() {}
+  explicit AnalogSeqBlock(CS& cmd, Block* owner) : SeqBlock() {
+    set_owner(owner);
+    parse(cmd);
+  }
+public:
+  void parse(CS& cmd)override;
+  void dump(std::ostream& o)const override;
+  SeqBlock const& block()const {
+    return *this;
+  }
+public: // sensitivities?
+//  void set_never() { _block.set_never(); }
+//  void set_always() { _block.set_always(); }
+//  bool is_never()const {return _block.is_never() ;}
+//  bool is_reachable()const {return _block.is_reachable() ;}
+//  bool is_always()const {return _block.is_always() ;}
+  bool update(); // SeqBlock?
+//  void set_sens(Base* s) {_block.set_sens(s);}
+//  void clear_vars();
+
+  TData const& deps(){ return _deps;};
+}; // AnalogSeqBlock
+/*--------------------------------------------------------------------------*/
+class AnalogCtrlBlock : public AnalogSeqBlock {
+public:
+  explicit AnalogCtrlBlock() : AnalogSeqBlock() {}
+  explicit AnalogCtrlBlock(CS& f, Statement* o) : AnalogSeqBlock() {
+    set_owner(o);
+    parse(f);
+  }
+
+  void parse(CS& cmd)override;
+  void dump(std::ostream& o)const override;
+  operator bool()const{ return size() || identifier() !=""; }
+  void set_owner(Statement* owner);
+}; // AnalogCtrlBlock
+/*--------------------------------------------------------------------------*/
+class AnalogFunctionArgs : public Block {
+public: // can't resolve these..
+  void parse(CS&)override;
+  void new_var_ref(Base* what)override;
   void dump(std::ostream& f)const override;
 };
 /*--------------------------------------------------------------------------*/
-class Analog_Function : public Block {
-  Analog_Function_Arg _variable;
-  Data_Type _type;
-  AF_Arg_List_Collection _args;
-  FUNCTION_ const* _function{NULL};
-public:
-  ~Analog_Function();
-  void parse(CS& f)override;
-  void dump(std::ostream& f)const override;
-  std::string const& identifier()const { return _variable.identifier(); }
-  std::string code_name()const { return "af_" + identifier(); }
-public:
+class AnalogFunctionBody : // public AnalogSeqBlock
+			  public AnalogCtrlBlock {
+public: // can't resolve these..
   Branch_Ref new_branch(std::string const&, std::string const&)override { untested();
     return Branch_Ref();
   }
@@ -133,10 +181,41 @@ public:
   Branch_Ref lookup_branch(std::string const&)const override {
     return Branch_Ref();
   }
-  FUNCTION_ const* function() const{return _function;}
-  AF_Arg_List_Collection const& args() const{ return _args; }
-  Analog_Function_Arg const& variable() const{ return _variable; }
+  Base* lookup(std::string const& f, bool recurse=true)override;
+
   void new_var_ref(Base* what)override;
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class VariableList : public List_Base<Base>{
+  void parse(CS&)override {incomplete();}
+public:
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class Analog_Function : public /*UserFunction?*/ Statement {
+  Token* _variable{NULL};
+  Data_Type _type;
+//  AF_Arg_List_Collection _args;
+  FUNCTION_ const* _function{NULL};
+  // simplify: statement is always a block.
+  AnalogFunctionArgs _args;
+  AnalogFunctionBody _block;
+  VariableList _vars;
+public:
+  ~Analog_Function();
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+  std::string const& key()const { assert(_variable); return _variable->name(); }
+  std::string code_name()const { assert(_variable); return "af_" + _variable->name(); }
+  // std::string code_name()const { untested(); assert(_variable); return "_v_" + _variable->name(); } // _variable->code_name?
+  FUNCTION_ const* function() const{return _function;}
+  // AF_Arg_List_Collection const& args() const{ return _args; }
+  Token const* variable() const{ return _variable; }
+  AnalogFunctionArgs const& args() const{return _args;}
+  AnalogFunctionBody const& body() const{return _block;}
+  Data_Type const& type()const {return _type;}
+  VariableList const& variables()const {return _vars;}
 };
 typedef Collection<Analog_Function> Analog_Functions;
 /*--------------------------------------------------------------------------*/
@@ -203,49 +282,6 @@ public:
   String_Arg key() const{return String_Arg("ACE");}
 };
 typedef LiSt<AnalogConstExpression, '\0', ',', ':'> AnalogConstExpressionList;
-/*--------------------------------------------------------------------------*/
-class AnalogSeqBlock : public SeqBlock {
-protected: // BUG?
-  TData _deps;
-protected:
-public:
-  explicit AnalogSeqBlock() : SeqBlock() {}
-  explicit AnalogSeqBlock(CS& cmd, Block* owner) : SeqBlock() {
-    set_owner(owner);
-    parse(cmd);
-  }
-public:
-  void parse(CS& cmd)override;
-  void dump(std::ostream& o)const override;
-  SeqBlock const& block()const {
-    return *this;
-  }
-public: // sensitivities?
-//  void set_never() { _block.set_never(); }
-//  void set_always() { _block.set_always(); }
-//  bool is_never()const {return _block.is_never() ;}
-//  bool is_reachable()const {return _block.is_reachable() ;}
-//  bool is_always()const {return _block.is_always() ;}
-  bool update(); // SeqBlock?
-//  void set_sens(Base* s) {_block.set_sens(s);}
-//  void clear_vars();
-
-  TData const& deps(){ return _deps;};
-}; // AnalogSeqBlock
-/*--------------------------------------------------------------------------*/
-class AnalogCtrlBlock : public AnalogSeqBlock {
-public:
-  explicit AnalogCtrlBlock() : AnalogSeqBlock() {}
-  explicit AnalogCtrlBlock(CS& f, Statement* o) : AnalogSeqBlock() {
-    set_owner(o);
-    parse(f);
-  }
-
-  void parse(CS& cmd)override;
-  void dump(std::ostream& o)const override;
-  operator bool()const{ return size() || identifier() !=""; }
-  void set_owner(Statement* owner);
-}; // AnalogCtrlBlock
 /*--------------------------------------------------------------------------*/
 class AnalogCtrlStmt : public AnalogStmt {
   TData _deps; // here?
@@ -477,13 +513,14 @@ public:
   void dump(std::ostream&)const override;
 };
 /*--------------------------------------------------------------------------*/
-// AnalogDecl?
-class AnalogRealDecl : public AnalogStmt {
+// VarDeclStmt? code?
+class AnalogDeclareVars : public AnalogStmt {
+//  typedef LiSt<Token_VARIABLE, '\0', ',', ';'> list_t;
   typedef LiSt<Token_VAR_REAL, '\0', ',', ';'> list_t;
   list_t _l;
   TData _deps;
 public:
-  explicit AnalogRealDecl(CS& f, Block* o){
+  explicit AnalogDeclareVars(CS& f, Block* o){
     set_owner(o);
     parse(f);
   }

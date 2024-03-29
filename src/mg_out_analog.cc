@@ -44,10 +44,12 @@ public:
   bool is_probe()const { return _mode==modePROBE; }
 public:
   void make_construct  (std::ostream& o, AnalogConstruct const& ab)const;
-  void make_af_body    (std::ostream& o, const Analog_Function& f)const;
+  void make_af         (std::ostream& o, const Analog_Function& f)const;
   void make_load_variables(std::ostream& o, const Variable_List_Collection& P, const Module& m)const;
   void make_store_variables(std::ostream& o, const Variable_List_Collection& P)const;
 private:
+  void make_af_args    (std::ostream& o, const Analog_Function& f)const;
+  void make_af_body    (std::ostream& o, const Analog_Function& f)const;
   void make_cond       (std::ostream& o, AnalogConditionalStmt const& s)const;
   void make_switch     (std::ostream& o, AnalogSwitchStmt const& s)const;
   void make_for        (std::ostream& o, AnalogForStmt const& s)const;
@@ -66,7 +68,7 @@ private:
 private:
   void make_block_int_identifier_list(std::ostream& o, ListOfBlockIntIdentifiers const& rl)const;
   void make_block_real_identifier_list(std::ostream& o, ListOfBlockRealIdentifiers const& rl)const;
-  void make_block_variables(std::ostream& o, AnalogRealDecl const& rl)const;
+  void make_block_variables(std::ostream& o, AnalogDeclareVars const& rl)const;
 private:
   void make_one_variable_load(std::ostream& o, Token_VAR_REF const& V, Module const& m)const;
   void make_one_variable_store(std::ostream& o, Token_VAR_REF const& V)const;
@@ -77,9 +79,9 @@ void OUT_ANALOG::make_variable(std::ostream& o, Token_VAR_REAL const& v) const
   // type?
   //
   if(_mode==modeSTATIC){ untested();
-    o__ "double _v_" << v.name() << "; // Variable_Decl";
+    o__ "double _v_" << v.name() << "; // Token_VAR_REAL";
   }else{
-    o__ "ddouble _v_" << v.name() << "; // Variable_Decl";
+    o__ "ddouble _v_" << v.name() << "; // Token_VAR_REAL";
 
     for(auto const& i : v.deps().ddeps()) {
       o__ " Dep: " << i->code_name() << " lin: " << i.is_linear();
@@ -121,7 +123,7 @@ void OUT_ANALOG::make_block_int_identifier_list(std::ostream& o,
 }
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_block_variables(std::ostream& o,
-    AnalogRealDecl const& rl) const
+    AnalogDeclareVars const& rl) const
 {
   for(auto v : rl.list()){
     assert(v);
@@ -171,9 +173,10 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
   {
     indent x;
     make_cc_expression(o, e, _mode==modeDYNAMIC);
-    if(dynamic_cast<Analog_Function_Arg const*>(&a.lhs())){ untested();
-      o__ lhsname << " = t0; // (*)\n";
-    }else if(a.is_int()){
+   //  if(dynamic_cast<Analog_Function_Arg const*>(&a.lhs())){ untested();
+   //    o__ lhsname << " = t0; // (*)\n";
+   //  }else
+    if(a.is_int()){
       o__ lhsname << " = int(t0); // (*)\n";
     }else if(within_af(&a)){
       o__ lhsname << " = t0; // (1a)\n";
@@ -374,7 +377,7 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Base const& ab) const
   }else if(auto assign=dynamic_cast<Assignment const*>(&ab)) {
     // incomplete.
     make_assignment(o, *assign);
-  }else if(auto ard=dynamic_cast<AnalogRealDecl const*>(&ab)) {
+  }else if(auto ard=dynamic_cast<AnalogDeclareVars const*>(&ab)) {
     make_block_variables(o, *ard);
   }else if(auto rl=dynamic_cast<ListOfBlockRealIdentifiers const*>(&ab)) { untested();
     make_block_real_identifier_list(o, *rl);
@@ -404,22 +407,80 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Base const& ab) const
   }
 }
 /*--------------------------------------------------------------------------*/
+void OUT_ANALOG::make_af(std::ostream& o, const Analog_Function& f) const
+{
+  auto mp = prechecked_cast<Module const*>(f.owner());
+  assert(mp);
+  auto& m = *mp;
+  o << "COMMON_" << m.identifier() << "::";
+  o << "ddouble COMMON_" << m.identifier() << "::" << f.code_name() << "(\n";
+  o << "            ";
+  make_af_args(o, f);
+  o << ") const\n{\n";
+  {
+    indent x;
+    o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
+    o__ "(void)pc;\n";
+    make_af_body(o, f);
+  }
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+void OUT_ANALOG::make_af_args(std::ostream& o, const Analog_Function& f) const
+{
+  std::string sep = "";
+  std::string qual = "";
+  for (Base const* x : f.args()){
+    auto coll =  prechecked_cast<AF_Arg_List const*>( x);
+    assert(coll);
+    if(coll->is_output()){
+      qual = "&";
+    }else{
+      qual = "";
+    }
+    for(auto i : *coll){
+      o << sep << "ddouble " << qual;
+      //o << " af_arg_" << i->identifier();
+      o << " _v_" << i->name(); // code_name?
+      sep = ", ";
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_af_body(std::ostream& o, const Analog_Function& f) const
 {
-  std::string me = f.variable().code_name();
-  o__ "ddouble " << me << "(0.);\n";
+  auto vv = prechecked_cast<Token_VAR_REF const*>( f.variable() );
+  assert(vv);
+  std::string me = vv->code_name();
+  o__ "ddouble " << me << "(0.);\n"; // type??
+  o << "// args w/o dir\n";
+  for(auto const& v : f.args().var_refs()) {
+    if(auto ard = dynamic_cast<Token_VAR_REAL const*>(v.second)){
+      make_variable(o, *ard);
+    }else{
+      trace1("non-decl vr", v.first);
+      // ignore ARGS
+    }
+  }
+  o << "// /args w/o dir\n";
 
-  // is-a-block, has-a-block...?
-  for(auto i : f) {
-    make_stmt(o, *i);
+  for(Base const* i : f.body()) {
+    if(auto ard = dynamic_cast<AnalogDeclareVars const*>(i)){
+      // make_stmt(o, *i);
+      make_block_variables(o, *ard);
+    }else{
+      make_stmt(o, *i);
+    }
   }
   o__ "return " << me << ";\n";
 }
 /*--------------------------------------------------------------------------*/
-void make_cc_af_body(std::ostream& o, const Analog_Function& f)
+void make_cc_af(std::ostream& o, const Analog_Function& f)
 {
   OUT_ANALOG oo(OUT_ANALOG::modeDYNAMIC);
-  oo.make_af_body(o, f);
+  oo.make_af(o, f);
 }
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_system_task(std::ostream& o, System_Task const& s) const
@@ -622,8 +683,6 @@ void OUT_ANALOG::make_seq(std::ostream& o, AnalogSeqBlock const& s) const
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_construct(std::ostream& o, AnalogConstruct const& ab) const
 {
- // if(_src && !ab.used_in(*_src)){ untested();
- // }else
   if(ab.statement_or_null()){
     make_stmt(o, *ab.statement_or_null());
   }else{ untested();
@@ -656,31 +715,6 @@ std::string const& Branch::omit() const
 std::string Branch::code_name() const
 {
   return "_b_" + p()->name() + "_" + n()->name();
-}
-/*--------------------------------------------------------------------------*/
-std::string Analog_Function_Arg::code_name()const
-{
-  return "_v_" + name(); // code_name?
-  return "af_arg_" + name();
-}
-/*--------------------------------------------------------------------------*/
-void make_cc_af_args(std::ostream& o, const Analog_Function& f)
-{
-  std::string sep = "";
-  std::string qual = "";
-  for (auto coll : f.args()){
-      if(coll->is_output()){
-	qual = "&";
-      }else{
-	qual = "";
-      }
-    for(auto i : *coll){
-      o << sep << "ddouble " << qual;
-      //o << " af_arg_" << i->identifier();
-      o << " _v_" << i->identifier(); // code_name?
-      sep = ", ";
-    }
-  }
 }
 /*--------------------------------------------------------------------------*/
 static void make_set_self_contribution(std::ostream& o, Dep const& d)
@@ -1159,7 +1193,7 @@ std::string Probe::code_name() const
     return "_flow" + _br->code_name(); // BUG. named_branch.
   }else if (_type == t_pot){
     return "_potential" + _br->code_name();
-  }else{ untested();
+  }else{
     unreachable();
     return("unreachable_probe");
   }

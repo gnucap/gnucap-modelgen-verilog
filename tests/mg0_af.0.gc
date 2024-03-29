@@ -11,6 +11,7 @@ module test_af_0(p, n);
 
 	analog function real fct;
 		input x;
+		real x;
 		begin
 			real a;
 			a = .2 + 0.*x;
@@ -19,12 +20,14 @@ module test_af_0(p, n);
 	endfunction
 	analog function real unused0;
 		input x;
+		real x;
 		begin
 			unused0 = x;
 		end
 	endfunction
 	analog function real unused1;
 		input x;
+		real x;
 		begin
 			unused1 = x;
 		end

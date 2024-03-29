@@ -390,7 +390,7 @@ public:
     assert(!_args.empty());
     _args.pop();
   }
-  size_t size() const{ untested();
+  size_t size() const{
     return _refs.size();
   }
   std::string code_name() const{
@@ -534,7 +534,7 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
       if(!A->args()) { untested();
 //	o << A->code_name() << "(); // no parlist\n";
 	assert(!argnames.size());
-      }else if(!argnames.size()){ untested();
+      }else if(!argnames.size()){
 //	o << A->code_name() << "(); // no args\n";
 	s.args_pop();
       }else{

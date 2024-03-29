@@ -10,6 +10,7 @@ electrical np, nn;
 
 analog function real dio
 input x;
+real x;
 begin
 dio = exp(x / 2.);
 end

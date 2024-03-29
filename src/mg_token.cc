@@ -834,7 +834,7 @@ void Token_VAR_REF::stack_op(Expression* e)const
       nd = a->data().clone();
 //      nd->add_sens(_item); not yet.
       trace3("var::stackop a", name(), nd->size(), deps().size());
-    }else if(auto dd = dynamic_cast<TData const*>(data())){
+    }else if(auto dd = dynamic_cast<TData const*>(data())){ untested();
       nd = dd->clone();
 //      nd->add_sens(_item); not yet.
     }else{ untested();
@@ -1018,13 +1018,13 @@ TData const& Token_VAR_REF::deps() const
 }
 /*--------------------------------------------------------------------------*/
 bool Token_VAR_REF::is_module_variable() const
-{ untested();
-  if(auto it=dynamic_cast<Assignment const*>(_item)){ untested();
+{
+  if(auto it=dynamic_cast<Assignment const*>(_item)){
     return it->is_module_variable();
-  }else{ untested();
-    auto p = prechecked_cast<Variable_Decl const*>(_item);
-    assert(p);
+  }else if( auto p = prechecked_cast<Variable_Decl const*>(_item)) { untested();
     return p->is_module_variable();
+  }else{
+    return false;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1032,10 +1032,15 @@ Data_Type const& Token_VAR_REF::type() const
 {
   if(auto it=dynamic_cast<Assignment const*>(_item)){
     return it->type();
-  }else{
-    auto p = prechecked_cast<Variable_Decl const*>(_item);
+  }else if(auto p = dynamic_cast<Variable_Decl const*>(_item)){
     assert(p);
     return p->type();
+  }else if(auto af = dynamic_cast<Analog_Function const*>(_item)){
+    return af->type();
+  }else{ untested();
+    unreachable();
+    static Data_Type_Real t;
+    return t;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1051,14 +1056,14 @@ bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
     assert(it->scope());
     assert(from.scope());
     return it->propagate_deps(from);
-  }else if(auto pa=dynamic_cast<AnalogProceduralAssignment*>(_item)){ untested();
-    // does not make sense.
-    assert(false);
-  }else{
-//    assert(!(options().optimize_unused() && !scope()->is_reachable()));
-    auto p = prechecked_cast<Variable_Decl*>(_item);
-    assert(p);
+  }else if(dynamic_cast<AnalogProceduralAssignment*>(_item)){ untested();
+    unreachable(); // does not make sense.
+    assert(false); // remove later.
+  }else if(auto p = dynamic_cast<Variable_Decl*>(_item)){
     return p->propagate_deps(from);
+  }else if(dynamic_cast<Analog_Function*>(_item)){
+  }else{ untested();
+    assert(0);
   }
 
   return false;
@@ -1108,17 +1113,7 @@ void Token_VAR_REAL::stack_op(Expression* e)const
   assert(_item);
   auto oi = prechecked_cast<TData const*>(_item);
   assert(oi);
-//  assert(deps());
   auto nd = deps().clone();
-
-//  Base const* r = scope->lookup(name());
-//  if(!r){ untested();
-//    assert(dynamic_cast<Paramset const*>(scope)); // ?
-//  }else if(r==this){ untested();
-//  }else if(auto x = dynamic_cast<Token_VAR_REF const*>(r)){ untested();
-//    return x->stack_op(e); // BUG.
-//  }else{ untested();
-//  }
 
   {
 //    assert(oi->owner());
@@ -1127,6 +1122,45 @@ void Token_VAR_REAL::stack_op(Expression* e)const
 //      nd->add_sens(_item); not yet.
       trace3("var::stackop a", name(), nd->size(), deps().size());
     }else if(auto dd = dynamic_cast<TData const*>(data())){
+      nd = dd->clone();
+//      nd->add_sens(_item); not yet.
+    }else{ untested();
+      incomplete();
+      trace1("var::stackop no assignment", name());
+    }
+
+//    assert(xx);
+    auto nn = new Token_VAR_REF(name(), E->scope(), nd);
+    assert(nn->scope());
+    nn->deps();
+//    assert(nn->num_deps() == nd->ddeps().size());
+    e->push_back(nn);
+//    assert(nn->_item == _item);
+
+  }
+}
+/*--------------------------------------------------------------------------*/
+// same as VAR_REAL::stack_op?
+void Token_VAR_INT::stack_op(Expression* e)const
+{ untested();
+  auto E = prechecked_cast<Expression_*>(e);
+  assert(E);
+  auto xx = dynamic_cast<Statement*>(E->owner());
+  auto mm = dynamic_cast<Module*>(E->owner());
+  auto af = dynamic_cast<Analog_Function*>(E->owner());// BUG?
+  assert(xx||mm||af);
+  assert(_item);
+  auto oi = prechecked_cast<TData const*>(_item);
+  assert(oi);
+  auto nd = deps().clone();
+
+  {
+//    assert(oi->owner());
+    if(auto a = dynamic_cast<Assignment const*>(_item)){ untested();
+      nd = a->data().clone();
+//      nd->add_sens(_item); not yet.
+      trace3("var::stackop a", name(), nd->size(), deps().size());
+    }else if(auto dd = dynamic_cast<TData const*>(data())){ untested();
       nd = dd->clone();
 //      nd->add_sens(_item); not yet.
     }else{ untested();
@@ -1159,15 +1193,19 @@ void Token_VAR_REAL::dump(std::ostream& o) const
 }
 /*--------------------------------------------------------------------------*/
 Data_Type const& Token_VAR_INT::type() const
-{
+{ untested();
   static Data_Type_Int t;
   return t;
 };
 /*--------------------------------------------------------------------------*/
-void Token_VAR_INT::stack_op(Expression* e)const
+void Token_ARGUMENT::dump(std::ostream& o) const
 {
-  incomplete();
-  Token_VAR_REF::stack_op(e);
+  o << name();
+}
+/*--------------------------------------------------------------------------*/
+void Token_ARGUMENT::dump(std::ostream& o) const
+{
+  o << name();
 }
 /*--------------------------------------------------------------------------*/
 void Token_VAR_INT::dump(std::ostream& o) const

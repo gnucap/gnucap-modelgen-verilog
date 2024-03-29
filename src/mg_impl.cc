@@ -789,7 +789,7 @@ Base* Block::lookup(std::string const& k, bool recurse)
   if(f != _var_refs.end()) {
     return f->second;
   }else if(!recurse) {
-    assert(dynamic_cast<Module const*>(this));
+//    assert(dynamic_cast<Module const*>(this) || dynamic_cast<AnalogFunction const*>(this));
     return NULL;
   }else if(k[0] == '<'){
     if(auto m = dynamic_cast<Module*>(this)){
@@ -799,6 +799,7 @@ Base* Block::lookup(std::string const& k, bool recurse)
       return scope()->lookup(k, true);
     }
   }else if(scope()) {
+    assert(scope() != this);
     return scope()->lookup(k, true);
   }else if(dynamic_cast<File const*>(this)){
   }else if(auto st = dynamic_cast<Statement*>(owner())){

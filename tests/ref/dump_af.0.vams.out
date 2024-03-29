@@ -19,26 +19,40 @@ module test_af();
     end
   endfunction
 
-  analog function real strange_log;
+  analog function real fct;
     input x;
     real x;
     begin
-      strange_log = ln(max(x, .1));
+      fct = ln(max(x, .1));
+    end
+  endfunction
+
+  analog function real fct2;
+    input x;
+    real x;
+    real y;
+    begin
+      y = 1.;
+      fct2 = ln(max(x, y));
     end
   endfunction
 
   analog function real something;
     input x, y;
-    real x, y;
+    output z;
+    real x;
+    real y, z;
     begin
       something = ((x + sqrt(((x * x) + ((y * 4.0) * y)))) * 0.5);
+      real r;
     end
   endfunction
 
   analog begin
     real i;
-    i = something( 26.,  20.0855369231877);
-    i = something( 26.,  1.);
+    real out;
+    i = something( 26.,  20.0855369231877, out);
+    i = something( 26.,  1., out);
   end
 
 endmodule

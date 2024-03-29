@@ -484,7 +484,7 @@ public:
     }
   }
   Base const* lookup(std::string const& k, bool recurse=true) const;
-  Base* lookup(std::string const& k, bool recurse=true);
+  virtual Base* lookup(std::string const& k, bool recurse=true);
   Base const* lookup(CS&) const;
 
 //  Base const* item(std::string const&name) { untested();

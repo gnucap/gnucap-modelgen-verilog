@@ -1,37 +1,6 @@
-nature current
-  access = "I";
-  units = "A";
-  abstol = "0.001234";
-endnature
-
-nature voltage
-  access = "V";
-  units = "V";
-  abstol = "0.0004321";
-endnature
-
-
-discipline electrical
-  potential "voltage";
-  flow "current";
-enddiscipline
-
-
-module test_af(a, b);
-  electrical a, b;
-  error #() y();
-  endfunction #() analog();
-  begin #() end();
-
-  analog function real xs;
+... al xs;
     input x;
     real x;
-  endfunction
-
-endmodule
-
-
-
-:28:
     error y;
-    ^ ? bad analog function
+      ^ ? need 'endfunction'
+

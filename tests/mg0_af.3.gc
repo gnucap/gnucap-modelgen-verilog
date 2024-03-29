@@ -12,6 +12,7 @@ module test_af_3(p, n);
 	analog function real sum;
 		input x;
 		input y;
+		real x, y;
 		begin
 			sum = x + y;
 		end
@@ -20,6 +21,7 @@ module test_af_3(p, n);
 	analog function real prod;
 		input x;
 		input y;
+		real x, y;
 		begin
 			prod = x * y;
 		end

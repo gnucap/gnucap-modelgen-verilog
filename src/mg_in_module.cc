@@ -1072,13 +1072,7 @@ void Block::new_var_ref(Base* what)
   Base* cc = _var_refs[p];
 
   // yikes.
-  if(dynamic_cast<Analog_Function_Arg const*>(what)
-   &&!dynamic_cast<Analog_Function_Arg const*>(cc)){ untested();
-    _var_refs[p] = what;
-  }else if(dynamic_cast<Analog_Function_Arg const*>(cc)
-   &&!dynamic_cast<Analog_Function_Arg const*>(what)){ untested();
-    _var_refs[p] = cc;
-  }else if(dynamic_cast<Paramset_Stmt const*>(what)){ untested();
+  if(dynamic_cast<Paramset_Stmt const*>(what)){ untested();
     unreachable();
     _var_refs[p] = what;
   }else if(cc) {
@@ -1089,16 +1083,18 @@ void Block::new_var_ref(Base* what)
       // updating variable...
       if(auto VT = dynamic_cast<Token_VAR_REF const*>(T)){
 	trace2("new_var_ref, update token", p, VT->deps().size());
-      }else{ untested();
+//      }else if(auto VT = dynamic_cast<Token_VAR_REAL const*>(T)){
+//	throw(Exception("already declared"));
+      }else{
 	trace1("new_var_ref, update token", p);
       }
     }else{ untested();
       throw(Exception("already there: '" + p + "'"));
     }
   }else if(T){
-    if(auto VT = dynamic_cast<Token_VAR_REF const*>(T)){
+    if(dynamic_cast<Token_VAR_REF const*>(T)){
       //trace2("new_var_ref, reg new token", p, VT->deps().size());
-    }else{ untested();
+    }else{
       trace1("new_var_ref, reg new token", p);
     }
     _var_refs[p] = what;

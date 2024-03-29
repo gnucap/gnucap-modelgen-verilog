@@ -1,5 +1,6 @@
 == modelgen
 - Port currents "I(<a>)" not supported.
+- named block variables supposed to be static
 - $limit: only "pnjlimit"
 - ac needs operating point, even if linear: mg2_cccs.0.gc
 - analysis("ic"): need more testing

@@ -15,26 +15,40 @@ analog function real limitex;
     end
 endfunction
 
-analog function real strange_log;
-    input x;
+analog function real fct;
     real x;
+    input x;
     begin
-        strange_log = ln(max(x , .1));
+        fct = ln(max(x , .1));
     end
 endfunction
 
+analog function real fct2;
+  real x;
+  input x;
+  real y;
+  begin
+    y = 1.;
+    fct2 = ln(max(x , y));
+  end
+endfunction
+
 analog function real something;
-    input x , y;
-    real x , y;
-    begin
+  input x, y;
+  output z;
+  real x;
+  real y, z;
+  begin
         something = 0.5 * (x + sqrt(x*x + 4.0*y*y));
-    end
+        real r;
+  end
 endfunction
 
 analog begin
 	real i;
-	i = something(1+5*5, exp(3));
-	i = something(1+5*5, exp(ln(1)));
+	real out;
+	i = something(1+5*5, exp(3), out);
+	i = something(1+5*5, exp(ln(1)), out);
 end
 
 endmodule

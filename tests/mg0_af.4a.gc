@@ -13,6 +13,7 @@ module test_af_4a(p, n);
     real x, c;
     input x, c;
     begin
+      real z;
       fct = (x + c);
     end
   endfunction

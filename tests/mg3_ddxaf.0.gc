@@ -11,6 +11,7 @@ module test_ddxaf(a);
 	(* desc="" *) real vin, tst1, tst2, tst3;
 	analog function real fct;
 		input x;
+		real x;
 		begin
 			fct = x*x;
 		end
@@ -18,6 +19,7 @@ module test_ddxaf(a);
 
 	analog function real fct2;
 		inout x;
+		real x;
 		begin
 			fct2 = x;
 			x = x*x;
@@ -26,6 +28,7 @@ module test_ddxaf(a);
 
 	analog function real fct3;
 		inout x;
+		real x;
 		begin
 			real y; y = x;
 			x = y*x;

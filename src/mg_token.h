@@ -341,6 +341,20 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Data_Type;
+class Token_ARGUMENT : public Token_SYMBOL {
+public:
+  Token * _var{NULL};
+  Data_Type const& type()const;
+public:
+  explicit Token_ARGUMENT() : Token_SYMBOL("",""){unreachable();}
+  explicit Token_ARGUMENT(std::string Name)
+    : Token_SYMBOL(Name, "") {}
+  void dump(std::ostream& o)const override;
+public: // LiSt
+  std::string key() const {unreachable();return "";}
+  void set_owner(Base*){unreachable();}
+};
+/*--------------------------------------------------------------------------*/
 class Token_VAR_REF : public Token_SYMBOL {
 protected:
   Base* _item;
@@ -374,6 +388,7 @@ private:
 /*--------------------------------------------------------------------------*/
 // VAR_DECL :: SYMBOL?
 /*--------------------------------------------------------------------------*/
+// class Token_VAR_DECL : public Token_VARIABLE
 class Token_VAR_REAL : public Token_VAR_REF {
   Block const* _owner{NULL};
 public:
@@ -394,6 +409,7 @@ public:
   void dump(std::ostream& o)const override;
 };
 /*--------------------------------------------------------------------------*/
+// class Token_VAR_DECL : public Token_VAR_REF
 class Token_VAR_INT : public Token_VAR_REF {
 public:
   explicit Token_VAR_INT() : Token_VAR_REF("",NULL,NULL) {unreachable();}

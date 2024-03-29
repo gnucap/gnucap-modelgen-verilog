@@ -348,12 +348,11 @@ static Base* parse_analog_stmt_or_null(CS& file, Block* scope)
   Base* ret = NULL;
 
   trace1("parse_analog_stmt_or_null", file.tail().substr(0,30));
-//  size_t here = file.cursor();
   ONE_OF	// module_item
     || (file >> ";")
     || ((file >> "begin") && (ret = pArse_seq(file, scope)))
-    || ((file >> "real ") && (ret = new AnalogRealDecl(file, scope)))
-    || ((file >> "integer ") && (ret = parse_int(file, scope)))
+    || ((file >> "real ") && (ret = new AnalogDeclareVars(file, scope)))
+    || ((file >> "integer ") && (ret = parse_int(file, scope))) // TODO: AnalogDeclareVars
     || ((file >> "if ") && (ret = parse_cond(file, scope)))
     || ((file >> "case ") && (ret = parse_switch(file, scope)))
     || ((file >> "while ") && (ret = new AnalogWhileStmt(file, scope)))
@@ -364,10 +363,11 @@ static Base* parse_analog_stmt_or_null(CS& file, Block* scope)
     || (ret = parse_contribution(file, scope))
     ;
 
-  trace1("parse_analog_stmt_or_null?", file.tail().substr(0,30));
   if(file.stuck(&here)) {
+    trace1("parse_analog_stmt_or_null? stuck", file.tail().substr(0,30));
     file.reset_fail(here);
   }else{
+    trace1("parse_analog_stmt_or_null? cont", file.tail().substr(0,30));
   }
 
   return ret;
@@ -821,7 +821,9 @@ void AnalogSeqBlock::parse(CS& f)
   }else{
   }
   for (;;) {
+    trace1("AnalogSeqBlock::parse loop", f.tail().substr(0,20));
     if(f >> "end "){
+      trace0("AnalogSeqBlock::parse, end");
       if(f.peek() == ';') {
 	f.warn(bWARNING, "stray semicolon\n");
 	f.skip();
@@ -936,7 +938,7 @@ void Assignment::dump(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 Assignment::~Assignment()
 {
-  if(options().optimize_unused() && !owner()->is_reachable()) {
+  if(options().optimize_unused() && !scope()->is_reachable()) {
   }else if(_data){
     trace3("~Assignment", _token->name(), this, data().ddeps().size());
     try{
@@ -1511,8 +1513,7 @@ void AnalogEvtCtlStmt::dump(std::ostream& o) const
 #endif
 }
 /*--------------------------------------------------------------------------*/
-void make_cc_af_body(std::ostream& o, const Analog_Function& f); // BUG
-void make_cc_af_args(std::ostream& o, const Analog_Function& f); // BUG
+void make_cc_af(std::ostream& o, const Analog_Function& f); // BUG
 namespace{
 /*--------------------------------------------------------------------------*/
 static Module const* to_module(Block const* owner)
@@ -1539,7 +1540,7 @@ class AF : public MGVAMS_FUNCTION {
 public:
   explicit AF(Analog_Function const* af) : _af(af) {
     assert(_af);
-    set_label(af->identifier());
+    set_label(af->variable()->name());
   }
 
 #if 1
@@ -1560,28 +1561,9 @@ public:
     return "af_" + label();
   }
   void make_cc_impl(std::ostream& o)const override {
-    o << "//incomplete: af impl\n";
-    assert(_af);
-    auto mp = to_module(_af->scope());
-    assert(mp);
-    auto& m = *mp;
 #if 1
-    auto f = _af;
-    assert(f);
-    o << "COMMON_" << m.identifier() << "::";
-    o << "ddouble COMMON_" << m.identifier() << "::" << f->code_name() << "(\n";
-    o << "            ";
-    make_cc_af_args(o, *f);
-    o << ") const\n{\n";
-    {
-      indent x;
-      o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
-      o__ "(void)pc;\n";
-      make_cc_af_body(o, *f);
-    }
-    o << "}\n"
-      "/*--------------------------------------"
-      "------------------------------------*/\n";
+    assert(_af);
+    make_cc_af(o, *_af);
 #endif
   }
 
@@ -1594,15 +1576,18 @@ public:
     // BUG? make_cc_af_args
     std::string sep = "";
     std::string qual = "";
-    for (auto coll : F.args()){
-      if(coll->is_output()){
+    for (Base const* x : F.args()){
+      auto coll = prechecked_cast<AF_Arg_List const*>(x);
+      assert(coll);
+
+      if(coll->is_output()){ untested();
 	qual = "/*output*/ &";
       }else{
 	qual = "";
       }
       for(auto i : *coll){
 	o << sep << "ddouble " << qual;
-	o << "/*" << i->identifier() << "*/";
+	o << "/*" << i->name() << "*/";
 	sep = ", ";
       }
     }
@@ -1615,70 +1600,170 @@ public:
 /*--------------------------------------------------------------------------*/
 void Analog_Function::parse(CS& f)
 {
-//  f >> _type >> _identifier; // VARIABLE
   _args.set_owner(this);
-  _variable.set_owner(this);
-  f >> _type >> _variable;
-//  new_var_ref(&_variable); // !
+  std::string name;
+  f >> _type >> name;
+  assert(!_variable);
+  auto data = new TData;
+  _variable = new Token_VAR_REF(name, this, data);
+  trace1("PAF", name);
+  _block.new_var_ref(_variable);
   size_t here = f.cursor();
-  bool end = false;
-  Base* s = NULL;
   for (;;) {
+    Base* s = NULL;
     ONE_OF	// module_item
       || f.umatch(";")
       || ((f >> "input ") && (f >> _args))
       || ((f >> "output ") && (f >> _args))
       || ((f >> "inout ") && (f >> _args))
-//      || (f >> _attribute_dummy)
-      || ((f >> "endfunction ") && (end = true))
-      || (s = parse_analog_stmt_or_null(f, this))
+      || ((f >> "real ") && (s = new AnalogDeclareVars(f, &_args)))
+      || ((f >> "integer ") && (s = parse_int(f, &_args))) // TODO: AnalogDeclareVars
       ;
-    if(s){
-      push_back(s);
-      s = NULL;
-    }else{
-    }
-    if (end){
-      break;
+    if (s){
+      _vars.push_back(s);
     }else if (!f.more()) { untested();
       f.warn(bWARNING, "premature EOF (analog function)");
       break;
     }else if (f.stuck(&here)) {
-      f.warn(bWARNING, "bad analog function");
       break;
     }else{
     }
+  }
+  trace1("body?", f.tail().substr(0,20));
+  _block.set_owner(this);
+//   for(auto& x : var_refs()){ untested();
+//     trace1("af vr??", x.first);
+//   }
+
+  for(auto& x : _args.var_refs()){
+    trace1("af vr", x.first);
+    if(auto y = dynamic_cast<Token_ARGUMENT*>(x.second)){
+      if(dynamic_cast<Token_VAR_REAL*>(y->_var)){
+	_block.new_var_ref(y->_var);
+      }else{ untested();
+	throw Exception("formal argument missing type\n");
+      }
+    }else{
+      assert(dynamic_cast<Token_VAR_REAL*>(x.second));
+      _block.new_var_ref(x.second);
+    }
+
+  }
+
+  f >> _block;
+
+  if(f >> "endfunction"){
+  }else{
+    throw Exception_CS_("need 'endfunction'\n", f);
   }
 
   assert(!_function);
   _function = new AF(this);
 }
 /*--------------------------------------------------------------------------*/
+Base* AnalogFunctionBody::lookup(std::string const& f, bool recurse)
+{
+  Base* b = AnalogCtrlBlock::lookup(f, recurse);
+  if(auto t = dynamic_cast<Token_VAR_REF const*>(b)){
+    if(t->is_module_variable()) {
+      // module variables not not allowed here.
+      return NULL;
+    }else{
+    }
+  }else if(dynamic_cast<Token_NODE const*>(b)){ untested();
+    // nodes not allowed here.
+    return NULL;
+  }
+  return b;
+}
+/*--------------------------------------------------------------------------*/
+void VariableList::dump(std::ostream& o) const
+{
+  for(auto i : *this){
+    assert(i);
+    i->dump(o);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void AnalogFunctionBody::dump(std::ostream& o) const
+{
+  o__ "";
+  AnalogCtrlBlock::dump(o);
+}
+/*--------------------------------------------------------------------------*/
 Analog_Function::~Analog_Function()
 {
-  for(auto x : _var_refs){
-    trace1("~AF", x.first);
-  }
+  delete _variable;
+  _variable = NULL;
   delete _function;
   _function = NULL;
 }
 /*--------------------------------------------------------------------------*/
 void Analog_Function::dump(std::ostream& o) const
 {
-  o__ "analog function " << _type << " " << _variable << ";\n";
+  assert(_variable);
+  o__ "analog function " << _type << " " << _variable->name() << ";\n";
   {
     indent x;
-    o__ _args;
-    Block::dump(o); // TODO: indentation
+    o << _args;
+    o << _vars;
+    _block.dump(o);
   }
   o__ "endfunction\n";
 }
 /*--------------------------------------------------------------------------*/
-void Analog_Function::new_var_ref(Base* b)
+void AnalogFunctionArgs::parse(CS& f)
+{
+  auto n = new AF_Arg_List(f, this);
+  push_back(n);
+}
+/*--------------------------------------------------------------------------*/
+void AnalogFunctionArgs::dump(std::ostream& o) const
+{
+  for(auto const& i : *this){
+    o__ *i; // ->dump(o);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void AnalogFunctionArgs::new_var_ref(Base* b)
 {
   auto t = prechecked_cast<Token*>(b);
   assert(t);
   trace1("AF::nvr", t->name());
+  Base* ex = NULL;
+  if(auto T = dynamic_cast<Token const*>(b)){
+    ex = lookup(T->name(), false);
+  }else{ untested();
+  }
+
+  Token_ARGUMENT* arg = NULL;
+  Token_VAR_REAL* decl = NULL;
+  if((arg = dynamic_cast<Token_ARGUMENT*>(b))){
+    if(dynamic_cast<Token_ARGUMENT*>(ex)){ untested();
+      throw Exception("duplicate argument");
+    }else if(auto dd = dynamic_cast<Token_VAR_REAL*>(ex)){
+      arg->_var = dd;
+      return Block::new_var_ref(arg);
+    }else{
+      return Block::new_var_ref(b);
+    }
+  }else if((decl = dynamic_cast<Token_VAR_REAL*>(b))){
+    if(auto aa=dynamic_cast<Token_ARGUMENT*>(ex)){
+      aa->_var = decl;
+      trace1("AF::nvr arg", t->name());
+      return Block::new_var_ref(aa);
+    }else if(dynamic_cast<Token_VAR_REAL*>(ex)){ untested();
+      throw Exception("duplicate variable name");
+    }else{
+      return Block::new_var_ref(b);
+    }
+  }else{ untested();
+    return Block::new_var_ref(b);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void AnalogFunctionBody::new_var_ref(Base* b)
+{
   return Block::new_var_ref(b);
 }
 /*--------------------------------------------------------------------------*/
@@ -1701,50 +1786,70 @@ AnalogExpression::~AnalogExpression()
 {
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 void AF_Arg_List_Collection::dump(std::ostream& o)const
-{
-  for(auto const& i : *this){
-    i->dump(o);
+{ untested();
+  for(auto const& i : *this){ untested();
+    o__ *i; // ->dump(o);
   }
   // Collection<Parameter_2_List>::dump(o);
 }
+#endif
 /*--------------------------------------------------------------------------*/
-void Analog_Function_Arg::parse(CS& f)
+void AF_Arg_List::parse(CS& f)
 {
-  trace1("Analog_Function_Arg::parse", f.tail().substr(0,10));
-  Variable_Decl::parse(f);
-}
-/*--------------------------------------------------------------------------*/
-void Analog_Function_Arg::dump(std::ostream& o)const
-{
-  o << name();
-}
-/*--------------------------------------------------------------------------*/
-void AF_Arg_List::parse(CS& file)
-{
-  std::string dir = file.last_match().substr(0,3);
-//  file >> _type;
+  std::string dir = f.last_match().substr(0,3);
+//  f >> _type;
   if(dir=="inp"){
     _direction = a_input;
-  }else if(dir=="out"){ untested();
+  }else if(dir=="out"){
     _direction = a_output;
-  }else if(dir=="ino"){
+  }else if(dir=="ino"){ untested();
     _direction = a_inout;
   }else{ untested();
-    trace2("AF_Arg_List::parse", file.tail().substr(0,10), dir);
+    trace2("AF_Arg_List::parse", f.tail().substr(0,10), dir);
     unreachable();
   }
-  LiSt<Analog_Function_Arg, '\0', ',', ';'>::parse(file);
-//  for(auto& i : *this){ untested();
-//    i->set_type(type);
-//  }
+  Analog_Function* o = prechecked_cast<Analog_Function*>(scope()->owner());
+  assert(o);
+  AnalogFunctionArgs* oo = prechecked_cast<AnalogFunctionArgs*>(owner());
+  assert(oo);
+
+  // Can't parse Tokens, cf AnalogDeclareVars::parse
+  LiSt<String_Arg, '\0', ',', ';'> l;
+  l.parse(f);
+  for(auto i : l){
+    auto b = owner()->lookup(i->to_string(), false);
+    auto v = dynamic_cast<Token_VAR_REAL*>(b);
+
+    if(dynamic_cast<Token_ARGUMENT const*>(b)){ untested();
+      throw Exception_CS_("already_declared: " + i->to_string() + "\n", f);
+    }else if(v){
+//      v->set_arg? set_used_in?
+    }else{
+    }
+
+    auto t = new Token_ARGUMENT(i->to_string());
+    t->_var = v;
+    trace1("stash", t->name());
+    owner()->new_var_ref(t);
+
+    if(v){
+//      v->deps().add_sens(t);
+    }else{
+    }
+
+    _l.push_back(t);
+  }
+
 }
 /*--------------------------------------------------------------------------*/
 void AF_Arg_List::dump(std::ostream& o)const
 {
   static std::string names[] = {"input", "output", "inout"};
   o << names[_direction] << " ";
-  LiSt<Analog_Function_Arg, '\0', ',', ';'>::dump(o);
+ // LiSt<Analog_Function_Arg, '\0', ',', ';'>::dump(o);
+  _l.dump(o);
   o << "\n";
 }
 /*--------------------------------------------------------------------------*/
@@ -1831,7 +1936,7 @@ bool Assignment::store_deps(TData const& d)
 	_data->add_sens(*x->sensitivities());
       }else{
       }
-    }else{
+    }else{ untested();
     }
 
     for(; ii < _data->ddeps().size(); ++ii) {
@@ -1950,14 +2055,14 @@ Contribution::~Contribution()
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::dump(std::ostream& o)const
-{
+{ untested();
   o__ name();
-  if(options().dump_annotate()){
-    for(auto d : deps().ddeps()){
+  if(options().dump_annotate()){ untested();
+    for(auto d : deps().ddeps()){ untested();
       o << "// dep " << d->code_name();
     }
     o << "\n";
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1975,31 +2080,40 @@ bool Variable_Decl::propagate_deps(Token_VAR_REF const& v)
   return false;
 }
 /*--------------------------------------------------------------------------*/
-void AnalogRealDecl::parse(CS& f)
+void AnalogDeclareVars::parse(CS& f)
 {
   LiSt<String_Arg, '\0', ',', ';'> l;
   l.parse(f);
   for(auto i : l){
     auto data = new TData;
     //      data->set_type(Data_Type_Real());
+    auto b = owner()->lookup(i->to_string(), false);
+    auto v = dynamic_cast<Token_VAR_REF const*>(b);
+
+    if(v) {
+      throw Exception_CS_("already_declared: " + i->to_string() + "\n", f);
+    }else{
+    }
+    trace1("AnalogDeclareVars::parse", i->to_string());
     auto t = new Token_VAR_REAL(i->to_string(), data, data);
     _l.push_back(t);
   }
   update();
 }
 /*--------------------------------------------------------------------------*/
-void AnalogRealDecl::dump(std::ostream& o) const
+void AnalogDeclareVars::dump(std::ostream& o) const
 {
   o__ "real ";
   _l.dump(o);
   o << "\n";
 }
 /*--------------------------------------------------------------------------*/
-bool AnalogRealDecl::update()
+bool AnalogDeclareVars::update()
 {
   for(Token_VAR_REAL* i : _l){
     assert(i);
     i->clear_deps();
+    trace1("decl nvr", i->name());
     owner()->new_var_ref(i);
   }
   return false;
@@ -2222,8 +2336,7 @@ FUNCTION_ const* analog_function_call(std::string const& f, Block const* scope)
   Module const* m = to_module(scope);
   assert(m);
   for(auto n: ::analog(*m).functions()){
-    trace2("is_afcall", n->identifier(), f);
-    if(n->identifier() == f){
+    if(n->key() == f){
       assert(n->function());
       return n->function();
     }else{

@@ -93,7 +93,7 @@ bool Assignment::is_int() const
 }
 /*--------------------------------------------------------------------------*/
 bool Assignment::is_module_variable() const
-{ untested();
+{
   assert(_lhsref);
   return _lhsref->is_module_variable();
 }
