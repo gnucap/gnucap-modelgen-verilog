@@ -234,9 +234,7 @@ void Assignment::parse(CS& f)
     }else{
       assert(_token->data());
       assert(_token->scope());
-//      trace1("parse prop", name());
       _lhsref->propagate_deps(*_token);
-      // _name = l->name();
       assert(_lhsref->name() == _token->name());
       trace2("parsedone", _token->name(), data().size());
     }
@@ -1661,9 +1659,6 @@ void Analog_Function::parse(CS& f)
   }
   trace1("body?", f.tail().substr(0,20));
   _block.set_owner(this);
-//   for(auto& x : var_refs()){ untested();
-//     trace1("af vr??", x.first);
-//   }
 
   for(auto& x : _args.var_refs()){
     trace1("af vr", x.first);
@@ -1696,7 +1691,7 @@ Base* AnalogFunctionBody::lookup(std::string const& f, bool recurse)
   Base* b = AnalogCtrlBlock::lookup(f, recurse);
   if(auto t = dynamic_cast<Token_VAR_REF const*>(b)){
     if(t->is_module_variable()) {
-      // module variables not not allowed here.
+      // module variables are not allowed here.
       return NULL;
     }else{
     }
@@ -1816,15 +1811,6 @@ AnalogExpression::~AnalogExpression()
 {
 }
 /*--------------------------------------------------------------------------*/
-#if 0
-void AF_Arg_List_Collection::dump(std::ostream& o)const
-{ untested();
-  for(auto const& i : *this){ untested();
-    o__ *i; // ->dump(o);
-  }
-  // Collection<Parameter_2_List>::dump(o);
-}
-#endif
 /*--------------------------------------------------------------------------*/
 void AF_Arg_List::parse(CS& f)
 {
@@ -1887,31 +1873,26 @@ bool Assignment::update()
 {
   TData const* D = &Expression_::deps();
   assert(D);
-//  size_t s = D->ddeps().size();
   bool ret;
 
-//  trace5("Assignment::update1", name(), s, D->ddeps().size(), this, _data->size());
   Expression_::update();
   D = &Expression_::deps();
-//  trace4("Assignment::update2", name(), s, D->ddeps().size(), this);
 
   assert(_token);
   if (store_deps(Expression_::deps())) {
     assert(_lhsref);
-//    trace2("Assignment::update prop", _rhs.deps().ddeps().size(), _lhsref->deps().ddeps().size());
     _lhsref->propagate_deps(*_token);
     assert(_token->operator->());
     ret = true;
     assert(_token->data());
   }else{
-//    trace4("Assignment::update no prop", name(), _rhs.deps().size(), _lhsref->deps().size(), _token->deps().size());
     ret = false;
     assert(_token->data());
     assert(_token->deps().size() >= Expression_::deps().size());
   }
-  scope()->new_var_ref(_token); // ??
-
+  scope()->new_var_ref(_token);
   // new_var_ref();
+
   return ret;
 }
 /*--------------------------------------------------------------------------*/
@@ -1952,8 +1933,6 @@ bool Assignment::store_deps(TData const& d)
       assert(!_data);
       _data = new TData();
       _token = new Token_VAR_REF(_lhsref->name(), this, _data);
-//      _token = new Token_VAR_REF(_lhsref->name(), owner(), _data);
-//      _token = new Token_VAR_REF(_lhsref->name(), _data, owner());
       assert(_token->data());
       assert(_token->scope());
     }
@@ -2407,22 +2386,9 @@ FUNCTION_ const* xs_function_call(std::string const& f, Block const* owner)
   if(f=="flow" || f=="potential") { untested();
     // TODO: return FUNCTION_*, VAMS_XS* from nature
     return (FUNCTION_*)(1); // TODO true;
-  }else if(file){
-    // use actual disciplines
-    // auto const& nl = file->nature_list();
-    // return find_ptr(nl.begin(), nl.end(), f);
-  }else if(f=="V") { untested();
-    // fallback. modelgen_0.cc // incomplete();
-    return (FUNCTION_*)(1); // TODO true;
-  }else if(f=="I") { untested();
-    // fallback. modelgen_0.cc // incomplete();
-    return (FUNCTION_*)(1); // TODO true;
-  }else if(f=="Pwr") { untested();
-    // fallback. modelgen_0.cc // incomplete();
-    return (FUNCTION_*)(1); // TODO true;
+  }else{
   }
 
-  /// TODO ///
   for(auto n: file->nature_list()){
     if(n->access().to_string() == f){
       // TODO: return FUNCTION_*, VAMS_XS* from nature
@@ -2456,13 +2422,7 @@ void Analog::parse(CS& f)
     ab->parse(f);
     _list.set_owner(owner()); // needed?
     push_back(ab);
-
-//    if(auto s = dynamic_cast<AnalogStmt*>(ab->statement_or_null())){ untested();
-//      s->update();
-//    }else{ untested();
-//    }
   }
-//  return f;
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref Branch_Map::lookup(std::string const& n)const
@@ -2474,10 +2434,6 @@ Branch_Ref Branch_Map::lookup(std::string const& n)const
     return Branch_Ref(NULL, false);
   }
 }
-// Branch_Ref Branch_Names::lookup(std::string const&) const
-// { untested();
-//   ...
-// }
 /*--------------------------------------------------------------------------*/
 void AnalogStmt::set_used_in(Base const* b)
 {

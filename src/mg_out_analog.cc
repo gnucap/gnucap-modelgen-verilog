@@ -173,9 +173,6 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
   {
     indent x;
     make_cc_expression(o, e, _mode==modeDYNAMIC);
-   //  if(dynamic_cast<Analog_Function_Arg const*>(&a.lhs())){ untested();
-   //    o__ lhsname << " = t0; // (*)\n";
-   //  }else
     if(a.is_int()){
       o__ lhsname << " = int(t0); // (*)\n";
     }else if(within_af(&a)){
@@ -349,11 +346,6 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
   o__ "}\n";
 } // make_contrib
 /*--------------------------------------------------------------------------*/
-//void AnalogExpression::dump(std::ostream& o)const
-//{
-//  _exp.dump(o);
-//}
-/*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_stmt(std::ostream& o, Base const& ab) const
 {
   auto st = dynamic_cast<AnalogStmt const*>(&ab);
@@ -383,9 +375,8 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Base const& ab) const
     make_assignment(o, *assign);
   }else if(auto ard=dynamic_cast<AnalogDeclareVars const*>(&ab)) {
     make_block_variables(o, *ard);
-  }else if(auto rl=dynamic_cast<ListOfBlockRealIdentifiers const*>(&ab)) { untested();
-    make_block_real_identifier_list(o, *rl);
   }else if(auto il=dynamic_cast<ListOfBlockIntIdentifiers const*>(&ab)) {
+    // incomplete
     make_block_int_identifier_list(o, *il);
   }else if(auto v=dynamic_cast<Variable_Decl const*>(&ab)) { untested();
     unreachable();

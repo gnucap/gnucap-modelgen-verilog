@@ -186,9 +186,6 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 	PP.stack_op(&E);
       }else if(auto v = dynamic_cast<Variable_Decl*>(r)) { untested();
 	unreachable();
-	if(n == v->name()){ untested();
-	}else{ untested();
-	}
 	Token_VAR_REF a(v->name(), v);
 	a.stack_op(&E);
       }else if(auto vt = dynamic_cast<Token_VAR_REF*>(r)) {
@@ -304,7 +301,6 @@ bool Expression_::update()
 void ConstantMinTypMaxExpression::parse(CS& file)
 {
   assert(_e.is_empty());
-//  Expression_ E;
   file >> _e;
   assert(_owner);
 //  = new Expression_();
@@ -366,8 +362,6 @@ TData const& Expression_::data() const
     return no_deps;
   }else if(auto d = dynamic_cast<TData const*>(back()->data())){
     return *d;
-//  }else if(auto d = dynamic_cast<Attrib const*>(back()->data())){ untested();
-//    return d->deps();
   }else{
     return no_deps;
   }
@@ -407,9 +401,6 @@ Block* Expression_::scope()
 /*--------------------------------------------------------------------------*/
 Expression_::~Expression_()
 {
-//  for(auto i : _deps){ untested();
-//    delete i;
-//  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
