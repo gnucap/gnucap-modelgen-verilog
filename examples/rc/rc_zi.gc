@@ -1,0 +1,22 @@
+load mgsim
+load vams/vsine.so
+load ./rc_zi.so
+
+verilog
+
+rc_zi #() b(out3, in);
+vsine #(.ampl(1), .freq(1/2/3.1415)) v1(in, 0);
+
+// lowpass for comparison
+// fc = 0.16Hz
+// phase shift = -45deg. delay: pi/4
+resistor #(.r(1)) r1(in out0)
+capacitor #(.c(1)) c1(0 out0)
+
+print tran v(in) v(out*) control(0)
+tran 10 basic
+//
+print ac vm(out*) vp(out*)
+ac .05 0.2 * 1.1
+
+status notime

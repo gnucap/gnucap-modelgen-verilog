@@ -8,11 +8,15 @@ module test_lap_nd0(p, n);
 	(* desc="" *) real ll1;
 	(* desc="" *) real ll2;
 	(* desc="" *) real ll3;
+	(* desc="" *) real ll4;
+	(* desc="" *) real ll5;
 	electrical p, n;
 	analog begin
 		ll1 = laplace_nd(V(p,n), '{2.}, '{2.});
 		ll2 = laplace_nd(V(p,n), '{1., 1.}, '{1., 1.});
 		ll3 = laplace_nd(V(p,n), '{.5, .5}, '{.5, .5});
+		ll4 = 2*laplace_nd(V(p,n), '{1.}, '{2.});
+		ll5 = 2*laplace_nd(V(n) - V(p), '{-1.}, '{2.});
 	end
 endmodule
 
@@ -28,8 +32,9 @@ vsine #(.dc(v), .ampl(1)) v1(1, 0);
 
 list
 
-print tran v(1) ll1(dut) ll2(dut) ll3(dut)
+print tran v(1) ll1(dut) ll2(dut) ll3(dut) ll4(dut) ll5(dut)
 tran 1 .1 trace=n
+// incomplete probes...
 print ac v(1) ll1(dut) ll2(dut) ll3(dut)
 ac 2 4 * 2
 status notime

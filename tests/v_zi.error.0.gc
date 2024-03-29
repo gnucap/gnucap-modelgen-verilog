@@ -1,0 +1,9 @@
+attach ../vams/vsine.so
+
+
+verilog
+
+va_zi #(.d0(1.), .n0(0.), .xr0(1). .n2(-1.) .n3(1.), .T(1)) b(0,out1,in,0);
+va_zi #(.ri(3), .d0(1.), .n0(0.), .xr0(1). .n2(-1.) .n3(1.), .T(1)) b(0,out1,in,0);
+
+list

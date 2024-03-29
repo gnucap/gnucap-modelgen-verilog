@@ -1,0 +1,27 @@
+nature current
+  access = I;
+  units = "A";
+  abstol = 1e-12; // OPT::abstol
+endnature
+
+// Electrical potential
+nature voltage
+  access = V;
+  units = "V";
+  abstol = 1e-6; // OPT::vntol
+endnature
+
+// Electrical discipline
+discipline electrical
+  potential voltage;
+  flow current;
+enddiscipline
+
+// H(s) = 1/(s+1)
+module rc_lap(out, in);
+	electrical out, in;
+	inout out,in;
+	analog begin
+		V(out) <+ laplace_nd(V(in), '{1.}, '{1.,1.});
+	end
+endmodule

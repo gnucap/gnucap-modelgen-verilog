@@ -1,5 +1,5 @@
 /*                        -*- C++ -*-
- * Copyright (C) 2023 Felix Salfelder
+ * Copyright (C) 2023,2024 Felix Salfelder
  * Author: Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * Verilog-AMS filters
+ * laplace filters in modelgen-verilog
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"
@@ -95,7 +95,6 @@ protected:
 //    delete _prb; belongs to _m
   }
   virtual LAP* clone()const = 0;
-  virtual void make_assign(std::ostream& o) const = 0;
   void set_code_name(std::string x){
     _code_name = x;
   }
@@ -107,6 +106,10 @@ public:
   // Module* m = e->owner()...
   Token* new_token(Module& m, size_t na)const override {
     assert(na != size_t(-1));
+    if(na>3){ untested();
+      throw Exception("syntax error, need 3 args");
+    }else{
+    }
 
     std::string filter_code_name = label() + "_" + std::to_string(n_filters++);
 
@@ -114,7 +117,6 @@ public:
     {
       cl->set_label(filter_code_name); // label()); // "_b_" + filter_code_name);
       cl->set_code_name("_b_" + filter_code_name);
-      assert(na<4);
       cl->set_num_args(na);
       cl->_m = &m;
       m.push_back(cl);
@@ -153,8 +155,8 @@ public:
     o__ "public:\n";
     o____ "int args(int sel)const override{\n";
     o______ "switch(sel){\n";
-    o________ "case 1: return " << _nums << ";\n";
-    o________ "case 2: return " << _dens << ";\n";
+    o________ "case 1: return " << numsize(_nums) << ";\n";
+    o________ "case 2: return " << densize(_dens) << ";\n";
     o________ "default: return 0;\n";
     o______ "}\n";
     o____ "}\n";
@@ -184,6 +186,10 @@ public:
     o << ");\n";
     o__ "bool _short"+_code_name+"()const {return " << bool(_output) << ";}\n";
   }
+  virtual std::string num_name_i()const = 0;
+  virtual std::string den_name_i()const = 0;
+  virtual int numsize(int x)const { return x; }
+  virtual int densize(int x)const { return x; }
 
   void make_cc_impl(std::ostream&o)const override {
     std::string cn = _br->code_name();
@@ -239,11 +245,11 @@ public:
       o__ "assert(l);\n";
       o__ "for(int i=0; i<int(num.size()); ++i){\n";
       o____ "trace2(\"precalc" << cn << "\", i, num[i]);\n";
-      o____ "l->set_param_by_name(\"n\"+to_string(i), to_string(num[i]));\n";
+      o____ "l->set_param_by_name(" + num_name_i() + ", to_string(num[i]));\n";
       o__ "}\n";
       o__ "for(int i=0; i<int(den.size()); ++i){\n";
       o____ "trace2(\"precalc" << cn << "\", i, den[i]);\n";
-      o____ "l->set_param_by_name(\"d\"+to_string(i), to_string(den[i]));\n";
+      o____ "l->set_param_by_name(" + den_name_i() + ", to_string(den[i]));\n";
       o__ "}\n";
       o__ "ret[d_potential" << cn << "] = -1.;\n";
       o__ "return ret;\n";
@@ -254,7 +260,7 @@ public:
   }
   std::string eval(CS&, const CARD_LIST*)const override{ untested();
     unreachable();
-    return "ddt";
+    return "laplace";
   }
   Probe const* prb()const {return _prb;}
   void set_n_to_gnd()const {
@@ -265,7 +271,32 @@ private:
   Branch const* output()const override;
   Node_Ref p()const override;
   Node_Ref n()const override;
+private:
+  void make_assign(std::ostream& o)const {
+    std::string cn = _br->code_name();
+    o__ "t0[d_potential" << cn << "] = -1.;\n";
+    o__ "assert(t0 == t0);\n";
+  }
 }; // LAP
+/*--------------------------------------------------------------------------*/
+class LZP : public LAP{
+public:
+  explicit LZP() : LAP() {
+    set_label("laplace_zp");
+  }
+  LZP* clone()const override{
+    return new LZP(*this);
+  }
+  std::string num_name_i()const override {
+    return "std::string(\"x\") + ((i%2)?'i':'r')  + to_string(i/2) /*A*/";
+  }
+  std::string den_name_i()const override {
+    return "std::string(\"r\") + ((i%2)?'i':'r')  + to_string(i/2) /*B*/";
+  }
+  int numsize(int x)const override{ assert(!(x%2)); return x/2+1; }
+  int densize(int x)const override{ assert(!(x%2)); return x/2+1; }
+} lzp;
+DISPATCHER<FUNCTION>::INSTALL d_zp(&function_dispatcher, "laplace_zp", &lzp);
 /*--------------------------------------------------------------------------*/
 class LND : public LAP{
 public:
@@ -275,14 +306,14 @@ public:
   LND* clone()const override{
     return new LND(*this);
   }
-private:
-  void make_assign(std::ostream& o)const override{
-    std::string cn = _br->code_name();
-    o__ "t0[d_potential" << cn << "] = -1.;\n";
-    o__ "assert(t0 == t0);\n";
+  std::string num_name_i()const override {
+    return "\"n\"+to_string(i)";
   }
-} ddt;
-DISPATCHER<FUNCTION>::INSTALL d_ddt(&function_dispatcher, "laplace_nd", &ddt);
+  std::string den_name_i()const override {
+    return "\"d\"+to_string(i)";
+  }
+} lnd;
+DISPATCHER<FUNCTION>::INSTALL d_nd(&function_dispatcher, "laplace_nd", &lnd);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 Branch* Token_LAP::branch() const
@@ -406,7 +437,7 @@ void Token_LAP::stack_op(Expression* e)const
   }else if(cont->has_sensitivities()) { itested();
   }else if(always){
     for(auto d : cont->data().ddeps()){
-      if(d->branch() != branch()) {
+      if(d->branch() != branch()) { untested();
       }else if(d.is_linear()){
 	// incomplete();
 	func->_output = cont->branch(); // polarity?

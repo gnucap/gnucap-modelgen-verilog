@@ -5,10 +5,11 @@ This file summarizes new features and important changes between snapshots.
 2024033*-dev
 ============
 * fix allocation in laplace
+* laplace_{zi,np,zp} filters
+* zi_{zi,nd,np,zp} filters
 * revisit build system
 * fix uninitialised access in *dt filter
 * output variables in paramset
-* ..
 
 20240229-dev
 ============

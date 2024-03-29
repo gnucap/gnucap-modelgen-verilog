@@ -880,7 +880,7 @@ double ValueRangeInterval::eval() const
     return NOT_INPUT;
   }else if(_ub == _lb){
     return _ub.expression().eval();
-  }else{ untested();
+  }else{
     return NOT_INPUT;
   }
 }

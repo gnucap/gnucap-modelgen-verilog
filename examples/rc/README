@@ -46,6 +46,26 @@ Note the second instance of rc_ps, without "ic" set. It does not use an
 internal node, because it resolves to the simpler one that does not take an
 "ic" parameter.
 
-== laplace_nd.gc
+== Laplace filter example
 
-TODO.
+Verilog-AMS defines s-domain filters, laplace_{nd,np,zd,zp}. Those are
+equivalent to linear networks, see LRM Section 4.5.11. Here's a simple
+example.
+
+$ gnucap-mg-vams --cc rc_lap.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o rc_lap.so
+$ gnucap rc_lap.gc
+[.. data]
+
+== Inverse Z filter lowpass
+
+Sometimes it is useful to be able to design discrete filters. Verilog-AMS
+defines the zi_{nd,np,zd,zp} family of filter functions to aid this. See LRM
+Section 4.5.12.
+
+Here's a small example lowpass filter, see the comments in rc_zi.gc for
+details, and run the simulation to compare against the ordinary linear rc.
+
+$ gnucap-mg-vams --cc rc_zi.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o rc_zi.so
+$ gnucap rc_zi.gc
+[.. data]
+

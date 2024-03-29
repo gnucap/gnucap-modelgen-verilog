@@ -1,7 +1,7 @@
 //va_laplace_nd #() a(1,2,3,4); 
-va_laplace_nd #(.n0(1),.n1(0),.n2(0),.d0(1),.d1(0),.d2(0)) b0 (.out0(0),.out1(1),.in0(in),.in1(0));
-va_laplace_nd #(.n0(.1),.n1(1),.n2(0),.d0(.1),.d1(1),.d2(0)) b1 (.out0(0),.out1(2),.in0(in),.in1(0));
-va_laplace_nd #(.n0(.1),.n1(1),.n2(1.000001),.d0(.1),.d1(1),.d2(1.000001)) b2 (.out0(0),.out1(3),.in0(in),.in1(0));
+va_laplace #(.n0(1),.n1(0),.n2(0),.d0(1),.d1(0),.d2(0)) b0 (.out0(0),.out1(1),.in0(in),.in1(0));
+va_laplace #(.n0(.1),.n1(1),.n2(0),.d0(.1),.d1(1),.d2(0)) b1 (.out0(0),.out1(2),.in0(in),.in1(0));
+va_laplace #(.n0(.1),.n1(1),.n2(1.000001),.d0(.1),.d1(1),.d2(1.000001)) b2 (.out0(0),.out1(3),.in0(in),.in1(0));
 vsine #(.freq(1),.ampl(1)) v1 (.p(in),.n(0));
 resistor #(.r(1)) r1 (.p(1),.n(0));
 resistor #(.r(1)) r1 (.p(2),.n(0));
@@ -75,11 +75,11 @@ resistor #(.r(1)) r1 (.p(3),.n(0));
 #Freq       vm(1)      vm(2)      vm(3)      vm(in)     vp(1)      vp(2)      vp(3)      vp(in)    
  0.01       1.         1.         1.         1.         0.         0.         0.         0.        
  0.1        1.         1.         1.         1.         0.         0.         0.         0.        
- 1.         1.         1.         1.         1.         0.         0.         0.         0.        
+ 1.         1.         1.         1.         1.         0.         0.         1.2602f    0.        
  10.        1.         1.         1.         1.         0.         0.         0.         0.        
  100.       1.         1.         1.         1.         0.         0.         0.         0.        
 Gnucap   System status
 iterations: op=0, dc=0, tran=239, fourier=0, total=316
 transient timesteps: accepted=65, rejected=7, total=72
 nodes: user=4, subckt=0, model=10, total=14
-dctran density=51.0%, ac density=51.0%
+dctran density=51.0%, ac density=19.4%

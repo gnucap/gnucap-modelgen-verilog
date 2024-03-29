@@ -1965,7 +1965,7 @@ bool Assignment::store_deps(TData const& d)
 	_data->add_sens(*x->sensitivities());
       }else{
       }
-    }else{ untested();
+    }else{
     }
 
     for(; ii < _data->ddeps().size(); ++ii) {

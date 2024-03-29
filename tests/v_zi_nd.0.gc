@@ -1,0 +1,22 @@
+load ../vams/vsine.so
+verilog
+
+va_zi_nd #(.d0(1.), .d1(0.), .n0(1.), .n1(1), .T(1)) b(0,out1,in,0);
+va_zi_nd #(.d0(1.), .d1(0.), .n0(0.), .n1(1), .T(1)) b(0,out2,in,0);
+vsource #(.dc(1.)) v1(in,0);
+
+list
+
+print tran v(out*) control(0)
+tran 5 basic
+
+
+vsine #(.mag(1)) vac(in,0);
+print ac vm(in) vm(out*) vp(out*)
+delete v1
+
+// BUG?: need dc.
+dc
+ac .001 1 * 1.4
+
+status notime

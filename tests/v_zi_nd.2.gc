@@ -1,0 +1,18 @@
+attach ../vams/vsine.so
+
+
+verilog
+parameter T = 1;
+
+va_zi_nd #(.d0(1.), .d1(-1.), .n0(1), .T(T), .tau(T*.1)) b(0,out1,in,0);
+va_zi_nd #(.d0(1.), .d1(1.), .n0(2), .T(T), .tau(T*.1)) b(0,out2,in,0);
+va_zi_nd #(.n0(1.), .d0(2.), .T(T), .tau(T*.1)) b(0,out3,in,0);
+vsource #(.dc(1.)) v1(in,0);
+
+
+list
+
+print tran v(in) v(out*) control(0)
+tran 10 basic
+
+status notime

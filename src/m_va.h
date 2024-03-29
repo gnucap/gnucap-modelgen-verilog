@@ -580,12 +580,26 @@ public:
     _v.push_back(a0);
     _v.push_back(a1);
   }
+  template<typename... Args>
+  array_(Args... args) {
+    push_back(args...);
+  }
+
   size_t size() const{return _v.size();}
   double const& operator[](int x)const {return _v[x];}
+private:
+  template<typename T>
+  void push_back(T t) {
+    _v.push_back(t);
+  }
+  template<typename T, typename... Args>
+  void push_back(T t, Args... args) {
+	  _v.push_back(t);
+	  push_back(args...);
+  }
 };
-}
-
 /*--------------------------------------------------------------------------*/
+} // namespace
 namespace va {
 // some builtin numerical functions according to verilog standard
 // TODO: move to plugins, like the others.

@@ -125,7 +125,7 @@ void print_attributes(std::ostream& o, const void* x)
 }
 /*--------------------------------------------------------------------------*/
 bool has_attributes(void const* x)
-{ untested();
+{
   assert(CKT_BASE::_attribs);
   return CKT_BASE::_attribs->at(x);
 }

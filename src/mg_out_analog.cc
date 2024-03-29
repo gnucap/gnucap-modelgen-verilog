@@ -339,6 +339,10 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	  o__ "//noelt: " << v->code_name() << "\n";
 	}
       }
+      if(C.data().ddeps().empty()) {
+	  o__ "//noddeps..\n";
+      }else{
+      }
 
     }
   }
@@ -733,7 +737,7 @@ static void make_set_self_contribution(std::ostream& o, Dep const& d)
     o__ "}else{\n";
     o____ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
     o__ "}\n";
-  }else if(both && d->is_flow_probe()) { untested();
+  }else if(both && d->is_flow_probe()) {
     o__ "// self flow\n";
     o__ "if (_pot"<< b->code_name() << "){\n";
     o____ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
@@ -938,7 +942,7 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Token_VAR_REF&
     V, Module const& m) const
 {
   if(_mode == modePRECALC){
-    if(V.type().is_int()) { untested();
+    if(V.type().is_int()) {
       o__ "int";
     }else if(V.type().is_real()) {
       o__ "ddouble";
@@ -966,8 +970,8 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Token_VAR_REF&
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_one_variable_store(std::ostream& o, Token_VAR_REF const& V) const
 {
-  if(!V.type().is_real()) { untested();
-  }else if(!V.is_module_variable()){ untested();
+  if(!V.type().is_real()) {
+  }else if(!V.is_module_variable()){
     unreachable();
   }else if(_mode == modePRECALC){ untested();
     o__ "// d->" << V.code_name() << " = " << V.code_name() << ";\n";

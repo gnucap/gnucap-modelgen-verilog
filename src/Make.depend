@@ -27,6 +27,10 @@ mg_filt_laplace.o: mg_filt_laplace.cc mg_func.h mg_token.h m_tokens.h \
 mg_filt_slew.o: mg_filt_slew.cc mg_func.h mg_token.h m_tokens.h \
  mg_expression.h mg_deps.h mg_lib.h mg_base.h mg_filter.h mg_circuit.h \
  mg_discipline.h mg_attrib.h mg_code.h mg_out.h mg_.h mg_module.h
+mg_filt_zi.o: mg_filt_zi.cc mg_func.h mg_token.h m_tokens.h \
+ mg_expression.h mg_deps.h mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h \
+ mg_attrib.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
+ mg_module.h
 mg_func.o: mg_func.cc mg_func.h mg_token.h m_tokens.h mg_expression.h \
  mg_deps.h mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h mg_attrib.h \
  mg_code.h mg_filter.h mg_circuit.h mg_discipline.h mg_module.h

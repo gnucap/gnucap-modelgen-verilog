@@ -191,6 +191,7 @@ bool DEV_FPOLY_G::do_tr()
 {
   assert(_values);
   double c0 = _values[0];
+  // incomplete current input?
   // if (_inputs) {untested();
   //   untested();
   //   for (int i=1; i<=_n_ports; ++i) {untested();

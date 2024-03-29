@@ -180,7 +180,7 @@ protected:
     }
   }
 protected: // base class?
-  bool has_attributes() const{ untested();
+  bool has_attributes() const{
     assert(CKT_BASE::_attribs);
     return CKT_BASE::_attribs->count(this);
   }

@@ -71,7 +71,7 @@ void File::parse(CS& f)
       ;
     if (has_attributes(&f)){
       f.warn(bWARNING, "dangling attributes");
-    }else{ untested();
+    }else{
     }
     if (!f.more()) {
       break;

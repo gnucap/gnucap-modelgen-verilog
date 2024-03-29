@@ -385,7 +385,7 @@ public:
   explicit Token_VAR_REF() : Token_SYMBOL("","")  { unreachable(); }
   ~Token_VAR_REF() {
     trace1("~Token_VAR_REF", name());
-    untested();}
+  }
 protected:
   Token_VAR_REF(Token_VAR_REF const*p, Base* owner);
 public:

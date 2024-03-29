@@ -19,6 +19,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
+ * laplace filter
+ * BUG1: pivot not reconsidered after parameter change.
+ * BUG2: when instanciated from analog block
+ *       highest index is pivot.
+ * BUG3: current input not currently implemented
  */
 #include <globals.h>
 #include <e_compon.h>
@@ -27,12 +32,14 @@
 #include <e_elemnt.h>
 #include <u_nodemap.h>
 #include "e_va.h"
+#include "e_rf.h"
 #include <u_limit.h>
-
 /*--------------------------------------------------------------------------*/
+
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
+bool ac_use_sckt = false;
 /*--------------------------------------------------------------------------*/
 class NATURE_current : public NATURE {
   double abstol()const override {return 1e-12;}
@@ -64,40 +71,22 @@ public:
 };
 static _COMMON_VASRC_electrical _C_V_electrical(CC_STATIC);
 /*--------------------------------------------------------------------------*/
-class LAPLACE;
-class COMMON_LAPLACE :public COMMON_COMPONENT{
-  typedef LAPLACE MOD;
+class COMMON_LAPLACE : public COMMON_RF_BASE {
 public:
-  explicit COMMON_LAPLACE(const COMMON_LAPLACE& p);
-  explicit COMMON_LAPLACE(int c=0);
-           ~COMMON_LAPLACE();
-  bool     operator==(const COMMON_COMPONENT&)const override;
+  PARAMETER<double> _tolerance{NOT_INPUT};
+  std::string name()const override {return "va_laplace";}
+public:
+  ~COMMON_LAPLACE() {}
+  COMMON_LAPLACE(int x) : COMMON_RF_BASE(x) {}
+  COMMON_LAPLACE(COMMON_LAPLACE const& x) = default;
   COMMON_LAPLACE* clone()const override {return new COMMON_LAPLACE(*this);}
-  void     set_param_by_index(int, std::string&, int)override;
-  int      set_param_by_name(std::string, std::string)override;
-  bool     is_valid()const;
-  bool     param_is_printable(int)const override;
-  std::string param_name(int)const override;
-  std::string param_name(int,int)const override;
-  std::string param_value(int)const override;
-  int param_count()const override {
-	  return int(_p_num.size() + _p_den.size())
-			  + COMMON_COMPONENT::param_count();
-  }
-  void precalc_first(const CARD_LIST*)override;
-  void expand(const COMPONENT*)override;
-  void precalc_last(const CARD_LIST*)override;
-  void tr_eval_analog(LAPLACE*)const;
-//  void precalc_analog(LAPLACE*)const;
-  std::string name()const override {itested();return "va_laplace_nd";}
-  static int  count() {return _count;}
-private: // strictly internal
-  static int _count;
-public: // input parameters
-//  PARAMETER<int> _p_vs;
-  std::vector<PARAMETER<double> > _p_num;
-  std::vector<PARAMETER<double> > _p_den;
-}cl; //COMMON_LAPLACE
+
+  bool operator==(const COMMON_COMPONENT& x)const;
+  void set_param_by_index(int I, std::string& Value, int Offset)override;
+  int set_param_by_name(std::string Name, std::string Value)override;
+  void precalc_last(const CARD_LIST* par_scope)override;
+}; //COMMON_LAPLACE
+COMMON_LAPLACE cl(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class LAPLACE : public ELEMENT {
 private:
@@ -139,7 +128,7 @@ public:
   std::string dev_type()const override{assert(has_common()); return common()->name();}
 private: // ELEMENT, pure
   void tr_iwant_matrix() override { return COMPONENT::tr_iwant_matrix(); }
-  void ac_iwant_matrix() override { return COMPONENT::ac_iwant_matrix(); }
+  void ac_iwant_matrix() override;
   double tr_involts()const override{ untested();
     assert(_input);
     return _input->tr_outvolts();
@@ -167,8 +156,8 @@ private: // BASE_SUBCKT
   TIME_PAIR tr_review()override	{assert(subckt()); return _time_by = subckt()->tr_review();}
   void	  tr_accept()override	{assert(subckt()); subckt()->tr_accept(); ELEMENT::tr_accept();}
   void	  tr_unload()override;
-  void	  ac_begin()override	{assert(subckt()); subckt()->ac_begin();}
-  void	  do_ac()override	{assert(subckt()); subckt()->do_ac();}
+  void	  ac_begin()override;
+  void	  do_ac()override;
   void	  ac_load()override;
 private: // overrides
   double tr_amps()const override;
@@ -227,156 +216,53 @@ private: // impl
   friend class COMMON_LAPLACE;
 }; // LAPLACE
 /*--------------------------------------------------------------------------*/
-COMMON_LAPLACE::COMMON_LAPLACE(int c)
-  :COMMON_COMPONENT(c),
-   _p_num(/*default*/),
-   _p_den(/*default*/)
-{
-  ++_count;
-}
-/*--------------------------------------------------------------------------*/
-COMMON_LAPLACE::COMMON_LAPLACE(const COMMON_LAPLACE& p)
-  :COMMON_COMPONENT(p),
-   _p_num(p._p_num),
-   _p_den(p._p_den)
-{
-  ++_count;
-}
-/*--------------------------------------------------------------------------*/
-COMMON_LAPLACE::~COMMON_LAPLACE()
-{
-  --_count;
-}
-/*--------------------------------------------------------------------------*/
 bool COMMON_LAPLACE::operator==(const COMMON_COMPONENT& x)const
 {
   const COMMON_LAPLACE* p = dynamic_cast<const COMMON_LAPLACE*>(&x);
   return (p
-    && _p_num == p->_p_num
-    && _p_den == p->_p_den
-    && COMMON_COMPONENT::operator==(x));
+    && _tolerance == p->_tolerance
+    && COMMON_RF_BASE::operator==(x));
+}
+/*--------------------------------------------------------------------------*/
+void COMMON_LAPLACE::precalc_last(const CARD_LIST* par_scope)
+{
+  COMMON_RF_BASE::precalc_last(par_scope);
+  e_val(&_tolerance, 0. , par_scope);
+
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_LAPLACE::set_param_by_index(int I, std::string& Value, int Offset)
 { untested();
 	incomplete();
   switch (COMMON_LAPLACE::param_count() - 1 - I) {
-  default: COMMON_COMPONENT::set_param_by_index(I, Value, Offset);
+  default: COMMON_RF_BASE::set_param_by_index(I, Value, Offset);
   }
 }
 /*--------------------------------------------------------------------------*/
 int COMMON_LAPLACE::set_param_by_name(std::string Name, std::string Value)
 {
   if(Name == "$mfactor"){ untested();
-    incomplete();
-    Name = "m";
+    _mfactor = Name;
+    return 0; // incomplete();
   }else{
-  }
-  trace2("spbn", Name, Value);
-  if(Name[0] == 'd'){
-    size_t idx = atoi(Name.substr(1).c_str());
-    assert(idx<20);
-    if(idx < _p_den.size()){
-    }else{
-      _p_den.resize(idx + 1);
-    }
-    _p_den[idx] = Value;
-  }else if(Name[0] == 'n'){
-    size_t idx = atoi(Name.substr(1).c_str());
-    assert(idx<20);
-    if(idx < _p_num.size()){
-    }else{
-      _p_num.resize(idx + 1);
-    }
-    _p_num[idx] = Value;
-  }else{ untested();
+    trace2("spbn", Name, Value);
+    return COMMON_RF_BASE::set_param_by_name(Name, Value);
   }
 
-  return 0; // incomplete();
-}
-/*--------------------------------------------------------------------------*/
-bool COMMON_LAPLACE::param_is_printable(int i)const
-{
-  size_t idx = COMMON_LAPLACE::param_count() - 1 - i;
-  if(idx < _p_num.size() + _p_den.size()){
-    return true;
-  }else{
-    return COMMON_COMPONENT::param_is_printable(i);
-  }
-}
-/*--------------------------------------------------------------------------*/
-std::string COMMON_LAPLACE::param_name(int i)const
-{
-  size_t idx = COMMON_LAPLACE::param_count() - 1 - i;
-  if(idx < _p_num.size()){
-    return "n" + to_string(int(idx));
-  }else if(idx < _p_num.size() + _p_den.size()){
-    return "d" + to_string(int(idx - _p_num.size()));
-  }else{ untested();
-    return COMMON_COMPONENT::param_name(i);
-  }
-}
-/*--------------------------------------------------------------------------*/
-std::string COMMON_LAPLACE::param_name(int i, int j)const
-{ untested();
-  if(j==0){ untested();
-    return param_name(i);
-  }else{ untested();
-    return "";
-  }
-}
-/*--------------------------------------------------------------------------*/
-std::string COMMON_LAPLACE::param_value(int i)const
-{
-  size_t idx = COMMON_LAPLACE::param_count() - 1 - i;
-  if (idx < _p_num.size()) {
-	  return _p_num[idx].string();
-  }else if (idx < (_p_num.size() + _p_den.size())) {
-	  return _p_den[idx - _p_num.size()].string();
-  }else{ untested();
-	  return COMMON_COMPONENT::param_value(i);
-  }
-}
-/*--------------------------------------------------------------------------*/
-bool COMMON_LAPLACE::is_valid() const
-{ untested();
-  return true; //COMMON_COMPONENT::is_valid();
-}
-/*--------------------------------------------------------------------------*/
-void COMMON_LAPLACE::expand(const COMPONENT* d)
-{
-  COMMON_COMPONENT::expand(d);
-}
-/*--------------------------------------------------------------------------*/
-void COMMON_LAPLACE::precalc_first(const CARD_LIST* par_scope)
-{
-  assert(par_scope);
-  COMMON_COMPONENT::precalc_first(par_scope);
-  for(auto &pp : _p_num) {
-    e_val(&(pp), 0., par_scope);
-  }
-  for(auto &pp : _p_den) {
-    e_val(&(pp), 0., par_scope);
-  }
-}
-/*--------------------------------------------------------------------------*/
-void COMMON_LAPLACE::precalc_last(const CARD_LIST* par_scope)
-{
-  assert(par_scope);
-  COMMON_COMPONENT::precalc_last(par_scope);
-  for(auto &pp : _p_num) {
-    e_val(&(pp),     0. , par_scope);
-  }
-  for(auto &pp : _p_den) {
-    e_val(&(pp),     0. , par_scope);
-  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-int COMMON_LAPLACE::_count = -1;
 static COMMON_LAPLACE Default_test_lap2(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+void LAPLACE::ac_iwant_matrix()
+{
+  if(ac_use_sckt){ untested();
+    COMPONENT::ac_iwant_matrix();
+  }else{
+    ELEMENT::ac_iwant_matrix_passive();
+  }
+}
 /*--------------------------------------------------------------------------*/
 double LAPLACE::tr_probe_num(std::string const& n) const
 {
@@ -496,8 +382,9 @@ std::string LAPLACE::port_name(int i)const
 	return names[i];
 }
 /*--------------------------------------------------------------------------*/
-LAPLACE m_test_lap2;
-DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "va_laplace_nd", &m_test_lap2);
+LAPLACE laplace;
+DISPATCHER<CARD>::INSTALL d0(&device_dispatcher,
+    "va_laplace|va_laplace_nd|va_laplace_zp|va_laplace_np|va_laplace_zd", &laplace);
 /*--------------------------------------------------------------------------*/
 CARD* LAPLACE::clone()const
 {
@@ -679,6 +566,7 @@ void LAPLACE::expand()
       }else{ untested();
       }
 
+      assert(num_s >= num_num);
       std::vector<node_t> nodes(num_s*2 + 2);
       nodes[0] = _n[n_out0];
       nodes[1] = _n[n_out1];
@@ -695,7 +583,8 @@ void LAPLACE::expand()
 	nodes[2+jj*2 + 1] = gnd;
       }
 
-      _output->set_parameters("out", this, &_C_V_electrical, 0., /*states:*/2 + num_num, _st_b_out_, 2+2*num_num, nodes.data());
+      _output->set_parameters("out", this, &_C_V_electrical, 0., /*states:*/2 + num_num, _st_b_out_,
+	   2+2*num_num, nodes.data());
     }
 
     const CARD* ddt = device_dispatcher[d_ddt_type];
@@ -720,12 +609,12 @@ void LAPLACE::expand()
       if (!_input) {
 	const CARD* input_dev = device_dispatcher[input_dev_type];
 	if(!input_dev){ untested();
-	  throw Exception("Cannot find va_pot. Load module?");
+	  throw Exception("Cannot find " + input_dev_type + ". Load module?");
 	}else{
 	}
 	_input = dynamic_cast<ELEMENT*>(input_dev->clone());
 	if(!_input){ untested();
-	  throw Exception("Cannot use va_pot: wrong type");
+	  throw Exception("Cannot use " + input_dev_type + ": wrong type");
 	}else{
 	}
 	subckt()->push_front(_input);
@@ -762,9 +651,6 @@ void LAPLACE::expand()
       }else{ untested();
       }
       std::vector<node_t> nodes(num_s*2);
-
-//      nodes[2] = _n[n_in0];
-//      nodes[3] = _n[n_in1];
 
       nodes[0] = state_node(_pivot);
       nodes[1] = gnd;
@@ -861,6 +747,7 @@ void LAPLACE::precalc_last()
   _st_b_out_[1] = 0;
 
   double piv = c->_p_den[_pivot];
+  assert(piv);
 
   for(int jj=0; jj<num_num; ++jj){
     _st_b_out_[2+jj] = c->_p_num[jj] / piv;
@@ -903,13 +790,19 @@ void LAPLACE::precalc_last()
     subckt()->precalc_last();
   }else{untested();
   }
-}
+
+  if(0){
+    assert(!common());
+//    assert(_vy0);
+//    _mfactor = _vy0[1];
+    COMPONENT::precalc_first();
+  }
+} // precalc_last
 /*--------------------------------------------------------------------------*/
 void LAPLACE::set_parameters(const std::string& Label, CARD *Owner,
 				   COMMON_COMPONENT *Common, double Value,
 				   int n_states, double states[],
 				   int n_nodes, const node_t nodes[])
-  //				   const double* inputs[])
 {
   trace2("LAPLACE::set_parameters", n_states, n_nodes);
   bool first_time = !_set_parameters;
@@ -926,7 +819,6 @@ void LAPLACE::set_parameters(const std::string& Label, CARD *Owner,
 
   cc->_p_den.resize(dens);
   cc->_p_num.resize(nums);
-  trace2("L", nums, dens);
 
   set_label(Label);
   set_owner(Owner);
@@ -949,13 +841,46 @@ void LAPLACE::set_parameters(const std::string& Label, CARD *Owner,
   trace4("setnodes", net_nodes(), nodes, dens, n_nodes);
   notstd::copy_n(nodes, net_nodes(), _n);
   _loss1 = _loss0 = 1.;
+
 }
 /*--------------------------------------------------------------------------*/
 void LAPLACE::ac_load()
 {
   ac_load_shunt();
-  assert(subckt());
-  subckt()->ac_load();
+  if(ac_use_sckt){ untested();
+    assert(subckt());
+    subckt()->ac_load();
+  }else{
+    ac_load_source();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void LAPLACE::do_ac()
+{
+  if(ac_use_sckt){ untested();
+    assert(subckt());
+    subckt()->do_ac();
+  }else{
+    auto c = prechecked_cast<COMMON_LAPLACE const*>(common());
+    assert(c);
+    assert( c->_p_num.size());
+    assert( c->_p_den.size());
+
+    COMPLEX z = _sim->_jomega;
+    COMPLEX num = evalp(z, c->_p_num.begin(), c->_p_num.size());
+    COMPLEX den = evalp(z, c->_p_den.begin(), c->_p_den.size());
+
+    _acg = num/den;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void LAPLACE::ac_begin()
+{
+  if(ac_use_sckt){ untested();
+    assert(subckt());
+    subckt()->ac_begin();
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void LAPLACE::tr_load()

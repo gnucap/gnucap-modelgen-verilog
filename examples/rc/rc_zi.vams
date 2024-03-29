@@ -1,0 +1,28 @@
+nature current
+  access = I;
+  units = "A";
+  abstol = 1e-12; // OPT::abstol
+endnature
+
+// Electrical potential
+nature voltage
+  access = V;
+  units = "V";
+  abstol = 1e-6; // OPT::vntol
+endnature
+
+// Electrical discipline
+discipline electrical
+  potential voltage;
+  flow current;
+enddiscipline
+
+// H(z) = .707*z^4
+module rc_zi(out, in);
+	electrical out, in;
+	inout out,in;
+	localparam real T=3.141592/16.;
+	analog begin
+		V(out) <+ zi_nd(V(in), '{0., 0.,0.,0.,.707}, '{1.}, T, T/100);
+	end
+endmodule

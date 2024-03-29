@@ -690,8 +690,7 @@ double DEV_CPOLY_CAP::tr_probe_num(const std::string& x)const
 void DEV_CPOLY_CAP::precalc_last()
 {
   assert(!common());
-  if(0 && _loss0){
-  }else{
+  {
     assert(_vy0);
     _mfactor = _vy0[1];
     COMPONENT::precalc_first();

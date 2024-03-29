@@ -198,7 +198,7 @@ void make_one_variable_decl(std::ostream& o, Token_VAR_REF const& V)
     }else{
 //      o__ "ddouble ";
     }
-  }else if(V.type().is_int()) { untested();
+  }else if(V.type().is_int()) {
     o__ "int";
     o << " _v_" << V.name() << "{0}";
   }else{ untested();

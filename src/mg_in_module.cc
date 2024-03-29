@@ -330,11 +330,11 @@ void Variable_List::parse(CS& f)
   }else{ untested();
     unreachable();
   }
-  if(has_attributes()){ untested();
+  if(has_attributes()){
     for (auto x : *this){
       ::attributes(x) = ::attributes(this);
     }
-  }else{ untested();
+  }else{
   }
 } // Variable_List::parse
 /*--------------------------------------------------------------------------*/
@@ -727,7 +727,7 @@ void Module::parse_body(CS& f)
     if (has_attributes(&f)) { untested();
       f.warn(0, "dangling attributesxx");
       print_attributes(std::cerr, &f);
-    }else{ untested();
+    }else{
     }
     if (end){
       break;

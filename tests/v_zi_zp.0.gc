@@ -1,0 +1,18 @@
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+
+parameter r=1
+parameter v=0
+
+vsine #(.dc(v), .ampl(.2)) v1(1, 0);
+va_zi_nd #(.xr0(0.), .rr0(0.)) b(0,out1,1,0);
+
+list
+
+print tran v(1) ll1(dut) ll2(dut) ll3(dut)
+tran 1 .1 trace=n
+status notime
+end

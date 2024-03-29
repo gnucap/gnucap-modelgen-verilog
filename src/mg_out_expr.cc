@@ -538,9 +538,11 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
       if(!A->args()) { untested();
 //	o << A->code_name() << "(); // no parlist\n";
 	assert(!argnames.size());
+	o << " /*(312b)*/ "; //  << A->code_name();
       }else if(!argnames.size()){
 //	o << A->code_name() << "(); // no args\n";
 	s.args_pop();
+	o << "; /*(312a)*/ "; //  << A->code_name();
       }else{
 	o << " /*(312)*/ "; //  << A->code_name();
 

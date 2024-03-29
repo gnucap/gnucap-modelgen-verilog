@@ -45,6 +45,7 @@ mg_filt.cc \
 mg_filt_ddx.cc \
 mg_filt_laplace.cc \
 mg_filt_slew.cc \
+mg_filt_zi.cc \
 mg_func.cc \
 mg_func_pf.cc \
 mg_func_sys.cc \
