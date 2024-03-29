@@ -813,13 +813,12 @@ void Token_VAR_REF::stack_op(Expression* e)const
 {
   auto E = prechecked_cast<Expression_*>(e);
   assert(E);
-  assert(_item);
+//  assert(_item); // or !reachable
 //  auto oi = prechecked_cast<Owned_Base const*>(_item);
 //  assert(oi);
   auto scope = E->scope(); // prechecked_cast<Block const*>(oi->owner());
   assert(scope);
 //  assert(deps());
-  auto nd = deps().clone();
 
   Base const* r = scope->lookup(name());
   if(!r){ untested();
@@ -831,12 +830,15 @@ void Token_VAR_REF::stack_op(Expression* e)const
   }
 
   {
+    TData* nd = NULL;
 //    assert(oi->owner());
     if(auto a = dynamic_cast<Assignment const*>(_item)){
+      nd = deps().clone();
       nd = a->data().clone();
 //      nd->add_sens(_item); not yet.
       trace3("var::stackop a", name(), nd->size(), deps().size());
     }else if(auto dd = dynamic_cast<TData const*>(data())){ untested();
+      nd = deps().clone();
       nd = dd->clone();
 //      nd->add_sens(_item); not yet.
     }else{ untested();
@@ -845,8 +847,8 @@ void Token_VAR_REF::stack_op(Expression* e)const
     }
 
     auto nn = new Token_VAR_REF(*this, nd);
-    nn->deps();
-    assert(nn->num_deps() == nd->ddeps().size());
+    // nn->deps();
+    assert(!_item || nn->num_deps() == nd->ddeps().size());
     e->push_back(nn);
     assert(nn->_item == _item);
 
@@ -1204,11 +1206,6 @@ Data_Type const& Token_VAR_INT::type() const
   static Data_Type_Int t;
   return t;
 };
-/*--------------------------------------------------------------------------*/
-void Token_ARGUMENT::dump(std::ostream& o) const
-{
-  o << name();
-}
 /*--------------------------------------------------------------------------*/
 void Token_ARGUMENT::dump(std::ostream& o) const
 {

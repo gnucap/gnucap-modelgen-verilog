@@ -6,7 +6,7 @@ module shadow(p, n);
 
   analog begin
     if (0) begin
-      i = I(p, n);
+      ;
     end
   end
 

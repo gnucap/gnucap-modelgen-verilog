@@ -186,7 +186,7 @@ static Token_VAR_REF* parse_variable(CS& f, Block* o)
   Token_VAR_REF* v = dynamic_cast<Token_VAR_REF*>(b);
   if(v){
     assert(f);
-    assert(v->data());
+    // assert(v->data()); no. unreachable?
   }else if (b) { untested();
     f.reset_fail(here);
     trace1("not a variable", f.tail().substr(0,10));
@@ -224,7 +224,8 @@ void Assignment::parse(CS& f)
 //    throw Exception_CS_("no assignment", f);
   }
 
-  if(_lhsref) {
+  if(options().optimize_unused() && !scope()->is_reachable()) {
+  }else if(_lhsref) {
     assert(l->data());
     assert(!_token);
     store_deps(Expression_::deps());
@@ -960,8 +961,8 @@ void Assignment::dump(std::ostream& o) const
   if(_token){
     o << _token->name() << " = ";
     Expression_::dump(o);
-  }else{ untested();
-    o << "/// unreachable?\n";
+  }else{
+//    o << "/// unreachable?\n";
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1609,7 +1610,7 @@ public:
       auto coll = prechecked_cast<AF_Arg_List const*>(x);
       assert(coll);
 
-      if(coll->is_output()){ untested();
+      if(coll->is_output()){
 	qual = "/*output*/ &";
       }else{
 	qual = "";
@@ -1833,7 +1834,7 @@ void AF_Arg_List::parse(CS& f)
     _direction = a_input;
   }else if(dir=="out"){
     _direction = a_output;
-  }else if(dir=="ino"){ untested();
+  }else if(dir=="ino"){
     _direction = a_inout;
   }else{ untested();
     trace2("AF_Arg_List::parse", f.tail().substr(0,10), dir);
@@ -2352,7 +2353,7 @@ void Analog::dump(std::ostream& o) const
     dump_shadow_src(o, *m);
   }else if (options().optimize_unused()) {
     dump_shadow_src(o, *m);
-  }else{ untested();
+  }else{
   }
 
   for(auto const& i: blocks()){

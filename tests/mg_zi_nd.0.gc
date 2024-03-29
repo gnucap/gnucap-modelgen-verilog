@@ -4,7 +4,7 @@ attach ../vams/vsine.so
 verilog
 
 `modelgen
-module test_zi_zp0(p, n);
+module test_zi_np0(p, n);
 	(* desc="" *) real ll1;
 	(* desc="" *) real ll2;
 	(* desc="" *) real ll3;
@@ -16,14 +16,14 @@ module test_zi_zp0(p, n);
 	end
 endmodule
 
-!make test_zi_zp0.so > /dev/null
-attach ./test_zi_zp0.so
+!make test_zi_np0.so > /dev/null
+attach ./test_zi_np0.so
 
 verilog
 parameter r=1
 parameter v=0
 
-test_zi_zp0 #() dut(1,0);
+test_zi_np0 #() dut(1,0);
 vsine #(.dc(v), .freq(.2), .ampl(1)) v1(1, 0);
 
 list

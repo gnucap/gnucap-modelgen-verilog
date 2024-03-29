@@ -1,6 +1,6 @@
 parameter r=1 
 parameter v=0 
-test_zi_zp0 #() dut (.p(1),.n(0));
+test_zi_np0 #() dut (.p(1),.n(0));
 vsine #(.freq(.2),.ampl(1),.dc(v)) v1 (.p(1),.n(0));
 no data, assuming no root, constant 1.
 no data, assuming no root, constant 1.

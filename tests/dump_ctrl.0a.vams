@@ -1,8 +1,7 @@
 `include "sub/disciplines.few"
 
 `pragma modelgen dump-annotate
-`pragma modelgen dump-unreachable
-`pragma modelgen nooptimize-unused
+`pragma modelgen nodump-unreachable
 
 module cond0(p,n);
 	analog begin
