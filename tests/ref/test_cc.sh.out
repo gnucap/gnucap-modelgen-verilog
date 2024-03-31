@@ -1559,8 +1559,13 @@ void MOD_resistor::expand()
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::precalc_last()
 {
-  BASE_SUBCKT::precalc_last();
-  auto c = static_cast<COMMON_resistor*>(mutable_common());
+  CARD::precalc_last();
+  try {
+    mutable_common()->precalc_last(scope());
+  }catch (Exception_Precalc& e) { untested();
+    error(bWARNING, long_label() + ": " + e.message());
+  }
+;  auto c = static_cast<COMMON_resistor*>(mutable_common());
   assert(c);
   (void)c;
   zero_filter_readout();
@@ -3255,8 +3260,13 @@ void MOD_capacitor::expand()
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::precalc_last()
 {
-  BASE_SUBCKT::precalc_last();
-  auto c = static_cast<COMMON_capacitor*>(mutable_common());
+  CARD::precalc_last();
+  try {
+    mutable_common()->precalc_last(scope());
+  }catch (Exception_Precalc& e) { untested();
+    error(bWARNING, long_label() + ": " + e.message());
+  }
+;  auto c = static_cast<COMMON_capacitor*>(mutable_common());
   assert(c);
   (void)c;
   zero_filter_readout();
@@ -4091,8 +4101,13 @@ void MOD_capacitor::expand()
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::precalc_last()
 {
-  BASE_SUBCKT::precalc_last();
-  auto c = static_cast<COMMON_capacitor*>(mutable_common());
+  CARD::precalc_last();
+  try {
+    mutable_common()->precalc_last(scope());
+  }catch (Exception_Precalc& e) { untested();
+    error(bWARNING, long_label() + ": " + e.message());
+  }
+;  auto c = static_cast<COMMON_capacitor*>(mutable_common());
   assert(c);
   (void)c;
   zero_filter_readout();

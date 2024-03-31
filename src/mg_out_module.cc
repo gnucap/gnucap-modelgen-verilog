@@ -845,14 +845,27 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   make_tag();
   String_Arg const& mid = m.identifier();
   o << "void MOD_" << mid << "::precalc_last()\n{\n";
-  o__ baseclass(m) << "::precalc_last();\n";
+//    o__ baseclass(m) << "::precalc_last();\n";
+  o__ "CARD::precalc_last();\n";
 
+  o__ "try {\n";
+  o____ "mutable_common()->precalc_last(scope());\n"; // for now.
+  o__ "}catch (Exception_Precalc& e) { untested();\n";
+  o____ "error(bWARNING, long_label() + \": \" + e.message());\n";
+  o__ "}\n;";
+
+  if(m.circuit()->element_list().size()) {
+    o__ "assert(subckt());\n";
+    o__ "subckt()->precalc_last();\n";
+  }else{
+  }
+
+  // bug? using mutable_common.. again.
   o__ "auto c = static_cast<COMMON_" << mid << "*>(mutable_common());\n";
   o__ "assert(c);\n";
   o__ "(void)c;\n";
 
   if(m.circuit()->element_list().size()){
-    o__ "assert(subckt());\n";
     o__ "subckt()->attach_params(&(c->_netlist_params), scope());\n";
   }else{
   }

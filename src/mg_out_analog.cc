@@ -962,15 +962,15 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Token_VAR_REF&
 void OUT_ANALOG::make_one_variable_store(std::ostream& o, Token_VAR_REF const& V) const
 {
   if(!V.type().is_real()) {
-  }else if(!V.is_module_variable()){
-    unreachable();
+//  }else if(!V.is_module_variable()){
+//    unreachable();
   }else if(_mode == modePRECALC){ untested();
     o__ "// d->" << V.code_name() << " = " << V.code_name() << ";\n";
   }else if(V.deps().ddeps().size() == 0){
     // it's a reference.
   }else if(options().optimize_deriv()) {
     // use destructor
-  }else{itested();
+  }else{untested();
     o__ "d->" << V.code_name() << " = " << V.code_name() << ".value();\n";
   }
 }

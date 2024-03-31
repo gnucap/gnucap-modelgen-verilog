@@ -70,7 +70,7 @@ bool Variable_Decl::is_used_in(Base const*) const
 bool Assignment::is_used_in(Base const*) const
 {
   // return _expression->is_used_in(b);
-  incomplete();
+  // incomplete(); later..
   return false;
 }
 /*--------------------------------------------------------------------------*/

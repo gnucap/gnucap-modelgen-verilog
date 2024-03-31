@@ -250,7 +250,6 @@ inline AnalogList const& analog_list(Module const& m)
 class AnalogStmt : public Statement {
   std::vector<Base const*> _used_in;
 public:
-  virtual bool update() = 0;
   void set_used_in(Base const*b); // const;
   void unset_used_in(Base const*b); // const;
   ~AnalogStmt();
@@ -296,7 +295,7 @@ public:
   AnalogCtrlBlock const& body()const { return _body; }
 private:
 //  bool update()override {return _body.update();}
-  TData const& deps(){ return _deps;};
+  TData const& deps()override { return _deps;};
   bool update()override {
     incomplete();
     return false;
@@ -363,7 +362,7 @@ public:
   AnalogConstExpression const& control() const{return _ctrl;}
   SeqBlock const& cases()const {return _body;}
   bool update()override {incomplete(); return false;}
-  TData const& deps(){ return _deps;};
+  TData const& deps()override{ return _deps;};
 }; // AnalogSwitchStmt
 /*--------------------------------------------------------------------------*/
 class AnalogConditionalStmt : public AnalogCtrlStmt {
@@ -463,8 +462,7 @@ private:
   void set_short();
   void set_always_pot();
   void set_direct(bool d=true);
-//  TData& deps() { return _rhs.deps(); }
-  TData const& deps();
+  TData const& deps()override;
 public:
   Contribution(CS& f, Block* o)
     : AnalogStmt(), _branch(NULL, false) {
@@ -539,7 +537,7 @@ public:
 
 private:
   bool update()override;
-  TData const& deps(){ return _deps;};
+  TData const& deps()override { return _deps;};
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

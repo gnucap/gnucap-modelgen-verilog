@@ -81,7 +81,7 @@ public:
   COMMON_LAPLACE(COMMON_LAPLACE const& x) = default;
   COMMON_LAPLACE* clone()const override {return new COMMON_LAPLACE(*this);}
 
-  bool operator==(const COMMON_COMPONENT& x)const;
+  bool operator==(const COMMON_COMPONENT& x)const override;
   void set_param_by_index(int I, std::string& Value, int Offset)override;
   int set_param_by_name(std::string Name, std::string Value)override;
   void precalc_last(const CARD_LIST* par_scope)override;

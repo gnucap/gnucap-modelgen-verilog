@@ -40,11 +40,11 @@ if [ ! -f $srcdir/NEWS ]; then
 	exit 1
 fi
 
-echo \# created by $PWD/$0. do not edit >Makefile
-echo \#------------------------------------------------------------------------ >>Makefile
-echo "srcdir = $srcdir" >> Makefile
-echo "VPATH = \${srcdir}" >> Makefile
-cat $srcdir/Makefile.in >> Makefile
+echo \# created by $PWD/$0. do not edit >makefile
+echo \#------------------------------------------------------------------------ >>makefile
+echo "srcdir = $srcdir" >> makefile
+echo "VPATH = \${srcdir}" >> makefile
+cat $srcdir/Makefile.in >> makefile
 #----------------------------------------------------------------
 echo "CCFLAGS = \\" >Make.ccflags
 echo "-DUNIX -O2 -DNDEBUG -I. -I../include -I../../include -W" >>Make.ccflags
@@ -92,7 +92,7 @@ sub_configure() {
 		srcdir_="$top_srcdir_/$1";
 	fi
 	echo '#stub. need to run configure first' > $m
-	echo "srcdir = $top_srcdir_/$1" >> $m
+	echo "srcdir = $srcdir_" >> $m
 	echo "prefix = $prefix" >> $m
 	echo '%: ; ${srcdir}/configure --prefix="${prefix}" --srcdir="${srcdir}" && ${MAKE} $@' >> $m
 	echo 'all: ; ${srcdir}/configure --prefix="${prefix}" --srcdir="${srcdir}" && ${MAKE}' >> $m

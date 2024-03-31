@@ -130,7 +130,7 @@ TData::~TData()
 /*--------------------------------------------------------------------------*/
 void TData::clear()
 {
-  incomplete();
+  // incomplete(); later.
   _s.clear();
   assert(!_s.size());
 }

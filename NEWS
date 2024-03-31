@@ -2,13 +2,15 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
-2024033*-dev
+20240331-dev
 ============
 * fix allocation in laplace
+* fix uninitialised access in *dt filter
+* refactor Tokens
 * laplace_{zi,np,zp} filters
 * zi_{zi,nd,np,zp} filters
 * revisit build system
-* fix uninitialised access in *dt filter
+* attribute instance improvements
 * output variables in paramset
 
 20240229-dev

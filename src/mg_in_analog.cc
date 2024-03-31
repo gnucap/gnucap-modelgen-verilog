@@ -1898,7 +1898,7 @@ bool Assignment::update()
 /*--------------------------------------------------------------------------*/
 bool AnalogStmt::propagate_rdeps(TData const&)
 {
-  incomplete();
+  /// incomplete(); later
   return false;
 }
 /*--------------------------------------------------------------------------*/

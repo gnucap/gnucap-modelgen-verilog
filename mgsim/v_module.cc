@@ -332,7 +332,8 @@ void DEV_MODULE::precalc_last()
 
     assert(!is_constant()); /* because I have more work to do */
   }else{
-    // its a proto.
+    CARD::precalc_last();
+    // its a proto, bypass common clash hotfix
   }
 }
 /*--------------------------------------------------------------------------*/

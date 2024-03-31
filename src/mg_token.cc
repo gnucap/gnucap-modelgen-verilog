@@ -1020,8 +1020,8 @@ TData const& Token_VAR_REF::deps() const
 }
 /*--------------------------------------------------------------------------*/
 bool Token_VAR_REF::is_module_variable() const
-{ untested();
-    unreachable();
+{ itested();
+    // unreachable(); // fix later.
     return false;
 }
 /*--------------------------------------------------------------------------*/
@@ -1172,7 +1172,7 @@ void Token_VAR_REAL::dump(std::ostream& o) const
 }
 /*--------------------------------------------------------------------------*/
 Data_Type const& Token_VAR_INT::type() const
-{ untested();
+{ itested();
   static Data_Type_Int t;
   return t;
 };
