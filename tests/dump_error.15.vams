@@ -1,0 +1,12 @@
+`include "disciplines.vams"
+
+// 2.8 identifiers..
+// An identifier shall be used to give an object a unique name so it can be referenced.
+
+module hp (B, C, D, V, Y, X);
+ electrical  B, C, D, V, Y, X;
+ real mX;
+ analog begin
+ mX = V(D);
+ end
+endmodule

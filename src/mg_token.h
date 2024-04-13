@@ -88,9 +88,7 @@ public:
 
   Token_NODE* clone()const override { return new Token_NODE(*this); }
 
-  void stack_op(Expression* E)const override{
-    E->push_back(clone());
-  }
+  void stack_op(Expression* E)const override;
 };
 /*--------------------------------------------------------------------------*/
 inline void Token_CALL::attach()

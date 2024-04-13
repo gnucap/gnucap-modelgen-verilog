@@ -817,6 +817,11 @@ void Token_VAR_REF::stack_op(Expression* e)const
   auto scope = E->scope(); // prechecked_cast<Block const*>(oi->owner());
   assert(scope);
 
+      if(!E->is_empty() && dynamic_cast<Token_PARLIST*>(E->back())){
+	throw Exception("syntax_error: ...");
+      }else{
+      }
+
   Base const* r = scope->lookup(name());
   if(!r){ untested();
     assert(dynamic_cast<Paramset const*>(scope)); // ?
@@ -1236,6 +1241,15 @@ Token_VAR_REAL* Token_VAR_REAL::deep_copy(Base* /*owner*/, std::string prefix)co
     unreachable();
     return new Token_VAR_REAL(*this);
   }
+}
+/*--------------------------------------------------------------------------*/
+void Token_NODE::stack_op(Expression* E) const
+{
+  if(!E->is_empty() && dynamic_cast<Token_PARLIST*>(E->back())){
+    throw Exception("syntax_error: Node " + name() + " does not take args");
+  }else{
+  }
+  E->push_back(clone());
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

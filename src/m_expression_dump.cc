@@ -134,7 +134,7 @@ void Expression_::dump(std::ostream& out)const
 	// pop op push
 	const Token* t1 = stack.back();
 	stack.pop_back();
-	Token* t = new Token_SYMBOL((**i).name(), t1->full_name());
+	Token* t = new Token_SYMBOL((**i).name() + t1->full_name());
 	locals.push_back(t);
 	stack.push_back(t);
       }else{
