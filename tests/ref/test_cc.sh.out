@@ -3277,15 +3277,16 @@ void MOD_capacitor::precalc_last()
   }
 }
 /*--------------------------------------------------------------------------*/
+//cc impl
 MOD_capacitor::ddouble MOD_capacitor::_b_ddt_1(ddouble t0)
 {
   MOD_capacitor* d = this;
   typedef MOD_capacitor MOD;
-    d->_st_b_ddt_1_p_ddt_1_n[0] = + t0.value();
-    // dep _potential_b_p_n
-    assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
-    // assert(!d->_st_b_ddt_1_p_ddt_1_n[2]);
-    d->_st_b_ddt_1_p_ddt_1_n[MOD::_st_b_ddt_1_p_ddt_1_n_::dep_potential_b_p_n]  = + t0[d_potential_b_p_n]; // (4)
+  d->_st_b_ddt_1_p_ddt_1_n[0] = + t0.value();
+  // dep _potential_b_p_n
+  assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
+  // assert(!d->_st_b_ddt_1_p_ddt_1_n[2]);
+  d->_st_b_ddt_1_p_ddt_1_n[MOD::_st_b_ddt_1_p_ddt_1_n_::dep_potential_b_p_n]  = + t0[d_potential_b_p_n]; // (4)
   // subdevice
   t0 = 0.;
   t0[d_potential_b_ddt_1_p_ddt_1_n] = 1.;
@@ -4118,15 +4119,16 @@ void MOD_capacitor::precalc_last()
   }
 }
 /*--------------------------------------------------------------------------*/
+//cc impl
 MOD_capacitor::ddouble MOD_capacitor::_b_ddt_2(ddouble t0)
 {
   MOD_capacitor* d = this;
   typedef MOD_capacitor MOD;
-    d->_st_b_ddt_2_p_ddt_2_n[0] = + t0.value();
-    // dep _potential_b_p_n
-    assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
-    // assert(!d->_st_b_ddt_2_p_ddt_2_n[2]);
-    d->_st_b_ddt_2_p_ddt_2_n[MOD::_st_b_ddt_2_p_ddt_2_n_::dep_potential_b_p_n]  = + t0[d_potential_b_p_n]; // (4)
+  d->_st_b_ddt_2_p_ddt_2_n[0] = + t0.value();
+  // dep _potential_b_p_n
+  assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
+  // assert(!d->_st_b_ddt_2_p_ddt_2_n[2]);
+  d->_st_b_ddt_2_p_ddt_2_n[MOD::_st_b_ddt_2_p_ddt_2_n_::dep_potential_b_p_n]  = + t0[d_potential_b_p_n]; // (4)
   auto e = prechecked_cast<ELEMENT const*>(d->_b_ddt_2_p_ddt_2_n);
   assert(e);
   d->_potential_b_ddt_2_p_ddt_2_n = t0 = e->tr_amps(); // (236)

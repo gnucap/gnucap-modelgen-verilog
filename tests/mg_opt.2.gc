@@ -1,0 +1,31 @@
+
+attach ./modelgen_0.so
+
+
+verilog
+
+`modelgen
+module test_opt_2(a, b);
+	electrical a, b;
+	inout a, b;
+	analog begin
+		I(a,b) <+ 0*ddt(V(a,b));
+		I(a,b) <+ ddt(0*V(a,b));
+	end
+endmodule
+
+!make test_opt_2.so > /dev/null
+attach ./test_opt_2.so
+
+parameter r=1
+parameter v=0
+
+test_opt_2 #() dut(0,0);
+
+list
+
+print dc v(dut.*)
+
+dc
+status notime
+end

@@ -31,13 +31,13 @@ class Token_TERNARY : public Token {
   Expression const* _false{NULL};
 protected:
   explicit Token_TERNARY(std::string Name, Base const* Data)
-    : Token(Name, Data) {}
+    : Token(Name, Data) { untested();}
 public:
   explicit Token_TERNARY(std::string Name, Expression const* t, Expression const* f, Base const* d)
     : Token(Name, d), _true(t), _false(f) {}
-  explicit Token_TERNARY(const Token_TERNARY& P) : Token(P) {}
+  explicit Token_TERNARY(const Token_TERNARY& P) : Token(P) { untested();}
   ~Token_TERNARY();
-  Token* clone()const override{return new Token_TERNARY(*this);}
+  Token* clone()const override{ untested();return new Token_TERNARY(*this);}
   Token* op(const Token* t1, const Token* t2, const Token* t3)const;
   void stack_op(Expression*)const override;
 public:
@@ -51,6 +51,7 @@ class FUNCTION_;
 class Probe;
 class Branch_Ref;
 class Block;
+class RDeps;
 class Expression_ : public Expression {
   Base* _owner{NULL};
   Block* _scope{NULL}; // remove. later.
@@ -59,24 +60,26 @@ public:
   ~Expression_();
   void resolve_symbols(Expression const& e);
   void set_owner(Base* b);
-//  void set_scope(Block* b){ _scope = b; }
+//  void set_scope(Block* b){ untested(); _scope = b; }
   void dump(std::ostream& out)const override;
 // private:
   Base* owner(){ return _owner; }
+  Base const* owner() const { untested(); return _owner; }
   Block* scope();
   Block const* scope()const { return const_cast<Expression_*>(this)->scope(); }
 public:
   void clear();
   Expression_* clone() const;
-  TData const& data()const;
-  TData const& deps()const {return data();} // remove?
+  TData const& data()const; // hmm
+  TData const& deps()const{return data();}
   // Attrib const& attrib()const;
-  bool update();
-  bool propagate_rdeps(TData const&);
+  bool update(RDeps const* r=NULL);
   void set_dep(Base*);
+  void set_rdeps(RDeps const&);
+private:
+  bool propagate_rdeps(RDeps const& r);
+//  TData& mutable_deps();
 private: // all the same eventually?
-//  TData& data();
-//  Token* resolve_function(FUNCTION_ const* filt, Block* owner) const;
   Token* resolve_xs_function(std::string const& n);
   Token* resolve_system_task(FUNCTION_ const* t);
   Probe const* new_probe(std::string const& xs, Branch_Ref const& br);

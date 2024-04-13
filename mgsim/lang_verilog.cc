@@ -225,9 +225,9 @@ void LANG_VERILOG::parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 	  cmd >> value;
 	  x->set_port_by_index(index, value);
 	  if (all_new) {
-	    if (x->node_is_grounded(index)) {
+	    if (x->node_is_grounded(index)) { untested();
 	      cmd.warn(bDANGER, here, "node 0 not allowed here");
-	    }else if (x->subckt() && x->subckt()->nodes()->how_many() != index+1) {
+	    }else if (x->subckt() && x->subckt()->nodes()->how_many() != index+1) { untested();
 	      cmd.warn(bDANGER, here, "duplicate port name, skipping");
 	    }else{
 	      ++index;
@@ -239,9 +239,9 @@ void LANG_VERILOG::parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 	  cmd.warn(bDANGER, here, e.message());
 	}
       }
-      if (index < x->min_nodes()) {
+      if (index < x->min_nodes()) { untested();
 	cmd.warn(bDANGER, "need " + to_string(x->min_nodes()-index) +" more nodes, grounding");
-	for (int iii = index;  iii < x->min_nodes();  ++iii) {
+	for (int iii = index;  iii < x->min_nodes();  ++iii) { untested();
 	  x->set_port_to_ground(iii);
 	}
       }else{
@@ -269,8 +269,8 @@ void LANG_VERILOG::parse_ports(CS& cmd, COMPONENT* x, bool all_new)
     cmd >> ')';
   }else{
     cmd.warn(bDANGER, "'(' required (parse ports) (grounding)");
-    for (int iii = 0;  iii < x->min_nodes();  ++iii) {
-      if (!(x->node_is_connected(iii))) {
+    for (int iii = 0;  iii < x->min_nodes();  ++iii) { untested();
+      if (!(x->node_is_connected(iii))) { untested();
 	cmd.warn(bDANGER, x->port_name(iii) + ": port unconnected, grounding");
 	x->set_port_to_ground(iii);
       }else{ untested();
@@ -309,7 +309,7 @@ CARD* LANG_VERILOG::parse_paramset(CS& cmd, CARD* x)
 {
   if(auto c = dynamic_cast<BASE_SUBCKT*>(x)) {
     return parse_paramset_(cmd, c);
-  }else if(auto m = dynamic_cast<MODEL_CARD*>(x)) {
+  }else if(auto m = dynamic_cast<MODEL_CARD*>(x)) { untested();
     //BUG// no paramset_item_declaration, falls back to spice mode
     return obsolete_parse_modelcard(cmd, m);
   }else{ untested();
@@ -319,7 +319,7 @@ CARD* LANG_VERILOG::parse_paramset(CS& cmd, CARD* x)
 }
 /*--------------------------------------------------------------------------*/
 CARD* LANG_VERILOG::obsolete_parse_modelcard(CS& cmd, MODEL_CARD* x)
-{
+{ untested();
   assert(x);
   cmd.reset();
   cmd >> "paramset ";
@@ -327,13 +327,13 @@ CARD* LANG_VERILOG::obsolete_parse_modelcard(CS& cmd, MODEL_CARD* x)
   parse_type(cmd, x);
   cmd >> ';';
 
-  for (;;) {
+  for (;;) { untested();
     parse_args_paramset(cmd, x);
-    if (cmd >> "endparamset ") {
+    if (cmd >> "endparamset ") { untested();
       break;
-    }else if (!cmd.more()) {
+    }else if (!cmd.more()) { untested();
       cmd.get_line("verilog-paramset>");
-    }else{
+    }else{ untested();
       cmd.check(bWARNING, "what's this?");
       break;
     }
@@ -380,7 +380,7 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
       cmd.get_line("verilog-paramset>");
     }else if (!cmd.more()) {
       cmd.get_line("verilog-paramset>");
-    }else{
+    }else{ untested();
       cmd.check(bWARNING, "what's this?");
       break;
     }
@@ -491,7 +491,7 @@ void LANG_VERILOG::print_attributes(OMSTREAM& o, const void* x) const
 }
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_args(OMSTREAM& o, const MODEL_CARD* x)
-{
+{ untested();
   print_args_paramset(o, x);
 }
 /*--------------------------------------------------------------------------*/
@@ -503,14 +503,14 @@ void LANG_VERILOG::print_args_paramset(OMSTREAM& o, const T* x)
     unreachable();
     // x->print_args_obsolete_callback(o, this);  //BUG//callback//
   }else{
-    if(0 && x->subckt()){
-      for(auto p : *x->subckt()->params()){
+    if(0 && x->subckt()){ untested();
+      for(auto p : *x->subckt()->params()){ untested();
 	std::string const& f = p.first;
-	if(!p.second.has_hard_value()){
+	if(!p.second.has_hard_value()){ untested();
 	  o << "  parameter " << p.first << ";\n";
-	}else if(f.size() < 2 || f[0] != '_' || f[1] != '.'){
+	}else if(f.size() < 2 || f[0] != '_' || f[1] != '.'){ untested();
 	  o << "  parameter " << p.first << " = " << p.second.string() << ";\n";
-	}else{
+	}else{ untested();
 	  // hack: hide internal parameter.
 	  // move to instance?
 	}
@@ -710,7 +710,7 @@ class CMD_PARAMSET : public CMD {
     const CARD* proto = OPT::language->find_proto(base_name, NULL);
     CARD* paramset = NULL;
 
-    if(auto model=dynamic_cast<MODEL_CARD const*>(proto)){
+    if(auto model=dynamic_cast<MODEL_CARD const*>(proto)){ untested();
       trace1("CMD_PARAMSET::do_it MODEL_CARD", base_name);
       // Spice compatibility mode. fix later.
       // // BUG also hits paramset //

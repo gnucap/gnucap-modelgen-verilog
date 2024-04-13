@@ -5,8 +5,7 @@ module dep0(d, g);
     // T : 1
     // c : 0
     real c;
-    real T// dep _potential_b_g_
-;
+    real T;
     c = T;
     T = V(g); // dep: _potential_b_g_
     I(d) <+ c;

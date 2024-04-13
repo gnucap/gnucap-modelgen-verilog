@@ -21,7 +21,7 @@
 #include "mg_out.h"
 #include "mg_func.h"
 #include "mg_circuit.h"
-#include "m_tokens.h"
+#include "mg_token.h"
 #include <stack>
 #include "mg_.h" // TODO
 /*--------------------------------------------------------------------------*/
@@ -68,7 +68,7 @@ void make_node_ref(std::ostream& o, const Node& n, bool used=true)
 {
   if(n.is_ground()) {
     o << "gnd";
-  }else if(!used){
+  }else if(!used){ untested();
     o << "gnd";
   }else{
     o << "_n[" << n.code_name() << "]";
@@ -170,7 +170,7 @@ static void make_tr_probe_num(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 static void make_set_parameters(std::ostream& o, const Element_2& e, std::string cn)
 {
-  make_tag();
+  make_tag(o);
   if(cn==""){ untested();
     cn = e.code_name();
   }else{
@@ -253,7 +253,7 @@ static void make_set_subdevice_parameters(std::ostream& o, const Element_2& e)
 /*--------------------------------------------------------------------------*/
 static void make_module_construct_stub(std::ostream& o, const Element_2& e, Module const&)
 {
-  make_tag();
+  make_tag(o);
   // std::string dev_type = "instance_proto";
   std::string dev_type = "instance";
   assert(!dynamic_cast<Branch const*>(&e));
@@ -347,7 +347,7 @@ static void make_build_netlist(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 void make_module_default_constructor(std::ostream& o, const Module& m)
 {
-  make_tag();
+  make_tag(o);
   o << "MOD_" << m.identifier() << "::MOD_" << m.identifier() << "()\n";
   o << "    :" << baseclass(m) << "()";
   o << "\n{\n"
@@ -489,7 +489,7 @@ void make_cc_analog_list(std::ostream& o, const Module& m, Branch const*
 static void make_tr_eval_branch(std::ostream& o, Module const& m,
 		Branch const& br)
 {
-  make_tag();
+  make_tag(o);
   std::string class_name = "EVAL_" + br.code_name() + '_';
   o << "static " << class_name << " Eval_" << br.name()
       << "(CC_STATIC);\n"
@@ -645,7 +645,7 @@ static void make_module_class(std::ostream& o, Module const& m)
 /*--------------------------------------------------------------------------*/
 static void make_module_allocate_local_node(std::ostream& o, const Node& p)
 {
-  make_tag();
+  make_tag(o);
   o__ "// node " << p.name() << " " << p.number() << "\n";
  // if (p.short_if().empty()) { untested();
  //   o <<
@@ -729,13 +729,13 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
     cn = cn_;
   }
 
-  make_tag();
+  make_tag(o);
   auto br = dynamic_cast<Branch const*>(&e);
   if(br){
   }else{
   }
 
-  if (br && br->is_short()) { untested();
+  if (br && br->is_short() && !br->is_filter()) { untested();
     o__ "if(0){ // short\n";
   }else if (!(e.omit().empty())) { untested();
     o__ "if (" << e.omit() << ") {\n";
@@ -807,7 +807,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
 /*--------------------------------------------------------------------------*/
 static void make_module_precalc_first(std::ostream& o, Module const& m)
 {
-  make_tag();
+  make_tag(o);
   String_Arg const& mid = m.identifier();
   o << "void MOD_" << mid << "::precalc_first()\n{\n";
   o__ baseclass(m) << "::precalc_first();\n";
@@ -842,7 +842,7 @@ static void make_module_precalc_first(std::ostream& o, Module const& m)
 /*--------------------------------------------------------------------------*/
 static void make_module_precalc_last(std::ostream& o, Module const& m)
 {
-  make_tag();
+  make_tag(o);
   String_Arg const& mid = m.identifier();
   o << "void MOD_" << mid << "::precalc_last()\n{\n";
 //    o__ baseclass(m) << "::precalc_last();\n";
@@ -895,7 +895,7 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
 /*--------------------------------------------------------------------------*/
 static void make_module_expand(std::ostream& o, Module const& m)
 {
-  make_tag();
+  make_tag(o);
   String_Arg const& mid = m.identifier();
   o << "void MOD_" << mid << "::expand()\n{\n";
   o__ "trace1(\"expand\", long_label());\n";
@@ -944,17 +944,23 @@ static void make_module_expand(std::ostream& o, Module const& m)
   o << "\n";
   o__ "// clone branches\n";
   for(auto i: m.circuit()->branches()){
-    if(i->has_element()) {
+    if(i->is_filter()) {
+      o__ "// filter " << i->name() << "\n";
+      indent x;
+      if(i->is_used()) {
+	make_module_expand_one_branch(o, *i, m, "");
+      }else{
+	o__ "//unused filter\n";
+      }
+    }else if(!i->is_used()) {
+      o__ "// unused " << i->name() << "\n";
+    }else if(i->has_element()) {
       o__ "// branch " << i->name() << "\n";
       indent x;
       make_module_expand_one_branch(o, *i, m, "");
 //      for(auto n : i->names()){ untested();
 //	make_module_expand_one_branch(o, *i, m, "_br_" + n);
 //      }
-    }else if(i->is_filter()) {
-      o__ "// filter " << i->name() << "\n";
-      indent x;
-      make_module_expand_one_branch(o, *i, m, "");
     }else{
       o__ "// branch no elt " << i->name() << "\n";
     }
@@ -1016,14 +1022,18 @@ static void make_module_dispatcher(std::ostream& o, Module const& m)
 /*--------------------------------------------------------------------------*/
 static void make_cc_func(std::ostream& o, const Module& m)
 {
-  for(auto f : m.funcs()){
-    f->make_cc_impl(o);
+  for(FUNCTION_ const* f : m.funcs()){
+    make_tag(o);
+    if(f->has_probes()){
+      f->make_cc_impl(o);
+    }else{
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
 void make_cc_module(std::ostream& o, const Module& m)
 {
-  make_tag();
+  make_tag(o);
 
   make_cc_decl(o, m);
   make_cc_common(o, m);

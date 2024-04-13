@@ -55,27 +55,27 @@ public:
   explicit DEV_CPOLY_G();
   ~DEV_CPOLY_G();
 protected: // override virtual
-  char	   id_letter()const override	{unreachable(); return '\0';}
-  std::string value_name()const override{incomplete(); return "";}
-  std::string dev_type()const override	{unreachable(); return "cpoly_g";}
+  char	   id_letter()const override	{ untested();unreachable(); return '\0';}
+  std::string value_name()const override{ untested();incomplete(); return "";}
+  std::string dev_type()const override	{ untested();unreachable(); return "cpoly_g";}
   int	   max_nodes()const override	{return net_nodes();}
   int	   min_nodes()const override	{return net_nodes();}
   int	   matrix_nodes()const override	{return _n_ports*2;}
   int	   net_nodes()const override	{return _n_ports*2;}
-  CARD*	   clone()const override	{return new DEV_CPOLY_G(*this);}
-  void	   tr_iwant_matrix()override	{tr_iwant_matrix_extended();}
+  CARD*	   clone()const override	{ untested();return new DEV_CPOLY_G(*this);}
+  void	   tr_iwant_matrix()override	{ untested();tr_iwant_matrix_extended();}
   bool	   do_tr()override;
   void	   tr_load()override;
   void	   tr_unload()override;
-  double   tr_involts()const override	{unreachable(); return NOT_VALID;}
-  double   tr_involts_limited()const override {unreachable(); return NOT_VALID;}
+  double   tr_involts()const override	{ untested();unreachable(); return NOT_VALID;}
+  double   tr_involts_limited()const override { untested();unreachable(); return NOT_VALID;}
   double   tr_amps()const override;
-  void	   ac_iwant_matrix()override	{ac_iwant_matrix_extended();}
+  void	   ac_iwant_matrix()override	{ untested();ac_iwant_matrix_extended();}
   void	   ac_load()override;
   COMPLEX  ac_involts()const override	{itested(); return NOT_VALID;}
   COMPLEX  ac_amps()const override	{itested(); return NOT_VALID;}
 
-  bool has_iv_probe()const override {return true;}
+  bool has_iv_probe()const override { untested();return true;}
   void expand_last()override;
   void expand_current_port(size_t i);
 

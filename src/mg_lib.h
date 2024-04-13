@@ -65,22 +65,25 @@ public:
   const_iterator begin()const { return _s.begin(); }
   const_iterator end()const { return _s.end(); }
   std::pair<iterator, bool> insert(T* t) { return _s.insert(t); }
-  void merge(pSet const& s) {
+  void clear() { _s.clear(); }
+  size_t merge(pSet const& s) {
      // _s.merge(s._s);// c++17
+     size_t r = 0;
      for(auto x : s._s){
-       _s.insert(x);
+       r += _s.insert(x).second;
      }
+     return r;
   }
-//  T*& operator[](std::string const& k){
+//  T*& operator[](std::string const& k){ untested();
 //    T K(k);
 //    auto p = _s.insert(&K);
-//    if(p.second){
+//    if(p.second){ untested();
 //      *p.first = NULL;
-//    }else{
+//    }else{ untested();
 //    }
 //  }
   size_t size()const {return _s.size();}
-  bool empty()const {return _s.empty();}
+  bool empty()const { untested();return _s.empty();}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

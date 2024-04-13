@@ -21,7 +21,7 @@
 /*--------------------------------------------------------------------------*/
 #include "mg_out.h"
 #include "mg_func.h"
-#include "m_tokens.h"
+#include "mg_token.h"
 #include "mg_options.h"
 #include "mg_analog.h" // BUG. Probe
 #include <globals.h>
@@ -390,7 +390,7 @@ public:
     assert(!_args.empty());
     _args.pop();
   }
-  size_t size() const{
+  size_t size() const{ untested();
     return _refs.size();
   }
   std::string code_name() const{
@@ -486,7 +486,7 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
 
     if (auto var = dynamic_cast<const Token_VAR_REF*>(*i)) {
       s.new_rhs(var); // if linear?
-//    }else if (auto t = dynamic_cast<const Token_OUT_VAR*>(*i)) {
+//    }else if (auto t = dynamic_cast<const Token_OUT_VAR*>(*i)) { untested();
 //      s.new_rhs(t); // if linear?
 //      //incomplete();
 //      //o__ "0.; // OUTVAR?!\n";

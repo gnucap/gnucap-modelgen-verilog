@@ -308,12 +308,12 @@ void PARAMSET::grow_nodes(size_t Index)
   if(Index<_node_capacity){
   }else{
     size_t new_capacity = std::max(_node_capacity, node_capacity_floor);
-    while(new_capacity <= Index) {
+    while(new_capacity <= Index) { untested();
       assert(new_capacity < new_capacity * 2);
       new_capacity *= 2;
     }
     node_t* new_nodes = new node_t[new_capacity];
-    for(size_t i=0; i<_node_capacity; ++i){
+    for(size_t i=0; i<_node_capacity; ++i){ untested();
       new_nodes[i] = _n[i];
     }
     delete[] _n;
@@ -327,7 +327,7 @@ int PARAMSET::set_param_by_name(std::string Name, std::string Value)
   trace3("PARAMSET::spbn", long_label(), Name, Value);
   assert(_parent);
 
-  if(Name==""){
+  if(Name==""){ untested();
       throw Exception_No_Match("invalid parameter: " + Name);
   }else if(_parent->subckt()){
     trace2("PARAMSET::spbn", long_label(), _parent->long_label());
@@ -484,7 +484,7 @@ void resolve_copy(CARD_LIST* t, PARAM_LIST const& p, const CARD_LIST*)
       out.set(i->first, s.str());
       trace2("resolve copy1", i->first, s.str());
 
-    }else{
+    }else{ untested();
     }
   }
 }

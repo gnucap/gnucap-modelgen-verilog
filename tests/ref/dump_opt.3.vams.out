@@ -1,0 +1,13 @@
+module test_opt3(np, n);
+  inout p, n;
+  electrical p, n;
+  analog begin // always
+    I(p, n) <+ 0.;
+    I(p, n) <+ 0.;
+    I(p, n) <+ 0.;
+  end
+
+endmodule
+
+
+

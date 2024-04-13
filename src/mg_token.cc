@@ -22,7 +22,7 @@
  * arithmetic tokens
  */
 #include "mg_expression.h"
-#include "m_tokens.h"
+#include "mg_token.h"
 #include "mg_func.h"
 #include "mg_options.h"
 #include "mg_analog.h" // BUG
@@ -54,6 +54,7 @@ static bool is_constant(Token const* t, double val=NOT_VALID)
     assert(dynamic_cast<Token_CONSTANT const*>(t)
 	  ||dynamic_cast<Token_PAR_REF const*>(t));
     if(val == NOT_VALID){
+      trace1("constant", t->name());
       return true;
     }else{
       return f->value() == val;
@@ -427,7 +428,14 @@ void Token_BINOP_::stack_op(Expression* E)const
     }
 
   }
+
+  trace1("binop result", E->back()->name());
   return;
+}
+/*--------------------------------------------------------------------------*/
+void Token_OUT_VAR::stack_op(Expression* E)const
+{
+  E->push_back(clone());
 }
 /*--------------------------------------------------------------------------*/
 void Token_TERNARY_::stack_op(Expression* E)const
@@ -507,8 +515,10 @@ static TData* new_deps(Base const* data)
   }
 }
 /*--------------------------------------------------------------------------*/
-void Token_CALL::stack_op(Expression* E)const
+void Token_CALL::stack_op(Expression* e) const
 {
+  Expression_* E = prechecked_cast<Expression_*>(e);
+  assert(E);
   trace1("call stackop", name());
   assert(E);
   Expression const* arg_expr = args();
@@ -527,13 +537,7 @@ void Token_CALL::stack_op(Expression* E)const
     }else{ untested();
     }
   }else if(dynamic_cast<Token_PARLIST const*>(E->back())) { untested();
-    T1 = E->back(); // Token_PARLIST?
-    assert(T1);
-    Base const* d = T1->data();
-
-    E->pop_back();
-    arg_expr = prechecked_cast<Expression const*>(d);
-    assert(arg_expr || !d);
+    assert(0);
   }else{
   }
 
@@ -578,12 +582,6 @@ void Token_CALL::stack_op(Expression* E)const
   }else if(!dynamic_cast<const Token_PARLIST*>(E->back())) {
     // SFCALL
     E->push_back(new Token_CALL(*this, const_deps.clone()));
-  }else if(auto PL = dynamic_cast<const Token_PARLIST*>(E->back())) { untested();
-    assert(0); // doesnt work
-    trace2("collect deps?", name(), E->back()->name());
-    auto deps = ::new_deps(PL);
-
-    E->push_back(new Token_CALL(*this, deps));
   }else{ untested();
     trace2("no params?", name(), E->back()->name());
     incomplete();
@@ -1029,7 +1027,7 @@ Data_Type const& Token_VAR_REF::type() const
 {
   if(auto it=dynamic_cast<Assignment const*>(_item)){
     return it->type();
-  }else if(auto p = dynamic_cast<Variable_Decl const*>(_item)){
+  }else if(auto p = dynamic_cast<Variable_Decl const*>(_item)){ untested();
     assert(p);
     return p->type();
   }else if(auto af = dynamic_cast<Analog_Function const*>(_item)){
@@ -1051,7 +1049,7 @@ bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
     assert(it->scope());
     assert(from.scope());
     return it->propagate_deps(from);
-  }else if(auto p = dynamic_cast<Variable_Decl*>(_item)){
+  }else if(auto p = dynamic_cast<Variable_Decl*>(_item)){ untested();
     return p->propagate_deps(from);
   }else if(dynamic_cast<Analog_Function*>(_item)){
   }else{ untested();
@@ -1141,7 +1139,7 @@ void Token_VAR_INT::stack_op(Expression* e)const
   assert(oi);
   auto nd = deps().clone();
 
-  {
+  { untested();
     if(auto a = dynamic_cast<Assignment const*>(_item)){ untested();
       nd = a->data().clone();
       trace3("var::stackop a", name(), nd->size(), deps().size());
@@ -1208,16 +1206,23 @@ Token_VAR_REF* Token_VAR_REF::clone()const
 }
 /*--------------------------------------------------------------------------*/
 Token_VAR_REF* Token_VAR_REF::deep_copy(Base* /*owner*/, std::string prefix)const
-{
-  if(dynamic_cast<TData const*>(_item)) {
+{ untested();
+  if(dynamic_cast<TData const*>(_item)) { untested();
     auto cl = new TData;
     auto n = new Token_VAR_REF(prefix + name(), cl, cl);
     attributes(n) = attributes(this);
     return n;
-  }else{
+  }else{ untested();
     unreachable();
     return new Token_VAR_REF(*this);
   }
+}
+/*--------------------------------------------------------------------------*/
+bool Token_VAR_REF::is_used() const
+{ untested();
+  auto td = prechecked_cast<TData const*>(data());
+  assert(td);
+  return td->is_used();
 }
 /*--------------------------------------------------------------------------*/
 Token_VAR_REAL* Token_VAR_REAL::deep_copy(Base* /*owner*/, std::string prefix)const
@@ -1227,7 +1232,7 @@ Token_VAR_REAL* Token_VAR_REAL::deep_copy(Base* /*owner*/, std::string prefix)co
     auto n = new Token_VAR_REAL(prefix + name(), cl, cl);
     attributes(n) = attributes(this);
     return n;
-  }else{
+  }else{ untested();
     unreachable();
     return new Token_VAR_REAL(*this);
   }

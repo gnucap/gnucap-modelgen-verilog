@@ -25,7 +25,7 @@
 #include "mg_func.h"
 #include "mg_out.h"
 #include "mg_analog.h"
-#include "m_tokens.h"
+#include "mg_token.h"
 #include <globals.h>
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/
@@ -267,6 +267,10 @@ public:
     assert(_m);
     _m->set_to_ground(_br->n());
   }
+  void set_p_to_gnd()const {
+    assert(_m);
+    _m->set_to_ground(_br->p());
+  }
 private:
   Branch const* output()const override;
   Node_Ref p()const override;
@@ -277,6 +281,9 @@ private:
     o__ "t0[d_potential" << cn << "] = -1.;\n";
     o__ "assert(t0 == t0);\n";
   }
+private: // setup
+  void setup()override;
+  Branch* branch() { return _br; }
 }; // LAP
 /*--------------------------------------------------------------------------*/
 class LZP : public LAP{
@@ -407,12 +414,19 @@ void Token_LAP::stack_op(Expression* e)const
   }else{ untested();
     unreachable();
   }
-
-  trace0("xdt use?");
+}
+/*--------------------------------------------------------------------------*/
+// duplicate. move up?
+void LAP::setup()
+{
+  auto func = this;
   int c_cnt = 0;
   bool assigned = false;
   bool always = false;
-  Contribution const* cont=NULL;
+  bool rdeps = false;
+  bool unknown = false;
+  Contribution const* cont = NULL;
+  trace1("xdt used_in?", branch()->used_in().size());
   for(auto b : branch()->used_in()) {
     if(auto c = dynamic_cast<Contribution const*>(b)){
       if(c->is_flow_contrib()) {
@@ -426,17 +440,30 @@ void Token_LAP::stack_op(Expression* e)const
 	always = true;
       }else{ untested();
       }
-    }else if(dynamic_cast<Assignment const*>(b)){ untested();
+    }else if(dynamic_cast<Assignment const*>(b)){
       assigned = true;
+    }else if(dynamic_cast<Branch const*>(b)){
+      rdeps = true;
+      // covered by rdeps?
+    }else if(dynamic_cast<Variable_List_Collection const*>(b)){
     }else{untested();
+      trace1("xdt unknown?", c_cnt);
+      unknown = true;
+      assert(0);
     }
   }
+  for(auto b : branch()->deps().rdeps()) { untested();
+    (void)b;
+    rdeps = true;
+  }
+
+  trace4("xdt use?", c_cnt, rdeps, assigned, branch()->code_name());
   func->_output = NULL;
-  if(c_cnt!=1){
-  }else if(assigned){ untested();
-  }else if(cont->has_sensitivities()) { itested();
-  }else if(always){
-    for(auto d : cont->data().ddeps()){
+  if(!has_refs()){ untested();
+    func->set_p_to_gnd();
+  }else if(cont && cont->has_sensitivities()) { untested();
+  }else if(c_cnt == 1 && always){
+    for(auto d : cont->ddeps()){
       if(d->branch() != branch()) { untested();
       }else if(d.is_linear()){
 	// incomplete();
@@ -446,7 +473,16 @@ void Token_LAP::stack_op(Expression* e)const
       }else{
       }
     }
+  }else if(rdeps){
+  }else if(c_cnt==0){
+    incomplete(); // analysis?
+    func->set_p_to_gnd();
+    // func->_output = cont->branch(); // polarity?
+  }else if(assigned){ untested();
+  }else if(c_cnt!=1){ untested();
   }else{ untested();
+    incomplete();
+    // func->set_p_to_gnd();
   }
 }
 /*--------------------------------------------------------------------------*/

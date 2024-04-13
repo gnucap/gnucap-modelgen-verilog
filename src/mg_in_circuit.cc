@@ -122,5 +122,32 @@ Port_3* Circuit::find_port(std::string const& n)
   }
 }
 /*--------------------------------------------------------------------------*/
+bool Branch::is_used_in(Base const* b)const
+{
+  for(auto& i : _used_in){
+    if(i == b){
+      return true;
+    }else{
+    }
+  }
+  return false;
+}
+/*--------------------------------------------------------------------------*/
+bool Branch::is_used()const
+{
+  if(is_filter()){
+    assert(_ctrl);
+    return _ctrl->has_refs();
+  }else if(_use){
+    return true;
+  }else if(_has_flow_probe) {
+    return true;
+//  }else if(_used_in.size()) { untested();
+//    return true;
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

@@ -276,14 +276,14 @@ double LAPLACE::tr_probe_num(std::string const& n) const
       return _n[net_nodes() + idx].v0();
     }else{ untested();
     }
-  }else{
+  }else{ untested();
   }
 
-  if(n == "vin") {
+  if(n == "vin") { untested();
     return _st_b_in_[0];
   }else if(n == "conv") { untested();
     return converged();
-  }else{
+  }else{ untested();
     return ELEMENT::tr_probe_num(n);
   }
 }
@@ -791,7 +791,7 @@ void LAPLACE::precalc_last()
   }else{untested();
   }
 
-  if(0){
+  if(0){ untested();
     assert(!common());
 //    assert(_vy0);
 //    _mfactor = _vy0[1];

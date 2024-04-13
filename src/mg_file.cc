@@ -69,7 +69,7 @@ void File::parse(CS& f)
       || ((f >> "discipline ")    && (f >> _discipline_list))
       || ((f >> "paramset ")      && (f >> _paramset_list))
       ;
-    if (has_attributes(&f)){
+    if (has_attributes(&f)){ untested();
       f.warn(bWARNING, "dangling attributes");
     }else{
     }

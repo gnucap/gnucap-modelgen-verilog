@@ -66,11 +66,11 @@ protected:
 /*--------------------------------------------------------------------------*/
 bool VAPOT::do_tr_con_chk_and_q()
 {
-  if(!_sim->_v0){
-  // }else if(_loaditer != _sim->iteration_tag()){
+  if(!_sim->_v0){ untested();
+  // }else if(_loaditer != _sim->iteration_tag()){ untested();
   }else if(_loaditer != _sim->iteration_tag()){
     q_load();
-  }else{
+  }else{ untested();
   }
 
   assert(_old_values);
@@ -104,7 +104,7 @@ bool VAPOT::do_tr()
 
   assert(_loss0);
 #if 0
-  if(_values[0] == LINEAR) {
+  if(_values[0] == LINEAR) { untested();
     // tmp hack
     _m0.x = 0.;
     // _m0.c0 = -_loss0 * _y[0].f1; // d_vs.
@@ -149,10 +149,10 @@ void VAPOT::tr_load()
   for (int i=0; i<=_n_ports; ++i) {
     _old_values[i] = _values[i];
   }
-  if(!_loss0){
-    if(_loss1){
+  if(!_loss0){ untested();
+    if(_loss1){ untested();
       tr_unload_shunt(); // 4 pt +- loss
-    }else{
+    }else{ untested();
     }
 
     tr_load_passive();
@@ -160,9 +160,9 @@ void VAPOT::tr_load()
     assert(!_loss0);
     // loss but CS mode.
     //
-    if(_loss1){
+    if(_loss1){ untested();
       tr_unload_shunt(); // 4 pt +- loss
-    }else{
+    }else{ untested();
     }
 			
     tr_load_passive();
@@ -187,7 +187,7 @@ double VAPOT::tr_amps()const
 {
   double amps = 0.;
   if(_loss0){
-  }else{
+  }else{ untested();
   }
   // amps = fixzero((_loss0 * tr_outvolts() + _m0.c1 * tr_involts() + _m0.c0), _m0.c0);
   amps = _loss0 * tr_outvolts() + _m0.c1 * tr_involts() + _m0.c0;
@@ -203,7 +203,7 @@ void VAPOT::ac_load()
 {
   if(_loss0){
     ac_load_shunt(); // 4 pt +- loss
-  }else{
+  }else{ untested();
   }
   if(_current_port_names.size()){ untested();
     incomplete();
@@ -215,7 +215,7 @@ void VAPOT::ac_load()
   for (int i=2; i<=_n_ports; ++i) {
     if(_loss0){
       ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], - _values[i] * _loss0);
-    }else{
+    }else{ untested();
       ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i]);
     }
   }

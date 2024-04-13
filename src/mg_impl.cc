@@ -22,7 +22,7 @@
 #include "mg_in.h"
 #include "mg_func.h" // TODO
 #include "mg_discipline.h"
-#include "m_tokens.h" // TData
+#include "mg_token.h" // TData
 #include "mg_options.h" // TData
 /*--------------------------------------------------------------------------*/
 Dep mg_const_dep(NULL);
@@ -337,17 +337,6 @@ bool Branch::has_flow_probe() const
   return _has_flow_probe;
 }
 /*--------------------------------------------------------------------------*/
-bool Branch::is_used()const
-{
-  if(_use){
-    return true;
-  }else if(_has_flow_probe) {
-    return true;
-  }else{
-    return false;
-  }
-}
-/*--------------------------------------------------------------------------*/
 bool Branch::is_generic()const
 {
   if(!is_direct()){
@@ -498,15 +487,6 @@ Branch_Ref& Branch_Ref::operator=(Branch_Ref const& o)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-//std::string const* Branch::reg_name(std::string const&s)
-//{ untested();
-//  for(auto i: _names){ untested();
-//    assert(i!=s);
-//  }
-//  _names.push_back(s);
-//  return &_names.back();
-//}
-/*--------------------------------------------------------------------------*/
 // has_source? is_source?
 bool Branch::has_element() const
 {
@@ -601,7 +581,7 @@ void Module::setup_nodes()
 {
   assert(_circuit);
   for(auto& br : _circuit->branches()){
-    if(br->is_short()) { untested();
+    if(br->is_short()) {
     }else if(br->req_short()) {
       trace4("short", br->name(), br->p()->number(), br->n()->number(), _circuit->net_nodes());
       if(br->p()->number() > int(_circuit->net_nodes())
@@ -633,8 +613,8 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args)
 /*--------------------------------------------------------------------------*/
 // std::string Variable_Decl::code_name() const
 std::string Variable_Decl::code_name() const
-{
-  if(is_real()){
+{ untested();
+  if(is_real()){ untested();
     return "_v_" + name();
   }else if(is_int()){ untested();
     return "_v_" + name();
@@ -651,11 +631,6 @@ void Branch::set_direct(bool d)
 {
   _direct = d;
 }
-/*--------------------------------------------------------------------------*/
-// double Assignment::eval() const
-// { untested();
-//   return rhs().eval();
-// }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void Branch::attach(Branch_Ref* r)
@@ -729,7 +704,7 @@ Block* Block::scope() const
   }else if(auto b = dynamic_cast<Block*>(_owner)){
     // incomplete?
     return b;
-  }else{
+  }else{ untested();
     unreachable();
     return NULL;
   }
@@ -742,11 +717,11 @@ Block* Block::scope()
   }else if(auto b = dynamic_cast<Block*>(_owner)){
     // incomplete?
     return b;
-  }else if(dynamic_cast<File const*>(_owner)){
+  }else if(dynamic_cast<File const*>(_owner)){ untested();
     return NULL;
   }else if(!_owner){
     return NULL;
-  }else{
+  }else{ untested();
     assert(0);
     return NULL;
   }
@@ -756,8 +731,9 @@ void Block::push_back(Base* c)
 {
   List_Base<Base>::push_back(c);
   if(auto v=dynamic_cast<Variable_Decl const*>(c)){ untested();
+    unreachable();
       trace1("reg var_ref", v->name());
-    _var_refs[v->name()] = c;
+    _var_refs[v->name()] = c; // BUG
   }else{
   }
 }
@@ -802,10 +778,10 @@ Base* Block::lookup(std::string const& k, bool recurse)
     assert(scope() != this);
     return scope()->lookup(k, true);
   }else if(dynamic_cast<File const*>(this)){
-  }else if(auto st = dynamic_cast<Statement*>(owner())){
+  }else if(auto st = dynamic_cast<Statement*>(owner())){ untested();
     assert(st->scope());
     return st->scope()->lookup(k, true);
-  }else{
+  }else{ untested();
     assert(dynamic_cast<File const*>(this));
   }
   return NULL;
@@ -880,13 +856,14 @@ double ValueRangeInterval::eval() const
     return NOT_INPUT;
   }else if(_ub == _lb){
     return _ub.expression().eval();
-  }else{
+  }else{ untested();
     return NOT_INPUT;
   }
 }
 /*--------------------------------------------------------------------------*/
 void Node::set_to_ground(Module*)
 {
+  _fanout.clear();
   _number = 0;
 }
 /*--------------------------------------------------------------------------*/
@@ -985,7 +962,8 @@ Circuit::~Circuit()
   _branches.clear();
 }
 /*--------------------------------------------------------------------------*/
-void Branch_Map::clear() {
+void Branch_Map::clear()
+{
   while(!_names.is_empty()){
     delete _names.back();
     _names.pop_back();

@@ -38,8 +38,8 @@ namespace notstd {
 /*--------------------------------------------------------------------------*/
 template <class InputIter, class Size, class OutputIter>
 void add_n(InputIter first, Size count, OutputIter result)
-{
-  for ( ; count > 0; --count) {
+{ untested();
+  for ( ; count > 0; --count) { untested();
     *result++ += *first++;
   }
 }
@@ -57,514 +57,514 @@ typedef int integer;
 template<int numderiv>
 class ddouble_ {
 protected:
-	double _data[1+numderiv];
+  double _data[1+numderiv];
 public:
-	ddouble_(ddouble_ const& o) {
-		notstd::copy_n(o._data, numderiv+1, _data);
-	}
-	explicit ddouble_() { clear(); }
-	// fixme: implicit conversion in af args..
-	/*explicit*/ ddouble_(int const& d) { clear(); *_data = d; }
-	/*explicit*/ ddouble_(double const& d) { clear(); *_data = d; }
-	/*explicit*/ ddouble_(PARAMETER<double> const& d) { clear(); *_data = d; }
-	void	set_all_deps() {
-	  std::fill_n(_data+1, numderiv, 0.);
-	}
-	void	set_no_deps() {
-	  std::fill_n(_data+1, numderiv, std::numeric_limits<double>::quiet_NaN());
-	}
+  ddouble_(ddouble_ const& o) {
+    notstd::copy_n(o._data, numderiv+1, _data);
+  }
+  explicit ddouble_() { clear(); }
+  // fixme: implicit conversion in af args..
+  /*explicit*/ ddouble_(int const& d) { untested(); clear(); *_data = d; }
+  /*explicit*/ ddouble_(double const& d) { clear(); *_data = d; }
+  /*explicit*/ ddouble_(PARAMETER<double> const& d) { clear(); *_data = d; }
+  void set_all_deps() {
+    std::fill_n(_data+1, numderiv, 0.);
+  }
+  void set_no_deps() {
+    std::fill_n(_data+1, numderiv, std::numeric_limits<double>::quiet_NaN());
+  }
 private:
-	void	reset_deriv(){
-	  set_all_deps();
-	}
+  void reset_deriv(){
+    set_all_deps();
+  }
 public:
-	virtual double const& value()const {return _data[0];}
-	double d(int i)const {return _data[i];}
-	double const& operator[](int i)const {return _data[i+1];}
-	double& operator[](int i){return _data[i+1];}
-	operator double()const { return *_data; }
+  virtual double const& value()const {return _data[0];}
+  double d(int i)const { untested();return _data[i];}
+  double const& operator[](int i)const { untested();return _data[i+1];}
+  double& operator[](int i){return _data[i+1];}
+  operator double()const { return *_data; }
 #if 1
- 	ddouble_& operator=(ddouble_ const& o) {
- 		assert(o == o);
- 		notstd::copy_n(o._data, numderiv+1, _data);
- 		return *this;
- 	}
+  ddouble_& operator=(ddouble_ const& o) {
+    assert(o == o);
+    notstd::copy_n(o._data, numderiv+1, _data);
+    return *this;
+  }
 #else
-	ddouble_& operator=(ddouble_ o) {
-		assert(o == o);
-		notstd::copy_n(o._data, numderiv+1, _data);
-		return *this;
-	}
+  ddouble_& operator=(ddouble_ o) { untested();
+    assert(o == o);
+    notstd::copy_n(o._data, numderiv+1, _data);
+    return *this;
+  }
 #endif
-	ddouble_& operator=(PARAMETER<double> const& o) {
-		assert(o == o);
-		*_data = o;
-		reset_deriv();
-		return *this;
+  ddouble_& operator=(PARAMETER<double> const& o) {
+    assert(o == o);
+    *_data = o;
+    reset_deriv();
+    return *this;
+  }
+  ddouble_& operator=(const double& o) {
+    assert(o == o);
+    *_data = o;
+    reset_deriv();
+    return *this;
+  }
+  bool is_same(const ddouble_& o)const { untested();
+    for(int i=0; i<=numderiv; ++i){ untested();
+      if(_data[i] != _data[i]){ itested();
+	if( o._data[i] == o._data[i] ){ untested();
+	  return false;
+	}else{ untested();
 	}
-	ddouble_& operator=(const double& o) {
-		assert(o == o);
-		*_data = o;
-		reset_deriv();
-		return *this;
-	}
-	bool is_same(const ddouble_& o)const {
-		for(int i=0; i<=numderiv; ++i){
-			if(_data[i] != _data[i]){ itested();
-			  if( o._data[i] == o._data[i] ){
-				return false;
-			  }else{
-			  }
-			}else if(_data[i] != o._data[i]){ untested();
-				return false;
-			}else{
-			}
-		}
-		return true;
-	}
-	bool operator==(const ddouble_& o)const {
+      }else if(_data[i] != o._data[i]){ untested();
+	return false;
+      }else{ untested();
+      }
+    }
+    return true;
+  }
+  bool operator==(const ddouble_& o)const {
 #if 0 // really?
-		for(int i=0; i<=numderiv; ++i){ untested();
-			if(_data[i] != o._data[i]){ untested();
-				return false;
-			}else{ untested();
-			}
-		}
+    for(int i=0; i<=numderiv; ++i){ untested();
+      if(_data[i] != o._data[i]){ untested();
+	return false;
+      }else{ untested();
+      }
+    }
 #else
-		return *_data == *o._data;
+    return *_data == *o._data;
 #endif
-		return true;
-	}
-	bool operator==(const double& o)const {
-		assert(_data);
-		return *_data == o;
-	}
-	bool operator==(const int& o)const {
-		double x = o;
-		return *_data == x;
-	}
-	bool operator<(const ddouble_& o)const {
-		return *_data < *o._data;
-	}
-	bool operator<(double const& o)const {
-		return *_data < o;
-	}
-	bool operator<(int const& o)const {
-		return *_data < o;
-	}
-	bool operator<(PARAMETER<double> const& o)const {
-		return *_data < double(o);
-	}
+    return true;
+  }
+  bool operator==(const double& o)const {
+    assert(_data);
+    return *_data == o;
+  }
+  bool operator==(const int& o)const { untested();
+    double x = o;
+    return *_data == x;
+  }
+  bool operator<(const ddouble_& o)const {
+    return *_data < *o._data;
+  }
+  bool operator<(double const& o)const {
+    return *_data < o;
+  }
+  bool operator<(int const& o)const { untested();
+    return *_data < o;
+  }
+  bool operator<(PARAMETER<double> const& o)const { untested();
+    return *_data < double(o);
+  }
 
-	bool operator<=(const ddouble_& o)const { itested();
-		return *_data <= *o._data;
-	}
-	bool operator<=(double const& o)const { itested();
-		return *_data <= o;
-	}
-	bool operator<=(int const& o)const { itested();
-		return *_data <= o;
-	}
-	bool operator>(ddouble_ const& o)const {
-		return *_data > *o._data;
-	}
-	bool operator>(double const& o)const {
-		return *_data > o;
-	}
-	bool operator>(int const& o)const {
-		return *_data > o;
-	}
-	bool operator>(PARAMETER<double> const& o)const {
-		return *_data > double(o);
-	}
+  bool operator<=(const ddouble_& o)const { itested();
+    return *_data <= *o._data;
+  }
+  bool operator<=(double const& o)const { itested();
+    return *_data <= o;
+  }
+  bool operator<=(int const& o)const { itested();
+    return *_data <= o;
+  }
+  bool operator>(ddouble_ const& o)const { untested();
+    return *_data > *o._data;
+  }
+  bool operator>(double const& o)const {
+    return *_data > o;
+  }
+  bool operator>(int const& o)const { untested();
+    return *_data > o;
+  }
+  bool operator>(PARAMETER<double> const& o)const { untested();
+    return *_data > double(o);
+  }
 
-	bool operator>=(const ddouble_& o)const { itested();
-		return *_data >= *o._data;
-	}
-	bool operator>=(const double& o)const {itested();
-		return *_data >= o;
-	}
-	bool operator>=(PARAMETER<double> const& o)const {itested();
-		return *_data >= double(o);
-	}
+  bool operator>=(const ddouble_& o)const { itested();
+    return *_data >= *o._data;
+  }
+  bool operator>=(const double& o)const {itested();
+    return *_data >= o;
+  }
+  bool operator>=(PARAMETER<double> const& o)const {itested();
+    return *_data >= double(o);
+  }
 
-	ddouble_& operator+=(const ddouble_& o) {
-		for(int i=0; i<=numderiv; ++i){
-			_data[i] += o._data[i];
-		}
-		return *this;
-	}
-	ddouble_ operator+(ddouble_ const& o) const {
-		ddouble_ ret = *this;
-		ret += o;
-		return ret;
-	}
-	ddouble_ operator+(double const& o) const {
-		ddouble_ ret = *this;
-		*ret._data += o;
-		return ret;
-	}
-	ddouble_ operator+(int const& o) const {
-		ddouble_ ret = *this;
-		*ret._data += o;
-		return ret;
-	}
-	ddouble_ operator+(PARAMETER<double> const& o) const {
-		ddouble_ ret = *this;
-		*ret._data += o;
-		return ret;
-	}
-	ddouble_ operator+()const {
-		return ddouble_(*this);
-	}
+  ddouble_& operator+=(const ddouble_& o) {
+    for(int i=0; i<=numderiv; ++i){
+      _data[i] += o._data[i];
+    }
+    return *this;
+  }
+  ddouble_ operator+(ddouble_ const& o) const {
+    ddouble_ ret = *this;
+    ret += o;
+    return ret;
+  }
+  ddouble_ operator+(double const& o) const {
+    ddouble_ ret = *this;
+    *ret._data += o;
+    return ret;
+  }
+  ddouble_ operator+(int const& o) const { untested();
+    ddouble_ ret = *this;
+    *ret._data += o;
+    return ret;
+  }
+  ddouble_ operator+(PARAMETER<double> const& o) const {
+    ddouble_ ret = *this;
+    *ret._data += o;
+    return ret;
+  }
+  ddouble_ operator+()const { untested();
+    return ddouble_(*this);
+  }
 
-	ddouble_& operator-=(const ddouble_& o) {
-		for(int i=0; i<=numderiv; ++i){
-			_data[i] -= o._data[i];
-		}
-		return *this;
-	}
-	ddouble_ operator-(ddouble_ const& o) const {
-		ddouble_ ret = *this;
-		ret -= o;
-		return ret;
-	}
-	ddouble_ operator-(double const& o) const {
-		ddouble_ ret = *this;
-		ret -= ddouble_(o);
-		return ret;
-	}
-	ddouble_ operator-(int const& o) const {
-		ddouble_ ret = *this;
-		ret -= o;
-		return ret;
-	}
-	ddouble_ operator-(PARAMETER<double> const& o) const {
-		ddouble_ ret = *this;
-		ret -= double(o);
-		return ret;
-	}
-	ddouble_ operator-() const {
-		ddouble_ ret;
-		for(int i=0; i<=numderiv; ++i){
-			ret._data[i] = - _data[i];
-		}
-		return ret;
-	}
+  ddouble_& operator-=(const ddouble_& o) {
+    for(int i=0; i<=numderiv; ++i){
+      _data[i] -= o._data[i];
+    }
+    return *this;
+  }
+  ddouble_ operator-(ddouble_ const& o) const {
+    ddouble_ ret = *this;
+    ret -= o;
+    return ret;
+  }
+  ddouble_ operator-(double const& o) const {
+    ddouble_ ret = *this;
+    ret -= ddouble_(o);
+    return ret;
+  }
+  ddouble_ operator-(int const& o) const { untested();
+    ddouble_ ret = *this;
+    ret -= o;
+    return ret;
+  }
+  ddouble_ operator-(PARAMETER<double> const& o) const {
+    ddouble_ ret = *this;
+    ret -= double(o);
+    return ret;
+  }
+  ddouble_ operator-() const {
+    ddouble_ ret;
+    for(int i=0; i<=numderiv; ++i){
+      ret._data[i] = - _data[i];
+    }
+    return ret;
+  }
 
-	ddouble_& operator*=(const ddouble_& o) {
-		assert(*o._data == *o._data);
-		assert(*_data == *_data);
-		for(int i=1; i<=numderiv; ++i){
-			// assert(_data[i] == _data[i]);
-			// assert(o._data[i] == o._data[i]);
-			_data[i] *= *o._data;
-			_data[i] += *_data * o._data[i];
-		}
-		*_data *= *o._data;
-		return *this;
-	}
-	ddouble_ operator*(const ddouble_& o) const {
-		ddouble_ ret = *this;
-		ret *= o;
-		return ret;
-	}
-	ddouble_& operator*=(const double& o) {
-		for(int i=0; i<=numderiv; ++i){
-			_data[i] *= o;
-		}
-		return *this;
-	}
-	ddouble_ operator*(const int& o) const { itested();
-		ddouble_ ret = *this;
-		ret *= double(o);
-		return ret;
-	}
-	ddouble_ operator*(const double& o) const {itested();
-		ddouble_ ret = *this;
-		ret *= o;
-		return ret;
-	}
-	ddouble_ operator*(PARAMETER<double> const& o) const {
-		ddouble_ ret = *this;
-		ret *= (double)o;
-		return ret;
-	}
+  ddouble_& operator*=(const ddouble_& o) {
+    assert(*o._data == *o._data);
+    assert(*_data == *_data);
+    for(int i=1; i<=numderiv; ++i){
+      // assert(_data[i] == _data[i]);
+      // assert(o._data[i] == o._data[i]);
+      _data[i] *= *o._data;
+      _data[i] += *_data * o._data[i];
+    }
+    *_data *= *o._data;
+    return *this;
+  }
+  ddouble_ operator*(const ddouble_& o) const {
+    ddouble_ ret = *this;
+    ret *= o;
+    return ret;
+  }
+  ddouble_& operator*=(const double& o) {
+    for(int i=0; i<=numderiv; ++i){
+      _data[i] *= o;
+    }
+    return *this;
+  }
+  ddouble_ operator*(const int& o) const { itested();
+    ddouble_ ret = *this;
+    ret *= double(o);
+    return ret;
+  }
+  ddouble_ operator*(const double& o) const {itested();
+    ddouble_ ret = *this;
+    ret *= o;
+    return ret;
+  }
+  ddouble_ operator*(PARAMETER<double> const& o) const {
+    ddouble_ ret = *this;
+    ret *= (double)o;
+    return ret;
+  }
 
 
-	ddouble_& operator/=(ddouble_ const& o) {
-		if(*o._data){
-			for(int i=1; i<=numderiv; ++i){
-				_data[i] *= o.value();
-				_data[i] -= value() * o._data[i];
-				_data[i] /= o.value() * o.value();
-			}
-			*_data /= *o._data;
-		}else{ itested();
-			*this /= (o + 1e-20);
-		}
-		return *this;
-	}
-	ddouble_ operator/(ddouble_ o) const {
-		ddouble_ ret = *this;
-		ret /= o;
-		return ret;
-	}
-	ddouble_& operator/=(double const& o) {
-		assert(_data);
-		assert(o);
-		for(int i=0; i<=numderiv; ++i){
-			_data[i] /= o;
-		}
-		return *this;
-	}
-//	ddouble_ operator/(double const& o) {
-//		assert(o);
-//		ddouble_ ret = *this;
-//		ret /= o;
-//		return ret;
-//	}
-	ddouble_ operator/(double const& o) const {
-		assert(o);
-		ddouble_ ret = *this;
-		ret /= o;
-		return ret;
-	}
-	ddouble_ operator/(int const& o) const {
-		assert(o);
-		ddouble_ ret = *this;
-		ret /= o;
-		return ret;
-	}
-	ddouble_ operator/(PARAMETER<double> const& o) const {
-		assert(o);
-		ddouble_ ret = *this;
-		ret /= double(o);
-		return ret;
-	}
-	ddouble_ operator/(PARAMETER<int> const& o) const {
-		assert(o);
-		ddouble_ ret = *this;
-		ret /= int(o);
-		return ret;
-	}
-	bool operator!() const { itested();
-		assert(_data);
-		return *_data == 0.;
-	}
+  ddouble_& operator/=(ddouble_ const& o) {
+    if(*o._data){
+      for(int i=1; i<=numderiv; ++i){
+	_data[i] *= o.value();
+	_data[i] -= value() * o._data[i];
+	_data[i] /= o.value() * o.value();
+      }
+      *_data /= *o._data;
+    }else{ itested();
+      *this /= (o + 1e-20);
+    }
+    return *this;
+  }
+  ddouble_ operator/(ddouble_ o) const {
+    ddouble_ ret = *this;
+    ret /= o;
+    return ret;
+  }
+  ddouble_& operator/=(double const& o) {
+    assert(_data);
+    assert(o);
+    for(int i=0; i<=numderiv; ++i){
+      _data[i] /= o;
+    }
+    return *this;
+  }
+  //	ddouble_ operator/(double const& o) { untested();
+  //		assert(o);
+  //		ddouble_ ret = *this;
+  //		ret /= o;
+  //		return ret;
+  //	}
+  ddouble_ operator/(double const& o) const { untested();
+    assert(o);
+    ddouble_ ret = *this;
+    ret /= o;
+    return ret;
+  }
+  ddouble_ operator/(int const& o) const { untested();
+    assert(o);
+    ddouble_ ret = *this;
+    ret /= o;
+    return ret;
+  }
+  ddouble_ operator/(PARAMETER<double> const& o) const {
+    assert(o);
+    ddouble_ ret = *this;
+    ret /= double(o);
+    return ret;
+  }
+  ddouble_ operator/(PARAMETER<int> const& o) const { untested();
+    assert(o);
+    ddouble_ ret = *this;
+    ret /= int(o);
+    return ret;
+  }
+  bool operator!() const { itested();
+    assert(_data);
+    return *_data == 0.;
+  }
 
-	ddouble_& chain(double const& d) {
-		for(int i=1; i<=numderiv; ++i){
-			_data[i] *= d;
-		}
-		return *this;
-	} /*chain*/
-	ddouble_& set_value(double const& v){
-		*_data = v;
-		return *this;
-	}
-	void clear() {
-		std::fill_n(_data, numderiv+1, 0.);
-	} /*clear*/
+  ddouble_& chain(double const& d) {
+    for(int i=1; i<=numderiv; ++i){
+      _data[i] *= d;
+    }
+    return *this;
+  } /*chain*/
+  ddouble_& set_value(double const& v){
+    *_data = v;
+    return *this;
+  }
+  void clear() {
+    std::fill_n(_data, numderiv+1, 0.);
+  } /*clear*/
 }; /*ddouble_*/
 
 template<int T>
 ddouble_<T> operator/(ddouble_<T> a, ddouble_<T> b)
-{
-	a /= b;
-	return a;
+{ untested();
+  a /= b;
+  return a;
 }
-template<int T>
-ddouble_<T> operator/(int const& a, ddouble_<T> b)
-{
-	ddouble_<T> c(a);
-	c /= b;
-	return c;
+  template<int T>
+  ddouble_<T> operator/(int const& a, ddouble_<T> b)
+{ untested();
+  ddouble_<T> c(a);
+  c /= b;
+  return c;
 }
-template<int T>
-ddouble_<T> operator/(double const& a, ddouble_<T> b)
+  template<int T>
+  ddouble_<T> operator/(double const& a, ddouble_<T> b)
 {
-	ddouble_<T> c(a);
-	c /= b;
-	return c;
+  ddouble_<T> c(a);
+  c /= b;
+  return c;
 }
-template<int T>
-ddouble_<T> operator/(PARAMETER<double> const& a, ddouble_<T> const& b)
+  template<int T>
+  ddouble_<T> operator/(PARAMETER<double> const& a, ddouble_<T> const& b)
 {
-	ddouble_<T> c(a);
-	c /= b;
-	return c;
+  ddouble_<T> c(a);
+  c /= b;
+  return c;
 }
-template<int T>
-ddouble_<T> operator/(PARAMETER<int> const& a, ddouble_<T> const& b)
-{
-	ddouble_<T> c(a);
-	c /= b;
-	return c;
+  template<int T>
+  ddouble_<T> operator/(PARAMETER<int> const& a, ddouble_<T> const& b)
+{ untested();
+  ddouble_<T> c(a);
+  c /= b;
+  return c;
 }
 
-template<int T>
-ddouble_<T> operator-(double const& a, ddouble_<T> b)
+  template<int T>
+  ddouble_<T> operator-(double const& a, ddouble_<T> b)
 {
-	ddouble_<T> c(a);
-	c -= b;
-	return c;
+  ddouble_<T> c(a);
+  c -= b;
+  return c;
 }
-template<int T>
-ddouble_<T> operator-(int const& a, ddouble_<T> b)
+  template<int T>
+  ddouble_<T> operator-(int const& a, ddouble_<T> b)
 { untested();
-	ddouble_<T> c(a);
-	c -= b;
-	return c;
+  ddouble_<T> c(a);
+  c -= b;
+  return c;
 }
-template<int T>
-ddouble_<T> operator-(PARAMETER<double> const& a, ddouble_<T> b)
+  template<int T>
+  ddouble_<T> operator-(PARAMETER<double> const& a, ddouble_<T> b)
 {itested();
-	ddouble_<T> c(a);
-	c -= b;
-	return c;
+  ddouble_<T> c(a);
+  c -= b;
+  return c;
 }
-template<int T>
-ddouble_<T> operator-(PARAMETER<int> const& a, ddouble_<T> b)
+  template<int T>
+  ddouble_<T> operator-(PARAMETER<int> const& a, ddouble_<T> b)
 { untested();
-	ddouble_<T> c(a);
-	c -= b;
-	return c;
+  ddouble_<T> c(a);
+  c -= b;
+  return c;
 }
 
-template<int T>
-ddouble_<T> operator*(double const& a, ddouble_<T> const& b)
+  template<int T>
+  ddouble_<T> operator*(double const& a, ddouble_<T> const& b)
 {
-	ddouble_<T> c(b);
-	c *= a;
-	return c;
+  ddouble_<T> c(b);
+  c *= a;
+  return c;
 }
-template<int T>
-ddouble_<T> operator*(int const& a, ddouble_<T> const& b)
-{
-	ddouble_<T> c(b);
-	c *= a;
-	return c;
+  template<int T>
+  ddouble_<T> operator*(int const& a, ddouble_<T> const& b)
+{ untested();
+  ddouble_<T> c(b);
+  c *= a;
+  return c;
 }
-template<int T>
-ddouble_<T> operator*(PARAMETER<double> const& a, ddouble_<T> const& b)
+  template<int T>
+  ddouble_<T> operator*(PARAMETER<double> const& a, ddouble_<T> const& b)
 {
-	ddouble_<T> c(a);
-	return c * b;
+  ddouble_<T> c(a);
+  return c * b;
 }
-template<int T>
-ddouble_<T> operator*(PARAMETER<int> const& a, ddouble_<T> const& b)
-{
-	ddouble_<T> c(b);
-	c *= a;
-	return c;
+  template<int T>
+  ddouble_<T> operator*(PARAMETER<int> const& a, ddouble_<T> const& b)
+{ untested();
+  ddouble_<T> c(b);
+  c *= a;
+  return c;
 }
 
-template<int T>
-ddouble_<T> operator+(double const& a, ddouble_<T> const& b)
+  template<int T>
+  ddouble_<T> operator+(double const& a, ddouble_<T> const& b)
 { itested();
-	ddouble_<T> c(b);
-	return c + a;
+  ddouble_<T> c(b);
+  return c + a;
 }
-template<int T>
-ddouble_<T> operator+(int const& a, ddouble_<T> const& b)
+  template<int T>
+  ddouble_<T> operator+(int const& a, ddouble_<T> const& b)
 { itested();
-	ddouble_<T> c(b);
-	return c + a;
+  ddouble_<T> c(b);
+  return c + a;
 }
-template<int T>
-ddouble_<T> operator+(PARAMETER<double> const& a, ddouble_<T> const& b)
+  template<int T>
+  ddouble_<T> operator+(PARAMETER<double> const& a, ddouble_<T> const& b)
 { itested();
-	ddouble_<T> c(b);
-	return c + a;
+  ddouble_<T> c(b);
+  return c + a;
 }
-template<int T>
-ddouble_<T> operator+(PARAMETER<int> const& a, ddouble_<T> const& b)
+  template<int T>
+  ddouble_<T> operator+(PARAMETER<int> const& a, ddouble_<T> const& b)
 { untested();
-	return b + double(a);
+  return b + double(a);
 }
 
-template<int T>
-bool operator==(ddouble_<T> const& a, PARAMETER<int> const& b)
+  template<int T>
+  bool operator==(ddouble_<T> const& a, PARAMETER<int> const& b)
 { untested();
-	return double(b) == a.value();
+  return double(b) == a.value();
 }
-template<int T>
-bool operator==(PARAMETER<int> const& b, ddouble_<T> const& a)
+  template<int T>
+  bool operator==(PARAMETER<int> const& b, ddouble_<T> const& a)
 { untested();
-	return double(b) == a.value();
+  return double(b) == a.value();
 }
 inline bool operator==(PARAMETER<int> const& b, double const& a)
 { itested();
-	return double(b) == a;
+  return double(b) == a;
 }
 inline bool operator==(PARAMETER<double> const& b, int const& a)
 { untested();
-	return int(b) == a;
+  return int(b) == a;
 }
 // inline bool operator==(PARAMETER<int> const& b, int const& a)
 // { untested();
 // 	return int(b) == a;
 // }
 
-template<class T>
-T& set_value(T& t, double const& d)
+  template<class T>
+  T& set_value(T& t, double const& d)
 {
-	t.set_value(d);
-	return t;
+  t.set_value(d);
+  return t;
 }
-template<>
-inline int& set_value(int& t, double const& v)
-{
-	return t = int(v);
+  template<>
+  inline int& set_value(int& t, double const& v)
+{ untested();
+  return t = int(v);
 }
-template<>
-inline double& set_value(double& t, double const& v)
-{
-	return t = v;
+  template<>
+  inline double& set_value(double& t, double const& v)
+{ untested();
+  return t = v;
 }
-template<>
-inline PARAMETER<int>& set_value(PARAMETER<int>& t, double const& v)
-{
-	t = int(v);
-	return t;
+  template<>
+  inline PARAMETER<int>& set_value(PARAMETER<int>& t, double const& v)
+{ untested();
+  t = int(v);
+  return t;
 }
-template<>
-inline PARAMETER<double>& set_value(PARAMETER<double>& t, double const& v)
+  template<>
+  inline PARAMETER<double>& set_value(PARAMETER<double>& t, double const& v)
 {
-	t = v;
-	return t;
+  t = v;
+  return t;
 }
 
-template<class T>
-T& chain(T& t, double const& d)
+  template<class T>
+  T& chain(T& t, double const& d)
 {
-	t.chain(d);
-	return t;
+  t.chain(d);
+  return t;
 }
-template<>
-inline double& chain(double& t, double const&)
-{
-	// no-op
-	return t;
-}
-template<>
-inline int& chain(int& t, double const&)
-{
-	// no-op
-	return t;
-}
-template<>
-inline PARAMETER<double>& chain(PARAMETER<double>& t, double const&)
-{ itested();
-	// no-op
-	return t;
-}
-template<>
-inline PARAMETER<int>& chain(PARAMETER<int>& t, double const&)
+  template<>
+  inline double& chain(double& t, double const&)
 { untested();
-	// no-op
-	return t;
+  // no-op
+  return t;
+}
+  template<>
+  inline int& chain(int& t, double const&)
+{ untested();
+  // no-op
+  return t;
+}
+  template<>
+  inline PARAMETER<double>& chain(PARAMETER<double>& t, double const&)
+{ itested();
+  // no-op
+  return t;
+}
+  template<>
+  inline PARAMETER<int>& chain(PARAMETER<int>& t, double const&)
+{ untested();
+  // no-op
+  return t;
 }
 
 
@@ -572,30 +572,30 @@ inline PARAMETER<int>& chain(PARAMETER<int>& t, double const&)
 class array_{
   std::vector<double> _v;
 public:
-  array_() {}
-  array_(double a0) {
+  array_() { untested();}
+  array_(double a0) { untested();
     _v.push_back(a0);
   }
-  array_(double a0, double a1) {
+  array_(double a0, double a1) { untested();
     _v.push_back(a0);
     _v.push_back(a1);
   }
   template<typename... Args>
-  array_(Args... args) {
+  array_(Args... args) { untested();
     push_back(args...);
   }
 
-  size_t size() const{return _v.size();}
-  double const& operator[](int x)const {return _v[x];}
+  size_t size() const{ untested();return _v.size();}
+  double const& operator[](int x)const { untested();return _v[x];}
 private:
   template<typename T>
-  void push_back(T t) {
+  void push_back(T t) { untested();
     _v.push_back(t);
   }
   template<typename T, typename... Args>
-  void push_back(T t, Args... args) {
-	  _v.push_back(t);
-	  push_back(args...);
+  void push_back(T t, Args... args) { untested();
+    _v.push_back(t);
+    push_back(args...);
   }
 };
 /*--------------------------------------------------------------------------*/
@@ -676,7 +676,7 @@ struct ddouble_if<T, double>{
 /*--------------------------------------------------------------------------*/
 template<class S, class T>
 typename ddouble_if<T, S>::type max(T d, S e)
-{
+{ untested();
   typedef typename ddouble_if<T, S>::type ret_t;
   if(double(d) <= double(e)){ itested();
     return ret_t(e);
@@ -712,14 +712,14 @@ T flicker_noise(T, T2, S=0.)
 /*--------------------------------------------------------------------------*/
 class EVT{
 public:
-	virtual void operator()() const = 0;
+  virtual void operator()() const = 0;
 };
 /*--------------------------------------------------------------------------*/
 } // va
 /*--------------------------------------------------------------------------*/
 class FILTER {
 public:
-   virtual double read_filter()const {unreachable(); return 0;}
+   virtual double read_filter()const { untested();unreachable(); return 0;}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

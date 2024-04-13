@@ -20,7 +20,7 @@
  */
 /*--------------------------------------------------------------------------*/
 
-#include "m_tokens.h" // $vt
+#include "mg_token.h" // $vt
 #include "mg_in.h"
 #include "mg_func.h"
 #include "mg_code.h"
@@ -119,10 +119,12 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       t->stack_op(&E);
     }else if(dynamic_cast<Token_CONSTANT*>(t)) {
       trace1("Token_CONSTANT", t->name());
+      assert(t->name()!=".x");
       t->stack_op(&E);
     }else if((E.is_empty() || !dynamic_cast<Token_PARLIST*>(E.back()))
           && symbol && t->name() == "inf") {
       Float* f = new Float(std::numeric_limits<double>::infinity());
+      assert(t->name()!=".x");
       E.push_back(new Token_CONSTANT(t->name(), f, ""));
     }else if(auto pl = dynamic_cast<Token_PARLIST*>(t)) {
 //      trace1("resolve PARLIST");
@@ -160,8 +162,10 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
     }else if (n[0]=='.'){
       if(strchr("0123456789", n[1])){
 	Float* f = new Float(n);
+	assert(n!=".x");
 	E.push_back(new Token_CONSTANT(n, f, ""));
       }else if(auto r = Scope->lookup(PS_MANGLE_PREFIX + n.substr(1))) {
+	incomplete();
 	if(auto vt = dynamic_cast<Token_VAR_REF*>(r)) {
 	  trace2("resolve VAR_REF", n, vt->deps().size());
 	  vt->stack_op(&E);
@@ -170,6 +174,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 //	  throw Exception("unresolved symbol: " + n);
 	}
       }else if(isalpha(n[1])){
+	trace1("resolve: outvar?", n);
 	E.push_back(new Token_OUT_VAR(n));
       }else{ untested();
 	throw Exception("unresolved symbol: " + n);
@@ -178,6 +183,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       trace1("number??", n);
       // a number. BUG: integer?
       Float* f = new Float(n);
+      assert(n!=".x");
       E.push_back(new Token_CONSTANT(n, f, ""));
     }else if(Base* r = Scope->lookup(n)){
       if(auto p = dynamic_cast<Parameter_Base const*>(r)) {
@@ -185,6 +191,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 	Token_PAR_REF PP(p->name(), p);
 	PP.stack_op(&E);
       }else if(auto v = dynamic_cast<Variable_Decl*>(r)) { untested();
+	assert(0);
 	unreachable();
 	Token_VAR_REF a(v->name(), v);
 	a.stack_op(&E);
@@ -272,25 +279,38 @@ void Expression_::set_owner(Base* o)
   }
 }
 /*--------------------------------------------------------------------------*/
-bool Expression_::update()
+void Expression_::set_rdeps(RDeps const& rd)
+{ untested();
+  assert(size());
+  assert(back());
+  assert(back()->data());
+  deps().rdeps() = rd;
+}
+/*--------------------------------------------------------------------------*/
+bool Expression_::update(RDeps const* rd)
 {
-  size_t n = deps().ddeps().size();
+  size_t n = deps().size();
 
   auto i = begin();
-  for(size_t nn=size(); nn--;){
-    if(auto variable = dynamic_cast<Token_VAR_REF*>(*i)) {
-      trace2("Expression_::update", variable->name(), variable->deps().size());
-    }else{
-    }
+  for(size_t nn=size(); nn--; i=erase(i)){
+    trace1("Expression_::update stack_op", (*i)->name());
     (*i)->stack_op(this);
-    i = erase(i);
   }
 
-  trace2("Expression_::update", size(), n);
-  if(n<=deps().ddeps().size()){
-  }else{ untested();
+  if(n<deps().ddeps().size()) {
+  }else if(n==deps().ddeps().size()) {
+  }else{
   }
-  return n != deps().ddeps().size();
+
+  bool rdd=false;
+  if(!size()) { untested();
+  }else if(rd) {
+    rdd = propagate_rdeps(*rd);
+  }else { untested();
+  }
+
+  trace3("Expression_::update", size(), n, rdd);
+  return rdd || n != deps().size();
 }
 /*--------------------------------------------------------------------------*/
 /* A.8.3
@@ -372,16 +392,21 @@ void Expression_::set_dep(Base*)
   incomplete();
 }
 /*--------------------------------------------------------------------------*/
-bool Expression_::propagate_rdeps(TData const& dep)
+bool Expression_::propagate_rdeps(RDeps const& r)
 {
   Sensitivities const& sens = data().sensitivities();
+  trace2("Expression_::propagate_rdeps", r.size(), sens.size());
   bool ret = false;
   for(auto s : sens){
     trace1("rdep sens", s);
     if(auto st = dynamic_cast<Statement*>(s)){
-      ret |= st->propagate_rdeps(dep);
+      ret |= st->propagate_rdeps(r);
     }else{ untested();
+      assert(0);
     }
+  }
+  for(auto& p : data().ddeps()){
+    ret |= p.propagate_rdeps(r);
   }
   return ret;
 }

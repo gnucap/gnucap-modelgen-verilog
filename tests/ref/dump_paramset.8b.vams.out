@@ -24,13 +24,13 @@ module const_res(p, n);
   real c, d;
 
   analog begin
-    a = 1;
-    b = (__y + 1);
+    __x = 1.;
+    __y = 2.;
   end
 
   analog begin
-    __x = 1.;
-    __y = 2.;
+    a = 1;
+    b = (__y + 1);
   end
 
 endmodule

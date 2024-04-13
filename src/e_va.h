@@ -28,13 +28,13 @@
 /*--------------------------------------------------------------------------*/
 class NATURE {
 public:
-  virtual double abstol()const{return 0.;}
+  virtual double abstol()const{ untested();return 0.;}
 };
 /*--------------------------------------------------------------------------*/
 class DISCIPLINE {
 public:
-  virtual NATURE const* flow()const {return NULL;}
-  virtual NATURE const* potential()const {return NULL;}
+  virtual NATURE const* flow()const { untested();return NULL;}
+  virtual NATURE const* potential()const { untested();return NULL;}
 };
 /*--------------------------------------------------------------------------*/
 // tmp kludge. nodes don't have disciplines yet...
@@ -56,7 +56,7 @@ public:
   double potential_abstol() const{
     if(!discipline()){ untested();
       return OPT::abstol;
-    }else if(!discipline()->potential()){
+    }else if(!discipline()->potential()){ untested();
       return OPT::abstol;
     }else{
       return discipline()->potential()->abstol();
@@ -66,15 +66,15 @@ public:
 /*--------------------------------------------------------------------------*/
 class COMMON_FILT : public COMMON_COMPONENT {
 public:
-  explicit COMMON_FILT(int i=CC_STATIC) : COMMON_COMPONENT(i) {}
-  ~COMMON_FILT() {}
+  explicit COMMON_FILT(int i=CC_STATIC) : COMMON_COMPONENT(i) { untested();}
+  ~COMMON_FILT() { untested();}
 public:
   //virtual DISCIPLINE const* discipline()const{untested(); return NULL;};
-  virtual int args(int) const{ return 0; }
+  virtual int args(int) const{ untested(); return 0; }
 };
 /*--------------------------------------------------------------------------*/
 inline void e_val(double* p, const double& x, const CARD_LIST*)
-{
+{ untested();
   assert(p);
   *p = x;
 }

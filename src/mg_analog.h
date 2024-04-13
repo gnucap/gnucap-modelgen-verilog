@@ -28,6 +28,7 @@
 // class access_function?
 class Probe : public FUNCTION_ {
   Branch_Ref _br;
+  mutable RDeps _rdeps;
   enum{
     t_unknown = 0,
     t_flow,
@@ -52,19 +53,20 @@ public:
   Nature const* nature() const;
   Discipline const* discipline() const;
 
-  bool operator==(Probe const& o) const{
+  bool operator==(Probe const& o) const{ untested();
     return _br == o._br && _type == o._type;
   }
   bool same_data(Probe const& o) const{
     return branch() == o.branch() && _type == o._type;
   }
-  bool operator!=(Probe const& o) const{
+  bool operator!=(Probe const& o) const{ untested();
     return !operator==(o);
   }
 private:
-  std::string eval(CS&, const CARD_LIST*)const override {unreachable(); return "";}
+  std::string eval(CS&, const CARD_LIST*)const override { untested();unreachable(); return "";}
   Token* new_token(Module&, size_t)const override;
 public:
+  bool propagate_rdeps(RDeps const&)const;
   void set_used_in(Base const*b)const{
     return _br.set_used_in(b);
   }
@@ -75,23 +77,6 @@ private:
   void make_cc_dev(std::ostream&)const override;
   void make_cc_common(std::ostream&)const override;
 }; // Probe
-/*--------------------------------------------------------------------------*/
-// Token?
-#if 0
-class Analog_Function_Arg : public Variable_Decl {
-public:
-  explicit Analog_Function_Arg() : Variable_Decl() {}
-  void parse(CS& f)override;
-  void dump(std::ostream& f)const override;
-  std::string code_name()const override;
-
-  Data_Type const& type()const override{
-    static Data_Type_Real r;
-    return r; // for now.
-  }
-};
-typedef Collection<Analog_Function_Arg> Analog_Function_Args;
-#endif
 /*--------------------------------------------------------------------------*/
 class AF_Arg_List : public Owned_Base { // was : public LiSt<Analog_Function_Arg, '\0', ',', ';'> 
 //  Data_Type _type;
@@ -109,7 +94,7 @@ public:
     parse(cmd);
   }
   bool is_output() const { return _direction >= a_output; }
-//  Data_Type const& type()const {return _type;}
+//  Data_Type const& type()const { untested();return _type;}
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   const_iterator begin()const { return _l.begin(); }
@@ -133,13 +118,12 @@ public:
     return *this;
   }
 public: // sensitivities?
-//  void set_never() { _block.set_never(); }
-//  void set_always() { _block.set_always(); }
-//  bool is_never()const {return _block.is_never() ;}
-//  bool is_reachable()const {return _block.is_reachable() ;}
-//  bool is_always()const {return _block.is_always() ;}
-  bool update(); // SeqBlock?
-//  void set_sens(Base* s) {_block.set_sens(s);}
+//  void set_never() { untested(); _block.set_never(); }
+//  void set_always() { untested(); _block.set_always(); }
+//  bool is_never()const { untested();return _block.is_never() ;}
+//  bool is_reachable()const { untested();return _block.is_reachable() ;}
+//  bool is_always()const { untested();return _block.is_always() ;}
+//  void set_sens(Base* s) { untested();_block.set_sens(s);}
 //  void clear_vars();
 
   TData const& deps(){ return _deps;};
@@ -167,12 +151,12 @@ public: // can't resolve these..
 };
 /*--------------------------------------------------------------------------*/
 class AnalogFunctionBody : // public AnalogSeqBlock
-			  public AnalogCtrlBlock {
+			  public AnalogCtrlBlock { //
 public: // can't resolve these..
   Branch_Ref new_branch(std::string const&, std::string const&)override { untested();
     return Branch_Ref();
   }
-  Branch_Ref new_branch(Node*, Node*)override {
+  Branch_Ref new_branch(Node*, Node*)override { untested();
     return Branch_Ref();
   }
   Node_Ref node(std::string const&)const override {
@@ -188,7 +172,7 @@ public: // can't resolve these..
 };
 /*--------------------------------------------------------------------------*/
 class VariableList : public List_Base<Base>{
-  void parse(CS&)override {incomplete();}
+  void parse(CS&)override { untested();incomplete();}
 public:
   void dump(std::ostream& f)const override;
 };
@@ -210,12 +194,16 @@ public:
   std::string code_name()const { assert(_variable); return "af_" + _variable->name(); }
   // std::string code_name()const { untested(); assert(_variable); return "_v_" + _variable->name(); } // _variable->code_name?
   FUNCTION_ const* function() const{return _function;}
-  // AF_Arg_List_Collection const& args() const{ return _args; }
+  // AF_Arg_List_Collection const& args() const{ untested(); return _args; }
   Token const* variable() const{ return _variable; }
   AnalogFunctionArgs const& args() const{return _args;}
   AnalogFunctionBody const& body() const{return _block;}
   Data_Type const& type()const {return _type;}
-  VariableList const& variables()const {return _vars;}
+  VariableList const& variables()const { untested();return _vars;}
+  bool is_used_in(Base const*)const override{ untested();
+    // incomplete();
+    return true;
+  }
 };
 typedef Collection<Analog_Function> Analog_Functions;
 /*--------------------------------------------------------------------------*/
@@ -254,11 +242,11 @@ public:
   void unset_used_in(Base const*b); // const;
   ~AnalogStmt();
 //  bool used_in(Base const*)const;
-  virtual /*?*/ bool is_used_in(Base const*)const;
-  bool propagate_rdeps(TData const&)override;
+  bool is_used_in(Base const*)const override;
+  bool propagate_rdeps(RDeps const&)override;
 
   virtual TData const& deps() = 0;
-//  Statement* parent_stmt()override {
+//  Statement* parent_stmt()override { untested();
 //    incomplete();
 //    return NULL;
 //  }
@@ -269,7 +257,7 @@ public:
   ~AnalogExpression();
   void parse(CS& file) override;
 //  void dump(std::ostream& o)const override;
-//  Block* owner() {return Owned_Base::owner();}
+//  Block* owner() { untested();return Owned_Base::owner();}
   Expression const& expression() const{ return *this;}
   bool is_true() const;
   bool is_false() const;
@@ -279,7 +267,7 @@ class AnalogConstExpression : public AnalogExpression {
 public:
 //  void parse(CS& file) override;
 //  void dump(std::ostream& o)const override;
-  String_Arg key() const{return String_Arg("ACE");}
+  String_Arg key() const{ untested();return String_Arg("ACE");}
 };
 typedef LiSt<AnalogConstExpression, '\0', ',', ':'> AnalogConstExpressionList;
 /*--------------------------------------------------------------------------*/
@@ -294,18 +282,17 @@ public:
   void parse(CS& cmd)override;
   AnalogCtrlBlock const& body()const { return _body; }
 private:
-//  bool update()override {return _body.update();}
+//  bool update()override { untested();return _body.update();}
   TData const& deps()override { return _deps;};
   bool update()override {
-    incomplete();
-    return false;
+    return _body.update();
   }
 }; // AnalogCtrlStmt
 /*--------------------------------------------------------------------------*/
 class CaseGen : public AnalogCtrlStmt {
   AnalogConstExpressionList* _cond{NULL};
 private:
-  CaseGen() : AnalogCtrlStmt(){ unreachable(); }
+  CaseGen() : AnalogCtrlStmt(){ untested(); unreachable(); }
 public:
   CaseGen(CS&, Block*, Expression const&, bool, bool);
   ~CaseGen(){
@@ -317,14 +304,14 @@ public:
   AnalogConstExpressionList const* cond_or_null()const {return _cond;}
   bool is_default()const {return !_cond;}
   void set_never() {return _body.set_never() ;}
-  void set_always() {return _body.set_always() ;}
+  void set_always() { untested();return _body.set_always() ;}
   bool is_never()const {return _body.is_never() ;}
   bool is_reachable()const {return _body.is_reachable() ;}
   bool is_always()const {return _body.is_always() ;}
   void calc_reach(Expression const& cond);
 
-  String_Arg key() const{return String_Arg("CaseGen");}
-//  bool update() override { incomplete(); }
+  String_Arg key() const{ untested();return String_Arg("CaseGen");}
+//  bool update() override { untested(); incomplete(); }
 };
 /*--------------------------------------------------------------------------*/
 // code?
@@ -334,6 +321,10 @@ public:
   explicit System_Task(CS&, Block*);
   void parse(CS& o) override;
   void dump(std::ostream&o)const override;
+  bool is_used_in(Base const*)const override{
+    incomplete();
+    return true;
+  }
 
   AnalogExpression const& expression() const{ return _e; }
 };
@@ -361,7 +352,7 @@ public:
   void dump(std::ostream& o)const override;
   AnalogConstExpression const& control() const{return _ctrl;}
   SeqBlock const& cases()const {return _body;}
-  bool update()override {incomplete(); return false;}
+  bool update()override;
   TData const& deps()override{ return _deps;};
 }; // AnalogSwitchStmt
 /*--------------------------------------------------------------------------*/
@@ -393,14 +384,14 @@ public:
   bool has_body() const{ return _body; }
   const Base& body() const{assert(_body); return _body; }
   virtual bool has_tail() const{ return false; }
-  virtual Base const& tail() const{ return _cond; }
+  virtual Base const& tail() const{ untested(); return _cond; }
 private:
   bool update()override;
 };
 /*--------------------------------------------------------------------------*/
 class AnalogForStmt : public AnalogWhileStmt {
-  Base* _init{NULL};
-  Base* _tail{NULL};
+  Assignment* _init{NULL};
+  Assignment* _tail{NULL};
 public:
   explicit AnalogForStmt(CS& file, Block* o) : AnalogWhileStmt() {
     set_owner(o);
@@ -411,10 +402,10 @@ public:
   void dump(std::ostream& o)const override;
 
   bool has_init()const{ return _init; }
-  Base const& init()const{ assert(_init); return *_init; }
+  Assignment const& init()const{ assert(_init); return *_init; }
 
   bool has_tail()const override{ return _tail; }
-  Base const& tail()const override{ assert(_tail); return *_tail; }
+  Assignment const& tail()const override{ assert(_tail); return *_tail; }
 private:
   bool update()override;
 };
@@ -424,7 +415,7 @@ class AnalogProceduralAssignment : public AnalogStmt {
   Assignment _a;
   TData _deps;
 public:
-  // explicit AnalogProceduralAssignment(Block* o) {
+  // explicit AnalogProceduralAssignment(Block* o) { untested();
   //   set_owner(o);
   //   _a.set_owner(o);
   // }
@@ -432,9 +423,7 @@ public:
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
   Assignment const& assignment()const {return _a;}
-  bool is_used_in(Base const*b)const override{
-    return _a.is_used_in(b) || AnalogStmt::is_used_in(b);
-  }
+  bool is_used_in(Base const*b)const override;
   Statement* deep_copy(Base* no)const override;
 private:
   bool update()override;
@@ -479,23 +468,23 @@ public:
   bool is_short() const { return _short; }
   bool is_direct() const;
   bool is_always() const{ assert(owner()); return owner()->is_always(); }
-  bool is_reachable()const {return owner()->is_reachable() ;}
+  bool is_reachable()const { untested();return owner()->is_reachable() ;}
   void parse(CS&)override;
   void dump(std::ostream&)const override;
   TData const& data() const {
-    if(_deps) {return *_deps;} else {return _rhs.deps();}
+    if(_deps) {return *_deps;} else {return _rhs.data();}
   }
-  bool has_deps()const {return true;}
+  bool has_deps()const { untested();return true;}
   Expression const& rhs()const {return _rhs;}
   std::string const& name() const{return _name;}
   Branch_Ref const& branch_ref() const{return _branch;}
   Branch const* branch() const{return _branch;}
   bool reversed() const{ return _branch.is_reversed() ;}
-  Branch_Ref new_branch(std::string const& p, std::string const& n) {
+  Branch_Ref new_branch(std::string const& p, std::string const& n) { untested();
     assert(owner());
     return owner()->new_branch(p, n);
   }
-  Branch_Ref new_branch(Node* p, Node* n) {
+  Branch_Ref new_branch(Node* p, Node* n) { untested();
     assert(owner());
     return owner()->new_branch(p, n);
   }
@@ -507,11 +496,11 @@ private:
 /*--------------------------------------------------------------------------*/
 class ListOfBlockRealIdentifiers : public LiSt<BlockVarIdentifier, '\0', ',', ';'>{
 public:
-  ListOfBlockRealIdentifiers() {}
-  ListOfBlockRealIdentifiers(CS& f, Block* o){
+  ListOfBlockRealIdentifiers() { untested();}
+  ListOfBlockRealIdentifiers(CS& f, Block* o){ untested();
     set_owner(o);
     parse(f);
-    for(auto i : *this){
+    for(auto i : *this){ untested();
       i->set_type(Data_Type_Real());
     }
   }
@@ -521,7 +510,7 @@ public:
 // VarDeclStmt? code?
 class AnalogDeclareVars : public AnalogStmt {
 //  typedef LiSt<Token_VARIABLE, '\0', ',', ';'> list_t;
-  typedef LiSt<Token_VAR_REAL, '\0', ',', ';'> list_t;
+  typedef LiSt<Token_VAR_REF, '\0', ',', ';'> list_t;
   list_t _l;
   TData _deps;
 public:

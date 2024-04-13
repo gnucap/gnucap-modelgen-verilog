@@ -62,14 +62,14 @@ public: // build
   void dump(std::ostream&)const override;
 
 public: // readout
-  const std::string& name()const	{return _name;}
-  const std::string  fullstring()const	{return _file.fullstring();}
+  const std::string& name()const	{ untested();return _name;}
+  const std::string  fullstring()const	{ untested();return _file.fullstring();}
   const Head&	     head()const	{return _head;}
-//  const Code_Block&  h_headers()const	{return _h_headers;}
-//  const Code_Block&  cc_headers()const	{return _cc_headers;}
+//  const Code_Block&  h_headers()const	{ untested();return _h_headers;}
+//  const Code_Block&  cc_headers()const	{ untested();return _cc_headers;}
   const Module_List& modules()const	{return _module_list;}
-//  const Code_Block&  h_direct()const	{return _h_direct;}
-//  const Code_Block&  cc_direct()const	{return _cc_direct;}
+//  const Code_Block&  h_direct()const	{ untested();return _h_direct;}
+//  const Code_Block&  cc_direct()const	{ untested();return _cc_direct;}
 
   const Nature_List&	 nature_list()const	{ return _nature_list;}
   const Discipline_List& discipline_list()const	{return _discipline_list;}
@@ -82,13 +82,13 @@ public: // readout
 /*--------------------------------------------------------------------------*/
 void parse_attributes(CS& cmd, void const* x);
 inline void parse_attributes(CS& cmd, intptr_t x)
-{
+{ untested();
   parse_attributes(cmd, (void const*) x);
 }
 /*--------------------------------------------------------------------------*/
 bool has_attributes(void const* x);
 inline bool has_attributes(intptr_t x)
-{
+{ untested();
   return has_attributes((void const*)x);
 }
 void print_attributes(std::ostream& o, const void* x);

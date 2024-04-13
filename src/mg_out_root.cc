@@ -45,9 +45,10 @@ static void make_header(std::ostream& o, const File& in,
     "#include <u_nodemap.h>\n"; // if submodules are used anywhere
 #ifdef DEPEND
   // nothing. just compute deps.
-#elif 0
+#elif defined(RETEST)
+  o <<
     "#include <m_va.h>\n"
-    "#include <e_va.h>\n"
+    "#include <e_va.h>\n";
 #else
   o <<
 #include "m_va.raw"

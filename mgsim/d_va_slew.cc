@@ -109,7 +109,7 @@ bool DEV_SLEW::do_tr()
   
   trace4("DEV_SLEW::do_tr", _sim->_time0, _y[0].f0, _y[1].f0, _y1.f0);
 
-  if(_sim->is_advance_iteration()){
+  if(_sim->is_advance_iteration()){ untested();
     // return true;
   }else if( CKT_BASE::_sim->analysis_is_static() ) {
     assert(_sim->_time0 == 0.);
@@ -128,7 +128,7 @@ bool DEV_SLEW::do_tr()
     }else if(_n_states > 3){
       sl_max = _states[3];
       sl_min = -sl_max;
-    }else{
+    }else{ untested();
     }
     trace4("DEV_SLEW::do_tr", sl_min, sl_max, slope, _n_states);
 
@@ -161,7 +161,7 @@ TIME_PAIR DEV_SLEW::tr_review()
   }else if(_n_states > 3){
     sl_max = _states[3];
     sl_min = -sl_max;
-  }else{
+  }else{ untested();
   }
 
   double slope_in = ( _y[0].f0 - _y[1].f0 ) / _dt;

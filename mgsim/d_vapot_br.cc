@@ -167,7 +167,7 @@ bool VA_BREQN::do_tr()
     _m0.x = 0.;
     _m0.c0 = -_loss0 * _values[0]; // -> rhs
     _m0.c1 = 0; // -_loss0 * _values[1];
-  }else{
+  }else{ untested();
     // current source.
     _m0 = CPOLY1(0., _values[0], _values[1]);
   }
@@ -211,7 +211,7 @@ void VA_BREQN::tr_load()
   }else{ untested();
     trace2("VA_BREQN::tr_load I", _values[0], _values[1]);
 
-    for (int i=1; i<=_n_ports; ++i) {
+    for (int i=1; i<=_n_ports; ++i) { untested();
       trace4("tr_load", long_label(), i, _values[i], _old_values[i]);
       tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_values[i]), &(_old_values[i]));
     }
@@ -219,7 +219,7 @@ void VA_BREQN::tr_load()
 }
 /*--------------------------------------------------------------------------*/
 double VA_BREQN::tr_amps()const
-{
+{ untested();
   return _n[BR()].v0();
 }
 /*--------------------------------------------------------------------------*/
@@ -318,7 +318,7 @@ void VA_BREQN::set_parameters(const std::string& Label, CARD *Owner,
     if (matrix_nodes() > NODES_PER_BRANCH) {
       // allocate a bigger node list
       _n = new node_t[matrix_nodes()];
-    }else{
+    }else{ untested();
       // use the default node list, already set
     }      
   }else{

@@ -38,7 +38,7 @@ protected: // override virtual
   std::string dev_type()const override{ return "va_acs"; }
 //  int      net_nodes()const override {untested(); return _net_nodes;}
 //  int      max_nodes()const override {untested(); return 4;}
-//   void set_port_by_index(int i, std::string& s) override {
+//   void set_port_by_index(int i, std::string& s) override { untested();
 //     incomplete();
 //   }
   void	   tr_iwant_matrix()override	{tr_iwant_matrix_extended();}
@@ -54,7 +54,7 @@ protected: // override virtual
 
   bool has_iv_probe()const override{return true;}
 public:
-  int set_param_by_name(std::string n, std::string v)override {
+  int set_param_by_name(std::string n, std::string v)override { untested();
     if(n=="mag"){ untested();
     incomplete();
       return 0;
@@ -68,7 +68,7 @@ public:
 		      int node_count, const node_t nodes[])override;
   //		      const double* inputs[]=0);
 protected:
-  double abstol() const{
+  double abstol() const{ untested();
     return 0.;
     auto cv = prechecked_cast<COMMON_VASRC const*>(common());
     assert(cv); // TODO: give feedback
@@ -79,7 +79,7 @@ protected:
     CS cmd(CS::_STRING, x);
     if (Umatch(x, "loss ")) {
       return XPROBE(_loss0);
-    }else{
+    }else{ untested();
       return DEV_CPOLY_G::ac_probe_ext(x);
     }
   }
@@ -88,14 +88,14 @@ protected:
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 //// void VAACS::ac_load()
-//// {
-////   if(_loss0){
+//// { untested();
+////   if(_loss0){ untested();
 ////     ac_load_shunt(); // 4 pt +- loss
-////   }else{
+////   }else{ untested();
 ////   }
 ////   if(_current_port_names.size()){ untested();
 ////     incomplete();
-////   }else{
+////   }else{ untested();
 ////   }
 ////   _acg = 1; // _values[1];
 ////   // ac_load_passive();
@@ -111,7 +111,7 @@ void VAACS::ac_load()
   //  ac_load_passive();
   }else{
   }
-  // for (int i=2; i<=_n_ports; ++i) {
+  // for (int i=2; i<=_n_ports; ++i) { untested();
   //   trace2("load", i, _vy0[i]);
   //   ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _vy0[i] * _sim->_jomega);
   // }
@@ -143,7 +143,7 @@ void VAACS::set_parameters(const std::string& Label, CARD *Owner,
     // _adj_values = new double[n_states];
     _old_values = new double[n_states];
 
-    if (matrix_nodes() > NODES_PER_BRANCH) {
+    if (matrix_nodes() > NODES_PER_BRANCH) { untested();
       // allocate a bigger node list
       _n = new node_t[matrix_nodes()];
     }else{

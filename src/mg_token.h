@@ -21,9 +21,9 @@
 /*--------------------------------------------------------------------------*/
 #ifndef MG_TOKEN_H
 #define MG_TOKEN_H
-#include "m_tokens.h"
-#include <m_expression.h>
+#include "mg_expression.h"
 #include "mg_func.h"
+#include "mg_deps.h" // BUG?
 #include "mg_base.h"
 /*--------------------------------------------------------------------------*/
 class FUNCTION_;
@@ -33,7 +33,7 @@ private: // stuff into data?
   Expression const* _args{NULL};
   size_t _num_args{size_t(-1)};
 private:
-  Token* clone()const override {
+  Token* clone()const override { untested();
     return new Token_CALL(*this);
   }
 public:
@@ -50,8 +50,8 @@ private:
   void attach();
   void detach();
 public:
-  void pop(){ untested(); assert(_args); _args = NULL; }
-  void push(Expression const* e){ assert(!_args); _args = e; }
+  void pop(){ untested(); untested(); assert(_args); _args = NULL; }
+  void push(Expression const* e){ untested(); assert(!_args); _args = e; }
   void stack_op(Expression* e)const override;
   void set_num_args(size_t n){ _num_args = n; } // expression size?
   void set_args(Expression* e){ assert(!_args); _args = e; } // needed?
@@ -120,7 +120,7 @@ inline std::string Token_CALL::code_name()const
   assert(_function);
   if(_function->code_name()!=""){
     return "/*call1*/" + _function->code_name();
-  }else if(_function->label()!=""){
+  }else if(_function->label()!=""){ untested();
     // incomplete(); // m_va.h, TODO
     return "/*INCOMPLETE*/ va::" + _function->label();
   }else{ untested();
@@ -133,12 +133,12 @@ class TData;
 TData* copy_deps(Base const* b);
 /*--------------------------------------------------------------------------*/
 static Token* copy(Token const* b)
-{
-  if(auto t=dynamic_cast<Token const*>(b)){
+{ untested();
+  if(auto t=dynamic_cast<Token const*>(b)){ untested();
     return t->clone();
   }else if(b){ untested();
     return NULL;
-  }else{
+  }else{ untested();
     return NULL;
   }
 }
@@ -152,7 +152,7 @@ public:
   explicit Token_PARLIST_(Token_PARLIST_ const& p)
     : Token_PARLIST(p) { assert(!_args); }
   explicit Token_PARLIST_(const std::string Name, Base* L=NULL)
-    : Token_PARLIST(Name, L) { assert(!L); assert(!_args); }
+    : Token_PARLIST(Name, L) { untested(); assert(!L); assert(!_args); }
   ~Token_PARLIST_();
 public:
   void stack_op(Expression* E)const override;
@@ -173,7 +173,7 @@ public:
   explicit Token_ARRAY_(Token_ARRAY_ const& p)
     : Token_ARRAY(p) { assert(!args()); }
   explicit Token_ARRAY_(const std::string Name, Base* L=NULL)
-    : Token_ARRAY(Name, L) { assert(!args()); }
+    : Token_ARRAY(Name, L) { untested(); assert(!args()); }
 public:
   void stack_op(Expression* E)const override;
   Token_ARRAY_* clone()const override{
@@ -200,7 +200,7 @@ public:
   ~Token_UNARY_(){ delete _op; }
 
   void stack_op(Expression*)const override;
-  void pop(){ _op = NULL; }
+  void pop(){ untested(); _op = NULL; }
   Token const* op1()const { return _op; };
 };
 /*--------------------------------------------------------------------------*/
@@ -210,7 +210,7 @@ private: // stuff into data?
   Token const* _op2{NULL};
 public:
   explicit Token_BINOP_(Token_BINOP const& b, Base const* d)
-    : Token_BINOP(b.name(), d) { }
+    : Token_BINOP(b.name(), d) { untested(); }
   explicit Token_BINOP_(std::string const& b, Base const* d)
     : Token_BINOP(b, d) { }
   explicit Token_BINOP_(std::string const& b,
@@ -249,9 +249,9 @@ class Token_TERNARY_ : public Token_TERNARY {
   Token const* _cond{NULL}; // stuff into data?
 public:
 //  explicit Token_TERNARY_(Token_TERNARY const& b, Base const* d)
-//    : Token_TERNARY(b.name(), d) { }
+//    : Token_TERNARY(b.name(), d) { untested(); }
   explicit Token_TERNARY_(std::string const& b, Base const* d)
-    : Token_TERNARY(b, d) { }
+    : Token_TERNARY(b, d) { untested(); }
   explicit Token_TERNARY_(std::string const& b, Token const* Cond,
       Expression const* t1, Expression const* t2, Base const* d=NULL)
     : Token_TERNARY(b, t1, t2, d), _cond(Cond) {}
@@ -279,7 +279,7 @@ public:
   explicit Token_SYMBOL_(Token_SYMBOL const& p)
     : Token_SYMBOL(p) { untested();
   }
-  ~Token_SYMBOL_(){
+  ~Token_SYMBOL_(){ untested();
 //    _data?
     incomplete();
   }
@@ -325,13 +325,13 @@ public:
 private:
   explicit Token_PAR_REF(const Token_PAR_REF& P, Base const* d=NULL)
     : Token_CONSTANT(P.name(), d, ""), _item(P._item) {}
-  Token* clone()const override {
+  Token* clone()const override { untested();
     return new Token_PAR_REF(*this);
   }
 public:
   void stack_op(Expression* e)const override;
 public:
-  std::string code_name()const {
+  std::string code_name()const { untested();
     return "_p_" + name();
   }
   Parameter_Base const* item()const {
@@ -343,15 +343,17 @@ public:
 class Token_OUT_VAR : public Token_SYMBOL {
 public:
   explicit Token_OUT_VAR(std::string Name)
-    : Token_SYMBOL(Name, "") {}
+    : Token_SYMBOL(Name, "") { }
+public:
+  void stack_op(Expression* e)const override;
 private:
   explicit Token_OUT_VAR(Token_OUT_VAR const& p)
-    : Token_SYMBOL(p.name(), "") {}
+    : Token_SYMBOL(p.name(), "") { }
   Token_OUT_VAR* clone()const override{
     return new Token_OUT_VAR(*this);
   }
-  // std::string code_name() const { return "_v_"+name(); }
-  void dump(std::ostream& o)const override {
+  // std::string code_name() const { untested(); return "_v_"+name(); }
+  void dump(std::ostream& o)const override { untested();
     o << "." << name();
   }
 };
@@ -362,27 +364,28 @@ public:
   Token * _var{NULL};
   Data_Type const& type()const;
 public:
-  explicit Token_ARGUMENT() : Token_SYMBOL("",""){unreachable();}
+  explicit Token_ARGUMENT() : Token_SYMBOL("",""){ untested();unreachable();}
   explicit Token_ARGUMENT(std::string Name)
     : Token_SYMBOL(Name, "") {}
   void dump(std::ostream& o)const override;
 public: // LiSt
-  std::string key() const {unreachable();return "";}
-  void set_owner(Base*){unreachable();}
+  std::string key() const { untested();unreachable();return "";}
+  void set_owner(Base*){ untested();unreachable();}
 };
 /*--------------------------------------------------------------------------*/
+// Token_VARIABLE?
 class Token_VAR_REF : public Token_SYMBOL {
 protected:
   Base* _item;
 public:
   explicit Token_VAR_REF(std::string Name, Base* item)
-    : Token_SYMBOL(Name, ""), _item(item) {}
+    : Token_SYMBOL(Name, ""), _item(item) { untested();}
   explicit Token_VAR_REF(std::string Name, Base* item, Base const* data)
     : Token_SYMBOL(Name, data), _item(item) {}
 // protected: //??
   explicit Token_VAR_REF(const Token_VAR_REF& P, Base* d=NULL)
     : Token_SYMBOL(P.name(), d), _item(P._item) {}
-  explicit Token_VAR_REF() : Token_SYMBOL("","")  { unreachable(); }
+  explicit Token_VAR_REF() : Token_SYMBOL("","")  { untested(); unreachable(); }
   ~Token_VAR_REF() {
     trace1("~Token_VAR_REF", name());
   }
@@ -400,10 +403,11 @@ public:
   TData const& deps()const;
   Block const* scope() const;
   std::string code_name() const { return "_v_"+name(); }
+  bool is_used() const;
 
   // LiSt
-  std::string key() const {unreachable();return "";}
-  void set_owner(Base*){unreachable();}
+  std::string key() const { untested();unreachable();return "";}
+  void set_owner(Base*){ untested();unreachable();}
 private:
   size_t num_deps() const;
 };
@@ -415,7 +419,7 @@ class Token_VAR_REAL : public Token_VAR_REF {
   Block const* _owner{NULL};
   // type //
 public:
-  explicit Token_VAR_REAL() : Token_VAR_REF("",NULL,NULL) {unreachable();}
+  explicit Token_VAR_REAL() : Token_VAR_REF("",NULL,NULL) { untested();unreachable();}
   explicit Token_VAR_REAL(std::string Name, Base* item, Base const* data)
     : Token_VAR_REF(Name, item, data) {}
   Token_VAR_REAL* deep_copy(Base* owner, std::string prefix)const override;
@@ -425,7 +429,7 @@ public:
   bool is_module_variable()const override{
     return _owner;
   }
-  std::string key() const {unreachable();return "";}
+  std::string key() const { untested();unreachable();return "";}
 
   void clear_deps();
   void stack_op(Expression* e)const override;
@@ -436,13 +440,13 @@ public:
 // class Token_VAR_DECL : public Token_VAR_REF
 class Token_VAR_INT : public Token_VAR_REF {
 public:
-  explicit Token_VAR_INT() : Token_VAR_REF("",NULL,NULL) {unreachable();}
+  explicit Token_VAR_INT() : Token_VAR_REF("",NULL,NULL) { untested();unreachable();}
   explicit Token_VAR_INT(std::string Name, Base* item, Base const* data)
     : Token_VAR_REF(Name, item, data) {}
   Data_Type const& type()const override;
 
-  void set_owner(Base*){unreachable();}
-  std::string key() const {unreachable();return "";}
+  void set_owner(Base*){ untested();unreachable();}
+  std::string key() const { untested();unreachable();return "";}
 
   void clear_deps();
   void stack_op(Expression* e)const override;

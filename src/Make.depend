@@ -1,128 +1,121 @@
 mg_code.o: mg_code.cc mg_.h mg_expression.h mg_attrib.h mg_base.h \
- mg_deps.h mg_lib.h mg_func.h mg_token.h m_tokens.h mg_code.h mg_filter.h \
+ mg_deps.h mg_lib.h mg_func.h mg_token.h mg_code.h mg_filter.h \
  mg_circuit.h mg_discipline.h mg_module.h
 mg_deps.o: mg_deps.cc mg_analog.h mg_.h mg_expression.h mg_attrib.h \
- mg_base.h mg_deps.h mg_lib.h mg_func.h mg_token.h m_tokens.h mg_code.h \
- mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
+ mg_base.h mg_deps.h mg_lib.h mg_func.h mg_token.h mg_code.h mg_filter.h \
+ mg_circuit.h mg_discipline.h mg_module.h
 mg_error.o: mg_error.cc mg_error.h
 mg_file.o: mg_file.cc mg_in.h mg_base.h mg_attrib.h mg_options.h \
  mg_error.h mg_.h mg_expression.h mg_deps.h mg_lib.h mg_func.h mg_token.h \
- m_tokens.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
- mg_module.h
-mg_filt_acstim.o: mg_filt_acstim.cc mg_func.h mg_token.h m_tokens.h \
- mg_expression.h mg_deps.h mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h \
- mg_attrib.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
- mg_module.h
-mg_filt.o: mg_filt.cc mg_func.h mg_token.h m_tokens.h mg_expression.h \
+ mg_code.h mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
+mg_filt_acstim.o: mg_filt_acstim.cc mg_func.h mg_token.h mg_expression.h \
  mg_deps.h mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h mg_attrib.h \
  mg_code.h mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
-mg_filt_ddx.o: mg_filt_ddx.cc mg_func.h mg_token.h m_tokens.h \
- mg_expression.h mg_deps.h mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h \
- mg_attrib.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
- mg_module.h
-mg_filt_laplace.o: mg_filt_laplace.cc mg_func.h mg_token.h m_tokens.h \
- mg_expression.h mg_deps.h mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h \
- mg_attrib.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
- mg_module.h
-mg_filt_slew.o: mg_filt_slew.cc mg_func.h mg_token.h m_tokens.h \
- mg_expression.h mg_deps.h mg_lib.h mg_base.h mg_filter.h mg_circuit.h \
- mg_discipline.h mg_attrib.h mg_code.h mg_out.h mg_.h mg_module.h
-mg_filt_zi.o: mg_filt_zi.cc mg_func.h mg_token.h m_tokens.h \
- mg_expression.h mg_deps.h mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h \
- mg_attrib.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
- mg_module.h
-mg_func.o: mg_func.cc mg_func.h mg_token.h m_tokens.h mg_expression.h \
+mg_filt.o: mg_filt.cc mg_func.h mg_token.h mg_expression.h mg_deps.h \
+ mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h mg_attrib.h mg_code.h \
+ mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
+mg_filt_ddx.o: mg_filt_ddx.cc mg_func.h mg_token.h mg_expression.h \
  mg_deps.h mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h mg_attrib.h \
  mg_code.h mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
-mg_func_pf.o: mg_func_pf.cc mg_func.h mg_token.h m_tokens.h \
+mg_filt_laplace.o: mg_filt_laplace.cc mg_func.h mg_token.h \
  mg_expression.h mg_deps.h mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h \
  mg_attrib.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
  mg_module.h
-mg_func_sys.o: mg_func_sys.cc mg_func.h mg_token.h m_tokens.h \
- mg_expression.h mg_deps.h mg_lib.h mg_base.h mg_out.h mg_.h mg_attrib.h \
+mg_filt_slew.o: mg_filt_slew.cc mg_func.h mg_token.h mg_expression.h \
+ mg_deps.h mg_lib.h mg_base.h mg_filter.h mg_circuit.h mg_discipline.h \
+ mg_attrib.h mg_code.h mg_out.h mg_.h mg_module.h
+mg_filt_zi.o: mg_filt_zi.cc mg_func.h mg_token.h mg_expression.h \
+ mg_deps.h mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h mg_attrib.h \
  mg_code.h mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
+mg_func.o: mg_func.cc mg_func.h mg_token.h mg_expression.h mg_deps.h \
+ mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h mg_attrib.h mg_code.h \
+ mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
+mg_func_pf.o: mg_func_pf.cc mg_func.h mg_token.h mg_expression.h \
+ mg_deps.h mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h mg_attrib.h \
+ mg_code.h mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
+mg_func_sys.o: mg_func_sys.cc mg_func.h mg_token.h mg_expression.h \
+ mg_deps.h mg_lib.h mg_base.h mg_out.h mg_.h mg_attrib.h mg_code.h \
+ mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
 mg_impl.o: mg_impl.cc mg_.h mg_expression.h mg_attrib.h mg_base.h \
- mg_deps.h mg_lib.h mg_func.h mg_token.h m_tokens.h mg_code.h mg_filter.h \
+ mg_deps.h mg_lib.h mg_func.h mg_token.h mg_code.h mg_filter.h \
  mg_circuit.h mg_discipline.h mg_module.h mg_in.h mg_options.h
 mg_in_analog.o: mg_in_analog.cc mg_analog.h mg_.h mg_expression.h \
- mg_attrib.h mg_base.h mg_deps.h mg_lib.h mg_func.h mg_token.h m_tokens.h \
- mg_code.h mg_filter.h mg_circuit.h mg_discipline.h mg_module.h mg_out.h \
- mg_in.h mg_error.h mg_options.h
+ mg_attrib.h mg_base.h mg_deps.h mg_lib.h mg_func.h mg_token.h mg_code.h \
+ mg_filter.h mg_circuit.h mg_discipline.h mg_module.h mg_out.h mg_in.h \
+ mg_error.h mg_options.h
 mg_in.o: mg_in.cc mg_error.h mg_options.h mg_out.h mg_base.h mg_in.h \
  mg_attrib.h mg_.h mg_expression.h mg_deps.h mg_lib.h mg_func.h \
- mg_token.h m_tokens.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
+ mg_token.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
  mg_module.h
 mg_in_discipline.o: mg_in_discipline.cc mg_.h mg_expression.h mg_attrib.h \
- mg_base.h mg_deps.h mg_lib.h mg_func.h mg_token.h m_tokens.h mg_code.h \
- mg_filter.h mg_circuit.h mg_discipline.h mg_module.h mg_in.h
-mg_in_expr.o: mg_in_expr.cc m_tokens.h mg_expression.h mg_deps.h mg_lib.h \
- mg_token.h mg_func.h mg_base.h mg_in.h mg_attrib.h mg_code.h mg_.h \
+ mg_base.h mg_deps.h mg_lib.h mg_func.h mg_token.h mg_code.h mg_filter.h \
+ mg_circuit.h mg_discipline.h mg_module.h mg_in.h
+mg_in_expr.o: mg_in_expr.cc mg_token.h mg_expression.h mg_func.h \
+ mg_deps.h mg_lib.h mg_base.h mg_in.h mg_attrib.h mg_code.h mg_.h \
  mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
 mg_in_module.o: mg_in_module.cc mg_.h mg_expression.h mg_attrib.h \
- mg_base.h mg_deps.h mg_lib.h mg_func.h mg_token.h m_tokens.h mg_code.h \
- mg_filter.h mg_circuit.h mg_discipline.h mg_module.h mg_error.h mg_out.h \
- mg_in.h mg_options.h mg_analog.h
+ mg_base.h mg_deps.h mg_lib.h mg_func.h mg_token.h mg_code.h mg_filter.h \
+ mg_circuit.h mg_discipline.h mg_module.h mg_error.h mg_out.h mg_in.h \
+ mg_options.h mg_analog.h
 mg_in_paramset.o: mg_in_paramset.cc mg_.h mg_expression.h mg_attrib.h \
- mg_base.h mg_deps.h mg_lib.h mg_func.h mg_token.h m_tokens.h mg_code.h \
- mg_filter.h mg_circuit.h mg_discipline.h mg_module.h mg_out.h mg_in.h \
- mg_options.h mg_error.h mg_analog.h
+ mg_base.h mg_deps.h mg_lib.h mg_func.h mg_token.h mg_code.h mg_filter.h \
+ mg_circuit.h mg_discipline.h mg_module.h mg_out.h mg_in.h mg_options.h \
+ mg_error.h mg_analog.h
 mg_in_verilog.o: mg_in_verilog.cc
 mg_in_circuit.o: mg_in_circuit.cc mg_circuit.h mg_base.h mg_discipline.h \
- mg_attrib.h mg_code.h mg_expression.h mg_in.h mg_.h mg_deps.h mg_lib.h \
- mg_func.h mg_token.h m_tokens.h mg_filter.h mg_module.h
+ mg_attrib.h mg_code.h mg_deps.h mg_lib.h mg_expression.h mg_in.h mg_.h \
+ mg_func.h mg_token.h mg_filter.h mg_module.h
 mg_block.o: mg_block.cc mg_.h mg_expression.h mg_attrib.h mg_base.h \
- mg_deps.h mg_lib.h mg_func.h mg_token.h m_tokens.h mg_code.h mg_filter.h \
+ mg_deps.h mg_lib.h mg_func.h mg_token.h mg_code.h mg_filter.h \
  mg_circuit.h mg_discipline.h mg_module.h
 mg_main.o: mg_main.cc mg_out.h mg_base.h mg_in.h mg_attrib.h mg_pp.h \
- mg_.h mg_expression.h mg_deps.h mg_lib.h mg_func.h mg_token.h m_tokens.h \
- mg_code.h mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
+ mg_.h mg_expression.h mg_deps.h mg_lib.h mg_func.h mg_token.h mg_code.h \
+ mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
 mg_nodes.o: mg_nodes.cc mg_.h mg_expression.h mg_attrib.h mg_base.h \
- mg_deps.h mg_lib.h mg_func.h mg_token.h m_tokens.h mg_code.h mg_filter.h \
+ mg_deps.h mg_lib.h mg_func.h mg_token.h mg_code.h mg_filter.h \
  mg_circuit.h mg_discipline.h mg_module.h
 mg_options.o: mg_options.cc mg_options.h
 mg_out.o: mg_out.cc mg_out.h mg_base.h
 mg_out_dump.o: mg_out_dump.cc mg_out.h mg_base.h mg_in.h mg_attrib.h \
- mg_.h mg_expression.h mg_deps.h mg_lib.h mg_func.h mg_token.h m_tokens.h \
- mg_code.h mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
+ mg_.h mg_expression.h mg_deps.h mg_lib.h mg_func.h mg_token.h mg_code.h \
+ mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
 mg_out_expr.o: mg_out_expr.cc mg_out.h mg_base.h mg_func.h mg_token.h \
- m_tokens.h mg_expression.h mg_deps.h mg_lib.h mg_options.h mg_analog.h \
- mg_.h mg_attrib.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
+ mg_expression.h mg_deps.h mg_lib.h mg_options.h mg_analog.h mg_.h \
+ mg_attrib.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
  mg_module.h
 mg_out_h.o: mg_out_h.cc mg_out.h mg_base.h mg_func.h mg_token.h \
- m_tokens.h mg_expression.h mg_deps.h mg_lib.h mg_options.h mg_analog.h \
- mg_.h mg_attrib.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
+ mg_expression.h mg_deps.h mg_lib.h mg_options.h mg_analog.h mg_.h \
+ mg_attrib.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
  mg_module.h
 mg_out_analog.o: mg_out_analog.cc mg_out.h mg_base.h mg_analog.h mg_.h \
  mg_expression.h mg_attrib.h mg_deps.h mg_lib.h mg_func.h mg_token.h \
- m_tokens.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
- mg_module.h mg_options.h
+ mg_code.h mg_filter.h mg_circuit.h mg_discipline.h mg_module.h \
+ mg_options.h
 mg_out_module.o: mg_out_module.cc mg_out.h mg_base.h mg_func.h mg_token.h \
- m_tokens.h mg_expression.h mg_deps.h mg_lib.h mg_circuit.h \
- mg_discipline.h mg_attrib.h mg_code.h mg_.h mg_filter.h mg_module.h
+ mg_expression.h mg_deps.h mg_lib.h mg_circuit.h mg_discipline.h \
+ mg_attrib.h mg_code.h mg_.h mg_filter.h mg_module.h
 mg_out_common.o: mg_out_common.cc mg_out.h mg_base.h mg_circuit.h \
- mg_discipline.h mg_attrib.h mg_code.h mg_expression.h mg_.h mg_deps.h \
- mg_lib.h mg_func.h mg_token.h m_tokens.h mg_filter.h mg_module.h
-mg_out_dev.o: mg_out_dev.cc mg_out.h mg_base.h m_tokens.h mg_expression.h \
- mg_deps.h mg_lib.h mg_token.h mg_func.h mg_.h mg_attrib.h mg_code.h \
- mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
+ mg_discipline.h mg_attrib.h mg_code.h mg_deps.h mg_lib.h mg_expression.h \
+ mg_.h mg_func.h mg_token.h mg_filter.h mg_module.h
+mg_out_dev.o: mg_out_dev.cc mg_out.h mg_base.h mg_token.h mg_expression.h \
+ mg_func.h mg_deps.h mg_lib.h mg_.h mg_attrib.h mg_code.h mg_filter.h \
+ mg_circuit.h mg_discipline.h mg_module.h
 mg_out_lib.o: mg_out_lib.cc mg_out.h mg_base.h mg_.h mg_expression.h \
- mg_attrib.h mg_deps.h mg_lib.h mg_func.h mg_token.h m_tokens.h mg_code.h \
+ mg_attrib.h mg_deps.h mg_lib.h mg_func.h mg_token.h mg_code.h \
  mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
 mg_out_root.o: mg_out_root.cc mg_out.h mg_base.h mg_in.h mg_attrib.h \
  mg_options.h mg_discipline.h mg_.h mg_expression.h mg_deps.h mg_lib.h \
- mg_func.h mg_token.h m_tokens.h mg_code.h mg_filter.h mg_circuit.h \
- mg_module.h
+ mg_func.h mg_token.h mg_code.h mg_filter.h mg_circuit.h mg_module.h
 mg_pp.o: mg_pp.cc mg_.h mg_expression.h mg_attrib.h mg_base.h mg_deps.h \
- mg_lib.h mg_func.h mg_token.h m_tokens.h mg_code.h mg_filter.h \
- mg_circuit.h mg_discipline.h mg_module.h mg_pp.h mg_error.h
-mg_task.o: mg_task.cc mg_func.h mg_token.h m_tokens.h mg_expression.h \
- mg_deps.h mg_lib.h mg_base.h mg_.h mg_attrib.h mg_code.h mg_filter.h \
- mg_circuit.h mg_discipline.h mg_module.h mg_out.h
-mg_token.o: mg_token.cc mg_expression.h m_tokens.h mg_deps.h mg_lib.h \
- mg_token.h mg_func.h mg_base.h mg_options.h mg_analog.h mg_.h \
- mg_attrib.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
- mg_module.h
+ mg_lib.h mg_func.h mg_token.h mg_code.h mg_filter.h mg_circuit.h \
+ mg_discipline.h mg_module.h mg_pp.h mg_error.h
+mg_task.o: mg_task.cc mg_func.h mg_token.h mg_expression.h mg_deps.h \
+ mg_lib.h mg_base.h mg_.h mg_attrib.h mg_code.h mg_filter.h mg_circuit.h \
+ mg_discipline.h mg_module.h mg_out.h
+mg_token.o: mg_token.cc mg_expression.h mg_token.h mg_func.h mg_deps.h \
+ mg_lib.h mg_base.h mg_options.h mg_analog.h mg_.h mg_attrib.h mg_code.h \
+ mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
 m_tokens.o: m_tokens.cc
-m_expression_dump.o: m_expression_dump.cc m_tokens.h mg_expression.h \
- mg_deps.h mg_lib.h mg_token.h mg_func.h mg_base.h mg_.h mg_attrib.h \
- mg_code.h mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
+m_expression_dump.o: m_expression_dump.cc mg_token.h mg_expression.h \
+ mg_func.h mg_deps.h mg_lib.h mg_base.h mg_.h mg_attrib.h mg_code.h \
+ mg_filter.h mg_circuit.h mg_discipline.h mg_module.h

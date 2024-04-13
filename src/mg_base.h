@@ -11,8 +11,8 @@ class Owned_Base : public Base {
   Block* _owner{NULL};
 protected:
   explicit Owned_Base() : Base() { }
-  explicit Owned_Base(Owned_Base const& b) : Base(), _owner(b._owner) { }
-  explicit Owned_Base(Block* o) : Base(), _owner(o) { }
+  explicit Owned_Base(Owned_Base const& b) : Base(), _owner(b._owner) { untested(); }
+  explicit Owned_Base(Block* o) : Base(), _owner(o) { untested(); }
 public:
   void set_owner(Block* b){  _owner = b; }
   Block const* owner()const { return _owner; }
@@ -22,15 +22,15 @@ protected:
 
 public:
 //  Attribute_Instance const* _attributes{NULL};
-  ATTRIB_LIST_p& attributes() {
+  ATTRIB_LIST_p& attributes() { untested();
     assert(CKT_BASE::_attribs);
     return (*CKT_BASE::_attribs)[this];
   }
-  const ATTRIB_LIST_p& attributes()const {
+  const ATTRIB_LIST_p& attributes()const { untested();
     assert(CKT_BASE::_attribs);
     return CKT_BASE::_attribs->at(this);
   }
-//  void set_attributes(Attribute_Instance const* a) {
+//  void set_attributes(Attribute_Instance const* a) { untested();
 //    _attributes = a;
 //  }
 };
@@ -53,17 +53,17 @@ public:
   explicit String_Arg(std::string const& s) : _s(s) {}
   String_Arg(String_Arg const& o) : Base(), _s(o._s) {} // needed?
   String_Arg& operator=(String_Arg const& o) { _s = o._s; return *this; }
-  //String_Arg(const std::string& s) : _s(s) {}
+  //String_Arg(const std::string& s) : _s(s) { untested();}
   const String_Arg&  key()const	  {return *this;}
   void parse(CS& f)override;
   void dump(std::ostream& f)const override{f << _s;}
   void operator=(const std::string& s)	 {_s = s;}
-  void operator+=(const std::string& s)	 {_s += s;}
+  void operator+=(const std::string& s)	 { untested();_s += s;}
   bool operator!=(const std::string& s)const {return _s != s;}
   bool operator==(const String_Arg& s)const {return _s == s._s;}
-  bool operator!=(const String_Arg& s)const {return _s != s._s;}
-  bool			is_empty()const	 {return _s.empty();}
-  std::string		lower()const	 {return to_lower(_s);}
+  bool operator!=(const String_Arg& s)const { untested();return _s != s._s;}
+  bool			is_empty()const	 { untested();return _s.empty();}
+  std::string		lower()const	 { untested();return to_lower(_s);}
   const std::string&	to_string()const {return _s;}
   void set_owner(Block*){
     // incomplete();
@@ -76,7 +76,7 @@ public:
   using List_Base<T>::begin;
   using List_Base<T>::end;
 private:
-  void parse(CS&) override {unreachable();}
+  void parse(CS&) override { untested();unreachable();}
 public:
   typedef typename List_Base<T>::const_iterator const_iterator;
 
@@ -103,15 +103,15 @@ public:
     }
     return end();
   }
-  const_iterator find(CS& file) const {
+  const_iterator find(CS& file) const { untested();
     size_t here = file.cursor();
     String_Arg s;
     //file >> s;
     s = file.ctos(":,.`()[];*/+-", "", "");
     const_iterator x = find(s);
-    if (x == end()) {
+    if (x == end()) { untested();
       file.reset(here);
-    }else{
+    }else{ untested();
     }
     return x;
   }
@@ -132,7 +132,7 @@ public:
   ~LiSt();
 
   void set_owner(Block* b){ _owner = b; }
-  Block const* owner() const{return _owner;}
+  Block const* owner() const{ untested();return _owner;}
   Block* owner(){return _owner;}
   void parse(CS& file) override{
     parse_n(file);
@@ -244,10 +244,10 @@ public:
 //  typedef typename List_Base<T>::iterator iterator;
 
   void set_owner(Block* c) { _owner = c; }
-  Block const* owner() const{return _owner;}
+  Block const* owner() const{ untested();return _owner;}
   Block* owner(){return _owner;}
-//  void set_file(File const* f){ _file = f; }
-//  File const* file() const{untested(); return _file;}
+//  void set_file(File const* f){ untested(); _file = f; }
+//  File const* file() const{ untested();untested(); return _file;}
   void parse(CS& file)override {
     size_t here = file.cursor();
     T* m = new T;
@@ -358,7 +358,7 @@ public:
 
   operator Branch*() const{ return _br; }
   Branch* operator->() const{ return _br; }
-  bool operator==(Branch_Ref const& o) const{ return _br==o._br && _r==o._r; }
+  bool operator==(Branch_Ref const& o) const{ untested(); return _br==o._br && _r==o._r; }
   bool is_reversed() const{return _r;}
 
   std::string const& pname() const;
@@ -400,8 +400,8 @@ public:
   bool is_reachable()const { return _reachable; }
   bool is_always()const { return _reachable == r_always; }
   bool is_never()const { return _reachable == r_never; }
-//  void set_unreachable() { untested(); _reachable = r_never; }
-//  void set_reachable() { untested(); _reachable = r_unknown; }
+//  void set_unreachable() { untested(); untested(); _reachable = r_never; }
+//  void set_reachable() { untested(); untested(); _reachable = r_unknown; }
   void set_always() { _reachable = r_always; }
   void set_never() { _reachable = r_never; }
   virtual void new_var_ref(Base* what);
@@ -422,15 +422,15 @@ public:
   }
 
 #if 1
-  virtual Branch_Ref new_branch(std::string const&, std::string const&) {
+  virtual Branch_Ref new_branch(std::string const&, std::string const&) { untested();
     unreachable();
     return Branch_Ref(NULL, false);
   }
-  virtual Branch_Ref new_branch(Node*, Node*) {
+  virtual Branch_Ref new_branch(Node*, Node*) { untested();
     unreachable();
     return Branch_Ref(NULL, false);
   }
-  virtual Branch_Ref lookup_branch(std::string const& n)const {
+  virtual Branch_Ref lookup_branch(std::string const& n)const { untested();
     assert(_owner);
     return scope()->lookup_branch(n);
   }
@@ -443,7 +443,7 @@ public:
   void set_owner_raw(Statement* b) {
     _owner = (Base*)(b);
   }
-  void set_owner_raw(Block* b) {
+  void set_owner_raw(Block* b) { untested();
     _owner = b;
   }
   void set_owner(Base* b){
@@ -454,8 +454,8 @@ public:
   void set_owner(Block* b){
     assert(!b || !_owner || _owner == b);
     _owner = b;
-    if(!b){
-    }else if(b->is_never()){
+    if(!b){ untested();
+    }else if(b->is_never()){ untested();
       set_never();
     }else if(b->is_always()){
       set_always();
@@ -506,21 +506,21 @@ public:
   Parameter_Base() :_positive(false), _octal(false) {}
   const std::string& type()const		{return _type;}
   const std::string code_name()const		{return "_p_" + _name;}
-  const std::string& user_name()const		{return _user_name;}
-  const std::string& alt_name()const		{return _alt_name;}
+  const std::string& user_name()const		{ untested();return _user_name;}
+  const std::string& alt_name()const		{ untested();return _alt_name;}
   const std::string& comment()const		{return _comment;}
-  // const ConstantMinTypMaxExpression& default_val()const 	{return _default_val;}
+  // const ConstantMinTypMaxExpression& default_val()const 	{ untested();return _default_val;}
   const std::string& print_test()const		{return _print_test;}
-  const std::string& calc_print_test()const	{return _calc_print_test;}
-  const std::string& scale()const		{return _scale;}
-  const std::string& offset()const		{return _offset;}
-  const std::string& calculate()const		{return _calculate;}
-  const std::string& quiet_min()const		{return _quiet_min;}
-  const std::string& quiet_max()const		{return _quiet_max;}
-  const std::string& final_default()const	{return _final_default;}
-  bool		positive()const			{return _positive;}
-  bool		octal()const			{return _octal;}
-  String_Arg key()const { return String_Arg(_name); }
+  const std::string& calc_print_test()const	{ untested();return _calc_print_test;}
+  const std::string& scale()const		{ untested();return _scale;}
+  const std::string& offset()const		{ untested();return _offset;}
+  const std::string& calculate()const		{ untested();return _calculate;}
+  const std::string& quiet_min()const		{ untested();return _quiet_min;}
+  const std::string& quiet_max()const		{ untested();return _quiet_max;}
+  const std::string& final_default()const	{ untested();return _final_default;}
+  bool		positive()const			{ untested();return _positive;}
+  bool		octal()const			{ untested();return _octal;}
+  String_Arg key()const { untested(); return String_Arg(_name); }
 
 #if 0
   // needed?
@@ -534,8 +534,8 @@ public:
   void set_owner(Block* c) { _owner = c; }
   std::string const& name() const{ return _name; }
   bool operator!=(const std::string& s)const {return _name != s;}
-//  virtual bool is_constant()const {untested(); return false;}
-  virtual double eval()const {untested(); return NOT_INPUT;}
+//  virtual bool is_constant()const { untested();untested(); return false;}
+  virtual double eval()const { untested();untested(); return NOT_INPUT;}
 protected:
   Block* owner(){ return _owner; }
 }; // Parameter_Base

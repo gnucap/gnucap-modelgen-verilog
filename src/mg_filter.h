@@ -11,24 +11,24 @@ class Filter : public Element_2 {
   int _num_states{0};
 public:
   explicit Filter(std::string const& name);
-  explicit Filter() : Element_2() { new_deps(); }
+  explicit Filter() : Element_2() { untested(); new_deps(); }
   ~Filter();
-  void parse(CS&) override{unreachable();}
-  void dump(std::ostream&)const override {unreachable();}
+  void parse(CS&) override{ untested();unreachable();}
+  void dump(std::ostream&)const override { untested();unreachable();}
 
   void set_num_states(int s) {_num_states = s; }
   void set_output(Branch_Ref const& x);
-//  Branch_Ref const& branch() const{ return _branch; }
+//  Branch_Ref const& branch() const{ untested(); return _branch; }
   std::string name() const {
     return _name;
   }
-  std::string branch_code_name() const {
+  std::string branch_code_name() const { untested();
     assert(_branch);
     return _branch->code_name();
   }
   size_t num_branches()const;
   std::string code_name()const override;
-  TData const& deps()const { assert(_deps); return *_deps; }
+  TData const& deps()const { untested(); assert(_deps); return *_deps; }
 
   size_t num_states()const override;
   size_t num_nodes()const override;
@@ -40,7 +40,7 @@ public:
   }
   void set_deps(TData const&);
 private:
-  TData& deps() { assert(_deps); return *_deps; }
+  TData& deps() { untested(); assert(_deps); return *_deps; }
   void new_deps();
 }; // Filter
 #endif

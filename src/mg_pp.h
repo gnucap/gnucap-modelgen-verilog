@@ -36,11 +36,11 @@ public:
   void dump(std::ostream& f)const override;
   Define(){}
   const String_Arg&  key()const   {return _name;}
-  const String_Arg&  name()const  {return _name;}
+  const String_Arg&  name()const  { untested();return _name;}
 
   std::string substitute(String_Arg_List const&, Define_List const&) const; // HERE?
   void preprocess(Define_List const&);
-//  size_t num_args()const { return _args.size(); }
+//  size_t num_args()const { untested(); return _args.size(); }
   size_t num_args()const { return _num_args; }
 private:
   void stash(std::string const&, String_Arg_List const&);
@@ -68,10 +68,10 @@ public:
 private:
   void parse(CS& file);
   void include(const std::string& file_name); // `include?
-  std::basic_ostream<char>& diag() {
-    if(_diag){
+  std::basic_ostream<char>& diag() { untested();
+    if(_diag){ untested();
       return *_diag;
-    }else{
+    }else{ untested();
       return std::cerr;
     }
   }

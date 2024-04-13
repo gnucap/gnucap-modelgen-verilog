@@ -22,7 +22,7 @@
  * Reconstructs an infix expression from the RPN.
  *  ===  slightly modified to deal with SYMBOL_ and PARLIST_  ===
  */
-#include "m_tokens.h"
+#include "mg_token.h"
 #include "mg_.h"
 /*--------------------------------------------------------------------------*/
 static void dump_token(Token const* t, std::ostream& out)
@@ -45,7 +45,7 @@ void Expression_::dump(std::ostream& out)const
   // The _list is the expression in RPN.
   // Un-parse it -- back to infix.
   for (const_iterator i = begin(); i != end(); ++i) {
-    trace1("dump", (*i)->name());
+//    trace1("Expression_::dump", (*i)->name());
     if (dynamic_cast<const Token_STOP*>(*i)) { untested();
       stack.push_back(*i);
     }else if (dynamic_cast<const Token_PARLIST*>(*i)

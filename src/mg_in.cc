@@ -53,18 +53,18 @@ void Head::parse(CS& file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void Attribute_Spec::parse(CS& f)
-{
+{ untested();
   assert(owner());
   _key = f.ctos("=", "", "");
   trace2("Attribute_Spec", _key, f.tail().substr(0,18));
-  if( f >> '=' ){
+  if( f >> '=' ){ untested();
     // _expr = new ConstExpression(f, owner());
     _expr = new value_type;
 //    f >> *_expr;
-    if(f.match1('\"')) {
+    if(f.match1('\"')) { untested();
       f >> *_expr;
       *_expr = "\"" + *_expr + "\"";
-    }else{
+    }else{ untested();
       *_expr = f.ctos(",=;)*"); // , "\"'{(", "\"'})");
     }
   }else{ untested();
@@ -82,22 +82,22 @@ void Attribute_Spec::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 #if 0
 void Attribute_Instance::parse(CS& f)
-{
+{ untested();
   size_t here = f.cursor();
-  if(f>>"(*"){
-    while(f.more() && !f.stuck(&here)){
+  if(f>>"(*"){ untested();
+    while(f.more() && !f.stuck(&here)){ untested();
 //      std::string value("1");
-      if(f >> "*)") {
+      if(f >> "*)") { untested();
 	trace1("got all attributes", f.tail().substr(0,17));
 	break;
-      }else{
+      }else{ untested();
       }
       assert(owner());
       auto s = new Attribute_Spec(f, owner());
       push_back(s);
       f.skip1(',');
     }
-  }else{
+  }else{ untested();
   }
 }
 #endif

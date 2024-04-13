@@ -25,11 +25,11 @@
 class NATURE : public COMMON_COMPONENT {
 	double _abstol{0.};
 public:
-	explicit NATURE() : COMMON_COMPONENT(){}
-	~NATURE(){}
+	explicit NATURE() : COMMON_COMPONENT(){ untested();}
+	~NATURE(){ untested();}
 public:
-	void set_abstol(double t) { _abstol = t; }
-	double abstol()const { return _abstol; }
+	void set_abstol(double t) { untested(); _abstol = t; }
+	double abstol()const { untested(); return _abstol; }
 }
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

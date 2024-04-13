@@ -29,12 +29,12 @@
 #include <globals.h>
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/
-// void Token_CALL::stack_op(Expression* e)const{
+// void Token_CALL::stack_op(Expression* e)const{ untested();
 //   assert(0);
 // }
 // /*--------------------------------------------------------------------------*/
 // inline Token* MGVAMS_FUNCTION::new_token(Module& m, size_t na) const
-// {
+// { untested();
 //      incomplete();
 //      return NULL;
 // }
@@ -53,14 +53,14 @@ public:
   }
   ~STUB() { }
 private:
-  std::string code_name()const override{
-    if(label()!=""){
+  std::string code_name()const override{ untested();
+    if(label()!=""){ untested();
       return "";
-    }else{
+    }else{ untested();
       return "va::" + label();
     }
   }
-  std::string eval(CS&, const CARD_LIST*)const override {
+  std::string eval(CS&, const CARD_LIST*)const override { untested();
 	  unreachable();
 	  return "AAA";
   }
@@ -100,7 +100,7 @@ public:
   double evalf(double const* x)const override { untested();
     return std::abs(*x);
   }
-  void make_cc_common(std::ostream& o)const override{
+  void make_cc_common(std::ostream& o)const override{ untested();
     o__ "template<class T>\n";
     o____ "T " << code_name() << "(T d)const {itested();\n";
     o____ "if(d>=0.){itested();\n";
@@ -110,7 +110,7 @@ public:
     o____ "return d;\n";
     o__ "}\n";
   }
-  std::string code_name()const override{
+  std::string code_name()const override{ untested();
     return "_f_abs";
   }
 } p_abs;
@@ -121,7 +121,7 @@ public:
   asinh() : MGVAMS_FUNCTION(){
     set_label("asinh");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     unreachable();
     PARAMETER<double> x;
     Cmd >> x;
@@ -132,7 +132,7 @@ public:
   double evalf(double const* x)const override { untested();
     return std::asinh(*x);
   }
-  void make_cc_common(std::ostream& o)const override{
+  void make_cc_common(std::ostream& o)const override{ untested();
     o__ "template<class T>\n";
     o__ "T " << code_name() << "(T d) const{\n";
     o__ "double b = std::sqrt(1.+double(d)*double(d));\n";
@@ -141,7 +141,7 @@ public:
     o____ "return d;\n";
     o__ "}\n";
   }
-  std::string code_name()const override{
+  std::string code_name()const override{ untested();
     return "_f_asinh";
   }
 } p_asinh;
@@ -152,7 +152,7 @@ public:
   atan() : MGVAMS_FUNCTION(){
     set_label("atan");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     unreachable();
     PARAMETER<double> x;
     Cmd >> x;
@@ -163,7 +163,7 @@ public:
   double evalf(double const* x)const override { untested();
     return std::atan(*x);
   }
-  void make_cc_common(std::ostream& o)const override{
+  void make_cc_common(std::ostream& o)const override{ untested();
     o__ "template<class T>\n";
     o__ "T " << code_name() << "(T d) const{\n";
     o____ "chain(d, 1./(1.+double(d)*double(d)));\n";
@@ -171,7 +171,7 @@ public:
     o____ "return d;\n";
     o__ "}\n";
   }
-  std::string code_name()const override{
+  std::string code_name()const override{ untested();
     return "_f_atan";
   }
 } p_atan;
@@ -182,7 +182,7 @@ public:
   atanh() : MGVAMS_FUNCTION(){
     set_label("atanh");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     unreachable();
     PARAMETER<double> x;
     Cmd >> x;
@@ -193,13 +193,13 @@ public:
   double evalf(double const* x)const override { untested();
     return std::atanh(*x);
   }
-  void make_cc_common(std::ostream& o)const override{
+  void make_cc_common(std::ostream& o)const override{ untested();
     o__ "template<class T>\n";
     o__ "T " << code_name() << "(T d) const{\n";
     incomplete();
     o__ "}\n";
   }
-  std::string code_name()const override{
+  std::string code_name()const override{ untested();
     return "_f_atanh";
   }
 } p_atanh;
@@ -246,14 +246,14 @@ public:
   double evalf(double const* x)const override { untested();
     return std::cosh(*x);
   }
-  void make_cc_common(std::ostream& o)const override{
+  void make_cc_common(std::ostream& o)const override{ untested();
     o__ "template<class T>\n";
     o__ "T " << code_name() << "(T d)const {itested();\n";
     o____ "chain(d, std::sinh(d));\n";
     o____ "return ::set_value(d, std::cosh(d));\n";
     o__ "};\n";
   }
-  std::string code_name()const override{
+  std::string code_name()const override{ untested();
     return "_f_cosh";
   }
 } p_cosh;
@@ -264,7 +264,7 @@ public:
   explicit exp() : MGVAMS_FUNCTION(){
     set_label("exp");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     PARAMETER<double> x;
     Cmd >> x;
     x.e_val(NOT_INPUT, Scope);
@@ -295,7 +295,7 @@ public:
     set_label("limexp");
   }
   ~limexp() { }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     PARAMETER<double> x;
     Cmd >> x;
     x.e_val(NOT_INPUT, Scope);
@@ -335,16 +335,16 @@ public:
   explicit floor() : MGVAMS_FUNCTION(){
     set_label("$floor");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     PARAMETER<double> x;
     Cmd >> x;
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::floor(x));
   }
-  std::string code_name()const override{
+  std::string code_name()const override{ untested();
     return "_f_floor";
   }
-  void make_cc_common(std::ostream& o)const override {
+  void make_cc_common(std::ostream& o)const override { untested();
     o__ "template<class T>\n";
     o__ "T " << code_name() << "(T d)const {itested();\n";
     o____ "return int(std::floor(d));\n";
@@ -364,10 +364,10 @@ public:
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::log10(x));
   }
-  std::string code_name()const override{
+  std::string code_name()const override{ untested();
     return "_f_log10";
   }
-  void make_cc_common(std::ostream& o)const override{
+  void make_cc_common(std::ostream& o)const override{ untested();
     o__ "template<class T>\n";
     o__ "T " << code_name() << "(T d)const {itested();\n";
     o____ "double l=-1e99;\n";
@@ -394,7 +394,7 @@ public:
   explicit ln() : MGVAMS_FUNCTION(){
     set_label("ln");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     PARAMETER<double> x;
     Cmd >> x;
     x.e_val(NOT_INPUT, Scope);
@@ -525,7 +525,7 @@ public:
   double evalf(double const* x)const override { untested();
     return std::sinh(*x);
   }
-  void make_cc_common(std::ostream& o)const override{
+  void make_cc_common(std::ostream& o)const override{ untested();
     o__ "template<class T>\n";
     o____ "T " << code_name() << "(T d)const { untested();\n";
     o____ "chain(d, std::cosh(d));\n";
@@ -533,7 +533,7 @@ public:
     o____ "return d;\n";
     o__ "}\n";
   }
-  std::string code_name()const override{
+  std::string code_name()const override{ untested();
     return "_f_sinh";
   }
 } p_sinh;

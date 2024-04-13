@@ -26,6 +26,7 @@
 #include <m_base.h>
 #include "mg_lib.h"
 /*--------------------------------------------------------------------------*/
+class RDeps;
 class Probe;
 class Dep /*Dynamic_Dep, DDep?*/{
 public: // types
@@ -43,7 +44,7 @@ public:
   explicit Dep(Probe const* p) : _prb(p) {}
   explicit Dep(Probe const* p, dep_order d) : _prb(p), _order(d) {}
 
-  int order()const {return _order;}
+  int order()const { untested();return _order;}
   bool is_linear()const { return _order<=_LINEAR; }
   bool is_quadratic()const { return _order<=_QUADRATIC; }
 
@@ -51,6 +52,7 @@ public:
   void set_any(){
     _order = _ANY;
   }
+  bool propagate_rdeps(RDeps const&) const;
 
 public:
   Probe const* operator->() const{ return _prb; }
@@ -71,11 +73,12 @@ public:
   void add(Base* x) { _s.insert(x); }
   void merge(Sensitivities const& s) { _s.merge(s._s); }
   bool empty()const {return !_s.size();}
+  size_t size()const { untested();return _s.size();}
 
-  iterator begin() {
+  iterator begin() { untested();
     return _s.begin();
   }
-  iterator end() {
+  iterator end() { untested();
     return _s.end();
   }
 
@@ -104,7 +107,7 @@ public:
   bool empty() const{
     return _s.empty();
   }
-  Dep back(){
+  Dep back(){ untested();
     return _s.back();
   }
   void clear(){
@@ -116,7 +119,7 @@ public:
     }
   }
   std::pair<DDeps::const_iterator, bool> insert(Dep const&);
-};
+}; // DDeps
 /*--------------------------------------------------------------------------*/
 // use ValueRange from mg_.h?
 class Range : public Base {
@@ -124,23 +127,26 @@ public:
   static Range _unknown;
   explicit Range() : Base() {}
 public:
-  Range* multiply(const Base*)const override {
+  Range* multiply(const Base*)const override { untested();
     return NULL;
   }
-  Base* multiply(const Float*)const override	{untested(); return NULL;}
-  Base* multiply(const String*)const override	{untested(); return NULL;}
+  Base* multiply(const Float*)const override	{ untested();untested(); return NULL;}
+  Base* multiply(const String*)const override	{ untested();untested(); return NULL;}
 
 private:
-  void parse(CS&)override {unreachable();}
-  void dump(std::ostream&)const override {unreachable();}
+  void parse(CS&)override { untested();unreachable();}
+  void dump(std::ostream&)const override { untested();unreachable();}
+};
+/*--------------------------------------------------------------------------*/
+class RDeps : public pSet<Base const> {
+
 };
 /*--------------------------------------------------------------------------*/
 class Branch;
 class TData : public Base {
-  DDeps _s; // dynamic_deps?
+  DDeps _ddeps;
   Sensitivities _sens;
-  mutable std::vector<Branch const*> _rdeps;
-//   RDeps _rdeps;
+  mutable /*bug*/ RDeps _rdeps;  // Branches & Probes...
   // V _sens; // discrete_deps?
   // R _range; // discrete_deps?
   bool _offset{false}; // -> dynamic_deps.
@@ -149,34 +155,43 @@ public:
   static TData _no_deps;
 public:
   explicit TData() : Base() {}
-  explicit TData(TData const& o) : Base(), _s(o._s),
+  explicit TData(TData const& o) : Base(), _ddeps(o._ddeps),
     _sens(o._sens),
+    _rdeps(o._rdeps),
     _offset(o._offset), _constant(o._constant) { }
   ~TData();
   TData* clone()const {
     return new TData(*this);
   }
   std::pair<DDeps::const_iterator, bool> insert(Dep const& d){
-    return _s.insert(d);
+    return _ddeps.insert(d);
   }
   void update(TData const& other);
-  Dep back(){
-    return _s.back();
-  }
+  Dep back(){ untested(); return _ddeps.back(); }
   void clear();
-  DDeps& ddeps() {return _s;}
-  std::vector<Branch const*>& rdeps()const {return _rdeps;}
-  DDeps const& ddeps()const {return _s;}
+
+  DDeps& ddeps() {return _ddeps;}
+  DDeps const& ddeps()const {return _ddeps;}
+  RDeps& rdeps() const {return _rdeps;}
+//  RDeps const& rdeps()const { untested();return _rdeps;}
+
   void set_offset(bool v = true){_offset = v;}
   void set_constant(bool v = true){_constant = v;} // attrib/sens?
-  size_t size()const {return _s.size() + _rdeps.size(); }
+  size_t size()const {return _ddeps.size(); } // { + _rdeps.size(); }
   bool is_offset()const {return _offset;}
-  bool is_constant()const {return _constant;}
+  bool is_constant()const { untested();return _constant;}
   bool is_linear()const;
   bool is_quadratic()const;
-  void set_any() { _s.set_any(); }
+  void set_any() { _ddeps.set_any(); }
 public: // sens
-  void add_sens(Base* x) {
+  void add_rdep(Base const* x){
+    _rdeps.insert(x);
+  }
+  bool is_used() const{ untested();
+    return _rdeps.size();
+  }
+public: // sens
+  void add_sens(Base* x) { untested();
     _sens.add(x);
   }
   void add_sens(Sensitivities const& s){
@@ -186,8 +201,8 @@ public: // sens
   Sensitivities const& sensitivities()const {return _sens; }
   Sensitivities& sensitivities() {return _sens; }
 private:
-  void parse(CS&)override {unreachable();}
-  void dump(std::ostream&)const override {unreachable();}
+  void parse(CS&)override { untested();unreachable();}
+  void dump(std::ostream&)const override { untested();unreachable();}
 public:
   TData& operator=(TData const& d){
     clear();
@@ -195,24 +210,24 @@ public:
     return *this;
   }
   Base* combine(const Base* X)const;
-  TData* multiply(const Base* X)const override; // {incomplete(); return NULL;}
-  Base* subtract(const Base*)const override	{incomplete(); return NULL;}
-  Base* r_subtract(const Base*)const override	{incomplete(); return NULL;}
-  Base* divide(const Base* X)const override;  //{incomplete(); return NULL;}
+  TData* multiply(const Base* X)const override; // { untested();incomplete(); return NULL;}
+  Base* subtract(const Base*)const override	{ untested();incomplete(); return NULL;}
+  Base* r_subtract(const Base*)const override	{ untested();incomplete(); return NULL;}
+  Base* divide(const Base* X)const override;  //{ untested();incomplete(); return NULL;}
   Base* r_divide(const Base*)const override   {incomplete(); return NULL;}	
   Base* modulo(const Base*)const override     {incomplete(); return NULL;}	
 
-  Base* multiply(const Float*)const override	{unreachable(); return NULL;}
-  Base* subtract(const Float*)const override	{unreachable(); return NULL;}
-  Base* r_subtract(const Float*)const override	{unreachable(); return NULL;}
-  Base* divide(const Float*)const override	{unreachable(); return NULL;}
+  Base* multiply(const Float*)const override	{ untested();unreachable(); return NULL;}
+  Base* subtract(const Float*)const override	{ untested();unreachable(); return NULL;}
+  Base* r_subtract(const Float*)const override	{ untested();unreachable(); return NULL;}
+  Base* divide(const Float*)const override	{ untested();unreachable(); return NULL;}
   Base* r_divide(const Float*)const override    {unreachable(); return NULL;}	
   Base* modulo(const Float*)const override      {unreachable(); return NULL;}	
 
-  Base* multiply(const String*)const override	{unreachable(); return NULL;}
-  Base* subtract(const String*)const override	{unreachable(); return NULL;}
-  Base* r_subtract(const String*)const override	{unreachable(); return NULL;}
-  Base* divide(const String*)const override	{unreachable(); return NULL;}
+  Base* multiply(const String*)const override	{ untested();unreachable(); return NULL;}
+  Base* subtract(const String*)const override	{ untested();unreachable(); return NULL;}
+  Base* r_subtract(const String*)const override	{ untested();unreachable(); return NULL;}
+  Base* divide(const String*)const override	{ untested();unreachable(); return NULL;}
   Base* r_divide(const String*)const override   {unreachable(); return NULL;}	
   Base* modulo(const String*)const override     {unreachable(); return NULL;}	
 };

@@ -3,14 +3,11 @@ module dep0(d, g);
   electrical d, g;
   analog begin // always
     // S : 1
-    // T : 1
-    // c : 1
-    real c// dep _potential_b_g_
-;
-    real T// dep _potential_b_g_
-;
-    real S// dep _potential_b_g_
-;
+    // T : 0
+    // c : 0
+    real c;
+    real T;
+    real S;
     S = T;
     while (1) begin
       // T : 1

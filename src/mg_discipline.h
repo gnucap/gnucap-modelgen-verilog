@@ -17,7 +17,7 @@ public:
   const String_Arg&  key()const	  {return _identifier;}
   const String_Arg&	parent_nature()const	{return _parent_nature;}
   const Attribute_List&	attributes()const	{return _attributes;}
-  const String_Arg&	operator[](const String_Arg& k)const {return _attributes[k];}
+  const String_Arg&	operator[](const String_Arg& k)const { untested();return _attributes[k];}
   const String_Arg&	access()const		{return _attributes["access"];}
   const String_Arg&	abstol()const		{return _attributes["abstol"];}
 };
@@ -40,7 +40,7 @@ public:
   explicit Discipline() {}
   const String_Arg&  identifier()const	    {return _identifier;}
   const String_Arg&  potential_ident()const {return _potential_ident;}
-  const String_Arg&  domain_ident()const    {return _domain_ident;}
+  const String_Arg&  domain_ident()const    { untested();return _domain_ident;}
   const String_Arg&  flow_ident()const	    {return _flow_ident;}
 
   Nature const* flow() const{return _flow;}

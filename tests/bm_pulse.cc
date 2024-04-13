@@ -112,7 +112,7 @@ bool EVAL_BM_PULSE::operator==(const COMMON_COMPONENT& x)const
 }
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_PULSE::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)const
-{
+{ untested();
   assert(lang);
   o << name();
   print_pair(o, lang, "iv", _iv);
@@ -137,11 +137,11 @@ void EVAL_BM_PULSE::precalc_last(const CARD_LIST* Scope)
   _width.e_val(_default_width, Scope);
   _period.e_val(_default_period, Scope);
 
-  if (_width == 0.) {
+  if (_width == 0.) { untested();
     _width = _default_width;
   }else{
   }
-  if (_period == 0.) {
+  if (_period == 0.) { untested();
     _period = _default_period;
   }else{
   }
@@ -187,7 +187,7 @@ TIME_PAIR EVAL_BM_PULSE::tr_review(COMPONENT* d)const
 				    // hack to avoid duplicate events from numerical noise
 
   dtmin *= 1.01;
-  if (raw_time <= _delay) {
+  if (raw_time <= _delay) { untested();
     d->_time_by.min_event(_delay);
   }else{
     double reltime;
@@ -250,7 +250,7 @@ bool EVAL_BM_PULSE::parse_numlist(CS& cmd)
     cmd >> val;
     if (cmd.stuck(&here)) {
       break;
-    }else{
+    }else{ untested();
       *i = val;
     }
   }

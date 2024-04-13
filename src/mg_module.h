@@ -38,7 +38,7 @@ public:
 class ValueRangeSpec : public Owned_Base {
   // incomplete();
 public:
-//  virtual bool is_constant()const { return false; }
+//  virtual bool is_constant()const { untested(); return false; }
   virtual double eval()const { return NOT_INPUT; }
 };
 /*--------------------------------------------------------------------------*/
@@ -67,7 +67,7 @@ public:
   ValueRangeSpec const* spec() const{ return _what; }
   double eval()const;
 
-  String_Arg key()const { return String_Arg("ValueRange"); }
+  String_Arg key()const { untested(); return String_Arg("ValueRange"); }
 };
 typedef LiSt<ValueRange, '\0', '\0', '\0', ',', ';'> ValueRangeList;
 class Aliasparam;
@@ -121,7 +121,7 @@ public:
     return _name;
   }
   bool operator!=(const std::string& s)const {return _name != s;}
-  Parameter_2 const* param()const {
+  Parameter_2 const* param()const { untested();
     assert(_param);
     return _param;
   }
@@ -154,7 +154,7 @@ protected:
   String_Arg	_identifier;
   Module const* _proto{NULL};
 private: // merge?
-  std::list<FUNCTION_ const*> _func;
+  std::list<FUNCTION_*> _func;
   pSet<FUNCTION_ const> _funcs;
   size_t _num_evt_slots{0};
   bool _has_analysis{false};
@@ -166,6 +166,7 @@ private: // elaboration data
   void new_circuit();
   void delete_analog();
   void delete_circuit();
+  void detach_out_vars();
 public:
   Module() {
     new_probe_map();
@@ -203,21 +204,22 @@ public:
   bool has_analog_block()const;
   void set_tr_review() {_has_tr_review = true; }
   void set_analysis() {_has_analysis = true; }
-  void push_back(FUNCTION_ const* f);
+  void push_back(FUNCTION_* f);
   void push_back(Filter /*const*/ * f);
   void push_back(Token* x);
   void push_back(Base* x);
   void install(FUNCTION_ const* f);
   void install(Probe const* f);// ?
-  std::list<FUNCTION_ const*> const& func()const {return _func;}
+  std::list<FUNCTION_*> const& func()const { untested();return _func;}
   pSet<FUNCTION_ const> const& funcs()const {return _funcs;}
 private: // misc
   CS& parse_analog(CS& cmd);
 public: // for now.
   void parse_body(CS& f);
   void parse_ports(CS& f);
-  virtual Module* deflate() {return this;}
+  virtual Module* deflate() { untested();return this;}
   Parameter_List_Collection& parameters()	{return _parameters;}
+  void setup_functions();
   void setup_nodes();
 
 public: // BUG

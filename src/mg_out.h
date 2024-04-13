@@ -32,10 +32,10 @@ extern std::string ind;
 #define o______ o____ "  " <<
 #define o________ o______ "  " <<
 /*--------------------------------------------------------------------------*/
-#ifdef PASS_TRACE_TAGS
-#define make_tag() (out << "//" << __func__ << ":" << __LINE__ << "\n")
+#ifdef DO_TRACE_TAGS
+#define make_tag(o) (o << "//" << __FILE__ ":" << __func__ << ":" << __LINE__ << "\n")
 #else
-#define make_tag()
+#define make_tag(o)
 #endif
 /*--------------------------------------------------------------------------*/
 struct indent{
@@ -43,7 +43,7 @@ struct indent{
     _old = ind;
     ind = ind + std::string(i, ' ');
   }
-  explicit indent(std::string s){
+  explicit indent(std::string s){ untested();
     _old = ind;
     ind = ind + s;
   }

@@ -9,7 +9,7 @@ retest.log:
 	# ${MAKE} untest
 	mkdir -p retest;
 	( cd retest; ../configure )
-	${MAKE} -C retest CPPFLAGS=-DTRACE_UNTESTED\ -DTRACE_UNTESTED_ONCE
+	${MAKE} -C retest CPPFLAGS=-DTRACE_UNTESTED\ -DTRACE_UNTESTED_ONCE\ -DRETEST
 
 	# TODO: parallel
 	${MAKE} -j1 -C retest check 2> retest.log
@@ -26,10 +26,13 @@ patch:
 check-git:
 	[ -d .git ]
 
-untest_exclude = \(extern\)\|\(%{\)\|\(switch\)\|\(enum\)\|\(union\)\|\(constexpr\)\|\(struct\)\|\(class\)\|\(namespace\)\|\(untested\)\|\(itested\)
+untest_exclude = \(extern\)\|\(switch\)\|\(enum\)\|\(union\)\|\(constexpr\)\|\(struct\)\|\(class\)\|\(namespace\)\|\(untested\)\|\(itested\)
 
+# place test calls at test hooks
 untest:
-	sed -i '/${untest_exclude}/!s/{$$/{ untested();/' src/*.cc
+	sed -i '/${untest_exclude}/!s/{$$/{ untested();/' */*.cc
+	sed -i '/${untest_exclude}/!s/{$$/{ untested();/' */*.h
+	sed -i '/tested/!s/{\(.*\)}$$/{ untested();\1}/' */*.h
 
 .PRECIOUS: retest.log
 .PHONY: check-git retest.subs retest.log

@@ -36,12 +36,12 @@ public:
   void parse(CS& f)override;
   void dump(std::ostream&)const override;
 public:
-  Attribute_Spec() : Owned_Base() {untested();}
-  Attribute_Spec(CS& f, Block* o) : Owned_Base(o) {
+  Attribute_Spec() : Owned_Base() { untested();untested();}
+  Attribute_Spec(CS& f, Block* o) : Owned_Base(o) { untested();
     set_owner(o);
     parse(f);
   }
-  ~Attribute_Spec(){
+  ~Attribute_Spec(){ untested();
     delete _expr;
     _expr = NULL;
   }
@@ -52,16 +52,16 @@ public:
     return o != _key;
   }
 
-  String_Arg const& key() const{
+  String_Arg const& key() const{ untested();
     return _key;
   }
-  bool has_expression() const{
+  bool has_expression() const{ untested();
     return _expr;
   }
-  value_type const* expression_or_null() const{
+  value_type const* expression_or_null() const{ untested();
     return _expr;
   }
-  value_type const& expression() const{
+  value_type const& expression() const{ untested();
     assert(_expr);
     return *_expr;
   }

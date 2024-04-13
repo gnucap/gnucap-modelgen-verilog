@@ -3,8 +3,7 @@ module test_dep5(np, n);
   electrical p, n;
   analog begin // always
     // AA : 1
-    real AA// dep _potential_b_p_n
-;
+    real AA;
     AA = V(p, n); // dep: _potential_b_p_n
     I(p, n) <+ ddt((AA * V(p, n))); // dep: _potential_b_ddt_0_p_ddt_0_n
   end

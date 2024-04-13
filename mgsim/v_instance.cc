@@ -124,7 +124,7 @@ protected:
   void		expand()override;
   CARD*		deflate()override;
 private:
-  void		precalc_last()override{
+  void		precalc_last()override{ untested();
     trace1("INSTANCE::precalc_last", long_label());
     // unreachable();
   }
@@ -616,7 +616,7 @@ void INSTANCE::expand()
       gotit = prechecked_cast<COMPONENT*>(*j);
       assert(gotit);
       *j = NULL;
-    }else if(d->param_count() > gotit->param_count()){
+    }else if(d->param_count() > gotit->param_count()){ untested();
       error(bDEBUG, long_label() + " tie break: " + to_string(gotit->param_count()) + " vs. " +
 	  to_string((*j)->param_count()) + "\n");
     }else if(d->param_count() < gotit->param_count()){
@@ -626,7 +626,7 @@ void INSTANCE::expand()
       gotit = prechecked_cast<COMPONENT*>(*j);
       assert(gotit);
       *j = NULL;
-    }else{
+    }else{ untested();
       error(bWARNING, long_label() + " ambiguous overload in " + dev_type() + "\n");
     }
     subckt()->erase(j);

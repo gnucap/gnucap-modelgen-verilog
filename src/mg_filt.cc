@@ -25,37 +25,11 @@
 #include "mg_func.h"
 #include "mg_out.h"
 #include "mg_analog.h"
-#include "m_tokens.h"
+#include "mg_token.h"
 #include <globals.h>
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/
 namespace{
-/*--------------------------------------------------------------------------*/
-static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
-{
-
-  {
-    char sign = '+';
-    indent a;
-    o__ "d->" << state << "[0] = " << sign << " " << "t0.value();\n";
-    size_t k = 2;
-
-    for(auto v : deps.ddeps()) {
-      // char sign = f.reversed()?'-':'+';
-      o__ "// dep " << v->code_name() << "\n";
-      // if(f->branch() == v->branch()){ untested(); }
-      if(v->branch()->is_short()){ untested();
-      }else{
-	o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
-	o__ "// assert(!d->" << state << "[" << k << "]);\n";
-	o__ "d->" << state << "[" //  << k << "]"
-	  << "MOD::" << state << "_::dep" << v->code_name() << "] "
-	  " = " << sign << " " << "t0[d" << v->code_name() << "]; // (4)\n";
-	++k;
-      }
-    }
-  }
-}
 /*--------------------------------------------------------------------------*/
 static int n_filters;
 /*--------------------------------------------------------------------------*/
@@ -84,7 +58,6 @@ private:
 /*--------------------------------------------------------------------------*/
 class XDT : public MGVAMS_FILTER {
   Module* _m{NULL};
-  Token_CALL const* _token{NULL};
   Probe const* _prb{NULL};
   std::string _code_name;
 public: // HACK
@@ -126,7 +99,7 @@ public:
       }
       cl->set_num_args(na);
       cl->_m = &m;
-      m.push_back(cl);
+      m.push_back(cl); // cl?
     }
 
     Node* np = m.new_node(filter_code_name + "_p");
@@ -152,6 +125,7 @@ public:
     return new Token_XDT(label(), cl);
   }
   void make_cc_precalc(std::ostream& o)const override{
+    make_tag(o);
     o__ "ddouble " << _code_name << "(";
       std::string comma;
       assert(num_args() < 3);
@@ -162,7 +136,12 @@ public:
     o << "){\n";
     o__ "ddouble ret = 0.;\n";
     std::string cn = _br->code_name();
-    o__ "ret[d_potential" << cn << "] = -1.;\n";
+
+    if(_br->is_short()){
+      o__ "/* short, mfactor hack */ ret[d_potential" << cn << "] = -1.;\n";
+    }else{
+      o__ "ret[d_potential" << cn << "] = -1.;\n";
+    }
     o__ "return ret;\n";
     o << "}\n";
   }
@@ -201,44 +180,7 @@ public:
       "------------------------------------*/\n";
 #endif
   }
-  void make_cc_impl(std::ostream&o)const override {
-//    make_cc_impl_comm(o);
-    std::string cn = _br->code_name();
-    std::string id = _m->identifier().to_string();
-    o << "MOD_"<< id <<"::ddouble MOD_" << id << "::" << _code_name << "(";
-    std::string comma;
-    for(size_t n=0; n<num_args(); ++n){
-      o << comma << "ddouble t" << n;
-      comma = ", ";
-    }
-    o << ")\n{\n";
-    o__ "MOD_" << id << "* d = this;\n";
-    o__ "typedef MOD_" << id << " MOD;\n";
-    std::string state = "_st" + cn;
-    make_cc_tmp(o, state, _br->deps());
-    trace2("xdt use", _br->code_name(), _br->is_used());
-
-    if(_output){
-      o__ "// subdevice\n";
-      o__ "t0 = 0.;\n";
-    }else{
-      o__ "auto e = prechecked_cast<ELEMENT const*>(d->"<< cn << ");\n";
-      o__ "assert(e);\n";
-      o__ "d->_potential" << cn << " = t0 = e->tr_amps(); // (236)\n";
-    }
-
-    make_assign(o);
-
-    if(_output){
-      o__ "return t0; // (output)\n";
-    }else{
-      o__ "return t0; // (node)\n";
-    }
-
-    o << "}\n"
-    "/*--------------------------------------"
-    "------------------------------------*/\n";
-  }
+  void make_cc_impl(std::ostream&o)const override;
   std::string eval(CS&, const CARD_LIST*)const override{ untested();
     unreachable();
     return "ddt";
@@ -248,12 +190,19 @@ public:
     assert(_m);
     _m->set_to_ground(_br->n());
   }
+  void set_p_to_gnd()const {
+    assert(_m);
+    _m->set_to_ground(_br->p());
+  }
 private:
   Branch const* output()const override;
 
   // really?
   Node_Ref p()const override;
   Node_Ref n()const override;
+private: // setup
+  void setup()override;
+  Branch* branch() { return _br; }
 }; // XDT
 /*--------------------------------------------------------------------------*/
 class DDT : public XDT{
@@ -267,7 +216,11 @@ public:
 private:
   void make_assign(std::ostream& o)const override{
     std::string cn = _br->code_name();
-    o__ "t0[d_potential" << cn << "] = 1.;\n";
+    if(_br->is_short()){
+      o__ "/* short */ t0[d_potential" << cn << "] = 1.;\n";
+    }else{
+      o__ "t0[d_potential" << cn << "] = 1.;\n";
+    }
     o__ "assert(t0 == t0);\n";
   }
 } ddt;
@@ -284,12 +237,16 @@ public:
 
 private:
   void make_assign(std::ostream& o)const override {
+    make_tag(o);
     std::string cn = _br->code_name();
-    if(num_args()>1){
+    if(num_args()>1){ untested();
       o__ "t0 = t0 + t1.value();\n";
     }else{
     }
-    o__ "t0[d_potential" << cn << "] = -1.;\n";
+    if(_br->is_short()){
+    }else{
+      o__ "t0[d_potential" << cn << "] = -1.;\n";
+    }
     o__ "assert(t0 == t0);\n";
   }
 } idt;
@@ -321,17 +278,23 @@ void Token_XDT::stack_op(Expression* e)const
   assert(!e->is_empty());
   auto cc = prechecked_cast<Token_CALL const*>(e->back());
   assert(cc);
+  trace1("Token_XDT::stack_op", cc->args()->size());
   e->pop_back();
   // assert(!e->is_empty());
 
   auto func = prechecked_cast<XDT const*>(f());
   assert(func);
 
-  if(auto dd = prechecked_cast<TData const*>(cc->data())) {
-    assert(dd);
-    for(auto i : dd->ddeps()){
-      trace1("xdt arg deps", i->code_name());
-    }
+  auto dd = prechecked_cast<TData const*>(cc->data());
+
+  assert(cc->args()->size());
+  if(is_zero(*cc->args())){
+    Float* f = new Float(0.);
+    e->push_back(new Token_CONSTANT("0.", f, ""));
+    delete cc;
+    cc = NULL;
+    func->set_p_to_gnd();
+  }else if(dd) {
 
     branch()->deps().clear();
     branch()->deps() = *dd; // HACK
@@ -363,12 +326,19 @@ void Token_XDT::stack_op(Expression* e)const
   }else{ untested();
     unreachable();
   }
-
-  trace0("xdt use?");
+  // ------------------------
+  // branch: function->_br
+}
+/*--------------------------------------------------------------------------*/
+void XDT::setup()
+{
+  auto func = this;
   int c_cnt = 0;
   bool assigned = false;
   bool always = false;
-  Contribution const* cont=NULL;
+  bool rdeps = false;
+  Contribution const* cont = NULL;
+  trace1("xdt used_in?", branch()->used_in().size());
   for(auto b : branch()->used_in()) {
     if(auto c = dynamic_cast<Contribution const*>(b)){
       if(c->is_flow_contrib()) {
@@ -382,16 +352,28 @@ void Token_XDT::stack_op(Expression* e)const
 	always = true;
       }else{
       }
-    }else if(dynamic_cast<Assignment const*>(b)){ untested();
+    }else if(dynamic_cast<Assignment const*>(b)){
       assigned = true;
+    }else if(dynamic_cast<Branch const*>(b)){
+      rdeps = true;
+      // covered by rdeps?
+    }else if(dynamic_cast<Variable_List_Collection const*>(b)){
     }else{untested();
+      trace1("xdt unknown?", c_cnt);
+      assert(0);
     }
   }
+  for(auto b : branch()->deps().rdeps()) { untested();
+    (void)b;
+    rdeps = true;
+  }
+
+  trace4("xdt use?", c_cnt, rdeps, assigned, branch()->code_name());
   func->_output = NULL;
-  if(c_cnt!=1){
-  }else if(assigned){ untested();
-  }else if(cont->has_sensitivities()) { itested();
-  }else if(always){
+  if(!has_refs()){
+    func->set_p_to_gnd();
+  }else if(cont && cont->has_sensitivities()) { untested();
+  }else if(c_cnt == 1 && always){
     for(auto d : cont->ddeps()){
       if(d->branch() != branch()) {
       }else if(d.is_linear()){
@@ -402,7 +384,16 @@ void Token_XDT::stack_op(Expression* e)const
       }else{
       }
     }
+  }else if(rdeps){
+  }else if(c_cnt==0){
+    incomplete(); // analysis?
+    func->set_p_to_gnd();
+    // func->_output = cont->branch(); // polarity?
+  }else if(assigned){ untested();
+  }else if(c_cnt!=1){ untested();
   }else{
+    incomplete();
+    // func->set_p_to_gnd();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -426,6 +417,74 @@ Node_Ref XDT::n() const
   return _n;
 }
 #endif
+/*--------------------------------------------------------------------------*/
+void XDT::make_cc_impl(std::ostream&o) const
+{
+  make_tag(o);
+//    make_cc_impl_comm(o);
+  std::string cn = _br->code_name();
+  std::string id = _m->identifier().to_string();
+  o << "//cc impl\n";
+  o << "MOD_"<< id <<"::ddouble MOD_" << id << "::" << _code_name << "(";
+  std::string comma;
+  for(size_t n=0; n<num_args(); ++n){
+    o << comma << "ddouble t" << n;
+    comma = ", ";
+  }
+  o << ")\n{\n";
+  if(has_refs()) {
+    o__ "MOD_" << id << "* d = this;\n";
+    o__ "typedef MOD_" << id << " MOD;\n";
+    std::string state = "_st" + cn;
+
+    {// make_cc_tmp(o, state, _br->deps());
+      TData const& deps = _br->deps();
+      char sign = '+';
+    //  indent a;
+      o__ "d->" << state << "[0] = " << sign << " " << "t0.value();\n";
+      size_t k = 2;
+
+      for(auto v : deps.ddeps()) {
+	// char sign = f.reversed()?'-':'+';
+	o__ "// dep " << v->code_name() << "\n";
+	// if(f->branch() == v->branch()){ untested(); }
+	if(v->branch()->is_short()){
+	}else{
+	  o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
+	  o__ "// assert(!d->" << state << "[" << k << "]);\n";
+	  o__ "d->" << state << "[" //  << k << "]"
+	    << "MOD::" << state << "_::dep" << v->code_name() << "] "
+	    " = " << sign << " " << "t0[d" << v->code_name() << "]; // (4)\n";
+	  ++k;
+	}
+      }
+    }
+    trace2("make_cc_impl xdt use", _br->code_name(), _br->is_used());
+
+    if(_output){
+      o__ "// subdevice\n";
+      o__ "t0 = 0.;\n";
+    }else{
+      o__ "auto e = prechecked_cast<ELEMENT const*>(d->"<< cn << ");\n";
+      o__ "assert(e);\n";
+      o__ "d->_potential" << cn << " = t0 = e->tr_amps(); // (236)\n";
+    }
+
+    make_assign(o);
+
+    if(_output){
+      o__ "return t0; // (output)\n";
+    }else{
+      o__ "return t0; // (node)\n";
+    }
+
+  }else{ untested();
+    o__ "return 0.; // (no refs)\n";
+  }
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+} // XDT::make_cc_impl
 /*--------------------------------------------------------------------------*/
 } // namespace
 /*--------------------------------------------------------------------------*/

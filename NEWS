@@ -2,6 +2,14 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
+202404**-dev
+============
+* fix output variable evaluation in paramset
+* propagate reverse dependencies
+* integer variable cleanup
+* optimise out unused filter calls
+* implement untest, retest
+
 20240331-dev
 ============
 * fix allocation in laplace

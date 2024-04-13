@@ -32,7 +32,7 @@
 #include "mg_in.h" // File
 #include "mg_pp.h"
 #include "mg_out.h"
-#include "m_tokens.h"
+#include "mg_token.h"
 /*--------------------------------------------------------------------------*/
 class Variable;
 class Probe;
@@ -50,7 +50,7 @@ class CMD_ : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST*)override {
     if(OPT::case_insensitive == 0){
-    }else{
+    }else{ untested();
       error(bWARNING, "running modelgen in insensitive mode\n");
     }
 

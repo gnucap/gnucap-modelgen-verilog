@@ -76,14 +76,14 @@ class Port_1 : public Base {
 public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
-  Port_1() {}
-  const std::string& name()const	{return _name;}
-  const std::string& short_to()const 	{return _short_to;}
-  const std::string& short_if()const 	{return _short_if;}
-  void set_owner(Block*){
+  Port_1() { untested();}
+  const std::string& name()const	{ untested();return _name;}
+  const std::string& short_to()const 	{ untested();return _short_to;}
+  const std::string& short_if()const 	{ untested();return _short_if;}
+  void set_owner(Block*){ untested();
     incomplete();
   }
-  String_Arg key()const { return String_Arg(_name); }
+  String_Arg key()const { untested(); return String_Arg(_name); }
 };
 /*--------------------------------------------------------------------------*/
 typedef LiSt<Port_1, '{', '#', '}'> Port_1_List;
@@ -119,40 +119,41 @@ public:
   void dump(std::ostream& f)const override;
   explicit Element_2() {}
   virtual ~Element_2() {}
-  Element_2(CS& f) {
+  Element_2(CS& f) { untested();
     parse(f);
   }
-//  void set_owner(Block* b) { _owner = b; }
-//  const std::string& module_or_paramset_identifier()const {return _module_or_paramset_identifier;}
+//  void set_owner(Block* b) { untested(); _owner = b; }
+//  const std::string& module_or_paramset_identifier()const { untested();return _module_or_paramset_identifier;}
   void set_dev_type(std::string const& s){_module_or_paramset_identifier = s;}
   void set_eval(std::string const& s){_eval = s;}
   void set_state(std::string const& s){_state = s;}
   virtual std::string dev_type()const {return _module_or_paramset_identifier;}
-  virtual Nature const* nature()const {return NULL;}
+  virtual Nature const* nature()const { untested();return NULL;}
   virtual Discipline const* discipline()const {return NULL;}
   const Parameter_3_List&
 		     list_of_parameter_assignments()const {return _list_of_parameter_assignments;}
   const Port_Connection_List& ports()const	  {return _list_of_port_connections;}
-  const Port_1_List& current_ports() const{return _current_port_list;}
-  virtual std::string instance_name()const  {return _name_of_module_instance;}
+  const Port_1_List& current_ports() const{ untested();return _current_port_list;}
+  virtual std::string instance_name()const  { untested();return _name_of_module_instance;}
   virtual std::string short_label()const 	  {return _name_of_module_instance;}
   virtual std::string code_name()const  {return "_e_" + _name_of_module_instance;}
   const std::string& eval()const 	{return _eval;}
-  const std::string& value()const 	{return _value;}
-  const std::string& args()const 	{return _args;}
+  const std::string& value()const 	{ untested();return _value;}
+  const std::string& args()const 	{ untested();return _args;}
   virtual const std::string& omit()const 	{return _omit;}
-  const std::string& reverse()const 	{return _reverse;}
+  const std::string& reverse()const 	{ untested();return _reverse;}
   virtual std::string state()const	{return _state;}
   virtual size_t	     num_nodes()const	{return ports().size();}
-  virtual size_t	     num_states()const	{unreachable(); return 0;}
+  virtual size_t	     num_states()const	{ untested();unreachable(); return 0;}
   virtual bool is_used()const {return true;} // incomplete.
-};
+  virtual bool is_used_in_branch()const {return true;} // incomplete.
+}; // Element_2
 /*--------------------------------------------------------------------------*/
 class Dep;
 class DDeps;
 class AnalogStmt;
 class Branch : public Element_2 {
- // TerminalPair _ports;
+  // TerminalPair _output;
   Node_Ref _p;
   Node_Ref _n;
   TData *_deps{NULL}; // delete? move to _ctrl.
@@ -177,9 +178,11 @@ class Branch : public Element_2 {
   std::vector<Base const*> _used_in; //?
 public: // use in contributions
   bool is_used()const override;
+//  bool is_used_in_branch()const override;
   void inc_use()const {++_use;}
   void dec_use()const {assert(_use); --_use;}
-  void set_used_in(Base const*);
+  bool set_used_in(Base const*);
+  bool is_used_in(Base const*) const;
   void unset_used_in(Base const*);
   std::vector<Base const*> const& used_in(/*Base const*?*/) {return _used_in;}
 public:
@@ -189,7 +192,7 @@ public:
   ~Branch();
   virtual std::string name()const; // use label?
   // later.
-  void parse(CS&)override {incomplete();}
+  void parse(CS&)override { untested();incomplete();}
   void dump(std::ostream&)const override;
   std::string const* reg_name(std::string const&); //?
   Node_Ref p() const;
@@ -200,7 +203,7 @@ public:
   bool is_generic() const;
   std::string code_name()const override;
   std::string short_label()const override { return code_name();}
-//  std::string name_of_module_instance()const  {return code_name();}
+//  std::string name_of_module_instance()const  { untested();return code_name();}
   std::string const& omit()const override;
   std::string dev_type()const override;
   void add_dep(Dep const&);
@@ -221,7 +224,7 @@ public:
   void dec_flow_source() { assert(_has_flow_src); --_has_flow_src; }
   void dec_pot_source() { assert(_has_pot_src); --_has_pot_src; }
   void dec_short(){ assert(_has_short); --_has_short; }
-//  void dec_always_pot(){ assert(_has_always_pot); --_has_always_pot; }
+//  void dec_always_pot(){ untested(); assert(_has_always_pot); --_has_always_pot; }
 
   void set_filter(FUNCTION_ const* f){ _ctrl=f; }
   void set_source(bool d=true) {_source = d; }
@@ -231,7 +234,7 @@ public:
   bool has_flow_probe() const;
   bool has_pot_probe() const;
   bool has_flow_source() const { return _has_flow_src; }
-  bool has_short() const { return _has_short; }
+  bool has_short() const { untested(); return _has_short; }
   bool has_always_pot() const { return _has_always_pot; }
   bool is_filter() const { return _ctrl; }
   bool has_pot_source()const;
@@ -246,7 +249,7 @@ public:
   void detach(Branch_Ref*);
   void reg_stmt(AnalogStmt const*);
   void dereg_stmt(AnalogStmt const*);
-  size_t number() const{return _number;}
+  size_t number() const{ untested();return _number;}
   size_t num_branches() const;
 
   TData const& deps()const { assert(_deps); return *_deps; } // delete?
@@ -276,7 +279,7 @@ inline std::string to_upper(std::string s)
 class New_Port : public Port_3 {
 //  Block* _owner{NULL};
 public:
-//  void set_owner(Block* c) { _owner = c; }
+//  void set_owner(Block* c) { untested(); _owner = c; }
   void parse(CS& f) override;
   New_Port() : Port_3() {}
 };
@@ -292,7 +295,22 @@ public:
   void dump(std::ostream& f)const override;
 };
 /*--------------------------------------------------------------------------*/
-class Branch_Declaration;
+typedef String_Arg Branch_Identifier;
+class List_Of_Branch_Identifiers : public LiSt<Branch_Identifier, '\0', ',', ';'>{
+public:
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class Branch_Declaration : public Owned_Base{
+  List_Of_Branch_Identifiers _list;
+  Branch_Ref _br;
+public:
+  explicit Branch_Declaration() : Owned_Base() {}
+public:
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
 class Branch_Declarations : public Collection<Branch_Declaration>{
 public:
   void parse(CS& f)override;
@@ -310,21 +328,21 @@ class Element_1 : public Base {
   std::string _reverse;
   std::string _state;
 public:
-  void set_owner(Block const*) { }
+  void set_owner(Block const*) { untested(); }
   void parse(CS&) override;
   void dump(std::ostream& f)const override;
-  Element_1() {untested();}
-  Element_1(CS& f) {parse(f);}
-  std::string dev_type()const	{return _dev_type;}
-  const Port_1_List& ports()const 	{return _port_list;}
-  const std::string& name()const 	{return _name;}
-  const std::string& eval()const 	{return _eval;}
-  const std::string& value()const 	{return _value;}
-  const std::string& args()const 	{return _args;}
-  const std::string& omit()const 	{return _omit;}
-  const std::string& reverse()const 	{return _reverse;}
-  std::string state()const	{return _state;}
-	size_t	     num_nodes()const	{return ports().size();}
+  Element_1() { untested();untested();}
+  Element_1(CS& f) { untested();parse(f);}
+  std::string dev_type()const	{ untested();return _dev_type;}
+  const Port_1_List& ports()const 	{ untested();return _port_list;}
+  const std::string& name()const 	{ untested();return _name;}
+  const std::string& eval()const 	{ untested();return _eval;}
+  const std::string& value()const 	{ untested();return _value;}
+  const std::string& args()const 	{ untested();return _args;}
+  const std::string& omit()const 	{ untested();return _omit;}
+  const std::string& reverse()const 	{ untested();return _reverse;}
+  std::string state()const	{ untested();return _state;}
+	size_t	     num_nodes()const	{ untested();return ports().size();}
 };
 /*--------------------------------------------------------------------------*/
 // the branches used in the model, in probes and sources, deduplicated.
@@ -347,7 +365,7 @@ public:
   //Branch_Ref new_branch(Node const* a, Node const* b, Block* owner);
   const_iterator begin() const{ return _brs.begin(); }
   const_iterator end() const{ return _brs.end(); }
-  size_t size() const{ return _brs.size(); }
+  size_t size() const{ untested(); return _brs.size(); }
 //  Branch_Ref lookup(std::string const&);
   Branch_Ref lookup(std::string const&) const;
 
@@ -371,12 +389,12 @@ public:
   explicit Node_Map();
   ~Node_Map();
 public:
-  const_reverse_iterator rbegin() const{ return _nodes.rbegin(); }
-  const_reverse_iterator rend() const{ return _nodes.rend(); }
+  const_reverse_iterator rbegin() const{ untested(); return _nodes.rbegin(); }
+  const_reverse_iterator rend() const{ untested(); return _nodes.rend(); }
   const_iterator begin() const{ return _nodes.begin(); }
-  const_iterator end() const{ return _nodes.end(); }
+  const_iterator end() const{ untested(); return _nodes.end(); }
   size_t size() const{ return _map.size(); }
-//   size_t how_many() const{ return _nodes.size() - 1; }
+//   size_t how_many() const{ untested(); return _nodes.size() - 1; }
   Node* new_node(std::string const&, Block* owner);
   Node_Ref operator[](std::string const& key) const;
   Node_Ref operator[](int key) const{ return _nodes[key]; }
@@ -406,19 +424,19 @@ public:
   explicit Circuit();
   ~Circuit();
   void parse(CS&) override;
-  void dump(std::ostream&)const override{incomplete();}
+  void dump(std::ostream&)const override{ untested();incomplete();}
 
   Port_3* find_port(std::string const& n);
 
-  size_t		min_nodes()const	{return ports().size();}
-  size_t		max_nodes()const	{return ports().size();}
+  size_t		min_nodes()const	{ untested();return ports().size();}
+  size_t		max_nodes()const	{ untested();return ports().size();}
   size_t		net_nodes()const	{return ports().size();}
 
   const New_Port_List&	  ports()const		{return _ports;}
   const Port_3_List_3&	  input()const		{return _input;}
   const Port_3_List_3&	  output()const		{return _output;}
   const Port_3_List_3&	  inout()const		{return _inout;}
-  const Port_3_List_3&	  ground()const		{return _ground;}
+  const Port_3_List_3&	  ground()const		{ untested();return _ground;}
   const Net_Declarations& net_decl()const       {return _net_decl;}
   const Branch_Declarations& branch_decl()const	{return _branch_decl;}
   const Element_2_List&	  element_list()const	{return _element_list;}
@@ -443,7 +461,7 @@ public: //TODO
 
   Node_Map&	nodes()		{return _nodes;}
   Branch_Map&	branches()	{return _branches;}
-  Port_1_List&	local_nodes()	{return _local_nodes;}
+  Port_1_List&	local_nodes()	{ untested();return _local_nodes;}
   Filter_List&	filters()	{return _filters;} // incomplete();
   void new_filter() { ++_num_filters; }
 };

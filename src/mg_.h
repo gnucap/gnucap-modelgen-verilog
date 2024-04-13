@@ -50,14 +50,14 @@ class Key : public Base {
   std::string _var;
   std::string _value;
 public:
-  void parse(CS& f)override {f >> _name >> _var >> '=' >> _value >> ';';}
+  void parse(CS& f)override { untested();f >> _name >> _var >> '=' >> _value >> ';';}
   void dump(std::ostream& f)const override
-  {f << name() << " " << var() << "=" << value() << "; ";}
-  Key() : Base() {}
-  const std::string& name()const	{return _name;}
-  const std::string& var()const 	{return _var;}
-  const std::string& value()const	{return _value;}
-  void set_owner(Block*){
+  { untested();f << name() << " " << var() << "=" << value() << "; ";}
+  Key() : Base() { untested();}
+  const std::string& name()const	{ untested();return _name;}
+  const std::string& var()const 	{ untested();return _var;}
+  const std::string& value()const	{ untested();return _value;}
+  void set_owner(Block*){ untested();
     incomplete();
   }
 };
@@ -66,10 +66,10 @@ typedef LiSt<Key, '{', '#', '}'> Key_List;
 class Bool_Arg : public Base {
   bool _s;
 public:
-  void parse(CS& f)override {_s = true; f.skip1b(";");}
-  void dump(std::ostream& f)const override {untested();f << _s;}
-  Bool_Arg() :_s(false) {}
-  operator bool()const {return _s;}
+  void parse(CS& f)override { untested();_s = true; f.skip1b(";");}
+  void dump(std::ostream& f)const override { untested();untested();f << _s;}
+  Bool_Arg() :_s(false) { untested();}
+  operator bool()const { untested();return _s;}
 };
 /*--------------------------------------------------------------------------*/
 class Probe; // Dep?
@@ -83,7 +83,7 @@ bool is_zero(Expression const& x);
 #if 0
 class Const_Expression : public Expression_ {
 public:
-  explicit Const_Expression() : Expression_() {}
+  explicit Const_Expression() : Expression_() { untested();}
 };
 #endif
 /*--------------------------------------------------------------------------*/
@@ -92,7 +92,7 @@ class Parameter_1 : public Parameter_Base {
 public:
   void parse(CS& f) override;
   void dump(std::ostream& f)const override;
-  Parameter_1() :Parameter_Base() {}
+  Parameter_1() :Parameter_Base() { untested();}
 };
 typedef LiSt<Parameter_1, '{', '#', '}'> Parameter_1_List;
 /*--------------------------------------------------------------------------*/
@@ -104,7 +104,7 @@ public:
     set_owner(o);
     parse(f);
   }
-  ~ConstExpression(){
+  ~ConstExpression(){ untested();
   }
   void parse(CS&)override;
   void dump(std::ostream&)const override;
@@ -144,11 +144,11 @@ class Code_Block : public Base {
   std::string _s;
   Block* _owner{NULL};
 public:
-  void set_owner(Block* c) { _owner = c; }
+  void set_owner(Block* c) { untested(); _owner = c; }
   void parse(CS& f)override;
-  void dump(std::ostream& f)const override{f << _s;}
-  Code_Block() {}
-  bool is_empty()const {return _s.length() < 2;}
+  void dump(std::ostream& f)const override{ untested();f << _s;}
+  Code_Block() { untested();}
+  bool is_empty()const { untested();return _s.length() < 2;}
 };
 #endif
 /*--------------------------------------------------------------------------*/
@@ -163,13 +163,13 @@ class Parameter_Block : public Base {
 public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
-  const String_Arg&	unnamed_value()const	{return _unnamed_value;}
-  const Parameter_1_List& override()const 	{return _override;}
-  const Parameter_1_List& raw()const		{return _raw;}
-  const Parameter_1_List& calculated()const	{return _calculated;}
- // const Code_Block&	code_pre()const		{return _code_pre;}
- // const Code_Block&	code_mid()const		{return _code_mid;}
- // const Code_Block&	code_post()const	{return _code_post;}
+  const String_Arg&	unnamed_value()const	{ untested();return _unnamed_value;}
+  const Parameter_1_List& override()const 	{ untested();return _override;}
+  const Parameter_1_List& raw()const		{ untested();return _raw;}
+  const Parameter_1_List& calculated()const	{ untested();return _calculated;}
+ // const Code_Block&	code_pre()const		{ untested();return _code_pre;}
+ // const Code_Block&	code_mid()const		{ untested();return _code_mid;}
+ // const Code_Block&	code_post()const	{ untested();return _code_post;}
   bool is_empty()const {untested();
     return (calculated().is_empty()
 				// && code_post().is_empty()
@@ -185,6 +185,7 @@ public:
 class Sensitivities;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// BUG. analog.h?
 class AnalogConstruct : public Statement {
   Block* _block{NULL};
 public:
@@ -199,9 +200,13 @@ public:
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
   void new_block();
-  Base const* statement_or_null() const{ return _block; }
+  Block const* block_or_null() const{ return _block; }
   Block* block(){ return _block; }
   void push_back(Statement*);
+  bool is_used_in(Base const*)const override { untested();
+    incomplete();
+    return true;
+  }
 };
 typedef Collection<AnalogConstruct> AnalogList;
 #if 0
@@ -212,19 +217,19 @@ protected:
 public:
   void parse(CS& f);
   void dump(std::ostream& f)const override;
-  Eval(CS& f) :_name(), _code() {parse(f);}
-  Eval() :_name(), _code() {}
-  const String_Arg&	name()const	{return _name;}
-  const Code_Block&	code()const	{return _code;}
+  Eval(CS& f) :_name(), _code() { untested();parse(f);}
+  Eval() :_name(), _code() { untested();}
+  const String_Arg&	name()const	{ untested();return _name;}
+  const Code_Block&	code()const	{ untested();return _code;}
 };
 typedef Collection<Eval> Eval_List;
 /*--------------------------------------------------------------------------*/
 class Function : public Eval {
 public:
-  void set_owner(Block const*) { }
+  void set_owner(Block const*) { untested(); }
   void parse(CS& f);
   void dump(std::ostream& f)const override;
-  Function() :Eval() {}
+  Function() :Eval() { untested();}
 };
 typedef Collection<Function> Function_List;
 #endif
@@ -267,34 +272,18 @@ public:
   void dump(std::ostream& f)const override;
 };
 /*--------------------------------------------------------------------------*/
-typedef String_Arg Branch_Identifier;
-class List_Of_Branch_Identifiers : public LiSt<Branch_Identifier, '\0', ',', ';'>{
-public:
-  void dump(std::ostream& f)const override;
-};
-/*--------------------------------------------------------------------------*/
-class Branch_Declaration : public Owned_Base{
-  List_Of_Branch_Identifiers _list;
-  Branch_Ref _br;
-public:
-  explicit Branch_Declaration() : Owned_Base() {}
-public:
-  void parse(CS& f)override;
-  void dump(std::ostream& f)const override;
-};
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class Arg : public Base {
   String_Arg _identifier;
 public:
-  Arg() {}
-  void set_owner(Block*){
+  Arg() { untested();}
+  void set_owner(Block*){ untested();
     incomplete();
   }
-  String_Arg const& identifier() const{return _identifier;}
+  String_Arg const& identifier() const{ untested();return _identifier;}
   void parse(CS& f) override;
-  void dump(std::ostream& f)const override {f << "      " << identifier() << ";\n";}
-  String_Arg const& key()const { return _identifier; }
+  void dump(std::ostream& f)const override { untested();f << "      " << identifier() << ";\n";}
+  String_Arg const& key()const { untested(); return _identifier; }
 };
 typedef LiSt<Arg, '{', '#', '}'> Arg_List;
 /*--------------------------------------------------------------------------*/
@@ -304,43 +293,25 @@ class Args : public Base {
   String_Arg _type;
   Arg_List   _arg_list;
 public:
-  void set_owner(Block const*){}
-  void parse(CS& f)override {f >> _name >> _type >> _arg_list;}
+  void set_owner(Block const*){ untested();}
+  void parse(CS& f)override { untested();f >> _name >> _type >> _arg_list;}
   void dump(std::ostream& f)const override
   {f << "    args " << name() << " " << type() << "\n"
      << arg_list() << "\n";}
-  Args(){}
-  const String_Arg& name()const {return _name;}
-  const String_Arg& type()const {return _type;}
-  const Arg_List&   arg_list()const {return _arg_list;}
+  Args(){ untested();}
+  const String_Arg& name()const { untested();return _name;}
+  const String_Arg& type()const { untested();return _type;}
+  const Arg_List&   arg_list()const { untested();return _arg_list;}
   typedef Arg_List::const_iterator const_iterator;
-  const_iterator begin()const	{return _arg_list.begin();}
-  const_iterator end()const	{return _arg_list.end();}
+  const_iterator begin()const	{ untested();return _arg_list.begin();}
+  const_iterator end()const	{ untested();return _arg_list.end();}
 };
 typedef Collection<Args> Args_List;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-#if 0
-class Probe : public Base {
-  std::string _name;
-  std::string _expression;
-public:
-  void parse(CS& f) {f >> _name >> '=' >> _expression >> ';';}
-  void dump(std::ostream& f)const
-	{f << "    " << name() << " = \"" << expression() << "\";\n";}
-  Probe() {untested();}
-  Probe(CS& f) {parse(f);}
-  const std::string& name()const	{return _name;}
-  const std::string& expression()const	{return _expression;}
-};
-typedef LiSt<Probe, '{', '#', '}'> Probe_List;
-#endif
 // Name clash, VAMS_ACCESS == Probe?
 // mg_analog.h?
 class Probe;
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class Named_Branch : public Branch {
@@ -352,10 +323,10 @@ public:
   explicit Named_Branch(Branch_Ref a, std::string n, Module* m)
      : Branch(a, m), _br(a), _name(n) {
      //  set_label("NBTODO");
-//     if(n==""){
+//     if(n==""){ untested();
 //       n = b.state();
 //       _sl = b.code_name();
-//     }else{
+//     }else{ untested();
 //       n = "_st" + n;
 //       _sl = "_br" + n;
 //     }
@@ -363,16 +334,16 @@ public:
 //    _num_states = b.num_states();
 //    set_label(b.short_label());
   }
-//  size_t num_states()const override {return _num_states;}
+//  size_t num_states()const override { untested();return _num_states;}
   std::string name()const override{return _name;} // label?
   bool has_name()const override {return true;}
   std::string code_name()const override;
-//  size_t num_nodes()const override {return _base.num_nodes();}
+//  size_t num_nodes()const override { untested();return _base.num_nodes();}
   std::string key()const {return _name;}
   Branch const* base()const {return _br;}
   bool is_reversed()const {return _br.is_reversed(); }
-//  std::string short_label()const override  {return _sl;}
-//  Discipline const* discipline()const override { return _base.discipline(); }
+//  std::string short_label()const override  { untested();return _sl;}
+//  Discipline const* discipline()const override { untested(); return _base.discipline(); }
 private:
   void inc_pot_probe()override {
     Branch::inc_pot_probe();
@@ -424,8 +395,8 @@ public:
   void parse(CS&)override {};
   void dump(std::ostream&)const override {};
   Node(int n) : _number(n){ assert(!n); _next=this; }
-  Node() {untested(); _next=this;}
-  Node(CS& f) {parse(f); _next=this;}
+  Node() { untested();untested(); _next=this;}
+  Node(CS& f) { untested();parse(f); _next=this;}
   Node(std::string const& f, int n) : _name(f), _number(n) { _next=this;}
 public:
   ~Node();
@@ -445,18 +416,18 @@ public:
   }
 
   Discipline const* discipline() const{  return _discipline; }
-  Nature const* nature() const{ return _nature; }
+  Nature const* nature() const{ untested(); return _nature; }
 public:
   bool is_used()const;
-  void inc_use()const {++_use;}
-  void dec_use()const {assert(_use); --_use;}
+  void inc_use()const { untested();++_use;}
+  void dec_use()const { untested();assert(_use); --_use;}
   void connect(Element_2 const*);
   bool is_ground() const{ return !_number; }
 }; // Node
 /*--------------------------------------------------------------------------*/
 class Node_List : public List<Node> {
 public:
-	explicit Node_List() : List<Node>() {}
+	explicit Node_List() : List<Node>() { untested();}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -464,8 +435,8 @@ public:
 /*--------------------------------------------------------------------------*/
 class Task : public Owned_Base {
 public:
-  void parse(CS&)override {unreachable();}
-  void dump(std::ostream&)const override {unreachable();}
+  void parse(CS&)override { untested();unreachable();}
+  void dump(std::ostream&)const override { untested();unreachable();}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -501,17 +472,17 @@ public:
   void parse(CS&)override;
   void dump(std::ostream&)const override;
   Expression const& expression() const{assert(_expression); return *_expression;};
-  Block* owner() {return Owned_Base::owner();}
+  Block* owner() { untested();return Owned_Base::owner();}
 };
 /*--------------------------------------------------------------------------*/
 // inline void Owned_Base::set_reachable()
-// {
+// { untested();
 //   assert(_owner);
 //   _owner->set_reachable();
 // }
 /*--------------------------------------------------------------------------*/
 // inline bool Owned_Base::is_reachable() const
-// {
+// { untested();
 //   assert(_owner);
 //   return _owner->is_reachable();
 // }
@@ -535,7 +506,7 @@ inline ATTRIB_LIST_p& attributes(void const* x)
 }
 /*--------------------------------------------------------------------------*/
 inline ATTRIB_LIST_p& attributes(intptr_t x)
-{
+{ untested();
   assert(CKT_BASE::_attribs);
   return (*CKT_BASE::_attribs)[(void*)x];
 }

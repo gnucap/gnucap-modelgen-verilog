@@ -25,7 +25,7 @@
 #include "mg_func.h"
 #include "mg_out.h"
 #include "mg_analog.h"
-#include "m_tokens.h"
+#include "mg_token.h"
 #include <globals.h>
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/

@@ -43,7 +43,7 @@ public:
   	: FUNCTION(o), _num_args(o._num_args) {
 	  set_label(o.short_label()); // base?
   }
-//  void set_label(std::string const& l){
+//  void set_label(std::string const& l){ untested();
 //  	_label = l;
 //  }
   ~FUNCTION_();
@@ -63,7 +63,7 @@ public:
   virtual void make_cc_tr_advance(std::ostream&)const {}
   virtual void make_cc_tr_review(std::ostream&)const {}
 
-  virtual Token* new_token(Module&, size_t)const {unreachable(); return NULL;}
+  virtual Token* new_token(Module&, size_t)const { untested();unreachable(); return NULL;}
   virtual bool static_code()const {return false;}
   virtual bool returns_void()const { return false; }
   virtual std::string code_name()const { itested();
@@ -74,21 +74,22 @@ public:
   virtual double evalf(double const*)const {
     throw Exception("not implemented");
   }
+  virtual void setup() {};
 /*--------------------------------------------------------------------------*/
 public: // use refcounter in e_base
   void	      inc_refs()const	{inc_probes();}
   void	      dec_refs()const	{dec_probes();}
   bool	      has_refs()const	{return has_probes();}
-};
+}; // FUNCTION_
 /*--------------------------------------------------------------------------*/
 class MGVAMS_FUNCTION : public FUNCTION_ {
-  std::string eval(CS&, const CARD_LIST*)const override{
+  std::string eval(CS&, const CARD_LIST*)const override{ untested();
 	  unreachable();
 	  return "func";
   }
 public:
   ~MGVAMS_FUNCTION() {}
-  virtual MGVAMS_FUNCTION* clone()const {
+  virtual MGVAMS_FUNCTION* clone()const { untested();
 	  unreachable();
 	  return NULL;
   }
@@ -100,7 +101,7 @@ public:
 class Node_Ref;
 class Branch;
 class MGVAMS_FILTER : public FUNCTION_ {
-  std::string eval(CS&, const CARD_LIST*)const override{
+  std::string eval(CS&, const CARD_LIST*)const override{ untested();
 	  unreachable();
 	  return "filt";
   }
@@ -108,26 +109,26 @@ public:
   ~MGVAMS_FILTER() {}
   // Token* new_token(Module& m, size_t na, Deps& d) const override;
   void make_cc_common(std::ostream&)const override {}
-  std::string code_name()const override{
+  std::string code_name()const override{ untested();
     return "";
   }
   virtual Node_Ref p() const;
   virtual Node_Ref n() const;
-  virtual Branch const* output()const{return NULL;}
+  virtual Branch const* output()const{ untested();return NULL;}
 };
 /*--------------------------------------------------------------------------*/
 class MGVAMS_TASK : public FUNCTION_ {
-  std::string eval(CS&, const CARD_LIST*)const override{
+  std::string eval(CS&, const CARD_LIST*)const override{ untested();
 	  unreachable();
 	  return "task";
   }
 public:
   ~MGVAMS_TASK() {}
-  virtual MGVAMS_TASK* clone()const {
+  virtual MGVAMS_TASK* clone()const { untested();
 	  unreachable();
 	  return NULL;
   }
-  std::string code_name()const override{
+  std::string code_name()const override{ untested();
 	  return "";
   }
 };
@@ -136,22 +137,22 @@ class VAMS_ACCESS : public FUNCTION_ {
   std::string _name, _arg0, _arg1;
 public:
   VAMS_ACCESS(std::string n, std::string a0, std::string a1)
-    : _name(n), _arg0(a0), _arg1(a1) {
+    : _name(n), _arg0(a0), _arg1(a1) { untested();
   }
 private:
-  std::string eval(CS&, const CARD_LIST*)const override {unreachable(); return "";}
+  std::string eval(CS&, const CARD_LIST*)const override { untested();unreachable(); return "";}
   Token* new_token(Module& m, size_t na)const override;
-  void make_cc_common(std::ostream&)const override { unreachable(); }
+  void make_cc_common(std::ostream&)const override { untested(); unreachable(); }
 };
 /*--------------------------------------------------------------------------*/
 // inline void MGVAMS_FUNCTION::make_cc_dev(std::ostream& o) const
-// {
+// { untested();
 // //   o__ "// " << label() << "\n";
 // }
 /*--------------------------------------------------------------------------*/
 inline FUNCTION_::~FUNCTION_()
 {
-  if(has_refs()){
+  if(has_refs()){ untested();
     incomplete();
     std::cerr << "stale ref " << label() << "\n";
   }else{

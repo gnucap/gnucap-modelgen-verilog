@@ -3,20 +3,19 @@ module test_while0a(p, n);
   electrical p, n;
   parameter real r = 0;
 
-  real z;
+  real z// dep _potential_b_p_n
+;
 
   analog begin // always
     // i : 0
     // x : 1
     // y : 1
-    // z : 0
+    // z : 1
     integer i;
-    real x// dep _potential_b_p_n
-, y// dep _potential_b_p_n
-;
+    real x, y;
     x = 0.;
     x = 0.; // dep: _potential_b_p_n
-    z = x;
+    z = x; // dep: _potential_b_p_n
     y = 0.; // dep: _potential_b_p_n
     i = r;
     while ((i > 0)) begin

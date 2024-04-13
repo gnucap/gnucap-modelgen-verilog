@@ -1,10 +1,8 @@
 mg_func_math.o: mg_func_math.cc ../src/mg_func.h ../src/mg_token.h \
- ../src/m_tokens.h ../src/mg_expression.h ../src/mg_deps.h \
- ../src/mg_lib.h ../src/mg_func.h ../src/mg_base.h ../src/mg_out.cc \
- ../src/mg_out.h ../src/mg_token.h ../src/mg_module.h ../src/mg_code.h \
- ../src/mg_attrib.h
+ ../src/mg_expression.h ../src/mg_func.h ../src/mg_deps.h ../src/mg_lib.h \
+ ../src/mg_base.h ../src/mg_out.cc ../src/mg_out.h ../src/mg_token.h \
+ ../src/mg_module.h ../src/mg_code.h ../src/mg_attrib.h
 mg_func_sys.o: mg_func_sys.cc ../src/mg_func.h ../src/mg_token.h \
- ../src/m_tokens.h ../src/mg_expression.h ../src/mg_deps.h \
- ../src/mg_lib.h ../src/mg_func.h ../src/mg_base.h ../src/mg_out.cc \
- ../src/mg_out.h ../src/mg_token.h ../src/mg_module.h ../src/mg_code.h \
- ../src/mg_attrib.h
+ ../src/mg_expression.h ../src/mg_func.h ../src/mg_deps.h ../src/mg_lib.h \
+ ../src/mg_base.h ../src/mg_out.cc ../src/mg_out.h ../src/mg_token.h \
+ ../src/mg_module.h ../src/mg_code.h ../src/mg_attrib.h

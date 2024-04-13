@@ -286,17 +286,19 @@ void Parameter_2_List::parse(CS& file)
   }
 }
 /*--------------------------------------------------------------------------*/
-// ATTRIB_LIST_p& attributes(void const* x) {
-//   assert(CKT_BASE::_attribs);
-//   return (*CKT_BASE::_attribs)[x];
-// }
-/*--------------------------------------------------------------------------*/
+// duplicate?
 void Variable_List::parse(CS& f)
 {
   assert(owner());
   Module* mod = prechecked_cast<Module*>(owner());
   assert(mod);
 
+  Variable_List_Collection const* p=NULL;
+  if(::attributes(&f)[std::string("desc")]!="0"
+   ||::attributes(&f)[std::string("units")]!="0"){
+    p = &mod->variables();
+  }else{
+  }
   move_attributes(&f, this);
 
   char t = f.last_match()[0];
@@ -308,13 +310,16 @@ void Variable_List::parse(CS& f)
     throw Exception_CS_("What type? " + t, f);
   }
 
-  // TODO: use Tokens.
   LiSt<String_Arg, '\0', ',', ';'> l;
   l.parse(f);
   // LiSt<Variable_Decl, '\0', ',', ';'>::parse(f);
   if(_type.is_real()) {
     for(auto i : l){
       auto data = new TData;
+      if(p){
+	data->add_rdep(p);
+      }else{
+      }
       auto r = new Token_VAR_REAL(i->to_string(), data, data);
       r->set_owner(mod);
       push_back(r);
@@ -323,6 +328,10 @@ void Variable_List::parse(CS& f)
   }else if(_type.is_int()) {
     for(auto i : l){
       auto data = new TData;
+      if(p){ untested();
+	data->add_rdep(p);
+      }else{
+      }
       auto I = new Token_VAR_INT(i->to_string(), data, data);
       push_back(I);
       mod->new_var_ref(I);
@@ -673,6 +682,7 @@ void Module::parse(CS& f)
   _circuit->parse_ports(f);
   f >> ';';
   parse_body(f);
+  setup_functions();
   setup_nodes();
 }
 /*--------------------------------------------------------------------------*/
@@ -863,7 +873,7 @@ void Module::dump(std::ostream& o)const
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::parse(CS& file)
-{
+{ untested();
   file >> ','; // ?? BUG.
   assert(owner());
   assert(!_data);
@@ -1051,7 +1061,7 @@ void Block::new_var_ref(Base* what)
       // updating variable...
       if(auto VT = dynamic_cast<Token_VAR_REF const*>(T)){
 	trace2("new_var_ref, update token", p, VT->deps().size());
-//      }else if(auto VT = dynamic_cast<Token_VAR_REAL const*>(T)){
+//      }else if(auto VT = dynamic_cast<Token_VAR_REAL const*>(T)){ untested();
 //	throw(Exception("already declared"));
       }else{
 	trace1("new_var_ref, update token", p);
@@ -1083,7 +1093,7 @@ void Circuit::push_back(Filter /*const?*/ * f)
   _filters.push_back(f);
 }
 /*--------------------------------------------------------------------------*/
-void Module::push_back(FUNCTION_ const* f)
+void Module::push_back(FUNCTION_* f)
 {
   _func.push_back(f);
   install(f);
@@ -1104,7 +1114,7 @@ void Module::push_back(Base* x)
 }
 /*--------------------------------------------------------------------------*/
 void Module::push_back(Token* f)
-{
+{ untested();
   if(auto t = dynamic_cast<Token_VAR_REF*>(f)) { untested();
     auto vl = new Variable_List;
     vl->set_owner(this);
@@ -1112,7 +1122,7 @@ void Module::push_back(Token* f)
     move_attributes(f, vl);
 //    attributes(f) = attributes(vl);
     _variables.push_back(vl);
-  }else{
+  }else{ untested();
     unreachable();
   }
 }
@@ -1148,9 +1158,25 @@ Branch::Branch(Node_Ref p, Node_Ref n, Module* m)
   // n->inc_use();
 }
 /*--------------------------------------------------------------------------*/
+void Module::detach_out_vars()
+{
+#ifndef NDEBUG
+  assert(circuit());
+  for(auto br : circuit()->branches()){
+    if(br->is_used_in(&variables())){
+      br->unset_used_in(&variables());
+    }else{
+    }
+  }
+#endif
+}
+/*--------------------------------------------------------------------------*/
 Module::~Module()
 {
   delete_analog();
+  detach_out_vars(); // delete variables?
+
+  // name clash, Gnucap probes vs Verilog-AMS "probe branch"
   delete _probes; // .clear();
 
   delete_circuit();
@@ -1228,5 +1254,11 @@ void Module::dump_variables(std::ostream& o) const
   }
 }
 /*--------------------------------------------------------------------------*/
+void Module::setup_functions()
+{
+  for(FUNCTION_* f : _func){
+    f->setup();
+  }
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

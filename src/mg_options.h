@@ -42,19 +42,19 @@ class Options : public Base {
 public:
   explicit Options(){ }
   void parse(CS& f) override;
-  void dump(std::ostream&)const override{unreachable();}
+  void dump(std::ostream&)const override{ untested();unreachable();}
 public:
   bool optimize_binop()   const{ return _optimize_binop; }
   bool optimize_swap()    const{ return _optimize_swap; }
   bool optimize_deriv()   const{ return _optimize_deriv; }
-  bool optimize_deps()    const{ return _optimize_deps; }
+  bool optimize_deps()    const{ untested(); return _optimize_deps; }
   bool optimize_unused()  const{ return _optimize_unused; }
   bool optimize_nodes()   const{ return _optimize_nodes; }
   bool gen_module()       const{ return _gen_module; }
   bool gen_paramset()     const{ return _gen_paramset; }
   bool dump_module()      const{ return _dump_module; }
   bool dump_paramset()    const{ return _dump_paramset; }
-  bool store_unreachable()const{ untested(); return _store_unreachable; }
+  bool store_unreachable()const{ untested(); untested(); return _store_unreachable; }
   bool dump_unreachable() const{ return _dump_unreachable; }
   bool dump_discipline()  const{ return _dump_discipline; }
   bool dump_nature()      const{ return _dump_nature; }

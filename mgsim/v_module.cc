@@ -106,7 +106,7 @@ private: // no ops for prototype
   }
   bool do_tr() override		{if(is_device()){ return BASE_SUBCKT::do_tr();}else{ return true;} }
 
-  bool tr_needs_eval()const override{
+  bool tr_needs_eval()const override{ untested();
     if(is_device()){untested();
       return BASE_SUBCKT::tr_needs_eval();
     }else{untested();
@@ -286,7 +286,7 @@ void DEV_MODULE::expand()
     for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
       CARD* d = (*i)->deflate();
 
-      if(d == (*i)){
+      if(d == (*i)){ untested();
       }else{
 	assert(d->owner() == this);
 	delete *i;
@@ -338,7 +338,7 @@ void DEV_MODULE::precalc_last()
 }
 /*--------------------------------------------------------------------------*/
 double DEV_MODULE::tr_probe_num(const std::string& x)const
-{
+{ untested();
   if (Umatch(x, "p ")) {untested();
     double power = 0.;
     assert(subckt());
@@ -363,7 +363,7 @@ double DEV_MODULE::tr_probe_num(const std::string& x)const
       power += CARD::probe(*ci,"PS");
     }
     return power;
-  }else{
+  }else{ untested();
     return COMPONENT::tr_probe_num(x);
   }
   /*NOTREACHED*/

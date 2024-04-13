@@ -22,6 +22,7 @@
 #ifndef MG_CODE_H
 #define MG_CODE_H
 #include "mg_base.h"
+#include "mg_deps.h" // BUG
 #include "mg_attrib.h"
 #include "mg_expression.h"
 /*--------------------------------------------------------------------------*/
@@ -32,12 +33,12 @@ protected:
   explicit Statement() : Owned_Base() {}
 public:
   virtual Statement* deep_copy(Base*)const
-    {unreachable();return NULL;}
-  virtual bool propagate_rdeps(TData const&){
+    { untested();unreachable();return NULL;}
+  virtual bool propagate_rdeps(RDeps const&){ untested();
     incomplete();
     return false;
   }
-  virtual bool propagate_deps(Token const&){
+  virtual bool propagate_deps(Token const&){ untested();
     incomplete();
     return false;
   }
@@ -46,6 +47,7 @@ public:
 //  virtual Statement* parent_stmt();
   virtual Block* scope() { return Owned_Base::owner(); }
   virtual Block const* scope() const { return Owned_Base::owner(); }
+  virtual bool is_used_in(Base const*)const = 0;
 public:
   bool is_reachable()const;
   bool is_always()const;
@@ -58,7 +60,7 @@ protected:
   type_t _type;
   Data_Type(type_t type) : Base(), _type(type){}
 public:
-  Data_Type(Data_Type const& t) : Base(), _type(t._type){}
+  Data_Type(Data_Type const& t) : Base(), _type(t._type){ untested();}
   Data_Type() : Base(), _type(t_default){}
   Data_Type& operator=(Data_Type const& o){ _type = o._type; return *this;}
   void parse(CS& f)override;
@@ -86,46 +88,46 @@ class Expression;
 class Variable_Decl : public Owned_Base {
   Data_Type _type;
 public:
-  Variable_Decl() : Owned_Base() { } // {new_deps(); }
+  Variable_Decl() : Owned_Base() { untested(); } // {new_deps(); }
   ~Variable_Decl();
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
-  virtual /*?*/ Data_Type const& type()const { return _type; }
+  virtual /*?*/ Data_Type const& type()const { untested(); return _type; }
 //  std::string code_name()const override;
-  void set_type(Data_Type const& d){ _type=d; }
+  void set_type(Data_Type const& d){ untested(); _type=d; }
   bool propagate_deps(Token_VAR_REF const&);
 protected:
   void clear_deps();
 private:
-//  TData& deps() { assert(_deps); return *_deps; }
+//  TData& deps() { untested(); assert(_deps); return *_deps; }
   void new_deps();
-//  void set_type(std::string const& a){_type=a;}
+//  void set_type(std::string const& a){ untested();_type=a;}
 protected:
   TData* _data{NULL};
   Token_VAR_REF* _token{NULL};
 public:
-  String_Arg key()const { return String_Arg(name()); }
-//  void set_type(Data_Type d){ _type=d; }
-  bool is_real()const { return type().is_real(); }
-  bool is_int()const { return type().is_int(); }
-  std::string const& identifier()const {return name();}
-  std::string const& name()const; //  {return name();}
+  String_Arg key()const { untested(); return String_Arg(name()); }
+//  void set_type(Data_Type d){ untested(); _type=d; }
+  bool is_real()const { untested(); return type().is_real(); }
+  bool is_int()const { untested(); return type().is_int(); }
+  std::string const& identifier()const { untested();return name();}
+  std::string const& name()const; //  { untested();return name();}
   virtual std::string code_name()const;
 
 //  virtual bool propagate_deps(Variable const&) = 0;
-  virtual double eval()const { return NOT_INPUT;}
+  virtual double eval()const { untested(); return NOT_INPUT;}
   Block const* scope() const;
-  bool has_deps()const { return _data; }
-  TData const& deps()const { assert(_data); return *_data; }
+  bool has_deps()const { untested(); return _data; }
+  TData const& deps()const { untested(); assert(_data); return *_data; }
   bool is_used_in(Base const*b)const;
 protected:
-  TData& data() { assert(_data); return *_data; }
+  TData& data() { untested(); assert(_data); return *_data; }
   void new_var_ref();
 };
 /*--------------------------------------------------------------------------*/
 class BlockVarIdentifier : public Variable_Decl {
 public:
-  explicit BlockVarIdentifier() : Variable_Decl() { }
+  explicit BlockVarIdentifier() : Variable_Decl() { untested(); }
 public:
   void parse(CS& cmd) override;
   void dump(std::ostream&)const override;
@@ -134,10 +136,10 @@ public:
 /*--------------------------------------------------------------------------*/
 class ListOfBlockIntIdentifiers : public LiSt<BlockVarIdentifier, '\0', ',', ';'>{
 public:
-  ListOfBlockIntIdentifiers(CS& f, Block* o){
+  ListOfBlockIntIdentifiers(CS& f, Block* o){ untested();
     set_owner(o);
     parse(f);
-    for(auto i : *this){
+    for(auto i : *this){ untested();
       i->set_type(Data_Type_Int());
     }
   }
@@ -166,7 +168,7 @@ public:
   explicit Assignment() : Expression_() {}
   ~Assignment();
 public:
-  //bool has_deps()const { return _data; }
+  //bool has_deps()const { untested(); return _data; }
   TData const& data()const { assert(_data); return *_data; }
   bool is_int() const;
   Data_Type const& type()const;
@@ -183,9 +185,11 @@ public:
   void set_lhs(Variable_Decl* v);
 
   void parse_rhs(CS& cmd);
+  RDeps const* rdeps() const;
   bool has_sensitivities()const;
 //  Block const* scope() const;
   bool is_used_in(Base const*b)const;
+  bool is_used()const;
 private: // implementation
   bool store_deps(TData const&);
   std::string code_name()const;
@@ -216,7 +220,7 @@ class SeqBlock : public Block {
 public:
   explicit SeqBlock() : Block() {}
   ~SeqBlock();
-  void parse(CS&)override{incomplete();}
+  void parse(CS&)override{ untested();incomplete();}
 //  void dump(std::ostream& o)const override;
   void parse_identifier(CS& f) { f >> _identifier; }
 
@@ -224,7 +228,7 @@ public:
     assert(owner());
     return scope()->new_branch(p, n);
   }
-  Branch_Ref new_branch(Node* p, Node* n)override {
+  Branch_Ref new_branch(Node* p, Node* n)override { untested();
     assert(owner());
     return scope()->new_branch(p, n);
   }
@@ -242,6 +246,7 @@ public:
   void set_sens(Base* s);
   void merge_sens(Sensitivities const& s);
   map const& variables()const {return _var_refs;}
+  bool update();
 }; // SeqBlock
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

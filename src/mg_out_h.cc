@@ -23,7 +23,7 @@
 #include "mg_func.h"
 #include "mg_options.h"
 #include "mg_analog.h" // BUG. Probe
-#include "m_tokens.h" // Deps
+#include "mg_token.h" // Deps
 /*--------------------------------------------------------------------------*/
 static void declare_deriv_enum(std::ostream& o, const Module& m)
 {
@@ -37,6 +37,9 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
   for(auto x : m.circuit()->branches()){
     assert(x);
     Branch const* b = x;
+    if(b->is_filter()){
+      o << "    d_potential" << b->code_name() << ",\n";
+    }else
     if(b->is_short()){
       // !has_element?
     }else{
@@ -125,7 +128,7 @@ static void make_funcs_common(std::ostream& o, pSet<FUNCTION_ const> const& P)
       o<<"// FUNCTION no refs: " << (*q)->label() << "\n";
     }else if(dynamic_cast<MGVAMS_TASK const*>(*q)){ untested();
       o<<"// TASK no refs: " << (*q)->label() << "\n";
-    }else if(dynamic_cast<MGVAMS_FILTER const*>(*q)){ untested();
+    }else if(dynamic_cast<MGVAMS_FILTER const*>(*q)){
       o<<"// FILTER no refs: " << (*q)->label() << "\n";
     }else if(dynamic_cast<VAMS_ACCESS const*>(*q)){ untested();
       o<<"// XS no refs: " << (*q)->label() << "\n";
@@ -198,7 +201,7 @@ void make_one_variable_decl(std::ostream& o, Token_VAR_REF const& V)
     }else{
 //      o__ "ddouble ";
     }
-  }else if(V.type().is_int()) {
+  }else if(V.type().is_int()) { untested();
     o__ "int";
     o << " _v_" << V.name() << "{0}";
   }else{ untested();
@@ -335,7 +338,7 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
 //      o << "/* found " << d->code_name() << "*/";
     Branch const* bbb = d->branch();
     assert(bbb);
-    if(bbb->is_short()){ untested();
+    if(bbb->is_short()){
     }else if(bbb == &br){
     }else if(bbb->has_flow_probe()){
     }else{
@@ -347,7 +350,7 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
   for(auto d : br.ddeps()){
     Branch const* bbb = d->branch();
     assert(bbb);
-    if(bbb->is_short()){ untested();
+    if(bbb->is_short()){
     }else if(bbb == &br){
     }else if(!bbb->has_flow_probe()){
     }else{
@@ -445,12 +448,18 @@ static void make_module(std::ostream& o, const Module& m)
   }else{
   }
   for (auto br : m.circuit()->branches()){
-    if(br->has_element()){
-      o__ "ELEMENT* " << br->code_name() << "{NULL}; // branch\n";
+    if(br->is_filter()){
+      if(!br->is_used() && options().optimize_unused()){
+	o__ "// ELEMENT* " << br->code_name() << "{NULL}; // unused filter\n";
+      }else{
+	o__ "ELEMENT* " << br->code_name() << "{NULL}; // filter\n";
+      }
     }else if(br->is_short()){
       o__ "// short : " << br->code_name() << "\n";
-    }else if(br->is_filter()){
-      o__ "ELEMENT* " << br->code_name() << "{NULL}; // filter\n";
+    }else if(!br->is_used() && options().optimize_unused()){
+      o__ "// ELEMENT* " << br->code_name() << "{NULL}; // unused\n";
+    }else if(br->has_element()){
+      o__ "ELEMENT* " << br->code_name() << "{NULL}; // branch\n";
     }else{
       o__ "// ELEMENT* " << br->code_name() << "{NULL}; // no element (BUG)?\n";
     }

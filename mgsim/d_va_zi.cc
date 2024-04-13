@@ -78,7 +78,7 @@ public:
   COMMON_ZIFILTER(COMMON_ZIFILTER const& x) = default;
   COMMON_ZIFILTER* clone()const override {return new COMMON_ZIFILTER(*this);}
 
-  bool operator==(const COMMON_COMPONENT& x)const;
+  bool operator==(const COMMON_COMPONENT& x)const override;
   void set_param_by_index(int I, std::string& Value, int Offset)override;
   int set_param_by_name(std::string Name, std::string Value)override;
   void precalc_last(const CARD_LIST* par_scope)override;
@@ -248,7 +248,7 @@ double ZFILTER::tr_involts()const
     assert(_ctrl_in);
     double input = *_ctrl_in;
     // just fpoly?
-    // for(int i = 0; i<_n_ports-1; ++i) {
+    // for(int i = 0; i<_n_ports-1; ++i) { untested();
     //   input += _ctrl_in[2+i] * dn_diff(_n[2+2*i].v0(), _n[2+2*i+1].v0());
     // }
     return input;
@@ -258,7 +258,7 @@ double ZFILTER::tr_involts()const
 }
 /*--------------------------------------------------------------------------*/
 double ZFILTER::tr_probe_num(std::string const& n) const
-{
+{ untested();
   auto c = prechecked_cast<COMMON_RF_BASE const*>(common());
   assert(c);
   int num_den = c->den_size();
@@ -269,14 +269,14 @@ double ZFILTER::tr_probe_num(std::string const& n) const
       return _regs[idx];
     }else{ untested();
     }
-  }else{
+  }else{ untested();
   }
 
-  if(n == "vin") {
+  if(n == "vin") { untested();
     return tr_involts();
   }else if(n == "conv") { untested();
     return converged();
-  }else{
+  }else{ untested();
     return ELEMENT::tr_probe_num(n);
   }
 }

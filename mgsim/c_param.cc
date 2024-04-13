@@ -43,7 +43,7 @@ public:
 //    trace1("parse", cmd.fullstring());
     double new_val;
 //    cmd >> new_val;
-    if (0 && cmd) {
+    if (0 && cmd) { untested();
       PARAMETER<double>::operator=(new_val);
       assert(_s == "#");
     }else{
@@ -52,7 +52,7 @@ public:
       name = cmd.ctos(",=();", "'{\"", "'}\"");
       trace1("parse", name);
       if (cmd) {
-	if (cmd.match1('(')) {
+	if (cmd.match1('(')) { untested();
 	  _s = name + '(' + cmd.ctos("", "(", ")") + ')';
 	}else{
 	  _s = name;
@@ -75,7 +75,7 @@ public:
   void do_it(CS& cmd, CARD_LIST* Scope)override {
     PARAM_LIST* pl = Scope->params();
     assert(pl);
-    if (cmd.is_end()) {
+    if (cmd.is_end()) { untested();
       pl->print(IO::mstdout, OPT::language);
       IO::mstdout << '\n';
     }else{
@@ -113,7 +113,7 @@ public:
       for(;;){
 	if(cmd >> "from "){
 	  range_expr = range_expr + "*(";
-	}else if(cmd>> "exclude ") {
+	}else if(cmd>> "exclude ") { untested();
 	  range_expr = range_expr + "*(1-";
 	}else{
 	  break;
@@ -128,7 +128,7 @@ public:
 	  lo = "<=";
 	}else if(cmd.skip1('(')){
 	  lo = "<";
-	}else{
+	}else{ untested();
 	  range = false;
 	}
 
@@ -139,7 +139,7 @@ public:
 	    // lb = cmd.ctos(":");
 	    Expression LL(L, Scope); // reduce_copy.
 	    double lb_ = LL.eval();
-	    if(lb_ == NOT_VALID){
+	    if(lb_ == NOT_VALID){ untested();
 	      incomplete();
 	    }else{
 	    }
@@ -154,7 +154,7 @@ public:
 	    // lb = cmd.ctos(":");
 	    Expression LL(L, Scope); // reduce_copy.
 	    double lb_ = LL.eval();
-	    if(lb_ == NOT_VALID){
+	    if(lb_ == NOT_VALID){ untested();
 	      incomplete();
 	    }else{
 	    }
@@ -169,13 +169,13 @@ public:
 	  }else{ untested();
 	  }
 	  what = "(" + lb + lo + Name + ")*(" + Name + uo + ub + ")";
-	}else{
+	}else{ untested();
 	  cmd >> what;
 	  what = "(" + Name + "==" + what + ")";
 	}
 	trace3("found1", Value, range_type, what);
 	range_expr = range_expr + what + ")";
-	if(cmd.skip1(',')){
+	if(cmd.skip1(',')){ untested();
 	  break;
 	}else{
 	}
@@ -199,7 +199,7 @@ public:
 
       PARAMETER<double> v = pl->deep_lookup(IS_VALID);
       if(range_expr=="1"){
-      }else if(v.has_hard_value()){
+      }else if(v.has_hard_value()){ untested();
 	range_expr = v.string() + "*" + range_expr;
 	pl->set(IS_VALID, range_expr);
       }else{

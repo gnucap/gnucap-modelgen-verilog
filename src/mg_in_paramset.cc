@@ -158,7 +158,7 @@ void Paramset::parse(CS& f)
       || ((f >> "endparamset ") && (end = true))
       ;
 
-    if (has_attributes(&f)){
+    if (has_attributes(&f)){ untested();
       f.warn(bWARNING, "dangling attributes "
 	   + attributes(&f).string(NULL));
     }else{
@@ -173,7 +173,7 @@ void Paramset::parse(CS& f)
       // throw?
       f.warn(0, "premature EOF (paramset)");
       break;
-    }else if (f.stuck(&here)) {
+    }else if (f.stuck(&here)) { untested();
       // throw?
       f.warn(0, "bad module");
       break;
@@ -315,13 +315,13 @@ static void import_proto_vars(Module* sub, Module const* proto)
 
   return;
 
-  for(auto const& x : pv) {
+  for(auto const& x : pv) { untested();
     std::stringstream o;
 
     o << x->type() << " ";
 
     std::string comma = "";
-    for (auto y : *x) {
+    for (auto y : *x) { untested();
       trace1("import_var", y->name());
       auto p = sub->lookup(y->name(), false);
       assert(!dynamic_cast<Variable_Decl const*>(p));
@@ -336,7 +336,7 @@ static void import_proto_vars(Module* sub, Module const* proto)
     o << ";";
     o << "endmodule;";
 
-    if(comma.size()){
+    if(comma.size()){ untested();
       trace1("command", o.str());
       CS cmd(CS::_STRING, o.str());
       sub->parse_body(cmd);
@@ -389,8 +389,9 @@ static void import_assignments(Module* sub, Module const* ps)
     if(dynamic_cast<Paramset_Stmt const*>(x)){
       // todo?
     }else if(auto a = dynamic_cast<Statement const*>(x)){
+      trace1("import assignment", *a);
       ac->push_back(a->deep_copy(ac->block()));
-    }else{
+    }else{ untested();
       assert(false);
     }
   }
@@ -424,11 +425,12 @@ void Paramset::expand()
   trace0("5. variables ========");
   import_ps_vars(_sub, this);
 
+  trace0("4. implementation ========");
+  import_proto_impl(_sub, _proto);
+
   trace0("6. assignments ========");
   import_assignments(_sub, this);
 
-  trace0("4. implementation ========");
-  import_proto_impl(_sub, _proto);
 }
 /*--------------------------------------------------------------------------*/
 Expression_ const& Paramset_Stmt::value() const
@@ -450,6 +452,8 @@ Module* Paramset::deflate()
     _sub->set_owner(scope());
     assert(dynamic_cast<Paramset*>(_sub));
     _sub = NULL;
+    sub->setup_functions();
+    sub->setup_nodes();
     return sub;
   }else{
     return this;

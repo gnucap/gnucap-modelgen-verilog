@@ -125,14 +125,15 @@ void TData::update(TData const& other)
 /*--------------------------------------------------------------------------*/
 TData::~TData()
 {
-  _s.clear();
+  _ddeps.clear();
+  _rdeps.clear();
 }
 /*--------------------------------------------------------------------------*/
 void TData::clear()
 {
   // incomplete(); later.
-  _s.clear();
-  assert(!_s.size());
+  _ddeps.clear();
+  assert(!_ddeps.size());
 }
 /*--------------------------------------------------------------------------*/
 std::pair<DDeps::const_iterator, bool> DDeps::insert(Dep const& x)
@@ -157,13 +158,23 @@ bool Dep::same_data(Dep const& o) const
 bool TData::has_sensitivities()const
 {
   return !_sens.empty(); // incomplete.
-  for(auto x : _sens){
-    if(dynamic_cast<AnalogEvtExpression const*>(x)){
+  for(auto x : _sens){ untested();
+    if(dynamic_cast<AnalogEvtExpression const*>(x)){ untested();
       return true;
-    }else{
+    }else{ untested();
     }
   }
   return false;//!_sens.empty();
+}
+/*--------------------------------------------------------------------------*/
+bool Dep::propagate_rdeps(RDeps const& r) const
+{
+  if(_prb){
+    return _prb->propagate_rdeps(r);
+  }else{ untested();
+    unreachable();
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

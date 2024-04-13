@@ -30,7 +30,7 @@
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/
 // inline Token* MGVAMS_FUNCTION::new_token(Module& m, size_t na) const
-// {
+// { untested();
 //      incomplete();
 //      return NULL;
 // }
@@ -43,7 +43,7 @@ public:
   ~ABSTIME() { }
 private:
   bool static_code()const override {return true;}
-//  Token* new_token(Module& m, size_t)const override {
+//  Token* new_token(Module& m, size_t)const override { untested();
 //    m.install(this);
 //    return new Token_CALL("$abstime", this);
 //  }

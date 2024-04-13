@@ -2,12 +2,10 @@ module dep0(d, g);
   inout d, g;
   electrical d, g;
   analog begin // always
-    // T : 1
-    // c : 1
-    real c// dep _potential_b_g_
-;
-    real T// dep _potential_b_g_
-;
+    // T : 0
+    // c : 0
+    real c;
+    real T;
     while (1) begin
       // T : 1
       // c : 1

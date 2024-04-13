@@ -20,7 +20,7 @@
  * 02110-1301, USA.
  */
 #include "mg_out.h"
-#include "m_tokens.h"
+#include "mg_token.h"
 #include "mg_.h" // TODO
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -59,39 +59,39 @@ static std::string fix_expression(const std::string& in)
 #endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-static void make_probe_parameter(std::ostream& out, const Parameter_1& p)
+static void make_probe_parameter(std::ostream& o, const Parameter_1& p)
 { untested();
-  make_tag();
-  out << "if (Umatch(x, \"";
+  make_tag(o);
+  o << "if (Umatch(x, \"";
   if (!(p.alt_name().empty())) {untested();
-    out << to_lower(p.alt_name()) << " \" || \"";
+    o << to_lower(p.alt_name()) << " \" || \"";
   }
-  out << to_lower(p.user_name()) << " \")) {\n"
+  o << to_lower(p.user_name()) << " \")) {\n"
     "    return " << p.code_name() << ";\n"
     "  }else ";
 }
 /*--------------------------------------------------------------------------*/
-void make_probe_parameter_list(std::ostream& out,const Parameter_1_List& pl)
+void make_probe_parameter_list(std::ostream& o,const Parameter_1_List& pl)
 { untested();
-  make_tag();
+  make_tag(o);
   for (Parameter_1_List::const_iterator
        p = pl.begin();
        p != pl.end();
        ++p) { untested();
-    make_probe_parameter(out, **p);
+    make_probe_parameter(o, **p);
   }
 }
 /*--------------------------------------------------------------------------*/
 #if 0
 /*--------------------------------------------------------------------------*/
-static void make_dev_aux(std::ostream& out, const Device& d)
+static void make_dev_aux(std::ostream& o, const Device& d)
 { untested();
-  make_tag();
+  make_tag(o);
   for (Function_List::const_iterator
        p = d.function_list().begin();
        p != d.function_list().end();
        ++p) { untested();
-    out << "void DEV_" << d.name() << "::" << (**p).name() << "\n"
+    o << "void DEV_" << d.name() << "::" << (**p).name() << "\n"
       "{\n"
 	<< (**p).code() <<
       "}\n"

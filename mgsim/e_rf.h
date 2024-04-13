@@ -79,7 +79,7 @@ public:
       trace1("normalised: ", x);
     }
   }
-  COMPLEX const& operator[](int i){ return _c[i]; }
+  COMPLEX const& operator[](int i){ untested(); return _c[i]; }
   const_iterator begin()const {return _c.begin();}
   const_iterator end()const {return _c.end();}
 };
@@ -181,7 +181,7 @@ int COMMON_RF_BASE::set_param_by_name(std::string Name, std::string Value)
     cmd >> idx;
     if(idx < 0){ untested();
       throw Exception_No_Match(Name);
-    }else if(cmd.more()){
+    }else if(cmd.more()){ untested();
       throw Exception_No_Match(Name);
     }else if(_den_type < 0){ untested();
       throw Exception_No_Match(Name);
@@ -196,7 +196,7 @@ int COMMON_RF_BASE::set_param_by_name(std::string Name, std::string Value)
 
     if(idx < 0){ untested();
       throw Exception_No_Match(Name);
-    }else if(cmd.more()){
+    }else if(cmd.more()){ untested();
       throw Exception_No_Match(Name);
     }else if(_num_type < 0){ untested();
       throw Exception_No_Match(Name);
@@ -269,7 +269,7 @@ std::string COMMON_RF_BASE::param_name(int i)const
 
   int idx = COMMON_RF_BASE::param_count() - 1 - i;
     // return "n" + to_string(int(idx));
-  if(idx < 0){
+  if(idx < 0){ untested();
     return COMMON_COMPONENT::param_name(i);
   }else if(idx < _num_type){
     return "n" + to_string(int(idx));
@@ -289,7 +289,7 @@ std::string COMMON_RF_BASE::param_name(int i)const
       return "d" + to_string(a);
     }else if(_den_type<0 && a<int(_p_den.size())){
       return std::string("r") + ((a%2)?'i':'r') + to_string(a/2);
-    }else{
+    }else{ untested();
     }
   }
   return COMMON_COMPONENT::param_name(i);
@@ -312,7 +312,7 @@ std::string COMMON_RF_BASE::param_value(int i)const
     nn = int(_p_num.size());
   }else{
   }
-  if (idx < 0) {
+  if (idx < 0) { untested();
   }else if (idx < _num_type) {
     return _p_num[idx].string();
   }else if (_num_type<0 && idx < int(_p_num.size())) {

@@ -25,7 +25,7 @@
 #include "mg_func.h"
 #include "mg_out.h"
 #include "mg_analog.h"
-#include "m_tokens.h"
+#include "mg_token.h"
 #include <globals.h>
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/
@@ -42,10 +42,10 @@ private:
 
   void stack_op(Expression* e)const override;
 
-  Expression_ const* args() const{ untested();
-    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){ untested();
+  Expression_ const* args() const{
+    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){
       return a;
-    }else{ untested();
+    }else{
       assert(!Token_CALL::args());
       return NULL;
     }
@@ -88,26 +88,33 @@ DISPATCHER<FUNCTION>::INSTALL d_pf(&function_dispatcher, ".port_flow", &pf);
 void Token_PF::stack_op(Expression* E)const
 {
 	// incomplete();
-	auto e = new Expression_;
 	if(auto pb = dynamic_cast<Token_PORT_BRANCH*>(E->back())) {
+		auto e = new Expression_;
 		E->pop_back();
 		e->push_back(pb);
-	}else{ untested();
-		assert(0);
-	}
 
-	if(dynamic_cast<Token_STOP*>(E->back())) {
-		delete E->back();
-		E->pop_back();
-	}else{ untested();
-		assert(0);
+		if(dynamic_cast<Token_STOP*>(E->back())) {
+			delete E->back();
+			E->pop_back();
+		}else{ untested();
+			assert(0);
+		}
+		// E->push_back(clone());
+		// use Token_CALL??
+		auto n = clone();
+		n->set_args(e);
+		// n->set_label("I");
+		E->push_back(n);
+	}else if(args()){
+		// return Token_CALL::stack_op(E);
+		std::string a ="(" + args()->back()->name() + ")";
+		auto c = new Token_PF(name() + a, f());
+		assert(args());
+//		assert(c->args());
+		E->push_back(c);
+	}else{
+		E->push_back(clone());
 	}
-	// E->push_back(clone());
-	// use Token_CALL??
-	auto n = clone();
-	n->set_args(e);
-	// n->set_label("I");
-	E->push_back(n);
 }
 /*--------------------------------------------------------------------------*/
 }
