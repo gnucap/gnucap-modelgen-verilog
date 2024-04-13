@@ -62,7 +62,6 @@ class XDT : public MGVAMS_FILTER {
   std::string _code_name;
 public: // HACK
   Branch* _br{NULL};
-  mutable Branch const* _output{NULL};
   Node_Ref _p;
   Node_Ref _n;
 protected:
@@ -201,8 +200,7 @@ private:
   Node_Ref p()const override;
   Node_Ref n()const override;
 private: // setup
-  void setup()override;
-  Branch* branch() { return _br; }
+  Branch* branch()const override { return _br; }
 }; // XDT
 /*--------------------------------------------------------------------------*/
 class DDT : public XDT{
@@ -328,73 +326,6 @@ void Token_XDT::stack_op(Expression* e)const
   }
   // ------------------------
   // branch: function->_br
-}
-/*--------------------------------------------------------------------------*/
-void XDT::setup()
-{
-  auto func = this;
-  int c_cnt = 0;
-  bool assigned = false;
-  bool always = false;
-  bool rdeps = false;
-  Contribution const* cont = NULL;
-  trace1("xdt used_in?", branch()->used_in().size());
-  for(auto b : branch()->used_in()) {
-    if(auto c = dynamic_cast<Contribution const*>(b)){
-      if(c->is_flow_contrib()) {
-	trace1("xdt used_in", c->name());
-	++c_cnt;
-	cont = c;
-      }else{
-	incomplete();
-      }
-      if(c->is_always()){
-	always = true;
-      }else{
-      }
-    }else if(dynamic_cast<Assignment const*>(b)){
-      assigned = true;
-    }else if(dynamic_cast<Branch const*>(b)){
-      rdeps = true;
-      // covered by rdeps?
-    }else if(dynamic_cast<Variable_List_Collection const*>(b)){
-    }else{untested();
-      trace1("xdt unknown?", c_cnt);
-      assert(0);
-    }
-  }
-  for(auto b : branch()->deps().rdeps()) { untested();
-    (void)b;
-    rdeps = true;
-  }
-
-  trace4("xdt use?", c_cnt, rdeps, assigned, branch()->code_name());
-  func->_output = NULL;
-  if(!has_refs()){
-    func->set_p_to_gnd();
-  }else if(cont && cont->has_sensitivities()) { untested();
-  }else if(c_cnt == 1 && always){
-    for(auto d : cont->ddeps()){
-      if(d->branch() != branch()) {
-      }else if(d.is_linear()){
-	// incomplete();
-	func->_output = cont->branch(); // polarity?
-      }
-      if(cont->reversed()){
-      }else{
-      }
-    }
-  }else if(rdeps){
-  }else if(c_cnt==0){
-    incomplete(); // analysis?
-    func->set_p_to_gnd();
-    // func->_output = cont->branch(); // polarity?
-  }else if(assigned){ untested();
-  }else if(c_cnt!=1){ untested();
-  }else{
-    incomplete();
-    // func->set_p_to_gnd();
-  }
 }
 /*--------------------------------------------------------------------------*/
 Branch const* XDT::output() const

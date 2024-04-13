@@ -80,7 +80,6 @@ class LAP : public MGVAMS_FILTER /* FUNCTION_ */ {
   std::string _code_name;
 public: // HACK
   Branch* _br{NULL};
-  mutable Branch const* _output{NULL};
   Node_Ref _p;
   Node_Ref _n;
   mutable int _nums{0};
@@ -102,6 +101,14 @@ protected:
     return "/*LAP*/ d->" + _code_name;
   }
 public:
+  void set_n_to_gnd()const {
+    assert(_m);
+    return MGVAMS_FILTER::set_n_to_gnd(_m);
+  }
+  void set_p_to_gnd()const {
+    assert(_m);
+    return MGVAMS_FILTER::set_p_to_gnd(_m);
+  }
   // Token* new_token(Expression_ const* e) ...
   // Module* m = e->owner()...
   Token* new_token(Module& m, size_t na)const override {
@@ -263,14 +270,6 @@ public:
     return "laplace";
   }
   Probe const* prb()const {return _prb;}
-  void set_n_to_gnd()const {
-    assert(_m);
-    _m->set_to_ground(_br->n());
-  }
-  void set_p_to_gnd()const {
-    assert(_m);
-    _m->set_to_ground(_br->p());
-  }
 private:
   Branch const* output()const override;
   Node_Ref p()const override;
@@ -282,8 +281,7 @@ private:
     o__ "assert(t0 == t0);\n";
   }
 private: // setup
-  void setup()override;
-  Branch* branch() { return _br; }
+  Branch* branch() const override { return _br; }
 }; // LAP
 /*--------------------------------------------------------------------------*/
 class LZP : public LAP{
@@ -413,76 +411,6 @@ void Token_LAP::stack_op(Expression* e)const
     e->push_back(N);
   }else{ untested();
     unreachable();
-  }
-}
-/*--------------------------------------------------------------------------*/
-// duplicate. move up?
-void LAP::setup()
-{
-  auto func = this;
-  int c_cnt = 0;
-  bool assigned = false;
-  bool always = false;
-  bool rdeps = false;
-  bool unknown = false;
-  Contribution const* cont = NULL;
-  trace1("xdt used_in?", branch()->used_in().size());
-  for(auto b : branch()->used_in()) {
-    if(auto c = dynamic_cast<Contribution const*>(b)){
-      if(c->is_flow_contrib()) {
-	trace1("xdt used_in", c->name());
-	++c_cnt;
-	cont = c;
-      }else{
-	incomplete();
-      }
-      if(c->is_always()){
-	always = true;
-      }else{ untested();
-      }
-    }else if(dynamic_cast<Assignment const*>(b)){
-      assigned = true;
-    }else if(dynamic_cast<Branch const*>(b)){
-      rdeps = true;
-      // covered by rdeps?
-    }else if(dynamic_cast<Variable_List_Collection const*>(b)){
-    }else{untested();
-      trace1("xdt unknown?", c_cnt);
-      unknown = true;
-      assert(0);
-    }
-  }
-  for(auto b : branch()->deps().rdeps()) { untested();
-    (void)b;
-    rdeps = true;
-  }
-
-  trace4("xdt use?", c_cnt, rdeps, assigned, branch()->code_name());
-  func->_output = NULL;
-  if(!has_refs()){ untested();
-    func->set_p_to_gnd();
-  }else if(cont && cont->has_sensitivities()) { untested();
-  }else if(c_cnt == 1 && always){
-    for(auto d : cont->ddeps()){
-      if(d->branch() != branch()) { untested();
-      }else if(d.is_linear()){
-	// incomplete();
-	func->_output = cont->branch(); // polarity?
-      }
-      if(cont->reversed()){ untested();
-      }else{
-      }
-    }
-  }else if(rdeps){
-  }else if(c_cnt==0){
-    incomplete(); // analysis?
-    func->set_p_to_gnd();
-    // func->_output = cont->branch(); // polarity?
-  }else if(assigned){ untested();
-  }else if(c_cnt!=1){ untested();
-  }else{ untested();
-    incomplete();
-    // func->set_p_to_gnd();
   }
 }
 /*--------------------------------------------------------------------------*/

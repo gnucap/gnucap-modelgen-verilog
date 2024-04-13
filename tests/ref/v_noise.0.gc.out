@@ -1,0 +1,15 @@
+white_noise #(.pwr(1),.m(2)) w (.p(1),.n(0));
+white_noise #(.pwr(2),.m(1)) w (.p(2),.n(0));
+white_noise #(.pwr(1),.m(1)) w (.p(3),.n(0));
+white_noise #(.pwr(1),.m(1)) w (.p(3),.n(0));
+resistor #(.r(1)) r1 (.p(1),.n(0));
+resistor #(.r(1)) r2 (.p(2),.n(0));
+resistor #(.r(1)) r3 (.p(3),.n(0));
+meas_noise #() noise1 (.p(1));
+meas_noise #() noise2 (.p(2));
+meas_noise #() noise3 (.p(3));
+#Freq       npwr(noise1) npwr(noise2) npwr(noise3)
+ 1.         4.         2.         2.        
+ 2.         4.         2.         2.        
+ 4.         4.         2.         2.        
+ 8.         4.         2.         2.        

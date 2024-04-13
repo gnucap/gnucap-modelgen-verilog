@@ -1,0 +1,28 @@
+resistor #(.r(1.)) r0 (.p(0),.n(0));
+resistor #(.r(1.),.wn(1.)) r1 (.p(1),.n(0));
+resistor #(.r(1.),.wn(-1.)) r2 (.p(2),.n(0));
+resistor #(.r(1.),.wn(2.)) r3 (.p(3),.n(0));
+resistor #(.r(1.),.wn(1.),.m(2)) r4 (.p(4),.n(0));
+meas_noise #(.name("thermal")) noise1 (.p(1));
+meas_noise #(.name("thermal")) noise2 (.p(2));
+meas_noise #(.name("thermal")) noise3 (.p(3));
+meas_noise #(.name("thermal")) noise4 (.p(4));
+#          
+ 27.       
+#Freq       npwr(noise1) npwr(noise2) npwr(noise3) npwr(noise4) x(r1._b_p_n) x(r1._b_white_noise_0_p_white_noise_0_n) x(r0._b_p_n) x(r0._b_white_noise_0_p_white_noise_0_n)
+ 1.         17.E-21   -17.E-21    33.E-21    17.E-21    ??         ??         ??         ??        
+ 2.         17.E-21   -17.E-21    33.E-21    17.E-21    ??         ??         ??         ??        
+ 4.         17.E-21   -17.E-21    33.E-21    17.E-21    ??         ??         ??         ??        
+ 8.         17.E-21   -17.E-21    33.E-21    17.E-21    ??         ??         ??         ??        
+#          
+ 300.      
+#Freq       npwr(noise1) npwr(noise2) npwr(noise3) npwr(noise4) x(r1._b_p_n) x(r1._b_white_noise_0_p_white_noise_0_n) x(r0._b_p_n) x(r0._b_white_noise_0_p_white_noise_0_n)
+ 1.         32.E-21   -32.E-21    63.E-21    32.E-21    ??         ??         ??         ??        
+ 2.         32.E-21   -32.E-21    63.E-21    32.E-21    ??         ??         ??         ??        
+ 4.         32.E-21   -32.E-21    63.E-21    32.E-21    ??         ??         ??         ??        
+ 8.         32.E-21   -32.E-21    63.E-21    32.E-21    ??         ??         ??         ??        
+Gnucap   System status
+iterations: op=2, dc=0, tran=0, fourier=0, total=13
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=4, subckt=0, model=0, total=4
+dctran density=25.0%, ac density=25.0%

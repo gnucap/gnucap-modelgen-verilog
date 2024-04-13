@@ -327,7 +327,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	assert(v->branch());
 	if(C.branch() == v->branch()){
 	  o__ "// same " << v->code_name() << "\n";
-	}else if(v->branch()->is_short()) { untested();
+	}else if(v->branch()->is_short()) {
 	  o__ "// short: " << v->code_name() << "\n";
 #if 1
 	}else if(v->is_flow_probe() && v->branch()->has_flow_source()) {
@@ -349,8 +349,6 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	if(C.branch() == v->branch()) {
 	  o__ "// same " << v->code_name() << "\n";
 	}else if(v->branch()->is_filter()){ /// && ref?
-	  incomplete();
-	  // TODO? element?
 	  o__ "// dep " << v->code_name() << "\n";
 	  o__ "m->" << v->branch()->state() << "[1] = "
 	  << neg_sign << " t0[d" << v->code_name() << "]; // (3p)\n";
@@ -801,7 +799,7 @@ static void make_cc_set_state(std::ostream& o, Branch const& b, std::string cn)
     o__ "// " << d->code_name() << " lin: " <<  d.is_linear() << "\n";
     if(d->branch() == &b){
       // move make_set_self_contribution here?
-    }else if(d->branch()->is_short()) { untested();
+    }else if(d->branch()->is_short()) {
     }else if(d->is_pot_probe()){
       o__ "sp += (long double)(" << b.state(cn) << "["
 	<< b.state() << "_::dep" << d->code_name()

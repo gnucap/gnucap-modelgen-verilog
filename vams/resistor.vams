@@ -1,7 +1,9 @@
 `include "disciplines.vams"
+`include "constants.vams"
 
+
+`ifdef LATER
 `define SHORT 1e-8
-
 module resistor(p, n);
 	electrical p, n;
 	inout p, n;
@@ -12,21 +14,33 @@ module resistor(p, n);
 		I(p,n) <+ i;
 	end
 endmodule
-
-`ifdef LATER
+`else
 module resistor(p, n);
 	electrical p, n;
 	inout p, n;
-	parameter real r = 1. from [`SHORT:inf);
+	parameter real r = 1. from [0.:inf);
 	parameter real tc1 = 0., tc2 = 0.;
-	localparam real g = 1 / r / (1+(tc1+tc2*T)*T;
+	parameter real wn = 0. from [0:inf);   // nonstandard
+	parameter real tnom = 0.; // nonstandard ..
+	(* desc="i" *) real i;
 	analog begin
-		I(p,n) <+ V(p,n) * g;
+		real dt, g;
+		if($param_given(tnom)) begin
+			 dt = $temperature - tnom;
+		end
+		if($param_given(tc1) || $param_given(tc2)) begin
+			g = 1. / (r * (1.+(tc1+tc2*dt)*dt));
+		end else begin
+			g = 1. / r;
+		end
+		i = V(p,n) * g;
+		I(p,n) <+ i;
+		I(p,n) <+ white_noise(wn * 4 * `P_K * g * $temperature, "thermal");
 	end
 endmodule
 
 paramset resistor resistor
-	parameter real r = 1. from [`SHORT:inf);
+	parameter real r = 1. from [0.:inf);
 	.r(r);
 endparamset
 `endif

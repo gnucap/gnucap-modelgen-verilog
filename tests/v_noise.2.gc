@@ -1,0 +1,30 @@
+load ../vams/resistor.so
+verilog
+
+resistor #(.r(1.)) r0(0, 0);
+resistor #(.r(1.), .wn(1.)) r1(1, 0);
+resistor #(.r(1.), .wn(-1.)) r2(2, 0);
+resistor #(.r(1.), .wn(2.)) r3(3, 0);
+resistor #(.$mfactor(2), .r(1.), .wn(1.)) r4(4, 0);
+
+noise_probe #(.name("thermal")) noise1(1);
+noise_probe #(.name("thermal")) noise2(2);
+noise_probe #(.name("thermal")) noise3(3);
+noise_probe #(.name("thermal")) noise4(4);
+
+probe ac npwr(noise*) x(r1.*) x(r0.*)
+
+list
+
+// BUG: need op
+op
+
+ac 1 8 * 2
+
+options temp=300
+// BUG: need op
+op
+ac 1 8 * 2
+
+status notime
+end

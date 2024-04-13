@@ -1,0 +1,27 @@
+
+verilog
+
+flicker_noise #(.m(2) .pwr(1)) fn1(1 0);
+flicker_noise #(.m(1) .pwr(2)) fn2(2 0);
+flicker_noise #(.m(1) .pwr(1)) fn3a(3 0);
+flicker_noise #(.m(1) .pwr(1)) fn3b(3 0);
+flicker_noise #(.m(1) .e(2), .pwr(1)) fn4(4 0);
+
+resistor #(1) r1(1, 0);
+resistor #(1) r2(2, 0);
+resistor #(1) r3(3, 0);
+resistor #(1) r4(4, 0);
+
+noise_probe noise1(1);
+noise_probe noise2(2);
+noise_probe noise3(3);
+noise_probe noise4(4);
+
+list
+
+probe ac npwr(noise*)
+ac 1 8 * 2
+probe ac nv(noise*)
+ac 1 8 * 2
+
+end

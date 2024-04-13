@@ -66,8 +66,8 @@ public:
 /*--------------------------------------------------------------------------*/
 class COMMON_FILT : public COMMON_COMPONENT {
 public:
-  explicit COMMON_FILT(int i=CC_STATIC) : COMMON_COMPONENT(i) { untested();}
-  ~COMMON_FILT() { untested();}
+  explicit COMMON_FILT(int i=CC_STATIC) : COMMON_COMPONENT(i) {}
+  ~COMMON_FILT() {}
 public:
   //virtual DISCIPLINE const* discipline()const{untested(); return NULL;};
   virtual int args(int) const{ untested(); return 0; }

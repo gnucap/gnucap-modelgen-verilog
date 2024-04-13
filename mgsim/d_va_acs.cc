@@ -18,14 +18,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * VAACS : ac_stim device
+ * VAACS : ac_stim device. missing phase..
  */
 #include "d_va.h"
 #include "u_xprobe.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-class VAACS : public DEV_CPOLY_G {
+class VAACS : public DEV_CPOLY_G /* COMPONENT? */ {
 protected:
   explicit VAACS(const VAACS& p) : DEV_CPOLY_G(p) {
     _loss1 = _loss0 = 1.;
@@ -36,6 +36,7 @@ public:
 protected: // override virtual
   CARD*	   clone()const override	{return new VAACS(*this);}
   std::string dev_type()const override{ return "va_acs"; }
+  std::string value_name()const override{ return "mag"; }
 //  int      net_nodes()const override {untested(); return _net_nodes;}
 //  int      max_nodes()const override {untested(); return 4;}
 //   void set_port_by_index(int i, std::string& s) override { untested();
@@ -54,14 +55,14 @@ protected: // override virtual
 
   bool has_iv_probe()const override{return true;}
 public:
-  int set_param_by_name(std::string n, std::string v)override { untested();
-    if(n=="mag"){ untested();
-    incomplete();
-      return 0;
-    }else{ untested();
-      return DEV_CPOLY_G::set_param_by_name(n, v);
-    }
-  }
+ // int set_param_by_name(std::string n, std::string v)override { untested();
+ //   if(n=="mag"){ untested();
+ //   incomplete();
+ //     return 0;
+ //   }else{ untested();
+ //     return DEV_CPOLY_G::set_param_by_name(n, v);
+ //   }
+ // }
   void set_parameters(const std::string& Label, CARD* Parent,
 		      COMMON_COMPONENT* Common, double Value,
 		      int state_count, double state[],
@@ -86,35 +87,17 @@ protected:
 }d;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-//// void VAACS::ac_load()
-//// { untested();
-////   if(_loss0){ untested();
-////     ac_load_shunt(); // 4 pt +- loss
-////   }else{ untested();
-////   }
-////   if(_current_port_names.size()){ untested();
-////     incomplete();
-////   }else{ untested();
-////   }
-////   _acg = 1; // _values[1];
-////   // ac_load_passive();
-////   ac_load_source();
-//// }
 void VAACS::ac_load()
 {
   ac_load_shunt(); // 4 pt +- loss
-  _acg = 1; // _vy0[1] * _sim->_jomega;
+  trace2("acs", long_label(), value());
+  _acg = value(); // 1; // _vy0[1] * _sim->_jomega; BUG. value?
   ac_load_source();
 
   if(_loss0){
   //  ac_load_passive();
   }else{
   }
-  // for (int i=2; i<=_n_ports; ++i) { untested();
-  //   trace2("load", i, _vy0[i]);
-  //   ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _vy0[i] * _sim->_jomega);
-  // }
 }
 /*--------------------------------------------------------------------------*/
 /* set: set parameters, used in model building
@@ -148,7 +131,7 @@ void VAACS::set_parameters(const std::string& Label, CARD *Owner,
       _n = new node_t[matrix_nodes()];
     }else{
       // use the default node list, already set
-    }      
+    }
   }else{
     assert(_n_ports == n_states-1);
     assert(_old_values);

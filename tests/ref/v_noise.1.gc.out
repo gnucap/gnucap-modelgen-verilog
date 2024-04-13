@@ -1,0 +1,23 @@
+flicker_noise #(.pwr(1),.m(2)) fn1 (.p(1),.n(0));
+flicker_noise #(.pwr(2),.m(1)) fn2 (.p(2),.n(0));
+flicker_noise #(.pwr(1),.m(1)) fn3a (.p(3),.n(0));
+flicker_noise #(.pwr(1),.m(1)) fn3b (.p(3),.n(0));
+flicker_noise #(.e(2),.pwr(1),.m(1)) fn4 (.p(4),.n(0));
+resistor #(.r(1)) r1 (.p(1),.n(0));
+resistor #(.r(1)) r2 (.p(2),.n(0));
+resistor #(.r(1)) r3 (.p(3),.n(0));
+resistor #(.r(1)) r4 (.p(4),.n(0));
+meas_noise #() noise1 (.p(1));
+meas_noise #() noise2 (.p(2));
+meas_noise #() noise3 (.p(3));
+meas_noise #() noise4 (.p(4));
+#Freq       npwr(noise1) npwr(noise2) npwr(noise3) npwr(noise4)
+ 1.         4.         2.         2.         1.        
+ 2.         2.         1.         1.         0.25      
+ 4.         1.         0.5        0.5        0.0625    
+ 8.         0.5        0.25       0.25       0.015625  
+#Freq       nv(noise1) nv(noise2) nv(noise3) nv(noise4)
+ 1.         2.         1.4142     1.4142     1.        
+ 2.         1.4142     1.         1.         0.5       
+ 4.         1.         0.70711    0.70711    0.25      
+ 8.         0.70711    0.5        0.5        0.125     

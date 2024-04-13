@@ -317,8 +317,7 @@ private:
     o__ "assert(t0 == t0);\n";
   }
 private: // setup
-  void setup()override;
-  Branch* branch() { return _br; }
+  Branch* branch()const override { return _br; }
 }; // ZIF
 /*--------------------------------------------------------------------------*/
 class ZIZP : public ZIF{
@@ -450,76 +449,6 @@ void Token_ZIF::stack_op(Expression* e)const
     unreachable();
   }
 };
-/*--------------------------------------------------------------------------*/
-// duplicate. move up?
-void ZIF::setup()
-{
-  auto func = this;
-  int c_cnt = 0;
-  bool assigned = false;
-  bool always = false;
-  bool rdeps = false;
-  bool unknown = false;
-  Contribution const* cont = NULL;
-  trace1("xdt used_in?", branch()->used_in().size());
-  for(auto b : branch()->used_in()) {
-    if(auto c = dynamic_cast<Contribution const*>(b)){
-      if(c->is_flow_contrib()) { untested();
-	trace1("xdt used_in", c->name());
-	++c_cnt;
-	cont = c;
-      }else{
-	incomplete();
-      }
-      if(c->is_always()){
-	always = true;
-      }else{ untested();
-      }
-    }else if(dynamic_cast<Assignment const*>(b)){
-      assigned = true;
-    }else if(dynamic_cast<Branch const*>(b)){
-      rdeps = true;
-      // covered by rdeps?
-    }else if(dynamic_cast<Variable_List_Collection const*>(b)){
-    }else{untested();
-      trace1("xdt unknown?", c_cnt);
-      unknown = true;
-      assert(0);
-    }
-  }
-  for(auto b : branch()->deps().rdeps()) { untested();
-    (void)b;
-    rdeps = true;
-  }
-
-  trace4("xdt use?", c_cnt, rdeps, assigned, branch()->code_name());
-  func->_output = NULL;
-  if(!has_refs()){ untested();
-    func->set_p_to_gnd();
-  }else if(cont && cont->has_sensitivities()) { untested();
-  }else if(c_cnt == 1 && always){ untested();
-    for(auto d : cont->ddeps()){ untested();
-      if(d->branch() != branch()) { untested();
-      }else if(d.is_linear()){ untested();
-	// incomplete();
-	func->_output = cont->branch(); // polarity?
-      }
-      if(cont->reversed()){ untested();
-      }else{ untested();
-      }
-    }
-  }else if(rdeps){
-  }else if(c_cnt==0){
-    incomplete(); // analysis?
-    func->set_p_to_gnd();
-    // func->_output = cont->branch(); // polarity?
-  }else if(assigned){ untested();
-  }else if(c_cnt!=1){ untested();
-  }else{ untested();
-    incomplete();
-    // func->set_p_to_gnd();
-  }
-}
 /*--------------------------------------------------------------------------*/
 Branch const* ZIF::output() const
 { itested();

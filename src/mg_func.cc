@@ -82,19 +82,91 @@ Node_Ref MGVAMS_FILTER::n() const
   return Node_Ref(); // (&Node_Map::mg_ground_node);
 }
 /*--------------------------------------------------------------------------*/
-#if 0
-Token* MGVAMS_FUNCTION::new_token(Module& m, size_t na) const
-{ untested();
-  m.install(this);
-  if(code_name() != ""){ untested();
-    return new Token_CALL(label(), this);
-  }else if(label() != ""){ untested();
-    return new Token_CALL(label(), this);
-  }else{ untested();
-    incomplete();
-    return NULL;
+void MGVAMS_FILTER::setup(Module* m)
+{
+  if(has_refs()){
+  }else{
+  }
+  if(branch()){
+    int c_cnt = 0;
+    bool assigned = false;
+    bool always = false;
+    bool rdeps = false;
+    Contribution const* cont = NULL;
+    trace1("xdt used_in?", branch()->used_in().size());
+    for(auto b : branch()->used_in()) {
+      if(auto c = dynamic_cast<Contribution const*>(b)){
+	if(c->is_flow_contrib()) {
+	  trace1("xdt used_in", c->name());
+	  ++c_cnt;
+	  cont = c;
+	}else{
+	  incomplete();
+	}
+	if(c->is_always()){
+	  always = true;
+	}else{
+	}
+      }else if(dynamic_cast<Assignment const*>(b)){
+	assigned = true;
+      }else if(dynamic_cast<Branch const*>(b)){
+	rdeps = true;
+	// covered by rdeps?
+      }else if(dynamic_cast<Variable_List_Collection const*>(b)){
+      }else{untested();
+	trace1("xdt unknown?", c_cnt);
+	assert(0);
+      }
+    }
+    for(auto b : branch()->deps().rdeps()) { untested();
+      (void)b;
+      rdeps = true;
+    }
+
+    trace4("xdt use?", c_cnt, rdeps, assigned, branch()->code_name());
+    _output = NULL;
+    if(!has_refs()){
+      set_p_to_gnd(m);
+    }else if(cont && cont->has_sensitivities()) { untested();
+    }else if(c_cnt == 1 && always){
+      for(auto d : cont->ddeps()){
+	if(d->branch() != branch()) {
+	}else if(d.is_linear()){
+	  // incomplete();
+	  _output = cont->branch(); // polarity?
+	}
+	if(cont->reversed()){
+	}else{
+	}
+      }
+    }else if(rdeps){
+    }else if(c_cnt==0){
+      incomplete(); // analysis?
+      set_p_to_gnd(m);
+      // func->_output = cont->branch(); // polarity?
+    }else if(assigned){ untested();
+    }else if(c_cnt!=1){ untested();
+    }else{
+      incomplete();
+      // func->set_p_to_gnd();
+    }
+  }else{
+
   }
 }
-#endif
+/*--------------------------------------------------------------------------*/
+void MGVAMS_FILTER::set_n_to_gnd(Module* m) const
+{
+  assert(m);
+  assert(branch());
+  m->set_to_ground(branch()->n());
+}
+/*--------------------------------------------------------------------------*/
+void MGVAMS_FILTER::set_p_to_gnd(Module* m) const
+{
+  assert(m);
+  assert(branch());
+  m->set_to_ground(branch()->p());
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

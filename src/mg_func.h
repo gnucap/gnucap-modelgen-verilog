@@ -74,7 +74,7 @@ public:
   virtual double evalf(double const*)const {
     throw Exception("not implemented");
   }
-  virtual void setup() {};
+  virtual void setup(Module*) {};
 /*--------------------------------------------------------------------------*/
 public: // use refcounter in e_base
   void	      inc_refs()const	{inc_probes();}
@@ -101,10 +101,8 @@ public:
 class Node_Ref;
 class Branch;
 class MGVAMS_FILTER : public FUNCTION_ {
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
-	  unreachable();
-	  return "filt";
-  }
+protected:
+  mutable Branch const* _output{NULL};
 public:
   ~MGVAMS_FILTER() {}
   // Token* new_token(Module& m, size_t na, Deps& d) const override;
@@ -115,6 +113,17 @@ public:
   virtual Node_Ref p() const;
   virtual Node_Ref n() const;
   virtual Branch const* output()const{ untested();return NULL;}
+  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+	  unreachable();
+	  return "filt";
+  }
+private:
+  virtual Branch* branch() const {return NULL;}
+  void setup(Module*)override;
+protected:
+public: // bug
+  void set_n_to_gnd(Module*)const;
+  void set_p_to_gnd(Module*)const;
 };
 /*--------------------------------------------------------------------------*/
 class MGVAMS_TASK : public FUNCTION_ {

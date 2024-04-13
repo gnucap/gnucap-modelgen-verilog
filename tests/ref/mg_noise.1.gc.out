@@ -1,0 +1,9 @@
+test_noise1 #() dut (.p(1),.n(0));
+meas_noise #() n1 (.p(1));
+meas_noise #() n2 (.p(1),.n(0));
+#          
+ 0.        
+#Freq       n(dut._b_p_n) n(dut._b_flicker_noise_1_p_flicker_noise_1_n) n(dut._b_flicker_noise_2_p_flicker_noise_2_n) npwr(n1)  
+ 10.        ??         1.         1.         0.2       
+ 100.       ??         1.         1.         0.02      
+ 1.K        ??         1.         1.         0.002     

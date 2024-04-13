@@ -6,6 +6,7 @@ TARGET = \
   d_va_acs.so \
   d_va_filter.so \
   d_va_laplace.so \
+  d_va_noise.so \
   d_va_slew.so \
   d_va_zi.so \
   d_vaflow.so \

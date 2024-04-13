@@ -461,7 +461,7 @@ static void make_module(std::ostream& o, const Module& m)
     }else if(br->has_element()){
       o__ "ELEMENT* " << br->code_name() << "{NULL}; // branch\n";
     }else{
-      o__ "// ELEMENT* " << br->code_name() << "{NULL}; // no element (BUG)?\n";
+      o__ "// ELEMENT* " << br->code_name() << "{NULL}; // no element (not used)\n";
     }
   }
   o << "private: // func decl\n";

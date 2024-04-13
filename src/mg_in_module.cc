@@ -1257,7 +1257,7 @@ void Module::dump_variables(std::ostream& o) const
 void Module::setup_functions()
 {
   for(FUNCTION_* f : _func){
-    f->setup();
+    f->setup(this);
   }
 }
 /*--------------------------------------------------------------------------*/

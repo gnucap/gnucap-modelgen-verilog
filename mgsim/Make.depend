@@ -2,6 +2,7 @@ c_param.o: c_param.cc
 d_va_acs.o: d_va_acs.cc d_va.h ../src/e_va.h
 d_va_filter.o: d_va_filter.cc
 d_va_laplace.o: d_va_laplace.cc ../src/e_va.h e_rf.h
+d_va_noise.o: d_va_noise.cc
 d_va_slew.o: d_va_slew.cc
 d_va_zi.o: d_va_zi.cc ../src/e_va.h e_rf.h
 d_vaflow.o: d_vaflow.cc d_va.h ../src/e_va.h

@@ -1,0 +1,7 @@
+test_noise0 #() dut (.p(1),.n(0));
+meas_noise #() n1 (.p(1));
+meas_noise #() n2 (.p(1),.n(0));
+#          
+ 0.        
+#Freq       n(dut._b_p_n) n(dut._b_white_noise_1_p_white_noise_1_n) npwr(n1)  
+ 0.         ??         2.         18.       

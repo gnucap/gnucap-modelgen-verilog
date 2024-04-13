@@ -108,8 +108,8 @@ public:
     reset_deriv();
     return *this;
   }
-  bool is_same(const ddouble_& o)const { untested();
-    for(int i=0; i<=numderiv; ++i){ untested();
+  bool is_same(const ddouble_& o)const {
+    for(int i=0; i<=numderiv; ++i){
       if(_data[i] != _data[i]){ itested();
 	if( o._data[i] == o._data[i] ){ untested();
 	  return false;
@@ -117,7 +117,7 @@ public:
 	}
       }else if(_data[i] != o._data[i]){ untested();
 	return false;
-      }else{ untested();
+      }else{
       }
     }
     return true;
@@ -139,7 +139,7 @@ public:
     assert(_data);
     return *_data == o;
   }
-  bool operator==(const int& o)const { untested();
+  bool operator==(const int& o)const {
     double x = o;
     return *_data == x;
   }
@@ -171,7 +171,7 @@ public:
   bool operator>(double const& o)const {
     return *_data > o;
   }
-  bool operator>(int const& o)const { untested();
+  bool operator>(int const& o)const {
     return *_data > o;
   }
   bool operator>(PARAMETER<double> const& o)const { untested();
@@ -214,7 +214,7 @@ public:
     *ret._data += o;
     return ret;
   }
-  ddouble_ operator+()const { untested();
+  ddouble_ operator+()const {
     return ddouble_(*this);
   }
 
@@ -324,7 +324,7 @@ public:
   //		ret /= o;
   //		return ret;
   //	}
-  ddouble_ operator/(double const& o) const { untested();
+  ddouble_ operator/(double const& o) const {
     assert(o);
     ddouble_ ret = *this;
     ret /= o;
@@ -520,7 +520,7 @@ inline bool operator==(PARAMETER<double> const& b, int const& a)
 }
   template<>
   inline double& set_value(double& t, double const& v)
-{ untested();
+{
   return t = v;
 }
   template<>
@@ -544,7 +544,7 @@ inline bool operator==(PARAMETER<double> const& b, int const& a)
 }
   template<>
   inline double& chain(double& t, double const&)
-{ untested();
+{
   // no-op
   return t;
 }
@@ -572,28 +572,28 @@ inline bool operator==(PARAMETER<double> const& b, int const& a)
 class array_{
   std::vector<double> _v;
 public:
-  array_() { untested();}
-  array_(double a0) { untested();
+  array_() {}
+  array_(double a0) {
     _v.push_back(a0);
   }
-  array_(double a0, double a1) { untested();
+  array_(double a0, double a1) {
     _v.push_back(a0);
     _v.push_back(a1);
   }
   template<typename... Args>
-  array_(Args... args) { untested();
+  array_(Args... args) {
     push_back(args...);
   }
 
-  size_t size() const{ untested();return _v.size();}
-  double const& operator[](int x)const { untested();return _v[x];}
+  size_t size() const{return _v.size();}
+  double const& operator[](int x)const {return _v[x];}
 private:
   template<typename T>
-  void push_back(T t) { untested();
+  void push_back(T t) {
     _v.push_back(t);
   }
   template<typename T, typename... Args>
-  void push_back(T t, Args... args) { untested();
+  void push_back(T t, Args... args) {
     _v.push_back(t);
     push_back(args...);
   }

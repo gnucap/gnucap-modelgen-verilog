@@ -114,7 +114,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
     auto symbol = dynamic_cast<Token_SYMBOL*>(t);
     std::string const& n = t->name();
     if(!E.is_empty() && dynamic_cast<Token_PARLIST*>(E.back())){
-      incomplete();
+      //incomplete();
      // throw Exception("syntax_error: " + n);
     }else{
     }

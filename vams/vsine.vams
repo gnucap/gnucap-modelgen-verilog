@@ -9,7 +9,7 @@ module vsine(p, n);
 	parameter real offset=0.;
 	parameter real phase =0.;
 	parameter real dc    =0.;
-	parameter real mag   =0.;
+	parameter real mag   =1.;
 	parameter real samples = 4. from (0:inf);
 	analog begin
 		if(analysis("dc") && $param_given(dc))

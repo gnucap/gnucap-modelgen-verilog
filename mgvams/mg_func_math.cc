@@ -79,11 +79,6 @@ DISPATCHER<FUNCTION>::INSTALL d_max(&function_dispatcher, "max|$max", &max);
 /*--------------------------------------------------------------------------*/
 #endif
 #if 1
-// TODO: implement small signal noise
-STUB white_noise("white_noise");
-DISPATCHER<FUNCTION>::INSTALL d_white_noise(&function_dispatcher, "white_noise", &white_noise);
-STUB flicker_noise("flicker_noise");
-DISPATCHER<FUNCTION>::INSTALL d_flicker_noise(&function_dispatcher, "flicker_noise", &flicker_noise);
 /*--------------------------------------------------------------------------*/
 class abs : public MGVAMS_FUNCTION {
 public:

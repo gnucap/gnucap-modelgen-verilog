@@ -817,7 +817,7 @@ void Token_VAR_REF::stack_op(Expression* e)const
   auto scope = E->scope(); // prechecked_cast<Block const*>(oi->owner());
   assert(scope);
 
-      if(!E->is_empty() && dynamic_cast<Token_PARLIST*>(E->back())){
+      if(!E->is_empty() && dynamic_cast<Token_PARLIST*>(E->back())){ untested();
 	throw Exception("syntax_error: ...");
       }else{
       }

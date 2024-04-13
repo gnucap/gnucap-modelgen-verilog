@@ -1,0 +1,32 @@
+
+attach ./modelgen_0.so
+
+verilog
+
+`modelgen test_noise0
+module test_noise0(p, n);
+	electrical p, n;
+	inout p, n;
+	analog begin
+		I(p,n) <+ white_noise(0);
+		I(p,n) <+ 3*white_noise(2);
+		I(p,n) <+ V(p,n);
+	end
+endmodule
+
+list
+
+!make test_noise0.so > /dev/null
+attach ./test_noise0.so
+
+test_noise0 #() dut(1, 0);
+noise_probe n1(1)
+noise_probe n2(1,0)
+
+list
+
+print ac n(dut.*) npwr(n1)
+
+dc
+ac
+end

@@ -1,0 +1,35 @@
+
+load ./modelgen_0.so
+
+verilog
+
+`modelgen
+module acstim2(p, n);
+	electrical p, n;
+	inout p, n;
+	analog begin
+		I(p,n) <+ ac_stim("ac", 2.);
+		I(p,n) <+ ac_stim("ac", 0.);
+	end
+endmodule
+
+
+!make acstim2.so > /dev/null
+attach ./acstim2.so
+
+parameter v=0
+
+module mm(1, gnd)
+	acstim2 d(1,gnd);
+	resistor #(1.) r(1,gnd);
+endmodule
+
+mm m1(a, 0);
+
+print dc v(nodes) x(m1.d.*)
+dc
+
+print ac v(nodes)
+ac 1 100 * 10
+status notime
+end

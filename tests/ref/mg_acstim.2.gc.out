@@ -1,0 +1,11 @@
+#           v(a)       x(m1.d._b_p_n) x(m1.d._b_acs_0_p_acs_0_n)
+ 0.         0.         ??         ??        
+#Freq       v(a)      
+ 1.         2.        
+ 10.        2.        
+ 100.       2.        
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=6
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%

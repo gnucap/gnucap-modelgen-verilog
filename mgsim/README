@@ -10,8 +10,10 @@ Stand-alone operation is intended but incomplete.
 - switch
 - ddt/idt
 - slew
-- (laplace_*)
-- (z_*)
+- laplace_*
+- z_*
+- white_noise
+- flicker_noise
 
 == Simulator extensions
 

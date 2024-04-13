@@ -812,6 +812,7 @@ bool is_false(Expression const& x)
 bool is_zero(Expression const& x)
 {
   double e = x.eval();
+  trace1("is_zero", e);
   return e == 0.;
 }
 /*--------------------------------------------------------------------------*/

@@ -9,6 +9,8 @@ This file summarizes new features and important changes between snapshots.
 * integer variable cleanup
 * optimise out unused filter calls
 * implement untest, retest
+* small signal noise sources and analysis
+* "mag" in ac_stim
 
 20240331-dev
 ============
