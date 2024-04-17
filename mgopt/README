@@ -1,0 +1,7 @@
+mgopt: modelgen-verilog optional plugins
+
+Contains nonstandard stuff, experiments or debugging aid. Load with -a flag,
+for now. (later: `pragma modelgen option-name or so).
+
+- nonoise.so:
+  white_noise and flicker_noise dummies, disables noise filters.

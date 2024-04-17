@@ -2,7 +2,6 @@
 # top level configure
 gnucap_conf=gnucap-conf
 
-SUBDIRS="src mgvams mgsim vams tests" # BUG, already in Make1.
 
 echo -n '# ' > config.log
 date >> config.log
@@ -39,6 +38,11 @@ if [ ! -f $srcdir/NEWS ]; then
 	echo could not find source directory
 	exit 1
 fi
+#----------------------------------------------------------------
+#SUBDIRS="src mgvams mgsim vams tests" # BUG, already in Make1.
+MAKE1_SUBDIRS=$(grep -m 1 SUBDIRS $srcdir/Make1 | sed 's/^.*= //g')
+SUBDIRS="${MAKE1_SUBDIRS}"
+#----------------------------------------------------------------
 
 echo \# created by $PWD/$0. do not edit >makefile
 echo \#------------------------------------------------------------------------ >>makefile

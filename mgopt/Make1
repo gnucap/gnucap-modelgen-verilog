@@ -1,0 +1,16 @@
+
+PACKAGE = mgopt
+
+TARGET = \
+  nonoise.so
+
+# BUG: not here
+MAKE_CPPFLAGS = -I ${top_srcdir}/src
+
+INSTALL_FILES = $(TARGET)
+INSTALL_DIR = $(PREFIX)/lib/gnucap/${PACKAGE}
+
+RAW_SRCS = ${TARGET:%.so=%.cc}
+SRCS = ${RAW_SRCS}
+
+CLEANFILES = ${TARGET}
