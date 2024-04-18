@@ -1,0 +1,26 @@
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_ddt6a(p, n, cp, cn);
+	electrical p, n, cp, cn;
+	analog begin
+		V(p,n) <+ 1000.*tanh(ddt(V(cp,cn))/1000.);
+	end
+endmodule
+
+!make test_ddt6a.so > /dev/null
+attach ./test_ddt6a.so
+
+parameter v=1
+
+test_ddt6a #() dut(out,0,in,0);
+vsine #(.dc(v), .ampl(1), .mag(1)) v1(in, 0);
+
+print tran v nodes iter(0)
+print ac vm(nodes) vp(nodes)
+tran 1
+ac 1 10 * 2
+status notime
