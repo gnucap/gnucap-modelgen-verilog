@@ -29,7 +29,8 @@ module device(p, n);
   (* desc="dummy" *)
   real x;
 
-  analog ;
+  analog begin
+  end
 
 endmodule
 

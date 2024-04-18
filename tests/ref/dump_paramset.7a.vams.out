@@ -24,7 +24,8 @@ module my_sh(p, n);
     V(p, n) <+ 0.;
   end
 
-  analog ;
+  analog begin
+  end
 
 endmodule
 

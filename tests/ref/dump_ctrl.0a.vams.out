@@ -23,9 +23,13 @@ module cond0(p, n);
     // T : 0
     // U : 0
     real S, T, U;
-    ;
-    if (((S + 1) == 3)) ;
-    ;
+    begin
+    end
+    if (((S + 1) == 3)) begin
+    end
+    S = 1;
+    begin
+    end
   end
 
 endmodule
@@ -93,6 +97,19 @@ module cond3(p, n);
       begin // always
         // S : 0
         S = 2;
+      end
+    end
+  end
+
+endmodule
+module cond4(p, n);
+  analog begin // always
+    // S : 0
+    // T : 0
+    real S;
+    real T;
+    begin // always
+      begin
       end
     end
   end

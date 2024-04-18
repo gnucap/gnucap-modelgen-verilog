@@ -1,0 +1,30 @@
+
+`include "sub/disciplines.few"
+`pragma modelgen expand-paramset
+`pragma modelgen nodump-module
+`pragma modelgen nodump-nature
+`pragma modelgen nodump-discipline
+`pragma modelgen dump-unreachable
+
+module resistor(a,b)
+	electrical a, b;
+
+	parameter real t = 0;
+	integer T;
+
+	analog begin
+    begin : initial_model
+        if (t >= 0) begin
+            T = 1;
+        end else begin
+            T = -1;
+        end
+	  end
+	end
+endmodule
+
+paramset const_res resistor;
+	.t = 1;
+endparamset;
+
+

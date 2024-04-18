@@ -74,6 +74,7 @@ public:
   using List_Base<T>::end;
 private:
   void parse(CS&) override { untested();unreachable();}
+  void dump(std::ostream& f)const override{f << "XX";}
 public:
   typedef typename List_Base<T>::const_iterator const_iterator;
 
@@ -404,6 +405,7 @@ public:
   void set_never() { _reachable = r_never; }
   virtual bool new_var_ref(Base* what);
   void clear_vars();
+//  void dump(std::ostream& f)const override{f << "???";}
 
   virtual Node* new_node(std::string const& p){ untested();
     assert(_owner);
@@ -499,8 +501,6 @@ protected:
   bool	      _positive;
   bool	      _octal;
 public:
-  // void parse(CS& f);
-  // void print(std::ostream& f)const;
   Parameter_Base() :_positive(false), _octal(false) {}
   const std::string& type()const		{return _type;}
   const std::string code_name()const		{return "_p_" + _name;}

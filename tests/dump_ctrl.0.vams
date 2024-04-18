@@ -74,3 +74,16 @@ module cond3(p,n);
 
 	end
 endmodule
+
+module cond4(p,n);
+	analog begin
+		real S;
+		real T;
+		if(1) begin
+			if(2) begin
+			end else begin
+			end
+		end else begin
+		end
+	end
+endmodule

@@ -143,5 +143,16 @@ bool Variable_List::update()
   return false;
 }
 /*--------------------------------------------------------------------------*/
+bool Variable_List::is_used_in(Base const* b) const
+{
+  for(auto v : _l){
+    if(v->is_used_in(b)){ untested();
+      return true;
+    }else{
+    }
+  }
+  return false;
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

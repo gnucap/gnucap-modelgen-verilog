@@ -1,0 +1,26 @@
+module resistor(a, b);
+  electrical a, b;
+  parameter real t = 0;
+
+  integer T;
+
+  analog begin
+    begin : initial_model
+      if ((t >= 0)) begin
+        T = 1;
+      end
+      else begin
+        T = -1.;
+      end
+    end
+  end
+
+endmodule
+
+
+
+// paramsets
+paramset const_res resistor;
+  .t = 1
+endparamset;
+

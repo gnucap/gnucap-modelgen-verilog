@@ -25,7 +25,8 @@ module device(p, n);
   parameter integer i = 0, j = 10;
   localparam real t1 = exp(l1), t2 = 10;
 
-  analog ;
+  analog begin
+  end
 
 endmodule
 module device(p, n);

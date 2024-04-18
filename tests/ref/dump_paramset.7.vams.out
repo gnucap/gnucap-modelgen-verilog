@@ -6,7 +6,6 @@ module shadow(p, n);
 
   analog begin
     if (0) begin
-      ;
     end
   end
 
@@ -24,7 +23,8 @@ module my_sh(p, n);
     V(p, n) <+ 0.;
   end
 
-  analog ;
+  analog begin
+  end
 
 endmodule
 

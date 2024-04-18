@@ -144,7 +144,7 @@ public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   Variable_List* deep_copy_(Block* owner, std::string prefix="") const;
-  bool is_used_in(Base const*)const override {incomplete(); return 0;}
+  bool is_used_in(Base const*)const override;
 //  void set_owner(Block* b){ Statement::set_owner(b); }
   const_iterator begin()const { return _l.begin(); }
   const_iterator end()const { return _l.end(); }
@@ -187,6 +187,7 @@ public:
 //  Block const* scope() const;
   bool is_used_in(Base const*b)const;
   bool is_used()const;
+  operator bool() const {return _token;}
 private: // implementation
   bool store_deps(TData const&);
   std::string code_name()const;

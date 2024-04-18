@@ -316,14 +316,18 @@ void dump_annotate(std::ostream& o, A const& _a)
 /*--------------------------------------------------------------------------*/
 void AnalogProceduralAssignment::dump(std::ostream& o)const
 {
-  o__ "";
-  _a.dump(o);
-  o << ";";
-  if(options().dump_annotate()){
-    dump_annotate(o, _a);
+  if(_a){
+    o__ "";
+    _a.dump(o);
+    o << ";";
+    if(options().dump_annotate()){
+      dump_annotate(o, _a);
+    }else{
+    }
+    o << "\n";
   }else{
+    // optimised out. BUG: ';' or not ';'?
   }
-  o << "\n";
 }
 /*--------------------------------------------------------------------------*/
 Base* parse_proc_assignment(CS& f, Block* o)
@@ -667,7 +671,7 @@ void CaseGen::calc_reach(Expression const& ctrl)
       b.pop();
       assert(result.size());
 
-      if(is_false(result)) {
+      if(is_false(result)) { untested();
       }else{
 	all_never = false;
       }
@@ -677,7 +681,7 @@ void CaseGen::calc_reach(Expression const& ctrl)
       }else{
       }
     }
-    if(all_never){
+    if(all_never){ untested();
       set_never();
     }else{
     }
@@ -1087,7 +1091,7 @@ void Contribution::parse(CS& cmd)
   }
   trace1("Contribution", _name);
   if(_branch->deps().is_linear()){
-  }else{
+  }else{ untested();
   }
 
   if(_branch.is_reversed()){
@@ -1211,7 +1215,7 @@ void Contribution::add_dep(Dep const& d)
   }else if(d->branch() != _branch){
   }else if(is_flow_contrib() && d->is_flow_probe()){ untested();
     _branch->set_selfdep();
-  }else if(is_pot_contrib() && d->is_pot_probe()){
+  }else if(is_pot_contrib() && d->is_pot_probe()){ untested();
     _branch->set_selfdep();
   }else{
   }
@@ -1324,7 +1328,7 @@ Branch::~Branch()
 bool Branch::set_used_in(Base const* b)
 {
   for(auto& i : _used_in){
-    if(i == b){
+    if(i == b){ untested();
       return false;
     }else{
     }
@@ -1390,7 +1394,7 @@ void Contribution::dump(std::ostream& o)const
 }
 /*--------------------------------------------------------------------------*/
 std::string Branch::name() const
-{
+{ untested();
   return "(" + _p->name()+", "+_n->name()+")";
 }
 /*--------------------------------------------------------------------------*/
@@ -1414,8 +1418,8 @@ bool Branch::req_short() const
 /*--------------------------------------------------------------------------*/
 void AnalogCtrlBlock::dump(std::ostream& o)const
 {
+  o << "begin";
   if(size() || identifier() != ""){
-    o << "begin";
     if(identifier() != ""){
       o << " : " << identifier();
     }else{
@@ -1445,12 +1449,16 @@ void AnalogCtrlBlock::dump(std::ostream& o)const
 	}
       }else{
       }
-      SeqBlock::dump(o);
+      if(size()){
+	SeqBlock::dump(o);
+      }else{
+      }
     }
-    o__ "end\n";
   }else{
-    o << ";\n";
+    o<< "\n";
+    // (why not) annotate?
   }
+  o__ "end\n";
 }
 /*--------------------------------------------------------------------------*/
 void AnalogSeqBlock::dump(std::ostream& o)const
@@ -1578,17 +1586,17 @@ public:
     }
   }
 #endif
-  std::string code_name()const override {
+  std::string code_name()const override { untested();
     return "af_" + label();
   }
-  void make_cc_impl(std::ostream& o)const override {
+  void make_cc_impl(std::ostream& o)const override { untested();
 #if 1
     assert(_af);
     make_cc_af(o, *_af);
 #endif
   }
 
-  void make_cc_common(std::ostream& o)const override {
+  void make_cc_common(std::ostream& o)const override { untested();
     o << "//incomplete: af common\n";
     assert(_af);
     auto& F = *_af;
@@ -1597,16 +1605,16 @@ public:
     // BUG? make_cc_af_args
     std::string sep = "";
     std::string qual = "";
-    for (Base const* x : F.args()){
+    for (Base const* x : F.args()){ untested();
       auto coll = prechecked_cast<AF_Arg_List const*>(x);
       assert(coll);
 
-      if(coll->is_output()){
+      if(coll->is_output()){ untested();
 	qual = "/*output*/ &";
-      }else{
+      }else{ untested();
 	qual = "";
       }
-      for(auto i : *coll){
+      for(auto i : *coll){ untested();
 	o << sep << "ddouble " << qual;
 	o << "/*" << i->name() << "*/";
 	sep = ", ";
@@ -1836,7 +1844,7 @@ void AF_Arg_List::parse(CS& f)
     _direction = a_input;
   }else if(dir=="out"){
     _direction = a_output;
-  }else if(dir=="ino"){
+  }else if(dir=="ino"){ untested();
     _direction = a_inout;
   }else{ untested();
     trace2("AF_Arg_List::parse", f.tail().substr(0,10), dir);
@@ -2095,36 +2103,36 @@ Probe* new_Probe(std::string const& xs, Branch_Ref const& br)
 }
 /*--------------------------------------------------------------------------*/
 size_t Branch::num_nodes() const
-{
+{ untested();
   size_t ret=1;
 
-  for(auto i : ddeps()){
-    if(i->branch()->is_short()){
-    }else if(i->branch() == this){
+  for(auto i : ddeps()){ untested();
+    if(i->branch()->is_short()){ untested();
+    }else if(i->branch() == this){ untested();
       // self conductance
-    }else if(i->is_pot_probe()){
+    }else if(i->is_pot_probe()){ untested();
       ++ret;
 //     }else if(i->is_filter_probe()){ untested();
 //       assert(i->is_pot_probe());
 //       unreachable();
 //       ++ret;
-    }else{
+    }else{ untested();
     }
   }
   return 2*ret;
 }
 /*--------------------------------------------------------------------------*/
 size_t Branch::num_states() const
-{
+{ untested();
   size_t k = 2;
   // TODO: cleanup
-  for(auto i : ddeps()){
+  for(auto i : ddeps()){ untested();
     assert(i);
     // if(i->is_reversed()){ untested();
     //}else
-    if(i->branch() == this){
-    }else if(i->branch()->is_short()){
-    }else{
+    if(i->branch() == this){ untested();
+    }else if(i->branch()->is_short()){ untested();
+    }else{ untested();
       ++k;
     }
   }
@@ -2178,7 +2186,7 @@ Probe::~Probe()
 }
 /*--------------------------------------------------------------------------*/
 bool Probe::is_reversed() const
-{
+{ untested();
   return _br.is_reversed();
 }
 /*--------------------------------------------------------------------------*/
@@ -2205,7 +2213,7 @@ void Module::delete_analog()
 }
 /*--------------------------------------------------------------------------*/
 bool Module::has_analog_block() const
-{
+{ untested();
   return ::analog(*this).has_block();
 }
 /*--------------------------------------------------------------------------*/
@@ -2220,7 +2228,7 @@ Analog::~Analog()
 }
 /*--------------------------------------------------------------------------*/
 bool Analog::has_block() const
-{
+{ untested();
   return !list().is_empty();
 }
 /*--------------------------------------------------------------------------*/
@@ -2428,17 +2436,17 @@ void AnalogStmt::unset_used_in(Base const* b)
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogProceduralAssignment::is_used_in(Base const*b)const
-{
+{ untested();
   return AnalogStmt::is_used_in(b);
   return _a.is_used_in(b) || AnalogStmt::is_used_in(b);
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogStmt::is_used_in(Base const* b)const
-{
-  for(auto& i : _used_in){
-    if(i == b){
+{ untested();
+  for(auto& i : _used_in){ untested();
+    if(i == b){ untested();
       return true;
-    }else{
+    }else{ untested();
     }
   }
   for(auto& i : _rdeps){ untested();

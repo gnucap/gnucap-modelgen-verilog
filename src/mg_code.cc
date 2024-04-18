@@ -77,7 +77,7 @@ void Variable_Decl::new_var_ref_()
 }
 /*--------------------------------------------------------------------------*/
 bool Variable_Decl::is_used_in(Base const*) const
-{ untested();
+{
   // return _token->is_used_in(b);
   incomplete();
   return false;
