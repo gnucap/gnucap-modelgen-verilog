@@ -31,33 +31,6 @@
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
-static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
-{
-
-  {
-    char sign = '+';
-    indent a;
-    o__ "d->" << state << "[0] = " << sign << " " << "t0.value();\n";
-    size_t k = 2;
-
-  // possibly unneeded. cf. ac_stim
-    for(auto v : deps.ddeps()) { untested();
-      // char sign = f.reversed()?'-':'+';
-      o__ "// dep " << v->code_name() << "\n";
-      // if(f->branch() == v->branch()){ untested(); }
-      if(v->branch()->is_short()){ untested();
-      }else{ untested();
-	o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
-	o__ "// assert(!d->" << state << "[" << k << "]);\n";
-	o__ "d->" << state << "[" //  << k << "]"
-	  << "MOD::" << state << "_::dep" << v->code_name() << "] "
-	  " = " << sign << " " << "t0[d" << v->code_name() << "]; // (4)\n";
-	++k;
-      }
-    }
-  }
-}
-/*--------------------------------------------------------------------------*/
 static int n_filters;
 /*--------------------------------------------------------------------------*/
 class Token_NOISE : public Token_CALL {
@@ -114,14 +87,6 @@ protected:
     return "d->" + _code_name;
   }
 public:
-  void set_n_to_gnd()const {
-    assert(_m);
-    return MGVAMS_FILTER::set_n_to_gnd(_m);
-  }
-  void set_p_to_gnd()const {
-    assert(_m);
-    return MGVAMS_FILTER::set_p_to_gnd(_m);
-  }
   Token* new_token(Module& m, size_t na)const override {
     assert(na != size_t(-1));
 
@@ -138,14 +103,15 @@ public:
     }
 
     Node* np = m.new_node(filter_code_name + "_p");
-    cl->_p = np;
     Node* nn = m.new_node(filter_code_name + "_n"); // &mg_ground_node
    // np->set_to(nn, "_short_"+code_name()+"()");
-    nn->set_to(np, "_short_b_"+filter_code_name+"()");
+    np->set_to(nn, "_short_b_"+filter_code_name+"()");
+
+    cl->_p = np;
     cl->_n = nn;
     {
-      // Branch* br = m.new_branch(np, &Node_Map::mg_ground_node);
-      Branch* br = m.new_branch(&Node_Map::mg_ground_node, nn);
+      //Branch* br = m.new_branch(&Node_Map::mg_ground_node, nn);
+      Branch* br = m.new_branch(np, &Node_Map::mg_ground_node);
 //      br->set_source();
       assert(br);
       assert(const_cast<Branch const*>(br)->owner());
@@ -213,13 +179,35 @@ public:
     o__ "MOD_" << id << "* d = this;\n";
     o__ "typedef MOD_" << id << " MOD;\n";
     std::string state = "_st" + cn;
-    make_cc_tmp(o, state, _br->deps());
+    { // make_cc_tmp(o, state, _br->deps());
+      TData const& deps = _br->deps();
+      char sign = '+';
+      indent a;
+      o__ "d->" << state << "[0] = " << sign << " " << "t0.value();\n";
+      size_t k = 2;
+
+      // possibly unneeded. cf. ac_stim
+      for(auto v : deps.ddeps()) { untested();
+	// char sign = f.reversed()?'-':'+';
+	o__ "// dep " << v->code_name() << "\n";
+	// if(f->branch() == v->branch()){ untested(); }
+	if(v->branch()->is_short()){ untested();
+	}else{ untested();
+	  o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
+	  o__ "// assert(!d->" << state << "[" << k << "]);\n";
+	  o__ "d->" << state << "[" //  << k << "]"
+	    << "MOD::" << state << "_::dep" << v->code_name() << "] "
+	    " = " << sign << " " << "t0[d" << v->code_name() << "]; // (4)\n";
+	  ++k;
+	}
+      }
+    }
     trace2("noise use", _br->code_name(), _br->is_used());
 
     if(_output){
       o__ "// subdevice\n";
       o__ "t0 = 0.;\n";
-    }else{ untested();
+    }else{
       o__ "d->" << cn << "->do_tr();\n";
       o__ "t0 = d->" << cn << "->tr_amps();\n";
       o__ "d->_potential" << cn << " = - t0;\n";
@@ -232,7 +220,7 @@ public:
 
     if(_output){
       o__ "return t0; // (output)\n";
-    }else{ untested();
+    }else{
       o__ "return t0; // (node)\n";
     }
 
@@ -280,13 +268,22 @@ public:
     return "ac_stim";
   }
   Probe const* prb()const {return _prb;}
+  void set_n_to_gnd()const {
+    assert(_m);
+    return MGVAMS_FILTER::set_n_to_gnd(_m);
+  }
+  void set_p_to_gnd()const {
+    assert(_m);
+    return MGVAMS_FILTER::set_p_to_gnd(_m);
+  }
 private:
   Branch const* output()const override;
 
   // really?
   Node_Ref p()const override;
   Node_Ref n()const override;
-  Branch* branch() const override { return _br; }
+private: // setup
+  Branch* branch()const override { return _br; }
 }; // NOISE
 /*--------------------------------------------------------------------------*/
 NOISE wn("white", 2);
@@ -375,58 +372,13 @@ void Token_NOISE::stack_op(Expression* e)const
     unreachable();
   }
 
-#if 0 // setup
-  bool  token_gone=false;
-  trace0("acstim use?");
-  int c_cnt = 0;
-  bool assigned = false;
-  bool always = false;
-  Contribution const* cont=NULL;
-  for(auto b : branch()->used_in()) { untested();
-    if(token_gone){ untested();
-    }else if(auto c = dynamic_cast<Contribution const*>(b)){ untested();
-      if(c->is_flow_contrib()) { untested();
-	trace1("acstim used_in", c->name());
-	++c_cnt;
-	cont = c;
-      }else{ untested();
-	// incomplete();
-      }
-      if(c->is_always()){ untested();
-	always = true;
-      }else{ untested();
-      }
-    }else if(dynamic_cast<Assignment const*>(b)){ untested();
-      assigned = true;
-    }else{untested();
-    }
-  }
-  func->_output = NULL;
-  if(token_gone){ untested();
-  }else if(c_cnt!=1){ untested();
-  }else if(assigned){ untested();
-  }else if(cont->has_sensitivities()) { itested();
-  }else if(always){ untested();
-    for(auto d : cont->ddeps()){ untested();
-      if(d->branch() != branch()) { untested();
-      }else if(d.is_linear()){ untested();
-	// incomplete();
-	func->_output = cont->branch(); // polarity?
-      }
-      if(cont->reversed()){ untested();
-      }else{ untested();
-      }
-    }
-  }else{ untested();
-  }
-#endif
 }
 /*--------------------------------------------------------------------------*/
 Branch const* NOISE::output() const
 {
   if(_output){
     return _output;
-  }else{ untested();
+  }else{
     return _br;
   }
 }

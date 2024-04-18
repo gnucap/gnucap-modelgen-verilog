@@ -31,9 +31,6 @@
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-// sim_data?
-static std::vector<COMPLEX> noises;
-/*--------------------------------------------------------------------------*/
 class COMMON_NOISE : public COMMON_COMPONENT {
   std::string _name; // PARAMETER<string>?
 protected:
@@ -130,9 +127,9 @@ class DEV_NOISE : public ELEMENT /* COMPONENT? */ {
   double* _values{NULL};
  // std::string _name; // PARAMETER<string>?
 public:
-  explicit DEV_NOISE(COMMON_COMPONENT* p) : ELEMENT(p){}
-  explicit DEV_NOISE(const DEV_NOISE& p) : ELEMENT(p){}
-  explicit DEV_NOISE() : ELEMENT() {}
+  explicit DEV_NOISE(COMMON_COMPONENT* p) : ELEMENT(p){ }
+  explicit DEV_NOISE(const DEV_NOISE& p) : ELEMENT(p){ }
+  explicit DEV_NOISE() : ELEMENT() { }
 public: // make noise
   double value()const{
     if(_values){
@@ -144,6 +141,9 @@ public: // make noise
   }
   XPROBE ac_probe_ext(std::string const&)const override;
   double tr_probe_num(std::string const&n)const override {
+//    if(n=="loss"){
+//      return _loss0;
+//    }
     auto cc = prechecked_cast<COMMON_NOISE const*>(common());
     assert(cc);
     double ev = cc->do_noise(this, n);
@@ -173,9 +173,7 @@ private: // override virtual
   void tr_load()override {}
   void tr_unload()override {}
   void ac_iwant_matrix()override {}
-  void ac_begin()override {
-	  trace1("ac_begin", mfactor());
-  }
+  void ac_begin()override {}
   void dc_advance()override {}
   void tr_advance()override {}
   void tr_regress()override {}
@@ -184,7 +182,9 @@ private: // override virtual
   TIME_PAIR tr_review()override {return TIME_PAIR();}
   bool do_tr()override {return true;}
   void do_ac()override {}
-  void ac_load()override {}
+  void ac_load()override {
+    ac_load_shunt(); // 4 pt +- loss
+  }
 private: // purely virtual in ELEMENT
   double tr_involts()const override {return tr_outvolts();}
   double tr_involts_limited()const override { return 0.; }
@@ -374,6 +374,7 @@ void DEV_NOISE::set_parameters(const std::string& Label, CARD *Owner,
   //assert(n_nodes <= net_nodes());
   notstd::copy_n(nodes, n_nodes, _n); // copy more in expand_last
   assert(net_nodes() == 2);
+  _loss1 = _loss0 = 1.;
 }
 /*--------------------------------------------------------------------------*/
 double COMMON_NOISE::do_noise(ELEMENT const* e, std::string const& what)const
@@ -388,7 +389,7 @@ double COMMON_NOISE::do_noise(ELEMENT const* e, std::string const& what)const
     double i_noise_r = E->value();
     int n1 = e->n_(OUT1).m_();
     int n2 = e->n_(OUT2).m_();
-    COMPLEX v = noises[n1] - noises[n2];
+    COMPLEX v = _sim->_noise[n1] - _sim->_noise[n2];
     trace3("done noise", long_label(), v, i_noise_r);
 
     return std::norm(v)*i_noise_r; // "norm" is the squared magnitude
@@ -421,18 +422,19 @@ double do_noise(CARD_LIST const& cl, std::string what="")
 /*--------------------------------------------------------------------------*/
 void set_sens_port(const node_t& n1, const node_t& n2)
 {
-  noises.resize(CKT_BASE::_sim->_total_nodes+1);
-  std::fill_n(noises.data(), CKT_BASE::_sim->_total_nodes+1, 0.);
+  size_t noise_size = CKT_BASE::_sim->_total_nodes+1;
+  assert(CKT_BASE::_sim->_noise);
+  std::fill_n(CKT_BASE::_sim->_noise, noise_size, 0.);
 
   if(n1.m_()>0){
-    assert(n1.m_()<int(noises.size()));
-    noises[n1.m_()] = 1.;
+    assert(n1.m_()<int(noise_size));
+    CKT_BASE::_sim->_noise[n1.m_()] = 1.;
   }else{ untested();
     // noises[0] shouldnt do anything
   }
-  if(n2.m_()>1){ untested();
-    assert(n2.m_()<int(noises.size()));
-    noises[n2.m_()] = -1.;
+  if(n2.m_()>0){ untested();
+    assert(n2.m_()<int(noise_size));
+    CKT_BASE::_sim->_noise[n2.m_()] = -1.;
   }else{
     // noises[0] shouldnt do anything
   }
@@ -442,7 +444,7 @@ COMPLEX port_noise(const node_t& n1, const node_t& n2, std::string what)
 {
   set_sens_port(n1, n2);
   ::status.back.start();
-  CKT_BASE::_sim->_acx.fbsubt(noises.data());
+  CKT_BASE::_sim->_acx.fbsubt(CKT_BASE::_sim->_noise);
   ::status.back.stop();
   return do_noise(CARD_LIST::card_list, what);
 }

@@ -5,7 +5,8 @@
 - ac needs operating point, even if linear: mg2_cccs.0.gc
 - analysis("ic"): need more testing
 - ddx is incomplete
-- V<+ddt(I) does not work on same branch
+- filter contribution to potential, uses internal node.
+- V<+ddt(I) does not work on same branch (related?)
 - event control is incomplete
 - numerical port names don't work
 - string type is missing (breaks "%s" in strobe etc.).

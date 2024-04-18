@@ -34,7 +34,6 @@ namespace{
 static int n_filters;
 /*--------------------------------------------------------------------------*/
 class Token_XDT : public Token_CALL {
-//  XDT* _xdt{NULL};
 public:
   explicit Token_XDT(const std::string Name, FUNCTION_ const* f)
     : Token_CALL(Name, f) {}
@@ -157,27 +156,6 @@ public:
   }
   void make_cc_impl_comm(std::ostream&)const{ untested();
     unreachable();
-#if 0
-    assert(_m); // owner?
-    assert(_f);
-    std::string id = _m->identifier().to_string();
-    o << "COMMON_" << id << "::";
-    o << "ddouble COMMON_" << id << "::FILTER__" << _code_name <<
-      "::operator()(";
-    assert(num_args() < 3);
-    for(size_t n=0; n<num_args(); ++n){ untested();
-      o << " ddouble t" << n << ", ";
-    }
-    o << "COMPONENT* dd) const\n{\n";
-    o__ "MOD_" << id << "* d = prechecked_cast<MOD_" << id << "*>(dd);\n";
-    o__ "assert(d);\n";
-    make_cc_tmp(_f, o);
-
-    make_assign(o);
-    o << "}\n"
-      "/*--------------------------------------"
-      "------------------------------------*/\n";
-#endif
   }
   void make_cc_impl(std::ostream&o)const override;
   std::string eval(CS&, const CARD_LIST*)const override{ untested();
@@ -185,6 +163,7 @@ public:
     return "ddt";
   }
   Probe const* prb()const {return _prb;}
+#if 0
   void set_n_to_gnd()const {
     assert(_m);
     _m->set_to_ground(_br->n());
@@ -193,6 +172,16 @@ public:
     assert(_m);
     _m->set_to_ground(_br->p());
   }
+#else
+  void set_n_to_gnd()const {
+    assert(_m);
+    return MGVAMS_FILTER::set_n_to_gnd(_m);
+  }
+  void set_p_to_gnd()const {
+    assert(_m);
+    return MGVAMS_FILTER::set_p_to_gnd(_m);
+  }
+#endif
 private:
   Branch const* output()const override;
 
@@ -283,8 +272,6 @@ void Token_XDT::stack_op(Expression* e)const
   auto func = prechecked_cast<XDT const*>(f());
   assert(func);
 
-  auto dd = prechecked_cast<TData const*>(cc->data());
-
   assert(cc->args()->size());
   if(is_zero(*cc->args())){
     Float* f = new Float(0.);
@@ -292,7 +279,7 @@ void Token_XDT::stack_op(Expression* e)const
     delete cc;
     cc = NULL;
     func->set_p_to_gnd();
-  }else if(dd) {
+  }else if(auto dd = prechecked_cast<TData const*>(cc->data())) {
 
     branch()->deps().clear();
     branch()->deps() = *dd; // HACK

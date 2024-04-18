@@ -101,6 +101,8 @@ void MGVAMS_FILTER::setup(Module* m)
 	  ++c_cnt;
 	  cont = c;
 	}else{
+	  // ++c_cnt;
+	  // cont = c;
 	  incomplete();
 	}
 	if(c->is_always()){
@@ -132,7 +134,7 @@ void MGVAMS_FILTER::setup(Module* m)
       for(auto d : cont->ddeps()){
 	if(d->branch() != branch()) {
 	}else if(d.is_linear()){
-	  // incomplete();
+	  incomplete(); // propagate loss?
 	  _output = cont->branch(); // polarity?
 	}
 	if(cont->reversed()){

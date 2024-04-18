@@ -74,7 +74,7 @@ void Element_2::parse(CS& file)
 
   Module* mod = dynamic_cast<Module*>(owner());
   if(mod /* && owner()->is_always() */){
-    for(auto const& p : _list_of_port_connections){
+    for(auto const& p : _list_of_port_connections) {
       assert(mod->node(p->node()));
       mod->node(p->node())->connect(this);
     }
@@ -1072,8 +1072,10 @@ Module::~Module()
 /*--------------------------------------------------------------------------*/
 bool Node::is_used() const
 {
+  trace2("Node::is_used", name(), _fanout.size());
   for(auto e : _fanout){
     if(e->is_used()){
+      trace2("Node::is_used", name(), e->code_name());
       return true;
     }else{
     }

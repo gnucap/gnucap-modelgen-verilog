@@ -28,7 +28,7 @@ namespace {
 class VAACS : public DEV_CPOLY_G /* COMPONENT? */ {
 protected:
   explicit VAACS(const VAACS& p) : DEV_CPOLY_G(p) {
-    _loss1 = _loss0 = 1.;
+    _loss1 = _loss0 = 1.; // -> set_parameters?
   }
 public:
   explicit VAACS() : DEV_CPOLY_G() {}

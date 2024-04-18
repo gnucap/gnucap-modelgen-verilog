@@ -374,7 +374,7 @@ void ZFILTER::tr_advance()
 /*--------------------------------------------------------------------------*/
 // typedef ZFILTER::ddouble ddouble;
 /*--------------------------------------------------------------------------*/
-void	  ZFILTER::tr_begin()
+void ZFILTER::tr_begin()
 {
   ELEMENT::tr_begin();
   _loss0 = 1.;

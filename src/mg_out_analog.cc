@@ -343,7 +343,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	  o__ "// dep " << v->code_name() << "\n";
 	  o__ "m->" << v->branch()->state() << "[1] = "
 	  << neg_sign << " t0[d" << v->code_name() << "]; // (3p)\n";
-	}else if(v->branch()->is_short()) { untested();
+	}else if(v->branch()->is_short()) {
 	  o__ "// short: " << v->code_name() << "\n";
 	}else if(v->branch()->has_element()){
 	  o__ "// elt? " << v->code_name() << "\n";
@@ -1201,8 +1201,8 @@ void make_cc_current_ports(std::ostream& o, Branch const* br, Element_2 const& e
       // self control is current
       o______ e.code_name() << "->set_current_port_by_index(0,\"\");\n";
     }else if(i->branch()){
-      if(i->branch()->is_short()){ untested();
-      }else{ untested();
+      if(i->branch()->is_short()){
+      }else{
 	o______ e.code_name() << "->set_current_port_by_index( "<< kk << ", \"" << i->branch()->code_name() << "\");\n";
 	++kk;
       }
@@ -1291,10 +1291,10 @@ void Probe::make_cc_dev(std::ostream& o) const
       o____ "t = " << code_name() << "; // unnamed\n";
       o____ "t[d" << code_name() << "] = 1; // unnamed\n"; // sign?
     }
-  }else if(_br->is_short()) { untested();
+  }else if(_br->is_short()) {
       o______ "// short\n";
       o______ "t = 0.;\n";
-  }else if(is_flow_probe()) { untested();
+  }else if(is_flow_probe()) {
       o______ "// flow probe\n";
       o______ "t = " << code_name() << ";\n";
       o____ "t[d" << code_name() << "] = 1;\n";  // BUG?

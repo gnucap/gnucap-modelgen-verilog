@@ -784,6 +784,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
 //    make_set_parameters(o, ee, cn);
     make_set_parameters(o, e, cn);
     if(br == br->output()){
+      // internal node
     }else{
       o______ "if(auto e = dynamic_cast<ELEMENT*>(" << cn << ")){\n";
       o________ "e->_loss0 = 0.;\n";

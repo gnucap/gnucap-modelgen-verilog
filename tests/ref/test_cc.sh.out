@@ -947,7 +947,7 @@ class COMMON_resistor :public COMMON_COMPONENT{
   enum {
     d_potential_b_white_noise_0_p_white_noise_0_n,
     d_potential_b_p_n,
-// short _b_white_noise_0_p_white_noise_0_n
+// not named: _b_white_noise_0_p_white_noise_0_n
 // not named: _b_p_n
      num_branches__  };
 public:
@@ -985,8 +985,8 @@ private: // funcs
   double f_temp()const {
     return P_CELSIUS0 + _sim->_temp_c;
   }
-// Probe no refs: potential__white_noise_0_n
 // Probe no refs: potential_p_n
+// Probe no refs: potential_white_noise_0_p_
 }; //COMMON_resistor
 /*--------------------------------------------------------------------------*/
 class PRECALC_resistor{
@@ -996,7 +996,7 @@ public:
   enum {
     d_potential_b_white_noise_0_p_white_noise_0_n,
     d_potential_b_p_n,
-// short _b_white_noise_0_p_white_noise_0_n
+// not named: _b_white_noise_0_p_white_noise_0_n
 // not named: _b_p_n
      num_branches__  };
 public:
@@ -1012,7 +1012,7 @@ public:
   enum {
     d_potential_b_white_noise_0_p_white_noise_0_n,
     d_potential_b_p_n,
-// short _b_white_noise_0_p_white_noise_0_n
+// not named: _b_white_noise_0_p_white_noise_0_n
 // not named: _b_p_n
      num_branches__  };
 private: // data
@@ -1023,17 +1023,18 @@ public: // netlist
 private: // func decl
 //other: $param_given
 //func $temperature
-//probe potential__white_noise_0_n
-  ddouble xs_potential_b_white_noise_0_p_white_noise_0_n() const { // potential__white_noise_0_n
-    ddouble t;
-      t = 0.;
-    return t;
-  }
 //probe potential_p_n
   ddouble xs_potential_b_p_n() const { // potential_p_n
     ddouble t;
     t = _potential_b_p_n; // unnamed
     t[d_potential_b_p_n] = 1; // unnamed
+    return t;
+  }
+//probe potential_white_noise_0_p_
+  ddouble xs_potential_b_white_noise_0_p_white_noise_0_n() const { // potential_white_noise_0_p_
+    ddouble t;
+    t = _potential_b_white_noise_0_p_white_noise_0_n; // unnamed
+    t[d_potential_b_white_noise_0_p_white_noise_0_n] = 1; // unnamed
     return t;
   }
 //filt white_noise_0
@@ -1086,9 +1087,9 @@ public: // states, _b_white_noise_0_p_white_noise_0_n;
   } _dep_b_white_noise_0_p_white_noise_0_n;
 public: // states, _b_p_n;
   double _value_b_p_n;
-  double _st_b_p_n  [2]; // (s)
+  double _st_b_p_n  [3]; // (s)
   struct _st_b_p_n_ {
-    enum {     VALUE, SELF/* : */
+    enum {     VALUE, SELF, dep_potential_b_white_noise_0_p_white_noise_0_n/* : */
     };
   } _dep_b_p_n;
 private: // node list
@@ -1096,7 +1097,7 @@ private: // node list
     n_p /* used: 1 */,
     n_n /* used: 1 */
     /* ---- */,
-    n_white_noise_0_p /* used: 0 */,
+    n_white_noise_0_p /* used: 1 */,
     n_white_noise_0_n /* used: 0 */
   };
 private: // probe values
@@ -1414,7 +1415,7 @@ bool MOD_resistor::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 #if 0
 // tr_eval_branch _b_white_noise_0_p_white_noise_0_n
-static EVAL__b_white_noise_0_p_white_noise_0_n_ Eval_(, white_noise_0_n)(CC_STATIC);
+static EVAL__b_white_noise_0_p_white_noise_0_n_ Eval_(white_noise_0_p, )(CC_STATIC);
 void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
 {
   assert(d);
@@ -1475,7 +1476,8 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         t0 =  /*(312)*/ /*call1*/d->_b_white_noise_0(t0, s0);
         d->_value_b_p_n /* contrib sign: */ += t0.value();
         // dep _potential_b_white_noise_0_p_white_noise_0_n
-        // short: _potential_b_white_noise_0_p_white_noise_0_n
+        assert(t0[d_potential_b_white_noise_0_p_white_noise_0_n] == t0[d_potential_b_white_noise_0_p_white_noise_0_n]);
+        d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_white_noise_0_p_white_noise_0_n] += t0[d_potential_b_white_noise_0_p_white_noise_0_n]; // (3)
       }
     }
   }
@@ -1499,7 +1501,7 @@ bool MOD_resistor::do_tr()
 /*--------------------------------------------------------------------------*/
 inline void MOD_resistor::zero_filter_readout()
 {
-  // filter _b_white_noise_0_p_white_noise_0_n short branch
+  _potential_b_white_noise_0_p_white_noise_0_n = 0.;
 }
 /*--------------------------------------------------------------------------*/
 inline void MOD_resistor::set_branch_contributions()
@@ -1517,6 +1519,7 @@ inline void MOD_resistor::set_branch_contributions()
       long double sp = 0.;
       // _potential_b_p_n lin: 1
       // _potential_b_white_noise_0_p_white_noise_0_n lin: 1
+      sp += (long double)(_st_b_p_n[_st_b_p_n_::dep_potential_b_white_noise_0_p_white_noise_0_n] * _potential_b_white_noise_0_p_white_noise_0_n);
       _st_b_p_n[0] = double(_st_b_p_n[0] - sp);
       }
     }
@@ -1526,7 +1529,7 @@ inline void MOD_resistor::set_branch_contributions()
 inline void MOD_resistor::clear_branch_contributions()
 {
     _value_b_p_n = 0.;
-    std::fill_n(_st_b_p_n+1, 1, 0.);
+    std::fill_n(_st_b_p_n+1, 2, 0.);
 }
 /*--------------------------------------------------------------------------*/
 typedef MOD_resistor::ddouble ddouble;
@@ -1655,7 +1658,8 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         t0 =  /*(312)*/ /*call1*/d->_b_white_noise_0(t0, s0);
         d->_value_b_p_n /* contrib sign: */ += t0.value();
         // dep _potential_b_white_noise_0_p_white_noise_0_n
-        // short: _potential_b_white_noise_0_p_white_noise_0_n
+        assert(t0[d_potential_b_white_noise_0_p_white_noise_0_n] == t0[d_potential_b_white_noise_0_p_white_noise_0_n]);
+        d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_white_noise_0_p_white_noise_0_n] += t0[d_potential_b_white_noise_0_p_white_noise_0_n]; // (3)
       }
     }
   }
@@ -1829,15 +1833,29 @@ void MOD_resistor::expand()
   gnd.set_to_ground(this);
   // port p 1
   // port n 2
-  // unused white_noise_0_p : 3
-  _n[n_white_noise_0_p].set_to_ground(this);
+  // internal white_noise_0_p : 3
+  // node white_noise_0_p 3
+    //assert(!(_n[n_white_noise_0_p].n_()));
+    //BUG// this assert fails on a repeat elaboration after a change.
+    //not sure of consequences when new_model_node called twice.
+    if (!(_n[n_white_noise_0_p].n_())) {
+    if (_short_b_white_noise_0()) {
+      _n[n_white_noise_0_p] = gnd;
+    }else{
+      _n[n_white_noise_0_p].new_model_node("." + long_label() + ".white_noise_0_p", this);
+      }
+    }else{
+    {
+       //_n[n_white_noise_0_p].new_model_node("white_noise_0_p." + long_label(), this);
+    }
+  }
   // ground
   _n[n_white_noise_0_n].set_to_ground(this);
   if (_sim->is_first_expand()) {
     precalc_first();
 
   // clone branches
-  // filter (, white_noise_0_n)
+  // filter (white_noise_0_p, )
     {
     if (!_b_white_noise_0_p_white_noise_0_n) {
       const CARD* p = device_dispatcher["va_white_noise"]; // va_white_noise
@@ -1880,8 +1898,8 @@ void MOD_resistor::expand()
     }else{
     }
       {
-        node_t nodes[] = {_n[n_p], _n[n_n]}; // nodes
-        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/2, _st_b_p_n, 2, nodes);
+        node_t nodes[] = {_n[n_p], _n[n_n], _n[n_white_noise_0_p], gnd}; // nodes
+        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/3, _st_b_p_n, 4, nodes);
       }
     }
 
@@ -1924,7 +1942,7 @@ void MOD_resistor::precalc_last()
   }
 }
 /*--------------------------------------------------------------------------*/
- // ../../src/mg_filt_noise.cc:195
+ // ../../src/mg_filt_noise.cc:161
 MOD_resistor::ddouble MOD_resistor::_b_white_noise_0(ddouble t0, std::string what)
 {
   (void)what;
