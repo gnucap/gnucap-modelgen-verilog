@@ -80,7 +80,7 @@ public:
   const std::string& name()const	{ untested();return _name;}
   const std::string& short_to()const 	{ untested();return _short_to;}
   const std::string& short_if()const 	{ untested();return _short_if;}
-  void set_owner(Block*){ untested();
+  void set_owner(Base*){ untested();
     incomplete();
   }
   String_Arg key()const { untested(); return String_Arg(_name); }

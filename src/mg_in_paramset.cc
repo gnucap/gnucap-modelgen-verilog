@@ -307,9 +307,14 @@ static void import_proto_vars(Module* sub, Module const* proto)
 {
   auto& pv = proto->variables();
 
-  for(auto const& x : pv) {
-    auto copy = x->deep_copy(sub, PS_MANGLE_PREFIX);
-    assert(copy->owner() == sub);
+  for(Variable_List const* x : pv) {
+    if(::attributes(x)[std::string("desc")]!="0"
+     ||::attributes(x)[std::string("units")]!="0"){
+    }else{
+    }
+
+    auto copy = x->deep_copy_(sub, PS_MANGLE_PREFIX);
+//    assert(copy->owner() == sub);
     sub->push_back(copy);
   }
 
@@ -373,8 +378,8 @@ static void import_ps_vars(Module* sub, Module const* ps)
   auto& pv = ps->variables();
 
   for(auto const& x : pv) {
-    auto copy = x->deep_copy(sub);
-    assert(copy->owner() == sub);
+    auto copy = x->deep_copy_(sub);
+//    assert(copy->owner() == sub);
     sub->push_back(copy);
   }
 }
@@ -502,9 +507,9 @@ void Paramset::dump(std::ostream& o) const
   }
 }
 /*--------------------------------------------------------------------------*/
-void Paramset::new_var_ref(Base* what)
+bool Paramset::new_var_ref(Base* what)
 {
-  auto V = dynamic_cast<Variable_Decl const*>(what);
+  assert(!dynamic_cast<Variable_Decl const*>(what));
   auto P = dynamic_cast<Parameter_2 const*>(what);
   auto T = dynamic_cast<Token const*>(what);
   auto R = dynamic_cast<Token_VAR_REF const*>(what);
@@ -518,8 +523,6 @@ void Paramset::new_var_ref(Base* what)
     p = T->name();
   }else if(R){ untested();
     p = R->name();
-  }else if(V){ untested();
-    p = V->name();
   }else if(P){
     p = P->name();
   }else if(T){ untested();
@@ -544,10 +547,6 @@ void Paramset::new_var_ref(Base* what)
   }else if(p.substr(0,2)==PS_MANGLE_PREFIX) {
     if(P) {
       p = p.substr(2);
-    }else if(V) { untested();
-      assert(V->owner()==this);
-      p = p.substr(2);
-    }else if(V && !V->owner()){ untested();
     }else if(T){
       _var_refs[p] = what;
       p = p.substr(2);
@@ -556,9 +555,11 @@ void Paramset::new_var_ref(Base* what)
     }
     trace1("PS::nvr mangle", p);
     _var_refs[p] = what;
+    return false;
   }else{
     return Module::new_var_ref(what);
   }
+  return false;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

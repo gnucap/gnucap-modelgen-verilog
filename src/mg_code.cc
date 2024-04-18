@@ -24,9 +24,10 @@
 #include "mg_deps.h" // BUG?
 #include "mg_token.h"
 #include "mg_module.h"
+#include "mg_error.h"
 /*--------------------------------------------------------------------------*/
 Variable_Decl::~Variable_Decl()
-{ untested();
+{
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::clear_deps()
@@ -42,7 +43,7 @@ void Variable_Decl::clear_deps()
 // }
 /*--------------------------------------------------------------------------*/
 std::string const& Variable_Decl::name() const
-{ untested();
+{
   assert(_token);
   return _token->name();
 }
@@ -55,10 +56,24 @@ Block const* Variable_Decl::scope() const
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::new_var_ref()
-{ untested();
-  assert(owner());
+{
   incomplete();
-//   owner()->new_var_ref(this);
+}
+void Variable_Decl::new_var_ref_()
+{
+  assert(owner());
+  auto l = prechecked_cast<Variable_List*>(owner());
+  assert(l);
+
+//  incomplete();
+  assert(_token);
+  if(auto m = dynamic_cast<Module*>(l->scope())){ untested();
+    m->new_var_ref(_token);
+  }else if(auto b = dynamic_cast<Block*>(l->scope())){
+    b->new_var_ref(_token);
+  }else{
+    unreachable();
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool Variable_Decl::is_used_in(Base const*) const
@@ -103,7 +118,7 @@ bool Assignment::is_int() const
 }
 /*--------------------------------------------------------------------------*/
 bool Statement::update()
-{ untested();
+{
   trace0("Statement::update");
 //  if(dynamic_cast<Block*>(parent_stmt())){ untested();
 //    incomplete();
@@ -154,19 +169,19 @@ bool Statement::is_never() const
 }
 /*--------------------------------------------------------------------------*/
 // generic?
-Variable_List* Variable_List::deep_copy(Block* owner, std::string prefix) const
+Variable_List* Variable_List::deep_copy_(Block* owner, std::string prefix) const
 {
   // return new Variable_List(this);
   // auto n = new Variable_List(*this);
   auto n = new Variable_List();
-  attributes(n) = attributes(this);
+  ::attributes(n) = ::attributes(this);
+
   n->_type = type();
   n->set_owner(owner);
-  for(auto i : *this){
+  for(Variable_Decl const* i : _l){
     auto j = i->deep_copy(n, prefix);
-    attributes(j) = attributes(n);
-    owner->new_var_ref(j);
-    n->push_back(j);
+    // owner->new_var_ref(j);
+    n->_l.push_back(j);
   }
   return n;
 }
@@ -185,6 +200,47 @@ bool SeqBlock::update()
   }else{
   }
   return ret;
+}
+/*--------------------------------------------------------------------------*/
+void Variable_Decl::new_data()
+{
+  assert(owner());
+  auto l = prechecked_cast<Variable_List const*>(owner());
+  assert(l);
+  Module const* mod = dynamic_cast<Module const*>(l->owner()); // scope?
+  Variable_List_Collection const* p=NULL;
+  if(!mod){ untested();
+  }else if(::attributes(this)[std::string("desc")]!="0"
+         ||::attributes(this)[std::string("units")]!="0"){
+    p = &mod->variables();
+  }else{
+  }
+  _data = new TData();
+  if(p){
+    _data->add_rdep(p);
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+Variable_Decl* Variable_Decl::deep_copy(Base* b, std::string s) const
+{
+  assert(b);
+  auto l = prechecked_cast<Variable_List*>(b);
+  assert(l);
+
+  auto n = new Variable_Decl;
+  n->set_owner(b);
+  assert(type());
+  n->set_type(type());
+  assert(n->type());
+  ::attributes(n) = ::attributes(l);
+  n->new_data();
+  n->_token = new Token_VAR_DECL(s+_token->name(), n, n->_data);
+  ::attributes(n->_token) = ::attributes(l);
+  assert(n->_token->type());
+  l->scope()->new_var_ref(n->_token);
+  assert(n->_token->data());
+  return n;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

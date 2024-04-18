@@ -67,6 +67,7 @@ public:
   void dump(std::ostream& f)const override;
   bool is_real() const{ return _type==t_real; }
   bool is_int() const{ return _type==t_int; }
+  operator bool() const {return _type!=t_default;}
 };
 /*--------------------------------------------------------------------------*/
 class Data_Type_Real : public Data_Type{
@@ -84,27 +85,27 @@ class Token_VAR_REF;
 class Token_PROBE; //bug?
 class Node;
 class TData;
-class Expression;
 class Variable_Decl : public Expression_ {
   Data_Type _type;
+  TData* _data{NULL};
+  Token_VAR_REF* _token{NULL};
+  std::string /*TODO*/ _dimensions;
 public:
-  Variable_Decl() : Expression_() { untested(); } // {new_deps(); }
+  explicit Variable_Decl() : Expression_() { }
   ~Variable_Decl();
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
-  virtual /*?*/ Data_Type const& type()const { untested(); return _type; }
+  virtual /*?*/ Data_Type const& type()const { return _type; }
 //  std::string code_name()const override;
-  void set_type(Data_Type const& d){ untested(); _type=d; }
+  void set_type(Data_Type const& d){ _type=d; }
   bool propagate_deps(Token_VAR_REF const&);
 protected:
   void clear_deps();
 private:
   void new_deps();
-protected:
-  TData* _data{NULL};
-  Token_VAR_REF* _token{NULL};
+  void new_data();
 public:
-  String_Arg key()const { untested(); return String_Arg(name()); }
+  String_Arg key()const { return String_Arg(name()); }
 //  void set_type(Data_Type d){ untested(); _type=d; }
   bool is_real()const { untested(); return type().is_real(); }
   bool is_int()const { untested(); return type().is_int(); }
@@ -116,20 +117,40 @@ public:
   virtual double eval()const { untested(); return NOT_INPUT;}
   Block const* scope() const;
   bool has_deps()const { untested(); return _data; }
-  TData const& deps()const { untested(); assert(_data); return *_data; }
+  TData const& deps()const { assert(_data); return *_data; }
   bool is_used_in(Base const*b)const;
+  Variable_Decl* deep_copy(Base* owner, std::string prefix="") const;
+  Token_VAR_REF const& token()const { assert(_token); return *_token; }
+  void update();
 protected:
-  TData& data() { untested(); assert(_data); return *_data; }
+  TData& data() { assert(_data); return *_data; }
   void new_var_ref();
-};
+  void new_var_ref_();
+}; // Variable_Decl
 /*--------------------------------------------------------------------------*/
-class Variable_List : public LiSt<Token_VAR_REF, '\0', ',', ';'> {
+class Variable_List : public Statement {
+  typedef LiSt<Variable_Decl, '\0', ',', ';'> list_;
+  typedef list_::const_iterator const_iterator;
+  list_ _l;
   Data_Type _type;
+public:
+  explicit Variable_List() : Statement() {}
+  explicit Variable_List(CS& f, Base* o) : Statement() {
+    set_owner(o);
+    parse(f);
+  }
 public:
   Data_Type const& type()const {return _type;}
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
-  Variable_List* deep_copy(Block* owner, std::string prefix="") const;
+  Variable_List* deep_copy_(Block* owner, std::string prefix="") const;
+  bool is_used_in(Base const*)const override {incomplete(); return 0;}
+//  void set_owner(Block* b){ Statement::set_owner(b); }
+  const_iterator begin()const { return _l.begin(); }
+  const_iterator end()const { return _l.end(); }
+  Variable_List* deep_copy(Base*)const override
+    { untested();unreachable();return NULL;}
+  bool update() override;
 };
 /*--------------------------------------------------------------------------*/
 class Assignment : public Expression_ {

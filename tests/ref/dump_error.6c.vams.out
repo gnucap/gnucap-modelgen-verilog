@@ -1,0 +1,4 @@
+...  p, n;
+ real i;
+ (*desc="p"*) real p;
+                      ^ ? already declared

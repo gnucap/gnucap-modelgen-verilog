@@ -51,8 +51,9 @@ mg_func.cc \
 mg_func_pf.cc \
 mg_func_sys.cc \
 mg_impl.cc \
-mg_in_analog.cc \
 mg_in.cc \
+mg_in_analog.cc \
+mg_in_code.cc \
 mg_in_discipline.cc \
 mg_in_expr.cc \
 mg_in_module.cc \

@@ -295,7 +295,7 @@ void Token_ACSTIM::stack_op(Expression* e)const
   }else if(!cc->args()->size()){ untested();
     throw Exception("syntax error, need args");
   }else if(cc->args()->size()>1 &&
-           is_zero(cc->args()->back())){ untested();
+           is_zero(cc->args()->back())){
     Float* f = new Float(0.);
     e->push_back(new Token_CONSTANT("0.", f, ""));
     delete cc;

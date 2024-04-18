@@ -1567,9 +1567,9 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
   (void)pc;
   {
     { // 
-      ddouble _v_dt; // Token_VAR_REAL
+      ddouble _v_dt; // Variable_Decl
       _v_dt.set_all_deps();
-      ddouble _v_g; // Token_VAR_REAL
+      ddouble _v_g; // Variable_Decl
       _v_g.set_all_deps();
       {
         // function $param_given 1
@@ -1675,9 +1675,9 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
   (void) _v_i;
   {
     { // 
-      ddouble _v_dt; // Token_VAR_REAL
+      ddouble _v_dt; // Variable_Decl
       _v_dt.set_all_deps();
-      ddouble _v_g; // Token_VAR_REAL
+      ddouble _v_g; // Variable_Decl
       _v_g.set_all_deps();
       {
         // function $param_given 1

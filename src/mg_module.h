@@ -132,6 +132,7 @@ public:
 };
 typedef  Collection<Aliasparam> Aliasparam_Collection;
 /*--------------------------------------------------------------------------*/
+class Port_3;
 class Node;
 class Probe_Map;
 class File;
@@ -231,7 +232,7 @@ private:
   Node_Ref node(std::string const& p) const override;
   Branch_Ref lookup_branch(std::string const& p) const override;
 public:
-  void new_var_ref(Base* what) override;
+  bool new_var_ref(Base* what)override;
   Node* node(Node_Ref r) { return r.mutable_node(*this); }
 public: //filters may need this..
   Node* new_node(std::string const& p) override;
@@ -239,11 +240,6 @@ public: //filters may need this..
   void set_to_ground(Node const*);
 }; // Module
 typedef Collection<Module> Module_List;
-/*--------------------------------------------------------------------------*/
-inline void Module::install(FUNCTION_ const* f)
-{
-  _funcs.insert(f);
-}
 /*--------------------------------------------------------------------------*/
 class Paramset : public Module {
   // std::string _proto_name; // needed?
@@ -258,7 +254,7 @@ private:
   CS& parse_stmt(CS& f);
   void expand();
 protected:
-  void new_var_ref(Base* what) override;
+  bool new_var_ref(Base* what) override;
 };
 typedef Collection<Paramset> Paramset_List;
 /*--------------------------------------------------------------------------*/

@@ -166,7 +166,7 @@ void Expression_::dump(std::ostream& out)const
 	locals.push_back(t);
 	stack.push_back(t);
       }
-    }else if (dynamic_cast<const Token_BINOP*>(*i)) { untested();
+    }else if (dynamic_cast<const Token_BINOP*>(*i)) {
       unreachable();
       // pop pop op push
       assert(!stack.empty());

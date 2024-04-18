@@ -58,6 +58,7 @@ public:
   Probe const* operator->() const{ return _prb; }
   Probe const* operator*() const{ return _prb; }
   operator Probe const*() const{ return _prb; }
+  std::string code_name()const;
 };
 /*--------------------------------------------------------------------------*/
 class Sensitivities {
@@ -73,7 +74,7 @@ public:
   void add(Base* x) { _s.insert(x); }
   void merge(Sensitivities const& s) { _s.merge(s._s); }
   bool empty()const {return !_s.size();}
-  size_t size()const { untested();return _s.size();}
+  size_t size()const {return _s.size();}
 
   iterator begin() { untested();
     return _s.begin();

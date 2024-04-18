@@ -978,5 +978,50 @@ void Branch::dereg_stmt(AnalogStmt const* r)
   unreachable(); // cleanup is out of order?
 }
 /*--------------------------------------------------------------------------*/
+// tmp fuzz
+//void Owned_Base::set_owner(Block* b)
+//{ untested();
+//  _owner=b;
+//}
+#if 0
+Block* Owned_Base::scope()const
+{
+  if(auto b = dynamic_cast<Block*>(_owner)) { untested();
+    return b;
+  }else if(auto o = dynamic_cast<Owned_Base*>(_owner)) { untested();
+    incomplete();
+    return NULL;
+    return o->scope();
+  }else{ untested();
+    incomplete();
+    return NULL;
+  }
+}
+Block* Owned_Base::owner()
+{
+  if(auto b = dynamic_cast<Block*>(_owner)) { untested();
+    return b;
+  }else if(auto o = dynamic_cast<Owned_Base*>(_owner)) { untested();
+    return NULL; // o->scope();
+  }else{ untested();
+    incomplete();
+    return NULL;
+  }
+}
+Block const* Owned_Base::owner()const
+{
+  if(auto b = dynamic_cast<Block*>(_owner)) { untested();
+    return b;
+  }else if(auto o = dynamic_cast<Owned_Base*>(_owner)) { untested();
+    incomplete();
+    return NULL;
+    return o->scope();
+  }else{ untested();
+    incomplete();
+    return NULL;
+  }
+}
+#endif
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

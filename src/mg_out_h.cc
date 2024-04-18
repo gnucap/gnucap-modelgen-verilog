@@ -211,17 +211,18 @@ void make_one_variable_decl(std::ostream& o, Token_VAR_REF const& V)
   o << ";\n";
 }
 /*--------------------------------------------------------------------------*/
+void make_one_variable_decl(std::ostream& o, Variable_Decl const& V)
+{
+  return make_one_variable_decl(o, V.token());
+}
+/*--------------------------------------------------------------------------*/
 static void make_variable_decl(std::ostream& o, const Variable_List_Collection& P)
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
-      Token_VAR_REF const* V = *p;
+      Variable_Decl const* V = *p;
       assert(V);
-      //if(V->has_attributes()) { untested();
-	make_one_variable_decl(o, *V);
-      //}else{ untested();
-//	tr_eval_analog local
-      //}
+      make_one_variable_decl(o, *V);
     }
   }
 }

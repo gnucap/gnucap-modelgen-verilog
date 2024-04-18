@@ -411,7 +411,8 @@ private:
 /*--------------------------------------------------------------------------*/
 // VAR_DECL :: SYMBOL?
 /*--------------------------------------------------------------------------*/
-// class Token_VAR_DECL : public Token_VARIABLE
+// obsolete.
+#if 0
 class Token_VAR_REAL : public Token_VAR_REF {
   Block const* _owner{NULL};
   Base const* _default{0};
@@ -445,6 +446,30 @@ public:
   Data_Type const& type()const override;
 
   void set_owner(Base*){ untested();unreachable();}
+  std::string key() const { untested();unreachable();return "";}
+
+  void clear_deps();
+  void stack_op(Expression* e)const override;
+
+  void dump(std::ostream& o)const override;
+  void set_default(Base const* x) { assert(!_default); _default=x; }
+};
+#endif
+/*--------------------------------------------------------------------------*/
+class Variable_List;
+class Token_VAR_DECL : public Token_VAR_REF {
+  // Variable_List const* _owner{NULL}; // _item?
+  Base const* _default{0};
+  // type //
+public:
+  explicit Token_VAR_DECL() : Token_VAR_REF("",NULL,NULL) { untested();unreachable();}
+  explicit Token_VAR_DECL(std::string Name, Base* item, Base const* data)
+    : Token_VAR_REF(Name, item, data) {}
+  // Token_VAR_DECL* deep_copy(Base* owner, std::string prefix)const override;
+  ~Token_VAR_DECL() { delete _default; }
+  Data_Type const& type()const override;
+
+//  void set_owner(Variable_List* b){_item = b;}
   std::string key() const { untested();unreachable();return "";}
 
   void clear_deps();

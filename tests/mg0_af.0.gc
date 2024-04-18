@@ -19,17 +19,17 @@ module test_af_0(p, n);
 		end
 	endfunction
 	analog function real unused0;
-		input x;
-		real x;
+		input y;
+		real y;
 		begin
-			unused0 = x;
+			unused0 = y;
 		end
 	endfunction
 	analog function real unused1;
-		input x;
-		real x;
+		input z;
+		real z;
 		begin
-			unused1 = x;
+			unused1 = z;
 		end
 	endfunction
 

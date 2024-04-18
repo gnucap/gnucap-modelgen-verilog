@@ -1048,7 +1048,7 @@ bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
     assert(it->scope());
     assert(from.scope());
     return it->propagate_deps(from);
-  }else if(auto p = dynamic_cast<Variable_Decl*>(_item)){ untested();
+  }else if(auto p = dynamic_cast<Variable_Decl*>(_item)){
     return p->propagate_deps(from);
   }else if(dynamic_cast<Analog_Function*>(_item)){
   }else{ untested();
@@ -1076,6 +1076,7 @@ Block const* Token_VAR_REF::scope() const
   }
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 void Token_VAR_REAL::clear_deps()
 {
   if(auto it=dynamic_cast<TData*>(_item)){
@@ -1090,7 +1091,51 @@ Data_Type const& Token_VAR_REAL::type() const
   static Data_Type_Real t;
   return t;
 };
+#endif
 /*--------------------------------------------------------------------------*/
+Data_Type const& Token_VAR_DECL::type() const
+{
+  assert(_item);
+  auto oi = prechecked_cast<Variable_Decl const*>(_item);
+  assert(oi);
+  assert(oi->type());
+  return oi->type();
+};
+/*--------------------------------------------------------------------------*/
+void Token_VAR_DECL::stack_op(Expression* e)const
+{
+  auto E = prechecked_cast<Expression_*>(e);
+  assert(E);
+  auto xx = dynamic_cast<Statement*>(E->owner());
+  auto mm = dynamic_cast<Module*>(E->owner());
+  auto af = dynamic_cast<Analog_Function*>(E->owner());// BUG?
+  assert(xx||mm||af);
+  assert(_item);
+  auto oi = prechecked_cast<Variable_Decl const*>(_item);
+  assert(oi);
+
+  {
+    TData* nd = NULL;
+    if(auto a = dynamic_cast<Assignment const*>(_item)){ untested();
+      nd = a->data().clone();
+//      nd->add_sens(_item); not yet.
+      trace3("var::stackop a", name(), nd->size(), deps().size());
+    }else if(auto dd = dynamic_cast<TData const*>(data())){
+      nd = dd->clone();
+//      nd->add_sens(_item); not yet.
+    }else{ untested();
+      incomplete();
+      trace1("var::stackop no assignment", name());
+    }
+
+    auto nn = new Token_VAR_REF(name(), E->scope(), nd);
+    assert(nn->scope());
+    e->push_back(nn);
+
+  }
+}
+/*--------------------------------------------------------------------------*/
+#if 0
 void Token_VAR_REAL::stack_op(Expression* e)const
 {
   auto E = prechecked_cast<Expression_*>(e);
@@ -1154,7 +1199,23 @@ void Token_VAR_INT::stack_op(Expression* e)const
     e->push_back(nn);
   }
 }
+#endif
 /*--------------------------------------------------------------------------*/
+void Token_VAR_DECL::dump(std::ostream& o) const
+{
+  incomplete();
+  o << name();
+  if(!options().dump_annotate()){
+  }else if(deps().ddeps().size()){
+    for(auto d : deps().ddeps()){
+      o << "// dep " << d->code_name();
+    }
+    o << "\n";
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+#if 0
 void Token_VAR_REAL::dump(std::ostream& o) const
 {
   o << name();
@@ -1174,12 +1235,13 @@ Data_Type const& Token_VAR_INT::type() const
   return t;
 };
 /*--------------------------------------------------------------------------*/
-void Token_ARGUMENT::dump(std::ostream& o) const
+void Token_VAR_INT::dump(std::ostream& o) const
 {
   o << name();
 }
+#endif
 /*--------------------------------------------------------------------------*/
-void Token_VAR_INT::dump(std::ostream& o) const
+void Token_ARGUMENT::dump(std::ostream& o) const
 {
   o << name();
 }
@@ -1206,6 +1268,7 @@ Token_VAR_REF* Token_VAR_REF::clone()const
 /*--------------------------------------------------------------------------*/
 Token_VAR_REF* Token_VAR_REF::deep_copy(Base* /*owner*/, std::string prefix)const
 { untested();
+  assert(0); // not needed.
   if(dynamic_cast<TData const*>(_item)) { untested();
     auto cl = new TData;
     auto n = new Token_VAR_REF(prefix + name(), cl, cl);
@@ -1224,6 +1287,7 @@ bool Token_VAR_REF::is_used() const
   return td->is_used();
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 Token_VAR_REAL* Token_VAR_REAL::deep_copy(Base* /*owner*/, std::string prefix)const
 {
   if(dynamic_cast<TData const*>(_item)) {
@@ -1236,6 +1300,21 @@ Token_VAR_REAL* Token_VAR_REAL::deep_copy(Base* /*owner*/, std::string prefix)co
     return new Token_VAR_REAL(*this);
   }
 }
+#endif
+/*--------------------------------------------------------------------------*/
+// Token_VAR_DECL* Token_VAR_DECL::deep_copy(Variable_Decl* owner, std::string prefix)const
+// {
+//   unreachable();
+//   if(dynamic_cast<TData const*>(_item)) {
+//     auto cl = new TData;
+//     auto n = new Token_VAR_DECL(prefix + name(), owner, cl);
+//     attributes(n) = attributes(this);
+//     return n;
+//   }else{ untested();
+//     unreachable();
+//     return new Token_VAR_DECL(*this);
+//   }
+// }
 /*--------------------------------------------------------------------------*/
 void Token_NODE::stack_op(Expression* E) const
 {

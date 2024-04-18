@@ -286,67 +286,6 @@ void Parameter_2_List::parse(CS& file)
   }
 }
 /*--------------------------------------------------------------------------*/
-// duplicate?
-void Variable_List::parse(CS& f)
-{
-  assert(owner());
-  Module* mod = prechecked_cast<Module*>(owner());
-  assert(mod);
-
-  Variable_List_Collection const* p=NULL;
-  if(::attributes(&f)[std::string("desc")]!="0"
-   ||::attributes(&f)[std::string("units")]!="0"){
-    p = &mod->variables();
-  }else{
-  }
-  move_attributes(&f, this);
-
-  char t = f.last_match()[0];
-  if(t=='r') {
-    _type = Data_Type_Real();
-  }else if(t=='i') {
-    _type = Data_Type_Int();
-  }else{ untested();
-    throw Exception_CS_("What type? " + t, f);
-  }
-
-  LiSt<String_Arg, '\0', ',', ';'> l;
-  l.parse(f);
-  // LiSt<Variable_Decl, '\0', ',', ';'>::parse(f);
-  if(_type.is_real()) {
-    for(auto i : l){
-      auto data = new TData;
-      if(p){
-	data->add_rdep(p);
-      }else{
-      }
-      auto r = new Token_VAR_REAL(i->to_string(), data, data);
-      r->set_owner(mod); // used in analog function
-      push_back(r);
-      mod->new_var_ref(r);
-    }
-  }else if(_type.is_int()) {
-    for(auto i : l){
-      auto data = new TData;
-      if(p){ untested();
-	data->add_rdep(p);
-      }else{
-      }
-      auto I = new Token_VAR_INT(i->to_string(), data, data);
-      push_back(I);
-      mod->new_var_ref(I);
-    }
-  }else{ untested();
-    unreachable();
-  }
-  if(has_attributes()){
-    for (auto x : *this){
-      ::attributes(x) = ::attributes(this);
-    }
-  }else{
-  }
-} // Variable_List::parse
-/*--------------------------------------------------------------------------*/
 void Parameter_2_List::dump(std::ostream& o)const
 {
   print_attributes(o, this);
@@ -367,7 +306,7 @@ void Variable_List::dump(std::ostream& o)const
   print_attributes(o, this);
 
   o__ _type << " ";
-  LiSt<Token_VAR_REF, '\0', ',', ';'>::dump(o);
+  _l.dump(o);
   o << "\n";
 }
 /*--------------------------------------------------------------------------*/
@@ -872,22 +811,6 @@ void Module::dump(std::ostream& o)const
   o << "endmodule\n";
 }
 /*--------------------------------------------------------------------------*/
-void Variable_Decl::parse(CS& file)
-{ untested();
-  file >> ','; // ?? BUG.
-  assert(owner());
-  assert(!_data);
-  assert(!_token);
-  std::string name;
-  file >> name;
-
-  _data = new TData();
-  _token = new Token_VAR_REF(name, this, _data);
-  trace1("variable decl", name);
-  incomplete();
-// owner()->new_var_ref(_token);
-}
-/*--------------------------------------------------------------------------*/
 void ValueRangeInterval::parse(CS& file)
 {
   if(file.last_match() == "["){
@@ -979,8 +902,9 @@ void ValueRangeConstant::dump(std::ostream& o)const
   o << _cexpr;
 }
 /*--------------------------------------------------------------------------*/
-void Module::new_var_ref(Base* what)
+bool Module::new_var_ref(Base* what)
 {
+  assert(!dynamic_cast<Variable_Decl const*>(what));
   auto P = dynamic_cast<Parameter_2 const*>(what);
   auto T = dynamic_cast<Token const*>(what);
 
@@ -1018,19 +942,17 @@ void Block::clear_vars()
 }
 /*--------------------------------------------------------------------------*/
 /// set_vr_ref?
-void Block::new_var_ref(Base* what)
+bool Block::new_var_ref(Base* what)
 {
   assert(what);
   std::string p;
-  auto V = dynamic_cast<Variable_Decl const*>(what);
+  assert(!dynamic_cast<Variable_Decl const*>(what));
   auto P = dynamic_cast<Parameter_2 const*>(what);
   auto T = dynamic_cast<Token const*>(what);
 
   if(T){
     p = T->name();
     // assert(T->data());
-  }else if(V){ untested();
-    p = V->name();
   }else if(P){
     p = P->name();
   }else if(auto A = dynamic_cast<Aliasparam const*>(what)){ untested();
@@ -1045,42 +967,11 @@ void Block::new_var_ref(Base* what)
     assert(false);
   }
 
-  trace3("new_var_ref", V, p, dynamic_cast<Paramset const*>(this));
-
   trace3("new_var_ref, stashing", p, this, dynamic_cast<Module const*>(this));
-  Base* cc = _var_refs[p];
-
-  // yikes.
-  if(dynamic_cast<Paramset_Stmt const*>(what)){ untested();
-    unreachable();
-    _var_refs[p] = what;
-  }else if(cc) {
-    _var_refs[p] = what;
-    if(V){ untested();
-      // updating variable...
-    }else if(T){
-      // updating variable...
-      if(auto VT = dynamic_cast<Token_VAR_REF const*>(T)){
-	trace2("new_var_ref, update token", p, VT->deps().size());
-//      }else if(auto VT = dynamic_cast<Token_VAR_REAL const*>(T)){ untested();
-//	throw(Exception("already declared"));
-      }else{
-	trace1("new_var_ref, update token", p);
-      }
-    }else{ untested();
-      throw(Exception("already there: '" + p + "'"));
-    }
-  }else if(T){
-    if(dynamic_cast<Token_VAR_REF const*>(T)){
-      //trace2("new_var_ref, reg new token", p, VT->deps().size());
-    }else{
-      trace1("new_var_ref, reg new token", p);
-    }
-    _var_refs[p] = what;
-  }else{
-    trace1("new_var_ref, reg new", p);
-    _var_refs[p] = what;
-  }
+  Base*& s = _var_refs[p];
+  bool ret = !s;
+  s = what;
+  return ret;
 }
 /*--------------------------------------------------------------------------*/
 void Module::push_back(Filter /*const?*/ * f)
@@ -1092,6 +983,11 @@ void Module::push_back(Filter /*const?*/ * f)
 void Circuit::push_back(Filter /*const?*/ * f)
 {
   _filters.push_back(f);
+}
+/*--------------------------------------------------------------------------*/
+void Module::install(FUNCTION_ const* f)
+{
+  _funcs.insert(f);
 }
 /*--------------------------------------------------------------------------*/
 void Module::push_back(FUNCTION_* f)
@@ -1114,18 +1010,9 @@ void Module::push_back(Base* x)
   }
 }
 /*--------------------------------------------------------------------------*/
-void Module::push_back(Token* f)
+void Module::push_back(Token*)
 { untested();
-  if(auto t = dynamic_cast<Token_VAR_REF*>(f)) { untested();
-    auto vl = new Variable_List;
-    vl->set_owner(this);
-    vl->push_back(t);
-    move_attributes(f, vl);
-//    attributes(f) = attributes(vl);
-    _variables.push_back(vl);
-  }else{ untested();
-    unreachable();
-  }
+  assert(0); // remove.
 }
 /*--------------------------------------------------------------------------*/
 Branch::Branch(Branch_Ref b, Module* m)
@@ -1261,5 +1148,6 @@ void Module::setup_functions()
     f->setup(this);
   }
 }
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

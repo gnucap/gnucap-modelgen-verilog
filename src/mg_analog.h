@@ -146,7 +146,7 @@ public:
 class AnalogFunctionArgs : public Block {
 public: // can't resolve these..
   void parse(CS&)override;
-  void new_var_ref(Base* what)override;
+  bool new_var_ref(Base* what)override;
   void dump(std::ostream& f)const override;
 };
 /*--------------------------------------------------------------------------*/
@@ -167,7 +167,7 @@ public: // can't resolve these..
   }
   Base* lookup(std::string const& f, bool recurse=true)override;
 
-  void new_var_ref(Base* what)override;
+  bool new_var_ref(Base* what)override;
   void dump(std::ostream& f)const override;
 };
 /*--------------------------------------------------------------------------*/
@@ -267,7 +267,7 @@ class AnalogConstExpression : public AnalogExpression {
 public:
 //  void parse(CS& file) override;
 //  void dump(std::ostream& o)const override;
-  String_Arg key() const{ untested();return String_Arg("ACE");}
+  String_Arg key() const{return String_Arg("ACE");}
 };
 typedef LiSt<AnalogConstExpression, '\0', ',', ':'> AnalogConstExpressionList;
 /*--------------------------------------------------------------------------*/
@@ -442,7 +442,7 @@ class Contribution : public AnalogStmt {
     t_pot
   } _type{t_unknown};
   bool _short{false};
-  Block* _owner{NULL};
+//  Block* _owner{NULL};
   TData* _deps{NULL};
   Sensitivities _sens;
 private:
@@ -495,6 +495,7 @@ private:
 }; // Contribution
 /*--------------------------------------------------------------------------*/
 // VarDeclStmt? code?
+#if 0
 class AnalogDeclareVars : public AnalogStmt {
 //  typedef LiSt<Token_VARIABLE, '\0', ',', ';'> list_t;
   typedef LiSt<Token_VAR_REF, '\0', ',', ';'> list_t;
@@ -515,6 +516,7 @@ private:
   bool update()override;
   TData const& deps()override { return _deps;};
 };
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

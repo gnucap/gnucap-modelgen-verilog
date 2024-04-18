@@ -370,9 +370,8 @@ static Base* parse_analog_stmt_or_null(CS& file, Block* scope)
   ONE_OF	// module_item
     || (file >> ";")
     || ((file >> "begin") && (ret = pArse_seq(file, scope)))
-    || ((file >> "real ") && (ret = new AnalogDeclareVars(file, scope)))
-    || ((file >> "integer ") && (ret = new AnalogDeclareVars(file, scope)))
-//    || ((file >> "integer ") && (ret = parse_int(file, scope))) // TODO: AnalogDeclareVars
+    || ((file >> "real ") && (ret = new Variable_List(file, scope)))
+    || ((file >> "integer ") && (ret = new Variable_List(file, scope)))
     || ((file >> "if ") && (ret = parse_cond(file, scope)))
     || ((file >> "case ") && (ret = parse_switch(file, scope)))
     || ((file >> "while ") && (ret = new AnalogWhileStmt(file, scope)))
@@ -537,7 +536,7 @@ bool AnalogSwitchStmt::update()
   bool ret = false;
   while(true){
     _body.clear_vars();
-    if (_body.update()){
+    if (_body.update()){ untested();
       ret = true;
     }else{
       break;
@@ -899,7 +898,8 @@ void AnalogCtrlBlock::set_owner(Statement* st)
     }
   }else{
   }
-  set_owner_raw(st);
+  Base* b = st;
+  set_owner_raw(b);
 //  Statement::set_owner(st);
   assert(owner());
 }
@@ -1637,8 +1637,8 @@ void Analog_Function::parse(CS& f)
       || ((f >> "input ") && (f >> _args))
       || ((f >> "output ") && (f >> _args))
       || ((f >> "inout ") && (f >> _args))
-      || ((f >> "real ") && (s = new AnalogDeclareVars(f, &_args)))
-      || ((f >> "integer ") && (s = new AnalogDeclareVars(f, &_args)))
+      || ((f >> "real ") && (s = new Variable_List(f, &_args)))
+      || ((f >> "integer ") && (s = new Variable_List(f, &_args)))
       ;
     if (s){
       _vars.push_back(s);
@@ -1656,13 +1656,13 @@ void Analog_Function::parse(CS& f)
   for(auto& x : _args.var_refs()){
     trace1("af vr", x.first);
     if(auto y = dynamic_cast<Token_ARGUMENT*>(x.second)){
-      if(dynamic_cast<Token_VAR_REAL*>(y->_var)){
+      if(dynamic_cast<Token_VAR_DECL*>(y->_var)){
 	_block.new_var_ref(y->_var);
       }else{ untested();
 	throw Exception("formal argument missing type\n");
       }
     }else{
-      assert(dynamic_cast<Token_VAR_REAL*>(x.second));
+      assert(dynamic_cast<Token_VAR_DECL*>(x.second));
       _block.new_var_ref(x.second);
     }
 
@@ -1698,7 +1698,7 @@ Base* AnalogFunctionBody::lookup(std::string const& k, bool recurse)
     }else{
       return b;
     }
-  }else{
+  }else{ untested();
     return NULL;
   }
 }
@@ -1751,7 +1751,7 @@ void AnalogFunctionArgs::dump(std::ostream& o) const
   }
 }
 /*--------------------------------------------------------------------------*/
-void AnalogFunctionArgs::new_var_ref(Base* b)
+bool AnalogFunctionArgs::new_var_ref(Base* b)
 {
   auto t = prechecked_cast<Token*>(b);
   assert(t);
@@ -1763,32 +1763,47 @@ void AnalogFunctionArgs::new_var_ref(Base* b)
   }
 
   Token_ARGUMENT* arg = NULL;
-  Token_VAR_REAL* decl = NULL;
+  Token_VAR_DECL* decl = NULL;
   if((arg = dynamic_cast<Token_ARGUMENT*>(b))){
+    trace1("AF::nvr1", t->name());
     if(dynamic_cast<Token_ARGUMENT*>(ex)){ untested();
       throw Exception("duplicate argument");
-    }else if(auto dd = dynamic_cast<Token_VAR_REAL*>(ex)){
+    }else if(auto dd = dynamic_cast<Token_VAR_DECL*>(ex)){
       arg->_var = dd;
       return Block::new_var_ref(arg);
+    }else if(auto tt = dynamic_cast<Token*>(ex)){ untested();
+      return Block::new_var_ref(tt);
+    }else if(ex){ untested();
+      assert(0);
+      unreachable();
     }else{
       return Block::new_var_ref(b);
     }
-  }else if((decl = dynamic_cast<Token_VAR_REAL*>(b))){
+  }else if((decl = dynamic_cast<Token_VAR_DECL*>(b))){
+    trace1("AF::nvr2", t->name());
     if(auto aa=dynamic_cast<Token_ARGUMENT*>(ex)){
       aa->_var = decl;
       trace1("AF::nvr arg", t->name());
-      return Block::new_var_ref(aa);
-    }else if(dynamic_cast<Token_VAR_REAL*>(ex)){ untested();
+      Block::new_var_ref(aa);
+      return true; // OK
+    }else if(dynamic_cast<Token_VAR_DECL*>(ex)){ untested();
       throw Exception("duplicate variable name");
+    }else if(auto tt = dynamic_cast<Token*>(ex)){ untested();
+      return Block::new_var_ref(tt);
+    }else if(ex){ untested();
+      assert(0);
+      unreachable();
     }else{
       return Block::new_var_ref(b);
     }
   }else{ untested();
+    assert(0);
     return Block::new_var_ref(b);
   }
+  return false;
 }
 /*--------------------------------------------------------------------------*/
-void AnalogFunctionBody::new_var_ref(Base* b)
+bool AnalogFunctionBody::new_var_ref(Base* b)
 {
   return Block::new_var_ref(b);
 }
@@ -1837,10 +1852,10 @@ void AF_Arg_List::parse(CS& f)
   l.parse(f);
   for(auto i : l){
     auto b = owner()->lookup(i->to_string(), false);
-    auto v = dynamic_cast<Token_VAR_REAL*>(b);
+    auto v = dynamic_cast<Token_VAR_DECL*>(b);
 
     if(dynamic_cast<Token_ARGUMENT const*>(b)){ untested();
-      throw Exception_CS_("already_declared: " + i->to_string() + "\n", f);
+      throw Exception_CS_("already declared: " + i->to_string() + "\n", f);
     }else if(v){
 //      v->set_arg? set_used_in?
     }else{
@@ -2034,6 +2049,8 @@ bool Contribution::is_pot_contrib() const
 Contribution::~Contribution()
 {
   assert(_branch); //?
+  assert(owner());
+  assert(dynamic_cast<Block const*>(owner()));
   if(!options().optimize_nodes()){ untested();
   }else if(!owner()->is_always()) {
   }else if(is_short()) {
@@ -2070,104 +2087,6 @@ Contribution::~Contribution()
   }
   delete _deps;
   _deps = NULL;
-}
-/*--------------------------------------------------------------------------*/
-void Variable_Decl::dump(std::ostream& o)const
-{ untested();
-  o__ name();
-  if(options().dump_annotate()){ untested();
-    for(auto d : deps().ddeps()){ untested();
-      o << "// dep " << d->code_name();
-    }
-    o << "\n";
-  }else{ untested();
-  }
-}
-/*--------------------------------------------------------------------------*/
-bool Variable_Decl::propagate_deps(Token_VAR_REF const& v)
-{ untested();
-  if(!v.data()){ untested();
-    incomplete();
-    return false;
-  }else{ untested();
-  }
-  TData const& incoming = v.deps();
-  assert(&deps() != &incoming);
-  data().update(incoming);
-  assert(deps().ddeps().size() >= incoming.ddeps().size());
-  return false;
-}
-/*--------------------------------------------------------------------------*/
-void AnalogDeclareVars::parse(CS& f)
-{
-  char tc = f.last_match()[0];
-  LiSt<String_Arg, '\0', ',', ';'> l;
-  l.parse(f);
-  Variable_List_Collection const* p=NULL;
-  if(auto m = dynamic_cast<Module*>(owner())) { untested();
-    if(::attributes(&f)[std::string("desc")]!="0"
-     ||::attributes(&f)[std::string("units")]!="0"){ untested();
-      p = &m->variables();
-    }else{ untested();
-    }
-  }else{
-  }
-  for(auto i : l){
-    //      data->set_type(Data_Type_Real());
-    auto b = owner()->lookup(i->to_string(), false);
-    auto v = dynamic_cast<Token_VAR_REF const*>(b);
-
-    if(v) {
-      throw Exception_CS_("already_declared: " + i->to_string() + "\n", f);
-    }else{
-    }
-    auto data = new TData;
-    if(p){ untested();
-      data->add_rdep(p);
-      trace1("AnalogDeclareVars::parse rdep", i->to_string());
-    }else{
-      trace1("AnalogDeclareVars::parse", i->to_string());
-    }
-    Token_VAR_REF* t=NULL;
-    if(tc=='r'){
-      t = new Token_VAR_REAL(i->to_string(), data, data);
-    // set_used_in(_branch);
-    }else if(tc=='i'){
-      t = new Token_VAR_INT(i->to_string(), data, data);
-    }else{ untested();
-      unreachable();
-    }
-    _l.push_back(t);
-  }
-  update();
-}
-/*--------------------------------------------------------------------------*/
-void AnalogDeclareVars::dump(std::ostream& o) const
-{
-  assert(_l.size());
-
-  o__ (*_l.begin())->type() << " ";
-  _l.dump(o);
-  o << "\n";
-}
-/*--------------------------------------------------------------------------*/
-bool AnalogDeclareVars::update()
-{
-  trace0("AnalogDeclareVars::update");
-  for(Token_VAR_REF* i : _l){
-
-    if(auto r = dynamic_cast<Token_VAR_REAL*>(i)){
-      r->clear_deps();
-      owner()->new_var_ref(i);
-    }else if(auto I = dynamic_cast<Token_VAR_INT*>(i)){
-      // I->clear_deps();
-      trace1("decl nvr", i->name());
-      owner()->new_var_ref(I);
-    }else{ untested();
-      incomplete();
-    }
-  }
-  return false;
 }
 /*--------------------------------------------------------------------------*/
 Probe* new_Probe(std::string const& xs, Branch_Ref const& br)
@@ -2550,5 +2469,6 @@ bool Probe::propagate_rdeps(RDeps const& r) const
   }
   return ret;
 }
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

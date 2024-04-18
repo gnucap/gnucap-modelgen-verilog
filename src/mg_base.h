@@ -9,19 +9,19 @@
 class Block;
 class Owned_Base : public Base {
   Block* _owner{NULL};
+//  Block* _scope{NULL};
 protected:
   explicit Owned_Base() : Base() { }
   explicit Owned_Base(Owned_Base const& b) : Base(), _owner(b._owner) { untested(); }
-  explicit Owned_Base(Block* o) : Base(), _owner(o) { untested(); }
 public:
-  void set_owner(Block* b){  _owner = b; }
-  Block const* owner()const { return _owner; }
-  Block* scope()const { return _owner; }
+  void set_owner(Base* b);
+  void set_owner(Block* b);
+  Block const* owner()const;
+  Block* scope()const;
 protected:
-  Block* owner(){ return _owner;}
+  Block* owner();
 
 public:
-//  Attribute_Instance const* _attributes{NULL};
   ATTRIB_LIST_p& attributes() { untested();
     assert(CKT_BASE::_attribs);
     return (*CKT_BASE::_attribs)[this];
@@ -30,9 +30,6 @@ public:
     assert(CKT_BASE::_attribs);
     return CKT_BASE::_attribs->at(this);
   }
-//  void set_attributes(Attribute_Instance const* a) { untested();
-//    _attributes = a;
-//  }
 };
 /*--------------------------------------------------------------------------*/
 inline std::string to_lower(std::string s)
@@ -65,7 +62,7 @@ public:
   bool			is_empty()const	 { untested();return _s.empty();}
   std::string		lower()const	 { untested();return to_lower(_s);}
   const std::string&	to_string()const {return _s;}
-  void set_owner(Block*){
+  void set_owner(Base*){
     // incomplete();
   }
 };
@@ -120,7 +117,7 @@ public:
 // class Attribute_Instance;
 template <class T, char BEGIN, char SEP, char END, char END2='\0', char END3='\0'>
 class LiSt : public Keyed_List<T> {
-  Block* _owner{NULL};
+  Base* _owner{NULL};
 //   Attribute_Instance const* _attributes{NULL};
 public:
   using List_Base<T>::size;
@@ -131,9 +128,9 @@ public:
 public:
   ~LiSt();
 
-  void set_owner(Block* b){ _owner = b; }
-  Block const* owner() const{ untested();return _owner;}
-  Block* owner(){return _owner;}
+  void set_owner(Base* b){ _owner = b; }
+  Base const* owner() const{ untested();return _owner;}
+  Base* owner(){return _owner;}
   void parse(CS& file) override{
     parse_n(file);
   }
@@ -164,7 +161,7 @@ protected:
 	TT* p = new TT;
 	p->set_owner(owner());
 	file >> *p;
-	if (file.stuck(&here)) { untested();
+	if (file.stuck(&here)) {
 	  delete p;
 	  file.warn(0, "not valid here");
 	  break;
@@ -391,11 +388,12 @@ protected:
 private:
   Base* _owner{NULL};
 public:
+  explicit Block() : List_Base<Base>() {}
+  ~Block();
   Block* scope() const;
   Block* scope();
   Base const* owner() const{ return _owner;}
   Base* owner(){ return _owner;}
-  ~Block();
 public:
   bool is_reachable()const { return _reachable; }
   bool is_always()const { return _reachable == r_always; }
@@ -404,7 +402,7 @@ public:
 //  void set_reachable() { untested(); untested(); _reachable = r_unknown; }
   void set_always() { _reachable = r_always; }
   void set_never() { _reachable = r_never; }
-  virtual void new_var_ref(Base* what);
+  virtual bool new_var_ref(Base* what);
   void clear_vars();
 
   virtual Node* new_node(std::string const& p){ untested();
@@ -440,10 +438,10 @@ public:
   }
 #endif
 
-  void set_owner_raw(Statement* b) {
-    _owner = (Base*)(b);
-  }
-  void set_owner_raw(Block* b) { untested();
+  // void set_owner_raw(Statement* b) {
+  //   _owner = (Base*)(b);
+  // }
+  void set_owner_raw(Base* b) {
     _owner = b;
   }
   void set_owner(Base* b){
@@ -480,7 +478,7 @@ public:
   }
 };
 /*--------------------------------------------------------------------------*/
-class Parameter_Base : public Base {
+class Parameter_Base : public Base { // Owned_Base?
   Block* _owner{NULL};
 protected:
   std::string _name;
@@ -531,7 +529,8 @@ public:
     }
   }
 #endif
-  void set_owner(Block* c) { _owner = c; }
+  //void set_owner(Block* c) { _owner = c; }
+  void set_owner(Base* c) { _owner = prechecked_cast<Block*>(c); assert(_owner); }
   std::string const& name() const{ return _name; }
   bool operator!=(const std::string& s)const {return _name != s;}
 //  virtual bool is_constant()const { untested();untested(); return false;}
@@ -549,6 +548,29 @@ template <class T, char BEGIN, char SEP, char END, char END2, char END3>
 LiSt<T, BEGIN, SEP, END, END2, END3>::~LiSt()
 {
   CKT_BASE::_attribs->erase(this, this);
+}
+/*--------------------------------------------------------------------------*/
+inline Block const* Owned_Base::owner() const
+{
+  return dynamic_cast<Block*>(_owner);
+}
+inline Block* Owned_Base::scope() const
+{
+  return dynamic_cast<Block*>(_owner);
+}
+inline Block* Owned_Base::owner()
+{
+  assert(!_owner || dynamic_cast<Block*>(_owner));
+  return dynamic_cast<Block*>(_owner);
+}
+inline void Owned_Base::set_owner(Block* b)
+{
+  _owner = b;
+}
+inline void Owned_Base::set_owner(Base* b)
+{
+  _owner = dynamic_cast<Block*>(b);
+  assert(_owner);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

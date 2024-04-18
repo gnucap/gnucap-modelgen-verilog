@@ -37,10 +37,11 @@ public:
   void dump(std::ostream&)const override;
 public:
   Attribute_Spec() : Owned_Base() { untested();untested();}
-  Attribute_Spec(CS& f, Block* o) : Owned_Base(o) { untested();
-    set_owner(o);
-    parse(f);
-  }
+//  Attribute_Spec(CS& f, Block* o) : Owned_Base(NULL) { untested();
+//    unreachable();
+//    set_owner(o);
+//    parse(f);
+//  }
   ~Attribute_Spec(){ untested();
     delete _expr;
     _expr = NULL;
@@ -83,6 +84,18 @@ public:
 typedef Collection<Attribute> Attribute_List;
 /*--------------------------------------------------------------------------*/
 void move_attributes(void* from, void* to);
+/*--------------------------------------------------------------------------*/
+inline ATTRIB_LIST_p& attributes(void const* x)
+{
+  assert(CKT_BASE::_attribs);
+  return (*CKT_BASE::_attribs)[x];
+}
+/*--------------------------------------------------------------------------*/
+inline ATTRIB_LIST_p& attributes(intptr_t x)
+{ untested();
+  assert(CKT_BASE::_attribs);
+  return (*CKT_BASE::_attribs)[(void*)x];
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

@@ -1,0 +1,5 @@
+
+module test()
+ real a=1;
+ real a=1;
+           ^ ? already declared

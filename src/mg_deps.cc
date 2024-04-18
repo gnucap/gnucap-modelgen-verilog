@@ -177,5 +177,10 @@ bool Dep::propagate_rdeps(RDeps const& r) const
   }
 }
 /*--------------------------------------------------------------------------*/
+std::string Dep::code_name() const
+{
+  assert(_prb);
+  return _prb->code_name();
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

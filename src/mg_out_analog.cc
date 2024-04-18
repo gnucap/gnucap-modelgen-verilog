@@ -70,26 +70,26 @@ private:
 private:
 //  void make_block_int_identifier_list(std::ostream& o, ListOfBlockIntIdentifiers const& rl)const;
 //  void make_block_real_identifier_list(std::ostream& o, ListOfBlockRealIdentifiers const& rl)const;
-  void make_block_variables(std::ostream& o, AnalogDeclareVars const& rl)const;
-  void make_real_variable   (std::ostream& o, Token_VAR_REAL const& v)const;
+  void make_block_variables(std::ostream& o, Variable_List const& rl)const;
+  void make_real_variable   (std::ostream& o, Token_VAR_DECL const& v)const;
 private:
   void make_one_variable_load(std::ostream& o, Token_VAR_REF const& V, Module const& m)const;
   void make_one_variable_store(std::ostream& o, Token_VAR_REF const& V)const;
 }; // OUT_ANALOG
 /*--------------------------------------------------------------------------*/
-static void make_int_variable(std::ostream& o, Token_VAR_INT const& v)
+static void make_int_variable(std::ostream& o, Token_VAR_DECL const& v)
 {
   o__ "int _v_" << v.name() << ";\n";
 }
 /*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_real_variable(std::ostream& o, Token_VAR_REAL const& v) const
+void OUT_ANALOG::make_real_variable(std::ostream& o, Token_VAR_DECL const& v) const
 {
   // type?
   //
   if(_mode==modeSTATIC){ untested();
-    o__ "double _v_" << v.name() << "; // Token_VAR_REAL";
+    o__ "double _v_" << v.name() << "; // Token_VAR_DECL";
   }else{
-    o__ "ddouble _v_" << v.name() << "; // Token_VAR_REAL";
+    o__ "ddouble _v_" << v.name() << "; // Token_VAR_DECL";
 
     for(auto const& i : v.deps().ddeps()) { untested();
       o__ " Dep: " << i->code_name() << " lin: " << i.is_linear();
@@ -103,22 +103,28 @@ void OUT_ANALOG::make_real_variable(std::ostream& o, Token_VAR_REAL const& v) co
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_variable(std::ostream& o, Token_VAR_REF const& v) const
 {
-  if(auto r = dynamic_cast<Token_VAR_REAL const*>(&v)){
+  auto r = dynamic_cast<Token_VAR_DECL const*>(&v);
+  assert(r);
+  if(r->type().is_real()){
     make_real_variable(o, *r);
-  }else if(auto i = dynamic_cast<Token_VAR_INT const*>(&v)){
-    make_int_variable(o, *i);
+  }else if(r->type().is_int()){
+    make_int_variable(o, *r);
   }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
 // obsolete.?
 void OUT_ANALOG::make_variable(std::ostream& o, Variable_Decl const& v) const
-{ untested();
+{
+  if(v.size()){ untested();
+    incomplete();
+  }else{
+  }
   // type?
   //
   if(_mode==modeSTATIC){ untested();
     o__ "double _v_" << v.name() << "; // Variable_Decl";
-  }else{ untested();
+  }else{
     o__ "ddouble _v_" << v.name() << "; // Variable_Decl";
 
     for(auto const& i : v.deps().ddeps()) { untested();
@@ -132,9 +138,13 @@ void OUT_ANALOG::make_variable(std::ostream& o, Variable_Decl const& v) const
 }
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_block_variables(std::ostream& o,
-    AnalogDeclareVars const& rl) const
+    Variable_List const& rl) const
 {
-  for(auto v : rl.list()){
+  for(Variable_Decl const* v : rl){
+    if(v->size()){ untested();
+      incomplete();
+    }else{
+    }
     assert(v);
     make_variable(o, *v);
   }
@@ -388,11 +398,8 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
   }else if(auto assign=dynamic_cast<Assignment const*>(&ab)) { untested();
     // incomplete.
     make_assignment(o, *assign);
-  }else if(auto ard=dynamic_cast<AnalogDeclareVars const*>(&ab)) {
+  }else if(auto ard=dynamic_cast<Variable_List const*>(&ab)) {
     make_block_variables(o, *ard);
-//  }else if(auto il=dynamic_cast<ListOfBlockIntIdentifiers const*>(&ab)) { untested();
-//    incomplete();
-//    make_block_int_identifier_list(o, *il);
   }else if(auto v=dynamic_cast<Variable_Decl const*>(&ab)) { untested();
     unreachable();
     make_variable(o, *v);
@@ -467,7 +474,7 @@ void OUT_ANALOG::make_af_body(std::ostream& o, const Analog_Function& f) const
   o__ "ddouble " << me << "(0.);\n"; // type??
   o << "// args w/o dir\n";
   for(auto const& v : f.args().var_refs()) {
-    if(auto ard = dynamic_cast<Token_VAR_REAL const*>(v.second)){
+    if(auto ard = dynamic_cast<Token_VAR_DECL const*>(v.second)){
       make_variable(o, *ard);
     }else{
       trace1("non-decl vr", v.first);
@@ -477,7 +484,7 @@ void OUT_ANALOG::make_af_body(std::ostream& o, const Analog_Function& f) const
   o << "// /args w/o dir\n";
 
   for(Base const* i : f.body()) {
-    if(auto ard = dynamic_cast<AnalogDeclareVars const*>(i)){
+    if(auto ard = dynamic_cast<Variable_List const*>(i)){
       // make_stmt(o, *i);
       make_block_variables(o, *ard);
     }else if(auto st = dynamic_cast<AnalogStmt const*>(i)){
@@ -967,7 +974,7 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Token_VAR_REF&
     }else if(V.type().is_real()) {
       o__ "ddouble";
     }else{ untested();
-      unreachable();
+      assert(0); // logic error.
     }
 
     o << " " << V.code_name() << "(m->" << V.code_name() << ");\n";
@@ -1016,7 +1023,7 @@ void OUT_ANALOG::make_load_variables(std::ostream& o, const
       auto const* V = *p;
       assert(V);
       {
-	make_one_variable_load(o, *V, m);
+	make_one_variable_load(o, V->token(), m);
       }
     }
   }
@@ -1031,11 +1038,8 @@ void OUT_ANALOG::make_store_variables(std::ostream& o, const Variable_List_Colle
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
-      Token_VAR_REF const* V = *p;
-      assert(V);
-      {
-	make_one_variable_store(o, *V);
-      }
+      Token_VAR_REF const& V = (*p)->token();
+      make_one_variable_store(o, V);
     }
   }
 }
@@ -1210,7 +1214,7 @@ std::string Probe::code_name() const
     return "_flow" + _br->code_name(); // BUG. named_branch.
   }else if (_type == t_pot){
     return "_potential" + _br->code_name();
-  }else{ untested();
+  }else{
     unreachable();
     return("unreachable_probe");
   }

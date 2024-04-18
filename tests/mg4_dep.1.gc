@@ -9,7 +9,7 @@ module test_dep1(p, n);
 	electrical p, n;
 	inout p, n;
 	real i;
-	(*desc="p"*) real p;
+	(*desc="prb"*) real prb;
 	localparam real p1 = 1;
 	analog begin
 		i = 0;
@@ -20,7 +20,7 @@ module test_dep1(p, n);
 
 		real j;
 		j = i;
-		p = ddx(j, V(p,n));
+		prb = ddx(j, V(p,n));
 		I(p,n) <+ j;
 	end
 endmodule
@@ -35,7 +35,7 @@ vsource #(.dc(v)) v1(1, 0);
 
 list
 
-print dc i(v1) p(dut)
+print dc i(v1) prb(dut)
 
 dc
 end

@@ -100,10 +100,10 @@ class ConstExpression : public Owned_Base {
   Expression_ _expression;
 public:
   explicit ConstExpression() : Owned_Base() {}
-  ConstExpression(CS& f, Block* o) : Owned_Base(o) { untested();
-    set_owner(o);
-    parse(f);
-  }
+//  ConstExpression(CS& f, Block* o) : Owned_Base(o) { untested();
+//    set_owner(o);
+//    parse(f);
+//  }
   ~ConstExpression(){ untested();
   }
   void parse(CS&)override;
@@ -244,7 +244,7 @@ public:
 protected:
   Block* owner(){return _owner;}
 public:
-  void set_owner(Block* c) { _owner = c; }
+  void set_owner(Base* c) { _owner = prechecked_cast<Block*>(c); assert(_owner); }
   void parse(CS& f) override;
 };
 /*--------------------------------------------------------------------------*/
@@ -277,7 +277,7 @@ class Arg : public Base {
   String_Arg _identifier;
 public:
   Arg() { untested();}
-  void set_owner(Block*){ untested();
+  void set_owner(Base*){ untested();
     incomplete();
   }
   String_Arg const& identifier() const{ untested();return _identifier;}
@@ -497,18 +497,6 @@ inline std::string Branch_Ref::name() const
 {
   assert(_br);
   return _br->name();
-}
-/*--------------------------------------------------------------------------*/
-inline ATTRIB_LIST_p& attributes(void const* x)
-{
-  assert(CKT_BASE::_attribs);
-  return (*CKT_BASE::_attribs)[x];
-}
-/*--------------------------------------------------------------------------*/
-inline ATTRIB_LIST_p& attributes(intptr_t x)
-{ untested();
-  assert(CKT_BASE::_attribs);
-  return (*CKT_BASE::_attribs)[(void*)x];
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

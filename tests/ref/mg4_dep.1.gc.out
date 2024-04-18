@@ -1,5 +1,5 @@
 parameter v=1 
 test_dep1 #() dut (.p(1),.n(0));
 vsource #(.dc(v)) v1 (.p(1),.n(0));
-#           i(v1)      p(dut)    
+#           i(v1)      prb(dut)  
  0.        -0.99999    1.        

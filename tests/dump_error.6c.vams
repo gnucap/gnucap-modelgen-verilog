@@ -1,0 +1,9 @@
+
+`include "disciplines.vams"
+
+module test_err6c(p, n);
+	electrical p, n;
+	inout p, n;
+	real i;
+	(*desc="p"*) real p;
+endmodule
