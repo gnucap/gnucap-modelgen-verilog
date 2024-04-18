@@ -1200,10 +1200,14 @@ void make_cc_current_ports(std::ostream& o, Branch const* br, Element_2 const& e
     }else if(i->branch() == br){
       // self control is current
       o______ e.code_name() << "->set_current_port_by_index(0,\"\");\n";
+    }else if(i->branch()){
+      if(i->branch()->is_short()){ untested();
+      }else{ untested();
+	o______ e.code_name() << "->set_current_port_by_index( "<< kk << ", \"" << i->branch()->code_name() << "\");\n";
+	++kk;
+      }
     }else{
-      assert(i->branch());
-      o______ e.code_name() << "->set_current_port_by_index( "<< kk << ", \"" << i->branch()->code_name() << "\");\n";
-      ++kk;
+      untested();
     }
   }
 }
@@ -1287,7 +1291,10 @@ void Probe::make_cc_dev(std::ostream& o) const
       o____ "t = " << code_name() << "; // unnamed\n";
       o____ "t[d" << code_name() << "] = 1; // unnamed\n"; // sign?
     }
-  }else if(is_flow_probe()) {
+  }else if(_br->is_short()) { untested();
+      o______ "// short\n";
+      o______ "t = 0.;\n";
+  }else if(is_flow_probe()) { untested();
       o______ "// flow probe\n";
       o______ "t = " << code_name() << ";\n";
       o____ "t[d" << code_name() << "] = 1;\n";  // BUG?

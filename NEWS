@@ -11,6 +11,9 @@ This file summarizes new features and important changes between snapshots.
 * implement untest, retest
 * small signal noise sources and analysis
 * "mag" in ac_stim
+* variable declaration type and range parse/dump.
+* various paramset expansion and dump fixes
+* fix optimised out dependency on short branch.
 
 20240331-dev
 ============
