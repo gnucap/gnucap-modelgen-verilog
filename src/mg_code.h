@@ -85,10 +85,10 @@ class Token_PROBE; //bug?
 class Node;
 class TData;
 class Expression;
-class Variable_Decl : public Owned_Base {
+class Variable_Decl : public Expression_ {
   Data_Type _type;
 public:
-  Variable_Decl() : Owned_Base() { untested(); } // {new_deps(); }
+  Variable_Decl() : Expression_() { untested(); } // {new_deps(); }
   ~Variable_Decl();
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
@@ -99,9 +99,7 @@ public:
 protected:
   void clear_deps();
 private:
-//  TData& deps() { untested(); assert(_deps); return *_deps; }
   void new_deps();
-//  void set_type(std::string const& a){ untested();_type=a;}
 protected:
   TData* _data{NULL};
   Token_VAR_REF* _token{NULL};
@@ -125,27 +123,6 @@ protected:
   void new_var_ref();
 };
 /*--------------------------------------------------------------------------*/
-class BlockVarIdentifier : public Variable_Decl {
-public:
-  explicit BlockVarIdentifier() : Variable_Decl() { untested(); }
-public:
-  void parse(CS& cmd) override;
-  void dump(std::ostream&)const override;
-  void update();
-};
-/*--------------------------------------------------------------------------*/
-class ListOfBlockIntIdentifiers : public LiSt<BlockVarIdentifier, '\0', ',', ';'>{
-public:
-  ListOfBlockIntIdentifiers(CS& f, Block* o){ untested();
-    set_owner(o);
-    parse(f);
-    for(auto i : *this){ untested();
-      i->set_type(Data_Type_Int());
-    }
-  }
-  void dump(std::ostream&)const override;
-};
-/*--------------------------------------------------------------------------*/
 class Variable_List : public LiSt<Token_VAR_REF, '\0', ',', ';'> {
   Data_Type _type;
 public:
@@ -155,7 +132,6 @@ public:
   Variable_List* deep_copy(Block* owner, std::string prefix="") const;
 };
 /*--------------------------------------------------------------------------*/
-// class Assignment : public Expression_ ? (later)
 class Assignment : public Expression_ {
 protected: // from Variable
   TData* _data{NULL};

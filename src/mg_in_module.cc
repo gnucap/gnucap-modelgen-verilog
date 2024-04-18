@@ -321,7 +321,7 @@ void Variable_List::parse(CS& f)
       }else{
       }
       auto r = new Token_VAR_REAL(i->to_string(), data, data);
-      r->set_owner(mod);
+      r->set_owner(mod); // used in analog function
       push_back(r);
       mod->new_var_ref(r);
     }
@@ -884,7 +884,8 @@ void Variable_Decl::parse(CS& file)
   _data = new TData();
   _token = new Token_VAR_REF(name, this, _data);
   trace1("variable decl", name);
-  owner()->new_var_ref(_token);
+  incomplete();
+// owner()->new_var_ref(_token);
 }
 /*--------------------------------------------------------------------------*/
 void ValueRangeInterval::parse(CS& file)

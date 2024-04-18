@@ -68,8 +68,8 @@ private:
   void make_variable   (std::ostream& o, Token_VAR_REF const& v)const;
   void make_variable   (std::ostream& o, Variable_Decl const& v)const;
 private:
-  void make_block_int_identifier_list(std::ostream& o, ListOfBlockIntIdentifiers const& rl)const;
-  void make_block_real_identifier_list(std::ostream& o, ListOfBlockRealIdentifiers const& rl)const;
+//  void make_block_int_identifier_list(std::ostream& o, ListOfBlockIntIdentifiers const& rl)const;
+//  void make_block_real_identifier_list(std::ostream& o, ListOfBlockRealIdentifiers const& rl)const;
   void make_block_variables(std::ostream& o, AnalogDeclareVars const& rl)const;
   void make_real_variable   (std::ostream& o, Token_VAR_REAL const& v)const;
 private:
@@ -131,28 +131,10 @@ void OUT_ANALOG::make_variable(std::ostream& o, Variable_Decl const& v) const
   }
 }
 /*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_block_int_identifier_list(std::ostream& o,
-    ListOfBlockIntIdentifiers const& rl) const
-{ untested();
-  for(Variable_Decl const* v : rl){ untested();
-    assert(v);
-    make_variable(o, *v);
-  }
-}
-/*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_block_variables(std::ostream& o,
     AnalogDeclareVars const& rl) const
 {
   for(auto v : rl.list()){
-    assert(v);
-    make_variable(o, *v);
-  }
-}
-/*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_block_real_identifier_list(std::ostream& o,
-    ListOfBlockRealIdentifiers const& rl) const
-{ untested();
-  for(Variable_Decl const* v : rl){ untested();
     assert(v);
     make_variable(o, *v);
   }
@@ -232,7 +214,6 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
 	}
 
 	if(v->branch()->is_short()) {
-	// }else if(a.lhs().is_module_variable()){ untested();
 	}else{
 	  o__ lhsname << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // (2b)\n";
 	  o__ "assert(" << lhsname << "[d" << v->code_name() << "] == " << "t0[d" << v->code_name() << "]); // (2b2)\n";
@@ -991,7 +972,6 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Token_VAR_REF&
 
     o << " " << V.code_name() << "(m->" << V.code_name() << ");\n";
     o__ "(void) " << V.code_name() << ";\n";
-  // }else if(!V.is_module_variable()){ untested();
   }else if(V.type().is_int()) { untested();
     o__ "int& " << V.code_name() << "(d->" << V.code_name() << ");\n";
   }else if(V.type().is_real()) {
@@ -1010,8 +990,6 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Token_VAR_REF&
 void OUT_ANALOG::make_one_variable_store(std::ostream& o, Token_VAR_REF const& V) const
 {
   if(!V.type().is_real()) { untested();
-//  }else if(!V.is_module_variable()){ untested();
-//    unreachable();
   }else if(_mode == modePRECALC){ untested();
     o__ "// d->" << V.code_name() << " = " << V.code_name() << ";\n";
   }else if(V.deps().ddeps().size() == 0){
@@ -1037,8 +1015,6 @@ void OUT_ANALOG::make_load_variables(std::ostream& o, const
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
       auto const* V = *p;
       assert(V);
-     // if(!V->is_module_variable()){ untested();
-     // }else
       {
 	make_one_variable_load(o, *V, m);
       }
@@ -1057,8 +1033,6 @@ void OUT_ANALOG::make_store_variables(std::ostream& o, const Variable_List_Colle
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
       Token_VAR_REF const* V = *p;
       assert(V);
-     // if(!V->is_module_variable()) { untested();
-     // }else
       {
 	make_one_variable_store(o, *V);
       }

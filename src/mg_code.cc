@@ -57,7 +57,8 @@ Block const* Variable_Decl::scope() const
 void Variable_Decl::new_var_ref()
 { untested();
   assert(owner());
-  owner()->new_var_ref(this);
+  incomplete();
+//   owner()->new_var_ref(this);
 }
 /*--------------------------------------------------------------------------*/
 bool Variable_Decl::is_used_in(Base const*) const
@@ -133,12 +134,6 @@ void Statement::set_rdeps(TData const& t)
 //    return NULL;
 //  }
 //}
-/*--------------------------------------------------------------------------*/
-void BlockVarIdentifier::update()
-{ untested();
-  clear_deps();
-  new_var_ref();
-}
 /*--------------------------------------------------------------------------*/
 bool Statement::is_reachable() const
 { untested();

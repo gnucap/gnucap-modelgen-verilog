@@ -1,6 +1,6 @@
 /*                             -*- C++ -*-
  * Copyright (C) 2001, 2023 Albert Davis
- *               2023 Felix Salfelder
+ *               2023, 2024 Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -493,19 +493,6 @@ private:
   bool update()override;
   void add_dep(Dep const&);
 }; // Contribution
-/*--------------------------------------------------------------------------*/
-class ListOfBlockRealIdentifiers : public LiSt<BlockVarIdentifier, '\0', ',', ';'>{
-public:
-  ListOfBlockRealIdentifiers() { untested();}
-  ListOfBlockRealIdentifiers(CS& f, Block* o){ untested();
-    set_owner(o);
-    parse(f);
-    for(auto i : *this){ untested();
-      i->set_type(Data_Type_Real());
-    }
-  }
-  void dump(std::ostream&)const override;
-};
 /*--------------------------------------------------------------------------*/
 // VarDeclStmt? code?
 class AnalogDeclareVars : public AnalogStmt {

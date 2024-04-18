@@ -243,36 +243,6 @@ Branch_Ref Module::lookup_branch(std::string const& p) const
   return _circuit->branches().lookup(p);
 }
 /*--------------------------------------------------------------------------*/
-#if 0
-Branch_Ref const& Branch_Names::new_name(std::string const& n, Branch_Ref const& r)
-{ untested();
-  Branch_Ref& j = _m[n];
-  if(j){ untested();
-    throw Exception("Branch " + n + " already defined\n");
-  }else{ untested();
-    j = r;
-    j.set_name(n);
-    return j;
-  }
-}
-#endif
-/*--------------------------------------------------------------------------*/
-// void Branch_Names::clear()
-// { untested();
-//   _m.clear();
-// }
-// /*--------------------------------------------------------------------------*/
-// Branch_Ref const& Branch_Names::lookup(std::string const& p) const
-// { untested();
-//   static Branch_Ref none;
-//   const_iterator i = _m.find(p);
-//   if(i == _m.end()){ untested();
-//     return none;
-//   }else{ untested();
-//     return i->second;
-//   }
-// }
-/*--------------------------------------------------------------------------*/
 void Filter::new_deps()
 {
   assert(!_deps);
@@ -618,8 +588,6 @@ std::string Variable_Decl::code_name() const
     return "_v_" + name();
   }else if(is_int()){ untested();
     return "_v_" + name();
-//  }else if(is_module_variable()){ untested();
-//    return "d->_v_" + name();
   }else{ untested();
     return "_v_" + name();
   }

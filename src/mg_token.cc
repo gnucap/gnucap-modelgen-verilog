@@ -1022,12 +1022,6 @@ TData const& Token_VAR_REF::deps() const
   return *d;
 }
 /*--------------------------------------------------------------------------*/
-bool Token_VAR_REF::is_module_variable() const
-{ itested();
-    // unreachable(); // fix later.
-    return false;
-}
-/*--------------------------------------------------------------------------*/
 Data_Type const& Token_VAR_REF::type() const
 {
   if(auto it=dynamic_cast<Assignment const*>(_item)){

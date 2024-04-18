@@ -927,26 +927,6 @@ void AnalogCtrlBlock::parse(CS& f)
   }
 }
 /*--------------------------------------------------------------------------*/
-// Variable_Decl::parse?
-void BlockVarIdentifier::parse(CS& file)
-{ untested();
-  assert(owner());
-  assert(!_data);
-  assert(!_token);
-  std::string name;
-  file >> name;
-
-  _data = new TData();
-  _token = new Token_VAR_REF(name, this, _data);
-  trace1("variable decl", name);
-  owner()->new_var_ref(_token);
-}
-/*--------------------------------------------------------------------------*/
-void BlockVarIdentifier::dump(std::ostream& o)const
-{ untested();
-  o << name();
-}
-/*--------------------------------------------------------------------------*/
 void AnalogConstruct::dump(std::ostream& o)const
 {
   o__ "analog ";
@@ -1699,20 +1679,28 @@ void Analog_Function::parse(CS& f)
   _function = new AF(this);
 }
 /*--------------------------------------------------------------------------*/
-Base* AnalogFunctionBody::lookup(std::string const& f, bool recurse)
+Base* AnalogFunctionBody::lookup(std::string const& k, bool recurse)
 {
-  Base* b = AnalogCtrlBlock::lookup(f, recurse);
-  if(auto t = dynamic_cast<Token_VAR_REF const*>(b)){
-    if(t->is_module_variable()) {
+  Base* b = AnalogCtrlBlock::lookup(k, false);
+  if(b){
+    return b;
+  }else if(recurse){
+    assert(scope());
+    assert(scope() != this);
+    b = scope()->lookup(k, true);
+
+    if(dynamic_cast<Token_VAR_REF const*>(b)){
       // module variables are not allowed here.
       return NULL;
+    }else if(dynamic_cast<Token_NODE const*>(b)){ untested();
+      // nodes not allowed here.
+      return NULL;
     }else{
+      return b;
     }
-  }else if(dynamic_cast<Token_NODE const*>(b)){ untested();
-    // nodes not allowed here.
+  }else{
     return NULL;
   }
-  return b;
 }
 /*--------------------------------------------------------------------------*/
 void VariableList::dump(std::ostream& o) const

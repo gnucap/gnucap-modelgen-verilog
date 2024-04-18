@@ -216,7 +216,7 @@ public:
     o << ")\n{\n";
     {
       indent x;
-      std::string cn = _br->code_name();
+//      std::string cn = _br->code_name();
       o__ "(void)what;\n";
 
       o__ "COMPONENT* l = _d->" << cn << ";\n";

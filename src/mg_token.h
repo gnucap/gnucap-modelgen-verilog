@@ -394,7 +394,6 @@ public:
   virtual Token_VAR_REF* deep_copy(Base* owner, std::string prefix="")const;
 public:
   void stack_op(Expression* e)const override;
-  virtual bool is_module_variable()const;
   Base const* operator->() const{ return _item; }
   virtual Data_Type const& type()const;
   bool propagate_deps(Token_VAR_REF const&);
@@ -415,32 +414,34 @@ private:
 // class Token_VAR_DECL : public Token_VARIABLE
 class Token_VAR_REAL : public Token_VAR_REF {
   Block const* _owner{NULL};
+  Base const* _default{0};
   // type //
 public:
   explicit Token_VAR_REAL() : Token_VAR_REF("",NULL,NULL) { untested();unreachable();}
   explicit Token_VAR_REAL(std::string Name, Base* item, Base const* data)
     : Token_VAR_REF(Name, item, data) {}
   Token_VAR_REAL* deep_copy(Base* owner, std::string prefix)const override;
+  ~Token_VAR_REAL() { delete _default; }
   Data_Type const& type()const override;
 
   void set_owner(Block const* b){_owner = b;}
-  bool is_module_variable()const override{
-    return _owner;
-  }
   std::string key() const { untested();unreachable();return "";}
 
   void clear_deps();
   void stack_op(Expression* e)const override;
 
   void dump(std::ostream& o)const override;
+  void set_default(Base const* x) { assert(!_default); _default=x; }
 };
 /*--------------------------------------------------------------------------*/
 // class Token_VAR_DECL : public Token_VAR_REF
 class Token_VAR_INT : public Token_VAR_REF {
+  Base const* _default{0};
 public:
   explicit Token_VAR_INT() : Token_VAR_REF("",NULL,NULL) { untested();unreachable();}
   explicit Token_VAR_INT(std::string Name, Base* item, Base const* data)
     : Token_VAR_REF(Name, item, data) {}
+  ~Token_VAR_INT() { delete _default; }
   Data_Type const& type()const override;
 
   void set_owner(Base*){ untested();unreachable();}
@@ -450,7 +451,9 @@ public:
   void stack_op(Expression* e)const override;
 
   void dump(std::ostream& o)const override;
+  void set_default(Base const* x) { assert(!_default); _default=x; }
 };
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet
