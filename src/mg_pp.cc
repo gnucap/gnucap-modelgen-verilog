@@ -282,7 +282,7 @@ void Pragma::parse(CS& f)
 }
 /*--------------------------------------------------------------------------*/
 /*
-The following compiler directives are supported:
+The following compiler directives are supported:untested();
 - `begin_keywords[1364-2005]
 - `celldefine[1364-2005]
 - `default_discipline[10.2]

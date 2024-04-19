@@ -78,7 +78,7 @@ private:
 }; // OUT_ANALOG
 /*--------------------------------------------------------------------------*/
 static void make_int_variable(std::ostream& o, Token_VAR_DECL const& v)
-{
+{ untested();
   o__ "int _v_" << v.name() << ";\n";
 }
 /*--------------------------------------------------------------------------*/
@@ -107,7 +107,7 @@ void OUT_ANALOG::make_variable(std::ostream& o, Token_VAR_REF const& v) const
   assert(r);
   if(r->type().is_real()){
     make_real_variable(o, *r);
-  }else if(r->type().is_int()){
+  }else if(r->type().is_int()){ untested();
     make_int_variable(o, *r);
   }else{ untested();
   }
@@ -1206,7 +1206,7 @@ void make_cc_current_ports(std::ostream& o, Branch const* br, Element_2 const& e
 	o______ e.code_name() << "->set_current_port_by_index( "<< kk << ", \"" << i->branch()->code_name() << "\");\n";
 	++kk;
       }
-    }else{
+    }else{ untested();
       untested();
     }
   }
@@ -1218,7 +1218,7 @@ std::string Probe::code_name() const
     return "_flow" + _br->code_name(); // BUG. named_branch.
   }else if (_type == t_pot){
     return "_potential" + _br->code_name();
-  }else{
+  }else{ untested();
     unreachable();
     return("unreachable_probe");
   }

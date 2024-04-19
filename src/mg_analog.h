@@ -267,7 +267,7 @@ class AnalogConstExpression : public AnalogExpression {
 public:
 //  void parse(CS& file) override;
 //  void dump(std::ostream& o)const override;
-  String_Arg key() const{return String_Arg("ACE");}
+  String_Arg key() const{ untested();return String_Arg("ACE");}
 };
 typedef LiSt<AnalogConstExpression, '\0', ',', ':'> AnalogConstExpressionList;
 /*--------------------------------------------------------------------------*/
@@ -502,13 +502,13 @@ class AnalogDeclareVars : public AnalogStmt {
   list_t _l;
   TData _deps;
 public:
-  explicit AnalogDeclareVars(CS& f, Block* o){
+  explicit AnalogDeclareVars(CS& f, Block* o){ untested();
     set_owner(o);
     parse(f);
   }
   void parse(CS& f)override;
   void dump(std::ostream& o)const override;
-  list_t const& list() const{
+  list_t const& list() const{ untested();
     return _l;
   }
 

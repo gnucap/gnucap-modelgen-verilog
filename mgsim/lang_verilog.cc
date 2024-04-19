@@ -660,7 +660,7 @@ void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
   print_ports_short(o, x);
   o << ";\n";
 //  auto p = x->subckt()->params();
-//  for(auto i: *p){
+//  for(auto i: *p){ untested();
 //    o << "  parameter " << i.first << " = " << i.second << ";\n";
 //  }
   print_items_sckt(o, x);

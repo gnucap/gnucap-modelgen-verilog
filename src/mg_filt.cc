@@ -164,11 +164,11 @@ public:
   }
   Probe const* prb()const {return _prb;}
 #if 0
-  void set_n_to_gnd()const {
+  void set_n_to_gnd()const { untested();
     assert(_m);
     _m->set_to_ground(_br->n());
   }
-  void set_p_to_gnd()const {
+  void set_p_to_gnd()const { untested();
     assert(_m);
     _m->set_to_ground(_br->p());
   }

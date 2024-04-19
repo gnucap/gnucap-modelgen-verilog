@@ -31,7 +31,7 @@
 /*--------------------------------------------------------------------------*/
 
 /* So analog initial block shall not contain the fol-
-lowing statements:
+lowing statements:untested();
 —statements with access functions or analog operators;
 —contribution statements;
 —event control statements.
@@ -943,7 +943,7 @@ void Assignment::dump(std::ostream& o) const
   if(_token){
     o << _token->name() << " = ";
     Expression_::dump(o);
-  }else{
+  }else{ untested();
 //    o << "/// unreachable?\n";
   }
 }
@@ -1451,7 +1451,7 @@ void AnalogCtrlBlock::dump(std::ostream& o)const
       }
       if(size()){
 	SeqBlock::dump(o);
-      }else{
+      }else{ untested();
       }
     }
   }else{

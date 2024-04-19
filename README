@@ -16,8 +16,8 @@ grant agreement No 101069594. See https://nlnet.nl/project/Gnucap-VerilogAMS/
 
 == Preliminaries
 
-Build with "make", requires Gnucap from the same date, or latest since.
-Generally develop branch may only work with Gnucap develop branch.
+Modelgen-verilog snapshots require Gnucap tagged at the same date, or latest
+since. Generally develop branch may only work with Gnucap develop branch.
 
 == Build instructions
 
@@ -87,7 +87,7 @@ gnucap> [..]
 - -D defines a symbol. Assign a value with -D"VARIABLE value"..
 - -o sets output path.
 - Files are located following logic from gcc implementation.
-- Output is sent to standard out, unless -o is specified.
+- Output is sent to standard out, unless -o is specified earlier.
 
 == Language plugin note
 

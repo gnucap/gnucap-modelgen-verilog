@@ -49,14 +49,14 @@ FPOLY1 integrate(const FPOLY1* q, const FPOLY1* i, double* time,
     trace3("integrate", dt, q[0].x,  i[0].x);
 
     switch (method) {
-    case mTRAPGEAR:
+    case mTRAPGEAR:untested();
       incomplete();
       // fall through
-    case mGEAR:
+    case mGEAR:untested();
       assert(OPT::_keep_time_steps >= 3);
       incomplete();
       // fall through
-    case mTRAPEULER:
+    case mTRAPEULER:untested();
       incomplete();
       // fall through
     case mEULER:

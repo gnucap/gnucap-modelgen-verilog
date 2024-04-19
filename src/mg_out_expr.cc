@@ -290,7 +290,7 @@ public:
       assert(_str_idx>-1);
       --_str_idx;
       break;
-    default:
+    default:untested();
       unreachable();
     }
     _types.pop();
@@ -390,7 +390,7 @@ public:
     assert(!_args.empty());
     _args.pop();
   }
-  size_t size() const{
+  size_t size() const{ untested();
     return _refs.size();
   }
   std::string code_name() const{
@@ -406,7 +406,7 @@ public:
       return "s" + std::to_string(_str_idx);
     case t_ref:
       return _refs.top();
-    default:
+    default:untested();
       unreachable();
       return "";
     }

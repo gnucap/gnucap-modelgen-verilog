@@ -56,7 +56,7 @@ Block const* Variable_Decl::scope() const
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::new_var_ref()
-{
+{ untested();
   incomplete();
 }
 void Variable_Decl::new_var_ref_()
@@ -71,7 +71,7 @@ void Variable_Decl::new_var_ref_()
     m->new_var_ref(_token);
   }else if(auto b = dynamic_cast<Block*>(l->scope())){
     b->new_var_ref(_token);
-  }else{
+  }else{ untested();
     unreachable();
   }
 }

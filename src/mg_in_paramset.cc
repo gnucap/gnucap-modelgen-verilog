@@ -108,7 +108,7 @@ CS& Paramset::parse_stmt(CS& f)
 - | hierarchical_parameter_identifier
 - | unary_operator { attribute_instance } constant_primary
 - | paramset_constant_expression binary_operator { attribute_instance } paramset_constant_expression
-- | paramset_constant_expression ? { attribute_instance } paramset_constant_expression :
+- | paramset_constant_expression ? { attribute_instance } paramset_constant_expression :untested();
 - paramset_constant_expression
 */
 /*--------------------------------------------------------------------------*/

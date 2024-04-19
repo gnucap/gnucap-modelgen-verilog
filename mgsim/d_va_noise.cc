@@ -141,7 +141,7 @@ public: // make noise
   }
   XPROBE ac_probe_ext(std::string const&)const override;
   double tr_probe_num(std::string const&n)const override {
-//    if(n=="loss"){
+//    if(n=="loss"){ untested();
 //      return _loss0;
 //    }
     auto cc = prechecked_cast<COMMON_NOISE const*>(common());
@@ -293,7 +293,7 @@ private: // override virtual
 //    incomplete();
 //  }
 //  bool is_valid()const;
-  //int param_count()const override {
+  //int param_count()const override { untested();
   //        return 1 + ELEMENT::param_count();
   //}
   int max_nodes()const override	{return 2;}

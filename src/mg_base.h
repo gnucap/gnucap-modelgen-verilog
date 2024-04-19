@@ -74,7 +74,7 @@ public:
   using List_Base<T>::end;
 private:
   void parse(CS&) override { untested();unreachable();}
-  void dump(std::ostream& f)const override{f << "XX";}
+  void dump(std::ostream& f)const override{ untested();f << "XX";}
 public:
   typedef typename List_Base<T>::const_iterator const_iterator;
 
@@ -162,7 +162,7 @@ protected:
 	TT* p = new TT;
 	p->set_owner(owner());
 	file >> *p;
-	if (file.stuck(&here)) {
+	if (file.stuck(&here)) { untested();
 	  delete p;
 	  file.warn(0, "not valid here");
 	  break;
@@ -178,7 +178,7 @@ protected:
     }
   }
 protected: // base class?
-  bool has_attributes() const{
+  bool has_attributes() const{ untested();
     assert(CKT_BASE::_attribs);
     return CKT_BASE::_attribs->count(this);
   }
@@ -405,7 +405,7 @@ public:
   void set_never() { _reachable = r_never; }
   virtual bool new_var_ref(Base* what);
   void clear_vars();
-//  void dump(std::ostream& f)const override{f << "???";}
+//  void dump(std::ostream& f)const override{ untested();f << "???";}
 
   virtual Node* new_node(std::string const& p){ untested();
     assert(_owner);
@@ -440,7 +440,7 @@ public:
   }
 #endif
 
-  // void set_owner_raw(Statement* b) {
+  // void set_owner_raw(Statement* b) { untested();
   //   _owner = (Base*)(b);
   // }
   void set_owner_raw(Base* b) {
@@ -518,7 +518,7 @@ public:
   const std::string& final_default()const	{ untested();return _final_default;}
   bool		positive()const			{ untested();return _positive;}
   bool		octal()const			{ untested();return _octal;}
-  String_Arg key()const { return String_Arg(_name); }
+  String_Arg key()const { untested(); return String_Arg(_name); }
 
 #if 0
   // needed?
@@ -529,7 +529,7 @@ public:
     }
   }
 #endif
-  //void set_owner(Block* c) { _owner = c; }
+  //void set_owner(Block* c) { untested(); _owner = c; }
   void set_owner(Base* c) { _owner = prechecked_cast<Block*>(c); assert(_owner); }
   std::string const& name() const{ return _name; }
   bool operator!=(const std::string& s)const {return _name != s;}

@@ -1040,7 +1040,7 @@ Data_Type const& Token_VAR_REF::type() const
 /*--------------------------------------------------------------------------*/
 bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
 {
-  if(auto dd=dynamic_cast<TData*>(_item)){
+  if(auto dd=dynamic_cast<TData*>(_item)){ untested();
     TData const& incoming = from.deps();
     dd->update(incoming);
     assert(deps().ddeps().size() >= incoming.ddeps().size());
@@ -1078,8 +1078,8 @@ Block const* Token_VAR_REF::scope() const
 /*--------------------------------------------------------------------------*/
 #if 0
 void Token_VAR_REAL::clear_deps()
-{
-  if(auto it=dynamic_cast<TData*>(_item)){
+{ untested();
+  if(auto it=dynamic_cast<TData*>(_item)){ untested();
     it->clear();
   }else{ untested();
     assert(false);
@@ -1087,7 +1087,7 @@ void Token_VAR_REAL::clear_deps()
 }
 /*--------------------------------------------------------------------------*/
 Data_Type const& Token_VAR_REAL::type() const
-{
+{ untested();
   static Data_Type_Real t;
   return t;
 };
@@ -1137,7 +1137,7 @@ void Token_VAR_DECL::stack_op(Expression* e)const
 /*--------------------------------------------------------------------------*/
 #if 0
 void Token_VAR_REAL::stack_op(Expression* e)const
-{
+{ untested();
   auto E = prechecked_cast<Expression_*>(e);
   assert(E);
   auto xx = dynamic_cast<Statement*>(E->owner());
@@ -1148,13 +1148,13 @@ void Token_VAR_REAL::stack_op(Expression* e)const
   auto oi = prechecked_cast<TData const*>(_item);
   assert(oi);
 
-  {
+  { untested();
     TData* nd = NULL;
     if(auto a = dynamic_cast<Assignment const*>(_item)){ untested();
       nd = a->data().clone();
 //      nd->add_sens(_item); not yet.
       trace3("var::stackop a", name(), nd->size(), deps().size());
-    }else if(auto dd = dynamic_cast<TData const*>(data())){
+    }else if(auto dd = dynamic_cast<TData const*>(data())){ untested();
       nd = dd->clone();
 //      nd->add_sens(_item); not yet.
     }else{ untested();
@@ -1202,30 +1202,30 @@ void Token_VAR_INT::stack_op(Expression* e)const
 #endif
 /*--------------------------------------------------------------------------*/
 void Token_VAR_DECL::dump(std::ostream& o) const
-{
+{ untested();
   incomplete();
   o << name();
-  if(!options().dump_annotate()){
-  }else if(deps().ddeps().size()){
-    for(auto d : deps().ddeps()){
+  if(!options().dump_annotate()){ untested();
+  }else if(deps().ddeps().size()){ untested();
+    for(auto d : deps().ddeps()){ untested();
       o << "// dep " << d->code_name();
     }
     o << "\n";
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
 #if 0
 void Token_VAR_REAL::dump(std::ostream& o) const
-{
+{ untested();
   o << name();
-  if(!options().dump_annotate()){
-  }else if(deps().ddeps().size()){
-    for(auto d : deps().ddeps()){
+  if(!options().dump_annotate()){ untested();
+  }else if(deps().ddeps().size()){ untested();
+    for(auto d : deps().ddeps()){ untested();
       o << "// dep " << d->code_name();
     }
     o << "\n";
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1236,7 +1236,7 @@ Data_Type const& Token_VAR_INT::type() const
 };
 /*--------------------------------------------------------------------------*/
 void Token_VAR_INT::dump(std::ostream& o) const
-{
+{ untested();
   o << name();
 }
 #endif
@@ -1289,8 +1289,8 @@ bool Token_VAR_REF::is_used() const
 /*--------------------------------------------------------------------------*/
 #if 0
 Token_VAR_REAL* Token_VAR_REAL::deep_copy(Base* /*owner*/, std::string prefix)const
-{
-  if(dynamic_cast<TData const*>(_item)) {
+{ untested();
+  if(dynamic_cast<TData const*>(_item)) { untested();
     auto cl = new TData;
     auto n = new Token_VAR_REAL(prefix + name(), cl, cl);
     attributes(n) = attributes(this);
@@ -1303,9 +1303,9 @@ Token_VAR_REAL* Token_VAR_REAL::deep_copy(Base* /*owner*/, std::string prefix)co
 #endif
 /*--------------------------------------------------------------------------*/
 // Token_VAR_DECL* Token_VAR_DECL::deep_copy(Variable_Decl* owner, std::string prefix)const
-// {
+// { untested();
 //   unreachable();
-//   if(dynamic_cast<TData const*>(_item)) {
+//   if(dynamic_cast<TData const*>(_item)) { untested();
 //     auto cl = new TData;
 //     auto n = new Token_VAR_DECL(prefix + name(), owner, cl);
 //     attributes(n) = attributes(this);

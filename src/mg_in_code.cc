@@ -81,9 +81,9 @@ void Variable_List::parse(CS& f)
     throw Exception_CS_("What type? " + t, f);
   }
 
-//  if( f >> "[" ){
+//  if( f >> "[" ){ untested();
 //    incomplete();
-//  }else{
+//  }else{ untested();
 //  }
 
   _l.set_owner(this);

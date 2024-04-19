@@ -420,19 +420,19 @@ class Token_VAR_REAL : public Token_VAR_REF {
 public:
   explicit Token_VAR_REAL() : Token_VAR_REF("",NULL,NULL) { untested();unreachable();}
   explicit Token_VAR_REAL(std::string Name, Base* item, Base const* data)
-    : Token_VAR_REF(Name, item, data) {}
+    : Token_VAR_REF(Name, item, data) { untested();}
   Token_VAR_REAL* deep_copy(Base* owner, std::string prefix)const override;
-  ~Token_VAR_REAL() { delete _default; }
+  ~Token_VAR_REAL() { untested(); delete _default; }
   Data_Type const& type()const override;
 
-  void set_owner(Block const* b){_owner = b;}
+  void set_owner(Block const* b){ untested();_owner = b;}
   std::string key() const { untested();unreachable();return "";}
 
   void clear_deps();
   void stack_op(Expression* e)const override;
 
   void dump(std::ostream& o)const override;
-  void set_default(Base const* x) { assert(!_default); _default=x; }
+  void set_default(Base const* x) { untested(); assert(!_default); _default=x; }
 };
 /*--------------------------------------------------------------------------*/
 // class Token_VAR_DECL : public Token_VAR_REF
@@ -441,8 +441,8 @@ class Token_VAR_INT : public Token_VAR_REF {
 public:
   explicit Token_VAR_INT() : Token_VAR_REF("",NULL,NULL) { untested();unreachable();}
   explicit Token_VAR_INT(std::string Name, Base* item, Base const* data)
-    : Token_VAR_REF(Name, item, data) {}
-  ~Token_VAR_INT() { delete _default; }
+    : Token_VAR_REF(Name, item, data) { untested();}
+  ~Token_VAR_INT() { untested(); delete _default; }
   Data_Type const& type()const override;
 
   void set_owner(Base*){ untested();unreachable();}
@@ -452,7 +452,7 @@ public:
   void stack_op(Expression* e)const override;
 
   void dump(std::ostream& o)const override;
-  void set_default(Base const* x) { assert(!_default); _default=x; }
+  void set_default(Base const* x) { untested(); assert(!_default); _default=x; }
 };
 #endif
 /*--------------------------------------------------------------------------*/
@@ -466,17 +466,17 @@ public:
   explicit Token_VAR_DECL(std::string Name, Base* item, Base const* data)
     : Token_VAR_REF(Name, item, data) {}
   // Token_VAR_DECL* deep_copy(Base* owner, std::string prefix)const override;
-  ~Token_VAR_DECL() { delete _default; }
+  ~Token_VAR_DECL() { untested(); delete _default; }
   Data_Type const& type()const override;
 
-//  void set_owner(Variable_List* b){_item = b;}
+//  void set_owner(Variable_List* b){ untested();_item = b;}
   std::string key() const { untested();unreachable();return "";}
 
   void clear_deps();
   void stack_op(Expression* e)const override;
 
   void dump(std::ostream& o)const override;
-  void set_default(Base const* x) { assert(!_default); _default=x; }
+  void set_default(Base const* x) { untested(); assert(!_default); _default=x; }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

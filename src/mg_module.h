@@ -67,7 +67,7 @@ public:
   ValueRangeSpec const* spec() const{ return _what; }
   double eval()const;
 
-  String_Arg key()const { return String_Arg("ValueRange"); }
+  String_Arg key()const { untested(); return String_Arg("ValueRange"); }
 };
 typedef LiSt<ValueRange, '\0', '\0', '\0', ',', ';'> ValueRangeList;
 class Aliasparam;

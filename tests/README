@@ -8,6 +8,19 @@ $ make check TESTSELECT=dump # will only test "dump*"
 Desired output is stored in ref, actual output will be in check/*.out
 See check/${TESTSELECT}.diffs for results (no diff == good).
 
-== run old test script (untested)
+== Code coverage testing
 
-$ ./test ../gnucap-verilog '' check ref
+Test coverage is computed following this protocol, see [1] for more
+background.
+
+- Places "untested calls" at each test hook.
+  There is an "untest" target in the top level Makefile.
+
+- Compile the program with CPPFLAGS=-DTRACE_UNTESTED.
+
+- Edit out the "untested" calls that are reached by the tests.
+
+More automation is currently under test. The intent is to retest after every
+change before committing.
+
+[1] http://gnucap.org/dokuwiki/doku.php/gnucap:manual:tech:code_coverage_testing?s[]=testing

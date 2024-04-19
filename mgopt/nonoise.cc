@@ -33,23 +33,23 @@ namespace{
 /*--------------------------------------------------------------------------*/
 class STUB : public MGVAMS_FUNCTION {
 public:
-  explicit STUB(std::string const l) : MGVAMS_FUNCTION() {
+  explicit STUB(std::string const l) : MGVAMS_FUNCTION() { untested();
     set_label(l);
   }
   ~STUB() { }
 private:
-  std::string code_name()const override{
-    if(label()!=""){
+  std::string code_name()const override{ untested();
+    if(label()!=""){ untested();
       return "";
-    }else{
+    }else{ untested();
       return "va::" + label();
     }
   }
-  std::string eval(CS&, const CARD_LIST*)const override {
+  std::string eval(CS&, const CARD_LIST*)const override { untested();
 	  unreachable();
 	  return "AAA";
   }
-  void make_cc_common(std::ostream& o)const override {
+  void make_cc_common(std::ostream& o)const override { untested();
     o << "// dummy " << label() << "\n";
   }
 };

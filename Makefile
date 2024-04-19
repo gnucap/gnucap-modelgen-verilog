@@ -26,13 +26,16 @@ patch:
 check-git:
 	[ -d .git ]
 
-untest_exclude = \(extern\)\|\(switch\)\|\(enum\)\|\(union\)\|\(constexpr\)\|\(struct\)\|\(class\)\|\(namespace\)\|\(untested\)\|\(itested\)
+untest_exclude = \(\[\]\)\|\(extern\)\|\(switch\)\|\(enum\)\|\(union\)\|\(constexpr\)\|\(struct\)\|\(class\)\|\(namespace\)\|\(untested\)\|\(itested\)
+colon_exclude = \(public\)\|\(protected\)\|\(private\)\|\(vim\)\|\(::$$\)\|\(\/\/.*:\)\|\(^.\*\)\|\(explicit\)
 
 # place test calls at test hooks
 untest:
 	sed -i '/${untest_exclude}/!s/{$$/{ untested();/' */*.cc
 	sed -i '/${untest_exclude}/!s/{$$/{ untested();/' */*.h
 	sed -i '/tested/!s/{\(.*\)}$$/{ untested();\1}/' */*.h
+	sed -i '/${colon_exclude}/!s/:$$/:untested();/' */*.cc
+	sed -i '/{[[:space:]]\/\*.*\*\/$$/s/{/{untested();/' */*.cc
 
 .PRECIOUS: retest.log
 .PHONY: check-git retest.subs retest.log

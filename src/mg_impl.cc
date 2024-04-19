@@ -985,7 +985,7 @@ void Branch::dereg_stmt(AnalogStmt const* r)
 //}
 #if 0
 Block* Owned_Base::scope()const
-{
+{ untested();
   if(auto b = dynamic_cast<Block*>(_owner)) { untested();
     return b;
   }else if(auto o = dynamic_cast<Owned_Base*>(_owner)) { untested();
@@ -998,7 +998,7 @@ Block* Owned_Base::scope()const
   }
 }
 Block* Owned_Base::owner()
-{
+{ untested();
   if(auto b = dynamic_cast<Block*>(_owner)) { untested();
     return b;
   }else if(auto o = dynamic_cast<Owned_Base*>(_owner)) { untested();
@@ -1009,7 +1009,7 @@ Block* Owned_Base::owner()
   }
 }
 Block const* Owned_Base::owner()const
-{
+{ untested();
   if(auto b = dynamic_cast<Block*>(_owner)) { untested();
     return b;
   }else if(auto o = dynamic_cast<Owned_Base*>(_owner)) { untested();

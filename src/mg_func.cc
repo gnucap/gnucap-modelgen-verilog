@@ -114,7 +114,7 @@ void MGVAMS_FILTER::setup(Module* m)
       }else if(dynamic_cast<Branch const*>(b)){
 	rdeps = true;
 	// covered by rdeps?
-      }else if(dynamic_cast<Variable_List_Collection const*>(b)){
+      }else if(dynamic_cast<Variable_List_Collection const*>(b)){ untested();
       }else{untested();
 	trace1("xdt unknown?", c_cnt);
 	assert(0);

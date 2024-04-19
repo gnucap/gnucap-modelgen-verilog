@@ -105,7 +105,7 @@ private:
   void new_deps();
   void new_data();
 public:
-  String_Arg key()const { return String_Arg(name()); }
+  String_Arg key()const { untested(); return String_Arg(name()); }
 //  void set_type(Data_Type d){ untested(); _type=d; }
   bool is_real()const { untested(); return type().is_real(); }
   bool is_int()const { untested(); return type().is_int(); }
@@ -145,7 +145,7 @@ public:
   void dump(std::ostream& f)const override;
   Variable_List* deep_copy_(Block* owner, std::string prefix="") const;
   bool is_used_in(Base const*)const override;
-//  void set_owner(Block* b){ Statement::set_owner(b); }
+//  void set_owner(Block* b){ untested(); Statement::set_owner(b); }
   const_iterator begin()const { return _l.begin(); }
   const_iterator end()const { return _l.end(); }
   Variable_List* deep_copy(Base*)const override

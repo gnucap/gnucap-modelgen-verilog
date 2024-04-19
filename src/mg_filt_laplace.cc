@@ -105,7 +105,7 @@ public:
     assert(_m);
     return MGVAMS_FILTER::set_n_to_gnd(_m);
   }
-  void set_p_to_gnd()const {
+  void set_p_to_gnd()const { untested();
     assert(_m);
     return MGVAMS_FILTER::set_p_to_gnd(_m);
   }

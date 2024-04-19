@@ -1,21 +1,20 @@
 == modelgen vams extensions
 
-Semantics and code generation for functions and tasks
+Semantics and code generation for functions and tasks.
+Some of them are not here, but still in ../src.
 
 (parenthesized: not yet)
 
 - A.8.2 Function calls
   - ln, log.. (see Table 9-11)
-  - ddt
-  - ddx
-  - idt
+  - ac_stim
+  - ddt, ddx, idt
   - limexp
   - slew
-  - (laplace_*)
-  - (zi_*)
-  - (white_noise)
-  - potential
-  - flow
+  - laplace_*, zi_*
+  - white_noise, flicker_noise
+  - (noise_table, noise_table_log)
+  - potential, flow
   - ..
 - Syntax 9-1 -- Display Tasks
   - $strobe
@@ -35,6 +34,9 @@ Semantics and code generation for functions and tasks
   - $time
   - ($stime)
   - ($abstime)
+- Table 9-10 -- Probabilistic
+  - ($random)
+  - ($arandom)
 - Table 9-11 -- Math system functions
   - atan
   - exp
@@ -46,6 +48,12 @@ Semantics and code generation for functions and tasks
   - $vt
   - $simparam
   - ($simparam$str)
+- Table 9-13 -- Dynamic simulation probe
+  - $simprobe
+- Table 9-14 -- Analog kernel control
+  - ($discontinuity)
+  - $limit
+  - $bound_step
 - Table 9-15 -- Hierarchical parameter system functions
   - $mfactor
   - ($xposition)

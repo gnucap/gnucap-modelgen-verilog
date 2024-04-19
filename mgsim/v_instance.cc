@@ -789,8 +789,8 @@ class CLEANUP : public CMD {
       // unreachable(); // call from DETACH_HACK
       exit(0);
       break;
-    case rINTERACTIVE:
-    case rSCRIPT:
+    case rINTERACTIVE:untested();
+    case rSCRIPT:untested();
     case rBATCH:        command("clear", Scope); exit(0); break;
     case rPRESET:       untested(); /*nothing*/ break;
     }
