@@ -1,0 +1,38 @@
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_zi_nd1(p, n);
+	(* desc="" *) real dv1;
+	(* desc="" *) real dv2;
+	(* desc="" *) real dv3;
+	(* desc="" *) real dv4;
+	(* desc="" *) real dv5;
+	electrical p, n;
+	analog begin
+		dv1 =       zi_nd(V(p) - V(n), '{1}, '{1,2}, .2, .01);
+		dv2 = - 2 * zi_nd(V(n) - V(p), '{1}, '{1,2}, .2, .01);
+		dv3 = - 3 * zi_nd(-V(p,n), '{1}, '{1,2}, .2, .01);
+		dv4 = - 4 * zi_nd(V(p,n), '{1}, '{-1,-2}, .2, .01);
+		dv5 = - 5 * zi_nd(-V(n,p), '{-1}, '{1,2}, .2, .01);
+	end
+endmodule
+
+!make test_zi_nd1.so > /dev/null
+attach ./test_zi_nd1.so
+
+verilog
+parameter r=1
+parameter v=0
+
+test_zi_nd1 #() dut(1,0);
+vsine #(.dc(v), .ampl(1)) v1(1, 0);
+
+list
+
+print tran v(1) dv1(dut) dv2(dut) dv3(dut) dv4(dut) dv5(dut)
+tran 1 trace=a
+status notime
+end

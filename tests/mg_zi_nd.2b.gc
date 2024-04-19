@@ -1,0 +1,35 @@
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_zi_nd2b(out, in, x);
+	electrical out, in, x;
+	inout out,in, x;
+	localparam real T=3.141592/16.;
+	analog begin
+		V(out) <+ zi_nd(V(x) - 2*V(in), '{0., 0.,0.,0.,.707}, '{-2.}, T, T/100);
+	end
+endmodule
+
+!make test_zi_nd2b.so > /dev/null
+attach ./test_zi_nd2b.so
+
+// H(z) = 1/z
+test_zi_nd2b #() b(out3, in, 0);
+vsine #(.ampl(1), .freq(1/2/3.1415)) v1(in, 0);
+
+// lowpass for comparison
+// fc = 0.16Hz
+// phase shift = -45deg. delay: pi/4
+resistor #(.r(1)) r1(in out0)
+capacitor #(.c(1)) c1(0 out0)
+
+print tran v(in) v(out*) control(0)
+tran 10 basic
+//
+print ac vm(out*) vp(out*)
+ac .05 0.2 * 1.1
+
+status notime
