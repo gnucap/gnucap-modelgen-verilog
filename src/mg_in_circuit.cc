@@ -135,16 +135,16 @@ bool Branch::is_used_in(Base const* b)const
 /*--------------------------------------------------------------------------*/
 bool Branch::is_used()const
 {
-  if(is_filter()){
+  if(is_filter()){ untested();
     assert(_ctrl);
     return _ctrl->has_refs();
-  }else if(_use){
+  }else if(_use){ untested();
     return true;
-  }else if(_has_flow_probe) {
+  }else if(_has_flow_probe) { untested();
     return true;
 //  }else if(_used_in.size()) { untested();
 //    return true;
-  }else{
+  }else{ untested();
     return false;
   }
 }

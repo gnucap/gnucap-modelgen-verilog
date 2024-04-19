@@ -1,0 +1,18 @@
+test_noise4 #() dut (.a(2),.b(1));
+test_noise4 #() dut (.a(1),.b(0));
+meas_noise #() n1 (.p(1));
+meas_noise #() n2 (.p(2));
+print dc v(nodes) x(dut.*) 
+                    ^ ? no match
+#           v(1)       v(2)      
+ 0.         0.         0.        
+#Freq       npwr(n1)   npwr(n2)  
+ 1.         0.         0.        
+ 2.         0.         0.        
+ 4.         0.         0.        
+ 8.         0.         0.        
+Gnucap   System status
+iterations: op=0, dc=2, tran=0, fourier=0, total=6
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=50.0%, ac density=50.0%

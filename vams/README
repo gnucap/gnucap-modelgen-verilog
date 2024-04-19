@@ -14,7 +14,8 @@ This is a work in progress
   - (vpulse)
   - (vpwl)
   - vsine
-  - (tline)
+  - (tline) # NB: some tlines are tricky to implement in vams.
+                  sometimes hand coded model + paramset works best
   - vccs
   - vcvs
   - diode (from gnucap)

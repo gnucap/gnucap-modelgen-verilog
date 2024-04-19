@@ -1072,12 +1072,16 @@ Module::~Module()
 /*--------------------------------------------------------------------------*/
 bool Node::is_used() const
 {
-  trace2("Node::is_used", name(), _fanout.size());
-  for(auto e : _fanout){
-    if(e->is_used()){
-      trace2("Node::is_used", name(), e->code_name());
-      return true;
-    }else{
+  if(1 && is_ground()){
+    trace1("Node::is_used, ground", name());
+  }else{
+    trace2("Node::is_used", name(), _fanout.size());
+    for(Element_2 const* e : _fanout){
+      if(e->is_used()){
+	trace2("Node::is_used", name(), e->code_name());
+	return true;
+      }else{
+      }
     }
   }
   return false;

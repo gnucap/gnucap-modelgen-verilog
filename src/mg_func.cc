@@ -136,6 +136,7 @@ void MGVAMS_FILTER::setup(Module* m)
 	}else if(d.is_linear()){
 	  incomplete(); // propagate loss?
 	  _output = cont->branch(); // polarity?
+	  set_p_to_gnd(m);
 	}
 	if(cont->reversed()){
 	}else{
@@ -162,6 +163,7 @@ void MGVAMS_FILTER::set_n_to_gnd(Module* m) const
   assert(m);
   assert(branch());
   m->set_to_ground(branch()->n());
+  assert(n()->is_ground());
 }
 /*--------------------------------------------------------------------------*/
 void MGVAMS_FILTER::set_p_to_gnd(Module* m) const
@@ -169,6 +171,7 @@ void MGVAMS_FILTER::set_p_to_gnd(Module* m) const
   assert(m);
   assert(branch());
   m->set_to_ground(branch()->p());
+  assert(p()->is_ground());
 }
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

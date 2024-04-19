@@ -1,0 +1,39 @@
+
+attach ./modelgen_1.so
+
+verilog
+
+`modelgen
+module test_noise4_(a, b);
+	electrical a, b;
+	inout a, b;
+	parameter real pwr = 1.;
+	analog begin
+		I(a) <+ white_noise(pwr);
+		I(b) <+ pwr*white_noise(1);
+	end
+endmodule
+paramset test_noise4 test_noise4_
+.pwr=0;
+endparamset
+`endmodelgen
+
+list
+
+!make test_noise4.so > /dev/null
+attach ./test_noise4.so
+
+test_noise4 #() dut(2, 1);
+test_noise4 #() dut(1, 0);
+noise_probe #() n1(1)
+noise_probe #() n2(2)
+
+list
+
+print dc v(nodes) x(dut.*)
+print ac npwr(n*)
+
+dc
+ac 1 8 * 2
+status notime
+end
