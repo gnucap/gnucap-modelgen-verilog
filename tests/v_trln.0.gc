@@ -1,0 +1,86 @@
+* load qucs/d_trln.so
+
+verilog
+
+options trsteporder 1
+options trtol 1
+
+module tln0(a, b);
+  parameter R;
+  parameter L;
+  parameter G;
+  parameter C;
+  resistor #(.r(R)) r(a j);
+  inductor #(.l(L)) l(b j);
+  admittance #(.g(G)) g(b 0);
+  capacitor #(.c(C)) c(b 0);
+endmodule
+
+module tln1(a, b);
+  parameter count
+  parameter R;
+  parameter L;
+  parameter G;
+  parameter C;
+  resistor #(.r(R)) r(a j);
+  inductor #(.l(L)) l(i j);
+  admittance #(.g(G)) g(i 0);
+  capacitor #(.c(C)) c(i 0);
+  tln #(.count(count - 1) .r(R) .l(L) .g(G) .c(C) ) t(i, b);
+endmodule
+
+paramset tln tln1
+  parameter count from [2:200];
+  parameter r=0;
+  parameter l=0;
+  parameter g=0;
+  parameter c=0;
+ .count = count;
+ .R = r;
+ .L = l;
+ .G = g;
+ .C = c;
+endparamset
+
+paramset tln tln0
+  parameter count from [1:1];
+  parameter r=0;
+  parameter l=0;
+  parameter g=0;
+  parameter c=0;
+ .R = r;
+ .L = l;
+ .G = g;
+ .C = c;
+endparamset
+
+module main(1 2 3 4);
+  parameter length = 1;
+
+	// subckt expansion, ac+tr
+  tln #(.count(100), .r(.1), .l(.01n), .g(.1u), .c(2f)) t1(1, 2);
+  resistor #(10.) r1(0 2);
+
+	// RLGC symbolic tline, ac only.
+  ltra #(.len(100) .r(.1), .l(.01n), .g(.1u), .c(2f)) t1(1, 0, 3, 0);
+  resistor #(10.) r1(0 3);
+
+	// gnucap lossless tline, ac+tr
+  tline #(.len(100) .r(.1), .l(.01n), .g(.1u), .c(2f)) t1(1, 0, 4, 0);
+  resistor #(10.) r1(0 4);
+endmodule
+
+main #() m(nin o1 o2 o3);
+
+spice
+.options noinsensitive
+V30 nin 0 pulse(0 1.8 0p 100p 100p .5n 1n) ac 1
+
+.dc
+.print ac vp(o*) vm(o*)
+.print tran v(nin) v(o*)
+
+.tr 1n basic
+.ac 1e6 1e10 * 2
+
+.status notime

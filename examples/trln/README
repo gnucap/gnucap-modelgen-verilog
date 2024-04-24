@@ -1,0 +1,31 @@
+== "spice" rc chain
+
+An rc chain models a transmission line.
+Compute ac characteristic and a transient.
+
+$ gnucap rc_chain.gc
+[..]
+
+Find the data in
+rc_chain_*.out
+
+== recursive definition
+
+Verilog-AMS allows recursive circuit definitions by means of paramset
+overloading. Here, a similar rc chain is constructed from a shorter one.
+
+$ gnucap rc_recursive.gc
+[..]
+
+The data is stored in
+rc_recursive_*.out
+
+see also ../tests/v_trln.0.gc for recursive RLGC
+
+== generate
+
+WIP
+
+== transmission line
+
+work in progress on RLGC line. need transient. see also ../tests/v_trln.0.gc.

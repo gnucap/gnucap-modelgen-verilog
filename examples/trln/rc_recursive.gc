@@ -1,0 +1,59 @@
+load mgsim
+verilog
+
+options trsteporder 1
+options trtol 1
+
+module tln0(a, b);
+  parameter R;
+  parameter C;
+  resistor #(.r(R)) r(a b);
+endmodule
+
+module tln1(a, b);
+  parameter length
+	parameter t1=0;
+  parameter R;
+  parameter C;
+  resistor #(.r(R)) r(a i);
+  capacitor #(.c(C)) c(i 0);
+  tln #(.length(length - 1) .r(R) .c(C) ) t(i, b);
+endmodule
+
+paramset tln tln1
+  parameter length from [2:200];
+  parameter r=0;
+  parameter c=0;
+ .length = length;
+ .R = r;
+ .C = c;
+endparamset
+
+paramset tln tln0
+  parameter length from [1:1];
+  parameter r=0;
+  parameter c=0;
+ .R = r;
+ .C = c;
+endparamset
+
+module main(1 2);
+  tln #(.length(200), .r(2.224404), .c(2.080806f)) t1(1, 2);
+endmodule
+
+main #() m(nin nout);
+
+spice
+.options noinsensitive
+V30 nin 0 pulse(0 1.8 0p 100p 100p .5n 1n) ac 1
+
+.dc
+.print ac vp(nout) vm(nout)
+.print tran v(nout) v(nin)
+
+.ac 1e6 1e10 * 2 > rc_recursive_ac.out
+.!cat rc_recursive_ac.out
+.tr 2n basic > rc_recursive_tr.out
+.!cat rc_recursive_tr.out
+
+.status notime
