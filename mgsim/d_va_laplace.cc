@@ -78,7 +78,8 @@ public:
 public:
   ~COMMON_LAPLACE() {}
   COMMON_LAPLACE(int x) : COMMON_RF_BASE(x) {}
-  COMMON_LAPLACE(COMMON_LAPLACE const& x) = default;
+  COMMON_LAPLACE(COMMON_LAPLACE const& x) :
+    COMMON_RF_BASE(x), _tolerance(x._tolerance) {}
   COMMON_LAPLACE* clone()const override {return new COMMON_LAPLACE(*this);}
 
   bool operator==(const COMMON_COMPONENT& x)const override;
@@ -87,6 +88,83 @@ public:
   void precalc_last(const CARD_LIST* par_scope)override;
 }; //COMMON_LAPLACE
 COMMON_LAPLACE cl(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+class COMMON_LAPLACE_ND : public COMMON_LAPLACE {
+  std::string name()const override {return "va_laplace_nd";}
+public:
+  ~COMMON_LAPLACE_ND() {}
+  COMMON_LAPLACE_ND(int x) : COMMON_LAPLACE(x) {set_xd(); set_nx();}
+  COMMON_LAPLACE_ND(COMMON_LAPLACE_ND const& x) : COMMON_LAPLACE(x) {}
+  COMMON_LAPLACE_ND* clone()const override {return new COMMON_LAPLACE_ND(*this);}
+
+  void precalc_last(const CARD_LIST* par_scope)override{
+    COMMON_LAPLACE::precalc_last(par_scope);
+    convert_nd();
+  }
+}; //COMMON_LAPLACE_ND
+COMMON_LAPLACE_ND cl_nd(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+class COMMON_LAPLACE_ZD : public COMMON_LAPLACE {
+  std::string name()const override {return "va_laplace_zd";}
+public:
+  ~COMMON_LAPLACE_ZD() {}
+  COMMON_LAPLACE_ZD(int x) : COMMON_LAPLACE(x) { set_xd(); set_zx(); }
+  COMMON_LAPLACE_ZD(COMMON_LAPLACE_ZD const& x) : COMMON_LAPLACE(x) {}
+  COMMON_LAPLACE_ZD* clone()const override {return new COMMON_LAPLACE_ZD(*this);}
+
+  void precalc_last(const CARD_LIST* par_scope)override{ untested();
+    COMMON_LAPLACE::precalc_last(par_scope);
+    convert_nd();
+  }
+}; //COMMON_LAPLACE_ZD
+COMMON_LAPLACE_ZD cl_zd(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+class COMMON_LAPLACE_NP : public COMMON_LAPLACE {
+  std::string name()const override {return "va_laplace_np";}
+public:
+  ~COMMON_LAPLACE_NP() {}
+  COMMON_LAPLACE_NP(int x) : COMMON_LAPLACE(x) { set_nx(); set_xp(); }
+  COMMON_LAPLACE_NP(COMMON_LAPLACE_NP const& x) : COMMON_LAPLACE(x) {}
+  COMMON_LAPLACE_NP* clone()const override {return new COMMON_LAPLACE_NP(*this);}
+
+  void precalc_last(const CARD_LIST* par_scope)override{
+    COMMON_LAPLACE::precalc_last(par_scope);
+    convert_nd();
+  }
+}; //COMMON_LAPLACE_NP
+COMMON_LAPLACE_NP cl_np(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+class COMMON_LAPLACE_ZP : public COMMON_LAPLACE {
+  std::string name()const override {return "va_laplace_zp";}
+public:
+  ~COMMON_LAPLACE_ZP() {}
+  COMMON_LAPLACE_ZP(int x) : COMMON_LAPLACE(x) { set_zx(); set_xp();
+    assert(!_p_den.size());
+    assert(!_p_num.size());
+  }
+  COMMON_LAPLACE_ZP(COMMON_LAPLACE_ZP const& x) : COMMON_LAPLACE(x) {}
+  COMMON_LAPLACE_ZP* clone()const override {return new COMMON_LAPLACE_ZP(*this);}
+
+  void precalc_last(const CARD_LIST* par_scope)override {
+    COMMON_LAPLACE::precalc_last(par_scope);
+    convert_nd();
+  }
+}; //COMMON_LAPLACE_ZP
+COMMON_LAPLACE_ZP cl_zp(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+class COMMON_LAPLACE_RP : public COMMON_LAPLACE {
+public:
+  ~COMMON_LAPLACE_RP() {}
+  COMMON_LAPLACE_RP(int x) : COMMON_LAPLACE(x) {set_rp();}
+  COMMON_LAPLACE_RP(COMMON_LAPLACE_RP const& x) : COMMON_LAPLACE(x) {}
+  COMMON_LAPLACE_RP* clone()const override {return new COMMON_LAPLACE_RP(*this);}
+
+  void precalc_last(const CARD_LIST* par_scope)override {
+    COMMON_LAPLACE::precalc_last(par_scope);
+    convert_nd();
+  }
+}; //COMMON_LAPLACE_RP
+COMMON_LAPLACE_RP cl_rp(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class LAPLACE : public ELEMENT {
 private:
@@ -105,6 +183,7 @@ private:
 private: // construct
   explicit LAPLACE(LAPLACE const&);
 public:
+  explicit LAPLACE(COMMON_COMPONENT* c) : ELEMENT(c) {}
   explicit LAPLACE();
   ~LAPLACE() {
     if (net_nodes() > NODES_PER_BRANCH) {
@@ -174,8 +253,8 @@ private: // overrides
   int int_nodes()const override {
     COMMON_LAPLACE const* c = prechecked_cast<COMMON_LAPLACE const*>(common());
     assert(c);
-    int dens = int(c->_p_den.size());
-    int num_num = int(c->_p_num.size());
+    int dens = int(c->den_size());
+    int num_num = int(c->num_size());
     int num_s = std::max(dens, num_num);
 
     return num_s;
@@ -228,11 +307,10 @@ void COMMON_LAPLACE::precalc_last(const CARD_LIST* par_scope)
 {
   COMMON_RF_BASE::precalc_last(par_scope);
   e_val(&_tolerance, 0. , par_scope);
-
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_LAPLACE::set_param_by_index(int I, std::string& Value, int Offset)
-{ untested();
+{
 	incomplete();
   switch (COMMON_LAPLACE::param_count() - 1 - I) {
   default: COMMON_RF_BASE::set_param_by_index(I, Value, Offset);
@@ -245,10 +323,9 @@ int COMMON_LAPLACE::set_param_by_name(std::string Name, std::string Value)
     _mfactor = Name;
     return 0; // incomplete();
   }else{
-    trace2("spbn", Name, Value);
+    trace2("COMMON_LAPLACE::spbn", Name, Value);
     return COMMON_RF_BASE::set_param_by_name(Name, Value);
   }
-
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -268,7 +345,7 @@ double LAPLACE::tr_probe_num(std::string const& n) const
 {
   COMMON_LAPLACE const* c = prechecked_cast<COMMON_LAPLACE const*>(common());
   assert(c);
-  int dens = int(c->_p_den.size());
+  int dens = int(c->den_size());
 
   if(n[0] == 's'){
     int idx = atoi(n.substr(1).c_str());
@@ -288,13 +365,13 @@ double LAPLACE::tr_probe_num(std::string const& n) const
   }
 }
 /*--------------------------------------------------------------------------*/
-LAPLACE::LAPLACE() : ELEMENT()
-{
-  attach_common(&Default_test_lap2);
-  // build netlist
-  // ports:2
-  // overrides
-}
+// LAPLACE::LAPLACE() : ELEMENT()
+// {
+//   attach_common(&Default_test_lap2);
+//   // build netlist
+//   // ports:2
+//   // overrides
+// }
 /*--------------------------------------------------------------------------*/
 // seq blocks
 /*--------------------------------------------------------------------------*/
@@ -325,7 +402,7 @@ bool LAPLACE::do_tr()
   COMMON_LAPLACE const* c = prechecked_cast<COMMON_LAPLACE const*>(common());
   assert(c);
   set_converged();
-  int dens = int(c->_p_den.size());
+  int dens = int(c->den_size());
 
   node_t gnd(&ground_node);
 
@@ -382,9 +459,18 @@ std::string LAPLACE::port_name(int i)const
 	return names[i];
 }
 /*--------------------------------------------------------------------------*/
-LAPLACE laplace;
-DISPATCHER<CARD>::INSTALL d0(&device_dispatcher,
-    "va_laplace|va_laplace_nd|va_laplace_zp|va_laplace_np|va_laplace_zd", &laplace);
+LAPLACE laplace(&cl);
+DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "va_laplace", &laplace);
+LAPLACE laplace_nd(&cl_nd);
+DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "va_laplace_nd", &laplace_nd);
+LAPLACE laplace_zd(&cl_zd);
+DISPATCHER<CARD>::INSTALL d2(&device_dispatcher, "va_laplace_zd", &laplace_zd);
+LAPLACE laplace_zp(&cl_zp);
+DISPATCHER<CARD>::INSTALL d3(&device_dispatcher, "va_laplace_zp", &laplace_zp);
+LAPLACE laplace_np(&cl_np);
+DISPATCHER<CARD>::INSTALL d4(&device_dispatcher, "va_laplace_np", &laplace_np);
+LAPLACE laplace_rp(&cl_rp);
+DISPATCHER<CARD>::INSTALL d5(&device_dispatcher, "va_laplace_rp", &laplace_rp);
 /*--------------------------------------------------------------------------*/
 CARD* LAPLACE::clone()const
 {
@@ -398,11 +484,14 @@ LAPLACE::LAPLACE(LAPLACE const&p) : ELEMENT(p)
   if(p._n){
     trace2("laplace", int_nodes(), max_nodes());
     assert(_n);
-    assert(int_nodes() + max_nodes() <= NODES_PER_BRANCH); // not expanded yet.
-//    _n = new node_t[int_nodes() + max_nodes()];
-//    for (int ii = 0; ii < p.net_nodes(); ++ii) { untested();
-//      _n[ii] = p._n[ii];
-//    }
+    if(int_nodes() + max_nodes() <= NODES_PER_BRANCH){
+       // not expanded yet...?
+    }else{
+      _n = new node_t[int_nodes() + max_nodes()];
+      for (int ii = 0; ii < p.net_nodes(); ++ii) {
+	_n[ii] = p._n[ii];
+      }
+    }
   }else{ untested();
   }
 }
@@ -434,7 +523,7 @@ int LAPLACE::pivot() const
 //  return 0;
   COMMON_LAPLACE const* c = prechecked_cast<COMMON_LAPLACE const*>(common());
   assert(c);
-  int dens = int(c->_p_den.size());
+  int dens = int(c->den_size());
   double p = 0;
   int r = 0;
   for(int i=0; i<dens; ++i){
@@ -460,7 +549,8 @@ void LAPLACE::expand()
   assert(common());
   auto c = static_cast</*const*/ COMMON_LAPLACE*>(mutable_common());
   assert(c);
-  int dens = int(c->_p_den.size());
+  int dens = int(c->den_size());
+  trace1("exapand", dens);
   assert(dens);
   _pivot = pivot();
   if(_pivot==0){
@@ -471,21 +561,23 @@ void LAPLACE::expand()
   }else{ untested();
   }
 
-  int num_num = int(c->_p_num.size());
+  int num_num = int(c->num_size());
   int num_s = std::max(dens, num_num);
   node_t gnd;
   gnd.set_to_ground(this);
 
-  trace2("expand", long_label(), _pivot);
+  trace4("expand", short_label(), c->_p_num.size(), c->num_size(), _pivot);
+  trace3("expand", short_label(), c->_p_den.size(), c->den_size());
+  trace5("expand", short_label(), _pivot, num_num, num_s, c->is_rp());
+
   ELEMENT::expand();
   assert(_n);
   if (!subckt()) {
     new_subckt();
-  }else{ untested();
+  }else{
   }
 
   _s_.resize(num_s);
-  trace2("expand", long_label(), c->_p_den.size());
 
   auto nn = new node_t[net_nodes() + num_s];
   notstd::copy_n(_n, net_nodes(), nn);
@@ -494,7 +586,7 @@ void LAPLACE::expand()
   }else{
   }
 
-  if(_state){ untested();
+  if(_state){
   }else{
     _state = new double[int_nodes()];
     std::fill_n(_state, int_nodes(), 0.);
@@ -508,9 +600,9 @@ void LAPLACE::expand()
 	//_n[n_s].new_model_node("s." + long_label(), this);
     }
   }
-  trace3("expand2", long_label(), c->_p_den.size(), int_nodes());
 
   if (_sim->is_first_expand()) {
+    trace4("expand first", short_label(), int_nodes(), num_s, num_num);
 
     int instate = 0;
     if(_st_b_in_){
@@ -518,12 +610,12 @@ void LAPLACE::expand()
       instate = 3;
     }
 
-    if(_st_s){ untested();
+    if(_st_s){
     }else{
       // s00 s01 s1 s2 .. sk | s1 X s0 | s2 X s1 ....
       _st_s = new double[1 + num_s + (num_s-1)*3 + instate];
     }
-    if(_st_b_out_){ untested();
+    if(_st_b_out_){
     }else{
       // s00 s01 s1 s2 .. sk | s1 X s0 | s2 X s1 ....
       _st_b_out_ = new double[2 + num_num];
@@ -563,7 +655,7 @@ void LAPLACE::expand()
 	}else{
 	}
 	subckt()->push_front(_output);
-      }else{ untested();
+      }else{
       }
 
       assert(num_s >= num_num);
@@ -618,7 +710,7 @@ void LAPLACE::expand()
 	}else{
 	}
 	subckt()->push_front(_input);
-      }else{ untested();
+      }else{
       }
       std::vector<node_t> nodes(dens*2 + 2 + 2*n_inputs);
       nodes[1] = state_node(_pivot);
@@ -635,6 +727,7 @@ void LAPLACE::expand()
     }
 
     int num_s0_states = 1 + dens;
+    trace1("expand", num_s0_states);
     {
       if (!_s_[0]) {
 	const CARD* s0_dev = device_dispatcher["va_pot"];
@@ -648,7 +741,7 @@ void LAPLACE::expand()
 	}else{
 	}
 	subckt()->push_front(_s_[0]);
-      }else{ untested();
+      }else{
       }
       std::vector<node_t> nodes(num_s*2);
 
@@ -678,7 +771,7 @@ void LAPLACE::expand()
 	}else{
 	}
 	subckt()->push_front(_s_[jj]);
-      }else{ untested();
+      }else{
       }
       {
 	node_t nodes[] = {state_node(jj), gnd, state_node(jj-1), gnd};
@@ -699,7 +792,7 @@ void LAPLACE::expand()
 	}else{
 	}
 	subckt()->push_front(_s_[jj+1]);
-      }else{ untested();
+      }else{
       }
       {
 	node_t nodes[] = {state_node(jj), gnd, state_node(jj+1), gnd};
@@ -724,22 +817,31 @@ void LAPLACE::expand()
       *i = d;
     }
   }
+
+//  assert( c->_p_num.size());
+  assert( c->_p_den.size());
 }
 /*--------------------------------------------------------------------------*/
 void LAPLACE::precalc_last()
 {
+  {
+    auto c = static_cast<COMMON_LAPLACE*>(mutable_common());
+    assert(c);
+    trace1("LAPLACE::precalc_last0a", c->_type);
+  }
   ELEMENT::precalc_last();
   auto c = static_cast<COMMON_LAPLACE*>(mutable_common());
   assert(c);
+  trace1("LAPLACE::precalc_last0b", c->_type);
 
   LAPLACE* m = this;
   LAPLACE const* p = this;
   assert(p);
 
-  int dens = int(c->_p_den.size());
-  int num_num = int(c->_p_num.size());
+  int dens = int(c->den_size());
+  int num_num = int(c->num_size());
   int num_s = std::max(dens, num_num);
-  trace1("LAPLACE::precalc_last", _pivot);
+  trace4("LAPLACE::precalc_last", num_s, _pivot, num_num, c->_type);
 
   int num_s0_states = 1 + dens;
 
@@ -747,7 +849,11 @@ void LAPLACE::precalc_last()
   _st_b_out_[1] = 0;
 
   double piv = c->_p_den[_pivot];
-  assert(piv);
+  if(fabs(piv)<OPT::shortckt){ untested();
+    error(bDANGER, long_label() + ": pivot too small\n");
+    piv = OPT::shortckt;
+  }else{
+  }
 
   for(int jj=0; jj<num_num; ++jj){
     _st_b_out_[2+jj] = c->_p_num[jj] / piv;
@@ -797,6 +903,7 @@ void LAPLACE::precalc_last()
 //    _mfactor = _vy0[1];
     COMPONENT::precalc_first();
   }
+  trace4("LAPLACE::precalc_last2", num_s, _pivot, num_num, c->_type);
 } // precalc_last
 /*--------------------------------------------------------------------------*/
 void LAPLACE::set_parameters(const std::string& Label, CARD *Owner,
@@ -813,12 +920,21 @@ void LAPLACE::set_parameters(const std::string& Label, CARD *Owner,
   int nums = p->args(1);
   int num_s = std::max(dens, nums);
 
-  auto cc = cl.clone();
+  assert(common());
   _n_ports = n_nodes/2;
   _st_b_in_ = states;
 
+  auto ccc = common()->clone();
+  auto cc = prechecked_cast<COMMON_LAPLACE*>(ccc);
+  assert(cc);
+
   cc->_p_den.resize(dens);
+//  cc->_den_type = dens; // HACK
   cc->_p_num.resize(nums);
+//  cc->_num_type = nums; // HACK
+  trace2("LAPLACE args", dens, nums);
+  assert(cc->num_size() == nums);
+  assert(cc->den_size() == dens);
 
   set_label(Label);
   set_owner(Owner);

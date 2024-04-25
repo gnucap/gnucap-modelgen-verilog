@@ -390,7 +390,7 @@ public:
     assert(!_args.empty());
     _args.pop();
   }
-  size_t size() const{ untested();
+  size_t size() const{
     return _refs.size();
   }
   std::string code_name() const{
@@ -486,7 +486,7 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
 
     if (auto var = dynamic_cast<const Token_VAR_REF*>(*i)) {
       s.new_rhs(var); // if linear?
-//    }else if (auto t = dynamic_cast<const Token_OUT_VAR*>(*i)) { untested();
+//    }else if (auto t = dynamic_cast<const Token_OUT_VAR*>(*i)) {
 //      s.new_rhs(t); // if linear?
 //      //incomplete();
 //      //o__ "0.; // OUTVAR?!\n";
@@ -510,7 +510,7 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
       }
     }else if (auto p = dynamic_cast<const Token_PAR_REF*>(*i)) {
       s.new_rhs(p);
-    }else if (auto pb = dynamic_cast<const Token_PORT_BRANCH*>(*i)) { untested();
+    }else if (auto pb = dynamic_cast<const Token_PORT_BRANCH*>(*i)) {
       incomplete();
       s.new_ref("0"); //port number here?
     }else if (auto A = dynamic_cast<const Token_ARRAY_*>(*i)) {

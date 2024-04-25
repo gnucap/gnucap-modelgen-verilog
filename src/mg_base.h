@@ -518,7 +518,7 @@ public:
   const std::string& final_default()const	{ untested();return _final_default;}
   bool		positive()const			{ untested();return _positive;}
   bool		octal()const			{ untested();return _octal;}
-  String_Arg key()const { untested(); return String_Arg(_name); }
+  String_Arg key()const { return String_Arg(_name); }
 
 #if 0
   // needed?

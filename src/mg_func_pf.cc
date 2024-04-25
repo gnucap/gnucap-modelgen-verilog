@@ -96,7 +96,7 @@ void Token_PF::stack_op(Expression* E)const
 		if(dynamic_cast<Token_STOP*>(E->back())) {
 			delete E->back();
 			E->pop_back();
-		}else{ untested();
+		}else{
 			assert(0);
 		}
 		// E->push_back(clone());

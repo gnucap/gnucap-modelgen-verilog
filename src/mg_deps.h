@@ -74,7 +74,7 @@ public:
   void add(Base* x) { _s.insert(x); }
   void merge(Sensitivities const& s) { _s.merge(s._s); }
   bool empty()const {return !_s.size();}
-  size_t size()const { untested();return _s.size();}
+  size_t size()const {return _s.size();}
 
   iterator begin() { untested();
     return _s.begin();

@@ -2,8 +2,6 @@ parameter r=1
 parameter v=0 
 test_lap_zp0 #() dut (.p(1),.n(0));
 vsine #(.ampl(1),.dc(v)) v1 (.p(1),.n(0));
-no data, assuming no root, constant 1.
-no data, assuming no root, constant 1.
 #Time       v(1)       ll1(dut)   ll2(dut)   ll3(dut)  
  0.         0.         0.         0.         0.        
  0.1        0.58779    0.58779    0.58779    0.58779   

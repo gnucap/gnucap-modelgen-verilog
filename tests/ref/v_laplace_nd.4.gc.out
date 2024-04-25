@@ -1,6 +1,6 @@
 //va_laplace_nd #() a(1,2,3,4); 
-va_laplace #(.n0(0),.n1(1),.d0(1),.d1(0)) b0 (.out0(0),.out1(1),.in0(in),.in1(0));
-va_laplace #(.n0(0),.n1(1),.d0(1)) b0 (.out0(0),.out1(2),.in0(in),.in1(0));
+va_laplace_nd #(.n0(0),.n1(1),.d0(1),.d1(0)) b0 (.out0(0),.out1(1),.in0(in),.in1(0));
+va_laplace_nd #(.n0(0),.n1(1),.d0(1)) b0 (.out0(0),.out1(2),.in0(in),.in1(0));
 vsine #(.freq(1),.ampl(1),.phase(-3.14159/2.)) v1 (.p(in),.n(0));
 resistor #(.r(1)) r1 (.p(1),.n(0));
 resistor #(.r(1)) r1 (.p(2),.n(0));

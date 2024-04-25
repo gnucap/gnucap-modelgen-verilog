@@ -420,7 +420,7 @@ void AnalogConditionalStmt::parse(CS& f)
   _false_part.set_owner(this);
 
   if(f >> "(" >> _cond >> ")"){
-  }else{ untested();
+  }else{
     throw Exception_CS_("expecting conditional", f);
   }
 
@@ -437,7 +437,7 @@ void AnalogConditionalStmt::parse(CS& f)
     }else if(_cond.is_false()) {
       if(is_always()) {
 	_false_part.set_always();
-      }else{untested();
+      }else{
       }
       _body.set_never();
     }else{
@@ -588,9 +588,9 @@ bool AnalogForStmt::update()
   bool ret = false;
 
   while(true){
-    if ( init_ && init_->update() ){ untested();
+    if ( init_ && init_->update() ){
       ret = true;
-    }else if (_body.update()){ untested();
+    }else if (_body.update()){
       ret = true;
     }else if ( tail_ && tail_->update() ) { untested();
       ret = true;
@@ -735,7 +735,7 @@ CaseGen::CaseGen(CS& f, Block* o, Expression const& ctrl, bool have_r, bool have
   }else if(f >> *c) {
     trace1("CaseGen2", f.tail().substr(0,20));
     _cond = c;
-  }else{ untested();
+  }else{
     delete c;
     throw Exception_CS_("bad switch statement", f);
   }
@@ -943,7 +943,7 @@ void Assignment::dump(std::ostream& o) const
   if(_token){
     o << _token->name() << " = ";
     Expression_::dump(o);
-  }else{ untested();
+  }else{
 //    o << "/// unreachable?\n";
   }
 }
@@ -1010,7 +1010,7 @@ void Branch_Ref::parse(CS& f)
   assert(!_br);
 
   trace1("Branch_Ref::parse", f.tail().substr(0,10));
-  if(f >> "("){ untested();
+  if(f >> "("){
   }else{ untested();
     throw Exception_No_Match("not a branch");
   }
@@ -1306,7 +1306,7 @@ Branch::~Branch()
   _deps = NULL;
 
   for(auto i : _used_in){
-    if(i){ untested();
+    if(i){
       std::cerr << "logic error. " << name() << " still used in. " << i << "\n";
       unreachable();
     }else{
@@ -1354,7 +1354,7 @@ void Branch::unset_used_in(Base const* b)
     // can't seem to avoid. cyclic deps...
     // unreachable();
 //    throw std::logic_error("cleanup " + code_name());
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1526,7 +1526,7 @@ void AnalogEvtCtlStmt::dump(std::ostream& o) const
 #if 0
   if(dynamic_cast<AnalogSeqBlock const*>(_stmt)){ untested();
     o << " " << *_stmt;
-  }else if(_stmt){ untested();
+  }else if(_stmt){
 #if 0
     o << " " << *_stmt;
 #else
@@ -1555,7 +1555,7 @@ static Module const* to_module(Block const* owner)
       owner = b;
     }else if(auto st = dynamic_cast<Statement const*>(owner->owner())){
       owner = st->scope();
-    }else{ untested();
+    }else{
       assert(false);
       return NULL;
     }
@@ -1798,7 +1798,7 @@ bool AnalogFunctionArgs::new_var_ref(Base* b)
       throw Exception("duplicate variable name");
     }else if(auto tt = dynamic_cast<Token*>(ex)){ untested();
       return Block::new_var_ref(tt);
-    }else if(ex){ untested();
+    }else if(ex){
       assert(0);
       unreachable();
     }else{
@@ -1826,7 +1826,7 @@ void AnalogEvtExpression::dump(std::ostream& o) const
   o << "(";
   if(_expression) {
     o << *_expression;
-  }else{ untested();
+  }else{
   }
   o << ")";
 }
@@ -1846,7 +1846,7 @@ void AF_Arg_List::parse(CS& f)
     _direction = a_output;
   }else if(dir=="ino"){
     _direction = a_inout;
-  }else{ untested();
+  }else{
     trace2("AF_Arg_List::parse", f.tail().substr(0,10), dir);
     unreachable();
   }
@@ -2083,7 +2083,7 @@ Contribution::~Contribution()
       i->branch()->dec_use();
       try{
 	(*i)->unset_used_in(this);
-      }catch(std::logic_error const& e){ untested();
+      }catch(std::logic_error const& e){
 	unreachable();
 	std::cerr << " logic error in " << name() << ": ";
 	std::cerr << e.what() << "\n";
@@ -2112,7 +2112,7 @@ size_t Branch::num_nodes() const
       // self conductance
     }else if(i->is_pot_probe()){
       ++ret;
-//     }else if(i->is_filter_probe()){ untested();
+//     }else if(i->is_filter_probe()){
 //       assert(i->is_pot_probe());
 //       unreachable();
 //       ++ret;
@@ -2150,7 +2150,7 @@ Probe::Probe(std::string const& xs, Branch_Ref br) : _br(br)
     _type = t_flow;
     _br->inc_flow_probe();
     _br->set_probe(); // shadow
-  }else{ untested();
+  }else{
     unreachable();
   }
 
@@ -2178,7 +2178,7 @@ Probe::~Probe()
     _br->unset_used_in(p);
   }
 
-//  if(_rdeps.size()){ untested();
+//  if(_rdeps.size()){
 //    _br->unset_used_in(this);
 //  }
 
@@ -2196,7 +2196,7 @@ Discipline const* Probe::discipline() const
 }
 /*--------------------------------------------------------------------------*/
 Nature const* Probe::nature() const
-{ untested();
+{
   return _br->nature();
 }
 /*--------------------------------------------------------------------------*/

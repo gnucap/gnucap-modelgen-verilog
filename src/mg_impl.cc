@@ -338,7 +338,7 @@ std::string Branch::dev_type()const
   }else if(!is_direct()){
     if(has_pot_source()){
       return "va_pot_br";
-    }else{ untested();
+    }else{
       return "incomplete_dev_type";
     }
   }else if(has_flow_probe()) {
@@ -510,7 +510,7 @@ Discipline const* Branch::discipline() const
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 Nature const* Branch::nature() const
-{ untested();
+{
 //  source?
   return NULL;
 }
@@ -568,7 +568,7 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args)
 {
   auto f = prechecked_cast<FUNCTION_ const*>(f_);
   assert(f);
-//  if(dynamic_cast<MGVAMS_FUNCTION const*>(f)){ untested();
+//  if(dynamic_cast<MGVAMS_FUNCTION const*>(f)){
     if(f->static_code()){
       // return f->new_token(*this, num_args);
       install(f);
@@ -689,7 +689,7 @@ Block* Block::scope()
     return NULL;
   }else if(!_owner){
     return NULL;
-  }else{ untested();
+  }else{
     assert(0);
     return NULL;
   }

@@ -105,7 +105,7 @@ public:
     assert(_m);
     return MGVAMS_FILTER::set_n_to_gnd(_m);
   }
-  void set_p_to_gnd()const { untested();
+  void set_p_to_gnd()const {
     assert(_m);
     return MGVAMS_FILTER::set_p_to_gnd(_m);
   }
@@ -250,6 +250,8 @@ public:
       o__ "trace2(\"precalc" << cn << "\", num.size(), den.size());\n";
       o__ "COMPONENT* l = _d->" << cn << ";\n";
       o__ "assert(l);\n";
+      o__ "std::string reset;\n";
+      o__ "l->set_param_by_index(-1,reset,0);\n";
       o__ "for(int i=0; i<int(num.size()); ++i){\n";
       o____ "trace2(\"precalc" << cn << "\", i, num[i]);\n";
       o____ "l->set_param_by_name(" + num_name_i() + ", to_string(num[i]));\n";
@@ -293,10 +295,10 @@ public:
     return new LZP(*this);
   }
   std::string num_name_i()const override {
-    return "std::string(\"x\") + ((i%2)?'i':'r')  + to_string(i/2) /*A*/";
+    return "std::string(\"z\") + ((i%2)?'i':'r')  + to_string(i/2) /*A*/";
   }
   std::string den_name_i()const override {
-    return "std::string(\"r\") + ((i%2)?'i':'r')  + to_string(i/2) /*B*/";
+    return "std::string(\"p\") + ((i%2)?'i':'r')  + to_string(i/2) /*B*/";
   }
   int numsize(int x)const override{ assert(!(x%2)); return x/2+1; }
   int densize(int x)const override{ assert(!(x%2)); return x/2+1; }
@@ -386,7 +388,7 @@ void Token_LAP::stack_op(Expression* e)const
     branch()->deps() = *dd; // HACK
     if(1){
       func->set_n_to_gnd();
-    }else if(0 /*sth linear*/){ untested();
+    }else if(0 /*sth linear*/){
       // somehow set loss=0 and output ports to target.
     }else{ untested();
     }
@@ -402,7 +404,7 @@ void Token_LAP::stack_op(Expression* e)const
     delete(cc);
   }else if(!e->size()) { untested();
     unreachable();
-  }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) { untested();
+  }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) {
     auto d = new TData;
     d->insert(Dep(func->prb())); // BUG?
     auto N = new Token_LAP(*this, d);

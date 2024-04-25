@@ -49,7 +49,7 @@ Some of them are not here, but still in ../src.
   - $simparam
   - ($simparam$str)
 - Table 9-13 -- Dynamic simulation probe
-  - $simprobe
+  - ($simprobe)
 - Table 9-14 -- Analog kernel control
   - ($discontinuity)
   - $limit

@@ -40,12 +40,12 @@ public:
 private:
   explicit Token_XDT(const Token_XDT& P, Base const* data, Expression_ const* e = NULL)
     : Token_CALL(P, data, e) {} // , _item(P._item) {}
-  Token* clone()const override {untested(); return new Token_XDT(*this);}
+  Token* clone()const override { return new Token_XDT(*this);}
 
   void stack_op(Expression* e)const override;
   Branch* branch() const;
   Expression_ const* args() const{ untested();
-    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){ untested();
+    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){
       return a;
     }else{ untested();
       assert(!Token_CALL::args());
@@ -287,7 +287,7 @@ void Token_XDT::stack_op(Expression* e)const
       func->set_n_to_gnd();
     }else if(0 /*sth linear*/){ untested();
       // somehow set loss=0 and output ports to target.
-    }else{ untested();
+    }else{
     }
 
     auto d = new TData;

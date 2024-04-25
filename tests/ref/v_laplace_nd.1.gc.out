@@ -1,5 +1,5 @@
 // H(s) = 1/(1+s) 
-va_laplace #(.n0(1.),.n1(0),.d0(1.),.d1(2.)) b (.out0(0),.out1(out1),.in0(in),.in1(0));
+va_laplace_nd #(.n0(1.),.n1(0),.d0(1.),.d1(2.)) b (.out0(0),.out1(out1),.in0(in),.in1(0));
 resistor #(.r(1.)) r1 (.p(out1),.n(0));
 vsine #(.freq(1),.ampl(1)) v1 (.p(in),.n(0));
 resistor #(.r(2.)) r1 (.p(in),.n(out2));

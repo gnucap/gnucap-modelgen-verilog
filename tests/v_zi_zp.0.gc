@@ -8,7 +8,7 @@ parameter r=1
 parameter v=0
 
 vsine #(.dc(v), .ampl(.2)) v1(1, 0);
-va_zi_nd #(.xr0(0.), .rr0(0.)) b(0,out1,1,0);
+va_zi_zp #(.zr0(0.), .pr0(0.)) b(0,out1,1,0);
 
 list
 

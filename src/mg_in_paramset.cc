@@ -158,7 +158,7 @@ void Paramset::parse(CS& f)
       || ((f >> "endparamset ") && (end = true))
       ;
 
-    if (has_attributes(&f)){ untested();
+    if (has_attributes(&f)){
       f.warn(bWARNING, "dangling attributes "
 	   + attributes(&f).string(NULL));
     }else{

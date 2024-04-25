@@ -105,7 +105,7 @@ private:
   void new_deps();
   void new_data();
 public:
-  String_Arg key()const { untested(); return String_Arg(name()); }
+  String_Arg key()const { return String_Arg(name()); }
 //  void set_type(Data_Type d){ untested(); _type=d; }
   bool is_real()const { untested(); return type().is_real(); }
   bool is_int()const { untested(); return type().is_int(); }

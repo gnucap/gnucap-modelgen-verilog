@@ -153,7 +153,7 @@ void make_cc(std::ostream& out, const File& in)
     "------------------------------------*/\n";
       ++num;
     }
-  }else if(!options().expand_paramset()){ untested();
+  }else if(!options().expand_paramset()){
   }else if(options().gen_paramset()){
     for (Paramset_List::const_iterator
 	 m = in.paramset_list().begin();

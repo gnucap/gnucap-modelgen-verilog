@@ -1,8 +1,8 @@
-va_zi #(.d0(1.), .n0(0.), .xr0(1). .n2(-1.) .n3(1.), .T(1)) b(0,out1,i
-                           ^ ? : bad parameter xr0 ignored
-va_zi #(.ri(3), .d0(1.), .n0(0.), .xr0(1). .n2(-1.) .n3(1.), .T(1)) b(
-         ^ ? : bad parameter ri ignored
-va_zi #(.ri(3), .d0(1.), .n0(0.), .xr0(1). .n2(-1.) .n3(1.), .T(1)) b(
-                                   ^ ? : bad parameter xr0 ignored
+va_zi #(.d0(1.), .n0(0.), .zr0(1). .n2(-1.) .n3(1.), .T(1)) b(0,out1,i
+                           ^ ? : bad parameter zr0 ignored
+va_zi #(.pi(3), .d0(1.), .n0(0.), .zr0(1). .n2(-1.) .n3(1.), .T(1)) b(
+         ^ ? : bad parameter pi ignored
+va_zi #(.pi(3), .d0(1.), .n0(0.), .zr0(1). .n2(-1.) .n3(1.), .T(1)) b(
+                                   ^ ? : bad parameter zr0 ignored
 va_zi #(.n0(0.),.n3(1.),.d0(1.)) b (.out0(0),.out1(out1),.in0(in),.in1(0));
 va_zi #(.n0(0.),.n3(1.),.d0(1.)) b (.out0(0),.out1(out1),.in0(in),.in1(0));

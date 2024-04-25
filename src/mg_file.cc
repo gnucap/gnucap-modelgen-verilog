@@ -107,7 +107,7 @@ void File::parse(CS& f)
      if(auto pp = dynamic_cast<Paramset*>(i)){
        trace1("undeflated paramset1", i->identifier());
        _paramset_list.push_back(pp);
-     }else{ untested();
+     }else{
        trace1("deflated paramset1", i->identifier());
        _module_list.push_back(i);
      }

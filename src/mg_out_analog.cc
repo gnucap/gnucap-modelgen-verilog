@@ -109,7 +109,7 @@ void OUT_ANALOG::make_variable(std::ostream& o, Token_VAR_REF const& v) const
     make_real_variable(o, *r);
   }else if(r->type().is_int()){ untested();
     make_int_variable(o, *r);
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -122,7 +122,7 @@ void OUT_ANALOG::make_variable(std::ostream& o, Variable_Decl const& v) const
   }
   // type?
   //
-  if(_mode==modeSTATIC){ untested();
+  if(_mode==modeSTATIC){
     o__ "double _v_" << v.name() << "; // Variable_Decl";
   }else{
     o__ "ddouble _v_" << v.name() << "; // Variable_Decl";
@@ -141,7 +141,7 @@ void OUT_ANALOG::make_block_variables(std::ostream& o,
     Variable_List const& rl) const
 {
   for(Variable_Decl const* v : rl){
-    if(v->size()){ untested();
+    if(v->size()){
       incomplete();
     }else{
     }
@@ -191,7 +191,7 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
       o__ lhsname << " = int(t0); // (*)\n";
     }else if(within_af(&a)){
       o__ lhsname << " = t0; // (1a)\n";
-    }else if(!options().optimize_deriv()) {itested();
+    }else if(!options().optimize_deriv()) {
       o__ lhsname << " = t0; // (*)\n";
       for(auto v : a.data().ddeps()) { untested();
 	o__ "// " << a.lhs().code_name() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // (2a)\n";
@@ -199,7 +199,7 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
       }
     }else if(_mode==modePRECALC){
       o__ lhsname << " = t0; // (prec)\n";
-    }else if(_mode==modeSTATIC){ untested();
+    }else if(_mode==modeSTATIC){
       o__ lhsname << " = t0.value(); // (s)\n";
     }else{
       o__ lhsname << " = t0.value(); // (*)\n";
@@ -246,7 +246,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
   }
 
   o__ "{ // Contribution " << C.name() << C.branch_ref() << " lin: " << C.data().is_linear() << "\n";
-//  if(!C.is_used()){ untested();
+//  if(!C.is_used()){
 //    o__ "// not used\n";
 //  }else
   if(!C.is_pot_contrib() && is_zero(e)){
@@ -385,7 +385,7 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
       o << "// omit Contibution..\n";
     }else if(dynamic_cast<AnalogProceduralAssignment const*>(&ab)) {
       o << "// omit Assignment..\n";
-    }else if(auto sb = dynamic_cast<AnalogSeqBlock const*>(&ab)){ untested();
+    }else if(auto sb = dynamic_cast<AnalogSeqBlock const*>(&ab)){
       // incomplete();
       make_seq(o, *sb);
     }else{
@@ -418,7 +418,7 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
     make_ctrl(o, ct->body());
   }else if(auto t=dynamic_cast<System_Task const*>(&ab)) {
     make_system_task(o, *t);
-  }else{ untested();
+  }else{
     incomplete();
     assert(false);
   }
@@ -663,7 +663,7 @@ void OUT_ANALOG::make_switch(std::ostream& o, AnalogSwitchStmt const& s) const
 //	if(i->code_or_null()){ untested();
 	  indent y;
 	  make_stmt(o, *i); // ->code_or_null());
-//	}else{ untested();
+//	}else{
 //	}
 
 	o__ "}else";
@@ -679,7 +679,7 @@ void OUT_ANALOG::make_switch(std::ostream& o, AnalogSwitchStmt const& s) const
     }else{ // } if(def->code_or_null()){ untested();
       indent y;
       make_stmt(o, *def);
-//    }else{ untested();
+//    }else{
     }
     o<<paren;
     o__ "\n";
@@ -715,7 +715,7 @@ void OUT_ANALOG::make_construct(std::ostream& o, AnalogConstruct const& ab) cons
 {
   if(ab.block_or_null()){
     make_block(o, *ab.block_or_null());
-  }else{ untested();
+  }else{
     unreachable();
     o << ";\n";
   }
@@ -907,7 +907,7 @@ static void make_cc_set_branch_contributions(std::ostream& o, const Module& m)
     if(b->is_short()) {
     }else if(b->has_pot_source()) {
       o__ "// pot src " << b->name() << "\n";
-      o__ "if(!" << b->code_name() << "){ untested();\n";
+      o__ "if(!" << b->code_name() << "){\n";
       o__ "}else if(_pot" << b->code_name() << "){\n";
       o____ b->code_name() << "->_loss0 = 1./OPT::shortckt;\n";
       o__ "}else{\n";
@@ -973,7 +973,7 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Token_VAR_REF&
       o__ "int";
     }else if(V.type().is_real()) {
       o__ "ddouble";
-    }else{ untested();
+    }else{
       assert(0); // logic error.
     }
 
@@ -997,7 +997,7 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Token_VAR_REF&
 void OUT_ANALOG::make_one_variable_store(std::ostream& o, Token_VAR_REF const& V) const
 {
   if(!V.type().is_real()) { untested();
-  }else if(_mode == modePRECALC){ untested();
+  }else if(_mode == modePRECALC){
     o__ "// d->" << V.code_name() << " = " << V.code_name() << ";\n";
   }else if(V.deps().ddeps().size() == 0){
     // it's a reference.
@@ -1065,7 +1065,7 @@ void make_cc_analog_list(std::ostream& o, const Module& m, Branch const*
     assert(bb);
 //    if(auto ab = dynamic_cast<AnalogStmt const*>(bb)){ untested();
 //    }else
-    // if(src && !bb->used_in(src)){ untested();
+    // if(src && !bb->used_in(src)){
     // }else
     if(auto ab = dynamic_cast<AnalogConstruct const*>(bb)){
       o__ "{\n";
@@ -1131,7 +1131,7 @@ static void make_cc_common_precalc(std::ostream& o, const Module& m)
 	oo.make_construct(o, *ab);
       }
       o__ "}\n";
-    }else{ untested();
+    }else{
     }
   }
 //  oo.make_store_variables(o, m.variables());
@@ -1218,7 +1218,7 @@ std::string Probe::code_name() const
     return "_flow" + _br->code_name(); // BUG. named_branch.
   }else if (_type == t_pot){
     return "_potential" + _br->code_name();
-  }else{ untested();
+  }else{
     unreachable();
     return("unreachable_probe");
   }

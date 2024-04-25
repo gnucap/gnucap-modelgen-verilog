@@ -6,7 +6,7 @@ parameter T = {3.141592 / 4.}
 
 // H(z) = 1/ (z * z * (1-z)) = 1/(zz-zzz)
 va_zi #(.d0(1.), .n0(0.), .n2(1.) .n3(-1.), .T(T*.5), .tau(T*.1)) b(0,out1,in,0);
-va_zi #(.d0(1.), .xr2(1.), .T(T*.5), .tau(T*.1)) b(0,out2,in,0);
+va_zi_zd #(.d0(1.), .zr2(1.), .T(T*.5), .tau(T*.1)) b(0,out2,in,0);
 va_zi #(.d0(1.), .n0(1.), .T(1.)) b(0,out3,in,0);
 vsine #(.ampl(1), .freq(1/2/3.1415)) v1(in, 0);
 

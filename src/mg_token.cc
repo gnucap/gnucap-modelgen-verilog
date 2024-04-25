@@ -317,7 +317,7 @@ void Token_BINOP_::stack_op(Expression* E)const
     }else if(n=='-' && is_constant(t1, 0.)) {
       t1.erase();
       t2.push();
-    }else if(n=='+' && is_constant(t1, 0.)) { untested();
+    }else if(n=='+' && is_constant(t1, 0.)) {
       t1.erase();
       t2.push();
     }else if(name()=="&&" && is_constant(t1, 0.)){
@@ -400,7 +400,7 @@ void Token_BINOP_::stack_op(Expression* E)const
 //  }else if(t1==t2, '-'){ ...
   }else{
     // t2 is constant?
-    if(n=='+' && is_constant(t2, 0.)){ untested();
+    if(n=='+' && is_constant(t2, 0.)){
       t2.erase();
       t1.push();
     }else if(n=='*' && is_constant(t2, 1.)){
@@ -509,7 +509,7 @@ static TData* new_deps(Base const* data)
       }
     }
     return d;
-  }else{ untested();
+  }else{
     assert(0);
     return new TData;
   }
@@ -534,9 +534,9 @@ void Token_CALL::stack_op(Expression* e) const
       pl->set_args(NULL);
       E->pop_back();
       delete(pl);
-    }else{ untested();
+    }else{
     }
-  }else if(dynamic_cast<Token_PARLIST const*>(E->back())) { untested();
+  }else if(dynamic_cast<Token_PARLIST const*>(E->back())) {
     assert(0);
   }else{
   }
@@ -582,7 +582,7 @@ void Token_CALL::stack_op(Expression* e) const
   }else if(!dynamic_cast<const Token_PARLIST*>(E->back())) {
     // SFCALL
     E->push_back(new Token_CALL(*this, const_deps.clone()));
-  }else{ untested();
+  }else{
     trace2("no params?", name(), E->back()->name());
     incomplete();
   }
@@ -608,7 +608,7 @@ size_t Token_ACCESS::num_deps() const
 { untested();
   if(auto t=dynamic_cast<TData const*>(data())){ untested();
     return t->ddeps().size();
-  }else{ untested();
+  }else{
     // incomplete();
     return 0;
   }
@@ -957,7 +957,7 @@ void Token_PARLIST_::stack_op(Expression* E) const
 }
 /*--------------------------------------------------------------------------*/
 Token* VAMS_ACCESS::new_token(Module& m, size_t na)const
-{ untested();
+{
   unreachable(); // obsolete.
   // use na?
   Branch_Ref br = m.new_branch(_arg0, _arg1);
@@ -982,7 +982,7 @@ Token* Probe::new_token(Module&, size_t na)const
     }else if(_type==t_flow){
       assert(discipline()->flow());
       name = discipline()->flow()->access().to_string();
-    }else{ untested();
+    }else{
       name = "UNKNOWN";
     }
   }else if(_type==t_pot){ untested();
@@ -1026,12 +1026,12 @@ Data_Type const& Token_VAR_REF::type() const
 {
   if(auto it=dynamic_cast<Assignment const*>(_item)){
     return it->type();
-  }else if(auto p = dynamic_cast<Variable_Decl const*>(_item)){ untested();
+  }else if(auto p = dynamic_cast<Variable_Decl const*>(_item)){
     assert(p);
     return p->type();
   }else if(auto af = dynamic_cast<Analog_Function const*>(_item)){
     return af->type();
-  }else{ untested();
+  }else{
     unreachable();
     static Data_Type_Real t;
     return t;

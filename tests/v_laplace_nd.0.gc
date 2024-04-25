@@ -22,4 +22,5 @@ tran 1 basic
 print ac vm(nodes) vp(nodes)
 ac .01 100 * 10
 
+list
 status notime

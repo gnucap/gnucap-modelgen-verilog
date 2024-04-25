@@ -68,7 +68,7 @@ void make_node_ref(std::ostream& o, const Node& n, bool used=true)
 {
   if(n.is_ground()) {
     o << "gnd";
-  }else if(!used){ untested();
+  }else if(!used){
     o << "gnd";
   }else{
     o << "_n[" << n.code_name() << "]";
@@ -171,7 +171,7 @@ static void make_tr_probe_num(std::ostream& o, const Module& m)
 static void make_set_parameters(std::ostream& o, const Element_2& e, std::string cn)
 {
   make_tag(o);
-  if(cn==""){ untested();
+  if(cn==""){
     cn = e.code_name();
   }else{
   }
@@ -187,7 +187,7 @@ static void make_set_parameters(std::ostream& o, const Element_2& e, std::string
   o << ", 0."; // value
   if (e.state() != "") {
     o << ", /*states:*/" << e.num_states() << ", " << e.state();
-  }else{ untested();
+  }else{
     o << ", 0, NULL";
   }
   o << ", " << e.num_nodes() << ", nodes);\n";
@@ -440,7 +440,7 @@ static void make_tr_review(std::ostream& o, const Module& m)
     o << "if(_sim->analysis_is_tran_static()){ untested();\n";
     o____ "q_accept();\n";
     o__ "}else ";
-  }else{ untested();
+  }else{
     o__ "";
   }
 #endif
@@ -725,7 +725,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
   std::string cn;
   if(cn_==""){
     cn = e.code_name();
-  }else{ untested();
+  }else{
     cn = cn_;
   }
 

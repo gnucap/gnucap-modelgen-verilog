@@ -53,18 +53,18 @@ void Head::parse(CS& file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void Attribute_Spec::parse(CS& f)
-{ untested();
+{
   assert(owner());
   _key = f.ctos("=", "", "");
   trace2("Attribute_Spec", _key, f.tail().substr(0,18));
-  if( f >> '=' ){ untested();
+  if( f >> '=' ){
     // _expr = new ConstExpression(f, owner());
     _expr = new value_type;
 //    f >> *_expr;
-    if(f.match1('\"')) { untested();
+    if(f.match1('\"')) {
       f >> *_expr;
       *_expr = "\"" + *_expr + "\"";
-    }else{ untested();
+    }else{
       *_expr = f.ctos(",=;)*"); // , "\"'{(", "\"'})");
     }
   }else{ untested();
@@ -97,7 +97,7 @@ void Attribute_Instance::parse(CS& f)
       push_back(s);
       f.skip1(',');
     }
-  }else{ untested();
+  }else{
   }
 }
 #endif

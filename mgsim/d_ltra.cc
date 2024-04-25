@@ -114,7 +114,7 @@ private:
 };
 /*--------------------------------------------------------------------------*/
 inline bool DEV_TRANSLINE::tr_needs_eval()const
-{ untested();
+{
   assert(!is_q_for_eval());
   return (_if0!=_if1 || _ir0!=_ir1);
 }
@@ -151,8 +151,8 @@ COMMON_TRANSLINE::COMMON_TRANSLINE(int c)
    G(_default_G),
    C(_default_C),
    icset(false)
-{ untested();
-  for (int i = 0;  i < NUM_INIT_COND;  ++i) { untested();
+{
+  for (int i = 0;  i < NUM_INIT_COND;  ++i) {
     ic[i] = 0.;
   }
 }
@@ -165,14 +165,14 @@ COMMON_TRANSLINE::COMMON_TRANSLINE(const COMMON_TRANSLINE& p)
    G(p.G),
    C(p.C),
    icset(p.icset)
-{ untested();
-  for (int i = 0;  i < NUM_INIT_COND;  ++i) { untested();
+{
+  for (int i = 0;  i < NUM_INIT_COND;  ++i) {
     ic[i] = p.ic[i];
   }
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_TRANSLINE::operator==(const COMMON_COMPONENT& x)const
-{ untested();
+{
   const COMMON_TRANSLINE* p = dynamic_cast<const COMMON_TRANSLINE*>(&x);
   bool rv = p
     && len == p->len
@@ -182,17 +182,17 @@ bool COMMON_TRANSLINE::operator==(const COMMON_COMPONENT& x)const
     && C == p->C
     && icset == p->icset
     && COMMON_COMPONENT::operator==(x);
-  if (rv) { untested();
-    for (int i=0; i<NUM_INIT_COND; ++i) { untested();
+  if (rv) {
+    for (int i=0; i<NUM_INIT_COND; ++i) {
       rv &= ic[i] == p->ic[i];
     }
-  }else{ untested();
+  }else{
   }
   return rv;
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_TRANSLINE::set_param_by_index(int I, std::string& Value, int Offset)
-{ untested();
+{
   trace2("spbn", I, Value);
   switch (COMMON_TRANSLINE::param_count() - 1 - I) {
   case 0:  len = Value; break;
@@ -228,7 +228,7 @@ bool COMMON_TRANSLINE::param_is_printable(int I)const
 }
 /*--------------------------------------------------------------------------*/
 std::string COMMON_TRANSLINE::param_name(int I)const
-{ untested();
+{
   switch (COMMON_TRANSLINE::param_count() - 1 - I) {
   case 0:  return "len";
   case 1:  return "r";
@@ -241,10 +241,10 @@ std::string COMMON_TRANSLINE::param_name(int I)const
 }
 /*--------------------------------------------------------------------------*/
 std::string COMMON_TRANSLINE::param_name(int I, int j)const
-{ untested();
-  if (j == 0) { untested();
+{
+  if (j == 0) {
     return param_name(I);
-  }else if (I >= COMMON_COMPONENT::param_count()) { untested();
+  }else if (I >= COMMON_COMPONENT::param_count()) {
     switch (COMMON_TRANSLINE::param_count() - 1 - I) {
     default: return "";
     }
@@ -268,7 +268,7 @@ std::string COMMON_TRANSLINE::param_value(int I)const
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_TRANSLINE::precalc_last(const CARD_LIST* Scope)
-{ untested();
+{
   assert(Scope);
   COMMON_COMPONENT::precalc_last(Scope);
 
@@ -287,11 +287,11 @@ DEV_TRANSLINE::DEV_TRANSLINE(COMMON_COMPONENT* c)
    _forward(), _reflect(),
    _if0(0), _ir0(0), _if1(0), _ir1(0),
    _y11(), _y12()
-{ untested();
+{
 }
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::precalc_last()
-{ untested();
+{
   ELEMENT::precalc_last();
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
@@ -302,7 +302,7 @@ void DEV_TRANSLINE::precalc_last()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::tr_iwant_matrix()
-{ untested();
+{
   _sim->_aa.iwant(_n[OUT1].m_(),_n[OUT2].m_());
   _sim->_aa.iwant(_n[IN1].m_(), _n[IN2].m_());
   _sim->_lu.iwant(_n[OUT1].m_(),_n[OUT2].m_());
@@ -312,7 +312,7 @@ void DEV_TRANSLINE::tr_iwant_matrix()
 /* first setup, initial dc, empty the lines
  */
 void DEV_TRANSLINE::tr_begin()
-{ untested();
+{
   ELEMENT::tr_begin();
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
@@ -327,7 +327,7 @@ void DEV_TRANSLINE::tr_begin()
  * This makes the Thevenin to Norton conversion.
  */
 void DEV_TRANSLINE::dc_advance()
-{ untested();
+{
   ELEMENT::dc_advance();
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
@@ -335,7 +335,7 @@ void DEV_TRANSLINE::dc_advance()
   _ir0 = 0.;  // _reflect.v_out(_sim->_time0).f0/c->real_z0;
 }
 void DEV_TRANSLINE::tr_advance()
-{ untested();
+{
   ELEMENT::tr_advance();
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
@@ -370,7 +370,7 @@ bool DEV_TRANSLINE::do_tr()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::tr_load()
-{ untested();
+{
   incomplete(); // won't work.
 		return;
   //BUG// explicit mfactor
@@ -416,7 +416,7 @@ void DEV_TRANSLINE::tr_load()
 /* limit the time step to no larger than a line length.
  */
 TIME_PAIR DEV_TRANSLINE::tr_review()
-{ untested();
+{
   q_accept();
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
@@ -426,7 +426,7 @@ TIME_PAIR DEV_TRANSLINE::tr_review()
 /* after this step is all done, determine the reflections and send them on.
  */
 void DEV_TRANSLINE::tr_accept()
-{ untested();
+{
   trace1(short_label().c_str(), _sim->_time0);
   // incomplete
 //  _reflect.push(_sim->_time0, _forward.v_reflect(_sim->_time0, tr_outvolts()));
@@ -438,7 +438,7 @@ void DEV_TRANSLINE::tr_unload()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::do_ac()
-{ untested();
+{
   const COMMON_TRANSLINE*c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
 #if 0
@@ -477,7 +477,7 @@ void DEV_TRANSLINE::do_ac()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::ac_load()
-{ untested();
+{
   //BUG// explicit mfactor
   _sim->_acx.load_symmetric(_n[OUT1].m_(), _n[OUT2].m_(), mfactor()*_y11);
   _sim->_acx.load_symmetric(_n[IN1].m_(), _n[IN2].m_(),  mfactor()*_y11);

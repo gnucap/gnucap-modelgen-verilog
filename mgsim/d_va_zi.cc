@@ -75,7 +75,8 @@ public:
 public:
   ~COMMON_ZIFILTER();
   COMMON_ZIFILTER(int x) : COMMON_RF_BASE(x) {}
-  COMMON_ZIFILTER(COMMON_ZIFILTER const& x) = default;
+  COMMON_ZIFILTER(COMMON_ZIFILTER const& x) : COMMON_RF_BASE(x),
+    _delay(x._delay), _period(x._period), _ttime(x._ttime) {}
   COMMON_ZIFILTER* clone()const override {return new COMMON_ZIFILTER(*this);}
 
   bool operator==(const COMMON_COMPONENT& x)const override;
@@ -83,7 +84,89 @@ public:
   int set_param_by_name(std::string Name, std::string Value)override;
   void precalc_last(const CARD_LIST* par_scope)override;
 }; //COMMON_ZIFILTER
-COMMON_ZIFILTER cl(CC_STATIC);
+COMMON_ZIFILTER czi(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+class COMMON_ZIFILTER_ND : public COMMON_ZIFILTER {
+  std::string name()const override {return "va_zi_nd";}
+public:
+  ~COMMON_ZIFILTER_ND() {}
+  COMMON_ZIFILTER_ND(int x) : COMMON_ZIFILTER(x) { set_nx(); set_xd();}
+  COMMON_ZIFILTER_ND(COMMON_ZIFILTER_ND const& x) : COMMON_ZIFILTER(x) {}
+  COMMON_ZIFILTER_ND* clone()const override {return new COMMON_ZIFILTER_ND(*this);}
+
+  void precalc_last(const CARD_LIST* par_scope)override{
+    COMMON_ZIFILTER::precalc_last(par_scope);
+    convert_nd();
+    reduce_shift();
+  }
+}; //COMMON_ZIFILTER_ND
+COMMON_ZIFILTER_ND czi_nd(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+class COMMON_ZIFILTER_ZD : public COMMON_ZIFILTER {
+  std::string name()const override {return "va_zi_zd";}
+public:
+  ~COMMON_ZIFILTER_ZD() {}
+  COMMON_ZIFILTER_ZD(int x) : COMMON_ZIFILTER(x) { set_zx(); set_xd(); }
+  COMMON_ZIFILTER_ZD(COMMON_ZIFILTER_ZD const& x) : COMMON_ZIFILTER(x) {}
+  COMMON_ZIFILTER_ZD* clone()const override {return new COMMON_ZIFILTER_ZD(*this);}
+
+  void precalc_last(const CARD_LIST* par_scope)override{
+    COMMON_ZIFILTER::precalc_last(par_scope);
+    convert_nd();
+    reduce_shift();
+  }
+}; //COMMON_ZIFILTER_ZD
+COMMON_ZIFILTER_ZD czi_zd(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+class COMMON_ZIFILTER_NP : public COMMON_ZIFILTER {
+  std::string name()const override {return "va_zi_np";}
+public:
+  ~COMMON_ZIFILTER_NP() {}
+  COMMON_ZIFILTER_NP(int x) : COMMON_ZIFILTER(x) { set_nx(); set_xp();}
+  COMMON_ZIFILTER_NP(COMMON_ZIFILTER_NP const& x) : COMMON_ZIFILTER(x) {}
+  COMMON_ZIFILTER_NP* clone()const override {return new COMMON_ZIFILTER_NP(*this);}
+
+  void precalc_last(const CARD_LIST* par_scope)override{ untested();
+    COMMON_ZIFILTER::precalc_last(par_scope);
+    convert_nd();
+    reduce_shift();
+  }
+}; //COMMON_ZIFILTER_NP
+COMMON_ZIFILTER_NP czi_np(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+class COMMON_ZIFILTER_ZP : public COMMON_ZIFILTER {
+  std::string name()const override {return "va_zi_zp";}
+public:
+  ~COMMON_ZIFILTER_ZP() {}
+  COMMON_ZIFILTER_ZP(int x) : COMMON_ZIFILTER(x) { set_zx(); set_xp();}
+  COMMON_ZIFILTER_ZP(COMMON_ZIFILTER_ZP const& x) : COMMON_ZIFILTER(x) {}
+  COMMON_ZIFILTER_ZP* clone()const override { return new COMMON_ZIFILTER_ZP(*this);}
+
+  void precalc_last(const CARD_LIST* par_scope)override{
+    COMMON_ZIFILTER::precalc_last(par_scope);
+    convert_nd();
+    reduce_shift();
+    trace2("zp::pl", _p_den.size(), _p_num.size());
+  }
+}; //COMMON_ZIFILTER_ZP
+COMMON_ZIFILTER_ZP czi_zp(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+class COMMON_ZIFILTER_RP : public COMMON_ZIFILTER {
+  std::string name()const override {return "va_zi_rp";}
+public:
+  ~COMMON_ZIFILTER_RP() {}
+  COMMON_ZIFILTER_RP(int x) : COMMON_ZIFILTER(x) { set_rp(); }
+  COMMON_ZIFILTER_RP(COMMON_ZIFILTER_RP const& x) = default;
+  COMMON_ZIFILTER_RP* clone()const override {return new COMMON_ZIFILTER_RP(*this);}
+
+  void precalc_last(const CARD_LIST* par_scope)override{ untested();
+    COMMON_ZIFILTER::precalc_last(par_scope);
+    convert_nd();
+    reduce_shift();
+  }
+}; //COMMON_ZIFILTER_RP
+COMMON_ZIFILTER_RP czi_rp(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class ZFILTER : public ELEMENT {
 private:
@@ -97,7 +180,7 @@ private:
 private: // construct
   explicit ZFILTER(ZFILTER const&);
 public:
-  explicit ZFILTER();
+  explicit ZFILTER(COMMON_COMPONENT*);
   ~ZFILTER() {
     if (net_nodes() > NODES_PER_BRANCH) {
       delete [] _n;
@@ -156,7 +239,7 @@ private: // overrides
     bool linear_input = !_ctrl_in; // TODO.
     int ii;
 
-    if(linear_input){ untested();
+    if(linear_input){
       ii = 2;
     }else if(_ctrl_in){
       ii = net_nodes();
@@ -192,7 +275,6 @@ COMMON_ZIFILTER::~COMMON_ZIFILTER()
 void COMMON_ZIFILTER::precalc_last(const CARD_LIST* par_scope)
 {
   COMMON_RF_BASE::precalc_last(par_scope);
-  reduce_shift();
   e_val(&_period, 1. , par_scope);
   e_val(&_ttime, 0.1 , par_scope);
   e_val(&_delay, 0. , par_scope);
@@ -224,7 +306,7 @@ int COMMON_ZIFILTER::set_param_by_name(std::string Name, std::string Value)
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_ZIFILTER::set_param_by_index(int I, std::string& Value, int Offset)
-{ untested();
+{
 	incomplete();
   switch (COMMON_ZIFILTER::param_count() - 1 - I) {
   case 0: _period = Value;
@@ -281,9 +363,8 @@ double ZFILTER::tr_probe_num(std::string const& n) const
   }
 }
 /*--------------------------------------------------------------------------*/
-ZFILTER::ZFILTER() : ELEMENT()
+ZFILTER::ZFILTER(COMMON_COMPONENT* c) : ELEMENT(c)
 {
-  attach_common(&Default_common);
   // build netlist
   // ports:2
   // overrides
@@ -386,6 +467,7 @@ void ZFILTER::tr_begin()
   int num_den = c->den_size();
   int num_num = c->num_size();
   int num_regs = std::max(num_den, num_num);
+  trace2("ZFILTER::tr_begin", num_num, num_den);
   std::fill_n(_regs, num_regs, 0.);
 }
 /*--------------------------------------------------------------------------*/
@@ -403,9 +485,18 @@ std::string ZFILTER::port_name(int i)const
 	return names[i];
 }
 /*--------------------------------------------------------------------------*/
-ZFILTER zi;
-DISPATCHER<CARD>::INSTALL d0(&device_dispatcher,
-     "va_zi|va_zi_nd|va_zi_zp|va_zi_zd|va_zi_np", &zi);
+ZFILTER zi(&czi);
+DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "va_zi", &zi);
+ZFILTER zi_nd(&czi_nd);
+DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "va_zi_nd", &zi_nd);
+ZFILTER zi_zd(&czi_zd);
+DISPATCHER<CARD>::INSTALL d2(&device_dispatcher, "va_zi_zd", &zi_zd);
+ZFILTER zi_np(&czi_np);
+DISPATCHER<CARD>::INSTALL d3(&device_dispatcher, "va_zi_np", &zi_np);
+ZFILTER zi_zp(&czi_zp);
+DISPATCHER<CARD>::INSTALL d4(&device_dispatcher, "va_zi_zp", &zi_zp);
+ZFILTER zi_rp(&czi_rp);
+DISPATCHER<CARD>::INSTALL d5(&device_dispatcher, "va_zi_rp", &zi_rp);
 /*--------------------------------------------------------------------------*/
 CARD* ZFILTER::clone()const
 {
@@ -452,7 +543,7 @@ void ZFILTER::expand()
   int num_num = c->num_size();
   int num_regs = std::max(num_den, num_num);
   assert(num_den);
-
+  trace2("ZFILTER::expand", num_den, num_num);
 
   if(!_ctrl_in) {
   }else if (!subckt()) {
@@ -557,10 +648,14 @@ void ZFILTER::set_parameters(const std::string& Label, CARD *Owner,
   assert(p);
   int dens = p->args(2);
   int nums = p->args(1);
+  trace2("ZFILTER args", dens, nums);
 //  int num_regs = std::max(dens, nums);
   _n_ports = n_nodes/2; // TODO: current ports
 
-  auto cc = cl.clone();
+  assert(common());
+  auto ccc = common()->clone();
+  auto cc = prechecked_cast<COMMON_ZIFILTER*>(ccc);
+  assert(cc);
 
   cc->_p_den.resize(dens);
   cc->_p_num.resize(nums);
@@ -695,6 +790,7 @@ void ZFILTER::tr_accept()
   int num_den = c->den_size();
   int num_num = c->num_size();
   int num_regs = std::max(num_den, num_num);
+  trace3("ZFILTER::tr_accept", num_den, num_num, num_regs);
   trace3("ZFILTER::tr_accept", long_label(), tr_involts(), num_regs);
 
   // double& new_output = _y[0].f1 = 0;

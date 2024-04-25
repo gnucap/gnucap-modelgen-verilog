@@ -5,7 +5,7 @@ verilog
 parameter T = {3.141592 / 4.}
 
 // H(z) = 1/ (z * z * (1-z)) = 1/(zz-zzz)
-va_zi #(.rr0(0.), .xr0(0.), .T(T*.5), .tau(T*.1)) b(0,out2,in,0);
+va_zi_zp #(.pr0(0.), .zr0(0.), .T(T*.5), .tau(T*.1)) b(0,out2,in,0);
 vsine #(.ampl(1), .freq(1/2/3.1415)) v1(in, 0);
 
 list

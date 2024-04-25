@@ -1,5 +1,5 @@
 // H(s) = 1 / (s^2+s+1) (or so) 
-va_laplace #(.n0(1),.n1(0),.n2(0),.d0(1.),.d1(1.),.d2(1)) b (.out0(0),.out1(2),.in0(in),.in1(0));
+va_laplace_nd #(.n0(1),.n1(0),.n2(0),.d0(1.),.d1(1.),.d2(1)) b (.out0(0),.out1(2),.in0(in),.in1(0));
 resistor #(.r(1)) r1 (.p(2),.n(0));
 resistor #(.r(1.)) r1 (.p(in),.n(nl));
 inductor #(.l(1.)) n1 (.p(nl),.n(nc));

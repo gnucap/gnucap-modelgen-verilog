@@ -444,7 +444,7 @@ void Net_Identifier_Ground::parse(CS& f)
   Node_Ref const& nn = owner()->node(name());
   if(nn) {
     set_node(mod->node(nn));
-  }else{ untested();
+  }else{
     throw Exception_CS_("ground: need previously declared net", f);
   }
 
@@ -868,7 +868,7 @@ void ValueRange::parse(CS& file)
     }
   }else if(file >> "exclude"){
     _type = vr_EXCLUDE;
-    if(file >> "[" || file >> "("){ untested();
+    if(file >> "[" || file >> "("){
       _what = new ValueRangeInterval;
       _what->set_owner(owner());
     }else if(file >> "'{"){ untested();
@@ -1109,7 +1109,7 @@ void SeqBlock::merge_sens(Sensitivities const& s)
 /*--------------------------------------------------------------------------*/
 void SeqBlock::set_sens(Base* s)
 {
-  if(_sens){ untested();
+  if(_sens){
   }else{
     _sens = new Sensitivities;
   }
