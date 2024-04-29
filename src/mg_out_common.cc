@@ -143,9 +143,15 @@ void make_common_set_param_by_name(std::ostream& o, const Module& m)
 {
   o << "aidx COMMON_" << m.identifier() << "::set_param_by_name("
        "std::string Name, std::string Value)\n{\n";
+  o__ "trace2(\"spbn " << m.identifier() << "\", Name, Value);\n";
 
   // BUG, mix into name/alias map below
-  o__ "if(Name == \"$mfactor\"){ Name = \"m\"; }\n";
+  o__ "if(Name == \"$mfactor\"){\n";
+//  o____ "return COMMON_COMPONENT::set_param_by_name(\"m\", Value); break;\n";
+  o____ "_mfactor = Value;\n"; // it's protected.
+  o____ "return 0; // incomplete\n";
+  //{  Name = \"m\"; }\n";
+  o__ "}else{\n";
 
   o__ "static std::string names[] = {";
   int cnt = 0;
@@ -236,6 +242,7 @@ void make_common_set_param_by_name(std::ostream& o, const Module& m)
 
   o__ "}\n";
   o__ "return lb;\n";
+  o__ "}\n";
 
   o << "}\n"
     "/*--------------------------------------------------------------------------*/\n";

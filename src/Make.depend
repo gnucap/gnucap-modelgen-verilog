@@ -76,7 +76,7 @@ mg_block.o: mg_block.cc mg_.h mg_expression.h mg_attrib.h mg_base.h \
  mg_circuit.h mg_discipline.h mg_module.h
 mg_main.o: mg_main.cc mg_out.h mg_base.h mg_in.h mg_attrib.h mg_pp.h \
  mg_.h mg_expression.h mg_deps.h mg_lib.h mg_func.h mg_token.h mg_code.h \
- mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
+ mg_filter.h mg_circuit.h mg_discipline.h mg_module.h config.h
 mg_nodes.o: mg_nodes.cc mg_.h mg_expression.h mg_attrib.h mg_base.h \
  mg_deps.h mg_lib.h mg_func.h mg_token.h mg_code.h mg_filter.h \
  mg_circuit.h mg_discipline.h mg_module.h

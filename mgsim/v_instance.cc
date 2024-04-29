@@ -150,7 +150,14 @@ private: // overrides
     return true;
   }
   int set_param_by_name(std::string name, std::string value) override {
-    _params.push_back(std::make_pair(name, value));
+    trace3("instance spbn", long_label(), name, value);
+    if(name=="$mfactor"){
+      incomplete();
+      // _mfactor = value; probably not.
+      _params.push_back(std::make_pair(name, value));
+    }else{
+      _params.push_back(std::make_pair(name, value));
+    }
     // mutable_common()->set_param_by_name(name, value); // ?
     return 0.; // incomplete.
   }
@@ -261,7 +268,7 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
     return;
   }else if(!c->common()){
     c->set_dev_type(modelname);
-  }else if(auto m=dynamic_cast<MODEL_CARD const*>(model)){ untested();
+  }else if(auto m=dynamic_cast<MODEL_CARD const*>(model)){
     // bypass spice-style find_model
     trace3("prepare_overload bypass", Proto->long_label(), Proto->net_nodes(), _parent);
     assert(c->common());
@@ -301,16 +308,21 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
 //    COMMON_PARAMLIST const* cp = prechecked_cast<COMMON_PARAMLIST const*>(Proto->common());
 //    assert(cp);
     for(int i=0; i<int(_params.size()); ++i){
-      trace4("stub param fwd", c->long_label(), i, _params[i].first, _params[i].second);
+      trace4("stub param fwd1", c->long_label(), i, _params[i].first, _params[i].second);
       std::string value = _params[i].second;
       if(_params[i].first == ""){
 	int idx = c->param_count() - i - 1;
 	c->set_param_by_index(idx, value, 0);
+      }else if(_params[i].first == "$mfactor"){
+	// needed?
+	c->set_param_by_name(_params[i].first, value);
       }else{
+	trace2("stub param fwd2", _params[i].first, value);
 	c->set_param_by_name(_params[i].first, value);
       }
     }
     Proto->subckt()->push_back(c);
+//    c->precalc_first(); // latch mfactor.??
   }catch(Exception const& e){
     // TODO: include proto name attribute
     error(bLOG, long_label() + " discarded: " + e.message() + "\n");
@@ -400,7 +412,6 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
 /*--------------------------------------------------------------------------*/
 CARD* INSTANCE::deflate()
 {
-  trace3("INSTANCE::deflate", long_label(), subckt()->size(), dev_type());
 //  return this; // keep it all. for debugging
   CARD_LIST* s = subckt();
   assert(s);
@@ -461,8 +472,6 @@ CARD* INSTANCE::deflate()
       // a paramset?
       delete (CARD*) r;
     }
-    trace2("INSTANCE::deflate done", long_label(), subckt()->size());
-    trace2("INSTANCE::deflate done", deflated->dev_type(), dev_type());
     // assert(deflated->dev_type()==dev_type()); ?
     return deflated;
   }else{ untested();

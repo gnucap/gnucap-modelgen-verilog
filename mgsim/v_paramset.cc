@@ -324,23 +324,26 @@ void PARAMSET::grow_nodes(size_t Index)
 /*--------------------------------------------------------------------------*/
 int PARAMSET::set_param_by_name(std::string Name, std::string Value)
 {
-  trace3("PARAMSET::spbn", long_label(), Name, Value);
   assert(_parent);
 
-  if(Name==""){ untested();
-      throw Exception_No_Match("invalid parameter: " + Name);
+  if(Name=="$mfactor"){
+    _mfactor = Value;
+    return BASE_SUBCKT::set_param_by_name("m", Value); // BUG? it's called m further down
+  }else if(Name==""){ untested();
+    throw Exception_No_Match("invalid parameter: " + Name);
   }else if(_parent->subckt()){
-    trace2("PARAMSET::spbn", long_label(), _parent->long_label());
+    trace2("PARAMSET::spbn2", long_label(), _parent->long_label());
     PARAM_LIST const* p = _parent->subckt()->params();
 
     if(p->find(Name) == p->end()){ untested();
       throw Exception_No_Match("invalid parameter: " + Name);
     }else{
     }
+    return BASE_SUBCKT::set_param_by_name(Name, Value);
   }else{
+    return BASE_SUBCKT::set_param_by_name(Name, Value);
   }
 
-  return BASE_SUBCKT::set_param_by_name(Name, Value);
 }
 /*--------------------------------------------------------------------------*/
 COMPONENT const* PARAMSET::prepare_dev(CARD const* proto)
@@ -418,7 +421,7 @@ void PARAMSET::precalc_first()
     // c->_params.set_try_again(pl);
   }
 
-  trace2("PARAMSET::pf done", long_label(), is_valid());
+  trace3("PARAMSET::pf done", long_label(), is_valid(), _mfactor);
 
   assert(!is_constant()); /* because I have more work to do */
 } // precalc_first
@@ -509,9 +512,14 @@ CARD* PARAMSET::deflate()
   *subckt()->params() = PARAM_LIST();
   // c->_params set_try_again ...
   subckt()->params()->set_try_again(_parent->subckt()->params());
+  trace0("PARAMSET::resolve?");
   resolve_copy(subckt(), c->_params, NULL);
+  for(auto const& x : c->_params){
+    trace2("debugp", x.first, x.second);
+  }
 
   trace4("PARAMSET::deflate args fwd", dev->long_label(), dev->dev_type(), long_label(), dev_type());
+  trace4("PARAMSET::deflate args fwd", dev->long_label(), _mfactor, pc->mfactor(), pc->mfactor().string());
   for(auto pi=pc->_params.begin(); pi!=pc->_params.end(); ++pi){
     CS cmd(CS::_STRING, pi->second.string());
     Expression e(cmd);
@@ -523,6 +531,7 @@ CARD* PARAMSET::deflate()
     demangle(value);
     trace3("PARAMSET::deflate args fix", long_label(), pi->first, value);
     assert(pi->first!="");
+    assert(pi->first!="$mfactor");
     dev->set_param_by_name(pi->first, value);
   }
 
@@ -539,6 +548,19 @@ CARD* PARAMSET::deflate()
   }else{ untested();
     // what is it?
   }
+
+  try {
+    deflated->set_param_by_name("$mfactor", to_string(_mfactor));
+  }catch (Exception_No_Match& e) {
+    // non-verilog device? try m instead.
+    deflated->set_param_by_name("m", to_string(_mfactor));
+  }
+  auto dd = prechecked_cast<COMPONENT const*>(deflated);
+  if(dd->common()){
+  }else{
+  }
+
+  deflated->precalc_first();
 
   return deflated;
 } // PARAMSET::deflate
@@ -601,11 +623,18 @@ void PARAMSET::expand()
     {
       auto cp = prechecked_cast<COMMON_PARAMLIST const*>(proto->common());
       for(auto i=cp->_params.begin(); i!=cp->_params.end(); ++i){
-	trace2("PARAMSET::expand sp", i->first, i->second.string());
       }
       for(auto i=cp->_params.begin(); i!=cp->_params.end(); ++i){
-	dev->set_param_by_name(i->first, i->second.string());
+	trace2("PARAMSET::expand sp", i->first, i->second.string());
+
+	if(i->first=="$mfactor"){
+	}else{
+	  dev->set_param_by_name(i->first, i->second.string());
+	}
       }
+      trace2("PARAMSET::expand sp", cp->mfactor(), cp->mfactor().string());
+//      dev->set_param_by_name("$mfactor", to_string(cp->mfactor()));
+      dev->precalc_first();
     }
 
     assert(subckt()->size()==1);

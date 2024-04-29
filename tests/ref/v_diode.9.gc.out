@@ -1,0 +1,51 @@
+paramset ddd diode;
+  parameter real area=1; 
+ .af=1.; .area=area; .bv=50; .cjo=1.p; .eg=1.11; .fc=0.5; .ibv=0.001; .is=10.f; .kf=0.; .level=0; .m=0.5; .n=1.; .rs=0.; .tt=0.; .vj=1.; .xti=3.;
+endparamset
+
+module main (1,2);
+  ddd #(.$mfactor(4.),.area(1.)) d1 (1,2);
+endmodule // main
+
+main #(.m(1.),.m(1.)) m (.1(2),.2(0));
+parameter v1=10 
+vsource #(.dc(v1)) V1 (.p(1),.n(0));
+resistor #(.r(100k)) R1 (.p(1),.n(2));
+print op v(1) v(2) i(v1) i(r1) id(m.d1) vd(m.d1) gd(m.d1) cd(m.d1) zra
+                     ^ ? no match
+print op v(1) v(2) i(v1) i(r1) id(m.d1) vd(m.d1) gd(m.d1) cd(m.d1) zra
+                           ^ ? no match
+#           v(1)       v(2)       id(m.d1)   vd(m.d1)   gd(m.d1)   cd(m.d1)   zraw(m.d1) z(2)      
+ 27.        10.        0.5582     ??         ??         ??         ??         ??         273.18    
+print dc v(1) v(2) i(v1) i(r1) id(m.d1) vd(m.d1) gd(m.d1) cd(m.d1) zra
+                     ^ ? no match
+print dc v(1) v(2) i(v1) i(r1) id(m.d1) vd(m.d1) gd(m.d1) cd(m.d1) zra
+                           ^ ? no match
+#           v(1)       v(2)       id(m.d1)   vd(m.d1)   gd(m.d1)   cd(m.d1)   zraw(m.d1) z(2)       iter(0)   
+-10.       -10.       -10.        ??         ??         ??         ??         ??         100.K      3.        
+-8.        -8.        -8.         ??         ??         ??         ??         ??         100.K      3.        
+-6.        -6.        -6.         ??         ??         ??         ??         ??         100.K      3.        
+-4.        -4.        -4.         ??         ??         ??         ??         ??         100.K      3.        
+-2.        -2.        -2.         ??         ??         ??         ??         ??         100.K      3.        
+ 0.         0.         0.         ??         ??         ??         ??         ??         100.K      3.        
+ 2.         2.         0.51044    ??         ??         ??         ??         ??         1.7067K    9.        
+ 4.         4.         0.5323     ??         ??         ??         ??         ??         740.34     5.        
+ 6.         6.         0.54402    ??         ??         ??         ??         ??         471.82     4.        
+ 8.         8.         0.55207    ??         ??         ??         ??         ??         346.06     4.        
+ 10.        10.        0.5582     ??         ??         ??         ??         ??         273.18     4.        
+Gnucap   System status
+iterations: op=8, dc=44, tran=0, fourier=0, total=52
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%
+#           v(1)       v(2)       id(m.d1)   vd(m.d1)   gd(m.d1)   cd(m.d1)   zraw(m.d1) z(2)       iter(0)   
+ 9.999      9.999      0.5582     ??         ??         ??         ??         ??         273.21     8.        
+ 10.        10.        0.5582     ??         ??         ??         ??         ??         273.21     2.        
+ 10.001     10.001     0.55821    ??         ??         ??         ??         ??         273.18     2.        
+#           v(1)       v(2)       id(m.d1)   vd(m.d1)   gd(m.d1)   cd(m.d1)   zraw(m.d1) z(2)      
+ 27.        10.        0.5582     ??         ??         ??         ??         ??         273.18    
+Gnucap   System status
+iterations: op=8, dc=12, tran=0, fourier=0, total=72
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%
