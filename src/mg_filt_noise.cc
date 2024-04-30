@@ -158,7 +158,7 @@ public:
   void make_cc_impl(std::ostream&o)const override {
     std::string cn = _br->code_name();
     std::string id = _m->identifier().to_string();
-    o << " // " << __FILE__ << ":" << __LINE__ << "\n"; // macro?
+    // o << " // " << __FILE__ << ":" << __LINE__ << "\n"; // macro?
     o << "MOD_"<< id <<"::ddouble MOD_" << id << "::" << _code_name << "(";
     o << "ddouble t0";
     for(size_t n=2; n<_na; ++n){

@@ -79,7 +79,7 @@ void Variable_Decl::new_var_ref_()
 bool Variable_Decl::is_used_in(Base const*) const
 {
   // return _token->is_used_in(b);
-  incomplete();
+  // incomplete();
   return false;
 }
 /*--------------------------------------------------------------------------*/
@@ -89,7 +89,7 @@ bool Assignment::is_used_in(Base const* b) const
     return p->is_used_in(b);
   }else{ untested();
   }
-  incomplete();
+  // incomplete(); // later
   return false;
 }
 /*--------------------------------------------------------------------------*/
@@ -134,7 +134,7 @@ void Statement::set_rdeps(TData const& t)
     if(auto b = dynamic_cast<Branch*>(x)){ untested();
       _rdeps.push_back(b);
     }else{ untested();
-      incomplete();
+      // incomplete(); // later
     }
   }
 }

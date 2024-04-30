@@ -150,7 +150,7 @@ void MGVAMS_FILTER::setup(Module* m)
     }else if(assigned){ untested();
     }else if(c_cnt!=1){ untested();
     }else{
-      incomplete();
+      // incomplete(); // later
       // func->set_p_to_gnd();
     }
   }else{

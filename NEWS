@@ -2,7 +2,7 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
-202404**-dev
+20240430-dev
 ============
 * fix output variable evaluation in paramset
 * propagate reverse dependencies
@@ -14,6 +14,8 @@ This file summarizes new features and important changes between snapshots.
 * variable declaration type and range parse/dump.
 * various paramset expansion and dump fixes
 * fix optimised out dependency on short branch.
+* bugfix mfactor in paramset instances
+* initial trln and ltra examples
 
 20240331-dev
 ============

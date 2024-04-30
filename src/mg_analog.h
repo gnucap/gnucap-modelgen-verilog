@@ -322,7 +322,7 @@ public:
   void parse(CS& o) override;
   void dump(std::ostream&o)const override;
   bool is_used_in(Base const*)const override{
-    incomplete();
+    // incomplete(); // later
     return true;
   }
 

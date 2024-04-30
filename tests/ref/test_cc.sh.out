@@ -1928,7 +1928,6 @@ void MOD_resistor::precalc_last()
   }
 }
 /*--------------------------------------------------------------------------*/
- // ../../src/mg_filt_noise.cc:161
 MOD_resistor::ddouble MOD_resistor::_b_white_noise_0(ddouble t0, std::string what)
 {
   (void)what;
