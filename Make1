@@ -18,7 +18,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 #------------------------------------------------------------------------
-SUBDIRS = src mgvams mgopt mgsim vams tests # man
+SUBDIRS = src mgvams mgopt mgsim vams tests
+# man
 #------------------------------------------------------------------------
 DISTCLEANFILES = config.log makefile
 #------------------------------------------------------------------------
