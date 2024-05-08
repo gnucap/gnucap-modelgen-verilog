@@ -640,7 +640,11 @@ void PARAMSET::expand()
     assert(subckt()->size()==1);
 
     subckt()->expand();
-    assert(dev->is_valid());
+    if(dev->is_valid()){
+    }else{
+      // TODO: seems to be the wrong place. see mg_bug.1.gc
+      throw Exception("invalid prototype for " + long_label());
+    }
   }
 } // expand
 /*--------------------------------------------------------------------------*/

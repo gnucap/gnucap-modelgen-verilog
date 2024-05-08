@@ -1,0 +1,16 @@
+>>>>>verilog 
+>>>>>`modelgen 
+>>>>>!make test_bug1.so > /dev/null 
+>>>>>attach ./test_bug1.so 
+>>>>>paramset invalid test_bug1 
+>>>>>module main() 
+>>>>>dc 
+main.dut: invalid from top level
+main.dut: 1 candidate found for invalid
+invalid prototype for m.dut
+>>>>>status notime 
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=0, total=1
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=0, subckt=1, model=0, total=1
+dctran density=0.0%, ac density=0.0%

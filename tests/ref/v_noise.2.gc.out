@@ -13,14 +13,14 @@ meas_noise #(.name("thermal")) noise3 (.p(3));
 meas_noise #(.name("thermal")) noise4 (.p(4));
 #          
  27.       
-#Freq       npwr(noise1) npwr(noise2) npwr(noise3) npwr(noise4) x(m.r1._b_p_n) x(m.r1._b_white_noise_0_p_white_noise_0_n) x(m.r0._b_p_n) x(m.r0._b_white_noise_0_p_white_noise_0_n)
+#Freq       npwr(noise1) npwr(noise2) npwr(noise3) npwr(noise4) x(m.r1._b_p_n) x(m.r1._b_white_noise_0_p_white_noise_0_n) x(m.r0._b_p_n) x(m.r0._b_white_noise_1_p_white_noise_1_n)
  1.         0.         17.E-21    8.E-21     8.E-21     ??         ??         ??         ??        
  2.         0.         17.E-21    8.E-21     8.E-21     ??         ??         ??         ??        
  4.         0.         17.E-21    8.E-21     8.E-21     ??         ??         ??         ??        
  8.         0.         17.E-21    8.E-21     8.E-21     ??         ??         ??         ??        
 #          
  300.      
-#Freq       npwr(noise1) npwr(noise2) npwr(noise3) npwr(noise4) x(m.r1._b_p_n) x(m.r1._b_white_noise_0_p_white_noise_0_n) x(m.r0._b_p_n) x(m.r0._b_white_noise_0_p_white_noise_0_n)
+#Freq       npwr(noise1) npwr(noise2) npwr(noise3) npwr(noise4) x(m.r1._b_p_n) x(m.r1._b_white_noise_0_p_white_noise_0_n) x(m.r0._b_p_n) x(m.r0._b_white_noise_1_p_white_noise_1_n)
  1.         0.         32.E-21    16.E-21    16.E-21    ??         ??         ??         ??        
  2.         0.         32.E-21    16.E-21    16.E-21    ??         ??         ??         ??        
  4.         0.         32.E-21    16.E-21    16.E-21    ??         ??         ??         ??        

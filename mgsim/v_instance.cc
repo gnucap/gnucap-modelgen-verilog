@@ -677,7 +677,7 @@ void INSTANCE::expand()
   }
 }
 /*--------------------------------------------------------------------------*/
-// Kludge: build proto in stub, so it only needs to be done once.
+// Kludge: build proto in stub, so it only needs doing once.
 void INSTANCE::precalc_first()
 {
   assert(common());
