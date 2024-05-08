@@ -252,7 +252,7 @@ void make_common_set_param_by_index(std::ostream& o, const Module& m)
   make_tag(o);
   o << "void COMMON_" << m.identifier() << "::set_param_by_index("
        "int I, std::string& Value, int /*Offset*/)\n{\n";
-  o << "  switch (COMMON_" << m.identifier() << "::param_count() - 1 - I) {\n";
+  o__ "  switch (COMMON_" << m.identifier() << "::param_count() - 1 - I) {\n";
   size_t i = 0;
 
   for (Parameter_List_Collection::const_iterator
@@ -268,9 +268,10 @@ void make_common_set_param_by_index(std::ostream& o, const Module& m)
     }
   }
 
-  o << "  default: incomplete(); // throw? COMMON_COMPONENT::set_param_by_index(I, Value, Offset);\n"
-    "  }\n"
-    "}\n"
+  o____ "default: incomplete(); // throw? COMMON_COMPONENT::set_param_by_index(I, Value, Offset);\n";
+  o__ "}\n";
+  o__ "(void) Value;\n";
+  o << "}\n"
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/

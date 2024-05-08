@@ -1259,7 +1259,10 @@ void Probe::make_cc_dev(std::ostream& o) const
   o____ "ddouble t;\n";
   std::string bcn = _br->code_name();
 
-  if(_br->is_source() && is_flow_probe()) {
+  if(_br->is_short()){
+    // why?
+    o______ "t = 0.;\n";
+  }else if(_br->is_source() && is_flow_probe()) {
     o____ "if(" << _br->code_name() << ") {\n";
     if(_br->has_pot_source()) {
       o______ "t = " << bcn << "->tr_amps();\n";

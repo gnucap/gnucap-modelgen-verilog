@@ -6,6 +6,7 @@ This file summarizes new features and important changes between snapshots.
 ============
 * noise fixes and test coverage
 * paramsets: emit code for prototype module last
+* bugfix short current probe
 
 20240430-dev
 ============

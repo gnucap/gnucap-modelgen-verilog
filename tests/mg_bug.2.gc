@@ -1,0 +1,36 @@
+
+attach ./modelgen_1.so
+
+
+verilog
+
+`modelgen
+module bug2 (a, c);
+	parameter real rs= 0.;
+	
+	inout a, c;
+	electrical a, c;
+	electrical ia;
+
+	analog begin
+		V(a, ia) <+ rs*I(a, ia);
+		V(c, ia) <+ I(c, ia);
+	end
+endmodule
+
+paramset test_bug2 bug2
+endparamset;
+`endmodelgen
+
+
+!make test_bug2.so > /dev/null
+attach ./test_bug2.so
+
+
+test_bug2 #() dut(1,0);
+resistor #(1) r1 (1 2);
+vsource #(1) v1(2 0);
+
+print dc i(v1)
+dc
+status notime
