@@ -116,7 +116,7 @@ bool VAPOT::do_tr()
     trace7("do_tr", long_label(), _self_is_current, _loss0, _values[0], _values[1], tr_amps(), amps);
 
      // _values[1] = _m0.c1;
-    for (int i=2; i<=_n_ports; ++i) { untested();
+    for (int i=2; i<=_n_ports; ++i) {
       _m0_[i-2] = _values[i];
     }
 
@@ -208,10 +208,10 @@ void VAPOT::ac_load()
   _acg = _m0.c1;
   ac_load_passive();
 
-  for (int i=2; i<=_n_ports; ++i) { untested();
+  for (int i=2; i<=_n_ports; ++i) {
     ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _m0_[i-2]);
-    if(_loss0){ untested();
-    }else{ untested();
+    if(_loss0){
+    }else{
     }
   }
 }
@@ -245,7 +245,7 @@ void VAPOT::set_parameters(const std::string& Label, CARD *Owner,
     _m1_ = new double[n_states-2];
     std::fill_n(_m1_, _n_ports-1, 0.);
 
-    if (matrix_nodes() > NODES_PER_BRANCH) { untested();
+    if (matrix_nodes() > NODES_PER_BRANCH) {
       // allocate a bigger node list
       _n = new node_t[matrix_nodes()];
     }else{

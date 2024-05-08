@@ -8,11 +8,11 @@ resistor #(.r(1)) r3 (.p(3),.n(0));
 meas_noise #() noise1 (.p(1));
 meas_noise #() noise2 (.p(2));
 meas_noise #() noise3 (.p(3));
-#Freq       npwr(noise1) npwr(noise2) npwr(noise3)
- 1.         2.         2.         2.        
- 2.         2.         2.         2.        
- 4.         2.         2.         2.        
- 8.         2.         2.         2.        
+#Freq       nv(noise1) nv(noise2) nv(noise3) npwr(noise1) npwr(noise2) npwr(noise3)
+ 1.         1.4142     1.4142     1.4142     2.         2.         2.        
+ 2.         1.4142     1.4142     1.4142     2.         2.         2.        
+ 4.         1.4142     1.4142     1.4142     2.         2.         2.        
+ 8.         1.4142     1.4142     1.4142     2.         2.         2.        
 Gnucap   System status
 iterations: op=0, dc=0, tran=0, fourier=0, total=4
 transient timesteps: accepted=0, rejected=0, total=0

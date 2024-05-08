@@ -5,3 +5,8 @@ meas_noise #() n2 (.p(1),.n(0));
  0.        
 #Freq       n(dut._b_p_n) n(dut._b_white_noise_1_p_white_noise_1_n) npwr(n1)  
  0.         ??         2.         18.       
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=4
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%

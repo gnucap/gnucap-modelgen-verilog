@@ -1,11 +1,11 @@
 
 verilog
 
-flicker_noise #(.m(2) .pwr(1)) fn1(1 0);
-flicker_noise #(.m(1) .pwr(2)) fn2(2 0);
-flicker_noise #(.m(1) .pwr(1)) fn3a(3 0);
-flicker_noise #(.m(1) .pwr(1)) fn3b(3 0);
-flicker_noise #(.m(1) .e(2), .pwr(1)) fn4(4 0);
+flicker_noise #(.$mfactor(2) .pwr(1)) fn1(1 0);
+flicker_noise #(.$mfactor(1) .pwr(2)) fn2(2 0);
+flicker_noise #(.$mfactor(1) .pwr(1)) fn3a(3 0);
+flicker_noise #(.$mfactor(1) .pwr(1)) fn3b(3 0);
+flicker_noise #(.$mfactor(1) .e(2), .pwr(1)) fn4(4 0);
 
 resistor #(1) r1(1, 0);
 resistor #(1) r2(2, 0);

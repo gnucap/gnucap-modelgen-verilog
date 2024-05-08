@@ -1,10 +1,10 @@
 
 verilog
 
-white_noise #(.m(2), .pwr(1)) w(1 0);
-white_noise #(.m(1), .pwr(2)) w(2 0);
-white_noise #(.m(1), .pwr(1)) w(3 0);
-white_noise #(.m(1), .pwr(1)) w(3 0);
+white_noise #(.$mfactor(2), .pwr(1)) w(1 0);
+white_noise #(.$mfactor(1), .pwr(2)) w(2 0);
+white_noise #(.$mfactor(1), .pwr(1)) w(3 0);
+white_noise #(.$mfactor(1), .pwr(1)) w(3 0);
 
 resistor #(1) r1(1, 0);
 resistor #(1) r2(2, 0);
@@ -16,7 +16,7 @@ noise_probe noise3(3);
 
 list
 
-probe ac npwr(noise*)
+probe ac nv(noise*) npwr(noise*)
 
 ac 1 8 * 2
 

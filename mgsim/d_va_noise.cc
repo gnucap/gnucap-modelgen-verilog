@@ -63,7 +63,7 @@ public:
       return param_name(I);
     }else if (I >= COMMON_COMPONENT::param_count()) {
       return "";
-    }else{untested();
+    }else{
       return COMMON_COMPONENT::param_name(I, j);
     }
   }
@@ -110,10 +110,11 @@ public:
       _value = V;
       return 2;
     }else if(N == "$mfactor"){
-      // tmp kludge
+      // incomplete, mfactor transition.
+      try{ COMMON_COMPONENT::set_param_by_name("$mfactor", V); }catch(Exception const&){}
       return 2+COMMON_COMPONENT::set_param_by_name("m", V);
     }else{
-      return 2+COMMON_COMPONENT::set_param_by_name(N, V);
+      throw Exception_No_Match(N);
     }
   }
   void precalc_last(CARD_LIST const* scope)override {

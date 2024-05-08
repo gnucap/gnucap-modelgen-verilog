@@ -833,7 +833,7 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
       o__ "// same " << d->code_name() << "\n";
       if(b->has_pot_source() && b->has_flow_probe()){
 	if(br.num_states()<=2){
-	}else{ untested();
+	}else{
 	  incomplete(); // the other ones??
 	}
       }else{

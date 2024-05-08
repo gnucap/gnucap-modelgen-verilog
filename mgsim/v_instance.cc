@@ -635,7 +635,7 @@ void INSTANCE::expand()
       gotit = prechecked_cast<COMPONENT*>(*j);
       assert(gotit);
       *j = NULL;
-    }else{ untested();
+    }else{
       error(bWARNING, long_label() + " ambiguous overload in " + dev_type() + "\n");
     }
     subckt()->erase(j);

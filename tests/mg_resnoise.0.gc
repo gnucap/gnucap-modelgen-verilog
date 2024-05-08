@@ -50,7 +50,6 @@ dc
 ac
 
 print ac nv(n5 n6 n7 n8)
-dc
 ac
 
 status notime

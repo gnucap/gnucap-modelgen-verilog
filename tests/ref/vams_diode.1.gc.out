@@ -1,3 +1,4 @@
+m.D1 ambiguous overload in diode
 #           v(m)       v(n)       i(V1)      region(m.D1) iter(0)   
  0.         0.         0.         0.         0.         0.        
 -1.        -54.129p   -1.4        0.        -1.         1.        
@@ -38,5 +39,5 @@
 Gnucap   System status
 iterations: op=0, dc=24, tran=0, fourier=0, total=31
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=2, subckt=0, model=0, total=2
+nodes: user=2, subckt=0, model=2, total=4
 dctran density=100.0%, ac density=100.0%

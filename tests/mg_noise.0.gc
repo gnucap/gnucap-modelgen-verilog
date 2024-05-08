@@ -29,4 +29,6 @@ print ac n(dut.*) npwr(n1)
 
 dc
 ac
+
+status notime
 end

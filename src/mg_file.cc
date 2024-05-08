@@ -70,7 +70,8 @@ void File::parse(CS& f)
       || ((f >> "paramset ")      && (f >> _paramset_list))
       ;
     if (has_attributes(&f)){ untested();
-      f.warn(bWARNING, "dangling attributes");
+      f.warn(bWARNING, "dangling attributes "
+	   + attributes(&f).string(NULL));
     }else{
     }
     if (!f.more()) {

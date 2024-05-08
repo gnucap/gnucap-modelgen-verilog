@@ -11,3 +11,8 @@ meas_noise #() nf (.p(6));
  0.        
 #Freq       npwr(na)   npwr(nb)   npwr(nc)   npwr(nd)   npwr(ne)   npwr(nf)  
  0.         2.         2.         2.         2.         2.         2.        
+Gnucap   System status
+iterations: op=3, dc=2, tran=0, fourier=0, total=6
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=6, subckt=0, model=2, total=8
+dctran density=40.6%, ac density=40.6%

@@ -507,7 +507,6 @@ void COMMON_RF_BASE::precalc_last(const CARD_LIST* par_scope)
 void COMMON_RF_BASE::convert_nd()
 {
   if(!_type){
-    untested();
     assert(1==_p_num.size());
     assert(1==_p_den.size());
     _p_num[0] = 1.;

@@ -674,8 +674,8 @@ void Module::parse_body(CS& f)
       || (f >> _circuit->element_list())	// module_instantiation
       ;
     if (has_attributes(&f)) { untested();
-      f.warn(0, "dangling attributesxx");
-      print_attributes(std::cerr, &f);
+      f.warn(bWARNING, "dangling attributes "
+	   + attributes(&f).string(NULL));
     }else{
     }
     if (end){

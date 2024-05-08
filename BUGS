@@ -22,7 +22,7 @@
 
 == libgnucap, TODO
 - MODEL_CARD in lang interface
+- $mfactor vs m clash pending resolution
 - BUG: padding long lines with whitespace
-- m vs M vs $mfactor.
 - tab/newline handling in cmd.warn Exception_CS
 - branch node order is suboptimal

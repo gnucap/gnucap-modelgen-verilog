@@ -1,0 +1,14 @@
+#           v(1)       v(2)       i(v1)      region(m.d1) region(m.d1) region(m.d1)
+ 0.         10.        2.1726    -469.64u    1.         1.         1.        
+#Freq       nv(n2)     nv(n3)     nv(n4)    
+ 1.E+3      5.4325E-6  5.4325E-6  5.4325E-6 
+ 10.E+3     1.7179E-6  1.7179E-6  1.7179E-6 
+ 100.E+3    543.36E-9  543.36E-9  543.36E-9 
+ 1.E+6      172.13E-9  172.13E-9  172.13E-9 
+ 10.E+6     55.376E-9  55.376E-9  55.376E-9 
+ 100.E+6    20.238E-9  20.238E-9  20.238E-9 
+Gnucap   System status
+iterations: op=0, dc=8, tran=0, fourier=0, total=14
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=4, subckt=0, model=20, total=24
+dctran density=27.1%, ac density=27.1%

@@ -1,0 +1,61 @@
+// simple diode test, d_diode.1.ckt
+verilog
+attach ../vams/diode.so
+
+verilog
+
+paramset ddd diode;
+  parameter real area=1;
+ .area= area;
+ .level=0;
+ .is= 10.f;
+ .rs= 10k;
+ .n= 1.;
+ .tt= 0.;
+ .cjo= 1.p;
+ .vj= 1.;
+ .m= 0.5 ;
+ .eg= 1.11;
+ .xti= 3.;
+ .kf= 1e-8;
+ .af= 1.;
+ .fc= 0.5;
+// .bv= 50;
+// .ibv= 0.001;
+endparamset;
+
+module two(1 2)
+  ddd #(.area(1.) .$mfactor(.5)) d1 (1  2);
+  ddd #(.area(1.) .$mfactor(.5)) d2 (1  2);
+endmodule
+
+module one(1 2)
+	ddd #(.area(1.) .$mfactor(1)) d1 (1  2);
+endmodule
+
+module mtwo(1 2)
+  ddd #(.area(1.) .$mfactor(1)) d1 (1  2);
+  ddd #(.area(1.) .$mfactor(1)) d2 (1  2);
+endmodule
+
+resistor #(50k) r1(1,2);
+two m(2 0);
+meas_noise #() n2(2);
+
+resistor #(50k) r1(1,3);
+one m(3 0);
+meas_noise #() n3(3);
+
+resistor #(50k) r1(1,4);
+mtwo #(.$mfactor(.5)) m(4 0);
+meas_noise #() n4(4);
+
+vsource #(.dc(10.)) v1(1,0);
+
+print dc v(1) v(2) i(v1) region(m.d1)
+dc
+print ac nv(n*)
+ac 1e3 1e8 * 10 basic
+* npwr(n*)
+status notime
+end

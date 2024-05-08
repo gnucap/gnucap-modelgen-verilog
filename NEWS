@@ -2,11 +2,19 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
+<<<<<<< HEAD
 202405**-dev
 ============
 * noise fixes and test coverage
 * paramsets: emit code for prototype module last
 * bugfix short current probe
+=======
+202405**
+========
+- fix mfactor bug in noise source
+- add noise to diode.vams
+- 
+>>>>>>> 97352150 (add rs in diode, and noise like ngspice.)
 
 20240430-dev
 ============

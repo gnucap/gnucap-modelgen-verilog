@@ -5,6 +5,9 @@
 
 `include "disciplines.vams"
 `include "constants.vams"
+`pragma modelgen expand-paramset
+`pragma modelgen gen-module
+`pragma modelgen gen-paramset
 
 module diode (a, c);
 	parameter real is=1e-15 from (0:inf);	// saturation current (A)
@@ -17,13 +20,14 @@ module diode (a, c);
 
 	parameter real tnom = 27. from (0:inf); // duplicate in COMMON_COMPONENT...
 	parameter real n = 1.; // why not use $mfactor?
+//   aliasparam n = $mfactor; // TODO
 
-	parameter real area=1;
+	parameter real area=1 from (0:inf);
 	parameter real perim=1;
 	parameter real rs= 0.;
 	parameter real tt= 0.;
 	parameter real vj= 1.;
-	parameter real m= 0.5 ;
+	parameter real m= 0.5 ; // nothing to do with mfactor or ngspice m
 	parameter real eg= 1.11;
 	parameter real xti= 3.;
 	parameter real kf= 0.;
@@ -36,6 +40,7 @@ module diode (a, c);
 	parameter real mjsw= .33;
 	
 	parameter integer level = 0. from [0:5];
+	parameter real dummy = 0. from [0:0]; // disambiguation kludge, need better ordering
 
 	localparam real is_adjusted = $param_given(is)? is : (js*area);
 	localparam real cj_adjusted = cjo * area;
@@ -43,7 +48,8 @@ module diode (a, c);
 
 	inout a, c;
 	electrical a, c;
-	branch (a, c) r, cap;
+	electrical ia;
+	branch (ia, c) r, cap;
 	real qd;
    (* desc="region" *) integer region;
 
@@ -51,10 +57,11 @@ module diode (a, c);
 		real volts, amps, g;
 
 		real tempratio;
-		if($param_given(tnom))
+		if($param_given(tnom)) begin
 			tempratio = $temperature / tnom + `P_CELSIUS0;
-		else
+		end else begin
 			tempratio = 1.;
+		end
 
 		real vt;
 		vt = $vt * n;
@@ -62,37 +69,44 @@ module diode (a, c);
 		real p_isat;
 		p_isat = is_adjusted * pow(tempratio, xti) * exp((eg/vt) *(tempratio-1));
 		real i;
+		real iaf;
 
 		volts = V(r);
+		amps = I(r);
+		iaf = pow(abs(amps), af);
+		real noise;
+		noise = white_noise(2*`P_Q * amps, "shot") + flicker_noise(kf*iaf, 1., "flicker");
 		case(level)
 			0: begin // gnucap model
 				if (volts <= 0.) begin
 					region = -1;
 					i = p_isat * (exp(volts/vt) - 1.);	
-					I(r) <+ i;
+					I(r) <+ i + noise;
+					amps = i;
 				end else begin
-					amps = I(r);
 					if (amps >= 0.) begin
 						region = 1;
-						V(r) <+ vt * ln(amps/p_isat + 1.);
+						V(r) <+ vt * ln(amps/p_isat + 1.) + noise;
 					end else begin
+						// should not get here once converged.
 						region = 0;
 						i = volts * p_isat/vt;
-						I(r) <+ i;
+						I(r) <+ i + noise;
 					end
 				end
 			end
+
 		   1,2,3,4,5: begin // spice model, WIP
 				if (volts <= 0.) begin
-					region = -1;
+					region = -1 - level*100.;
 					g = ( p_isat / vt + $simparam("gmin") );
 				end else begin
-					region = 1;
+					region = 1 + level*100.;
 					real ev;
 					ev = exp(volts/vt);
 					g = ( p_isat * ( ev - 1.) + $simparam("gmin") );
 				end
-				I(r) <+ g*volts;
+				I(r) <+ g*volts + noise;
 			end
 		endcase
 
@@ -138,4 +152,137 @@ module diode (a, c);
 		qd = tf*ii - qb - qsw;// * V(cap); //  * (csw); // wrong.
 		I(cap) <+ ddt(qd);
 	end
+
+	analog begin
+		// V(a, ia) <+ rs * area * I(a, ia);
+		if(rs) begin
+			I(a, ia) <+ V(a, ia) / rs * area;
+			I(a, ia) <+ white_noise(4 * `P_K * (1./rs*area) * $temperature, "thermal");
+		end else begin
+			V(a, ia) <+ 0.;
+		end
+	end
 endmodule
+
+(*desc="nors"*)
+paramset diode diode
+	parameter real is=1e-15 from (0:inf);	// saturation current (A)
+	parameter real tf=0. from [0:inf);	// forward transit time (s)
+	parameter real cjo=0 from [0:inf);	// zero-bias junction capacitance (F)
+	parameter real pb=1. from (0:inf);
+	parameter real pbsw=pb from (0:inf);
+	parameter real cjsw=0 from [0:inf);	// zero-bias sw capacitance (F)
+	parameter real phi=0.7 exclude 0;	// built-in junction potential (V)
+
+	//parameter real tnom = 27. from (0:inf); // duplicate in COMMON_COMPONENT...
+	parameter real n = 1.; // why not use $mfactor?
+//   aliasparam n = $mfactor; // TODO
+
+	parameter real area=1;
+	parameter real perim=1;
+	parameter real rs= 0. from [0:0];
+	parameter real tt= 0.;
+	parameter real vj= 1.;
+	parameter real m= 0.5 ;
+	parameter real eg= 1.11;
+	parameter real xti= 3.;
+	parameter real kf= 0.;
+	parameter real af= 1.;
+	parameter real fc= 0.5;
+	parameter real bv= 50;
+	parameter real ibv= 0.001;
+	parameter real js= 0.;
+	parameter real mj= .5;
+	parameter real mjsw= .33;
+	
+	parameter integer level = 0. from [0:0];
+
+	.is = $param_given(is)? is : (js*area);
+	.tf = tf;
+	.cjo = cjo;
+	.pb = pb;
+	.pbsw = pbsw;
+	.cjsw = cjsw;
+	.phi = phi;
+//	.tnom = tnom;
+	.n = n;
+	.area = area;
+
+	.rs= 0;
+	.tt= tt;
+	.vj= vj;
+	.m= m;
+	.eg= eg;
+	.xti= xti;
+	.kf= kf;
+	.af= af;
+	.fc= fc;
+	.bv= bv;
+	.ibv= ibv;
+	.js= js;
+	.mj= mj;
+	.mjsw= mjsw;
+
+	.level = level;
+endparamset;
+
+paramset diode diode
+	parameter real is=1e-15 from (0:inf);	// saturation current (A)
+	parameter real tf=0. from [0:inf);	// forward transit time (s)
+	parameter real cjo=0 from [0:inf);	// zero-bias junction capacitance (F)
+	parameter real pb=1. from (0:inf);
+	parameter real pbsw=pb from (0:inf);
+	parameter real cjsw=0 from [0:inf);	// zero-bias sw capacitance (F)
+	parameter real phi=0.7 exclude 0;	// built-in junction potential (V)
+
+//	parameter real tnom = 27. from (0:inf); // duplicate in COMMON_COMPONENT...
+	parameter real n = 1.; // why not use $mfactor?
+//   aliasparam n = $mfactor; // TODO
+
+	parameter real area=1;
+	parameter real perim=1;
+	parameter real rs= 1. from (0:inf];
+	parameter real tt= 0.;
+	parameter real vj= 1.;
+	parameter real m= 0.5 ;
+	parameter real eg= 1.11;
+	parameter real xti= 3.;
+	parameter real kf= 0.;
+	parameter real af= 1.;
+	parameter real fc= 0.5;
+	parameter real bv= 50;
+	parameter real ibv= 0.001;
+	parameter real js= 0.;
+	parameter real mj= .5;
+	parameter real mjsw= .33;
+	
+	parameter integer level = 0. from [0:0];
+
+	.is = $param_given(is)? is : (js*area);
+	.tf = tf;
+	.cjo = cjo;
+	.pb = pb;
+	.pbsw = pbsw;
+	.cjsw = cjsw;
+	.phi = phi;
+//	.tnom = tnom;
+	.n = n;
+	.area = area;
+
+	.rs= rs;
+	.tt= tt;
+	.vj= vj;
+	.m= m;
+	.eg= eg;
+	.xti= xti;
+	.kf= kf;
+	.af= af;
+	.fc= fc;
+	.bv= bv;
+	.ibv= ibv;
+	.js= js;
+	.mj= mj;
+	.mjsw= mjsw;
+
+	.level = level;
+endparamset;

@@ -118,6 +118,7 @@ void Paramset::parse(CS& f)
   assert(o);
 
   move_attributes(&f, this);
+  assert(!has_attributes(&f));
   _parameters.set_owner(this);
   _variables.set_owner(this);
 
@@ -158,7 +159,7 @@ void Paramset::parse(CS& f)
       || ((f >> "endparamset ") && (end = true))
       ;
 
-    if (has_attributes(&f)){
+    if (has_attributes(&f)){ untested();
       f.warn(bWARNING, "dangling attributes "
 	   + attributes(&f).string(NULL));
     }else{
