@@ -298,7 +298,7 @@ bool PARAMSET::is_valid() const
     double x = v.e_val(1., subckt());
     trace3("PARAMSET::is_valid", long_label(), x, v.string());
     return x==1.;
-  }else{ untested();
+  }else{ itested();
     return false;
   }
 }

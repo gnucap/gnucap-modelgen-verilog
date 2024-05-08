@@ -10,7 +10,7 @@ options bypass
 verilog
 
 inductor #(.ic(1) .l(1) .$mfactor(1)) c1(out, 0);
-resistor #(.r(2) .m(2)) r1(0, out)
+resistor #(.r(2) .$mfactor(2)) r1(0, out)
 
 print tran v(nodes) iter(0)
 print dc v(nodes)

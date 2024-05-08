@@ -963,14 +963,14 @@ public:
   std::string param_name(int)const override;
   std::string param_name(int,int)const override;
   std::string param_value(int)const override;
-  int param_count()const override {return (5 + COMMON_COMPONENT::param_count());}
+  int param_count()const override {return 5 + COMMON_COMPONENT::param_count();}
   void precalc_first(const CARD_LIST*)override;
   void expand(const COMPONENT*)override;
   void precalc_last(const CARD_LIST*)override;
   void tr_eval_analog(MOD_resistor*)const;
   void precalc_analog(MOD_resistor*)const;
   std::string name()const override {itested();return "resistor";}
-  static int  count() {return _count;}
+    static int  count() {return _count;}
 private: // strictly internal
   static int _count;
 public: // input parameters
@@ -1148,7 +1148,7 @@ bool COMMON_resistor::operator==(const COMMON_COMPONENT& x)const
     && COMMON_COMPONENT::operator==(x));
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_resistor::set_param_by_index(int I, std::string& Value, int Offset)
+void COMMON_resistor::set_param_by_index(int I, std::string& Value, int /*Offset*/)
 {
   switch (COMMON_resistor::param_count() - 1 - I) {
   case 0:  _p_r = Value; break;
@@ -1156,7 +1156,7 @@ void COMMON_resistor::set_param_by_index(int I, std::string& Value, int Offset)
   case 2:  _p_tc2 = Value; break;
   case 3:  _p_noisy = Value; break;
   case 4:  _p_tnom = Value; break;
-  default: COMMON_COMPONENT::set_param_by_index(I, Value, Offset);
+  default: incomplete(); // throw? COMMON_COMPONENT::set_param_by_index(I, Value, Offset);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1165,6 +1165,7 @@ aidx COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
   trace2("spbn resistor", Name, Value);
   if(Name == "$mfactor"){
     _mfactor = Value;
+    try { return COMMON_COMPONENT::set_param_by_name("m", Value); } catch(Exception const&) {} 
     return 0; // incomplete
   }else{
   static std::string names[] = {"noisy", "r", "tc1", "tc2", "tnom"  };
@@ -1191,7 +1192,7 @@ aidx COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
     case 3:_p_tc1 = Value;    break; // 0
     case 2:_p_tc2 = Value;    break; // 0
     case 1:_p_tnom = Value;    break; // 0
-    case 0: return COMMON_COMPONENT::set_param_by_name(Name, Value); break;
+    case 0: throw Exception_No_Match(Name);
   }
   return lb;
   }
@@ -2921,14 +2922,14 @@ public:
   std::string param_name(int)const override;
   std::string param_name(int,int)const override;
   std::string param_value(int)const override;
-  int param_count()const override {return (1 + COMMON_COMPONENT::param_count());}
+  int param_count()const override {return 1 + COMMON_COMPONENT::param_count();}
   void precalc_first(const CARD_LIST*)override;
   void expand(const COMPONENT*)override;
   void precalc_last(const CARD_LIST*)override;
   void tr_eval_analog(MOD_capacitor*)const;
   void precalc_analog(MOD_capacitor*)const;
   std::string name()const override {itested();return "capacitor";}
-  static int  count() {return _count;}
+    static int  count() {return _count;}
 private: // strictly internal
   static int _count;
 public: // input parameters
@@ -3109,11 +3110,11 @@ bool COMMON_capacitor::operator==(const COMMON_COMPONENT& x)const
     && COMMON_COMPONENT::operator==(x));
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_capacitor::set_param_by_index(int I, std::string& Value, int Offset)
+void COMMON_capacitor::set_param_by_index(int I, std::string& Value, int /*Offset*/)
 {
   switch (COMMON_capacitor::param_count() - 1 - I) {
   case 0:  _p_c = Value; break;
-  default: COMMON_COMPONENT::set_param_by_index(I, Value, Offset);
+  default: incomplete(); // throw? COMMON_COMPONENT::set_param_by_index(I, Value, Offset);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -3122,6 +3123,7 @@ aidx COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
   trace2("spbn capacitor", Name, Value);
   if(Name == "$mfactor"){
     _mfactor = Value;
+    try { return COMMON_COMPONENT::set_param_by_name("m", Value); } catch(Exception const&) {} 
     return 0; // incomplete
   }else{
   static std::string names[] = {"c"  };
@@ -3144,7 +3146,7 @@ aidx COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
   assert(lb<=ub);
   switch(ub-lb){
     case 1:_p_c = Value;    break; // 0
-    case 0: return COMMON_COMPONENT::set_param_by_name(Name, Value); break;
+    case 0: throw Exception_No_Match(Name);
   }
   return lb;
   }
@@ -3681,14 +3683,14 @@ public:
   std::string param_name(int)const override;
   std::string param_name(int,int)const override;
   std::string param_value(int)const override;
-  int param_count()const override {return (2 + COMMON_COMPONENT::param_count());}
+  int param_count()const override {return 2 + COMMON_COMPONENT::param_count();}
   void precalc_first(const CARD_LIST*)override;
   void expand(const COMPONENT*)override;
   void precalc_last(const CARD_LIST*)override;
   void tr_eval_analog(MOD_capacitor*)const;
   void precalc_analog(MOD_capacitor*)const;
   std::string name()const override {itested();return "capacitor";}
-  static int  count() {return _count;}
+    static int  count() {return _count;}
 private: // strictly internal
   static int _count;
 public: // input parameters
@@ -3875,12 +3877,12 @@ bool COMMON_capacitor::operator==(const COMMON_COMPONENT& x)const
     && COMMON_COMPONENT::operator==(x));
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_capacitor::set_param_by_index(int I, std::string& Value, int Offset)
+void COMMON_capacitor::set_param_by_index(int I, std::string& Value, int /*Offset*/)
 {
   switch (COMMON_capacitor::param_count() - 1 - I) {
   case 0:  _p_c = Value; break;
   case 1:  _p_ic = Value; break;
-  default: COMMON_COMPONENT::set_param_by_index(I, Value, Offset);
+  default: incomplete(); // throw? COMMON_COMPONENT::set_param_by_index(I, Value, Offset);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -3889,6 +3891,7 @@ aidx COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
   trace2("spbn capacitor", Name, Value);
   if(Name == "$mfactor"){
     _mfactor = Value;
+    try { return COMMON_COMPONENT::set_param_by_name("m", Value); } catch(Exception const&) {} 
     return 0; // incomplete
   }else{
   static std::string names[] = {"c", "ic"  };
@@ -3912,7 +3915,7 @@ aidx COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
   switch(ub-lb){
     case 2:_p_c = Value;    break; // 0
     case 1:_p_ic = Value;    break; // 0
-    case 0: return COMMON_COMPONENT::set_param_by_name(Name, Value); break;
+    case 0: throw Exception_No_Match(Name);
   }
   return lb;
   }

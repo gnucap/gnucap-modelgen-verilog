@@ -6,7 +6,7 @@ load ../vams/resistor.so
 // options bypass
 verilog
 
-resistor #(.r(2) .m(2)) r1(in, 0)
+resistor #(.r(2) .$mfactor(2)) r1(in, 0)
 resistor #(.r(5) .$mfactor(5)) r2(in, 0)
 
 spice

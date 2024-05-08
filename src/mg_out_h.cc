@@ -248,31 +248,31 @@ static void make_common(std::ostream& o, const Module& m)
   }
   declare_ddouble(o, m);
   o << "public:\n";
-  o__ "explicit " << class_name << "(const " << class_name << "& p);\n"
-    "  explicit " << class_name << "(int c=0);\n"
-    "           ~" << class_name << "();\n"
-    "  bool     operator==(const COMMON_COMPONENT&)const override;\n"
-    "  COMMON_COMPONENT* clone()const override {return new "<<class_name<<"(*this);}\n"
-    "  void     set_param_by_index(int, std::string&, int)override;\n"
-    "  aidx     set_param_by_name(std::string, std::string)override;\n"
-    "  bool     is_valid()const;\n"
-    "  bool     param_is_printable(int)const override;\n"
-    "  std::string param_name(int)const override;\n"
-    "  std::string param_name(int,int)const override;\n"
-    "  std::string param_value(int)const override;\n"
-    "  int param_count()const override {return ("
-	     << m.parameters().count_nonlocal()
-	     << " + " << base_class_name << "::param_count());}\n"
-    "  void precalc_first(const CARD_LIST*)override;\n"
-    "  void expand(const COMPONENT*)override;\n"
-    "  void precalc_last(const CARD_LIST*)override;\n"
-    // if has_analog?
-    "  void tr_eval_analog(MOD_" << m.identifier() << "*)const;\n"
-    "  void precalc_analog(MOD_" << m.identifier() << "*)const;\n"
-    "  std::string name()const override {itested();return \"" << m.identifier() << "\";}\n"
+  o__ "explicit " << class_name << "(const " << class_name << "& p);\n";
+  o__ "explicit " << class_name << "(int c=0);\n";
+  o__ "         ~" << class_name << "();\n";
+  o__ "bool     operator==(const COMMON_COMPONENT&)const override;\n";
+  o__ "COMMON_COMPONENT* clone()const override {return new "<<class_name<<"(*this);}\n";
+  o__ "void     set_param_by_index(int, std::string&, int)override;\n";
+  o__ "aidx     set_param_by_name(std::string, std::string)override;\n";
+  o__ "bool     is_valid()const;\n";
+  o__ "bool     param_is_printable(int)const override;\n";
+  o__ "std::string param_name(int)const override;\n";
+  o__ "std::string param_name(int,int)const override;\n";
+  o__ "std::string param_value(int)const override;\n";
+  o__ "int param_count()const override {return "
+        << m.parameters().count_nonlocal()
+        << " + " << base_class_name << "::param_count();}\n";
+  o__ "void precalc_first(const CARD_LIST*)override;\n";
+  o__ "void expand(const COMPONENT*)override;\n";
+  o__ "void precalc_last(const CARD_LIST*)override;\n";
+  // if has_analog?
+  o__ "void tr_eval_analog(MOD_" << m.identifier() << "*)const;\n";
+  o__ "void precalc_analog(MOD_" << m.identifier() << "*)const;\n";
+  o__ "std::string name()const override {itested();return \"" << m.identifier() << "\";}\n";
 //    "  const SDP_CARD* sdp()const {return _sdp;}\n"
 //    "  bool     has_sdp()const {untested();return _sdp;}\n"
-    "  static int  count() {return _count;}\n"
+  o__ "  static int  count() {return _count;}\n"
     "private: // strictly internal\n"
     "  static int _count;\n"
     "public: // input parameters\n";

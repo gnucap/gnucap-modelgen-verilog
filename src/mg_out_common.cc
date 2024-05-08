@@ -147,8 +147,8 @@ void make_common_set_param_by_name(std::ostream& o, const Module& m)
 
   // BUG, mix into name/alias map below
   o__ "if(Name == \"$mfactor\"){\n";
-//  o____ "return COMMON_COMPONENT::set_param_by_name(\"m\", Value); break;\n";
   o____ "_mfactor = Value;\n"; // it's protected.
+  o____ "try { return COMMON_COMPONENT::set_param_by_name(\"m\", Value); } catch(Exception const&) {} \n";
   o____ "return 0; // incomplete\n";
   //{  Name = \"m\"; }\n";
   o__ "}else{\n";
@@ -237,8 +237,7 @@ void make_common_set_param_by_name(std::ostream& o, const Module& m)
     o____ "break; // " << alias[n] << "\n";
     --cnt;
   }
-  o____ "case 0: return COMMON_COMPONENT::set_param_by_name(Name, Value); break;\n";
-
+  o____ "case 0: throw Exception_No_Match(Name);\n";
 
   o__ "}\n";
   o__ "return lb;\n";
@@ -252,7 +251,7 @@ void make_common_set_param_by_index(std::ostream& o, const Module& m)
 {
   make_tag(o);
   o << "void COMMON_" << m.identifier() << "::set_param_by_index("
-       "int I, std::string& Value, int Offset)\n{\n";
+       "int I, std::string& Value, int /*Offset*/)\n{\n";
   o << "  switch (COMMON_" << m.identifier() << "::param_count() - 1 - I) {\n";
   size_t i = 0;
 
@@ -269,7 +268,7 @@ void make_common_set_param_by_index(std::ostream& o, const Module& m)
     }
   }
 
-  o << "  default: COMMON_COMPONENT::set_param_by_index(I, Value, Offset);\n"
+  o << "  default: incomplete(); // throw? COMMON_COMPONENT::set_param_by_index(I, Value, Offset);\n"
     "  }\n"
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";

@@ -3,7 +3,7 @@ test_noise3 #() dut (.p(1),.n(0));
 meas_noise #() n1 (.p(1));
 meas_noise #() n2 (.p(2));
 #           v(1)       v(2)       x(dut._b_p_n) x(dut._b_white_noise_0_p_white_noise_0_n) x(dut._b_p_n) x(dut._b_white_noise_0_p_white_noise_0_n)
- 0.         0.         0.         ??         0.         ??         0.        
+ 0.         0.         0.         ??         ??         ??         ??        
 #Freq       npwr(n1)   npwr(n2)  
  1.         1.         2.        
  2.         1.         2.        

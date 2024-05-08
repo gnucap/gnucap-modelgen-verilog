@@ -143,7 +143,7 @@ public: // make noise
     }
   }
   XPROBE ac_probe_ext(std::string const&)const override;
-  double noise_num(std::string const&n)const override { untested();
+  double noise_num(std::string const&n)const override {
 //    if(n=="loss"){ untested();
 //      return _loss0;
 //    }
@@ -187,19 +187,19 @@ private: // override virtual
   void dc_advance()override {}
   void tr_advance()override {}
   void tr_regress()override {}
-  double tr_amps()const override { untested(); return 0.;}
+  double tr_amps()const override { return 0.;}
   bool tr_needs_eval()const override {return false;}
   TIME_PAIR tr_review()override {return TIME_PAIR();}
   bool do_tr()override {return true;}
   void do_ac()override {}
   void ac_load()override {
-    if(_loss0){ untested();
+    if(_loss0){
       trace1("AC_LOAD", value());
       incomplete();
       _acg = 100;//value(); // 1; // _vy0[1] * _sim->_jomega; BUG. value?
  //     ac_load_source();
       ac_load_shunt(); // 4 pt +- loss
-    }else{ untested();
+    }else{
       ac_load_shunt(); // 4 pt +- loss
     }
   }
@@ -463,9 +463,9 @@ XPROBE MEAS_NOISE::ac_probe_ext(const std::string& x)const
   auto cc = prechecked_cast<COMMON_NOISE const*>(common());
   assert(cc);
   std::string const& name = cc->noise_id();
-  if (Umatch(x, "npwr")) { untested();
+  if (Umatch(x, "npwr")) {
     return XPROBE(port_noise(_n[0], _n[1], name));
-  }else if (Umatch(x, "nv")) { untested();
+  }else if (Umatch(x, "nv")) {
     return XPROBE(sqrt(port_noise(_n[0], _n[1], name)));
   }else{
     return ELEMENT::ac_probe_ext(x);
