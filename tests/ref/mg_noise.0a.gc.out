@@ -1,0 +1,13 @@
+test_noise0a #() dut (.a(1),.b(2),.c(3),.d(4),.e(5),.f(6));
+meas_noise #() na (.p(1));
+meas_noise #() nb (.p(2));
+meas_noise #() nc (.p(3));
+meas_noise #() nd (.p(4));
+meas_noise #() ne (.p(5));
+meas_noise #() nf (.p(6));
+#          
+ 27.       
+#          
+ 0.        
+#Freq       npwr(na)   npwr(nb)   npwr(nc)   npwr(nd)   npwr(ne)   npwr(nf)  
+ 0.         2.         2.         2.         2.         2.         2.        

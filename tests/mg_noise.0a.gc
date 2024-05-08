@@ -1,0 +1,60 @@
+
+attach ./modelgen_0.so
+
+verilog
+
+`modelgen test_noise0a
+module test_noise0a(a, b, c, d, e, f);
+	electrical a, b, c, d, e, f;
+	inout a, b, c, d, e, f;
+	analog begin
+		real x, y;
+
+		I(a) <+ white_noise(1);
+		I(a) <+ white_noise(1);
+		I(a) <+ V(a);
+
+		I(b) <+ white_noise(2);
+		I(b) <+ V(b);
+
+		I(c) <+ sqrt(2) * white_noise(1);
+		I(c) <+ V(c);
+
+		x = white_noise(1) / sqrt(2.);
+		I(d) <+ x;
+		I(d) <+ x;
+		I(d) <+ V(d);
+
+		y = white_noise(1) / sqrt(2.);
+		I(e) <+ 3*y;
+		I(e) <+ -y;
+		I(e) <+ V(e);
+
+		I(f) <+ y * sqrt(2);
+		I(f) <+ x * sqrt(2);
+		I(f) <+ V(f);
+	end
+endmodule
+
+list
+
+!make test_noise0a.so > /dev/null
+attach ./test_noise0a.so
+
+test_noise0a #() dut(1, 2, 3, 4, 5, 6);
+noise_probe na(1)
+noise_probe nb(2)
+noise_probe nc(3)
+noise_probe nd(4)
+noise_probe ne(5)
+noise_probe nf(6)
+
+list
+
+op
+print ac npwr(n*)
+// print ac + m(dut._b_w*)
+
+dc
+ac
+end

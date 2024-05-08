@@ -2,6 +2,10 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
+202405**-dev
+============
+* noise fixes and test coverage
+
 20240430-dev
 ============
 * fix output variable evaluation in paramset

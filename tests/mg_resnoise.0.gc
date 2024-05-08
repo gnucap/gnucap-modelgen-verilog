@@ -1,0 +1,57 @@
+
+attach ./modelgen_0.so
+attach vams/resistor.so
+
+verilog
+
+`modelgen test_rn0
+module test_rn0(p, n);
+	electrical p, n, i;
+	inout p, n;
+	parameter real r=1;
+	parameter real mm=1;
+	analog begin
+		V(p,i) <+ white_noise(4 * 1.3806505e-23 * r * $temperature / mm);
+		V(i,n) <+ I(i,n) * r / mm;
+	end
+endmodule
+
+list
+
+!make test_rn0.so > /dev/null
+attach ./test_rn0.so
+
+// resistor does I(p,n) <+ white_noise(noisy * 4 * `P_K * g * $temperature, "thermal");
+resistor #(.r(100) .noisy(1)) r(0,1);
+test_rn0 #(.r(100)) dut(2, 0);
+
+resistor #(.$mfactor(2) .r(200) .noisy(1)) r(0,3);
+test_rn0 #(.$mfactor(2) .r(200)) dut(4, 0);
+
+test_rn0 #(.mm(2), .$mfactor(1) .r(200)) dut(7, 0);
+test_rn0 #(.$mfactor(2.) .r(200)) dut(8, 0);
+
+list
+
+noise_probe n1(1)
+noise_probe n2(2)
+noise_probe n3(3)
+noise_probe n4(4)
+noise_probe n5(5)
+noise_probe n6(6)
+noise_probe n7(7)
+noise_probe n8(8)
+
+list
+
+print ac nv(n1 n2 n3 n4)
+print dc v(1)
+dc
+ac
+
+print ac nv(n5 n6 n7 n8)
+dc
+ac
+
+status notime
+end

@@ -109,6 +109,9 @@ public:
     }else if(N == "pwr"){
       _value = V;
       return 2;
+    }else if(N == "$mfactor"){
+      // tmp kludge
+      return 2+COMMON_COMPONENT::set_param_by_name("m", V);
     }else{
       return 2+COMMON_COMPONENT::set_param_by_name(N, V);
     }
@@ -133,21 +136,28 @@ public:
 public: // make noise
   double value()const{
     if(_values){
-      // trace2("value", long_label(), *_values);
+      trace4("DEV_NOISE::value", long_label(), *_values, _values[1], _mfactor);
       return *_values;
     }else{
       return ELEMENT::value(); // common->_value?
     }
   }
   XPROBE ac_probe_ext(std::string const&)const override;
-  double tr_probe_num(std::string const&n)const override {
+  double noise_num(std::string const&n)const override { untested();
 //    if(n=="loss"){ untested();
 //      return _loss0;
 //    }
     auto cc = prechecked_cast<COMMON_NOISE const*>(common());
     assert(cc);
     double ev = cc->do_noise(this, n);
-    return mfactor() * mfactor() * ev;
+    trace5("DEV_NOISE::noise_num", long_label(), _mfactor, mfactor(), ev, _loss0);
+    if(_values){
+      return mfactor() * _values[1] * ev;
+    }else if(_loss0){
+      return mfactor() * ev;
+    }else{
+      return mfactor() * ev;
+    }
   }
 private: // override virtual
   void set_parameters(const std::string& Label, CARD *Owner,
@@ -177,13 +187,21 @@ private: // override virtual
   void dc_advance()override {}
   void tr_advance()override {}
   void tr_regress()override {}
-  double tr_amps()const override {return 0.;}
+  double tr_amps()const override { untested(); return 0.;}
   bool tr_needs_eval()const override {return false;}
   TIME_PAIR tr_review()override {return TIME_PAIR();}
   bool do_tr()override {return true;}
   void do_ac()override {}
   void ac_load()override {
-    ac_load_shunt(); // 4 pt +- loss
+    if(_loss0){ untested();
+      trace1("AC_LOAD", value());
+      incomplete();
+      _acg = 100;//value(); // 1; // _vy0[1] * _sim->_jomega; BUG. value?
+ //     ac_load_source();
+      ac_load_shunt(); // 4 pt +- loss
+    }else{ untested();
+      ac_load_shunt(); // 4 pt +- loss
+    }
   }
 private: // purely virtual in ELEMENT
   double tr_involts()const override {return tr_outvolts();}
@@ -331,8 +349,8 @@ void DEV_NOISE::precalc_last()
     CARDSTASH z(this);
     detach_common();
     assert(!common());
-    _mfactor = _values[1];
-    trace2("mf hack", long_label(), _mfactor);
+    _mfactor = _values[1]; //  * _values[1];
+    trace4("mf hack", long_label(), _mfactor, _values[0], _values[1]);
     COMPONENT::precalc_first();
     z.restore();
   }else{
@@ -399,27 +417,6 @@ double COMMON_NOISE::do_noise(ELEMENT const* e, std::string const& what)const
   }
 }
 /*--------------------------------------------------------------------------*/
-double do_noise(CARD_LIST const& cl, std::string what="")
-{
-  double o_power = 0;
-  for (CARD const* c : cl) {
-    // trace_func_comp();
-    if(c->is_device()){
-      if(auto n=dynamic_cast<DEV_NOISE const*>(c) ){
-	o_power += n->tr_probe_num(what);
-      }else{
-      }
-      if( auto s = c->subckt()) {
-	o_power += do_noise(*s, what);
-      }else{
-      }
-    }else{
-    }
-  }
-  trace1("pwrsum", o_power);
-  return o_power;
-}
-/*--------------------------------------------------------------------------*/
 void set_sens_port(const node_t& n1, const node_t& n2)
 {
   size_t noise_size = CKT_BASE::_sim->_total_nodes+1;
@@ -440,20 +437,22 @@ void set_sens_port(const node_t& n1, const node_t& n2)
   }
 }
 /*--------------------------------------------------------------------------*/
-COMPLEX port_noise(const node_t& n1, const node_t& n2, std::string what)
+double port_noise(const node_t& n1, const node_t& n2, std::string what)
 {
   set_sens_port(n1, n2);
   ::status.back.start();
   CKT_BASE::_sim->_acx.fbsubt(CKT_BASE::_sim->_noise);
   ::status.back.stop();
-  return do_noise(CARD_LIST::card_list, what);
+  return CARD_LIST::card_list.noise_num(what);
 }
 /*--------------------------------------------------------------------------*/
-XPROBE DEV_NOISE::ac_probe_ext(const std::string& x)const
+XPROBE DEV_NOISE::ac_probe_ext(const std::string& x) const
 {
   trace2("ac noise", long_label(), mfactor());
   if (Umatch(x, "n|value")) {
     return XPROBE(value());
+  }else if (Umatch(x, "m")) {
+    return XPROBE(mfactor());
   }else{
     return ELEMENT::ac_probe_ext(x);
   }
@@ -464,9 +463,9 @@ XPROBE MEAS_NOISE::ac_probe_ext(const std::string& x)const
   auto cc = prechecked_cast<COMMON_NOISE const*>(common());
   assert(cc);
   std::string const& name = cc->noise_id();
-  if (Umatch(x, "npwr")) {
+  if (Umatch(x, "npwr")) { untested();
     return XPROBE(port_noise(_n[0], _n[1], name));
-  }else if (Umatch(x, "nv")) {
+  }else if (Umatch(x, "nv")) { untested();
     return XPROBE(sqrt(port_noise(_n[0], _n[1], name)));
   }else{
     return ELEMENT::ac_probe_ext(x);

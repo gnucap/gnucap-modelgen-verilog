@@ -1,0 +1,37 @@
+// resistor does I(p,n) <+ white_noise(noisy * 4 * `P_K * g * $temperature, "thermal"); 
+resistor #(.r(100),.noisy(1)) r (.p(0),.n(1));
+test_rn0 #(.r(100)) dut (.p(2),.n(0));
+test_rn0 #(.r(200),.m(1)) r (.p(3),.n(0));
+test_rn0 #(.r(200),.m(1)) r (.p(3),.n(0));
+resistor #(.r(200),.noisy(1),.m(2)) r (.p(0),.n(4));
+test_rn0 #(.r(100),.mm(.5),.m(2)) dut (.p(5),.n(0));
+test_rn0 #(.r(100),.mm(2),.m(.5)) dut (.p(6),.n(0));
+test_rn0 #(.r(200),.mm(.5),.m(4)) dut (.p(7),.n(0));
+// resistor does I(p,n) <+ white_noise(noisy * 4 * `P_K * g * $temperature, "thermal"); 
+resistor #(.r(100),.noisy(1)) r (.p(0),.n(1));
+test_rn0 #(.r(100)) dut (.p(2),.n(0));
+test_rn0 #(.r(200),.m(1)) r (.p(3),.n(0));
+test_rn0 #(.r(200),.m(1)) r (.p(3),.n(0));
+resistor #(.r(200),.noisy(1),.m(2)) r (.p(0),.n(4));
+test_rn0 #(.r(100),.mm(.5),.m(2)) dut (.p(5),.n(0));
+test_rn0 #(.r(100),.mm(2),.m(.5)) dut (.p(6),.n(0));
+test_rn0 #(.r(200),.mm(.5),.m(4)) dut (.p(7),.n(0));
+meas_noise #() n1 (.p(1));
+meas_noise #() n2 (.p(2));
+meas_noise #() n3 (.p(3));
+meas_noise #() n4 (.p(4));
+meas_noise #() n5 (.p(5));
+meas_noise #() n6 (.p(6));
+meas_noise #() n7 (.p(7));
+meas_noise #() n8 (.p(8));
+#           v(1)      
+ 0.         0.        
+#Freq       nv(n1)     nv(n2)     nv(n3)     nv(n4)    
+ 0.         1.2875n    1.2875n    1.2875n    1.2875n   
+#Freq       nv(n5)     nv(n6)     nv(n7)     nv(n8)    
+ 0.         1.2875n    1.2875n    1.2875n    0.        
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=5
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=8, subckt=0, model=0, total=8
+dctran density=12.5%, ac density=12.5%

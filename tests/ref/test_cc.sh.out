@@ -976,7 +976,7 @@ private: // strictly internal
 public: // input parameters
   PARAMETER<real> _p_r /*  */;
   PARAMETER<real> _p_tc1 /*  */, _p_tc2 /*  */;
-  PARAMETER<real> _p_wn /*  */;
+  PARAMETER<real> _p_noisy /*  */;
   PARAMETER<real> _p_tnom /*  */;
 private: // funcs
   bool param_given(PARA_BASE const& p)const {
@@ -1114,7 +1114,7 @@ COMMON_resistor::COMMON_resistor(int c)
    _p_r(/*default*/),
    _p_tc1(/*default*/),
    _p_tc2(/*default*/),
-   _p_wn(/*default*/),
+   _p_noisy(/*default*/),
    _p_tnom(/*default*/)
 {
   ++_count;
@@ -1125,7 +1125,7 @@ COMMON_resistor::COMMON_resistor(const COMMON_resistor& p)
    _p_r(p._p_r),
    _p_tc1(p._p_tc1),
    _p_tc2(p._p_tc2),
-   _p_wn(p._p_wn),
+   _p_noisy(p._p_noisy),
    _p_tnom(p._p_tnom)
 {
   ++_count;
@@ -1143,7 +1143,7 @@ bool COMMON_resistor::operator==(const COMMON_COMPONENT& x)const
     && _p_r == p->_p_r
     && _p_tc1 == p->_p_tc1
     && _p_tc2 == p->_p_tc2
-    && _p_wn == p->_p_wn
+    && _p_noisy == p->_p_noisy
     && _p_tnom == p->_p_tnom
     && COMMON_COMPONENT::operator==(x));
 }
@@ -1154,7 +1154,7 @@ void COMMON_resistor::set_param_by_index(int I, std::string& Value, int Offset)
   case 0:  _p_r = Value; break;
   case 1:  _p_tc1 = Value; break;
   case 2:  _p_tc2 = Value; break;
-  case 3:  _p_wn = Value; break;
+  case 3:  _p_noisy = Value; break;
   case 4:  _p_tnom = Value; break;
   default: COMMON_COMPONENT::set_param_by_index(I, Value, Offset);
   }
@@ -1167,7 +1167,7 @@ aidx COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
     _mfactor = Value;
     return 0; // incomplete
   }else{
-  static std::string names[] = {"r", "tc1", "tc2", "tnom", "wn"  };
+  static std::string names[] = {"noisy", "r", "tc1", "tc2", "tnom"  };
   int lb = 0;
   int ub = 5;
   while(lb < ub) {
@@ -1186,11 +1186,11 @@ aidx COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
   }
   assert(lb<=ub);
   switch(ub-lb){
-    case 5:_p_r = Value;    break; // 0
-    case 4:_p_tc1 = Value;    break; // 0
-    case 3:_p_tc2 = Value;    break; // 0
-    case 2:_p_tnom = Value;    break; // 0
-    case 1:_p_wn = Value;    break; // 0
+    case 5:_p_noisy = Value;    break; // 0
+    case 4:_p_r = Value;    break; // 0
+    case 3:_p_tc1 = Value;    break; // 0
+    case 2:_p_tc2 = Value;    break; // 0
+    case 1:_p_tnom = Value;    break; // 0
     case 0: return COMMON_COMPONENT::set_param_by_name(Name, Value); break;
   }
   return lb;
@@ -1203,7 +1203,7 @@ bool COMMON_resistor::param_is_printable(int i)const
   case 0:  return (_p_r.has_hard_value());
   case 1:  return (_p_tc1.has_hard_value());
   case 2:  return (_p_tc2.has_hard_value());
-  case 3:  return (_p_wn.has_hard_value());
+  case 3:  return (_p_noisy.has_hard_value());
   case 4:  return (_p_tnom.has_hard_value());
   default: return COMMON_COMPONENT::param_is_printable(i);
   }
@@ -1215,7 +1215,7 @@ std::string COMMON_resistor::param_name(int i)const
   case 0:  return "r";
   case 1:  return "tc1";
   case 2:  return "tc2";
-  case 3:  return "wn";
+  case 3:  return "noisy";
   case 4:  return "tnom";
   default: return COMMON_COMPONENT::param_name(i);
   }
@@ -1236,7 +1236,7 @@ std::string COMMON_resistor::param_value(int i)const
   case 0:  return _p_r.string();
   case 1:  return _p_tc1.string();
   case 2:  return _p_tc2.string();
-  case 3:  return _p_wn.string();
+  case 3:  return _p_noisy.string();
   case 4:  return _p_tnom.string();
   default: return COMMON_COMPONENT::param_value(i);
   }
@@ -1269,10 +1269,10 @@ bool COMMON_resistor::is_valid() const
   }
   {
   ddouble t0;
-  t0 =  Inf;
+  t0 =  1.;
   ub = t0;
   }
-  if(!(lb<=_p_wn && _p_wn<ub)){ return false; }else{ }
+  if(!(lb<=_p_noisy && _p_noisy<=ub)){ return false; }else{ }
   }
   return true; //COMMON_COMPONENT::is_valid();
 }
@@ -1310,7 +1310,7 @@ void COMMON_resistor::precalc_first(const CARD_LIST* par_scope)
     ddouble t0;
     t0 =  0.;
     real def = real(t0.value());
-    e_val(&(this->_p_wn),     def , par_scope);
+    e_val(&(this->_p_noisy),     def , par_scope);
   }
   {
     ddouble t0;
@@ -1348,7 +1348,7 @@ void COMMON_resistor::precalc_last(const CARD_LIST* par_scope)
     ddouble t0;
     t0 =  0.;
     real def = real(t0.value());
-    e_val(&(this->_p_wn),     def , par_scope);
+    e_val(&(this->_p_noisy),     def , par_scope);
   }
   {
     ddouble t0;
@@ -1466,7 +1466,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
       { // Contribution I(p, n) lin: 1
         ddouble t0;
         // t0[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
-        t0 = (_p_wn) /*rhspar*/ *  55.22602000000000899E-24;
+        t0 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24;
         t0 = t0 * _v_g/*rhsvar*/;
         // function $temperature 1
         ddouble t1;
@@ -1646,7 +1646,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
       { // Contribution I(p, n) lin: 1
         ddouble t0;
         // t0[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
-        t0 = (_p_wn) /*rhspar*/ *  55.22602000000000899E-24;
+        t0 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24;
         t0 = t0 * _v_g/*rhsvar*/;
         // function $temperature 1
         ddouble t1;
@@ -1744,7 +1744,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
       }
       { // Contribution I(p, n) lin: 1
         ddouble t0;
-        t0 = (_p_wn) /*rhspar*/ *  55.22602000000000899E-24;
+        t0 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24;
         t0 = t0 * _v_g/*rhsvar*/;
         // function $temperature 1
         ddouble t1;

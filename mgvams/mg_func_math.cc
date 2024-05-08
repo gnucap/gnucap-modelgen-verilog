@@ -95,7 +95,7 @@ public:
   double evalf(double const* x)const override { untested();
     return std::abs(*x);
   }
-  void make_cc_common(std::ostream& o)const override{ untested();
+  void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";
     o____ "T " << code_name() << "(T d)const {itested();\n";
     o____ "if(d>=0.){itested();\n";
@@ -105,7 +105,7 @@ public:
     o____ "return d;\n";
     o__ "}\n";
   }
-  std::string code_name()const override{ untested();
+  std::string code_name()const override{
     return "_f_abs";
   }
 } p_abs;

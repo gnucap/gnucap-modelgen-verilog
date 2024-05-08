@@ -1,0 +1,56 @@
+
+attach ./modelgen_0.so
+
+verilog
+
+`modelgen test_noise0m
+module test_noise0m(p, n);
+	electrical p, n;
+	inout p, n;
+	parameter real mm=1;
+	parameter real nn=1;
+	analog begin
+		I(p,n) <+ mm*white_noise(nn);
+	end
+endmodule
+
+list
+
+!make test_noise0m.so > /dev/null
+attach ./test_noise0m.so
+
+test_noise0m #() w1a(1, 0);
+test_noise0m #() w1b(1, 0);
+resistor #(.r(1)) r1(1,0);
+noise_probe n1(1)
+
+test_noise0m #(.$mfactor(2)) w2(2, 0);
+resistor #(.r(1)) r1(2,0);
+noise_probe n2(2)
+
+va_white_noise #() w2(3, 0);
+va_white_noise #() w2(3, 0);
+resistor #(.r(1)) r1(3,0);
+noise_probe n3(3)
+
+va_white_noise #(.$mfactor(2)) w4(4, 0);
+resistor #(.r(1)) r1(4,0);
+noise_probe n4(4)
+
+test_noise0m #(.nn(2)) w5(5, 0);
+resistor #(.r(1)) r1(5,0);
+noise_probe n5(5)
+
+test_noise0m #(.mm(1.41)) w5(6, 0);
+resistor #(.r(1)) r1(6,0);
+noise_probe n6(6)
+
+list
+
+print ac npwr(n*)
+
+dc
+ac
+print ac nv(n*)
+ac
+end

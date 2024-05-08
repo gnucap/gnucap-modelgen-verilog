@@ -1,0 +1,26 @@
+test_noise0m #() w1a (.p(1),.n(0));
+test_noise0m #() w1b (.p(1),.n(0));
+resistor #(.r(1)) r1 (.p(1),.n(0));
+meas_noise #() n1 (.p(1));
+test_noise0m #(.m(2)) w2 (.p(2),.n(0));
+resistor #(.r(1)) r1 (.p(2),.n(0));
+meas_noise #() n2 (.p(2));
+white_noise #() w2 (.p(3),.n(0));
+white_noise #() w2 (.p(3),.n(0));
+resistor #(.r(1)) r1 (.p(3),.n(0));
+meas_noise #() n3 (.p(3));
+white_noise #(.m(2)) w4 (.p(4),.n(0));
+resistor #(.r(1)) r1 (.p(4),.n(0));
+meas_noise #() n4 (.p(4));
+test_noise0m #(.nn(2)) w5 (.p(5),.n(0));
+resistor #(.r(1)) r1 (.p(5),.n(0));
+meas_noise #() n5 (.p(5));
+test_noise0m #(.mm(1.41)) w5 (.p(6),.n(0));
+resistor #(.r(1)) r1 (.p(6),.n(0));
+meas_noise #() n6 (.p(6));
+#          
+ 0.        
+#Freq       npwr(n1)   npwr(n2)   npwr(n3)   npwr(n4)   npwr(n5)   npwr(n6)  
+ 0.         2.         2.         2.         2.         2.         1.9881    
+#Freq       nv(n1)     nv(n2)     nv(n3)     nv(n4)     nv(n5)     nv(n6)    
+ 0.         1.4142     1.4142     1.4142     1.4142     1.4142     1.41      

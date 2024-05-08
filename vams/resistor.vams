@@ -20,7 +20,7 @@ module resistor(p, n);
 	inout p, n;
 	parameter real r = 1. from [0.:inf);
 	parameter real tc1 = 0., tc2 = 0.;
-	parameter real wn = 0. from [0:inf);   // nonstandard
+	parameter real noisy = 0. from [0:1];   // nspice
 	parameter real tnom = 0.; // nonstandard ..
 	(* desc="i" *) real i;
 	analog begin
@@ -35,7 +35,7 @@ module resistor(p, n);
 		end
 		i = V(p,n) * g;
 		I(p,n) <+ i;
-		I(p,n) <+ white_noise(wn * 4 * `P_K * g * $temperature, "thermal");
+		I(p,n) <+ white_noise(noisy * 4 * `P_K * g * $temperature, "thermal");
 	end
 endmodule
 

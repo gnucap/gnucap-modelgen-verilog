@@ -187,12 +187,12 @@ public:
       size_t k = 2;
 
       // possibly unneeded. cf. ac_stim
-      for(auto v : deps.ddeps()) { untested();
+      for(auto v : deps.ddeps()) {
 	// char sign = f.reversed()?'-':'+';
 	o__ "// dep " << v->code_name() << "\n";
 	// if(f->branch() == v->branch()){ untested(); }
 	if(v->branch()->is_short()){ untested();
-	}else{ untested();
+	}else{
 	  o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
 	  o__ "// assert(!d->" << state << "[" << k << "]);\n";
 	  o__ "d->" << state << "[" //  << k << "]"
@@ -337,7 +337,7 @@ void Token_NOISE::stack_op(Expression* e)const
     func->set_p_to_gnd();
   }else if(auto dd = prechecked_cast<TData const*>(cc->data())) {
     assert(dd);
-    for(auto i : dd->ddeps()){ untested();
+    for(auto i : dd->ddeps()){
       trace1("dep arg deps", i->code_name());
     }
 
