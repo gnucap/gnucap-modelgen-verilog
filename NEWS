@@ -5,6 +5,7 @@ This file summarizes new features and important changes between snapshots.
 202405**-dev
 ============
 * noise fixes and test coverage
+* paramsets: emit code for prototype module last
 
 20240430-dev
 ============

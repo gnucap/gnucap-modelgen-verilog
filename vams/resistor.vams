@@ -2,19 +2,6 @@
 `include "constants.vams"
 
 
-`ifdef LATER
-`define SHORT 1e-8
-module resistor(p, n);
-	electrical p, n;
-	inout p, n;
-	parameter real r = 1. from [`SHORT:inf);
-	(* desc="i" *) real i;
-	analog begin
-		i = V(p,n) / r;
-		I(p,n) <+ i;
-	end
-endmodule
-`else
 module resistor(p, n);
 	electrical p, n;
 	inout p, n;
@@ -43,4 +30,3 @@ paramset resistor resistor
 	parameter real r = 1. from [0.:inf);
 	.r(r);
 endparamset
-`endif

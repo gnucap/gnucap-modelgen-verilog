@@ -2,7 +2,7 @@
 `pragma modelgen expand-paramset
 `pragma modelgen nogen-module
 
-module capacitor_(p,n);
+module capacitor(p,n);
 	inout p,n;
 	electrical p,n;
 
@@ -16,12 +16,12 @@ module capacitor_(p,n);
 	end
 endmodule
 
-paramset capacitor capacitor_
+paramset capacitor capacitor
 	parameter real c = 1. from [0:inf);
 	.c = c;
 endparamset
 
-paramset capacitor capacitor_
+paramset capacitor capacitor
 	parameter real c = 1. from [0:inf);
 	parameter real ic = 0;
 	.c = c;
