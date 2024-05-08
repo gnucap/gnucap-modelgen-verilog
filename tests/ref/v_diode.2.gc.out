@@ -1,0 +1,35 @@
+.subckt ddd (  )
+parameter real area=1; 
+.ends ddd
+.subckt main ( 1 2 )
+d1 ( 1 2 )  ddd  area=1.
+.ends main
+m ( 2 0 )  main 
+V1 ( 1 0 )  DC  10.  AC  1.
+R1 ( 1 2 )  50.K
+#           v(1)       v(2)       i(V1)      i(R1)      id(m.d1)   vd(m.d1)   req(m.d1)  cd(m.d1)   z(m.d1)    zraw(m.d1) gd(m.d1)   z(2)       iter(0)    region(m.d1)
+ 27.        10.        2.1726    -156.55u    156.55u    ??         ??         ??         ??         ??         ??         ??         8.4478K    8.         1.        
+#           v(1)       v(2)       i(V1)      i(R1)      id(m.d1)   vd(m.d1)   req(m.d1)  cd(m.d1)   z(m.d1)    zraw(m.d1) gd(m.d1)   z(2)       iter(0)    region(m.d1)
+-10.       -10.       -10.        0.        -20.01p     ??         ??         ??         ??         ??         ??         ??         50.K       5.        -1.        
+-8.        -8.        -8.         0.        -16.01p     ??         ??         ??         ??         ??         ??         ??         50.K       4.        -1.        
+-6.        -6.        -6.         0.        -12.01p     ??         ??         ??         ??         ??         ??         ??         50.K       4.        -1.        
+-4.        -4.        -4.         0.        -8.01p      ??         ??         ??         ??         ??         ??         ??         50.K       4.        -1.        
+-2.        -2.        -2.         0.        -4.01p      ??         ??         ??         ??         ??         ??         ??         50.K       4.        -1.        
+ 0.         0.         0.         0.         0.         ??         ??         ??         ??         ??         ??         ??         50.K       5.        -1.        
+ 2.         2.         0.79888   -24.022u    24.022u    ??         ??         ??         ??         ??         ??         ??         9.0678K    10.        1.        
+ 4.         4.         1.1508    -56.983u    56.983u    ??         ??         ??         ??         ??         ??         ??         8.6462K    5.         1.        
+ 6.         6.         1.494     -90.119u    90.119u    ??         ??         ??         ??         ??         ??         ??         8.5317K    4.         1.        
+ 8.         8.         1.8341    -123.32u    123.32u    ??         ??         ??         ??         ??         ??         ??         8.4785K    4.         1.        
+ 10.        10.        2.1726    -156.55u    156.55u    ??         ??         ??         ??         ??         ??         ??         8.4478K    4.         1.        
+Gnucap   System status
+iterations: op=8, dc=53, tran=0, fourier=0, total=61
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=4, total=6
+dctran density=66.7%, ac density=66.7%
+#           v(1)       v(2)       i(V1)      i(R1)      id(m.d1)   vd(m.d1)   req(m.d1)  cd(m.d1)   z(m.d1)    zraw(m.d1) gd(m.d1)   z(2)       iter(0)    region(m.d1)
+ 27.        10.        2.1726    -156.55u    156.55u    ??         ??         ??         ??         ??         ??         ??         8.4478K    8.         1.        
+Gnucap   System status
+iterations: op=8, dc=53, tran=0, fourier=0, total=69
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=4, total=6
+dctran density=66.7%, ac density=66.7%
