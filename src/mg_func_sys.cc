@@ -80,7 +80,7 @@ private:
     return "$$mfactor";
   }
   Token* new_token(Module& m, size_t)const override {
-    _m = &m;
+    _m = &m; // needed?
     m.install(this);
     return new Token_CALL("$mfactor", this);
   }
@@ -88,13 +88,15 @@ private:
     return "d->_f_mfactor";
   }
  void make_cc_precalc(std::ostream& o)const override {
-   o__ "double " << "_f_mfactor()const;\n";
+   o__ "double " << "_f_mfactor()const{;\n";
+   o____ "return _d->mfactor();\n";
+   o__ "}\n;";
  }
- void make_cc_impl(std::ostream& o)const override {
+ void make_cc_impl(std::ostream&)const override {
    assert(_m);
-   o << "double " << "PRECALC_" << _m->identifier() << "::_f_mfactor()const {\n";
-   o__ "return _d->mfactor();\n";
-   o << "}\n";
+  // o << "double " << "PRECALC_" << _m->identifier() << "::_f_mfactor()const {\n";
+  // o__ "return _d->mfactor();\n";
+  // o << "}\n";
  }
  void make_cc_dev(std::ostream& o)const override {
    o__ "double " << "_f_mfactor()const {\n";

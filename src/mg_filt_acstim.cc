@@ -219,7 +219,7 @@ public:
 //      std::string cn = _br->code_name();
       o__ "(void)what;\n";
 
-      o__ "COMPONENT* l = _d->" << cn << ";\n";
+      o__ "COMPONENT* l = DEV(_d)->" << cn << ";\n";
       o__ "assert(l);\n";
       o__ "l->set_param_by_name(\"mag\", to_string(t1));\n";
       //o__ "l->set_param_by_name(\"phase\", to_string(t1));\n";

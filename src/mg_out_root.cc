@@ -72,7 +72,7 @@ static void make_header(std::ostream& o, const File& in,
     "const double INF(BIGBIG);\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
-  o << "namespace {\n"
+  o << "namespace { // head\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
@@ -82,7 +82,7 @@ static void make_tail(std::ostream& o, const File&)
   o << // in.cc_direct() <<
     "/*--------------------------------------"
     "------------------------------------*/\n"
-    "}\n"
+    "} // tail\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
@@ -149,7 +149,9 @@ void make_cc(std::ostream& out, const File& in)
 	 ++m) {
       out << "namespace n" << std::to_string(num) << "{\n";
       make_cc_module(out, **m);
-      out << "}\n";
+      out << "} // n" << std::to_string(num) << "\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
       ++num;
     }
   }else{
@@ -162,7 +164,7 @@ void make_cc(std::ostream& out, const File& in)
 	 ++m) {
       out << "namespace n" << std::to_string(num) << "{\n";
       make_cc_module(out, **m);
-      out << "}\n" <<
+      out << "} // n" << std::to_string(num) << "\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
       ++num;

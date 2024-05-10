@@ -264,7 +264,7 @@ public:
       o__ "ddouble ret = 0.;\n";
 //      std::string cn = _br->code_name();
       o__ "trace2(\"precalc" << cn << "\", num.size(), den.size());\n";
-      o__ "COMPONENT* l = _d->" << cn << ";\n";
+      o__ "COMPONENT* l = DEV(_d)->" << cn << ";\n";
       o__ "assert(l);\n";
       o__ "std::string reset;\n";
       o__ "l->set_param_by_index(-1,reset,0);\n";

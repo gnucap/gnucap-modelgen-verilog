@@ -78,7 +78,7 @@ public:
     file.reset();
     size_t here = file.cursor();
 
-    if (cmd >> "paramset"){
+    while (cmd >> "paramset"){
       cmd >> name;
       module_content += cmd.fullstring();
       CS opt(CS::_STRING, "nogen-module");
@@ -98,7 +98,6 @@ public:
       file.reset(here);
       file.reset();
       trace1("paramset", name);
-    }else{
     }
 
     cmd >> "`endmodelgen";

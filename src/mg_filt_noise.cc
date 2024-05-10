@@ -246,14 +246,14 @@ public:
     }
     o__ "ddouble ret = 0.;\n";
     if(num_args()==_na){
-      o__ "COMPONENT* l = _d->" << cn << ";\n";
+      o__ "COMPONENT* l = DEV(_d)->" << cn << ";\n";
       o__ "assert(l);\n";
       o__ "l->set_param_by_name(\"name\", what);\n";
     }else{
     }
     if(num_args()>1 && _na==3){
       o__ "{\n";
-      o____ "COMPONENT* l = _d->" << cn << ";\n";
+      o____ "COMPONENT* l = DEV(_d)->" << cn << ";\n";
       o____ "assert(l);\n";
       o____ "l->set_param_by_name(\"e\", to_string(t1));\n";
       o__ "}\n";

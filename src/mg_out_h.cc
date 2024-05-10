@@ -401,11 +401,11 @@ static void make_precalc(std::ostream& o, Module const& m)
 {
   std::string class_name = "PRECALC_" + m.identifier().to_string();
   o << "class " << class_name << "{\n";
-  o__ "MOD_" <<  m.identifier() << "* _d{NULL};\n";
+  o__ "COMPONENT* _d{NULL};\n";
   o << "public:\n";
   declare_ddouble(o, m);
   o << "public:\n";
-  o__ "explicit " << class_name << "(MOD_" <<  m.identifier() << "*d) : _d(d) {}\n";
+  o__ "explicit " << class_name << "(COMPONENT* d) : _d(d) {}\n";
   // ... functions->make_cc_precalc?
   for(auto const& i : m.funcs()) {
     // indent x;
