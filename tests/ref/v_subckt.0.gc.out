@@ -1,5 +1,5 @@
 m #(.v(1), .w(2)) mm(.a(0), .b(1), .c(2)); 
-     ^ ? m: bad parameter v ignored
+    ^ ? m: bad parameter v ignored
 module m (a,b,c);
   parameter w=1 
   vsource #(.dc(v)) v1 (a,b);

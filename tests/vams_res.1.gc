@@ -13,7 +13,7 @@ spice
 V1 in 0 ac 1 dc 0.9 tran sin
 
 .print tran v(nodes) iter(0)
-.print dc v(nodes) iter(0)
+.print dc v(nodes) I(V1) iter(0)
 .print ac vm(nodes) vp(nodes)
 
 .dc

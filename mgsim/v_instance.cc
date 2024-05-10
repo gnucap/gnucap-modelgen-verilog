@@ -268,7 +268,7 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
     return;
   }else if(!c->common()){
     c->set_dev_type(modelname);
-  }else if(auto m=dynamic_cast<MODEL_CARD const*>(model)){
+  }else if(auto m=dynamic_cast<MODEL_CARD const*>(model)){ untested();
     // bypass spice-style find_model
     trace3("prepare_overload bypass", Proto->long_label(), Proto->net_nodes(), _parent);
     assert(c->common());
@@ -625,7 +625,7 @@ void INSTANCE::expand()
       gotit = prechecked_cast<COMPONENT*>(*j);
       assert(gotit);
       *j = NULL;
-    }else if(d->param_count() > gotit->param_count()){ untested();
+    }else if(d->param_count() > gotit->param_count()){
       error(bDEBUG, long_label() + " tie break: " + to_string(gotit->param_count()) + " vs. " +
 	  to_string((*j)->param_count()) + "\n");
     }else if(d->param_count() < gotit->param_count()){

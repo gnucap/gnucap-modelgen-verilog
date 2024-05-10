@@ -83,7 +83,7 @@ public:
 };
 typedef Collection<Attribute> Attribute_List;
 /*--------------------------------------------------------------------------*/
-void move_attributes(void* from, void* to);
+void move_attributes(void* from, void const* to);
 /*--------------------------------------------------------------------------*/
 inline ATTRIB_LIST_p& attributes(void const* x)
 {

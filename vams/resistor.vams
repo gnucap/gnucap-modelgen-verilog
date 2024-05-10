@@ -9,6 +9,7 @@ module resistor(p, n);
 	parameter real tc1 = 0., tc2 = 0.;
 	parameter real noisy = 0. from [0:1];   // nspice
 	parameter real tnom = 0.; // nonstandard ..
+	aliasparam m = $mfactor;
 	(* desc="i" *) real i;
 	analog begin
 		real dt, g;

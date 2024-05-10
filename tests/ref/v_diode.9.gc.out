@@ -7,7 +7,7 @@ module main (1,2);
   ddd #(.$mfactor(4.),.area(1.)) d1 (1,2);
 endmodule // main
 
-main #(.m(1.),.m(1.)) m (.1(2),.2(0));
+main #(.$mfactor(1.)) m (.1(2),.2(0));
 parameter v1=10 
 vsource #(.dc(v1)) V1 (.p(1),.n(0));
 resistor #(.r(100k)) R1 (.p(1),.n(2));

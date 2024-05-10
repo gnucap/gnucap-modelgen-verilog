@@ -242,16 +242,16 @@ DISPATCHER<CARD>::INSTALL
   d1(&device_dispatcher, "va_idt", &p1);
 /*--------------------------------------------------------------------------*/
 void DEV_IDT::ac_load()
-{
+{ untested();
   ac_load_shunt(); // 4 pt +- loss
 		   //
   COMPLEX omg = _sim->_jomega;
   if(_loss0){ untested();
     omg /= - _loss0;
-  }else{
+  }else{ untested();
   }
 		   //
-  if(1){
+  if(1){ untested();
     // abusing _vy[1] for mfactor.
   }else{ untested();
     assert(!_vy0[1]); // for now.
@@ -260,7 +260,7 @@ void DEV_IDT::ac_load()
 
   trace4("load", _vy0[0], _vy0[1], _loss0, _loss1);
   ac_load_passive();
-  for (int i=2; i<=_n_ports; ++i) {
+  for (int i=2; i<=_n_ports; ++i) { untested();
     trace2("load", i, _vy0[i]);
     ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _vy0[i] / omg);
   }
@@ -692,7 +692,7 @@ void DEV_CPOLY_CAP::precalc_last()
   assert(!common());
   {
     assert(_vy0);
-    _mfactor = _vy0[1];
+    set_mfactor(_vy0[1]);
     COMPONENT::precalc_first();
   }
 }

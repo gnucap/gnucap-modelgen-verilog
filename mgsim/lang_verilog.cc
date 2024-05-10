@@ -161,35 +161,73 @@ void LANG_VERILOG::parse_args_paramset(CS& cmd, CARD* x)
   }
 }
 /*--------------------------------------------------------------------------*/
+bool has_attributes(void const* x)
+{
+  assert(CKT_BASE::_attribs);
+  return CKT_BASE::_attribs->at(x);
+}
+/*--------------------------------------------------------------------------*/
+static void move_attributes(void* from, void const* to)
+{
+  assert(!has_attributes(to)); //for now.
+  if(has_attributes(from)){ untested();
+    (*CKT_BASE::_attribs)[to] = (*CKT_BASE::_attribs)[from].chown(from, to);
+    CKT_BASE::_attribs->erase(from, reinterpret_cast<bool*>(from)+1);
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+static void erase_attributes(void* from)
+{
+  CKT_BASE::_attribs->erase(from, reinterpret_cast<bool*>(from)+1);
+}
+/*--------------------------------------------------------------------------*/
 void LANG_VERILOG::parse_args_instance(CS& cmd, CARD* x)
 {
   assert(x);
 
   if (cmd >> "#(") {
+    parse_attributes(cmd, &cmd);
+    size_t c_arg = cmd.cursor();
+    
     if (cmd.match1('.')) {
       // by name
       while (cmd >> '.') {
-	size_t here = cmd.cursor();
-	std::string name  = cmd.ctos("(", "", "");
+	std::string Name  = cmd.ctos("(", "", "");
 	std::string value = cmd.ctos(",)", "(", ")");
 	cmd >> ',';
 	try{
-	  x->set_param_by_name(name, value);
+	  int Index = x->set_param_by_name(Name, value);
+	  trace3("pai", Index, Name, value);
+	  move_attributes(&cmd, x->param_id_tag(Index));
 	}catch (Exception_No_Match&) {
-	  cmd.warn(bDANGER, here, x->long_label() + ": bad parameter " + name + " ignored");
+	  cmd.warn(bDANGER, c_arg, x->long_label() + ": bad parameter " + Name + " ignored");
+	  erase_attributes(&cmd);
+	}catch (Exception_Clash&) {
+	  cmd.warn(bDANGER, c_arg, x->long_label() + ": already set " + Name + ", ignored");
+	  erase_attributes(&cmd);
 	}
+	parse_attributes(cmd, &cmd);
+	c_arg = cmd.cursor();
       }
     }else{
       // by order
-      int index = 1;
-      while (cmd.is_alnum() || cmd.match1("+-.")) {
-	size_t here = cmd.cursor();
+      for (int Index = x->param_count() - 1;  cmd.is_alnum() || cmd.match1("+-.");  --Index) {
 	try{
 	  std::string value = cmd.ctos(",)", "", "");
-	  x->set_param_by_index(x->param_count() - index++, value, 0/*offset*/);
+	  x->set_param_by_index(Index, value, 0/*offset*/);
+	  move_attributes(&cmd, x->param_id_tag(Index));
+	  parse_attributes(cmd, &cmd);
 	}catch (Exception_Too_Many& e) {untested();
-	  cmd.warn(bDANGER, here, e.message());
+	  cmd.warn(bDANGER, c_arg, e.message());
+	  erase_attributes(&cmd);
+	}catch (Exception_Clash&) { untested();
+	  // reachable?
+	  cmd.warn(bDANGER, c_arg, x->long_label() + ": already set, ignored");
+	  erase_attributes(&cmd);
 	}
+	parse_attributes(cmd, &cmd);
+	c_arg = cmd.cursor();
       }
     }
     cmd >> ')';
@@ -197,6 +235,7 @@ void LANG_VERILOG::parse_args_instance(CS& cmd, CARD* x)
     // no args
   }
 }
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::parse_label(CS& cmd, CARD* x)
 {

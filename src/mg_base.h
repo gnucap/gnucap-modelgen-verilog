@@ -498,10 +498,9 @@ protected:
   std::string _quiet_min;
   std::string _quiet_max;
   std::string _final_default;
-  bool	      _positive;
-  bool	      _octal;
 public:
-  Parameter_Base() :_positive(false), _octal(false) {}
+  Parameter_Base() {}
+  explicit Parameter_Base(std::string const& name) : _name(name) {}
   const std::string& type()const		{return _type;}
   const std::string code_name()const		{return "_p_" + _name;}
   const std::string& user_name()const		{ untested();return _user_name;}
@@ -516,8 +515,6 @@ public:
   const std::string& quiet_min()const		{ untested();return _quiet_min;}
   const std::string& quiet_max()const		{ untested();return _quiet_max;}
   const std::string& final_default()const	{ untested();return _final_default;}
-  bool		positive()const			{ untested();return _positive;}
-  bool		octal()const			{ untested();return _octal;}
   String_Arg key()const { return String_Arg(_name); }
 
 #if 0

@@ -194,6 +194,27 @@ void Parameter_2::add_alias(Aliasparam const* a)
   _aliases.push_back(a);
 }
 /*--------------------------------------------------------------------------*/
+class HS_Parameter : public Parameter_Base {
+public:
+  explicit HS_Parameter(std::string const& p) : Parameter_Base(p) {}
+private:
+  void parse(CS&)override {unreachable();}
+  void dump(std::ostream&)const override {unreachable();}
+};
+HS_Parameter hp_mfactor("$mfactor");
+HS_Parameter hp_xpos("$xposition");
+HS_Parameter hp_ypos("$yposition");
+HS_Parameter hp_zpos("$zposition");
+HS_Parameter hp_angle("$angle");
+HS_Parameter hp_vflip("$bflip");
+HS_Parameter hp_hflip("$hflip");
+HS_Parameter hp_bflip("$bflip");
+/*--------------------------------------------------------------------------*/
+bool Aliasparam::is_hs() const
+{
+  return dynamic_cast<HS_Parameter const*>(_param);
+}
+/*--------------------------------------------------------------------------*/
 void Aliasparam::parse(CS& f)
 {
   std::string paramname;
@@ -209,6 +230,7 @@ void Aliasparam::parse(CS& f)
   for(auto pl : p){
     auto it = notstd::find_ptr(pl->begin(), pl->end(), paramname);
     if(pp){
+      assert(it == pl->end());
     }else if(it != pl->end()){
       pp = *it;
     }else{
@@ -225,6 +247,23 @@ void Aliasparam::parse(CS& f)
     pp->add_alias(this);
     _param = pp;
     // owner()->new_var_ref(this); // nope. does not create symbol acc to LRM
+  }else if(paramname == "$mfactor"){
+    _param = &hp_mfactor;
+  }else if(paramname == "$xposition"){ untested();
+    _param = &hp_xpos;
+  }else if(paramname == "$yposition"){
+    _param = &hp_ypos;
+  }else if(paramname == "$zposition"){ untested();
+    _param = &hp_zpos;
+  }else if(paramname == "$angle"){ untested();
+    _param = &hp_angle;
+  }else if(paramname == "$hflip"){ untested();
+    _param = &hp_hflip;
+  }else if(paramname == "$vflip"){ untested();
+    _param = &hp_vflip;
+  }else if(paramname == "$bflip"){ untested();
+    // sflip?
+    _param = &hp_bflip;
   }else{
     f.reset(here);
     throw Exception_CS_("no such parameter", f);
@@ -919,7 +958,7 @@ bool Module::new_var_ref(Base* what)
     p = T->name();
   }
 
-  if(p!=""){
+  if(p != ""){
     auto const& alias = aliasparam();
     // alias.find(p)?
     if(alias.end() == notstd::find_ptr(alias.begin(), alias.end(), p)){

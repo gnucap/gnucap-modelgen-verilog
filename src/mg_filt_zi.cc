@@ -270,21 +270,26 @@ public:
       o__ "l->set_param_by_index(-1,reset,0);\n";
       o__ "for(int i=0; i<int(num.size()); ++i){\n";
       o____ "trace2(\"precalc" << cn << "\", i, num[i]);\n";
+      o____ "l->set_param_by_name(" + num_name_i() + ", \"\");\n";
       o____ "l->set_param_by_name(" + num_name_i() + ", to_string(num[i]));\n";
       o__ "}\n";
       o__ "for(int i=0; i<int(den.size()); ++i){\n";
       o____ "trace2(\"precalc" << cn << "\", i, den[i]);\n";
+      o____ "l->set_param_by_name(" + den_name_i() + ", \"\");\n";
       o____ "l->set_param_by_name(" + den_name_i() + ", to_string(den[i]));\n";
       o__ "}\n";
       if(num_args()>3){
+	o__ "l->set_param_by_name(\"T\", \"\");\n";
 	o__ "l->set_param_by_name(\"T\", to_string(T));\n";
       }else{
       }
       if(num_args()>4){
+	o__ "l->set_param_by_name(\"tau\", \"\");\n";
 	o__ "l->set_param_by_name(\"tau\", to_string(tau));\n";
       }else{
       }
       if(num_args()>5){ untested();
+	o__ "l->set_param_by_name(\"t0\", \"\");\n";
 	o__ "l->set_param_by_name(\"t0\", to_string(t0));\n";
       }else{
       }

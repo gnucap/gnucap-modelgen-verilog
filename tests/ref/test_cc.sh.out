@@ -1154,11 +1154,7 @@ void COMMON_resistor::set_param_by_index(int I, std::string& Value, int /*Offset
 aidx COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
 {
   trace2("spbn resistor", Name, Value);
-  if(Name == "$mfactor"){
-    _mfactor = Value;
-    try { return COMMON_COMPONENT::set_param_by_name("m", Value); } catch(Exception const&) {} 
-    return 0; // incomplete
-  }else{
+  {
   static std::string names[] = {"r"  };
   int lb = 0;
   int ub = 1;
@@ -1834,6 +1830,7 @@ ddouble PRECALC_resistor::_b_white_noise_1(ddouble, std::string what) {
   ddouble ret = 0.;
   COMPONENT* l = DEV(_d)->_b_white_noise_1_p_white_noise_1_n;
   assert(l);
+  l->set_param_by_name("name", "");
   l->set_param_by_name("name", what);
   ret[d_potential_b_white_noise_1_p_white_noise_1_n] = -1.;
   return ret;
@@ -1946,6 +1943,7 @@ public:
   explicit MOD_resistor(); // : BASE_SUBCKT() { _n = _nodes; }
   CARD* clone()const override;
 private: // overrides
+  aidx     set_param_by_name(std::string, std::string)override;
   bool is_valid()const override;
   void precalc_first()override;
   void expand()override;
@@ -2065,14 +2063,10 @@ void COMMON_resistor::set_param_by_index(int I, std::string& Value, int /*Offset
 aidx COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
 {
   trace2("spbn resistor", Name, Value);
-  if(Name == "$mfactor"){
-    _mfactor = Value;
-    try { return COMMON_COMPONENT::set_param_by_name("m", Value); } catch(Exception const&) {} 
-    return 0; // incomplete
-  }else{
-  static std::string names[] = {"noisy", "r", "tc1", "tc2", "tnom"  };
+  {
+  static std::string names[] = {"m", "noisy", "r", "tc1", "tc2", "tnom"  };
   int lb = 0;
-  int ub = 5;
+  int ub = 6;
   while(lb < ub) {
     int mid = (lb+ub)/2;
     int c = std::strcmp(Name.c_str(), names[mid].c_str());
@@ -2082,13 +2076,15 @@ aidx COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
       lb = mid+1;
     }else{
       lb = mid;
-      ub = 5;
+      ub = 6;
       assert(lb<ub);
       break;
     }
   }
   assert(lb<=ub);
   switch(ub-lb){
+    case 6:  return COMMON_COMPONENT::set_param_by_name("$mfactor", Value);
+    break; // -1
     case 5:_p_noisy = Value;    break; // 0
     case 4:_p_r = Value;    break; // 0
     case 3:_p_tc1 = Value;    break; // 0
@@ -2697,6 +2693,37 @@ MOD_resistor::MOD_resistor(MOD_resistor const&p) : BASE_SUBCKT(p)
     }
 }
 /*--------------------------------------------------------------------------*/
+aidx MOD_resistor::set_param_by_name(std::string Name, std::string Value)
+{
+  trace2("spbn resistor", Name, Value);
+  {
+  static std::string names[] = {"m"  };
+  int lb = 0;
+  int ub = 1;
+  while(lb < ub) {
+    int mid = (lb+ub)/2;
+    int c = std::strcmp(Name.c_str(), names[mid].c_str());
+    if(c<0){
+      ub = mid;
+    }else if(c>0){
+      lb = mid+1;
+    }else{
+      lb = mid;
+      ub = 1;
+      assert(lb<ub);
+      break;
+    }
+  }
+  assert(lb<=ub);
+  switch(ub-lb){
+    case 1:  return COMPONENT::set_param_by_name("$mfactor", Value);
+    break; // -1
+    case 0: return COMPONENT::set_param_by_name(Name, Value);
+  }
+  return lb;
+  }
+}
+/*--------------------------------------------------------------------------*/
 void MOD_resistor::precalc_first()
 {
   BASE_SUBCKT::precalc_first();
@@ -2856,6 +2883,7 @@ ddouble PRECALC_resistor::_b_white_noise_0(ddouble, std::string what) {
   ddouble ret = 0.;
   COMPONENT* l = DEV(_d)->_b_white_noise_0_p_white_noise_0_n;
   assert(l);
+  l->set_param_by_name("name", "");
   l->set_param_by_name("name", what);
   ret[d_potential_b_white_noise_0_p_white_noise_0_n] = -1.;
   return ret;
@@ -4030,11 +4058,7 @@ void COMMON_capacitor::set_param_by_index(int I, std::string& Value, int /*Offse
 aidx COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
 {
   trace2("spbn capacitor", Name, Value);
-  if(Name == "$mfactor"){
-    _mfactor = Value;
-    try { return COMMON_COMPONENT::set_param_by_name("m", Value); } catch(Exception const&) {} 
-    return 0; // incomplete
-  }else{
+  {
   static std::string names[] = {"c"  };
   int lb = 0;
   int ub = 1;
@@ -4806,11 +4830,7 @@ void COMMON_capacitor::set_param_by_index(int I, std::string& Value, int /*Offse
 aidx COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
 {
   trace2("spbn capacitor", Name, Value);
-  if(Name == "$mfactor"){
-    _mfactor = Value;
-    try { return COMMON_COMPONENT::set_param_by_name("m", Value); } catch(Exception const&) {} 
-    return 0; // incomplete
-  }else{
+  {
   static std::string names[] = {"c", "ic"  };
   int lb = 0;
   int ub = 2;

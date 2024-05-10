@@ -239,7 +239,7 @@ private: // overrides
     bool linear_input = !_ctrl_in; // TODO.
     int ii;
 
-    if(linear_input){
+    if(linear_input){ untested();
       ii = 2;
     }else if(_ctrl_in){
       ii = net_nodes();

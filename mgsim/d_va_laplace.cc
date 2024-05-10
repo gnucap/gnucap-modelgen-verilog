@@ -73,7 +73,7 @@ static _COMMON_VASRC_electrical _C_V_electrical(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class COMMON_LAPLACE : public COMMON_RF_BASE {
 public:
-  PARAMETER<double> _tolerance{NOT_INPUT};
+  PARAMETER<double> _tolerance; // {NOT_INPUT};
   std::string name()const override {return "va_laplace";}
 public:
   ~COMMON_LAPLACE() {}
@@ -84,7 +84,6 @@ public:
 
   bool operator==(const COMMON_COMPONENT& x)const override;
   void set_param_by_index(int I, std::string& Value, int Offset)override;
-  int set_param_by_name(std::string Name, std::string Value)override;
   void precalc_last(const CARD_LIST* par_scope)override;
 }; //COMMON_LAPLACE
 COMMON_LAPLACE cl(CC_STATIC);
@@ -127,7 +126,7 @@ public:
   COMMON_LAPLACE_NP(COMMON_LAPLACE_NP const& x) : COMMON_LAPLACE(x) {}
   COMMON_LAPLACE_NP* clone()const override {return new COMMON_LAPLACE_NP(*this);}
 
-  void precalc_last(const CARD_LIST* par_scope)override{
+  void precalc_last(const CARD_LIST* par_scope)override{ untested();
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();
   }
@@ -317,17 +316,6 @@ void COMMON_LAPLACE::set_param_by_index(int I, std::string& Value, int Offset)
   }
 }
 /*--------------------------------------------------------------------------*/
-int COMMON_LAPLACE::set_param_by_name(std::string Name, std::string Value)
-{
-  if(Name == "$mfactor"){ untested();
-    _mfactor = Name;
-    return 0; // incomplete();
-  }else{
-    trace2("COMMON_LAPLACE::spbn", Name, Value);
-    return COMMON_RF_BASE::set_param_by_name(Name, Value);
-  }
-}
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 static COMMON_LAPLACE Default_test_lap2(CC_STATIC);
 /*--------------------------------------------------------------------------*/
@@ -366,7 +354,7 @@ double LAPLACE::tr_probe_num(std::string const& n) const
 }
 /*--------------------------------------------------------------------------*/
 // LAPLACE::LAPLACE() : ELEMENT()
-// {
+// { untested();
 //   attach_common(&Default_test_lap2);
 //   // build netlist
 //   // ports:2

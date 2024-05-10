@@ -130,17 +130,14 @@ bool has_attributes(void const* x)
   return CKT_BASE::_attribs->at(x);
 }
 /*--------------------------------------------------------------------------*/
-void move_attributes(void* from, void* to)
+void move_attributes(void* from, void const* to)
 {
-  assert(CKT_BASE::_attribs);
-  std::stringstream s;
-  print_attributes(s, from);
-  CKT_BASE::_attribs->erase(from, from);
-  CKT_BASE::_attribs->erase(to, to);
-  CS cmd(CS::_STRING, s.str());
-  trace3("ma", from, to, s.str());
-  parse_attributes(cmd, to);
-  assert(!has_attributes(from));
+  assert(!has_attributes(to)); //for now.
+  if(has_attributes(from)){
+    (*CKT_BASE::_attribs)[to] = (*CKT_BASE::_attribs)[from].chown(from, to);
+    CKT_BASE::_attribs->erase(from, reinterpret_cast<bool*>(from)+1);
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 template class List_Base<Base>;

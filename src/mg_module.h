@@ -111,7 +111,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Aliasparam : public Owned_Base {
-  Parameter_2 const* _param{NULL};
+  Parameter_Base const* _param{NULL};
   std::string _name;
 public:
   explicit Aliasparam() : Owned_Base() {}
@@ -121,14 +121,15 @@ public:
     return _name;
   }
   bool operator!=(const std::string& s)const {return _name != s;}
-  Parameter_2 const* param()const { untested();
+  Parameter_Base const* param()const { untested();
     assert(_param);
     return _param;
   }
-  std::string param_name()const {
+  std::string const& param_name()const {
     assert(_param);
     return _param->name();
   }
+  bool is_hs()const;
 };
 typedef  Collection<Aliasparam> Aliasparam_Collection;
 /*--------------------------------------------------------------------------*/
@@ -188,6 +189,9 @@ public: // TODO
 
   const Parameter_List_Collection& parameters()const	{return _parameters;}
   const Aliasparam_Collection& aliasparam()const	{return _aliasparam;}
+  bool has_hsparam() const{
+    return aliasparam().size();// fixme.
+  }
   const Variable_List_Collection& variables()const	{return _variables;}
   const Circuit*	  circuit()const	{return _circuit;}
   const Owned_Base& analog() const {assert(_analog); return *_analog;}

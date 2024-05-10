@@ -58,12 +58,12 @@ public:
   int param_count()const override {
     return 2 + COMMON_COMPONENT::param_count();
   }
-  std::string param_name(int I, int j)const override {
-    if (j == 0) {
+  std::string param_name(int I, int j)const override { untested();
+    if (j == 0) { untested();
       return param_name(I);
-    }else if (I >= COMMON_COMPONENT::param_count()) {
+    }else if (I >= COMMON_COMPONENT::param_count()) { untested();
       return "";
-    }else{
+    }else{ untested();
       return COMMON_COMPONENT::param_name(I, j);
     }
   }
@@ -73,7 +73,7 @@ public:
       return "pwr";
     }else if(idx==1){
       return "name";
-    }else{
+    }else{ untested();
       return COMMON_COMPONENT::param_name(i);
     }
   }
@@ -83,7 +83,7 @@ public:
       return _value.string();
     }else if(idx==1) {
       return "\"" + _name + "\"";
-    }else{
+    }else{ untested();
       return COMMON_COMPONENT::param_value(i);
     }
   }
@@ -109,11 +109,11 @@ public:
     }else if(N == "pwr"){
       _value = V;
       return 2;
-    }else if(N == "$mfactor"){
+    }else if(N == "$mfactor"){ untested();
       // incomplete, mfactor transition.
       try{ COMMON_COMPONENT::set_param_by_name("$mfactor", V); }catch(Exception const&){}
       return 2+COMMON_COMPONENT::set_param_by_name("m", V);
-    }else{
+    }else{ untested();
       throw Exception_No_Match(N);
     }
   }
@@ -137,7 +137,6 @@ public:
 public: // make noise
   double value()const{
     if(_values){
-      trace4("DEV_NOISE::value", long_label(), *_values, _values[1], _mfactor);
       return *_values;
     }else{
       return ELEMENT::value(); // common->_value?
@@ -151,10 +150,10 @@ public: // make noise
     auto cc = prechecked_cast<COMMON_NOISE const*>(common());
     assert(cc);
     double ev = cc->do_noise(this, n);
-    trace5("DEV_NOISE::noise_num", long_label(), _mfactor, mfactor(), ev, _loss0);
+    trace4("DEV_NOISE::noise_num", long_label(), mfactor(), ev, _loss0);
     if(_values){
       return mfactor() * _values[1] * ev;
-    }else if(_loss0){
+    }else if(_loss0){ untested();
       return mfactor() * ev;
     }else{
       return mfactor() * ev;
@@ -241,12 +240,12 @@ public:
   int param_count()const override {
     return 1 + COMMON_NOISE::param_count();
   }
-  std::string param_name(int I, int j)const override {
-    if (j == 0) {
+  std::string param_name(int I, int j)const override { untested();
+    if (j == 0) { untested();
       return param_name(I);
-    }else if (I >= COMMON_NOISE::param_count()) {
+    }else if (I >= COMMON_NOISE::param_count()) { untested();
       return "";
-    }else{
+    }else{ untested();
       return COMMON_NOISE::param_name(I, j);
     }
   }
@@ -350,8 +349,8 @@ void DEV_NOISE::precalc_last()
     CARDSTASH z(this);
     detach_common();
     assert(!common());
-    _mfactor = _values[1]; //  * _values[1];
-    trace4("mf hack", long_label(), _mfactor, _values[0], _values[1]);
+    set_mfactor(_values[1]);
+    trace4("mf hack", long_label(), mfactor(), _values[0], _values[1]);
     COMPONENT::precalc_first();
     z.restore();
   }else{
@@ -452,7 +451,7 @@ XPROBE DEV_NOISE::ac_probe_ext(const std::string& x) const
   trace2("ac noise", long_label(), mfactor());
   if (Umatch(x, "n|value")) {
     return XPROBE(value());
-  }else if (Umatch(x, "m")) {
+  }else if (Umatch(x, "m")) { untested();
     return XPROBE(mfactor());
   }else{
     return ELEMENT::ac_probe_ext(x);

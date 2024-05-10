@@ -254,10 +254,12 @@ public:
       o__ "l->set_param_by_index(-1,reset,0);\n";
       o__ "for(int i=0; i<int(num.size()); ++i){\n";
       o____ "trace2(\"precalc" << cn << "\", i, num[i]);\n";
+      o____ "l->set_param_by_name(" + num_name_i() + ", \"\");\n";
       o____ "l->set_param_by_name(" + num_name_i() + ", to_string(num[i]));\n";
       o__ "}\n";
       o__ "for(int i=0; i<int(den.size()); ++i){\n";
       o____ "trace2(\"precalc" << cn << "\", i, den[i]);\n";
+      o____ "l->set_param_by_name(" + den_name_i() + ", \"\");\n";
       o____ "l->set_param_by_name(" + den_name_i() + ", to_string(den[i]));\n";
       o__ "}\n";
       o__ "ret[d_potential" << cn << "] = -1.;\n";

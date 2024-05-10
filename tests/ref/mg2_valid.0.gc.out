@@ -6,7 +6,7 @@ module test (1,2);
 endmodule // test
 
 test #() m (.1(1),.2(2));
-m.r1 tie break: 5 vs. 3
+m.r1 tie break: 12 vs. 9
 #           v(1)       v(2)      
 m.r0: short circuit
  0.         9.9998u    0.99999   

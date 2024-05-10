@@ -1,5 +1,5 @@
 test_temp1 #(.dc(dc)) dut(1, 0); 
-              ^ ? : bad parameter dc ignored
+             ^ ? : bad parameter dc ignored
 test_temp1 #() dut (.q(1),.n(0));
 #           v(1)       iter(0)    T(dut)    
  25.        0.025692   3.         ??        

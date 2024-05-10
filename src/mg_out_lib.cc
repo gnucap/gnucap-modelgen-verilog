@@ -115,12 +115,6 @@ static void make_get_one_param(std::ostream& out, const Parameter_1& p,
     if (!(p.offset().empty())) {untested();
       incomplete();
       out << ", m_OFFSET, " << p.offset();
-    }else if (p.positive()) { untested();
-      //incomplete();
-      //out << ", mPOSITIVE";
-    }else if (p.octal()) {untested();
-      incomplete();
-      out << ", m_OCTAL";
     }else if (!(p.scale().empty())) {untested();
       incomplete();       
       out << ", m_SCALE, " << p.scale();

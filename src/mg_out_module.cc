@@ -23,6 +23,7 @@
 #include "mg_circuit.h"
 #include "mg_token.h"
 #include <stack>
+#include <numeric> // iota
 #include "mg_.h" // TODO
 /*--------------------------------------------------------------------------*/
 static String_Arg const& potential_abstol(Branch const& b)
@@ -1040,6 +1041,87 @@ static void make_cc_func(std::ostream& o, const Module& m)
   }
 }
 /*--------------------------------------------------------------------------*/
+static void make_module_set_param_by_name(std::ostream& o, const Module& m)
+{
+  o << "aidx MOD_" << m.identifier() << "::set_param_by_name("
+       "std::string Name, std::string Value)\n{\n";
+  o__ "trace2(\"spbn " << m.identifier() << "\", Name, Value);\n";
+
+  o__ "{\n";
+
+
+  o__ "static std::string names[] = {";
+  int cnt = 0;
+  std::vector<std::string const*> names;
+  std::vector<std::string const*> hs;
+  std::vector<int> alias;
+
+  for (auto n : m.aliasparam()){
+    if(n->is_hs()){
+      names.push_back(&n->name());
+      hs.push_back(&n->param_name());
+      alias.push_back(-1);
+    }else{
+    }
+  }
+
+  std::vector<int> idx(names.size());
+  std::iota(idx.begin(), idx.end(), 0);
+  std::sort(idx.begin(), idx.end(),
+      [&](int A, int B) -> bool {
+      return *names[A] < *names[B];
+      });
+
+
+  std::string comma;
+  for(auto n : idx){
+      o << comma << "\"" << *names[n] << "\"";
+      comma = ", ";
+  }
+  cnt = int(names.size());
+  o__ "};\n";
+  o__ "int lb = 0;\n";
+  o__ "int ub = " << cnt << ";\n";
+  o__ "while(lb < ub) {\n";
+  o____ "int mid = (lb+ub)/2;\n";
+  o____ "int c = std::strcmp(Name.c_str(), names[mid].c_str());\n";
+  o____ "if(c<0){\n";
+  o______ "ub = mid;\n";
+  o____ "}else if(c>0){\n";
+  o______ "lb = mid+1;\n";
+  o____ "}else{\n";
+  o______ "lb = mid;\n";
+  o______ "ub = " << cnt << ";\n";
+  o______ "assert(lb<ub);\n";
+  o______ "break;\n";
+  o____ "}\n";
+  o__ "}\n";
+  o__ "assert(lb<=ub);\n";
+
+  o__ "switch(ub-lb){\n";
+  for(auto n : idx){
+    std::string cn = "_p_" + *names[n];
+    std::string pn;
+    o____ "case " << cnt << ":";
+    if(alias[n] == -1){
+      assert(hs[n]);
+      o__ "return COMPONENT::set_param_by_name(\"" << *hs[n] << "\", Value);\n";
+    }else{
+      unreachable();
+    }
+    o____ "break; // " << alias[n] << "\n";
+    --cnt;
+  }
+  o____ "case 0: return COMPONENT::set_param_by_name(Name, Value);\n";
+
+  o__ "}\n";
+  o__ "return lb;\n";
+  o__ "}\n";
+
+  o << "}\n"
+    "/*--------------------------------------------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
 void make_cc_module(std::ostream& o, const Module& m)
 {
   make_tag(o);
@@ -1066,6 +1148,10 @@ void make_cc_module(std::ostream& o, const Module& m)
 //  make_module_evals(o, m);
 //  make_module_default_constructor(o, m);
   make_module_copy_constructor(o, m);
+  if(m.has_hsparam()) {
+    make_module_set_param_by_name(o, m);
+  }else{
+  }
   make_module_precalc_first(o, m);
   make_module_is_valid(o, m);
   make_module_expand(o, m);

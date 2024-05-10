@@ -327,8 +327,7 @@ int PARAMSET::set_param_by_name(std::string Name, std::string Value)
   assert(_parent);
 
   if(Name=="$mfactor"){
-    _mfactor = Value;
-    return BASE_SUBCKT::set_param_by_name("m", Value); // BUG? it's called m further down
+    return BASE_SUBCKT::set_param_by_name(Name, Value);
   }else if(Name==""){ untested();
     throw Exception_No_Match("invalid parameter: " + Name);
   }else if(_parent->subckt()){
@@ -421,7 +420,7 @@ void PARAMSET::precalc_first()
     // c->_params.set_try_again(pl);
   }
 
-  trace3("PARAMSET::pf done", long_label(), is_valid(), _mfactor);
+  trace3("PARAMSET::pf done", long_label(), is_valid(), my_mfactor());
 
   assert(!is_constant()); /* because I have more work to do */
 } // precalc_first
@@ -519,7 +518,7 @@ CARD* PARAMSET::deflate()
   }
 
   trace4("PARAMSET::deflate args fwd", dev->long_label(), dev->dev_type(), long_label(), dev_type());
-  trace4("PARAMSET::deflate args fwd", dev->long_label(), _mfactor, pc->mfactor(), pc->mfactor().string());
+  trace2("PARAMSET::deflate args fwd", dev->long_label(), my_mfactor());
   for(auto pi=pc->_params.begin(); pi!=pc->_params.end(); ++pi){
     CS cmd(CS::_STRING, pi->second.string());
     Expression e(cmd);
@@ -532,6 +531,8 @@ CARD* PARAMSET::deflate()
     trace3("PARAMSET::deflate args fix", long_label(), pi->first, value);
     assert(pi->first!="");
     assert(pi->first!="$mfactor");
+    // BUG? already set?
+    dev->set_param_by_name(pi->first, "");
     dev->set_param_by_name(pi->first, value);
   }
 
@@ -549,12 +550,8 @@ CARD* PARAMSET::deflate()
     // what is it?
   }
 
-  try {
-    deflated->set_param_by_name("$mfactor", to_string(_mfactor));
-  }catch (Exception_No_Match& e) {
-    // non-verilog device? try m instead.
-    deflated->set_param_by_name("m", to_string(_mfactor));
-  }
+  deflated->set_param_by_name("$mfactor", ""); // to string?
+  deflated->set_param_by_name("$mfactor", to_string(my_mfactor())); // to string?
   auto dd = prechecked_cast<COMPONENT const*>(deflated);
   if(dd->common()){
   }else{
@@ -627,13 +624,12 @@ void PARAMSET::expand()
       for(auto i=cp->_params.begin(); i!=cp->_params.end(); ++i){
 	trace2("PARAMSET::expand sp", i->first, i->second.string());
 
-	if(i->first=="$mfactor"){
+	if(i->first=="$mfactor"){ untested();
 	}else{
+	  dev->set_param_by_name(i->first, ""); // again? BUG?
 	  dev->set_param_by_name(i->first, i->second.string());
 	}
       }
-      trace2("PARAMSET::expand sp", cp->mfactor(), cp->mfactor().string());
-//      dev->set_param_by_name("$mfactor", to_string(cp->mfactor()));
       dev->precalc_first();
     }
 

@@ -35,8 +35,9 @@ class PARAM_PARSE : public PARAMETER<double> {
 public:
   explicit PARAM_PARSE() : PARAMETER<double>() { }
 public:
-  void	operator=(const std::string& s)override { untested();
+  PARAMETER<double>& operator=(const std::string& s)override { untested();
     PARAMETER<double>::operator=(s);
+    return *this;
   }
 public:
   void parse(CS& cmd)override {

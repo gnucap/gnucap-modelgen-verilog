@@ -1,5 +1,5 @@
 test_alias #(.pp(4) .aa(5)) dut4(1,0); 
-                     ^ ? : bad parameter aa ignored
+                    ^ ? : bad parameter aa ignored
 test_alias #(.pp(1)) dut1 (.p(1),.n(0));
 test_alias #(.pp(2)) dut2 (.p(1),.n(0));
 test_alias #() dut3 (.p(1),.n(0));

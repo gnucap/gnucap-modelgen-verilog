@@ -248,6 +248,7 @@ public:
     if(num_args()==_na){
       o__ "COMPONENT* l = DEV(_d)->" << cn << ";\n";
       o__ "assert(l);\n";
+      o__ "l->set_param_by_name(\"name\", \"\");\n";
       o__ "l->set_param_by_name(\"name\", what);\n";
     }else{
     }
@@ -255,6 +256,7 @@ public:
       o__ "{\n";
       o____ "COMPONENT* l = DEV(_d)->" << cn << ";\n";
       o____ "assert(l);\n";
+      o____ "l->set_param_by_name(\"e\", \"\");\n";
       o____ "l->set_param_by_name(\"e\", to_string(t1));\n";
       o__ "}\n";
     }else{

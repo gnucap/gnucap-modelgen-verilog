@@ -493,6 +493,11 @@ static void make_module(std::ostream& o, const Module& m)
   }else{
   }
 /*--------------------------------------------------------------------------*/
+
+  if(m.has_hsparam()){
+    o__ "aidx     set_param_by_name(std::string, std::string)override;\n";
+  }else{
+  }
   o__ "bool is_valid()const override;\n";
   o__ "void precalc_first()override;\n";
   o__ "void expand()override;\n";

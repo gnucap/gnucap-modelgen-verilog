@@ -1,5 +1,7 @@
-dut.c1 tie break: 6 vs. 5
-dut.r1 tie break: 9 vs. 5
+dut.c1 tie break: 13 vs. 9
+dut.c1 tie break: 9 vs. 12
+dut.r1 tie break: 16 vs. 9
+dut.r1 tie break: 9 vs. 12
 #           v(in)      v(out)     iter(0)   
  0.         0.9        0.9        3.        
 #Time       v(in)      v(out)     iter(0)   

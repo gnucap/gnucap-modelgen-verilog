@@ -9,7 +9,7 @@ main.D1 discarded: no match: tf
 main.D1: diode:1 from device_dispatcher
 main.D1: diode:2 from device_dispatcher
 main.D1: 3 candidates found for diode
-m.D1 tie break: 31 vs. 29
+m.D1 tie break: 38 vs. 36
 m.D1 ambiguous overload in diode
 >>>>>.dc v -1 0.65 .05 
 #           v(n)       v(n2)      i(V1)      i(V2)      z(m.D1)    iter(0)   
@@ -47,6 +47,7 @@ m.D1 ambiguous overload in diode
  0.55       0.55       0.55      -1.7189u   -1.7189u    ??         7.        
  0.6        0.6        0.6       -11.88u    -11.88u     ??         7.        
  0.65       0.65       0.65      -82.106u   -82.106u    ??         7.        
+v already set. replacing
 >>>>>.status notime 
 Gnucap   System status
 iterations: op=0, dc=168, tran=0, fourier=0, total=168

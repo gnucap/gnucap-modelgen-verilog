@@ -38,7 +38,6 @@ module device(p, n);
   aliasparam g = c;
   aliasparam h = e;
   aliasparam m = $mfactor;
-  aliasparam y = $yposition;
 
 endmodule
 

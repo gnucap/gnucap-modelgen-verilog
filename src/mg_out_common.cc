@@ -145,18 +145,24 @@ void make_common_set_param_by_name(std::ostream& o, const Module& m)
        "std::string Name, std::string Value)\n{\n";
   o__ "trace2(\"spbn " << m.identifier() << "\", Name, Value);\n";
 
-  // BUG, mix into name/alias map below
-  o__ "if(Name == \"$mfactor\"){\n";
-  o____ "_mfactor = Value;\n"; // it's protected.
-  o____ "try { return COMMON_COMPONENT::set_param_by_name(\"m\", Value); } catch(Exception const&) {} \n";
-  o____ "return 0; // incomplete\n";
-  //{  Name = \"m\"; }\n";
-  o__ "}else{\n";
+  o__ "{\n";
+
 
   o__ "static std::string names[] = {";
   int cnt = 0;
   std::vector<std::string const*> names;
+  std::vector<std::string const*> hs;
   std::vector<int> alias;
+
+  for (auto n : m.aliasparam()){
+    if(n->is_hs()){
+      names.push_back(&n->name());
+      hs.push_back(&n->param_name());
+      alias.push_back(-1);
+    }else{
+    }
+  }
+
   for (Parameter_List_Collection::const_iterator
       q = m.parameters().begin();
       q != m.parameters().end(); ++q) {
@@ -217,7 +223,10 @@ void make_common_set_param_by_name(std::ostream& o, const Module& m)
     std::string cn = "_p_" + *names[n];
     std::string pn;
     o____ "case " << cnt << ":";
-    if(alias[n]){
+    if(alias[n] == -1){
+      assert(hs[n]);
+      o__ "return COMMON_COMPONENT::set_param_by_name(\"" << *hs[n] << "\", Value);\n";
+    }else if(alias[n]){
       cn = *names[n - alias[n] + 1];
       pn = "_p_" + cn;
       o << "\n";
@@ -230,10 +239,11 @@ void make_common_set_param_by_name(std::ostream& o, const Module& m)
       o____ "}else{\n";
       o____ "}\n";
       o____ "";
+      o << pn << " = Value;";
     }else{
       pn = cn;
+      o << pn << " = Value;";
     }
-    o << pn << " = Value;";
     o____ "break; // " << alias[n] << "\n";
     --cnt;
   }
