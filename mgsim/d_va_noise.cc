@@ -346,13 +346,8 @@ void DEV_NOISE::precalc_last()
 {
   ELEMENT::precalc_last();
   if(_values){
-    CARDSTASH z(this);
-    detach_common();
-    assert(!common());
     set_mfactor(_values[1]);
-    trace4("mf hack", long_label(), mfactor(), _values[0], _values[1]);
-    COMPONENT::precalc_first();
-    z.restore();
+    COMPONENT::precalc_first(); // latch _mfactor_fixed
   }else{
   }
   auto cc = prechecked_cast<COMMON_NOISE const*>(common());
