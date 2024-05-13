@@ -43,9 +43,9 @@ private:
   void stack_op(Expression* e)const override;
 
   Expression_ const* args() const{
-    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){
+    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){ untested();
       return a;
-    }else{
+    }else{ untested();
       assert(!Token_CALL::args());
       return NULL;
     }
@@ -66,18 +66,44 @@ private:
     return new Token_PF(label(), this);
   }
   std::string code_name()const override{ untested();
-    incomplete();
-    return "_PORT_FLOW";
+    return "d->PORT_FLOW";
   }
-//   void stack_op(Expression const& args, Expression* out) const override { untested();
-//     incomplete();
-//   }
+  void make_cc_precalc(std::ostream& o)const override { untested();
+    o__ "double PORT_FLOW(int)const {\n";
+	 o____ "return 0.;\n";
+	 o__ "}\n";
+  }
   void make_cc_common(std::ostream& o)const override { untested();
-    o__ "double " << code_name() << "(int)const {\n";
-    o____ "incomplete();\n";
-    o____ "return 0.;\n";
+//    o__ "double " << code_name() << "(int i, BASE_SUBCKT const* c)const {\n";
+//	 o____ "return va::" << code_name() << "(i, c);\n";
+//	 o__ "}\n";
+  }
+  void make_cc_dev(std::ostream& o)const override { untested();
+    o__ "double PORT_FLOW(int i){\n";
+	 o____ "return va::PORT_FLOW(i, this);\n";
+	 o__ "}\n";
+  }
+#if 0
+  void make_cc_dev(std::ostream& o)const override { untested();
+    o__ "double " << code_name() << "(int i)const {\n";
+	 o____ "node_t n = c->n_(i);\n";
+	 o____ "double I(0.);\n";
+    o____ "assert(c->subckt());\n";
+    o____ "for(CARD const* c : *c->subckt()){\n";
+	 o______ "auto e = dynamic_cast<ELEMENT const*>(c);\n";
+	 o______ "if(!e){\n";
+	 o______ "}else if(e->n_(1) == e->n_(0)){ untested();\n";
+	 o______ "}else if(e->n_(1) == n){\n";
+	 o________ "I+= e->tr_amps();\n";
+	 o______ "}else if(e->n_(0) == n){\n";
+	 o________ "I-= e->tr_amps();\n";
+	 o______ "}else{\n";
+	 o______ "}\n";
+    o____ "}\n";
+    o____ "return I;\n";
     o__ "}\n";
   }
+#endif
   std::string eval(CS&, const CARD_LIST*)const override { untested();
     unreachable();
     return "port_flow";
@@ -88,29 +114,24 @@ DISPATCHER<FUNCTION>::INSTALL d_pf(&function_dispatcher, ".port_flow", &pf);
 void Token_PF::stack_op(Expression* E)const
 {
 	// incomplete();
-	if(auto pb = dynamic_cast<Token_PORT_BRANCH*>(E->back())) {
+	if(auto pb = dynamic_cast<Token_PORT_BRANCH*>(E->back())) { untested();
 		auto e = new Expression_;
 		E->pop_back();
 		e->push_back(pb);
 
-		if(dynamic_cast<Token_STOP*>(E->back())) {
-			delete E->back();
-			E->pop_back();
-		}else{
-			assert(0);
-		}
-		// E->push_back(clone());
-		// use Token_CALL??
+		assert(prechecked_cast<Token_STOP*>(E->back()));
+		delete E->back();
+		E->pop_back();
+
 		auto n = clone();
 		n->set_args(e);
 		// n->set_label("I");
 		E->push_back(n);
-	}else if(args()){
+	}else if(args()){ untested();
 		// return Token_CALL::stack_op(E);
-		std::string a ="(" + args()->back()->name() + ")";
-		auto c = new Token_PF(name() + a, f());
+		auto c = new Token_PF(name(), f()); // clone?
+		c->set_args(args()->clone());
 		assert(args());
-//		assert(c->args());
 		E->push_back(c);
 	}else{
 		E->push_back(clone());

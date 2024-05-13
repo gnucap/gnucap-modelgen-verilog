@@ -1,0 +1,30 @@
+attach ./modelgen_1.so
+verilog
+
+`modelgen
+module test_pf0(p, n);
+  electrical p, n;
+  (*desc="i"*) real i;
+  (*desc="j"*) real j;
+
+  analog begin
+    V(n, p) <+ 0.;
+    i = flow(<p>);
+    j = flow(<n>);
+  end
+
+endmodule
+`endmodelgen
+
+!make test_pf0.so > /dev/null
+attach ./test_pf0.so
+
+parameter i=0
+isource #(i) i(0,1);
+test_pf0 x(1,0);
+
+print dc i(x) j(x)
+dc i -1 1 1
+
+status notime
+end

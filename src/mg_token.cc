@@ -1325,5 +1325,13 @@ void Token_NODE::stack_op(Expression* E) const
   E->push_back(clone());
 }
 /*--------------------------------------------------------------------------*/
+std::string Token_PORT_BRANCH::code_name() const
+{
+  assert(_port);
+  Node_Ref const& n = _port->node();
+  assert(n);
+  return "MOD::"+n->code_name(); //  + ", p";
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

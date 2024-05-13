@@ -511,8 +511,7 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
     }else if (auto p = dynamic_cast<const Token_PAR_REF*>(*i)) {
       s.new_rhs(p);
     }else if (auto pb = dynamic_cast<const Token_PORT_BRANCH*>(*i)) {
-      incomplete();
-      s.new_ref("0"); //port number here?
+      s.new_ref(pb->code_name());
     }else if (auto A = dynamic_cast<const Token_ARRAY_*>(*i)) {
       if(A->args()){
 	auto se = prechecked_cast<Expression const*>(A->args());
@@ -559,14 +558,15 @@ static void make_cc_expression_(std::ostream& o, Expression const& e, RPN_VARS& 
       s.new_constant(o, *c);
     }else if(auto F = dynamic_cast<const Token_CALL*>(*i)) {
       if(F->args()){
+        o__ "// F " << (*i)->name() << " args:" << s.have_args() << "\n";
 	auto se = prechecked_cast<Expression const*>(F->args());
 	assert(se);
 	s.stop();
 	make_cc_expression_(o, *se, s);
       }else{
+	o__ "// function " << (*i)->name() << " args:" << s.have_args() << "\n";
       }
 
-      o__ "// function " << (*i)->name() << " " << s.have_args() << "\n";
       std::vector<std::string> argnames;
       if(F->args()) {
 	assert(s.have_args());

@@ -732,6 +732,29 @@ public:
    virtual double read_filter()const { untested();unreachable(); return 0;}
 };
 /*--------------------------------------------------------------------------*/
+namespace va {
+/*--------------------------------------------------------------------------*/
+inline double PORT_FLOW(int i, BASE_SUBCKT const* m)
+{
+  node_t n = m->n_(i);
+  double I(0.);
+  assert(m->subckt());
+  for(CARD const* c : *m->subckt()){
+    auto e = dynamic_cast<ELEMENT const*>(c);
+    if(!e){ untested();
+    }else if(e->n_(1) == e->n_(0)){ untested();
+    }else if(e->n_(0) == n){
+      I+= e->tr_amps();
+    }else if(e->n_(1) == n){
+      I-= e->tr_amps();
+    }else{ untested();
+    }
+  }
+  return I;
+}
+/*--------------------------------------------------------------------------*/
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 /*--------------------------------------------------------------------------*/
@@ -816,7 +839,6 @@ inline void e_val(double* p, const double& x, const CARD_LIST*)
   assert(p);
   *p = x;
 }
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
@@ -1435,9 +1457,9 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         // same _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        // F white_noise args:0
         std::string s0;
         s0 = "thermal";
-        // function white_noise 1
         ddouble t0;
         // t0[d_potential_b_white_noise_1_p_white_noise_1_n] = 0.; // (output dep)
         t0 =  /*(312)*/ /*call1*/d->_b_white_noise_1( 0., s0);
@@ -1571,9 +1593,9 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         // same _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        // F white_noise args:0
         std::string s0;
         s0 = "thermal";
-        // function white_noise 1
         ddouble t0;
         // t0[d_potential_b_white_noise_1_p_white_noise_1_n] = 0.; // (output dep)
         t0 =  /*(312)*/ /*call1*/d->_b_white_noise_1( 0., s0);
@@ -1626,9 +1648,9 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
         // same _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        // F white_noise args:0
         std::string s0;
         s0 = "thermal";
-        // function white_noise 1
         ddouble t0;
         t0 =  /*(312)*/ /*call1*/d->_b_white_noise_1( 0., s0);
         // dep _potential_b_white_noise_1_p_white_noise_1_n
@@ -2363,18 +2385,18 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         // same _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        // F white_noise args:0
         ddouble t0;
         // t0[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
         t0 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24;
         t0 = t0 * _v_g/*rhsvar*/;
-        // function $temperature 1
+        // function $temperature args:1
         ddouble t1;
         // t1[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
         t1 = /*call1*/f_temp(); // no parlist
         t0 = t0 * t1;
         std::string s0;
         s0 = "thermal";
-        // function white_noise 1
         t0 =  /*(312)*/ /*call1*/d->_b_white_noise_0(t0, s0);
         d->_value_b_p_n /* contrib sign: */ += t0.value();
         // dep _potential_b_white_noise_0_p_white_noise_0_n
@@ -2475,13 +2497,13 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
       ddouble _v_g; // Variable_Decl
       _v_g.set_all_deps();
       {
-        // function $param_given 1
+        // F $param_given args:0
         ddouble t0;
         t0 =  /*(312)*/ /*call1*/param_given((_p_tnom) /*rhspar*/);
         if (t0) {
           { // 
             { // Assignment real 'dt'.
-              // function $temperature 0
+              // function $temperature args:0
               ddouble t0;
               t0 = /*call1*/f_temp(); // no parlist
               t0 = t0 - (_p_tnom) /*rhspar*/;
@@ -2491,10 +2513,10 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         }
       }
       {
-        // function $param_given 1
+        // F $param_given args:0
         ddouble t0;
         t0 =  /*(312)*/ /*call1*/param_given((_p_tc1) /*rhspar*/);
-        // function $param_given 1
+        // F $param_given args:0
         ddouble t1;
         t1 =  /*(312)*/ /*call1*/param_given((_p_tc2) /*rhspar*/);
         t0 = t0 || t1;
@@ -2543,18 +2565,18 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         // same _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        // F white_noise args:0
         ddouble t0;
         // t0[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
         t0 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24;
         t0 = t0 * _v_g/*rhsvar*/;
-        // function $temperature 1
+        // function $temperature args:1
         ddouble t1;
         // t1[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
         t1 = /*call1*/f_temp(); // no parlist
         t0 = t0 * t1;
         std::string s0;
         s0 = "thermal";
-        // function white_noise 1
         t0 =  /*(312)*/ /*call1*/d->_b_white_noise_0(t0, s0);
         d->_value_b_p_n /* contrib sign: */ += t0.value();
         // dep _potential_b_white_noise_0_p_white_noise_0_n
@@ -2583,13 +2605,13 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
       ddouble _v_g; // Variable_Decl
       _v_g.set_all_deps();
       {
-        // function $param_given 1
+        // F $param_given args:0
         ddouble t0;
         t0 =  /*(312)*/ /*call1*/param_given((_p_tnom) /*rhspar*/);
         if (t0) {
           { // 
             { // Assignment real 'dt'.
-              // function $temperature 0
+              // function $temperature args:0
               ddouble t0;
               t0 = /*call1*/f_temp(); // no parlist
               t0 = t0 - (_p_tnom) /*rhspar*/;
@@ -2599,10 +2621,10 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
         }
       }
       {
-        // function $param_given 1
+        // F $param_given args:0
         ddouble t0;
         t0 =  /*(312)*/ /*call1*/param_given((_p_tc1) /*rhspar*/);
-        // function $param_given 1
+        // F $param_given args:0
         ddouble t1;
         t1 =  /*(312)*/ /*call1*/param_given((_p_tc2) /*rhspar*/);
         t0 = t0 || t1;
@@ -2642,16 +2664,16 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
         // same _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        // F white_noise args:0
         ddouble t0;
         t0 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24;
         t0 = t0 * _v_g/*rhsvar*/;
-        // function $temperature 1
+        // function $temperature args:1
         ddouble t1;
         t1 = /*call1*/f_temp(); // no parlist
         t0 = t0 * t1;
         std::string s0;
         s0 = "thermal";
-        // function white_noise 1
         t0 =  /*(312)*/ /*call1*/d->_b_white_noise_0(t0, s0);
         // dep _potential_b_white_noise_0_p_white_noise_0_n
         m->_st_b_white_noise_0_p_white_noise_0_n[1] = - t0[d_potential_b_white_noise_0_p_white_noise_0_n]; // (3p)
@@ -3627,6 +3649,29 @@ public:
    virtual double read_filter()const { untested();unreachable(); return 0;}
 };
 /*--------------------------------------------------------------------------*/
+namespace va {
+/*--------------------------------------------------------------------------*/
+inline double PORT_FLOW(int i, BASE_SUBCKT const* m)
+{
+  node_t n = m->n_(i);
+  double I(0.);
+  assert(m->subckt());
+  for(CARD const* c : *m->subckt()){
+    auto e = dynamic_cast<ELEMENT const*>(c);
+    if(!e){ untested();
+    }else if(e->n_(1) == e->n_(0)){ untested();
+    }else if(e->n_(0) == n){
+      I+= e->tr_amps();
+    }else if(e->n_(1) == n){
+      I-= e->tr_amps();
+    }else{ untested();
+    }
+  }
+  return I;
+}
+/*--------------------------------------------------------------------------*/
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 /*--------------------------------------------------------------------------*/
@@ -3711,7 +3756,6 @@ inline void e_val(double* p, const double& x, const CARD_LIST*)
   assert(p);
   *p = x;
 }
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
@@ -4342,12 +4386,12 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
       {
         { // 
           { // Contribution I(p, n) lin: 1
+            // F ddt args:0
             ddouble t0;
             // t0[d_potential_b_ddt_1_p_ddt_1_n] = 0.; // (output dep)
             t0.set_no_deps();
             t0 = p->xs_potential_b_p_n();
             t0 = (_p___c) /*rhspar*/ * t0;
-            // function ddt 1
             t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_1(t0);
             d->_value_b_p_n /* contrib sign: */ += t0.value();
             // dep _potential_b_ddt_1_p_ddt_1_n
@@ -4374,10 +4418,10 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
       {
         { // 
           { // Contribution I(p, n) lin: 1
+            // F ddt args:0
             ddouble t0;
             t0 = 0.; // static?
             t0 = (_p___c) /*rhspar*/ * t0;
-            // function ddt 1
             t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_1(t0);
             // dep _potential_b_ddt_1_p_ddt_1_n
             m->_st_b_ddt_1_p_ddt_1_n[1] = - t0[d_potential_b_ddt_1_p_ddt_1_n]; // (3p)
@@ -5136,9 +5180,9 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
   {
     { // 
       {
+        // F analysis args:0
         std::string s0;
         s0 = "ic";
-        // function analysis 1
         ddouble t0;
         t0 =  /*(312)*/ /*call1*/_f_analysis(s0);
         t0 =  1. && t0;
@@ -5159,12 +5203,12 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
         }else {
           { // 
             { // Contribution I(p, n) lin: 1
+              // F ddt args:0
               ddouble t0;
               // t0[d_potential_b_ddt_2_p_ddt_2_n] = 0.; // (output dep)
               t0.set_no_deps();
               t0 = p->xs_potential_b_p_n();
               t0 = (_p___c) /*rhspar*/ * t0;
-              // function ddt 1
               t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_2(t0);
               if (d->_pot_b_p_n){
                 d->_pot_b_p_n = false;
@@ -5198,9 +5242,9 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
   {
     { // 
       {
+        // F analysis args:0
         std::string s0;
         s0 = "ic";
-        // function analysis 1
         ddouble t0;
         t0 =  /*(312)*/ /*call1*/_f_analysis(s0);
         t0 =  1. && t0;
@@ -5215,10 +5259,10 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
         }else {
           { // 
             { // Contribution I(p, n) lin: 1
+              // F ddt args:0
               ddouble t0;
               t0 = 0.; // static?
               t0 = (_p___c) /*rhspar*/ * t0;
-              // function ddt 1
               t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_2(t0);
               // dep _potential_b_ddt_2_p_ddt_2_n
               m->_st_b_ddt_2_p_ddt_2_n[1] = - t0[d_potential_b_ddt_2_p_ddt_2_n]; // (3p)

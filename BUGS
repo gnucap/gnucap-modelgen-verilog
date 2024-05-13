@@ -1,10 +1,9 @@
 == modelgen
-- Port currents "I(<a>)" not supported.
 - named block variables supposed to be static
 - $limit: only "pnjlimit"
 - ac needs operating point, even if linear: mg2_cccs.0.gc
 - analysis("ic"): need more testing
-- ddx is incomplete
+- ddx, flow(<port>): no derivatives (feature?)
 - filter contribution to potential, uses internal node.
 - V<+ddt(I) does not work on same branch (related?)
 - event control is incomplete

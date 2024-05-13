@@ -76,6 +76,7 @@ public:
   void stack_op(Expression* E)const override{
     E->push_back(clone());
   }
+  std::string code_name()const;
 };
 /*--------------------------------------------------------------------------*/
 class Token_NODE : public Token_SYMBOL {
