@@ -14,7 +14,7 @@ module test_lap_nd0(p, n);
 	analog begin
 		ll1 = laplace_nd(V(p,n), '{2.}, '{2.});
 		ll2 = laplace_nd(V(p,n), '{1., 1.}, '{1., 1.});
-		ll3 = laplace_nd(V(p,n), '{.5, .5}, '{.5, .5});
+		ll3 = -laplace_nd(-V(p,n), '{.5, .5}, '{.5, .5});
 		ll4 = 2*laplace_nd(V(p,n), '{1.}, '{2.});
 		ll5 = 2*laplace_nd(V(n) - V(p), '{-1.}, '{2.});
 	end

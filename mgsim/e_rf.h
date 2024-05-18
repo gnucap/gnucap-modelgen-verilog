@@ -137,6 +137,7 @@ poly poly::operator*(poly const& other)
 /*--------------------------------------------------------------------------*/
 } // namespace
 /*--------------------------------------------------------------------------*/
+// COMMON_FILT?
 class COMMON_RF_BASE :public COMMON_COMPONENT{
   typedef enum { rf_unknown = 0,
 		 rf_nx = 1,
@@ -149,6 +150,10 @@ class COMMON_RF_BASE :public COMMON_COMPONENT{
 		 rf_zp = 2 | 8,
 		 rf_rp =     8 | 16
                }  rf_type;
+protected:
+  int _arg0{0};
+  int _arg1{0};
+  int _arg2{0};
 public:
   std::vector<PARAMETER<double> > _p_num;
   std::vector<PARAMETER<double> > _p_den;
@@ -172,7 +177,6 @@ public:
   }
   void precalc_first(const CARD_LIST*)override;
   void precalc_last(const CARD_LIST*)override;
-  virtual int args(int)const {unreachable(); return 0;} // needed?
   void set_rp() { _type = rf_rp; }
   void set_zx() { _type = rf_type(_type | rf_zx); }
   void set_nx() { _type = rf_type(_type | rf_nx); }
@@ -187,16 +191,17 @@ public:
     if(is_rp()){
       return int(_p_num.size())/2;
     }else if(num_is_z()){
-      return int(_p_num.size()/2 + 1);
+      return int((_p_num.size()+1)/2 + 1);
     }else{
       return int(_p_num.size());
     }
   }
   int den_size()const {
+    trace2("den_size", _type, _p_den.size());
     if(is_rp()){
       return int(_p_den.size())/2 + 1;
     }else if(den_is_p()){
-      return int(_p_den.size()/2 + 1);
+      return int((_p_den.size()+1)/2 + 1);
     }else{
       return int(_p_den.size());
     }
@@ -210,7 +215,12 @@ private:
   void convert(IN& data, std::string const& what)const;
   template<class IN>
   void invres(IN& data, IN& type)const;
-};
+
+public: // arg hacks
+  void set_args(int n, int v) {  (&_arg0)[n]=v; }
+  int args(int i)const { untested(); return (&_arg0)[i]; }
+  virtual int num_states()const{ return std::max(_arg1, _arg2); }
+}; // COMMON_RF_BASE
 /*--------------------------------------------------------------------------*/
 COMMON_RF_BASE::COMMON_RF_BASE(int c)
   :COMMON_COMPONENT(c),
@@ -221,6 +231,9 @@ COMMON_RF_BASE::COMMON_RF_BASE(int c)
 /*--------------------------------------------------------------------------*/
 COMMON_RF_BASE::COMMON_RF_BASE(const COMMON_RF_BASE& p)
   :COMMON_COMPONENT(p),
+   _arg0(p._arg0),
+   _arg1(p._arg1),
+   _arg2(p._arg2),
    _p_num(p._p_num),
    _p_den(p._p_den),
    _type(p._type)
@@ -232,6 +245,9 @@ bool COMMON_RF_BASE::operator==(const COMMON_COMPONENT& x)const
 {
   const COMMON_RF_BASE* p = dynamic_cast<const COMMON_RF_BASE*>(&x);
   return (p
+    && _arg0 == p->_arg0
+    && _arg1 == p->_arg1
+    && _arg2 == p->_arg2
     && _p_num == p->_p_num
     && _p_den == p->_p_den
     && _type == p->_type
@@ -243,7 +259,7 @@ void COMMON_RF_BASE::set_param_by_index(int I, std::string& Value, int Offset)
   if(I==-1){
     // reset;
     _type = rf_unknown;
-  }else{
+  }else{ untested();
     incomplete();
     switch (COMMON_RF_BASE::param_count() - 1 - I) {
     default: COMMON_COMPONENT::set_param_by_index(I, Value, Offset);
@@ -253,11 +269,6 @@ void COMMON_RF_BASE::set_param_by_index(int I, std::string& Value, int Offset)
 /*--------------------------------------------------------------------------*/
 int COMMON_RF_BASE::set_param_by_name(std::string Name, std::string Value)
 {
-  if(Name == "$mfactor"){ untested();
-    incomplete();
-    Name = "m";
-  }else{
-  }
   CS cmd(CS::_STRING, Name);
   int idx;
   if(Name.size()<2){ untested();
@@ -300,7 +311,7 @@ int COMMON_RF_BASE::set_param_by_name(std::string Name, std::string Value)
       if(den_is_d()) { untested();
 	throw Exception_No_Match(Name);
       }else if(size_t(2*idx + 1) < _p_den.size()){
-      }else if(is_rp()) { untested();
+      }else if(is_rp()) {
 	size_t m = std::max(_p_den.size(), _p_num.size());
 	m = std::max(m, size_t(2*(idx + 1)));
 	_p_den.resize(m);
@@ -344,6 +355,7 @@ int COMMON_RF_BASE::set_param_by_name(std::string Name, std::string Value)
       _p_num[2*idx + (Name[1] == 'i')] = Value;
 
     }else{
+      incomplete(); // no match?
     }
     if(is_rp()){
       size_t m = std::max(_p_den.size(), _p_num.size());
@@ -355,14 +367,16 @@ int COMMON_RF_BASE::set_param_by_name(std::string Name, std::string Value)
     throw Exception_No_Match(Name);
   }
 
-  if(num_is_z()){
+#if 0 // needed?
+  if(num_is_z()){ untested();
      assert(!(_p_num.size()%2));
-  }else{
+  }else{ untested();
   }
-  if(den_is_p()){
+  if(den_is_p()){ untested();
      assert(!(_p_den.size()%2));
-  }else{
+  }else{ untested();
   }
+#endif
 
 
   return 0; // incomplete();
@@ -375,7 +389,7 @@ bool COMMON_RF_BASE::param_is_printable(int i)const
   int nn = int(_p_num.size());
   int pp = int(_p_den.size());
 
-  if(idx < 0){
+  if(idx < 0){ untested();
   }else if(size_t(idx) < _p_num.size() && _p_num[idx].is_constant()){
     return true;
   }else if(is_rp() && size_t(idx) < _p_num.size()){
@@ -516,8 +530,8 @@ void COMMON_RF_BASE::convert_nd()
     invres(_p_num, _p_den);
     _type = rf_nd;
     assert(!is_rp());
-  }else if ( !num_is_n() || !den_is_p() ){
-    trace3("convert", _type, _p_num.size(), _p_den.size());
+  }else if ( !num_is_n() || !den_is_d() ){
+    trace5("convert", _type, _p_num.size(), _p_den.size(), _arg1, _arg2);
     if(!num_is_n()){
       // assert(num_is_z());
       convert(_p_num, "numerator");
@@ -532,9 +546,8 @@ void COMMON_RF_BASE::convert_nd()
     _type = rf_nd;
     assert(num_is_n());
     assert(den_is_d());
-  }else{ untested();
-    incomplete();
-    assert(0);
+  }else{
+    assert(_type == rf_nd);
   }
 
   assert(_p_num.size());
@@ -545,7 +558,7 @@ template<class IN>
 void COMMON_RF_BASE::convert(IN& data, std::string const& what) const
 {
   trace2("convert", data.size(), what);
-  if(!data.size()){ untested();
+  if(!data.size()){
     error(bPICKY, "no data, assuming no root, constant 1.\n");
     incomplete(); // fall through
     data.resize(1);

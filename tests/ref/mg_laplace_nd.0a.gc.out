@@ -3,23 +3,23 @@ parameter v=0
 test_lap_nd0a #() dut (.p(0),.n(3),.cp(1),.cn(0));
 resistor #(.r(1)) r (.p(3),.n(0));
 vsine #(.ampl(1),.dc(v),.mag(1)) v1 (.p(1),.n(0));
-#Time       v(1)       v(3)      
- 0.         0.         0.        
- 0.1        0.58779    0.58779   
- 0.2        0.95106    0.95106   
- 0.3        0.95106    0.95106   
- 0.4        0.58779    0.58779   
- 0.5       -5.f       -5.f       
- 0.6       -0.58779   -0.58779   
- 0.7       -0.95106   -0.95106   
- 0.8       -0.95106   -0.95106   
- 0.9       -0.58779   -0.58779   
- 1.         9.f        9.f       
+#Time       v(1)       v(3)       i(dut._b_laplace_nd_0_p_laplace_nd_0_n.out) i(dut._b_laplace_nd_1_p_laplace_nd_1_n.out)
+ 0.         0.         0.         0.         0.        
+ 0.1        0.58779    0.58779    0.29389    0.58779   
+ 0.2        0.95106    0.95106    0.47553    0.95106   
+ 0.3        0.95106    0.95106    0.47553    0.95106   
+ 0.4        0.58779    0.58779    0.29389    0.58779   
+ 0.5       -5.f       -5.f       -2.4011f   -4.8021f   
+ 0.6       -0.58779   -0.58779   -0.29389   -0.58779   
+ 0.7       -0.95106   -0.95106   -0.47553   -0.95106   
+ 0.8       -0.95106   -0.95106   -0.47553   -0.95106   
+ 0.9       -0.58779   -0.58779   -0.29389   -0.58779   
+ 1.         9.f        9.f        4.5839f    9.1677f   
 #Freq       v(1)       vp(3)      vm(3)     
  2.         1.         0.         1.        
  4.         1.         0.         1.        
 Gnucap   System status
 iterations: op=0, dc=0, tran=45, fourier=0, total=59
 transient timesteps: accepted=12, rejected=0, total=12
-nodes: user=2, subckt=0, model=2, total=4
-dctran density=75.0%, ac density=50.0%
+nodes: user=2, subckt=0, model=3, total=5
+dctran density=68.0%, ac density=52.0%

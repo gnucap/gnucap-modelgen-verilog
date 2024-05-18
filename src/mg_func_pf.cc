@@ -43,7 +43,7 @@ private:
   void stack_op(Expression* e)const override;
 
   Expression_ const* args() const{
-    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){ untested();
+    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){
       return a;
     }else{ untested();
       assert(!Token_CALL::args());
@@ -65,25 +65,25 @@ private:
     m.install(this);
     return new Token_PF(label(), this);
   }
-  std::string code_name()const override{ untested();
+  std::string code_name()const override{
     return "d->PORT_FLOW";
   }
-  void make_cc_precalc(std::ostream& o)const override { untested();
+  void make_cc_precalc(std::ostream& o)const override {
     o__ "double PORT_FLOW(int)const {\n";
 	 o____ "return 0.;\n";
 	 o__ "}\n";
   }
-  void make_cc_common(std::ostream& o)const override { untested();
-//    o__ "double " << code_name() << "(int i, BASE_SUBCKT const* c)const {\n";
-//	 o____ "return va::" << code_name() << "(i, c);\n";
-//	 o__ "}\n";
-  }
-  void make_cc_dev(std::ostream& o)const override { untested();
+  void make_cc_dev(std::ostream& o)const override {
     o__ "double PORT_FLOW(int i){\n";
 	 o____ "return va::PORT_FLOW(i, this);\n";
 	 o__ "}\n";
   }
 #if 0
+  void make_cc_common(std::ostream& o)const override {
+//    o__ "double " << code_name() << "(int i, BASE_SUBCKT const* c)const {\n";
+//	 o____ "return va::" << code_name() << "(i, c);\n";
+//	 o__ "}\n";
+  }
   void make_cc_dev(std::ostream& o)const override { untested();
     o__ "double " << code_name() << "(int i)const {\n";
 	 o____ "node_t n = c->n_(i);\n";
@@ -114,7 +114,7 @@ DISPATCHER<FUNCTION>::INSTALL d_pf(&function_dispatcher, ".port_flow", &pf);
 void Token_PF::stack_op(Expression* E)const
 {
 	// incomplete();
-	if(auto pb = dynamic_cast<Token_PORT_BRANCH*>(E->back())) { untested();
+	if(auto pb = dynamic_cast<Token_PORT_BRANCH*>(E->back())) {
 		auto e = new Expression_;
 		E->pop_back();
 		e->push_back(pb);
@@ -127,7 +127,7 @@ void Token_PF::stack_op(Expression* E)const
 		n->set_args(e);
 		// n->set_label("I");
 		E->push_back(n);
-	}else if(args()){ untested();
+	}else if(args()){
 		// return Token_CALL::stack_op(E);
 		auto c = new Token_PF(name(), f()); // clone?
 		c->set_args(args()->clone());

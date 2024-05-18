@@ -6,6 +6,7 @@
 - ddx, flow(<port>): no derivatives (feature?)
 - filter contribution to potential, uses internal node.
 - V<+ddt(I) does not work on same branch (related?)
+- V<+laplace(...) sign bug
 - event control is incomplete
 - numerical port names don't work
 - string type is missing (breaks "%s" in strobe etc.).

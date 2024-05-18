@@ -8,8 +8,7 @@ va_laplace_zp #(.pr0(0.) ,.zr0(0.)) b0(0,out1,in,0);
 // not checked
 va_laplace_zp #(.pr0(1.) ,.zr0(0.)) b0(0,out2,in,0);
 
-// unhandled, WIP
-// va_laplace_zp #(.pr0(0.)) b0(0,out1,in,0);
+va_laplace_zp #(.pr0(0.)) b0(0,out3,in,0);
 
 list
 dc
@@ -18,6 +17,7 @@ list
 vsine #(.ampl(1), .freq(1)) v1(in, 0);
 resistor #(1) r1(out1,0);
 resistor #(1) r1(out2,0);
+resistor #(1) r1(out3,0);
 print tran v(nodes)
 tran 1 basic
 

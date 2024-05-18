@@ -34,10 +34,10 @@ capacitor #(.c(1.)) n1 (.p(out2),.n(0));
  1.        -0.02978   -0.02978   -0.059561   0.02978   
 #Freq       vm(out1)   vm(out2)   vp(out1)   vp(out2)  
  0.1        0.62268    0.62268   -51.488    -51.488    
- 1.         0.079327   0.079326  -85.45     -85.45     
+ 1.         0.079326   0.079326  -85.45     -85.45     
  10.        0.0079575  0.0079575 -89.544    -89.544    
 Gnucap   System status
 iterations: op=0, dc=0, tran=96, fourier=0, total=131
 transient timesteps: accepted=27, rejected=5, total=32
 nodes: user=3, subckt=0, model=3, total=6
-dctran density=66.7%, ac density=38.9%
+dctran density=66.7%, ac density=44.4%

@@ -462,9 +462,9 @@ void DEV_TRANSLINE::do_ac()
   double len = c->len;
 
   COMPLEX jwL = _sim->_jomega * L;
-  COMPLEX jwC = _sim->_jomega * C;
-  COMPLEX gamma = std::sqrt((R+jwL)*(G+jwC)); // ~ jw sqrt(L/C)?
-  COMPLEX z0 = (R+jwL) / gamma;
+  COMPLEX jwC = _sim->_jomega * C;            //  alpha << beta, beta approx. |k|
+  COMPLEX gamma = std::sqrt((R+jwL)*(G+jwC)); // -> jw sqrt(LC)?
+  COMPLEX z0 = (R+jwL) / gamma;               // -> sqrt(L/C)
 
   trace4("trln:ac", _sim->_jomega/_sim->_freq, z0, gamma, len);
 

@@ -162,8 +162,8 @@ public:
     o__ "public:\n";
     o____ "int args(int sel)const override{\n";
     o______ "switch(sel){\n";
-    o________ "case 1: return " << numsize(_nums) << ";\n";
-    o________ "case 2: return " << densize(_dens) << ";\n";
+    o________ "case 1: return " << _nums << "; //?\n";
+    o________ "case 2: return " << _dens << ";\n";
     o________ "default: return 0;\n";
     o______ "}\n";
     o____ "}\n";
@@ -218,8 +218,9 @@ public:
       o__ "// subdevice\n";
       o__ "t0 = 0.;\n";
     }else{
-      o__ "t0 = d->" << cn << "->tr_amps();\n";
-      o__ "d->_potential" << cn << " = - t0;\n"; // -?
+      o__ "auto e = prechecked_cast<ELEMENT const*>(d->"<< cn << ");\n";
+      o__ "assert(e);\n";
+      o__ "d->_potential" << cn << " = t0 = e->tr_amps(); // (236)\n";
     }
 
     make_assign(o);
@@ -281,7 +282,7 @@ private:
 private:
   void make_assign(std::ostream& o)const {
     std::string cn = _br->code_name();
-    o__ "t0[d_potential" << cn << "] = -1.;\n";
+    o__ "t0[d_potential" << cn << "] = 1.;\n";
     o__ "assert(t0 == t0);\n";
   }
 private: // setup
@@ -302,10 +303,28 @@ public:
   std::string den_name_i()const override {
     return "std::string(\"p\") + ((i%2)?'i':'r')  + to_string(i/2) /*B*/";
   }
-  int numsize(int x)const override{ assert(!(x%2)); return x/2+1; }
-  int densize(int x)const override{ assert(!(x%2)); return x/2+1; }
+ // int numsize(int x)const override{ assert(!(x%2)); return x/2+1; }
+ // int densize(int x)const override{ assert(!(x%2)); return x/2+1; }
 } lzp;
 DISPATCHER<FUNCTION>::INSTALL d_zp(&function_dispatcher, "laplace_zp", &lzp);
+/*--------------------------------------------------------------------------*/
+class LNP : public LAP{
+public:
+  explicit LNP() : LAP() {
+    set_label("laplace_np");
+  }
+  LNP* clone()const override{
+    return new LNP(*this);
+  }
+  std::string num_name_i()const override {
+    return "\"n\"+to_string(i)";
+  }
+  std::string den_name_i()const override {
+    return "std::string(\"p\") + ((i%2)?'i':'r')  + to_string(i/2) /*B*/";
+  }
+ // int densize(int x)const override{ assert(!(x%2)); return x/2+1; }
+} lnp;
+DISPATCHER<FUNCTION>::INSTALL d_np(&function_dispatcher, "laplace_np", &lnp);
 /*--------------------------------------------------------------------------*/
 class LND : public LAP{
 public:
@@ -323,6 +342,24 @@ public:
   }
 } lnd;
 DISPATCHER<FUNCTION>::INSTALL d_nd(&function_dispatcher, "laplace_nd", &lnd);
+/*--------------------------------------------------------------------------*/
+class LZD : public LAP{
+public:
+  explicit LZD() : LAP() {
+    set_label("laplace_zd");
+  }
+  LZD* clone()const override{
+    return new LZD(*this);
+  }
+  std::string num_name_i()const override { untested();
+    return "std::string(\"z\") + ((i%2)?'i':'r')  + to_string(i/2) /*A*/";
+  }
+  std::string den_name_i()const override { untested();
+    return "\"d\"+to_string(i)";
+  }
+  int numsize(int x)const override{ assert(!(x%2)); return x/2+1; }
+} lzd;
+DISPATCHER<FUNCTION>::INSTALL d_zd(&function_dispatcher, "laplace_zd", &lzd);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 Branch* Token_LAP::branch() const

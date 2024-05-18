@@ -82,6 +82,8 @@ public:
     COMMON_RF_BASE(x), _tolerance(x._tolerance) {}
   COMMON_LAPLACE* clone()const override {return new COMMON_LAPLACE(*this);}
 
+  virtual int pivot()const;
+
   bool operator==(const COMMON_COMPONENT& x)const override;
   void set_param_by_index(int I, std::string& Value, int Offset)override;
   void precalc_last(const CARD_LIST* par_scope)override;
@@ -99,6 +101,16 @@ public:
   void precalc_last(const CARD_LIST* par_scope)override{
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();
+  }
+  virtual int num_states()const override{
+    trace2("num_states", _arg1, _arg2);
+    if(_arg1 || _arg2){
+      // set_parameters
+      return std::max(_arg1, _arg2);
+    }else{
+      // direct use. figure out in expand
+      return 0;
+    }
   }
 }; //COMMON_LAPLACE_ND
 COMMON_LAPLACE_ND cl_nd(CC_STATIC);
@@ -126,9 +138,30 @@ public:
   COMMON_LAPLACE_NP(COMMON_LAPLACE_NP const& x) : COMMON_LAPLACE(x) {}
   COMMON_LAPLACE_NP* clone()const override {return new COMMON_LAPLACE_NP(*this);}
 
-  void precalc_last(const CARD_LIST* par_scope)override{ untested();
+  void precalc_last(const CARD_LIST* par_scope)override{
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();
+  }
+  void precalc_first(const CARD_LIST* par_scope)override {
+    COMMON_LAPLACE::precalc_first(par_scope);
+    convert_nd();
+  }
+  int pivot()const override {
+    if(_p_den.size()) {
+      return 1;
+    }else{ untested();
+      return 0;
+    }
+  }
+  virtual int num_states()const override{
+    trace2("num_states", _arg1, _arg2);
+    if(_arg1 || _arg2){
+      // set_parameters
+      return std::max(_arg1, (_arg2+1)/2 + 1);
+    }else{
+      // direct use. figure out in expand
+      return 0;
+    }
   }
 }; //COMMON_LAPLACE_NP
 COMMON_LAPLACE_NP cl_np(CC_STATIC);
@@ -146,7 +179,32 @@ public:
 
   void precalc_last(const CARD_LIST* par_scope)override {
     COMMON_LAPLACE::precalc_last(par_scope);
+    if(!_p_num.size()){
+      set_zx();
+    }else{
+    }
+    if(!_p_den.size()){
+      set_xp();
+    }else{
+    }
     convert_nd();
+  }
+  int pivot()const override {
+    if(_p_den.size()) {
+      return 1;
+    }else{
+      return 0;
+    }
+  }
+  virtual int num_states()const override{
+    trace2("num_states", _arg1, _arg2);
+    if(_arg1 || _arg2){
+      // set_parameters
+      return (std::max(_arg1, _arg2)+1)/2 + 1;
+    }else{
+      // direct use. figure out in expand
+      return 0;
+    }
   }
 }; //COMMON_LAPLACE_ZP
 COMMON_LAPLACE_ZP cl_zp(CC_STATIC);
@@ -162,6 +220,17 @@ public:
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();
   }
+  int pivot()const override {
+    if(_p_den.size()) {
+      return 1;
+    }else{ untested();
+      return 0;
+    }
+  }
+ // void precalc_first(const CARD_LIST* par_scope)override {
+ //   COMMON_LAPLACE::precalc_first(par_scope);
+ //   convert_nd();
+ // }
 }; //COMMON_LAPLACE_RP
 COMMON_LAPLACE_RP cl_rp(CC_STATIC);
 /*--------------------------------------------------------------------------*/
@@ -217,6 +286,8 @@ private: // BASE_SUBCKT
   void	  tr_begin()override	{assert(subckt()); subckt()->tr_begin(); ELEMENT::tr_begin();
       _s_[0]->_loss0 = 1.;
       _s_[0]->_loss1 = 1.;
+//      _output->_loss0 = _loss0;
+//      _output->_loss1 = _loss1;
   }
   void	  tr_restore()override	{assert(subckt()); subckt()->tr_restore(); ELEMENT::tr_restore();}
   void	  dc_advance()override; //{set_not_converged(); /*really?*/ assert(subckt()); subckt()->dc_advance();}
@@ -289,7 +360,6 @@ private: // node list
   };
   node_t const& state_node(int k)const {return _n[net_nodes()+k];}
   node_t& state_node(int k) {return _n[net_nodes()+k];}
-  int pivot()const;
 private: // impl
   friend class COMMON_LAPLACE;
 }; // LAPLACE
@@ -325,7 +395,19 @@ void LAPLACE::ac_iwant_matrix()
   if(ac_use_sckt){ untested();
     COMPONENT::ac_iwant_matrix();
   }else{
-    ELEMENT::ac_iwant_matrix_passive();
+    // ELEMENT::ac_iwant_matrix_passive();
+    // ac_iwant_matrix_extended()
+    assert(is_device());
+
+    for (int ii = 0;  ii < ext_nodes();  ++ii) {
+      if (_n[ii].m_() >= 0) {
+	for (int jj = 0;  jj < ii ;  ++jj) {
+	  _sim->_acx.iwant(_n[ii].m_(),_n[jj].m_());
+	}
+      }else{itested();
+	// node 1 is grounded or invalid
+      }
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -506,11 +588,15 @@ bool LAPLACE::is_valid()const
   return c->is_valid();
 }
 /*--------------------------------------------------------------------------*/
-int LAPLACE::pivot() const
+int COMMON_LAPLACE::pivot() const
 {
 //  return 0;
-  COMMON_LAPLACE const* c = prechecked_cast<COMMON_LAPLACE const*>(common());
+  COMMON_LAPLACE const* c = this;
   assert(c);
+  if(c->den_is_p()){
+    return c->num_states()-1;
+  }else{
+  }
   int dens = int(c->den_size());
   double p = 0;
   int r = 0;
@@ -523,6 +609,7 @@ int LAPLACE::pivot() const
     }else{
     }
   }
+  trace3("pivot", c->den_size(), p, dens); 
 
   if(p == 0.){
     // elaboration order fallback hack.
@@ -535,12 +622,13 @@ int LAPLACE::pivot() const
 void LAPLACE::expand()
 {
   assert(common());
-  auto c = static_cast</*const*/ COMMON_LAPLACE*>(mutable_common());
+  auto c = prechecked_cast</*const*/ COMMON_LAPLACE*>(mutable_common());
   assert(c);
   int dens = int(c->den_size());
-  trace1("exapand", dens);
   assert(dens);
-  _pivot = pivot();
+  _pivot = c->pivot();
+  assert(_pivot >= 0);
+  trace2("expand", dens, _pivot);
   if(_pivot==0){
   }else if(_pivot==1){
   }else if(_pivot==2){
@@ -551,6 +639,11 @@ void LAPLACE::expand()
 
   int num_num = int(c->num_size());
   int num_s = std::max(dens, num_num);
+  assert(c->num_states() == num_s || !c->num_states());
+  if(c->num_states()>num_s){
+    num_s = c->num_states();
+  }else{
+  }
   node_t gnd;
   gnd.set_to_ground(this);
 
@@ -806,9 +899,10 @@ void LAPLACE::expand()
     }
   }
 
+  // after precalc_last
 //  assert( c->_p_num.size());
-  assert( c->_p_den.size());
-}
+//  assert( c->_p_den.size());
+} // expand
 /*--------------------------------------------------------------------------*/
 void LAPLACE::precalc_last()
 {
@@ -834,7 +928,7 @@ void LAPLACE::precalc_last()
   int num_s0_states = 1 + dens;
 
   _st_b_out_[0] = 0;
-  _st_b_out_[1] = 0;
+  _st_b_out_[1] = 0; // _st_b_in_[1];
 
   double piv = c->_p_den[_pivot];
   if(fabs(piv)<OPT::shortckt){ untested();
@@ -849,6 +943,7 @@ void LAPLACE::precalc_last()
   }
 
   assert(_st_b_in_);
+  double mhack = _st_b_in_[1];
   _st_b_in_[1] = 0.;
   if(_set_parameters){
   }else{
@@ -885,13 +980,16 @@ void LAPLACE::precalc_last()
   }else{untested();
   }
 
-  if(0){ untested();
-    assert(!common());
-//    assert(_vy0);
-//    _mfactor = _vy0[1];
-    COMPONENT::precalc_first();
+  trace1("LAPLACE::precalc_last mfactor?", _st_b_in_[1]);
+    // _st_b_in_[1] = 1.;
+  if(_set_parameters) {
+    assert(_output);
+    ((COMPONENT*)_output)->set_param_by_name("$mfactor", "");
+    ((COMPONENT*)_output)->set_param_by_name("$mfactor", to_string(mhack));
+    _output->COMPONENT::precalc_first();
+  }else{
   }
-  trace4("LAPLACE::precalc_last2", num_s, _pivot, num_num, c->_type);
+  trace5("LAPLACE::precalc_last2", num_s, _pivot, num_num, c->_type, mfactor());
 } // precalc_last
 /*--------------------------------------------------------------------------*/
 void LAPLACE::set_parameters(const std::string& Label, CARD *Owner,
@@ -899,14 +997,14 @@ void LAPLACE::set_parameters(const std::string& Label, CARD *Owner,
 				   int n_states, double states[],
 				   int n_nodes, const node_t nodes[])
 {
-  trace2("LAPLACE::set_parameters", n_states, n_nodes);
   bool first_time = !_set_parameters;
   _set_parameters = true;
   auto p = prechecked_cast<COMMON_FILT const*>(Common);
   assert(p);
   int dens = p->args(2);
   int nums = p->args(1);
-  int num_s = std::max(dens, nums);
+
+  trace4("LAPLACE::set_parameters", n_states, n_nodes, nums, dens);
 
   assert(common());
   _n_ports = n_nodes/2;
@@ -916,13 +1014,15 @@ void LAPLACE::set_parameters(const std::string& Label, CARD *Owner,
   auto cc = prechecked_cast<COMMON_LAPLACE*>(ccc);
   assert(cc);
 
-  cc->_p_den.resize(dens);
-//  cc->_den_type = dens; // HACK
-  cc->_p_num.resize(nums);
-//  cc->_num_type = nums; // HACK
-  trace2("LAPLACE args", dens, nums);
-  assert(cc->num_size() == nums);
-  assert(cc->den_size() == dens);
+  // HACK
+  cc->set_args(1, p->args(1));
+  cc->set_args(2, p->args(2));
+  if(first_time){
+    cc->_p_den.resize(dens);
+    cc->_p_num.resize(nums);
+  }else{
+  }
+  int num_s = cc->num_states();
 
   set_label(Label);
   set_owner(Owner);
@@ -950,12 +1050,19 @@ void LAPLACE::set_parameters(const std::string& Label, CARD *Owner,
 /*--------------------------------------------------------------------------*/
 void LAPLACE::ac_load()
 {
-  ac_load_shunt();
+  //ac_load_shunt(); // BUG. explicit mfactor.
+  _sim->_acx.load_symmetric(_n[OUT1].m_(), _n[OUT2].m_(), mfactor() * _output->mfactor() * _loss0);
   if(ac_use_sckt){ untested();
     assert(subckt());
     subckt()->ac_load();
   }else{
-    ac_load_source();
+//    _acg = _values[1];
+  //  ac_load_source();
+   auto _values = _st_b_in_;
+    for (int i=2; i<=_n_ports; ++i) {
+      ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i] * _acg);
+    }
+
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -974,7 +1081,9 @@ void LAPLACE::do_ac()
     COMPLEX num = evalp(z, c->_p_num.begin(), c->_p_num.size());
     COMPLEX den = evalp(z, c->_p_den.begin(), c->_p_den.size());
 
-    _acg = num/den;
+    // BUG: explicit mfactor.
+    trace1("do_ac mfactor hack", _output->mfactor());
+    _acg = _output->mfactor() * num/den;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1005,7 +1114,13 @@ double LAPLACE::tr_amps() const
 {
   assert(_output);
   double r = _output->tr_amps();
-  trace1("LAPLACE::tr_amps", r);
+  if(_loss0){
+    assert(_loss0==1.);
+    incomplete();
+    // r = -r;
+  }else{ untested();
+  }
+  trace2("LAPLACE::tr_amps", r, _loss0);
   return r;
 }
 /*--------------------------------------------------------------------------*/

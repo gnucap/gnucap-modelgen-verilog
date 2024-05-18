@@ -4,13 +4,25 @@ attach ../vams/vsine.so
 verilog
 
 va_laplace_rp #(.rr0(2)) b0(0,out1,in,0);
-// va_laplace #(.pr0(1.)) b0(0,out2,in,0); // incomplete
+va_laplace_nd #(.n0( 2.),.d0( 0.),.d1( 1.)) b0 (.out0(0),.out1(ref1),.in0(in),.in1(0));
+
+va_laplace_rp #(.pr0(1.)) b0(0,out2,in,0); // incomplete? 0 / (s-1) ..
+
 va_laplace_rp #(.rr0(1.), .pr0(1.)) b0(0,out3,in,0);
+va_laplace_nd #(.n0( 1.),.d0( -1.),.d1( 1.)) b0 (.out0(0),.out1(ref3),.in0(in),.in1(0));
+
 va_laplace_rp #(.rr0(1.), .pr0(1.), .rr1(1.), .pr1(2.)) b0(0,out4,in,0);
+va_laplace_nd #(.n0(-3.),.n1( 2.),.d0( 2.),.d1(-3.),.d2( 1.)) b0 (.out0(0),.out1(ref4),.in0(in),.in1(0));
+
+
 resistor #(1.) r1(out1, 0);
 resistor #(1.) r2(out2, 0);
 resistor #(1.) r3(out3, 0);
 resistor #(1.) r4(out4, 0);
+resistor #(1.) r1(ref1, 0);
+resistor #(1.) r2(ref2, 0);
+resistor #(1.) r3(ref3, 0);
+resistor #(1.) r4(ref4, 0);
 
 list
 dc

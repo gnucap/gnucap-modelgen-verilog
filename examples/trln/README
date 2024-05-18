@@ -26,6 +26,21 @@ see also ../tests/v_trln.0.gc for recursive RLGC
 
 WIP
 
+== frequency domain modelling
+
+Verilog-AMS opens a new perspective to data driven transmission line (TL)
+modelling. Typically, measurement (VNA) or EM simulation (Maxwell) results are
+in terms of scattering parameters, and well known methods extract transfer
+functions from them.
+
+See trln0.vams for a TL modelled in terms of transfer functions (no meaningful
+coefficients) and trln_laplace.gc for a simulation.
+
+$ gnucap-mg-vams --cc trln0.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o trln0.so
+$ gnucap trln_laplace.gc
+[..]
+
 == transmission line
 
 work in progress on RLGC line. need transient. see also ../tests/v_trln.0.gc.
+

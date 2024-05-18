@@ -101,7 +101,8 @@ void MGVAMS_FILTER::setup(Module* m)
 	  ++c_cnt;
 	  cont = c;
 	}else{
-	  // ++c_cnt;
+	  ++c_cnt;
+	  ++c_cnt;
 	  // cont = c;
 	  incomplete();
 	}

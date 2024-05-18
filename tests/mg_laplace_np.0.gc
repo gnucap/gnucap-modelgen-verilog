@@ -4,23 +4,25 @@ attach ../vams/vsine.so
 verilog
 
 `modelgen
-module test_lap_nd0a(p,n,cp, cn);
+module test_lap_np0(p,n,cp, cn);
 	electrical p, n;
 	electrical cp, cn;
+	branch (cp,cn) in;
+	branch (p,n) out;
 	analog begin
-		I(p,n) <+ laplace_nd(.5*V(cp,cn), '{2.}, '{2.});
-		I(p,n) <+ .5 * laplace_nd(-V(cn,cp), '{2.}, '{2.});
+		 I(out) <+  laplace_np(V(in), '{1.},'{-1.,1.,-1.,-1});
 	end
 endmodule
+		//I(out) <+  laplace_nd(V(in), '{2.},'{2,2,1});
 
-!make test_lap_nd0a.so > /dev/null
-attach ./test_lap_nd0a.so
+!make test_lap_np0.so > /dev/null
+attach ./test_lap_np0.so
 
 verilog
 parameter r=1
 parameter v=0
 
-test_lap_nd0a #() dut(0, 3, 1,0);
+test_lap_np0 #() dut(0, 3, 1,0);
 resistor #(1) r(3,0);
 vsine #(.mag(1), .dc(v), .ampl(1)) v1(1, 0);
 

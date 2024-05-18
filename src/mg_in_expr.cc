@@ -277,7 +277,7 @@ void Expression_::set_owner(Base* o)
   }else if(auto s = dynamic_cast<Statement*>(o)){
     _owner = s;
     _scope = s->scope();
-  }else{ untested();
+  }else{
     incomplete();
     _owner = o;
 //    _scope = o->owner();
