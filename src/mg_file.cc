@@ -69,9 +69,9 @@ void File::parse(CS& f)
       || ((f >> "discipline ")    && (f >> _discipline_list))
       || ((f >> "paramset ")      && (f >> _paramset_list))
       ;
-    if (has_attributes(&f)){ untested();
+    if (attr.has_attributes(tag_t(&f))) { untested();
       f.warn(bWARNING, "dangling attributes "
-	   + attributes(&f).string(NULL));
+	   + attr.attributes(tag_t(&f))->string(tag_t(NULL)));
     }else{
     }
     if (!f.more()) {

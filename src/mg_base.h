@@ -6,6 +6,42 @@
 #include <l_indirect.h>
 #include <u_attrib.h>
 /*--------------------------------------------------------------------------*/
+class ckt_attr : protected CKT_BASE{
+public:
+  using CKT_BASE::attributes;
+  using CKT_BASE::set_attributes;
+  using CKT_BASE::erase_attributes;
+  using CKT_BASE::has_attributes;
+//  const ATTRIB_LIST_p& attributes(tag_t x)const {return _attribs.at(x);}
+//  ATTRIB_LIST_p&   set_attributes(tag_t x)	{return _attribs[x];}
+//  bool		   has_attributes(tag_t x)const {return attributes(x);}
+//  void		 erase_attributes(tag_t x)	{_attribs.erase(x);}
+//  void	     erase_attributes(tag_t b, tag_t e) {_attribs.erase(b,e);}
+  void move_attributes(tag_t from, tag_t to) {
+    assert(!has_attributes(to)); //for now.
+    if(has_attributes(from)){
+      set_attributes(to).add_to(attributes(from)->string(tag_t(0)), to);
+      erase_attributes(from, from+1);
+    }else{
+    }
+  }
+#if 0
+  ATTRIB_LIST& chown(ATTRIB_LIST& a, tag_t Old, tag_t New) {
+    if(_owner == Old){
+      _owner = New;
+      if(_up){
+	_up->chown(Old, New);
+      }else{
+      }
+    }else{untested();
+    }
+    return *this;
+  }
+#endif
+/*--------------------------------------------------------------------------*/
+};
+extern ckt_attr attr;
+/*--------------------------------------------------------------------------*/
 class Block;
 class Owned_Base : public Base {
   Block* _owner{NULL};
@@ -22,14 +58,14 @@ protected:
   Block* owner();
 
 public:
-  ATTRIB_LIST_p& attributes() { untested();
-    assert(CKT_BASE::_attribs);
-    return (*CKT_BASE::_attribs)[this];
-  }
-  const ATTRIB_LIST_p& attributes()const { untested();
-    assert(CKT_BASE::_attribs);
-    return CKT_BASE::_attribs->at(this);
-  }
+//  ATTRIB_LIST_p& attributes() { untested();
+//    assert(CKT_BASE::_attribs);
+//    return (*CKT_BASE::_attribs)[this];
+//  }
+//  const ATTRIB_LIST_p& attributes()const { untested();
+//    assert(CKT_BASE::_attribs);
+//    return CKT_BASE::_attribs->at(this);
+//  }
 };
 /*--------------------------------------------------------------------------*/
 inline std::string to_lower(std::string s)
@@ -176,11 +212,6 @@ protected:
       }else{ untested();
       }
     }
-  }
-protected: // base class?
-  bool has_attributes() const{ untested();
-    assert(CKT_BASE::_attribs);
-    return CKT_BASE::_attribs->count(this);
   }
 public:
   void dump(std::ostream& f)const override {
@@ -544,7 +575,7 @@ inline void String_Arg::parse(CS& f)
 template <class T, char BEGIN, char SEP, char END, char END2, char END3>
 LiSt<T, BEGIN, SEP, END, END2, END3>::~LiSt()
 {
-  CKT_BASE::_attribs->erase(this, this);
+  attr.erase_attributes(tag_t(this), tag_t(this)+1);
 }
 /*--------------------------------------------------------------------------*/
 inline Block const* Owned_Base::owner() const

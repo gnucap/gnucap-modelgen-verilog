@@ -365,11 +365,16 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
 
     CARD_LIST::const_iterator i = toplevel.find_(modelname);
     while(i != toplevel.end()) {
-      std::string desc = ((*i)->attributes(*i))[std::string("desc")];
-      if(desc == "0"){
-	desc = "";
+      auto const& a = attributes(tag_t(*i));
+      std::string desc;
+      if(a){
+	desc = a->operator[](std::string("desc"));
+	if(desc == "0") { untested();
+	  desc = "";
+	}else{
+	  desc = ": " + desc;
+	}
       }else{
-	desc = ": " + desc;
       }
       error(bLOG, long_label() + ": " + modelname + " from top level" + desc + "\n");
 
@@ -610,13 +615,18 @@ void INSTANCE::expand()
     CARD const* s = *i;
     COMPONENT const* d = dynamic_cast<COMPONENT const*>(s);
     CARD_LIST::iterator j = i;
-      ++i;
+    ++i;
     if(!d->is_valid()){
-      std::string desc = (d->attributes(d))[std::string("desc")];
-      if(desc == "0"){
-	desc = "";
-      }else{ untested();
-	desc = ": " + desc;
+      std::string desc;
+      auto const& a = attributes(tag_t(*i));
+      if(a){ untested();
+	desc = a->operator[](std::string("desc"));
+	if(desc == "0"){
+	  desc = "";
+	}else{ untested();
+	  desc = ": " + desc;
+	}
+      }else{
       }
 
       error(bTRACE, long_label() + " dropped invalid candidate"+desc+".\n");

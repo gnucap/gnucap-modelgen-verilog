@@ -172,7 +172,7 @@ void make_one_variable_decl(std::ostream& o, Token_VAR_REF const& V)
   if(V.type().is_real()) {
       o__ "double ";
       o << " _v_" << V.name() << "{0.}";
-   if(attributes(&V)){
+   if(attr.attributes(tag_t(&V))){
 #if 0
    }else if(options().optimize_deriv()) { untested();
       o__ "struct _V_" << V.name() << " : ddouble {\n";

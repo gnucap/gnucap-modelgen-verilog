@@ -104,7 +104,7 @@ void Net_Declarations::parse(CS& f)
   }
 
   if(d){
-    move_attributes(&f, d);
+    attr.move_attributes(tag_t(&f), tag_t(d));
     push_back(d);
   }else{
   }

@@ -1272,7 +1272,7 @@ Token_VAR_REF* Token_VAR_REF::deep_copy(Base* /*owner*/, std::string prefix)cons
   if(dynamic_cast<TData const*>(_item)) { untested();
     auto cl = new TData;
     auto n = new Token_VAR_REF(prefix + name(), cl, cl);
-    attributes(n) = attributes(this);
+    attr.set_attributes(tag_t(n)) = attr.attributes(tag_t(this));
     return n;
   }else{ untested();
     unreachable();

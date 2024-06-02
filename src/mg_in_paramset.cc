@@ -75,7 +75,7 @@ CS& Paramset::parse_stmt(CS& f)
     // delete dup;
 
   }else if(Base* ret=parse_proc_assignment(f, this)){
-    move_attributes(&f, ret);
+    attr.move_attributes(tag_t(&f), tag_t(ret));
     push_back(ret);
     // ...
   }else{
@@ -117,8 +117,10 @@ void Paramset::parse(CS& f)
   File* o = prechecked_cast<File*>(owner());
   assert(o);
 
-  move_attributes(&f, this);
-  assert(!has_attributes(&f));
+  // move_attributes(f);
+  attr.move_attributes(tag_t(&f), tag_t(this));
+
+  assert(!attr.has_attributes(tag_t(&f)));
   _parameters.set_owner(this);
   _variables.set_owner(this);
 
@@ -159,9 +161,9 @@ void Paramset::parse(CS& f)
       || ((f >> "endparamset ") && (end = true))
       ;
 
-    if (has_attributes(&f)){ untested();
+    if (attr.has_attributes(tag_t(&f))){ untested();
       f.warn(bWARNING, "dangling attributes "
-	   + attributes(&f).string(NULL));
+	   + attr.attributes(tag_t(&f))->string(tag_t(NULL)));
     }else{
     }
     if (end){
@@ -309,11 +311,6 @@ static void import_proto_vars(Module* sub, Module const* proto)
   auto& pv = proto->variables();
 
   for(Variable_List const* x : pv) {
-    if(::attributes(x)[std::string("desc")]!="0"
-     ||::attributes(x)[std::string("units")]!="0"){
-    }else{
-    }
-
     auto copy = x->deep_copy_(sub, PS_MANGLE_PREFIX);
 //    assert(copy->owner() == sub);
     sub->push_back(copy);

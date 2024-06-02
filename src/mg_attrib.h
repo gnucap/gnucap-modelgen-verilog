@@ -83,20 +83,6 @@ public:
 };
 typedef Collection<Attribute> Attribute_List;
 /*--------------------------------------------------------------------------*/
-void move_attributes(void* from, void const* to);
-/*--------------------------------------------------------------------------*/
-inline ATTRIB_LIST_p& attributes(void const* x)
-{
-  assert(CKT_BASE::_attribs);
-  return (*CKT_BASE::_attribs)[x];
-}
-/*--------------------------------------------------------------------------*/
-inline ATTRIB_LIST_p& attributes(intptr_t x)
-{ untested();
-  assert(CKT_BASE::_attribs);
-  return (*CKT_BASE::_attribs)[(void*)x];
-}
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

@@ -110,32 +110,16 @@ void parse_attributes(CS& cmd, void const* x)
     while(cmd.ns_more() && !(cmd >> "*)")) {
       attrib_string += cmd.ctoc();
     }
-    attributes(x).add_to(attrib_string, x);
+    attr.set_attributes(tag_t(x)).add_to(attrib_string, tag_t(x));
   }
 }
 /*--------------------------------------------------------------------------*/
 void print_attributes(std::ostream& o, const void* x)
 {
   assert(x);
-  if (has_attributes(x)) {
+  if (attr.has_attributes(tag_t(x))) {
     o__ "";
-    o << "(* " << attributes(x).string(NULL) << " *)\n";
-  }else{
-  }
-}
-/*--------------------------------------------------------------------------*/
-bool has_attributes(void const* x)
-{
-  assert(CKT_BASE::_attribs);
-  return CKT_BASE::_attribs->at(x);
-}
-/*--------------------------------------------------------------------------*/
-void move_attributes(void* from, void const* to)
-{
-  assert(!has_attributes(to)); //for now.
-  if(has_attributes(from)){
-    (*CKT_BASE::_attribs)[to] = (*CKT_BASE::_attribs)[from].chown(from, to);
-    CKT_BASE::_attribs->erase(from, reinterpret_cast<bool*>(from)+1);
+    o << "(* " << attr.attributes(tag_t(x))->string(tag_t(NULL)) << " *)\n";
   }else{
   }
 }

@@ -61,7 +61,7 @@ void Variable_Decl::parse(CS& f)
     throw Exception_CS_("already declared", f);
   }
 
-  ::attributes(_token) = ::attributes(&f);
+  attr.set_attributes(tag_t(_token)) = attr.attributes(tag_t(&f));
 }
 /*--------------------------------------------------------------------------*/
 void Variable_List::parse(CS& f)
@@ -89,7 +89,7 @@ void Variable_List::parse(CS& f)
   _l.set_owner(this);
   _l.parse(f);
 
-  move_attributes(&f, this);
+  attr.move_attributes(tag_t(&f), tag_t(this));
 //  update();
 } // Variable_List::parse
 /*--------------------------------------------------------------------------*/

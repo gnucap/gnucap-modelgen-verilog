@@ -86,11 +86,6 @@ inline void parse_attributes(CS& cmd, intptr_t x)
   parse_attributes(cmd, (void const*) x);
 }
 /*--------------------------------------------------------------------------*/
-bool has_attributes(void const* x);
-inline bool has_attributes(intptr_t x)
-{ untested();
-  return has_attributes((void const*)x);
-}
 void print_attributes(std::ostream& o, const void* x);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

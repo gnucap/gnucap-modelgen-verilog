@@ -301,7 +301,7 @@ void Parameter_2_List::parse(CS& file)
 {
   Module* m = prechecked_cast<Module*>(owner());
   assert(m);
-  move_attributes(&file, this);
+  attr.move_attributes(tag_t(&file), tag_t(this));
 
   assert(file.last_match().size());
 
@@ -652,7 +652,7 @@ void Module::parse(CS& f)
   _circuit->set_owner(this);
   File* o = prechecked_cast<File*>(owner());
   assert(o);
-  move_attributes(&f, this);
+  attr.move_attributes(tag_t(&f), tag_t(this));
 
   // f >> "module |macromodule |connectmodule "; from caller
   f >> _identifier;
@@ -712,9 +712,9 @@ void Module::parse_body(CS& f)
       || ((f >> "endmodule ") && (end = true))
       || (f >> _circuit->element_list())	// module_instantiation
       ;
-    if (has_attributes(&f)) { untested();
+    if (attr.has_attributes(tag_t(&f))) { untested();
       f.warn(bWARNING, "dangling attributes "
-	   + attributes(&f).string(NULL));
+	   + attr.attributes(tag_t(&f))->string(tag_t(NULL)));
     }else{
     }
     if (end){

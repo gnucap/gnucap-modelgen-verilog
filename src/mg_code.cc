@@ -174,7 +174,7 @@ Variable_List* Variable_List::deep_copy_(Block* owner, std::string prefix) const
   // return new Variable_List(this);
   // auto n = new Variable_List(*this);
   auto n = new Variable_List();
-  ::attributes(n) = ::attributes(this);
+  attr.set_attributes(tag_t(n)) = attr.attributes(tag_t(this));
 
   n->_type = type();
   n->set_owner(owner);
@@ -209,9 +209,11 @@ void Variable_Decl::new_data()
   assert(l);
   Module const* mod = dynamic_cast<Module const*>(l->owner()); // scope?
   Variable_List_Collection const* p=NULL;
+  ATTRIB_LIST_p const& a = attr.attributes(tag_t(this));
   if(!mod){ untested();
-  }else if(::attributes(this)[std::string("desc")]!="0"
-         ||::attributes(this)[std::string("units")]!="0"){
+  }else if(!a) {
+  }else if(a->operator[](std::string("desc")) != "0"
+         ||a->operator[](std::string("units")) != "0") {
     p = &mod->variables();
   }else{
   }
@@ -233,10 +235,10 @@ Variable_Decl* Variable_Decl::deep_copy(Base* b, std::string s) const
   assert(type());
   n->set_type(type());
   assert(n->type());
-  ::attributes(n) = ::attributes(l);
+  attr.set_attributes(tag_t(n)) = attr.attributes(tag_t(l));
   n->new_data();
   n->_token = new Token_VAR_DECL(s+_token->name(), n, n->_data);
-  ::attributes(n->_token) = ::attributes(l);
+  attr.set_attributes(tag_t(n->_token)) = attr.attributes(tag_t(l));
   assert(n->_token->type());
   l->scope()->new_var_ref(n->_token);
   assert(n->_token->data());
