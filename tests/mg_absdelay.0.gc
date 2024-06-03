@@ -1,0 +1,39 @@
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_absdel0(p, n);
+	(* desc="" *) real ll1;
+	(* desc="" *) real ll2;
+	(* desc="" *) real ll3;
+	(* desc="" *) real ll4;
+	(* desc="" *) real ll5;
+	electrical p, n;
+	analog begin
+		ll1 = absdelay(V(p,n), .1);
+	end
+endmodule
+
+!make test_absdel0.so > /dev/null
+attach ./test_absdel0.so
+
+verilog
+parameter r=1
+parameter v=0
+
+test_absdel0 #() dut(1,0);
+vsine #(.dc(v), .ampl(1)) v1(1, 0);
+
+list
+
+print tran v(1) ll1(dut) vin(dut.*)
+tran 1 .1 trace=n
+
+end
+// incomplete probes...
+print ac v(1) ll1(dut) ll2(dut) ll3(dut)
+ac 2 4 * 2
+status notime
+end

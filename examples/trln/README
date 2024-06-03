@@ -26,6 +26,15 @@ see also ../tests/v_trln.0.gc for recursive RLGC
 
 WIP
 
+== transmission line
+
+Gnucap has a built-in transmission line, implemented as a delay line. Here's a
+(partial) Verilog-AMS implementation and comparison.
+
+$ gnucap-mg-vams --cc tline0.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o tline0.so
+$ gnucap trln_absdelay.gc
+[..]
+
 == frequency domain modelling
 
 Verilog-AMS opens a new perspective to data driven transmission line (TL)
@@ -40,7 +49,7 @@ $ gnucap-mg-vams --cc trln0.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -sha
 $ gnucap trln_laplace.gc
 [..]
 
-== transmission line
+== RLGC
 
 work in progress on RLGC line. need transient. see also ../tests/v_trln.0.gc.
 

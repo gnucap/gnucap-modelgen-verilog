@@ -40,6 +40,7 @@ mg_code.cc \
 mg_deps.cc \
 mg_error.cc \
 mg_file.cc \
+mg_filt_absdelay.cc \
 mg_filt_acstim.cc \
 mg_filt.cc \
 mg_filt_ddx.cc \

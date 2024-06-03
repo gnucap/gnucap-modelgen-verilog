@@ -2,7 +2,12 @@ load mgsim
 load ./trln0.so
 verilog
 
-parameter z0=5.
+parameter z0=50.
+options trtol=5
+
+// TODO. need to fix tolerances..
+options nobypass
+options noincmode
 
 trln0 #(.z0(z0)) tmatch(m_out 0 m_in 0 );
 trln0 #(.z0(z0)) topen( nc 0 o_in 0 );
@@ -16,10 +21,12 @@ resistor #(z0) rin3 (s_in vsrc);
 
 spice
 * BUG: need pulse in vams.
-v1 vsrc 0 pulse rise=.1 fall=.1 iv=0 pv=1 delay=1 width=1 ac 1
+v1 vsrc 0 pulse rise=.1 fall=.1 iv=0 pv=1 delay=1 width=2 ac 1
 
 .print tran v(vsrc) v(m_in) v(s_in) v(o_in) v(m_out)
 .tran 10 basic | {tee trln_laplace_tr.out}
+
+.end
 
 .print ac vm(*_in) vp(*_in)
 .ac .125 512 * 2

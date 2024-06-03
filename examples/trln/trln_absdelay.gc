@@ -1,0 +1,25 @@
+load mgsim
+verilog
+
+load ./tline0.so
+
+parameter z0=50.
+
+// built in tline for comparison
+tline  #(.z0(z0) .delay(.2) tmatch1(m_out1 0 m_in1 0 );
+tline0 #(.z0(z0) .delay(.2) tmatch2(m_out2 0 m_in2 0 );
+
+resistor #(z0*.9) rmatch (m_out1 0);
+resistor #(z0*.9) rmatch (m_out2 0);
+resistor #(z0*.9) rin1 (m_in1 vsrc);
+resistor #(z0*.9) rin1 (m_in2 vsrc);
+
+spice
+* BUG: need pulse in vams.
+v1 vsrc 0 pulse rise=.1 fall=.1 iv=0 pv=1 delay=1 width=1 ac 1
+
+.print tran v(vsrc) v(m_out*)
+.tran 10 basic | {tee tline0.out}
+
+.print ac vm(m_out*) vp(m_out*)
+.ac .125 512 * 2

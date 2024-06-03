@@ -138,9 +138,12 @@ public:
   COMMON_LAPLACE_NP(COMMON_LAPLACE_NP const& x) : COMMON_LAPLACE(x) {}
   COMMON_LAPLACE_NP* clone()const override {return new COMMON_LAPLACE_NP(*this);}
 
-  void precalc_last(const CARD_LIST* par_scope)override{
+  void precalc_last(const CARD_LIST* par_scope)override {
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();
+    for(auto x : _p_den){
+      trace1("NP den", x);
+    }
   }
   void precalc_first(const CARD_LIST* par_scope)override {
     COMMON_LAPLACE::precalc_first(par_scope);
@@ -1127,7 +1130,7 @@ double LAPLACE::tr_amps() const
 {
   assert(_output);
   double r = _output->tr_amps();
-  if(_loss0){ untested();
+  if(_loss0){
     assert(_loss0==1.);
     assert(!_output->_loss0);
     incomplete();

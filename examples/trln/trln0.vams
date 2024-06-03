@@ -24,20 +24,21 @@ module trln0(out0, out1, in0, in1)
 	electrical fwd, ref;
 	branch (out0, out1) out;
 	branch (in0, in1) in;
-	parameter real pp = -40;
-	parameter real z0 = 2.;
+	parameter real pp = -1e2;
+	parameter real z0 = 50.;
+//	(*desc="v"*)
 	real vref, vfwd;
 	analog begin
-      I(out) <+ V(out)/z0;
-      I(in) <+ V(in)/z0;
 
-		vfwd = laplace_np(V(in) -V(ref), '{.7,.002,-0.01,0.0001}, '{-33,0,pp,.5.,pp,-.5, .5*pp,.9,.5*pp,-.9});
-		vref = laplace_np(V(out)-V(fwd), '{.7,.002,-0.01,0.0001}, '{-33,0,pp,.5.,pp,-.5, .5*pp,.9,.5*pp,-.9});
+		vfwd = laplace_np(2.*V(in)-V(ref) , '{ 1,-.01},
+                                          '{-5,0,pp,5,pp,-5, .5*pp,.9,.5*pp,-.9});
+		vref = laplace_np(2.*V(out)-V(fwd), '{ 1,-.01},
+                                          '{-5,0,pp,5,pp,-5, .5*pp,.9,.5*pp,-.9});
 
 		I(fwd) <+ V(fwd) - vfwd;
 		I(ref) <+ V(ref) - vref;
 
-		I(out) <+ vfwd/z0;
-		I(in) <+ vref/z0;
+		I(out) <+ (V(out) - vfwd)/z0;
+		I(in) <+ (V(in) - vref)/z0;
 	end
 endmodule

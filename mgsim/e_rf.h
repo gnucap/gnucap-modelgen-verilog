@@ -541,6 +541,9 @@ void COMMON_RF_BASE::convert_nd()
     if(!den_is_d()){
       // assert(den_is_p());
       convert(_p_den, "denominator");
+      for(auto x : _p_den){
+	trace1("p2d", x);
+      }
     }else{
     }
     _type = rf_nd;

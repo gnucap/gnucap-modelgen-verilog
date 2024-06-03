@@ -5264,8 +5264,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
               t0 = 0.; // static?
               t0 = (_p___c) /*rhspar*/ * t0;
               t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_2(t0);
-              // dep _potential_b_ddt_2_p_ddt_2_n
-              m->_st_b_ddt_2_p_ddt_2_n[1] = - t0[d_potential_b_ddt_2_p_ddt_2_n]; // (3p)
+              m->_st_b_ddt_2_p_ddt_2_n[1] = -1; // (3q)
             }
           }
         }

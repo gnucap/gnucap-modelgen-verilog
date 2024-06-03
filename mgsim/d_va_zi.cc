@@ -479,10 +479,10 @@ inline void ZFILTER::dc_advance()
 /*--------------------------------------------------------------------------*/
 std::string ZFILTER::port_name(int i)const
 {
-	assert(i >= 0);
-	assert(i < max_nodes());
-	static std::string names[] = {"out0", "out1", "in0", "in1" };
-	return names[i];
+  assert(i >= 0);
+  assert(i < max_nodes());
+  static std::string names[] = {"out0", "out1", "in0", "in1" };
+  return names[i];
 }
 /*--------------------------------------------------------------------------*/
 ZFILTER zi(&czi);
