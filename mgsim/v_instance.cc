@@ -151,15 +151,9 @@ private: // overrides
   }
   int set_param_by_name(std::string name, std::string value) override {
     trace3("instance spbn", long_label(), name, value);
-    if(name=="$mfactor"){
-      incomplete();
-      // _mfactor = value; probably not.
-      _params.push_back(std::make_pair(name, value));
-    }else{
-      _params.push_back(std::make_pair(name, value));
-    }
+    _params.push_back(std::make_pair(name, value));
     // mutable_common()->set_param_by_name(name, value); // ?
-    return 0.; // incomplete.
+    return _params.size()-1; // incomplete.
   }
   std::string param_name(int i, int j) const override { untested();
     if(j==0){ untested();
@@ -177,7 +171,13 @@ private: // overrides
     return _params[i].second;
   }
   void set_param_by_index(int i, std::string& value, int) override {
-    int idx = i+1;
+    int idx;
+    if(i<0){
+      idx = -i-1;
+    }else{
+      idx = i+1;
+    }
+    trace3("spbi", i, idx, value);
 
     // TODO: use common.
     if(int(_params.size()) == idx){

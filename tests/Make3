@@ -4,14 +4,14 @@ ENV = GNUCAP_PLUGPATH=${top_builddir}:$(plugpath) top_srcdir=${top_srcdir} srcdi
 
 glob_dump = $(shell cd ${srcdir}; ls dump*.vams)
 glob_pp = $(shell cd ${srcdir}; ls *.vapp)
-glob_v = $(shell cd ${srcdir}; ls v*.gc)
 glob_mg = $(shell cd ${srcdir}; ls mg*.gc)
+glob_gc = $(shell cd ${srcdir}; ls u*.gc v*.gc)
 glob_sh = $(shell cd ${srcdir}; ls *.sh)
 
 filt_dump = $(filter ${TESTCASES}%, ${glob_dump})
 filt_pp   = $(filter ${TESTCASES}%, ${glob_pp})
-filt_v    = $(filter ${TESTCASES}%, ${glob_v})
 filt_mg   = $(filter ${TESTCASES}%, ${glob_mg})
+filt_gc   = $(filter ${TESTCASES}%, ${glob_gc})
 filt_sh   = $(filter ${TESTCASES}%, ${glob_sh})
 
 dump_out = ${filt_dump:%=${TARGETDIR}/%.out}
@@ -20,11 +20,11 @@ dump_diff = ${filt_dump:%=${TARGETDIR}/%.diff}
 pp_out = ${filt_pp:%=${TARGETDIR}/%.out}
 pp_diff = ${filt_pp:%=${TARGETDIR}/%.diff}
 
-v_out = ${filt_v:%=${TARGETDIR}/%.out}
 mg_out = ${filt_mg:%=${TARGETDIR}/%.out}
+gc_out = ${filt_gc:%=${TARGETDIR}/%.out}
 
-gc_out = ${v_out} ${mg_out}
-gc_diff = ${gc_out:%.out=%.diff}
+all_gc_out = ${mg_out} ${gc_out}
+gc_diff = ${all_gc_out:%.out=%.diff}
 
 sh_out = ${filt_sh:%=${TARGETDIR}/%.out}
 sh_diff = ${filt_sh:%=${TARGETDIR}/%.diff}
@@ -45,7 +45,7 @@ check: ${TARGETDIR}/${TESTCASES}.diff
 ${TARGETDIR}/${TESTCASES}.diff : ${diff}
 	@cat $+ > $@
 
-${gc_out}: ${TEST_PLUGINS} ${SYMLINKS}
+${all_gc_out}: ${TEST_PLUGINS} ${SYMLINKS}
 
 # this is a hack: link *.o
 modelgen_0.so: modelgen_0.cc ../src/gnucap-mg-vams
@@ -70,12 +70,12 @@ prep: ${SYMLINKS}
 	# @[ ! -s "${TARGETDIR}" ]
 	-mkdir -p ${TARGETDIR}
 
-${v_out}: ${TARGETDIR}/v%.gc.out: prep
-	-@${ENV} ${GNUCAP} ${GNUCAP_ARGS} ${srcdir}/v$*.gc |tail -n +12 | \
-		grep -v '^stashing\ as' | grep -v 'already\ installed' | grep -v ^make > $@
-
 ${mg_out}: ${TARGETDIR}/mg%.gc.out: prep
 	-@${ENV} ${GNUCAP} ${GNUCAP_ARGS} ${MG_ARGS} ${srcdir}/mg$*.gc |tail -n +12 | \
+		grep -v '^stashing\ as' | grep -v 'already\ installed' | grep -v ^make > $@
+
+${gc_out}: ${TARGETDIR}/%.gc.out: prep
+	-@${ENV} ${GNUCAP} ${GNUCAP_ARGS} ${srcdir}/$*.gc |tail -n +12 | \
 		grep -v '^stashing\ as' | grep -v 'already\ installed' | grep -v ^make > $@
 
 ${pp_out}: ${TARGETDIR}/%.vapp.out: prep
