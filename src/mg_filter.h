@@ -17,7 +17,7 @@ public:
   void dump(std::ostream&)const override { untested();unreachable();}
 
   void set_num_states(int s) {_num_states = s; }
-  void set_output(Branch_Ref const& x);
+//  void set_output(Branch_Ref const& x);
 //  Branch_Ref const& branch() const{ untested(); return _branch; }
   std::string name() const {
     return _name;

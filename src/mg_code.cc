@@ -202,6 +202,23 @@ bool SeqBlock::update()
   return ret;
 }
 /*--------------------------------------------------------------------------*/
+static bool is_output_var(tag_t t)
+{
+  ATTRIB_LIST_p const& a = attr.attributes(t);
+  if(!a) {
+  }else if(a->operator[](std::string("desc")) != "0"
+         ||a->operator[](std::string("units")) != "0") {
+    return true;
+  }else{
+  }
+  return false;
+}
+/*--------------------------------------------------------------------------*/
+bool Assignment::is_output_var() const
+{
+  return :: is_output_var(tag_t(_lhsref));
+}
+/*--------------------------------------------------------------------------*/
 void Variable_Decl::new_data()
 {
   assert(owner());
@@ -209,11 +226,8 @@ void Variable_Decl::new_data()
   assert(l);
   Module const* mod = dynamic_cast<Module const*>(l->owner()); // scope?
   Variable_List_Collection const* p=NULL;
-  ATTRIB_LIST_p const& a = attr.attributes(tag_t(this));
   if(!mod){ untested();
-  }else if(!a) {
-  }else if(a->operator[](std::string("desc")) != "0"
-         ||a->operator[](std::string("units")) != "0") {
+  }else if(is_output_var(tag_t(this))) {
     p = &mod->variables();
   }else{
   }

@@ -188,6 +188,7 @@ public:
   bool is_used_in(Base const*b)const;
   bool is_used()const;
   operator bool() const {return _token;}
+  bool is_output_var()const;
 private: // implementation
   bool store_deps(TData const&);
   std::string code_name()const;

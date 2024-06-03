@@ -117,6 +117,9 @@ public:
 	  unreachable();
 	  return "filt";
   }
+  bool is_standalone()const {
+    return _output;
+  }
 private:
   virtual Branch* branch() const {return NULL;}
   void setup(Module*)override;

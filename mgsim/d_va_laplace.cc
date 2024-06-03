@@ -276,7 +276,8 @@ public:
 private: // ELEMENT, pure
   void tr_iwant_matrix() override { return COMPONENT::tr_iwant_matrix(); }
   void ac_iwant_matrix() override;
-  double tr_involts()const override{ untested();
+  double tr_involts()const override { untested();
+    incomplete();
     assert(_input);
     return _input->tr_outvolts();
   }
@@ -286,7 +287,11 @@ private: // BASE_SUBCKT
   void	  tr_begin()override	{assert(subckt()); subckt()->tr_begin(); ELEMENT::tr_begin();
       _s_[0]->_loss0 = 1.;
       _s_[0]->_loss1 = 1.;
-//      _output->_loss0 = _loss0;
+      if(_set_parameters){
+	// _output->_loss0 = _loss0;
+      }else{
+	assert(!_loss0);
+      }
 //      _output->_loss1 = _loss1;
   }
   void	  tr_restore()override	{assert(subckt()); subckt()->tr_restore(); ELEMENT::tr_restore();}
@@ -715,11 +720,15 @@ void LAPLACE::expand()
 
     trace2("expand2a", long_label(), c->_p_den.size());
 
-    std::string output_elt_type = "va_flow";
+    std::string output_elt_type;
     std::string d_ddt_type = "va_ddt";
     std::string d_idt_type = "va_idt";
 
-//    output_elt_type = "va_pot";
+    if(_set_parameters) {
+      output_elt_type = "va_sw";
+    }else{
+    }
+    output_elt_type = "va_flow";
 //    s_elt_type = "va_idt"; needs reverse order num coeffs
 
     {
@@ -899,6 +908,10 @@ void LAPLACE::expand()
     }
   }
 
+  if(_set_parameters){
+    // _output->_loss1 = _output->_loss0 = 1.;
+  }else{
+  }
   // after precalc_last
 //  assert( c->_p_num.size());
 //  assert( c->_p_den.size());
@@ -939,10 +952,10 @@ void LAPLACE::precalc_last()
 
   for(int jj=0; jj<num_num; ++jj){
     _st_b_out_[2+jj] = c->_p_num[jj] / piv;
-    trace2("preclast", jj, _st_b_out_[jj+2]);
   }
 
   assert(_st_b_in_);
+  trace2("mhack", _st_b_in_[0], _st_b_in_[1]);
   double mhack = _st_b_in_[1];
   _st_b_in_[1] = 0.;
   if(_set_parameters){
@@ -1045,7 +1058,6 @@ void LAPLACE::set_parameters(const std::string& Label, CARD *Owner,
   trace4("setnodes", net_nodes(), nodes, dens, n_nodes);
   notstd::copy_n(nodes, net_nodes(), _n);
   _loss1 = _loss0 = 1.;
-
 }
 /*--------------------------------------------------------------------------*/
 void LAPLACE::ac_load()
@@ -1100,7 +1112,8 @@ void LAPLACE::tr_load()
 {
   tr_load_shunt();
   assert(subckt());
-  trace2("LAPLACE::tr_load", _loaditer, _sim->iteration_tag());
+  trace3("LAPLACE::tr_load", _loaditer, _sim->iteration_tag(), _loss0);
+  assert(!_output->_loss0);
   subckt()->tr_load();
 }
 /*--------------------------------------------------------------------------*/
@@ -1114,13 +1127,19 @@ double LAPLACE::tr_amps() const
 {
   assert(_output);
   double r = _output->tr_amps();
-  if(_loss0){
+  if(_loss0){ untested();
     assert(_loss0==1.);
+    assert(!_output->_loss0);
     incomplete();
-    // r = -r;
+//    r = -r; // done in _output?
   }else{ untested();
+    assert(!_output->_loss0);
   }
-  trace2("LAPLACE::tr_amps", r, _loss0);
+  if(_set_parameters){
+    trace5("LAPLACE::tr_amps", r, _loss0, _input->tr_amps(), *_st_b_in_, _n[0].v0());
+    trace3("LAPLACE::tr_amps", _st_b_in_[2], _output->tr_outvolts(), _output->tr_amps());
+  }else{
+  }
   return r;
 }
 /*--------------------------------------------------------------------------*/

@@ -581,17 +581,16 @@ double DEV_CPOLY_CAP::tr_amps() const
 {
   // return fixzero((_loss0 * tr_outvolts() + _m0.c1 * tr_involts() + _m0.c0), _m0.c0);
   double amps = _m0.c0;
-  if(_loss0){
-    amps = -_m0.c0;
-    assert(_loss0 == 1.);
-    for (int i=2; i<=_n_ports; ++i) {
-      amps -= dn_diff(_n[2*i-2].v0(),_n[2*i-1].v0()) * _vi0[i];
-    }
-  }else{
-    for (int i=2; i<=_n_ports; ++i) {
-      amps += dn_diff(_n[2*i-2].v0(),_n[2*i-1].v0()) * _vi0[i];
-    }
+  for (int i=2; i<=_n_ports; ++i) { untested();
+    amps += dn_diff(_n[2*i-2].v0(),_n[2*i-1].v0()) * _vi0[i];
   }
+
+  if(_loss0){ untested();
+    assert(_loss0 == 1.); // for now.
+    amps = -amps;
+  }else{ untested();
+  }
+
   return amps;
 }
 /*--------------------------------------------------------------------------*/

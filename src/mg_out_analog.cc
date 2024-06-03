@@ -339,10 +339,12 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	assert(v->branch());
 	if(C.branch() == v->branch()) {
 	  o__ "// same " << v->code_name() << "\n";
-	}else if(v->branch()->is_filter()){ /// && ref?
+	}else if(v->branch()->is_detached_filter()){ /// && ref?
 	  o__ "// dep " << v->code_name() << "\n";
 	  o__ "m->" << v->branch()->state() << "[1] = "
 	  << neg_sign << " t0[d" << v->code_name() << "]; // (3p)\n";
+	}else if(v->branch()->is_filter()){ /// && ref?
+	  o__ "m->" << v->branch()->state() << "[1] = "<<neg_sign<<"1; // (3q)\n"; // mfactor hack
 	}else if(v->branch()->is_short()) {
 	  o__ "// short: " << v->code_name() << "\n";
 	}else if(v->branch()->has_element()){

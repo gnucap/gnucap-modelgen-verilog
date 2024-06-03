@@ -191,6 +191,7 @@ bool DEV_FPOLY_G::do_tr()
 {
   assert(_values);
   double c0 = _values[0];
+  trace4("DEV_FPOLY_G::do_tr", long_label(), _values[0], _values[1], _values[_n_ports]);
   // incomplete current input?
   // if (_inputs) {untested();
   //   untested();

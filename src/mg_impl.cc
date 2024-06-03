@@ -272,6 +272,12 @@ size_t Filter::num_branches() const
   return 0;
 }
 /*--------------------------------------------------------------------------*/
+bool Branch::is_detached_filter() const
+{
+  auto f = dynamic_cast<MGVAMS_FILTER const*>( _ctrl);
+  return f && f->is_standalone();
+}
+/*--------------------------------------------------------------------------*/
 void Branch::new_deps()
 {
   assert(!_deps);
@@ -977,51 +983,6 @@ void Branch::dereg_stmt(AnalogStmt const* r)
   assert(0);
   unreachable(); // cleanup is out of order?
 }
-/*--------------------------------------------------------------------------*/
-// tmp fuzz
-//void Owned_Base::set_owner(Block* b)
-//{ untested();
-//  _owner=b;
-//}
-#if 0
-Block* Owned_Base::scope()const
-{ untested();
-  if(auto b = dynamic_cast<Block*>(_owner)) { untested();
-    return b;
-  }else if(auto o = dynamic_cast<Owned_Base*>(_owner)) { untested();
-    incomplete();
-    return NULL;
-    return o->scope();
-  }else{ untested();
-    incomplete();
-    return NULL;
-  }
-}
-Block* Owned_Base::owner()
-{ untested();
-  if(auto b = dynamic_cast<Block*>(_owner)) { untested();
-    return b;
-  }else if(auto o = dynamic_cast<Owned_Base*>(_owner)) { untested();
-    return NULL; // o->scope();
-  }else{ untested();
-    incomplete();
-    return NULL;
-  }
-}
-Block const* Owned_Base::owner()const
-{ untested();
-  if(auto b = dynamic_cast<Block*>(_owner)) { untested();
-    return b;
-  }else if(auto o = dynamic_cast<Owned_Base*>(_owner)) { untested();
-    incomplete();
-    return NULL;
-    return o->scope();
-  }else{ untested();
-    incomplete();
-    return NULL;
-  }
-}
-#endif
 /*--------------------------------------------------------------------------*/
 ckt_attr attr;
 /*--------------------------------------------------------------------------*/

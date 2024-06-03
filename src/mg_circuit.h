@@ -237,6 +237,7 @@ public:
   bool has_short() const { untested(); return _has_short; }
   bool has_always_pot() const { return _has_always_pot; }
   bool is_filter() const { return _ctrl; }
+  bool is_detached_filter()const;
   bool has_pot_source()const;
   bool is_source()const {return _source || has_pot_source() || has_flow_source();}
   bool is_shadow_source()const;

@@ -1,0 +1,25 @@
+parameter r=1 
+parameter v=0 
+test_mgddt0 #() dut (.out0(0),.out1(3),.in0(1),.in1(0));
+resistor #(.r(2)) r (.p(3),.n(0));
+vsine #(.ampl(1),.dc(v),.mag(1)) v1 (.p(1),.n(0));
+#Time       v(1)       v(3)       vfwd(dut) 
+ 0.         0.         0.         ??        
+ 0.1        0.58779    10.2       ??        
+ 0.2        0.95106    3.8644     ??        
+ 0.3        0.95106   -3.9666     ??        
+ 0.4        0.58779   -10.564     ??        
+ 0.5       -7.f       -12.947     ??        
+ 0.6       -0.58779   -9.9856     ??        
+ 0.7       -0.95106   -3.6503     ??        
+ 0.8       -0.95106    4.1807     ??        
+ 0.9       -0.58779    10.35      ??        
+ 1.         13.f       13.161     ??        
+#Freq       v(1)       vp(3)      vm(3)     
+ 2.         1.         90.        25.133    
+ 4.         1.         90.        50.265    
+Gnucap   System status
+iterations: op=0, dc=0, tran=94, fourier=0, total=126
+transient timesteps: accepted=23, rejected=7, total=30
+nodes: user=2, subckt=0, model=1, total=3
+dctran density=77.8%, ac density=77.8%

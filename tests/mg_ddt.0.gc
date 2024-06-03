@@ -1,0 +1,44 @@
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_mgddt0(out0, out1, in0, in1)
+	electrical out0, out1;
+	electrical in0, in1;
+	electrical fwd, ref;
+	branch (out0, out1) out;
+	branch (in0, in1) in;
+	parameter real pp = -1e2;
+	real vfwd;
+	analog begin
+      I(out) <+ V(out)/2;
+
+		vfwd = ddt(2.*V(in)-V(ref));
+		I(out) <+ vfwd;
+	end
+endmodule
+`endmodelgen
+
+
+!make test_mgddt0.so > /dev/null
+attach ./test_mgddt0.so
+
+verilog
+parameter r=1
+parameter v=0
+
+test_mgddt0 #() dut(0, 3, 1,0);
+resistor #(2) r(3,0);
+vsine #(.mag(1), .dc(v), .ampl(1)) v1(1, 0);
+
+list
+
+print tran v(1) v(3) vfwd(dut)
+tran 1 .1 trace=n
+print ac v(1) vp(3) vm(3)
+ac 2 4 * 2
+status notime
+end

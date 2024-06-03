@@ -91,16 +91,19 @@ void MGVAMS_FILTER::setup(Module* m)
     int c_cnt = 0;
     bool assigned = false;
     bool always = false;
+    bool output_var = false;
     bool rdeps = false;
     Contribution const* cont = NULL;
-    trace1("xdt used_in?", branch()->used_in().size());
+    trace1("filter used_in?", branch()->used_in().size());
     for(auto b : branch()->used_in()) {
+      trace0("filter use ..");
       if(auto c = dynamic_cast<Contribution const*>(b)){
 	if(c->is_flow_contrib()) {
-	  trace1("xdt used_in", c->name());
+	  trace1("filter used_in flow", c->name());
 	  ++c_cnt;
 	  cont = c;
 	}else{
+	  trace1("filter used else", c->name());
 	  ++c_cnt;
 	  ++c_cnt;
 	  // cont = c;
@@ -110,12 +113,16 @@ void MGVAMS_FILTER::setup(Module* m)
 	  always = true;
 	}else{
 	}
-      }else if(dynamic_cast<Assignment const*>(b)){
+      }else if(auto aa=dynamic_cast<Assignment const*>(b)){
+	trace1("use in assignment", aa->is_output_var());
 	assigned = true;
-      }else if(dynamic_cast<Branch const*>(b)){
+	output_var = aa->is_output_var();
+      }else if(auto bb=dynamic_cast<Branch const*>(b)){
+	trace1("use in branch", bb->code_name());
 	rdeps = true;
 	// covered by rdeps?
       }else if(dynamic_cast<Variable_List_Collection const*>(b)){ untested();
+	trace1("use in variable", bb->code_name());
       }else{untested();
 	trace1("xdt unknown?", c_cnt);
 	assert(0);
@@ -126,12 +133,17 @@ void MGVAMS_FILTER::setup(Module* m)
       rdeps = true;
     }
 
-    trace4("xdt use?", c_cnt, rdeps, assigned, branch()->code_name());
+    trace4("filter use?", c_cnt, rdeps, assigned, branch()->code_name());
     _output = NULL;
+    if(output_var){
+      // can't tet optimise out if there is both
+      // single contribution and output var...
+    }else{
+    }
     if(!has_refs()){
       set_p_to_gnd(m);
     }else if(cont && cont->has_sensitivities()) { untested();
-    }else if(c_cnt == 1 && always){
+    }else if(c_cnt == 1 && always && !output_var){
       for(auto d : cont->ddeps()){
 	if(d->branch() != branch()) {
 	}else if(d.is_linear()){
