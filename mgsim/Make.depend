@@ -1,6 +1,7 @@
 c_param.o: c_param.cc
 d_ltra.o: d_ltra.cc
 d_va_acs.o: d_va_acs.cc d_va.h ../src/e_va.h
+d_va_absdelay.o: d_va_absdelay.cc ../src/e_va.h
 d_va_filter.o: d_va_filter.cc
 d_va_laplace.o: d_va_laplace.cc ../src/e_va.h e_rf.h
 d_va_noise.o: d_va_noise.cc

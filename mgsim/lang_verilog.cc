@@ -46,7 +46,7 @@ public:
   using CKT_BASE::has_attributes;
 
 public: // override virtual, used by callback
-  std::string arg_front()const override { untested();
+  std::string arg_front()const override {
     switch (_mode) {
     case mPARAMSET:untested(); return " .";			    break;
     case mDEFAULT:  return (arg_count++ > 0) ? ", ." : "."; break;
@@ -54,7 +54,7 @@ public: // override virtual, used by callback
     unreachable();
     return "";
   }
-  std::string arg_mid()const override { untested();
+  std::string arg_mid()const override {
     switch (_mode) {
     case mPARAMSET:untested(); return "="; break;
     case mDEFAULT:  return "("; break;
@@ -62,7 +62,7 @@ public: // override virtual, used by callback
     unreachable();
     return "";
   }
-  std::string arg_back()const override { untested();
+  std::string arg_back()const override {
     switch (_mode) {
     case mPARAMSET:untested(); return ";"; break;
     case mDEFAULT:  return ")"; break;
@@ -135,9 +135,9 @@ std::string LANG_VERILOG::parse_attributes(CS& cmd)
 {
   std::string attrib_string = "";
   std::string comma = "";
-  while (cmd >> "(*") { untested();
+  while (cmd >> "(*") {
     attrib_string += comma;
-    while(cmd.ns_more() && !(cmd >> "*)")) { untested();
+    while(cmd.ns_more() && !(cmd >> "*)")) {
       attrib_string += cmd.ctoc();
     }
     comma = ", ";
@@ -190,7 +190,7 @@ void LANG_VERILOG::parse_args_paramset(CS& cmd, CARD* x)
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::move_attributes(tag_t from, tag_t to)
 {
-  if(has_attributes(to)){ untested();
+  if(has_attributes(to)){
     unreachable();
     erase_attributes(to, to+1);
   }else{
@@ -260,7 +260,7 @@ void LANG_VERILOG::parse_label(CS& cmd, CARD* x)
   std::string my_name;
   if (cmd >> my_name) {
     x->set_label(my_name);
-  }else{ untested();
+  }else{
     x->set_label(x->id_letter() + std::string("_unnamed")); //BUG// not unique
     cmd.warn(bDANGER, "label required");
   }
@@ -344,7 +344,7 @@ void LANG_VERILOG::parse_ports(CS& cmd, COMPONENT* x, bool all_new)
       }
     }
     cmd >> ')';
-  }else{ untested();
+  }else{
     cmd.warn(bDANGER, "'(' required (parse ports) (grounding)");
     for (int Index = 0;  Index < x->min_nodes();  ++Index) { untested();
       if (!(x->node_is_connected(Index))) { untested();
@@ -496,10 +496,10 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
   for (;;) {
 
     cmd.get_line("verilog-module>");
-    while (parse_attributes(cmd, tag_t(&cmd))) { untested();
+    while (parse_attributes(cmd, tag_t(&cmd))) {
       cmd.get_line("verilog-module>");
     }
-    if(has_attributes(tag_t(&cmd))){ untested();
+    if(has_attributes(tag_t(&cmd))){
     }else{
     }
     trace1("parse_module", cmd.tail());
@@ -517,7 +517,7 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
       cmd.check(bDANGER, "ERROR: This will not work. Need top level.");
       new__instance(cmd, x, x->subckt());
     }else{
-      if(has_attributes(tag_t(&cmd))){ untested();
+      if(has_attributes(tag_t(&cmd))){
       }else{
       }
       trace1("parse_module: instance", cmd.tail());
@@ -540,7 +540,7 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
 COMPONENT* LANG_VERILOG::parse_instance(CS& cmd, COMPONENT* x)
 {
   assert(x);
-  if(has_attributes(tag_t(&cmd))){ untested();
+  if(has_attributes(tag_t(&cmd))){
   }else{
   }
   assert (!(cmd >> "(*"));
@@ -575,7 +575,7 @@ std::string LANG_VERILOG::find_type_in_string(CS& cmd)
 void LANG_VERILOG::parse_top_item(CS& cmd, CARD_LIST* Scope)
 {
   cmd.get_line("gnucap-verilog>");
-  while(parse_attributes(cmd, tag_t(&cmd))) { untested();
+  while(parse_attributes(cmd, tag_t(&cmd))) {
     cmd.get_line("gnucap-verilog>");
   }
   new__instance(cmd, NULL, Scope);
@@ -640,7 +640,7 @@ void LANG_VERILOG::print_args(OMSTREAM& o, const COMPONENT* x)
 {
   assert(x);
   o << " #(";
-  if (x->use_obsolete_callback_print()) { untested();
+  if (x->use_obsolete_callback_print()) {
     arg_count = 0;
     x->print_args_obsolete_callback(o, this);  //BUG//callback//
     arg_count = INACTIVE;

@@ -8,6 +8,10 @@ mg_error.o: mg_error.cc mg_error.h
 mg_file.o: mg_file.cc mg_in.h mg_base.h mg_attrib.h mg_options.h \
  mg_error.h mg_.h mg_expression.h mg_deps.h mg_lib.h mg_func.h mg_token.h \
  mg_code.h mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
+mg_filt_absdelay.o: mg_filt_absdelay.cc mg_func.h mg_token.h \
+ mg_expression.h mg_deps.h mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h \
+ mg_attrib.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
+ mg_module.h
 mg_filt_acstim.o: mg_filt_acstim.cc mg_func.h mg_token.h mg_expression.h \
  mg_deps.h mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h mg_attrib.h \
  mg_code.h mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
