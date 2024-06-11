@@ -187,6 +187,7 @@ private: // override virtual
   void dc_advance()override {}
   void tr_advance()override {}
   void tr_regress()override {}
+  void tr_restore()override {itested();}
   double tr_amps()const override { return 0.;}
   bool tr_needs_eval()const override {return false;}
   TIME_PAIR tr_review()override {return TIME_PAIR();}
