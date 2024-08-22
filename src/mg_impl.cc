@@ -28,12 +28,12 @@
 Dep mg_const_dep(NULL);
 /*--------------------------------------------------------------------------*/
 bool ConstantMinTypMaxExpression::empty() const
-{ untested();
+{
   return _e.is_empty();
 }
 /*--------------------------------------------------------------------------*/
 bool Module::has_submodule() const
-{ untested();
+{
   assert(circuit());
   return !circuit()->element_list().is_empty();
 }
@@ -42,7 +42,7 @@ bool Module::has_submodule() const
 #endif
 /*--------------------------------------------------------------------------*/
 Branch_Ref Branch_Map::new_branch(Branch_Ref const& b, std::string name)
-{ untested();
+{
   assert(name!="");
   assert(b);
   //return new_branch(b->p(), b->n(), name);
@@ -52,33 +52,33 @@ Branch_Ref Branch_Map::new_branch(Branch_Ref const& b, std::string name)
   auto it = _names.find(name);
   if(it != _names.end()){ untested();
     throw Exception("already there" + name);
-  }else{ untested();
+  }else{
     trace1("new named branch?", name);
     auto n = new Named_Branch(b, name, m);
     _names.push_back(n);
     _brs.push_back(n);
-    if(b.is_reversed()){ untested();
-    }else{ untested();
+    if(b.is_reversed()){
+    }else{
     }
     return Branch_Ref(n, b.is_reversed());
   }
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref Branch_Map::new_branch(Node_Ref a, Node_Ref b)
-{ untested();
+{
   std::pair<Node const*, Node const*> p(a, b);
   auto m = prechecked_cast<Module*>(owner());
   assert(m);
 
   auto ii = _m.find(p);
-  if(ii!=_m.end()){ untested();
+  if(ii!=_m.end()){
     return Branch_Ref(ii->second);
-  }else{ untested();
+  }else{
     std::pair<Node const*, Node const*> r(b, a);
     auto i = _m.find(r);
-    if(i!=_m.end()){ untested();
+    if(i!=_m.end()){
       return Branch_Ref(i->second, true);
-    }else{ untested();
+    }else{
       auto nb = new Branch(a, b, m);
       nb->set_owner(owner());
       _brs.push_front(nb); // front?
@@ -90,7 +90,7 @@ Branch_Ref Branch_Map::new_branch(Node_Ref a, Node_Ref b)
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref Module::new_branch(Node* p, Node* n = NULL)
-{ untested();
+{
   assert(_circuit);
   Branch_Ref br = _circuit->branches().new_branch(p, n);
   assert(br);
@@ -105,23 +105,23 @@ size_t Module::num_branches() const
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
-{ untested();
+{
   trace2("new_branch", p,n);
   if(p==""){ untested();
     throw Exception("syntax error");
   }else if(p[0] == '<'){ untested();
     incomplete();
     assert(0); // wrong place.
-  }else{ untested();
+  }else{
   }
 
   assert(_circuit);
   Branch_Ref a(_circuit->branches().lookup(p) /*, polarity?*/);
 
-  if(a){ untested();
+  if(a){
     if(n!=""){ untested();
       throw Exception("syntax error");
-    }else{ untested();
+    }else{
       // polarity??
       return a;
     }
@@ -135,7 +135,7 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
     }
 
     Node_Ref nn;
-    if(n==""){ untested();
+    if(n==""){
       nn = &Node_Map::mg_ground_node;
     }else if( nn = node(n) ){
     }else{
@@ -147,10 +147,10 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
 }
 /*--------------------------------------------------------------------------*/
 Node* Node_Map::new_node(std::string const& p, Block* owner)
-{ untested();
+{
   Node*& cc = _map[p];
-  if(cc) { untested();
-  }else{ untested();
+  if(cc) {
+  }else{
     // new_ref here?
     cc = new Node(p, int(_nodes.size()));
     owner->new_var_ref(cc);
@@ -160,31 +160,31 @@ Node* Node_Map::new_node(std::string const& p, Block* owner)
 }
 /*--------------------------------------------------------------------------*/
 Node_Map::Node_Map()
-{ untested();
+{
   assert(mg_ground_node.number() == 0);
   _nodes.push_back(&mg_ground_node);
 }
 /*--------------------------------------------------------------------------*/
 Node_Map::~Node_Map()
-{ untested();
+{
   size_t i = 1;
-  for(; i < _nodes.size(); ++i){ untested();
+  for(; i < _nodes.size(); ++i){
     delete _nodes[i];
   }
 }
 /*--------------------------------------------------------------------------*/
 Node_Ref Node_Map::operator[](std::string const& key) const
-{ untested();
+{
   auto i = _map.find(key);
-  if(i != _map.end()) { untested();
+  if(i != _map.end()) {
     return i->second;
-  }else{ untested();
+  }else{
     throw Exception("no such node " + key );
   }
 }
 /*--------------------------------------------------------------------------*/
 Node* Module::new_node(std::string const& p)
-{ untested();
+{
   assert(_circuit);
   Node* n = _circuit->nodes().new_node(p, this);
   // new_var_ref(n);
@@ -192,41 +192,41 @@ Node* Module::new_node(std::string const& p)
 }
 /*--------------------------------------------------------------------------*/
 Node_Ref Module::node(std::string const& p) const
-{ untested();
-  try{ untested();
+{
+  try{
     assert(_circuit);
     return _circuit->nodes()[p];
-  }catch(Exception const&){ untested();
+  }catch(Exception const&){
     return NULL;
   }
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref Module::lookup_branch(std::string const& p) const
-{ untested();
+{
   assert(_circuit);
   return _circuit->branches().lookup(p);
 }
 /*--------------------------------------------------------------------------*/
 void Filter::new_deps()
-{ untested();
+{
   assert(!_deps);
   _deps = new TData;
 }
 /*--------------------------------------------------------------------------*/
 Filter::Filter(std::string const& name)
   : Element_2(), _name(name)
-{ untested();
+{
   new_deps();
 }
 /*--------------------------------------------------------------------------*/
 Filter::~Filter()
-{ untested();
+{
   delete _deps;
   _deps = NULL;
 }
 /*--------------------------------------------------------------------------*/
 std::string Filter::code_name()const
-{ untested();
+{
   return "_f_" + _name; // name()?
 }
 /*--------------------------------------------------------------------------*/
@@ -237,13 +237,13 @@ size_t Filter::num_branches() const
 }
 /*--------------------------------------------------------------------------*/
 bool Branch::is_detached_filter() const
-{ untested();
+{
   auto f = dynamic_cast<MGVAMS_FILTER const*>( _ctrl);
   return f && f->is_standalone();
 }
 /*--------------------------------------------------------------------------*/
 void Branch::new_deps()
-{ untested();
+{
   assert(!_deps);
   _deps = new TData;
   assert(_deps->is_linear());
@@ -257,7 +257,7 @@ size_t Branch::num_branches() const
 }
 /*--------------------------------------------------------------------------*/
 void Branch::add_dep(Dep const& b)
-{ untested();
+{
 //  if(b->branch() == this){ untested();
 //    _selfdep = true;
 //  }else{ untested();
@@ -268,60 +268,60 @@ void Branch::add_dep(Dep const& b)
 }
 /*--------------------------------------------------------------------------*/
 bool Branch::has_pot_probe() const
-{ untested();
+{
   return _has_pot_probe;
 }
 /*--------------------------------------------------------------------------*/
 bool Branch::has_flow_probe() const
-{ untested();
+{
   return _has_flow_probe;
 }
 /*--------------------------------------------------------------------------*/
 bool Branch::is_generic()const
-{ untested();
-  if(!is_direct()){ untested();
-    if(has_pot_source()){ untested();
+{
+  if(!is_direct()){
+    if(has_pot_source()){
       return true;
     }else{ untested();
       incomplete();
     }
-  }else if(has_flow_probe()){ untested();
+  }else if(has_flow_probe()){
     // return _selfdep;
-  }else if(has_pot_source()){ untested();
-    if(_selfdep){ untested();
+  }else if(has_pot_source()){
+    if(_selfdep){
       return true;
-    }else{ untested();
+    }else{
     }
-  }else if(has_flow_source()){ untested();
+  }else if(has_flow_source()){
   }else{ untested();
   }
   return false;
 }
 /*--------------------------------------------------------------------------*/
 std::string Branch::dev_type()const
-{ untested();
+{
 //  if( .. attribute .. )?
-  if(is_filter()) { untested();
+  if(is_filter()) {
     std::string label = "va_" + _ctrl->label();
     auto pos = label.find_last_of("_");
     return label.substr(0, pos);
-  }else if(!is_direct()){ untested();
-    if(has_pot_source()){ untested();
+  }else if(!is_direct()){
+    if(has_pot_source()){
       return "va_pot_br";
     }else{ untested();
       return "incomplete_dev_type";
     }
-  }else if(has_flow_probe()) { untested();
+  }else if(has_flow_probe()) {
     return "va_sw"; // ?
-  }else if(has_pot_source()){ untested();
-    if(_selfdep){ untested();
+  }else if(has_pot_source()){
+    if(_selfdep){
       return "va_pot_br";
-    }else if(has_always_pot() && !has_flow_source()) { untested();
+    }else if(has_always_pot() && !has_flow_source()) {
       return "va_pot";
-    }else{ untested();
+    }else{
       return "va_sw";
     }
-  }else if(has_flow_source()){ untested();
+  }else if(has_flow_source()){
     return "va_flow";
   }else{ untested();
     return "va_sw";
@@ -334,8 +334,8 @@ Branch_Ref::Branch_Ref(Branch_Ref const& b)
     : Base(),
       _br(b._br),
       _r(b._r)
-{ untested();
-  if(_br){ untested();
+{
+  if(_br){
     _br->attach(this);
   }else{ untested();
   }
@@ -345,8 +345,8 @@ Branch_Ref::Branch_Ref(Branch_Ref&& b)
     : Base(),
       _br(b._br),
       _r(b._r)
-{ untested();
-  if(_br){ untested();
+{
+  if(_br){
     _br->attach(this);
   }else{ untested();
   }
@@ -354,33 +354,33 @@ Branch_Ref::Branch_Ref(Branch_Ref&& b)
 /*--------------------------------------------------------------------------*/
 Branch_Ref::Branch_Ref(Branch* b, bool reversed)
   : _br(b), _r(reversed)
-{ untested();
-  if(_br){ untested();
+{
+  if(_br){
     _br->attach(this);
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref::Branch_Ref(Named_Branch* b)
   : _br(b), _r(b->is_reversed())
-{ untested();
-  if(_br){ untested();
+{
+  if(_br){
     _br->attach(this);
   }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref::~Branch_Ref()
-{ untested();
-  if(_br){ untested();
+{
+  if(_br){
     _br->detach(this);
     _br = NULL;
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string Branch_Ref::code_name()const
-{ untested();
+{
   assert(_br);
 //  if(has_name()){ untested();
 //    return "_br_" + *_name;
@@ -397,30 +397,30 @@ std::string Branch_Ref::code_name()const
 // }
 /*--------------------------------------------------------------------------*/
 Branch_Ref& Branch_Ref::operator=(Branch_Ref&& o)
-{ untested();
+{
   operator=(o);
 
-  if(_br) { untested();
+  if(_br) {
 //    assert(_br->has(this));
-  }else{ untested();
+  }else{
   }
   return *this;
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref& Branch_Ref::operator=(Branch_Ref const& o)
-{ untested();
+{
   if(_br) { untested();
     _br->detach(this);
-  }else{ untested();
+  }else{
   }
 
   _br = o._br;
   _r = o._r;
   //_name = o._name;
 
-  if(_br) { untested();
+  if(_br) {
     _br->attach(this);
-  }else{ untested();
+  }else{
   }
 
   return *this;
@@ -429,47 +429,47 @@ Branch_Ref& Branch_Ref::operator=(Branch_Ref const& o)
 /*--------------------------------------------------------------------------*/
 // has_source? is_source?
 bool Branch::has_element() const
-{ untested();
-  if(is_short()){ untested();
+{
+  if(is_short()){
     return false;
-  }else if( has_flow_source() ){ untested();
+  }else if( has_flow_source() ){
     return true;
-  }else if( has_pot_source() ){ untested();
+  }else if( has_pot_source() ){
     return true;
-  }else if( has_flow_probe() ){ untested();
+  }else if( has_flow_probe() ){
     return true;
-  }else{ untested();
+  }else{
     return false;
   }
 }
 /*--------------------------------------------------------------------------*/
 bool Branch::has_pot_source() const
-{ untested();
+{
   return _has_pot_src; //  || _has_flow_probe;
 }
 /*--------------------------------------------------------------------------*/
 size_t Filter::num_states() const
-{ untested();
+{
   return size_t(_num_states);
 }
 /*--------------------------------------------------------------------------*/
 // BUG: delegate to branch
 size_t Filter::num_nodes() const
-{ untested();
+{
   // slew? BUG
   return 0;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 Discipline const* Branch::discipline() const
-{ untested();
+{
   assert(_p);
   assert(_n);
-  if(_n == &Node_Map::mg_ground_node){ untested();
+  if(_n == &Node_Map::mg_ground_node){
     return _p->discipline();
-  }else if(!_p->discipline()){ untested();
+  }else if(!_p->discipline()){
     return _n->discipline();
-  }else if(_p->discipline() == _n->discipline()){ untested();
+  }else if(_p->discipline() == _n->discipline()){
     return _p->discipline();
   }else{itested();
     incomplete(); // no default.
@@ -486,9 +486,9 @@ Nature const* Branch::nature() const
 }
 /*--------------------------------------------------------------------------*/
 void Node::set_to(Node* p)
-{ untested();
-  if(number()==p->number()) { untested();
-  }else{ untested();
+{
+  if(number()==p->number()) {
+  }else{
     _number = p->number();
     Node* n = _next;
     _next = p->_next;
@@ -498,14 +498,14 @@ void Node::set_to(Node* p)
 }
 /*--------------------------------------------------------------------------*/
 void Node_Map::set_short(Node const* p, Node const* n)
-{ untested();
-  if(p->number() > n->number()){ untested();
+{
+  if(p->number() > n->number()){
     std::swap(p, n);
-  }else{ untested();
+  }else{
   }
 
   if(p->number() == n->number()){ untested();
-  }else{ untested();
+  }else{
     int j = n->number();
     int i = p->number();
     assert(i < j);
@@ -518,32 +518,32 @@ void Node_Map::set_short(Node const* p, Node const* n)
 /*--------------------------------------------------------------------------*/
 // void Circuit::setup_nodes()?
 void Module::setup_nodes()
-{ untested();
+{
   assert(_circuit);
-  for(auto& br : _circuit->branches()){ untested();
-    if(br->is_short()) { untested();
-    }else if(br->req_short()) { untested();
+  for(auto& br : _circuit->branches()){
+    if(br->is_short()) {
+    }else if(br->req_short()) {
       trace4("short", br->name(), br->p()->number(), br->n()->number(), _circuit->net_nodes());
       if(br->p()->number() > int(_circuit->net_nodes())
-       ||br->n()->number() > int(_circuit->net_nodes())) { untested();
+       ||br->n()->number() > int(_circuit->net_nodes())) {
 	_circuit->nodes().set_short(br->p(), br->n());
-      }else{ untested();
+      }else{
       }
-    }else{ untested();
+    }else{
     }
   }
 }
 /*--------------------------------------------------------------------------*/
 Token* Module::new_token(FUNCTION const* f_, size_t num_args)
-{ untested();
+{
   auto f = prechecked_cast<FUNCTION_ const*>(f_);
   assert(f);
 //  if(dynamic_cast<MGVAMS_FUNCTION const*>(f)){ untested();
-    if(f->static_code()){ untested();
+    if(f->static_code()){
       // return f->new_token(*this, num_args);
       install(f);
       return new Token_CALL(f->label(), f);
-    }else{ untested();
+    }else{
       return f->new_token(*this, num_args);
     }
 //   }else{ untested();
@@ -566,16 +566,16 @@ std::string Variable_Decl::code_name() const
 }
 /*--------------------------------------------------------------------------*/
 void Branch::set_direct(bool d)
-{ untested();
+{
   _direct = d;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void Branch::attach(Branch_Ref* r)
-{ untested();
+{
   assert(r);
 #ifndef NDEBUG
-  for(auto i : _refs){ untested();
+  for(auto i : _refs){
     assert(i != r);
   }
 #endif
@@ -583,14 +583,14 @@ void Branch::attach(Branch_Ref* r)
 }
 /*--------------------------------------------------------------------------*/
 void Branch::detach(Branch_Ref* r)
-{ untested();
+{
   assert(r);
-  for(auto& i : _refs){ untested();
-    if(i == r){ untested();
+  for(auto& i : _refs){
+    if(i == r){
       i = _refs.back();
       _refs.resize(_refs.size()-1);
       return;
-    }else{ untested();
+    }else{
     }
   }
   assert(0);
@@ -598,7 +598,7 @@ void Branch::detach(Branch_Ref* r)
 }
 /*--------------------------------------------------------------------------*/
 bool Module::sync() const
-{ untested();
+{
 #if 0
   // need getattr<bool>?
   if(!has_attr("sync")){ untested();
@@ -613,16 +613,16 @@ bool Module::sync() const
   }
 #endif
 
-  if(has_submodule() && has_analog_block()){ untested();
-  }else if(has_analog_block()) { untested();
-  }else if(has_submodule()) { untested();
+  if(has_submodule() && has_analog_block()){
+  }else if(has_analog_block()) {
+  }else if(has_submodule()) {
   }
   return has_analog_block();
 }
 /*--------------------------------------------------------------------------*/
 std::string Filter::state()const
-{ untested();
-  if(Element_2::state().size()){ untested();
+{
+  if(Element_2::state().size()){
     return Element_2::state();
   }else{ untested();
     // BUG?
@@ -631,15 +631,15 @@ std::string Filter::state()const
 }
 /*--------------------------------------------------------------------------*/
 std::string Filter::short_label()const
-{ untested();
+{
   return name();
 }
 /*--------------------------------------------------------------------------*/
 Block* Block::scope() const
-{ untested();
-  if(auto ob = dynamic_cast<Owned_Base*>(_owner)){ untested();
+{
+  if(auto ob = dynamic_cast<Owned_Base*>(_owner)){
     return ob->scope();
-  }else if(auto b = dynamic_cast<Block*>(_owner)){ untested();
+  }else if(auto b = dynamic_cast<Block*>(_owner)){
     // incomplete?
     return b;
   }else{ untested();
@@ -649,15 +649,15 @@ Block* Block::scope() const
 }
 /*--------------------------------------------------------------------------*/
 Block* Block::scope()
-{ untested();
-  if(auto ob = dynamic_cast<Owned_Base*>(_owner)){ untested();
+{
+  if(auto ob = dynamic_cast<Owned_Base*>(_owner)){
     return ob->scope();
-  }else if(auto b = dynamic_cast<Block*>(_owner)){ untested();
+  }else if(auto b = dynamic_cast<Block*>(_owner)){
     // incomplete?
     return b;
   }else if(dynamic_cast<File const*>(_owner)){ untested();
     return NULL;
-  }else if(!_owner){ untested();
+  }else if(!_owner){
     return NULL;
   }else{ untested();
     assert(0);
@@ -666,24 +666,24 @@ Block* Block::scope()
 }
 /*--------------------------------------------------------------------------*/
 void Block::push_back(Base* c)
-{ untested();
+{
   List_Base<Base>::push_back(c);
   if(auto v=dynamic_cast<Variable_Decl const*>(c)){ untested();
     unreachable();
       trace1("reg var_ref", v->name());
     _var_refs[v->name()] = c; // BUG
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
 Base const* Block::lookup(CS& f) const
-{ untested();
+{
   std::string name;
   size_t here = f.cursor();
   f >> name;
   Base const* b = lookup(name, true);
-  if(b){ untested();
-  }else{ untested();
+  if(b){
+  }else{
     trace1("cannot lookup", name);
     f.reset_fail(here);
   }
@@ -691,31 +691,31 @@ Base const* Block::lookup(CS& f) const
 }
 /*--------------------------------------------------------------------------*/
 Base const* Block::lookup(std::string const& k, bool recurse) const
-{ untested();
+{
   Block* b = const_cast<Block*>(this);
   return b->lookup(k, recurse);
 }
 /*--------------------------------------------------------------------------*/
 Base* Block::lookup(std::string const& k, bool recurse)
-{ untested();
+{
   trace2("lookup", _owner, k);
   const_iterator f = _var_refs.find(k);
-  if(f != _var_refs.end()) { untested();
+  if(f != _var_refs.end()) {
     return f->second;
-  }else if(!recurse) { untested();
+  }else if(!recurse) {
 //    assert(dynamic_cast<Module const*>(this) || dynamic_cast<AnalogFunction const*>(this));
     return NULL;
-  }else if(k[0] == '<'){ untested();
-    if(auto m = dynamic_cast<Module*>(this)){ untested();
+  }else if(k[0] == '<'){
+    if(auto m = dynamic_cast<Module*>(this)){
       std::string portname = k.substr(1, k.size()-2);
       return m->find_port(portname);
-    }else{ untested();
+    }else{
       return scope()->lookup(k, true);
     }
-  }else if(scope()) { untested();
+  }else if(scope()) {
     assert(scope() != this);
     return scope()->lookup(k, true);
-  }else if(dynamic_cast<File const*>(this)){ untested();
+  }else if(dynamic_cast<File const*>(this)){
   }else if(auto st = dynamic_cast<Statement*>(owner())){ untested();
     assert(st->scope());
     return st->scope()->lookup(k, true);
@@ -726,39 +726,39 @@ Base* Block::lookup(std::string const& k, bool recurse)
 }
 /*--------------------------------------------------------------------------*/
 DDeps::const_iterator DDeps::begin() const
-{ untested();
+{
   return _s.begin();
 }
 /*--------------------------------------------------------------------------*/
 DDeps::const_iterator DDeps::end() const
-{ untested();
+{
   return _s.end();
 }
 /*--------------------------------------------------------------------------*/
 bool is_true(Expression const& x)
-{ untested();
+{
   double e = x.eval();
   return e != NOT_INPUT && e;
 }
 /*--------------------------------------------------------------------------*/
 bool is_false(Expression const& x)
-{ untested();
+{
   double e = x.eval();
   return e != NOT_INPUT && !e;
 }
 /*--------------------------------------------------------------------------*/
 bool is_zero(Expression const& x)
-{ untested();
+{
   double e = x.eval();
   trace1("is_zero", e);
   return e == 0.;
 }
 /*--------------------------------------------------------------------------*/
 TData* copy_deps(Base const* b)
-{ untested();
-  if(auto t=dynamic_cast<TData const*>(b)){ untested();
+{
+  if(auto t=dynamic_cast<TData const*>(b)){
     return t->clone();
-  }else if(!b) { untested();
+  }else if(!b) {
     // unary(par_ref)?
   }else{ untested();
     incomplete();
@@ -778,98 +778,98 @@ TData* copy_deps(Base const* b)
 // }
 /*--------------------------------------------------------------------------*/
 bool ConstExpression::operator==(ConstExpression const& o) const
-{ untested();
+{
   double a = _expression.eval();
   if(a == NOT_INPUT){ untested();
     return false;
-  }else{ untested();
+  }else{
     return a == o._expression.eval();
   }
 }
 /*--------------------------------------------------------------------------*/
 double ValueRangeInterval::eval() const
-{ untested();
-  if(!lb_is_closed()){ untested();
+{
+  if(!lb_is_closed()){
     return NOT_INPUT;
-  }else if(!ub_is_closed()){ untested();
+  }else if(!ub_is_closed()){
     return NOT_INPUT;
-  }else if(_ub == _lb){ untested();
+  }else if(_ub == _lb){
     return _ub.expression().eval();
-  }else{ untested();
+  }else{
     return NOT_INPUT;
   }
 }
 /*--------------------------------------------------------------------------*/
 void Node::set_to_ground(Module*)
-{ untested();
+{
   _fanout.clear();
   _number = 0;
 }
 /*--------------------------------------------------------------------------*/
 void Module::set_to_ground(Node const* n)
-{ untested();
+{
   trace1("stc", n->number());
   assert(_circuit);
-  if(n->number()){ untested();
+  if(n->number()){
     assert(*(_circuit->nodes().begin() + n->number()) == n);
     (*(_circuit->nodes().begin() + n->number()))->set_to_ground(this);
-  }else{ untested();
+  }else{
     // already ground
   }
 }
 /*--------------------------------------------------------------------------*/
 Branch const* Branch::output() const
-{ untested();
-  if(auto f = dynamic_cast<MGVAMS_FILTER const*>(_ctrl)){ untested();
+{
+  if(auto f = dynamic_cast<MGVAMS_FILTER const*>(_ctrl)){
     return f->output();
-  }else{ untested();
+  }else{
   }
   return this;
 }
 /*--------------------------------------------------------------------------*/
 Node_Ref Branch::p() const
-{ untested();
-  if(auto f = dynamic_cast<MGVAMS_FILTER const*>(_ctrl)){ untested();
+{
+  if(auto f = dynamic_cast<MGVAMS_FILTER const*>(_ctrl)){
     return f->p();
-  }else{ untested();
+  }else{
   }
   assert(_p); return _p;
 }
 /*--------------------------------------------------------------------------*/
 Node_Ref Branch::n() const
-{ untested();
-  if(auto f = dynamic_cast<MGVAMS_FILTER const*>(_ctrl)){ untested();
+{
+  if(auto f = dynamic_cast<MGVAMS_FILTER const*>(_ctrl)){
     return f->n();
-  }else{ untested();
+  }else{
   }
   assert(_n); return _n;
 }
 /*--------------------------------------------------------------------------*/
 bool Assignment::has_sensitivities()const
-{ untested();
+{
   return data().has_sensitivities();
 }
 /*--------------------------------------------------------------------------*/
 bool Parameter_2_List::is_local()const
-{ untested();
+{
   // really? ask *begin?
   return _is_local;
 }
 /*--------------------------------------------------------------------------*/
 double /*?*/ Parameter_2::eval() const
-{ untested();
-  if(is_local()) { untested();
+{
+  if(is_local()) {
     return _default_val.value();
-  }else if (value_range_list().size() == 1) { untested();
+  }else if (value_range_list().size() == 1) {
     return (*value_range_list().begin())->eval();
-  }else{ untested();
+  }else{
     return NOT_INPUT;
   }
 }
 /*--------------------------------------------------------------------------*/
 double ValueRange::eval() const
-{ untested();
-  if(spec()){ untested();
+{
+  if(spec()){
     return spec()->eval();
   }else{ untested();
     return NOT_INPUT;
@@ -877,37 +877,37 @@ double ValueRange::eval() const
 }
 /*--------------------------------------------------------------------------*/
 void Module::parse_ports(CS& f)
-{ untested();
+{
   assert(_circuit);
   _circuit->parse_ports(f);
 }
 /*--------------------------------------------------------------------------*/
 void Module::new_circuit()
-{ untested();
+{
   assert(!_circuit);
   _circuit = new Circuit();
 }
 /*--------------------------------------------------------------------------*/
 void Module::new_filter()
-{ untested();
+{
   assert(_circuit);
   _circuit->new_filter();
 }
 /*--------------------------------------------------------------------------*/
 Circuit::~Circuit()
-{ untested();
+{
   _filters.clear();
   _branch_decl.clear();
   _branches.clear();
 }
 /*--------------------------------------------------------------------------*/
 void Branch_Map::clear()
-{ untested();
-  while(!_names.is_empty()){ untested();
+{
+  while(!_names.is_empty()){
     delete _names.back();
     _names.pop_back();
   }
-  for(auto& x : _m){ untested();
+  for(auto& x : _m){
     delete x.second;
 //      x = NULL;
   }
@@ -917,16 +917,16 @@ void Branch_Map::clear()
 }
 /*--------------------------------------------------------------------------*/
 DDeps const& Branch::ddeps()const
-{ untested();
+{
   assert(_deps);
   return _deps->ddeps();
 }
 /*--------------------------------------------------------------------------*/
 void Branch::reg_stmt(AnalogStmt const* r)
-{ untested();
+{
   assert(r);
 #ifndef NDEBUG
-  for(auto i : _stmts){ untested();
+  for(auto i : _stmts){
     assert(i != r);
   }
 #endif
@@ -934,14 +934,14 @@ void Branch::reg_stmt(AnalogStmt const* r)
 }
 /*--------------------------------------------------------------------------*/
 void Branch::dereg_stmt(AnalogStmt const* r)
-{ untested();
+{
   assert(r);
-  for(auto& i : _stmts){ untested();
-    if(i == r){ untested();
+  for(auto& i : _stmts){
+    if(i == r){
       i = _stmts.back();
       _stmts.resize(_stmts.size()-1);
       return;
-    }else{ untested();
+    }else{
     }
   }
   assert(0);

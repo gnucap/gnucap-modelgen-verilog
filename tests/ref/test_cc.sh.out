@@ -1653,8 +1653,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
         s0 = "thermal";
         ddouble t0;
         t0 =  /*(312)*/ /*call1*/d->_b_white_noise_1( 0., s0);
-        // dep _potential_b_white_noise_1_p_white_noise_1_n
-        m->_st_b_white_noise_1_p_white_noise_1_n[1] = - t0[d_potential_b_white_noise_1_p_white_noise_1_n]; // (3p)
+        m->_st_b_white_noise_1_p_white_noise_1_n[1] = -t0[d_potential_b_white_noise_1_p_white_noise_1_n]; // (3p)
       }
     }
   }
@@ -2675,8 +2674,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
         std::string s0;
         s0 = "thermal";
         t0 =  /*(312)*/ /*call1*/d->_b_white_noise_0(t0, s0);
-        // dep _potential_b_white_noise_0_p_white_noise_0_n
-        m->_st_b_white_noise_0_p_white_noise_0_n[1] = - t0[d_potential_b_white_noise_0_p_white_noise_0_n]; // (3p)
+        m->_st_b_white_noise_0_p_white_noise_0_n[1] = -t0[d_potential_b_white_noise_0_p_white_noise_0_n]; // (3p)
       }
     }
   }
@@ -4423,8 +4421,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
             t0 = 0.; // static?
             t0 = (_p___c) /*rhspar*/ * t0;
             t0 =  /*(312)*/ /*call1*//*XDT*/ d->_b_ddt_1(t0);
-            // dep _potential_b_ddt_1_p_ddt_1_n
-            m->_st_b_ddt_1_p_ddt_1_n[1] = - t0[d_potential_b_ddt_1_p_ddt_1_n]; // (3p)
+            m->_st_b_ddt_1_p_ddt_1_n[1] = -t0[d_potential_b_ddt_1_p_ddt_1_n]; // (3p)
           }
         }
       }
