@@ -422,7 +422,7 @@ void AnalogConditionalStmt::parse(CS& f)
   _false_part.set_owner(this);
 
   if(f >> "(" >> _cond >> ")"){
-  }else{
+  }else{ untested();
     throw Exception_CS_("expecting conditional", f);
   }
 
@@ -433,13 +433,13 @@ void AnalogConditionalStmt::parse(CS& f)
     }else if(_cond.is_true()) {
       if(is_always()) {
 	_body.set_always();
-      }else{untested();
+      }else{
       }
       _false_part.set_never();
     }else if(_cond.is_false()) {
       if(is_always()) {
 	_false_part.set_always();
-      }else{
+      }else{ untested();
       }
       _body.set_never();
     }else{
@@ -590,9 +590,9 @@ bool AnalogForStmt::update()
   bool ret = false;
 
   while(true){
-    if ( init_ && init_->update() ){
+    if ( init_ && init_->update() ){ untested();
       ret = true;
-    }else if (_body.update()){
+    }else if (_body.update()){ untested();
       ret = true;
     }else if ( tail_ && tail_->update() ) { untested();
       ret = true;
@@ -737,7 +737,7 @@ CaseGen::CaseGen(CS& f, Block* o, Expression const& ctrl, bool have_r, bool have
   }else if(f >> *c) {
     trace1("CaseGen2", f.tail().substr(0,20));
     _cond = c;
-  }else{
+  }else{ untested();
     delete c;
     throw Exception_CS_("bad switch statement", f);
   }
@@ -880,7 +880,7 @@ void AnalogSeqBlock::parse(CS& f)
     }else{
     }
     Base* s = parse_analog_stmt(f, this);
-    if(!s){ untested();
+    if(!s){
       throw Exception_CS_("bad analog block", f);
     }else{
       push_back(s);
@@ -994,14 +994,26 @@ Branch_Ref parse_branch(Block* owner, CS& f)
   }else{
     f.reset_fail(here);
     return Branch_Ref();
+    f.reset_fail(here);
     throw Exception_No_Match("not a branch");
   }
   std::string pp = f.ctos(",)");
   std::string pn = f.ctos(",)");
-  f >> ")";
+  if(f >> ")"){
+  }else{ untested();
+    f.reset_fail(here);
+    throw Exception_No_Match("not a branch");
+  }
 
+  trace2("a branch", pp, pn);
   assert(owner);
   Branch_Ref b = owner->new_branch(pp, pn);
+  trace2("still a branch", pp, pn);
+  if(b){
+  }else{
+  //   throw Exception_No_Match("not a branch");
+    f.reset_fail(here);
+  }
   // assert(b._br);
   return b;
 }
@@ -1012,7 +1024,7 @@ void Branch_Ref::parse(CS& f)
   assert(!_br);
 
   trace1("Branch_Ref::parse", f.tail().substr(0,10));
-  if(f >> "("){
+  if(f >> "("){ untested();
   }else{ untested();
     throw Exception_No_Match("not a branch");
   }
@@ -1086,6 +1098,7 @@ void Contribution::parse(CS& cmd)
   _branch = parse_branch(owner(), cmd);
 
   if(_branch){
+    trace2("got branch", _name, cmd.tail().substr(0,20));
   }else{
     cmd.reset(here);
     trace2("not a Contribution", _name, cmd.tail().substr(0,20));
@@ -1100,8 +1113,10 @@ void Contribution::parse(CS& cmd)
   }else{
   }
 
-  if(!_branch->discipline()) {
+  if(!_branch->discipline()) { untested();
     cmd.reset(here);
+    unreachable();
+    assert(0);
     throw Exception_CS_("bad discipline.", cmd);
   }else{
   }
@@ -1308,7 +1323,7 @@ Branch::~Branch()
   _deps = NULL;
 
   for(auto i : _used_in){
-    if(i){
+    if(i){ untested();
       std::cerr << "logic error. " << name() << " still used in. " << i << "\n";
       unreachable();
     }else{
@@ -1356,7 +1371,7 @@ void Branch::unset_used_in(Base const* b)
     // can't seem to avoid. cyclic deps...
     // unreachable();
 //    throw std::logic_error("cleanup " + code_name());
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1528,7 +1543,7 @@ void AnalogEvtCtlStmt::dump(std::ostream& o) const
 #if 0
   if(dynamic_cast<AnalogSeqBlock const*>(_stmt)){ untested();
     o << " " << *_stmt;
-  }else if(_stmt){
+  }else if(_stmt){ untested();
 #if 0
     o << " " << *_stmt;
 #else
@@ -1557,7 +1572,7 @@ static Module const* to_module(Block const* owner)
       owner = b;
     }else if(auto st = dynamic_cast<Statement const*>(owner->owner())){
       owner = st->scope();
-    }else{
+    }else{ untested();
       assert(false);
       return NULL;
     }
@@ -1800,7 +1815,7 @@ bool AnalogFunctionArgs::new_var_ref(Base* b)
       throw Exception("duplicate variable name");
     }else if(auto tt = dynamic_cast<Token*>(ex)){ untested();
       return Block::new_var_ref(tt);
-    }else if(ex){
+    }else if(ex){ untested();
       assert(0);
       unreachable();
     }else{
@@ -1828,7 +1843,7 @@ void AnalogEvtExpression::dump(std::ostream& o) const
   o << "(";
   if(_expression) {
     o << *_expression;
-  }else{
+  }else{ untested();
   }
   o << ")";
 }
@@ -1848,7 +1863,7 @@ void AF_Arg_List::parse(CS& f)
     _direction = a_output;
   }else if(dir=="ino"){
     _direction = a_inout;
-  }else{
+  }else{ untested();
     trace2("AF_Arg_List::parse", f.tail().substr(0,10), dir);
     unreachable();
   }
@@ -2085,7 +2100,7 @@ Contribution::~Contribution()
       i->branch()->dec_use();
       try{
 	(*i)->unset_used_in(this);
-      }catch(std::logic_error const& e){
+      }catch(std::logic_error const& e){ untested();
 	unreachable();
 	std::cerr << " logic error in " << name() << ": ";
 	std::cerr << e.what() << "\n";
@@ -2114,7 +2129,7 @@ size_t Branch::num_nodes() const
       // self conductance
     }else if(i->is_pot_probe()){
       ++ret;
-//     }else if(i->is_filter_probe()){
+//     }else if(i->is_filter_probe()){ untested();
 //       assert(i->is_pot_probe());
 //       unreachable();
 //       ++ret;
@@ -2152,7 +2167,7 @@ Probe::Probe(std::string const& xs, Branch_Ref br) : _br(br)
     _type = t_flow;
     _br->inc_flow_probe();
     _br->set_probe(); // shadow
-  }else{
+  }else{ untested();
     unreachable();
   }
 
@@ -2180,7 +2195,7 @@ Probe::~Probe()
     _br->unset_used_in(p);
   }
 
-//  if(_rdeps.size()){
+//  if(_rdeps.size()){ untested();
 //    _br->unset_used_in(this);
 //  }
 
@@ -2198,7 +2213,7 @@ Discipline const* Probe::discipline() const
 }
 /*--------------------------------------------------------------------------*/
 Nature const* Probe::nature() const
-{
+{ untested();
   return _br->nature();
 }
 /*--------------------------------------------------------------------------*/

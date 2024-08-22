@@ -1,0 +1,10 @@
+`include "sub/disciplines.few"
+`pragma modelgen nodump-module
+`pragma modelgen noexpand-paramset
+
+module test(n, p)
+	electrical n, p;
+	analog begin
+		XS(n, p) <+ 17.
+	end
+endmodule
