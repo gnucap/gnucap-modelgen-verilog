@@ -39,54 +39,6 @@ bool Module::has_submodule() const
 }
 /*--------------------------------------------------------------------------*/
 #if 1
-Probe* new_Probe(std::string const& xs, Branch_Ref const& br);
-Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
-{
-    trace1("new_probe", br.has_name());
-  std::string flow_xs;
-  std::string pot_xs;
-
-  if(br->discipline()){
-    trace2("new_probe", xs, br->discipline()->identifier());
-    flow_xs = br->discipline()->flow()->access().to_string();
-    pot_xs = br->discipline()->potential()->access().to_string();
-  }else{
-    // huh?
-  }
-
-  std::string nn = xs;
-  if(xs == flow_xs || xs == "flow"){
-    nn = "flow";
-  }else if( xs == pot_xs || xs == "potential" ){
-    nn = "potential";
-//  }else if( xs == "_filter"){ untested();
-//   // obsolete?
-//    br->set_filter();
-  }else{ untested();
-    trace1("new_probe", xs);
-    incomplete(); // port branch?
-    nn = xs;
-  }
-
-  std::string k = nn + "_" + br.pname() + "_" + br.nname();
-  if(br.has_name()){
-    k = nn + "_" + br.name();
-  }else{
-  }
-
-  assert(_probes);
-  Probe*& prb = (*_probes)[k];
-
-  if(prb) {
-  }else{
-    prb = ::new_Probe(nn, br);
-//    prb->set_label(k);
-    install(prb); // duplicate reference..?
-  }
-
-  trace1("new_probe", br.has_name());
-  return prb;
-}
 #endif
 /*--------------------------------------------------------------------------*/
 Branch_Ref Branch_Map::new_branch(Branch_Ref const& b, std::string name)

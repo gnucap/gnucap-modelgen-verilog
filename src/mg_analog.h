@@ -210,6 +210,7 @@ typedef Collection<Analog_Function> Analog_Functions;
 class Analog : public Owned_Base {
   AnalogList _list;
   Analog_Functions _functions;
+  Probe_Map* _probes{NULL};
 public:
   explicit Analog();
   ~Analog();
@@ -221,6 +222,9 @@ public:
   AnalogList const& blocks()const { return _list; }
   Analog_Functions const& functions()const { return _functions; }
   void push_back(Base*);
+
+  void new_probe_map(); // analog?
+  Probe const* new_probe(std::string const& xs, Branch_Ref const& br, Module* m);
 };
 /*--------------------------------------------------------------------------*/
 inline Analog const& analog(Module const& m)

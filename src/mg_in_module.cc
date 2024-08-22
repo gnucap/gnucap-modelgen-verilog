@@ -1103,9 +1103,6 @@ Module::~Module()
   delete_analog();
   detach_out_vars(); // delete variables?
 
-  // name clash, Gnucap probes vs Verilog-AMS "probe branch"
-  delete _probes; // .clear();
-
   delete_circuit();
 }
 /*--------------------------------------------------------------------------*/

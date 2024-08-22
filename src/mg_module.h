@@ -162,8 +162,6 @@ private: // merge?
   bool _has_analysis{false};
   bool _has_tr_review{false};
 private: // elaboration data
-  Probe_Map* _probes{NULL};
-  void new_probe_map(); // analog?
   void new_analog();
   void new_circuit();
   void delete_analog();
@@ -171,7 +169,6 @@ private: // elaboration data
   void detach_out_vars();
 public:
   Module() {
-    new_probe_map();
     new_analog();
     new_circuit();
   }
@@ -214,7 +211,6 @@ public:
   void push_back(Token* x);
   void push_back(Base* x);
   void install(FUNCTION_ const* f);
-  void install(Probe const* f);// ?
   std::list<FUNCTION_*> const& func()const { untested();return _func;}
   pSet<FUNCTION_ const> const& funcs()const {return _funcs;}
 private: // misc

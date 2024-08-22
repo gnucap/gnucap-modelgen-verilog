@@ -2221,12 +2221,16 @@ bool Module::has_analog_block() const
 /*--------------------------------------------------------------------------*/
 Analog::Analog()
 {
+  new_probe_map();
 }
 /*--------------------------------------------------------------------------*/
 Analog::~Analog()
 {
   _list.clear();
   _functions.clear();
+
+  // name clash, Gnucap probes vs Verilog-AMS "probe branch"
+  delete _probes; // .clear();
 }
 /*--------------------------------------------------------------------------*/
 bool Analog::has_block() const
@@ -2234,8 +2238,9 @@ bool Analog::has_block() const
   return !list().is_empty();
 }
 /*--------------------------------------------------------------------------*/
-void Module::new_probe_map()
+void Analog::new_probe_map()
 {
+  assert(!_probes);
   _probes = new Probe_Map;
 }
 /*--------------------------------------------------------------------------*/
@@ -2244,11 +2249,6 @@ Probe_Map::~Probe_Map()
   for(auto i: *this) {
     delete i.second;
   }
-}
-/*--------------------------------------------------------------------------*/
-void Module::install(Probe const* f)
-{
-  _funcs.insert(f);
 }
 /*--------------------------------------------------------------------------*/
 bool Branch::is_shadow_source()const
@@ -2478,6 +2478,67 @@ bool Probe::propagate_rdeps(RDeps const& r) const
     }
   }
   return ret;
+}
+/*--------------------------------------------------------------------------*/
+Probe* new_Probe(std::string const& xs, Branch_Ref const& br);
+Probe const* Analog::new_probe(std::string const& xs, Branch_Ref const& br, Module* m)
+{
+    trace1("new_probe", br.has_name());
+  std::string flow_xs;
+  std::string pot_xs;
+
+  if(br->discipline()){
+    trace2("new_probe", xs, br->discipline()->identifier());
+    flow_xs = br->discipline()->flow()->access().to_string();
+    pot_xs = br->discipline()->potential()->access().to_string();
+  }else{
+    // huh?
+  }
+
+  std::string nn = xs;
+  if(xs == flow_xs || xs == "flow"){
+    nn = "flow";
+  }else if( xs == pot_xs || xs == "potential" ){
+    nn = "potential";
+//  }else if( xs == "_filter"){ untested();
+//   // obsolete?
+//    br->set_filter();
+  }else{ untested();
+    trace1("new_probe", xs);
+    incomplete(); // port branch?
+    nn = xs;
+  }
+
+  std::string k = nn + "_" + br.pname() + "_" + br.nname();
+  if(br.has_name()){
+    k = nn + "_" + br.name();
+  }else{
+  }
+
+  assert(_probes);
+  Probe*& prb = (*_probes)[k];
+
+  if(prb) {
+  }else{
+    prb = ::new_Probe(nn, br);
+//    prb->set_label(k);
+    m->install(prb); // duplicate reference..?
+  }
+
+  trace1("new_probe", br.has_name());
+  return prb;
+}
+/*--------------------------------------------------------------------------*/
+// todo: detach
+Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
+{
+  auto a = prechecked_cast<Analog*>(_analog);
+  assert(a);
+  FUNCTION_ const* f = a->new_probe(xs, br, this);
+
+  auto pr = prechecked_cast<Probe const*>(f);
+  assert(pr);
+  return pr;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
