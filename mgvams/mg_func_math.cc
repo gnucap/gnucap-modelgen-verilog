@@ -190,8 +190,9 @@ public:
   }
   void make_cc_common(std::ostream& o)const override{ untested();
     o__ "template<class T>\n";
-    o__ "T " << code_name() << "(T d) const{\n";
-    incomplete();
+    o__ "T " << code_name() << "(T d) const{untested();\n";
+    o______ "chain(d, 1./((1.-double(d))*(1+double(d))));\n";
+    o______ "return ::set_value(d, std::atanh(d));\n";
     o__ "}\n";
   }
   std::string code_name()const override{ untested();
