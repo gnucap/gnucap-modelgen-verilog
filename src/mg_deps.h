@@ -180,7 +180,7 @@ public:
   void set_constant(bool v = true){_constant = v;} // attrib/sens?
   size_t size()const {return _ddeps.size(); } // { + _rdeps.size(); }
   bool is_offset()const {return _offset;}
-  bool is_constant()const { untested();return _constant;}
+  bool is_constant()const {return _constant;}
   bool is_linear()const;
   bool is_quadratic()const;
   void set_any() { _ddeps.set_any(); }

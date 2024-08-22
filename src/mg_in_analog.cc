@@ -296,6 +296,8 @@ void dump_annotate(std::ostream& o, A const& _a)
 {
   if(!_a.scope()->is_reachable()){
     o << " // --\n";
+  }else if(_a.data().is_constant()){ untested();
+    o << " // c\n";
   }else{
     if(_a.data().ddeps().size()){
       o << " //";

@@ -153,6 +153,26 @@ module cond4(p, n);
   end
 
 endmodule
+module cond5(p, n);
+  analog begin // always
+    // S : 0
+    // T : 0
+    // i : 0
+    real S;
+    real T;
+    integer i;
+    i = 1;
+    if (i) begin
+      // i : 0
+      i = 2;
+    end
+    else begin
+      // i : 0
+      i = 3;
+    end
+  end
+
+endmodule
 
 
 

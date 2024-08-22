@@ -11,6 +11,7 @@ module vsine(p, n);
 	parameter real dc    =0.;
 	parameter real mag   =1.;
 	parameter real samples = 4. from (0:inf);
+	(*desc="i"*) real i;
 	analog begin
 		if(analysis("dc") && $param_given(dc)) begin
 			V(p, n) <+ dc;
@@ -18,6 +19,7 @@ module vsine(p, n);
 			V(p, n) <+ ampl*sin(`M_TWO_PI*freq*$abstime - phase) + offset;
 			$bound_step(1./(freq*samples));
 		end
+		i = I(p,n);
 
 		V(p, n) <+ ac_stim("ac", mag);
 	end

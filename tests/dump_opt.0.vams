@@ -1,5 +1,8 @@
 
 `include "sub/disciplines.few"
+`pragma modelgen nodump-nature
+`pragma modelgen nodump-discipline
+`pragma modelgen dump-annotate
 
 module test(d, g, s, b);
 	electrical d, g;
