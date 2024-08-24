@@ -117,9 +117,9 @@ public:
 //  virtual bool propagate_deps(Variable const&) = 0;
   virtual double eval()const { untested(); return NOT_INPUT;}
   Block const* scope() const;
-  bool has_deps()const { untested(); return _data; }
+  // bool has_deps()const { untested(); return _data; }
   TData const& deps()const { assert(_data); return *_data; }
-  bool is_used_in(Base const*b)const;
+ // bool is_used_in(Base const*b)const;
   Variable_Decl* deep_copy(Base* owner, std::string prefix="") const;
   Token_VAR_REF const& token()const { assert(_token); return *_token; }
   void update();

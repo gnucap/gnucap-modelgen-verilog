@@ -194,10 +194,10 @@ bool Variable_Stmt::update()
 bool Variable_Stmt::is_used_in(Base const* b) const
 {
   for(auto v : _l){
-    if(v->is_used_in(b)){ untested();
-      return true;
-    }else{
-    }
+    // if(v->is_used_in(b)){ untested();
+    //   return true;
+    // }else{
+    // }
   }
   return false;
 }
@@ -218,12 +218,12 @@ bool SeqBlock::update()
   return ret;
 }
 /*--------------------------------------------------------------------------*/
-bool Variable_Decl::is_used_in(Base const*) const
-{
-  // return _token->is_used_in(b);
-  // incomplete();
-  return false;
-}
+//bool Variable_Decl::is_used_in(Base const*) const
+//{
+//  // return _token->is_used_in(b);
+//  // incomplete();
+//  return false;
+//}
 /*--------------------------------------------------------------------------*/
 void SeqBlock::merge_sens(Sensitivities const& s)
 {
