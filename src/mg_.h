@@ -199,6 +199,7 @@ public:
 public:
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
+  bool update()override { incomplete(); return false; }
   void new_block();
   Block const* block_or_null() const{ return _block; }
   Block* block(){ return _block; }

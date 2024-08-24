@@ -41,7 +41,7 @@ public:
     incomplete();
     return false;
   }
-  virtual bool update();
+  virtual bool update() = 0;
 //  virtual Statement* parent_stmt();
   virtual Block* scope() { return Owned_Base::owner(); }
   virtual Block const* scope() const { return Owned_Base::owner(); }

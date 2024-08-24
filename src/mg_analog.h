@@ -153,6 +153,7 @@ public:
   void dump(std::ostream& o)const override {
     _block.dump(o);
   }
+  bool update()override { return _block.update(); }
   AnalogSeqBlock const& block()const { return _block; }
 };
 /*--------------------------------------------------------------------------*/
@@ -274,6 +275,7 @@ class Analog_Function : public /*UserFunction?*/ Statement {
   AnalogFunctionArgs _args;
   AnalogFunctionBody _block;
   VariableLists _vars;
+  bool update()override { return false; }
 public:
   ~Analog_Function();
   void parse(CS& f)override;
@@ -382,6 +384,7 @@ public:
     // incomplete(); // later
     return true;
   }
+  bool update()override { incomplete(); return false; }
 
   AnalogExpression const& expression() const{ return _e; }
 };
