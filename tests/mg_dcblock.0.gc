@@ -1,0 +1,39 @@
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+verilog
+
+`modelgen
+module test_dcb0(p, n);
+electrical p, n;
+
+(*desc=""*) real v;
+analog begin
+	if(analysis("static"))
+		v = V(p,n);
+	else
+		V(p,n) <+ v;
+end
+endmodule
+`endmodelgen
+
+!make test_dcb0.so > /dev/null
+attach ./test_dcb0.so
+
+test_dcb0 d1(2, 1);
+vsine #(.offset(1) .ampl(1) .freq(1)) v0(1, 0);
+resistor #(.r(1)) r1(2, 0);
+list
+
+print dc v(nodes) v(d1)
+dc
+
+print ac vm(nodes) vp(nodes)
+ac 1 100 * 10
+
+print tran v(nodes) v(d1) i(r1) i(v0)
+tran 1
+
+print ac vm(nodes) vp(nodes)
+ac 1 100 * 10
+end

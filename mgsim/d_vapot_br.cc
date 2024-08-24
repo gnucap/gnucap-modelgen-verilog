@@ -41,6 +41,7 @@ protected: // override virtual
   void	   tr_iwant_matrix_extended_branch();
   bool	   do_tr()override;
   void	   tr_load()override;
+  void	   tr_unload_ones();
   void	   tr_load_ones();
   void	   ac_load_ones();
   void	   tr_begin()override{
@@ -162,16 +163,22 @@ bool VA_BREQN::do_tr()
 {
   assert(_values);
 
-  if(_loss0){
+  if(is_vs()){
     trace2("loss", _values[0], _values[1]);
     _m0.x = 0.;
     _m0.c0 = -_loss0 * _values[0]; // -> rhs
     _m0.c1 = 0; // -_loss0 * _values[1];
-  }else{ untested();
+  }else{
     // current source.
     _m0 = CPOLY1(0., _values[0], _values[1]);
   }
   return do_tr_con_chk_and_q();
+}
+/*--------------------------------------------------------------------------*/
+inline void VA_BREQN::tr_unload_ones()
+{
+  _one0 = 0;
+  tr_load_ones();
 }
 /*--------------------------------------------------------------------------*/
 inline void VA_BREQN::tr_load_ones()
@@ -183,10 +190,10 @@ inline void VA_BREQN::tr_load_ones()
     _sim->_aa.load_asymmetric(_n[OUT1].m_(), _n[OUT2].m_(), _n[BR()].m_(), 0,  d);
 
     if(is_vs()){
-      trace4("CPG::tr_load_ones vs", long_label(), _one0, _one1, d);
+      trace4("BREQN::tr_load_ones vs", long_label(), _one0, _one1, d);
       _sim->_aa.load_asymmetric(_n[BR()].m_(), 0, _n[OUT1].m_(), _n[OUT2].m_(), d);
-    }else{ untested();
-      trace4("CPG::tr_load_ones cs", long_label(), _one0, _one1, d);
+    }else{
+      trace4("BREQN::tr_load_ones cs", long_label(), _one0, _one1, d);
       _sim->_aa.load_diagonal_point(_n[BR()].m_(), d);
     }
   }else{
@@ -197,6 +204,14 @@ inline void VA_BREQN::tr_load_ones()
 void VA_BREQN::tr_load()
 {
   node_t gnd(&ground_node);
+  if(_loss0 != _loss1){
+      std::swap(_loss1, _loss0);
+      tr_unload_ones();
+      std::swap(_loss1, _loss0);
+      _one0 = 1;
+      _loss1 = _loss0;
+  }else{
+  }
   tr_load_ones();
 
   if(is_vs()){
@@ -208,10 +223,10 @@ void VA_BREQN::tr_load()
       trace2("VA_BREQN::tr_load vs", i, _values[i]);
       tr_load_extended(gnd, _n[BR()], _n[2*i-2], _n[2*i-1], &(_values[i]), &(_old_values[i]));
     }
-  }else{ untested();
+  }else{
     trace2("VA_BREQN::tr_load I", _values[0], _values[1]);
 
-    for (int i=1; i<=_n_ports; ++i) { untested();
+    for (int i=1; i<=_n_ports; ++i) {
       trace4("tr_load", long_label(), i, _values[i], _old_values[i]);
       tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_values[i]), &(_old_values[i]));
     }
@@ -262,7 +277,7 @@ inline void VA_BREQN::ac_load_ones()
 
   if(is_vs()){
     _sim->_acx.load_asymmetric(_n[BR()].m_(), 0, _n[OUT1].m_(), _n[OUT2].m_(), d);
-  }else{ untested();
+  }else{
     _sim->_acx.load_diagonal_point(_n[BR()].m_(), d);
   }
 }
@@ -276,8 +291,8 @@ void VA_BREQN::ac_load()
       trace2("VA_BREQN::ac_load", i, _values[i]);
       ac_load_extended(gnd, _n[BR()], _n[2*i-2], _n[2*i-1], _values[i]);
     }
-  }else{ untested();
-    for (int i=1; i<=_n_ports; ++i) { untested();
+  }else{
+    for (int i=1; i<=_n_ports; ++i) {
       ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i]);
     }
   }
@@ -318,7 +333,7 @@ void VA_BREQN::set_parameters(const std::string& Label, CARD *Owner,
     if (matrix_nodes() > NODES_PER_BRANCH) {
       // allocate a bigger node list
       _n = new node_t[matrix_nodes()];
-    }else{ untested();
+    }else{
       // use the default node list, already set
     }      
   }else{
