@@ -59,7 +59,7 @@ private:
   void make_switch     (std::ostream& o, AnalogSwitchStmt const& s)const;
   void make_for        (std::ostream& o, AnalogForStmt const& s)const;
   void make_while      (std::ostream& o, AnalogWhileStmt const& s)const;
-  void make_seq        (std::ostream& o, AnalogSeqBlock const& s)const;
+  void make_seq        (std::ostream& o, AnalogSeqStmt const& s)const;
   void make_ctrl       (std::ostream& o, AnalogCtrlBlock const& s)const;
   void make_assignment (std::ostream& o, Assignment const& a)const;
   void make_contrib    (std::ostream& o, Contribution const& C)const;
@@ -70,10 +70,9 @@ private:
   void make_variable   (std::ostream& o, Token_VAR_REF const& v)const;
   void make_variable   (std::ostream& o, Variable_Decl const& v)const;
 private:
-//  void make_block_int_identifier_list(std::ostream& o, ListOfBlockIntIdentifiers const& rl)const;
-//  void make_block_real_identifier_list(std::ostream& o, ListOfBlockRealIdentifiers const& rl)const;
-  void make_block_variables(std::ostream& o, Variable_Stmt const& rl)const;
-  void make_real_variable   (std::ostream& o, Token_VAR_DECL const& v)const;
+  void make_block_variables(std::ostream& o, Variable_Stmt const&)const;
+  void make_real_variable  (std::ostream& o, Token_VAR_DECL const&)const;
+  void make_seq            (std::ostream& o, AnalogSeqBlock const&)const;
 private:
   void make_one_variable_load(std::ostream& o, Token_VAR_REF const& V, Module const& m)const;
   void make_one_variable_store(std::ostream& o, Token_VAR_REF const& V)const;
@@ -420,6 +419,8 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
     make_ctrl(o, ct->body());
   }else if(auto t=dynamic_cast<System_Task const*>(&ab)) {
     make_system_task(o, *t);
+  }else if(auto ass=dynamic_cast<AnalogSeqStmt const*>(&ab)) {
+    make_seq(o, *ass);
   }else{ untested();
     incomplete();
     assert(false);
@@ -695,12 +696,18 @@ void OUT_ANALOG::make_ctrl(std::ostream& o, AnalogCtrlBlock const& s) const
   make_seq(o, s);
 }
 /*--------------------------------------------------------------------------*/
+void OUT_ANALOG::make_seq(std::ostream& o, AnalogSeqStmt const& s) const
+{
+  return make_seq(o, s.block());
+}
+/*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_seq(std::ostream& o, AnalogSeqBlock const& s) const
 {
   o__ "{ // " << s.identifier() << "\n";
   for(auto i : s.block()) {
     indent x;
     if(auto st = dynamic_cast<Statement const*>(i)){
+      unreachable();
       make_stmt(o, *st);
     }else if(auto as = dynamic_cast<AnalogSeqBlock const*>(i)){
       // incomplete(); // later.

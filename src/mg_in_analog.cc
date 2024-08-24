@@ -124,9 +124,9 @@ static Base* new_evt_ctl_stmt(CS& file, Block* o)
   }
 }
 /*--------------------------------------------------------------------------*/
-static Base* pArse_seq(CS& f, Block* owner)
+static Statement* parse_seq(CS& f, Block* owner)
 {
-  return new AnalogSeqBlock(f, owner);
+  return new AnalogSeqStmt(f, owner);
 }
 /*--------------------------------------------------------------------------*/
 // static Base* parse_int(CS& f, Block* o)
@@ -304,7 +304,7 @@ static Base* parse_analog_stmt_or_null(CS& file, Block* scope)
   trace1("parse_analog_stmt_or_null", file.tail().substr(0,30));
   ONE_OF	// module_item
     || (file >> ";")
-    || ((file >> "begin") && (ret = pArse_seq(file, scope)))
+    || ((file >> "begin") && (ret = parse_seq(file, scope)))
     || ((file >> "real ") && (ret = new Variable_Stmt(file, scope)))
     || ((file >> "integer ") && (ret = new Variable_Stmt(file, scope)))
     || ((file >> "if ") && (ret = parse_cond(file, scope)))
@@ -783,6 +783,21 @@ void AnalogConstruct::parse(CS& f)
   ab->update();
 }
 /*--------------------------------------------------------------------------*/
+void AnalogSeqStmt::parse(CS& f)
+{
+  _block.set_owner(this);
+
+  if(is_never()) { untested();
+    _block.set_never();
+  }else if(is_always()) { untested();
+    _block.set_always();
+  }else{ untested();
+  }
+
+  f >> _block;
+  // _block.update();
+}
+/*--------------------------------------------------------------------------*/
 void AnalogSeqBlock::parse(CS& f)
 {
   assert(owner());
@@ -795,6 +810,7 @@ void AnalogSeqBlock::parse(CS& f)
   }else if(dynamic_cast<Module const*>(scope())) {
     set_always();
   }else{
+    assert(dynamic_cast<Statement const*>(owner()));
   }
   for (;;) {
     trace1("AnalogSeqBlock::parse loop", f.tail().substr(0,20));

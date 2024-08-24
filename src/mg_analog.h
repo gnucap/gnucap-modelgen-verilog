@@ -155,6 +155,7 @@ public:
   }
   bool update()override { return _block.update(); }
   AnalogSeqBlock const& block()const { return _block; }
+  TData const& deps() override { return _block.deps(); }
 };
 /*--------------------------------------------------------------------------*/
 class AnalogCtrlBlock : public AnalogSeqBlock {
