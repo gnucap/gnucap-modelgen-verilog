@@ -129,6 +129,39 @@ static Statement* parse_seq(CS& f, Block* owner)
   return new AnalogSeqStmt(f, owner);
 }
 /*--------------------------------------------------------------------------*/
+template<class A>
+void dump_annotate(std::ostream& o, A const& a)
+{
+  if(!a.scope()->is_reachable()){
+    o << " // --\n";
+  }else if(a.data().is_constant()){ untested();
+    o << " // c\n";
+  }else{
+    if(a.data().ddeps().size()){
+      o << " //";
+    }else if(a.has_sensitivities()){
+      o << " //";
+    }else if(a.rdeps_().size()){
+      o << " //";
+    }else{
+    }
+    for(const Dep& d : a.data().ddeps()) {
+      o << " dep: ";
+      o << d->code_name();
+    }
+#if 1
+    if(a.has_sensitivities()){
+      o << " s" << a.sensitivities().size();
+    }else{
+    }
+#endif
+    if(a.rdeps_().size()){
+      o << " r" << a.rdeps_().size();
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 // static Base* parse_int(CS& f, Block* o)
 // { untested();
 //   trace1("AnalogBlock::parse int", f.tail().substr(0,10));
@@ -164,18 +197,82 @@ void System_Task::parse(CS& f)
 {
   assert(owner());
   _e.set_owner(this);
-  trace1("====", f.tail().substr(0,10));
+  trace1("System_Task::parse0", f.tail().substr(0,10));
   f >> _e;
-  trace1("/====", f.tail().substr(0,10));
+  trace1("System_Task::parse1", f.tail().substr(0,10));
   f >> ";";
+
+  // assert(rdeps());
+  trace1("System_Task::parse2", rdeps().size());
+  update(); // rdeps?
+  trace0("System_Task::update1");
 }
 /*--------------------------------------------------------------------------*/
 void System_Task::dump(std::ostream&o)const
 {
-  o__ _e << ";\n";
+  o__ _e << ";";
+
+  if(options().dump_annotate()){
+    dump_annotate(o, *this);
+  }else{
+  }
+  o << "\n";
 }
 /*--------------------------------------------------------------------------*/
-// void Assignment::parse(CS& f)?
+bool System_Task::is_used_in(Base const*b) const
+{
+  if(_e.is_used_in(b)){ untested();
+    return true;
+  }else if( Statement::is_used_in(b)) {
+    return true;
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+FUNCTION_ const* System_Task::function() const
+{
+  assert(_e.size());
+  Token const* t = *_e.begin();
+  assert(t);
+  Token_CALL const* c = prechecked_cast<Token_CALL const*>(t);
+  assert(c);
+  return c->f();
+}
+/*--------------------------------------------------------------------------*/
+// code?
+bool System_Task::update()
+{
+  assert(function());
+
+  if(function()->has_tr_review()){
+    add_rdep(&tr_eval_tag);
+  }else{
+  }
+  if(function()->has_tr_review()){
+    add_rdep(&tr_review_tag);
+  }else{
+  }
+  if(function()->has_tr_accept()){
+    add_rdep(&tr_accept_tag);
+  }else{
+  }
+  if(function()->has_tr_advance()){ untested();
+    add_rdep(&tr_advance_tag);
+  }else{
+  }
+  // Expression_::update(rdeps());
+ //  auto& rd = _e.data().rdeps(); // also collect from control block?
+ //  size_t rs = rd.size();
+ // //  _rdeps.merge(rd); // needed?
+ //  trace2("System_Task::update2", rd.size(), rdeps().size());
+  bool ret = _e.update(&_rdeps);
+//  assert(rs<=_e.data().rdeps().size()); // WIP
+
+ // trace3("System_Task::update3", ret, rd.size(), rdeps().size());
+  return propagate_rdeps(_rdeps) || Statement::update() || ret;
+}
+/*--------------------------------------------------------------------------*/
 void AnalogProceduralAssignment::parse(CS& f)
 {
   // assert(owner()); ?
@@ -185,7 +282,6 @@ void AnalogProceduralAssignment::parse(CS& f)
   trace2("Proc assignment?", f.tail().substr(0,20), _a.owner());
   std::string what;
   f >> what;
-//  f >> what;
   if(what == ""){ untested();
     f.reset_fail(here);
     throw Exception_No_Match("need name");
@@ -195,6 +291,7 @@ void AnalogProceduralAssignment::parse(CS& f)
   if(f >> _a){
     trace1("preupdate", _a);
     update(); // hmm, analysis?
+   // _a.data().add_sens(this);
     trace1("postupdate", _a);
     if(f >> ";"){
     }else{ untested();
@@ -220,31 +317,6 @@ Statement* AnalogProceduralAssignment::deep_copy(Base* owner) const
   return a;
 }
 /*--------------------------------------------------------------------------*/
-template<class A>
-void dump_annotate(std::ostream& o, A const& _a)
-{
-  if(!_a.scope()->is_reachable()){
-    o << " // --\n";
-  }else if(_a.data().is_constant()){ untested();
-    o << " // c\n";
-  }else{
-    if(_a.data().ddeps().size()){
-      o << " //";
-    }else if(_a.has_sensitivities()){
-      o << " //";
-    }else{
-    }
-    for(const Dep& d : _a.data().ddeps()) {
-      o << " dep: ";
-      o << d->code_name();
-    }
-    if(_a.has_sensitivities()){
-      o << " s";
-    }else{
-    }
-  }
-}
-/*--------------------------------------------------------------------------*/
 void AnalogProceduralAssignment::dump(std::ostream& o)const
 {
   if(_a){
@@ -252,7 +324,8 @@ void AnalogProceduralAssignment::dump(std::ostream& o)const
     _a.dump(o);
     o << ";";
     if(options().dump_annotate()){
-      dump_annotate(o, _a);
+      dump_annotate(o, *this);
+      // dump_annotate(o, _a);
     }else{
     }
     o << "\n";
@@ -393,7 +466,7 @@ AnalogConditionalStmt::AnalogConditionalStmt(Block* o, CS& file)
   parse(file);
 }
 /*--------------------------------------------------------------------------*/
-void AnalogConditionalStmt::dump(std::ostream& o)const
+void AnalogConditionalStmt::dump(std::ostream& o) const
 {
   bool omit_true = !options().dump_unreachable() && _cond.is_false();
   bool omit_false = !options().dump_unreachable() && _cond.is_true();
@@ -427,13 +500,23 @@ void AnalogConditionalStmt::dump(std::ostream& o)const
   }
 }
 /*--------------------------------------------------------------------------*/
+bool AnalogConditionalStmt::is_used_in(Base const* b) const
+{
+  if (_cond.is_used_in(b)){ untested();
+    return true;
+  }else{
+    return AnalogStmt::is_used_in(b);
+  }
+}
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 void AnalogCtrlStmt::parse(CS& f)
 {
   _body.set_owner(this);
   f >> _body;
 }
 /*--------------------------------------------------------------------------*/
-void AnalogCtrlStmt::dump(std::ostream& o)const
+void AnalogCtrlStmt::dump(std::ostream& o) const
 {
   if(!_body){
     o << ";\n";
@@ -441,6 +524,12 @@ void AnalogCtrlStmt::dump(std::ostream& o)const
     o << " ";
     _body.dump(o);
   }
+}
+/*--------------------------------------------------------------------------*/
+bool AnalogCtrlStmt::propagate_rdeps(RDeps const& r)
+{
+  // incomplete(); // remove?
+  return Statement::propagate_rdeps(r);
 }
 /*--------------------------------------------------------------------------*/
 AnalogWhileStmt::AnalogWhileStmt(CS& file, Block* o)
@@ -454,6 +543,7 @@ bool AnalogWhileStmt::update()
 //  _ctrl?
   bool ret = false;
   while(true){
+    trace0("AnalogWhileStmt::update");
     _body.clear_vars();
     if (_body.update()){
       ret = true;
@@ -461,7 +551,8 @@ bool AnalogWhileStmt::update()
       break;
     }
   }
-  return ret;
+  return // propagate_rdeps(_rdeps) ||
+     AnalogStmt::update() || ret;
 }
 /*--------------------------------------------------------------------------*/
 // duplicate?
@@ -477,7 +568,8 @@ bool AnalogSwitchStmt::update()
       break;
     }
   }
-  return ret;
+  return // propagate_rdeps(_rdeps) ||
+     AnalogStmt::update() || ret;
 }
 /*--------------------------------------------------------------------------*/
 void AnalogWhileStmt::parse(CS& file)
@@ -519,17 +611,18 @@ bool AnalogForStmt::update()
   bool ret = false;
 
   while(true){
-    if ( init_ && init_->update(&rdeps()) ){ untested();
+    if ( init_ && init_->update() ){ untested();
       ret = true;
     }else if (_body.update()){ untested();
       ret = true;
-    }else if ( tail_ && tail_->update(&rdeps()) ) { untested();
+    }else if ( tail_ && tail_->update() ) { untested();
       ret = true;
     }else{
       break;
     }
   }
-  return ret;
+  return // propagate_rdeps(_rdeps) ||
+     AnalogStmt::update() || ret;
 }
 /*--------------------------------------------------------------------------*/
 void AnalogForStmt::parse(CS& f)
@@ -562,12 +655,25 @@ void AnalogForStmt::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 bool AnalogProceduralAssignment::update()
 {
-  trace0("AnalogProceduralAssignment::update");
+  trace1("AnalogProceduralAssignment::update",  deps().size());
+//  trace1("AnalogProceduralAssignment::update",  _a.data().size());
+  trace1("AnalogProceduralAssignment::update",  rdeps().size());
+
+  bool ret;
   if(options().optimize_unused() && !scope()->is_reachable()) {
-    return false;
+    ret = false;
   }else{
-    return _a.update(&rdeps());
+    RDeps r(rdeps());
+    assert(r.size()==rdeps().size());
+    ret = _a.update(&r);
+    assert(r.size()==rdeps().size());
+    //_rdeps.merge(_a.data().rdeps());
   }
+
+  trace1("AnalogProceduralAssignment::update1",  rdeps().size());
+ // trace1("AnalogProceduralAssignment::update1",  _a.data().size());
+  trace1("AnalogProceduralAssignment::update1",  deps().size());
+  return AnalogStmt::update() || ret;
 }
 /*--------------------------------------------------------------------------*/
 void AnalogForStmt::dump(std::ostream& o)const
@@ -761,6 +867,12 @@ void AnalogSwitchStmt::dump(std::ostream& o)const
   o__ "endcase\n";
 }
 /*--------------------------------------------------------------------------*/
+bool AnalogConstruct::is_used_in(Base const*) const
+{
+  // incomplete.
+  return true;
+}
+/*--------------------------------------------------------------------------*/
 void AnalogConstruct::new_block()
 {
   assert(!_block);
@@ -770,6 +882,7 @@ void AnalogConstruct::new_block()
 /*--------------------------------------------------------------------------*/
 void AnalogConstruct::push_back(Statement*s)
 {
+  // assert(0); // no longer used?
   assert(_block);
   _block->push_back(s);
 }
@@ -789,7 +902,7 @@ void AnalogSeqStmt::parse(CS& f)
 
   if(is_never()) { untested();
     _block.set_never();
-  }else if(is_always()) { untested();
+  }else if(is_always()) {
     _block.set_always();
   }else{ untested();
   }
@@ -809,8 +922,10 @@ void AnalogSeqBlock::parse(CS& f)
     set_always();
   }else if(dynamic_cast<Module const*>(scope())) {
     set_always();
-  }else{
-    assert(dynamic_cast<Statement const*>(owner()));
+  }else if(dynamic_cast<Statement const*>(owner())) {
+  }else{ untested();
+    assert(0);
+    unreachable();
   }
   for (;;) {
     trace1("AnalogSeqBlock::parse loop", f.tail().substr(0,20));
@@ -908,7 +1023,7 @@ Branch_Ref parse_branch(Block* owner, CS& f)
   Branch_Ref b = owner->new_branch(pp, pn);
   trace2("still a branch", pp, pn);
   if(b){
-  }else{
+  }else{ untested();
   //   throw Exception_No_Match("not a branch");
     f.reset_fail(here);
   }
@@ -1149,7 +1264,7 @@ DDeps const& Contribution::ddeps() const
   return data().ddeps();
 }
 /*--------------------------------------------------------------------------*/
-TData const& Contribution::deps()
+TData const& Contribution::deps() const
 {
   if(_deps){
     return *_deps;
@@ -1166,9 +1281,10 @@ bool Contribution::update()
     _deps = new TData;
   }else{
   }
+  _rdeps.insert(_branch);
 
   size_t s = _deps->ddeps().size();
-  bool rdd = _rhs.update(&rdeps());
+  bool rdd = _rhs.update(&_rdeps);
   TData const* D = &_rhs.data();
   s = _deps->ddeps().size();
 
@@ -1178,14 +1294,14 @@ bool Contribution::update()
   if(options().optimize_unused() && !owner()->is_reachable()) { untested();
   }else{
     for(; s < _deps->ddeps().size(); ++s) {
-      Dep const& d = data().ddeps()[s];
+      Dep const& d = deps().ddeps()[s];
       add_dep(d);
     }
   }
   _sens.merge(_deps->sensitivities());
 
   trace4("Contribution::update C", rdd, ret, _deps->ddeps().size(),  D->ddeps().size());
-  return rdd || ret || (_deps->ddeps().size() != s);
+  return AnalogStmt::update() || rdd || ret || (_deps->ddeps().size() != s);
 } // Contribution::update
 /*--------------------------------------------------------------------------*/
 void Branch_Map::parse(CS& f)
@@ -1216,13 +1332,6 @@ Branch::~Branch()
   delete _deps;
   _deps = NULL;
 
-  for(auto i : _used_in){
-    if(i){ untested();
-      std::cerr << "logic error. " << name() << " still used in. " << i << "\n";
-      unreachable();
-    }else{
-    }
-  }
   if(_use){ untested();
     unreachable();
     std::cerr << "logic error. " << name() << " still used.\n";
@@ -1453,6 +1562,40 @@ void AnalogEvtCtlStmt::dump(std::ostream& o) const
 #endif
 }
 /*--------------------------------------------------------------------------*/
+bool AnalogEvtCtlStmt::update()
+{
+
+ // bool rdd = _rhs.update(&_deps->rdeps());
+ // bool ret = propagate_rdeps(_rdeps);
+  bool ret = false;
+  while(true){
+    _body.clear_vars();
+    if ( _ctrl.update() ){ untested();
+      ret = true;
+    }else if (_body.update()){ untested();
+      ret = true;
+    }else{
+      break;
+    }
+  }
+
+  // set_rdeps(_ctrl.rdeps());
+  return AnalogStmt::update() || ret;
+}
+/*--------------------------------------------------------------------------*/
+bool AnalogEvtCtlStmt::is_used_in(Base const* b)const
+{
+  // store rdeps in Statement::_rdeps?
+
+  // o__ "// AnalogEvtCtlStmt2 " << cond().data().rdeps().size() << "\n";
+
+  if( _ctrl.is_used_in(b)){
+    return true;
+  }else{
+    return AnalogCtrlStmt::is_used_in(b);
+  }
+}
+/*--------------------------------------------------------------------------*/
 void make_cc_af(std::ostream& o, const Analog_Function& f); // BUG
 namespace{
 /*--------------------------------------------------------------------------*/
@@ -1462,7 +1605,7 @@ static Module const* to_module(Block const* owner)
     assert(owner);
     if(auto m = dynamic_cast<Module const*>(owner)){
       return m;
-    }else if(auto b = dynamic_cast<Block const*>(owner->owner())){
+    }else if(auto b = dynamic_cast<Block const*>(owner->owner())){ untested();
       owner = b;
     }else if(auto st = dynamic_cast<Statement const*>(owner->owner())){
       owner = st->scope();
@@ -1727,19 +1870,66 @@ bool AnalogFunctionBody::new_var_ref(Base* b)
   return Block::new_var_ref(b);
 }
 /*--------------------------------------------------------------------------*/
+bool AnalogEvtExpression::is_used_in(Base const* b)const
+{
+  // propagate to owner instead??
+  for(auto& i : _rdeps){
+    if(i == b){
+      return true;
+    }else{
+    }
+  }
+
+  return false;
+}
+/*--------------------------------------------------------------------------*/
 void AnalogEvtExpression::parse(CS& file)
 {
-  _expression = new Expression(file);
+  Expression rhs(file);
+  file >> ","; // LiSt??
+  assert(owner());
+  // Expression_::set_owner(scope());
+  resolve_symbols(rhs);
+
+  set_rdeps();
 }
 /*--------------------------------------------------------------------------*/
 void AnalogEvtExpression::dump(std::ostream& o) const
 {
-  o << "(";
-  if(_expression) {
-    o << *_expression;
-  }else{ untested();
+  o << "("; // here?
+  Expression_::dump(o);
+  o << ")"; // here?
+}
+/*--------------------------------------------------------------------------*/
+void AnalogEvtExpression::set_rdeps()
+{
+  if(function()->has_tr_review()){
+    add_rdep(&tr_eval_tag);
+  }else{
   }
-  o << ")";
+  if(function()->has_tr_review()){
+    add_rdep(&tr_review_tag);
+  }else{
+  }
+  if(function()->has_tr_accept()){
+    add_rdep(&tr_accept_tag);
+  }else{
+  }
+  if(function()->has_tr_advance()){
+    add_rdep(&tr_advance_tag);
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+// incomplete. expressions...
+FUNCTION_ const* AnalogEvtExpression::function() const
+{
+  assert(size());
+  Token const* t = *begin();
+  assert(t);
+  Token_CALL const* c = prechecked_cast<Token_CALL const*>(t);
+  assert(c);
+  return c->f();
 }
 /*--------------------------------------------------------------------------*/
 AnalogExpression::~AnalogExpression()
@@ -1804,11 +1994,6 @@ void AF_Arg_List::dump(std::ostream& o)const
   o << "\n";
 }
 /*--------------------------------------------------------------------------*/
-bool AnalogStmt::propagate_rdeps(RDeps const&)
-{
-//  incomplete();
-  return false;
-}
 /*--------------------------------------------------------------------------*/
 void Contribution::set_direct(bool d)
 {
@@ -2231,15 +2416,39 @@ Branch_Ref Branch_Map::lookup(std::string const& n)const
 /*--------------------------------------------------------------------------*/
 bool AnalogProceduralAssignment::is_used_in(Base const*b)const
 {
-  return AnalogStmt::is_used_in(b);
-  return _a.is_used_in(b) || AnalogStmt::is_used_in(b);
+ // return AnalogStmt::is_used_in(b);
+  if (_a.is_used_in(b)) { untested();
+    return true;
+  }else if (AnalogStmt::is_used_in(b)) {
+    return true;
+  }else{
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 AnalogStmt::~AnalogStmt()
 {
- // for(auto n :_used_in){
- //   assert(!n);
- // }
+}
+/*--------------------------------------------------------------------------*/
+// propagate individually?
+bool AnalogProceduralAssignment::propagate_rdeps(RDeps const& r)
+{
+  assert(owner());
+  auto s = dynamic_cast<Statement*>(owner_());
+  if(s){
+  }else{
+  }
+  bool ret = false;
+  for(auto n : r) {
+   // auto p = _rdeps.insert(n);
+    //if(p.second)
+    {
+      ret |= propagate_rdep(n);
+      // ret = propagate_rdep(*p.first);
+      //ret = s->propagate_rdep(*p.first);
+    }
+  }
+  return ret;
 }
 /*--------------------------------------------------------------------------*/
 bool Probe::propagate_rdeps(RDeps const& r) const
@@ -2314,6 +2523,21 @@ Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
   auto pr = prechecked_cast<Probe const*>(f);
   assert(pr);
   return pr;
+}
+/*--------------------------------------------------------------------------*/
+// mg_code?
+void Statement::set_rdeps(TData const& t)
+{ untested();
+      unreachable(); // still
+ //  for(auto x : t.sensitivities()){ untested();
+ //    if(auto b = dynamic_cast<Branch*>(x)){ untested();
+ //      _rdeps.insert(b);
+ //      // _rdeps.push_back(b);
+ //    }else{ untested();
+ //      _rdeps.insert(b);
+ //      // incomplete(); // later
+ //    }
+ //  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

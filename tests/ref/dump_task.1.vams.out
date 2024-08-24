@@ -1,0 +1,28 @@
+module foo(p, x);
+  inout p;
+  electrical p;
+  electrical x;
+  real A, B;
+  real y// dep _potential_b_p_
+;
+
+  analog begin // always
+    // A : 0
+    // B : 0
+    // C : 0
+    // y : 0
+    real C;
+    A = 1; // s1 r3
+    B = A; // s2 r3
+    C = B; // s3 r3
+    $strobe("some strobe %f.", (C + V(x))); // dep: _potential_b_x_ s3 r3
+    y = V(p); // dep: _potential_b_p_ s1 r3
+    $strobe("some strobe %f.", y); // dep: _potential_b_p_ s1 r3
+    $finish(1);
+    y = 0; // s1
+  end
+
+endmodule
+
+
+

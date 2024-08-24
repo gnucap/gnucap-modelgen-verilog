@@ -229,10 +229,10 @@ public:
     assert(num_args() < 4);
     if(num_args()>1){
       o << ", double delay=1";
-    }else{
+    }else{ untested();
       unreachable();
     }
-    if(num_args()>2){
+    if(num_args()>2){ untested();
       o << ", double maxdelay=1";
     }else{
     }
@@ -245,10 +245,10 @@ public:
       if(num_args()>1){
 	o__ "l->set_param_by_name(\"delay\", \"\");\n";
 	o__ "l->set_param_by_name(\"delay\", to_string(delay));\n";
-      }else{
+      }else{ untested();
 	unreachable();
       }
-      if(num_args()>2){
+      if(num_args()>2){ untested();
 	o__ "l->set_param_by_name(\"maxdelay\", \"\");\n";
 	o__ "l->set_param_by_name(\"maxdelay\", to_string(maxdelay));\n";
       }else{

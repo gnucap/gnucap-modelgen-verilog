@@ -141,6 +141,12 @@ class Filter; // BUG. probably
 class Analog;
 class Circuit;
 class Module : public Block {
+public:
+  typedef enum : int{
+    mm_NONE = 0,
+    mm_ANALOG = 1,
+    mm_DIGITAL = 2
+  } mode_mask_t;
 private: // verilog input data
   File const* _file{NULL};
   Aliasparam_Collection _aliasparam;
@@ -149,6 +155,11 @@ private: // verilog input data
   Owned_Base* _analog{NULL};
   Circuit* _circuit{NULL};
 //  Block _module_body;
+public: // token?
+//  rdep_tag const& tr_eval_tag   ()const { untested();return ::tr_eval_tag;}
+//  rdep_tag const& tr_review_tag ()const { untested();return ::tr_review_tag;}
+//  rdep_tag const& tr_advance_tag()const { untested();return ::tr_advance_tag;}
+//  rdep_tag const& tr_accept_tag ()const { untested();return ::tr_accept_tag;}
 protected:
   Variable_List_Collection _variables;
   Parameter_List_Collection _parameters;
@@ -158,9 +169,11 @@ protected:
 private: // merge?
   std::list<FUNCTION_*> _func;
   pSet<FUNCTION_ const> _funcs;
-  size_t _num_evt_slots{0};
-  bool _has_analysis{false};
-  bool _has_tr_review{false};
+  mode_mask_t _has_analysis{mm_NONE};
+  mode_mask_t _has_tr_review{mm_NONE};
+  mode_mask_t _has_tr_accept{mm_NONE};
+  mode_mask_t _has_tr_advance{mm_NONE};
+  int _times{0}; // _time array size
 private: // elaboration data
   void new_analog();
   void new_circuit();
@@ -192,26 +205,34 @@ public: // TODO
   const Variable_List_Collection& variables()const	{return _variables;}
   const Circuit*	  circuit()const	{return _circuit;}
   const Owned_Base& analog() const {assert(_analog); return *_analog;}
-  bool has_events()const {return _num_evt_slots;}
   bool has_analysis()const {return _has_analysis;}
-  bool has_tr_review()const {return _has_tr_review;}
-  void new_evt_slot() { ++_num_evt_slots; }
+  bool has_tr_review()const {return _has_tr_review || has_analysis(); }
+  bool has_tr_accept()const {return _has_tr_accept || has_analysis(); }
+  bool has_tr_advance()const {return _has_tr_advance || has_analysis()
+       || has_analog_block(); // why?
+  }
+
+  bool has_tr_advance_analog()const {return _has_tr_advance & mm_ANALOG; }
+
+  int times()const {return _times;}
   void new_filter();
-  size_t num_evt_slots()const {return _num_evt_slots; }
   Port_3* find_port(std::string const&);
 public:
   size_t num_branches() const;
   bool sync()const;
   bool has_submodule()const;
   bool has_analog_block()const;
-  void set_tr_review() {_has_tr_review = true; }
-  void set_analysis() {_has_analysis = true; }
+  void set_tr_review(mode_mask_t m=mm_ANALOG) {_has_tr_review  = (mode_mask_t)(_has_tr_review  | m); }
+  void set_tr_accept(mode_mask_t m=mm_ANALOG) {_has_tr_accept  = (mode_mask_t)(_has_tr_accept  | m); }
+  void set_tr_advance(mode_mask_t m=mm_ANALOG){_has_tr_advance = (mode_mask_t)(_has_tr_advance | m); }
+  void set_times(int h) {if(h > _times){_times = h;}else{}}
+  void set_analysis() {_has_analysis = mm_ANALOG; }
   void push_back(FUNCTION_* f);
   void push_back(Filter /*const*/ * f);
   void push_back(Token* x);
   void push_back(Base* x);
   void install(FUNCTION_ const* f);
-  std::list<FUNCTION_*> const& func()const { untested();return _func;}
+ // std::list<FUNCTION_*> const& func()const { untested();return _func;}
   pSet<FUNCTION_ const> const& funcs()const {return _funcs;}
 private: // misc
   CS& parse_analog(CS& cmd);

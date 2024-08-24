@@ -312,7 +312,7 @@ void Token_ACSTIM::stack_op(Expression* e)const
     branch()->deps() = *dd; // HACK
     if(1){
       func->set_n_to_gnd();
-    }else if(0 /*sth linear*/){
+    }else if(0 /*sth linear*/){ untested();
       // somehow set loss=0 and output ports to target.
     }else{ untested();
     }

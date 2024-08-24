@@ -199,15 +199,12 @@ public:
 public:
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
-  bool update()override { incomplete(); return false; }
+  bool update()override { untested(); incomplete(); return false; }
   void new_block();
   Block const* block_or_null() const{ return _block; }
   Block* block(){ return _block; }
   void push_back(Statement*);
-  bool is_used_in(Base const*)const override { untested();
-    incomplete();
-    return true;
-  }
+  bool is_used_in(Base const*)const override; // BUG?
 };
 typedef Collection<AnalogConstruct> AnalogList;
 #if 0
@@ -441,8 +438,8 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-void make_cc_expression(std::ostream& o, Expression const& e, bool deriv=true);
-void make_cc_event_cond(std::ostream& o, Expression const& e);
+void make_cc_expression(std::ostream& o, Expression const& e, bool deriv=true,
+    std::string ctx="");
 void dump_analog(std::ostream& o, Module const& m);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

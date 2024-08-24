@@ -35,15 +35,15 @@ protected: // override virtual
   void	   tr_iwant_matrix()override	{tr_iwant_matrix_extended();}
   bool	   do_tr()override;
   void	   tr_load()override;
-  double   tr_involts()const override	{unreachable(); return NOT_VALID;}
-  double   tr_involts_limited()const override {unreachable(); return NOT_VALID;}
+  double   tr_involts()const override	{ untested();unreachable(); return NOT_VALID;}
+  double   tr_involts_limited()const override { untested();unreachable(); return NOT_VALID;}
   double   tr_amps()const override;
   void	   ac_iwant_matrix()override	{ac_iwant_matrix_extended();}
   void	   ac_load()override;
   COMPLEX  ac_involts()const override	{itested(); return NOT_VALID;}
   COMPLEX  ac_amps()const override	{itested(); return NOT_VALID;}
 
-  bool has_iv_probe()const override {return true;}
+  bool has_iv_probe()const override { untested();return true;}
 
 public:
   void set_parameters(const std::string& Label, CARD* Parent,
@@ -180,8 +180,8 @@ private:
 public:
   explicit DEV_FPOLY_G() :VAFLOW() {}
 private: // override virtual
-  char	   id_letter()const override {unreachable(); return '\0';}
-  std::string dev_type()const override {unreachable(); return "va_fpoly_g";}
+  char	   id_letter()const override { untested();unreachable(); return '\0';}
+  std::string dev_type()const override { untested();unreachable(); return "va_fpoly_g";}
   CARD*	   clone()const override { return new DEV_FPOLY_G(*this);}
   bool	   do_tr() override;
 }ff;

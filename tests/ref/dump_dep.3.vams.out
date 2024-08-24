@@ -13,21 +13,21 @@ module test_while0a(p, n);
     // z : 1
     integer i;
     real x, y;
-    x = 0.;
-    x = 0.; // dep: _potential_b_p_n
-    z = x; // dep: _potential_b_p_n
-    y = 0.; // dep: _potential_b_p_n
-    i = r;
+    x = 0.; // s1
+    x = 0.; // dep: _potential_b_p_n s4 r1
+    z = x; // dep: _potential_b_p_n s5
+    y = 0.; // dep: _potential_b_p_n s3 r1
+    i = r; // s2
     while ((i > 0)) begin
       // i : 0
       // x : 1
       // y : 1
-      i = (i - 1);
-      x = y; // dep: _potential_b_p_n
-      y = (x + V(p, n)); // dep: _potential_b_p_n
+      i = (i - 1); // s2
+      x = y; // dep: _potential_b_p_n s3 r1
+      y = (x + V(p, n)); // dep: _potential_b_p_n s3 r1
     end
-    x = x; // dep: _potential_b_p_n
-    I(p, n) <+ x; // dep: _potential_b_p_n
+    x = x; // dep: _potential_b_p_n s5 r1
+    I(p, n) <+ x; // dep: _potential_b_p_n s5 r1
   end
 
 endmodule

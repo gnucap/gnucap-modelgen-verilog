@@ -65,7 +65,7 @@ public:
   const_iterator begin()const { return _s.begin(); }
   const_iterator end()const { return _s.end(); }
   std::pair<iterator, bool> insert(T* t) { return _s.insert(t); }
-  void clear() { _s.clear(); }
+  void clear() { untested(); _s.clear(); }
   size_t merge(pSet const& s) {
      // _s.merge(s._s);// c++17
      size_t r = 0;

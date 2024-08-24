@@ -1,0 +1,15 @@
+`include "disciplines.vams"
+`pragma modelgen nodump-nature
+`pragma modelgen nodump-discipline
+
+module timer_test(out);
+	output out;
+	electrical out;
+	integer rst;
+	analog begin
+		rst = 0;
+		@(timer(1., 1.))
+			rst = 1;
+		V(out) <+ idt(1.0, 0., rst);
+	end
+endmodule

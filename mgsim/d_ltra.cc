@@ -76,7 +76,7 @@ private:
 public:
   explicit	DEV_TRANSLINE(COMMON_COMPONENT* c=NULL);
 private: // override virtual
-  char		id_letter()const override	{return 'T';}
+  char		id_letter()const override	{ untested();return 'T';}
   std::string   value_name()const override	{return "#";}
   std::string	dev_type()const override	{itested(); return "tline";}
   int		max_nodes()const override	{return 4;}

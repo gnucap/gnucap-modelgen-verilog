@@ -80,7 +80,7 @@ public:
   COMMON_LAPLACE(int x) : COMMON_RF_BASE(x) {}
   COMMON_LAPLACE(COMMON_LAPLACE const& x) :
     COMMON_RF_BASE(x), _tolerance(x._tolerance) {}
-  COMMON_LAPLACE* clone()const override {return new COMMON_LAPLACE(*this);}
+  COMMON_LAPLACE* clone()const override { untested();return new COMMON_LAPLACE(*this);}
 
   virtual int pivot()const;
 
@@ -116,12 +116,12 @@ public:
 COMMON_LAPLACE_ND cl_nd(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class COMMON_LAPLACE_ZD : public COMMON_LAPLACE {
-  std::string name()const override {return "va_laplace_zd";}
+  std::string name()const override { untested();return "va_laplace_zd";}
 public:
   ~COMMON_LAPLACE_ZD() {}
   COMMON_LAPLACE_ZD(int x) : COMMON_LAPLACE(x) { set_xd(); set_zx(); }
-  COMMON_LAPLACE_ZD(COMMON_LAPLACE_ZD const& x) : COMMON_LAPLACE(x) {}
-  COMMON_LAPLACE_ZD* clone()const override {return new COMMON_LAPLACE_ZD(*this);}
+  COMMON_LAPLACE_ZD(COMMON_LAPLACE_ZD const& x) : COMMON_LAPLACE(x) { untested();}
+  COMMON_LAPLACE_ZD* clone()const override { untested();return new COMMON_LAPLACE_ZD(*this);}
 
   void precalc_last(const CARD_LIST* par_scope)override{ untested();
     COMMON_LAPLACE::precalc_last(par_scope);
@@ -230,7 +230,7 @@ public:
       return 0;
     }
   }
- // void precalc_first(const CARD_LIST* par_scope)override {
+ // void precalc_first(const CARD_LIST* par_scope)override { untested();
  //   COMMON_LAPLACE::precalc_first(par_scope);
  //   convert_nd();
  // }
@@ -284,8 +284,8 @@ private: // ELEMENT, pure
     assert(_input);
     return _input->tr_outvolts();
   }
-  double  tr_involts_limited()const override { incomplete(); return 0.; }
-  COMPLEX ac_involts()const override { incomplete(); return 0.; }
+  double  tr_involts_limited()const override { untested(); incomplete(); return 0.; }
+  COMPLEX ac_involts()const override { untested(); incomplete(); return 0.; }
 private: // BASE_SUBCKT
   void	  tr_begin()override	{assert(subckt()); subckt()->tr_begin(); ELEMENT::tr_begin();
       _s_[0]->_loss0 = 1.;
@@ -297,18 +297,18 @@ private: // BASE_SUBCKT
       }
 //      _output->_loss1 = _loss1;
   }
-  void	  tr_restore()override	{assert(subckt()); subckt()->tr_restore(); ELEMENT::tr_restore();}
-  void	  dc_advance()override; //{set_not_converged(); /*really?*/ assert(subckt()); subckt()->dc_advance();}
-  void	  tr_advance()override;	// {assert(subckt()); subckt()->tr_advance();}
+  void	  tr_restore()override	{ untested();assert(subckt()); subckt()->tr_restore(); ELEMENT::tr_restore();}
+  void	  dc_advance()override; //{ untested();set_not_converged(); /*really?*/ assert(subckt()); subckt()->dc_advance();}
+  void	  tr_advance()override;	// { untested();assert(subckt()); subckt()->tr_advance();}
   void	  tr_regress()override {
     set_not_converged();
     assert(subckt()); subckt()->tr_regress();
     ELEMENT::tr_regress();
   }
-  bool	  tr_needs_eval()const override; // {assert(subckt()); return subckt()->tr_needs_eval();}
-  // void	  tr_queue_eval()override {assert(subckt()); subckt()->tr_queue_eval();}
+  bool	  tr_needs_eval()const override; // { untested();assert(subckt()); return subckt()->tr_needs_eval();}
+  // void	  tr_queue_eval()override { untested();assert(subckt()); subckt()->tr_queue_eval();}
   void    tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }
-  bool	  do_tr()override; // {assert(subckt());set_converged(subckt()->do_tr());return converged();}
+  bool	  do_tr()override; // { untested();assert(subckt());set_converged(subckt()->do_tr());return converged();}
   void	  tr_load()override;
   TIME_PAIR tr_review()override	{assert(subckt()); return _time_by = subckt()->tr_review();}
   void	  tr_accept()override	{assert(subckt()); subckt()->tr_accept(); ELEMENT::tr_accept();}
@@ -601,7 +601,7 @@ int COMMON_LAPLACE::pivot() const
 //  return 0;
   COMMON_LAPLACE const* c = this;
   assert(c);
-  if(c->den_is_p()){
+  if(c->den_is_p()){ untested();
     return c->num_states()-1;
   }else{
   }
@@ -648,7 +648,7 @@ void LAPLACE::expand()
   int num_num = int(c->num_size());
   int num_s = std::max(dens, num_num);
   assert(c->num_states() == num_s || !c->num_states());
-  if(c->num_states()>num_s){
+  if(c->num_states()>num_s){ untested();
     num_s = c->num_states();
   }else{
   }
@@ -1036,7 +1036,7 @@ void LAPLACE::set_parameters(const std::string& Label, CARD *Owner,
   if(first_time){
     cc->_p_den.resize(dens);
     cc->_p_num.resize(nums);
-  }else{
+  }else{ untested();
   }
   int num_s = cc->num_states();
 
@@ -1141,7 +1141,7 @@ double LAPLACE::tr_amps() const
   if(_set_parameters){
     trace5("LAPLACE::tr_amps", r, _loss0, _input->tr_amps(), *_st_b_in_, _n[0].v0());
     trace3("LAPLACE::tr_amps", _st_b_in_[2], _output->tr_outvolts(), _output->tr_amps());
-  }else{
+  }else{ untested();
   }
   return r;
 }

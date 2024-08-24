@@ -40,12 +40,12 @@ public:
 private:
   explicit Token_XDT(const Token_XDT& P, Base const* data, Expression_ const* e = NULL)
     : Token_CALL(P, data, e) {} // , _item(P._item) {}
-  Token* clone()const override { return new Token_XDT(*this);}
+  Token* clone()const override { untested(); return new Token_XDT(*this);}
 
   void stack_op(Expression* e)const override;
   Branch* branch() const;
   Expression_ const* args() const{ untested();
-    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){
+    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){ untested();
       return a;
     }else{ untested();
       assert(!Token_CALL::args());
@@ -91,12 +91,13 @@ public:
       cl->set_label(filter_code_name); // label()); // "_b_" + filter_code_name);
       cl->set_code_name("_b_" + filter_code_name);
       if(na<3){
-      }else{ untested();
+      }else{
 	incomplete();
 	error(bDANGER, "too many arguments\n");
       }
       cl->set_num_args(na);
       cl->_m = &m;
+      m.set_tr_advance();
       m.push_back(cl); // cl?
     }
 
@@ -287,7 +288,7 @@ void Token_XDT::stack_op(Expression* e)const
       func->set_n_to_gnd();
     }else if(0 /*sth linear*/){ untested();
       // somehow set loss=0 and output ports to target.
-    }else{
+    }else{ untested();
     }
 
     auto d = new TData;

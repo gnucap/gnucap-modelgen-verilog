@@ -126,7 +126,6 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
       return a;
     }
   }else{
-    incomplete();
     Node_Ref pp = node(p);
 
     if(pp){
@@ -138,7 +137,7 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
     if(n==""){
       nn = &Node_Map::mg_ground_node;
     }else if( nn = node(n) ){
-    }else{
+    }else{ untested();
       throw Exception_No_Match(n + " does not exist");
     }
 
@@ -538,17 +537,26 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args)
 {
   auto f = prechecked_cast<FUNCTION_ const*>(f_);
   assert(f);
-//  if(dynamic_cast<MGVAMS_FUNCTION const*>(f)){ untested();
-    if(f->static_code()){
-      // return f->new_token(*this, num_args);
-      install(f);
-      return new Token_CALL(f->label(), f);
-    }else{
-      return f->new_token(*this, num_args);
-    }
-//   }else{ untested();
-//     return f->new_token(*this, num_args);
-//   }
+  Token* t = NULL;
+
+
+  if(f->has_tr_review()){
+    auto c = prechecked_cast<Token_CALL*>(t);
+    // assert(c);
+    // incomplete();
+   // c->set_used_in(tr_review_tag);
+  }else{
+  }
+
+  if(f->static_code()){
+    // return f->new_token(*this, num_args);
+    install(f);
+    t = new Token_CALL(f->label(), f);
+  }else{
+    t = f->new_token(*this, num_args);
+  }
+
+  return t;
 }
 /*--------------------------------------------------------------------------*/
 // std::string Variable_Decl::code_name() const

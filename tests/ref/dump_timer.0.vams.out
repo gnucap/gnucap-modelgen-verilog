@@ -1,0 +1,18 @@
+too many arguments
+module timer_test(out);
+  output out;
+  electrical out;
+  integer rst;
+
+  analog begin
+    rst = 0;
+    @(timer(1., 1.)) begin
+      rst = 1;
+    end
+    V(out) <+ idt(1.0, 0., rst);
+  end
+
+endmodule
+
+
+

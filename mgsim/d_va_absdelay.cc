@@ -35,10 +35,10 @@ namespace {
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class NATURE_current : public NATURE {
-  double abstol()const override {return 1e-12;}
+  double abstol()const override { untested();return 1e-12;}
 }_N_current;
 class NATURE_voltage : public NATURE {
-  double abstol()const override {return 1e-6;}
+  double abstol()const override { untested();return 1e-6;}
 }_N_voltage;
 class DISCIPLINE_electrical : public DISCIPLINE {
 public:
@@ -54,12 +54,12 @@ class _COMMON_VASRC_electrical : public COMMON_VASRC {
 public:
   _COMMON_VASRC_electrical(int i) : COMMON_VASRC(i){}
 private:
-  _COMMON_VASRC_electrical(_COMMON_VASRC_electrical const&p)     : COMMON_VASRC(p){}
+  _COMMON_VASRC_electrical(_COMMON_VASRC_electrical const&p)     : COMMON_VASRC(p){ untested();}
   COMMON_COMPONENT* clone()const override{ untested();
     return new _COMMON_VASRC_electrical(*this);
   }
   std::string name()const override{untested(); return "electrical";}
-  DISCIPLINE const* discipline()const override {return &_D_electrical;}
+  DISCIPLINE const* discipline()const override { untested();return &_D_electrical;}
 public:
 };
 static _COMMON_VASRC_electrical _C_V_electrical(CC_STATIC);
@@ -112,8 +112,8 @@ private: // ELEMENT, pure
   void tr_iwant_matrix() override;
   void ac_iwant_matrix() override;
   double tr_involts()const override;
-  double tr_involts_limited()const override { incomplete(); return 0.; }
-  COMPLEX ac_involts()const override { incomplete(); return 0.; }
+  double tr_involts_limited()const override { untested(); incomplete(); return 0.; }
+  COMPLEX ac_involts()const override { untested(); incomplete(); return 0.; }
 private: // BASE_SUBCKT
   void	  tr_begin()override;
   void	  tr_restore()override	{ untested();
@@ -284,13 +284,13 @@ void DELAY::tr_advance()
   ELEMENT::tr_advance();
   try{
     _out0 = _forward.v_out(_sim->_time0).f0;
-  }catch(Exception const&){
+  }catch(Exception const&){ untested();
     assert(0);
   }
 }
 /*--------------------------------------------------------------------------*/
 void DELAY::tr_regress()
-{
+{ untested();
   ELEMENT::tr_regress();
   _out0 = _forward.v_out(_sim->_time0).f0;
 }
@@ -540,7 +540,7 @@ void DELAY::ac_load()
 //	0, _n[input_idx()].m_(), mfactor_hack * _acg);
 
     auto _values = _ctrl_in;
-    for (int i=2; i<=_n_ports; ++i) {
+    for (int i=2; i<=_n_ports; ++i) { untested();
       ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i] * _acg);
     }
   }else{
@@ -572,13 +572,13 @@ void DELAY::tr_load()
   }
   trace1("DELAY::trload", lvf);
   if (lvf != 0.) {
-    if (_n[OUT1].m_() != 0) {
+    if (_n[OUT1].m_() != 0) { untested();
       _n[OUT1].i() -= mfactor() * lvf;
     }else{
     }
     if (_n[OUT2].m_() != 0) {
       _n[OUT2].i() += mfactor() * lvf;
-    }else{
+    }else{ untested();
     }
   }else{
   }

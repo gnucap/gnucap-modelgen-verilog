@@ -3,19 +3,23 @@ module dep0(d, g);
   electrical d, g;
   analog begin // always
     // S : 0
-    // T : 0
+    // T : 1
     // U : 1
+    // X : 1
     real T;
     real S;
     while (1) begin
       // S : 1
       // T : 1
-      T = T; // dep: _potential_b_g_ s
-      S = T; // dep: _potential_b_g_ s
-      T = V(g); // dep: _potential_b_g_
+      T = T; // dep: _potential_b_g_ s7
+      S = T; // dep: _potential_b_g_ s7
+      T = V(g); // dep: _potential_b_g_ s1
     end
     real U;
-    U = S; // dep: _potential_b_g_ s
+    real X;
+    U = S; // dep: _potential_b_g_ s6
+    T = U; // dep: _potential_b_g_ s7
+    X = U; // dep: _potential_b_g_ s7
   end
 
 endmodule

@@ -142,8 +142,10 @@ void MGVAMS_FILTER::setup(Module* m)
     }
     if(!has_refs()){
       set_p_to_gnd(m);
-    }else if(cont && cont->has_sensitivities()) { untested();
+   // }else if(cont && cont->has_sensitivities()) { untested();
+      // BUG.
     }else if(c_cnt == 1 && always && !output_var){
+      assert(cont);
       for(auto d : cont->ddeps()){
 	if(d->branch() != branch()) {
 	}else if(d.is_linear()){
@@ -163,7 +165,7 @@ void MGVAMS_FILTER::setup(Module* m)
     }else if(assigned){ untested();
     }else if(c_cnt!=1){ untested();
     }else{
-      // incomplete(); // later
+      incomplete(); // later
       // func->set_p_to_gnd();
     }
   }else{

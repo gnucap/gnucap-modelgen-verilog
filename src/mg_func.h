@@ -47,15 +47,23 @@ public:
 //  	_label = l;
 //  }
   ~FUNCTION_();
-  std::string const& label()const {
-    return short_label();
-  }
-  std::string const& key()const { // free?
-    return label();
-  }
+
+public: // characteristics
+  std::string const& label()const { return short_label(); }
+  std::string const& key()const { return label(); } // free?
   void set_num_args(size_t n){ _num_args = n; }
   size_t num_args() const { return _num_args; }
+  virtual bool has_tr_eval()const { untested();return true;}
+  virtual bool has_tr_review()const {return false;}
+  virtual bool has_tr_accept()const {return false;}
+  virtual bool has_tr_advance()const {return false;}
 
+  virtual bool static_code()const {return false;}
+  virtual bool is_common()const {return false;}
+  virtual bool has_modes()const {return false;}
+  virtual bool returns_void()const { return false; }
+
+public: // code generation
   virtual void make_cc_impl(std::ostream&)const {}
   virtual void make_cc_common(std::ostream&)const {}
   virtual void make_cc_dev(std::ostream&)const {}
@@ -64,8 +72,6 @@ public:
   virtual void make_cc_tr_review(std::ostream&)const {}
 
   virtual Token* new_token(Module&, size_t)const { untested();unreachable(); return NULL;}
-  virtual bool static_code()const {return false;}
-  virtual bool returns_void()const { return false; }
   virtual std::string code_name()const { itested();
 	  // incomplete();
 	  return "";

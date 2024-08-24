@@ -1,0 +1,16 @@
+module vcsw(p, n, cp, cn);
+  inout p, n, cp, cn;
+  electrical p, n, cp, cn;
+  parameter real th = 0;
+
+  analog begin
+    @(cross((V(cp, cn) - th), 0));
+    if ((V(cp, cn) > th)) begin
+      V(p, n) <+ 0;
+    end
+  end
+
+endmodule
+
+
+

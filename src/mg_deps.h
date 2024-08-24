@@ -141,7 +141,6 @@ private:
 };
 /*--------------------------------------------------------------------------*/
 class RDeps : public pSet<Base const> {
-
 };
 /*--------------------------------------------------------------------------*/
 class Branch;
@@ -181,6 +180,11 @@ public:
   bool is_linear()const;
   bool is_quadratic()const;
   void set_any() { _ddeps.set_any(); }
+public: // sens
+  //void add_rdep(Base const* x){ untested(); //  _rdeps.insert(x); //}
+ // bool is_used() const{ untested();
+ //   return _rdeps.size();
+ // }
 public: // sens
   void add_sens(Base* x) {
     _sens.add(x);

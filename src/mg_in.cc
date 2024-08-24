@@ -53,18 +53,18 @@ void Head::parse(CS& file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void Attribute_Spec::parse(CS& f)
-{
+{ untested();
   assert(owner());
   _key = f.ctos("=", "", "");
   trace2("Attribute_Spec", _key, f.tail().substr(0,18));
-  if( f >> '=' ){
+  if( f >> '=' ){ untested();
     // _expr = new ConstExpression(f, owner());
     _expr = new value_type;
 //    f >> *_expr;
-    if(f.match1('\"')) {
+    if(f.match1('\"')) { untested();
       f >> *_expr;
       *_expr = "\"" + *_expr + "\"";
-    }else{
+    }else{ untested();
       *_expr = f.ctos(",=;)*"); // , "\"'{(", "\"'})");
     }
   }else{ untested();
@@ -97,7 +97,7 @@ void Attribute_Instance::parse(CS& f)
       push_back(s);
       f.skip1(',');
     }
-  }else{
+  }else{ untested();
   }
 }
 #endif
@@ -125,6 +125,11 @@ void print_attributes(std::ostream& o, const void* x)
 }
 /*--------------------------------------------------------------------------*/
 template class List_Base<Base>;
+/*--------------------------------------------------------------------------*/
+bool is_file(Base const* f)
+{
+  return dynamic_cast<File const*>(f);
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

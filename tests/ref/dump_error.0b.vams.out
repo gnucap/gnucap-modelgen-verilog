@@ -1,0 +1,6 @@
+... 
+
+ analog
+  if(1) begin
+   bogus(17);
+              ^ ? bad analog block

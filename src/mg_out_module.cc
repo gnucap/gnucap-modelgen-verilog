@@ -69,7 +69,7 @@ void make_node_ref(std::ostream& o, const Node& n, bool used=true)
 {
   if(n.is_ground()) {
     o << "gnd";
-  }else if(!used){
+  }else if(!used){ untested();
     o << "gnd";
   }else{
     o << "_n[" << n.code_name() << "]";
@@ -93,7 +93,7 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
   o << "bool MOD_" << m.identifier() << "::tr_needs_eval()const\n{\n";
   o__ "trace2(\"" << m.identifier() <<"::needs_eval?\", long_label(), has_probes());\n";
   o__ "node_t gnd(&ground_node);\n";
-  o__ "if (is_q_for_eval()) { untested();\n";
+  o__ "if (is_q_for_eval()) {\n";
   o____ "return false;\n";
   o__ "}else if (!converged()) {\n";
   o____ "return true;\n";
@@ -139,6 +139,19 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
       "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+// DUP in code.cc
+static bool is_output_var(tag_t t)
+{
+  ATTRIB_LIST_p const& a = attr.attributes(t);
+  if(!a) {
+  }else if(a->operator[](std::string("desc")) != "0"
+         ||a->operator[](std::string("units")) != "0") {
+    return true;
+  }else{
+  }
+  return false;
+}
+/*--------------------------------------------------------------------------*/
 static void make_tr_probe_num(std::ostream& o, const Module& m)
 {
   o << "double MOD_" << m.identifier() << "::tr_probe_num(std::string const& n) const\n{\n";
@@ -151,12 +164,11 @@ static void make_tr_probe_num(std::ostream& o, const Module& m)
       auto const& a = attr.attributes(tag_t(p));
       if(v.first.substr(0, L) == PS_MANGLE_PREFIX){
 	// not a probe.
-      }else if(!a) {
-      }else if(a->operator[](std::string("desc")) != "0"
-             ||a->operator[](std::string("units")) != "0") {
+      }else if(is_output_var(tag_t(p))) {
 	o__ "if(n == \"" << v.first << "\"){\n";
 	o____ "return _v_" << p->name() << ";\n";
 	o__ "}\n";
+      }else{
       }
 
     }else{
@@ -174,7 +186,7 @@ static void make_tr_probe_num(std::ostream& o, const Module& m)
 static void make_set_parameters(std::ostream& o, const Element_2& e, std::string cn)
 {
   make_tag(o);
-  if(cn==""){
+  if(cn==""){ untested();
     cn = e.code_name();
   }else{
   }
@@ -190,7 +202,7 @@ static void make_set_parameters(std::ostream& o, const Element_2& e, std::string
   o << ", 0."; // value
   if (e.state() != "") {
     o << ", /*states:*/" << e.num_states() << ", " << e.state();
-  }else{
+  }else{ untested();
     o << ", 0, NULL";
   }
   o << ", " << e.num_nodes() << ", nodes);\n";
@@ -384,18 +396,16 @@ static void make_do_tr(std::ostream& o, const Module& m)
   o << "bool MOD_" << m.identifier() << "::do_tr()\n{\n";
   o__ "trace3(\"" << m.identifier() <<"::do_tr\", this, long_label(), _sim->iteration_number());\n";
   o__ "clear_branch_contributions();\n";
-  if(m.num_evt_slots()){
-    o__ "_evt_seek = 0;\n";
-  }else{
-  }
   o__ "read_probes();\n";
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
+
+  // if has_analog
   o__ "set_converged();\n";
   o__ "c->tr_eval_analog(this);\n";
-  // if analog?
   o__ "set_branch_contributions();\n";
+
   o__ "assert(subckt());\n";
   o__ "set_converged(subckt()->do_tr() && converged());\n";
   // o__ "return converged() && _sim->iteration_number() > 3;\n";
@@ -405,20 +415,53 @@ static void make_do_tr(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_tr_begin(std::ostream& o, const Module& m)
+{
+  o << "inline void MOD_" << m.identifier() << "::tr_begin()\n{\n";
+  o__ "BASE_SUBCKT::tr_begin();\n";
+  if(m.times()){
+    o__ "_time[0] = 0.;\n";
+    o__ "for (int i=" << m.times()-1 << "; i>0; --i) {\n";
+    o____ "_time[i] = 0;\n";
+    o__ "}\n";
+  }else{ untested();
+  }
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
 static void make_tr_advance(std::ostream& o, const Module& m)
 {
   o << "inline void MOD_" << m.identifier() << "::tr_advance()\n{\n";
+  o__ "COMMON_" << m.identifier() << " const* c = "
+    "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
+  o__ "assert(c);\n";
+  o__ "(void)c;\n";
+
   if(m.has_analysis()) {
-    o__ "COMMON_" << m.identifier() << " const* c = "
-      "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
-    o__ "assert(c);\n";
     o__ "if(_sim->_last_time == 0.){\n";
+    o__ "incomplete();\n";
     o__ "c->tr_eval_analog(this);\n";
     o__ "}else{\n";
     o__ "}\n";
   }else{
   }
+  if(m.times()){
+    o__ "for (int i=" << m.times()-1 << "; i>0; --i) {\n";
+    o____ "assert(_time[i] < _time[i-1] || _time[i] == 0.);\n";
+    o____ "_time[i] = _time[i-1];\n";
+    // _y[i] = _y[i-1];
+    o__ "}\n";
+    o__ "_time[0] = _sim->_time0;\n";
+  }else{
+  }
   o__ "set_not_converged();\n";
+
+  if(m.has_tr_advance_analog()){
+    o__ "c->tr_advance_analog(this);\n";
+  }else{
+  }
   for(auto f : m.funcs()){
     f->make_cc_tr_advance(o);
   }
@@ -428,32 +471,58 @@ static void make_tr_advance(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_tr_regress(std::ostream& o, const Module& m)
+{
+  o << "inline void MOD_" << m.identifier() << "::tr_regress()\n{\n";
+  o__ baseclass(m) << "::tr_regress();\n";
+  if(m.times()){
+    o__ "for (int i=" << m.times()-1 << "; i>0; --i) {\n";
+    o____ "assert(_time[i] < _time[i-1] || _time[i] == 0.);\n";
+    o__ "}\n";
+    o__ "_time[0] = _sim->_time0;\n";
+  }else{
+  }
+  o__ "set_not_converged();\n";
+
+  o__ "COMMON_" << m.identifier() << " const* c = "
+    "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
+  o__ "assert(c);\n";
+  o__ "c->tr_regress_analog(this);\n";
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
 static void make_tr_review(std::ostream& o, const Module& m)
 {
   o << "inline TIME_PAIR MOD_" << m.identifier() << "::tr_review()\n{\n";
-  if(m.num_evt_slots()){
-    o__ "if(_evt_seek){\n";
-    o____ "q_accept();\n";
-    o__ "}else ";
-  }else{
-    o__ "";
-  }
 #if 0
   if(m.has_analysis()){ untested();
     o << "if(_sim->analysis_is_tran_static()){ untested();\n";
     o____ "q_accept();\n";
     o__ "}else ";
-  }else{
+  }else{ untested();
     o__ "";
   }
 #endif
-  o << "{itested();\n";
-  o__ "}\n";
-  o__ "TIME_PAIR time_by = BASE_SUBCKT::tr_review();\n";
+  o__ "_time_by = BASE_SUBCKT::tr_review();\n";
+  o__ "COMMON_" << m.identifier() << " const* c = "
+    "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
+  o__ "assert(c);\n";
+  o__ "trace1(\"review0\", _time_by._event);\n";
+  o__ "c->tr_review_analog(this);\n";
+  o__ "trace1(\"review\", _time_by._event);\n";
   for(auto f : m.funcs()){
     f->make_cc_tr_review(o);
   }
-  o__ "return time_by;\n";
+  o << "{itested();\n";
+  o__ "}\n";
+  o__ "if(_accept){\n";
+  o____ "COMPONENT::q_accept();\n";
+  o____ "trace1(\"" << m.identifier() <<"::_accept\", _sim->_time0);\n";
+  o____ "_accept = 0;\n";
+  o__ "}\n";
+  o__ "return _time_by;\n";
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -462,23 +531,12 @@ static void make_tr_review(std::ostream& o, const Module& m)
 static void make_tr_accept(std::ostream& o, const Module& m)
 {
   o << "inline void MOD_" << m.identifier() << "::tr_accept()\n{\n";
-  if(m.num_evt_slots()){
-  o__ "for(unsigned i=0; i<_evt_seek; ++i){\n";
-  o____ "(*_evt[i])();\n";
-  // o____ "(this->*_evt[i])();\n";
-  o__ "}\n";
-  o__ "_evt_seek = 0;\n"; // needed?
-  }else{
-  }
-#if 0
-  if(m.has_analysis()) { untested();
-    o__ "COMMON_" << m.identifier() << " const* c = "
-      "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
-    o__ "assert(c);\n";
-    o__ "c->tr_eval_analog(this);\n";
-  }else{ untested();
-  }
-#endif
+  o__ "trace1(\"" << m.identifier() <<"::tr_accept\", _sim->_time0);\n";
+
+  o__ "COMMON_" << m.identifier() << " const* c = "
+    "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
+  o__ "assert(c);\n";
+  o__ "c->tr_accept_analog(this);\n"; // call from COMMON::tr_accept?
   o__ "return " << baseclass(m) << "::tr_accept();\n";
   o << "}\n"
     "/*--------------------------------------"
@@ -611,20 +669,25 @@ static void make_module_class(std::ostream& o, Module const& m)
     make_cc_analog(o, m);
   }else{
   }
-  if(m.has_events()){
-    make_tr_review(o, m);
-    make_tr_accept(o, m);
-  }else if(m.has_analysis()){
-    make_tr_review(o, m);
-    make_tr_accept(o, m);
-  }else if(m.has_tr_review()){
-    make_tr_review(o, m);
-    // make_tr_advance(o, m);
+
+  if(m.times()){
+    make_tr_begin(o, m);
   }else{
   }
 
-  if(m.has_analog_block()){
+  if(m.has_analysis()){
+    make_tr_review(o, m);
+  }else if(m.has_tr_review()){
+    make_tr_review(o, m);
+  }else{
+  }
+  if(m.has_tr_accept()){
+    make_tr_accept(o, m);
+  }else{
+  }
+  if(m.has_tr_advance()){
     make_tr_advance(o, m);
+    make_tr_regress(o, m);
   }else{
     assert(!m.has_analysis());
   }
@@ -728,7 +791,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
   std::string cn;
   if(cn_==""){
     cn = e.code_name();
-  }else{
+  }else{ untested();
     cn = cn_;
   }
 
@@ -1032,7 +1095,7 @@ static void make_cc_func(std::ostream& o, const Module& m)
     o____ "assert(m);\n";
     o____ "return m;\n";
     o__ "};\n";
-  }else{
+  }else{ untested();
   }
   for(FUNCTION_ const* f : m.funcs()){
     make_tag(o);
@@ -1070,7 +1133,7 @@ static void make_module_set_param_by_name(std::ostream& o, const Module& m)
   std::vector<int> idx(names.size());
   std::iota(idx.begin(), idx.end(), 0);
   std::sort(idx.begin(), idx.end(),
-      [&](int A, int B) -> bool {
+      [&](int A, int B) -> bool { untested();
       return *names[A] < *names[B];
       });
 
@@ -1108,7 +1171,7 @@ static void make_module_set_param_by_name(std::ostream& o, const Module& m)
     if(alias[n] == -1){
       assert(hs[n]);
       o__ "return COMPONENT::set_param_by_name(\"" << *hs[n] << "\", Value);\n";
-    }else{
+    }else{ untested();
       unreachable();
     }
     o____ "break; // " << alias[n] << "\n";

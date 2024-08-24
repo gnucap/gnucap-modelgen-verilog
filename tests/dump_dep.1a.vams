@@ -16,7 +16,10 @@ module dep0(d, g);
       T = V(g);
     end
     real U;
+    real X;
     U = S;
+    T = U;
+    X = U;
   end
 
 endmodule

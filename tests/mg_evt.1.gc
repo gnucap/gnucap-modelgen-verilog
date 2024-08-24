@@ -1,0 +1,40 @@
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+
+
+verilog
+
+`modelgen
+module test_evt1_0(p, n);
+	electrical p, n;
+	inout p, n;
+	analog begin
+		@(cross(V(p,n), 0)) begin
+			$debug("zero cross dbg %g %g\n", $abstime, V(p,n));
+			$write("zero cross     %g %g\n", $abstime, V(p,n));
+      end
+		@(above(V(p,n) - 1.5, 0)) begin
+			$debug("above 1.5 dbg %g %g\n", $abstime, V(p,n));
+			$write("above 1.5     %g %g\n", $abstime, V(p,n));
+      end
+	end
+endmodule
+
+list
+
+!make test_evt1_0.so > /dev/null
+attach ./test_evt1_0.so
+
+test_evt1_0 dut0(1,0);
+test_evt1_0 dut1(0,1);
+vsine #(.freq(1e6) .ampl(2) .samples(9)) vin(1,0);
+
+list
+
+print dc v(nodes) iter(0)
+dc
+print tran v(nodes) iter(0)
+tran 1e-6 basic
+
+end

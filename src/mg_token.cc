@@ -29,6 +29,11 @@
 #include <stack>
 #include <globals.h> // TODO: Expression->resolve?
 /*--------------------------------------------------------------------------*/
+rdep_tag tr_eval_tag;
+rdep_tag tr_review_tag;
+rdep_tag tr_advance_tag;
+rdep_tag tr_accept_tag;
+/*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
 static bool is_constant(Token const* t, bool val)
@@ -317,7 +322,7 @@ void Token_BINOP_::stack_op(Expression* E)const
     }else if(n=='-' && is_constant(t1, 0.)) {
       t1.erase();
       t2.push();
-    }else if(n=='+' && is_constant(t1, 0.)) {
+    }else if(n=='+' && is_constant(t1, 0.)) { untested();
       t1.erase();
       t2.push();
     }else if(name()=="&&" && is_constant(t1, 0.)){
@@ -400,7 +405,7 @@ void Token_BINOP_::stack_op(Expression* E)const
 //  }else if(t1==t2, '-'){ ...
   }else{
     // t2 is constant?
-    if(n=='+' && is_constant(t2, 0.)){
+    if(n=='+' && is_constant(t2, 0.)){ untested();
       t2.erase();
       t1.push();
     }else if(n=='*' && is_constant(t2, 1.)){
@@ -469,7 +474,7 @@ void Token_TERNARY_::stack_op(Expression* E)const
     }
 
   }else{
-    TData* data = new TData;
+    TData* deps = new TData;
 
     auto SE = prechecked_cast<Expression_*>(E);
     assert(SE);
@@ -481,7 +486,7 @@ void Token_TERNARY_::stack_op(Expression* E)const
       // already stackopped? just clone..
       (**i).stack_op(t);
     }
-    data->update(t->data());
+    deps->update(t->data());
 
     Expression_* f = new Expression_;
     f->set_owner(SE->owner());
@@ -490,9 +495,9 @@ void Token_TERNARY_::stack_op(Expression* E)const
       // already stackopped? just clone..
       (**i).stack_op(f);
     }
-    data->update(f->data());
+    deps->update(f->data());
 
-    E->push_back(new Token_TERNARY_(name(), cond, t, f, data));
+    E->push_back(new Token_TERNARY_(name(), cond, t, f, deps));
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -509,7 +514,7 @@ static TData* new_deps(Base const* data)
       }
     }
     return d;
-  }else{
+  }else{ untested();
     assert(0);
     return new TData;
   }
@@ -534,9 +539,9 @@ void Token_CALL::stack_op(Expression* e) const
       pl->set_args(NULL);
       E->pop_back();
       delete(pl);
-    }else{
+    }else{ untested();
     }
-  }else if(dynamic_cast<Token_PARLIST const*>(E->back())) {
+  }else if(dynamic_cast<Token_PARLIST const*>(E->back())) { untested();
     assert(0);
   }else{
   }
@@ -555,6 +560,7 @@ void Token_CALL::stack_op(Expression* e) const
     }else{ untested();
     }
     if(f){
+      incomplete();
       trace2("CALL stackopped", name(), E->back()->name());
     }else{
       auto SE = prechecked_cast<Expression_*>(E);
@@ -569,6 +575,7 @@ void Token_CALL::stack_op(Expression* e) const
       // here?
       TData* deps = new_deps(arg_expr);
       deps->set_any();
+
       E->push_back(new Token_CALL(*this, deps, EE));
     }
     delete T1;
@@ -582,7 +589,7 @@ void Token_CALL::stack_op(Expression* e) const
   }else if(!dynamic_cast<const Token_PARLIST*>(E->back())) {
     // SFCALL
     E->push_back(new Token_CALL(*this, const_deps.clone()));
-  }else{
+  }else{ untested();
     trace2("no params?", name(), E->back()->name());
     incomplete();
   }
@@ -608,7 +615,7 @@ size_t Token_ACCESS::num_deps() const
 { untested();
   if(auto t=dynamic_cast<TData const*>(data())){ untested();
     return t->ddeps().size();
-  }else{
+  }else{ untested();
     // incomplete();
     return 0;
   }
@@ -957,7 +964,7 @@ void Token_PARLIST_::stack_op(Expression* E) const
 }
 /*--------------------------------------------------------------------------*/
 Token* VAMS_ACCESS::new_token(Module& m, size_t na)const
-{
+{ untested();
   unreachable(); // obsolete.
   // use na?
   Branch_Ref br = m.new_branch(_arg0, _arg1);
@@ -982,7 +989,7 @@ Token* Probe::new_token(Module&, size_t na)const
     }else if(_type==t_flow){
       assert(discipline()->flow());
       name = discipline()->flow()->access().to_string();
-    }else{
+    }else{ untested();
       name = "UNKNOWN";
     }
   }else if(_type==t_pot){ untested();
@@ -1026,12 +1033,12 @@ Data_Type const& Token_VAR_REF::type() const
 {
   if(auto it=dynamic_cast<Assignment const*>(_item)){
     return it->type();
-  }else if(auto p = dynamic_cast<Variable_Decl const*>(_item)){
+  }else if(auto p = dynamic_cast<Variable_Decl const*>(_item)){ untested();
     assert(p);
     return p->type();
   }else if(auto af = dynamic_cast<Analog_Function const*>(_item)){
     return af->type();
-  }else{
+  }else{ untested();
     unreachable();
     static Data_Type_Real t;
     return t;
@@ -1278,14 +1285,6 @@ Token_VAR_REF* Token_VAR_REF::deep_copy(Base* /*owner*/, std::string prefix)cons
     unreachable();
     return new Token_VAR_REF(*this);
   }
-}
-/*--------------------------------------------------------------------------*/
-bool Token_VAR_REF::is_used() const
-{ untested();
-  auto td = prechecked_cast<TData const*>(data());
-  assert(td);
-  incomplete();
-  return false;
 }
 /*--------------------------------------------------------------------------*/
 #if 0

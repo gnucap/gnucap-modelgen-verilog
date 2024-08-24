@@ -9,12 +9,30 @@ module dep0(d, g);
   electrical d, g;
   analog begin
     real c;
+    real d;
     real T;
     while(1) begin
       I(d) <+ c;
       c = T;
       T = V(g);
     end
-  end
 
+    d = c;
+  end
+endmodule
+
+module dep1(out0, out1, in0, in1)
+	electrical out0, out1;
+	electrical in0, in1;
+	electrical fwd, ref;
+	branch (out0, out1) out;
+	branch (in0, in1) in;
+	parameter real pp = -1e2;
+	real vfwd;
+	analog begin
+      I(out) <+ V(out)/2;
+
+		vfwd = ddt(2.*V(in)-V(ref));
+		I(out) <+ vfwd;
+	end
 endmodule

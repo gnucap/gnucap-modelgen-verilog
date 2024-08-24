@@ -241,6 +241,7 @@ static void make_common(std::ostream& o, const Module& m)
   o << "class MOD_" << m.identifier() << ";\n";
   o << "class " << class_name << " :public " << base_class_name << "{\n";
   o__ "typedef MOD_" << m.identifier() << " MOD;\n";
+  o__ "typedef enum { m_TR_ADVANCE, m_TR_ACCEPT, m_PRECALC, m_TR_REVIEW }eval_t;\n";
   if(m.circuit()->element_list().size()){
   o << "public:\n";
     o__ "PARAM_LIST _netlist_params;\n";
@@ -268,6 +269,19 @@ static void make_common(std::ostream& o, const Module& m)
   o__ "void precalc_last(const CARD_LIST*)override;\n";
   // if has_analog?
   o__ "void tr_eval_analog(MOD_" << m.identifier() << "*)const;\n";
+  if(m.has_tr_review() && m.has_analog_block()){
+    o__ "void tr_review_analog(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
+  if(m.has_tr_accept() && m.has_analog_block()){
+    o__ "void tr_accept_analog(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
+  if(m.has_tr_advance() && m.has_analog_block()){
+    o__ "void tr_advance_analog(MOD_" << m.identifier() << "*)const;\n";
+    o__ "void tr_regress_analog(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
   o__ "void precalc_analog(MOD_" << m.identifier() << "*)const;\n";
   o__ "std::string name()const override {itested();return \"" << m.identifier() << "\";}\n";
 //    "  const SDP_CARD* sdp()const {return _sdp;}\n"
@@ -438,11 +452,21 @@ static void make_module(std::ostream& o, const Module& m)
   o << "class " << class_name << " : public " << base_name << " {\n";
   o << "private:\n";
   o__ "static int _count;\n";
+ // o__ "bool _eval{false};\n";
+  if(m.has_tr_review()){
+    o__ "bool _accept{false};\n";
+  }else{
+  }
   o << "public:\n";
   declare_ddouble(o, m);
   o << "private: // data\n";
   size_t total_nodes = m.circuit()->nodes().size();
   o__ "node_t _nodes[" << total_nodes << "];\n";
+  if(m.times()){
+    o__ "double _time[" << m.times() << "];\n";
+    o__ "TIME_PAIR _time_by;\n";
+  }else{
+  }
   o << "public: // netlist\n";
   if(m.circuit()->element_list().size()){
     make_cc_elements(o, m.circuit()->element_list());
@@ -467,18 +491,6 @@ static void make_module(std::ostream& o, const Module& m)
   }
   o << "private: // func decl\n";
   make_func_dev(o, m.funcs());
-  if(m.has_events()){
-    o << "private: // evt, tasks\n";
-    o__ "unsigned _evt_seek{0};\n";
-  //  o__ "void("<<class_name<<"::*_evt[" << m.num_evt_slots() << "])();\n";
-    o__ "va::EVT const* _evt[" << m.num_evt_slots() << "];\n";
-    o__ "void q_evt(va::EVT const* c){\n";
-  //  o__ "void q_evt(void ("<< class_name <<"::*c)()) {\n";
-    o____ "assert(_evt_seek<" << m.num_evt_slots() << ");\n";
-    o____ "_evt[_evt_seek++] = c;\n";
-    o__ "}\n";
-  }else{
-  }
   o << "private: // construct\n";
   o__ "explicit MOD_" << m.identifier() << "(MOD_" << m.identifier() << " const&);\n";
   o << "public:\n";
@@ -504,14 +516,25 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "void precalc_last()override;\n";
   o__ "void zero_filter_readout();\n";
   o__ "//void    map_nodes();         //BASE_SUBCKT\n";
-  o__ "//void    tr_begin();          //BASE_SUBCKT\n";
+  if(m.times()){
+  o__ "void    tr_begin()override;\n";
+  }else{
+  }
   o__ "//void    tr_restore();        //BASE_SUBCKT\n";
   o__ "void    tr_load()override{ trace1(\"tr_load\", long_label());BASE_SUBCKT::tr_load();}\n";
-  if(m.num_evt_slots() || m.has_analysis() ){
+
+  if(m.has_tr_review()){
     o__ "TIME_PAIR  tr_review()override;\n";
-    o__ "void    tr_accept()override;\n";
-  }else if(m.has_tr_review()){
-    o__ "TIME_PAIR  tr_review()override;\n";
+    o__ "void q_accept() { _accept = 1; }\n";
+  }else{
+  }
+  if(m.has_tr_accept()){
+    o__ "void tr_accept()override;\n";
+  }else{
+  }
+  if(m.has_tr_advance()){
+    o__ "void tr_advance()override;\n";
+    o__ "void tr_regress()override;\n";
   }else{
   }
   if(m.has_analysis()){
@@ -530,10 +553,9 @@ static void make_module(std::ostream& o, const Module& m)
     o__ "//bool    do_tr();             //BASE_SUBCKT\n";
   }else{
     o__ "void      dc_advance()override {set_not_converged(); BASE_SUBCKT::dc_advance();}\n";
-    o__ "void      tr_advance()override;\n";
-    o__ "void      tr_regress()override {set_not_converged(); BASE_SUBCKT::tr_regress();}\n";
     o__ "bool      tr_needs_eval()const override;\n";
     o__ "void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }\n";
+   //  o__ "void q_eval() { COMPONENT::q_eval(); }\n";
     o__ "bool      do_tr() override;\n";
 //    o__ "void      ac_begin() override;\n";
 //    o__ " void    do_ac();\n";

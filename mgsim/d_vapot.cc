@@ -40,14 +40,14 @@ protected: // override virtual
     _loss0 = 1./OPT::shortckt;
   }
   double   tr_involts()const override	{ return tr_outvolts();}
-  double   tr_involts_limited()const override {return tr_outvolts_limited();}
+  double   tr_involts_limited()const override { untested();return tr_outvolts_limited();}
   double   tr_amps()const override;
   void	   ac_iwant_matrix()override	{ac_iwant_matrix_extended();}
   void	   ac_load()override;
   COMPLEX  ac_involts()const override	{itested(); return NOT_VALID;}
   COMPLEX  ac_amps()const override	{itested(); return NOT_VALID;}
 
-  bool has_iv_probe()const override{return true;}
+  bool has_iv_probe()const override{ untested();return true;}
 public:
   void set_parameters(const std::string& Label, CARD* Parent,
 		      COMMON_COMPONENT* Common, double Value,

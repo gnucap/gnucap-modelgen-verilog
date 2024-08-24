@@ -1,4 +1,4 @@
-test_task0 #() dut ();
+test_strobe0 #() dut ();
 #           iter(0)   
 1hello 1.000000
 2hello            foo 1.000000

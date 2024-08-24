@@ -122,22 +122,22 @@ public:
   explicit DEV_CPOLY_CAP();
   ~DEV_CPOLY_CAP();
 protected: // override virtual
-  char	   id_letter()const override	{unreachable(); return '\0';}
-  std::string value_name()const override{incomplete(); return "";}
-  std::string dev_type()const override	{unreachable(); return "cpoly_cap";}
+  char	   id_letter()const override	{ untested();unreachable(); return '\0';}
+  std::string value_name()const override{ untested();incomplete(); return "";}
+  std::string dev_type()const override	{ untested();unreachable(); return "cpoly_cap";}
   int	   max_nodes()const override	{return net_nodes();}
   int	   min_nodes()const override	{return net_nodes();}
   int	   matrix_nodes()const override	{return _n_ports*2;}
   int	   net_nodes()const override	{return _n_ports*2;}
-  CARD*	   clone()const override        {unreachable();return new DEV_CPOLY_CAP(*this);}
+  CARD*	   clone()const override        { untested();unreachable();return new DEV_CPOLY_CAP(*this);}
   void	   tr_iwant_matrix()override	{tr_iwant_matrix_extended();}
   void     precalc_last() override;
   bool	   tr_needs_eval()const override;
   bool	   do_tr()override;
   void	   tr_load()override;
   void	   tr_unload()override;
-  double   tr_involts()const override	{return dn_diff(_n[IN1].v0(), _n[IN2].v0());}
-  double   tr_involts_limited()const override {return volts_limited(_n[IN1],_n[IN2]);}
+  double   tr_involts()const override	{ untested();return dn_diff(_n[IN1].v0(), _n[IN2].v0());}
+  double   tr_involts_limited()const override { untested();return volts_limited(_n[IN1],_n[IN2]);}
   double   tr_amps()const override;
   void	   ac_iwant_matrix()override	{ac_iwant_matrix_extended();}
   void	   ac_load()override;
@@ -183,13 +183,13 @@ public:
   explicit DEV_DDT() :DEV_CPOLY_CAP() {}
   // explicit DEV_DDT(isrc) :DEV_CPOLY_CAP() {...} // TODO
 private: // override virtual
-  char	   id_letter()const override	{unreachable(); return '\0';}
-  std::string dev_type()const override	{unreachable(); return "ddt";}
+  char	   id_letter()const override	{ untested();unreachable(); return '\0';}
+  std::string dev_type()const override	{ untested();unreachable(); return "ddt";}
   CARD*	   clone()const override	{return new DEV_DDT(*this);}
   bool	   do_tr()override;
   void	   tr_begin()override;
   void	   tr_advance()override;
-  TIME_PAIR tr_review()override; //		{return _time_by.reset();}//BUG//review(_i0.f0, _it1.f0);}
+  TIME_PAIR tr_review()override; //		{ untested();return _time_by.reset();}//BUG//review(_i0.f0, _it1.f0);}
 }p4;
 DISPATCHER<CARD>::INSTALL d_ddt(&device_dispatcher, "va_ddt", &p4);
 // DEV_DDT p4i(I);
@@ -228,8 +228,8 @@ private:
 public:
   explicit DEV_IDT() :DEV_CPOLY_CAP() {}
 private: // override virtual
-  char	   id_letter()const override	{unreachable(); return '\0';}
-  std::string dev_type()const override	{unreachable(); return "idt";}
+  char	   id_letter()const override	{ untested();unreachable(); return '\0';}
+  std::string dev_type()const override	{ untested();unreachable(); return "idt";}
   CARD*	   clone()const override	{return new DEV_IDT(*this);}
   bool	   do_tr()override;
   double   tr_amps()const override; // HACK

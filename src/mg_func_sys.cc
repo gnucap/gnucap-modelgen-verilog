@@ -183,7 +183,7 @@ public:
     : Token_CALL(Name, f) {}
 private:
   explicit Token_PG(const Token_PG& P, Base const* data=NULL)
-    : Token_CALL(P, data) {}
+    : Token_CALL(P, data) { untested();}
   Token* clone()const override { untested();
     return new Token_PG(*this);
   }

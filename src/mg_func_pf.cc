@@ -37,7 +37,7 @@ public:
     : Token_CALL(Name, f) {}
 private:
   explicit Token_PF(const Token_PF& P, Base const* data, Expression_ const* e = NULL)
-    : Token_CALL(P, data, e) {} // , _item(P._item) {}
+    : Token_CALL(P, data, e) { untested();} // , _item(P._item) {}
   Token_PF* clone()const override { return new Token_PF(*this);}
 
   void stack_op(Expression* e)const override;
@@ -79,7 +79,7 @@ private:
 	 o__ "}\n";
   }
 #if 0
-  void make_cc_common(std::ostream& o)const override {
+  void make_cc_common(std::ostream& o)const override { untested();
 //    o__ "double " << code_name() << "(int i, BASE_SUBCKT const* c)const {\n";
 //	 o____ "return va::" << code_name() << "(i, c);\n";
 //	 o__ "}\n";
@@ -133,7 +133,7 @@ void Token_PF::stack_op(Expression* E)const
 		c->set_args(args()->clone());
 		assert(args());
 		E->push_back(c);
-	}else{
+	}else{ untested();
 		E->push_back(clone());
 	}
 }

@@ -31,27 +31,35 @@ class Statement : public Owned_Base {
 protected:
   explicit Statement() : Owned_Base() {}
 public:
-  virtual Statement* deep_copy(Base*)const
+  virtual Statement* deep_copy(Base*)const // = 0;?
     { untested();unreachable();return NULL;}
-  virtual bool propagate_rdeps(RDeps const&){ untested();
-    incomplete();
-    return false;
-  }
-  virtual bool propagate_deps(Token const&){ untested();
-    incomplete();
-    return false;
-  }
+  virtual bool propagate_rdeps(RDeps const&);
+  bool propagate_rdep(Base const*);
   virtual bool update() = 0;
 //  virtual Statement* parent_stmt();
   virtual Block* scope() { return Owned_Base::owner(); }
   virtual Block const* scope() const { return Owned_Base::owner(); }
   virtual bool is_used_in(Base const*)const;
+  virtual Base* owner_() {
+    if(scope()){
+      return scope()->owner();
+    }else{ untested();
+      return NULL;
+    }
+  }
 
+public:
+  virtual RDeps const& rdeps()const { return _rdeps; }
+private:
+  void set_rdeps(TData const&);
+//protected:
+//  void store_rdeps(Rdeps const&);
+public:
   bool set_used_in(Base const*b);
   void unset_used_in(Base const*b){} // later.
+  RDeps const& rdeps_()const {return _rdeps;} // dump_annotate
 protected:
-  RDeps const& rdeps()const {return _rdeps;}
-  void set_rdeps(TData const&);
+ // void set_rdeps(TData const&);
 public:
   bool is_reachable()const;
   bool is_always()const;
@@ -93,6 +101,7 @@ class Variable_Decl : public Expression_ {
   Data_Type _type;
   TData* _data{NULL};
   Token_VAR_REF* _token{NULL};
+  RDeps _rdeps; // Expression_?
   std::string /*TODO*/ _dimensions;
 public:
   explicit Variable_Decl() : Expression_() { }
@@ -149,29 +158,31 @@ public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   Variable_Stmt* deep_copy_(Block* owner, std::string prefix="") const;
-  bool is_used_in(Base const*)const override;
 //  void set_owner(Block* b){ untested(); Statement::set_owner(b); }
   const_iterator begin()const { return _l.begin(); }
   const_iterator end()const { return _l.end(); }
   Variable_Stmt* deep_copy(Base*)const override
     { untested();unreachable();return NULL;}
   bool update() override;
+  bool is_used_in(Base const* b)const override;
+  RDeps const& rdeps()const override{
+    static RDeps r; return r;
+  }
 };
 /*--------------------------------------------------------------------------*/
 class Assignment : public Expression_ {
-protected: // from Variable
+protected:
   TData* _data{NULL};
   Token_VAR_REF* _token{NULL};
 protected:
   Token_VAR_REF* _lhsref{NULL};
-//  Expression_ _rhs;
 public:
   explicit Assignment(CS& f, Base* o);
   explicit Assignment() : Expression_() {}
   ~Assignment();
 public:
   //bool has_deps()const { untested(); return _data; }
-  TData const& data()const { assert(_data); return *_data; }
+  TData const& data()const;
   bool is_int() const;
   Data_Type const& type()const;
   Expression_ const& rhs()const {return *this;}
@@ -182,12 +193,12 @@ public:
   void parse(CS& cmd) override;
   void dump(std::ostream&)const override;
   bool propagate_deps(Token_VAR_REF const&);
-  bool update(RDeps const* r);
-// protected:
-  void set_lhs(Variable_Decl* v);
+ // bool update();
+  bool update(RDeps const* r=NULL);
 
   void parse_rhs(CS& cmd);
-  RDeps const* rdeps() const;
+  RDeps const& rdeps() const { static RDeps r; return r; } // dump_annotate.
+  Sensitivities const& sensitivities()const;
   bool has_sensitivities()const;
 //  Block const* scope() const;
   bool is_used_in(Base const*b)const;
@@ -217,10 +228,9 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Sensitivities;
-// code.h?
 class SeqBlock : public Block {
   String_Arg _identifier;
-  Sensitivities* _sens{NULL};
+  Sensitivities* _sens{NULL}; // here?
 public:
   explicit SeqBlock() : Block() {}
   ~SeqBlock();
@@ -251,6 +261,8 @@ public:
   void merge_sens(Sensitivities const& s);
   map const& variables()const {return _var_refs;}
   bool update();
+public:
+  bool propagate_rdeps(RDeps const&);
 }; // SeqBlock
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -12,11 +12,11 @@ public:
   using CKT_BASE::set_attributes;
   using CKT_BASE::erase_attributes;
   using CKT_BASE::has_attributes;
-//  const ATTRIB_LIST_p& attributes(tag_t x)const {return _attribs.at(x);}
-//  ATTRIB_LIST_p&   set_attributes(tag_t x)	{return _attribs[x];}
-//  bool		   has_attributes(tag_t x)const {return attributes(x);}
-//  void		 erase_attributes(tag_t x)	{_attribs.erase(x);}
-//  void	     erase_attributes(tag_t b, tag_t e) {_attribs.erase(b,e);}
+//  const ATTRIB_LIST_p& attributes(tag_t x)const { untested();return _attribs.at(x);}
+//  ATTRIB_LIST_p&   set_attributes(tag_t x)	{ untested();return _attribs[x];}
+//  bool		   has_attributes(tag_t x)const { untested();return attributes(x);}
+//  void		 erase_attributes(tag_t x)	{ untested();_attribs.erase(x);}
+//  void	     erase_attributes(tag_t b, tag_t e) { untested();_attribs.erase(b,e);}
   void move_attributes(tag_t from, tag_t to) {
     assert(!has_attributes(to)); //for now.
     if(has_attributes(from)){
@@ -26,12 +26,12 @@ public:
     }
   }
 #if 0
-  ATTRIB_LIST& chown(ATTRIB_LIST& a, tag_t Old, tag_t New) {
-    if(_owner == Old){
+  ATTRIB_LIST& chown(ATTRIB_LIST& a, tag_t Old, tag_t New) { untested();
+    if(_owner == Old){ untested();
       _owner = New;
-      if(_up){
+      if(_up){ untested();
 	_up->chown(Old, New);
-      }else{
+      }else{ untested();
       }
     }else{untested();
     }
@@ -488,7 +488,7 @@ public:
     if(!b){ untested();
     }else if(b->is_never()){ untested();
       set_never();
-    }else if(b->is_always()){
+    }else if(b->is_always()){ untested();
       set_always();
     }else{
     }

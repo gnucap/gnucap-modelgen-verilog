@@ -64,17 +64,19 @@ public:
   void dump(std::ostream& out)const override;
 // private:
   Base* owner(){ return _owner; }
-  Base const* owner() const { untested(); return _owner; }
+  Base const* owner() const { return _owner; }
   Block* scope();
   Block const* scope()const { return const_cast<Expression_*>(this)->scope(); }
 public:
   void clear();
   Expression_* clone() const;
   TData const& data()const; // hmm
+//  TData const& deps()const{ untested();return data();}
   // Attrib const& attrib()const;
   bool update(RDeps const* r=NULL);
   void set_dep(Base*);
   void set_rdeps(RDeps const&);
+  bool is_used_in(Base const*)const;
 private:
   bool propagate_rdeps(RDeps const& r);
 //  TData& mutable_deps();
@@ -83,6 +85,7 @@ private: // all the same eventually?
   Token* resolve_system_task(FUNCTION_ const* t);
   Probe const* new_probe(std::string const& xs, Branch_Ref const& br);
 }; // Expression_
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

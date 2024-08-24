@@ -1,0 +1,36 @@
+
+
+attach ./modelgen_0.so
+
+
+verilog
+
+`modelgen
+module test_strobe1()
+	analog begin
+		real one;
+		$strobe("0 %f", one);
+		one = 1.;
+		if(one) begin
+			$strobe("1 %f", one);
+		end
+		if(1) begin
+			$strobe("2 %f", one);
+		end
+	end
+endmodule
+
+!make test_strobe1.so > /dev/null
+attach ./test_strobe1.so
+
+test_strobe1 #() dut();
+
+list
+
+print dc iter(0)
+dc
+
+options gmin 1e-6
+print tr iter(0)
+tr 1
+end

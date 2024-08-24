@@ -125,7 +125,7 @@ Port_3* Circuit::find_port(std::string const& n)
 bool Branch::is_used_in(Base const* b)const
 {
   for(auto& i : _used_in){
-    if(i == b){
+    if(i == b){ untested();
       return true;
     }else{
     }

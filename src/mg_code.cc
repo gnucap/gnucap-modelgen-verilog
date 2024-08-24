@@ -76,6 +76,8 @@ void Variable_Decl::new_var_ref_()
   }
 }
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 // generic?
 Variable_Stmt* Variable_Stmt::deep_copy_(Block* owner, std::string prefix) const
 {
@@ -101,7 +103,7 @@ static bool is_output_var(tag_t t)
   }else if(a->operator[](std::string("desc")) != "0"
          ||a->operator[](std::string("units")) != "0") {
     return true;
-  }else{
+  }else{ untested();
   }
   return false;
 }
@@ -123,12 +125,14 @@ void Variable_Decl::new_data()
     p = &mod->variables();
   }else{
   }
-  _data = new TData();
-  if(p){
-    incomplete();
-    // _data->add_rdep(p);
-  }else{
-  }
+  // _rdeps.add(p);
+   _data = new TData();
+   if(p){
+  incomplete();
+   }
+ //    _data->add_rdep(p);
+ //  }else{ untested();
+ //  }
 }
 /*--------------------------------------------------------------------------*/
 Variable_Decl* Variable_Decl::deep_copy(Base* b, std::string s) const
@@ -144,12 +148,31 @@ Variable_Decl* Variable_Decl::deep_copy(Base* b, std::string s) const
   assert(n->type());
   attr.set_attributes(tag_t(n)) = attr.attributes(tag_t(l));
   n->new_data();
+  assert(n->_data);
   n->_token = new Token_VAR_DECL(s+_token->name(), n, n->_data);
   attr.set_attributes(tag_t(n->_token)) = attr.attributes(tag_t(l));
   assert(n->_token->type());
   l->scope()->new_var_ref(n->_token);
-  assert(n->_token->data());
+
+  if(n->_token->data()){
+  }else{ untested();
+  }
   return n;
+}
+/*--------------------------------------------------------------------------*/
+// inline?
+bool Expression_::is_used_in(Base const* b) const
+{
+ //  for(auto& i : data().rdeps()) { untested();
+ //    trace2("AnalogEvtCtrlStmt::is_used_in", i, b);
+ //    if(i == b){ untested();
+ //      return true;
+ //    }else{ untested();
+ //    }
+ //  }
+  {
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

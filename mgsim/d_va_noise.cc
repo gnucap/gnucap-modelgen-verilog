@@ -111,7 +111,7 @@ public:
       return 2;
     }else if(N == "$mfactor"){ untested();
       // incomplete, mfactor transition.
-      try{ COMMON_COMPONENT::set_param_by_name("$mfactor", V); }catch(Exception const&){}
+      try{ untested(); COMMON_COMPONENT::set_param_by_name("$mfactor", V); }catch(Exception const&){}
       return 2+COMMON_COMPONENT::set_param_by_name("m", V);
     }else{ untested();
       throw Exception_No_Match(N);
@@ -133,7 +133,7 @@ class DEV_NOISE : public ELEMENT /* COMPONENT? */ {
 public:
   explicit DEV_NOISE(COMMON_COMPONENT* p) : ELEMENT(p){ }
   explicit DEV_NOISE(const DEV_NOISE& p) : ELEMENT(p){ }
-  explicit DEV_NOISE() : ELEMENT() { }
+  explicit DEV_NOISE() : ELEMENT() { untested(); }
 public: // make noise
   double value()const{
     if(_values){
@@ -168,7 +168,7 @@ private: // override virtual
     // BUG: stray call. no side effect.
   }
   void precalc_last()override;
-  char	   id_letter()const override{return '\0';}
+  char	   id_letter()const override{ untested();return '\0';}
   std::string value_name()const override{return "";}
   std::string dev_type()const override{
     assert(common());
@@ -176,15 +176,15 @@ private: // override virtual
   }
   int	max_nodes()const override {return 2;}
   int	min_nodes()const override {return 2;}
-  int	matrix_nodes()const override {return 2;}
+  int	matrix_nodes()const override { untested();return 2;}
   int	net_nodes()const override {return 2;}
-  bool	has_iv_probe()const override {return false;}
-  bool	use_obsolete_callback_parse()const override {return false;}
+  bool	has_iv_probe()const override { untested();return false;}
+  bool	use_obsolete_callback_parse()const override { untested();return false;}
   CARD*	clone()const override {return new DEV_NOISE(*this);}
   void tr_iwant_matrix()override{}
   void tr_begin()override {}
   void tr_load()override {}
-  void tr_unload()override {}
+  void tr_unload()override { untested();}
   void ac_iwant_matrix()override {}
   void ac_begin()override {}
   void dc_advance()override {}
@@ -208,9 +208,9 @@ private: // override virtual
     }
   }
 private: // purely virtual in ELEMENT
-  double tr_involts()const override {return tr_outvolts();}
-  double tr_involts_limited()const override { return 0.; }
-  COMPLEX  ac_involts()const override {return ac_outvolts();}
+  double tr_involts()const override { untested();return tr_outvolts();}
+  double tr_involts_limited()const override { untested(); return 0.; }
+  COMPLEX  ac_involts()const override { untested();return ac_outvolts();}
 
 private:
   std::string port_name(int i)const override{
@@ -305,9 +305,9 @@ private:
   explicit MEAS_NOISE(const MEAS_NOISE& p) : ELEMENT(p) {}
 public:
   explicit MEAS_NOISE(COMMON_COMPONENT* cc) : ELEMENT(cc) {}
-  explicit MEAS_NOISE()	: ELEMENT() {}
+  explicit MEAS_NOISE()	: ELEMENT() { untested();}
 private: // override virtual
-  char id_letter()const override {return '\0';}
+  char id_letter()const override { untested();return '\0';}
   std::string value_name()const override {return "#";}
   std::string dev_type()const override {return "meas_noise";}
   CARD* clone()const override {return new MEAS_NOISE(*this);}
@@ -320,15 +320,15 @@ private: // override virtual
   //}
   int max_nodes()const override	{return 2;}
   int min_nodes()const override	{return 1;}
-  int matrix_nodes()const override	{return 0;}
+  int matrix_nodes()const override	{ untested();return 0;}
   int int_nodes()const override	{return 0;}
   int net_nodes()const override	{return _net_nodes;}
 private: // purely virtual in ELEMENT
   void tr_iwant_matrix()override {}
   void ac_iwant_matrix()override {}
-  double tr_involts()const override { return 0.; }
-  double tr_involts_limited()const override { return 0.; }
-  COMPLEX ac_involts()const override { return 0.; }
+  double tr_involts()const override { untested(); return 0.; }
+  double tr_involts_limited()const override { untested(); return 0.; }
+  COMPLEX ac_involts()const override { untested(); return 0.; }
   XPROBE ac_probe_ext(const std::string&)const override;
 
 //  void precalc_last()override { untested();

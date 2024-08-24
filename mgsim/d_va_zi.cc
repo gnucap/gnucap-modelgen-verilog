@@ -37,10 +37,10 @@ namespace {
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class NATURE_current : public NATURE {
-  double abstol()const override {return 1e-12;}
+  double abstol()const override { untested();return 1e-12;}
 }_N_current;
 class NATURE_voltage : public NATURE {
-  double abstol()const override {return 1e-6;}
+  double abstol()const override { untested();return 1e-6;}
 }_N_voltage;
 class DISCIPLINE_electrical : public DISCIPLINE {
 public:
@@ -56,12 +56,12 @@ class _COMMON_VASRC_electrical : public COMMON_VASRC {
 public:
   _COMMON_VASRC_electrical(int i) : COMMON_VASRC(i){}
 private:
-  _COMMON_VASRC_electrical(_COMMON_VASRC_electrical const&p)     : COMMON_VASRC(p){}
+  _COMMON_VASRC_electrical(_COMMON_VASRC_electrical const&p)     : COMMON_VASRC(p){ untested();}
   COMMON_COMPONENT* clone()const override{ untested();
     return new _COMMON_VASRC_electrical(*this);
   }
   std::string name()const override{untested(); return "electrical";}
-  DISCIPLINE const* discipline()const override {return &_D_electrical;}
+  DISCIPLINE const* discipline()const override { untested();return &_D_electrical;}
 public:
 };
 static _COMMON_VASRC_electrical _C_V_electrical(CC_STATIC);
@@ -120,12 +120,12 @@ COMMON_ZIFILTER_ZD czi_zd(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class COMMON_ZIFILTER_NP : public COMMON_ZIFILTER {
-  std::string name()const override {return "va_zi_np";}
+  std::string name()const override { untested();return "va_zi_np";}
 public:
   ~COMMON_ZIFILTER_NP() {}
   COMMON_ZIFILTER_NP(int x) : COMMON_ZIFILTER(x) { set_nx(); set_xp();}
-  COMMON_ZIFILTER_NP(COMMON_ZIFILTER_NP const& x) : COMMON_ZIFILTER(x) {}
-  COMMON_ZIFILTER_NP* clone()const override {return new COMMON_ZIFILTER_NP(*this);}
+  COMMON_ZIFILTER_NP(COMMON_ZIFILTER_NP const& x) : COMMON_ZIFILTER(x) { untested();}
+  COMMON_ZIFILTER_NP* clone()const override { untested();return new COMMON_ZIFILTER_NP(*this);}
 
   void precalc_last(const CARD_LIST* par_scope)override{ untested();
     COMMON_ZIFILTER::precalc_last(par_scope);
@@ -153,12 +153,12 @@ public:
 COMMON_ZIFILTER_ZP czi_zp(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class COMMON_ZIFILTER_RP : public COMMON_ZIFILTER {
-  std::string name()const override {return "va_zi_rp";}
+  std::string name()const override { untested();return "va_zi_rp";}
 public:
   ~COMMON_ZIFILTER_RP() {}
   COMMON_ZIFILTER_RP(int x) : COMMON_ZIFILTER(x) { set_rp(); }
   COMMON_ZIFILTER_RP(COMMON_ZIFILTER_RP const& x) = default;
-  COMMON_ZIFILTER_RP* clone()const override {return new COMMON_ZIFILTER_RP(*this);}
+  COMMON_ZIFILTER_RP* clone()const override { untested();return new COMMON_ZIFILTER_RP(*this);}
 
   void precalc_last(const CARD_LIST* par_scope)override{ untested();
     COMMON_ZIFILTER::precalc_last(par_scope);
@@ -197,8 +197,8 @@ private: // ELEMENT, pure
   void tr_iwant_matrix() override;
   void ac_iwant_matrix() override;
   double tr_involts()const override;
-  double tr_involts_limited()const override { incomplete(); return 0.; }
-  COMPLEX ac_involts()const override { incomplete(); return 0.; }
+  double tr_involts_limited()const override { untested(); incomplete(); return 0.; }
+  COMPLEX ac_involts()const override { untested(); incomplete(); return 0.; }
 private: // BASE_SUBCKT
   void	  tr_begin()override;
   void	  tr_restore()override	{
@@ -239,7 +239,7 @@ private: // overrides
     bool linear_input = !_ctrl_in; // TODO.
     int ii;
 
-    if(linear_input){
+    if(linear_input){ untested();
       ii = 2;
     }else if(_ctrl_in){
       ii = net_nodes();

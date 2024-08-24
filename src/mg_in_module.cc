@@ -32,13 +32,13 @@
 + module_instantiation ::=
 +	  module_or_paramset_identifier [ parameter_value_assignment ] 
 +	  module_instance
--	  { "," module_instance }
+-	  { untested(); "," module_instance }
 +	  ";"
 + parameter_value_assignment ::=
 +	  "# (" list_of_parameter_assignments ")"
 + list_of_parameter_assignments ::=
--	  ordered_parameter_assignment { "," ordered_parameter_assignment }
-+	| named_parameter_assigmnent { "," named_parameter_assignment }
+-	  ordered_parameter_assignment { untested(); "," ordered_parameter_assignment }
++	| named_parameter_assigmnent { untested(); "," named_parameter_assignment }
 
 + module_instance ::=
 +	   name_of_module_instance "(" [ list_of_port_connections ] ")"
@@ -46,8 +46,8 @@
 +	   module_instance_identifier
 -	  [ range ]
 + list_of_port_connections ::=
-+	  ordered_port_connection { "," ordered_port_connection }
--	| named_port_connection { "," named_port_connection }
++	  ordered_port_connection { untested(); "," ordered_port_connection }
+-	| named_port_connection { untested(); "," named_port_connection }
 + ordered_port_connection ::=
 +	  {attribute_instance} [ expression ]
 - named_port_connection ::=
@@ -129,11 +129,11 @@ void Parameter_3::dump(std::ostream& out)const
 +	  "aliasparam" parameter_identifier "=" parameter_identifier ";"
 // A.2.3
 + list_of_param_assignments ::=
-+	  param_assignment { "," param_assignment }
++	  param_assignment { untested(); "," param_assignment }
 // A.2.4
 + param_assignment ::=
-+	  parameter_identifier "=" constant_mintypmax_expression { value_range }
--	| parameter_identifier range "=" constant_arrayinit { value_range }
++	  parameter_identifier "=" constant_mintypmax_expression { untested(); value_range }
+-	| parameter_identifier range "=" constant_arrayinit { untested(); value_range }
 */
 void Parameter_2::parse(CS& f)
 {
@@ -198,8 +198,8 @@ class HS_Parameter : public Parameter_Base {
 public:
   explicit HS_Parameter(std::string const& p) : Parameter_Base(p) {}
 private:
-  void parse(CS&)override {unreachable();}
-  void dump(std::ostream&)const override {unreachable();}
+  void parse(CS&)override { untested();unreachable();}
+  void dump(std::ostream&)const override { untested();unreachable();}
 };
 HS_Parameter hp_mfactor("$mfactor");
 HS_Parameter hp_xpos("$xposition");
@@ -483,7 +483,7 @@ void Net_Identifier_Ground::parse(CS& f)
   Node_Ref const& nn = owner()->node(name());
   if(nn) {
     set_node(mod->node(nn));
-  }else{
+  }else{ untested();
     throw Exception_CS_("ground: need previously declared net", f);
   }
 
@@ -541,11 +541,11 @@ void Port_3::dump(std::ostream& out)const
 + module_declaration ::=
 +	  {attribute_instance}  module_keyword  module_identifier
 -		[ module_parameter_port_list ]
-+		list_of_ports ";" { module_item }
++		list_of_ports ";" { untested(); module_item }
 +	  "endmodule"
 -	| {attribute_instance}  module_keyword  module_identifier
 -		[ module_parameter_port_list ]
--		[ list_of_port_declarations ] ";" { non_port_module_item }
+-		[ list_of_port_declarations ] ";" { untested(); non_port_module_item }
 -	  "endmodule"
 + module_keyword ::=
 +	  "module"
@@ -747,7 +747,7 @@ void Module::parse_body(CS& f)
 - | hierarchical_net_identifier [ constant_expression ]
 - | hierarchical_net_identifier [ constant_range_expression ]
 - list_of_branch_identifiers ::=
-- branch_identifier [ range ] { , branch_identifier [ range ] }
+- branch_identifier [ range ] { untested(); , branch_identifier [ range ] }
 */
 /*--------------------------------------------------------------------------*/
 void Branch_Declaration::dump(std::ostream& o) const
@@ -907,7 +907,7 @@ void ValueRange::parse(CS& file)
     }
   }else if(file >> "exclude"){
     _type = vr_EXCLUDE;
-    if(file >> "[" || file >> "("){
+    if(file >> "[" || file >> "("){ untested();
       _what = new ValueRangeInterval;
       _what->set_owner(owner());
     }else if(file >> "'{"){ untested();
@@ -1090,7 +1090,7 @@ void Module::detach_out_vars()
 #ifndef NDEBUG
   assert(circuit());
   for(auto br : circuit()->branches()){
-    if(br->is_used_in(&variables())){
+    if(br->is_used_in(&variables())){ untested();
       br->unset_used_in(&variables());
     }else{
     }

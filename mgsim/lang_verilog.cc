@@ -95,9 +95,9 @@ private: // local
 
 private: // TODO, transition, stale pure virtuals...
   MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*)override
-  { incomplete(); unreachable(); return NULL; }
+  { untested(); incomplete(); unreachable(); return NULL; }
   void print_paramset(OMSTREAM&, const MODEL_CARD*)override
-  { incomplete(); unreachable(); }
+  { untested(); incomplete(); unreachable(); }
 
 private: // override virtual, called by print_item
   void print_paramset(OMSTREAM&, const CARD*) /* override */;
@@ -179,7 +179,7 @@ void LANG_VERILOG::parse_args_paramset(CS& cmd, CARD* x)
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::move_attributes(tag_t from, tag_t to)
 {
-  if(has_attributes(to)){
+  if(has_attributes(to)){ untested();
     unreachable();
     erase_attributes(to, to+1);
   }else{
@@ -316,15 +316,15 @@ void LANG_VERILOG::parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 	attribs = parse_attributes(cmd);
 	here = cmd.cursor();
       }
-      if (Index < x->min_nodes()) { untested();
+      if (Index < x->min_nodes()) {
 	//BUG// This may be a bad idea.
 	//BUG// It's definitely wrong with all_new.
 	//BUG// What should we do with unconnected ports?
 	if (all_new) {untested();
-	}else{ untested();
+	}else{
 	}
 	cmd.warn(bDANGER, "need " + to_string(x->min_nodes()-Index) +" more nodes, grounding");
-	for (  ;  Index < x->min_nodes();  ++Index) { untested();
+	for (  ;  Index < x->min_nodes();  ++Index) {
 	  x->set_port_to_ground(Index);
 	}
       }else{

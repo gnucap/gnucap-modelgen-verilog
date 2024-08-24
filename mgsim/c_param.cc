@@ -210,7 +210,7 @@ public:
     }
     cmd.check(bDANGER, "syntax error");
   }
-  std::string const& range() const {return _range;}
+  std::string const& range() const { untested();return _range;}
 private:
   std::string _range;
 } p;

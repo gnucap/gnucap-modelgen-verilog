@@ -70,14 +70,14 @@ private:
   // void	set_port_by_name(std::string&, std::string&) override;
 private: // override virtual
   bool		is_device()const override	{return _parent;}
-  char		id_letter()const override	{return 'X';}
+  char		id_letter()const override	{ untested();return 'X';}
   bool		print_type_in_spice()const override {return true;}
-  std::string   value_name()const override	{return "#";}
+  std::string   value_name()const override	{ untested();return "#";}
   int		max_nodes()const override;
   int		ext_nodes()const override {return int(_node_capacity);}
   int		min_nodes()const override;
   int		matrix_nodes()const override	{return 0;}
-  // int	net_nodes()const override	{return _net_nodes;}
+  // int	net_nodes()const override	{ untested();return _net_nodes;}
   void		precalc_first()override;
   bool		makes_own_scope()const override;
   bool		is_valid()const override;
@@ -137,7 +137,7 @@ public:
 public: // override virtual
   char		id_letter()const override	{untested();return '\0';}
   CARD*		clone_instance()const override;
-  bool		print_type_in_spice()const override {unreachable(); return false;}
+  bool		print_type_in_spice()const override { untested();unreachable(); return false;}
   std::string   value_name()const override	{untested();incomplete(); return "";}
   std::string   dev_type()const override	{itested(); return "";}
   int		max_nodes()const override	{return PORTS_PER_SUBCKT;}
@@ -159,16 +159,16 @@ private: // no-ops for prototype
   TIME_PAIR tr_review() override { return TIME_PAIR(NEVER, NEVER);}
   void tr_accept()override {}
   void tr_advance()override {}
-  void tr_restore()override {}
+  void tr_restore()override { untested();}
   void tr_regress()override {}
   void dc_advance()override {}
   void ac_begin()override {}
   void do_ac()override {}
   void ac_load()override {}
-  bool do_tr()override { return true;}
+  bool do_tr()override { untested(); return true;}
   bool tr_needs_eval()const override {untested(); return false;}
   void tr_queue_eval()override {}
-  std::string port_name(int i)const override{return port_value(i);}
+  std::string port_name(int i)const override{ untested();return port_value(i);}
 } pp(&Default_SUBCKT);
 DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "X|subckt", &pp);
 /*--------------------------------------------------------------------------*/
@@ -324,7 +324,7 @@ int DEV_MODULE::set_param_by_name(std::string Name, std::string Value)
     trace2("spice spbn", Name, Value);
     int i = BASE_SUBCKT::set_param_by_name(Name,Value);
     COMMON_PARAMLIST* c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
-    for(auto p : c->_params){
+    for(auto p : c->_params){ untested();
       trace2("spbn param spice", p.first, p.second.string());
     }
     return i;
@@ -363,17 +363,17 @@ void DEV_MODULE::expand()
   if(_parent == &pp){ untested();
     COMMON_PARAMLIST const* c = prechecked_cast<COMMON_PARAMLIST const*>(common());
     assert(c);
-    for(auto p : c->_params){
+    for(auto p : c->_params){ untested();
       trace2("expand param spice", p.first, p.second);
     }
     // first time spice
     assert(c->modelname()!="");
     const CARD* model = find_looking_out(c->modelname());
-    if ((_parent = dynamic_cast<const DEV_SUBCKT_PROTO*>(model))) {
+    if ((_parent = dynamic_cast<const DEV_SUBCKT_PROTO*>(model))) { untested();
       // good
-    }else if (dynamic_cast<const BASE_SUBCKT*>(model)) {
+    }else if (dynamic_cast<const BASE_SUBCKT*>(model)) { untested();
       throw Exception_Type_Mismatch(long_label(), c->modelname(), "subckt proto");
-    }else{
+    }else{ untested();
       throw Exception_Type_Mismatch(long_label(), c->modelname(), "subckt");
     }
     assert(!_parent->is_device()); // really?

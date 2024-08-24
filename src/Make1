@@ -51,6 +51,7 @@ mg_filt_zi.cc \
 mg_func.cc \
 mg_func_pf.cc \
 mg_func_sys.cc \
+mg_func_evt.cc \
 mg_impl.cc \
 mg_in.cc \
 mg_in_analog.cc \
@@ -77,6 +78,7 @@ mg_out_lib.cc \
 mg_out_root.cc \
 mg_pp.cc \
 mg_task.cc \
+mg_task_write.cc \
 mg_token.cc \
 m_tokens.cc \
 m_expression_dump.cc

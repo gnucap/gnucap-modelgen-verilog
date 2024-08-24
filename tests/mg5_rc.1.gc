@@ -15,9 +15,9 @@ module test_rc1(in, out);
   analog begin
     I(g,out) <+ ddt(V(g,out));
     if(analysis("static")) begin
-      $strobe("%f %f\n", V(in), V(out));
+      $strobe("%f %f", V(in), V(out));
     end else begin
-      $strobe("%f %f %f\n", $abstime, V(in), V(out));
+      $strobe("%f %f %f", $abstime, V(in), V(out));
     end
   end
 endmodule

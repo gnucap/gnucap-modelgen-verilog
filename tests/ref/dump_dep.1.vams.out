@@ -8,14 +8,14 @@ module dep0(d, g);
     real c;
     real T;
     real S;
-    S = T; // s
+    S = T; // s3
     while (1) begin
       // T : 1
       // c : 1
-      c = T; // dep: _potential_b_g_ s
-      T = V(g); // dep: _potential_b_g_
+      c = T; // dep: _potential_b_g_ s3
+      T = V(g); // dep: _potential_b_g_ s1
     end
-    S = T; // dep: _potential_b_g_ s
+    S = T; // dep: _potential_b_g_ s3
   end
 
 endmodule

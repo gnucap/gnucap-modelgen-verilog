@@ -1,0 +1,43 @@
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+
+
+verilog
+
+`modelgen
+module test_evt1_1(p, n);
+	electrical p, n;
+	inout p, n;
+	analog begin
+
+		@(cross(V(p,n), 0)) begin
+			$write("zero cross %f\n", $abstime);
+      end
+
+		@(cross(V(p,n)-1, 0))
+			$write("one cross %f\n", $abstime);
+
+		@(cross(V(p,n), 1))
+			$write("up cross %f\n", $abstime);
+		@(cross(V(p,n), -1))
+			$write("dn cross %f\n", $abstime);
+	end
+endmodule
+
+list
+
+!make test_evt1_1.so > /dev/null
+attach ./test_evt1_1.so
+
+test_evt1_1 dut(1,0);
+vsine #(.freq(1) .ampl(2)) vin(1,0);
+
+list
+
+print dc v(nodes) iter(0)
+dc
+print tran v(nodes) iter(0)
+tran 3
+
+end

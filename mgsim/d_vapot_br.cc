@@ -54,8 +54,8 @@ protected: // override virtual
     return bool(_loss0); // HACK.
   }
 
-  double   tr_involts()const override	{unreachable(); return NOT_VALID;}
-  double   tr_involts_limited()const override {unreachable(); return NOT_VALID;}
+  double   tr_involts()const override	{ untested();unreachable(); return NOT_VALID;}
+  double   tr_involts_limited()const override { untested();unreachable(); return NOT_VALID;}
   double   tr_amps()const override;
   void	   ac_iwant_matrix()override;
   void	   ac_iwant_matrix_extended_branch();
@@ -63,7 +63,7 @@ protected: // override virtual
   COMPLEX  ac_involts()const override	{untested(); return NOT_VALID;}
   COMPLEX  ac_amps()const override	{untested(); return NOT_VALID;}
 
-  bool has_iv_probe()const override{incomplete(); return false;}
+  bool has_iv_probe()const override{ untested();incomplete(); return false;}
   void expand()override;
 
 public:

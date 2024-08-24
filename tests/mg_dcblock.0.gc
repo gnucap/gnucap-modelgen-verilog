@@ -28,6 +28,7 @@ list
 print dc v(nodes) v(d1)
 dc
 
+// BUG: ac_eval missing (see BUGS)
 print ac vm(nodes) vp(nodes)
 ac 1 100 * 10
 

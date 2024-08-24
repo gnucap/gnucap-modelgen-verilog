@@ -28,9 +28,8 @@
 class AnalogStmt : public Statement {
 public:
   ~AnalogStmt();
-  bool propagate_rdeps(RDeps const&)override;
 
-  virtual TData const& deps() = 0;
+  virtual TData const& deps()const = 0;
 //  Statement* parent_stmt()override { untested();
 //    incomplete();
 //    return NULL;
@@ -119,7 +118,7 @@ protected: // BUG?
 protected:
 public:
   explicit AnalogSeqBlock() : SeqBlock() {}
-  explicit AnalogSeqBlock(CS& cmd, Block* owner) : SeqBlock() {
+  explicit AnalogSeqBlock(CS& cmd, Base* owner) : SeqBlock() { untested();
     set_owner(owner);
     parse(cmd);
   }
@@ -139,12 +138,13 @@ public: // sensitivities?
 //  void clear_vars();
 
   TData const& deps(){ return _deps;};
+  TData const& deps()const { return _deps;};
 }; // AnalogSeqBlock
 /*--------------------------------------------------------------------------*/
 class AnalogSeqStmt : public AnalogStmt {
   AnalogSeqBlock _block; // SeqBlock?
 public:
-  explicit AnalogSeqStmt() : AnalogStmt() {}
+  explicit AnalogSeqStmt() : AnalogStmt() { untested();}
   explicit AnalogSeqStmt(CS& cmd, Block* owner) : AnalogStmt() {
     set_owner(owner);
     parse(cmd);
@@ -155,7 +155,7 @@ public:
   }
   bool update()override { return _block.update(); }
   AnalogSeqBlock const& block()const { return _block; }
-  TData const& deps() override { return _block.deps(); }
+  TData const& deps()const override { untested(); return _block.deps(); }
 };
 /*--------------------------------------------------------------------------*/
 class AnalogCtrlBlock : public AnalogSeqBlock {
@@ -200,6 +200,14 @@ public: // can't resolve these..
   void dump(std::ostream& f)const override;
 };
 /*--------------------------------------------------------------------------*/
+#if 1
+class VariableLists : public List_Base<Base>{
+  void parse(CS&)override { untested();incomplete();}
+public:
+  void dump(std::ostream& f)const override;
+};
+#endif
+/*--------------------------------------------------------------------------*/
 class AnalogCtrlStmt : public AnalogStmt {
   TData _deps; // here?
 protected:
@@ -212,10 +220,14 @@ public:
   AnalogCtrlBlock const& body()const { return _body; }
 private:
 //  bool update()override { untested();return _body.update();}
-  TData const& deps()override { return _deps;};
+  TData const& deps()const override { return _deps;}; // ?
+//  TData const& data()const override { return _deps;};
   bool update()override {
-    return _body.update();
+    incomplete();
+    bool ret = _body.update();
+    return AnalogStmt::update() || ret;
   }
+  bool propagate_rdeps(RDeps const& incoming)override;
 }; // AnalogCtrlStmt
 /*--------------------------------------------------------------------------*/
 /*
@@ -224,9 +236,23 @@ analog_event_control ::=
 @ hierarchical_event_identifier
 | @ ( analog_event_expression )
 analog_event_expression ::=
-...
+-   expression
+- | posedge expression
+- | negedge expression
+- | hierarchical_event_identifier
+- | initial_step [ ( " analysis_identifier "{ , " analysis_identifier " } ) ]
+- | final_step [ ( " analysis_identifier " { , " analysis_identifier " } ) ]
+- | analog_event_functions
+- | analog_event_expression or analog_event_expression
+- analog_event_functions ::=
+- cross ( analog_expression [ , analog_expression_or_null
+-   [ , constant_expression_or_null [ , constant_expression_or_null [ , analog_expression ] ] ] ] )
+- | above ( analog_expression [ , constant_expression_or_null
+-   [ , constant_expression_or_null [ , analog_expression ] ] ] )
+- | timer ( analog_expression [ , analog_expression_or_null
+-   [ , constant_expression_or_null [ , analog_expression ] ] ] )
 - analog_event_statement ::=
-- { attribute_instance } analog_loop_statement
+-   { attribute_instance } analog_loop_statement
 - | { attribute_instance } analog_case_statement
 - | { attribute_instance } analog_conditional_statement
 - | { attribute_instance } analog_procedural_assignment
@@ -237,16 +263,22 @@ analog_event_expression ::=
 - | { attribute_instance } ;
 */
 /*--------------------------------------------------------------------------*/
-class AnalogEvtExpression : public Owned_Base {
-  Expression* _expression{NULL};
+class AnalogEvtExpression : public Expression_ {
+  RDeps _rdeps;
 public:
-  ~AnalogEvtExpression(){
-    delete _expression;
-  }
+  explicit AnalogEvtExpression() : Expression_() {}
+  ~AnalogEvtExpression(){ }
   void parse(CS&)override;
   void dump(std::ostream&)const override;
-  Expression const& expression() const{assert(_expression); return *_expression;};
-  Block* owner() { untested();return Owned_Base::owner();}
+//  Expression const& expression() const{return _expression;};
+  bool is_used_in(Base const*)const;
+//
+private: // incomplete
+  void set_rdeps(); // pull in rdeps from functions
+  bool add_rdep(Base const* b) {
+    return _rdeps.insert(b).second;
+  }
+  FUNCTION_ const* function()const; // BUG. expressions?
 };
 /*--------------------------------------------------------------------------*/
 class AnalogEvtCtlStmt : public AnalogCtrlStmt {
@@ -255,17 +287,14 @@ public:
   ~AnalogEvtCtlStmt() { }
   void parse(CS&)override;
   void dump(std::ostream&)const override;
-  Expression const& cond()const{ return _ctrl.expression(); }
-  const AnalogCtrlBlock& code() const{ return _body; }
+  Expression_ const& cond()const { return _ctrl; } // override?
+  const AnalogCtrlBlock& code()const { return _body; }
+  bool update()override;
+
+  bool is_used_in(Base const* b)const override;
+ // RDeps const& rdeps()const override { untested(); return _ctrl.data().rdeps(); }
 }; // AnalogEvtCtlStmt
-/*--------------------------------------------------------------------------*/
-#if 1
-class VariableLists : public List_Base<Base>{
-  void parse(CS&)override { untested();incomplete();}
-public:
-  void dump(std::ostream& f)const override;
-};
-#endif
+typedef Collection<AnalogEvtCtlStmt> Analog_Events;
 /*--------------------------------------------------------------------------*/
 class Analog_Function : public /*UserFunction?*/ Statement {
   Token* _variable{NULL};
@@ -276,7 +305,7 @@ class Analog_Function : public /*UserFunction?*/ Statement {
   AnalogFunctionArgs _args;
   AnalogFunctionBody _block;
   VariableLists _vars;
-  bool update()override { return false; }
+  bool update()override { untested(); return false; }
 public:
   ~Analog_Function();
   void parse(CS& f)override;
@@ -295,6 +324,7 @@ public:
     // incomplete();
     return true;
   }
+ // RDeps const& rdeps()const override { untested(); return _rdeps; }
 };
 typedef Collection<Analog_Function> Analog_Functions;
 /*--------------------------------------------------------------------------*/
@@ -302,6 +332,7 @@ class Analog : public Owned_Base {
   AnalogList _list;
   Analog_Functions _functions;
   Probe_Map* _probes{NULL};
+  Analog_Events _events;
 public:
   explicit Analog();
   ~Analog();
@@ -312,6 +343,7 @@ public:
   AnalogList const& list()const { return _list; }
   AnalogList const& blocks()const { return _list; }
   Analog_Functions const& functions()const { return _functions; }
+  Analog_Events const& events()const { untested(); return _events; }
   void push_back(Base*);
 
   void new_probe_map(); // analog?
@@ -332,6 +364,7 @@ inline AnalogList const& analog_list(Module const& m)
 /*--------------------------------------------------------------------------*/
 class AnalogExpression : public Expression_ {
 public:
+  explicit AnalogExpression() : Expression_() {}
   ~AnalogExpression();
   void parse(CS& file) override;
 //  void dump(std::ostream& o)const override;
@@ -339,18 +372,20 @@ public:
   Expression const& expression() const{ return *this;}
   bool is_true() const;
   bool is_false() const;
+//  bool has_sensitivities()const { untested(); return !_sens.empty(); }
 };
 /*--------------------------------------------------------------------------*/
 class AnalogConstExpression : public AnalogExpression {
 public:
 //  void parse(CS& file) override;
 //  void dump(std::ostream& o)const override;
-  String_Arg key() const{return String_Arg("ACE");}
+  String_Arg key() const{ untested();return String_Arg("ACE");}
 };
 typedef LiSt<AnalogConstExpression, '\0', ',', ':'> AnalogConstExpressionList;
 /*--------------------------------------------------------------------------*/
 class CaseGen : public AnalogCtrlStmt {
   AnalogConstExpressionList* _cond{NULL};
+  RDeps _rdeps; // TODO;
 private:
   CaseGen() : AnalogCtrlStmt(){ untested(); unreachable(); }
 public:
@@ -371,30 +406,40 @@ public:
   void calc_reach(Expression const& cond);
 
   String_Arg key() const{ untested();return String_Arg("CaseGen");}
-//  bool update() override { untested(); incomplete(); }
+  RDeps const& rdeps()const override { untested(); return _rdeps; }
+ // bool update() override { untested(); incomplete(); }
 };
 /*--------------------------------------------------------------------------*/
 // code?
 class System_Task : public Statement {
-  AnalogExpression _e;
+  AnalogExpression _e; // Analog?
+  RDeps _rdeps;
 public:
   explicit System_Task(CS&, Block*);
   void parse(CS& o) override;
   void dump(std::ostream&o)const override;
-  bool is_used_in(Base const*)const override{
-    // incomplete(); // later
-    return true;
-  }
-  bool update()override { incomplete(); return false; }
+  bool is_used_in(Base const*)const override;
+  bool update()override;
 
-  AnalogExpression const& expression() const{ return _e; }
+  bool has_sensitivities()const {return _e.data().has_sensitivities();}
+  Sensitivities const& sensitivities()const {return _e.data().sensitivities();}
+
+  AnalogExpression const& expression()const { return _e; }
+  FUNCTION_ const* function()const;
+  TData const& data()const { return _e.data(); }
+  RDeps const& rdeps()const override { return _rdeps; }
+private:
+  bool add_rdep(Base const* b) {
+    return _rdeps.insert(b).second;
+  }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class AnalogSwitchStmt : public AnalogStmt {
+class AnalogSwitchStmt : public AnalogStmt { // CtrlStmt?
   TData _deps; // here?
   AnalogConstExpression _ctrl; // Const??
   SeqBlock _body;
+  RDeps _rdeps; // here?
 public:
   AnalogSwitchStmt(Block* o, CS& file);
   ~AnalogSwitchStmt() { }
@@ -404,11 +449,13 @@ public:
   AnalogConstExpression const& control() const{return _ctrl;}
   SeqBlock const& cases()const {return _body;}
   bool update()override;
-  TData const& deps()override{ return _deps;};
+  TData const& deps()const override { return _deps;};
+ // TData const& data()const override {return _deps;}; // ctrl?
+  RDeps const& rdeps()const override{ return _rdeps; }
 }; // AnalogSwitchStmt
 /*--------------------------------------------------------------------------*/
 class AnalogConditionalStmt : public AnalogCtrlStmt {
-  AnalogConstExpression _cond; // Const??
+  AnalogConstExpression _cond; // Const?
   AnalogCtrlBlock _false_part;
 public:
   explicit AnalogConditionalStmt(Block* o, CS& file);
@@ -419,11 +466,14 @@ public:
   AnalogConstExpression const& conditional() const{return _cond;}
   const AnalogCtrlBlock& true_part() const{ return _body; }
   const AnalogCtrlBlock& false_part() const{ return _false_part; }
+  bool is_used_in(Base const*)const override;
+
+  TData const& deps()const override{ return _cond.data(); } // ?
 }; // AnalogConditionalStmt
 /*--------------------------------------------------------------------------*/
 class AnalogWhileStmt : public AnalogCtrlStmt {
 protected:
-  AnalogExpression _cond;
+  AnalogExpression _cond; // -> AnalogCtrlStmt?
   explicit AnalogWhileStmt() { }
 public:
   explicit AnalogWhileStmt(CS& file, Block* o);
@@ -465,6 +515,7 @@ private:
 class AnalogProceduralAssignment : public AnalogStmt {
   Assignment _a;
   TData _deps;
+ // RDeps _rdeps;
 public:
   // explicit AnalogProceduralAssignment(Block* o) { untested();
   //   set_owner(o);
@@ -473,12 +524,19 @@ public:
   explicit AnalogProceduralAssignment(CS&, Block*);
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
-  Assignment const& assignment()const {return _a;}
+  Assignment const& expression()const {return _a;}
   bool is_used_in(Base const*b)const override;
   Statement* deep_copy(Base* no)const override;
+  bool propagate_rdeps(RDeps const& r)override;
 private:
   bool update()override;
-  TData const& deps()override {return _deps;};
+  TData const& deps()const override {return _deps;};
+public: // dump_annotate
+  TData const& data()const {return _a.data();};
+  bool has_sensitivities()const {
+    return _a.has_sensitivities();
+  }
+  Sensitivities const& sensitivities()const {return _a.sensitivities();}
 }; // AnalogProceduralAssignment
 /*--------------------------------------------------------------------------*/
 // ContributionStatement?
@@ -495,6 +553,7 @@ class Contribution : public AnalogStmt {
   bool _short{false};
 //  Block* _owner{NULL};
   TData* _deps{NULL};
+  RDeps _rdeps; // dump_annotate
   Sensitivities _sens;
 private:
   void set_pot_contrib();
@@ -502,7 +561,7 @@ private:
   void set_short();
   void set_always_pot();
   void set_direct(bool d=true);
-  TData const& deps()override;
+  TData const& deps()const override; // data?
 public:
   Contribution(CS& f, Block* o)
     : AnalogStmt(), _branch(NULL, false) {
@@ -513,7 +572,8 @@ public:
 public:
 
   DDeps const& ddeps() const;
-  bool has_sensitivities()const { return !_sens.empty(); }
+  bool has_sensitivities()const { return !_sens.empty(); }  // BUG? _deps->sens?
+  Sensitivities const& sensitivities()const { return _sens; }  // BUG? _deps->sens?
   bool is_pot_contrib() const;
   bool is_flow_contrib() const;
   bool is_short() const { return _short; }
@@ -543,6 +603,9 @@ private:
   Expression& rhs() {return _rhs;}
   bool update()override;
   void add_dep(Dep const&);
+public:
+  RDeps const& rdeps()const override { return _rdeps; }
+//  RDeps const& rdeps()const override { untested();return data().rdeps();}
 }; // Contribution
 /*--------------------------------------------------------------------------*/
 // VarDeclStmt? code?

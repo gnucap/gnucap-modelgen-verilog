@@ -31,19 +31,13 @@ bool Statement::set_used_in(Base const* b)
   return _rdeps.insert(b).second;
 }
 /*--------------------------------------------------------------------------*/
-bool Statement::is_used_in(Base const* b)const
+bool Statement::is_used_in(Base const* b) const
 {
- // for(auto& i : _used_in){
- //   if(i == b){
- //     return true;
- //   }else{
- //   }
- // }
- // return _rdeps.count(b); ?
-  for(auto& i : _rdeps){ untested();
-    if(i == b){ untested();
+  // "used in vs rdeps?"
+  for(auto const& i : rdeps()){
+    if(i == b){
       return true;
-    }else{ untested();
+    }else{
     }
   }
   return false;
@@ -87,6 +81,39 @@ bool Statement::is_never() const
 {
   assert(scope());
   return scope()->is_never();
+}
+/*--------------------------------------------------------------------------*/
+bool is_file(Base const*);
+bool Statement::propagate_rdep(Base const* b)
+{
+  bool new_dep = _rdeps.insert(b).second;
+  Base* o = owner_();
+  if(!new_dep){
+  }else if(auto s = dynamic_cast<Statement*>(o)){
+    s->propagate_rdep(b);
+  }else if(auto s = dynamic_cast<Module*>(o)){
+  }else if(is_file(o)) {
+  }else{ untested();
+    unreachable();
+  }
+  return new_dep;
+}
+/*--------------------------------------------------------------------------*/
+bool Statement::propagate_rdeps(RDeps const& r)
+{
+  trace2("Statement::propagate_rdeps", typeid(*this).name(), r.size());
+  assert(owner());
+  auto s = prechecked_cast<Statement*>(owner_());
+  assert(s);
+  bool ret = false;
+  for(auto n : r) {
+    auto p = _rdeps.insert(n);
+    if(p.second){
+      ret = s->propagate_rdep(*p.first);
+    }else{
+    }
+  }
+  return ret;
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Stmt::parse(CS& f)
@@ -164,6 +191,7 @@ void Variable_Decl::parse(CS& f)
 
   attr.set_attributes(tag_t(_token)) = attr.attributes(tag_t(&f));
 }
+/*--------------------------------------------------------------------------*/
 void Variable_Decl::dump(std::ostream& o)const
 {
   o << name() << _dimensions;
@@ -183,6 +211,16 @@ void Variable_Decl::dump(std::ostream& o)const
   }
 }
 /*--------------------------------------------------------------------------*/
+TData const& Assignment::data()const
+{
+  if(_token){
+    assert(_token->data() == _data);
+  }else{ untested();
+  }
+  assert(_data);
+  return *_data;
+}
+/*--------------------------------------------------------------------------*/
 bool Variable_Decl::propagate_deps(Token_VAR_REF const& v)
 {
   if(!v.data()){ untested();
@@ -197,16 +235,20 @@ bool Variable_Decl::propagate_deps(Token_VAR_REF const& v)
   return false;
 }
 /*--------------------------------------------------------------------------*/
-bool Variable_Decl::propagate_rdeps(RDeps const& r)
+bool Variable_Decl::propagate_rdeps(RDeps const& incoming)
 {
-  // propagate to _Stmt?
-  incomplete();
-  return false;
+  return _rdeps.merge(incoming);
 }
+/*--------------------------------------------------------------------------*/
+// bool Variable_Decl::is_used_in(Base const* b) const
+// { untested();
+//   incomplete();
+//   return true;
+// }
 /*--------------------------------------------------------------------------*/
 bool Variable_Stmt::update()
 {
-  trace0("AnalogDeclareVars::update");
+  //trace1("Variable_Stmt::update", _rdeps.size());
   for(Variable_Decl* d : *this){
     assert(d);
     d->update();
@@ -216,13 +258,20 @@ bool Variable_Stmt::update()
 /*--------------------------------------------------------------------------*/
 bool Variable_Stmt::is_used_in(Base const* b) const
 {
-  for(auto v : _l){
+  for(Variable_Decl const* v : _l){
     // if(v->is_used_in(b)){ untested();
     //   return true;
-    // }else{
+    // }else{ untested();
     // }
   }
-  return false;
+
+  if(Statement::is_used_in(b)) { untested();
+    return true;
+  }else{
+    incomplete();
+    return true; // mg_strobe.0.gc.out 
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool SeqBlock::update()
@@ -233,7 +282,8 @@ bool SeqBlock::update()
     for(auto i: *this){
       if(auto s = dynamic_cast<Statement*>(i)){
 	ret |= s->update();
-      }else{
+      }else{ untested();
+	unreachable(); // comment? later..
       }
     }
   }else{
@@ -241,12 +291,12 @@ bool SeqBlock::update()
   return ret;
 }
 /*--------------------------------------------------------------------------*/
-//bool Variable_Decl::is_used_in(Base const*) const
-//{
-//  // return _token->is_used_in(b);
-//  // incomplete();
-//  return false;
-//}
+bool SeqBlock::propagate_rdeps(RDeps const& s)
+{ untested();
+  assert(0);
+  incomplete();
+  return false;
+}
 /*--------------------------------------------------------------------------*/
 void SeqBlock::merge_sens(Sensitivities const& s)
 {
@@ -259,7 +309,7 @@ void SeqBlock::merge_sens(Sensitivities const& s)
 /*--------------------------------------------------------------------------*/
 void SeqBlock::set_sens(Base* s)
 {
-  if(_sens){
+  if(_sens){ untested();
   }else{
     _sens = new Sensitivities;
   }
@@ -326,9 +376,13 @@ void Assignment::parse(CS& f)
     assert(!_token);
     store_deps(Expression_::data());
     assert(_token);
-    if(options().optimize_unused() && !scope()->is_reachable()) { untested();
-      unreachable();
-    }else{
+    if(owner()){
+      assert(_data);
+      _data->add_sens(owner());
+    }else{ untested();
+    }
+
+    {
       assert(_token->data());
       assert(_token->scope());
       _lhsref->propagate_deps(*_token);
@@ -344,19 +398,23 @@ void Assignment::parse(CS& f)
 }
 /*--------------------------------------------------------------------------*/
 bool Assignment::is_used_in(Base const* b) const
-{ untested();
-  if(auto p = dynamic_cast<Statement const*>(owner())) { untested();
-    return p->is_used_in(b);
+{
+  if(auto p = dynamic_cast<Statement const*>(owner())) {
+    // AnalogProcAssignment?
+//    return p->is_used_in(b);
   }else{ untested();
+    unreachable();
   }
-  // incomplete(); // later
-  return false;
+
+  return Expression_::is_used_in(b);
 }
 /*--------------------------------------------------------------------------*/
 bool Assignment::is_used() const
 { untested();
   assert(_token);
-  return _token->is_used();
+  unreachable();
+  return false;
+  // return _token->is_used();
 }
 /*--------------------------------------------------------------------------*/
 std::string Assignment::code_name() const
@@ -377,6 +435,11 @@ bool Assignment::is_int() const
   return type().is_int();
 }
 /*--------------------------------------------------------------------------*/
+Sensitivities const& Assignment::sensitivities()const
+{
+  return data().sensitivities();
+}
+/*--------------------------------------------------------------------------*/
 bool Assignment::has_sensitivities()const
 {
   return data().has_sensitivities();
@@ -385,10 +448,12 @@ bool Assignment::has_sensitivities()const
 bool Assignment::update(RDeps const* r)
 {
   bool ret;
-  assert(r);
-  trace1("Assignment::update", rdeps()->size());
+  if(r){
+    trace2("Assignment::update", r->size(), Expression_::data().size());
+  }else{
+  }
 
-  Expression_::update(r);
+  ret = Expression_::update(r);
 
   assert(_token);
   assert(scope());
@@ -408,10 +473,14 @@ bool Assignment::update(RDeps const* r)
   }
   scope()->new_var_ref(_token); // always needed?
 				//
+ //  if(!r){ untested();
+ //  }else if(auto s = dynamic_cast<Statement*>(owner())){ untested();
+ //    ret |= s->propagate_rdeps(*r);
+ //  }else{ untested();
+ //  }
   return ret;
 }
 /*--------------------------------------------------------------------------*/
-// bool Assignment::sync_data(TData const& d)
 bool Assignment::store_deps(TData const& d)
 {
   assert(_lhsref);
@@ -461,23 +530,21 @@ bool Assignment::propagate_deps(Token_VAR_REF const& from)
 {
   TData const& d = from.deps();
   assert(from.scope());
+  bool ret = false;
   if(from.scope() == scope()) {
-    return _lhsref->propagate_deps(from);
+    ret = _lhsref->propagate_deps(from);
   }else{
-    bool ret = store_deps(d);
+    ret |= store_deps(d);
     assert(_lhsref);
-    return _lhsref->propagate_deps(*_token) || ret;
+    ret |= _lhsref->propagate_deps(*_token);
   }
-}
-/*--------------------------------------------------------------------------*/
-RDeps const* Assignment::rdeps() const
-{ untested();
-  assert(_lhsref);
-  // _lhsref->rdeps...
-  incomplete();
-  static RDeps _rdeps;
-  return &_rdeps;
-  // return &_lhsref->deps().rdeps();
+  // if(auto s = dynamic_cast<Statement*>(owner())) { untested();
+  //   s->propagate_deps(from);
+  // }else{ untested();
+  //   assert(0);
+  // }
+
+  return ret;
 }
 /*--------------------------------------------------------------------------*/
 void Assignment::dump(std::ostream& o) const
@@ -485,7 +552,7 @@ void Assignment::dump(std::ostream& o) const
   if(_token){
     o << _token->name() << " = ";
     Expression_::dump(o);
-  }else{
+  }else{ untested();
 //    o << "/// unreachable?\n";
   }
 }
@@ -496,7 +563,7 @@ Assignment::~Assignment()
   }else if(_data){
     trace3("~Assignment", _token->name(), this, data().ddeps().size());
     try{
-//      for(Dep d : data().ddeps()) {
+//      for(Dep d : data().ddeps()) { untested();
 //	(*d)->unset_used_in(this);
 //      }
     }catch(std::logic_error const& e){ untested();
@@ -526,7 +593,6 @@ void Assignment::parse_rhs(CS& cmd)
   cmd.reset(cmd.cursor());
   trace1("Assignment::parse_rhs", bool(cmd));
 }
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

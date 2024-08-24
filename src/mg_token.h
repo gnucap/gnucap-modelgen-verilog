@@ -26,6 +26,15 @@
 #include "mg_deps.h" // BUG?
 #include "mg_base.h"
 /*--------------------------------------------------------------------------*/
+class rdep_tag : public Base{
+  virtual void parse(CS&)override { untested();unreachable();}
+  virtual void dump(std::ostream& o)const override { untested();unreachable();}
+};
+extern rdep_tag tr_eval_tag;
+extern rdep_tag tr_review_tag;
+extern rdep_tag tr_advance_tag;
+extern rdep_tag tr_accept_tag;
+/*--------------------------------------------------------------------------*/
 class FUNCTION_;
 class Token_CALL : public Token_SYMBOL {
 private: // stuff into data?
@@ -50,8 +59,6 @@ private:
   void attach();
   void detach();
 public:
-  void pop(){ untested(); untested(); assert(_args); _args = NULL; }
-  void push(Expression const* e){ untested(); assert(!_args); _args = e; }
   void stack_op(Expression* e)const override;
   void set_num_args(size_t n){ _num_args = n; } // expression size?
   void set_args(Expression* e){ assert(!_args); _args = e; } // needed?
@@ -60,6 +67,8 @@ public:
   virtual /*?*/ std::string code_name() const;
   FUNCTION_ const* f() const{ return _function; }
   bool returns_void() const;
+  bool has_modes() const{ assert(_function); return _function->has_modes(); }
+  bool is_common() const{ assert(_function); return _function->is_common(); }
 }; // Token_CALL
 /*--------------------------------------------------------------------------*/
 class Port_3; // New_Port?
@@ -106,7 +115,7 @@ inline void Token_CALL::detach()
 /*--------------------------------------------------------------------------*/
 inline bool Token_CALL::returns_void() const
 {
-//  assert(_function);
+  assert(_function);
   if(_function){
     return _function->returns_void();
   }else{ untested();
@@ -118,7 +127,7 @@ inline std::string Token_CALL::code_name()const
 {
   assert(_function);
   if(_function->code_name()!=""){
-    return "/*call1*/" + _function->code_name();
+    return _function->code_name();
   }else if(_function->label()!=""){ untested();
     // incomplete(); // m_va.h, TODO
     return "/*INCOMPLETE*/ va::" + _function->label();
@@ -401,14 +410,14 @@ public:
   TData const& deps()const;
   Block const* scope() const;
   std::string code_name() const { return "_v_"+name(); }
-  bool is_used() const;
+ // bool is_used() const;
 
   // LiSt
   std::string key() const { untested();unreachable();return "";}
   void set_owner(Base*){ untested();unreachable();}
 private:
   size_t num_deps() const;
-};
+}; // Token_VAR_REF
 /*--------------------------------------------------------------------------*/
 // VAR_DECL :: SYMBOL?
 /*--------------------------------------------------------------------------*/

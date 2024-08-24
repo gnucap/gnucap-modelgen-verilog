@@ -62,6 +62,7 @@ private:
       cl->set_label("_" + filter_code_name);
       cl->set_num_args(na);
       cl->_m = &m;
+      m.set_tr_advance();
       m.push_back(cl);
     }
 

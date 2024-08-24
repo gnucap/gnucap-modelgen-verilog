@@ -22,6 +22,7 @@
 #include "mg_out.h"
 #include "mg_analog.h"
 #include "mg_options.h"
+#include <typeinfo>
 /*--------------------------------------------------------------------------*/
 class OUT_ANALOG {
 public:
@@ -30,28 +31,41 @@ public:
     modeSTATIC = 1,
     modeDYNAMIC = 2,
     modePROBE = 3,
-    modeREVIEW = 4
+    modeADVANCE = 4,
+    modeREGRESS = 5,
+    modeREVIEW = 6,
+    modeACCEPT = 7,
+    modeNUM = 8,
   }_mode;
-  Branch const* _src{NULL};
+  Base const* _src{NULL};
+  std::string ctx()const {
+    char const* names[modeNUM] = { //
+      "precalc", "static", "tr_eval", "probe",
+      "tr_advance", "tr_regress", "tr_review", "tr_accept"
+    };
+    return names[_mode];
+  }
 
 public:
-  explicit OUT_ANALOG(mode m, Branch const* src=NULL)
+  explicit OUT_ANALOG(mode m, Base const* src=NULL)
     : _mode(m),
       _src(src){}
 
 public:
   bool is_dynamic()const { return _mode==modeDYNAMIC; }
   bool is_precalc()const { return _mode==modePRECALC; }
-  bool is_probe()const   { return _mode==modePROBE; }
+  bool is_probe()const   { untested(); return _mode==modePROBE; }
   bool is_review()const  { return _mode==modeREVIEW; }
+  bool is_accept()const  { untested(); return _mode==modeACCEPT; }
 public:
+  void make_analog_list(std::ostream& o, const Module& m)const;
   void make_construct  (std::ostream& o, AnalogConstruct const& ab)const;
   void make_af         (std::ostream& o, const Analog_Function& f)const;
   void make_load_variables(std::ostream& o, const Variable_List_Collection& P, const Module& m)const;
   void make_store_variables(std::ostream& o, const Variable_List_Collection& P)const;
 private:
   void make_stmt       (std::ostream& o, Statement const& a)const;
-  void make_block       (std::ostream& o, Block const& s)const;
+  void make_block      (std::ostream& o, Block const& s)const;
 private:
   void make_af_args    (std::ostream& o, const Analog_Function& f)const;
   void make_af_body    (std::ostream& o, const Analog_Function& f)const;
@@ -76,6 +90,10 @@ private:
 private:
   void make_one_variable_load(std::ostream& o, Token_VAR_REF const& V, Module const& m)const;
   void make_one_variable_store(std::ostream& o, Token_VAR_REF const& V)const;
+
+  void make_cc_expression(std::ostream& o, Expression const& e, bool b=false)const {
+    return ::make_cc_expression(o, e, _mode!=modePRECALC, ctx());
+  }
 }; // OUT_ANALOG
 /*--------------------------------------------------------------------------*/
 static void make_int_variable(std::ostream& o, Token_VAR_DECL const& v)
@@ -147,6 +165,11 @@ void OUT_ANALOG::make_block_variables(std::ostream& o,
     }else{
     }
     assert(v);
+    if(_src && !v->is_used_in(_src)){
+      o << "// omit Var decl?\n";
+    }else{
+    }
+
     make_variable(o, *v);
   }
 }
@@ -187,7 +210,7 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
 //   }else
   {
     indent x;
-    make_cc_expression(o, e, _mode==modeDYNAMIC);
+    make_cc_expression(o, e);
     if(a.is_int()){
       o__ lhsname << " = int(t0); // (*)\n";
     }else if(within_af(&a)){
@@ -255,7 +278,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
   }else if(C.branch()->is_short()){
   }else{
     indent x;
-    make_cc_expression(o, e, is_dynamic());
+    make_cc_expression(o, e);
 
     char sign = C.reversed()?'-':'+';
     char neg_sign = C.reversed()?'+':'-';
@@ -318,7 +341,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	o__ "// dep " << v->code_name() << "\n";
 	assert(v->branch());
 	if(C.branch() == v->branch()){
-	  o__ "// same " << v->code_name() << "\n";
+	  o__ "// same2 " << v->code_name() << "\n";
 	}else if(v->branch()->is_short()) {
 	  o__ "// short: " << v->code_name() << "\n";
 #if 1
@@ -339,7 +362,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
       for(auto v : C.data().ddeps()) {
 	assert(v->branch());
 	if(C.branch() == v->branch()) {
-	  o__ "// same " << v->code_name() << "\n";
+	  o__ "// same2 " << v->code_name() << "\n";
 	}else if(v->branch()->is_detached_filter()){ /// && ref?
 	  o__ "m->" << v->branch()->state() << "[1] = " << neg_sign << "t0[d" << v->code_name() << "]; // (3p)\n";
 	}else if(v->branch()->is_filter()){ /// && ref?
@@ -356,7 +379,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	  o__ "//noddeps..\n";
       }else{
       }
-
+    }else{ untested();
     }
   }
   o__ "}\n";
@@ -373,37 +396,35 @@ void OUT_ANALOG::make_block(std::ostream& o, Block const& ab) const
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
 {
-  if(auto s = dynamic_cast<AnalogSeqBlock const*>(&ab)){ untested();
-    return make_seq(o, *s);
+  if(_src && !ab.is_used_in(_src)){
+    o << "// omit Statement " << typeid(ab).name() << "\n";
+    return;
+    o << "#if 0 // omit Statement " << typeid(ab).name() << "\n";
   }else{
   }
-
-  auto st = dynamic_cast<Statement const*>(&ab);
-  assert(st);
-
-  if(_src && st && !st->is_used_in(_src)){
-    if(dynamic_cast<Contribution const*>(&ab)){
+#if 0
+    if(dynamic_cast<Contribution const*>(&ab)){ untested();
       o << "// omit Contibution..\n";
-    }else if(dynamic_cast<AnalogProceduralAssignment const*>(&ab)) {
+    }else if(dynamic_cast<AnalogProceduralAssignment const*>(&ab)) { untested();
       o << "// omit Assignment..\n";
     }else if(auto sb = dynamic_cast<AnalogSeqBlock const*>(&ab)){ untested();
       // incomplete();
       make_seq(o, *sb);
-    }else{
-      o << "// omit statement\n";
+    }else{ untested();
+      o << "// omit statement1\n";
+      o << "//" << st->rdeps_size() << "\n";
     }
-  }else if(auto fc=dynamic_cast<Contribution const*>(&ab)) {
+#endif
+
+  if(auto fc=dynamic_cast<Contribution const*>(&ab)) {
     make_contrib(o, *fc);
   }else if(auto a=dynamic_cast<AnalogProceduralAssignment const*>(&ab)) {
-    make_assignment(o, a->assignment());
+    make_assignment(o, a->expression());
   }else if(auto assign=dynamic_cast<Assignment const*>(&ab)) { untested();
     // incomplete.
     make_assignment(o, *assign);
   }else if(auto ard=dynamic_cast<Variable_Stmt const*>(&ab)) {
     make_block_variables(o, *ard);
-  }else if(auto v=dynamic_cast<Variable_Decl const*>(&ab)) { untested();
-    unreachable();
-    make_variable(o, *v);
   }else if(auto cs=dynamic_cast<AnalogConditionalStmt const*>(&ab)) {
     make_cond(o, *cs);
   }else if(auto ss=dynamic_cast<AnalogSwitchStmt const*>(&ab)) {
@@ -424,6 +445,11 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
   }else{ untested();
     incomplete();
     assert(false);
+  }
+
+  if(_src && !ab.is_used_in(_src)){ untested();
+    o << "#endif // omit\n";
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -513,13 +539,35 @@ void OUT_ANALOG::make_system_task(std::ostream& o, System_Task const& s) const
   o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
+// TODO: use FUNCTION_?
+void make_cc_event_cond(std::ostream& o, Expression const& e)
+{ untested();
+  typedef Expression::const_iterator const_iterator;
+  // TODO: var stack.
+  o__ "bool evt = false\n;";
+  o__ "{\n";
+  for (const_iterator i = e.begin(); i != e.end(); ++i) { untested();
+    if((*i)->name()=="initial_step"){ untested();
+      o__ "evt = _sim->_phase == p_INIT_DC;\n";
+//    o__ "evt = _sim->vams_initial_step();\n"; // TODO
+    }else if((*i)->name()=="initial_model"){ untested();
+      std::cerr << "WARNING: ADMS style keyword encountered\n";
+      o__ "evt = _sim->is_initial_step();\n";
+    }else{ untested();
+      incomplete();
+      o << "--> " << (*i)->name() << " <--\n";
+    }
+  }
+  o__ "}\n";
+}
+/*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_evt(std::ostream& o, AnalogEvtCtlStmt const& s) const
 {
-  o__ "{\n";
+  o__ "{ // AnalogEvtCtlStmt\n";
   {
     indent x;
-    make_cc_event_cond(o, s.cond());
-    o__ "if (evt) {\n";
+    make_cc_expression(o, s.cond());
+    o__ "if (t0 /*?*/) {\n";
     {
       indent y;
       make_ctrl(o, s.code());
@@ -707,14 +755,13 @@ void OUT_ANALOG::make_seq(std::ostream& o, AnalogSeqBlock const& s) const
   for(auto i : s.block()) {
     indent x;
     if(auto st = dynamic_cast<Statement const*>(i)){
-      unreachable();
       make_stmt(o, *st);
-    }else if(auto as = dynamic_cast<AnalogSeqBlock const*>(i)){
+    }else if(auto as = dynamic_cast<AnalogSeqBlock const*>(i)){ untested();
       // incomplete(); // later.
       make_seq(o, *as);
     }else{ untested();
       incomplete();
-      assert(0);
+      unreachable();
     }
   }
   o__ "}\n";
@@ -722,7 +769,9 @@ void OUT_ANALOG::make_seq(std::ostream& o, AnalogSeqBlock const& s) const
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_construct(std::ostream& o, AnalogConstruct const& ab) const
 {
-  if(ab.block_or_null()){
+  if(_src && !ab.is_used_in(_src)){ untested();
+    o << "// omit construct...\n";
+  }else if(ab.block_or_null()){
     make_block(o, *ab.block_or_null());
   }else{ untested();
     unreachable();
@@ -839,7 +888,7 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
 
   for(auto const& d : b->deps().ddeps()){
     if(d->branch() == b){
-      o__ "// same " << d->code_name() << "\n";
+      o__ "// same1 " << d->code_name() << "\n";
       if(b->has_pot_source() && b->has_flow_probe()){
 	if(br.num_states()<=2){
 	}else{ untested();
@@ -977,16 +1026,16 @@ static void make_one_variable_proxy(std::ostream& o, Token_VAR_REF const& V,
 void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Token_VAR_REF&
     V, Module const& m) const
 {
-  if(_mode == modePRECALC){
+  if(!is_dynamic()) {
     if(V.type().is_int()) { untested();
       o__ "int";
     }else if(V.type().is_real()) {
-      o__ "ddouble";
+      o__ "ddouble"; // double?
     }else{ untested();
       assert(0); // logic error.
     }
 
-    o << " " << V.code_name() << "(m->" << V.code_name() << ");\n";
+    o << " " << V.code_name() << "(m->" << V.code_name() << "); // !dynamic\n";
     o__ "(void) " << V.code_name() << ";\n";
   }else if(V.type().is_int()) { untested();
     o__ "int& " << V.code_name() << "(d->" << V.code_name() << ");\n";
@@ -1006,8 +1055,9 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Token_VAR_REF&
 void OUT_ANALOG::make_one_variable_store(std::ostream& o, Token_VAR_REF const& V) const
 {
   if(!V.type().is_real()) { untested();
-  }else if(_mode == modePRECALC){ untested();
+  }else if(is_precalc()) { untested();
     o__ "// d->" << V.code_name() << " = " << V.code_name() << ";\n";
+  }else if(is_review()) { untested();
   }else if(V.deps().ddeps().size() == 0){
     // it's a reference.
   }else if(options().optimize_deriv()) {
@@ -1020,7 +1070,7 @@ void OUT_ANALOG::make_one_variable_store(std::ostream& o, Token_VAR_REF const& V
 void OUT_ANALOG::make_load_variables(std::ostream& o, const
     Variable_List_Collection& P, const Module& m) const
 {
-  if(_mode==modeDYNAMIC){
+  if(is_dynamic()) {
     // not sure if these are actually unused. GCC bug?
     o << "#pragma GCC diagnostic push\n";
     o << "#pragma GCC diagnostic ignored \"-Wunused-local-typedefs\"\n";
@@ -1031,13 +1081,11 @@ void OUT_ANALOG::make_load_variables(std::ostream& o, const
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
       auto const* V = *p;
       assert(V);
-      {
-	make_one_variable_load(o, V->token(), m);
-      }
+      make_one_variable_load(o, V->token(), m);
     }
   }
 
-  if(_mode==modeDYNAMIC){
+  if(is_dynamic()) {
     o << "#pragma GCC diagnostic pop\n";
   }else{
   }
@@ -1066,21 +1114,46 @@ static void make_cc_ac_begin(std::ostream& o, const Module& m)
 }
 #endif
 /*--------------------------------------------------------------------------*/
-void make_cc_analog_list(std::ostream& o, const Module& m, Branch const*
-    src=NULL)
+void OUT_ANALOG::make_analog_list(std::ostream& o, const Module& m) const
 {
-  OUT_ANALOG oo(OUT_ANALOG::modeDYNAMIC, src);
-  for(auto bb : analog_list(m)){
+  if(is_precalc()){
+    o__ "MOD_" << m.identifier() << " const* p = m;\n";
+    o__ "assert(p);\n";
+    o__ "(void)p;\n";
+    o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
+    o__ "(void)pc;\n";
+    o__ "PRECALC_" << m.identifier() << " P(m);\n"; // BUG/HACK
+    o__ "PRECALC_" << m.identifier() << "* d = &P;\n";
+    o__ "(void)d;\n";
+  }else if(is_dynamic()){
+    o__ "MOD_" << m.identifier() << " const* p = d;\n";
+    o__ "assert(p);\n";
+    o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
+    o__ "(void)pc;\n";
+  }else{
+    o__ "MOD_" << m.identifier() << " const* p = m;\n";
+    o__ "MOD_" << m.identifier() << "* d = m;\n";
+    o__ "assert(p);\n";
+    o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
+    o__ "(void)pc;\n";
+  }
+
+  for(auto const& bb : analog_list(m)){
     assert(bb);
-//    if(auto ab = dynamic_cast<AnalogStmt const*>(bb)){ untested();
-//    }else
-    // if(src && !bb->used_in(src)){ untested();
-    // }else
-    if(auto ab = dynamic_cast<AnalogConstruct const*>(bb)){
+    if(auto ab = dynamic_cast<AnalogStmt const*>(bb)){ untested();
+    }else{
+    }
+    if(_src){
+    }else{
+    }
+    trace1("analoglist", bb->is_used_in(NULL));
+    if(_src && !bb->is_used_in(_src)){ untested();
+      o__ "// omit2 " << typeid(*bb).name() << "\n";
+    }else if(auto ab = dynamic_cast<AnalogConstruct const*>(bb)){
       o__ "{\n";
       {
 	indent a;
-	oo.make_construct(o, *ab);
+	make_construct(o, *ab);
       }
       o__ "}\n";
     }else{ untested();
@@ -1088,25 +1161,85 @@ void make_cc_analog_list(std::ostream& o, const Module& m, Branch const*
   }
 }
 /*--------------------------------------------------------------------------*/
+static void make_cc_common_tr_advance(std::ostream& o, const Module& m)
+{
+  o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
+  o << "inline void COMMON_" << m.identifier() <<
+    "::tr_advance_analog(MOD_" << m.identifier() << "* m) const\n{\n";
+  // o << "eval_t mode = m_TR_ADVANCE;\n";
+  // o << "(void)mode;\n";
+
+  OUT_ANALOG oo(OUT_ANALOG::modeADVANCE, &tr_advance_tag);
+  oo.make_load_variables(o, m.variables(), m);
+  oo.make_analog_list(o, m);
+  oo.make_store_variables(o, m.variables());
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_common_tr_regress(std::ostream& o, const Module& m)
+{
+  o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
+  o << "inline void COMMON_" << m.identifier() <<
+    "::tr_regress_analog(MOD_" << m.identifier() << "* m) const\n{\n";
+//  o << "eval_t mode = m_TR_ADVANCE;\n";
+//  o << "(void)mode;\n";
+
+  OUT_ANALOG oo(OUT_ANALOG::modeREGRESS, &tr_advance_tag);
+  oo.make_load_variables(o, m.variables(), m);
+  oo.make_analog_list(o, m);
+  oo.make_store_variables(o, m.variables());
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
 static void make_cc_common_tr_eval(std::ostream& o, const Module& m)
 {
   o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
-  o << "inline void COMMON_" << m.identifier() << 
+  o << "inline void COMMON_" << m.identifier() <<
     "::tr_eval_analog(MOD_" << m.identifier() << "* d) const\n{\n";
   o__ "trace1(\"" << m.identifier() <<"::tr_eval_analog\", d);\n";
   o__ "trace1(\"" << m.identifier() <<"::tr_eval_analog\", d->long_label());\n";
 
   OUT_ANALOG oo(OUT_ANALOG::modeDYNAMIC);
+
   oo.make_load_variables(o, m.variables(), m);
-
-  // parameters are here.
-  o__ "MOD_" << m.identifier() << " const* p = d;\n";
-  o__ "assert(p);\n";
-  o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
-  o__ "(void)pc;\n";
-
-  make_cc_analog_list(o, m);
+  oo.make_analog_list(o, m);
   oo.make_store_variables(o, m.variables());
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_common_tr_review(std::ostream& o, const Module& m)
+{
+  o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
+  o << "inline void COMMON_" << m.identifier() <<
+    "::tr_review_analog(MOD_" << m.identifier() << "* m) const\n{\n";
+  o__ "trace1(\"review analog1\", m->_time_by._event);\n";
+//  o << "eval_t mode = m_TR_REVIEW;\n";
+
+  OUT_ANALOG oo(OUT_ANALOG::modeREVIEW, &tr_review_tag);
+  oo.make_load_variables(o, m.variables(), m);
+  oo.make_analog_list(o, m);
+
+  o__ "trace1(\"review analog2\", m->_time_by._event);\n";
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_common_tr_accept(std::ostream& o, const Module& m)
+{
+  // o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
+  o << "inline void COMMON_" << m.identifier() <<
+    "::tr_accept_analog(MOD_" << m.identifier() << "* m) const\n{\n";
+
+  OUT_ANALOG oo(OUT_ANALOG::modeACCEPT, &tr_accept_tag);
+  oo.make_load_variables(o, m.variables(), m);
+  oo.make_analog_list(o, m);
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -1116,34 +1249,11 @@ static void make_cc_common_precalc(std::ostream& o, const Module& m)
 {
   o << "inline void COMMON_" << m.identifier() << 
     "::precalc_analog(MOD_" << m.identifier() << "* m) const\n{\n";
-
-  // probes are here.
-  o__ "MOD_" << m.identifier() << " const* p = m;\n";
-  o__ "assert(p);\n";
-  o__ "(void)p;\n";
-  o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
-  o__ "(void)pc;\n";
-  o__ "PRECALC_" << m.identifier() << " P(m);\n";
-  o__ "PRECALC_" << m.identifier() << "* d = &P;\n";
-  o__ "(void)d;\n";
-  // o__ "return;\n";
+  o << "//OUT_ANALOG precalc\n";
 
   OUT_ANALOG oo(OUT_ANALOG::modePRECALC);
   oo.make_load_variables(o, m.variables(), m);
-
-  for(auto bb : analog_list(m)){
-    assert(bb);
-    if(auto ab = dynamic_cast<AnalogConstruct const*>(bb)){
-      o__ "{\n";
-      {
-	indent a;
-	oo.make_construct(o, *ab);
-      }
-      o__ "}\n";
-    }else{ untested();
-    }
-  }
-//  oo.make_store_variables(o, m.variables());
+  oo.make_analog_list(o, m);
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -1177,6 +1287,22 @@ void make_cc_analog(std::ostream& o, const Module& m)
 //  make_cc_ac_begin(o, m);
   make_cc_common_tr_eval(o, m);
   make_cc_common_precalc(o, m);
+
+  // assert(m.has_analog_block());
+  // assert(m.has_analog_stuff()); // in always blocks..
+  if(m.has_tr_review()){
+    make_cc_common_tr_review(o, m);
+  }else{
+  }
+  if(m.has_tr_accept()){
+    make_cc_common_tr_accept(o, m);
+  }else{
+  }
+  if(m.has_tr_advance()){
+    make_cc_common_tr_advance(o, m);
+    make_cc_common_tr_regress(o, m);
+  }else{ untested();
+  }
 }
 /*--------------------------------------------------------------------------*/
 void make_node_ref(std::ostream& o, const Node& n, bool used=true);
@@ -1261,7 +1387,7 @@ std::string Probe::code_name_() const
   return xsname + cn;
 }
 /*--------------------------------------------------------------------------*/
-void Probe::make_cc_common(std::ostream&) const{}
+void Probe::make_cc_common(std::ostream&) const{ untested();}
 void Probe::make_cc_dev(std::ostream& o) const
 {
   o__ "ddouble xs" << code_name_() << "() const { // " << label() << "\n";
@@ -1321,6 +1447,14 @@ void Probe::make_cc_dev(std::ostream& o) const
     o____ "return t;\n";
   }
   o__ "}\n";
+}
+/*--------------------------------------------------------------------------*/
+// TODO. obsolete.
+void make_cc_analog_list(std::ostream& o, const Module& m, Branch const*
+    src=NULL)
+{
+  OUT_ANALOG oo(OUT_ANALOG::modeDYNAMIC, src);
+  oo.make_analog_list(o, m);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

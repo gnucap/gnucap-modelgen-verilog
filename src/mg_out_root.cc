@@ -154,7 +154,7 @@ void make_cc(std::ostream& out, const File& in)
     "------------------------------------*/\n";
       ++num;
     }
-  }else{
+  }else{ untested();
   }
 
   if(options().gen_module()){

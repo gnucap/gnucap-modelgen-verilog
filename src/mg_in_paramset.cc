@@ -89,8 +89,8 @@ CS& Paramset::parse_stmt(CS& f)
 - A.1.9 Paramset Declaration
 + paramset_declaration ::=
 + { attribute_instance } paramset paramset_identifier module_or_paramset_identifier ;
-+ paramset_item_declaration { paramset_item_declaration }
-- paramset_statement { paramset_statement }
++ paramset_item_declaration { untested(); paramset_item_declaration }
+- paramset_statement { untested(); paramset_statement }
 + endparamset
 + paramset_item_declaration ::=
 +   { attribute_instance } parameter_declaration ;

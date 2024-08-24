@@ -10,14 +10,14 @@ module base(p, n);
   parameter real s=1;
   analog begin
 		if($param_given(r)) begin
-			$strobe("r given\n");
+			$write("r given\n");
 		end else begin
-			$strobe("r not given\n");
+			$write("r not given\n");
 		end
 		if($param_given(s)) begin
-			$strobe("s given\n");
+			$write("s given\n");
 		end else begin
-			$strobe("s not given\n");
+			$write("s not given\n");
 		end
   end
 endmodule

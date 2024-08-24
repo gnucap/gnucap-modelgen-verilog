@@ -64,7 +64,7 @@ static Token* resolve_function(FUNCTION_ const* f, Expression const* e, Block* o
       na = ex->size();
     }else{ untested();
     }
-  }else if(dynamic_cast<Token_PARLIST const*>(e->back())){
+  }else if(dynamic_cast<Token_PARLIST const*>(e->back())){ untested();
   }else{
   }
   Token* t = owner->new_token(f, na);
@@ -156,7 +156,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 	assert(tern->false_part());
 	tp->resolve_symbols(*tern->true_part());
 	fp->resolve_symbols(*tern->false_part());
-      }catch(Exception const& ee){
+      }catch(Exception const& ee){ untested();
 	delete tp;
 	delete fp;
 	throw ee;
@@ -195,7 +195,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 //	p->stack_op(&E); // ?
 	Token_PAR_REF PP(p->name(), p);
 	PP.stack_op(&E);
-      }else if(auto v = dynamic_cast<Variable_Decl*>(r)) {
+      }else if(auto v = dynamic_cast<Variable_Decl*>(r)) { untested();
 	assert(0);
 	unreachable();
 	Token_VAR_REF a(v->name(), v);
@@ -233,7 +233,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       // move to stack_op?
       if(E.is_empty()){
       }else if(auto parlist = dynamic_cast<Token_PARLIST_ const*>(E.back())){
-	if(auto ed = dynamic_cast<Expression const*>(parlist->data())){
+	if(auto ed = dynamic_cast<Expression const*>(parlist->data())){ untested();
 	  na = ed->size();
 	}else if(parlist->args()){
 	  na = parlist->args()->size();
@@ -286,10 +286,10 @@ void Expression_::set_owner(Base* o)
 /*--------------------------------------------------------------------------*/
 void Expression_::set_rdeps(RDeps const& rd)
 { untested();
+  assert(0);
   assert(size());
   assert(back());
   assert(back()->data());
-//  data().rdeps() = rd;
 }
 /*--------------------------------------------------------------------------*/
 bool Expression_::update(RDeps const* rd)
@@ -309,9 +309,10 @@ bool Expression_::update(RDeps const* rd)
 
   bool rdd=false;
   if(!size()) { untested();
+    assert(0);
   }else if(rd) {
-    rdd = propagate_rdeps(*rd);
-  }else { untested();
+    rdd = propagate_rdeps(*rd); // set deps.rdeps?
+  }else {
   }
 
   trace3("Expression_::update", size(), n, rdd);
@@ -412,9 +413,17 @@ bool Expression_::propagate_rdeps(RDeps const& r)
       assert(0);
     }
   }
+  if(auto st = dynamic_cast<Statement*>(owner())) {
+    ret |= st->propagate_rdeps(r);
+  }else{ untested();
+    assert(0);
+  }
   for(auto& p : data().ddeps()){
     ret |= p.propagate_rdeps(r);
   }
+ //  for(auto& p : data().pdeps()){ untested();
+ //    ret |= p.propagate_rdeps(r);
+ //  }
   return ret;
 }
 /*--------------------------------------------------------------------------*/

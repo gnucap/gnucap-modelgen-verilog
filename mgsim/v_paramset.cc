@@ -75,9 +75,9 @@ public:
   ~PARAMSET(){ delete[] _n; _node_capacity = 0; }
 private:
   bool is_device() const override { return owner(); }
-  std::string value_name()const override{unreachable(); return "";}
+  std::string value_name()const override{ untested();unreachable(); return "";}
   std::string port_name(int)const override;
-  bool print_type_in_spice()const override {unreachable(); return false; }
+  bool print_type_in_spice()const override { untested();unreachable(); return false; }
   int set_port_by_name(std::string& name, std::string& value)override{
     assert(_dev);
     trace4("PARAMSET::spbn", long_label(), name, value, max_nodes());

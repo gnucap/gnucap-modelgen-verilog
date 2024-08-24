@@ -2,6 +2,10 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
+202408**-dev
+============
+* cross events
+
 202405**-dev
 ============
 * noise analysis fixes and test coverage

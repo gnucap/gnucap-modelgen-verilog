@@ -1,0 +1,25 @@
+`include "disciplines.vams"
+`include "constants.vams"
+`pragma modelgen dump-annotate
+`pragma modelgen nodump-nature
+`pragma modelgen nodump-discipline
+
+module dep0(d, g);
+
+	inout      d, g;
+	electrical d, g;
+
+	real S;
+	real T;
+	analog begin
+		T = 1;
+		S = 2;
+
+		if(analysis("static")) begin
+			$strobe("%f", T);
+		end else begin
+			$strobe("%f", S);
+		end
+
+	end
+endmodule

@@ -36,6 +36,8 @@ public:
   explicit BOUND_STEP() : MGVAMS_TASK() {
     set_label("bound_step");
   }
+  bool has_modes()const override {return true;}
+  bool has_tr_review()const override {return true;}
 private:
   std::string eval(CS&, const CARD_LIST*)const override{ untested();
     unreachable(); // SFCALL won't eval
@@ -43,140 +45,36 @@ private:
   }
   Token* new_token(Module& m, size_t)const override {
     m.install(this);
-    m.set_tr_review();
+    m.set_tr_review(); // set based on has_tr_review?!
     return new Token_CALL("$bound_step", this);
   }
   std::string code_name()const override{
-    return "d->_f_bound_step";
+    return "d->_f_bound_step_";
   }
  void make_cc_precalc(std::ostream& o)const override {
-   o__ "void " << "_f_bound_step(double)const{}\n";
+   o__ "void " << "_f_bound_step_precalc(double)const{}\n";
+   // o__ "void " << "_f_bound_step_CALLMODE_hack(double d) {\n}\n";
  }
  void make_cc_dev(std::ostream& o)const override {
-   o__ "double _bound_step{NEVER};\n";
-   o__ "void " << "_f_bound_step(double d) {\n";
-   o____ "_bound_step = std::min(_bound_step, d);\n";
+   // o__ "double _bound_step{NEVER};\n";
+   o__ "void " << "_f_bound_step_tr_eval(double d) {\n";
+   o__ "}\n";
+   o__ "void " << "_f_bound_step_tr_review(double d) {\n";
+   o____ "_time_by.min_error_estimate(_sim->_time0 + d);\n";
    o__ "}\n";
  }
  void make_cc_tr_review(std::ostream& o)const override {
-   o__ "time_by.min_error_estimate(_sim->_time0 + _bound_step);\n";
+   // TODO. set_tr_review
+   // o__ "_time_by.min_error_estimate(_sim->_time0 + _bound_step);\n";
  }
  void make_cc_tr_advance(std::ostream& o)const override {
-   o__ "_bound_step = NEVER;\n";
+   // o__ "_bound_step = NEVER;\n";
  }
  bool returns_void()const override { return true; }
 } bound_step;
 DISPATCHER<FUNCTION>::INSTALL d_bound_step(&function_dispatcher, "$bound_step", &bound_step);
 /*--------------------------------------------------------------------------*/
 static size_t cnt;
-class DEBUG_TASK : public MGVAMS_TASK {
-public:
-  explicit DEBUG_TASK() : MGVAMS_TASK(){
-  }
-private:
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
-    return "$$debug";
-  }
-  MGVAMS_TASK* clone()const override {
-    return new DEBUG_TASK(*this);
-  }
-  Token* new_token(Module& m, size_t na)const override{
-    MGVAMS_TASK* cl = clone();
-    cl->set_num_args(na);
-    cl->set_label("t_debug_" + std::to_string(cnt++));
-    m.push_back(cl);
-    return new Token_CALL("$debug", cl);
-  }
-  void make_cc_precalc(std::ostream& o)const override {
-    o__ "void " << label() << "(std::string const&";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", double";
-    }
-    o << "){\n";
-    o__ "}\n";
-  }
-  void make_cc_dev(std::ostream& o)const override {
-    o__ "void " << label() << "(std::string const& a0";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", double a" << i;
-    }
-    o << "){\n";
-    o______ "fprintf(stdout, a0.c_str()";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", a" << i;
-    }
-    o << ");\n";
-    o__ "}\n";
-  }
-  std::string code_name()const override{
-    return "d->" + label();
-  }
-  bool returns_void()const override { return true; }
-} debug;
-DISPATCHER<FUNCTION>::INSTALL d_debug(&function_dispatcher, "$debug", &debug);
-/*--------------------------------------------------------------------------*/
-class STROBE_TASK : public MGVAMS_TASK {
-public:
-  explicit STROBE_TASK() : MGVAMS_TASK(){
-//    set_label("strobe");
-  }
-private:
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
-    return "$$strobe";
-  }
-  MGVAMS_TASK* clone()const override {
-    return new STROBE_TASK(*this);
-  }
-  Token* new_token(Module& m, size_t na)const override{
-    m.new_evt_slot();
-    MGVAMS_TASK* cl = clone();
-    cl->set_num_args(na);
-    cl->set_label("t_strobe_" + std::to_string(cnt++));
-    m.push_back(cl);
-    return new Token_CALL("$strobe", cl);
-  }
-  void make_cc_precalc(std::ostream& o)const override {
-    o__ "void " << label() << "(std::string const&";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", double";
-    }
-    o << "){\n";
-    o__ "}\n";
-  }
-  void make_cc_dev(std::ostream& o)const override {
-    o__ "struct _" << label() << " : public va::EVT {\n";
-    o____ "std::string _a0;\n";
-    for(size_t i=1; i<num_args(); ++i) {
-      o____  "double _a" << i << ";\n";
-    }
-
-    o____ "void operator()()const override {\n";
-    o______ "fprintf(stdout, _a0.c_str()";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", _a" << i;
-    }
-    o << ");\n";
-    o____ "}\n";
-    o__ "} __" << label() << ";\n";
-
-    o__ "void " << label() << "(std::string const& a0";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", double a" << i;
-    }
-    o << "){\n";
-    for(size_t i=0; i<num_args(); ++i) {
-      o____ "__" << label()  << "._a" << i << " = a" << i << ";\n";
-    }
-    o____ "q_evt(&__" << label() << ");\n";
-    o__ "}\n";
-  }
-  std::string code_name()const override{
-    return "d->" + label();
-  }
-  bool returns_void()const override { return true; }
-} strobe;
-// TODO: $write is $strobe, "but with no newline".
-DISPATCHER<FUNCTION>::INSTALL d_strobe(&function_dispatcher, "$strobe|$write", &strobe);
 /*--------------------------------------------------------------------------*/
 class FINISH_TASK : public MGVAMS_TASK {
 public:
@@ -192,6 +90,7 @@ private:
   }
   Token* new_token(Module& m, size_t na)const override{
     m.install(this);
+    m.set_tr_advance();
     Token_CALL* t = new Token_CALL("$finish", this);
     t->set_num_args(na); // still needed?
     return t;

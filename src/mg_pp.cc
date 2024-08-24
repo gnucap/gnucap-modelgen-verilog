@@ -29,25 +29,25 @@
 class C_Comment : public Base {
 public:
   void parse(CS& f)override;
-  void dump(std::ostream&)const override{ incomplete();}
+  void dump(std::ostream&)const override{ untested(); incomplete();}
 } dummy_c_comment;
 /*--------------------------------------------------------------------------*/
 class Cxx_Comment : public Base {
 public:
   void parse(CS& f)override;
-  void dump(std::ostream&)const override{ incomplete();}
+  void dump(std::ostream&)const override{ untested(); incomplete();}
 } dummy_cxx_comment;
 /*--------------------------------------------------------------------------*/
 class Skip_Block : public Base {
 public:
   void parse(CS& f)override;
-  void dump(std::ostream&)const override{ incomplete();}
+  void dump(std::ostream&)const override{ untested(); incomplete();}
 } skip_block;
 /*--------------------------------------------------------------------------*/
 class Pragma : public Base {
 public:
   void parse(CS& f)override;
-  void dump(std::ostream&)const override{ incomplete();}
+  void dump(std::ostream&)const override{ untested(); incomplete();}
 } pragma;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

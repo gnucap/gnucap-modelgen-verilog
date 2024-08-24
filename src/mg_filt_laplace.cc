@@ -105,7 +105,7 @@ public:
     assert(_m);
     return MGVAMS_FILTER::set_n_to_gnd(_m);
   }
-  void set_p_to_gnd()const {
+  void set_p_to_gnd()const { untested();
     assert(_m);
     return MGVAMS_FILTER::set_p_to_gnd(_m);
   }
@@ -126,6 +126,7 @@ public:
       cl->set_code_name("_b_" + filter_code_name);
       cl->set_num_args(na);
       cl->_m = &m;
+      m.set_tr_advance();
       m.push_back(cl);
     }
 
@@ -195,8 +196,8 @@ public:
   }
   virtual std::string num_name_i()const = 0;
   virtual std::string den_name_i()const = 0;
-  virtual int numsize(int x)const { return x; }
-  virtual int densize(int x)const { return x; }
+  virtual int numsize(int x)const { untested(); return x; }
+  virtual int densize(int x)const { untested(); return x; }
 
   void make_cc_impl(std::ostream&o)const override {
     std::string cn = _br->code_name();
@@ -303,8 +304,8 @@ public:
   std::string den_name_i()const override {
     return "std::string(\"p\") + ((i%2)?'i':'r')  + to_string(i/2) /*B*/";
   }
- // int numsize(int x)const override{ assert(!(x%2)); return x/2+1; }
- // int densize(int x)const override{ assert(!(x%2)); return x/2+1; }
+ // int numsize(int x)const override{ untested(); assert(!(x%2)); return x/2+1; }
+ // int densize(int x)const override{ untested(); assert(!(x%2)); return x/2+1; }
 } lzp;
 DISPATCHER<FUNCTION>::INSTALL d_zp(&function_dispatcher, "laplace_zp", &lzp);
 /*--------------------------------------------------------------------------*/
@@ -322,7 +323,7 @@ public:
   std::string den_name_i()const override {
     return "std::string(\"p\") + ((i%2)?'i':'r')  + to_string(i/2) /*B*/";
   }
- // int densize(int x)const override{ assert(!(x%2)); return x/2+1; }
+ // int densize(int x)const override{ untested(); assert(!(x%2)); return x/2+1; }
 } lnp;
 DISPATCHER<FUNCTION>::INSTALL d_np(&function_dispatcher, "laplace_np", &lnp);
 /*--------------------------------------------------------------------------*/
@@ -348,7 +349,7 @@ public:
   explicit LZD() : LAP() {
     set_label("laplace_zd");
   }
-  LZD* clone()const override{
+  LZD* clone()const override{ untested();
     return new LZD(*this);
   }
   std::string num_name_i()const override { untested();
@@ -357,7 +358,7 @@ public:
   std::string den_name_i()const override { untested();
     return "\"d\"+to_string(i)";
   }
-  int numsize(int x)const override{ assert(!(x%2)); return x/2+1; }
+  int numsize(int x)const override{ untested(); assert(!(x%2)); return x/2+1; }
 } lzd;
 DISPATCHER<FUNCTION>::INSTALL d_zd(&function_dispatcher, "laplace_zd", &lzd);
 /*--------------------------------------------------------------------------*/
@@ -427,7 +428,7 @@ void Token_LAP::stack_op(Expression* e)const
     branch()->deps() = *dd; // HACK
     if(1){
       func->set_n_to_gnd();
-    }else if(0 /*sth linear*/){
+    }else if(0 /*sth linear*/){ untested();
       // somehow set loss=0 and output ports to target.
     }else{ untested();
     }
@@ -443,7 +444,7 @@ void Token_LAP::stack_op(Expression* e)const
     delete(cc);
   }else if(!e->size()) { untested();
     unreachable();
-  }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) {
+  }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) { untested();
     auto d = new TData;
     d->insert(Dep(func->prb())); // BUG?
     auto N = new Token_LAP(*this, d);

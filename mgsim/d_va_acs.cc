@@ -35,7 +35,7 @@ public:
   ~VAACS() {}
 protected: // override virtual
   CARD*	   clone()const override	{return new VAACS(*this);}
-  std::string dev_type()const override{ return "va_acs"; }
+  std::string dev_type()const override{ untested(); return "va_acs"; }
   std::string value_name()const override{ return "mag"; }
 //  int      net_nodes()const override {untested(); return _net_nodes;}
 //  int      max_nodes()const override {untested(); return 4;}
@@ -44,7 +44,7 @@ protected: // override virtual
 //   }
   void	   tr_iwant_matrix()override	{tr_iwant_matrix_extended();}
   double   tr_involts()const override	{untested(); return tr_outvolts();}
-  double   tr_involts_limited()const override {return tr_outvolts_limited();}
+  double   tr_involts_limited()const override { untested();return tr_outvolts_limited();}
   double   tr_amps()const override{return 0.;}
   void	   ac_iwant_matrix()override	{ac_iwant_matrix_extended();}
   void	   ac_load()override;
@@ -53,7 +53,7 @@ protected: // override virtual
   bool	   do_tr()override { return true; }
   bool	   tr_needs_eval()const override { return false; }
 
-  bool has_iv_probe()const override{return true;}
+  bool has_iv_probe()const override{ untested();return true;}
 public:
  // int set_param_by_name(std::string n, std::string v)override { untested();
  //   if(n=="mag"){ untested();

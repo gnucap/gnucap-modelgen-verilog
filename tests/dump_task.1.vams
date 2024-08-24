@@ -1,0 +1,28 @@
+
+`include "sub/disciplines.few"
+`pragma modelgen dump-annotate
+`pragma modelgen nodump-discipline
+`pragma modelgen nodump-nature
+
+module foo(p, x)
+
+	inout p;
+	electrical p;
+	electrical x;
+	real A, B;
+	real y;
+	
+	analog begin
+		real C;
+		A = 1;
+		B = A;
+		C = B;
+		$strobe("some strobe %f.", C + V(x));
+
+		y = V(p);
+		$strobe("some strobe %f.", y);
+		$finish(1);
+		y = 0;
+	end
+
+endmodule

@@ -9,16 +9,16 @@ module dep6(d, g);
     real c;
     @(initial_step) begin
       // c : 0
-      c = 1.; // s
+      c = 1.; // s2
     end
     @(initial_step) begin
       // c : 0
-      c = 2.; // s
+      c = 2.; // s2
     end
     real T, S, U;
-    T = c; // s
-    S = (T * T); // s
-    U = exp(c); // s
+    T = c; // s6
+    S = (T * T); // s7
+    U = exp(c); // s6
   end
 
 endmodule
