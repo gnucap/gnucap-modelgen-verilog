@@ -53,6 +53,7 @@ public:
     _order = _ANY;
   }
   bool propagate_rdeps(RDeps const&) const;
+  void set_used_in(Base const*) const;
 
 public:
   Probe const* operator->() const{ return _prb; }

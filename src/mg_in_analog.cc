@@ -869,53 +869,6 @@ void AnalogConstruct::dump(std::ostream& o)const
   b->dump(o);
 }
 /*--------------------------------------------------------------------------*/
-void Assignment::dump(std::ostream& o) const
-{
-  if(_token){
-    o << _token->name() << " = ";
-    Expression_::dump(o);
-  }else{
-//    o << "/// unreachable?\n";
-  }
-}
-/*--------------------------------------------------------------------------*/
-Assignment::~Assignment()
-{
-  if(options().optimize_unused() && !scope()->is_reachable()) {
-  }else if(_data){
-    trace3("~Assignment", _token->name(), this, data().ddeps().size());
-    try{
-      for(Dep d : data().ddeps()) {
-	(*d)->unset_used_in(this);
-      }
-    }catch(std::logic_error const& e){ untested();
-      std::cerr << " logic error in Assignment " << _token->name() << ": ";
-      std::cerr << e.what() << "\n";
-      assert(0);
-    }
-  }else{
-  }
-  delete _token;
-  _token = NULL;
-}
-/*--------------------------------------------------------------------------*/
-void Assignment::parse_rhs(CS& cmd)
-{
-  assert(owner());
-  assert(scope());
-  assert(dynamic_cast<Statement*>(owner()));
-  trace1("Assignment::parse_rhs", cmd.tail().substr(0,10));
-  Expression rhs(cmd);
-  assert(Expression_::is_empty());
-
-  assert(!_data);
-  // assert(deps().ddeps().empty());
-  //_rhs.set_owner(owner()); // this? AssignmentStatement?
-  resolve_symbols(rhs);
-  cmd.reset(cmd.cursor());
-  trace1("Assignment::parse_rhs", bool(cmd));
-}
-/*--------------------------------------------------------------------------*/
 Branch_Ref parse_branch(Block* owner, CS& f)
 {
   size_t here = f.cursor();
@@ -1835,109 +1788,11 @@ void AF_Arg_List::dump(std::ostream& o)const
   o << "\n";
 }
 /*--------------------------------------------------------------------------*/
-RDeps const* Assignment::rdeps() const
-{ untested();
-  assert(_lhsref);
-  // _lhsref->rdeps...
-  incomplete();
-  static RDeps _rdeps;
-  return &_rdeps;
-  // return &_lhsref->deps().rdeps();
-}
-/*--------------------------------------------------------------------------*/
-bool Assignment::update()
-{
-  bool ret;
-  assert(rdeps());
-  trace1("Assignment::update", rdeps()->size());
-
-  Expression_::update(rdeps());
-
-  assert(_token);
-  assert(scope());
-
-  if (store_deps(Expression_::data())) {
-    // something new there.. pass it on.
-    assert(_lhsref);
-    _lhsref->propagate_deps(*_token);
-    assert(_token->operator->());
-    ret = true;
-    assert(_token->data());
-  }else{
-    ret = false;
-    assert(_token->data());
-//    trace2("Assignment::update", _token->deps().size(), Expression_::deps().size());
-    assert(_token->deps().size() >= Expression_::data().size());
-  }
-  scope()->new_var_ref(_token); // always needed?
-				//
-  return ret;
-}
-/*--------------------------------------------------------------------------*/
 bool AnalogStmt::propagate_rdeps(RDeps const&)
 {
 //  incomplete();
   return false;
 }
-/*--------------------------------------------------------------------------*/
-bool Assignment::propagate_deps(Token_VAR_REF const& from)
-{
-  TData const& d = from.deps();
-  assert(from.scope());
-  if(from.scope() == scope()) {
-    return _lhsref->propagate_deps(from);
-  }else{
-    bool ret = store_deps(d);
-    assert(_lhsref);
-    return _lhsref->propagate_deps(*_token) || ret;
-  }
-}
-/*--------------------------------------------------------------------------*/
-// bool Assignment::sync_data(TData const& d)
-bool Assignment::store_deps(TData const& d)
-{
-  assert(_lhsref);
-  size_t ii = 0;
-  bool ret = false;
-
-  if(options().optimize_unused() && !scope()->is_reachable()) { untested();
-    _token = new Token_VAR_REF(_lhsref->name(), NULL);
-  }else{
-
-    if(_token) {
-      assert(_data);
-      ii = _data->ddeps().size();
-    }else{
-      assert(!_data);
-      _data = new TData();
-      _token = new Token_VAR_REF(_lhsref->name(), this, _data);
-      assert(_token->data());
-      assert(_token->scope());
-    }
-    _data->update(d);
-
-    assert(ii <= _data->ddeps().size());
-
-    if(auto x = dynamic_cast<SeqBlock const*>(scope())) {
-      if(x->has_sensitivities()) {
-	_data->add_sens(*x->sensitivities());
-      }else{
-      }
-    }else{
-    }
-
-    for(; ii < _data->ddeps().size(); ++ii) {
-      ret = true;
-      Dep const& dd = _data->ddeps()[ii];
-      trace2("inc_use2", (*dd)->code_name(), this);
-      (*dd)->set_used_in(this);
-    }
-//    assert(&deps() == _data);
-    assert(d.ddeps().size() <= _data->ddeps().size());
-  }
-
-  return ret;
-} // Assignment::store_deps
 /*--------------------------------------------------------------------------*/
 void Contribution::set_direct(bool d)
 {
