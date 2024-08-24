@@ -1195,15 +1195,11 @@ bool Contribution::update()
 
   if(!_deps){ untested();
     _deps = new TData;
-    assert(_deps->rdeps().size());
   }else{
   }
-  trace2("Contribution::update A", name(), _deps->rdeps().size());
-  _deps->add_rdep(_branch);
-  trace2("Contribution::update B", name(), _deps->rdeps().size());
 
   size_t s = _deps->ddeps().size();
-  bool rdd = _rhs.update(&_deps->rdeps());
+  bool rdd = _rhs.update(&_rdeps);
   TData const* D = &_rhs.data();
   s = _deps->ddeps().size();
 
@@ -1840,9 +1836,13 @@ void AF_Arg_List::dump(std::ostream& o)const
 }
 /*--------------------------------------------------------------------------*/
 RDeps const* Assignment::rdeps() const
-{
+{ untested();
   assert(_lhsref);
-  return &_lhsref->deps().rdeps();
+  // _lhsref->rdeps...
+  incomplete();
+  static RDeps _rdeps;
+  return &_rdeps;
+  // return &_lhsref->deps().rdeps();
 }
 /*--------------------------------------------------------------------------*/
 bool Assignment::update()

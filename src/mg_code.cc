@@ -125,7 +125,8 @@ void Variable_Decl::new_data()
   }
   _data = new TData();
   if(p){
-    _data->add_rdep(p);
+    incomplete();
+    // _data->add_rdep(p);
   }else{
   }
 }

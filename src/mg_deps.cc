@@ -126,7 +126,6 @@ void TData::update(TData const& other)
 TData::~TData()
 {
   _ddeps.clear();
-  _rdeps.clear();
 }
 /*--------------------------------------------------------------------------*/
 void TData::clear()

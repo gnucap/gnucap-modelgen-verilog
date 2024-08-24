@@ -28,7 +28,7 @@
 /*--------------------------------------------------------------------------*/
 class Statement : public Owned_Base {
 protected:
-  std::vector<Base*> _rdeps;
+  RDeps _rdeps;
 protected:
   explicit Statement() : Owned_Base() {}
 public:

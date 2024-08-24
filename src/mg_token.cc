@@ -1284,7 +1284,8 @@ bool Token_VAR_REF::is_used() const
 { untested();
   auto td = prechecked_cast<TData const*>(data());
   assert(td);
-  return td->is_used();
+  incomplete();
+  return false;
 }
 /*--------------------------------------------------------------------------*/
 #if 0

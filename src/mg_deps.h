@@ -147,7 +147,6 @@ class Branch;
 class TData : public Base {
   DDeps _ddeps;
   Sensitivities _sens;
-  mutable /*bug*/ RDeps _rdeps;  // Branches & Probes...
   // V _sens; // discrete_deps?
   // R _range; // discrete_deps?
   bool _offset{false}; // -> dynamic_deps.
@@ -158,7 +157,6 @@ public:
   explicit TData() : Base() {}
   explicit TData(TData const& o) : Base(), _ddeps(o._ddeps),
     _sens(o._sens),
-    _rdeps(o._rdeps),
     _offset(o._offset), _constant(o._constant) { }
   ~TData();
   TData* clone()const {
@@ -173,8 +171,6 @@ public:
 
   DDeps& ddeps() {return _ddeps;}
   DDeps const& ddeps()const {return _ddeps;}
-  RDeps& rdeps() const {return _rdeps;}
-//  RDeps const& rdeps()const { untested();return _rdeps;}
 
   void set_offset(bool v = true){_offset = v;}
   void set_constant(bool v = true){_constant = v;} // attrib/sens?
@@ -184,13 +180,6 @@ public:
   bool is_linear()const;
   bool is_quadratic()const;
   void set_any() { _ddeps.set_any(); }
-public: // sens
-  void add_rdep(Base const* x){
-    _rdeps.insert(x);
-  }
-  bool is_used() const{ untested();
-    return _rdeps.size();
-  }
 public: // sens
   void add_sens(Base* x) {
     _sens.add(x);

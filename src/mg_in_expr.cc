@@ -289,7 +289,7 @@ void Expression_::set_rdeps(RDeps const& rd)
   assert(size());
   assert(back());
   assert(back()->data());
-  data().rdeps() = rd;
+//  data().rdeps() = rd;
 }
 /*--------------------------------------------------------------------------*/
 bool Expression_::update(RDeps const* rd)

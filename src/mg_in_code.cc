@@ -176,8 +176,8 @@ bool Variable_Decl::propagate_deps(Token_VAR_REF const& v)
 /*--------------------------------------------------------------------------*/
 bool Variable_Decl::propagate_rdeps(RDeps const& r)
 {
+  // propagate to _Stmt?
   incomplete();
-  deps().rdeps().merge(r);
   return false;
 }
 /*--------------------------------------------------------------------------*/
