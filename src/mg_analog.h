@@ -141,6 +141,21 @@ public: // sensitivities?
   TData const& deps(){ return _deps;};
 }; // AnalogSeqBlock
 /*--------------------------------------------------------------------------*/
+class AnalogSeqStmt : public AnalogStmt {
+  AnalogSeqBlock _block; // SeqBlock?
+public:
+  explicit AnalogSeqStmt() : AnalogStmt() {}
+  explicit AnalogSeqStmt(CS& cmd, Block* owner) : AnalogStmt() {
+    set_owner(owner);
+    parse(cmd);
+  }
+  void parse(CS& cmd)override;
+  void dump(std::ostream& o)const override {
+    _block.dump(o);
+  }
+  AnalogSeqBlock const& block()const { return _block; }
+};
+/*--------------------------------------------------------------------------*/
 class AnalogCtrlBlock : public AnalogSeqBlock {
 public:
   explicit AnalogCtrlBlock() : AnalogSeqBlock() {}
