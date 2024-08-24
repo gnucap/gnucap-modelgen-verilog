@@ -1,0 +1,30 @@
+
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_rc2(in, out);
+  inout in, out;
+  electrical in, out, g;
+  ground g;
+  resistor #(.r(1)) r(in, out);
+  analog begin
+    begin : here
+      I(g,out) <+ ddt(V(g,out));
+    end
+  end
+endmodule
+
+!make test_rc2.so > /dev/null
+
+attach ./test_rc2.so
+
+parameter v=1;
+test_rc2 #() dut(in, out);
+vsine #(.freq(1), .ampl(v), .dc(v)) v1(in, 0);
+
+print tran iter(0)
+tran .5
+status notime
