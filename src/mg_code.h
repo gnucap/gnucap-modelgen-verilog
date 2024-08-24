@@ -27,7 +27,6 @@
 #include "mg_expression.h"
 /*--------------------------------------------------------------------------*/
 class Statement : public Owned_Base {
-protected:
   RDeps _rdeps;
 protected:
   explicit Statement() : Owned_Base() {}
@@ -42,7 +41,6 @@ public:
     incomplete();
     return false;
   }
-  void set_rdeps(TData const&);
   virtual bool update();
 //  virtual Statement* parent_stmt();
   virtual Block* scope() { return Owned_Base::owner(); }
@@ -51,6 +49,9 @@ public:
 
   bool set_used_in(Base const*b);
   void unset_used_in(Base const*b){} // later.
+protected:
+  RDeps const& rdeps()const {return _rdeps;}
+  void set_rdeps(TData const&);
 public:
   bool is_reachable()const;
   bool is_always()const;
@@ -181,7 +182,7 @@ public:
   void parse(CS& cmd) override;
   void dump(std::ostream&)const override;
   bool propagate_deps(Token_VAR_REF const&);
-  bool update();
+  bool update(RDeps const* r);
 // protected:
   void set_lhs(Variable_Decl* v);
 

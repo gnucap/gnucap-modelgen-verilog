@@ -519,11 +519,11 @@ bool AnalogForStmt::update()
   bool ret = false;
 
   while(true){
-    if ( init_ && init_->update() ){ untested();
+    if ( init_ && init_->update(&rdeps()) ){ untested();
       ret = true;
     }else if (_body.update()){ untested();
       ret = true;
-    }else if ( tail_ && tail_->update() ) { untested();
+    }else if ( tail_ && tail_->update(&rdeps()) ) { untested();
       ret = true;
     }else{
       break;
@@ -566,7 +566,7 @@ bool AnalogProceduralAssignment::update()
   if(options().optimize_unused() && !scope()->is_reachable()) {
     return false;
   }else{
-    return _a.update();
+    return _a.update(&rdeps());
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1152,7 +1152,7 @@ bool Contribution::update()
   }
 
   size_t s = _deps->ddeps().size();
-  bool rdd = _rhs.update(&_rdeps);
+  bool rdd = _rhs.update(&rdeps());
   TData const* D = &_rhs.data();
   s = _deps->ddeps().size();
 

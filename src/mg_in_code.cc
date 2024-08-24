@@ -382,13 +382,13 @@ bool Assignment::has_sensitivities()const
   return data().has_sensitivities();
 }
 /*--------------------------------------------------------------------------*/
-bool Assignment::update()
+bool Assignment::update(RDeps const* r)
 {
   bool ret;
-  assert(rdeps());
+  assert(r);
   trace1("Assignment::update", rdeps()->size());
 
-  Expression_::update(rdeps());
+  Expression_::update(r);
 
   assert(_token);
   assert(scope());
