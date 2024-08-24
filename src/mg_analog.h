@@ -26,13 +26,8 @@
 #include "mg_code.h"
 /*--------------------------------------------------------------------------*/
 class AnalogStmt : public Statement {
-  std::vector<Base const*> _used_in;
 public:
-  void set_used_in(Base const*b); // const;
-  void unset_used_in(Base const*b); // const;
   ~AnalogStmt();
-//  bool used_in(Base const*)const;
-  bool is_used_in(Base const*)const override;
   bool propagate_rdeps(RDeps const&)override;
 
   virtual TData const& deps() = 0;

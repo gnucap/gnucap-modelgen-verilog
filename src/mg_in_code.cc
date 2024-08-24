@@ -26,6 +26,29 @@
 #include "mg_attrib.h"
 #include "mg_options.h"
 /*--------------------------------------------------------------------------*/
+bool Statement::set_used_in(Base const* b)
+{
+  return _rdeps.insert(b).second;
+}
+/*--------------------------------------------------------------------------*/
+bool Statement::is_used_in(Base const* b)const
+{
+ // for(auto& i : _used_in){
+ //   if(i == b){
+ //     return true;
+ //   }else{
+ //   }
+ // }
+ // return _rdeps.count(b); ?
+  for(auto& i : _rdeps){ untested();
+    if(i == b){ untested();
+      return true;
+    }else{ untested();
+    }
+  }
+  return false;
+}
+/*--------------------------------------------------------------------------*/
 bool Statement::update()
 {
   trace0("Statement::update");

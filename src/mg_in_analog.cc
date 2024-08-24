@@ -2358,50 +2358,10 @@ Branch_Ref Branch_Map::lookup(std::string const& n)const
   }
 }
 /*--------------------------------------------------------------------------*/
-void AnalogStmt::set_used_in(Base const* b)
-{
-  for(auto& i : _used_in){ untested();
-    if(i == b){ untested();
-      return;
-    }else{ untested();
-    }
-  }
-  _used_in.push_back(b);
-}
-/*--------------------------------------------------------------------------*/
-void AnalogStmt::unset_used_in(Base const* b)
-{
-  //for(auto& i : _used_in){
-  //  if(i == b){
-  //    i = NULL;
-  //    return;
-  //  }else{ untested();
-  //  }
-  //}
-  //unreachable();
-}
-/*--------------------------------------------------------------------------*/
 bool AnalogProceduralAssignment::is_used_in(Base const*b)const
 {
   return AnalogStmt::is_used_in(b);
   return _a.is_used_in(b) || AnalogStmt::is_used_in(b);
-}
-/*--------------------------------------------------------------------------*/
-bool AnalogStmt::is_used_in(Base const* b)const
-{
-  for(auto& i : _used_in){
-    if(i == b){
-      return true;
-    }else{
-    }
-  }
-  for(auto& i : _rdeps){ untested();
-    if(i == b){ untested();
-      return true;
-    }else{ untested();
-    }
-  }
-  return false;
 }
 /*--------------------------------------------------------------------------*/
 AnalogStmt::~AnalogStmt()

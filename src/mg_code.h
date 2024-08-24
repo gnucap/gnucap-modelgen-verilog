@@ -47,7 +47,10 @@ public:
 //  virtual Statement* parent_stmt();
   virtual Block* scope() { return Owned_Base::owner(); }
   virtual Block const* scope() const { return Owned_Base::owner(); }
-  virtual bool is_used_in(Base const*)const = 0;
+  virtual bool is_used_in(Base const*)const;
+
+  bool set_used_in(Base const*b);
+  void unset_used_in(Base const*b){} // later.
 public:
   bool is_reachable()const;
   bool is_always()const;
