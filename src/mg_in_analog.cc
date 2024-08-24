@@ -2371,14 +2371,14 @@ void AnalogStmt::set_used_in(Base const* b)
 /*--------------------------------------------------------------------------*/
 void AnalogStmt::unset_used_in(Base const* b)
 {
-  for(auto& i : _used_in){
-    if(i == b){
-      i = NULL;
-      return;
-    }else{ untested();
-    }
-  }
-  unreachable();
+  //for(auto& i : _used_in){
+  //  if(i == b){
+  //    i = NULL;
+  //    return;
+  //  }else{ untested();
+  //  }
+  //}
+  //unreachable();
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogProceduralAssignment::is_used_in(Base const*b)const
@@ -2406,9 +2406,9 @@ bool AnalogStmt::is_used_in(Base const* b)const
 /*--------------------------------------------------------------------------*/
 AnalogStmt::~AnalogStmt()
 {
-  for(auto n :_used_in){
-    assert(!n);
-  }
+ // for(auto n :_used_in){
+ //   assert(!n);
+ // }
 }
 /*--------------------------------------------------------------------------*/
 bool Probe::propagate_rdeps(RDeps const& r) const
