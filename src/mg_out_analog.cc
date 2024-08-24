@@ -319,7 +319,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	o__ "// dep " << v->code_name() << "\n";
 	assert(v->branch());
 	if(C.branch() == v->branch()){
-	  o__ "// same2 " << v->code_name() << "\n";
+	  o__ "// same " << v->code_name() << "\n";
 	}else if(v->branch()->is_short()) {
 	  o__ "// short: " << v->code_name() << "\n";
 #if 1
@@ -340,7 +340,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
       for(auto v : C.data().ddeps()) {
 	assert(v->branch());
 	if(C.branch() == v->branch()) {
-	  o__ "// same2 " << v->code_name() << "\n";
+	  o__ "// same " << v->code_name() << "\n";
 	}else if(v->branch()->is_detached_filter()){ /// && ref?
 	  o__ "m->" << v->branch()->state() << "[1] = " << neg_sign << "t0[d" << v->code_name() << "]; // (3p)\n";
 	}else if(v->branch()->is_filter()){ /// && ref?
@@ -832,7 +832,7 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
 
   for(auto const& d : b->deps().ddeps()){
     if(d->branch() == b){
-      o__ "// same1 " << d->code_name() << "\n";
+      o__ "// same " << d->code_name() << "\n";
       if(b->has_pot_source() && b->has_flow_probe()){
 	if(br.num_states()<=2){
 	}else{ untested();

@@ -289,12 +289,12 @@ void Expression_::set_rdeps(RDeps const& rd)
   assert(size());
   assert(back());
   assert(back()->data());
-  deps().rdeps() = rd;
+  data().rdeps() = rd;
 }
 /*--------------------------------------------------------------------------*/
 bool Expression_::update(RDeps const* rd)
 {
-  size_t n = deps().size();
+  size_t n = data().size();
 
   auto i = begin();
   for(size_t nn=size(); nn--; i=erase(i)){
@@ -302,8 +302,8 @@ bool Expression_::update(RDeps const* rd)
     (*i)->stack_op(this);
   }
 
-  if(n<deps().ddeps().size()) {
-  }else if(n==deps().ddeps().size()) {
+  if(n<data().ddeps().size()) {
+  }else if(n==data().ddeps().size()) {
   }else{
   }
 
@@ -315,7 +315,7 @@ bool Expression_::update(RDeps const* rd)
   }
 
   trace3("Expression_::update", size(), n, rdd);
-  return rdd || n != deps().size();
+  return rdd || n != data().size();
 }
 /*--------------------------------------------------------------------------*/
 /* A.8.3

@@ -71,7 +71,6 @@ public:
   void clear();
   Expression_* clone() const;
   TData const& data()const; // hmm
-  TData const& deps()const{return data();}
   // Attrib const& attrib()const;
   bool update(RDeps const* r=NULL);
   void set_dep(Base*);

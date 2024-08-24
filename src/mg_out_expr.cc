@@ -714,7 +714,7 @@ void make_cc_expression(std::ostream& o, Expression const& e, bool dynamic)
   TData const* deps = NULL;
   if(!dynamic){
   }else if(auto ex = dynamic_cast<Expression_ const*>(&e)){
-    deps = &ex->deps();
+    deps = &ex->data();
   }else{ untested();
   }
   RPN_VARS s(deps);

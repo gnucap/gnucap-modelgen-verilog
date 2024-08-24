@@ -469,7 +469,7 @@ void Token_TERNARY_::stack_op(Expression* E)const
     }
 
   }else{
-    TData* deps = new TData;
+    TData* data = new TData;
 
     auto SE = prechecked_cast<Expression_*>(E);
     assert(SE);
@@ -481,7 +481,7 @@ void Token_TERNARY_::stack_op(Expression* E)const
       // already stackopped? just clone..
       (**i).stack_op(t);
     }
-    deps->update(t->deps());
+    data->update(t->data());
 
     Expression_* f = new Expression_;
     f->set_owner(SE->owner());
@@ -490,9 +490,9 @@ void Token_TERNARY_::stack_op(Expression* E)const
       // already stackopped? just clone..
       (**i).stack_op(f);
     }
-    deps->update(f->deps());
+    data->update(f->data());
 
-    E->push_back(new Token_TERNARY_(name(), cond, t, f, deps));
+    E->push_back(new Token_TERNARY_(name(), cond, t, f, data));
   }
 }
 /*--------------------------------------------------------------------------*/

@@ -1204,7 +1204,7 @@ bool Contribution::update()
 
   size_t s = _deps->ddeps().size();
   bool rdd = _rhs.update(&_deps->rdeps());
-  TData const* D = &_rhs.deps();
+  TData const* D = &_rhs.data();
   s = _deps->ddeps().size();
 
   _deps->update(*D);
@@ -1213,7 +1213,7 @@ bool Contribution::update()
   if(options().optimize_unused() && !owner()->is_reachable()) { untested();
   }else{
     for(; s < _deps->ddeps().size(); ++s) {
-      Dep const& d = deps().ddeps()[s];
+      Dep const& d = data().ddeps()[s];
       add_dep(d);
     }
   }
@@ -1856,7 +1856,7 @@ bool Assignment::update()
   assert(_token);
   assert(scope());
 
-  if (store_deps(Expression_::deps())) {
+  if (store_deps(Expression_::data())) {
     // something new there.. pass it on.
     assert(_lhsref);
     _lhsref->propagate_deps(*_token);
@@ -1867,7 +1867,7 @@ bool Assignment::update()
     ret = false;
     assert(_token->data());
 //    trace2("Assignment::update", _token->deps().size(), Expression_::deps().size());
-    assert(_token->deps().size() >= Expression_::deps().size());
+    assert(_token->deps().size() >= Expression_::data().size());
   }
   scope()->new_var_ref(_token); // always needed?
 				//
