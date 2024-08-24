@@ -9,8 +9,8 @@ module dep0(d, g);
     while (1) begin
       // T : 1
       // c : 1
-      I(d) <+ c; // dep: _potential_b_g_
-      c = T; // dep: _potential_b_g_
+      I(d) <+ c; // dep: _potential_b_g_ s
+      c = T; // dep: _potential_b_g_ s
       T = V(g); // dep: _potential_b_g_
     end
   end

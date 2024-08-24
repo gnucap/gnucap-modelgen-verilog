@@ -25,7 +25,7 @@ module dep7(a, g);
         I(g) <+ d; // dep: _potential_b_a_
         real f// dep _potential_b_a_
 ;
-        f = d; // dep: _potential_b_a_
+        f = d; // dep: _potential_b_a_ s
       end
       else begin
         I(g) <+ 1;
@@ -64,7 +64,7 @@ module dep7p(a, g);
         I(g) <+ d; // dep: _potential_b_a_
         real f// dep _potential_b_a_
 ;
-        f = d; // dep: _potential_b_a_
+        f = d; // dep: _potential_b_a_ s
       end
       else begin
         I(g) <+ 1;

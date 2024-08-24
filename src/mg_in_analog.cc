@@ -175,77 +175,6 @@ void System_Task::dump(std::ostream&o)const
   o__ _e << ";\n";
 }
 /*--------------------------------------------------------------------------*/
-// void Lhs_Ref::parse()
-static Token_VAR_REF* parse_variable(CS& f, Block* o)
-{
-  size_t here = f.cursor();
-  std::string what;
-  f >> what;
-  trace1("parse_variable", what);
-  Base* b = o->lookup(what);
-  Token_VAR_REF* v = dynamic_cast<Token_VAR_REF*>(b);
-  if(v){
-    assert(f);
-    // assert(v->data()); no. unreachable?
-  }else if (b) { untested();
-    f.reset_fail(here);
-    trace1("not a variable", f.tail().substr(0,10));
-    assert(0);
-  }else{
-    f.reset_fail(here);
-    trace1("not found", f.tail().substr(0,10));
-  }
-  return v;
-}
-/*--------------------------------------------------------------------------*/
-Assignment::Assignment(CS& f, Base* o)
-{
-  // unreachable(); // reached from for condition
-  set_owner(o);
-  parse(f);
-} // Assignment::Assignment
-/*--------------------------------------------------------------------------*/
-void Assignment::parse(CS& f)
-{
-  assert(owner());
-  assert(scope());
-  size_t here = f.cursor();
-  Token_VAR_REF* l = parse_variable(f, scope());
-  // assert(l->name() == name());?
-
-  if(f && f >> "="){
-    _lhsref = l;
-    assert(_lhsref);
-    parse_rhs(f);
-  }else{
-    assert(!_lhsref);
-    f.reset_fail(here);
-  }
-
-  if(options().optimize_unused() && !scope()->is_reachable()) {
-  }else if(_lhsref) {
-    assert(f);
-    assert(l->data());
-    assert(!_token);
-    store_deps(Expression_::data());
-    assert(_token);
-    if(options().optimize_unused() && !scope()->is_reachable()) { untested();
-      unreachable();
-    }else{
-      assert(_token->data());
-      assert(_token->scope());
-      _lhsref->propagate_deps(*_token);
-      assert(_lhsref->name() == _token->name());
-      trace2("parsedone", _token->name(), data().size());
-    }
-    assert(_token);
-    assert(scope());
-    scope()->new_var_ref(_token);
-  }else{
-    // possibly not a variable..
-  }
-}
-/*--------------------------------------------------------------------------*/
 // void Assignment::parse(CS& f)?
 void AnalogProceduralAssignment::parse(CS& f)
 {
@@ -376,8 +305,8 @@ static Base* parse_analog_stmt_or_null(CS& file, Block* scope)
   ONE_OF	// module_item
     || (file >> ";")
     || ((file >> "begin") && (ret = pArse_seq(file, scope)))
-    || ((file >> "real ") && (ret = new Variable_List(file, scope)))
-    || ((file >> "integer ") && (ret = new Variable_List(file, scope)))
+    || ((file >> "real ") && (ret = new Variable_Stmt(file, scope)))
+    || ((file >> "integer ") && (ret = new Variable_Stmt(file, scope)))
     || ((file >> "if ") && (ret = parse_cond(file, scope)))
     || ((file >> "case ") && (ret = parse_switch(file, scope)))
     || ((file >> "while ") && (ret = new AnalogWhileStmt(file, scope)))
@@ -1532,7 +1461,7 @@ void AnalogEvtCtlStmt::parse(CS& file)
   file >> _ctrl;
   assert(owner());
   _body.set_owner(this);
-  _body.set_sens(this);
+  _body.set_sens(this); // BUG
   file >> _body;
 }
 /*--------------------------------------------------------------------------*/
@@ -1662,8 +1591,8 @@ void Analog_Function::parse(CS& f)
       || ((f >> "input ") && (f >> _args))
       || ((f >> "output ") && (f >> _args))
       || ((f >> "inout ") && (f >> _args))
-      || ((f >> "real ") && (s = new Variable_List(f, &_args)))
-      || ((f >> "integer ") && (s = new Variable_List(f, &_args)))
+      || ((f >> "real ") && (s = new Variable_Stmt(f, &_args)))
+      || ((f >> "integer ") && (s = new Variable_Stmt(f, &_args)))
       ;
     if (s){
       _vars.push_back(s);
@@ -1728,7 +1657,7 @@ Base* AnalogFunctionBody::lookup(std::string const& k, bool recurse)
   }
 }
 /*--------------------------------------------------------------------------*/
-void VariableList::dump(std::ostream& o) const
+void VariableLists::dump(std::ostream& o) const
 {
   for(auto i : *this){
     assert(i);

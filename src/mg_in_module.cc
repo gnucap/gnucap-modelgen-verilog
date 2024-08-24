@@ -340,7 +340,7 @@ void Parameter_2_List::dump(std::ostream& o)const
   o << "\n";
 }
 /*--------------------------------------------------------------------------*/
-void Variable_List::dump(std::ostream& o)const
+void Variable_Stmt::dump(std::ostream& o)const
 {
   print_attributes(o, this);
 
@@ -351,7 +351,7 @@ void Variable_List::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void Variable_List_Collection::parse(CS& f)
 {
-  Collection<Variable_List>::parse(f);
+  Collection<Variable_Stmt>::parse(f);
 }
 /*--------------------------------------------------------------------------*/
 void Variable_List_Collection::dump(std::ostream& o)const
@@ -1038,7 +1038,7 @@ void Module::push_back(FUNCTION_* f)
 // TODO always push into body?
 void Module::push_back(Base* x)
 {
-  if(auto vl = dynamic_cast<Variable_List*>(x)){
+  if(auto vl = dynamic_cast<Variable_Stmt*>(x)){
     _variables.push_back(vl);
   }else if(auto a = dynamic_cast<AnalogConstruct*>(x)){
     auto A = prechecked_cast<Analog*>(_analog); // needed? use LiSt?
@@ -1132,30 +1132,6 @@ Node::~Node()
 {
   trace1("~Node", code_name());
   // assert(!is_used()); incomplete.
-}
-/*--------------------------------------------------------------------------*/
-void SeqBlock::merge_sens(Sensitivities const& s)
-{
-  if(_sens){ untested();
-  }else{
-    _sens = new Sensitivities;
-  }
-  _sens->merge(s);
-}
-/*--------------------------------------------------------------------------*/
-void SeqBlock::set_sens(Base* s)
-{
-  if(_sens){
-  }else{
-    _sens = new Sensitivities;
-  }
-  _sens->add(s);
-}
-/*--------------------------------------------------------------------------*/
-SeqBlock::~SeqBlock()
-{
-  delete _sens;
-  _sens = NULL;
 }
 /*--------------------------------------------------------------------------*/
 void Module::delete_circuit()

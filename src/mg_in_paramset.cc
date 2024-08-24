@@ -310,7 +310,7 @@ static void import_proto_vars(Module* sub, Module const* proto)
 {
   auto& pv = proto->variables();
 
-  for(Variable_List const* x : pv) {
+  for(Variable_Stmt const* x : pv) {
     auto copy = x->deep_copy_(sub, PS_MANGLE_PREFIX);
 //    assert(copy->owner() == sub);
     sub->push_back(copy);

@@ -845,11 +845,6 @@ Node_Ref Branch::n() const
   assert(_n); return _n;
 }
 /*--------------------------------------------------------------------------*/
-bool Assignment::has_sensitivities()const
-{
-  return data().has_sensitivities();
-}
-/*--------------------------------------------------------------------------*/
 bool Parameter_2_List::is_local()const
 {
   // really? ask *begin?

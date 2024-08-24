@@ -192,7 +192,7 @@ public: // sens
     return _rdeps.size();
   }
 public: // sens
-  void add_sens(Base* x) { untested();
+  void add_sens(Base* x) {
     _sens.add(x);
   }
   void add_sens(Sensitivities const& s){

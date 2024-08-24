@@ -157,7 +157,11 @@ bool Dep::same_data(Dep const& o) const
 /*--------------------------------------------------------------------------*/
 bool TData::has_sensitivities()const
 {
-  return !_sens.empty(); // incomplete.
+  if(_sens.empty()){
+    return false;
+  }else{
+    return true;
+  }
   for(auto x : _sens){ untested();
     if(dynamic_cast<AnalogEvtExpression const*>(x)){ untested();
       return true;

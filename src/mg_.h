@@ -444,36 +444,6 @@ void make_cc_expression(std::ostream& o, Expression const& e, bool deriv=true);
 void make_cc_event_cond(std::ostream& o, Expression const& e);
 void dump_analog(std::ostream& o, Module const& m);
 /*--------------------------------------------------------------------------*/
-/*
-analog_event_control_statement ::= analog_event_control analog_event_statement
-analog_event_control ::=
-@ hierarchical_event_identifier
-| @ ( analog_event_expression )
-analog_event_expression ::=
-...
-- analog_event_statement ::=
-- { attribute_instance } analog_loop_statement
-- | { attribute_instance } analog_case_statement
-- | { attribute_instance } analog_conditional_statement
-- | { attribute_instance } analog_procedural_assignment
-- | { attribute_instance } analog_event_seq_block
-- | { attribute_instance } analog_system_task_enable
-- | { attribute_instance } disable_statement
-- | { attribute_instance } event_trigger
-- | { attribute_instance } ;
-*/
-/*--------------------------------------------------------------------------*/
-class AnalogEvtExpression : public Owned_Base {
-  Expression* _expression{NULL};
-public:
-  ~AnalogEvtExpression(){
-    delete _expression;
-  }
-  void parse(CS&)override;
-  void dump(std::ostream&)const override;
-  Expression const& expression() const{assert(_expression); return *_expression;};
-  Block* owner() { untested();return Owned_Base::owner();}
-};
 /*--------------------------------------------------------------------------*/
 // inline void Owned_Base::set_reachable()
 // { untested();

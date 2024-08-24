@@ -457,9 +457,9 @@ public:
 };
 #endif
 /*--------------------------------------------------------------------------*/
-class Variable_List;
+class Variable_Stmt;
 class Token_VAR_DECL : public Token_VAR_REF {
-  // Variable_List const* _owner{NULL}; // _item?
+  // Variable_Stmt const* _owner{NULL}; // _item?
   Base const* _default{0};
   // type //
 public:
@@ -470,7 +470,7 @@ public:
   ~Token_VAR_DECL() { untested(); delete _default; }
   Data_Type const& type()const override;
 
-//  void set_owner(Variable_List* b){ untested();_item = b;}
+//  void set_owner(Variable_Stmt* b){ untested();_item = b;}
   std::string key() const { untested();unreachable();return "";}
 
   void clear_deps();

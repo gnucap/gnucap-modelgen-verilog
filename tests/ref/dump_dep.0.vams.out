@@ -6,9 +6,9 @@ module dep0(d, g);
     // c : 0
     real c;
     real T;
-    c = T;
+    c = T; // s
     T = V(g); // dep: _potential_b_g_
-    I(d) <+ c;
+    I(d) <+ c; // s
     I(g) <+ V(g); // dep: _potential_b_g_
   end
 

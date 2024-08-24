@@ -128,10 +128,10 @@ void MGVAMS_FILTER::setup(Module* m)
 	assert(0);
       }
     }
-    for(auto b : branch()->deps().rdeps()) { untested();
-      (void)b;
-      rdeps = true;
-    }
+    // for(auto b : branch()->deps().rdeps()) { untested();
+    //   (void)b;
+    //   rdeps = true;
+    // }
 
     trace4("filter use?", c_cnt, rdeps, assigned, branch()->code_name());
     _output = NULL;

@@ -97,7 +97,7 @@ private: // no ops for prototype
   void tr_advance()override	{if(is_device()){ BASE_SUBCKT::tr_advance();}else{} }
   TIME_PAIR tr_review() override{if(is_device()){ return BASE_SUBCKT::tr_review();}else{
                                                   return TIME_PAIR(NEVER, NEVER);}}
-  void dc_advance()override	{if(is_device()){ BASE_SUBCKT::dc_advance();}else{untested();} }
+  void dc_advance()override	{if(is_device()){ BASE_SUBCKT::dc_advance();}else{} }
   void do_ac()override		{if(is_device()){ BASE_SUBCKT::do_ac();}else{} }
   void ac_load()override	{if(is_device()){ BASE_SUBCKT::ac_load();}else{} }
   void tr_queue_eval()override{

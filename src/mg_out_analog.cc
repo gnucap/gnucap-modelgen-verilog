@@ -72,7 +72,7 @@ private:
 private:
 //  void make_block_int_identifier_list(std::ostream& o, ListOfBlockIntIdentifiers const& rl)const;
 //  void make_block_real_identifier_list(std::ostream& o, ListOfBlockRealIdentifiers const& rl)const;
-  void make_block_variables(std::ostream& o, Variable_List const& rl)const;
+  void make_block_variables(std::ostream& o, Variable_Stmt const& rl)const;
   void make_real_variable   (std::ostream& o, Token_VAR_DECL const& v)const;
 private:
   void make_one_variable_load(std::ostream& o, Token_VAR_REF const& V, Module const& m)const;
@@ -140,7 +140,7 @@ void OUT_ANALOG::make_variable(std::ostream& o, Variable_Decl const& v) const
 }
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_block_variables(std::ostream& o,
-    Variable_List const& rl) const
+    Variable_Stmt const& rl) const
 {
   for(Variable_Decl const* v : rl){
     if(v->size()){ untested();
@@ -400,7 +400,7 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
   }else if(auto assign=dynamic_cast<Assignment const*>(&ab)) { untested();
     // incomplete.
     make_assignment(o, *assign);
-  }else if(auto ard=dynamic_cast<Variable_List const*>(&ab)) {
+  }else if(auto ard=dynamic_cast<Variable_Stmt const*>(&ab)) {
     make_block_variables(o, *ard);
   }else if(auto v=dynamic_cast<Variable_Decl const*>(&ab)) { untested();
     unreachable();
@@ -486,7 +486,7 @@ void OUT_ANALOG::make_af_body(std::ostream& o, const Analog_Function& f) const
   o << "// /args w/o dir\n";
 
   for(Base const* i : f.body()) {
-    if(auto ard = dynamic_cast<Variable_List const*>(i)){
+    if(auto ard = dynamic_cast<Variable_Stmt const*>(i)){
       // make_stmt(o, *i);
       make_block_variables(o, *ard);
     }else if(auto st = dynamic_cast<AnalogStmt const*>(i)){

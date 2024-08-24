@@ -406,6 +406,8 @@ bool Expression_::propagate_rdeps(RDeps const& r)
     trace1("rdep sens", s);
     if(auto st = dynamic_cast<Statement*>(s)){
       ret |= st->propagate_rdeps(r);
+    }else if(auto vd = dynamic_cast<Variable_Decl*>(s)){
+      ret |= vd->propagate_rdeps(r);
     }else{ untested();
       assert(0);
     }

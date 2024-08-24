@@ -99,6 +99,7 @@ public:
 //  std::string code_name()const override;
   void set_type(Data_Type const& d){ _type=d; }
   bool propagate_deps(Token_VAR_REF const&);
+  bool propagate_rdeps(RDeps const&);
 protected:
   void clear_deps();
 private:
@@ -128,14 +129,14 @@ protected:
   void new_var_ref_();
 }; // Variable_Decl
 /*--------------------------------------------------------------------------*/
-class Variable_List : public Statement {
+class Variable_Stmt : public Statement {
   typedef LiSt<Variable_Decl, '\0', ',', ';'> list_;
   typedef list_::const_iterator const_iterator;
   list_ _l;
   Data_Type _type;
 public:
-  explicit Variable_List() : Statement() {}
-  explicit Variable_List(CS& f, Base* o) : Statement() {
+  explicit Variable_Stmt() : Statement() {}
+  explicit Variable_Stmt(CS& f, Base* o) : Statement() {
     set_owner(o);
     parse(f);
   }
@@ -143,12 +144,12 @@ public:
   Data_Type const& type()const {return _type;}
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
-  Variable_List* deep_copy_(Block* owner, std::string prefix="") const;
+  Variable_Stmt* deep_copy_(Block* owner, std::string prefix="") const;
   bool is_used_in(Base const*)const override;
 //  void set_owner(Block* b){ untested(); Statement::set_owner(b); }
   const_iterator begin()const { return _l.begin(); }
   const_iterator end()const { return _l.end(); }
-  Variable_List* deep_copy(Base*)const override
+  Variable_Stmt* deep_copy(Base*)const override
     { untested();unreachable();return NULL;}
   bool update() override;
 };
