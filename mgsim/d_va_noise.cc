@@ -164,6 +164,9 @@ private: // override virtual
 		      COMMON_COMPONENT *Common, double Value,
 		      int n_states, double states[],
 		      int n_nodes, const node_t nodes[])override;
+  void set_current_port_by_index(int, const std::string&) {
+    // BUG: stray call. no side effect.
+  }
   void precalc_last()override;
   char	   id_letter()const override{return '\0';}
   std::string value_name()const override{return "";}
