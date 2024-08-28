@@ -5,6 +5,8 @@ This file summarizes new features and important changes between snapshots.
 202408**-dev
 ============
 * cross events
+* timer event
+* $discontinuity
 
 202405**-dev
 ============

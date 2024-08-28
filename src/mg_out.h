@@ -31,6 +31,7 @@ extern std::string ind;
 #define o____ o__ "  " <<
 #define o______ o____ "  " <<
 #define o________ o______ "  " <<
+#define o__________ o________ "  " <<
 /*--------------------------------------------------------------------------*/
 #ifdef DO_TRACE_TAGS
 #define make_tag(o) (o << "//" << __FILE__ ":" << __func__ << ":" << __LINE__ << "\n")

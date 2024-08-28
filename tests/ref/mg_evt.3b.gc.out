@@ -1,0 +1,26 @@
+test_evt3b #() dut0 (.p(1),.n(0));
+#           v(1)       iter(0)   
+time3   0
+time2   0
+ 0.         0.         2.        
+#Time       iter(0)   
+time3   0
+time2   0
+ 0.         2.        
+ 0.1        2.        
+time2   2
+ 2.         2.        
+time3   3
+ 3.         2.        
+time2   4
+ 4.         2.        
+time2   6
+ 6.         2.        
+time3   6
+ 6.         4.        
+time2   8
+ 8.         2.        
+time3   9
+ 9.         2.        
+time2   10
+ 10.        2.        

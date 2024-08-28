@@ -141,11 +141,21 @@ class Filter; // BUG. probably
 class Analog;
 class Circuit;
 class Module : public Block {
+  typedef enum : int{
+    if_AC_BEGIN = 0,
+    if_TR_BEGIN = 1,
+    if_TR_ADVANCE = 2,
+    if_TR_REVIEW = 3,
+    if_TR_ACCEPT = 4,
+    if_SET_EVENT = 6,
+    if_COUNT = 5
+  } iface_id_t;
 public:
   typedef enum : int{
     mm_NONE = 0,
     mm_ANALOG = 1,
-    mm_DIGITAL = 2
+    mm_DIGITAL = 2,
+    mm_BOTH = 3
   } mode_mask_t;
 private: // verilog input data
   File const* _file{NULL};
@@ -170,9 +180,8 @@ private: // merge?
   std::list<FUNCTION_*> _func;
   pSet<FUNCTION_ const> _funcs;
   mode_mask_t _has_analysis{mm_NONE};
-  mode_mask_t _has_tr_review{mm_NONE};
-  mode_mask_t _has_tr_accept{mm_NONE};
-  mode_mask_t _has_tr_advance{mm_NONE};
+
+  mode_mask_t _has_pid[if_COUNT]{mm_NONE};
   int _times{0}; // _time array size
 private: // elaboration data
   void new_analog();
@@ -206,13 +215,25 @@ public: // TODO
   const Circuit*	  circuit()const	{return _circuit;}
   const Owned_Base& analog() const {assert(_analog); return *_analog;}
   bool has_analysis()const {return _has_analysis;}
-  bool has_tr_review()const {return _has_tr_review || has_analysis(); }
-  bool has_tr_accept()const {return _has_tr_accept || has_analysis(); }
-  bool has_tr_advance()const {return _has_tr_advance || has_analysis()
+
+  bool has_events()const    { return _has_pid[if_SET_EVENT];}
+  bool has_tr_begin()const  { return _has_pid[if_TR_BEGIN];}
+  bool has_tr_review()const { return _has_pid[if_TR_REVIEW]  || has_analysis(); }
+  bool has_tr_accept()const { return _has_pid[if_TR_ACCEPT]  || has_analysis(); }
+  bool has_tr_advance()const{ return _has_pid[if_TR_ADVANCE] || has_analysis()
        || has_analog_block(); // why?
   }
 
-  bool has_tr_advance_analog()const {return _has_tr_advance & mm_ANALOG; }
+  bool has_ac_begin_analog()const   {untested(); return _has_pid[if_TR_BEGIN]   & mm_ANALOG; }
+  bool has_tr_begin_analog()const   { return _has_pid[if_TR_BEGIN]   & mm_ANALOG; }
+  bool has_tr_review_analog()const  {untested(); return _has_pid[if_TR_BEGIN]   & mm_ANALOG; }
+  bool has_tr_advance_analog()const { return _has_pid[if_TR_ADVANCE] & mm_ANALOG; }
+  bool has_tr_accept_analog()const  {untested(); return _has_pid[if_TR_ACCEPT]  & mm_ANALOG; }
+
+  bool has_tr_begin_digital()const   { return _has_pid[if_TR_BEGIN]   & mm_DIGITAL; }
+  bool has_tr_review_digital()const  {untested(); return _has_pid[if_TR_BEGIN]   & mm_DIGITAL; }
+  bool has_tr_advance_digital()const {untested(); return _has_pid[if_TR_ADVANCE] & mm_DIGITAL; }
+  bool has_tr_accept_digital()const  {untested(); return _has_pid[if_TR_ACCEPT]  & mm_DIGITAL; }
 
   int times()const {return _times;}
   void new_filter();
@@ -222,9 +243,18 @@ public:
   bool sync()const;
   bool has_submodule()const;
   bool has_analog_block()const;
-  void set_tr_review(mode_mask_t m=mm_ANALOG) {_has_tr_review  = (mode_mask_t)(_has_tr_review  | m); }
-  void set_tr_accept(mode_mask_t m=mm_ANALOG) {_has_tr_accept  = (mode_mask_t)(_has_tr_accept  | m); }
-  void set_tr_advance(mode_mask_t m=mm_ANALOG){_has_tr_advance = (mode_mask_t)(_has_tr_advance | m); }
+
+  void set_set_event (mode_mask_t m=mm_ANALOG) {set_pid(if_SET_EVENT, m);}
+  void set_ac_begin  (mode_mask_t m=mm_ANALOG) {set_pid(if_AC_BEGIN, m);}
+  void set_tr_begin  (mode_mask_t m=mm_ANALOG) {set_pid(if_TR_BEGIN, m);}
+  void set_tr_review (mode_mask_t m=mm_ANALOG) {set_pid(if_TR_REVIEW, m);}
+  void set_tr_accept (mode_mask_t m=mm_ANALOG) {set_pid(if_TR_ACCEPT, m);}
+  void set_tr_advance(mode_mask_t m=mm_ANALOG) {set_pid(if_TR_ADVANCE, m);}
+
+private:
+  void set_pid  (iface_id_t p, mode_mask_t m=mm_ANALOG) {_has_pid[p] = (mode_mask_t)(_has_pid[p] | m);}
+
+public:
   void set_times(int h) {if(h > _times){_times = h;}else{}}
   void set_analysis() {_has_analysis = mm_ANALOG; }
   void push_back(FUNCTION_* f);

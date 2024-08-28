@@ -5,6 +5,13 @@ Some of them are not here, but still in ../src.
 
 (parenthesized: not yet)
 
+- A.6.5 Timing control Statements
+  - initial_step
+  - (final_step)
+  - cross
+  - above
+  - timer
+  - (absdelta)
 - A.8.2 Function calls
   - ln, log.. (see Table 9-11)
   - ac_stim
@@ -21,9 +28,9 @@ Some of them are not here, but still in ../src.
   - ($display)
   - ($monitor)
   - $write
-  - ($debug)
+  - $debug
 - Table 9-4 -- Simulation control system tasks
-  - ($finish)
+  - $finish
   - ($stop)
   - ($fatal)
   - ($warning)
@@ -33,7 +40,7 @@ Some of them are not here, but still in ../src.
   - ($realtime)
   - $time
   - ($stime)
-  - ($abstime)
+  - $abstime
 - Table 9-10 -- Probabilistic
   - ($random)
   - ($arandom)
@@ -51,7 +58,7 @@ Some of them are not here, but still in ../src.
 - Table 9-13 -- Dynamic simulation probe
   - ($simprobe)
 - Table 9-14 -- Analog kernel control
-  - ($discontinuity)
+  - $discontinuity
   - $limit
   - $bound_step
 - Table 9-15 -- Hierarchical parameter system functions

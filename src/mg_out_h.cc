@@ -273,6 +273,10 @@ static void make_common(std::ostream& o, const Module& m)
     o__ "void tr_review_analog(MOD_" << m.identifier() << "*)const;\n";
   }else{
   }
+  if(m.has_tr_begin_analog()) {
+    o__ "void tr_begin_analog(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
   if(m.has_tr_accept() && m.has_analog_block()){
     o__ "void tr_accept_analog(MOD_" << m.identifier() << "*)const;\n";
   }else{
@@ -453,7 +457,7 @@ static void make_module(std::ostream& o, const Module& m)
   o << "private:\n";
   o__ "static int _count;\n";
  // o__ "bool _eval{false};\n";
-  if(m.has_tr_review()){
+  if(m.has_tr_accept()){
     o__ "bool _accept{false};\n";
   }else{
   }
@@ -525,11 +529,27 @@ static void make_module(std::ostream& o, const Module& m)
 
   if(m.has_tr_review()){
     o__ "TIME_PAIR  tr_review()override;\n";
-    o__ "void q_accept() { _accept = 1; }\n";
+  }else{
+  }
+  if(m.has_tr_begin()){
+    o__ "void tr_begin()override;\n";
   }else{
   }
   if(m.has_tr_accept()){
     o__ "void tr_accept()override;\n";
+    o__ "void q_accept() { _accept = 1; }\n";
+  }else{
+  }
+  if(m.has_events()) {
+    o__ "double new_event(double newtime, double tol) {\n";
+    o____ "trace2(\"new_event\", long_label(), newtime);\n";
+    o____ "_sim->new_event(newtime);\n";
+    o____ "if(tol) {\n";
+             // not used.
+    o____ "}else{\n";
+    o____ "}\n";
+    o____ "return newtime;\n"; // for now
+    o__ "}\n";
   }else{
   }
   if(m.has_tr_advance()){

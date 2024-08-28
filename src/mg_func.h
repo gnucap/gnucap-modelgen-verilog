@@ -53,10 +53,12 @@ public: // characteristics
   std::string const& key()const { return label(); } // free?
   void set_num_args(size_t n){ _num_args = n; }
   size_t num_args() const { return _num_args; }
-  virtual bool has_tr_eval()const { untested();return true;}
+  virtual bool has_tr_begin()const  {return false;}
+  virtual bool has_tr_eval()const   { untested();return true;}
   virtual bool has_tr_review()const {return false;}
   virtual bool has_tr_accept()const {return false;}
-  virtual bool has_tr_advance()const {return false;}
+  virtual bool has_tr_advance()const{return false;}
+  virtual bool has_set_event()const {return false;}
 
   virtual bool static_code()const {return false;}
   virtual bool is_common()const {return false;}

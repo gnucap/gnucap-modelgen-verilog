@@ -1,0 +1,20 @@
+test_evt3c #() dut0 (.p(1),.n(0));
+#           v(1)       iter(0)   
+time3   0
+time2   0
+ 0.         0.         2.        
+#Time       iter(0)    control(0)
+time3   0
+time2   0
+ 0.         2.         1.        
+ 0.1        2.         9.        
+time2   2
+ 2.         2.         2.        
+time3   3
+ 3.         2.         2.        
+time2   4
+ 4.         2.         2.        
+time2   6
+ 6.         2.         2.        
+ 6.         4.         17.       
+ 6.00000004 dut0 timer: giving up on event at 6.000000000002

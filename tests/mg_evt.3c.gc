@@ -1,0 +1,35 @@
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_evt3c(p, n);
+	electrical p, n;
+	inout p, n;
+	analog begin
+		@(timer(0, 3+1e-12, 1e-8)) begin
+			$write("time3   %g\n", $abstime);
+      end
+		@(timer(0, 2, 1e-8)) begin
+			$write("time2   %g\n", $abstime);
+      end
+	end
+endmodule
+
+list
+
+!make test_evt3c.so > /dev/null
+attach ./test_evt3c.so
+
+test_evt3c dut0(1,0);
+
+list
+
+print dc v(nodes) iter(0)
+dc
+print tran iter(0) control(0)
+tran 10 basic
+
+end

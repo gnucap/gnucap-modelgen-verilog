@@ -91,7 +91,7 @@ void make_cc_current_ports(std::ostream& o, Branch const* br, Element_2 const&);
 static void make_tr_needs_eval(std::ostream& o, const Module& m)
 {
   o << "bool MOD_" << m.identifier() << "::tr_needs_eval()const\n{\n";
-  o__ "trace2(\"" << m.identifier() <<"::needs_eval?\", long_label(), has_probes());\n";
+  o__ "trace3(\"" << m.identifier() <<"::needs_eval?\", long_label(), _sim->_time0, has_probes());\n";
   o__ "node_t gnd(&ground_node);\n";
   o__ "if (is_q_for_eval()) {\n";
   o____ "return false;\n";
@@ -426,6 +426,15 @@ static void make_tr_begin(std::ostream& o, const Module& m)
     o__ "}\n";
   }else{ untested();
   }
+  if(m.has_tr_begin_analog()) {
+  o__ "c->tr_begin_analog(this);\n"; // call from COMMON::tr_begin?
+  }else{
+  }
+  if(m.has_tr_begin_digital()) {
+  o__ "c->tr_begin_digital(this);\n"; // call from COMMON::tr_begin?
+  }else{
+  }
+  // o__ "return " << baseclass(m) << "::tr_begin();\n";
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -439,7 +448,7 @@ static void make_tr_advance(std::ostream& o, const Module& m)
   o__ "assert(c);\n";
   o__ "(void)c;\n";
 
-  if(m.has_analysis()) {
+  if(m.has_analysis()) { // BUG?
     o__ "if(_sim->_last_time == 0.){\n";
     o__ "incomplete();\n";
     o__ "c->tr_eval_analog(this);\n";
@@ -465,7 +474,7 @@ static void make_tr_advance(std::ostream& o, const Module& m)
   for(auto f : m.funcs()){
     f->make_cc_tr_advance(o);
   }
-  o__ "return " << baseclass(m) << "::tr_advance();\n";
+  o__ baseclass(m) << "::tr_advance();\n"; // upside down. cf mg2_an2
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -475,13 +484,19 @@ static void make_tr_regress(std::ostream& o, const Module& m)
 {
   o << "inline void MOD_" << m.identifier() << "::tr_regress()\n{\n";
   o__ baseclass(m) << "::tr_regress();\n";
+  if(m.times()>1){
+    o__ "assert(_time[1] <= _sim->_time0);\n";
+  }else{
+  }
   if(m.times()){
+    o__ "assert(_time[0] >= _sim->_time0); // moving backwards\n";
     o__ "for (int i=" << m.times()-1 << "; i>0; --i) {\n";
     o____ "assert(_time[i] < _time[i-1] || _time[i] == 0.);\n";
     o__ "}\n";
     o__ "_time[0] = _sim->_time0;\n";
   }else{
   }
+    // _y[i] = _y[i-1];
   o__ "set_not_converged();\n";
 
   o__ "COMMON_" << m.identifier() << " const* c = "
@@ -506,22 +521,29 @@ static void make_tr_review(std::ostream& o, const Module& m)
   }
 #endif
   o__ "_time_by = BASE_SUBCKT::tr_review();\n";
+  if(m.has_tr_accept()){
+    o__ "_accept = 0;\n";
+  }else{
+  }
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
   o__ "trace1(\"review0\", _time_by._event);\n";
   o__ "c->tr_review_analog(this);\n";
-  o__ "trace1(\"review\", _time_by._event);\n";
   for(auto f : m.funcs()){
     f->make_cc_tr_review(o);
   }
   o << "{itested();\n";
   o__ "}\n";
-  o__ "if(_accept){\n";
-  o____ "COMPONENT::q_accept();\n";
-  o____ "trace1(\"" << m.identifier() <<"::_accept\", _sim->_time0);\n";
-  o____ "_accept = 0;\n";
-  o__ "}\n";
+  if(m.has_tr_accept()){
+    o__ "if(_accept){\n";
+    o____ "COMPONENT::q_accept();\n";
+    o____ "trace1(\"" << m.identifier() <<"::_accept\", _sim->_time0);\n";
+    o__ "}else{\n";
+    o__ "}\n";
+  }
+
+  o__ "trace3(\"review done\", long_label(), _sim->_time0, _time_by._event);\n";
   o__ "return _time_by;\n";
   o << "}\n"
     "/*--------------------------------------"

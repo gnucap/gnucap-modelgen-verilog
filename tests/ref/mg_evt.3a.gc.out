@@ -1,0 +1,15 @@
+test_evt3a #() dut0 (.p(1),.n(0));
+#Time       iter(0)   
+time1   0
+ 0.         2.        
+ 0.1        2.        
+time1   2
+ 2.         2.        
+time1   4
+ 4.         2.        
+time1   6
+ 6.         2.        
+time1   8
+ 8.         2.        
+time1   10
+ 10.        2.        

@@ -31,38 +31,6 @@
 namespace {
 static int n_events;
 /*--------------------------------------------------------------------------*/
-class Token_EVT : public Token_CALL {
-public:
-  explicit Token_EVT(const std::string Name, FUNCTION_ const* f = NULL)
-    : Token_CALL(Name, f) {}
-private:
-  explicit Token_EVT(const Token_EVT& P, Base const* data=NULL)
-    : Token_CALL(P, data) { untested();}
-  Token* clone()const override { untested();
-    return new Token_EVT(*this);
-  }
-  void stack_op(Expression* e)const override {
-    Token const* arg=NULL;
-	  Token_CALL::stack_op(e);
-#if 0
-    if(!e->size()){ untested();
-      assert(e);
-      Token_CALL::stack_op(e);
-    }else if(auto p = dynamic_cast<Token_PARLIST_ const*>(e->back())){ untested();
-      if(auto ee = dynamic_cast<Expression const*>(p->data())){ untested();
-	arg = ee->back();
-      }else if(p->args()){ untested();
-	arg = p->args()->back();
-      }else{ untested();
-	unreachable();
-      }
-    }else{ untested();
-      unreachable();
-    }
-#endif
-  }
-};
-/*--------------------------------------------------------------------------*/
 class INITIAL_MODEL : public FUNCTION_ {
 public:
   explicit INITIAL_MODEL() : FUNCTION_() {
@@ -308,36 +276,6 @@ public:
   }
 } above;
 DISPATCHER<FUNCTION>::INSTALL d_above(&function_dispatcher, "above", &above);
-/*--------------------------------------------------------------------------*/
-class TIMER : public FUNCTION_ {
-public:
-  explicit TIMER() : FUNCTION_() {
-    set_label("timer");
-  }
-  ~TIMER(){ }
-private:
-  bool static_code()const override {return false;}
-  Token* new_token(Module& m, size_t)const override {
-    m.install(this);
-    return new Token_EVT(label(), this);
-  }
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
-    unreachable();
-    return "";
-  }
-  std::string code_name()const override{ untested();
-    return "timer";
-  }
-//   void stack_op(Expression const& args, Expression* out) const override { untested();
-//     incomplete();
-//   }
-  void make_cc_common(std::ostream& o)const override { untested();
-    incomplete();
-    o__ "bool " << code_name() << "(PARA_BASE const& p)const {\n";
-    o__ "}\n";
-  }
-} timer;
-DISPATCHER<FUNCTION>::INSTALL d_timer(&function_dispatcher, "timer", &timer);
 /*--------------------------------------------------------------------------*/
 } // namespace
 /*--------------------------------------------------------------------------*/

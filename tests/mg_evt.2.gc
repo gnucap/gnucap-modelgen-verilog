@@ -1,0 +1,35 @@
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+
+
+verilog
+
+`modelgen
+module test_evt2(p, n);
+	electrical p, n;
+	inout p, n;
+	analog begin
+		@(cross(V(p,n), 0)) begin
+			$discontinuity;
+      end
+	end
+endmodule
+
+list
+
+!make test_evt2.so > /dev/null
+attach ./test_evt2.so
+
+test_evt2 dut0(1,0);
+test_evt2 dut1(0,1);
+vsine #(.freq(1e6) .ampl(2) .samples(9)) vin(1,0);
+
+list
+
+print dc v(nodes) iter(0)
+dc
+print tran v(nodes) iter(0)
+tran 1e-6 basic
+
+end

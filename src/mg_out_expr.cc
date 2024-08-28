@@ -390,7 +390,7 @@ public:
     assert(!_args.empty());
     _args.pop();
   }
-  size_t size() const{ untested();
+  size_t size() const{
     return _refs.size();
   }
   std::string code_name() const{
@@ -599,25 +599,26 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
 	o__ s.code_name() << " = ";
       }
 
+      if(F->has_modes()){
+	o << F->code_name() << _ctx;
+      }else{
+	o << F->code_name();
+      }
+      o << "(";
+      std::string comma = "";
+      if(F->is_common()){
+	o << "d";
+	comma = ", ";
+      }else{
+      }
       if(!F->args()) {
-	o << F->code_name() << "(); // no parlist\n";
+	o << "); // no parlist\n";
 	assert(!argnames.size());
       }else if(!argnames.size()){
-	o << F->code_name() << "(); // no args\n";
+	o << "); // no args\n";
 	s.args_pop();
       }else{
 	assert(F->code_name()!="");
-	if(F->has_modes()){
-	  o << F->code_name() << _ctx;
-	}else{
-	  o << " /*(312)*/ " << F->code_name();
-	}
-	o << "(";
-	if(F->is_common()){
-	  o << "d,";
-	}else{
-	}
-       	std::string comma = "";
 	for(size_t ii=argnames.size(); ii; --ii){
 	  o << comma << argnames[ii-1];
 	  comma = ", ";

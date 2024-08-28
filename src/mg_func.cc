@@ -66,6 +66,10 @@ void FUNCTION_::stack_op(Expression const& arg, Expression* E) const
     double value = evalf(argv);
     const Float* v = new Float(value);
     E->push_back(new Token_CONSTANT(to_string(value), v, ""));
+  }else if(arg.size()==3){
+    double value = evalf(argv);
+    const Float* v = new Float(value);
+    E->push_back(new Token_CONSTANT(to_string(value), v, ""));
   }else{ untested();
     incomplete();
   }

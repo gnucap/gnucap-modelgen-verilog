@@ -489,6 +489,22 @@ public:
   void set_default(Base const* x) { untested(); assert(!_default); _default=x; }
 };
 /*--------------------------------------------------------------------------*/
+class Token_EVT : public Token_CALL {
+public:
+  explicit Token_EVT(const std::string Name, FUNCTION_ const* f = NULL)
+    : Token_CALL(Name, f) {}
+private:
+  explicit Token_EVT(const Token_EVT& P, Base const* data=NULL)
+    : Token_CALL(P, data) { untested();}
+  Token* clone()const override { untested();
+    return new Token_EVT(*this);
+  }
+  void stack_op(Expression* e)const override {
+    Token const* arg=NULL;
+	  Token_CALL::stack_op(e);
+  }
+};
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet
