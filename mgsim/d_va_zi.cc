@@ -177,6 +177,9 @@ private:
   double _output{0}; // ELEMENT::_y?
   ELEMENT* _input{NULL}; // needed in ac
   double _old_output{0};
+  double _new_event{0.};
+  double _pending_event{0.};
+  double _previous_event{0.};
 private: // construct
   explicit ZFILTER(ZFILTER const&);
 public:
@@ -208,6 +211,7 @@ private: // BASE_SUBCKT
   void	  dc_advance()override;
   void	  tr_advance()override;
   void	  tr_regress()override {
+    incomplete(); // is it? just don't advance.
     set_not_converged();
     ELEMENT::tr_regress();
   }
@@ -217,6 +221,7 @@ private: // BASE_SUBCKT
   void	  tr_load()override;
   TIME_PAIR tr_review()override;
 
+  void new_sample_event(double ne);
   void tr_accept()override;
   void tr_unload()override;
   void ac_begin()override;
@@ -239,7 +244,7 @@ private: // overrides
     bool linear_input = !_ctrl_in; // TODO.
     int ii;
 
-    if(linear_input){ untested();
+    if(linear_input){
       ii = 2;
     }else if(_ctrl_in){
       ii = net_nodes();
@@ -405,6 +410,39 @@ void ZFILTER::tr_advance()
   assert( c->_p_den.size());
   trace3("ZFILTER::tr_advance", long_label(), c->_delay, c->_period);
 
+  if(_pending_event != _new_event) {
+    int num_den = c->den_size();
+    int num_num = c->num_size();
+    int num_regs = std::max(num_den, num_num);
+    // double& new_output = _y[0].f1 = 0;
+    _old_output = _output;
+    double new_input = tr_involts();
+    int i = num_regs-1;
+
+    for(i=num_regs-1; i>num_den-1; --i){
+      _regs[i] = _regs[i-1];
+    }
+    for(       ; i>0; --i){
+      trace3("den", i, c->_p_den[i], c->_p_den.size());
+      new_input -= _regs[i] * c->_p_den[i] / c->_p_den[0];
+      _regs[i] = _regs[i-1];
+    }
+    _regs[0] = new_input;
+
+    _output = 0.;
+    for(i=0; i<num_num; ++i){
+      _output += _regs[i] * c->_p_num[i];
+    }
+    assert(c->_p_den[0]);
+    _output /= c->_p_den[0];
+    trace4("accept", _sim->_time0, c->_p_den[0], c->_p_num[0], new_input);
+    trace4("accept", _sim->_time0, _output, _old_output, tr_involts());
+
+    _previous_event = _pending_event;
+    _pending_event = _new_event;
+  }else{
+  }
+
   double raw_time = d->_sim->_time0;
 
   node_t gnd(&ground_node);
@@ -461,13 +499,14 @@ void ZFILTER::tr_begin()
   _loss0 = 1.;
   _loss1 = 1.;
   _output = 0.; //really?
+  _old_output = 0.; //really?
 
   COMMON_RF_BASE const* c = prechecked_cast<COMMON_RF_BASE const*>(common());
   assert(c);
   int num_den = c->den_size();
   int num_num = c->num_size();
   int num_regs = std::max(num_den, num_num);
-  trace2("ZFILTER::tr_begin", num_num, num_den);
+  trace2("ZFILTER::tr_begin", tr_input(), num_num);
   std::fill_n(_regs, num_regs, 0.);
 }
 /*--------------------------------------------------------------------------*/
@@ -765,6 +804,15 @@ void ZFILTER::tr_load()
   tr_load_source();
 }
 /*--------------------------------------------------------------------------*/
+void ZFILTER::new_sample_event(double ne)
+{
+  auto c = prechecked_cast<COMMON_ZIFILTER const*>(common());
+  assert(c);
+  _new_event = ne;
+  // TODO/BUG: events are global.
+  _sim->new_event(_new_event);
+}
+/*--------------------------------------------------------------------------*/
 void ZFILTER::tr_accept()
 {
   ELEMENT::tr_accept();
@@ -772,79 +820,67 @@ void ZFILTER::tr_accept()
   assert(c);
   trace4("ZFILTER::tr_accept", _sim->_time0, long_label(), tr_involts(), c->_period);
 
-  double raw_time = _sim->_time0 + _sim->_dtmin * .01;
-  raw_time -= c->_delay;
-  int howmany = int(raw_time / c->_period);
+  double time0 = _sim->_time0;
 
-  assert(fmod(raw_time - c->_delay, c->_period) < _sim->_dtmin);
+  if(time0 == 0){
+    if(c->_delay){ untested();
+      assert(!_pending_event);
+      new_sample_event(_pending_event + c->_delay);
+      _sim->new_event(_new_event + c->_ttime); // BUG: unsafe.
+    }else{
+      _sim->new_event(c->_ttime); // BUG: unsafe.
+      new_sample_event(_pending_event + c->_period);
+      _sim->new_event(_new_event + c->_ttime); // BUG: unsafe.
+    }
+  }else if(time0 < _pending_event){ untested();
+    // waiting
+  }else if(time0 <= _pending_event + _sim->_dtmin){
+    trace3("accept now", time0, _new_event, _pending_event);
+    new_sample_event(_pending_event + c->_period);
+    _sim->new_event(_new_event + c->_ttime); // BUG: unsafe.
 
-  double et = c->_delay + double(howmany+1) * c->_period;
-#if 0
-  _n[2]->set_event(et, lvUNKNOWN);
-#else
-  _sim->new_event(et);// BUG: global event.
-#endif
+    trace2("ZFILTER::tr_accept", long_label(), tr_involts());
 
-  _old_output = _output;
-
-  int num_den = c->den_size();
-  int num_num = c->num_size();
-  int num_regs = std::max(num_den, num_num);
-  trace3("ZFILTER::tr_accept", num_den, num_num, num_regs);
-  trace3("ZFILTER::tr_accept", long_label(), tr_involts(), num_regs);
-
-  // double& new_output = _y[0].f1 = 0;
-  double new_input = tr_involts();
-  int i = num_regs-1;
-  for(i=num_regs-1; i>num_den-1; --i){
-    _regs[i] = _regs[i-1];
+  }else{ untested();
+    trace3("accept miss", _sim->_time0, _new_event, _pending_event);
+    trace3("accept miss", _sim->_time0, _output, _old_output);
+    unreachable();
+    // time_by_min etc.. try to recover?
   }
-  for(       ; i>0; --i){
-    trace3("den", i, c->_p_den[i], c->_p_den.size());
-    new_input -= _regs[i] * c->_p_den[i] / c->_p_den[0];
-    _regs[i] = _regs[i-1];
-  }
-  _regs[0] = new_input;
-
-  _output = 0.;
-  for(i=0; i<num_num; ++i){
-    _output += _regs[i] * c->_p_num[i];
-  }
-  assert(c->_p_den[0]);
-  _output /= c->_p_den[0];
-  trace4("accept", _sim->_time0, c->_p_den[0], c->_p_num[0], new_input);
-  trace4("accept", _sim->_time0, _output, _old_output, tr_involts());
-}
+} // tr_accept
 /*--------------------------------------------------------------------------*/
 TIME_PAIR ZFILTER::tr_review()
 {
-  trace1("ZFILTER::tr_review", long_label());
+  trace4("ZFILTER::tr_review0", long_label(), _sim->_time0, _new_event, _pending_event);
   ELEMENT::tr_review();
   auto c = prechecked_cast<COMMON_ZIFILTER const*>(common());
   assert(c);
 
+  assert(_previous_event <= _pending_event);
+  assert(_pending_event <= _new_event);
+
   // hack to avoid duplicate events from numerical noise
   double raw_time = _sim->_time0 + _sim->_dtmin * .01;
 
-  if (raw_time <= c->_delay) { untested();
-    _time_by.min_event(c->_delay);
-  }else{
-    double reltime;
-    assert(c->_period);
-    reltime = fmod(raw_time - c->_delay, c->_period);
-      trace2("review", c->_period, reltime);
-
-    double time_offset = raw_time - reltime;
-    if (reltime < _sim->_dtmin * .5) {
-      q_accept();
-      _time_by.min_event(c->_ttime + time_offset);
-    }else if (reltime < c->_ttime) {
-      _time_by.min_event(c->_ttime + time_offset);
-    }else if (reltime < c->_period) {
-      trace1("review", c->_period);
-      _time_by.min_event(c->_period + time_offset);
-    }else{ untested();
-    }
+  if (_sim->_time0 == 0.){
+    q_accept();
+  }else if (raw_time <= c->_delay) { untested();
+    // _time_by.min_event(c->_delay);
+  }else if (raw_time < _previous_event) {
+  }else if (raw_time < _previous_event + c->_ttime) {
+    // there should be an event scheduled for _previous_event + c->_ttime.
+    // what if we missed it?
+    // _time_by.min_event(_previous_event + c->_ttime);
+  }else if (_sim->_time0 < _pending_event) {
+    // past transition, awaiting new sample.
+  }else if (_sim->_time0 <= _pending_event + 1.01* _sim->_dtmin) {
+    // sample window
+    q_accept(); // new_events will be queued in tr_accept.
+  }else{ untested();
+    // we missed it.. retry?
+    _time_by.min_event(_pending_event);
+    // what if we missed end-of transition event?
+    incomplete();
   }
   trace3("ZFILTER::tr_review", long_label(), _sim->_time0, _time_by._event);
   return _time_by;

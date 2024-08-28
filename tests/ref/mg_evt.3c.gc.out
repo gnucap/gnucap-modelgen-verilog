@@ -16,5 +16,11 @@ time2   4
  4.         2.         2.        
 time2   6
  6.         2.         2.        
- 6.         4.         17.       
- 6.00000004 dut0 timer: giving up on event at 6.000000000002
+time3   6
+ 6.         2.         2.        
+time2   8
+ 8.         2.         2.        
+time3   9
+ 9.         2.         2.        
+time2   10
+ 10.        2.         1.        
