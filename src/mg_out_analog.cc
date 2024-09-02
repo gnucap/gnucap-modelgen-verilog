@@ -227,7 +227,7 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
       o__ lhsname << " = t0.value(); // (s)\n";
     }else{
       o__ lhsname << " = t0.value(); // (*)\n";
-//      o__ lhsname << ".set_no_deps(); // (42)\n";
+      // o__ lhsname << ".set_no_deps(); // (42)\n";
 #ifdef TRACE_ASSIGN
       o__ "trace1(\"assign\", " << lhsname << ");\n";
 #endif
@@ -248,6 +248,7 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
 	}
 
 	if(v->branch()->is_short()) {
+	  o__ "// " << lhsname << "[d" << v->code_name() << "] short\n";
 	}else{
 	  o__ lhsname << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // (2b)\n";
 	  o__ "assert(" << lhsname << "[d" << v->code_name() << "] == " << "t0[d" << v->code_name() << "]); // (2b2)\n";
@@ -1140,7 +1141,7 @@ void OUT_ANALOG::make_analog_list(std::ostream& o, const Module& m) const
 
   for(auto const& bb : analog_list(m)){
     assert(bb);
-    if(auto ab = dynamic_cast<AnalogStmt const*>(bb)){ untested();
+    if(dynamic_cast<AnalogStmt const*>(bb)){ untested();
     }else{
     }
     if(_src){

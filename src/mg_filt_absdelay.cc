@@ -360,7 +360,7 @@ void Token_ABSDELAY::stack_op(Expression* e)const
 };
 /*--------------------------------------------------------------------------*/
 Branch const* ABSDELAY::output() const
-{ itested();
+{
   if(_output){ untested();
     return _output;
   }else{

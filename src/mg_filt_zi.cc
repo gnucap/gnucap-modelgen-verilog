@@ -459,7 +459,7 @@ void Token_ZIF::stack_op(Expression* e)const
 };
 /*--------------------------------------------------------------------------*/
 Branch const* ZIF::output() const
-{ itested();
+{
   if(_output){ untested();
     return _output;
   }else{

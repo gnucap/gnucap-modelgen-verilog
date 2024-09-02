@@ -457,7 +457,7 @@ void Token_LAP::stack_op(Expression* e)const
 }
 /*--------------------------------------------------------------------------*/
 Branch const* LAP::output() const
-{ itested();
+{
   if(_output){
     return _output;
   }else{

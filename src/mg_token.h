@@ -500,8 +500,7 @@ private:
     return new Token_EVT(*this);
   }
   void stack_op(Expression* e)const override {
-    Token const* arg=NULL;
-	  Token_CALL::stack_op(e);
+    Token_CALL::stack_op(e);
   }
 };
 /*--------------------------------------------------------------------------*/

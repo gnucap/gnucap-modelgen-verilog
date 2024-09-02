@@ -161,7 +161,6 @@ static void make_tr_probe_num(std::ostream& o, const Module& m)
       std::string name = p->name();
 
       size_t L = strlen(PS_MANGLE_PREFIX);
-      auto const& a = attr.attributes(tag_t(p));
       if(v.first.substr(0, L) == PS_MANGLE_PREFIX){
 	// not a probe.
       }else if(is_output_var(tag_t(p))) {

@@ -91,7 +91,7 @@ bool Statement::propagate_rdep(Base const* b)
   if(!new_dep){
   }else if(auto s = dynamic_cast<Statement*>(o)){
     s->propagate_rdep(b);
-  }else if(auto s = dynamic_cast<Module*>(o)){
+  }else if(dynamic_cast<Module*>(o)){
   }else if(is_file(o)) {
   }else{ untested();
     unreachable();

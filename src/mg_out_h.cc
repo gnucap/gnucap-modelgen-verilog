@@ -273,7 +273,7 @@ static void make_common(std::ostream& o, const Module& m)
     o__ "void tr_review_analog(MOD_" << m.identifier() << "*)const;\n";
   }else{
   }
-  if(m.has_tr_begin_analog()) {
+  if(m.has_tr_begin_analog()) { untested();
     o__ "void tr_begin_analog(MOD_" << m.identifier() << "*)const;\n";
   }else{
   }
@@ -531,7 +531,7 @@ static void make_module(std::ostream& o, const Module& m)
     o__ "TIME_PAIR  tr_review()override;\n";
   }else{
   }
-  if(m.has_tr_begin()){
+  if(m.has_tr_begin()){ untested();
     o__ "void tr_begin()override;\n";
   }else{
   }

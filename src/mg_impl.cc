@@ -136,7 +136,7 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
     Node_Ref nn;
     if(n==""){
       nn = &Node_Map::mg_ground_node;
-    }else if( nn = node(n) ){
+    }else if( (nn = node(n)) ){
     }else{ untested();
       throw Exception_No_Match(n + " does not exist");
     }
