@@ -147,8 +147,8 @@ class Module : public Block {
     if_TR_ADVANCE = 2,
     if_TR_REVIEW = 3,
     if_TR_ACCEPT = 4,
-    if_SET_EVENT = 6,
-    if_COUNT = 5
+    if_SET_EVENT = 5,
+    if_COUNT = 6
   } iface_id_t;
 public:
   typedef enum : int{
