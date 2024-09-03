@@ -44,8 +44,9 @@ public:
   bool propagate_rdep(Base const*);
   virtual bool update() = 0;
 //  virtual Statement* parent_stmt();
-  virtual Block* scope() { return Owned_Base::owner(); }
-  virtual Block const* scope() const { return Owned_Base::owner(); }
+  // Block* scope() { return Owned_Base::owner(); }
+  // Block const* scope() const { return Owned_Base::owner(); }
+
   virtual bool is_used_in(Base const*)const;
   virtual Base* owner_() {
     if(scope()){
@@ -120,6 +121,7 @@ public:
   void set_type(Data_Type const& d){ _type=d; }
   bool propagate_deps(Token_VAR_REF const&);
   bool propagate_rdeps(RDeps const&);
+  bool is_state_variable()const;
 protected:
   void clear_deps();
 private:
@@ -238,14 +240,14 @@ class Sensitivities;
 class SeqBlock : public Block {
   Sensitivities* _sens{NULL}; // here?
 protected: // AF
-  String_Arg _identifier;
   Variable_List_Collection _variables;
 public:
   explicit SeqBlock() : Block() {}
   ~SeqBlock();
   void parse(CS&)override{ untested();incomplete();}
 //  void dump(std::ostream& o)const override;
-  void parse_identifier(CS& f) { f >> _identifier; }
+  void parse_identifier(CS& f);
+  bool has_identifier()const {return _identifier != "";}
 
   Branch_Ref new_branch(std::string const& p, std::string const& n)override {
     assert(owner());

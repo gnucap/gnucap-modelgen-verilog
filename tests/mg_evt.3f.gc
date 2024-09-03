@@ -1,0 +1,38 @@
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+attach ./d_reject.so
+
+
+verilog
+
+`modelgen
+module test_timer3f(p, n);
+	electrical p, n;
+	inout p, n;
+	real state;
+	analog begin
+		@(timer(1)) begin
+			$debug("timer %g %g\n", $abstime, state);
+			state = 1;
+      end
+		$write("time0 %g %g\n", $abstime, state);
+	end
+endmodule
+
+list
+
+!make test_timer3f.so > /dev/null
+attach ./test_timer3f.so
+
+test_timer3f dut0(1,0);
+reject #(.time(.9)) r();
+
+list
+
+print dc v(nodes) iter(0)
+dc
+print tran iter(0)
+tran 2 basic
+
+end

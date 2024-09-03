@@ -62,9 +62,9 @@ public:
   void make_construct  (std::ostream& o, AnalogConstruct const& ab)const;
   void make_af         (std::ostream& o, const Analog_Function& f)const;
   void make_load_variables(std::ostream& o, const Module& m)const;
-  void make_store_variables(std::ostream& o, const Variable_List_Collection& P)const;
+ // void make_store_variables(std::ostream& o, const Variable_List_Collection& P)const;
 private:
-  void make_load_module_variables(std::ostream& o, const Variable_List_Collection& P, const Module& m)const;
+  void make_load_block_variables(std::ostream& o, const Variable_List_Collection& P)const;
   void make_stmt       (std::ostream& o, Statement const& a)const;
   void make_block      (std::ostream& o, Block const& s)const;
 private:
@@ -87,9 +87,10 @@ private:
 private:
   void make_block_variables(std::ostream& o, Variable_Stmt const&)const;
   void make_real_variable  (std::ostream& o, Token_VAR_DECL const&)const;
-  void make_seq            (std::ostream& o, AnalogSeqBlock const&)const;
+  void make_seq_block      (std::ostream& o, AnalogSeqBlock const&)const;
 private:
-  void make_one_variable_load(std::ostream& o, Token_VAR_REF const& V, Module const& m)const;
+  void make_one_local_var(std::ostream& o, Token_VAR_REF const& V)const;
+  void make_one_variable_load(std::ostream& o, Token_VAR_REF const& V)const;
   void make_one_variable_store(std::ostream& o, Token_VAR_REF const& V)const;
 
   void make_cc_expression(std::ostream& o, Expression const& e, bool b=false)const {
@@ -99,7 +100,7 @@ private:
 /*--------------------------------------------------------------------------*/
 static void make_int_variable(std::ostream& o, Token_VAR_DECL const& v)
 { untested();
-  o__ "int _v_" << v.name() << ";\n";
+  o__ "/*int_variable*/ int _v_" << v.name() << ";\n";
 }
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_real_variable(std::ostream& o, Token_VAR_DECL const& v) const
@@ -160,6 +161,7 @@ void OUT_ANALOG::make_variable(std::ostream& o, Variable_Decl const& v) const
 void OUT_ANALOG::make_block_variables(std::ostream& o,
     Variable_Stmt const& rl) const
 {
+  o << "// make_block_variables\n";
   for(Variable_Decl const* v : rl){
     if(v->size()){ untested();
       incomplete();
@@ -390,7 +392,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 void OUT_ANALOG::make_block(std::ostream& o, Block const& ab) const
 {
   if(auto s = dynamic_cast<AnalogSeqBlock const*>(&ab)){
-    return make_seq(o, *s);
+    return make_seq_block(o, *s);
   }else{ untested();
     assert(0);
   }
@@ -428,7 +430,6 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
   }else if(auto ard=dynamic_cast<Variable_Stmt const*>(&ab)) {
     incomplete();
     assert(0);
-    make_block_variables(o, *ard);
   }else if(auto cs=dynamic_cast<AnalogConditionalStmt const*>(&ab)) {
     make_cond(o, *cs);
   }else if(auto ss=dynamic_cast<AnalogSwitchStmt const*>(&ab)) {
@@ -752,35 +753,37 @@ void OUT_ANALOG::make_switch(std::ostream& o, AnalogSwitchStmt const& s) const
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_ctrl(std::ostream& o, AnalogCtrlBlock const& s) const
 {
-  make_seq(o, s);
+  make_seq_block(o, s);
 }
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_seq(std::ostream& o, AnalogSeqStmt const& s) const
 {
-  return make_seq(o, s.block());
+  return make_seq_block(o, s.block());
 }
 /*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_seq(std::ostream& o, AnalogSeqBlock const& s) const
+void OUT_ANALOG::make_seq_block(std::ostream& o, AnalogSeqBlock const& s) const
 {
   o__ "{ // " << s.identifier() << "\n";
+  make_load_block_variables(o, s.variables_());
+#if 0
   for(auto i : s.variables_()) {
     assert(s.identifier() != "");
 
     if(auto st = dynamic_cast<Variable_Stmt const*>(i)){
       make_block_variables(o, *st);
-      // make_stmt(o, *st);
     }else{
       unreachable();
     }
 
   }
+#endif
   for(auto i : s.block()) {
     indent x;
     if(auto st = dynamic_cast<Statement const*>(i)){
       make_stmt(o, *st);
     }else if(auto as = dynamic_cast<AnalogSeqBlock const*>(i)){ untested();
       // incomplete(); // later.
-      make_seq(o, *as);
+      make_seq_block(o, *as);
     }else{ untested();
       incomplete();
       unreachable();
@@ -1015,11 +1018,10 @@ static void make_cc_set_branch_contributions(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_one_variable_proxy(std::ostream& o, Token_VAR_REF const& V,
-    Module const& m)
+static void make_one_variable_proxy(std::ostream& o, Token_VAR_REF const& V)
 {
   o__ "class _V_" << V.name() << " : public ddouble {\n";
-  o____ "MOD_" << m.identifier() << " * const _m;\n";
+  o____ "MOD__ * const _m;\n";
   o__ "public:\n";
   o____ "typedef ddouble base;\n";
   o____ "typedef va::ddouble_tag base_tag;\n";
@@ -1028,11 +1030,11 @@ static void make_one_variable_proxy(std::ostream& o, Token_VAR_REF const& V,
   o____ "_V_" << V.name() << "(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}\n";
   o____ "_V_" << V.name() << "(_V_" << V.name() << " const& p) : ddouble(p), _m(NULL) {}\n";
   o____ "explicit _V_" << V.name() << "() : ddouble(), _m(NULL) {set_all_deps();}\n";
-  o____ "_V_" << V.name() << "(MOD_" << m.identifier() << " * m) : "
-    << "ddouble(m->" << V.code_name() << "), _m(m) {}\n";
+  o____ "_V_" << V.name() << "(MOD__* m) : "
+    << "ddouble(m->" << V.long_code_name() << "), _m(m) {}\n";
   o____ "~_V_" << V.name() << "() {\n"
     << "	if(_m){\n";
-  o______ "_m->" << V.code_name() << " = value();\n";
+  o______ "_m->" << V.long_code_name() << " = value();\n";
   o____ "}else{itested(); }}\n";
   o____ "ddouble& operator=(double t){\n";
   o______ "ddouble::operator=(t);\n";
@@ -1045,8 +1047,13 @@ static void make_one_variable_proxy(std::ostream& o, Token_VAR_REF const& V,
   o__ "}";
 }
 /*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Token_VAR_REF&
-    V, Module const& m) const
+void OUT_ANALOG::make_one_local_var(std::ostream& o, const Token_VAR_REF& V) const
+{ untested();
+  incomplete();
+}
+/*--------------------------------------------------------------------------*/
+void OUT_ANALOG::make_one_variable_load(std::ostream& o,
+                                        const Token_VAR_REF& V) const
 {
   if(!is_dynamic()) {
     if(V.type().is_int()) { untested();
@@ -1057,15 +1064,21 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Token_VAR_REF&
       assert(0); // logic error.
     }
 
-    o << " " << V.code_name() << "(m->" << V.code_name() << "); // !dynamic\n";
+    o << " " << V.code_name() << "(m->" << V.long_code_name() << "); // !dynamic\n";
     o__ "(void) " << V.code_name() << ";\n";
   }else if(V.type().is_int()) { untested();
-    o__ "int& " << V.code_name() << "(d->" << V.code_name() << ");\n";
+    o__ "int& " << V.code_name() << "(d->" << V.long_code_name() << ");\n";
   }else if(V.type().is_real()) {
     if(V.deps().ddeps().size() == 0){
-      o__ "double& " << V.code_name() << "(d->" << V.code_name() << "); // (823)\n";
+      if(dynamic_cast<Module const*>(V.scope())) {
+	o__ "double& " << V.code_name() << "(d->" << V.long_code_name() << "); // (823)\n";
+      }else{
+	o__ "// tmp block proxy (823b)\n";
+	make_one_variable_proxy(o, V);
+	o << V.code_name() << "(d);\n";
+      }
     }else if(options().optimize_deriv()) {
-      make_one_variable_proxy(o, V, m);
+      make_one_variable_proxy(o, V);
       o << V.code_name() << "(d);\n";
     }else{itested();
       o__ "ddouble " << V.code_name() << "(d->" << V.code_name() << "); // (828)\n";
@@ -1074,6 +1087,7 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o, const Token_VAR_REF&
   }
 }
 /*--------------------------------------------------------------------------*/
+// no longer needed.
 void OUT_ANALOG::make_one_variable_store(std::ostream& o, Token_VAR_REF const& V) const
 {
   if(!V.type().is_real()) { untested();
@@ -1089,8 +1103,8 @@ void OUT_ANALOG::make_one_variable_store(std::ostream& o, Token_VAR_REF const& V
   }
 }
 /*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_load_module_variables(std::ostream& o, const
-    Variable_List_Collection& P, const Module& m) const
+void OUT_ANALOG::make_load_block_variables(std::ostream& o, const
+    Variable_List_Collection& P) const
 {
   if(is_dynamic()) {
     // not sure if these are actually unused. GCC bug?
@@ -1101,9 +1115,15 @@ void OUT_ANALOG::make_load_module_variables(std::ostream& o, const
 
   for (auto q = P.begin(); q != P.end(); ++q) {
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
-      auto const* V = *p;
+      Variable_Decl const* V = *p;
       assert(V);
-      make_one_variable_load(o, V->token(), m);
+
+      if(V->is_state_variable()){
+	make_one_variable_load(o, V->token());
+      }else{
+	make_one_local_var(o, V->token());
+	incomplete();
+      }
     }
   }
 
@@ -1115,19 +1135,21 @@ void OUT_ANALOG::make_load_module_variables(std::ostream& o, const
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_load_variables(std::ostream& o, const Module& m) const
 {
-  make_load_module_variables(o, m.variables(), m);
+  make_load_block_variables(o, m.variables());
  // make_load_block_variables(o, m.variables_(), m);
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 void OUT_ANALOG::make_store_variables(std::ostream& o, const Variable_List_Collection& P) const
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
       Token_VAR_REF const& V = (*p)->token();
-      make_one_variable_store(o, V);
+      // make_one_variable_store(o, V);
     }
   }
 }
+#endif
 /*--------------------------------------------------------------------------*/
 #if 0
 static void make_cc_ac_begin(std::ostream& o, const Module& m)
@@ -1200,7 +1222,6 @@ static void make_cc_common_tr_advance(std::ostream& o, const Module& m)
   OUT_ANALOG oo(OUT_ANALOG::modeADVANCE, &tr_advance_tag);
   oo.make_load_variables(o, m);
   oo.make_analog_list(o, m);
-  oo.make_store_variables(o, m.variables());
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -1217,7 +1238,6 @@ static void make_cc_common_tr_regress(std::ostream& o, const Module& m)
   OUT_ANALOG oo(OUT_ANALOG::modeREGRESS, &tr_advance_tag);
   oo.make_load_variables(o, m);
   oo.make_analog_list(o, m);
-  oo.make_store_variables(o, m.variables());
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -1235,7 +1255,6 @@ static void make_cc_common_tr_eval(std::ostream& o, const Module& m)
 
   oo.make_load_variables(o, m);
   oo.make_analog_list(o, m);
-  oo.make_store_variables(o, m.variables());
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -1309,6 +1328,7 @@ static void make_clear_branch_contributions(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 void make_cc_analog(std::ostream& o, const Module& m)
 {
+  o << "typedef MOD_" << m.identifier() << " MOD__;\n"; // here?
   make_cc_zero_filter_readout(o, m);
   make_cc_set_branch_contributions(o, m);
   make_clear_branch_contributions(o, m);

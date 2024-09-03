@@ -132,9 +132,9 @@ private:
     o______ "trace2(\"tr_eval1\", _req_evt, _sim->_time0);\n";
     o______ "if (_req_evt < _sim->_time0){untested();\n";
     o________ "return false;\n";
-    o______ "}else if (_req_evt <= _sim->_time0 + _sim->_dtmin){untested();\n";
+    o______ "}else if (_req_evt <= _sim->_time0 + _sim->_dtmin) {\n";
     o________ "return true;\n";
-    o______ "}else{untested();\n";
+    o______ "}else{\n";
     o________ "return false;\n";
     o______ "}\n";
     o____ "}\n";
@@ -183,9 +183,7 @@ private:
     o______ "}else if(_sim->_time0 <= _req_evt + " << accept_tol() << ") {\n";
     o________ "if(period) {\n";
     o__________ "set_event(d, period, " << tol() << ");\n";
-    o________ "}else if(delay) {untested();\n";
-    o__________ "_req_evt = NEVER;\n";
-    o________ "}else if(delay) {untested();\n";
+    o________ "}else if(delay) {\n";
     o__________ "_req_evt = NEVER;\n";
     o________ "}\n";
     o________ "return true;\n";

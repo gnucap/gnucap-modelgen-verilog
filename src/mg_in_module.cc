@@ -211,7 +211,7 @@ HS_Parameter hp_hflip("$hflip");
 HS_Parameter hp_bflip("$bflip");
 /*--------------------------------------------------------------------------*/
 bool Aliasparam::is_hs() const
-{
+{ untested();
   return dynamic_cast<HS_Parameter const*>(_param);
 }
 /*--------------------------------------------------------------------------*/
@@ -311,7 +311,7 @@ void Parameter_2_List::parse(CS& file)
     _type = std::string("real"); // TODO: enum
   }else if(file.umatch("integer")){
     _type = std::string("integer"); // TODO: enum
-  }else{
+  }else{ untested();
     throw Exception_CS_("parameter: need \"real\", \"integer\"\n", file);
   }
   std::string type = _type.to_string();
@@ -353,7 +353,7 @@ size_t Parameter_List_Collection::count_nonlocal() const
 {
   size_t sum = 0;
   for(auto const& i : *this){
-    if(i->is_local()){
+    if(i->is_local()){ untested();
     }else{
       sum += i->size();
     }
@@ -952,62 +952,20 @@ bool Module::new_var_ref(Base* what)
     }else{
       throw(Exception("alias already there: '" + p + "'"));
     }
-  }else{ untested();
+  }else{
   }
 
   return Block::new_var_ref(what);
 }
 /*--------------------------------------------------------------------------*/
-void Block::clear_vars()
-{
-      // for(Dep d : deps().ddeps()) { untested();
-      //   (*d)->unset_used_in(this);
-      // }
-  // detach?
-  _var_refs.clear();
-}
-/*--------------------------------------------------------------------------*/
-/// set_vr_ref?
-bool Block::new_var_ref(Base* what)
-{
-  assert(what);
-  std::string p;
-  assert(!dynamic_cast<Variable_Decl const*>(what));
-  auto P = dynamic_cast<Parameter_2 const*>(what);
-  auto T = dynamic_cast<Token const*>(what);
-
-  if(T){
-    p = T->name();
-    // assert(T->data());
-  }else if(P){
-    p = P->name();
-  }else if(auto A = dynamic_cast<Aliasparam const*>(what)){ untested();
-    p = A->name();
-  }else if(auto ps = dynamic_cast<Paramset_Stmt const*>(what)){ untested();
-    unreachable();
-    p = "."+ps->name();
-  }else if(auto nn = dynamic_cast<Node const*>(what)){
-    p = nn->name();
-  }else{ untested();
-    incomplete();
-    assert(false);
-  }
-
-  trace3("new_var_ref, stashing", p, this, dynamic_cast<Module const*>(this));
-  Base*& s = _var_refs[p];
-  bool ret = !s;
-  s = what;
-  return ret;
-}
-/*--------------------------------------------------------------------------*/
 void Module::push_back(Filter /*const?*/ * f)
-{
+{ untested();
   assert(_circuit);
   _circuit->push_back(f);
 }
 /*--------------------------------------------------------------------------*/
 void Circuit::push_back(Filter /*const?*/ * f)
-{
+{ untested();
   _filters.push_back(f);
 }
 /*--------------------------------------------------------------------------*/
@@ -1095,7 +1053,7 @@ Module::~Module()
 /*--------------------------------------------------------------------------*/
 bool Node::is_used() const
 {
-  if(1 && is_ground()){
+  if(1 && is_ground()){ untested();
     trace1("Node::is_used, ground", name());
   }else{
     trace2("Node::is_used", name(), _fanout.size());
@@ -1103,7 +1061,7 @@ bool Node::is_used() const
       if(e->is_used()){
 	trace2("Node::is_used", name(), e->code_name());
 	return true;
-      }else{
+      }else{ untested();
       }
     }
   }

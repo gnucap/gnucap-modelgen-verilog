@@ -259,6 +259,12 @@ bool Variable_Decl::propagate_rdeps(RDeps const& incoming)
 //   return true;
 // }
 /*--------------------------------------------------------------------------*/
+bool Variable_Decl::is_state_variable() const
+{
+  // TODO.
+  return true;
+}
+/*--------------------------------------------------------------------------*/
 bool Variable_Stmt::update()
 {
   //trace1("Variable_Stmt::update", _rdeps.size());
@@ -284,6 +290,16 @@ bool Variable_Stmt::is_used_in(Base const* b) const
     incomplete();
     return true; // mg_strobe.0.gc.out 
     return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void SeqBlock::parse_identifier(CS& f)
+{
+  f >> _identifier;
+  if(_identifier.to_string() == ""){ untested();
+  }else if(scope()) {
+    scope()->new_var_ref(this);
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/

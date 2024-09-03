@@ -11,7 +11,8 @@ module test_while0a(p, n);
 	parameter real r=0;
 	analog begin : main
 		integer i;
-		real x, y;
+		real x;
+		real y;
 		x = 0.;
 		y = 0.;
 		i = r;

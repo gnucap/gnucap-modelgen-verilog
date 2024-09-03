@@ -317,6 +317,7 @@ public:
     return true;
   }
 private:
+  // parse_identifier?
   void set_identifier(std::string const& name) { _identifier = name; }
 };
 typedef Collection<Analog_Function> Analog_Functions;

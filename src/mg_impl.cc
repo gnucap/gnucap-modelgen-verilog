@@ -542,8 +542,12 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args)
 
   if(f->has_tr_review()){
     auto c = prechecked_cast<Token_CALL*>(t);
-    // assert(c);
+    (void)c;
     // incomplete();
+   // m.set_tr_review(); // wrong? because token may be deleted later on.
+   //                    // inc/dec?
+   //                    // do it in token?
+   //
    // c->set_used_in(tr_review_tag);
   }else{
   }
@@ -650,8 +654,7 @@ Block* Block::scope() const
   }else if(auto b = dynamic_cast<Block*>(_owner)){
     // incomplete?
     return b;
-  }else{ untested();
-    unreachable();
+  }else{ itested();
     return NULL;
   }
 }
@@ -731,6 +734,51 @@ Base* Block::lookup(std::string const& k, bool recurse)
     assert(dynamic_cast<File const*>(this));
   }
   return NULL;
+}
+/*--------------------------------------------------------------------------*/
+void Block::clear_vars()
+{
+      // for(Dep d : deps().ddeps()) { untested();
+      //   (*d)->unset_used_in(this);
+      // }
+  // detach?
+  _var_refs.clear();
+}
+/*--------------------------------------------------------------------------*/
+/// set_vr_ref?
+bool Block::new_var_ref(Base* what)
+{
+  assert(what);
+  std::string p;
+  assert(!dynamic_cast<Variable_Decl const*>(what));
+  auto P = dynamic_cast<Parameter_2 const*>(what);
+  auto T = dynamic_cast<Token const*>(what);
+
+  if(T){
+    p = T->name();
+    // assert(T->data());
+  }else if(P){
+    p = P->name();
+  }else if(auto A = dynamic_cast<Aliasparam const*>(what)){ untested();
+    unreachable();
+    p = A->name();
+  }else if(auto ps = dynamic_cast<Paramset_Stmt const*>(what)){ untested();
+    unreachable();
+    p = "."+ps->name();
+  }else if(auto nn = dynamic_cast<Node const*>(what)){
+    p = nn->name();
+  }else if(auto blk = dynamic_cast<SeqBlock const*>(what)){
+    p = blk->identifier().to_string();
+  }else{ untested();
+    incomplete();
+    assert(false);
+  }
+
+  trace3("new_var_ref, stashing", p, this, dynamic_cast<Module const*>(this));
+  Base*& s = _var_refs[p];
+  bool ret = !s;
+  s = what;
+  return ret;
 }
 /*--------------------------------------------------------------------------*/
 DDeps::const_iterator DDeps::begin() const

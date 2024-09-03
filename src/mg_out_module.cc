@@ -165,7 +165,7 @@ static void make_tr_probe_num(std::ostream& o, const Module& m)
 	// not a probe.
       }else if(is_output_var(tag_t(p))) {
 	o__ "if(n == \"" << v.first << "\"){\n";
-	o____ "return _v_" << p->name() << ";\n";
+	o____ "return _v_._" << p->name() << ";\n";
 	o__ "}\n";
       }else{
       }
@@ -473,6 +473,7 @@ static void make_tr_advance(std::ostream& o, const Module& m)
   for(auto f : m.funcs()){
     f->make_cc_tr_advance(o);
   }
+  o__ "_v_1 = _v_;\n";
   o__ baseclass(m) << "::tr_advance();\n"; // upside down. cf mg2_an2
   o << "}\n"
     "/*--------------------------------------"
@@ -501,6 +502,7 @@ static void make_tr_regress(std::ostream& o, const Module& m)
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
+  o__ "_v_ = _v_1;\n";
   o__ "c->tr_regress_analog(this);\n";
   o << "}\n"
     "/*--------------------------------------"

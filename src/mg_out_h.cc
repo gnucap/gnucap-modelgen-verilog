@@ -170,9 +170,8 @@ static void make_parameter_decl(std::ostream& o, const Parameter_List_Collection
 void make_one_variable_decl(std::ostream& o, Token_VAR_REF const& V)
 {
   if(V.type().is_real()) {
-      o__ "double ";
-      o << " _v_" << V.name() << "{0.}";
-   if(attr.attributes(tag_t(&V))){
+    o__ "double _" << V.name() << "{0.}";
+    if(attr.attributes(tag_t(&V))){
 #if 0
    }else if(options().optimize_deriv()) { untested();
       o__ "struct _V_" << V.name() << " : ddouble {\n";
@@ -202,8 +201,7 @@ void make_one_variable_decl(std::ostream& o, Token_VAR_REF const& V)
 //      o__ "ddouble ";
     }
   }else if(V.type().is_int()) {
-    o__ "int";
-    o << " _v_" << V.name() << "{0}";
+    o__ "int _" << V.name() << "{0}";
   }else{ untested();
     incomplete();
     o__ "unknown";
@@ -233,19 +231,47 @@ static void make_variable_decl(std::ostream& o, Block const& b);
 static void make_module_variable_decl(std::ostream& o, Module const& m)
 {
   Variable_List_Collection const& P = m.variables();
-  make_variable_collection(o, P);
+  o__ "struct state_{\n";
+  {
+    indent x;
+    make_variable_collection(o, P);
 
-  for(auto a : analog(m).list()){
-    assert(a);
-    assert(a->block());
-    make_variable_decl(o, *a->block());
+    for(auto a : analog(m).list()){
+      assert(a);
+      assert(a->block());
+      make_variable_decl(o, *a->block());
+    }
+  }
+  o__ "}_v_;\n";
+  o__ "state_ _v_1;\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_block_variable_decl(std::ostream& o, SeqBlock const& s);
+static void make_subblock_variable_decl(std::ostream& o, SeqBlock const& s)
+{
+  for(int i=0; i<s.num_blocks(); ++i){
+    assert(s.blocks(i));
+    if(auto sb = dynamic_cast<SeqBlock const*>(s.blocks(i))){
+      make_block_variable_decl(o, *sb);
+    }else{ untested();
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
 static void make_block_variable_decl(std::ostream& o, SeqBlock const& s)
 {
   Variable_List_Collection const& P = s.variables_();
-  make_variable_collection(o, P); // name??
+  if(s.has_identifier()){
+    o__ "struct namespace_" << s.identifier() << "{\n";
+    {
+      indent ns;
+      make_variable_collection(o, P);
+      make_subblock_variable_decl(o, s);
+    }
+    o__ "}" << s.code_name() << ";\n";
+  }else{
+    make_subblock_variable_decl(o, s);
+  }
 }
 /*--------------------------------------------------------------------------*/
 static void make_variable_decl(std::ostream& o, Block const& b)

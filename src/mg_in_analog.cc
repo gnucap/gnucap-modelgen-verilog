@@ -810,6 +810,9 @@ void AnalogSwitchStmt::parse(CS& f)
   //_ctrl.set_owner(scope());
   _ctrl.set_owner(this);
   _body.set_owner(this);
+  auto sb = dynamic_cast<SeqBlock*>(scope());
+  assert(sb);
+  sb->add_block(&_body); // re-use var_ref?
 
   f >> "(" >> _ctrl >> ")";
   CaseGen* def = NULL;
@@ -941,7 +944,9 @@ void AnalogSeqBlock::parse(CS& f)
     set_always();
   }else if(dynamic_cast<Module const*>(scope())) {
     set_always();
-  }else if(dynamic_cast<Statement const*>(owner())) {
+  }else if(auto sb = dynamic_cast<SeqBlock*>(scope())) {
+    sb->add_block(this); // re-use var_ref?
+  }else if(dynamic_cast<Statement const*>(owner())) { untested();
   }else{ untested();
     assert(0);
     unreachable();
@@ -1483,6 +1488,8 @@ void AnalogCtrlBlock::dump(std::ostream& o)const
 	    }else{ untested();
 	      o << "???\n";
 	    }
+	  }else if(dynamic_cast<Block const*>(i.second)){
+	    // later.
 	  }else{ untested();
 	    o__ "// " << i.first << "\n";
 	  }
@@ -1522,7 +1529,7 @@ void AnalogSeqBlock::dump(std::ostream& o)const
     for(auto i : variables()){
       if(auto v = dynamic_cast<Token_VAR_REF const*>(i.second)){
 	o__ "// " << v->name() << " : " << v->deps().size() << "\n";
-      }else{ untested();
+      }else{
 	o__ "// " << i.first << "\n";
       }
     }
@@ -1718,7 +1725,7 @@ void Analog_Function::parse(CS& f)
   assert(!_variable);
   auto data = new TData;
   _variable = new Token_VAR_REF(name, this, data);
-  set_identifier(name);
+  set_identifier(name); // parse_identifier?
   trace1("PAF", name);
   _block.new_var_ref(_variable);
 
@@ -1756,26 +1763,6 @@ void Analog_Function::parse(CS& f)
   trace1("body?", f.tail().substr(0,20));
   _block.set_owner(this);
 
-#if 0
-  try{ untested();
-    for(auto& x : _args.var_refs()){ untested();
-      trace1("af vr", x.first);
-      if(auto y = dynamic_cast<Token_ARGUMENT*>(x.second)){ untested();
-	if(dynamic_cast<Token_VAR_DECL*>(y->_var)){ untested();
-	  _args.new_var_ref(y->_var);
-	}else{ untested();
-	  throw Exception("formal argument missing type\n");
-	}
-      }else{ untested();
-	assert(dynamic_cast<Token_VAR_DECL*>(x.second));
-	_args.new_var_ref(x.second);
-      }
-    }
-  }catch (Exception const& e){ untested();
-    throw Exception_CS_(e.message(), f);
-  }
-#endif
-
   f >> _block; // actually a Statement, but always a CtrlBlock, for simplicity
 
   if(f >> "endfunction"){
@@ -1799,25 +1786,25 @@ Base* AnalogFunctionArgs::lookup(std::string const& k, bool recurse)
   Base* b = Block::lookup(k, false);
   if(dynamic_cast<Token_VAR_DECL const*>(b)){
     return b;
-  }else{ untested();
+  }else{
   }
 
   b = Block::lookup(k, recurse);
-  if(auto n = dynamic_cast<Token_ARGUMENT const*>(b)){ untested();
+  if(auto n = dynamic_cast<Token_ARGUMENT const*>(b)){
     trace2("AnalogFunctionArgs::lookup1 arg", k, n->_var);
-    if(n->_var){ untested();
+    if(n->_var){
       return n->_var;
-    }else{ untested();
+    }else{
       return b;
     }
-  }else if(dynamic_cast<Token_VAR_DECL const*>(b)){ untested();
+  }else if(dynamic_cast<Token_VAR_DECL const*>(b)){
     return NULL;
   }else if(dynamic_cast<Token_VAR_REF const*>(b)){ untested();
     return NULL;
   }else if(dynamic_cast<Token_NODE const*>(b)){ untested();
       // nodes not allowed here.
     return NULL;
-  }else{ untested();
+  }else{
     return b;
   }
 }
@@ -1827,7 +1814,7 @@ Base* AnalogFunctionBody::lookup(std::string const& k, bool recurse)
   Base* b = AnalogCtrlBlock::lookup(k, false);
   if(b){
     return b;
-  }else if(recurse){ untested();
+  }else if(recurse){
     assert(scope());
     assert(scope() != this);
     // b = scope()->lookup(k, true);
@@ -2519,13 +2506,13 @@ Branch_Ref Branch_Map::lookup(std::string const& n)const
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogProceduralAssignment::is_used_in(Base const*b)const
-{
+{ untested();
  // return AnalogStmt::is_used_in(b);
   if (_a.is_used_in(b)) { untested();
     return true;
-  }else if (AnalogStmt::is_used_in(b)) {
+  }else if (AnalogStmt::is_used_in(b)) { untested();
     return true;
-  }else{
+  }else{ untested();
     return false;
   }
 }

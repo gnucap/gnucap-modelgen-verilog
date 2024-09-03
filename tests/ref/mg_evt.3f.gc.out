@@ -1,0 +1,18 @@
+test_timer0 #() dut0 (.p(1),.n(0));
+reject #() r ();
+#           v(1)       iter(0)   
+time0 0 0
+ 0.         0.         2.        
+#Time       iter(0)   
+time0 0 0
+ 0.         2.        
+time0 0.02 0
+ 0.02       2.        
+timer 1 0
+time0 0.51 0
+ 0.51       4.        
+timer 1 0
+time0 1 1
+ 1.         2.        
+time0 2 1
+ 2.         2.        

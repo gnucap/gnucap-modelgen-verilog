@@ -104,7 +104,7 @@ module diode (a, c);
 				if (volts <= 0.) begin
 					region = -1 - level*100.;
 					g = ( p_isat / vt + $simparam("gmin") );
-				end else begin : ev
+				end else begin : on
 					real ev;
 					region = 1 + level*100.;
 					ev = exp(volts/vt);

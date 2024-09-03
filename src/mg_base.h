@@ -407,6 +407,9 @@ class Statement;
 class Block : public List_Base<Base> /* is Base_,  has-A List? */ {
 public:
   typedef std::map<std::string, Base*> map; // set?
+  std::vector<Block*> _blocks;
+protected:
+  String_Arg _identifier;
 private:
   typedef map::const_iterator const_iterator;
   typedef enum{
@@ -509,7 +512,18 @@ public:
   map const& var_refs()const {
     return _var_refs;
   }
-};
+
+  /*virtual*/ int num_blocks()const {return int(_blocks.size());}
+  /*virtual*/ Block const* blocks(int i)const {
+    assert(i<int(_blocks.size()));
+    return _blocks[i];
+  }
+  void add_block(Block* b){
+    _blocks.push_back(b);
+  }
+  std::string code_name()const;
+  std::string long_code_name()const;
+}; // Block
 /*--------------------------------------------------------------------------*/
 class Parameter_Base : public Base { // Owned_Base?
   Block* _owner{NULL};

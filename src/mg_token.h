@@ -410,6 +410,7 @@ public:
   TData const& deps()const;
   Block const* scope() const;
   std::string code_name() const { return "_v_"+name(); }
+  std::string long_code_name()const;
  // bool is_used() const;
 
   // LiSt

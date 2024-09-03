@@ -1,0 +1,54 @@
+
+attach ./modelgen_1.so
+
+
+verilog
+`modelgen
+module test_scope0(p, n);
+	electrical p, n;
+	inout p, n;
+	real x;
+	analog begin : main
+		real y;
+		real x;
+		y = 1;
+		begin : nest
+			real z;
+			y = 2;
+			x = 1;
+		end
+		begin
+			begin : deep
+				real w;
+			end
+		end
+		if(1) begin : cond
+			real n;
+			n = 5;
+		end
+	end
+	analog begin
+		begin : two
+			real z;
+		end
+		case(x)
+			-1: begin : test0
+			end
+			1: begin : test
+				real r;
+				r = 0;
+			end
+ 			0: begin
+ 				if(1) begin : test1
+ 					real r1;
+ 					r1 = 0.;
+ 				end
+			end
+		endcase
+	end
+endmodule
+`endmodelgen
+
+!make test_scope0.so >/dev/null
+op
+end

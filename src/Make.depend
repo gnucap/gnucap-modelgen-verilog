@@ -81,9 +81,7 @@ mg_in_verilog.o: mg_in_verilog.cc
 mg_in_circuit.o: mg_in_circuit.cc mg_circuit.h mg_base.h mg_discipline.h \
  mg_attrib.h mg_code.h mg_deps.h mg_lib.h mg_expression.h mg_in.h mg_.h \
  mg_func.h mg_token.h mg_filter.h mg_module.h
-mg_block.o: mg_block.cc mg_.h mg_expression.h mg_attrib.h mg_base.h \
- mg_deps.h mg_lib.h mg_func.h mg_token.h mg_code.h mg_filter.h \
- mg_circuit.h mg_discipline.h mg_module.h
+mg_block.o: mg_block.cc mg_base.h
 mg_main.o: mg_main.cc mg_out.h mg_base.h mg_in.h mg_attrib.h mg_pp.h \
  mg_.h mg_expression.h mg_deps.h mg_lib.h mg_func.h mg_token.h mg_code.h \
  mg_filter.h mg_circuit.h mg_discipline.h mg_module.h config.h

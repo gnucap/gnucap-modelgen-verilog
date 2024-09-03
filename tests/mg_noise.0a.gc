@@ -7,7 +7,7 @@ verilog
 module test_noise0a(a, b, c, d, e, f);
 	electrical a, b, c, d, e, f;
 	inout a, b, c, d, e, f;
-	analog begin
+	analog begin : main
 		real x, y;
 
 		I(a) <+ white_noise(1);
