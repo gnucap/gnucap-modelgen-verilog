@@ -420,52 +420,6 @@ private:
   size_t num_deps() const;
 }; // Token_VAR_REF
 /*--------------------------------------------------------------------------*/
-// VAR_DECL :: SYMBOL?
-/*--------------------------------------------------------------------------*/
-// obsolete.
-#if 0
-class Token_VAR_REAL : public Token_VAR_REF {
-  Block const* _owner{NULL};
-  Base const* _default{0};
-  // type //
-public:
-  explicit Token_VAR_REAL() : Token_VAR_REF("",NULL,NULL) { untested();unreachable();}
-  explicit Token_VAR_REAL(std::string Name, Base* item, Base const* data)
-    : Token_VAR_REF(Name, item, data) { untested();}
-  Token_VAR_REAL* deep_copy(Base* owner, std::string prefix)const override;
-  ~Token_VAR_REAL() { untested(); delete _default; }
-  Data_Type const& type()const override;
-
-  void set_owner(Block const* b){ untested();_owner = b;}
-  std::string key() const { untested();unreachable();return "";}
-
-  void clear_deps();
-  void stack_op(Expression* e)const override;
-
-  void dump(std::ostream& o)const override;
-  void set_default(Base const* x) { untested(); assert(!_default); _default=x; }
-};
-/*--------------------------------------------------------------------------*/
-// class Token_VAR_DECL : public Token_VAR_REF
-class Token_VAR_INT : public Token_VAR_REF {
-  Base const* _default{0};
-public:
-  explicit Token_VAR_INT() : Token_VAR_REF("",NULL,NULL) { untested();unreachable();}
-  explicit Token_VAR_INT(std::string Name, Base* item, Base const* data)
-    : Token_VAR_REF(Name, item, data) { untested();}
-  ~Token_VAR_INT() { untested(); delete _default; }
-  Data_Type const& type()const override;
-
-  void set_owner(Base*){ untested();unreachable();}
-  std::string key() const { untested();unreachable();return "";}
-
-  void clear_deps();
-  void stack_op(Expression* e)const override;
-
-  void dump(std::ostream& o)const override;
-  void set_default(Base const* x) { untested(); assert(!_default); _default=x; }
-};
-#endif
 /*--------------------------------------------------------------------------*/
 class Variable_Stmt;
 class Token_VAR_DECL : public Token_VAR_REF {
