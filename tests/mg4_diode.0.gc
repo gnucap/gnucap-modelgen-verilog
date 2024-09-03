@@ -19,7 +19,7 @@ module test_diode0(a, c);
 	branch (a, c) r, cap;
 	real qd;
 
-	analog begin
+	analog begin : main
 		real i;
 		i = is*(limexp(V(r)/$vt) - 1);
 		I(r) <+ i;

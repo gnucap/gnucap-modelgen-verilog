@@ -9,7 +9,7 @@ module dep0(d, g);
     inout      d, g;
     electrical d, g;
 
-    analog begin
+    analog begin: main
         real c;
         real T;
 

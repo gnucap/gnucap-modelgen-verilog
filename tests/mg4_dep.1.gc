@@ -11,14 +11,14 @@ module test_dep1(p, n);
 	real i;
 	(*desc="prb"*) real prb;
 	localparam real p1 = 1;
-	analog begin
+	analog begin : main
+		real j;
 		i = 0;
 
 		if(p1) begin
 			i = V(p,n);
 		end
 
-		real j;
 		j = i;
 		prb = ddx(j, V(p,n));
 		I(p,n) <+ j;

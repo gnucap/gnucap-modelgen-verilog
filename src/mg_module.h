@@ -27,13 +27,6 @@
 #include "mg_base.h"
 #include "mg_code.h"
 class Aliasparam;
-class Variable_Stmt;
-class Variable_List_Collection : public Collection<Variable_Stmt>{
-public:
-  void parse(CS& f)override;
-  void dump(std::ostream& f)const override;
-};
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class ValueRangeSpec : public Owned_Base {
   // incomplete();

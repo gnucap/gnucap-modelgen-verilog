@@ -11,7 +11,7 @@ module test_ddx2(p,n,cp,cn);
 	electrical p, n, cp, cn;
 	parameter real gm = 1.0;
 	(* desc="" *) real vin, plus, minus, zero;
-	analog begin
+	analog begin : main
 		real vv;
 		if(1) begin
 			vin = V(cp,cn);

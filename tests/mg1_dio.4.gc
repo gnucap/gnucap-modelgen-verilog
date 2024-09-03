@@ -8,7 +8,7 @@ verilog
 module test_dio4(p, n);
 electrical p, n;
 
-analog begin
+analog begin : main
 	real v;
 	v = V(p, n);
 	if(v < 0.) ;

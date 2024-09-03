@@ -12,8 +12,8 @@ module test_af_0(p, n);
 	analog function real fct;
 		input x;
 		real x;
+		real a;
 		begin
-			real a;
 			a = .2 + 0.*x;
 			fct = exp(a*v);
 		end
@@ -33,7 +33,7 @@ module test_af_0(p, n);
 		end
 	endfunction
 
-	analog begin
+	analog begin : main
 		real v;
 		V(p, n) <+ fct(v);
 		if(0.) v = unused1(v+2);

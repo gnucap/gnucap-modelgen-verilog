@@ -9,7 +9,7 @@ module dep7(d, g);
   electrical d, g;
   real T;
   parameter real p = 0.;
-  analog begin
+  analog begin : main
     real c;
     @(initial_step) begin
       if ((! $param_given(p))) begin

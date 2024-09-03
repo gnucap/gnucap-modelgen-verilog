@@ -173,10 +173,13 @@ public:
 }; // AnalogCtrlBlock
 /*--------------------------------------------------------------------------*/
 class AnalogFunctionArgs : public Block {
+public:
+  Variable_List_Collection _variables;
 public: // can't resolve these..
   void parse(CS&)override;
   bool new_var_ref(Base* what)override;
   void dump(std::ostream& f)const override;
+  Base* lookup(std::string const& f, bool recurse=true)override;
 };
 /*--------------------------------------------------------------------------*/
 class AnalogFunctionBody : // public AnalogSeqBlock
@@ -198,15 +201,8 @@ public: // can't resolve these..
 
   bool new_var_ref(Base* what)override;
   void dump(std::ostream& f)const override;
+  Block* scope();
 };
-/*--------------------------------------------------------------------------*/
-#if 1
-class VariableLists : public List_Base<Base>{
-  void parse(CS&)override { untested();incomplete();}
-public:
-  void dump(std::ostream& f)const override;
-};
-#endif
 /*--------------------------------------------------------------------------*/
 class AnalogCtrlStmt : public AnalogStmt {
   TData _deps; // here?
@@ -299,32 +295,29 @@ typedef Collection<AnalogEvtCtlStmt> Analog_Events;
 class Analog_Function : public /*UserFunction?*/ Statement {
   Token* _variable{NULL};
   Data_Type _type;
-//  AF_Arg_List_Collection _args;
   FUNCTION_ const* _function{NULL};
-  // simplify: statement is always a block.
   AnalogFunctionArgs _args;
-  AnalogFunctionBody _block;
-  VariableLists _vars;
+  friend class AnalogFunctionBody; // uuh
   bool update()override { untested(); return false; }
+  std::string _identifier;
+protected:
+  AnalogFunctionBody _block;
 public:
   ~Analog_Function();
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   std::string const& key()const { assert(_variable); return _variable->name(); }
   std::string code_name()const { assert(_variable); return "af_" + _variable->name(); }
-  // std::string code_name()const { untested(); assert(_variable); return "_v_" + _variable->name(); } // _variable->code_name?
   FUNCTION_ const* function() const{return _function;}
-  // AF_Arg_List_Collection const& args() const{ untested(); return _args; }
   Token const* variable() const{ return _variable; }
-  AnalogFunctionArgs const& args() const{return _args;}
+  AnalogFunctionArgs const& header() const{return _args;}
   AnalogFunctionBody const& body() const{return _block;}
   Data_Type const& type()const {return _type;}
-  //VariableList const& variables()const { untested();return _vars;}
   bool is_used_in(Base const*)const override{ untested();
-    // incomplete();
     return true;
   }
- // RDeps const& rdeps()const override { untested(); return _rdeps; }
+private:
+  void set_identifier(std::string const& name) { _identifier = name; }
 };
 typedef Collection<Analog_Function> Analog_Functions;
 /*--------------------------------------------------------------------------*/

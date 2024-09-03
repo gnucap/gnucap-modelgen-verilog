@@ -9,9 +9,9 @@ module polarity3_0(p, n);
 	electrical p, n;
 	inout p, n;
 	real VV;
-	analog begin
-		VV = 2.0 * V(n, p);
+	analog begin : main
 		real i;
+		VV = 2.0 * V(n, p);
 		i = V(p,n);
 		I(p,n) <+ i;
 	end

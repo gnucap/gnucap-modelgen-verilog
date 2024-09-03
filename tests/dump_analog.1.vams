@@ -4,7 +4,7 @@
 module test(p, n)
 electrical p, n;
 
- analog begin
+ analog begin : main
   real a;
   begin : scopename
  	real b;

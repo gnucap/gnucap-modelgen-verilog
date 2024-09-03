@@ -5,7 +5,8 @@ module test(a, b);
   real T;
   real U;
 
-  analog begin
+  analog begin : main
+    real x;
     begin
       V(a) <+ 1.1;
     end
@@ -21,7 +22,6 @@ module test(a, b);
     else begin
       V(b) <+ 3.7;
     end
-    real x;
     x = 0.;
     if (x) begin
       V(a) <+ 5.;

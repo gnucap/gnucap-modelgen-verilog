@@ -1,13 +1,15 @@
 module dep0(d, g);
   inout d, g;
   electrical d, g;
-  analog begin // always
+  analog begin : main // always
     // S : 0
     // T : 1
     // U : 1
     // X : 1
     real T;
     real S;
+    real U;
+    real X;
     while (1) begin
       // S : 1
       // T : 1
@@ -15,8 +17,6 @@ module dep0(d, g);
       S = T; // dep: _potential_b_g_ s7
       T = V(g); // dep: _potential_b_g_ s1
     end
-    real U;
-    real X;
     U = S; // dep: _potential_b_g_ s6
     T = U; // dep: _potential_b_g_ s7
     X = U; // dep: _potential_b_g_ s7

@@ -220,12 +220,12 @@ void System_Task::dump(std::ostream&o)const
 }
 /*--------------------------------------------------------------------------*/
 bool System_Task::is_used_in(Base const*b) const
-{
+{ untested();
   if(_e.is_used_in(b)){ untested();
     return true;
-  }else if( Statement::is_used_in(b)) {
+  }else if( Statement::is_used_in(b)) { untested();
     return true;
-  }else{
+  }else{ untested();
     return false;
   }
 }
@@ -378,8 +378,6 @@ static Base* parse_analog_stmt_or_null(CS& file, Block* scope)
   ONE_OF	// module_item
     || (file >> ";")
     || ((file >> "begin") && (ret = parse_seq(file, scope)))
-    || ((file >> "real ") && (ret = new Variable_Stmt(file, scope)))
-    || ((file >> "integer ") && (ret = new Variable_Stmt(file, scope)))
     || ((file >> "if ") && (ret = parse_cond(file, scope)))
     || ((file >> "case ") && (ret = parse_switch(file, scope)))
     || ((file >> "while ") && (ret = new AnalogWhileStmt(file, scope)))
@@ -708,7 +706,7 @@ void CaseGen::calc_reach(Expression const& ctrl)
       b.pop();
       assert(result.size());
 
-      if(is_false(result)) {
+      if(is_false(result)) { untested();
       }else{
 	all_never = false;
       }
@@ -718,7 +716,7 @@ void CaseGen::calc_reach(Expression const& ctrl)
       }else{
       }
     }
-    if(all_never){
+    if(all_never){ untested();
       set_never();
     }else{
     }
@@ -911,11 +909,32 @@ void AnalogSeqStmt::parse(CS& f)
   // _block.update();
 }
 /*--------------------------------------------------------------------------*/
+    // f >> _variables; ?
+static void parse_block_variables(CS& f, Variable_List_Collection& P)
+{
+  for (;;) {
+    trace1("AnalogSeqBlock::parse loop", f.tail().substr(0,20));
+    if( 0 // || ((f >> "parameter ") && (f >> _parameters))
+	|| ((f >> "real ") && (f >> P))
+	|| ((f >> "integer ") && (f >> P))) {
+      if(f.peek() == ';') { untested();
+	f.warn(bWARNING, "stray semicolon\n");
+	f.skip();
+      }else{
+      }
+    }else{
+      break;
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 void AnalogSeqBlock::parse(CS& f)
 {
   assert(owner());
   if(f >> ":"){
     parse_identifier(f);
+    _variables.set_owner(this);
+    parse_block_variables(f, _variables);
   }else{
   }
   if(dynamic_cast<Module const*>(owner())) { untested();
@@ -1245,7 +1264,7 @@ void Contribution::add_dep(Dep const& d)
   }else if(d->branch() != _branch){
   }else if(is_flow_contrib() && d->is_flow_probe()){ untested();
     _branch->set_selfdep();
-  }else if(is_pot_contrib() && d->is_pot_probe()){
+  }else if(is_pot_contrib() && d->is_pot_probe()){ untested();
     _branch->set_selfdep();
   }else{
   }
@@ -1348,7 +1367,7 @@ Branch::~Branch()
 bool Branch::set_used_in(Base const* b)
 {
   for(auto& i : _used_in){
-    if(i == b){
+    if(i == b){ untested();
       return false;
     }else{
     }
@@ -1370,7 +1389,7 @@ void Branch::unset_used_in(Base const* b)
     }else{
     }
   }
-  if(!found){
+  if(!found){ untested();
     // can't seem to avoid. cyclic deps...
     // unreachable();
 //    throw std::logic_error("cleanup " + code_name());
@@ -1438,6 +1457,7 @@ bool Branch::req_short() const
 /*--------------------------------------------------------------------------*/
 void AnalogCtrlBlock::dump(std::ostream& o)const
 {
+  // base?
   o << "begin";
   if(size() || identifier() != ""){
     if(identifier() != ""){
@@ -1469,9 +1489,12 @@ void AnalogCtrlBlock::dump(std::ostream& o)const
 	}
       }else{
       }
+      for(auto* i : variables_()) {
+	i->dump(o);
+      }
       if(size()){
 	SeqBlock::dump(o);
-      }else{ untested();
+      }else{
       }
     }
   }else{
@@ -1483,12 +1506,18 @@ void AnalogCtrlBlock::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void AnalogSeqBlock::dump(std::ostream& o)const
 {
+  // SeqBlock::dump, code?
   o__ "begin";
   if(identifier() != ""){
-    o << " : " << identifier();
+    o << " : " << identifier() << "\n";
+    indent x;
+    for(auto* i : variables_()) {
+      i->dump(o);
+    }
   }else{
+    assert(!variables_().size());
+    o << "\n";
   }
-  o << "\n";
   if(options().dump_annotate()){
     for(auto i : variables()){
       if(auto v = dynamic_cast<Token_VAR_REF const*>(i.second)){
@@ -1584,14 +1613,14 @@ bool AnalogEvtCtlStmt::update()
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogEvtCtlStmt::is_used_in(Base const* b)const
-{
+{ untested();
   // store rdeps in Statement::_rdeps?
 
   // o__ "// AnalogEvtCtlStmt2 " << cond().data().rdeps().size() << "\n";
 
-  if( _ctrl.is_used_in(b)){
+  if( _ctrl.is_used_in(b)){ untested();
     return true;
-  }else{
+  }else{ untested();
     return AnalogCtrlStmt::is_used_in(b);
   }
 }
@@ -1659,11 +1688,11 @@ public:
     // BUG? make_cc_af_args
     std::string sep = "";
     std::string qual = "";
-    for (Base const* x : F.args()){
+    for (Base const* x : F.header()){
       auto coll = prechecked_cast<AF_Arg_List const*>(x);
       assert(coll);
 
-      if(coll->is_output()){
+      if(coll->is_output()){ untested();
 	qual = "/*output*/ &";
       }else{
 	qual = "";
@@ -1689,11 +1718,17 @@ void Analog_Function::parse(CS& f)
   assert(!_variable);
   auto data = new TData;
   _variable = new Token_VAR_REF(name, this, data);
+  set_identifier(name);
   trace1("PAF", name);
   _block.new_var_ref(_variable);
-  size_t here = f.cursor();
+
+ // parse_block_variables(f, _block._variables);
+  _args._variables.set_owner(&_args); // ..
+
   for (;;) {
-    Base* s = NULL;
+    size_t here = f.cursor();
+    Variable_Stmt* s = NULL;
+    trace1("af variables...", f.tail().substr(0,30));
     ONE_OF	// module_item
       || f.umatch(";")
       || ((f >> "input ") && (f >> _args))
@@ -1702,35 +1737,46 @@ void Analog_Function::parse(CS& f)
       || ((f >> "real ") && (s = new Variable_Stmt(f, &_args)))
       || ((f >> "integer ") && (s = new Variable_Stmt(f, &_args)))
       ;
+    if (!s){
+      trace1("done?", _args.lookup("x"));
+    }
     if (s){
-      _vars.push_back(s);
+      _args._variables.push_back(s);
     }else if (!f.more()) { untested();
       f.warn(bWARNING, "premature EOF (analog function)");
       break;
     }else if (f.stuck(&here)) {
       break;
+    }else if (!f){ untested();
+      // bug? handle in "stuck" below?
+      throw Exception_CS_("error parsing variables\n", f);
     }else{
     }
   }
   trace1("body?", f.tail().substr(0,20));
   _block.set_owner(this);
 
-  for(auto& x : _args.var_refs()){
-    trace1("af vr", x.first);
-    if(auto y = dynamic_cast<Token_ARGUMENT*>(x.second)){
-      if(dynamic_cast<Token_VAR_DECL*>(y->_var)){
-	_block.new_var_ref(y->_var);
+#if 0
+  try{ untested();
+    for(auto& x : _args.var_refs()){ untested();
+      trace1("af vr", x.first);
+      if(auto y = dynamic_cast<Token_ARGUMENT*>(x.second)){ untested();
+	if(dynamic_cast<Token_VAR_DECL*>(y->_var)){ untested();
+	  _args.new_var_ref(y->_var);
+	}else{ untested();
+	  throw Exception("formal argument missing type\n");
+	}
       }else{ untested();
-	throw Exception("formal argument missing type\n");
+	assert(dynamic_cast<Token_VAR_DECL*>(x.second));
+	_args.new_var_ref(x.second);
       }
-    }else{
-      assert(dynamic_cast<Token_VAR_DECL*>(x.second));
-      _block.new_var_ref(x.second);
     }
-
+  }catch (Exception const& e){ untested();
+    throw Exception_CS_(e.message(), f);
   }
+#endif
 
-  f >> _block;
+  f >> _block; // actually a Statement, but always a CtrlBlock, for simplicity
 
   if(f >> "endfunction"){
   }else{
@@ -1741,6 +1787,35 @@ void Analog_Function::parse(CS& f)
   _function = new AF(this);
 }
 /*--------------------------------------------------------------------------*/
+Block* AnalogFunctionBody::scope()
+{
+  auto o = prechecked_cast<Analog_Function*>(owner());
+  return &o->_args;
+}
+/*--------------------------------------------------------------------------*/
+Base* AnalogFunctionArgs::lookup(std::string const& k, bool recurse)
+{
+  trace2("AnalogFunctionArgs::lookup", k, recurse);
+  Base* b = Block::lookup(k, recurse);
+  if(auto n = dynamic_cast<Token_ARGUMENT const*>(b)){
+    trace2("AnalogFunctionArgs::lookup1 arg", k, n->_var);
+    if(n->_var){
+      return n->_var;
+    }else{
+      return b;
+    }
+  }else if(dynamic_cast<Token_VAR_DECL const*>(b)){
+    return b;
+  }else if(dynamic_cast<Token_VAR_REF const*>(b)){ untested();
+    return NULL;
+  }else if(dynamic_cast<Token_NODE const*>(b)){ untested();
+      // nodes not allowed here.
+    return NULL;
+  }else{
+    return b;
+  }
+}
+/*--------------------------------------------------------------------------*/
 Base* AnalogFunctionBody::lookup(std::string const& k, bool recurse)
 {
   Base* b = AnalogCtrlBlock::lookup(k, false);
@@ -1749,34 +1824,37 @@ Base* AnalogFunctionBody::lookup(std::string const& k, bool recurse)
   }else if(recurse){
     assert(scope());
     assert(scope() != this);
-    b = scope()->lookup(k, true);
+    // b = scope()->lookup(k, true);
 
-    if(dynamic_cast<Token_VAR_REF const*>(b)){
-      // module variables are not allowed here.
-      return NULL;
-    }else if(dynamic_cast<Token_NODE const*>(b)){ untested();
+    if(dynamic_cast<Token_NODE const*>(b)){ untested();
       // nodes not allowed here.
       return NULL;
-    }else{
+    }else if(b){ untested();
+      trace2("AnalogFunctionBody::lookup1 arg", k, b);
       return b;
+    }else{
+      return scope()->lookup(k, recurse);
+      // return b;
     }
   }else{ untested();
+    return scope()->lookup(k, false);
     return NULL;
-  }
-}
-/*--------------------------------------------------------------------------*/
-void VariableLists::dump(std::ostream& o) const
-{
-  for(auto i : *this){
-    assert(i);
-    i->dump(o);
   }
 }
 /*--------------------------------------------------------------------------*/
 void AnalogFunctionBody::dump(std::ostream& o) const
 {
-  o__ "";
-  AnalogCtrlBlock::dump(o);
+ AnalogCtrlBlock::dump(o);
+ return;
+  for(auto* i : variables_()) { untested();
+    i->dump(o);
+  }
+  o__ "begin\n";
+  { untested();
+    indent x;
+    Block::dump(o);
+  }
+  o__ "end\n";
 }
 /*--------------------------------------------------------------------------*/
 Analog_Function::~Analog_Function()
@@ -1794,7 +1872,9 @@ void Analog_Function::dump(std::ostream& o) const
   {
     indent x;
     o << _args;
-    o << _vars;
+    incomplete();
+   // o << _vars;
+    o__ "";
     _block.dump(o);
   }
   o__ "endfunction\n";
@@ -1808,6 +1888,9 @@ void AnalogFunctionArgs::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 void AnalogFunctionArgs::dump(std::ostream& o) const
 {
+  for(auto* i : _variables) {
+    i->dump(o);
+  }
   for(auto const& i : *this){
     o__ *i; // ->dump(o);
   }
@@ -1817,20 +1900,22 @@ bool AnalogFunctionArgs::new_var_ref(Base* b)
 {
   auto t = prechecked_cast<Token*>(b);
   assert(t);
-  trace1("AF::nvr", t->name());
+  trace1("AF_args::new_var_ref", t->name());
   Base* ex = NULL;
   if(auto T = dynamic_cast<Token const*>(b)){
     ex = lookup(T->name(), false);
+    trace1("AF_args::new_var_ref0", ex);
   }else{ untested();
   }
 
   Token_ARGUMENT* arg = NULL;
   Token_VAR_DECL* decl = NULL;
   if((arg = dynamic_cast<Token_ARGUMENT*>(b))){
-    trace1("AF::nvr1", t->name());
+    trace1("AF_args::new_var_ref ARG", t->name());
     if(dynamic_cast<Token_ARGUMENT*>(ex)){ untested();
       throw Exception("duplicate argument");
     }else if(auto dd = dynamic_cast<Token_VAR_DECL*>(ex)){
+      trace1("AF_args::new_var_ref ARG + DECL", t->name());
       arg->_var = dd;
       return Block::new_var_ref(arg);
     }else if(auto tt = dynamic_cast<Token*>(ex)){ untested();
@@ -1842,14 +1927,18 @@ bool AnalogFunctionArgs::new_var_ref(Base* b)
       return Block::new_var_ref(b);
     }
   }else if((decl = dynamic_cast<Token_VAR_DECL*>(b))){
-    trace1("AF::nvr2", t->name());
-    if(auto aa=dynamic_cast<Token_ARGUMENT*>(ex)){
-      aa->_var = decl;
-      trace1("AF::nvr arg", t->name());
+    trace2("AF_args::new_var_ref DECL", t->name(), ex);
+    if(dynamic_cast<Token_VAR_DECL*>(ex)){
+      throw Exception("duplicate variable name " + t->name());
+    }else if(auto aa=dynamic_cast<Token_ARGUMENT*>(ex)){
+      trace2("AF_args::new_var_ref DECL + ARG", t->name(), aa->_var);
+      if(aa->_var){ untested();
+	throw Exception("duplicate variable name");
+      }else{
+	aa->_var = decl;
+      }
       Block::new_var_ref(aa);
       return true; // OK
-    }else if(dynamic_cast<Token_VAR_DECL*>(ex)){ untested();
-      throw Exception("duplicate variable name");
     }else if(auto tt = dynamic_cast<Token*>(ex)){ untested();
       return Block::new_var_ref(tt);
     }else if(ex){ untested();
@@ -1858,6 +1947,8 @@ bool AnalogFunctionArgs::new_var_ref(Base* b)
     }else{
       return Block::new_var_ref(b);
     }
+  }else if(dynamic_cast<Token_VAR_REF*>(b)) { untested();
+    return Block::new_var_ref(b);
   }else{ untested();
     assert(0);
     return Block::new_var_ref(b);
@@ -1871,12 +1962,12 @@ bool AnalogFunctionBody::new_var_ref(Base* b)
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogEvtExpression::is_used_in(Base const* b)const
-{
+{ untested();
   // propagate to owner instead??
-  for(auto& i : _rdeps){
-    if(i == b){
+  for(auto& i : _rdeps){ untested();
+    if(i == b){ untested();
       return true;
-    }else{
+    }else{ untested();
     }
   }
 
@@ -1945,7 +2036,7 @@ void AF_Arg_List::parse(CS& f)
     _direction = a_input;
   }else if(dir=="out"){
     _direction = a_output;
-  }else if(dir=="ino"){
+  }else if(dir=="ino"){ untested();
     _direction = a_inout;
   }else{ untested();
     trace2("AF_Arg_List::parse", f.tail().substr(0,10), dir);
@@ -1960,12 +2051,15 @@ void AF_Arg_List::parse(CS& f)
   LiSt<String_Arg, '\0', ',', ';'> l;
   l.parse(f);
   for(auto i : l){
+    trace1("AF_Arg_List::parse alreacy declared?", i->to_string());
     auto b = owner()->lookup(i->to_string(), false);
     auto v = dynamic_cast<Token_VAR_DECL*>(b);
 
     if(dynamic_cast<Token_ARGUMENT const*>(b)){ untested();
       throw Exception_CS_("already declared: " + i->to_string() + "\n", f);
-    }else if(v){
+    }else if(dynamic_cast<Token_VAR_DECL const*>(b)){
+      incomplete();
+    }else if(v){ untested();
 //      v->set_arg? set_used_in?
     }else{
     }
@@ -1973,7 +2067,11 @@ void AF_Arg_List::parse(CS& f)
     auto t = new Token_ARGUMENT(i->to_string());
     t->_var = v;
     trace1("stash", t->name());
-    owner()->new_var_ref(t);
+    try{
+      owner()->new_var_ref(t);
+    }catch(Exception const& e){ untested();
+      throw Exception_CS_(e.message(), f);
+    }
 
     if(v){
 //      v->deps().add_sens(t);
@@ -2109,16 +2207,16 @@ size_t Branch::num_nodes() const
   size_t ret=1;
 
   for(auto i : ddeps()){
-    if(i->branch()->is_short()){
+    if(i->branch()->is_short()){ untested();
     }else if(i->branch() == this){
       // self conductance
-    }else if(i->is_pot_probe()){
+    }else if(i->is_pot_probe()){ untested();
       ++ret;
 //     }else if(i->is_filter_probe()){ untested();
 //       assert(i->is_pot_probe());
 //       unreachable();
 //       ++ret;
-    }else{
+    }else{ untested();
     }
   }
   return 2*ret;
@@ -2133,8 +2231,8 @@ size_t Branch::num_states() const
     // if(i->is_reversed()){ untested();
     //}else
     if(i->branch() == this){
-    }else if(i->branch()->is_short()){
-    }else{
+    }else if(i->branch()->is_short()){ untested();
+    }else{ untested();
       ++k;
     }
   }
@@ -2188,7 +2286,7 @@ Probe::~Probe()
 }
 /*--------------------------------------------------------------------------*/
 bool Probe::is_reversed() const
-{
+{ untested();
   return _br.is_reversed();
 }
 /*--------------------------------------------------------------------------*/
@@ -2362,7 +2460,7 @@ FUNCTION_ const* xs_function_call(std::string const& f, Block const* owner)
   }
 
   assert(file);
-  if(f=="flow" || f=="potential") {
+  if(f=="flow" || f=="potential") { untested();
     // TODO: return FUNCTION_*, VAMS_XS* from nature
     return (FUNCTION_*)(1); // TODO true;
   }else{

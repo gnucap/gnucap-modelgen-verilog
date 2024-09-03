@@ -5,7 +5,7 @@ module dep7(d, g);
 
   real T;
 
-  analog begin // always
+  analog begin : main // always
     // T : 0
     // c : 0
     real c;

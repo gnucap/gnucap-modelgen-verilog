@@ -1,7 +1,7 @@
 
 
 module test();
-  analog begin
+  analog begin : main
     real i;
     i =  20.0855369231877;
     i =  1.09861228866811;

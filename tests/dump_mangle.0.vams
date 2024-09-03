@@ -12,12 +12,12 @@ endmodule
 
 module underscore1();
   localparam real __L=0.;
-  analog begin
+  analog begin : main
     real R;
     R = __L;
   end
   analog begin
-    begin
+    begin : main
 		real R;
       R = __L;
     end

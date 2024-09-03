@@ -9,7 +9,7 @@ module test_while0a(p, n);
    inout p, n;
    parameter real r=0;
 	real z;
-   analog begin
+   analog begin : main
       integer i;
       real x, y;
       x = 0.;

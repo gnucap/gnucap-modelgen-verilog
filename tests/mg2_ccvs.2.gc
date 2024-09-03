@@ -9,7 +9,7 @@ module test_ccvs2(p, n, cp, cn);
 electrical p, n, cp, cn;
 
 (* desc="cin" *) real cin;
-analog begin
+analog begin : main
 	real gain;
 	gain = 3;
 	cin = I(cp, cn);

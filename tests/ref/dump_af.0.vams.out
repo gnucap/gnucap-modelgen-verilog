@@ -44,11 +44,10 @@ module test_af();
     real y, z;
     begin
       something = ((x + sqrt(((x * x) + ((y * 4.0) * y)))) * 0.5);
-      real r;
     end
   endfunction
 
-  analog begin
+  analog begin : main
     real i;
     real out;
     i = something( 26.,  20.0855369231877, out);

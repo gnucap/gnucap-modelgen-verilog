@@ -53,28 +53,32 @@ module diode (a, c);
 	real qd;
    (* desc="region" *) integer region;
 
-	analog begin
+	analog begin : main
 		real volts, amps, g;
 
 		real tempratio;
+		real vt;
+		real p_isat;
+		real i;
+		real iaf;
+		real noise;
+		real qb;
+		real qsw;
+		real ii;
+
 		if($param_given(tnom)) begin
 			tempratio = $temperature / tnom + `P_CELSIUS0;
 		end else begin
 			tempratio = 1.;
 		end
 
-		real vt;
 		vt = $vt * n;
     	// region_t oldregion = region;
-		real p_isat;
 		p_isat = is_adjusted * pow(tempratio, xti) * exp((eg/vt) *(tempratio-1));
-		real i;
-		real iaf;
 
 		volts = V(r);
 		amps = I(r);
 		iaf = pow(abs(amps), af);
-		real noise;
 		noise = white_noise(2*`P_Q * amps, "shot") + flicker_noise(kf*iaf, 1., "flicker");
 		case(level)
 			0: begin // gnucap model
@@ -100,9 +104,9 @@ module diode (a, c);
 				if (volts <= 0.) begin
 					region = -1 - level*100.;
 					g = ( p_isat / vt + $simparam("gmin") );
-				end else begin
-					region = 1 + level*100.;
+				end else begin : ev
 					real ev;
+					region = 1 + level*100.;
 					ev = exp(volts/vt);
 					g = ( p_isat * ( ev - 1.) + $simparam("gmin") );
 				end
@@ -110,7 +114,6 @@ module diode (a, c);
 			end
 		endcase
 
-		real qb;
 		if (volts < fc * pb) begin
 			qb = cj_adjusted * pb * pow(1.-(volts/pb), 1.-mj) / (1.-mj);
 // 			cb = cj_adjusted * pow(1. - (volts / pb),  -mj); // Cj
@@ -122,7 +125,6 @@ module diode (a, c);
 // 			cb = cj_adjusted / pow(1. - fc, 1. + mj) * (1. - fc*(1.+mj) + (volts/pb)*mj); // Cj
  		end
 
-		real qsw;
  		if (volts < fc * pbsw) begin
 			qsw = cjsw_adjusted * pbsw * pow(1.-(volts/pbsw), 1.-mjsw) / (1.-mjsw);
 // 			csw = cjsw_adjusted / pow(1. - (volts / pbsw),  mjsw); // Cj
@@ -146,7 +148,6 @@ module diode (a, c);
 
       // Cj TODO
 		// qd = tf*amps - 2*cjo*phi*sqrt(1 - V(cap)/phi);
-		real ii;
 		 ii = is*(limexp(V(r)/$vt) - 1);
 		// qd = tf*ii - 2.*cjo*phi*sqrt(1. - V(cap)/phi);
 		qd = tf*ii - qb - qsw;// * V(cap); //  * (csw); // wrong.

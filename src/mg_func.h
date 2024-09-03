@@ -172,7 +172,7 @@ private:
 /*--------------------------------------------------------------------------*/
 inline FUNCTION_::~FUNCTION_()
 {
-  if(has_refs()){ untested();
+  if(has_refs()){
     incomplete();
     std::cerr << "stale ref " << label() << "\n";
   }else{

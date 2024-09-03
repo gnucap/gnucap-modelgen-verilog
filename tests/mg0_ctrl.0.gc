@@ -9,7 +9,7 @@ module test_while0_0(p, n);
 	electrical p, n;
 	inout p, n;
 	parameter real v=0;
-	analog begin
+	analog begin : main
 		integer i;
 		i = v;
 		while(i>0) begin

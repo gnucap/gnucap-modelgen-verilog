@@ -29,13 +29,14 @@ module test_ddxaf(a);
 	analog function real fct3;
 		inout x;
 		real x;
-		begin
-			real y; y = x;
+		real y;
+		begin : mul
+			y = x;
 			x = y*x;
 		end
 	endfunction
 
-	analog begin
+	analog begin : main
 		real tmp, tmp2, tmp3;
 		tmp = V(a);
 		vin = fct(tmp);

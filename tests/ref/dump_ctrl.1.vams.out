@@ -1,24 +1,5 @@
-nature current
-  access = "I";
-  units = "A";
-  abstol = "0.001234";
-endnature
-
-nature voltage
-  access = "V";
-  units = "V";
-  abstol = "0.0004321";
-endnature
-
-
-discipline electrical
-  potential "voltage";
-  flow "current";
-enddiscipline
-
-
 module while0(p, n);
-  analog begin
+  analog begin : main
     real S, T, U;
     while (0);
     while (S);
@@ -29,7 +10,7 @@ module while0(p, n);
 
 endmodule
 module while1(p, n);
-  analog begin
+  analog begin : main
     real S;
     while ((S < 10)) begin
       S = (S + 1);

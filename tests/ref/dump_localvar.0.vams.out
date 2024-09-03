@@ -1,29 +1,10 @@
-nature current
-  access = "I";
-  units = "A";
-  abstol = "0.001234";
-endnature
-
-nature voltage
-  access = "V";
-  units = "V";
-  abstol = "0.0004321";
-endnature
-
-
-discipline electrical
-  potential "voltage";
-  flow "current";
-enddiscipline
-
-
 module test(p, n);
   inout p, n;
   electrical p, n;
   parameter real a = 2.;
   localparam integer two_a = (a * 2);
 
-  analog begin
+  analog begin : main
     real b;
     real c, d;
     b = two_a;

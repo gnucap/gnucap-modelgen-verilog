@@ -1,12 +1,13 @@
 module dep6(d, g);
   inout d, g;
   electrical d, g;
-  analog begin // always
+  analog begin : main // always
     // S : 0
     // T : 0
     // U : 0
     // c : 0
     real c;
+    real T, S, U;
     @(initial_step) begin
       // c : 0
       c = 1.; // s2
@@ -15,7 +16,6 @@ module dep6(d, g);
       // c : 0
       c = 2.; // s2
     end
-    real T, S, U;
     T = c; // s6
     S = (T * T); // s7
     U = exp(c); // s6

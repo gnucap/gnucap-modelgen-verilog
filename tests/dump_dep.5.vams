@@ -7,7 +7,7 @@
 module test_dep5(np, n);
    electrical p, n;
    inout p, n;
-   analog begin
+   analog begin : main
 		real AA;
 		AA = V(p,n);
 		I(p,n) <+ ddt(AA * V(p,n));

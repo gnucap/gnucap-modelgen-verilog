@@ -26,6 +26,13 @@
 #include "mg_attrib.h"
 #include "mg_expression.h"
 /*--------------------------------------------------------------------------*/
+class Variable_Stmt;
+class Variable_List_Collection : public Collection<Variable_Stmt>{
+public:
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
 class Statement : public Owned_Base {
   RDeps _rdeps;
 protected:
@@ -229,8 +236,10 @@ public:
 /*--------------------------------------------------------------------------*/
 class Sensitivities;
 class SeqBlock : public Block {
-  String_Arg _identifier;
   Sensitivities* _sens{NULL}; // here?
+protected: // AF
+  String_Arg _identifier;
+  Variable_List_Collection _variables;
 public:
   explicit SeqBlock() : Block() {}
   ~SeqBlock();
@@ -260,6 +269,7 @@ public:
   void set_sens(Base* s);
   void merge_sens(Sensitivities const& s);
   map const& variables()const {return _var_refs;}
+  Variable_List_Collection const& variables_()const {return _variables;}
   bool update();
 public:
   bool propagate_rdeps(RDeps const&);

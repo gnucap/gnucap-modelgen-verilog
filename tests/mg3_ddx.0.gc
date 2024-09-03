@@ -11,7 +11,7 @@ module test_ddx0(n)
 
 	(* desc="" *) real dd;
 
-	analog begin
+	analog begin : main
 		real v;
 		real sq;
 		v = V(n);

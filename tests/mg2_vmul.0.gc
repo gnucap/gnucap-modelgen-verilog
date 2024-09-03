@@ -6,10 +6,10 @@ verilog
 
 `modelgen
 module test_vmul0(p, n, x, y);
-electrical p, n, x, y;
+	electrical p, n, x, y;
+	real gain;
 
 analog begin
-	real gain;
 	gain = 1.;
 	V(p,n) <+ gain*V(x)*V(y);
 end

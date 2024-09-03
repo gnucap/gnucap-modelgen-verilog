@@ -1,5 +1,7 @@
 
 `include "sub/disciplines.few"
+`pragma modelgen dump-nature
+`pragma modelgen dump-discipline
 
 discipline logic;
   domain discrete;

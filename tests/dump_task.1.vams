@@ -12,7 +12,7 @@ module foo(p, x)
 	real A, B;
 	real y;
 	
-	analog begin
+	analog begin : main
 		real C;
 		A = 1;
 		B = A;

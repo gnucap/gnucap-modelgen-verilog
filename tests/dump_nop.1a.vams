@@ -9,7 +9,8 @@ module test(a, b);
 	parameter real arg=0 from [0.:0.];
 	real T;
 	real U;
-	analog begin
+	analog begin : main
+		real x;
 		if(0)
 			V(a) <+ 1.;
 		else
@@ -33,7 +34,6 @@ module test(a, b);
 		if(0==1)
 			V(a) <+ 4.;
 
-		real x;
 		x = 0.;
 		if(x)
 			V(a) <+ 5.;

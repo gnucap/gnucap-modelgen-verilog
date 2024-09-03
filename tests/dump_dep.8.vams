@@ -10,19 +10,19 @@ module dep7(a, g);
   electrical a, g;
   real T;
   parameter real p = 0.;
-  analog begin
+  analog begin : main
     real c, d;
     c = V(a);
-    if(V(g)>1) begin
+    if(V(g)>1) begin : b0
       real t;
       t = 4;
     end else begin
       d = c;
     end
     begin : stuff
-      if(c > 0) begin
-        I(g) <+ d;
+      if(c > 0) begin : b1
         real f;
+        I(g) <+ d;
         f = d;
       end else begin
         I(g) <+ 1;

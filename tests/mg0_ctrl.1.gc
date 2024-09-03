@@ -9,7 +9,7 @@ module test_for0_0(p, n);
 	electrical p, n;
 	inout p, n;
 	parameter real v=0;
-	analog begin
+	analog begin : main
 		integer i;
 		i = 0;
 		for(i=v; i>0; i=i-1) begin

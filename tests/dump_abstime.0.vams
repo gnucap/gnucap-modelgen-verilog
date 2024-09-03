@@ -1,6 +1,6 @@
 
 module test()
-	analog begin
+	analog begin : main
 		real t;
 		t = $abstime;
 		t = $abstime();

@@ -4,7 +4,7 @@
 `pragma modelgen nodump-unreachable
 
 module cond0(p,n);
-	analog begin
+	analog begin : main
 		real S, T, U;
 		if (1.);
 		if (1 + S == 3);
@@ -14,7 +14,7 @@ module cond0(p,n);
 endmodule
 
 module cond1(p,n);
-	analog begin
+	analog begin : main
 		real S;
 		if (1==1) begin
 			S = 3;
@@ -31,7 +31,7 @@ module cond1(p,n);
 endmodule
 
 module cond2(p,n);
-	analog begin
+	analog begin : main
 		real S;
 		real T;
 		if(1 == exp(1.)) S = 1;
@@ -44,7 +44,7 @@ module cond2(p,n);
 endmodule
 
 module cond3(p,n);
-	analog begin
+	analog begin : main
 		real S;
 		real T;
 		if(1) begin
@@ -76,7 +76,7 @@ module cond3(p,n);
 endmodule
 
 module cond4(p,n);
-	analog begin
+	analog begin : main
 		real S;
 		real T;
 		if(1) begin

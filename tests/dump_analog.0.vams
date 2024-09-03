@@ -2,7 +2,7 @@
 
 module test
 
- analog begin
+ analog begin : main
   real a;
   begin : scopename
  	real b;

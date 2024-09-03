@@ -6,7 +6,7 @@
 module ctrl(a, g);
   inout      a, g;
   electrical a, g;
-  analog begin
+  analog begin : main
     real d;
     if(V(g)>1)
     else begin

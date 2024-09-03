@@ -9,12 +9,12 @@ module scope0(np, nn);
 electrical np, nn;
 
 analog begin
-	begin
+	begin : main1
 		real i;
 		i = 1;
 		I(np,nn) <+ i;
 	end
-	begin
+	begin : main2
 		real i;
 		i = 1;
 		I(np,nn) <+ i;

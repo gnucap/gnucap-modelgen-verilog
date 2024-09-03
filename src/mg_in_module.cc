@@ -349,19 +349,6 @@ void Variable_Stmt::dump(std::ostream& o)const
   o << "\n";
 }
 /*--------------------------------------------------------------------------*/
-void Variable_List_Collection::parse(CS& f)
-{
-  Collection<Variable_Stmt>::parse(f);
-}
-/*--------------------------------------------------------------------------*/
-void Variable_List_Collection::dump(std::ostream& o)const
-{
-  for(auto const& i : *this){
-    i->dump(o);
-  }
-  // Collection<Parameter_2_List>::dump(o);
-}
-/*--------------------------------------------------------------------------*/
 size_t Parameter_List_Collection::count_nonlocal() const
 {
   size_t sum = 0;

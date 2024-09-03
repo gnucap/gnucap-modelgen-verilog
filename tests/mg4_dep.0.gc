@@ -11,7 +11,8 @@ module test_dep0(p, n);
 	real i;
 	localparam real p0 = 0;
 	localparam real p1 = 1;
-	analog begin
+	analog begin : main
+		real j;
 		i = 0;
 		
 		if(p0) begin
@@ -22,7 +23,6 @@ module test_dep0(p, n);
 			i = p1?max(V(n),0):0;
 		end
 
-		real j;
 		j = i;
 		I(p,n) <+ j;
 	end

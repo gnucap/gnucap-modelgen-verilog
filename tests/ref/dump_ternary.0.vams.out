@@ -1,7 +1,7 @@
 
 
 module ternary();
-  analog begin
+  analog begin : main
     real one, two;
     one = 1;
     one = 1;

@@ -6,7 +6,7 @@ module ternary(p, n);
 	inout p, n;
 	real a;
 	parameter real c = 1.;
-	analog begin
+	analog begin : main
 		real b;
 		real N, i, WE, WSEG;
 		a   =  1 + (( N * i * 1 )>(1.)?(1):(2));

@@ -13,7 +13,7 @@ module test_lt0(p, n);
 electrical p, n;
 parameter real is = .5e-14;
 
-analog begin
+analog begin : main
 	real v;
    v = $limit(V(p, n), "pnjlim", $vt, 0.7);
 	I(p,n) <+ is * (exp(v/$vt) - 1.);

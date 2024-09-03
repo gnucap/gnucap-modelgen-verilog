@@ -12,8 +12,8 @@ module test_af_1(p, n);
 	analog function real fct;
 		input x;
 		real x;
+		real a;
 		begin
-			real a;
 			a = .2;
 			fct = exp(a*x);
 		end

@@ -11,7 +11,7 @@ module resistor(p, n);
 	parameter real tnom = 0.; // nonstandard ..
 	aliasparam m = $mfactor;
 	(* desc="i" *) real i;
-	analog begin
+	analog begin : main
 		real dt, g;
 		if($param_given(tnom)) begin
 			 dt = $temperature - tnom;

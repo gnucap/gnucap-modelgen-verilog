@@ -1,24 +1,5 @@
-nature current
-  access = "I";
-  units = "A";
-  abstol = "0.001234";
-endnature
-
-nature voltage
-  access = "V";
-  units = "V";
-  abstol = "0.0004321";
-endnature
-
-
-discipline electrical
-  potential "voltage";
-  flow "current";
-enddiscipline
-
-
 module cond0(p, n);
-  analog begin // always
+  analog begin : main // always
     // S : 0
     // T : 0
     // U : 0
@@ -33,7 +14,7 @@ module cond0(p, n);
 
 endmodule
 module cond1(p, n);
-  analog begin // always
+  analog begin : main // always
     // S : 0
     real S;
     if ( 1.) begin // always
@@ -58,7 +39,7 @@ module cond1(p, n);
 
 endmodule
 module cond2(p, n);
-  analog begin // always
+  analog begin : main // always
     // S : 0
     // T : 0
     real S;
@@ -83,7 +64,7 @@ module cond2(p, n);
 
 endmodule
 module cond3(p, n);
-  analog begin // always
+  analog begin : main // always
     // S : 0
     // T : 0
     real S;
@@ -141,7 +122,7 @@ module cond3(p, n);
 
 endmodule
 module cond4(p, n);
-  analog begin // always
+  analog begin : main // always
     // S : 0
     // T : 0
     real S;
@@ -154,7 +135,7 @@ module cond4(p, n);
 
 endmodule
 module cond5(p, n);
-  analog begin // always
+  analog begin : main // always
     // S : 0
     // T : 0
     // i : 0

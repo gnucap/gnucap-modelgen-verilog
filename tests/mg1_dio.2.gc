@@ -16,7 +16,7 @@ dio = exp(x / 2.);
 end
 endfunction
 
-analog begin
+analog begin : main
 	real a;
 	real one;
 	real sinsquare;

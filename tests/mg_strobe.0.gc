@@ -8,9 +8,9 @@ verilog
 `modelgen
 module test_strobe0()
 
-	analog begin
-		$strobe("1hello %f", 1.);
+	analog begin : main
 		real one;
+		$strobe("1hello %f", 1.);
 		one = 1;
 		$write("2hello \
           foo %f\n", one);

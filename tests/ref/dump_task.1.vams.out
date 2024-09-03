@@ -6,7 +6,7 @@ module foo(p, x);
   real y// dep _potential_b_p_
 ;
 
-  analog begin // always
+  analog begin : main // always
     // A : 0
     // B : 0
     // C : 0

@@ -6,7 +6,7 @@ module test_while0a(p, n);
   real z// dep _potential_b_p_n
 ;
 
-  analog begin // always
+  analog begin : main // always
     // i : 0
     // x : 1
     // y : 1

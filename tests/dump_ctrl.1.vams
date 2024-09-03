@@ -1,7 +1,7 @@
 `include "sub/disciplines.few"
 
 module while0(p,n);
-	analog begin
+	analog begin : main
 		real S, T, U;
 		while (0);
 		while (S);
@@ -12,7 +12,7 @@ module while0(p,n);
 endmodule
 
 module while1(p,n);
-	analog begin
+	analog begin : main
 		real S;
 		while (S < 10) S = S+1;
    end

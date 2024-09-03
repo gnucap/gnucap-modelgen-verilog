@@ -40,11 +40,10 @@ analog function real something;
   real y, z;
   begin
         something = 0.5 * (x + sqrt(x*x + 4.0*y*y));
-        real r;
   end
 endfunction
 
-analog begin
+analog begin : main
 	real i;
 	real out;
 	i = something(1+5*5, exp(3), out);

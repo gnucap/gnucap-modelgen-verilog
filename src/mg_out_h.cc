@@ -201,7 +201,7 @@ void make_one_variable_decl(std::ostream& o, Token_VAR_REF const& V)
     }else{
 //      o__ "ddouble ";
     }
-  }else if(V.type().is_int()) { untested();
+  }else if(V.type().is_int()) {
     o__ "int";
     o << " _v_" << V.name() << "{0}";
   }else{ untested();
@@ -216,7 +216,8 @@ void make_one_variable_decl(std::ostream& o, Variable_Decl const& V)
   return make_one_variable_decl(o, V.token());
 }
 /*--------------------------------------------------------------------------*/
-static void make_variable_decl(std::ostream& o, const Variable_List_Collection& P)
+static void make_variable_collection(std::ostream& o,
+    Variable_List_Collection const& P)
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
@@ -224,6 +225,37 @@ static void make_variable_decl(std::ostream& o, const Variable_List_Collection& 
       assert(V);
       make_one_variable_decl(o, *V);
     }
+  }
+}
+/*--------------------------------------------------------------------------*/
+static void make_variable_decl(std::ostream& o, Block const& b);
+/*--------------------------------------------------------------------------*/
+static void make_module_variable_decl(std::ostream& o, Module const& m)
+{
+  Variable_List_Collection const& P = m.variables();
+  make_variable_collection(o, P);
+
+  for(auto a : analog(m).list()){
+    assert(a);
+    assert(a->block());
+    make_variable_decl(o, *a->block());
+  }
+}
+/*--------------------------------------------------------------------------*/
+static void make_block_variable_decl(std::ostream& o, SeqBlock const& s)
+{
+  Variable_List_Collection const& P = s.variables_();
+  make_variable_collection(o, P); // name??
+}
+/*--------------------------------------------------------------------------*/
+static void make_variable_decl(std::ostream& o, Block const& b)
+{
+  if(auto m = dynamic_cast<Module const*>(&b)){
+    make_module_variable_decl(o, *m);
+  }else if(auto s = dynamic_cast<SeqBlock const*>(&b)){
+    make_block_variable_decl(o, *s);
+    incomplete();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -595,7 +627,7 @@ static void make_module(std::ostream& o, const Module& m)
   o << "/* ========== */\n";
 
   o << "public: // instance vars\n";
-  make_variable_decl(o, m.variables());
+  make_variable_decl(o, m);
   o << "private: // branch state\n";
   make_branch_states(o, m);
   o << "private: // node list\n";

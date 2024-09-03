@@ -118,6 +118,7 @@ bool Statement::propagate_rdeps(RDeps const& r)
 /*--------------------------------------------------------------------------*/
 void Variable_Stmt::parse(CS& f)
 {
+  size_t here = f.cursor();
   assert(owner());
   Module* mod = prechecked_cast<Module*>(owner());
   if(mod){
@@ -139,9 +140,20 @@ void Variable_Stmt::parse(CS& f)
 //  }
 
   _l.set_owner(this);
-  _l.parse(f);
+  try{
+    trace1("Variable_Stmt::parse", f.tail().substr(0,30));
+    _l.parse(f);
+    assert(f);
+  }catch (Exception_CS_ const& ee){
+    throw ee;
+  }catch (Exception const& e){
+    // incomplete();
+    f.reset_fail(here);
+    throw Exception_CS_(e.message(), f);
+  }
 
   attr.move_attributes(tag_t(&f), tag_t(this));
+
 //  update();
 } // Variable_Stmt::parse
 /*--------------------------------------------------------------------------*/
@@ -184,6 +196,7 @@ void Variable_Decl::parse(CS& f)
   assert(l->type());
   set_type(l->type());
 
+  trace1("already declared?", name);
   if(l->scope()->new_var_ref(_token)){
   }else{
     throw Exception_CS_("already declared", f);
@@ -279,6 +292,13 @@ bool SeqBlock::update()
   trace0("AnalogSeqBlock::update");
   bool ret = false;
   if(is_reachable()){
+    for(auto i: _variables){
+      if(auto s = dynamic_cast<Statement*>(i)){
+	ret |= s->update();
+      }else{ untested();
+	unreachable(); // comment? later..
+      }
+    }
     for(auto i: *this){
       if(auto s = dynamic_cast<Statement*>(i)){
 	ret |= s->update();
@@ -320,6 +340,7 @@ SeqBlock::~SeqBlock()
 {
   delete _sens;
   _sens = NULL;
+ //  delete _variables;
 }
 /*--------------------------------------------------------------------------*/
 // void Lhs_Ref::parse()
@@ -592,6 +613,19 @@ void Assignment::parse_rhs(CS& cmd)
   resolve_symbols(rhs);
   cmd.reset(cmd.cursor());
   trace1("Assignment::parse_rhs", bool(cmd));
+}
+/*--------------------------------------------------------------------------*/
+void Variable_List_Collection::parse(CS& f)
+{
+  Collection<Variable_Stmt>::parse(f);
+}
+/*--------------------------------------------------------------------------*/
+void Variable_List_Collection::dump(std::ostream& o)const
+{
+  for(auto const& i : *this){
+    i->dump(o);
+  }
+  // Collection<Parameter_2_List>::dump(o);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

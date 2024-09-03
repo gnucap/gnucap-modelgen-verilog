@@ -1,7 +1,7 @@
 module dep0(d, g);
   inout d, g;
   electrical d, g;
-  analog begin // always
+  analog begin : main // always
     // S : 0
     // T : 1
     // U : 1

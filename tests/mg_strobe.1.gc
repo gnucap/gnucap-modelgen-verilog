@@ -7,7 +7,7 @@ verilog
 
 `modelgen
 module test_strobe1()
-	analog begin
+	analog begin : main
 		real one;
 		$strobe("0 %f", one);
 		one = 1.;

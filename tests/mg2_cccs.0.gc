@@ -8,7 +8,7 @@ verilog
 module test_cccs0(p, n, cp, cn);
 electrical p, n, cp, cn;
 
-analog begin
+analog begin : main
 	real gain;
 	gain = 17;
 	I(p,n) <+ gain*I(cp,cn);
