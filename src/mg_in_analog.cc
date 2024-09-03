@@ -1796,22 +1796,28 @@ Block* AnalogFunctionBody::scope()
 Base* AnalogFunctionArgs::lookup(std::string const& k, bool recurse)
 {
   trace2("AnalogFunctionArgs::lookup", k, recurse);
-  Base* b = Block::lookup(k, recurse);
-  if(auto n = dynamic_cast<Token_ARGUMENT const*>(b)){
+  Base* b = Block::lookup(k, false);
+  if(dynamic_cast<Token_VAR_DECL const*>(b)){
+    return b;
+  }else{ untested();
+  }
+
+  b = Block::lookup(k, recurse);
+  if(auto n = dynamic_cast<Token_ARGUMENT const*>(b)){ untested();
     trace2("AnalogFunctionArgs::lookup1 arg", k, n->_var);
-    if(n->_var){
+    if(n->_var){ untested();
       return n->_var;
-    }else{
+    }else{ untested();
       return b;
     }
-  }else if(dynamic_cast<Token_VAR_DECL const*>(b)){
-    return b;
+  }else if(dynamic_cast<Token_VAR_DECL const*>(b)){ untested();
+    return NULL;
   }else if(dynamic_cast<Token_VAR_REF const*>(b)){ untested();
     return NULL;
   }else if(dynamic_cast<Token_NODE const*>(b)){ untested();
       // nodes not allowed here.
     return NULL;
-  }else{
+  }else{ untested();
     return b;
   }
 }
@@ -1821,7 +1827,7 @@ Base* AnalogFunctionBody::lookup(std::string const& k, bool recurse)
   Base* b = AnalogCtrlBlock::lookup(k, false);
   if(b){
     return b;
-  }else if(recurse){
+  }else if(recurse){ untested();
     assert(scope());
     assert(scope() != this);
     // b = scope()->lookup(k, true);
