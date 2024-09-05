@@ -96,10 +96,10 @@ CS & CS::warn(int badness, size_t spot, const std::string& message)
     }
 
     int lineno = 1;
-    for (size_t i=0; i<linestart; ++i) { itested();
-      if (_cmd[i] == '\n') { itested();
+    for (size_t i=0; i<linestart; ++i) {
+      if (_cmd[i] == '\n') {
 	++lineno;
-      }else{ itested();
+      }else{
       }
     }
 
@@ -145,10 +145,10 @@ void Exception_CS_::construct(const CS& cmd, size_t here)
     _cursor = 40;
   }
   std::string::size_type l = _cmd.find_last_of('\n', _cursor);
-  if( l != std::string::npos ) { itested();
+  if( l != std::string::npos ) {
     std::string::size_type line_end = _cmd.find_first_of('\n', _cursor);
     _cursor -= l-1;
-    if( line_end != std::string::npos ) { itested();
+    if( line_end != std::string::npos ) {
       _cmd = _cmd.substr(0, line_end);
     }else{
     }
@@ -163,7 +163,7 @@ Exception_CS_::Exception_CS_(const std::string& Message, const CS& cmd, size_t h
 }
 /*--------------------------------------------------------------------------*/
 const std::string Exception_CS_::message()const
-{itested();
+{
   std::string s;
   for(auto i : _cmd){
     if(i=='\t'){

@@ -92,13 +92,14 @@ class Token_NODE : public Token_SYMBOL {
   Node_Ref const _node;
 public:
   Token_NODE(Token_NODE const& s)
-    : Token_SYMBOL(s), _node(s._node) {}
+    : Token_SYMBOL(s), _node(s._node) { }
   Token_NODE(Token_SYMBOL const& s, Node_Ref p)
-    : Token_SYMBOL(s), _node(p) {}
+    : Token_SYMBOL(s), _node(p) { }
 
   Token_NODE* clone()const override { return new Token_NODE(*this); }
 
   void stack_op(Expression* E)const override;
+  std::string code_name()const;
 };
 /*--------------------------------------------------------------------------*/
 inline void Token_CALL::attach()

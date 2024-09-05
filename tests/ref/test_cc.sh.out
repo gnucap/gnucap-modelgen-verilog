@@ -1092,7 +1092,7 @@ private: // overrides
     //void    ac_load();           //BASE_SUBCKT
     //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing
   int max_nodes()const override {return 2;}
-  int min_nodes()const override {return 2;}
+  int min_nodes()const override {return 0;}
   int int_nodes()const override    {return 2;}
   std::string value_name()const override {itested(); return "";}
   bool print_type_in_spice()const override {itested(); return false;}
@@ -2270,7 +2270,7 @@ private: // overrides
     //void    ac_load();           //BASE_SUBCKT
     //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing
   int max_nodes()const override {return 2;}
-  int min_nodes()const override {return 2;}
+  int min_nodes()const override {return 0;}
   int int_nodes()const override    {return 2;}
   std::string value_name()const override {itested(); return "";}
   bool print_type_in_spice()const override {itested(); return false;}
@@ -4648,7 +4648,7 @@ private: // overrides
     //void    ac_load();           //BASE_SUBCKT
     //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing
   int max_nodes()const override {return 2;}
-  int min_nodes()const override {return 2;}
+  int min_nodes()const override {return 0;}
   int int_nodes()const override    {return 2;}
   std::string value_name()const override {itested(); return "";}
   bool print_type_in_spice()const override {itested(); return false;}
@@ -5543,7 +5543,7 @@ private: // overrides
     //void    ac_load();           //BASE_SUBCKT
     //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing
   int max_nodes()const override {return 2;}
-  int min_nodes()const override {return 2;}
+  int min_nodes()const override {return 0;}
   int int_nodes()const override    {return 2;}
   std::string value_name()const override {itested(); return "";}
   bool print_type_in_spice()const override {itested(); return false;}

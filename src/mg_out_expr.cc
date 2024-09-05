@@ -356,6 +356,12 @@ public:
     return _types.top() == t_ref;
   }
   void new_constant(std::ostream& o, Token_CONSTANT const& c);
+  void new_rhs(Token_NODE const* v){
+    {
+      _refs.push("MOD::n_" + v->code_name() + "/*node*/");
+    }
+    _types.push(t_ref);
+  }
   void new_rhs(Token_VAR_REF const* v){
     // TODO: linear?
     // if(0 && (*v)->is_real()){ untested();
@@ -717,6 +723,8 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
 	o__ "}\n";
       }
       o__ "}\n";
+    }else if (auto n = dynamic_cast<const Token_NODE*>(*i)) {
+      s.new_rhs(n);
     }else{ untested();
       assert(!dynamic_cast<const Token_UNARY*>(*i));
       assert(!dynamic_cast<const Token_SYMBOL*>(*i));

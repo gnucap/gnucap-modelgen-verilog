@@ -1,0 +1,26 @@
+attach ./modelgen_1.so
+verilog
+
+`modelgen
+module test_port1(p, n);
+  electrical p, n;
+  real i;
+
+  analog begin
+	if ($port_connected(n))
+		$debug("connected: n\n");
+	if ($port_connected(p))
+		$debug("connected: p\n");
+  end
+
+endmodule
+`endmodelgen
+
+!make test_port1.so > /dev/null
+attach ./test_port1.so
+
+test_port1 #() a(1 2);
+test_port1 #() b(1);
+test_port1 #() c();
+
+op

@@ -51,6 +51,7 @@ mg_filt_zi.cc \
 mg_evt_timer.cc \
 mg_func.cc \
 mg_func_pf.cc \
+mg_func_port.cc \
 mg_func_sys.cc \
 mg_func_evt.cc \
 mg_impl.cc \

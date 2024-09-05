@@ -1316,6 +1316,12 @@ Token_VAR_REAL* Token_VAR_REAL::deep_copy(Base* /*owner*/, std::string prefix)co
 //   }
 // }
 /*--------------------------------------------------------------------------*/
+std::string Token_NODE::code_name() const
+{
+  return name();
+  return "_n[n_" + name() + "]";
+}
+/*--------------------------------------------------------------------------*/
 void Token_NODE::stack_op(Expression* E) const
 {
   if(!E->is_empty() && dynamic_cast<Token_PARLIST*>(E->back())){

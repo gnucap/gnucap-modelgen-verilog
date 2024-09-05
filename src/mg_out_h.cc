@@ -280,7 +280,6 @@ static void make_variable_decl(std::ostream& o, Block const& b)
     make_module_variable_decl(o, *m);
   }else if(auto s = dynamic_cast<SeqBlock const*>(&b)){
     make_block_variable_decl(o, *s);
-    incomplete();
   }else{
   }
 }
@@ -644,7 +643,8 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "  //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing\n";
 //  o << ind << "std::string dev_type()const override {return \"demo\";}\n";
   o__ "int max_nodes()const override {return "<< m.circuit()->ports().size() <<";}\n";
-  o__ "int min_nodes()const override {return "<< m.circuit()->ports().size() <<";}\n";
+ // o__ "int net_nodes()const override {return "<< m.circuit()->ports().size() <<";}\n";
+  o__ "int min_nodes()const override {return 0;}\n";
   o__ "int int_nodes()const override    {return "
       << m.circuit()->nodes().size() - m.circuit()->ports().size() << ";}\n";
   o__ "std::string value_name()const override {itested(); return \"\";}\n";
