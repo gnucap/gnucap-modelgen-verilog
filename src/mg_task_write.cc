@@ -44,6 +44,7 @@ private:
   MGVAMS_TASK* clone()const override {
     return new DEBUG_TASK(*this);
   }
+  bool has_tr_accept()const override {return true;}
   Token* new_token(Module& m, size_t na)const override{
     MGVAMS_TASK* cl = clone();
     cl->set_num_args(na);

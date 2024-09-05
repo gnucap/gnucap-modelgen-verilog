@@ -211,7 +211,7 @@ HS_Parameter hp_hflip("$hflip");
 HS_Parameter hp_bflip("$bflip");
 /*--------------------------------------------------------------------------*/
 bool Aliasparam::is_hs() const
-{ untested();
+{
   return dynamic_cast<HS_Parameter const*>(_param);
 }
 /*--------------------------------------------------------------------------*/
@@ -311,7 +311,7 @@ void Parameter_2_List::parse(CS& file)
     _type = std::string("real"); // TODO: enum
   }else if(file.umatch("integer")){
     _type = std::string("integer"); // TODO: enum
-  }else{ untested();
+  }else{
     throw Exception_CS_("parameter: need \"real\", \"integer\"\n", file);
   }
   std::string type = _type.to_string();
@@ -353,7 +353,7 @@ size_t Parameter_List_Collection::count_nonlocal() const
 {
   size_t sum = 0;
   for(auto const& i : *this){
-    if(i->is_local()){ untested();
+    if(i->is_local()){
     }else{
       sum += i->size();
     }
@@ -959,13 +959,13 @@ bool Module::new_var_ref(Base* what)
 }
 /*--------------------------------------------------------------------------*/
 void Module::push_back(Filter /*const?*/ * f)
-{ untested();
+{
   assert(_circuit);
   _circuit->push_back(f);
 }
 /*--------------------------------------------------------------------------*/
 void Circuit::push_back(Filter /*const?*/ * f)
-{ untested();
+{
   _filters.push_back(f);
 }
 /*--------------------------------------------------------------------------*/
@@ -1053,7 +1053,7 @@ Module::~Module()
 /*--------------------------------------------------------------------------*/
 bool Node::is_used() const
 {
-  if(1 && is_ground()){ untested();
+  if(1 && is_ground()){
     trace1("Node::is_used, ground", name());
   }else{
     trace2("Node::is_used", name(), _fanout.size());
@@ -1061,7 +1061,7 @@ bool Node::is_used() const
       if(e->is_used()){
 	trace2("Node::is_used", name(), e->code_name());
 	return true;
-      }else{ untested();
+      }else{
       }
     }
   }

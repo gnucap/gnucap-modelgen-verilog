@@ -294,6 +294,7 @@ void Expression_::set_rdeps(RDeps const& rd)
 /*--------------------------------------------------------------------------*/
 bool Expression_::update(RDeps const* rd)
 {
+  trace1("Expression_::update", rd?rd->size():-1);
   size_t n = data().size();
 
   auto i = begin();

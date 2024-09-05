@@ -127,9 +127,10 @@ void MGVAMS_FILTER::setup(Module* m)
 	// covered by rdeps?
       }else if(dynamic_cast<Variable_List_Collection const*>(b)){ untested();
 	trace1("use in variable", bb->code_name());
+      }else if(b == &tr_accept_tag) {
       }else{untested();
 	trace1("xdt unknown?", c_cnt);
-	assert(0);
+	unreachable();
       }
     }
     // for(auto b : branch()->deps().rdeps()) { untested();

@@ -223,6 +223,7 @@ private:
     bool ret = _body.update();
     return AnalogStmt::update() || ret;
   }
+public:
   bool propagate_rdeps(RDeps const& incoming)override;
 }; // AnalogCtrlStmt
 /*--------------------------------------------------------------------------*/
@@ -268,6 +269,7 @@ public:
   void dump(std::ostream&)const override;
 //  Expression const& expression() const{return _expression;};
   bool is_used_in(Base const*)const;
+ // bool update(RDeps const* r) // not virtual
 //
 private: // incomplete
   void set_rdeps(); // pull in rdeps from functions
@@ -275,6 +277,8 @@ private: // incomplete
     return _rdeps.insert(b).second;
   }
   FUNCTION_ const* function()const; // BUG. expressions?
+public:
+  RDeps const& rdeps()const { return _rdeps; }
 };
 /*--------------------------------------------------------------------------*/
 class AnalogEvtCtlStmt : public AnalogCtrlStmt {

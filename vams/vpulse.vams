@@ -1,0 +1,38 @@
+// (c) Felix Salfelder 2024
+// GPLv3+
+`include "disciplines.vams"
+`include "constants.vams"
+
+module vpulse(p, n);
+	output p, n;
+	electrical p, n;
+	parameter real dc    =0.;
+	parameter real mag   =1.;
+	parameter real phase =0.;
+	parameter real val0  =0.;
+	parameter real val1  =1.;
+	parameter real td    =0.;
+	parameter real width =1.;
+	parameter real period=2.;
+	(*desc="i"*) real i;
+	(*desc="v"*) real v;
+	analog begin
+		if(analysis("dc") && $param_given(dc)) begin
+			v = dc;
+		end else begin
+		end begin
+			// TODO: need "transition".
+			@(timer(td + width, period)) begin
+				v = val0;
+				$discontinuity;
+			end
+			@(timer(td,  period)) begin
+				v = val1;
+				$discontinuity;
+			end
+		end
+		//$debug("AA %g %g\n", $abstime, v);
+		V(p,n) <+ v;
+		i = I(p,n);
+	end
+endmodule

@@ -130,13 +130,11 @@ private:
     o______ "}else{\n";
     o______ "}\n";
     o______ "trace2(\"tr_eval1\", _req_evt, _sim->_time0);\n";
-    o______ "if (_req_evt < _sim->_time0){untested();\n";
-    o________ "return false;\n";
+    o______ "if (_req_evt < _sim->_time0){\n";
     o______ "}else if (_req_evt <= _sim->_time0 + _sim->_dtmin) {\n";
-    o________ "return true;\n";
     o______ "}else{\n";
-    o________ "return false;\n";
     o______ "}\n";
+    o______ "return false;\n";
     o____ "}\n";
     /*----------------------------------------------------------------------*/
     o____ "bool tr_begin" << args() << " {\n";
@@ -164,9 +162,11 @@ private:
     o______ "trace3(\"timer::tr_review\", _req_evt, _sim->_time0, _sim->_dtmin);\n";
     o______ "if (_sim->_time0 < _req_evt) {\n";
     o______ "}else if (_sim->_time0 <= _req_evt + " << accept_tol() << ") {\n";
+    o________ "trace2(\"timer::tr_review q accept\", _req_evt, _sim->_time0);\n";
     o________ "d->q_accept();\n";
     o______ "}else if(d->_time[1] <= _req_evt) {\n";
     o________ "double back_to = _previous_evt;\n";
+    o________ "trace3(\"timer::tr_review\", _req_evt, _sim->_time0, back_to);\n";
     o________ "d->_time_by.min_event(back_to + _sim->_dtmin);\n";
     o______ "}else{\n";
     o________ "// scheduler issue?\n";
@@ -178,6 +178,7 @@ private:
     /*----------------------------------------------------------------------*/
     o____ "bool tr_accept" << args() << " {\n";
     o______ "trace3(\"timer::tr_accept\", _previous_evt, _req_evt, _sim->_time0);\n";
+    o______ "trace2(\"timer::tr_accept\", delay, period);\n";
     o______ "if(_sim->_time0 < _req_evt) {\n";
     o________ "return false; // not ours\n";
     o______ "}else if(_sim->_time0 <= _req_evt + " << accept_tol() << ") {\n";
@@ -187,8 +188,8 @@ private:
     o__________ "_req_evt = NEVER;\n";
     o________ "}\n";
     o________ "return true;\n";
-    o______ "}else if(_sim->analysis_is_static()) {\n";
-    o________ "if(!delay) {\n";
+    o______ "}else if(_sim->analysis_is_static()) {untested();\n";
+    o________ "if(!delay) {untested();\n";
     o__________ "set_event(d, period, " << tol() << ");\n";
     o________ "}else{ untested();\n";
     o________ "}\n";

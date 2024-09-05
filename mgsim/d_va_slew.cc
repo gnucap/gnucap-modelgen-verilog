@@ -129,6 +129,8 @@ bool DEV_SLEW::do_tr()
       sl_max = _states[3];
       sl_min = -sl_max;
     }else{ untested();
+      sl_max = 1e99;
+      sl_min = -sl_max;
     }
     trace4("DEV_SLEW::do_tr", sl_min, sl_max, slope, _n_states);
 
@@ -162,6 +164,8 @@ TIME_PAIR DEV_SLEW::tr_review()
     sl_max = _states[3];
     sl_min = -sl_max;
   }else{ untested();
+    sl_max = 1e99;
+    sl_min = -sl_max;
   }
 
   double slope_in = ( _y[0].f0 - _y[1].f0 ) / _dt;

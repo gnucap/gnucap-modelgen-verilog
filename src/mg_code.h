@@ -66,7 +66,8 @@ public:
   bool set_used_in(Base const*b);
   void unset_used_in(Base const*b){} // later.
   RDeps const& rdeps_()const {return _rdeps;} // dump_annotate
-protected:
+protected: // dbg.
+  int rdeps_size()const { return int(_rdeps.size()); }
  // void set_rdeps(TData const&);
 public:
   bool is_reachable()const;

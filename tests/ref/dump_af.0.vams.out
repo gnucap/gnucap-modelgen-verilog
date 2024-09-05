@@ -2,8 +2,8 @@
 
 module test_af();
   analog function real limitex;
-    input x;
     real x;
+    input x;
     begin
       if ((x > 17.)) begin
         limitex = ((x + -16.) * 42.);
@@ -20,17 +20,17 @@ module test_af();
   endfunction
 
   analog function real fct;
-    input x;
     real x;
+    input x;
     begin
       fct = ln(max(x, .1));
     end
   endfunction
 
   analog function real fct2;
-    input x;
     real x;
     real y;
+    input x;
     begin
       y = 1.;
       fct2 = ln(max(x, y));
@@ -38,10 +38,10 @@ module test_af();
   endfunction
 
   analog function real something;
-    input x, y;
-    output z;
     real x;
     real y, z;
+    input x, y;
+    output z;
     begin
       something = ((x + sqrt(((x * x) + ((y * 4.0) * y)))) * 0.5);
     end

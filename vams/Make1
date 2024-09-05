@@ -9,6 +9,7 @@ MODELS = \
 	isine.vams \
 	vccs.vams \
 	vcvs.vams \
+	vpulse.vams \
 	vsine.vams
 
 TARGET = ${MODELS:.vams=.so}

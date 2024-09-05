@@ -45,7 +45,7 @@ bool Statement::is_used_in(Base const* b) const
 /*--------------------------------------------------------------------------*/
 bool Statement::update()
 {
-  trace0("Statement::update");
+  trace2("Statement::update nop", typeid(*this).name(), _rdeps.size());
 //  if(dynamic_cast<Block*>(parent_stmt())){ untested();
 //    incomplete();
 //  }else{ untested();

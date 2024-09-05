@@ -2,9 +2,9 @@ module test_opt3(np, n);
   inout p, n;
   electrical p, n;
   analog begin // always
-    I(p, n) <+ 0.; // r1
-    I(p, n) <+ 0.; // r1
-    I(p, n) <+ 0.; // r1
+    I(p, n) <+ 0.; // r2
+    I(p, n) <+ 0.; // r2
+    I(p, n) <+ 0.; // r2
   end
 
 endmodule

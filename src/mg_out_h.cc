@@ -600,7 +600,8 @@ static void make_module(std::ostream& o, const Module& m)
   }
   if(m.has_events()) {
     o__ "double new_event(double newtime, double tol) {\n";
-    o____ "trace2(\"new_event\", long_label(), newtime);\n";
+    o____ "trace3(\"new_event\", long_label(), _sim->_time0, newtime);\n";
+    o____ "trace2(\"new_event\", long_label(), newtime - _sim->_time0);\n";
     o____ "_sim->new_event(newtime);\n";
     o____ "if(tol) {\n";
              // not used.

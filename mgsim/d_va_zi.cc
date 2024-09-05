@@ -254,7 +254,7 @@ private: // overrides
     return ii;
   }
   int matrix_nodes()const override {return 2;}
-  std::string value_name()const override {itested(); return "";}
+  std::string value_name()const override { return "";}
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
 public: // params

@@ -383,7 +383,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	  o__ "//noddeps..\n";
       }else{
       }
-    }else{ untested();
+    }else{
     }
   }
   o__ "}\n";
@@ -1056,17 +1056,25 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o,
                                         const Token_VAR_REF& V) const
 {
   if(!is_dynamic()) {
-    if(V.type().is_int()) { untested();
+    if(V.type().is_int()) {
       o__ "int";
     }else if(V.type().is_real()) {
-      o__ "ddouble"; // double?
+      if(is_precalc()) {
+	o__ "ddouble"; // precalc hacks derivatives a bit.
+      }else{
+	o__ "double";
+      }
     }else{ untested();
-      assert(0); // logic error.
+      unreachable();
     }
 
-    o << " " << V.code_name() << "(m->" << V.long_code_name() << "); // !dynamic\n";
+    if(is_precalc()) {
+      o << " " << V.code_name() << "(m->" << V.long_code_name() << "); // precalc 1068\n";
+    }else{
+      o << "& " << V.code_name() << "(m->" << V.long_code_name() << "); // (1068)\n";
+    }
     o__ "(void) " << V.code_name() << ";\n";
-  }else if(V.type().is_int()) { untested();
+  }else if(V.type().is_int()) {
     o__ "int& " << V.code_name() << "(d->" << V.long_code_name() << ");\n";
   }else if(V.type().is_real()) {
     if(V.deps().ddeps().size() == 0){

@@ -75,7 +75,7 @@ private:
     o______ "if(i){ untested();\n";
     o______ "}else{\n";
     o______ "}\n";
-    o______ "_sim->new_event(_sim->_time0 + OPT::dtmin*1.01);\n";
+    o______ "_sim->new_event(_sim->_time0 + _sim->_dtmin*1.01);\n";
     o____ "}\n";
     // o__ "}_" << label() << ";\n";
   }

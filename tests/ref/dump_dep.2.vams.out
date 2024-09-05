@@ -11,9 +11,9 @@ module dep0(d, g);
     while (1) begin
       // T : 1
       // c : 1
-      I(d) <+ c; // dep: _potential_b_g_ s4 r1
-      c = T; // dep: _potential_b_g_ s3 r1
-      T = V(g); // dep: _potential_b_g_ s1 r1
+      I(d) <+ c; // dep: _potential_b_g_ s4 r2
+      c = T; // dep: _potential_b_g_ s3 r2
+      T = V(g); // dep: _potential_b_g_ s1 r2
     end
     d = c; // dep: _potential_b_g_ s5
   end
@@ -32,9 +32,9 @@ module dep1(out0, out1, in0, in1);
 
   analog begin // always
     // vfwd : 1
-    I(out) <+ (V(out) / 2); // dep: _potential_nb_out r1
-    vfwd = ddt(((V(in) * 2.) - V(ref))); // dep: _potential_b_ddt_0_p_ddt_0_n s1 r1
-    I(out) <+ vfwd; // dep: _potential_b_ddt_0_p_ddt_0_n s1 r1
+    I(out) <+ (V(out) / 2); // dep: _potential_nb_out r2
+    vfwd = ddt(((V(in) * 2.) - V(ref))); // dep: _potential_b_ddt_0_p_ddt_0_n s1 r2
+    I(out) <+ vfwd; // dep: _potential_b_ddt_0_p_ddt_0_n s1 r2
   end
 
 endmodule

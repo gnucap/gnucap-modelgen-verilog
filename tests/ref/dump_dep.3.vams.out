@@ -14,20 +14,20 @@ module test_while0a(p, n);
     integer i;
     real x, y;
     x = 0.; // s1
-    x = 0.; // dep: _potential_b_p_n s4 r1
+    x = 0.; // dep: _potential_b_p_n s4 r2
     z = x; // dep: _potential_b_p_n s5
-    y = 0.; // dep: _potential_b_p_n s3 r1
+    y = 0.; // dep: _potential_b_p_n s3 r2
     i = r; // s2
     while ((i > 0)) begin
       // i : 0
       // x : 1
       // y : 1
       i = (i - 1); // s2
-      x = y; // dep: _potential_b_p_n s3 r1
-      y = (x + V(p, n)); // dep: _potential_b_p_n s3 r1
+      x = y; // dep: _potential_b_p_n s3 r2
+      y = (x + V(p, n)); // dep: _potential_b_p_n s3 r2
     end
-    x = x; // dep: _potential_b_p_n s5 r1
-    I(p, n) <+ x; // dep: _potential_b_p_n s5 r1
+    x = x; // dep: _potential_b_p_n s5 r2
+    I(p, n) <+ x; // dep: _potential_b_p_n s5 r2
   end
 
 endmodule

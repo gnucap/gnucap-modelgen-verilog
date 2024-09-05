@@ -1,0 +1,15 @@
+
+attach ../vams/vpulse.so
+
+verilog
+
+vpulse #(.dc(.5), .val0(0), .val1(1)) v1(in, 0);
+
+list
+
+print dc v(nodes)
+dc basic
+print tran v(nodes) v(v1)
+tran 10 basic
+
+status notime

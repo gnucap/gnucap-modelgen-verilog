@@ -340,7 +340,7 @@ private: // overrides
 //  int matrix_nodes()const override { untested();
 //    return int_nodes() + max_nodes();
 //  }
-  std::string value_name()const override {itested(); return "";}
+  std::string value_name()const override { return "";}
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
   void set_port_by_index(int Index, std::string& Value)override {

@@ -78,7 +78,7 @@ public:
 private: // override virtual
   char		id_letter()const override	{ untested();return 'T';}
   std::string   value_name()const override	{return "#";}
-  std::string	dev_type()const override	{itested(); return "tline";}
+  std::string	dev_type()const override	{ return "tline";}
   int		max_nodes()const override	{return 4;}
   int		min_nodes()const override	{return 4;}
   int		matrix_nodes()const override	{return 4;}

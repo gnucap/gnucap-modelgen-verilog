@@ -333,7 +333,7 @@ DEV_CPOLY_CAP::~DEV_CPOLY_CAP()
   delete [] _vy1;
   delete [] _vi0;
   delete [] _vi1;
-  if (net_nodes() > NODES_PER_BRANCH) { itested();
+  if (net_nodes() > NODES_PER_BRANCH) {
     delete [] _n;
   }else{
     // it is part of a base class
@@ -654,7 +654,7 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
     }else{
       // use the default node list, already set
     }      
-  }else{itested();
+  }else{
     assert(_n_ports == n_states-1);
     assert(_vy1);
     assert(_vi0);

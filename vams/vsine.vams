@@ -1,3 +1,5 @@
+// (c) Felix Salfelder 2023, 2024
+// GPLv3+
 `include "disciplines.vams"
 `include "constants.vams"
 

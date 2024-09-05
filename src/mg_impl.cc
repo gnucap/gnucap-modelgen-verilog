@@ -654,7 +654,7 @@ Block* Block::scope() const
   }else if(auto b = dynamic_cast<Block*>(_owner)){
     // incomplete?
     return b;
-  }else{ itested();
+  }else{
     return NULL;
   }
 }

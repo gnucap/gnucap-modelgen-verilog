@@ -6,10 +6,10 @@ module dep0(d, g);
     // c : 0
     real c;
     real T;
-    c = T; // s3 r1
-    T = V(g); // dep: _potential_b_g_ s1 r1
-    I(d) <+ c; // s3 r1
-    I(g) <+ V(g); // dep: _potential_b_g_ r1
+    c = T; // s3 r2
+    T = V(g); // dep: _potential_b_g_ s1 r2
+    I(d) <+ c; // s3 r2
+    I(g) <+ V(g); // dep: _potential_b_g_ r2
   end
 
 endmodule
