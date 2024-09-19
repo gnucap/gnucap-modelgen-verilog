@@ -210,7 +210,7 @@ public: // TODO
   bool has_analysis()const {return _has_analysis;}
 
   bool has_events()const    { return _has_pid[if_SET_EVENT];}
-  bool has_tr_begin()const  { return _has_pid[if_TR_BEGIN];}
+  bool has_tr_begin()const  { return _has_pid[if_TR_BEGIN]   || times(); }
   bool has_tr_review()const { return _has_pid[if_TR_REVIEW]  || has_analysis(); }
   bool has_tr_accept()const { return _has_pid[if_TR_ACCEPT]  || has_analysis(); }
   bool has_tr_advance()const{ return _has_pid[if_TR_ADVANCE] || has_analysis()

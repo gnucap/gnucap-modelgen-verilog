@@ -578,10 +578,6 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "void precalc_last()override;\n";
   o__ "void zero_filter_readout();\n";
   o__ "//void    map_nodes();         //BASE_SUBCKT\n";
-  if(m.times()){
-  o__ "void    tr_begin()override;\n";
-  }else{
-  }
   o__ "//void    tr_restore();        //BASE_SUBCKT\n";
   o__ "void    tr_load()override{ trace1(\"tr_load\", long_label());BASE_SUBCKT::tr_load();}\n";
 
@@ -591,6 +587,7 @@ static void make_module(std::ostream& o, const Module& m)
   }
   if(m.has_tr_begin()){ untested();
     o__ "void tr_begin()override;\n";
+    o__ "void tr_restore()override;\n";
   }else{
   }
   if(m.has_tr_accept()){

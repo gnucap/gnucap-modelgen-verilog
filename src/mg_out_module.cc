@@ -433,7 +433,33 @@ static void make_tr_begin(std::ostream& o, const Module& m)
   o__ "c->tr_begin_digital(this);\n"; // call from COMMON::tr_begin?
   }else{
   }
-  // o__ "return " << baseclass(m) << "::tr_begin();\n";
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_tr_restore(std::ostream& o, const Module& m)
+{
+  o << "inline void MOD_" << m.identifier() << "::tr_restore()\n{\n";
+  o__ "BASE_SUBCKT::tr_restore();\n";
+  if(m.times()){
+    o__ "for (int i=" << m.times()-1 << "; i>0; --i) {\n";
+    o____ "_time[i] = 0;\n";
+    o__ "}\n";
+  }else{ untested();
+  }
+  o__ "COMMON_" << m.identifier() << " const* c = "
+    "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
+  o__ "assert(c);\n";
+  o__ "(void)c;\n";
+  if(m.has_tr_begin_analog()) { untested();
+  o__ "c->tr_begin_analog(this);\n"; // for now
+  }else{
+  }
+  if(m.has_tr_begin_digital()) { untested();
+  o__ "c->tr_begin_digital(this);\n"; // for now
+  }else{
+  }
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -691,8 +717,9 @@ static void make_module_class(std::ostream& o, Module const& m)
   }else{
   }
 
-  if(m.times()){
+  if(m.has_tr_begin()) {
     make_tr_begin(o, m);
+    make_tr_restore(o, m);
   }else{
   }
 
