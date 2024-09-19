@@ -3,7 +3,6 @@ attach ./modelgen_0.so
 
 
 verilog
-// ddx test case inspired by LRM 4.5.6
 
 `modelgen
 module test_slw2(p,c);

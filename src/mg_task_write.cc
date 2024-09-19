@@ -78,56 +78,6 @@ private:
 } debug;
 DISPATCHER<FUNCTION>::INSTALL d_debug(&function_dispatcher, "$debug", &debug);
 /*--------------------------------------------------------------------------*/
-class TRACE_TASK : public MGVAMS_TASK {
-public:
-  explicit TRACE_TASK() : MGVAMS_TASK(){
-  }
-private:
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
-    unreachable();
-    return "$$debug";
-  }
-  MGVAMS_TASK* clone()const override {
-    return new TRACE_TASK(*this);
-  }
-  bool has_tr_advance()const override {return true;}
-  bool has_tr_regress()const override {return false;}
-  bool has_tr_accept()const override {return true;}
-  bool has_tr_begin()const override {return false;}
-  bool static_code()const override {return false;}
-  Token* new_token(Module& m, size_t na)const override{
-    MGVAMS_TASK* cl = clone();
-    cl->set_num_args(na);
-    cl->set_label("t_trace_" + std::to_string(cnt++));
-    m.push_back(cl);
-    return new Token_CALL("$trace", cl);
-  }
-  void make_cc_dev(std::ostream& o)const override {
-    o__ "void " << label() << "(std::string const& a0";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", double a" << i;
-    }
-    o << ") {\n";
-    o______ "fprintf(stdout, a0.c_str()";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", a" << i;
-    }
-    o << ");\n";
-    o__ "}\n";
-    o__ "void " << label() << "__precalc(std::string const&";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", double";
-    }
-    o << "){\n";
-    o__ "}\n";
-  }
-  std::string code_name()const override{
-    return "d->" + label();
-  }
-  bool returns_void()const override { return true; }
-} trace;
-// not yet. DISPATCHER<FUNCTION>::INSTALL d_trace(&function_dispatcher, "$trace", &trace);
-/*--------------------------------------------------------------------------*/
 class WRITE : public MGVAMS_TASK {
   Module* _m{NULL};
 public:
@@ -147,7 +97,7 @@ private:
   bool has_tr_advance()const override {return true;}
   bool has_tr_regress()const override {return false;}
   bool has_tr_accept()const override {return true;}
-  bool has_tr_begin()const override {return false;}
+  bool has_tr_begin()const override {return true;}
   bool static_code()const override {return false;}
   Token* new_token(Module& m, size_t na)const override{
     WRITE* cl = clone();
@@ -155,9 +105,24 @@ private:
     cl->set_label("t_write_" + std::to_string(cnt++));
     m.push_back(cl);
     cl->_m = &m;
+    // WIP: remove: use has_*
+    m.set_tr_begin(); // WIP, remove.
     m.set_tr_review(); // WIP, remove.
     m.set_tr_accept(); // WIP, remove.
+    m.set_tr_advance(); // WIP, remove.
+//    m.set_tr_regress(); // WIP, remove.
+
     return new Token_CALL(label(), cl);
+  }
+  void args(std::ostream& o, bool names=false)const {
+    o << "MOD_" <<_m->identifier()<<"* d, std::string";
+    for(size_t i=1; i<num_args(); ++i) {
+      o____  ", double";
+      if(names){
+       o << " a " << i;
+      }else{
+      }
+    }
   }
   void make_cc_dev(std::ostream& o)const override {
     o__ "struct cls" << label() << "{\n";
@@ -170,31 +135,28 @@ private:
     o << ")const {}\n";
 
     assert(_m);
-    o____ "void tr_review(MOD_" <<_m->identifier()<<"* d, std::string";
-    for(size_t i=1; i<num_args(); ++i) {
-      o____  ", double";
-    }
-    o << ") { untested(); assert(d); d->q_accept(); }\n";
-
-    o____ "void tr_advance(MOD_" <<_m->identifier()<<"* d, std::string";
-    for(size_t i=1; i<num_args(); ++i) {
-      o____  ", double a" << i << "";
-    }
-    o << ") {untested();\n";
+    o____ "void tr_begin("; args(o); o << ") {\n";
+    o______ "trace1(\"write::tr_begin\", _sim->_time0);\n";
     o______ "assert(d); d->q_accept();\n";
     o____"}\n";
 
-    o____ "void tr_regress(MOD_" <<_m->identifier()<<"* d, std::string";
-    for(size_t i=1; i<num_args(); ++i) {
-      o____  ", double a" << i << "";
-    }
-    o << ") { /*nop*/ }\n";
+    o____ "void tr_review("; args(o); o << ") {untested();\n";
+    o______ " assert(d); d->q_accept();\n";
+    o____"}\n";
+
+    o____ "void tr_advance("; args(o); o << ") {\n";
+    o______ "trace1(\"write::tr_advance\", _sim->_time0);\n";
+    o______ "assert(d); d->q_accept();\n";
+    o____"}\n";
+
+    o____ "void tr_regress("; args(o); o << ") { /*nop*/ }\n";
 
     o____ "void tr_accept(CARD* d, std::string a0";
     for(size_t i=1; i<num_args(); ++i) {
       o____  ", double a" << i << "";
     }
     o << ")const {\n";
+    o______ "trace1(\"write::tr_accept\", _sim->_time0);\n";
     if(end().size()){
       o______ "a0 += \"" << end() << "\";\n";
     }else{
@@ -205,12 +167,8 @@ private:
     }
     o << ");\n";
     o____ "}\n";
-    o__ "void precalc(void*, std::string const";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", double";
-    }
-    o << "){\n";
-    o__ "}\n";
+
+    o____ "void precalc("; args(o); o << ") { /*nop*/ }\n";
     o__ "}_" << label() << ";\n";
   }
   std::string code_name()const override{

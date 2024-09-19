@@ -11,13 +11,13 @@ module my_res(a, b);
     // __i : 1
     begin
     // __i : 0
-      __i = 3.; // s1 r1
+      __i = 3.; // s1 r2
       begin
       // __i : 1
-        __i = V(a, b); // dep: _potential_b_a_b s1 r1
+        __i = V(a, b); // dep: _potential_b_a_b s1 r2
       end
     end
-    __i = __i; // dep: _potential_b_a_b s3 r1
+    __i = __i; // dep: _potential_b_a_b s3 r2
   end
 
 endmodule

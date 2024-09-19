@@ -284,7 +284,7 @@ void Expression_::set_owner(Base* o)
   }
 }
 /*--------------------------------------------------------------------------*/
-void Expression_::set_rdeps(RDeps const& rd)
+void Expression_::set_rdeps(RDeps const&)
 { untested();
   assert(0);
   assert(size());

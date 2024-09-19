@@ -5288,7 +5288,20 @@ inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
   (void)d;
   { //
     { // 
-// omit Statement 21AnalogConditionalStmt
+      {
+        { // 
+          { // Contribution I(p, n) lin: 1
+            // F ddt args:0
+            ddouble t0;
+            //t0.set_no_deps();
+            //t0[d_potential_b_ddt_1_p_ddt_1_n] = 0.; // (output dep)
+            t0.set_no_deps();
+            t0 = p->xs_potential_b_p_n();
+            t0 = (_p___c) /*rhspar*/ * t0;
+            t0 = /*XDT*/ d->_b_ddt_1(t0);
+          }
+        }
+      }
     }
   }
 }
@@ -6282,7 +6295,16 @@ inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
           }
         }else {
           { // 
-// omit Statement 12Contribution
+            { // Contribution I(p, n) lin: 1
+              // F ddt args:0
+              ddouble t0;
+              //t0.set_no_deps();
+              //t0[d_potential_b_ddt_2_p_ddt_2_n] = 0.; // (output dep)
+              t0.set_no_deps();
+              t0 = p->xs_potential_b_p_n();
+              t0 = (_p___c) /*rhspar*/ * t0;
+              t0 = /*XDT*/ d->_b_ddt_2(t0);
+            }
           }
         }
 

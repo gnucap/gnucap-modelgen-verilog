@@ -1,0 +1,40 @@
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+attach ./d_reject.so
+
+
+verilog
+
+`modelgen
+module test_timer3h(p, n);
+	electrical p, n;
+	inout p, n;
+	(*desc=""*) real cnt, mytime;
+	analog begin
+		@(timer(mytime)) begin
+			$write("evt %g\n", $abstime);
+			mytime = $abstime + 1;
+			cnt = cnt + 1;
+      end
+		if(0) $trace("time0 abstime=%g cnt=%g mytime=%g\n", $abstime, cnt, mytime);
+	end
+endmodule
+
+list
+
+!make test_timer3h.so > /dev/null
+attach ./test_timer3h.so
+
+test_timer3h dut0(1,0);
+reject #(.time(4.2)) r();
+
+list
+
+print dc v(nodes) iter(0)
+print tran v(1) mytime(dut0) iter(0) control(0)
+tran 4 basic
+dc
+tran 6 basic
+
+end

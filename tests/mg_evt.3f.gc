@@ -14,7 +14,7 @@ module test_timer3f(p, n);
 	(*desc=""*) integer count;
 	analog begin
 		@(timer(1)) begin
-			$debug("timer %g %g\n", $abstime, state);
+			$trace("timer %g %g\n", $abstime, state);
 			state = 1;
 			count = count + 1;
       end

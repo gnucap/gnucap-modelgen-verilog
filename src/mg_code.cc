@@ -166,7 +166,7 @@ Variable_Decl* Variable_Decl::deep_copy(Base* b, std::string s) const
 }
 /*--------------------------------------------------------------------------*/
 // inline?
-bool Expression_::is_used_in(Base const* b) const
+bool Expression_::is_used_in(Base const*) const
 {
  //  for(auto& i : data().rdeps()) { untested();
  //    trace2("AnalogEvtCtrlStmt::is_used_in", i, b);

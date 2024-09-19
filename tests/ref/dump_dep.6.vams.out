@@ -10,15 +10,15 @@ module dep6(d, g);
     real T, S, U;
     @(initial_step) begin
       // c : 0
-      c = 1.; // s2 r1
+      c = 1.; // s2 r2
     end
     @(initial_step) begin
       // c : 0
-      c = 2.; // s2 r1
+      c = 2.; // s2 r2
     end
-    T = c; // s6 r1
-    S = (T * T); // s7 r1
-    U = exp(c); // s6 r1
+    T = c; // s6 r2
+    S = (T * T); // s7 r2
+    U = exp(c); // s6 r2
   end
 
 endmodule

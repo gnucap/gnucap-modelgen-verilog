@@ -1,15 +1,27 @@
 test_evt3a #() dut0 (.p(1),.n(0));
-#Time       iter(0)   
-time1   0
- 0.         2.        
- 0.1        2.        
-time1   2
- 2.         2.        
-time1   4
- 4.         2.        
-time1   6
- 6.         2.        
-time1   8
- 8.         2.        
-time1   10
- 10.        2.        
+#Time       cnt(dut0)  iter(0)   
+timerd 0
+timer0 0
+timer1 0
+ 0.         1.         2.        
+ 0.1        1.         2.        
+timerd 2
+timer0 2
+timer1 2
+ 2.         2.         2.        
+timerd 4
+timer0 4
+timer1 4
+ 4.         3.         2.        
+timerd 6
+timer0 6
+timer1 6
+ 6.         4.         2.        
+timerd 8
+timer0 8
+timer1 8
+ 8.         5.         2.        
+timerd 10
+timer0 10
+timer1 10
+ 10.        6.         2.        

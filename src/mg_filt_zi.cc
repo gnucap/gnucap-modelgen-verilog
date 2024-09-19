@@ -186,8 +186,8 @@ public:
       assert(num_args() < 6);
       o << ", array_ const& num";
       o << ", array_ const& den";
-      for(int n=3;n < int(num_args()); ++n){
-	o << ", double t" << n;
+      for(int nn=3;nn < int(num_args()); ++nn){
+	o << ", double t" << nn;
       }
     o << ");\n";
   }

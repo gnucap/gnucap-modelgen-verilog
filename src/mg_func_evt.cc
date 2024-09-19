@@ -147,8 +147,13 @@ private:
 
     make_tr_eval(o);
 
+    o____ "bool tr_begin(MOD_" << _m->identifier() << "* d,\n";
+    o____ "               double input, int dir, int more=0) {\n";
+    o______ "return false;\n";
+    o____ "}\n";
+
     o____ "bool tr_accept(MOD_" << _m->identifier() << "* d,\n";
-    o____ "               double input, int dir, int more=0){\n";
+    o____ "               double input, int dir, int more=0) {\n";
     o______ "trace2(\"cross::tr_accept\", _state[0], _state[1]);\n";
     o______ "return tr_eval(d, input, dir, more);\n";
     o____ "}\n";

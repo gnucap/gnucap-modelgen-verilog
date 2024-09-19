@@ -41,7 +41,7 @@ public:
   virtual Statement* deep_copy(Base*)const // = 0;?
     { untested();unreachable();return NULL;}
   virtual bool propagate_rdeps(RDeps const&);
-  bool propagate_rdep(Base const*);
+  /*virtual?*/ bool propagate_rdep(Base const*);
   virtual bool update() = 0;
 //  virtual Statement* parent_stmt();
   // Block* scope() { return Owned_Base::owner(); }
@@ -64,7 +64,7 @@ private:
 //  void store_rdeps(Rdeps const&);
 public:
   bool set_used_in(Base const*b);
-  void unset_used_in(Base const*b){} // later.
+  void unset_used_in(Base const*){} // later.
   RDeps const& rdeps_()const {return _rdeps;} // dump_annotate
 protected: // dbg.
   int rdeps_size()const { return int(_rdeps.size()); }

@@ -59,7 +59,7 @@ public:
   bool is_probe()const   { untested(); return _mode==modePROBE; }
   bool is_tr_begin()const  { return _mode==modeTR_BEGIN; }
   bool is_tr_review()const  { return _mode==modeTR_REVIEW; }
-  bool is_tr_accept()const  { untested(); return _mode==modeTR_ACCEPT; }
+  bool is_tr_accept()const  { return _mode==modeTR_ACCEPT; }
   bool is_tr_advance()const  { untested(); return _mode==modeTR_ADVANCE; }
 public:
   void make_analog_list(std::ostream& o, const Module& m)const;
@@ -99,6 +99,7 @@ private:
   void make_one_variable_store(std::ostream& o, Token_VAR_REF const& V)const;
 
   void make_cc_expression(std::ostream& o, Expression const& e, bool b=false)const {
+    (void)b;
     return ::make_cc_expression(o, e, _mode!=modePRECALC, ctx());
   }
 }; // OUT_ANALOG
@@ -231,11 +232,13 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
       }
     }else if(_mode==modePRECALC){
       o__ lhsname << " = t0; // (prec)\n";
-    }else if(_mode==modeTR_ADVANCE){ untested();
+    }else if(is_static()){
       o__ lhsname << " = t0.value(); // (s)\n";
-    }else if(_mode==modeTR_REGRESS){ untested();
+    }else if(_mode==modeTR_ADVANCE){
       o__ lhsname << " = t0.value(); // (s)\n";
-    }else if(is_static()){ untested();
+    }else if(_mode==modeTR_REGRESS){
+      o__ lhsname << " = t0.value(); // (s)\n";
+    }else if(_mode==modeTR_ACCEPT){
       o__ lhsname << " = t0.value(); // (s)\n";
     }else{
       o__ lhsname << " = t0.value(); // (*)\n";
@@ -1080,7 +1083,7 @@ static void make_one_variable_proxy(std::ostream& o, Token_VAR_REF const& V)
   o__ "}";
 }
 /*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_one_local_var(std::ostream& o, const Token_VAR_REF& V) const
+void OUT_ANALOG::make_one_local_var(std::ostream& , const Token_VAR_REF& ) const
 { untested();
   incomplete();
 }
@@ -1268,7 +1271,7 @@ static void make_cc_common_tr_begin(std::ostream& o, const Module& m)
   o << "inline void COMMON_" << m.identifier() <<
     "::tr_begin_analog(MOD_" << m.identifier() << "* m) const\n{\n";
  // o__ "trace1(\"" << m.identifier() <<"::tr_begin_analog\", d);\n";
- // o__ "trace1(\"" << m.identifier() <<"::tr_begin_analog\", d->long_label());\n";
+ o__ "trace1(\"" << m.identifier() <<"::tr_begin_analog\", m->long_label());\n";
 
   OUT_ANALOG oo(OUT_ANALOG::modeTR_BEGIN, &tr_begin_tag);
 
@@ -1374,7 +1377,7 @@ void make_cc_analog(std::ostream& o, const Module& m)
 
   // assert(m.has_analog_block());
   // assert(m.has_analog_stuff()); // in always blocks..
-  if(m.has_tr_begin()){
+  if(m.has_tr_begin_analog()){
     make_cc_common_tr_begin(o, m);
   }else{
   }

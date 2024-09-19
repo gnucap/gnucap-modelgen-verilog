@@ -5,4 +5,5 @@ inductor.o: inductor.cc
 isine.o: isine.cc
 vccs.o: vccs.cc
 vcvs.o: vcvs.cc
+vpulse.o: vpulse.cc
 vsine.o: vsine.cc

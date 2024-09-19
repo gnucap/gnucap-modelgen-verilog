@@ -15,6 +15,10 @@ mg_filt_absdelay.o: mg_filt_absdelay.cc mg_func.h mg_token.h \
 mg_filt_acstim.o: mg_filt_acstim.cc mg_func.h mg_token.h mg_expression.h \
  mg_deps.h mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h mg_attrib.h \
  mg_code.h mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
+mg_filt_transition.o: mg_filt_transition.cc mg_func.h mg_token.h \
+ mg_expression.h mg_deps.h mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h \
+ mg_attrib.h mg_code.h mg_filter.h mg_circuit.h mg_discipline.h \
+ mg_module.h
 mg_filt.o: mg_filt.cc mg_func.h mg_token.h mg_expression.h mg_deps.h \
  mg_lib.h mg_base.h mg_out.h mg_analog.h mg_.h mg_attrib.h mg_code.h \
  mg_filter.h mg_circuit.h mg_discipline.h mg_module.h
@@ -132,6 +136,9 @@ mg_task.o: mg_task.cc mg_func.h mg_token.h mg_expression.h mg_deps.h \
 mg_task_discont.o: mg_task_discont.cc mg_func.h mg_token.h \
  mg_expression.h mg_deps.h mg_lib.h mg_base.h mg_.h mg_attrib.h mg_code.h \
  mg_filter.h mg_circuit.h mg_discipline.h mg_module.h mg_out.h
+mg_task_trace.o: mg_task_trace.cc mg_func.h mg_token.h mg_expression.h \
+ mg_deps.h mg_lib.h mg_base.h mg_.h mg_attrib.h mg_code.h mg_filter.h \
+ mg_circuit.h mg_discipline.h mg_module.h mg_out.h
 mg_task_write.o: mg_task_write.cc mg_func.h mg_token.h mg_expression.h \
  mg_deps.h mg_lib.h mg_base.h mg_.h mg_attrib.h mg_code.h mg_filter.h \
  mg_circuit.h mg_discipline.h mg_module.h mg_out.h

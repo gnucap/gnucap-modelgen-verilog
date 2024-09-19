@@ -423,13 +423,13 @@ static void make_tr_begin(std::ostream& o, const Module& m)
     o__ "for (int i=" << m.times()-1 << "; i>0; --i) {\n";
     o____ "_time[i] = 0;\n";
     o__ "}\n";
-  }else{ untested();
+  }else{
   }
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
   o__ "(void)c;\n";
-  if(m.has_tr_begin_analog()) { untested();
+  if(m.has_tr_begin_analog()) {
   o__ "c->tr_begin_analog(this);\n"; // call from COMMON::tr_begin?
   }else{
   }
@@ -450,13 +450,13 @@ static void make_tr_restore(std::ostream& o, const Module& m)
     o__ "for (int i=" << m.times()-1 << "; i>0; --i) {\n";
     o____ "_time[i] = 0;\n";
     o__ "}\n";
-  }else{ untested();
+  }else{
   }
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
   o__ "(void)c;\n";
-  if(m.has_tr_begin_analog()) { untested();
+  if(m.has_tr_begin_analog()) {
   o__ "c->tr_begin_analog(this);\n"; // for now
   }else{
   }

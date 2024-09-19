@@ -1,0 +1,36 @@
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_trans1(p, n);
+	(* desc="" *) real v;
+	(* desc="" *) real pulse;
+	electrical p, n;
+	analog begin
+		@(timer(0, 2)) begin
+			v = 1.;
+		end
+		@(timer(1, 2)) begin
+			v = 0.;
+		end
+		pulse = transition(v, .1, .15, .25);
+	end
+endmodule
+
+!make test_trans1.so > /dev/null
+attach ./test_trans1.so
+
+verilog
+
+test_trans1 #() dut(1,0);
+
+list
+
+print tran v(dut) pulse(dut) control(0) iter(0)
+tran 4 trace=n basic
+
+tran 0 4 .2 trace=n basic
+
+end

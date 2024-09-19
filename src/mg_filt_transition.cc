@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * absdelay function/filter
+ * transition function/filter
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"
@@ -59,21 +59,23 @@ static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
 /*--------------------------------------------------------------------------*/
 static int n_filters;
 /*--------------------------------------------------------------------------*/
-class Token_ABSDELAY : public Token_CALL {
+class Token_TRANSITION : public Token_CALL {
 public:
-  explicit Token_ABSDELAY(const std::string Name, FUNCTION_ const* f)
+  explicit Token_TRANSITION(const std::string Name, FUNCTION_ const* f)
     : Token_CALL(Name, f) {}
 private:
-  explicit Token_ABSDELAY(const Token_ABSDELAY& P, Base const* data, Expression_ const* e = NULL)
+  explicit Token_TRANSITION(const Token_TRANSITION& P, Base const* data, Expression_ const* e = NULL)
     : Token_CALL(P, data, e) {} // , _item(P._item) {}
-  Token* clone()const override {untested(); return new Token_ABSDELAY(*this);}
+  Token* clone()const override {untested(); return new Token_TRANSITION(*this);}
 
   void stack_op(Expression* e)const override;
   Branch* branch() const;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class ABSDELAY : public MGVAMS_FILTER /* FUNCTION_ */ {
+const int NUM_ARGS = 5;
+/*--------------------------------------------------------------------------*/
+class TRANSITION : public MGVAMS_FILTER /* FUNCTION_ */ {
   Module* _m{NULL};
   Probe const* _prb{NULL};
   std::string _code_name;
@@ -83,23 +85,23 @@ public: // HACK
   Node_Ref _p;
   Node_Ref _n;
 
-  explicit ABSDELAY() : MGVAMS_FILTER() {
-    set_label("absdelay");
+  explicit TRANSITION() : MGVAMS_FILTER() {
+    set_label("transition");
   }
-  explicit ABSDELAY(ABSDELAY const& p) : MGVAMS_FILTER(p) {
+  explicit TRANSITION(TRANSITION const& p) : MGVAMS_FILTER(p) {
   }
-  ~ABSDELAY(){
+  ~TRANSITION(){
 //    delete _prb; belongs to _m
   }
-  virtual ABSDELAY* clone()const {
-    return new ABSDELAY(*this);
+  virtual TRANSITION* clone()const {
+    return new TRANSITION(*this);
   }
 protected:
   void set_code_name(std::string x){
     _code_name = x;
   }
   std::string code_name()const override{
-    return "/*ABSDELAY*/ d->" + _code_name;
+    return "/*TRANSITION*/ d->" + _code_name;
   }
 public:
   // Token* new_token(Expression_ const* e) ...
@@ -109,7 +111,7 @@ public:
 
     std::string filter_code_name = label() + "_" + std::to_string(n_filters++);
 
-    ABSDELAY* cl = clone();
+    TRANSITION* cl = clone();
     {
       cl->set_label(filter_code_name); // label()); // "_b_" + filter_code_name);
       cl->set_code_name("_b_" + filter_code_name);
@@ -140,7 +142,7 @@ public:
       m.new_filter();
     }
 
-    return new Token_ABSDELAY(label(), cl);
+    return new Token_TRANSITION(label(), cl);
   }
 
   void make_cc_common(std::ostream& o)const override{
@@ -151,7 +153,7 @@ public:
     o____ "common" << _code_name <<"(int i=CC_STATIC) : COMMON_FILT(i) {}\n";
     o__ "public:\n";
     o__ "private:\n";
-    o____ "std::string name()const override {return \"absdelay_name\";}\n";
+    o____ "std::string name()const override {return \"transition_name\";}\n";
     o__ "};\n";
     o__ "static common" << _code_name
       << " _common" << _code_name << ";\n";
@@ -160,16 +162,15 @@ public:
   void make_cc_dev(std::ostream& o)const override{
     o__ "ddouble " << _code_name << "(ddouble t0";
       assert(num_args());
-      assert(num_args() < 4);
+      assert(num_args() <= NUM_ARGS);
       for(int n=1; n < int(num_args()); ++n){
 	o << ", double t" << n;
       }
-
     o << "); // (d)\n";
     o__ "bool _short"+_code_name+"()const {return " << bool(_output) << ";}\n";
     o__ "ddouble " << _code_name << "__precalc(ddouble const&";
       assert(num_args());
-      assert(num_args() < 4);
+      assert(num_args() <= NUM_ARGS);
       for(int n=1; n < int(num_args()); ++n){
 	o << ", double t" << n;
       }
@@ -216,14 +217,23 @@ public:
 //    std::string id = m.identifier().to_string();
     o << "ddouble MOD_" << id << "::" << _code_name << "__precalc(ddouble const&";
     assert(num_args());
-    assert(num_args() < 4);
+    assert(num_args() <= NUM_ARGS);
+
     if(num_args()>1){
-      o << ", double delay=1";
+      o << ", double td=1";
     }else{ untested();
       unreachable();
     }
-    if(num_args()>2){ untested();
-      o << ", double maxdelay=1";
+    if(num_args()>2){
+      o << ", double rise_time=0.";
+    }else{
+    }
+    if(num_args()>3){
+      o << ", double fall_time=0.";
+    }else{
+    }
+    if(num_args()>4){ untested();
+      o << ", double time_tol=0";
     }else{
     }
     o << ")\n{\n";
@@ -231,18 +241,37 @@ public:
       o__ "ddouble ret = 0.;\n";
       o__ "COMPONENT* l = " << cn << ";\n";
       o__ "assert(l);\n";
-      o__ "std::string reset;\n";
+      o__ "if(rise_time < _sim->_dtmin) {\n";
+      o____ "rise_time = _sim->_dtmin;\n";
+      o__ "}else{\n";
+      o__ "}\n";
+      o__ "if(fall_time < _sim->_dtmin) {\n";
+      o____ "fall_time = _sim->_dtmin;\n";
+      o__ "}else{\n";
+      o__ "}\n";
+      // todo: arguments are dynamic, move to accept (or so)
       if(num_args()>1){
 	o__ "l->set_param_by_name(\"delay\", \"\");\n";
-	o__ "l->set_param_by_name(\"delay\", to_string(delay));\n";
+	o__ "l->set_param_by_name(\"delay\", to_string(td));\n";
       }else{ untested();
 	unreachable();
       }
-      if(num_args()>2){ untested();
-	o__ "l->set_param_by_name(\"maxdelay\", \"\");\n";
-	o__ "l->set_param_by_name(\"maxdelay\", to_string(maxdelay));\n";
+      if(num_args()>2){
+	o__ "l->set_param_by_name(\"rise\", \"\");\n";
+	o__ "l->set_param_by_name(\"rise\", to_string(rise_time));\n";
       }else{
       }
+      if(num_args()>3){
+	o__ "l->set_param_by_name(\"fall\", \"\");\n";
+	o__ "l->set_param_by_name(\"fall\", to_string(fall_time));\n";
+      }else{
+      }
+      if(num_args()>4){ untested();
+	o__ "l->set_param_by_name(\"tol\", \"\");\n";
+	o__ "l->set_param_by_name(\"tol\", to_string(time_tol));\n";
+      }else{
+      }
+      o__ "l->precalc_last();\n";
       o__ "ret[d_potential" << cn << "] = -1.;\n";
       o__ "return ret;\n";
     }
@@ -252,7 +281,7 @@ public:
   }
   std::string eval(CS&, const CARD_LIST*)const override{ untested();
     unreachable();
-    return "absdelay";
+    return "transition";
   }
   Probe const* prb()const {return _prb;}
   void set_n_to_gnd()const {
@@ -269,12 +298,12 @@ private:
   Node_Ref n()const override;
 private: // setup
   Branch* branch()const override { return _br; }
-} absdel;
-DISPATCHER<FUNCTION>::INSTALL d0(&function_dispatcher, "absdelay", &absdel);
+} trans;
+DISPATCHER<FUNCTION>::INSTALL d0(&function_dispatcher, "transition", &trans);
 /*--------------------------------------------------------------------------*/
-Branch* Token_ABSDELAY::branch() const
+Branch* Token_TRANSITION::branch() const
 {
-  auto func = prechecked_cast<ABSDELAY const*>(f());
+  auto func = prechecked_cast<TRANSITION const*>(f());
   assert( func);
   assert( func->_br);
   return func->_br;
@@ -290,7 +319,7 @@ static Expression_* clone_args(Base const* e)
   }
 }
 /*--------------------------------------------------------------------------*/
-void Token_ABSDELAY::stack_op(Expression* e)const
+void Token_TRANSITION::stack_op(Expression* e)const
 {
   assert(e);
   Token_CALL::stack_op(e);
@@ -299,10 +328,10 @@ void Token_ABSDELAY::stack_op(Expression* e)const
   auto cc = prechecked_cast<Token_CALL const*>(e->back());
   assert(cc);
   assert(cc->args());
-  trace1("Token_ABSDELAY::stack_op", cc->args()->size());
+  trace1("Token_TRANSITION::stack_op", cc->args()->size());
   e->pop_back();
 
-  auto func = prechecked_cast<ABSDELAY const*>(f());
+  auto func = prechecked_cast<TRANSITION const*>(f());
   assert(func);
 
   if(cc->args()->size() < 1){ untested();
@@ -329,7 +358,7 @@ void Token_ABSDELAY::stack_op(Expression* e)const
     auto d = new TData;
     trace1("xdt output dep", func->prb()->code_name());
     d->insert(Dep(func->prb(), Dep::_LINEAR)); // BUG?
-    auto N = new Token_ABSDELAY(*this, d, clone_args(cc->args()));
+    auto N = new Token_TRANSITION(*this, d, clone_args(cc->args()));
     assert(N->data());
     assert(dynamic_cast<TData const*>(N->data()));
     e->push_back(N);
@@ -340,7 +369,7 @@ void Token_ABSDELAY::stack_op(Expression* e)const
   }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) { untested();
     auto d = new TData;
     d->insert(Dep(func->prb())); // BUG?
-    auto N = new Token_ABSDELAY(*this, d);
+    auto N = new Token_TRANSITION(*this, d);
     assert(N->data());
     assert(dynamic_cast<TData const*>(N->data()));
     e->push_back(N);
@@ -349,7 +378,7 @@ void Token_ABSDELAY::stack_op(Expression* e)const
   }
 };
 /*--------------------------------------------------------------------------*/
-Branch const* ABSDELAY::output() const
+Branch const* TRANSITION::output() const
 {
   if(_output){ untested();
     return _output;
@@ -359,12 +388,12 @@ Branch const* ABSDELAY::output() const
 }
 /*--------------------------------------------------------------------------*/
 #if 1
-Node_Ref ABSDELAY::p() const
+Node_Ref TRANSITION::p() const
 {
   return _p;
 }
 /*--------------------------------------------------------------------------*/
-Node_Ref ABSDELAY::n() const
+Node_Ref TRANSITION::n() const
 {
   return _n;
 }

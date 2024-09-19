@@ -28,7 +28,7 @@
 /*--------------------------------------------------------------------------*/
 class rdep_tag : public Base{
   virtual void parse(CS&)override { untested();unreachable();}
-  virtual void dump(std::ostream& o)const override { untested();unreachable();}
+  virtual void dump(std::ostream&)const override { untested();unreachable();}
 };
 extern rdep_tag tr_begin_tag;
 extern rdep_tag tr_eval_tag;

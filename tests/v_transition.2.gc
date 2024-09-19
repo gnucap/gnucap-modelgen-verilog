@@ -1,0 +1,25 @@
+
+attach ../vams/vpulse.so
+attach ./d_reject.so
+
+
+verilog
+
+va_transition #(.delay(.1) .rise(.9) .fall(1.1)) b0(0,1,in,0);
+
+vpulse #(.val0(0) .val1(1) .fall(.1) .rise(.1) .width(.3) .period(1)) v1(in, 0);
+//resistor #(1) r1(1,0);
+reject #(.time(3)) r();
+
+list
+
+print tran v(nodes) control(0) iter(0)
+tran 0 5 basic
+
+
+end
+print ac vm(nodes) vp(nodes)
+ac .01 100 * 10
+
+list
+status notime

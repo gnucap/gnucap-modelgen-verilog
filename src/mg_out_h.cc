@@ -330,7 +330,7 @@ static void make_common(std::ostream& o, const Module& m)
     o__ "void tr_review_analog(MOD_" << m.identifier() << "*)const;\n";
   }else{
   }
-  if(m.has_tr_begin_analog()) { untested();
+  if(m.has_tr_begin_analog()) {
     o__ "void tr_begin_analog(MOD_" << m.identifier() << "*)const;\n";
   }else{
   }
@@ -483,10 +483,10 @@ static void make_precalc(std::ostream& o, Module const& m)
   o << "public:\n";
   o__ "explicit " << class_name << "(COMPONENT* d) : _d(d) {}\n";
   // ... functions->make_cc_precalc?
-  for(auto const& i : m.funcs()) {
-    // indent x;
-   // i->make_cc_precalc(o);
-  }
+ // for(auto const& i : m.funcs()) {
+ //   // indent x;
+ //  // i->make_cc_precalc(o);
+ // }
 
   o << "};\n"
     "/*--------------------------------------"
@@ -585,7 +585,7 @@ static void make_module(std::ostream& o, const Module& m)
     o__ "TIME_PAIR  tr_review()override;\n";
   }else{
   }
-  if(m.has_tr_begin()){ untested();
+  if(m.has_tr_begin()){
     o__ "void tr_begin()override;\n";
     o__ "void tr_restore()override;\n";
   }else{

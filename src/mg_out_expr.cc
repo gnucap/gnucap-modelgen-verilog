@@ -58,7 +58,7 @@ static char* ftos_(double num, int fieldwidth, int len, int fmt)
     static char strpool[POOLSIZE][MAXLENGTH];
     static int poolindex = 0;
     ++poolindex;
-    if (poolindex >= POOLSIZE) {itested();
+    if (poolindex >= POOLSIZE) {
       poolindex = 0;
     }
     str = strpool[poolindex];

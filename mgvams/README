@@ -18,6 +18,8 @@ Some of them are not here, but still in ../src.
   - ddt, ddx, idt
   - limexp
   - slew
+  - absdelay
+  - transition
   - laplace_*, zi_*
   - white_noise, flicker_noise
   - (noise_table, noise_table_log)
@@ -70,4 +72,4 @@ Some of them are not here, but still in ../src.
   - ($vflip)
 - Table 9-16 -- Explicit binding detection system functions
   - $param_given
-  - ($port_connected)
+  - $port_connected

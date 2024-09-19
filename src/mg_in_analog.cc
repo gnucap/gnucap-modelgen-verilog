@@ -245,6 +245,11 @@ bool System_Task::update()
 {
   assert(function());
 
+  // add_rdeps(function()->rdeps()); /// TODO // 
+  if(function()->has_tr_begin()){
+    add_rdep(&tr_begin_tag);
+  }else{
+  }
   if(function()->has_tr_review()){
     add_rdep(&tr_eval_tag);
   }else{
@@ -257,7 +262,7 @@ bool System_Task::update()
     add_rdep(&tr_accept_tag);
   }else{
   }
-  if(function()->has_tr_advance()){ untested();
+  if(function()->has_tr_advance()){
     add_rdep(&tr_advance_tag);
   }else{
   }
@@ -439,7 +444,7 @@ void AnalogConditionalStmt::parse(CS& f)
     }else if(_cond.is_false()) {
       if(is_always()) {
 	_false_part.set_always();
-      }else{ untested();
+      }else{
       }
       _body.set_never();
     }else{
@@ -671,7 +676,8 @@ bool AnalogProceduralAssignment::update()
   trace1("AnalogProceduralAssignment::update1",  rdeps().size());
  // trace1("AnalogProceduralAssignment::update1",  _a.data().size());
   trace1("AnalogProceduralAssignment::update1",  deps().size());
-  if(is_state_var()){ untested();
+  ret |= propagate_rdep(&tr_begin_tag); // BUG. propagates across event block boundaries.
+  if(is_state_var()){
     ret |= propagate_rdep(&tr_advance_tag);
   }else{ untested();
   }
@@ -2024,7 +2030,7 @@ void AnalogEvtExpression::set_rdeps()
     add_rdep(&tr_eval_tag);
   }else{
   }
-  if(function()->has_tr_review()){ untested();
+  if(function()->has_tr_review()){
     add_rdep(&tr_review_tag);
   }else{
   }
@@ -2566,13 +2572,7 @@ bool AnalogProceduralAssignment::propagate_rdeps(RDeps const& r)
   }
   bool ret = false;
   for(auto n : r) {
-   // auto p = _rdeps.insert(n);
-    //if(p.second)
-    {
-      ret |= propagate_rdep(n);
-      // ret = propagate_rdep(*p.first);
-      //ret = s->propagate_rdep(*p.first);
-    }
+    ret |= propagate_rdep(n);
   }
   return ret;
 }
@@ -2652,7 +2652,7 @@ Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
 }
 /*--------------------------------------------------------------------------*/
 // mg_code?
-void Statement::set_rdeps(TData const& t)
+void Statement::set_rdeps(TData const& )
 { untested();
       unreachable(); // still
  //  for(auto x : t.sensitivities()){ untested();

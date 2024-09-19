@@ -3,15 +3,17 @@ reject #() r ();
 #           v(1)       iter(0)   
 time0 0 0
  0.         0.         2.        
-#Time       iter(0)   
+#Time       state(dut0) count(dut0) iter(0)   
 time0 0 0
- 0.         2.        
+ 0.         0.         0.         2.        
 time0 0.02 0
- 0.02       2.        
+ 0.02       0.         0.         2.        
+@tr_advance:timer 1 0
 time0 0.51 0
- 0.51       4.        
-timer 1 0
+ 0.51       0.         0.         4.        
+@tr_advance:timer 1 0
+@tr_accept:timer 1 1
 time0 1 1
- 1.         2.        
+ 1.         1.         1.         2.        
 time0 2 1
- 2.         2.        
+ 2.         1.         1.         2.        

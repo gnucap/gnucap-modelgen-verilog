@@ -293,7 +293,7 @@ public:
   bool update()override;
 
   bool is_used_in(Base const* b)const override;
- // RDeps const& rdeps()const override { untested(); return _ctrl.data().rdeps(); }
+  // TODO bool propagate_rdep(Base const*) override; // block unused tags.
 }; // AnalogEvtCtlStmt
 typedef Collection<AnalogEvtCtlStmt> Analog_Events;
 /*--------------------------------------------------------------------------*/

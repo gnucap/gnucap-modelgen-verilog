@@ -12,31 +12,27 @@ module vpulse(p, n);
 	parameter real val0  =0.;
 	parameter real val1  =1.;
 	parameter real td    =0.;
+	parameter real rise  =0.;
+	parameter real fall  =0.;
 	parameter real width =1.;
 	parameter real period=2.;
 	(*desc="i"*) real i;
 	(*desc="v"*) real v;
 	analog begin
 		begin : evt
-		//end begin
-			// TODO: need "transition".
-		   @(timer(td + width, period)) begin
-		   //	$write("off %g\n", $abstime);
+		   @(timer(td + width + rise, period)) begin
 		   	v = val0;
-		   //	$discontinuity;
 		   end
 			@(timer(td,  period)) begin
-			//	$write("on %g\n", $abstime);
 				v = val1;
-			//	$discontinuity;
 			end
 		end
 
 		if(analysis("static") && $param_given(dc)) begin
+         // BUG in Table E.1. not sure what dc is used for.
 			v = dc;
 		end
-		//$debug("AA %g %g\n", $abstime, v);
-		V(p,n) <+ v;
+		V(p,n) <+ transition(v, 0., rise, fall);
 		i = I(p,n);
 	end
 endmodule

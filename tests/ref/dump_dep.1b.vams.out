@@ -9,15 +9,15 @@ module dep0(d, g);
     real S;
     real U// dep _potential_b_g_
 ;
-    T = T; // dep: _potential_b_g_ s4 r1
-    U = T; // dep: _potential_b_g_ s5 r1
+    T = T; // dep: _potential_b_g_ s4 r2
+    U = T; // dep: _potential_b_g_ s5 r2
     while (1) begin
       // S : 1
       // T : 1
-      S = T; // dep: _potential_b_g_ s5 r1
-      T = V(g); // dep: _potential_b_g_ s1 r1
+      S = T; // dep: _potential_b_g_ s5 r2
+      T = V(g); // dep: _potential_b_g_ s1 r2
     end
-    T = T; // dep: _potential_b_g_ s4 r1
+    T = T; // dep: _potential_b_g_ s4 r2
   end
 
 endmodule
