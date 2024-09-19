@@ -17,19 +17,23 @@ module vpulse(p, n);
 	(*desc="i"*) real i;
 	(*desc="v"*) real v;
 	analog begin
-		if(analysis("dc") && $param_given(dc)) begin
-			v = dc;
-		end else begin
-		end begin
+		begin : evt
+		//end begin
 			// TODO: need "transition".
-			@(timer(td + width, period)) begin
-				v = val0;
-				$discontinuity;
-			end
+		   @(timer(td + width, period)) begin
+		   //	$write("off %g\n", $abstime);
+		   	v = val0;
+		   //	$discontinuity;
+		   end
 			@(timer(td,  period)) begin
+			//	$write("on %g\n", $abstime);
 				v = val1;
-				$discontinuity;
+			//	$discontinuity;
 			end
+		end
+
+		if(analysis("static") && $param_given(dc)) begin
+			v = dc;
 		end
 		//$debug("AA %g %g\n", $abstime, v);
 		V(p,n) <+ v;

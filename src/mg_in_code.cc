@@ -259,10 +259,10 @@ bool Variable_Decl::propagate_rdeps(RDeps const& incoming)
 //   return true;
 // }
 /*--------------------------------------------------------------------------*/
-bool Variable_Decl::is_state_variable() const
+bool Variable_Decl::is_state_var() const
 {
-  // TODO.
-  return true;
+  assert(_token);
+  return _token->is_state_var();
 }
 /*--------------------------------------------------------------------------*/
 bool Variable_Stmt::update()

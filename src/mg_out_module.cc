@@ -425,6 +425,10 @@ static void make_tr_begin(std::ostream& o, const Module& m)
     o__ "}\n";
   }else{ untested();
   }
+  o__ "COMMON_" << m.identifier() << " const* c = "
+    "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
+  o__ "assert(c);\n";
+  o__ "(void)c;\n";
   if(m.has_tr_begin_analog()) { untested();
   o__ "c->tr_begin_analog(this);\n"; // call from COMMON::tr_begin?
   }else{
@@ -472,6 +476,10 @@ static void make_tr_advance(std::ostream& o, const Module& m)
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
   o__ "(void)c;\n";
+  if(m.has_tr_accept()){
+    o__ "_accept = 0;\n"; // also in regress?
+  }else{
+  }
 
   if(m.has_analysis()) { // BUG?
     o__ "if(_sim->_last_time == 0.){\n";
@@ -492,14 +500,15 @@ static void make_tr_advance(std::ostream& o, const Module& m)
   }
   o__ "set_not_converged();\n";
 
+  o__ "_v_1 = _v_;\n";
   if(m.has_tr_advance_analog()){
     o__ "c->tr_advance_analog(this);\n";
   }else{
   }
   for(auto f : m.funcs()){
+    // needed?
     f->make_cc_tr_advance(o);
   }
-  o__ "_v_1 = _v_;\n";
   o__ baseclass(m) << "::tr_advance();\n"; // upside down. cf mg2_an2
   o << "}\n"
     "/*--------------------------------------"
@@ -548,10 +557,6 @@ static void make_tr_review(std::ostream& o, const Module& m)
   }
 #endif
   o__ "_time_by = BASE_SUBCKT::tr_review();\n";
-  if(m.has_tr_accept()){
-    o__ "_accept = 0;\n";
-  }else{
-  }
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
@@ -584,6 +589,9 @@ static void make_tr_accept(std::ostream& o, const Module& m)
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
   o__ "c->tr_accept_analog(this);\n"; // call from COMMON::tr_accept?
+  for(auto f : m.funcs()){
+    f->make_cc_tr_accept(o);
+  }
   o__ "return " << baseclass(m) << "::tr_accept();\n";
   o << "}\n"
     "/*--------------------------------------"

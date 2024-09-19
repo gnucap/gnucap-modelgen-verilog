@@ -218,6 +218,7 @@ private:
 //  bool update()override { untested();return _body.update();}
   TData const& deps()const override { return _deps;}; // ?
 //  TData const& data()const override { return _deps;};
+protected:
   bool update()override {
     incomplete();
     bool ret = _body.update();
@@ -465,6 +466,10 @@ public:
   const AnalogCtrlBlock& true_part() const{ return _body; }
   const AnalogCtrlBlock& false_part() const{ return _false_part; }
   bool is_used_in(Base const*)const override;
+  bool update()override {
+    bool ret = _false_part.update();
+    return AnalogCtrlStmt::update() || ret;
+  }
 
   TData const& deps()const override{ return _cond.data(); } // ?
 }; // AnalogConditionalStmt
@@ -535,6 +540,7 @@ public: // dump_annotate
     return _a.has_sensitivities();
   }
   Sensitivities const& sensitivities()const {return _a.sensitivities();}
+  bool is_state_var()const {return _a.is_state_var();}
 }; // AnalogProceduralAssignment
 /*--------------------------------------------------------------------------*/
 // ContributionStatement?

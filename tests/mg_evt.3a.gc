@@ -9,9 +9,13 @@ verilog
 module test_evt3a(p, n);
 	electrical p, n;
 	inout p, n;
+	(*desc=""*) integer cnt;
 	analog begin
 		@(timer(0,2)) begin
-			$write("time1   %g\n", $abstime);
+			$debug("timerd %g\n", $abstime, cnt);
+			$write("timer0 %g\n", $abstime, cnt);
+			cnt = cnt + 1;
+			$write("timer1 %g\n", $abstime, cnt);
       end
 	end
 endmodule
@@ -26,7 +30,7 @@ test_evt3a dut0(1,0);
 
 list
 
-print tran iter(0)
+print tran cnt(dut0) iter(0)
 tran 10 basic
 
 end

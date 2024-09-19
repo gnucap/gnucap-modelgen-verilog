@@ -219,12 +219,12 @@ public: // TODO
 
   bool has_ac_begin_analog()const   {untested(); return _has_pid[if_TR_BEGIN]   & mm_ANALOG; }
   bool has_tr_begin_analog()const   { return _has_pid[if_TR_BEGIN]   & mm_ANALOG; }
-  bool has_tr_review_analog()const  {untested(); return _has_pid[if_TR_BEGIN]   & mm_ANALOG; }
+  bool has_tr_review_analog()const  {untested(); return _has_pid[if_TR_REVIEW]   & mm_ANALOG; }
   bool has_tr_advance_analog()const { return _has_pid[if_TR_ADVANCE] & mm_ANALOG; }
   bool has_tr_accept_analog()const  {untested(); return _has_pid[if_TR_ACCEPT]  & mm_ANALOG; }
 
   bool has_tr_begin_digital()const   { return _has_pid[if_TR_BEGIN]   & mm_DIGITAL; }
-  bool has_tr_review_digital()const  {untested(); return _has_pid[if_TR_BEGIN]   & mm_DIGITAL; }
+  bool has_tr_review_digital()const  {untested(); return _has_pid[if_TR_REVIEW]   & mm_DIGITAL; }
   bool has_tr_advance_digital()const {untested(); return _has_pid[if_TR_ADVANCE] & mm_DIGITAL; }
   bool has_tr_accept_digital()const  {untested(); return _has_pid[if_TR_ACCEPT]  & mm_DIGITAL; }
 

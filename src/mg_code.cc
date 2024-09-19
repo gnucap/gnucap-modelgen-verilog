@@ -113,6 +113,11 @@ bool Assignment::is_output_var() const
   return :: is_output_var(tag_t(_lhsref));
 }
 /*--------------------------------------------------------------------------*/
+bool Assignment::is_state_var() const
+{
+  return _lhsref->is_state_var();
+}
+/*--------------------------------------------------------------------------*/
 void Variable_Decl::new_data()
 {
   assert(owner());

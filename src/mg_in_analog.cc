@@ -671,6 +671,10 @@ bool AnalogProceduralAssignment::update()
   trace1("AnalogProceduralAssignment::update1",  rdeps().size());
  // trace1("AnalogProceduralAssignment::update1",  _a.data().size());
   trace1("AnalogProceduralAssignment::update1",  deps().size());
+  if(is_state_var()){ untested();
+    ret |= propagate_rdep(&tr_advance_tag);
+  }else{ untested();
+  }
   return AnalogStmt::update() || ret;
 }
 /*--------------------------------------------------------------------------*/
@@ -1995,11 +1999,15 @@ void AnalogEvtExpression::dump(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 void AnalogEvtExpression::set_rdeps()
 {
+  if(function()->has_tr_begin()){
+    add_rdep(&tr_begin_tag);
+  }else{
+  }
   if(function()->has_tr_eval()){
     add_rdep(&tr_eval_tag);
   }else{
   }
-  if(function()->has_tr_review()){
+  if(function()->has_tr_review()){ untested();
     add_rdep(&tr_review_tag);
   }else{
   }
@@ -2516,7 +2524,9 @@ Branch_Ref Branch_Map::lookup(std::string const& n)const
 bool AnalogProceduralAssignment::is_used_in(Base const*b)const
 {
  // return AnalogStmt::is_used_in(b);
-  if (_a.is_used_in(b)) { untested();
+  if (b == &tr_begin_tag){
+    return true;
+  }else if (_a.is_used_in(b)) { untested();
     return true;
   }else if (AnalogStmt::is_used_in(b)) {
     return true;

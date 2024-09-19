@@ -30,6 +30,7 @@ class rdep_tag : public Base{
   virtual void parse(CS&)override { untested();unreachable();}
   virtual void dump(std::ostream& o)const override { untested();unreachable();}
 };
+extern rdep_tag tr_begin_tag;
 extern rdep_tag tr_eval_tag;
 extern rdep_tag tr_review_tag;
 extern rdep_tag tr_advance_tag;
@@ -418,6 +419,7 @@ public:
   // LiSt
   std::string key() const { untested();unreachable();return "";}
   void set_owner(Base*){ untested();unreachable();}
+  bool is_state_var()const;
 private:
   size_t num_deps() const;
 }; // Token_VAR_REF

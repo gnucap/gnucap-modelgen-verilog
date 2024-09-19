@@ -169,7 +169,7 @@ public:
   bool operator<=(const ddouble_& o)const { itested();
     return *_data <= *o._data;
   }
-  bool operator<=(double const& o)const { itested();
+  bool operator<=(double const& o)const {
     return *_data <= o;
   }
   bool operator<=(int const& o)const { itested();
@@ -191,7 +191,7 @@ public:
   bool operator>=(const ddouble_& o)const { itested();
     return *_data >= *o._data;
   }
-  bool operator>=(const double& o)const {itested();
+  bool operator>=(const double& o)const {
     return *_data >= o;
   }
   bool operator>=(PARAMETER<double> const& o)const {itested();
@@ -290,7 +290,7 @@ public:
     ret *= double(o);
     return ret;
   }
-  ddouble_ operator*(const double& o) const {itested();
+  ddouble_ operator*(const double& o)const {
     ddouble_ ret = *this;
     ret *= o;
     return ret;
@@ -377,130 +377,130 @@ public:
     std::fill_n(_data, numderiv+1, 0.);
   } /*clear*/
 }; /*ddouble_*/
-
+/*--------------------------------------------------------------------------*/
 template<int T>
 ddouble_<T> operator/(ddouble_<T> a, ddouble_<T> b)
 { untested();
   a /= b;
   return a;
 }
-  template<int T>
-  ddouble_<T> operator/(int const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator/(int const& a, ddouble_<T> b)
 { untested();
   ddouble_<T> c(a);
   c /= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator/(double const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator/(double const& a, ddouble_<T> b)
 {
   ddouble_<T> c(a);
   c /= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator/(PARAMETER<double> const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator/(PARAMETER<double> const& a, ddouble_<T> const& b)
 {
   ddouble_<T> c(a);
   c /= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator/(PARAMETER<int> const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator/(PARAMETER<int> const& a, ddouble_<T> const& b)
 { untested();
   ddouble_<T> c(a);
   c /= b;
   return c;
 }
 
-  template<int T>
-  ddouble_<T> operator-(double const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator-(double const& a, ddouble_<T> b)
 {
   ddouble_<T> c(a);
   c -= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator-(int const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator-(int const& a, ddouble_<T> b)
 { untested();
   ddouble_<T> c(a);
   c -= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator-(PARAMETER<double> const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator-(PARAMETER<double> const& a, ddouble_<T> b)
 {itested();
   ddouble_<T> c(a);
   c -= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator-(PARAMETER<int> const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator-(PARAMETER<int> const& a, ddouble_<T> b)
 { untested();
   ddouble_<T> c(a);
   c -= b;
   return c;
 }
 
-  template<int T>
-  ddouble_<T> operator*(double const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator*(double const& a, ddouble_<T> const& b)
 {
   ddouble_<T> c(b);
   c *= a;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator*(int const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator*(int const& a, ddouble_<T> const& b)
 { untested();
   ddouble_<T> c(b);
   c *= a;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator*(PARAMETER<double> const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator*(PARAMETER<double> const& a, ddouble_<T> const& b)
 {
   ddouble_<T> c(a);
   return c * b;
 }
-  template<int T>
-  ddouble_<T> operator*(PARAMETER<int> const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator*(PARAMETER<int> const& a, ddouble_<T> const& b)
 { untested();
   ddouble_<T> c(b);
   c *= a;
   return c;
 }
 
-  template<int T>
-  ddouble_<T> operator+(double const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator+(double const& a, ddouble_<T> const& b)
+{
+  ddouble_<T> c(b);
+  return c + a;
+}
+template<int T>
+ddouble_<T> operator+(int const& a, ddouble_<T> const& b)
 { itested();
   ddouble_<T> c(b);
   return c + a;
 }
-  template<int T>
-  ddouble_<T> operator+(int const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator+(PARAMETER<double> const& a, ddouble_<T> const& b)
 { itested();
   ddouble_<T> c(b);
   return c + a;
 }
-  template<int T>
-  ddouble_<T> operator+(PARAMETER<double> const& a, ddouble_<T> const& b)
-{ itested();
-  ddouble_<T> c(b);
-  return c + a;
-}
-  template<int T>
-  ddouble_<T> operator+(PARAMETER<int> const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator+(PARAMETER<int> const& a, ddouble_<T> const& b)
 { untested();
   return b + double(a);
 }
 
-  template<int T>
-  bool operator==(ddouble_<T> const& a, PARAMETER<int> const& b)
+template<int T>
+bool operator==(ddouble_<T> const& a, PARAMETER<int> const& b)
 { untested();
   return double(b) == a.value();
 }
-  template<int T>
-  bool operator==(PARAMETER<int> const& b, ddouble_<T> const& a)
+template<int T>
+bool operator==(PARAMETER<int> const& b, ddouble_<T> const& a)
 { untested();
   return double(b) == a.value();
 }
@@ -517,19 +517,21 @@ inline bool operator==(PARAMETER<double> const& b, int const& a)
 // 	return int(b) == a;
 // }
 
-  template<class T>
-  T& set_value(T& t, double const& d)
+template<class T>
+T& set_value(T& t, double const& d)
 {
   t.set_value(d);
   return t;
 }
-  template<>
-  inline int& set_value(int& t, double const& v)
+
+template<>
+inline int& set_value(int& t, double const& v)
 { untested();
   return t = int(v);
 }
-  template<>
-  inline double& set_value(double& t, double const& v)
+
+template<>
+inline double& set_value(double& t, double const& v)
 {
   return t = v;
 }
@@ -546,38 +548,36 @@ inline bool operator==(PARAMETER<double> const& b, int const& a)
   return t;
 }
 
-  template<class T>
-  T& chain(T& t, double const& d)
+template<class T>
+T& chain(T& t, double const& d)
 {
   t.chain(d);
   return t;
 }
-  template<>
-  inline double& chain(double& t, double const&)
+template<>
+inline double& chain(double& t, double const&)
 {
   // no-op
   return t;
 }
-  template<>
-  inline int& chain(int& t, double const&)
+template<>
+inline int& chain(int& t, double const&)
 { untested();
   // no-op
   return t;
 }
-  template<>
-  inline PARAMETER<double>& chain(PARAMETER<double>& t, double const&)
-{ itested();
+template<>
+inline PARAMETER<double>& chain(PARAMETER<double>& t, double const&)
+{
   // no-op
   return t;
 }
-  template<>
-  inline PARAMETER<int>& chain(PARAMETER<int>& t, double const&)
+template<>
+inline PARAMETER<int>& chain(PARAMETER<int>& t, double const&)
 { untested();
   // no-op
   return t;
 }
-
-
 /*--------------------------------------------------------------------------*/
 class array_{
   std::vector<double> _v;
@@ -1015,21 +1015,6 @@ private: // funcs
 // Probe no refs: potential_white_noise_1_p_
 }; //COMMON_resistor
 /*--------------------------------------------------------------------------*/
-class PRECALC_resistor{
-  COMPONENT* _d{NULL};
-public:
-  typedef ddouble_<2> ddouble;
-  enum {
-    d_potential_b_white_noise_1_p_white_noise_1_n,
-    d_potential_b_p_n,
-// short _b_white_noise_1_p_white_noise_1_n
-// not named: _b_p_n
-     num_branches__  };
-public:
-  explicit PRECALC_resistor(COMPONENT* d) : _d(d) {}
-  ddouble _b_white_noise_1(ddouble, std::string what="");
-};
-/*--------------------------------------------------------------------------*/
 class MOD_resistor : public BASE_SUBCKT {
 private:
   static int _count;
@@ -1065,6 +1050,7 @@ private: // func decl
 //filt white_noise_1
   ddouble _b_white_noise_1(ddouble t0, std::string what);
   bool _short_b_white_noise_1()const {return 1;}
+  ddouble _b_white_noise_1__precalc(ddouble, std::string what="");
 private: // construct
   explicit MOD_resistor(MOD_resistor const&);
 public:
@@ -1443,10 +1429,12 @@ void EVAL__b_white_noise_1_p_white_noise_1_n_::tr_eval(ELEMENT* d)const
   const COMMON_resistor* c = prechecked_cast<const COMMON_resistor*>(p->common());
   assert(c);
   MOD_resistor const* p = d;
+  (void)p;
   assert(p);
   COMMON_resistor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // main
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -1463,9 +1451,11 @@ void EVAL__b_white_noise_1_p_white_noise_1_n_::tr_eval(ELEMENT* d)const
       explicit _V_dt() : ddouble(), _m(NULL) {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
-	if(_m){
-        _m->_v_._main._dt = value();
-      }else{itested(); }}
+        if(_m){
+          _m->_v_._main._dt = value();
+        }else{
+        }
+      }
       ddouble& operator=(double t){
         ddouble::operator=(t);
         return *this;
@@ -1488,9 +1478,11 @@ void EVAL__b_white_noise_1_p_white_noise_1_n_::tr_eval(ELEMENT* d)const
       explicit _V_g() : ddouble(), _m(NULL) {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
-	if(_m){
-        _m->_v_._main._g = value();
-      }else{itested(); }}
+        if(_m){
+          _m->_v_._main._g = value();
+        }else{
+        }
+      }
       ddouble& operator=(double t){
         ddouble::operator=(t);
         return *this;
@@ -1520,10 +1512,12 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
   const COMMON_resistor* c = prechecked_cast<const COMMON_resistor*>(p->common());
   assert(c);
   MOD_resistor const* p = d;
+  (void)p;
   assert(p);
   COMMON_resistor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // main
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -1540,9 +1534,11 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
       explicit _V_dt() : ddouble(), _m(NULL) {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
-	if(_m){
-        _m->_v_._main._dt = value();
-      }else{itested(); }}
+        if(_m){
+          _m->_v_._main._dt = value();
+        }else{
+        }
+      }
       ddouble& operator=(double t){
         ddouble::operator=(t);
         return *this;
@@ -1565,9 +1561,11 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
       explicit _V_g() : ddouble(), _m(NULL) {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
-	if(_m){
-        _m->_v_._main._g = value();
-      }else{itested(); }}
+        if(_m){
+          _m->_v_._main._g = value();
+        }else{
+        }
+      }
       ddouble& operator=(double t){
         ddouble::operator=(t);
         return *this;
@@ -1698,9 +1696,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
     explicit _V___i() : ddouble(), _m(NULL) {set_all_deps();}
     _V___i(MOD__* m) : ddouble(m->_v_.___i), _m(m) {}
     ~_V___i() {
-	if(_m){
-      _m->_v_.___i = value();
-    }else{itested(); }}
+      if(_m){
+        _m->_v_.___i = value();
+      }else{
+      }
+    }
     ddouble& operator=(double t){
       ddouble::operator=(t);
       return *this;
@@ -1712,10 +1712,12 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
   }_v___i(d);
 #pragma GCC diagnostic pop
   MOD_resistor const* p = d;
+  (void)p;
   assert(p);
   COMMON_resistor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // main
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -1732,9 +1734,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
       explicit _V_dt() : ddouble(), _m(NULL) {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
-	if(_m){
-        _m->_v_._main._dt = value();
-      }else{itested(); }}
+        if(_m){
+          _m->_v_._main._dt = value();
+        }else{
+        }
+      }
       ddouble& operator=(double t){
         ddouble::operator=(t);
         return *this;
@@ -1757,9 +1761,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
       explicit _V_g() : ddouble(), _m(NULL) {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
-	if(_m){
-        _m->_v_._main._g = value();
-      }else{itested(); }}
+        if(_m){
+          _m->_v_._main._g = value();
+        }else{
+        }
+      }
       ddouble& operator=(double t){
         ddouble::operator=(t);
         return *this;
@@ -1829,14 +1835,13 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
   ddouble _v___i(m->_v_.___i); // precalc 1068
   (void) _v___i;
   MOD_resistor const* p = m;
-  assert(p);
+  MOD_resistor* d = m;
   (void)p;
+  assert(p);
   COMMON_resistor const* pc = this;
   (void)pc;
-  PRECALC_resistor P(m);
-  PRECALC_resistor* d = &P;
   (void)d;
-  {
+  { //
     { // main
     ddouble _v_dt(m->_v_._main._dt); // precalc 1068
     (void) _v_dt;
@@ -1869,7 +1874,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
         std::string s0;
         s0 = "thermal";
         ddouble t0;
-        t0 = d->_b_white_noise_1( 0., s0);
+        t0 = d->_b_white_noise_1__precalc( 0., s0);
         m->_st_b_white_noise_1_p_white_noise_1_n[1] = -t0[d_potential_b_white_noise_1_p_white_noise_1_n]; // (3p)
       }
     }
@@ -1883,18 +1888,38 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
   (void) _v___i;
   MOD_resistor const* p = m;
   MOD_resistor* d = m;
+  (void)p;
   assert(p);
   COMMON_resistor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // main
     double& _v_dt(m->_v_._main._dt); // (1068)
     (void) _v_dt;
     double& _v_g(m->_v_._main._g); // (1068)
     (void) _v_g;
-// omit Statement 21AnalogConditionalStmt
-// omit Statement 21AnalogConditionalStmt
-// omit Statement 26AnalogProceduralAssignment
+      {
+      }
+      {
+        { // 
+          { // Assignment real 'g'.
+            ddouble t0;
+            //t0.set_no_deps();
+            t0 =  1. / (_p___r) /*rhspar*/;
+            _v_g = t0.value(); // (s)
+          }
+        }
+      }
+      { // Assignment real '__i'.
+        ddouble t0;
+        //t0.set_no_deps();
+        //t0[d_potential_b_p_n] = 0.; // (output dep)
+        t0.set_no_deps();
+        t0 = p->xs_potential_b_p_n();
+        t0 = t0 * _v_g/*rhsvar*/;
+        _v___i = t0.value(); // (s)
+      }
 // omit Statement 12Contribution
 // omit Statement 12Contribution
     }
@@ -1908,18 +1933,38 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
   (void) _v___i;
   MOD_resistor const* p = m;
   MOD_resistor* d = m;
+  (void)p;
   assert(p);
   COMMON_resistor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // main
     double& _v_dt(m->_v_._main._dt); // (1068)
     (void) _v_dt;
     double& _v_g(m->_v_._main._g); // (1068)
     (void) _v_g;
-// omit Statement 21AnalogConditionalStmt
-// omit Statement 21AnalogConditionalStmt
-// omit Statement 26AnalogProceduralAssignment
+      {
+      }
+      {
+        { // 
+          { // Assignment real 'g'.
+            ddouble t0;
+            //t0.set_no_deps();
+            t0 =  1. / (_p___r) /*rhspar*/;
+            _v_g = t0.value(); // (s)
+          }
+        }
+      }
+      { // Assignment real '__i'.
+        ddouble t0;
+        //t0.set_no_deps();
+        //t0[d_potential_b_p_n] = 0.; // (output dep)
+        t0.set_no_deps();
+        t0 = p->xs_potential_b_p_n();
+        t0 = t0 * _v_g/*rhsvar*/;
+        _v___i = t0.value(); // (s)
+      }
 // omit Statement 12Contribution
 // omit Statement 12Contribution
     }
@@ -2127,10 +2172,10 @@ MOD_resistor::ddouble MOD_resistor::_b_white_noise_1(ddouble t0, std::string wha
   return t0; // (output)
 }
 /*--------------------------------------------------------------------------*/
-ddouble PRECALC_resistor::_b_white_noise_1(ddouble, std::string what) {
+ddouble MOD_resistor::_b_white_noise_1__precalc(ddouble, std::string what) {
   (void)what;
   ddouble ret = 0.;
-  COMPONENT* l = DEV(_d)->_b_white_noise_1_p_white_noise_1_n;
+  COMPONENT* l = _b_white_noise_1_p_white_noise_1_n;
   assert(l);
   l->set_param_by_name("name", "");
   l->set_param_by_name("name", what);
@@ -2192,21 +2237,6 @@ private: // funcs
 // Probe no refs: potential_white_noise_0_p_
 }; //COMMON_resistor
 /*--------------------------------------------------------------------------*/
-class PRECALC_resistor{
-  COMPONENT* _d{NULL};
-public:
-  typedef ddouble_<2> ddouble;
-  enum {
-    d_potential_b_white_noise_0_p_white_noise_0_n,
-    d_potential_b_p_n,
-// short _b_white_noise_0_p_white_noise_0_n
-// not named: _b_p_n
-     num_branches__  };
-public:
-  explicit PRECALC_resistor(COMPONENT* d) : _d(d) {}
-  ddouble _b_white_noise_0(ddouble, std::string what="");
-};
-/*--------------------------------------------------------------------------*/
 class MOD_resistor : public BASE_SUBCKT {
 private:
   static int _count;
@@ -2242,6 +2272,7 @@ private: // func decl
 //filt white_noise_0
   ddouble _b_white_noise_0(ddouble t0, std::string what);
   bool _short_b_white_noise_0()const {return 1;}
+  ddouble _b_white_noise_0__precalc(ddouble, std::string what="");
 private: // construct
   explicit MOD_resistor(MOD_resistor const&);
 public:
@@ -2651,10 +2682,12 @@ void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
   const COMMON_resistor* c = prechecked_cast<const COMMON_resistor*>(p->common());
   assert(c);
   MOD_resistor const* p = d;
+  (void)p;
   assert(p);
   COMMON_resistor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // main
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -2671,9 +2704,11 @@ void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
       explicit _V_dt() : ddouble(), _m(NULL) {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
-	if(_m){
-        _m->_v_._main._dt = value();
-      }else{itested(); }}
+        if(_m){
+          _m->_v_._main._dt = value();
+        }else{
+        }
+      }
       ddouble& operator=(double t){
         ddouble::operator=(t);
         return *this;
@@ -2696,9 +2731,11 @@ void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
       explicit _V_g() : ddouble(), _m(NULL) {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
-	if(_m){
-        _m->_v_._main._g = value();
-      }else{itested(); }}
+        if(_m){
+          _m->_v_._main._g = value();
+        }else{
+        }
+      }
       ddouble& operator=(double t){
         ddouble::operator=(t);
         return *this;
@@ -2728,10 +2765,12 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
   const COMMON_resistor* c = prechecked_cast<const COMMON_resistor*>(p->common());
   assert(c);
   MOD_resistor const* p = d;
+  (void)p;
   assert(p);
   COMMON_resistor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // main
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -2748,9 +2787,11 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
       explicit _V_dt() : ddouble(), _m(NULL) {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
-	if(_m){
-        _m->_v_._main._dt = value();
-      }else{itested(); }}
+        if(_m){
+          _m->_v_._main._dt = value();
+        }else{
+        }
+      }
       ddouble& operator=(double t){
         ddouble::operator=(t);
         return *this;
@@ -2773,9 +2814,11 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
       explicit _V_g() : ddouble(), _m(NULL) {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
-	if(_m){
-        _m->_v_._main._g = value();
-      }else{itested(); }}
+        if(_m){
+          _m->_v_._main._g = value();
+        }else{
+        }
+      }
       ddouble& operator=(double t){
         ddouble::operator=(t);
         return *this;
@@ -2963,9 +3006,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
     explicit _V_i() : ddouble(), _m(NULL) {set_all_deps();}
     _V_i(MOD__* m) : ddouble(m->_v_._i), _m(m) {}
     ~_V_i() {
-	if(_m){
-      _m->_v_._i = value();
-    }else{itested(); }}
+      if(_m){
+        _m->_v_._i = value();
+      }else{
+      }
+    }
     ddouble& operator=(double t){
       ddouble::operator=(t);
       return *this;
@@ -2977,10 +3022,12 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
   }_v_i(d);
 #pragma GCC diagnostic pop
   MOD_resistor const* p = d;
+  (void)p;
   assert(p);
   COMMON_resistor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // main
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -2997,9 +3044,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
       explicit _V_dt() : ddouble(), _m(NULL) {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
-	if(_m){
-        _m->_v_._main._dt = value();
-      }else{itested(); }}
+        if(_m){
+          _m->_v_._main._dt = value();
+        }else{
+        }
+      }
       ddouble& operator=(double t){
         ddouble::operator=(t);
         return *this;
@@ -3022,9 +3071,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
       explicit _V_g() : ddouble(), _m(NULL) {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
-	if(_m){
-        _m->_v_._main._g = value();
-      }else{itested(); }}
+        if(_m){
+          _m->_v_._main._g = value();
+        }else{
+        }
+      }
       ddouble& operator=(double t){
         ddouble::operator=(t);
         return *this;
@@ -3150,14 +3201,13 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
   ddouble _v_i(m->_v_._i); // precalc 1068
   (void) _v_i;
   MOD_resistor const* p = m;
-  assert(p);
+  MOD_resistor* d = m;
   (void)p;
+  assert(p);
   COMMON_resistor const* pc = this;
   (void)pc;
-  PRECALC_resistor P(m);
-  PRECALC_resistor* d = &P;
   (void)d;
-  {
+  { //
     { // main
     ddouble _v_dt(m->_v_._main._dt); // precalc 1068
     (void) _v_dt;
@@ -3233,7 +3283,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
         t0 = t0 * t1;
         std::string s0;
         s0 = "thermal";
-        t0 = d->_b_white_noise_0(t0, s0);
+        t0 = d->_b_white_noise_0__precalc(t0, s0);
         m->_st_b_white_noise_0_p_white_noise_0_n[1] = -t0[d_potential_b_white_noise_0_p_white_noise_0_n]; // (3p)
       }
     }
@@ -3247,18 +3297,80 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
   (void) _v_i;
   MOD_resistor const* p = m;
   MOD_resistor* d = m;
+  (void)p;
   assert(p);
   COMMON_resistor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // main
     double& _v_dt(m->_v_._main._dt); // (1068)
     (void) _v_dt;
     double& _v_g(m->_v_._main._g); // (1068)
     (void) _v_g;
-// omit Statement 21AnalogConditionalStmt
-// omit Statement 21AnalogConditionalStmt
-// omit Statement 26AnalogProceduralAssignment
+      {
+        // F $param_given args:0
+        ddouble t0;
+        //t0.set_no_deps();
+        t0 = param_given((_p_tnom) /*rhspar*/);
+        if (t0) {
+          { // 
+            { // Assignment real 'dt'.
+              // function $temperature args:0
+              ddouble t0;
+              //t0.set_no_deps();
+              t0 = f_temp(); // no parlist
+              t0 = t0 - (_p_tnom) /*rhspar*/;
+              _v_dt = t0.value(); // (s)
+            }
+          }
+        }
+      }
+      {
+        // F $param_given args:0
+        ddouble t0;
+        //t0.set_no_deps();
+        t0 = param_given((_p_tc1) /*rhspar*/);
+        // F $param_given args:0
+        ddouble t1;
+        //t1.set_no_deps();
+        t1 = param_given((_p_tc2) /*rhspar*/);
+        t0 = t0 || t1;
+        if (t0) {
+          { // 
+            { // Assignment real 'g'.
+              ddouble t0;
+              //t0.set_no_deps();
+              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/;
+              t0 = (_p_tc1) /*rhspar*/ + t0;
+              t0 = t0 * _v_dt/*rhsvar*/;
+              t0 = t0 +  1.;
+              t0 = (_p_r) /*rhspar*/ * t0;
+              t0 =  1. / t0;
+              _v_g = t0.value(); // (s)
+            }
+          }
+        }else {
+          { // 
+            { // Assignment real 'g'.
+              ddouble t0;
+              //t0.set_no_deps();
+              t0 =  1. / (_p_r) /*rhspar*/;
+              _v_g = t0.value(); // (s)
+            }
+          }
+        }
+
+      }
+      { // Assignment real 'i'.
+        ddouble t0;
+        //t0.set_no_deps();
+        //t0[d_potential_b_p_n] = 0.; // (output dep)
+        t0.set_no_deps();
+        t0 = p->xs_potential_b_p_n();
+        t0 = t0 * _v_g/*rhsvar*/;
+        _v_i = t0.value(); // (s)
+      }
 // omit Statement 12Contribution
 // omit Statement 12Contribution
     }
@@ -3272,18 +3384,80 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
   (void) _v_i;
   MOD_resistor const* p = m;
   MOD_resistor* d = m;
+  (void)p;
   assert(p);
   COMMON_resistor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // main
     double& _v_dt(m->_v_._main._dt); // (1068)
     (void) _v_dt;
     double& _v_g(m->_v_._main._g); // (1068)
     (void) _v_g;
-// omit Statement 21AnalogConditionalStmt
-// omit Statement 21AnalogConditionalStmt
-// omit Statement 26AnalogProceduralAssignment
+      {
+        // F $param_given args:0
+        ddouble t0;
+        //t0.set_no_deps();
+        t0 = param_given((_p_tnom) /*rhspar*/);
+        if (t0) {
+          { // 
+            { // Assignment real 'dt'.
+              // function $temperature args:0
+              ddouble t0;
+              //t0.set_no_deps();
+              t0 = f_temp(); // no parlist
+              t0 = t0 - (_p_tnom) /*rhspar*/;
+              _v_dt = t0.value(); // (s)
+            }
+          }
+        }
+      }
+      {
+        // F $param_given args:0
+        ddouble t0;
+        //t0.set_no_deps();
+        t0 = param_given((_p_tc1) /*rhspar*/);
+        // F $param_given args:0
+        ddouble t1;
+        //t1.set_no_deps();
+        t1 = param_given((_p_tc2) /*rhspar*/);
+        t0 = t0 || t1;
+        if (t0) {
+          { // 
+            { // Assignment real 'g'.
+              ddouble t0;
+              //t0.set_no_deps();
+              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/;
+              t0 = (_p_tc1) /*rhspar*/ + t0;
+              t0 = t0 * _v_dt/*rhsvar*/;
+              t0 = t0 +  1.;
+              t0 = (_p_r) /*rhspar*/ * t0;
+              t0 =  1. / t0;
+              _v_g = t0.value(); // (s)
+            }
+          }
+        }else {
+          { // 
+            { // Assignment real 'g'.
+              ddouble t0;
+              //t0.set_no_deps();
+              t0 =  1. / (_p_r) /*rhspar*/;
+              _v_g = t0.value(); // (s)
+            }
+          }
+        }
+
+      }
+      { // Assignment real 'i'.
+        ddouble t0;
+        //t0.set_no_deps();
+        //t0[d_potential_b_p_n] = 0.; // (output dep)
+        t0.set_no_deps();
+        t0 = p->xs_potential_b_p_n();
+        t0 = t0 * _v_g/*rhsvar*/;
+        _v_i = t0.value(); // (s)
+      }
 // omit Statement 12Contribution
 // omit Statement 12Contribution
     }
@@ -3522,10 +3696,10 @@ MOD_resistor::ddouble MOD_resistor::_b_white_noise_0(ddouble t0, std::string wha
   return t0; // (output)
 }
 /*--------------------------------------------------------------------------*/
-ddouble PRECALC_resistor::_b_white_noise_0(ddouble, std::string what) {
+ddouble MOD_resistor::_b_white_noise_0__precalc(ddouble, std::string what) {
   (void)what;
   ddouble ret = 0.;
-  COMPONENT* l = DEV(_d)->_b_white_noise_0_p_white_noise_0_n;
+  COMPONENT* l = _b_white_noise_0_p_white_noise_0_n;
   assert(l);
   l->set_param_by_name("name", "");
   l->set_param_by_name("name", what);
@@ -3708,7 +3882,7 @@ public:
   bool operator<=(const ddouble_& o)const { itested();
     return *_data <= *o._data;
   }
-  bool operator<=(double const& o)const { itested();
+  bool operator<=(double const& o)const {
     return *_data <= o;
   }
   bool operator<=(int const& o)const { itested();
@@ -3730,7 +3904,7 @@ public:
   bool operator>=(const ddouble_& o)const { itested();
     return *_data >= *o._data;
   }
-  bool operator>=(const double& o)const {itested();
+  bool operator>=(const double& o)const {
     return *_data >= o;
   }
   bool operator>=(PARAMETER<double> const& o)const {itested();
@@ -3829,7 +4003,7 @@ public:
     ret *= double(o);
     return ret;
   }
-  ddouble_ operator*(const double& o) const {itested();
+  ddouble_ operator*(const double& o)const {
     ddouble_ ret = *this;
     ret *= o;
     return ret;
@@ -3916,130 +4090,130 @@ public:
     std::fill_n(_data, numderiv+1, 0.);
   } /*clear*/
 }; /*ddouble_*/
-
+/*--------------------------------------------------------------------------*/
 template<int T>
 ddouble_<T> operator/(ddouble_<T> a, ddouble_<T> b)
 { untested();
   a /= b;
   return a;
 }
-  template<int T>
-  ddouble_<T> operator/(int const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator/(int const& a, ddouble_<T> b)
 { untested();
   ddouble_<T> c(a);
   c /= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator/(double const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator/(double const& a, ddouble_<T> b)
 {
   ddouble_<T> c(a);
   c /= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator/(PARAMETER<double> const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator/(PARAMETER<double> const& a, ddouble_<T> const& b)
 {
   ddouble_<T> c(a);
   c /= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator/(PARAMETER<int> const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator/(PARAMETER<int> const& a, ddouble_<T> const& b)
 { untested();
   ddouble_<T> c(a);
   c /= b;
   return c;
 }
 
-  template<int T>
-  ddouble_<T> operator-(double const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator-(double const& a, ddouble_<T> b)
 {
   ddouble_<T> c(a);
   c -= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator-(int const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator-(int const& a, ddouble_<T> b)
 { untested();
   ddouble_<T> c(a);
   c -= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator-(PARAMETER<double> const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator-(PARAMETER<double> const& a, ddouble_<T> b)
 {itested();
   ddouble_<T> c(a);
   c -= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator-(PARAMETER<int> const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator-(PARAMETER<int> const& a, ddouble_<T> b)
 { untested();
   ddouble_<T> c(a);
   c -= b;
   return c;
 }
 
-  template<int T>
-  ddouble_<T> operator*(double const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator*(double const& a, ddouble_<T> const& b)
 {
   ddouble_<T> c(b);
   c *= a;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator*(int const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator*(int const& a, ddouble_<T> const& b)
 { untested();
   ddouble_<T> c(b);
   c *= a;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator*(PARAMETER<double> const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator*(PARAMETER<double> const& a, ddouble_<T> const& b)
 {
   ddouble_<T> c(a);
   return c * b;
 }
-  template<int T>
-  ddouble_<T> operator*(PARAMETER<int> const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator*(PARAMETER<int> const& a, ddouble_<T> const& b)
 { untested();
   ddouble_<T> c(b);
   c *= a;
   return c;
 }
 
-  template<int T>
-  ddouble_<T> operator+(double const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator+(double const& a, ddouble_<T> const& b)
+{
+  ddouble_<T> c(b);
+  return c + a;
+}
+template<int T>
+ddouble_<T> operator+(int const& a, ddouble_<T> const& b)
 { itested();
   ddouble_<T> c(b);
   return c + a;
 }
-  template<int T>
-  ddouble_<T> operator+(int const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator+(PARAMETER<double> const& a, ddouble_<T> const& b)
 { itested();
   ddouble_<T> c(b);
   return c + a;
 }
-  template<int T>
-  ddouble_<T> operator+(PARAMETER<double> const& a, ddouble_<T> const& b)
-{ itested();
-  ddouble_<T> c(b);
-  return c + a;
-}
-  template<int T>
-  ddouble_<T> operator+(PARAMETER<int> const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator+(PARAMETER<int> const& a, ddouble_<T> const& b)
 { untested();
   return b + double(a);
 }
 
-  template<int T>
-  bool operator==(ddouble_<T> const& a, PARAMETER<int> const& b)
+template<int T>
+bool operator==(ddouble_<T> const& a, PARAMETER<int> const& b)
 { untested();
   return double(b) == a.value();
 }
-  template<int T>
-  bool operator==(PARAMETER<int> const& b, ddouble_<T> const& a)
+template<int T>
+bool operator==(PARAMETER<int> const& b, ddouble_<T> const& a)
 { untested();
   return double(b) == a.value();
 }
@@ -4056,19 +4230,21 @@ inline bool operator==(PARAMETER<double> const& b, int const& a)
 // 	return int(b) == a;
 // }
 
-  template<class T>
-  T& set_value(T& t, double const& d)
+template<class T>
+T& set_value(T& t, double const& d)
 {
   t.set_value(d);
   return t;
 }
-  template<>
-  inline int& set_value(int& t, double const& v)
+
+template<>
+inline int& set_value(int& t, double const& v)
 { untested();
   return t = int(v);
 }
-  template<>
-  inline double& set_value(double& t, double const& v)
+
+template<>
+inline double& set_value(double& t, double const& v)
 {
   return t = v;
 }
@@ -4085,38 +4261,36 @@ inline bool operator==(PARAMETER<double> const& b, int const& a)
   return t;
 }
 
-  template<class T>
-  T& chain(T& t, double const& d)
+template<class T>
+T& chain(T& t, double const& d)
 {
   t.chain(d);
   return t;
 }
-  template<>
-  inline double& chain(double& t, double const&)
+template<>
+inline double& chain(double& t, double const&)
 {
   // no-op
   return t;
 }
-  template<>
-  inline int& chain(int& t, double const&)
+template<>
+inline int& chain(int& t, double const&)
 { untested();
   // no-op
   return t;
 }
-  template<>
-  inline PARAMETER<double>& chain(PARAMETER<double>& t, double const&)
-{ itested();
+template<>
+inline PARAMETER<double>& chain(PARAMETER<double>& t, double const&)
+{
   // no-op
   return t;
 }
-  template<>
-  inline PARAMETER<int>& chain(PARAMETER<int>& t, double const&)
+template<>
+inline PARAMETER<int>& chain(PARAMETER<int>& t, double const&)
 { untested();
   // no-op
   return t;
 }
-
-
 /*--------------------------------------------------------------------------*/
 class array_{
   std::vector<double> _v;
@@ -4565,25 +4739,6 @@ private: // funcs
 // Probe no refs: potential_p_n
 }; //COMMON_capacitor
 /*--------------------------------------------------------------------------*/
-class PRECALC_capacitor{
-  COMPONENT* _d{NULL};
-public:
-  typedef ddouble_<2> ddouble;
-  enum {
-    d_potential_b_ddt_1_p_ddt_1_n,
-    d_potential_b_p_n,
-// short _b_ddt_1_p_ddt_1_n
-// not named: _b_p_n
-     num_branches__  };
-public:
-  explicit PRECALC_capacitor(COMPONENT* d) : _d(d) {}
-  ddouble _b_ddt_1(ddouble){
-  ddouble ret = 0.;
-  /* short, mfactor hack */ ret[d_potential_b_ddt_1_p_ddt_1_n] = -1.;
-  return ret;
-}
-};
-/*--------------------------------------------------------------------------*/
 class MOD_capacitor : public BASE_SUBCKT {
 private:
   static int _count;
@@ -4607,6 +4762,11 @@ private: // func decl
 //filt ddt_1
   ddouble _b_ddt_1(ddouble t0);
   bool _short_b_ddt_1()const {return 1;}
+  ddouble _b_ddt_1__precalc(ddouble){
+  ddouble ret = 0.;
+  /* short, mfactor hack */ ret[d_potential_b_ddt_1_p_ddt_1_n] = -1.;
+  return ret;
+}
 //probe potential_ddt_1_p_
   ddouble xs_potential_b_ddt_1_p_ddt_1_n() const { // potential_ddt_1_p_
     ddouble t;
@@ -4944,10 +5104,12 @@ void EVAL__b_ddt_1_p_ddt_1_n_::tr_eval(ELEMENT* d)const
   const COMMON_capacitor* c = prechecked_cast<const COMMON_capacitor*>(p->common());
   assert(c);
   MOD_capacitor const* p = d;
+  (void)p;
   assert(p);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -4967,10 +5129,12 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
   const COMMON_capacitor* c = prechecked_cast<const COMMON_capacitor*>(p->common());
   assert(c);
   MOD_capacitor const* p = d;
+  (void)p;
   assert(p);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -5032,10 +5196,12 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #pragma GCC diagnostic pop
   MOD_capacitor const* p = d;
+  (void)p;
   assert(p);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -5068,14 +5234,13 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
 {
 //OUT_ANALOG precalc
   MOD_capacitor const* p = m;
-  assert(p);
+  MOD_capacitor* d = m;
   (void)p;
+  assert(p);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  PRECALC_capacitor P(m);
-  PRECALC_capacitor* d = &P;
   (void)d;
-  {
+  { //
     { // 
       {
         { // 
@@ -5084,7 +5249,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
             ddouble t0;
             t0 = 0.; // precalc.
             t0 = (_p___c) /*rhspar*/ * t0;
-            t0 = /*XDT*/ d->_b_ddt_1(t0);
+            t0 = /*XDT*/ d->_b_ddt_1__precalc(t0);
             m->_st_b_ddt_1_p_ddt_1_n[1] = -t0[d_potential_b_ddt_1_p_ddt_1_n]; // (3p)
           }
         }
@@ -5099,10 +5264,12 @@ inline void COMMON_capacitor::tr_review_analog(MOD_capacitor* m) const
   trace1("review analog1", m->_time_by._event);
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
+  (void)p;
   assert(p);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // 
 // omit Statement 21AnalogConditionalStmt
     }
@@ -5114,10 +5281,12 @@ inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 {
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
+  (void)p;
   assert(p);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // 
 // omit Statement 21AnalogConditionalStmt
     }
@@ -5129,10 +5298,12 @@ inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
 {
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
+  (void)p;
   assert(p);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // 
 // omit Statement 21AnalogConditionalStmt
     }
@@ -5144,10 +5315,12 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
 {
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
+  (void)p;
   assert(p);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // 
 // omit Statement 21AnalogConditionalStmt
     }
@@ -5157,13 +5330,10 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
 inline TIME_PAIR MOD_capacitor::tr_review()
 {
   _time_by = BASE_SUBCKT::tr_review();
-  _accept = 0;
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
   trace1("review0", _time_by._event);
   c->tr_review_analog(this);
-{itested();
-  }
   if(_accept){
     COMPONENT::q_accept();
     trace1("capacitor::_accept", _sim->_time0);
@@ -5187,14 +5357,15 @@ inline void MOD_capacitor::tr_advance()
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
   (void)c;
+  _accept = 0;
   if(_sim->_last_time == 0.){
   incomplete();
   c->tr_eval_analog(this);
   }else{
   }
   set_not_converged();
-  c->tr_advance_analog(this);
   _v_1 = _v_;
+  c->tr_advance_analog(this);
   BASE_SUBCKT::tr_advance();
 }
 /*--------------------------------------------------------------------------*/
@@ -5459,25 +5630,6 @@ private: // funcs
 // Probe no refs: potential_p_n
 }; //COMMON_capacitor
 /*--------------------------------------------------------------------------*/
-class PRECALC_capacitor{
-  COMPONENT* _d{NULL};
-public:
-  typedef ddouble_<2> ddouble;
-  enum {
-    d_potential_b_ddt_2_p_ddt_2_n,
-    d_potential_b_p_n,
-// not named: _b_ddt_2_p_ddt_2_n
-// not named: _b_p_n
-     num_branches__  };
-public:
-  explicit PRECALC_capacitor(COMPONENT* d) : _d(d) {}
-  ddouble _b_ddt_2(ddouble){
-  ddouble ret = 0.;
-  ret[d_potential_b_ddt_2_p_ddt_2_n] = -1.;
-  return ret;
-}
-};
-/*--------------------------------------------------------------------------*/
 class MOD_capacitor : public BASE_SUBCKT {
 private:
   static int _count;
@@ -5501,6 +5653,11 @@ private: // func decl
 //filt ddt_2
   ddouble _b_ddt_2(ddouble t0);
   bool _short_b_ddt_2()const {return 0;}
+  ddouble _b_ddt_2__precalc(ddouble){
+  ddouble ret = 0.;
+  ret[d_potential_b_ddt_2_p_ddt_2_n] = -1.;
+  return ret;
+}
 //probe potential_ddt_2_p_
   ddouble xs_potential_b_ddt_2_p_ddt_2_n() const { // potential_ddt_2_p_
     ddouble t;
@@ -5863,10 +6020,12 @@ void EVAL__b_ddt_2_p_ddt_2_n_::tr_eval(ELEMENT* d)const
   const COMMON_capacitor* c = prechecked_cast<const COMMON_capacitor*>(p->common());
   assert(c);
   MOD_capacitor const* p = d;
+  (void)p;
   assert(p);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -5886,10 +6045,12 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
   const COMMON_capacitor* c = prechecked_cast<const COMMON_capacitor*>(p->common());
   assert(c);
   MOD_capacitor const* p = d;
+  (void)p;
   assert(p);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -5959,10 +6120,12 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #pragma GCC diagnostic pop
   MOD_capacitor const* p = d;
+  (void)p;
   assert(p);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -6030,14 +6193,13 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
 {
 //OUT_ANALOG precalc
   MOD_capacitor const* p = m;
-  assert(p);
+  MOD_capacitor* d = m;
   (void)p;
+  assert(p);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  PRECALC_capacitor P(m);
-  PRECALC_capacitor* d = &P;
   (void)d;
-  {
+  { //
     { // 
       {
         // F analysis args:0
@@ -6061,7 +6223,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
               ddouble t0;
               t0 = 0.; // precalc.
               t0 = (_p___c) /*rhspar*/ * t0;
-              t0 = /*XDT*/ d->_b_ddt_2(t0);
+              t0 = /*XDT*/ d->_b_ddt_2__precalc(t0);
               m->_st_b_ddt_2_p_ddt_2_n[1] = -1; // (3q)
             }
           }
@@ -6078,10 +6240,12 @@ inline void COMMON_capacitor::tr_review_analog(MOD_capacitor* m) const
   trace1("review analog1", m->_time_by._event);
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
+  (void)p;
   assert(p);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // 
 // omit Statement 21AnalogConditionalStmt
     }
@@ -6093,10 +6257,12 @@ inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 {
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
+  (void)p;
   assert(p);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // 
       {
         // F analysis args:0
@@ -6130,10 +6296,12 @@ inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
 {
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
+  (void)p;
   assert(p);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // 
 // omit Statement 21AnalogConditionalStmt
     }
@@ -6145,10 +6313,12 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
 {
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
+  (void)p;
   assert(p);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  (void)d;
+  { //
     { // 
 // omit Statement 21AnalogConditionalStmt
     }
@@ -6158,13 +6328,10 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
 inline TIME_PAIR MOD_capacitor::tr_review()
 {
   _time_by = BASE_SUBCKT::tr_review();
-  _accept = 0;
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
   trace1("review0", _time_by._event);
   c->tr_review_analog(this);
-{itested();
-  }
   if(_accept){
     COMPONENT::q_accept();
     trace1("capacitor::_accept", _sim->_time0);
@@ -6188,14 +6355,15 @@ inline void MOD_capacitor::tr_advance()
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
   (void)c;
+  _accept = 0;
   if(_sim->_last_time == 0.){
   incomplete();
   c->tr_eval_analog(this);
   }else{
   }
   set_not_converged();
-  c->tr_advance_analog(this);
   _v_1 = _v_;
+  c->tr_advance_analog(this);
   BASE_SUBCKT::tr_advance();
 }
 /*--------------------------------------------------------------------------*/

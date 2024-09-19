@@ -29,6 +29,7 @@
 #include <stack>
 #include <globals.h> // TODO: Expression->resolve?
 /*--------------------------------------------------------------------------*/
+rdep_tag tr_begin_tag;
 rdep_tag tr_eval_tag;
 rdep_tag tr_review_tag;
 rdep_tag tr_advance_tag;
@@ -1343,6 +1344,11 @@ std::string Token_VAR_REF::long_code_name() const
 {
   std::string s = scope()->long_code_name();
   return "_v_" + s + "._"+ name();
+}
+/*--------------------------------------------------------------------------*/
+bool Token_VAR_REF::is_state_var() const
+{
+  return true; // TODO
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

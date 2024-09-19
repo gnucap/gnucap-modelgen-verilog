@@ -149,30 +149,35 @@ private:
 
     o____ "bool tr_accept(MOD_" << _m->identifier() << "* d,\n";
     o____ "               double input, int dir, int more=0){\n";
-    o______ "trace2(\"tracc\", _state[0], _state[1]);\n";
+    o______ "trace2(\"cross::tr_accept\", _state[0], _state[1]);\n";
     o______ "return tr_eval(d, input, dir, more);\n";
     o____ "}\n";
+
     o____ "bool tr_advance(MOD_" << _m->identifier() << "* d,\n";
     o____ "                double input, int dir, int more=0){\n";
     o______ "_state[1] = _state[0];\n";
     o______ "_in[1] = _in[0];\n";
+    o______ "trace3(\"cross::tr_advance\", _in[0], _in[1], input);\n";
     o______ "_state[0] = (_in[0] == 0.)?_UNKNOWN:(_in[0]>0.)?_ON:_OFF;\n";
     o______ "if(_state[1] != _state[0]) {\n";
     o________ "d->q_eval();\n";
+    o________ "return true;\n"; // really?
     o______ "}else{\n";
     o______ "}\n";
+    o______ "return tr_eval(d, input, dir, more);\n";
     o______ "return false;\n";
     o____ "}\n";
+
     o____ "bool tr_review(MOD_" << _m->identifier() << "* d,\n";
     o____ "               double input, int dir, int more=0){\n";
     o______ "_in[0] = input;\n";
     o______ "double old_dv = _in[0] - _in[1];\n";
     o______ "double old_dt = d->_time[0] - d->_time[1];\n";
-    o______ "trace5(\"trr\", old_dt, old_dv, _in[0], _in[1], input);\n";
+    o______ "trace5(\"cross::tr_review\", old_dt, old_dv, _in[0], _in[1], input);\n";
     o______ "if(_state[0] != _ON && old_dv > 0) {\n";
     o________ "double new_dv = - _in[1];\n";
     o________ "double new_dt = old_dt * new_dv / old_dv;\n";
-    o________ "trace2(\"cross review\", d->_time[1], new_dt);\n";
+    o________ "trace2(\"cross::tr_review\", d->_time[1], new_dt);\n";
     o________ "d->_time_by.min_event(d->_time[1] + new_dt);\n";
     o______ "}else if(_state[0] != _OFF && old_dv < 0){\n";
     o________ "double new_dv = - _in[1];\n";
@@ -184,6 +189,7 @@ private:
     o______ "return tr_eval(d, input, dir, more);\n";
     //o______ "return _state[1] != _state[0];\n";
     o____ "}\n";
+
     o____ "bool tr_regress(MOD_" << _m->identifier() << "* d,\n";
     o____ "                double input, int dir, int more=0) {\n";
     o______ "_in[0] = input;\n";
@@ -260,6 +266,7 @@ public:
   void make_tr_eval(std::ostream& o)const override {
     o____ "bool tr_eval(MOD_" << _m->identifier() << "* d,\n";
     o____ "             double input, int dir, int more=0){\n";
+    o______ "trace2(\"above::tr_eval\", input, _state[0]==_ON);\n";
     o______ "return _state[0] == _ON;\n";
     o____ "}\n";
   }

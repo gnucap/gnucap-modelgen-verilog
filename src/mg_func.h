@@ -59,6 +59,7 @@ public: // characteristics
   virtual bool has_tr_review()const {return false;}
   virtual bool has_tr_accept()const {return false;}
   virtual bool has_tr_advance()const{return false;}
+  virtual bool has_tr_regress()const{return has_tr_advance();}
   virtual bool has_set_event()const {return false;}
 
   virtual bool static_code()const {return false;}
@@ -72,6 +73,7 @@ public: // code generation
   virtual void make_cc_dev(std::ostream&)const {}
   virtual void make_cc_tr_advance(std::ostream&)const {}
   virtual void make_cc_tr_review(std::ostream&)const {}
+  virtual void make_cc_tr_accept(std::ostream&)const {}
 
   virtual Token* new_token(Module&, size_t)const { untested();unreachable(); return NULL;}
   virtual std::string code_name()const { itested();

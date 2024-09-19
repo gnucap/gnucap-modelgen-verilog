@@ -10,11 +10,13 @@ verilog
 module test_timer3f(p, n);
 	electrical p, n;
 	inout p, n;
-	real state;
+	(*desc=""*) real state;
+	(*desc=""*) integer count;
 	analog begin
 		@(timer(1)) begin
 			$debug("timer %g %g\n", $abstime, state);
 			state = 1;
+			count = count + 1;
       end
 		$write("time0 %g %g\n", $abstime, state);
 	end
@@ -32,7 +34,7 @@ list
 
 print dc v(nodes) iter(0)
 dc
-print tran iter(0)
-tran 2 basic
+print tran state(dut0) count(dut0) iter(0)
+tran 2 basic trace n
 
 end

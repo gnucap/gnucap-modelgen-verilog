@@ -4,7 +4,7 @@ module test_dep5(np, n);
   analog begin : main // always
     // AA : 1
     real AA;
-    AA = V(p, n); // dep: _potential_b_p_n s1
+    AA = V(p, n); // dep: _potential_b_p_n s1 r1
     I(p, n) <+ ddt((AA * V(p, n))); // dep: _potential_b_ddt_0_p_ddt_0_n r2
   end
 

@@ -122,7 +122,7 @@ public:
   void set_type(Data_Type const& d){ _type=d; }
   bool propagate_deps(Token_VAR_REF const&);
   bool propagate_rdeps(RDeps const&);
-  bool is_state_variable()const;
+  bool is_state_var()const;
 protected:
   void clear_deps();
 private:
@@ -215,6 +215,7 @@ public:
   bool is_used()const;
   operator bool() const {return _token;}
   bool is_output_var()const;
+  bool is_state_var()const;
 private: // implementation
   bool store_deps(TData const&);
   std::string code_name()const;
