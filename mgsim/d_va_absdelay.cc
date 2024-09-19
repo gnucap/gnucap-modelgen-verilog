@@ -780,13 +780,14 @@ void COMMON_TRANSITION::tr_accept(COMPONENT* c) const
   }else{
   }
   double pending = e->_forward.cleanup(_sim->_time0);
-  if(pending != e->_current){
+  if(pending == e->_current) {
+  }else if(pending < NEVER) {
     trace3("DELAY::accept q0", _sim->_time0, pending, e->_current);
     _sim->new_event(pending); // BUG? provisional event
-    e->_current = pending;
   }else{
     trace3("DELAY::accept q1", _sim->_time0, pending, e->_current);
   }
+  e->_current = pending;
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_TRANSITION::tr_advance(COMPONENT* c) const

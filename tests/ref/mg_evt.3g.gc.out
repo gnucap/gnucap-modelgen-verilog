@@ -3,8 +3,8 @@ test_timer3g #() dut0 (.p(1),.n(0));
 #Time       v(1)       state(dut0) iter(0)    control(0)
 time0 0 0
  0.         1.         1.         3.         1.        
-time0 0.03 1
- 0.03       1.         1.         3.         9.        
+time0 0.0294118 1
+ 0.029412   1.         1.         3.         9.        
 time0 1 1
  1.         0.         0.         3.         2.        
 time0 2 0
@@ -17,8 +17,8 @@ time0 0 0
 #Time       v(1)       state(dut0) iter(0)    control(0)
 time0 0 1
  0.         0.         0.         3.         1.        
-time0 0.03 0
- 0.03       0.         0.         3.         9.        
+time0 0.0294118 0
+ 0.029412   0.         0.         3.         9.        
 time0 1 0
  1.         1.         1.         3.         2.        
 time0 2 1
