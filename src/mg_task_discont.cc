@@ -54,14 +54,6 @@ private:
     m.set_tr_accept(); // WIP, remove.
     return new Token_CALL(label(), this);
   }
-  void make_cc_precalc(std::ostream& o)const override {
-    std::string n = label();
-   // o__ "struct cls" << label() << "{\n";
-    o__ "void "<<n<<"precalc(int i=0) const";
-    o << "{\n";
-    o__ "}\n";
-   // o__ "}_" << label() << ";\n";
-  }
   void make_cc_dev(std::ostream& o)const override {
     std::string n = label();
     //o__ "struct cls" << label() << "{\n";
@@ -78,6 +70,9 @@ private:
     o______ "_sim->new_event(_sim->_time0 + _sim->_dtmin*1.01);\n";
     o____ "}\n";
     // o__ "}_" << label() << ";\n";
+    o__ "void "<<n<<"precalc(int i=0) const";
+    o << "{\n";
+    o__ "}\n";
   }
   std::string code_name()const override{
     return "d->" + label() + "";

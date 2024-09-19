@@ -97,9 +97,9 @@ public:
   }
   void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";
-    o__ "T " << code_name() << "(T d)const {itested();\n";
-    o____ "if(d>=0.){itested();\n";
-    o____ "}else{itested();\n";
+    o__ "T " << code_name() << "(T d)const {\n";
+    o____ "if(d>=0.){\n";
+    o____ "}else{\n";
     o______ "d *= -1.;\n";
     o____ "}\n";
     o____ "return d;\n";
@@ -401,9 +401,9 @@ public:
   }
   void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";
-    o__ "T " << code_name() << "(T d)const {itested();\n";
+    o__ "T " << code_name() << "(T d)const {\n";
     o____ "double l=-1e99;\n";
-    o____ "if(d>1e-60){itested();\n";
+    o____ "if(d>1e-60) {\n";
     o______ "l = std::log(double(d));\n";
     o______ "chain(d, 1./double(d));\n";
     o____ "}else if(d>0){ untested();\n";

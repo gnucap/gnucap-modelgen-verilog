@@ -159,7 +159,7 @@ public:
   bool operator<=(const ddouble_& o)const { itested();
     return *_data <= *o._data;
   }
-  bool operator<=(double const& o)const { itested();
+  bool operator<=(double const& o)const {
     return *_data <= o;
   }
   bool operator<=(int const& o)const { itested();
@@ -181,7 +181,7 @@ public:
   bool operator>=(const ddouble_& o)const { itested();
     return *_data >= *o._data;
   }
-  bool operator>=(const double& o)const {itested();
+  bool operator>=(const double& o)const {
     return *_data >= o;
   }
   bool operator>=(PARAMETER<double> const& o)const {itested();
@@ -280,7 +280,7 @@ public:
     ret *= double(o);
     return ret;
   }
-  ddouble_ operator*(const double& o) const {itested();
+  ddouble_ operator*(const double& o)const {
     ddouble_ ret = *this;
     ret *= o;
     return ret;
@@ -367,130 +367,130 @@ public:
     std::fill_n(_data, numderiv+1, 0.);
   } /*clear*/
 }; /*ddouble_*/
-
+/*--------------------------------------------------------------------------*/
 template<int T>
 ddouble_<T> operator/(ddouble_<T> a, ddouble_<T> b)
 { untested();
   a /= b;
   return a;
 }
-  template<int T>
-  ddouble_<T> operator/(int const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator/(int const& a, ddouble_<T> b)
 { untested();
   ddouble_<T> c(a);
   c /= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator/(double const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator/(double const& a, ddouble_<T> b)
 {
   ddouble_<T> c(a);
   c /= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator/(PARAMETER<double> const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator/(PARAMETER<double> const& a, ddouble_<T> const& b)
 {
   ddouble_<T> c(a);
   c /= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator/(PARAMETER<int> const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator/(PARAMETER<int> const& a, ddouble_<T> const& b)
 { untested();
   ddouble_<T> c(a);
   c /= b;
   return c;
 }
 
-  template<int T>
-  ddouble_<T> operator-(double const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator-(double const& a, ddouble_<T> b)
 {
   ddouble_<T> c(a);
   c -= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator-(int const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator-(int const& a, ddouble_<T> b)
 { untested();
   ddouble_<T> c(a);
   c -= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator-(PARAMETER<double> const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator-(PARAMETER<double> const& a, ddouble_<T> b)
 {itested();
   ddouble_<T> c(a);
   c -= b;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator-(PARAMETER<int> const& a, ddouble_<T> b)
+template<int T>
+ddouble_<T> operator-(PARAMETER<int> const& a, ddouble_<T> b)
 { untested();
   ddouble_<T> c(a);
   c -= b;
   return c;
 }
 
-  template<int T>
-  ddouble_<T> operator*(double const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator*(double const& a, ddouble_<T> const& b)
 {
   ddouble_<T> c(b);
   c *= a;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator*(int const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator*(int const& a, ddouble_<T> const& b)
 { untested();
   ddouble_<T> c(b);
   c *= a;
   return c;
 }
-  template<int T>
-  ddouble_<T> operator*(PARAMETER<double> const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator*(PARAMETER<double> const& a, ddouble_<T> const& b)
 {
   ddouble_<T> c(a);
   return c * b;
 }
-  template<int T>
-  ddouble_<T> operator*(PARAMETER<int> const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator*(PARAMETER<int> const& a, ddouble_<T> const& b)
 { untested();
   ddouble_<T> c(b);
   c *= a;
   return c;
 }
 
-  template<int T>
-  ddouble_<T> operator+(double const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator+(double const& a, ddouble_<T> const& b)
+{
+  ddouble_<T> c(b);
+  return c + a;
+}
+template<int T>
+ddouble_<T> operator+(int const& a, ddouble_<T> const& b)
 { itested();
   ddouble_<T> c(b);
   return c + a;
 }
-  template<int T>
-  ddouble_<T> operator+(int const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator+(PARAMETER<double> const& a, ddouble_<T> const& b)
 { itested();
   ddouble_<T> c(b);
   return c + a;
 }
-  template<int T>
-  ddouble_<T> operator+(PARAMETER<double> const& a, ddouble_<T> const& b)
-{ itested();
-  ddouble_<T> c(b);
-  return c + a;
-}
-  template<int T>
-  ddouble_<T> operator+(PARAMETER<int> const& a, ddouble_<T> const& b)
+template<int T>
+ddouble_<T> operator+(PARAMETER<int> const& a, ddouble_<T> const& b)
 { untested();
   return b + double(a);
 }
 
-  template<int T>
-  bool operator==(ddouble_<T> const& a, PARAMETER<int> const& b)
+template<int T>
+bool operator==(ddouble_<T> const& a, PARAMETER<int> const& b)
 { untested();
   return double(b) == a.value();
 }
-  template<int T>
-  bool operator==(PARAMETER<int> const& b, ddouble_<T> const& a)
+template<int T>
+bool operator==(PARAMETER<int> const& b, ddouble_<T> const& a)
 { untested();
   return double(b) == a.value();
 }
@@ -507,19 +507,21 @@ inline bool operator==(PARAMETER<double> const& b, int const& a)
 // 	return int(b) == a;
 // }
 
-  template<class T>
-  T& set_value(T& t, double const& d)
+template<class T>
+T& set_value(T& t, double const& d)
 {
   t.set_value(d);
   return t;
 }
-  template<>
-  inline int& set_value(int& t, double const& v)
+
+template<>
+inline int& set_value(int& t, double const& v)
 { untested();
   return t = int(v);
 }
-  template<>
-  inline double& set_value(double& t, double const& v)
+
+template<>
+inline double& set_value(double& t, double const& v)
 {
   return t = v;
 }
@@ -536,38 +538,36 @@ inline bool operator==(PARAMETER<double> const& b, int const& a)
   return t;
 }
 
-  template<class T>
-  T& chain(T& t, double const& d)
+template<class T>
+T& chain(T& t, double const& d)
 {
   t.chain(d);
   return t;
 }
-  template<>
-  inline double& chain(double& t, double const&)
+template<>
+inline double& chain(double& t, double const&)
 {
   // no-op
   return t;
 }
-  template<>
-  inline int& chain(int& t, double const&)
+template<>
+inline int& chain(int& t, double const&)
 { untested();
   // no-op
   return t;
 }
-  template<>
-  inline PARAMETER<double>& chain(PARAMETER<double>& t, double const&)
-{ itested();
+template<>
+inline PARAMETER<double>& chain(PARAMETER<double>& t, double const&)
+{
   // no-op
   return t;
 }
-  template<>
-  inline PARAMETER<int>& chain(PARAMETER<int>& t, double const&)
+template<>
+inline PARAMETER<int>& chain(PARAMETER<int>& t, double const&)
 { untested();
   // no-op
   return t;
 }
-
-
 /*--------------------------------------------------------------------------*/
 class array_{
   std::vector<double> _v;

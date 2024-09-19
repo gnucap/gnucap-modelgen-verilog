@@ -174,16 +174,6 @@ public:
     o__ "static common" << _code_name
       << " _common" << _code_name << ";\n";
   }
-
-  void make_cc_precalc(std::ostream& o)const override{
-    o__ "ddouble " << _code_name << "(ddouble const&";
-      assert(num_args());
-      assert(num_args() < 4);
-      o << ", array_ const& num";
-      o << ", array_ const& den";
-    o << ");\n";
-  }
-
   void make_cc_dev(std::ostream& o)const override{
     o__ "ddouble " << _code_name << "(ddouble t0";
       assert(num_args());
@@ -193,6 +183,12 @@ public:
       }
     o << ");\n";
     o__ "bool _short"+_code_name+"()const {return " << bool(_output) << ";}\n";
+    o__ "ddouble " << _code_name << "__precalc(ddouble const&";
+      assert(num_args());
+      assert(num_args() < 4);
+      o << ", array_ const& num";
+      o << ", array_ const& den";
+    o << ");\n";
   }
   virtual std::string num_name_i()const = 0;
   virtual std::string den_name_i()const = 0;
@@ -240,7 +236,7 @@ public:
     "/*--------------------------------------"
     "------------------------------------*/\n";
 //    std::string id = m.identifier().to_string();
-    o << "ddouble PRECALC_" << id << "::" << _code_name << "(ddouble const&";
+    o << "ddouble MOD_" << id << "::" << _code_name << "__precalc(ddouble const&";
       assert(num_args());
       assert(num_args() < 4);
       o << ", array_ const& num";
@@ -250,7 +246,7 @@ public:
       o__ "ddouble ret = 0.;\n";
 //      std::string cn = _br->code_name();
       o__ "trace2(\"precalc" << cn << "\", num.size(), den.size());\n";
-      o__ "COMPONENT* l = DEV(_d)->" << cn << ";\n";
+      o__ "COMPONENT* l = " << cn << ";\n";
       o__ "assert(l);\n";
       o__ "std::string reset;\n";
       o__ "l->set_param_by_index(-1,reset,0);\n";

@@ -427,9 +427,6 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
   }else if(auto assign=dynamic_cast<Assignment const*>(&ab)) { untested();
     // incomplete.
     make_assignment(o, *assign);
-  }else if(auto ard=dynamic_cast<Variable_Stmt const*>(&ab)) {
-    incomplete();
-    assert(0);
   }else if(auto cs=dynamic_cast<AnalogConditionalStmt const*>(&ab)) {
     make_cond(o, *cs);
   }else if(auto ss=dynamic_cast<AnalogSwitchStmt const*>(&ab)) {
@@ -1032,10 +1029,12 @@ static void make_one_variable_proxy(std::ostream& o, Token_VAR_REF const& V)
   o____ "explicit _V_" << V.name() << "() : ddouble(), _m(NULL) {set_all_deps();}\n";
   o____ "_V_" << V.name() << "(MOD__* m) : "
     << "ddouble(m->" << V.long_code_name() << "), _m(m) {}\n";
-  o____ "~_V_" << V.name() << "() {\n"
-    << "	if(_m){\n";
-  o______ "_m->" << V.long_code_name() << " = value();\n";
-  o____ "}else{itested(); }}\n";
+  o____ "~_V_" << V.name() << "() {\n";
+  o______ "if(_m){\n";
+  o________ "_m->" << V.long_code_name() << " = value();\n";
+  o______ "}else{\n";
+  o______ "}\n";
+  o____ "}\n";
   o____ "ddouble& operator=(double t){\n";
   o______ "ddouble::operator=(t);\n";
   o______ "return *this;\n";
@@ -1176,25 +1175,18 @@ void OUT_ANALOG::make_analog_list(std::ostream& o, const Module& m) const
 {
   if(is_precalc()){
     o__ "MOD_" << m.identifier() << " const* p = m;\n";
-    o__ "assert(p);\n";
-    o__ "(void)p;\n";
-    o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
-    o__ "(void)pc;\n";
-    o__ "PRECALC_" << m.identifier() << " P(m);\n"; // BUG/HACK
-    o__ "PRECALC_" << m.identifier() << "* d = &P;\n";
-    o__ "(void)d;\n";
+    o__ "MOD_" << m.identifier() << "* d = m;\n";
   }else if(is_dynamic()){
     o__ "MOD_" << m.identifier() << " const* p = d;\n";
-    o__ "assert(p);\n";
-    o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
-    o__ "(void)pc;\n";
   }else{
     o__ "MOD_" << m.identifier() << " const* p = m;\n";
     o__ "MOD_" << m.identifier() << "* d = m;\n";
-    o__ "assert(p);\n";
-    o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
-    o__ "(void)pc;\n";
   }
+  o__ "(void)p;\n";
+  o__ "assert(p);\n";
+  o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
+  o__ "(void)pc;\n";
+  o__ "(void)d;\n";
 
   for(auto const& bb : analog_list(m)){
     assert(bb);

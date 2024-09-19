@@ -123,9 +123,9 @@ public:
 
     return new Token_XDT(label(), cl);
   }
-  void make_cc_precalc(std::ostream& o)const override{
+  void make_cc_precalc_(std::ostream& o)const{
     make_tag(o);
-    o__ "ddouble " << _code_name << "(";
+    o__ "ddouble " << _code_name << "__precalc(";
       std::string comma;
       assert(num_args() < 3);
       for(size_t n=0; n<num_args(); ++n){
@@ -154,6 +154,7 @@ public:
       }
     o << ");\n";
     o__ "bool _short"+_code_name+"()const {return " << bool(_output) << ";}\n";
+    make_cc_precalc_(o);
   }
   void make_cc_impl_comm(std::ostream&)const{ untested();
     unreachable();

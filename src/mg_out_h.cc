@@ -474,6 +474,7 @@ static void make_branch_states(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 static void make_precalc(std::ostream& o, Module const& m)
 {
+  return;
   std::string class_name = "PRECALC_" + m.identifier().to_string();
   o << "class " << class_name << "{\n";
   o__ "COMPONENT* _d{NULL};\n";
@@ -484,7 +485,7 @@ static void make_precalc(std::ostream& o, Module const& m)
   // ... functions->make_cc_precalc?
   for(auto const& i : m.funcs()) {
     // indent x;
-    i->make_cc_precalc(o);
+   // i->make_cc_precalc(o);
   }
 
   o << "};\n"

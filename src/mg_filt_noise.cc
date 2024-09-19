@@ -125,22 +125,6 @@ public:
 
     return new Token_NOISE(label(), cl);
   }
-  void make_cc_precalc(std::ostream& o)const override{
-    o__ "ddouble " << _code_name << "(";
-    assert(num_args() <= _na);
-    if(num_args()>0){
-    o << "ddouble";
-    }else{ untested();
-    }
-    for(size_t n=2; n<_na; ++n){
-      o << ", ddouble";
-    }
-    if(num_args()==_na){
-      o << ", std::string what=\"\"";
-    }else{
-    }
-    o << ");\n";
-  }
   void make_cc_dev(std::ostream& o)const override{
     o__ "ddouble " << _code_name << "(";
       assert(num_args() <= _na);
@@ -154,6 +138,20 @@ public:
       }
     o << ");\n";
     o__ "bool _short"+_code_name+"()const {return " << bool(_output) << ";}\n";
+    o__ "ddouble " << _code_name << "__precalc(";
+    assert(num_args() <= _na);
+    if(num_args()>0){
+    o << "ddouble";
+    }else{ untested();
+    }
+    for(size_t n=2; n<_na; ++n){
+      o << ", ddouble";
+    }
+    if(num_args()==_na){
+      o << ", std::string what=\"\"";
+    }else{
+    }
+    o << ");\n";
   }
   void make_cc_impl(std::ostream&o)const override {
     std::string cn = _br->code_name();
@@ -227,7 +225,7 @@ public:
     o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
-    o << "ddouble PRECALC_" << id << "::" << _code_name << "(";
+    o << "ddouble MOD_" << id << "::" << _code_name << "__precalc(";
     if(num_args()>0){
       o << "ddouble";
     }else{ untested();
@@ -246,7 +244,7 @@ public:
     }
     o__ "ddouble ret = 0.;\n";
     if(num_args()==_na){
-      o__ "COMPONENT* l = DEV(_d)->" << cn << ";\n";
+      o__ "COMPONENT* l = " << cn << ";\n";
       o__ "assert(l);\n";
       o__ "l->set_param_by_name(\"name\", \"\");\n";
       o__ "l->set_param_by_name(\"name\", what);\n";
@@ -254,7 +252,7 @@ public:
     }
     if(num_args()>1 && _na==3){
       o__ "{\n";
-      o____ "COMPONENT* l = DEV(_d)->" << cn << ";\n";
+      o____ "COMPONENT* l = " << cn << ";\n";
       o____ "assert(l);\n";
       o____ "l->set_param_by_name(\"e\", \"\");\n";
       o____ "l->set_param_by_name(\"e\", to_string(t1));\n";

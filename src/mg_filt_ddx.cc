@@ -90,8 +90,8 @@ public:
   std::string code_name()const override{
     return "/*DDX*/" + label();
   }
-  void make_cc_dev(std::ostream&)const override{
-  }
+  bool has_precalc()const override {return false;}
+  void make_cc_dev(std::ostream&)const override{ }
   void make_cc_common(std::ostream& o)const override{
     o__ "class FILTER" << label() << "{\n";
     o__ "public:\n";

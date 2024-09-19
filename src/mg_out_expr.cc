@@ -606,11 +606,14 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
 	o__ s.code_name() << " = ";
       }
 
+      o << F->code_name();
       if(F->has_modes()){
-	o << F->code_name() << _ctx;
+	o << _ctx;
+      }else if(_ctx=="precalc" && F->has_precalc()){
+	o << "__" + _ctx;
       }else{
-	o << F->code_name();
       }
+
       o << "(";
       std::string comma = "";
       if(F->is_common()){

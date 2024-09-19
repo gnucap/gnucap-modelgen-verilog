@@ -51,10 +51,6 @@ private:
   std::string code_name()const override{
     return "d->_f_bound_step_";
   }
- void make_cc_precalc(std::ostream& o)const override {
-   o__ "void " << "_f_bound_step_precalc(double)const{}\n";
-   // o__ "void " << "_f_bound_step_CALLMODE_hack(double d) {\n}\n";
- }
  void make_cc_dev(std::ostream& o)const override {
    // o__ "double _bound_step{NEVER};\n";
    o__ "void " << "_f_bound_step_tr_eval(double d) {\n";
@@ -62,6 +58,7 @@ private:
    o__ "void " << "_f_bound_step_tr_review(double d) {\n";
    o____ "_time_by.min_error_estimate(_sim->_time0 + d);\n";
    o__ "}\n";
+   o__ "void " << "_f_bound_step_precalc(double)const{}\n";
  }
  void make_cc_tr_review(std::ostream& o)const override {
    // TODO. set_tr_review
@@ -95,18 +92,16 @@ private:
     t->set_num_args(na); // still needed?
     return t;
   }
-  void make_cc_precalc(std::ostream& o)const override {
-    o__ "void t_finish(int n=1){\n";
-    o____ "(void)n;\n";
-    o__ "}\n";
-    o__ "void t_finish(double x){return t_finish(int(x));}\n";
-  }
   void make_cc_dev(std::ostream& o)const override {
     o__ "void t_finish(int n=1){\n";
     o____ "(void)n;\n";
     o____ "throw Exception(\"finish\");\n";
     o__ "}\n";
     o__ "void t_finish(double x){return t_finish(int(x));}\n";
+    o__ "void t_finish__precalc(int n=1){\n";
+    o____ "(void)n;\n";
+    o__ "}\n";
+    o__ "void t_finish__precalc(double x){return t_finish(int(x));}\n";
   }
   std::string code_name()const override{
     return "d->" + label();
@@ -136,11 +131,6 @@ class LIMIT : public MGVAMS_TASK {
   void make_cc_common(std::ostream&)const override {
     // nothing.
   }
-  void make_cc_precalc(std::ostream& o)const override {
-    o__ "ddouble " << label() << "(ddouble in, std::string const& what, double const& a, double const& b){\n";
-    o____ "return 0.;\n";
-    o__ "}\n";
-  }
   void make_cc_dev(std::ostream& o)const override {
     o__ "class " << label() << "{\n";
     o____ "double _old;\n";
@@ -159,6 +149,9 @@ class LIMIT : public MGVAMS_TASK {
     o______ "}\n";
     o______ "// convcheck old vs in?\n";
     o______ "return in;\n";
+    o____ "}\n";
+    o____ "ddouble precalc(ddouble in, std::string const& what, double const& a, double const& b){\n";
+    o______ "return 0.;\n";
     o____ "}\n";
     o__ "} " << label() << ";\n";
   }

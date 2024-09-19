@@ -76,8 +76,13 @@ private:
     auto t = new Token_CALL(label(), cl);
     return t;
   }
-  void make_cc_precalc(std::ostream& o)const override{
-    o__ "ddouble " << label() << "(";
+  void make_cc_dev(std::ostream& o)const override{
+    assert(_f);
+    std::string cn = _f->code_name();
+    o__ "double " << cn << "state[" << _f->num_states() << "]\n;"; // filter/num_states?
+    o__ "ELEMENT* _f" << label() << "{NULL};\n";
+    make_cc_dev_(o);
+    o__ "ddouble " << label() << "__precalc(";
       std::string comma;
       for(size_t n=0; n<num_args(); ++n){
 	o << comma << "ddouble";
@@ -86,13 +91,6 @@ private:
     o << "){\n";
     o____ "return 0.;\n";
     o__ "}\n";
-  }
-  void make_cc_dev(std::ostream& o)const override{
-    assert(_f);
-    std::string cn = _f->code_name();
-    o__ "double " << cn << "state[" << _f->num_states() << "]\n;"; // filter/num_states?
-    o__ "ELEMENT* _f" << label() << "{NULL};\n";
-    make_cc_dev_(o);
   }
   void make_assign(std::ostream& o)const {
     assert(_f);

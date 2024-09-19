@@ -164,16 +164,6 @@ public:
       << " _common" << _code_name << ";\n";
   }
 
-  void make_cc_precalc(std::ostream& o)const override{
-    o__ "ddouble " << _code_name << "(ddouble const&";
-      assert(num_args());
-      assert(num_args() < 4);
-      for(int n=1; n < int(num_args()); ++n){
-	o << ", double t" << n;
-      }
-    o << ");\n";
-  }
-
   void make_cc_dev(std::ostream& o)const override{
     o__ "ddouble " << _code_name << "(ddouble t0";
       assert(num_args());
@@ -184,6 +174,13 @@ public:
 
     o << "); // (d)\n";
     o__ "bool _short"+_code_name+"()const {return " << bool(_output) << ";}\n";
+    o__ "ddouble " << _code_name << "__precalc(ddouble const&";
+      assert(num_args());
+      assert(num_args() < 4);
+      for(int n=1; n < int(num_args()); ++n){
+	o << ", double t" << n;
+      }
+    o << ");\n";
   }
 
   void make_cc_impl(std::ostream&o)const override {
@@ -224,7 +221,7 @@ public:
     "/*--------------------------------------"
     "------------------------------------*/\n";
 //    std::string id = m.identifier().to_string();
-    o << "ddouble PRECALC_" << id << "::" << _code_name << "(ddouble const&";
+    o << "ddouble MOD_" << id << "::" << _code_name << "__precalc(ddouble const&";
     assert(num_args());
     assert(num_args() < 4);
     if(num_args()>1){
@@ -239,7 +236,7 @@ public:
     o << ")\n{\n";
     {
       o__ "ddouble ret = 0.;\n";
-      o__ "COMPONENT* l = DEV(_d)->" << cn << ";\n";
+      o__ "COMPONENT* l = " << cn << ";\n";
       o__ "assert(l);\n";
       o__ "std::string reset;\n";
       if(num_args()>1){

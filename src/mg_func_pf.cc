@@ -65,17 +65,16 @@ private:
     m.install(this);
     return new Token_PF(label(), this);
   }
+  bool has_precalc()const override {return true;}
   std::string code_name()const override{
     return "d->PORT_FLOW";
-  }
-  void make_cc_precalc(std::ostream& o)const override {
-    o__ "double PORT_FLOW(int)const {\n";
-	 o____ "return 0.;\n";
-	 o__ "}\n";
   }
   void make_cc_dev(std::ostream& o)const override {
     o__ "double PORT_FLOW(int i){\n";
 	 o____ "return va::PORT_FLOW(i, this);\n";
+	 o__ "}\n";
+    o__ "double PORT_FLOW__precalc(int)const {\n";
+	 o____ "return 0.;\n";
 	 o__ "}\n";
   }
 #if 0

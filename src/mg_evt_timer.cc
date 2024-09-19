@@ -118,8 +118,8 @@ private:
     o____ "}\n";
     /*----------------------------------------------------------------------*/
     o__ "public:\n";
-    o____ "bool precalc" << args() << " {\n";
-   // o______ "unreachable();\n";
+    o____ "bool precalc(void* d,\n";
+    o____ "             double delay, double period=0., double tol=0., int en=1) {\n";
     o______ "return false;\n";
     o____ "}\n";
     /*----------------------------------------------------------------------*/
@@ -200,16 +200,6 @@ private:
     o______ "}\n";
     o____ "}\n";
     /*----------------------------------------------------------------------*/
-    o__ "}"<< _code_name <<";\n";
-  }
-  void make_cc_precalc(std::ostream& o)const override{
-    make_tag(o);
-    o__ "class cls" << _code_name << "{\n";
-    o__ "public:\n";
-    o____ "bool precalc(void* d,\n";
-    o____ "               double delay, double period=0., double tol=0., int en=1) {\n";
-    o______ "return false;\n";
-    o____ "}\n";
     o__ "}"<< _code_name <<";\n";
   }
 

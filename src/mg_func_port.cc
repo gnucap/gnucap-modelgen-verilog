@@ -54,11 +54,6 @@ private:
     o____ "return _n[i].is_connected();\n";
     o__ "}\n";
   }
-  void make_cc_precalc(std::ostream& o)const override {
-    o__ "bool node_is_connected(int i)const {\n";
-    o____ "return (_d)->node_is_connected(i);\n";
-    o__ "}\n";
-  }
 } pg;
 DISPATCHER<FUNCTION>::INSTALL d_pg(&function_dispatcher, "$port_connected", &pg);
 /*--------------------------------------------------------------------------*/

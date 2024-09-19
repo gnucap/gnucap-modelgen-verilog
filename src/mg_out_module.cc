@@ -534,8 +534,6 @@ static void make_tr_review(std::ostream& o, const Module& m)
   for(auto f : m.funcs()){
     f->make_cc_tr_review(o);
   }
-  o << "{itested();\n";
-  o__ "}\n";
   if(m.has_tr_accept()){
     o__ "if(_accept){\n";
     o____ "COMPONENT::q_accept();\n";

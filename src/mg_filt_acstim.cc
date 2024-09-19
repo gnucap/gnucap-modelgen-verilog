@@ -150,15 +150,6 @@ public:
 
     return new Token_ACSTIM(label(), cl);
   }
-  void make_cc_precalc(std::ostream& o)const override{
-    o__ "ddouble " << _code_name << "(std::string";
-      assert(num_args() < 3);
-      for(size_t n=1; n<num_args(); ++n){
-	o << ", ddouble";
-      }
-    o << ");\n";
-
-  }
   void make_cc_dev(std::ostream& o)const override{
     o__ "ddouble " << _code_name << "(";
       o << "std::string what";
@@ -168,6 +159,12 @@ public:
       }
     o << ");\n";
     o__ "bool _short"+_code_name+"()const {return " << bool(_output) << ";}\n";
+    o__ "ddouble " << _code_name << "__precalc(std::string";
+      assert(num_args() < 3);
+      for(size_t n=1; n<num_args(); ++n){
+	o << ", ddouble";
+      }
+    o << ");\n";
   }
   void make_cc_impl(std::ostream&o)const override {
     std::string cn = _br->code_name();
@@ -208,7 +205,7 @@ public:
     o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
-    o << "ddouble PRECALC_" << id << "::" << _code_name << "(";
+    o << "ddouble MOD_" << id << "::" << _code_name << "__precalc(";
     o << "std::string what";
     for(size_t n=1; n<num_args(); ++n){
       o << ", ddouble t" << n;
@@ -219,7 +216,7 @@ public:
 //      std::string cn = _br->code_name();
       o__ "(void)what;\n";
 
-      o__ "COMPONENT* l = DEV(_d)->" << cn << ";\n";
+      o__ "COMPONENT* l = " << cn << ";\n";
       o__ "assert(l);\n";
       o__ "l->set_param_by_name(\"mag\", \"\");\n";
       o__ "l->set_param_by_name(\"mag\", to_string(t1));\n";

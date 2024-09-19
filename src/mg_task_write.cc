@@ -52,14 +52,6 @@ private:
     m.push_back(cl);
     return new Token_CALL("$debug", cl);
   }
-  void make_cc_precalc(std::ostream& o)const override {
-    o__ "void " << label() << "(std::string const&";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", double";
-    }
-    o << "){\n";
-    o__ "}\n";
-  }
   void make_cc_dev(std::ostream& o)const override {
     o__ "void " << label() << "(std::string const& a0";
     for(size_t i=1; i<num_args(); ++i) {
@@ -71,6 +63,12 @@ private:
       o << ", a" << i;
     }
     o << ");\n";
+    o__ "}\n";
+    o__ "void " << label() << "__precalc(std::string const&";
+    for(size_t i=1; i<num_args(); ++i) {
+      o << ", double";
+    }
+    o << "){\n";
     o__ "}\n";
   }
   std::string code_name()const override{
@@ -108,16 +106,6 @@ private:
     m.set_tr_accept(); // WIP, remove.
     return new Token_CALL(label(), cl);
   }
-  void make_cc_precalc(std::ostream& o)const override {
-    o__ "struct cls" << label() << "{\n";
-    o__ "void precalc(void*, std::string const";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", double";
-    }
-    o << "){\n";
-    o__ "}\n";
-    o__ "}_" << label() << ";\n";
-  }
   void make_cc_dev(std::ostream& o)const override {
     o__ "struct cls" << label() << "{\n";
 
@@ -150,6 +138,12 @@ private:
     }
     o << ");\n";
     o____ "}\n";
+    o__ "void precalc(void*, std::string const";
+    for(size_t i=1; i<num_args(); ++i) {
+      o << ", double";
+    }
+    o << "){\n";
+    o__ "}\n";
     o__ "}_" << label() << ";\n";
   }
   std::string code_name()const override{

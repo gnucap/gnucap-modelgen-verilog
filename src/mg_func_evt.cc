@@ -144,11 +144,6 @@ private:
     o____ "double _in[2]{0.};\n";
     o____ "state_t _state[2]{_UNKNOWN};\n";
     o__ "public:\n";
-    o____ "bool precalc(MOD_" << _m->identifier() << "* d,\n";
-    o____ "             double input, int dir, int more=0){\n";
-   // o______ "unreachable();\n";
-    o______ "return false;\n";
-    o____ "}\n";
 
     make_tr_eval(o);
 
@@ -194,13 +189,7 @@ private:
     o______ "_in[0] = input;\n";
     o______ "return false;\n"; // ?
     o____ "}\n";
-    o__ "}"<< _code_name <<";\n";
-  }
-  void make_cc_precalc(std::ostream& o)const override{
-    make_tag(o);
-    o__ "class cls" << _code_name << "{\n";
-    o__ "public:\n";
-    o____ "bool precalc(PRECALC_" << _m->identifier() << "* d,\n";
+    o____ "bool precalc(MOD_" << _m->identifier() << "* d,\n";
     o____ "             double input, int dir, int more=0) {\n";
     o______ "return false;\n";
     o____ "}\n";

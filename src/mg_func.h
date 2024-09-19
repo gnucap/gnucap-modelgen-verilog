@@ -53,6 +53,7 @@ public: // characteristics
   std::string const& key()const { return label(); } // free?
   void set_num_args(size_t n){ _num_args = n; }
   size_t num_args() const { return _num_args; }
+  virtual bool has_precalc()const   {return false;}
   virtual bool has_tr_begin()const  {return false;}
   virtual bool has_tr_eval()const   {return true;}
   virtual bool has_tr_review()const {return false;}
@@ -69,7 +70,6 @@ public: // code generation
   virtual void make_cc_impl(std::ostream&)const {}
   virtual void make_cc_common(std::ostream&)const {}
   virtual void make_cc_dev(std::ostream&)const {}
-  virtual void make_cc_precalc(std::ostream&)const {}
   virtual void make_cc_tr_advance(std::ostream&)const {}
   virtual void make_cc_tr_review(std::ostream&)const {}
 
@@ -125,9 +125,8 @@ public:
 	  unreachable();
 	  return "filt";
   }
-  bool is_standalone()const {
-    return _output;
-  }
+  bool has_precalc()const override { return true;}
+  bool is_standalone()const { return _output; }
 private:
   virtual Branch* branch() const {return NULL;}
   void setup(Module*)override;
