@@ -72,6 +72,7 @@ private:
   void make_stmt       (std::ostream& o, Statement const& a)const;
   void make_block      (std::ostream& o, Block const& s)const;
 private:
+  void make_af_tparam  (std::ostream& o, const Analog_Function& f)const;
   void make_af_args    (std::ostream& o, const Analog_Function& f)const;
   void make_af_body    (std::ostream& o, const Analog_Function& f)const;
   void make_cond       (std::ostream& o, AnalogConditionalStmt const& s)const;
@@ -468,6 +469,9 @@ void OUT_ANALOG::make_af(std::ostream& o, const Analog_Function& f) const
   auto mp = prechecked_cast<Module const*>(f.owner());
   assert(mp);
   auto& m = *mp;
+  o << "template<";
+  make_af_tparam(o, f);
+  o << "class X>\n";
   o << "COMMON_" << m.identifier() << "::";
   o << "ddouble COMMON_" << m.identifier() << "::" << f.code_name() << "(\n";
   o << "            ";
@@ -484,10 +488,27 @@ void OUT_ANALOG::make_af(std::ostream& o, const Analog_Function& f) const
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+void OUT_ANALOG::make_af_tparam(std::ostream& o, const Analog_Function& f) const
+{
+  int n = 0;
+  for (Base const* x : f.header()){
+    auto coll =  prechecked_cast<AF_Arg_List const*>( x);
+    assert(coll);
+    for(auto i : *coll){
+      (void) i;
+      if(coll->is_output()){
+	o << "class D"<<++n<<", ";
+      }else{
+      }
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_af_args(std::ostream& o, const Analog_Function& f) const
 {
   std::string sep = "";
   std::string qual = "";
+  int n = 0;
   for (Base const* x : f.header()){
     auto coll =  prechecked_cast<AF_Arg_List const*>( x);
     assert(coll);
@@ -497,7 +518,12 @@ void OUT_ANALOG::make_af_args(std::ostream& o, const Analog_Function& f) const
       qual = "";
     }
     for(auto i : *coll){
-      o << sep << "ddouble " << qual;
+      if(coll->is_output()){
+	o << sep << "D" << ++n << "& ";
+      }else{
+	qual = "";
+	o << sep << "ddouble " << qual;
+      }
       //o << " af_arg_" << i->identifier();
       o << " _v_" << i->name(); // code_name?
       sep = ", ";

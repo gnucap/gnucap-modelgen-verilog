@@ -1696,22 +1696,39 @@ public:
     o << "//incomplete: af common\n";
     assert(_af);
     auto& F = *_af;
+    int n = 0;
+
+    o__ "template<";
+    for (Base const* x : F.header()){
+      auto coll = prechecked_cast<AF_Arg_List const*>(x);
+      assert(coll);
+
+      for(auto i : *coll){
+	if(coll->is_output()){
+	  o << "class D" << ++n << ", ";
+	}else{
+	}
+	o << "/*" << i->name() << "*/";
+      }
+    }
+    o << "class X=void>\n";
     o__ "ddouble " << F.code_name() << "(";
     trace1("af::make_cc_common", label());
     // BUG? make_cc_af_args
     std::string sep = "";
     std::string qual = "";
+    n = 0;
     for (Base const* x : F.header()){
       auto coll = prechecked_cast<AF_Arg_List const*>(x);
       assert(coll);
 
-      if(coll->is_output()){
-	qual = "/*output*/ &";
-      }else{
-	qual = "";
-      }
       for(auto i : *coll){
-	o << sep << "ddouble " << qual;
+	if(coll->is_output()){
+	  qual = "/*output*/ &";
+	  o << sep << "D" << ++n << "& ";
+	}else{
+	  o << sep << "ddouble ";
+	}
 	o << "/*" << i->name() << "*/";
 	sep = ", ";
       }
