@@ -1,4 +1,4 @@
-
+# MakeList for mgvams
 PACKAGE = mgvams
 
 TARGET = \

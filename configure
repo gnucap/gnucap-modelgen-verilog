@@ -11,49 +11,92 @@ echo $0 "$@" >> config.log
 # stale. from previous snapshot.
 find . -name makefile -delete
 #-------------  Stuff added to enable --prefix  --------------
-if test "x$1" != "x"; then
-    # echo Found input parameter -- $1
-    #  Now see if the parameter is --prefix=
-    if test "x${1#--prefix=}" != "x$1"; then
-        # echo "Found --prefix in input args.  Setting prefix directory."
-        prefix=${1#--prefix=}
-	     prefix_given=yes
-    else
-        # echo "Found unrecognized parameter in input args."
-        #  Just use the default prefix dir.
-        prefix=/usr/local
-    fi
- 
-else
-    # echo "No input parameter found."
-    #  Just use the default prefix dir
-	 prefix=/usr/local
-fi
-
-echo prefix is $prefix
-
+prefix=/usr/local
+prefix_given=no
+srcdir_given=no
+top_srcdir_given=no
+top_builddir_given=no # this is where gnucap was built.
+preset=
+force_in_tree=no
 srcdir=$(dirname $0)
+top_srcdir=$(dirname $0)
+submodules=
+
+while [ 0 -ne $# ]; do
+	case "$1" in
+		--prefix=*)
+			  prefix=${1#--prefix=}
+			  prefix_given=yes
+			  ;;
+		--enable-debug)
+			  preset=Debug
+			  ;;
+		--enable-submodules)
+			  submodules="yes"
+			  ;;
+		--disable-submodules)
+			  submodules="no"
+			  ;;
+		--srcdir=*)
+			  srcdir=${1#--srcdir=}
+			  srcdir_given=yes
+			  ;;
+		--top-srcdir=*)
+			  top_srcdir=${1#--top-srcdir=}
+			  top_srcdir_given=yes
+			  ;;
+		--top-builddir=*)
+			  top_builddir=${1#--top-builddir=}
+			  top_builddir_given=yes
+			  ;;
+		--force-in-tree)
+			  force_in_tree=yes
+			  ;;
+		--preset=*)
+			  preset=${1#--preset=}
+			  ;;
+		*)
+			echo unrecognised: "$1"
+			;;
+	esac
+	shift
+done
+#----------------------------------------------------------------
+if [ x$top_builddir_given = xno ]; then
+	: #OK
+elif [ "$top_builddir" = "${top_builddir%~*}" ]; then
+	: #OK
+else
+	top_builddir=${HOME}/${top_builddir#\~}
+fi
+#----------------------------------------------------------------
+# # delegate. later.
+# if [ $top_srcdir_given = yes ]; then
+# 	exec $top_srcdir/configure --top-srcdir="$top_srcdir" --prefix="prefix" --srcdir="$srcdir" --preset="${preset}"
+# else
+# 	:
+# fi
+#----------------------------------------------------------------
 # abs_srcdir=$(cd $srcdir; pwd)
-if [ ! -f $srcdir/NEWS ]; then
+if [ -f $srcdir/NEWS ]; then
+	: # OK
+elif [ $srcdir_given = "yes" ]; then
+	: # OK
+else
 	echo could not find source directory
 	exit 1
 fi
 #----------------------------------------------------------------
-#SUBDIRS="src mgvams mgsim vams tests" # BUG, already in Make1.
-MAKE1_SUBDIRS=$(grep -m 1 SUBDIRS $srcdir/Make1 | sed 's/^.*= //g')
+MAKE1_SUBDIRS=$(grep -m 1 SUBDIRS $srcdir/MakeList | sed 's/^.*= //g')
 SUBDIRS="${MAKE1_SUBDIRS}"
 #----------------------------------------------------------------
-
-echo \# created by $PWD/$0. do not edit >makefile
-echo \#------------------------------------------------------------------------ >>makefile
-echo "srcdir = $srcdir" >> makefile
-echo "VPATH = \${srcdir}" >> makefile
-cat $srcdir/Makefile.in >> makefile
+# echo \# created by $PWD/$0. do not edit >Makefile
+# echo \#------------------------------------------------------------------------ >>Makefile
+# echo "srcdir = $srcdir" >> Makefile
+# echo "VPATH = \${srcdir}" >> Makefile
+# echo 'include ${srcdir}/MakeList' >> Makefile
+# cat $srcdir/Makefile.in >> Makefile
 #----------------------------------------------------------------
-echo "CCFLAGS = \\" >Make.ccflags
-echo "-DUNIX -O2 -DNDEBUG -I. -I../include -I../../include -W" >>Make.ccflags
-
-#------------------------------------------------------------------------
 # LDFLAGS="-rdynamic"
 #------------------------------------------------------------------------
 cat <<CAT_EOF >Make.sys
@@ -63,17 +106,55 @@ TARGET_EXT =
 
 
 .SUFFIXES : .o .cc
-.cc.o:; \$(CXX) \$(CCFLAGS) -c \$< # configure/Make2
 #------------------------------------------------------------------------
 CAT_EOF
 
-echo \# created by $PWD/$0. do not edit >Make2
-echo \#------------------------------------------------------------------------ >>Make2
-echo "CXX = c++" >>Make2
-echo "PREFIX = " $prefix >>Make2
-echo "LDFLAGS = $LDFLAGS "`${gnucap_conf} --ldflags` >>Make2
-cat Make.ccflags Make.sys >>Make2
-rm Make.ccflags Make.sys
+echo \# created by $PWD/$0. do not edit >MakeConf
+echo \#------------------------------------------------------------------------ >>MakeConf
+echo "CXX = c++" >>MakeConf
+echo "PREFIX = " $prefix >>MakeConf
+
+if [ x$top_builddir_given = xno ]; then
+#	echo "c.o:; \$(CXX) \$(CCFLAGS) -c \$< # configure/MakeConf" >> MakeConf
+
+	echo 'CXX = $(shell $(GNUCAP_CONF) --cxx)' >> MakeConf
+
+	echo 'GNUCAP_CONF = gnucap-conf' >> MakeConf
+	echo 'GNUCAP_CPPFLAGS = $(shell $(GNUCAP_CONF) --cppflags) -DPIC' >> MakeConf
+	echo 'GNUCAP_CXXFLAGS = $(shell $(GNUCAP_CONF) --cxxflags)' >> MakeConf
+	echo 'GNUCAP_LDFLAGS = $(shell $(GNUCAP_CONF) --ldflags)' >> MakeConf
+	echo 'GNUCAP_LIBDIR = $(shell $(GNUCAP_CONF) --libdir)' >> MakeConf
+	echo 'GNUCAP_LIBS = $(shell $(GNUCAP_CONF) --libs)' >> MakeConf
+	echo 'GNUCAP_PKGLIBDIR = $(shell $(GNUCAP_CONF) --pkglibdir)' >> MakeConf
+	echo 'GNUCAP_INCLUDEDIR = $(shell $(GNUCAP_CONF) --includedir)' >> MakeConf
+	echo 'GNUCAP_EXEC_PREFIX = $(shell $(GNUCAP_CONF) --exec-prefix)' >> MakeConf
+
+	echo "LDFLAGS = $LDFLAGS "`${gnucap_conf} --ldflags` >>MakeConf
+	echo "INCLUDE = -I ${srcdir}/../src" >> MakeConf
+
+else
+	echo "LDFLAGS = $LDFLAGS -L${top_builddir}/lib" >>MakeConf
+	echo "GNUCAP_LIBDIR = ${top_builddir}/lib" >>MakeConf
+
+	if [ "${top_srcdir%.*}" = "${top_srcdir}" ]; then
+		echo "top_srcdir = ${top_srcdir}# absolute" >> MakeConf
+	else
+		echo "top_srcdir = ../${top_srcdir}# relative" >> MakeConf
+	fi
+	echo "GNUCAP_INCLUDEDIR = \${top_srcdir}/include" >> MakeConf
+	echo "INCLUDE = -I ../${srcdir}/src -I \${GNUCAP_INCLUDEDIR}" >> MakeConf
+fi
+
+if [ "$preset" ]; then
+	echo "PRESET = ${preset}" >>MakeConf
+	echo "PRESET_CONF_FILE = \${GNUCAP_INCLUDEDIR}/MakeConf.\${PRESET}" >> MakeConf
+	echo 'include ${PRESET_CONF_FILE}' >> MakeConf
+else
+	: # not ready yet
+fi
+
+cat Make.sys >>MakeConf
+rm Make.sys
 #------------------------------------------------------------------------
 case $srcdir in
 	[\\/]* | ?:[\\/]*)
@@ -86,6 +167,48 @@ case $srcdir in
 		top_srcdir_="../$srcdir"
 		;;
 esac
+#------------------------------------------------------------------------
+out_of_tree=yes
+top_srcdir_=top_srcdir
+case $srcdir in
+	[\\/]* | ?:[\\/]*)
+		top_srcdir_="$srcdir"
+		;;
+	\.)
+		top_srcdir_=".."
+		out_of_tree=no
+		;;
+	*)
+		top_srcdir_="../$srcdir"
+		;;
+esac
+#----------------------------------------------------------------
+sub_makefile() {
+	m="$1"
+	echo sub_makefile $1
+	echo \# created by $0 do not edit >$1
+	echo \#------------------------------------------------------------------------ >> $1
+	echo "top_srcdir = $top_srcdir" >> $1
+	echo "srcdir = $srcdir" >> $1
+#	echo "srcdir = $top_srcdir_/$1" >> $m # BUG
+	echo "VPATH = \${srcdir}" >> $1
+	echo "include \${srcdir}/MakeList" >> $1
+	echo "include ../MakeConf" >> $1
+	echo "include \${srcdir}/../MakeBase" >> $1
+	[ -f ${srcdir}/Make.depend ] && \
+	echo "include \${srcdir}/Make.depend" >> $1
+}
+#------------------------------------------------------------------------
+if [ -f $srcdir/Makefile.in ]; then
+	echo \# created by $PWD/$0. do not edit >Makefile
+	echo \#------------------------------------------------------------------------ >>Makefile
+	echo "srcdir = $srcdir" >> Makefile
+	echo "VPATH = \${srcdir}" >> Makefile
+	# echo "SUBMODULES = ${SUBMODULES}" >> Makefile
+	cat $srcdir/Makefile.in >> Makefile
+else
+	sub_makefile Makefile
+fi
 #------------------------------------------------------------------------
 sub_configure() {
 	echo sub_configure $1
@@ -103,28 +226,36 @@ sub_configure() {
 	echo '.PHONY: all' >> $m
 }
 #------------------------------------------------------------------------
-sub_makefile() {
+sub_configure() {
 	m="$1/Makefile"
-	echo sub_makefile $m
-	echo \# created by $0 do not edit >$m
-	echo \#------------------------------------------------------------------------ >> $m
+	echo creating $m
+	if [ "$top_srcdir_" = ".." ]; then
+		srcdir_=".";
+	else
+		srcdir_="$top_srcdir_/$1";
+	fi
+	echo '#stub. need to run configure first' > $m
 	echo "top_srcdir = $top_srcdir_" >> $m
-	echo "srcdir = $top_srcdir_/$1" >> $m
-	echo "VPATH = \${srcdir}" >> $m
-	echo "include \${srcdir}/Make1" >> $m
-	echo "include ../Make2" >> $m
-	echo "include $top_srcdir_/Make3" >> $m
-	[ -f ${srcdir}/${1}/Make.depend ] && \
-	echo "include \${srcdir}/Make.depend" >> $m
+	echo "top_builddir = .." >> $m
+	echo "srcdir = $srcdir_" >> $m
+	echo "prefix = $prefix" >> $m
+	echo 'CONFIGURE_ARGS = --prefix="${prefix}" --srcdir="${srcdir}" \\' >> $m
+	echo '                 --top-builddir="${top_builddir}" --top-srcdir="${top_srcdir}"' >> $m
+
+	if [ -f $srcdir/$i/configure ]; then
+		echo 'CONFIGURE = "${srcdir}/configure"' >> $m
+	else
+		echo 'CONFIGURE = "${top_srcdir}/configure"' >> $m
+	fi
+
+	echo '%: ; ${CONFIGURE} ${CONFIGURE_ARGS} && ${MAKE} $@' >> $m
+	echo 'all: ; ${CONFIGURE} ${CONFIGURE_ARGS} && ${MAKE}' >> $m
+	echo '.PHONY: all' >> $m
 }
 #------------------------------------------------------------------------
 for i in ${SUBDIRS}; do
 	mkdir -p $i;
-	if [ -f $srcdir/$i/configure ]; then
-		sub_configure $i;
-	else
-		sub_makefile $i;
-	fi
+	sub_configure $i;
 done
-
+#------------------------------------------------------------------------
 exit 0

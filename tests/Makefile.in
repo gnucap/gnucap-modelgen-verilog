@@ -3,6 +3,8 @@
 #srcdir = @SRCDIR@
 #top_srcdir = @TOP_SRCDIR@
 
+# TODO
+GNUCAP_CONF = gnucap-conf
 CXX = $(shell $(GNUCAP_CONF) --cxx)
 GNUCAP_CPPFLAGS = $(shell $(GNUCAP_CONF) --cppflags) -DADD_VERSION -DPIC
 GNUCAP_CXXFLAGS = $(shell $(GNUCAP_CONF) --cxxflags) -std=c++11
@@ -12,8 +14,8 @@ SYMLINKS = ${PWD}/disciplines.vams ${PWD}/constants.vams ${PWD}/sub
 LN_S = ln -sf
 DIFF = diff -rup
 
-include ${srcdir}/Make1
-# include Make3?
+include ${srcdir}/MakeList
+include ../MakeConf
 all: ${TEST_PLUGINS}
 TESTCASES =
 REFDIR = ref
@@ -23,8 +25,10 @@ TARGETDIR = check
 
 ref = ${REFDIR}
 
-include ${srcdir}/Make3
-include ${top_srcdir}/Make3
+include ${srcdir}/MakeBase
+include ${srcdir}/../MakeBase
+
+makefiles: Makefile
 
 .PHONY: ${diff} ${v_out} ${gc_out} ${pp_out} ${dump_out} check diff prep
 .DELETE_ON_ERROR:

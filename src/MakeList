@@ -21,7 +21,9 @@
 # 02110-1301, USA.
 #------------------------------------------------------------------------
 TARGET = gnucap-mg-vams
+TARGET_EXE = gnucap-mg-vams
 TARGET_LIBS = -lgnucap
+LIBS = -lgnucap # used in MakeConf.default
 #------------------------------------------------------------------------
 # BUG
 all: ${TARGET}
@@ -89,7 +91,7 @@ m_expression_dump.cc
 RAW_HDRS = mg_.h mg_out.h
 INSTALL_HDRS = m_va.h e_va.h
 #------------------------------------------------------------------------
-RAW_OTHER = Make1 Make2.g++ Make2.Debug Make2.mingw32 configure
+RAW_OTHER = MakeList
 #------------------------------------------------------------------------
 RAW = $(RAW_HDRS) $(RAW_SRCS) $(RAW_OTHER)
 #------------------------------------------------------------------------

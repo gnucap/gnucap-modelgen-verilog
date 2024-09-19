@@ -153,7 +153,7 @@ private: // overrides
     trace3("instance spbn", long_label(), name, value);
     _params.push_back(std::make_pair(name, value));
     // mutable_common()->set_param_by_name(name, value); // ?
-    return _params.size()-1; // incomplete.
+    return int(_params.size())-1; // incomplete.
   }
   std::string param_name(int i, int j) const override { untested();
     if(j==0){ untested();
@@ -809,7 +809,9 @@ class CLEANUP : public CMD {
       exit(0);
       break;
     case rINTERACTIVE:untested();
+	// fall through
     case rSCRIPT:untested();
+	// fall through
     case rBATCH:        command("clear", Scope); exit(0); break;
     case rPRESET:       untested(); /*nothing*/ break;
     }

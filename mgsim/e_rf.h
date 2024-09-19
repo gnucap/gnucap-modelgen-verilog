@@ -41,7 +41,7 @@ class poly {
   typedef c_t::const_iterator const_iterator;
   c_t _c;
 public:
-  explicit poly(poly const& p) : _c(p._c) {}
+  poly(poly const& p) : _c(p._c) {}
   explicit poly(int degree) : _c(degree+1, 0.) { }
   explicit poly(COMPLEX c0=1.) : _c(1) { _c[0] = c0; }
 
@@ -120,7 +120,7 @@ poly poly::operator*(COMPLEX const& o)
   for(int i=0; i<size(); ++i){
     r[i] *= o;
   }
-  return poly(r);
+  return r;
 }
 /*--------------------------------------------------------------------------*/
 poly poly::operator*(poly const& other)
@@ -132,7 +132,7 @@ poly poly::operator*(poly const& other)
       r[i+j] += _c[i] * other[j];
     }
   }
-  return poly(r);
+  return r;
 }
 /*--------------------------------------------------------------------------*/
 } // namespace

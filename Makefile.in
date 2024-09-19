@@ -2,12 +2,12 @@
 # ... for use with configure & GNU Make aka. "gmake"
 # Author: Felix Salfelder 2024
 #-----------------------------------------------------------------------------
-include ${srcdir}/Make1
-RECURSIVE_TARGETS = all install clean depend
+include ${srcdir}/MakeList
+RECURSIVE_TARGETS = all install clean depend makefiles
 #-----------------------------------------------------------------------------
 ${RECURSIVE_TARGETS:%=%-recursive}: %-recursive:
 	for i in ${SUBDIRS}; do \
-	  $(MAKE) -C $${i} $*; \
+	  $(MAKE) -C $${i} $* || exit 1; \
 	done
 #-----------------------------------------------------------------------------
 ${RECURSIVE_TARGETS}: %: %-recursive

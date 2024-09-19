@@ -1,6 +1,7 @@
-# tests Make3
+# tests MakeBase
 #
-ENV = GNUCAP_PLUGPATH=${top_builddir}:$(plugpath) top_srcdir=${top_srcdir} srcdir=${srcdir}
+ENV = GNUCAP_PLUGPATH=${top_builddir}:$(plugpath) top_srcdir=${top_srcdir} srcdir=${srcdir} \
+      LD_LIBRARY_PATH=${GNUCAP_LIBDIR}${LD_LIBRARY_PATH:%:%}
 
 glob_dump = $(shell cd ${srcdir}; ls dump*.vams)
 glob_pp = $(shell cd ${srcdir}; ls *.vapp)

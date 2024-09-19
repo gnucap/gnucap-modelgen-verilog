@@ -45,25 +45,28 @@ sed -e "s#@pkglibdir_expanded@#$pkglibdir_expanded#" \
 	       < $srcdir/config.h.in > config.h
 
 
-cat <<CAT_EOF >makefile
+cat <<CAT_EOF >Makefile
 #------------------------------------------------------------------------
 # created by $0 do not edit
 
 CXX = g++
 TARGET_EXT =
+INCLUDE =
 
 srcdir = $srcdir
 top_srcdir = $top_srcdir
 VPATH = \${srcdir}
-include \${srcdir}/Make1
+include \${srcdir}/MakeList
+
+
+include ../MakeConf
+include $top_srcdir/MakeBase # use from gnucap?
+include \${srcdir}/Make.depend
 
 \$(TARGET): \$(OBJS)
-	\$(CXX) \$(MAKE_CXXFLAGS) \$(CXXFLAGS) \$(MAKE_CPPFLAGS) \$(CPPFLAGS) \$(OBJS) -o \$@ \$(TARGET_LIBS) \$(LDFLAGS)
+#	\$(CXX) \$(MAKE_CXXFLAGS) \$(CXXFLAGS) \$(MAKE_CPPFLAGS) \$(CPPFLAGS) \$(OBJS) -o \$@ \$(TARGET_LIBS) \$(LDFLAGS)
 
-
-include ../Make2
-include $top_srcdir/Make3 # use from gnucap?
-include \${srcdir}/Make.depend
+makefiles:
 
 .DELETE_ON_ERROR:
 #------------------------------------------------------------------------
