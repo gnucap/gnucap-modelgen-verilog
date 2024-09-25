@@ -2,13 +2,18 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
-202408**-dev
+202409**-dev
 ============
+* name spaces and state variables
 * cross events
 * timer event
 * $discontinuity
+* transition filter
+* $port_connected
+* vpulse device
+* combined build with Gnucap
 
-202405**-dev
+20240702-dev
 ============
 * noise analysis fixes and test coverage
 * paramsets: emit code for prototype module last

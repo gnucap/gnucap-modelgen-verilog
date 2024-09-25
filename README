@@ -21,19 +21,14 @@ since. Generally develop branch may only work with Gnucap develop branch.
 
 == Build instructions
 
-To build the package, type
+To build the package, install Gnucap and type
 
 $ cd some_empty_directory
 $ $OLDPWD/configure
 $ make # tested with GNU Make.
 
-In-tree builds also work, but are not recommended.
-
-$ ./configure
-$ make,
-
-as this will leave files all over the place. These will interfere with
-subsequent out-of-tree builds.
+Alternatively, move the modelgen-verilog source directory into the Gnucap
+source directory, and build Gnucap following the instructions there.
 
 == Tests
 
