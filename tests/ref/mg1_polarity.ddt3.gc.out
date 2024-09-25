@@ -1,14 +1,14 @@
 polarity_ddt3 #() dut (.p(1),.n(0));
 resistor #(.r(1)) r (.p(1),.n(2));
 #Time       v(1)       v(2)       i(dut._b_ddt_1_p_ddt_1_n) i(dut._b_ddt_0_p_ddt_0_n) iter(0)    timef(dut._b_ddt_0_p_ddt_0_n) timef(dut._b_ddt_1_p_ddt_1_n) timef(v1)  timef(dut._b_p_n) timef(r)  
- 0.         0.         0.         0.         0.         3.         Inf        Inf        1.n        Inf        Inf       
- 2.n        1.         1.        -500.Meg    500.Meg    3.         3.n        3.n        4.688n     Inf        Inf       
- 3.1n       1.         1.         500.Meg   -500.Meg    3.         4.1n       4.1n       Inf        Inf        Inf       
- 4.2n       1.         1.        -500.Meg    500.Meg    3.         5.2n       5.2n       Inf        Inf        Inf       
- 5.3n       1.         1.         500.Meg   -500.Meg    3.         Inf        Inf        Inf        Inf        Inf       
+ 0.         0.         0.         0.         0.         3.         Inf        Inf        Inf        Inf        Inf       
+ 2.n        1.         1.        -500.Meg    500.Meg    25.        3.n        3.n        4.688n     Inf        Inf       
+ 3.n        1.         1.         500.Meg   -500.Meg    3.         4.n        4.n        Inf        Inf        Inf       
+ 4.n        1.         1.        -500.Meg    500.Meg    3.         5.n        5.n        Inf        Inf        Inf       
+ 5.n        1.         1.         500.Meg   -500.Meg    3.         Inf        Inf        Inf        Inf        Inf       
  1.         1.         1.        -500.Meg    500.Meg    3.         Inf        Inf        Inf        Inf        Inf       
 Gnucap   System status
-iterations: op=0, dc=0, tran=18, fourier=0, total=24
-transient timesteps: accepted=6, rejected=0, total=6
+iterations: op=0, dc=0, tran=40, fourier=0, total=53
+transient timesteps: accepted=6, rejected=7, total=13
 nodes: user=2, subckt=0, model=0, total=2
 dctran density=100.0%, ac density=100.0%

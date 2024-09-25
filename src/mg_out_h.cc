@@ -598,13 +598,17 @@ static void make_module(std::ostream& o, const Module& m)
   if(m.has_events()) {
     o__ "double new_event(double newtime, double tol) {\n";
     o____ "trace3(\"new_event\", long_label(), _sim->_time0, newtime);\n";
-    o____ "trace2(\"new_event\", long_label(), newtime - _sim->_time0);\n";
-    o____ "_sim->new_event(newtime);\n";
+    o____ "trace3(\"new_event\", long_label(), newtime - _sim->_time0, _sim->_dtmin);\n";
     o____ "if(tol) {\n";
              // not used.
     o____ "}else{\n";
     o____ "}\n";
-    o____ "return newtime;\n"; // for now
+    o____ "if(!_sim->analysis_is_dcop()) {\n";
+    o______ "assert(_sim->_dtmin);\n";
+    o______ "return _sim->new_event(newtime, this);\n";
+    o____ "}else{\n";
+    o______ "return NEVER;\n";
+    o____ "}\n";
     o__ "}\n";
   }else{
   }

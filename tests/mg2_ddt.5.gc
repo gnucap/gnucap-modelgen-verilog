@@ -1,5 +1,4 @@
 attach ./modelgen_0.so
-
 attach ../vams/isine.so
 
 verilog

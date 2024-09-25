@@ -1,8 +1,6 @@
 attach ./modelgen_0.so
 attach ../vams/isine.so
 
-
-* BUG
 * options noincmode
 
 verilog

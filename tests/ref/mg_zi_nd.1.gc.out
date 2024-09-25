@@ -4,7 +4,6 @@ test_zi_nd1 #() dut (.p(1),.n(0));
 vsine #(.ampl(1),.dc(v)) v1 (.p(1),.n(0));
 #Time       v(1)       dv1(dut)   dv2(dut)   dv3(dut)   dv4(dut)   dv5(dut)  
  0.         0.         0.         0.         0.         0.         0.        
- 0.005      0.031411   0.         0.         0.         0.         0.        
  0.01       0.062791   0.         0.         0.         0.         0.        
  0.2        0.95106    0.         0.         0.         0.         0.        
  0.21       0.96858    0.95106    1.9021     2.8532     3.8042     4.7553    
@@ -16,7 +15,7 @@ vsine #(.ampl(1),.dc(v)) v1 (.p(1),.n(0));
  0.81      -0.92978   -2.1266    -4.2533    -6.3799    -8.5065    -10.633    
  1.         14.f      -2.1266    -4.2533    -6.3799    -8.5065    -10.633    
 Gnucap   System status
-iterations: op=0, dc=0, tran=36, fourier=0, total=48
-transient timesteps: accepted=12, rejected=0, total=12
+iterations: op=0, dc=0, tran=33, fourier=0, total=44
+transient timesteps: accepted=11, rejected=0, total=11
 nodes: user=1, subckt=0, model=6, total=7
 dctran density=38.8%, ac density=38.8%

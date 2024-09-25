@@ -19,7 +19,7 @@ vsine #(.dc(v), .ampl(1)) v1(1, 0);
 
 spice
 R2  3  0  1.
-* .tcap C2  0 3  1  0  1.
+*.tcap C2  0 3  1  0  1.
 .print tran v nodes iter(0)
 .print ac vm(nodes) vp(nodes)
 .tran 1

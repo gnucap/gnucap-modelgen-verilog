@@ -112,6 +112,7 @@ private:
     o____ "void set_event(MOD_" << _m->identifier() << "* d, double abstime, double abstol) {\n";
     o______ "trace2(\"set_event\", _previous_evt, abstime);\n";
     o______ "double newtime = d->new_event(abstime, abstol);\n";
+    o______ "trace3(\"set_event1\", _previous_evt, newtime,  _previous_evt - newtime);\n";
     o______ "assert(_previous_evt <= newtime);\n"; // == at startup?
     o______ "_req_evt = newtime;\n";
     o____ "}\n";
@@ -165,8 +166,9 @@ private:
     o________ "return false;\n";
     o______ "}else if(d->_time[1] <= _req_evt) {\n";
     o________ "incomplete();\n";
-    o________ "throw Exception(to_string(_sim->_time0) + \" \" + d->long_label() + \" timer: giving up on advance at\""
-              << " + to_string(_req_evt));\n";
+   // o________ "double tol_ratio = tol / _sim->_dtmin;\n";
+   // o________ "throw Exception(to_string(_sim->_time0) + \" \" + d->long_label() + \" timer: giving up on advance at\""
+   //           << " + to_string(_req_evt) + \", \" + to_string(tol_ratio));\n";
     o________ "return false;\n";
     o______ "}else{\n";
     o________ "return false;\n";
@@ -174,9 +176,14 @@ private:
     o____ "}\n";
     /*----------------------------------------------------------------------*/
     o____ "bool tr_regress" << args() << "{\n";
-    o______ "trace3(\"timer::tr_regress\", _previous_evt, _req_evt, _sim->_time0);\n";
+    o______ "trace4(\"timer::tr_regress\", _previous_evt, _req_evt, _sim->_time0, _sim->_time0 - _previous_evt);\n";
     o______ "_req_evt = _previous_evt;\n"; // consolidate previous "tr_accept"
-    o______ "if (_sim->_time0 < _req_evt) {\n";
+    o______ "if (d->_time[1] == 0. && _sim->_time0 < _previous_evt + _sim->_dtmin) {\n";
+    o________ "trace3(\"timer::tr_regress2\", _previous_evt, _req_evt, _sim->_time0);\n";
+    o________ "_req_evt = NEVER; // _sim->_time0;\n";
+    o________ "_previous_evt = _sim->_time0;\n";
+    o________ "return true;\n";
+    o______ "}else if (_sim->_time0 < _req_evt) {\n";
     o________ "return false;\n";
     o______ "}else if (_sim->_time0 <= _req_evt + " << accept_tol() << ") {\n";
     o________ "return true;\n";
@@ -195,7 +202,14 @@ private:
     o______ "}\n";
 
     o______ "if (_sim->_time0 < _req_evt) {\n";
-    o________ "trace4(\"timer::tr_review0\", _req_evt, _sim->_time0, delay, period);\n";
+    o________ "if (d->_time[1] == 0. && _sim->_time0 < _previous_evt + _sim->_dtmin) {\n";
+    o__________ "trace4(\"timer::tr_review0 close miss1\", _req_evt, _sim->_time0, delay, period);\n";
+    o__________ "d->q_accept();\n"; // (B), overlap with (A)?
+    o________ "}else if (_sim->_time0 + _sim->_dtmin > _req_evt) { untested();\n";
+    o__________ "trace4(\"timer::tr_review0 close miss\", _req_evt, _sim->_time0, delay, period);\n";
+    o________ "}else{\n";
+    o__________ "trace4(\"timer::tr_review0\", _req_evt, _sim->_time0, delay, period);\n";
+    o________ "}\n";
     o______ "}else if (_sim->_time0 <= _req_evt + " << accept_tol() << ") {\n";
     o________ "trace2(\"timer::tr_review q accept\", _req_evt, _sim->_time0);\n";
     o________ "d->q_accept();\n"; // (B), overlap with (A)?
@@ -205,12 +219,15 @@ private:
     o________ "if (period < _sim->_time0) {\n";
     o__________ "d->_time_by.min_event(back_to);\n";
     o__________ "_previous_evt = back_to;\n";
-    o________ "}else{\n";
+    // o__________ "set_event(d, back_to, " << tol() << ");\n";
+    // o__________ "_previous_evt = _req_evt;\n";
+    o________ "}else{ untested();\n";
     o________ "}\n";
     o______ "}else if(d->_time[1] == 0. && _req_evt == 0. && period && delay) {\n";
     o________ "double back_to = delay;\n";
     o________ "trace3(\"timer::tr_review2b\", _req_evt, _sim->_time0, back_to);\n";
     o______ "}else if(d->_time[1] <= _req_evt) {\n";
+    o________ "trace4(\"timer::tr_review2a\", _req_evt, _sim->_time0, delay, period);\n";
     o________ "double back_to = _previous_evt;\n";
     o________ "trace2(\"timer::tr_review3\", period, delay);\n";
     o________ "trace4(\"timer::tr_review3\", d->_time[1], _req_evt, _sim->_time0, back_to);\n";
@@ -239,10 +256,10 @@ private:
     o________ "}\n";
     o________ "return true;\n";
     o______ "}else if(_sim->_time0 <= _previous_evt + " << accept_tol() << ") {\n";
+    o________ "trace4(\"timer::tr_accept1\", _previous_evt, _req_evt, d->_time[1], _sim->_time0);\n";
     o________ "if(period) {\n";
     o__________ "double raw_time = _sim->_time0;\n";
     o__________ "int tick = ( raw_time - delay + _sim->_dtmin) / period;\n";
-    o__________ "trace6(\"timer::tr_accept1\", raw_time, _previous_evt, _req_evt, d->_time[1], tick, _sim->_time0);\n";
     o__________ "set_event(d, delay + (tick+1)*period, " << tol() << ");\n";
     o________ "}else if(delay > _sim->_time0) {\n";
     o__________ "trace4(\"timer::tr_accept1a\", _previous_evt, _req_evt, d->_time[1], _sim->_time0);\n";
@@ -257,6 +274,7 @@ private:
     o________ "}\n";
     o________ "return true;\n";
     o______ "}else if(d->_time[1] == 0. && _req_evt == 0. && delay) {\n";
+    o________ "trace5(\"timer::tr_accept3a\", period, _previous_evt, _req_evt, d->_time[1], _sim->_time0);\n";
     o________ "set_event(d, delay, " << tol() << ");\n";
     o________ "return false;\n";
     o______ "}else if(d->_time[1] == 0. && _req_evt == 0. && !delay && period) {\n";
@@ -270,6 +288,8 @@ private:
     o________ "return false;\n";
     o______ "}else{\n";
     o________ "trace3(\"timer::tr_accept miss\", _previous_evt, _req_evt, _sim->_time0);\n";
+    o________ "trace1(\"timer::tr_accept miss\", _previous_evt - _sim->_time0);\n";
+    o________ "trace1(\"timer::tr_accept miss\", _req_evt - _sim->_time0);\n";
     o________ "return false;\n";
     o______ "}\n";
     o____ "}\n";

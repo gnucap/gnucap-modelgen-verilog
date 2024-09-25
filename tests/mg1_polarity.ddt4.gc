@@ -22,7 +22,6 @@ list
 attach ./polarity_ddt4.so
 
 polarity_ddt4 dut(1,0);
-// vsine #(.phase(-3.1415/2), .ampl(1), .freq(1)) v(1,0);
 vsine #(.phase(0), .ampl(1), .freq(1)) v(1,0);
 
 list

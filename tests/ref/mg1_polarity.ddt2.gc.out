@@ -3,9 +3,9 @@ resistor #(.r(1)) r (.p(1),.n(2));
 #Time       v(1)       v(2)       i(dut._b_ddt_1_p_ddt_1_n) i(dut._b_ddt_0_p_ddt_0_n) iter(0)   
  0.         0.         0.         0.         0.         3.        
  2.n        1.         1.        -500.Meg    500.Meg    3.        
- 3.1n       1.         1.         500.Meg   -500.Meg    3.        
- 4.2n       1.         1.        -500.Meg    500.Meg    3.        
- 5.3n       1.         1.         500.Meg   -500.Meg    3.        
+ 3.n        1.         1.         500.Meg   -500.Meg    3.        
+ 4.n        1.         1.        -500.Meg    500.Meg    3.        
+ 5.n        1.         1.         500.Meg   -500.Meg    3.        
  1.         1.         1.        -500.Meg    500.Meg    3.        
 Gnucap   System status
 iterations: op=0, dc=0, tran=18, fourier=0, total=24

@@ -118,7 +118,6 @@ public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   virtual /*?*/ Data_Type const& type()const { return _type; }
-//  std::string code_name()const override;
   void set_type(Data_Type const& d){ _type=d; }
   bool propagate_deps(Token_VAR_REF const&);
   bool propagate_rdeps(RDeps const&);
@@ -130,19 +129,15 @@ private:
   void new_data();
 public:
   String_Arg key()const { return String_Arg(name()); }
-//  void set_type(Data_Type d){ untested(); _type=d; }
   bool is_real()const { untested(); return type().is_real(); }
   bool is_int()const { untested(); return type().is_int(); }
   std::string const& identifier()const { untested();return name();}
   std::string const& name()const; //  { untested();return name();}
-  virtual std::string code_name()const;
+  virtual std::string code_name()const {unreachable(); return "";}
 
-//  virtual bool propagate_deps(Variable const&) = 0;
   virtual double eval()const { untested(); return NOT_INPUT;}
   Block const* scope() const;
-  // bool has_deps()const { untested(); return _data; }
   TData const& deps()const { assert(_data); return *_data; }
- // bool is_used_in(Base const*b)const;
   Variable_Decl* deep_copy(Base* owner, std::string prefix="") const;
   Token_VAR_REF const& token()const { assert(_token); return *_token; }
   void update();

@@ -1,0 +1,41 @@
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+
+
+verilog
+
+`modelgen
+module test_evtana0c(p, n);
+	electrical p, n;
+	inout p, n;
+	(*desc=""*) integer cnt;
+	real v;
+	analog begin
+		if(analysis("static")) begin
+			$debug("static %g\n", $abstime);
+			v = .4;
+		end else begin
+			@(timer(0., .5)) begin
+				v = 1;
+				cnt = cnt + 1;
+			end
+		end
+		V(p,n) <+ v;
+	end
+endmodule
+`endmodelgen
+
+list
+
+!make test_evtana0c.so > /dev/null
+attach ./test_evtana0c.so
+
+test_evtana0c dut0(1,0);
+
+list
+
+print tran cnt(dut0) v(1) control(0) iter(0)
+tran 1 basic
+
+end

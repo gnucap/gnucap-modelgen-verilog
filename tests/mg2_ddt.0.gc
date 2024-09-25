@@ -26,6 +26,7 @@ parameter v=0
 
 test_ddt0 #() dut(1,0);
 vsine #(.dc(v), .ampl(1)) v1(1, 0);
+//exact 12.56637061435
 
 list
 
@@ -33,5 +34,11 @@ print tran v(1) i(dut._b*) iter(0)
 print tran + d1(dut) d2(dut) d3(dut)
 tran 1 .1 trace=n
 tran 0 1 .1 trace=n
+tran 0 .5 .05 trace=n
+print tran clear
+tran 0 .4 .01 trace=n > /dev/null
+print tran v(1) i(dut._b*) iter(0)
+print tran + d1(dut) d2(dut) d3(dut)
+tran .5
 status notime
 end

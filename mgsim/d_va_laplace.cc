@@ -1133,8 +1133,6 @@ double LAPLACE::tr_amps() const
   if(_loss0){
     assert(_loss0==1.);
     assert(!_output->_loss0);
-    incomplete();
-//    r = -r; // done in _output?
   }else{ untested();
     assert(!_output->_loss0);
   }

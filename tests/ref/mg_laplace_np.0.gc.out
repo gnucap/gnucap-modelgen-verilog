@@ -13,14 +13,14 @@ vsine #(.ampl(1),.dc(v),.mag(1)) v1 (.p(1),.n(0));
  0.5       -7.f        0.11596    0.11596   
  0.6       -0.58779    0.14558    0.14558   
  0.7       -0.95106    0.15696    0.15696   
- 0.8       -0.95106    0.14696    0.14696   
- 0.9       -0.58779    0.11978    0.11978   
- 1.         13.f       0.085342   0.085342  
+ 0.8       -0.95106    0.14702    0.14702   
+ 0.9       -0.58779    0.11989    0.11989   
+ 1.         14.f       0.085484   0.085484  
 #Freq       v(1)       vp(3)      vm(3)     
  2.         1.        -170.84     0.012664  
  4.         1.        -175.44     0.0031663 
 Gnucap   System status
-iterations: op=0, dc=0, tran=279, fourier=0, total=351
-transient timesteps: accepted=65, rejected=5, total=70
+iterations: op=0, dc=0, tran=275, fourier=0, total=346
+transient timesteps: accepted=64, rejected=5, total=69
 nodes: user=2, subckt=0, model=4, total=6
 dctran density=66.7%, ac density=44.4%

@@ -25,8 +25,6 @@
 #include "mg_token.h" // TData
 #include "mg_options.h" // TData
 /*--------------------------------------------------------------------------*/
-Dep mg_const_dep(NULL);
-/*--------------------------------------------------------------------------*/
 bool ConstantMinTypMaxExpression::empty() const
 {
   return _e.is_empty();
@@ -37,9 +35,6 @@ bool Module::has_submodule() const
   assert(circuit());
   return !circuit()->element_list().is_empty();
 }
-/*--------------------------------------------------------------------------*/
-#if 1
-#endif
 /*--------------------------------------------------------------------------*/
 Branch_Ref Branch_Map::new_branch(Branch_Ref const& b, std::string name)
 {
@@ -96,12 +91,6 @@ Branch_Ref Module::new_branch(Node* p, Node* n = NULL)
   assert(br);
   assert(((Branch const*) br)->owner() == this);
   return br;
-}
-/*--------------------------------------------------------------------------*/
-size_t Module::num_branches() const
-{ untested();
-  assert(_circuit);
-  return _circuit->branches().size();
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
@@ -229,224 +218,6 @@ std::string Filter::code_name()const
   return "_f_" + _name; // name()?
 }
 /*--------------------------------------------------------------------------*/
-// number of *all* branches in the module.
-size_t Filter::num_branches() const
-{ untested();
-  return 0;
-}
-/*--------------------------------------------------------------------------*/
-bool Branch::is_detached_filter() const
-{
-  auto f = dynamic_cast<MGVAMS_FILTER const*>( _ctrl);
-  return f && f->is_standalone();
-}
-/*--------------------------------------------------------------------------*/
-void Branch::new_deps()
-{
-  assert(!_deps);
-  _deps = new TData;
-  assert(_deps->is_linear());
-}
-/*--------------------------------------------------------------------------*/
-size_t Branch::num_branches() const
-{ untested();
-  auto m = prechecked_cast<Module const*>(owner());
-  assert(m);
-  return m->num_branches();
-}
-/*--------------------------------------------------------------------------*/
-void Branch::add_dep(Dep const& b)
-{
-//  if(b->branch() == this){ untested();
-//    _selfdep = true;
-//  }else{ untested();
-//  }
-  // TODO incomplete(); // linear?
-//  b->branch()->inc_use();
-  deps().insert(b);
-}
-/*--------------------------------------------------------------------------*/
-bool Branch::has_pot_probe() const
-{
-  return _has_pot_probe;
-}
-/*--------------------------------------------------------------------------*/
-bool Branch::has_flow_probe() const
-{
-  return _has_flow_probe;
-}
-/*--------------------------------------------------------------------------*/
-bool Branch::is_generic()const
-{
-  if(!is_direct()){
-    if(has_pot_source()){
-      return true;
-    }else{ untested();
-      incomplete();
-    }
-  }else if(has_flow_probe()){
-    // return _selfdep;
-  }else if(has_pot_source()){
-    if(_selfdep){
-      return true;
-    }else{
-    }
-  }else if(has_flow_source()){
-  }else{ untested();
-  }
-  return false;
-}
-/*--------------------------------------------------------------------------*/
-std::string Branch::dev_type()const
-{
-//  if( .. attribute .. )?
-  if(is_filter()) {
-    std::string label = "va_" + _ctrl->label();
-    auto pos = label.find_last_of("_");
-    return label.substr(0, pos);
-  }else if(!is_direct()){
-    if(has_pot_source()){
-      return "va_pot_br";
-    }else{ untested();
-      return "incomplete_dev_type";
-    }
-  }else if(has_flow_probe()) {
-    return "va_sw"; // ?
-  }else if(has_pot_source()){
-    if(_selfdep){
-      return "va_pot_br";
-    }else if(has_always_pot() && !has_flow_source()) {
-      return "va_pot";
-    }else{
-      return "va_sw";
-    }
-  }else if(has_flow_source()){
-    return "va_flow";
-  }else{ untested();
-    return "va_sw";
-  }
-  unreachable();
-  return "";
-}
-/*--------------------------------------------------------------------------*/
-Branch_Ref::Branch_Ref(Branch_Ref const& b)
-    : Base(),
-      _br(b._br),
-      _r(b._r)
-{
-  if(_br){
-    _br->attach(this);
-  }else{ untested();
-  }
-}
-/*--------------------------------------------------------------------------*/
-Branch_Ref::Branch_Ref(Branch_Ref&& b)
-    : Base(),
-      _br(b._br),
-      _r(b._r)
-{
-  if(_br){
-    _br->attach(this);
-  }else{ untested();
-  }
-}
-/*--------------------------------------------------------------------------*/
-Branch_Ref::Branch_Ref(Branch* b, bool reversed)
-  : _br(b), _r(reversed)
-{
-  if(_br){
-    _br->attach(this);
-  }else{
-  }
-}
-/*--------------------------------------------------------------------------*/
-Branch_Ref::Branch_Ref(Named_Branch* b)
-  : _br(b), _r(b->is_reversed())
-{
-  if(_br){
-    _br->attach(this);
-  }else{ untested();
-  }
-}
-/*--------------------------------------------------------------------------*/
-Branch_Ref::~Branch_Ref()
-{
-  if(_br){
-    _br->detach(this);
-    _br = NULL;
-  }else{
-  }
-}
-/*--------------------------------------------------------------------------*/
-std::string Branch_Ref::code_name()const
-{
-  assert(_br);
-//  if(has_name()){ untested();
-//    return "_br_" + *_name;
-//  }else{ untested();
-  return _br->code_name();
-//  }
-}
-/*--------------------------------------------------------------------------*/
-// void Branch_Ref::set_name(std::string const& n)
-// { untested();
-//   assert(!has_name());
-//   assert(_br);
-//   _name = _br->reg_name(n);
-// }
-/*--------------------------------------------------------------------------*/
-Branch_Ref& Branch_Ref::operator=(Branch_Ref&& o)
-{
-  operator=(o);
-
-  if(_br) {
-//    assert(_br->has(this));
-  }else{
-  }
-  return *this;
-}
-/*--------------------------------------------------------------------------*/
-Branch_Ref& Branch_Ref::operator=(Branch_Ref const& o)
-{
-  if(_br) { untested();
-    _br->detach(this);
-  }else{
-  }
-
-  _br = o._br;
-  _r = o._r;
-  //_name = o._name;
-
-  if(_br) {
-    _br->attach(this);
-  }else{
-  }
-
-  return *this;
-}
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-// has_source? is_source?
-bool Branch::has_element() const
-{
-  if(is_short()){
-    return false;
-  }else if( has_flow_source() ){
-    return true;
-  }else if( has_pot_source() ){
-    return true;
-  }else if( has_flow_probe() ){
-    return true;
-  }else{
-    return false;
-  }
-}
-/*--------------------------------------------------------------------------*/
-bool Branch::has_pot_source() const
-{
-  return _has_pot_src; //  || _has_flow_probe;
-}
-/*--------------------------------------------------------------------------*/
 size_t Filter::num_states() const
 {
   return size_t(_num_states);
@@ -561,20 +332,6 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args)
   }
 
   return t;
-}
-/*--------------------------------------------------------------------------*/
-// std::string Variable_Decl::code_name() const
-std::string Variable_Decl::code_name() const
-{ untested();
-  if(is_real()){ untested();
-    return "_v_" + name();
-  }else if(is_int()){ untested();
-    return "_v_" + name();
-  }else{ untested();
-    return "_v_" + name();
-  }
-  incomplete();
-  return name(); //?
 }
 /*--------------------------------------------------------------------------*/
 void Branch::set_direct(bool d)

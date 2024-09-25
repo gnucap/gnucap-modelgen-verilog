@@ -149,5 +149,210 @@ bool Branch::is_used()const
   }
 }
 /*--------------------------------------------------------------------------*/
+bool Branch::is_detached_filter() const
+{
+  auto f = dynamic_cast<MGVAMS_FILTER const*>( _ctrl);
+  return f && f->is_standalone();
+}
+/*--------------------------------------------------------------------------*/
+void Branch::new_deps()
+{
+  assert(!_deps);
+  _deps = new TData;
+  assert(_deps->is_linear());
+}
+/*--------------------------------------------------------------------------*/
+void Branch::add_dep(Dep const& b)
+{
+//  if(b->branch() == this){ untested();
+//    _selfdep = true;
+//  }else{ untested();
+//  }
+  // TODO incomplete(); // linear?
+//  b->branch()->inc_use();
+  deps().insert(b);
+}
+/*--------------------------------------------------------------------------*/
+bool Branch::has_pot_probe() const
+{
+  return _has_pot_probe;
+}
+/*--------------------------------------------------------------------------*/
+bool Branch::has_flow_probe() const
+{
+  return _has_flow_probe;
+}
+/*--------------------------------------------------------------------------*/
+bool Branch::is_generic()const
+{
+  if(!is_direct()){
+    if(has_pot_source()){
+      return true;
+    }else{ untested();
+      incomplete();
+    }
+  }else if(has_flow_probe()){
+    // return _selfdep;
+  }else if(has_pot_source()){
+    if(_selfdep){
+      return true;
+    }else{
+    }
+  }else if(has_flow_source()){
+  }else{ untested();
+  }
+  return false;
+}
+/*--------------------------------------------------------------------------*/
+std::string Branch::dev_type()const
+{
+//  if( .. attribute .. )?
+  if(is_filter()) {
+    std::string label = "va_" + _ctrl->label();
+    auto pos = label.find_last_of("_");
+    return label.substr(0, pos);
+  }else if(!is_direct()){
+    if(has_pot_source()){
+      return "va_pot_br";
+    }else{ untested();
+      return "incomplete_dev_type";
+    }
+  }else if(has_flow_probe()) {
+    return "va_sw"; // ?
+  }else if(has_pot_source()){
+    if(_selfdep){
+      return "va_pot_br";
+    }else if(has_always_pot() && !has_flow_source()) {
+      return "va_pot";
+    }else{
+      return "va_sw";
+    }
+  }else if(has_flow_source()){
+    return "va_flow";
+  }else{ untested();
+    return "va_sw";
+  }
+  unreachable();
+  return "";
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref::Branch_Ref(Branch_Ref const& b)
+    : Base(),
+      _br(b._br),
+      _r(b._r)
+{
+  if(_br){
+    _br->attach(this);
+  }else{ untested();
+  }
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref::Branch_Ref(Branch_Ref&& b)
+    : Base(),
+      _br(b._br),
+      _r(b._r)
+{
+  if(_br){
+    _br->attach(this);
+  }else{ untested();
+  }
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref::Branch_Ref(Branch* b, bool reversed)
+  : _br(b), _r(reversed)
+{
+  if(_br){
+    _br->attach(this);
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref::Branch_Ref(Named_Branch* b)
+  : _br(b), _r(b->is_reversed())
+{
+  if(_br){
+    _br->attach(this);
+  }else{ untested();
+  }
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref::~Branch_Ref()
+{
+  if(_br){
+    _br->detach(this);
+    _br = NULL;
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+std::string Branch_Ref::code_name()const
+{
+  assert(_br);
+//  if(has_name()){ untested();
+//    return "_br_" + *_name;
+//  }else{ untested();
+  return _br->code_name();
+//  }
+}
+/*--------------------------------------------------------------------------*/
+// void Branch_Ref::set_name(std::string const& n)
+// { untested();
+//   assert(!has_name());
+//   assert(_br);
+//   _name = _br->reg_name(n);
+// }
+/*--------------------------------------------------------------------------*/
+Branch_Ref& Branch_Ref::operator=(Branch_Ref&& o)
+{
+  operator=(o);
+
+  if(_br) {
+//    assert(_br->has(this));
+  }else{
+  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref& Branch_Ref::operator=(Branch_Ref const& o)
+{
+  if(_br) { untested();
+    _br->detach(this);
+  }else{
+  }
+
+  _br = o._br;
+  _r = o._r;
+  //_name = o._name;
+
+  if(_br) {
+    _br->attach(this);
+  }else{
+  }
+
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+// has_source? is_source?
+bool Branch::has_element() const
+{
+  if(is_short()){
+    return false;
+  }else if( has_flow_source() ){
+    return true;
+  }else if( has_pot_source() ){
+    return true;
+  }else if( has_flow_probe() ){
+    return true;
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool Branch::has_pot_source() const
+{
+  return _has_pot_src; //  || _has_flow_probe;
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet
