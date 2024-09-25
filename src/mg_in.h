@@ -55,7 +55,7 @@ class File : public Block {
   Paramset_List   _paramset_list;
 public: // build
   File();
-  ~File(){ }
+  ~File();
 
   void read(std::string const&);
   void parse(CS& f) override;

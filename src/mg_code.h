@@ -235,7 +235,6 @@ public:
   void parse(CS& f)override;
   void dump(std::ostream& o)const override;
   double value() const;
-  void resolve();
 };
 /*--------------------------------------------------------------------------*/
 class Sensitivities;

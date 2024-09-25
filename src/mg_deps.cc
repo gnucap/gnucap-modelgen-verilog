@@ -121,6 +121,11 @@ void TData::update(TData const& other)
   }
   trace1("update", other.sensitivities().empty());
   _sens.merge(other.sensitivities());
+
+  if(other.is_constant()){
+  }else{
+    set_constant(false);
+  }
 }
 /*--------------------------------------------------------------------------*/
 TData::~TData()

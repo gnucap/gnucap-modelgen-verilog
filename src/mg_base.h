@@ -1,3 +1,24 @@
+/*                             -*- C++ -*-
+ * Copyright (C) 2001, 2023 Albert Davis
+ *               2023, 2024 Felix Salfelder
+ *
+ * This file is part of "Gnucap", the Gnu Circuit Analysis Package
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+ */
 
 #ifndef MG_BASE_H
 #define MG_BASE_H
@@ -5,6 +26,7 @@
 #include <e_base.h>
 #include <l_indirect.h>
 #include <u_attrib.h>
+#include "mg_error.h"
 /*--------------------------------------------------------------------------*/
 class ckt_attr : protected CKT_BASE{
 public:
@@ -281,7 +303,19 @@ public:
     size_t here = file.cursor();
     T* m = new T;
     m->set_owner(_owner);
-    file >> *m;
+    try{
+      file >> *m;
+    }catch(Exception_CS_ const& e){
+      // really?
+      //delete m;
+      push_back(m);
+      throw e;
+    }catch(Exception const& e){
+      // really?
+      push_back(m);
+      throw e;
+    }
+
     if (!file.stuck(&here)) {
       push_back(m);
       file.skip(0); // set _ok;

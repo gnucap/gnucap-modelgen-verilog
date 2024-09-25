@@ -62,6 +62,7 @@ public:
 
   String_Arg key()const { return String_Arg("ValueRange"); }
 };
+/*--------------------------------------------------------------------------*/
 typedef LiSt<ValueRange, '\0', '\0', '\0', ',', ';'> ValueRangeList;
 class Aliasparam;
 class Parameter_2 : public Parameter_Base {
@@ -71,9 +72,10 @@ class Parameter_2 : public Parameter_Base {
   bool _is_given{false};
   ConstantMinTypMaxExpression _default_val;
 public:
+  Parameter_2() :Parameter_Base() {}
+  ~Parameter_2();
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
-  Parameter_2() :Parameter_Base() {}
   void set_type(std::string const& a){_type=a;}
   void set_local( bool x=true ) {_is_local = x;}
   bool is_local()const {return _is_local;}
@@ -91,6 +93,9 @@ class Parameter_2_List : public LiSt<Parameter_2, '\0', ',', ';'> {
   String_Arg _type;
   bool _is_local{false};
 public:
+  explicit Parameter_2_List()
+     : LiSt<Parameter_2, '\0', ',', ';'>() { }
+  ~Parameter_2_List() { }
   bool is_local()const;
   String_Arg const& type()const {return _type;}
   void parse(CS& f)override;

@@ -8,6 +8,7 @@ module device(p,n);
 	parameter real d=1., e=2;
 	parameter integer i=0, j=10;
 	localparam	real t1=exp(l1), t2=10;
+	localparam	real sum=t1+1+2+3+4;
 	analog begin
 	end
 endmodule

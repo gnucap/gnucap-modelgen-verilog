@@ -1,1 +1,2 @@
-unresolved symbol: $typo
+... , n; analog begin V(p,n) <+ $typo(4); end endmodule 
+                                        ^ ? unresolved symbol: $typo

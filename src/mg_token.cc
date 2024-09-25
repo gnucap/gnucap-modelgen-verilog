@@ -37,7 +37,21 @@ rdep_tag tr_accept_tag;
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-static bool is_constant(Token const* t, bool val)
+static bool is_constant(Token const* t)
+{
+  if(auto f = dynamic_cast<const Float*>(t->data())){ untested();
+    assert(dynamic_cast<Token_CONSTANT const*>(t)
+	  ||dynamic_cast<Token_PAR_REF const*>(t));
+    return true;
+  }else if(auto data = dynamic_cast<const TData*>(t->data())){
+    return data->is_constant();
+  }else{
+    unreachable();
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+static bool is_literal(Token const* t, bool val)
 { untested();
   if(auto f = dynamic_cast<const Float*>(t->data())){ untested();
     assert(dynamic_cast<Token_CONSTANT const*>(t)
@@ -54,7 +68,7 @@ static bool is_constant(Token const* t, bool val)
   }
 }
 /*--------------------------------------------------------------------------*/
-static bool is_constant(Token const* t, double val=NOT_VALID)
+static bool is_literal(Token const* t, double val=NOT_VALID)
 {
   if(auto f = dynamic_cast<const Float*>(t->data())){
     assert(dynamic_cast<Token_CONSTANT const*>(t)
@@ -100,17 +114,17 @@ public:
   ~stash_op(){
     assert(!_op);
   }
-  bool is_constant(double val=NOT_VALID) const {
+  bool is_literal(double val=NOT_VALID) const {
     assert(_op);
-    return ::is_constant(_op, val);
+    return ::is_literal(_op, val);
   }
   bool is_true() const { untested();
     assert(_op);
-    return ::is_constant(_op, true);
+    return ::is_literal(_op, true);
   }
   bool is_false() const { untested();
     assert(_op);
-    return ::is_constant(_op, false);
+    return ::is_literal(_op, false);
   }
   void push() {
     _E->push_back(_op);
@@ -136,9 +150,9 @@ public:
 /*--------------------------------------------------------------------------*/
 } // namespace
 /*--------------------------------------------------------------------------*/
-static bool is_constant(stash_op const& o)
+static bool is_literal(stash_op const& o)
 {
-  return o.is_constant();
+  return o.is_literal();
 }
 /*--------------------------------------------------------------------------*/
 }
@@ -156,6 +170,7 @@ class CD : public TData{
 public:
   explicit CD(){
     set_offset();
+    set_constant();
   }
 }const_deps;
 /*--------------------------------------------------------------------------*/
@@ -228,7 +243,7 @@ void Token_UNARY_::stack_op(Expression* E)const
   Token const* t1 = E->back();
   E->pop_back();
 
-  if (is_constant(t1)) {
+  if (is_literal(t1)) {
     assert(!dynamic_cast<TData const*>(t1->data()));
     Token* t = op(t1);
     assert(t);
@@ -288,8 +303,8 @@ void Token_BINOP_::stack_op(Expression* E)const
     E->push_back(new Token_BINOP_(name(), t2, t1, deps));
     t1.pop();
     t2.pop();
-  }else if (is_constant(t1)) {
-    if (is_constant(t2)) {
+  }else if (is_literal(t1)) {
+    if (is_literal(t2)) {
       // have # # + .. becomes result (the usual)
       Token* t = op(t2, t1);
       assert(t);
@@ -310,28 +325,28 @@ void Token_BINOP_::stack_op(Expression* E)const
 	t2.pop();
 	delete t;
       }
-    }else if(n=='*' && is_constant(t1, 0.)){
+    }else if(n=='*' && is_literal(t1, 0.)){
       // -ffinite-math?
       t2.erase();
       t1.push();
-    }else if(n=='/' && is_constant(t1, 1.)) {
+    }else if(n=='/' && is_literal(t1, 1.)) {
       t1.erase();
       t2.push();
-    }else if(n=='*' && is_constant(t1, 1.)) {
+    }else if(n=='*' && is_literal(t1, 1.)) {
       t1.erase();
       t2.push();
-    }else if(n=='-' && is_constant(t1, 0.)) {
+    }else if(n=='-' && is_literal(t1, 0.)) {
       t1.erase();
       t2.push();
-    }else if(n=='+' && is_constant(t1, 0.)) { untested();
+    }else if(n=='+' && is_literal(t1, 0.)) { untested();
       t1.erase();
       t2.push();
-    }else if(name()=="&&" && is_constant(t1, 0.)){
+    }else if(name()=="&&" && is_literal(t1, 0.)){
       t2.erase();
       t1.push();
     }else if(auto bb = dynamic_cast<Token_BINOP_*>(t2.op())) {
       char m = bb->name()[0];
-      if(is_constant(bb->op2())) {
+      if(is_literal(bb->op2())) {
 	auto t3 = bb->op2();
 	if(( (m == '+' && n == '+')
 	  || (m == '+' && n == '-')
@@ -363,7 +378,7 @@ void Token_BINOP_::stack_op(Expression* E)const
 	  t1.pop();
 	  t2.pop();
 	}
-      }else if(is_constant(bb->op1())) {
+      }else if(is_literal(bb->op1())) {
 	auto t3 = bb->op1();
 	if(( (m == '/' && n == '*') // (A / b) * C = (A*C) / b
 	  || (m == '-' && n == '+')
@@ -406,20 +421,20 @@ void Token_BINOP_::stack_op(Expression* E)const
 //  }else if(t1==t2, '-'){ ...
   }else{
     // t2 is constant?
-    if(n=='+' && is_constant(t2, 0.)){ untested();
+    if(n=='+' && is_literal(t2, 0.)){ untested();
       t2.erase();
       t1.push();
-    }else if(n=='*' && is_constant(t2, 1.)){
+    }else if(n=='*' && is_literal(t2, 1.)){
       t2.erase();
       t1.push();
-    }else if(n=='*' && is_constant(t2, 0.)){
+    }else if(n=='*' && is_literal(t2, 0.)){
       // -ffinite-math?
       t1.erase();
       t2.push();
-    }else if(name()=="&&" && is_constant(t2, 0.)){
+    }else if(name()=="&&" && is_literal(t2, 0.)){
       t1.erase();
       t2.push();
-    }else if( options().optimize_swap() && is_constant(t2)){
+    }else if( options().optimize_swap() && is_literal(t2)){
       if(n=='*' || n=='+'){
 	E->push_back(new Token_BINOP_(name(), t1, t2, deps));
       }else{
@@ -436,8 +451,12 @@ void Token_BINOP_::stack_op(Expression* E)const
   }
 
   trace1("binop result", E->back()->name());
-  return;
-}
+  if(auto EE=dynamic_cast<Expression_ const*>(E)){
+     trace1("binop EE", EE->is_constant());
+  }else{
+     trace0("binop Expression");
+  }
+} // Token_BINOP_::stack_op
 /*--------------------------------------------------------------------------*/
 void Token_OUT_VAR::stack_op(Expression* E)const
 {
@@ -458,8 +477,8 @@ void Token_TERNARY_::stack_op(Expression* E)const
 
   assert(true_part());
   assert(false_part());
-  if ( is_constant(cond) ) {
-    bool select = !is_constant(cond, 0.);
+  if ( is_literal(cond) ) {
+    bool select = !is_literal(cond, 0.);
     delete cond;
     cond = NULL;
     Expression const* sel;
@@ -476,6 +495,12 @@ void Token_TERNARY_::stack_op(Expression* E)const
 
   }else{
     TData* deps = new TData;
+    if(is_constant(cond)){
+      deps->set_constant();
+    }else{
+      deps->set_constant(false);
+    }
+    
 
     auto SE = prechecked_cast<Expression_*>(E);
     assert(SE);
@@ -497,15 +522,23 @@ void Token_TERNARY_::stack_op(Expression* E)const
       (**i).stack_op(f);
     }
     deps->update(f->data());
+    trace1("TERNARY", deps->is_constant());
 
     E->push_back(new Token_TERNARY_(name(), cond, t, f, deps));
   }
+}
+/*--------------------------------------------------------------------------*/
+Token_TERNARY_::~Token_TERNARY_()
+{
+  delete _cond;
+  _cond = NULL;
 }
 /*--------------------------------------------------------------------------*/
 static TData* new_deps(Base const* data)
 {
   if(auto ee = dynamic_cast<Expression const*>(data)){
     auto d = new TData;
+    d->set_constant();
     for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) {
       trace1("stackop get deps", (**i).name());
       if(auto dd=dynamic_cast<TData const*>((*i)->data())){
@@ -542,9 +575,8 @@ void Token_CALL::stack_op(Expression* e) const
       delete(pl);
     }else{ untested();
     }
-  }else if(dynamic_cast<Token_PARLIST const*>(E->back())) { untested();
-    assert(0);
   }else{
+    assert(!dynamic_cast<Token_PARLIST const*>(E->back()));
   }
 
   if (arg_expr) {
@@ -556,6 +588,7 @@ void Token_CALL::stack_op(Expression* e) const
       try{
 	f->stack_op(*arg_expr, E);
       }catch(Exception const&){
+	incomplete();
 	f = NULL;
       }
     }else{ untested();
@@ -575,6 +608,7 @@ void Token_CALL::stack_op(Expression* e) const
 
       // here?
       TData* deps = new_deps(arg_expr);
+      trace1("stackop stashed arg", deps->is_constant());
       deps->set_any();
 
       E->push_back(new Token_CALL(*this, deps, EE));
@@ -594,6 +628,12 @@ void Token_CALL::stack_op(Expression* e) const
     trace2("no params?", name(), E->back()->name());
     incomplete();
   }
+}
+/*--------------------------------------------------------------------------*/
+Token_CALL::~Token_CALL()
+{
+  detach();
+  delete _args;
 }
 /*--------------------------------------------------------------------------*/
 // BUG

@@ -325,7 +325,7 @@ static std::string get_identifier(CS& f)
   if(f.is_alpha() || f.match1('_')){
     ret += f.ctoc();
   }else{
-    throw(Exception_CS("syntax error", f));
+    throw(Exception_CS_("syntax error", f));
   }
   while(f.is_alnum() || f.match1("_$")) {
     ret += f.ctoc();

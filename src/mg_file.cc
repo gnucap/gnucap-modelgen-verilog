@@ -116,4 +116,15 @@ void File::parse(CS& f)
 #endif
 }
 /*--------------------------------------------------------------------------*/
+File::~File()
+{
+  // _module_list.clear();
+  // _macromodule_list.clear();
+  // _connectmodule_list.clear();
+  // _nature_list.clear();
+  // _discipline_list.clear();
+  // _paramset_list.clear();
+}
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet

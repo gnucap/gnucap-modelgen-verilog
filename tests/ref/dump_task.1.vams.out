@@ -18,7 +18,7 @@ module foo(p, x);
     $strobe("some strobe %f.", (C + V(x))); // dep: _potential_b_x_ s3 r3
     y = V(p); // dep: _potential_b_p_ s1 r3
     $strobe("some strobe %f.", y); // dep: _potential_b_p_ s1 r3
-    $finish(1);
+    $finish(1); // c
     y = 0; // s1 r2
   end
 

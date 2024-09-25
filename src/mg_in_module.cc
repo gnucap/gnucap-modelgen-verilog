@@ -102,7 +102,6 @@ void Parameter_3::parse(CS& file)
 {
   _default_val.set_owner(owner());
   file >> '.' >> _name >> '(' >> _default_val >> ')' >> ',';
-  _default_val.resolve();
 }
 /*--------------------------------------------------------------------------*/
 void Parameter_3::dump(std::ostream& out)const
@@ -154,15 +153,29 @@ void Parameter_2::parse(CS& f)
     trace3("not there", _name, name(), dynamic_cast<Module const*>(owner()) );
   }
 
-  f >> '=' >> _default_val;
-  f >> _value_range_list;
+  f >> '=';
+
+  try{
+    f >> _default_val;
+  }catch(Exception_CS_ const& ec){
+    throw ec;
+  }catch(Exception const& e){ untested();
+    throw e;
+  }
+  {
+    f >> _value_range_list;
+  }
 
   assert(owner());
 }
 /*--------------------------------------------------------------------------*/
+inline Parameter_2::~Parameter_2()
+{
+}
+/*--------------------------------------------------------------------------*/
 void Parameter_2::resolve()
 {
-  _default_val.resolve();
+ // _default_val.resolve();
 
 #if 1
   try{
@@ -317,7 +330,13 @@ void Parameter_2_List::parse(CS& file)
   std::string type = _type.to_string();
   trace2("Parameter_2_List", _type, _is_local);
 
-  LiSt<Parameter_2, '\0', ',', ';'>::parse(file);
+  try{
+    LiSt<Parameter_2, '\0', ',', ';'>::parse(file);
+  }catch(Exception_CS_ const& e){
+    for(auto& i : *this){ untested();
+    }
+    throw e;
+  }
   for(auto& i : *this){
     i->set_type(type);
     i->set_local(_is_local);
@@ -1047,7 +1066,6 @@ Module::~Module()
 {
   delete_analog();
   detach_out_vars(); // delete variables?
-
   delete_circuit();
 }
 /*--------------------------------------------------------------------------*/

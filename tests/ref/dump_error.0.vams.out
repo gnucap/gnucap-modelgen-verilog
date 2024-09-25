@@ -1,1 +1,5 @@
-unresolved symbol: x
+... al p, n;
+
+ analog
+  I(p,n) <+ X(x,y);
+                    ^ ? unresolved symbol: x

@@ -77,6 +77,7 @@ public:
   void set_dep(Base*);
   void set_rdeps(RDeps const&);
   bool is_used_in(Base const*)const;
+  bool is_constant()const;
 private:
   bool propagate_rdeps(RDeps const& r);
 //  TData& mutable_deps();

@@ -1,0 +1,37 @@
+
+module localparam0();
+	parameter real c=1.;
+	localparam real l1=c+5, l2=10;
+	parameter real d=1., e=2;
+	parameter integer i=0, j=10;
+	localparam	real t0=exp(0);
+	localparam	real t1a=c;
+	localparam	real t1b=-c;
+
+	localparam	real t1=exp(10);
+
+	localparam	real t2=exp(l1), t4=exp(2);
+endmodule
+
+module localparam1();
+ // parameter real A=1;
+  real nonconst_wrong;
+  localparam real ok = 2;
+  localparam real also_ok = 2 + 2 * 2;
+  localparam real more_ok = ok + 2 + 2 * 2;
+
+	parameter real c=1.;
+	localparam real l2=c;
+	localparam real l1=5+c;
+	localparam real l1b=c+5;
+	localparam real l4=10;
+	localparam real l4a=exp(10);
+	localparam real x=exp(l4);
+	localparam real l3=c+5, l4b=10;
+	localparam real TT=(l4==10)?l1:(l2+3);
+	localparam real PG=$param_given(c);
+	localparam real TT1=(exp(c))?1:2;
+	localparam real PG2=($param_given(c))?1:2;
+ // localparam real empty;
+  localparam real bug = nonconst_wrong + 2;
+endmodule

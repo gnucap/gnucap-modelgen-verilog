@@ -49,7 +49,7 @@ private:
 public:
   explicit Token_CALL(const std::string Name, FUNCTION_ const* f, Expression const* e=NULL)
     : Token_SYMBOL(Name, ""), _function(f), _args(e) { attach(); }
-  ~Token_CALL() { detach(); delete _args; }
+  ~Token_CALL();
 protected:
   explicit Token_CALL(const Token_CALL& P)
     : Token_SYMBOL(P.name(), ""), _function(P._function), _num_args(P._num_args) { attach(); }
@@ -266,10 +266,7 @@ public:
   explicit Token_TERNARY_(std::string const& b, Token const* Cond,
       Expression const* t1, Expression const* t2, Base const* d=NULL)
     : Token_TERNARY(b, t1, t2, d), _cond(Cond) {}
-  ~Token_TERNARY_(){
-    delete _cond;
-    _cond = NULL;
-  }
+  ~Token_TERNARY_();
 
   Token* clone()const override { untested();
     unreachable();

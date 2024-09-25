@@ -218,9 +218,11 @@ private:
 	  e->push_back(new Token_CONSTANT("0.", f, ""));
 	}else{
 	  Token_CALL::stack_op(e);
+	//  is_constant();
 	}
       }else{ untested();
 	Token_CALL::stack_op(e);
+	// is_constant();
       }
     }else if(dynamic_cast<Token_CONSTANT const*>(arg)){ untested();
       assert(0);

@@ -28,6 +28,7 @@
 #include <e_cardlist.h>
 #include <globals.h>
 #include "mg_.h" // TODO
+#include "mg_error.h" // TODO
 /*--------------------------------------------------------------------------*/
 void Expression_::clear()
 {
@@ -100,8 +101,12 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
   }else if(auto st = dynamic_cast<Statement*>(Owner)){ untested();
     Scope = st->scope();
   }else{ untested();
-    assert(0);
+    unreachable();
   }
+  if(dynamic_cast<Module const*>(Scope)){
+  }else{
+  }
+  assert(Scope);
 
   for(List_Base<Token>::const_iterator ii = e.begin(); ii!=e.end(); ++ii) {
     trace1("resolve in", (*ii)->name());
@@ -328,13 +333,18 @@ bool Expression_::update(RDeps const* rd)
 void ConstantMinTypMaxExpression::parse(CS& file)
 {
   assert(_e.is_empty());
-  file >> _e;
+  Expression_ e;
+  file >> e;
   assert(_owner);
-//  = new Expression_();
   _e.set_owner(_owner);
-//  _e.resolve_symbols(E);
+  _e.resolve_symbols(e);
+  if(_e.is_constant()){
+  }else{
+    throw(Exception_CS_("not constant", file));
+  }
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 void ConstantMinTypMaxExpression::resolve()
 {
   Expression_ tmp;
@@ -349,6 +359,7 @@ void ConstantMinTypMaxExpression::resolve()
     tmp.pop_back();
   }
 }
+#endif
 /*--------------------------------------------------------------------------*/
 void ConstantMinTypMaxExpression::dump(std::ostream& o)const
 {
@@ -385,11 +396,14 @@ void ConstExpression::dump(std::ostream& o) const
 TData const& Expression_::data() const
 {
   static TData no_deps;
+  no_deps.set_constant();
   if(is_empty()){ untested();
     return no_deps;
   }else if(auto d = dynamic_cast<TData const*>(back()->data())){
+    // really? see is_constant...
     return *d;
   }else{
+    assert(no_deps.is_constant());
     return no_deps;
   }
 }
@@ -438,6 +452,24 @@ Block* Expression_::scope()
     incomplete();
     assert(0);
     return NULL;
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool Expression_::is_constant() const
+{
+  if(size() > 1) {
+    bool c = true;
+    for(auto const& i : *this) {
+      assert(i);
+      if(auto const* d = dynamic_cast<TData const*>(back()->data())){
+	c &= d->is_constant();
+      }else{
+	incomplete();
+      }
+    }
+    return c;
+  }else{
+    return data().is_constant();
   }
 }
 /*--------------------------------------------------------------------------*/

@@ -134,8 +134,6 @@ void dump_annotate(std::ostream& o, A const& a)
 {
   if(!a.scope()->is_reachable()){
     o << " // --\n";
-  }else if(a.data().is_constant()){ untested();
-    o << " // c\n";
   }else{
     if(a.data().ddeps().size()){
       o << " //";
@@ -143,6 +141,8 @@ void dump_annotate(std::ostream& o, A const& a)
       o << " //";
     }else if(a.rdeps_().size()){
       o << " //";
+    }else if(a.data().is_constant()){
+      o << " // c";
     }else{
     }
     for(const Dep& d : a.data().ddeps()) {
@@ -408,6 +408,7 @@ static Base* parse_analog_stmt(CS& file, Block* owner)
   size_t here = file.cursor();
   Base* a = parse_analog_stmt_or_null(file, owner);
   if(file.stuck(&here)) {
+    delete a;
     throw Exception_CS_("what's this?", file);
     file.reset_fail(here);
     return NULL;
@@ -1023,6 +1024,7 @@ void AnalogCtrlBlock::parse(CS& f)
     }else if(b){
       push_back(b);
     }else{
+      delete b;
     }
   }
 }
@@ -1170,16 +1172,6 @@ void Contribution::parse(CS& cmd)
   Discipline const* disc = _branch->discipline();
   assert(disc);
 
-  if(disc->flow() &&
-      (_name == "flow" || disc->flow()->access().to_string() == _name)) {
-    _nature = disc->flow();
-  }else if(disc->potential() &&
-      (_name == "potential" || disc->potential()->access().to_string() == _name)) {
-    _nature = disc->potential();
-    set_pot_contrib();
-  }else{
-    throw Exception_CS_("bad access", cmd);
-  }
 
   if(cmd >> "<+"){
     set_direct();
@@ -1191,11 +1183,18 @@ void Contribution::parse(CS& cmd)
     // trace1("bb?", cmd.tail().substr(0,20));
     // cmd >> xs >> bb >> "==";
   }else{
+//    if(_branch){
+//      _branch->dec_use();
+//    }else{
+//    }
+    //detach();
     throw Exception_CS_("expecting \"<+\" or \":\"", cmd);
   }
 
 
-  { // cmd >> _rhs;
+
+  {
+    // cmd >> _rhs;
     assert(owner());
     trace1("Contrib::parse", cmd.tail().substr(0,20));
     Expression rhs_(cmd);
@@ -1203,8 +1202,24 @@ void Contribution::parse(CS& cmd)
 
     assert(owner());
     _rhs.set_owner(this);
-    _rhs.resolve_symbols(rhs_);
+    try{
+      _rhs.resolve_symbols(rhs_);
+    }catch(Exception const& e){
+      throw Exception_CS_(e.message(), cmd);
+    }
   }
+
+  if(disc->flow() &&
+      (_name == "flow" || disc->flow()->access().to_string() == _name)) {
+    _nature = disc->flow();
+  }else if(disc->potential() &&
+      (_name == "potential" || disc->potential()->access().to_string() == _name)) {
+    _nature = disc->potential();
+    set_pot_contrib(); // further down?
+  }else{
+    throw Exception_CS_("bad access", cmd);
+  }
+
   {
 
     trace1("Contrib::parse", rhs().back()->name());
@@ -2102,6 +2117,7 @@ void AF_Arg_List::parse(CS& f)
     try{
       owner()->new_var_ref(t);
     }catch(Exception const& e){ untested();
+      delete t;
       throw Exception_CS_(e.message(), f);
     }
 
@@ -2356,11 +2372,13 @@ Analog::Analog()
 /*--------------------------------------------------------------------------*/
 Analog::~Analog()
 {
+  // name clash, Gnucap probes vs Verilog-AMS "probe branch"
   _list.clear();
   _functions.clear();
+  {
+    delete _probes; // .clear();
+  }
 
-  // name clash, Gnucap probes vs Verilog-AMS "probe branch"
-  delete _probes; // .clear();
 }
 /*--------------------------------------------------------------------------*/
 bool Analog::has_block() const

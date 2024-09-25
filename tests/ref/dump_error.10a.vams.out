@@ -1,1 +1,3 @@
-unresolved symbol: R
+...  analog begin
+  V(p,n) <+ I(p,n) * R;
+                        ^ ? unresolved symbol: R
