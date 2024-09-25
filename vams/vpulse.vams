@@ -18,21 +18,24 @@ module vpulse(p, n);
 	parameter real period=2.;
 	(*desc="i"*) real i;
 	(*desc="v"*) real v;
-	analog begin
+	analog begin : pulse
+		real vrect;
 		begin : evt
-		   @(timer(td + width + rise, period)) begin
-		   	v = val0;
-		   end
+			@(timer(td + width + rise, period)) begin
+				vrect = val0;
+			end
 			@(timer(td,  period)) begin
-				v = val1;
+				vrect = val1;
 			end
 		end
 
 		if(analysis("static") && $param_given(dc)) begin
          // BUG in Table E.1. not sure what dc is used for.
-			v = dc;
+			vrect = dc;
 		end
-		V(p,n) <+ transition(v, 0., rise, fall);
+		v = transition(vrect, 0., rise, fall);
+		V(p,n) <+ v;
+		v = V(p,n);
 		i = I(p,n);
 	end
 endmodule
