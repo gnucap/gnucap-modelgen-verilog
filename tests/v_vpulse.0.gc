@@ -9,7 +9,7 @@ list
 
 //print dc v(nodes)
 //dc basic
-print tran v(nodes) v(v1)
+print tran v(nodes) v(v1) control(0) iter(0)
 tran 10 basic
 
 status notime

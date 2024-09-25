@@ -43,6 +43,7 @@ protected:
     _delay(x._delay) {}
 
 public:
+  bool has_tr_eval()const override {return true;}
   virtual void tr_advance(COMPONENT*c) const = 0;
 }; //COMMON_DELAY
 /*--------------------------------------------------------------------------*/
@@ -261,7 +262,7 @@ double DELAY::tr_involts()const
 /*--------------------------------------------------------------------------*/
 double DELAY::tr_probe_num(std::string const& n) const
 {
-  if(n == "output"){
+  if(n == "output"){ untested();
     return _out0;
   }else if(n == "s"){
     return double(_forward.size());
@@ -296,34 +297,37 @@ bool DELAY::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 bool DELAY::do_tr()
 {
-//  return ELEMENT::do_tr();
+  assert(has_tr_eval());
+  //return ELEMENT::do_tr();
   const COMMON_DELAY* c=prechecked_cast<const COMMON_DELAY*>(common());
   assert(c);
   c->tr_eval(this);
+  store_values();
+  q_load();
   assert(converged());
   return true;
 
   //if (_out0 != _out1) { untested();
-  if (!conchk(_out0, _out1, OPT::abstol, OPT::reltol*.01)) {
+  if (!conchk(_out0, _out1, OPT::abstol, OPT::reltol*.01)) { untested();
     q_load();
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
 void DELAY::tr_advance()
 {
-  trace1("DELAY::tr_advance", _sim->_time0);
   ELEMENT::tr_advance();
   const COMMON_DELAY* c=prechecked_cast<const COMMON_DELAY*>(common());
   assert(c);
   c->tr_advance(this);
+  trace2("DELAY::tr_advance", _sim->_time0, _y[0].f0);
 }
 /*--------------------------------------------------------------------------*/
 void DELAY::tr_regress()
 {
   ELEMENT::tr_regress();
-  // y?
-  _out0 = _forward.v_out(_sim->_time0).f0;
+  _y[0] = _forward.v_out(_sim->_time0);
+  _out0 = _y[0].f0;
 }
 /*--------------------------------------------------------------------------*/
 // typedef DELAY::ddouble ddouble;
@@ -333,6 +337,7 @@ void DELAY::tr_begin()
   ELEMENT::tr_begin();
   _loss0 = 1.;
   _out0 = _out1 = 0;
+  _y1.f0 = _y[0].f0 = 0.;	//BUG// override?
   _current = 0;
   if(_ctrl_in) {
     *_ctrl_in = 0.; // here?
@@ -368,7 +373,7 @@ void DELAY::tr_begin()
       assert(_fall);
     }else{
     }
-  }else{
+  }else{ untested();
     auto* cc=prechecked_cast<const COMMON_DELAY*>(common());
     incomplete();
   }
@@ -662,7 +667,7 @@ TIME_PAIR DELAY::tr_review()
   if(c){
     q_accept();
     // incomplete();
-    return TIME_PAIR(_sim->_time0 + c->_delay, NEVER);
+    _time_by.min_event(_sim->_time0 + c->_delay);
   }else{
     DELAY* e = this;
     if(e->tr_involts() != e->_old_input){
@@ -676,8 +681,9 @@ TIME_PAIR DELAY::tr_review()
       q_accept();
     }else{ untested();
     }
-    return TIME_PAIR();
   }
+  trace1("DELAY::trr", _time_by._error_estimate);
+  return _time_by;
 }
 /*--------------------------------------------------------------------------*/
 void DELAY::tr_unload()
@@ -724,9 +730,10 @@ void COMMON_ABSDELAY::tr_advance(COMPONENT* c) const
   assert(e);
 
   try{
-    e->_out0 = e->_forward.v_out(_sim->_time0).f0;
+    e->_y[0] = e->_forward.v_out(_sim->_time0);
+    e->_out0 = e->_y[0].f0;
   }catch(Exception const&){ untested();
-    for(auto p : e->_forward){
+    for(auto p : e->_forward){ untested();
       trace2("bug", p.first, p.second);
     }
     trace1("bug", e->_forward.size());
@@ -797,7 +804,8 @@ void COMMON_TRANSITION::tr_advance(COMPONENT* c) const
 
   try{
     trace3("transition::tr_advance", _sim->_time0, e->_out0, e->_forward.size());
-    e->_out0 = e->_forward.v_out(_sim->_time0).f0;
+    e->_y[0] = e->_forward.v_out(_sim->_time0);
+    e->_out0 = e->_y[0].f0;
   }catch(Exception const&){ untested();
     assert(0);
   }
@@ -819,7 +827,7 @@ int COMMON_TRANSITION::set_param_by_name(std::string Name, std::string Value)
     _rise = Value;
   }else if(Name == "fall"){
     _fall = Value;
-  }else if(Name == "tol"){
+  }else if(Name == "tol"){ untested();
     incomplete();
    // _tol = Value;
   }else{ untested();
