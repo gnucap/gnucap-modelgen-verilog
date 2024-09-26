@@ -204,17 +204,10 @@ private: // ELEMENT, pure
   COMPLEX ac_involts()const override { untested(); incomplete(); return 0.; }
 private: // BASE_SUBCKT
   void	  tr_begin()override;
-  void	  tr_restore()override	{
-    ELEMENT::tr_restore();
-    incomplete();
-  }
+  void	  tr_restore()override;
   void	  dc_advance()override;
   void	  tr_advance()override;
-  void	  tr_regress()override {
-    incomplete(); // is it? just don't advance.
-    set_not_converged();
-    ELEMENT::tr_regress();
-  }
+  void	  tr_regress()override;
   bool	  tr_needs_eval()const override;
   void    tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }
   bool	  do_tr()override;
@@ -235,9 +228,9 @@ private: // overrides
   void expand()override;
   void precalc_last()override;
   double tr_probe_num(std::string const&)const override;
-  int max_nodes()const override {return std::max(4,_n_ports*2);}
+  int max_nodes()const override {return std::max(2,_n_ports*2);}
   int net_nodes()const override	{return _n_ports*2;}
-  int min_nodes()const override {return 4;}
+  int min_nodes()const override {return 2;}
   int int_nodes()const override {return bool(_ctrl_in);}
 
   int input_idx()const {
@@ -394,7 +387,7 @@ bool ZFILTER::tr_needs_eval()const
 };
 /*--------------------------------------------------------------------------*/
 bool ZFILTER::do_tr()
-{ untested();
+{
   return ELEMENT::do_tr();
 }
 /*--------------------------------------------------------------------------*/
@@ -426,8 +419,8 @@ void ZFILTER::tr_advance()
     }
     for(       ; i>0; --i){
       trace3("den", i, c->_p_den[i], c->_p_den.size());
-      new_input -= _regs[i] * c->_p_den[i] / c->_p_den[0];
       _regs[i] = _regs[i-1];
+      new_input -= _regs[i] * c->_p_den[i] / c->_p_den[0];
     }
     _regs[0] = new_input;
 
@@ -437,8 +430,9 @@ void ZFILTER::tr_advance()
     }
     assert(c->_p_den[0]);
     _output /= c->_p_den[0];
-    trace4("accept", _sim->_time0, c->_p_den[0], c->_p_num[0], new_input);
-    trace4("accept", _sim->_time0, _output, _old_output, tr_involts());
+   //  _y[0].f0 = _output;
+    trace4("ZFILTER::accept", _sim->_time0, c->_p_den[0], c->_p_num[0], new_input);
+    trace4("ZFILTER::accept", _sim->_time0, _output, _old_output, tr_involts());
 
     _previous_event = _pending_event;
     _pending_event = _new_event;
@@ -493,6 +487,17 @@ void ZFILTER::tr_advance()
   q_load();
 }
 /*--------------------------------------------------------------------------*/
+void ZFILTER::tr_regress()
+{
+  ELEMENT::tr_regress();
+  set_not_converged();
+  if(_output == _old_output){
+  }else{
+  }
+  // _output = _old_output;
+  q_load();
+}
+/*--------------------------------------------------------------------------*/
 // typedef ZFILTER::ddouble ddouble;
 /*--------------------------------------------------------------------------*/
 void ZFILTER::tr_begin()
@@ -501,6 +506,7 @@ void ZFILTER::tr_begin()
   _loss0 = 1.;
   _loss1 = 1.;
   _output = 0.; //really?
+  _y[0].f0 = _output;
   _old_output = 0.; //really?
 
   COMMON_RF_BASE const* c = prechecked_cast<COMMON_RF_BASE const*>(common());
@@ -508,8 +514,15 @@ void ZFILTER::tr_begin()
   int num_den = c->den_size();
   int num_num = c->num_size();
   int num_regs = std::max(num_den, num_num);
-  trace2("ZFILTER::tr_begin", tr_input(), num_num);
+  trace3("ZFILTER::tr_begin", tr_input(), num_num, _sim->_time0);
   std::fill_n(_regs, num_regs, 0.);
+}
+/*--------------------------------------------------------------------------*/
+void ZFILTER::tr_restore()
+{
+  ELEMENT::tr_restore();
+  trace4("ZFILTER::tr_restore", _pending_event, _new_event, _previous_event, _sim->_time0);
+//  _output = _old_output;
 }
 /*--------------------------------------------------------------------------*/
 inline void ZFILTER::dc_advance()
@@ -591,17 +604,6 @@ void ZFILTER::expand()
     new_subckt();
   }else{ untested();
   }
-
-#if 0
-  // make space for input node.
-  if(_ctrl_in && input_idx() >= 4){ untested();
-    auto nn = new node_t[net_nodes() + 1];
-    notstd::copy_n(_n, net_nodes(), nn);
-    // delete _n; no. it's in ELEMENT
-    _n = nn;
-  }else{ untested();
-  }
-#endif
 
   if(!_ctrl_in) {
 //  }else if(linear_input){ untested();
@@ -713,7 +715,7 @@ void ZFILTER::set_parameters(const std::string& Label, CARD *Owner,
     if(net_nodes()+int_nodes()>NODES_PER_BRANCH) {
       _n = new node_t[net_nodes()+int_nodes()];
       trace4("allocnodes", net_nodes(), nodes, int_nodes(), n_nodes);
-    }else{ untested();
+    }else{
     }
   }else{untested();
     assert(net_nodes() == n_nodes);
@@ -836,7 +838,7 @@ void ZFILTER::tr_accept()
       new_sample_event(spl);
       _sim->new_event(_new_event + c->_ttime, this); // BUG: unsafe.
     }
-  }else if(time0 < _pending_event){ untested();
+  }else if(time0 < _pending_event){
     trace4("ZFILTER::tr_accept2", long_label(), time0, _new_event, _pending_event);
     // waiting
   }else if(time0 < _pending_event + 2*_sim->_dtmin){
@@ -887,7 +889,7 @@ TIME_PAIR ZFILTER::tr_review()
     // we missed it.. retry? bug in scheduler?
    _time_by.min_event(_pending_event);
   }
-  trace3("ZFILTER::tr_review", long_label(), _sim->_time0, _time_by._event);
+  trace4("ZFILTER::tr_review", long_label(), _sim->_time0, _time_by._event, _time_by._error_estimate);
   return _time_by;
 }
 /*--------------------------------------------------------------------------*/

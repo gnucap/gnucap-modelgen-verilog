@@ -142,11 +142,12 @@ class Module : public Block {
   typedef enum : int{
     if_AC_BEGIN = 0,
     if_TR_BEGIN = 1,
-    if_TR_ADVANCE = 2,
-    if_TR_REVIEW = 3,
-    if_TR_ACCEPT = 4,
-    if_SET_EVENT = 5,
-    if_COUNT = 6
+    if_TR_RESTORE = 2,
+    if_TR_ADVANCE = 3,
+    if_TR_REVIEW = 4,
+    if_TR_ACCEPT = 5,
+    if_SET_EVENT = 6,
+    if_COUNT = 7
   } iface_id_t;
 public:
   typedef enum : int{
@@ -163,11 +164,6 @@ private: // verilog input data
   Owned_Base* _analog{NULL};
   Circuit* _circuit{NULL};
 //  Block _module_body;
-public: // token?
-//  rdep_tag const& tr_eval_tag   ()const { untested();return ::tr_eval_tag;}
-//  rdep_tag const& tr_review_tag ()const { untested();return ::tr_review_tag;}
-//  rdep_tag const& tr_advance_tag()const { untested();return ::tr_advance_tag;}
-//  rdep_tag const& tr_accept_tag ()const { untested();return ::tr_accept_tag;}
 protected:
   Variable_List_Collection _variables;
   Parameter_List_Collection _parameters;
@@ -216,6 +212,7 @@ public: // TODO
 
   bool has_events()const    { return _has_pid[if_SET_EVENT];}
   bool has_tr_begin()const  { return _has_pid[if_TR_BEGIN]   || times(); }
+  bool has_tr_restore()const{ return _has_pid[if_TR_RESTORE] || times(); }
   bool has_tr_review()const { return _has_pid[if_TR_REVIEW]  || has_analysis(); }
   bool has_tr_accept()const { return _has_pid[if_TR_ACCEPT]  || has_analysis(); }
   bool has_tr_advance()const{ return _has_pid[if_TR_ADVANCE] || has_analysis()
@@ -224,11 +221,13 @@ public: // TODO
 
   bool has_ac_begin_analog()const   {untested(); return _has_pid[if_TR_BEGIN]   & mm_ANALOG; }
   bool has_tr_begin_analog()const   { return _has_pid[if_TR_BEGIN]   & mm_ANALOG; }
+  bool has_tr_restore_analog()const { return _has_pid[if_TR_RESTORE]   & mm_ANALOG; }
   bool has_tr_review_analog()const  {untested(); return _has_pid[if_TR_REVIEW]   & mm_ANALOG; }
   bool has_tr_advance_analog()const { return _has_pid[if_TR_ADVANCE] & mm_ANALOG; }
   bool has_tr_accept_analog()const  {untested(); return _has_pid[if_TR_ACCEPT]  & mm_ANALOG; }
 
   bool has_tr_begin_digital()const   { return _has_pid[if_TR_BEGIN]   & mm_DIGITAL; }
+  bool has_tr_restore_digital()const { return _has_pid[if_TR_RESTORE]   & mm_DIGITAL; }
   bool has_tr_review_digital()const  {untested(); return _has_pid[if_TR_REVIEW]   & mm_DIGITAL; }
   bool has_tr_advance_digital()const {untested(); return _has_pid[if_TR_ADVANCE] & mm_DIGITAL; }
   bool has_tr_accept_digital()const  {untested(); return _has_pid[if_TR_ACCEPT]  & mm_DIGITAL; }
@@ -245,6 +244,7 @@ public:
   void set_set_event (mode_mask_t m=mm_ANALOG) {set_pid(if_SET_EVENT, m);}
   void set_ac_begin  (mode_mask_t m=mm_ANALOG) {set_pid(if_AC_BEGIN, m);}
   void set_tr_begin  (mode_mask_t m=mm_ANALOG) {set_pid(if_TR_BEGIN, m);}
+  void set_tr_restore(mode_mask_t m=mm_ANALOG) {set_pid(if_TR_RESTORE, m);}
   void set_tr_review (mode_mask_t m=mm_ANALOG) {set_pid(if_TR_REVIEW, m);}
   void set_tr_accept (mode_mask_t m=mm_ANALOG) {set_pid(if_TR_ACCEPT, m);}
   void set_tr_advance(mode_mask_t m=mm_ANALOG) {set_pid(if_TR_ADVANCE, m);}

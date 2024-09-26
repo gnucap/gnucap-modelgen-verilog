@@ -55,6 +55,7 @@ public: // characteristics
   size_t num_args() const { return _num_args; }
   virtual bool has_precalc()const   {return false;}
   virtual bool has_tr_begin()const  {return false;}
+  virtual bool has_tr_restore()const{return has_tr_begin();}
   virtual bool has_tr_eval()const   {return true;}
   virtual bool has_tr_review()const {return false;}
   virtual bool has_tr_accept()const {return false;}

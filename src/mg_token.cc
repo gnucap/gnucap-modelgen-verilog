@@ -30,6 +30,7 @@
 #include <globals.h> // TODO: Expression->resolve?
 /*--------------------------------------------------------------------------*/
 rdep_tag tr_begin_tag;
+rdep_tag tr_restore_tag;
 rdep_tag tr_eval_tag;
 rdep_tag tr_review_tag;
 rdep_tag tr_advance_tag;

@@ -334,6 +334,10 @@ static void make_common(std::ostream& o, const Module& m)
     o__ "void tr_begin_analog(MOD_" << m.identifier() << "*)const;\n";
   }else{
   }
+  if(m.has_tr_restore_analog()) {
+    o__ "void tr_restore_analog(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
   if(m.has_tr_accept() && m.has_analog_block()){
     o__ "void tr_accept_analog(MOD_" << m.identifier() << "*)const;\n";
   }else{

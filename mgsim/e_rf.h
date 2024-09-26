@@ -535,6 +535,9 @@ void COMMON_RF_BASE::convert_nd()
     if(!num_is_n()){
       // assert(num_is_z());
       convert(_p_num, "numerator");
+      for(auto x : _p_num){
+	trace1("p2n", x);
+      }
       assert(_p_num.size());
     }else{
     }

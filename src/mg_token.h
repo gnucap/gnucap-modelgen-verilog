@@ -31,6 +31,7 @@ class rdep_tag : public Base{
   virtual void dump(std::ostream&)const override { untested();unreachable();}
 };
 extern rdep_tag tr_begin_tag;
+extern rdep_tag tr_restore_tag;
 extern rdep_tag tr_eval_tag;
 extern rdep_tag tr_review_tag;
 extern rdep_tag tr_advance_tag;

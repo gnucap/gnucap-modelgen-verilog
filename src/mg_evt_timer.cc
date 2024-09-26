@@ -46,6 +46,7 @@ private:
   bool is_common()const override {return true;}
   bool has_modes()const override {return true;}
   bool has_tr_begin()const override {return true;}
+  bool has_tr_restore()const override {return true;}
   bool has_tr_review()const override {return true;}
   bool has_tr_accept()const override {return true;}
   bool has_tr_advance()const override {return true;}
@@ -68,6 +69,7 @@ private:
       m.set_times(2);
       // TODO
       m.set_tr_begin();
+      m.set_tr_restore();
       m.set_tr_review();
       m.set_tr_advance();
       m.set_set_event();
@@ -139,10 +141,10 @@ private:
     /*----------------------------------------------------------------------*/
     o____ "bool tr_begin" << args() << " {\n";
     o______ "_previous_evt = 0.;\n";
-    // o______ "trace2(\"timer::tr_begin1\", _req_evt, _previous_evt);\n";
     o______ "if(delay) {\n";
     o________ "_previous_evt = -NEVER;\n";
-    o________ "_req_evt = delay;\n";
+    o________ "set_event(d, delay, 0);\n";
+    o________ "trace2(\"timer::tr_begin2\", _sim->_time0, _req_evt - delay);\n";
     o______ "}else if(period){\n";
     o______ "}else{\n";
     o________ "incomplete();\n";
@@ -221,7 +223,7 @@ private:
     o__________ "_previous_evt = back_to;\n";
     // o__________ "set_event(d, back_to, " << tol() << ");\n";
     // o__________ "_previous_evt = _req_evt;\n";
-    o________ "}else{ untested();\n";
+    o________ "}else{\n";
     o________ "}\n";
     o______ "}else if(d->_time[1] == 0. && _req_evt == 0. && period && delay) {\n";
     o________ "double back_to = delay;\n";

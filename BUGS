@@ -1,15 +1,14 @@
 == modelgen
-- named block variables supposed to be static
-- state variable identification, regress
+- all variables are static, some speed impact.
 - $limit: only "pnjlimit"
 - ac needs operating point, even if linear: mg2_cccs.0.gc
 - ddx, flow(<port>): no derivatives (feature?)
 - filter contribution to potential, uses internal node.
 - V<+ddt(I) does not work on same branch (related?)
-- numerical port names don't work
 - string type is missing (breaks "%s" in strobe etc.).
 - types don't work. 1/2 equals .5
 - cleanup hack breaks detach_all
+- `default_transision missing, and some step control
 
 == simulator plugins
 - "ground" statement not implemented.
@@ -17,6 +16,7 @@
 - paramset: requires newlines, v_paramset.2a.gc
 
 == libgnucap, TODO
+- need NODE_P, discrete nodes
 - MODEL_CARD in lang interface
 - BUG: padding long lines with whitespace
 - tab/newline handling in cmd.warn Exception_CS
@@ -25,7 +25,6 @@
 == fixed, presumably. recheck.
 - analysis("ic"): need more testing
 - c_pulse.so: obsolete hack, need discontinuities.
-- $mfactor vs m clash pending resolution
 - V<+laplace(...) sign bug
 - event control is incomplete
 - llvm build: sometimes crashes during shutown

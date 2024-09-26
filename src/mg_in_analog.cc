@@ -202,6 +202,34 @@ void System_Task::parse(CS& f)
   trace1("System_Task::parse1", f.tail().substr(0,10));
   f >> ";";
 
+  assert(function());
+
+  // add_rdeps(function()->rdeps()); /// TODO // 
+  if(function()->has_tr_begin()){
+    add_rdep(&tr_begin_tag);
+  }else{
+  }
+  if(function()->has_tr_restore()){
+    add_rdep(&tr_begin_tag);
+  }else{
+  }
+  if(function()->has_tr_review()){
+    add_rdep(&tr_eval_tag);
+  }else{
+  }
+  if(function()->has_tr_review()){
+    add_rdep(&tr_review_tag);
+  }else{
+  }
+  if(function()->has_tr_accept()){
+    add_rdep(&tr_accept_tag);
+  }else{
+  }
+  if(function()->has_tr_advance()){
+    add_rdep(&tr_advance_tag);
+  }else{
+  }
+
   // assert(rdeps());
   trace1("System_Task::parse2", rdeps().size());
   update(); // rdeps?
@@ -243,29 +271,6 @@ FUNCTION_ const* System_Task::function() const
 // code?
 bool System_Task::update()
 {
-  assert(function());
-
-  // add_rdeps(function()->rdeps()); /// TODO // 
-  if(function()->has_tr_begin()){
-    add_rdep(&tr_begin_tag);
-  }else{
-  }
-  if(function()->has_tr_review()){
-    add_rdep(&tr_eval_tag);
-  }else{
-  }
-  if(function()->has_tr_review()){
-    add_rdep(&tr_review_tag);
-  }else{
-  }
-  if(function()->has_tr_accept()){
-    add_rdep(&tr_accept_tag);
-  }else{
-  }
-  if(function()->has_tr_advance()){
-    add_rdep(&tr_advance_tag);
-  }else{
-  }
   // Expression_::update(rdeps());
  //  auto& rd = _e.data().rdeps(); // also collect from control block?
  //  size_t rs = rd.size();
@@ -2035,8 +2040,13 @@ void AnalogEvtExpression::dump(std::ostream& o) const
   o << ")"; // here?
 }
 /*--------------------------------------------------------------------------*/
+// TODO // dup in SystemTask
 void AnalogEvtExpression::set_rdeps()
 {
+  if(function()->has_tr_restore()){
+    add_rdep(&tr_begin_tag);
+  }else{
+  }
   if(function()->has_tr_begin()){
     add_rdep(&tr_begin_tag);
   }else{

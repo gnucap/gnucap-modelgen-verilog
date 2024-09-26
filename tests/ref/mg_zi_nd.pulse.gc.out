@@ -1,0 +1,32 @@
+parameter r=1 
+parameter v=0 
+parameter a=.2 
+test_zi_npp #() dut ();
+#Time       in(dut)    ll0(dut)   ll1(dut)   ll2(dut)   ll3(dut)   ll4(dut)  
+ 0.         1.         0.         0.         0.         0.         0.        
+ 0.1        1.         1.         1.         1.         1.         1.        
+ 0.5        0.         1.         1.         1.         1.         1.        
+ 1.         0.         1.         1.         1.         1.         1.        
+ 1.1        0.         0.         0.         0.         0.         0.        
+ 2.         0.         0.         0.         0.         0.         0.        
+ 2.1        0.         0.         0.         0.         0.         0.        
+ 3.         0.         0.         0.         0.         0.         0.        
+ 3.1        0.         0.         0.         0.         0.         0.        
+ 4.         0.         0.         0.         0.         0.         0.        
+ 4.1        0.         0.         0.         0.         0.         0.        
+ 5.         0.         0.         0.         0.         0.         0.        
+ 5.1        0.         0.         0.         0.         0.         0.        
+ 6.         0.         0.         0.         0.         0.         0.        
+ 6.1        0.         0.         0.         0.         0.         0.        
+ 7.         0.         0.         0.         0.         0.         0.        
+ 7.1        0.         0.         0.         0.         0.         0.        
+ 8.         0.         0.         0.         0.         0.         0.        
+ 8.1        0.         0.         0.         0.         0.         0.        
+ 9.         0.         0.         0.         0.         0.         0.        
+ 9.1        0.         0.         0.         0.         0.         0.        
+ 10.        0.         0.         0.         0.         0.         0.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=44, fourier=0, total=66
+transient timesteps: accepted=22, rejected=0, total=22
+nodes: user=0, subckt=0, model=5, total=5
+dctran density=20.0%, ac density=20.0%

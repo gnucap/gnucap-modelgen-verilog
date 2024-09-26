@@ -456,12 +456,12 @@ static void make_tr_restore(std::ostream& o, const Module& m)
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
   o__ "(void)c;\n";
-  if(m.has_tr_begin_analog()) {
-  o__ "c->tr_begin_analog(this);\n"; // for now
+  if(m.has_tr_restore_analog()) {
+    o__ "c->tr_restore_analog(this);\n";
   }else{
   }
-  if(m.has_tr_begin_digital()) { untested();
-  o__ "c->tr_begin_digital(this);\n"; // for now
+  if(m.has_tr_restore_digital()) { untested();
+    o__ "c->tr_restore_digital(this);\n";
   }else{
   }
   o << "}\n"

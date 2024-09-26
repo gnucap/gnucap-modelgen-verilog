@@ -5,11 +5,13 @@ verilog
 
 `modelgen
 module test_zi_np0(p, n);
+	(* desc="" *) real ll0;
 	(* desc="" *) real ll1;
 	(* desc="" *) real ll2;
 	(* desc="" *) real ll3;
 	electrical p, n;
 	analog begin
+		ll0 = zi_nd(V(p,n), '{1.,1.}, '{1., 1.});
 		ll1 = zi_nd(V(p,n), '{1.}, '{1.});
 		ll2 = zi_nd(V(p,n), '{0.,1.}, '{1., 0.});
 		ll3 = zi_zp(V(p,n), '{}, '{});
@@ -25,12 +27,16 @@ parameter v=0
 
 test_zi_np0 #() dut(1,0);
 vsine #(.dc(v), .freq(.2), .ampl(1)) v1(1, 0);
+// vsine #(.dc(v), .phase(-3.14/2) .ampl(.2)) v1(1, 0);
 
 list
 
-print tran v(1) ll1(dut) ll2(dut) ll3(dut)
+print tran v(1) ll0(dut) ll1(dut) ll2(dut) ll3(dut)
 //tran 1 .1 trace=n // BUG
-tran 10 trace=n
+tran 5 trace=n
+tran 6 trace=n
+
+
 // incomplete probes...
 print ac v(1) ll1(dut) ll2(dut) ll3(dut)
 ac 2 4 * 2

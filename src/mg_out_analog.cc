@@ -32,16 +32,17 @@ public:
     modeDYNAMIC = 2,
     modePROBE = 3,
     modeTR_BEGIN = 4,
-    modeTR_ADVANCE = 5,
-    modeTR_REGRESS = 6,
-    modeTR_REVIEW = 7,
-    modeTR_ACCEPT = 8,
-    modeNUM = 9
+    modeTR_RESTORE = 5,
+    modeTR_ADVANCE = 6,
+    modeTR_REGRESS = 7,
+    modeTR_REVIEW = 8,
+    modeTR_ACCEPT = 9,
+    modeNUM = 10
   }_mode;
   Base const* _src{NULL};
   std::string ctx()const {
     char const* names[modeNUM] = { //
-      "precalc", "static", "tr_eval", "probe", "tr_begin",
+      "precalc", "static", "tr_eval", "probe", "tr_begin", "tr_restore",
       "tr_advance", "tr_regress", "tr_review", "tr_accept"
     };
     return names[_mode];
@@ -1265,15 +1266,14 @@ static void make_cc_common_tr_regress(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_cc_common_tr_begin(std::ostream& o, const Module& m)
+static void make_cc_common_tr(std::ostream& o, const Module& m, OUT_ANALOG::mode mode, Base const* dep)
 {
+  OUT_ANALOG oo(mode, dep);
   o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
   o << "inline void COMMON_" << m.identifier() <<
-    "::tr_begin_analog(MOD_" << m.identifier() << "* m) const\n{\n";
+    "::" << oo.ctx() << "_analog(MOD_" << m.identifier() << "* m) const\n{\n";
  // o__ "trace1(\"" << m.identifier() <<"::tr_begin_analog\", d);\n";
- o__ "trace1(\"" << m.identifier() <<"::tr_begin_analog\", m->long_label());\n";
-
-  OUT_ANALOG oo(OUT_ANALOG::modeTR_BEGIN, &tr_begin_tag);
+ o__ "trace1(\"" << m.identifier() <<"::tr_"<<oo.ctx()<<"_analog\", m->long_label());\n";
 
   oo.make_load_variables(o, m);
   oo.make_analog_list(o, m);
@@ -1378,7 +1378,11 @@ void make_cc_analog(std::ostream& o, const Module& m)
   // assert(m.has_analog_block());
   // assert(m.has_analog_stuff()); // in always blocks..
   if(m.has_tr_begin_analog()){
-    make_cc_common_tr_begin(o, m);
+    make_cc_common_tr(o, m, OUT_ANALOG::modeTR_BEGIN, &tr_begin_tag);
+  }else{
+  }
+  if(m.has_tr_restore_analog()){
+    make_cc_common_tr(o, m, OUT_ANALOG::modeTR_RESTORE, &tr_restore_tag);
   }else{
   }
   if(m.has_tr_review()){
