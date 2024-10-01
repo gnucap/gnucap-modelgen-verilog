@@ -306,32 +306,26 @@ void SeqBlock::parse_identifier(CS& f)
 bool SeqBlock::update()
 {
   trace0("AnalogSeqBlock::update");
-  bool ret = false;
+  int ret = 0;
   if(is_reachable()){
     for(auto i: _variables){
       if(auto s = dynamic_cast<Statement*>(i)){
-	ret |= s->update();
+	ret += s->update();
       }else{ untested();
 	unreachable(); // comment? later..
       }
     }
     for(auto i: *this){
       if(auto s = dynamic_cast<Statement*>(i)){
-	ret |= s->update();
+	ret += s->update();
       }else{ untested();
 	unreachable(); // comment? later..
       }
     }
   }else{
   }
+  trace1("AnalogSeqBlock::update done", ret);
   return ret;
-}
-/*--------------------------------------------------------------------------*/
-bool SeqBlock::propagate_rdeps(RDeps const& s)
-{ untested();
-  assert(0);
-  incomplete();
-  return false;
 }
 /*--------------------------------------------------------------------------*/
 void SeqBlock::merge_sens(Sensitivities const& s)

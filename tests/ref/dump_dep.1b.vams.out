@@ -7,8 +7,7 @@ module dep0(d, g);
     // U : 1
     real T;
     real S;
-    real U// dep _potential_b_g_
-;
+    real U;
     T = T; // dep: _potential_b_g_ s4 r2
     U = T; // dep: _potential_b_g_ s5 r2
     while (1) begin

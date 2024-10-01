@@ -730,6 +730,7 @@ DDeps const& Branch::ddeps()const
   return _deps->ddeps();
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 void Branch::reg_stmt(AnalogStmt const* r)
 {
   assert(r);
@@ -755,6 +756,7 @@ void Branch::dereg_stmt(AnalogStmt const* r)
   assert(0);
   unreachable(); // cleanup is out of order?
 }
+#endif
 /*--------------------------------------------------------------------------*/
 ckt_attr attr;
 /*--------------------------------------------------------------------------*/

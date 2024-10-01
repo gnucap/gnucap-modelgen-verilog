@@ -77,7 +77,7 @@ private:
   std::string eval(CS&, const CARD_LIST*)const override { untested();unreachable(); return "";}
   Token* new_token(Module&, size_t)const override;
 public:
-  bool propagate_rdeps(RDeps const&)const;
+  bool propagate_rdeps_(RDeps const&)const;
   void set_used_in(Base const*b)const{
     return _br.set_used_in(b);
   }

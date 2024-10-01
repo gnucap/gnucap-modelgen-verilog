@@ -1,0 +1,38 @@
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_ddtidt0(p, n);
+	electrical p, n;
+	(* desc="" *) real d;
+	(* desc="" *) real i;
+	analog begin
+		i = idt(V(p, n), 0);
+		d = ddt(i);
+		I(p,n) <+ d;
+	end
+endmodule
+
+!make test_ddtidt0.so > /dev/null
+attach ./test_ddtidt0.so
+
+verilog
+
+test_ddtidt0 #() d0(1, 2);
+resistor #(1.) ra(0,2);
+vsine #(.mag(1) .offset(-1) .phase(-3.1415/2.), .ampl(1)) v1(1, 0);
+
+print tran v(nodes) i(d0) d(d0) i(v1)
+options method=trap
+tran 0 .1 basic
+options method=euler
+tran 0 .1 0.05 basic
+* options method=gear
+* tran 0 .5
+
+print ac vm(nodes) vp(nodes)
+ac 1 10 * 10
+status notime
+end

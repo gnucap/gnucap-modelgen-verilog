@@ -97,7 +97,7 @@ bool VAFLOW::do_tr()
 /*--------------------------------------------------------------------------*/
 void VAFLOW::tr_load()
 {
-  trace3("VAFLOW::tr_load", long_label(), _n_ports, matrix_nodes());
+  trace5("VAFLOW::tr_load", long_label(), _values[0], _values[1], _n_ports, matrix_nodes());
   tr_load_passive();
   _old_values[0] = _values[0];
   _old_values[1] = _values[1];

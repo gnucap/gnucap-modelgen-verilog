@@ -88,6 +88,7 @@ Node_Ref MGVAMS_FILTER::n() const
 /*--------------------------------------------------------------------------*/
 void MGVAMS_FILTER::setup(Module* m)
 {
+  trace1("filter setup", code_name());
   if(has_refs()){
   }else{
   }
@@ -96,11 +97,15 @@ void MGVAMS_FILTER::setup(Module* m)
     bool assigned = false;
     bool always = false;
     bool output_var = false;
-    bool rdeps = false;
+    bool rdeps_ = false;
     Contribution const* cont = NULL;
     trace1("filter used_in?", branch()->used_in().size());
-    for(auto b : branch()->used_in()) {
-      trace0("filter use ..");
+
+    // use rdeps, not used_in....?
+   // for(Base const* b : rdeps()) {
+   // }
+    for(Base const* b : branch()->used_in()) {
+      trace2("filter use ..", code_name(), typeid(*b).name());
       if(auto c = dynamic_cast<Contribution const*>(b)){
 	if(c->is_flow_contrib()) {
 	  trace1("filter used_in flow", c->name());
@@ -117,16 +122,27 @@ void MGVAMS_FILTER::setup(Module* m)
 	  always = true;
 	}else{
 	}
+      }else if(auto aa=dynamic_cast<AnalogProceduralAssignment const*>(b)){ untested();
+	if(aa->is_always()){ untested();
+	  always = true;
+	}else{ untested();
+	}
       }else if(auto aa=dynamic_cast<Assignment const*>(b)){
 	trace1("use in assignment", aa->is_output_var());
 	assigned = true;
 	output_var = aa->is_output_var();
+
       }else if(auto bb=dynamic_cast<Branch const*>(b)){
 	trace1("use in branch", bb->code_name());
-	rdeps = true;
+	if(branch() == bb){ untested();
+	}else{
+	  rdeps_ = true;
+	}
 	// covered by rdeps?
       }else if(dynamic_cast<Variable_List_Collection const*>(b)){ untested();
       }else if(b == &tr_accept_tag) {
+      }else if(b == &tr_begin_tag) {
+      }else if(b == &tr_advance_tag) {
       }else{
 	trace1("xdt unknown?", c_cnt);
 	unreachable();
@@ -137,10 +153,10 @@ void MGVAMS_FILTER::setup(Module* m)
     //   rdeps = true;
     // }
 
-    trace4("filter use?", c_cnt, rdeps, assigned, branch()->code_name());
+    trace4("filter use?", c_cnt, rdeps_, assigned, branch()->code_name());
     _output = NULL;
     if(output_var){
-      // can't tet optimise out if there is both
+      // can't optimise out if there is both
       // single contribution and output var...
     }else{
     }
@@ -155,26 +171,38 @@ void MGVAMS_FILTER::setup(Module* m)
 	}else if(d.is_linear()){
 	  incomplete(); // propagate loss?
 	  _output = cont->branch(); // polarity?
-	  set_p_to_gnd(m);
 	}
 	if(cont->reversed()){
 	}else{
 	}
       }
-    }else if(rdeps){
+    }else if(rdeps_){
+      // ?
     }else if(c_cnt==0){
+      if(rdeps_){ untested();
+      }else{
+      }
+      trace5("filter use2", branch()->code_name(), always, output_var, assigned, c_cnt);
       incomplete(); // analysis?
       set_p_to_gnd(m);
       // func->_output = cont->branch(); // polarity?
     }else if(assigned){ untested();
     }else if(c_cnt!=1){ untested();
     }else{
+      unreachable();
       incomplete(); // later
       // func->set_p_to_gnd();
     }
   }else{
-
+    assert(!_output);
   }
+
+  if(_output){
+    trace1("filter output", branch()->code_name());
+    set_p_to_gnd(m);
+  }else{
+  }
+
 }
 /*--------------------------------------------------------------------------*/
 void MGVAMS_FILTER::set_n_to_gnd(Module* m) const

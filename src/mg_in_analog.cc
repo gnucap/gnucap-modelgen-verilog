@@ -664,9 +664,11 @@ void AnalogForStmt::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 bool AnalogProceduralAssignment::update()
 {
-  trace1("AnalogProceduralAssignment::update",  deps().size());
+  trace2("AnalogProceduralAssignment::update", _a.lhs().name(), rdeps().size());
 //  trace1("AnalogProceduralAssignment::update",  _a.data().size());
-  trace1("AnalogProceduralAssignment::update",  rdeps().size());
+  for(auto& r : rdeps()){
+    trace2("AnalogProceduralAssignment::update", _a.lhs().name(), typeid(*r).name());
+  }
 
   bool ret;
   if(options().optimize_unused() && !scope()->is_reachable()) {
@@ -910,7 +912,9 @@ void AnalogConstruct::parse(CS& f)
   assert(!_block);
   auto ab = new AnalogCtrlBlock(f, this);
   _block = ab;
-  ab->update();
+  while(ab->update()){
+    trace0("AnalogConstruct update");
+  }
 }
 /*--------------------------------------------------------------------------*/
 void AnalogSeqStmt::parse(CS& f)
@@ -1281,7 +1285,7 @@ void Contribution::parse(CS& cmd)
   }else{
     trace2("inc_use0", name(), branch()->name());
     _branch->inc_use(); // ??
-    _branch->reg_stmt(this);
+   // _branch->reg_stmt(this);
     set_used_in(_branch);
 //    _deps->add_rdep(this);
 //    _deps->add_rdep(_branch);
@@ -2248,7 +2252,7 @@ Contribution::~Contribution()
       }
     }
 
-    _branch->dereg_stmt(this);
+   // _branch->dereg_stmt(this);
     unset_used_in(_branch);
   }
   delete _deps;
@@ -2599,19 +2603,20 @@ bool AnalogProceduralAssignment::propagate_rdeps(RDeps const& r)
   }else{
   }
   bool ret = false;
-  for(auto n : r) {
+  for(Base const* n : r) {
     ret |= propagate_rdep(n);
   }
   return ret;
 }
 /*--------------------------------------------------------------------------*/
-bool Probe::propagate_rdeps(RDeps const& r) const
+bool Probe::propagate_rdeps_(RDeps const& r) const
 {
+  trace1("Probe::propagate_rdeps", r.size());
   bool ret = false;
-  for(auto n : r) {
-    auto p = _rdeps.insert(n);
+  for(Base const* n : r) {
+    auto p = _rdeps.insert(n); // rdeps in probe, not branch?
     if(p.second){
-      ret = _br->set_used_in(*p.first); // unset?
+      ret |= _br->set_used_in(*p.first); // unset?
     }else{
     }
   }

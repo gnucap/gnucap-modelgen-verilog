@@ -303,7 +303,7 @@ void LANG_VERILOG::parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 	    }
 	  }else{
 	  }
-	}catch (Exception_Too_Many& e) { untested();
+	}catch (Exception_Too_Many& e) {
 	  cmd.warn(bDANGER, here, e.message());
 	}catch (Exception_Clash&) {untested();
 	  unreachable();

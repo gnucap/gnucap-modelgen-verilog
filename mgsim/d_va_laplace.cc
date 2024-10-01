@@ -291,7 +291,7 @@ private: // BASE_SUBCKT
       _s_[0]->_loss0 = 1.;
       _s_[0]->_loss1 = 1.;
       if(_set_parameters){
-	// _output->_loss0 = _loss0;
+//	_output->_loss0 = _loss0; // no loss in vaflow
       }else{
 	assert(!_loss0);
       }
@@ -436,6 +436,8 @@ double LAPLACE::tr_probe_num(std::string const& n) const
 
   if(n == "vin") { untested();
     return _st_b_in_[0];
+  }else if(n == "loss") { untested();
+    return _loss0;
   }else if(n == "conv") { untested();
     return converged();
   }else{ untested();
@@ -960,6 +962,11 @@ void LAPLACE::precalc_last()
   assert(_st_b_in_);
   trace2("mhack", _st_b_in_[0], _st_b_in_[1]);
   double mhack = _st_b_in_[1];
+  if(_loss0){
+    assert(_loss0 == 1);
+    mhack = - _loss0 * mhack;
+  }else{
+  }
   _st_b_in_[1] = 0.;
   if(_set_parameters){
   }else{
@@ -1131,8 +1138,7 @@ double LAPLACE::tr_amps() const
   assert(_output);
   double r = _output->tr_amps();
   if(_loss0){
-    assert(_loss0==1.);
-    assert(!_output->_loss0);
+    assert(!_output->_loss0); // no loss in vaflow
   }else{ untested();
     assert(!_output->_loss0);
   }
@@ -1140,6 +1146,11 @@ double LAPLACE::tr_amps() const
     trace5("LAPLACE::tr_amps", r, _loss0, _input->tr_amps(), *_st_b_in_, _n[0].v0());
     trace3("LAPLACE::tr_amps", _st_b_in_[2], _output->tr_outvolts(), _output->tr_amps());
   }else{ untested();
+  }
+  if(_loss0){
+    assert(_loss0==1.);
+//    r = -r;
+  }else{
   }
   return r;
 }

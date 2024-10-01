@@ -27,6 +27,7 @@ vsine #(.mag(1), .dc(v), .ampl(1)) v1(1, 0);
 list
 
 print tran v(1) v(3) i(dut.*.out)
+// print tran loss(dut.*)
 tran 1 .1 trace=n
 print ac v(1) vp(3) vm(3)
 ac 2 4 * 2

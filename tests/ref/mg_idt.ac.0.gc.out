@@ -1,0 +1,11 @@
+#          
+ 0.        
+#Freq       vm(1)      vm(2)      vm(3)      vm(4)      vp(1)      vp(2)      vp(3)      vp(4)     
+ 0.15916    1.         0.99997    0.99997    0.99997    0.         90.        90.        90.       
+#Freq       vm(1)      vm(2)      vm(3)      vm(4)      vp(1)      vp(2)      vp(3)      vp(4)     
+ 1.         1.         0.15915    0.15915    0.15915    0.         90.        90.        90.       
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=5
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=4, subckt=0, model=4, total=8
+dctran density=53.1%, ac density=43.8%

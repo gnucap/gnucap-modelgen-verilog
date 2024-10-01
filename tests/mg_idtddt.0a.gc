@@ -1,0 +1,43 @@
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+options noincmode nobypass
+
+`modelgen
+module test_idtddt0(p, n);
+	(* desc="" *) real d;
+	(* desc="" *) real i;
+	electrical p, n;
+	electrical a, b;
+	analog begin
+		I(a) <+ ddt(V(p,n));
+		I(a) <+ V(a);
+
+		I(b) <+ idt(V(a),0);
+		I(b) <+ V(b);
+
+		I(p,n) <+ V(b);
+	end
+endmodule
+
+!make test_idtddt0.so > /dev/null
+attach ./test_idtddt0.so
+
+verilog
+
+test_idtddt0 #() d0(2,0);
+resistor #(1.) r(1,2)
+vsine #(.offset(-1) .phase(-3.1415/2.), .ampl(1)) v1(1, 0);
+
+print tran v(nodes)
+// d(d0) i(d0) i(d0.*) v(d0.*)
+tran 0 .1 basic
+options method=euler
+tran 0 .1 basic
+
+print ac vm(nodes) vp(nodes)
+ac 1 10 * 10
+status notime
+end

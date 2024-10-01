@@ -3,7 +3,7 @@ module test_nop2(np, n);
   electrical p, n;
   analog begin // always
     begin // always
-      I(p, n) <+ 0.; // r2
+      I(p, n) <+ 0.; // r1
     end
   end
 

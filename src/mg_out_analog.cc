@@ -298,7 +298,6 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
     make_cc_expression(o, e);
 
     char sign = C.reversed()?'-':'+';
-    char neg_sign = C.reversed()?'+':'-';
     std::string bcn = C.branch_ref().code_name();
     if(!is_dynamic()) {
     }else if(C.branch()->has_pot_source()){
@@ -380,10 +379,10 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	assert(v->branch());
 	if(C.branch() == v->branch()) {
 	  o__ "// same2 " << v->code_name() << "\n";
-	}else if(v->branch()->is_detached_filter()){ /// && ref?
-	  o__ "m->" << v->branch()->state() << "[1] = " << neg_sign << "t0[d" << v->code_name() << "]; // (3p)\n";
-	}else if(v->branch()->is_filter()){ /// && ref?
-	  o__ "m->" << v->branch()->state() << "[1] = " << neg_sign << "1; // (3q)\n"; // mfactor hack
+	}else if(v->branch()->is_detached_filter()){
+	  o__ "m->" << v->branch()->state() << "[1] = " << sign << "t0[d" << v->code_name() << "]; // (3p)\n";
+	}else if(v->branch()->is_filter()){
+	  o__ "m->" << v->branch()->state() << "[1] = " << sign << "1; // (3q)\n"; // mfactor hack
 	}else if(v->branch()->is_short()) {
 	  o__ "// short: " << v->code_name() << "\n";
 	}else if(v->branch()->has_element()){
@@ -798,7 +797,11 @@ void OUT_ANALOG::make_seq(std::ostream& o, AnalogSeqStmt const& s) const
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_seq_block(std::ostream& o, AnalogSeqBlock const& s) const
 {
-  o__ "{ // " << s.identifier() << "\n";
+  if(s.has_identifier()) {
+    o__ "{ // : " << s.identifier() << "\n";
+  }else{
+    o__ "{ // anonymous block\n";
+  }
   make_load_block_variables(o, s.variables_());
 #if 0
   for(auto i : s.variables_()) {

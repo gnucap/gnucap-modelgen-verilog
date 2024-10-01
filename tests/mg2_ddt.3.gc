@@ -26,7 +26,12 @@ resistor #(1) R2(3  0);
 print tran dd(dut) iter(0)
 tran 1
 print tran v nodes iter(0)
+options numdgt 20
+options noincmode nobypass
 tran 0 1
+options incmode bypass
+tran 0 1
+options numdgt 5
 print ac vm(3) vp(3)
 ac 1 10 * 2
 status notime

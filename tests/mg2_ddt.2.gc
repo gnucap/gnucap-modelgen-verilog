@@ -13,6 +13,7 @@ endmodule
 
 !make test_ddt2.so > /dev/null
 attach ./test_ddt2.so
+parameter v=1
 
 test_ddt2 #() dut(0,3,1,0);
 vsine #(.dc(v), .ampl(1)) v1(1, 0);
@@ -24,4 +25,8 @@ R2  3  0  1.
 .print ac vm(nodes) vp(nodes)
 .tran 1
 .ac 1 10 * 2
+
+.options noincmode
+.options nobypass
+.tran 0 1
 .status notime

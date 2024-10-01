@@ -269,8 +269,8 @@ public:
   map const& variables()const {return _var_refs;}
   Variable_List_Collection const& variables_()const {return _variables;}
   bool update();
-public:
-  bool propagate_rdeps(RDeps const&);
+//public:
+  //bool propagate_rdeps(RDeps const&);
 }; // SeqBlock
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -166,7 +166,6 @@ class Branch : public Element_2 {
   size_t _has_always_pot{0};
   FUNCTION_ const* _ctrl{NULL};
   std::vector<Branch_Ref*> _refs;
-  std::vector<AnalogStmt const*> _stmts;
   size_t _number;
 //  std::list<std::string> _names;
   bool _direct{true};
@@ -226,7 +225,7 @@ public:
   void dec_short(){ assert(_has_short); --_has_short; }
 //  void dec_always_pot(){ untested(); assert(_has_always_pot); --_has_always_pot; }
 
-  void set_filter(FUNCTION_ const* f){ _ctrl=f; }
+  void set_filter(FUNCTION_ const* f){ assert(!_ctrl); _ctrl=f; }
   void set_source(bool d=true) {_source = d; }
   void set_probe(bool d=true) {_probe = d; }
   void set_direct(bool d=true);
@@ -248,14 +247,14 @@ public:
 //  bool has(Branch_Ref*) const;
   void attach(Branch_Ref*);
   void detach(Branch_Ref*);
-  void reg_stmt(AnalogStmt const*);
-  void dereg_stmt(AnalogStmt const*);
   size_t number() const{ untested();return _number;}
   size_t num_branches() const;
 
-  TData const& deps()const { assert(_deps); return *_deps; } // delete?
   DDeps const& ddeps()const;
-  TData& deps() { assert(_deps); return *_deps; } // delete?
+
+  // move to function?
+  TData const& deps()const { assert(_deps); return *_deps; }
+  TData& deps() { assert(_deps); return *_deps; }
 						 //
   Branch const* output() const;
   virtual bool has_name()const{return false;}

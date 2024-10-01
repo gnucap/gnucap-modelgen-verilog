@@ -24,11 +24,11 @@ module dep7(a, g);
       if ((c > 0)) begin : b1
         // f : 1
         real f;
-        I(g) <+ d; // dep: _potential_b_a_ s3 r2
+        I(g) <+ d; // dep: _potential_b_a_ s3 r1
         f = d; // dep: _potential_b_a_ s4 r2
       end
       else begin
-        I(g) <+ 1; // r2
+        I(g) <+ 1; // r1
       end
     end
   end
@@ -63,11 +63,11 @@ module dep7p(a, g);
       if ((c > 0)) begin : b1
         // f : 1
         real f;
-        I(g) <+ d; // dep: _potential_b_a_ s3 r2
+        I(g) <+ d; // dep: _potential_b_a_ s3 r1
         f = d; // dep: _potential_b_a_ s4 r2
       end
       else begin
-        I(g) <+ 1; // r2
+        I(g) <+ 1; // r1
       end
     end
   end

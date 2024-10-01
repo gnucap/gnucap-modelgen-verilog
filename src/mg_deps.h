@@ -52,7 +52,7 @@ public:
   void set_any(){
     _order = _ANY;
   }
-  bool propagate_rdeps(RDeps const&) const;
+  bool propagate_rdeps_(RDeps const&) const;
   void set_used_in(Base const*) const;
 
 public:

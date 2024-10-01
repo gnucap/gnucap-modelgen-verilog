@@ -302,10 +302,19 @@ bool Expression_::update(RDeps const* rd)
   trace1("Expression_::update", rd?rd->size():-1);
   size_t n = data().size();
 
+  bool rdd = false;
   auto i = begin();
   for(size_t nn=size(); nn--; i=erase(i)){
     trace1("Expression_::update stack_op", (*i)->name());
     (*i)->stack_op(this);
+
+    // propagate here??
+    if(!size()) { untested();
+      assert(0);
+    }else if(rd) {
+      rdd |= propagate_rdeps(*rd); // set deps.rdeps?
+    }else {
+    }
   }
 
   if(n<data().ddeps().size()) {
@@ -313,13 +322,6 @@ bool Expression_::update(RDeps const* rd)
   }else{
   }
 
-  bool rdd=false;
-  if(!size()) { untested();
-    assert(0);
-  }else if(rd) {
-    rdd = propagate_rdeps(*rd); // set deps.rdeps?
-  }else {
-  }
 
   trace3("Expression_::update", size(), n, rdd);
   return rdd || n != data().size();
@@ -429,12 +431,14 @@ bool Expression_::propagate_rdeps(RDeps const& r)
     }
   }
   if(auto st = dynamic_cast<Statement*>(owner())) {
-    ret |= st->propagate_rdeps(r);
+    incomplete();
+   // ret |= st->propagate_rdeps(r);
   }else{ untested();
     assert(0);
   }
-  for(auto& p : data().ddeps()){
-    ret |= p.propagate_rdeps(r);
+  // BUG.
+  for(Dep p : data().ddeps()){
+    ret |= p.propagate_rdeps_(r);
   }
  //  for(auto& p : data().pdeps()){ untested();
  //    ret |= p.propagate_rdeps(r);

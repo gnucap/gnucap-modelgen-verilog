@@ -1,0 +1,35 @@
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_idtac0(p, q, r, s, n);
+	(* desc="" *) real d;
+	(* desc="" *) real i;
+	electrical p, n;
+	analog begin
+		d = V(p,n);
+		i = idt(d,0);
+		I(q,n) <+ i;
+
+		I(r,n) <+ idt(d,0) + V(r,n);
+		I(s,n) <+ laplace_nd(V(p, n), '{1.}, '{0., 1.}) + V(s,n);
+	end
+endmodule
+
+!make test_idtac0.so > /dev/null
+attach ./test_idtac0.so
+
+verilog
+
+test_idtac0 #() d0(1, 2, 3, 4, 0);
+resistor #(1.) r (2,0);
+vsine #(.mag(1.)) v1(1, 0);
+
+dc // BUG?
+print ac vm(nodes) vp(nodes)
+ac {1./3.1415/2.}
+ac 1
+status notime
+end

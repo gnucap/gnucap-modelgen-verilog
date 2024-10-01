@@ -260,7 +260,7 @@ public:
       o____ "l->set_param_by_name(" + den_name_i() + ", \"\");\n";
       o____ "l->set_param_by_name(" + den_name_i() + ", to_string(den[i]));\n";
       o__ "}\n";
-      o__ "ret[d_potential" << cn << "] = -1.;\n";
+      o__ "ret[d_potential" << cn << "] = 1.;\n";
       o__ "return ret;\n";
     }
     o__ "}\n"

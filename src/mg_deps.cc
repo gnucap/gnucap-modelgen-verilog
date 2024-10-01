@@ -176,14 +176,10 @@ bool TData::has_sensitivities()const
   return false;//!_sens.empty();
 }
 /*--------------------------------------------------------------------------*/
-bool Dep::propagate_rdeps(RDeps const& r) const
+bool Dep::propagate_rdeps_(RDeps const& r) const
 {
-  if(_prb){
-    return _prb->propagate_rdeps(r);
-  }else{ untested();
-    unreachable();
-    return false;
-  }
+  assert(_prb);
+  return _prb->propagate_rdeps_(r);
 }
 /*--------------------------------------------------------------------------*/
 std::string Dep::code_name() const
