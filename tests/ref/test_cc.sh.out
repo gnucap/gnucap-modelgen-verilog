@@ -1875,7 +1875,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
         s0 = "thermal";
         ddouble t0;
         t0 = d->_b_white_noise_1__precalc( 0., s0);
-        m->_st_b_white_noise_1_p_white_noise_1_n[1] = -t0[d_potential_b_white_noise_1_p_white_noise_1_n]; // (3p)
+        m->_st_b_white_noise_1_p_white_noise_1_n[1] = +t0[d_potential_b_white_noise_1_p_white_noise_1_n]; // (3p)
       }
     }
   }
@@ -3284,7 +3284,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
         std::string s0;
         s0 = "thermal";
         t0 = d->_b_white_noise_0__precalc(t0, s0);
-        m->_st_b_white_noise_0_p_white_noise_0_n[1] = -t0[d_potential_b_white_noise_0_p_white_noise_0_n]; // (3p)
+        m->_st_b_white_noise_0_p_white_noise_0_n[1] = +t0[d_potential_b_white_noise_0_p_white_noise_0_n]; // (3p)
       }
     }
   }
@@ -4764,9 +4764,9 @@ private: // func decl
   bool _short_b_ddt_1()const {return 1;}
   ddouble _b_ddt_1__precalc(ddouble){
   ddouble ret = 0.;
-  /* short, mfactor hack */ ret[d_potential_b_ddt_1_p_ddt_1_n] = -1.;
-  return ret;
-}
+    /* short, mfactor hack */ ret[d_potential_b_ddt_1_p_ddt_1_n] = 1.;
+    return ret;
+  }
 //probe potential_ddt_1_p_
   ddouble xs_potential_b_ddt_1_p_ddt_1_n() const { // potential_ddt_1_p_
     ddouble t;
@@ -5250,7 +5250,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
             t0 = 0.; // precalc.
             t0 = (_p___c) /*rhspar*/ * t0;
             t0 = /*XDT*/ d->_b_ddt_1__precalc(t0);
-            m->_st_b_ddt_1_p_ddt_1_n[1] = -t0[d_potential_b_ddt_1_p_ddt_1_n]; // (3p)
+            m->_st_b_ddt_1_p_ddt_1_n[1] = +t0[d_potential_b_ddt_1_p_ddt_1_n]; // (3p)
           }
         }
       }
@@ -5558,7 +5558,6 @@ MOD_capacitor::ddouble MOD_capacitor::_b_ddt_1(ddouble t0)
   d->_st_b_ddt_1_p_ddt_1_n[MOD::_st_b_ddt_1_p_ddt_1_n_::dep_potential_b_p_n]  = + t0[d_potential_b_p_n]; // (4)
   // subdevice
   t0 = 0.;
-  /* short */ t0[d_potential_b_ddt_1_p_ddt_1_n] = 1.;
   assert(t0 == t0);
   return t0; // (output)
 }
@@ -5655,9 +5654,9 @@ private: // func decl
   bool _short_b_ddt_2()const {return 0;}
   ddouble _b_ddt_2__precalc(ddouble){
   ddouble ret = 0.;
-  ret[d_potential_b_ddt_2_p_ddt_2_n] = -1.;
-  return ret;
-}
+    ret[d_potential_b_ddt_2_p_ddt_2_n] = 1.; // not short.
+    return ret;
+  }
 //probe potential_ddt_2_p_
   ddouble xs_potential_b_ddt_2_p_ddt_2_n() const { // potential_ddt_2_p_
     ddouble t;
@@ -6224,7 +6223,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
               t0 = 0.; // precalc.
               t0 = (_p___c) /*rhspar*/ * t0;
               t0 = /*XDT*/ d->_b_ddt_2__precalc(t0);
-              m->_st_b_ddt_2_p_ddt_2_n[1] = -1; // (3q)
+              m->_st_b_ddt_2_p_ddt_2_n[1] = +1; // (3q)
             }
           }
         }

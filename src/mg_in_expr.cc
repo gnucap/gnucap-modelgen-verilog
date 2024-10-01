@@ -430,8 +430,7 @@ bool Expression_::propagate_rdeps(RDeps const& r)
       assert(0);
     }
   }
-  if(auto st = dynamic_cast<Statement*>(owner())) {
-    incomplete();
+  if(dynamic_cast<Statement*>(owner())) {
    // ret |= st->propagate_rdeps(r);
   }else{ untested();
     assert(0);

@@ -884,7 +884,7 @@ static void make_set_self_contribution(std::ostream& o, Dep const& d)
     o__ "}else{\n";
     o____ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
     o__ "}\n";
-  }else if(both && d->is_flow_probe()) { untested();
+  }else if(both && d->is_flow_probe()) {
     o__ "// self flow\n";
     o__ "if (_pot"<< b->code_name() << "){\n";
     o____ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
@@ -954,7 +954,7 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
       o__ "// same1 " << d->code_name() << "\n";
       if(b->has_pot_source() && b->has_flow_probe()){
 	if(br.num_states()<=2){
-	}else{ untested();
+	}else{
 	  incomplete(); // the other ones??
 	}
       }else{

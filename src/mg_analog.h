@@ -215,12 +215,9 @@ public:
   void parse(CS& cmd)override;
   AnalogCtrlBlock const& body()const { return _body; }
 private:
-//  bool update()override { untested();return _body.update();}
   TData const& deps()const override { return _deps;}; // ?
-//  TData const& data()const override { return _deps;};
 protected:
   bool update()override {
-    incomplete();
     bool ret = _body.update();
     return AnalogStmt::update() || ret;
   }

@@ -97,8 +97,8 @@ ${sh_out}: ${TARGETDIR}/%.sh.out: prep
 	-@${ENV} ${srcdir}/$*.sh ${MODELGEN} > $@
 
 ${PWD}/disciplines.vams:
-	-${LN_S} ${top_srcdir}/vams/disciplines.vams
+	-${LN_S} ${srcdir}/../vams/disciplines.vams
 ${PWD}/constants.vams:
-	-${LN_S} ${top_srcdir}/vams/constants.vams
+	-${LN_S} ${srcdir}/../vams/constants.vams
 ${PWD}/sub:
 	-${LN_S} ${srcdir}/sub

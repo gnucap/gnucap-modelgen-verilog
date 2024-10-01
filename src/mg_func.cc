@@ -127,10 +127,10 @@ void MGVAMS_FILTER::setup(Module* m)
 	  always = true;
 	}else{ untested();
 	}
-      }else if(auto aa=dynamic_cast<Assignment const*>(b)){
-	trace1("use in assignment", aa->is_output_var());
+      }else if(auto a2=dynamic_cast<Assignment const*>(b)){
+	trace1("use in assignment", a2->is_output_var());
 	assigned = true;
-	output_var = aa->is_output_var();
+	output_var = a2->is_output_var();
 
       }else if(auto bb=dynamic_cast<Branch const*>(b)){
 	trace1("use in branch", bb->code_name());

@@ -40,14 +40,14 @@ namespace {
 /*--------------------------------------------------------------------------*/
 static bool is_constant(Token const* t)
 {
-  if(auto f = dynamic_cast<const Float*>(t->data())){ untested();
+  if(dynamic_cast<const Float*>(t->data())){ untested();
     assert(dynamic_cast<Token_CONSTANT const*>(t)
 	  ||dynamic_cast<Token_PAR_REF const*>(t));
     return true;
   }else if(auto data = dynamic_cast<const TData*>(t->data())){
     return data->is_constant();
   }else{
-    unreachable();
+    // unreachable(); incomplete?
     return false;
   }
 }
@@ -589,13 +589,13 @@ void Token_CALL::stack_op(Expression* e) const
       try{
 	f->stack_op(*arg_expr, E);
       }catch(Exception const&){
-	incomplete();
+	// incomplete(); later
 	f = NULL;
       }
     }else{ untested();
     }
     if(f){
-      incomplete();
+      // incomplete();
       trace2("CALL stackopped", name(), E->back()->name());
     }else{
       auto SE = prechecked_cast<Expression_*>(E);

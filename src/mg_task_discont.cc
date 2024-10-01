@@ -49,6 +49,10 @@ private:
   bool has_tr_accept()const override {return true;}
   bool static_code()const override {return false;}
   Token* new_token(Module& m, size_t na)const override{
+    if(na>1){
+      incomplete(); // error?
+    }else{
+    }
     m.install(this);
     m.set_tr_review(); // WIP, remove.
     m.set_tr_accept(); // WIP, remove.

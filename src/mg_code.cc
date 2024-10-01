@@ -127,17 +127,13 @@ void Variable_Decl::new_data()
   Variable_List_Collection const* p=NULL;
   if(!mod){ untested();
   }else if(is_output_var(tag_t(this))) {
+    // todo: tag?
     p = &mod->variables();
+    (void)p;
+    // set_rdep(tag_probe);
   }else{
   }
-  // _rdeps.add(p);
-   _data = new TData();
-   if(p){
-  incomplete();
-   }
- //    _data->add_rdep(p);
- //  }else{ untested();
- //  }
+  _data = new TData();
 }
 /*--------------------------------------------------------------------------*/
 Variable_Decl* Variable_Decl::deep_copy(Base* b, std::string s) const

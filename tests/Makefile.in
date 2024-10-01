@@ -8,7 +8,7 @@ GNUCAP_CONF = gnucap-conf
 CXX = $(shell $(GNUCAP_CONF) --cxx)
 GNUCAP_CPPFLAGS = $(shell $(GNUCAP_CONF) --cppflags) -DADD_VERSION -DPIC
 GNUCAP_CXXFLAGS = $(shell $(GNUCAP_CONF) --cxxflags) -std=c++11
-MAKE_CPPFLAGS = -I${top_srcdir}/src
+MAKE_CPPFLAGS = -I${srcdir}/../src
 CPPFLAGS = -DTRACE_UNTESTED
 SYMLINKS = ${PWD}/disciplines.vams ${PWD}/constants.vams ${PWD}/sub
 LN_S = ln -sf

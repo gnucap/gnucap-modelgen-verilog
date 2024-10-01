@@ -277,17 +277,11 @@ bool Variable_Stmt::update()
 /*--------------------------------------------------------------------------*/
 bool Variable_Stmt::is_used_in(Base const* b) const
 {
-  for(Variable_Decl const* v : _l){
-    // if(v->is_used_in(b)){ untested();
-    //   return true;
-    // }else{ untested();
-    // }
-  }
+  // incomplete
 
   if(Statement::is_used_in(b)) { untested();
     return true;
   }else{
-    incomplete();
     return true; // mg_strobe.0.gc.out 
     return false;
   }
@@ -430,13 +424,6 @@ void Assignment::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 bool Assignment::is_used_in(Base const* b) const
 {
-  if(auto p = dynamic_cast<Statement const*>(owner())) {
-    // AnalogProcAssignment?
-//    return p->is_used_in(b);
-  }else{ untested();
-    unreachable();
-  }
-
   return Expression_::is_used_in(b);
 }
 /*--------------------------------------------------------------------------*/

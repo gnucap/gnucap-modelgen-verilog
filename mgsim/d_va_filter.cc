@@ -189,7 +189,7 @@ private: // override virtual
   CARD*	   clone()const override	{return new DEV_DDT(*this);}
   bool	   do_tr()override;
   void	   ac_load()override; // TODO: ac_eval
-  double   tr_amps()const override      { untested(); return DEV_CPOLY_CAP::tr_amps(); }
+  double   tr_amps()const override      { return DEV_CPOLY_CAP::tr_amps(); }
   void	   tr_begin()override;
   void	   tr_advance()override;
   void tr_load()override{
@@ -239,7 +239,7 @@ private: // override virtual
   std::string dev_type()const override	{ untested();unreachable(); return "idt";}
   CARD*	   clone()const override	{return new DEV_IDT(*this);}
   bool	   do_tr()override;
-  double   tr_amps()const override      { untested(); return DEV_CPOLY_CAP::tr_amps(); }
+  double   tr_amps()const override      { return DEV_CPOLY_CAP::tr_amps(); }
 /*--------------------------------------------------------------------------*/
   void	   tr_begin()override;
   void	   tr_advance()override;
@@ -253,9 +253,9 @@ void DEV_IDT::ac_load()
 {
  // do_ac.
   _acout = 1./_sim->_jomega;
-  if(_loss0) { untested();
+  if(_loss0) {
     _acout *= - _loss0;
-  }else{ untested();
+  }else{
   }
 		   //
   DEV_CPOLY_CAP::ac_load();
@@ -430,7 +430,7 @@ bool DEV_DDT::do_tr()
     assert( i == _n_ports - _input.size() + 1);
 
     // current port input
-    for (; int(i)<=_n_ports; ++i) { untested();
+    for (; int(i)<=_n_ports; ++i) {
       int k = int(i)-int(_n_ports - _input.size() + 1);
       assert(_input[k]->has_iv_probe()); // for now.
       // _m0.c0 += _y[0].f1 * _input->_m0.c0;
@@ -489,7 +489,7 @@ void DEV_IDT::tr_advance()
   trace2("DEV_IDT::tr_advance", long_label(), _sim->_time0);
   STORAGE::tr_advance();
 
-  if(0) // later
+#if 0 // later
   if(_sim->_v0){
     for (int i=2; i<=_n_ports; ++i) {
       _vi0[i] = tr_l_to_g(_vy0[i], _vi0[i], _time, _method_a, _dt);
@@ -506,6 +506,7 @@ void DEV_IDT::tr_advance()
     }
   }else{ untested();
   }
+#endif
 
    // if(_sim->_last_time == 0.) {
    //   // breaks idt..
@@ -642,7 +643,7 @@ void DEV_CPOLY_CAP::ac_load()
 {
   ac_load_shunt(); // 4 pt +- loss
 		   //
-  if(_acg==0.){ untested();
+  if(_acg==0.){
   }else{ untested();
   }
   ac_load_passive();
@@ -657,9 +658,9 @@ void DEV_DDT::ac_load()
  // return DEV_CPOLY_CAP::ac_load();
 
   _acout = _sim->_jomega;
-  if(_loss0){ untested();
+  if(_loss0) {
     _acout *= - _loss0;
-  }else{ untested();
+  }else{
   }
 
   trace6("CAP::ac_load", long_label(), _vy0[0], _vy0[1], _loss0, _loss1, _acg);

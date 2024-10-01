@@ -333,8 +333,6 @@ void Parameter_2_List::parse(CS& file)
   try{
     LiSt<Parameter_2, '\0', ',', ';'>::parse(file);
   }catch(Exception_CS_ const& e){
-    for(auto& i : *this){ untested();
-    }
     throw e;
   }
   for(auto& i : *this){

@@ -520,9 +520,9 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
      //    o__ s.code_name() << " = 0.; // precalc.\n";
      //  }else
       if(!s.has_deps()){
-	incomplete(); // use ctx?
+	// incomplete(); // use ctx instead.
         o__ s.code_name() << " = 0.; // precalc.\n";
-//	o__ s.code_name() << " = p->xs" << pp->code_name_() << "();\n";
+//	o__ s.code_name() << " = p->xs" << pp->code_name_() << "precalc();\n";
       }else if(pp->is_short()){
 	o__ s.code_name() << " = 0.; // short probe\n";
       }else{

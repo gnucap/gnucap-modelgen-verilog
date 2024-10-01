@@ -268,7 +268,7 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
     return;
   }else if(!c->common()){
     c->set_dev_type(modelname);
-  }else if(auto m=dynamic_cast<MODEL_CARD const*>(model)){ untested();
+  }else if(auto m=dynamic_cast<MODEL_CARD const*>(model)){
     // bypass spice-style find_model
     trace3("prepare_overload bypass", Proto->long_label(), Proto->net_nodes(), _parent);
     assert(c->common());

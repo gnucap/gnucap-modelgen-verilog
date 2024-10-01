@@ -161,7 +161,7 @@ private: // overrides
   void precalc_last()override;
   double tr_probe_num(std::string const&)const override;
   int max_nodes()const override {return std::max(2,_n_ports*2);}
-  int net_nodes()const override	{incomplete(); return _n_ports*2;}
+  int net_nodes()const override	{return _n_ports*2;}
   int min_nodes()const override {return 4;}
   int int_nodes()const override {return bool(_ctrl_in);}
 
@@ -374,7 +374,7 @@ void DELAY::tr_begin()
     }else{
     }
   }else{ untested();
-    auto* cc=prechecked_cast<const COMMON_DELAY*>(common());
+   // auto* cc=prechecked_cast<const COMMON_DELAY*>(common());
     incomplete();
   }
 }

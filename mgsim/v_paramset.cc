@@ -308,12 +308,12 @@ void PARAMSET::grow_nodes(size_t Index)
   if(Index<_node_capacity){
   }else{
     size_t new_capacity = std::max(_node_capacity, node_capacity_floor);
-    while(new_capacity <= Index) { untested();
+    while(new_capacity <= Index) {
       assert(new_capacity < new_capacity * 2);
       new_capacity *= 2;
     }
     node_t* new_nodes = new node_t[new_capacity];
-    for(size_t i=0; i<_node_capacity; ++i){ untested();
+    for(size_t i=0; i<_node_capacity; ++i){
       new_nodes[i] = _n[i];
     }
     delete[] _n;
