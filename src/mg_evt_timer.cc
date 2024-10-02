@@ -120,12 +120,22 @@ private:
     o____ "}\n";
     /*----------------------------------------------------------------------*/
     o__ "public:\n";
-    o____ "bool precalc(void* d,\n";
-    o____ "             double delay, double period=0., double tol=0., int en=1) {\n";
+    o____ "bool precalc(void*,\n";
+    o____ "             double, double period=0., double tol=0., int en=1) {\n";
+    o______ "(void)period;\n";
+    o______ "(void)tol;\n";
+    o______ "(void)en;\n";
     o______ "return false;\n";
     o____ "}\n";
     /*----------------------------------------------------------------------*/
+    // not needed?
     o____ "bool tr_eval" << args() << " {\n";
+    o______ "(void)d;\n";
+    o______ "(void)period;\n";
+    o______ "(void)delay;\n";
+    o______ "(void)period;\n";
+    o______ "(void)tol;\n";
+    o______ "(void)en;\n";
     o______ "trace2(\"tr_eval\", _req_evt, _sim->_time0);\n";
     o______ "if (_sim->_time0 == 0.){\n";
    // o________ "tr_begin(d, delay, period, tol, en);\n"; // lost init event in "TRANSIENT::first"?
@@ -140,6 +150,8 @@ private:
     o____ "}\n";
     /*----------------------------------------------------------------------*/
     o____ "bool tr_begin" << args() << " {\n";
+    o______ "(void)tol;\n";
+    o______ "(void)en;\n"; // incomplete
     o______ "_previous_evt = 0.;\n";
     o______ "if(delay) {\n";
     o________ "_previous_evt = -NEVER;\n";
@@ -155,6 +167,8 @@ private:
     o____ "}\n";
     /*----------------------------------------------------------------------*/
     o____ "bool tr_advance" << args() << " {\n";
+    o______ "(void)tol;\n";
+    o______ "(void)en;\n"; // incomplete
     o______ "trace3(\"timer::tr_advance\", _previous_evt, _req_evt, _sim->_time0);\n";
     o______ "trace3(\"timer::tr_advance\", delay, period, _sim->_time0);\n";
     o______ "_previous_evt = _req_evt;\n"; // consolidate previous "tr_accept"
@@ -178,6 +192,10 @@ private:
     o____ "}\n";
     /*----------------------------------------------------------------------*/
     o____ "bool tr_regress" << args() << "{\n";
+    o______ "(void)delay;\n";
+    o______ "(void)period;\n";
+    o______ "(void)tol;\n";
+    o______ "(void)en;\n";
     o______ "trace4(\"timer::tr_regress\", _previous_evt, _req_evt, _sim->_time0, _sim->_time0 - _previous_evt);\n";
     o______ "_req_evt = _previous_evt;\n"; // consolidate previous "tr_accept"
     o______ "if (d->_time[1] == 0. && _sim->_time0 < _previous_evt + _sim->_dtmin) {\n";
@@ -195,6 +213,8 @@ private:
     o____ "}\n";
     /*----------------------------------------------------------------------*/
     o____ "bool tr_review" << args() << " {\n";
+    o______ "(void)tol;\n";
+    o______ "(void)en;\n";
     o______ "trace3(\"timer::tr_review\", _req_evt, _sim->_time0, _sim->_dtmin);\n";
 
     o______ "if (_sim->_time0) {\n";
@@ -245,6 +265,8 @@ private:
     o____ "}\n";
     /*----------------------------------------------------------------------*/
     o____ "bool tr_accept" << args() << " {\n";
+    o______ "(void)tol;\n";
+    o______ "(void)en;\n"; // incomplete.
     o______ "trace3(\"timer::tr_accept\", _sim->_time0, delay, period);\n";
     o______ "if(_sim->_time0 < _previous_evt) {\n";
     o________ "return false; // not ours\n";
@@ -261,7 +283,7 @@ private:
     o________ "trace4(\"timer::tr_accept1\", _previous_evt, _req_evt, d->_time[1], _sim->_time0);\n";
     o________ "if(period) {\n";
     o__________ "double raw_time = _sim->_time0;\n";
-    o__________ "int tick = ( raw_time - delay + _sim->_dtmin) / period;\n";
+    o__________ "int tick = int(( raw_time - delay + _sim->_dtmin) / period);\n";
     o__________ "set_event(d, delay + (tick+1)*period, " << tol() << ");\n";
     o________ "}else if(delay > _sim->_time0) {\n";
     o__________ "trace4(\"timer::tr_accept1a\", _previous_evt, _req_evt, d->_time[1], _sim->_time0);\n";

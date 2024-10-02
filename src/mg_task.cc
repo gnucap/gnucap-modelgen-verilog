@@ -53,7 +53,7 @@ private:
   }
   void make_cc_dev(std::ostream& o)const override {
     // o__ "double _bound_step{NEVER};\n";
-    o__ "void " << "_f_bound_step_tr_eval(double d) {\n";
+    o__ "void " << "_f_bound_step_tr_eval(double) {\n";
     o__ "}\n";
     o__ "void " << "_f_bound_step_tr_review(double d) {\n";
     o____ "_time_by.min_error_estimate(_sim->_time0 + d);\n";

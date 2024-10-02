@@ -185,6 +185,9 @@ public:
       o << ", double t" << n;
     }
     o << ")\n{\n";
+    for(int n=1; n < int(num_args()); ++n){
+      o__ "(void)t" << n << ";\n";
+    }
     o__ "MOD_" << id << "* d = this;\n";
     o__ "typedef MOD_" << id << " MOD;\n";
     std::string state = "_st" + cn;

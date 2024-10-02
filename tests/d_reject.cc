@@ -73,6 +73,13 @@ private: // override virtual
 		  return COMPONENT::set_param_by_name(N, V);
 	  }
   }
+  std::string param_name(int I, int J)const override { untested();
+	  if (J == 0) {
+		  return param_name(I);
+	  }else{
+		  return "";
+	  }
+  }
   std::string param_name(int i)const override { untested();
 	  int idx = REJECT::param_count() - 1 - i;
 	  if(idx==0){ untested();
