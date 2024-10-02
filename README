@@ -8,11 +8,13 @@ package adds support for the behavioural modelling section.
 
 == Funding
 
-Combined with Gnucap, this release concludes the project on Verilog-AMS funded
-through the NGI0 Entrust Fund, a fund established by NLnet with financial
-support from the European Commission's Next Generation Internet programme,
-under the aegis of DG Communications Networks, Content and Technology under
-grant agreement No 101069594. See https://nlnet.nl/project/Gnucap-VerilogAMS/
+This project is funded through the NGI0 Entrust Fund, a fund established by
+NLnet with financial support from the European Commission's Next Generation
+Internet programme, under the aegis of DG Communications Networks, Content and
+Technology under grant agreement No 101069594.
+
+https://nlnet.nl/project/Gnucap-VerilogAMS/
+https://nlnet.nl/project/Gnucap-MixedSignals/
 
 == Preliminaries
 

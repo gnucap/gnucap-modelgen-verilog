@@ -2,7 +2,7 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
-202409**-dev
+20241002-dev
 ============
 * name spaces and state variables
 * cross events
