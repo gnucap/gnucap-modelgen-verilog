@@ -999,8 +999,9 @@
  996.E-12  -58.669E-9  937.11E-6  0.         0.057156  
  997.E-12  -58.016E-9  944.09E-6  0.         0.056553  
  998.E-12  -57.527E-9  853.59E-6  0.         0.056013  
- 1.E-9     -56.149E-9  785.62E-6  0.         0.055053  
- 1.001E-9   0.018      804.9E-6   0.         0.054597  
+ 999.E-12  -56.834E-9  801.85E-6  0.         0.05552   
+ 1.E-9     -56.087E-9  811.86E-6  0.         0.055053  
+ 1.001E-9   0.018      781.7E-6   0.         0.054597  
 #Freq       vp(o1)     vp(o2)     vp(o3)     vm(o1)     vm(o2)     vm(o3)    
  1.Meg     -0.018243  -0.018241  -0.036      0.49998    0.49998    1.        
  2.Meg     -0.036485  -0.036482  -0.072      0.49998    0.49998    1.        
@@ -1018,7 +1019,7 @@
  8.192G    -71.737    -71.709    -80.983     0.19916    0.19914    0.20993   
  16.384G   -85.96     -85.902    -89.065     0.14009    0.1401     0.14234   
 Gnucap   System status
-iterations: op=0, dc=2, tran=2544, fourier=0, total=3561
-transient timesteps: accepted=1000, rejected=0, total=1000
+iterations: op=0, dc=2, tran=2546, fourier=0, total=3564
+transient timesteps: accepted=1001, rejected=0, total=1001
 nodes: user=4, subckt=199, model=0, total=203
 dctran density=2.4%, ac density=2.4%

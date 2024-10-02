@@ -16,10 +16,11 @@
  0.56873   -0.41853    5.6696     3.        
  0.63034   -0.73042    4.4549     3.        
  0.69195   -0.93421    2.1606     3.        
- 0.75356   -0.99975   -0.033143   3.        
+ 0.75356   -0.99975   -0.033144   3.        
  0.81517   -0.91733   -2.6423     3.        
- 0.90758   -0.54858   -5.338      3.        
- 1.         0.        -6.534      3.        
+ 0.87678   -0.69916   -4.4401     3.        
+ 0.93839   -0.37751   -6.0011     3.        
+ 1.         0.        -6.2537     3.        
 #Freq       vm(1)      vm(3)      vp(1)      vp(3)     
  1.         1.         6.2832     0.        -90.       
  2.         1.         12.566     0.        -90.       
@@ -27,7 +28,7 @@
  8.         1.         50.265     0.        -90.       
  16.        1.         100.53     0.        -90.       
 Gnucap   System status
-iterations: op=0, dc=0, tran=84, fourier=0, total=117
-transient timesteps: accepted=21, rejected=7, total=28
+iterations: op=0, dc=0, tran=87, fourier=0, total=121
+transient timesteps: accepted=22, rejected=7, total=29
 nodes: user=2, subckt=0, model=0, total=2
 dctran density=100.0%, ac density=100.0%
