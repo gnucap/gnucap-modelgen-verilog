@@ -84,13 +84,13 @@ module diode (a, c);
 			0: begin // gnucap model
 				if (volts <= 0.) begin
 					region = -1;
-					i = p_isat * (exp(volts/vt) - 1.);	
+					i = p_isat * (expm1(volts/vt));
 					I(r) <+ i + noise;
 					amps = i;
 				end else begin
 					if (amps >= 0.) begin
 						region = 1;
-						V(r) <+ vt * ln(amps/p_isat + 1.) + noise;
+						V(r) <+ vt * ln1p(amps/p_isat) + noise;
 					end else begin
 						// should not get here once converged.
 						region = 0;

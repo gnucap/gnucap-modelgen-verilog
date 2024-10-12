@@ -285,6 +285,33 @@ public:
 } p_exp;
 DISPATCHER<FUNCTION>::INSTALL d_exp(&function_dispatcher, "exp|$exp", &p_exp);
 /*--------------------------------------------------------------------------*/
+class expm1 : public MGVAMS_FUNCTION {
+public:
+  explicit expm1() : MGVAMS_FUNCTION(){
+    set_label("expm1");
+  }
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
+    PARAMETER<double> x;
+    Cmd >> x;
+    x.e_val(NOT_INPUT, Scope);
+    return to_string(std::expm1(x));
+  }
+  double evalf(double const* x)const override {
+    return std::expm1(*x);
+  }
+  void make_cc_common(std::ostream& o)const override{
+    o__ "template<class T>\n";
+    o__ "T " << code_name() << "(T d) const{\n";
+    o____ "::set_value(d, std::expm1(d));\n";
+    o____ "return chain(d, d+1.);\n";
+    o__ "}\n";
+  }
+  std::string code_name()const override{
+    return "_f_expm1";
+  }
+} p_expm1;
+DISPATCHER<FUNCTION>::INSTALL d_expm1(&function_dispatcher, "expm1|$expm1", &p_expm1);
+/*--------------------------------------------------------------------------*/
 class limexp : public MGVAMS_FUNCTION {
 public:
   explicit limexp() : MGVAMS_FUNCTION(){
@@ -423,6 +450,42 @@ public:
   }
 } p_ln;
 DISPATCHER<FUNCTION>::INSTALL d_ln(&function_dispatcher, "ln|$ln|$log", &p_ln);
+/*--------------------------------------------------------------------------*/
+class ln1p : public MGVAMS_FUNCTION {
+public:
+  explicit ln1p() : MGVAMS_FUNCTION(){
+    set_label("ln1p");
+  }
+  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
+    PARAMETER<double> x;
+    Cmd >> x;
+    x.e_val(NOT_INPUT, Scope);
+    return to_string(std::log1p(x));
+  }
+  double evalf(double const* x)const override {
+    return std::log1p(*x);
+  }
+  void make_cc_common(std::ostream& o)const override { untested();
+    o__ "template<class T>\n";
+    o__ "T " << code_name() << "(T d)const {\n";
+    o____ "double l=-1e99;\n";
+    o____ "if(d>-1.) { untested();\n";
+    o______ "l = std::log1p(double(d));\n";
+    o______ "chain(d, 1./double(1.+d));\n";
+    o____ "}else{\n";
+    o______ "unreachable();\n";
+    o______ "l=-1e40;\n";
+    o______ "chain(d, 1e40);\n";
+    o____ "}\n";
+    o____ "::set_value(d, l);\n";
+    o____ "return d;\n";
+    o____ "}\n";
+  }
+  std::string code_name()const override{
+    return "_f_ln1p";
+  }
+} p_ln1p;
+DISPATCHER<FUNCTION>::INSTALL d_ln1p(&function_dispatcher, "ln1p|$ln1p", &p_ln1p);
 /*--------------------------------------------------------------------------*/
 class pow: public MGVAMS_FUNCTION {
 public:
