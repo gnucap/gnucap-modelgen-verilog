@@ -670,11 +670,11 @@ static void make_module(std::ostream& o, const Module& m)
     assert(x);
     Branch const* b = x;
     if(b->has_flow_probe()){
-      o << ind << "double _flow" << b->code_name() << ";\n";
+      o__ "double _flow" << b->code_name() << "{0.};\n";
     }else{
     }
     if(b->has_pot_probe()){
-      o << ind << "double _potential" << b->code_name() << ";\n";
+      o__ "double _potential" << b->code_name() << "{0.};\n";
     }else{
     }
   }

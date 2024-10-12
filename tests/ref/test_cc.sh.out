@@ -1117,8 +1117,8 @@ private: // node list
     n_white_noise_1_n /* used: 0 */
   };
 private: // probe values
-  double _potential_b_white_noise_1_p_white_noise_1_n;
-  double _potential_b_p_n;
+  double _potential_b_white_noise_1_p_white_noise_1_n{0.};
+  double _potential_b_p_n{0.};
 private: // impl
   void read_probes();
   void set_branch_contributions();
@@ -2340,8 +2340,8 @@ private: // node list
     n_white_noise_0_n /* used: 0 */
   };
 private: // probe values
-  double _potential_b_white_noise_0_p_white_noise_0_n;
-  double _potential_b_p_n;
+  double _potential_b_white_noise_0_p_white_noise_0_n{0.};
+  double _potential_b_p_n{0.};
 private: // impl
   void read_probes();
   void set_branch_contributions();
@@ -4842,8 +4842,8 @@ private: // node list
     n_ddt_1_n /* used: 0 */
   };
 private: // probe values
-  double _potential_b_ddt_1_p_ddt_1_n;
-  double _potential_b_p_n;
+  double _potential_b_ddt_1_p_ddt_1_n{0.};
+  double _potential_b_p_n{0.};
 private: // impl
   void read_probes();
   void set_branch_contributions();
@@ -5735,8 +5735,8 @@ private: // node list
     n_ddt_2_n /* used: 0 */
   };
 private: // probe values
-  double _potential_b_ddt_2_p_ddt_2_n;
-  double _potential_b_p_n;
+  double _potential_b_ddt_2_p_ddt_2_n{0.};
+  double _potential_b_p_n{0.};
 private: // impl
   void read_probes();
   void set_branch_contributions();
