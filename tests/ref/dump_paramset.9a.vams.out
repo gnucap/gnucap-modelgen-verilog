@@ -1,14 +1,14 @@
 // paramsets
 module const_res(a, b);
   electrical a, b;
-  localparam real __t = 1;
+  localparam real __t =  1.;
 
   integer __T;
 
   analog begin
     begin : initial_model
-      if ( 1.) begin
-        __T = 1;
+      if (1) begin
+        __T =  1.;
       end
       else begin
       end

@@ -295,7 +295,7 @@ void Token_ACSTIM::stack_op(Expression* e)const
   }else if(cc->args()->size()>1 &&
            is_zero(cc->args()->back())){
     Float* f = new Float(0.);
-    e->push_back(new Token_CONSTANT("0.", f, ""));
+    e->push_back(new Token_CONSTANT(f, ""));
     delete cc;
     cc = NULL;
 //    func->set_p_to_gnd();

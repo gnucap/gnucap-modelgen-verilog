@@ -308,7 +308,7 @@ public:
   ~Analog_Function();
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
-  std::string const& key()const { assert(_variable); return _variable->name(); }
+  std::string const key()const { assert(_variable); return _variable->name(); }
   std::string code_name()const { assert(_variable); return "af_" + _variable->name(); }
   FUNCTION_ const* function() const{return _function;}
   Token const* variable() const{ return _variable; }

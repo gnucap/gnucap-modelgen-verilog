@@ -19,7 +19,6 @@ vsource #(.dc(v)) v1 (.p(1),.n(0));
  0.         0.         0.         ??         0.         1.         0.         0.        
  0.5        0.5        0.5        ??         500.04f    1.         0.5        0.5       
  1.         1.         1.         ??         1.0001p    1.         1.         1.        
-v already set. replacing
 >>>>>status notime 
 Gnucap   System status
 iterations: op=0, dc=7, tran=0, fourier=0, total=7

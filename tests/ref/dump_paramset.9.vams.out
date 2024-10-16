@@ -1,13 +1,13 @@
 module resistor(a, b);
   electrical a, b;
-  parameter real t = 0;
+  parameter real t =  0.;
 
   integer T;
 
   analog begin
     begin : initial_model
-      if ((t >= 0)) begin
-        T = 1;
+      if ((t >=  0.)) begin
+        T =  1.;
       end
       else begin
         T = -1.;
@@ -21,6 +21,6 @@ endmodule
 
 // paramsets
 paramset const_res resistor;
-  .t = 1
+  .t =  1.
 endparamset;
 

@@ -454,7 +454,7 @@ void Token_BINOP_::stack_op(Expression* E)const
   trace1("binop result", E->back()->name());
   if(auto EE=dynamic_cast<Expression_ const*>(E)){
      trace1("binop EE", EE->is_constant());
-  }else{
+  }else{ untested();
      trace0("binop Expression");
   }
 } // Token_BINOP_::stack_op
@@ -837,7 +837,7 @@ void Token_PAR_REF::stack_op(Expression* e)const
   assert(_item);
   double ev = _item->eval();
   trace2("stack_op PAR_REF", name(), ev);
-  if(ev!=NOT_INPUT) {
+  if(ev!=::NOT_INPUT) {
     Float* f = new Float(ev);
     // e->push_back(new Token_CONSTANT(name(), f, ""));
     e->push_back(new Token_PAR_REF(*this, f));
@@ -924,6 +924,7 @@ static Expression* new_arglist(Expression* E)
   auto arg_exp = new Expression_();
   // replace multiple tokens of a PARLIST with a single token
   for (;;) {
+    assert(E->size());
     Token* t = E->back();
     E->pop_back();
     if (dynamic_cast<const Token_STOP*>(t)) {

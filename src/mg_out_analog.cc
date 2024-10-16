@@ -58,8 +58,8 @@ public:
   bool is_static()const { return _mode==modeSTATIC || _mode==modeTR_BEGIN ; } // || ...?
   bool is_precalc()const { return _mode==modePRECALC; }
   bool is_probe()const   { untested(); return _mode==modePROBE; }
-  bool is_tr_begin()const  { return _mode==modeTR_BEGIN; }
-  bool is_tr_review()const  { return _mode==modeTR_REVIEW; }
+  bool is_tr_begin()const  { untested(); return _mode==modeTR_BEGIN; }
+  bool is_tr_review()const  { untested(); return _mode==modeTR_REVIEW; }
   bool is_tr_accept()const  { return _mode==modeTR_ACCEPT; }
   bool is_tr_advance()const  { untested(); return _mode==modeTR_ADVANCE; }
 public:
@@ -175,7 +175,7 @@ void OUT_ANALOG::make_block_variables(std::ostream& o,
     }else{
     }
     assert(v);
-    if(_src && !v->is_used_in(_src)){
+    if(_src && !v->is_used_in(_src)){ untested();
       o << "// omit Var decl?\n";
     }else{
     }
@@ -554,11 +554,11 @@ void OUT_ANALOG::make_af_body(std::ostream& o, const Analog_Function& f) const
   for(Base const* s : f.body().variables_()) {
      if(auto ard = dynamic_cast<Variable_Stmt const*>(s)){
        make_block_variables(o, *ard);
-     }else{
+     }else{ untested();
      }
   }
   for(Base const* i : f.body()) {
-    if(dynamic_cast<Variable_Stmt const*>(i)){
+    if(dynamic_cast<Variable_Stmt const*>(i)){ untested();
       unreachable();
       // make_stmt(o, *i);
      // make_block_variables(o, *ard);
@@ -804,12 +804,12 @@ void OUT_ANALOG::make_seq_block(std::ostream& o, AnalogSeqBlock const& s) const
   }
   make_load_block_variables(o, s.variables_());
 #if 0
-  for(auto i : s.variables_()) {
+  for(auto i : s.variables_()) { untested();
     assert(s.identifier() != "");
 
-    if(auto st = dynamic_cast<Variable_Stmt const*>(i)){
+    if(auto st = dynamic_cast<Variable_Stmt const*>(i)){ untested();
       make_block_variables(o, *st);
-    }else{
+    }else{ untested();
       unreachable();
     }
 
@@ -884,7 +884,7 @@ static void make_set_self_contribution(std::ostream& o, Dep const& d)
     o__ "}else{\n";
     o____ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
     o__ "}\n";
-  }else if(both && d->is_flow_probe()) {
+  }else if(both && d->is_flow_probe()) { untested();
     o__ "// self flow\n";
     o__ "if (_pot"<< b->code_name() << "){\n";
     o____ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
@@ -954,7 +954,7 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
       o__ "// same1 " << d->code_name() << "\n";
       if(b->has_pot_source() && b->has_flow_probe()){
 	if(br.num_states()<=2){
-	}else{
+	}else{ untested();
 	  incomplete(); // the other ones??
 	}
       }else{
@@ -1137,14 +1137,14 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o,
 /*--------------------------------------------------------------------------*/
 // no longer needed.
 void OUT_ANALOG::make_one_variable_store(std::ostream& o, Token_VAR_REF const& V) const
-{
+{ untested();
   if(!V.type().is_real()) { untested();
   }else if(is_precalc()) { untested();
     o__ "// d->" << V.code_name() << " = " << V.code_name() << ";\n";
   }else if(is_tr_review()) { untested();
-  }else if(V.deps().ddeps().size() == 0){
+  }else if(V.deps().ddeps().size() == 0){ untested();
     // it's a reference.
-  }else if(options().optimize_deriv()) {
+  }else if(options().optimize_deriv()) { untested();
     // use destructor
   }else{untested();
     o__ "d->" << V.code_name() << " = " << V.code_name() << ".value();\n";
@@ -1168,7 +1168,7 @@ void OUT_ANALOG::make_load_block_variables(std::ostream& o, const
 
       if(V->is_state_var()){
 	make_one_variable_load(o, V->token());
-      }else{
+      }else{ untested();
 	make_one_local_var(o, V->token());
 	incomplete();
       }
@@ -1451,7 +1451,7 @@ std::string Probe::code_name() const
     return "_flow" + _br->code_name(); // BUG. named_branch.
   }else if (_type == t_pot){
     return "_potential" + _br->code_name();
-  }else{
+  }else{ untested();
     return("unreachable_probe"); // trace.
   }
 }

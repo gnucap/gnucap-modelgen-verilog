@@ -1,7 +1,7 @@
 module dep7(a, g);
   inout a, g;
   electrical a, g;
-  parameter real p = 0.;
+  parameter real p =  0.;
 
   real T;
 
@@ -10,10 +10,10 @@ module dep7(a, g);
     // d : 0
     real c, d;
     c = V(a); // dep: _potential_b_a_ s1 r4
-    if ((V(g) > 1)) begin : b0
+    if ((V(g) >  1.)) begin : b0
       // t : 0
       real t;
-      t = 4; // s1 r2
+      t =  4.; // s1 r2
     end
     else begin
       // d : 1
@@ -21,14 +21,14 @@ module dep7(a, g);
     end
     begin : stuff
     // b1
-      if ((c > 0)) begin : b1
+      if ((c >  0.)) begin : b1
         // f : 1
         real f;
         I(g) <+ d; // dep: _potential_b_a_ s3 r1
         f = d; // dep: _potential_b_a_ s4 r2
       end
       else begin
-        I(g) <+ 1; // r1
+        I(g) <+  1.; // r1
       end
     end
   end
@@ -40,7 +40,7 @@ endmodule
 // paramsets
 module dep7p(a, g);
   electrical a, g;
-  localparam real __p = 0.;
+  localparam real __p =  0.;
 
   real __T;
 
@@ -49,10 +49,10 @@ module dep7p(a, g);
     // d : 0
     real c, d;
     c = V(a); // dep: _potential_b_a_ s1 r4
-    if ((V(g) > 1)) begin : b0
+    if ((V(g) >  1.)) begin : b0
       // t : 0
       real t;
-      t = 4; // s1 r2
+      t =  4.; // s1 r2
     end
     else begin
       // d : 1
@@ -60,14 +60,14 @@ module dep7p(a, g);
     end
     begin : stuff
     // b1
-      if ((c > 0)) begin : b1
+      if ((c >  0.)) begin : b1
         // f : 1
         real f;
         I(g) <+ d; // dep: _potential_b_a_ s3 r1
         f = d; // dep: _potential_b_a_ s4 r2
       end
       else begin
-        I(g) <+ 1; // r1
+        I(g) <+  1.; // r1
       end
     end
   end

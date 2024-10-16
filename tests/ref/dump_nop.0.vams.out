@@ -4,9 +4,6 @@ module test(d, g, s, b);
   real U;
 
   analog begin
-    T = 0.;
-    T = 0.;
-    T = 0.;
     T =  0.;
     T =  0.;
     T =  0.;
@@ -14,8 +11,11 @@ module test(d, g, s, b);
     T =  0.;
     T =  0.;
     T =  0.;
-    T = 0.;
-    T = 0.;
+    T =  0.;
+    T =  0.;
+    T =  0.;
+    T =  0.;
+    T =  0.;
   end
 
 endmodule

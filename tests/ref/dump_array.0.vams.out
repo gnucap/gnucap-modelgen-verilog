@@ -4,8 +4,8 @@ module test_array(p, n);
   real dv;
 
   analog begin
-    dv = '{1, 2, 3};
-    dv = ddt(V(p, n), '{1, 0});
+    dv = '{ 1.,  2.,  3.};
+    dv = ddt(V(p, n), '{ 1.,  0.});
   end
 
 endmodule

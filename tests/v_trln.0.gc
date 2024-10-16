@@ -6,10 +6,10 @@ options trsteporder 1
 options trtol 1
 
 module tln0(a, b);
-  parameter R;
-  parameter L;
-  parameter G;
-  parameter C;
+  parameter real R;
+  parameter real L;
+  parameter real G;
+  parameter real C;
   resistor #(.r(R)) r(a j);
   inductor #(.l(L)) l(b j);
   admittance #(.g(G)) g(b 0);
@@ -17,11 +17,11 @@ module tln0(a, b);
 endmodule
 
 module tln1(a, b);
-  parameter count
-  parameter R;
-  parameter L;
-  parameter G;
-  parameter C;
+  parameter integer count
+  parameter real R;
+  parameter real L;
+  parameter real G;
+  parameter real C;
   resistor #(.r(R)) r(a j);
   inductor #(.l(L)) l(i j);
   admittance #(.g(G)) g(i 0);
@@ -30,7 +30,7 @@ module tln1(a, b);
 endmodule
 
 paramset tln tln1
-  parameter count from [2:200];
+  parameter integer count from [2:200];
   parameter r=0;
   parameter l=0;
   parameter g=0;
@@ -43,7 +43,7 @@ paramset tln tln1
 endparamset
 
 paramset tln tln0
-  parameter count from [1:1];
+  parameter real count from [1:1];
   parameter r=0;
   parameter l=0;
   parameter g=0;

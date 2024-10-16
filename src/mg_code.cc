@@ -42,7 +42,7 @@ void Variable_Decl::clear_deps()
 //   _deps = new TData;
 // }
 /*--------------------------------------------------------------------------*/
-std::string const& Variable_Decl::name() const
+std::string const Variable_Decl::name() const
 {
   assert(_token);
   return _token->name();

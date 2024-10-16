@@ -4,18 +4,18 @@ module underscore0();
   real __V;
 
   analog begin
-    __V = 1;
+    __V =  1.;
   end
 
   analog begin
     begin
-      __V = 1;
+      __V =  1.;
     end
   end
 
 endmodule
 module underscore1();
-  localparam real __L = 0.;
+  localparam real __L =  0.;
 
   analog begin : main
     real R;

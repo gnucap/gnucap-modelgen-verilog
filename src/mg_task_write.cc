@@ -95,7 +95,7 @@ private:
   bool has_modes()const override {return true;}
  // bool has_tr_review()const override {return true;} // need to q_accept?
   bool has_tr_advance()const override {return true;}
-  bool has_tr_regress()const override {return false;}
+  bool has_tr_regress()const override { untested();return false;}
   bool has_tr_accept()const override {return true;}
   bool has_tr_begin()const override {return true;}
   bool static_code()const override {return false;}
@@ -118,7 +118,7 @@ private:
     o << "MOD_" <<_m->identifier()<<"* d, std::string";
     for(size_t i=1; i<num_args(); ++i) {
       o____  ", double";
-      if(names){
+      if(names){ untested();
        o << " a " << i;
       }else{
       }

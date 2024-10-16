@@ -1,23 +1,23 @@
 // paramsets
 module my_res(a, b);
   electrical a, b;
-  parameter real g = 1;
-  localparam real __r = (1. / g);
+  parameter real g =  1.;
+  localparam real __r = ( 1. / g);
 
   real __g;
   real __i;
   real __alpha;
 
   analog begin
-    __alpha = 1.;
+    __alpha =  1.;
     if (__r) begin
       __g = (__alpha / __r);
     end
     I(a, b) <+ (V(a, b) * __g);
     begin
-      __i = 3.;
+      __i =  3.;
       begin
-        __i = 4;
+        __i =  4.;
       end
     end
   end

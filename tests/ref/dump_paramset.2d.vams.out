@@ -1,6 +1,6 @@
 module resistor(a, b);
   electrical a, b;
-  parameter real r = 0.;
+  parameter real r =  0.;
 
   real R;
 
@@ -16,7 +16,7 @@ endmodule
 // paramsets
 module const_res(a, b);
   electrical a, b;
-  localparam real __r = 1;
+  localparam real __r =  1.;
 
   real __R;
 

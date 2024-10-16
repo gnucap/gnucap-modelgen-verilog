@@ -143,7 +143,7 @@ void dump_annotate(std::ostream& o, A const& a)
       o << " //";
     }else if(a.data().is_constant()){
       o << " // c";
-    }else{
+    }else{ untested();
     }
     for(const Dep& d : a.data().ddeps()) {
       o << " dep: ";
@@ -571,7 +571,7 @@ bool AnalogSwitchStmt::update()
   bool ret = false;
   while(true){
     _body.clear_vars();
-    if (_body.update()){
+    if (_body.update()){ untested();
       ret = true;
     }else{
       break;
@@ -622,7 +622,7 @@ bool AnalogForStmt::update()
   while(true){
     if ( init_ && init_->update() ){ untested();
       ret = true;
-    }else if (_body.update()){
+    }else if (_body.update()){ untested();
       ret = true;
     }else if ( tail_ && tail_->update() ) { untested();
       ret = true;
@@ -1192,9 +1192,9 @@ void Contribution::parse(CS& cmd)
     // trace1("bb?", cmd.tail().substr(0,20));
     // cmd >> xs >> bb >> "==";
   }else{
-//    if(_branch){
+//    if(_branch){ untested();
 //      _branch->dec_use();
-//    }else{
+//    }else{ untested();
 //    }
     //detach();
     throw Exception_CS_("expecting \"<+\" or \":\"", cmd);
@@ -1580,13 +1580,18 @@ void AnalogSeqBlock::dump(std::ostream& o)const
 #if 1
 void AnalogExpression::parse(CS& file)
 {
-  trace1("AnalogExpression::parse", file.tail().substr(0,40));
+  trace1("AnalogExpression::parse", file.tail().substr(0,100));
 
-  Expression rhs(file);
-  file >> ","; // LiSt??
-  assert(owner());
-  // Expression_::set_owner(scope());
-  resolve_symbols(rhs);
+  {
+    Expression rhs(file);
+    file >> ","; // LiSt??
+    assert(owner());
+    // Expression_::set_owner(scope());
+    //
+    {
+    resolve_symbols(rhs);
+    }
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogExpression::is_true() const
@@ -2008,7 +2013,7 @@ bool AnalogFunctionBody::new_var_ref(Base* b)
 }
 /*--------------------------------------------------------------------------*/
 // bool AnalogEvtExpression::update(RDeps const* r=NULL);
-// {
+// { untested();
 //   trace2("EvtExpression::update", _rdeps.size(), r);
 //   Expression_::update(r);
 // }
@@ -2057,7 +2062,7 @@ void AnalogEvtExpression::set_rdeps()
   }
   if(function()->has_tr_eval()){
     add_rdep(&tr_eval_tag);
-  }else{
+  }else{ untested();
   }
   if(function()->has_tr_review()){
     add_rdep(&tr_review_tag);
@@ -2600,7 +2605,7 @@ bool AnalogProceduralAssignment::propagate_rdeps(RDeps const& r)
   assert(owner());
   auto s = dynamic_cast<Statement*>(owner_());
   if(s){
-  }else{
+  }else{ untested();
   }
   bool ret = false;
   for(Base const* n : r) {

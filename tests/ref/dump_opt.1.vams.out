@@ -1,11 +1,11 @@
 
 
 module test(d, g, s, b);
-  parameter real P = 3 from [(0):(0)];
-  parameter real Q = 3 from [(1):(1)];
+  parameter real P =  3. from [( 0.):( 0.)];
+  parameter real Q =  3. from [( 1.):( 1.)];
   localparam real R0 =  1.;
   localparam real R1 = Q;
-  localparam real R2 = 2;
+  localparam real R2 =  2.;
 
   real T;
 

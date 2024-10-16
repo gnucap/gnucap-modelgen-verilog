@@ -276,12 +276,12 @@ bool Variable_Stmt::update()
 }
 /*--------------------------------------------------------------------------*/
 bool Variable_Stmt::is_used_in(Base const* b) const
-{
+{ untested();
   // incomplete
 
   if(Statement::is_used_in(b)) { untested();
     return true;
-  }else{
+  }else{ untested();
     return true; // mg_strobe.0.gc.out 
     return false;
   }
@@ -293,7 +293,7 @@ void SeqBlock::parse_identifier(CS& f)
   if(_identifier.to_string() == ""){ untested();
   }else if(scope()) {
     scope()->new_var_ref(this);
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -570,7 +570,7 @@ void Assignment::dump(std::ostream& o) const
   if(_token){
     o << _token->name() << " = ";
     Expression_::dump(o);
-  }else{
+  }else{ untested();
 //    o << "/// unreachable?\n";
   }
 }

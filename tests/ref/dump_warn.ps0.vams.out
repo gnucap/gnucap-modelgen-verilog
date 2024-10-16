@@ -1,7 +1,7 @@
 // paramsets
 paramset my_res resistor;
-  parameter real R0 = 1.;
-  parameter real R1 = 1.;
+  parameter real R0 =  1.;
+  parameter real R1 =  1.;
 
   .rrr = R0
   .rrr = R1

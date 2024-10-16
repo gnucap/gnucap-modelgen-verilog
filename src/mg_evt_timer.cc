@@ -59,7 +59,7 @@ private:
     {
       cl->set_label(event_code_name);
       cl->set_code_name(event_code_name);
-      if(na>4){
+      if(na>4){ untested();
 	error(bDANGER, "too many arguments\n");
       }else{
       }
@@ -83,7 +83,7 @@ private:
 
 private:
   bool have_tol()const { return num_args() >= 3; }
-  bool have_en()const { return num_args() >= 4; }
+  bool have_en()const { untested(); return num_args() >= 4; }
 
   std::string args()const {
     return "(MOD_" + _m->identifier().to_string() + "* d, "

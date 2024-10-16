@@ -5,7 +5,7 @@ module shadow(p, n);
   real i;
 
   analog begin
-    if (0) begin
+    if ( 0.) begin
     end
   end
 
@@ -20,7 +20,7 @@ module my_sh(p, n);
   real __i;
 
   analog begin
-    V(p, n) <+ 0.;
+    V(p, n) <+  0.;
   end
 
   analog begin

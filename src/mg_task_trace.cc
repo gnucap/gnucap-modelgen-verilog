@@ -46,7 +46,7 @@ private:
     return new TRACE_TASK(*this);
   }
   bool has_tr_advance()const override {return true;}
-  bool has_tr_regress()const override {return true;}
+  bool has_tr_regress()const override { untested();return true;}
   bool has_tr_accept()const override {return true;}
   bool has_tr_begin()const override {return true;}
   bool static_code()const override {return false;}

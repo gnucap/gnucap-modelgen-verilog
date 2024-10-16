@@ -4,10 +4,10 @@ module branchtest(a, b);
   branch (c, b) mybr2;
   branch (b, c) mybr3;
   analog begin
-    I(a, b) <+ 1;
-    I(b, a) <+ 2;
-    I(mybr2) <+ 3;
-    I(mybr3) <+ 4;
+    I(a, b) <+  1.;
+    I(b, a) <+  2.;
+    I(mybr2) <+  3.;
+    I(mybr3) <+  4.;
   end
 
 endmodule

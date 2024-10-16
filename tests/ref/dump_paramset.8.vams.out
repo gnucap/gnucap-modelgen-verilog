@@ -13,6 +13,6 @@ paramset const_res resistor;
   real a;
   real b;
 
-  a = (.x + 1);
+  a = (.x +  1.);
 endparamset;
 

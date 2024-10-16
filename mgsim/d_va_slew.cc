@@ -189,7 +189,7 @@ TIME_PAIR DEV_SLEW::tr_review()
     }else{
     }
   }else if(slope_in > sl_max){
-  }else if(slope_in < sl_min){ untested();
+  }else if(slope_in < sl_min){
   }else{
   }
 

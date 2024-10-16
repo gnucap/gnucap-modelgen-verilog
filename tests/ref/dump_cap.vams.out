@@ -1,7 +1,7 @@
 module cap(p, n);
   inout p, n;
   electrical p, n;
-  parameter real c = 1.;
+  parameter real c =  1.;
 
   analog begin
     I(p, n) <+ (c * ddt(V(p, n)));

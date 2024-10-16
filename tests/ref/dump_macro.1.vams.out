@@ -3,7 +3,7 @@
 module a(1, 2);
 endmodule
 module a(1, 2);
-  parameter real a = 0. from [(0.):(0.));
+  parameter real a =  0. from [( 0.):( 0.));
 
 endmodule
 

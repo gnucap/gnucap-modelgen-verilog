@@ -397,7 +397,7 @@ public:
     assert(!_args.empty());
     _args.pop();
   }
-  size_t size() const{
+  size_t size() const{ untested();
     return _refs.size();
   }
   std::string code_name() const{
@@ -442,7 +442,7 @@ private:
 /*--------------------------------------------------------------------------*/
 static void make_cc_string(std::ostream& o, String const& e)
 {
-  o << '"';
+ // o << '"';
   for(char c : e.val_string()){
     if(c=='\n'){itested();
 //      o << '\\';
@@ -450,7 +450,7 @@ static void make_cc_string(std::ostream& o, String const& e)
     }
     o << c;
   }
-  o << '"';
+  // o << '"';
 }
 /*--------------------------------------------------------------------------*/
 void RPN_VARS::new_constant(std::ostream& o, Token_CONSTANT const& c)

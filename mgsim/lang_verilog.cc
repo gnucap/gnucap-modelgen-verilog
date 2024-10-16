@@ -312,15 +312,15 @@ void LANG_VERILOG::parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 	attribs = parse_attributes(cmd);
 	here = cmd.cursor();
       }
-      if (Index < x->min_nodes()) {
+      if (Index < x->min_nodes()) { untested();
 	//BUG// This may be a bad idea.
 	//BUG// It's definitely wrong with all_new.
 	//BUG// What should we do with unconnected ports?
 	if (all_new) {untested();
-	}else{
+	}else{ untested();
 	}
 	cmd.warn(bDANGER, "need " + to_string(x->min_nodes()-Index) +" more nodes, grounding");
-	for (  ;  Index < x->min_nodes();  ++Index) {
+	for (  ;  Index < x->min_nodes();  ++Index) { untested();
 	  x->set_port_to_ground(Index);
 	}
       }else{

@@ -30,11 +30,11 @@ class Token_TERNARY : public Token {
   Expression const* _true{NULL};
   Expression const* _false{NULL};
 protected:
-  explicit Token_TERNARY(std::string Name, Base const* Data)
-    : Token(Name, Data) { untested();}
+  explicit Token_TERNARY(std::string /*Name*/, Base const* Data)
+    : Token(Data) { untested();}
 public:
-  explicit Token_TERNARY(std::string Name, Expression const* t, Expression const* f, Base const* d)
-    : Token(Name, d), _true(t), _false(f) {}
+  explicit Token_TERNARY(std::string /*Name*/, Expression const* t, Expression const* f, Base const* d)
+    : Token(d), _true(t), _false(f) {}
   explicit Token_TERNARY(const Token_TERNARY& P) : Token(P) { untested();}
   ~Token_TERNARY();
   Token* clone()const override{ untested();return new Token_TERNARY(*this);}

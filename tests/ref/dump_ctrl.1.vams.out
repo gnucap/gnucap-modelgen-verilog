@@ -1,10 +1,10 @@
 module while0(p, n);
   analog begin : main
     real S, T, U;
-    while (0);
+    while ( 0.);
     while (S);
     while (S) begin
-      S = 0;
+      S =  0.;
     end
   end
 
@@ -12,8 +12,8 @@ endmodule
 module while1(p, n);
   analog begin : main
     real S;
-    while ((S < 10)) begin
-      S = (S + 1);
+    while ((S <  10.)) begin
+      S = (S +  1.);
     end
   end
 

@@ -593,7 +593,7 @@ TData* copy_deps(Base const* b)
 bool ConstExpression::operator==(ConstExpression const& o) const
 {
   double a = _expression.eval();
-  if(a == NOT_INPUT){ untested();
+  if(a == ::NOT_INPUT){ untested();
     return false;
   }else{
     return a == o._expression.eval();
@@ -603,13 +603,13 @@ bool ConstExpression::operator==(ConstExpression const& o) const
 double ValueRangeInterval::eval() const
 {
   if(!lb_is_closed()){
-    return NOT_INPUT;
+    return ::NOT_INPUT;
   }else if(!ub_is_closed()){
-    return NOT_INPUT;
+    return ::NOT_INPUT;
   }else if(_ub == _lb){
     return _ub.expression().eval();
   }else{
-    return NOT_INPUT;
+    return ::NOT_INPUT;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -671,7 +671,7 @@ double /*?*/ Parameter_2::eval() const
   }else if (value_range_list().size() == 1) {
     return (*value_range_list().begin())->eval();
   }else{
-    return NOT_INPUT;
+    return ::NOT_INPUT;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -680,7 +680,7 @@ double ValueRange::eval() const
   if(spec()){
     return spec()->eval();
   }else{ untested();
-    return NOT_INPUT;
+    return ::NOT_INPUT;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -732,10 +732,10 @@ DDeps const& Branch::ddeps()const
 /*--------------------------------------------------------------------------*/
 #if 0
 void Branch::reg_stmt(AnalogStmt const* r)
-{
+{ untested();
   assert(r);
 #ifndef NDEBUG
-  for(auto i : _stmts){
+  for(auto i : _stmts){ untested();
     assert(i != r);
   }
 #endif
@@ -743,14 +743,14 @@ void Branch::reg_stmt(AnalogStmt const* r)
 }
 /*--------------------------------------------------------------------------*/
 void Branch::dereg_stmt(AnalogStmt const* r)
-{
+{ untested();
   assert(r);
-  for(auto& i : _stmts){
-    if(i == r){
+  for(auto& i : _stmts){ untested();
+    if(i == r){ untested();
       i = _stmts.back();
       _stmts.resize(_stmts.size()-1);
       return;
-    }else{
+    }else{ untested();
     }
   }
   assert(0);

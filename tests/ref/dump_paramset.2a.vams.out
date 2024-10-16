@@ -1,7 +1,7 @@
 // paramsets
 module my_res(a, b);
   electrical a, b;
-  parameter real r = 1.;
+  parameter real r =  1.;
   localparam real __r = r;
   localparam real __l = __r;
 

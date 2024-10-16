@@ -24,7 +24,7 @@ module my_sh(a, b);
     I(a, b) <+ 0.;
   end
   analog begin
-    I(a, b) <+ 0.;
+    I(a, b) <+  0.;
   end
 
   analog begin

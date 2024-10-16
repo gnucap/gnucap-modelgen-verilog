@@ -4,8 +4,8 @@ module test_lap0(p, n);
   real dv;
 
   analog begin
-    dv = '{1, 2, 3};
-    dv = laplace_nd(V(p, n), '{1}, '{1, 0});
+    dv = '{ 1.,  2.,  3.};
+    dv = laplace_nd(V(p, n), '{ 1.}, '{ 1.,  0.});
   end
 
 endmodule

@@ -1,14 +1,14 @@
 module test(p, n);
   inout p, n;
   electrical p, n;
-  parameter real a = 2.;
+  parameter real a =  2.;
 
   real x[3:74];
-  real b = (a * 2);
-  real y[0:2] = '{ 1., a, 3.};
+  real b = (a *  2.);
+  real y[0:2] = '{ 1., a,  3.};
 
   analog begin
-    y = '{1, 2, 3};
+    y = '{ 1.,  2.,  3.};
     I(p, n) <+ b;
   end
 

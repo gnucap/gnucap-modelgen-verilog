@@ -1,10 +1,10 @@
 module device(p, n);
   inout p, n;
-  parameter real c = 1.;
-  localparam real l1 = (c + 5), l2 = 10;
-  parameter real d = 1., e = 2;
-  parameter integer i = 0, j = 10;
-  localparam real t1 = exp(l1), t2 = 10;
+  parameter real c =  1.;
+  localparam real l1 = (c +  5.), l2 =  10.;
+  parameter real d =  1., e =  2.;
+  parameter integer i =  0., j =  10.;
+  localparam real t1 = exp(l1), t2 =  10.;
   localparam real sum = (t1 +  10.);
 
   analog begin
@@ -13,9 +13,9 @@ module device(p, n);
 endmodule
 module device(p, n);
   inout p, n;
-  parameter real c = 1. from [(0.):(inf));
-  parameter real d = 1. from [(1.):(2.)] exclude 3.;
-  parameter real e = 1. from [(0.):(inf)), f = 3;
+  parameter real c =  1. from [( 0.):( Inf));
+  parameter real d =  1. from [( 1.):( 2.)] exclude 3.;
+  parameter real e =  1. from [( 0.):( Inf)), f =  3.;
 
   aliasparam g = c;
   aliasparam h = e;

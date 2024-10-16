@@ -4,8 +4,8 @@ module shadow(a, b);
   real i;
 
   analog begin
-    if (0) begin
-      I(a, b) <+ 0.;
+    if ( 0.) begin
+      I(a, b) <+  0.;
     end
     i = I(a, b);
   end
@@ -21,7 +21,7 @@ module my_sh(a, b);
   real __i;
 
   analog begin
-    I(a, b) <+ 0.;
+    I(a, b) <+  0.;
   end
 
   analog begin

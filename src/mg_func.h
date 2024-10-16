@@ -81,6 +81,7 @@ public: // code generation
 	  // incomplete();
 	  return "";
   }
+  void stack_op(Expression*)const override{unreachable(); } // not yet
   void stack_op(Expression const& args, Expression* out) const;
   virtual double evalf(double const*)const {
     throw Exception("not implemented");

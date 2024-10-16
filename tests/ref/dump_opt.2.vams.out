@@ -5,28 +5,28 @@ module test(d, g, s, b);
 
   analog begin
     if (T) begin
-      T = 1;
+      T =  1.;
     end
     else begin
-      T = 2;
+      T =  2.;
     end
     begin
-      T = 2;
+      T =  2.;
     end
     begin
-      T = 1;
+      T =  1.;
     end
     if (T) begin
-      T = 1;
+      T =  1.;
     end
     else begin
-      T = 2;
+      T =  2.;
     end
     begin
-      T = 2;
+      T =  2.;
     end
     begin
-      T = 1;
+      T =  1.;
     end
   end
 

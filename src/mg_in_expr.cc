@@ -31,8 +31,8 @@
 #include "mg_error.h" // TODO
 /*--------------------------------------------------------------------------*/
 void Expression_::clear()
-{
-  while (!is_empty()){
+{ untested();
+  while (!is_empty()){ untested();
     delete back();
     pop_back();
   }
@@ -129,13 +129,11 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       t->stack_op(&E);
     }else if(dynamic_cast<Token_CONSTANT*>(t)) {
       trace1("Token_CONSTANT", t->name());
-      assert(t->name()!=".x");
       t->stack_op(&E);
     }else if((E.is_empty() || !dynamic_cast<Token_PARLIST*>(E.back()))
-          && symbol && t->name() == "inf") {
+          && symbol && (t->name() == "inf" || t->name() == "Inf" /*BUG*/ )) {
       Float* f = new Float(std::numeric_limits<double>::infinity());
-      assert(t->name()!=".x");
-      E.push_back(new Token_CONSTANT(t->name(), f, ""));
+      E.push_back(new Token_CONSTANT(f, ""));
     }else if(auto pl = dynamic_cast<Token_PARLIST*>(t)) {
 //      trace1("resolve PARLIST");
       Token_PARLIST_ tt(*pl);
@@ -172,8 +170,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
     }else if (n[0]=='.'){
       if(strchr("0123456789", n[1])){
 	Float* f = new Float(n);
-	assert(n!=".x");
-	E.push_back(new Token_CONSTANT(n, f, ""));
+	E.push_back(new Token_CONSTANT(f, ""));
       }else if(auto r = Scope->lookup(PS_MANGLE_PREFIX + n.substr(1))) {
 	incomplete();
 	if(auto vt = dynamic_cast<Token_VAR_REF*>(r)) {
@@ -193,8 +190,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       trace1("number??", n);
       // a number. BUG: integer?
       Float* f = new Float(n);
-      assert(n!=".x");
-      E.push_back(new Token_CONSTANT(n, f, ""));
+      E.push_back(new Token_CONSTANT(f, ""));
     }else if(Base* r = Scope->lookup(n)){
       if(auto p = dynamic_cast<Parameter_Base const*>(r)) {
 //	p->stack_op(&E); // ?
@@ -348,16 +344,16 @@ void ConstantMinTypMaxExpression::parse(CS& file)
 /*--------------------------------------------------------------------------*/
 #if 0
 void ConstantMinTypMaxExpression::resolve()
-{
+{ untested();
   Expression_ tmp;
   tmp.set_owner(_owner);
   tmp.resolve_symbols(_e);
   _e.clear();
 
-  for(auto j : tmp){
+  for(auto j : tmp){ untested();
     _e.push_back(j);
   }
-  while(tmp.size()){
+  while(tmp.size()){ untested();
     tmp.pop_back();
   }
 }
@@ -460,13 +456,13 @@ Block* Expression_::scope()
 /*--------------------------------------------------------------------------*/
 bool Expression_::is_constant() const
 {
-  if(size() > 1) {
+  if(size() > 1) { untested();
     bool c = true;
-    for(auto const& i : *this) {
+    for(auto const& i : *this) { untested();
       assert(i);
-      if(auto const* d = dynamic_cast<TData const*>(back()->data())){
+      if(auto const* d = dynamic_cast<TData const*>(back()->data())){ untested();
 	c &= d->is_constant();
-      }else{
+      }else{ untested();
 	incomplete();
       }
     }

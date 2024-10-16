@@ -279,7 +279,7 @@ void Token_XDT::stack_op(Expression* e)const
   if(is_zero(*cc->args())){
     trace2("Token_XDT::stack_op1", name(), cc->args()->size());
     Float* f = new Float(0.);
-    e->push_back(new Token_CONSTANT("0.", f, ""));
+    e->push_back(new Token_CONSTANT(f, ""));
     delete cc;
     cc = NULL;
     func->set_p_to_gnd();

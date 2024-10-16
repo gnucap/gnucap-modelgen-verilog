@@ -129,6 +129,7 @@ public:
   static Range _unknown;
   explicit Range() : Base() {}
 public:
+  using Base::multiply;
   Range* multiply(const Base*)const override { untested();
     return NULL;
   }
@@ -211,6 +212,13 @@ public:
   Base* divide(const Base* X)const override;  //{ untested();incomplete(); return NULL;}
   Base* r_divide(const Base*)const override   {incomplete(); return NULL;}	
   Base* modulo(const Base*)const override     {incomplete(); return NULL;}	
+
+  Base* multiply(const Integer*)const override	{ untested();unreachable(); return NULL;}
+  Base* subtract(const Integer*)const override	{ untested();unreachable(); return NULL;}
+  Base* r_subtract(const Integer*)const override{ untested();unreachable(); return NULL;}
+  Base* divide(const Integer*)const override	{ untested();unreachable(); return NULL;}
+  Base* r_divide(const Integer*)const override  { unreachable(); return NULL;}	
+  Base* modulo(const Integer*)const override    { unreachable(); return NULL;}	
 
   Base* multiply(const Float*)const override	{ untested();unreachable(); return NULL;}
   Base* subtract(const Float*)const override	{ untested();unreachable(); return NULL;}

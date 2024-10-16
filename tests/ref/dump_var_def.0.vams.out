@@ -1,10 +1,10 @@
 module test(p, n);
   inout p, n;
   electrical p, n;
-  parameter real a = 2.;
+  parameter real a =  2.;
 
   real x;
-  real b = (a * 2);
+  real b = (a *  2.);
 
   analog begin
     I(p, n) <+ b;

@@ -280,7 +280,7 @@ static void make_variable_decl(std::ostream& o, Block const& b)
     make_module_variable_decl(o, *m);
   }else if(auto s = dynamic_cast<SeqBlock const*>(&b)){
     make_block_variable_decl(o, *s);
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -487,7 +487,7 @@ static void make_precalc(std::ostream& o, Module const& m)
   o << "public:\n";
   o__ "explicit " << class_name << "(COMPONENT* d) : _d(d) {}\n";
   // ... functions->make_cc_precalc?
- // for(auto const& i : m.funcs()) {
+ // for(auto const& i : m.funcs()) { untested();
  //   // indent x;
  //  // i->make_cc_precalc(o);
  // }

@@ -7,8 +7,8 @@ module dep0(d, g);
   analog begin // always
     // S : 0
     // T : 0
-    T = 1; // s1 r3
-    S = 2; // s1 r3
+    T =  1.; // s1 r3
+    S =  2.; // s1 r3
     if (analysis("static")) begin
       $strobe("%f", T); // s1 r3
     end

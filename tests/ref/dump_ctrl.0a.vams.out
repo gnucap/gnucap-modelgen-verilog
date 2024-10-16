@@ -6,9 +6,9 @@ module cond0(p, n);
     real S, T, U;
     begin
     end
-    if (((S + 1) == 3)) begin
+    if (((S +  1.) ==  3.)) begin
     end
-    S = 1; // s1 r2
+    S =  1.; // s1 r2
     begin
     end
   end
@@ -20,11 +20,11 @@ module cond1(p, n);
     real S;
     begin // always
       // S : 0
-      S = 3; // s1 r2
+      S =  3.; // s1 r2
     end
     begin : bla // always
       // S : 0
-      S = 1; // s1 r2
+      S =  1.; // s1 r2
     end
   end
 
@@ -37,7 +37,7 @@ module cond2(p, n);
     real T;
     begin // always
       // T : 0
-      T = 1; // s1 r2
+      T =  1.; // s1 r2
     end
   end
 
@@ -51,7 +51,7 @@ module cond3(p, n);
     begin // always
       begin // always
         // S : 0
-        S = 2; // s1 r2
+        S =  2.; // s1 r2
       end
     end
     begin // always
@@ -60,7 +60,7 @@ module cond3(p, n);
           begin // always
             begin // always
               // T : 0
-              T = 1; // s1 r2
+              T =  1.; // s1 r2
             end
           end
         end
@@ -68,16 +68,16 @@ module cond3(p, n);
     end
     if (T) begin
       // T : 0
-      T = 0; // s1 r2
+      T =  0.; // s1 r2
     end
     else begin
       // T : 0
-      T = 2; // s1 r2
+      T =  2.; // s1 r2
     end
     begin // always
       begin // always
         // S : 0
-        S = 2; // s1 r2
+        S =  2.; // s1 r2
       end
     end
   end

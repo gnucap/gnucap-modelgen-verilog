@@ -610,7 +610,7 @@ public:
   std::string const& name() const{ return _name; }
   bool operator!=(const std::string& s)const {return _name != s;}
 //  virtual bool is_constant()const { untested();untested(); return false;}
-  virtual double eval()const { untested();untested(); return NOT_INPUT;}
+  virtual double eval()const { untested();untested(); return ::NOT_INPUT;}
 protected:
   Block* owner(){ return _owner; }
 }; // Parameter_Base

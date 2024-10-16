@@ -52,12 +52,10 @@ main.v3: 1 candidate found for A
 print dc v(nodes) v(m0.*) y(m0.v*.*) 
                             ^ ? no match
 >>>>>param v=1 
-v already set. replacing
 >>>>>dc 
 #           v(1)       v(2)       v(3)       v(m0.v1)   v(m0.v2)   v(m0.v3)  
  0.         1.         2.         1.         1.         2.         1.        
 >>>>>param v=2 
-v already set. replacing
 >>>>>dc 
 #           v(1)       v(2)       v(3)       v(m0.v1)   v(m0.v2)   v(m0.v3)  
  0.         1.         2.         2.         1.         2.         2.        

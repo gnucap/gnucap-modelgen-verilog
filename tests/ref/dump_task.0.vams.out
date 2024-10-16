@@ -5,8 +5,8 @@ module foo();
 
   analog begin
     $strobe("some strobe %f.", x);
-    $strobe("some strobe %f.", 0);
-    $finish(1);
+    $strobe("some strobe %f.",  0.);
+    $finish( 1.);
   end
 
   analog begin

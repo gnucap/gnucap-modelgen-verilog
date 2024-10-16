@@ -5,14 +5,14 @@ module test();
 
   analog begin
     begin : scopename
-      a = 1;
+      a =  1.;
     end
   end
 
   analog begin
     begin
       begin
-        a = 1;
+        a =  1.;
       end
     end
   end
@@ -21,7 +21,7 @@ module test();
     begin
       begin
         begin
-          a = 1;
+          a =  1.;
         end
       end
     end

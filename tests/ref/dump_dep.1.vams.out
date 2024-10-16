@@ -9,7 +9,7 @@ module dep0(d, g);
     real T;
     real S;
     S = T; // s3 r2
-    while (1) begin
+    while ( 1.) begin
       // T : 1
       // c : 1
       c = T; // dep: _potential_b_g_ s3 r2

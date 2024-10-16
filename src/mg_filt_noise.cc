@@ -331,7 +331,7 @@ void Token_NOISE::stack_op(Expression* e)const
     throw Exception("syntax error, need args");
   }else if(is_zero(*cc->args())){
     Float* f = new Float(0.);
-    e->push_back(new Token_CONSTANT("0.", f, ""));
+    e->push_back(new Token_CONSTANT(f, ""));
     delete cc;
     cc = NULL;
     func->set_p_to_gnd();

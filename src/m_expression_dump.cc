@@ -68,7 +68,7 @@ void Expression_::dump(std::ostream& out)const
       }
       de->dump(o);
       o << tarr->name();
-      Token* t = new Token_ARRAY(o.str());
+      Token* t = new Token_SYMBOL(o.str());
       locals.push_back(t);
       stack.push_back(t);
     }else if (auto pl = dynamic_cast<const Token_PARLIST_*>(*i)) { untested();

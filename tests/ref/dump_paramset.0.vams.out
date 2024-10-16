@@ -2,8 +2,8 @@
 module resistor(a, b);
   electrical a, b;
   (* attrib=yes *)
-  parameter real r = 0.;
-  parameter real aa = 0, bb = 0.;
+  parameter real r =  0.;
+  parameter real aa =  0., bb =  0.;
 
   analog begin
     I(a, b) <+ (V(a, b) / r);
@@ -16,12 +16,12 @@ endmodule
 // paramsets
 (* attribute="stub" *)
 paramset const_res resistor;
-  parameter real rr = 0., RR = 0.;
+  parameter real rr =  0., RR =  0.;
   localparam real ll = rr;
   (* attrib=yes *)
-  parameter real xx = 0.;
+  parameter real xx =  0.;
 
-  .r = 1
+  .r =  1.
   .aa = (xx + ll)
 endparamset;
 

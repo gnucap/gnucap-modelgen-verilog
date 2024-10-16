@@ -210,12 +210,12 @@ private:
 	  delete e->back();
 	  e->pop_back();
 	  Float* f = new Float(1.);
-	  e->push_back(new Token_CONSTANT("1.", f, ""));
+	  e->push_back(new Token_CONSTANT(f, ""));
 	}else if(p2->is_local()){
 	  delete e->back();
 	  e->pop_back();
 	  Float* f = new Float(0.);
-	  e->push_back(new Token_CONSTANT("0.", f, ""));
+	  e->push_back(new Token_CONSTANT(f, ""));
 	}else{
 	  Token_CALL::stack_op(e);
 	//  is_constant();
@@ -229,7 +229,7 @@ private:
       delete e->back();
       e->pop_back();
       Float* f = new Float(0.);
-      e->push_back(new Token_CONSTANT("0.", f, ""));
+      e->push_back(new Token_CONSTANT(f, ""));
     }else if(arg) { untested();
       incomplete(); // error?
     }else{ untested();

@@ -1,6 +1,6 @@
 module resistor(a, b);
   electrical a, b;
-  parameter real r = 1. from ((0):(inf));
+  parameter real r =  1. from (( 0.):( Inf));
 
   analog begin
     I(a, b) <+ (V(a, b) / r);
@@ -12,13 +12,13 @@ endmodule
 
 // paramsets
 paramset my_res resistor;
-  parameter real R = 1.;
+  parameter real R =  1.;
 
   .r = R
 endparamset;
 paramset my_res resistor;
-  parameter real R0 = 1.;
-  parameter real R1 = 1.;
+  parameter real R0 =  1.;
+  parameter real R1 =  1.;
 
   .r = (R0 + R1)
 endparamset;

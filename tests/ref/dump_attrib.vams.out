@@ -3,9 +3,9 @@ module device(p, n);
   inout p, n;
   (* desc="normal port" *)
   electrical p, n;
-  parameter real c = 1.;
+  parameter real c =  1.;
   (* units="m^2", type="instance",            desc="Bottom area of source junction", *)
-  parameter real ABSOURCE = 1.0e-12;
+  parameter real ABSOURCE =  1.E-12;
 
   (* desc="dummy" *)
   real x;

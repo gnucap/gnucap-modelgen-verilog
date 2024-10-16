@@ -106,7 +106,7 @@ private:
 
   int net_nodes()const override {
     if(_dev){
-      trace3("PARAMSET::net_nodes", _dev->long_label(), _dev->net_nodes(), _dev->max_nodes());
+      // trace3("PARAMSET::net_nodes", _dev->long_label(), _dev->net_nodes(), _dev->max_nodes());
       return _net_nodes; // dev->net_nodes(); // problem with chain
       return _dev->net_nodes(); // problem with bjt
     }else{
@@ -294,11 +294,21 @@ bool PARAMSET::is_valid() const
   assert(_parent);
   if(_parent->subckt()){
     PARAM_LIST const* params = _parent->subckt()->params();
-    PARAMETER<double> v = params->deep_lookup("_..is_valid");
-    double x = v.e_val(1., subckt());
-    trace3("PARAMSET::is_valid", long_label(), x, v.string());
-    return x==1.;
-  }else{
+    PARAM_INSTANCE v = params->deep_lookup("_..is_valid");
+    Base const* x = v.e_val(nullptr, subckt());
+    Integer c;
+    Integer* res = c.assign(x);
+    if(!res) {
+      return true;
+    }else{
+      assert(x);
+      trace3("PARAMSET::valid?", long_label(), v.string(), res->value());
+      int a = res->value();
+      delete res;
+      return a;
+    }
+  }else{ untested();
+    trace1("PARAMSET::invalid?", long_label());
     return false;
   }
 }
@@ -470,8 +480,16 @@ void resolve_copy(CARD_LIST* t, PARAM_LIST const& p, const CARD_LIST*)
 	  E.push_back(*ii);
 	  skip1 = false;
 	}else if(dynamic_cast<Token_CONSTANT*>(*ii)
-	    && !dynamic_cast<const Float*>((*ii)->data())) {
-	  E.push_back(new Token_CONSTANT("_." + (*ii)->name(), NULL, ""));
+	    && !dynamic_cast<const Float*>((*ii)->data())
+	    && !dynamic_cast<const Integer*>((*ii)->data())) {
+	  incomplete(); // probably;
+		unreachable(); // unfixed m_expression_reduce gets us here.
+	  E.push_back(new Token_SYMBOL("_." + (*ii)->name()));
+	  delete(*ii);
+	}else if(dynamic_cast<Token_SYMBOL*>(*ii)) {
+	  assert(!dynamic_cast<const Float*>((*ii)->data()));
+	  assert(!dynamic_cast<const Integer*>((*ii)->data()));
+	  E.push_back(new Token_SYMBOL("_." + (*ii)->name()));
 	  delete(*ii);
 	}else{
 	  E.push_back(*ii);
@@ -514,12 +532,13 @@ CARD* PARAMSET::deflate()
   trace0("PARAMSET::resolve?");
   resolve_copy(subckt(), c->_params, NULL);
   for(auto const& x : c->_params){
-    trace2("debugp", x.first, x.second);
+    trace1("debugp", x.first);
   }
 
   trace4("PARAMSET::deflate args fwd", dev->long_label(), dev->dev_type(), long_label(), dev_type());
   trace2("PARAMSET::deflate args fwd", dev->long_label(), my_mfactor());
   for(auto pi=pc->_params.begin(); pi!=pc->_params.end(); ++pi){
+    trace3("PARAMSET::deflate args fwd2", dev->long_label(), pi->first, pi->second.string());
     CS cmd(CS::_STRING, pi->second.string());
     Expression e(cmd);
     Expression r(e, subckt());

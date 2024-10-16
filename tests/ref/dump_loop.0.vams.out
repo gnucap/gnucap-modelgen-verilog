@@ -3,18 +3,18 @@
 module loops();
   analog begin : main
     real i;
-    i = 5;
+    i =  5.;
     while (i) begin
-      i = (i - 1);
+      i = (i -  1.);
     end
-    for (i = 9; (i > 4); i = (i - 1)) begin
-      i = (i - 1);
+    for (i =  9.; (i >  4.); i = (i -  1.)) begin
+      i = (i -  1.);
     end
-    for (; (i > 0); i = (i - 1)) begin
-      i = (i - 1);
+    for (; (i >  0.); i = (i -  1.)) begin
+      i = (i -  1.);
     end
-    for (; (i > 0); ) begin
-      i = (i - 1);
+    for (; (i >  0.); ) begin
+      i = (i -  1.);
     end
   end
 

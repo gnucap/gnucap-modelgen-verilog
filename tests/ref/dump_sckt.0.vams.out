@@ -2,8 +2,8 @@ module net(a, b);
   inout a, b;
   electrical 0, 1, 2, a, b;
   ground 0;
-  parameter real r = 1.;
-  parameter real c = 1.;
+  parameter real r =  1.;
+  parameter real c =  1.;
 
   resistor #(.r(r)) r1(a, 1);
   resistor #(.r(r)) r2(1, 2);

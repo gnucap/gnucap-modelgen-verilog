@@ -61,15 +61,15 @@ void FUNCTION_::stack_op(Expression const& arg, Expression* E) const
   }else if(arg.size()==1){
     double value = evalf(argv);
     const Float* v = new Float(value);
-    E->push_back(new Token_CONSTANT(to_string(value), v, ""));
+    E->push_back(new Token_CONSTANT(v, ""));
   }else if(arg.size()==2){
     double value = evalf(argv);
     const Float* v = new Float(value);
-    E->push_back(new Token_CONSTANT(to_string(value), v, ""));
+    E->push_back(new Token_CONSTANT(v, ""));
   }else if(arg.size()==3){
     double value = evalf(argv);
     const Float* v = new Float(value);
-    E->push_back(new Token_CONSTANT(to_string(value), v, ""));
+    E->push_back(new Token_CONSTANT(v, ""));
   }else{ untested();
     incomplete();
   }
@@ -102,7 +102,7 @@ void MGVAMS_FILTER::setup(Module* m)
     trace1("filter used_in?", branch()->used_in().size());
 
     // use rdeps, not used_in....?
-   // for(Base const* b : rdeps()) {
+   // for(Base const* b : rdeps()) { untested();
    // }
     for(Base const* b : branch()->used_in()) {
       trace2("filter use ..", code_name(), typeid(*b).name());
@@ -143,7 +143,7 @@ void MGVAMS_FILTER::setup(Module* m)
       }else if(b == &tr_accept_tag) {
       }else if(b == &tr_begin_tag) {
       }else if(b == &tr_advance_tag) {
-      }else{
+      }else{ untested();
 	trace1("xdt unknown?", c_cnt);
 	unreachable();
       }
@@ -188,7 +188,7 @@ void MGVAMS_FILTER::setup(Module* m)
       // func->_output = cont->branch(); // polarity?
     }else if(assigned){ untested();
     }else if(c_cnt!=1){ untested();
-    }else{
+    }else{ untested();
       unreachable();
       incomplete(); // later
       // func->set_p_to_gnd();

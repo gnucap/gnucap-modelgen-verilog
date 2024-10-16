@@ -1,15 +1,15 @@
 module test(p, n);
   inout p, n;
   electrical p, n;
-  parameter real a = 2.;
-  localparam integer two_a = (a * 2);
+  parameter real a =  2.;
+  localparam integer two_a = (a *  2.);
 
   analog begin : main
     real b;
     real c, d;
     b = two_a;
-    c = 0;
-    d = 0;
+    c =  0.;
+    d =  0.;
     I(p, n) <+ ((b + c) + d);
     begin : second
       real b;

@@ -248,15 +248,24 @@ CARD_LIST* DEV_MODULE::scope()
 /*--------------------------------------------------------------------------*/
 bool DEV_MODULE::is_valid() const
 {
-  trace1("DEV_MODULE::is_valid", long_label());
   assert(subckt());
   assert(_parent);
   assert(_parent->subckt());
   PARAM_LIST const* params = _parent->subckt()->params();
-  PARAMETER<double> v = params->deep_lookup("_..is_valid");
-  trace1("DEV_MODULE::is_valid I", v.string());
-  double x = v.e_val(1., subckt());
-  return x==1.;
+  PARAM_INSTANCE v = params->deep_lookup("_..is_valid");
+  trace2("DEV_MODULE::is_valid I", long_label(), v.string());
+  Base const* x = v.e_val(nullptr, subckt());
+  Integer c;
+  Integer* res = c.assign(x);
+  if(!res) {
+    return true;
+  }else{ untested();
+    assert(x);
+    trace1("DEV_MODULE::is_valid I", typeid(*x).name());
+    int a = res->value();
+    delete res;
+    return a;
+  }
 }
 /*--------------------------------------------------------------------------*/
 CARD* DEV_MODULE::clone()const
@@ -392,7 +401,7 @@ void DEV_MODULE::expand()
     assert(pl);
     c->_params.set_try_again(pl);
     for(auto p : c->_params){
-      trace3("expand param", p.first, p.second, p.second.string());
+      trace2("expand param", p.first, p.second.string());
     }
 
     renew_subckt(_parent, &(c->_params));

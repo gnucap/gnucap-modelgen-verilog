@@ -47,7 +47,6 @@ m.D1 ambiguous overload in diode
  0.55       0.55       0.55      -1.7189u   -1.7189u    ??         7.        
  0.6        0.6        0.6       -11.88u    -11.88u     ??         7.        
  0.65       0.65       0.65      -82.106u   -82.106u    ??         7.        
-v already set. replacing
 >>>>>.status notime 
 Gnucap   System status
 iterations: op=0, dc=168, tran=0, fourier=0, total=168

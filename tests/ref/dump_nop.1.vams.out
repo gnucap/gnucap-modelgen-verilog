@@ -1,26 +1,26 @@
 module test(a, b);
   electrical a, b;
-  parameter real arg = 0 from [(0.):(0.)];
+  parameter real arg =  0. from [( 0.):( 0.)];
 
   real T;
   real U;
 
   analog begin
-    if (0) begin
-      V(a) <+ 1.;
+    if ( 0.) begin
+      V(a) <+  1.;
     end
     else begin
-      V(a) <+ 2.;
+      V(a) <+  2.;
     end
     if (arg) begin
-      V(b) <+ 3.;
+      V(b) <+  3.;
     end
-    if ( 0.) begin
-      V(a) <+ 4.;
+    if (0) begin
+      V(a) <+  4.;
     end
     case (arg)
-      0: begin
-        V(b) <+ 2.2;
+       0.: begin
+        V(b) <+  2.2;
       end
       default:;
     endcase

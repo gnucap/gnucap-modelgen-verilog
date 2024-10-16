@@ -1,7 +1,7 @@
 module ternary(p, n);
   inout p, n;
   electrical p, n;
-  parameter real c = 1.;
+  parameter real c =  1.;
 
   real a;
 

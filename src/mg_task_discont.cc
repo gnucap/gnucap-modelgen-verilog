@@ -40,7 +40,7 @@ private:
   std::string eval(CS&, const CARD_LIST*)const override{ untested();
     return "$$discontinuity";
   }
-  DISCONT* clone()const override {
+  DISCONT* clone()const override { untested();
     return new DISCONT(*this);
   }
  // bool is_common()const override {return true;} // extra CARD*
@@ -82,7 +82,7 @@ private:
     return "d->" + label() + "";
   }
   bool returns_void()const override { return true; }
-  virtual std::string end()const{return "";}
+  virtual std::string end()const{ untested();return "";}
 } disc;
 DISPATCHER<FUNCTION>::INSTALL d_disc(&function_dispatcher, "$discontinuity", &disc);
 /*--------------------------------------------------------------------------*/

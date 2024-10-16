@@ -1,20 +1,20 @@
 module test_pg0(p, n);
   electrical p, n;
-  parameter real st = 3.;
-  localparam real l = 5.;
+  parameter real st =  3.;
+  localparam real l =  5.;
 
   analog begin
     if ($param_given(st)) begin
-      V(p, n) <+ 1.0;
+      V(p, n) <+  1.;
     end
     else begin
-      V(p, n) <+ 1.1;
+      V(p, n) <+  1.1;
     end
-    if (0.) begin
-      V(p, n) <+ 2.0;
+    if ( 0.) begin
+      V(p, n) <+  2.;
     end
     else begin
-      V(p, n) <+ 2.1;
+      V(p, n) <+  2.1;
     end
   end
 

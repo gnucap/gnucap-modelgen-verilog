@@ -338,45 +338,48 @@ class PP_Quoted_String : public String {
 public:
   void parse(CS& f) override {
     if(f >> "\"") {
-      _data = "\"";
+     // _data = "";
+     // _data = "\"";
       parse_(f);
-      _data += "\"";
+     // _data += "\"";
     }else{
     }
   }
 
 private:
   void parse_(CS& f) {
+    std::string data;
     while(true){
       while (f.peek() && (!isgraph(f.peek()))) {
-	_data += f.ctoc();
+	data += f.ctoc();
       }
-      trace2("qs a1", _data, f.peek());
+      trace2("qs a1", data, f.peek());
 
-      append_to(f, _data, "\\\"\n");
-      trace2("qs a2", _data, f.peek());
+      append_to(f, data, "\\\"\n");
+      trace2("qs a2", data, f.peek());
       if (f.peek() == '"') {
 	f.skip();
 	break;
       }else if (f.peek() == '\n') { untested();
-	_data += '\\';
-	_data += f.ctoc();
+	data += '\\';
+	data += f.ctoc();
       }else if (f.peek() == '\\') {
-	_data += f.ctoc();
+	data += f.ctoc();
 	if(f.peek() == '\\'){
-	  _data += f.ctoc();
+	  data += f.ctoc();
 	}else if(f.peek() == '\"'){
-	  _data += f.ctoc();
+	  data += f.ctoc();
 	}else if(f.peek() == '\n'){
-	  _data += f.ctoc();
+	  data += f.ctoc();
 	}else{
 	}
       }else{ untested();
-	trace2("qs", _data, f.peek());
+	trace2("qs", data, f.peek());
 	throw Exception_CS("need '\"'", f);
       }
     }
-    trace1("PP_Quoted_String", _data);
+    trace1("PP_Quoted_String", data);
+    String::operator=(data);
   }
   void dump(std::ostream& o)const override;
 } quoted_string;
@@ -648,12 +651,13 @@ void Preprocessor::read(std::string const& file_name)
 }
 /*--------------------------------------------------------------------------*/
 void PP_Quoted_String::dump(std::ostream& o)const{ untested();
-  for(char c : _data){ untested();
-    if(c=='\n'){ untested();
+  assert(_data);
+  for(char* c=_data; c; ++c) { untested();
+    if(*c=='\n'){ untested();
       o << '\\';
     }else{ untested();
     }
-    o << c;
+    o << *c;
   }
 }
 /*--------------------------------------------------------------------------*/

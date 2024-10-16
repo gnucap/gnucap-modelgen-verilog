@@ -131,11 +131,11 @@ public:
   String_Arg key()const { return String_Arg(name()); }
   bool is_real()const { untested(); return type().is_real(); }
   bool is_int()const { untested(); return type().is_int(); }
-  std::string const& identifier()const { untested();return name();}
-  std::string const& name()const; //  { untested();return name();}
+  std::string const identifier()const { untested();return name();}
+  std::string const name()const; //  { untested();return name();}
   virtual std::string code_name()const {unreachable(); return "";}
 
-  virtual double eval()const { untested(); return NOT_INPUT;}
+  virtual double eval()const { untested(); return ::NOT_INPUT;}
   Block const* scope() const;
   TData const& deps()const { assert(_data); return *_data; }
   Variable_Decl* deep_copy(Base* owner, std::string prefix="") const;

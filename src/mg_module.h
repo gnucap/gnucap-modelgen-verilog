@@ -32,7 +32,7 @@ class ValueRangeSpec : public Owned_Base {
   // incomplete();
 public:
 //  virtual bool is_constant()const { untested(); return false; }
-  virtual double eval()const { return NOT_INPUT; }
+  virtual double eval()const { return ::NOT_INPUT; }
 };
 /*--------------------------------------------------------------------------*/
 class ValueRangeConstant : public ValueRangeSpec {

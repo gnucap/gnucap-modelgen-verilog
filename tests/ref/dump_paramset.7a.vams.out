@@ -21,7 +21,7 @@ module my_sh(p, n);
   real __i;
 
   analog begin
-    V(p, n) <+ 0.;
+    V(p, n) <+  0.;
   end
 
   analog begin

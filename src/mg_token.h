@@ -327,13 +327,14 @@ private:
 /*--------------------------------------------------------------------------*/
 class Parameter_Base;
 class Token_PAR_REF : public Token_CONSTANT {
+  std::string _name;
   Parameter_Base const* _item;
 public:
   explicit Token_PAR_REF(const std::string Name, Parameter_Base const* item)
-    : Token_CONSTANT(Name, NULL, ""), _item(item) {}
+    : Token_CONSTANT(NULL, ""), _name(Name), _item(item) {}
 private:
   explicit Token_PAR_REF(const Token_PAR_REF& P, Base const* d=NULL)
-    : Token_CONSTANT(P.name(), d, ""), _item(P._item) {}
+    : Token_CONSTANT(d, ""), _name(P._name), _item(P._item) {}
   Token* clone()const override { untested();
     return new Token_PAR_REF(*this);
   }
@@ -347,6 +348,7 @@ public:
     return _item;
   }
   Parameter_Base const* operator->() const{ return _item; }
+  std::string val_string()const override {return _name;}
 };
 /*--------------------------------------------------------------------------*/
 class Token_OUT_VAR : public Token_SYMBOL {

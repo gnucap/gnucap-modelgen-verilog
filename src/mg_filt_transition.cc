@@ -229,11 +229,11 @@ public:
     }
     if(num_args()>2){
       o << ", double rise_time=0.";
-    }else{
+    }else{ untested();
     }
     if(num_args()>3){
       o << ", double fall_time=0.";
-    }else{
+    }else{ untested();
     }
     if(num_args()>4){ untested();
       o << ", double time_tol=0";
@@ -262,12 +262,12 @@ public:
       if(num_args()>2){
 	o__ "l->set_param_by_name(\"rise\", \"\");\n";
 	o__ "l->set_param_by_name(\"rise\", to_string(rise_time));\n";
-      }else{
+      }else{ untested();
       }
       if(num_args()>3){
 	o__ "l->set_param_by_name(\"fall\", \"\");\n";
 	o__ "l->set_param_by_name(\"fall\", to_string(fall_time));\n";
-      }else{
+      }else{ untested();
       }
       if(num_args()>4){ untested();
 	o__ "l->set_param_by_name(\"tol\", \"\");\n";
