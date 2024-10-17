@@ -109,7 +109,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
   assert(Scope);
 
   for(List_Base<Token>::const_iterator ii = e.begin(); ii!=e.end(); ++ii) {
-    trace1("resolve in", (*ii)->name());
+    trace2("resolve in", (*ii)->name(), typeid(**ii).name());
   }
 
   // lookup symbols
@@ -456,13 +456,13 @@ Block* Expression_::scope()
 /*--------------------------------------------------------------------------*/
 bool Expression_::is_constant() const
 {
-  if(size() > 1) { untested();
+  if(size() > 1) {
     bool c = true;
-    for(auto const& i : *this) { untested();
+    for(auto const& i : *this) {
       assert(i);
-      if(auto const* d = dynamic_cast<TData const*>(back()->data())){ untested();
+      if(auto const* d = dynamic_cast<TData const*>(back()->data())){
 	c &= d->is_constant();
-      }else{ untested();
+      }else{
 	incomplete();
       }
     }

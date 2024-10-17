@@ -570,7 +570,7 @@ void Assignment::dump(std::ostream& o) const
   if(_token){
     o << _token->name() << " = ";
     Expression_::dump(o);
-  }else{ untested();
+  }else{
 //    o << "/// unreachable?\n";
   }
 }

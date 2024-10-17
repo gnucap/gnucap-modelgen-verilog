@@ -307,7 +307,7 @@ bool PARAMSET::is_valid() const
       delete res;
       return a;
     }
-  }else{ untested();
+  }else{
     trace1("PARAMSET::invalid?", long_label());
     return false;
   }
@@ -465,6 +465,7 @@ void resolve_copy(CARD_LIST* t, PARAM_LIST const& p, const CARD_LIST*)
       CS cmd(CS::_STRING, i->second.string());
       Expression f(cmd);
       CARD_LIST empty;
+      empty.set_verilog_math();
       Expression e(f, &empty);
       Expression E;
 	
@@ -516,6 +517,7 @@ CARD* PARAMSET::deflate()
   trace2("PARAMSET::deflate", long_label(), subckt()->size());
   assert(is_valid());
   assert(subckt());
+  subckt()->set_verilog_math();
   assert(subckt()->size()==1);
   CARD_LIST::iterator i = subckt()->begin();
   assert(*i);

@@ -44,9 +44,9 @@ endparamset
 
 module main(1 2);
 parameter len=10
-parameter r0=1
-parameter c0=1
-parameter l0=.1
+parameter real r0=1
+parameter real c0=1
+parameter real l0=.1
   tln #(.length(len) .c(c0/len) .r(r0/len) .l(l0/len)) t1(1, 2);
 endmodule
 

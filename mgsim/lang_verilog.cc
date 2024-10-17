@@ -419,6 +419,8 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
   parse_type(cmd, x);
   cmd >> ';';
 
+  x->subckt()->set_verilog_math();
+
   for (;;) {
     size_t here = cmd.cursor();
     if (cmd >> "parameter ") {
@@ -472,6 +474,7 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
   parse_label(cmd, x);
   parse_ports(cmd, x, true/*all new*/);
   cmd >> ';';
+  x->subckt()->set_verilog_math();
 
   bool have_instance = false;
 

@@ -6,7 +6,7 @@ module tln0 (a,b);
 endmodule // tln0
 
 module tln1 (a,b);
-  parameter length 
+  parameter integer length 
   parameter r; 
   parameter c; 
   resistor #(.r(r)) r (a,i);
@@ -15,14 +15,14 @@ module tln1 (a,b);
 endmodule // tln1
 
 paramset tln tln1;
-  parameter length from [2:999]; 
+  parameter integer length from [2:999]; 
   parameter r; 
   parameter c; 
  .c=c; .length=length; .r=r;
 endparamset
 
 paramset tln tln0;
-  parameter length from [1:1]; 
+  parameter integer length from [1:1]; 
   parameter r; 
   parameter c; 
  .c=c; .r=r;
@@ -30,7 +30,7 @@ endparamset
 
 module main (1,2);
   parameter len=10 
-  tln #(.r(1/len),.c(1/len),.length(len)) t1 (1,2);
+  tln #(.r(1./len),.c(1./len),.length(len)) t1 (1,2);
 endmodule // main
 
 main #() m (.1(1),.2(2));

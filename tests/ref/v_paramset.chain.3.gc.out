@@ -11,7 +11,7 @@
 >>>>>parameter length from [1:1]; 
 >>>>>parameter r=0; 
 >>>>>module main(1 2); 
->>>>>parameter L=5 
+>>>>>parameter real L=5.; 
 >>>>>spice 
 >>>>>.options noinsensitive 
 >>>>>.print dc v(nodes) y(m.t1.r) y(m.t1.t.r) 

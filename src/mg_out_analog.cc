@@ -1451,7 +1451,7 @@ std::string Probe::code_name() const
     return "_flow" + _br->code_name(); // BUG. named_branch.
   }else if (_type == t_pot){
     return "_potential" + _br->code_name();
-  }else{ untested();
+  }else{
     return("unreachable_probe"); // trace.
   }
 }

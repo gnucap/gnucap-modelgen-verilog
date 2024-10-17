@@ -29,7 +29,7 @@ paramset tln tln0
 endparamset
 
 module main(1 2);
-  parameter L=5
+  parameter real L=5.;
   tln #(.length(L) .r(1/L)) t1(1, 2);
 endmodule
 

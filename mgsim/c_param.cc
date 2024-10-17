@@ -55,7 +55,7 @@ public:
     }else if(auto i = dynamic_cast<Integer const*>(v.value())){ untested();
       eq = i->equal(_value);
     }else{ untested();
-      // incomplete();
+      incomplete();
     }
 
     bool ret = false;
@@ -114,8 +114,10 @@ public:
       }else{ untested();
 	return "";
       }
-   // }else if (_s == "") { untested();
-   //   return "NA(" + _value->val_string() + ")";
+    }else if (_s == "") { untested();
+      incomplete();
+      //return "NA(" + _value->val_string() + ")";
+      return _s;
     }else{
       return _s;
     }

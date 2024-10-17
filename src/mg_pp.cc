@@ -338,18 +338,24 @@ class PP_Quoted_String : public String {
 public:
   void parse(CS& f) override {
     if(f >> "\"") {
-     // _data = "";
-     // _data = "\"";
       parse_(f);
-     // _data += "\"";
     }else{
+    }
+  }
+  std::string val_string()const override	{
+    if(_data){
+      // BUG: missing escape?
+      return '"' + std::string(_data) + '"';
+    }else{ untested();
+      unreachable();
+      return "nul"; // uh. make sure to query is_NA;
     }
   }
 
 private:
   void parse_(CS& f) {
-    std::string data;
-    while(true){
+    std::string data; // = "\"";
+    while(true) {
       while (f.peek() && (!isgraph(f.peek()))) {
 	data += f.ctoc();
       }
@@ -378,6 +384,7 @@ private:
 	throw Exception_CS("need '\"'", f);
       }
     }
+    // data += "\n";
     trace1("PP_Quoted_String", data);
     String::operator=(data);
   }
@@ -650,8 +657,10 @@ void Preprocessor::read(std::string const& file_name)
   parse(file);
 }
 /*--------------------------------------------------------------------------*/
-void PP_Quoted_String::dump(std::ostream& o)const{ untested();
+void PP_Quoted_String::dump(std::ostream& o)const
+{ untested();
   assert(_data);
+ // o << '"';
   for(char* c=_data; c; ++c) { untested();
     if(*c=='\n'){ untested();
       o << '\\';
@@ -659,6 +668,7 @@ void PP_Quoted_String::dump(std::ostream& o)const{ untested();
     }
     o << *c;
   }
+  //o << '"';
 }
 /*--------------------------------------------------------------------------*/
 void Preprocessor::parse(CS& file)

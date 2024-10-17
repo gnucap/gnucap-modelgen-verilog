@@ -209,10 +209,12 @@ class DEV_INSTANCE_PROTO : public INSTANCE {
   explicit	DEV_INSTANCE_PROTO(const DEV_INSTANCE_PROTO&p)
    : INSTANCE(p) { untested();
      new_subckt();
+     subckt()->set_verilog_math();
    }
 public:
   explicit	DEV_INSTANCE_PROTO() : INSTANCE() {
     new_subckt();
+    subckt()->set_verilog_math();
     protos().insert(this);
   }
   ~DEV_INSTANCE_PROTO(){
@@ -610,6 +612,7 @@ void INSTANCE::expand()
   trace3("INSTANCE::expand sckt in", long_label(), subckt()->size(), _sim->is_first_expand());
   // assert(subckt()->size());
   subckt()->set_owner(NULL);
+  subckt()->set_verilog_math();
   subckt()->set_owner(owner()); // TODO: renew_subckt with alternative owner?
   subckt()->precalc_first(); // here?
 
