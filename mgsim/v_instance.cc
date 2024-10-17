@@ -229,6 +229,10 @@ public:
 
   bool do_tr()override { untested(); unreachable(); return true; }
 
+  void ac_final()override {untested();}
+  void dc_final()override {untested();}
+  void tr_final()override {untested();}
+
 public:
   void set_port_by_index(int Index, std::string& Value)override {
     grow_nodes(Index, _n, _node_capacity, node_capacity_floor);

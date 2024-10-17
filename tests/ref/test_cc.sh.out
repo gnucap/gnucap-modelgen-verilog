@@ -1074,6 +1074,9 @@ private: // overrides
   bool      tr_needs_eval()const override;
   void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }
   bool      do_tr() override;
+  void ac_final()override {}
+  void dc_final()override {}
+  void tr_final()override {}
   double tr_probe_num(std::string const&)const override;
     //void    ac_load();           //BASE_SUBCKT
     //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing
@@ -2297,6 +2300,9 @@ private: // overrides
   bool      tr_needs_eval()const override;
   void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }
   bool      do_tr() override;
+  void ac_final()override {}
+  void dc_final()override {}
+  void tr_final()override {}
   double tr_probe_num(std::string const&)const override;
     //void    ac_load();           //BASE_SUBCKT
     //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing
@@ -4804,6 +4810,9 @@ private: // overrides
   bool      tr_needs_eval()const override;
   void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }
   bool      do_tr() override;
+  void ac_final()override {}
+  void dc_final()override {}
+  void tr_final()override {}
   double tr_probe_num(std::string const&)const override;
     //void    ac_load();           //BASE_SUBCKT
     //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing
@@ -5695,6 +5704,9 @@ private: // overrides
   bool      tr_needs_eval()const override;
   void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }
   bool      do_tr() override;
+  void ac_final()override {}
+  void dc_final()override {}
+  void tr_final()override {}
   double tr_probe_num(std::string const&)const override;
     //void    ac_load();           //BASE_SUBCKT
     //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing

@@ -94,12 +94,16 @@ private: // no ops for prototype
   void tr_load()override	{if(is_device()){ BASE_SUBCKT::tr_load();}else{} }
   void tr_accept()override	{if(is_device()){ BASE_SUBCKT::tr_accept();}else{} }
   void tr_regress()override	{if(is_device()){ BASE_SUBCKT::tr_regress();}else{} }
+  void dc_final()override {if(is_device()){ BASE_SUBCKT::dc_final();}else{}}
+  void tr_final()override {if(is_device()){ BASE_SUBCKT::tr_final();}else{}}
   void tr_advance()override	{if(is_device()){ BASE_SUBCKT::tr_advance();}else{} }
   TIME_PAIR tr_review() override{if(is_device()){ return BASE_SUBCKT::tr_review();}else{
                                                   return TIME_PAIR(NEVER, NEVER);}}
   void dc_advance()override	{if(is_device()){ BASE_SUBCKT::dc_advance();}else{} }
   void do_ac()override		{if(is_device()){ BASE_SUBCKT::do_ac();}else{} }
   void ac_load()override	{if(is_device()){ BASE_SUBCKT::ac_load();}else{} }
+  void ac_final()override	{if(is_device()){ BASE_SUBCKT::ac_final();}else{}}
+
   void tr_queue_eval()override{
     if(is_device()){
       BASE_SUBCKT::tr_queue_eval();
@@ -161,10 +165,13 @@ private: // no-ops for prototype
   void tr_advance()override {}
   void tr_restore()override { untested();}
   void tr_regress()override {}
+  void dc_final()override {}
+  void tr_final()override {}
   void dc_advance()override {}
   void ac_begin()override {}
   void do_ac()override {}
   void ac_load()override {}
+  void ac_final()override {}
   bool do_tr()override { untested(); return true;}
   bool tr_needs_eval()const override {untested(); return false;}
   void tr_queue_eval()override {}

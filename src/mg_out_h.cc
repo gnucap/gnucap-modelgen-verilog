@@ -644,6 +644,11 @@ static void make_module(std::ostream& o, const Module& m)
 //    o__ "void      ac_begin() override;\n";
 //    o__ " void    do_ac();\n";
   }
+  { // todo
+  o__ "void ac_final()override {}\n";
+  o__ "void dc_final()override {}\n";
+  o__ "void tr_final()override {}\n";
+  }
   o__ "double tr_probe_num(std::string const&)const override;\n";
   o__ "  //void    ac_load();           //BASE_SUBCKT\n";
   o__ "  //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing\n";
