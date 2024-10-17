@@ -2,10 +2,10 @@
 options trace
 verilog
 
-module main(1,2,3,4);
+module main(.a(a),.b(b),.c(c),.d(d));
 parameter x=0
-vsource #(1.) v(3,1);
-res #(.r(1) .x(x)) R1(3,1);
+vsource #(1.) v(c,a);
+res #(.r(1) .x(x)) R1(.p(c),.n(a));
 endmodule
 
 main #(.x(x)) m(0,1,2,4);

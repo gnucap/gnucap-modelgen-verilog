@@ -59,6 +59,7 @@ private:
   friend class DEV_SUBCKT_PROTO;
   const BASE_SUBCKT* _parent;
   size_t _node_capacity;
+  std::vector<std::string> _port_name; // common?
 protected:
   explicit	DEV_MODULE(const DEV_MODULE&);
 public:
@@ -67,7 +68,7 @@ public:
   CARD*		clone()const override;
 private:
   void		set_port_by_index(int Index, std::string& Value) override;
-  // void	set_port_by_name(std::string&, std::string&) override;
+  int		set_port_by_name(std::string&, std::string&) override;
 private: // override virtual
   bool		is_device()const override	{return _parent;}
   char		id_letter()const override	{ untested();return 'X';}
@@ -219,6 +220,19 @@ void DEV_MODULE::set_port_by_index(int Index, std::string& Value)
   BASE_SUBCKT::set_port_by_index(Index, Value);
 }
 /*--------------------------------------------------------------------------*/
+int DEV_MODULE::set_port_by_name(std::string& name, std::string& value)
+{
+  if(_parent){
+    return BASE_SUBCKT::set_port_by_name(name, value);
+  }else{ untested();
+    int index = net_nodes();
+    // grow_nodes(index, _n, _node_capacity, node_capacity_floor);
+    _port_name.push_back(name);
+    set_port_by_index(index, value); // bumps _net_nodes
+    return index;
+  }
+}
+/*--------------------------------------------------------------------------*/
 int DEV_MODULE::max_nodes() const
 {
   if(_parent == &pp){ untested();
@@ -363,8 +377,15 @@ std::string DEV_MODULE::port_name(int i)const
       return "";
     }
   }else if(_parent) { untested(); untested();
+    unreachable();
     // reachable?
     return "";
+  }else if(size_t(i)<_port_name.size()){
+    if(_port_name[i]!=""){ untested();
+      return _port_name[i];
+    }else{ untested();
+      return  port_value(i);
+    }
   }else if(i<net_nodes()) {
     return port_value(i);
   }else{
