@@ -75,8 +75,8 @@ distclean: clean
 #-----------------------------------------------------------------------------
 # include/MakeConf.default says (let's try)
 MAKE_CXXFLAGS = ${GNUCAP_CXXFLAGS}
-MAKE_EXE = $(CXX) $(CCFLAGS) $(MAKE_CXXFLAGS) $(CXXFLAGS) ${GNUCAP_CPPFLAGS} $(OBJS) $(LIBS) $(LDFLAGS) -o $@
-MAKE_LIB = $(CXX) $(CCFLAGS) $(MAKE_CXXFLAGS) $(CXXFLAGS) ${GNUCAP_CPPFLAGS} $(OBJS) $(LIBS) $(LDFLAGS) -shared -o $@
+MAKE_EXE = $(CXX) $(CCFLAGS) $(MAKE_CXXFLAGS) $(CXXFLAGS) ${GNUCAP_CPPFLAGS} ${CPPFLAGS} $(OBJS) $(LIBS) $(LDFLAGS) -o $@
+MAKE_LIB = $(CXX) $(CCFLAGS) $(MAKE_CXXFLAGS) $(CXXFLAGS) ${GNUCAP_CPPFLAGS} ${CPPFLAGS} $(OBJS) $(LIBS) $(LDFLAGS) -shared -o $@
 # MAKE_EXE = $(CXX) $(CCFLAGS) $(OBJS) $(TARGET_LIBS) $(LDFLAGS) -o
 # MAKE_LIB = $(CXX) $(CCFLAGS) $(OBJS) $(TARGET_LIBS) $(LDFLAGS) -shared -o
 #

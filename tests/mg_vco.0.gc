@@ -1,0 +1,40 @@
+verilog
+
+attach ./modelgen_1.so
+attach vams/resistor.so
+attach vams/vpulse.so
+
+`modelgen
+module testvco0(out, vcp, vcn);
+
+  output out;
+  input vcp, vcn;
+  electrical out, vcp, vcn;
+
+  parameter real kvco = 1e9;
+  parameter real fc = 1e9;
+  real vc, freq;
+
+  parameter integer samples = 20;
+
+  analog begin
+    vc = V(vcp,vcn);
+    V(out) <+ 1.0 * cos(idt(6.28 * (vc*kvco + fc), 0.0));
+    freq = fc + kvco*vc;
+    $bound_step( 1.0 / freq / samples );
+  end
+
+endmodule
+`endmodelgen
+
+!make testvco0.so > /dev/null
+attach ./testvco0.so
+
+testvco0 #(.samples(6)) t(out, in, 0 );
+vpulse #(.rise(1e-8)) vv(in, 0 );
+resistor #(1) r(out 0);
+
+print tran v(nodes)
+tran 1e-8 basic
+
+end

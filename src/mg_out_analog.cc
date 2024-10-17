@@ -55,7 +55,7 @@ public:
 
 public:
   bool is_dynamic()const { return _mode==modeDYNAMIC; }
-  bool is_static()const { return _mode==modeSTATIC || _mode==modeTR_BEGIN ; } // || ...?
+  bool is_static()const { return _mode==modeSTATIC || _mode==modeTR_BEGIN || _mode==modeTR_REVIEW ; } // || ...?
   bool is_precalc()const { return _mode==modePRECALC; }
   bool is_probe()const   { untested(); return _mode==modePROBE; }
   bool is_tr_begin()const  { untested(); return _mode==modeTR_BEGIN; }
