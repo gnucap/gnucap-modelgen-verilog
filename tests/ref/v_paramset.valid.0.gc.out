@@ -36,7 +36,7 @@ endparamset
  .r=R;
 endparamset
 
-module main (1,2,3,4);
+module main (.1(1),.2(2),.3(3),.4(4));
   vsource #(1.) v (3,1);
   res #(.R(1)) R1 (3,1);
 endmodule // main

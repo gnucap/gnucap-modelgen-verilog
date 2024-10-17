@@ -5,7 +5,7 @@
 >>>>>parameter foo 
 >>>>>module main(1,2,3); 
 >>>>>list 
-module foo (1,2);
+module foo (.1(1),.2(2));
   parameter R=1 
   resistor #(.r(R)) rr (1,2);
 endmodule // foo
@@ -15,7 +15,7 @@ paramset myres foo;
  .R=foo+5;
 endparamset
 
-module main (1,2,3);
+module main (.1(1),.2(2),.3(3));
   vsource #(1.) v (1,2);
   myres #(.foo(5)) R1 (3,2);
   resistor #(.r(10)) r (1,3);

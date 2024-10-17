@@ -1,10 +1,10 @@
-module vsin (p,n);
+module vsin (.p(p),.n(n));
   .parameter amplitude 
   .parameter dc 
   vsource #(sin.offset(NA( 0.)), .amplitude(amplitude), .frequency( 1.), .delay(NA( 0.)), .damping(NA( 0.))  DC dc) V1 (.p(p),.n(n));
 endmodule // vsin
 
-module net1 (a,b,gnd);
+module net1 (.a(a),.b(b),.gnd(gnd));
   parameter r = 1.; 
   parameter c = 1.; 
   resistor #(.r(r)) r1 (a,1);

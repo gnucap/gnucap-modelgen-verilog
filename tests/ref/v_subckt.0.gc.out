@@ -1,6 +1,6 @@
 m #(.v(1), .w(2)) mm(.a(0), .b(1), .c(2)); 
     ^ ? m: bad parameter v ignored
-module m (a,b,c);
+module m (.a(a),.b(b),.c(c));
   parameter w=1 
   vsource #(.dc(v)) v1 (a,b);
   vsource #(.dc(w)) v1 (c,a);

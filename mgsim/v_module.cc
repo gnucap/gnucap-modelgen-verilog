@@ -176,7 +176,7 @@ private: // no-ops for prototype
   bool do_tr()override { untested(); return true;}
   bool tr_needs_eval()const override {untested(); return false;}
   void tr_queue_eval()override {}
-  std::string port_name(int i)const override{ untested();return port_value(i);}
+  std::string port_name(int i)const override {return port_value(i);}
 } pp(&Default_SUBCKT);
 DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "X|subckt", &pp);
 /*--------------------------------------------------------------------------*/

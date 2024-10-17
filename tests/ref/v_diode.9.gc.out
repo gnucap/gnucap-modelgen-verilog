@@ -3,7 +3,7 @@ paramset ddd diode;
  .af=1.; .area=area; .bv=50; .cjo=1.p; .eg=1.11; .fc=0.5; .ibv=0.001; .is=10.f; .kf=0.; .level=0; .m=0.5; .n=1.; .rs=0.; .tt=0.; .vj=1.; .xti=3.;
 endparamset
 
-module main (1,2);
+module main (.1(1),.2(2));
   ddd #(.$mfactor(4.),.area(1.)) d1 (1,2);
 endmodule // main
 

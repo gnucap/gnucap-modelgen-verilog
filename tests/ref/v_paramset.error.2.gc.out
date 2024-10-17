@@ -1,6 +1,6 @@
 paramset vs vsource 
 ^ ? ERROR: This will not work. Need top level.
-module main (1,2);
+module main (.1(1),.2(2));
   parameter v 
   paramset vs vsource;
   parameter voltage 

@@ -9,7 +9,7 @@ paramset myres resistor;
  .r=foo+5;
 endparamset
 
-module main (1,2,3,4);
+module main (.1(1),.2(2),.3(3),.4(4));
   parameter five=5 
   vsource #(1.) v (3,1);
   myres #(.foo(five)) R1 (4,2);

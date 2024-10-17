@@ -1,11 +1,11 @@
-module tln0 (a,b);
+module tln0 (.a(a),.b(b));
   parameter r 
   parameter c 
   resistor #(.r(r)) r (a,b);
   capacitor #(.c(c)) c (b,0);
 endmodule // tln0
 
-module tln1 (a,b);
+module tln1 (.a(a),.b(b));
   parameter integer length 
   parameter r; 
   parameter c; 
@@ -28,7 +28,7 @@ paramset tln tln0;
  .c=c; .r=r;
 endparamset
 
-module main (1,2);
+module main (.1(1),.2(2));
   parameter len=10 
   tln #(.r(1./len),.c(1./len),.length(len)) t1 (1,2);
 endmodule // main

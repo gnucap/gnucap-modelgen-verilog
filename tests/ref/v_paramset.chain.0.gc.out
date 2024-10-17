@@ -1,5 +1,5 @@
 >>>>>verilog 
->>>>>module main(1,2,3,4); 
+>>>>>module main(.a(a),.b(b),.c(c),.d(d)); 
 >>>>>parameter x=0 
 >>>>>paramset res2 resistor; 
 >>>>>parameter R; 
@@ -10,13 +10,13 @@
 >>>>>parameter x; 
 >>>>>parameter x=0 
 >>>>>list 
-module main (1,2,3,4);
+module main (.a(a),.b(b),.c(c),.d(d));
   parameter x=0 
-  vsource #(1.) v (3,1);
-  res #(.x(x),.r(1)) R1 (3,1);
+  vsource #(1.) v (c,a);
+  res #(.x(x),.r(1)) R1 (.p(c),.n(a));
 endmodule // main
 
-main #(.x(x)) m (.1(0),.2(1),.3(2),.4(4));
+main #(.x(x)) m (.a(0),.b(1),.c(2),.d(4));
 paramset res2 resistor;
   parameter R; 
   parameter S=0; 

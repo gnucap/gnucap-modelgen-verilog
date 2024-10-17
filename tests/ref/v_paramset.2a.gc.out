@@ -4,7 +4,7 @@ paramset vs vsource;
  .dc=dc;
 endparamset
 
-module main (1,2);
+module main (.1(1),.2(2));
   vs #(.dc(1)) v1 (1,2);
 endmodule // main
 

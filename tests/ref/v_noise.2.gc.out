@@ -1,6 +1,6 @@
 probe ac npwr(noise*) x(m.r1.*) x(m.r0.*) 
                                   ^ ? no match
-module main (1,2,3,4);
+module main (.1(1),.2(2),.3(3),.4(4));
   resistor #(.$mfactor(1),.r(1.)) r0 (1,0);
   resistor #(.noisy(1.),.r(1.)) r1 (2,0);
   resistor #(.noisy(1.),.r(1.)) r2 (3,0);

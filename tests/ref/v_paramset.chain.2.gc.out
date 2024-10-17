@@ -10,7 +10,7 @@ paramset zap bob;
 
 endparamset
 
-module main (1,2,3,4);
+module main (.1(1),.2(2),.3(3),.4(4));
   bob #() r1 (1,2);
   zap #() r2 (2,0);
   vsource #(1) v1 (1,0);

@@ -1,4 +1,4 @@
-module vsin (p,n);
+module vsin (.p(p),.n(n));
   .parameter amplitude 
   .parameter dc 
   vsource #(sin.offset(NA( 0.)), .amplitude(amplitude), .frequency( 1.), .delay(NA( 0.)), .damping(NA( 0.))  DC dc) V1 (.p(p),.n(n));

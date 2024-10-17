@@ -11,7 +11,7 @@
 >>>>>parameter PD; 
 >>>>>param v=0 
 >>>>>list 
-module main (1,2,3,4);
+module main (.1(1),.2(2),.3(3),.4(4));
   parameter v=0 
   C #(.PC(1.)) v1 (2,1);
   B #(.PB(2.)) v2 (3,1);

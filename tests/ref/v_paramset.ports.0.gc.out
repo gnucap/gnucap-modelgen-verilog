@@ -6,7 +6,7 @@ paramset myv vsource;
  .dc=1;
 endparamset
 
-module main (1,2,3,4);
+module main (.1(1),.2(2),.3(3),.4(4));
   resistor #(1.) v (3,1);
   myv #() R1 (.p(3),.n(1));
 endmodule // main
