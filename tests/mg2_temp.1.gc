@@ -17,7 +17,7 @@ endmodule
 !make test_temp1.so > /dev/null
 attach ./test_temp1.so
 
-test_temp1 #(.dc(dc)) dut(1, 0);
+test_temp1 #(.dc(dc)) dut(\1 , \0 );
 
 list
 

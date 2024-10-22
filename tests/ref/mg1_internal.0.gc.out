@@ -1,5 +1,9 @@
+module test_int ... ); electrical p, n, 1, 2; parameter real dc = 1.; analog
+                                        ^ ? invalid identifier
+module test_int ... electrical p, n, 1, 2; parameter real dc = 1.; analog be
+                                        ^ ? invalid identifier
 parameter dc not specified, using default
-test_int #(.dc(dc)) dut (.p(1),.n(0));
-resistor #(.r(2)) r0 (.p(1),.n(0));
+test_int #(.dc(dc)) dut (.p(\1 ),.n(\0 ));
+resistor #(.r(2)) r0 (.p(\1 ),.n(\0 ));
 #           v(1)       i(r0)      iter(0)   
  0.         0.99999    0.49999    4.        

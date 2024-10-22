@@ -23,7 +23,7 @@ endmodule
 attach ./test_bug0.so
 
 
-test_bug0 #() dut(1,0);
+test_bug0 #() dut(\1 ,\0 );
 
 dc
 status notime

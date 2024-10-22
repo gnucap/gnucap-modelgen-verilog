@@ -1,10 +1,20 @@
+module test(1 2); 
+            ^ ? invalid identifier
+module test(1 2); 
+              ^ ? invalid identifier
+test_valid1 #(.r(1.), .ub(2.)) r1(\1 ,2); 
+                                      ^ ? invalid identifier
+test m(1 2) 
+       ^ ? invalid identifier
+test m(1 2) 
+         ^ ? invalid identifier
 // name clash.. 
-module test (.1(1),.2(2));
+module test (.\1 (\1 ),.\2 (\2 ));
   test_valid1 #(.r(1.)) r0 (1,0);
   test_valid1 #(.ub(2.),.r(1.)) r1 (1,2);
   vsource #(.dc(1.)) v1 (2,0);
 endmodule // test
 
-test #() m (.1(1),.2(2));
+test #() m (.\1 (\1 ),.\2 (\2 ));
 #           v(1)       v(2)      
  0.         0.5        1.        

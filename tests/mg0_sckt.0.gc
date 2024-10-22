@@ -22,8 +22,8 @@ parameter r=1
 parameter c=1
 parameter v=0
 
-test_net0 #(.r(r)) dut(1,2);
-vsource #(.dc(v)) v1(1, 0);
+test_net0 #(.r(r)) dut(\1 ,2);
+vsource #(.dc(v)) v1(\1 , \0 );
 
 list
 

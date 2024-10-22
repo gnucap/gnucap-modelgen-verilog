@@ -1,3 +1,5 @@
+test_collapse0 #(.R(1)) c1(\1 ,2); 
+                               ^ ? invalid identifier
 #           v(1)       v(2)       v(c0._b_P_PI) i(c0._b_P_PI)
  0.         999.98u    99.999     999.98u    99.998    
 Gnucap   System status

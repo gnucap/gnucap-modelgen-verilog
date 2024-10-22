@@ -27,8 +27,8 @@ attach ./test_sckt4a.so
 
 verilog
 
-isource #(.dc(1)) i(0, 1);
-test_sckt4 #() dut(1, 0);
+isource #(.dc(1)) i(\0 , 1);
+test_sckt4 #() dut(\1 , \0 );
 
 list
 

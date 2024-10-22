@@ -33,7 +33,7 @@ verilog
 test_lap1 #(.d0(1) .n0(1), .n1(0)) lp(in, p2);
 resistor #(1.) r1(in, nl);
 inductor #(1.) n1(nl, nc);
-capacitor #(1.) n1(nc, 0);
+capacitor #(1.) n1(nc, \0 );
 
 spice
 

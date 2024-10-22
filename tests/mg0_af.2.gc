@@ -26,8 +26,8 @@ endmodule
 attach ./test_af_2.so
 
 parameter rr=0
-isource #(.dc(1)) ii(0, 1);
-test_af_2 #(.rr(rr)) dut(1, 0);
+isource #(.dc(1)) ii(\0 , 1);
+test_af_2 #(.rr(rr)) dut(\1 , \0 );
 
 list
 

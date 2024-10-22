@@ -1,3 +1,5 @@
+test_xdt1p #(.c(c)) dut(out, 0, in); 
+                             ^ ? invalid identifier
 #Time       v(in)      v(r)       iter(0)   
  0.         0.         0.         3.        
  1.n        6.2832n    0.0062832  32.       

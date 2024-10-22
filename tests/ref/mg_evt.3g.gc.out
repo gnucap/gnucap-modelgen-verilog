@@ -1,4 +1,4 @@
-test_timer3g #() dut0 (.p(1),.n(0));
+test_timer3g #() dut0 (.p(\1 ),.n(\0 ));
 // reject #(.time(.9)) r(); 
 #Time       v(1)       state(dut0) iter(0)    control(0)
 time0 0 0

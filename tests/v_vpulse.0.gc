@@ -3,7 +3,7 @@ attach ../vams/vpulse.so
 
 verilog
 
-vpulse #(.val0(0), .val1(1)) v1(in, 0);
+vpulse #(.val0(0), .val1(1)) v1(in, \0 );
 
 list
 

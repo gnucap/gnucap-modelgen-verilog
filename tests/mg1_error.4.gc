@@ -22,7 +22,7 @@ endmodule
 attach ./test_alias2.so
 
 module main(1 2);
-	test_alias2 #(.pp(4) .aa(5)) dut4(1, 2);
+	test_alias2 #(.pp(4) .aa(5)) dut4(\1 , \2 );
 endmodule
 
 main m(0 1);

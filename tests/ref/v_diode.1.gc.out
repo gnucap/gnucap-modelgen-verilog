@@ -1,3 +1,13 @@
+module main(1 2) 
+            ^ ? invalid identifier
+module main(1 2) 
+              ^ ? invalid identifier
+ddd #(.area(1.)) d1 (1  \2 ); 
+                     ^ ? invalid identifier
+main m(2 0); 
+       ^ ? invalid identifier
+main m(2 0); 
+         ^ ? invalid identifier
 .subckt ddd (  )
 parameter real area=1; 
 .ends ddd

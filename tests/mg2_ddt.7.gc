@@ -16,8 +16,8 @@ attach ./test_ddt7.so
 
 parameter v=1
 
-test_ddt7 #() dut(1,0,3,0);
-vsine #(.dc(v), .ampl(1), .mag(1)) v1(1, 0);
+test_ddt7 #() dut(\1 ,\0 ,3,\0 );
+vsine #(.dc(v), .ampl(1), .mag(1)) v1(\1 , \0 );
 
 print tran v nodes iter(0)
 print ac vm(nodes) vp(nodes)

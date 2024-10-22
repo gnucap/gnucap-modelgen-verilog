@@ -1,4 +1,4 @@
-vpulse #(.val0(0),.val1(1)) v1 (.p(in),.n(0));
+vpulse #(.val0(0),.val1(1)) v1 (.p(in),.n(\0 ));
 #Time       v(in)      v(v1)      control(0) iter(0)   
  0.         0.         0.         1.         3.        
  20.E-9     1.         1.         2.         3.        

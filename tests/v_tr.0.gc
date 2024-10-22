@@ -5,7 +5,7 @@ verilog
 module rc(1, 2, gnd)
 	parameter ic=1
 	capacitor #(.c(1u) .ic(1) .$mfactor(1)) c(1 gnd);
-	resistor #(.r(1k)) r(1 2);
+	resistor #(.r(1k)) r(\1 \2 );
 endmodule
 
 parameter ic=2
@@ -14,12 +14,12 @@ parameter ic=2
 // simulates what is instanciated. The node denotes ground node.
 // (at the time of writing, the "ground" declarator is not implemented.)
 
-rc #(.ic(ic)) myrc(1, 2, 0);
+rc #(.ic(ic)) myrc(\1 , 2, \0 );
 
 print tran v(nodes) iter(0)
 tran 1m
 
-capacitor #(.c(1u)) ctop(2, 0);
+capacitor #(.c(1u)) ctop(\2 ,\0 );
 
 tran 2m
 

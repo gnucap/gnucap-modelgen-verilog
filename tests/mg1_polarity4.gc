@@ -23,9 +23,9 @@ attach ./test_pol4.so
 
 parameter v=0
 
-test_pol4 #() dut(1,0,2,0);
-vsource #(2) v(2,0)
-resistor #(1) r(1,0)
+test_pol4 #() dut(\1 ,\0 ,2,\0 );
+vsource #(2) v(2,\0 )
+resistor #(1) r(\1 ,\0 )
 
 list
 

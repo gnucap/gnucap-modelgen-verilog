@@ -1,5 +1,5 @@
 
-module test()
+module test(1, \2 )
 
 analog begin
 	$strobe("an %f escaped \"`string\" test.", arg);

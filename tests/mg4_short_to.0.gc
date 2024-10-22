@@ -18,8 +18,8 @@ endmodule
 !make short_to0.so > /dev/null
 attach ./short_to0.so
 
-short_to0 #() s1(1,0);
-vsource #(.dc(1)) v(1, 0);
+short_to0 #() s1(\1 ,\0 );
+vsource #(.dc(1)) v(\1 , \0 );
 
 print dc v(nodes)
 dc

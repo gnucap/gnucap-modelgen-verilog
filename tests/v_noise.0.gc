@@ -1,14 +1,14 @@
 
 verilog
 
-white_noise #(.$mfactor(2), .pwr(1)) w(1 0);
-white_noise #(.$mfactor(1), .pwr(2)) w(2 0);
-white_noise #(.$mfactor(1), .pwr(1)) w(3 0);
-white_noise #(.$mfactor(1), .pwr(1)) w(3 0);
+white_noise #(.$mfactor(2), .pwr(1)) w(1 \0 );
+white_noise #(.$mfactor(1), .pwr(2)) w(2 \0 );
+white_noise #(.$mfactor(1), .pwr(1)) w(3 \0 );
+white_noise #(.$mfactor(1), .pwr(1)) w(3 \0 );
 
-resistor #(1) r1(1, 0);
-resistor #(1) r2(2, 0);
-resistor #(1) r3(3, 0);
+resistor #(1) r1(\1 , \0 );
+resistor #(1) r2(\2 ,\0 );
+resistor #(1) r3(3, \0 );
 
 noise_probe noise1(1);
 noise_probe noise2(2);

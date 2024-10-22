@@ -1,6 +1,12 @@
 >>>>>verilog 
 >>>>>module main(.a(a),.b(b),.c(c),.d(d)); 
 >>>>>parameter x=0 
+main #(.x(x)) m(\0 ,1,2,4); 
+                    ^ ? invalid identifier
+main #(.x(x)) m(\0 ,1,2,4); 
+                      ^ ? invalid identifier
+main #(.x(x)) m(\0 ,1,2,4); 
+                        ^ ? invalid identifier
 >>>>>paramset res2 resistor; 
 >>>>>parameter R; 
 >>>>>parameter S=0; 
@@ -16,7 +22,7 @@ module main (.a(a),.b(b),.c(c),.d(d));
   res #(.x(x),.r(1)) R1 (.p(c),.n(a));
 endmodule // main
 
-main #(.x(x)) m (.a(0),.b(1),.c(2),.d(4));
+main #(.x(x)) m (.a(\0 ),.b(\1 ),.c(\2 ),.d(\4 ));
 paramset res2 resistor;
   parameter R; 
   parameter S=0; 

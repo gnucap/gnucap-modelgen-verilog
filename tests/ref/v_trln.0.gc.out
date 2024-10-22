@@ -1,3 +1,25 @@
+module main(1 2 3 4); 
+            ^ ? invalid identifier
+module main(1 2 3 4); 
+              ^ ? invalid identifier
+module main(1 2 3 4); 
+                ^ ? invalid identifier
+module main(1 2 3 4); 
+                  ^ ? invalid identifier
+resistor #(10.) r1(0 \2 ); 
+                   ^ ? invalid identifier
+ltra #(.len(10\ ... c(2f)) t1(\1 , \0 , 3, \0 ); 
+                                        ^ ? invalid identifier
+resistor #(10.) r1(0 3); 
+                   ^ ? invalid identifier
+resistor #(10.) r1(0 3); 
+                     ^ ? invalid identifier
+tline #(.len(10 ... c(2f)) t1(\1 , \0 , 4, \0 ); 
+                                        ^ ? invalid identifier
+resistor #(10.) r1(0 4); 
+                   ^ ? invalid identifier
+resistor #(10.) r1(0 4); 
+                     ^ ? invalid identifier
 #          
  0.        
 #Time       v(nin)     v(o1)      v(o2)      v(o3)     

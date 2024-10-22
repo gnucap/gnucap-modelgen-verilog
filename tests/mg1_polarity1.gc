@@ -19,8 +19,8 @@ list
 !make polarity1_0.so > /dev/null
 attach ./polarity1_0.so
 
-polarity1_0 dut(1,0);
-vsource v1(1, 0);
+polarity1_0 dut(\1 ,\0 );
+vsource v1(\1 , \0 );
 
 list
 

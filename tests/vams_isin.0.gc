@@ -11,8 +11,8 @@ module main(a, b gnd);
 endmodule
 
 main #() dut(a, b 0)
-resistor #(1) ra(a 0);
-resistor #(1) rb(b 0);
+resistor #(1) ra(a \0 );
+resistor #(1) rb(b \0 );
 
 spice
 

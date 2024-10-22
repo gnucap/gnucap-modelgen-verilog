@@ -1,4 +1,4 @@
-test_evt3 #() dut0 (.p(1),.n(0));
+test_evt3 #() dut0 (.p(\1 ),.n(\0 ));
 #           v(1)       iter(0)   
 time1   0
  0.         0.         2.        

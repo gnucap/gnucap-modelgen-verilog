@@ -20,8 +20,8 @@ endmodule
 attach ./test_pf0.so
 
 parameter i=0
-isource #(i) i(0,1);
-test_pf0 x(1,0);
+isource #(i) i(\0 ,\1 );
+test_pf0 x(\1 ,\0 );
 
 print dc i(x) j(x)
 dc i -1 1 1

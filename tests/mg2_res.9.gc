@@ -24,8 +24,8 @@ attach ./test_res_9.so
 
 parameter v=1
 
-test_res_9 #() dut(1,0);
-vsource #(.dc(v)) v1(1, 0);
+test_res_9 #() dut(\1 ,\0 );
+vsource #(.dc(v)) v1(\1 , \0 );
 
 print dc v(nodes) i(v1)
 

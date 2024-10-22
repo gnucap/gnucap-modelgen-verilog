@@ -1,9 +1,21 @@
 
 
-module e(1, 2);
+module e(\1 , \2 );
 endmodule
-module f(1, 2);
+module f(\1 , \2 );
 endmodule
 
 
 
+:3:
+module e(1,2);
+         ^ ? invalid identifier
+:3:
+module e(1,2);
+           ^ ? invalid identifier
+:6:
+module f(1,2);
+         ^ ? invalid identifier
+:6:
+module f(1,2);
+           ^ ? invalid identifier

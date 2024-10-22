@@ -21,8 +21,8 @@ attach ./test_ret0.so
 
 parameter v=0
 
-test_ret0 #() dut(1,0);
-vsource #(.dc(1)) v1(1, 0);
+test_ret0 #() dut(\1 ,\0 );
+vsource #(.dc(1)) v1(\1 , \0 );
 
 list
 

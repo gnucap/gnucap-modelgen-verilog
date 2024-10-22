@@ -1,8 +1,12 @@
-test_short0 #() d0 (.p(1),.n(0));
-test_short1 #() d1 (.p(2),.n(0));
-resistor #(.r(1)) r0 (.p(3),.n(1));
-resistor #(.r(1)) r1 (.p(3),.n(2));
-vsource #(.dc(1)) v1 (.p(3),.n(0));
+resistor #(.r(1)) r0(\3 , 1); 
+                          ^ ? invalid identifier
+vsource #(.dc(1)) v1(3, \0 ); 
+                     ^ ? invalid identifier
+test_short0 #() d0 (.p(\1 ),.n(\0 ));
+test_short1 #() d1 (.p(\2 ),.n(\0 ));
+resistor #(.r(1)) r0 (.p(\3 ),.n(\1 ));
+resistor #(.r(1)) r1 (.p(\3 ),.n(\2 ));
+vsource #(.dc(1)) v1 (.p(\3 ),.n(\0 ));
 #           v(1)       v(2)       v(3)       i(r0)      i(r1)      i(d0._b_p_n) i(d1._b_p_n)
  0.         0.         0.         0.         0.         0.         0.         0.        
  0.5        4.9999u    4.9999u    0.49999    0.49999    0.49999    0.49999    0.49999   

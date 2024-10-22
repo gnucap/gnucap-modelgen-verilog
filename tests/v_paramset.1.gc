@@ -5,7 +5,7 @@ parameter voltage
 .dc=voltage
 endparamset
 
-module main(1,2);
+module main(\1 ,2);
 vs #(.voltage(1)) v1(1 2)
 endmodule
 

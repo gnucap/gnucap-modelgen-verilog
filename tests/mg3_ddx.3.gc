@@ -19,9 +19,9 @@ endmodule
 !make test_ddx3.so > /dev/null
 attach ./test_ddx3.so
 
-test_ddx3 #() dut(1,0);
+test_ddx3 #() dut(\1 ,\0 );
 parameter v=0
-vsource #(.dc(v)) v1(1,0);
+vsource #(.dc(v)) v1(\1 ,\0 );
 
 list
 

@@ -1,3 +1,7 @@
+testvco0 #(.samples(6)) t(out, in, 0 ); 
+                                   ^ ? invalid identifier
+vpulse #(.rise(1e-8)) vv(in, 0 ); 
+                             ^ ? invalid identifier
 #Time       v(in)      v(out)    
  0.         0.         0.99999   
  2.E-12     200.E-6    0.99991   

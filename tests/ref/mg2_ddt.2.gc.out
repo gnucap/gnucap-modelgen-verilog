@@ -1,3 +1,7 @@
+test_ddt2 #() dut(\0 ,3,1,\0 ); 
+                      ^ ? invalid identifier
+test_ddt2 #() dut(\0 ,3,1,\0 ); 
+                        ^ ? invalid identifier
 #Time       v(1)       v(3)       iter(0)   
  0.         0.         0.         3.        
  2.n        12.566n    6.2832     24.       

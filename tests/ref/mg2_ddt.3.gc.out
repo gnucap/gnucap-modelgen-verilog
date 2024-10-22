@@ -1,3 +1,9 @@
+test_expcap0 #() dut(\0 ,3,1,\0 ); 
+                         ^ ? invalid identifier
+test_expcap0 #() dut(\0 ,3,1,\0 ); 
+                           ^ ? invalid identifier
+resistor #(1) R2(3  \0 ); 
+                 ^ ? invalid identifier
 #Time       dd(dut)    iter(0)   
  0.         0.         3.        
  2.n        6.2832     32.       

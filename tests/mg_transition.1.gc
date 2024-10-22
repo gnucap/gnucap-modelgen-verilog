@@ -24,7 +24,7 @@ attach ./test_trans1.so
 
 verilog
 
-test_trans1 #() dut(1,0);
+test_trans1 #() dut(\1 ,\0 );
 
 list
 

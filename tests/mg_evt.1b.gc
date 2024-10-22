@@ -30,8 +30,8 @@ list
 !make test_evt1_1.so > /dev/null
 attach ./test_evt1_1.so
 
-test_evt1_1 dut(1,0);
-vsine #(.freq(1) .ampl(2)) vin(1,0);
+test_evt1_1 dut(\1 ,\0 );
+vsine #(.freq(1) .ampl(2)) vin(\1 ,\0 );
 
 list
 

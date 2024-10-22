@@ -30,12 +30,12 @@ attach ./test_mfactor_.so
 parameter v=0
 
 module mm(a)
-test_mfactor #(.$mfactor(2)) d(1,0);
+test_mfactor #(.$mfactor(2)) d(\1 ,\0 );
 endmodule
 
-test_mfactor d1(1,0);
-test_mfactor #(.$mfactor(2)) d2(1,0);
-test_mfactor_ #(.$mfactor(6)) d3(1,0);
+test_mfactor d1(\1 ,\0 );
+test_mfactor #(.$mfactor(2)) d2(\1 ,\0 );
+test_mfactor_ #(.$mfactor(6)) d3(\1 ,\0 );
 
 mm m1(a);
 mm #(.$mfactor(3)) m2(a);

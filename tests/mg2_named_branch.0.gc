@@ -20,7 +20,7 @@ attach ./test_nbr0.so
 
 parameter v=0
 
-test_nbr0 #() dut(1,0);
+test_nbr0 #() dut(\1 ,\0 );
 
 list
 

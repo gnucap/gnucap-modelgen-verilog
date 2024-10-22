@@ -22,8 +22,8 @@ endmodule
 !make test_pg0.so > /dev/null
 attach ./test_pg0.so
 
-test_pg0 #(.st(1)) dut(1,0);
-test_pg0 #() dut(2,0);
+test_pg0 #(.st(1)) dut(\1 ,\0 );
+test_pg0 #() dut(\2 ,\0 );
 
 list
 

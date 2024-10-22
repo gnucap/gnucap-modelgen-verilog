@@ -21,11 +21,11 @@ attach ./test_xdt1p.so
 verilog
 
 test_xdt1p #(.c(c)) dut(out, 0, in);
-resistor #(.r(1)) r(0, out);
+resistor #(.r(1)) r(\0 , out);
 
 parameter v=0
 parameter c=1m
-vsine #(.dc(v), .ampl(1)) v1(in, 0);
+vsine #(.dc(v), .ampl(1)) v1(in, \0 );
 
 print tran v(in) v(r) iter(0)
 tran .5

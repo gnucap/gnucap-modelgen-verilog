@@ -25,10 +25,10 @@ endmodule
 !make test_iprb0.so > /dev/null
 attach ./test_iprb0.so
 
-test_iprb0 #() dut(0, 1, 2, 0);
+test_iprb0 #() dut(\0 , 1, 2, \0 );
 parameter v=0
-vsource #(.dc(v)) v1(2,0);
-resistor #(.r(1)) r1(1,0);
+vsource #(.dc(v)) v1(\2 ,\0 );
+resistor #(.r(1)) r1(\1 ,\0 );
 
 list
 

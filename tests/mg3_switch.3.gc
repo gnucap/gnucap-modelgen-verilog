@@ -21,8 +21,8 @@ endmodule
 attach ./test_sw_3.so
 
 parameter rr=1
-isource #(.dc(1)) ii(0, 1);
-test_sw_3 #(.rr(rr)) dut(1, 0);
+isource #(.dc(1)) ii(\0 , 1);
+test_sw_3 #(.rr(rr)) dut(\1 , \0 );
 
 list
 

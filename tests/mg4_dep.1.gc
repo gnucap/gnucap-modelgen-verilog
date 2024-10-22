@@ -30,8 +30,8 @@ attach ./test_dep1.so
 
 parameter v=1
 
-test_dep1 #() dut(1,0);
-vsource #(.dc(v)) v1(1, 0);
+test_dep1 #() dut(\1 ,\0 );
+vsource #(.dc(v)) v1(\1 , \0 );
 
 list
 

@@ -59,6 +59,7 @@ void New_Port::parse(CS& file)
 {
   Port_3::parse(file); // TODO: port_base?
   assert(owner());
+  trace1("New_Port::parse", name());
   owner()->new_node(name());
 }
 /*--------------------------------------------------------------------------*/

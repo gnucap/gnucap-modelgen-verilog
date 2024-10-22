@@ -31,9 +31,9 @@ verilog
 parameter r=1
 parameter v=0
 
-test_xdt1 #() dut(1,0,ii);
-resistor #(1.) r1(ii,0);
-vsin #(.dc(v), .ampl(1)) v1(1, 0);
+test_xdt1 #() dut(\1 ,\0 ,ii);
+resistor #(1.) r1(ii,\0 );
+vsin #(.dc(v), .ampl(1)) v1(\1 , \0 );
 
 list
 

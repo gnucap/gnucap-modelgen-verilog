@@ -19,8 +19,8 @@ attach ./acstim0.so
 parameter v=0
 
 module mm(1, gnd)
-	acstim0 d(1,gnd);
-	resistor #(1.) r(1,gnd);
+	acstim0 d(\1 ,gnd);
+	resistor #(1.) r(\1 ,gnd);
 endmodule
 
 mm m1(a, 0);

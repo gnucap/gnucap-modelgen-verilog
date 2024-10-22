@@ -20,9 +20,9 @@ list
 attach ./portnames1.so
 
 portnames1 dut(.n0(0),.n2(2),.n1(1),.n3(3));
-resistor #(.r(1)) r1(1, 0);
-resistor #(.r(1)) r2(2, 0);
-resistor #(.r(1)) r3(3, 0);
+resistor #(.r(1)) r1(\1 , \0 );
+resistor #(.r(1)) r2(\2 ,\0 );
+resistor #(.r(1)) r3(3, \0 );
 
 list
 

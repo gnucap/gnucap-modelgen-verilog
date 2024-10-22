@@ -9,8 +9,8 @@ module main(a, gnd);
   isine #(.mag(1.)) v1(gnd, a);
 endmodule
 
-main #() dut(1, 0);
-resistor #(1) ra(a,0);
+main #() dut(\1 , \0 );
+resistor #(1) ra(a,\0 );
 
 spice
 

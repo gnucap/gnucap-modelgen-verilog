@@ -1,14 +1,14 @@
-va_laplace_zp #(.zr0(0.),.pr0(0.)) b0 (.out0(0),.out1(out1),.in0(in),.in1(0));
+va_laplace_zp #(.zr0(0.),.pr0(0.)) b0 (.out0(\0 ),.out1(out1),.in0(in),.in1(\0 ));
 // not checked 
-va_laplace_zp #(.zr0(0.),.pr0(1.)) b0 (.out0(0),.out1(out2),.in0(in),.in1(0));
-va_laplace_zp #(.pr0(0.)) b0 (.out0(0),.out1(out3),.in0(in),.in1(0));
+va_laplace_zp #(.zr0(0.),.pr0(1.)) b0 (.out0(\0 ),.out1(out2),.in0(in),.in1(\0 ));
+va_laplace_zp #(.pr0(0.)) b0 (.out0(\0 ),.out1(out3),.in0(in),.in1(\0 ));
 no data, assuming no root, constant 1.
 #          
  0.        
-va_laplace_zp #(.n0( 0.),.n1( 1.),.d0( 0.),.d1( 1.)) b0 (.out0(0),.out1(out1),.in0(in),.in1(0));
+va_laplace_zp #(.n0( 0.),.n1( 1.),.d0( 0.),.d1( 1.)) b0 (.out0(\0 ),.out1(out1),.in0(in),.in1(\0 ));
 // not checked 
-va_laplace_zp #(.n0( 0.),.n1( 1.),.d0( 1.),.d1(-1.)) b0 (.out0(0),.out1(out2),.in0(in),.in1(0));
-va_laplace_zp #(.n0( 1.),.d0( 0.),.d1( 1.)) b0 (.out0(0),.out1(out3),.in0(in),.in1(0));
+va_laplace_zp #(.n0( 0.),.n1( 1.),.d0( 1.),.d1(-1.)) b0 (.out0(\0 ),.out1(out2),.in0(in),.in1(\0 ));
+va_laplace_zp #(.n0( 1.),.d0( 0.),.d1( 1.)) b0 (.out0(\0 ),.out1(out3),.in0(in),.in1(\0 ));
 #Time       v(in)      v(out1)    v(out2)    v(out3)   
  0.         0.         0.         0.         0.        
  498.E-9    3.129E-6   3.129E-6  -3.129E-6   1.558E-12 

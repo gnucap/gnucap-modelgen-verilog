@@ -1,16 +1,16 @@
 load ../vams/resistor.so
 verilog
 
-module main(1,2,3,4)
-resistor #(.r(1.), .$mfactor(1)) r0(1, 0);
-resistor #(.r(1.), .noisy(1.)) r1(2, 0);
+module main(1,\2 , \3 , \4 )
+resistor #(.r(1.), .$mfactor(1)) r0(\1 , \0 );
+resistor #(.r(1.), .noisy(1.)) r1(\2 ,\0 );
 
-resistor #(.r(1.), .noisy(1.)) r2(3, 0);
-resistor #(.r(1.), .noisy(1.)) r3(3, 0);
+resistor #(.r(1.), .noisy(1.)) r2(3, \0 );
+resistor #(.r(1.), .noisy(1.)) r3(3, \0 );
 
-resistor #(.$mfactor(2), .r(1.), .noisy(1.)) r4(4, 0);
+resistor #(.$mfactor(2), .r(1.), .noisy(1.)) r4(4, \0 );
 endmodule
-main m(1,2,3,4)
+main m(1,\2 , \3 , \4 )
 
 noise_probe #(.name("thermal")) noise1(1);
 noise_probe #(.name("thermal")) noise2(2);

@@ -4,7 +4,7 @@ paramset vs vsource
 .dc=voltage
 endparamset
 
-module main(1,2);
+module main(\1 ,2);
 vs #() v1(1 2)
 endmodule
 

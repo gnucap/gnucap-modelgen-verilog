@@ -1,5 +1,5 @@
-polarity3_0 #() dut (.p(1),.n(0));
-vsource #() v1 (.p(1),.n(0));
+polarity3_0 #() dut (.p(\1 ),.n(\0 ));
+vsource #() v1 (.p(\1 ),.n(\0 ));
 #           v(v1)      i(v1)      r(dut._b_n_p) iter(0)   
  0.         0.         0.         1.         3.        
  1.         0.99999   -0.99999    1.         3.        

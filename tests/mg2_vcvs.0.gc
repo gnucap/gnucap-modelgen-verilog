@@ -21,7 +21,7 @@ endmodule
 attach ./test_vcvs0.so
 
 test_vcvs0 dut(b, 0, a, 0);
-vsource #(.dc(i)) i1(a, 0);
+vsource #(.dc(i)) i1(a, \0 );
 
 parameter i=1
 list

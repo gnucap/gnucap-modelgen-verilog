@@ -1,6 +1,6 @@
-pid1 #(.p(.1),.i(100),.d(1m)) dut (.sp(0),.sn(out),.cp(n1),.cn(0));
-capacitor #(.c(1u)) c (.p(out),.n(0));
-resistor #(.r(1)) r (.p(out),.n(0));
+pid1 #(.p(.1),.i(100),.d(1m)) dut (.sp(\0 ),.sn(out),.cp(n1),.cn(\0 ));
+capacitor #(.c(1u)) c (.p(out),.n(\0 ));
+resistor #(.r(1)) r (.p(out),.n(\0 ));
 #Time          v(n1)         v(out)        iter(0)       timef(dut._b_ddt_1_p_ddt_1_n)
  0.            0.            0.            3.            Inf          
  20.p          12.566371n    12.566119u    21.           30.p         

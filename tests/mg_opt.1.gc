@@ -21,7 +21,7 @@ attach ./test_opt_1.so
 parameter r=1
 parameter v=0
 
-test_opt_1 #() dut(0,0);
+test_opt_1 #() dut(\0 ,\0 );
 
 list
 

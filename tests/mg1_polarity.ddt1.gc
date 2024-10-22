@@ -18,7 +18,7 @@ list
 !make polarity_ddt1.so > /dev/null
 attach ./polarity_ddt1.so
 
-polarity_ddt1 dut(1,0);
+polarity_ddt1 dut(\1 ,\0 );
 
 list
 

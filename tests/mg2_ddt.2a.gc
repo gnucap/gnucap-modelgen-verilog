@@ -21,7 +21,7 @@ endmodule
 !make test_tcap0a.so > /dev/null
 attach ./test_tcap0a.so
 
-test_tcap0a #() dut(3,0,1,0);
+test_tcap0a #() dut(3,\0 ,\1 ,\0 );
 
 spice
 V1  1  0  SIN  offset= 0.  amplitude= 1.  frequency= 1.  delay= 0.  damping= 0. ac 1

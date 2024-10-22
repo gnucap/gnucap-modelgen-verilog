@@ -1,3 +1,5 @@
+test_pol5 #() dut(\1 ,\0 ,2,\0 ); 
+                          ^ ? invalid identifier
 #           v(1)       v(2)       iter(0)   
  0.        -6.         2.         3.        
 #Freq       v(1)       v(2)       vp(1)      iter(0)   

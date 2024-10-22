@@ -1,3 +1,7 @@
+hys #() h1(1 0) 
+           ^ ? invalid identifier
+hys #() h1(1 0) 
+             ^ ? invalid identifier
 #Time       v(1)       i(V1)      s(h1)     
  0.         0.         0.         0.        
  11.854n    52.137u   -52.137n    61.876n   

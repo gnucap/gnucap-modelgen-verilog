@@ -24,8 +24,8 @@ verilog
 parameter r=1
 parameter v=0
 
-test_ddt0 #() dut(1,0);
-vsine #(.dc(v), .ampl(1)) v1(1, 0);
+test_ddt0 #() dut(\1 ,\0 );
+vsine #(.dc(v), .ampl(1)) v1(\1 , \0 );
 //exact 12.56637061435
 
 list

@@ -21,8 +21,8 @@ attach ./test_an2a.so
 
 parameter v=0
 
-test_an2a #() dut(1,0);
-resistor #(.r(1)) c1(1, 0);
+test_an2a #() dut(\1 ,\0 );
+resistor #(.r(1)) c1(\1 , \0 );
 
 list
 

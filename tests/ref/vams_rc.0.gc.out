@@ -1,3 +1,5 @@
+main #() dut(in out 0) 
+                    ^ ? invalid identifier
 dut.c1 tie break: 13 vs. 9
 dut.c1 tie break: 9 vs. 12
 dut.r1 tie break: 16 vs. 9

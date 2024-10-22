@@ -23,12 +23,12 @@ endmodule
 !make test_sw1.so > /dev/null
 attach ./test_sw1.so
 
-test_sw1 #() dut(1,0,2,0);
+test_sw1 #() dut(\1 ,\0 ,2,\0 );
 parameter v=0
-vsource #(.dc(v)) v1(2,0);
+vsource #(.dc(v)) v1(\2 ,\0 );
 
-vsource #(.dc(1)) v1(3,0);
-resistor #(.r(1)) v1(3,1);
+vsource #(.dc(1)) v1(3,\0 );
+resistor #(.r(1)) v1(\3 ,\1 );
 
 list
 

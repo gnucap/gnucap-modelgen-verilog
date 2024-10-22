@@ -5,7 +5,7 @@ parameter dc;
 .dc=dc; // comment2
 endparamset;
 
-module main(1,2);
+module main(\1 ,2);
 vs #(.dc(1)) v1(1 2)
 endmodule
 

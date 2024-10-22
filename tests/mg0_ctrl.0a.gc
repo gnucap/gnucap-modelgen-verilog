@@ -31,8 +31,8 @@ list
 !make test_while0a.so > /dev/null
 attach ./test_while0a.so
 
-test_while0a #(.r(2)) dut(1,0);
-vsource #(.dc(1)) v(1,0);
+test_while0a #(.r(2)) dut(\1 ,\0 );
+vsource #(.dc(1)) v(\1 ,\0 );
 
 list
 

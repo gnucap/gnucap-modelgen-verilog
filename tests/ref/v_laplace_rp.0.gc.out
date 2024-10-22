@@ -1,35 +1,47 @@
-va_laplace #(.rr0(2)) b0 (.out0(0),.out1(out1),.in0(in),.in1(0));
-va_laplace_nd #(.n0( 2.),.d0( 0.),.d1( 1.)) b0 (.out0(0),.out1(ref1),.in0(in),.in1(0));
-va_laplace #(.pr0(1.)) b0 (.out0(0),.out1(out2),.in0(in),.in1(0));
-va_laplace #(.rr0(1.),.pr0(1.)) b0 (.out0(0),.out1(out3),.in0(in),.in1(0));
-va_laplace_nd #(.n0( 1.),.d0( -1.),.d1( 1.)) b0 (.out0(0),.out1(ref3),.in0(in),.in1(0));
-va_laplace #(.rr0(1.),.rr1(1.),.pr0(1.),.pr1(2.)) b0 (.out0(0),.out1(out4),.in0(in),.in1(0));
-va_laplace_nd #(.n0(-3.),.n1( 2.),.d0( 2.),.d1(-3.),.d2( 1.)) b0 (.out0(0),.out1(ref4),.in0(in),.in1(0));
-resistor #(.r(1.)) r1 (.p(out1),.n(0));
-resistor #(.r(1.)) r2 (.p(out2),.n(0));
-resistor #(.r(1.)) r3 (.p(out3),.n(0));
-resistor #(.r(1.)) r4 (.p(out4),.n(0));
-resistor #(.r(1.)) r1 (.p(ref1),.n(0));
-resistor #(.r(1.)) r2 (.p(ref2),.n(0));
-resistor #(.r(1.)) r3 (.p(ref3),.n(0));
-resistor #(.r(1.)) r4 (.p(ref4),.n(0));
+va_laplace_nd # ... .d1( 1.)) b0 (.out0(0),.out1(ref1),.in0(in),.in1(0)); 
+                                        ^ ? invalid identifier
+va_laplace_nd # ... ref1),.in0(in),.in1(0)); 
+                                        ^ ? invalid identifier
+va_laplace_nd # ... .d1( 1.)) b0 (.out0(0),.out1(ref3),.in0(in),.in1(0)); 
+                                        ^ ? invalid identifier
+va_laplace_nd # ... ref3),.in0(in),.in1(0)); 
+                                        ^ ? invalid identifier
+va_laplace_nd # ... .d2( 1.)) b0 (.out0(0),.out1(ref4),.in0(in),.in1(0)); 
+                                        ^ ? invalid identifier
+va_laplace_nd # ... ref4),.in0(in),.in1(0)); 
+                                        ^ ? invalid identifier
+va_laplace #(.rr0(2)) b0 (.out0(\0 ),.out1(out1),.in0(in),.in1(\0 ));
+va_laplace_nd #(.n0( 2.),.d0( 0.),.d1( 1.)) b0 (.out0(\0 ),.out1(ref1),.in0(in),.in1(\0 ));
+va_laplace #(.pr0(1.)) b0 (.out0(\0 ),.out1(out2),.in0(in),.in1(\0 ));
+va_laplace #(.rr0(1.),.pr0(1.)) b0 (.out0(\0 ),.out1(out3),.in0(in),.in1(\0 ));
+va_laplace_nd #(.n0( 1.),.d0( -1.),.d1( 1.)) b0 (.out0(\0 ),.out1(ref3),.in0(in),.in1(\0 ));
+va_laplace #(.rr0(1.),.rr1(1.),.pr0(1.),.pr1(2.)) b0 (.out0(\0 ),.out1(out4),.in0(in),.in1(\0 ));
+va_laplace_nd #(.n0(-3.),.n1( 2.),.d0( 2.),.d1(-3.),.d2( 1.)) b0 (.out0(\0 ),.out1(ref4),.in0(in),.in1(\0 ));
+resistor #(.r(1.)) r1 (.p(out1),.n(\0 ));
+resistor #(.r(1.)) r2 (.p(out2),.n(\0 ));
+resistor #(.r(1.)) r3 (.p(out3),.n(\0 ));
+resistor #(.r(1.)) r4 (.p(out4),.n(\0 ));
+resistor #(.r(1.)) r1 (.p(ref1),.n(\0 ));
+resistor #(.r(1.)) r2 (.p(ref2),.n(\0 ));
+resistor #(.r(1.)) r3 (.p(ref3),.n(\0 ));
+resistor #(.r(1.)) r4 (.p(ref4),.n(\0 ));
 #          
  0.        
-va_laplace #(.n0( 2.),.d0( 0.),.d1( 1.)) b0 (.out0(0),.out1(out1),.in0(in),.in1(0));
-va_laplace_nd #(.n0( 2.),.d0( 0.),.d1( 1.)) b0 (.out0(0),.out1(ref1),.in0(in),.in1(0));
-va_laplace #(.n0( 0.),.d0(-1.),.d1( 1.)) b0 (.out0(0),.out1(out2),.in0(in),.in1(0));
-va_laplace #(.n0( 1.),.d0(-1.),.d1( 1.)) b0 (.out0(0),.out1(out3),.in0(in),.in1(0));
-va_laplace_nd #(.n0( 1.),.d0( -1.),.d1( 1.)) b0 (.out0(0),.out1(ref3),.in0(in),.in1(0));
-va_laplace #(.n0(-3.),.n1( 2.),.d0( 2.),.d1(-3.),.d2( 1.)) b0 (.out0(0),.out1(out4),.in0(in),.in1(0));
-va_laplace_nd #(.n0(-3.),.n1( 2.),.d0( 2.),.d1(-3.),.d2( 1.)) b0 (.out0(0),.out1(ref4),.in0(in),.in1(0));
-resistor #(.r(1.)) r1 (.p(out1),.n(0));
-resistor #(.r(1.)) r2 (.p(out2),.n(0));
-resistor #(.r(1.)) r3 (.p(out3),.n(0));
-resistor #(.r(1.)) r4 (.p(out4),.n(0));
-resistor #(.r(1.)) r1 (.p(ref1),.n(0));
-resistor #(.r(1.)) r2 (.p(ref2),.n(0));
-resistor #(.r(1.)) r3 (.p(ref3),.n(0));
-resistor #(.r(1.)) r4 (.p(ref4),.n(0));
+va_laplace #(.n0( 2.),.d0( 0.),.d1( 1.)) b0 (.out0(\0 ),.out1(out1),.in0(in),.in1(\0 ));
+va_laplace_nd #(.n0( 2.),.d0( 0.),.d1( 1.)) b0 (.out0(\0 ),.out1(ref1),.in0(in),.in1(\0 ));
+va_laplace #(.n0( 0.),.d0(-1.),.d1( 1.)) b0 (.out0(\0 ),.out1(out2),.in0(in),.in1(\0 ));
+va_laplace #(.n0( 1.),.d0(-1.),.d1( 1.)) b0 (.out0(\0 ),.out1(out3),.in0(in),.in1(\0 ));
+va_laplace_nd #(.n0( 1.),.d0( -1.),.d1( 1.)) b0 (.out0(\0 ),.out1(ref3),.in0(in),.in1(\0 ));
+va_laplace #(.n0(-3.),.n1( 2.),.d0( 2.),.d1(-3.),.d2( 1.)) b0 (.out0(\0 ),.out1(out4),.in0(in),.in1(\0 ));
+va_laplace_nd #(.n0(-3.),.n1( 2.),.d0( 2.),.d1(-3.),.d2( 1.)) b0 (.out0(\0 ),.out1(ref4),.in0(in),.in1(\0 ));
+resistor #(.r(1.)) r1 (.p(out1),.n(\0 ));
+resistor #(.r(1.)) r2 (.p(out2),.n(\0 ));
+resistor #(.r(1.)) r3 (.p(out3),.n(\0 ));
+resistor #(.r(1.)) r4 (.p(out4),.n(\0 ));
+resistor #(.r(1.)) r1 (.p(ref1),.n(\0 ));
+resistor #(.r(1.)) r2 (.p(ref2),.n(\0 ));
+resistor #(.r(1.)) r3 (.p(ref3),.n(\0 ));
+resistor #(.r(1.)) r4 (.p(ref4),.n(\0 ));
 #Time       v(in)      v(out1)    v(out2)    v(out3)    v(out4)    v(ref1)    v(ref2)    v(ref3)    v(ref4)   
  0.         0.         0.         0.         0.         0.         0.         0.         0.         0.        
  89.E-9     559.2E-9   100.E-15   0.         50.E-15    100.E-15   100.E-15   0.         50.E-15    100.E-15  

@@ -19,9 +19,9 @@ endmodule
 !make test_flow0.so > /dev/null
 attach ./test_flow0.so
 
-test_flow0 d1(0, 2, 1, 0);
-resistor #(.r(1)) r0(2, 0);
-isource #(.dc(i)) i1(0, 1);
+test_flow0 d1(\0 , 2, 1, 0);
+resistor #(.r(1)) r0(\2 ,\0 );
+isource #(.dc(i)) i1(\0 , 1);
 
 parameter i=1
 list
@@ -29,7 +29,7 @@ print dc v(nodes) i(d1.*) i(r0) iter(0)
 dc
 dc
 
-resistor #(.r(1k)) r0(2, 0);
+resistor #(.r(1k)) r0(\2 ,\0 );
 dc
 
 end

@@ -2,7 +2,17 @@
 >>>>>module mod(a b) 
 >>>>>paramset bob mod; 
 >>>>>paramset bob modwrong; 
->>>>>module main(1,2,3,4) 
+>>>>>module main(1,\2 , \3 , \4 ) 
+module main(1,\2 , \3 , \4 ) 
+            ^ ? invalid identifier
+bob b1 (.a(1) .b(2)); 
+           ^ ? invalid identifier
+bob b1 (.a(1) .b(2)); 
+                 ^ ? invalid identifier
+main m(\1 ,2,3,\0 ); 
+           ^ ? invalid identifier
+main m(\1 ,2,3,\0 ); 
+             ^ ? invalid identifier
 >>>>>list 
 module modwrong (.A(A),.b(b));
 endmodule // modwrong
@@ -18,11 +28,11 @@ paramset bob modwrong;
 
 endparamset
 
-module main (.1(1),.2(2),.3(3),.4(4));
-  bob #() b1 (.a(1),.b(2));
+module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
+  bob #() b1 (.a(\1 ),.b(\2 ));
 endmodule // main
 
-main #() m (.1(1),.2(2),.3(3),.4(0));
+main #() m (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\0 ));
 >>>>>op 
 main.b1: bob from top level
 main.b1: bob from top level

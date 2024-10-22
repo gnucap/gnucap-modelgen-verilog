@@ -1,3 +1,5 @@
+resistor #(.r(2) .m(2)) r1(in, 0) 
+                               ^ ? invalid identifier
 #           v(in)      I(V1)      iter(0)   
  0.         0.89999   -0.89999    3.        
 #Time       v(in)      iter(0)   

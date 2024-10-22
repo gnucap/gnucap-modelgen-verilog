@@ -18,8 +18,8 @@ list
 !make polarity_ddt2.so > /dev/null
 attach ./polarity_ddt2.so
 
-polarity_ddt2 dut(1,0);
-resistor #(.r(1)) r(1,2);
+polarity_ddt2 dut(\1 ,\0 );
+resistor #(.r(1)) r(\1 ,2);
 
 list
 

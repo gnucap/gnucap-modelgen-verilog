@@ -21,8 +21,8 @@ attach ./test_ps1.so
 
 verilog
 
-test_ps1 #(.r(2)) r(1, 0);
-isource #(.dc(5)) i(0, 1);
+test_ps1 #(.r(2)) r(\1 , \0 );
+isource #(.dc(5)) i(\0 , 1);
 
 print dc v(nodes) iter(0)
 dc

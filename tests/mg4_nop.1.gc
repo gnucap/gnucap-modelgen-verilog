@@ -17,8 +17,8 @@ endmodule
 !make test_nop0.so > /dev/null
 attach ./test_nop0.so
 
-test_nop0 #() dut(1,0);
-vsource #(.dc(1)) v1(1, 0);
+test_nop0 #() dut(\1 ,\0 );
+vsource #(.dc(1)) v1(\1 , \0 );
 
 list
 

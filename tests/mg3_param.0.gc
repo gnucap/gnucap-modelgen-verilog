@@ -19,10 +19,10 @@ endmodule
 !make test_alias.so > /dev/null
 attach ./test_alias.so
 
-test_alias #(.aa(1)) dut1(1,0);
-test_alias #(.pp(2)) dut2(1,0);
-test_alias dut3(1,0);
-test_alias #(.pp(4) .aa(5)) dut4(1,0);
+test_alias #(.aa(1)) dut1(\1 ,\0 );
+test_alias #(.pp(2)) dut2(\1 ,\0 );
+test_alias dut3(\1 ,\0 );
+test_alias #(.pp(4) .aa(5)) dut4(\1 ,\0 );
 
 list
 

@@ -16,11 +16,11 @@ module test_dep0(p, n);
 		i = 0;
 		
 		if(p0) begin
-			i = p0?0:max(0,V(p));
+			i = p0?0:max(\0 ,V(p));
 		end else if(p1) begin
 			i = V(p,n);
 		end else begin
-			i = p1?max(V(n),0):0;
+			i = p1?max(V(n),\0 ):0;
 		end
 
 		j = i;
@@ -33,8 +33,8 @@ attach ./test_dep0.so
 
 parameter v=1
 
-test_dep0 #() dut(1,0);
-vsource #(.dc(v)) v1(1, 0);
+test_dep0 #() dut(\1 ,\0 );
+vsource #(.dc(v)) v1(\1 , \0 );
 
 list
 

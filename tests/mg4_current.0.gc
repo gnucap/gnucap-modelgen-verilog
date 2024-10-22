@@ -26,8 +26,8 @@ attach ./test_current0.so
 
 parameter v=0
 
-test_current0 dut(1,0);
-resistor #(1) r1(1, 0);
+test_current0 dut(\1 ,\0 );
+resistor #(1) r1(\1 , \0 );
 
 list
 

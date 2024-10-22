@@ -23,9 +23,9 @@ list
 !make test_case0_0.so > /dev/null
 attach ./test_case0_0.so
 
-test_case0_0 #(.v(1)) dut(1,0);
-test_case0_0 #(.v(2)) dut(2,0);
-test_case0_0 #(.v(3)) dut(3,0);
+test_case0_0 #(.v(1)) dut(\1 ,\0 );
+test_case0_0 #(.v(2)) dut(\2 ,\0 );
+test_case0_0 #(.v(3)) dut(3,\0 );
 
 list
 

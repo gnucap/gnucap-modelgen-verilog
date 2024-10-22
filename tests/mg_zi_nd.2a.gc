@@ -17,8 +17,8 @@ endmodule
 attach ./test_zi_nd2a.so
 
 // H(z) = 1/z
-test_zi_nd2a #() b(out3, in, 0);
-vsine #(.ampl(1), .freq(1/2/3.1415)) v1(in, 0);
+test_zi_nd2a #() b(out3, in, \0 );
+vsine #(.ampl(1), .freq(1/2/3.1415)) v1(in, \0 );
 
 // lowpass for comparison
 // fc = 0.16Hz

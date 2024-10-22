@@ -24,8 +24,8 @@ attach ./test_branch_0.so
 
 parameter v=0
 
-test_branch_0 #() dut(1,0);
-vsource #(.dc(v)) v1(1, 0);
+test_branch_0 #() dut(\1 ,\0 );
+vsource #(.dc(v)) v1(\1 , \0 );
 
 list
 

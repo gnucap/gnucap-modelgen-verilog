@@ -1,7 +1,7 @@
 // it does work! I(cp,cn) is a short circuit. 
 // (circuit doesn't make much sense) 
-test_ccvs1 #() d1 (.p(1),.n(0),.cp(1),.cn(0));
-vsource #(.dc(i)) v1 (.p(1),.n(0));
+test_ccvs1 #() d1 (.p(\1 ),.n(\0 ),.cp(\1 ),.cn(\0 ));
+vsource #(.dc(i)) v1 (.p(\1 ),.n(\0 ));
 parameter i=1 
 #           v(1)       i(v1)     
  0.         0.         0.        

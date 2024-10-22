@@ -27,9 +27,9 @@ endparamset;
 attach ./test_bug2.so
 
 
-test_bug2 #() dut(1,0);
-resistor #(1) r1 (1 2);
-vsource #(1) v1(2 0);
+test_bug2 #() dut(\1 ,\0 );
+resistor #(1) r1 (\1 \2 );
+vsource #(1) v1(2 \0 );
 
 print dc i(v1)
 dc

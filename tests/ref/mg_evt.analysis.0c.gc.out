@@ -1,4 +1,4 @@
-test_evtana0c #() dut0 (.p(1),.n(0));
+test_evtana0c #() dut0 (.p(\1 ),.n(\0 ));
 #Time       cnt(dut0)  v(1)       control(0) iter(0)   
 static 0
 static 0

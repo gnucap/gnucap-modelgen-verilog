@@ -4,8 +4,8 @@ load ../vams/vccs.so
 
 verilog
 
-vccs #(.gm(2) .$mfactor(1)) vv(0, out, in, 0);
-resistor #(.r(1)) r(0, out);
+vccs #(.gm(2) .$mfactor(1)) vv(\0 , out, in, \0 );
+resistor #(.r(1)) r(\0 , out);
 
 spice
 

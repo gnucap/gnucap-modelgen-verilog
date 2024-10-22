@@ -7,7 +7,7 @@ module main(n, g)
 	diode #(.is(1e-15) .tf(1u) .cjo(1pf) .level(0)) D1(n g);
 endmodule
 
-main m(n,0);
+main m(n,\0 );
 
 spice
 

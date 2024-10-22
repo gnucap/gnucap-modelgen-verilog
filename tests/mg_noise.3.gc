@@ -18,8 +18,8 @@ list
 !make test_noise3.so > /dev/null
 attach ./test_noise3.so
 
-test_noise3 #() dut(2, 1);
-test_noise3 #() dut(1, 0);
+test_noise3 #() dut(\2 , 1);
+test_noise3 #() dut(\1 , \0 );
 noise_probe #() n1(1)
 noise_probe #() n2(2)
 

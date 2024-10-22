@@ -18,9 +18,9 @@ attach ./test_expcap0.so
 
 parameter v=0
 
-test_expcap0 #() dut(0,3,1,0);
-vsine #(.mag(1), .dc(v), .ampl(1)) v1(1, 0);
-resistor #(1) R2(3  0);
+test_expcap0 #() dut(\0 ,3,1,\0 );
+vsine #(.mag(1), .dc(v), .ampl(1)) v1(\1 , \0 );
+resistor #(1) R2(3  \0 );
 
  * loss(dut._b_ddt_1_p_ddt_1_n) i(dut._b_ddt_1_p_ddt_1_n) dd(dut) iter(0)
 print tran dd(dut) iter(0)

@@ -24,7 +24,7 @@ list
 !make test_evt3b.so > /dev/null
 attach ./test_evt3b.so
 
-test_evt3b dut0(1,0);
+test_evt3b dut0(\1 ,\0 );
 
 list
 

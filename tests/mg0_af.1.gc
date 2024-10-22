@@ -28,7 +28,7 @@ endmodule
 attach ./test_af_1.so
 
 parameter v1=0
-test_af_1 #(.v(v1)) dut(1,0);
+test_af_1 #(.v(v1)) dut(\1 ,\0 );
 
 list
 

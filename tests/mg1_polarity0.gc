@@ -55,17 +55,17 @@ attach ./polarity1.so
 attach ./polarity2.so
 attach ./polarity3.so
 
-vsource #(.dc(v)) v1(1, 0);
-polarity0 dut(1,0);
+vsource #(.dc(v)) v1(\1 , \0 );
+polarity0 dut(\1 ,\0 );
 
-vsource #(.dc(v)) v2(2, 0);
-polarity1 dut(2,0);
+vsource #(.dc(v)) v2(\2 ,\0 );
+polarity1 dut(\2 ,\0 );
 
-vsource #(.dc(v)) v3(3, 0);
-polarity2 dut(3,0);
+vsource #(.dc(v)) v3(3, \0 );
+polarity2 dut(3,\0 );
 
-vsource #(.dc(v)) v3(4, 0);
-polarity3 dut(4,0);
+vsource #(.dc(v)) v3(4, \0 );
+polarity3 dut(4,\0 );
 
 list
 parameter v=0

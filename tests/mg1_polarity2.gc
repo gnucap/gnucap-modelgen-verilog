@@ -23,16 +23,16 @@ list
 !make polarity2_0.so > /dev/null
 attach ./polarity2_0.so
 
-polarity2_0             d(3,0,1,0,2,0);
-polarity2_0 #(.cv(0.)) d4(4,0,1,0,2,0);
-polarity2_0 #(.ci(0.)) d5(5,0,1,0,2,0);
+polarity2_0             d(3,\0 ,\1 ,\0 ,\2 ,\0 );
+polarity2_0 #(.cv(0.)) d4(4,\0 ,\1 ,\0 ,\2 ,\0 );
+polarity2_0 #(.ci(0.)) d5(5,\0 ,\1 ,\0 ,\2 ,\0 );
 
-isource #(.dc(1)) i1(1, 0);
-vsource #(.dc(1)) v1(2, 0);
+isource #(.dc(1)) i1(\1 , \0 );
+vsource #(.dc(1)) v1(\2 ,\0 );
 
-resistor #(.r(1)) r3(3, 0);
-resistor #(.r(1)) r4(4, 0);
-resistor #(.r(1)) r5(5, 0);
+resistor #(.r(1)) r3(3, \0 );
+resistor #(.r(1)) r4(4, \0 );
+resistor #(.r(1)) r5(5, \0 );
 
 list
 

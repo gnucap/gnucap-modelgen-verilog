@@ -50,17 +50,17 @@ attach ./test_res2.so
 parameter r=1
 parameter v=0
 
-test_res0 #(.r(r)) dut(1,2);
-vsource #(.dc(v)) v1(1, 0);
-vsource #(.dc(1)) v2(2, 0);
+test_res0 #(.r(r)) dut(\1 ,2);
+vsource #(.dc(v)) v1(\1 , \0 );
+vsource #(.dc(1)) v2(\2 ,\0 );
 
-test_res1 #(.r(2*r)) dut(3,4);
-vsource #(.dc(v)) v3(3, 0);
-vsource #(.dc(1)) v4(4, 0);
+test_res1 #(.r(2*r)) dut(\3 ,4);
+vsource #(.dc(v)) v3(3, \0 );
+vsource #(.dc(1)) v4(4, \0 );
 
 test_res2 #(.r(4*r)) dut(5,6);
-vsource #(.dc(v)) v5(5, 0);
-vsource #(.dc(1)) v6(6, 0);
+vsource #(.dc(v)) v5(5, \0 );
+vsource #(.dc(1)) v6(6, \0 );
 
 list
 

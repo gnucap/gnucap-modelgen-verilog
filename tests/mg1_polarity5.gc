@@ -25,8 +25,8 @@ attach ./test_pol5.so
 
 parameter v=0
 
-test_pol5 #() dut(1,0,2,0);
-resistor #(1) r(1,0)
+test_pol5 #() dut(\1 ,\0 ,2,\0 );
+resistor #(1) r(\1 ,\0 )
 
 spice
 

@@ -31,7 +31,7 @@ list
 !make test_timer3g.so > /dev/null
 attach ./test_timer3g.so
 
-test_timer3g dut0(1,0);
+test_timer3g dut0(\1 ,\0 );
 // reject #(.time(.9)) r();
 
 list

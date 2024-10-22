@@ -20,10 +20,10 @@ endmodule
 
 attach ./test_dio0.so
 
-resistor #(.r(1)) dut(3,2);
-test_dio0 dut(2,1);
-test_dio0 dut(1,0);
-vsource v1(3, 0);
+resistor #(.r(1)) dut(\3 ,2);
+test_dio0 dut(\2 ,\1 );
+test_dio0 dut(\1 ,\0 );
+vsource v1(3, \0 );
 
 list
 

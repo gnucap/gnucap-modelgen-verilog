@@ -1,5 +1,5 @@
 parameter dc not specified, using default
-test_vs0 #(.dc(dc)) dut (.p(1),.n(0));
-resistor #(.r(2)) r0 (.p(1),.n(0));
+test_vs0 #(.dc(dc)) dut (.p(\1 ),.n(\0 ));
+resistor #(.r(2)) r0 (.p(\1 ),.n(\0 ));
 #           v(1)       i(r0)      iter(0)   
  0.         1.         0.5        4.        

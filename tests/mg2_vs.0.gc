@@ -18,8 +18,8 @@ endmodule
 !make test_vs0.so > /dev/null
 attach ./test_vs0.so
 
-test_vs0 #(.dc(dc)) dut(1, 0);
-resistor #(.r(2)) r0(1, 0);
+test_vs0 #(.dc(dc)) dut(\1 , \0 );
+resistor #(.r(2)) r0(\1 , \0 );
 
 list
 

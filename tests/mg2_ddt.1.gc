@@ -21,8 +21,8 @@ verilog
 parameter r=1
 parameter v=0
 
-test_ddt1 #() dut(1,0);
-vsine #(.phase(-3.1415/2.), .dc(v), .ampl(1)) v1(1, 0);
+test_ddt1 #() dut(\1 ,\0 );
+vsine #(.phase(-3.1415/2.), .dc(v), .ampl(1)) v1(\1 , \0 );
 
 list
 

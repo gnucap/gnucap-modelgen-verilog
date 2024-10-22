@@ -7,13 +7,13 @@ paramset test_invalid resistor;
  .r=R;
 endparamset
 
-module main(1,2,3,4);
-	vsource #(1.) v(3,1);
-	test_invalid #(.R(1.5)) R1(3,1);
-	test_invalid #() R2(3,1);
+module main(\1 ,\2 , \3 , \4 );
+	vsource #(1.) v(\3 ,\1 );
+	test_invalid #(.R(1.5)) R1(\3 ,\1 );
+	test_invalid #() R2(\3 ,\1 );
 endmodule
 
-main m(0,1,2,4);
+main m(\0 ,1,2,4);
 
 list
 

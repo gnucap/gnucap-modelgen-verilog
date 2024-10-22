@@ -1,6 +1,6 @@
 parameter v=0 
-test_res3_0 #(.r(.69314718055994530941)) dut (.np(1),.nn(0));
-vsource #(.dc(v)) v1 (.p(1),.n(0));
+test_res3_0 #(.r(.69314718055994530941)) dut (.np(\1 ),.nn(\0 ));
+vsource #(.dc(v)) v1 (.p(\1 ),.n(\0 ));
 #           i(dut)    
  0.         0.        
  0.25       0.125     

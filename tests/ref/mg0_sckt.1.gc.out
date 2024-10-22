@@ -19,9 +19,9 @@ endmodule // net1
 parameter r = 10 
 parameter c = 1m 
 parameter v = 1 
-test_net1 #(.r(r),.c(c)) dut (.a(1),.b(2),.gnd(0));
-net1 #(.c(c),.r(r)) dut (.a(1),.b(3),.gnd(0));
-vsin #(.amplitude(v),.dc(v)) v1 (.p(1),.n(0));
+test_net1 #(.r(r),.c(c)) dut (.a(\1 ),.b(\2 ),.gnd(\0 ));
+net1 #(.c(c),.r(r)) dut (.a(\1 ),.b(\3 ),.gnd(\0 ));
+vsin #(.amplitude(v),.dc(v)) v1 (.p(\1 ),.n(\0 ));
 #           v(1)       v(2)       v(3)      
  0.         0.         0.         0.        
  0.5        0.5        0.5        0.5       

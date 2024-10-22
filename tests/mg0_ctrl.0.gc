@@ -24,9 +24,9 @@ list
 !make test_while0_0.so > /dev/null
 attach ./test_while0_0.so
 
-test_while0_0 #(.v(1)) dut(1,0);
-test_while0_0 #(.v(2)) dut(2,0);
-test_while0_0 #(.v(3)) dut(3,0);
+test_while0_0 #(.v(1)) dut(\1 ,\0 );
+test_while0_0 #(.v(2)) dut(\2 ,\0 );
+test_while0_0 #(.v(3)) dut(3,\0 );
 
 list
 

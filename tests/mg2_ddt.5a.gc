@@ -22,8 +22,8 @@ verilog
 parameter r=1
 parameter v=0
 
-test_ddt5a #() dut(1,0,x);
-isine #(.offset(-1), .phase(-3.141592/2), .ampl(1)) i1(0, 1);
+test_ddt5a #() dut(\1 ,\0 ,x);
+isine #(.offset(-1), .phase(-3.141592/2), .ampl(1)) i1(\0 , 1);
 
 list
 

@@ -20,8 +20,8 @@ attach ./test_debug0.so
 
 verilog
 
-test_debug0 #(.r(2)) r(1, 0);
-isource #(.dc(5)) i(0, 1);
+test_debug0 #(.r(2)) r(\1 , \0 );
+isource #(.dc(5)) i(\0 , 1);
 
 print dc v(nodes) iter(0)
 dc

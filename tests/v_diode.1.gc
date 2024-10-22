@@ -25,7 +25,7 @@ paramset ddd diode;
 endparamset;
 
 module main(1 2)
-  ddd #(.area(1.)) d1 (1  2);
+  ddd #(.area(1.)) d1 (1  \2 );
 endmodule
 
 main m(2 0);

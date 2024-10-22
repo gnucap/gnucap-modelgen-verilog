@@ -52,7 +52,7 @@ endmodule
 attach ./test_ddxaf.so
 
 test_ddxaf #() dut(1);
-vsource #(1) v(1,0);
+vsource #(1) v(\1 ,\0 );
 
 list
 

@@ -19,9 +19,9 @@ list
 !make test_noise0.so > /dev/null
 attach ./test_noise0.so
 
-test_noise0 #() dut(1, 0);
+test_noise0 #() dut(\1 , \0 );
 noise_probe n1(1)
-noise_probe n2(1,0)
+noise_probe n2(1,\0 )
 
 list
 

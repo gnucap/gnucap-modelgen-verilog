@@ -1,8 +1,14 @@
+resistor #(.r(10k)) r1(\1 ,2); 
+                           ^ ? invalid identifier
+resistor #(.r(1k)) r1(\3 ,2); 
+                          ^ ? invalid identifier
+vsource #(.dc(v)) v1(3,\0 ); 
+                     ^ ? invalid identifier
 parameter v=1 
-test_ind0 #() dut (.p(1),.n(2));
-resistor #(.r(10k)) r1 (.p(1),.n(2));
-resistor #(.r(1k)) r1 (.p(3),.n(2));
-vsource #(.dc(v)) v1 (.p(3),.n(0));
+test_ind0 #() dut (.p(\1 ),.n(\2 ));
+resistor #(.r(10k)) r1 (.p(\1 ),.n(\2 ));
+resistor #(.r(1k)) r1 (.p(\3 ),.n(\2 ));
+vsource #(.dc(v)) v1 (.p(\3 ),.n(\0 ));
 #           v(1)       v(2)       v(3)       iter(0)   
  0.        -10.        1.f        1.         4.        
 Gnucap   System status

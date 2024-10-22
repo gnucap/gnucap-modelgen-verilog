@@ -32,7 +32,7 @@ attach ./testvco0.so
 
 testvco0 #(.samples(6)) t(out, in, 0 );
 vpulse #(.rise(1e-8)) vv(in, 0 );
-resistor #(1) r(out 0);
+resistor #(1) r(out \0 );
 
 print tran v(nodes)
 tran 1e-8 basic

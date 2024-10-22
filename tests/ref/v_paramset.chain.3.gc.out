@@ -11,6 +11,10 @@
 >>>>>parameter length from [1:1]; 
 >>>>>parameter r=0; 
 >>>>>module main(1 2); 
+module main(1 2); 
+            ^ ? invalid identifier
+module main(1 2); 
+              ^ ? invalid identifier
 >>>>>parameter real L=5.; 
 >>>>>spice 
 >>>>>.options noinsensitive 

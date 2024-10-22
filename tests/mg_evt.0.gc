@@ -22,7 +22,7 @@ list
 !make test_evt0_0.so > /dev/null
 attach ./test_evt0_0.so
 
-test_evt0_0 #(.v(1)) dut(1,0);
+test_evt0_0 #(.v(1)) dut(\1 ,\0 );
 
 list
 

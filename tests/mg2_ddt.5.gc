@@ -19,8 +19,8 @@ verilog
 parameter r=1
 parameter v=0
 
-test_ddt5 #() dut(1,0);
-isine #(.offset(v), .ampl(1)) v1(0, 1);
+test_ddt5 #() dut(\1 ,\0 );
+isine #(.offset(v), .ampl(1)) v1(\0 , 1);
 
 list
 

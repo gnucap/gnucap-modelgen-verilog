@@ -1,3 +1,21 @@
+module main(\1 ,2); 
+                ^ ? invalid identifier
+vs #(.voltage({ln(exp(v))})) v1(2 1) 
+                                ^ ? invalid identifier
+vs #(.voltage({ln(exp(v))})) v1(2 1) 
+                                  ^ ? invalid identifier
+main #(.v(1)) m1(0 1) 
+                 ^ ? invalid identifier
+main #(.v(1)) m1(0 1) 
+                   ^ ? invalid identifier
+main #(.v(2)) m2(0 2) 
+                 ^ ? invalid identifier
+main #(.v(2)) m2(0 2) 
+                   ^ ? invalid identifier
+main #(.v(a)) m2(0 3) 
+                 ^ ? invalid identifier
+main #(.v(a)) m2(0 3) 
+                   ^ ? invalid identifier
 parameter a not specified, using default
 parameter a value is "NOT_INPUT"
 parameter a not specified, using default

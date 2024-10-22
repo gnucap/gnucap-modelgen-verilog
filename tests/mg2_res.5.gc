@@ -24,14 +24,14 @@ attach ./test_res_5.so
 parameter r=1
 parameter v=0
 
-test_res_5 #(.r(100)) dut(1,0);
-vsource #(.dc(v)) v1(1, 0);
+test_res_5 #(.r(10\0 ),) dut(\1 ,\0 );
+vsource #(.dc(v)) v1(\1 , \0 );
 
-test_res_5 #(.r(1)) dut(2,0);
-vsource #(.dc(v)) v2(2, 0);
+test_res_5 #(.r(1)) dut(\2 ,\0 );
+vsource #(.dc(v)) v2(\2 ,\0 );
 
-test_res_5 #(.r(.01)) dut(3,0);
-vsource #(.dc(v)) v3(3, 0);
+test_res_5 #(.r(.01)) dut(3,\0 );
+vsource #(.dc(v)) v3(3, \0 );
 
 list
 

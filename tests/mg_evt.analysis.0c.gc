@@ -31,7 +31,7 @@ list
 !make test_evtana0c.so > /dev/null
 attach ./test_evtana0c.so
 
-test_evtana0c dut0(1,0);
+test_evtana0c dut0(\1 ,\0 );
 
 list
 

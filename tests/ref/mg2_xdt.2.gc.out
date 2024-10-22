@@ -6,8 +6,8 @@ endmodule // vsin
 
 parameter r=1 
 parameter v=0 
-test_xdt2 #() dut (.p(1),.n(0));
-vsin #(.ampl(1),.dc(v)) v1 (.p(1),.n(0));
+test_xdt2 #() dut (.p(\1 ),.n(\0 ));
+vsin #(.ampl(1),.dc(v)) v1 (.p(\1 ),.n(\0 ));
 #Time       v(1)       idtddt(dut) ddtidt(dut) i(dut._b_ddt_0_p_ddt_0_n) i(dut._b_ddt_1_p_ddt_1_n) i(dut._b_idt_2_p_idt_2_n) iter(0)   
  0.         0.         0.         ??         0.         0.         0.         2.        
  0.1        0.58779    0.58779    ??         5.1531     5.1531     0.58779    46.       

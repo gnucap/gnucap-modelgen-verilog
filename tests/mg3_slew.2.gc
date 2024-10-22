@@ -19,7 +19,7 @@ endmodule
 !make test_slw2.so > /dev/null
 attach ./test_slw2.so
 
-test_slw2 #() dut(2,1);
+test_slw2 #() dut(\2 ,\1 );
 
 spice
 

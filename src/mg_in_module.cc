@@ -395,6 +395,48 @@ void Parameter_List_Collection::dump(std::ostream& o)const
 //   // Collection<Localparam_List>::dump(o);
 // }
 /*--------------------------------------------------------------------------*/
+static std::string get_identifier(CS& cmd, std::string const& term)
+{
+  trace1("get_identifier", cmd.tail().substr(0,2));
+  cmd.skipbl();
+  std::string id;
+
+  if(cmd.is_digit()) {
+    cmd.warn(bWARNING, "invalid identifier");
+  }else{
+  }
+
+  if(cmd >> "\\") {
+    id = cmd.get_to(" \t\f");
+    trace1("got to", cmd.peek());
+    cmd.skip();
+
+    {
+      bool plain = true;
+      for(size_t i = 0; plain && i<id.size() ; ++i) {
+	if (isalnum(id[i])) {
+	}else if (id[i] == '$') {
+	  plain = false;
+	}else{
+	  plain = false;
+	}
+      }
+
+      if(plain) {
+	// don't touch, for now.
+      }else{
+	// store escaped string.
+	id = "\\" + id;
+      }
+    }
+  }else{
+    id = cmd.ctos(term, "", "");
+  }
+
+  trace1("identifier", id);
+  return id;
+}
+/*--------------------------------------------------------------------------*/
 /* A.1.3	6.2, 6.5
 + port ::=
 +       [ port_expression ]
@@ -406,14 +448,26 @@ void Parameter_List_Collection::dump(std::ostream& o)const
 +       port_identifier
 -       [ "[" constant_range_expression "]" ]
 */
-void Port_3::parse(CS& file)
+void Port_3::parse(CS& f)
 {
-  if (file >> '.') {
-    _name  = file.ctos("(", "", "");
-    _value = file.ctos(",)", "(", ")");
+  size_t here = f.cursor();
+  if (f >> '.') {
+    _name = get_identifier(f, "(");
+    int paren = f.skip1b('(');
+    _value = get_identifier(f, ";,)");
+
+    if (!paren){untested();
+      //?
+    }else if( f.skip1b(')')) {
+    }else{untested();
+      f.warn(bDANGER, here, "need ')'");
+    }
+
   }else{
-    file >> _name; // value?
+    _name = get_identifier(f, ";,)");
   }
+  f >> ",";
+  trace3("Port_3::name", _name, value(), f.tail().substr(0,2));
   if(owner()){
     _node = owner()->new_node(value());
   }else{
@@ -532,12 +586,25 @@ void Port_3::set_discipline(Discipline const* d, Module* owner)
   owner->node(_node)->set_discipline(d);
 }
 /*--------------------------------------------------------------------------*/
+static std::string mangle(std::string const& name)
+{
+  if(isdigit(name[0])) {
+    return '\\' + name + " ";
+  }else if(name[0] == '\\') {
+    return name + " ";
+  }else{
+    // ok, for now.
+    // probably need '\\' ... ' ' whenever special characters are used.
+    return name;
+  }
+}
+/*--------------------------------------------------------------------------*/
 void Port_3::dump(std::ostream& out)const
 {
   if(has_identifier()){
-    out << "." << name() << "(" << value() << ")";
+    out << "." << mangle(name()) << "(" << mangle(value()) << ")";
   }else{
-    out << name();
+    out << mangle(name());
   }
 }
 /*--------------------------------------------------------------------------*/

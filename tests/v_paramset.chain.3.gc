@@ -30,10 +30,10 @@ endparamset
 
 module main(1 2);
   parameter real L=5.;
-  tln #(.length(L) .r(1/L)) t1(1, 2);
+  tln #(.length(L) .r(1/L)) t1(\1 , \2 );
 endmodule
 
-main #() m(1 2);
+main #() m(\1 \2 );
 
 spice
 .options noinsensitive

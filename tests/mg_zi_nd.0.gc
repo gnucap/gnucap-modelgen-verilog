@@ -25,9 +25,9 @@ verilog
 parameter r=1
 parameter v=0
 
-test_zi_np0 #() dut(1,0);
-vsine #(.dc(v), .freq(.2), .ampl(1)) v1(1, 0);
-// vsine #(.dc(v), .phase(-3.14/2) .ampl(.2)) v1(1, 0);
+test_zi_np0 #() dut(\1 ,\0 );
+vsine #(.dc(v), .freq(.2), .ampl(1)) v1(\1 , \0 );
+// vsine #(.dc(v), .phase(-3.14/2) .ampl(.2)) v1(\1 , \0 );
 
 list
 

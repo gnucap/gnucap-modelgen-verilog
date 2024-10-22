@@ -19,11 +19,11 @@ endmodule
 !make test_vmul0.so > /dev/null
 attach ./test_vmul0.so
 
-test_vmul0 d1(2, 0, a, b);
-resistor #(.r(1)) r1(2, 0);
+test_vmul0 d1(\2 , \0 , a, b);
+resistor #(.r(1)) r1(\2 ,\0 );
 
-vsource #(.dc(va)) v1(a, 0);
-vsource #(.dc(vb)) v2(b, 0);
+vsource #(.dc(va)) v1(a, \0 );
+vsource #(.dc(vb)) v2(b, \0 );
 
 parameter va=1
 parameter vb=1

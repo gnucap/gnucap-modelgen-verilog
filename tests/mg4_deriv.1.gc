@@ -25,11 +25,11 @@ endmodule
 !make test_deriv1.so > /dev/null
 attach ./test_deriv1.so
 
-test_deriv1 #() dut(1, 2);
+test_deriv1 #() dut(\1 , \2 );
 
 parameter v=0
-// vsource #(.dc(v)) v1(2,0);
-resistor #(.r(100)) r1(1,0);
+// vsource #(.dc(v)) v1(\2 ,\0 );
+resistor #(.r(10\0 ),) r1(\1 ,\0 );
 
 list
 

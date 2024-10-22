@@ -22,8 +22,8 @@ list
 !make polarity3_0.so > /dev/null
 attach ./polarity3_0.so
 
-polarity3_0 dut(1,0);
-vsource v1(1, 0);
+polarity3_0 dut(\1 ,\0 );
+vsource v1(\1 , \0 );
 
 list
 

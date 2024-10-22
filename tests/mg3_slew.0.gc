@@ -18,9 +18,9 @@ endmodule
 !make test_slw0.so > /dev/null
 attach ./test_slw0.so
 
-test_slw0 #() dut(2,1);
+test_slw0 #() dut(\2 ,\1 );
 parameter v=1
-vsource #(.dc(v)) v1(1,0);
+vsource #(.dc(v)) v1(\1 ,\0 );
 
 list
 

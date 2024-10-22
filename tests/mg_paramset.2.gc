@@ -33,8 +33,8 @@ attach ./test_ps2.so
 
 verilog
 
-test_ps2 #(.r(2)) r(1, 0);
-test_ps2 #() r(1, 0);
+test_ps2 #(.r(2)) r(\1 , \0 );
+test_ps2 #() r(\1 , \0 );
 
 print dc v(nodes) iter(0)
 dc

@@ -19,7 +19,7 @@ endmodule
 !make test_port1.so > /dev/null
 attach ./test_port1.so
 
-test_port1 #() a(1 2);
+test_port1 #() a(\1 \2 );
 test_port1 #() b(1);
 test_port1 #() c();
 

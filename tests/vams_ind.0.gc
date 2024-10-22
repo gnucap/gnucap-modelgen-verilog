@@ -8,8 +8,8 @@ verilog
 
 module main(1 2 ref)
 parameter p=1
-// inductor #(.l(p)) L3(1  2); // default plugin
-inductor  #(.l(p) .$mfactor(1)) L3(1  2);
+// inductor #(.l(p)) L3(1  \2 ); // default plugin
+inductor  #(.l(p) .$mfactor(1)) L3(1,  \2 );
 resistor  #(.r(p)) r2( 2  ref);
 endmodule
 

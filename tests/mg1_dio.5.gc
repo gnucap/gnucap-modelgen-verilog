@@ -21,9 +21,9 @@ endmodule
 
 attach ./test_dio5.so
 
-resistor #(.r(1)) r1(2,1);
-test_dio5 dut(1,0);
-vsource v1(2, 0);
+resistor #(.r(1)) r1(\2 ,\1 );
+test_dio5 dut(\1 ,\0 );
+vsource v1(\2 ,\0 );
 
 list
 

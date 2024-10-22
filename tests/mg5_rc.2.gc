@@ -23,7 +23,7 @@ attach ./test_rc2.so
 
 parameter v=1;
 test_rc2 #() dut(in, out);
-vsine #(.freq(1), .ampl(v), .dc(v)) v1(in, 0);
+vsine #(.freq(1), .ampl(v), .dc(v)) v1(in, \0 );
 
 print tran iter(0)
 tran .5

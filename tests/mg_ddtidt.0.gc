@@ -20,9 +20,9 @@ attach ./test_ddtidt0.so
 
 verilog
 
-test_ddtidt0 #() d0(1, 2);
-resistor #(1.) ra(0,2);
-vsine #(.mag(1) .offset(-1) .phase(-3.1415/2.), .ampl(1)) v1(1, 0);
+test_ddtidt0 #() d0(\1 , \2 );
+resistor #(1.) ra(\0 ,2);
+vsine #(.mag(1) .offset(-1) .phase(-3.1415/2.), .ampl(1)) v1(\1 , \0 );
 
 print tran v(nodes) i(d0) d(d0) i(v1)
 options method=trap

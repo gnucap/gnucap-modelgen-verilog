@@ -23,9 +23,9 @@ endmodule
 !make test_sw0.so > /dev/null
 attach ./test_sw0.so
 
-test_sw0 #() dut(1,0);
+test_sw0 #() dut(\1 ,\0 );
 parameter v=0
-vsource #(.dc(v)) v1(1,0);
+vsource #(.dc(v)) v1(\1 ,\0 );
 
 list
 

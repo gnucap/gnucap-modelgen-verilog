@@ -9,7 +9,7 @@ module main(a, gnd);
   vsine #(.mag(1.)) v1(a, gnd);
 endmodule
 
-main #() dut(1, 0)
+main #() dut(\1 , 0)
 
 spice
 

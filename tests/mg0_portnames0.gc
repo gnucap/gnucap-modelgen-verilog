@@ -19,12 +19,12 @@ list
 attach ./portnames0.so
 
 portnames0 dut(.np(0),.nn(1));
-resistor #(.r(1)) r1(1, 0);
+resistor #(.r(1)) r1(\1 , \0 );
 
 portnames0 dut(.nn(0),.np(2));
 portnames0 dut(.np(0),.nn(2));
 portnames0 dut(.nn(2),.np(0));
-resistor #(.r(1)) r2(2, 0);
+resistor #(.r(1)) r2(\2 ,\0 );
 
 list
 

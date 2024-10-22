@@ -21,8 +21,8 @@ attach ./test_ic0.so
 
 parameter v=0
 
-test_ic0 #() dut(1,0);
-capacitor #(.c(1)) c1(1, 0);
+test_ic0 #() dut(\1 ,\0 );
+capacitor #(.c(1)) c1(\1 , \0 );
 
 list
 

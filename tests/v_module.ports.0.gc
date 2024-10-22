@@ -11,7 +11,7 @@ module main(1 2);
   ports p (1 0);
 endmodule
 
-main #() m(1 2);
+main #() m(\1 \2 );
 
 print dc v(nodes)
 dc

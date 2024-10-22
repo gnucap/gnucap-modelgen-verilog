@@ -20,9 +20,9 @@ endmodule
 !make test_dcb0.so > /dev/null
 attach ./test_dcb0.so
 
-test_dcb0 d1(2, 1);
-vsine #(.offset(1) .ampl(1) .freq(1)) v0(1, 0);
-resistor #(.r(1)) r1(2, 0);
+test_dcb0 d1(\2 , 1);
+vsine #(.offset(1) .ampl(1) .freq(1)) v0(\1 , \0 );
+resistor #(.r(1)) r1(\2 ,\0 );
 list
 
 print dc v(nodes) v(d1)

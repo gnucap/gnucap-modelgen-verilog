@@ -19,8 +19,8 @@ list
 !make polarity_ddt3.so > /dev/null
 attach ./polarity_ddt3.so
 
-polarity_ddt3 dut(1,0);
-resistor #(.r(1)) r(1,2);
+polarity_ddt3 dut(\1 ,\0 );
+resistor #(.r(1)) r(\1 ,2);
 
 list
 

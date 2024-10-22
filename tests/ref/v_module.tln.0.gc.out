@@ -1,3 +1,7 @@
+module main(1 2); 
+            ^ ? invalid identifier
+module main(1 2); 
+              ^ ? invalid identifier
 module tln0 (.a(a),.b(b));
   parameter r 
   parameter c 
@@ -28,12 +32,12 @@ paramset tln tln0;
  .c=c; .r=r;
 endparamset
 
-module main (.1(1),.2(2));
+module main (.\1 (\1 ),.\2 (\2 ));
   parameter len=10 
   tln #(.r(1./len),.c(1./len),.length(len)) t1 (1,2);
 endmodule // main
 
-main #() m (.1(1),.2(2));
+main #() m (.\1 (\1 ),.\2 (\2 ));
 #Time       v(1)       v(2)      
  0.         0.         0.        
  42.E-9     263.87E-9  0.        

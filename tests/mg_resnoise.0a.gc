@@ -23,29 +23,29 @@ list
 attach ./test_rn0.so
 
 // resistor does I(p,n) <+ white_noise(noisy * 4 * `P_K * g * $temperature, "thermal");
-resistor #(.r(100) .noisy(1)) r(0,1);
-test_rn0 #(.r(100)) dut(2, 0);
+resistor #(.r(100) .noisy(1)) r(\0 ,\1 );
+test_rn0 #(.r(100 ),) dut(\2 ,\0 );
 
-test_rn0 #(.$mfactor(1) .r(200)) r(3,0);
-test_rn0 #(.$mfactor(1) .r(200)) r(3,0);
+test_rn0 #(.$mfactor(1) .r(20\0 ),) r(3,\0 );
+test_rn0 #(.$mfactor(1) .r(20\0 ),) r(3,\0 );
 
-resistor #(.$mfactor(2) .r(200) .noisy(1)) r(0,4);
+resistor #(.$mfactor(2) .r(200) .noisy(1)) r(\0 , \4 );
 
-test_rn0 #(.$mfactor(2) .mm(.5) .r(100)) dut(5, 0);
-test_rn0 #(.$mfactor(.5) .mm(2) .r(100)) dut(6, 0);
+test_rn0 #(.$mfactor(2) .mm(.5) .r(100 ),) dut(\5 , \0 );
+test_rn0 #(.$mfactor(.5) .mm(2) .r(100 ),) dut(\6 , \0 );
 
-test_rn0 #(.mm(.5), .$mfactor(4) .r(200)) dut(7, 0);
+test_rn0 #(.mm(.5), .$mfactor(4) .r(200 ),) dut(\7 , \0 );
 
 list
 
-noise_probe n1(1)
-noise_probe n2(2)
-noise_probe n3(3)
-noise_probe n4(4)
-noise_probe n5(5)
-noise_probe n6(6)
-noise_probe n7(7)
-noise_probe n8(8)
+noise_probe n1(\1 );
+noise_probe n2(\2 );
+noise_probe n3(\3 );
+noise_probe n4(\4 );
+noise_probe n5(\5 );
+noise_probe n6(\6 );
+noise_probe n7(\7 );
+noise_probe n8(\8 );
 
 list
 

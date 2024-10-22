@@ -30,9 +30,9 @@ verilog
 parameter r=1
 parameter v=0
 
-test_mgddt0 #() dut(0, 3, 1,0);
-resistor #(2) r(3,0);
-vsine #(.mag(1), .dc(v), .ampl(1)) v1(1, 0);
+test_mgddt0 #() dut(\0 , 3, 1,\0 );
+resistor #(2) r(3,\0 );
+vsine #(.mag(1), .dc(v), .ampl(1)) v1(\1 , \0 );
 
 list
 

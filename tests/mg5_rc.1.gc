@@ -28,7 +28,7 @@ attach ./test_rc1.so
 
 test_rc1 #() dut(in, out);
 parameter v=0;
-vsine #(.freq(1), .ampl(v), .dc(v)) v1(in, 0);
+vsine #(.freq(1), .ampl(v), .dc(v)) v1(in, \0 );
 
 // print dc v(nodes) iter(0)
 dc v -1 2 1

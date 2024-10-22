@@ -12,8 +12,8 @@ module tln0(a, b);
   parameter real C;
   resistor #(.r(R)) r(a j);
   inductor #(.l(L)) l(b j);
-  admittance #(.g(G)) g(b 0);
-  capacitor #(.c(C)) c(b 0);
+  admittance #(.g(G)) g(b \0 );
+  capacitor #(.c(C)) c(b \0 );
 endmodule
 
 module tln1(a, b);
@@ -24,8 +24,8 @@ module tln1(a, b);
   parameter real C;
   resistor #(.r(R)) r(a j);
   inductor #(.l(L)) l(i j);
-  admittance #(.g(G)) g(i 0);
-  capacitor #(.c(C)) c(i 0);
+  admittance #(.g(G)) g(i \0 );
+  capacitor #(.c(C)) c(i \0 );
   tln #(.count(count - 1) .r(R) .l(L) .g(G) .c(C) ) t(i, b);
 endmodule
 
@@ -58,15 +58,15 @@ module main(1 2 3 4);
   parameter length = 1;
 
 	// subckt expansion, ac+tr
-  tln #(.count(100), .r(.1), .l(.01n), .g(.1u), .c(2f)) t1(1, 2);
-  resistor #(10.) r1(0 2);
+  tln #(.count(10\0 ),, .r(.1), .l(.01n), .g(.1u), .c(2f)) t1(\1 , \2 );
+  resistor #(10.) r1(0 \2 );
 
 	// RLGC symbolic tline, ac only.
-  ltra #(.len(100) .r(.1), .l(.01n), .g(.1u), .c(2f)) t1(1, 0, 3, 0);
+  ltra #(.len(10\0 ), .r(.1), .l(.01n), .g(.1u), .c(2f)) t1(\1 , \0 , 3, \0 );
   resistor #(10.) r1(0 3);
 
 	// gnucap lossless tline, ac+tr
-  tline #(.len(100) .r(.1), .l(.01n), .g(.1u), .c(2f)) t1(1, 0, 4, 0);
+  tline #(.len(10\0 ), .r(.1), .l(.01n), .g(.1u), .c(2f)) t1(\1 , \0 , 4, \0 );
   resistor #(10.) r1(0 4);
 endmodule
 

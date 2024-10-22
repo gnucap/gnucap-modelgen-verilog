@@ -26,9 +26,9 @@ list
 !make test_evt1_0.so > /dev/null
 attach ./test_evt1_0.so
 
-test_evt1_0 dut0(1,0);
-test_evt1_0 dut1(0,1);
-vsine #(.freq(1e6) .ampl(2) .samples(9)) vin(1,0);
+test_evt1_0 dut0(\1 ,\0 );
+test_evt1_0 dut1(\0 ,\1 );
+vsine #(.freq(1e6) .ampl(2) .samples(9)) vin(\1 ,\0 );
 
 list
 

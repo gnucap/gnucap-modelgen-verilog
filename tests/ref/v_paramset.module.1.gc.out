@@ -2,6 +2,20 @@
 >>>>>module ports(a, b) 
 >>>>>module ports(a, B) 
 >>>>>module main(1 2); 
+module main(1 2); 
+            ^ ? invalid identifier
+module main(1 2); 
+              ^ ? invalid identifier
+ports p (.a(1) .b(0)); 
+            ^ ? invalid identifier
+ports p (.a(1) .b(0)); 
+                  ^ ? invalid identifier
+ports p (.a(2) .b(0) .c(0)); 
+            ^ ? invalid identifier
+ports p (.a(2) .b(0) .c(0)); 
+                  ^ ? invalid identifier
+ports p (.a(2) .b(0) .c(0)); 
+                        ^ ? invalid identifier
 >>>>>print dc v(nodes) 
 main.p: ports from top level
 main.p discarded: not enough nodes, have 2 need 3

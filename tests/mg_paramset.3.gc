@@ -30,8 +30,8 @@ attach ./test_ps3.so
 verilog
 parameter v=1
 
-test_ps3 #() r(1, 0);
-vsource #(.dc(v)) v1(1, 0);
+test_ps3 #() r(\1 , \0 );
+vsource #(.dc(v)) v1(\1 , \0 );
 
 print dc a(r) b(r) c(r) y(r) x(r) __y(r)
 dc v 0 1 .1

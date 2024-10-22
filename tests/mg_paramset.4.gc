@@ -22,8 +22,8 @@ attach ./test_ps4b.so
 
 verilog
 
-test_ps4a #() a(1, 0);
-test_ps4b #(.$mfactor(4)) b(1, 0);
+test_ps4a #() a(\1 , \0 );
+test_ps4b #(.$mfactor(4)) b(\1 , \0 );
 
 print dc m(a) m(b)
 dc

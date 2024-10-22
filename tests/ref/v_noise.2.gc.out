@@ -1,6 +1,24 @@
+module main(1,\2 , \3 , \4 ) 
+            ^ ? invalid identifier
+resistor #(.r(1.), .noisy(1.)) r2(3, \0 ); 
+                                  ^ ? invalid identifier
+resistor #(.r(1.), .noisy(1.)) r3(3, \0 ); 
+                                  ^ ? invalid identifier
+resistor #(.$mf ... 1.), .noisy(1.)) r4(4, \0 ); 
+                                        ^ ? invalid identifier
+main m(1,\2 , \3 , \4 ) 
+       ^ ? invalid identifier
+noise_probe #(.name("thermal")) noise1(1); 
+                                       ^ ? invalid identifier
+noise_probe #(.name("thermal")) noise2(2); 
+                                       ^ ? invalid identifier
+noise_probe #(.name("thermal")) noise3(3); 
+                                       ^ ? invalid identifier
+noise_probe #(.name("thermal")) noise4(4); 
+                                       ^ ? invalid identifier
 probe ac npwr(noise*) x(m.r1.*) x(m.r0.*) 
                                   ^ ? no match
-module main (.1(1),.2(2),.3(3),.4(4));
+module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
   resistor #(.$mfactor(1),.r(1.)) r0 (1,0);
   resistor #(.noisy(1.),.r(1.)) r1 (2,0);
   resistor #(.noisy(1.),.r(1.)) r2 (3,0);
@@ -8,11 +26,11 @@ module main (.1(1),.2(2),.3(3),.4(4));
   resistor #(.noisy(1.),.r(1.),.$mfactor(2)) r4 (4,0);
 endmodule // main
 
-main #() m (.1(1),.2(2),.3(3),.4(4));
-meas_noise #(.name("thermal")) noise1 (.p(1));
-meas_noise #(.name("thermal")) noise2 (.p(2));
-meas_noise #(.name("thermal")) noise3 (.p(3));
-meas_noise #(.name("thermal")) noise4 (.p(4));
+main #() m (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
+meas_noise #(.name("thermal")) noise1 (.p(\1 ));
+meas_noise #(.name("thermal")) noise2 (.p(\2 ));
+meas_noise #(.name("thermal")) noise3 (.p(\3 ));
+meas_noise #(.name("thermal")) noise4 (.p(\4 ));
 #          
  27.       
 #Freq       npwr(noise1) npwr(noise2) npwr(noise3) npwr(noise4) x(m.r1._b_p_n) x(m.r1._b_white_noise_0_p_white_noise_0_n)

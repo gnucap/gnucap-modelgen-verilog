@@ -3,7 +3,7 @@
 `define samething `thing
 
 `ifdef thing
-`thing a(1,2);
+`thing a(\1 ,\2 );
 endmodule;
 `else
 parse_error
@@ -12,31 +12,31 @@ parse_error
 `ifdef bla
 parse_error
 `else
-`samething b(1,2);
+`samething b(\1 ,\2 );
 endmodule;
 `endif
 
 `ifndef thing
 parse_error
 `else
-module c(1,2);
+module c(\1 ,\2 );
 endmodule;
 `endif
 
 `ifndef sth
-module d(1,2);
+module d(\1 ,\2 );
 endmodule;
 `else
 parse_error
 `endif
 
 `ifndef bla
-module e(1,2);
+module e(\1 ,\2 );
 endmodule;
  `ifdef bla
 	parse_error
  `else
-module f(1,2);
+module f(\1 ,\2 );
 endmodule;
  `endif
 `endif

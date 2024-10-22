@@ -1,4 +1,5 @@
 #           y(r)      
+open circuit: internal node 2
  0.         9.        
  0.1        9.        
  0.2        9.        
@@ -13,5 +14,5 @@
 Gnucap   System status
 iterations: op=0, dc=22, tran=0, fourier=0, total=22
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=1, subckt=0, model=0, total=1
+nodes: user=2, subckt=0, model=0, total=2
 dctran density=100.0%, ac density=100.0%
