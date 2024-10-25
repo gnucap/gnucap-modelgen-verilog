@@ -1,21 +1,21 @@
 verilog
 
 paramset vs vsource
-parameter voltage
-.dc=voltage
+parameter voltage;
+.dc=voltage;
 endparamset
 
-module main(\1 ,2);
-  parameter v
-  vs #(.voltage({ln(exp(v))})) v1(2 1)
+module main(\1 ,\2 );
+  parameter real v;
+  vs #(.voltage(ln(exp(v)))) v1(\2 , \1 );
 endmodule
 
-main #(.v(1)) m1(0 1)
-main #(.v(2)) m2(0 2)
-main #(.v(a)) m2(0 3)
+main #(.v(1)) m1(\0 , \1 );
+main #(.v(2)) m2(\0 , \2 );
+main #(.v(a)) m2(\0 , \3 );
 
 print dc v(nodes)
-param a=1
+param real a=1
 dc
 param a=2
 dc

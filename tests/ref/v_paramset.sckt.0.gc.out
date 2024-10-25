@@ -4,9 +4,7 @@ module foo(1 2);
            ^ ? invalid identifier
 module foo(1 2); 
              ^ ? invalid identifier
->>>>>parameter R=1 
 >>>>>paramset myres foo; 
->>>>>parameter foo 
 >>>>>module main(\1 ,2,3); 
 module main(\1 ,2,3); 
                 ^ ? invalid identifier
@@ -24,12 +22,12 @@ main m(\0 ,1,2);
              ^ ? invalid identifier
 >>>>>list 
 module foo (.\1 (\1 ),.\2 (\2 ));
-  parameter R=1 
+  parameter R=1; 
   resistor #(.r(R)) rr (1,2);
 endmodule // foo
 
 paramset myres foo;
-  parameter foo 
+  parameter foo; 
  .R=foo+5;
 endparamset
 

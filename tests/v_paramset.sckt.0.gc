@@ -3,12 +3,12 @@ options trace
 verilog
 
 module foo(1 2);
-  parameter R=1
+  parameter R=1;
   resistor #(.r(R)) rr(\1 \2 );
 endmodule
 
 paramset myres foo;
-  parameter foo
+  parameter foo;
  .R={foo+5};
 endparamset
 

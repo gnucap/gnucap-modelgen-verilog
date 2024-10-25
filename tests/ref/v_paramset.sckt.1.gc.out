@@ -1,15 +1,11 @@
 >>>>>module tln0(a, b); 
->>>>>parameter RR; 
 >>>>>module tln1(a, b); 
->>>>>parameter R; 
 >>>>>paramset tln tln1 
->>>>>parameter r; 
 >>>>>module main(1 2); 
 module main(1 2); 
             ^ ? invalid identifier
 module main(1 2); 
               ^ ? invalid identifier
->>>>>parameter r0=2 
 >>>>>spice 
 >>>>>.options noinsensitive 
 >>>>>.print dc v(nodes) y(m.t1.tttt.r) y(m.t1.rrrr) 

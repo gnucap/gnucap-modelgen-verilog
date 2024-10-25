@@ -1,14 +1,9 @@
 >>>>>verilog 
 >>>>>(* desc="res1" *) paramset res resistor; 
->>>>>parameter R from (1:2]; 
 >>>>>(* desc="res2" *) paramset res resistor; 
->>>>>parameter R=.5 from (0:1]; 
 >>>>>(* desc="res3" *) paramset res resistor; 
->>>>>parameter R from [100:200]; 
 >>>>>(* desc="res4" *) paramset res resistor; 
->>>>>parameter R from [(1k):(2k)); 
 >>>>>(* desc="res5" *) paramset res resistor; 
->>>>>parameter R from [(2k):(3k)]; 
 >>>>>module main(\1 ,\2 , \3 , \4 ); 
 main m(\0 ,1,2,4); 
            ^ ? invalid identifier

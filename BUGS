@@ -6,7 +6,6 @@
 - filter contribution to potential, uses internal node.
 - V<+ddt(I) does not work on same branch (related?)
 - string type is missing (breaks "%s" in strobe etc.).
-- types don't work. 1/2 equals .5
 - cleanup hack breaks detach_all
 - `default_transision missing, and some step control
 
@@ -25,6 +24,5 @@
 == fixed, presumably. recheck.
 - analysis("ic"): need more testing
 - c_pulse.so: obsolete hack, need discontinuities.
-- V<+laplace(...) sign bug
 - event control is incomplete
 - llvm build: sometimes crashes during shutown

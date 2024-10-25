@@ -224,7 +224,7 @@ int DEV_MODULE::set_port_by_name(std::string& name, std::string& value)
 {
   if(_parent){
     return BASE_SUBCKT::set_port_by_name(name, value);
-  }else{ untested();
+  }else{
     int index = net_nodes();
     // grow_nodes(index, _n, _node_capacity, node_capacity_floor);
     _port_name.push_back(name);
@@ -381,7 +381,7 @@ std::string DEV_MODULE::port_name(int i)const
     // reachable?
     return "";
   }else if(size_t(i)<_port_name.size()){
-    if(_port_name[i]!=""){ untested();
+    if(_port_name[i]!=""){
       return _port_name[i];
     }else{ untested();
       return  port_value(i);

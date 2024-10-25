@@ -88,7 +88,7 @@ public:
   ~abs() { }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     PARAMETER<double> x;
-    Cmd >> x;
+    x.obsolete_parse(Cmd);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::abs(x));
   }
@@ -119,7 +119,7 @@ public:
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     unreachable();
     PARAMETER<double> x;
-    Cmd >> x;
+    x.obsolete_parse(Cmd);
     trace1("asinh", x);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::asinh(x));
@@ -150,7 +150,7 @@ public:
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     unreachable();
     PARAMETER<double> x;
-    Cmd >> x;
+    x.obsolete_parse(Cmd);
     trace1("atan", x);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::atan(x));
@@ -180,7 +180,7 @@ public:
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     unreachable();
     PARAMETER<double> x;
-    Cmd >> x;
+    x.obsolete_parse(Cmd);
     trace1("atanh", x);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::atanh(x));
@@ -208,7 +208,7 @@ public:
   }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { itested();
     PARAMETER<double> x;
-    Cmd >> x;
+    x.obsolete_parse(Cmd);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::cos(x));
   }
@@ -235,7 +235,7 @@ public:
   }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { itested();
     PARAMETER<double> x;
-    Cmd >> x;
+    x.obsolete_parse(Cmd);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::cosh(x));
   }
@@ -262,7 +262,7 @@ public:
   }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     PARAMETER<double> x;
-    Cmd >> x;
+    x.obsolete_parse(Cmd);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::exp(x));
   }
@@ -292,7 +292,7 @@ public:
   }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     PARAMETER<double> x;
-    Cmd >> x;
+    x.obsolete_parse(Cmd);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::expm1(x));
   }
@@ -320,7 +320,7 @@ public:
   ~limexp() { }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     PARAMETER<double> x;
-    Cmd >> x;
+    x.obsolete_parse(Cmd);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::exp(x));
   }
@@ -360,7 +360,7 @@ public:
   }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     PARAMETER<double> x;
-    Cmd >> x;
+    x.obsolete_parse(Cmd);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::floor(x));
   }
@@ -383,7 +383,7 @@ public:
   }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     PARAMETER<double> x;
-    Cmd >> x;
+    x.obsolete_parse(Cmd);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::log10(x));
   }
@@ -419,7 +419,7 @@ public:
   }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     PARAMETER<double> x;
-    Cmd >> x;
+    x.obsolete_parse(Cmd);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::log(x));
   }
@@ -458,7 +458,7 @@ public:
   }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     PARAMETER<double> x;
-    Cmd >> x;
+    x.obsolete_parse(Cmd);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::log1p(x));
   }
@@ -499,8 +499,10 @@ public:
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {untested();
     trace1("pow", Cmd.tail());
     PARAMETER<double> x, y;
-    Cmd >> x >> y;
+    x.obsolete_parse(Cmd);
+    y.obsolete_parse(Cmd);
     x.e_val(NOT_INPUT, Scope);
+    y.e_val(NOT_INPUT, Scope);
     return to_string(std::pow(x, y));
   }
   double evalf(double const* x)const override {
@@ -550,7 +552,7 @@ public:
   }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { itested();
     PARAMETER<double> x;
-    Cmd >> x;
+    x.obsolete_parse(Cmd);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::sin(x));
   }
@@ -577,7 +579,7 @@ public:
   }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { itested();
     PARAMETER<double> x;
-    Cmd >> x;
+    x.obsolete_parse(Cmd);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::sinh(x));
   }
@@ -605,7 +607,7 @@ public:
   }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { itested();
     PARAMETER<double> x;
-    Cmd >> x;
+    x.obsolete_parse(Cmd);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::sqrt(x));
   }
@@ -643,7 +645,7 @@ public:
   }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { itested();
     PARAMETER<double> x;
-    Cmd >> x;
+    x.obsolete_parse(Cmd);
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::tanh(x));
   }

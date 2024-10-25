@@ -2,14 +2,14 @@
 verilog
 
 module tln0(a, b);
-  parameter r
-  parameter c
+  parameter r;
+  parameter c;
   resistor #(.r(r)) r(a b);
   capacitor #(.c(c)) c(b, \0 );
 endmodule
 
 module tln1(a, b);
-  parameter integer length
+  parameter integer length;
   parameter r;
   parameter c;
   resistor #(.r(r)) r(a i);
@@ -35,7 +35,7 @@ paramset tln tln0
 endparamset
 
 module main(1 2);
-  parameter len=10
+  parameter len=10;
   tln #(.length(len) .c(1./len) .r(1./len)) t1(\1 , \2 );
 endmodule
 

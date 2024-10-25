@@ -1,11 +1,9 @@
+parameter length 
+                 ^ ? syntax error
 module main(1 2); 
             ^ ? invalid identifier
 module main(1 2); 
               ^ ? invalid identifier
-main #(.len(10)) m(1 3); 
-                   ^ ? invalid identifier
-main #(.len(10)) m(1 3); 
-                     ^ ? invalid identifier
 #Time       v(1)       v(2)       v(3)      
  0.         0.         0.         0.        
  498.E-9    3.129E-6   0.         0.        

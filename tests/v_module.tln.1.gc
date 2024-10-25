@@ -2,9 +2,9 @@
 verilog
 
 module tln0(a, b);
-  parameter r
-  parameter c
-  parameter l
+  parameter r;
+  parameter c;
+  parameter l;
   resistor #(.r(r)) r(a i);
   inductor #(.l(l)) l(i, b);
   capacitor #(.c(c)) c(b, \0 );
@@ -43,15 +43,15 @@ paramset tln tln0
 endparamset
 
 module main(1 2);
-parameter len=10
-parameter real r0=1
-parameter real c0=1
-parameter real l0=.1
+  parameter len=10;
+  parameter real r0=1;
+  parameter real c0=1;
+  parameter real l0=.1;
   tln #(.length(len) .c(c0/len) .r(r0/len) .l(l0/len)) t1(\1 , \2 );
 endmodule
 
 main #(.len(5)) m(\1 \2 );
-main #(.len(10)) m(1 3);
+main #(.len(10)) m(\1 \3 );
 
 spice
 .options noinsensitive

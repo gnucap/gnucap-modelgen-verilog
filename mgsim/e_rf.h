@@ -276,7 +276,7 @@ int COMMON_RF_BASE::set_param_by_name(std::string Name, std::string Value)
     cmd >> idx;
     if(idx < 0){ untested();
       throw Exception_No_Match(Name);
-    }else if(cmd.more()){ untested();
+    }else if(cmd.more()){
       throw Exception_No_Match(Name);
     }else if(is_rp() || den_is_p()){ untested();
       throw Exception_No_Match(Name);
@@ -291,7 +291,7 @@ int COMMON_RF_BASE::set_param_by_name(std::string Name, std::string Value)
 
     if(idx < 0){ untested();
       throw Exception_No_Match(Name);
-    }else if(cmd.more()){ untested();
+    }else if(cmd.more()){
       throw Exception_No_Match(Name);
     }else if(is_rp() || num_is_z()){ untested();
       throw Exception_No_Match(Name);

@@ -3,7 +3,7 @@ options trace
 verilog
 
 paramset res nonexistant;
-  parameter R
+  parameter R;
  .r=R+1k;
 endparamset
 
@@ -12,7 +12,7 @@ vsource #(1.) v(\3 ,\1 );
 res #(.R(201)) R1(\3 ,\1 );
 endmodule
 
-main m(\0 ,1,2,4);
+main m(\0 , \1 , \2 , \4 );
 
 list
 

@@ -1,14 +1,14 @@
 verilog
 
 paramset vs vsource
-  parameter voltage
+  parameter voltage;
 //comment
 // comment
- .dc=voltage
+ .dc=voltage;
 endparamset
 
 module main(\1 ,2);
-  parameter v
+  parameter v;
   vs #(.voltage(v)) v1(1 2)
 endmodule
 

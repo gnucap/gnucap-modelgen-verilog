@@ -17,7 +17,7 @@ module tln0(a, b);
 endmodule
 
 module tln1(a, b);
-  parameter integer count
+  parameter integer count;
   parameter real R;
   parameter real L;
   parameter real G;

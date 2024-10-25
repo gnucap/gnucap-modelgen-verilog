@@ -7,7 +7,6 @@ main m(\0 ,1,2,4);
 main m(\0 ,1,2,4); 
                ^ ? invalid identifier
 >>>>>paramset res resistor; 
->>>>>parameter R=.5 from (0:1]; 
 >>>>>list 
 module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
   vsource #(1.) v (3,1);

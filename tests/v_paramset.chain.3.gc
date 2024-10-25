@@ -8,8 +8,8 @@ module tln0(a, b);
 endmodule
 
 module tln1(a, b);
-  parameter length
-	parameter t1=0;
+  parameter length;
+  parameter t1=0;
   parameter R;
   resistor #(.r(R+1e-98)) r(a i);
   tln #(.length(length - 1) .r(R) ) t(i, b);

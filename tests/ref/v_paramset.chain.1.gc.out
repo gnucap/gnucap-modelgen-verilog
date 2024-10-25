@@ -1,26 +1,15 @@
 >>>>>verilog 
 >>>>>module main(\1 ,\2 , \3 , \4 ); 
->>>>>parameter v=0 
 A #(.PA(v)) v3(4,\1 ); 
                ^ ? invalid identifier
-main #(.v(v)) m0(\0 ,1,2,3); 
-                     ^ ? invalid identifier
-main #(.v(v)) m0(\0 ,1,2,3); 
-                       ^ ? invalid identifier
-main #(.v(v)) m0(\0 ,1,2,3); 
-                         ^ ? invalid identifier
 >>>>>paramset A B; 
->>>>>parameter PA; 
 >>>>>paramset B C; 
->>>>>parameter PB; 
 >>>>>paramset C D; 
->>>>>parameter PC; 
 >>>>>paramset D vsource; 
->>>>>parameter PD; 
 >>>>>param v=0 
 >>>>>list 
 module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
-  parameter v=0 
+  parameter v=0; 
   C #(.PC(1.)) v1 (2,1);
   B #(.PB(2.)) v2 (3,1);
   A #(.PA(v)) v3 (4,1);
