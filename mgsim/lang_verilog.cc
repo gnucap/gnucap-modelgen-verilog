@@ -679,6 +679,8 @@ void CMD_PARAM::parse(CS& cmd, CARD_LIST* Scope) const
 /*--------------------------------------------------------------------------*/
 void CMD_PARAM::parse_range(CS& cmd, CARD_LIST* Scope, std::string Name) const
 {
+  assert(Scope);
+  Scope->set_verilog_math();
   PARAM_LIST* pl = Scope->params();
   {
     std::string range_expr = "1";
@@ -697,16 +699,38 @@ void CMD_PARAM::parse_range(CS& cmd, CARD_LIST* Scope, std::string Name) const
       range_type = cmd.trimmed_last_match();
       std::string what;
       std::string lb, ub, uo, lo;
-      bool range = true;
+      enum { none = 0, interval = 1, set = 2 } range = none;
       if(cmd.skip1('[')){
 	lo = "<=";
+	range=interval;
       }else if(cmd.skip1('(')){
 	lo = "<";
+	range=interval;
+      }else if(cmd.peek() == '\''){
+	range=set;
       }else{ untested();
-	range = false;
       }
 
-      if(range){
+      if(range == set){
+	Expression L;
+	cmd >> L;
+	Expression LL(L, Scope); // reduce_copy.
+	if(LL.size()>2){
+	  incomplete();
+	  auto t = LL.begin();
+	  ++t;
+	  what = "!(1";
+	  std::string n = (*t)->name();
+	  while (++t != LL.end()){
+	    what += "*(" + n + "!=" + Name + ")";
+	    n = (*t)->name();
+	  }
+	  what += ")";
+	}else{
+	  incomplete();
+	}
+
+      }else if(range){
 	{
 	  Expression L;
 	  trace1("lb?", cmd.tail());
@@ -759,13 +783,13 @@ void CMD_PARAM::parse_range(CS& cmd, CARD_LIST* Scope, std::string Name) const
 	cmd >> what;
 	what = "(" + Name + "==" + what + ")";
       }
+      trace1("condition", what);
       range_expr = range_expr + what + ")";
       if(cmd.skip1(',')){ untested();
 	break;
       }else{
       }
-    }
-    //      range_expr = range_expr + "}";
+    } // from/exclude loop
 
     if (cmd.stuck(&here)) {
       incomplete();
@@ -1219,6 +1243,7 @@ class CMD_PARAMSET : public CMD {
   }
 } p1;
 DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "paramset", &p1);
+/*--------------------------------------------------------------------------*/
 class CMD_MODULE : public CMD {
   void do_it(CS& cmd, CARD_LIST* Scope)override {
     BASE_SUBCKT* new_module = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("module"));

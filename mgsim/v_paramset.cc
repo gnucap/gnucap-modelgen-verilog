@@ -292,6 +292,7 @@ bool PARAMSET::is_valid() const
 {
   assert(scope());
   assert(_parent);
+  trace1("PARAMSET::is_valid", long_label());
   if(_parent->subckt()){
     PARAM_LIST const* params = _parent->subckt()->params();
     PARAM_INSTANCE v = params->deep_lookup("_..is_valid");
@@ -481,6 +482,7 @@ void resolve_copy(CARD_LIST* t, PARAM_LIST const& p, const CARD_LIST*)
 	  E.push_back(*ii);
 	  skip1 = false;
 	}else if(dynamic_cast<Token_CONSTANT*>(*ii)
+	    && !dynamic_cast<const String*>((*ii)->data())
 	    && !dynamic_cast<const Float*>((*ii)->data())
 	    && !dynamic_cast<const Integer*>((*ii)->data())) {
 	  incomplete(); // probably;

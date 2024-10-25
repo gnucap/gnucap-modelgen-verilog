@@ -273,8 +273,9 @@ bool DEV_MODULE::is_valid() const
   assert(_parent);
   assert(_parent->subckt());
   PARAM_LIST const* params = _parent->subckt()->params();
+  trace1("DEV_MODULE::is_valid I", long_label());
   PARAM_INSTANCE v = params->deep_lookup("_..is_valid");
-  trace2("DEV_MODULE::is_valid I", long_label(), v.string());
+  trace2("DEV_MODULE::is_valid II", long_label(), v.string());
   Base const* x = v.e_val(nullptr, subckt());
   Integer c;
   Integer* res = c.assign(x);
@@ -282,7 +283,7 @@ bool DEV_MODULE::is_valid() const
     return true;
   }else{ untested();
     assert(x);
-    trace1("DEV_MODULE::is_valid I", typeid(*x).name());
+    trace1("DEV_MODULE::is_valid III", typeid(*x).name());
     int a = res->value();
     delete res;
     return a;

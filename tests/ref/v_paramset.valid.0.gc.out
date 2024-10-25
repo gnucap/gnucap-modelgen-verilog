@@ -5,12 +5,6 @@
 >>>>>(* desc="res4" *) paramset res resistor; 
 >>>>>(* desc="res5" *) paramset res resistor; 
 >>>>>module main(\1 ,\2 , \3 , \4 ); 
-main m(\0 ,1,2,4); 
-           ^ ? invalid identifier
-main m(\0 ,1,2,4); 
-             ^ ? invalid identifier
-main m(\0 ,1,2,4); 
-               ^ ? invalid identifier
 >>>>>list 
 (* desc="res1" *) paramset res resistor;
   parameter R from (1:2]; 
