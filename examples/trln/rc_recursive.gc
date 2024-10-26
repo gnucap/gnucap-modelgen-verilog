@@ -37,8 +37,8 @@ paramset tln tln0
  .C = c;
 endparamset
 
-module main(1 2);
-  tln #(.length(200), .r(2.224404), .c(2.080806f)) t1(1, 2);
+module main(\1 , \2 );
+  tln #(.length(200), .r(2.224404), .c(2.080806f)) t1(\1 , \2 );
 endmodule
 
 main #() m(nin nout);

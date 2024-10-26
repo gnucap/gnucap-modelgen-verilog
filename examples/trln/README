@@ -49,7 +49,11 @@ $ gnucap-mg-vams --cc trln0.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -sha
 $ gnucap trln_laplace.gc
 [..]
 
-== RLGC
+== RLGC line
 
-work in progress on RLGC line. need transient. see also ../tests/v_trln.0.gc.
-
+Circuit expansion of RLGC is easily represented as paramset, see
+../tests/v_trln.0.gc. Also works for coupled lines, and slightly more complex
+stuff. When using linear R, L, G, C, the resulting circuit is linear, and the
+behaviour can be modelled in the frequency domain. So laplace_* filters work
+here. Swapping in a convolution based laplace module will speed up simulation
+without invalidating the models.

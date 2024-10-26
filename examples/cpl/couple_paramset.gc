@@ -1,0 +1,130 @@
+load mgsim
+verilog
+
+options trtol 1
+
+// TODO:
+// ground node
+// "electrical"
+// non-spice mut
+// better parameterisation
+
+verilog
+
+// in0 o--L--oo--R--o out0
+//        .  ||
+//        k  GC
+//        .  ||
+// in1 o--L--oo--R--o out1
+
+module cpl0(in0, in1, gnd, out0, out1);
+//  electrical i0, i1;
+  parameter k;
+  parameter real R;
+  parameter real L;
+  parameter real G;
+  parameter real C;
+
+  resistor #(.r(R)) r(i0, out0);
+  resistor #(.r(R)) r(i1, out1);
+
+  mut #(.l(L), .k(k)) m1(in0, in1, i0, i1);
+
+  admittance #(.g(G)) g(i0, i1);
+  admittance #(.g(G)) g(i0, gnd);
+  admittance #(.g(G)) g(i1, gnd);
+
+  capacitor #(.c(C)) c(i0, i1);
+  capacitor #(.c(C)) c(i0, gnd);
+  capacitor #(.c(C)) c(i1, gnd);
+endmodule
+
+//                  j0
+// in0 o--L--oo--R--o-.....-o out0
+//        .  ||
+//        k  GC        ...
+//        .  ||
+// in1 o--L--oo--R--o-.....-o out1
+//                  j1
+module cpl1(in0, in1, gnd, out0, out1);
+//  electrical i0, i1;
+//  electrical j0, j1;
+  parameter length;
+  parameter R;
+  parameter L;
+  parameter G;
+  parameter C;
+  parameter k;
+
+  resistor #(.r(R)) r(i0, j0);
+  resistor #(.r(R)) r(i1, j0);
+
+  mut #(.l(L), .k(k)) m1(in0, in1, i0, i1);
+
+  admittance #(.g(G)) g(i0, i1);
+  admittance #(.g(G)) g(i0, gnd);
+  admittance #(.g(G)) g(i1, gnd);
+
+  capacitor #(.c(C)) c(i0, i1);
+  capacitor #(.c(C)) c(i0, gnd);
+  capacitor #(.c(C)) c(i1, gnd);
+
+  cpl #(.length(length - 1) .r(R) .l(L) .g(G) .c(C) .k(k) ) t(j0, j1, gnd, out0, out1);
+endmodule
+
+paramset cpl cpl1
+  parameter length from [2:200];
+  parameter r=0;
+  parameter c=0;
+  parameter l=0;
+  parameter g=0;
+  parameter k=0;
+ .length = length;
+ .R = r;
+ .L = l;
+ .G = g;
+ .C = c;
+ .k = k;
+endparamset
+
+paramset cpl cpl0
+  parameter length from [1:1];
+  parameter r=0;
+  parameter c=0;
+  parameter l=0;
+  parameter g=0;
+  parameter k=0;
+ .R = r;
+ .L = l;
+ .G = g;
+ .C = c;
+ .k = k;
+endparamset
+
+module main(in, out, ct );
+  cpl #(.length(200), .r(.01), .l(.1n), .g(.2u) .c(15.f) .k(.9) ) t1(in, vv , \0 , out, ct );
+  resistor #(50) r(out, \0 );
+  resistor #(50) r(ct, \0 );
+  vsource #(.dc(1)) V3(vv, \0);
+endmodule
+
+main #() m(nin, nout, ct);
+
+spice
+.options noinsensitive
+
+.subckt mut in0 in1 out0 out1
+.parameter l
+.parameter k
+L1a in0 out0 {l}
+L1b in1 out1 {l}
+K1 L1a L1b {k}
+.ends
+
+V0 nin 0 pulse(0 1.8 0p 100p 100p .5n 1n) ac 1
+
+.print tran v(nodes)
+
+.tr 2n basic > cpl.out
+
+.status notime

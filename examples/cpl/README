@@ -1,0 +1,14 @@
+== coupled transmission lines
+
+This one does not need a model compiler. Expands to a given number of dual
+RLGC links, with the coils coupled together. A transient simulation computes
+some cross talk.
+
+$ gnucap couple_paramset.gc
+
+Now plot cpl.out.
+
+== more advanced stuff
+
+with the model compiler, more advanced stuff will become fairly easy to do.
+Keywords are "generate", "laplace", and "overloading".
