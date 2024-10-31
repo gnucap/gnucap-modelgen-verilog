@@ -368,9 +368,9 @@ ConstantMinTypMaxExpression::~ConstantMinTypMaxExpression()
 {
 }
 /*--------------------------------------------------------------------------*/
-double ConstantMinTypMaxExpression::value() const
+Base const* ConstantMinTypMaxExpression::value() const
 {
-  return _e.eval();
+  return _e.value();
 }
 /*--------------------------------------------------------------------------*/
 void ConstExpression::parse(CS& file)

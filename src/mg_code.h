@@ -135,7 +135,7 @@ public:
   std::string const name()const; //  { untested();return name();}
   virtual std::string code_name()const {unreachable(); return "";}
 
-  virtual double eval()const { untested(); return ::NOT_INPUT;}
+  virtual Base const* value()const { unreachable(); return nullptr;}
   Block const* scope() const;
   TData const& deps()const { assert(_data); return *_data; }
   Variable_Decl* deep_copy(Base* owner, std::string prefix="") const;
@@ -229,7 +229,7 @@ public:
   bool empty()const;
   void parse(CS& f)override;
   void dump(std::ostream& o)const override;
-  double value() const;
+  Base const* value() const;
 };
 /*--------------------------------------------------------------------------*/
 class Sensitivities;

@@ -125,7 +125,7 @@ public:
   bool ub_is_closed()const {return _ub_is_closed;}
   ConstExpression const& lb()const {return _lb;}
   ConstExpression const& ub()const {return _ub;}
-  double eval()const override;
+  Base const* value()const override;
 };
 /*--------------------------------------------------------------------------*/
 // parameter type name = value ;

@@ -32,7 +32,7 @@ class ValueRangeSpec : public Owned_Base {
   // incomplete();
 public:
 //  virtual bool is_constant()const { untested(); return false; }
-  virtual double eval()const { return ::NOT_INPUT; }
+  virtual Base const* value()const { return nullptr; }
 };
 /*--------------------------------------------------------------------------*/
 class ValueRangeConstant : public ValueRangeSpec {
@@ -58,7 +58,7 @@ public:
   bool is_from() const{return _type == vr_FROM;}
   bool is_exclude() const{return _type == vr_EXCLUDE;}
   ValueRangeSpec const* spec() const{ return _what; }
-  double eval()const;
+  Base const* value()const;
 
   String_Arg key()const { return String_Arg("ValueRange"); }
 };
@@ -85,7 +85,7 @@ public:
   ValueRangeList const& value_range_list()const { return _value_range_list; }
   std::list<Aliasparam const*> const& aliases()const {return _aliases;}
   void resolve();
-  double eval()const override;
+  Base const* value()const override;
   ConstantMinTypMaxExpression const& default_val()const 	{return _default_val;}
 };
 /*--------------------------------------------------------------------------*/

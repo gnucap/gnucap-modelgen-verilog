@@ -550,21 +550,49 @@ DDeps::const_iterator DDeps::end() const
 /*--------------------------------------------------------------------------*/
 bool is_true(Expression const& x)
 {
-  double e = x.eval();
-  return e != NOT_INPUT && e;
+  Base const* e = x.value();
+  Integer* b = nullptr;
+  if(dynamic_cast<TData const*>(e)) {
+    return false;
+  }else if(e) {
+    vInteger a;
+    b = a.assign(e);
+  }else{
+  }
+  if(b && b->value()){
+    delete b;
+    return true;
+  }else if(b){
+    delete b;
+  }else{
+  }
+  return false;
 }
 /*--------------------------------------------------------------------------*/
 bool is_false(Expression const& x)
 {
-  double e = x.eval();
-  return e != NOT_INPUT && !e;
+  Base const* e = x.value();
+  Integer* b = nullptr;
+  if(dynamic_cast<TData const*>(e)) {
+    return false;
+  }else if(e) {
+    vInteger a;
+    b = a.assign(e);
+  }else{
+  }
+  if(b && !b->value()){
+    delete b;
+    return true;
+  }else if(b){
+    delete b;
+  }else{
+  }
+  return false;
 }
 /*--------------------------------------------------------------------------*/
 bool is_zero(Expression const& x)
 {
-  double e = x.eval();
-  trace1("is_zero", e);
-  return e == 0.;
+  return is_false(x);
 }
 /*--------------------------------------------------------------------------*/
 TData* copy_deps(Base const* b)
@@ -600,16 +628,16 @@ bool ConstExpression::operator==(ConstExpression const& o) const
   }
 }
 /*--------------------------------------------------------------------------*/
-double ValueRangeInterval::eval() const
+Base const* ValueRangeInterval::value() const
 {
   if(!lb_is_closed()){
-    return ::NOT_INPUT;
+    return nullptr;
   }else if(!ub_is_closed()){
-    return ::NOT_INPUT;
+    return nullptr;
   }else if(_ub == _lb){
-    return _ub.expression().eval();
+    return _ub.expression().value();
   }else{
-    return ::NOT_INPUT;
+    return nullptr;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -664,23 +692,23 @@ bool Parameter_2_List::is_local()const
   return _is_local;
 }
 /*--------------------------------------------------------------------------*/
-double /*?*/ Parameter_2::eval() const
+Base const* Parameter_2::value() const
 {
   if(is_local()) {
     return _default_val.value();
   }else if (value_range_list().size() == 1) {
-    return (*value_range_list().begin())->eval();
+    return (*value_range_list().begin())->value();
   }else{
-    return ::NOT_INPUT;
   }
+  return nullptr;
 }
 /*--------------------------------------------------------------------------*/
-double ValueRange::eval() const
+Base const* ValueRange::value() const
 {
   if(spec()){
-    return spec()->eval();
+    return spec()->value();
   }else{ untested();
-    return ::NOT_INPUT;
+    return nullptr;
   }
 }
 /*--------------------------------------------------------------------------*/

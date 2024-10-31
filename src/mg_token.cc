@@ -835,12 +835,9 @@ bool Token_ACCESS::is_short() const
 void Token_PAR_REF::stack_op(Expression* e)const
 {
   assert(_item);
-  double ev = _item->eval();
-  trace2("stack_op PAR_REF", name(), ev);
-  if(ev!=::NOT_INPUT) {
-    Float* f = new Float(ev);
-    // e->push_back(new Token_CONSTANT(name(), f, ""));
-    e->push_back(new Token_PAR_REF(*this, f));
+  Base const* ev = _item->value();
+  if(ev) {
+    e->push_back(new Token_PAR_REF(*this, ev->clone()));
   }else{
     e->push_back(new Token_PAR_REF(*this, NULL/*TODO*/));
   }
