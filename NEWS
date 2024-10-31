@@ -2,12 +2,14 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
-202411**
+20241031-dev
 ============
 * expm1, logp1
 * adjust port names and syntax
 * string parameter range
+* add coupled line example
 * verilog style integer arithmetics
+* clarify license situation
 
 20241002-dev
 ============

@@ -104,3 +104,8 @@ modelgen with "-I/path/to/non-free/stuff".
 == LICENSE
 
 All code in this package is licensed under GPL 3 or any later version.
+
+Any modelgen-verilog output is subject to the same license as the input. In
+addition, binaries compiled from unmodified modelgen-verilog output against
+unmodified Gnucap headers using unmodified gcc are subject to the license(s)
+of the Verilog input used only.

@@ -469,7 +469,7 @@ public:
     o__ "template<class T>\n";
     o__ "T " << code_name() << "(T d)const {\n";
     o____ "double l=-1e99;\n";
-    o____ "if(d>-1.) { untested();\n";
+    o____ "if(d>-1.) {\n";
     o______ "l = std::log1p(double(d));\n";
     o______ "chain(d, 1./double(1.+d));\n";
     o____ "}else{\n";
