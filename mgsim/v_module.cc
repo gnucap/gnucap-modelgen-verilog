@@ -345,11 +345,8 @@ int DEV_MODULE::set_param_by_name(std::string Name, std::string Value)
   assert(_parent);
   assert(_parent->subckt());
 
-  if (Umatch(Name, "$mfactor ")) {
-//    m->set_param_by_name("$mfactor", "");
-    int x = BASE_SUBCKT::set_param_by_name("$mfactor", Value);
-    trace2("DEV_MODULE::spbn", long_label(), Value);
-    return x;
+  if (Name[0] == '$'){
+    return BASE_SUBCKT::set_param_by_name(Name, Value);
   }else if(_parent==&pp) { untested();
     // spice.
     trace2("spice spbn", Name, Value);
