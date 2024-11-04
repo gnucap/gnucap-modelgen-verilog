@@ -359,7 +359,6 @@ int PARAMSET::set_param_by_name(std::string Name, std::string Value)
 COMPONENT const* PARAMSET::prepare_dev(CARD const* proto)
 {
   auto dev = prechecked_cast<COMPONENT const*>(proto);
-  assert(dev);
 
 #if 0
   // this does not work, proto could be a paramset.
@@ -374,6 +373,12 @@ COMPONENT const* PARAMSET::prepare_dev(CARD const* proto)
     dev->set_port_by_index(i, pn);
   }
 #endif
+
+  if(dev){
+  }else if(auto m = dynamic_cast<MODEL_CARD const*>(proto)) {
+    dev = prechecked_cast<COMPONENT const*>(m->component_proto());
+    assert(dev);
+  }
   return dev;
 }
 /*--------------------------------------------------------------------------*/

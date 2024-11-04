@@ -276,7 +276,7 @@ private:
     o__________ "return false;\n";
     o________ "}else if(period) {\n";
     o__________ "set_event(d, period, " << tol() << ");\n";
-    o________ "}else{ untested();\n";
+    o________ "}else{\n";
     o________ "}\n";
     o________ "return true;\n";
     o______ "}else if(_sim->_time0 <= _previous_evt + " << accept_tol() << ") {\n";

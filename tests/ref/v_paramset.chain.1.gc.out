@@ -3,6 +3,8 @@
 A #(.PA(v)) v3(4,\1 ); 
                ^ ? invalid identifier
 >>>>>paramset A B; 
+paramset A B; 
+         ^ ? unknown proto. will retry later.
 >>>>>paramset B C; 
 >>>>>paramset C D; 
 >>>>>paramset D vsource; 

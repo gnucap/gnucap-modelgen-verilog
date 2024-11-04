@@ -1,5 +1,7 @@
 >>>>>verilog 
 >>>>>paramset res nonexistant; 
+paramset res nonexistant; 
+         ^ ? unknown proto. will retry later.
 >>>>>module main(\1 ,\2 , \3 , \4 ); 
 >>>>>list 
 no match: nonexistant

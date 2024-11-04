@@ -78,31 +78,26 @@ public: // override virtual, called by commands
   DEV_COMMENT*	parse_comment(CS&, DEV_COMMENT*)override;
   DEV_DOT*	parse_command(CS&, DEV_DOT*)override;
   CARD*		parse_paramset(CS&, CARD*) /* override */;
+  MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*)override;
   COMPONENT*	parse_paramset_(CS&, BASE_SUBCKT*);
   CARD*		obsolete_parse_modelcard(CS&, MODEL_CARD*);
   BASE_SUBCKT*  parse_module(CS&, BASE_SUBCKT*)override;
   COMPONENT*	parse_instance(CS&, COMPONENT*)override;
   std::string	find_type_in_string(CS&)override;
+  void move_attributes(tag_t from, tag_t to);
 private: // local
   void skip_attributes(CS& cmd);
   std::string  parse_attributes(CS& cmd);
   void store_attributes(std::string attrib_string, tag_t x);
   CS& parse_attributes(CS& cmd, tag_t x);
-  void move_attributes(tag_t from, tag_t to);
   void parse_type(CS& cmd, CARD* x);
   void parse_args_paramset(CS& cmd, /* MODEL_*/ CARD* x);
   void parse_args_instance(CS& cmd, CARD* x);
   void parse_label(CS& cmd, CARD* x);
   void parse_ports(CS& cmd, COMPONENT* x, bool all_new);
 
-private: // TODO, transition, stale pure virtuals...
-  MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*)override
-  { untested(); incomplete(); unreachable(); return NULL; }
-  void print_paramset(OMSTREAM&, const MODEL_CARD*)override
-  { untested(); incomplete(); unreachable(); }
-
 private: // override virtual, called by print_item
-  void print_paramset(OMSTREAM&, const CARD*) /* override */;
+  void print_paramset(OMSTREAM&, const MODEL_CARD*)override;
   void print_module(OMSTREAM&, const BASE_SUBCKT*)override;
   void print_instance(OMSTREAM&, const COMPONENT*)override;
   void print_comment(OMSTREAM&, const DEV_COMMENT*)override;
@@ -113,7 +108,7 @@ private: // local
   void print_args(OMSTREAM&, const COMPONENT*);
   template<class T>
   void print_args_paramset(OMSTREAM&, const T*);
-  void print_items_sckt(OMSTREAM&, const BASE_SUBCKT*);
+  void print_items_sckt(OMSTREAM&, const COMPONENT*);
   void print_type(OMSTREAM& o, const COMPONENT* x);
   void print_label(OMSTREAM& o, const COMPONENT* x);
   void print_ports_long(OMSTREAM& o, const COMPONENT* x);
@@ -431,7 +426,7 @@ DEV_DOT* LANG_VERILOG::parse_command(CS& cmd, DEV_DOT* x)
 //  parse_attributes(cmd, tag_t(x));
   trace1("cmdproc", cmd.tail());
   CMD::cmdproc(cmd, scope);
-  delete x;
+  delete x; // push back if s()?
   return NULL;
 }
 /*--------------------------------------------------------------------------*/
@@ -441,8 +436,9 @@ DEV_DOT* LANG_VERILOG::parse_command(CS& cmd, DEV_DOT* x)
  *  "endparamset"
  */
 CARD* LANG_VERILOG::parse_paramset(CS& cmd, CARD* x)
-{
-  if(auto c = dynamic_cast<BASE_SUBCKT*>(x)) {
+{ untested();
+  if(auto c = dynamic_cast<BASE_SUBCKT*>(x)) { untested();
+    incomplete();
     return parse_paramset_(cmd, c);
   }else if(auto m = dynamic_cast<MODEL_CARD*>(x)) { untested();
     //BUG// no paramset_item_declaration, falls back to spice mode
@@ -456,6 +452,8 @@ CARD* LANG_VERILOG::parse_paramset(CS& cmd, CARD* x)
 CARD* LANG_VERILOG::obsolete_parse_modelcard(CS& cmd, MODEL_CARD* x)
 { untested();
   assert(x);
+  trace1("obsolete_parse_modelcard", cmd.fullstring());
+  trace1("obsolete_parse_modelcard", cmd.tail());
   cmd.reset();
   cmd >> "paramset ";
   parse_label(cmd, x);
@@ -656,14 +654,14 @@ void CMD_PARAM::parse(CS& cmd, CARD_LIST* Scope) const
     if(cmd >> ';') {
       assert(cmd);
       break;
-    }else if(cmd >> ',') {
+    }else if(cmd >> ',') { untested();
     }else{
       parse_range(cmd, Scope, Name);
     }
 
     if(cmd >> ';') {
       break;
-    }else if(cmd >> ',') {
+    }else if(cmd >> ',') { untested();
     }
 
     if (cmd.stuck(&here)) { untested();
@@ -726,7 +724,7 @@ void CMD_PARAM::parse_range(CS& cmd, CARD_LIST* Scope, std::string Name) const
 	    n = (*t)->name();
 	  }
 	  what += ")";
-	}else{
+	}else{ untested();
 	  incomplete();
 	}
 
@@ -747,7 +745,7 @@ void CMD_PARAM::parse_range(CS& cmd, CARD_LIST* Scope, std::string Name) const
 	  }else if(auto ff = dynamic_cast<Float const*>(lb_)){
 	    incomplete();
 	    lb = to_string(ff->value());
-	  }else{
+	  }else{ untested();
 	    incomplete();
 	  }
 	}
@@ -766,7 +764,7 @@ void CMD_PARAM::parse_range(CS& cmd, CARD_LIST* Scope, std::string Name) const
 	    ub = to_string(ii->value());
 	  }else if(auto ff = dynamic_cast<Float const*>(ub_)){
 	    ub = to_string(ff->value());
-	  }else{
+	  }else{ untested();
 	    incomplete();
 	  }
 	}
@@ -827,7 +825,7 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
   trace1("parse_paramset_", cmd.fullstring());
   trace1("parse_paramset_", cmd.tail());
 
-  move_attributes(tag_t(&cmd), tag_t(x));
+ // move_attributes(tag_t(&cmd), tag_t(x));
   cmd >> "paramset ";
   parse_label(cmd, x);
   parse_type(cmd, x);
@@ -964,6 +962,7 @@ std::string LANG_VERILOG::find_type_in_string(CS& cmd)
     cmd >> type;
   }
   cmd.reset(here); // where the type is.
+  trace1("ftis", type);
   return type;
 }
 /*--------------------------------------------------------------------------*/
@@ -1117,8 +1116,9 @@ void LANG_VERILOG::print_ports_short(OMSTREAM& o, const COMPONENT* x)
 #endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-void LANG_VERILOG::print_items_sckt(OMSTREAM& o, const BASE_SUBCKT* x)
+void LANG_VERILOG::print_items_sckt(OMSTREAM& o, const COMPONENT* x)
 {
+  assert(dynamic_cast<BASE_SUBCKT const*>(x));
   for (CARD_LIST::const_iterator
       ci = x->subckt()->begin(); ci != x->subckt()->end(); ++ci) {
     o << "  ";
@@ -1126,33 +1126,88 @@ void LANG_VERILOG::print_items_sckt(OMSTREAM& o, const BASE_SUBCKT* x)
   }
 }
 /*--------------------------------------------------------------------------*/
-void LANG_VERILOG::print_paramset(OMSTREAM& o, const CARD* c)
+class PARAMSET_MODEL : public MODEL_CARD {
+  explicit PARAMSET_MODEL() : MODEL_CARD(NULL) {untested();}
+  COMPONENT* _p{NULL};
+public:
+  explicit PARAMSET_MODEL(COMPONENT* c) : MODEL_CARD(c) {
+    _p = c;
+    assert(c);
+    // set_label("paramset");
+    set_label(c->short_label());
+  }
+
+  PARAMSET_MODEL* clone()const override {
+    assert(component_proto());
+    CARD* c = component_proto()->clone();
+    auto* p = prechecked_cast<COMPONENT*>(c);
+    assert(p);
+
+    return new PARAMSET_MODEL(p);
+  }
+  CARD* clone_instance()const override {
+    return component_proto()->clone_instance();
+  }
+
+  int param_count()const override {
+    return component_proto()->param_count();
+  }
+  std::string param_name(int i)const override {
+    return component_proto()->param_name(i);
+  }
+  std::string param_name(int i, int j)const override { untested();
+    return component_proto()->param_name(i, j);
+  }
+  void precalc_first()override {
+    return _p->precalc_first();
+  }
+private:
+  std::string dev_type()const override { return component_proto()->dev_type(); }
+};
+/*--------------------------------------------------------------------------*/
+MODEL_CARD* LANG_VERILOG::parse_paramset(CS&, MODEL_CARD* m)
+{ untested();
+  if(auto p = dynamic_cast<PARAMSET_MODEL*>(m)) { untested();
+    assert(m->component_proto());
+
+
+
+  }else{ untested();
+    unreachable();
+    incomplete();
+  }
+  return m;
+}
+/*--------------------------------------------------------------------------*/
+void LANG_VERILOG::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
 {
-  if(auto x = dynamic_cast<MODEL_CARD const*>(c)){ untested();
+  print_attributes(o, tag_t(x));
+
+  if(dynamic_cast<PARAMSET_MODEL const*>(x)) { // } ->short_label() == "paramset") { untested();
+    COMPONENT const* bs = prechecked_cast<COMPONENT const*>(x->component_proto());
+    print_attributes(o, tag_t(bs)); // ?
+    o << "paramset " << bs->short_label() << ' ' << x->dev_type() << ";\n";
+    print_items_sckt(o, bs);
+    print_args_paramset(o, bs);
+    o << "\nendparamset\n\n";
+  }else{ untested();
+    // spice fallback
     _mode = mPARAMSET;
-    print_attributes(o, tag_t(x));
     o << "paramset " << x->short_label() << ' ' << x->dev_type() << ";\n";
     print_args(o, x);
     o << "\n"
       "endparamset\n\n";
     _mode = mDEFAULT;
-  }else if(auto bs = dynamic_cast<BASE_SUBCKT const*>(c)){
-    print_attributes(o, tag_t(bs));
-    o << "paramset " << bs->short_label() << ' ' << c->dev_type() << ";\n";
-    print_items_sckt(o, bs);
-    print_args_paramset(o, bs);
-    o << "\nendparamset\n\n";
-  }else{ untested();
-    incomplete();
   }
 }
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
 {
 
-  if(((CARD const*)x)->dev_type()!=""){
+  if(((CARD const*)x)->dev_type()!=""){ untested();
+    unreachable();
     // tmp hack. module type is the label, so dev_type is blank.
-    return print_paramset(o, x);
+   // return print_paramset(o, x);
   }else{
   }
   assert(x);
@@ -1180,9 +1235,10 @@ void LANG_VERILOG::print_instance(OMSTREAM& o, const COMPONENT* x)
     print_ports_long(o, x);
     o << ";\n";
   }else{ untested();
-    _mode = mPARAMSET;
-    print_paramset(o, x);
-    _mode = mDEFAULT;
+    incomplete();
+   // _mode = mPARAMSET;
+   // print_paramset(o, x);
+   // _mode = mDEFAULT;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1218,28 +1274,23 @@ class CMD_PARAMSET : public CMD {
     const CARD* proto = OPT::language->find_proto(base_name, NULL);
     CARD* paramset = NULL;
 
-    if(auto model=dynamic_cast<MODEL_CARD const*>(proto)){ untested();
-      trace1("CMD_PARAMSET::do_it MODEL_CARD", base_name);
-      // Spice compatibility mode. fix later.
-      // // BUG also hits paramset //
-
-      paramset = model->clone();
-      auto mc = prechecked_cast<MODEL_CARD*>(paramset);
-      assert(mc);
-      OPT::language->parse_paramset(cmd, mc);
+    if(!proto){
+      // 6.4 Paramsets: second identifier will be [..] module".
+      //                "will", maybe at a later stage?
+      cmd.warn(bPICKY, here, "unknown proto. will retry later.");
     }else{
-      paramset = device_dispatcher.clone("paramset");
-      assert(paramset);
-      auto dev = prechecked_cast<BASE_SUBCKT*>(paramset);
-      assert(dev);
-      //assert(dev->scope());
-
-      // OPT::language->parse_paramset(cmd, dev);
-      cmd.reset(here); // really?
-      lang_verilog.parse_paramset(cmd, dev);
     }
+
+    paramset = device_dispatcher.clone("paramset");
+    auto dev = prechecked_cast<BASE_SUBCKT*>(paramset);
+    assert(dev);
+    cmd.reset(here);
+    lang_verilog.parse_paramset_(cmd, dev);
     trace3("CMD_PARAMSET", paramset->long_label(), paramset->dev_type(), paramset);
-    Scope->push_back(paramset);
+    auto m = new PARAMSET_MODEL(dev);
+    lang_verilog.move_attributes(tag_t(&cmd), tag_t(m));
+    Scope->push_back(m);
+
   }
 } p1;
 DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "paramset", &p1);

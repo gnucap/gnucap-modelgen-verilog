@@ -3,10 +3,10 @@ options trace
 verilog
 
 module main(\1 ,\2 , \3 , \4 );
-parameter v=0;
-C #(.PC(1.)) v1(\2 ,\1 );
-B #(.PB(2.)) v2(\3 ,\1 );
-A #(.PA(v)) v3(4,\1 );
+  parameter v=0;
+  C #(.PC(1.)) v1(\2 ,\1 );
+  B #(.PB(2.)) v2(\3 ,\1 );
+  A #(.PA(v)) v3(4,\1 );
 endmodule
 
 main #(.v(v)) m0(\0 , \1 , \2 , \3 );
