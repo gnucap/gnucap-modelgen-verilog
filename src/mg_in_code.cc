@@ -31,18 +31,6 @@ bool Statement::set_used_in(Base const* b)
   return _rdeps.insert(b).second;
 }
 /*--------------------------------------------------------------------------*/
-bool Statement::is_used_in(Base const* b) const
-{
-  // "used in vs rdeps?"
-  for(auto const& i : rdeps()){
-    if(i == b){
-      return true;
-    }else{
-    }
-  }
-  return false;
-}
-/*--------------------------------------------------------------------------*/
 bool Statement::update()
 {
   trace2("Statement::update nop", typeid(*this).name(), _rdeps.size());
@@ -97,23 +85,6 @@ bool Statement::propagate_rdep(Base const* b)
     unreachable();
   }
   return new_dep;
-}
-/*--------------------------------------------------------------------------*/
-bool Statement::propagate_rdeps(RDeps const& r)
-{
-  trace2("Statement::propagate_rdeps", typeid(*this).name(), r.size());
-  assert(owner());
-  auto s = prechecked_cast<Statement*>(owner_());
-  assert(s);
-  bool ret = false;
-  for(auto n : r) {
-    auto p = _rdeps.insert(n);
-    if(p.second){
-      ret = s->propagate_rdep(*p.first);
-    }else{
-    }
-  }
-  return ret;
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Stmt::parse(CS& f)

@@ -631,12 +631,6 @@ void Token_CALL::stack_op(Expression* e) const
   }
 }
 /*--------------------------------------------------------------------------*/
-Token_CALL::~Token_CALL()
-{
-  detach();
-  delete _args;
-}
-/*--------------------------------------------------------------------------*/
 // BUG
 static Module* to_module(Block* owner)
 {

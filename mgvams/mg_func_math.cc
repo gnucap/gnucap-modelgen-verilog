@@ -29,18 +29,12 @@
 #include <globals.h>
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/
-// void Token_CALL::stack_op(Expression* e)const{ untested();
-//   assert(0);
-// }
-// /*--------------------------------------------------------------------------*/
-// inline Token* MGVAMS_FUNCTION::new_token(Module& m, size_t na) const
-// { untested();
-//      incomplete();
-//      return NULL;
-// }
-//MGVAMS_FUNCTION::~MGVAMS_FUNCTION()
-//{ unreachable();
-//}
+bool Statement::propagate_rdep(Base const* b)
+{
+  unreachable();
+  incomplete();
+  return false;
+}
 /*--------------------------------------------------------------------------*/
 namespace{
 #if 1

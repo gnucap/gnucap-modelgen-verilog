@@ -1053,11 +1053,6 @@ void Circuit::push_back(Filter /*const?*/ * f)
   _filters.push_back(f);
 }
 /*--------------------------------------------------------------------------*/
-void Module::install(FUNCTION_ const* f)
-{
-  _funcs.insert(f);
-}
-/*--------------------------------------------------------------------------*/
 void Module::push_back(FUNCTION_* f)
 {
   _func.push_back(f);

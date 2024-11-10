@@ -259,7 +259,7 @@ public:
   void push_back(Filter /*const*/ * f);
   void push_back(Token* x);
   void push_back(Base* x);
-  void install(FUNCTION_ const* f);
+  void install(FUNCTION_ const* f) { _funcs.insert(f); }
  // std::list<FUNCTION_*> const& func()const { untested();return _func;}
   pSet<FUNCTION_ const> const& funcs()const {return _funcs;}
 private: // misc

@@ -50,7 +50,11 @@ private:
 public:
   explicit Token_CALL(const std::string Name, FUNCTION_ const* f, Expression const* e=NULL)
     : Token_SYMBOL(Name, ""), _function(f), _args(e) { attach(); }
-  ~Token_CALL();
+  ~Token_CALL() {
+    detach();
+    delete _args;
+  }
+
 protected:
   explicit Token_CALL(const Token_CALL& P)
     : Token_SYMBOL(P.name(), ""), _function(P._function), _num_args(P._num_args) { attach(); }

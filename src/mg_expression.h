@@ -57,7 +57,7 @@ class Expression_ : public Expression {
   Block* _scope{NULL}; // remove. later.
 public:
   explicit Expression_() : Expression() {}
-  ~Expression_();
+  ~Expression_() {}
   void resolve_symbols(Expression const& e);
   void set_owner(Base* b);
 //  void set_scope(Block* b){ untested(); _scope = b; }
@@ -69,7 +69,7 @@ public:
   Block const* scope()const { return const_cast<Expression_*>(this)->scope(); }
 public:
   void clear();
-  Expression_* clone() const;
+  Expression_* clone()const;
   TData const& data()const; // hmm
 //  TData const& deps()const{ untested();return data();}
   // Attrib const& attrib()const;
@@ -86,6 +86,18 @@ private: // all the same eventually?
   Token* resolve_system_task(FUNCTION_ const* t);
   Probe const* new_probe(std::string const& xs, Branch_Ref const& br);
 }; // Expression_
+/*--------------------------------------------------------------------------*/
+inline Expression_* Expression_::clone() const
+{
+  Expression_* n = new Expression_;
+  n->set_owner(_owner);
+
+  for (Expression::const_iterator i = begin(); i != end(); ++i) {
+    // n->push_back((*i)->clone()); // BUG
+    (*i)->stack_op(n);
+  }
+  return n;
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

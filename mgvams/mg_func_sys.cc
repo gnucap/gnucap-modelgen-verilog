@@ -29,6 +29,15 @@
 #include <globals.h>
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/
+bool Statement::propagate_rdep(Base const* b)
+{
+  unreachable();
+  incomplete();
+  return false;
+}
+/*--------------------------------------------------------------------------*/
+// namespace?
+/*--------------------------------------------------------------------------*/
 // inline Token* MGVAMS_FUNCTION::new_token(Module& m, size_t na) const
 // { untested();
 //      incomplete();

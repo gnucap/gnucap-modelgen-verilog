@@ -26,8 +26,46 @@
 #include "mg_out.h"
 #include "mg_analog.h"
 #include "mg_token.h"
+#include "mg_code.h"
 #include <globals.h>
 #include <u_parameter.h>
+/*--------------------------------------------------------------------------*/
+void Expression_::set_owner(Base* o)
+{
+	// _scope = b;
+  if(auto s = dynamic_cast<Statement*>(o)){ untested();
+    _owner = s;
+    _scope = s->scope();
+  }else{
+	_owner = o;
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool Statement::propagate_rdep(Base const* b)
+{
+  bool new_dep = _rdeps.insert(b).second;
+  Base* o = owner_();
+  if(!new_dep){
+  }else if(auto s = dynamic_cast<Statement*>(o)){
+    s->propagate_rdep(b);
+ // }else if(dynamic_cast<Module*>(o)){
+ // }else if(is_file(o)) {
+  }else{ untested();
+    unreachable();
+  }
+  return new_dep;
+}
+/*--------------------------------------------------------------------------*/
+void Expression_::dump(std::ostream& o) const
+{
+	Expression::dump(o);
+}
+/*--------------------------------------------------------------------------*/
+void Token_CALL::stack_op(Expression*) const
+{
+  unreachable();
+  incomplete();
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 namespace {
@@ -70,12 +108,12 @@ private:
     return "d->PORT_FLOW";
   }
   void make_cc_dev(std::ostream& o)const override {
-    o__ "double PORT_FLOW(int i){\n";
-	 o____ "return va::PORT_FLOW(i, this);\n";
-	 o__ "}\n";
-    o__ "double PORT_FLOW__precalc(int)const {\n";
-	 o____ "return 0.;\n";
-	 o__ "}\n";
+    o << "  " <<  "double PORT_FLOW(int i){\n";
+	 o << "  " <<  "  return va::PORT_FLOW(i, this);\n";
+	 o << "  " <<  "}\n";
+    o << "  " <<  "double PORT_FLOW__precalc(int)const {\n";
+	 o << "  " <<  "  return 0.;\n";
+	 o << "  " <<  "}\n";
   }
 #if 0
   void make_cc_common(std::ostream& o)const override { untested();

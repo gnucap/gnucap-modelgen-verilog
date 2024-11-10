@@ -273,6 +273,35 @@ public:
   //bool propagate_rdeps(RDeps const&);
 }; // SeqBlock
 /*--------------------------------------------------------------------------*/
+inline bool Statement::propagate_rdeps(RDeps const& r)
+{
+  trace2("Statement::propagate_rdeps", typeid(*this).name(), r.size());
+  assert(owner());
+  auto s = prechecked_cast<Statement*>(owner_());
+  assert(s);
+  bool ret = false;
+  for(auto n : r) {
+    auto p = _rdeps.insert(n);
+    if(p.second){
+      ret = s->propagate_rdep(*p.first);
+    }else{
+    }
+  }
+  return ret;
+}
+/*--------------------------------------------------------------------------*/
+inline bool Statement::is_used_in(Base const* b) const
+{
+  // "used in vs rdeps?"
+  for(auto const& i : rdeps()){
+    if(i == b){
+      return true;
+    }else{
+    }
+  }
+  return false;
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

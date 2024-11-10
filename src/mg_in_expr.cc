@@ -38,19 +38,6 @@ void Expression_::clear()
   }
 }
 /*--------------------------------------------------------------------------*/
-Expression_* Expression_::clone() const
-{
-  Expression_* n = new Expression_;
-  n->set_owner(_owner);
-
-  for (Expression::const_iterator i = begin(); i != end(); ++i) {
-    // n->push_back((*i)->clone()); // BUG
-    (*i)->stack_op(n);
-  }
-
-  return n;
-}
-/*--------------------------------------------------------------------------*/
 static Token* resolve_function(FUNCTION_ const* f, Expression const* e, Block* owner)
 {
   assert(f);
@@ -470,10 +457,6 @@ bool Expression_::is_constant() const
   }else{
     return data().is_constant();
   }
-}
-/*--------------------------------------------------------------------------*/
-Expression_::~Expression_()
-{
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
