@@ -253,7 +253,7 @@ protected:
     o______ "}else if(dir==1) {\n";
     o________ "return _state[0] == _ON;\n";
     o______ "}else if(dir==-1) {\n";
-    o________ "return !_state[0] == _OFF;\n";
+    o________ "return _state[0] == _OFF;\n";
     o______ "}else{\n";
     o________ "return false;\n";
     o______ "}\n";
