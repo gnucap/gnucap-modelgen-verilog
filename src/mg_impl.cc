@@ -84,7 +84,7 @@ Branch_Ref Branch_Map::new_branch(Node_Ref a, Node_Ref b)
   }
 }
 /*--------------------------------------------------------------------------*/
-Branch_Ref Module::new_branch(Node* p, Node* n = NULL)
+Branch_Ref Module::new_branch(Node* p, Node* n = nullptr)
 {
   assert(_circuit);
   Branch_Ref br = _circuit->branches().new_branch(p, n);
@@ -185,7 +185,7 @@ Node_Ref Module::node(std::string const& p) const
     assert(_circuit);
     return _circuit->nodes()[p];
   }catch(Exception const&){
-    return NULL;
+    return nullptr;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -210,7 +210,7 @@ Filter::Filter(std::string const& name)
 Filter::~Filter()
 {
   delete _deps;
-  _deps = NULL;
+  _deps = nullptr;
 }
 /*--------------------------------------------------------------------------*/
 std::string Filter::code_name()const
@@ -244,7 +244,7 @@ Discipline const* Branch::discipline() const
   }else{itested();
     incomplete(); // no default.
     // Make sure to specify some discipline for now.
-    return NULL;
+    return nullptr;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -252,7 +252,7 @@ Discipline const* Branch::discipline() const
 Nature const* Branch::nature() const
 { untested();
 //  source?
-  return NULL;
+  return nullptr;
 }
 /*--------------------------------------------------------------------------*/
 void Node::set_to(Node* p)
@@ -308,7 +308,7 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args)
 {
   auto f = prechecked_cast<FUNCTION_ const*>(f_);
   assert(f);
-  Token* t = NULL;
+  Token* t = nullptr;
 
 
   if(f->has_tr_review()){
@@ -412,7 +412,7 @@ Block* Block::scope() const
     // incomplete?
     return b;
   }else{
-    return NULL;
+    return nullptr;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -424,12 +424,12 @@ Block* Block::scope()
     // incomplete?
     return b;
   }else if(dynamic_cast<File const*>(_owner)){ untested();
-    return NULL;
+    return nullptr;
   }else if(!_owner){
-    return NULL;
+    return nullptr;
   }else{ untested();
     assert(0);
-    return NULL;
+    return nullptr;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -472,7 +472,7 @@ Base* Block::lookup(std::string const& k, bool recurse)
     return f->second;
   }else if(!recurse) {
 //    assert(dynamic_cast<Module const*>(this) || dynamic_cast<AnalogFunction const*>(this));
-    return NULL;
+    return nullptr;
   }else if(k[0] == '<'){
     if(auto m = dynamic_cast<Module*>(this)){
       std::string portname = k.substr(1, k.size()-2);
@@ -490,7 +490,7 @@ Base* Block::lookup(std::string const& k, bool recurse)
   }else{ untested();
     assert(dynamic_cast<File const*>(this));
   }
-  return NULL;
+  return nullptr;
 }
 /*--------------------------------------------------------------------------*/
 void Block::clear_vars()
@@ -606,7 +606,7 @@ TData* copy_deps(Base const* b)
     unreachable();
     assert(0);
   }
-  return NULL;
+  return nullptr;
 }
 /*--------------------------------------------------------------------------*/
 // bool ValueRangeSpec::is_constant() const
@@ -745,7 +745,7 @@ void Branch_Map::clear()
   }
   for(auto& x : _m){
     delete x.second;
-//      x = NULL;
+//      x = nullptr;
   }
   _m.clear();
   _brs.clear();

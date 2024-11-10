@@ -98,7 +98,7 @@ void MGVAMS_FILTER::setup(Module* m)
     bool always = false;
     bool output_var = false;
     bool rdeps_ = false;
-    Contribution const* cont = NULL;
+    Contribution const* cont = nullptr;
     trace1("filter used_in?", branch()->used_in().size());
 
     // use rdeps, not used_in....?
@@ -154,7 +154,7 @@ void MGVAMS_FILTER::setup(Module* m)
     // }
 
     trace4("filter use?", c_cnt, rdeps_, assigned, branch()->code_name());
-    _output = NULL;
+    _output = nullptr;
     if(output_var){
       // can't optimise out if there is both
       // single contribution and output var...

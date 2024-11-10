@@ -5,9 +5,9 @@
 // TODO: merge into Element_2?
 class Filter : public Element_2 {
   std::string _name; // BUG?
-  TData* _deps{NULL};
+  TData* _deps{nullptr};
   Branch_Ref _branch;
-  Probe const* _prb=NULL;
+  Probe const* _prb=nullptr;
   int _num_states{0};
 public:
   explicit Filter(std::string const& name);

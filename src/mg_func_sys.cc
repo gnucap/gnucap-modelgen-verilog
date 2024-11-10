@@ -69,7 +69,7 @@ DISPATCHER<FUNCTION>::INSTALL d_analysis(&function_dispatcher, "analysis", &anal
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class MFACTOR : public FUNCTION_ {
-  mutable Module const* _m{NULL};
+  mutable Module const* _m{nullptr};
 public:
   explicit MFACTOR() : FUNCTION_() {
     set_label("mfactor");
@@ -177,16 +177,16 @@ DISPATCHER<FUNCTION>::INSTALL d_vt(&function_dispatcher, "$vt", &vt);
 /*--------------------------------------------------------------------------*/
 class Token_PG : public Token_CALL {
 public:
-  explicit Token_PG(const std::string Name, FUNCTION_ const* f = NULL)
+  explicit Token_PG(const std::string Name, FUNCTION_ const* f = nullptr)
     : Token_CALL(Name, f) {}
 private:
-  explicit Token_PG(const Token_PG& P, Base const* data=NULL)
+  explicit Token_PG(const Token_PG& P, Base const* data=nullptr)
     : Token_CALL(P, data) { untested();}
   Token* clone()const override { untested();
     return new Token_PG(*this);
   }
   void stack_op(Expression* e)const override{
-    Token const* arg=NULL;
+    Token const* arg=nullptr;
 
     if(!e->size()){ untested();
       assert(e);

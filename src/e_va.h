@@ -33,8 +33,8 @@ public:
 /*--------------------------------------------------------------------------*/
 class DISCIPLINE {
 public:
-  virtual NATURE const* flow()const { untested();return NULL;}
-  virtual NATURE const* potential()const { untested();return NULL;}
+  virtual NATURE const* flow()const { untested();return nullptr;}
+  virtual NATURE const* potential()const { untested();return nullptr;}
 };
 /*--------------------------------------------------------------------------*/
 // tmp kludge. nodes don't have disciplines yet...
@@ -43,7 +43,7 @@ public:
   explicit COMMON_VASRC(int i) : COMMON_COMPONENT(i) {}
   ~COMMON_VASRC() {}
 public:
-  virtual DISCIPLINE const* discipline()const{return NULL;};
+  virtual DISCIPLINE const* discipline()const{return nullptr;};
   double flow_abstol() const{
     if(!discipline()){ untested();
       return OPT::abstol;
@@ -69,7 +69,7 @@ public:
   explicit COMMON_FILT(int i=CC_STATIC) : COMMON_COMPONENT(i) { }
   ~COMMON_FILT() { }
 public:
-  //virtual DISCIPLINE const* discipline()const{untested(); return NULL;};
+  //virtual DISCIPLINE const* discipline()const{untested(); return nullptr;};
   virtual int args(int) const{ untested(); return 0; }
 };
 /*--------------------------------------------------------------------------*/

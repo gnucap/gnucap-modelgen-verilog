@@ -77,8 +77,8 @@ extern ckt_attr attr;
 /*--------------------------------------------------------------------------*/
 class Block;
 class Owned_Base : public Base {
-  Block* _owner{NULL};
-//  Block* _scope{NULL};
+  Block* _owner{nullptr};
+//  Block* _scope{nullptr};
 protected:
   explicit Owned_Base() : Base() { }
   explicit Owned_Base(Owned_Base const& b) : Base(), _owner(b._owner) { untested(); }
@@ -187,8 +187,8 @@ public:
 // class Attribute_Instance;
 template <class T, char BEGIN, char SEP, char END, char END2='\0', char END3='\0'>
 class LiSt : public Keyed_List<T> {
-  Base* _owner{NULL};
-//   Attribute_Instance const* _attributes{NULL};
+  Base* _owner{nullptr};
+//   Attribute_Instance const* _attributes{nullptr};
 public:
   using List_Base<T>::size;
   using List_Base<T>::push_back;
@@ -292,8 +292,8 @@ typedef LiSt<Raw_String_Arg, '(', ',', ')'> Raw_String_Arg_List;
 class File;
 template <class T>
 class Collection : public List_Base<T> { // Keyed_List?
-  Block* _owner{NULL};
-//  File const* _file{NULL};
+  Block* _owner{nullptr};
+//  File const* _file{nullptr};
 public:
   using List_Base<T>::push_back;
   using List_Base<T>::begin;
@@ -390,7 +390,7 @@ public:
 class Node;
 class Module;
 class Node_Ref {
-  Node* _node{NULL};
+  Node* _node{nullptr};
 public:
   explicit Node_Ref() {}
   Node_Ref(Node* n) : _node(n){}
@@ -410,7 +410,7 @@ private:
 class Branch;
 class Named_Branch;
 class Branch_Ref : public Base {
-  Branch* _br{NULL};
+  Branch* _br{nullptr};
   bool _r{false};
 public:
   Branch_Ref(Branch_Ref&& b);
@@ -466,7 +466,7 @@ private:
 protected:
   map _var_refs;
 private:
-  Base* _owner{NULL};
+  Base* _owner{nullptr};
 public:
   explicit Block() : List_Base<Base>() {}
   ~Block();
@@ -503,11 +503,11 @@ public:
 #if 1
   virtual Branch_Ref new_branch(std::string const&, std::string const&) { untested();
     unreachable();
-    return Branch_Ref(NULL, false);
+    return Branch_Ref(nullptr, false);
   }
   virtual Branch_Ref new_branch(Node*, Node*) { untested();
     unreachable();
-    return Branch_Ref(NULL, false);
+    return Branch_Ref(nullptr, false);
   }
   virtual Branch_Ref lookup_branch(std::string const& n)const { untested();
     assert(_owner);
@@ -550,7 +550,7 @@ public:
 //    if(f != _items.end()) { untested();
 //      return f->second;
 //    }else{ untested();
-//      return NULL;
+//      return nullptr;
 //    }
 //  }
   void push_back(Base* x);
@@ -571,7 +571,7 @@ public:
 }; // Block
 /*--------------------------------------------------------------------------*/
 class Parameter_Base : public Base { // Owned_Base?
-  Block* _owner{NULL};
+  Block* _owner{nullptr};
 protected:
   std::string _name;
   std::string _type;

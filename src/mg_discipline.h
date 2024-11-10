@@ -28,9 +28,9 @@ class Discipline : public Base {
   String_Arg	_potential_ident;
   String_Arg	_domain_ident;
   String_Arg	_flow_ident;
-  Nature const* _flow{NULL};
-  Nature const* _potential{NULL};
-  Block const* _owner{NULL};
+  Nature const* _flow{nullptr};
+  Nature const* _potential{nullptr};
+  Block const* _owner{nullptr};
 public:
   void set_owner(Block const* c) {_owner=c;}
   Block const* owner() {return _owner;}

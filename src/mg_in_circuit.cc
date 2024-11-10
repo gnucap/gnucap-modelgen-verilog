@@ -81,7 +81,7 @@ void Net_Declarations::parse(CS& f)
     assert(root);
   }
   auto ii = root->discipline_list().find(f);
-  Net_Decl_List* d = NULL;
+  Net_Decl_List* d = nullptr;
 
   if(ii!=root->discipline_list().end()){
 //    size_t here = f.cursor();
@@ -119,7 +119,7 @@ Port_3* Circuit::find_port(std::string const& n)
     return *p;
   }else{ untested();
     trace1("port not found", n);
-    return NULL;
+    return nullptr;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -281,7 +281,7 @@ Branch_Ref::~Branch_Ref()
 {
   if(_br){
     _br->detach(this);
-    _br = NULL;
+    _br = nullptr;
   }else{
   }
 }

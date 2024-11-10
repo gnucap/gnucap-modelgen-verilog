@@ -78,7 +78,7 @@ public:
 //    T K(k);
 //    auto p = _s.insert(&K);
 //    if(p.second){ untested();
-//      *p.first = NULL;
+//      *p.first = nullptr;
 //    }else{ untested();
 //    }
 //  }

@@ -49,7 +49,7 @@ bool Statement::update()
 //    return x;
 //  }else{ untested();
 //    incomplete();
-//    return NULL;
+//    return nullptr;
 //  }
 //}
 /*--------------------------------------------------------------------------*/
@@ -314,7 +314,7 @@ void SeqBlock::set_sens(Base* s)
 SeqBlock::~SeqBlock()
 {
   delete _sens;
-  _sens = NULL;
+  _sens = nullptr;
  //  delete _variables;
 }
 /*--------------------------------------------------------------------------*/
@@ -477,7 +477,7 @@ bool Assignment::store_deps(TData const& d)
   bool ret = false;
 
   if(options().optimize_unused() && !scope()->is_reachable()) { untested();
-    _token = new Token_VAR_REF(_lhsref->name(), NULL);
+    _token = new Token_VAR_REF(_lhsref->name(), nullptr);
   }else{
 
     if(_token) {
@@ -563,7 +563,7 @@ Assignment::~Assignment()
   }else{
   }
   delete _token;
-  _token = NULL;
+  _token = nullptr;
 }
 /*--------------------------------------------------------------------------*/
 void Assignment::parse_rhs(CS& cmd)

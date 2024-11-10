@@ -38,7 +38,7 @@ public:
   explicit Token_DDX(const std::string Name, FUNCTION_ const* f)
     : Token_CALL(Name, f) {}
 private:
-  explicit Token_DDX(const Token_DDX& P, Base const* data, Expression_ const* e = NULL)
+  explicit Token_DDX(const Token_DDX& P, Base const* data, Expression_ const* e = nullptr)
     : Token_CALL(P, data, e) {} // , _item(P._item) {}
   Token* clone()const override {untested(); return new Token_DDX(*this);}
 
@@ -60,15 +60,15 @@ private:
       return a;
     }else{ untested();
       assert(!Token_CALL::args());
-      return NULL;
+      return nullptr;
     }
   }
 
 };
 /*--------------------------------------------------------------------------*/
 class DDX : public MGVAMS_FILTER {
-  Module* _m{NULL};
-  mutable Probe const* _ddxprobe{NULL}; // hack.
+  Module* _m{nullptr};
+  mutable Probe const* _ddxprobe{nullptr}; // hack.
 public:
   explicit DDX(){ set_label("ddx"); }
   DDX* clone()const /*override*/{
@@ -167,7 +167,7 @@ static Expression_* clone_args(Base const* e)
     return e_->clone();
   }else{ untested();
     unreachable();
-    return NULL;
+    return nullptr;
   }
 }
 /*--------------------------------------------------------------------------*/

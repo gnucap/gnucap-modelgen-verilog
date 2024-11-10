@@ -32,7 +32,7 @@ public:
   virtual TData const& deps()const = 0;
 //  Statement* parent_stmt()override { untested();
 //    incomplete();
-//    return NULL;
+//    return nullptr;
 //  }
 };
 /*--------------------------------------------------------------------------*/
@@ -295,9 +295,9 @@ public:
 typedef Collection<AnalogEvtCtlStmt> Analog_Events;
 /*--------------------------------------------------------------------------*/
 class Analog_Function : public /*UserFunction?*/ Statement {
-  Token* _variable{NULL};
+  Token* _variable{nullptr};
   Data_Type _type;
-  FUNCTION_ const* _function{NULL};
+  FUNCTION_ const* _function{nullptr};
   AnalogFunctionArgs _args;
   friend class AnalogFunctionBody; // uuh
   bool update()override { untested(); return false; }
@@ -327,7 +327,7 @@ typedef Collection<Analog_Function> Analog_Functions;
 class Analog : public Owned_Base {
   AnalogList _list;
   Analog_Functions _functions;
-  Probe_Map* _probes{NULL};
+  Probe_Map* _probes{nullptr};
   Analog_Events _events;
 public:
   explicit Analog();
@@ -380,7 +380,7 @@ public:
 typedef LiSt<AnalogConstExpression, '\0', ',', ':'> AnalogConstExpressionList;
 /*--------------------------------------------------------------------------*/
 class CaseGen : public AnalogCtrlStmt {
-  AnalogConstExpressionList* _cond{NULL};
+  AnalogConstExpressionList* _cond{nullptr};
   RDeps _rdeps; // TODO;
 private:
   CaseGen() : AnalogCtrlStmt(){ untested(); unreachable(); }
@@ -491,8 +491,8 @@ private:
 };
 /*--------------------------------------------------------------------------*/
 class AnalogForStmt : public AnalogWhileStmt {
-  Assignment* _init{NULL};
-  Assignment* _tail{NULL};
+  Assignment* _init{nullptr};
+  Assignment* _tail{nullptr};
 public:
   explicit AnalogForStmt(CS& file, Block* o) : AnalogWhileStmt() {
     set_owner(o);
@@ -543,7 +543,7 @@ public: // dump_annotate
 // ContributionStatement?
 class Contribution : public AnalogStmt {
   std::string _name;
-  Nature const* _nature{NULL};
+  Nature const* _nature{nullptr};
   Expression_ _rhs;
   Branch_Ref _branch;
   enum{
@@ -552,8 +552,8 @@ class Contribution : public AnalogStmt {
     t_pot
   } _type{t_unknown};
   bool _short{false};
-//  Block* _owner{NULL};
-  TData* _deps{NULL};
+//  Block* _owner{nullptr};
+  TData* _deps{nullptr};
   RDeps _rdeps; // dump_annotate
   Sensitivities _sens;
 private:
@@ -565,7 +565,7 @@ private:
   TData const& deps()const override; // data?
 public:
   Contribution(CS& f, Block* o)
-    : AnalogStmt(), _branch(NULL, false) {
+    : AnalogStmt(), _branch(nullptr, false) {
     set_owner(o);
     parse(f);
   }

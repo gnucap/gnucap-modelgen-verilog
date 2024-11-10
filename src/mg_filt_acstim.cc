@@ -65,7 +65,7 @@ public:
   explicit Token_ACSTIM(const std::string Name, FUNCTION_ const* f)
     : Token_CALL(Name, f) {}
 private:
-  explicit Token_ACSTIM(const Token_ACSTIM& P, Base const* data, Expression_ const* e = NULL)
+  explicit Token_ACSTIM(const Token_ACSTIM& P, Base const* data, Expression_ const* e = nullptr)
     : Token_CALL(P, data, e) {} // , _item(P._item) {}
   Token* clone()const override {untested(); return new Token_ACSTIM(*this);}
 
@@ -76,19 +76,19 @@ private:
       return a;
     }else{ untested();
       assert(!Token_CALL::args());
-      return NULL;
+      return nullptr;
     }
   }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class ACSTIM : public MGVAMS_FILTER {
-  Module* _m{NULL};
-  Token_CALL const* _token{NULL};
-  Probe const* _prb{NULL};
+  Module* _m{nullptr};
+  Token_CALL const* _token{nullptr};
+  Probe const* _prb{nullptr};
   std::string _code_name;
 public: // HACK
-  Branch* _br{NULL};
+  Branch* _br{nullptr};
   Node_Ref _p;
   Node_Ref _n;
   explicit ACSTIM() : MGVAMS_FILTER() {
@@ -264,7 +264,7 @@ static Expression_* clone_args(Base const* e)
     return e_->clone();
   }else{ untested();
     unreachable();
-    return NULL;
+    return nullptr;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -297,7 +297,7 @@ void Token_ACSTIM::stack_op(Expression* e)const
     Float* f = new Float(0.);
     e->push_back(new Token_CONSTANT(f, ""));
     delete cc;
-    cc = NULL;
+    cc = nullptr;
 //    func->set_p_to_gnd();
   }else if(auto dd = prechecked_cast<TData const*>(cc->data())) {
     assert(dd);

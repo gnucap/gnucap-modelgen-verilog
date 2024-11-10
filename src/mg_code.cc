@@ -124,7 +124,7 @@ void Variable_Decl::new_data()
   auto l = prechecked_cast<Variable_Stmt const*>(owner());
   assert(l);
   Module const* mod = dynamic_cast<Module const*>(l->owner()); // scope?
-  Variable_List_Collection const* p=NULL;
+  Variable_List_Collection const* p=nullptr;
   if(!mod){ untested();
   }else if(is_output_var(tag_t(this))) {
     // todo: tag?

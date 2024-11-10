@@ -180,10 +180,10 @@ static Base* parse_system_task(CS& f, Block* o)
     try{
       return new System_Task(f, o);
     }catch(Exception const& e){ untested();
-      return NULL;
+      return nullptr;
     }
   }else{
-    return NULL;
+    return nullptr;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -358,7 +358,7 @@ Base* parse_proc_assignment(CS& f, Block* o)
     }
   }catch(Exception_No_Match const&){ untested();
   }
-  return NULL;
+  return nullptr;
 }
 /*--------------------------------------------------------------------------*/
 AnalogProceduralAssignment::AnalogProceduralAssignment(CS& file, Block* o)
@@ -374,7 +374,7 @@ static Base* parse_contribution(CS& f, Block* owner)
   try{
     return new Contribution(f, owner);
   }catch(Exception_No_Match const& x){
-    return NULL;
+    return nullptr;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -382,7 +382,7 @@ static Base* parse_analog_stmt_or_null(CS& file, Block* scope)
 {
   size_t here = file.cursor();
   assert(scope);
-  Base* ret = NULL;
+  Base* ret = nullptr;
 
   trace1("parse_analog_stmt_or_null", file.tail().substr(0,30));
   ONE_OF	// module_item
@@ -416,7 +416,7 @@ static Base* parse_analog_stmt(CS& file, Block* owner)
     delete a;
     throw Exception_CS_("what's this?", file);
     file.reset_fail(here);
-    return NULL;
+    return nullptr;
   }else{
     return a;
   }
@@ -510,10 +510,10 @@ void AnalogConditionalStmt::dump(std::ostream& o) const
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogConditionalStmt::is_used_in(Base const* b) const
-{ untested();
+{
   if (_cond.is_used_in(b)){ untested();
     return true;
-  }else{ untested();
+  }else{
     return AnalogStmt::is_used_in(b);
   }
 }
@@ -607,7 +607,7 @@ static Assignment* parse_assignment_or_null(CS& f, Statement* owner)
   if(f) {
   }else{
     delete a;
-    a = NULL;
+    a = nullptr;
   }
   return a;
 }
@@ -643,7 +643,7 @@ void AnalogForStmt::parse(CS& f)
   _init = init;
   if(!f){
     delete _init;
-    _init = NULL;
+    _init = nullptr;
   }else{
   }
   f >> ";";
@@ -719,7 +719,7 @@ void CaseGen::calc_reach(Expression const& ctrl)
     bool all_never = true;
     for(auto const& j : *_cond){
       trace2("==", ctrl.back()->name(), j->expression().back()->name());
-      Token_BINOP_ b("==", ctrl.back(), j->expression().back(), NULL);
+      Token_BINOP_ b("==", ctrl.back(), j->expression().back(), nullptr);
       b.stack_op(&result);
       b.pop();
       assert(result.size());
@@ -833,7 +833,7 @@ void AnalogSwitchStmt::parse(CS& f)
   sb->add_block(&_body); // re-use var_ref?
 
   f >> "(" >> _ctrl >> ")";
-  CaseGen* def = NULL;
+  CaseGen* def = nullptr;
   bool have_reachable = false;
   bool have_always = false;
 
@@ -1389,7 +1389,7 @@ Branch::~Branch()
   assert(!_has_flow_probe);
 
   delete _deps;
-  _deps = NULL;
+  _deps = nullptr;
 
   if(_use){ untested();
     unreachable();
@@ -1421,7 +1421,7 @@ void Branch::unset_used_in(Base const* b)
   int found = 0;
   for(auto& i : _used_in){
     if(i == b){
-      i = NULL;
+      i = nullptr;
       ++found;
 #ifndef NDEBUG
       return;
@@ -1696,15 +1696,15 @@ static Module const* to_module(Block const* owner)
       owner = st->scope();
     }else{ untested();
       assert(false);
-      return NULL;
+      return nullptr;
     }
   }
   unreachable();
-  return NULL;
+  return nullptr;
 }
 /*--------------------------------------------------------------------------*/
 class AF : public MGVAMS_FUNCTION {
-  Analog_Function const* _af{NULL};
+  Analog_Function const* _af{nullptr};
 public:
   explicit AF(Analog_Function const* af) : _af(af) {
     assert(_af);
@@ -1721,7 +1721,7 @@ public:
       return new Token_CALL(label(), this);
     }else{ untested();
       incomplete();
-      return NULL;
+      return nullptr;
     }
   }
 #endif
@@ -1800,7 +1800,7 @@ void Analog_Function::parse(CS& f)
 
   for (;;) {
     size_t here = f.cursor();
-    Variable_Stmt* s = NULL;
+    Variable_Stmt* s = nullptr;
     trace1("af variables...", f.tail().substr(0,30));
     ONE_OF	// module_item
       || f.umatch(";")
@@ -1864,12 +1864,12 @@ Base* AnalogFunctionArgs::lookup(std::string const& k, bool recurse)
       return b;
     }
   }else if(dynamic_cast<Token_VAR_DECL const*>(b)){
-    return NULL;
+    return nullptr;
   }else if(dynamic_cast<Token_VAR_REF const*>(b)){ untested();
-    return NULL;
+    return nullptr;
   }else if(dynamic_cast<Token_NODE const*>(b)){ untested();
       // nodes not allowed here.
-    return NULL;
+    return nullptr;
   }else{
     return b;
   }
@@ -1887,7 +1887,7 @@ Base* AnalogFunctionBody::lookup(std::string const& k, bool recurse)
 
     if(dynamic_cast<Token_NODE const*>(b)){ untested();
       // nodes not allowed here.
-      return NULL;
+      return nullptr;
     }else if(b){ untested();
       trace2("AnalogFunctionBody::lookup1 arg", k, b);
       return b;
@@ -1897,7 +1897,7 @@ Base* AnalogFunctionBody::lookup(std::string const& k, bool recurse)
     }
   }else{ untested();
     return scope()->lookup(k, false);
-    return NULL;
+    return nullptr;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1919,9 +1919,9 @@ void AnalogFunctionBody::dump(std::ostream& o) const
 Analog_Function::~Analog_Function()
 {
   delete _variable;
-  _variable = NULL;
+  _variable = nullptr;
   delete _function;
-  _function = NULL;
+  _function = nullptr;
 }
 /*--------------------------------------------------------------------------*/
 void Analog_Function::dump(std::ostream& o) const
@@ -1960,15 +1960,15 @@ bool AnalogFunctionArgs::new_var_ref(Base* b)
   auto t = prechecked_cast<Token*>(b);
   assert(t);
   trace1("AF_args::new_var_ref", t->name());
-  Base* ex = NULL;
+  Base* ex = nullptr;
   if(auto T = dynamic_cast<Token const*>(b)){
     ex = lookup(T->name(), false);
     trace1("AF_args::new_var_ref0", ex);
   }else{ untested();
   }
 
-  Token_ARGUMENT* arg = NULL;
-  Token_VAR_DECL* decl = NULL;
+  Token_ARGUMENT* arg = nullptr;
+  Token_VAR_DECL* decl = nullptr;
   if((arg = dynamic_cast<Token_ARGUMENT*>(b))){
     trace1("AF_args::new_var_ref ARG", t->name());
     if(dynamic_cast<Token_ARGUMENT*>(ex)){ untested();
@@ -2020,7 +2020,7 @@ bool AnalogFunctionBody::new_var_ref(Base* b)
   return Block::new_var_ref(b);
 }
 /*--------------------------------------------------------------------------*/
-// bool AnalogEvtExpression::update(RDeps const* r=NULL);
+// bool AnalogEvtExpression::update(RDeps const* r=nullptr);
 // { untested();
 //   trace2("EvtExpression::update", _rdeps.size(), r);
 //   Expression_::update(r);
@@ -2318,7 +2318,7 @@ Contribution::~Contribution()
     unset_used_in(_branch);
   }
   delete _deps;
-  _deps = NULL;
+  _deps = nullptr;
 }
 /*--------------------------------------------------------------------------*/
 Probe* new_Probe(std::string const& xs, Branch_Ref const& br)
@@ -2433,7 +2433,7 @@ void Module::new_analog()
 void Module::delete_analog()
 {
   delete _analog;
-  _analog = NULL;
+  _analog = nullptr;
 }
 /*--------------------------------------------------------------------------*/
 bool Module::has_analog_block() const
@@ -2554,7 +2554,7 @@ FUNCTION_ const* analog_function_call(std::string const& f, Block const* scope)
     }else{
     }
   }
-  return NULL;
+  return nullptr;
 }
 /*--------------------------------------------------------------------------*/
 static File const* to_file(Block const* owner)
@@ -2567,12 +2567,12 @@ static File const* to_file(Block const* owner)
     }
     owner = owner->scope();
     if(!owner){ untested();
-      return NULL;
+      return nullptr;
     }else{
     }
   }
   unreachable();
-  return NULL;
+  return nullptr;
 }
 /*--------------------------------------------------------------------------*/
 FUNCTION_ const* xs_function_call(std::string const& f, Block const* owner)
@@ -2599,7 +2599,7 @@ FUNCTION_ const* xs_function_call(std::string const& f, Block const* owner)
     }else{
     }
   }
-  return NULL;
+  return nullptr;
 }
 /*--------------------------------------------------------------------------*/
 void Analog::push_back(Base* ab)
@@ -2634,7 +2634,7 @@ Branch_Ref Branch_Map::lookup(std::string const& n)const
   if(it != _names.end()) {
     return Branch_Ref(*it);
   }else{
-    return Branch_Ref(NULL, false);
+    return Branch_Ref(nullptr, false);
   }
 }
 /*--------------------------------------------------------------------------*/

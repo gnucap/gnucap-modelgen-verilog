@@ -31,20 +31,20 @@ class Attribute_Spec : public Owned_Base {
 public:
   typedef std::string value_type;
 private:
-  value_type* _expr{NULL};
+  value_type* _expr{nullptr};
 public:
   void parse(CS& f)override;
   void dump(std::ostream&)const override;
 public:
   Attribute_Spec() : Owned_Base() { untested();untested();}
-//  Attribute_Spec(CS& f, Block* o) : Owned_Base(NULL) { untested();
+//  Attribute_Spec(CS& f, Block* o) : Owned_Base(nullptr) { untested();
 //    unreachable();
 //    set_owner(o);
 //    parse(f);
 //  }
   ~Attribute_Spec(){ untested();
     delete _expr;
-    _expr = NULL;
+    _expr = nullptr;
   }
   bool operator==(Attribute_Spec const& o) const{ untested();
     return o._key == _key;

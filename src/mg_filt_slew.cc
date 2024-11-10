@@ -35,8 +35,8 @@ namespace {
 static int n_filters;
 /*--------------------------------------------------------------------------*/
 class SLEW : public MGVAMS_FILTER {
-  Module* _m{NULL};
-  Filter const* _f{NULL};
+  Module* _m{nullptr};
+  Filter const* _f{nullptr};
 public:
   explicit SLEW() : MGVAMS_FILTER() {
     set_label("slew");
@@ -49,7 +49,7 @@ public:
   }
 private:
   Token* new_token(Module& m, size_t na)const override{
-    Filter* f = NULL;
+    Filter* f = nullptr;
 
     std::string filter_code_name = label() + "_" + std::to_string(n_filters++);
 
@@ -80,7 +80,7 @@ private:
     assert(_f);
     std::string cn = _f->code_name();
     o__ "double " << cn << "state[" << _f->num_states() << "]\n;"; // filter/num_states?
-    o__ "ELEMENT* _f" << label() << "{NULL};\n";
+    o__ "ELEMENT* _f" << label() << "{nullptr};\n";
     make_cc_dev_(o);
     o__ "ddouble " << label() << "__precalc(";
       std::string comma;

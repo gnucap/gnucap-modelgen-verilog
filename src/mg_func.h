@@ -77,7 +77,7 @@ public: // code generation
   virtual void make_cc_tr_review(std::ostream&)const {}
   virtual void make_cc_tr_accept(std::ostream&)const {}
 
-  virtual Token* new_token(Module&, size_t)const { untested();unreachable(); return NULL;}
+  virtual Token* new_token(Module&, size_t)const { untested();unreachable(); return nullptr;}
   virtual std::string code_name()const { itested();
 	  // incomplete();
 	  return "";
@@ -104,7 +104,7 @@ public:
   ~MGVAMS_FUNCTION() {}
   virtual MGVAMS_FUNCTION* clone()const { untested();
 	  unreachable();
-	  return NULL;
+	  return nullptr;
   }
   virtual void make_cc_dev(std::ostream&)const override {}
 //  Token* new_token(Module& m, size_t na) const override;
@@ -161,7 +161,7 @@ class Node_Ref;
 class Branch;
 class MGVAMS_FILTER : public FUNCTION_ {
 protected:
-  mutable Branch const* _output{NULL};
+  mutable Branch const* _output{nullptr};
 public:
   ~MGVAMS_FILTER() {}
   // Token* new_token(Module& m, size_t na, Deps& d) const override;
@@ -171,7 +171,7 @@ public:
   }
   virtual Node_Ref p() const;
   virtual Node_Ref n() const;
-  virtual Branch const* output()const{ untested();return NULL;}
+  virtual Branch const* output()const{ untested();return nullptr;}
   std::string eval(CS&, const CARD_LIST*)const override{ untested();
 	  unreachable();
 	  return "filt";
@@ -179,7 +179,7 @@ public:
   bool has_precalc()const override { return true;}
   bool is_standalone()const { return _output; }
 private:
-  virtual Branch* branch() const {return NULL;}
+  virtual Branch* branch() const {return nullptr;}
   void setup(Module*)override;
 protected:
 public: // bug
@@ -196,7 +196,7 @@ public:
   ~MGVAMS_TASK() {}
   virtual MGVAMS_TASK* clone()const { untested();
 	  unreachable();
-	  return NULL;
+	  return nullptr;
   }
   std::string code_name()const override{ untested();
 	  return "";

@@ -51,7 +51,7 @@ class ValueRange : public Owned_Base {
     vr_FROM,
     vr_EXCLUDE
   } _type{vr_FROM};
-  ValueRangeSpec* _what{NULL};
+  ValueRangeSpec* _what{nullptr};
 public:
   void parse(CS& f) override;
   void dump(std::ostream& f)const override;
@@ -109,7 +109,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Aliasparam : public Owned_Base {
-  Parameter_Base const* _param{NULL};
+  Parameter_Base const* _param{nullptr};
   std::string _name;
 public:
   explicit Aliasparam() : Owned_Base() {}
@@ -157,19 +157,19 @@ public:
     mm_BOTH = 3
   } mode_mask_t;
 private: // verilog input data
-  File const* _file{NULL};
+  File const* _file{nullptr};
   Aliasparam_Collection _aliasparam;
   // Element_2_List _element_list;
   // Port_1_List _local_nodes;
-  Owned_Base* _analog{NULL};
-  Circuit* _circuit{NULL};
+  Owned_Base* _analog{nullptr};
+  Circuit* _circuit{nullptr};
 //  Block _module_body;
 protected:
   Variable_List_Collection _variables;
   Parameter_List_Collection _parameters;
   // Code_Block		_validate;
   String_Arg	_identifier;
-  Module const* _proto{NULL};
+  Module const* _proto{nullptr};
 private: // merge?
   std::list<FUNCTION_*> _func;
   pSet<FUNCTION_ const> _funcs;
@@ -292,7 +292,7 @@ typedef Collection<Module> Module_List;
 /*--------------------------------------------------------------------------*/
 class Paramset : public Module {
   // std::string _proto_name; // needed?
-  Paramset* _sub{NULL};
+  Paramset* _sub{nullptr};
 public:
   explicit Paramset() : Module() {}
   void parse(CS& f)override;

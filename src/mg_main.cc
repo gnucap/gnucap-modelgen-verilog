@@ -57,16 +57,16 @@ static void make_module_file(const File& in, std::string dump_name)
 /*--------------------------------------------------------------------------*/
 class OUTPUT {
   std::basic_ostream<char>& _default;
-  std::basic_ostream<char>* _o{NULL};
+  std::basic_ostream<char>* _o{nullptr};
 public:
   explicit OUTPUT(std::basic_ostream<char>& d) : _default(d) {};
   ~OUTPUT(){
     delete _o;
-    _o = NULL;
+    _o = nullptr;
   }
   void set(std::string const& name){
     delete _o;
-    _o = NULL;
+    _o = nullptr;
     _o = new std::ofstream(name);
   }
 

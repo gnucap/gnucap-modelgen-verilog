@@ -62,12 +62,12 @@ static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
 static int n_filters;
 /*--------------------------------------------------------------------------*/
 class Token_ZIF : public Token_CALL {
-//  ZIF* _xdt{NULL};
+//  ZIF* _xdt{nullptr};
 public:
   explicit Token_ZIF(const std::string Name, FUNCTION_ const* f)
     : Token_CALL(Name, f) {}
 private:
-  explicit Token_ZIF(const Token_ZIF& P, Base const* data, Expression_ const* e = NULL)
+  explicit Token_ZIF(const Token_ZIF& P, Base const* data, Expression_ const* e = nullptr)
     : Token_CALL(P, data, e) {} // , _item(P._item) {}
   Token* clone()const override {untested(); return new Token_ZIF(*this);}
 
@@ -77,12 +77,12 @@ private:
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class ZIF : public MGVAMS_FILTER /* FUNCTION_ */ {
-  Module* _m{NULL};
-  Probe const* _prb{NULL};
+  Module* _m{nullptr};
+  Probe const* _prb{nullptr};
   std::string _code_name;
 public: // HACK
-  Branch* _br{NULL};
-  mutable Branch const* _output{NULL};
+  Branch* _br{nullptr};
+  mutable Branch const* _output{nullptr};
   Node_Ref _p;
   Node_Ref _n;
   mutable int _nums{0};
@@ -149,7 +149,7 @@ public:
   void make_cc_common(std::ostream& o)const override{
     o << "public:\n";
     o__ "class common" << _code_name <<": public COMMON_FILT {\n";
-    o____ "COMMON_COMPONENT* clone()const override{unreachable(); return NULL;}\n";
+    o____ "COMMON_COMPONENT* clone()const override{unreachable(); return nullptr;}\n";
     o__ "public:\n";
     o____ "common" << _code_name <<"(int i=CC_STATIC) : COMMON_FILT(i) {}\n";
     o__ "public:\n";
@@ -375,7 +375,7 @@ static Expression_* clone_args(Base const* e)
     return e_->clone();
   }else{ untested();
     unreachable();
-    return NULL;
+    return nullptr;
   }
 }
 /*--------------------------------------------------------------------------*/

@@ -34,7 +34,7 @@ static int n_events;
 class TIMER : public MGVAMS_EVENT {
 protected:
   std::string _code_name;
-  Module* _m{NULL};
+  Module* _m{nullptr};
 public:
   explicit TIMER() : MGVAMS_EVENT() {
     set_label("timer");

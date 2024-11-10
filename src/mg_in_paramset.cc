@@ -45,7 +45,7 @@ CS& Paramset::parse_stmt(CS& f)
     }
 
     trace1("got", s->name());
-    Base* dup = NULL;
+    Base* dup = nullptr;
     if((dup = lookup("." + s->name()))){
       if(auto dd = dynamic_cast<Paramset_Stmt*>(dup)){
 	dd->set_overridden();
@@ -163,7 +163,7 @@ void Paramset::parse(CS& f)
 
     if (attr.has_attributes(tag_t(&f))){ untested();
       f.warn(bWARNING, "dangling attributes "
-	   + attr.attributes(tag_t(&f))->string(tag_t(NULL)));
+	   + attr.attributes(tag_t(&f))->string(tag_t(nullptr)));
     }else{
     }
     if (end){
@@ -451,10 +451,10 @@ Module* Paramset::deflate()
 {
   if(_sub){
     Paramset* sub = _sub;
-    _sub->set_owner((Base*)NULL);
+    _sub->set_owner((Base*)nullptr);
     _sub->set_owner(scope());
     assert(dynamic_cast<Paramset*>(_sub));
-    _sub = NULL;
+    _sub = nullptr;
     sub->setup_functions();
     sub->setup_nodes();
     return sub;

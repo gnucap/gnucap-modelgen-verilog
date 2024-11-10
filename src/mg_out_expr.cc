@@ -745,7 +745,7 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
 void make_cc_expression(std::ostream& o, Expression const& e, bool dynamic,
     std::string ctx)
 {
-  TData const* deps = NULL;
+  TData const* deps = nullptr;
   if(!dynamic){
   }else if(auto ex = dynamic_cast<Expression_ const*>(&e)){
     deps = &ex->data();

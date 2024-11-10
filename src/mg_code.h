@@ -39,7 +39,7 @@ protected:
   explicit Statement() : Owned_Base() {}
 public:
   virtual Statement* deep_copy(Base*)const // = 0;?
-    { untested();unreachable();return NULL;}
+    { untested();unreachable();return nullptr;}
   virtual bool propagate_rdeps(RDeps const&);
   /*virtual?*/ bool propagate_rdep(Base const*);
   virtual bool update() = 0;
@@ -52,7 +52,7 @@ public:
     if(scope()){
       return scope()->owner();
     }else{ untested();
-      return NULL;
+      return nullptr;
     }
   }
 
@@ -108,8 +108,8 @@ class Node;
 class TData;
 class Variable_Decl : public Expression_ {
   Data_Type _type;
-  TData* _data{NULL};
-  Token_VAR_REF* _token{NULL};
+  TData* _data{nullptr};
+  Token_VAR_REF* _token{nullptr};
   RDeps _rdeps; // Expression_?
   std::string /*TODO*/ _dimensions;
 public:
@@ -167,7 +167,7 @@ public:
   const_iterator begin()const { return _l.begin(); }
   const_iterator end()const { return _l.end(); }
   Variable_Stmt* deep_copy(Base*)const override
-    { untested();unreachable();return NULL;}
+    { untested();unreachable();return nullptr;}
   bool update() override;
   bool is_used_in(Base const* b)const override;
   RDeps const& rdeps()const override{
@@ -177,10 +177,10 @@ public:
 /*--------------------------------------------------------------------------*/
 class Assignment : public Expression_ {
 protected:
-  TData* _data{NULL};
-  Token_VAR_REF* _token{NULL};
+  TData* _data{nullptr};
+  Token_VAR_REF* _token{nullptr};
 protected:
-  Token_VAR_REF* _lhsref{NULL};
+  Token_VAR_REF* _lhsref{nullptr};
 public:
   explicit Assignment(CS& f, Base* o);
   explicit Assignment() : Expression_() {}
@@ -199,7 +199,7 @@ public:
   void dump(std::ostream&)const override;
   bool propagate_deps(Token_VAR_REF const&);
  // bool update();
-  bool update(RDeps const* r=NULL);
+  bool update(RDeps const* r=nullptr);
 
   void parse_rhs(CS& cmd);
   RDeps const& rdeps() const { static RDeps r; return r; } // dump_annotate.
@@ -219,7 +219,7 @@ private: // implementation
 // class AnalogExpression?
 class ConstantMinTypMaxExpression : public Base {
   Expression_ _e;
-  Block* _owner{NULL};
+  Block* _owner{nullptr};
 public:
   explicit ConstantMinTypMaxExpression() : Base(){}
   ~ConstantMinTypMaxExpression();
@@ -234,7 +234,7 @@ public:
 /*--------------------------------------------------------------------------*/
 class Sensitivities;
 class SeqBlock : public Block {
-  Sensitivities* _sens{NULL}; // here?
+  Sensitivities* _sens{nullptr}; // here?
 protected: // AF
   Variable_List_Collection _variables;
 public:

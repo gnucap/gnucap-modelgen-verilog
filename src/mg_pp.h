@@ -53,7 +53,7 @@ class Preprocessor : public CS {
   Define_List _define_list;
   std::string _cwd;
   std::string _include_path;
-  std::basic_ostream<char>* _diag{NULL};
+  std::basic_ostream<char>* _diag{nullptr};
 private:
   std::string _stripped_file; // DUP?
 public:

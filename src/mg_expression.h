@@ -27,8 +27,8 @@
 /*--------------------------------------------------------------------------*/
 // temporary hack.
 class Token_TERNARY : public Token {
-  Expression const* _true{NULL};
-  Expression const* _false{NULL};
+  Expression const* _true{nullptr};
+  Expression const* _false{nullptr};
 protected:
   explicit Token_TERNARY(std::string /*Name*/, Base const* Data)
     : Token(Data) { untested();}
@@ -53,8 +53,8 @@ class Branch_Ref;
 class Block;
 class RDeps;
 class Expression_ : public Expression {
-  Base* _owner{NULL};
-  Block* _scope{NULL}; // remove. later.
+  Base* _owner{nullptr};
+  Block* _scope{nullptr}; // remove. later.
 public:
   explicit Expression_() : Expression() {}
   ~Expression_() {}
@@ -73,7 +73,7 @@ public:
   TData const& data()const; // hmm
 //  TData const& deps()const{ untested();return data();}
   // Attrib const& attrib()const;
-  bool update(RDeps const* r=NULL);
+  bool update(RDeps const* r=nullptr);
   void set_dep(Base*);
   void set_rdeps(RDeps const&);
   bool is_used_in(Base const*)const;

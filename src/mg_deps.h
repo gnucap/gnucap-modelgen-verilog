@@ -37,7 +37,7 @@ public: // types
     _ANY,
   } dep_order;
 private:
-  Probe const* _prb{NULL};
+  Probe const* _prb{nullptr};
   dep_order _order{_ANY};
 public:
   Dep(Dep const& p) : _prb(p._prb), _order(p._order) {}
@@ -131,10 +131,10 @@ public:
 public:
   using Base::multiply;
   Range* multiply(const Base*)const override { untested();
-    return NULL;
+    return nullptr;
   }
-  Base* multiply(const Float*)const override	{ untested();untested(); return NULL;}
-  Base* multiply(const String*)const override	{ untested();untested(); return NULL;}
+  Base* multiply(const Float*)const override	{ untested();untested(); return nullptr;}
+  Base* multiply(const String*)const override	{ untested();untested(); return nullptr;}
 
 private:
   void parse(CS&)override { untested();unreachable();}
@@ -206,33 +206,33 @@ public:
     return *this;
   }
   Base* combine(const Base* X)const;
-  TData* multiply(const Base* X)const override; // { untested();incomplete(); return NULL;}
-  Base* subtract(const Base*)const override	{ untested();incomplete(); return NULL;}
-  Base* r_subtract(const Base*)const override	{ untested();incomplete(); return NULL;}
-  Base* divide(const Base* X)const override;  //{ untested();incomplete(); return NULL;}
-  Base* r_divide(const Base*)const override   {incomplete(); return NULL;}	
-  Base* modulo(const Base*)const override     {incomplete(); return NULL;}	
+  TData* multiply(const Base* X)const override; // { untested();incomplete(); return nullptr;}
+  Base* subtract(const Base*)const override	{ untested();incomplete(); return nullptr;}
+  Base* r_subtract(const Base*)const override	{ untested();incomplete(); return nullptr;}
+  Base* divide(const Base* X)const override;  //{ untested();incomplete(); return nullptr;}
+  Base* r_divide(const Base*)const override   {incomplete(); return nullptr;}	
+  Base* modulo(const Base*)const override     {incomplete(); return nullptr;}	
 
-  Base* multiply(const Integer*)const override	{ untested();unreachable(); return NULL;}
-  Base* subtract(const Integer*)const override	{ untested();unreachable(); return NULL;}
-  Base* r_subtract(const Integer*)const override{ untested();unreachable(); return NULL;}
-  Base* divide(const Integer*)const override	{ untested();unreachable(); return NULL;}
-  Base* r_divide(const Integer*)const override  { unreachable(); return NULL;}	
-  Base* modulo(const Integer*)const override    { unreachable(); return NULL;}	
+  Base* multiply(const Integer*)const override	{ untested();unreachable(); return nullptr;}
+  Base* subtract(const Integer*)const override	{ untested();unreachable(); return nullptr;}
+  Base* r_subtract(const Integer*)const override{ untested();unreachable(); return nullptr;}
+  Base* divide(const Integer*)const override	{ untested();unreachable(); return nullptr;}
+  Base* r_divide(const Integer*)const override  { unreachable(); return nullptr;}	
+  Base* modulo(const Integer*)const override    { unreachable(); return nullptr;}	
 
-  Base* multiply(const Float*)const override	{ untested();unreachable(); return NULL;}
-  Base* subtract(const Float*)const override	{ untested();unreachable(); return NULL;}
-  Base* r_subtract(const Float*)const override	{ untested();unreachable(); return NULL;}
-  Base* divide(const Float*)const override	{ untested();unreachable(); return NULL;}
-  Base* r_divide(const Float*)const override    {unreachable(); return NULL;}	
-  Base* modulo(const Float*)const override      {unreachable(); return NULL;}	
+  Base* multiply(const Float*)const override	{ untested();unreachable(); return nullptr;}
+  Base* subtract(const Float*)const override	{ untested();unreachable(); return nullptr;}
+  Base* r_subtract(const Float*)const override	{ untested();unreachable(); return nullptr;}
+  Base* divide(const Float*)const override	{ untested();unreachable(); return nullptr;}
+  Base* r_divide(const Float*)const override    {unreachable(); return nullptr;}	
+  Base* modulo(const Float*)const override      {unreachable(); return nullptr;}	
 
-  Base* multiply(const String*)const override	{ untested();unreachable(); return NULL;}
-  Base* subtract(const String*)const override	{ untested();unreachable(); return NULL;}
-  Base* r_subtract(const String*)const override	{ untested();unreachable(); return NULL;}
-  Base* divide(const String*)const override	{ untested();unreachable(); return NULL;}
-  Base* r_divide(const String*)const override   {unreachable(); return NULL;}	
-  Base* modulo(const String*)const override     {unreachable(); return NULL;}	
+  Base* multiply(const String*)const override	{ untested();unreachable(); return nullptr;}
+  Base* subtract(const String*)const override	{ untested();unreachable(); return nullptr;}
+  Base* r_subtract(const String*)const override	{ untested();unreachable(); return nullptr;}
+  Base* divide(const String*)const override	{ untested();unreachable(); return nullptr;}
+  Base* r_divide(const String*)const override   {unreachable(); return nullptr;}	
+  Base* modulo(const String*)const override     {unreachable(); return nullptr;}	
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -93,7 +93,7 @@ DISPATCHER<FUNCTION>::INSTALL d_initial_step(&function_dispatcher, "initial_step
 class CROSS : public MGVAMS_EVENT {
 protected:
   std::string _code_name;
-  Module* _m{NULL};
+  Module* _m{nullptr};
 public:
   explicit CROSS() : MGVAMS_EVENT() {
     set_label("cross");

@@ -121,7 +121,7 @@ static void make_funcs_common(std::ostream& o, pSet<FUNCTION_ const> const& P)
 {
   for (auto q = P.begin(); q != P.end(); ++q) {
     if(!*q){ untested();
-      o<<"// NULL\n";
+      o<<"// nullptr\n";
     }else if( (*q)->has_refs() ){
       (*q)->make_cc_common(o);
     }else if(dynamic_cast<MGVAMS_FUNCTION const*>(*q)){ untested();
@@ -481,7 +481,7 @@ static void make_precalc(std::ostream& o, Module const& m)
   return;
   std::string class_name = "PRECALC_" + m.identifier().to_string();
   o << "class " << class_name << "{\n";
-  o__ "COMPONENT* _d{NULL};\n";
+  o__ "COMPONENT* _d{nullptr};\n";
   o << "public:\n";
   declare_ddouble(o, m);
   o << "public:\n";
@@ -499,12 +499,12 @@ static void make_precalc(std::ostream& o, Module const& m)
 /*--------------------------------------------------------------------------*/
 static void make_cc_elements(std::ostream& o, Element_2_List const& L)
 {
-  o__ "COMPONENT const* _parent{NULL};\n";
+  o__ "COMPONENT const* _parent{nullptr};\n";
   for (Element_2_List::const_iterator e = L.begin(); e != L.end();
       ++e) {
     {
       assert(*e);
-      o__ "COMPONENT const* " << (*e)->code_name() << "{NULL};\n";
+      o__ "COMPONENT const* " << (*e)->code_name() << "{nullptr};\n";
     }
   }
 }
@@ -541,18 +541,18 @@ static void make_module(std::ostream& o, const Module& m)
   for (auto br : m.circuit()->branches()){
     if(br->is_filter()){
       if(!br->is_used() && options().optimize_unused()){
-	o__ "// ELEMENT* " << br->code_name() << "{NULL}; // unused filter\n";
+	o__ "// ELEMENT* " << br->code_name() << "{nullptr}; // unused filter\n";
       }else{
-	o__ "ELEMENT* " << br->code_name() << "{NULL}; // filter\n";
+	o__ "ELEMENT* " << br->code_name() << "{nullptr}; // filter\n";
       }
     }else if(br->is_short()){
       o__ "// short : " << br->code_name() << "\n";
     }else if(!br->is_used() && options().optimize_unused()){
-      o__ "// ELEMENT* " << br->code_name() << "{NULL}; // unused\n";
+      o__ "// ELEMENT* " << br->code_name() << "{nullptr}; // unused\n";
     }else if(br->has_element()){
-      o__ "ELEMENT* " << br->code_name() << "{NULL}; // branch\n";
+      o__ "ELEMENT* " << br->code_name() << "{nullptr}; // branch\n";
     }else{
-      o__ "// ELEMENT* " << br->code_name() << "{NULL}; // no element (not used)\n";
+      o__ "// ELEMENT* " << br->code_name() << "{nullptr}; // no element (not used)\n";
     }
   }
   o << "private: // func decl\n";

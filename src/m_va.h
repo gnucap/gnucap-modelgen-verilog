@@ -342,7 +342,7 @@ public:
     ret /= double(o);
     return ret;
   }
-  ddouble_ operator/(PARAMETER<int> const& o) const { untested();
+  ddouble_ operator/(PARAMETER<int> const& o) const {
     assert(o);
     ddouble_ ret = *this;
     ret /= int(o);

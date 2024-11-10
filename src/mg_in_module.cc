@@ -239,7 +239,7 @@ void Aliasparam::parse(CS& f)
   Module* m = prechecked_cast<Module*>(owner());
   assert(m);
   auto& p = m->parameters();
-  Parameter_2* pp = NULL;
+  Parameter_2* pp = nullptr;
   for(auto pl : p){
     auto it = notstd::find_ptr(pl->begin(), pl->end(), paramname);
     if(pp){
@@ -785,7 +785,7 @@ void Module::parse_body(CS& f)
       ;
     if (attr.has_attributes(tag_t(&f))) { untested();
       f.warn(bWARNING, "dangling attributes "
-	   + attr.attributes(tag_t(&f))->string(tag_t(NULL)));
+	   + attr.attributes(tag_t(&f))->string(tag_t(nullptr)));
     }else{
     }
     if (end){
@@ -1160,7 +1160,7 @@ Node::~Node()
 void Module::delete_circuit()
 {
   delete _circuit;
-  _circuit = NULL;
+  _circuit = nullptr;
 }
 /*--------------------------------------------------------------------------*/
 void Module::dump_parameters(std::ostream& o) const

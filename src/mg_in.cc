@@ -119,7 +119,7 @@ void print_attributes(std::ostream& o, const void* x)
   assert(x);
   if (attr.has_attributes(tag_t(x))) {
     o__ "";
-    o << "(* " << attr.attributes(tag_t(x))->string(tag_t(NULL)) << " *)\n";
+    o << "(* " << attr.attributes(tag_t(x))->string(tag_t(nullptr)) << " *)\n";
   }else{
   }
 }

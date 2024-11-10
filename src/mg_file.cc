@@ -71,7 +71,7 @@ void File::parse(CS& f)
       ;
     if (attr.has_attributes(tag_t(&f))) { untested();
       f.warn(bWARNING, "dangling attributes "
-	   + attr.attributes(tag_t(&f))->string(tag_t(NULL)));
+	   + attr.attributes(tag_t(&f))->string(tag_t(nullptr)));
     }else{
     }
     if (!f.more()) {

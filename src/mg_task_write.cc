@@ -79,7 +79,7 @@ private:
 DISPATCHER<FUNCTION>::INSTALL d_debug(&function_dispatcher, "$debug", &debug);
 /*--------------------------------------------------------------------------*/
 class WRITE : public MGVAMS_TASK {
-  Module* _m{NULL};
+  Module* _m{nullptr};
 public:
   explicit WRITE() : MGVAMS_TASK(){
     set_label("$write");

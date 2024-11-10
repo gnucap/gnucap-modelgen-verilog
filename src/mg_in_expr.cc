@@ -152,7 +152,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 	throw ee;
       }
 
-      Token_TERNARY_ t3(t->name(), NULL, tp, fp, NULL);
+      Token_TERNARY_ t3(t->name(), nullptr, tp, fp, nullptr);
       t3.stack_op(&E);
     }else if (n[0]=='.'){
       if(strchr("0123456789", n[1])){
@@ -205,7 +205,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
     }else if(!E.is_empty() && dynamic_cast<Token_PARLIST*>(E.back())
 	  && is_xs_function(n, Scope)) {
       // this is upside down...
-      Token_ACCESS tta(n, NULL);
+      Token_ACCESS tta(n, nullptr);
       tta.stack_op(&E);
     }else if(FUNCTION_ const* af = is_analog_function_call(n, Scope)) {
       // TODO: use "r"
@@ -437,7 +437,7 @@ Block* Expression_::scope()
   }else{ untested();
     incomplete();
     assert(0);
-    return NULL;
+    return nullptr;
   }
 }
 /*--------------------------------------------------------------------------*/

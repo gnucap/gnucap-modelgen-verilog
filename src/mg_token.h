@@ -30,15 +30,15 @@
 class FUNCTION_;
 class Token_CALL : public Token_SYMBOL {
 private: // stuff into data?
-  FUNCTION_ const* _function{NULL};
-  Expression const* _args{NULL};
+  FUNCTION_ const* _function{nullptr};
+  Expression const* _args{nullptr};
   size_t _num_args{size_t(-1)};
 private:
   Token* clone()const override { untested();
     return new Token_CALL(*this);
   }
 public:
-  explicit Token_CALL(const std::string Name, FUNCTION_ const* f, Expression const* e=NULL)
+  explicit Token_CALL(const std::string Name, FUNCTION_ const* f, Expression const* e=nullptr)
     : Token_SYMBOL(Name, ""), _function(f), _args(e) { attach(); }
   ~Token_CALL() {
     detach();
@@ -48,7 +48,7 @@ public:
 protected:
   explicit Token_CALL(const Token_CALL& P)
     : Token_SYMBOL(P.name(), ""), _function(P._function), _num_args(P._num_args) { attach(); }
-  explicit Token_CALL(const Token_CALL& P, Base const* data, Expression const* e=NULL)
+  explicit Token_CALL(const Token_CALL& P, Base const* data, Expression const* e=nullptr)
     : Token_SYMBOL(P.name(), data), _function(P._function), _args(e)
     , _num_args(P._num_args) { attach(); }
 private:
@@ -67,7 +67,7 @@ public:
 /*--------------------------------------------------------------------------*/
 class Port_3; // New_Port?
 class Token_PORT_BRANCH : public Token_SYMBOL {
-  Port_3 const* _port{NULL}; // use _data?
+  Port_3 const* _port{nullptr}; // use _data?
 public:
   Token_PORT_BRANCH(Token_PORT_BRANCH const& s)
     : Token_SYMBOL(s), _port(s._port) {}
@@ -130,21 +130,21 @@ static Token* copy(Token const* b)
   if(auto t=dynamic_cast<Token const*>(b)){ untested();
     return t->clone();
   }else if(b){ untested();
-    return NULL;
+    return nullptr;
   }else{ untested();
-    return NULL;
+    return nullptr;
   }
 }
 /*--------------------------------------------------------------------------*/
 class Expression_;
 class Token_PARLIST_ : public Token_PARLIST {
-  Expression const* _args{NULL};
+  Expression const* _args{nullptr};
 public:
   explicit Token_PARLIST_(Token_PARLIST const& p)
     : Token_PARLIST(p) { assert(!_args); }
   explicit Token_PARLIST_(Token_PARLIST_ const& p)
     : Token_PARLIST(p) { assert(!_args); }
-  explicit Token_PARLIST_(const std::string Name, Base* L=NULL)
+  explicit Token_PARLIST_(const std::string Name, Base* L=nullptr)
     : Token_PARLIST(Name, L) { untested(); assert(!L); assert(!_args); }
   ~Token_PARLIST_() { delete _args; _args = nullptr; }
 /*--------------------------------------------------------------------------*/
@@ -160,13 +160,13 @@ public:
 /*--------------------------------------------------------------------------*/
 #if 1
 class Token_ARRAY_ : public Token_ARRAY {
-  Expression const* _args{NULL};
+  Expression const* _args{nullptr};
 public:
   explicit Token_ARRAY_(Token_ARRAY const& p)
     : Token_ARRAY(p) { assert(!args()); }
   explicit Token_ARRAY_(Token_ARRAY_ const& p)
     : Token_ARRAY(p) { assert(!args()); }
-  explicit Token_ARRAY_(const std::string Name, Base* L=NULL)
+  explicit Token_ARRAY_(const std::string Name, Base* L=nullptr)
     : Token_ARRAY(Name, L) { untested(); assert(!args()); }
 public:
   void stack_op(Expression* E)const override;
@@ -182,9 +182,9 @@ public:
 #endif
 /*--------------------------------------------------------------------------*/
 class Token_UNARY_ : public Token_UNARY {
-  Token const* _op{NULL}; // stuff into data?
+  Token const* _op{nullptr}; // stuff into data?
 public:
-  explicit Token_UNARY_(const std::string Name, Token const* op, Base const* d=NULL)
+  explicit Token_UNARY_(const std::string Name, Token const* op, Base const* d=nullptr)
     : Token_UNARY(Name, d), _op(op) {}
   explicit Token_UNARY_(Token_UNARY const& b)
     : Token_UNARY(b.name()) { } // ,( copy_deps(b.data())) { }
@@ -194,14 +194,14 @@ public:
   ~Token_UNARY_(){ delete _op; }
 
   void stack_op(Expression*)const override;
-  void pop(){ untested(); _op = NULL; }
+  void pop(){ untested(); _op = nullptr; }
   Token const* op1()const { return _op; };
 };
 /*--------------------------------------------------------------------------*/
 class Token_BINOP_ : public Token_BINOP {
 private: // stuff into data?
-  Token const* _op1{NULL};
-  Token const* _op2{NULL};
+  Token const* _op1{nullptr};
+  Token const* _op2{nullptr};
 public:
   explicit Token_BINOP_(Token_BINOP const& b, Base const* d)
     : Token_BINOP(b.name(), d) { untested(); }
@@ -217,13 +217,13 @@ public:
     delete _op2;
   }
   void pop(){
-    _op1 = _op2 = NULL;
+    _op1 = _op2 = nullptr;
   }
   void pop1(){
-    _op1 = NULL;
+    _op1 = nullptr;
   }
   void pop2(){
-    _op2 = NULL;
+    _op2 = nullptr;
   }
 
   Token* clone()const override { untested();
@@ -240,20 +240,20 @@ private:
 };
 /*--------------------------------------------------------------------------*/
 class Token_TERNARY_ : public Token_TERNARY {
-  Token const* _cond{NULL}; // stuff into data?
+  Token const* _cond{nullptr}; // stuff into data?
 public:
 //  explicit Token_TERNARY_(Token_TERNARY const& b, Base const* d)
 //    : Token_TERNARY(b.name(), d) { untested(); }
   explicit Token_TERNARY_(std::string const& b, Base const* d)
     : Token_TERNARY(b, d) { untested(); }
   explicit Token_TERNARY_(std::string const& b, Token const* Cond,
-      Expression const* t1, Expression const* t2, Base const* d=NULL)
+      Expression const* t1, Expression const* t2, Base const* d=nullptr)
     : Token_TERNARY(b, t1, t2, d), _cond(Cond) {}
   ~Token_TERNARY_();
 
   Token* clone()const override { untested();
     unreachable();
-    return NULL;
+    return nullptr;
     // new Token_TERNARY_(name(), dup(true_part()), dup(false_part()), copy(data()));
   }
 
@@ -286,7 +286,7 @@ class FUNCTION_;
 class Token_ACCESS : public Token_SYMBOL {
   mutable /*BUG*/ FUNCTION_ const* _prb;
 public:
-  explicit Token_ACCESS(const std::string Name, Base const* Data, FUNCTION_ const* f=NULL)
+  explicit Token_ACCESS(const std::string Name, Base const* Data, FUNCTION_ const* f=nullptr)
     : Token_SYMBOL(Name, Data), _prb(f) {}
 
 private:
@@ -313,9 +313,9 @@ class Token_PAR_REF : public Token_CONSTANT {
   Parameter_Base const* _item;
 public:
   explicit Token_PAR_REF(const std::string Name, Parameter_Base const* item)
-    : Token_CONSTANT(NULL, ""), _name(Name), _item(item) {}
+    : Token_CONSTANT(nullptr, ""), _name(Name), _item(item) {}
 private:
-  explicit Token_PAR_REF(const Token_PAR_REF& P, Base const* d=NULL)
+  explicit Token_PAR_REF(const Token_PAR_REF& P, Base const* d=nullptr)
     : Token_CONSTANT(d, ""), _name(P._name), _item(P._item) {}
   Token* clone()const override { untested();
     return new Token_PAR_REF(*this);
@@ -354,7 +354,7 @@ private:
 class Data_Type;
 class Token_ARGUMENT : public Token_SYMBOL {
 public:
-  Token * _var{NULL};
+  Token * _var{nullptr};
   Data_Type const& type()const;
 public:
   explicit Token_ARGUMENT() : Token_SYMBOL("",""){ untested();unreachable();}
@@ -376,7 +376,7 @@ public:
   explicit Token_VAR_REF(std::string Name, Base* item, Base const* data)
     : Token_SYMBOL(Name, data), _item(item) {}
 // protected: //??
-  explicit Token_VAR_REF(const Token_VAR_REF& P, Base* d=NULL)
+  explicit Token_VAR_REF(const Token_VAR_REF& P, Base* d=nullptr)
     : Token_SYMBOL(P.name(), d), _item(P._item) {}
   explicit Token_VAR_REF() : Token_SYMBOL("","")  { untested(); unreachable(); }
   ~Token_VAR_REF() {
@@ -409,11 +409,11 @@ private:
 /*--------------------------------------------------------------------------*/
 class Variable_Stmt;
 class Token_VAR_DECL : public Token_VAR_REF {
-  // Variable_Stmt const* _owner{NULL}; // _item?
+  // Variable_Stmt const* _owner{nullptr}; // _item?
   Base const* _default{0};
   // type //
 public:
-  explicit Token_VAR_DECL() : Token_VAR_REF("",NULL,NULL) { untested();unreachable();}
+  explicit Token_VAR_DECL() : Token_VAR_REF("",nullptr,nullptr) { untested();unreachable();}
   explicit Token_VAR_DECL(std::string Name, Base* item, Base const* data)
     : Token_VAR_REF(Name, item, data) {}
   // Token_VAR_DECL* deep_copy(Base* owner, std::string prefix)const override;
@@ -432,10 +432,10 @@ public:
 /*--------------------------------------------------------------------------*/
 class Token_EVT : public Token_CALL {
 public:
-  explicit Token_EVT(const std::string Name, FUNCTION_ const* f = NULL)
+  explicit Token_EVT(const std::string Name, FUNCTION_ const* f = nullptr)
     : Token_CALL(Name, f) {}
 private:
-  explicit Token_EVT(const Token_EVT& P, Base const* data=NULL)
+  explicit Token_EVT(const Token_EVT& P, Base const* data=nullptr)
     : Token_CALL(P, data) { untested();}
   Token* clone()const override { untested();
     return new Token_EVT(*this);

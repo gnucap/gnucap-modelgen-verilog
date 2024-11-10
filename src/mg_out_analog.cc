@@ -39,7 +39,7 @@ public:
     modeTR_ACCEPT = 9,
     modeNUM = 10
   }_mode;
-  Base const* _src{NULL};
+  Base const* _src{nullptr};
   std::string ctx()const {
     char const* names[modeNUM] = { //
       "precalc", "static", "tr_eval", "probe", "tr_begin", "tr_restore",
@@ -49,7 +49,7 @@ public:
   }
 
 public:
-  explicit OUT_ANALOG(mode m, Base const* src=NULL)
+  explicit OUT_ANALOG(mode m, Base const* src=nullptr)
     : _mode(m),
       _src(src){}
 
@@ -745,7 +745,7 @@ void OUT_ANALOG::make_switch(std::ostream& o, AnalogSwitchStmt const& s) const
     o__ "}\n";
     std::string paren="";
 
-    CaseGen const* def = NULL;
+    CaseGen const* def = nullptr;
     for(auto c : s.cases()){
       auto i = prechecked_cast<CaseGen*>(c);
       assert(i);
@@ -1064,11 +1064,11 @@ static void make_one_variable_proxy(std::ostream& o, Token_VAR_REF const& V)
   o__ "public:\n";
   o____ "typedef ddouble base;\n";
   o____ "typedef va::ddouble_tag base_tag;\n";
-  o____ "_V_" << V.name() << "(ddouble const& p) : ddouble(p), _m(NULL) { itested(); }\n";
-  o____ "_V_" << V.name() << "(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}\n";
-  o____ "_V_" << V.name() << "(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}\n";
-  o____ "_V_" << V.name() << "(_V_" << V.name() << " const& p) : ddouble(p), _m(NULL) {}\n";
-  o____ "explicit _V_" << V.name() << "() : ddouble(), _m(NULL) {set_all_deps();}\n";
+  o____ "_V_" << V.name() << "(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }\n";
+  o____ "_V_" << V.name() << "(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}\n";
+  o____ "_V_" << V.name() << "(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}\n";
+  o____ "_V_" << V.name() << "(_V_" << V.name() << " const& p) : ddouble(p), _m(nullptr) {}\n";
+  o____ "explicit _V_" << V.name() << "() : ddouble(), _m(nullptr) {set_all_deps();}\n";
   o____ "_V_" << V.name() << "(MOD__* m) : "
     << "ddouble(m->" << V.long_code_name() << "), _m(m) {}\n";
   o____ "~_V_" << V.name() << "() {\n";
@@ -1225,7 +1225,7 @@ void OUT_ANALOG::make_analog_list(std::ostream& o, const Module& m) const
     if(_src){
     }else{
     }
-    trace1("analoglist", bb->is_used_in(NULL));
+    trace1("analoglist", bb->is_used_in(nullptr));
     if(_src && !bb->is_used_in(_src)){ untested();
       o__ "// omit2 " << typeid(*bb).name() << "\n";
     }else if(auto ab = dynamic_cast<AnalogConstruct const*>(bb)){
@@ -1549,7 +1549,7 @@ void Probe::make_cc_dev(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 // TODO. obsolete.
 void make_cc_analog_list(std::ostream& o, const Module& m, Branch const*
-    src=NULL)
+    src=nullptr)
 {
   OUT_ANALOG oo(OUT_ANALOG::modeDYNAMIC, src);
   oo.make_analog_list(o, m);

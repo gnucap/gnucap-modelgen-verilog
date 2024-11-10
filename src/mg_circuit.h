@@ -61,7 +61,7 @@ typedef LiSt<Port_3, '\0', ',', ';'> Port_3_List_3;
 /*--------------------------------------------------------------------------*/
 class Port_Connection_List : public LiSt<Port_3, '(', ',', ')'> {
   bool _has_names{false};
-  // Block* _owner{NULL};
+  // Block* _owner{nullptr};
 public:
   void parse(CS& f)override;
   bool has_names() const {return _has_names;}
@@ -113,7 +113,7 @@ class Element_2 : public Owned_Base {
   std::string _omit;
   std::string _reverse;
   std::string _state;
-//  Block* _owner{NULL};
+//  Block* _owner{nullptr};
 public:
   void parse(CS&) override;
   void dump(std::ostream& f)const override;
@@ -128,8 +128,8 @@ public:
   void set_eval(std::string const& s){_eval = s;}
   void set_state(std::string const& s){_state = s;}
   virtual std::string dev_type()const {return _module_or_paramset_identifier;}
-  virtual Nature const* nature()const { untested();return NULL;}
-  virtual Discipline const* discipline()const {return NULL;}
+  virtual Nature const* nature()const { untested();return nullptr;}
+  virtual Discipline const* discipline()const {return nullptr;}
   const Parameter_3_List&
 		     list_of_parameter_assignments()const {return _list_of_parameter_assignments;}
   const Port_Connection_List& ports()const	  {return _list_of_port_connections;}
@@ -156,7 +156,7 @@ class Branch : public Element_2 {
   // TerminalPair _output;
   Node_Ref _p;
   Node_Ref _n;
-  TData *_deps{NULL}; // delete? move to _ctrl.
+  TData *_deps{nullptr}; // delete? move to _ctrl.
   // TODO: refactor into _ctrl
   size_t _has_flow_probe{0};
   size_t _has_pot_probe{0};
@@ -164,7 +164,7 @@ class Branch : public Element_2 {
   size_t _has_pot_src{0};
   size_t _has_short{0};
   size_t _has_always_pot{0};
-  FUNCTION_ const* _ctrl{NULL};
+  FUNCTION_ const* _ctrl{nullptr};
   std::vector<Branch_Ref*> _refs;
   size_t _number;
 //  std::list<std::string> _names;
@@ -277,7 +277,7 @@ inline std::string to_upper(std::string s)
 /*--------------------------------------------------------------------------*/
 // TODO: Port_Base?
 class New_Port : public Port_3 {
-//  Block* _owner{NULL};
+//  Block* _owner{nullptr};
 public:
 //  void set_owner(Block* c) { untested(); _owner = c; }
   void parse(CS& f) override;

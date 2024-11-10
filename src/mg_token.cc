@@ -88,8 +88,8 @@ static bool is_literal(Token const* t, double val=NOT_VALID)
 namespace {
 /*--------------------------------------------------------------------------*/
 class stash_op {
-  Token* _op{NULL};
-  Expression* _E{NULL};
+  Token* _op{nullptr};
+  Expression* _E{nullptr};
 public:
   stash_op(Expression* E) : _E(E) {
     assert(E);
@@ -129,14 +129,14 @@ public:
   }
   void push() {
     _E->push_back(_op);
-    _op = NULL;
+    _op = nullptr;
   }
   void pop() {
-    _op = NULL;
+    _op = nullptr;
   }
   void erase() {
     delete(_op);
-    _op = NULL;
+    _op = nullptr;
   }
   operator Token const*()const {
     return _op;
@@ -242,7 +242,7 @@ TData const* Token_BINOP_::op_deps(Token const* t1, Token const* t2)const
     b = d2->combine(d1);
   }
 
-  TData const* ret = NULL;
+  TData const* ret = nullptr;
   if(b){
     ret = prechecked_cast<TData const*>(b);
     assert(ret);
@@ -282,7 +282,7 @@ void Token_UNARY_::stack_op(Expression* E)const
     }
   }else{
     TData const* d1 = dynamic_cast<TData const*>(t1->data());
-    TData const* deps = NULL;
+    TData const* deps = nullptr;
     if(d1) {
       deps = d1->clone();
     }else{
@@ -507,7 +507,7 @@ void Token_TERNARY_::stack_op(Expression* E)const
   if ( is_literal(cond) ) {
     bool select = !is_literal(cond, 0.);
     delete cond;
-    cond = NULL;
+    cond = nullptr;
     Expression const* sel;
 
     if(select){
@@ -558,7 +558,7 @@ void Token_TERNARY_::stack_op(Expression* E)const
 Token_TERNARY_::~Token_TERNARY_()
 {
   delete _cond;
-  _cond = NULL;
+  _cond = nullptr;
 }
 /*--------------------------------------------------------------------------*/
 static TData* new_deps(Base const* data)
@@ -589,7 +589,7 @@ void Token_CALL::stack_op(Expression* e) const
   assert(E);
   Expression const* arg_expr = args();
 
-  Token const* T1 = NULL;
+  Token const* T1 = nullptr;
   bool del_args = false;
   if (arg_expr) {
   }else if (E->is_empty()) {
@@ -597,7 +597,7 @@ void Token_CALL::stack_op(Expression* e) const
     del_args = true;
     arg_expr = pl->args();
     if(arg_expr){
-      pl->set_args(NULL);
+      pl->set_args(nullptr);
       E->pop_back();
       delete(pl);
     }else{ untested();
@@ -616,7 +616,7 @@ void Token_CALL::stack_op(Expression* e) const
 	f->stack_op(*arg_expr, E);
       }catch(Exception const&){
 	// incomplete(); later
-	f = NULL;
+	f = nullptr;
       }
     }else{ untested();
     }
@@ -670,7 +670,7 @@ static Module* to_module(Block* owner)
     assert(owner);
   }
   unreachable();
-  return NULL;
+  return nullptr;
 }
 /*--------------------------------------------------------------------------*/
 size_t Token_ACCESS::num_deps() const
@@ -859,7 +859,7 @@ void Token_PAR_REF::stack_op(Expression* e)const
   if(ev) {
     e->push_back(new Token_PAR_REF(*this, ev->clone()));
   }else{
-    e->push_back(new Token_PAR_REF(*this, NULL/*TODO*/));
+    e->push_back(new Token_PAR_REF(*this, nullptr/*TODO*/));
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -898,7 +898,7 @@ void Token_VAR_REF::stack_op(Expression* e)const
   }
 
   {
-    TData* nd = NULL;
+    TData* nd = nullptr;
     if(auto a = dynamic_cast<Assignment const*>(_item)){
       nd = deps().clone();
       nd = a->data().clone();
@@ -1071,7 +1071,7 @@ Block const* Token_VAR_REF::scope() const
   }else if(auto ex=dynamic_cast<Expression_*>(_item)){
     return ex->scope();
   }else{ untested();
-    return NULL;
+    return nullptr;
     unreachable();
     auto p = prechecked_cast<Variable_Decl*>(_item);
     assert(p);
@@ -1118,7 +1118,7 @@ void Token_VAR_DECL::stack_op(Expression* e)const
   assert(oi);
 
   {
-    TData* nd = NULL;
+    TData* nd = nullptr;
     if(auto a = dynamic_cast<Assignment const*>(_item)){ untested();
       nd = a->data().clone();
 //      nd->add_sens(_item); not yet.
@@ -1152,7 +1152,7 @@ void Token_VAR_REAL::stack_op(Expression* e)const
   assert(oi);
 
   { untested();
-    TData* nd = NULL;
+    TData* nd = nullptr;
     if(auto a = dynamic_cast<Assignment const*>(_item)){ untested();
       nd = a->data().clone();
 //      nd->add_sens(_item); not yet.

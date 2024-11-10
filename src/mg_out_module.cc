@@ -202,7 +202,7 @@ static void make_set_parameters(std::ostream& o, const Element_2& e, std::string
   if (e.state() != "") {
     o << ", /*states:*/" << e.num_states() << ", " << e.state();
   }else{ untested();
-    o << ", 0, NULL";
+    o << ", 0, nullptr";
   }
   o << ", " << e.num_nodes() << ", nodes);\n";
 }
@@ -230,7 +230,7 @@ static void map_subdev_nodes(std::ostream& o, const Element_2& e)
     o____ "c->set_parameters(c->short_label(), this";
     o << ", c->mutable_common()";
     o << ", 0."; // value
-    o << ", 0, NULL";
+    o << ", 0, nullptr";
     o << ", " << e.num_nodes() << ", nodes);\n";
   }
 }
@@ -599,7 +599,7 @@ static void make_tr_accept(std::ostream& o, const Module& m)
 }
 /*--------------------------------------------------------------------------*/
 void make_cc_analog_list(std::ostream& o, const Module& m, Branch const*
-    src=NULL);
+    src=nullptr);
 /*--------------------------------------------------------------------------*/
 // move to analog.cc?
 static void make_tr_eval_branch(std::ostream& o, Module const& m,
@@ -863,7 +863,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
     o__ "if (" << e.omit() << ") {\n";
     o____ "if (" << cn << ") {\n";
     o______ "subckt()->erase(" << cn << ");\n";
-    o______ cn << " = NULL;\n";
+    o______ cn << " = nullptr;\n";
     o____ "}else{\n";
     o____ "}\n";
     o__ "}else{\n";
@@ -950,7 +950,7 @@ static void make_module_precalc_first(std::ostream& o, Module const& m)
     o__ "subckt()->attach_params(&(c->_netlist_params), scope());\n";
   }else{
   }
-  o____ "attach_common(NULL);\n";
+  o____ "attach_common(nullptr);\n";
   o____ "attach_common(cc);\n";
   o____ "subckt()->precalc_first();\n";
   o__ "}else{\n";

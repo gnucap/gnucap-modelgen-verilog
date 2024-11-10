@@ -794,8 +794,8 @@ public:
 /*--------------------------------------------------------------------------*/
 class DISCIPLINE {
 public:
-  virtual NATURE const* flow()const { untested();return NULL;}
-  virtual NATURE const* potential()const { untested();return NULL;}
+  virtual NATURE const* flow()const { untested();return nullptr;}
+  virtual NATURE const* potential()const { untested();return nullptr;}
 };
 /*--------------------------------------------------------------------------*/
 // tmp kludge. nodes don't have disciplines yet...
@@ -804,7 +804,7 @@ public:
   explicit COMMON_VASRC(int i) : COMMON_COMPONENT(i) {}
   ~COMMON_VASRC() {}
 public:
-  virtual DISCIPLINE const* discipline()const{return NULL;};
+  virtual DISCIPLINE const* discipline()const{return nullptr;};
   double flow_abstol() const{
     if(!discipline()){ untested();
       return OPT::abstol;
@@ -830,7 +830,7 @@ public:
   explicit COMMON_FILT(int i=CC_STATIC) : COMMON_COMPONENT(i) { }
   ~COMMON_FILT() { }
 public:
-  //virtual DISCIPLINE const* discipline()const{untested(); return NULL;};
+  //virtual DISCIPLINE const* discipline()const{untested(); return nullptr;};
   virtual int args(int) const{ untested(); return 0; }
 };
 /*--------------------------------------------------------------------------*/
@@ -1029,8 +1029,8 @@ public:
 private: // data
   node_t _nodes[4];
 public: // netlist
-  ELEMENT* _b_white_noise_1_p_white_noise_1_n{NULL}; // filter
-  ELEMENT* _b_p_n{NULL}; // branch
+  ELEMENT* _b_white_noise_1_p_white_noise_1_n{nullptr}; // filter
+  ELEMENT* _b_p_n{nullptr}; // branch
 private: // func decl
 //other: $param_given
 //func $temperature
@@ -1447,11 +1447,11 @@ void EVAL__b_white_noise_1_p_white_noise_1_n_::tr_eval(ELEMENT* d)const
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_dt(ddouble const& p) : ddouble(p), _m(NULL) { itested(); }
-      _V_dt(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_dt(_V_dt const& p) : ddouble(p), _m(NULL) {}
-      explicit _V_dt() : ddouble(), _m(NULL) {set_all_deps();}
+      _V_dt(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
+      _V_dt(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_dt(_V_dt const& p) : ddouble(p), _m(nullptr) {}
+      explicit _V_dt() : ddouble(), _m(nullptr) {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
         if(_m){
@@ -1474,11 +1474,11 @@ void EVAL__b_white_noise_1_p_white_noise_1_n_::tr_eval(ELEMENT* d)const
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p), _m(NULL) { itested(); }
-      _V_g(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p), _m(NULL) {}
-      explicit _V_g() : ddouble(), _m(NULL) {set_all_deps();}
+      _V_g(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
+      _V_g(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_g(_V_g const& p) : ddouble(p), _m(nullptr) {}
+      explicit _V_g() : ddouble(), _m(nullptr) {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
         if(_m){
@@ -1530,11 +1530,11 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_dt(ddouble const& p) : ddouble(p), _m(NULL) { itested(); }
-      _V_dt(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_dt(_V_dt const& p) : ddouble(p), _m(NULL) {}
-      explicit _V_dt() : ddouble(), _m(NULL) {set_all_deps();}
+      _V_dt(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
+      _V_dt(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_dt(_V_dt const& p) : ddouble(p), _m(nullptr) {}
+      explicit _V_dt() : ddouble(), _m(nullptr) {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
         if(_m){
@@ -1557,11 +1557,11 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p), _m(NULL) { itested(); }
-      _V_g(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p), _m(NULL) {}
-      explicit _V_g() : ddouble(), _m(NULL) {set_all_deps();}
+      _V_g(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
+      _V_g(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_g(_V_g const& p) : ddouble(p), _m(nullptr) {}
+      explicit _V_g() : ddouble(), _m(nullptr) {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
         if(_m){
@@ -1692,11 +1692,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
   public:
     typedef ddouble base;
     typedef va::ddouble_tag base_tag;
-    _V___i(ddouble const& p) : ddouble(p), _m(NULL) { itested(); }
-    _V___i(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-    _V___i(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-    _V___i(_V___i const& p) : ddouble(p), _m(NULL) {}
-    explicit _V___i() : ddouble(), _m(NULL) {set_all_deps();}
+    _V___i(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
+    _V___i(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+    _V___i(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+    _V___i(_V___i const& p) : ddouble(p), _m(nullptr) {}
+    explicit _V___i() : ddouble(), _m(nullptr) {set_all_deps();}
     _V___i(MOD__* m) : ddouble(m->_v_.___i), _m(m) {}
     ~_V___i() {
       if(_m){
@@ -1730,11 +1730,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_dt(ddouble const& p) : ddouble(p), _m(NULL) { itested(); }
-      _V_dt(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_dt(_V_dt const& p) : ddouble(p), _m(NULL) {}
-      explicit _V_dt() : ddouble(), _m(NULL) {set_all_deps();}
+      _V_dt(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
+      _V_dt(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_dt(_V_dt const& p) : ddouble(p), _m(nullptr) {}
+      explicit _V_dt() : ddouble(), _m(nullptr) {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
         if(_m){
@@ -1757,11 +1757,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p), _m(NULL) { itested(); }
-      _V_g(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p), _m(NULL) {}
-      explicit _V_g() : ddouble(), _m(NULL) {set_all_deps();}
+      _V_g(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
+      _V_g(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_g(_V_g const& p) : ddouble(p), _m(nullptr) {}
+      explicit _V_g() : ddouble(), _m(nullptr) {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
         if(_m){
@@ -2029,7 +2029,7 @@ void MOD_resistor::precalc_first()
   assert(c);
   auto cc = c->clone();
   if(subckt()){
-    attach_common(NULL);
+    attach_common(nullptr);
     attach_common(cc);
     subckt()->precalc_first();
   }else{
@@ -2254,8 +2254,8 @@ public:
 private: // data
   node_t _nodes[4];
 public: // netlist
-  ELEMENT* _b_white_noise_0_p_white_noise_0_n{NULL}; // filter
-  ELEMENT* _b_p_n{NULL}; // branch
+  ELEMENT* _b_white_noise_0_p_white_noise_0_n{nullptr}; // filter
+  ELEMENT* _b_p_n{nullptr}; // branch
 private: // func decl
 //other: $param_given
 //func $temperature
@@ -2703,11 +2703,11 @@ void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_dt(ddouble const& p) : ddouble(p), _m(NULL) { itested(); }
-      _V_dt(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_dt(_V_dt const& p) : ddouble(p), _m(NULL) {}
-      explicit _V_dt() : ddouble(), _m(NULL) {set_all_deps();}
+      _V_dt(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
+      _V_dt(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_dt(_V_dt const& p) : ddouble(p), _m(nullptr) {}
+      explicit _V_dt() : ddouble(), _m(nullptr) {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
         if(_m){
@@ -2730,11 +2730,11 @@ void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p), _m(NULL) { itested(); }
-      _V_g(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p), _m(NULL) {}
-      explicit _V_g() : ddouble(), _m(NULL) {set_all_deps();}
+      _V_g(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
+      _V_g(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_g(_V_g const& p) : ddouble(p), _m(nullptr) {}
+      explicit _V_g() : ddouble(), _m(nullptr) {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
         if(_m){
@@ -2786,11 +2786,11 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_dt(ddouble const& p) : ddouble(p), _m(NULL) { itested(); }
-      _V_dt(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_dt(_V_dt const& p) : ddouble(p), _m(NULL) {}
-      explicit _V_dt() : ddouble(), _m(NULL) {set_all_deps();}
+      _V_dt(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
+      _V_dt(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_dt(_V_dt const& p) : ddouble(p), _m(nullptr) {}
+      explicit _V_dt() : ddouble(), _m(nullptr) {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
         if(_m){
@@ -2813,11 +2813,11 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p), _m(NULL) { itested(); }
-      _V_g(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p), _m(NULL) {}
-      explicit _V_g() : ddouble(), _m(NULL) {set_all_deps();}
+      _V_g(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
+      _V_g(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_g(_V_g const& p) : ddouble(p), _m(nullptr) {}
+      explicit _V_g() : ddouble(), _m(nullptr) {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
         if(_m){
@@ -3005,11 +3005,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
   public:
     typedef ddouble base;
     typedef va::ddouble_tag base_tag;
-    _V_i(ddouble const& p) : ddouble(p), _m(NULL) { itested(); }
-    _V_i(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-    _V_i(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-    _V_i(_V_i const& p) : ddouble(p), _m(NULL) {}
-    explicit _V_i() : ddouble(), _m(NULL) {set_all_deps();}
+    _V_i(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
+    _V_i(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+    _V_i(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+    _V_i(_V_i const& p) : ddouble(p), _m(nullptr) {}
+    explicit _V_i() : ddouble(), _m(nullptr) {set_all_deps();}
     _V_i(MOD__* m) : ddouble(m->_v_._i), _m(m) {}
     ~_V_i() {
       if(_m){
@@ -3043,11 +3043,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_dt(ddouble const& p) : ddouble(p), _m(NULL) { itested(); }
-      _V_dt(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_dt(_V_dt const& p) : ddouble(p), _m(NULL) {}
-      explicit _V_dt() : ddouble(), _m(NULL) {set_all_deps();}
+      _V_dt(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
+      _V_dt(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_dt(_V_dt const& p) : ddouble(p), _m(nullptr) {}
+      explicit _V_dt() : ddouble(), _m(nullptr) {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
         if(_m){
@@ -3070,11 +3070,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p), _m(NULL) { itested(); }
-      _V_g(double const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(NULL) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p), _m(NULL) {}
-      explicit _V_g() : ddouble(), _m(NULL) {set_all_deps();}
+      _V_g(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
+      _V_g(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
+      _V_g(_V_g const& p) : ddouble(p), _m(nullptr) {}
+      explicit _V_g() : ddouble(), _m(nullptr) {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
         if(_m){
@@ -3556,7 +3556,7 @@ void MOD_resistor::precalc_first()
   assert(c);
   auto cc = c->clone();
   if(subckt()){
-    attach_common(NULL);
+    attach_common(nullptr);
     attach_common(cc);
     subckt()->precalc_first();
   }else{
@@ -4513,8 +4513,8 @@ public:
 /*--------------------------------------------------------------------------*/
 class DISCIPLINE {
 public:
-  virtual NATURE const* flow()const { untested();return NULL;}
-  virtual NATURE const* potential()const { untested();return NULL;}
+  virtual NATURE const* flow()const { untested();return nullptr;}
+  virtual NATURE const* potential()const { untested();return nullptr;}
 };
 /*--------------------------------------------------------------------------*/
 // tmp kludge. nodes don't have disciplines yet...
@@ -4523,7 +4523,7 @@ public:
   explicit COMMON_VASRC(int i) : COMMON_COMPONENT(i) {}
   ~COMMON_VASRC() {}
 public:
-  virtual DISCIPLINE const* discipline()const{return NULL;};
+  virtual DISCIPLINE const* discipline()const{return nullptr;};
   double flow_abstol() const{
     if(!discipline()){ untested();
       return OPT::abstol;
@@ -4549,7 +4549,7 @@ public:
   explicit COMMON_FILT(int i=CC_STATIC) : COMMON_COMPONENT(i) { }
   ~COMMON_FILT() { }
 public:
-  //virtual DISCIPLINE const* discipline()const{untested(); return NULL;};
+  //virtual DISCIPLINE const* discipline()const{untested(); return nullptr;};
   virtual int args(int) const{ untested(); return 0; }
 };
 /*--------------------------------------------------------------------------*/
@@ -4760,8 +4760,8 @@ public:
 private: // data
   node_t _nodes[4];
 public: // netlist
-  ELEMENT* _b_ddt_1_p_ddt_1_n{NULL}; // filter
-  ELEMENT* _b_p_n{NULL}; // branch
+  ELEMENT* _b_ddt_1_p_ddt_1_n{nullptr}; // filter
+  ELEMENT* _b_p_n{nullptr}; // branch
 private: // func decl
 //other: $param_given
 //other: analysis
@@ -5423,7 +5423,7 @@ void MOD_capacitor::precalc_first()
   assert(c);
   auto cc = c->clone();
   if(subckt()){
-    attach_common(NULL);
+    attach_common(nullptr);
     attach_common(cc);
     subckt()->precalc_first();
   }else{
@@ -5653,8 +5653,8 @@ public:
 private: // data
   node_t _nodes[4];
 public: // netlist
-  ELEMENT* _b_ddt_2_p_ddt_2_n{NULL}; // filter
-  ELEMENT* _b_p_n{NULL}; // branch
+  ELEMENT* _b_ddt_2_p_ddt_2_n{nullptr}; // filter
+  ELEMENT* _b_p_n{nullptr}; // branch
 private: // func decl
 //other: $param_given
 //other: analysis
@@ -6401,7 +6401,7 @@ void MOD_capacitor::precalc_first()
   assert(c);
   auto cc = c->clone();
   if(subckt()){
-    attach_common(NULL);
+    attach_common(nullptr);
     attach_common(cc);
     subckt()->precalc_first();
   }else{

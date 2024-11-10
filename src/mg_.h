@@ -142,7 +142,7 @@ public:
 #if 0
 class Code_Block : public Base {
   std::string _s;
-  Block* _owner{NULL};
+  Block* _owner{nullptr};
 public:
   void set_owner(Block* c) { untested(); _owner = c; }
   void parse(CS& f)override;
@@ -187,13 +187,13 @@ class Sensitivities;
 /*--------------------------------------------------------------------------*/
 // BUG. analog.h?
 class AnalogConstruct : public Statement {
-  Block* _block{NULL};
+  Block* _block{nullptr};
 public:
   AnalogConstruct(){
   }
   ~AnalogConstruct(){
     delete _block;
-    _block = NULL;
+    _block = nullptr;
   }
 
 public:
@@ -236,7 +236,7 @@ class Discipline;
 // TODO: Port_Base?
 class Node;
 class Net_Identifier : public Port_3 {
-  Block* _owner{NULL};
+  Block* _owner{nullptr};
 public:
   Net_Identifier() : Port_3() {}
 protected:
@@ -257,7 +257,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Net_Decl_List_Discipline : public Net_Decl_List {
-  Discipline const* _disc{NULL};
+  Discipline const* _disc{nullptr};
 public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
@@ -317,7 +317,7 @@ class Named_Branch : public Branch {
   Branch_Ref _br;
   std::string _name;
 public:
-  // explicit Named_Branch(std::string n) : Branch(NULL, NULL, NULL), _name(n){} // BUG: no transparent compare in c++<14
+  // explicit Named_Branch(std::string n) : Branch(nullptr, nullptr, nullptr), _name(n){} // BUG: no transparent compare in c++<14
   explicit Named_Branch(Branch_Ref a, std::string n, Module* m)
      : Branch(a, m), _br(a), _name(n) {
      //  set_label("NBTODO");
@@ -362,7 +362,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Paramset_Stmt : public Owned_Base {
-  Parameter_Base const* _what{NULL};
+  Parameter_Base const* _what{nullptr};
   Expression_ _rhs;
   bool _overridden{false};
 public:
@@ -382,11 +382,11 @@ public:
 class Node : public Base {
   std::string _name;
   int _number{-1};
-  Node const* _short_to{NULL};
+  Node const* _short_to{nullptr};
   std::string _short_if;
-  Discipline const* _discipline{NULL};
-  Nature const* _nature{NULL};
-  Node* _next{NULL};
+  Discipline const* _discipline{nullptr};
+  Nature const* _nature{nullptr};
+  Node* _next{nullptr};
   mutable int _use{0};
   std::vector<Element_2 const*> _fanout;
 public:
