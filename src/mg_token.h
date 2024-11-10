@@ -73,9 +73,7 @@ public:
   virtual /*?*/ std::string code_name() const;
   FUNCTION_ const* f() const{ return _function; }
   bool returns_void() const;
-  bool has_modes() const{ assert(_function); return _function->has_modes(); }
-  bool has_precalc() const{ assert(_function); return _function->has_precalc(); }
-  bool is_common() const{ assert(_function); return _function->is_common(); }
+  FUNCTION_ const* operator->()const { assert(_function); return _function; }
 }; // Token_CALL
 /*--------------------------------------------------------------------------*/
 class Port_3; // New_Port?

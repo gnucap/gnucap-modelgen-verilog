@@ -29,7 +29,7 @@
 #include <globals.h>
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/
-bool Statement::propagate_rdep(Base const* b)
+bool Statement::propagate_rdep(Base const* )
 {
   unreachable();
   incomplete();
