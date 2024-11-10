@@ -248,12 +248,12 @@ void System_Task::dump(std::ostream&o)const
 }
 /*--------------------------------------------------------------------------*/
 bool System_Task::is_used_in(Base const*b) const
-{
+{ untested();
   if(_e.is_used_in(b)){ untested();
     return true;
-  }else if( Statement::is_used_in(b)) {
+  }else if( Statement::is_used_in(b)) { untested();
     return true;
-  }else{
+  }else{ untested();
     return false;
   }
 }
@@ -450,7 +450,7 @@ void AnalogConditionalStmt::parse(CS& f)
     }else if(_cond.is_false()) {
       if(is_always()) {
 	_false_part.set_always();
-      }else{
+      }else{ untested();
       }
       _body.set_never();
     }else{
@@ -510,10 +510,10 @@ void AnalogConditionalStmt::dump(std::ostream& o) const
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogConditionalStmt::is_used_in(Base const* b) const
-{
+{ untested();
   if (_cond.is_used_in(b)){ untested();
     return true;
-  }else{
+  }else{ untested();
     return AnalogStmt::is_used_in(b);
   }
 }
@@ -724,7 +724,7 @@ void CaseGen::calc_reach(Expression const& ctrl)
       b.pop();
       assert(result.size());
 
-      if(is_false(result)) {
+      if(is_false(result)) { untested();
       }else{
 	all_never = false;
       }
@@ -734,7 +734,7 @@ void CaseGen::calc_reach(Expression const& ctrl)
       }else{
       }
     }
-    if(all_never){
+    if(all_never){ untested();
       set_never();
     }else{
     }
@@ -887,7 +887,7 @@ void AnalogSwitchStmt::dump(std::ostream& o)const
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogConstruct::is_used_in(Base const*) const
-{
+{ untested();
   // incomplete.
   return true;
 }
@@ -1164,7 +1164,7 @@ void Contribution::parse(CS& cmd)
   }
   trace1("Contribution", _name);
   if(_branch->deps().is_linear()){
-  }else{
+  }else{ untested();
   }
 
   if(_branch.is_reversed()){
@@ -1273,7 +1273,7 @@ void Contribution::parse(CS& cmd)
   }
 
   if(_branch->deps().is_linear()){
-  }else{
+  }else{ untested();
   }
 
   if(owner()->is_reachable()){
@@ -1303,7 +1303,7 @@ void Contribution::add_dep(Dep const& d)
   }else if(d->branch() != _branch){
   }else if(is_flow_contrib() && d->is_flow_probe()){ untested();
     _branch->set_selfdep();
-  }else if(is_pot_contrib() && d->is_pot_probe()){
+  }else if(is_pot_contrib() && d->is_pot_probe()){ untested();
     _branch->set_selfdep();
   }else{
   }
@@ -1608,7 +1608,15 @@ bool AnalogExpression::is_false() const
 void AnalogEvtCtlStmt::parse(CS& file)
 {
   _ctrl.set_owner(owner()); // ?
+  if(file >> '('){
+  }else{ untested();
+    file.warn(bDANGER, "expecting '('");
+  }
   file >> _ctrl;
+  if(file >> ')'){
+  }else{ untested();
+    file.warn(bDANGER, "need ')'");
+  }
   assert(owner());
   _body.set_owner(this);
   _body.set_sens(this); // BUG
@@ -1661,14 +1669,14 @@ bool AnalogEvtCtlStmt::update()
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogEvtCtlStmt::is_used_in(Base const* b)const
-{
+{ untested();
   // store rdeps in Statement::_rdeps?
 
   // o__ "// AnalogEvtCtlStmt2 " << cond().data().rdeps().size() << "\n";
 
-  if( _ctrl.is_used_in(b)){
+  if( _ctrl.is_used_in(b)){ untested();
     return true;
-  }else{
+  }else{ untested();
     return AnalogCtrlStmt::is_used_in(b);
   }
 }
@@ -1717,31 +1725,31 @@ public:
     }
   }
 #endif
-  std::string code_name()const override {
+  std::string code_name()const override { untested();
     return "af_" + label();
   }
-  void make_cc_impl(std::ostream& o)const override {
+  void make_cc_impl(std::ostream& o)const override { untested();
 #if 1
     assert(_af);
     make_cc_af(o, *_af);
 #endif
   }
 
-  void make_cc_common(std::ostream& o)const override {
+  void make_cc_common(std::ostream& o)const override { untested();
     o << "//incomplete: af common\n";
     assert(_af);
     auto& F = *_af;
     int n = 0;
 
     o__ "template<";
-    for (Base const* x : F.header()){
+    for (Base const* x : F.header()){ untested();
       auto coll = prechecked_cast<AF_Arg_List const*>(x);
       assert(coll);
 
-      for(auto i : *coll){
-	if(coll->is_output()){
+      for(auto i : *coll){ untested();
+	if(coll->is_output()){ untested();
 	  o << "class D" << ++n << ", ";
-	}else{
+	}else{ untested();
 	}
 	o << "/*" << i->name() << "*/";
       }
@@ -1753,15 +1761,15 @@ public:
     std::string sep = "";
     std::string qual = "";
     n = 0;
-    for (Base const* x : F.header()){
+    for (Base const* x : F.header()){ untested();
       auto coll = prechecked_cast<AF_Arg_List const*>(x);
       assert(coll);
 
-      for(auto i : *coll){
-	if(coll->is_output()){
+      for(auto i : *coll){ untested();
+	if(coll->is_output()){ untested();
 	  qual = "/*output*/ &";
 	  o << sep << "D" << ++n << "& ";
-	}else{
+	}else{ untested();
 	  o << sep << "ddouble ";
 	}
 	o << "/*" << i->name() << "*/";
@@ -2019,12 +2027,12 @@ bool AnalogFunctionBody::new_var_ref(Base* b)
 // }
 /*--------------------------------------------------------------------------*/
 bool AnalogEvtExpression::is_used_in(Base const* b)const
-{
+{ untested();
   // propagate to owner instead??
-  for(auto& i : _rdeps){
-    if(i == b){
+  for(auto& i : _rdeps){ untested();
+    if(i == b){ untested();
       return true;
-    }else{
+    }else{ untested();
     }
   }
 
@@ -2033,11 +2041,17 @@ bool AnalogEvtExpression::is_used_in(Base const* b)const
 /*--------------------------------------------------------------------------*/
 void AnalogEvtExpression::parse(CS& file)
 {
+  trace1("AnalogEvtExpression::parse0", file.tail().substr(0,10));
   Expression rhs(file);
-  file >> ","; // LiSt??
+  trace1("AnalogEvtExpression::parse1", file.tail().substr(0,10));
   assert(owner());
   // Expression_::set_owner(scope());
   resolve_symbols(rhs);
+
+  while(file >> "or" || file >> ","){
+    Expression rhsor(file);
+    resolve_symbols(rhsor);
+  }
 
   set_rdeps();
 }
@@ -2102,7 +2116,7 @@ void AF_Arg_List::parse(CS& f)
     _direction = a_input;
   }else if(dir=="out"){
     _direction = a_output;
-  }else if(dir=="ino"){
+  }else if(dir=="ino"){ untested();
     _direction = a_inout;
   }else{ untested();
     trace2("AF_Arg_List::parse", f.tail().substr(0,10), dir);
@@ -2270,36 +2284,36 @@ Probe* new_Probe(std::string const& xs, Branch_Ref const& br)
 }
 /*--------------------------------------------------------------------------*/
 size_t Branch::num_nodes() const
-{
+{ untested();
   size_t ret=1;
 
-  for(auto i : ddeps()){
-    if(i->branch()->is_short()){
-    }else if(i->branch() == this){
+  for(auto i : ddeps()){ untested();
+    if(i->branch()->is_short()){ untested();
+    }else if(i->branch() == this){ untested();
       // self conductance
-    }else if(i->is_pot_probe()){
+    }else if(i->is_pot_probe()){ untested();
       ++ret;
 //     }else if(i->is_filter_probe()){ untested();
 //       assert(i->is_pot_probe());
 //       unreachable();
 //       ++ret;
-    }else{
+    }else{ untested();
     }
   }
   return 2*ret;
 }
 /*--------------------------------------------------------------------------*/
 size_t Branch::num_states() const
-{
+{ untested();
   size_t k = 2;
   // TODO: cleanup
-  for(auto i : ddeps()){
+  for(auto i : ddeps()){ untested();
     assert(i);
     // if(i->is_reversed()){ untested();
     //}else
-    if(i->branch() == this){
-    }else if(i->branch()->is_short()){
-    }else{
+    if(i->branch() == this){ untested();
+    }else if(i->branch()->is_short()){ untested();
+    }else{ untested();
       ++k;
     }
   }
@@ -2353,7 +2367,7 @@ Probe::~Probe()
 }
 /*--------------------------------------------------------------------------*/
 bool Probe::is_reversed() const
-{
+{ untested();
   return _br.is_reversed();
 }
 /*--------------------------------------------------------------------------*/
@@ -2380,7 +2394,7 @@ void Module::delete_analog()
 }
 /*--------------------------------------------------------------------------*/
 bool Module::has_analog_block() const
-{
+{ untested();
   return ::analog(*this).has_block();
 }
 /*--------------------------------------------------------------------------*/
@@ -2401,7 +2415,7 @@ Analog::~Analog()
 }
 /*--------------------------------------------------------------------------*/
 bool Analog::has_block() const
-{
+{ untested();
   return !list().is_empty();
 }
 /*--------------------------------------------------------------------------*/
@@ -2529,7 +2543,7 @@ FUNCTION_ const* xs_function_call(std::string const& f, Block const* owner)
   }
 
   assert(file);
-  if(f=="flow" || f=="potential") {
+  if(f=="flow" || f=="potential") { untested();
     // TODO: return FUNCTION_*, VAMS_XS* from nature
     return (FUNCTION_*)(1); // TODO true;
   }else{
@@ -2582,15 +2596,15 @@ Branch_Ref Branch_Map::lookup(std::string const& n)const
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogProceduralAssignment::is_used_in(Base const*b)const
-{
+{ untested();
  // return AnalogStmt::is_used_in(b);
-  if (b == &tr_begin_tag){
+  if (b == &tr_begin_tag){ untested();
     return true;
   }else if (_a.is_used_in(b)) { untested();
     return true;
-  }else if (AnalogStmt::is_used_in(b)) {
+  }else if (AnalogStmt::is_used_in(b)) { untested();
     return true;
-  }else{
+  }else{ untested();
     return false;
   }
 }

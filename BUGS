@@ -16,7 +16,6 @@
 
 == libgnucap, TODO
 - need NODE_P, discrete nodes
-- MODEL_CARD in lang interface
 - BUG: padding long lines with whitespace
 - tab/newline handling in cmd.warn Exception_CS
 - branch node order is suboptimal
