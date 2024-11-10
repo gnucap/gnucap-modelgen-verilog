@@ -274,7 +274,7 @@ private: // incomplete
   bool add_rdep(Base const* b) {
     return _rdeps.insert(b).second;
   }
-  FUNCTION_ const* function()const; // BUG. expressions?
+  FUNCTION_ const* function()const;
 public:
   RDeps const& rdeps()const { return _rdeps; }
 };

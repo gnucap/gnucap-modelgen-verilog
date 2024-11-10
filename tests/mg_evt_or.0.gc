@@ -1,0 +1,36 @@
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+
+
+verilog
+
+`modelgen
+module test_evt_or0(p, n);
+	electrical p, n;
+	inout p, n;
+	analog begin
+		@(cross(V(p,n), 0) or above(V(p,n)-1., 0)) begin
+			$debug("or dbg %g %g\n", $abstime, V(p,n));
+			$write("or     %g %g\n", $abstime, V(p,n));
+      end
+	end
+endmodule
+
+list
+
+!make test_evt_or0.so > /dev/null
+attach ./test_evt_or0.so
+
+test_evt_or0 dut0(\1 ,\0 );
+test_evt_or0 dut1(\0 ,\1 );
+vsine #(.freq(1e6) .ampl(2) .samples(9)) vin(\1 ,\0 );
+
+list
+
+print dc v(nodes) iter(0)
+dc
+print tran v(nodes) iter(0)
+tran 1e-6 basic
+
+end

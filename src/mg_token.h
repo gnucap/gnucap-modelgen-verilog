@@ -22,20 +22,10 @@
 #ifndef MG_TOKEN_H
 #define MG_TOKEN_H
 #include "mg_expression.h"
-#include "mg_func.h"
+#include "mg_func.h" // BUG?
 #include "mg_deps.h" // BUG?
 #include "mg_base.h"
-/*--------------------------------------------------------------------------*/
-class rdep_tag : public Base{
-  virtual void parse(CS&)override { untested();unreachable();}
-  virtual void dump(std::ostream&)const override { untested();unreachable();}
-};
-extern rdep_tag tr_begin_tag;
-extern rdep_tag tr_restore_tag;
-extern rdep_tag tr_eval_tag;
-extern rdep_tag tr_review_tag;
-extern rdep_tag tr_advance_tag;
-extern rdep_tag tr_accept_tag;
+#include <stack> // BUG
 /*--------------------------------------------------------------------------*/
 class FUNCTION_;
 class Token_CALL : public Token_SYMBOL {
@@ -72,7 +62,6 @@ public:
   Expression const* args()const { return _args; }
   virtual /*?*/ std::string code_name() const;
   FUNCTION_ const* f() const{ return _function; }
-  bool returns_void() const;
   FUNCTION_ const* operator->()const { assert(_function); return _function; }
 }; // Token_CALL
 /*--------------------------------------------------------------------------*/
@@ -110,23 +99,13 @@ public:
 inline void Token_CALL::attach()
 {
   assert(_function);
-  _function->inc_refs();
+  ((CKT_BASE const*)_function)->inc_probes();
 }
 /*--------------------------------------------------------------------------*/
 inline void Token_CALL::detach()
 {
   assert(_function);
-  _function->dec_refs();
-}
-/*--------------------------------------------------------------------------*/
-inline bool Token_CALL::returns_void() const
-{
-  assert(_function);
-  if(_function){
-    return _function->returns_void();
-  }else{ untested();
-    return false;
-  }
+  ((CKT_BASE const*)_function)->dec_probes();
 }
 /*--------------------------------------------------------------------------*/
 inline std::string Token_CALL::code_name()const
@@ -167,7 +146,8 @@ public:
     : Token_PARLIST(p) { assert(!_args); }
   explicit Token_PARLIST_(const std::string Name, Base* L=NULL)
     : Token_PARLIST(Name, L) { untested(); assert(!L); assert(!_args); }
-  ~Token_PARLIST_();
+  ~Token_PARLIST_() { delete _args; _args = nullptr; }
+/*--------------------------------------------------------------------------*/
 public:
   void stack_op(Expression* E)const override;
   Token_PARLIST_* clone()const override{

@@ -41,6 +41,7 @@ RAW_SRCS = \
 mg_code.cc \
 mg_deps.cc \
 mg_error.cc \
+mg_evt_at.cc \
 mg_file.cc \
 mg_filt_absdelay.cc \
 mg_filt_acstim.cc \

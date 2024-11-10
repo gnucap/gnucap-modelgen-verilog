@@ -156,6 +156,32 @@ static bool is_literal(stash_op const& o)
   return o.is_literal();
 }
 /*--------------------------------------------------------------------------*/
+Expression* new_arglist(Expression* E)
+{
+  assert(!E->is_empty());
+  std::stack<Token*> stack; // needed?
+  auto arg_exp = new Expression_();
+  // replace multiple tokens of a PARLIST with a single token
+  for (;;) {
+    assert(E->size());
+    Token* t = E->back();
+    E->pop_back();
+    if (dynamic_cast<const Token_STOP*>(t)) {
+      delete t;
+      break;
+    }else{
+      stack.push(t);
+    }
+  }
+  // turn over (there is no push_front, maybe on purpose)
+  while(!stack.empty()){
+    trace1("pushing", stack.top()->name());
+    arg_exp->push_back(stack.top());
+    stack.pop();
+  }
+  return arg_exp;
+}
+/*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
 #if 0
@@ -902,38 +928,6 @@ TData* Token_PARLIST_::new_deps()const
   return ::new_deps(data());
 }
 /*--------------------------------------------------------------------------*/
-Token_PARLIST_::~Token_PARLIST_()
-{
-  delete _args;
-  _args = NULL;
-}
-/*--------------------------------------------------------------------------*/
-static Expression* new_arglist(Expression* E)
-{
-  assert(!E->is_empty());
-  std::stack<Token*> stack; // needed?
-  auto arg_exp = new Expression_();
-  // replace multiple tokens of a PARLIST with a single token
-  for (;;) {
-    assert(E->size());
-    Token* t = E->back();
-    E->pop_back();
-    if (dynamic_cast<const Token_STOP*>(t)) {
-      delete t;
-      break;
-    }else{
-      stack.push(t);
-    }
-  }
-  // turn over (there is no push_front, maybe on purpose)
-  while(!stack.empty()){
-    trace1("pushing", stack.top()->name());
-    arg_exp->push_back(stack.top());
-    stack.pop();
-  }
-  return arg_exp;
-}
-/*--------------------------------------------------------------------------*/
 void Token_ARRAY_::stack_op(Expression* E) const
 {
   assert(E);
@@ -962,38 +956,6 @@ void Token_ARRAY_::stack_op(Expression* E) const
     assert(n);
     n->set_args(arg_exp);
     E->push_back(n);
-  }
-}
-/*--------------------------------------------------------------------------*/
-void Token_PARLIST_::stack_op(Expression* E) const
-{
-  assert(E);
-  if(auto ee = dynamic_cast<Expression const*>(data())){ untested();
-    unreachable();
-    auto arg_exp = new Expression_();
-    for(auto const& i : *ee){ untested();
-      // just clone?
-      i->stack_op(arg_exp);
-    }
-    auto parlist = new Token_PARLIST("", arg_exp);
-    E->push_back(parlist);
-  }else if(args()){ untested();
-    auto arg_exp = new Expression_();
-    for(auto const& i : *args()){ untested();
-      // just clone?
-      i->stack_op(arg_exp);
-    }
-    auto* pl = clone();
-    pl->set_args(arg_exp);
-    E->push_back(pl);
-  }else{
-    Expression* arg_exp = new_arglist(E);
-    trace0("new PARLIST_");
-    auto parlist = clone(); // new Token_PARLIST_("", arg_exp);
-    auto n = prechecked_cast<Token_PARLIST_*>(parlist);
-    assert(n);
-    n->set_args(arg_exp);
-    E->push_back(parlist);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1382,6 +1344,38 @@ std::string Token_VAR_REF::long_code_name() const
 bool Token_VAR_REF::is_state_var() const
 {
   return true; // TODO
+}
+/*--------------------------------------------------------------------------*/
+inline void Token_PARLIST_::stack_op(Expression* E) const
+{
+  assert(E);
+  if(auto ee = dynamic_cast<Expression const*>(data())){ untested();
+    unreachable();
+    auto arg_exp = new Expression_();
+    for(auto const& i : *ee){ untested();
+      // just clone?
+      i->stack_op(arg_exp);
+    }
+    auto parlist = new Token_PARLIST("", arg_exp);
+    E->push_back(parlist);
+  }else if(args()){ untested();
+    auto arg_exp = new Expression_();
+    for(auto const& i : *args()){ untested();
+      // just clone?
+      i->stack_op(arg_exp);
+    }
+    auto* pl = clone();
+    pl->set_args(arg_exp);
+    E->push_back(pl);
+  }else{
+    Expression* arg_exp = new_arglist(E);
+    trace0("new PARLIST_");
+    auto parlist = clone(); // new Token_PARLIST_("", arg_exp);
+    auto n = prechecked_cast<Token_PARLIST_*>(parlist);
+    assert(n);
+    n->set_args(arg_exp);
+    E->push_back(parlist);
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -1625,7 +1625,7 @@ void AnalogEvtCtlStmt::parse(CS& file)
 /*--------------------------------------------------------------------------*/
 void AnalogEvtCtlStmt::dump(std::ostream& o) const
 {
-  o__ "@" << _ctrl << "";
+  o__ _ctrl;
   AnalogCtrlStmt::dump(o);
 #if 0
   if(dynamic_cast<AnalogSeqBlock const*>(_stmt)){ untested();
@@ -2039,56 +2039,99 @@ bool AnalogEvtExpression::is_used_in(Base const* b)const
   return false;
 }
 /*--------------------------------------------------------------------------*/
+class EVENT_OR : public FUNCTION_{
+}evtOR;
+/*--------------------------------------------------------------------------*/
 void AnalogEvtExpression::parse(CS& file)
 {
+  assert(!size());
+ // assert(!function());
+ // _evt_or = new EVENT_OR();
+
   trace1("AnalogEvtExpression::parse0", file.tail().substr(0,10));
-  Expression rhs(file);
+
+  Expression rhs;
+  rhs.push_back(new Token_STOP("("));
+  file >> rhs;
+
+  // TODO:
+  // if(dynamic_cast<EVENT_FUNCTION const*>(rhs.back()){
+  // }else{
+  //   error.
+  // }
+
   trace1("AnalogEvtExpression::parse1", file.tail().substr(0,10));
   assert(owner());
   // Expression_::set_owner(scope());
-  resolve_symbols(rhs);
 
   while(file >> "or" || file >> ","){
-    Expression rhsor(file);
-    resolve_symbols(rhsor);
+    file >> rhs;
+    // TODO:
+    // if(dynamic_cast<EVENT_FUNCTION const*>(rhs.back()){
+    // }else{
+    //   error.
+    // }
   }
+
+  FUNCTION const* f = function_dispatcher["@"];
+  auto f_ = prechecked_cast<FUNCTION_ const*>(f);
+  assert(f_);
+  rhs.push_back(new Token_PARLIST(")"));
+  rhs.push_back(new Token_CALL("@", f_));
+
+  resolve_symbols(rhs);
+  update();
 
   set_rdeps();
 }
 /*--------------------------------------------------------------------------*/
 void AnalogEvtExpression::dump(std::ostream& o) const
 {
-  o << "("; // here?
   Expression_::dump(o);
-  o << ")"; // here?
 }
 /*--------------------------------------------------------------------------*/
 // TODO // dup in SystemTask
 void AnalogEvtExpression::set_rdeps()
 {
-  if(function()->has_tr_restore()){
-    add_rdep(&tr_begin_tag);
-  }else{
-  }
-  if(function()->has_tr_begin()){
-    add_rdep(&tr_begin_tag);
-  }else{
-  }
-  if(function()->has_tr_eval()){
-    add_rdep(&tr_eval_tag);
-  }else{ untested();
-  }
-  if(function()->has_tr_review()){
-    add_rdep(&tr_review_tag);
-  }else{
-  }
-  if(function()->has_tr_accept()){
-    add_rdep(&tr_accept_tag);
-  }else{
-  }
-  if(function()->has_tr_advance()){
-    add_rdep(&tr_advance_tag);
-  }else{
+  assert(size());
+  Token const* t = back();
+  assert(t);
+  Token_CALL const* c = prechecked_cast<Token_CALL const*>(t);
+  assert(c);
+
+  Expression const* a = c->args();
+  assert(a);
+
+  for(auto i : *a) {
+    Token_CALL const* call = prechecked_cast<Token_CALL const*>(i);
+    assert(call);
+    auto& f = *call;
+    auto e = prechecked_cast<MGVAMS_EVENT const*>(f.f());
+    assert(e);
+    if(f->has_tr_begin()){
+      add_rdep(&tr_begin_tag);
+    }else{
+    }
+    if(f->has_tr_restore()){
+      add_rdep(&tr_begin_tag);
+    }else{
+    }
+    if(f->has_tr_review()){
+      add_rdep(&tr_eval_tag);
+    }else{
+    }
+    if(f->has_tr_review()){
+      add_rdep(&tr_review_tag);
+    }else{
+    }
+    if(f->has_tr_accept()){
+      add_rdep(&tr_accept_tag);
+    }else{
+    }
+    if(f->has_tr_advance()){
+      add_rdep(&tr_advance_tag);
+    }else{
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -2096,7 +2139,7 @@ void AnalogEvtExpression::set_rdeps()
 FUNCTION_ const* AnalogEvtExpression::function() const
 {
   assert(size());
-  Token const* t = *begin();
+  Token const* t = back();
   assert(t);
   Token_CALL const* c = prechecked_cast<Token_CALL const*>(t);
   assert(c);

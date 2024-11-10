@@ -70,7 +70,7 @@ Base* TData::combine(const Base* X)const
   return n;
 }
 /*--------------------------------------------------------------------------*/
-TData* TData::multiply(const Base* X)const
+inline TData* TData::multiply(const Base* X) const
 {
   auto n = clone();
   auto o = prechecked_cast<TData const*>(X);
@@ -93,7 +93,7 @@ TData* TData::multiply(const Base* X)const
   return n;
 }
 /*--------------------------------------------------------------------------*/
-Base* TData::divide(const Base* X)const
+inline Base* TData::divide(const Base* X) const
 {
   auto n = clone();
   auto o = prechecked_cast<TData const*>(X);
@@ -126,12 +126,6 @@ void TData::update(TData const& other)
   }else{
     set_constant(false);
   }
-}
-/*--------------------------------------------------------------------------*/
-TData::~TData()
-{
-  _ddeps.clear();
-  //_rdeps.clear();
 }
 /*--------------------------------------------------------------------------*/
 void TData::clear()

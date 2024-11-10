@@ -31,9 +31,9 @@
 namespace {
 static int n_events;
 /*--------------------------------------------------------------------------*/
-class INITIAL_MODEL : public FUNCTION_ {
+class INITIAL_MODEL : public MGVAMS_EVENT {
 public:
-  explicit INITIAL_MODEL() : FUNCTION_() {
+  explicit INITIAL_MODEL() : MGVAMS_EVENT() {
     set_label("initial_model");
   }
   ~INITIAL_MODEL(){ }
@@ -58,9 +58,9 @@ private:
 } initial_model;
 DISPATCHER<FUNCTION>::INSTALL d_initial_model(&function_dispatcher, "initial_model", &initial_model);
 /*--------------------------------------------------------------------------*/
-class INITIAL_STEP : public FUNCTION_ {
+class INITIAL_STEP : public MGVAMS_EVENT {
 public:
-  explicit INITIAL_STEP() : FUNCTION_() {
+  explicit INITIAL_STEP() : MGVAMS_EVENT() {
     set_label("initial_step");
   }
   ~INITIAL_STEP(){ }
@@ -90,12 +90,12 @@ private:
 } initial_step;
 DISPATCHER<FUNCTION>::INSTALL d_initial_step(&function_dispatcher, "initial_step", &initial_step);
 /*--------------------------------------------------------------------------*/
-class CROSS : public FUNCTION_ {
+class CROSS : public MGVAMS_EVENT {
 protected:
   std::string _code_name;
   Module* _m{NULL};
 public:
-  explicit CROSS() : FUNCTION_() {
+  explicit CROSS() : MGVAMS_EVENT() {
     set_label("cross");
   }
   ~CROSS(){ }

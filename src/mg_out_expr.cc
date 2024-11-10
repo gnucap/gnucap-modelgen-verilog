@@ -598,7 +598,7 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
       }else{
       }
 
-      if(F->returns_void()) {
+      if((*F)->returns_void()) {
 	s.new_float(o); // TODO
 	o__"(void)" <<  s.code_name() << ";\n";
       }else{

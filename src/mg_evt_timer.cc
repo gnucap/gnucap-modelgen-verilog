@@ -31,12 +31,12 @@
 namespace {
 static int n_events;
 /*--------------------------------------------------------------------------*/
-class TIMER : public FUNCTION_ {
+class TIMER : public MGVAMS_EVENT {
 protected:
   std::string _code_name;
   Module* _m{NULL};
 public:
-  explicit TIMER() : FUNCTION_() {
+  explicit TIMER() : MGVAMS_EVENT() {
     set_label("timer");
   }
   ~TIMER(){ }

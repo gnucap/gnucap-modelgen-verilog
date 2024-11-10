@@ -24,6 +24,7 @@
 
 #include <u_function.h>
 #include "mg_token.h" // BUG?
+#include "mg_base.h"
 //#include <m_expression.h>
 /*--------------------------------------------------------------------------*/
 #ifndef MG_FUNCTION_H
@@ -108,6 +109,52 @@ public:
   virtual void make_cc_dev(std::ostream&)const override {}
 //  Token* new_token(Module& m, size_t na) const override;
   bool static_code()const override {return true;}
+};
+/*--------------------------------------------------------------------------*/
+class MGVAMS_EVENT : public FUNCTION_ {
+private:
+  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+	  unreachable();
+	  return "func";
+  }
+public:
+  MGVAMS_EVENT() : FUNCTION_() {
+//    if(has_tr_restore()){
+//      add_rdep(&tr_begin_tag);
+//    }else{
+//    }
+//    if(has_tr_begin()){
+//      add_rdep(&tr_begin_tag);
+//    }else{
+//    }
+//    if(has_tr_eval()){
+//      add_rdep(&tr_eval_tag);
+//    }else{ untested();
+//    }
+//    if(has_tr_review()){
+//      add_rdep(&tr_review_tag);
+//    }else{
+//    }
+//    if(has_tr_accept()){
+//      add_rdep(&tr_accept_tag);
+//    }else{
+//    }
+//    if(has_tr_advance()){
+//      add_rdep(&tr_advance_tag);
+//    }else{
+//    }
+  }
+  MGVAMS_EVENT(MGVAMS_EVENT const& p) : FUNCTION_(p) {
+   // assert(p._rdeps());
+   // _rdeps = p._rdeps.clone();
+  }
+  ~MGVAMS_EVENT() {} //  {delete _rdeps;}
+  virtual MGVAMS_EVENT* clone()const {untested(); unreachable(); return nullptr; }
+
+ // RDeps const& rdeps() {
+ //   assert(_rdeps);
+ //   return _rdeps;
+ // }
 };
 /*--------------------------------------------------------------------------*/
 class Node_Ref;

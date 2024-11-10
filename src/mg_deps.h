@@ -159,7 +159,7 @@ public:
   explicit TData(TData const& o) : Base(), _ddeps(o._ddeps),
     _sens(o._sens),
     _offset(o._offset), _constant(o._constant) { }
-  ~TData();
+  ~TData() { _ddeps.clear(); }
   TData* clone()const {
     return new TData(*this);
   }

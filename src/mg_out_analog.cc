@@ -611,6 +611,7 @@ void OUT_ANALOG::make_evt(std::ostream& o, AnalogEvtCtlStmt const& s) const
 {
   o__ "{ // AnalogEvtCtlStmt\n";
   {
+    trace1("AnalogEvtCtlStmt", s.cond().size());
     indent x;
     make_cc_expression(o, s.cond());
     o__ "if (t0 /*?*/) {\n";
@@ -1451,7 +1452,7 @@ std::string Probe::code_name() const
     return "_flow" + _br->code_name(); // BUG. named_branch.
   }else if (_type == t_pot){
     return "_potential" + _br->code_name();
-  }else{
+  }else{ untested();
     return("unreachable_probe"); // trace.
   }
 }
