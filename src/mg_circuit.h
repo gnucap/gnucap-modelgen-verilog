@@ -26,34 +26,13 @@
 #ifndef MG_CIRCUIT_H
 #define MG_CIRCUIT_H
 #include "mg_base.h"
+#include "mg_module.h" // New_Port_List (BUG?)
 #include "mg_discipline.h"
 #include "mg_code.h" // MinTypMaxExpression??
 #include "mg_expression.h"
 /*--------------------------------------------------------------------------*/
 class Discipline;
 // TODO: Port_Base?
-class Port_3 : public Owned_Base {
-  std::string _name;
-  std::string _value; // needed?
-  Node_Ref _node;
-public:
-  void parse(CS& f)override;
-  void dump(std::ostream& f)const override;
-  Port_3() {}
-  const std::string& name()const  {return _name;}
-  const std::string& value()const  {
-    if(has_identifier()){
-      return _value;
-    }else{
-      return _name; // _node->name?
-    }
-  }
-  bool has_identifier()const;
-  String_Arg key()const { return String_Arg(value()); }
-  Node_Ref const& node()const {return _node;}
-  void set_node(Node*n){_node = n;}
-  void set_discipline(Discipline const* d, Module* owner);
-};
 // list ::= "(" port {"," port} ")"
 typedef LiSt<Port_3, '(', ',', ')'> Port_3_List_2;
 // list ::= port {"," port} ";"
@@ -275,16 +254,6 @@ inline std::string to_upper(std::string s)
 // typedef LiSt<Parameter_1, '{', '#', '}'> Parameter_1_List;
 // .name(value)
 /*--------------------------------------------------------------------------*/
-// TODO: Port_Base?
-class New_Port : public Port_3 {
-//  Block* _owner{nullptr};
-public:
-//  void set_owner(Block* c) { untested(); _owner = c; }
-  void parse(CS& f) override;
-  New_Port() : Port_3() {}
-};
-// list ::= "(" port {"," port} ")"
-typedef LiSt<New_Port, '(', ',', ')'> New_Port_List;
 /*--------------------------------------------------------------------------*/
 class Net_Identifier;
 typedef LiSt<Net_Identifier, '\0', ',', ';'> Net_Decl_List;

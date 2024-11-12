@@ -1,3 +1,24 @@
+/*                       -*- C++ -*-
+ * Copyright (C) 2001, 2023 Albert Davis
+ *               2023, 2024 Felix Salfelder
+ *
+ * This file is part of "Gnucap", the Gnu Circuit Analysis Package
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+ */
 #include "mg_in.h"
 #include "mg_options.h"
 #include "mg_error.h"
@@ -30,6 +51,12 @@ void File::dump(std::ostream& o) const
     o << paramset_list() << '\n';
   }else{ untested();
   }
+
+  if(primitive_list().is_empty()) {
+  }else{
+    o << "// primitives\n";
+    o << primitive_list() << '\n';
+  }
 }
 /*--------------------------------------------------------------------------*/
 File::File() : _file(CS::_STRING, "")
@@ -56,18 +83,20 @@ void File::parse(CS& f)
   _nature_list.set_owner(this);
   _discipline_list.set_owner(this);
   _paramset_list.set_owner(this);
+  _primitive_list.set_owner(this);
 
   size_t here = _file.cursor();
   for (;;) {
     parse_attributes(f, &f);
     ONE_OF	// description
       || f.umatch(";")
-      || ((f >> "module ")	     && (f >> _module_list))
+      || ((f >> "module ")        && (f >> _module_list))
       || ((f >> "macromodule ")   && (f >> _macromodule_list))
       || ((f >> "connectmodule ") && (f >> _connectmodule_list))
-      || ((f >> "nature ")	     && (f >> _nature_list))
+      || ((f >> "nature ")        && (f >> _nature_list))
       || ((f >> "discipline ")    && (f >> _discipline_list))
       || ((f >> "paramset ")      && (f >> _paramset_list))
+      || ((f >> "primitive ")     && (f >> _primitive_list))
       ;
     if (attr.has_attributes(tag_t(&f))) { untested();
       f.warn(bWARNING, "dangling attributes "

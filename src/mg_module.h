@@ -24,6 +24,7 @@
 /*--------------------------------------------------------------------------*/
 #ifndef MG_MODULE_H
 #define MG_MODULE_H
+#include "mg_component.h"
 #include "mg_base.h"
 #include "mg_code.h"
 class Aliasparam;

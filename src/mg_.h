@@ -31,6 +31,7 @@
 #include "mg_code.h"
 #include "mg_filter.h"
 #include "mg_module.h"
+#include "mg_primitive.h"
 // #include "mg_lib.h"
 /*--------------------------------------------------------------------------*/
 // TODO: better prefix

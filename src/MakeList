@@ -65,6 +65,7 @@ mg_in_discipline.cc \
 mg_in_expr.cc \
 mg_in_module.cc \
 mg_in_paramset.cc \
+mg_in_primitive.cc \
 mg_in_verilog.cc \
 mg_in_circuit.cc \
 mg_block.cc \

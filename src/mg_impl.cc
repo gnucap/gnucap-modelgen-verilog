@@ -171,10 +171,17 @@ Node_Ref Node_Map::operator[](std::string const& key) const
   }
 }
 /*--------------------------------------------------------------------------*/
+// TODO: virtual scope.
 Node* Module::new_node(std::string const& p)
 {
   assert(_circuit);
   Node* n = _circuit->nodes().new_node(p, this);
+  // new_var_ref(n);
+  return n;
+}
+Node* Primitive::new_node(std::string const& p)
+{
+  Node* n = nodes().new_node(p, this);
   // new_var_ref(n);
   return n;
 }

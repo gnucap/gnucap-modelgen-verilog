@@ -38,9 +38,11 @@ public:
 class Discipline;
 class Module;
 class Paramset;
+class Primitive;
 typedef Collection<Nature> Nature_List;
 typedef Collection<Paramset> Paramset_List;
 typedef Collection<Module> Module_List;
+typedef Collection<Primitive> Primitive_List;
 typedef Collection<Discipline> Discipline_List;
 class File : public Block {
   std::string	_name;
@@ -53,6 +55,7 @@ class File : public Block {
   Module_List	_macromodule_list;
   Module_List	_connectmodule_list;
   Paramset_List   _paramset_list;
+  Primitive_List  _primitive_list;
 public: // build
   File();
   ~File();
@@ -77,7 +80,7 @@ public: // readout
   const Module_List&	 macromodule_list()const	{return _macromodule_list;}
   const Module_List&	 connectmodule_list()const	{return _connectmodule_list;}
   const Paramset_List&	 paramset_list()const	{return _paramset_list;}
-
+  const Primitive_List&  primitive_list()const{return _primitive_list;}
 };
 /*--------------------------------------------------------------------------*/
 void parse_attributes(CS& cmd, void const* x);

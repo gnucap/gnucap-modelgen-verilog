@@ -471,7 +471,7 @@ public:
   explicit Block() : List_Base<Base>() {}
   ~Block();
   Block* scope() const;
-  Block* scope();
+  /*virtual*/ Block* scope();
   Base const* owner() const{ return _owner;}
   Base* owner(){ return _owner;}
 public:
@@ -487,11 +487,11 @@ public:
 //  void dump(std::ostream& f)const override{ untested();f << "???";}
 
   virtual Node* new_node(std::string const& p){ untested();
-    assert(_owner);
+    assert(scope());
     return scope()->new_node(p);
   }
   virtual Node_Ref node(std::string const& p) const{ untested();
-    assert(_owner);
+    assert(scope());
     return scope()->new_node(p); // new??
   }
 
