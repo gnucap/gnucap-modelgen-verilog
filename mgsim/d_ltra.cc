@@ -318,6 +318,13 @@ void DEV_TRANSLINE::tr_begin()
   assert(c);
   _forward.initialize().push(0.-c->real_td, 0.).push(0., 0.);
   _reflect.initialize().push(0.-c->real_td, 0.).push(0., 0.);
+
+  static bool w;
+  if(!w){
+    error(bDANGER, "ltra: no accurate transient model\n");
+    w = true;
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* before anything else .. see what is coming out
@@ -331,24 +338,27 @@ void DEV_TRANSLINE::dc_advance()
   ELEMENT::dc_advance();
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
-  _if0 = 0.; incomplete(); // _forward.v_out(_sim->_time0).f0/c->real_z0;
-  _ir0 = 0.;  // _reflect.v_out(_sim->_time0).f0/c->real_z0;
+  return; // see tr_begin
+  _if0 = _forward.v_out(_sim->_time0).f0/c->real_z0;
+  _ir0 = _reflect.v_out(_sim->_time0).f0/c->real_z0;
 }
 void DEV_TRANSLINE::tr_advance()
 {
   ELEMENT::tr_advance();
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
-  _if0 = 0.; incomplete(); // _forward.v_out(_sim->_time0).f0/c->real_z0;
-  _ir0 = 0.;  // _reflect.v_out(_sim->_time0).f0/c->real_z0;
+  return; // see tr_begin
+  _if0 = _forward.v_out(_sim->_time0).f0/c->real_z0;
+  _ir0 = _reflect.v_out(_sim->_time0).f0/c->real_z0;
 }
 void DEV_TRANSLINE::tr_regress()
 { untested();
   ELEMENT::tr_regress();
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
-  _if0 = 0.; incomplete(); // _forward.v_out(_sim->_time0).f0/c->real_z0;
-  _ir0 = 0.;  // _reflect.v_out(_sim->_time0).f0/c->real_z0;
+  return; // see tr_begin
+  _if0 = _forward.v_out(_sim->_time0).f0/c->real_z0;
+  _ir0 = _reflect.v_out(_sim->_time0).f0/c->real_z0;
 }
 /*--------------------------------------------------------------------------*/
 /* usually nothing, always converged.  It is all done in advance and accept.
@@ -371,8 +381,7 @@ bool DEV_TRANSLINE::do_tr()
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::tr_load()
 {
-  incomplete(); // won't work.
-		return;
+  return; // see tr_begin
   //BUG// explicit mfactor
   double lvf = NOT_VALID; // load value, forward
   double lvr = NOT_VALID; // load value, reflected
