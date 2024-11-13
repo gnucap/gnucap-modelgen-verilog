@@ -64,7 +64,7 @@ public:
   }
   explicit ddouble_() { clear(); }
   // fixme: implicit conversion in af args..
-  /*explicit*/ ddouble_(int const& d) { untested(); clear(); *_data = d; }
+  /*explicit*/ ddouble_(int const& d) { clear(); *_data = d; }
   /*explicit*/ ddouble_(double const& d) { clear(); *_data = d; }
   /*explicit*/ ddouble_(PARAMETER<double> const& d) { clear(); *_data = d; }
   void set_all_deps() {
@@ -204,7 +204,7 @@ public:
     *ret._data += o;
     return ret;
   }
-  ddouble_ operator+(int const& o) const { untested();
+  ddouble_ operator+(int const& o) const {
     ddouble_ ret = *this;
     *ret._data += o;
     return ret;
@@ -330,7 +330,7 @@ public:
     ret /= o;
     return ret;
   }
-  ddouble_ operator/(int const& o) const { untested();
+  ddouble_ operator/(int const& o) const {
     assert(o);
     ddouble_ ret = *this;
     ret /= o;

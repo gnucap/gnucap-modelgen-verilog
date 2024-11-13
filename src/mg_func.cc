@@ -33,6 +33,44 @@
 /*--------------------------------------------------------------------------*/
 void FUNCTION_::stack_op(Expression const& arg, Expression* E) const
 {
+  assert(E);
+  size_t s = E->size();
+  E->push_back(new Token_STOP(")"));
+  bool literal = true;
+  for(auto i : arg) {
+    if(dynamic_cast<Token_CONSTANT const*>(i)) {
+      if(i->data()) {
+	E->push_back(new Token_CONSTANT(i->data()->clone()));
+      }else{
+	// parameter.
+	literal = false;
+      }
+    }else{
+      literal = false;
+    }
+  }
+  E->push_back(new Token_PARLIST("("));
+
+  if(literal){
+    try{
+      stack_op(E);
+    }catch(Exception const& x){
+      while (E->size()>s){
+	delete E->back();
+	E->pop_back();
+      }
+      throw x;
+    }
+  }else{
+    while (E->size()>s) {
+      delete E->back();
+      E->pop_back();
+    }
+    throw Exception("failed.");
+  }
+
+  return;
+
   Expression const* ee = &arg;
   bool all_float = false;
   double argv[5];

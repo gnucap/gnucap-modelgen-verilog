@@ -124,7 +124,7 @@ static void make_funcs_common(std::ostream& o, pSet<FUNCTION_ const> const& P)
       o<<"// nullptr\n";
     }else if( (*q)->has_refs() ){
       (*q)->make_cc_common(o);
-    }else if(dynamic_cast<MGVAMS_FUNCTION const*>(*q)){ untested();
+    }else if(dynamic_cast<MGVAMS_FUNCTION const*>(*q)){
       o<<"// FUNCTION no refs: " << (*q)->label() << "\n";
     }else if(dynamic_cast<MGVAMS_TASK const*>(*q)){ untested();
       o<<"// TASK no refs: " << (*q)->label() << "\n";

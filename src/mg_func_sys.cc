@@ -39,6 +39,9 @@ public:
   std::string eval(CS&, const CARD_LIST*)const override{ untested();
     return "analysis";
   }
+  void stack_op(Expression*)const override {
+    throw Exception("invalid");
+  }
   std::string code_name()const override{
     return "_f_analysis";
   }
@@ -79,6 +82,9 @@ private:
     unreachable(); // SFCALL won't eval
     return "$$mfactor";
   }
+  void stack_op(Expression*)const override {
+    throw Exception("invalid");
+  }
   Token* new_token(Module& m, size_t)const override {
     _m = &m; // needed?
     m.install(this);
@@ -112,8 +118,8 @@ public:
   ~TEMPERATURE(){ }
 private:
   bool static_code()const override {return true;}
-  std::string eval(CS&, const CARD_LIST*)const override{ unreachable();
-    return "$$temperature";
+  void stack_op(Expression*)const override {
+    throw Exception("invalid");
   }
   void make_cc_common(std::ostream& o)const override {
     o__ "double " << code_name() << "()const {\n";
@@ -139,9 +145,8 @@ public:
     }
   }
 private:
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
-    unreachable(); // SFCALL won't eval
-    return "$$vt";
+  void stack_op(Expression*)const override {
+    throw Exception("invalid");
   }
   bool static_code()const override {return false;}
   Token* new_token(Module& m, size_t na)const override {
@@ -250,8 +255,8 @@ private:
     m.install(this);
     return new Token_PG(label(), this);
   }
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
-    return "$param_given";
+  void stack_op(Expression*)const override { untested();
+    throw Exception("invalid");
   }
   std::string code_name()const override{
     return "param_given";

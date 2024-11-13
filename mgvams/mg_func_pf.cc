@@ -115,6 +115,9 @@ private:
 	 o << "  " <<  "  return 0.;\n";
 	 o << "  " <<  "}\n";
   }
+  void stack_op(Expression*)const override { untested();
+    throw Exception("invalid");
+  }
 #if 0
   void make_cc_common(std::ostream& o)const override { untested();
 //    o__ "double " << code_name() << "(int i, BASE_SUBCKT const* c)const {\n";
@@ -141,10 +144,6 @@ private:
     o__ "}\n";
   }
 #endif
-  std::string eval(CS&, const CARD_LIST*)const override { untested();
-    unreachable();
-    return "port_flow";
-  }
 } pf;
 DISPATCHER<FUNCTION>::INSTALL d_pf(&function_dispatcher, ".port_flow", &pf);
 /*--------------------------------------------------------------------------*/

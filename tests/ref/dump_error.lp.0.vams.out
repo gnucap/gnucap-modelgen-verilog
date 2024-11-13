@@ -1,3 +1,4 @@
-... ocalparam real TT=(l4==10)?l1:(l2+3);
- localparam real P
+... lparam real bug = nonconst_wrong + 2;
+endmodule
+
                                         ^ ? not constant

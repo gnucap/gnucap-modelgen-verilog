@@ -50,8 +50,8 @@ module test_af();
   analog begin : main
     real i;
     real out;
-    i = something( 26.,  20.0855369231877, out);
-    i = something( 26.,  1., out);
+    i = something(26,  20.0855369231877, out);
+    i = something(26,  1., out);
   end
 
 endmodule

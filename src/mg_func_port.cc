@@ -46,6 +46,9 @@ private:
   std::string eval(CS&, const CARD_LIST*)const override{ untested();
     return "$port_connected";
   }
+  void stack_op(Expression*)const override { untested();
+    throw Exception("invalid");
+  }
   std::string code_name()const override{
     return "d->node_is_connected";
   }

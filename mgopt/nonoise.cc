@@ -45,12 +45,11 @@ private:
       return "va::" + label();
     }
   }
-  std::string eval(CS&, const CARD_LIST*)const override { untested();
-	  unreachable();
-	  return "AAA";
-  }
   void make_cc_common(std::ostream& o)const override { untested();
     o << "// dummy " << label() << "\n";
+  }
+  void stack_op(Expression*)const override { untested();
+    throw Exception("invalid");
   }
 };
 /*--------------------------------------------------------------------------*/

@@ -119,7 +119,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       t->stack_op(&E);
     }else if((E.is_empty() || !dynamic_cast<Token_PARLIST*>(E.back()))
           && symbol && (t->name() == "inf" || t->name() == "Inf" /*BUG*/ )) {
-      Float* f = new Float(std::numeric_limits<double>::infinity());
+      Float* f = new vReal(std::numeric_limits<double>::infinity());
       E.push_back(new Token_CONSTANT(f, ""));
     }else if(auto pl = dynamic_cast<Token_PARLIST*>(t)) {
 //      trace1("resolve PARLIST");
@@ -156,10 +156,10 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       t3.stack_op(&E);
     }else if (n[0]=='.'){
       if(strchr("0123456789", n[1])){
-	Float* f = new Float(n);
+	Float* f = new vReal(n);
 	E.push_back(new Token_CONSTANT(f, ""));
       }else if(auto r = Scope->lookup(PS_MANGLE_PREFIX + n.substr(1))) {
-	incomplete();
+	// incomplete();
 	if(auto vt = dynamic_cast<Token_VAR_REF*>(r)) {
 	  trace2("resolve VAR_REF", n, vt->deps().size());
 	  vt->stack_op(&E);
@@ -174,10 +174,19 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 	throw Exception("unresolved symbol: " + n);
       }
     }else if (strchr("0123456789", n[0])) {
-      trace1("number??", n);
-      // a number. BUG: integer?
-      Float* f = new Float(n);
-      E.push_back(new Token_CONSTANT(f, ""));
+      bool is_int = true;
+      for(std::string::const_iterator c = n.begin();
+	  is_int && c != n.end(); ++c){
+	is_int = isdigit(*c);
+      }
+
+      Base* N;
+      if(is_int) {
+	N = new vInteger(n);
+      }else{
+	N = new vReal(n);
+      }
+      E.push_back(new Token_CONSTANT(N));
     }else if(Base* r = Scope->lookup(n)){
       if(auto p = dynamic_cast<Parameter_Base const*>(r)) {
 //	p->stack_op(&E); // ?
@@ -231,10 +240,15 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 	assert(!dynamic_cast<Token_PARLIST const*>(E.back()));
       }
       trace2("va_function?", n, na);
+#if 1
       Token* tt = resolve_function(vaf, &E, scope());
       assert(tt);
       tt->stack_op(&E);
       delete tt;
+#else
+      //  not enough. must keep track of used functions.
+      vaf->stack_op(&E);
+#endif
     }else if(Node_Ref a = Scope->node(t->name())) { untested();
       Token_NODE tn(*symbol, a);
       tn.stack_op(&E);

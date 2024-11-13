@@ -4,7 +4,7 @@ module shadow(a, b);
   real i;
 
   analog begin
-    if ( 0.) begin
+    if (0) begin
       I(a, b) <+  0.;
     end
     i = I(a, b);

@@ -1,6 +1,6 @@
 module test(a, b);
   electrical a, b;
-  parameter real arg =  0. from [( 0.):( 0.)];
+  parameter real arg = 0 from [( 0.):( 0.)];
 
   real T;
   real U;
@@ -27,12 +27,12 @@ module test(a, b);
       V(a) <+  5.;
     end
     case (arg)
-       0.: begin
+      0: begin
         V(b) <+  1.2;
       end
     endcase
     case (arg)
-       0.: begin
+      0: begin
         V(b) <+  2.;
       end
     endcase

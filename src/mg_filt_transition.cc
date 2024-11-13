@@ -286,6 +286,9 @@ public:
     unreachable();
     return "transition";
   }
+  void stack_op(Expression*)const override {
+    throw Exception("invalid");
+  }
   Probe const* prb()const {return _prb;}
   void set_n_to_gnd()const {
     assert(_m);

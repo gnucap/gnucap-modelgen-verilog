@@ -6,6 +6,6 @@ module test_array(p, n);
 	(* desc="" *) real dv;
 	electrical p, n;
 	analog begin
-		dv = exp('{1,2,3,1+2, '{"nest", 17} });
+		dv = exp('{1.,2,3,1+2, '{"nest", 17} });
 	end
 endmodule

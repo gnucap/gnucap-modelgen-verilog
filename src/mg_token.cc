@@ -44,6 +44,10 @@ static bool is_constant(Token const* t)
     assert(dynamic_cast<Token_CONSTANT const*>(t)
 	  ||dynamic_cast<Token_PAR_REF const*>(t));
     return true;
+  }else if(dynamic_cast<const Integer*>(t->data())){ untested();
+    assert(dynamic_cast<Token_CONSTANT const*>(t)
+	  ||dynamic_cast<Token_PAR_REF const*>(t));
+    return true;
   }else if(auto data = dynamic_cast<const TData*>(t->data())){
     return data->is_constant();
   }else{
@@ -79,6 +83,15 @@ static bool is_literal(Token const* t, double val=NOT_VALID)
       return true;
     }else{
       return f->value() == val;
+    }
+  }else if(auto i = dynamic_cast<const Integer*>(t->data())){
+    assert(dynamic_cast<Token_CONSTANT const*>(t)
+	  ||dynamic_cast<Token_PAR_REF const*>(t));
+    if(val == NOT_VALID){
+      trace1("constant", t->name());
+      return true;
+    }else{
+      return i->value() == val;
     }
   }else{
     return false;

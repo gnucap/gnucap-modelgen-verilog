@@ -1710,6 +1710,9 @@ public:
     assert(_af);
     set_label(af->variable()->name());
   }
+  void stack_op(Expression*)const override {
+    throw Exception("invalid"); // really?
+  }
 
 #if 1
   Token* new_token(Module& m, size_t /*na*/) const override { untested();
@@ -2039,14 +2042,10 @@ bool AnalogEvtExpression::is_used_in(Base const* b)const
   return false;
 }
 /*--------------------------------------------------------------------------*/
-class EVENT_OR : public FUNCTION_{
-}evtOR;
-/*--------------------------------------------------------------------------*/
 void AnalogEvtExpression::parse(CS& file)
 {
   assert(!size());
  // assert(!function());
- // _evt_or = new EVENT_OR();
 
   trace1("AnalogEvtExpression::parse0", file.tail().substr(0,10));
 

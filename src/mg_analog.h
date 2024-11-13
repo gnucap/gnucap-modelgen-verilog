@@ -74,7 +74,9 @@ public:
     return !operator==(o);
   }
 private:
-  std::string eval(CS&, const CARD_LIST*)const override { untested();unreachable(); return "";}
+  void stack_op(Expression*)const override {
+    throw Exception("invalid");
+  }
   Token* new_token(Module&, size_t)const override;
 public:
   bool propagate_rdeps_(RDeps const&)const;

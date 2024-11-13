@@ -74,7 +74,7 @@ public:
   }
   explicit ddouble_() { clear(); }
   // fixme: implicit conversion in af args..
-  /*explicit*/ ddouble_(int const& d) { untested(); clear(); *_data = d; }
+  /*explicit*/ ddouble_(int const& d) { clear(); *_data = d; }
   /*explicit*/ ddouble_(double const& d) { clear(); *_data = d; }
   /*explicit*/ ddouble_(PARAMETER<double> const& d) { clear(); *_data = d; }
   void set_all_deps() {
@@ -214,7 +214,7 @@ public:
     *ret._data += o;
     return ret;
   }
-  ddouble_ operator+(int const& o) const { untested();
+  ddouble_ operator+(int const& o) const {
     ddouble_ ret = *this;
     *ret._data += o;
     return ret;
@@ -340,7 +340,7 @@ public:
     ret /= o;
     return ret;
   }
-  ddouble_ operator/(int const& o) const { untested();
+  ddouble_ operator/(int const& o) const {
     assert(o);
     ddouble_ ret = *this;
     ret /= o;
@@ -2514,13 +2514,13 @@ bool COMMON_resistor::is_valid() const
   {
   ddouble t0;
   //t0.set_no_deps();
-  t0 =  0.;
+  t0 = 0;
   lb = t0;
   }
   {
   ddouble t0;
   //t0.set_no_deps();
-  t0 =  1.;
+  t0 = 1;
   ub = t0;
   }
   if(!(lb<=_p_noisy && _p_noisy<=ub)){ return false; }else{ }
@@ -3793,7 +3793,7 @@ public:
   }
   explicit ddouble_() { clear(); }
   // fixme: implicit conversion in af args..
-  /*explicit*/ ddouble_(int const& d) { untested(); clear(); *_data = d; }
+  /*explicit*/ ddouble_(int const& d) { clear(); *_data = d; }
   /*explicit*/ ddouble_(double const& d) { clear(); *_data = d; }
   /*explicit*/ ddouble_(PARAMETER<double> const& d) { clear(); *_data = d; }
   void set_all_deps() {
@@ -3933,7 +3933,7 @@ public:
     *ret._data += o;
     return ret;
   }
-  ddouble_ operator+(int const& o) const { untested();
+  ddouble_ operator+(int const& o) const {
     ddouble_ ret = *this;
     *ret._data += o;
     return ret;
@@ -4059,7 +4059,7 @@ public:
     ret /= o;
     return ret;
   }
-  ddouble_ operator/(int const& o) const { untested();
+  ddouble_ operator/(int const& o) const {
     assert(o);
     ddouble_ ret = *this;
     ret /= o;
@@ -4971,7 +4971,7 @@ bool COMMON_capacitor::is_valid() const
   {
   ddouble t0;
   //t0.set_no_deps();
-  t0 =  0.;
+  t0 = 0;
   lb = t0;
   }
   {
@@ -5013,7 +5013,7 @@ void COMMON_capacitor::precalc_first(const CARD_LIST* par_scope)
   {
     ddouble t0;
     //t0.set_no_deps();
-    t0 =  0.;
+    t0 = 0;
     real def = real(t0.value());
     this->_p___ic = def;
   }
@@ -5042,7 +5042,7 @@ void COMMON_capacitor::precalc_last(const CARD_LIST* par_scope)
   {
     ddouble t0;
     //t0.set_no_deps();
-    t0 =  0.;
+    t0 = 0;
     real def = real(t0.value());
     this->_p___ic = def;
   }
@@ -5875,7 +5875,7 @@ bool COMMON_capacitor::is_valid() const
   {
   ddouble t0;
   //t0.set_no_deps();
-  t0 =  0.;
+  t0 = 0;
   lb = t0;
   }
   {
@@ -5910,7 +5910,7 @@ void COMMON_capacitor::precalc_first(const CARD_LIST* par_scope)
   {
     ddouble t0;
     //t0.set_no_deps();
-    t0 =  0.;
+    t0 = 0;
     real def = real(t0.value());
     e_val(&(this->_p_ic),     def , par_scope);
   }
@@ -5946,7 +5946,7 @@ void COMMON_capacitor::precalc_last(const CARD_LIST* par_scope)
   {
     ddouble t0;
     //t0.set_no_deps();
-    t0 =  0.;
+    t0 = 0;
     real def = real(t0.value());
     e_val(&(this->_p_ic),     def , par_scope);
   }

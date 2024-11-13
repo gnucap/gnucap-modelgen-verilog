@@ -43,9 +43,180 @@ void Expression_::dump(std::ostream& ) const
 }
 /*--------------------------------------------------------------------------*/
 namespace{
-#if 1
 /*--------------------------------------------------------------------------*/
+Base const* get_constant(Expression* E)
+{
+  assert(E);
+  Base const* p = nullptr;
+  assert(E->size());
+  Token* pl = E->back();
+  if(dynamic_cast<Token_PARLIST*>(pl)){
+    E->pop_back();
+    assert(E->size());
+  }else{
+    pl = nullptr;
+  }
 
+  if(auto cc=dynamic_cast<Token_CONSTANT const*>(E->back())) {
+    p = cc->data();
+  }else{
+  }
+
+  if(pl){
+    E->push_back(pl);
+  }else{
+  }
+
+  return p;
+}
+/*--------------------------------------------------------------------------*/
+std::pair<Base const*, Base const*> get_constant2(Expression* E)
+{
+  assert(E);
+  std::pair<Base const*, Base const*> ret;
+  auto it = E->end();
+  --it;
+
+  Token* pl = E->back();
+  if(dynamic_cast<Token_PARLIST*>(pl)) {
+    assert(it!=E->begin());
+    --it;
+  }else{ untested();
+    pl = nullptr;
+  }
+
+  if(auto cc=dynamic_cast<Token_CONSTANT const*>(*it)) {
+    ret.second = cc->data();
+    assert(it!=E->begin());
+    --it;
+    if(auto c2=dynamic_cast<Token_CONSTANT const*>(*it)) {
+      ret.first = c2->data();
+    }else{ untested();
+    }
+  }else{ untested();
+  }
+
+  if(!pl){ untested();
+  }else if(it == E->begin()) { untested();
+    unreachable();
+  }else{
+    --it;
+    if(dynamic_cast<Token_STOP const*>(*it)) {
+    }else{ untested();
+      unreachable(); // hopefully.
+      ret.first = ret.second = nullptr;
+    }
+  }
+
+  return ret;
+}
+/*--------------------------------------------------------------------------*/
+double get_double(Expression* E)
+{
+  Base const* b = get_constant(E);
+  bool ok = false;
+  double p;
+  if(auto f = dynamic_cast<Float const*>(b)){
+    p = f->value();
+    ok = true;
+  }else if(auto i = dynamic_cast<Integer const*>(b)){
+    p = i->value();
+    ok = true;
+  }else{
+  }
+
+  if(ok){
+    return p;
+  }else{
+    throw Exception("not double\n");
+  }
+}
+/*--------------------------------------------------------------------------*/
+#if 0
+int get_int(Expression* E)
+{
+  Base const* b = get_constant(E);
+  bool ok = false;
+  int p;
+  if(auto f = dynamic_cast<Integer const*>(b)){
+    p = f->value();
+    ok = true;
+  }else{
+  }
+
+  if(ok){
+    return p;
+  }else{
+    throw Exception("not double\n");
+  }
+}
+#endif
+/*--------------------------------------------------------------------------*/
+void subs_double(Expression* E, double x)
+{
+  assert(E->size());
+  if(dynamic_cast<Token_PARLIST*>(E->back())) {
+    delete E->back();
+    E->pop_back();
+    delete E->back();
+    E->pop_back();
+    assert(dynamic_cast<Token_STOP const*>(E->back()));
+    delete E->back();
+    E->pop_back();
+  }else{
+    assert(dynamic_cast<Token_CONSTANT const*>(E->back()));
+    delete E->back();
+    E->pop_back();
+  }
+  auto v = new vReal(x);
+  E->push_back(new Token_CONSTANT(v));
+}
+/*--------------------------------------------------------------------------*/
+void subs_double2(Expression* E, double x)
+{
+  assert(E->size());
+  if(dynamic_cast<Token_PARLIST*>(E->back())) {
+    delete E->back();
+    E->pop_back();
+    delete E->back();
+    E->pop_back();
+    delete E->back();
+    E->pop_back();
+    assert(dynamic_cast<Token_STOP const*>(E->back()));
+    delete E->back();
+    E->pop_back();
+  }else{
+    assert(dynamic_cast<Token_CONSTANT const*>(E->back()));
+    delete E->back();
+    E->pop_back();
+    assert(dynamic_cast<Token_CONSTANT const*>(E->back()));
+    delete E->back();
+    E->pop_back();
+  }
+  auto v = new vReal(x);
+  E->push_back(new Token_CONSTANT(v));
+}
+/*--------------------------------------------------------------------------*/
+void subs_int(Expression* E, int x)
+{
+  assert(E->size());
+  if(dynamic_cast<Token_PARLIST*>(E->back())) { untested();
+    delete E->back();
+    E->pop_back();
+    delete E->back();
+    E->pop_back();
+    assert(dynamic_cast<Token_STOP const*>(E->back()));
+    delete E->back();
+    E->pop_back();
+  }else{
+    assert(dynamic_cast<Token_CONSTANT const*>(E->back()));
+    delete E->back();
+    E->pop_back();
+  }
+  auto v = new vInteger(x);
+  E->push_back(new Token_CONSTANT(v));
+}
+/*--------------------------------------------------------------------------*/
 class STUB : public MGVAMS_FUNCTION {
 public:
   explicit STUB(std::string const l) : MGVAMS_FUNCTION() {
@@ -60,9 +231,8 @@ private:
       return "va::" + label();
     }
   }
-  std::string eval(CS&, const CARD_LIST*)const override { untested();
-	  unreachable();
-	  return "AAA";
+  void stack_op(Expression*)const override {
+    throw Exception("invalid");
   }
   void make_cc_common(std::ostream& o)const override {
     o << "// dummy " << label() << "\n";
@@ -77,7 +247,6 @@ DISPATCHER<FUNCTION>::INSTALL d_min(&function_dispatcher, "min|$min", &min);
 STUB max("max");
 DISPATCHER<FUNCTION>::INSTALL d_max(&function_dispatcher, "max|$max", &max);
 /*--------------------------------------------------------------------------*/
-#endif
 #if 1
 /*--------------------------------------------------------------------------*/
 class abs : public MGVAMS_FUNCTION {
@@ -92,8 +261,15 @@ public:
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::abs(x));
   }
-  double evalf(double const* x)const override { untested();
-    return std::abs(*x);
+  void stack_op(Expression* e)const override { untested();
+    Base const* x = get_constant(e);
+    if(auto f = dynamic_cast<Float const*>(x)) { untested();
+      subs_double(e, std::abs(f->value()));
+    }else if(auto i = dynamic_cast<Integer const*>(x)) { untested();
+      subs_double(e, std::abs(i->value()));
+    }else{
+      throw Exception("invalid arg");
+    }
   }
   void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";
@@ -116,16 +292,9 @@ public:
   asinh() : MGVAMS_FUNCTION(){
     set_label("asinh");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
-    unreachable();
-    PARAMETER<double> x;
-    x.obsolete_parse(Cmd);
-    trace1("asinh", x);
-    x.e_val(NOT_INPUT, Scope);
-    return to_string(std::asinh(x));
-  }
-  double evalf(double const* x)const override { untested();
-    return std::asinh(*x);
+  void stack_op(Expression* e)const override { untested();
+    double x = get_double(e);
+    subs_double(e, std::asinh(x));
   }
   void make_cc_common(std::ostream& o)const override{ untested();
     o__ "template<class T>\n";
@@ -147,16 +316,9 @@ public:
   atan() : MGVAMS_FUNCTION(){
     set_label("atan");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
-    unreachable();
-    PARAMETER<double> x;
-    x.obsolete_parse(Cmd);
-    trace1("atan", x);
-    x.e_val(NOT_INPUT, Scope);
-    return to_string(std::atan(x));
-  }
-  double evalf(double const* x)const override { untested();
-    return std::atan(*x);
+  void stack_op(Expression* e)const override { untested();
+    double x = get_double(e);
+    subs_double(e, std::atan(x));
   }
   void make_cc_common(std::ostream& o)const override{ untested();
     o__ "template<class T>\n";
@@ -177,16 +339,9 @@ public:
   atanh() : MGVAMS_FUNCTION(){
     set_label("atanh");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
-    unreachable();
-    PARAMETER<double> x;
-    x.obsolete_parse(Cmd);
-    trace1("atanh", x);
-    x.e_val(NOT_INPUT, Scope);
-    return to_string(std::atanh(x));
-  }
-  double evalf(double const* x)const override { untested();
-    return std::atanh(*x);
+  void stack_op(Expression* e)const override { untested();
+    double x = get_double(e);
+    subs_double(e, std::atanh(x));
   }
   void make_cc_common(std::ostream& o)const override{ untested();
     o__ "template<class T>\n";
@@ -206,14 +361,9 @@ public:
   explicit cos() : MGVAMS_FUNCTION(){
     set_label("cos");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { itested();
-    PARAMETER<double> x;
-    x.obsolete_parse(Cmd);
-    x.e_val(NOT_INPUT, Scope);
-    return to_string(std::cos(x));
-  }
-  double evalf(double const* x)const override { untested();
-    return std::cos(*x);
+  void stack_op(Expression* e)const override { untested();
+    double x = get_double(e);
+    subs_double(e, std::cos(x));
   }
   void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";
@@ -233,14 +383,9 @@ public:
   explicit cosh() : MGVAMS_FUNCTION(){
     set_label("cosh");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { itested();
-    PARAMETER<double> x;
-    x.obsolete_parse(Cmd);
-    x.e_val(NOT_INPUT, Scope);
-    return to_string(std::cosh(x));
-  }
-  double evalf(double const* x)const override { untested();
-    return std::cosh(*x);
+  void stack_op(Expression* e)const override { untested();
+    double x = get_double(e);
+    subs_double(e, std::cosh(x));
   }
   void make_cc_common(std::ostream& o)const override{ untested();
     o__ "template<class T>\n";
@@ -260,14 +405,9 @@ public:
   explicit exp() : MGVAMS_FUNCTION(){
     set_label("exp");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
-    PARAMETER<double> x;
-    x.obsolete_parse(Cmd);
-    x.e_val(NOT_INPUT, Scope);
-    return to_string(std::exp(x));
-  }
-  double evalf(double const* x)const override {
-    return std::exp(*x);
+  void stack_op(Expression* e)const override {
+    double x = get_double(e);
+    subs_double(e, std::exp(x));
   }
   void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";
@@ -290,14 +430,9 @@ public:
   explicit expm1() : MGVAMS_FUNCTION(){
     set_label("expm1");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
-    PARAMETER<double> x;
-    x.obsolete_parse(Cmd);
-    x.e_val(NOT_INPUT, Scope);
-    return to_string(std::expm1(x));
-  }
-  double evalf(double const* x)const override {
-    return std::expm1(*x);
+  void stack_op(Expression* e)const override {
+    double x = get_double(e);
+    subs_double(e, std::expm1(x));
   }
   void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";
@@ -318,11 +453,9 @@ public:
     set_label("limexp");
   }
   ~limexp() { }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
-    PARAMETER<double> x;
-    x.obsolete_parse(Cmd);
-    x.e_val(NOT_INPUT, Scope);
-    return to_string(std::exp(x));
+  void stack_op(Expression* e)const override {
+    double x = get_double(e);
+    subs_double(e, std::exp(x));
   }
   void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";
@@ -358,11 +491,15 @@ public:
   explicit floor() : MGVAMS_FUNCTION(){
     set_label("$floor");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
-    PARAMETER<double> x;
-    x.obsolete_parse(Cmd);
-    x.e_val(NOT_INPUT, Scope);
-    return to_string(std::floor(x));
+  void stack_op(Expression* e)const override { untested();
+    Base const* x = get_constant(e);
+    if(auto f = dynamic_cast<Float const*>(x)) { untested();
+      subs_double(e, std::floor(f->value()));
+    }else if(auto i = dynamic_cast<Integer const*>(x)) { untested();
+      subs_int(e, i->value());
+    }else{ untested();
+      throw Exception("invalid arg");
+    }
   }
   std::string code_name()const override{ untested();
     return "_f_floor";
@@ -381,11 +518,9 @@ public:
   explicit log() : MGVAMS_FUNCTION(){
     set_label("$log10");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
-    PARAMETER<double> x;
-    x.obsolete_parse(Cmd);
-    x.e_val(NOT_INPUT, Scope);
-    return to_string(std::log10(x));
+  void stack_op(Expression* e)const override { untested();
+    double x = get_double(e);
+    subs_double(e, std::log10(x));
   }
   std::string code_name()const override{ untested();
     return "_f_log10";
@@ -417,14 +552,9 @@ public:
   explicit ln() : MGVAMS_FUNCTION(){
     set_label("ln");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
-    PARAMETER<double> x;
-    x.obsolete_parse(Cmd);
-    x.e_val(NOT_INPUT, Scope);
-    return to_string(std::log(x));
-  }
-  double evalf(double const* x)const override {
-    return std::log(*x);
+  void stack_op(Expression* e)const override {
+    double x = get_double(e);
+    subs_double(e, std::log(x));
   }
   void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";
@@ -456,14 +586,9 @@ public:
   explicit ln1p() : MGVAMS_FUNCTION(){
     set_label("ln1p");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
-    PARAMETER<double> x;
-    x.obsolete_parse(Cmd);
-    x.e_val(NOT_INPUT, Scope);
-    return to_string(std::log1p(x));
-  }
-  double evalf(double const* x)const override {
-    return std::log1p(*x);
+  void stack_op(Expression* e)const override { untested();
+    double x = get_double(e);
+    subs_double(e, std::log1p(x));
   }
   void make_cc_common(std::ostream& o)const override { untested();
     o__ "template<class T>\n";
@@ -496,17 +621,28 @@ public:
   std::string code_name()const override{
     return "_f_pow";
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override {untested();
-    trace1("pow", Cmd.tail());
-    PARAMETER<double> x, y;
-    x.obsolete_parse(Cmd);
-    y.obsolete_parse(Cmd);
-    x.e_val(NOT_INPUT, Scope);
-    y.e_val(NOT_INPUT, Scope);
-    return to_string(std::pow(x, y));
-  }
-  double evalf(double const* x)const override {
-    return std::pow(x[0], x[1]);
+  void stack_op(Expression* e)const override {
+    auto args = get_constant2(e);
+    if(auto base = dynamic_cast<Float const*>(args.first)) {
+      if(auto expof = dynamic_cast<Float const*>(args.second)) {
+	subs_double2(e, std::pow(base->value(), expof->value()));
+      }else if(auto expo = dynamic_cast<Integer const*>(args.second)) {
+	subs_double2(e, std::pow(base->value(), expo->value()));
+      }else{ untested();
+	throw Exception("invalid");
+      }
+    }else if(auto basei = dynamic_cast<Integer const*>(args.first)) {
+      if(auto expof = dynamic_cast<Float const*>(args.second)) {
+	subs_double2(e, std::pow(basei->value(), expof->value()));
+      }else if(auto expo = dynamic_cast<Integer const*>(args.second)) {
+	// TODO: deal with exponent sign etc.
+	subs_double2(e, std::pow(basei->value(), expo->value()));
+      }else{ untested();
+	throw Exception("invalid");
+      }
+    }else{
+      throw Exception("invalid");
+    }
   }
   void make_cc_common(std::ostream& o)const override {
     o__ "template<class T, class S>\n";
@@ -550,14 +686,9 @@ public:
   explicit sin() : MGVAMS_FUNCTION(){
     set_label("sin");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { itested();
-    PARAMETER<double> x;
-    x.obsolete_parse(Cmd);
-    x.e_val(NOT_INPUT, Scope);
-    return to_string(std::sin(x));
-  }
-  double evalf(double const* x)const override { untested();
-    return std::sin(*x);
+  void stack_op(Expression* e)const override { untested();
+    double x = get_double(e);
+    subs_double(e, std::sin(x));
   }
   void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";
@@ -577,14 +708,9 @@ public:
   explicit sinh() : MGVAMS_FUNCTION(){
     set_label("sinh");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { itested();
-    PARAMETER<double> x;
-    x.obsolete_parse(Cmd);
-    x.e_val(NOT_INPUT, Scope);
-    return to_string(std::sinh(x));
-  }
-  double evalf(double const* x)const override { untested();
-    return std::sinh(*x);
+  void stack_op(Expression* e)const override { untested();
+    double x = get_double(e);
+    subs_double(e, std::sinh(x));
   }
   void make_cc_common(std::ostream& o)const override{ untested();
     o__ "template<class T>\n";
@@ -605,11 +731,9 @@ public:
   explicit sqrt() : MGVAMS_FUNCTION(){
     set_label("sqrt");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { itested();
-    PARAMETER<double> x;
-    x.obsolete_parse(Cmd);
-    x.e_val(NOT_INPUT, Scope);
-    return to_string(std::sqrt(x));
+  void stack_op(Expression* e)const override {
+    double x = get_double(e);
+    subs_double(e, std::sqrt(x));
   }
   void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";
@@ -643,14 +767,9 @@ public:
   explicit tanh() : MGVAMS_FUNCTION(){
     set_label("tanh");
   }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { itested();
-    PARAMETER<double> x;
-    x.obsolete_parse(Cmd);
-    x.e_val(NOT_INPUT, Scope);
-    return to_string(std::tanh(x));
-  }
-  double evalf(double const* x)const override { untested();
-    return std::tanh(*x);
+  void stack_op(Expression* e)const override { untested();
+    double x = get_double(e);
+    subs_double(e, std::tanh(x));
   }
   void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";

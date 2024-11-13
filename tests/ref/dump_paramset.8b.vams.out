@@ -29,8 +29,8 @@ module const_res(p, n);
   end
 
   analog begin
-    a =  1.;
-    b = (__y +  1.);
+    a = 1;
+    b = (__y + 1);
   end
 
 endmodule

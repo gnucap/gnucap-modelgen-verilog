@@ -56,8 +56,8 @@ private:
 //    m.install(this);
 //    return new Token_CALL("$abstime", this);
 //  }
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
-    return "$$abstime";
+  void stack_op(Expression*)const override {
+    throw Exception("invalid");
   }
   std::string code_name()const override{
     return "_f_abstime";
@@ -78,8 +78,8 @@ public:
   ~SIMPARAM(){ }
 private:
   bool static_code()const override {return true;}
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
-    return "$$simparam";
+  void stack_op(Expression*)const override {
+    throw Exception("invalid");
   }
   std::string code_name()const override{
     return "_f_simparam";

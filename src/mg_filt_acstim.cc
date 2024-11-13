@@ -228,9 +228,8 @@ public:
     }
     o << "}\n";
   }
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
-    unreachable();
-    return "ac_stim";
+  void stack_op(Expression*)const override {
+    throw Exception("invalid");
   }
   Probe const* prb()const {return _prb;}
   void set_n_to_gnd()const {

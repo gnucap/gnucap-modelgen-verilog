@@ -4,12 +4,12 @@ module underscore0();
   real __V;
 
   analog begin
-    __V =  1.;
+    __V = 1;
   end
 
   analog begin
     begin
-      __V =  1.;
+      __V = 1;
     end
   end
 

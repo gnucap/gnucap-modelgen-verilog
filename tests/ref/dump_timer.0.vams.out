@@ -5,9 +5,9 @@ module timer_test(out);
   integer rst;
 
   analog begin
-    rst =  0.;
+    rst = 0;
     @(timer( 1.,  1.)) begin
-      rst =  1.;
+      rst = 1;
     end
     V(out) <+ idt( 1.,  0., rst);
   end

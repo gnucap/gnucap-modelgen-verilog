@@ -355,7 +355,7 @@ public:
     assert(!_types.empty());
     return _types.top() == t_ref;
   }
-  void new_constant(std::ostream& o, Token_CONSTANT const& c);
+  void new_literal(std::ostream& o, Token_CONSTANT const& c);
   void new_rhs(Token_NODE const* v){
     {
       _refs.push("MOD::n_" + v->code_name() + "/*node*/");
@@ -453,7 +453,7 @@ static void make_cc_string(std::ostream& o, String const& e)
   // o << '"';
 }
 /*--------------------------------------------------------------------------*/
-void RPN_VARS::new_constant(std::ostream& o, Token_CONSTANT const& c)
+void RPN_VARS::new_literal(std::ostream& o, Token_CONSTANT const& c)
 {
   if(auto ff=dynamic_cast<Float const*>(c.data())){
 #if 1
@@ -463,6 +463,8 @@ void RPN_VARS::new_constant(std::ostream& o, Token_CONSTANT const& c)
     tmp << "(" << std::scientific << std::setprecision(17) << ff->value() << ")";
     s.new_ref(tmp.str());
 #endif
+  }else if(auto ii=dynamic_cast<Integer const*>(c.data())) {
+    new_ref(to_string(ii->value()));
   }else if(auto S=dynamic_cast<String const*>(c.data())){
     new_string(o);
     o__ code_name() << " = ";
@@ -575,7 +577,7 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
 	s.args_pop();
       }
     }else if (auto c = dynamic_cast<const Token_CONSTANT*>(*i)) {
-      s.new_constant(o, *c);
+      s.new_literal(o, *c);
     }else if(auto F = dynamic_cast<const Token_CALL*>(*i)) {
       if(F->args()){
         o__ "// F " << (*i)->name() << " args:" << s.have_args() << "\n";

@@ -82,7 +82,8 @@ public: // code generation
 	  // incomplete();
 	  return "";
   }
-  void stack_op(Expression*)const override{unreachable(); } // not yet
+  using FUNCTION::stack_op;
+  void stack_op(Expression*)const override = 0;
   void stack_op(Expression const& args, Expression* out) const;
   virtual double evalf(double const*)const {
     throw Exception("not implemented");
@@ -113,9 +114,8 @@ public:
 /*--------------------------------------------------------------------------*/
 class MGVAMS_EVENT : public FUNCTION_ {
 private:
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
-	  unreachable();
-	  return "func";
+  void stack_op(Expression*)const override {
+    throw Exception("invalid");
   }
 public:
   MGVAMS_EVENT() : FUNCTION_() {
@@ -172,9 +172,8 @@ public:
   virtual Node_Ref p() const;
   virtual Node_Ref n() const;
   virtual Branch const* output()const{ untested();return nullptr;}
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
-	  unreachable();
-	  return "filt";
+  void stack_op(Expression*)const override {
+    throw Exception("invalid");
   }
   bool has_precalc()const override { return true;}
   bool is_standalone()const { return _output; }
@@ -188,9 +187,8 @@ public: // bug
 };
 /*--------------------------------------------------------------------------*/
 class MGVAMS_TASK : public FUNCTION_ {
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
-	  unreachable();
-	  return "task";
+  void stack_op(Expression*)const override {
+    throw Exception("invalid");
   }
 public:
   ~MGVAMS_TASK() {}
@@ -210,7 +208,9 @@ public:
     : _name(n), _arg0(a0), _arg1(a1) { untested();
   }
 private:
-  std::string eval(CS&, const CARD_LIST*)const override { untested();unreachable(); return "";}
+  void stack_op(Expression*)const override { untested();
+    throw Exception("invalid");
+  }
   Token* new_token(Module& m, size_t na)const override;
   void make_cc_common(std::ostream&)const override { untested(); unreachable(); }
 };

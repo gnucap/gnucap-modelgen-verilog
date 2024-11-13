@@ -1,7 +1,7 @@
 // paramsets
 module my_res(a, b);
   electrical a, b;
-  parameter real g =  1.;
+  parameter real g = 1;
   localparam real __r = ( 1. / g);
 
   real __g;
@@ -17,7 +17,7 @@ module my_res(a, b);
     begin
       __i =  3.;
       begin
-        __i =  4.;
+        __i = 4;
       end
     end
   end
