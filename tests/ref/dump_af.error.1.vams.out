@@ -1,0 +1,5 @@
+... nction real f;
+  input x;
+  input x;
+ ^ ? already declared: x
+

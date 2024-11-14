@@ -1,0 +1,18 @@
+module test_af(a, b);
+  electrical a, b;
+  analog function real xs;
+    real y;
+    real x;
+    input x;
+    begin : main
+      real x;
+    end
+  endfunction
+
+  analog begin
+  end
+
+endmodule
+
+
+

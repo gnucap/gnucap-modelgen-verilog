@@ -1,0 +1,5 @@
+... real f;
+  real x;
+  input x;
+  real x;
+         ^ ? duplicate variable name

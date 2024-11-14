@@ -1,0 +1,13 @@
+
+module test_af()
+
+analog function real f;
+  real x;
+  input x;
+  real x;
+  begin
+    f = x;
+  end
+endfunction
+
+endmodule

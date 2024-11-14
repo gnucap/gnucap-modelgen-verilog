@@ -226,6 +226,7 @@ TData const* Token_BINOP_::op_deps(Token const* t1, Token const* t2)const
     assert(dynamic_cast<Token_CONSTANT const*>(t1)
          ||dynamic_cast<Token_OUT_VAR const*>(t1)
          ||dynamic_cast<Token_PAR_REF const*>(t1)
+         ||dynamic_cast<Token_VAR_REF const*>(t1) // ARGUMENT?
          ||dynamic_cast<Token_UNARY const*>(t1));
     d1 = &const_deps;
     assert(!d1->is_linear());
@@ -237,6 +238,7 @@ TData const* Token_BINOP_::op_deps(Token const* t1, Token const* t2)const
     assert(dynamic_cast<Token_CONSTANT const*>(t2)
          ||dynamic_cast<Token_OUT_VAR const*>(t2)
          ||dynamic_cast<Token_PAR_REF const*>(t2)
+         ||dynamic_cast<Token_VAR_REF const*>(t2) // ARGUMENT?
          ||dynamic_cast<Token_UNARY const*>(t2));
     d2 = &const_deps;
     assert(!d2->is_linear());
@@ -913,14 +915,17 @@ void Token_VAR_REF::stack_op(Expression* e)const
   {
     TData* nd = nullptr;
     if(auto a = dynamic_cast<Assignment const*>(_item)){
-      nd = deps().clone();
+      // nd = deps().clone();
       nd = a->data().clone();
 //      nd->add_sens(_item); not yet.
       trace3("var::stackop a", name(), nd->size(), deps().size());
-    }else if(auto dd = dynamic_cast<TData const*>(data())){ untested();
-      nd = deps().clone();
+    }else if(auto dd = dynamic_cast<TData const*>(data())){
+      // nd = deps().clone();
       nd = dd->clone();
 //      nd->add_sens(_item); not yet.
+   //  }else if(!_item){
+   //    assert(prechecked_cast<Token_ARGUMENT const*>(this));
+   //    nd = new TData(); // BUG.
     }else{ untested();
       incomplete();
       trace1("var::stackop no assignment", name());
@@ -1067,7 +1072,7 @@ bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
   }else if(auto p = dynamic_cast<Variable_Decl*>(_item)){
     return p->propagate_deps(from);
   }else if(dynamic_cast<Analog_Function*>(_item)){
-  }else{ untested();
+  }else{
     unreachable();
   }
 
@@ -1092,6 +1097,13 @@ Block const* Token_VAR_REF::scope() const
   }
 }
 /*--------------------------------------------------------------------------*/
+Data_Type const& Token_ARGUMENT::type() const
+{
+  // _var?
+  unreachable();
+    static Data_Type_Real t;
+    return t;
+}
 #if 0
 void Token_VAR_REAL::clear_deps()
 { untested();

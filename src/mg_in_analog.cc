@@ -1710,7 +1710,7 @@ public:
     assert(_af);
     set_label(af->variable()->name());
   }
-  void stack_op(Expression*)const override {
+  void stack_op(Expression*)const override { untested();
     throw Exception("invalid"); // really?
   }
 
@@ -1862,7 +1862,8 @@ Base* AnalogFunctionArgs::lookup(std::string const& k, bool recurse)
   if(auto n = dynamic_cast<Token_ARGUMENT const*>(b)){
     trace2("AnalogFunctionArgs::lookup1 arg", k, n->_var);
     if(n->_var){
-      return n->_var;
+      return b;
+      return n->_var; // need var in Expression::resolve...
     }else{
       return b;
     }
@@ -1978,6 +1979,7 @@ bool AnalogFunctionArgs::new_var_ref(Base* b)
       throw Exception("duplicate argument");
     }else if(auto dd = dynamic_cast<Token_VAR_DECL*>(ex)){
       trace1("AF_args::new_var_ref ARG + DECL", t->name());
+      assert(!arg->_var || arg->_var==dd);
       arg->_var = dd;
       return Block::new_var_ref(arg);
     }else if(auto tt = dynamic_cast<Token*>(ex)){ untested();
@@ -1990,11 +1992,11 @@ bool AnalogFunctionArgs::new_var_ref(Base* b)
     }
   }else if((decl = dynamic_cast<Token_VAR_DECL*>(b))){
     trace2("AF_args::new_var_ref DECL", t->name(), ex);
-    if(dynamic_cast<Token_VAR_DECL*>(ex)){
+    if(dynamic_cast<Token_VAR_DECL*>(ex)){ untested();
       throw Exception("duplicate variable name " + t->name());
     }else if(auto aa=dynamic_cast<Token_ARGUMENT*>(ex)){
       trace2("AF_args::new_var_ref DECL + ARG", t->name(), aa->_var);
-      if(aa->_var){ untested();
+      if(aa->_var){
 	throw Exception("duplicate variable name");
       }else{
 	aa->_var = decl;
@@ -2054,8 +2056,8 @@ void AnalogEvtExpression::parse(CS& file)
   file >> rhs;
 
   // TODO:
-  // if(dynamic_cast<EVENT_FUNCTION const*>(rhs.back()){
-  // }else{
+  // if(dynamic_cast<EVENT_FUNCTION const*>(rhs.back()){ untested();
+  // }else{ untested();
   //   error.
   // }
 
@@ -2066,8 +2068,8 @@ void AnalogEvtExpression::parse(CS& file)
   while(file >> "or" || file >> ","){
     file >> rhs;
     // TODO:
-    // if(dynamic_cast<EVENT_FUNCTION const*>(rhs.back()){
-    // }else{
+    // if(dynamic_cast<EVENT_FUNCTION const*>(rhs.back()){ untested();
+    // }else{ untested();
     //   error.
     // }
   }
@@ -2136,7 +2138,7 @@ void AnalogEvtExpression::set_rdeps()
 /*--------------------------------------------------------------------------*/
 // incomplete. expressions...
 FUNCTION_ const* AnalogEvtExpression::function() const
-{
+{ untested();
   assert(size());
   Token const* t = back();
   assert(t);
@@ -2173,16 +2175,13 @@ void AF_Arg_List::parse(CS& f)
   LiSt<String_Arg, '\0', ',', ';'> l;
   l.parse(f);
   for(auto i : l){
-    trace1("AF_Arg_List::parse alreacy declared?", i->to_string());
+    trace2("AF_Arg_List::parse already declared?", dir, i->to_string());
     auto b = owner()->lookup(i->to_string(), false);
     auto v = dynamic_cast<Token_VAR_DECL*>(b);
 
-    if(dynamic_cast<Token_ARGUMENT const*>(b)){ untested();
+    if(dynamic_cast<Token_ARGUMENT const*>(b)){
       throw Exception_CS_("already declared: " + i->to_string() + "\n", f);
-    }else if(dynamic_cast<Token_VAR_DECL const*>(b)){
-      incomplete();
-    }else if(v){ untested();
-//      v->set_arg? set_used_in?
+    }else if(v){
     }else{
     }
 
@@ -2201,6 +2200,8 @@ void AF_Arg_List::parse(CS& f)
     }else{
     }
 
+    // input, output, input define the argument order, 4.7.3
+    // need to check duplicate names?
     _l.push_back(t);
   }
 

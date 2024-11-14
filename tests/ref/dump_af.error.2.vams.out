@@ -1,0 +1,6 @@
+...  f;
+  real x;
+  input x;
+  output x;
+ ^ ? already declared: x
+

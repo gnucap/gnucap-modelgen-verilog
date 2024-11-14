@@ -352,27 +352,13 @@ private:
 };
 /*--------------------------------------------------------------------------*/
 class Data_Type;
-class Token_ARGUMENT : public Token_SYMBOL {
-public:
-  Token * _var{nullptr};
-  Data_Type const& type()const;
-public:
-  explicit Token_ARGUMENT() : Token_SYMBOL("",""){ untested();unreachable();}
-  explicit Token_ARGUMENT(std::string Name)
-    : Token_SYMBOL(Name, "") {}
-  void dump(std::ostream& o)const override;
-public: // LiSt
-  std::string key() const { untested();unreachable();return "";}
-  void set_owner(Base*){ untested();unreachable();}
-};
-/*--------------------------------------------------------------------------*/
 // Token_VARIABLE?
 class Token_VAR_REF : public Token_SYMBOL {
 protected:
   Base* _item;
 public:
   explicit Token_VAR_REF(std::string Name, Base* item)
-    : Token_SYMBOL(Name, ""), _item(item) { untested();}
+    : Token_SYMBOL(Name, ""), _item(item) {}
   explicit Token_VAR_REF(std::string Name, Base* item, Base const* data)
     : Token_SYMBOL(Name, data), _item(item) {}
 // protected: //??

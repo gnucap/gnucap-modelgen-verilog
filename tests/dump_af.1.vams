@@ -1,0 +1,21 @@
+
+`include "sub/disciplines.few"
+
+module test_af(a,b)
+electrical a, b;
+
+analog function real xs;
+  real y;
+  input x;
+  real x;
+    begin : main
+      real x;
+    end
+endfunction
+
+analog begin
+end
+
+endmodule
+
+
