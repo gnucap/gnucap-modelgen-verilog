@@ -31,10 +31,21 @@
 class Node_Map;
 /*--------------------------------------------------------------------------*/
 class UDP_Table : public Base {
+  int _width{0};
   std::string _blob;
+  std::vector<std::vector<int>> _lines;
+  New_Port_List const* _ports{nullptr};
 public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
+
+  void set_ports(New_Port_List const* p) {
+    assert(p);
+    _ports = p;
+    set_width(int(_ports->size()));
+  }
+  void set_width(int i) { _width = i; }
+  void parse_line(CS& f);
 };
 /*--------------------------------------------------------------------------*/
 class Port_3;

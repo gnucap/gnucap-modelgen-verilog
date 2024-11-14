@@ -76,7 +76,7 @@ void Primitive::dump(std::ostream& o)const
     o << "inout " << inout() << "\n";
   }else{
   }
-  o << table() << "\n";
+  o << table();
   o << "endprimitive\n";
 }
 /*
@@ -127,7 +127,6 @@ void Primitive::parse_body(CS& f)
   _inout.set_owner(this);
 
   size_t here = f.cursor();
-  bool end = false;
   for (;;) {
     parse_attributes(f, &f);
     ONE_OF	// module_item
@@ -135,23 +134,24 @@ void Primitive::parse_body(CS& f)
       || ((f >> "input ") && (f >> input()))
       || ((f >> "output ") && (f >> output()))
       || ((f >> "inout ") && (f >> inout()))
-      || ((f >> "table ") && (f >> table()))
-      || ((f >> "endprimitive ") && (end = true))
       ;
-    if (attr.has_attributes(tag_t(&f))) { untested();
-      f.warn(bWARNING, "dangling attributes "
-	   + attr.attributes(tag_t(&f))->string(tag_t(nullptr)));
+
+    if (f.stuck(&here)) {
+      break;
     }else{
     }
-    if (end){
-      break;
-    }else if (!f.more()) { untested();
-      f.warn(0, "premature EOF (module)");
-      break;
-    }else if (f.stuck(&here)) { untested();
-      throw Exception_CS_("bad module", f);
-    }else{
-    }
+  }
+
+  table().set_ports(&_ports);
+
+  if(f >> "table "){
+    f >> table();
+  }else{ untested();
+    f.warn(bWARNING, "need table\n");
+  }
+
+  if(f >> "endprimitive"){
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -166,15 +166,79 @@ Primitive::~Primitive()
   delete _nodes;
 }
 /*--------------------------------------------------------------------------*/
+void UDP_Table::parse_line(CS& f)
+{
+  std::vector<int> line;
+  bool end = false;
+
+  int i;
+  for(i=0; i<_width + 2; ++i){
+    bool sep = false;
+    size_t here = f.cursor();
+    ONE_OF
+      || ((f >> '1') && (line.push_back(1), true))
+      || ((f >> '0') && (line.push_back(0), true))
+      || ((f >> 'x') && (line.push_back(2), true))
+      || ((f >> ':') && (sep=true))
+      || ((f >> ';') && (end=true))
+      ;
+
+    if (sep && int(line.size())+1!=_width){ untested();
+      throw Exception_CS_("bad table", f);
+    }else if (end){
+      break;
+    }else if (f.stuck(&here)) { untested();
+      throw Exception_CS_("bad table", f);
+    }else{
+    }
+  }
+  if(i!=_width+1){
+    throw Exception_CS_("bad table", f);
+  }else{
+  }
+  _lines.push_back(line);
+}
+/*--------------------------------------------------------------------------*/
 void UDP_Table::parse(CS& f)
 {
-  _blob = f.get_to("endtable");
-  f >> "endtable";
+  for (;;) {
+    if(f >> "endtable"){
+      break;
+    }else{
+      parse_line(f);
+    }
+  }
 }
 /*--------------------------------------------------------------------------*/
 void UDP_Table::dump(std::ostream& o) const
 {
-  o << _blob;
+  static std::string names[]{ //
+    "0", "1", "x", "r", "f"
+  };
+  o << "table\n";
+  if(_ports && _ports->size()){
+    o << "//";
+    auto p = _ports->begin();
+    std::string out = (*p)->name();
+    while(++p != _ports->end()){
+      o << " " << (*p)->name();
+    }
+    o << " : " << out << "\n";
+  }
+  for(auto i : _lines){
+    o << "  ";
+    int k = 1;
+    for(auto j : i){
+      o << " " << names[j];
+      ++k;
+      if(k == _width){
+	o << " :";
+      }else{
+      }
+    }
+    o << ";\n";
+  }
+  o << "endtable\n";
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
