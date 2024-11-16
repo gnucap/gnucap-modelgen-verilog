@@ -988,7 +988,7 @@ void LANG_VERILOG::print_attributes(OMSTREAM& o, tag_t x) const
 }
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_args(OMSTREAM& o, const MODEL_CARD* x)
-{ untested();
+{
   print_args_paramset(o, x);
 }
 /*--------------------------------------------------------------------------*/
@@ -1190,7 +1190,7 @@ void LANG_VERILOG::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
     print_items_sckt(o, bs);
     print_args_paramset(o, bs);
     o << "\nendparamset\n\n";
-  }else{ untested();
+  }else{
     // spice fallback
     _mode = mPARAMSET;
     o << "paramset " << x->short_label() << ' ' << x->dev_type() << ";\n";

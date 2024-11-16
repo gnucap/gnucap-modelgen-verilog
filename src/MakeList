@@ -81,6 +81,7 @@ mg_out_module.cc \
 mg_out_common.cc \
 mg_out_dev.cc \
 mg_out_lib.cc \
+mg_out_primitive.cc \
 mg_out_root.cc \
 mg_pp.cc \
 mg_task.cc \

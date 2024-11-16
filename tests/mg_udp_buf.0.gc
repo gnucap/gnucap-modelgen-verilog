@@ -1,0 +1,39 @@
+
+load ./modelgen_1.so
+load vams/vpulse.so
+
+`modelgen test_mybuf0
+module test_mybuf0
+endmodule
+
+primitive mybuf0 (out, in1);
+output out;
+input in1;
+table
+        0 : 0;
+        1 : 1;
+endtable
+endprimitive
+`endmodelgen
+
+!make test_mybuf0.so >/dev/null
+attach ./test_mybuf0.so
+
+module test(a, b);
+  vpulse #(.val0(0) .val1(5) .width(.2) .period(.5)) v1(b, \0 );
+  mybuf0 b(.out(a), .in1(b));
+endmodule
+
+spice
+.model dummy_tmp logic
+.verilog
+
+test #() t(a, b)
+
+list
+
+print op v(nodes)
+op
+
+print tran v(nodes) l(nodes)
+tran 1 trace n

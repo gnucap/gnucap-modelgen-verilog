@@ -1,0 +1,40 @@
+running modelgen in insensitive mode
+module test (.a(a),.b(b));
+  vpulse #(.period(.5),.width(.2),.val1(5),.val0(0)) v1 (b,0);
+  mybuf0 #() b (.out(a),.in1(b));
+endmodule // test
+
+paramset dummy_tmp logic;
+ .delay=NA( 1.n); .vmax=NA( 5.); .vmin=NA( 0.); .unknown=NA( 2.5); .rise=NA( 500.p); .fall=NA( 500.p); .rs=NA( 100.); .rw=NA( 1.G); .thh=NA( 0.75); .thl=NA( 0.25); .mr=NA( 5.); .mf=NA( 5.); .over=NA( 0.1); .tnom=NA( 27.);
+endparamset
+
+test #() t (.a(a),.b(b));
+t.b: can't find subckt: dummy_tmpmybuf01, forcing digital
+#           v(a)       v(b)      
+ 27.        0.         0.        
+#Time       v(a)       v(b)       l(a)       l(b)      
+ 0.         0.         0.         0.         0.01      
+ 2.n        0.         5.         1.         3.01      
+ 3.n        5.         5.         3.         3.01      
+ 4.n        5.         5.         3.         3.01      
+ 5.n        5.         5.         3.         3.01      
+ 6.n        5.         5.         3.         3.01      
+ 0.2        5.         5.         3.         3.01      
+ 0.2        5.         0.         2.         0.01      
+ 0.2        0.         0.         0.         0.01      
+ 0.2        0.         0.         0.         0.01      
+ 0.2        0.         0.         0.         0.01      
+ 0.2        0.         0.         0.         0.01      
+ 0.5        0.         0.         0.         0.01      
+ 0.5        0.         5.         1.         3.01      
+ 0.5        5.         5.         3.         3.01      
+ 0.5        5.         5.         3.         3.01      
+ 0.5        5.         5.         3.         3.01      
+ 0.5        5.         5.         3.         3.01      
+ 0.7        5.         5.         3.         3.01      
+ 0.7        5.         0.         2.         0.01      
+ 0.7        0.         0.         0.         0.01      
+ 0.7        0.         0.         0.         0.01      
+ 0.7        0.         0.         0.         0.01      
+ 0.7        0.         0.         0.         0.01      
+ 1.         0.         0.         0.         0.01      

@@ -2,7 +2,7 @@
  * Copyright (C) 2023 Felix Salfelder
  * Author: Felix Salfelder
  *
- * This file is part of \"Gnucap\", the Gnu Circuit Analysis Package
+ * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -78,6 +78,31 @@ inline void e_val(double* p, const double& x, const CARD_LIST*)
   assert(p);
   *p = x;
 }
+/*--------------------------------------------------------------------------*/
+struct LOGICVAL;
+class INTERFACE COMMON_UDP : public COMMON_COMPONENT {
+  PARAMETER<vInteger> _delay;
+protected:
+  explicit	COMMON_UDP(int c=0) :COMMON_COMPONENT(c) { _modelname = "dummy_tmp"; }
+  explicit	COMMON_UDP(const COMMON_UDP& p) :COMMON_COMPONENT(p) { _modelname = "dummy_tmp"; }
+public:
+		~COMMON_UDP()			{}
+  bool operator==(const COMMON_COMPONENT&x)const override {
+    auto p = dynamic_cast<const COMMON_UDP*>(&x);
+    bool rv = p
+      && _delay == p->_delay
+      && COMMON_COMPONENT::operator==(x);
+    return rv;
+  }
+  virtual LOGICVAL logic_eval(const node_t*, int)const	= 0;
+
+  void		set_param_by_index(int, std::string& x, int)override {_delay=x;}
+  bool		param_is_printable(int i)const override {return i==0;}
+  using COMMON_COMPONENT::param_name;
+  std::string	param_name(int)const override {return "delay";}
+  std::string	param_value(int)const override {return "42";}
+  int param_count()const override {return (1 + COMMON_COMPONENT::param_count());}
+};
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

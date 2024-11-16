@@ -86,7 +86,7 @@ MAKE_LIB = $(CXX) $(CCFLAGS) $(MAKE_CXXFLAGS) $(CXXFLAGS) ${GNUCAP_CPPFLAGS} ${C
 #
 # temporary workaround, see source
 %.raw: %.h
-	sed -e 's/^/"/' -e 's/$$/\\n"/' $< > $@
+	sed -e 's/"/\\"/g' -e 's/^/"/' -e 's/$$/\\n"/' $< > $@
 mg_out_root.o: ${EMBED_HEADERS}
 
 $(TARGET_EXE)$(TARGET_EXE_EXT): $(TARGET_DEPENDS)

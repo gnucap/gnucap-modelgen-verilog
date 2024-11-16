@@ -152,6 +152,10 @@ mg_out_lib.o: mg_out_lib.cc mg_out.h mg_base.h mg_error.h mg_.h \
  mg_expression.h mg_attrib.h mg_deps.h mg_lib.h mg_func.h mg_token.h \
  mg_code.h mg_filter.h mg_circuit.h mg_module.h mg_component.h \
  mg_discipline.h mg_primitive.h
+mg_out_primitive.o: mg_out_primitive.cc mg_out.h mg_base.h mg_error.h \
+ mg_primitive.h mg_code.h mg_deps.h mg_lib.h mg_attrib.h mg_expression.h \
+ mg_component.h mg_circuit.h mg_module.h mg_discipline.h mg_.h mg_func.h \
+ mg_token.h mg_filter.h
 mg_out_root.o: mg_out_root.cc mg_out.h mg_base.h mg_error.h mg_in.h \
  mg_attrib.h mg_options.h mg_discipline.h mg_.h mg_expression.h mg_deps.h \
  mg_lib.h mg_func.h mg_token.h mg_code.h mg_filter.h mg_circuit.h \

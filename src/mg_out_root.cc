@@ -59,6 +59,7 @@ static void make_header(std::ostream& o, const File& in,
 #endif
   o <<
     "#include <u_limit.h>\n"
+    "#include <bitset>\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 
@@ -171,6 +172,16 @@ void make_cc(std::ostream& out, const File& in)
     }
   }else{
   }
+
+  for (auto p : in.primitive_list()) {
+    out << "namespace n" << std::to_string(num) << "{\n";
+    make_cc_primitive(out, *p);
+    out << "} // n" << std::to_string(num) << "\n"
+      "/*--------------------------------------"
+      "------------------------------------*/\n";
+    ++num;
+  }
+
   make_tail(out, in);
 }
 /*--------------------------------------------------------------------------*/

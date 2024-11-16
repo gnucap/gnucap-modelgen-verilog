@@ -1,5 +1,6 @@
 c_param.o: c_param.cc
 d_ltra.o: d_ltra.cc m_wave.h
+d_udp.o: d_udp.cc ../src/e_va.h
 d_va_acs.o: d_va_acs.cc d_va.h ../src/e_va.h
 d_va_absdelay.o: d_va_absdelay.cc m_wave.h ../src/e_va.h
 d_va_filter.o: d_va_filter.cc

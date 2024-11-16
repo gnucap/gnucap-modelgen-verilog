@@ -33,8 +33,28 @@ class Node_Map;
 class UDP_Table : public Base {
   int _width{0};
   std::string _blob;
-  std::vector<std::vector<int>> _lines;
+  typedef std::vector<int> line_t;
+  std::vector<line_t> _lines;
   New_Port_List const* _ports{nullptr};
+public:
+  enum{
+    udp_0 = 0,
+    udp_1,
+    udp_x,
+    udp_r,
+    udp_f,
+    udp_w,
+    udp_q,
+    udp_count
+  };
+private:
+  char name(int i)const {
+    assert(i<udp_count);
+    static char names[] { //
+      '0', '1', 'x', 'r', 'f', '*', '?'
+    };
+  return names[i];
+  }
 public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
@@ -46,6 +66,7 @@ public:
   }
   void set_width(int i) { _width = i; }
   void parse_line(CS& f);
+  std::vector<line_t> const& lines()const {return _lines;}
 };
 /*--------------------------------------------------------------------------*/
 class Port_3;
@@ -72,6 +93,10 @@ public:
   const String_Arg& identifier()const	{return _identifier;}
 private:
   void parse_body(CS& f);
+
+public: // Component.
+  New_Port_List const& ports()const {return _ports;}
+  int net_nodes()const {return int(ports().size());}
 
 public: // share "circuit" with Module?
 	// stash here, for now.

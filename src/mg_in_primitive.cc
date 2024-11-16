@@ -192,7 +192,7 @@ void UDP_Table::parse_line(CS& f)
     }else{
     }
   }
-  if(i!=_width+1){
+  if(i!=_width+1){ untested();
     throw Exception_CS_("bad table", f);
   }else{
   }
@@ -212,9 +212,6 @@ void UDP_Table::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 void UDP_Table::dump(std::ostream& o) const
 {
-  static std::string names[]{ //
-    "0", "1", "x", "r", "f"
-  };
   o << "table\n";
   if(_ports && _ports->size()){
     o << "//";
@@ -229,7 +226,7 @@ void UDP_Table::dump(std::ostream& o) const
     o << "  ";
     int k = 1;
     for(auto j : i){
-      o << " " << names[j];
+      o << " " << name(j);
       ++k;
       if(k == _width){
 	o << " :";

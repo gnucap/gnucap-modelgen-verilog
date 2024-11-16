@@ -640,7 +640,7 @@ Preprocessor::Preprocessor() : CS(CS::_STRING, "")
 void Preprocessor::read(std::string const& file_name)
 {
   if(OPT::case_insensitive == 0){
-  }else{ untested();
+  }else{
   }
   // _name = file_name;
   std::string::size_type sepplace;

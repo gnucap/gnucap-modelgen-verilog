@@ -397,6 +397,7 @@ public:
 
   Port_3* find_port(std::string const& n);
 
+public: // Component
   size_t		min_nodes()const	{ untested();return ports().size();}
   size_t		max_nodes()const	{ untested();return ports().size();}
   size_t		net_nodes()const	{return ports().size();}

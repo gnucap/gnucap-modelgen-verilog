@@ -51,7 +51,7 @@ class CMD_ : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST*)override {
     if(OPT::case_insensitive == 0){
-    }else{ untested();
+    }else{
       error(bWARNING, "running modelgen in insensitive mode\n");
     }
 
@@ -98,6 +98,22 @@ public:
       file.reset(here);
       file.reset();
       trace1("paramset", name);
+    }
+    while (cmd >> "primitive"){
+      module_content += cmd.fullstring();
+      for (;;) {
+	cmd.get_line("verilog-primitive>");
+
+	module_content += cmd.fullstring();
+	if (cmd >> "endprimitive ") {
+	  cmd.get_line("verilog>");
+	  break;
+	}else{
+	}
+      }
+      file = module_content;
+      file.reset(here);
+      file.reset();
     }
 
     cmd >> "`endmodelgen";

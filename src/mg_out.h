@@ -91,6 +91,10 @@ void make_cc_analog_functions(std::ostream&, const Module&);
 /* mg_out_common.cc */
 void make_cc_common(std::ostream&, const Module&);
 /*--------------------------------------------------------------------------*/
+/* mg_out_primitive.cc */
+class Primitive;
+void make_cc_primitive(std::ostream&, const Primitive&);
+/*--------------------------------------------------------------------------*/
 inline std::string baseclass(Module const&)
 {
   return "BASE_SUBCKT";
