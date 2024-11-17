@@ -1,11 +1,15 @@
-test_temp0 #(.dc(dc)) dut(\1 , 2, \0 ); 
-                               ^ ? invalid identifier
 parameter dc not specified, using default
-test_temp0 #(.dc(dc)) dut (.p(\1 ),.q(\2 ),.n(\0 ));
+test_temp0 #(.dc(dc),.tnom(300)) dut (.p(\1 ),.q(\2 ),.n(\0 ));
 #           v(1)       v(2)       iter(0)    T(dut)    
+delta 0.000159416
  25.        298.15     0.         3.         298.15    
+delta 7.32452e-05
  26.        299.15     0.         3.         299.15    
+delta -1.29256e-05
  27.        300.15     0.         3.         300.15    
+delta -9.90965e-05
  28.        301.15     0.         3.         301.15    
+delta -0.000185267
  29.        302.15     0.         3.         302.15    
+delta -0.000271438
  30.        303.15     0.         3.         303.15    

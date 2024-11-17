@@ -127,4 +127,53 @@ private:
 } simparam;
 DISPATCHER<FUNCTION>::INSTALL d_simparam(&function_dispatcher, "$simparam", &simparam);
 /*--------------------------------------------------------------------------*/
+class TEMPERATURE : public MGVAMS_FUNCTION {
+public:
+  explicit TEMPERATURE() {
+    set_label("$temperature");
+  }
+  ~TEMPERATURE(){ }
+private:
+  bool static_code()const override {return true;}
+  void stack_op(Expression*)const override {
+    throw Exception("invalid");
+  }
+  void make_cc_common(std::ostream& o)const override {
+    o__ "double " << code_name() << "()const {\n";
+    o____ "return P_CELSIUS0 + _sim->_temp_c;\n";
+    o__ "}\n";
+  }
+public:
+  std::string code_name()const override{
+    return "f_temp";
+  }
+} temperature;
+DISPATCHER<FUNCTION>::INSTALL d1(&function_dispatcher, "$temperature", &temperature);
+/*--------------------------------------------------------------------------*/
+class VT : public MGVAMS_FUNCTION {
+public:
+  explicit VT() : MGVAMS_FUNCTION() {
+    set_label("$vt");
+  }
+  ~VT(){ }
+private:
+  void stack_op(Expression*)const override {
+    throw Exception("invalid");
+  }
+  bool static_code()const override {return true;}
+  std::string code_name()const override{
+    return "_f_vt";
+  }
+  void make_cc_common(std::ostream& o)const override {
+    o__ "double " << code_name() << "()const {\n";
+    o____ "return P_K * (P_CELSIUS0 + _sim->_temp_c) / P_Q;\n";
+    o__ "}\n";
+    o__ "double " << code_name() << "(double T)const {\n";
+    o____ "assert(T>=-P_CELSIUS0);\n";
+    o____ "return P_K * T / P_Q;\n";
+    o__ "}\n";
+  }
+} vt;
+DISPATCHER<FUNCTION>::INSTALL d_vt(&function_dispatcher, "$vt", &vt);
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

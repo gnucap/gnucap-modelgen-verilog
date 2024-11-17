@@ -8,12 +8,14 @@ verilog
 module test_temp0(p, q, n);
 	electrical p, q, n;
 	parameter real dc = 1.;
+	parameter real tnom = 0;
 	(* desc="" *) real T;
 
 	analog begin
 		T = $temperature();
 		V(p,n) <+ $temperature();
 		V(q,n) <+ $vt(T) - $vt();
+		$strobe("delta %g", $vt(tnom) - $vt());
 	end
 
 endmodule
@@ -21,7 +23,7 @@ endmodule
 !make test_temp0.so > /dev/null
 attach ./test_temp0.so
 
-test_temp0 #(.dc(dc)) dut(\1 , 2, \0 );
+test_temp0 #(.dc(dc) .tnom(300)) dut(\1 , \2 , \0 );
 
 list
 

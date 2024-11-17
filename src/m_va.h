@@ -552,7 +552,7 @@ inline double& chain(double& t, double const&)
 }
 template<>
 inline int& chain(int& t, double const&)
-{ untested();
+{
   // no-op
   return t;
 }

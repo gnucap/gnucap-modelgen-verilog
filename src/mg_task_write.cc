@@ -132,26 +132,29 @@ private:
     for(size_t i=1; i<num_args(); ++i) {
       o____  ", double";
     }
-    o << ")const {}\n";
+    o << ")const { (void)d; }\n";
 
     assert(_m);
     o____ "void tr_begin("; args(o); o << ") {\n";
+    o____ "(void)d;\n";
     o______ "trace1(\"write::tr_begin\", _sim->_time0);\n";
     o______ "assert(d); d->q_accept();\n";
     o____"}\n";
 
     o____ "void tr_review("; args(o); o << ") {untested();\n";
+    o____ "(void)d;\n";
     o______ " assert(d); d->q_accept();\n";
     o____"}\n";
 
     o____ "void tr_advance("; args(o); o << ") {\n";
+    o____ "(void)d;\n";
     o______ "trace1(\"write::tr_advance\", _sim->_time0);\n";
     o______ "assert(d); d->q_accept();\n";
     o____"}\n";
 
-    o____ "void tr_regress("; args(o); o << ") { /*nop*/ }\n";
+    o____ "void tr_regress("; args(o); o << ") { (void)d; /*nop*/ }\n";
 
-    o____ "void tr_accept(CARD* d, std::string a0";
+    o____ "void tr_accept(CARD*, std::string a0";
     for(size_t i=1; i<num_args(); ++i) {
       o____  ", double a" << i << "";
     }
@@ -168,7 +171,7 @@ private:
     o << ");\n";
     o____ "}\n";
 
-    o____ "void precalc("; args(o); o << ") { /*nop*/ }\n";
+    o____ "void precalc("; args(o); o << ") { (void)d; /*nop*/ }\n";
     o__ "}_" << label() << ";\n";
   }
   std::string code_name()const override{
