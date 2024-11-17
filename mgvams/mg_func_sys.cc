@@ -70,6 +70,35 @@ private:
 } abstime;
 DISPATCHER<FUNCTION>::INSTALL d_abstime(&function_dispatcher, "$abstime", &abstime);
 /*--------------------------------------------------------------------------*/
+class MFACTOR : public MGVAMS_FUNCTION {
+  mutable Module const* _m{nullptr};
+public:
+  explicit MFACTOR() : MGVAMS_FUNCTION() {
+    set_label("$mfactor");
+  }
+private:
+  bool static_code()const override {return true;}
+  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+    unreachable(); // SFCALL won't eval
+    return "$$mfactor";
+  }
+  void stack_op(Expression*)const override { untested();
+    throw Exception("invalid");
+  }
+  std::string code_name()const override {
+    return "d->_f_mfactor";
+  }
+  void make_cc_dev(std::ostream& o)const override {
+    o__ "double " << "_f_mfactor()const {\n";
+    o____ "return mfactor();\n";
+    o__ "}\n";
+    o__ "double " << "_f_mfactor__precalc()const {\n";
+    o____ "return mfactor();\n";
+    o__ "}\n";
+  }
+} mfactor;
+DISPATCHER<FUNCTION>::INSTALL d_mfactor(&function_dispatcher, "$mfactor", &mfactor);
+/*--------------------------------------------------------------------------*/
 class SIMPARAM : public MGVAMS_FUNCTION {
 public:
   explicit SIMPARAM() {
