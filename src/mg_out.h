@@ -39,10 +39,16 @@ extern std::string ind;
 #define make_tag(o)
 #endif
 /*--------------------------------------------------------------------------*/
+// obsolete.
 struct indent{
-  explicit indent(size_t i=2){
+  explicit indent(int i=2){
     _old = ind;
-    ind = ind + std::string(i, ' ');
+    if(i<0){ untested();
+      assert(ind.size()>=size_t(-i));
+      ind = ind.substr(i, ind.size()+i);
+    }else{
+      ind = ind + std::string(i, ' ');
+    }
   }
   explicit indent(std::string s){ untested();
     _old = ind;
@@ -52,6 +58,33 @@ struct indent{
     ind = _old;
   }
   std::string _old;
+};
+/*--------------------------------------------------------------------------*/
+class oindent : private std::streambuf, public std::ostream{
+  std::ostream& _o;
+  int _indent;
+  std::string _old_ind; // obsolete.
+public:
+  oindent(std::ostream&o, int indent=2) : std::ostream(this), _o(o), _indent(indent) {
+    _old_ind = ind;
+    ind = "";
+  }
+  ~oindent(){
+    ind = _old_ind;
+  }
+
+  int overflow(int c)override {
+    while(_indent) {
+      _o << " ";
+      --_indent;
+    }
+    if(c=='\n'){
+      _indent = 2;
+    }else{
+    }
+    _o << char(c);
+    return 0;
+  }
 };
 /*--------------------------------------------------------------------------*/
 class File;
