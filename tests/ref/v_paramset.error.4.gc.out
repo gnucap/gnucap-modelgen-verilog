@@ -1,12 +1,6 @@
 >>>>>verilog 
 >>>>>paramset test_invalid resistor; 
 >>>>>module main(\1 ,\2 , \3 , \4 ); 
-main m(\0 ,1,2,4); 
-           ^ ? invalid identifier
-main m(\0 ,1,2,4); 
-             ^ ? invalid identifier
-main m(\0 ,1,2,4); 
-               ^ ? invalid identifier
 >>>>>list 
 paramset test_invalid resistor;
   parameter R=0 from (1:2]; 

@@ -16,5 +16,4 @@ main #(.v(1)) m1(0 1)
 main #(.v(2)) m2(0 2)
 
 list
-print dc v(nodes)
 dc

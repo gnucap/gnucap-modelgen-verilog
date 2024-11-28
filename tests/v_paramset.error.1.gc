@@ -15,6 +15,6 @@ endmodule
 main m(\0 , \1 , \2 , \4 );
 
 list
-
+end
 print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
 dc

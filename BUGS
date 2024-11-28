@@ -1,4 +1,5 @@
 == modelgen
+- bug in V(p) if !$port_connected(p)
 - all variables are static, some speed impact.
 - $limit: only "pnjlimit"
 - ac needs operating point, even if linear: mg2_cccs.0.gc

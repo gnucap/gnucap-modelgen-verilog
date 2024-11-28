@@ -72,11 +72,11 @@ prep: ${SYMLINKS}
 	-mkdir -p ${TARGETDIR}
 
 ${mg_out}: ${TARGETDIR}/mg%.gc.out: prep
-	-@${ENV} ${GNUCAP} ${GNUCAP_ARGS} ${MG_ARGS} ${srcdir}/mg$*.gc |tail -n +12 | \
+	-@${ENV} ${GNUCAP} ${GNUCAP_ARGS} ${MG_ARGS} < ${srcdir}/mg$*.gc |tail -n +12 | \
 		grep -v '^stashing\ as' | grep -v 'already\ installed' | grep -v ^make > $@
 
 ${gc_out}: ${TARGETDIR}/%.gc.out: prep
-	-@${ENV} ${GNUCAP} ${GNUCAP_ARGS} ${srcdir}/$*.gc |tail -n +12 | \
+	-@${ENV} ${GNUCAP} ${GNUCAP_ARGS} < ${srcdir}/$*.gc |tail -n +12 | \
 		grep -v '^stashing\ as' | grep -v 'already\ installed' | grep -v ^make > $@
 
 ${pp_out}: ${TARGETDIR}/%.vapp.out: prep

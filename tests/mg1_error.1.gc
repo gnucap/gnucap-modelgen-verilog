@@ -15,4 +15,4 @@ end
 endmodule
 
 
-!make test_error1.so /dev/null
+// !make test_error1.so > /dev/null

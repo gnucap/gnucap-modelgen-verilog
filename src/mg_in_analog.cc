@@ -414,6 +414,7 @@ static Base* parse_analog_stmt(CS& file, Block* owner)
   Base* a = parse_analog_stmt_or_null(file, owner);
   if(file.stuck(&here)) {
     delete a;
+    trace1("what?", file.tail().substr(0,20));
     throw Exception_CS_("what's this?", file);
     file.reset_fail(here);
     return nullptr;
