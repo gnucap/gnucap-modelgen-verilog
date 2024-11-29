@@ -234,7 +234,7 @@ public:
     ret -= ddouble_(o);
     return ret;
   }
-  ddouble_ operator-(int const& o) const { untested();
+  ddouble_ operator-(int const& o) const {
     ddouble_ ret = *this;
     ret -= o;
     return ret;
@@ -412,7 +412,7 @@ ddouble_<T> operator-(double const& a, ddouble_<T> b)
 }
 template<int T>
 ddouble_<T> operator-(int const& a, ddouble_<T> b)
-{ untested();
+{
   ddouble_<T> c(a);
   c -= b;
   return c;

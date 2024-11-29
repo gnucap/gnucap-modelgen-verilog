@@ -177,9 +177,9 @@ void VAPOT::tr_load()
   for (int i=2; i<=_n_ports; ++i) {
     trace2("load port", long_label(), i);
     trace2("load port", long_label(), _m0_[i-2]);
-    trace2("load port", long_label(), _n[2*i-2]->short_label());
-    trace2("load port", long_label(), _n[2*i-1]->short_label());
-    tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_m0_[i-2]), &(_m1_[i-2]));
+    trace2("load port", long_label(), n_(2*i-2)->short_label());
+    trace2("load port", long_label(), n_(2*i-1)->short_label());
+    tr_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), &(_m0_[i-2]), &(_m1_[i-2]));
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -193,7 +193,7 @@ double VAPOT::tr_amps()const
   amps = _loss0 * tr_outvolts() + _m0.c1 * tr_involts() + _m0.c0;
 
   for (int i=2; i<=_n_ports; ++i) {
-    amps += (_n[2*i-2].v0() - _n[2*i-1].v0()) * _m0_[i-2];
+    amps += (n_(2*i-2).v0() - n_(2*i-1).v0()) * _m0_[i-2];
   }
   trace3("tr_amps4", long_label(), _loss0, amps);
   return amps;
@@ -214,9 +214,9 @@ void VAPOT::ac_load()
 
   for (int i=2; i<=_n_ports; ++i) {
     if(_loss0){
-      ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], - _values[i] * _loss0);
+      ac_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), - _values[i] * _loss0);
     }else{ untested();
-      ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i]);
+      ac_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), _values[i]);
     }
   }
 }
@@ -255,7 +255,7 @@ void VAPOT::set_parameters(const std::string& Label, CARD *Owner,
 
     if (matrix_nodes() > NODES_PER_BRANCH) {
       // allocate a bigger node list
-      _n = new node_t[matrix_nodes()];
+      _nN = new node_t[matrix_nodes()];
     }else{
       // use the default node list, already set
     }      
@@ -271,7 +271,7 @@ void VAPOT::set_parameters(const std::string& Label, CARD *Owner,
   std::fill_n(_values, n_states, 0.);
   std::fill_n(_old_values, n_states, 0.);
   assert(n_nodes <= net_nodes());
-  notstd::copy_n(nodes, n_nodes, _n); // copy more in expand_last
+  notstd::copy_n(nodes, n_nodes, _nN); // copy more in expand_last
   assert(net_nodes() == _n_ports * 2);
 }
 /*--------------------------------------------------------------------------*/

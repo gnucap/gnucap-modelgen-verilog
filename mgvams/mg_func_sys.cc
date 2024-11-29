@@ -82,7 +82,7 @@ private:
     unreachable(); // SFCALL won't eval
     return "$$mfactor";
   }
-  void stack_op(Expression*)const override { untested();
+  void stack_op(Expression*)const override {
     throw Exception("invalid");
   }
   std::string code_name()const override {

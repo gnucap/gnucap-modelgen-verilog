@@ -161,7 +161,7 @@ void VAPOT::tr_load()
   }
 
   for (int i=2; i<=_n_ports; ++i) {
-    tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_m0_[i-2]), &(_m1_[i-2]));
+    tr_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), &(_m0_[i-2]), &(_m1_[i-2]));
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -183,13 +183,13 @@ double VAPOT::tr_amps()const
 
   int i=2;
   for (; i<=int(_n_ports - _input.size()); ++i) {
-    amps += dn_diff(_n[2*i-2].v0(), _n[2*i-1].v0()) * _m0_[i-2];
+    amps += dn_diff(n_(2*i-2).v0(), n_(2*i-1).v0()) * _m0_[i-2];
   }
   for (; i<=_n_ports; ++i) { untested();
     assert(0); // later.
     int k = i-int(_n_ports - _input.size() + 1);
     double scale = _input[k]->_loss0 + _input[k]->_m0.c1;
-    amps += scale * dn_diff(_n[2*i-2].v0(), _n[2*i-1].v0()) * _m0_[i-2];
+    amps += scale * dn_diff(n_(2*i-2).v0(), n_(2*i-1).v0()) * _m0_[i-2];
   }
   trace3("VAPOT::tr_amps done", tr_outvolts(), _loss0, amps);
   return amps;
@@ -209,7 +209,7 @@ void VAPOT::ac_load()
   ac_load_passive();
 
   for (int i=2; i<=_n_ports; ++i) {
-    ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _m0_[i-2]);
+    ac_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), _m0_[i-2]);
     if(_loss0){
     }else{
     }
@@ -248,7 +248,7 @@ void VAPOT::set_parameters(const std::string& Label, CARD *Owner,
 
     if (matrix_nodes() > NODES_PER_BRANCH) {
       // allocate a bigger node list
-      _n = new node_t[matrix_nodes()];
+      _nN = new node_t[matrix_nodes()];
     }else{
       // use the default node list, already set
     }      
@@ -264,7 +264,7 @@ void VAPOT::set_parameters(const std::string& Label, CARD *Owner,
   std::fill_n(_values, n_states, 0.);
   std::fill_n(_old_values, n_states, 0.);
   assert(n_nodes <= net_nodes());
-  notstd::copy_n(nodes, n_nodes, _n); // copy more in expand_last
+  notstd::copy_n(nodes, n_nodes, _nN); // copy more in expand_last
   assert(net_nodes() == _n_ports * 2);
 }
 /*--------------------------------------------------------------------------*/

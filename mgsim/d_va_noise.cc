@@ -128,6 +128,7 @@ public:
 COMMON_NOISE ccn(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class DEV_NOISE : public ELEMENT /* COMPONENT? */ {
+ // node_t* _nN{nullptr};
   double* _values{NULL};
  // std::string _name; // PARAMETER<string>?
 public:
@@ -213,6 +214,9 @@ private: // purely virtual in ELEMENT
   COMPLEX  ac_involts()const override { untested();return ac_outvolts();}
 
 private:
+ // node_t& n_(int i)const {
+ //   assert(_nodes); assert(i>=0); assert(i<matrix_nodes()); return _nN[i];
+ // }
   std::string port_name(int i)const override{
     assert(i >= 0);
     assert(i < 2);
@@ -389,7 +393,7 @@ void DEV_NOISE::set_parameters(const std::string& Label, CARD *Owner,
   std::fill_n(_values, n_states, 0.);
   //std::fill_n(_old_values, n_states, 0.);
   //assert(n_nodes <= net_nodes());
-  notstd::copy_n(nodes, n_nodes, _n); // copy more in expand_last
+  notstd::copy_n(nodes, n_nodes, _nodes);
   assert(net_nodes() == 2);
   _loss1 = _loss0 = 1.;
 }
@@ -463,9 +467,9 @@ XPROBE MEAS_NOISE::ac_probe_ext(const std::string& x)const
   assert(cc);
   std::string const& name = cc->noise_id();
   if (Umatch(x, "npwr")) {
-    return XPROBE(port_noise(_n[0], _n[1], name));
+    return XPROBE(port_noise(n_(0), n_(1), name));
   }else if (Umatch(x, "nv")) {
-    return XPROBE(sqrt(port_noise(_n[0], _n[1], name)));
+    return XPROBE(sqrt(port_noise(n_(0), n_(1), name)));
   }else{
     return ELEMENT::ac_probe_ext(x);
   }

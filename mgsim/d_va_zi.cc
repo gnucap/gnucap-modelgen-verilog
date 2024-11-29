@@ -169,6 +169,7 @@ public:
 COMMON_ZIFILTER_RP czi_rp(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class ZFILTER : public ELEMENT {
+  node_t* _nN{nullptr};
 private:
   int _n_ports{2};
 private:
@@ -186,7 +187,7 @@ public:
   explicit ZFILTER(COMMON_COMPONENT*);
   ~ZFILTER() {
     if (net_nodes() > NODES_PER_BRANCH) {
-      delete [] _n;
+      delete [] _nN;
     }else{
       // it is part of a base class
     }
@@ -250,6 +251,7 @@ private: // overrides
   std::string value_name()const override { return "";}
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
+  node_t& n_(int i)const { return _nN[i]; }
 public: // params
   void set_parameters(const std::string& Label, CARD* Parent,
 		      COMMON_COMPONENT* Common, double Value,
@@ -329,11 +331,11 @@ double ZFILTER::tr_involts()const
     double input = *_ctrl_in;
     // just fpoly?
     // for(int i = 0; i<_n_ports-1; ++i) { untested();
-    //   input += _ctrl_in[2+i] * dn_diff(_n[2+2*i].v0(), _n[2+2*i+1].v0());
+    //   input += _ctrl_in[2+i] * dn_diff(n_(2+2*i].v0(), n_(2+2*i+1].v0());
     // }
     return input;
   }else{
-    return dn_diff(_n[IN1].v0(), _n[IN2].v0());
+    return dn_diff(n_(IN1).v0(), n_(IN2).v0());
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -558,17 +560,17 @@ CARD* ZFILTER::clone()const
   return new_instance;
 }
 /*--------------------------------------------------------------------------*/
-ZFILTER::ZFILTER(ZFILTER const&p) : ELEMENT(p)
+ZFILTER::ZFILTER(ZFILTER const&p) : ELEMENT(p), _nN(_nodes)
 {
-  if(p._n){
+  if(p._nN){
     trace2("laplace", int_nodes(), max_nodes());
-    assert(_n);
+    assert(_nN);
     assert(int_nodes() + max_nodes() <= NODES_PER_BRANCH); // not expanded yet.
-//    _n = new node_t[int_nodes() + max_nodes()];
+//    _nN = new node_t[int_nodes() + max_nodes()];
 //    for (int ii = 0; ii < p.net_nodes(); ++ii) { untested();
-//      _n[ii] = p._n[ii];
+//      n_(ii] = p.n_(ii];
 //    }
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -607,9 +609,9 @@ void ZFILTER::expand()
 
   if(!_ctrl_in) {
 //  }else if(linear_input){ untested();
-  }else if (!_n[input_idx()].n_()) {
+  }else if (!n_(input_idx()).n_()) {
     trace1("expand nmn", input_idx());
-    _n[input_idx()].new_model_node(".input", this);
+    n_(input_idx()).new_model_node(".input", this);
   }else{ untested();
     trace1("expand nmn alreay there?", input_idx());
   }
@@ -645,10 +647,10 @@ void ZFILTER::expand()
 
       node_t gnd;
       gnd.set_to_ground(this);
-      nodes[0] = _n[input_idx()];
+      nodes[0] = n_(input_idx());
       nodes[1] = gnd;
       for(int k=2; k<2*n_inputs + 2; ++k){
-	nodes[k] = _n[k];
+	nodes[k] = n_(k);
       }
 
       trace2("expand4 input", long_label(), c->_p_den.size());
@@ -713,7 +715,7 @@ void ZFILTER::set_parameters(const std::string& Label, CARD *Owner,
 //    _current_port_names.resize(n_states - 1 - n_nodes/2);
  //   _n_ports = n_nodes/2; // sets num_nodes() = _n_ports*2
     if(net_nodes()+int_nodes()>NODES_PER_BRANCH) {
-      _n = new node_t[net_nodes()+int_nodes()];
+      _nN = new node_t[net_nodes()+int_nodes()];
       trace4("allocnodes", net_nodes(), nodes, int_nodes(), n_nodes);
     }else{
     }
@@ -726,7 +728,7 @@ void ZFILTER::set_parameters(const std::string& Label, CARD *Owner,
   // _vy0 = states;
   trace4("setnodes", net_nodes(), nodes, dens, n_nodes);
 //  assert(net_nodes() == n_nodes);
-  notstd::copy_n(nodes, net_nodes(), _n);
+  notstd::copy_n(nodes, net_nodes(), _nN);
   _loss1 = _loss0 = 1.;
 } // set_parameters
 /*--------------------------------------------------------------------------*/
@@ -755,11 +757,11 @@ void ZFILTER::do_ac()
 void ZFILTER::ac_iwant_matrix()
 {
   if(_input){
-    trace2("ZFILTER::ac_iwant_matrix", input_idx(),_n[input_idx()].m_());
-    _sim->_acx.iwant(_n[OUT1].m_(),_n[input_idx()].m_());
-    //_sim->_acx.iwant(_n[OUT1].m_(),_n[IN2].m_()); IN2==gnd.
-    _sim->_acx.iwant(_n[OUT2].m_(),_n[input_idx()].m_());
-    //_sim->_acx.iwant(_n[OUT2].m_(),_n[IN2].m_()); IN2==gnd.
+    trace2("ZFILTER::ac_iwant_matrix", input_idx(),n_(input_idx()).m_());
+    _sim->_acx.iwant(n_(OUT1).m_(),n_(input_idx()).m_());
+    //_sim->_acx.iwant(n_(OUT1).m_(),n_(IN2).m_()); IN2==gnd.
+    _sim->_acx.iwant(n_(OUT2).m_(),n_(input_idx()).m_());
+    //_sim->_acx.iwant(n_(OUT2).m_(),n_(IN2).m_()); IN2==gnd.
 
     _input->ac_iwant_matrix();
   }else{
@@ -790,11 +792,11 @@ void ZFILTER::ac_load()
   ac_load_shunt();
   if(_input){
     _input->ac_load();
-    trace2("acload", input_idx(), _n[input_idx()].m_());
+    trace2("acload", input_idx(), n_(input_idx()).m_());
     // ac_load_active(); but other input.
     double mfactor_hack = _ctrl_in[1];
-    _sim->_acx.load_asymmetric(_n[OUT1].m_(), _n[OUT2].m_(),
-	0, _n[input_idx()].m_(), mfactor_hack * _acg);
+    _sim->_acx.load_asymmetric(n_(OUT1).m_(), n_(OUT2).m_(),
+	0, n_(input_idx()).m_(), mfactor_hack * _acg);
   }else{
     trace2("acload", _acg, mfactor());
     ac_load_active();
@@ -803,7 +805,7 @@ void ZFILTER::ac_load()
 /*--------------------------------------------------------------------------*/
 void ZFILTER::tr_load()
 {
-  trace3("trload", long_label(), input_idx(), _n[input_idx()].m_());
+  trace3("trload", long_label(), input_idx(), n_(input_idx()).m_());
   tr_load_shunt();
   tr_load_source();
 }

@@ -54,7 +54,7 @@ private:
   }
   void make_cc_dev(std::ostream& o)const override {
     o__ "bool node_is_connected(int i)const override {\n";
-    o____ "return _n[i].is_connected();\n";
+    o____ "return n_(i).is_connected();\n";
     o__ "}\n";
   }
 } pg;

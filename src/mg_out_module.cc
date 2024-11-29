@@ -72,7 +72,7 @@ void make_node_ref(std::ostream& o, const Node& n, bool used=true)
   }else if(!used){ untested();
     o << "gnd";
   }else{
-    o << "_n[" << n.code_name() << "]";
+    o << "n_(" << n.code_name() << ")";
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -215,13 +215,13 @@ static void map_subdev_nodes(std::ostream& o, const Element_2& e)
   if(e.ports().has_names()){
     Port_3_List_2::const_iterator p = e.ports().begin();
     for (;p != e.ports().end(); ++p) {
-      o << comma << "_n[n_" << (**p).value() << "]";
+      o << comma << "n_(n_" << (**p).value() << ")";
       comma = ",";
     }
   }else{
     Port_3_List_2::const_iterator p = e.ports().begin();
     for (;p != e.ports().end(); ++p) {
-      o << comma << "_n[n_" << (**p).name() << "]";
+      o << comma << "n_(n_" << (**p).name() << ")";
       comma = ",";
     }
   }
@@ -327,10 +327,8 @@ void make_module_copy_constructor(std::ostream& o, const Module& m)
     o << ", _parent(p._parent)";
   }
   o << "\n{\n";
-  o__ "_n = _nodes;\n";
-
   o__ "for (int ii = 0; ii < max_nodes(); ++ii) {\n";
-  o__ ind << "_n[ii] = p._n[ii];\n";
+  o__ ind << "n_(ii) = p.n_(ii);\n";
   o__ ind << "}\n";
   o << "}\n";
   o <<
@@ -365,7 +363,6 @@ void make_module_default_constructor(std::ostream& o, const Module& m)
   o << "MOD_" << m.identifier() << "::MOD_" << m.identifier() << "()\n";
   o << "    :" << baseclass(m) << "()";
   o << "\n{\n"
-    "  _n = _nodes;\n"
     "  attach_common(&Default_" << m.identifier() << ");\n"
     "  ++_count;\n";
 
@@ -779,14 +776,14 @@ static void make_module_allocate_local_node(std::ostream& o, const Node& p)
  // }else
   {
     o <<
-      "    //assert(!(_n[n_" << p.name() << "].n_()));\n"
+      "    //assert(!(n_(n_" << p.name() << ").n_()));\n"
       "    //BUG// this assert fails on a repeat elaboration after a change.\n"
       "    //not sure of consequences when new_model_node called twice.\n"
-      "    if (!(_n[n_" << p.name() << "].n_())) {\n";
+      "    if (!(n_(n_" << p.name() << ").n_())) {\n";
     if(p.short_to()){
       assert(!p.short_if().empty());
       o____ "if (" << p.short_if() << ") {\n";
-      o______ "_n[n_" << p.name() << "] = "; // _n[n_" << p.short_to()->name() << "];\n";
+      o______ "n_(n_" << p.name() << ") = "; // _n[n_" << p.short_to()->name() << "];\n";
 	make_node_ref(o, *p.short_to());
 	o << ";\n";
       o____ "}else";
@@ -794,7 +791,7 @@ static void make_module_allocate_local_node(std::ostream& o, const Node& p)
       o____ "";
     }
     o << "{\n";
-    o______ "_n[n_" << p.name() << "].new_model_node(\".\" + long_label() + \"." << p.name() 
+    o______ "n_(n_" << p.name() << ").new_model_node(\".\" + long_label() + \"." << p.name() 
 			   << "\", this);\n";
     o______ "}\n";
     o____ "}else{\n";
@@ -817,7 +814,7 @@ static void make_module_allocate_local_nodes(std::ostream& o, Module const& m)
     assert(nn);
     if(nn->number() == 0) {
       o__ "// ground\n";
-      o__ "_n[n_" << nn->name() << "].set_to_ground(this);\n";
+      o__ "n_(n_" << nn->name() << ").set_to_ground(this);\n";
     }else if(nn->number() < n){
     }else if(n <= int(m.circuit()->ports().size())){
       o__ "// port " << nn->name() << " " << nn->number() << "\n";
@@ -826,7 +823,7 @@ static void make_module_allocate_local_nodes(std::ostream& o, Module const& m)
       make_module_allocate_local_node(o, *nn);
     }else{
       o__ "// unused " << nn->name() << " : " << nn->number() << "\n";
-      o__ "_n[n_" << nn->name() << "].set_to_ground(this);\n"; // for now.
+      o__ "n_(n_" << nn->name() << ").set_to_ground(this);\n"; // for now.
     }
   }
 
@@ -835,7 +832,7 @@ static void make_module_allocate_local_nodes(std::ostream& o, Module const& m)
     assert(nn);
     if(nn->number() == 0) {
     }else if(nn->number() < n){
-      o__ "_n[" << n - 1 << "] = _n[" << nn->number() - 1 << "]; // (a)\n";
+      o__ "n_(" << n - 1 << ") = n_(" << nn->number() - 1 << "); // (a)\n";
     }else{
     }
   }
@@ -1024,7 +1021,6 @@ static void make_module_expand(std::ostream& o, Module const& m)
   o__ "trace1(\"expand\", long_label());\n";
 
   o__ baseclass(m) << "::expand();\n";
-  o__ "assert(_n);\n";
   o__ "assert(common());\n";
   o__ "auto c = static_cast</*const*/ COMMON_" << mid << "*>(mutable_common());\n"; // const?!
   o__ "assert(c);\n";

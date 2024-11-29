@@ -95,6 +95,7 @@ public:
 COMMON_TRANSITION ctrans(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class DELAY : public ELEMENT {
+  node_t* _nN{nullptr};
 public:
   WAVE _forward;
   std::deque<std::pair<double, double>> _wave;
@@ -117,7 +118,7 @@ public:
   explicit DELAY(COMMON_COMPONENT*);
   ~DELAY() {
     if (net_nodes() > NODES_PER_BRANCH) { untested();
-      delete [] _n;
+      delete [] _nN;
     }else{
       // it is part of a base class
     }
@@ -182,6 +183,9 @@ private: // overrides
   std::string value_name()const override { return "";}
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
+  node_t& n_(int i)const {
+    assert(_nodes); assert(i>=0); assert(i<net_nodes()+int_nodes()); return _nN[i];
+  }
 public: // params
   void set_parameters(const std::string& Label, CARD* Parent,
 		      COMMON_COMPONENT* Common, double Value,
@@ -253,10 +257,10 @@ double DELAY::tr_involts()const
     return *_ctrl_in;
     // just fpoly?
     // for(int i = 0; i<_n_ports-1; ++i) { untested();
-    //   input += _ctrl_in[2+i] * dn_diff(_n[2+2*i].v0(), _n[2+2*i+1].v0());
+    //   input += _ctrl_in[2+i) * dn_diff(n_(2+2*i).v0(), n_(2+2*i+1).v0());
     // }
   }else{
-    return dn_diff(_n[IN1].v0(), _n[IN2].v0());
+    return dn_diff(n_(IN1).v0(), n_(IN2).v0());
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -402,12 +406,12 @@ CARD* DELAY::clone()const
   return new DELAY(*this);
 }
 /*--------------------------------------------------------------------------*/
-DELAY::DELAY(DELAY const&p) : ELEMENT(p)
+DELAY::DELAY(DELAY const&p) : ELEMENT(p), _nN(_nodes)
 {
-  if(p._n){
-    assert(_n);
+  if(p._nN){
+    assert(_nN);
     assert(int_nodes() + max_nodes() <= NODES_PER_BRANCH); // not expanded yet.
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -452,9 +456,9 @@ void DELAY::expand()
 
   if(!_ctrl_in) {
 //  }else if(linear_input){ untested();
-  }else if (!_n[input_idx()].n_()) {
+  }else if (!n_(input_idx()).n_()) {
     trace1("expand nmn", input_idx());
-    _n[input_idx()].new_model_node(".input", this);
+    n_(input_idx()).new_model_node(".input", this);
   }else{ untested();
     trace1("expand nmn alreay there?", input_idx());
   }
@@ -467,10 +471,10 @@ void DELAY::expand()
 
       node_t gnd;
       gnd.set_to_ground(this);
-      nodes[0] = _n[input_idx()];
+      nodes[0] = n_(input_idx());
       nodes[1] = gnd;
       for(int k=2; k<2*n_inputs + 2; ++k){
-	nodes[k] = _n[k];
+	nodes[k] = n_(k);
       }
     }else{
       // _input = this;
@@ -524,7 +528,7 @@ void DELAY::set_parameters(const std::string& Label, CARD *Owner,
 //    _current_port_names.resize(n_states - 1 - n_nodes/2);
  //   _n_ports = n_nodes/2; // sets num_nodes() = _n_ports*2
     if(net_nodes()+int_nodes()>NODES_PER_BRANCH) {
-      _n = new node_t[net_nodes()+int_nodes()];
+      _nN = new node_t[net_nodes()+int_nodes()];
       trace4("allocnodes", net_nodes(), nodes, int_nodes(), n_nodes);
     }else{
     }
@@ -533,7 +537,7 @@ void DELAY::set_parameters(const std::string& Label, CARD *Owner,
     // assert could fail if changing the number of nodes after a run
   }
 
-  notstd::copy_n(nodes, net_nodes(), _n);
+  notstd::copy_n(nodes, net_nodes(), _nN);
   _loss0 = 1.;
 } // set_parameters
 /*--------------------------------------------------------------------------*/
@@ -555,18 +559,18 @@ void DELAY::do_ac()
 void DELAY::ac_iwant_matrix()
 {
   if(_ctrl_in){
-    //trace2("DELAY::ac_iwant_matrix", input_idx(),_n[input_idx()].m_());
-    //_sim->_acx.iwant(_n[OUT1].m_(),_n[input_idx()].m_());
-    //_sim->_acx.iwant(_n[OUT2].m_(),_n[input_idx()].m_());
+    //trace2("DELAY::ac_iwant_matrix", input_idx(),n_(input_idx()).m_());
+    //_sim->_acx.iwant(n_(OUT1).m_(),n_(input_idx()).m_());
+    //_sim->_acx.iwant(n_(OUT2).m_(),n_(input_idx()).m_());
 
     //_input->ac_iwant_matrix();
 
     assert(is_device());
 
     for (int ii = 0;  ii < ext_nodes();  ++ii) {
-      if (_n[ii].m_() >= 0) {
+      if (n_(ii).m_() >= 0) {
 	for (int jj = 0;  jj < ii ;  ++jj) {
-	  _sim->_acx.iwant(_n[ii].m_(),_n[jj].m_());
+	  _sim->_acx.iwant(n_(ii).m_(),n_(jj).m_());
 	}
       }else{itested();
 	// node 1 is grounded or invalid
@@ -600,15 +604,15 @@ void DELAY::ac_load()
   ac_load_shunt();
   if(_ctrl_in){ untested();
     assert(_ctrl_in);
-    trace4("acload", input_idx(), _n[input_idx()].m_(), _acg, _n_ports);
+    trace4("acload", input_idx(), n_(input_idx()).m_(), _acg, _n_ports);
     // ac_load_active(); but other input.
 //    double mfactor_hack = _ctrl_in[1];
-//    _sim->_acx.load_asymmetric(_n[OUT1].m_(), _n[OUT2].m_(),
-//	0, _n[input_idx()].m_(), mfactor_hack * _acg);
+//    _sim->_acx.load_asymmetric(n_(OUT1].m_(), n_(OUT2].m_(),
+//	0, n_(input_idx()].m_(), mfactor_hack * _acg);
 
     auto _values = _ctrl_in;
     for (int i=2; i<=_n_ports; ++i) { untested();
-      ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i] * _acg);
+      ac_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), _values[i] * _acg);
     }
   }else{
     trace2("acload", _acg, mfactor());
@@ -632,19 +636,19 @@ void DELAY::tr_load()
     //const COMMON_ABSDELAY* c = prechecked_cast<const COMMON_ABSDELAY*>(common());
     //assert(c);
     // if loss0?
-    // _sim->_aa.load_symmetric(_n[OUT1].m_(), _n[OUT2].m_(), mfactor());
+    // _sim->_aa.load_symmetric(n_(OUT1).m_(), n_(OUT2).m_(), mfactor());
     lvf = _out0;
   }else{
     lvf = dn_diff(_out0, _out1);
   }
   trace1("DELAY::trload", lvf);
   if (lvf != 0.) {
-    if (_n[OUT1].m_() != 0) { untested();
-      _n[OUT1].i() -= mfactor() * lvf;
+    if (n_(OUT1).m_() != 0) { untested();
+      n_(OUT1).i() -= mfactor() * lvf;
     }else{
     }
-    if (_n[OUT2].m_() != 0) {
-      _n[OUT2].i() += mfactor() * lvf;
+    if (n_(OUT2).m_() != 0) {
+      n_(OUT2).i() += mfactor() * lvf;
     }else{ untested();
     }
   }else{

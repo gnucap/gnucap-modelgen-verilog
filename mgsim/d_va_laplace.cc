@@ -238,6 +238,7 @@ public:
 COMMON_LAPLACE_RP cl_rp(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class LAPLACE : public ELEMENT {
+  node_t* _nN{nullptr};
 private:
   int _n_ports{2};
 public: // netlist
@@ -258,7 +259,7 @@ public:
   explicit LAPLACE();
   ~LAPLACE() {
     if (net_nodes() > NODES_PER_BRANCH) {
-      delete [] _n;
+      delete [] _nN;
     }else{
       // it is part of a base class
     }
@@ -343,10 +344,13 @@ private: // overrides
   std::string value_name()const override { return "";}
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
+  node_t& n_(int i)const {
+    assert(_nN); assert(i>=0); assert(i<max_nodes() + int_nodes()); return _nN[i];
+  }
   void set_port_by_index(int Index, std::string& Value)override {
-    if(!_n){ untested();
+    if(!_nN){
       trace2("spbi", long_label(), matrix_nodes());
-      _n = new node_t[max_nodes()];
+      _nN = new node_t[max_nodes()];
     }else{
       trace2("spbi -", long_label(), matrix_nodes());
     }
@@ -366,8 +370,8 @@ private: // node list
     n_in0,
     n_in1,
   };
-  node_t const& state_node(int k)const {return _n[net_nodes()+k];}
-  node_t& state_node(int k) {return _n[net_nodes()+k];}
+  node_t const& state_node(int k)const {return _nN[net_nodes()+k];}
+  node_t& state_node(int k) {return _nN[net_nodes()+k];}
 private: // impl
   friend class COMMON_LAPLACE;
 }; // LAPLACE
@@ -408,9 +412,9 @@ void LAPLACE::ac_iwant_matrix()
     assert(is_device());
 
     for (int ii = 0;  ii < ext_nodes();  ++ii) {
-      if (_n[ii].m_() >= 0) {
+      if (n_(ii).m_() >= 0) {
 	for (int jj = 0;  jj < ii ;  ++jj) {
-	  _sim->_acx.iwant(_n[ii].m_(),_n[jj].m_());
+	  _sim->_acx.iwant(n_(ii).m_(),n_(jj).m_());
 	}
       }else{itested();
 	// node 1 is grounded or invalid
@@ -428,7 +432,7 @@ double LAPLACE::tr_probe_num(std::string const& n) const
   if(n[0] == 's'){
     int idx = atoi(n.substr(1).c_str());
     if(idx < dens){
-      return _n[net_nodes() + idx].v0();
+      return n_(net_nodes() + idx).v0();
     }else{ untested();
     }
   }else{ untested();
@@ -489,7 +493,7 @@ bool LAPLACE::do_tr()
   for(int k=0; k<int_nodes(); ++k){
     _state[k] = volts_limited(state_node(k), gnd);
   }
-  // _involts = volts_limited(_n[n_in0], _n[n_in1]);
+  // _involts = volts_limited(n_(n_in0], n_(n_in1]);
 
   // common?
   assert(_st_s);
@@ -498,12 +502,12 @@ bool LAPLACE::do_tr()
 
   for (int k=_pivot; k < int_nodes()-1; ++k){
     trace2("test_lap2::do_tr", k, volts_limited(state_node(k), gnd));
-    _st_s[num_s0_states + 3*k] = _state[k]; // volts_limited(_n[n_s0+k], gnd);
+    _st_s[num_s0_states + 3*k] = _state[k]; // volts_limited(n_(n_s0+k], gnd);
   }
 
   for (int k=0; k < _pivot; ++k){
     trace2("test_lap2::do_tr", k, volts_limited(state_node(k), gnd));
-    _st_s[num_s0_states + 3*k] = _state[k+1]; // volts_limited(_n[n_s0+k], gnd);
+    _st_s[num_s0_states + 3*k] = _state[k+1]; // volts_limited(n_(n_s0+k], gnd);
   }
 
   _st_s[0] = 0; // LINEAR;
@@ -561,18 +565,18 @@ CARD* LAPLACE::clone()const
 /*--------------------------------------------------------------------------*/
 LAPLACE::LAPLACE(LAPLACE const&p) : ELEMENT(p)
 {
-  if(p._n){
+  if(p._nN){
     trace2("laplace", int_nodes(), max_nodes());
-    assert(_n);
+    assert(_nN);
     if(int_nodes() + max_nodes() <= NODES_PER_BRANCH){
        // not expanded yet...?
     }else{
-      _n = new node_t[int_nodes() + max_nodes()];
+      _nN = new node_t[int_nodes() + max_nodes()];
       for (int ii = 0; ii < p.net_nodes(); ++ii) {
-	_n[ii] = p._n[ii];
+	n_(ii) = p.n_(ii);
       }
     }
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -662,7 +666,7 @@ void LAPLACE::expand()
   trace5("expand", short_label(), _pivot, num_num, num_s, c->is_rp());
 
   ELEMENT::expand();
-  assert(_n);
+  assert(_nN);
   if (!subckt()) {
     new_subckt();
   }else{
@@ -671,8 +675,8 @@ void LAPLACE::expand()
   _s_.resize(num_s);
 
   auto nn = new node_t[net_nodes() + num_s];
-  notstd::copy_n(_n, net_nodes(), nn);
-  _n = nn;
+  notstd::copy_n(_nN, net_nodes(), nn);
+  _nN = nn;
   if(net_nodes()==4){
   }else{
   }
@@ -683,12 +687,12 @@ void LAPLACE::expand()
     std::fill_n(_state, int_nodes(), 0.);
   }
 
-  // node_t* _ni = _n + 4;
+  // node_t* _ni = _nN + 4;
   for(int jj = 0; jj < num_s; ++jj) {
     if (!(state_node(jj).n_())) {
       state_node(jj).new_model_node("." + long_label() + ".s" + to_string(jj), this);
     }else{ untested();
-	//_n[n_s].new_model_node("s." + long_label(), this);
+	//n_(n_s].new_model_node("s." + long_label(), this);
     }
   }
 
@@ -755,8 +759,8 @@ void LAPLACE::expand()
 
       assert(num_s >= num_num);
       std::vector<node_t> nodes(num_s*2 + 2);
-      nodes[0] = _n[n_out0];
-      nodes[1] = _n[n_out1];
+      nodes[0] = n_(n_out0);
+      nodes[1] = n_(n_out1);
       int jj;
       for(jj = 0; jj < _pivot; ++jj) {
 	nodes[2+jj*2] = state_node(jj);
@@ -812,7 +816,7 @@ void LAPLACE::expand()
       nodes[0] = gnd;
 
       for(int k=0; k<2*n_inputs; ++k){
-	nodes[2+k] = _n[n_in0+k];
+	nodes[2+k] = n_(n_in0+k);
       }
 
       trace2("expand4 input", long_label(), c->_p_den.size());
@@ -1057,7 +1061,7 @@ void LAPLACE::set_parameters(const std::string& Label, CARD *Owner,
 //    _current_port_names.resize(n_states - 1 - n_nodes/2);
     // _input.resize(n_states - 1 - n_nodes/2);
  //   _n_ports = n_nodes/2; // sets num_nodes() = _n_ports*2
-    _n = new node_t[net_nodes() + num_s];
+    _nN = new node_t[net_nodes() + num_s];
   }else{untested();
     assert(net_nodes() == n_nodes);
     // assert could fail if changing the number of nodes after a run
@@ -1066,14 +1070,14 @@ void LAPLACE::set_parameters(const std::string& Label, CARD *Owner,
   // _vy0 = states;
   assert(net_nodes() == n_nodes);
   trace4("setnodes", net_nodes(), nodes, dens, n_nodes);
-  notstd::copy_n(nodes, net_nodes(), _n);
+  notstd::copy_n(nodes, net_nodes(), _nN);
   _loss1 = _loss0 = 1.;
 }
 /*--------------------------------------------------------------------------*/
 void LAPLACE::ac_load()
 {
   //ac_load_shunt(); // BUG. explicit mfactor.
-  _sim->_acx.load_symmetric(_n[OUT1].m_(), _n[OUT2].m_(), mfactor() * _output->mfactor() * _loss0);
+  _sim->_acx.load_symmetric(n_(OUT1).m_(), n_(OUT2).m_(), mfactor() * _output->mfactor() * _loss0);
   if(ac_use_sckt){ untested();
     assert(subckt());
     subckt()->ac_load();
@@ -1082,7 +1086,7 @@ void LAPLACE::ac_load()
   //  ac_load_source();
    auto _values = _st_b_in_;
     for (int i=2; i<=_n_ports; ++i) {
-      ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i] * _acg);
+      ac_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), _values[i] * _acg);
     }
 
   }
@@ -1143,7 +1147,7 @@ double LAPLACE::tr_amps() const
     assert(!_output->_loss0);
   }
   if(_set_parameters){
-    trace5("LAPLACE::tr_amps", r, _loss0, _input->tr_amps(), *_st_b_in_, _n[0].v0());
+    trace5("LAPLACE::tr_amps", r, _loss0, _input->tr_amps(), *_st_b_in_, n_(0).v0());
     trace3("LAPLACE::tr_amps", _st_b_in_[2], _output->tr_outvolts(), _output->tr_amps());
   }else{ untested();
   }

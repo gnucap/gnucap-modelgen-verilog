@@ -103,7 +103,7 @@ void VAFLOW::tr_load()
   _old_values[1] = _values[1];
   for (int i=2; i<=_n_ports; ++i) {
     // trace4("VAFLOW::tr_load", long_label(), i, _values[i], _old_values[i]);
-    tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_values[i]), &(_old_values[i]));
+    tr_load_extended(_nN[OUT1], _nN[OUT2], _nN[2*i-2], _nN[2*i-1], &(_values[i]), &(_old_values[i]));
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -111,7 +111,7 @@ double VAFLOW::tr_amps()const
 {
   double amps = _m0.c0;
   for (int i=1; i<=_n_ports; ++i) {
-    amps += dn_diff(_n[2*i-2].v0(), _n[2*i-1].v0()) * _values[i];
+    amps += dn_diff(_nN[2*i-2].v0(), _nN[2*i-1].v0()) * _values[i];
   }
   return amps;
 }
@@ -122,7 +122,7 @@ void VAFLOW::ac_load()
   ac_load_passive();
   for (int i=2; i<=_n_ports; ++i) {
     trace4("acload", long_label(), i, _values[i], _old_values[i]);
-    ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i]);
+    ac_load_extended(_nN[OUT1], _nN[OUT2], _nN[2*i-2], _nN[2*i-1], _values[i]);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -153,7 +153,7 @@ void VAFLOW::set_parameters(const std::string& Label, CARD *Owner,
 
     if (net_nodes() > NODES_PER_BRANCH) {
       // allocate a bigger node list
-      _n = new node_t[net_nodes()];
+      _nN = new node_t[net_nodes()];
     }else{
       // use the default node list, already set
     }      
@@ -168,7 +168,7 @@ void VAFLOW::set_parameters(const std::string& Label, CARD *Owner,
   std::fill_n(_values, n_states, 0.);
   std::fill_n(_old_values, n_states, 0.);
   assert(n_nodes <= net_nodes());
-  notstd::copy_n(nodes, n_nodes, _n); // copy more in expand_last
+  notstd::copy_n(nodes, n_nodes, _nN); // copy more in expand_last
   assert(net_nodes() == _n_ports * 2);
 }
 /*--------------------------------------------------------------------------*/
@@ -202,9 +202,9 @@ bool DEV_FPOLY_G::do_tr()
   // }else
   {
     for (int i=1; i<=_n_ports; ++i) {
-      c0 -= volts_limited(_n[2*i-2],_n[2*i-1]) * _values[i];
-      trace4("", i, volts_limited(_n[2*i-2],_n[2*i-1]), _values[i],
-	     volts_limited(_n[2*i-2],_n[2*i-1]) * _values[i]);
+      c0 -= volts_limited(_nN[2*i-2],_nN[2*i-1]) * _values[i];
+      trace4("", i, volts_limited(_nN[2*i-2],_nN[2*i-1]), _values[i],
+	     volts_limited(_nN[2*i-2],_nN[2*i-1]) * _values[i]);
     }
   }
   trace2("", _values[0], c0);

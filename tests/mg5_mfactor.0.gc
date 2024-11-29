@@ -13,13 +13,15 @@ module test_mfactor(p, n);
 	analog m = $mfactor;
 endmodule
 
+// modelgen_0.cc: does not flush attributes for
+// subsequent runs..
 `modelgen
 module test_mfactor_(p, n);
 	electrical p, n;
 	inout p, n;
-	(*desc="mfactor"*)real m;
+	(*desc="mfactor"*)real mm;
 	test_mfactor #(.$mfactor(7)) m(p,n);
-	analog m = $mfactor;
+	analog mm = $mfactor;
 endmodule
 
 
@@ -40,6 +42,7 @@ test_mfactor_ #(.$mfactor(6)) d3(\1 ,\0 );
 mm m1(a);
 mm #(.$mfactor(3)) m2(a);
 
-print dc m(d*) m(m*.d) m(d3.m)
+print dc m(d1)  m(d2)  mm(d3)  m(m1.d)  m(m2.d)  m(d3.m)
+
 dc
 end

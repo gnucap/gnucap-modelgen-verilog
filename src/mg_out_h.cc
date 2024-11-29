@@ -528,7 +528,7 @@ static void make_module(std::ostream& o, const Module& m)
   declare_ddouble(o, m);
   o << "private: // data\n";
   size_t total_nodes = m.circuit()->nodes().size();
-  o__ "node_t _nodes[" << total_nodes << "];\n";
+  o__ "mutable node_t _nodes[" << total_nodes << "];\n";
   if(m.times()){
     o__ "double _time[" << m.times() << "];\n";
     o__ "TIME_PAIR _time_by;\n";
@@ -662,6 +662,9 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "std::string value_name()const override {itested(); return \"\";}\n";
   o__ "bool print_type_in_spice()const override {itested(); return false;}\n";
   o__ "std::string port_name(int i)const override;\n";
+  o__ "node_t& n_(int i)const override {\n";
+  o____ "assert(_nodes); assert(i>=0); assert(i<" << total_nodes << "); return _nodes[i];\n";
+  o__ "}\n";
   o << "private: // impl\n";
   o << "/* ========== */\n";
 

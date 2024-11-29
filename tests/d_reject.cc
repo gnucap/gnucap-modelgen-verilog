@@ -28,6 +28,7 @@
 namespace {
 /*--------------------------------------------------------------------------*/
 class REJECT : public COMPONENT {
+	mutable node_t* _n{nullptr};
 	PARAMETER<double> _rejecttime;
 	bool _done{false};
 	double _time0{0.};
@@ -37,7 +38,7 @@ private:
   explicit REJECT(const REJECT& p) :COMPONENT(p) {
 	  trace1("REJECT", _net_nodes);
 	  for(int i = 0; i<_net_nodes; ++i){ untested();
-		  _n[i] = p._n[i];
+		  // _n[i] = p._n[i];
 	  }
   }
 public:
@@ -61,6 +62,7 @@ private: // override virtual
   double   tr_probe_num(const std::string&)const override;
   bool print_type_in_spice()const override{ untested();return false;}
   std::string port_name(int)const { untested();unreachable(); return "";}
+  virtual node_t& n_(int i)const {assert(_n); return _n[i];}
 
   int param_count()const override{
 	  return COMPONENT::param_count() + 1;

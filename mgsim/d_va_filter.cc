@@ -117,6 +117,8 @@ protected:
   double   _load_time{0.};
   std::vector<std::string> _current_port_names;
   std::vector<ELEMENT const*> _input;
+private:
+  node_t* _nN{nullptr};
 protected:
   explicit DEV_CPOLY_CAP(const DEV_CPOLY_CAP& p);
 public:
@@ -137,13 +139,17 @@ protected: // override virtual
   bool	   do_tr()override;
   void	   tr_load()override;
   void	   tr_unload()override;
-  double   tr_involts()const override	{ untested();return dn_diff(_n[IN1].v0(), _n[IN2].v0());}
-  double   tr_involts_limited()const override { untested();return volts_limited(_n[IN1],_n[IN2]);}
+  double   tr_involts()const override	{ untested();return dn_diff(n_(IN1).v0(), n_(IN2).v0());}
+  double   tr_involts_limited()const override { untested();return volts_limited(n_(IN1),n_(IN2));}
   double   tr_amps()const override;
   void	   ac_iwant_matrix()override	{ac_iwant_matrix_extended();}
   void	   ac_load()override;
   COMPLEX  ac_involts()const override	{itested(); return NOT_VALID;}
   COMPLEX  ac_amps()const override	{itested(); return NOT_VALID;}
+
+  node_t& n_(int i)const {
+    assert(_nN); assert(i>=0); assert(i<matrix_nodes()); return _nN[i];
+  }
 
   std::string port_name(int)const override {untested();
     incomplete();
@@ -152,7 +158,7 @@ protected: // override virtual
   }
 
   void expand_last()override;
-  void expand_current_port(size_t i);
+  void expand_current_port(int i);
   void set_current_port_by_index(int i, const std::string& s) override {
     if(i==0){ untested();
       // _self_is_current = true;
@@ -280,7 +286,8 @@ DEV_CPOLY_CAP::DEV_CPOLY_CAP(const DEV_CPOLY_CAP& p)
    _vi0(NULL),
    _vi1(NULL),
    _n_ports(p._n_ports),
-   _load_time(NOT_VALID)
+   _load_time(NOT_VALID),
+   _nN(_nodes)
 {
   // not really a copy .. only valid to copy a default
   // too lazy to do it right, and that's all that is being used
@@ -303,7 +310,8 @@ DEV_CPOLY_CAP::DEV_CPOLY_CAP()
    _vi0(NULL),
    _vi1(NULL),
    _n_ports(0),
-   _load_time(NOT_VALID)
+   _load_time(NOT_VALID),
+   _nN(_nodes)
 {
 }
 /*--------------------------------------------------------------------------*/
@@ -313,7 +321,7 @@ DEV_CPOLY_CAP::~DEV_CPOLY_CAP()
   delete [] _vi0;
   delete [] _vi1;
   if (net_nodes() > NODES_PER_BRANCH) {
-    delete [] _n;
+    delete [] _nN;
   }else{
     // it is part of a base class
   }
@@ -413,21 +421,21 @@ bool DEV_DDT::do_tr()
   assert(_vi0[0] == _vi0[0]);
   
   if(_sim->_v0){
-    size_t i = 2;
-    for (; i<=_n_ports - _input.size(); ++i) {
+    int i = 2;
+    for (; i<=_n_ports - int(_input.size()); ++i) {
       if(_loss0){
 	_vi0[i] = -_loss0 * tr_c_to_g(_vy0[i], _vi0[i]);
       }else{
 	_vi0[i] = tr_c_to_g(_vy0[i], _vi0[i]);
       }
 
-      trace4("DEV_DDT::do_tr", i, _vi0[0], volts_limited(_n[2*i-2],_n[2*i-1]), _vi0[i]);
-      _vi0[0] -= volts_limited(_n[2*i-2],_n[2*i-1]) * _vi0[i];
+      trace4("DEV_DDT::do_tr", i, _vi0[0], volts_limited(n_(2*i-2),n_(2*i-1)), _vi0[i]);
+      _vi0[0] -= volts_limited(n_(2*i-2),n_(2*i-1)) * _vi0[i];
       assert(_vi0[i] == _vi0[i]);
       assert(_vi0[0] == _vi0[0]);
     }
 
-    assert( i == _n_ports - _input.size() + 1);
+    assert( i == _n_ports - int(_input.size()) + 1);
 
     // current port input
     for (; int(i)<=_n_ports; ++i) {
@@ -450,7 +458,7 @@ bool DEV_DDT::do_tr()
 	_vi0[i] = scale * tr_c_to_g(_vy0[i], _vi0[i]);
       }
 
-      _vi0[0] -= volts_limited(_n[2*i-2],_n[2*i-1]) * _vi0[i];
+      _vi0[0] -= volts_limited(n_(2*i-2),n_(2*i-1)) * _vi0[i];
     }
 
     for (int ii=0; ii<=_n_ports; ++ii) {
@@ -497,7 +505,7 @@ void DEV_IDT::tr_advance()
 	_vi0[i] *= -_loss0;
       }else{
       }
-      _vi0[0] -= volts_limited(_n[2*i-2],_n[2*i-1]) * _vi0[i];
+      _vi0[0] -= volts_limited(n_(2*i-2],n_(2*i-1]) * _vi0[i];
       assert(_vi0[i] == _vi0[i]);
       assert(_vi0[0] == _vi0[0]);
     }
@@ -541,7 +549,7 @@ bool DEV_IDT::do_tr()
   if(_sim->_v0){
     for (int i=2; i<=_n_ports; ++i) {
       _vi0[i] = tr_l_to_g(_vy0[i], _vi0[i], _time, _method_a, _dt);
-      _vi0[0] -= volts_limited(_n[2*i-2],_n[2*i-1]) * _vi0[i];
+      _vi0[0] -= volts_limited(n_(2*i-2),n_(2*i-1)) * _vi0[i];
 
       assert(_vi0[i] == _vi0[i]);
       assert(_vi0[0] == _vi0[0]);
@@ -607,7 +615,7 @@ void DEV_CPOLY_CAP::tr_load()
     }else{
     }
     trace4("DEV_CPOLY_CAP::tr_load", _sim->_time0, _vi0[i], long_label(), i);
-    tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_vi0[i]), &(_vi1[i]));
+    tr_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), &(_vi0[i]), &(_vi1[i]));
   }
 
   assert(_loaditer == _sim->iteration_tag()); // double load
@@ -626,7 +634,7 @@ double DEV_CPOLY_CAP::tr_amps() const
   // return fixzero((_loss0 * tr_outvolts() + _m0.c1 * tr_involts() + _m0.c0), _m0.c0);
   double amps = _m0.c0;
   for (int i=2; i<=_n_ports; ++i) {
-    amps += dn_diff(_n[2*i-2].v0(),_n[2*i-1].v0()) * _vi0[i];
+    amps += dn_diff(n_(2*i-2).v0(),n_(2*i-1).v0()) * _vi0[i];
   }
 
   if(_loss0){
@@ -649,7 +657,7 @@ void DEV_CPOLY_CAP::ac_load()
   ac_load_passive();
   for (int i=2; i<=_n_ports; ++i) {
     trace2("CAP::ac_load", i, _vy0[i]);
-    ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _vy0[i] * _acout);
+    ac_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), _vy0[i] * _acout);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -702,7 +710,7 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
 
     if (net_nodes() > NODES_PER_BRANCH) {
       // allocate a bigger node list
-      _n = new node_t[net_nodes()];
+      _nN = new node_t[net_nodes()];
     }else{
       // use the default node list, already set
     }      
@@ -722,9 +730,9 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
   std::fill_n(_vi1, n_states, 0.);
 
   trace4("set_parameters", n_nodes, net_nodes(), _n_ports, _vy0[1]);
-  notstd::copy_n(nodes, n_nodes, _n);
+  notstd::copy_n(nodes, n_nodes, _nN);
   assert(net_nodes() == _n_ports * 2);
-  if(_n[0].n_() != _n[1].n_()){
+  if(n_(0).n_() != n_(1).n_()){
     _vy0[1] = 1.; // mfactor hack.
     _vy1[1] = 1.; // mfactor hack.
   }else{
@@ -740,7 +748,7 @@ double DEV_CPOLY_CAP::tr_probe_num(const std::string& x)const
   }else if (Umatch(x, "st0 ")) {
     return _vy0[0];
   }else if (Umatch(x, "v0 ")) {
-    return _n[0].v0();
+    return n_(0).v0();
   }else{
     return STORAGE::tr_probe_num(x);
   }
@@ -760,14 +768,14 @@ void DEV_CPOLY_CAP::precalc_last()
 void DEV_CPOLY_CAP::expand_last()
 {
   ELEMENT::expand_last();
-  for(size_t i=0; i<_current_port_names.size(); ++i){
+  for(int i=0; i<int(_current_port_names.size()); ++i){
     expand_current_port(i);
     // expand_current_port(&_input[i], _current_port_names[i], this); // or so.
   }
 }
 /*--------------------------------------------------------------------------*/
 // !! duplicate in d_va.h
-void DEV_CPOLY_CAP::expand_current_port(size_t i)
+void DEV_CPOLY_CAP::expand_current_port(int i)
 {
   std::string const& input_label = _current_port_names[i];
   ELEMENT const*& input = _input[i];
@@ -786,13 +794,13 @@ void DEV_CPOLY_CAP::expand_current_port(size_t i)
 		    + " has a subckt, cannot be used as current probe");
   }else if (input->has_inode()) {untested();
     incomplete(); // wrong N1
-    _n[IN1] = input->n_(IN1);
-    _n[IN2].set_to_ground(this);
+    n_(IN1) = input->n_(IN1);
+    n_(IN2).set_to_ground(this);
   }else if (input->has_iv_probe()) {
-    size_t IN1 = net_nodes() - 2*_current_port_names.size() + 2*i;
+    int IN1 = net_nodes() - 2*int(_current_port_names.size()) + 2*i;
     trace4("flow ecp", i, IN1, net_nodes(), _current_port_names.size());
-    _n[IN1] = input->n_(OUT1);
-    _n[IN1+1] = input->n_(OUT2);
+    n_(IN1) = input->n_(OUT1);
+    n_(IN1+1) = input->n_(OUT2);
   }else{ untested();
     throw Exception(long_label() + ": " + input_label + " cannot be used as current probe");
   }

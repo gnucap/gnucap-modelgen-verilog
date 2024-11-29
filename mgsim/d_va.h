@@ -43,6 +43,7 @@ protected:
   double*  _m1_{NULL};
   int	   _n_ports{0};
   double   _time;
+  node_t*  _nN{nullptr};
   std::vector<std::string> _current_port_names;
   std::vector<ELEMENT const*> _input;
 #ifndef NDEBUG
@@ -74,10 +75,13 @@ protected: // override virtual
   void	   ac_load()override;
   COMPLEX  ac_involts()const override	{itested(); return NOT_VALID;}
   COMPLEX  ac_amps()const override	{itested(); return NOT_VALID;}
+  node_t& n_(int i)const {
+    assert(_nN); assert(i>=0); assert(i<matrix_nodes()); return _nN[i];
+  }
 
   bool has_iv_probe()const override { untested();return true;}
   void expand_last()override;
-  void expand_current_port(size_t i);
+  void expand_current_port(int i);
 
   void set_current_port_by_index(int i, const std::string& s) override {
     if(i==0){
@@ -115,7 +119,8 @@ DEV_CPOLY_G::DEV_CPOLY_G(const DEV_CPOLY_G& p)
    _values(NULL),
    _old_values(NULL),
    _n_ports(p._n_ports),
-   _time(NOT_VALID)
+   _time(NOT_VALID),
+   _nN(_nodes)
 {
   // not really a copy .. only valid to copy a default
   // too lazy to do it right, and that's all that is being used
@@ -131,23 +136,24 @@ DEV_CPOLY_G::DEV_CPOLY_G()
    _values(NULL),
    _old_values(NULL),
    _n_ports(0),
-   _time(NOT_VALID)
+   _time(NOT_VALID),
+   _nN(_nodes)
 {
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::expand_last()
 {
   ELEMENT::expand_last();
-  for(size_t i=0; i<_current_port_names.size(); ++i){
+  for(int i=0; i<int(_current_port_names.size()); ++i){
     expand_current_port(i);
   }
 }
 /*--------------------------------------------------------------------------*/
-void DEV_CPOLY_G::expand_current_port(size_t i)
+void DEV_CPOLY_G::expand_current_port(int i)
 {
   std::string const& input_label = _current_port_names[i];
   ELEMENT const* input = _input[i];
-//  node_t* n = _n + net_nodes() + 2*(i-_input.size()) - IN1;
+//  node_t* n = _nN + net_nodes() + 2*(i-_input.size()) - IN1;
 
   assert (input_label != "");
   CARD const* e = find_in_my_scope(input_label);
@@ -162,13 +168,13 @@ void DEV_CPOLY_G::expand_current_port(size_t i)
 		    + " has a subckt, cannot be used as current probe");
   }else if (input->has_inode()) {untested();
     incomplete(); // wrong N1
-    _n[IN1] = input->n_(IN1);
-    _n[IN2].set_to_ground(this);
+    n_(IN1) = input->n_(IN1);
+    n_(IN2).set_to_ground(this);
   }else if (input->has_iv_probe()) {
-    size_t IN1 = net_nodes() - 2*_current_port_names.size() + 2*i;
+    int IN1 = net_nodes() - 2*int(_current_port_names.size()) + 2*i;
     trace4("flow ecp", i, IN1, net_nodes(), _current_port_names.size());
-    _n[IN1] = input->n_(OUT1);
-    _n[IN1+1] = input->n_(OUT2);
+    n_(IN1) = input->n_(OUT1);
+    n_(IN1+1) = input->n_(OUT2);
   }else{ untested();
     throw Exception(long_label() + ": " + input_label + " cannot be used as current probe");
   }
@@ -180,7 +186,7 @@ DEV_CPOLY_G::~DEV_CPOLY_G()
   delete [] _m0_;
   delete [] _m1_;
   if (net_nodes() > NODES_PER_BRANCH) {
-    delete [] _n;
+    delete [] _nN;
   }else{
     // it is part of a base class
   }
@@ -242,7 +248,7 @@ void DEV_CPOLY_G::tr_load()
   _old_values[1] = _values[1];
   for (int i=2; i<=_n_ports; ++i) { untested();
     trace4("tr_load", long_label(), i, _values[i], _old_values[i]);
-    tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_values[i]), &(_old_values[i]));
+    tr_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), &(_values[i]), &(_old_values[i]));
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -258,7 +264,7 @@ double DEV_CPOLY_G::tr_amps()const
 { untested();
   double amps = _m0.c0;
   for (int i=1; i<=_n_ports; ++i) { untested();
-    amps += dn_diff(_n[2*i-2].v0(), _n[2*i-1].v0()) * _values[i];
+    amps += dn_diff(n_(2*i-2).v0(), n_(2*i-1).v0()) * _values[i];
   }
   return amps;
 }
@@ -269,7 +275,7 @@ void DEV_CPOLY_G::ac_load()
   ac_load_passive();
   for (int i=2; i<=_n_ports; ++i) { untested();
     trace4("acload", long_label(), i, _values[i], _old_values[i]);
-    ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _values[i]);
+    ac_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), _values[i]);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -301,7 +307,7 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
 
     if (net_nodes() > NODES_PER_BRANCH) { untested();
       // allocate a bigger node list
-      _n = new node_t[net_nodes()];
+      _nN = new node_t[net_nodes()];
     }else{ untested();
       // use the default node list, already set
     }      
@@ -315,7 +321,7 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
   std::fill_n(_values, n_states, 0.);
   std::fill_n(_old_values, n_states, 0.);
   assert(n_nodes <= net_nodes());
-  notstd::copy_n(nodes, n_nodes, _n); // copy more in expand_last
+  notstd::copy_n(nodes, n_nodes, _nN); // copy more in expand_last
   assert(net_nodes() == _n_ports * 2);
 }
 /*--------------------------------------------------------------------------*/

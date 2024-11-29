@@ -36,17 +36,17 @@ namespace{
 // components with one node are unlikely.
 const size_t node_capacity_floor = 2;
 /*--------------------------------------------------------------------------*/
-static void grow_nodes(size_t Index, node_t*& n, size_t& capacity, size_t capacity_floor)
+static void grow_nodes(int Index, node_t*& n, int& capacity, int capacity_floor)
 {
   if(Index < capacity){
   }else{
-    size_t new_capacity = std::max(capacity, capacity_floor);
+    int new_capacity = std::max(capacity, capacity_floor);
     while(new_capacity <= Index) {
       assert(new_capacity < new_capacity * 2);
       new_capacity *= 2;
     }
     node_t* new_nodes = new node_t[new_capacity];
-    for(size_t i=0; i<capacity; ++i){
+    for(int i=0; i<capacity; ++i){
       new_nodes[i] = n[i];
     }
     delete[] n;
@@ -69,6 +69,7 @@ static COMMON_INSTANCE Default_SUBCKT(CC_STATIC);
 // TODO: cleanup/rename?
 class INSTANCE : public BASE_SUBCKT {
   friend class DEV_INSTANCE_PROTO; // has to do with _parent.
+  node_t* _n{nullptr};
 protected: // HACK
   static int	_count;
 
@@ -78,7 +79,7 @@ protected: // stub stuff
   mutable DEV_INSTANCE_PROTO* _proto; // use common->proto?
   std::vector<std::pair<std::string, std::string>> _params;
   std::vector<std::string> _port_names;
-  size_t _node_capacity;
+  int _node_capacity;
 protected:
   explicit	INSTANCE(const INSTANCE&);
 public:
@@ -191,6 +192,9 @@ private:
   void collect_overloads(DEV_INSTANCE_PROTO* scope) const;
   void prepare_overload(CARD* proto, std::string modelname, DEV_INSTANCE_PROTO* p) const;
 
+  node_t& n_(int i)const {
+    assert(_n); assert(i>=0); assert(i<_node_capacity); return _n[i];
+  }
 protected:
   std::string port_name(int i)const override;
 public:

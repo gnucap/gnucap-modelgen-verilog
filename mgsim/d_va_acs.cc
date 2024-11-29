@@ -128,7 +128,7 @@ void VAACS::set_parameters(const std::string& Label, CARD *Owner,
 
     if (matrix_nodes() > NODES_PER_BRANCH) { untested();
       // allocate a bigger node list
-      _n = new node_t[matrix_nodes()];
+      _nN = new node_t[matrix_nodes()];
     }else{
       // use the default node list, already set
     }
@@ -144,7 +144,7 @@ void VAACS::set_parameters(const std::string& Label, CARD *Owner,
   std::fill_n(_values, n_states, 0.);
   std::fill_n(_old_values, n_states, 0.);
   assert(n_nodes <= net_nodes());
-  notstd::copy_n(nodes, n_nodes, _n); // copy more in expand_last
+  notstd::copy_n(nodes, n_nodes, _nN); // copy more in expand_last
   assert(net_nodes() == _n_ports * 2);
 }
 /*--------------------------------------------------------------------------*/
