@@ -30,8 +30,6 @@
 #include "e_elemnt.h"
 #include "e_va.h"
 /*--------------------------------------------------------------------------*/
-#define COMMON_LOGIC COMMON_UDP
-/*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
 #if 1
@@ -101,9 +99,9 @@ private: // override virtuals
   std::string port_name(int i)const override {
     assert(i >= 0);
     assert(i < PORTS_PER_GATE);
-    static std::string names[PORTS_PER_GATE] = {"out",
-			"in1", "in2", "in3", "in4", "in5", "in6", "in7", "in8", "in9"};
-    return names[i];
+    const COMMON_LOGIC* c = dynamic_cast<const COMMON_LOGIC*>(common());
+    assert(c);
+    return c->port_name(i);
   }
 public:
   static int count()			{untested();return _count;}
@@ -592,7 +590,7 @@ bool DEV_LOGIC::want_digital()const
 int DEV_LOGIC::_count = -1;
 /*--------------------------------------------------------------------------*/
 static DEV_LOGIC p1(nullptr);
-static DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "udp", &p1);
+static DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "logic", &p1);
 /*--------------------------------------------------------------------------*/
 #endif
 }

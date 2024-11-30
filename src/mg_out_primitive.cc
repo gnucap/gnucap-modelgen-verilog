@@ -26,12 +26,13 @@ static void make_cc_class(std::ostream& o, const Primitive& p)
 {
   std::string class_name = "COMMON_" + p.identifier().to_string();
   std::string base_class_name;
-  base_class_name = "COMMON_UDP";
+  base_class_name = "COMMON_LOGIC";
   o << "class " << class_name << " :public " << base_class_name << "{\n";
-  o__ "explicit " << class_name << "(const " << class_name << "& p) : COMMON_UDP(p) {};\n";
+  o__ "explicit " << class_name << "(const " << class_name << "& p) : "
+                  << base_class_name << "(p) { set_modelname(\"dummy_tmp\");}\n";
   o__ "COMMON_COMPONENT* clone()const override {return new "<<class_name<<"(*this);}\n";
   o << "public:\n";
-  o__ "explicit " << class_name << "(int c=0) : COMMON_UDP(c) {}\n";
+  o__ "explicit " << class_name << "(int c=0) : " << base_class_name << "(c) {}\n";
   o__ "         ~" << class_name << "() {}\n";
   o << "private:\n";
   o__ "bool    operator==(const COMMON_COMPONENT& x)const override {\n";
@@ -39,16 +40,23 @@ static void make_cc_class(std::ostream& o, const Primitive& p)
   o____ "bool rv = p && " << base_class_name << "::operator==(x);\n";
   o____ "return rv;\n";
   o__ "}\n";
-//  o__ "void     set_param_by_index(int, std::string&, int)override{incomplete();}\n";
-//  o__ "aidx     set_param_by_name(std::string, std::string)override{incomplete(); return 0;}\n";
-//  o__ "bool     is_valid()const {return true;}\n";
-//  o__ "bool     param_is_printable(int i)const override {return i==0;}\n";
-//  o__ "using COMMON_UDP::param_name;\n";
-//  o__ "std::string param_name(int i)const override {assert(i==0); return \"delay\";}\n";
-//  o__ "std::string param_value(int i)const override;\n";
-//  o__ "int param_count()const override {return 1;}\n";
   o__ "virtual LOGICVAL logic_eval(node_t const*, int)const override;\n";
   o__ "std::string name()const override {itested();return \"" << p.identifier() << "\";}\n";
+  o__ "std::string port_name(int i)const override {\n";
+  o____ "assert(i >= 0);\n";
+  o____ "static std::string names[] = {";
+  std::string comma = "";
+  for (auto nn : p.ports()){
+    o << comma << '"' << nn->name() << '"';
+    comma = ", ";
+  }
+  o____ "};\n";
+  o____ "if(i < " << p.ports().size() << "){\n";
+  o______ "return names[i];\n";
+  o____ "}else{ untested();\n";
+  o______ "return \"\";\n";
+  o____ "}\n";
+  o__ "}\n";
 
   o << "}; //" << class_name << "\n"
     "/*--------------------------------------"
@@ -72,7 +80,8 @@ static std::string mkmask(std::vector<int> const& line, int what)
 {
   assert(line.size());
   std::string s = "std::bitset<" + to_string(int(line.size())-1) + ">(0b";
-  for(int i = 0; i< int(line.size())-1; ++i){
+  int i = int(line.size());
+  while(i--){
     if(line[i] == what){
       s+= "1";
     }else{
@@ -125,7 +134,7 @@ static void make_cc_install(std::ostream& o, const Primitive& p)
 {
   o << "class udp_installer : public CARD {\n";
   o__ "CARD* clone()const override {\n";
-  o____ "CARD* c = device_dispatcher.clone(\"udp\");\n";
+  o____ "CARD* c = device_dispatcher.clone(\"logic\");\n";
   o____ "auto cc = prechecked_cast<COMPONENT*>(c);\n";
   o____ "assert(cc);\n";
   o____ "auto nc = new COMMON_" << p.identifier() << "();\n";
