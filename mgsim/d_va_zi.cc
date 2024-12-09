@@ -251,7 +251,7 @@ private: // overrides
   std::string value_name()const override { return "";}
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
-  node_t& n_(int i)const { return _nN[i]; }
+  node_t& n_(int i)const override { return _nN[i]; }
 public: // params
   void set_parameters(const std::string& Label, CARD* Parent,
 		      COMMON_COMPONENT* Common, double Value,

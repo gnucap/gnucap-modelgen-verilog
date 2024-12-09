@@ -94,7 +94,7 @@ private:
 class Token_ARGUMENT : public Token_VAR_REF {
 public:
   Token * _var{nullptr}; // why not use VAR_REF::_item?
-  Data_Type const& type()const;
+  Data_Type const& type()const override;
 public:
   explicit Token_ARGUMENT() : Token_VAR_REF("", nullptr){ untested();unreachable();}
   explicit Token_ARGUMENT(std::string Name)

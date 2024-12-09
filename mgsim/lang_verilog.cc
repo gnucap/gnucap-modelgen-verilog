@@ -77,7 +77,6 @@ public: // override virtual, called by commands
   void		parse_top_item(CS&, CARD_LIST*)override;
   DEV_COMMENT*	parse_comment(CS&, DEV_COMMENT*)override;
   DEV_DOT*	parse_command(CS&, DEV_DOT*)override;
-  CARD*		parse_paramset(CS&, CARD*) /* override */;
   MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*)override;
   COMPONENT*	parse_paramset_(CS&, BASE_SUBCKT*);
   CARD*		obsolete_parse_modelcard(CS&, MODEL_CARD*);
@@ -435,45 +434,22 @@ DEV_DOT* LANG_VERILOG::parse_command(CS& cmd, DEV_DOT* x)
  *    <paramset_statement>*
  *  "endparamset"
  */
-CARD* LANG_VERILOG::parse_paramset(CS& cmd, CARD* x)
+MODEL_CARD* LANG_VERILOG::parse_paramset(CS&, MODEL_CARD* x)
 { untested();
-  if(auto c = dynamic_cast<BASE_SUBCKT*>(x)) { untested();
+  if(dynamic_cast<BASE_SUBCKT*>(x)) { untested();
     incomplete();
-    return parse_paramset_(cmd, c);
+    return NULL;
+   // return parse_paramset_(cmd, c);
   }else if(auto m = dynamic_cast<MODEL_CARD*>(x)) { untested();
     //BUG// no paramset_item_declaration, falls back to spice mode
-    return obsolete_parse_modelcard(cmd, m);
+    unreachable();
+    return m;
+    // return obsolete_parse_modelcard(cmd, m);
   }else{ untested();
     unreachable();
     return NULL;
   }
 }
-/*--------------------------------------------------------------------------*/
-CARD* LANG_VERILOG::obsolete_parse_modelcard(CS& cmd, MODEL_CARD* x)
-{ untested();
-  assert(x);
-  trace1("obsolete_parse_modelcard", cmd.fullstring());
-  trace1("obsolete_parse_modelcard", cmd.tail());
-  cmd.reset();
-  cmd >> "paramset ";
-  parse_label(cmd, x);
-  parse_type(cmd, x);
-  cmd >> ';';
-
-  for (;;) { untested();
-    parse_args_paramset(cmd, x);
-    if (cmd >> "endparamset ") { untested();
-      break;
-    }else if (!cmd.more()) { untested();
-      cmd.get_line("verilog-paramset>");
-    }else{ untested();
-      cmd.check(bWARNING, "what's this?");
-      break;
-    }
-  }
-  return x;
-}
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class CMD_PARAM : public CMD {
 public:
@@ -511,7 +487,7 @@ public:
   ~PARAM_ANY() { delete _value; _value=nullptr;}
   PARA_BASE* clone()const override{ untested();return new PARAM_ANY(*this);}
   PARA_BASE* pclone(void*p)const override{return new(p) PARAM_ANY(*this);}
-  bool operator==(const PARA_BASE& v)const { untested();
+  bool operator==(const PARA_BASE& v)const override { untested();
     // PARAMETER const* p = dynamic_cast<PARAMETER const*>(&b);
     // return (p && _v == p->_v  &&  _s == p->_s);
     Base* eq = nullptr;
@@ -593,7 +569,7 @@ public:
     return _value;
   }
   bool has_good_value()const override { untested();unreachable(); return false;}
-  Base const* e_val_(const Base* def, const CARD_LIST* s, int)const { untested();
+  Base const* e_val_(const Base* def, const CARD_LIST* s, int)const override { untested();
     // def does not seem to carry type info...
     // see s_dc.vcvs1{a,b,c}.gc
     error(bDEBUG, "assuming double in " + _s + "\n");
@@ -1164,20 +1140,6 @@ public:
 private:
   std::string dev_type()const override { return component_proto()->dev_type(); }
 };
-/*--------------------------------------------------------------------------*/
-MODEL_CARD* LANG_VERILOG::parse_paramset(CS&, MODEL_CARD* m)
-{ untested();
-  if(auto p = dynamic_cast<PARAMSET_MODEL*>(m)) { untested();
-    assert(m->component_proto());
-
-
-
-  }else{ untested();
-    unreachable();
-    incomplete();
-  }
-  return m;
-}
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
 {

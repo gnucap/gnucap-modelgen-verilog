@@ -192,7 +192,7 @@ private:
   void collect_overloads(DEV_INSTANCE_PROTO* scope) const;
   void prepare_overload(CARD* proto, std::string modelname, DEV_INSTANCE_PROTO* p) const;
 
-  node_t& n_(int i)const {
+  node_t& n_(int i)const override {
     assert(_n); assert(i>=0); assert(i<_node_capacity); return _n[i];
   }
 protected:
