@@ -207,7 +207,10 @@ void MGVAMS_FILTER::setup(Module* m)
       for(auto d : cont->ddeps()){
 	if(d->branch() != branch()) {
 	}else if(d.is_linear()){
-	  incomplete(); // propagate loss?
+	  if(cont->is_pot_contrib()){ untested();
+	    incomplete(); // propagate loss?
+	  }else{
+	  }
 	  _output = cont->branch(); // polarity?
 	}
 	if(cont->reversed()){
@@ -218,10 +221,10 @@ void MGVAMS_FILTER::setup(Module* m)
       // ?
     }else if(c_cnt==0){
       if(rdeps_){ untested();
+	incomplete(); // analysis?
       }else{
       }
       trace5("filter use2", branch()->code_name(), always, output_var, assigned, c_cnt);
-      incomplete(); // analysis?
       set_p_to_gnd(m);
       // func->_output = cont->branch(); // polarity?
     }else if(assigned){ untested();
