@@ -183,7 +183,7 @@ private: // overrides
   std::string value_name()const override { return "";}
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
-  node_t& n_(int i)const {
+  node_t& n_(int i)const override {
     assert(_nodes); assert(i>=0); assert(i<net_nodes()+int_nodes()); return _nN[i];
   }
 public: // params

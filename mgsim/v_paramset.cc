@@ -78,7 +78,7 @@ private:
   bool is_device() const override { return owner(); }
   std::string value_name()const override{ untested();unreachable(); return "";}
   std::string port_name(int)const override;
-  node_t& n_(int i)const {
+  node_t& n_(int i)const override {
     assert(_n); assert(i>=0); assert(i<_node_capacity); return _n[i];
   }
   bool print_type_in_spice()const override { untested();unreachable(); return false; }

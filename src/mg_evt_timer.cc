@@ -40,7 +40,7 @@ public:
     set_label("timer");
   }
   ~TIMER(){ }
-  virtual TIMER* clone()const /*override*/ {return new TIMER(*this);}
+  virtual TIMER* clone()const override {return new TIMER(*this);}
 private:
   bool static_code()const override {return false;}
   bool is_common()const override {return true;}

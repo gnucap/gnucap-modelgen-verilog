@@ -126,7 +126,7 @@ private:
   double	tr_probe_num(const std::string&)const override;
   int param_count_dont_print()const override {return common()->COMMON_COMPONENT::param_count();}
 
-  node_t& n_(int i)const {
+  node_t& n_(int i)const override {
     assert(_n); assert(i>=0); assert(i<_node_capacity); return _n[i];
   }
   std::string port_name(int i)const override;

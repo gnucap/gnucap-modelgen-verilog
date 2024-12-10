@@ -61,8 +61,8 @@ private: // override virtual
 
   double   tr_probe_num(const std::string&)const override;
   bool print_type_in_spice()const override{ untested();return false;}
-  std::string port_name(int)const { untested();unreachable(); return "";}
-  virtual node_t& n_(int i)const {assert(_n); return _n[i];}
+  std::string port_name(int)const override { untested();unreachable(); return "";}
+  virtual node_t& n_(int i)const override {assert(_n); return _n[i];}
 
   int param_count()const override{
 	  return COMPONENT::param_count() + 1;

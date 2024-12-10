@@ -99,7 +99,7 @@ public:
     set_label("cross");
   }
   ~CROSS(){ }
-  virtual CROSS* clone()const /*override*/ {return new CROSS(*this);}
+  virtual CROSS* clone()const override {return new CROSS(*this);}
 private:
   bool static_code()const override {return false;}
   bool is_common()const override {return true;}
