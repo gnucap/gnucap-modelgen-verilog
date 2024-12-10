@@ -2,6 +2,16 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
+20241210-dev
+============
+* initial user defined primitives
+* event "or" code generation
+* bugfixes, cross event etc.
+* paramset is a MODEL_CARD
+* more functions/tasks are plugins
+* catch up with gnucap, portlist & `include
+
+
 20241031-dev
 ============
 * expm1, logp1
