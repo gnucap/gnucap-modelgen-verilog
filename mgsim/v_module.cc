@@ -454,7 +454,7 @@ void DEV_MODULE::expand()
 /*--------------------------------------------------------------------------*/
 void DEV_MODULE::precalc_first()
 {
-  BASE_SUBCKT::precalc_first();
+  COMPONENT::precalc_first();
 
   if (subckt()) {
   }else{
@@ -489,7 +489,7 @@ void DEV_MODULE::precalc_last()
     CARD::precalc_last();
     // its a proto, bypass common clash hotfix
   }else if(is_device()){
-    BASE_SUBCKT::precalc_last();
+    COMPONENT::precalc_last();
     COMMON_PARAMLIST* c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
     assert(c);
     subckt()->attach_params(&(c->_params), scope());

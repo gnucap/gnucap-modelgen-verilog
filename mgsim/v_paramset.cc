@@ -411,7 +411,7 @@ void PARAMSET::precalc_first()
   }
 
   if(is_device()) {
-    BASE_SUBCKT::precalc_first();
+    COMPONENT::precalc_first();
     assert(subckt());
     auto c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
     assert(c);
