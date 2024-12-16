@@ -1056,18 +1056,20 @@ void LANG_VERILOG::print_ports_long(OMSTREAM& o, const COMPONENT* x)
   for (int ii = 0;  x->port_exists(ii);  ++ii) {
     o << sep;
     print_attributes(o, x->port_id_tag(ii));
-    if(x->port_name(ii) != ""){
-      o << "." << mangle(x->port_name(ii)) << '(' << mangle(x->port_value(ii)) << ')';
+    if(!x->port_name(ii).size()){
+      o << mangle(x->port_value(ii));
     }else{
-      o << x->port_value(ii);
+      o << '.' << mangle(x->port_name(ii)) << '(' << mangle(x->port_value(ii)) << ')';
     }
-    sep = ",";
+    sep = ',';
   }
   for (int ii = 0;  x->current_port_exists(ii);  ++ii) {untested();
-    o << sep << x->current_port_name(ii) << '(' << x->current_port_value(ii) << ')';
-    sep = ",.";
+    o << sep;
+    //////print_attributes(o, x->port_id_tag(ii));
+    o << '.' << x->current_port_name(ii) << '(' << x->current_port_value(ii) << ')';
+    sep = ',';
   }
-  o << ")";
+  o << ')';
 }
 /*--------------------------------------------------------------------------*/
 #if 0

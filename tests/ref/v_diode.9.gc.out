@@ -14,7 +14,7 @@ paramset ddd diode;
 endparamset
 
 module main (.\1 (\1 ),.\2 (\2 ));
-  ddd #(.$mfactor(4.),.area(1.)) d1 (1,2);
+  ddd #(.$mfactor(4.),.area(1.)) d1 (\1 ,\2 );
 endmodule // main
 
 main #(.$mfactor(1.)) m (.\1 (\2 ),.\2 (\0 ));

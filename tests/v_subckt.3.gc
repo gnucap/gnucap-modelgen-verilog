@@ -1,0 +1,17 @@
+verilog
+
+module port_names (.A(A_),.B(B_));
+	vsource #(.dc(1)) v(A_, B_);
+endmodule
+
+module main(AA);
+	port_names p(.A(AA), .B(\0 ));
+endmodule
+
+
+main m(AA);
+
+list
+print op v(nodes)
+op
+end

@@ -22,7 +22,7 @@ paramset myv vsource;
 endparamset
 
 module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
-  myres #(1.) v (3,1);
+  myres #(1.) v (\3 ,\1 );
   myv #() V1 (.n(\1 ),.p(\3 ));
 endmodule // main
 

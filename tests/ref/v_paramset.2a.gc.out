@@ -15,7 +15,7 @@ paramset vs vsource;
 endparamset
 
 module main (.\1 (\1 ),.\2 (\2 ));
-  vs #(.dc(1)) v1 (1,2);
+  vs #(.dc(1)) v1 (\1 ,\2 );
 endmodule // main
 
 main #() m1 (.\1 (\0 ),.\2 (\1 ));

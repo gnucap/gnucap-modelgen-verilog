@@ -1,7 +1,7 @@
 running modelgen in insensitive mode
 module test (.y(y),.a(a),.b(b));
-  vpulse #(.period(.5),.width(.2),.val1(5),.val0(0)) v1 (a,0);
-  vpulse #(.period(.5),.width(.2),.td(.1),.val1(5),.val0(0)) v1 (b,0);
+  vpulse #(.period(.5),.width(.2),.val1(5),.val0(0)) v1 (a,\0 );
+  vpulse #(.period(.5),.width(.2),.td(.1),.val1(5),.val0(0)) v1 (b,\0 );
   myand0 #() b (.y(y),.a(a),.b(b));
 endmodule // test
 

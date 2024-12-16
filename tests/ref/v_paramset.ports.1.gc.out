@@ -27,7 +27,7 @@ module myres (.a(a),.b(b));
 endmodule // myres
 
 module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
-  vsource #(1.) v (3,1);
+  vsource #(1.) v (\3 ,\1 );
   myres #() R1 (.p(\1 ),.n(\3 ));
 endmodule // main
 

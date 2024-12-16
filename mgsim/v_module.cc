@@ -138,6 +138,7 @@ DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "module", &p0);
 #define PORTS_PER_SUBCKT 100
 /*--------------------------------------------------------------------------*/
 class DEV_SUBCKT_PROTO : public DEV_MODULE {
+ // std::vector <std::string> _port_name;
 private:
   explicit	DEV_SUBCKT_PROTO(const DEV_SUBCKT_PROTO&p);
 public:
@@ -180,7 +181,8 @@ private: // no-ops for prototype
   bool do_tr()override { untested(); return true;}
   bool tr_needs_eval()const override {untested(); return false;}
   void tr_queue_eval()override {}
-  std::string port_name(int i)const override {return port_value(i);}
+  int  set_port_by_name(std::string& name, std::string& value) override;
+  std::string port_name(int i)const override;
 } pp(&Default_SUBCKT);
 DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "X|subckt", &pp);
 /*--------------------------------------------------------------------------*/
@@ -196,6 +198,26 @@ DEV_SUBCKT_PROTO::DEV_SUBCKT_PROTO(COMMON_COMPONENT* c)
   :DEV_MODULE(c)
 {
   new_subckt();
+}
+/*--------------------------------------------------------------------------*/
+int DEV_SUBCKT_PROTO::set_port_by_name(std::string& name, std::string& value)
+{ untested();
+  int index = net_nodes();
+  assert(index == int(_port_name.size()));
+  _port_name.push_back(name);
+  set_port_by_index(index, value);
+  return index;
+}
+/*--------------------------------------------------------------------------*/
+std::string DEV_SUBCKT_PROTO::port_name(int i) const
+{
+  if(i>=int(_port_name.size())) {
+    return port_value(i);
+  }else if(_port_name[i]!="") { untested();
+    return _port_name[i];
+  }else{ untested();
+    return port_value(i);
+  }
 }
 /*--------------------------------------------------------------------------*/
 CARD* DEV_SUBCKT_PROTO::clone_instance()const
@@ -227,6 +249,7 @@ void DEV_MODULE::set_port_by_index(int Index, std::string& Value)
 int DEV_MODULE::set_port_by_name(std::string& name, std::string& value)
 {
   if(_parent){
+    trace2("DEV_MODULE::spbn", name, value);
     return BASE_SUBCKT::set_port_by_name(name, value);
   }else{
     int index = net_nodes();
@@ -374,7 +397,7 @@ std::string DEV_MODULE::port_name(int i)const
 {
   if (const DEV_MODULE* p=dynamic_cast<const DEV_MODULE*>(_parent)) {
     if (i<p->net_nodes()){
-      return p->port_value(i);
+      return p->port_name(i);
     }else{untested();
       return "";
     }

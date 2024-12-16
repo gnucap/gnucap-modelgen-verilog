@@ -6,7 +6,7 @@ module hsp (.a(a),.b(b));
 endmodule // hsp
 
 module main (.\1 (\1 ),.\2 (\2 ));
-  hsp #((* test=3 *) .$mfactor(2),(* test=2 *) .$xposition(3)) test (1,0);
+  hsp #((* test=3 *) .$mfactor(2),(* test=2 *) .$xposition(3)) test (\1 ,\0 );
 endmodule // main
 
 main #() m (.\1 (\1 ),.\2 (\2 ));

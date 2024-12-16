@@ -7,7 +7,7 @@ main m(0 1);
 main m(0 1); 
          ^ ? invalid identifier
 module main (.\1 (\1 ),.\2 (\2 ));
-  test_alias2 #(.aa(5),.pp(4)) dut4 (1,2);
+  test_alias2 #(.aa(5),.pp(4)) dut4 (\1 ,\2 );
 endmodule // main
 
 main #() m (.\1 (\0 ),.\2 (\1 ));

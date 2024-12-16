@@ -1,0 +1,11 @@
+module port_names (.A(A_),.B(B_));
+  vsource #(.dc(1)) v (A_,B_);
+endmodule // port_names
+
+module main (.AA(AA));
+  port_names #() p (.A(AA),.B(\0 ));
+endmodule // main
+
+main #() m (.AA(AA));
+#           v(AA)     
+ 27.        1.        
