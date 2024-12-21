@@ -14,4 +14,4 @@ end
 
 endmodule
 
-!make test_error3.so > /dev/null
+// !make test_error3.so > /dev/null

@@ -83,11 +83,13 @@ private:
     assert(_n); assert(i>=0); assert(i<_node_capacity); return _n[i];
   }
   bool print_type_in_spice()const override { untested();unreachable(); return false; }
+#ifndef NDEBUG
   int set_port_by_name(std::string& name, std::string& value)override{
     assert(_dev);
     trace4("PARAMSET::spbn", long_label(), name, value, max_nodes());
     return BASE_SUBCKT::set_port_by_name(name, value);
   }
+#endif
   void set_port_by_index(int Index, std::string& Value)override{
     grow_nodes(Index);
     BASE_SUBCKT::set_port_by_index(Index, Value);
@@ -96,6 +98,7 @@ private:
 private:
 
   CARD* clone() const override;
+  CARD* clone_instance() const override;
 
   bool is_valid() const override;
 /*--------------------------------------------------------------------------*/
@@ -140,22 +143,22 @@ private:
   void build_sckt(COMPONENT*);
   void expand()override;
   CARD* deflate()override;
-  void map_nodes()override { /*no-op*/ }
+  void map_nodes()override { untested(); /*no-op*/ }
 private: // no ops for top level
 #if 1
-  void precalc_last() override { assert(!is_device());}
-  void tr_begin() override{ assert(!is_device());}
-  void ac_begin() override{ assert(!is_device());}
-  void tr_load() override{ assert(!is_device());}
+  void precalc_last() override { untested(); assert(!is_device());}
+  void tr_begin() override{ untested(); assert(!is_device());}
+  void ac_begin() override{ untested(); assert(!is_device());}
+  void tr_load() override{ untested(); assert(!is_device());}
   bool tr_needs_eval()const override{ untested(); assert(!is_device()); return false;}
-  void tr_queue_eval()override{ assert(!is_device());}
-  void tr_accept() override{ assert(!is_device());}
+  void tr_queue_eval()override{ untested(); assert(!is_device());}
+  void tr_accept() override{ untested(); assert(!is_device());}
   double tr_probe_num(const std::string&)const override{untested(); return NOT_VALID;}
-  void tr_advance() override{ assert(!is_device());}
-  void dc_advance() override{ assert(!is_device());}
-  bool do_tr() override{ assert(!is_device()); return true;}
-  void do_ac() override{ assert(!is_device());}
-  void ac_load() override{ assert(!is_device());}
+  void tr_advance() override{ untested(); assert(!is_device());}
+  void dc_advance() override{ untested(); assert(!is_device());}
+  bool do_tr() override{ untested(); assert(!is_device()); return true;}
+  void do_ac() override{ untested(); assert(!is_device());}
+  void ac_load() override{ untested(); assert(!is_device());}
 #else
   void tr_begin() override{ untested();
     if(owner()){ untested();
@@ -265,9 +268,22 @@ PARAMSET::PARAMSET(PARAMSET const& p)
   }
   new_subckt();
 
-  if(scope()){
-  }else{ untested();
-  }
+  // if(scope()){ untested();
+  // }else{ untested();
+  // }
+}
+/*--------------------------------------------------------------------------*/
+CARD* PARAMSET::clone_instance() const
+{
+  PARAMSET* n = new PARAMSET(*this);
+  assert(n->has_common());
+  assert(has_common());
+  auto c = prechecked_cast<COMMON_PARAMLIST*>(common()->clone());
+  assert(c);
+  c->_params = PARAM_LIST();
+  n->attach_common(c);
+  n->_parent = this;
+  return n;
 }
 /*--------------------------------------------------------------------------*/
 CARD* PARAMSET::clone() const
@@ -275,7 +291,7 @@ CARD* PARAMSET::clone() const
   PARAMSET* n = new PARAMSET(*this);
   assert(n->has_common());
   assert(has_common());
-  if(owner() == NULL){
+  if(this == &ps) {
     auto c = prechecked_cast<COMMON_PARAMLIST*>(common()->clone());
     assert(c);
     c->_params = PARAM_LIST();
@@ -289,7 +305,7 @@ CARD* PARAMSET::clone() const
 /*--------------------------------------------------------------------------*/
 bool PARAMSET::is_valid() const
 {
-  assert(scope());
+  // assert(scope());
   assert(_parent);
   trace1("PARAMSET::is_valid", long_label());
   if(_parent->subckt()){
@@ -334,13 +350,13 @@ void PARAMSET::grow_nodes(int Index)
 /*--------------------------------------------------------------------------*/
 int PARAMSET::set_param_by_name(std::string Name, std::string Value)
 {
-  assert(_parent);
+//  assert(_parent);
 
   if(Name=="$mfactor"){
     return BASE_SUBCKT::set_param_by_name(Name, Value);
   }else if(Name==""){ untested();
     throw Exception_No_Match("invalid parameter: " + Name);
-  }else if(_parent->subckt()){
+  }else if(_parent && _parent->subckt()){
     trace2("PARAMSET::spbn2", long_label(), _parent->long_label());
     PARAM_LIST const* p = _parent->subckt()->params();
 
@@ -383,7 +399,7 @@ COMPONENT const* PARAMSET::prepare_dev(CARD const* proto)
 /*--------------------------------------------------------------------------*/
 void PARAMSET::precalc_first()
 {
-  assert(scope());
+ // assert(scope());
   trace5("PARAMSET::pf", long_label(), owner(), _dev, _sim->is_first_expand(), !is_device());
   std::string base_name = dev_type();
 
@@ -403,6 +419,9 @@ void PARAMSET::precalc_first()
   }else{
   }
 
+ // if(!owner()){
+ //   // this does not work.
+ // }else
   if(_parent && _parent->subckt()) {
     COMPONENT::precalc_first();
     assert(subckt());
@@ -486,7 +505,7 @@ void resolve_copy(CARD_LIST* t, PARAM_LIST const& p, const CARD_LIST*)
 	}else if(dynamic_cast<Token_CONSTANT*>(*ii)
 	    && !dynamic_cast<const String*>((*ii)->data())
 	    && !dynamic_cast<const Float*>((*ii)->data())
-	    && !dynamic_cast<const Integer*>((*ii)->data())) {
+	    && !dynamic_cast<const Integer*>((*ii)->data())) { untested();
 	  incomplete(); // probably;
 		unreachable(); // unfixed m_expression_reduce gets us here.
 	  E.push_back(new Token_SYMBOL("_." + (*ii)->name()));
@@ -589,17 +608,17 @@ CARD* PARAMSET::deflate()
 /*--------------------------------------------------------------------------*/
 void PARAMSET::expand()
 {
-  if(!is_device()){
+  if(!is_device()){ untested();
     // not a device, not expandable.
   }else{
     BASE_SUBCKT::expand();
     trace2("PARAMSET::expand", long_label(), net_nodes());
     assert(common());
     auto proto = prechecked_cast<COMPONENT const*>(_parent);
+    // assert(proto->owner() == nullptr);
     assert(proto);
     assert(proto->scope());
     assert(proto->subckt());
-    assert(proto->owner() == NULL);
     assert(_parent->_dev);
     // assert(net_nodes() == proto->net_nodes());
     // assert(net_nodes() == _parent->_dev->net_nodes());
@@ -615,7 +634,7 @@ void PARAMSET::expand()
     subckt()->attach_params(&(c->_params), scope());
 
     // renew_subckt(_parent, ... ) dev=sckt()->..?
-    CARD* d = _parent->_dev->clone_instance(); // TODO: just "clone"
+    CARD* d = _parent->_dev->clone_instance();
     assert(d);
     auto dev = prechecked_cast<COMPONENT*>(d);
     assert(dev);

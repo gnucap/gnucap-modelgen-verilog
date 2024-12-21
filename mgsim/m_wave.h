@@ -293,7 +293,7 @@ inline void WAVE::new_transition(double t, double rt, double ft, double new_fv)
     }else if(0. > old_slope && old_slope > abs_slope){
       // fall faster
       _w.push_back(DPAIR(start, vcur));
-    }else if(fabs(new_fv) > fabs(old_fv) && new_fv*old_fv > 0 ){
+    }else if(fabs(new_fv) > fabs(old_fv) && new_slope*old_slope > 0 ){
       trace5("nt1d keep?", start, new_fv, old_fv, old_slope, new_slope);
       if(0 <= old_slope){
 	assert(old_slope >= new_slope);
@@ -310,10 +310,10 @@ inline void WAVE::new_transition(double t, double rt, double ft, double new_fv)
       trace3("nt2", sign, new_fv, old_fv);
       trace2("nt2", old_slope - new_slope, new_fv*old_fv);
       assert(sign*old_slope >= sign*abs_slope);
-      assert(sign*new_fv <= sign*old_fv);
 
       double t_int = (start * new_slope - old_ft * old_slope ) / ( new_slope - old_slope );
       trace5("nt2", start, old_ft, old_slope, new_slope, t_int);
+      assert(sign*new_slope <= sign*old_slope);
       double new_ft = start + new_tt;
       assert(t_int <= new_ft);
       assert(start <= t_int);

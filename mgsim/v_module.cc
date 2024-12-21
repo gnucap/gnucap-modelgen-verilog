@@ -348,7 +348,7 @@ DEV_MODULE::DEV_MODULE(const DEV_MODULE& p)
   :BASE_SUBCKT(p),
    _parent(p._parent)
 {
-  trace2("DEV_MODULE::DEV_MODULE", long_label(), net_nodes());
+  trace2("DEV_MODULE::DEV_MODULE", short_label(), net_nodes());
   _node_capacity = net_nodes();
   if(_node_capacity){
     _n = new node_t[_node_capacity];

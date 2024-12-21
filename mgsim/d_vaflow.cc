@@ -66,10 +66,8 @@ bool VAFLOW::do_tr_con_chk_and_q()
 {
   trace1("VAFLOW::do_tr_con_chk", long_label());
   if(!_sim->_v0){ untested();
-  }else if(_loaditer != _sim->iteration_tag()){
-
+  }else{ //  if(_loaditer != _sim->iteration_tag()){ }
     q_load();
-  }else{ untested();
   }
 
   assert(_old_values);

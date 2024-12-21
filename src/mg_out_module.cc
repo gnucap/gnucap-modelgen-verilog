@@ -139,18 +139,8 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
       "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-// DUP in code.cc
-static bool is_output_var(tag_t t)
-{
-  ATTRIB_LIST_p const& a = attr.attributes(t);
-  if(!a) {
-  }else if(a->operator[](std::string("desc")) != "0"
-         ||a->operator[](std::string("units")) != "0") {
-    return true;
-  }else{
-  }
-  return false;
-}
+// code.cc
+bool is_output_var(tag_t t);
 /*--------------------------------------------------------------------------*/
 static void make_tr_probe_num(std::ostream& o, const Module& m)
 {
@@ -364,7 +354,8 @@ void make_module_default_constructor(std::ostream& o, const Module& m)
   o << "    :" << baseclass(m) << "()";
   o << "\n{\n"
     "  attach_common(&Default_" << m.identifier() << ");\n"
-    "  ++_count;\n";
+    "  ++_count;\n"
+    "  set_owner(nullptr);\n";
 
   make_build_netlist(o, m);
 
@@ -1151,7 +1142,7 @@ static void make_cc_func(std::ostream& o, const Module& m)
   }
   for(FUNCTION_ const* f : m.funcs()){
     make_tag(o);
-    if(f->has_probes()){
+    if(f->has_refs()){
       f->make_cc_impl(o);
     }else{
     }

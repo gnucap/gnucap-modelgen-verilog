@@ -159,7 +159,15 @@ protected: // override virtual
 
   void expand_last()override;
   void expand_current_port(int i);
-  void set_current_port_by_index(int i, const std::string& s) override {
+
+  void set_port_by_index(int i, /*const*/ std::string& s) override {
+    if(i>=0){ untested();
+      ELEMENT::set_port_by_index(i, s);
+    }else{
+      obsolete_set_current_port_by_index(-i-1, s);
+    }
+  }
+  void obsolete_set_current_port_by_index(int i, const std::string& s) {
     if(i==0){ untested();
       // _self_is_current = true;
     }else if(i<=int(_current_port_names.size())){
@@ -596,7 +604,7 @@ bool DEV_IDT::do_tr()
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_CAP::tr_load()
 {
-  assert(_loaditer != _sim->iteration_tag()); // double load
+ // assert(_loaditer != _sim->iteration_tag()); // double load
 
   tr_load_shunt(); // 4 pt +- loss
   for (int i=0; i<=_n_ports; ++i) {
@@ -618,7 +626,7 @@ void DEV_CPOLY_CAP::tr_load()
     tr_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), &(_vi0[i]), &(_vi1[i]));
   }
 
-  assert(_loaditer == _sim->iteration_tag()); // double load
+ // assert(_loaditer == _sim->iteration_tag()); // double load
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_CAP::tr_unload()

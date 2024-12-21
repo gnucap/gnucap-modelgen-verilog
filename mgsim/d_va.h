@@ -83,7 +83,14 @@ protected: // override virtual
   void expand_last()override;
   void expand_current_port(int i);
 
-  void set_current_port_by_index(int i, const std::string& s) override {
+  void set_port_by_index(int i, /*const*/ std::string& s) override {
+    if(i>=0){ untested();
+      ELEMENT::set_port_by_index(i, s);
+    }else{
+      obsolete_set_current_port_by_index(-i-1, s);
+    }
+  }
+  virtual void obsolete_set_current_port_by_index(int i, const std::string& s) {
     if(i==0){
       _self_is_current = true;
     }else if(i<=int(_current_port_names.size())){

@@ -1126,7 +1126,6 @@ void LAPLACE::tr_load()
 {
   tr_load_shunt();
   assert(subckt());
-  trace3("LAPLACE::tr_load", _loaditer, _sim->iteration_tag(), _loss0);
   assert(!_output->_loss0);
   subckt()->tr_load();
 }

@@ -68,9 +68,8 @@ bool VAPOT::do_tr_con_chk_and_q()
 {
   if(!_sim->_v0){ untested();
   // }else if(_loaditer != _sim->iteration_tag()){ untested();
-  }else if(_loaditer != _sim->iteration_tag()){
+  }else{ //  if(_loaditer != _sim->iteration_tag()){ }
     q_load();
-  }else{ untested();
   }
 
   assert(_old_values);

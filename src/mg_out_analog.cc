@@ -1433,11 +1433,17 @@ void make_cc_current_ports(std::ostream& o, Branch const* br, Element_2 const& e
     if(!i->is_flow_probe()){
     }else if(i->branch() == br){
       // self control is current
-      o______ e.code_name() << "->set_current_port_by_index(0,\"\");\n";
+      o______ "{\n";
+      o________ "std::string tmp = \"\";"; // BUG: passing ref.
+      o________ e.code_name() << "->set_port_by_index(-1,tmp);\n";
+      o______ "}\n";
     }else if(i->branch()){
       if(i->branch()->is_short()){
       }else{
-	o______ e.code_name() << "->set_current_port_by_index( "<< kk << ", \"" << i->branch()->code_name() << "\");\n";
+	o______ "{\n";
+	o________ "std::string tmp = \"" << i->branch()->code_name() << "\";"; // BUG: passing ref.
+	o________ e.code_name() << "->set_port_by_index( -1-"<< kk << ", tmp);\n";
+	o______ "}\n";
 	++kk;
       }
     }else{ untested();

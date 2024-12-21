@@ -36,6 +36,7 @@ class Module;
 class TData;
 // TODO: move upstream, partly?
 class FUNCTION_ : public FUNCTION {
+  mutable int _refs{0};
 //  std::string _label; // e_base.
   size_t _num_args{size_t(-1)};
 public:
@@ -90,10 +91,10 @@ public: // code generation
   }
   virtual void setup(Module*) {};
 /*--------------------------------------------------------------------------*/
-public: // use refcounter in e_base
-  void	      inc_refs()const	{inc_probes();}
-  void	      dec_refs()const	{dec_probes();}
-  bool	      has_refs()const	{return has_probes();}
+public:
+  void	      inc_refs()const	{++_refs;}
+  void	      dec_refs()const	{assert(_refs); --_refs;}
+  bool	      has_refs()const	{return _refs;}
 }; // FUNCTION_
 /*--------------------------------------------------------------------------*/
 class MGVAMS_FUNCTION : public FUNCTION_ {

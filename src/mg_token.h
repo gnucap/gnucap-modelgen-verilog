@@ -99,13 +99,13 @@ public:
 inline void Token_CALL::attach()
 {
   assert(_function);
-  ((CKT_BASE const*)_function)->inc_probes();
+  _function->inc_refs();
 }
 /*--------------------------------------------------------------------------*/
 inline void Token_CALL::detach()
 {
   assert(_function);
-  ((CKT_BASE const*)_function)->dec_probes();
+  _function->dec_refs();
 }
 /*--------------------------------------------------------------------------*/
 inline std::string Token_CALL::code_name()const

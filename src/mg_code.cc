@@ -84,7 +84,10 @@ Variable_Stmt* Variable_Stmt::deep_copy_(Block* owner, std::string prefix) const
   // return new Variable_Stmt(this);
   // auto n = new Variable_Stmt(*this);
   auto n = new Variable_Stmt();
-  attr.set_attributes(tag_t(n)) = attr.attributes(tag_t(this));
+  if(attr.has_attributes(tag_t(this))) {
+    attr.set_attributes(tag_t(n)) = attr.attributes(tag_t(this));
+  }else{
+  }
 
   n->_type = type();
   n->set_owner(owner);
@@ -96,14 +99,16 @@ Variable_Stmt* Variable_Stmt::deep_copy_(Block* owner, std::string prefix) const
   return n;
 }
 /*--------------------------------------------------------------------------*/
-static bool is_output_var(tag_t t)
+bool is_output_var(tag_t t)
 {
-  ATTRIB_LIST_p const& a = attr.attributes(t);
-  if(!a) {
-  }else if(a->operator[](std::string("desc")) != "0"
-         ||a->operator[](std::string("units")) != "0") {
-    return true;
-  }else{ untested();
+  if(attr.has_attributes(t)) {
+    ATTRIB_LIST_p const& a = attr.attributes(t);
+    if(   a->operator[](std::string("desc")) != "0"
+	||a->operator[](std::string("units")) != "0") {
+      return true;
+    }else{
+    }
+  }else{
   }
   return false;
 }
@@ -147,11 +152,17 @@ Variable_Decl* Variable_Decl::deep_copy(Base* b, std::string s) const
   assert(type());
   n->set_type(type());
   assert(n->type());
-  attr.set_attributes(tag_t(n)) = attr.attributes(tag_t(l));
+  if(attr.has_attributes(tag_t(l))) {
+    attr.set_attributes(tag_t(n)) = attr.attributes(tag_t(l));
+  }else{
+  }
   n->new_data();
   assert(n->_data);
   n->_token = new Token_VAR_DECL(s+_token->name(), n, n->_data);
-  attr.set_attributes(tag_t(n->_token)) = attr.attributes(tag_t(l));
+  if(attr.has_attributes(tag_t(l))) {
+    attr.set_attributes(tag_t(n->_token)) = attr.attributes(tag_t(l));
+  }else{
+  }
   assert(n->_token->type());
   l->scope()->new_var_ref(n->_token);
 

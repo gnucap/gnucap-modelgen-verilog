@@ -173,7 +173,10 @@ void Variable_Decl::parse(CS& f)
     throw Exception_CS_("already declared", f);
   }
 
-  attr.set_attributes(tag_t(_token)) = attr.attributes(tag_t(&f));
+  if(attr.has_attributes(tag_t(&f))) {
+    attr.set_attributes(tag_t(_token)) = attr.attributes(tag_t(&f));
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::dump(std::ostream& o)const

@@ -60,7 +60,7 @@ class COMMON_INSTANCE : public COMMON_PARAMLIST {
 public:
   COMMON_INSTANCE(int x) : COMMON_PARAMLIST(x) {}
 public:
-  DEV_INSTANCE_PROTO* _proto{NULL};
+  DEV_INSTANCE_PROTO* _proto{nullptr};
 };
 static COMMON_INSTANCE Default_SUBCKT(CC_STATIC);
 /*--------------------------------------------------------------------------*/
@@ -75,7 +75,7 @@ protected: // HACK
 
 protected: // stub stuff
   INSTANCE const* _cloned_from; // use common/mutable_common instead?
-  const COMPONENT* _parent{NULL};
+  const COMPONENT* _parent{nullptr};
   mutable DEV_INSTANCE_PROTO* _proto; // use common->proto?
   std::vector<std::pair<std::string, std::string>> _params;
   std::vector<std::string> _port_names;
@@ -85,6 +85,10 @@ protected:
 public:
   explicit	INSTANCE();
 		~INSTANCE();
+  CARD*		clone_instance()const override { untested();
+    // incomplete();
+    return clone();
+  }
   CARD*		clone()const override {
     INSTANCE* new_instance = new INSTANCE(*this);
 
@@ -141,7 +145,7 @@ private: // overrides
 			      int node_count, const node_t nodes[]) override{
     if(node_count){
       grow_nodes(node_count-1, _n, _node_capacity, node_capacity_floor);
-      _net_nodes = node_count;
+      _net_nodes = short(node_count);
     }else{ untested();
     }
     COMPONENT::set_parameters(Label, Parent, Common, Value, state_count, state,
@@ -294,6 +298,7 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
 
   c->set_owner(Proto);
   c->set_label(label);
+  assert(c->is_device());
 
   try {
     trace3("DEV_INSTANCE_PROTO::po, set port in proto", Proto->long_label(), Proto->net_nodes(), Proto->max_nodes());
@@ -375,14 +380,17 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
 
     CARD_LIST::const_iterator i = toplevel.find_(modelname);
     while(i != toplevel.end()) {
-      auto const& a = attributes(tag_t(*i));
       std::string desc;
-      if(a){
-	desc = a->operator[](std::string("desc"));
-	if(desc == "0") { untested();
-	  desc = "";
-	}else{
-	  desc = ": " + desc;
+      if(has_attributes(tag_t(*i))) {
+	auto const& a = attributes(tag_t(*i));
+	if(a){
+	  desc = a->operator[](std::string("desc"));
+	  if(desc == "0") { untested();
+	    desc = "";
+	  }else{
+	    desc = ": " + desc;
+	  }
+	}else{ untested();
 	}
       }else{
       }
@@ -453,9 +461,9 @@ CARD* INSTANCE::deflate()
   if(i!=s->end()){
     CARD* r = *i;
     { // TODO?: r = s->detach(i);
-      *i = NULL;
+      *i = nullptr;
       s->erase(i);
-      r->set_owner(NULL);
+      r->set_owner(nullptr);
       // r->precalc_first(); BUG?
       r->set_owner(owner());
       r->set_label(short_label());
@@ -497,13 +505,13 @@ CARD* INSTANCE::deflate()
 /*--------------------------------------------------------------------------*/
 INSTANCE::INSTANCE()
   :BASE_SUBCKT()
-  ,_cloned_from(NULL)
-  ,_parent(NULL)
-  ,_proto(NULL)
+  ,_cloned_from(nullptr)
+  ,_parent(nullptr)
+  ,_proto(nullptr)
   ,_node_capacity(0)
 {
   attach_common(&Default_SUBCKT);
-  assert(_n == NULL);
+  assert(_n == nullptr);
   ++_count;
 }
 /*--------------------------------------------------------------------------*/
@@ -511,16 +519,16 @@ INSTANCE::INSTANCE(const INSTANCE& p)
   :BASE_SUBCKT(p)
   ,_cloned_from(&p)
   ,_parent(p._parent)
-  ,_proto(NULL)
+  ,_proto(nullptr)
   ,_node_capacity(0)
 {
-  trace2("INSTANCE::INSTANCE", p.long_label(), p._net_nodes);
+  trace2("INSTANCE::INSTANCE", p.short_label(), p._net_nodes);
   assert(_net_nodes == p._net_nodes);
   _node_capacity = net_nodes();
   if(_node_capacity){
     _n = new node_t[_node_capacity];
   }else{
-    assert(_n == NULL);
+    assert(_n == nullptr);
   }
   if(p.is_device()){
     for (int ii = 0;  ii < net_nodes();  ++ii) {
@@ -546,8 +554,10 @@ INSTANCE::INSTANCE(const INSTANCE& p)
     incomplete();
   }else{
     // TODO:: use dispatcher["instance_proto"]?
-    trace2("INSTANCE::INSTANCE no model", p.long_label(), p._net_nodes);
+    trace2("INSTANCE::INSTANCE no model", p.short_label(), p._net_nodes);
     _proto = new DEV_INSTANCE_PROTO();
+   // _proto->set_owner(nullptr); // reset
+   // assert(!_proto->owner());
     assert(_proto->common());
     assert(_proto->subckt());
     assert(_proto->subckt()->params());
@@ -615,13 +625,13 @@ void INSTANCE::expand()
 
   trace3("INSTANCE::expand sckt in", long_label(), subckt()->size(), _sim->is_first_expand());
   // assert(subckt()->size());
-  subckt()->set_owner(NULL);
+  subckt()->set_owner(nullptr);
   subckt()->set_verilog_math();
   subckt()->set_owner(owner()); // TODO: renew_subckt with alternative owner?
   subckt()->precalc_first(); // here?
 
   // sift. move to CARD_LIST::expand?
-  COMPONENT* gotit = NULL;
+  COMPONENT* gotit = nullptr;
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ){
     CARD const* s = *i;
     COMPONENT const* d = dynamic_cast<COMPONENT const*>(s);
@@ -629,13 +639,16 @@ void INSTANCE::expand()
     ++i;
     if(!d->is_valid()){
       std::string desc;
-      auto const& a = attributes(tag_t(*i));
-      if(a){ untested();
-	desc = a->operator[](std::string("desc"));
-	if(desc == "0"){ untested();
-	  desc = "";
+      if(has_attributes(tag_t(*i))) {
+	auto const& a = attributes(tag_t(*i));
+	if(a){ untested();
+	  desc = a->operator[](std::string("desc"));
+	  if(desc == "0"){ untested();
+	    desc = "";
+	  }else{ untested();
+	    desc = ": " + desc;
+	  }
 	}else{ untested();
-	  desc = ": " + desc;
 	}
       }else{
       }
@@ -645,7 +658,7 @@ void INSTANCE::expand()
 //      error(bTRACE, long_label() + " found valid candidate.\n");
       gotit = prechecked_cast<COMPONENT*>(*j);
       assert(gotit);
-      *j = NULL;
+      *j = nullptr;
     }else if(d->param_count() > gotit->param_count()){
       error(bDEBUG, long_label() + " tie break: " + to_string(gotit->param_count()) + " vs. " +
 	  to_string((*j)->param_count()) + "\n");
@@ -655,7 +668,7 @@ void INSTANCE::expand()
       delete (CARD*) gotit;
       gotit = prechecked_cast<COMPONENT*>(*j);
       assert(gotit);
-      *j = NULL;
+      *j = nullptr;
     }else{
       error(bWARNING, long_label() + " ambiguous overload in " + dev_type() + "\n");
     }

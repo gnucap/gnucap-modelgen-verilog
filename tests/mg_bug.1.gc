@@ -20,11 +20,11 @@ endmodule
 attach ./test_bug1.so
 
 paramset invalid test_bug1
-.rs = 1;
+  .rs = 1;
 endparamset
 
 module main()
-invalid #() dut(\1 ,\0 );
+  invalid #() dut(\1 ,\0 );
 endmodule
 main m()
 dc

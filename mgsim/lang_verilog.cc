@@ -463,6 +463,7 @@ public:
       DEV_DOT* dd = new DEV_DOT();
       assert(dd);
       dd->set(cmd.fullstring());
+      dd->set_owner(nullptr); // ?
       Scope->push_back(dd);
     }
   }
@@ -922,6 +923,7 @@ COMPONENT* LANG_VERILOG::parse_instance(CS& cmd, COMPONENT* x)
   parse_ports(cmd, x, false/*allow dups*/);
   cmd >> ';';
   cmd.check(bWARNING, "what's this?");
+//  x->set_owner(nullptr);
   return x;
 }
 /*--------------------------------------------------------------------------*/
@@ -955,10 +957,13 @@ void LANG_VERILOG::parse_top_item(CS& cmd, CARD_LIST* Scope)
 void LANG_VERILOG::print_attributes(OMSTREAM& o, tag_t x) const
 {
   assert(x);
-  auto const& a = attributes(x);
-  if (a) {
-    trace1("pa", x);
-    o << "(* " << a->string(tag_t(NULL)) << " *) ";
+  if(has_attributes(x)){
+    auto const& a = attributes(x);
+    if (a) {
+      trace1("pa", x);
+      o << "(* " << a->string(tag_t(NULL)) << " *) ";
+    }else{ untested();
+    }
   }else{
   }
 }
@@ -1061,12 +1066,6 @@ void LANG_VERILOG::print_ports_long(OMSTREAM& o, const COMPONENT* x)
     }else{
       o << '.' << mangle(x->port_name(ii)) << '(' << mangle(x->port_value(ii)) << ')';
     }
-    sep = ',';
-  }
-  for (int ii = 0;  x->current_port_exists(ii);  ++ii) {untested();
-    o << sep;
-    //////print_attributes(o, x->port_id_tag(ii));
-    o << '.' << x->current_port_name(ii) << '(' << x->current_port_value(ii) << ')';
     sep = ',';
   }
   o << ')';
@@ -1246,6 +1245,7 @@ class CMD_PARAMSET : public CMD {
     }
 
     paramset = device_dispatcher.clone("paramset");
+    paramset->set_owner(nullptr); // m?
     auto dev = prechecked_cast<BASE_SUBCKT*>(paramset);
     assert(dev);
     cmd.reset(here);
@@ -1253,6 +1253,7 @@ class CMD_PARAMSET : public CMD {
     trace3("CMD_PARAMSET", paramset->long_label(), paramset->dev_type(), paramset);
     auto m = new PARAMSET_MODEL(dev);
     lang_verilog.move_attributes(tag_t(&cmd), tag_t(m));
+    m->set_owner(nullptr);
     Scope->push_back(m);
 
   }
@@ -1263,7 +1264,8 @@ class CMD_MODULE : public CMD {
   void do_it(CS& cmd, CARD_LIST* Scope)override {
     BASE_SUBCKT* new_module = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("module"));
     assert(new_module);
-    assert(!new_module->owner());
+    // assert(!new_module->owner());
+    new_module->set_owner(nullptr);
     assert(new_module->subckt());
     assert(new_module->subckt()->is_empty());
     assert(!new_module->is_device());

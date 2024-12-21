@@ -1399,6 +1399,7 @@ MOD_resistor::MOD_resistor()
 {
   attach_common(&Default_resistor);
   ++_count;
+  set_owner(nullptr);
   // build netlist
   // ports:2
   // overrides
@@ -2655,6 +2656,7 @@ MOD_resistor::MOD_resistor()
 {
   attach_common(&Default_resistor);
   ++_count;
+  set_owner(nullptr);
   // build netlist
   // ports:2
   // overrides
@@ -5082,6 +5084,7 @@ MOD_capacitor::MOD_capacitor()
 {
   attach_common(&Default_capacitor);
   ++_count;
+  set_owner(nullptr);
   // build netlist
   // ports:2
   // overrides
@@ -6000,6 +6003,7 @@ MOD_capacitor::MOD_capacitor()
 {
   attach_common(&Default_capacitor);
   ++_count;
+  set_owner(nullptr);
   // build netlist
   // ports:2
   // overrides
