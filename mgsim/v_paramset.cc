@@ -75,7 +75,8 @@ public:
   PARAMSET(PARAMSET const& p);
   ~PARAMSET(){ delete[] _n; _node_capacity = 0; }
 private:
-  bool is_device() const override { return owner(); }
+  bool is_device() const override { return true; }
+
   std::string value_name()const override{ untested();unreachable(); return "";}
   std::string port_name(int)const override;
   node_t& n_(int i)const override {
@@ -259,14 +260,8 @@ PARAMSET::PARAMSET(PARAMSET const& p)
   }else{
     assert(_n == NULL);
   }
-  if(p.is_device()){
-    for (int ii = 0;  ii < net_nodes();  ++ii) {
-      _n[ii] = p._n[ii];
-    }
-  }else{
-    for (int ii = 0;  ii < net_nodes();  ++ii) { untested();
-      assert(!_n[ii].n_());
-    }
+  for (int ii = 0;  ii < net_nodes();  ++ii) {
+    _n[ii] = p._n[ii];
   }
   new_subckt();
 
@@ -394,15 +389,13 @@ void PARAMSET::precalc_first()
 
   if(_dev){
     // assert(_dev == find_proto(base_name, NULL)); TODO.
-  }else if(!is_device()) {
+  }else{
     CARD const* p = find_proto(base_name, NULL); //what if there are 2?
     if(!p){
       throw Exception_No_Match(base_name); // cmd.warn(bDANGER, here, "paramset: no match");
     }else{
     }
     _dev = prepare_dev(p);
-  }else{ untested();
-    incomplete();
   }
 
   if(!_dev){ untested();
@@ -410,7 +403,7 @@ void PARAMSET::precalc_first()
   }else{
   }
 
-  if(is_device()) {
+  if(_parent && _parent->subckt()) {
     COMPONENT::precalc_first();
     assert(subckt());
     auto c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
