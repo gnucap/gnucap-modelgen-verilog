@@ -1152,10 +1152,11 @@ public:
   explicit MODULE_PROTO() : PARAMSET_MODEL() { }
   explicit MODULE_PROTO(COMPONENT* c)
     : PARAMSET_MODEL(c) { }
-  ~MODULE_PROTO() { delete component_proto(); }
+  ~MODULE_PROTO() { untested(); delete component_proto(); }
 
   PARAMSET_MODEL* clone()const override { untested();
     _instanciated = true; //??
+    incomplete();
     return new MODULE_PROTO(*this);
   }
   CARD* clone_instance()const override {
@@ -1166,7 +1167,7 @@ public:
   void precalc_first()override {
     auto* cp = prechecked_cast<COMPONENT const*>(component_proto());
     assert(cp);
-    if(_instanciated){
+    if(1||_instanciated){
     }else if(cp->is_valid()){
       auto i = CARD_LIST::card_list.begin();
       while(i!=CARD_LIST::card_list.end() && *i !=this){
@@ -1184,7 +1185,7 @@ public:
     }else{
     }
   }
-  void expand()override { incomplete(); }
+  void expand()override { }
   void precalc_last()override { }
   CARD* deflate()override { incomplete(); return this;}
 

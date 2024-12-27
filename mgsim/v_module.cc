@@ -66,7 +66,8 @@ protected:
 public:
   explicit	DEV_MODULE(COMMON_COMPONENT* c);
 		~DEV_MODULE()		{ delete[] _n; _node_capacity = 0; }
-  CARD*		clone()const override;
+  DEV_MODULE*	clone()const override;
+  CARD*		clone_instance()const override;
 private:
   void		set_port_by_index(int Index, std::string& Value) override;
   int		set_port_by_name(std::string&, std::string&) override;
@@ -77,7 +78,7 @@ private: // override virtual
   std::string   value_name()const override	{ untested();return "#";}
   int		max_nodes()const override;
   int		ext_nodes()const override {return int(_node_capacity);}
-  int		min_nodes()const override;
+  int		min_nodes()const override	{return 0;}
   int		matrix_nodes()const override	{return 0;}
   // int	net_nodes()const override	{ untested();return _net_nodes;}
   void		precalc_first()override;
@@ -154,7 +155,7 @@ public: // override virtual
   int		min_nodes()const override	{return 0;}
   int		matrix_nodes()const override	{untested();return 0;}
   int		net_nodes()const override	{return _net_nodes;}
-  CARD*		clone()const override		{return new DEV_SUBCKT_PROTO(*this);}
+  DEV_MODULE*	clone()const override		{return new DEV_SUBCKT_PROTO(*this);}
   bool		is_device()const override	{return false;}
   bool		makes_own_scope()const override	{return true;}
   CARD_LIST*	   scope()override		{untested();return subckt();}
@@ -265,21 +266,13 @@ int DEV_MODULE::max_nodes() const
   if(_parent == &pp){ untested();
     // spice..
     return _parent->max_nodes();
-    return PORTS_PER_SUBCKT;
-  }else if(_parent){
+  }else if(_parent){ untested();
     return static_cast<CARD const*>(_parent)->net_nodes();
-  }else{
-    // allow one more, building a prototype.
-    return net_nodes()+1;
-  }
-}
-/*--------------------------------------------------------------------------*/
-int DEV_MODULE::min_nodes() const
-{
-  if(_parent){
-    return ((CARD const*)_parent)->net_nodes();
-  }else{
-    return 0;
+  }else if(this == &pp){ untested();
+    return 100000;
+  }else{ untested();
+    return 100000;
+    return net_nodes();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -296,10 +289,15 @@ CARD_LIST* DEV_MODULE::scope()
 /*--------------------------------------------------------------------------*/
 bool DEV_MODULE::is_valid() const
 {
+  PARAM_LIST const* params;
+  if(_parent){
+    assert(_parent->subckt());
+    params = _parent->subckt()->params();
+  }else{
+    assert(subckt());
+    params = subckt()->params();
+  }
   assert(subckt());
-  assert(_parent);
-  assert(_parent->subckt());
-  PARAM_LIST const* params = _parent->subckt()->params();
   trace1("DEV_MODULE::is_valid I", long_label());
   PARAM_INSTANCE v = params->deep_lookup("_..is_valid");
   trace2("DEV_MODULE::is_valid II", long_label(), v.string());
@@ -317,7 +315,7 @@ bool DEV_MODULE::is_valid() const
   }
 }
 /*--------------------------------------------------------------------------*/
-CARD* DEV_MODULE::clone()const
+DEV_MODULE* DEV_MODULE::clone()const
 {
   DEV_MODULE* new_instance = new DEV_MODULE(*this);
   assert(!new_instance->subckt());
@@ -337,6 +335,13 @@ CARD* DEV_MODULE::clone()const
   return new_instance;
 }
 /*--------------------------------------------------------------------------*/
+CARD* DEV_MODULE::clone_instance() const
+{
+  auto m = clone();
+  m->_net_nodes = 0; // needed in v_instance: 274
+  return m;
+}
+/*--------------------------------------------------------------------------*/
 DEV_MODULE::DEV_MODULE(COMMON_COMPONENT* c)
   :BASE_SUBCKT(c),
    _parent(NULL), _node_capacity(0)
@@ -348,8 +353,8 @@ DEV_MODULE::DEV_MODULE(const DEV_MODULE& p)
   :BASE_SUBCKT(p),
    _parent(p._parent)
 {
-  trace2("DEV_MODULE::DEV_MODULE", short_label(), net_nodes());
-  _node_capacity = net_nodes();
+  trace3("DEV_MODULE::DEV_MODULE", short_label(), net_nodes(), p.max_nodes());
+  _node_capacity = p.max_nodes();
   if(_node_capacity){
     _n = new node_t[_node_capacity];
   }else{
@@ -422,6 +427,14 @@ void DEV_MODULE::expand()
 {
   BASE_SUBCKT::expand();
 
+  for(int i=0; i<max_nodes(); ++i) {
+    if(n_(i).is_connected()){
+    }else{
+      n_(i).new_model_node("." + long_label() + "." + port_name(i), this);
+      n_(i).n_()->set_label("");
+    }
+  }
+
   if(_parent == &pp){ untested();
     COMMON_PARAMLIST const* c = prechecked_cast<COMMON_PARAMLIST const*>(common());
     assert(c);
@@ -457,6 +470,7 @@ void DEV_MODULE::expand()
       trace2("expand param", p.first, p.second.string());
     }
 
+    trace3("expand", short_label(), net_nodes(), max_nodes());
     renew_subckt(_parent, &(c->_params));
     subckt()->expand();
 

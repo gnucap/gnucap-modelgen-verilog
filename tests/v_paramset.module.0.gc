@@ -10,9 +10,9 @@ module ports(a, b)
   vsource #(.dc(2)) c(a, b);
 endmodule
 
-module main(1 2);
-  ports p (1 0);
-  ports p (2 0 0);
+module main(\1 , \2 );
+  ports p (\1 , \0 );
+  ports p (\2 , \0 , \0 );
 endmodule
 
 main #() m(\1 \2 );

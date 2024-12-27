@@ -267,10 +267,7 @@ DISPATCHER<CARD>::INSTALL dd(&device_dispatcher, "instance_proto", &pp);
 /*--------------------------------------------------------------------------*/
 void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE_PROTO* Proto) const
 {
-  // assert(Proto==this); // for now.
-  trace3("prepare_overload", Proto->long_label(), Proto->net_nodes(), _parent);
   assert(Proto);
-  // assert(!_parent);
   assert(Proto->subckt());
   assert(Proto->scope()==Proto->subckt());
   assert(model);
@@ -301,10 +298,11 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
   assert(c->is_device());
 
   try {
-    trace3("DEV_INSTANCE_PROTO::po, set port in proto", Proto->long_label(), Proto->net_nodes(), Proto->max_nodes());
+    trace3("DEV_INSTANCE_PROTO::po, set port in proto", Proto->short_label(), Proto->net_nodes(), Proto->max_nodes());
+    trace1("DEV_INSTANCE_PROTO::po, set port in proto", net_nodes());
     for(int i=0; i<Proto->net_nodes(); ++i){
       std::string v = Proto->port_value(i);
-      trace3("DEV_INSTANCE_PROTO::po, set port in proto", Proto->long_label(), i, v);
+      trace3("DEV_INSTANCE_PROTO::po, set port in proto", Proto->short_label(), i, v);
       trace2("DEV_INSTANCE_PROTO::po, set port in proto", c->net_nodes(), c->max_nodes());
 
       if(v[0] == '*'){
@@ -359,7 +357,6 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
   assert(c);
   assert(c->modelname()!="");
   std::string modelname = c->modelname();
-  trace3("co", long_label(), c->modelname(), Proto->long_label());
 
   assert(Proto->scope()==Proto->subckt());
   assert(!Proto->scope()->size());
@@ -618,6 +615,7 @@ void INSTANCE::expand()
     // assert(pl);
     // c->_params.set_try_again(pl);
 
+    // here: candidate has too many ports.
     renew_subckt(_parent, &(c->_params)); // pass owner?
     assert(scope()!=subckt());
     // subckt()->attach_params(&(c->_params), scope());
@@ -715,7 +713,7 @@ void INSTANCE::expand()
 void INSTANCE::precalc_first()
 {
   assert(common());
-  trace3("INSTANCE::precalc_first", long_label(), _parent, common()->modelname());
+  trace3("INSTANCE::precalc_first", short_label(), _parent, common()->modelname());
   trace1("INSTANCE::precalc_first", _sim->is_first_expand());
 
   if(!owner()){ untested();
@@ -727,7 +725,7 @@ void INSTANCE::precalc_first()
   }
 
   if(_parent){
-    trace2("INSTANCE::precalc_first w/ parent", long_label(), _parent->long_label());
+    trace2("INSTANCE::precalc_first w/ parent", short_label(), _parent->short_label());
   }else{ untested();
   }
   // a device in a module instance
