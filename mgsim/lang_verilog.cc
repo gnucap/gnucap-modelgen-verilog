@@ -1,6 +1,6 @@
 /*$Id: lang_verilog.cc $ -*- C++ -*-
  * Copyright (C) 2007 Albert Davis
- *               2022 Felix Salfelder
+ *               2022-24 Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -29,6 +29,7 @@
 #include <u_lang.h>
 /*--------------------------------------------------------------------------*/
 static const std::string IS_VALID = "_..is_valid";
+static bool instanciate_unused = false;
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -1104,8 +1105,9 @@ void LANG_VERILOG::print_items_sckt(OMSTREAM& o, const COMPONENT* x)
 }
 /*--------------------------------------------------------------------------*/
 class PARAMSET_MODEL : public MODEL_CARD {
-  explicit PARAMSET_MODEL() : MODEL_CARD(NULL) {untested();}
   COMPONENT* _p{NULL};
+protected:
+  explicit PARAMSET_MODEL() : MODEL_CARD(NULL) {untested();}
 public:
   explicit PARAMSET_MODEL(COMPONENT* c) : MODEL_CARD(c) {
     _p = c;
@@ -1142,11 +1144,63 @@ private:
   std::string dev_type()const override { return component_proto()->dev_type(); }
 };
 /*--------------------------------------------------------------------------*/
+class MODULE_PROTO : public PARAMSET_MODEL {
+  mutable bool _instanciated{!instanciate_unused};
+  explicit MODULE_PROTO(MODULE_PROTO const& p)
+    : PARAMSET_MODEL(p), _instanciated(p._instanciated) {untested(); }
+public:
+  explicit MODULE_PROTO() : PARAMSET_MODEL() { }
+  explicit MODULE_PROTO(COMPONENT* c)
+    : PARAMSET_MODEL(c) { }
+  ~MODULE_PROTO() { delete component_proto(); }
+
+  PARAMSET_MODEL* clone()const override { untested();
+    _instanciated = true; //??
+    return new MODULE_PROTO(*this);
+  }
+  CARD* clone_instance()const override {
+    _instanciated = true;
+    return PARAMSET_MODEL::clone_instance();
+  }
+public:
+  void precalc_first()override {
+    auto* cp = prechecked_cast<COMPONENT const*>(component_proto());
+    assert(cp);
+    if(_instanciated){
+    }else if(cp->is_valid()){
+      auto i = CARD_LIST::card_list.begin();
+      while(i!=CARD_LIST::card_list.end() && *i !=this){
+	++i;
+      }
+
+      if(i==CARD_LIST::card_list.end()){
+	unreachable();
+      }else{
+	++i;
+	auto ii = clone_instance();
+	ii->set_owner(nullptr);
+	CARD_LIST::card_list.insert(i, ii);
+      }
+    }else{
+    }
+  }
+  void expand()override { incomplete(); }
+  void precalc_last()override { }
+  CARD* deflate()override { incomplete(); return this;}
+
+public:
+  char id_letter()const override{return 'X';}
+};
+/*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
 {
   print_attributes(o, tag_t(x));
 
-  if(dynamic_cast<PARAMSET_MODEL const*>(x)) { // } ->short_label() == "paramset") { untested();
+  if(dynamic_cast<MODULE_PROTO const*>(x)) {
+    auto bs = prechecked_cast<BASE_SUBCKT const*>(x->component_proto());
+    assert(bs);
+    print_module(o, bs);
+  }else if(dynamic_cast<PARAMSET_MODEL const*>(x)) { // } ->short_label() == "paramset") { untested();
     COMPONENT const* bs = prechecked_cast<COMPONENT const*>(x->component_proto());
     print_attributes(o, tag_t(bs)); // ?
     o << "paramset " << bs->short_label() << ' ' << x->dev_type() << ";\n";
@@ -1271,7 +1325,10 @@ class CMD_MODULE : public CMD {
     assert(!new_module->is_device());
     try {
       lang_verilog.parse_module(cmd, new_module);
-      Scope->push_back(new_module);
+      auto m = new MODULE_PROTO(new_module);
+      lang_verilog.move_attributes(tag_t(&cmd), tag_t(m));
+      m->set_owner(nullptr);
+      Scope->push_back(m);
     }catch(Exception const& e) {
       cmd.warn(bDANGER, e.message());
       for (;;) {

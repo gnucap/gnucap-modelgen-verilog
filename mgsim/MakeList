@@ -17,6 +17,7 @@ TARGET = \
   d_vapot.so \
   d_vasw.so \
   lang_verilog.so \
+  lang_spice.so \
   v_instance.so \
   v_paramset.so \
   v_module.so
