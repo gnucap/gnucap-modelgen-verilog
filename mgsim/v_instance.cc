@@ -629,10 +629,16 @@ void INSTANCE::expand()
   subckt()->precalc_first(); // here?
 
   // sift. move to CARD_LIST::expand?
+  //
+  // tie break rules
+  // - The paramset with the fewest number of un-overridden parameters shall be selected.
+  // - The paramset with the greatest number of local parameters with specified ranges shall be selected.
+  // - The paramset with the fewest ports not connected in the instance line shall be selected.
   COMPONENT* gotit = nullptr;
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ){
     CARD const* s = *i;
     COMPONENT const* d = dynamic_cast<COMPONENT const*>(s);
+    assert(d);
     CARD_LIST::iterator j = i;
     ++i;
     if(!d->is_valid()){
@@ -663,6 +669,16 @@ void INSTANCE::expand()
     }else if(d->param_count() < gotit->param_count()){
       error(bDEBUG, long_label() + " tie break: " + to_string(gotit->param_count()) + " vs. " +
 	  to_string((*j)->param_count()) + "\n");
+      delete (CARD*) gotit;
+      gotit = prechecked_cast<COMPONENT*>(*j);
+      assert(gotit);
+      *j = nullptr;
+    }else if(d->max_nodes() > gotit->max_nodes()){
+      error(bDEBUG, long_label() + " port tie break: " + to_string(gotit->max_nodes()) + " vs. " +
+	  to_string(d->max_nodes()) + "\n");
+    }else if(d->max_nodes() < gotit->max_nodes()){
+      error(bDEBUG, long_label() + " port tie break: " + to_string(gotit->max_nodes()) + " vs. " +
+	  to_string(d->max_nodes()) + "\n");
       delete (CARD*) gotit;
       gotit = prechecked_cast<COMPONENT*>(*j);
       assert(gotit);

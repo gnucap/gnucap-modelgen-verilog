@@ -1152,7 +1152,7 @@ public:
   explicit MODULE_PROTO() : PARAMSET_MODEL() { }
   explicit MODULE_PROTO(COMPONENT* c)
     : PARAMSET_MODEL(c) { }
-  ~MODULE_PROTO() { untested(); delete component_proto(); }
+  ~MODULE_PROTO() { delete component_proto(); }
 
   PARAMSET_MODEL* clone()const override { untested();
     _instanciated = true; //??

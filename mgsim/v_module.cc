@@ -73,7 +73,7 @@ private:
   int		set_port_by_name(std::string&, std::string&) override;
 private: // override virtual
   bool		is_device()const override	{return _parent;}
-  char		id_letter()const override	{ untested();return 'X';}
+  char		id_letter()const override	{return 'X';}
   bool		print_type_in_spice()const override {return true;}
   std::string   value_name()const override	{ untested();return "#";}
   int		max_nodes()const override;
@@ -266,11 +266,11 @@ int DEV_MODULE::max_nodes() const
   if(_parent == &pp){ untested();
     // spice..
     return _parent->max_nodes();
-  }else if(_parent){ untested();
+  }else if(_parent){
     return static_cast<CARD const*>(_parent)->net_nodes();
   }else if(this == &pp){ untested();
     return 100000;
-  }else{ untested();
+  }else{
     return 100000;
     return net_nodes();
   }
@@ -306,7 +306,7 @@ bool DEV_MODULE::is_valid() const
   Integer* res = c.assign(x);
   if(!res) {
     return true;
-  }else{ untested();
+  }else{
     assert(x);
     trace1("DEV_MODULE::is_valid III", typeid(*x).name());
     int a = res->value();
