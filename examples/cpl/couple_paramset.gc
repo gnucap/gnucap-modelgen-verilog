@@ -19,6 +19,7 @@ verilog
 
 module cpl0(in0, in1, gnd, out0, out1);
 //  electrical i0, i1;
+  parameter length=0 from [1:1];
   parameter k;
   parameter real R;
   parameter real L;
@@ -49,7 +50,7 @@ endmodule
 module cpl1(in0, in1, gnd, out0, out1);
 //  electrical i0, i1;
 //  electrical j0, j1;
-  parameter length;
+  parameter length=0 from [2:200];
   parameter R;
   parameter L;
   parameter G;
@@ -85,6 +86,7 @@ paramset cpl cpl1
  .G = g;
  .C = c;
  .k = k;
+ .length = length;
 endparamset
 
 paramset cpl cpl0
@@ -99,6 +101,7 @@ paramset cpl cpl0
  .G = g;
  .C = c;
  .k = k;
+ .length = 1;
 endparamset
 
 module main(in, out, ct );

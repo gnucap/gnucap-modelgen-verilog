@@ -5,14 +5,15 @@ options trsteporder 1
 options trtol 1
 
 module tln0(a, b);
+  parameter length=0 from [1:1];
   parameter R;
   parameter C;
   resistor #(.r(R)) r(a b);
 endmodule
 
 module tln1(a, b);
-  parameter length
-	parameter t1=0;
+  parameter length=0 from [2:200];
+  parameter t1=0;
   parameter R;
   parameter C;
   resistor #(.r(R)) r(a i);
@@ -35,6 +36,7 @@ paramset tln tln0
   parameter c=0;
  .R = r;
  .C = c;
+ .length = 1;
 endparamset
 
 module main(\1 , \2 );
