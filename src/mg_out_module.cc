@@ -517,7 +517,11 @@ static void make_tr_regress(std::ostream& o, const Module& m)
     o__ "for (int i=" << m.times()-1 << "; i>0; --i) {\n";
     o____ "assert(_time[i] < _time[i-1] || _time[i] == 0.);\n";
     o__ "}\n";
-    o__ "_time[0] = _sim->_time0;\n";
+    o__ "if(_time[0] != _sim->_time0){\n";
+    o____ "_v_ = _v_1;\n";
+    o____ "_time[0] = _sim->_time0;\n";
+    o__ "}else{ itested();\n";
+    o__ "}\n";
   }else{
   }
     // _y[i] = _y[i-1];
@@ -526,7 +530,6 @@ static void make_tr_regress(std::ostream& o, const Module& m)
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
-  o__ "_v_ = _v_1;\n";
   o__ "c->tr_regress_analog(this);\n";
   o << "}\n"
     "/*--------------------------------------"

@@ -1995,7 +1995,6 @@ inline void MOD_resistor::tr_regress()
   set_not_converged();
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
   assert(c);
-  _v_ = _v_1;
   c->tr_regress_analog(this);
 }
 /*--------------------------------------------------------------------------*/
@@ -3492,7 +3491,6 @@ inline void MOD_resistor::tr_regress()
   set_not_converged();
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
   assert(c);
-  _v_ = _v_1;
   c->tr_regress_analog(this);
 }
 /*--------------------------------------------------------------------------*/
@@ -5393,7 +5391,6 @@ inline void MOD_capacitor::tr_regress()
   set_not_converged();
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
-  _v_ = _v_1;
   c->tr_regress_analog(this);
 }
 /*--------------------------------------------------------------------------*/
@@ -6372,7 +6369,6 @@ inline void MOD_capacitor::tr_regress()
   set_not_converged();
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
-  _v_ = _v_1;
   c->tr_regress_analog(this);
 }
 /*--------------------------------------------------------------------------*/
