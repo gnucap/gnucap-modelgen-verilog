@@ -435,8 +435,9 @@ static void make_tr_restore(std::ostream& o, const Module& m)
   o << "inline void MOD_" << m.identifier() << "::tr_restore()\n{\n";
   o__ "BASE_SUBCKT::tr_restore();\n";
   if(m.times()){
-    o__ "for (int i=" << m.times()-1 << "; i>0; --i) {\n";
-    o____ "_time[i] = 0;\n";
+    o__ "if (_time[0] != _sim->_time0) {untested();\n";
+    o____ "error(bDANGER, \"//BUG// restore time mismatch.  last=%g, using=%g\\n\", _time[0], _sim->_time0);\n";
+    o__ "}else{\n";
     o__ "}\n";
   }else{
   }

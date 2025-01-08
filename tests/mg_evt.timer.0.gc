@@ -1,0 +1,40 @@
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+attach ./d_reject.so
+
+
+verilog
+
+`modelgen
+module test_evt_t0(p, n);
+	electrical p, n;
+	inout p, n;
+	(*desc=""*) real state;
+	analog begin
+		@(timer(0.001, 0.002)) begin
+			state = state+1.;
+      end
+	end
+endmodule
+
+list
+
+!make test_evt_t0.so > /dev/null
+attach ./test_evt_t0.so
+
+test_evt_t0    dut(\1 ,\0 );
+// reject #(.time(.9)) r();
+
+list
+
+print dc v(nodes) state(dut) iter(0)
+print tran v(1) state(dut) iter(0) control(0)
+// tran 3 basic
+dc
+//tran 0.005 0.001 basic trace i
+tran 0.013 0.0005 basic trace n
+tran 0 0.013 strobe={NA} basic trace n
+tran 0.019 strobe={NA} basic trace n
+
+end
