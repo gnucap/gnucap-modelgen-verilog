@@ -1,0 +1,39 @@
+
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+attach ./d_reject.so
+
+verilog
+
+`modelgen
+module test_init0();
+	parameter real period = 1.0, amplitude = 1.0;
+	(*desc="state"*) integer state;
+	(*desc="time"*) real t;
+
+	analog begin
+		@(timer(period, period)) begin
+			t = $abstime;
+		end
+	end
+endmodule
+
+
+
+list
+
+!make test_init0.so > /dev/null
+attach ./test_init0.so
+
+test_init0 #(.period(.5)) dut0();
+reject #(.time(2)) r();
+
+list
+
+print tran t(dut0) iter(0) control(0)
+tran 3 basic
+tran 0 1 .1 basic trace=n
+
+end
+

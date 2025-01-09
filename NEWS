@@ -2,6 +2,10 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
+202502**-dev
+============
+* static state reinitialisation fixed
+
 20241210-dev
 ============
 * initial user defined primitives

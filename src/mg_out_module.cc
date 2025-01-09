@@ -413,6 +413,7 @@ static void make_tr_begin(std::ostream& o, const Module& m)
     o__ "}\n";
   }else{
   }
+  o__ "_v_1 = _v_ = state_();\n";
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
