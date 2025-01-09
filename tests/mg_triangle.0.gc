@@ -1,0 +1,50 @@
+
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+attach ./d_reject.so
+
+verilog
+
+`modelgen
+module test_triangle0(p, n);
+	inout p,n;
+	electrical p,n;
+	parameter real period = 1.0, amplitude = 1.0;
+	(*desc="state"*) integer state;
+	(*desc="time"*) real t;
+
+	analog begin
+		@(timer(0., period)) begin
+			state = 1.;
+			t = $abstime;
+			$discontinuity;
+		end
+		@(timer(period/2., period)) begin
+			state = -1.;
+			t = $abstime;
+			$discontinuity;
+		end
+		if(0)$trace("time %g t %g\n", $abstime, t);
+		V(p, n) <+ amplitude*state* (4.*($abstime - t)/period - 1.);
+	end
+endmodule
+
+
+
+list
+
+!make test_triangle0.so > /dev/null
+attach ./test_triangle0.so
+
+test_triangle0 dut0(\1 ,\0 );
+reject #(.time(.9)) r();
+
+list
+
+print tran v(1) t(dut0) state(dut0) iter(0) control(0)
+tran 3 basic
+tran 0 3 .1 basic trace=n
+
+end
+
