@@ -98,6 +98,7 @@ private:
   bool has_tr_regress()const override { untested();return false;}
   bool has_tr_accept()const override {return true;}
   bool has_tr_begin()const override {return true;}
+  bool has_tr_restore()const override {return false;}
   bool static_code()const override {return false;}
   Token* new_token(Module& m, size_t na)const override{
     WRITE* cl = clone();

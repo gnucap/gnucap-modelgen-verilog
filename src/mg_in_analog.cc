@@ -210,7 +210,7 @@ void System_Task::parse(CS& f)
   }else{
   }
   if(function()->has_tr_restore()){
-    add_rdep(&tr_begin_tag);
+    add_rdep(&tr_restore_tag);
   }else{
   }
   if(function()->has_tr_review()){
@@ -686,12 +686,14 @@ bool AnalogProceduralAssignment::update()
  // trace1("AnalogProceduralAssignment::update1",  _a.data().size());
   trace1("AnalogProceduralAssignment::update1",  deps().size());
   ret |= propagate_rdep(&tr_begin_tag); // BUG. propagates across event block boundaries.
+  // ret |= propagate_rdep(&tr_restore_tag);
   if(is_state_var()){
     ret |= propagate_rdep(&tr_advance_tag);
+    ret |= propagate_rdep(&tr_accept_tag);
   }else{ untested();
   }
   return AnalogStmt::update() || ret;
-}
+} // AnalogProceduralAssignment::update()
 /*--------------------------------------------------------------------------*/
 void AnalogForStmt::dump(std::ostream& o)const
 {
@@ -1657,7 +1659,7 @@ bool AnalogEvtCtlStmt::update()
     _body.clear_vars();
     if ( _ctrl.update() ){ untested();
       ret = true;
-    }else if (_body.update()){ untested();
+    }else if (_body.update()){
       ret = true;
     }else{
       break;
@@ -2115,7 +2117,7 @@ void AnalogEvtExpression::set_rdeps()
     }else{
     }
     if(f->has_tr_restore()){
-      add_rdep(&tr_begin_tag);
+      add_rdep(&tr_restore_tag);
     }else{
     }
     if(f->has_tr_review()){

@@ -62,6 +62,7 @@ public:
   bool is_tr_review()const  { untested(); return _mode==modeTR_REVIEW; }
   bool is_tr_accept()const  { return _mode==modeTR_ACCEPT; }
   bool is_tr_advance()const  { untested(); return _mode==modeTR_ADVANCE; }
+  bool is_tr_restore()const { return _mode==modeTR_RESTORE; }
 public:
   void make_analog_list(std::ostream& o, const Module& m)const;
   void make_construct  (std::ostream& o, AnalogConstruct const& ab)const;
@@ -1110,9 +1111,9 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o,
     }
 
     if(is_tr_accept()) {
+      o << "& " << V.code_name() << "(m->_v_" << V.long_code_name() << "); // accept 1113\n";
       // TODO? assert post-accept values against _v_
-      o << " " << V.code_name() << "(m->_v_1" << V.long_code_name() << "); // accept 1113\n";
-    }else if(is_precalc()) {
+    }else if(is_precalc() || is_tr_restore()) {
       o << " " << V.code_name() << "(m->_v_" << V.long_code_name() << "); // precalc 1068\n";
     }else{
       o << "& " << V.code_name() << "(m->_v_" << V.long_code_name() << "); // (1068)\n";
@@ -1251,6 +1252,8 @@ static void make_cc_common_tr_advance(std::ostream& o, const Module& m)
   // o << "eval_t mode = m_TR_ADVANCE;\n";
   // o << "(void)mode;\n";
 
+  o__ "m->_v_1 = m->_v_;\n";
+
   OUT_ANALOG oo(OUT_ANALOG::modeTR_ADVANCE, &tr_advance_tag);
   oo.make_load_variables(o, m);
   oo.make_analog_list(o, m);
@@ -1264,6 +1267,15 @@ static void make_cc_common_tr_regress(std::ostream& o, const Module& m)
   o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
   o << "inline void COMMON_" << m.identifier() <<
     "::tr_regress_analog(MOD_" << m.identifier() << "* m) const\n{\n";
+
+#if 1 // revisit sweep ..
+  o__ "if(_sim->_phase == p_RESTORE) {untested();\n";
+  o____ "return;\n";
+  o__ "}else{\n";
+  o__ "}\n";
+#endif
+
+  o__ "m->_v_ = m->_v_1;\n";
 
   OUT_ANALOG oo(OUT_ANALOG::modeTR_REGRESS, &tr_advance_tag);
   oo.make_load_variables(o, m);
@@ -1331,6 +1343,9 @@ static void make_cc_common_tr_accept(std::ostream& o, const Module& m)
     "::tr_accept_analog(MOD_" << m.identifier() << "* m) const\n{\n";
 
   OUT_ANALOG oo(OUT_ANALOG::modeTR_ACCEPT, &tr_accept_tag);
+
+  o__ "m->_v_ = m->_v_1;\n"; // restore & replay
+
   oo.make_load_variables(o, m);
   oo.make_analog_list(o, m);
   o << "}\n"

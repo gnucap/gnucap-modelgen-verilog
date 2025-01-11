@@ -1892,6 +1892,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
 typedef MOD_resistor::ddouble ddouble;
 inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
 {
+  m->_v_1 = m->_v_;
   double& _v___i(m->_v_.___i); // (1068)
   (void) _v___i;
   MOD_resistor const* p = m;
@@ -1937,6 +1938,11 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
 typedef MOD_resistor::ddouble ddouble;
 inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
 {
+  if(_sim->_phase == p_RESTORE) {untested();
+    return;
+  }else{
+  }
+  m->_v_ = m->_v_1;
   double& _v___i(m->_v_.___i); // (1068)
   (void) _v___i;
   MOD_resistor const* p = m;
@@ -1984,6 +1990,10 @@ inline void MOD_resistor::tr_advance()
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
   assert(c);
   (void)c;
+  if(_sim->_phase == p_RESTORE) {untested();
+    return;
+  }else{
+  }
   set_not_converged();
   _v_1 = _v_;
   BASE_SUBCKT::tr_advance();
@@ -1993,6 +2003,11 @@ inline void MOD_resistor::tr_regress()
 {
   BASE_SUBCKT::tr_regress();
   set_not_converged();
+  q_eval();
+  if(_sim->_phase == p_RESTORE) {
+    return;
+  }else{
+  }
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
   assert(c);
   c->tr_regress_analog(this);
@@ -3304,6 +3319,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
 typedef MOD_resistor::ddouble ddouble;
 inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
 {
+  m->_v_1 = m->_v_;
   double& _v_i(m->_v_._i); // (1068)
   (void) _v_i;
   MOD_resistor const* p = m;
@@ -3391,6 +3407,11 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
 typedef MOD_resistor::ddouble ddouble;
 inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
 {
+  if(_sim->_phase == p_RESTORE) {untested();
+    return;
+  }else{
+  }
+  m->_v_ = m->_v_1;
   double& _v_i(m->_v_._i); // (1068)
   (void) _v_i;
   MOD_resistor const* p = m;
@@ -3480,6 +3501,10 @@ inline void MOD_resistor::tr_advance()
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
   assert(c);
   (void)c;
+  if(_sim->_phase == p_RESTORE) {untested();
+    return;
+  }else{
+  }
   set_not_converged();
   _v_1 = _v_;
   BASE_SUBCKT::tr_advance();
@@ -3489,6 +3514,11 @@ inline void MOD_resistor::tr_regress()
 {
   BASE_SUBCKT::tr_regress();
   set_not_converged();
+  q_eval();
+  if(_sim->_phase == p_RESTORE) {
+    return;
+  }else{
+  }
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
   assert(c);
   c->tr_regress_analog(this);
@@ -5295,6 +5325,7 @@ inline void COMMON_capacitor::tr_review_analog(MOD_capacitor* m) const
 /*--------------------------------------------------------------------------*/
 inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 {
+  m->_v_ = m->_v_1;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -5312,6 +5343,7 @@ inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
 {
+  m->_v_1 = m->_v_;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -5329,6 +5361,11 @@ inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
 typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
 {
+  if(_sim->_phase == p_RESTORE) {untested();
+    return;
+  }else{
+  }
+  m->_v_ = m->_v_1;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -5345,6 +5382,10 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
 /*--------------------------------------------------------------------------*/
 inline TIME_PAIR MOD_capacitor::tr_review()
 {
+  if(_sim->_phase == p_RESTORE) {
+    return _time_by;
+  }else{
+  }
   _time_by = BASE_SUBCKT::tr_review();
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
@@ -5361,6 +5402,11 @@ inline TIME_PAIR MOD_capacitor::tr_review()
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::tr_accept()
 {
+  if(_sim->_phase == p_RESTORE) {
+    return;
+  }else{
+  }
+  assert(_sim->_phase != p_RESTORE);
   trace1("capacitor::tr_accept", _sim->_time0);
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
@@ -5373,6 +5419,10 @@ inline void MOD_capacitor::tr_advance()
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
   (void)c;
+  if(_sim->_phase == p_RESTORE) {untested();
+    return;
+  }else{
+  }
   _accept = 0;
   if(_sim->_last_time == 0.){
   incomplete();
@@ -5389,6 +5439,11 @@ inline void MOD_capacitor::tr_regress()
 {
   BASE_SUBCKT::tr_regress();
   set_not_converged();
+  q_eval();
+  if(_sim->_phase == p_RESTORE) {
+    return;
+  }else{
+  }
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
   c->tr_regress_analog(this);
@@ -6273,6 +6328,7 @@ inline void COMMON_capacitor::tr_review_analog(MOD_capacitor* m) const
 /*--------------------------------------------------------------------------*/
 inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 {
+  m->_v_ = m->_v_1;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -6290,6 +6346,7 @@ inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
 {
+  m->_v_1 = m->_v_;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -6307,6 +6364,11 @@ inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
 typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
 {
+  if(_sim->_phase == p_RESTORE) {untested();
+    return;
+  }else{
+  }
+  m->_v_ = m->_v_1;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -6323,6 +6385,10 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
 /*--------------------------------------------------------------------------*/
 inline TIME_PAIR MOD_capacitor::tr_review()
 {
+  if(_sim->_phase == p_RESTORE) {
+    return _time_by;
+  }else{
+  }
   _time_by = BASE_SUBCKT::tr_review();
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
@@ -6339,6 +6405,11 @@ inline TIME_PAIR MOD_capacitor::tr_review()
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::tr_accept()
 {
+  if(_sim->_phase == p_RESTORE) {
+    return;
+  }else{
+  }
+  assert(_sim->_phase != p_RESTORE);
   trace1("capacitor::tr_accept", _sim->_time0);
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
@@ -6351,6 +6422,10 @@ inline void MOD_capacitor::tr_advance()
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
   (void)c;
+  if(_sim->_phase == p_RESTORE) {untested();
+    return;
+  }else{
+  }
   _accept = 0;
   if(_sim->_last_time == 0.){
   incomplete();
@@ -6367,6 +6442,11 @@ inline void MOD_capacitor::tr_regress()
 {
   BASE_SUBCKT::tr_regress();
   set_not_converged();
+  q_eval();
+  if(_sim->_phase == p_RESTORE) {
+    return;
+  }else{
+  }
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
   c->tr_regress_analog(this);

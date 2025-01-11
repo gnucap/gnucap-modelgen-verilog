@@ -180,6 +180,7 @@ void MGVAMS_FILTER::setup(Module* m)
       }else if(dynamic_cast<Variable_List_Collection const*>(b)){ untested();
       }else if(b == &tr_accept_tag) {
       }else if(b == &tr_begin_tag) {
+      }else if(b == &tr_restore_tag) {
       }else if(b == &tr_advance_tag) {
       }else{ untested();
 	trace1("xdt unknown?", c_cnt);

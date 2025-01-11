@@ -44,6 +44,11 @@ list
 
 print tran v(1) t(dut0) state(dut0) iter(0) control(0)
 tran 3 basic
+
+// now first step outcome looks odd, but is correct. The first timer event may
+// happen at a positive time, c.f. 5.10.3.3
+// either way, this hints at the need for analog initial blocks.
+
 tran 0 3 .1 basic trace=n
 
 end

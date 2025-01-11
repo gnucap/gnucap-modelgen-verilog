@@ -3,6 +3,8 @@ attach ./modelgen_1.so
 attach ../vams/vsine.so
 attach ./d_reject.so
 
+options dtmin=.01
+
 
 verilog
 
@@ -13,7 +15,7 @@ module test_timer3h(p, n);
 	(*desc=""*) real cnt, mytime;
 	analog begin
 		@(timer(mytime)) begin
-			$write("evt %g\n", $abstime);
+			$write("test event %g %g\n", $abstime, cnt);
 			mytime = $abstime + 1;
 			cnt = cnt + 1;
       end
@@ -27,14 +29,17 @@ list
 attach ./test_timer3h.so
 
 test_timer3h dut0(\1 ,\0 );
-reject #(.time(4.2)) r();
+reject #(.time(2.2)) r();
 
 list
 
-print dc v(nodes) iter(0)
 print tran v(1) mytime(dut0) iter(0) control(0)
 tran 4 basic
+delete dut0
+test_timer3h dut0(\1 ,\0 );
+print dc v(nodes) iter(0)
+print tran v(1) mytime(dut0) iter(0) control(0)
 dc
-tran 6 basic
+tran 0 4 .5 basic
 
 end

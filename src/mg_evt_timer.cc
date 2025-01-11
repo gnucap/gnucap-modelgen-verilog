@@ -109,14 +109,18 @@ private:
     make_tag(o);
 
     o__ "class cls" << _code_name << "{\n";
-    o____ "double _req_evt{0.};\n";
-    o____ "double _previous_evt{0.};\n";
+    o____ "double _req_evt{0.};\n"; // -NEVER?
+    o____ "double _previous_evt{-NEVER};\n";
     o____ "void set_event(MOD_" << _m->identifier() << "* d, double abstime, double abstol) {\n";
-    o______ "trace2(\"set_event\", _previous_evt, abstime);\n";
+    o______ "trace2(\"timer::set_event\", _previous_evt, abstime);\n";
+    o______ "assert(abstime> _sim->_time0);\n";
     o______ "double newtime = d->new_event(abstime, abstol);\n";
     o______ "trace3(\"set_event1\", _previous_evt, newtime,  _previous_evt - newtime);\n";
-    o______ "assert(_previous_evt <= newtime);\n"; // == at startup?
+    o______ "assert(_previous_evt <= newtime || _previous_evt == NEVER);\n"; // == at startup?
     o______ "_req_evt = newtime;\n";
+    o______ "trace3(\"timer::set_event1\", _previous_evt, newtime, _req_evt - _sim->_time0);\n";
+    o______ "assert(is_q(_sim->_time0));\n";
+    o______ "assert(is_q(_req_evt));\n";
     o____ "}\n";
     /*----------------------------------------------------------------------*/
     o__ "public:\n";
@@ -141,7 +145,7 @@ private:
    // o________ "tr_begin(d, delay, period, tol, en);\n"; // lost init event in "TRANSIENT::first"?
     o______ "}else{\n";
     o______ "}\n";
-    o______ "trace2(\"tr_eval1\", _req_evt, _sim->_time0);\n";
+    o______ "trace2(\"timer::tr_eval1\", _req_evt, _sim->_time0);\n";
     o______ "if (_req_evt < _sim->_time0){\n";
     o______ "}else if (_req_evt <= _sim->_time0 + _sim->_dtmin) {\n";
     o______ "}else{\n";
@@ -149,174 +153,336 @@ private:
     o______ "return false;\n";
     o____ "}\n";
     /*----------------------------------------------------------------------*/
+    o____ "bool tr_restore" << args() << " {\n";
+    o______ "(void)d;\n";
+    o______ "(void)period;\n";
+    o______ "(void)delay;\n";
+    o______ "(void)period;\n";
+    o______ "(void)tol;\n";
+    o______ "(void)en;\n"; // incomplete
+    o______ "if(_req_evt == NEVER){\n";
+    o______ "}else if(_req_evt == NEVER){\n";
+    o______ "}else if(_req_evt == _sim->_time0){\n";
+    o______ "}else{\n";
+    o________ "assert(_sim->_dtmin);\n";
+    o________ "_req_evt = std::round(_req_evt/_sim->_dtmin) * _sim->_dtmin;\n";
+    o______ "}\n";
+    o______ "assert(is_q(_req_evt));\n";
+    o______ "return true;\n";
+    o____ "}\n";
+    /*----------------------------------------------------------------------*/
     o____ "bool tr_begin" << args() << " {\n";
     o______ "(void)tol;\n";
     o______ "(void)en;\n"; // incomplete
-    o______ "_previous_evt = 0.;\n";
+    o______ "_previous_evt = -NEVER;\n"; // -NEVER?
+    o______ "_req_evt = 0.;\n"; // -NEVER?
     o______ "if(delay) {\n";
     o________ "_previous_evt = -NEVER;\n";
-    o________ "set_event(d, delay, 0);\n";
     o________ "trace2(\"timer::tr_begin2\", _sim->_time0, _req_evt - delay);\n";
     o______ "}else if(period){\n";
     o______ "}else{\n";
     o________ "incomplete();\n";
+    o________ "_previous_evt = 0;\n";
     o________ "_req_evt = NEVER;\n;";
     o________ "trace2(\"timer::tr_begin2c\", _req_evt, _previous_evt);\n";
     o______ "}\n";
+
+    // o________ "set_event(d, delay, 0);\n";
+    o______ "d->q_accept();\n"; // BUG. don't know where to put it.
+				// need to recover when omitted.
     o______ "return _previous_evt == 0.;\n";
     o____ "}\n";
     /*----------------------------------------------------------------------*/
-    o____ "bool tr_advance" << args() << " {\n";
+    o << "#ifndef NDEBUG\n";
+    o____ "bool is_q(double x) const {\n";
+    o______ "return !_sim->_dtmin || x==NEVER || x==-NEVER || std::round(x/_sim->_dtmin) * _sim->_dtmin == x;\n";
+    o____ "}\n";
+    o << "#endif\n";
+    /*----------------------------------------------------------------------*/
+    o____ "bool tr_advance" << args() << "const {\n";
     o______ "(void)tol;\n";
     o______ "(void)en;\n"; // incomplete
     o______ "trace3(\"timer::tr_advance\", _previous_evt, _req_evt, _sim->_time0);\n";
-    o______ "trace3(\"timer::tr_advance\", delay, period, _sim->_time0);\n";
-    o______ "_previous_evt = _req_evt;\n"; // consolidate previous "tr_accept"
-    o______ "if (_sim->_time0 < _req_evt) {\n";
-    o________ "return false;\n";
+    o______ "trace4(\"timer::tr_advance\", delay, period, _sim->_time0, d->_time[1]);\n";
+   // o______ "double time1 = d->_time[1];\n";
+    o______ "assert(_sim->_phase != p_RESTORE);\n";
+    o______ "assert(is_q(_sim->_time0));\n";
+    o______ "assert(is_q(_req_evt));\n";
+
+    o______ "if (_req_evt == NEVER) {\n";
+    o______ "}else if (_sim->_time0 < _req_evt) {\n";
+    o________ "trace2(\"timer::tr_advance not yet\", _sim->_time0, _req_evt);\n";
     o______ "}else if (_sim->_time0 <= _req_evt + " << accept_tol() << ") {\n";
-    o________ "d->q_accept();\n";
+    o________ "trace3(\"timer::tr_advance hit\", delay, period, _sim->_time0);\n";
     o________ "return true;\n";
-    o______ "}else if(d->_time[1] == 0. && _req_evt == 0.) {\n";
-    o________ "d->q_accept();\n";
-    o________ "return false;\n";
+    o______ "}else{\n";
+    o______ "}\n;";
+
+#if 0
+    o______ "if(d->_time[1] == 0. && _req_evt == 0.) {\n";
+    o________ "trace4(\"timer::tr_advance miss init\", delay, period, _sim->_time0, _previous_evt);\n";
+    o________ "incomplete();\n"; // needed?
     o______ "}else if(d->_time[1] <= _req_evt) {\n";
-    o________ "incomplete();\n";
+    o________ "trace3(\"timer::tr_advance 4\", delay, period, _sim->_time0);\n";
+    o________ "incomplete();\n"; // needed?
    // o________ "double tol_ratio = tol / _sim->_dtmin;\n";
    // o________ "throw Exception(to_string(_sim->_time0) + \" \" + d->long_label() + \" timer: giving up on advance at\""
    //           << " + to_string(_req_evt) + \", \" + to_string(tol_ratio));\n";
-    o________ "return false;\n";
     o______ "}else{\n";
-    o________ "return false;\n";
+    o________ "incomplete();\n";
     o______ "}\n";
-    o____ "}\n";
+#endif
+    o______ "return false;\n";
+    o____ "} // tr_advance\n";
     /*----------------------------------------------------------------------*/
     o____ "bool tr_regress" << args() << "{\n";
     o______ "(void)delay;\n";
     o______ "(void)period;\n";
     o______ "(void)tol;\n";
     o______ "(void)en;\n";
-    o______ "trace4(\"timer::tr_regress\", _previous_evt, _req_evt, _sim->_time0, _sim->_time0 - _previous_evt);\n";
-    o______ "_req_evt = _previous_evt;\n"; // consolidate previous "tr_accept"
-    o______ "if (d->_time[1] == 0. && _sim->_time0 < _previous_evt + _sim->_dtmin) {\n";
+   // o______ "return tr_advance(d, delay, period, tol, en);\n";
+    o______ "assert(_sim->_phase != p_RESTORE);\n";
+
+#if 0 // really?
+  o__ "if(_sim->_phase == p_RESTORE) {untested();\n";
+  o____ "return false;\n";
+  o__ "}else{untested();\n";
+  o__ "}\n";
+#endif
+    o______ "bool ret;\n";
+    o______ "trace4(\"timer::tr_regress\", _previous_evt, _req_evt, _sim->_time0, _sim->_dtmin);\n";
+   // o______ "_req_evt = _previous_evt;\n"; // consolidate previous "tr_accept"
+    o______ "if (d->_time[1] == 0. && _sim->_time0 < _previous_evt + _sim->_dtmin) { untested();\n";
     o________ "trace3(\"timer::tr_regress2\", _previous_evt, _req_evt, _sim->_time0);\n";
+    o______ "incomplete();\n"; // doesnt work
     o________ "_req_evt = NEVER; // _sim->_time0;\n";
-    o________ "_previous_evt = _sim->_time0;\n";
-    o________ "return true;\n";
+   // o________ "_previous_evt = _sim->_time0;\n"; not needed. only updating _prev in accept.
+    o________ "ret = true;\n";
     o______ "}else if (_sim->_time0 < _req_evt) {\n";
-    o________ "return false;\n";
-    o______ "}else if (_sim->_time0 <= _req_evt + " << accept_tol() << ") {\n";
-    o________ "return true;\n";
+    o________ "trace3(\"timer::tr_regress3\", _previous_evt, _req_evt, _sim->_time0);\n";
+    o________ "ret = false;\n";
+    o______ "}else if (_sim->_time0 <= _req_evt + " << accept_tol() << ") { untested();\n";
+    o________ "trace3(\"timer::tr_regress5\", _previous_evt, _req_evt, _sim->_time0);\n";
+    o________ "ret = true;\n";
     o______ "}else{\n";
-    o________ "return false;\n";
+    o________ "ret = false;\n";
     o______ "}\n";
-    o____ "}\n";
+
+#if 0 // unneeded?
+    o______ "if (_previous_evt != -NEVER) {\n";
+    o______ "}else if (_sim->_time0 <= _req_evt + 2.01*_sim->_dtmin + " << accept_tol() << ") {\n";
+    o______ "incomplete();\n"; // doesnt work.  mg_evt.analysis.0c.gc
+   //  o________ "_previous_evt = _req_evt;\n"; // it's as close as we get to it . breaks v_vpulse.0b.gc.diff
+    o________ "trace5(\"timer::tr_regress merge\", ret, _previous_evt, _req_evt, _sim->_time0, _sim->_time0 - _previous_evt);\n";
+    o______ "}else{ untested();\n";
+    o________ "trace5(\"timer::tr_regress3\", ret, _previous_evt, _req_evt, _sim->_time0, _sim->_time0 - _previous_evt);\n";
+    o______ "}\n";
+#endif
+
+    o______ "trace5(\"timer::tr_regress done\", ret, _previous_evt, _req_evt, _sim->_time0, _sim->_time0 - _previous_evt);\n";
+    o______ "assert(is_q(_sim->_time0));\n";
+    o______ "assert(is_q(_req_evt));\n";
+    o______ "return ret;\n";
+    o____ "} // tr_regress\n";
     /*----------------------------------------------------------------------*/
     o____ "bool tr_review" << args() << " {\n";
     o______ "(void)tol;\n";
     o______ "(void)en;\n";
-    o______ "trace3(\"timer::tr_review\", _req_evt, _sim->_time0, _sim->_dtmin);\n";
+    o______ "assert(_sim->_phase != p_RESTORE);\n";
 
-    o______ "if (_sim->_time0) {\n";
-    o______ "}else if (period || delay) {\n";
-    o________ "d->q_accept();\n"; // (A)
+    o______ "double next = next_event(delay, period, tol);\n";
+    o______ "trace4(\"timer::tr_review\", _sim->_time0, delay, period, next);\n";
+    o______ "trace3(\"timer::tr_review\", _req_evt, _sim->_time0, next);\n";
+    o______ "trace1(\"timer::tr_review\", _req_evt - _sim->_time0);\n";
+    o______ "assert(  _req_evt == _sim->_time0 || fabs( _req_evt - _sim->_time0) > 1e-18); // both quantised\n";
+    o______ "assert(is_q(_sim->_time0));\n";
+    o______ "assert(is_q(_req_evt));\n";
+
+    o______ "if (_sim->_time0 < _req_evt && _req_evt != NEVER) {\n";
+    o________ "trace3(\"timer::tr_review early\", _req_evt, _sim->_time0, next);\n";
+    o______ "}else if (_sim->_time0 <= _req_evt + " << accept_tol() << " && _req_evt != NEVER) {\n";
+    o________ "trace3(\"timer::tr_review hit\", _req_evt, _sim->_time0, next);\n";
+    o________ "d->q_accept();\n";
+    o______ "}else if(next < _previous_evt + " << accept_tol() << "){\n";
+    o________ "trace4(\"timer::tr_review norecover\", _previous_evt, _req_evt, _sim->_time0, next);\n";
+    o______ "}else if(_sim->_time0 < next - " << accept_tol() << "){\n";
+    o______ "}else if(_previous_evt == -NEVER && next < " << accept_tol() << ") { untested();\n";
+    o________ "trace4(\"timer::tr_review min_event0\", _previous_evt, _req_evt, _sim->_time0, next);\n";
+    o________ "d->_time_by.min_event(_sim->_dtmin);\n";
+    o________ "return false;\n";
     o______ "}else{\n";
+    o________ "trace4(\"timer::tr_review min_event2\", _previous_evt, _req_evt, _sim->_time0, next);\n";
+    o________ "d->_time_by.min_event(_previous_evt + _sim->_dtmin);\n";
+    o________ "return false;\n";
+    o______ "}\n";
+
+    o______ "if (next == NEVER) {\n";
+    o______ "}else if ( _sim->_time0 < _req_evt && next == _req_evt) {\n"; // needed?
+    o________ "trace3(\"timer::tr_review nop0\", _req_evt, _sim->_time0, _sim->_dtmin);\n";
+    o______ "}else if (_sim->_time0 < next && _req_evt == NEVER) {\n";
+    o________ "trace3(\"timer::tr_review qa\", _req_evt, _sim->_time0, _sim->_dtmin);\n";
+    o________ "d->q_accept();\n"; // stray event. mg_evt.3{h,i}.gc
+    o______ "}else if (next > _sim->_time0 && _req_evt > _sim->_time0) {\n";
+    o________ "trace3(\"timer::tr_review nop1\", _req_evt, _sim->_time0, _sim->_dtmin);\n";
+    o______ "}else if (next > _req_evt && next > _previous_evt) {\n";
+    o________ "d->q_accept();\n"; // mg_evt.analysis.0c.gc
+    o______ "}else if (next != _req_evt) {\n";
+  //  o________ "d->q_accept();\n";
+    o______ "}else{ untested();\n";
+    o________ "incomplete();\n";
+  //  o________ "_req_evt = next;\n";
     o______ "}\n";
 
     o______ "if (_sim->_time0 < _req_evt) {\n";
-    o________ "if (d->_time[1] == 0. && _sim->_time0 < _previous_evt + _sim->_dtmin) {\n";
-    o__________ "trace4(\"timer::tr_review0 close miss1\", _req_evt, _sim->_time0, delay, period);\n";
-    o__________ "d->q_accept();\n"; // (B), overlap with (A)?
-    o________ "}else if (_sim->_time0 + _sim->_dtmin > _req_evt) { untested();\n";
-    o__________ "trace4(\"timer::tr_review0 close miss\", _req_evt, _sim->_time0, delay, period);\n";
-    o________ "}else{\n";
-    o__________ "trace4(\"timer::tr_review0\", _req_evt, _sim->_time0, delay, period);\n";
-    o________ "}\n";
     o______ "}else if (_sim->_time0 <= _req_evt + " << accept_tol() << ") {\n";
-    o________ "trace2(\"timer::tr_review q accept\", _req_evt, _sim->_time0);\n";
-    o________ "d->q_accept();\n"; // (B), overlap with (A)?
+    o________ "trace2(\"timer::tr_review qa2\", _req_evt, _sim->_time0);\n";
+   //  o________ "d->q_accept();\n"; // (B), overlap with (A)?
     o______ "}else if(d->_time[1] == 0. && _req_evt == 0. && period && !delay) {\n";
+    // time[1]==0?
     o________ "double back_to = period;\n";
     o________ "trace3(\"timer::tr_review2\", _req_evt, _sim->_time0, back_to);\n";
     o________ "if (period < _sim->_time0) {\n";
+    o__________ "trace3(\"timer::tr_review min_event4\", _req_evt, _sim->_time0, back_to);\n";
     o__________ "d->_time_by.min_event(back_to);\n";
-    o__________ "_previous_evt = back_to;\n";
-    // o__________ "set_event(d, back_to, " << tol() << ");\n";
-    // o__________ "_previous_evt = _req_evt;\n";
+    o__________ "incomplete();\n";
+    o__________ "_previous_evt = back_to;\n"; //????
     o________ "}else{\n";
     o________ "}\n";
-    o______ "}else if(d->_time[1] == 0. && _req_evt == 0. && period && delay) {\n";
-    o________ "double back_to = delay;\n";
-    o________ "trace3(\"timer::tr_review2b\", _req_evt, _sim->_time0, back_to);\n";
-    o______ "}else if(d->_time[1] <= _req_evt) {\n";
-    o________ "trace4(\"timer::tr_review2a\", _req_evt, _sim->_time0, delay, period);\n";
-    o________ "double back_to = _previous_evt;\n";
-    o________ "trace2(\"timer::tr_review3\", period, delay);\n";
-    o________ "trace4(\"timer::tr_review3\", d->_time[1], _req_evt, _sim->_time0, back_to);\n";
-    o______ "}else if(_sim->_time0 == 0.) {\n";
-    // incomplete(); // analysis?
     o______ "}else{\n";
-    o________ "trace4(\"timer::tr_review err?\", _req_evt, _previous_evt, _sim->_time0, _sim->_dtmin);\n";
-    o________ "// scheduler issue?\n";
-    o________ "//throw Exception(to_string(_sim->_time0) + \" \" + d->long_label() + \" timer: giving up on review at\""
-              << " + to_string(_req_evt));\n";
     o______ "}\n";
+    o______ "assert(is_q(_req_evt));\n";
     o______ "return true;\n";
+    o____ "}\n";
+    /*----------------------------------------------------------------------*/
+    // compute time of next event from timer args and previous
+    o____ "double next_event(double td, double period, double tol)const {\n";
+    o______ "double ret;\n";
+    o______ "// assert(_sim->_time0 <= _req_evt + " << accept_tol() << ");\n";
+    o______ "if(_sim->analysis_is_static()) {\n";
+    o________ "if(td) {\n";
+    o__________ "return td;\n";
+    o________ "}else if(period) {\n";
+    o__________ "return period;\n";
+    o________ "}else{\n";
+    o__________ "return NEVER;\n";
+    o________ "}\n";
+    o______ "}else if(_sim->_time0 <= _previous_evt + 1.01*_sim->_dtmin + " << accept_tol() << ") {\n";
+    o________ "if(period) {\n";
+    o__________ "double raw_time = _sim->_time0 + 1.01*_sim->_dtmin + " << accept_tol() << ";\n";
+    o__________ "int tick = int(( raw_time - td) / period);\n"; // +dtmin?!
+    o__________ "return td + (tick+1)*period;\n";
+    o________ "}else if(_sim->_time0 < td - " << accept_tol() << ") {\n";
+    o__________ "return td;\n";
+    o________ "}else{\n";
+    o__________ "return NEVER;\n";
+    o________ "}\n";
+    o______ "}else{ // past previous\n";
+    o________ "assert(_sim->_time0 > _previous_evt);\n";
+    o________ "if(_sim->_time0 < td) {\n";
+    o__________ "ret = td;\n";
+    o________ "}else if(period) {\n"; // same as above?
+    o__________ "double raw_time = _sim->_time0 + " << accept_tol() << ";\n";
+    o__________ "int tick = int(( raw_time - td) / period);\n";
+    o__________ "ret = td + (tick+1)*period;\n";
+    o__________ "trace7(\"timer::next_event " << label() << " p2\", tol, _sim->_time0, raw_time, td, period, _previous_evt, ret);\n";
+    o________ "}else if(td < _sim->_time0 + " << accept_tol() << ") {\n";
+    o__________ "if(_previous_evt>0.) {\n";
+    o__________ "  ret = td;\n";
+    o__________ "}else{\n";
+    o__________ "  ret = NEVER;\n";
+    o__________ "}\n";
+    o________ "}else{ untested();\n";
+    o__________ "trace4(\"timer::next_event td2\", _sim->_time0, td, period, _previous_evt);\n";
+    o__________ "return NEVER;\n";
+    o________ "}\n";
+    o______ "}\n";
+    o______ "trace5(\"timer::next_event\", _sim->_time0, td, period, _previous_evt, ret);\n";
+    o______ "// assert(ret >= td);\n"; // no. < means need to go back.
+    o______ "trace6(\"timer::next_event done " << label() << "\", "
+                  "_sim->_time0, _req_evt, _previous_evt, ret, td, period);\n";
+    o______ "return ret;\n";
+    o____ "}\n";
+    /*----------------------------------------------------------------------*/
+    o____ "bool tr_accept_static" << args() << " {\n";
+    o______ "(void)tol;\n";
+    o______ "(void)en;\n"; // incomplete.
+    o______ "if(delay){\n";
+    o________ "_previous_evt = -NEVER;\n";
+    o________ "_req_evt = delay;\n";
+    o______ "}else if(period) {\n";
+    o________ "_previous_evt = 0.;\n";
+    o________ "_req_evt = period;\n";
+    o______ "}else{\n";
+    o________ "_previous_evt = -NEVER;\n";
+    o________ "_req_evt = NEVER;\n";
+    o______ "}\n";
+    o______ "if(_req_evt == NEVER) {\n";
+    o______ "}else if(_req_evt > _sim->_time0) {\n";
+    o________ "set_event(d, _req_evt, " << tol() << ");\n";
+    o______ "}\n";
+    o______ "if(!delay) {\n";
+    o________ "_previous_evt = 0.;\n";
+    o______ "}else{\n";
+    o______ "}\n";
+    o______ "trace6(\"timer::tr_accept done s\", _sim->_time0, _req_evt, _sim->_dtmin, _previous_evt, delay, _sim->analysis_is_static());\n";
+    o______ "assert(is_q(_sim->_time0));\n";
+    o______ "assert(is_q(_req_evt));\n";
+    o______ "return !delay;\n";
     o____ "}\n";
     /*----------------------------------------------------------------------*/
     o____ "bool tr_accept" << args() << " {\n";
     o______ "(void)tol;\n";
     o______ "(void)en;\n"; // incomplete.
-    o______ "trace3(\"timer::tr_accept\", _sim->_time0, delay, period);\n";
-    o______ "if(_sim->_time0 < _previous_evt) {\n";
-    o________ "return false; // not ours\n";
-    o______ "}else if(_sim->analysis_is_static()) {\n";
-    o________ "if(delay) {\n";
-    o__________ "set_event(d, delay, " << tol() << ");\n";
-    o__________ "return false;\n";
-    o________ "}else if(period) {\n";
-    o__________ "set_event(d, period, " << tol() << ");\n";
-    o________ "}else{\n";
-    o________ "}\n";
-    o________ "return true;\n";
-    o______ "}else if(_sim->_time0 <= _previous_evt + " << accept_tol() << ") {\n";
-    o________ "trace4(\"timer::tr_accept1\", _previous_evt, _req_evt, d->_time[1], _sim->_time0);\n";
-    o________ "if(period) {\n";
-    o__________ "double raw_time = _sim->_time0;\n";
-    o__________ "int tick = int(( raw_time - delay + _sim->_dtmin) / period);\n";
-    o__________ "set_event(d, delay + (tick+1)*period, " << tol() << ");\n";
-    o________ "}else if(delay > _sim->_time0) {\n";
-    o__________ "trace4(\"timer::tr_accept1a\", _previous_evt, _req_evt, d->_time[1], _sim->_time0);\n";
-    o__________ "set_event(d, delay, tol);\n"; // 3f?
-    // o__________ "_req_evt = NEVER;\n";
-    o________ "}else if(delay) {\n";
-    o__________ "trace4(\"timer::tr_accept1b\", _previous_evt, _req_evt, d->_time[1], _sim->_time0);\n";
- // o__________ "set_event(d, delay, tol);\n"; // 3f?
-    o__________ "_req_evt = NEVER;\n";
-    o________ "}else{\n";
-    o__________ "trace4(\"timer::tr_accept1c\", _previous_evt, _req_evt, d->_time[1], _sim->_time0);\n";
-    o________ "}\n";
-    o________ "return true;\n";
-    o______ "}else if(d->_time[1] == 0. && _req_evt == 0. && delay) {\n";
-    o________ "trace5(\"timer::tr_accept3a\", period, _previous_evt, _req_evt, d->_time[1], _sim->_time0);\n";
-    o________ "set_event(d, delay, " << tol() << ");\n";
-    o________ "return false;\n";
-    o______ "}else if(d->_time[1] == 0. && _req_evt == 0. && !delay && period) {\n";
-    o________ "trace5(\"timer::tr_accept3\", period, _previous_evt, _req_evt, d->_time[1], _sim->_time0);\n";
-    o________ "if (period < _sim->_time0){\n";
-                 // too late
-    o________ "}else{\n";
-    o__________ "set_event(d, period, " << tol() << ");\n";
-    o__________ "trace5(\"timer::tr_accept3b\", period, _previous_evt, _req_evt, d->_time[1], _sim->_time0);\n";
-    o________ "}\n";
-    o________ "return false;\n";
+    o______ "assert(_sim->_phase != p_RESTORE);\n";
+    o______ "bool ret = false;\n";
+    o______ "trace4(\"timer::tr_accept\", _sim->_time0, delay, period, _sim->analysis_is_static());\n";
+    o______ "trace3(\"timer::tr_accept\", _sim->_time0, _previous_evt, _req_evt);\n";
+
+    // check if this one was requested.
+    o______ "if(_sim->analysis_is_static()) {\n";
+    o________ "return tr_accept_static(d, delay, period);\n";
+    o______ "}else if(_sim->_time0 < _req_evt){\n";
+    o______ "}else if(_sim->_time0 <= _req_evt + " << accept_tol() << ") {\n";
+    o________ "ret = true;\n";
     o______ "}else{\n";
-    o________ "trace3(\"timer::tr_accept miss\", _previous_evt, _req_evt, _sim->_time0);\n";
-    o________ "trace1(\"timer::tr_accept miss\", _previous_evt - _sim->_time0);\n";
-    o________ "trace1(\"timer::tr_accept miss\", _req_evt - _sim->_time0);\n";
-    o________ "return false;\n";
     o______ "}\n";
-    o____ "}\n";
+
+    o______ "if (ret){\n;";
+    o________ "// make the requested time permanent\n";
+    o________ "_previous_evt = _req_evt;\n";
+    o______ "}else{\n";
+    o______ "}\n";
+
+    o______ "double re = next_event(delay, period, tol);\n";
+    o______ "assert(re >= delay);\n";
+
+    o______ "if(re == NEVER) {\n";
+    o________ "_req_evt = NEVER;\n";
+    o______ "}else if(_sim->_time0 < re - " <<  accept_tol() << ") {\n";
+    o________ "trace4(\"timer::tr_accept re nohit?\", _sim->_time0, _req_evt, _previous_evt,  re);\n";
+    o________ "_req_evt = re;\n"; // new event, quantize below.
+    o________ "if(ret){\n";
+    o________ "}else{\n";
+    o________ "}\n";
+    o______ "}else{\n";
+    o______ "}\n";
+
+    o______ "if(_req_evt == NEVER) {\n";
+    o________ "// assert(ret);\n";
+    o______ "}else if(_sim->_time0 < _req_evt + " << accept_tol() << ") {\n";
+    o________ "set_event(d, _req_evt, " << tol() << ");\n";
+    o______ "}else{\n";
+    o________ "trace6(\"timer::tr_accept bogus?\", _sim->_time0, _req_evt, _previous_evt, ret, re, _sim->analysis_is_static());\n";
+    o________ "assert(  _req_evt == _sim->_time0 || fabs( _req_evt - _sim->_time0) > 1e-18); // both quantised\n";
+    o______ "}\n";
+
+    o______ "trace6(\"timer::tr_accept done " << label() << "\", "
+                  "_sim->_time0, _req_evt, _previous_evt, ret, re, _sim->analysis_is_static());\n";
+    o______ "assert(is_q(_sim->_time0));\n";
+    o______ "assert(is_q(_req_evt));\n";
+
+    o______ "return ret;\n";
+    o____ "} // tr_accept\n";
     /*----------------------------------------------------------------------*/
     o__ "}"<< _code_name <<";\n";
   }

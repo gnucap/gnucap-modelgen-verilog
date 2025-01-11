@@ -13,6 +13,7 @@ module test_timer3g(p, n);
 	(*desc=""*) real state;
 	analog begin
 		@(timer(0, 1)) begin
+			if(0) $trace("timer %g\n", $abstime);
 			if(state == 0)	begin
 				if(0) $trace("time on %g\n", $abstime);
 				state = 1.;

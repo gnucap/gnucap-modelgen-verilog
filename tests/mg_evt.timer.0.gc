@@ -14,6 +14,7 @@ module test_evt_t0(p, n);
 	analog begin
 		@(timer(0.001, 0.002)) begin
 			state = state+1.;
+			if(0) $trace("state %g", state);
       end
 	end
 endmodule

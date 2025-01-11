@@ -13,7 +13,7 @@ module dep7(a, g);
     if ((V(g) > 1)) begin : b0
       // t : 0
       real t;
-      t = 4; // s1 r2
+      t = 4; // s1 r3
     end
     else begin
       // d : 1
@@ -25,7 +25,7 @@ module dep7(a, g);
         // f : 1
         real f;
         I(g) <+ d; // dep: _potential_b_a_ s3 r1
-        f = d; // dep: _potential_b_a_ s4 r2
+        f = d; // dep: _potential_b_a_ s4 r3
       end
       else begin
         I(g) <+ 1; // r1
@@ -52,7 +52,7 @@ module dep7p(a, g);
     if ((V(g) > 1)) begin : b0
       // t : 0
       real t;
-      t = 4; // s1 r2
+      t = 4; // s1 r3
     end
     else begin
       // d : 1
@@ -64,7 +64,7 @@ module dep7p(a, g);
         // f : 1
         real f;
         I(g) <+ d; // dep: _potential_b_a_ s3 r1
-        f = d; // dep: _potential_b_a_ s4 r2
+        f = d; // dep: _potential_b_a_ s4 r3
       end
       else begin
         I(g) <+ 1; // r1

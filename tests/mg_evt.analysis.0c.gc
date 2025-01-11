@@ -13,9 +13,10 @@ module test_evtana0c(p, n);
 	real v;
 	analog begin
 		if(analysis("static")) begin
-			$debug("static %g\n", $abstime);
+			$trace("static %g\n", $abstime);
 			v = .4;
 		end else begin
+			if(0) $trace("not static %g\n", $abstime);
 			@(timer(0., .5)) begin
 				v = 1;
 				cnt = cnt + 1;
@@ -36,6 +37,6 @@ test_evtana0c dut0(\1 ,\0 );
 list
 
 print tran cnt(dut0) v(1) control(0) iter(0)
-tran 1 basic
+tran 2 basic trace n
 
 end

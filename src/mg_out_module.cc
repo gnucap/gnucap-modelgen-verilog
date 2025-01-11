@@ -442,6 +442,12 @@ static void make_tr_restore(std::ostream& o, const Module& m)
     o__ "}\n";
   }else{
   }
+#if 0 // revisit sweep ..
+  o__ "if(_sim->_phase == p_RESTORE) {untested();\n";
+  o____ "return;\n";
+  o__ "}else{untested();\n";
+  o__ "}\n";
+#endif
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
@@ -466,6 +472,14 @@ static void make_tr_advance(std::ostream& o, const Module& m)
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
   o__ "(void)c;\n";
+
+#if 1 // revisit sweep ..
+  o__ "if(_sim->_phase == p_RESTORE) {untested();\n";
+  o____ "return;\n";
+  o__ "}else{\n";
+  o__ "}\n";
+#endif
+
   if(m.has_tr_accept()){
     o__ "_accept = 0;\n"; // also in regress?
   }else{
@@ -519,14 +533,22 @@ static void make_tr_regress(std::ostream& o, const Module& m)
     o____ "assert(_time[i] < _time[i-1] || _time[i] == 0.);\n";
     o__ "}\n";
     o__ "if(_time[0] != _sim->_time0){\n";
-    o____ "_v_ = _v_1;\n";
     o____ "_time[0] = _sim->_time0;\n";
     o__ "}else{ itested();\n";
     o__ "}\n";
   }else{
   }
+
+//  o____ "_v_ = _v_1;\n";
     // _y[i] = _y[i-1];
   o__ "set_not_converged();\n";
+  o__ "q_eval();\n";
+#if 1 // revisit sweep ..
+  o__ "if(_sim->_phase == p_RESTORE) {\n";
+  o____ "return;\n";
+  o__ "}else{\n";
+  o__ "}\n";
+#endif
 
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
@@ -540,6 +562,12 @@ static void make_tr_regress(std::ostream& o, const Module& m)
 static void make_tr_review(std::ostream& o, const Module& m)
 {
   o << "inline TIME_PAIR MOD_" << m.identifier() << "::tr_review()\n{\n";
+#if 1
+  o__ "if(_sim->_phase == p_RESTORE) {\n";
+  o____ "return _time_by;\n";
+  o__ "}else{\n";
+  o__ "}\n";
+#endif
 #if 0
   if(m.has_analysis()){ untested();
     o << "if(_sim->analysis_is_tran_static()){ untested();\n";
@@ -576,6 +604,13 @@ static void make_tr_review(std::ostream& o, const Module& m)
 static void make_tr_accept(std::ostream& o, const Module& m)
 {
   o << "inline void MOD_" << m.identifier() << "::tr_accept()\n{\n";
+#if 1
+  o__ "if(_sim->_phase == p_RESTORE) {\n";
+  o____ "return;\n";
+  o__ "}else{\n";
+  o__ "}\n";
+#endif
+  o__ "assert(_sim->_phase != p_RESTORE);\n";
   o__ "trace1(\"" << m.identifier() <<"::tr_accept\", _sim->_time0);\n";
 
   o__ "COMMON_" << m.identifier() << " const* c = "

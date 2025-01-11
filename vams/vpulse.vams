@@ -18,8 +18,9 @@ module vpulse(p, n);
 	parameter real period=2.;
 	(*desc="i"*) real i;
 	(*desc="v"*) real v;
+	(*desc="vrect"*) real vrect; // for debugging only.
 	analog begin : pulse
-		real vrect;
+		// real vrect;
 		begin : evt
 			@(timer(td + width + rise, period)) begin
 				vrect = val0;

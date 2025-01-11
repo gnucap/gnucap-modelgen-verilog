@@ -12,7 +12,7 @@ time0 0.02 0
 time0 0.51 0
  0.51       0.         0.         4.        
 @tr_advance:timer 1 0
-@tr_accept:timer 1 1
+@tr_accept:timer 1 0
 time0 1 1
  1.         1.         1.         2.        
 time0 2 1

@@ -15,7 +15,7 @@ module dep0(d, g);
       c = T; // dep: _potential_b_g_ s3 r4
       T = V(g); // dep: _potential_b_g_ s1 r4
     end
-    d = c; // dep: _potential_b_g_ s5 r2
+    d = c; // dep: _potential_b_g_ s5 r3
   end
 
 endmodule
