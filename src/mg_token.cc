@@ -1363,7 +1363,7 @@ std::string Token_PORT_BRANCH::code_name() const
 std::string Token_VAR_REF::long_code_name() const
 {
   std::string s = scope()->long_code_name();
-  return "_v_" + s + "._"+ name();
+  return s + "._"+ name();
 }
 /*--------------------------------------------------------------------------*/
 bool Token_VAR_REF::is_state_var() const

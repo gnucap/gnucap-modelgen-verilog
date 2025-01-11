@@ -1070,10 +1070,10 @@ static void make_one_variable_proxy(std::ostream& o, Token_VAR_REF const& V)
   o____ "_V_" << V.name() << "(_V_" << V.name() << " const& p) : ddouble(p), _m(nullptr) {}\n";
   o____ "explicit _V_" << V.name() << "() : ddouble(), _m(nullptr) {set_all_deps();}\n";
   o____ "_V_" << V.name() << "(MOD__* m) : "
-    << "ddouble(m->" << V.long_code_name() << "), _m(m) {}\n";
+    << "ddouble(m->_v_" << V.long_code_name() << "), _m(m) {}\n";
   o____ "~_V_" << V.name() << "() {\n";
   o______ "if(_m){\n";
-  o________ "_m->" << V.long_code_name() << " = value();\n";
+  o________ "_m->_v_" << V.long_code_name() << " = value();\n";
   o______ "}else{\n";
   o______ "}\n";
   o____ "}\n";
@@ -1109,18 +1109,20 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o,
       unreachable();
     }
 
-    if(is_precalc() || is_tr_accept()) {
-      o << " " << V.code_name() << "(m->" << V.long_code_name() << "); // precalc 1068\n";
+    if(is_tr_accept()) {
+      o << " " << V.code_name() << "(m->_v_" << V.long_code_name() << "); // accept 1113\n";
+    }else if(is_precalc()) {
+      o << " " << V.code_name() << "(m->_v_" << V.long_code_name() << "); // precalc 1068\n";
     }else{
-      o << "& " << V.code_name() << "(m->" << V.long_code_name() << "); // (1068)\n";
+      o << "& " << V.code_name() << "(m->_v_" << V.long_code_name() << "); // (1068)\n";
     }
     o__ "(void) " << V.code_name() << ";\n";
   }else if(V.type().is_int()) {
-    o__ "int& " << V.code_name() << "(d->" << V.long_code_name() << ");\n";
+    o__ "int& " << V.code_name() << "(d->_v_" << V.long_code_name() << ");\n";
   }else if(V.type().is_real()) {
     if(V.deps().ddeps().size() == 0){
       if(dynamic_cast<Module const*>(V.scope())) {
-	o__ "double& " << V.code_name() << "(d->" << V.long_code_name() << "); // (823)\n";
+	o__ "double& " << V.code_name() << "(d->_v_" << V.long_code_name() << "); // (823)\n";
       }else{
 	o__ "// tmp block proxy (823b)\n";
 	make_one_variable_proxy(o, V);
@@ -1129,7 +1131,7 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o,
     }else if(options().optimize_deriv()) {
       make_one_variable_proxy(o, V);
       o << V.code_name() << "(d);\n";
-    }else{itested();
+    }else{untested();
       o__ "ddouble " << V.code_name() << "(d->" << V.code_name() << "); // (828)\n";
     }
   }else{ untested();

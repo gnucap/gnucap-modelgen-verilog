@@ -1,27 +1,33 @@
 test_evt3a #() dut0 (.p(\1 ),.n(\0 ));
 #Time       cnt(dut0)  iter(0)   
-timerd 0
-timer0 0
-timer1 0
+@tr_begin:timerd 0 0
+@tr_accept:timerd 0 1
+timer0 0 1
+timer1 0 2
  0.         1.         2.        
  0.1        1.         2.        
-timerd 2
-timer0 2
-timer1 2
+@tr_advance:timerd 2 1
+@tr_accept:timerd 2 2
+timer0 2 2
+timer1 2 3
  2.         2.         2.        
-timerd 4
-timer0 4
-timer1 4
+@tr_advance:timerd 4 2
+@tr_accept:timerd 4 3
+timer0 4 3
+timer1 4 4
  4.         3.         2.        
-timerd 6
-timer0 6
-timer1 6
+@tr_advance:timerd 6 3
+@tr_accept:timerd 6 4
+timer0 6 4
+timer1 6 5
  6.         4.         2.        
-timerd 8
-timer0 8
-timer1 8
+@tr_advance:timerd 8 4
+@tr_accept:timerd 8 5
+timer0 8 5
+timer1 8 6
  8.         5.         2.        
-timerd 10
-timer0 10
-timer1 10
+@tr_advance:timerd 10 5
+@tr_accept:timerd 10 6
+timer0 10 6
+timer1 10 7
  10.        6.         2.        
