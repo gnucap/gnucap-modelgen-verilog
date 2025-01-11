@@ -1110,7 +1110,8 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o,
     }
 
     if(is_tr_accept()) {
-      o << " " << V.code_name() << "(m->_v_" << V.long_code_name() << "); // accept 1113\n";
+      // TODO? assert post-accept values against _v_
+      o << " " << V.code_name() << "(m->_v_1" << V.long_code_name() << "); // accept 1113\n";
     }else if(is_precalc()) {
       o << " " << V.code_name() << "(m->_v_" << V.long_code_name() << "); // precalc 1068\n";
     }else{
