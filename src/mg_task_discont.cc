@@ -63,8 +63,11 @@ private:
     //o__ "struct cls" << label() << "{\n";
 
     //template?
-    o____ "void "<<n<<"tr_eval(int i=0)const {}\n";
+    o____ "void "<<n<<"tr_eval(int i=0)const {\n";
+    o______ "(void)i;\n";
+    o____ "}\n";
     o____ "void "<<n<<"tr_review(int i=0) {\n";
+    o______ "(void)i;\n";
     o______ "q_accept();\n";
     o____ "}\n";
     o____ "void "<<n<<"tr_accept(int i=0)const {\n";
@@ -74,8 +77,8 @@ private:
     o______ "_sim->new_event(_sim->_time0 + _sim->_dtmin);\n";
     o____ "}\n";
     // o__ "}_" << label() << ";\n";
-    o__ "void "<<n<<"precalc(int i=0) const";
-    o << "{\n";
+    o__ "void "<<n<<"precalc(int i=0)const {\n";
+    o____ "(void)i;\n";
     o__ "}\n";
   }
   std::string code_name()const override{
