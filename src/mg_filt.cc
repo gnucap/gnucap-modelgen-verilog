@@ -59,6 +59,8 @@ class XDT : public MGVAMS_FILTER {
   Module* _m{nullptr};
   Probe const* _prb{nullptr};
   std::string _code_name;
+protected:
+  std::string raw_code_name()const {return _code_name;}
 public: // HACK
   Branch* _br{nullptr};
   Node_Ref _p;
@@ -80,6 +82,7 @@ protected:
   std::string code_name()const override{
     return "/*XDT*/ d->" + _code_name;
   }
+  virtual int max_args()const = 0;
 public:
   Token* new_token(Module& m, size_t na)const override {
     assert(na != size_t(-1));
@@ -90,7 +93,7 @@ public:
     {
       cl->set_label(filter_code_name); // label()); // "_b_" + filter_code_name);
       cl->set_code_name("_b_" + filter_code_name);
-      if(na<3){
+      if(int(na) < max_args()) {
       }else{
 	incomplete();
 	error(bDANGER, "too many arguments\n");
@@ -127,7 +130,10 @@ public:
     make_tag(o);
     o__ "ddouble " << _code_name << "__precalc(";
       std::string comma;
-      assert(num_args() < 3);
+      if(num_args() > 4) {
+	incomplete();
+      }else{
+      }
       for(size_t n=0; n<num_args(); ++n){
 	o << comma << "ddouble";
 	comma = ", ";
@@ -147,7 +153,6 @@ public:
   void make_cc_dev(std::ostream& o)const override{
     o__ "ddouble " << _code_name << "(";
       std::string comma;
-      assert(num_args() < 3);
       for(size_t n=0; n<num_args(); ++n){
 	o << comma << "ddouble t" << n;
 	comma = ", ";
@@ -202,6 +207,7 @@ public:
   DDT* clone()const override{
     return new DDT(*this);
   }
+  int max_args()const override {return 3;}
 private:
   void make_assign(std::ostream& o)const override{
     std::string cn = _br->code_name();
@@ -224,6 +230,13 @@ public:
     return new IDT(*this);
   }
 
+public:
+  bool has_modes()const override {return true;}
+  bool has_tr_begin()const override {return true;}
+  bool has_tr_review()const override {return true;}
+  bool has_tr_accept()const override {return num_args()>2;}
+  bool has_tr_advance()const override {return false;}
+
 private:
   void make_assign(std::ostream& o)const override {
     make_tag(o);
@@ -239,6 +252,99 @@ private:
     }
     o__ "assert(t0 == t0);\n";
   }
+  void args(std::ostream& o)const {
+    std::string comma;
+    for(size_t n=0; n<num_args(); ++n){
+      o << comma << "ddouble t" << n;
+      comma = ", ";
+    }
+  }
+  void argnames(std::ostream& o)const {
+    std::string comma;
+    for(size_t n=0; n<num_args(); ++n){
+      o << comma << "t" << n;
+      comma = ", ";
+    }
+  }
+  void make_cc_dev(std::ostream& o)const override{
+    XDT::make_cc_dev(o);
+    std::string comma;
+/*--------------------------------------------------------------------------*/
+    comma = "";
+    o__ "ddouble " << raw_code_name() << "tr_eval("; args(o); o << "){\n";
+    o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
+    o__ "}\n";
+    o__ "ddouble " << raw_code_name() << "tr_advance("; args(o); o << "){\n";
+    o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
+    o__ "}\n";
+    o__ "ddouble " << raw_code_name() << "tr_regress("; args(o); o << "){\n";
+    o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
+    o__ "}\n";
+/*--------------------------------------------------------------------------*/
+    comma = "";
+    o__ "ddouble " << raw_code_name() << "tr_accept(";
+      for(size_t n=0; n<num_args(); ++n){
+	o << comma << "ddouble t" << n;
+	comma = ", ";
+      }
+    o << ") {\n";
+    if(num_args()>2){
+      o____ "std::string tmp;\n";
+      std::string cn = _br->code_name();
+      o____ "((COMPONENT*)" << cn << ")->set_param_by_index(123456, tmp, int(t2));\n";
+    }else{
+    }
+    if(num_args()>1){
+      o__ "(void)t0;\n";
+      o__ "(void)t1;\n";
+    }else if(num_args()>0){
+      o__ "(void)t0;\n";
+    }else{
+    }
+    o____ "return 0.;\n";
+    o__ "}\n";
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+    comma = "";
+    o__ "ddouble " << raw_code_name() << "tr_review(";
+      for(size_t n=0; n<num_args(); ++n){
+	o << comma << "ddouble";
+	comma = ", ";
+      }
+    o << "){\n";
+    if(num_args()>2){
+      o____ "q_accept();\n";
+    }else{
+    }
+
+    o____ "return 0.;";
+    o__ "}\n";
+/*--------------------------------------------------------------------------*/
+    comma = "";
+    o__ "ddouble " << raw_code_name() << "precalc(";
+      if(num_args() > 4) {
+	incomplete();
+      }else{
+      }
+      for(size_t n=0; n<num_args(); ++n){
+	o << comma << "ddouble t" << n;
+	comma = ", ";
+      }
+    o << "){\n";
+    o____ "return " << raw_code_name() << "__precalc(";
+    comma = "";
+      if(num_args() > 4) {
+	incomplete();
+      }else{
+      }
+      for(size_t n=0; n<num_args(); ++n){
+	o << comma << "t" << n;
+	comma = ", ";
+      }
+    o << ");\n";
+    o__ "}\n";
+  }
+  int max_args()const override {return 4;}
 } idt;
 DISPATCHER<FUNCTION>::INSTALL d_idt(&function_dispatcher, "idt", &idt);
 /*--------------------------------------------------------------------------*/
@@ -321,6 +427,10 @@ void Token_XDT::stack_op(Expression* e)const
 
   if(args){
     RDeps rr;
+    if(func->has_tr_accept()){
+      rr.insert(&tr_accept_tag);
+    }else{
+    }
     rr.insert(func->prb()->branch());
     trace1("Token_XDT::stackop 4", args->size());
     args->update(&rr); // bug. more generic path.
@@ -365,6 +475,13 @@ void XDT::make_cc_impl(std::ostream&o) const
     comma = ", ";
   }
   o << ")\n{\n";
+  if(num_args()>2) {
+    o__ "(void)t1;\n";
+    o__ "(void)t2;\n";
+  }else if(num_args()>1) {
+    o__ "(void)t1;\n";
+  }else{
+  }
   if(has_refs()) {
     o__ "MOD_" << id << "* d = this;\n";
     o__ "typedef MOD_" << id << " MOD;\n";

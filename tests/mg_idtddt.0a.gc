@@ -6,7 +6,7 @@ verilog
 options noincmode nobypass
 
 `modelgen
-module test_idtddt0(p, n);
+module test_idtddt0a(p, n);
 	(* desc="" *) real d;
 	(* desc="" *) real i;
 	electrical p, n;
@@ -22,12 +22,12 @@ module test_idtddt0(p, n);
 	end
 endmodule
 
-!make test_idtddt0.so > /dev/null
-attach ./test_idtddt0.so
+!make test_idtddt0a.so > /dev/null
+attach ./test_idtddt0a.so
 
 verilog
 
-test_idtddt0 #() d0(\2 ,\0 );
+test_idtddt0a #() d0(\2 ,\0 );
 resistor #(1.) r(\1 ,\2 )
 vsine #(.offset(-1) .phase(-3.1415/2.), .ampl(1)) v1(\1 , \0 );
 

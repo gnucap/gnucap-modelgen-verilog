@@ -1,0 +1,36 @@
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_idt3a(p, n);
+	electrical p, n;
+	integer rst;
+	analog begin
+		rst = 0;
+		@(timer(1, 1)) begin
+			rst = 1;
+			$discontinuity();
+		end
+		V(p, n) <+ idt(1.0, 0, rst);
+	end
+endmodule
+
+!make test_idt3a.so > /dev/null
+attach ./test_idt3a.so
+
+verilog
+
+test_idt3a #() dut(a ,\0 );
+
+list
+
+print tran v nodes
+print tran + iter(0) control(0)
+tran .1 3
+
+tran 0 3 strobe={NA} trace n
+
+status notime
+end

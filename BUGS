@@ -9,11 +9,13 @@
 - string type is missing (breaks "%s" in strobe etc.).
 - cleanup hack breaks detach_all
 - `default_transision missing, and some step control
+- bogus error message on wrong filter args
 
 == simulator plugins
 - "ground" statement not implemented.
-- still missing tiebreak rules in overload
+- missing localparam rules in overload
 - paramset: requires newlines, v_paramset.2a.gc
+- not (yet) instanciating unused modules
 
 == libgnucap, TODO
 - need NODE_P, discrete nodes
@@ -23,6 +25,5 @@
 
 == fixed, presumably. recheck.
 - analysis("ic"): need more testing
-- c_pulse.so: obsolete hack, need discontinuities.
 - event control is incomplete
 - llvm build: sometimes crashes during shutown

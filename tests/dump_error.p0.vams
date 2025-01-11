@@ -1,0 +1,18 @@
+`include "sub/disciplines.few"
+
+// using port in idt.
+// BUG bogus error message
+
+module test_errp0(p, q, r, s, n);
+	(* desc="" *) real d;
+	(* desc="" *) real i;
+	electrical p, n;
+	analog begin
+		d = V(p,n);
+		i = idt(d, \0 );
+		I(q,n) <+ i;
+
+		I(r,n) <+ idt(d, 0. ) + V(r,n);
+		I(s,n) <+ laplace_nd(V(p, n), '{1.}, '{0., 1.}) + V(s,n);
+	end
+endmodule

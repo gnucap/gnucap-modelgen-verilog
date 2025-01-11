@@ -1,4 +1,3 @@
-too many arguments
 module timer_test(out);
   output out;
   electrical out;

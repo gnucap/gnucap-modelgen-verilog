@@ -243,6 +243,7 @@ bool DEV_CPOLY_CAP::tr_needs_eval()const
 }
 /*--------------------------------------------------------------------------*/
 class DEV_IDT : public DEV_CPOLY_CAP {
+  bool _reset{false};
 private:
   explicit DEV_IDT(const DEV_IDT& p)
     :DEV_CPOLY_CAP(p) {}
@@ -259,6 +260,16 @@ private: // override virtual
   void	   tr_advance()override;
   void	   ac_load()override;
   TIME_PAIR tr_review()override;
+public:
+  void set_param_by_index(int i, std::string& v, int j)override {
+    trace2("DEV_IDT reset", long_label(), _sim->_time0);
+    if(i==123456){
+      // BUG. need node_p or something to pass signals.
+      _reset = j;
+    }else{ untested();
+      return DEV_CPOLY_CAP::set_param_by_index(i, v, j);
+    }
+  }
 }p1;
 DISPATCHER<CARD>::INSTALL
   d1(&device_dispatcher, "va_idt", &p1);
@@ -502,6 +513,14 @@ void DEV_IDT::tr_begin()
 /*--------------------------------------------------------------------------*/
 void DEV_IDT::tr_advance()
 {
+  if(_reset){
+    trace2("DEV_IDT::tr_advance reset", long_label(), _sim->_time0);
+    _reset = false;
+    _i[0] = _i[1] = FPOLY1(0., 0., 0.);
+  }else{
+    trace2("DEV_IDT::tr_advance no reset", long_label(), _sim->_time0);
+  }
+
   trace2("DEV_IDT::tr_advance", long_label(), _sim->_time0);
   STORAGE::tr_advance();
 
