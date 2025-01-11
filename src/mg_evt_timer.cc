@@ -204,7 +204,6 @@ private:
     o______ "(void)en;\n"; // incomplete
     o______ "trace3(\"timer::tr_advance\", _previous_evt, _req_evt, _sim->_time0);\n";
     o______ "trace4(\"timer::tr_advance\", delay, period, _sim->_time0, d->_time[1]);\n";
-   // o______ "double time1 = d->_time[1];\n";
     o______ "assert(_sim->_phase != p_RESTORE);\n";
     o______ "assert(is_q(_sim->_time0));\n";
     o______ "assert(is_q(_req_evt));\n";
@@ -218,20 +217,6 @@ private:
     o______ "}else{\n";
     o______ "}\n;";
 
-#if 0
-    o______ "if(d->_time[1] == 0. && _req_evt == 0.) {\n";
-    o________ "trace4(\"timer::tr_advance miss init\", delay, period, _sim->_time0, _previous_evt);\n";
-    o________ "incomplete();\n"; // needed?
-    o______ "}else if(d->_time[1] <= _req_evt) {\n";
-    o________ "trace3(\"timer::tr_advance 4\", delay, period, _sim->_time0);\n";
-    o________ "incomplete();\n"; // needed?
-   // o________ "double tol_ratio = tol / _sim->_dtmin;\n";
-   // o________ "throw Exception(to_string(_sim->_time0) + \" \" + d->long_label() + \" timer: giving up on advance at\""
-   //           << " + to_string(_req_evt) + \", \" + to_string(tol_ratio));\n";
-    o______ "}else{\n";
-    o________ "incomplete();\n";
-    o______ "}\n";
-#endif
     o______ "return false;\n";
     o____ "} // tr_advance\n";
     /*----------------------------------------------------------------------*/
@@ -243,15 +228,8 @@ private:
    // o______ "return tr_advance(d, delay, period, tol, en);\n";
     o______ "assert(_sim->_phase != p_RESTORE);\n";
 
-#if 0 // really?
-  o__ "if(_sim->_phase == p_RESTORE) {untested();\n";
-  o____ "return false;\n";
-  o__ "}else{untested();\n";
-  o__ "}\n";
-#endif
     o______ "bool ret;\n";
     o______ "trace4(\"timer::tr_regress\", _previous_evt, _req_evt, _sim->_time0, _sim->_dtmin);\n";
-   // o______ "_req_evt = _previous_evt;\n"; // consolidate previous "tr_accept"
     o______ "if (d->_time[1] == 0. && _sim->_time0 < _previous_evt + _sim->_dtmin) { untested();\n";
     o________ "trace3(\"timer::tr_regress2\", _previous_evt, _req_evt, _sim->_time0);\n";
     o______ "incomplete();\n"; // doesnt work
@@ -267,17 +245,6 @@ private:
     o______ "}else{\n";
     o________ "ret = false;\n";
     o______ "}\n";
-
-#if 0 // unneeded?
-    o______ "if (_previous_evt != -NEVER) {\n";
-    o______ "}else if (_sim->_time0 <= _req_evt + 2.01*_sim->_dtmin + " << accept_tol() << ") {\n";
-    o______ "incomplete();\n"; // doesnt work.  mg_evt.analysis.0c.gc
-   //  o________ "_previous_evt = _req_evt;\n"; // it's as close as we get to it . breaks v_vpulse.0b.gc.diff
-    o________ "trace5(\"timer::tr_regress merge\", ret, _previous_evt, _req_evt, _sim->_time0, _sim->_time0 - _previous_evt);\n";
-    o______ "}else{ untested();\n";
-    o________ "trace5(\"timer::tr_regress3\", ret, _previous_evt, _req_evt, _sim->_time0, _sim->_time0 - _previous_evt);\n";
-    o______ "}\n";
-#endif
 
     o______ "trace5(\"timer::tr_regress done\", ret, _previous_evt, _req_evt, _sim->_time0, _sim->_time0 - _previous_evt);\n";
     o______ "assert(is_q(_sim->_time0));\n";
@@ -327,18 +294,14 @@ private:
     o______ "}else if (next > _req_evt && next > _previous_evt) {\n";
     o________ "d->q_accept();\n"; // mg_evt.analysis.0c.gc
     o______ "}else if (next != _req_evt) {\n";
-  //  o________ "d->q_accept();\n";
     o______ "}else{ untested();\n";
     o________ "incomplete();\n";
-  //  o________ "_req_evt = next;\n";
     o______ "}\n";
 
     o______ "if (_sim->_time0 < _req_evt) {\n";
     o______ "}else if (_sim->_time0 <= _req_evt + " << accept_tol() << ") {\n";
     o________ "trace2(\"timer::tr_review qa2\", _req_evt, _sim->_time0);\n";
-   //  o________ "d->q_accept();\n"; // (B), overlap with (A)?
     o______ "}else if(d->_time[1] == 0. && _req_evt == 0. && period && !delay) {\n";
-    // time[1]==0?
     o________ "double back_to = period;\n";
     o________ "trace3(\"timer::tr_review2\", _req_evt, _sim->_time0, back_to);\n";
     o________ "if (period < _sim->_time0) {\n";
