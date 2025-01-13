@@ -28,6 +28,7 @@
 namespace {
 /*--------------------------------------------------------------------------*/
 enum {NUM_INIT_COND = 4};
+enum {PC = 5};
 /*--------------------------------------------------------------------------*/
 class COMMON_TRANSLINE : public COMMON_COMPONENT {
 public:
@@ -54,7 +55,7 @@ public:
   std::string	param_name(int)const override;
   std::string	param_name(int,int)const override;
   std::string	param_value(int)const override;
-  int param_count()const override {return (5 + COMMON_COMPONENT::param_count());}
+  int param_count()const override {return (PC + COMMON_COMPONENT::param_count());}
 public:
   void		precalc_last(const CARD_LIST*)override;
   std::string	name()const override		{untested(); return "transline";}
@@ -194,13 +195,13 @@ bool COMMON_TRANSLINE::operator==(const COMMON_COMPONENT& x)const
 void COMMON_TRANSLINE::set_param_by_index(int I, std::string& Value, int Offset)
 {
   trace2("spbn", I, Value);
-  switch (COMMON_TRANSLINE::param_count() - 1 - I) {
+  switch (I) {
   case 0:  len = Value; break;
   case 1:  R = Value; break;
   case 2:  L = Value; break;
   case 3:  G = Value; break;
   case 4:  C = Value; break;
-  default: COMMON_COMPONENT::set_param_by_index(I, Value, Offset); break;
+  default: COMMON_COMPONENT::set_param_by_index(I - PC, Value, Offset + PC); break;
   }
   //BUG// does not print IC
 }
@@ -229,7 +230,7 @@ bool COMMON_TRANSLINE::param_is_printable(int I)const
 /*--------------------------------------------------------------------------*/
 std::string COMMON_TRANSLINE::param_name(int I)const
 {
-  switch (COMMON_TRANSLINE::param_count() - 1 - I) {
+  switch (I) {
   case 0:  return "len";
   case 1:  return "r";
   case 2:  return "l";
@@ -245,10 +246,10 @@ std::string COMMON_TRANSLINE::param_name(int I, int j)const
   if (j == 0) {
     return param_name(I);
   }else if (I >= COMMON_COMPONENT::param_count()) {
-    switch (COMMON_TRANSLINE::param_count() - 1 - I) {
+    switch (I) {
     default: return "";
     }
-  }else{ untested();
+  }else{
     return COMMON_COMPONENT::param_name(I, j);
   }
   //BUG// does not print IC

@@ -262,7 +262,7 @@ void make_common_set_param_by_index(std::ostream& o, const Module& m)
   make_tag(o);
   o << "void COMMON_" << m.identifier() << "::set_param_by_index("
        "int I, std::string& Value, int /*Offset*/)\n{\n";
-  o__ "  switch (COMMON_" << m.identifier() << "::param_count() - 1 - I) {\n";
+  o__ "switch (I) {\n";
   size_t i = 0;
 
   for (Parameter_List_Collection::const_iterator
@@ -278,7 +278,9 @@ void make_common_set_param_by_index(std::ostream& o, const Module& m)
     }
   }
 
-  o____ "default: incomplete(); // throw? COMMON_COMPONENT::set_param_by_index(I, Value, Offset);\n";
+  int s = int(m.parameters().size());
+  o____ "default: incomplete(); // throw? COMMON_COMPONENT::set_param_by_index(I - "
+	 << s << ", Value, Offset + " << s << ");\n";
   o__ "}\n";
   o__ "(void) Value;\n";
   o << "}\n"
@@ -289,9 +291,9 @@ void make_common_param_is_printable(std::ostream& o, const Module& m)
 {
   make_tag(o);
   o <<
-    "bool COMMON_" << m.identifier() << "::param_is_printable(int i)const\n"
+    "bool COMMON_" << m.identifier() << "::param_is_printable(int I)const\n"
     "{\n"
-    "  switch (COMMON_" << m.identifier() << "::param_count() - 1 - i) {\n";
+    "  switch (I) {\n";
   size_t i = 0;
 //  for (Parameter_1_List::const_iterator 
 //       p = m.common().override().begin(); 
@@ -328,7 +330,8 @@ void make_common_param_is_printable(std::ostream& o, const Module& m)
   }
 //  assert(i == m.common().override().size() + m.common().raw().size());
   o <<
-    "  default: return COMMON_COMPONENT::param_is_printable(i);\n"
+    "  default: return COMMON_COMPONENT::param_is_printable(I - "
+        << m.parameters().size() << ");\n"
     "  }\n"
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";
@@ -338,8 +341,8 @@ void make_common_param_name(std::ostream& o, const Module& m)
 {
   make_tag(o);
   o <<
-    "std::string COMMON_" << m.identifier() << "::param_name(int i)const\n{\n"
-    "  switch (COMMON_" << m.identifier() << "::param_count() - 1 - i) {\n";
+    "std::string COMMON_" << m.identifier() << "::param_name(int I)const\n{\n"
+    "  switch (I) {\n";
   size_t i = 0;
 //  for (Parameter_1_List::const_iterator 
 //       p = m.common().override().begin(); 
@@ -363,15 +366,15 @@ void make_common_param_name(std::ostream& o, const Module& m)
   }
 //  assert(i == m.common().override().size() + m.common().raw().size());
   o <<
-    "  default: return COMMON_COMPONENT::param_name(i);\n"
+    "  default: return COMMON_COMPONENT::param_name(I);\n"
     "  }\n"
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";
   o <<
-    "std::string COMMON_" << m.identifier() << "::param_name(int i, int j)const\n"
+    "std::string COMMON_" << m.identifier() << "::param_name(int I, int j)const\n"
     "{\n";
   o__ "if(j==0){\n";
-  o____ "return param_name(i);\n";
+  o____ "return param_name(I);\n";
   o__ "}else{\n";
   o____ "return \"\";\n";
   o__ "}\n";
@@ -509,9 +512,9 @@ void make_common_param_value(std::ostream& o, const Module& m)
 {
   make_tag(o);
   o <<
-    "std::string COMMON_" << m.identifier() << "::param_value(int i)const\n"
+    "std::string COMMON_" << m.identifier() << "::param_value(int I)const\n"
     "{\n"
-    "  switch (COMMON_" << m.identifier() << "::param_count() - 1 - i) {\n";
+    "  switch (I) {\n";
   size_t i = 0;
 //  for (Parameter_1_List::const_iterator 
 //       p = m.common().override().begin(); 
@@ -536,7 +539,7 @@ void make_common_param_value(std::ostream& o, const Module& m)
 
 //  assert(i == m.common().override().size() + m.common().raw().size());
   o <<
-    "  default: return COMMON_COMPONENT::param_value(i);\n"
+    "  default: return COMMON_COMPONENT::param_value(I);\n"
     "  }\n"
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";

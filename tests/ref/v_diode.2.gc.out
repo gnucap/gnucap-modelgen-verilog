@@ -1,20 +1,10 @@
-module main(1 2) 
-            ^ ? invalid identifier
-module main(1 2) 
-              ^ ? invalid identifier
-ddd #(.area(1.)) d1 (1  \2 ); 
-                     ^ ? invalid identifier
-main m(2 0); 
-       ^ ? invalid identifier
-main m(2 0); 
-         ^ ? invalid identifier
-.model ddd diode ( tnom=NA( NA))
+.model ddd diode ( $mfactor=NA( NA))
 .subckt main ( 1 2 )
 d1 ( 1 2 )  ddd  area=1.
 .ends main
 m ( 2 0 )  main 
 V1 ( 1 0 )  DC  10.  AC  1.
-R1 ( 1 2 )  50.K
+R1 ( 1 2 )  r= 50.K
 #           v(1)       v(2)       i(V1)      i(R1)      id(m.d1)   vd(m.d1)   req(m.d1)  cd(m.d1)   z(m.d1)    zraw(m.d1) gd(m.d1)   z(2)       iter(0)    region(m.d1)
  27.        10.        2.1726    -156.55u    156.55u    ??         ??         ??         ??         ??         ??         ??         8.4478K    8.         1.        
 #           v(1)       v(2)       i(V1)      i(R1)      id(m.d1)   vd(m.d1)   req(m.d1)  cd(m.d1)   z(m.d1)    zraw(m.d1) gd(m.d1)   z(2)       iter(0)    region(m.d1)

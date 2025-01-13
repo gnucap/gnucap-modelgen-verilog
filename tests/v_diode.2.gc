@@ -24,11 +24,11 @@ paramset ddd diode;
  .ibv= 0.001;
 endparamset;
 
-module main(1 2)
-  ddd #(.area(1.)) d1 (1  \2 );
+module main(\1 , \2 )
+  ddd #(.area(1.)) d1 (\1 , \2 );
 endmodule
 
-main m(2 0);
+main m(\2 , \0 );
 
 spice
 

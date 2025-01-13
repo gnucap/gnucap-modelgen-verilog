@@ -23,7 +23,7 @@
 "list "
 module aaa (.c(c),.d(d));
   resistor #(100) r1 (a,b);
-  resistor #(2,200) r2 ((* m *) a,b);
+  resistor #((* r *) 200,(* m *) 2) r2 (a,b);
   r1 #() r3 (a,b);
   r2 #() r4 (a,b);
   r1 #() r5 (a,b);
@@ -31,9 +31,9 @@ module aaa (.c(c),.d(d));
 endmodule // aaa
 
 module bbb ((* b *) .e(e),.f(f));
-  resistor #(100) r1 (a,b);
-  resistor #(.r(200),(* d *) .$mfactor(2)) r2 (a,b);
-  resistor #((* d *) .r(200),.$mfactor(2)) r2a (a,b);
+  resistor #((* a *) 100) r1 (a,b);
+  resistor #((* d *) .$mfactor(2),.r(200)) r2 (a,b);
+  resistor #(.$mfactor(2),(* d *) .r(200)) r2a (a,b);
   r1 #() r3 (a,b);
   r2 #() r4 (a,b);
   r1 #() r5 (a,b);

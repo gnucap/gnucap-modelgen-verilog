@@ -1169,9 +1169,9 @@ bool COMMON_resistor::operator==(const COMMON_COMPONENT& x)const
 /*--------------------------------------------------------------------------*/
 void COMMON_resistor::set_param_by_index(int I, std::string& Value, int /*Offset*/)
 {
-    switch (COMMON_resistor::param_count() - 1 - I) {
+  switch (I) {
   case 0:  _p_r = Value; break;
-    default: incomplete(); // throw? COMMON_COMPONENT::set_param_by_index(I, Value, Offset);
+    default: incomplete(); // throw? COMMON_COMPONENT::set_param_by_index(I - 5, Value, Offset + 5);
   }
   (void) Value;
 }
@@ -1206,36 +1206,36 @@ aidx COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
   }
 }
 /*--------------------------------------------------------------------------*/
-bool COMMON_resistor::param_is_printable(int i)const
+bool COMMON_resistor::param_is_printable(int I)const
 {
-  switch (COMMON_resistor::param_count() - 1 - i) {
+  switch (I) {
   case 0:  return (_p_r.has_hard_value());
-  default: return COMMON_COMPONENT::param_is_printable(i);
+  default: return COMMON_COMPONENT::param_is_printable(I - 5);
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMMON_resistor::param_name(int i)const
+std::string COMMON_resistor::param_name(int I)const
 {
-  switch (COMMON_resistor::param_count() - 1 - i) {
+  switch (I) {
   case 0:  return "r";
-  default: return COMMON_COMPONENT::param_name(i);
+  default: return COMMON_COMPONENT::param_name(I);
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMMON_resistor::param_name(int i, int j)const
+std::string COMMON_resistor::param_name(int I, int j)const
 {
   if(j==0){
-    return param_name(i);
+    return param_name(I);
   }else{
     return "";
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMMON_resistor::param_value(int i)const
+std::string COMMON_resistor::param_value(int I)const
 {
-  switch (COMMON_resistor::param_count() - 1 - i) {
+  switch (I) {
   case 0:  return _p_r.string();
-  default: return COMMON_COMPONENT::param_value(i);
+  default: return COMMON_COMPONENT::param_value(I);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -2417,13 +2417,13 @@ bool COMMON_resistor::operator==(const COMMON_COMPONENT& x)const
 /*--------------------------------------------------------------------------*/
 void COMMON_resistor::set_param_by_index(int I, std::string& Value, int /*Offset*/)
 {
-    switch (COMMON_resistor::param_count() - 1 - I) {
+  switch (I) {
   case 0:  _p_r = Value; break;
   case 1:  _p_tc1 = Value; break;
   case 2:  _p_tc2 = Value; break;
   case 3:  _p_noisy = Value; break;
   case 4:  _p_tnom = Value; break;
-    default: incomplete(); // throw? COMMON_COMPONENT::set_param_by_index(I, Value, Offset);
+    default: incomplete(); // throw? COMMON_COMPONENT::set_param_by_index(I - 4, Value, Offset + 4);
   }
   (void) Value;
 }
@@ -2464,48 +2464,48 @@ aidx COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
   }
 }
 /*--------------------------------------------------------------------------*/
-bool COMMON_resistor::param_is_printable(int i)const
+bool COMMON_resistor::param_is_printable(int I)const
 {
-  switch (COMMON_resistor::param_count() - 1 - i) {
+  switch (I) {
   case 0:  return (_p_r.has_hard_value());
   case 1:  return (_p_tc1.has_hard_value());
   case 2:  return (_p_tc2.has_hard_value());
   case 3:  return (_p_noisy.has_hard_value());
   case 4:  return (_p_tnom.has_hard_value());
-  default: return COMMON_COMPONENT::param_is_printable(i);
+  default: return COMMON_COMPONENT::param_is_printable(I - 4);
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMMON_resistor::param_name(int i)const
+std::string COMMON_resistor::param_name(int I)const
 {
-  switch (COMMON_resistor::param_count() - 1 - i) {
+  switch (I) {
   case 0:  return "r";
   case 1:  return "tc1";
   case 2:  return "tc2";
   case 3:  return "noisy";
   case 4:  return "tnom";
-  default: return COMMON_COMPONENT::param_name(i);
+  default: return COMMON_COMPONENT::param_name(I);
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMMON_resistor::param_name(int i, int j)const
+std::string COMMON_resistor::param_name(int I, int j)const
 {
   if(j==0){
-    return param_name(i);
+    return param_name(I);
   }else{
     return "";
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMMON_resistor::param_value(int i)const
+std::string COMMON_resistor::param_value(int I)const
 {
-  switch (COMMON_resistor::param_count() - 1 - i) {
+  switch (I) {
   case 0:  return _p_r.string();
   case 1:  return _p_tc1.string();
   case 2:  return _p_tc2.string();
   case 3:  return _p_noisy.string();
   case 4:  return _p_tnom.string();
-  default: return COMMON_COMPONENT::param_value(i);
+  default: return COMMON_COMPONENT::param_value(I);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -4929,9 +4929,9 @@ bool COMMON_capacitor::operator==(const COMMON_COMPONENT& x)const
 /*--------------------------------------------------------------------------*/
 void COMMON_capacitor::set_param_by_index(int I, std::string& Value, int /*Offset*/)
 {
-    switch (COMMON_capacitor::param_count() - 1 - I) {
+  switch (I) {
   case 0:  _p_c = Value; break;
-    default: incomplete(); // throw? COMMON_COMPONENT::set_param_by_index(I, Value, Offset);
+    default: incomplete(); // throw? COMMON_COMPONENT::set_param_by_index(I - 3, Value, Offset + 3);
   }
   (void) Value;
 }
@@ -4966,36 +4966,36 @@ aidx COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
   }
 }
 /*--------------------------------------------------------------------------*/
-bool COMMON_capacitor::param_is_printable(int i)const
+bool COMMON_capacitor::param_is_printable(int I)const
 {
-  switch (COMMON_capacitor::param_count() - 1 - i) {
+  switch (I) {
   case 0:  return (_p_c.has_hard_value());
-  default: return COMMON_COMPONENT::param_is_printable(i);
+  default: return COMMON_COMPONENT::param_is_printable(I - 3);
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMMON_capacitor::param_name(int i)const
+std::string COMMON_capacitor::param_name(int I)const
 {
-  switch (COMMON_capacitor::param_count() - 1 - i) {
+  switch (I) {
   case 0:  return "c";
-  default: return COMMON_COMPONENT::param_name(i);
+  default: return COMMON_COMPONENT::param_name(I);
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMMON_capacitor::param_name(int i, int j)const
+std::string COMMON_capacitor::param_name(int I, int j)const
 {
   if(j==0){
-    return param_name(i);
+    return param_name(I);
   }else{
     return "";
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMMON_capacitor::param_value(int i)const
+std::string COMMON_capacitor::param_value(int I)const
 {
-  switch (COMMON_capacitor::param_count() - 1 - i) {
+  switch (I) {
   case 0:  return _p_c.string();
-  default: return COMMON_COMPONENT::param_value(i);
+  default: return COMMON_COMPONENT::param_value(I);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -5853,10 +5853,10 @@ bool COMMON_capacitor::operator==(const COMMON_COMPONENT& x)const
 /*--------------------------------------------------------------------------*/
 void COMMON_capacitor::set_param_by_index(int I, std::string& Value, int /*Offset*/)
 {
-    switch (COMMON_capacitor::param_count() - 1 - I) {
+  switch (I) {
   case 0:  _p_c = Value; break;
   case 1:  _p_ic = Value; break;
-    default: incomplete(); // throw? COMMON_COMPONENT::set_param_by_index(I, Value, Offset);
+    default: incomplete(); // throw? COMMON_COMPONENT::set_param_by_index(I - 3, Value, Offset + 3);
   }
   (void) Value;
 }
@@ -5892,39 +5892,39 @@ aidx COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
   }
 }
 /*--------------------------------------------------------------------------*/
-bool COMMON_capacitor::param_is_printable(int i)const
+bool COMMON_capacitor::param_is_printable(int I)const
 {
-  switch (COMMON_capacitor::param_count() - 1 - i) {
+  switch (I) {
   case 0:  return (_p_c.has_hard_value());
   case 1:  return (_p_ic.has_hard_value());
-  default: return COMMON_COMPONENT::param_is_printable(i);
+  default: return COMMON_COMPONENT::param_is_printable(I - 3);
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMMON_capacitor::param_name(int i)const
+std::string COMMON_capacitor::param_name(int I)const
 {
-  switch (COMMON_capacitor::param_count() - 1 - i) {
+  switch (I) {
   case 0:  return "c";
   case 1:  return "ic";
-  default: return COMMON_COMPONENT::param_name(i);
+  default: return COMMON_COMPONENT::param_name(I);
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMMON_capacitor::param_name(int i, int j)const
+std::string COMMON_capacitor::param_name(int I, int j)const
 {
   if(j==0){
-    return param_name(i);
+    return param_name(I);
   }else{
     return "";
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMMON_capacitor::param_value(int i)const
+std::string COMMON_capacitor::param_value(int I)const
 {
-  switch (COMMON_capacitor::param_count() - 1 - i) {
+  switch (I) {
   case 0:  return _p_c.string();
   case 1:  return _p_ic.string();
-  default: return COMMON_COMPONENT::param_value(i);
+  default: return COMMON_COMPONENT::param_value(I);
   }
 }
 /*--------------------------------------------------------------------------*/

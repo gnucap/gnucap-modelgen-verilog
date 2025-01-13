@@ -8,13 +8,13 @@ main m(2 0);
        ^ ? invalid identifier
 main m(2 0); 
          ^ ? invalid identifier
-.model ddd diode ( tnom=NA( NA))
+.model ddd diode ( $mfactor=NA( NA))
 .subckt main ( 1 2 )
 d1 ( 1 2 )  ddd  area=1.
 .ends main
 m ( 2 0 )  main 
 V1 ( 1 0 ) sin offset=NA( 0.) amplitude= 10. frequency= 10.Meg delay=NA( 0.) damping=NA( 0.)  DC -10.  AC  1.
-R1 ( 1 2 )  100.K
+R1 ( 1 2 )  r= 100.K
 #           v(1)       v(2)       i(V1)      i(R1)      id(m.d1)   vd(m.d1)   req(m.d1)  cd(m.d1)   z(m.d1)    zraw(m.d1) gd(m.d1)   z(2)       iter(0)    region(m.d1)
  0.         0.         0.         0.         0.         ??         ??         ??         ??         ??         ??         ??         NaN        0.         0.        
 -1.        -10.       -10.        0.        -33.864p    ??         ??         ??         ??         ??         ??         ??         100.K      1.        -1.        

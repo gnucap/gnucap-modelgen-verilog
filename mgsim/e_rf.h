@@ -384,7 +384,7 @@ int COMMON_RF_BASE::set_param_by_name(std::string Name, std::string Value)
 /*--------------------------------------------------------------------------*/
 bool COMMON_RF_BASE::param_is_printable(int i)const
 {
-  int idx = COMMON_RF_BASE::param_count() - 1 - i;
+  int idx = i;
 
   int nn = int(_p_num.size());
   int pp = int(_p_den.size());
@@ -410,14 +410,12 @@ bool COMMON_RF_BASE::param_is_printable(int i)const
   return COMMON_COMPONENT::param_is_printable(i);
 }
 /*--------------------------------------------------------------------------*/
-std::string COMMON_RF_BASE::param_name(int i)const
+std::string COMMON_RF_BASE::param_name(int idx)const
 {
-
-  int idx = COMMON_RF_BASE::param_count() - 1 - i;
   trace4("param_name", idx, is_rp(), _p_num.size(), _p_den.size());
     // return "n" + to_string(int(idx));
   if(idx < 0){ untested();
-    return COMMON_COMPONENT::param_name(i);
+    return COMMON_COMPONENT::param_name(idx);
   }else if(idx < int(_p_num.size())){
     if(num_is_n()) {
       return "n" + to_string(idx);
@@ -440,7 +438,9 @@ std::string COMMON_RF_BASE::param_name(int i)const
       unreachable();
     }
   }
-  return COMMON_COMPONENT::param_name(i);
+  int nn = int(_p_num.size());
+  int pp = int(_p_den.size());
+  return COMMON_COMPONENT::param_name(idx - nn - pp);
 }
 /*--------------------------------------------------------------------------*/
 std::string COMMON_RF_BASE::param_name(int i, int j)const
@@ -452,9 +452,8 @@ std::string COMMON_RF_BASE::param_name(int i, int j)const
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMMON_RF_BASE::param_value(int i)const
+std::string COMMON_RF_BASE::param_value(int idx)const
 {
-  int idx = COMMON_RF_BASE::param_count() - 1 - i;
   if (idx < 0) { untested();
   }else if (idx < int(_p_num.size())) {
     return _p_num[idx].string();
@@ -463,7 +462,7 @@ std::string COMMON_RF_BASE::param_value(int i)const
     return _p_den[a].string();
   }else{ untested();
   }
-  return COMMON_COMPONENT::param_value(i);
+  return COMMON_COMPONENT::param_value(idx);
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_RF_BASE::is_valid() const
