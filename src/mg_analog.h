@@ -447,13 +447,32 @@ private:
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+class AnalogInitialStmt : public AnalogCtrlStmt {
+public:
+  explicit AnalogInitialStmt(Block* o, CS& file) {
+    set_owner(o);
+    parse(file);
+  }
+  ~AnalogInitialStmt(){ }
+public:
+  void parse(CS& file) override;
+  void dump(std::ostream& o)const override;
+  bool is_used_in(Base const*)const override; // needed?
+  bool update()override;
+
+ // TData const& deps()const override // AnalogCtrlStmt
+}; // AnalogInitialStmt
+/*--------------------------------------------------------------------------*/
 class AnalogSwitchStmt : public AnalogStmt { // CtrlStmt?
   TData _deps; // here?
   AnalogConstExpression _ctrl; // Const??
   SeqBlock _body;
   RDeps _rdeps; // here?
 public:
-  AnalogSwitchStmt(Block* o, CS& file);
+  AnalogSwitchStmt(Block* o, CS& file) {
+    set_owner(o);
+    parse(file);
+  }
   ~AnalogSwitchStmt() { }
 public:
   void parse(CS& file) override;
@@ -470,7 +489,11 @@ class AnalogConditionalStmt : public AnalogCtrlStmt {
   AnalogConstExpression _cond; // Const?
   AnalogCtrlBlock _false_part;
 public:
-  explicit AnalogConditionalStmt(Block* o, CS& file);
+  explicit AnalogConditionalStmt(Block* o, CS& file) {
+    set_owner(o);
+    parse(file);
+  }
+/*--------------------------------------------------------------------------*/
   ~AnalogConditionalStmt(){ }
 public:
   void parse(CS& file) override;

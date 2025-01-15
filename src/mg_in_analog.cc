@@ -99,6 +99,11 @@ to contribute to a branch and the flow and potential access functions being used
 Note V and I cannot be used as access functions because there are parameters called V and I declared in the
 module. */
 /*--------------------------------------------------------------------------*/
+static Base* parse_initial(CS& file, Block* o)
+{
+  return new AnalogInitialStmt(o, file);
+}
+/*--------------------------------------------------------------------------*/
 static Base* parse_cond(CS& file, Block* o)
 {
   return new AnalogConditionalStmt(o, file);
@@ -393,6 +398,7 @@ static Base* parse_analog_stmt_or_null(CS& file, Block* scope)
     || ((file >> "while ") && (ret = new AnalogWhileStmt(file, scope)))
     || ((file >> "for ") && (ret = new AnalogForStmt(file, scope)))
     || ((file >> "@ ") && (ret = new_evt_ctl_stmt(file, scope)))
+    || ((file >> "initial ") && (ret = parse_initial(file, scope)))
     || (ret = parse_proc_assignment(file, scope))
     || (ret = parse_system_task(file, scope))
     || (ret = parse_contribution(file, scope))
@@ -421,6 +427,35 @@ static Base* parse_analog_stmt(CS& file, Block* owner)
   }else{
     return a;
   }
+}
+/*--------------------------------------------------------------------------*/
+void AnalogInitialStmt::parse(CS& f)
+{
+  assert(owner());
+  _body.set_owner(this);
+
+  if(f >> _body){
+  }else{ untested();
+    throw Exception_CS_("expecting statement", f);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void AnalogInitialStmt::dump(std::ostream& o) const
+{ untested();
+  o__ "initial ";
+  _body.dump(o);
+}
+/*--------------------------------------------------------------------------*/
+bool AnalogInitialStmt::is_used_in(Base const* b) const
+{
+  return AnalogStmt::is_used_in(b);
+}
+/*--------------------------------------------------------------------------*/
+bool AnalogInitialStmt::update()
+{
+  bool ret = AnalogCtrlStmt::update();
+  ret |= propagate_rdep(&tr_begin_tag);
+  return ret;
 }
 /*--------------------------------------------------------------------------*/
 void AnalogConditionalStmt::parse(CS& f)
@@ -468,12 +503,6 @@ void AnalogConditionalStmt::parse(CS& f)
       f.reset(here);
     }
   }
-}
-/*--------------------------------------------------------------------------*/
-AnalogConditionalStmt::AnalogConditionalStmt(Block* o, CS& file)
-{
-  set_owner(o);
-  parse(file);
 }
 /*--------------------------------------------------------------------------*/
 void AnalogConditionalStmt::dump(std::ostream& o) const
@@ -579,7 +608,7 @@ bool AnalogSwitchStmt::update()
     }
   }
   return // propagate_rdeps(_rdeps) ||
-     AnalogStmt::update() || ret;
+     AnalogStmt::update() || ret; // bypass ctrlStmt?
 }
 /*--------------------------------------------------------------------------*/
 void AnalogWhileStmt::parse(CS& file)
@@ -816,12 +845,6 @@ CaseGen::CaseGen(CS& f, Block* o, Expression const& ctrl, bool have_r, bool have
   trace2("CaseGen done", have_a, is_never());
 
   assert(owner());
-}
-/*--------------------------------------------------------------------------*/
-AnalogSwitchStmt::AnalogSwitchStmt(Block* o, CS& file)
-{
-  set_owner(o);
-  parse(file);
 }
 /*--------------------------------------------------------------------------*/
 void AnalogSwitchStmt::parse(CS& f)

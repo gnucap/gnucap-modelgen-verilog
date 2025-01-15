@@ -58,7 +58,7 @@ public:
   bool is_static()const { return _mode==modeSTATIC || _mode==modeTR_BEGIN || _mode==modeTR_REVIEW ; } // || ...?
   bool is_precalc()const { return _mode==modePRECALC; }
   bool is_probe()const   { untested(); return _mode==modePROBE; }
-  bool is_tr_begin()const  { untested(); return _mode==modeTR_BEGIN; }
+  bool is_tr_begin()const  { return _mode==modeTR_BEGIN; }
   bool is_tr_review()const  { untested(); return _mode==modeTR_REVIEW; }
   bool is_tr_accept()const  { return _mode==modeTR_ACCEPT; }
   bool is_tr_advance()const  { untested(); return _mode==modeTR_ADVANCE; }
@@ -77,6 +77,7 @@ private:
   void make_af_tparam  (std::ostream& o, const Analog_Function& f)const;
   void make_af_args    (std::ostream& o, const Analog_Function& f)const;
   void make_af_body    (std::ostream& o, const Analog_Function& f)const;
+  void make_initial    (std::ostream& o, AnalogInitialStmt const& s)const;
   void make_cond       (std::ostream& o, AnalogConditionalStmt const& s)const;
   void make_switch     (std::ostream& o, AnalogSwitchStmt const& s)const;
   void make_for        (std::ostream& o, AnalogForStmt const& s)const;
@@ -451,6 +452,8 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
   }else if(auto ev=dynamic_cast<AnalogEvtCtlStmt const*>(&ab)) {
     make_evt(o, *ev);
     //throw Exception("analogevtctl unsupported");
+  }else if(auto is=dynamic_cast<AnalogInitialStmt const*>(&ab)) {
+    make_initial(o, *is);
   }else if(auto ct = dynamic_cast<AnalogCtrlStmt const*>(&ab)){
     make_ctrl(o, ct->body());
   }else if(auto t=dynamic_cast<System_Task const*>(&ab)) {
@@ -673,6 +676,16 @@ void OUT_ANALOG::make_for(std::ostream& o, AnalogForStmt const& s) const
   }else{ untested();
   }
   make_loop(o, s);
+}
+/*--------------------------------------------------------------------------*/
+void OUT_ANALOG::make_initial(std::ostream& o, AnalogInitialStmt const& s) const
+{
+  if(is_tr_begin()) {
+    o__ "{\n";
+    make_ctrl(o, s.body());
+    o__ "}\n";
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_cond(std::ostream& o, AnalogConditionalStmt const& s) const

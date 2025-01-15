@@ -2,11 +2,17 @@
 `pragma modelgen nodump-nature
 `pragma modelgen nodump-discipline
 
-module test(d, g, s, b);
+module test();
 	real T;
+	analog initial T = 1;
+
+	analog initial begin
+		if(T == 1) T = 2;
+	end
+
 	analog begin
-		@(initial_step) begin
-			T = $temperature;
+		initial begin
+			if(T == 2) T = 3;
 		end
 	end
 endmodule
