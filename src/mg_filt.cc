@@ -232,7 +232,7 @@ public:
 
 public:
   bool has_modes()const override {return true;}
-  bool has_tr_begin()const override {return true;}
+  bool has_tr_begin()const override {return false;}
   bool has_tr_review()const override {return true;}
   bool has_tr_accept()const override {return num_args()>2;}
   bool has_tr_advance()const override {return false;}
@@ -271,6 +271,9 @@ private:
     std::string comma;
 /*--------------------------------------------------------------------------*/
     comma = "";
+    o__ "ddouble " << raw_code_name() << "tr_begin("; args(o); o << "){\n";
+    o____ "return 0.;\n";
+    o__ "}\n";
     o__ "ddouble " << raw_code_name() << "tr_eval("; args(o); o << "){\n";
     o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
     o__ "}\n";
