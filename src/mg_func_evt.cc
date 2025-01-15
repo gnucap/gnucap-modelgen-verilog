@@ -147,19 +147,22 @@ private:
 
     make_tr_eval(o);
 
-    o____ "bool tr_begin(MOD_" << _m->identifier() << "* d,\n";
-    o____ "               double input, int dir, int more=0) {\n";
+    o____ "bool tr_begin(MOD_" << _m->identifier() << "*,\n";
+    o____ "               double, int, int more=0) {\n";
+    o______ "(void)more;\n";
     o______ "return false;\n";
     o____ "}\n";
 
     o____ "bool tr_accept(MOD_" << _m->identifier() << "* d,\n";
     o____ "               double input, int dir, int more=0) {\n";
+    o______ "(void)more;\n";
     o______ "trace2(\"cross::tr_accept\", _state[0], _state[1]);\n";
     o______ "return tr_eval(d, input, dir, more);\n";
     o____ "}\n";
 
     o____ "bool tr_advance(MOD_" << _m->identifier() << "* d,\n";
     o____ "                double input, int dir, int more=0){\n";
+    o______ "(void)more;\n";
     o______ "_state[1] = _state[0];\n";
     o______ "_in[1] = _in[0];\n";
     o______ "trace3(\"cross::tr_advance\", _in[0], _in[1], input);\n";
@@ -170,11 +173,11 @@ private:
     o______ "}else{\n";
     o______ "}\n";
     o______ "return tr_eval(d, input, dir, more);\n";
-    o______ "return false;\n";
     o____ "}\n";
 
     o____ "bool tr_review(MOD_" << _m->identifier() << "* d,\n";
     o____ "               double input, int dir, int more=0){\n";
+    o______ "(void)more;\n";
     o______ "_in[0] = input;\n";
     o______ "double old_dv = _in[0] - _in[1];\n";
     o______ "double old_dt = d->_time[0] - d->_time[1];\n";
@@ -195,13 +198,16 @@ private:
     //o______ "return _state[1] != _state[0];\n";
     o____ "}\n";
 
-    o____ "bool tr_regress(MOD_" << _m->identifier() << "* d,\n";
-    o____ "                double input, int dir, int more=0) {\n";
+    o____ "bool tr_regress(MOD_" << _m->identifier() << "*,\n";
+    o____ "                double input, int, int more=0) {\n";
+    o______ "(void)more;\n";
     o______ "_in[0] = input;\n";
     o______ "return false;\n"; // ?
     o____ "}\n";
-    o____ "bool precalc(MOD_" << _m->identifier() << "* d,\n";
-    o____ "             double input, int dir, int more=0) {\n";
+    o____ "bool precalc(MOD_" << _m->identifier() << "*,\n";
+    o____ "             double, int, int more=0) {\n";
+    o______ "(void)more;\n";
+    o______ "(void)more;\n";
     o______ "return false;\n";
     o____ "}\n";
     o__ "}"<< _code_name <<";\n";
@@ -232,8 +238,9 @@ private:
   }
 protected:
   virtual void make_tr_eval(std::ostream& o)const {
-    o____ "bool tr_eval(MOD_" << _m->identifier() << "* d,\n";
+    o____ "bool tr_eval(MOD_" << _m->identifier() << "*,\n";
     o____ "             double input, int dir, int more=0) {\n";
+    o______ "(void)more;\n";
     o______ "trace3(\"sw::tr_eval\", _sim->_time0, _state[0], _state[1]);\n";
     o______ "if (_sim->analysis_is_static()) {\n";
     o________ "if(input == 0.){\n";
@@ -269,8 +276,10 @@ public:
   }
   CROSS* clone()const override {return new ABOVE(*this);}
   void make_tr_eval(std::ostream& o)const override {
-    o____ "bool tr_eval(MOD_" << _m->identifier() << "* d,\n";
-    o____ "             double input, int dir, int more=0){\n";
+    o____ "bool tr_eval(MOD_" << _m->identifier() << "*,\n";
+    o____ "             double input, int, int more=0){\n";
+    o______ "(void)more;\n";
+    o______ "(void)input;\n";
     o______ "trace2(\"above::tr_eval\", input, _state[0]==_ON);\n";
     o______ "return _state[0] == _ON;\n";
     o____ "}\n";
