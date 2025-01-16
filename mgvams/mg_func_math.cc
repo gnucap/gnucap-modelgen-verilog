@@ -242,10 +242,7 @@ private:
 // TODO: these are still in m_va.h
 STUB acosh("acosh");
 DISPATCHER<FUNCTION>::INSTALL d_acosh(&function_dispatcher, "acosh|$acosh", &acosh);
-STUB min("min");
-DISPATCHER<FUNCTION>::INSTALL d_min(&function_dispatcher, "min|$min", &min);
-STUB max("max");
-DISPATCHER<FUNCTION>::INSTALL d_max(&function_dispatcher, "max|$max", &max);
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #if 1
 /*--------------------------------------------------------------------------*/
@@ -486,6 +483,106 @@ public:
 } p_limexp;
 DISPATCHER<FUNCTION>::INSTALL d_limexp(&function_dispatcher, "limexp|$limexp", &p_limexp);
 /*--------------------------------------------------------------------------*/
+class max : public MGVAMS_FUNCTION {
+public:
+  explicit max() : MGVAMS_FUNCTION(){
+    set_label("max");
+  }
+  ~max() { }
+  std::string eval(CS&, const CARD_LIST*)const override { untested();
+    unreachable();
+    return "..";
+  }
+  void stack_op(Expression* e)const override { untested();
+    auto args = get_constant2(e);
+    if(auto a = dynamic_cast<Float const*>(args.first)) { untested();
+      if(auto b = dynamic_cast<Float const*>(args.second)) { untested();
+	subs_double2(e, std::max(a->value(), b->value()));
+      }else if(auto bi = dynamic_cast<Integer const*>(args.second)) { untested();
+	subs_double2(e, std::max(a->value(), double(bi->value())));
+      }else{ untested();
+	throw Exception("invalid");
+      }
+    }else if(auto ai = dynamic_cast<Integer const*>(args.first)) { untested();
+      if(auto b = dynamic_cast<Float const*>(args.second)) { untested();
+	subs_double2(e, std::max(double(ai->value()), b->value()));
+      }else if(auto bi = dynamic_cast<Integer const*>(args.second)) { untested();
+	subs_double2(e, std::max(bi->value(), ai->value()));
+      }else{ untested();
+	throw Exception("invalid");
+      }
+    }else{
+      throw Exception("invalid");
+    }
+  }
+  void make_cc_common(std::ostream& o)const override{
+    o__ "template<class T, class S>\n";
+    o__ "typename va::ddouble_if<T, S>::type\n";
+    o__ "    " << code_name() << "(T d, S e)const {\n";
+    o____ "typedef typename va::ddouble_if<T, S>::type ret_t;\n";
+    o____ "if(double(d) <= double(e)){itested();\n";
+    o____ "  return ret_t(e);\n";
+    o____ "}else{ itested();\n";
+    o____ "  return ret_t(d);\n";
+    o____ "}\n";
+    o__ "}\n";
+  }
+  std::string code_name()const override{
+    return "_f_max";
+  }
+} p_max;
+DISPATCHER<FUNCTION>::INSTALL d_max(&function_dispatcher, "max|$max", &p_max);
+/*--------------------------------------------------------------------------*/
+class min : public MGVAMS_FUNCTION {
+public:
+  explicit min() : MGVAMS_FUNCTION(){
+    set_label("min");
+  }
+  ~min() { }
+  std::string eval(CS&, const CARD_LIST*)const override { untested();
+    unreachable();
+    return "..";
+  }
+  void stack_op(Expression* e)const override { untested();
+    auto args = get_constant2(e);
+    if(auto a = dynamic_cast<Float const*>(args.first)) { untested();
+      if(auto b = dynamic_cast<Float const*>(args.second)) { untested();
+	subs_double2(e, std::min(a->value(), b->value()));
+      }else if(auto bi = dynamic_cast<Integer const*>(args.second)) { untested();
+	subs_double2(e, std::min(a->value(), double(bi->value())));
+      }else{ untested();
+	throw Exception("invalid");
+      }
+    }else if(auto ai = dynamic_cast<Integer const*>(args.first)) { untested();
+      if(auto b = dynamic_cast<Float const*>(args.second)) { untested();
+	subs_double2(e, std::min(double(ai->value()), b->value()));
+      }else if(auto bi = dynamic_cast<Integer const*>(args.second)) { untested();
+	subs_double2(e, std::min(bi->value(), ai->value()));
+      }else{ untested();
+	throw Exception("invalid");
+      }
+    }else{
+      throw Exception("invalid");
+    }
+  }
+  void make_cc_common(std::ostream& o)const override{
+    o__ "template<class T, class S>\n";
+    o__ "typename va::ddouble_if<T, S>::type\n";
+    o__ "    " << code_name() << "(T d, S e)const {\n";
+    o____ "typedef typename va::ddouble_if<T, S>::type ret_t;\n";
+    o____ "if(double(d) <= double(e)){itested();\n";
+    o____ "  return ret_t(d);\n";
+    o____ "}else{ itested();\n";
+    o____ "  return ret_t(e);\n";
+    o____ "}\n";
+    o__ "}\n";
+  }
+  std::string code_name()const override{
+    return "_f_min";
+  }
+} p_min;
+DISPATCHER<FUNCTION>::INSTALL d_min(&function_dispatcher, "min|$min", &p_min);
+/*--------------------------------------------------------------------------*/
 class floor : public MGVAMS_FUNCTION {
 public:
   explicit floor() : MGVAMS_FUNCTION(){
@@ -573,7 +670,7 @@ public:
     o____ "}\n";
     o____ "::set_value(d, l);\n";
     o____ "return d;\n";
-    o____ "}\n";
+    o__ "}\n";
   }
   std::string code_name()const override{
     return "_f_ln";
@@ -738,19 +835,16 @@ public:
   void make_cc_common(std::ostream& o)const override{
     o__ "template<class T>\n";
     o____ "T " << code_name() << "(T d)const {itested();\n";
-    o______ "if(double(d)>1e-90){ itested();\n";
+    o______ "if(double(d)>0.){ itested();\n";
     o________ "double s = std::sqrt(d);\n";
     o________ "::set_value(d, s);\n";
     o________ "chain(d, .5/s);\n";
-    o______ "}else if(d>0){ untested();\n";
-    o________ "chain(d, 5e91);\n";
-    o________ "::set_value(d, std::sqrt(d));\n";
-    o______ "}else if(d==0){ itested();\n";
-    o________ "chain(d, .5e200);\n";
+    o______ "}else if(d==0){\n";
+    o________ "chain(d, 1e99);\n"; // problem? need inf..
     o________ "::set_value(d, 0.);\n";
-    o______ "}else{\n";
-    o________ "unreachable();\n";
-    o________ "chain(d, .5e99);\n";
+    o______ "}else{untested();\n";
+    o________ "// numerical bug in model...\n";
+    o________ "chain(d, inf);\n";
     o________ "::set_value(d, 0.);\n";
     o______ "}\n";
     o____ "return d;\n";

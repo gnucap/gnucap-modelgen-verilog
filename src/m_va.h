@@ -674,35 +674,13 @@ struct ddouble_if<T, double>{
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-template<class S, class T>
-typename ddouble_if<T, S>::type max(T d, S e)
-{ untested();
-  typedef typename ddouble_if<T, S>::type ret_t;
-  if(double(d) <= double(e)){ itested();
-    return ret_t(e);
-  }else{itested();
-    return ret_t(d);
-  }
-}
-/*--------------------------------------------------------------------------*/
-template<class T, class S>
-typename ddouble_if<T, S>::type min(T d, S e)
-{itested();
-  typedef typename ddouble_if<T, S>::type ret_t;
-  if(double(d) <= double(e)){itested();
-    return ret_t(d);
-  }else{ itested();
-    return ret_t(e);
-  }
-}
-/*--------------------------------------------------------------------------*/
 template<class T, class S=T>
 T white_noise(T, S=0.)
 { itested();
   //incomplete();
   return T(0.);
 }
-
+/*--------------------------------------------------------------------------*/
 template<class T, class T2, class S=T>
 T flicker_noise(T, T2, S=0.)
 { itested();
