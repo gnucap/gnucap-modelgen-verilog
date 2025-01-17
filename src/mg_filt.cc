@@ -270,8 +270,10 @@ private:
     XDT::make_cc_dev(o);
     std::string comma;
 /*--------------------------------------------------------------------------*/
-    comma = "";
     o__ "ddouble " << raw_code_name() << "tr_begin("; args(o); o << "){\n";
+    for(size_t n=0; n<num_args(); ++n){
+      o << "(void)t" << n << ";\n";
+    }
     o____ "return 0.;\n";
     o__ "}\n";
     o__ "ddouble " << raw_code_name() << "tr_eval("; args(o); o << "){\n";

@@ -143,7 +143,7 @@ class LIMIT : public MGVAMS_TASK {
     o______ "// convcheck old vs in?\n";
     o______ "return in;\n";
     o____ "}\n";
-    o____ "ddouble precalc(ddouble in, std::string const& what, double const& a, double const& b){\n";
+    o____ "ddouble precalc(ddouble, std::string const&, double const&, double const&) {\n";
     o______ "return 0.;\n";
     o____ "}\n";
     o__ "} " << label() << ";\n";
