@@ -28,7 +28,7 @@ module test(y, a, nen);
 endmodule
 
 spice
-.model dummy_tmp logic
+.model logic logic
 .verilog
 
 test #() t(y, a, nen)

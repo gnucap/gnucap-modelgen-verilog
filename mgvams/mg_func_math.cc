@@ -842,7 +842,7 @@ public:
     o______ "}else if(d==0){\n";
     o________ "chain(d, 1e99);\n"; // problem? need inf..
     o________ "::set_value(d, 0.);\n";
-    o______ "}else{untested();\n";
+    o______ "}else{\n";
     o________ "// numerical bug in model...\n";
     o________ "chain(d, inf);\n";
     o________ "::set_value(d, 0.);\n";

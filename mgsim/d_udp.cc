@@ -19,20 +19,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * UDP
+ * logic model and device.
+ * netlist syntax:
+ * device:  mxxxx  out gnd vdd in1 in2 ... family gatetype
+ * model:   .model mname LOGIC <args>
  */
 //testing=script,sparse 2023.11.22
 #include "e_logicmod.h"
-#include "u_lang.h"
 #include "globals.h"
 #include "e_subckt.h"
 #include "u_xprobe.h"
+#include "e_logic.h"
 #include "e_elemnt.h"
-#include "e_va.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-#if 1
 class DEV_LOGIC : public ELEMENT {
 public:
   enum {OUTNODE=0,BEGIN_IN=1}; //node labels
@@ -44,25 +45,25 @@ private:
   smode_t	_oldgatemode;
   smode_t	_gatemode;
   static int	_count;
-  mutable node_t	_nodes[PORTS_PER_GATE];	/* PORTS_PER_GATE <= PORTSPERSUBCKT */
+  mutable node_t _nodes[PORTS_PER_GATE];	/* PORTS_PER_GATE <= PORTSPERSUBCKT */
 public:
   explicit	DEV_LOGIC(COMMON_COMPONENT* c=nullptr);
   explicit	DEV_LOGIC(const DEV_LOGIC& p);
 		~DEV_LOGIC()		{--_count;}
 private: // override virtuals
-  char	   id_letter()const override	{untested();return 'U';}
+  char	   id_letter()const override	{return 'U';}
   std::string value_name()const override{return "";}
   bool	      print_type_in_spice()const override{return true;}
   std::string dev_type()const override{assert(has_common()); return common()->name();}
   int	   tail_size()const override {return 2;}
   int	   max_nodes()const override {return PORTS_PER_GATE;}
   int	   min_nodes()const override {return BEGIN_IN+1;}
-  int	   matrix_nodes()const override	{return 2;}
+  int	   matrix_nodes()const override	{ untested();return 2;}
   int	   net_nodes()const override {return _net_nodes;}
   CARD*	   clone()const override {return new DEV_LOGIC(*this);}
   void	   precalc_first()override {ELEMENT::precalc_first(); if (subckt()) {subckt()->precalc_first();}}
   void	   expand()override;
-  void	   precalc_last() override{ELEMENT::precalc_last(); if (subckt()) {subckt()->precalc_last();}}
+  void	   precalc_last() override;
   //void   map_nodes();
 
   void	   tr_iwant_matrix()override;
@@ -78,9 +79,9 @@ private: // override virtuals
   void	   tr_unload()override;
   TIME_PAIR tr_review()override;
   void	   tr_accept()override;
-  double   tr_involts()const override	{unreachable(); return 0;}
+  double   tr_involts()const override	{ untested();unreachable(); return 0;}
   //double tr_input()const		//ELEMENT
-  double   tr_involts_limited()const override {unreachable(); return 0;}
+  double   tr_involts_limited()const override { untested();unreachable(); return 0;}
   //double tr_input_limited()const	//ELEMENT
   //double tr_amps()const		//ELEMENT
   double   tr_probe_num(const std::string&)const override;
@@ -89,8 +90,8 @@ private: // override virtuals
   void	   ac_begin()override;
   void	   do_ac()override	{untested();  assert(subckt());  subckt()->do_ac();}
   void	   ac_load()override	{untested();  assert(subckt());  subckt()->ac_load();}
-  COMPLEX  ac_involts()const override	{unreachable(); return 0.;}
-  COMPLEX  ac_amps()const override	{unreachable(); return 0.;}
+  COMPLEX  ac_involts()const override	{ untested();unreachable(); return 0.;}
+  COMPLEX  ac_amps()const override	{ untested();unreachable(); return 0.;}
   XPROBE   ac_probe_ext(const std::string&)const override;
 
   node_t& n_(int i)const override {
@@ -102,6 +103,9 @@ private: // override virtuals
     const COMMON_LOGIC* c = dynamic_cast<const COMMON_LOGIC*>(common());
     assert(c);
     return c->port_name(i);
+    //static std::string names[PORTS_PER_GATE] = {"out",
+    //    "in1", "in2", "in3", "in4", "in5", "in6", "in7", "in8", "in9"};
+    //return names[i];
   }
 public:
   static int count()			{untested();return _count;}
@@ -137,6 +141,15 @@ DEV_LOGIC::DEV_LOGIC(const DEV_LOGIC& p)
   ++_count;
 }
 /*--------------------------------------------------------------------------*/
+void DEV_LOGIC::precalc_last()
+{
+  ELEMENT::precalc_last();
+  if (subckt()) {
+    subckt()->precalc_last();
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
 void DEV_LOGIC::expand()
 {
   ELEMENT::expand();
@@ -166,8 +179,6 @@ void DEV_LOGIC::expand()
     error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)), 
 	  long_label() + ": can't find subckt: " + subckt_name + ", forcing digital\n");
   }
-  
-  assert(!is_constant()); /* is a BUG */
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_iwant_matrix()
@@ -526,8 +537,7 @@ void DEV_LOGIC::tr_accept()
 	assert(future_state.lv_old() == future_state.lv_future());
 	if (n_(OUTNODE)->lv() == lvUNKNOWN
 	    || future_state.lv_future() != n_(OUTNODE)->lv_future()) {
-	  n_(OUTNODE)->set_event(m->delay, future_state);
-	  _sim->new_event(n_(OUTNODE)->final_time(), this);
+	  n_(OUTNODE)->set_event(c->_real_delay, future_state);
 	  //assert(future_state == n_(OUTNODE).lv_future());
 	  if (_lastchangenode == OUTNODE) {untested();
 	    unreachable();
@@ -585,14 +595,10 @@ bool DEV_LOGIC::want_digital()const
     ((OPT::mode == moDIGITAL) || (OPT::mode == moMIXED && _quality == qGOOD));
 }
 /*--------------------------------------------------------------------------*/
-
-/*--------------------------------------------------------------------------*/
 int DEV_LOGIC::_count = -1;
 /*--------------------------------------------------------------------------*/
 static DEV_LOGIC p1(nullptr);
 static DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "logic", &p1);
-/*--------------------------------------------------------------------------*/
-#endif
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

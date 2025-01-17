@@ -29,7 +29,7 @@ static void make_cc_class(std::ostream& o, const Primitive& p)
   base_class_name = "COMMON_LOGIC";
   o << "class " << class_name << " :public " << base_class_name << "{\n";
   o__ "explicit " << class_name << "(const " << class_name << "& p) : "
-                  << base_class_name << "(p) { set_modelname(\"dummy_tmp\");}\n";
+                  << base_class_name << "(p) { }\n";
   o__ "COMMON_COMPONENT* clone()const override {return new "<<class_name<<"(*this);}\n";
   o << "public:\n";
   o__ "explicit " << class_name << "(int c=0) : " << base_class_name << "(c) {}\n";
