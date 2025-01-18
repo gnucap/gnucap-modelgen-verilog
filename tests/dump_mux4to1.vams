@@ -1,0 +1,25 @@
+// (c) Felix Salfelder 2025
+// GPLv3+
+`include "disciplines.vams"
+`include "constants.vams"
+`pragma modelgen nodump-nature
+`pragma modelgen nodump-discipline
+
+
+primitive muxtest (out, nen, s1, s0, d3, d2, d1, d0);
+output mux;
+input nen, s1, s0, d3, d2, d1, d0;
+table
+	1 ? ? ? ? ? ? : x;
+	0 0 0 ? ? ? 1 : 1;
+	0 0 0 ? ? ? 0 : 0;
+	0 0 1 ? ? 1 ? : 1;
+	0 0 1 ? ? 0 ? : 0;
+	0 1 0 ? 1 ? ? : 1;
+	0 1 0 ? 0 ? ? : 0;
+	0 1 1 1 ? ? ? : 1;
+	0 1 1 0 ? ? ? : 0;
+	0 x x 0 0 0 0 : 0;
+	0 x x 1 1 1 1 : 1;
+endtable
+endprimitive

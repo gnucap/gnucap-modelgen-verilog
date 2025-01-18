@@ -176,9 +176,10 @@ void UDP_Table::parse_line(CS& f)
     bool sep = false;
     size_t here = f.cursor();
     ONE_OF
-      || ((f >> '1') && (line.push_back(1), true))
-      || ((f >> '0') && (line.push_back(0), true))
-      || ((f >> 'x') && (line.push_back(2), true))
+      || ((f >> '1') && (line.push_back(udp_1), true))
+      || ((f >> '0') && (line.push_back(udp_0), true))
+      || ((f >> 'x') && (line.push_back(udp_x), true))
+      || ((f >> '?') && (line.push_back(udp_q), true))
       || ((f >> ':') && (sep=true))
       || ((f >> ';') && (end=true))
       ;

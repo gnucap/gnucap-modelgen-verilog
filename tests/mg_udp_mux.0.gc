@@ -1,0 +1,45 @@
+
+load ./modelgen_1.so
+load vams/vpulse.so
+
+`modelgen test_mymux0
+module test_mymux0
+endmodule
+
+primitive mymux0 (y, s, d1, d0);
+output out;
+input in1;
+table
+        0 1 ?: 1;
+        0 0 ?: 0;
+        1 ? 1: 1;
+        1 ? 0: 0;
+        x 0 0: 0;
+        x 1 1: 1;
+endtable
+endprimitive
+`endmodelgen
+
+!make test_mymux0.so >/dev/null
+attach ./test_mymux0.so
+
+module test(y, s, a, b);
+  vpulse #(.val0(0) .val1(5) .width(.25) .period(.5)) v1(a, \0 );
+  vpulse #(.val0(0) .val1(5), .td(.1) .width(.5) .period(1)) v1(b, \0 );
+  vpulse #(.val0(0) .val1(5), .td(.1) .width(1) .period(2)) v1(s, \0 );
+  mymux0 b(y, s, a, b);
+endmodule
+
+spice
+.model logic logic
+.verilog
+
+test #() t(y, s, a, b)
+
+list
+
+print op v(nodes)
+op
+
+print tran v(nodes)
+tran 2 .2 trace n

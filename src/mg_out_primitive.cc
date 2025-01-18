@@ -82,7 +82,9 @@ static std::string mkmask(std::vector<int> const& line, int what)
   std::string s = "std::bitset<" + to_string(int(line.size())-1) + ">(0b";
   int i = int(line.size());
   while(i--){
-    if(line[i] == what){
+    if(line[i] == UDP_Table::udp_q){
+      s+= "1";
+    }else if(line[i] == what){
       s+= "1";
     }else{
       s+= "0";
