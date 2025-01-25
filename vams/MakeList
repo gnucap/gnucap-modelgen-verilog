@@ -25,7 +25,7 @@ VAMS_HEADERS = \
 	constants.vams \
 	disciplines.vams
 INSTALL_FILES_1 = ${VAMS_HEADERS:%=${srcdir}/%}
-INSTALL_DIR_1 = ${GNUCAP_INCLUDEDIR}
+INSTALL_DIR_1 = ${PREFIX}/include/gnucap/
 
 # BUG: wrong place, create some Make2?
 MG_ENV = GNUCAP_PLUGPATH=..

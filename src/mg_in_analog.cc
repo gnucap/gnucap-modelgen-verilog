@@ -441,7 +441,7 @@ void AnalogInitialStmt::parse(CS& f)
 }
 /*--------------------------------------------------------------------------*/
 void AnalogInitialStmt::dump(std::ostream& o) const
-{ untested();
+{
   o__ "initial ";
   _body.dump(o);
 }

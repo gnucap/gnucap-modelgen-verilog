@@ -66,6 +66,7 @@ private:
     make_cc_dev(o, "tr_accept");
     make_cc_dev(o, "tr_advance");
     make_cc_dev(o, "tr_regress");
+    make_cc_dev(o, "tr_restore");
     make_cc_dev(o, "tr_finish");
     make_cc_dev(o, "precalc");
   }
