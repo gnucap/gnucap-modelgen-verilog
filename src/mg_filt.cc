@@ -233,7 +233,7 @@ public:
 public:
   bool has_modes()const override {return true;}
   bool has_tr_begin()const override {return false;}
-  bool has_tr_review()const override {return true;}
+  bool has_tr_review()const override {return num_args()>2;}
   bool has_tr_accept()const override {return num_args()>2;}
   bool has_tr_advance()const override {return false;}
 
