@@ -1099,10 +1099,13 @@ Block const* Token_VAR_REF::scope() const
 /*--------------------------------------------------------------------------*/
 Data_Type const& Token_ARGUMENT::type() const
 {
-  // _var?
+  if(auto v = dynamic_cast<Token_VAR_DECL const*>(_var)) {
+    return v->type();
+  }else{
   unreachable();
     static Data_Type_Real t;
     return t;
+  }
 }
 #if 0
 void Token_VAR_REAL::clear_deps()

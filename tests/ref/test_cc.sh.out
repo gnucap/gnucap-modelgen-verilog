@@ -609,6 +609,19 @@ private:
   }
 };
 /*--------------------------------------------------------------------------*/
+template<class A, class T>
+class wrap_arg{
+   A _a;
+   T& _d;
+public:
+   wrap_arg(T& d) : _d(d) { _a = d; }
+   operator A&() { return _a; }
+   ~wrap_arg() { _d = _a; }
+};
+/*--------------------------------------------------------------------------*/
+template<class S, class T>
+wrap_arg<S, T> io_arg(S, T& d) { return wrap_arg<S, T>(d); }
+/*--------------------------------------------------------------------------*/
 } // namespace
 namespace va {
 // some builtin numerical functions according to verilog standard
@@ -2144,12 +2157,13 @@ void MOD_resistor::precalc_last()
   }
 }
 /*--------------------------------------------------------------------------*/
-  inline MOD_resistor* DEV(COMPONENT* d)
+inline MOD_resistor* DEV(COMPONENT* d)
 {
-    auto m = prechecked_cast<MOD_resistor*>(d);
-    assert(m);
-    return m;
-  };
+  auto m = prechecked_cast<MOD_resistor*>(d);
+  assert(m);
+  return m;
+};
+/*--------------------------------------------------------------------------*/
 MOD_resistor::ddouble MOD_resistor::_b_white_noise_1(ddouble t0, std::string what)
 {
   (void)what;
@@ -3668,12 +3682,13 @@ void MOD_resistor::precalc_last()
   }
 }
 /*--------------------------------------------------------------------------*/
-  inline MOD_resistor* DEV(COMPONENT* d)
+inline MOD_resistor* DEV(COMPONENT* d)
 {
-    auto m = prechecked_cast<MOD_resistor*>(d);
-    assert(m);
-    return m;
-  };
+  auto m = prechecked_cast<MOD_resistor*>(d);
+  assert(m);
+  return m;
+};
+/*--------------------------------------------------------------------------*/
 MOD_resistor::ddouble MOD_resistor::_b_white_noise_0(ddouble t0, std::string what)
 {
   (void)what;
@@ -4313,6 +4328,19 @@ private:
     push_back(args...);
   }
 };
+/*--------------------------------------------------------------------------*/
+template<class A, class T>
+class wrap_arg{
+   A _a;
+   T& _d;
+public:
+   wrap_arg(T& d) : _d(d) { _a = d; }
+   operator A&() { return _a; }
+   ~wrap_arg() { _d = _a; }
+};
+/*--------------------------------------------------------------------------*/
+template<class S, class T>
+wrap_arg<S, T> io_arg(S, T& d) { return wrap_arg<S, T>(d); }
 /*--------------------------------------------------------------------------*/
 } // namespace
 namespace va {
@@ -5549,12 +5577,13 @@ void MOD_capacitor::precalc_last()
   }
 }
 /*--------------------------------------------------------------------------*/
-  inline MOD_capacitor* DEV(COMPONENT* d)
+inline MOD_capacitor* DEV(COMPONENT* d)
 {
-    auto m = prechecked_cast<MOD_capacitor*>(d);
-    assert(m);
-    return m;
-  };
+  auto m = prechecked_cast<MOD_capacitor*>(d);
+  assert(m);
+  return m;
+};
+/*--------------------------------------------------------------------------*/
 //cc impl
 MOD_capacitor::ddouble MOD_capacitor::_b_ddt_1(ddouble t0)
 {
@@ -6569,12 +6598,13 @@ void MOD_capacitor::precalc_last()
   }
 }
 /*--------------------------------------------------------------------------*/
-  inline MOD_capacitor* DEV(COMPONENT* d)
+inline MOD_capacitor* DEV(COMPONENT* d)
 {
-    auto m = prechecked_cast<MOD_capacitor*>(d);
-    assert(m);
-    return m;
-  };
+  auto m = prechecked_cast<MOD_capacitor*>(d);
+  assert(m);
+  return m;
+};
+/*--------------------------------------------------------------------------*/
 //cc impl
 MOD_capacitor::ddouble MOD_capacitor::_b_ddt_2(ddouble t0)
 {

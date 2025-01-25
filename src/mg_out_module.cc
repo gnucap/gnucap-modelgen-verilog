@@ -1173,11 +1173,13 @@ static void make_module_dispatcher(std::ostream& o, Module const& m)
 static void make_cc_func(std::ostream& o, const Module& m)
 {
   if(1||m.size()) {
-    o__ "inline MOD_" << m.identifier() << "* DEV(COMPONENT* d)\n{\n";
-    o____ "auto m = prechecked_cast<MOD_" << m.identifier() << "*>(d);\n";
-    o____ "assert(m);\n";
-    o____ "return m;\n";
-    o__ "};\n";
+    o << "inline MOD_" << m.identifier() << "* DEV(COMPONENT* d)\n{\n";
+    o__ "auto m = prechecked_cast<MOD_" << m.identifier() << "*>(d);\n";
+    o__ "assert(m);\n";
+    o__ "return m;\n";
+    o << "};\n"
+      "/*--------------------------------------"
+      "------------------------------------*/\n";
   }else{ untested();
   }
   for(FUNCTION_ const* f : m.funcs()){

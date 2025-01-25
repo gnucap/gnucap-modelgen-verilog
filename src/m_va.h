@@ -599,6 +599,19 @@ private:
   }
 };
 /*--------------------------------------------------------------------------*/
+template<class A, class T>
+class wrap_arg{
+   A _a;
+   T& _d;
+public:
+   wrap_arg(T& d) : _d(d) { _a = d; }
+   operator A&() { return _a; }
+   ~wrap_arg() { _d = _a; }
+};
+/*--------------------------------------------------------------------------*/
+template<class S, class T>
+wrap_arg<S, T> io_arg(S, T& d) { return wrap_arg<S, T>(d); }
+/*--------------------------------------------------------------------------*/
 } // namespace
 namespace va {
 // some builtin numerical functions according to verilog standard

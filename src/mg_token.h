@@ -392,6 +392,20 @@ private:
   size_t num_deps() const;
 }; // Token_VAR_REF
 /*--------------------------------------------------------------------------*/
+class Token_ARGUMENT : public Token_VAR_REF {
+public:
+  Token * _var{nullptr}; // why not use VAR_REF::_item?
+  Data_Type const& type()const override;
+public:
+  explicit Token_ARGUMENT() : Token_VAR_REF("", nullptr){ untested();unreachable();}
+  explicit Token_ARGUMENT(std::string Name)
+    : Token_VAR_REF(Name, nullptr, new TData()) {}
+  void dump(std::ostream& o)const override;
+public: // LiSt
+  std::string key() const { untested();unreachable();return "";}
+  void set_owner(Base*){ untested();unreachable();}
+};
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class Variable_Stmt;
 class Token_VAR_DECL : public Token_VAR_REF {

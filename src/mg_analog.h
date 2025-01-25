@@ -91,20 +91,6 @@ private:
   void make_cc_common(std::ostream&)const override;
 }; // Probe
 /*--------------------------------------------------------------------------*/
-class Token_ARGUMENT : public Token_VAR_REF {
-public:
-  Token * _var{nullptr}; // why not use VAR_REF::_item?
-  Data_Type const& type()const override;
-public:
-  explicit Token_ARGUMENT() : Token_VAR_REF("", nullptr){ untested();unreachable();}
-  explicit Token_ARGUMENT(std::string Name)
-    : Token_VAR_REF(Name, nullptr, new TData()) {}
-  void dump(std::ostream& o)const override;
-public: // LiSt
-  std::string key() const { untested();unreachable();return "";}
-  void set_owner(Base*){ untested();unreachable();}
-};
-/*--------------------------------------------------------------------------*/
 class AF_Arg_List : public Owned_Base { // was : public LiSt<Analog_Function_Arg, '\0', ',', ';'> 
 //  Data_Type _type;
   typedef LiSt<Token_ARGUMENT, '\0', ',', ';'> list_t;

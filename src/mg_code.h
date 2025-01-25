@@ -77,7 +77,7 @@ public:
 /*--------------------------------------------------------------------------*/
 class Data_Type : public Base{
 protected:
-  typedef enum{ t_default, t_real, t_int } type_t;
+  typedef enum{ t_default, t_real, t_int, t_string, t_fun } type_t;
   type_t _type;
   Data_Type(type_t type) : Base(), _type(type){}
 public:
@@ -88,7 +88,13 @@ public:
   void dump(std::ostream& f)const override;
   bool is_real() const{ return _type==t_real; }
   bool is_int() const{ return _type==t_int; }
+  bool is_string() const{ return _type==t_string; }
+  bool is_function() const{ return _type==t_fun; }
   operator bool() const {return _type!=t_default;}
+  std::string cxx_name()const {
+    static std::string names[] = {"??", "ddouble", "integer", "std::string"};
+    return names[_type];
+  }
 };
 /*--------------------------------------------------------------------------*/
 class Data_Type_Real : public Data_Type{
@@ -300,6 +306,27 @@ inline bool Statement::is_used_in(Base const* b) const
     }
   }
   return false;
+}
+/*--------------------------------------------------------------------------*/
+inline std::string cxx_name(Data_Type const*x)
+{
+  if(!x) { untested();
+    return "??";
+  }else{
+    return x->cxx_name();
+  }
+#if 0 // ?
+  else if(x->is_real()) { untested();
+    return "ddouble";
+  }else if(x->is_int()) { untested();
+    return "int";
+  }else if(x->is_string()) { untested();
+    return "std::string";
+  }else{ untested();
+    unreachable();
+    return "??";
+  }
+#endif
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

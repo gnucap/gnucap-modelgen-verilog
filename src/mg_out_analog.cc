@@ -74,7 +74,6 @@ private:
   void make_stmt       (std::ostream& o, Statement const& a)const;
   void make_block      (std::ostream& o, Block const& s)const;
 private:
-  void make_af_tparam  (std::ostream& o, const Analog_Function& f)const;
   void make_af_args    (std::ostream& o, const Analog_Function& f)const;
   void make_af_body    (std::ostream& o, const Analog_Function& f)const;
   void make_initial    (std::ostream& o, AnalogInitialStmt const& s)const;
@@ -476,14 +475,11 @@ void OUT_ANALOG::make_af(std::ostream& o, const Analog_Function& f) const
   auto mp = prechecked_cast<Module const*>(f.owner());
   assert(mp);
   auto& m = *mp;
-  o << "template<";
-  make_af_tparam(o, f);
-  o << "class X>\n";
   o << "COMMON_" << m.identifier() << "::";
   o << "ddouble COMMON_" << m.identifier() << "::" << f.code_name() << "(\n";
-  o << "            ";
+  o << "            MOD* d";
   make_af_args(o, f);
-  o << ") const\n{\n";
+  o << ") const\n{ // make_af\n";
   {
     indent x;
     o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
@@ -495,27 +491,10 @@ void OUT_ANALOG::make_af(std::ostream& o, const Analog_Function& f) const
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_af_tparam(std::ostream& o, const Analog_Function& f) const
-{
-  int n = 0;
-  for (Base const* x : f.header()){
-    auto coll =  prechecked_cast<AF_Arg_List const*>( x);
-    assert(coll);
-    for(auto i : *coll){
-      (void) i;
-      if(coll->is_output()){
-	o << "class D"<<++n<<", ";
-      }else{
-      }
-    }
-  }
-}
-/*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_af_args(std::ostream& o, const Analog_Function& f) const
 {
-  std::string sep = "";
+  std::string sep = ", ";
   std::string qual = "";
-  int n = 0;
   for (Base const* x : f.header()){
     auto coll =  prechecked_cast<AF_Arg_List const*>( x);
     assert(coll);
@@ -524,12 +503,11 @@ void OUT_ANALOG::make_af_args(std::ostream& o, const Analog_Function& f) const
     }else{
       qual = "";
     }
-    for(auto i : *coll){
+    for(Token_ARGUMENT const* i : *coll){
+      o << sep << cxx_name(&i->type());
       if(coll->is_output()){
-	o << sep << "D" << ++n << "& ";
+	o << "&";
       }else{
-	qual = "";
-	o << sep << "ddouble " << qual;
       }
       //o << " af_arg_" << i->identifier();
       o << " _v_" << i->name(); // code_name?

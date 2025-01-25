@@ -1764,44 +1764,66 @@ public:
 #endif
   }
 
+ // bool context_arg()const override { return true; }
+  bool is_common()const override { return true; }
+  // TODO: fix linear search
+  bool is_output_arg(int I)const override {
+    assert(_af);
+    int n = 0;
+    for (Base const* x : _af->header()){
+      auto coll = prechecked_cast<AF_Arg_List const*>(x);
+      assert(coll);
+      for(Token_ARGUMENT const* i : *coll){
+	(void)i;
+	if(n++ == I) {
+	  return coll->is_output();
+	}else{
+	}
+      }
+    }
+    unreachable();
+    return false;
+  }
+  // TODO: fix linear search
+  Data_Type const* arg_type(int I)const override {
+    assert(_af);
+    int n = 0;
+    for (Base const* x : _af->header()){
+      auto coll = prechecked_cast<AF_Arg_List const*>(x);
+      assert(coll);
+      for(Token_ARGUMENT const* i : *coll){
+	if(n++ == I) {
+	  return &i->type();
+	}else{
+	}
+      }
+    }
+    unreachable();
+    return nullptr;
+  }
+
+  /// BUG: belongs to mg_out_analog.
   void make_cc_common(std::ostream& o)const override {
     o << "//incomplete: af common\n";
     assert(_af);
     auto& F = *_af;
-    int n = 0;
 
-    o__ "template<";
-    for (Base const* x : F.header()){
-      auto coll = prechecked_cast<AF_Arg_List const*>(x);
-      assert(coll);
-
-      for(auto i : *coll){
-	if(coll->is_output()){
-	  o << "class D" << ++n << ", ";
-	}else{
-	}
-	o << "/*" << i->name() << "*/";
-      }
-    }
-    o << "class X=void>\n";
-    o__ "ddouble " << F.code_name() << "(";
+    o__ "ddouble /*BUG*/" << F.code_name() << "(MOD* d";
     trace1("af::make_cc_common", label());
     // BUG? make_cc_af_args
-    std::string sep = "";
-    std::string qual = "";
-    n = 0;
+    std::string sep = ", ";
     for (Base const* x : F.header()){
       auto coll = prechecked_cast<AF_Arg_List const*>(x);
       assert(coll);
 
-      for(auto i : *coll){
+      for(Token_ARGUMENT const* i : *coll){
+	o << sep << cxx_name(&i->type());
+
 	if(coll->is_output()){
-	  qual = "/*output*/ &";
-	  o << sep << "D" << ++n << "& ";
+	  o << "&";
 	}else{
-	  o << sep << "ddouble ";
 	}
-	o << "/*" << i->name() << "*/";
+	o << " /*" << i->name() << "*/";
 	sep = ", ";
       }
     }

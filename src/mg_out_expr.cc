@@ -535,6 +535,7 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
     }else if (auto pb = dynamic_cast<const Token_PORT_BRANCH*>(*i)) {
       s.new_ref(pb->code_name());
     }else if (auto A = dynamic_cast<const Token_ARRAY_*>(*i)) {
+      // TODO: move out of here.
       if(A->args()){
 	auto se = prechecked_cast<Expression const*>(A->args());
 	assert(se);
@@ -612,6 +613,7 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
       if((*F)->has_modes()){
 	o << _ctx;
       }else if(_ctx=="precalc" && (*F)->has_precalc()){
+	// TODO: cleanup.
 	o << "__" + _ctx;
       }else{
       }
@@ -619,7 +621,7 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
       o << "(";
       std::string comma = "";
       if((*F)->is_common()){
-	o << "d";
+	o << "d /*is_common*/";
 	comma = ", ";
       }else{
       }
@@ -631,8 +633,14 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
 	s.args_pop();
       }else{
 	assert(F->code_name()!="");
-	for(size_t ii=argnames.size(); ii; --ii){
-	  o << comma << argnames[ii-1];
+	for(int nn=0; nn<int(argnames.size()); ++nn) {
+	  int ii = int(argnames.size())-nn-1;
+	  o << comma; //  << "/* arg " << nn << "*/";
+	  if((*F)->is_output_arg(nn)){
+	    o << "io_arg(" << cxx_name((*F)->arg_type(nn)) << "(), " << argnames[ii] << ")";
+	  }else{
+	    o << argnames[ii];
+	  }
 	  comma = ", ";
 	}
 	o << ");\n";

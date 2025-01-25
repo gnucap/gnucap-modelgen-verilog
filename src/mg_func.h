@@ -34,6 +34,7 @@ class Token;
 class Expression;
 class Module;
 class TData;
+class Data_Type;
 // TODO: move upstream, partly?
 class FUNCTION_ : public FUNCTION {
   mutable int _refs{0};
@@ -45,6 +46,7 @@ public:
   	: FUNCTION(o), _num_args(o._num_args) {
 	  set_label(o.short_label()); // base?
   }
+
 //  void set_label(std::string const& l){ untested();
 //  	_label = l;
 //  }
@@ -55,6 +57,9 @@ public: // characteristics
   std::string const& key()const { return label(); } // free?
   void set_num_args(size_t n){ _num_args = n; }
   size_t num_args() const { return _num_args; }
+  virtual bool is_output_arg(int)const {return false;}
+  virtual Data_Type const* arg_type(int)const{return nullptr;}
+  virtual Data_Type const* return_type()const{return nullptr;}
   virtual bool has_precalc()const   {return false;}
   virtual bool has_tr_begin()const  {return false;}
   virtual bool has_tr_restore()const{return has_tr_begin();}
@@ -68,7 +73,9 @@ public: // characteristics
   virtual bool static_code()const {return false;}
   virtual bool is_common()const {return false;}
   virtual bool has_modes()const {return false;}
-  virtual bool returns_void()const { return false; }
+  virtual bool context_arg()const {return false;}
+
+  virtual bool returns_void()const { return false; } // use return_type?
 
 public: // code generation
   virtual void make_cc_impl(std::ostream&)const {}
