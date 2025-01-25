@@ -175,7 +175,7 @@ public:
   bool operator<=(int const& o)const { itested();
     return *_data <= o;
   }
-  bool operator>(ddouble_ const& o)const { untested();
+  bool operator>(ddouble_ const& o)const {
     return *_data > *o._data;
   }
   bool operator>(double const& o)const {
@@ -190,6 +190,9 @@ public:
 
   bool operator>=(const ddouble_& o)const { itested();
     return *_data >= *o._data;
+  }
+  bool operator>=(const int& o)const { itested();
+    return *_data >= o;
   }
   bool operator>=(const double& o)const {
     return *_data >= o;
@@ -957,6 +960,7 @@ static _COMMON_VASRC_rotational_omega _C_V_rotational_omega(CC_STATIC);
 namespace n0{
 class MOD_resistor;
 class COMMON_resistor :public COMMON_COMPONENT{
+  typedef COMMON_resistor COMMON;
   typedef MOD_resistor MOD;
   typedef enum { m_TR_ADVANCE, m_TR_ACCEPT, m_PRECALC, m_TR_REVIEW }eval_t;
   typedef ddouble_<2> ddouble;
@@ -1009,6 +1013,7 @@ private: // funcs
 }; //COMMON_resistor
 /*--------------------------------------------------------------------------*/
 class MOD_resistor : public BASE_SUBCKT {
+  typedef COMMON_resistor COMMON;
 private:
   static int _count;
 public:
@@ -2193,6 +2198,7 @@ ddouble MOD_resistor::_b_white_noise_1__precalc(ddouble, std::string what) {
 namespace n1{
 class MOD_resistor;
 class COMMON_resistor :public COMMON_COMPONENT{
+  typedef COMMON_resistor COMMON;
   typedef MOD_resistor MOD;
   typedef enum { m_TR_ADVANCE, m_TR_ACCEPT, m_PRECALC, m_TR_REVIEW }eval_t;
   typedef ddouble_<2> ddouble;
@@ -2244,6 +2250,7 @@ private: // funcs
 }; //COMMON_resistor
 /*--------------------------------------------------------------------------*/
 class MOD_resistor : public BASE_SUBCKT {
+  typedef COMMON_resistor COMMON;
 private:
   static int _count;
 public:
@@ -3895,7 +3902,7 @@ public:
   bool operator<=(int const& o)const { itested();
     return *_data <= o;
   }
-  bool operator>(ddouble_ const& o)const { untested();
+  bool operator>(ddouble_ const& o)const {
     return *_data > *o._data;
   }
   bool operator>(double const& o)const {
@@ -3910,6 +3917,9 @@ public:
 
   bool operator>=(const ddouble_& o)const { itested();
     return *_data >= *o._data;
+  }
+  bool operator>=(const int& o)const { itested();
+    return *_data >= o;
   }
   bool operator>=(const double& o)const {
     return *_data >= o;
@@ -4677,6 +4687,7 @@ static _COMMON_VASRC_rotational_omega _C_V_rotational_omega(CC_STATIC);
 namespace n0{
 class MOD_capacitor;
 class COMMON_capacitor :public COMMON_COMPONENT{
+  typedef COMMON_capacitor COMMON;
   typedef MOD_capacitor MOD;
   typedef enum { m_TR_ADVANCE, m_TR_ACCEPT, m_PRECALC, m_TR_REVIEW }eval_t;
   typedef ddouble_<2> ddouble;
@@ -4740,6 +4751,7 @@ private: // funcs
 }; //COMMON_capacitor
 /*--------------------------------------------------------------------------*/
 class MOD_capacitor : public BASE_SUBCKT {
+  typedef COMMON_capacitor COMMON;
 private:
   static int _count;
   bool _accept{false};
@@ -5604,6 +5616,7 @@ MOD_capacitor::ddouble MOD_capacitor::_b_ddt_1(ddouble t0)
 namespace n1{
 class MOD_capacitor;
 class COMMON_capacitor :public COMMON_COMPONENT{
+  typedef COMMON_capacitor COMMON;
   typedef MOD_capacitor MOD;
   typedef enum { m_TR_ADVANCE, m_TR_ACCEPT, m_PRECALC, m_TR_REVIEW }eval_t;
   typedef ddouble_<2> ddouble;
@@ -5667,6 +5680,7 @@ private: // funcs
 }; //COMMON_capacitor
 /*--------------------------------------------------------------------------*/
 class MOD_capacitor : public BASE_SUBCKT {
+  typedef COMMON_capacitor COMMON;
 private:
   static int _count;
   bool _accept{false};

@@ -64,8 +64,6 @@ private:
 } bound_step;
 DISPATCHER<FUNCTION>::INSTALL d_bound_step(&function_dispatcher, "$bound_step", &bound_step);
 /*--------------------------------------------------------------------------*/
-static size_t cnt;
-/*--------------------------------------------------------------------------*/
 class FINISH_TASK : public MGVAMS_TASK {
 public:
   explicit FINISH_TASK() : MGVAMS_TASK(){
@@ -102,54 +100,6 @@ private:
   bool returns_void()const override { return true; }
 } finish;
 DISPATCHER<FUNCTION>::INSTALL d_finish(&function_dispatcher, "$finish", &finish);
-/*--------------------------------------------------------------------------*/
-class LIMIT : public MGVAMS_TASK {
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
-    return "$limit";
-  }
-  LIMIT* clone()const override{
-    return new LIMIT(*this);
-  }
-  Token* new_token(Module& m, size_t na)const override{
-    LIMIT* cl = clone();
-    cl->set_label("t_limit_" + std::to_string(cnt++));
-    cl->set_num_args(na);
-    m.push_back(cl);
-    // d untouched?
-    return new Token_CALL("$limit", cl);
-  }
-  std::string code_name()const override{
-    return "d->" + label();
-  }
-  void make_cc_common(std::ostream&)const override {
-    // nothing.
-  }
-  void make_cc_dev(std::ostream& o)const override {
-    o__ "class " << label() << "{\n";
-    o____ "double _old;\n";
-    o____ "public:\n";
-    o____ "ddouble operator()(ddouble in, std::string const& what, double const& a, double const& b){\n";
-    o______ "double old = in;\n";
-    o______ "assert(what == \"pnjlim\"); // for now\n";
-    o______ "if(_sim->is_initial_step()) {\n";
-    o________ "in.set_value(0.);\n";
-    o________ "_old = 0;\n";
-    o______ "}else{\n";
-    // o________ "in = ngspice_pnjlim(in, _old, a, b);\n";
-    // BUG: what about the derivatives?
-    o________ "in.set_value(pnj_limit(in, _old, a, b));\n";
-    o________ "_old = old;\n";
-    o______ "}\n";
-    o______ "// convcheck old vs in?\n";
-    o______ "return in;\n";
-    o____ "}\n";
-    o____ "ddouble precalc(ddouble, std::string const&, double const&, double const&) {\n";
-    o______ "return 0.;\n";
-    o____ "}\n";
-    o__ "} " << label() << ";\n";
-  }
-} limit;
-DISPATCHER<FUNCTION>::INSTALL d_limit(&function_dispatcher, "$limit", &limit);
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/

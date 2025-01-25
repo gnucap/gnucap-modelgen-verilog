@@ -9,7 +9,7 @@ mg_func_pf.o: mg_func_pf.cc ../src/mg_func.h ../src/mg_token.h \
  ../src/mg_analog.h ../src/mg_.h ../src/mg_attrib.h ../src/mg_code.h \
  ../src/mg_filter.h ../src/mg_circuit.h ../src/mg_module.h \
  ../src/mg_component.h ../src/mg_discipline.h ../src/mg_primitive.h \
- ../src/mg_token.h ../src/mg_code.h
+ ../src/mg_token.h ../src/mg_code.h f__.cc
 mg_func_sys.o: mg_func_sys.cc ../src/mg_func.h ../src/mg_token.h \
  ../src/mg_expression.h ../src/mg_func.h ../src/mg_base.h \
  ../src/mg_error.h ../src/mg_deps.h ../src/mg_lib.h ../src/mg_out.cc \

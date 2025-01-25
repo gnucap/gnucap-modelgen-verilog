@@ -9,6 +9,7 @@ This file summarizes new features and important changes between snapshots.
 * port connections now optional
 * overloading based on connections
 * idt reset flag
+* analog function ref in $limit call
 
 20241210-dev
 ============

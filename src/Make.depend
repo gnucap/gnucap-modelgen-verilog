@@ -172,6 +172,10 @@ mg_task_discont.o: mg_task_discont.cc mg_func.h mg_token.h \
  mg_expression.h mg_base.h mg_error.h mg_deps.h mg_lib.h mg_.h \
  mg_attrib.h mg_code.h mg_filter.h mg_circuit.h mg_module.h \
  mg_component.h mg_discipline.h mg_primitive.h mg_out.h
+mg_task_limit.o: mg_task_limit.cc mg_func.h mg_token.h mg_expression.h \
+ mg_base.h mg_error.h mg_deps.h mg_lib.h mg_.h mg_attrib.h mg_code.h \
+ mg_filter.h mg_circuit.h mg_module.h mg_component.h mg_discipline.h \
+ mg_primitive.h mg_out.h
 mg_task_trace.o: mg_task_trace.cc mg_func.h mg_token.h mg_expression.h \
  mg_base.h mg_error.h mg_deps.h mg_lib.h mg_.h mg_attrib.h mg_code.h \
  mg_filter.h mg_circuit.h mg_module.h mg_component.h mg_discipline.h \

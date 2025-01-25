@@ -1741,13 +1741,13 @@ public:
   }
 
 #if 1
-  Token* new_token(Module& m, size_t /*na*/) const override { untested();
+  Token* new_token(Module& m, size_t /*na*/) const override {
     trace1("AF::new_token", label());
     m.install(this);
-    if(code_name() != ""){ untested();
-      return new Token_CALL(label(), this);
+    if(code_name() != ""){
+      return new Token_FUNCTION(label(), this);
     }else if(label() != ""){ untested();
-      return new Token_CALL(label(), this);
+      return new Token_FUNCTION(label(), this);
     }else{ untested();
       incomplete();
       return nullptr;
@@ -1808,7 +1808,7 @@ public:
     assert(_af);
     auto& F = *_af;
 
-    o__ "ddouble /*BUG*/" << F.code_name() << "(MOD* d";
+    o__ "ddouble /*BUG*/" << F.code_name() << "(COMPONENT* c";
     trace1("af::make_cc_common", label());
     // BUG? make_cc_af_args
     std::string sep = ", ";
@@ -2591,7 +2591,8 @@ void Analog::dump(std::ostream& o) const
   }
 }
 /*--------------------------------------------------------------------------*/
-FUNCTION_ const* analog_function_call(std::string const& f, Block const* scope)
+// BUG. go through refs
+FUNCTION_ const* analog_function(std::string const& f, Block const* scope)
 {
   Module const* m = to_module(scope);
   assert(m);

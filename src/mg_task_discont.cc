@@ -63,21 +63,21 @@ private:
     //o__ "struct cls" << label() << "{\n";
 
     //template?
-    o____ "void "<<n<<"tr_eval(int i=0)const {\n";
-    o______ "if(i==-1){untested();\n";
+    o____ "void "<<n<<"tr_eval(int i=0) {\n";
+    o______ "if(i==-1){\n";
     o________ "/*d->*/set_converged(false);\n";
-    o______ "}else{untested();\n";
+    o______ "}else{\n";
     o______ "}\n";
     o____ "}\n";
     o____ "void "<<n<<"tr_review(int i=0) {\n";
-    o______ "if(i>=0){untested();\n";
+    o______ "if(i>=0){\n";
     o________ "q_accept();\n";
     o______ "}else{untested();\n";
     o______ "}\n";
     o____ "}\n";
     o____ "void "<<n<<"tr_accept(int i=0)const {\n";
-    o______ "if(i>=0){ untested();\n";
-    o________ "_sim->new_event(_sim->_time0 + _sim->_dtmin, d);\n";
+    o______ "if(i>=0){\n";
+    o________ "_sim->new_event(_sim->_time0 + _sim->_dtmin, this);\n";
     o______ "}else{ untested();\n";
     o______ "}\n";
     o____ "}\n";

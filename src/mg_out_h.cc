@@ -291,6 +291,7 @@ static void make_common(std::ostream& o, const Module& m)
   std::string class_name = "COMMON_" + m.identifier().to_string();
   std::string base_class_name;
   base_class_name = "COMMON_COMPONENT";
+  std::string common_name = "COMMON_" + m.identifier().to_string();
   // if(m.has_submodule()){ untested();
   //   base_class_name = "COMMON_PARAMLIST";
   // }else{ untested();
@@ -298,6 +299,7 @@ static void make_common(std::ostream& o, const Module& m)
   // }
   o << "class MOD_" << m.identifier() << ";\n";
   o << "class " << class_name << " :public " << base_class_name << "{\n";
+  o__ "typedef " << common_name << " COMMON;\n";
   o__ "typedef MOD_" << m.identifier() << " MOD;\n";
   o__ "typedef enum { m_TR_ADVANCE, m_TR_ACCEPT, m_PRECALC, m_TR_REVIEW }eval_t;\n";
   if(m.circuit()->element_list().size()){
@@ -517,6 +519,7 @@ static void make_module(std::ostream& o, const Module& m)
   std::string common_name = "COMMON_" + m.identifier().to_string();
   std::string precalc_name = "PRECALC_" + m.identifier().to_string();
   o << "class " << class_name << " : public " << base_name << " {\n";
+  o__ "typedef " << common_name << " COMMON;\n";
   o << "private:\n";
   o__ "static int _count;\n";
  // o__ "bool _eval{false};\n";

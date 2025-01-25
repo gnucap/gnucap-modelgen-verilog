@@ -477,11 +477,14 @@ void OUT_ANALOG::make_af(std::ostream& o, const Analog_Function& f) const
   auto& m = *mp;
   o << "COMMON_" << m.identifier() << "::";
   o << "ddouble COMMON_" << m.identifier() << "::" << f.code_name() << "(\n";
-  o << "            MOD* d";
+  o << "            COMPONENT* c";
   make_af_args(o, f);
   o << ") const\n{ // make_af\n";
   {
     indent x;
+    o__ "auto d = prechecked_cast<MOD*>(c);\n";
+    o__ "assert(d);\n";
+    o__ "(void)d;\n";
     o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
     o__ "(void)pc;\n";
     make_af_body(o, f);

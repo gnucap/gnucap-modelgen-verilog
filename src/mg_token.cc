@@ -683,6 +683,7 @@ void Token_FUNCTION::stack_op(Expression* e) const
   if (arg_expr) {
   }else if (E->is_empty()) {
   }else if(auto pl=dynamic_cast<Token_PARLIST_*>(E->back())) {
+    // del_args = true;
     arg_expr = pl->args();
     if(arg_expr){
       pl->set_args(nullptr);
@@ -695,19 +696,19 @@ void Token_FUNCTION::stack_op(Expression* e) const
   }
 
   if (arg_expr) {
-    Token_CALL t(*this, nullptr, arg_expr);
+    Token_CALL t(*this, nullptr, arg_expr); // check: does it delete arg_expr?
     return t.stack_op(E);
   }else if (E->is_empty()){
     incomplete();
     E->push_back(new Token_CALL(*this, const_deps.clone()));
   }else if(!dynamic_cast<const Token_PARLIST*>(E->back())) {
     incomplete();
-    E->push_back(new Token_CALL(*this, const_deps.clone()));
+    E->push_back(new Token_FUNCTION(*this, const_deps.clone()));
   }else{ untested();
     trace2("no params?", name(), E->back()->name());
     incomplete();
   }
-}
+} // Token_FUNCTION::stack_op
 /*--------------------------------------------------------------------------*/
 // BUG
 static Module* to_module(Block* owner)

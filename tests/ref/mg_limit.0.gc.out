@@ -1,7 +1,3 @@
-test_lt0 #(.is(5e-15)) dut(\3 ,2); 
-                               ^ ? invalid identifier
-vsource v1(v, 0); 
-              ^ ? invalid identifier
 // options nobypass 
 // options noincmode 
 resistor #(.r(1)) dut (.p(\3 ),.n(v));

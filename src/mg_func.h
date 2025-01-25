@@ -85,7 +85,7 @@ public: // code generation
   virtual void make_cc_tr_review(std::ostream&)const {}
   virtual void make_cc_tr_accept(std::ostream&)const {}
 
-  virtual Token* new_token(Module&, size_t)const { untested();unreachable(); return nullptr;}
+  virtual Token* new_token(Module&, size_t)const {unreachable(); return nullptr;}
   virtual std::string code_name()const { itested();
 	  // incomplete();
 	  return "";

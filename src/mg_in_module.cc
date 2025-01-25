@@ -1204,9 +1204,13 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args)
 
   trace2("Module::new_token", f->label(), f->static_code());
   if(f->static_code()) {
-    // return f->new_token(*this, num_args);
     install(f);
-    t = new Token_FUNCTION(f->label(), f);
+    t = f->new_token(*this, num_args);
+    if(!t){
+      // incomplete(); // BUG missing new_token?
+      t = new Token_CALL(f->label(), f);
+    }else{
+    }
   }else{
     t = f->new_token(*this, num_args);
   }

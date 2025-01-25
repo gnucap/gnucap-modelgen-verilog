@@ -65,11 +65,7 @@ static FUNCTION_ const* va_function(std::string const& n)
   return dynamic_cast<FUNCTION_ const*>(f);
 }
 /*--------------------------------------------------------------------------*/
-FUNCTION_ const* analog_function_call(std::string const& f, Block const* owner);
-static FUNCTION_ const* is_analog_function_call(std::string const& f, Block const* owner)
-{
-  return analog_function_call(f, owner);
-}
+FUNCTION_ const* analog_function(std::string const& f, Block const* owner);
 /*--------------------------------------------------------------------------*/
 FUNCTION_ const* xs_function_call(std::string const& f, Block const* owner);
 static bool is_xs_function(std::string const& f, Block const* owner)
@@ -95,12 +91,9 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
   }
   assert(Scope);
 
-  for(List_Base<Token>::const_iterator ii = e.begin(); ii!=e.end(); ++ii) {
-    trace2("resolve in", (*ii)->name(), typeid(**ii).name());
-  }
-
   // lookup symbols
   for(List_Base<Token>::const_iterator ii = e.begin(); ii!=e.end(); ++ii) {
+    trace2("resolve in", (*ii)->name(), typeid(**ii).name());
     Token* t = *ii;
 
     auto symbol = dynamic_cast<Token_SYMBOL*>(t);
@@ -217,20 +210,22 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       // this is upside down...
       Token_ACCESS tta(n, nullptr);
       tta.stack_op(&E);
-    }else if(FUNCTION_ const* af = is_analog_function_call(n, Scope)) {
-      // assert(r);
-      Token* tt = resolve_function(af, &E, scope());
-      if(dynamic_cast<Token_PARLIST*>(E.back())){
+    }else if(FUNCTION_ const* af = analog_function(n, Scope)) {
+      // assert(r); // BUG, use refs.
+     // if(dynamic_cast<Token_PARLIST*>(E.back())){
+     // }else{
+     // }
+	Token* tt = resolve_function(af, &E, scope());
        //  assert(dynamic_cast<FUNCTION_ const*>(r));
        //  assert(r == af);
 	// Token_AFCALL a(n, af);
 	assert(tt);
 	tt->stack_op(&E);
 	delete tt;
-      }else{
-	incomplete();
-	E.push_back(tt->clone());
-      }
+     // }else{ untested();
+     //   incomplete();
+     //   E.push_back(tt->clone());
+     // }
     }else if(FUNCTION_ const* vaf = va_function(n)) {
       Token* tt = resolve_function(vaf, &E, scope());
       assert(tt);

@@ -371,14 +371,14 @@ private:
   //  o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
     if(has_refs()) {
       std::string cn = _br->code_name();
-      o____ "MOD_" << id() << "* d = this;\n";
-      o____ "typedef MOD_" << id() << " MOD;\n";
       std::string state = "_st" + cn;
 
       if(_output){
 	o____ "// subdevice\n";
 	o____ "t0 = 0.;\n";
       }else{
+	o____ "MOD_" << id() << "* d = this;\n";
+	o____ "typedef MOD_" << id() << " MOD;\n";
 	o____ "auto e = prechecked_cast<ELEMENT const*>(d->"<< cn << ");\n";
 	o____ "assert(e);\n";
 	// o____ "d->_potential" << cn << " = t0 = e->tr_amps(); // (313)\n";

@@ -39,7 +39,7 @@ public:
   ~EVT_AT(){ }
 private:
   bool static_code()const override {return true;}
-  Token* new_token(Module& m, size_t)const override { untested();
+  Token* new_token(Module& m, size_t)const override {
     m.install(this);
     return new Token_CALL("@", this);
   }

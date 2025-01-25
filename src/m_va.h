@@ -165,7 +165,7 @@ public:
   bool operator<=(int const& o)const { itested();
     return *_data <= o;
   }
-  bool operator>(ddouble_ const& o)const { untested();
+  bool operator>(ddouble_ const& o)const {
     return *_data > *o._data;
   }
   bool operator>(double const& o)const {
@@ -180,6 +180,9 @@ public:
 
   bool operator>=(const ddouble_& o)const { itested();
     return *_data >= *o._data;
+  }
+  bool operator>=(const int& o)const { itested();
+    return *_data >= o;
   }
   bool operator>=(const double& o)const {
     return *_data >= o;

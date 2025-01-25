@@ -646,10 +646,8 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
 	o << ");\n";
 	s.args_pop();
       }
-    }else if (auto ff=dynamic_cast<const Token_FUNCTION*>(*i)) { untested();
-      incomplete();
-      o__ "FFF" << (*i)->name() << "\n";
-
+    }else if (auto ff=dynamic_cast<const Token_FUNCTION*>(*i)) {
+      s.new_ref("&COMMON::" + ff->code_name());
     }else if (auto pl=dynamic_cast<const Token_PARLIST_*>(*i)) { untested();
       if(auto se = dynamic_cast<Expression const*>(pl->args())){ untested();
 	o__ "// start parlist\n";
