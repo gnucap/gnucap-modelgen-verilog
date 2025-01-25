@@ -1172,7 +1172,7 @@ void OUT_ANALOG::make_one_variable_store(std::ostream& o, Token_VAR_REF const& V
 void OUT_ANALOG::make_load_block_variables(std::ostream& o, const
     Variable_List_Collection& P) const
 {
-  if(is_dynamic()) {
+  if(is_dynamic() && P.size()) {
     // not sure if these are actually unused. GCC bug?
     o << "#pragma GCC diagnostic push\n";
     o << "#pragma GCC diagnostic ignored \"-Wunused-local-typedefs\"\n";
@@ -1193,7 +1193,7 @@ void OUT_ANALOG::make_load_block_variables(std::ostream& o, const
     }
   }
 
-  if(is_dynamic()) {
+  if(is_dynamic() && P.size()) {
     o << "#pragma GCC diagnostic pop\n";
   }else{
   }

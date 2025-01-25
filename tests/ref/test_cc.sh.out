@@ -1565,9 +1565,6 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
 // omit Statement 21AnalogConditionalStmt
       {
         { // anonymous block
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
           { // Assignment real 'g'.
             ddouble t0;
             //t0.set_no_deps();
@@ -1766,9 +1763,6 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
       }
       {
         { // anonymous block
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
           { // Assignment real 'g'.
             ddouble t0;
             //t0.set_no_deps();
@@ -2840,9 +2834,6 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         t0 = param_given((_p_tnom) /*rhspar*/);
         if (t0) {
           { // anonymous block
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
             { // Assignment real 'dt'.
               // function $temperature args:0
               ddouble t0;
@@ -2866,9 +2857,6 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         t0 = t0 || t1;
         if (t0) {
           { // anonymous block
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
             { // Assignment real 'g'.
               ddouble t0;
               //t0.set_no_deps();
@@ -2883,9 +2871,6 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
           }
         }else {
           { // anonymous block
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
             { // Assignment real 'g'.
               ddouble t0;
               //t0.set_no_deps();
@@ -3097,9 +3082,6 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         t0 = param_given((_p_tnom) /*rhspar*/);
         if (t0) {
           { // anonymous block
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
             { // Assignment real 'dt'.
               // function $temperature args:0
               ddouble t0;
@@ -3123,9 +3105,6 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         t0 = t0 || t1;
         if (t0) {
           { // anonymous block
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
             { // Assignment real 'g'.
               ddouble t0;
               //t0.set_no_deps();
@@ -3140,9 +3119,6 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
           }
         }else {
           { // anonymous block
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
             { // Assignment real 'g'.
               ddouble t0;
               //t0.set_no_deps();
@@ -5137,9 +5113,6 @@ void EVAL__b_ddt_1_p_ddt_1_n_::tr_eval(ELEMENT* d)const
   (void)d;
   { //
     { // anonymous block
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
 // omit Statement 21AnalogConditionalStmt
     }
   }
@@ -5162,9 +5135,6 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
   (void)d;
   { //
     { // anonymous block
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
 // omit Statement 21AnalogConditionalStmt
     }
   }
@@ -5218,9 +5188,6 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
 {
   trace1("capacitor::tr_eval_analog", d);
   trace1("capacitor::tr_eval_analog", d->long_label());
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
   MOD_capacitor const* p = d;
   (void)p;
   assert(p);
@@ -5229,14 +5196,8 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
   (void)d;
   { //
     { // anonymous block
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
       {
         { // anonymous block
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
           { // Contribution I(p, n) lin: 1
             // F ddt args:0
             ddouble t0;
@@ -6106,9 +6067,6 @@ void EVAL__b_ddt_2_p_ddt_2_n_::tr_eval(ELEMENT* d)const
   (void)d;
   { //
     { // anonymous block
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
 // omit Statement 21AnalogConditionalStmt
     }
   }
@@ -6131,9 +6089,6 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
   (void)d;
   { //
     { // anonymous block
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
 // omit Statement 21AnalogConditionalStmt
     }
   }
@@ -6195,9 +6150,6 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
 {
   trace1("capacitor::tr_eval_analog", d);
   trace1("capacitor::tr_eval_analog", d->long_label());
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
   MOD_capacitor const* p = d;
   (void)p;
   assert(p);
@@ -6206,9 +6158,6 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
   (void)d;
   { //
     { // anonymous block
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
       {
         // F analysis args:0
         std::string s0;
@@ -6219,9 +6168,6 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
         t0 =  1. && t0;
         if (t0) {
           { // anonymous block
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
             { // Contribution V(p, n) lin: 1
               ddouble t0;
               //t0.set_no_deps();
@@ -6237,9 +6183,6 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
           }
         }else {
           { // anonymous block
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic pop
             { // Contribution I(p, n) lin: 1
               // F ddt args:0
               ddouble t0;
