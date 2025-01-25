@@ -49,7 +49,7 @@ private:
   bool has_tr_regress()const override { untested();return true;}
   bool has_tr_accept()const override {return true;}
   bool has_tr_begin()const override {return true;}
-  bool has_tr_restore()const override {return false;}
+  bool has_tr_restore()const override {return true;}
   bool static_code()const override {return false;}
   bool has_modes()const override {return true;}
   Token* new_token(Module& m, size_t na)const override{

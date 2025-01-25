@@ -1,0 +1,41 @@
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_idtddt1(p, n);
+	electrical p, n;
+	inout p, n;
+	(*desc=1*) real qgs;
+	analog begin : eval_cgs
+		real cgst;
+		cgst = 1e-3;
+
+		qgs = idt(1e9 * cgst * ddt(V(p, n) / 1e9), cgst / 1e9);
+$write("");
+$trace("qgs %g\n", qgs);
+
+		I(p, n) <+ ddt(qgs);
+	end
+endmodule
+
+!make test_idtddt1.so > /dev/null
+attach ./test_idtddt1.so
+
+verilog
+
+test_idtddt1  #() d(\2 ,\0 );
+resistor #(1.) r(\1 , \2 )
+vsine #(.offset(-1 ) .phase(-3.14152.), .ampl(1)) v1 (\1 , \0 );
+
+print tran v(nodes) qgs(d)
+print dc v(nodes) qgs(d)
+print ac vm(nodes) vp(nodes)
+ac 1 10 * 10
+dc 1 10 * 10
+ac 1 10 * 10
+tran 1p
+ac 1 10 * 10
+status notime
+end

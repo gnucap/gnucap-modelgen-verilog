@@ -1911,7 +1911,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
 // omit Statement 12Contribution
     }
   }
-}
+} // tr_advance_analog
 /*--------------------------------------------------------------------------*/
 typedef MOD_resistor::ddouble ddouble;
 inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
@@ -1961,7 +1961,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
 // omit Statement 12Contribution
     }
   }
-}
+} // tr_regress_analog
 /*--------------------------------------------------------------------------*/
 inline void MOD_resistor::tr_advance()
 {
@@ -1975,7 +1975,7 @@ inline void MOD_resistor::tr_advance()
   set_not_converged();
   _v_1 = _v_;
   BASE_SUBCKT::tr_advance();
-}
+} // tr_advance
 /*--------------------------------------------------------------------------*/
 inline void MOD_resistor::tr_regress()
 {
@@ -3380,7 +3380,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
 // omit Statement 12Contribution
     }
   }
-}
+} // tr_advance_analog
 /*--------------------------------------------------------------------------*/
 typedef MOD_resistor::ddouble ddouble;
 inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
@@ -3472,7 +3472,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
 // omit Statement 12Contribution
     }
   }
-}
+} // tr_regress_analog
 /*--------------------------------------------------------------------------*/
 inline void MOD_resistor::tr_advance()
 {
@@ -3486,7 +3486,7 @@ inline void MOD_resistor::tr_advance()
   set_not_converged();
   _v_1 = _v_;
   BASE_SUBCKT::tr_advance();
-}
+} // tr_advance
 /*--------------------------------------------------------------------------*/
 inline void MOD_resistor::tr_regress()
 {
@@ -4758,11 +4758,35 @@ private: // func decl
 //filt ddt_1
   ddouble _b_ddt_1(ddouble t0);
   bool _short_b_ddt_1()const {return 1;}
-  ddouble _b_ddt_1__precalc(ddouble){
+  ddouble _b_ddt_1precalc(ddouble){
   ddouble ret = 0.;
     /* short, mfactor hack */ ret[d_potential_b_ddt_1_p_ddt_1_n] = 1.;
     return ret;
   }
+  ddouble _b_ddt_1tr_begin(ddouble t0){
+(void)t0;
+    return 0.;
+  }
+  ddouble _b_ddt_1tr_eval(ddouble t0){
+    return _b_ddt_1(t0);
+  }
+  ddouble _b_ddt_1tr_advance(ddouble t0){
+    return _b_ddt_1(t0);
+  }
+  ddouble _b_ddt_1tr_regress(ddouble t0){
+    return _b_ddt_1(t0);
+  }
+  ddouble _b_ddt_1tr_accept(ddouble t0) {
+    (void)t0;
+    MOD_capacitor* d = this;
+    typedef MOD_capacitor MOD;
+    // subdevice
+    t0 = 0.;
+    assert(t0 == t0);
+    return t0;
+  } // ddt tr_accept
+  ddouble _b_ddt_1tr_review(ddouble){
+    return 0.;  } // ddt tr_review
 //probe potential_ddt_1_p_
   ddouble xs_potential_b_ddt_1_p_ddt_1_n() const { // potential_ddt_1_p_
     ddouble t;
@@ -5221,7 +5245,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
             t0.set_no_deps();
             t0 = p->xs_potential_b_p_n();
             t0 = (_p___c) /*rhspar*/ * t0;
-            t0 = /*XDT*/ d->_b_ddt_1(t0);
+            t0 = /*XDT*/ d->_b_ddt_1tr_eval(t0);
             d->_value_b_p_n /* contrib sign: */ += t0.value();
             // dep _potential_b_ddt_1_p_ddt_1_n
             // short: _potential_b_ddt_1_p_ddt_1_n
@@ -5251,7 +5275,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
             ddouble t0;
             t0 = 0.; // precalc.
             t0 = (_p___c) /*rhspar*/ * t0;
-            t0 = /*XDT*/ d->_b_ddt_1__precalc(t0);
+            t0 = /*XDT*/ d->_b_ddt_1precalc(t0);
             m->_st_b_ddt_1_p_ddt_1_n[1] = +t0[d_potential_b_ddt_1_p_ddt_1_n]; // (3p)
           }
         }
@@ -5294,7 +5318,7 @@ inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 // omit Statement 21AnalogConditionalStmt
     }
   }
-}
+} // tr_accept_analog
 /*--------------------------------------------------------------------------*/
 typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
@@ -5312,7 +5336,7 @@ inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
 // omit Statement 21AnalogConditionalStmt
     }
   }
-}
+} // tr_advance_analog
 /*--------------------------------------------------------------------------*/
 typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
@@ -5334,7 +5358,7 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
 // omit Statement 21AnalogConditionalStmt
     }
   }
-}
+} // tr_regress_analog
 /*--------------------------------------------------------------------------*/
 inline TIME_PAIR MOD_capacitor::tr_review()
 {
@@ -5368,7 +5392,7 @@ inline void MOD_capacitor::tr_accept()
   assert(c);
   c->tr_accept_analog(this);
   return BASE_SUBCKT::tr_accept();
-}
+} // tr_accept
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::tr_advance()
 {
@@ -5389,7 +5413,7 @@ inline void MOD_capacitor::tr_advance()
   _v_1 = _v_;
   c->tr_advance_analog(this);
   BASE_SUBCKT::tr_advance();
-}
+} // tr_advance
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::tr_regress()
 {
@@ -5583,7 +5607,7 @@ MOD_capacitor::ddouble MOD_capacitor::_b_ddt_1(ddouble t0)
   // subdevice
   t0 = 0.;
   assert(t0 == t0);
-  return t0; // (output)
+  return t0;
 }
 /*--------------------------------------------------------------------------*/
 } // n0
@@ -5676,11 +5700,37 @@ private: // func decl
 //filt ddt_2
   ddouble _b_ddt_2(ddouble t0);
   bool _short_b_ddt_2()const {return 0;}
-  ddouble _b_ddt_2__precalc(ddouble){
+  ddouble _b_ddt_2precalc(ddouble){
   ddouble ret = 0.;
     ret[d_potential_b_ddt_2_p_ddt_2_n] = 1.; // not short.
     return ret;
   }
+  ddouble _b_ddt_2tr_begin(ddouble t0){
+(void)t0;
+    return 0.;
+  }
+  ddouble _b_ddt_2tr_eval(ddouble t0){
+    return _b_ddt_2(t0);
+  }
+  ddouble _b_ddt_2tr_advance(ddouble t0){
+    return _b_ddt_2(t0);
+  }
+  ddouble _b_ddt_2tr_regress(ddouble t0){
+    return _b_ddt_2(t0);
+  }
+  ddouble _b_ddt_2tr_accept(ddouble t0) {
+    (void)t0;
+    MOD_capacitor* d = this;
+    typedef MOD_capacitor MOD;
+    auto e = prechecked_cast<ELEMENT const*>(d->_b_ddt_2_p_ddt_2_n);
+    assert(e);
+    t0 = d->_potential_b_ddt_2_p_ddt_2_n;// = t0 = e->tr_amps(); // (313)
+    t0[d_potential_b_ddt_2_p_ddt_2_n] = 1.;
+    assert(t0 == t0);
+    return t0;
+  } // ddt tr_accept
+  ddouble _b_ddt_2tr_review(ddouble){
+    return 0.;  } // ddt tr_review
 //probe potential_ddt_2_p_
   ddouble xs_potential_b_ddt_2_p_ddt_2_n() const { // potential_ddt_2_p_
     ddouble t;
@@ -6198,7 +6248,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
               t0.set_no_deps();
               t0 = p->xs_potential_b_p_n();
               t0 = (_p___c) /*rhspar*/ * t0;
-              t0 = /*XDT*/ d->_b_ddt_2(t0);
+              t0 = /*XDT*/ d->_b_ddt_2tr_eval(t0);
               if (d->_pot_b_p_n){
                 d->_pot_b_p_n = false;
                 d->_value_b_p_n = 0.;
@@ -6252,7 +6302,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
               ddouble t0;
               t0 = 0.; // precalc.
               t0 = (_p___c) /*rhspar*/ * t0;
-              t0 = /*XDT*/ d->_b_ddt_2__precalc(t0);
+              t0 = /*XDT*/ d->_b_ddt_2precalc(t0);
               m->_st_b_ddt_2_p_ddt_2_n[1] = +1; // (3q)
             }
           }
@@ -6297,7 +6347,7 @@ inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 // omit Statement 21AnalogConditionalStmt
     }
   }
-}
+} // tr_accept_analog
 /*--------------------------------------------------------------------------*/
 typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
@@ -6315,7 +6365,7 @@ inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
 // omit Statement 21AnalogConditionalStmt
     }
   }
-}
+} // tr_advance_analog
 /*--------------------------------------------------------------------------*/
 typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
@@ -6337,7 +6387,7 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
 // omit Statement 21AnalogConditionalStmt
     }
   }
-}
+} // tr_regress_analog
 /*--------------------------------------------------------------------------*/
 inline TIME_PAIR MOD_capacitor::tr_review()
 {
@@ -6371,7 +6421,7 @@ inline void MOD_capacitor::tr_accept()
   assert(c);
   c->tr_accept_analog(this);
   return BASE_SUBCKT::tr_accept();
-}
+} // tr_accept
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::tr_advance()
 {
@@ -6392,7 +6442,7 @@ inline void MOD_capacitor::tr_advance()
   _v_1 = _v_;
   c->tr_advance_analog(this);
   BASE_SUBCKT::tr_advance();
-}
+} // tr_advance
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::tr_regress()
 {
@@ -6597,7 +6647,7 @@ MOD_capacitor::ddouble MOD_capacitor::_b_ddt_2(ddouble t0)
   d->_potential_b_ddt_2_p_ddt_2_n = t0 = e->tr_amps(); // (236)
   t0[d_potential_b_ddt_2_p_ddt_2_n] = 1.;
   assert(t0 == t0);
-  return t0; // (node)
+  return t0;
 }
 /*--------------------------------------------------------------------------*/
 } // n1

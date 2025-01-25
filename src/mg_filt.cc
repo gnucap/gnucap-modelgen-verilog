@@ -42,6 +42,7 @@ private:
     : Token_CALL(P, data, e) {} // , _item(P._item) {}
   Token* clone()const override { untested(); return new Token_XDT(*this);}
 
+private:
   void stack_op(Expression* e)const override;
   Branch* branch() const;
   Expression_ const* args() const{ untested();
@@ -61,6 +62,13 @@ class XDT : public MGVAMS_FILTER {
   std::string _code_name;
 protected:
   std::string raw_code_name()const {return _code_name;}
+public:
+  bool has_modes()const override {return true;}
+  bool has_tr_begin()const override {return false;}
+  bool has_tr_review()const override {return false;}
+  bool has_tr_accept()const override {return false;}
+  bool has_tr_advance()const override {return false;}
+
 public: // HACK
   Branch* _br{nullptr};
   Node_Ref _p;
@@ -75,6 +83,10 @@ protected:
 //    delete _prb;
   }
   virtual XDT* clone()const = 0;
+  std::string id()const {
+    assert(_m);
+    return _m->identifier().to_string();
+  }
   virtual void make_assign(std::ostream& o) const = 0;
   void set_code_name(std::string x){
     _code_name = x;
@@ -128,7 +140,7 @@ public:
   }
   void make_cc_precalc_(std::ostream& o)const{
     make_tag(o);
-    o__ "ddouble " << _code_name << "__precalc(";
+    o__ "ddouble " << _code_name << "precalc(";
       std::string comma;
       if(num_args() > 4) {
 	incomplete();
@@ -150,7 +162,21 @@ public:
     o____ "return ret;\n";
     o__ "}\n";
   }
-  void make_cc_dev(std::ostream& o)const override{
+  void args(std::ostream& o)const {
+    std::string comma;
+    for(size_t n=0; n<num_args(); ++n){
+      o << comma << "ddouble t" << n;
+      comma = ", ";
+    }
+  }
+  void argnames(std::ostream& o)const {
+    std::string comma;
+    for(size_t n=0; n<num_args(); ++n){
+      o << comma << "t" << n;
+      comma = ", ";
+    }
+  }
+  void make_cc_dev(std::ostream& o)const override { // XDT
     o__ "ddouble " << _code_name << "(";
       std::string comma;
       for(size_t n=0; n<num_args(); ++n){
@@ -160,6 +186,23 @@ public:
     o << ");\n";
     o__ "bool _short"+_code_name+"()const {return " << bool(_output) << ";}\n";
     make_cc_precalc_(o);
+
+    o__ "ddouble " << raw_code_name() << "tr_begin("; args(o); o << "){\n";
+    for(size_t n=0; n<num_args(); ++n){
+      o << "(void)t" << n << ";\n";
+    }
+    o____ "return 0.;\n";
+    o__ "}\n";
+    o__ "ddouble " << raw_code_name() << "tr_eval("; args(o); o << "){\n";
+    o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
+    o__ "}\n";
+    o__ "ddouble " << raw_code_name() << "tr_advance("; args(o); o << "){\n";
+    o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
+    o__ "}\n";
+    o__ "ddouble " << raw_code_name() << "tr_regress("; args(o); o << "){\n";
+    o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
+    o__ "}\n";
+
   }
   void make_cc_impl_comm(std::ostream&)const{ untested();
     unreachable();
@@ -209,14 +252,73 @@ public:
   }
   int max_args()const override {return 3;}
 private:
-  void make_assign(std::ostream& o)const override{
-    std::string cn = _br->code_name();
-    if(_br->is_short()){
-     // o__ "/* short */ t0[d_potential" << cn << "] = 1.;\n";
+  void make_assign(std::ostream&)const override {}
+  void make_cc_dev(std::ostream& o)const override { // DDT
+    XDT::make_cc_dev(o);
+    std::string comma;
+    comma = "";
+    o__ "ddouble " << raw_code_name() << "tr_accept(";
+      for(size_t n=0; n<num_args(); ++n){
+	o << comma << "ddouble t" << n;
+	comma = ", ";
+      }
+    o << ") {\n";
+    if(num_args()>1){
+      o____ "(void)t0;\n";
+      o____ "(void)t1;\n";
+    }else if(num_args()>0){
+      o____ "(void)t0;\n";
     }else{
-      o__ "t0[d_potential" << cn << "] = 1.;\n";
     }
-    o__ "assert(t0 == t0);\n";
+
+#if 0 // IDT only. merge?
+    if(num_args()>2){
+      o____ "std::string tmp;\n";
+      std::string cn = _br->code_name();
+      o____ "((COMPONENT*)" << cn << ")->set_param_by_index(123456, tmp, int(t2));\n";
+      // o____ "if(t2) return 0.;\n";
+    }else{
+    }
+#endif
+
+  //  o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
+    if(has_refs()) {
+      std::string cn = _br->code_name();
+      o____ "MOD_" << id() << "* d = this;\n";
+      o____ "typedef MOD_" << id() << " MOD;\n";
+      std::string state = "_st" + cn;
+
+      if(_output){
+	o____ "// subdevice\n";
+	o____ "t0 = 0.;\n";
+      }else{
+	o____ "auto e = prechecked_cast<ELEMENT const*>(d->"<< cn << ");\n";
+	o____ "assert(e);\n";
+	// o____ "d->_potential" << cn << " = t0 = e->tr_amps(); // (313)\n";
+	o____ "t0 = d->_potential" << cn << ";// = t0 = e->tr_amps(); // (313)\n";
+      }
+
+      if(_br->is_short()){
+	// output sent to other branch
+      }else{
+	o____ "t0[d_potential" << cn << "] = 1.;\n";
+      }
+      o____ "assert(t0 == t0);\n";
+      o____ "return t0;\n";
+    }else{
+      o____ "return 0.; // (no refs)\n";
+    }
+    o__ "} // ddt tr_accept\n";
+/*--------------------------------------------------------------------------*/
+    comma = "";
+    o__ "ddouble " << raw_code_name() << "tr_review(";
+      for(size_t n=0; n<num_args(); ++n){
+	o << comma << "ddouble";
+	comma = ", ";
+      }
+    o << "){\n";
+    o____ "return 0.;";
+    o__ "} // ddt tr_review\n";
   }
 } ddt;
 DISPATCHER<FUNCTION>::INSTALL d_ddt(&function_dispatcher, "ddt", &ddt);
@@ -229,63 +331,21 @@ public:
   IDT* clone()const override {
     return new IDT(*this);
   }
-
-public:
-  bool has_modes()const override {return true;}
-  bool has_tr_begin()const override {return false;}
+private:
   bool has_tr_review()const override {return num_args()>2;}
   bool has_tr_accept()const override {return num_args()>2;}
-  bool has_tr_advance()const override {return false;}
 
 private:
   void make_assign(std::ostream& o)const override {
     make_tag(o);
-    std::string cn = _br->code_name();
     if(num_args()>1){
       o__ "t0 = t0 + t1.value();\n";
     }else{
     }
-    if(_br->is_short()){
-      // output sent to other branch
-    }else{
-      o__ "t0[d_potential" << cn << "] = 1.;\n";
-    }
-    o__ "assert(t0 == t0);\n";
   }
-  void args(std::ostream& o)const {
-    std::string comma;
-    for(size_t n=0; n<num_args(); ++n){
-      o << comma << "ddouble t" << n;
-      comma = ", ";
-    }
-  }
-  void argnames(std::ostream& o)const {
-    std::string comma;
-    for(size_t n=0; n<num_args(); ++n){
-      o << comma << "t" << n;
-      comma = ", ";
-    }
-  }
-  void make_cc_dev(std::ostream& o)const override{
+  void make_cc_dev(std::ostream& o)const override { // IDT
     XDT::make_cc_dev(o);
     std::string comma;
-/*--------------------------------------------------------------------------*/
-    o__ "ddouble " << raw_code_name() << "tr_begin("; args(o); o << "){\n";
-    for(size_t n=0; n<num_args(); ++n){
-      o << "(void)t" << n << ";\n";
-    }
-    o____ "return 0.;\n";
-    o__ "}\n";
-    o__ "ddouble " << raw_code_name() << "tr_eval("; args(o); o << "){\n";
-    o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
-    o__ "}\n";
-    o__ "ddouble " << raw_code_name() << "tr_advance("; args(o); o << "){\n";
-    o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
-    o__ "}\n";
-    o__ "ddouble " << raw_code_name() << "tr_regress("; args(o); o << "){\n";
-    o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
-    o__ "}\n";
-/*--------------------------------------------------------------------------*/
     comma = "";
     o__ "ddouble " << raw_code_name() << "tr_accept(";
       for(size_t n=0; n<num_args(); ++n){
@@ -293,22 +353,50 @@ private:
 	comma = ", ";
       }
     o << ") {\n";
+    if(num_args()>1){
+      o____ "(void)t0;\n";
+      o____ "(void)t1;\n";
+    }else if(num_args()>0){
+      o____ "(void)t0;\n";
+    }else{
+    }
     if(num_args()>2){
       o____ "std::string tmp;\n";
       std::string cn = _br->code_name();
       o____ "((COMPONENT*)" << cn << ")->set_param_by_index(123456, tmp, int(t2));\n";
+      // o____ "if(t2) return 0.;\n";
     }else{
     }
-    if(num_args()>1){
-      o__ "(void)t0;\n";
-      o__ "(void)t1;\n";
-    }else if(num_args()>0){
-      o__ "(void)t0;\n";
-    }else{
+
+  //  o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
+    if(has_refs()) {
+      std::string cn = _br->code_name();
+      o____ "MOD_" << id() << "* d = this;\n";
+      o____ "typedef MOD_" << id() << " MOD;\n";
+      std::string state = "_st" + cn;
+
+      if(_output){
+	o____ "// subdevice\n";
+	o____ "t0 = 0.;\n";
+      }else{
+	o____ "auto e = prechecked_cast<ELEMENT const*>(d->"<< cn << ");\n";
+	o____ "assert(e);\n";
+	// o____ "d->_potential" << cn << " = t0 = e->tr_amps(); // (313)\n";
+	o____ "t0 = d->_potential" << cn << ";// = t0 = e->tr_amps(); // (313)\n";
+      }
+
+     // make_assign(o);
+      if(_br->is_short()){
+	// output sent to other branch
+      }else{
+	o____ "t0[d_potential" << cn << "] = 1.;\n";
+      }
+      o____ "assert(t0 == t0);\n";
+      o____ "return t0;\n";
+    }else{ untested();
+      o____ "return 0.; // (no refs)\n";
     }
-    o____ "return 0.;\n";
-    o__ "}\n";
-/*--------------------------------------------------------------------------*/
+    o__ "} // idt tr_accept\n";
 /*--------------------------------------------------------------------------*/
     comma = "";
     o__ "ddouble " << raw_code_name() << "tr_review(";
@@ -323,31 +411,8 @@ private:
     }
 
     o____ "return 0.;";
-    o__ "}\n";
+    o__ "} // idt tr_review\n";
 /*--------------------------------------------------------------------------*/
-    comma = "";
-    o__ "ddouble " << raw_code_name() << "precalc(";
-      if(num_args() > 4) {
-	incomplete();
-      }else{
-      }
-      for(size_t n=0; n<num_args(); ++n){
-	o << comma << "ddouble t" << n;
-	comma = ", ";
-      }
-    o << "){\n";
-    o____ "return " << raw_code_name() << "__precalc(";
-    comma = "";
-      if(num_args() > 4) {
-	incomplete();
-      }else{
-      }
-      for(size_t n=0; n<num_args(); ++n){
-	o << comma << "t" << n;
-	comma = ", ";
-      }
-    o << ");\n";
-    o__ "}\n";
   }
   int max_args()const override {return 4;}
 } idt;
@@ -526,13 +591,13 @@ void XDT::make_cc_impl(std::ostream&o) const
     }
 
     make_assign(o);
-
-    if(_output){
-      o__ "return t0; // (output)\n";
+    if(_br->is_short()){
+      // output sent to other branch
     }else{
-      o__ "return t0; // (node)\n";
+      o__ "t0[d_potential" << cn << "] = 1.;\n";
     }
-
+    o__ "assert(t0 == t0);\n";
+    o__ "return t0;\n";
   }else{ untested();
     o__ "return 0.; // (no refs)\n";
   }

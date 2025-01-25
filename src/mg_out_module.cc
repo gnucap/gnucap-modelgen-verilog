@@ -514,7 +514,7 @@ static void make_tr_advance(std::ostream& o, const Module& m)
     f->make_cc_tr_advance(o);
   }
   o__ baseclass(m) << "::tr_advance();\n"; // upside down. cf mg2_an2
-  o << "}\n"
+  o << "} // tr_advance\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
@@ -621,7 +621,7 @@ static void make_tr_accept(std::ostream& o, const Module& m)
     f->make_cc_tr_accept(o);
   }
   o__ "return " << baseclass(m) << "::tr_accept();\n";
-  o << "}\n"
+  o << "} // tr_accept\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }

@@ -1270,7 +1270,7 @@ static void make_cc_common_tr_advance(std::ostream& o, const Module& m)
   OUT_ANALOG oo(OUT_ANALOG::modeTR_ADVANCE, &tr_advance_tag);
   oo.make_load_variables(o, m);
   oo.make_analog_list(o, m);
-  o << "}\n"
+  o << "} // tr_advance_analog\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
@@ -1293,7 +1293,7 @@ static void make_cc_common_tr_regress(std::ostream& o, const Module& m)
   OUT_ANALOG oo(OUT_ANALOG::modeTR_REGRESS, &tr_advance_tag);
   oo.make_load_variables(o, m);
   oo.make_analog_list(o, m);
-  o << "}\n"
+  o << "} // tr_regress_analog\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
@@ -1361,7 +1361,7 @@ static void make_cc_common_tr_accept(std::ostream& o, const Module& m)
 
   oo.make_load_variables(o, m);
   oo.make_analog_list(o, m);
-  o << "}\n"
+  o << "} // tr_accept_analog\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
