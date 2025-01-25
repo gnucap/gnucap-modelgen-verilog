@@ -29,6 +29,7 @@
 #include "mg_code.h"
 #include <globals.h>
 #include <u_parameter.h>
+#include "f__.cc" // TODO
 /*--------------------------------------------------------------------------*/
 void Expression_::set_owner(Base* o)
 {
@@ -59,12 +60,6 @@ bool Statement::propagate_rdep(Base const* b)
 void Expression_::dump(std::ostream& o) const
 {
 	Expression::dump(o);
-}
-/*--------------------------------------------------------------------------*/
-void Token_CALL::stack_op(Expression*) const
-{
-  unreachable();
-  incomplete();
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -177,3 +172,4 @@ void Token_PF::stack_op(Expression* E)const
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet

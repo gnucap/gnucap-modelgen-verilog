@@ -1183,6 +1183,37 @@ void Module::dump_variables(std::ostream& o) const
   }
 }
 /*--------------------------------------------------------------------------*/
+Token* Module::new_token(FUNCTION const* f_, size_t num_args)
+{
+  auto f = prechecked_cast<FUNCTION_ const*>(f_);
+  assert(f);
+  Token* t = nullptr;
+
+
+  if(f->has_tr_review()){
+    auto c = prechecked_cast<Token_CALL*>(t);
+    (void)c;
+    // incomplete();
+   // m.set_tr_review(); // wrong? because token may be deleted later on.
+   //                    // inc/dec?
+   //                    // do it in token?
+   //
+   // c->set_used_in(tr_review_tag);
+  }else{
+  }
+
+  trace2("Module::new_token", f->label(), f->static_code());
+  if(f->static_code()) {
+    // return f->new_token(*this, num_args);
+    install(f);
+    t = new Token_FUNCTION(f->label(), f);
+  }else{
+    t = f->new_token(*this, num_args);
+  }
+
+  return t;
+}
+/*--------------------------------------------------------------------------*/
 void Module::setup_functions()
 {
   for(FUNCTION_* f : _func){

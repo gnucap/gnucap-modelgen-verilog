@@ -4782,7 +4782,6 @@ private: // func decl
   }
   ddouble _b_ddt_1tr_accept(ddouble t0) {
     (void)t0;
-    MOD_capacitor* d = this;
     typedef MOD_capacitor MOD;
     // subdevice
     t0 = 0.;
@@ -5710,8 +5709,8 @@ private: // func decl
   }
   ddouble _b_ddt_2tr_accept(ddouble t0) {
     (void)t0;
-    MOD_capacitor* d = this;
     typedef MOD_capacitor MOD;
+    MOD* d = this;
     auto e = prechecked_cast<ELEMENT const*>(d->_b_ddt_2_p_ddt_2_n);
     assert(e);
     t0 = d->_potential_b_ddt_2_p_ddt_2_n;// = t0 = e->tr_amps(); // (313)

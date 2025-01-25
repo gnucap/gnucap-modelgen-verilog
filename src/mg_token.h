@@ -28,41 +28,60 @@
 #include <stack> // BUG
 /*--------------------------------------------------------------------------*/
 class FUNCTION_;
-class Token_CALL : public Token_SYMBOL {
+class Token_FUNCTION : public Token_SYMBOL {
 private: // stuff into data?
   FUNCTION_ const* _function{nullptr};
-  Expression const* _args{nullptr};
   size_t _num_args{size_t(-1)};
+public:
+  explicit Token_FUNCTION(const std::string Name, FUNCTION_ const* f)
+    : Token_SYMBOL(Name, ""), _function(f) { attach(); }
+  ~Token_FUNCTION() { detach(); }
+protected:
+  explicit Token_FUNCTION(Token_FUNCTION const& P)
+    : Token_SYMBOL(P.name(), ""), _function(P._function), _num_args(P._num_args) { attach(); }
+  explicit Token_FUNCTION(Token_FUNCTION const& P, Base const* data)
+    : Token_SYMBOL(P.name(), data), _function(P._function), _num_args(P._num_args) { attach(); }
+protected:
+  void stack_op(Expression* e)const override;
+public:
+  void set_num_args(size_t n) { _num_args = n; } // expression size?
+  FUNCTION_ const* f()const { return _function; }
+  FUNCTION_ const* function()const { return _function; }
+  FUNCTION_ const* operator->()const { assert(_function); return _function; }
+  virtual /*?*/ std::string code_name()const;
+private:
+  void attach();
+  void detach();
+
+  // really?
+  // friend class Token_CALL;
+};
+/*--------------------------------------------------------------------------*/
+class Token_CALL : public Token_FUNCTION {
+private: // stuff into data?
+  Expression const* _args{nullptr};
+public:
+  explicit Token_CALL(const std::string Name, FUNCTION_ const* f, Expression const* e=nullptr)
+    : Token_FUNCTION(Name, f), _args(e) { }
+  ~Token_CALL() {
+    delete _args;
+  }
+  void stack_op(Expression* E)const override;
 private:
   Token* clone()const override { untested();
     return new Token_CALL(*this);
   }
-public:
-  explicit Token_CALL(const std::string Name, FUNCTION_ const* f, Expression const* e=nullptr)
-    : Token_SYMBOL(Name, ""), _function(f), _args(e) { attach(); }
-  ~Token_CALL() {
-    detach();
-    delete _args;
-  }
 
 protected:
   explicit Token_CALL(const Token_CALL& P)
-    : Token_SYMBOL(P.name(), ""), _function(P._function), _num_args(P._num_args) { attach(); }
-  explicit Token_CALL(const Token_CALL& P, Base const* data, Expression const* e=nullptr)
-    : Token_SYMBOL(P.name(), data), _function(P._function), _args(e)
-    , _num_args(P._num_args) { attach(); }
-private:
-  void attach();
-  void detach();
+    : Token_FUNCTION(P) { }
 public:
-  void stack_op(Expression* e)const override;
-  void set_num_args(size_t n){ _num_args = n; } // expression size?
+  explicit Token_CALL(const Token_FUNCTION& P, Base const* data, Expression const* e=nullptr)
+    : Token_FUNCTION(P, data), _args(e) { }
+public:
   void set_args(Expression* e){ assert(!_args); _args = e; } // needed?
  // size_t num_args() const;
   Expression const* args()const { return _args; }
-  virtual /*?*/ std::string code_name() const;
-  FUNCTION_ const* f() const{ return _function; }
-  FUNCTION_ const* operator->()const { assert(_function); return _function; }
 }; // Token_CALL
 /*--------------------------------------------------------------------------*/
 class Port_3; // New_Port?
@@ -96,26 +115,26 @@ public:
   std::string code_name()const;
 };
 /*--------------------------------------------------------------------------*/
-inline void Token_CALL::attach()
+inline void Token_FUNCTION::attach()
 {
   assert(_function);
   _function->inc_refs();
 }
 /*--------------------------------------------------------------------------*/
-inline void Token_CALL::detach()
+inline void Token_FUNCTION::detach()
 {
   assert(_function);
   _function->dec_refs();
 }
 /*--------------------------------------------------------------------------*/
-inline std::string Token_CALL::code_name()const
+inline std::string Token_FUNCTION::code_name()const
 {
-  assert(_function);
-  if(_function->code_name()!=""){
-    return _function->code_name();
-  }else if(_function->label()!=""){ untested();
+  assert(f());
+  if(f()->code_name() != "") {
+    return f()->code_name();
+  }else if(f()->label() != "") { untested();
     // incomplete(); // m_va.h, TODO
-    return "/*INCOMPLETE*/ va::" + _function->label();
+    return "/*INCOMPLETE*/ va::" + f()->label();
   }else{ untested();
     return "Token_CALL::code_name: incomplete";
   }

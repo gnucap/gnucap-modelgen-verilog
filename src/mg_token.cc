@@ -623,7 +623,7 @@ void Token_CALL::stack_op(Expression* e) const
 
   if (arg_expr) {
     trace2("CALL got parlist", name(), arg_expr->size());
-    FUNCTION_ const* f = _function;
+    FUNCTION_ const* f = function();
 
     if(f){
       // this is wrong. need different token...
@@ -665,6 +665,43 @@ void Token_CALL::stack_op(Expression* e) const
     E->push_back(new Token_CALL(*this, const_deps.clone()));
   }else if(!dynamic_cast<const Token_PARLIST*>(E->back())) {
     // SFCALL
+    E->push_back(new Token_CALL(*this, const_deps.clone()));
+  }else{ untested();
+    trace2("no params?", name(), E->back()->name());
+    incomplete();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Token_FUNCTION::stack_op(Expression* e) const
+{
+  Expression_* E = prechecked_cast<Expression_*>(e);
+  assert(E);
+  trace1("call stackop", name());
+  assert(E);
+  Expression const* arg_expr = NULL;
+
+  if (arg_expr) {
+  }else if (E->is_empty()) {
+  }else if(auto pl=dynamic_cast<Token_PARLIST_*>(E->back())) {
+    arg_expr = pl->args();
+    if(arg_expr){
+      pl->set_args(nullptr);
+      E->pop_back();
+      delete(pl);
+    }else{ untested();
+    }
+  }else{
+    assert(!dynamic_cast<Token_PARLIST const*>(E->back()));
+  }
+
+  if (arg_expr) {
+    Token_CALL t(*this, nullptr, arg_expr);
+    return t.stack_op(E);
+  }else if (E->is_empty()){
+    incomplete();
+    E->push_back(new Token_CALL(*this, const_deps.clone()));
+  }else if(!dynamic_cast<const Token_PARLIST*>(E->back())) {
+    incomplete();
     E->push_back(new Token_CALL(*this, const_deps.clone()));
   }else{ untested();
     trace2("no params?", name(), E->back()->name());

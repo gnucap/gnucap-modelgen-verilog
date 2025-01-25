@@ -188,6 +188,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       }
       E.push_back(new Token_CONSTANT(N));
     }else if(Base* r = Scope->lookup(n)){
+      // TODO: analog function here?
       if(auto p = dynamic_cast<Parameter_Base const*>(r)) {
 //	p->stack_op(&E); // ?
 	Token_PAR_REF PP(p->name(), p);
@@ -217,38 +218,24 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       Token_ACCESS tta(n, nullptr);
       tta.stack_op(&E);
     }else if(FUNCTION_ const* af = is_analog_function_call(n, Scope)) {
-      // TODO: use "r"
-      assert(dynamic_cast<Token_PARLIST*>(E.back()));
+      // assert(r);
       Token* tt = resolve_function(af, &E, scope());
-      // Token_AFCALL a(n, af);
-      assert(tt);
-      tt->stack_op(&E);
-      delete tt;
-    }else if(FUNCTION_ const* vaf = va_function(n)) {
-      size_t na = -1;
-
-      // move to stack_op?
-      if(E.is_empty()){
-      }else if(auto parlist = dynamic_cast<Token_PARLIST_ const*>(E.back())){
-	if(auto ed = dynamic_cast<Expression const*>(parlist->data())){ untested();
-	  na = ed->size();
-	}else if(parlist->args()){
-	  na = parlist->args()->size();
-	}else{ untested();
-	}
+      if(dynamic_cast<Token_PARLIST*>(E.back())){
+       //  assert(dynamic_cast<FUNCTION_ const*>(r));
+       //  assert(r == af);
+	// Token_AFCALL a(n, af);
+	assert(tt);
+	tt->stack_op(&E);
+	delete tt;
       }else{
-	assert(!dynamic_cast<Token_PARLIST const*>(E.back()));
+	incomplete();
+	E.push_back(tt->clone());
       }
-      trace2("va_function?", n, na);
-#if 1
+    }else if(FUNCTION_ const* vaf = va_function(n)) {
       Token* tt = resolve_function(vaf, &E, scope());
       assert(tt);
       tt->stack_op(&E);
       delete tt;
-#else
-      //  not enough. must keep track of used functions.
-      vaf->stack_op(&E);
-#endif
     }else if(Node_Ref a = Scope->node(t->name())) { untested();
       Token_NODE tn(*symbol, a);
       tn.stack_op(&E);
