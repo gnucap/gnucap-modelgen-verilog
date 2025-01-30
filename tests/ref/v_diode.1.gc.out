@@ -14,7 +14,7 @@ d1 ( 1 2 )  ddd  area=1.
 .ends main
 m ( 2 0 )  main 
 V1 ( 1 0 )  DC  10.  AC  1.
-R1 ( 1 2 )  r= 100.K
+R1 ( 1 2 )  100.K
 #           v(1)       v(2)       i(V1)      i(R1)      id(m.d1)   vd(m.d1)   req(m.d1)  cd(m.d1)   z(m.d1)    zraw(m.d1) gd(m.d1)   z(2)       iter(0)    region(m.d1)
  27.        10.        0.59396   -94.06u     94.06u     ??         ??         ??         ??         ??         ??         ??         274.22     8.         1.        
 #           v(1)       v(2)       i(V1)      i(R1)      id(m.d1)   vd(m.d1)   req(m.d1)  cd(m.d1)   z(m.d1)    zraw(m.d1) gd(m.d1)   z(2)       iter(0)    region(m.d1)

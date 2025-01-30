@@ -1103,6 +1103,10 @@ void LANG_VERILOG::print_items_sckt(OMSTREAM& o, const COMPONENT* x)
   assert(dynamic_cast<BASE_SUBCKT const*>(x));
   for (CARD_LIST::const_iterator
       ci = x->subckt()->begin(); ci != x->subckt()->end(); ++ci) {
+    if (has_attributes( (*ci)->id_tag() )) { untested();
+      o << "  ";
+      print_attributes(o, (*ci)->id_tag());
+    }
     o << "  ";
     print_item(o, *ci);
   }
