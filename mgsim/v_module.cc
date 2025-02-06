@@ -21,6 +21,7 @@
  *------------------------------------------------------------------
  * module stuff
  */
+#if 0 // use module from library
 #include <u_nodemap.h>
 #include <e_node.h>
 #include <globals.h>
@@ -579,4 +580,5 @@ double DEV_MODULE::tr_probe_num(const std::string& x)const
 /*--------------------------------------------------------------------------*/
 } // namespace
 /*--------------------------------------------------------------------------*/
+#endif
 // vim:ts=8:sw=2:noet:
