@@ -46,7 +46,6 @@ public:
   std::string name()const override {return "verilog";}
   bool case_insensitive()const override {return false;}
   UNITS units()const override {return uSI;}
-  using CKT_BASE::has_attributes;
 
 public: // override virtual, used by callback
   std::string arg_front()const override {
@@ -862,7 +861,7 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
   assert(x);
 
   // header
-  move_attributes(tag_t(&cmd), tag_t(x));
+  move_attributes(tag_t(&cmd), x->id_tag());
   (cmd >> "module |macromodule ");
   parse_label(cmd, x);
   parse_ports(cmd, x, true/*all new*/);
@@ -921,7 +920,7 @@ COMPONENT* LANG_VERILOG::parse_instance(CS& cmd, COMPONENT* x)
   }else{
   }
   assert (!(cmd >> "(*"));
-  move_attributes(tag_t(&cmd), tag_t(x));
+  move_attributes(tag_t(&cmd), x->id_tag());
   parse_type(cmd, x);
   parse_args_instance(cmd, x);
   parse_label(cmd, x);
@@ -962,16 +961,17 @@ void LANG_VERILOG::parse_top_item(CS& cmd, CARD_LIST* Scope)
 void LANG_VERILOG::print_attributes(OMSTREAM& o, tag_t x) const
 {
   assert(x);
-  if(has_attributes(x)){
-    auto const& a = attributes(x);
-    if (a) {
-      trace1("pa", x);
-      o << "(* " << a->string(tag_t(NULL)) << " *) ";
-    }else{ untested();
+
+  if (has_attributes(x)) {
+    std::string s = attributes(x)->string(x);
+    if(s.size()) {
+      o << "(* " << s << " *) ";
+    }else{
     }
   }else{
   }
 }
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_args(OMSTREAM& o, const MODEL_CARD* x)
 {
@@ -1103,10 +1103,6 @@ void LANG_VERILOG::print_items_sckt(OMSTREAM& o, const COMPONENT* x)
   assert(dynamic_cast<BASE_SUBCKT const*>(x));
   for (CARD_LIST::const_iterator
       ci = x->subckt()->begin(); ci != x->subckt()->end(); ++ci) {
-    if (has_attributes( (*ci)->id_tag() )) { untested();
-      o << "  ";
-      print_attributes(o, (*ci)->id_tag());
-    }
     o << "  ";
     print_item(o, *ci);
   }
@@ -1203,15 +1199,14 @@ public:
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
 {
-  print_attributes(o, tag_t(x));
-
   if(dynamic_cast<MODULE_PROTO const*>(x)) {
+    // print_attributes(o, x->id_tag()); // in print_module
     auto bs = prechecked_cast<BASE_SUBCKT const*>(x->component_proto());
     assert(bs);
     print_module(o, bs);
   }else if(dynamic_cast<PARAMSET_MODEL const*>(x)) { // } ->short_label() == "paramset") { untested();
     COMPONENT const* bs = prechecked_cast<COMPONENT const*>(x->component_proto());
-    print_attributes(o, tag_t(bs)); // ?
+    print_attributes(o, x->id_tag());
     o << "paramset " << bs->short_label() << ' ' << x->dev_type() << ";\n";
     print_items_sckt(o, bs);
     print_args_paramset(o, bs);
@@ -1229,7 +1224,6 @@ void LANG_VERILOG::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
 {
-
   if(((CARD const*)x)->dev_type()!=""){ untested();
     unreachable();
     // tmp hack. module type is the label, so dev_type is blank.
@@ -1239,7 +1233,7 @@ void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
   assert(x);
   assert(x->subckt());
 
-  print_attributes(o, tag_t(x));
+  print_attributes(o, x->id_tag());
   o << "module " << x->short_label();
   print_ports_long(o, x);
   o << ";\n";
@@ -1253,7 +1247,7 @@ void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_instance(OMSTREAM& o, const COMPONENT* x)
 {
-  print_attributes(o, tag_t(x));
+  print_attributes(o, x->id_tag());
   if(x->is_device()){
     print_type(o, x);
     print_args(o, x);
@@ -1315,7 +1309,7 @@ class CMD_PARAMSET : public CMD {
     lang_verilog.parse_paramset_(cmd, dev);
     trace3("CMD_PARAMSET", paramset->long_label(), paramset->dev_type(), paramset);
     auto m = new PARAMSET_MODEL(dev);
-    lang_verilog.move_attributes(tag_t(&cmd), tag_t(m));
+    lang_verilog.move_attributes(tag_t(&cmd), m->id_tag());
     m->set_owner(nullptr);
     Scope->push_back(m);
 
@@ -1335,7 +1329,7 @@ class CMD_MODULE : public CMD {
     try {
       lang_verilog.parse_module(cmd, new_module);
       auto m = new MODULE_PROTO(new_module);
-      lang_verilog.move_attributes(tag_t(&cmd), tag_t(m));
+      lang_verilog.move_attributes(tag_t(&cmd), m->id_tag());
       m->set_owner(nullptr);
       Scope->push_back(m);
     }catch(Exception const& e) {

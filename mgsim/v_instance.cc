@@ -373,8 +373,8 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
     CARD_LIST::const_iterator i = toplevel.find_(modelname);
     while(i != toplevel.end()) {
       std::string desc;
-      if(has_attributes(tag_t(*i))) {
-	auto const& a = attributes(tag_t(*i));
+      if(has_attributes((*i)->id_tag())) {
+	auto const& a = attributes((*i)->id_tag());
 	if(a){
 	  desc = a->operator[](std::string("desc"));
 	  if(desc == "0") { untested();
@@ -638,8 +638,8 @@ void INSTANCE::expand()
     ++i;
     if(!d->is_valid()){
       std::string desc;
-      if(has_attributes(tag_t(*i))) {
-	auto const& a = attributes(tag_t(*i));
+      if(has_attributes((*i)->id_tag())) {
+	auto const& a = attributes((*i)->id_tag());
 	if(a){ untested();
 	  desc = a->operator[](std::string("desc"));
 	  if(desc == "0"){ untested();
