@@ -21,7 +21,7 @@ attach ./test_cs0.so
 
 test_cs0 dut(\1 ,2);
 vsource v1(\1 , \0 );
-resistor #(.r(1\0 ),) v2(\2 ,\0 );
+resistor #(.r(10)) v2(\2 ,\0 );
 
 list
 

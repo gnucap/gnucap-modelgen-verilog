@@ -60,15 +60,15 @@ module main(\1 , \2 , \3 , \4 );
   parameter length = 1;
 
 	// subckt expansion, ac+tr
-  tln #(.count(10\0 ),, .r(.1), .l(.01n), .g(.1u), .c(2f)) t1(\1 , \2 );
+  tln #(.count(100 ),, .r(.1), .l(.01n), .g(.1u), .c(2f)) t1(\1 , \2 );
   resistor #(10.) r1(\0 , \2 );
 
 	// RLGC symbolic tline, ac only.
-  ltra #(.len(10\0 ), .r(.1), .l(.01n), .g(.1u), .c(2f)) t1(\1 , \0 , \3 , \0 );
+  ltra #(.len(100 ), .r(.1), .l(.01n), .g(.1u), .c(2f)) t1(\1 , \0 , \3 , \0 );
   resistor #(10.) r1(\0 , \3 );
 
 	// gnucap lossless tline, ac+tr
-  tline #(.len(10\0 ), .r(.1), .l(.01n), .g(.1u), .c(2f)) t1(\1 , \0 , \4 , \0 );
+  tline #(.len(100 ), .r(.1), .l(.01n), .g(.1u), .c(2f)) t1(\1 , \0 , \4 , \0 );
   resistor #(10.) r1(\0 , \4 );
 endmodule
 

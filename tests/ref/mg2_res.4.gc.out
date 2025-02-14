@@ -1,7 +1,3 @@
-test_res_4 #(.r(.01)) dut(3,\0 ); 
-                          ^ ? invalid identifier
-vsource #(.dc(v)) v3(3, \0 ); 
-                     ^ ? invalid identifier
 parameter r=1 
 parameter v=0 
 test_res_4 #(.r(100 )) dut (.p(\1 ),.n(\0 ));

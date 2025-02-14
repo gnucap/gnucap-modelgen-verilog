@@ -21,7 +21,7 @@ endparamset
 
 module main(1 2);
   parameter r0=2;
-  tln #( .r(r\0 ),) t1(\1 , \2 );
+  tln #( .r(r0),) t1(\1 , \2 );
 endmodule
 
 main #() m(\1 \2 );

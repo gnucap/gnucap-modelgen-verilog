@@ -22,7 +22,7 @@ attach ./test_res1_0.so
 parameter r=1
 parameter v=0
 
-test_res1_0 #(.r(10\0 ),) dut(\1 ,\0 );
+test_res1_0 #(.r(100 ),) dut(\1 ,\0 );
 vsource #(.dc(v)) v1(\1 , \0 );
 
 test_res1_0 #(.r(1)) dut(\2 ,\0 );

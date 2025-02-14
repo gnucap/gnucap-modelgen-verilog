@@ -2,7 +2,7 @@ test_cs0 dut(\1 ,2);
                  ^ ? invalid identifier
 test_cs0 #() dut (.np(\1 ),.nn(\2 ));
 vsource #() v1 (.p(\1 ),.n(\0 ));
-resistor #(.r(10 )) v2 (.p(\2 ),.n(\0 ));
+resistor #(.r(10)) v2 (.p(\2 ),.n(\0 ));
 #           v(1)       v(2)      
  0.        -10.u       10.       
  0.1        0.09999    10.       

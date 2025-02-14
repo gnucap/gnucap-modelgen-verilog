@@ -26,9 +26,9 @@ endmodule
 !make scope0.so > /dev/null
 attach ./scope0.so
 
-scope0 dut(\1 ,2);
+scope0 dut(\1 , \2 );
 vsource v1(\1 , \0 );
-resistor #(.r(1\0 ),) v2(\2 ,\0 );
+resistor #(.r(10 ),) v2(\2 ,\0 );
 
 list
 
