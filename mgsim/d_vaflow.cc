@@ -135,7 +135,7 @@ void VAFLOW::set_parameters(const std::string& Label, CARD *Owner,
   bool first_time = (net_nodes() == 0);
 
   set_label(Label);
-  trace4("VAFLOW::set_parameters", long_label(), n_nodes, n_states, first_time);
+  trace4("VAFLOW::set_parameters", short_label(), n_nodes, n_states, first_time);
   set_owner(Owner);
   set_value(Value);
   attach_common(Common);
@@ -151,7 +151,7 @@ void VAFLOW::set_parameters(const std::string& Label, CARD *Owner,
 
     if (net_nodes() > NODES_PER_BRANCH) {
       // allocate a bigger node list
-      _nN = new node_t[net_nodes()];
+      _nN = new node_t[ext_nodes()];
     }else{
       // use the default node list, already set
     }      
@@ -167,7 +167,7 @@ void VAFLOW::set_parameters(const std::string& Label, CARD *Owner,
   std::fill_n(_old_values, n_states, 0.);
   assert(n_nodes <= net_nodes());
   notstd::copy_n(nodes, n_nodes, _nN); // copy more in expand_last
-  assert(net_nodes() == _n_ports * 2);
+  assert(ext_nodes() == _n_ports * 2);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

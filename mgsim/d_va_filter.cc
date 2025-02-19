@@ -131,7 +131,8 @@ protected: // override virtual
   int	   max_nodes()const override	{return net_nodes();}
   int	   min_nodes()const override	{return net_nodes();}
   int	   matrix_nodes()const override	{return _n_ports*2;}
-  int	   net_nodes()const override	{return _n_ports*2;}
+  int	   net_nodes()const override	{return _n_ports*2 - int(_current_port_names.size());}
+  int	   ext_nodes()const override	{return _n_ports*2;}
   CARD*	   clone()const override        { untested();unreachable();return new DEV_CPOLY_CAP(*this);}
   void	   tr_iwant_matrix()override	{tr_iwant_matrix_extended();}
   void     precalc_last() override;
@@ -165,6 +166,19 @@ protected: // override virtual
       ELEMENT::set_port_by_index(i, s);
     }else{
       obsolete_set_current_port_by_index(-i-1, s);
+    }
+  }
+private:
+  int first_current_port()const { return (_n_ports - int(_current_port_names.size()))*2; }
+  int last_current_port()const { return 2*_n_ports - int(_current_port_names.size()); }
+  bool node_is_connected(int i)const override {
+    if(i < first_current_port()){
+      return ELEMENT::node_is_connected(i);
+    }else if(i < last_current_port()) {
+      return true; // no names set // BUG.
+      return _current_port_names[i-_n_ports*2] != "";
+    }else{ untested();
+      return false;
     }
   }
   void obsolete_set_current_port_by_index(int i, const std::string& s) {
@@ -758,7 +772,7 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
 
   trace4("set_parameters", n_nodes, net_nodes(), _n_ports, _vy0[1]);
   notstd::copy_n(nodes, n_nodes, _nN);
-  assert(net_nodes() == _n_ports * 2);
+  assert(ext_nodes() == _n_ports * 2);
   if(n_(0).n_() != n_(1).n_()){
     _vy0[1] = 1.; // mfactor hack.
     _vy1[1] = 1.; // mfactor hack.
@@ -824,8 +838,8 @@ void DEV_CPOLY_CAP::expand_current_port(int i)
     n_(IN1) = input->n_(IN1);
     n_(IN2).set_to_ground(this);
   }else if (input->has_iv_probe()) {
-    int IN1 = net_nodes() - 2*int(_current_port_names.size()) + 2*i;
-    trace4("flow ecp", i, IN1, net_nodes(), _current_port_names.size());
+    int IN1 = ext_nodes() - 2*int(_current_port_names.size()) + 2*i;
+    trace4("flow ecp", i, IN1, ext_nodes(), _current_port_names.size());
     n_(IN1) = input->n_(OUT1);
     n_(IN1+1) = input->n_(OUT2);
   }else{ untested();

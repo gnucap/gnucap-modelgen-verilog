@@ -271,7 +271,7 @@ void VAPOT::set_parameters(const std::string& Label, CARD *Owner,
   std::fill_n(_old_values, n_states, 0.);
   assert(n_nodes <= net_nodes());
   notstd::copy_n(nodes, n_nodes, _nN); // copy more in expand_last
-  assert(net_nodes() == _n_ports * 2);
+  assert(net_nodes() == _n_ports * 2 - int(_current_port_names.size()));
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

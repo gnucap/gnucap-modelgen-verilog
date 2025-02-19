@@ -24,7 +24,7 @@ attach ./test_ccvs0.so
 test_ccvs0 d1(\2 ,\0 , \1 , \0 );
 resistor #(.r(1)) r1(\2 ,\0 );
 
-isource #(.dc(i)) i1(\0 , 1);
+isource #(.dc(i)) i1(\0 , \1 );
 resistor #(.r(10.00001u)) r0(\1 , \0 );
 
 parameter i=1

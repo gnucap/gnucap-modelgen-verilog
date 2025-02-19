@@ -161,10 +161,11 @@ private: // overrides
   void expand()override;
   void precalc_last()override;
   double tr_probe_num(std::string const&)const override;
-  int max_nodes()const override {return std::max(2,_n_ports*2);}
-  int net_nodes()const override	{return _n_ports*2;}
-  int min_nodes()const override {return 4;}
-  int int_nodes()const override {return bool(_ctrl_in);}
+  int max_nodes()const override { return std::max(2,_n_ports*2);}
+  int ext_nodes()const override { return _n_ports*2;}
+  int net_nodes()const override { return _n_ports*2;}
+  int min_nodes()const override { return net_nodes();}
+  int int_nodes()const override { return bool(_ctrl_in);}
 
   int input_idx()const {
     bool linear_input = !_ctrl_in; // TODO.

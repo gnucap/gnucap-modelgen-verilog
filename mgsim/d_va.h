@@ -60,9 +60,10 @@ protected: // override virtual
   std::string value_name()const override{incomplete(); return "";}
   std::string dev_type()const override	{ untested();unreachable(); return "cpoly_g";}
   int	   max_nodes()const override	{return net_nodes();}
+  int	   ext_nodes()const override	{return _n_ports*2;}
   int	   min_nodes()const override	{return net_nodes();}
   int	   matrix_nodes()const override	{return _n_ports*2;}
-  int	   net_nodes()const override	{return _n_ports*2;}
+  int	   net_nodes()const override	{return _n_ports*2 - int(_current_port_names.size());}
   CARD*	   clone()const override	{ untested();return new DEV_CPOLY_G(*this);}
   void	   tr_iwant_matrix()override	{ untested();tr_iwant_matrix_extended();}
   bool	   do_tr()override;
@@ -88,6 +89,19 @@ protected: // override virtual
       ELEMENT::set_port_by_index(i, s);
     }else{
       obsolete_set_current_port_by_index(-i-1, s);
+    }
+  }
+private:
+  int first_current_port()const { return (_n_ports - int(_current_port_names.size()))*2; }
+  int last_current_port()const { return 2*_n_ports - int(_current_port_names.size()); }
+  bool node_is_connected(int i)const override {
+    if(i < first_current_port()){
+      return ELEMENT::node_is_connected(i);
+    }else if(i < last_current_port()) {
+      return true; // no names set // BUG.
+      return _current_port_names[i-_n_ports*2] != "";
+    }else{ untested();
+      return false;
     }
   }
   virtual void obsolete_set_current_port_by_index(int i, const std::string& s) {
@@ -178,8 +192,8 @@ void DEV_CPOLY_G::expand_current_port(int i)
     n_(IN1) = input->n_(IN1);
     n_(IN2).set_to_ground(this);
   }else if (input->has_iv_probe()) {
-    int IN1 = net_nodes() - 2*int(_current_port_names.size()) + 2*i;
-    trace4("flow ecp", i, IN1, net_nodes(), _current_port_names.size());
+    int IN1 = ext_nodes() - 2*int(_current_port_names.size()) + 2*i;
+    trace4("flow ecp", i, IN1, ext_nodes(), _current_port_names.size());
     n_(IN1) = input->n_(OUT1);
     n_(IN1+1) = input->n_(OUT2);
   }else{ untested();
