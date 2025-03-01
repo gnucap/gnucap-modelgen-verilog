@@ -787,7 +787,7 @@ void CMD_PARAM::parse_range(CS& cmd, CARD_LIST* Scope, std::string Name) const
 
     PARAM_INSTANCE v = pl->deep_lookup(IS_VALID);
     if(range_expr=="1"){ untested();
-    }else if(v.has_hard_value()){ untested();
+    }else if(v.has_hard_value()){
       range_expr = v.string() + "*" + range_expr;
       trace2("c_param hv", IS_VALID, range_expr);
       pl->set(IS_VALID, range_expr);

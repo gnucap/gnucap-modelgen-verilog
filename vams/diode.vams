@@ -10,7 +10,8 @@
 `pragma modelgen gen-paramset
 
 module diode (a, c);
-	parameter real is=1e-15 from (0:inf);	// saturation current (A)
+	parameter integer polarity = 1 from [-1:1]; //  exclude 0;
+	parameter real is=1e-15 from [0:inf);	// saturation current (A)
 	parameter real tf=0. from [0:inf);	// forward transit time (s)
 	parameter real cjo=0 from [0:inf);	// zero-bias junction capacitance (F)
 	parameter real pb=1. from (0:inf);
@@ -52,10 +53,10 @@ module diode (a, c);
 	branch (ia, c) r, cap;
 	real qd;
    (* desc="region" *) integer region;
+   (* desc="v" *) real v;
 
 	analog begin : main
-		real volts, amps, g;
-
+		real amps, g;
 		real tempratio;
 		real vt;
 		real p_isat;
@@ -76,63 +77,63 @@ module diode (a, c);
     	// region_t oldregion = region;
 		p_isat = is_adjusted * pow(tempratio, xti) * exp((eg/vt) *(tempratio-1));
 
-		volts = V(r);
-		amps = I(r);
+		v = polarity * V(r);
+		amps = polarity * I(r);
 		iaf = pow(abs(amps), af);
 		noise = white_noise(2*`P_Q * amps, "shot") + flicker_noise(kf*iaf, 1., "flicker");
 		case(level)
 			0: begin // gnucap model
-				if (volts <= 0.) begin
+				if (v <= 0.) begin
 					region = -1;
-					i = p_isat * (expm1(volts/vt));
-					I(r) <+ i + noise;
+					i = p_isat * (expm1(v/vt));
+					I(r) <+ polarity * i + noise;
 					amps = i;
 				end else begin
 					if (amps >= 0.) begin
 						region = 1;
-						V(r) <+ vt * ln1p(amps/p_isat) + noise;
+						V(r) <+ polarity * vt * ln1p(amps/p_isat) + noise;
 					end else begin
 						// should not get here once converged.
 						region = 0;
-						i = volts * p_isat/vt;
-						I(r) <+ i + noise;
+						i = v * p_isat/vt;
+						I(r) <+ polarity * i + noise;
 					end
 				end
 			end
 
 		   1,2,3,4,5: begin // spice model, WIP
-				if (volts <= 0.) begin
+				if (v <= 0.) begin
 					region = -1 - level*100.;
 					g = ( p_isat / vt + $simparam("gmin") );
 				end else begin : on
 					real ev;
 					region = 1 + level*100.;
-					ev = exp(volts/vt);
+					ev = exp(v/vt);
 					g = ( p_isat * ( ev - 1.) + $simparam("gmin") );
 				end
-				I(r) <+ g*volts + noise;
+				I(r) <+ polarity * g*v + noise;
 			end
 		endcase
 
-		if (volts < fc * pb) begin
-			qb = cj_adjusted * pb * pow(1.-(volts/pb), 1.-mj) / (1.-mj);
-// 			cb = cj_adjusted * pow(1. - (volts / pb),  -mj); // Cj
+		if (v < fc * pb) begin
+			qb = cj_adjusted * pb * pow(1.-(v/pb), 1.-mj) / (1.-mj);
+// 			cb = cj_adjusted * pow(1. - (v / pb),  -mj); // Cj
  		end else begin
          // untested...
 			qb = cj_adjusted * ((pb* ( pow(1.-fc, 1.-mj) - 1.) / (1.-mj)) // qb0
                             + pow(1.-fc, - 1. - mj)
-                            + volts * ( (1.-fc*(1.+mj)) + .5 * (volts/pb) * mj));
-// 			cb = cj_adjusted / pow(1. - fc, 1. + mj) * (1. - fc*(1.+mj) + (volts/pb)*mj); // Cj
+                            + v * ( (1.-fc*(1.+mj)) + .5 * (v/pb) * mj));
+// 			cb = cj_adjusted / pow(1. - fc, 1. + mj) * (1. - fc*(1.+mj) + (v/pb)*mj); // Cj
  		end
 
- 		if (volts < fc * pbsw) begin
-			qsw = cjsw_adjusted * pbsw * pow(1.-(volts/pbsw), 1.-mjsw) / (1.-mjsw);
-// 			csw = cjsw_adjusted / pow(1. - (volts / pbsw),  mjsw); // Cj
+ 		if (v < fc * pbsw) begin
+			qsw = cjsw_adjusted * pbsw * pow(1.-(v/pbsw), 1.-mjsw) / (1.-mjsw);
+// 			csw = cjsw_adjusted / pow(1. - (v / pbsw),  mjsw); // Cj
  		end else begin
 			qsw = cjsw_adjusted * ((pbsw* ( pow(1.-fc, 1.-mjsw) - 1.) / (1.-mjsw)) // qsw0
                                + pow(1.-fc, - 1. - mjsw)
-                               + volts * ( (1.-fc*(1.+mjsw)) + .5 * (volts/pbsw) * mjsw));
-// 			csw = cjsw_adjusted / pow(1. - fc, 1. + mjsw) * (1. - fc*(1.+mjsw) + (volts/pbsw)*mjsw); // Cj
+                               + v * ( (1.-fc*(1.+mjsw)) + .5 * (v/pbsw) * mjsw));
+// 			csw = cjsw_adjusted / pow(1. - fc, 1. + mjsw) * (1. - fc*(1.+mjsw) + (v/pbsw)*mjsw); // Cj
  		end
 //     
 //     double ctt;
@@ -148,10 +149,10 @@ module diode (a, c);
 
       // Cj TODO
 		// qd = tf*amps - 2*cjo*phi*sqrt(1 - V(cap)/phi);
-		 ii = is*(limexp(V(r)/$vt) - 1);
+		 ii = is*(limexp(polarity * V(r)/$vt) - 1);
 		// qd = tf*ii - 2.*cjo*phi*sqrt(1. - V(cap)/phi);
 		qd = tf*ii - qb - qsw;// * V(cap); //  * (csw); // wrong.
-		I(cap) <+ ddt(qd);
+		I(cap) <+ polarity * ddt(qd);
 	end
 
 	analog begin

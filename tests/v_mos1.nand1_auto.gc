@@ -1,0 +1,58 @@
+verilog
+// options trace
+load ../vams
+
+paramset nmos mosfet;
+  parameter real l;
+  parameter real w;
+ .polarity = 1;
+ .l = l;
+ .w = w;
+ .vto=.7;
+ .level=1;
+endparamset
+
+paramset pmos mosfet;
+  parameter real l;
+  parameter real w;
+ .polarity = -1;
+ .l = l;
+ .w = w;
+ .vto=-.7;
+ .level=1;
+endparamset
+
+module nand2(\2 , \3 , \1 , \4 , \11 );
+  // ground 0 // later
+  pmos #(.w(8e-6) .l(600e-9)) p1(\4 , \2 , \1 , \1 );
+  pmos #(.w(8e-6) .l(600e-9)) p2(\4 , \3 , \1 , \1 );
+  nmos #(.w(8e-6) .l(600e-9)) n1(\4 , \2 , \11 , \0 );
+  nmos #(.w(8e-6) .l(600e-9)) n2(\11 , \3 , \0 , \0 );
+  capacitor #(.c(1p)) C1(\4 , \0 );
+endmodule
+
+nand2 XI10(\2 , \2 , \1 , \4 , \5 );
+
+spice
+
+vdd 1 0 5
+vin 2 0 PWL (0 0, 1n 0, 3n 5, 10n 5, 12n 0, 20n 0)
+
+.print op v(nodes) z(5) iter(0)
+.op trace iter
+
+.print op cgsm(XI10.p1) cgdm(XI10.p1) cgbm(XI10.p1)
+.op
+.print op cgsm(XI10.p2) cgdm(XI10.p2) cgbm(XI10.p2)
+.op
+.print op cgsm(XI10.n1) cgdm(XI10.n1) cgbm(XI10.n1)
+.op
+.print op cgsm(XI10.n2) cgdm(XI10.n2) cgbm(XI10.n2)
+.op
+
+.options trtol = 1
+.print tran v(2) v(4) v(5)  iter(0)
+.tran 10n trace=a basic
+
+.stat notime
+.end

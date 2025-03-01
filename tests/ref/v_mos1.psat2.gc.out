@@ -1,0 +1,37 @@
+#           v(2)       v(3)       v(4)       iter(0)   
+ 0.         0.         0.         0.         0.        
+-1.        -5.        -5.         0.         1.        
+-2.        -4.8279    -5.         0.         2.        
+-3.        -4.2935    -5.         0.         3.        
+-4.        -4.1513    -5.         0.         4.        
+-5.        -4.1396    -5.         0.         5.        
+-6.        -4.1395    -5.         0.         6.        
+-7.        -4.1395    -5.         0.         7.        
+ 27.       -4.1395    -5.         0.         8.        
+#           i(Vds)     i(Vbs)     ps(Vds)    ps(Vbs)   
+ 27.        8.6051u   -4.1395p    43.025u    0.        
+#           id(d.m1)   Is(d.m1)   ig(d.m1)   ib(d.m1)   ibd(d.m1)  ibs(d.m1) 
+ 27.        0.         0.         0.         0.         ??         ??        
+#           vgs(d.m1)  vds(d.m1)  vbs(d.m1)  vbd(d.m1)  von(d.m1)  vdsat(d.m1)
+ 27.       -4.1395    -4.1395    -41.39E-18  ??         3.5155     0.62399   
+#           gm(d.m1)   gds(d.m1)  gmb(d.m1)  gbd(d.m1)  gbs(d.m1) 
+ 27.        27.58u     2.0788u    0.         ??         ??        
+#           cbd(d.m1)  cbs(d.m1)  cgs(d.m1)  cgd(d.m1)  cgb(d.m1) 
+ 27.        ??         ??         ??         ??         ??        
+#           cqgs(d.m1) cqgd(d.m1) cqgb(d.m1) cqbd(d.m1) cqbs(d.m1)
+ 27.        ??         ??         ??         ??         ??        
+#           qgs(d.m1)  qgd(d.m1)  qgb(d.m1)  qbd(d.m1)  qbs(d.m1) 
+ 27.        0.         0.         0.         ??         ??        
+#           cgsovl(d.m1) cgdovl(d.m1) cgbovl(d.m1) cgate(d.m1) region(d.m1)
+ 27.        ??         ??         ??         62.973f    7.        
+#           cgst(d.m1) cgdt(d.m1) cgbt(d.m1)
+ 27.        43.953f    1.9707f    0.        
+#           vdm(d.m1)  vgm(d.m1)  vbm(d.m1)  vsm(d.m1) 
+ 27.       -2.0697    -2.0697     2.0697     2.0697    
+#           vd(d.m1)   vg(d.m1)   vb(d.m1)   vs(d.m1)   vth(d.m1)  vgst(d.m1)
+ 27.       -4.1395    -4.1395    -41.39E-18  0.        -3.5155     0.62399   
+Gnucap   System status
+iterations: op=8, dc=0, tran=0, fourier=0, total=96
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=3, subckt=0, model=14, total=17
+dctran density=31.5%, ac density=31.5%

@@ -1,0 +1,728 @@
+/*                            -*-
+ * Copyright (C) 2024, 2025 Felix Salfelder
+ *
+ * This file is part of "Gnucap", the Gnu Circuit Analysis Package
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+ *------------------------------------------------------------------
+ * Spice "level 1" mos demo, meant to highlight some modelling and
+ * convergence issues. Show how to represent (bogus) capacitors in
+ * Verilog-ams. Inspired by Gnucap d_mos1.model.
+ *
+ * To get exact spice mos1 behaviour, use a spice model.
+ * Consider bsim and friends for better analog performance
+ *
+ */
+/*--------------------------------------------------------------------------*/
+`include "disciplines.vams"
+`include "constants.vams"
+
+`define defl 100.u // $simulator("opt_defl", 1.)?
+`define defw 100.u // $simulator("opt_defw", 1.)?
+`define defad 1. // $simulator("opt_defad", 1.)?
+`define defas 1. // $simulator("opt_defas", 1.)?
+`define mDEFAULT_is 1e-14;
+`define pP -1;
+`define pN 1;
+
+  //enum gate_t 
+`define gtSAME -1
+`define gtMETAL 0
+`define gtOPP 1
+
+`define CAPS
+// workaround missing tolerances. TODO etc.
+`define CHGHACK 1e6
+`define use_limit
+
+`define NI 1.45e16 // intrinsic carrier concentration
+
+module mosfet(d, g, s, b);
+	electrical d, g, s, b;
+	inout d, g, s, b;
+
+	electrical _d; // short_to=d short_if="!OPT::rstray || s->rd == 0.";
+	electrical _s; // is short_to=s short_if="!OPT::rstray || s->rs == 0.";
+
+	parameter real tnom = 0.;
+
+	parameter integer polarity = 1 from [-1:1] exclude 0;
+	parameter integer diolevel = 1 from [0:99];
+	parameter integer needs_isub=0;
+
+	(*desc="drawn (optical) channel length"*)
+	parameter real l = `defl from (0.:inf);
+
+	(*desc="channel width (drawn)"*)
+	parameter real w = `defw from (0.:inf);
+
+	(*desc="drain area, drawn"*)
+	parameter real ad = `defad from(0.:inf);
+
+	(*desc="source area, drawn"*)
+	parameter real as = `defas from(0.:inf);
+
+	(*desc="drain perimeter"*)
+	parameter real pd = 0. from [0.:inf); // 0.?
+
+	(*desc="source perimeter"*)
+	parameter real ps = 0. from [0.:inf); // 0.?
+
+	(*desc="drain # squares"*)
+	parameter real nrd = 1. from (0.:inf);
+
+	(*desc="source # squares"*)
+	parameter real nrs = 1. from (0.:inf);
+
+	(*desc="coef for fwd bias depl cap formula"*)
+	parameter real fc = 0.;
+	(*desc="junction potential"*)
+	parameter real pb = 0.;
+	(*desc="zero-bias jct capacitance (per area)"*)
+	parameter real cj = 0.;
+	(*desc="grading coefficient"*)
+	parameter real mj = 0.;
+	(*desc="zero bias sidewall cap (per perim.)"*)
+	parameter real cjsw = 0.;
+	(*desc="sidewall junction potential"*)
+	parameter real pbsw = 0.;
+	(*desc="sidewall grading coefficient"*)
+	parameter real mjsw = 0.;
+	(*desc="flicker noise coefficient"*)
+	parameter real kf = 0.;
+	(*desc="flicker noise exponent"*)
+	parameter real af = 0.;
+
+	parameter integer level = 1;
+
+	(*desc="bulk jct sat current"*)
+	parameter real is = `mDEFAULT_is;
+
+	(*desc="bulk jct sat current per sq meter"*)
+	parameter real js = is; // NA
+
+	(*desc="D & S diffusion sheet resistance"*)
+	parameter real rsh = 0.;
+
+	(*desc="drain ohmic resistance"*)
+	parameter real rd = rsh * nrd;
+
+	(*desc="source ohmic resistance"*)
+	parameter real rs = rsh * nrs;
+
+	(*desc="0-bias BD jct capacitance"*)
+	parameter real cbd = 0.; // NA
+
+	(*desc="0-bias BS jct capacitance"*)
+	parameter real cbs = 0.; // NA
+
+	(*desc="GS overlap capacitance"*)
+	parameter real cgso = 0.;
+	aliasparam cgs = cgso;
+
+	(*desc="GD overlap capacitance"*)
+	parameter real cgdo = 0.;
+	aliasparam cgd = cgdo;
+
+	(*desc="GB overlap capacitance"*)
+	parameter real cgbo = 0.;
+	aliasparam cgb = cgbo;
+
+	(*desc="length bias accounts for masking and etching effects"*)
+	parameter real xl = 0.;
+	aliasparam dl = xl;
+	aliasparam ldel = xl;
+
+	(*desc="width bias accounts for masking and etching effects"*)
+	parameter real xw = 0.;
+	aliasparam dw = xw;
+	aliasparam wdel = xw;
+
+	(*desc="length shrink factor"*)
+	parameter real lmlt = 1.;
+
+	(*desc="width shrink factor"*)
+	parameter real wmlt = 1.;
+
+	(*desc="channel length reduction each side"*)
+	parameter real del = 0.;
+
+	(*desc="lateral length diffusion"*)
+	parameter real ld = 0.;
+	aliasparam dlat = ld;
+	aliasparam ladt = ld;
+
+	(*desc="width diffusion"*)
+	parameter real wd = 0.;
+
+	(*desc="-----b drain junction saturation current"*)
+	localparam real idsat = ( !$param_given(js) || !ad || !as )?  is : js * ad;
+	(*desc="-----b source junction saturation current"*)
+	localparam real issat = ( !$param_given(js) || !ad || !as )? is : js * as;
+
+	(*desc="-23-c- actual (electrical) channel length"*)
+	localparam real l_eff = $param_given(l)? (l * lmlt + xl - 2. * (ld + del) ) : `defl;
+	(*desc="--3-c- actual (electrical) channel width" *)
+	localparam real w_eff = $param_given(w)? (w * wmlt + xw - 2. * wd ) : `defw;
+
+	(*desc="zero-bias threshold voltage"*)
+	parameter real vto = 0.; // NA?
+
+	(*desc="channel-length modulation"*)
+	parameter real lambda = 0.; // NA?
+
+	(*desc="oxide thickness"*)
+	parameter real tox = 0. from [0.:inf); // NA?
+
+//      double nsub_cm
+	(*desc="substrate doping", unit="cm"*)
+	parameter real nsub = 0.; // NA?
+
+      //double nss_cm
+	(*desc="surface state density", unit="cm"*)
+	parameter real nss = 0.;
+
+	(*desc="metallurgical junction depth"*)
+	parameter real xj = 0. from [0.:inf); // 0.?
+
+	// double uo_cm
+	(*"surface mobility", unit="cm"*)
+	parameter real uo = 600.;
+	aliasparam u0 = uo;
+
+	(*desc="type of gate material - really gate_t"*)
+	parameter integer tpg = `gtOPP;
+
+	// fixup units.
+	localparam real _nsub = nsub * `ICM2M3;
+	localparam real _nss = nss * `ICM2M2;
+	localparam real _uo = uo * `CM2M2;
+
+	(*desc="oxide capacitance (E_OX / tox)"*)
+	parameter real cox = 0.;
+	parameter real gamma = 0.;
+	parameter real phi = .6;
+
+	(*desc="transconductance parameter"*)
+	parameter real kp=2e-5;
+
+	real _cox;
+	real _kp;
+	(*desc="dbg phi"*)real _phi; // s->phi?
+	real _vto;
+	real _gamma;
+	real _egap;
+
+	real tnom_k;
+	analog function integer reverse_if_needed;
+		real vds, vgs, vbs;
+		integer reversed;
+		inout vds, vgs, vbs;
+		input reversed;
+		begin
+			if (vds < 0) begin
+				reversed = !reversed;
+				vgs = vgs - vds;
+				vbs = vbs - vds;
+				vds = -vds;
+			end
+			reverse_if_needed = reversed;
+		end
+	endfunction
+
+	analog function real fet_limit_vds;
+		real vnew, vold;
+		input vnew, vold;
+		begin
+		if (vold >= 3.5) begin
+			if (vnew > (3*vold + 2)) begin
+				fet_limit_vds = 3 * vold + 2;
+			end else if (vnew < 2) begin
+				fet_limit_vds = 2;
+			end else begin
+				fet_limit_vds = vnew;
+			end
+		end else begin
+			if (vnew > 4)	begin
+				fet_limit_vds = 4;
+			end else if (vnew < -.5) begin
+				fet_limit_vds = -.5;
+			end else begin
+				fet_limit_vds = vnew;
+			end
+		end
+		if(fet_limit_vds != vnew)
+			$discontinuity(-1);
+		end
+	endfunction
+
+	analog function real fet_limit_vgs;
+		real vnew, vold, vto;
+		input vnew, vold, vto;
+
+		real v_limited;
+		real vgst_old = vold - vto;
+		real vgst_new = vnew - vto;
+		begin
+			vgst_old = vold - vto;
+			vgst_new = vnew - vto;
+			if (vgst_old >= 3.5) begin
+				if (vgst_new < 2) begin
+					v_limited = 2;
+				end else if (vgst_new > (3 * vgst_old + 2)) begin
+					v_limited = 3*vgst_old + 2;
+				end else begin
+					v_limited = vgst_new;
+				end
+			end else if (vgst_old >= 0) begin
+			 // assert(vgst_old < 3.5);
+				if (vgst_new < -.5) begin
+					v_limited = -.5;
+				end else if (vgst_new > 4) begin
+					v_limited = 4;
+				end else begin
+					v_limited = vgst_new;
+				end
+			end else if (vgst_old <= 0) begin
+				// assert(vgst_old < 0);
+				if (vgst_new < (3 * vgst_old - 2)) begin
+					v_limited = 3*vgst_old - 2;
+				end else if (vgst_new > .5) begin
+					v_limited = .5;
+				end else begin
+					v_limited = vgst_new;
+				end
+			end else begin
+				// overflow or other numeric error
+				// $debug("unreachable, fet_limit..."); // BUG //
+			end
+			if(v_limited != vgst_new)
+				$discontinuity(-1);
+			fet_limit_vgs = v_limited + vto;
+		end
+	endfunction
+
+	analog begin
+		if($param_given(tnom)) begin
+			tnom_k = tnom + `P_CELSIUS0;
+		end else begin
+			tnom_k = $temperature();
+			// tnom_k = $simparam("tnom", $temperature()); // probably the intent //
+		end
+		_egap = 1.16 - (7.02e-4*tnom_k*tnom_k) / (tnom_k+1108.);
+
+		// set defaults.
+		_vto = polarity * vto;
+		_gamma = gamma;
+		_phi = phi;
+		_cox = cox;
+		_kp = kp;
+
+		if ($param_given(tox)) begin
+			_cox = `P_EPS_OX / tox;
+			if (!$param_given(kp)) begin
+				_kp = _uo * _cox;
+				// calc_kp = true;
+			end
+			if ($param_given(nsub)) begin
+				if (!$param_given(phi)) begin
+					_phi = (2. * `P_K_Q) * tnom_k * ln(_nsub/`NI);
+					@(initial_step) begin
+						if (_phi < .1) begin
+							//	      strobe("%s calculated phi too small, using .1\n", $instance_name());
+							$strobe("calculated phi too small, using .1\n");
+							_phi = .1;
+						end
+					end
+				end
+				if (!$param_given(gamma)) begin
+					_gamma = sqrt(2. * `P_EPS_SI * `P_Q * _nsub) / _cox;
+				end
+				if (!$param_given(vto)) begin : vto
+					real phi_ms;
+					real vfb;
+					phi_ms = (tpg == `gtMETAL) ?
+							  polarity * (-.05 - (_egap + polarity * _phi) / 2.)
+							  : -(tpg * _egap + _phi) / 2.;
+					vfb = phi_ms - polarity * `P_Q * _nss / _cox;
+					_vto = vfb + _phi + _gamma * sqrt(_phi);
+					// calc_vto = true;
+				end
+			end else begin
+			  // tox is input, nsub isn't
+			end
+		end else begin
+			// tox is not input.
+		end
+	end // analog
+
+	(*desc="saturation voltage"*)           real vdsat;
+	(*desc="vgs - von."*)                   real vgst;
+	(*desc="actual threshold voltage"*)     real von;
+	(*desc="vth"*)                          real vth; //  = "von * m->polarity";
+	(*desc="cgate"*)                        real cgate; // "s->cgate";
+	(*desc="region"*)                       integer region;
+	(*desc="flag: Vgs < 0, reverse s & d"*) integer reversed;
+	(*desc="flag: in cut off region"*)      integer cutoff;
+	(*desc="flag: subthreshold region"*)    integer subthreshold;
+	(*desc="flag: in saturation region"*)   integer saturated;
+	(*desc="flag: sb diode fwd biased"*)    integer sbfwd;
+	(*desc="flag: punch thru region"*)      integer punchthru;
+
+	analog initial begin
+		cutoff = 0;
+	end
+
+	analog begin
+		cgate = _cox * w_eff * l_eff;
+	end
+
+	localparam real s_cgso = cgso * w_eff; // "m->cgso * w_eff"
+	localparam real s_cgdo = cgdo * w_eff; // "m->cgdo * w_eff"
+	localparam real s_cgbo = cgbo * l_eff; // "m->cgbo * l_eff"
+
+	// TODO
+   //  omit="!OPT::rstray || s->rs == 0.";
+	// resistor #(.r(rs)) Rs(s, _s);
+   // omit="!OPT::rstray || s->rd == 0.";
+	// resistor #(.r(rd)) Rd(d, _d);
+
+   // omit="_n[n_b].n_() == _n[n_d].n_() || s->idsat == 0.";
+   // if(idsat)
+	diode #(.level(diolevel), .area(ad), .polarity(polarity), .perim(pd), .is(idsat), .cjo(cbd)) ddb(b, _d);
+
+   // omit="_n[n_b].n_() == _n[n_s].n_() || s->issat == 0.";
+   // if(issat)
+	diode #(.level(diolevel), .area(as), .polarity(polarity), .perim(ps), .is(issat), .cjo(cbs)) dsb(b, _s);
+
+	(*desc="vds"*) real vds;
+	(*desc="vgs"*) real vgs;
+	(*desc="vbs"*) real vbs;
+	(*desc="ids"*) real ids;
+	(*desc="gm"*)  real gm;
+	(*desc="gds"*) real gds;
+	(*desc="gmb"*) real gmb;
+	(*desc="gmbr"*)real gmbr;
+	(*desc="gmbf"*)real gmbf;
+
+	(*desc="is"*) real Is;
+	(*desc="ig"*) real ig;
+	(*desc="id"*) real id;
+	(*desc="ib"*) real ib;
+	(*desc="vd"*) real vd;
+	(*desc="vg"*) real vg;
+	(*desc="vs"*) real vs;
+	(*desc="vb"*) real vb;
+	(*desc="vdm"*) real vdm;
+	(*desc="vgm"*) real vgm;
+	(*desc="vbm"*) real vbm;
+	(*desc="vsm"*) real vsm;
+	(*desc="vdg"*) real vdg;
+	(*desc="vbg"*) real vbg;
+	(*desc="vsg"*) real vsg;
+	(*desc="vdb"*) real vdb;
+	(*desc="vgb"*) real vgb;
+	(*desc="vsb"*) real vsb;
+	
+	(*desc="cgs{m}"*) real cgsm;
+	(*desc="cgd{m}"*) real cgdm;
+	(*desc="cgb{m}"*) real cgbm;
+	(*desc="cgst"*) real cgst;
+	(*desc="cgdt"*) real cgdt;
+	(*desc="cgbt"*) real cgbt;
+	(*desc="qgs"*) real qgs;
+	(*desc="qgd"*) real qgd;
+	(*desc="qgb"*) real qgb;
+	(*desc="temp"*) real temp;
+
+	real _vds;
+	real _vgs;
+	real _vbs;
+
+	real gmf;
+	real gmr;
+	real idb;
+	real isb;
+
+	real t_phi;
+	real t_beta;
+	real t_sqrt_phi;
+	real t_egap;
+
+	analog begin : temperature_dependent
+		real tempratio;
+		real tempratio4;
+		real kt;
+		real vt;
+		real egap_;
+		real arg;
+
+		temp = $temperature(); // in Kelvin
+		tempratio = temp / tnom_k;
+		tempratio4 = tempratio * sqrt(tempratio);
+		kt = temp * `P_K;
+		vt = temp * `P_K_Q;
+		egap_ = 1.16 - (7.02e-4*temp*temp) / (temp+1108.);
+
+		arg = (_egap*tempratio - egap_) / (2.*kt);
+
+		t_phi = _phi*tempratio + (-2.*vt*(1.5*ln(tempratio)+`P_Q*(arg)));
+		t_beta = (_kp / tempratio4) * w_eff / l_eff;
+		t_sqrt_phi = sqrt(t_phi);
+		t_egap = egap_;
+	end
+
+	analog begin : do_tr0
+		real Vds, Vgs, Vbs;
+		if (reversed) begin
+			Vds = polarity * V(_s, _d);
+			Vgs = polarity * V(g, _d);
+			Vbs = polarity * V(b, _d);
+		end else begin
+			Vds = polarity * V(_d, _s);
+			Vgs = polarity * V(g, _s);
+			Vbs = polarity * V(b, _s);
+		end
+
+`ifdef use_limit
+		_vgs = $limit(Vgs, fet_limit_vgs, von);
+		_vds = $limit(Vds, fet_limit_vds);
+`else
+		_vgs = Vgs;
+		_vds = Vds;
+`endif
+
+		_vbs = Vbs;
+		_vbs = min(Vbs, 0.);
+	end
+
+
+	analog begin : mos1_tr_eval
+		real _sarg;
+		integer new_reversed;
+
+		new_reversed = reverse_if_needed( _vds, _vgs, _vbs, reversed);
+		if(new_reversed != reversed) begin
+			// $strobe("reversing");
+			// does not work in sat1r
+			// $discontinuity();
+		end
+
+		reversed = new_reversed;
+
+		if (_vbs <= 0.) begin
+			_sarg = sqrt(t_phi - _vbs);
+			sbfwd = 0;
+		end else begin
+			$strobe("untested");
+			_sarg = t_sqrt_phi / (1. + .5 * _vbs / t_phi);
+			sbfwd = 1;
+		end
+
+		von = _vto + _gamma * (_sarg - sqrt(_phi)) + .5 * (_egap - t_egap) + .5 * (t_phi - _phi);
+		vdsat = _vgs - von;
+		vgst = vdsat;
+
+		if (vdsat < 0.) begin
+			vdsat = 0.;
+		end
+
+		cutoff = (vgst < 0.);
+		saturated = (_vds > vdsat);
+		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
+		if (cutoff) begin
+			gmf = 0.;
+			ids = 0.;
+		end else if (saturated) begin
+			gmf  = t_beta * vgst * (1. + lambda * _vds);
+			ids = gmf * (.5 * vgst);
+		end else begin //  triode 
+			gmf = t_beta * _vds * (1. + lambda * _vds);
+			ids = gmf * (vgst - .5*_vds);
+		end
+
+		if (reversed) begin
+			ids = -ids;
+			gmr = gmf;
+			gmf = 0.;
+		end else begin
+			gmr = 0.;
+		end
+
+		ids = polarity * ids;
+	end
+
+	analog begin : set_sources
+		V(_d, d) <+ 0;
+		V(_s, s) <+ 0;
+		I(_d, _s) <+ ids;
+	//	I(_s, b) <+ isb; // * polarity;
+	//	I(_d, b) <+ idb; //  * polarity;
+	end // analog
+
+	analog begin : set_region
+		region = 0;
+		region = region + !cutoff;
+		region = region + !subthreshold * 2;
+		region = region + saturated * 4;
+		region = region + sbfwd * 10;
+		region = region + (_vbs > _vds) * 20;
+		region = region + punchthru * 40;
+		if(reversed) region = -region;
+	end
+
+`ifdef CAPS
+	// should use subdevices, but need more system verilog semantics..
+	// omit="!OPT::cstray || _n[n_b].n_() == _n[n_g].n_()";
+	// omit="!OPT::cstray || _n[n_g].n_() == _n[n_d].n_()";
+	// capacitor #(.c(s_cgbo)) Cgb(g, b);
+	analog begin : eval_cgb
+		cgbt = s_cgbo;
+
+		if (vgst < - _phi) begin : accumulation
+			cgbt = cgbt + cgate;
+		end else if (vgst < 0.) begin : depletion
+			cgbt = cgbt + cgate * (-vgst) / _phi;
+		end else begin : active_overlap_only
+		end
+		cgbm = cgbt - s_cgbo;  // "cgs{m}" = "@Cgs[EV] - @Cgs[NV]";
+
+		qgb = `CHGHACK * idt(cgbt * ddt(V(g,b) / `CHGHACK), 0);
+		I(g,b) <+ ddt(qgb);
+	end
+
+	// omit="!OPT::cstray || _n[n_g].n_() == _n[n_s].n_()";
+	// eval=Cgs
+	// capacitor #(.c(s_cgso)) Cgs(g, _s);
+	analog begin : eval_cgs
+		real ddif;
+
+		cgst = 0;
+		ddif = 2. * vdsat - _vds;
+
+		if(reversed) begin : cgd_model
+			if (vgst >= 0.) begin
+				if (vdsat > _vds) begin : linear
+					cgst = (2./3.) * cgate * (1. - (vdsat*vdsat)/(ddif*ddif));
+					if (vgst <= .1) begin : smooth_discont
+						cgst = cgst * 10. * vgst;
+					end
+				end else begin
+				end
+			end
+		end else begin : cgs_model
+			if (vgst >= - _phi/2.) begin : depletion_or_active
+				cgst = (2./3.) * cgate;
+				if (vdsat > _vds) begin : linear
+					real ndif;
+					ndif = vdsat - _vds;
+					cgst = cgst * ( 1. - (ndif*ndif)/(ddif*ddif) );
+				end
+				if (vgst <= 0) begin
+					cgst = cgst * (1. + vgst / _phi);
+					cgst = cgst * (1. + vgst / _phi);
+				end
+			end else begin
+				//$debug("inactive\n");
+			end
+		end
+		cgsm = cgst;
+		cgst = cgst + s_cgso;
+
+		qgs = idt(`CHGHACK * cgst * ddt(V(g,_s) / `CHGHACK), cgst / `CHGHACK);
+		I(g,_s) <+ ddt(qgs);
+	end // cgs
+
+   // omit="!OPT::cstray || _n[n_g].n_() == _n[n_d].n_()";
+   // eval=Cgd
+	// capacitor #(.c(s_cgdo)) Cgd(g, _d);
+	analog begin : eval_cgd
+		//real cap;
+		real ddif;
+
+		cgdt = 0;
+		ddif = 2. * vdsat - _vds;
+
+		if(!reversed) begin
+			if (vgst >= 0.) begin
+				if (vdsat > _vds) begin : linear
+					cgdt = (2./3.) * cgate * (1. - (vdsat*vdsat)/(ddif*ddif));
+					if (vgst <= .1) begin : smooth_discont
+						cgdt = cgdt * 10. * vgst;
+					end
+				end else begin
+				end
+			end
+		end else begin : cgs_model
+			if (vgst >= - _phi/2.) begin : depletion_or_active
+				cgdt = (2./3.) * cgate;
+				if (vdsat > _vds) begin : linear
+					real ndif;
+					ndif = vdsat - _vds;
+					cgdt = cgdt * ( 1. - (ndif*ndif)/(ddif*ddif) );
+				end
+				if (vgst <= 0) begin
+					cgdt = cgdt * (1. + vgst / _phi);
+					cgdt = cgdt * (1. + vgst / _phi);
+				end
+			end
+		end
+		cgdm = cgdt; // "cgs{m}" = "@Cgs[EV] - @Cgs[NV]";
+		cgdt = cgdt + s_cgdo;
+
+		qgd = idt(`CHGHACK * cgdt * ddt(V(g,_d) / `CHGHACK),0);
+		I(g,_d) <+ ddt(qgd);
+	end // cgd
+
+`endif
+
+	analog begin : output_vars
+		vds = V(_d, _s);
+		vgs = V(g, _s);
+		vbs = V(b, _s);
+		gm = (reversed) ? gmr : gmf;
+		gmbf = ddx(ids, V(b, _s));
+		gmbr = ddx(ids, V(b, _d));
+		gmb = (reversed) ? gmbr : gmbf;
+		gds = ids / V(_d, _s); // BUG?
+		vdg = V(d,g);
+		vbg = V(b,g);
+		vsg = V(s,g);
+		vdb = V(d,b);
+		vgb = V(g,b);
+		vsb = V(s,b);
+		vdm = V(d,s)/2.;
+		vgm = (V(g,s) + V(g,d))/2.;
+		vbm = (V(b,s) + V(b,d))/2.;
+		vsm = V(s,d)/2.;
+		vbs = V(b,s);
+		vd  = V(d);
+		vg  = V(g);
+		vs  = V(s);
+		vb  = V(b);
+
+		vth = polarity * von;
+
+		// does not work
+		// Is = I(<s>);
+		// id = I(<d>);
+		// ig = I(<g>);
+		// ib = I(<b>);
+	end
+
+endmodule
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/

@@ -1,0 +1,33 @@
+#           v(2)       v(3)       v(4)       iter(0)   
+ 0.         0.         0.         0.         0.        
+-1.        -5.        -5.         0.         1.        
+-2.        -4.8279    -5.         0.         2.        
+-3.        -2.9524    -5.         0.         3.        
+-4.        -2.199     -5.         0.         4.        
+-5.        -2.0195    -5.         0.         5.        
+-6.        -2.008     -5.         0.         6.        
+-7.        -2.0079    -5.         0.         7.        
+-8.        -2.0079    -5.         0.         8.        
+ 27.       -2.0079    -5.         0.         9.        
+#           i(Vds)     i(Vbs)     ps(Vds)    ps(Vbs)   
+ 27.        29.921u   -2.0079p    149.6u     0.        
+#           id(d.m1)   is(d.m1)   ig(d.m1)   ib(d.m1)   ibd(d.m1)  ibs(d.m1) 
+ 27.        0.         ??         0.         0.         ??         ??        
+#           vgs(d.m1)  vds(d.m1)  vbs(d.m1)  vbd(d.m1)  von(d.m1)  vdsat(d.m1)
+ 27.       -2.0079    -2.0079    -20.08E-18  ??         0.84435    1.1636    
+#           gm(d.m1)   gds(d.m1)  gmb(d.m1)  gbd(d.m1)  gbs(d.m1) 
+ 27.        51.43u     14.901u    0.         ??         ??        
+#           cbdm(d.m1) cbsm(d.m1) cgsm(d.m1) cgdm(d.m1) cgbm(d.m1)
+ 27.        ??         ??         41.982f    0.         0.        
+#           cqgs(d.m1) cqgd(d.m1) cqgb(d.m1) cqbd(d.m1) cqbs(d.m1)
+ 27.        ??         ??         ??         ??         ??        
+#           qgs(d.m1)  qgd(d.m1)  qgb(d.m1)  qbd(d.m1)  qbs(d.m1) 
+ 27.        0.         0.         0.         ??         ??        
+#           cgsovl(d.m1) cgdovl(d.m1) cgbovl(d.m1) cgate(d.m1) region(d.m1)
+ 27.        ??         ??         ??         62.973f    7.        
+#           cgst(d.m1) cgdt(d.m1) cgbt(d.m1)
+ 27.        43.953f    1.9707f    0.        
+#           vdm(d.m1)  vgm(d.m1)  vbm(d.m1)  vsm(d.m1) 
+ 27.       -1.004     -1.004      1.004      1.004     
+#           vd(d.m1)   vg(d.m1)   vb(d.m1)   vs(d.m1)   vth(d.m1)  vgst(d.m1)
+ 27.       -2.0079    -2.0079    -20.08E-18  0.        -0.84435    1.1636    

@@ -217,7 +217,7 @@ static void map_subdev_nodes(std::ostream& o, const Element_2& e)
   }
   {
     o << "};\n";
-    o____ "c->set_parameters(c->short_label(), this";
+    o____ "c->set_parameters(\"" << e.short_label() << "\", this";
     o << ", c->mutable_common()";
     o << ", 0."; // value
     o << ", 0, nullptr";

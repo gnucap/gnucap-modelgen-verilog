@@ -116,8 +116,8 @@ private: // no ops for prototype
   }
   bool do_tr() override		{if(is_device()){ return BASE_SUBCKT::do_tr();}else{ return true;} }
 
-  bool tr_needs_eval()const override{ untested();
-    if(is_device()){untested();
+  bool tr_needs_eval()const override {
+    if(is_device()){
       return BASE_SUBCKT::tr_needs_eval();
     }else{untested();
       return false;

@@ -7,6 +7,7 @@ MODELS = \
 	resistor.vams \
 	inductor.vams \
 	isine.vams \
+	mosfet.vams \
 	vccs.vams \
 	vcvs.vams \
 	vpulse.vams \

@@ -1,0 +1,29 @@
+#           v(2)       v(3)       v(4)       iter(0)   
+ 27.        2.0079     5.         0.         9.        
+#           v(2)       v(3)       v(4)       iter(0)    region(d.m1)
+ 27.        2.0079     5.         0.         9.         7.        
+#           i(Vds)     i(Vbs)     ps(Vds)    ps(Vbs)   
+ 27.       -29.921u    2.0079p    149.6u     0.        
+#           Id(d.m1)   Is(d.m1)  
+ 27.        ??         0.        
+#           vgs(d.m1)  vds(d.m1)  vbs(d.m1)  vth(d.m1)  vdsat(d.m1)
+ 27.        2.0079     2.0079     20.08E-18  0.84435    1.1636    
+#           gm(d.m1)   gds(d.m1)  gmb(d.m1)  cbd(d.m1)  cbs(d.m1) 
+ 27.        51.43u     14.901u    0.         ??         ??        
+#           cgsovl(d.m1) cgdovl(d.m1) cgbovl(d.m1) cgate(d.m1) region(d.m1)
+ 27.        ??         ??         ??         62.973f    7.        
+#           cgs(d.m1)  cgd(d.m1)  cgb(d.m1)  vgst(d.m1) von(d.m1) 
+ 27.        ??         ??         ??         1.1636     0.84435   
+#           cgst(d.m1) cgdt(d.m1) cgbt(d.m1) Is(d.m1)   Ig(d.m1)   Ib(d.m1)  
+ 27.        43.953f    1.9707f    0.         0.         ??         ??        
+#           p(d.m1)    pd(d.m1)   ps(d.m1)   ids(d.m1)  idstray(d.m1) iderror(d.m1)
+ 27.        ??         ??         ??         29.921u    ??         ??        
+#           vdm(d.m1)  vgm(d.m1)  vbm(d.m1)  vsm(d.m1) 
+ 27.        1.004      1.004     -1.004     -1.004     
+#           vd(d.m1)   vg(d.m1)   vb(d.m1)   vs(d.m1)  
+ 27.        2.0079     2.0079     20.08E-18  0.        
+Gnucap   System status
+iterations: op=9, dc=0, tran=0, fourier=0, total=108
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=3, subckt=0, model=14, total=17
+dctran density=31.5%, ac density=31.5%

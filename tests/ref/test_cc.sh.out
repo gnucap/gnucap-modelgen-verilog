@@ -159,7 +159,7 @@ public:
   bool operator<(double const& o)const {
     return *_data < o;
   }
-  bool operator<(int const& o)const { untested();
+  bool operator<(int const& o)const {
     return *_data < o;
   }
   bool operator<(PARAMETER<double> const& o)const { untested();
@@ -467,7 +467,7 @@ ddouble_<T> operator*(PARAMETER<double> const& a, ddouble_<T> const& b)
 }
 template<int T>
 ddouble_<T> operator*(PARAMETER<int> const& a, ddouble_<T> const& b)
-{ untested();
+{
   ddouble_<T> c(b);
   c *= a;
   return c;
@@ -730,6 +730,7 @@ namespace va {
 /*--------------------------------------------------------------------------*/
 inline double PORT_FLOW(int i, BASE_SUBCKT const* m)
 {
+  incomplete();
   node_t n = m->n_(i);
   double I(0.);
   assert(m->subckt());
@@ -1253,7 +1254,10 @@ bool COMMON_resistor::is_valid() const
   t0 =  Inf;
   ub = t0;
   }
-  if(!(lb<=_p_r && _p_r<ub)){ return false; }else{ }
+  if(!(lb<=_p_r && _p_r<ub)){
+      return false;
+    }else{
+    }
   }
   return true; //COMMON_COMPONENT::is_valid();
 }
@@ -2520,7 +2524,10 @@ bool COMMON_resistor::is_valid() const
   t0 =  Inf;
   ub = t0;
   }
-  if(!(lb<=_p_r && _p_r<ub)){ return false; }else{ }
+  if(!(lb<=_p_r && _p_r<ub)){
+      return false;
+    }else{
+    }
   }
   {
   double lb, ub;
@@ -2536,7 +2543,10 @@ bool COMMON_resistor::is_valid() const
   t0 = 1;
   ub = t0;
   }
-  if(!(lb<=_p_noisy && _p_noisy<=ub)){ return false; }else{ }
+  if(!(lb<=_p_noisy && _p_noisy<=ub)){
+      return false;
+    }else{
+    }
   }
   return true; //COMMON_COMPONENT::is_valid();
 }
@@ -3886,7 +3896,7 @@ public:
   bool operator<(double const& o)const {
     return *_data < o;
   }
-  bool operator<(int const& o)const { untested();
+  bool operator<(int const& o)const {
     return *_data < o;
   }
   bool operator<(PARAMETER<double> const& o)const { untested();
@@ -4194,7 +4204,7 @@ ddouble_<T> operator*(PARAMETER<double> const& a, ddouble_<T> const& b)
 }
 template<int T>
 ddouble_<T> operator*(PARAMETER<int> const& a, ddouble_<T> const& b)
-{ untested();
+{
   ddouble_<T> c(b);
   c *= a;
   return c;
@@ -4457,6 +4467,7 @@ namespace va {
 /*--------------------------------------------------------------------------*/
 inline double PORT_FLOW(int i, BASE_SUBCKT const* m)
 {
+  incomplete();
   node_t n = m->n_(i);
   double I(0.);
   assert(m->subckt());
@@ -5012,7 +5023,10 @@ bool COMMON_capacitor::is_valid() const
   t0 =  Inf;
   ub = t0;
   }
-  if(!(lb<=_p_c && _p_c<ub)){ return false; }else{ }
+  if(!(lb<=_p_c && _p_c<ub)){
+      return false;
+    }else{
+    }
   }
   return true; //COMMON_COMPONENT::is_valid();
 }
@@ -5955,7 +5969,10 @@ bool COMMON_capacitor::is_valid() const
   t0 =  Inf;
   ub = t0;
   }
-  if(!(lb<=_p_c && _p_c<ub)){ return false; }else{ }
+  if(!(lb<=_p_c && _p_c<ub)){
+      return false;
+    }else{
+    }
   }
   return true; //COMMON_COMPONENT::is_valid();
 }

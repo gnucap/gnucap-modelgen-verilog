@@ -454,7 +454,10 @@ static void make_common_is_valid(std::ostream& o, const Module& m)
 	  unreachable();
 	}
 	make_param_check_range(o, *v, (*p)->code_name());
-	o << "){ return false; }else{ }\n";
+	o << "){\n";
+	o______ "return false;\n";
+	o____ "}else{\n";
+	o____ "}\n";
 	o__ "}\n";
       }
     }

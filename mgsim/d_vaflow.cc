@@ -74,11 +74,13 @@ bool VAFLOW::do_tr_con_chk_and_q()
   set_converged(conchk(_time, _sim->_time0));
   _time = _sim->_time0;
   if(converged()){
-    set_converged(conchk(_old_values[0], _values[0], abstol()));
+    set_converged(conchk(_old_values[0], _values[0]));
+    trace2("VAFLOW::do_tr_con_chk0", long_label(), converged());
   }else{
   }
   for (int i=1; converged() && i<=_n_ports; ++i) {
     set_converged(conchk(_old_values[i], _values[i] /*, 0.?*/ ));
+    trace2("VAFLOW::do_tr_con_chk1", long_label(), converged());
   }
   return converged();
 }
@@ -135,7 +137,6 @@ void VAFLOW::set_parameters(const std::string& Label, CARD *Owner,
   bool first_time = (net_nodes() == 0);
 
   set_label(Label);
-  trace4("VAFLOW::set_parameters", short_label(), n_nodes, n_states, first_time);
   set_owner(Owner);
   set_value(Value);
   attach_common(Common);

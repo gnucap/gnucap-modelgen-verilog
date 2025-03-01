@@ -1,0 +1,18 @@
+
+attach ./modelgen_0.so
+
+
+verilog
+
+`modelgen
+module test_error5(p, n);
+	electrical p, n;
+
+	real A;
+	analog begin
+	end
+	real A;
+
+endmodule
+
+!make test_error5.so > /dev/null

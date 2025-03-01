@@ -52,10 +52,11 @@ FPOLY1 integrate(const FPOLY1* q, const FPOLY1* i, double* time,
     case mTRAPGEAR:untested();
       incomplete();
       // fall through
-    case mGEAR:untested();
+    case mGEAR:
       assert(OPT::_keep_time_steps >= 3);
-      incomplete();
-      // fall through
+       return FPOLY1(q[0].x,
+ 		    (3./2.) * i[0].f0 + q[1].f0 * dt - (1./2.) * (q[1].f0 + q[2].f0) * (time[1] - time[2]),
+ 		    q[0].f1 * (2./3.) * dt);
     case mTRAPEULER:untested();
       incomplete();
       // fall through
@@ -239,6 +240,8 @@ TIME_PAIR DEV_DDT::tr_review()
     double timestep = tr_review_trunc_error(_y);
     _time_by.min_error_estimate(tr_review_check_and_convert(timestep));
   }
+
+      // time_future = _time[1] + timestep;
   return _time_by;
 }
 /*--------------------------------------------------------------------------*/

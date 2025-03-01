@@ -1,0 +1,68 @@
+verilog
+//options trace
+load ../vams
+
+options method gear
+options itl4=40
+
+paramset nmos mosfet;
+  parameter real l;
+  parameter real w;
+  .polarity = 1;
+  .l = l;
+  .w = w;
+  .vto=.7;
+  .level=1;
+  .diolevel=1;
+endparamset
+
+paramset pmos mosfet;
+  parameter real l;
+  parameter real w;
+  .polarity = -1;
+  .l = l;
+  .w = w;
+  .vto=-.7;
+  .level=1;
+  .diolevel=1;
+endparamset
+
+module test(\1 ,\2 , \3 , \4 ,\5 , \6 , \7 );
+// ground 0 // later
+pmos #(.w(8e-6) .l(600e-9)) p1(\3 , \2 , \1 , \1 );
+nmos #(.w(8e-6) .l(600e-9)) n1(\3 , \2 , \0 , \0 );
+capacitor #(1f) C1(\3 , \0 );
+
+pmos #(.w(8e-6) .l(600e-9)) p2(\4 , \2 , \1 , \1 );
+nmos #(.w(8e-6) .l(600e-9)) n2(\4 , \2 , \0 , \0 );
+resistor #(10k) R2(\4 , \0 );
+
+pmos #(.w(8e-6) .l(600e-9)) p3(\5 , \2 , \1 , \1 );
+nmos #(.w(8e-6) .l(600e-9)) n3(\5 , \2 , \0 , \0 );
+capacitor #(1p) C3(\5 , \0 );
+
+pmos #(.w(8e-6) .l(600e-9)) p4(\6 , \2 , \1 , \1 );
+resistor #(5.8k) R4(\6 , \0 );
+
+nmos #(.w(8e-6) .l(600e-9)) n5(\7 , \2 , \0 , \0 );
+resistor #(5.8k) R5(\7 , \1 );
+endmodule
+
+test d(\1 , \2 , \3 , \4 , \5 , \6 , \7 );
+
+spice
+
+vdd 1 0 5
+vin 2 0 PWL (0 0, 1n 0, 3n 5, 10n 5, 12n 0, 20n 0)
+
+.op
+
+.print dc v(1) v(2) v(3) v(4) v(5) v(6) v(7) iter(0)
+.dc vin 0 5 .25
+.status notime
+
+.print tran v(1) v(2) v(3) v(4) v(5) v(6) v(7) iter(0)
+.tran 0.1n 5n basic
+.status notime
+
+.end

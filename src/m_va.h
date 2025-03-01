@@ -149,7 +149,7 @@ public:
   bool operator<(double const& o)const {
     return *_data < o;
   }
-  bool operator<(int const& o)const { untested();
+  bool operator<(int const& o)const {
     return *_data < o;
   }
   bool operator<(PARAMETER<double> const& o)const { untested();
@@ -457,7 +457,7 @@ ddouble_<T> operator*(PARAMETER<double> const& a, ddouble_<T> const& b)
 }
 template<int T>
 ddouble_<T> operator*(PARAMETER<int> const& a, ddouble_<T> const& b)
-{ untested();
+{
   ddouble_<T> c(b);
   c *= a;
   return c;
@@ -720,6 +720,7 @@ namespace va {
 /*--------------------------------------------------------------------------*/
 inline double PORT_FLOW(int i, BASE_SUBCKT const* m)
 {
+  incomplete();
   node_t n = m->n_(i);
   double I(0.);
   assert(m->subckt());

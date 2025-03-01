@@ -10,6 +10,7 @@
 - cleanup hack breaks detach_all
 - `default_transision missing, and some step control
 - bogus error message on wrong filter args
+- seems to crash on V(x) if x is parameter.
 
 == simulator plugins
 - "ground" statement not implemented.
@@ -18,6 +19,7 @@
 - not (yet) instanciating unused modules
 
 == libgnucap, TODO
+- BUG: port probes awaiting node rework
 - need NODE_P, discrete nodes
 - BUG: padding long lines with whitespace
 - tab/newline handling in cmd.warn Exception_CS

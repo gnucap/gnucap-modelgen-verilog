@@ -1,0 +1,87 @@
+// nmos n gate, saturated, js specified (unreasonable value) default bulk cap
+verilog
+attach ../vams/mosfet.so
+attach ../vams/diode.so
+
+paramset cmosn mosfet;
+  parameter real l = 9.u;
+  parameter real w = 9.u;
+  parameter real nrd = 1.;
+  parameter real nrs = 1.;
+  parameter real as = 81.p;
+  parameter real ad = 81.p;
+ .l = l;
+ .w = w;
+ .nrd = nrd;
+ .nrs = nrs;
+ .as = as;
+ .ad = ad;
+
+ .level=1;
+ .vto= 0.844345;
+ .kp= 41.5964u;
+ .gamma= 0.863074;
+ .phi= 0.6;
+ .rd= 0.;
+ .rs= 0.;
+ .cbd= 0.;
+ .cbs= 0.;
+ .is= 0.;
+ .pb= 0.7;
+ .cgso= 218.971p;
+ .cgdo= 218.971p
+ .cgbo= 0.;
+ .rsh= 0.;
+ .cj= 384.4u;
+ .mj= 0.4884;
+ .cjsw= 527.2p;
+ .mjsw= 0.3002;
+ .js= 0.;
+ .tox= 41.8n;
+ .nsub= 15.3142E+15;
+ .nss= 1.E+12;
+ .tpg=1;
+ .xj= 400.n;
+ .ld= 265.073n;
+ .uo= 503.521;
+ .kf= 0.;
+ .af= 1.;
+ .fc= 0.5;
+endparamset
+
+module dut(d g s b);
+  cmosn #(.l(9.u),.w(9.u),.nrd(1.),.nrs(1.),.as(81p),.ad(81p)) m1  ( d g s b);
+endmodule
+
+dut d ( \2 , \2 , \0 , \4 );
+
+spice
+Vds   3  0  5.
+Rds   2  3  100.K
+Vbs   4  0  0.
+.print op v(nodes) iter(0)
+.op
+.print op v(nodes) iter(0) region(d.m1)
+.op trace n
+.print op i(v*) ps(v*)
+.op
+.print op Id(d.m1) Is(d.m1)
+.op
+.print op vgs(d.m1) vds(d.m1) vbs(d.m1) vth(d.m1) vdsat(d.m1)
+.op
+.print op gm(d.m1) gds(d.m1) gmb(d.m1) cbd(d.m1) cbs(d.m1)
+.op
+.print op cgsovl(d.m1) cgdovl(d.m1) cgbovl(d.m1) cgate(d.m1) region(d.m1)
+.op
+.print op cgs(d.m1) cgd(d.m1) cgb(d.m1) vgst(d.m1) von(d.m1)
+.op
+.print op cgst(d.m1) cgdt(d.m1) cgbt(d.m1) Is(d.m1) Ig(d.m1) Ib(d.m1)
+.op
+.print op p(d.m1) pd(d.m1) ps(d.m1) ids(d.m1) idstray(d.m1) iderror(d.m1)
+.op
+.print op vdm(d.m1) vgm(d.m1) vbm(d.m1) vsm(d.m1)
+.op
+.print op vd(d.m1) vg(d.m1) vb(d.m1) vs(d.m1)
+.op
+.status notime
+.end

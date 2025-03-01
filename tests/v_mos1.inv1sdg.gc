@@ -1,0 +1,102 @@
+load ../vams/mosfet.so
+
+*options noincmode
+*options nobypass
+*options trace
+options itl4=40
+options method=gear
+
+paramset nmos mosfet;
+  parameter real l;
+  parameter real w;
+  .polarity = 1;
+  .l = l;
+  .w = w;
+  .vto=.7;
+  .level=1;
+  .diolevel=99;
+endparamset
+
+paramset pmos mosfet;
+  parameter real l;
+  parameter real w;
+  .polarity = -1;
+  .l = l;
+  .w = w;
+  .vto=-.7;
+  .level=1;
+  .diolevel=99;
+endparamset
+
+module test(\1 ,\2 ,\3 ,\4 ,\5 ,\6 ,\7 );
+// ground 0 // later
+pmos #(.w(8e-6) .l(600e-9)) p1(\3 , \2 , \1 , \1 );
+nmos #(.w(8e-6) .l(600e-9)) n1(\3 , \2 , \0 , \0 );
+pmos #(.w(8e-6) .l(600e-9)) p2(\4 , \2 , \1 , \1 );
+nmos #(.w(8e-6) .l(600e-9)) n2(\4 , \2 , \0 , \0 );
+
+pmos #(.w(8e-6) .l(600e-9)) p3(\5 , \2 , \1 , \1 );
+nmos #(.w(8e-6) .l(600e-9)) n3(\5 , \2 , \0 , \0 );
+
+pmos #(.w(8e-6) .l(600e-9)) p4(\6 , \2 , \1 , \1 );
+
+nmos #(.w(8e-6) .l(600e-9)) n5(\7 , \2 , \0 , \0 );
+endmodule
+
+module diode(a,b);
+  parameter real polarity=0 from [1:1];
+  parameter real level=1 from [99:99];
+  parameter real area;
+  parameter real perim;
+  parameter real cjo;
+  parameter real is;
+  diode1 #(.area(area), .perim(perim), .cjo(cjo), .is(is)) d(a, b);
+endmodule
+module diode(a,b);
+  parameter real polarity=0 from [-1:-1];
+  parameter real level=1 from [99:99];
+  parameter real area;
+  parameter real perim;
+  parameter real cjo;
+  parameter real is;
+  diode1 #(.area(area), .perim(perim), .cjo(cjo), .is(is)) d(b, a);
+endmodule
+
+verilog
+
+test d(\1 ,\2 ,\3 ,\4 ,\5 ,\6 ,\7 );
+
+spice
+.options noinsensitive
+
+.subckt diode1 a b
+  .parameter area;
+  .parameter perim;
+  .parameter cjo;
+  .parameter is;
+  .model pp d mos_level=1
+  D1 a b pp (area=area perim=perim is=is cjo=cjo)
+.ends
+
+R2  4 0 10k
+C3  5 0 1p
+R4  6 0 5.8k
+R5  7 1 5.8k
+
+Vdd 1 0 5
+Vin 2 0 pwl (0 0, 1n 0, 3n 5, 10n 5, 12n 0, 20n 0)
+
+* unstable node 3?
+C2  3 0 1f
+*R2  5 0 100k
+
+.op
+
+.print dc v(1) v(2) v(3) v(4) v(5) v(6) v(7) iter(0)
+.dc Vin 0 5 .25
+.status notime
+
+.print tran v(1) v(2) v(3) v(4) v(5) v(6) v(7) iter(0)
+.tran 0.1n 5n trace n
+
+.end

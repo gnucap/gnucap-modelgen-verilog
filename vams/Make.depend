@@ -3,6 +3,7 @@ diode.o: diode.cc
 resistor.o: resistor.cc
 inductor.o: inductor.cc
 isine.o: isine.cc
+mosfet.o: mosfet.cc
 vccs.o: vccs.cc
 vcvs.o: vcvs.cc
 vpulse.o: vpulse.cc
