@@ -14,5 +14,3 @@ module test_error5(p, n);
 	real A;
 
 endmodule
-
-!make test_error5.so > /dev/null

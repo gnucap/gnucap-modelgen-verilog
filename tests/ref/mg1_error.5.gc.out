@@ -1,0 +1,2 @@
+... , n; real A; analog begin end real A; endmodule 
+                                        ^ ? already declared

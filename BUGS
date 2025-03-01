@@ -8,17 +8,17 @@
 - V<+ddt(I) does not work on same branch (related?)
 - string type is missing (breaks "%s" in strobe etc.).
 - cleanup hack breaks detach_all
-- `default_transision missing, and some step control
+- `default_transition missing, and some step control
 - bogus error message on wrong filter args
 - seems to crash on V(x) if x is parameter.
 
 == simulator plugins
-- "ground" statement not implemented.
 - missing localparam rules in overload
 - paramset: requires newlines, v_paramset.2a.gc
 - not (yet) instanciating unused modules
 
 == libgnucap, TODO
+- "ground" statement not implemented.
 - BUG: port probes awaiting node rework
 - need NODE_P, discrete nodes
 - BUG: padding long lines with whitespace

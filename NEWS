@@ -2,7 +2,7 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
-202502**-dev
+20250301-dev
 ============
 * static state reinitialisation fixed
 * event algorithm improvements
@@ -10,6 +10,14 @@ This file summarizes new features and important changes between snapshots.
 * overloading based on connections
 * idt reset flag
 * analog function ref in $limit call
+* wildcard in udp table
+* idiomatic mosfet model (demo/stub)
+* sync/drop module plugin
+* MODEL_CARD envelope for prototypes
+* two more constants, from CMC policy
+* $limit improvements, $discontinuity(-1)
+* rework timer logic
+* always block parse/dump
 
 20241210-dev
 ============
