@@ -134,39 +134,6 @@ static Statement* parse_seq(CS& f, Block* owner)
   return new AnalogSeqStmt(f, owner);
 }
 /*--------------------------------------------------------------------------*/
-template<class A>
-void dump_annotate(std::ostream& o, A const& a)
-{
-  if(!a.scope()->is_reachable()){
-    o << " // --\n";
-  }else{
-    if(a.data().ddeps().size()){
-      o << " //";
-    }else if(a.has_sensitivities()){
-      o << " //";
-    }else if(a.rdeps_().size()){
-      o << " //";
-    }else if(a.data().is_constant()){
-      o << " // c";
-    }else{ untested();
-    }
-    for(const Dep& d : a.data().ddeps()) {
-      o << " dep: ";
-      o << d->code_name();
-    }
-#if 1
-    if(a.has_sensitivities()){
-      o << " s" << a.sensitivities().size();
-    }else{
-    }
-#endif
-    if(a.rdeps_().size()){
-      o << " r" << a.rdeps_().size();
-    }else{
-    }
-  }
-}
-/*--------------------------------------------------------------------------*/
 // static Base* parse_int(CS& f, Block* o)
 // { untested();
 //   trace1("AnalogBlock::parse int", f.tail().substr(0,10));
