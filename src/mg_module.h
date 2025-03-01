@@ -162,6 +162,7 @@ private: // verilog input data
   Aliasparam_Collection _aliasparam;
   // Element_2_List _element_list;
   // Port_1_List _local_nodes;
+  Owned_Base* _always{nullptr};
   Owned_Base* _analog{nullptr};
   Circuit* _circuit{nullptr};
 //  Block _module_body;
@@ -180,13 +181,16 @@ private: // merge?
   int _times{0}; // _time array size
 private: // elaboration data
   void new_analog();
+  void new_always();
   void new_circuit();
   void delete_analog();
+  void delete_always();
   void delete_circuit();
   void detach_out_vars();
 public:
   Module() {
     new_analog();
+    new_always();
     new_circuit();
   }
   ~Module();
@@ -209,6 +213,7 @@ public: // TODO
   const Variable_List_Collection& variables()const	{return _variables;}
   const Circuit*	  circuit()const	{return _circuit;}
   const Owned_Base& analog() const {assert(_analog); return *_analog;}
+  const Owned_Base& always() const {assert(_always); return *_always;}
   bool has_analysis()const {return _has_analysis;}
 
   bool has_events()const    { return _has_pid[if_SET_EVENT];}
@@ -241,6 +246,7 @@ public:
   bool sync()const;
   bool has_submodule()const;
   bool has_analog_block()const;
+  bool has_always_block()const;
 
   void set_set_event (mode_mask_t m=mm_ANALOG) {set_pid(if_SET_EVENT, m);}
   void set_ac_begin  (mode_mask_t m=mm_ANALOG) {set_pid(if_AC_BEGIN, m);}

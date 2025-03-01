@@ -61,6 +61,7 @@ mg_impl.cc \
 mg_in.cc \
 mg_in_analog.cc \
 mg_in_code.cc \
+mg_in_digital.cc \
 mg_in_discipline.cc \
 mg_in_expr.cc \
 mg_in_module.cc \

@@ -372,15 +372,15 @@ public:
   bool is_used_in(Base const*)const override;
   bool update()override;
 
-  bool has_sensitivities()const { untested(); return _e.data().has_sensitivities();}
-  Sensitivities const& sensitivities()const { untested(); return _e.data().sensitivities();}
+  bool has_sensitivities()const { return _e.data().has_sensitivities();}
+  Sensitivities const& sensitivities()const { return _e.data().sensitivities();}
 
-  Expression_ const& expression()const { untested(); return _e; }
+  Expression_ const& expression()const { return _e; }
   FUNCTION_ const* function()const;
-  TData const& data()const { untested(); return _e.data(); }
-  RDeps const& rdeps()const override { untested(); return _rdeps; }
+  TData const& data()const { return _e.data(); }
+  RDeps const& rdeps()const override { return _rdeps; }
 private:
-  bool add_rdep(Base const* b) { untested();
+  bool add_rdep(Base const* b) {
     return _rdeps.insert(b).second;
   }
 };

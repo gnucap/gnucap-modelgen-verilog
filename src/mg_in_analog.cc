@@ -315,11 +315,12 @@ void AnalogProceduralAssignment::dump(std::ostream& o)const
   }
 }
 /*--------------------------------------------------------------------------*/
-Base* parse_proc_assignment(CS& f, Block* o)
+//code?
+Base* parse_assignment(CS& f, Block* o)
 {
   assert(o);
   f.skipbl();
-  trace1("parse_proc_assignment", f.tail().substr(0,30));
+  trace1("parse_assignment", f.tail().substr(0,30));
   try{
     auto n = new AnalogProceduralAssignment(f, o);
     if(f){
@@ -365,7 +366,7 @@ static Base* parse_analog_stmt_or_null(CS& file, Block* scope)
     || ((file >> "for ") && (ret = new AnalogForStmt(file, scope)))
     || ((file >> "@ ") && (ret = new_evt_ctl_stmt(file, scope)))
     || ((file >> "initial ") && (ret = parse_initial(file, scope)))
-    || (ret = parse_proc_assignment(file, scope))
+    || (ret = parse_assignment(file, scope))
     || (ret = parse_system_task(file, scope))
     || (ret = parse_contribution(file, scope))
     ;
@@ -2759,21 +2760,6 @@ Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
   auto pr = prechecked_cast<Probe const*>(f);
   assert(pr);
   return pr;
-}
-/*--------------------------------------------------------------------------*/
-// mg_code?
-void Statement::set_rdeps(TData const& )
-{ untested();
-      unreachable(); // still
- //  for(auto x : t.sensitivities()){ untested();
- //    if(auto b = dynamic_cast<Branch*>(x)){ untested();
- //      _rdeps.insert(b);
- //      // _rdeps.push_back(b);
- //    }else{ untested();
- //      _rdeps.insert(b);
- //      // incomplete(); // later
- //    }
- //  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -42,6 +42,20 @@ bool Statement::update()
   return false;
 }
 /*--------------------------------------------------------------------------*/
+void Statement::set_rdeps(TData const& )
+{ untested();
+      unreachable(); // still
+ //  for(auto x : t.sensitivities()){ untested();
+ //    if(auto b = dynamic_cast<Branch*>(x)){ untested();
+ //      _rdeps.insert(b);
+ //      // _rdeps.push_back(b);
+ //    }else{ untested();
+ //      _rdeps.insert(b);
+ //      // incomplete(); // later
+ //    }
+ //  }
+}
+/*--------------------------------------------------------------------------*/
 //Statement* Statement::parent_stmt()
 //{ untested();
 //  Block* b = scope();

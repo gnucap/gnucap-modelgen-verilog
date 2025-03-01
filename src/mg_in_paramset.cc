@@ -26,7 +26,7 @@
 #include "l_stlextra.h"
 #include "mg_analog.h"
 /*--------------------------------------------------------------------------*/
-Base* parse_proc_assignment(CS& f, Block* o); // in_analog.cc
+Base* parse_assignment(CS& f, Block* o); // in_analog.cc
 CS& Paramset::parse_stmt(CS& f)
 {
   f.skipbl();
@@ -74,7 +74,7 @@ CS& Paramset::parse_stmt(CS& f)
 
     // delete dup;
 
-  }else if(Base* ret=parse_proc_assignment(f, this)){
+  }else if(Base* ret=parse_assignment(f, this)){
     attr.move_attributes(tag_t(&f), tag_t(ret));
     push_back(ret);
     // ...

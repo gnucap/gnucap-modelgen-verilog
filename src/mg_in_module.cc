@@ -748,6 +748,8 @@ void Module::parse_body(CS& f)
   //_local_nodes.set_owner(this);
   assert(_analog);
   _analog->set_owner(this);
+  assert(_always);
+  _always->set_owner(this);
   // _tr_eval.set_owner(this);
   // _validate.set_owner(this);
 
@@ -780,6 +782,7 @@ void Module::parse_body(CS& f)
       || ((f >> "localparam ") && (f >> _parameters))
       || ((f >> "aliasparam ") && (f >> _aliasparam))
       || ((f >> "analog ") && f >> *_analog)
+      || ((f >> "always ") && f >> *_always)
       || ((f >> "endmodule ") && (end = true))
       || (f >> _circuit->element_list())	// module_instantiation
       ;
@@ -917,6 +920,8 @@ void Module::dump(std::ostream& o)const
 
   assert(_analog);
   _analog->dump(o);
+  assert(_always);
+  _always->dump(o);
 
   o << "endmodule\n";
 }

@@ -1,0 +1,10 @@
+
+
+module test();
+  always begin : stuff
+  end
+
+endmodule
+
+
+
