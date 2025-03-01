@@ -202,9 +202,8 @@ void System_Task::parse(CS& f)
 {
   assert(owner());
   _e.set_owner(this);
-  trace1("System_Task::parse0", f.tail().substr(0,10));
-  f >> _e;
-  trace1("System_Task::parse1", f.tail().substr(0,10));
+  Expression rhs(f);
+  _e.resolve_symbols(rhs);
   f >> ";";
 
   assert(function());

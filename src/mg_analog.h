@@ -408,30 +408,6 @@ public:
  // bool update() override { untested(); incomplete(); }
 };
 /*--------------------------------------------------------------------------*/
-// code?
-class System_Task : public Statement {
-  AnalogExpression _e; // Analog?
-  RDeps _rdeps;
-public:
-  explicit System_Task(CS&, Block*);
-  void parse(CS& o) override;
-  void dump(std::ostream&o)const override;
-  bool is_used_in(Base const*)const override;
-  bool update()override;
-
-  bool has_sensitivities()const {return _e.data().has_sensitivities();}
-  Sensitivities const& sensitivities()const {return _e.data().sensitivities();}
-
-  AnalogExpression const& expression()const { return _e; }
-  FUNCTION_ const* function()const;
-  TData const& data()const { return _e.data(); }
-  RDeps const& rdeps()const override { return _rdeps; }
-private:
-  bool add_rdep(Base const* b) {
-    return _rdeps.insert(b).second;
-  }
-};
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class AnalogInitialStmt : public AnalogCtrlStmt {
 public:

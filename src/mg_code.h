@@ -329,6 +329,29 @@ inline std::string cxx_name(Data_Type const*x)
 #endif
 }
 /*--------------------------------------------------------------------------*/
+class System_Task : public Statement {
+  Expression_ _e; // Analog?
+  RDeps _rdeps;
+public:
+  explicit System_Task(CS&, Block*);
+  void parse(CS& o) override;
+  void dump(std::ostream&o)const override;
+  bool is_used_in(Base const*)const override;
+  bool update()override;
+
+  bool has_sensitivities()const { untested(); return _e.data().has_sensitivities();}
+  Sensitivities const& sensitivities()const { untested(); return _e.data().sensitivities();}
+
+  Expression_ const& expression()const { untested(); return _e; }
+  FUNCTION_ const* function()const;
+  TData const& data()const { untested(); return _e.data(); }
+  RDeps const& rdeps()const override { untested(); return _rdeps; }
+private:
+  bool add_rdep(Base const* b) { untested();
+    return _rdeps.insert(b).second;
+  }
+};
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet
