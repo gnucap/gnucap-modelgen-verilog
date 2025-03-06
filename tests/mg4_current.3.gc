@@ -29,4 +29,5 @@ list
 print dc i(dut) v(nodes) i(dut.*)
 
 dc v 0 1 .5 trace=i
+status notime
 end

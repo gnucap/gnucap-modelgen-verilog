@@ -38,4 +38,5 @@ tran 0.013 0.0005 basic trace n
 tran 0 0.013 strobe={NA} basic trace n
 tran 0.019 strobe={NA} basic trace n
 
+status notime
 end

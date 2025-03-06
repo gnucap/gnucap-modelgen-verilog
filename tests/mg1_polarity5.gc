@@ -37,3 +37,4 @@ v1 2 0 dc 2 ac 1
 
 .dc
 .ac
+.status notime

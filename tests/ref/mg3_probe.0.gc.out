@@ -8,3 +8,8 @@ vsource #(.dc(v)) v1 (.p(\1 ),.n(\0 ));
 vsource #(.dc(v)) v1 (.p(\2 ),.n(\0 ));
 #           v(1)       v(2)       i(dut1)    i(dut2)    v(dut1)    v(dut2)   
  0.         2.5        2.5        99.        250.K      2.5        2.5       
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=3
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=50.0%, ac density=50.0%

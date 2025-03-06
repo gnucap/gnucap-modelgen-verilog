@@ -51,5 +51,5 @@ tran 3 basic
 
 tran 0 3 .1 basic trace=n
 
+status notime
 end
-

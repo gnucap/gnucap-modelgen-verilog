@@ -28,3 +28,8 @@ resistor #(.r(1)) r5 (.p(\5 ),.n(\0 ));
  1.         0.         0.         3.        
  0.        -1.        -10.u       3.        
  1.        -1.        -10.u       3.        
+Gnucap   System status
+iterations: op=0, dc=12, tran=0, fourier=0, total=27
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=5, subckt=0, model=0, total=5
+dctran density=76.0%, ac density=76.0%

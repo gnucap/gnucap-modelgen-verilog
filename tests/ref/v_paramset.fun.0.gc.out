@@ -14,3 +14,8 @@ parameter ln(exp(v)) value is "NOT_INPUT"
  0.         1.         2.         2.        
 #           v(1)       v(2)       v(3)      
  0.         1.         2.         3.        
+Gnucap   System status
+iterations: op=0, dc=2, tran=0, fourier=0, total=6
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=3, subckt=0, model=0, total=3
+dctran density=33.3%, ac density=33.3%

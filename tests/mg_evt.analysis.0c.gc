@@ -39,4 +39,5 @@ list
 print tran cnt(dut0) v(1) control(0) iter(0)
 tran 2 basic trace n
 
+status notime
 end

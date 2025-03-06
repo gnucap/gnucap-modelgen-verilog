@@ -30,4 +30,5 @@ vsource #(.dc(v)) v1(\1 , \0 );
 print dc v(nodes) i(v1)
 
 dc
+status notime
 end

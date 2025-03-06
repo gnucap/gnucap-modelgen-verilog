@@ -28,4 +28,5 @@ list
 
 print dc v(nodes) vin(dut) val0(dut.*) val1(dut.*) val2(dut.*)
 dc
+status notime
 end

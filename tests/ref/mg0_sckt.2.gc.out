@@ -9,3 +9,8 @@ endmodule // vsin
 test_net2 #() dut (.a(\1 ),.b(\2 ),.gnd(\0 ));
 #           v(1)       v(2)      
  0.         1.         1.        
+Gnucap   System status
+iterations: op=0, dc=2, tran=0, fourier=0, total=2
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=50.0%, ac density=50.0%

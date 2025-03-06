@@ -36,5 +36,5 @@ list
 print tran t1(dut0) t2(dut0) iter(0) control(0)
 tran 1 basic
 
+status notime
 end
-

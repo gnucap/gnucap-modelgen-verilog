@@ -18,3 +18,8 @@ polarity3 #() dut (.np(\4 ),.nn(\0 ));
  0.         0.         0.         0.         0.         3.        
  0.5       -0.5       -0.99998   -1.5       -1.9999     3.        
  1.        -0.99999   -2.        -2.9999    -3.9998     3.        
+Gnucap   System status
+iterations: op=0, dc=9, tran=0, fourier=0, total=9
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=4, subckt=0, model=0, total=4
+dctran density=25.0%, ac density=25.0%

@@ -41,3 +41,4 @@ dc v1 0 1 1 i1 0 3 3
 
 print dc i(d._b_cp_cn) v(d._b_cp_cn) iter(0)
 dc v1 0 1 1 i1 0 3 3
+status notime

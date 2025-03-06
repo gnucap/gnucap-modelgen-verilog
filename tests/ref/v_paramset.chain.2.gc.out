@@ -39,4 +39,10 @@ main.v1: 1 candidate found for vsource
 >>>>>op 
 #           v(1)       v(2)       v(3)       v(4)      
  27.        1.         0.5        0.         0.        
+>>>>>status notime 
+Gnucap   System status
+iterations: op=2, dc=0, tran=0, fourier=0, total=2
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=4, subckt=0, model=0, total=4
+dctran density=37.5%, ac density=37.5%
 >>>>>end 

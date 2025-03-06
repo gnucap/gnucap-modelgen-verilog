@@ -4,3 +4,8 @@ test_pol5 #() dut(\1 ,\0 ,2,\0 );
  0.        -6.         2.         3.        
 #Freq       v(1)       v(2)       vp(1)      iter(0)   
  0.         2.         1.         180.       0.        
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=4
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%

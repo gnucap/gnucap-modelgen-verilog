@@ -53,4 +53,5 @@ dc
 ac
 print ac nv(n*)
 ac
+status notime
 end

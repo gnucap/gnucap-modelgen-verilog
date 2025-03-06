@@ -25,3 +25,8 @@ time is \ foo 1.000000
 gmin is 1e-06
 iter is 1.000000, def 42.000000
  1.         2.        
+Gnucap   System status
+iterations: op=0, dc=2, tran=6, fourier=0, total=11
+transient timesteps: accepted=3, rejected=0, total=3
+nodes: user=0, subckt=0, model=0, total=0
+dctran density=0.0%, ac density=0.0%

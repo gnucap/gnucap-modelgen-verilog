@@ -11,4 +11,10 @@ resistor #(.r(1.)) r1 (.p(in),.n(\0 ));
 >>>>>.op 
 #           v(in)      v(out1)   
  27.        0.         0.        
+>>>>>.status notime 
+Gnucap   System status
+iterations: op=3, dc=0, tran=0, fourier=0, total=3
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=3, total=5
+dctran density=84.0%, ac density=28.0%
 >>>>>.end 

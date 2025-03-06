@@ -16,3 +16,8 @@ parameter i=1
  0.         10.u       17.        17.        1.         17.        6.        
 #           v(1)       v(2)       i(d1._b_p_n) i(d1._b_cp_cn) i(r0)      iter(0)   
  0.         10.u       16.983     17.        1.         16.983     6.        
+Gnucap   System status
+iterations: op=0, dc=6, tran=0, fourier=0, total=18
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%

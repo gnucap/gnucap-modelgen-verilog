@@ -49,3 +49,8 @@ Vgs ( 1 0 )  DC  3.236734
 Vds ( 3 0 )  DC  0.01
 Rds ( 2 3 )  1.
 Vbs ( 4 0 )  DC -1.234875
+Gnucap   System status
+iterations: op=6, dc=74, tran=0, fourier=0, total=134
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=4, subckt=0, model=14, total=18
+dctran density=34.0%, ac density=34.0%

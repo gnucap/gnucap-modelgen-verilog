@@ -60,4 +60,5 @@ Vbs   4  0 -1.234875
 .dc vgs -10 10 1
 .width out=80
 .list
+.status notime
 .end

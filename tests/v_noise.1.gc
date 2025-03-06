@@ -24,4 +24,5 @@ ac 1 8 * 2
 probe ac nv(noise*)
 ac 1 8 * 2
 
+status notime
 end

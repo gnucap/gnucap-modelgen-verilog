@@ -31,4 +31,6 @@ list
 
 print dc v(nodes) i(v1) st(dut) iter(0)
 dc v1 -3 3 1 loop
+status notime
+end
 end

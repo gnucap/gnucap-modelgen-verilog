@@ -41,7 +41,7 @@ R1   1  2  100.K
 .print dc v(1) v(2) i(v1) 
 *>.print dc + i(r1) id(m.d1) vd(m.d1) req(m.d1) cd(m.d1) z(m.d1) zraw(m.d1) gd(m.d1) z(2) iter(0) region(m.d1)
 .dc v1 -10 10 2
-*>.stat notime
+*>.status notime
 *>.op
-*>.stat notime
+*>.status notime
 .end

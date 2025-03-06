@@ -24,3 +24,4 @@ list
 
 print dc v(nodes) i(m.v)
 dc
+status notime

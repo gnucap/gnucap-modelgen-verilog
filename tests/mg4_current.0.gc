@@ -34,4 +34,5 @@ list
 print dc i(r1) iA(dut) iB(dut) v(nodes) i(dut.*)
 
 dc r1 1 2 .5 trace=i
+status notime
 end

@@ -31,3 +31,8 @@
  27.       -1.004     -1.004      1.004      1.004     
 #           vd(d.m1)   vg(d.m1)   vb(d.m1)   vs(d.m1)   vth(d.m1)  vgst(d.m1)
  27.       -2.0079    -2.0079    -20.08E-18  0.        -0.84435    1.1636    
+Gnucap   System status
+iterations: op=9, dc=0, tran=0, fourier=0, total=108
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=3, subckt=0, model=14, total=17
+dctran density=31.5%, ac density=31.5%

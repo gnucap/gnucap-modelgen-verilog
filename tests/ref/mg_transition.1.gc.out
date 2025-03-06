@@ -54,3 +54,8 @@ test_trans1 #() dut (.p(\1 ),.n(\0 ));
  3.6        0.         0.         1.         2.        
  3.8        0.         0.         1.         2.        
  4.         1.         0.         1.         2.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=94, fourier=0, total=243
+transient timesteps: accepted=77, rejected=4, total=81
+nodes: user=1, subckt=0, model=1, total=2
+dctran density=50.0%, ac density=50.0%

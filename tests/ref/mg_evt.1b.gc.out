@@ -91,3 +91,8 @@ dn cross 2.500000
  2.5       -213.63n    3.        
  2.75      -2.         3.        
  3.         84.f       3.        
+Gnucap   System status
+iterations: op=0, dc=3, tran=284, fourier=0, total=388
+transient timesteps: accepted=72, rejected=29, total=101
+nodes: user=1, subckt=0, model=1, total=2
+dctran density=100.0%, ac density=100.0%

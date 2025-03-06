@@ -31,4 +31,5 @@ list
 
 print dc v(2) i(i*) iter(0)
 dc i 0 2 .5
+status notime
 end

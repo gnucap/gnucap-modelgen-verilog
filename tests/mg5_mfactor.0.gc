@@ -45,4 +45,5 @@ mm #(.$mfactor(3)) m2(a);
 print dc m(d1)  m(d2)  mm(d3)  m(m1.d)  m(m2.d)  m(d3.m)
 
 dc
+status notime
 end

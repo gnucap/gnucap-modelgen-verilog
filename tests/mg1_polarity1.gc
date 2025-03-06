@@ -27,3 +27,4 @@ list
 print dc v(v1) i(v1) r(dut.*) iter(0)
 
 dc v1 0 2 1
+status notime

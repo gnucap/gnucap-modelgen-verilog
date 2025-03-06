@@ -46,3 +46,8 @@ test_evt_t0 #() dut (.p(\1 ),.n(\0 ));
  0.015      0.         8.         2.         2.        
  0.017      0.         9.         2.         2.        
  0.019      0.         10.        2.         1.        
+Gnucap   System status
+iterations: op=0, dc=2, tran=10, fourier=0, total=128
+transient timesteps: accepted=42, rejected=0, total=42
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%

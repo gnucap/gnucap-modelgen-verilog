@@ -13,3 +13,8 @@ delta -0.000185267
  29.        302.15     0.         3.         302.15    
 delta -0.000271438
  30.        303.15     0.         3.         303.15    
+Gnucap   System status
+iterations: op=18, dc=0, tran=0, fourier=0, total=18
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=50.0%, ac density=50.0%

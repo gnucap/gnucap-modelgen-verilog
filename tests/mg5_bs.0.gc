@@ -28,4 +28,5 @@ endmodule
 mm m1(a);
 
 tran 5.5
+status notime
 end

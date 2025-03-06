@@ -18,3 +18,8 @@ vsource #() v1 (.p(\3 ),.n(\0 ));
  6.         0.75166    1.5033     6.         6.        
  8.         0.91056    1.8211     7.9999     6.        
  10.        1.0353     2.0706     9.9999     5.        
+Gnucap   System status
+iterations: op=0, dc=60, tran=0, fourier=0, total=60
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=3, subckt=0, model=0, total=3
+dctran density=77.8%, ac density=77.8%

@@ -21,3 +21,4 @@ param a=2
 dc
 param a=3
 dc
+status notime

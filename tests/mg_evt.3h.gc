@@ -42,4 +42,5 @@ print tran v(1) mytime(dut0) iter(0) control(0)
 dc
 tran 0 4 .5 basic
 
+status notime
 end

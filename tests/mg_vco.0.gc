@@ -37,4 +37,5 @@ resistor #(1) r(out \0 );
 print tran v(nodes)
 tran 1e-8 basic
 
+status notime
 end

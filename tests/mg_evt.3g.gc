@@ -43,4 +43,5 @@ tran 3 basic
 dc
 tran 3 basic
 
+status notime
 end

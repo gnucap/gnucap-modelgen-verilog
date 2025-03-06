@@ -16,4 +16,5 @@ i1 in 0 ac 1
 .print op v(nodes)
 .op
 
+.status notime
 .end

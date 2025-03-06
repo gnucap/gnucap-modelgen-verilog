@@ -40,3 +40,4 @@ op
 
 print tran v(nodes) l(nodes)
 tran 1 trace n
+status notime

@@ -110,3 +110,8 @@ or     9.16667e-07 0.999996
  916.67E-9 -1.         5.        
  916.67E-9 -0.99997    2.        
  1.E-6      26.E-15    3.        
+Gnucap   System status
+iterations: op=0, dc=3, tran=121, fourier=0, total=168
+transient timesteps: accepted=36, rejected=8, total=44
+nodes: user=1, subckt=0, model=1, total=2
+dctran density=100.0%, ac density=100.0%

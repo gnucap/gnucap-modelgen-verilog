@@ -6,3 +6,8 @@ polarity_ddt0 #() dut (.p(\1 ),.n(\0 ));
  4.n        1.        
  5.n        1.        
  1.         1.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=39, fourier=0, total=52
+transient timesteps: accepted=6, rejected=7, total=13
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%

@@ -28,4 +28,5 @@ list
 
 print dc v(nodes) iter(0)
 dc
+status notime
 end

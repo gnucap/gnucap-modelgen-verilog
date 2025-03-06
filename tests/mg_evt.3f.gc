@@ -37,4 +37,5 @@ dc
 print tran state(dut0) count(dut0) iter(0)
 tran 2 basic trace n
 
+status notime
 end

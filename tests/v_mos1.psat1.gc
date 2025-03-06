@@ -86,4 +86,5 @@ Vbs   4  0  0.
 .op
 .print op vd(d.m1) vg(d.m1) vb(d.m1) vs(d.m1) vth(d.m1) vgst(d.m1)
 .op
+.status notime
 .end

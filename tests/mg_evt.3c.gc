@@ -32,4 +32,5 @@ dc
 print tran iter(0) control(0)
 tran 10 basic
 
+status notime
 end

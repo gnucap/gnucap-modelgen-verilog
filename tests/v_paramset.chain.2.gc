@@ -20,4 +20,5 @@ list
 
 print op v(nodes)
 op
+status notime
 end

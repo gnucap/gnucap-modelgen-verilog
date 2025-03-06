@@ -63,3 +63,8 @@ t.b: can't find subckt: logicmyand02, forcing digital
  0.8        0.         0.         0.         0.01       0.01       0.        
  0.8        0.         0.         0.         0.01       0.01       0.        
  1.         0.         0.         0.         0.01       0.01       0.        
+Gnucap   System status
+iterations: op=3, dc=0, tran=157, fourier=0, total=224
+transient timesteps: accepted=49, rejected=15, total=64
+nodes: user=3, subckt=0, model=4, total=7
+dctran density=34.7%, ac density=34.7%

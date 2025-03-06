@@ -41,4 +41,5 @@ list
 print dc i(v1)
 
 dc
+status notime
 end

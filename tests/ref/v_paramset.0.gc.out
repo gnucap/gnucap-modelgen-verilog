@@ -35,3 +35,8 @@ main #(.v(2)) m2 (.\1 (\2 ),.\2 (\0 ));
  2.         1.         2.        
 #Time       v(1)       v(2)      
  2.         1.         2.        
+Gnucap   System status
+iterations: op=0, dc=2, tran=4, fourier=0, total=26
+transient timesteps: accepted=8, rejected=0, total=8
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=50.0%, ac density=50.0%

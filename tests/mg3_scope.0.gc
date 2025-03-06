@@ -34,3 +34,4 @@ list
 
 print dc v(nodes)
 dc v1 0 1 .5
+status notime

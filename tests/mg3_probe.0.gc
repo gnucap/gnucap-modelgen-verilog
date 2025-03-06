@@ -36,4 +36,5 @@ list
 
 print dc v(nodes) i(dut*) v(dut*)
 dc
+status notime
 end

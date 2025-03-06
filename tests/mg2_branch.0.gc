@@ -32,4 +32,5 @@ list
 print dc i(dut) j(dut)
 
 dc v 0 1 .25
+status notime
 end

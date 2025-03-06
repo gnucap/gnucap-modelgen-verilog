@@ -28,3 +28,8 @@ main #(.v(1)) m1 (.\1 (\0 ),.\2 (\1 ));
 main #(.v(2)) m2 (.\1 (\0 ),.\2 (\2 ));
 main.v1: no candidates found for vs
 m1.v1: no valid prototype found for vs
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=0, total=1
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=0.0%, ac density=0.0%

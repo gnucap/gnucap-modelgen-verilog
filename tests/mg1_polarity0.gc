@@ -73,3 +73,4 @@ parameter v=0
 print dc i(v*) iter(0)
 
 dc v .0 1 .5
+status notime

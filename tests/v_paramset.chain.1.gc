@@ -39,3 +39,4 @@ param v=1
 dc
 param v=2
 dc
+status notime

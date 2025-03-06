@@ -1,2 +1,7 @@
 #           m(d1)      m(d2)      mm(d3)     m(m1.d)    m(m2.d)    m(d3.m)   
  0.         1.         2.         6.         2.         6.         42.       
+Gnucap   System status
+iterations: op=0, dc=2, tran=0, fourier=0, total=2
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=2, model=0, total=4
+dctran density=25.0%, ac density=25.0%

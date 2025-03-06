@@ -16,3 +16,4 @@ parameter voltage=1
 dc
 parameter voltage=2
 dc
+status notime

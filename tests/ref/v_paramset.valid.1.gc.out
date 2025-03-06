@@ -39,3 +39,9 @@ m.R1 dropped invalid candidate.
 >>>>>dc 
 #           v(1)       v(2)       v(4)      
  0.         0.         1.         2.        
+>>>>>status notime 
+Gnucap   System status
+iterations: op=0, dc=2, tran=0, fourier=0, total=2
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=3, subckt=0, model=0, total=3
+dctran density=33.3%, ac density=33.3%

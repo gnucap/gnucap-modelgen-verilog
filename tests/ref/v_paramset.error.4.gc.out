@@ -23,3 +23,9 @@ main.R2: test_invalid from top level
 main.R2: 1 candidate found for test_invalid
 m.R2 dropped invalid candidate.
 m.R2: no candidates test_invalid
+>>>>>status notime 
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=0, total=0
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=3, subckt=0, model=0, total=3
+dctran density=0.0%, ac density=0.0%

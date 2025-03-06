@@ -30,3 +30,4 @@ list
 parameter dc=1
 print op v(nodes) iter(0) T(dut)
 op 25 30 1
+status notime

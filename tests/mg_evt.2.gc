@@ -32,4 +32,5 @@ dc
 print tran v(nodes) iter(0)
 tran 1e-6 basic
 
+status notime
 end

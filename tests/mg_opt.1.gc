@@ -28,4 +28,5 @@ list
 print dc v(dut.*)
 
 dc
+status notime
 end

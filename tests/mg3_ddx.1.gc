@@ -32,4 +32,5 @@ list
 
 print dc v(nodes) zero(dut) minus1(dut) minus2(dut) plus(dut) iter(0)
 dc
+status notime
 end

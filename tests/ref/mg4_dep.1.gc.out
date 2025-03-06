@@ -3,3 +3,8 @@ test_dep1 #() dut (.p(\1 ),.n(\0 ));
 vsource #(.dc(v)) v1 (.p(\1 ),.n(\0 ));
 #           i(v1)      prb(dut)  
  0.        -0.99999    1.        
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=3
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%

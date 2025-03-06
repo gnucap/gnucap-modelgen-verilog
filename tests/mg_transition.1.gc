@@ -33,4 +33,5 @@ tran 4 trace=n basic
 
 tran 0 4 .2 trace=n basic
 
+status notime
 end

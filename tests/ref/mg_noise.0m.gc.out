@@ -54,3 +54,8 @@ meas_noise #() n6 (.p(\6 ));
  0.         2.         2.         2.         2.         2.         1.9881    
 #Freq       nv(n1)     nv(n2)     nv(n3)     nv(n4)     nv(n5)     nv(n6)    
  0.         1.4142     1.4142     1.4142     1.4142     1.4142     1.41      
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=5
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=6, subckt=0, model=0, total=6
+dctran density=16.7%, ac density=16.7%

@@ -27,3 +27,4 @@ options nobypass
 
 print tran v(nodes)
 tr 2
+status notime

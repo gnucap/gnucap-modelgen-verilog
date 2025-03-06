@@ -28,4 +28,5 @@ list
 
 print dc prb(dut*)
 dc
+status notime
 end

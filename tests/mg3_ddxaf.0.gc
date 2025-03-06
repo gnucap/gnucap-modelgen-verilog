@@ -58,4 +58,5 @@ list
 
 print dc tst1(dut) tst2(dut) tst3(dut)
 dc
+status notime
 end

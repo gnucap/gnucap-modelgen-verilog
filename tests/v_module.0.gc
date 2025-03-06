@@ -18,5 +18,5 @@ delete m
 main m(.\1 (\1 ) .b(\0 ));
 print op v(m.r1) v(1)
 op
+status notime
 list
-

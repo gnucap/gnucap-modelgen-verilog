@@ -25,4 +25,10 @@ R1 ( 4 2 )  myres  foo=five
 r ( 1 2 )  resistor  r=10
 .ends main
 m ( 0 1 2 4 )  main 
+>>>>>.status notime 
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=0, total=0
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=0, subckt=0, model=0, total=0
+dctran density=0.0%, ac density=0.0%
 >>>>>.end 

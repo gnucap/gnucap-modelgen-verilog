@@ -37,4 +37,5 @@ V1 2 0 ac 1 dc v
 .measure gain=at(probe="v(1)" x=".5" deriv)
 .dc v .5 .5 0
 .print ac vm(1) vp(1)
+.status notime
 .ac 1

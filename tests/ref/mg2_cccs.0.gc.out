@@ -24,3 +24,8 @@ parameter i=1
  2.         9.9999u    17.        17.        0.99999    17.        2.        
 #Freq       v(1)       v(2)      
  1.         9.9999u    17.       
+Gnucap   System status
+iterations: op=0, dc=14, tran=0, fourier=0, total=42
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%

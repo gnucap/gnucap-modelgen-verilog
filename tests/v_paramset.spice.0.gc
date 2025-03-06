@@ -20,4 +20,5 @@ list
 spice
 
 .list
+.status notime
 .end

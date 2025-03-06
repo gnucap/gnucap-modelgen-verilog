@@ -33,3 +33,8 @@ test event 3 3
  3.5        0.         4.         2.         1.        
 test event 4 4
  4.         0.         5.         2.         1.        
+Gnucap   System status
+iterations: op=0, dc=2, tran=20, fourier=0, total=68
+transient timesteps: accepted=19, rejected=3, total=22
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%

@@ -44,4 +44,5 @@ Vgs   1  0  1.
 Vds   2  0  1.
 .print op v(nodes)
 .op
+.status notime
 .end

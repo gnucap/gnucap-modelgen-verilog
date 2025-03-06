@@ -7,3 +7,8 @@ vsource #(.dc(v)) v1 (.p(\1 ),.n(\0 ));
  0.5        0.5        ??        
  0.75       0.74999    ??        
  1.         0.99999    ??        
+Gnucap   System status
+iterations: op=0, dc=11, tran=0, fourier=0, total=11
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%

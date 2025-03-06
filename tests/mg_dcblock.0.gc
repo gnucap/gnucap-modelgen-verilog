@@ -37,4 +37,5 @@ tran 1
 
 print ac vm(nodes) vp(nodes)
 ac 1 100 * 10
+status notime
 end

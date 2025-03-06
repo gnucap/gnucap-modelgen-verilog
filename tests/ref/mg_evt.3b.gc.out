@@ -23,3 +23,8 @@ time3   9
  9.         2.        
 time2   10
  10.        2.        
+Gnucap   System status
+iterations: op=0, dc=2, tran=18, fourier=0, total=29
+transient timesteps: accepted=9, rejected=0, total=9
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%

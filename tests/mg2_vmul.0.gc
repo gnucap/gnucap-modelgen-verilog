@@ -31,4 +31,5 @@ list
 
 print dc v(nodes) iter(0)
 dc va 0 2 .5 vb 0 2 1
+status notime
 end

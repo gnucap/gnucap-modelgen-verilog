@@ -1,2 +1,7 @@
 #           v(1)       v(2)      
  27.       -1.        -1.        
+Gnucap   System status
+iterations: op=3, dc=0, tran=0, fourier=0, total=3
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=14, total=16
+dctran density=27.3%, ac density=27.3%

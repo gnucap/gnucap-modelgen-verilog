@@ -22,3 +22,8 @@ reject #() r ();
  0.8        0.5        2.         1.        
  0.9        0.5        2.         1.        
  1.         1.         2.         1.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=24, fourier=0, total=66
+transient timesteps: accepted=21, rejected=1, total=22
+nodes: user=0, subckt=0, model=0, total=0
+dctran density=0.0%, ac density=0.0%
