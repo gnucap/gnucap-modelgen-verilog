@@ -1,0 +1,27 @@
+test_evt_cross2 #() dut0 (.p(\1 ),.n(\0 ),.x(c));
+vsine #(.freq(1e6),.ampl(2),.samples(9)) vin (.p(\1 ),.n(\0 ));
+#           v(1)       v(c)       iter(0)   
+ 0.         0.         0.         3.        
+#Time       v(1)       v(c)       iter(0)    c(dut0)    v(c)      
+ 0.         0.         0.         2.         0.         0.        
+ 2.E-12     25.133E-6  0.         6.         0.         0.        
+ 4.E-12     50.265E-6  0.         3.         0.         0.        
+ 111.11E-9  1.2856     0.         3.         0.         0.        
+ 222.23E-9  1.9696     0.         3.         0.         0.        
+ 333.34E-9  1.732      0.         3.         0.         0.        
+ 444.45E-9  0.684      0.         3.         0.         0.        
+ 499.76E-9  0.0030411  0.         6.         0.         0.        
+ 500.E-9   -13.E-15    0.         6.         0.         0.        
+zero cross     5.00002e-07 -2.51327e-05
+ 500.E-9   -25.133E-6  1.         3.         1.         1.        
+ 583.34E-9 -1.         0.         3.         0.         0.        
+ 666.67E-9 -1.7321     0.         3.         0.         0.        
+ 750.E-9   -2.         0.         3.         0.         0.        
+ 833.33E-9 -1.732      0.         3.         0.         0.        
+ 916.67E-9 -1.         0.         3.         0.         0.        
+ 1.E-6      26.E-15    0.         3.         0.         0.        
+Gnucap   System status
+iterations: op=0, dc=3, tran=56, fourier=0, total=78
+transient timesteps: accepted=16, rejected=3, total=19
+nodes: user=2, subckt=0, model=1, total=3
+dctran density=77.8%, ac density=77.8%
