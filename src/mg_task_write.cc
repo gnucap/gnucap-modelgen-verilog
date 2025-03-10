@@ -93,7 +93,7 @@ private:
   }
   bool is_common()const override {return true;} // extra CARD*
   bool has_modes()const override {return true;}
- // bool has_tr_review()const override {return true;} // need to q_accept?
+  bool has_tr_review()const override {return true;}
   bool has_tr_advance()const override {return true;}
   bool has_tr_regress()const override { untested();return false;}
   bool has_tr_accept()const override {return true;}
