@@ -1,0 +1,45 @@
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_cross5(p, n);
+	electrical p, n;
+	inout p, n;
+	parameter real h=0. from [0:.1];
+	real t;
+	(*desc=""*) integer count;
+	analog initial begin
+		t = 1;
+		count = 0;
+	end
+
+	analog begin
+		@(cross(V(p,n), 0)) begin
+			if(1)$strobe(".");
+			$trace(".\n");
+			if(t>=0) begin
+				t = - h;
+			end else begin
+				t = h;
+			end
+			count = count+1;
+		end
+	end
+endmodule
+
+list
+
+!make test_cross5.so > /dev/null
+attach ./test_cross5.so
+
+parameter h=1e-3
+test_cross5 #(.h(h)) dut(\1 ,\0 );
+vsine #(.freq(1) .ampl(1)) vin(\1 ,\0 );
+
+print tran v(nodes) iter(0) count(dut)
+tran 2 trace n
+status notime
+end

@@ -2,6 +2,13 @@
 attach ./modelgen_1.so
 attach ../vams/vsine.so
 
+// V(x) remains 0.
+// consistent with mg_evt.timer.4.gc.
+
+// nonzero at the crossing time?
+// equality makes no sense, time is analog.
+// (what do other implementations do?)
+
 verilog
 
 `modelgen

@@ -1,0 +1,31 @@
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_timer4(p);
+	inout p;
+	electrical p;
+	(* desc="" *) real vv;
+	analog begin
+		vv = 0;
+		@(timer(.1, .2 )) vv = 1;
+		V(p) <+ vv;
+	end
+endmodule
+
+!make test_timer4.so > /dev/null
+attach ./test_timer4.so
+
+verilog
+
+test_timer4 #() dut(p);
+
+list
+
+print tran vv(dut) v(p)
+tran 1 .1 trace=n
+
+status notime
+end

@@ -94,6 +94,7 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
   o__ "trace3(\"" << m.identifier() <<"::needs_eval?\", long_label(), _sim->_time0, has_probes());\n";
   o__ "node_t gnd(&ground_node);\n";
   o__ "if (is_q_for_eval()) {\n";
+  o____ "trace3(\"" << m.identifier() <<"::needs_eval?\", long_label(), _sim->_time0, is_q_for_eval());\n";
   o____ "return false;\n";
   o__ "}else if (!converged()) {\n";
   o____ "return true;\n";
@@ -381,7 +382,7 @@ void make_module_default_constructor(std::ostream& o, const Module& m)
 static void make_do_tr(std::ostream& o, const Module& m)
 {
   o << "bool MOD_" << m.identifier() << "::do_tr()\n{\n";
-  o__ "trace3(\"" << m.identifier() <<"::do_tr\", this, long_label(), _sim->iteration_number());\n";
+  o__ "trace2(\"" << m.identifier() <<"::do_tr\", long_label(), _sim->iteration_number());\n";
   o__ "clear_branch_contributions();\n";
   o__ "read_probes();\n";
   o__ "COMMON_" << m.identifier() << " const* c = "

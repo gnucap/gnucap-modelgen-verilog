@@ -12,15 +12,17 @@ vsine #(.freq(1e6),.ampl(2),.samples(9)) vin (.p(\1 ),.n(\0 ));
  333.34E-9  1.732      3.        
  444.45E-9  0.684      3.        
  499.76E-9  0.0030411  6.        
+zero cross     5e-07 1.30777e-14
+zero cross     5e-07 -1.30777e-14
  500.E-9   -13.E-15    6.        
-zero cross     5.00002e-07 2.51327e-05
-zero cross     5.00002e-07 -2.51327e-05
  500.E-9   -25.133E-6  3.        
  583.34E-9 -1.         3.        
  666.67E-9 -1.7321     3.        
  750.E-9   -2.         3.        
  833.33E-9 -1.732      3.        
  916.67E-9 -1.         3.        
+zero cross     1e-06 -2.61934e-14
+zero cross     1e-06 2.61934e-14
  1.E-6      26.E-15    3.        
 Gnucap   System status
 iterations: op=0, dc=3, tran=56, fourier=0, total=78

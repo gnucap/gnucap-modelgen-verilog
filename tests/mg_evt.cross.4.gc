@@ -1,0 +1,50 @@
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_cross4(p, n);
+	electrical p, n;
+	inout p, n;
+	(*desc=""*) real t;
+	(*desc=""*) real c;
+	parameter real h=0. from [0:.1];
+	analog initial begin
+		t = 1;
+		c = 0;
+	end
+
+	analog begin
+		@(cross(V(p,n)-t, 0)) begin
+			if(t>=1) begin
+				t = 1 - h;
+			end else begin
+				t = 1 + h;
+			end
+			c = c+1;
+		end
+	end
+endmodule
+
+list
+
+!make test_cross4.so > /dev/null
+attach ./test_cross4.so
+
+parameter h=1e-3
+test_cross4 #(.h(h)) dut(\1 ,\0 );
+vsine #(.freq(1) .ampl(2)) vin(\1 ,\0 );
+
+list
+
+print tran v(nodes) c(dut) t(dut) iter(0)
+tran 1.1 trace n
+status notime
+
+parameter h=0
+tran 0 1.1 trace n
+
+status notime
+end

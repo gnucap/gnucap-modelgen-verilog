@@ -142,13 +142,13 @@ private:
     o______ "assert(d); d->q_accept();\n";
     o____"}\n";
 
-    o____ "void tr_review("; args(o); o << ") {untested();\n";
-    o____ "(void)d;\n";
+    o____ "void tr_review("; args(o); o << ") {\n";
+    o______ "(void)d;\n";
     o______ " assert(d); d->q_accept();\n";
     o____"}\n";
 
     o____ "void tr_advance("; args(o); o << ") {\n";
-    o____ "(void)d;\n";
+    o______ "(void)d;\n";
     o______ "trace1(\"write::tr_advance\", _sim->_time0);\n";
     o______ "assert(d); d->q_accept();\n";
     o____"}\n";

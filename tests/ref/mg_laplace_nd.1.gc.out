@@ -15,7 +15,7 @@ vsine #(.ampl(1),.dc(v)) v1 (.p(\1 ),.n(\0 ));
  0.9       -0.58779   -0.01445   -0.0289    -0.04335   -0.0578    -0.07225   
  1.         7.f       -0.028412  -0.056824  -0.085237  -0.11365   -0.14206   
 Gnucap   System status
-iterations: op=0, dc=0, tran=134, fourier=0, total=168
+iterations: op=0, dc=0, tran=130, fourier=0, total=164
 transient timesteps: accepted=30, rejected=4, total=34
 nodes: user=1, subckt=0, model=11, total=12
 dctran density=30.6%, ac density=23.6%

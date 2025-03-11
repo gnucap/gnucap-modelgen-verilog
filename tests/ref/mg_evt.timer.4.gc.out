@@ -1,0 +1,18 @@
+test_timer4 #() dut (.p(p));
+#Time       vv(dut)    v(p)      
+ 0.         0.         0.        
+ 0.1        1.         0.        
+ 0.2        0.         0.        
+ 0.3        1.         0.        
+ 0.4        0.         0.        
+ 0.5        1.         0.        
+ 0.6        0.         0.        
+ 0.7        1.         0.        
+ 0.8        0.         0.        
+ 0.9        1.         0.        
+ 1.         0.         0.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=36, fourier=0, total=48
+transient timesteps: accepted=12, rejected=0, total=12
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%

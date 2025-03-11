@@ -1412,6 +1412,7 @@ bool MOD_resistor::tr_needs_eval()const
   trace3("resistor::needs_eval?", long_label(), _sim->_time0, has_probes());
   node_t gnd(&ground_node);
   if (is_q_for_eval()) {
+    trace3("resistor::needs_eval?", long_label(), _sim->_time0, is_q_for_eval());
     return false;
   }else if (!converged()) {
     return true;
@@ -1636,7 +1637,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
 #endif
 bool MOD_resistor::do_tr()
 {
-  trace3("resistor::do_tr", this, long_label(), _sim->iteration_number());
+  trace2("resistor::do_tr", long_label(), _sim->iteration_number());
   clear_branch_contributions();
   read_probes();
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
@@ -1685,7 +1686,6 @@ inline void MOD_resistor::clear_branch_contributions()
 typedef MOD_resistor::ddouble ddouble;
 inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
 {
-  trace1("resistor::tr_eval_analog", d);
   trace1("resistor::tr_eval_analog", d->long_label());
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -2686,6 +2686,7 @@ bool MOD_resistor::tr_needs_eval()const
   trace3("resistor::needs_eval?", long_label(), _sim->_time0, has_probes());
   node_t gnd(&ground_node);
   if (is_q_for_eval()) {
+    trace3("resistor::needs_eval?", long_label(), _sim->_time0, is_q_for_eval());
     return false;
   }else if (!converged()) {
     return true;
@@ -2961,7 +2962,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
 #endif
 bool MOD_resistor::do_tr()
 {
-  trace3("resistor::do_tr", this, long_label(), _sim->iteration_number());
+  trace2("resistor::do_tr", long_label(), _sim->iteration_number());
   clear_branch_contributions();
   read_probes();
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
@@ -3010,7 +3011,6 @@ inline void MOD_resistor::clear_branch_contributions()
 typedef MOD_resistor::ddouble ddouble;
 inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
 {
-  trace1("resistor::tr_eval_analog", d);
   trace1("resistor::tr_eval_analog", d->long_label());
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -5134,6 +5134,7 @@ bool MOD_capacitor::tr_needs_eval()const
   trace3("capacitor::needs_eval?", long_label(), _sim->_time0, has_probes());
   node_t gnd(&ground_node);
   if (is_q_for_eval()) {
+    trace3("capacitor::needs_eval?", long_label(), _sim->_time0, is_q_for_eval());
     return false;
   }else if (!converged()) {
     return true;
@@ -5196,7 +5197,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
 #endif
 bool MOD_capacitor::do_tr()
 {
-  trace3("capacitor::do_tr", this, long_label(), _sim->iteration_number());
+  trace2("capacitor::do_tr", long_label(), _sim->iteration_number());
   clear_branch_contributions();
   read_probes();
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
@@ -5239,7 +5240,6 @@ inline void MOD_capacitor::clear_branch_contributions()
 typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
 {
-  trace1("capacitor::tr_eval_analog", d);
   trace1("capacitor::tr_eval_analog", d->long_label());
   MOD_capacitor const* p = d;
   (void)p;
@@ -6094,6 +6094,7 @@ bool MOD_capacitor::tr_needs_eval()const
   trace3("capacitor::needs_eval?", long_label(), _sim->_time0, has_probes());
   node_t gnd(&ground_node);
   if (is_q_for_eval()) {
+    trace3("capacitor::needs_eval?", long_label(), _sim->_time0, is_q_for_eval());
     return false;
   }else if (!converged()) {
     return true;
@@ -6156,7 +6157,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
 #endif
 bool MOD_capacitor::do_tr()
 {
-  trace3("capacitor::do_tr", this, long_label(), _sim->iteration_number());
+  trace2("capacitor::do_tr", long_label(), _sim->iteration_number());
   clear_branch_contributions();
   read_probes();
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
@@ -6207,7 +6208,6 @@ inline void MOD_capacitor::clear_branch_contributions()
 typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
 {
-  trace1("capacitor::tr_eval_analog", d);
   trace1("capacitor::tr_eval_analog", d->long_label());
   MOD_capacitor const* p = d;
   (void)p;

@@ -1300,7 +1300,6 @@ static void make_cc_common_tr_eval(std::ostream& o, const Module& m)
   o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
   o << "inline void COMMON_" << m.identifier() <<
     "::tr_eval_analog(MOD_" << m.identifier() << "* d) const\n{\n";
-  o__ "trace1(\"" << m.identifier() <<"::tr_eval_analog\", d);\n";
   o__ "trace1(\"" << m.identifier() <<"::tr_eval_analog\", d->long_label());\n";
 
   OUT_ANALOG oo(OUT_ANALOG::modeDYNAMIC);
