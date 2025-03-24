@@ -1,0 +1,29 @@
+verilog
+
+ground gnd;
+
+module net(.p(x), .n(x));
+endmodule
+
+paramset mynet net
+parameter real r=0. from [0:0];
+endparamset
+
+paramset mynet resistor;
+parameter r from (0:1e99);
+.r = r;
+endparamset
+
+module main(a, b);
+	mynet #(.r(0.)) n1(a, c);
+	mynet #(.r(1.)) n2(c, b);
+	isource #(1) i0(b, a);
+endmodule
+
+list
+
+main #() m1(a, gnd);
+
+print dc v(nodes)
+dc
+status notime

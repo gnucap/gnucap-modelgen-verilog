@@ -390,7 +390,6 @@ int PARAMSET::set_param_by_name(std::string Name, std::string Value)
   }else if(Name==""){ untested();
     throw Exception_No_Match("invalid parameter: " + Name);
   }else if(_parent && _parent->subckt()){
-    trace2("PARAMSET::spbn2", short_label(), _parent->long_label());
     PARAM_LIST const* p = _parent->subckt()->params();
 
     if(p->find(Name) == p->end()){ untested();
@@ -712,7 +711,9 @@ void PARAMSET::expand()
 
     assert(subckt()->size()==1);
 
-    subckt()->expand();
+    {untested();
+      subckt()->expand();
+    }
     if(dev->is_valid()){
     }else{
       // TODO: seems to be the wrong place. see mg_bug.1.gc

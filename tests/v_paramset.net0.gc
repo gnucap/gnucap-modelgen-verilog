@@ -1,0 +1,19 @@
+verilog
+
+ground gnd;
+
+module net(.a(x), .b(x));
+endmodule
+
+paramset mynet net
+endparamset
+
+module main(a, b);
+	mynet nn(.a(a), .b(b))
+endmodule
+
+main #() m1(a, gnd);
+
+print dc
+dc
+status notime

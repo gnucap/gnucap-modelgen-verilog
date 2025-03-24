@@ -802,10 +802,39 @@ static void make_module_class(std::ostream& o, Module const& m)
     "------------------------------------*/\n";
 } // make_module_class
 /*--------------------------------------------------------------------------*/
-static void make_module_clear_local_nodes(std::ostream& o)
+static void make_module_clear_local_nodes(std::ostream& o, Module const& m)
 {
+  o____ "for(int i=0; i<ext_nodes()+int_nodes(); ++i){\n";
+  o______ "trace3(\"expand0 clear\", long_label(), i, n_(i).e_());\n";
+  o____ "}\n";
+  o____ "assert(scope());\n";
+  o____ "assert(scope()->nodes());\n";
+  o____ "NODE_MAP& nodes = *scope()->nodes();\n";
+  o____ "(void)nodes;\n";
+
+  int pp = 0;
+  for (auto nn : m.circuit()->ports()) {
+    o << "//port " << nn->name() << " " << nn->node()->number() << "\n";
+    int nnnn = nn->node()->number() - 1;
+    if(nnnn!=pp){
+      assert(nnnn<pp);
+      o______ "build_union(&n_("<<pp<<"), &n_("<<nnnn<<"));\n";
+    }else{
+    }
+    ++pp;
+  }
+
+  // o____ "for(int i=0; i<net_nodes(); ++i) {\n";
+  // o______ "assert(n_(i).e_()>=0);\n";
+  // o______ "assert(n_(i).e_()< nodes.size());\n";
+  // o______ "trace3(\"expand1 union\", long_label(), i, n_(i).e_());\n";
+  // o______ "build_union(&nodes[n_(i).e_()], &n_(i));\n";
+  // o____ "}\n";
   o____ "for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){\n";
   o______ "n_(i).clear();\n";
+  o____ "}\n";
+  o____ "for(int i=0; i<ext_nodes()+int_nodes(); ++i){\n";
+  o______ "trace3(\"expand2 clear\", long_label(), i, n_(i).e_());\n";
   o____ "}\n";
 }
 /*--------------------------------------------------------------------------*/
@@ -1065,7 +1094,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
   o__ "node_t gnd;\n";
   o__ "gnd.set_to_ground(nullptr);\n";
   o__ "if (_sim->is_first_expand()) {\n";
-  make_module_clear_local_nodes(o);
+  make_module_clear_local_nodes(o, m);
   make_module_new_local_nodes(o, m);
   if(m.circuit()->element_list().size()){
     o__ "assert(_parent);\n";

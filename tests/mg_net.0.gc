@@ -1,0 +1,39 @@
+
+attach ./modelgen_0.so
+attach ./c_debug.so
+
+
+verilog
+
+`modelgen
+module test_net_0(.p(a), .n(a));
+	electrical a;
+	inout a;
+	(*desc=""*) real v;
+	analog begin
+		v = V(a);
+	end
+endmodule
+
+list
+
+!make test_net_0.so > /dev/null
+attach ./test_net_0.so
+
+parameter r=1
+parameter v=0
+
+ground gnd;
+test_net_0 #() N0(aa , bb);
+test_net_0 #() N1(gnd, gnd);
+test_net_0 #() N2(xx , \0 );
+vsource #(.dc(v)) v1(bb, gnd);
+
+list
+
+print dc v(N*)
+
+dc v 0 1 .5
+status notime
+portdump
+end

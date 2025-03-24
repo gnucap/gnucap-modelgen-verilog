@@ -1,0 +1,37 @@
+parameter r=1 
+parameter v=0 
+ground gnd; 
+test_net_0 #() N0 (.p(aa),.n(bb));
+test_net_0 #() N1 (.p(gnd),.n(gnd));
+test_net_0 #() N2 (.p(xx),.n(\0 ));
+vsource #(.dc(v)) v1 (.p(bb),.n(gnd));
+#           v(N0)      v(N1)      v(N2)     
+ 0.         0.         0.         0.        
+ 0.5        0.5        0.         0.        
+ 1.         1.         0.         0.        
+Gnucap   System status
+iterations: op=0, dc=6, tran=0, fourier=0, total=6
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%
+name   ...
+have 1 nodes. model: 0 sckt: 0
+
+
+
+
+N0 2 2 1
+0 1
+1 1
+2 0
+N1 2 2 1
+0 0
+1 0
+2 0
+N2 2 2 1
+0 0
+1 0
+2 0
+v1 2 2 0
+0 1
+1 0

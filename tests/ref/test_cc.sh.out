@@ -2078,8 +2078,19 @@ void MOD_resistor::expand()
   node_t gnd;
   gnd.set_to_ground(nullptr);
   if (_sim->is_first_expand()) {
+    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
+      trace3("expand0 clear", long_label(), i, n_(i).e_());
+    }
+    assert(scope());
+    assert(scope()->nodes());
+    NODE_MAP& nodes = *scope()->nodes();
+//port p 1
+//port n 2
     for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
       n_(i).clear();
+    }
+    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
+      trace3("expand2 clear", long_label(), i, n_(i).e_());
     }
   // port p 1
   // port n 2
@@ -3616,8 +3627,19 @@ void MOD_resistor::expand()
   node_t gnd;
   gnd.set_to_ground(nullptr);
   if (_sim->is_first_expand()) {
+    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
+      trace3("expand0 clear", long_label(), i, n_(i).e_());
+    }
+    assert(scope());
+    assert(scope()->nodes());
+    NODE_MAP& nodes = *scope()->nodes();
+//port p 1
+//port n 2
     for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
       n_(i).clear();
+    }
+    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
+      trace3("expand2 clear", long_label(), i, n_(i).e_());
     }
   // port p 1
   // port n 2
@@ -5532,8 +5554,19 @@ void MOD_capacitor::expand()
   node_t gnd;
   gnd.set_to_ground(nullptr);
   if (_sim->is_first_expand()) {
+    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
+      trace3("expand0 clear", long_label(), i, n_(i).e_());
+    }
+    assert(scope());
+    assert(scope()->nodes());
+    NODE_MAP& nodes = *scope()->nodes();
+//port p 1
+//port n 2
     for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
       n_(i).clear();
+    }
+    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
+      trace3("expand2 clear", long_label(), i, n_(i).e_());
     }
   // port p 1
   // port n 2
@@ -6554,8 +6587,19 @@ void MOD_capacitor::expand()
   node_t gnd;
   gnd.set_to_ground(nullptr);
   if (_sim->is_first_expand()) {
+    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
+      trace3("expand0 clear", long_label(), i, n_(i).e_());
+    }
+    assert(scope());
+    assert(scope()->nodes());
+    NODE_MAP& nodes = *scope()->nodes();
+//port p 1
+//port n 2
     for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
       n_(i).clear();
+    }
+    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
+      trace3("expand2 clear", long_label(), i, n_(i).e_());
     }
   // port p 1
   // port n 2

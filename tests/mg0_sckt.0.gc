@@ -7,7 +7,7 @@ options trace
 verilog
 
 `modelgen
-module test_net0(a, b);
+module test_sckt0(a, b);
 	inout a, b;
 	electrical a, b;
 	parameter real r = 1.;
@@ -15,14 +15,14 @@ module test_net0(a, b);
 	resistor #(.r(r)) r1(a, b);
 endmodule;
 
-!make test_net0.so > /dev/null
-attach ./test_net0.so
+!make test_sckt0.so > /dev/null
+attach ./test_sckt0.so
 
 parameter r=1
 parameter c=1
 parameter v=0
 
-test_net0 #(.r(r)) dut(\1 ,2);
+test_sckt0 #(.r(r)) dut(\1 ,2);
 vsource #(.dc(v)) v1(\1 , \0 );
 
 list

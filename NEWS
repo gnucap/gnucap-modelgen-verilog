@@ -6,6 +6,7 @@ This file summarizes new features and important changes between snapshots.
 ============
 - improve overloading diagnostics
 - fix paramset param_count bug
+- codegen for same_port aka net devices
 
 20250301-dev
 ============
