@@ -1,0 +1,32 @@
+verilog
+
+options trace
+
+// ground gnd;
+
+(*desc="A"*)
+paramset mynet resistor;
+parameter real r from (0:1e99);
+parameter real s=1 from (0:1e99);
+.r = r;
+endparamset
+
+(*desc="B"*)
+paramset mynet resistor;
+parameter real r from (0:1e99);
+.r = r;
+endparamset
+
+module main(a, b);
+	mynet #(.r(1.)) n1(.p(a), .n(c));
+	mynet #(.r(1.)) n2(.p(c), .n(b));
+	isource #(1) i0(b, a);
+endmodule
+
+list
+
+main #() m1(a, \0 );
+
+print dc v(nodes)
+dc
+status notime

@@ -493,25 +493,27 @@ public:
   ~PARAM_ANY() { delete _value; _value=nullptr;}
   PARA_BASE* clone()const override{ untested();return new PARAM_ANY(*this);}
   PARA_BASE* pclone(void*p)const override{return new(p) PARAM_ANY(*this);}
-  bool operator==(const PARA_BASE& v)const override { untested();
+  bool operator==(const PARA_BASE& v)const override {
     // PARAMETER const* p = dynamic_cast<PARAMETER const*>(&b);
     // return (p && _v == p->_v  &&  _s == p->_s);
     Base* eq = nullptr;
+    bool ret = false;
    // if(_s != v._s){ untested();
    //   return false;
    // }else
-    if(auto f = dynamic_cast<Float const*>(v.value())){ untested();
+    if(auto f = dynamic_cast<Float const*>(v.value())){
       eq = f->equal(_value);
     }else if(auto i = dynamic_cast<Integer const*>(v.value())){ untested();
       eq = i->equal(_value);
+    }else if(v.value() == nullptr) {
+      ret = _value == nullptr;
     }else{ untested();
       incomplete();
     }
 
-    bool ret = false;
-    if(auto ii=dynamic_cast<Integer const*>(eq)){ untested();
+    if(auto ii=dynamic_cast<Integer const*>(eq)){
       ret = ii->value();
-    }else{ untested();
+    }else{
     }
     delete eq;
 
@@ -526,8 +528,8 @@ public:
     //}else{ untested();
     //  return !v._value || !has_hard_value();
     //}
-    if(ret){ untested();
-    }else{ untested();
+    if(ret){
+    }else{
     }
     return ret;
   }
@@ -575,7 +577,7 @@ public:
     return _value;
   }
   bool has_good_value()const override { untested();unreachable(); return false;}
-  Base const* e_val_(const Base* def, const CARD_LIST* s, int)const override { untested();
+  Base const* e_val_(const Base* def, const CARD_LIST* s, int)const override {
     // def does not seem to carry type info...
     // see s_dc.vcvs1{a,b,c}.gc
     error(bDEBUG, "assuming double in " + _s + "\n");
@@ -842,7 +844,7 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
       cmd.get_line("verilog-paramset>");
     }else if (!cmd.more()) {
       cmd.get_line("verilog-paramset>");
-    }else{ untested();
+    }else{
       cmd.check(bWARNING, "what's this?");
       break;
     }

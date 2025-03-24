@@ -261,6 +261,13 @@ public:
 }pp; // DEV_INSTANCE_PROTO
 DISPATCHER<CARD>::INSTALL dd(&device_dispatcher, "instance_proto", &pp);
 /*--------------------------------------------------------------------------*/
+class attributes : public CKT_BASE{
+public:
+  ATTRIB_LIST_p& set(tag_t t){
+    return set_attributes(t);
+  }
+}attr;
+/*--------------------------------------------------------------------------*/
 void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE_PROTO* Proto) const
 {
   assert(Proto);
@@ -271,13 +278,20 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
   COMPONENT* c = prechecked_cast<COMPONENT*>(cl);
   assert(c || !cl);
 
+  if(cl && has_attributes(model->id_tag())) {
+    trace2("INSTANCE::prepare_overload attr?", modelname, attributes(model->id_tag())->string(tag_t()));
+    attr.set(cl->id_tag()) = attributes(model->id_tag());
+  }else{
+    trace1("INSTANCE::prepare_overload no attr", modelname);
+  }
+
   if(!cl){
     return;
   }else if(!c->common()){
     c->set_dev_type(modelname);
   }else if(auto m=dynamic_cast<MODEL_CARD const*>(model)){
     // bypass spice-style find_model
-    trace3("prepare_overload bypass", Proto->long_label(), Proto->net_nodes(), _parent);
+    trace3("prepare_overload bypass", Proto->short_label(), Proto->net_nodes(), _parent);
     assert(c->common());
     COMMON_COMPONENT* cc = c->common()->clone();
     cc->attach(m);
@@ -317,7 +331,7 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
 //    COMMON_PARAMLIST const* cp = prechecked_cast<COMMON_PARAMLIST const*>(Proto->common());
 //    assert(cp);
     for(int i=0; i<int(_params.size()); ++i){
-      trace4("stub param fwd1", c->long_label(), i, _params[i].first, _params[i].second);
+      trace4("stub param fwd1", c->short_label(), i, _params[i].first, _params[i].second);
       std::string value = _params[i].second;
       if(_params[i].first == ""){
 	c->set_param_by_index(i, value, 0);
@@ -597,7 +611,7 @@ void INSTANCE::expand()
   }
 #endif
 
-  trace4("expand I", long_label(), _parent->long_label(), _parent, _parent->net_nodes());
+  trace4("expand I", short_label(), _parent->short_label(), _parent, _parent->net_nodes());
   trace2("expand I: renew", _parent->scope()->nodes(), _parent->scope()->nodes()->how_many());
   trace2("expand I: renew", _parent->scope()->size(), common()->has_model());
   trace2("expand I: renew", _parent->subckt()->size(), common()->has_model());
@@ -636,22 +650,27 @@ void INSTANCE::expand()
     assert(d);
     CARD_LIST::iterator j = i;
     ++i;
-    if(!d->is_valid()){
-      std::string desc;
-      if(has_attributes((*i)->id_tag())) {
-	auto const& a = attributes((*i)->id_tag());
-	if(a){ untested();
-	  desc = a->operator[](std::string("desc"));
-	  if(desc == "0"){ untested();
-	    desc = "";
-	  }else{ untested();
-	    desc = ": " + desc;
-	  }
-	}else{ untested();
-	}
-      }else{
-      }
 
+    std::string desc;
+    if(has_attributes(s->id_tag())) {
+      auto const& a = attributes(s->id_tag());
+      if(a){
+	desc = a->operator[](std::string("desc"));
+	if(desc == "0"){ untested();
+	  desc = "";
+	}else{
+	  desc = ": " + desc;
+	  error(bTRACE, long_label() + " .. candidate"+desc+", params: "+to_string(s->param_count())+"\n");
+	}
+      }else{ untested();
+	// error(bTRACE, long_label() + " .. anonymous candidate.\n");
+      }
+    }else{
+      // error(bTRACE, long_label() + s->dev_type() + " .. no attr candidate.\n");
+      // error(bTRACE, long_label() + " .. params " + to_string(d->param_count()) + "\n");
+    }
+
+    if(!d->is_valid()){
       error(bTRACE, long_label() + " dropped invalid candidate"+desc+".\n");
     }else if(!gotit){
 //      error(bTRACE, long_label() + " found valid candidate.\n");
@@ -659,11 +678,19 @@ void INSTANCE::expand()
       assert(gotit);
       *j = nullptr;
     }else if(d->param_count() > gotit->param_count()){
-      error(bDEBUG, long_label() + " tie break: " + to_string(gotit->param_count()) + " vs. " +
-	  to_string((*j)->param_count()) + "\n");
+      if(desc.size()){
+	error(bTRACE, long_label() + " rejecting candidate, more params"+desc+".\n");
+      }else{
+	error(bDEBUG, long_label() + " tie break: " + to_string(gotit->param_count()) + " vs. " +
+	    to_string(d->param_count()) + "\n");
+      }
     }else if(d->param_count() < gotit->param_count()){
-      error(bDEBUG, long_label() + " tie break: " + to_string(gotit->param_count()) + " vs. " +
-	  to_string((*j)->param_count()) + "\n");
+      if(desc.size()){
+	error(bTRACE, long_label() + " found fewer params"+desc+".\n");
+      }else{
+	error(bDEBUG, long_label() + " tie break: " + to_string(gotit->param_count()) + " vs. " +
+	    to_string(d->param_count()) + "\n");
+      }
       delete (CARD*) gotit;
       gotit = prechecked_cast<COMPONENT*>(*j);
       assert(gotit);

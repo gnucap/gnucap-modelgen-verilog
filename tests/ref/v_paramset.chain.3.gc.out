@@ -13,16 +13,56 @@ module main(1 2);
 main.t1: tln from top level
 main.t1: tln from top level
 main.t1: 2 candidates found for tln
+assuming double in L
+assuming double in 1/L
+assuming double in L
+assuming double in 1/L
 m.t1 dropped invalid candidate.
+assuming double in L
+assuming double in 1/L
+assuming double in L
+assuming double in 1/L
 tln1.r: resistor from device_dispatcher
 tln1.r: 1 candidate found for resistor
 tln1.t: tln from top level
 tln1.t: tln from top level
 tln1.t: 2 candidates found for tln
+assuming double in length - 1
+assuming double in R
+assuming double in length - 1
+assuming double in R
 m.t1._.t dropped invalid candidate.
+assuming double in length - 1
+assuming double in R
+assuming double in length - 1
+assuming double in R
+assuming double in length - 1
+assuming double in R
+assuming double in length - 1
+assuming double in R
 m.t1._.t._.t dropped invalid candidate.
+assuming double in length - 1
+assuming double in R
+assuming double in length - 1
+assuming double in R
+assuming double in length - 1
+assuming double in R
+assuming double in length - 1
+assuming double in R
 m.t1._.t._.t._.t dropped invalid candidate.
+assuming double in length - 1
+assuming double in R
+assuming double in length - 1
+assuming double in R
+assuming double in length - 1
+assuming double in R
+assuming double in length - 1
+assuming double in R
 m.t1._.t._.t._.t._.t dropped invalid candidate.
+assuming double in length - 1
+assuming double in R
+assuming double in length - 1
+assuming double in R
 tln0.r: resistor from device_dispatcher
 tln0.r: 1 candidate found for resistor
 >>>>>.dc 

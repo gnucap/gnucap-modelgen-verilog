@@ -21,6 +21,10 @@ main.R1: test_invalid from top level
 main.R1: 1 candidate found for test_invalid
 main.R2: test_invalid from top level
 main.R2: 1 candidate found for test_invalid
+assuming double in 1.5
+assuming double in 1.5
+assuming double in 1.5
+assuming double in 0
 m.R2 dropped invalid candidate.
 m.R2: no candidates test_invalid
 >>>>>status notime 

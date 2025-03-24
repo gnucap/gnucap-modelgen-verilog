@@ -997,7 +997,7 @@ DISPATCHER<CMD>::INSTALL d4(&command_dispatcher, ".merge|merge", &p4);
 class CMD_RUN : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST* Scope)override {
-    while (cmd.match1('<')) {untested();
+    while (cmd.match1('<')) {
       command("clear", Scope);
       cmd.skip();
       cmd.skipbl();

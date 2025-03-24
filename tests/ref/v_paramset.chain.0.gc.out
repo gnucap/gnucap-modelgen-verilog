@@ -37,6 +37,21 @@ main.v: 1 candidate found for vsource
 main.R1: res from top level
 main.R1: res from model_dispatcher
 main.R1: 1 candidate found for res
+assuming double in 1
+assuming double in 0
+assuming double in x
+assuming double in 1
+assuming double in 0
+assuming double in x
+assuming double in 1
+assuming double in 0
+assuming double in x
+assuming double in r+s+x
+assuming double in 0
+assuming double in r+s+x
+assuming double in 0
+assuming double in r+s+x
+assuming double in 0
 print dc v(nodes) i(m.v) y(m.*) y(m.R1.*) 
                                   ^ ? no match
 >>>>>dc 

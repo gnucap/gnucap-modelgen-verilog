@@ -11,7 +11,7 @@ paramset A B;
 >>>>>param v=0 
 >>>>>list 
 module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
-  parameter v=0; 
+  parameter real v=0; 
   C #(.PC(1.)) v1 (\2 ,\1 );
   B #(.PB(2.)) v2 (\3 ,\1 );
   A #(.PA(v)) v3 (\4 ,\1 );
@@ -19,22 +19,22 @@ endmodule // main
 
 main #(.v(v)) m0 (.\1 (\0 ),.\2 (\1 ),.\3 (\2 ),.\4 (\3 ));
 paramset A B;
-  parameter PA; 
+  parameter real PA; 
  .PB=PA;
 endparamset
 
 paramset B C;
-  parameter PB; 
+  parameter real PB; 
  .PC=PB;
 endparamset
 
 paramset C D;
-  parameter PC; 
+  parameter real PC; 
  .PD=PC;
 endparamset
 
 paramset D vsource;
-  parameter PD; 
+  parameter real PD; 
  .dc=PD;
 endparamset
 

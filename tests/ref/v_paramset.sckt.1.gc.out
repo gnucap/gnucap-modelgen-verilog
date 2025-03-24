@@ -11,6 +11,9 @@ module main(1 2);
 >>>>>.print dc v(nodes) y(m.t1.tttt.r) y(m.t1.rrrr) 
 main.t1: tln from top level
 main.t1: 1 candidate found for tln
+assuming double in r0
+assuming double in r0
+assuming double in r0
 tln1.rrrr: resistor from device_dispatcher
 tln1.rrrr: 1 candidate found for resistor
 tln1.tttt: tln0 from top level

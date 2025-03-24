@@ -1,0 +1,46 @@
+>>>>>paramset mynet resistor; 
+>>>>>paramset mynet resistor; 
+>>>>>module main(a, b); 
+>>>>>list 
+// ground gnd; 
+(* desc="A" *) paramset mynet resistor;
+  parameter real r from (0:1e99); 
+  parameter real s=1 from (0:1e99); 
+ .r=r;
+endparamset
+
+(* desc="B" *) paramset mynet resistor;
+  parameter real r from (0:1e99); 
+ .r=r;
+endparamset
+
+module main (.a(a),.b(b));
+  mynet #(.r(1.)) n1 (.p(a),.n(c));
+  mynet #(.r(1.)) n2 (.p(c),.n(b));
+  isource #(1) i0 (b,a);
+endmodule // main
+
+>>>>>print dc v(nodes) 
+main.n1: mynet from top level: A
+main.n1: mynet from top level: B
+main.n1: 2 candidates found for mynet
+main.n2: mynet from top level: A
+main.n2: mynet from top level: B
+main.n2: 2 candidates found for mynet
+main.i0: isource from device_dispatcher
+main.i0: 1 candidate found for isource
+m1.n1 .. candidate: A, params: 13
+m1.n1 .. candidate: B, params: 12
+m1.n1 found fewer params: B.
+m1.n2 .. candidate: A, params: 13
+m1.n2 .. candidate: B, params: 12
+m1.n2 found fewer params: B.
+>>>>>dc 
+#           v(a)      
+ 0.         2.        
+>>>>>status notime 
+Gnucap   System status
+iterations: op=0, dc=2, tran=0, fourier=0, total=2
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=1, subckt=1, model=0, total=2
+dctran density=100.0%, ac density=100.0%

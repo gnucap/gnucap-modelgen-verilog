@@ -39,6 +39,9 @@ main.R1: res from top level
 main.R1: res from top level
 main.R1: res from model_dispatcher
 main.R1: 3 candidates found for res
+assuming double in 201
+assuming double in 201
+assuming double in 201
 m.R1 dropped invalid candidate.
 m.R1 dropped invalid candidate.
 m.R1 dropped invalid candidate.
