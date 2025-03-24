@@ -1,0 +1,39 @@
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+attach ./c_debug.so
+
+verilog
+*options method=euler
+ground \0 ;
+
+`modelgen
+module test_ddtidt1(p, q, n);
+	electrical p, q, n;
+	(* desc="" *) real d;
+	(* desc="" *) real i;
+	analog begin
+		i = idt(V(p,n));
+		d = ddt(i);
+		I(q,n) <+ d;
+	end
+endmodule
+
+!make test_ddtidt1.so > /dev/null
+attach ./test_ddtidt1.so
+
+verilog
+parameter r=1
+parameter v=0
+
+test_ddtidt1  #() d0 (\1 , a, \0 );
+resistor #(1.) ra(a,\0 );
+vsine #(.offset(-1 ) .phase(-3.1415/2.), .ampl(1 )) v1 (\1 , \0 );
+
+print dc v(nodes)
+dc
+
+print tran v(nodes) d(d0) i(d0) d(d1) i(d1) st0(d0.*) v(d0.*)
+tran 0 .5 .01 trace i
+status notime
+portdump
+end

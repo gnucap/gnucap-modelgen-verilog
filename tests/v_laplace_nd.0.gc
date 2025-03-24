@@ -1,5 +1,6 @@
 
 attach ../vams/vsine.so
+attach ./c_debug.so
 
 verilog
 
@@ -24,3 +25,4 @@ ac .01 100 * 10
 
 list
 status notime
+portdump

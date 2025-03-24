@@ -1,5 +1,6 @@
 attach ./modelgen_0.so
 attach ../vams/vsine.so
+attach ./c_debug.so
 
 verilog
 
@@ -33,3 +34,4 @@ print ac vm(out*) vp(out*)
 ac .05 0.2 * 1.1
 
 status notime
+portdump

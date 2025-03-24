@@ -1,0 +1,15 @@
+
+attach ../vams/vpulse.so
+attach ./c_debug.so
+
+verilog
+
+vpulse #(.val0(0) .val1(1) .width(2) .period(5)) v1(in, 0 );
+
+list
+
+print tran v(nodes) control(0)
+tran 0 10 .1 basic
+
+portdump
+status notime

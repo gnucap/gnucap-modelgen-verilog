@@ -1,6 +1,6 @@
 
 attach ./modelgen_0.so
-
+attach ./c_debug.so
 
 verilog
 
@@ -27,6 +27,7 @@ parameter i=1
 list
 print dc v(nodes) i(d1.*) i(r0) iter(0)
 dc i 0 2 .5
+portdump
 
 spice
 .option noinsensitive
@@ -37,4 +38,5 @@ R1 0 1 1
 .ac 1
 
 .status notime
+.portdump
 .end

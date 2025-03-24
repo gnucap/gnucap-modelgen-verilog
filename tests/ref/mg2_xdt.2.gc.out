@@ -25,3 +25,46 @@ iterations: op=0, dc=0, tran=92, fourier=0, total=122
 transient timesteps: accepted=23, rejected=7, total=30
 nodes: user=1, subckt=0, model=1, total=2
 dctran density=100.0%, ac density=100.0%
+name   ...
+have 2 nodes. model: 1 sckt: 0
+
+vsin 2 2 0
+0 -1
+1 -1
+ 
+ 
+ vsin.V1 2 2 0
+ 0 -1
+ 1 -1
+
+
+dut 2 2 6
+0 2
+1 0
+2 0
+3 0
+4 1
+5 0
+6 0
+7 0
+ dut._b_ddt_0_p_ddt_0_n 4 4 0
+ 0 0
+ 1 0
+ 2 2
+ 3 0
+ dut._b_ddt_1_p_ddt_1_n 4 4 0
+ 0 1
+ 1 0
+ 2 2
+ 3 0
+ dut._b_idt_2_p_idt_2_n 4 4 0
+ 0 0
+ 1 0
+ 2 1
+ 3 0
+v1 2 2 0
+0 2
+1 0
+ v1.V1 2 2 0
+ 0 2
+ 1 0
