@@ -1,5 +1,6 @@
 load ../vams/mosfet.so
 load ../vams/diode.so
+ground \0 ;
 
 *options noincmode
 *options nobypass
@@ -29,6 +30,7 @@ paramset pmos mosfet;
 endparamset
 
 module test(\1 ,\2 , \3 , \4 ,\5 , \6 , \7 );
+ground \0 ;
 // ground 0 // later
 pmos #(.w(8e-6) .l(600e-9)) p1(\3 , \2 , \1 , \1 );
 nmos #(.w(8e-6) .l(600e-9)) n1(\3 , \2 , \0 , \0 );

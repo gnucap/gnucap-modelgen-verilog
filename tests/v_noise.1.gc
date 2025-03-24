@@ -1,5 +1,6 @@
 
 verilog
+ground \0 ;
 
 flicker_noise #(.$mfactor(2) .pwr(1)) fn1(1 \0 );
 flicker_noise #(.$mfactor(1) .pwr(2)) fn2(2 \0 );
@@ -12,10 +13,10 @@ resistor #(1) r2(\2 ,\0 );
 resistor #(1) r3(3, \0 );
 resistor #(1) r4(4, \0 );
 
-noise_probe noise1(1);
-noise_probe noise2(2);
-noise_probe noise3(3);
-noise_probe noise4(4);
+noise_probe noise1(\1 );
+noise_probe noise2(\2 );
+noise_probe noise3(\3 );
+noise_probe noise4(\4 );
 
 list
 

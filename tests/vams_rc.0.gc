@@ -9,12 +9,12 @@ options debug
 options bypass
 verilog
 
-module main(in out gnd);
+module main(in, out, gnd);
 capacitor #(.c(.5) .$mfactor(2)) c1(gnd, out);
 resistor #(.r(2) .$mfactor(2)) r1(in, out)
 endmodule
 
-main #() dut(in out 0)
+main #() dut(in out \0 )
 
 spice
 

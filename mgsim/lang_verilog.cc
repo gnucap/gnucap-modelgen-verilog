@@ -891,6 +891,9 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
     }else if (cmd >> "//") {
       cmd.reset();
       new__instance(cmd, x, x->subckt());
+    }else if (cmd >> "ground ") {
+      cmd.reset();
+      new__instance(cmd, x, x->subckt());
     }else if (cmd >> "paramset ") {
       cmd.reset();
       cmd.check(bDANGER, "ERROR: This will not work. Need top level.");

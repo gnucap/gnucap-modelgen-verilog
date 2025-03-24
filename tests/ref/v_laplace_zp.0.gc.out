@@ -44,5 +44,5 @@ va_laplace_zp #(.n0( 1.),.d0( 0.),.d1( 1.)) b0 (.out0(\0 ),.out1(out3),.in0(in),
 Gnucap   System status
 iterations: op=0, dc=3, tran=87, fourier=0, total=124
 transient timesteps: accepted=25, rejected=4, total=29
-nodes: user=6, subckt=0, model=7, total=13
-dctran density=49.1%, ac density=21.9%
+nodes: user=4, subckt=0, model=7, total=11
+dctran density=53.7%, ac density=25.6%

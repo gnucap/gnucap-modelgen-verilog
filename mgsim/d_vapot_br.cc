@@ -62,9 +62,13 @@ protected: // override virtual
   void	   ac_load()override;
   COMPLEX  ac_involts()const override	{untested(); return NOT_VALID;}
   COMPLEX  ac_amps()const override	{untested(); return NOT_VALID;}
+  node_t& n_(int i)const override {
+    assert(_nN); assert(i>=0); assert(i<matrix_nodes()); return _nN[i];
+  }
 
   bool has_iv_probe()const override{ untested();incomplete(); return false;}
   void expand()override;
+ // void expand_last()override{assert(0);}
 
 public:
   void set_parameters(const std::string& Label, CARD* Parent,
@@ -87,14 +91,28 @@ protected:
 /*--------------------------------------------------------------------------*/
 void VA_BREQN::expand()
 {
+  if (_sim->is_first_expand()) {
+    for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
+      n_(i).clear();
+    }
+  }else{
+  }
   assert(BR());
   if (_sim->is_first_expand()) {
     n_(BR()).new_model_node( long_label() + ".br", this);
-    trace2("newmodelnode", long_label(), n_(BR()).t_());
+    assert(BR() < int_nodes()+ext_nodes());
   }else{ untested();
-    trace3("no newmodelnode", BR(), long_label(), n_(BR()).t_());
   }
   DEV_CPOLY_G::expand();
+
+  trace5("VA_BREQN::expand alloc", long_label(), net_nodes(), ext_nodes(), int_nodes(), BR());
+  for(int i=ext_nodes()+int_nodes(); i>net_nodes();){
+    --i;
+    trace3("VA_BREQN::expand alloc1", long_label(), i, n_(i).n_());
+    trace1("VA_BREQN::expand alloc2", _sim->_model_nodes);
+    n_(i).allocate(2);
+    trace1("VA_BREQN::expand alloc2b", _sim->_model_nodes);
+  }
 }
 /*--------------------------------------------------------------------------*/
 void VA_BREQN::tr_iwant_matrix_extended_branch()
@@ -315,7 +333,7 @@ void VA_BREQN::set_parameters(const std::string& Label, CARD *Owner,
   bool first_time = (net_nodes() == 0);
 
   set_label(Label);
-  trace3("VA_BREQN::set_parameters", long_label(), n_nodes, n_states);
+  trace3("VA_BREQN::set_parameters", short_label(), n_nodes, n_states);
   set_owner(Owner);
   set_value(Value);
   attach_common(Common);

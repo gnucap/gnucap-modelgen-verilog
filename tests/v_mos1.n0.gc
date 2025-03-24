@@ -4,6 +4,7 @@ attach ../vams/diode.so
 *options trace
 
 verilog
+ground \0 ;
 
 paramset nnn mosfet;
   parameter real l = 9.u;

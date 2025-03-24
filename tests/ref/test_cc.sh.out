@@ -731,21 +731,28 @@ namespace va {
 inline double PORT_FLOW(int i, BASE_SUBCKT const* m)
 {
   incomplete();
-  node_t n = m->n_(i);
+  node_t const& n = m->n_(i);
   double I(0.);
   assert(m->subckt());
   for(CARD const* c : *m->subckt()){
     auto e = dynamic_cast<ELEMENT const*>(c);
     if(!e){ untested();
-    }else if(e->n_(1) == e->n_(0)){ untested();
-    }else if(e->n_(0) == n){
+    }else if(e->n_(1).m_() == e->n_(0).m_()){ untested();
+    }else if(e->n_(0).m_() == n.m_()){
       I+= e->tr_amps();
-    }else if(e->n_(1) == n){
+    }else if(e->n_(1).m_() == n.m_()){
       I-= e->tr_amps();
     }else{ untested();
     }
   }
   return I;
+}
+/*--------------------------------------------------------------------------*/
+inline node_t& ground()
+{
+  assert(CARD_LIST::card_list.nodes());
+ // assert(CARD_LIST::card_list.nodes()->at(0).m_()==0);
+  return CARD_LIST::card_list.nodes()->at(0);
 }
 /*--------------------------------------------------------------------------*/
 }
@@ -782,6 +789,7 @@ inline double PORT_FLOW(int i, BASE_SUBCKT const* m)
 /*--------------------------------------------------------------------------*/
 #include <e_compon.h>
 #include <e_logic.h>
+#include <m_union.h>
 /*--------------------------------------------------------------------------*/
 class NATURE {
 public:
@@ -2068,14 +2076,17 @@ void MOD_resistor::expand()
   }
 
   node_t gnd;
-  gnd.set_to_ground(this);
+  gnd.set_to_ground(nullptr);
+  if (_sim->is_first_expand()) {
+    for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
+      n_(i).clear();
+    }
   // port p 1
   // port n 2
   // ground
-  n_(n_white_noise_1_p).set_to_ground(this);
+  n_(n_white_noise_1_p).set_to_ground(nullptr);
   // ground
-  n_(n_white_noise_1_n).set_to_ground(this);
-  if (_sim->is_first_expand()) {
+  n_(n_white_noise_1_n).set_to_ground(nullptr);
     precalc_first();
 
   // clone branches
@@ -2135,6 +2146,8 @@ void MOD_resistor::expand()
   //precalc();
   subckt()->expand();
   //subckt()->precalc();
+  // alloc ground
+  // alloc ground
   assert(!is_constant());
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();
@@ -3601,14 +3614,17 @@ void MOD_resistor::expand()
   }
 
   node_t gnd;
-  gnd.set_to_ground(this);
+  gnd.set_to_ground(nullptr);
+  if (_sim->is_first_expand()) {
+    for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
+      n_(i).clear();
+    }
   // port p 1
   // port n 2
   // ground
-  n_(n_white_noise_0_p).set_to_ground(this);
+  n_(n_white_noise_0_p).set_to_ground(nullptr);
   // ground
-  n_(n_white_noise_0_n).set_to_ground(this);
-  if (_sim->is_first_expand()) {
+  n_(n_white_noise_0_n).set_to_ground(nullptr);
     precalc_first();
 
   // clone branches
@@ -3668,6 +3684,8 @@ void MOD_resistor::expand()
   //precalc();
   subckt()->expand();
   //subckt()->precalc();
+  // alloc ground
+  // alloc ground
   assert(!is_constant());
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();
@@ -4468,21 +4486,28 @@ namespace va {
 inline double PORT_FLOW(int i, BASE_SUBCKT const* m)
 {
   incomplete();
-  node_t n = m->n_(i);
+  node_t const& n = m->n_(i);
   double I(0.);
   assert(m->subckt());
   for(CARD const* c : *m->subckt()){
     auto e = dynamic_cast<ELEMENT const*>(c);
     if(!e){ untested();
-    }else if(e->n_(1) == e->n_(0)){ untested();
-    }else if(e->n_(0) == n){
+    }else if(e->n_(1).m_() == e->n_(0).m_()){ untested();
+    }else if(e->n_(0).m_() == n.m_()){
       I+= e->tr_amps();
-    }else if(e->n_(1) == n){
+    }else if(e->n_(1).m_() == n.m_()){
       I-= e->tr_amps();
     }else{ untested();
     }
   }
   return I;
+}
+/*--------------------------------------------------------------------------*/
+inline node_t& ground()
+{
+  assert(CARD_LIST::card_list.nodes());
+ // assert(CARD_LIST::card_list.nodes()->at(0).m_()==0);
+  return CARD_LIST::card_list.nodes()->at(0);
 }
 /*--------------------------------------------------------------------------*/
 }
@@ -4519,6 +4544,7 @@ inline double PORT_FLOW(int i, BASE_SUBCKT const* m)
 /*--------------------------------------------------------------------------*/
 #include <e_compon.h>
 #include <e_logic.h>
+#include <m_union.h>
 /*--------------------------------------------------------------------------*/
 class NATURE {
 public:
@@ -5504,14 +5530,17 @@ void MOD_capacitor::expand()
   }
 
   node_t gnd;
-  gnd.set_to_ground(this);
+  gnd.set_to_ground(nullptr);
+  if (_sim->is_first_expand()) {
+    for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
+      n_(i).clear();
+    }
   // port p 1
   // port n 2
   // ground
-  n_(n_ddt_1_p).set_to_ground(this);
+  n_(n_ddt_1_p).set_to_ground(nullptr);
   // ground
-  n_(n_ddt_1_n).set_to_ground(this);
-  if (_sim->is_first_expand()) {
+  n_(n_ddt_1_n).set_to_ground(nullptr);
     precalc_first();
 
   // clone branches
@@ -5571,6 +5600,8 @@ void MOD_capacitor::expand()
   //precalc();
   subckt()->expand();
   //subckt()->precalc();
+  // alloc ground
+  // alloc ground
   assert(!is_constant());
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();
@@ -6521,28 +6552,22 @@ void MOD_capacitor::expand()
   }
 
   node_t gnd;
-  gnd.set_to_ground(this);
+  gnd.set_to_ground(nullptr);
+  if (_sim->is_first_expand()) {
+    for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
+      n_(i).clear();
+    }
   // port p 1
   // port n 2
   // internal ddt_2_p : 3
   // node ddt_2_p 3
-    //assert(!(n_(n_ddt_2_p).n_()));
-    //BUG// this assert fails on a repeat elaboration after a change.
-    //not sure of consequences when new_model_node called twice.
-    if (!(n_(n_ddt_2_p).n_())) {
     if (_short_b_ddt_2()) {
       n_(n_ddt_2_p) = gnd;
     }else{
       n_(n_ddt_2_p).new_model_node("." + long_label() + ".ddt_2_p", this);
-      }
-    }else{
-    {
-       //_n[n_ddt_2_p].new_model_node("ddt_2_p." + long_label(), this);
     }
-  }
   // ground
-  n_(n_ddt_2_n).set_to_ground(this);
-  if (_sim->is_first_expand()) {
+  n_(n_ddt_2_n).set_to_ground(nullptr);
     precalc_first();
 
   // clone branches
@@ -6597,6 +6622,8 @@ void MOD_capacitor::expand()
   //precalc();
   subckt()->expand();
   //subckt()->precalc();
+  // alloc ground
+  n_(2).allocate(2);
   assert(!is_constant());
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();

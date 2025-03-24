@@ -42,6 +42,9 @@ protected: // override virtual
   void	   ac_load()override;
   COMPLEX  ac_involts()const override	{itested(); return NOT_VALID;}
   COMPLEX  ac_amps()const override	{itested(); return NOT_VALID;}
+  node_t& n_(int i)const override {
+    assert(_nN); assert(i>=0); assert(i<ext_nodes()); return _nN[i];
+  }
 
   bool has_iv_probe()const override { untested();return true;}
 
@@ -168,7 +171,7 @@ void VAFLOW::set_parameters(const std::string& Label, CARD *Owner,
   std::fill_n(_old_values, n_states, 0.);
   assert(n_nodes <= net_nodes());
   notstd::copy_n(nodes, n_nodes, _nN); // copy more in expand_last
-  assert(ext_nodes() == _n_ports * 2);
+  assert(ext_nodes() == _n_ports * 2); // c.f. e_ccsrc.h
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

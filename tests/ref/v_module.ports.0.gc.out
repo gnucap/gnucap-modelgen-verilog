@@ -4,10 +4,7 @@ module main(1 2);
             ^ ? invalid identifier
 module main(1 2); 
               ^ ? invalid identifier
-ports p (1 0); 
-         ^ ? invalid identifier
-ports p (1 0); 
-           ^ ? invalid identifier
+>>>>>ground \0 ; 
 >>>>>print dc v(nodes) 
 main.p: ports from top level
 main.p: 1 candidate found for ports

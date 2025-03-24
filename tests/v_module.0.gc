@@ -1,8 +1,8 @@
 
 module main(.\1 (\1 ), .b(\2 ));
-  // global \0 ;
+  ground \0 ;
   resistor #(1) r1(\1 , \2 );
-  resistor #(1) r1(\2 , \0 );
+  resistor #(1) r2(\2 , \0 );
   isource #(1) i1(\0 , \1 );
 endmodule
 

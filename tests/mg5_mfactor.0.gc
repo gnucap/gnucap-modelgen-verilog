@@ -4,6 +4,7 @@ load ./modelgen_0.so
 
 
 verilog
+ground \0 ;
 
 `modelgen
 module test_mfactor(p, n);
@@ -32,6 +33,7 @@ attach ./test_mfactor_.so
 parameter v=0
 
 module mm(a)
+ground \0 ;
 test_mfactor #(.$mfactor(2)) d(\1 ,\0 );
 endmodule
 

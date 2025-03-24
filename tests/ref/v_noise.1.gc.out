@@ -12,14 +12,7 @@ resistor #(1) r3(3, \0 );
                  ^ ? invalid identifier
 resistor #(1) r4(4, \0 ); 
                  ^ ? invalid identifier
-noise_probe noise1(1); 
-                   ^ ? invalid identifier
-noise_probe noise2(2); 
-                   ^ ? invalid identifier
-noise_probe noise3(3); 
-                   ^ ? invalid identifier
-noise_probe noise4(4); 
-                   ^ ? invalid identifier
+ground \0 ; 
 flicker_noise #(.$mfactor(2),.pwr(1)) fn1 (.p(\1 ),.n(\0 ));
 flicker_noise #(.$mfactor(1),.pwr(2)) fn2 (.p(\2 ),.n(\0 ));
 flicker_noise #(.$mfactor(1),.pwr(1)) fn3a (.p(\3 ),.n(\0 ));

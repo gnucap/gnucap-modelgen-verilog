@@ -62,7 +62,7 @@ protected: // override virtual
   int	   max_nodes()const override	{return net_nodes();}
   int	   ext_nodes()const override	{return _n_ports*2;}
   int	   min_nodes()const override	{return net_nodes();}
-  int	   matrix_nodes()const override	{return _n_ports*2;}
+  int	   matrix_nodes()const override	{ return ext_nodes() + int_nodes();}
   int	   net_nodes()const override	{return _n_ports*2 - int(_current_port_names.size());}
   CARD*	   clone()const override	{ untested();return new DEV_CPOLY_G(*this);}
   void	   tr_iwant_matrix()override	{ untested();tr_iwant_matrix_extended();}
@@ -77,7 +77,7 @@ protected: // override virtual
   COMPLEX  ac_involts()const override	{itested(); return NOT_VALID;}
   COMPLEX  ac_amps()const override	{itested(); return NOT_VALID;}
   node_t& n_(int i)const override {
-    assert(_nN); assert(i>=0); assert(i<matrix_nodes()); return _nN[i];
+    assert(_nN); assert(i>=0); assert(i<net_nodes()); return _nN[i];
   }
 
   bool has_iv_probe()const override { untested();return true;}
@@ -164,10 +164,11 @@ DEV_CPOLY_G::DEV_CPOLY_G()
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::expand_last()
 {
-  ELEMENT::expand_last();
+  // squeeze in current ports.
   for(int i=0; i<int(_current_port_names.size()); ++i){
     expand_current_port(i);
   }
+  ELEMENT::expand_last(); // internal nodes allocated here (kludge)
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::expand_current_port(int i)
@@ -190,7 +191,8 @@ void DEV_CPOLY_G::expand_current_port(int i)
   }else if (input->has_inode()) {untested();
     incomplete(); // wrong N1
     n_(IN1) = input->n_(IN1);
-    n_(IN2).set_to_ground(this);
+    n_(IN2).set_to_ground(nullptr);
+    assert(n_(IN2).n_() == &ground_node);
   }else if (input->has_iv_probe()) {
     int IN1 = ext_nodes() - 2*int(_current_port_names.size()) + 2*i;
     trace4("flow ecp", i, IN1, ext_nodes(), _current_port_names.size());
@@ -330,6 +332,7 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
       // allocate a bigger node list
       _nN = new node_t[net_nodes()];
     }else{ untested();
+      unreachable();
       // use the default node list, already set
     }      
   }else{ untested();

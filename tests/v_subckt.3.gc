@@ -5,6 +5,7 @@ module port_names (.A(A_),.B(B_));
 endmodule
 
 module main(AA);
+	ground \0 ;
 	port_names p(.A(AA), .B(\0 ));
 endmodule
 

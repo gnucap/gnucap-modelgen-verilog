@@ -117,7 +117,7 @@ protected:
   // override. the base class does not know about _parent.
   int set_port_by_name(std::string& name, std::string& ext_name)override;
   int		min_nodes()const override	{return 0;}
-  int		ext_nodes()const override	{ untested();return net_nodes();}
+  int		ext_nodes()const override	{return net_nodes();}
   int		matrix_nodes()const override	{ untested();return 0;}
 protected:
   int		net_nodes()const override	{return _net_nodes;}
@@ -481,15 +481,15 @@ CARD* INSTANCE::deflate()
     assert(c);
     int h = _parent->subckt()->nodes()->how_many();
     trace2("rewire", long_label(), h);
+#if 0
     for(int ii=0; ii<net_nodes(); ++ii){
       std::string nn = _n[ii].n_()->short_label();
       trace4("rewire", long_label(), ii, nn, c->n_(ii).n_()->short_label());
-      trace4("rewire", long_label(), ii, c->n_(ii).t_(), n_(ii).t_());
       trace4("rewire", long_label(), ii, c->n_(ii).e_(), n_(ii).e_());
     }
+#endif
     for(int ii=0; ii<net_nodes(); ++ii){
-      assert(c->n_(ii).t_() == n_(c->n_(ii).e_()-1).t_());
-      c->n_(ii) = n_(c->n_(ii).e_()-1);
+      c->n_(ii) = n_(c->n_(ii).e_());
     }
 
     assert(r->dev_type()!="");

@@ -8,7 +8,8 @@ module ports(a, b)
 endmodule
 
 module main(1 2);
-  ports p (1 0);
+  ground \0 ;
+  ports p (\1 , \0 );
 endmodule
 
 main #() m(\1 \2 );

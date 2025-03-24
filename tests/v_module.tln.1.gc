@@ -1,7 +1,9 @@
 
 verilog
+ground \0 ;
 
 module tln0(a, b);
+  ground \0 ;
   parameter integer length=0 from [1:1];
   parameter r;
   parameter c;
@@ -12,6 +14,7 @@ module tln0(a, b);
 endmodule
 
 module tln1(a, b);
+  ground \0 ;
   parameter real length=0 from [1:1000];
   parameter r;
   parameter c;

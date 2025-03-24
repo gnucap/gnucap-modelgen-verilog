@@ -721,21 +721,28 @@ namespace va {
 inline double PORT_FLOW(int i, BASE_SUBCKT const* m)
 {
   incomplete();
-  node_t n = m->n_(i);
+  node_t const& n = m->n_(i);
   double I(0.);
   assert(m->subckt());
   for(CARD const* c : *m->subckt()){
     auto e = dynamic_cast<ELEMENT const*>(c);
     if(!e){ untested();
-    }else if(e->n_(1) == e->n_(0)){ untested();
-    }else if(e->n_(0) == n){
+    }else if(e->n_(1).m_() == e->n_(0).m_()){ untested();
+    }else if(e->n_(0).m_() == n.m_()){
       I+= e->tr_amps();
-    }else if(e->n_(1) == n){
+    }else if(e->n_(1).m_() == n.m_()){
       I-= e->tr_amps();
     }else{ untested();
     }
   }
   return I;
+}
+/*--------------------------------------------------------------------------*/
+inline node_t& ground()
+{
+  assert(CARD_LIST::card_list.nodes());
+ // assert(CARD_LIST::card_list.nodes()->at(0).m_()==0);
+  return CARD_LIST::card_list.nodes()->at(0);
 }
 /*--------------------------------------------------------------------------*/
 }

@@ -3,8 +3,8 @@
 attach ./modelgen_0.so
 attach ./c_debug.so
 
-
 verilog
+ground \0 ;
 
 `modelgen
 module test_ind1(p, n)

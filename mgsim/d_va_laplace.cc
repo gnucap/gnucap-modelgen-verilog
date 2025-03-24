@@ -643,13 +643,6 @@ void LAPLACE::expand()
   _pivot = c->pivot();
   assert(_pivot >= 0);
   trace2("expand", dens, _pivot);
-  if(_pivot==0){
-  }else if(_pivot==1){
-  }else if(_pivot==2){
-  }else if(_pivot==3){ untested();
-  }else if(_pivot==4){ untested();
-  }else{ untested();
-  }
 
   int num_num = int(c->num_size());
   int num_s = std::max(dens, num_num);
@@ -658,6 +651,22 @@ void LAPLACE::expand()
     num_s = c->num_states();
   }else{
   }
+
+  auto nn = new node_t[net_nodes() + num_s];
+  notstd::copy_n(_nN, net_nodes(), nn);
+  delete[] _nN;
+  _nN = nn;
+
+  ELEMENT::expand();
+
+  if(_pivot==0){
+  }else if(_pivot==1){
+  }else if(_pivot==2){
+  }else if(_pivot==3){ untested();
+  }else if(_pivot==4){ untested();
+  }else{ untested();
+  }
+
   node_t gnd;
   gnd.set_to_ground(this);
 
@@ -665,7 +674,6 @@ void LAPLACE::expand()
   trace3("expand", short_label(), c->_p_den.size(), c->den_size());
   trace5("expand", short_label(), _pivot, num_num, num_s, c->is_rp());
 
-  ELEMENT::expand();
   assert(_nN);
   if (!subckt()) {
     new_subckt();
@@ -674,9 +682,6 @@ void LAPLACE::expand()
 
   _s_.resize(num_s);
 
-  auto nn = new node_t[net_nodes() + num_s];
-  notstd::copy_n(_nN, net_nodes(), nn);
-  _nN = nn;
   if(net_nodes()==4){
   }else{
   }
@@ -688,7 +693,8 @@ void LAPLACE::expand()
   }
 
   // node_t* _ni = _nN + 4;
-  for(int jj = 0; jj < num_s; ++jj) {
+  for(int jj = num_s; jj; ) {
+    --jj;
     if (!(state_node(jj).n_())) {
       state_node(jj).new_model_node("." + long_label() + ".s" + to_string(jj), this);
     }else{ untested();
@@ -920,6 +926,10 @@ void LAPLACE::expand()
   if(_set_parameters){
     // _output->_loss1 = _output->_loss0 = 1.;
   }else{
+  }
+
+  for(int i=ext_nodes()+int_nodes(); i>net_nodes();){
+    n_(--i).allocate(2);
   }
   // after precalc_last
 //  assert( c->_p_num.size());

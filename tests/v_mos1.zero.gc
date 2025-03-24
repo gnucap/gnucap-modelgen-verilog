@@ -1,4 +1,5 @@
 verilog
+ground \0 ;
 // nmos n gate, vds = 0
 attach ../vams/mosfet.so
 attach ../vams/diode.so

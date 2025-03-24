@@ -114,7 +114,7 @@ protected:
   double*  _vi0; // vector form of _i0; current, difference conductance
   double*  _vi1; // vector form of _i1
   COMPLEX _acout; // TODO: use _vi*?
-  int	   _n_ports;
+  int	   _n_ports{-1};
   double   _load_time{0.};
   std::vector<std::string> _current_port_names;
   std::vector<ELEMENT const*> _input;
@@ -616,7 +616,8 @@ bool DEV_IDT::do_tr()
   }else{
   }
 
-  trace2("idttramp", oldtramps, tr_amps());
+  trace4("idttramp", oldtramps, tr_amps(), n_(0).v0(), n_(1).v0());
+  trace4("idttramp", oldtramps, tr_amps(), n_(0).m_(), n_(1).m_());
   //_m0 = CPOLY1(0., _vi0[0], _vi0[1]);
 //  _vi0[0] = 0;
 //  _vi0[1] = 0;
@@ -776,10 +777,10 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
   trace4("set_parameters", n_nodes, net_nodes(), _n_ports, _vy0[1]);
   notstd::copy_n(nodes, n_nodes, _nN);
   assert(ext_nodes() == _n_ports * 2);
-  if(n_(0).n_() != n_(1).n_()){
+  if(n_(0).is_short_to(n_(1))){
+  }else{
     _vy0[1] = 1.; // mfactor hack.
     _vy1[1] = 1.; // mfactor hack.
-  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -839,7 +840,7 @@ void DEV_CPOLY_CAP::expand_current_port(int i)
   }else if (input->has_inode()) {untested();
     incomplete(); // wrong N1
     n_(IN1) = input->n_(IN1);
-    n_(IN2).set_to_ground(this);
+    n_(IN2).set_to_ground(nullptr);
   }else if (input->has_iv_probe()) {
     int IN1 = ext_nodes() - 2*int(_current_port_names.size()) + 2*i;
     trace4("flow ecp", i, IN1, ext_nodes(), _current_port_names.size());

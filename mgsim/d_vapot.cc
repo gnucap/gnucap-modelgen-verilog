@@ -46,6 +46,9 @@ protected: // override virtual
   void	   ac_load()override;
   COMPLEX  ac_involts()const override	{itested(); return NOT_VALID;}
   COMPLEX  ac_amps()const override	{itested(); return NOT_VALID;}
+  node_t& n_(int i)const override {
+    assert(_nN); assert(i>=0); assert(i<matrix_nodes()); return _nN[i];
+  }
 
   bool has_iv_probe()const override{ untested();return true;}
 public:

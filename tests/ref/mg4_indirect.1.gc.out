@@ -1,3 +1,4 @@
+ground \0 ; 
 parameter v = 1. 
 test_ind1 #() dut (.p(\1 ),.n(\2 ));
 resistor #(.r(10k)) r1 (.p(\1 ),.n(\2 ));
@@ -13,6 +14,7 @@ nodes: user=3, subckt=0, model=1, total=4
 dctran density=87.5%, ac density=87.5%
 name   ...
 have 4 nodes. model: 1 sckt: 0
+
 
 
 dut 2 2 0

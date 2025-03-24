@@ -471,7 +471,7 @@ void DELAY::expand()
       std::vector<node_t> nodes(2*_n_ports);
 
       node_t gnd;
-      gnd.set_to_ground(this);
+      gnd.set_to_ground(nullptr);
       nodes[0] = n_(input_idx());
       nodes[1] = gnd;
       for(int k=2; k<2*n_inputs + 2; ++k){

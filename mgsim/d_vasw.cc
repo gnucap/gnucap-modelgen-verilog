@@ -229,7 +229,7 @@ void VAPOT::set_parameters(const std::string& Label, CARD *Owner,
   bool first_time = (net_nodes() == 0);
 
   set_label(Label);
-  trace3("VAPOT::set_parameters", long_label(), n_nodes, n_states);
+  trace3("VAPOT::set_parameters", short_label(), n_nodes, n_states);
   set_owner(Owner);
   set_value(Value);
   attach_common(Common);

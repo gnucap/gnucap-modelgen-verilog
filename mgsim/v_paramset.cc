@@ -81,6 +81,7 @@ private:
 
   std::string value_name()const override{ untested();unreachable(); return "";}
   std::string port_name(int)const override;
+  int ext_nodes()const override {return net_nodes();}
   node_t& n_(int i)const override {
     assert(_n); assert(i>=0); assert(i<_node_capacity); return _n[i];
   }

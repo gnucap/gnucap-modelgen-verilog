@@ -35,11 +35,11 @@ main.R1: res from top level: res2
 main.R1: res from model_dispatcher
 main.R1: 2 candidates found for res
 m.R1 .. candidate: res1, params: 12
-m.R1 .. candidate: res2, params: 12
-m.R1 dropped invalid candidate: res2.
-m.R1 .. candidate: res1, params: 12
 m.R1 dropped invalid candidate: res1.
 m.R1 .. candidate: res2, params: 12
+m.R1 .. candidate: res1, params: 12
+m.R1 .. candidate: res2, params: 12
+m.R1 dropped invalid candidate: res2.
 >>>>>dc 
 #           v(1)       v(2)       v(4)      
  0.         0.         1.         2.        

@@ -607,16 +607,16 @@ void ZFILTER::expand()
   }else{ untested();
   }
 
-  if(!_ctrl_in) {
-//  }else if(linear_input){ untested();
-  }else if (!n_(input_idx()).n_()) {
-    trace1("expand nmn", input_idx());
-    n_(input_idx()).new_model_node(".input", this);
-  }else{ untested();
-    trace1("expand nmn alreay there?", input_idx());
-  }
-
   if (_sim->is_first_expand()) {
+    if(!_ctrl_in) {
+  //  }else if(linear_input){ untested();
+    }else if (!n_(input_idx()).n_()) {
+      trace1("expand nmn", input_idx());
+      n_(input_idx()).new_model_node(".input", this);
+    }else{ untested();
+      trace1("expand nmn alreay there?", input_idx());
+    }
+
     if(!_regs){
       _regs = new double [num_regs];
       trace3("expand", long_label(), c->_p_den.size(), _ctrl_in);
@@ -646,7 +646,7 @@ void ZFILTER::expand()
       std::vector<node_t> nodes(2*_n_ports);
 
       node_t gnd;
-      gnd.set_to_ground(this);
+      gnd.set_to_ground(nullptr);
       nodes[0] = n_(input_idx());
       nodes[1] = gnd;
       for(int k=2; k<2*n_inputs + 2; ++k){
@@ -664,8 +664,18 @@ void ZFILTER::expand()
   }else{ untested();
   }
 
-
+  assert(input_idx() < ext_nodes()+int_nodes());
   assert(!is_constant());
+
+#if 0
+  for(int i=ext_nodes()+int_nodes(); i>net_nodes(); ) {
+    n_(--i).allocate(2);
+  }
+#else
+  for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i) {
+    n_(i).allocate(2);
+  }
+#endif
 } //expand
 /*--------------------------------------------------------------------------*/
 void ZFILTER::precalc_last()

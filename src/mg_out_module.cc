@@ -164,6 +164,14 @@ static void make_tr_probe_num(std::ostream& o, const Module& m)
     }else{
     }
   }
+#ifdef DEBUG_PROBES
+  for(int i = 0; i<m.circuit()->nodes().size(); ++i){
+	o__ "if(n == \"NV0_" << i << "\"){\n";
+	o____ "return n_(" << i << ").v0();\n";
+	o__ "}\n";
+  }
+#endif
+
   o__ "if(n == \"conv\") {\n";
   o____ "return converged();\n";
   o__ "}\n";
@@ -794,7 +802,14 @@ static void make_module_class(std::ostream& o, Module const& m)
     "------------------------------------*/\n";
 } // make_module_class
 /*--------------------------------------------------------------------------*/
-static void make_module_allocate_local_node(std::ostream& o, const Node& p)
+static void make_module_clear_local_nodes(std::ostream& o)
+{
+  o____ "for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){\n";
+  o______ "n_(i).clear();\n";
+  o____ "}\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_module_new_local_node(std::ostream& o, const Node& p)
 {
   make_tag(o);
   o__ "// node " << p.name() << " " << p.number() << "\n";
@@ -807,11 +822,6 @@ static void make_module_allocate_local_node(std::ostream& o, const Node& p)
  //   //BUG// generates bad code if no short_to
  // }else
   {
-    o <<
-      "    //assert(!(n_(n_" << p.name() << ").n_()));\n"
-      "    //BUG// this assert fails on a repeat elaboration after a change.\n"
-      "    //not sure of consequences when new_model_node called twice.\n"
-      "    if (!(n_(n_" << p.name() << ").n_())) {\n";
     if(p.short_to()){
       assert(!p.short_if().empty());
       o____ "if (" << p.short_if() << ") {\n";
@@ -825,37 +835,27 @@ static void make_module_allocate_local_node(std::ostream& o, const Node& p)
     o << "{\n";
     o______ "n_(n_" << p.name() << ").new_model_node(\".\" + long_label() + \"." << p.name() 
 			   << "\", this);\n";
-    o______ "}\n";
-    o____ "}else{\n";
-
-      // "      if (" << p.short_if() << ") {\n"
-      // "        assert(_n[n_" << p.name() << "] == _n[n_" << p.short_to() << "]);\n"
-      // "      }else"
-    o____ "{\n";
-    o______ " //_n[n_" << p.name() << "].new_model_node(\"" << p.name()
-		 << ".\" + long_label(), this);\n";
     o____ "}\n";
-    o__ "}\n";
   }
 }
 /*--------------------------------------------------------------------------*/
-static void make_module_allocate_local_nodes(std::ostream& o, Module const& m)
+static void make_module_new_local_nodes(std::ostream& o, Module const& m)
 {
   for (int n=1; n<=int(m.circuit()->nodes().size()); ++n) {
     Node const* nn = m.circuit()->nodes()[n];
     assert(nn);
     if(nn->number() == 0) {
       o__ "// ground\n";
-      o__ "n_(n_" << nn->name() << ").set_to_ground(this);\n";
+      o__ "n_(n_" << nn->name() << ").set_to_ground(nullptr);\n";
     }else if(nn->number() < n){
     }else if(n <= int(m.circuit()->ports().size())){
       o__ "// port " << nn->name() << " " << nn->number() << "\n";
     }else if(nn->is_used()){
       o__ "// internal " << nn->name() << " : " << nn->number() << "\n";
-      make_module_allocate_local_node(o, *nn);
+      make_module_new_local_node(o, *nn);
     }else{
       o__ "// unused " << nn->name() << " : " << nn->number() << "\n";
-      o__ "n_(n_" << nn->name() << ").set_to_ground(this);\n"; // for now.
+      o__ "n_(n_" << nn->name() << ").set_to_ground(nullptr);\n"; // for now.
     }
   }
 
@@ -1063,8 +1063,10 @@ static void make_module_expand(std::ostream& o, Module const& m)
     "  }\n"
     "\n";
   o__ "node_t gnd;\n";
-  o__ "gnd.set_to_ground(this);\n";
-  make_module_allocate_local_nodes(o, m);
+  o__ "gnd.set_to_ground(nullptr);\n";
+  o__ "if (_sim->is_first_expand()) {\n";
+  make_module_clear_local_nodes(o);
+  make_module_new_local_nodes(o, m);
   if(m.circuit()->element_list().size()){
     o__ "assert(_parent);\n";
     o__ "assert(_parent->subckt());\n";
@@ -1078,7 +1080,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
     // o__ "c->_params.set_try_again(pl);\n";
   }else{
   }
-  o__ "if (_sim->is_first_expand()) {\n";
+  // o__ "if (_sim->is_first_expand()) {\n";
 
     if(m.circuit()->element_list().size()){
       make_renew_sckt(o, m);
@@ -1090,7 +1092,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
 //       p = d.circuit().opt_nodes().begin();
 //       p != d.circuit().opt_nodes().end();
 //       ++p) { untested();
-//    make_dev_allocate_local_nodes(out, **p);
+//    make_dev_new_local_nodes(out, **p);
 //  }
   o << "\n";
   o__ "// clone branches\n";
@@ -1142,6 +1144,22 @@ static void make_module_expand(std::ostream& o, Module const& m)
   // TODO: deflate
   o__ "subckt()->expand();\n";
   o__ "//subckt()->precalc();\n";
+
+  for (int n=int(m.circuit()->nodes().size()); n; --n) {
+    Node const* nn = m.circuit()->nodes()[n];
+    assert(nn);
+    int pos = nn->number();
+    if(pos == 0) {
+      o__ "// alloc ground\n";
+    //   o__ "n_(n_" << nn->name() << ").set_to_ground(nullptr);\n";
+    }else if(pos < n){
+    }else if(n <= int(m.circuit()->ports().size())){
+    }else{
+      o__ "n_("<<pos-1<<").allocate(2);\n";
+    }
+  }
+
+
   o__ "assert(!is_constant());\n";
   if (m.sync()) {
 //    o << "  subckt()->set_slave();\n";

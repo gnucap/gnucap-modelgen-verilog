@@ -1,7 +1,9 @@
 load ../vams/resistor.so
 verilog
+ground \0 ;
 
 module main(1,\2 , \3 , \4 )
+ground \0 ;
 resistor #(.r(1.), .$mfactor(1)) r0(\1 , \0 );
 resistor #(.r(1.), .noisy(1.)) r1(\2 ,\0 );
 

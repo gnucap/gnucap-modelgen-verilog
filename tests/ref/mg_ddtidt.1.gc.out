@@ -1,7 +1,5 @@
 *options method=euler 
 ^ ? *options: no match
-ground \0 ; 
-^ ? ground: no match
 #           v(1)       v(a)      
  0.        -1.0731n    0.        
 print tran v(nodes) d(d0) i(d0) d(d1) i(d1) st0(d0.*) v(d0.*) 
@@ -375,6 +373,7 @@ nodes: user=2, subckt=0, model=3, total=5
 dctran density=76.0%, ac density=76.0%
 name   ...
 have 5 nodes. model: 3 sckt: 0
+
 
 
 

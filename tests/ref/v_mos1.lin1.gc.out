@@ -40,6 +40,7 @@
  8.         8.         0.0099971  0.01      -2.9388u   
  9.         9.         0.0099966  0.01      -3.3805u   
  10.        10.        0.0099962  0.01      -3.8223u   
+ground \0 ; 
 .model cmosn mosfet ( $mfactor=NA( NA))
 .subckt dut ( d g s b )
 m1 ( d g s b )  cmosn  l=9.u w=9.u nrd=1. nrs=1.

@@ -12,5 +12,5 @@ invalid prototype for m.dut
 Gnucap   System status
 iterations: op=0, dc=0, tran=0, fourier=0, total=1
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=0, subckt=1, model=0, total=1
+nodes: user=0, subckt=0, model=0, total=0
 dctran density=0.0%, ac density=0.0%

@@ -20,6 +20,7 @@ endprimitive
 attach ./test_mybuf0.so
 
 module test(a, b);
+  ground \0 ;
   vpulse #(.val0(0) .val1(5) .width(.2) .period(.5)) v1(b, \0 );
   mybuf0 b(.out(a), .in1(b));
 endmodule
