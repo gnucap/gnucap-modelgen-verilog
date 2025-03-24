@@ -54,3 +54,46 @@ iterations: op=0, dc=0, tran=12, fourier=0, total=202
 transient timesteps: accepted=45, rejected=5, total=50
 nodes: user=2, subckt=0, model=3, total=5
 dctran density=76.0%, ac density=76.0%
+name   ...
+have 5 nodes. model: 3 sckt: 0
+
+d0 2 2 4
+0 5
+1 4
+2 3
+3 0
+4 2
+5 0
+ d0._b_p_n 4 4 0
+ 0 5
+ 1 4
+ 2 2
+ 3 0
+ d0._b_idt_0_p_idt_0_n 4 4 0
+ 0 3
+ 1 0
+ 2 5
+ 3 4
+ d0._b_ddt_1_p_ddt_1_n 4 4 0
+ 0 2
+ 1 0
+ 2 3
+ 3 0
+ra 2 2 0
+0 0
+1 4
+v1 2 2 2
+0 5
+1 0
+2 0
+3 1
+ v1._b_p_n 4 4 0
+ 0 5
+ 1 0
+ 2 0
+ 3 1
+ v1._b_acs_0_p_acs_0_n 2 2 0
+ 0 0
+ 1 1
+
+

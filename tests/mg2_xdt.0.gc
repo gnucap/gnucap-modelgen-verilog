@@ -1,4 +1,5 @@
 attach ./modelgen_0.so
+attach ./c_debug.so
 
 
 spice
@@ -43,4 +44,5 @@ print tran + i(dut._b_idt_0*)
 print tran + iter(0)
 tran 0 1 .1 trace=n
 status notime
+portdump
 end

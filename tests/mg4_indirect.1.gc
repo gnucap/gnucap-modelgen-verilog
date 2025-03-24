@@ -1,6 +1,7 @@
 
 
 attach ./modelgen_0.so
+attach ./c_debug.so
 
 
 verilog
@@ -21,8 +22,8 @@ attach ./test_ind1.so
 parameter v = 1.
 
 test_ind1 #() dut(\1 , \2 );
-resistor #(.r(10k)) r1(\1 ,2);
-resistor #(.r(1k)) r1(\3 ,2);
+resistor #(.r(10k)) r1(\1 , \2 );
+resistor #(.r(1k)) r1(\3 , \2 );
 
 list
 
@@ -35,3 +36,4 @@ v2 3 0 ac 1 dc 1
 .ac
 
 .status notime
+.portdump

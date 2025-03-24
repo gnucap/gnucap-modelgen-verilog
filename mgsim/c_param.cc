@@ -116,6 +116,7 @@ public:
       parse(cmd, pl, Scope);
       DEV_DOT* dd = new DEV_DOT();
       assert(dd);
+      dd->set_owner(nullptr);
       dd->set(cmd.fullstring());
       Scope->push_back(dd);
     }
