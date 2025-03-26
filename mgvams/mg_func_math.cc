@@ -255,7 +255,7 @@ public:
   ~abs() { }
   std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
     PARAMETER<double> x;
-    x.obsolete_parse(Cmd);
+    Cmd >> x;
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::abs(x));
   }

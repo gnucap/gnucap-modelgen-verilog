@@ -2084,6 +2084,7 @@ void MOD_resistor::expand()
     assert(scope());
     assert(scope()->nodes());
     NODE_MAP& nodes = *scope()->nodes();
+    (void)nodes;
 //port p 1
 //port n 2
     for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
@@ -3633,6 +3634,7 @@ void MOD_resistor::expand()
     assert(scope());
     assert(scope()->nodes());
     NODE_MAP& nodes = *scope()->nodes();
+    (void)nodes;
 //port p 1
 //port n 2
     for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
@@ -5560,6 +5562,7 @@ void MOD_capacitor::expand()
     assert(scope());
     assert(scope()->nodes());
     NODE_MAP& nodes = *scope()->nodes();
+    (void)nodes;
 //port p 1
 //port n 2
     for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
@@ -6593,6 +6596,7 @@ void MOD_capacitor::expand()
     assert(scope());
     assert(scope()->nodes());
     NODE_MAP& nodes = *scope()->nodes();
+    (void)nodes;
 //port p 1
 //port n 2
     for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){

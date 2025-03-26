@@ -534,7 +534,7 @@ public:
     return ret;
   }
 
-  void obsolete_parse(CS&) override { untested(); unreachable(); }
+  void parse(CS&) override { untested(); unreachable(); }
   PARA_BASE& operator=(const std::string&s) override{ _s = s; return *this;}
   PARA_BASE& operator=(Base const* v)override {
     delete _value;
