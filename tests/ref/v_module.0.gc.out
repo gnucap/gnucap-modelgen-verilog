@@ -1,5 +1,7 @@
 module main (.\1 (\1 ),.b(\2 ));
   ground \0 ; 
+  electrical \1 , \2 ; 
+  inout \1 , \2 ; 
   resistor #(1) r1 (\1 ,\2 );
   resistor #(1) r2 (\2 ,\0 );
   isource #(1) i1 (\0 ,\1 );
@@ -17,6 +19,8 @@ nodes: user=1, subckt=0, model=0, total=1
 dctran density=100.0%, ac density=100.0%
 module main (.\1 (\1 ),.b(\2 ));
   ground \0 ; 
+  electrical \1 , \2 ; 
+  inout \1 , \2 ; 
   resistor #(1) r1 (\1 ,\2 );
   resistor #(1) r2 (\2 ,\0 );
   isource #(1) i1 (\0 ,\1 );

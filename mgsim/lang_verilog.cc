@@ -478,6 +478,46 @@ private:
   void parse_range(CS& cmd, CARD_LIST* Scope, std::string Name)const;
 } module_param;
 /*--------------------------------------------------------------------------*/
+class CMD_NET_DECL : public CMD {
+public:
+  void do_it(CS& cmd, CARD_LIST* Scope)override {
+    assert(Scope);
+    assert(cmd.last_match().size()>2);
+    DEV_DOT* dot = new DEV_DOT();
+    dot->set(cmd.fullstring());
+    Scope->push_back(dot);
+    assert(Scope->nodes());
+    NODE_MAP& nm = *Scope->nodes();
+
+    std::string name;
+    while(cmd.more() && !(cmd >> ';')){
+      name = get_identifier(cmd, ",;");
+      trace2("net_decl", cmd.last_match(), name);
+      NODE* n = nm.new_node(name);
+      assert(n);
+      node_t& nn = n->n_(0);
+      (void) nn;
+      switch(cmd.last_match()[2]) {
+      case 'p': // inPut
+	// nn.set_input();
+	break;
+      case 't': // ouTput
+	// nn.set_output();
+	break;
+      case 'o': // inOut
+	// nn.set_output();
+	// nn.set_input();
+	break;
+      case 'e': // elEctrical
+      case 'r': // wiRe
+	// not yet.
+      default:
+	break;
+      }
+    }
+  }
+} net_decl;
+/*--------------------------------------------------------------------------*/
 // essentially PARAM_INSTANCE::PARAM_NONE, untyped parameter
 // but resolve to verilog types.
 class PARAM_ANY : public PARA_BASE {
@@ -529,7 +569,7 @@ public:
     //  return !v._value || !has_hard_value();
     //}
     if(ret){
-    }else{
+    }else{ untested();
     }
     return ret;
   }
@@ -620,7 +660,7 @@ void CMD_PARAM::parse(CS& cmd, CARD_LIST* Scope) const
   }
   size_t here = cmd.cursor();
   for (;;) {
-    if (!(cmd.more() && (cmd.is_alpha() || cmd.match1('_')))) {
+    if (!(cmd.more() && (cmd.is_alpha() || cmd.match1('_')))) { untested();
       break;
     }else{
     }
@@ -650,10 +690,10 @@ void CMD_PARAM::parse(CS& cmd, CARD_LIST* Scope) const
 
     if (cmd.stuck(&here)) { untested();
       break;
-    }else{
+    }else{ untested();
     }
   }
-  if(!cmd){
+  if(!cmd){ untested();
     cmd.warn(bDANGER, "syntax error");
   }else{
   }
@@ -773,7 +813,7 @@ void CMD_PARAM::parse_range(CS& cmd, CARD_LIST* Scope, std::string Name) const
       }
     } // from/exclude loop
 
-    if (cmd.stuck(&here)) {
+    if (cmd.stuck(&here)) { untested();
       incomplete();
       trace2("c_param stuck", cmd.tail(), range_expr);
       return;
@@ -821,7 +861,6 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
     size_t here = cmd.cursor();
     if (cmd >> "parameter ") {
       module_param.do_it(cmd, x->subckt());
-      trace1("done parameter", cmd.tail());
     }else if (cmd >> "//") {
       cmd.reset(here);
       // new__instance(cmd, x, x->subckt()); // BUG
@@ -894,6 +933,8 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
     }else if (cmd >> "ground ") {
       cmd.reset();
       new__instance(cmd, x, x->subckt());
+    }else if (cmd >> "wire|electrical|inout|input|output") {
+      net_decl.do_it(cmd, x->subckt());
     }else if (cmd >> "paramset ") {
       cmd.reset();
       cmd.check(bDANGER, "ERROR: This will not work. Need top level.");
@@ -972,7 +1013,7 @@ void LANG_VERILOG::print_attributes(OMSTREAM& o, tag_t x) const
     std::string s = attributes(x)->string(x);
     if(s.size()) {
       o << "(* " << s << " *) ";
-    }else{
+    }else{ untested();
     }
   }else{
   }
@@ -1159,7 +1200,7 @@ class MODULE_PROTO : public PARAMSET_MODEL {
   explicit MODULE_PROTO(MODULE_PROTO const& p)
     : PARAMSET_MODEL(p), _instanciated(p._instanciated) {untested(); }
 public:
-  explicit MODULE_PROTO() : PARAMSET_MODEL() { }
+  explicit MODULE_PROTO() : PARAMSET_MODEL() { untested(); }
   explicit MODULE_PROTO(COMPONENT* c)
     : PARAMSET_MODEL(c) { }
   ~MODULE_PROTO() { delete component_proto(); }
@@ -1178,29 +1219,29 @@ public:
     auto* cp = prechecked_cast<COMPONENT const*>(component_proto());
     assert(cp);
     if(1||_instanciated){
-    }else if(cp->is_valid()){
+    }else if(cp->is_valid()){ untested();
       auto i = CARD_LIST::card_list.begin();
-      while(i!=CARD_LIST::card_list.end() && *i !=this){
+      while(i!=CARD_LIST::card_list.end() && *i !=this){ untested();
 	++i;
       }
 
-      if(i==CARD_LIST::card_list.end()){
+      if(i==CARD_LIST::card_list.end()){ untested();
 	unreachable();
-      }else{
+      }else{ untested();
 	++i;
 	auto ii = clone_instance();
 	ii->set_owner(nullptr);
 	CARD_LIST::card_list.insert(i, ii);
       }
-    }else{
+    }else{ untested();
     }
   }
   void expand()override { }
   void precalc_last()override { }
-  CARD* deflate()override { incomplete(); return this;}
+  CARD* deflate()override { untested(); incomplete(); return this;}
 
 public:
-  char id_letter()const override{return 'X';}
+  char id_letter()const override{ untested();return 'X';}
 };
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_paramset(OMSTREAM& o, const MODEL_CARD* x)

@@ -711,7 +711,7 @@ void PARAMSET::expand()
 
     assert(subckt()->size()==1);
 
-    {untested();
+    {
       subckt()->expand();
     }
     if(dev->is_valid()){
