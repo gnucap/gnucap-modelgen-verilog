@@ -27,6 +27,9 @@
 #include <e_compon.h>
 #include <e_logic.h>
 #include <m_union.h>
+#include <e_node.h>
+/*--------------------------------------------------------------------------*/
+extern NODE ground_node;
 /*--------------------------------------------------------------------------*/
 class NATURE {
 public:
