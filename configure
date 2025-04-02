@@ -87,6 +87,12 @@ else
 	exit 1
 fi
 #----------------------------------------------------------------
+if [ -d .git ]; then
+	:
+elif [ -f $srcdir/NEWS ]; then
+	echo \* > .gitignore
+fi
+#----------------------------------------------------------------
 MAKE1_SUBDIRS=$(grep -m 1 SUBDIRS $srcdir/MakeList | sed 's/^.*= //g')
 SUBDIRS="${MAKE1_SUBDIRS}"
 #----------------------------------------------------------------
@@ -99,16 +105,6 @@ SUBDIRS="${MAKE1_SUBDIRS}"
 #----------------------------------------------------------------
 # LDFLAGS="-rdynamic"
 #------------------------------------------------------------------------
-cat <<CAT_EOF >Make.sys
-#------------------------------------------------------------------------
-CXX = g++
-TARGET_EXT =
-
-
-.SUFFIXES : .o .cc
-#------------------------------------------------------------------------
-CAT_EOF
-
 echo \# created by $PWD/$0. do not edit >MakeConf
 echo \#------------------------------------------------------------------------ >>MakeConf
 echo "CXX = c++" >>MakeConf
@@ -144,7 +140,7 @@ else
 	echo "GNUCAP_INCLUDEDIR = \${top_srcdir}/include" >> MakeConf
 	echo "INCLUDE = -I ../${srcdir}/src -I \${GNUCAP_INCLUDEDIR}" >> MakeConf
 fi
-
+#------------------------------------------------------------------------
 if [ "$preset" ]; then
 	echo "PRESET = ${preset}" >>MakeConf
 	echo "PRESET_CONF_FILE = \${GNUCAP_INCLUDEDIR}/MakeConf.\${PRESET}" >> MakeConf
@@ -152,9 +148,6 @@ if [ "$preset" ]; then
 else
 	: # not ready yet
 fi
-
-cat Make.sys >>MakeConf
-rm Make.sys
 #------------------------------------------------------------------------
 case $srcdir in
 	[\\/]* | ?:[\\/]*)
@@ -211,24 +204,9 @@ else
 fi
 #------------------------------------------------------------------------
 sub_configure() {
-	echo sub_configure $1
-	m="$1/Makefile"
-	if [ "$top_srcdir_" = ".." ]; then
-		srcdir_=".";
-	else
-		srcdir_="$top_srcdir_/$1";
-	fi
-	echo '#stub. need to run configure first' > $m
-	echo "srcdir = $srcdir_" >> $m
-	echo "prefix = $prefix" >> $m
-	echo '%: ; ${srcdir}/configure --prefix="${prefix}" --srcdir="${srcdir}" && ${MAKE} $@' >> $m
-	echo 'all: ; ${srcdir}/configure --prefix="${prefix}" --srcdir="${srcdir}" && ${MAKE}' >> $m
-	echo '.PHONY: all' >> $m
-}
-#------------------------------------------------------------------------
-sub_configure() {
 	m="$1/Makefile"
 	echo creating $m
+	rm -rf "$1/Make.depend"
 	if [ "$top_srcdir_" = ".." ]; then
 		srcdir_=".";
 	else
@@ -255,7 +233,7 @@ sub_configure() {
 #------------------------------------------------------------------------
 for i in ${SUBDIRS}; do
 	mkdir -p $i;
-	sub_configure $i;
+	sub_configure $i
 done
 #------------------------------------------------------------------------
 exit 0

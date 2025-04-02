@@ -93,7 +93,6 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 
   // lookup symbols
   for(List_Base<Token>::const_iterator ii = e.begin(); ii!=e.end(); ++ii) {
-    trace2("resolve in", (*ii)->name(), typeid(**ii).name());
     Token* t = *ii;
 
     auto symbol = dynamic_cast<Token_SYMBOL*>(t);

@@ -116,7 +116,7 @@ void Variable_Stmt::parse(CS& f)
   }else if(t=='i') {
     _type = Data_Type_Int();
   }else{ untested();
-    throw Exception_CS_("What type? " + t, f);
+    throw Exception_CS_("What type? " + to_string(t), f);
   }
 
 //  if( f >> "[" ){ untested();

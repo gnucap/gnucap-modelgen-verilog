@@ -314,7 +314,6 @@ class Probe;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class Named_Branch : public Branch {
-  size_t _num_states;
   Branch_Ref _br;
   std::string _name;
 public:

@@ -84,7 +84,6 @@ private:
 /*--------------------------------------------------------------------------*/
 class ACSTIM : public MGVAMS_FILTER {
   Module* _m{nullptr};
-  Token_CALL const* _token{nullptr};
   Probe const* _prb{nullptr};
   std::string _code_name;
 public: // HACK

@@ -109,7 +109,6 @@ private:
     }else if(subckt()){
       trace3("PARAMSET::param_count1", short_label(), BASE_SUBCKT::param_count(), subckt()->params()->size());
       return BASE_SUBCKT::param_count();
-      return subckt()->params()->size() + BASE_SUBCKT::param_count();
     }else{
       trace2("PARAMSET::param_count2", short_label(), BASE_SUBCKT::param_count());
       return BASE_SUBCKT::param_count();

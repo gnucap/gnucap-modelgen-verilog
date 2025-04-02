@@ -64,7 +64,7 @@ static bool is_literal(Token const* t, bool val)
     if(f->value() == NOT_VALID){ untested();
       return false;
     }else if(val){ untested();
-      return f->value();
+      return bool(f->value());
     }else{ untested();
       return f->value() == 0.;
     }
