@@ -6,7 +6,7 @@ noise_probe #(.name("B")) nB(1)
                              ^ ? invalid identifier
 noise_probe #(.name("F")) nF(1) 
                              ^ ? invalid identifier
-test_noise2 #() dut (.p(\1 ),.n(\\\0 ));
+test_noise2 #() dut (.p(\1 ),.n(\0 ));
 meas_noise #() nAll (.p(\1 ));
 meas_noise #(.name("A")) nA (.p(\1 ));
 meas_noise #(.name("B")) nB (.p(\1 ));
@@ -14,16 +14,12 @@ meas_noise #(.name("F")) nF (.p(\1 ));
 #          
  0.        
 #Freq       npwr(nAll) npwr(nA)   npwr(nB)   npwr(nF)  
-open circuit: internal node 2
- 1.         0.         0.         0.         0.        
-open circuit: internal node 2
- 2.         0.         0.         0.         0.        
-open circuit: internal node 2
- 4.         0.         0.         0.         0.        
-open circuit: internal node 2
- 8.         0.         0.         0.         0.        
+ 1.         8.         2.         1.         1.        
+ 2.         7.25       2.         1.         0.25      
+ 4.         7.0625     2.         1.         0.0625    
+ 8.         7.0156     2.         1.         0.015625  
 Gnucap   System status
 iterations: op=0, dc=3, tran=0, fourier=0, total=7
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=2, subckt=0, model=0, total=2
+nodes: user=1, subckt=0, model=0, total=1
 dctran density=100.0%, ac density=100.0%

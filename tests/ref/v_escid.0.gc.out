@@ -1,0 +1,14 @@
+resistor r5(1\\ , 2\\ ); 
+            ^ ? invalid identifier
+resistor r5(1\\ , 2\\ ); 
+                  ^ ? invalid identifier
+resistor #() r1 (.p(a),.n(b));
+resistor #() r2 (.p(\1 ),.n(\2 ));
+resistor #() r3 (.p(\\\1 ),.n(\2\\ ));
+resistor #() r4 (.p(\\\1\\2\\3 ),.n(\2\\\\\\ ));
+resistor #() r5 (.p(\1\\\\ ),.n(\2\\\\ ));
+r1 ( a b ) 
+r2 ( 1 2 ) 
+r3 ( \1 2\ ) 
+r4 ( \1\2\3 2\\\ ) 
+r5 ( 1\\ 2\\ ) 

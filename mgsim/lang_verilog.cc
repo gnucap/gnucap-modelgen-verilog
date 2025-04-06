@@ -253,27 +253,48 @@ void LANG_VERILOG::parse_label(CS& cmd, CARD* x)
   }
 }
 /*--------------------------------------------------------------------------*/
-// map to verilog representation
-std::string mangle(std::string const& name)
+void dump_identifier(OMSTREAM& o, std::string const& name)
 {
-  if(isdigit(name[0])) {
-    return '\\' + name + " ";
-  }else if(name[0] == '\\') {
-    return name + " ";
+  bool plain = true;
+
+  if(isalpha(name[0])){
+  }else if(name[0] == '$'){ untested();
+  }else if(name[0] == '_'){ untested();
   }else{
-    // ok, for now.
-    // probably need '\\' ... ' ' whenever special characters are used.
-    return name;
+    plain = false;
+  }
+
+  for(size_t i=1; plain && i<name.size(); ++i){
+    if(isalnum(name[i])){
+    }else if(name[i] == '_'){
+    }else{ untested();
+      plain = false;
+    }
+  }
+
+  if(plain){
+    o << name;
+  }else{
+    o << '\\';
+    for(size_t i=0; i<name.size(); ++i){
+      if(name[i] == '\\'){
+	o << '\\';
+      }else{
+      }
+      o << name[i];
+    }
+    o << ' ';
   }
 }
 /*--------------------------------------------------------------------------*/
 // get identifier and turn into internal representation
-// "\1 " -> "1"     -- so it also works with spice
-// "\a " -> "a"     -- identical, use simple form
-// "\$ " -> "\$"   -- not sure
-// "\a* " -> "\a*" -- keep escaped string
-// "\\\ " -> "\\\" -- keep escaped string
-std::string get_identifier(CS& cmd, std::string const& term)
+// "\1 " -> "1"         -- so it also works with spice
+// "\a " -> "a"         -- identical, use simple form
+// "\$ " -> "$"         -- not sure.
+// "\a* " -> "a*"       -- store unprotected
+// "\\\xyz " -> "\xyz"  -- remove additional escapes
+// "\foo\bar"           -- incomplete
+static std::string parse_identifier(CS& cmd, std::string const& term)
 {
   cmd.skipbl();
   std::string id;
@@ -283,31 +304,28 @@ std::string get_identifier(CS& cmd, std::string const& term)
   }else{
   }
 
-  if(cmd >> "\\") {
-    id = cmd.get_to(" \t\f");
-    trace1("got to", cmd.peek());
-    cmd.skip();
+  bool esc = cmd.skip1('\\');
 
-    {
-      bool plain = true;
-      for(size_t i = 0; plain && i<id.size() ; ++i) {
-	if (isalnum(id[i])) {
-	}else if (id[i] == '$') { untested();
-	  plain = false;
-	}else{
-	  plain = false;
-	}
+  while(esc && cmd.more()) {
+    if(cmd.skip1('\\')){
+      if(cmd.skip1('\\')){
+	id += "\\";
+      }else{ untested();
+	cmd.warn(bDANGER, "invalid escaped char");
       }
-
-      if(plain) {
-	// don't touch, for now.
-      }else{
-	// store escaped string.
-	id = "\\" + id;
-      }
+    }else{
     }
-  }else{
+    id += cmd.get_to(" \t\f\\");
+
+    if(cmd.skip1(" \t\f")){
+      break;
+    }else{
+    }
+  }
+
+  if(!esc) {
     id = cmd.ctos(term, "", "");
+  }else{
   }
 
   trace1("identifier", id);
@@ -325,9 +343,9 @@ void LANG_VERILOG::parse_ports(CS& cmd, COMPONENT* x, bool all_new)
     if (cmd.match1('.')) {
       // by name
       while (cmd >> '.') {
-	std::string Name = get_identifier(cmd, "(");
+	std::string Name = parse_identifier(cmd, "(");
 	int paren = cmd.skip1b('(');
-	std::string value = get_identifier(cmd, ")");
+	std::string value = parse_identifier(cmd, ")");
 	if (!paren){untested();
 	  //?
 	}else if( cmd.skip1b(')')) {
@@ -357,7 +375,7 @@ void LANG_VERILOG::parse_ports(CS& cmd, COMPONENT* x, bool all_new)
       int Index;
       for (Index = 0;  cmd.is_alnum() || cmd.peek() == '\\';  ++Index) {
 	try{
-	  std::string value = get_identifier(cmd, ",)");
+	  std::string value = parse_identifier(cmd, ",)");
 	  cmd >> ',';
 	  x->set_port_by_index(Index, value);
 	  store_attributes(attribs,  x->port_id_tag(Index));
@@ -491,7 +509,7 @@ public:
 
     std::string name;
     while(cmd.more() && !(cmd >> ';')){
-      name = get_identifier(cmd, ",;");
+      name = parse_identifier(cmd, ",;");
       trace2("net_decl", cmd.last_match(), name);
       NODE* n = nm.new_node(name);
       assert(n);
@@ -1114,9 +1132,13 @@ void LANG_VERILOG::print_ports_long(OMSTREAM& o, const COMPONENT* x)
     o << sep;
     print_attributes(o, x->port_id_tag(ii));
     if(!x->port_name(ii).size()){
-      o << mangle(x->port_value(ii));
+      dump_identifier(o, x->port_value(ii));
     }else{
-      o << '.' << mangle(x->port_name(ii)) << '(' << mangle(x->port_value(ii)) << ')';
+      o << '.';
+      dump_identifier(o, x->port_name(ii));
+      o << '(';
+      dump_identifier(o, x->port_value(ii));
+      o << ')';
     }
     sep = ',';
   }
