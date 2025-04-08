@@ -872,7 +872,6 @@ public:
     o____ "double t = std::tanh(d);\n";
     o____ "::set_value(d, t);\n";
     o____ "chain(d, 1. - t*t);\n";
-    o____ "assert(d.is_same(d));\n";
     o____ "return d;\n";
     o__ "}\n";
   }

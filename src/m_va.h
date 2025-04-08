@@ -143,6 +143,7 @@ public:
     double x = o;
     return *_data == x;
   }
+
   bool operator<(const ddouble_& o)const {
     return *_data < *o._data;
   }
@@ -165,6 +166,10 @@ public:
   bool operator<=(int const& o)const { itested();
     return *_data <= o;
   }
+  bool operator<=(PARAMETER<double> const& o)const { itested();
+    return *_data <= double(o);
+  }
+
   bool operator>(ddouble_ const& o)const {
     return *_data > *o._data;
   }
