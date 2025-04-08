@@ -5,6 +5,8 @@ resistor r2(\1 , \2 );
 resistor r3(\\\1 , \2\\ );
 resistor r4(\\\1\\2\\3 , \2\\\\\\ );
 resistor r5(1\\ , 2\\ );
+resistor \r6 (a, b);
+resistor \\\r7 (a, b);
 
 list
 

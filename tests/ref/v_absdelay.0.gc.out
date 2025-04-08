@@ -4,9 +4,9 @@ va_delay #() b0 (.out0(\0 ),.out1(\1 ),.in0(in),.in1(\0 ));
 va_delay #() b0 (.out0(\0 ),.out1(\2 ),.in0(in),.in1(\0 ));
 va_delay #() b0 (.out0(\0 ),.out1(\3 ),.in0(in),.in1(\0 ));
 vsine #(.freq(1),.ampl(1)) v1 (.p(in),.n(\0 ));
-resistor #(.r(1)) r\1 (.p(\1 ),.n(\0 ));
-resistor #(.r(1)) r\1 (.p(\2 ),.n(\0 ));
-resistor #(.r(1)) r\1 (.p(\3 ),.n(\0 ));
+resistor #(.r(1)) \r\\1  (.p(\1 ),.n(\0 ));
+resistor #(.r(1)) \r\\1  (.p(\2 ),.n(\0 ));
+resistor #(.r(1)) \r\\1  (.p(\3 ),.n(\0 ));
 #Time       v(1)       v(2)       v(3)       v(in)     
  0.         0.         0.         0.         0.        
  0.01       0.         0.         0.         0.062791  
@@ -30,9 +30,9 @@ va_delay #() b0 (.out0(\0 ),.out1(\1 ),.in0(in),.in1(\0 ));
 va_delay #() b0 (.out0(\0 ),.out1(\2 ),.in0(in),.in1(\0 ));
 va_delay #() b0 (.out0(\0 ),.out1(\3 ),.in0(in),.in1(\0 ));
 vsine #(.freq(1),.ampl(1)) v1 (.p(in),.n(\0 ));
-resistor #(.r(1)) r\1 (.p(\1 ),.n(\0 ));
-resistor #(.r(1)) r\1 (.p(\2 ),.n(\0 ));
-resistor #(.r(1)) r\1 (.p(\3 ),.n(\0 ));
+resistor #(.r(1)) \r\\1  (.p(\1 ),.n(\0 ));
+resistor #(.r(1)) \r\\1  (.p(\2 ),.n(\0 ));
+resistor #(.r(1)) \r\\1  (.p(\3 ),.n(\0 ));
 Gnucap   System status
 iterations: op=0, dc=0, tran=36, fourier=0, total=53
 transient timesteps: accepted=12, rejected=0, total=12

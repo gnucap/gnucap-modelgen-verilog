@@ -118,6 +118,8 @@ DISPATCHER<LANGUAGE>::INSTALL
 	d(&language_dispatcher, lang_verilog.name(), &lang_verilog);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+static std::string parse_identifier(CS& cmd, std::string const& term);
+/*--------------------------------------------------------------------------*/
 std::string LANG_VERILOG::parse_attributes(CS& cmd)
 {
   std::string attrib_string = "";
@@ -152,8 +154,7 @@ CS& LANG_VERILOG::parse_attributes(CS& cmd, tag_t x)
 void LANG_VERILOG::parse_type(CS& cmd, CARD* x)
 {
   assert(x);
-  std::string new_type;
-  cmd >> new_type;
+  std::string new_type = parse_identifier(cmd, ",=(){};");
   x->set_dev_type(new_type);
 }
 /*--------------------------------------------------------------------------*/
@@ -244,10 +245,10 @@ void LANG_VERILOG::parse_args_instance(CS& cmd, CARD* x)
 void LANG_VERILOG::parse_label(CS& cmd, CARD* x)
 {
   assert(x);
-  std::string my_name;
-  if (cmd >> my_name) {
+  std::string my_name = parse_identifier(cmd, ",=(){};");
+  if (cmd) {
     x->set_label(my_name);
-  }else{
+  }else{ untested();
     x->set_label(x->id_letter() + std::string("_unnamed")); //BUG// not unique
     cmd.warn(bDANGER, "label required");
   }
@@ -1112,13 +1113,13 @@ void LANG_VERILOG::print_args(OMSTREAM& o, const COMPONENT* x)
 void LANG_VERILOG::print_type(OMSTREAM& o, const COMPONENT* x)
 {
   assert(x);
-  o << x->dev_type();
+  dump_identifier(o, x->dev_type());
 }
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_label(OMSTREAM& o, const COMPONENT* x)
 {
   assert(x);
-  o << x->short_label();
+  dump_identifier(o, x->short_label());
 }
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_ports_long(OMSTREAM& o, const COMPONENT* x)
