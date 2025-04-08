@@ -69,13 +69,16 @@ public:
 class Statement : public Owned_Base {
   RDeps _rdeps;
 protected:
+public: //BUG, mg_base.h: 315
   explicit Statement() : Owned_Base() {}
 public:
   virtual Statement* deep_copy(Base*)const // = 0;?
     { untested();unreachable();return nullptr;}
   virtual bool propagate_rdeps(RDeps const&);
   /*virtual?*/ bool propagate_rdep(Base const*);
-  virtual bool update() = 0;
+  virtual bool update(){
+    trace2("Statement::update nop", typeid(*this).name(), _rdeps.size());
+    return false; }
 //  virtual Statement* parent_stmt();
   // Block* scope() { return Owned_Base::owner(); }
   // Block const* scope() const { return Owned_Base::owner(); }
@@ -88,6 +91,10 @@ public:
       return nullptr;
     }
   }
+
+public:
+  void parse(CS&)override {unreachable();};
+  void dump(std::ostream&)const override{unreachable();}
 
 public:
   virtual RDeps const& rdeps()const { return _rdeps; }

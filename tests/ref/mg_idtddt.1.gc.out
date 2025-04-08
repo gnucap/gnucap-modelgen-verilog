@@ -6,7 +6,6 @@ open circuit: internal node 5
  10.        0.         0.         0.         0.        
 @precalc:qgs 0
 #           v(1)       v(2)       qgs(d)    
-@tr_begin:qgs 0
 @tr_eval:qgs 1e-12
 @tr_eval:qgs 1e-12
 @tr_eval:qgs 1e-12
@@ -22,7 +21,6 @@ open circuit: internal node 5
  10.        1.         0.99803   -35.858u   -3.5953    
 @precalc:qgs 0
 #Time       v(1)       v(2)       qgs(d)    
-@tr_begin:qgs 0
 @tr_eval:qgs 1e-12
 @tr_eval:qgs 1e-12
 @tr_accept:qgs 0

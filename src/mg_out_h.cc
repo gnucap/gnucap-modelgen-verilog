@@ -237,10 +237,12 @@ static void make_module_variable_decl(std::ostream& o, Module const& m)
     indent x;
     make_variable_collection(o, P);
 
-    for(auto a : analog(m).list()){
-      assert(a);
-      assert(a->block());
-      make_variable_decl(o, *a->block());
+    for(auto s : analog(m).list()){
+      if(auto a = dynamic_cast<AnalogConstruct const*>(s)){
+	assert(a->block());
+	make_variable_decl(o, *a->block());
+      }else{
+      }
     }
   }
   o__ "}_v_;\n";

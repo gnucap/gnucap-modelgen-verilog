@@ -248,7 +248,7 @@ void LANG_VERILOG::parse_label(CS& cmd, CARD* x)
   std::string my_name = parse_identifier(cmd, ",=(){};");
   if (cmd) {
     x->set_label(my_name);
-  }else{ untested();
+  }else{
     x->set_label(x->id_letter() + std::string("_unnamed")); //BUG// not unique
     cmd.warn(bDANGER, "label required");
   }
@@ -268,7 +268,7 @@ void dump_identifier(OMSTREAM& o, std::string const& name)
   for(size_t i=1; plain && i<name.size(); ++i){
     if(isalnum(name[i])){
     }else if(name[i] == '_'){
-    }else{ untested();
+    }else{
       plain = false;
     }
   }

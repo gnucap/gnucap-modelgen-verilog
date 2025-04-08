@@ -5,7 +5,7 @@ vsine #(.freq(1e6),.ampl(2),.samples(9)) vin (.p(\1 ),.n(\0 ));
  0.         0.         3.        
 #Time       v(1)       iter(0)   
  0.         0.         2.        
- 2.E-12     25.133E-6  3.        
+ 2.E-12     25.133E-6  6.        
  4.E-12     50.265E-6  3.        
  111.11E-9  1.2856     3.        
  129.64E-9  1.4549     3.        
@@ -55,7 +55,7 @@ zero cross dbg 1e-06 2.61934e-14
 zero cross     1e-06 2.61934e-14
  1.E-6      26.E-15    3.        
 Gnucap   System status
-iterations: op=0, dc=3, tran=147, fourier=0, total=204
-transient timesteps: accepted=38, rejected=16, total=54
+iterations: op=0, dc=3, tran=150, fourier=0, total=208
+transient timesteps: accepted=38, rejected=17, total=55
 nodes: user=1, subckt=0, model=1, total=2
 dctran density=100.0%, ac density=100.0%

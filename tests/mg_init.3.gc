@@ -1,0 +1,33 @@
+
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+attach ./d_reject.so
+
+verilog
+
+`modelgen
+module test_init3();
+	(*desc="t1"*) real t1;
+
+	analog initial begin
+		t1 = 2;
+		$strobe("init");
+	end
+endmodule
+
+list
+
+!make test_init3.so > /dev/null
+attach ./test_init3.so
+
+test_init3 #() dut0();
+reject #(.time(2)) r();
+
+list
+
+print tran t1(dut0)
+tran 1 basic
+
+status notime
+end

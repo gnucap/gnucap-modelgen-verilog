@@ -452,7 +452,11 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
     make_evt(o, *ev);
     //throw Exception("analogevtctl unsupported");
   }else if(auto is=dynamic_cast<AnalogInitialStmt const*>(&ab)) {
-    make_initial(o, *is);
+    if(is_tr_begin()){
+      make_initial(o, *is);
+    }else{
+      o__ "// omit initial\n";
+    }
   }else if(auto ct = dynamic_cast<AnalogCtrlStmt const*>(&ab)){
     make_ctrl(o, ct->body());
   }else if(auto t=dynamic_cast<System_Task const*>(&ab)) {
@@ -828,9 +832,14 @@ void OUT_ANALOG::make_seq_block(std::ostream& o, AnalogSeqBlock const& s) const
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_construct(std::ostream& o, AnalogConstruct const& ab) const
 {
+  if(is_tr_begin()){
+  }else{
+  }
+
   if(_src && !ab.is_used_in(_src)){ untested();
     o << "// omit construct...\n";
   }else if(ab.block_or_null()){
+    o << "// construct block...\n";
     make_block(o, *ab.block_or_null());
   }else{ untested();
     unreachable();
@@ -1200,7 +1209,11 @@ static void make_cc_ac_begin(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_analog_list(std::ostream& o, const Module& m) const
 {
-  if(is_precalc()){
+  if(is_tr_begin()){
+    o__ "//initial analog list\n";
+    o__ "MOD_" << m.identifier() << " const* p = m;\n";
+    o__ "MOD_" << m.identifier() << "* d = m;\n";
+  }else if(is_precalc()){
     o__ "MOD_" << m.identifier() << " const* p = m;\n";
     o__ "MOD_" << m.identifier() << "* d = m;\n";
   }else if(is_dynamic()){
@@ -1217,17 +1230,18 @@ void OUT_ANALOG::make_analog_list(std::ostream& o, const Module& m) const
 
   for(auto const& bb : analog_list(m)){
     assert(bb);
-    if(dynamic_cast<AnalogStmt const*>(bb)){ untested();
-    }else{
-    }
-    if(_src){
-    }else{
-    }
-    trace1("analoglist", bb->is_used_in(nullptr));
-    if(_src && !bb->is_used_in(_src)){ untested();
+    if(_src && !bb->is_used_in(_src)){
       o__ "// omit2 " << typeid(*bb).name() << "\n";
+    }else if(auto in = dynamic_cast<AnalogInitialStmt const*>(bb)){
+      o__ "// AnalogInitialStmt\n";
+      if(is_tr_begin()){
+	make_stmt(o, *in);
+      }else{
+      }
+    }else if(is_tr_begin()){
+      o__ "// is_tr_begin\n";
     }else if(auto ab = dynamic_cast<AnalogConstruct const*>(bb)){
-      o__ "{ //\n";
+      o__ "{ // AnalogConstruct\n";
       {
 	indent a;
 	make_construct(o, *ab);
@@ -1290,6 +1304,10 @@ static void make_cc_common_tr(std::ostream& o, const Module& m, OUT_ANALOG::mode
 
   oo.make_load_variables(o, m);
   oo.make_analog_list(o, m);
+  if(oo.is_tr_begin()) {
+    o__ "m->_v_1 = m->_v_;\n";
+  }else{
+  }
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -1395,18 +1413,22 @@ void make_cc_analog(std::ostream& o, const Module& m)
   if(m.has_tr_begin_analog()){
     make_cc_common_tr(o, m, OUT_ANALOG::modeTR_BEGIN, &tr_begin_tag);
   }else{
+    o__ "// !has_tr_begin_analog\n";
   }
   if(m.has_tr_restore_analog()){
     make_cc_common_tr(o, m, OUT_ANALOG::modeTR_RESTORE, &tr_restore_tag);
   }else{
+    o__ "// !has_tr_restore_analog\n";
   }
   if(m.has_tr_review()){
     make_cc_common_tr_review(o, m);
   }else{
+    o__ "// !has_tr_review\n";
   }
   if(m.has_tr_accept()){
     make_cc_common_tr_accept(o, m);
   }else{
+    o__ "// !has_tr_accept\n";
   }
   if(m.has_tr_advance()){
     make_cc_common_tr_advance(o, m);

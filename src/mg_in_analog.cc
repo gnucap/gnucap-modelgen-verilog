@@ -367,7 +367,7 @@ static Base* parse_analog_stmt_or_null(CS& file, Block* scope)
     || ((file >> "while ") && (ret = new AnalogWhileStmt(file, scope)))
     || ((file >> "for ") && (ret = new AnalogForStmt(file, scope)))
     || ((file >> "@ ") && (ret = new_evt_ctl_stmt(file, scope)))
-    || ((file >> "initial ") && (ret = parse_initial(file, scope)))
+   // || ((file >> "initial ") && (ret = parse_initial(file, scope)))
     || (ret = parse_assignment(file, scope))
     || (ret = parse_system_task(file, scope))
     || (ret = parse_contribution(file, scope))
@@ -1038,7 +1038,6 @@ void AnalogCtrlBlock::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 void AnalogConstruct::dump(std::ostream& o)const
 {
-  o__ "analog ";
   Base* b = _block;
   b->dump(o);
 }
@@ -2540,6 +2539,7 @@ void Analog::dump(std::ostream& o) const
   }
 
   for(auto const& i: blocks()){
+    o__ "analog ";
     o << *i << "\n";
   }
 }
@@ -2608,6 +2608,8 @@ void Analog::push_back(Base* ab)
 {
   if(auto c = dynamic_cast<AnalogConstruct*>(ab)){
     _list.push_back(c);
+  }else if(auto i = dynamic_cast<AnalogInitialStmt*>(ab)){
+    _list.push_back(i);
   }else{ untested();
     unreachable();
   }
@@ -2618,6 +2620,10 @@ void Analog::parse(CS& f)
   if(f >> "function "){
     _functions.set_owner(owner());
     f >> _functions;
+  }else if(f >> "initial "){
+    AnalogInitialStmt* is = new AnalogInitialStmt(owner(), f);
+    is->set_owner(owner());
+    push_back(is);
   }else{
     AnalogConstruct* ab = new AnalogConstruct();
     // AnalogConstruct* ab = new AnalogConstruct(f, owner());

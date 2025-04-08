@@ -1459,7 +1459,8 @@ void EVAL__b_white_noise_1_p_white_noise_1_n_::tr_eval(ELEMENT* d)const
   COMMON_resistor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // : main
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -1542,7 +1543,8 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
   COMMON_resistor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // : main
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -1738,7 +1740,8 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
   COMMON_resistor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // : main
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -1859,7 +1862,8 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
   COMMON_resistor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // : main
     ddouble _v_dt(m->_v_._main._dt); // precalc 1068
     (void) _v_dt;
@@ -1899,6 +1903,10 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
   }
 }
 /*--------------------------------------------------------------------------*/
+  // !has_tr_begin_analog
+  // !has_tr_restore_analog
+  // !has_tr_review
+  // !has_tr_accept
 typedef MOD_resistor::ddouble ddouble;
 inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
 {
@@ -1912,7 +1920,8 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
   COMMON_resistor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // : main
     double& _v_dt(m->_v_._main._dt); // (1068)
     (void) _v_dt;
@@ -1962,7 +1971,8 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
   COMMON_resistor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // : main
     double& _v_dt(m->_v_._main._dt); // (1068)
     (void) _v_dt;
@@ -2750,7 +2760,8 @@ void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
   COMMON_resistor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // : main
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -2833,7 +2844,8 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
   COMMON_resistor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // : main
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -3080,7 +3092,8 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
   COMMON_resistor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // : main
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -3251,7 +3264,8 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
   COMMON_resistor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // : main
     ddouble _v_dt(m->_v_._main._dt); // precalc 1068
     (void) _v_dt;
@@ -3334,6 +3348,10 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
   }
 }
 /*--------------------------------------------------------------------------*/
+  // !has_tr_begin_analog
+  // !has_tr_restore_analog
+  // !has_tr_review
+  // !has_tr_accept
 typedef MOD_resistor::ddouble ddouble;
 inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
 {
@@ -3347,7 +3365,8 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
   COMMON_resistor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // : main
     double& _v_dt(m->_v_._main._dt); // (1068)
     (void) _v_dt;
@@ -3439,7 +3458,8 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
   COMMON_resistor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // : main
     double& _v_dt(m->_v_._main._dt); // (1068)
     (void) _v_dt;
@@ -5231,7 +5251,8 @@ void EVAL__b_ddt_1_p_ddt_1_n_::tr_eval(ELEMENT* d)const
   COMMON_capacitor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // anonymous block
 // omit Statement 21AnalogConditionalStmt
     }
@@ -5253,7 +5274,8 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
   COMMON_capacitor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // anonymous block
 // omit Statement 21AnalogConditionalStmt
     }
@@ -5313,7 +5335,8 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
   COMMON_capacitor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // anonymous block
       {
         { // anonymous block
@@ -5346,7 +5369,8 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
   COMMON_capacitor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // anonymous block
       {
         { // anonymous block
@@ -5364,6 +5388,8 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
   }
 }
 /*--------------------------------------------------------------------------*/
+  // !has_tr_begin_analog
+  // !has_tr_restore_analog
 typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_review_analog(MOD_capacitor* m) const
 {
@@ -5375,7 +5401,8 @@ inline void COMMON_capacitor::tr_review_analog(MOD_capacitor* m) const
   COMMON_capacitor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // anonymous block
 // omit Statement 21AnalogConditionalStmt
     }
@@ -5393,7 +5420,8 @@ inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
   COMMON_capacitor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // anonymous block
 // omit Statement 21AnalogConditionalStmt
     }
@@ -5411,7 +5439,8 @@ inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
   COMMON_capacitor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // anonymous block
 // omit Statement 21AnalogConditionalStmt
     }
@@ -5433,7 +5462,8 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
   COMMON_capacitor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // anonymous block
 // omit Statement 21AnalogConditionalStmt
     }
@@ -6208,7 +6238,8 @@ void EVAL__b_ddt_2_p_ddt_2_n_::tr_eval(ELEMENT* d)const
   COMMON_capacitor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // anonymous block
 // omit Statement 21AnalogConditionalStmt
     }
@@ -6230,7 +6261,8 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
   COMMON_capacitor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // anonymous block
 // omit Statement 21AnalogConditionalStmt
     }
@@ -6298,7 +6330,8 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
   COMMON_capacitor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // anonymous block
       {
         // F analysis args:0
@@ -6363,7 +6396,8 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
   COMMON_capacitor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // anonymous block
       {
         // F analysis args:0
@@ -6398,6 +6432,8 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
   }
 }
 /*--------------------------------------------------------------------------*/
+  // !has_tr_begin_analog
+  // !has_tr_restore_analog
 typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_review_analog(MOD_capacitor* m) const
 {
@@ -6409,7 +6445,8 @@ inline void COMMON_capacitor::tr_review_analog(MOD_capacitor* m) const
   COMMON_capacitor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // anonymous block
 // omit Statement 21AnalogConditionalStmt
     }
@@ -6427,7 +6464,8 @@ inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
   COMMON_capacitor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // anonymous block
 // omit Statement 21AnalogConditionalStmt
     }
@@ -6445,7 +6483,8 @@ inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
   COMMON_capacitor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // anonymous block
 // omit Statement 21AnalogConditionalStmt
     }
@@ -6467,7 +6506,8 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
   COMMON_capacitor const* pc = this;
   (void)pc;
   (void)d;
-  { //
+  { // AnalogConstruct
+// construct block...
     { // anonymous block
 // omit Statement 21AnalogConditionalStmt
     }

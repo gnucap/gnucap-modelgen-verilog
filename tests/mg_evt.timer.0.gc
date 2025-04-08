@@ -1,4 +1,5 @@
 
+*options trace
 attach ./modelgen_1.so
 attach ../vams/vsine.so
 attach ./d_reject.so

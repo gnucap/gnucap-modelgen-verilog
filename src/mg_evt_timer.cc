@@ -263,7 +263,7 @@ private:
     o______ "trace1(\"timer::tr_review\", _req_evt - _sim->_time0);\n";
     o______ "assert(  _req_evt == _sim->_time0 || fabs( _req_evt - _sim->_time0) > 1e-18); // both quantised\n";
     o______ "assert(is_q(_sim->_time0));\n";
-    o______ "assert(is_q(_req_evt));\n";
+    o______ "assert(is_q(_req_evt) || _sim->_time0 == 0);\n";
 
     o______ "if (_sim->_time0 < _req_evt && _req_evt != NEVER) {\n";
     o________ "trace3(\"timer::tr_review early\", _req_evt, _sim->_time0, next);\n";
@@ -313,7 +313,7 @@ private:
     o________ "}\n";
     o______ "}else{\n";
     o______ "}\n";
-    o______ "assert(is_q(_req_evt));\n";
+    o______ "assert(is_q(_req_evt) || _sim->_time0 == 0);\n";
     o______ "return true;\n";
     o____ "}\n";
     /*----------------------------------------------------------------------*/
@@ -368,7 +368,6 @@ private:
     /*----------------------------------------------------------------------*/
     o____ "bool tr_accept_static" << args() << " {\n";
     o______ "(void)tol;\n";
-    o______ "(void)en;\n"; // incomplete.
     o______ "if(delay){\n";
     o________ "_previous_evt = -NEVER;\n";
     o________ "_req_evt = delay;\n";
@@ -383,6 +382,7 @@ private:
     o______ "}else if(_req_evt > _sim->_time0) {\n";
     o________ "set_event(d, _req_evt, " << tol() << ");\n";
     o______ "}\n";
+    o______ "assert(is_q(_req_evt));\n";
     o______ "if(!delay) {\n";
     o________ "_previous_evt = 0.;\n";
     o______ "}else{\n";
@@ -390,7 +390,7 @@ private:
     o______ "trace6(\"timer::tr_accept done s\", _sim->_time0, _req_evt, _sim->_dtmin, _previous_evt, delay, _sim->analysis_is_static());\n";
     o______ "assert(is_q(_sim->_time0));\n";
     o______ "assert(is_q(_req_evt));\n";
-    o______ "return !delay;\n";
+    o______ "return !delay && en;\n";
     o____ "}\n";
     /*----------------------------------------------------------------------*/
     o____ "bool tr_accept" << args() << " {\n";
@@ -437,6 +437,7 @@ private:
     o______ "}else{\n";
     o________ "trace6(\"timer::tr_accept bogus?\", _sim->_time0, _req_evt, _previous_evt, ret, re, _sim->analysis_is_static());\n";
     o________ "assert(  _req_evt == _sim->_time0 || fabs( _req_evt - _sim->_time0) > 1e-18); // both quantised\n";
+    o________ "assert(is_q(_req_evt));\n";
     o______ "}\n";
 
     o______ "trace6(\"timer::tr_accept done " << label() << "\", "

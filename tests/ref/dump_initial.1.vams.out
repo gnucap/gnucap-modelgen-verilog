@@ -1,28 +1,22 @@
 module test();
   real T;
 
-  analog begin
-    initial begin
+  analog   initial begin
+    // T : 0
+    T = 1; // s1 r3
+  end
+
+  analog   initial begin // always
+    if ((T == 1)) begin
       // T : 0
-      T = 1; // s1 r3
+      T = 2; // s1 r3
     end
   end
 
-  analog begin
-    initial begin
-      if ((T == 1)) begin
-        // T : 0
-        T = 2; // s1 r3
-      end
-    end
-  end
-
-  analog begin // always
-    initial begin
-      if ((T == 2)) begin
-        // T : 0
-        T = 3; // s1 r3
-      end
+  analog   initial begin // always
+    if ((T == 2)) begin
+      // T : 0
+      T = 3; // s1 r3
     end
   end
 

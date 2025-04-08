@@ -10,11 +10,10 @@ module test();
 		if(T == 1) T = 2;
 	end
 
-	analog begin
+	analog
 		initial begin
 			if(T == 2) T = 3;
 		end
-	end
 endmodule
 
 

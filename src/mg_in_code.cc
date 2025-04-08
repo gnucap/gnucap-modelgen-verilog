@@ -31,17 +31,6 @@ bool Statement::set_used_in(Base const* b)
   return _rdeps.insert(b).second;
 }
 /*--------------------------------------------------------------------------*/
-bool Statement::update()
-{
-  trace2("Statement::update nop", typeid(*this).name(), _rdeps.size());
-//  if(dynamic_cast<Block*>(parent_stmt())){ untested();
-//    incomplete();
-//  }else{ untested();
-//    incomplete();
-//  }
-  return false;
-}
-/*--------------------------------------------------------------------------*/
 void Statement::set_rdeps(TData const& )
 { untested();
       unreachable(); // still

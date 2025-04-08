@@ -312,7 +312,7 @@ public:
 //  File const* file() const{ untested();untested(); return _file;}
   void parse(CS& file)override {
     size_t here = file.cursor();
-    T* m = new T;
+    T* m = new T; // BUG.
     m->set_owner(_owner);
     try{
       file >> *m;

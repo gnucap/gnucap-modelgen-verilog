@@ -1,0 +1,12 @@
+test_init3 #() dut0 ();
+reject #() r ();
+#Time       t1(dut0)  
+init
+ 0.         2.        
+ 0.01       2.        
+ 1.         2.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=6, fourier=0, total=9
+transient timesteps: accepted=3, rejected=0, total=3
+nodes: user=0, subckt=0, model=0, total=0
+dctran density=0.0%, ac density=0.0%
