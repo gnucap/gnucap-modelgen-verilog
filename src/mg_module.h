@@ -314,6 +314,40 @@ protected:
 };
 typedef Collection<Paramset> Paramset_List;
 /*--------------------------------------------------------------------------*/
+inline Module const* to_module(Block const* owner)
+{
+  while(true){
+    assert(owner);
+    if(auto m = dynamic_cast<Module const*>(owner)){
+      return m;
+    }else if(auto b = dynamic_cast<Block const*>(owner->owner())){ untested();
+      owner = b;
+    }else if(auto st = dynamic_cast<Statement const*>(owner->owner())){
+      owner = st->scope();
+    }else{ untested();
+      assert(false);
+      return nullptr;
+    }
+  }
+  unreachable();
+  return nullptr;
+}
+/*--------------------------------------------------------------------------*/
+inline Module* to_module(Block* owner)
+{
+  assert(owner);
+  while(true){
+    if(auto m = dynamic_cast<Module *>(owner)){
+      return m;
+    }else{
+    }
+    owner = owner->scope();
+    assert(owner);
+  }
+  unreachable();
+  return nullptr;
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

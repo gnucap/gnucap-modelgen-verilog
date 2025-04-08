@@ -1,0 +1,42 @@
+
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+attach ./d_reject.so
+
+verilog
+
+`modelgen
+module test_init2(n);
+	electrical n;
+	parameter real p = 0;
+	(*desc="t1"*) real t1;
+	(*desc="t2"*) real t2;
+
+	analog initial begin : bla
+		t1 = 2;
+	end
+	analog initial begin
+		if(t2 > 1) t1 = 17;
+	end
+	analog begin
+		t2 = p;
+		V(n) <+ t1;
+	end
+endmodule
+
+list
+
+!make test_init2.so > /dev/null
+attach ./test_init2.so
+
+test_init2 #(.p(42.)) dut0(p);
+reject #(.time(2)) r();
+
+list
+
+print tran v(p) t1(dut0) t2(dut0) iter(0) control(0)
+tran 1 basic
+
+status notime
+end

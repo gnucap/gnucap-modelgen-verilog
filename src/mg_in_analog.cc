@@ -25,6 +25,7 @@
 #include "mg_options.h"
 #include "mg_discipline.h"
 #include "mg_token.h"
+#include "mg_module.h"
 #include <e_cardlist.h> // TODO: really?
 #include <u_opt.h>
 #include "globals.h"
@@ -98,6 +99,7 @@ named or unnamed branch. The example below demonstrates the potential access fun
 to contribute to a branch and the flow and potential access functions being used to probe branches.
 Note V and I cannot be used as access functions because there are parameters called V and I declared in the
 module. */
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 static Base* parse_initial(CS& file, Block* o)
 {
@@ -399,6 +401,9 @@ static Base* parse_analog_stmt(CS& file, Block* owner)
 void AnalogInitialStmt::parse(CS& f)
 {
   assert(owner());
+  Module* m = to_module(owner());
+  assert(m);
+  m->set_tr_begin();
   _body.set_owner(this);
 
   if(f >> _body){
@@ -1676,25 +1681,6 @@ bool AnalogEvtCtlStmt::is_used_in(Base const* b)const
 /*--------------------------------------------------------------------------*/
 void make_cc_af(std::ostream& o, const Analog_Function& f); // BUG
 namespace{
-/*--------------------------------------------------------------------------*/
-static Module const* to_module(Block const* owner)
-{
-  while(true){
-    assert(owner);
-    if(auto m = dynamic_cast<Module const*>(owner)){
-      return m;
-    }else if(auto b = dynamic_cast<Block const*>(owner->owner())){ untested();
-      owner = b;
-    }else if(auto st = dynamic_cast<Statement const*>(owner->owner())){
-      owner = st->scope();
-    }else{ untested();
-      assert(false);
-      return nullptr;
-    }
-  }
-  unreachable();
-  return nullptr;
-}
 /*--------------------------------------------------------------------------*/
 class AF : public MGVAMS_FUNCTION {
   Analog_Function const* _af{nullptr};

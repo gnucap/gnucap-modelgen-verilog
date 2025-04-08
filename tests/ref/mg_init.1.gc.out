@@ -1,9 +1,9 @@
 test_init1 #(.p(42.)) dut0 ();
 reject #() r ();
 #Time       t1(dut0)   t2(dut0)   iter(0)    control(0)
- 0.         0.         42.        2.         1.        
- 0.01       0.         42.        2.         9.        
- 1.         0.         42.        2.         1.        
+ 0.         2.         42.        2.         1.        
+ 0.01       2.         42.        2.         9.        
+ 1.         2.         42.        2.         1.        
 Gnucap   System status
 iterations: op=0, dc=0, tran=6, fourier=0, total=9
 transient timesteps: accepted=3, rejected=0, total=3

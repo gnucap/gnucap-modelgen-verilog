@@ -710,22 +710,6 @@ void Token_FUNCTION::stack_op(Expression* e) const
   }
 } // Token_FUNCTION::stack_op
 /*--------------------------------------------------------------------------*/
-// BUG
-static Module* to_module(Block* owner)
-{
-  assert(owner);
-  while(true){
-    if(auto m = dynamic_cast<Module *>(owner)){
-      return m;
-    }else{
-    }
-    owner = owner->scope();
-    assert(owner);
-  }
-  unreachable();
-  return nullptr;
-}
-/*--------------------------------------------------------------------------*/
 size_t Token_ACCESS::num_deps() const
 { untested();
   if(auto t=dynamic_cast<TData const*>(data())){ untested();
