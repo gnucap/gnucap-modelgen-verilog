@@ -1222,25 +1222,6 @@ bool DigitalEvtCtlStmt::is_used_in(Base const* b)const
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
-static Module const* to_module(Block const* owner)
-{
-  while(true){
-    assert(owner);
-    if(auto m = dynamic_cast<Module const*>(owner)){
-      return m;
-    }else if(auto b = dynamic_cast<Block const*>(owner->owner())){ untested();
-      owner = b;
-    }else if(auto st = dynamic_cast<Statement const*>(owner->owner())){ untested();
-      owner = st->scope();
-    }else{ untested();
-      assert(false);
-      return nullptr;
-    }
-  }
-  unreachable();
-  return nullptr;
-}
-/*--------------------------------------------------------------------------*/
 } // namespace
 /*--------------------------------------------------------------------------*/
 bool DigitalEvtExpression::is_used_in(Base const* b)const

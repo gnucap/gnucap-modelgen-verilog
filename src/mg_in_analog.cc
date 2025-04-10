@@ -101,11 +101,6 @@ Note V and I cannot be used as access functions because there are parameters cal
 module. */
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-static Base* parse_initial(CS& file, Block* o)
-{
-  return new AnalogInitialStmt(o, file);
-}
-/*--------------------------------------------------------------------------*/
 static Base* parse_cond(CS& file, Block* o)
 {
   return new AnalogConditionalStmt(o, file);
