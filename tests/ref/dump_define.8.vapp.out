@@ -1,10 +1,12 @@
 
 
 
-module test() 
-begin analog 
-real var; 
-var  = 1; 
-end 
-endmodule 
 
+ "q"b "q"b "q" 
+
+ "qq"b "qq"b "qq" 
+
+ "qq\
+qq"b "qq\
+qq"b "qq\
+qq" 

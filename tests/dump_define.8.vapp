@@ -1,0 +1,10 @@
+
+`define A(a) a b a b a
+
+`A("q")
+
+`A(\
+"qq")
+
+`A("qq\
+qq")
