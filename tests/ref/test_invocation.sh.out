@@ -1,8 +1,16 @@
 
 
 
+
+
 module subanotherone();
 endmodule;
+
+
+
+
+
+
 
 
 
@@ -24,6 +32,7 @@ discipline electrical
   potential voltage;
   flow current;
 enddiscipline
+
 
 
 module conductor0 (p, n);

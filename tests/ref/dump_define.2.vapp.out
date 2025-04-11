@@ -1,10 +1,12 @@
 
 
 
+
+
+
+
 module aa
 parameter real b= 2 ;
-endmodule
-dump_define.2.vapp:1:
+endmoduledump_define.2.vapp:1:
 `define B 2
         ^ ? already defined: B 2
-

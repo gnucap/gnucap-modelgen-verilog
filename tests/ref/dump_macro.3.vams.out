@@ -7,15 +7,15 @@ endmodule
 
 
 
-:3:
+:6:
 module e(1,2);
          ^ ? invalid identifier
-:3:
+:6:
 module e(1,2);
            ^ ? invalid identifier
-:6:
+:11:
 module f(1,2);
          ^ ? invalid identifier
-:6:
+:11:
 module f(1,2);
            ^ ? invalid identifier

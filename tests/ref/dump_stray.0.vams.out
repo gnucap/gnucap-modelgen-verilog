@@ -9,7 +9,7 @@ endmodule
 
 
 
-:6:
+:7:
  end;
     ^ ? stray semicolon
 

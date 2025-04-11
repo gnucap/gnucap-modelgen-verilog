@@ -1,4 +1,3 @@
 ... lparam real bug = nonconst_wrong + 2;
 endmodule
-
                                         ^ ? not constant

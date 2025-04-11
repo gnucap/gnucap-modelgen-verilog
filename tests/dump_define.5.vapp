@@ -5,7 +5,8 @@ endmodule
 
 `A
 
-`define B(p, n) I(p,n) <+ V(p,n)
+`define B(p, n) I(p,n) <+ \
+V(p,n)
 `define C(X, Y) X = Y; \
 Y = 3 \
 // test

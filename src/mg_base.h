@@ -312,6 +312,7 @@ public:
 //  File const* file() const{ untested();untested(); return _file;}
   void parse(CS& file)override {
     size_t here = file.cursor();
+    trace2("parse0", here, file.fullstring());
     T* m = new T; // BUG.
     m->set_owner(_owner);
     try{
@@ -331,6 +332,7 @@ public:
       push_back(m);
       file.skip(0); // set _ok;
     }else{
+      trace2("parse1 stuck", here, file.fullstring());
       delete m;
       file.warn(bWARNING, "what's this??");
     }

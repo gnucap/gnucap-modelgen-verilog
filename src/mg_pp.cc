@@ -26,6 +26,14 @@
 #include <stack>
 #include <u_opt.h>
 /*--------------------------------------------------------------------------*/
+void getline_(CS& cmd)
+{
+  trace1("pp old line", cmd.fullstring());
+  cmd.getline("");
+  trace1("pp got line", cmd.fullstring());
+  // cmd.get_line("", false);
+}
+/*--------------------------------------------------------------------------*/
 class C_Comment : public Base {
 public:
   void parse(CS& f)override;
@@ -57,94 +65,14 @@ public:
 //   return _define_list;
 // }
 /*--------------------------------------------------------------------------*/
-// copied in from a_construct.
-static std::string getlines(FILE *fileptr);
-CS& CS::get_line(const std::string& prompt)
-{
-  ++_line_number;
-  if (is_file()) {
-    _cmd = getlines(_file);
-    _cnt = 0;
-    _length = _cmd.length();
-    _ok = true;
-  }else{untested();
-    assert(_file == stdin);
-    char cmdbuf[BUFLEN];
-    getcmd(prompt.c_str(), cmdbuf, BUFLEN);
-    _cmd = cmdbuf;
-    _cnt = 0;
-    _length = _cmd.length();
-    _ok = true;
-  }
-
-  if (OPT::listing) { untested();
-    IO::mstdout << "\"" << fullstring() << "\"\n";
-  }else{
-  }
-  return *this;
-}
-/*--------------------------------------------------------------------------*/
-static std::string getlines(FILE *fileptr)
-{
-  const bool spice_style_line_continuation = false; // arg? flag?
-  assert(fileptr);
-  const int buffer_size = BIGBUFLEN;
-  std::string s;
-
-  bool need_to_get_more = true;  // get another line (extend)
-  while (need_to_get_more) {
-    char buffer[buffer_size+1];
-    char* got_something = fgets(buffer, buffer_size, fileptr);
-    if (!got_something) { // probably end of file
-      need_to_get_more = false;
-      if (s == "") {
-	throw Exception_End_Of_Input("");
-      }else{
-      }
-    }else if(spice_style_line_continuation) { untested();
-      trim(buffer);
-      size_t count = strlen(buffer);
-      if (count && buffer[count-1] == '\\') { untested();
-	buffer[count-1] = '\0';
-      }else{ untested();
-	// look ahead at next line
-	//int c = fgetc(fileptr);
-	int c;
-	while (isspace(c = fgetc(fileptr))) { untested();
-	  // skip
-	}
-	if (c == '+') { untested();
-	  need_to_get_more = true;
-	}else if (c == '\n') {unreachable();
-	  need_to_get_more = true;
-	  ungetc(c,fileptr);
-	}else{ untested();
-	  need_to_get_more = false;
-	  ungetc(c,fileptr);
-	}
-      }
-    }else{
-      size_t count = strlen(buffer);
-      if (buffer[count-2] == '\\') {
-	assert(buffer[count-1] == '\n');
-	assert(buffer[count] == '\0');
-      }else{
-	need_to_get_more = false;
-      }
-      s += buffer;
-    }
-  }
-  trace1("getlines", s.substr(0, 30));
-  return s;
-}
 /*--------------------------------------------------------------------------*/
 static void append_to(CS& f, std::string& to, std::string until)
 {
 //  trace2("append_to", f.tail().substr(0,10), f.ns_more());
   if(!f.ns_more()) {
     try{
-//      to+="\n";
-      f.get_line("");
+      getline_(f);
+      to+="\n";
 //      trace2("got line", f.tail().substr(0,10), f.ns_more());
     }catch (Exception_End_Of_Input const&) {
       assert(!f.ns_more());
@@ -157,6 +85,7 @@ static void append_to(CS& f, std::string& to, std::string until)
   // }
 
   while (f.ns_more()) {
+    trace1("match1?", until);
     std::string chunk = f.get_to(until);
     to += chunk;
     if(f.match1(until)){
@@ -164,11 +93,12 @@ static void append_to(CS& f, std::string& to, std::string until)
       return;
     }else{
       trace3("no match", until, chunk, f.tail().substr(0,30));
-//      to += "\n"; // BUG? BUG1
       try{
-	f.get_line("");
+	getline_(f);
+	to += "\n";
 	trace2("got line2 ", f.tail().substr(0,10), f.ns_more());
-      }catch( Exception_End_Of_Input const&){
+      }catch( Exception_End_Of_Input const& x){
+//	to += "\n"; // BUG? BUG1
 	trace2("EOI", to.substr(0,20), chunk);
       }
     }
@@ -181,11 +111,11 @@ void C_Comment::parse(CS& file)
 //  size_t here = file.cursor();
   for (;;) {
     if(!file.skipto1('*')){ untested(); untested();
-      file.get_line("");
+      getline_(file);
     }else if (file >> "*/") {
       break;  // done with comment
     }else if (!file.ns_more()){
-      file.get_line("");
+      getline_(file);
     }else{
       file.skip();
     }
@@ -195,10 +125,10 @@ void C_Comment::parse(CS& file)
 void Cxx_Comment::parse(CS& file)
 {
   try{
-    file.get_line("");
+    getline_(file);
   }catch (Exception_End_Of_Input const&) {
     // comment ran to EOF
-    while(file.ns_more()){
+    while(file.ns_more()){ untested();
       file.skip();
     }
   }
@@ -239,7 +169,7 @@ void Skip_Block::parse(CS& file)
       ++nest;
     }else if (!file.more()) {
       try{
-	file.get_line("");
+	getline_(file);
       }catch (Exception_End_Of_Input const& e) {
 	file.warn(bDANGER, "unterminated conditional block");
 	throw e;
@@ -375,7 +305,7 @@ private:
 	  data += f.ctoc();
 	}else if(f.peek() == '\"'){
 	  data += f.ctoc();
-	}else if(f.peek() == '\n'){
+	}else if(f.peek() == '\n'){ untested();
 	  data += f.ctoc();
 	}else{
 	}
@@ -412,17 +342,24 @@ void Define::stash(std::string const& s, String_Arg_List const& args)
       _value_tpl += f.ctoc();
     }
   }
+  trace3("stash?", s, f.peek(), f.tail().substr(0,20));
   size_t ts = _value_tpl.size();
   if(!ts){
-  }else if(_value_tpl[ts-1] == '\n') {
+  }else if(_value_tpl[ts-1] == '\n') { untested();
     _value_tpl.resize(ts-1);
   }else{
+  }
+  trace3("stash done?", s, (bool)f, f.tail().substr(0,20));
+  if(!f.peek()){
+   // f.reset(f.cursor());
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
 void Define::parse(CS& f)
 {
   _name = get_identifier(f);
+  trace1("Define::parse", _name);
   String_Arg_List args;
   if(f.peek() == '('){
     f >> args;
@@ -435,16 +372,27 @@ void Define::parse(CS& f)
       _value_tpl += quoted_string.val_string();
       stash(f.get_to("\\/\n\""), args); // here?
     }else if (f >> "//") {
-      f.get_to("\n"); //  dummy_cxx_comment;
+     // f.get_to("\n"); //  dummy_cxx_comment;
+      while(f.ns_more()){
+	f.skip();
+      }
+      assert(f);
+      break;
     }else if (f >> "/*") /* C comment */ {
       f >> dummy_c_comment; //BUG// line count may be wrong
       stash(f.get_to("\\/\n"), args);
     }else if(f.match1('\\')) {
+      trace1("define parse \\", f.fullstring());
       f.skip();
-      if(f.match1('\n')) {
+      if(!f.ns_more()){
+	getline_(f);
+	std::string more = f.get_to("\\/\n");
+	trace1("define parse \\", more);
+	stash(more, args);
+      }else if(f.match1('\n')) { untested();
 	std::string more = f.get_to("\\/\n"); // BUG
 	stash("\n" + more, args);
-      }else{ untested();
+      }else{
 	std::string more = f.get_to("\\/\n"); // BUG
 	stash(more, args);
       }
@@ -453,12 +401,15 @@ void Define::parse(CS& f)
       f.skip();
       std::string more = f.get_to("\\/\n"); // BUG
       stash(more, args);
-    }else if(f.match1('\n')){
+    }else if(f.match1('\n')){ untested();
       stash("\n", args);
       f.skip();
       stash(f.get_to("\\/\n\""), args); // here?
+    }else{ untested();
+      incomplete();
     }
   }
+  trace3("done?", f.fullstring(), f.tail(), (bool)f);
 
   _num_args = args.size();
 } // Define::parse
@@ -526,6 +477,7 @@ std::string expand_macros(CS& file, Define_List const& d)
   return stripped_file;
 }
 /*--------------------------------------------------------------------------*/
+// BUG: use some kind of ctos && line cont
 void Raw_String_Arg::parse(CS& f)
 {
   int par = 0;
@@ -537,7 +489,15 @@ void Raw_String_Arg::parse(CS& f)
       quote = !quote;
       _s += f.ctoc();
     }else if(quote) {
-      _s += f.ctoc();
+      char c = f.ctoc();
+      _s += c;
+      if(f.ns_more()){ untested();
+      }else if(c=='\\'){ untested();
+	getline_(f);
+	_s+="\n";
+      }else{ untested();
+      }
+      trace1("rsa", _s);
     }else if(p == '(') {
       ++par;
       _s += f.ctoc();
@@ -551,9 +511,14 @@ void Raw_String_Arg::parse(CS& f)
     }else if(par) {
       _s += f.ctoc();
     }else if(p == '\\') {
+      incomplete();
       f.skip();
       p = f.peek();
-      if(p=='\n'){
+      if(!f.ns_more()){
+	getline_(f);
+	assert(f); // ??
+	break;
+      }else if(p=='\n'){ untested();
 //	f.skip();
       }else{ untested();
 	_s += '\\';
@@ -565,20 +530,87 @@ void Raw_String_Arg::parse(CS& f)
       _s += f.ctoc();
     }
   }
-  trace1("got rsa", _s);
+  trace3("got rsa", _s, _s.size(), (bool)f);
+  if(_s.size() && f>>',' && f.skip1('\\') && !f.ns_more()){
+    getline_(f);
+  }else{
+  }
+  if(_s.size()){
+    f.reset(f.cursor());
+  }else{ untested();
+    f.reset_fail(f.cursor());
+  }
+}
+/*--------------------------------------------------------------------------*/
+static bool parse_raw_args(CS& f, Raw_String_Arg_List& values, size_t max)
+{
+  // values.parse_n(f, max);
+		//
+  int paren = f.skip1b('(');
+  size_t here = f.cursor();
+  for (;;) {
+    if(f >> '\\' && !f.ns_more()){
+      f.getline("");
+      here = 0;
+      continue;
+    }else{
+    }
+    if (f.stuck(&here)) {
+      f.skipbl();
+      while(f >> '\\' && !f.ns_more()){ untested();
+	f.getline("");
+	here = 0;
+	f.skipbl();
+      }
+      paren -= f.skip1(')');
+      if (paren == 0) {
+	break;
+      }else{
+      }
+      Raw_String_Arg* p = new Raw_String_Arg;
+      p->set_owner(values.owner());
+      trace3("pr", f.fullstring(), f.tail(), here);
+      while(f >> '\\' && !f.ns_more()){ untested();
+	f.getline("");
+	here = 0;
+      }
+      trace3("pr1", f.fullstring(), f.tail(), here);
+      f >> *p;
+      trace3("pr1b", f.fullstring(), f.tail(), (bool)f);
+      bool got_something = f;
+      while(f.match1('\\') && f.skip1('\\') && !f.ns_more()){
+	f.getline("");
+	here = 0;
+      }
+      trace3("pr2", f.fullstring(), f.tail(), here);
+      if (!got_something) { untested();
+	delete p;
+	f.warn(0, "not valid here");
+	break;
+      }else if (max==values.size()){
+	delete p;
+	throw Exception_Too_Many(int(values.size()+1), int(max), 0);
+      }else{
+	trace1("insert", p->key());
+	values.push_back(p);
+      }
+
+      // return f;
+
+    }else{
+    }
+  }
+  return f;
 }
 /*--------------------------------------------------------------------------*/
 // Define::?
 static String_Arg_List eval_args(CS& f, size_t howmany, Define_List const& d)
 {
   trace2("eval_rgs", f.tail().substr(0,20), howmany);
-  Raw_String_Arg_List values;
+  Raw_String_Arg_List values; // decouple parse?
   if(!howmany) {
   }else if(f.match1('(')){
-    values.parse_n(f, howmany);
-    for(auto i : values){
-      trace1("parse_n dbg", i->to_string());
-    }
+    parse_raw_args(f, values, howmany);
   }else{
   }
 
@@ -671,6 +703,15 @@ void PP_Quoted_String::dump(std::ostream& o)const
   //o << '"';
 }
 /*--------------------------------------------------------------------------*/
+static bool parse_define(CS& f, Define_List& l)
+{
+  Define* p = new Define;
+  p->set_owner(l.owner());
+  f >> *p;
+  l.push_back(p);
+  return f;
+}
+/*--------------------------------------------------------------------------*/
 void Preprocessor::parse(CS& file)
 {
   std::stack<int> _cond;
@@ -694,10 +735,11 @@ void Preprocessor::parse(CS& file)
 	define_list().erase(defi);
       }else{
       }
-      if(file >> define_list()) {
+      if(parse_define(file, define_list())) {
       }else{ untested();
 	throw Exception_CS_("expecting macro name", file);
       }
+      trace2("done define", file.fullstring(), (bool)file);
     }else if (file >> "`include") {
       std::string include_file_name;
       file >> include_file_name;
@@ -780,8 +822,8 @@ void Preprocessor::parse(CS& file)
 
     if (!file.ns_more()) {
       try {
-//	_stripped_file += "\n"; // BUG?
-	file.get_line("");
+	getline_(file);
+	_stripped_file += "\n";
       }catch (Exception_End_Of_Input const&) {
 	break;
       }

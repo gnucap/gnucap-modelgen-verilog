@@ -1,6 +1,13 @@
 
 
 
+
+
+
+
+
+
+
 nature current
   access = I;
   units = "A";
@@ -24,7 +31,31 @@ enddiscipline
 
 
 
-  module log_amp (P_I1, P_Ir, P_Vout);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ module log_amp (P_I1, P_Ir, P_Vout);
  inout P_I1, P_Ir;
  inout P_Vout;
  endmodule
