@@ -342,7 +342,7 @@ void Define::stash(std::string const& s, String_Arg_List const& args)
       _value_tpl += f.ctoc();
     }
   }
-  trace3("stash?", s, f.peek(), f.tail().substr(0,20));
+  trace3("stash?", s, _value_tpl, f.tail().substr(0,20));
   size_t ts = _value_tpl.size();
   if(!ts){
   }else if(_value_tpl[ts-1] == '\n') { untested();
@@ -450,10 +450,13 @@ std::string expand_macros(CS& file, Define_List const& d)
   size_t here = file.cursor();
   for (;;) {
     stripped_file += file.get_to("\"/`");
-    if (file >> '"') {
+    if (file.skip1(" \t")) { untested();
+      stripped_file += " ";
+      file.skipbl(); // does not set OK?!
+    }else if (file.skip1('"')) {
       // quoted string
       stripped_file += '"' + file.get_to("\"");
-      if (file >> '"') {
+      if (file.skip1('"')) {
 	stripped_file += '"';
       }else{ untested();
 	throw Exception_CS("need '\"'", file);
@@ -491,8 +494,8 @@ void Raw_String_Arg::parse(CS& f)
     }else if(quote) {
       char c = f.ctoc();
       _s += c;
-      if(f.ns_more()){ untested();
-      }else if(c=='\\'){ untested();
+      if(f.ns_more()){
+      }else if(c=='\\'){
 	getline_(f);
 	_s+="\n";
       }else{ untested();
@@ -642,7 +645,6 @@ void Define::dump(std::ostream&)const
 /*--------------------------------------------------------------------------*/
 std::string Define::substitute(String_Arg_List const& values, Define_List const& d) const
 {
-//  trace2("substitute", file.fullstring(), values.size());
   std::string stripped_file = "";
   std::string sep = "";
 
@@ -800,7 +802,7 @@ void Preprocessor::parse(CS& file)
       }
     }else if (file >> "`pragma") {
       file >> pragma;
-    }else if (file >> "`") {
+    }else if (file.skip1('`')) {
       String_Arg id(get_identifier(file));
       Define_List::const_iterator x = define_list().find(id);
       if (x != define_list().end()) {
