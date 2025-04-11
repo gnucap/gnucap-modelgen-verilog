@@ -1,14 +1,14 @@
-ground gnd; 
+ground gnd;
 module net (.p(x),.n(x));
 endmodule // net
 
 paramset mynet net;
-  parameter real r=0. from [0:0]; 
+  parameter real r=0. from [0:0];
 
 endparamset
 
 paramset mynet resistor;
-  parameter r from (0:1e99); 
+  parameter r from (0:1e99);
  .r=r;
 endparamset
 

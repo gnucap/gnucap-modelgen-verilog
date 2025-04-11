@@ -1,6 +1,6 @@
-isource #(.dc(1)) ii(\0 , 1); 
+isource #(.dc(1)) ii(\0 , 1);
                           ^ ? invalid identifier
-parameter rr=0 
+parameter rr=0
 isource #(.dc(1)) ii (.p(\0 ),.n(\1 ));
 test_af_2 #(.rr(rr)) dut (.p(\1 ),.n(\0 ));
 #           v(1)       iter(0)   

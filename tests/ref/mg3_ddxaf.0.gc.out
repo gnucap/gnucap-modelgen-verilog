@@ -1,4 +1,4 @@
-test_ddxaf #() dut(1); 
+test_ddxaf #() dut(1);
                    ^ ? invalid identifier
 test_ddxaf #() dut (.a(\1 ));
 vsource #(.dc(1)) v (.p(\1 ),.n(\0 ));

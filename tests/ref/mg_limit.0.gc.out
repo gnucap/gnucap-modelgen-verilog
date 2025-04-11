@@ -1,5 +1,5 @@
-// options nobypass 
-// options noincmode 
+// options nobypass
+// options noincmode
 resistor #(.r(1)) dut (.p(\3 ),.n(v));
 test_lt0 #(.is(5e-15)) dut (.p(\3 ),.n(\2 ));
 test_lt0 #() dut (.p(\2 ),.n(\1 ));

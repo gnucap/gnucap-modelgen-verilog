@@ -1,18 +1,18 @@
-flicker_noise # ... tor(2) .pwr(1)) fn1(1 \0 ); 
+flicker_noise # ... tor(2) .pwr(1)) fn1(1 \0 );
                                         ^ ? invalid identifier
-flicker_noise # ... tor(1) .pwr(2)) fn2(2 \0 ); 
+flicker_noise # ... tor(1) .pwr(2)) fn2(2 \0 );
                                         ^ ? invalid identifier
-flicker_noise # ... or(1) .pwr(1)) fn3a(3 \0 ); 
+flicker_noise # ... or(1) .pwr(1)) fn3a(3 \0 );
                                         ^ ? invalid identifier
-flicker_noise # ... or(1) .pwr(1)) fn3b(3 \0 ); 
+flicker_noise # ... or(1) .pwr(1)) fn3b(3 \0 );
                                         ^ ? invalid identifier
-flicker_noise # ... .e(2), .pwr(1)) fn4(4 \0 ); 
+flicker_noise # ... .e(2), .pwr(1)) fn4(4 \0 );
                                         ^ ? invalid identifier
-resistor #(1) r3(3, \0 ); 
+resistor #(1) r3(3, \0 );
                  ^ ? invalid identifier
-resistor #(1) r4(4, \0 ); 
+resistor #(1) r4(4, \0 );
                  ^ ? invalid identifier
-ground \0 ; 
+ground \0 ;
 flicker_noise #(.$mfactor(2),.pwr(1)) fn1 (.p(\1 ),.n(\0 ));
 flicker_noise #(.$mfactor(1),.pwr(2)) fn2 (.p(\2 ),.n(\0 ));
 flicker_noise #(.$mfactor(1),.pwr(1)) fn3a (.p(\3 ),.n(\0 ));

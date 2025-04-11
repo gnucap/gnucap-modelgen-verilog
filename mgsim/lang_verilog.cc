@@ -883,9 +883,9 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
     }else if (cmd >> "//") {
       cmd.reset(here);
       // new__instance(cmd, x, x->subckt()); // BUG
-      cmd.get_line("verilog-paramset>");
+      cmd.getline("verilog-paramset>");
     }else if (!cmd.more()) {
-      cmd.get_line("verilog-paramset>");
+      cmd.getline("verilog-paramset>");
     }else{
       break;
     }
@@ -899,9 +899,9 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
     }else if (cmd >> "// ") {
       cmd.reset(here);
       // new__instance(cmd, x, x->subckt()); // BUG
-      cmd.get_line("verilog-paramset>");
+      cmd.getline("verilog-paramset>");
     }else if (!cmd.more()) {
-      cmd.get_line("verilog-paramset>");
+      cmd.getline("verilog-paramset>");
     }else{
       cmd.check(bWARNING, "what's this?");
       break;
@@ -934,9 +934,9 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
   // body
   for (;;) {
 
-    cmd.get_line("verilog-module>");
+    cmd.getline("verilog-module>");
     while (!parse_attributes(cmd, tag_t(&cmd)).more()){
-      cmd.get_line("verilog-module>");
+      cmd.getline("verilog-module>");
     }
     if(has_attributes(tag_t(&cmd))){
     }else{
@@ -1016,9 +1016,9 @@ std::string LANG_VERILOG::find_type_in_string(CS& cmd)
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::parse_top_item(CS& cmd, CARD_LIST* Scope)
 {
-  cmd.get_line("gnucap-verilog>");
+  cmd.getline("gnucap-verilog>");
   while(!parse_attributes(cmd, tag_t(&cmd)).more()) {
-    cmd.get_line("gnucap-verilog>");
+    cmd.getline("gnucap-verilog>");
   }
   new__instance(cmd, NULL, Scope);
 }
@@ -1405,7 +1405,7 @@ class CMD_MODULE : public CMD {
     }catch(Exception const& e) {
       cmd.warn(bDANGER, e.message());
       for (;;) {
-	cmd.get_line("verilog-module>");
+	cmd.getline("verilog-module>");
 
 	if (cmd >> "endmodule ") { untested();
 	  break;

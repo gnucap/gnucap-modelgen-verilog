@@ -3,7 +3,7 @@ module port_names (.A(A_),.B(B_));
 endmodule // port_names
 
 module main (.AA(AA));
-  ground \0 ; 
+   ground \0 ;
   port_names #() p (.A(AA),.B(\0 ));
 endmodule // main
 

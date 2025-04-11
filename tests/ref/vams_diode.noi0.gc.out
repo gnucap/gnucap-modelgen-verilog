@@ -1,46 +1,46 @@
-module two(1 2) 
+module two(1 2)
            ^ ? invalid identifier
-module two(1 2) 
+module two(1 2)
              ^ ? invalid identifier
-ddd #(.area(1.) .$mfactor(.5)) d1 (1  \2 ); 
-                                   ^ ? invalid identifier
-ddd #(.area(1.) .$mfactor(.5)) d2 (1  \2 ); 
-                                   ^ ? invalid identifier
-module one(1 2) 
+  ddd #(.area(1.) .$mfactor(.5)) d1 (1  \2 );
+                                     ^ ? invalid identifier
+  ddd #(.area(1.) .$mfactor(.5)) d2 (1  \2 );
+                                     ^ ? invalid identifier
+module one(1 2)
            ^ ? invalid identifier
-module one(1 2) 
+module one(1 2)
              ^ ? invalid identifier
-ddd #(.area(1.) .$mfactor(1)) d1 (1  \2 ); 
-                                  ^ ? invalid identifier
-module mtwo(1 2) 
+ ddd #(.area(1.) .$mfactor(1)) d1 (1  \2 );
+                                   ^ ? invalid identifier
+module mtwo(1 2)
             ^ ? invalid identifier
-module mtwo(1 2) 
+module mtwo(1 2)
               ^ ? invalid identifier
-ddd #(.area(1.) .$mfactor(1)) d1 (1  \2 ); 
-                                  ^ ? invalid identifier
-ddd #(.area(1.) .$mfactor(1)) d2 (1  \2 ); 
-                                  ^ ? invalid identifier
-resistor #(50k) r1(\1 ,2); 
+  ddd #(.area(1.) .$mfactor(1)) d1 (1  \2 );
+                                    ^ ? invalid identifier
+  ddd #(.area(1.) .$mfactor(1)) d2 (1  \2 );
+                                    ^ ? invalid identifier
+resistor #(50k) r1(\1 ,2);
                        ^ ? invalid identifier
-two m(2 0); 
+two m(2 0);
       ^ ? invalid identifier
-two m(2 0); 
+two m(2 0);
         ^ ? invalid identifier
-meas_noise #() n2(2); 
+meas_noise #() n2(2);
                   ^ ? invalid identifier
-resistor #(50k) r1(\1 ,3); 
+resistor #(50k) r1(\1 ,3);
                        ^ ? invalid identifier
-one m(3 0); 
+one m(3 0);
       ^ ? invalid identifier
-one m(3 0); 
+one m(3 0);
         ^ ? invalid identifier
-meas_noise #() n3(3); 
+meas_noise #() n3(3);
                   ^ ? invalid identifier
-resistor #(50k) r1(\1 ,4); 
+resistor #(50k) r1(\1 ,4);
                        ^ ? invalid identifier
-mtwo #(.$mfactor(.5)) m(4 \0 ); 
+mtwo #(.$mfactor(.5)) m(4 \0 );
                         ^ ? invalid identifier
-meas_noise #() n4(4); 
+meas_noise #() n4(4);
                   ^ ? invalid identifier
 #           v(1)       v(2)       i(v1)      region(m.d1) region(m.d1) region(m.d1)
  0.         10.        2.1726    -469.64u    1.         1.         1.        

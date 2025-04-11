@@ -2,8 +2,8 @@ test_vmul0 #() d1 (.p(\2 ),.n(\0 ),.x(a),.y(b));
 resistor #(.r(1)) r1 (.p(\2 ),.n(\0 ));
 vsource #(.dc(va)) v1 (.p(a),.n(\0 ));
 vsource #(.dc(vb)) v2 (.p(b),.n(\0 ));
-parameter va=1 
-parameter vb=1 
+parameter va=1
+parameter vb=1
 #           v(2)       v(a)       v(b)       iter(0)   
  0.         0.         0.         0.         3.        
  0.5        0.         0.5        0.         4.        

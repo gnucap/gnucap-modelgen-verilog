@@ -1,4 +1,4 @@
-rc myrc(out, 0); 
+rc myrc(out, 0);
              ^ ? invalid identifier
 #Time       v(out)     iter(0)   
  0.         0.99999    3.        

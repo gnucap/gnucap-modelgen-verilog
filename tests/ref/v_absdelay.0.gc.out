@@ -1,4 +1,4 @@
-vsine #(.ampl(1), .freq(1)) v1(in, 0 ); 
+vsine #(.ampl(1), .freq(1)) v1(in, 0 );
                                    ^ ? invalid identifier
 va_delay #() b0 (.out0(\0 ),.out1(\1 ),.in0(in),.in1(\0 ));
 va_delay #() b0 (.out0(\0 ),.out1(\2 ),.in0(in),.in1(\0 ));

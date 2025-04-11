@@ -1,20 +1,20 @@
->>>>>paramset bob resistor; 
->>>>>paramset zap bob; 
->>>>>module main(1,\2 , \3 , \4 ) 
-module main(1,\2 , \3 , \4 ) 
+>>>>>paramset bob resistor;
+>>>>>paramset zap bob;
+>>>>>module main(1,\2 , \3 , \4 )
+module main(1,\2 , \3 , \4 )
             ^ ? invalid identifier
->>>>>ground \0 ; 
-bob  r1 (1 2); 
-         ^ ? invalid identifier
-bob  r1 (1 2); 
+>>>>>  ground \0 ;
+  bob  r1 (1 2);
            ^ ? invalid identifier
-zap  r2 (2 0); 
-         ^ ? invalid identifier
-zap  r2 (2 0); 
+  bob  r1 (1 2);
+             ^ ? invalid identifier
+  zap  r2 (2 0);
            ^ ? invalid identifier
-vsource #(1) v1 (1 \0 ); 
-                 ^ ? invalid identifier
->>>>>list 
+  zap  r2 (2 0);
+             ^ ? invalid identifier
+  vsource #(1) v1 (1 \0 );
+                   ^ ? invalid identifier
+>>>>>list
 paramset bob resistor;
  .r=10k;
 endparamset
@@ -24,27 +24,27 @@ paramset zap bob;
 endparamset
 
 module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
-  ground \0 ; 
+    ground \0 ;
   bob #() r1 (\1 ,\2 );
   zap #() r2 (\2 ,\0 );
   vsource #(1) v1 (\1 ,\0 );
 endmodule // main
 
 main #() m (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
->>>>>print op v(nodes) 
+>>>>>print op v(nodes)
 main.r1: bob from top level
 main.r1: 1 candidate found for bob
 main.r2: zap from top level
 main.r2: 1 candidate found for zap
 main.v1: vsource from device_dispatcher
 main.v1: 1 candidate found for vsource
->>>>>op 
+>>>>>op
 #           v(1)       v(2)       v(3)       v(4)      
  27.        1.         0.5        0.         0.        
->>>>>status notime 
+>>>>>status notime
 Gnucap   System status
 iterations: op=2, dc=0, tran=0, fourier=0, total=2
 transient timesteps: accepted=0, rejected=0, total=0
 nodes: user=4, subckt=0, model=0, total=4
 dctran density=37.5%, ac density=37.5%
->>>>>end 
+>>>>>end

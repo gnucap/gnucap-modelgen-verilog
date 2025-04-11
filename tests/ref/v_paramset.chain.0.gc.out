@@ -1,37 +1,37 @@
 >>>>>verilog 
->>>>>module main(.a(a),.b(b),.c(c),.d(d)); 
-main #(.x(x)) m(\0 ,1,2,4); 
+>>>>>module main(.a(a),.b(b),.c(c),.d(d));
+main #(.x(x)) m(\0 ,1,2,4);
                     ^ ? invalid identifier
-main #(.x(x)) m(\0 ,1,2,4); 
+main #(.x(x)) m(\0 ,1,2,4);
                       ^ ? invalid identifier
-main #(.x(x)) m(\0 ,1,2,4); 
+main #(.x(x)) m(\0 ,1,2,4);
                         ^ ? invalid identifier
->>>>>paramset res2 resistor; 
->>>>>paramset res res2; 
->>>>>parameter x=0 
->>>>>list 
+>>>>>paramset res2 resistor;
+>>>>>paramset res res2;
+>>>>>parameter x=0
+>>>>>list
 module main (.a(a),.b(b),.c(c),.d(d));
-  parameter x=0; 
+    parameter x=0;
   vsource #(1.) v (c,a);
   res #(.r(1),.x(x)) R1 (.p(c),.n(a));
 endmodule // main
 
 main #(.x(x)) m (.a(\0 ),.b(\1 ),.c(\2 ),.d(\4 ));
 paramset res2 resistor;
-  parameter R; 
-  parameter S=0; 
+    parameter R;
+    parameter S=0;
  .r=R+S;
 endparamset
 
 paramset res res2;
-  parameter r; 
-  parameter s=0; 
-  parameter x; 
+    parameter r;
+    parameter s=0;
+    parameter x;
  .R=r+s+x;
 endparamset
 
-parameter x=0 
->>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*) 
+parameter x=0
+>>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
 main.v: vsource from device_dispatcher
 main.v: 1 candidate found for vsource
 main.R1: res from top level
@@ -52,15 +52,15 @@ assuming double in r+s+x
 assuming double in 0
 assuming double in r+s+x
 assuming double in 0
-print dc v(nodes) i(m.v) y(m.*) y(m.R1.*) 
+print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
                                   ^ ? no match
->>>>>dc 
+>>>>>dc
 #           v(1)       v(2)       v(4)       i(m.v)     y(m.v)     y(m.R1)   
  0.         0.         0.99999    0.        -0.99999    0.         1.        
->>>>>dc 
+>>>>>dc
 #           v(1)       v(2)       v(4)       i(m.v)     y(m.v)     y(m.R1)   
  0.         0.         0.99999    0.        -0.99999    0.         1.        
->>>>>status notime 
+>>>>>status notime
 Gnucap   System status
 iterations: op=0, dc=4, tran=0, fourier=0, total=8
 transient timesteps: accepted=0, rejected=0, total=0

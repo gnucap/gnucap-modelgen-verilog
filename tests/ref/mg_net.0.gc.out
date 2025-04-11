@@ -1,6 +1,6 @@
-parameter r=1 
-parameter v=0 
-ground gnd; 
+parameter r=1
+parameter v=0
+ground gnd;
 test_net_0 #() N0 (.p(aa),.n(bb));
 test_net_0 #() N1 (.p(gnd),.n(gnd));
 test_net_0 #() N2 (.p(xx),.n(\0 ));

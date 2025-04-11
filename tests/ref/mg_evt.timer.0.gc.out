@@ -1,5 +1,5 @@
 test_evt_t0 #() dut (.p(\1 ),.n(\0 ));
-// reject #(.time(.9)) r(); 
+// reject #(.time(.9)) r();
 #           v(1)       state(dut) iter(0)   
  0.         0.         0.         2.        
 #Time       v(1)       state(dut) iter(0)    control(0)

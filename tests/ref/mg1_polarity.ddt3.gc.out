@@ -1,4 +1,4 @@
-resistor #(.r(1)) r(\1 ,2); 
+resistor #(.r(1)) r(\1 ,2);
                         ^ ? invalid identifier
 polarity_ddt3 #() dut (.p(\1 ),.n(\0 ));
 resistor #(.r(1)) r (.p(\1 ),.n(\2 ));

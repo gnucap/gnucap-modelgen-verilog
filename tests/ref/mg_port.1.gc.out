@@ -1,4 +1,4 @@
-test_port1 #() b(1); 
+test_port1 #() b(1);
                  ^ ? invalid identifier
 connected: n
 connected: p

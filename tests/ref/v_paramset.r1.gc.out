@@ -1,16 +1,16 @@
->>>>>paramset mynet resistor; 
->>>>>paramset mynet resistor; 
->>>>>module main(a, b); 
->>>>>list 
-// ground gnd; 
+>>>>>paramset mynet resistor;
+>>>>>paramset mynet resistor;
+>>>>>module main(a, b);
+>>>>>list
+// ground gnd;
 (* desc="A" *) paramset mynet resistor;
-  parameter real r from (0:1e99); 
-  parameter real s=1 from (0:1e99); 
+  parameter real r from (0:1e99);
+  parameter real s=1 from (0:1e99);
  .r=r;
 endparamset
 
 (* desc="B" *) paramset mynet resistor;
-  parameter real r from (0:1e99); 
+  parameter real r from (0:1e99);
  .r=r;
 endparamset
 
@@ -20,7 +20,7 @@ module main (.a(a),.b(b));
   isource #(1) i0 (b,a);
 endmodule // main
 
->>>>>print dc v(nodes) 
+>>>>>print dc v(nodes)
 main.n1: mynet from top level: A
 main.n1: mynet from top level: B
 main.n1: 2 candidates found for mynet
@@ -35,10 +35,10 @@ m1.n2 found fewer params: B.
 m1.n1 .. candidate: A, params: 13
 m1.n1 .. candidate: B, params: 12
 m1.n1 found fewer params: B.
->>>>>dc 
+>>>>>dc
 #           v(a)      
  0.         2.        
->>>>>status notime 
+>>>>>status notime
 Gnucap   System status
 iterations: op=0, dc=2, tran=0, fourier=0, total=2
 transient timesteps: accepted=0, rejected=0, total=0

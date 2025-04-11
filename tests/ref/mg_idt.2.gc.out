@@ -1,6 +1,6 @@
-parameter r=1 
-parameter v=0 
-parameter pi=3.1415926535897932384626433832795028841972 
+parameter r=1
+parameter v=0
+parameter pi=3.1415926535897932384626433832795028841972
 test_idt2 #() dut (.p(\0 ),.n(\3 ),.cp(\1 ),.cn(\0 ));
 vsine #(.freq(1 /6.28),.ampl(1 ),.dc(v)) v1 (.p(\1 ),.n(\0 ));
 resistor #(.r(1)) r (.p(\0 ),.n(\3 ));

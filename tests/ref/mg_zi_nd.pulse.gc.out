@@ -1,6 +1,6 @@
-parameter r=1 
-parameter v=0 
-parameter a=.2 
+parameter r=1
+parameter v=0
+parameter a=.2
 test_zi_npp #() dut ();
 #Time       in(dut)    ll0(dut)   ll1(dut)   ll2(dut)   ll3(dut)   ll4(dut)  
  0.         1.         0.         0.         0.         0.         0.        

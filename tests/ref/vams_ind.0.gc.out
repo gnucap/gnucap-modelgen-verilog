@@ -1,16 +1,16 @@
-module main(1 2 ref) 
+module main(1 2 ref)
             ^ ? invalid identifier
-module main(1 2 ref) 
+module main(1 2 ref)
               ^ ? invalid identifier
-inductor  #(.l(p) .$mfactor(1)) L3(1,  \2 ); 
+inductor  #(.l(p) .$mfactor(1)) L3(1,  \2 );
                                    ^ ? invalid identifier
-resistor  #(.r(p)) r2( 2  ref); 
+resistor  #(.r(p)) r2( 2  ref);
                        ^ ? invalid identifier
-main m(1 2 0) 
+main m(1 2 0)
        ^ ? invalid identifier
-main m(1 2 0) 
+main m(1 2 0)
          ^ ? invalid identifier
-main m(1 2 0) 
+main m(1 2 0)
            ^ ? invalid identifier
 #Time       v(1)       v(2)      
  0.         0.         0.        

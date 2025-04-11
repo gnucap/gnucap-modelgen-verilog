@@ -1,4 +1,4 @@
-parameter v=0 
+parameter v=0
 test_branch_0 #() dut (.p(\1 ),.n(\0 ));
 vsource #(.dc(v)) v1 (.p(\1 ),.n(\0 ));
 #           i(dut)     j(dut)    

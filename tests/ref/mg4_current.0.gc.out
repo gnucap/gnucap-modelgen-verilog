@@ -1,4 +1,4 @@
-parameter v=0 
+parameter v=0
 test_current0 #() dut (.p(\1 ),.n(\0 ));
 resistor #(.r(1)) r1 (.p(\1 ),.n(\0 ));
 #           i(r1)      iA(dut)    iB(dut)    v(1)       i(dut._nb_B) i(dut._nb_A)

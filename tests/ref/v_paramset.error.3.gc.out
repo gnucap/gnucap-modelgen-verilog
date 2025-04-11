@@ -1,12 +1,12 @@
-module main(\1 ,2); 
+module main(\1 ,2);
                 ^ ? invalid identifier
-vs #() v1(1 2) 
+vs #() v1(1 2)
           ^ ? invalid identifier
-vs #() v1(1 2) 
+vs #() v1(1 2)
             ^ ? invalid identifier
-main m1(0 1) 
+main m1(0 1)
         ^ ? invalid identifier
-main m1(0 1) 
+main m1(0 1)
           ^ ? invalid identifier
 parameter voltage not specified, using default
 #           v(1)      

@@ -4,8 +4,8 @@ module vsin (.p(p),.n(n));
   vsource #(sin.offset(NA( 0.)), .amplitude(ampl), .frequency( 1.), .delay(NA( 0.)), .damping(NA( 0.))  DC dc) V1 (.p(p),.n(n));
 endmodule // vsin
 
-parameter r=1 
-parameter v=0 
+parameter r=1
+parameter v=0
 test_xdt1 #() dut (.p(\1 ),.n(\0 ),.ni(ii));
 resistor #(.r(1.)) r1 (.p(ii),.n(\0 ));
 vsin #(.ampl(1),.dc(v)) v1 (.p(\1 ),.n(\0 ));

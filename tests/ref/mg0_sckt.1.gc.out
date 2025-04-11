@@ -5,8 +5,8 @@ module vsin (.p(p),.n(n));
 endmodule // vsin
 
 module net1 (.a(a),.b(b),.gnd(gnd));
-  parameter r = 1.; 
-  parameter c = 1.; 
+   parameter r = 1.;
+   parameter c = 1.;
   resistor #(.r(r)) r1 (a,\1 );
   resistor #(.r(2*r)) r2 (\1 ,\2 );
   resistor #(.r(r)) r3 (\2 ,b);
@@ -16,9 +16,9 @@ module net1 (.a(a),.b(b),.gnd(gnd));
   capacitor #(.c(c)) c2 (\2 ,gnd);
 endmodule // net1
 
-parameter r = 10 
-parameter c = 1m 
-parameter v = 1 
+parameter r = 10
+parameter c = 1m
+parameter v = 1
 test_net1 #(.r(r),.c(c)) dut (.a(\1 ),.b(\2 ),.gnd(\0 ));
 net1 #(.c(c),.r(r)) dut (.a(\1 ),.b(\3 ),.gnd(\0 ));
 vsin #(.amplitude(v),.dc(v)) v1 (.p(\1 ),.n(\0 ));

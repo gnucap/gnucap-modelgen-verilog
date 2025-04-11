@@ -1,10 +1,10 @@
-test m(1 2) 
+test m(1 2)
        ^ ? invalid identifier
-test m(1 2) 
+test m(1 2)
          ^ ? invalid identifier
-// name clash.. 
+// name clash..
 module test (.\1 (\1 ),.\2 (\2 ));
-  ground \0 ; 
+   ground \0 ;
   resistor #(.r(0.)) r0 (\1 ,\0 );
   resistor #(.r(1.)) r1 (\1 ,\2 );
   vsource #(.dc(1.)) v1 (\2 ,\0 );

@@ -1,6 +1,6 @@
-resistor #(.r(2) .$mfactor(2)) r1(in, 0) 
+resistor #(.r(2) .$mfactor(2)) r1(in, 0)
                                       ^ ? invalid identifier
-resistor #(.r(5) .$mfactor(5)) r2(in, 0) 
+resistor #(.r(5) .$mfactor(5)) r2(in, 0)
                                       ^ ? invalid identifier
 #           v(in)      i(V1)      i(r1)      i(r2)     
  0.         0.89998   -1.8        0.44999    0.18      

@@ -1,8 +1,8 @@
-test_idtac0 #() d0(\1 , 2, 3, 4, \0 ); 
+test_idtac0 #() d0(\1 , 2, 3, 4, \0 );
                         ^ ? invalid identifier
-test_idtac0 #() d0(\1 , 2, 3, 4, \0 ); 
+test_idtac0 #() d0(\1 , 2, 3, 4, \0 );
                            ^ ? invalid identifier
-test_idtac0 #() d0(\1 , 2, 3, 4, \0 ); 
+test_idtac0 #() d0(\1 , 2, 3, 4, \0 );
                               ^ ? invalid identifier
 #          
  0.        

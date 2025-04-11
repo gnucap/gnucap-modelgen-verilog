@@ -1,6 +1,6 @@
 running modelgen in insensitive mode
 module test (.y(y),.a(a),.b(b));
-  ground \0 ; 
+  ground \0 ;
   vpulse #(.val0(0),.val1(5),.width(.2),.period(.5)) v1 (a,\0 );
   vpulse #(.val0(0),.val1(5),.td(.1),.width(.2),.period(.5)) v1 (b,\0 );
   myand0 #(10000) b (.y(y),.a(a),.b(b));

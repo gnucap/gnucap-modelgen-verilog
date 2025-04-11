@@ -1,4 +1,4 @@
-parameter v1=0 
+parameter v1=0
 test_af_4 #(.v(v1)) dut (.p(\1 ),.n(\0 ));
 #           v(1)       iter(0)   
 -5.        -2.         3.        

@@ -1,4 +1,4 @@
-parameter h=1e-3 
+parameter h=1e-3
 test_cross4 #(.h(h)) dut (.p(\1 ),.n(\0 ));
 vsine #(.freq(1),.ampl(2)) vin (.p(\1 ),.n(\0 ));
 #Time       v(1)       c(dut)     t(dut)     iter(0)   

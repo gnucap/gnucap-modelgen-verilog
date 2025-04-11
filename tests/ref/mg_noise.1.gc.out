@@ -1,10 +1,10 @@
-test_noise\1  #() dut(\1 , \\\0      ); 
+test_noise\1  #() dut(\1 , \\\0      );
 ^ ? test_noise\1: no match
-noise_probe n1(1) 
+noise_probe n1(1)
                ^ ? invalid identifier
 meas_noise #() n1 (.p(\1 ));
 meas_noise #() n2 (.p(\1 ),.n(\0 ));
-print ac n(dut.*) npwr(n1) 
+print ac n(dut.*) npwr(n1)
            ^ ? no match
 #          
  0.        

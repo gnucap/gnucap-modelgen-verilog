@@ -1,33 +1,33 @@
 >>>>>verilog 
->>>>>(* desc="res1" *) paramset res resistor; 
->>>>>(* desc="res2" *) paramset res resistor; 
->>>>>(* desc="res3" *) paramset res resistor; 
->>>>>(* desc="res4" *) paramset res resistor; 
->>>>>(* desc="res5" *) paramset res resistor; 
->>>>>module main(\1 ,\2 , \3 , \4 ); 
->>>>>list 
+>>>>>(* desc="res1" *) paramset res resistor;
+>>>>>(* desc="res2" *) paramset res resistor;
+>>>>>(* desc="res3" *) paramset res resistor;
+>>>>>(* desc="res4" *) paramset res resistor;
+>>>>>(* desc="res5" *) paramset res resistor;
+>>>>>module main(\1 ,\2 , \3 , \4 );
+>>>>>list
 (* desc="res1" *) paramset res resistor;
-  parameter real R from (1:2]; 
+    parameter real R from (1:2];
  .r=R+1k;
 endparamset
 
 (* desc="res2" *) paramset res resistor;
-  parameter real R=.5 from (0:1]; 
+    parameter real R=.5 from (0:1];
  .r=R;
 endparamset
 
 (* desc="res3" *) paramset res resistor;
-  parameter real R from [100:200]; 
+    parameter real R from [100:200];
  .r=R+1k;
 endparamset
 
 (* desc="res4" *) paramset res resistor;
-  parameter real R from [(1k):(2k)); 
+    parameter real R from [(1k):(2k));
  .r=R;
 endparamset
 
 (* desc="res5" *) paramset res resistor;
-  parameter real R from [(2k):(3k)]; 
+    parameter real R from [(2k):(3k)];
  .r=R;
 endparamset
 
@@ -37,7 +37,7 @@ module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
 endmodule // main
 
 main #() m (.\1 (\0 ),.\2 (\1 ),.\3 (\2 ),.\4 (\4 ));
->>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*) 
+>>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
 main.v: vsource from device_dispatcher
 main.v: 1 candidate found for vsource
 main.R1: res from top level: res1
@@ -57,12 +57,12 @@ m.R1 .. candidate: res4, params: 12
 m.R1 dropped invalid candidate: res4.
 m.R1 .. candidate: res5, params: 12
 m.R1 dropped invalid candidate: res5.
-print dc v(nodes) i(m.v) y(m.*) y(m.R1.*) 
+print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
                                   ^ ? no match
->>>>>dc 
+>>>>>dc
 #           v(1)       v(2)       v(4)       i(m.v)     y(m.v)     y(m.R1)   
  0.         0.         0.99999    0.        -0.99999    0.         1.        
->>>>>status notime 
+>>>>>status notime
 Gnucap   System status
 iterations: op=0, dc=4, tran=0, fourier=0, total=4
 transient timesteps: accepted=0, rejected=0, total=0

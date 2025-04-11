@@ -1,24 +1,24 @@
-module main(\1 ,2); 
+module main(\1 ,2);
                 ^ ? invalid identifier
-vs #(.voltage(v)) v1(1 2) 
-                     ^ ? invalid identifier
-vs #(.voltage(v)) v1(1 2) 
+  vs #(.voltage(v)) v1(1 2)
                        ^ ? invalid identifier
-main #(.v(1)) m1(1 0) 
+  vs #(.voltage(v)) v1(1 2)
+                         ^ ? invalid identifier
+main #(.v(1)) m1(1 0)
                  ^ ? invalid identifier
-main #(.v(1)) m1(1 0) 
+main #(.v(1)) m1(1 0)
                    ^ ? invalid identifier
-main #(.v(2)) m2(2 0) 
+main #(.v(2)) m2(2 0)
                  ^ ? invalid identifier
-main #(.v(2)) m2(2 0) 
+main #(.v(2)) m2(2 0)
                    ^ ? invalid identifier
 paramset vs vsource;
-  parameter voltage; 
+    parameter voltage;
  .dc=voltage;
 endparamset
 
 module main (.\1 (\1 ),.\2 (\2 ));
-  parameter v; 
+    parameter v;
   vs #(.voltage(v)) v1 (\1 ,\2 );
 endmodule // main
 

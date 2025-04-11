@@ -1,14 +1,14 @@
-test_noise4 #() dut(\2 , 1); 
+test_noise4 #() dut(\2 , 1);
                          ^ ? invalid identifier
-noise_probe #() n1(1) 
+noise_probe #() n1(1)
                    ^ ? invalid identifier
-noise_probe #() n2(2) 
+noise_probe #() n2(2)
                    ^ ? invalid identifier
 test_noise4 #() dut (.a(\2 ),.b(\1 ));
 test_noise4 #() dut (.a(\1 ),.b(\0 ));
 meas_noise #() n1 (.p(\1 ));
 meas_noise #() n2 (.p(\2 ));
-print dc v(nodes) x(dut.*) 
+print dc v(nodes) x(dut.*)
                     ^ ? no match
 #           v(1)       v(2)      
  0.         0.         0.        

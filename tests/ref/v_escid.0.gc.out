@@ -1,6 +1,6 @@
-resistor r5(1\\ , 2\\ ); 
+resistor r5(1\\ , 2\\ );
             ^ ? invalid identifier
-resistor r5(1\\ , 2\\ ); 
+resistor r5(1\\ , 2\\ );
                   ^ ? invalid identifier
 resistor #() r1 (.p(a),.n(b));
 resistor #() r2 (.p(\1 ),.n(\2 ));

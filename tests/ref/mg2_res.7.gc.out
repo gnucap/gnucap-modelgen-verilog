@@ -1,7 +1,7 @@
-// not sure what this is supposed to to 
-// I(p,n) is a short. V(io) is nonzero? 
-parameter r=1 
-parameter v=0 
+// not sure what this is supposed to to
+// I(p,n) is a short. V(io) is nonzero?
+parameter r=1
+parameter v=0
 test_res_7 #(.r(100 )) dut (.p(\1 ),.n(\0 ));
 vsource #(.dc(v)) v1 (.p(\1 ),.n(\0 ));
 test_res_7 #(.r(1)) dut (.p(\2 ),.n(\0 ));

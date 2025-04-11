@@ -1,15 +1,15 @@
 >>>>>verilog 
->>>>>(* desc="res1" *) paramset res resistor; 
->>>>>(* desc="res2" *) paramset res resistor; 
->>>>>module main(\1 ,\2 , \3 , \4 ); 
->>>>>list 
+>>>>>(* desc="res1" *) paramset res resistor;
+>>>>>(* desc="res2" *) paramset res resistor;
+>>>>>module main(\1 ,\2 , \3 , \4 );
+>>>>>list
 (* desc="res1" *) paramset res resistor;
-  parameter string what from '{"one", "ONE"}; 
+    parameter string what from '{"one", "ONE"};
  .r=1;
 endparamset
 
 (* desc="res2" *) paramset res resistor;
-  parameter string what from '{"two", "TWO"}; 
+    parameter string what from '{"two", "TWO"};
  .r=2;
 endparamset
 
@@ -21,7 +21,7 @@ module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
 endmodule // main
 
 main #() m (.\1 (\0 ),.\2 (\1 ),.\3 (\2 ),.\4 (\4 ));
->>>>>print dc v(nodes) 
+>>>>>print dc v(nodes)
 main.v: isource from device_dispatcher
 main.v: 1 candidate found for isource
 main.v: isource from device_dispatcher
@@ -40,10 +40,10 @@ m.R1 .. candidate: res2, params: 12
 m.R1 .. candidate: res1, params: 12
 m.R1 .. candidate: res2, params: 12
 m.R1 dropped invalid candidate: res2.
->>>>>dc 
+>>>>>dc
 #           v(1)       v(2)       v(4)      
  0.         0.         1.         2.        
->>>>>status notime 
+>>>>>status notime
 Gnucap   System status
 iterations: op=0, dc=2, tran=0, fourier=0, total=2
 transient timesteps: accepted=0, rejected=0, total=0

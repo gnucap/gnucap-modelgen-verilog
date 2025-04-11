@@ -1,4 +1,4 @@
-parameter rr=0 
+parameter rr=0
 vsource #(.dc(1)) vv (.p(\1 ),.n(\0 ));
 test_af_3 #(.rr(rr)) dut (.p(\1 ),.n(\0 ));
 #           v(1)       i(vv)      iter(0)   

@@ -1,4 +1,4 @@
-ground \0 ; 
+ground \0 ;
 va_zi_nd #(.n0(1.),.n1(1),.d0(1.),.d1(0.)) b1 (.out0(\0 ),.out1(out1),.in0(in),.in1(\0 ));
 va_zi_nd #(.n0(0.),.n1(1),.d0(1.),.d1(0.)) b2 (.out0(\0 ),.out1(out2),.in0(in),.in1(\0 ));
 vsource #(.dc(1.)) v1 (.p(in),.n(\0 ));

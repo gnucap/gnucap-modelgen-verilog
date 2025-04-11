@@ -1,21 +1,21 @@
->>>>>ground gnd; 
->>>>>module net(.p(x), .n(x)); 
->>>>>paramset Resistor net 
->>>>>paramset Resistor resistor 
->>>>>module main(a, b); 
->>>>>list 
-ground gnd; 
+>>>>>ground gnd;
+>>>>>module net(.p(x), .n(x));
+>>>>>paramset Resistor net
+>>>>>paramset Resistor resistor
+>>>>>module main(a, b);
+>>>>>list
+ground gnd;
 module net (.p(x),.n(x));
 endmodule // net
 
 (* desc="A" *) paramset Resistor net;
-  parameter real r=0. from [0:0]; 
+  parameter real r=0. from [0:0];
 
 endparamset
 
 (* desc="B" *) paramset Resistor resistor;
-  parameter real r=0. from (0:1e99); 
-  parameter real s=0.; 
+  parameter real r=0. from (0:1e99);
+  parameter real s=0.;
  .r=r;
 endparamset
 
@@ -25,7 +25,7 @@ module main (.a(a),.b(b));
   isource #(1) i0 (b,a);
 endmodule // main
 
->>>>>print dc v(nodes) 
+>>>>>print dc v(nodes)
 main.n1: Resistor from top level: A
 r already set. replacing
 main.n1: Resistor from top level: B
@@ -44,10 +44,10 @@ m1.n2 .. candidate: B, params: 13
 m1.n1 .. candidate: A, params: 12
 m1.n1 .. candidate: B, params: 13
 m1.n1 dropped invalid candidate: B.
->>>>>dc 
+>>>>>dc
 #           v(a)       v(gnd)    
  0.         1.         0.        
->>>>>status notime 
+>>>>>status notime
 Gnucap   System status
 iterations: op=0, dc=2, tran=0, fourier=0, total=2
 transient timesteps: accepted=0, rejected=0, total=0

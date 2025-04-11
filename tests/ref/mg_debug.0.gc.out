@@ -1,4 +1,4 @@
-isource #(.dc(5)) i(\0 , 1); 
+isource #(.dc(5)) i(\0 , 1);
                          ^ ? invalid identifier
 test 0.000000
 #           v(1)       iter(0)   

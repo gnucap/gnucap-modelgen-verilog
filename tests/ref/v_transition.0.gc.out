@@ -1,8 +1,8 @@
-va_transition # ... ) .fall(.2)) b0(\0 ,1,in,\0 ); 
+va_transition # ... ) .fall(.2)) b0(\0 ,1,in,\0 );
                                         ^ ? invalid identifier
 va_transition #() b0 (.out0(\0 ),.out1(\1 ),.in0(in),.in1(\0 ));
 vpulse #(.val0(0),.val1(1),.rise(.1),.fall(.1),.width(1),.period(2)) v1 (.p(in),.n(\0 ));
-//resistor #(1) r1(\1 ,\0 ); 
+//resistor #(1) r1(\1 ,\0 );
 reject #() r ();
 #Time       v(1)       v(in)      control(0) s(b0)     
  0.         0.         0.         1.         1.        

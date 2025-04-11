@@ -1,12 +1,12 @@
-portnames1 dut(.n0(0),.n2(2),.n1(1),.n3(3)); 
+portnames1 dut(.n0(0),.n2(2),.n1(1),.n3(3));
                    ^ ? invalid identifier
-portnames1 dut(.n0(0),.n2(2),.n1(1),.n3(3)); 
+portnames1 dut(.n0(0),.n2(2),.n1(1),.n3(3));
                           ^ ? invalid identifier
-portnames1 dut(.n0(0),.n2(2),.n1(1),.n3(3)); 
+portnames1 dut(.n0(0),.n2(2),.n1(1),.n3(3));
                                  ^ ? invalid identifier
-portnames1 dut( ... ),.n2(2),.n1(1),.n3(3)); 
+portnames1 dut( ... ),.n2(2),.n1(1),.n3(3));
                                         ^ ? invalid identifier
-resistor #(.r(1)) r3(3, \0 ); 
+resistor #(.r(1)) r3(3, \0 );
                      ^ ? invalid identifier
 portnames1 #() dut (.n0(\0 ),.n1(\1 ),.n2(\2 ),.n3(\3 ));
 resistor #(.r(1)) r1 (.p(\1 ),.n(\0 ));

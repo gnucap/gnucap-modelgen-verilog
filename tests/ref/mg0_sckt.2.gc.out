@@ -1,4 +1,4 @@
-test_net2 #() dut(\1 ,2,\0 ); 
+test_net2 #() dut(\1 ,2,\0 );
                       ^ ? invalid identifier
 module vsin (.p(p),.n(n));
   .parameter amplitude 

@@ -1,4 +1,4 @@
-parameter v=0 
+parameter v=0
 test_an2a #() dut (.np(\1 ),.nn(\0 ));
 resistor #(.r(1)) c1 (.p(\1 ),.n(\0 ));
 #           v(1)       iter(0)   

@@ -1,8 +1,8 @@
-va_laplace_nd # ... (1), .n0(1)) b1(\0 ,2,in,\0 ); 
+va_laplace_nd # ... (1), .n0(1)) b1(\0 ,2,in,\0 );
                                         ^ ? invalid identifier
-va_laplace_np # ... -1) .n0(.5)) b0(\0 ,1,in,\0 ); 
+va_laplace_np # ... -1) .n0(.5)) b0(\0 ,1,in,\0 );
                                         ^ ? invalid identifier
-resistor #(1) r1(3,\0 ); 
+resistor #(1) r1(3,\0 );
                  ^ ? invalid identifier
 #Time       v(1)       v(2)       v(3)       v(in)     
  0.         0.         0.         0.         0.        

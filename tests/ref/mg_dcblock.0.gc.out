@@ -1,4 +1,4 @@
-test_dcb0 d1(\2 , 1); 
+test_dcb0 d1(\2 , 1);
                   ^ ? invalid identifier
 test_dcb0 #() d1 (.p(\2 ),.n(\1 ));
 vsine #(.freq(1),.ampl(1),.offset(1)) v0 (.p(\1 ),.n(\0 ));

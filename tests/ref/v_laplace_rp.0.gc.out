@@ -1,14 +1,14 @@
-va_laplace_nd # ... .d1( 1.)) b0 (.out0(0),.out1(ref1),.in0(in),.in1(0)); 
+va_laplace_nd # ... .d1( 1.)) b0 (.out0(0),.out1(ref1),.in0(in),.in1(0));
                                         ^ ? invalid identifier
-va_laplace_nd # ... ref1),.in0(in),.in1(0)); 
+va_laplace_nd # ... ref1),.in0(in),.in1(0));
                                         ^ ? invalid identifier
-va_laplace_nd # ... .d1( 1.)) b0 (.out0(0),.out1(ref3),.in0(in),.in1(0)); 
+va_laplace_nd # ... .d1( 1.)) b0 (.out0(0),.out1(ref3),.in0(in),.in1(0));
                                         ^ ? invalid identifier
-va_laplace_nd # ... ref3),.in0(in),.in1(0)); 
+va_laplace_nd # ... ref3),.in0(in),.in1(0));
                                         ^ ? invalid identifier
-va_laplace_nd # ... .d2( 1.)) b0 (.out0(0),.out1(ref4),.in0(in),.in1(0)); 
+va_laplace_nd # ... .d2( 1.)) b0 (.out0(0),.out1(ref4),.in0(in),.in1(0));
                                         ^ ? invalid identifier
-va_laplace_nd # ... ref4),.in0(in),.in1(0)); 
+va_laplace_nd # ... ref4),.in0(in),.in1(0));
                                         ^ ? invalid identifier
 va_laplace #(.rr0(2)) b0 (.out0(\0 ),.out1(out1),.in0(in),.in1(\0 ));
 va_laplace_nd #(.n0( 2.),.d0( 0.),.d1( 1.)) b0 (.out0(\0 ),.out1(ref1),.in0(in),.in1(\0 ));

@@ -1,10 +1,10 @@
-*options method=euler 
+*options method=euler
 ^ ? *options: no match
 #           v(1)       v(a)      
  0.        -1.0731n    0.        
-print tran v(nodes) d(d0) i(d0) d(d1) i(d1) st0(d0.*) v(d0.*) 
+print tran v(nodes) d(d0) i(d0) d(d1) i(d1) st0(d0.*) v(d0.*)
                                   ^ ? no match
-print tran v(no ... d(d0) i(d0) d(d1) i(d1) st0(d0.*) v(d0.*) 
+print tran v(no ... d(d0) i(d0) d(d1) i(d1) st0(d0.*) v(d0.*)
                                         ^ ? no match
 #Time       v(1)       v(a)       d(d0)      i(d0)      st0(d0._b_idt_0_p_idt_0_n) st0(d0._b_ddt_1_p_ddt_1_n) st0(d0._b_q_n) v(d0._b_idt_0_p_idt_0_n) v(d0._b_ddt_1_p_ddt_1_n) v(d0._b_q_n)
  0.         0.         0.         0.         0.        -1.0731n    0.         ??         0.         0.         0.        

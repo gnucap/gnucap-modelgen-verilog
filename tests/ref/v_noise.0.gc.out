@@ -1,4 +1,4 @@
-ground \0 ; 
+ground \0 ;
 white_noise #(.$mfactor(2),.pwr(1)) w (.p(\1 ),.n(\0 ));
 white_noise #(.$mfactor(1),.pwr(2)) w (.p(\2 ),.n(\0 ));
 white_noise #(.$mfactor(1),.pwr(1)) w (.p(\3 ),.n(\0 ));

@@ -1,6 +1,6 @@
-ground \0 ; 
-parameter r=1 
-parameter v=0 
+ground \0 ;
+parameter r=1
+parameter v=0
 test_absdel0 #() dut (.p(\1 ),.n(\0 ));
 vsine #(.ampl(1),.dc(v)) v1 (.p(\1 ),.n(\0 ));
 #Time       v(1)       ll1(dut)   vin(dut._b_absdelay_0_p_absdelay_0_n)

@@ -1,29 +1,29 @@
->>>>>module hsp(a, b) 
->>>>>module main(\1 , \2 ); 
->>>>>ground \0 ; 
->>>>>list 
+>>>>>module hsp(a, b)
+>>>>>module main(\1 , \2 );
+>>>>>  ground \0 ;
+>>>>>list
 module hsp (.a(a),.b(b));
   vsource #(.dc(2),(* test=1 *) .$yposition(10)) c (a,b);
 endmodule // hsp
 
 module main (.\1 (\1 ),.\2 (\2 ));
-  ground \0 ; 
+    ground \0 ;
   hsp #((* test=2 *) .$xposition(3),(* test=3 *) .$mfactor(2)) test (\1 ,\0 );
 endmodule // main
 
 main #() m (.\1 (\1 ),.\2 (\2 ));
->>>>>print dc v(nodes) 
+>>>>>print dc v(nodes)
 main.test: hsp from top level
 main.test: 1 candidate found for hsp
 hsp.c: vsource from device_dispatcher
 hsp.c: 1 candidate found for vsource
->>>>>dc 
+>>>>>dc
 #           v(1)       v(2)      
  0.         2.         0.        
->>>>>status notime 
+>>>>>status notime
 Gnucap   System status
 iterations: op=0, dc=2, tran=0, fourier=0, total=2
 transient timesteps: accepted=0, rejected=0, total=0
 nodes: user=2, subckt=0, model=0, total=2
 dctran density=50.0%, ac density=50.0%
->>>>>end 
+>>>>>end

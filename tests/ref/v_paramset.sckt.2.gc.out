@@ -1,19 +1,19 @@
->>>>>module modwrong(A b) 
->>>>>module mod(a b) 
->>>>>paramset bob mod; 
->>>>>paramset bob modwrong; 
->>>>>module main(1,\2 , \3 , \4 ) 
-module main(1,\2 , \3 , \4 ) 
+>>>>>module modwrong(A b)
+>>>>>module mod(a b)
+>>>>>paramset bob mod;
+>>>>>paramset bob modwrong;
+>>>>>module main(1,\2 , \3 , \4 )
+module main(1,\2 , \3 , \4 )
             ^ ? invalid identifier
-bob b1 (.a(1) .b(2)); 
-           ^ ? invalid identifier
-bob b1 (.a(1) .b(2)); 
-                 ^ ? invalid identifier
-main m(\1 ,2,3,\0 ); 
-           ^ ? invalid identifier
-main m(\1 ,2,3,\0 ); 
+  bob b1 (.a(1) .b(2));
              ^ ? invalid identifier
->>>>>list 
+  bob b1 (.a(1) .b(2));
+                   ^ ? invalid identifier
+main m(\1 ,2,3,\0 );
+           ^ ? invalid identifier
+main m(\1 ,2,3,\0 );
+             ^ ? invalid identifier
+>>>>>list
 module modwrong (.A(A),.b(b));
 endmodule // modwrong
 
@@ -33,14 +33,14 @@ module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
 endmodule // main
 
 main #() m (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\0 ));
->>>>>op 
+>>>>>op
 main.b1: bob from top level
 main.b1: bob from top level
 main.b1 discarded: no match: a
 main.b1: 1 candidate found for bob
 #          
  27.       
->>>>>status notime 
+>>>>>status notime
 Gnucap   System status
 iterations: op=2, dc=0, tran=0, fourier=0, total=2
 transient timesteps: accepted=0, rejected=0, total=0

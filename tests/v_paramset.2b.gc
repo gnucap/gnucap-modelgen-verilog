@@ -1,8 +1,8 @@
 verilog
 
-paramset vs vsource; \
-parameter dc; \
-.dc=dc; \
+paramset vs vsource;
+parameter dc;
+.dc=dc;
 endparamset;
 
 module main(\1 ,2);

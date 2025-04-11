@@ -1,5 +1,5 @@
-parameter r=1 
-parameter v=0 
+parameter r=1
+parameter v=0
 test_res2_0 #(.r(r)) dut (.np(\1 ),.nn(\0 ));
 vsource #(.dc(v)) v1 (.p(\1 ),.n(\0 ));
 #           i(dut)    

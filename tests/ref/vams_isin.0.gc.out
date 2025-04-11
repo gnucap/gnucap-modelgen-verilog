@@ -1,4 +1,4 @@
-main #() dut(a, b 0) 
+main #() dut(a, b 0)
                   ^ ? invalid identifier
 #           v(a)       v(b)       iter(0)   
  0.         0.         1.         3.        

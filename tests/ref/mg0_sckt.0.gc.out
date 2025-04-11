@@ -1,28 +1,28 @@
 >>>>>verilog 
->>>>>`modelgen 
->>>>>!make test_sckt0.so > /dev/null 
->>>>>attach ./test_sckt0.so 
->>>>>parameter r=1 
->>>>>parameter c=1 
->>>>>parameter v=0 
-test_sckt0 #(.r(r)) dut(\1 ,2); 
+>>>>>`modelgen
+>>>>>!make test_sckt0.so > /dev/null
+>>>>>attach ./test_sckt0.so
+>>>>>parameter r=1
+>>>>>parameter c=1
+>>>>>parameter v=0
+test_sckt0 #(.r(r)) dut(\1 ,2);
                             ^ ? invalid identifier
->>>>>list 
-parameter r=1 
-parameter c=1 
-parameter v=0 
+>>>>>list
+parameter r=1
+parameter c=1
+parameter v=0
 test_sckt0 #(.r(r)) dut (.a(\1 ),.b(\2 ));
 vsource #(.dc(v)) v1 (.p(\1 ),.n(\0 ));
->>>>>print dc v(nodes) v(dut) v(dut.r1) y(dut.r1) v1(dut.r1) v2(dut.r1) 
+>>>>>print dc v(nodes) v(dut) v(dut.r1) y(dut.r1) v1(dut.r1) v2(dut.r1)
 .r1: resistor from device_dispatcher
 .r1: 1 candidate found for resistor
->>>>>dc v 0 1 .5 
+>>>>>dc v 0 1 .5
 #           v(1)       v(2)       v(dut)     v(dut.r1)  y(dut.r1)  v1(dut.r1) v2(dut.r1)
  0.         0.         0.         ??         0.         1.         0.         0.        
  0.5        0.5        0.5        ??         500.04f    1.         0.5        0.5       
  1.         1.         1.         ??         1.0001p    1.         1.         1.        
 v already set. replacing
->>>>>status notime 
+>>>>>status notime
 Gnucap   System status
 iterations: op=0, dc=7, tran=0, fourier=0, total=7
 transient timesteps: accepted=0, rejected=0, total=0

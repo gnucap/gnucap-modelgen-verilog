@@ -1,5 +1,5 @@
-ground \0 ; 
-parameter v = 1. 
+ground \0 ;
+parameter v = 1.
 test_ind1 #() dut (.p(\1 ),.n(\2 ));
 resistor #(.r(10k)) r1 (.p(\1 ),.n(\2 ));
 resistor #(.r(1k)) r1 (.p(\3 ),.n(\2 ));

@@ -1,22 +1,22 @@
->>>>>module ports(a, b) 
->>>>>module main(1 2); 
-module main(1 2); 
+>>>>>module ports(a, b)
+>>>>>module main(1 2);
+module main(1 2);
             ^ ? invalid identifier
-module main(1 2); 
+module main(1 2);
               ^ ? invalid identifier
->>>>>ground \0 ; 
->>>>>print dc v(nodes) 
+>>>>>  ground \0 ;
+>>>>>print dc v(nodes)
 main.p: ports from top level
 main.p: 1 candidate found for ports
 ports.c: vsource from device_dispatcher
 ports.c: 1 candidate found for vsource
->>>>>dc 
+>>>>>dc
 #           v(1)       v(2)      
  0.         2.         0.        
->>>>>status notime 
+>>>>>status notime
 Gnucap   System status
 iterations: op=0, dc=2, tran=0, fourier=0, total=2
 transient timesteps: accepted=0, rejected=0, total=0
 nodes: user=2, subckt=0, model=0, total=2
 dctran density=50.0%, ac density=50.0%
->>>>>end 
+>>>>>end

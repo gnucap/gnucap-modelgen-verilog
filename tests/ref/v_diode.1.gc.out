@@ -1,12 +1,12 @@
-module main(1 2) 
+module main(1 2)
             ^ ? invalid identifier
-module main(1 2) 
+module main(1 2)
               ^ ? invalid identifier
-ddd #(.area(1.)) d1 (1  \2 ); 
-                     ^ ? invalid identifier
-main m(2 0); 
+  ddd #(.area(1.)) d1 (1  \2 );
+                       ^ ? invalid identifier
+main m(2 0);
        ^ ? invalid identifier
-main m(2 0); 
+main m(2 0);
          ^ ? invalid identifier
 .model ddd diode ( $mfactor=NA( NA))
 .subckt main ( 1 2 )

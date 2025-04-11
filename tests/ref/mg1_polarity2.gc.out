@@ -1,14 +1,14 @@
-polarity2_0             d(3,\0 ,\1 ,\0 ,\2 ,\0 ); 
+polarity2_0             d(3,\0 ,\1 ,\0 ,\2 ,\0 );
                           ^ ? invalid identifier
-polarity2_0 #(.cv(0.)) d4(4,\0 ,\1 ,\0 ,\2 ,\0 ); 
+polarity2_0 #(.cv(0.)) d4(4,\0 ,\1 ,\0 ,\2 ,\0 );
                           ^ ? invalid identifier
-polarity2_0 #(.ci(0.)) d5(5,\0 ,\1 ,\0 ,\2 ,\0 ); 
+polarity2_0 #(.ci(0.)) d5(5,\0 ,\1 ,\0 ,\2 ,\0 );
                           ^ ? invalid identifier
-resistor #(.r(1)) r3(3, \0 ); 
+resistor #(.r(1)) r3(3, \0 );
                      ^ ? invalid identifier
-resistor #(.r(1)) r4(4, \0 ); 
+resistor #(.r(1)) r4(4, \0 );
                      ^ ? invalid identifier
-resistor #(.r(1)) r5(5, \0 ); 
+resistor #(.r(1)) r5(5, \0 );
                      ^ ? invalid identifier
 polarity2_0 #() d (.p(\3 ),.n(\0 ),.cp(\1 ),.cn(\0 ),.vp(\2 ),.vn(\0 ));
 polarity2_0 #(.cv(0.)) d4 (.p(\4 ),.n(\0 ),.cp(\1 ),.cn(\0 ),.vp(\2 ),.vn(\0 ));

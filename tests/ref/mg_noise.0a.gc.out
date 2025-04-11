@@ -1,24 +1,24 @@
-test_noise0a #() dut(\1 , 2, 3, 4, 5, 6); 
+test_noise0a #() dut(\1 , 2, 3, 4, 5, 6);
                           ^ ? invalid identifier
-test_noise0a #() dut(\1 , 2, 3, 4, 5, 6); 
+test_noise0a #() dut(\1 , 2, 3, 4, 5, 6);
                              ^ ? invalid identifier
-test_noise0a #() dut(\1 , 2, 3, 4, 5, 6); 
+test_noise0a #() dut(\1 , 2, 3, 4, 5, 6);
                                 ^ ? invalid identifier
-test_noise0a #() dut(\1 , 2, 3, 4, 5, 6); 
+test_noise0a #() dut(\1 , 2, 3, 4, 5, 6);
                                    ^ ? invalid identifier
-test_noise0a #() dut(\1 , 2, 3, 4, 5, 6); 
+test_noise0a #() dut(\1 , 2, 3, 4, 5, 6);
                                       ^ ? invalid identifier
-noise_probe na(1) 
+noise_probe na(1)
                ^ ? invalid identifier
-noise_probe nb(2) 
+noise_probe nb(2)
                ^ ? invalid identifier
-noise_probe nc(3) 
+noise_probe nc(3)
                ^ ? invalid identifier
-noise_probe nd(4) 
+noise_probe nd(4)
                ^ ? invalid identifier
-noise_probe ne(5) 
+noise_probe ne(5)
                ^ ? invalid identifier
-noise_probe nf(6) 
+noise_probe nf(6)
                ^ ? invalid identifier
 test_noise0a #() dut (.a(\1 ),.b(\2 ),.c(\3 ),.d(\4 ),.e(\5 ),.f(\6 ));
 meas_noise #() na (.p(\1 ));

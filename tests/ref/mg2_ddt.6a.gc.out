@@ -1,4 +1,4 @@
-test_ddt6a #() dut(out,0,in,\0 ); 
+test_ddt6a #() dut(out,0,in,\0 );
                        ^ ? invalid identifier
 #Time       v(in)      v(out)     iter(0)   
  0.         0.         0.         3.        

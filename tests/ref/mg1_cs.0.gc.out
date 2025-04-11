@@ -1,4 +1,4 @@
-test_cs0 dut(\1 ,2); 
+test_cs0 dut(\1 ,2);
                  ^ ? invalid identifier
 test_cs0 #() dut (.np(\1 ),.nn(\2 ));
 vsource #() v1 (.p(\1 ),.n(\0 ));

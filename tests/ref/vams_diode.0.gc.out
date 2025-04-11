@@ -1,5 +1,5 @@
->>>>>module main(n, g) 
->>>>>spice 
+>>>>>module main(n, g)
+>>>>>spice
 >>>>>.model dd d cjo=1pf is=1e-15 
 >>>>>.parameter v=0 
 >>>>>.print dc v(nodes) i(V1) i(V2) z(m.D1) iter(0) 

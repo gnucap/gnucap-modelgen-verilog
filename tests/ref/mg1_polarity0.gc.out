@@ -1,10 +1,10 @@
-vsource #(.dc(v)) v3(3, \0 ); 
+vsource #(.dc(v)) v3(3, \0 );
                      ^ ? invalid identifier
-polarity2 dut(3,\0 ); 
+polarity2 dut(3,\0 );
               ^ ? invalid identifier
-vsource #(.dc(v)) v3(4, \0 ); 
+vsource #(.dc(v)) v3(4, \0 );
                      ^ ? invalid identifier
-polarity3 dut(4,\0 ); 
+polarity3 dut(4,\0 );
               ^ ? invalid identifier
 vsource #(.dc(v)) v1 (.p(\1 ),.n(\0 ));
 polarity0 #() dut (.np(\1 ),.nn(\0 ));

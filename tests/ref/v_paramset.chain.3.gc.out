@@ -1,13 +1,13 @@
->>>>>module tln0(a, b); 
->>>>>module tln1(a, b); 
->>>>>paramset tln tln1 
->>>>>paramset tln tln0 
->>>>>module main(1 2); 
-module main(1 2); 
+>>>>>module tln0(a, b);
+>>>>>module tln1(a, b);
+>>>>>paramset tln tln1
+>>>>>paramset tln tln0
+>>>>>module main(1 2);
+module main(1 2);
             ^ ? invalid identifier
-module main(1 2); 
+module main(1 2);
               ^ ? invalid identifier
->>>>>spice 
+>>>>>spice
 >>>>>.options noinsensitive 
 >>>>>.print dc v(nodes) y(m.t1.r) y(m.t1.t.r) 
 main.t1: tln from top level

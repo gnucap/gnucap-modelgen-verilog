@@ -1,4 +1,4 @@
-parameter v=1 
+parameter v=1
 test_dep0 #() dut (.p(\1 ),.n(\0 ));
 vsource #(.dc(v)) v1 (.p(\1 ),.n(\0 ));
 #           i(v1)     

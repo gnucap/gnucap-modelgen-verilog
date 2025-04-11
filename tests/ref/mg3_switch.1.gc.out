@@ -1,9 +1,9 @@
-test_sw1 #() dut(\1 ,\0 ,2,\0 ); 
+test_sw1 #() dut(\1 ,\0 ,2,\0 );
                          ^ ? invalid identifier
-vsource #(.dc(1)) v1(3,\0 ); 
+vsource #(.dc(1)) v1(3,\0 );
                      ^ ? invalid identifier
 test_sw1 #() dut (.p(\1 ),.n(\0 ),.cp(\2 ),.cn(\0 ));
-parameter v=0 
+parameter v=0
 vsource #(.dc(v)) v1 (.p(\2 ),.n(\0 ));
 vsource #(.dc(1)) v1 (.p(\3 ),.n(\0 ));
 resistor #(.r(1)) v1 (.p(\3 ),.n(\1 ));

@@ -1,8 +1,8 @@
->>>>>module tln0(a, b); 
->>>>>module tln1(a, b); 
->>>>>paramset tln tln1 
->>>>>module main(\1 , \2 ); 
->>>>>spice 
+>>>>>module tln0(a, b);
+>>>>>module tln1(a, b);
+>>>>>paramset tln tln1
+>>>>>module main(\1 , \2 );
+>>>>>spice
 >>>>>.options noinsensitive 
 >>>>>.print dc v(nodes) y(m.t1.tttt.r) y(m.t1.rrrr) 
 main.t1: tln from top level

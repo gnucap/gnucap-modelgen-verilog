@@ -1,8 +1,8 @@
-main #() m1(0 1) 
+main #() m1(0 1)
             ^ ? invalid identifier
-main #() m1(0 1) 
+main #() m1(0 1)
               ^ ? invalid identifier
-print dc v(nodes) v(m1.v1) v(m1.v1.*) 
+print dc v(nodes) v(m1.v1) v(m1.v1.*)
                              ^ ? no match
 Gnucap   System status
 iterations: op=0, dc=0, tran=0, fourier=0, total=0
