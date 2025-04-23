@@ -205,6 +205,32 @@ public:
 } strobe;
 DISPATCHER<FUNCTION>::INSTALL d_strobe(&function_dispatcher, "$strobe", &strobe);
 /*--------------------------------------------------------------------------*/
+class WARNING : public WRITE {
+public:
+  explicit WARNING() : WRITE() {
+    set_label("$warning");
+  }
+  std::string end()const override{return "\\n";}
+  WRITE* clone()const override {
+    incomplete(); // need stderr or error(bWARNING..)
+    return new WARNING(*this);
+  }
+} warning;
+DISPATCHER<FUNCTION>::INSTALL d_warning(&function_dispatcher, "$warning", &warning);
+/*--------------------------------------------------------------------------*/
+class ERROR : public WRITE {
+public:
+  explicit ERROR() : WRITE() {
+    set_label("$error");
+  }
+  std::string end()const override{return "\\n";}
+  WRITE* clone()const override {
+    incomplete(); // need stderr or error(bDANGER..)
+    return new ERROR(*this);
+  }
+} error;
+DISPATCHER<FUNCTION>::INSTALL d_error(&function_dispatcher, "$error", &error);
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
