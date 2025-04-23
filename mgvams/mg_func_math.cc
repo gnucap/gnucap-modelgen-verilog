@@ -354,6 +354,33 @@ public:
 } p_atanh;
 DISPATCHER<FUNCTION>::INSTALL d_atanh(&function_dispatcher, "atanh|$atanh", &p_atanh);
 /*--------------------------------------------------------------------------*/
+class ceil : public MGVAMS_FUNCTION {
+public:
+  explicit ceil() : MGVAMS_FUNCTION(){
+    set_label("$ceil");
+  }
+  void stack_op(Expression* e)const override { untested();
+    Base const* x = get_constant(e);
+    if(auto f = dynamic_cast<Float const*>(x)) { untested();
+      subs_double(e, std::ceil(f->value()));
+    }else if(auto i = dynamic_cast<Integer const*>(x)) { untested();
+      subs_int(e, i->value());
+    }else{ untested();
+      throw Exception("invalid arg");
+    }
+  }
+  std::string code_name()const override{ untested();
+    return "_f_ceil";
+  }
+  void make_cc_common(std::ostream& o)const override { untested();
+    o__ "template<class T>\n";
+    o__ "T " << code_name() << "(T d)const {itested();\n";
+    o____ "return int(std::ceil(d));\n";
+    o__ "}\n";
+  }
+} p_ceil;
+DISPATCHER<FUNCTION>::INSTALL d_ceil(&function_dispatcher, "ceil|$ceil", &p_ceil);
+/*--------------------------------------------------------------------------*/
 class cos : public MGVAMS_FUNCTION {
 public:
   explicit cos() : MGVAMS_FUNCTION(){
