@@ -1,0 +1,48 @@
+verilog
+// test current port in instance
+
+ground gnd;
+
+module main0 (\1 , \2 , \3 , \4 );
+  parameter R=1;
+  ccvs #(.gain(R)) vs1(\3i , \2 , vp2);
+  vsource #(.dc(0)) vp1(\3 , \3i );
+
+  ccvs #(.gain(R)) vs2(\1 , \4i , vp1);
+  vsource #(.dc(0)) vp2(\4 , \4i );
+endmodule
+
+// same without current ports...
+module main1 (\1 , \2 , \3 , \4 );
+  parameter R=1;
+  vccs #(1/R) cs1(\2 , \3 , \4 , \1 );
+  vccs #(1/R) cs2(\1 , \4 , \2 , \3 );
+endmodule
+
+main0 #(.R(.34)) m(.\1 (A),.\2 (B),.\3 (gnd),.\4 (gnd));
+main1 #(.R(.34)) m(.\1 (C),.\2 (D),.\3 (gnd),.\4 (gnd));
+list
+
+
+spice
+.options noinsensitive
+.print op v(nodes)
+.op
+.ground gnd
+
+R1 1 A .5k
+V1 1 0 sin ampl=1 freq=1k ac 1
+L1 0 B 1u
+
+R1 1 C .5k
+V1 1 0 sin ampl=1 freq=1k ac 1
+L1 0 D 1u
+
+.print tran v(nodes)
+.list
+.tran 1m basic | {tee aa.out}
+
+.print ac vm(nodes)
+.ac .1k 100k * 10
+.print ac vp(nodes)
+.ac .1k 100k * 10

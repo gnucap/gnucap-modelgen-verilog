@@ -1,8 +1,6 @@
 >>>>>paramset bob resistor;
 >>>>>paramset zap bob;
->>>>>module main(1,\2 , \3 , \4 )
-module main(1,\2 , \3 , \4 )
-            ^ ? invalid identifier
+>>>>>module main(\1 ,\2 , \3 , \4 )
 >>>>>  ground \0 ;
   bob  r1 (1 2);
            ^ ? invalid identifier
@@ -12,8 +10,6 @@ module main(1,\2 , \3 , \4 )
            ^ ? invalid identifier
   zap  r2 (2 0);
              ^ ? invalid identifier
-  vsource #(1) v1 (1 \0 );
-                   ^ ? invalid identifier
 >>>>>list
 paramset bob resistor;
  .r=10k;

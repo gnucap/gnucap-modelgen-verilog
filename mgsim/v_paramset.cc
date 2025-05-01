@@ -719,6 +719,16 @@ void PARAMSET::expand()
       dev->precalc_first();
       dev->expand_first();
       dev->expand();
+      if(dynamic_cast<PARAMSET*>(dev)){
+      }else{
+	COMPONENT* ddd = dynamic_cast<COMPONENT*>(dev->deflate());
+	if(ddd!=dev){
+	  *subckt()->begin() = ddd;
+	  delete (CARD*)dev;
+	  dev = ddd;
+	}else{
+	}
+      }
       dev->expand_last();
     }
 
