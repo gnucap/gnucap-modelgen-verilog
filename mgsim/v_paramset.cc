@@ -573,6 +573,7 @@ CARD* PARAMSET::deflate()
   assert(subckt());
   subckt()->set_verilog_math();
   assert(subckt()->size()==1);
+
   CARD_LIST::iterator i = subckt()->begin();
   assert(*i);
   COMPONENT* dev = prechecked_cast<COMPONENT*>(*i);
@@ -709,10 +710,18 @@ void PARAMSET::expand()
     }
 
     assert(subckt()->size()==1);
+    assert(dev==d);
 
-    {
+    if(0){
+      // cannot deflate yet
       subckt()->expand();
+    }else{
+      dev->precalc_first();
+      dev->expand_first();
+      dev->expand();
+      dev->expand_last();
     }
+
     if(dev->is_valid()){
     }else{
       // TODO: seems to be the wrong place. see mg_bug.1.gc
