@@ -1,6 +1,29 @@
 
-module rc(1, 2, gnd)
+nature current
+  access = I;
+  units = "A";
+  abstol = 1e-12; // OPT::abstol
+endnature
+
+// Electrical potential
+nature voltage
+  access = V;
+  units = "V";
+  abstol = 1e-6; // OPT::vntol
+endnature
+
+// Electrical discipline
+discipline electrical
+  potential voltage;
+  flow current;
+enddiscipline
+
+module rc(\1 , \2 );
+	electrical \1 , \2 ;
+	electrical gnd;
+	inout \1 , \2 ;
+	ground gnd;
 	parameter real ic=1;
-	capacitor #(.c(1u), .ic(ic)) c(1, gnd);
-	resistor #(.r(1k)) r(1, 2);
+	capacitor #(.c(1u), .ic(ic)) c(\1 , gnd);
+	resistor #(.r(1k)) r(\1 , \2 );
 endmodule

@@ -90,7 +90,7 @@ protected:
 void VAACS::ac_load()
 {
   ac_load_shunt(); // 4 pt +- loss
-  trace2("acs", long_label(), value());
+  trace2("VAACS::ac_load", long_label(), value());
   _acg = value(); // 1; // _vy0[1] * _sim->_jomega; BUG. value?
   ac_load_source();
 

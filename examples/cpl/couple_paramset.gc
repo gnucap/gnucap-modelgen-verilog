@@ -10,6 +10,7 @@ options trtol 1
 // better parameterisation
 
 verilog
+ground gnd;
 
 // in0 o--L--oo--R--o out0
 //        .  ||
@@ -18,6 +19,7 @@ verilog
 // in1 o--L--oo--R--o out1
 
 module cpl0(in0, in1, gnd, out0, out1);
+  ground gnd;
 //  electrical i0, i1;
   parameter length=0 from [1:1];
   parameter k;
@@ -50,6 +52,7 @@ endmodule
 module cpl1(in0, in1, gnd, out0, out1);
 //  electrical i0, i1;
 //  electrical j0, j1;
+  ground gnd;
   parameter length=0 from [2:200];
   parameter R;
   parameter L;
@@ -105,10 +108,11 @@ paramset cpl cpl0
 endparamset
 
 module main(in, out, ct );
-  cpl #(.length(200), .r(.01), .l(.1n), .g(.2u) .c(15.f) .k(.9) ) t1(in, vv , \0 , out, ct );
-  resistor #(50) r(out, \0 );
-  resistor #(50) r(ct, \0 );
-  vsource #(.dc(1)) V3(vv, \0);
+  ground gnd;
+  cpl #(.length(200), .r(.01), .l(.1n), .g(.2u) .c(15.f) .k(.9) ) t1(in, vv , gnd , out, ct );
+  resistor #(50) r(out, gnd );
+  resistor #(50) r(ct, gnd );
+  vsource #(.dc(1)) V3(vv, gnd );
 endmodule
 
 main #() m(nin, nout, ct);
@@ -124,7 +128,7 @@ L1b in1 out1 {l}
 K1 L1a L1b {k}
 .ends
 
-V0 nin 0 pulse(0 1.8 0p 100p 100p .5n 1n) ac 1
+V0 nin gnd pulse(0 1.8 0p 100p 100p .5n 1n) ac 1
 
 .print tran v(nodes)
 

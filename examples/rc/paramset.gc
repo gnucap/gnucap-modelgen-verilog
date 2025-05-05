@@ -1,21 +1,23 @@
 verilog
 load mgsim
 
-// the models we just compiled
+// the module we just compiled
 load ./rc_b.so
 
 paramset rc_ps rc
 	.ic = 2;
 endparamset
 
-module main(1,2,3);
-	rc_ps myrc1(1, 2, 3);
-	rc_ps myrc2(1, 2, 3);
-	resistor #(.r(1k)) r1(2, 0);
+module main(\1 , \2 , \3 );
+	rc_ps myrc1(\1 , \2 , \3 );
+	rc_ps myrc2(\1 , \2 , \3 );
+	ground gnd;
+	resistor #(.r(1k)) r1(\2 , gnd);
 endmodule
 
 // instanciate it
-main m(1,2,0);
+ground gnd;
+main m(\1 , \2 , gnd);
 
 print tran v(nodes)
 tran 1m

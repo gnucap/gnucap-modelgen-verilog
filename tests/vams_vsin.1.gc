@@ -6,10 +6,12 @@ load ../vams/vsine.so
 verilog
 
 module main(a, gnd);
-  vsine #(.mag(1.)) v1(a, gnd);
+  // vsine #(.mag(1.)) v1(a, gnd);
+  vsine #(.mag(1), .ampl(1), .freq(1./2./3.1415)) v1(a, gnd);
 endmodule
 
-main #() dut(\1 , 0)
+ground gnd;
+main #() dut(\1 , gnd )
 
 spice
 
@@ -18,9 +20,10 @@ R1 1 2 1
 C1 0 2 1
 
 .print dc v(nodes) iter(0)
-.print ac v(nodes) iter(0)
+.print tran v(nodes) iter(0)
+.print ac vm(nodes) vp(nodes) iter(0)
 
-.dc
+.tran 1 basic
 .ac 1 1000 * 10
 .status notime
 .end

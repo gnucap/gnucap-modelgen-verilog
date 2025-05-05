@@ -3,9 +3,10 @@ load vams/vsine.so
 load ./rc_zi.so
 
 verilog
+ground gnd;
 
 rc_zi #() b(out3, in);
-vsine #(.ampl(1), .freq(1/2/3.1415)) v1(in, 0);
+vsine #(.ampl(1), .freq(1/2/3.1415)) v1(in, gnd);
 
 // lowpass for comparison
 // fc = 0.16Hz

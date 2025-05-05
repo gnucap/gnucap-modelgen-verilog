@@ -2,25 +2,26 @@ verilog
 load mgsim
 load vams/capacitor.so
 
-module rc(1, 2, gnd)
+module rc(\1 , \2 )
+	ground gnd;
 	parameter ic=1
-	capacitor #(.c(1u), .ic(ic)) c(1 gnd);
-	resistor #(.r(1k)) r(1 2);
+	capacitor #(.c(1u), .ic(ic)) c(\1 , gnd);
+	resistor #(.r(1k)) r(\1 , \2 );
 endmodule
 
 parameter ic=2
 
 // Verilog does not define instances or nodes at top level. Gnucap only
-// simulates what is instanciated. The 0 node denotes ground.
-// (at the time of writing, the "ground" declarator is not implemented.)
+// simulates what is instanciated.
 
-rc #(.ic(ic)) myrc(1, 2, 0);
+rc #(.ic(ic)) myrc(\1, \2 );
 
 print tran v(nodes)
 tran 1m
 
 // can have multiple instances at top level.
-capacitor #(.c(1u)) c1(2, 0);
+ground \0 ;
+capacitor #(.c(1u)) c1(\2 , \0 );
 
 tran 0 1m
 

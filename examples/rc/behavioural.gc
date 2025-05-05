@@ -7,8 +7,9 @@ load ./rc_b.so
 parameter ic=1
 
 // instanciate it.
-rc #(.ic(ic)) myrc1(1, 2, 0);
-resistor #(.r(1k)) r1(2, 0);
+ground gnd;
+rc #(.ic(ic)) myrc1(\1 , \2 , gnd);
+resistor #(.r(1k)) r1(\2 , gnd);
 
 print tran v(nodes)
 tran 1m

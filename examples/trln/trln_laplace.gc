@@ -5,23 +5,25 @@ verilog
 parameter z0=50.
 options trtol=5
 
+ground gnd;
+
 // TODO. need to fix tolerances..
 options nobypass
 options noincmode
 
-trln0 #(.z0(z0)) tmatch(m_out 0 m_in 0 );
-trln0 #(.z0(z0)) topen( nc 0 o_in 0 );
-trln0 #(.z0(z0)) tshort(x x s_in 0 );
+trln0 #(.z0(z0)) tmatch(m_out gnd m_in gnd );
+trln0 #(.z0(z0)) topen( nc gnd o_in gnd );
+trln0 #(.z0(z0)) tshort(x x s_in gnd );
 
 
-resistor #(z0) rmatch (m_out 0);
+resistor #(z0) rmatch (m_out gnd);
 resistor #(z0) rin1 (m_in vsrc);
 resistor #(z0) rin2 (o_in vsrc);
 resistor #(z0) rin3 (s_in vsrc);
 
 spice
-* BUG: need pulse in vams.
-v1 vsrc 0 pulse rise=.1 fall=.1 iv=0 pv=1 delay=1 width=2 ac 1
+* TODO use vams/vpulse
+v1 vsrc gnd pulse rise=.1 fall=.1 iv=0 pv=1 delay=1 width=2 ac 1
 
 .print tran v(vsrc) v(m_in) v(s_in) v(o_in) v(m_out)
 .tran 10 basic | {tee trln_laplace_tr.out}

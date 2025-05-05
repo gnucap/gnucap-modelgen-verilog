@@ -1094,9 +1094,15 @@ void LAPLACE::ac_load()
   }else{
 //    _acg = _values[1];
   //  ac_load_source();
+  COMPLEX _acout = _acg;
+  if(_loss0) {
+    // BUG: duplicate in other filters.
+    _acout *= -1; // - _loss0 * _output->mfactor();
+  }else{
+  }
    auto _values = _st_b_in_;
     for (int i=2; i<=_n_ports; ++i) {
-      ac_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), _values[i] * _acg);
+      ac_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), _values[i] * _acout);
     }
 
   }

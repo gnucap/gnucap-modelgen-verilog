@@ -1261,7 +1261,7 @@ public:
   }
   void expand()override { }
   void precalc_last()override { }
-  CARD* deflate()override { untested(); incomplete(); return this;}
+  CARD* deflate()override { incomplete(); return this;}
 
 public:
   char id_letter()const override{ untested();return 'X';}
