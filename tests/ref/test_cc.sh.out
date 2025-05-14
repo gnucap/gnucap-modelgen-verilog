@@ -689,6 +689,16 @@ struct ddouble_if<PARAMETER<double>, double> {
   typedef double type;
 };
 /*--------------------------------------------------------------------------*/
+template<>
+struct ddouble_if<PARAMETER<int>, double> {
+  typedef double type;
+};
+/*--------------------------------------------------------------------------*/
+template<>
+struct ddouble_if<PARAMETER<int>, int> {
+  typedef double type;
+};
+/*--------------------------------------------------------------------------*/
 template<class T, int a>
 struct ddouble_if<T, ddouble_<a>>{
   typedef ddouble_<a> type;
@@ -4493,6 +4503,16 @@ struct ddouble_if<PARAMETER<double>, S> {
 /*--------------------------------------------------------------------------*/
 template<>
 struct ddouble_if<PARAMETER<double>, double> {
+  typedef double type;
+};
+/*--------------------------------------------------------------------------*/
+template<>
+struct ddouble_if<PARAMETER<int>, double> {
+  typedef double type;
+};
+/*--------------------------------------------------------------------------*/
+template<>
+struct ddouble_if<PARAMETER<int>, int> {
   typedef double type;
 };
 /*--------------------------------------------------------------------------*/

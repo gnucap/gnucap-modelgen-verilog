@@ -1,0 +1,33 @@
+
+attach ./modelgen_1.so
+
+
+verilog
+
+`modelgen
+module test_bug3 (a, c);
+	parameter integer rs= 2.1;
+	
+	inout a, c;
+	electrical a, c;
+	electrical ia;
+	real vv;
+
+	analog initial begin
+		vv = exp(rs) + pow(rs,0.5);
+	end
+
+	analog V(a,c) <+ vv;
+endmodule
+`endmodelgen
+
+
+!make test_bug3.so > /dev/null
+attach ./test_bug3.so
+
+
+test_bug3 #() dut(\1 ,\0 );
+
+print dc v(nodes)
+dc
+status notime

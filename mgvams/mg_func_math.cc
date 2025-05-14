@@ -240,12 +240,17 @@ private:
   }
 };
 /*--------------------------------------------------------------------------*/
+void declare_f1(std::ostream& o, std::string const& cn)
+{
+  o__ "template<class T>\n";
+  o__ "typename va::ddouble_if<T, double>::type " << cn << "(T d)const {\n";
+  o____ "typename va::ddouble_if<T, double>::type ret(d);\n";
+}
+/*--------------------------------------------------------------------------*/
 // TODO: these are still in m_va.h
 STUB acosh("acosh");
 DISPATCHER<FUNCTION>::INSTALL d_acosh(&function_dispatcher, "acosh|$acosh", &acosh);
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-#if 1
 /*--------------------------------------------------------------------------*/
 class abs : public MGVAMS_FUNCTION {
 public:
@@ -319,11 +324,10 @@ public:
     subs_double(e, std::atan(x));
   }
   void make_cc_common(std::ostream& o)const override{ untested();
-    o__ "template<class T>\n";
-    o__ "T " << code_name() << "(T d) const{\n";
-    o____ "chain(d, 1./(1.+double(d)*double(d)));\n";
-    o____ "::set_value(d, std::atan(d));\n";
-    o____ "return d;\n";
+    declare_f1(o, code_name());
+    o____ "chain(ret, 1./(1.+double(d)*double(d)));\n";
+    o____ "::set_value(ret, std::atan(double(d)));\n";
+    o____ "return ret;\n";
     o__ "}\n";
   }
   std::string code_name()const override{ untested();
@@ -342,10 +346,9 @@ public:
     subs_double(e, std::atanh(x));
   }
   void make_cc_common(std::ostream& o)const override{ untested();
-    o__ "template<class T>\n";
-    o__ "T " << code_name() << "(T d) const{untested();\n";
-    o______ "chain(d, 1./((1.-double(d))*(1+double(d))));\n";
-    o______ "return ::set_value(d, std::atanh(d));\n";
+    declare_f1(o, code_name());
+    o______ "chain(ret, 1./((1.-double(d))*(1+double(d))));\n";
+    o______ "return ::set_value(ret, std::atanh(double(d)));\n";
     o__ "}\n";
   }
   std::string code_name()const override{ untested();
@@ -391,10 +394,9 @@ public:
     subs_double(e, std::cos(x));
   }
   void make_cc_common(std::ostream& o)const override{
-    o__ "template<class T>\n";
-    o____ "T " << code_name() << "(T d)const {\n";
-    o______ "chain(d, -std::sin(d));\n";
-    o______ "return ::set_value(d, std::cos(d));\n";
+    declare_f1(o, code_name());
+    o______ "chain(ret, -std::sin(double(d)));\n";
+    o______ "return ::set_value(ret, std::cos(double(d)));\n";
     o__ "}\n";
   }
   std::string code_name()const override{
@@ -413,10 +415,9 @@ public:
     subs_double(e, std::cosh(x));
   }
   void make_cc_common(std::ostream& o)const override{ untested();
-    o__ "template<class T>\n";
-    o__ "T " << code_name() << "(T d)const {itested();\n";
-    o____ "chain(d, std::sinh(d));\n";
-    o____ "return ::set_value(d, std::cosh(d));\n";
+    declare_f1(o, code_name());
+    o____ "chain(ret, std::sinh(double(d)));\n";
+    o____ "return ::set_value(ret, std::cosh(double(d)));\n";
     o__ "};\n";
   }
   std::string code_name()const override{ untested();
@@ -435,14 +436,10 @@ public:
     subs_double(e, std::exp(x));
   }
   void make_cc_common(std::ostream& o)const override{
-    o__ "template<class T>\n";
-    o__ "T " << code_name() << "(T d) const{\n";
-    o____ "::set_value(d, std::exp(d));\n";
-    o____ "return chain(d, d);\n";
+    declare_f1(o, code_name());
+    o____ "::set_value(ret, std::exp(double(d)));\n";
+    o____ "return chain(ret, double(ret));\n";
     o__ "}\n";
-//    o__ "double " << code_name() << "(double const& d) const{\n";
-//    o____ "return std::exp(d);\n";
-//    o__ "}\n";
   }
   std::string code_name()const override{
     return "_f_exp";
@@ -460,10 +457,9 @@ public:
     subs_double(e, std::expm1(x));
   }
   void make_cc_common(std::ostream& o)const override{
-    o__ "template<class T>\n";
-    o__ "T " << code_name() << "(T d) const{\n";
-    o____ "::set_value(d, std::expm1(d));\n";
-    o____ "return chain(d, d+1.);\n";
+    declare_f1(o, code_name());
+    o____ "::set_value(ret, std::expm1(double(d)));\n";
+    o____ "return chain(ret, double(ret)+1.);\n";
     o__ "}\n";
   }
   std::string code_name()const override{
@@ -472,6 +468,7 @@ public:
 } p_expm1;
 DISPATCHER<FUNCTION>::INSTALL d_expm1(&function_dispatcher, "expm1|$expm1", &p_expm1);
 /*--------------------------------------------------------------------------*/
+// BUG: missing proper limiting.
 class limexp : public MGVAMS_FUNCTION {
 public:
   explicit limexp() : MGVAMS_FUNCTION(){
@@ -483,27 +480,23 @@ public:
     subs_double(e, std::exp(x));
   }
   void make_cc_common(std::ostream& o)const override{
-    o__ "template<class T>\n";
-    o__ "T " << code_name() << "(T d) const{\n";
+    declare_f1(o, code_name());
     o____ "const double lt = 80.;\n";
     o____ "double nv;\n";
     o____ "double nd;\n";
-    o____ "if(d>lt){\n";
+    o____ "if(double(d)>lt){\n";
     o______ "nv = std::exp(lt) * (1.0 - lt + d);\n";
     o______ "nd = std::exp(lt);\n";
-    o____ "}else if(d<-lt){\n";
+    o____ "}else if(double(d)<-lt){\n";
     o______ "nv = std::exp(-lt) * (1.0 + lt + d);\n";
     o______ "nd = std::exp(-lt);\n";
     o____ "}else{\n";
     o______ "nv = nd = std::exp(d);\n";
     o____ "}\n";
     // o____ "std::cerr << \"limexp: \" << d << \" \" << nv << \" \" << nd << \"\\n\";";
-    o____ "::set_value(d, nv);\n";
-    o____ "return chain(d, nd);\n";
+    o____ "::set_value(ret, nv);\n";
+    o____ "return chain(ret, nd);\n";
     o__ "}\n";
-//    o__ "double " << code_name() << "(double const& d) const{\n";
-//    o____ "return std::exp(d);\n";
-//    o__ "}\n";
   }
   std::string code_name()const override{
     return "_f_limexp";
@@ -651,22 +644,21 @@ public:
     return "_f_log10";
   }
   void make_cc_common(std::ostream& o)const override{ untested();
-    o__ "template<class T>\n";
-    o__ "T " << code_name() << "(T d)const {itested();\n";
+    declare_f1(o, code_name());
     o____ "double l=-1e99;\n";
-    o____ "if(d>1e-60){itested();\n";
+    o____ "if(double(d)>1e-60){itested();\n";
     o______ "l = std::log10(double(d));\n";
-    o______ "chain(d, 1./double(d));incomplete();\n"; // scale.
-    o____ "}else if(d>0){ untested();\n";
+    o______ "chain(ret, 1./double(d));incomplete();\n"; // scale.
+    o____ "}else if(double(d)>0){ untested();\n";
     o______ "l=-1e60;\n";
-    o______ "chain(d, 1e60);\n";
+    o______ "chain(ret, 1e60);\n";
     o____ "}else{\n";
     o______ "unreachable();\n";
     o______ "l=-1e40;\n";
-    o______ "chain(d, 1e40);\n";
+    o______ "chain(ret, 1e40);\n";
     o____ "}\n";
-    o____ "::set_value(d, l);\n";
-    o____ "return d;\n";
+    o____ "::set_value(ret, l);\n";
+    o____ "return ret;\n";
     o____ "}\n";
   }
 } p_log;
@@ -681,23 +673,22 @@ public:
     double x = get_double(e);
     subs_double(e, std::log(x));
   }
-  void make_cc_common(std::ostream& o)const override{
-    o__ "template<class T>\n";
-    o__ "T " << code_name() << "(T d)const {\n";
+  void make_cc_common(std::ostream& o)const override {
+    declare_f1(o, code_name());
     o____ "double l=-1e99;\n";
-    o____ "if(d>1e-60) {\n";
+    o____ "if(double(d)>1e-60) {\n";
     o______ "l = std::log(double(d));\n";
-    o______ "chain(d, 1./double(d));\n";
-    o____ "}else if(d>0){ untested();\n";
+    o______ "chain(ret, 1./double(d));\n";
+    o____ "}else if(double(d)>0){ untested();\n";
     o______ "l=-1e60;\n";
-    o______ "chain(d, 1e60);\n";
+    o______ "chain(ret, 1e60);\n";
     o____ "}else{\n";
     o______ "unreachable();\n";
     o______ "l=-1e40;\n";
-    o______ "chain(d, 1e40);\n";
+    o______ "chain(ret, 1e40);\n";
     o____ "}\n";
-    o____ "::set_value(d, l);\n";
-    o____ "return d;\n";
+    o____ "::set_value(ret, l);\n";
+    o____ "return ret;\n";
     o__ "}\n";
   }
   std::string code_name()const override{
@@ -716,19 +707,18 @@ public:
     subs_double(e, std::log1p(x));
   }
   void make_cc_common(std::ostream& o)const override { untested();
-    o__ "template<class T>\n";
-    o__ "T " << code_name() << "(T d)const {\n";
+    declare_f1(o, code_name());
     o____ "double l=-1e99;\n";
-    o____ "if(d>-1.) {\n";
+    o____ "if(double(d)>-1.) {\n";
     o______ "l = std::log1p(double(d));\n";
-    o______ "chain(d, 1./double(1.+d));\n";
+    o______ "chain(ret, 1./(1.+double(d)));\n";
     o____ "}else{\n";
     o______ "unreachable();\n";
     o______ "l=-1e40;\n";
-    o______ "chain(d, 1e40);\n";
+    o______ "chain(ret, 1e40);\n";
     o____ "}\n";
-    o____ "::set_value(d, l);\n";
-    o____ "return d;\n";
+    o____ "::set_value(ret, l);\n";
+    o____ "return ret;\n";
     o____ "}\n";
   }
   std::string code_name()const override{
@@ -772,19 +762,21 @@ public:
   void make_cc_common(std::ostream& o)const override {
     o__ "template<class T, class S>\n";
     o__ "typename va::ddouble_if<T, S>::type " << code_name() << "(T b, S e)const {\n";
+    o____ "typedef typename va::ddouble_if<T, S>::type ret_t;\n";
+    o____ "ret_t ret(b);\n";
     o____ "assert(b==b);\n";
     o____ "assert(e==e);\n";
     o____ "double p;\n";
     o____ "if(double(b) != 0.){\n";
-    o____ "  p = std::pow(b, e);\n";
-    o____ "  chain(b, double(e)/double(b)*p);\n";
+    o____ "  p = std::pow(double(b), e);\n";
+    o____ "  chain(ret, double(e)/double(b)*p);\n";
     o____ "}else{\n";
     o____ "  p = 0;\n";
-    o____ "  chain(b, 0.);\n";
+    o____ "  chain(ret, 0.);\n";
     o____ "}\n";
     o____ "\n";
     o____ "if(double(b) > 0.){\n";
-    o____ "  double l = std::log(b);\n";
+    o____ "  double l = std::log(double(ret));\n";
     o____ "  assert(l==l);\n";
     o____ "  chain(e, l*p);\n";
     o____ "  assert(e==e);\n";
@@ -793,13 +785,10 @@ public:
     o____ "  chain(e, 0.);\n";
     o____ "}\n";
     o____ "\n";
-    o____ "::set_value(b, p);\n";
+    o____ "::set_value(ret, p);\n";
     o____ "::set_value(e, 0.);\n";
-    o____ "typedef typename va::ddouble_if<T, S>::type ret_t;\n";
-    o____ "ret_t ret(b);\n";
 //    o____ "ret = b;\n";
     o____ "ret += ret_t(e);\n";
-    o____ "assert(b==b);\n";
     o____ "return ret;\n";
     o__ "}\n";
   }
@@ -816,10 +805,9 @@ public:
     subs_double(e, std::sin(x));
   }
   void make_cc_common(std::ostream& o)const override{
-    o__ "template<class T>\n";
-    o__ "T " << code_name() << "(T d)const {\n";
-    o____ "chain(d, std::cos(d));\n";
-    o____ "return ::set_value(d, std::sin(d));\n";
+    declare_f1(o, code_name());
+    o____ "chain(ret, std::cos(d));\n";
+    o____ "return ::set_value(ret, std::sin(d));\n";
     o__ "}\n";
   }
   std::string code_name()const override{
@@ -838,11 +826,9 @@ public:
     subs_double(e, std::sinh(x));
   }
   void make_cc_common(std::ostream& o)const override{ untested();
-    o__ "template<class T>\n";
-    o__ "T " << code_name() << "(T d)const { untested();\n";
-    o____ "chain(d, std::cosh(d));\n";
-    o____ "::set_value(d, std::sinh(d));\n";
-    o____ "return d;\n";
+    declare_f1(o, code_name());
+    o____ "chain(ret, std::cosh(double(d)));\n";
+    o____ "return ::set_value(ret, std::sinh(double(d)));\n";
     o__ "}\n";
   }
   std::string code_name()const override{ untested();
@@ -861,21 +847,20 @@ public:
     subs_double(e, std::sqrt(x));
   }
   void make_cc_common(std::ostream& o)const override{
-    o__ "template<class T>\n";
-    o____ "T " << code_name() << "(T d)const {itested();\n";
+    declare_f1(o, code_name());
     o______ "if(double(d)>0.){ itested();\n";
-    o________ "double s = std::sqrt(d);\n";
-    o________ "::set_value(d, s);\n";
-    o________ "chain(d, .5/s);\n";
+    o________ "double s = std::sqrt(double(d));\n";
+    o________ "::set_value(ret, s);\n";
+    o________ "chain(ret, .5/s);\n";
     o______ "}else if(d==0){\n";
-    o________ "chain(d, 1e99);\n"; // problem? need inf..
-    o________ "::set_value(d, 0.);\n";
+    o________ "chain(ret, 1e99);\n"; // problem? need inf..
+    o________ "::set_value(ret, 0.);\n";
     o______ "}else{\n";
     o________ "// numerical bug in model...\n";
-    o________ "chain(d, inf);\n";
-    o________ "::set_value(d, 0.);\n";
+    o________ "chain(ret, inf);\n";
+    o________ "::set_value(ret, 0.);\n";
     o______ "}\n";
-    o____ "return d;\n";
+    o____ "return ret;\n";
     o__ "}\n";
   }
   std::string code_name()const override{
@@ -894,12 +879,11 @@ public:
     subs_double(e, std::tan(x));
   }
   void make_cc_common(std::ostream& o)const override{ untested();
-    o__ "template<class T>\n";
-    o__ "T " << code_name() << "(T d) const{\n";
-    o____ "double cd = cos(d);\n";
-    o____ "chain(d, 1./(cd*cd));\n";
-    o____ "::set_value(d, std::tan(d));\n";
-    o____ "return d;\n";
+    declare_f1(o, code_name());
+    o____ "double cd = cos(double(d));\n";
+    o____ "chain(ret, 1./(cd*cd));\n";
+    o____ "::set_value(ret, std::tan(double(d)));\n";
+    o____ "return ret;\n";
     o__ "}\n";
   }
   std::string code_name()const override{ untested();
@@ -917,13 +901,12 @@ public:
     double x = get_double(e);
     subs_double(e, std::tanh(x));
   }
-  void make_cc_common(std::ostream& o)const override{
-    o__ "template<class T>\n";
-    o__ "T " << code_name() << "(T d)const {itested();\n";
-    o____ "double t = std::tanh(d);\n";
-    o____ "::set_value(d, t);\n";
-    o____ "chain(d, 1. - t*t);\n";
-    o____ "return d;\n";
+  void make_cc_common(std::ostream& o)const override {
+    declare_f1(o, code_name());
+    o____ "double t = std::tanh(double(d));\n";
+    o____ "::set_value(ret, t);\n";
+    o____ "chain(ret, 1. - t*t);\n";
+    o____ "return ret;\n";
     o__ "}\n";
   }
   std::string code_name()const override{
@@ -932,7 +915,6 @@ public:
 } p_tanh;
 DISPATCHER<FUNCTION>::INSTALL d_tanh(&function_dispatcher, "tanh|$tanh", &p_tanh);
 /*--------------------------------------------------------------------------*/
-#endif
 } // namespace
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
