@@ -2,7 +2,7 @@ ground gnd;
 ground \0 ;
 parameter r=1
 parameter v=0
-test_lap_nd0a #() dut (.p(\3 ),.n(\0 ),.cp(\1 ),.cn(\0 ));
+test_lap_nd0b #() dut (.p(\3 ),.n(\0 ),.cp(\1 ),.cn(\0 ));
 vsine #(.ampl(1),.dc(v),.mag(1)) v1 (.p(\1 ),.n(\0 ));
 resistor #(.r(0.01)) r1 (.p(\3 ),.n(\0 ));
 #Time       v(1)       v(3)       i(dut._b_laplace_nd_0_p_laplace_nd_0_n.out) i(dut._b_laplace_nd_1_p_laplace_nd_1_n.out)

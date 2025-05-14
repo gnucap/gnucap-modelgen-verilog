@@ -6,7 +6,7 @@ ground gnd;
 ground \0 ;
 
 `modelgen
-module test_lap_nd0a(p,n,cp, cn);
+module test_lap_nd0b(p,n,cp, cn);
 	electrical p, n;
 	electrical cp, cn, x;
 	analog begin
@@ -15,14 +15,14 @@ module test_lap_nd0a(p,n,cp, cn);
 	end
 endmodule
 
-!make test_lap_nd0a.so > /dev/null
-attach ./test_lap_nd0a.so
+!make test_lap_nd0b.so > /dev/null
+attach ./test_lap_nd0b.so
 
 verilog
 parameter r=1
 parameter v=0
 
-test_lap_nd0a #() dut(\3 , \0 , \1 ,\0 );
+test_lap_nd0b #() dut(\3 , \0 , \1 ,\0 );
 vsine #(.mag(1), .dc(v), .ampl(1)) v1(\1 , \0 );
 resistor #(0.01) r1 (\3 , \0 );
 
