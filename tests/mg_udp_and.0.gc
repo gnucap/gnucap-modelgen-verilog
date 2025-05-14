@@ -21,7 +21,7 @@ endprimitive
 !make test_myand0.so >/dev/null
 attach ./test_myand0.so
 
-module test(y, a, b);
+module testand(y, a, b);
   ground \0 ;
   vpulse #(.val0(0) .val1(5) .width(.2) .period(.5)) v1(a, \0 );
   vpulse #(.val0(0) .val1(5), .td(.1) .width(.2) .period(.5)) v1(b, \0 );
@@ -32,7 +32,7 @@ spice
 .model logic logic
 .verilog
 
-test #() t(y, a, b)
+testand #() t(y, a, b)
 
 list
 

@@ -1,16 +1,16 @@
 running modelgen in insensitive mode
-module test (.y(y),.a(a),.b(b));
+module testand (.y(y),.a(a),.b(b));
   ground \0 ;
   vpulse #(.val0(0),.val1(5),.width(.2),.period(.5)) v1 (a,\0 );
   vpulse #(.val0(0),.val1(5),.td(.1),.width(.2),.period(.5)) v1 (b,\0 );
   myand0 #() b (.y(y),.a(a),.b(b));
-endmodule // test
+endmodule // testand
 
 paramset logic logic;
  .delay=NA( 1.n); .vmax=NA( 5.); .vmin=NA( 0.); .unknown=NA( 2.5); .rise=NA( 500.p); .fall=NA( 500.p); .rs=NA( 100.); .rw=NA( 1.G); .thh=NA( 0.75); .thl=NA( 0.25); .mr=NA( 5.); .mf=NA( 5.); .over=NA( 0.1); .tnom=NA( 27.);
 endparamset
 
-test #() t (.y(y),.a(a),.b(b));
+testand #() t (.y(y),.a(a),.b(b));
 t.b: can't find subckt: logicmyand02, forcing digital
 #           v(a)       v(b)       v(y)      
  27.        0.         0.         0.        
