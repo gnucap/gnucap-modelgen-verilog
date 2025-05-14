@@ -884,6 +884,30 @@ public:
 } p_sqrt;
 DISPATCHER<FUNCTION>::INSTALL d_sqrt(&function_dispatcher, "sqrt|$sqrt", &p_sqrt);
 /*--------------------------------------------------------------------------*/
+class tan : public MGVAMS_FUNCTION {
+public:
+  tan() : MGVAMS_FUNCTION(){
+    set_label("tan");
+  }
+  void stack_op(Expression* e)const override { untested();
+    double x = get_double(e);
+    subs_double(e, std::tan(x));
+  }
+  void make_cc_common(std::ostream& o)const override{ untested();
+    o__ "template<class T>\n";
+    o__ "T " << code_name() << "(T d) const{\n";
+    o____ "double cd = cos(d);\n";
+    o____ "chain(d, 1./(cd*cd));\n";
+    o____ "::set_value(d, std::tan(d));\n";
+    o____ "return d;\n";
+    o__ "}\n";
+  }
+  std::string code_name()const override{ untested();
+    return "_f_tan";
+  }
+} p_tan;
+DISPATCHER<FUNCTION>::INSTALL d_tan(&function_dispatcher, "tan|$tan", &p_tan);
+/*--------------------------------------------------------------------------*/
 class tanh : public MGVAMS_FUNCTION {
 public:
   explicit tanh() : MGVAMS_FUNCTION(){
