@@ -1,0 +1,5 @@
+dump_define.16.vapp:1:
+..effCJ, DMCGeff,
+                 ^ ? not valid here
+... Mod, BSIM4min, BSIM4weffCJ, DMCGeff,
+                                        ^ ? Need more values
