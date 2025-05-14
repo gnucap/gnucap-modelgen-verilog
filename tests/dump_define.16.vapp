@@ -2,7 +2,7 @@
 
 `define BSIM4PAeffGeo(nf, geo, minSD, Weffcj, DMCG, DMCI, DMDG, Ps, Pd, As, Ad)\
     if (geo < 9) \
-        `BSIM4NumFingerDiff(nf, minSD, nuIntD, nuEndD, nuIntS, nuEndS) \
+        stuff \
     T0 = DMCG + DMCI;\
     T1 = DMCG + DMCG;\
     T2 = DMDG + DMDG;\

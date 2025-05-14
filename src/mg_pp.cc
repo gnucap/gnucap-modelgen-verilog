@@ -437,7 +437,7 @@ static std::string expand_macro(CS& file, Define_List const& d)
       auto values = eval_args(file, (*x)->num_args(), d);
       std::string subst = (*x)->substitute(values, d);
       stripped_file += subst; //  + "\n";
-    }else{ untested();
+    }else{
       throw(Exception_CS("undefined macro", file));
     }
   }
@@ -553,6 +553,10 @@ static bool parse_raw_args(CS& f, Raw_String_Arg_List& values, size_t max)
   size_t here = f.cursor();
   for (;;) {
     if(f >> '\\' && !f.ns_more()){
+      f.getline("");
+      here = 0;
+      continue;
+    }else if(!f.more()){
       f.getline("");
       here = 0;
       continue;

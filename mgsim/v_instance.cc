@@ -346,7 +346,7 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
 
       if(i<c->net_nodes()){
 	// OK
-      }else if(i<c->net_nodes()+c->num_current_ports()){ untested();
+      }else if(i<c->net_nodes()+c->num_current_ports()){
 	trace2("DEV_INSTANCE_PROTO::po current port?", i, v);
 	std::string branch_name = Proto->port_value(i); // v.substr(1);
 	trace1("DEV_INSTANCE_PROTO::po current port?", branch_name);
@@ -535,7 +535,7 @@ CARD* INSTANCE::deflate()
 	}else{
 	  c->n_(ii) = n_(c->n_(ii).e_());
 	}
-      }else if(ii < c->net_nodes()+c->num_current_ports()){ untested();
+      }else if(ii < c->net_nodes()+c->num_current_ports()){
       }else{ untested();
       }
     }
