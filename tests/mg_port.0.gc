@@ -1,0 +1,26 @@
+attach ./modelgen_1.so
+verilog
+
+`modelgen
+module test_port0(p, n);
+  electrical p, n;
+  real i;
+
+  analog begin
+    V(p,n)<+1;
+		
+    $strobe("%f\n", V(n));
+  end
+
+endmodule
+`endmodelgen
+
+!make test_port0.so > /dev/null
+attach ./test_port0.so
+
+ground gnd;
+test_port0 #() bn(.n(gnd));
+test_port0 #() bp(.p(gnd));
+
+op
+status notime

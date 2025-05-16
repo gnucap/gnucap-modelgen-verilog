@@ -2122,7 +2122,9 @@ void MOD_resistor::expand()
       trace3("expand2 clear", long_label(), i, n_(i).e_());
     }
   // port p 1
+  find_subset(&n_(n_p));
   // port n 2
+  find_subset(&n_(n_n));
   // ground
   n_(n_white_noise_1_p).set_to_ground(nullptr);
   // ground
@@ -2188,6 +2190,12 @@ void MOD_resistor::expand()
   //subckt()->precalc();
   // alloc ground
   // alloc ground
+  trace2("float0?", long_label(), n_(1).e_());
+  n_(1).allocate(2); // no-op unless floating
+  trace2("float1?", long_label(), n_(1).e_());
+  trace2("float0?", long_label(), n_(0).e_());
+  n_(0).allocate(2); // no-op unless floating
+  trace2("float1?", long_label(), n_(0).e_());
   assert(!is_constant());
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();
@@ -3682,7 +3690,9 @@ void MOD_resistor::expand()
       trace3("expand2 clear", long_label(), i, n_(i).e_());
     }
   // port p 1
+  find_subset(&n_(n_p));
   // port n 2
+  find_subset(&n_(n_n));
   // ground
   n_(n_white_noise_0_p).set_to_ground(nullptr);
   // ground
@@ -3748,6 +3758,12 @@ void MOD_resistor::expand()
   //subckt()->precalc();
   // alloc ground
   // alloc ground
+  trace2("float0?", long_label(), n_(1).e_());
+  n_(1).allocate(2); // no-op unless floating
+  trace2("float1?", long_label(), n_(1).e_());
+  trace2("float0?", long_label(), n_(0).e_());
+  n_(0).allocate(2); // no-op unless floating
+  trace2("float1?", long_label(), n_(0).e_());
   assert(!is_constant());
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();
@@ -5638,7 +5654,9 @@ void MOD_capacitor::expand()
       trace3("expand2 clear", long_label(), i, n_(i).e_());
     }
   // port p 1
+  find_subset(&n_(n_p));
   // port n 2
+  find_subset(&n_(n_n));
   // ground
   n_(n_ddt_1_p).set_to_ground(nullptr);
   // ground
@@ -5704,6 +5722,12 @@ void MOD_capacitor::expand()
   //subckt()->precalc();
   // alloc ground
   // alloc ground
+  trace2("float0?", long_label(), n_(1).e_());
+  n_(1).allocate(2); // no-op unless floating
+  trace2("float1?", long_label(), n_(1).e_());
+  trace2("float0?", long_label(), n_(0).e_());
+  n_(0).allocate(2); // no-op unless floating
+  trace2("float1?", long_label(), n_(0).e_());
   assert(!is_constant());
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();
@@ -6682,7 +6706,9 @@ void MOD_capacitor::expand()
       trace3("expand2 clear", long_label(), i, n_(i).e_());
     }
   // port p 1
+  find_subset(&n_(n_p));
   // port n 2
+  find_subset(&n_(n_n));
   // internal ddt_2_p : 3
   // node ddt_2_p 3
     if (_short_b_ddt_2()) {
@@ -6748,6 +6774,12 @@ void MOD_capacitor::expand()
   //subckt()->precalc();
   // alloc ground
   n_(2).allocate(2);
+  trace2("float0?", long_label(), n_(1).e_());
+  n_(1).allocate(2); // no-op unless floating
+  trace2("float1?", long_label(), n_(1).e_());
+  trace2("float0?", long_label(), n_(0).e_());
+  n_(0).allocate(2); // no-op unless floating
+  trace2("float1?", long_label(), n_(0).e_());
   assert(!is_constant());
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();

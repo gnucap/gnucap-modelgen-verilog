@@ -879,6 +879,8 @@ static void make_module_new_local_nodes(std::ostream& o, Module const& m)
     }else if(nn->number() < n){
     }else if(n <= int(m.circuit()->ports().size())){
       o__ "// port " << nn->name() << " " << nn->number() << "\n";
+      // BUG: allocate floating ports even if unused.
+      o__ "find_subset(&n_(n_" << nn->name() << "));\n";
     }else if(nn->is_used()){
       o__ "// internal " << nn->name() << " : " << nn->number() << "\n";
       make_module_new_local_node(o, *nn);
@@ -1183,6 +1185,9 @@ static void make_module_expand(std::ostream& o, Module const& m)
     //   o__ "n_(n_" << nn->name() << ").set_to_ground(nullptr);\n";
     }else if(pos < n){
     }else if(n <= int(m.circuit()->ports().size())){
+      o__ "trace2(\"float0?\", long_label(), n_("<<pos-1<<").e_());\n";
+      o__ "n_("<<pos-1<<").allocate(2); // no-op unless floating\n";
+      o__ "trace2(\"float1?\", long_label(), n_("<<pos-1<<").e_());\n";
     }else{
       o__ "n_("<<pos-1<<").allocate(2);\n";
     }
