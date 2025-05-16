@@ -1,0 +1,36 @@
+
+attach ./modelgen_0.so
+
+verilog
+
+`modelgen test_noise1m
+module test_noise1m(p, n, a, b);
+	electrical p, n, a, b;
+	inout p, n, a, b;
+	analog begin
+		I(p,n) <+ white_noise(1, "white");
+		I(p,n) <+ white_noise(V(b), "white");
+		I(p,n) <+ white_noise(V(a), "white");
+		I(p,n) <+ white_noise(V(b) + V(a), "white");
+	end
+endmodule
+
+list
+
+!make test_noise1m.so > /dev/null
+attach ./test_noise1m.so
+
+ground gnd;
+test_noise1m  #() dut(\1 ,gnd, ctl, ctl);
+resistor  #(.r(1.)) r(\1 ,gnd);
+vsource  #(.dc(1.)) v(ctl, gnd);
+noise_probe n1(\1 );
+
+list
+
+print ac npwr(n1)
+
+dc
+ac 10 1000 * 10
+status notime
+end

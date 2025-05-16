@@ -400,7 +400,7 @@ void DEV_NOISE::set_parameters(const std::string& Label, CARD *Owner,
   std::fill_n(_values, n_states, 0.);
   //std::fill_n(_old_values, n_states, 0.);
   //assert(n_nodes <= net_nodes());
-  notstd::copy_n(nodes, n_nodes, _nodes);
+  notstd::copy_n(nodes, 2, _nodes);
   assert(net_nodes() == 2);
   _loss1 = _loss0 = 1.;
 }
