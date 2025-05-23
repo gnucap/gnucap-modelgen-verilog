@@ -1132,16 +1132,19 @@ void LANG_VERILOG::print_ports_long(OMSTREAM& o, const COMPONENT* x)
   for (int ii = 0;  x->port_exists(ii);  ++ii) {
     o << sep;
     print_attributes(o, x->port_id_tag(ii));
-    if(!x->port_name(ii).size()){
-      dump_identifier(o, x->port_value(ii));
+    if(x->node_is_connected(ii)){
+      if(!x->port_name(ii).size()){
+	dump_identifier(o, x->port_value(ii));
+      }else{
+	o << '.';
+	dump_identifier(o, x->port_name(ii));
+	o << '(';
+	dump_identifier(o, x->port_value(ii));
+	o << ')';
+      }
+      sep = ',';
     }else{
-      o << '.';
-      dump_identifier(o, x->port_name(ii));
-      o << '(';
-      dump_identifier(o, x->port_value(ii));
-      o << ')';
     }
-    sep = ',';
   }
   o << ')';
 }
@@ -1261,7 +1264,10 @@ public:
   }
   void expand()override { }
   void precalc_last()override { }
-  CARD* deflate()override { incomplete(); return this;}
+  CARD* deflate()override {
+    //incomplete(); // later.
+    return this;
+  }
 
 public:
   char id_letter()const override{ untested();return 'X';}

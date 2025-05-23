@@ -53,7 +53,7 @@ private:
     return "d->node_is_connected";
   }
   void make_cc_dev(std::ostream& o)const override {
-    o__ "bool node_is_connected(int i)const override { untested(); \n";
+    o__ "bool node_is_connected(int i)const override {\n";
     o____ "trace2(\"conn\", i, n_(i).e_());\n";
     o____ "return n_(i).e_() != INVALID_NODE;\n";
     o__ "}\n";

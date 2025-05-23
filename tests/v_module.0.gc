@@ -18,7 +18,16 @@ op
 
 delete m
 main m(.\1 (\1 ) .b(\0 ));
+list
 print op v(m.r1) v(1)
 op
-status notime
+
+delete m
+main m(.b(\1 ));
 list
+print op v(m.r1) v(1)
+op
+
+list
+
+status notime
