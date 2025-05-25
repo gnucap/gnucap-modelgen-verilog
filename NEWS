@@ -2,12 +2,19 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
-20250***-dev
+20250525-dev
 ============
 - improve overloading diagnostics
 - fix paramset param_count bug
 - codegen for same_port aka net devices
+- add ceil, tangent functions, NaN
+- support current ports in overloads
+- pp: replace get_line overload use getline
+- some event related fixes, analog initial
 - fix analog init related bugs
+- fix integer parameters in function args
+- fix crash in noise source (ignore input nodes)
+- sign fix laplace filter potential output
 
 20250301-dev
 ============

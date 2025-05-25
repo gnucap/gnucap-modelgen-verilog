@@ -1,7 +1,5 @@
 == modelgen
-- bug in V(p) if !$port_connected(p)
 - all variables are static, some speed impact.
-- $limit: only "pnjlimit"
 - ac needs operating point, even if linear: mg2_cccs.0.gc
 - ddx, flow(<port>): no derivatives (feature?)
 - filter contribution to potential, uses internal node.
@@ -11,6 +9,7 @@
 - `default_transition missing, and some step control
 - bogus error message on wrong filter args
 - seems to crash on V(x) if x is parameter.
+- v_instance: port name issue with case insensitive
 
 == simulator plugins
 - missing localparam rules in overload
@@ -18,7 +17,6 @@
 - not (yet) instanciating unused modules
 
 == libgnucap, TODO
-- "ground" statement not implemented.
 - BUG: port probes awaiting node rework
 - need NODE_P, discrete nodes
 - BUG: padding long lines with whitespace
@@ -26,6 +24,4 @@
 - branch node order is suboptimal
 
 == fixed, presumably. recheck.
-- analysis("ic"): need more testing
-- event control is incomplete
-- llvm build: sometimes crashes during shutown
+- bug in V(p) if !$port_connected(p)
