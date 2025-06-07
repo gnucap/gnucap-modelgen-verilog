@@ -822,7 +822,9 @@ bool COMMON_TRANSITION::operator==(const COMMON_COMPONENT& x)const
 {
   const COMMON_TRANSITION* p = dynamic_cast<const COMMON_TRANSITION*>(&x);
   return (p
-    && _delay == p->_delay
+    && _delay == p->_delay // COMMON_DELAY?
+    && _rise == p->_rise
+    && _fall == p->_fall
     && COMMON_COMPONENT::operator==(x));
 }
 /*--------------------------------------------------------------------------*/

@@ -14,7 +14,6 @@ test #() m (.\1 (\1 ),.\2 (\2 ));
 m.r1 ambiguous overload in resistor
 #           v(1)       v(2)      
 m.r0: short circuit
-m.r0: short circuit
  0.         9.9998u    0.99999   
 Gnucap   System status
 iterations: op=0, dc=3, tran=0, fourier=0, total=3

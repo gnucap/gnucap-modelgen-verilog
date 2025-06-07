@@ -32,10 +32,11 @@
 namespace {
 /*--------------------------------------------------------------------------*/
 class COMMON_NOISE : public COMMON_COMPONENT {
+  PARAMETER<double> _value;
   std::string _name; // PARAMETER<string>?
 protected:
   COMMON_NOISE(COMMON_NOISE const& p)
-    : COMMON_COMPONENT(p), _name(p._name) {}
+    : COMMON_COMPONENT(p), _value(p._value), _name(p._name) {}
 public:
   COMMON_NOISE(int c) : COMMON_COMPONENT(c) {}
   COMMON_COMPONENT* clone()const override {
@@ -47,6 +48,7 @@ public:
   {
     const COMMON_NOISE* p = dynamic_cast<const COMMON_NOISE*>(&x);
     bool rv = p
+      && _value == p->_value
       && _name == p->noise_id()
       && COMMON_COMPONENT::operator==(x);
     if (rv) {
@@ -67,34 +69,31 @@ public:
       return COMMON_COMPONENT::param_name(I, j);
     }
   }
-  std::string param_name(int i)const override {
-    int idx = COMMON_NOISE::param_count() - 1 - i;
+  std::string param_name(int idx)const override {
     if(idx==0){
       return "pwr";
     }else if(idx==1){
       return "name";
     }else{ untested();
-      return COMMON_COMPONENT::param_name(i);
+      return COMMON_COMPONENT::param_name(idx-2);
     }
   }
-  std::string param_value(int i)const override {
-    int idx = COMMON_NOISE::param_count() - 1 - i;
+  std::string param_value(int idx)const override {
     if(idx==0) {
       return _value.string();
     }else if(idx==1) {
       return "\"" + _name + "\"";
     }else{ untested();
-      return COMMON_COMPONENT::param_value(i);
+      return COMMON_COMPONENT::param_value(idx-2);
     }
   }
-  bool param_is_printable(int i)const override {
-    int idx = COMMON_NOISE::param_count() - 1 - i;
+  bool param_is_printable(int idx)const override {
     if(idx==0) {
       return _value.has_hard_value();
     }else if(idx==1) {
       return _name!="";
-    }else{
-      return COMMON_COMPONENT::param_is_printable(i);
+    }else{ untested();
+      return COMMON_COMPONENT::param_is_printable(idx-2);
     }
   }
   int set_param_by_name(std::string N, std::string V)override {
@@ -123,6 +122,7 @@ public:
     trace2("pl", _value, _value.string());
   }
 public:
+  double value()const override {return _value;}
   virtual double do_noise(ELEMENT const* e, std::string const&)const;
 }; // COMMON_NOISE
 COMMON_NOISE ccn(CC_STATIC);
@@ -140,7 +140,9 @@ public: // make noise
     if(_values){
       return *_values;
     }else{
-      return ELEMENT::value(); // common->_value?
+      auto cc = prechecked_cast<COMMON_NOISE const*>(common());
+      assert(cc);
+      return cc->value();
     }
   }
   XPROBE ac_probe_ext(std::string const&)const override;
@@ -165,7 +167,7 @@ private: // override virtual
 		      COMMON_COMPONENT *Common, double Value,
 		      int n_states, double states[],
 		      int n_nodes, const node_t nodes[])override;
-  // void set_current_port_by_index(int, const std::string&)override {
+  // void set_current_port_by_index(int, const std::string&)override { untested();
   //   // BUG: stray call. no side effect.
   // }
   void set_port_by_index(int i, /*const*/ std::string& s) override {
@@ -177,7 +179,7 @@ private: // override virtual
   }
   void precalc_last()override;
   char	   id_letter()const override{ untested();return '\0';}
-  std::string value_name()const override{return "";}
+  std::string value_name()const override{ untested();return "";}
   std::string dev_type()const override{
     assert(common());
     return common()->name();
@@ -221,7 +223,7 @@ private: // purely virtual in ELEMENT
   COMPLEX  ac_involts()const override { untested();return ac_outvolts();}
 
 private:
- // node_t& n_(int i)const {
+ // node_t& n_(int i)const { untested();
  //   assert(_nodes); assert(i>=0); assert(i<matrix_nodes()); return _nN[i];
  // }
   std::string port_name(int i)const override{
@@ -319,7 +321,7 @@ public:
   explicit MEAS_NOISE()	: ELEMENT() { untested();}
 private: // override virtual
   char id_letter()const override { untested();return '\0';}
-  std::string value_name()const override {return "#";}
+  std::string value_name()const override { untested();return "#";}
   std::string dev_type()const override {return "meas_noise";}
   CARD* clone()const override {return new MEAS_NOISE(*this);}
 //  void set_param_by_index(int, std::string& V)override { untested();
@@ -369,7 +371,7 @@ void DEV_NOISE::precalc_last()
   assert(cc);
   if(_values){
   }else{
-    _value = cc->value();
+    set_value(cc->value());
   }
 }
 /*--------------------------------------------------------------------------*/

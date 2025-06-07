@@ -30,11 +30,13 @@
 #include "e_model.h"
 #include "e_elemnt.h"
 #include "bm.h"
+#include "u_node.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
 static const bool add_mfactor = true; // allow $mfactor
 static const bool alias_m_mfactor = true; // treat m as mfactor when rejected.
+static const bool want_ground_zero = true; // "ground 0;"
 /*--------------------------------------------------------------------------*/
 class LANG_SPICE_BASE : public LANGUAGE {
 public:
@@ -76,6 +78,14 @@ private: // local
   void print_args(OMSTREAM&, const COMPONENT*);
   void print_label(OMSTREAM&, const COMPONENT*);
   void print_ports(OMSTREAM&, const COMPONENT*);
+public:
+  void set_ground(CARD_LIST* Scope) { untested();
+    if(want_ground_zero) { untested();
+      CMD::command(".ground 0", Scope);
+      // CMD::command(".global 0", Scope);
+    }else{ untested();
+    }
+  }
 };
 /*--------------------------------------------------------------------------*/
 class LANG_SPICE : public LANG_SPICE_BASE {
@@ -169,7 +179,8 @@ static int count_ports(CS& cmd, int maxnodes, int minnodes, int leave_tail, int 
 	num_nodes = i - leave_tail - 1;
       }
       break;
-    }else{
+    }else if (cmd.skip1b(';')) { untested();
+      // need test
     }
   }
   if (num_nodes < start) {untested();
@@ -225,6 +236,7 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
 			     int start, int num_nodes, bool all_new)
 {
   assert(x);
+  trace3("parse_ports", start, num_nodes, all_new);
 
   int paren = cmd.skip1b('(');
   int index = start;
@@ -237,7 +249,7 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
 	break; // done.  have closing paren.
       }else if (index >= num_nodes) {
 	break; // done.  have maxnodes.
-      }else if (!cmd.more()) {untested();
+      }else if (!cmd.more()) {
 	break; // done.  premature end of line.
       }else if (OPT::keys_between_nodes &&
 		(cmd.umatch("poly ")
@@ -253,6 +265,13 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
 	size_t here = cmd.cursor();
 	std::string node_name;
 	cmd >> node_name;
+	int mapsize = 0;
+	if (all_new) {
+	  assert(x->subckt());
+	  assert(x->subckt()->nodes());
+	  mapsize = x->subckt()->nodes()->size();
+	}else{
+	}
 	if (cmd.stuck(&here)) {untested();
 	  // didn't move, probably a terminator.
 	  throw Exception("bad node name");
@@ -261,13 +280,18 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
 	  x->set_port_by_index(index, node_name);
 	}
 	//----------------------
-	if (!(x->node_is_connected(index))) {untested();
+	if (/*node_name!="0" && */!(x->node_is_connected(index))) {untested();
 	  break; // illegal node name, might be proper exit.
-	}else{
+        }else{
+	  //?
+	}
+
+	{
 	  if (all_new) {
-	    if (x->node_is_grounded(index)) {
+	    if (/*x->node_is_grounded(index)*/ node_name=="0") {
 	      cmd.warn(bDANGER, here1, "node 0 not allowed here");
-	    }else if (x->subckt() && x->subckt()->nodes()->how_many() != index+1) {
+	    }else if (x->subckt() && x->subckt()->nodes()->size() == mapsize) {
+	      trace3("hmm", node_name, x->subckt()->nodes()->size(), index);
 	      cmd.warn(bDANGER, here1, "duplicate port name, skipping");
 	    }else{
 	      ++index;
@@ -367,19 +391,11 @@ void LANG_SPICE_BASE::parse_element_using_obsolete_callback(CS& cmd, COMPONENT* 
   // dc == deflated_common
   // It might be just "c".
   // It might be something else that is simpler but equivalent.
-  if (dc->is_trivial()) {
-    assert(dynamic_cast<EVAL_BM_VALUE*>(dc));
-    // If it is a simple value, don't use a common.
-    // Just store the value directly.
-    xx->obsolete_move_parameters_from_common(dc);
+  if (dc != c) {
     delete c;
   }else{
-    x->attach_common(dc);
-    if (dc != c) {
-      delete c;
-    }else{
-    }
   }
+  x->attach_common(dc);
   cmd.check(bDANGER, "what's this?");
 }
 /*--------------------------------------------------------------------------*/
@@ -410,7 +426,7 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
     }else{				// only name=value pairs
     }
     size_t here = cmd.cursor();
-    for (int i=0; ; ++i) {
+    for ( ; ; ) {
       if (paren && cmd.skip1b(')')) {
 	break;
       }else if (!cmd.more()) {
@@ -547,7 +563,7 @@ BASE_SUBCKT* LANG_SPICE_BASE::parse_module(CS& cmd, BASE_SUBCKT* x)
     cmd.reset(here);
     parse_ports(cmd, x, x->min_nodes(), 0/*start*/, num_nodes, true/*all new*/);
   }
-  cmd >> *x->subckt()->params();
+  x->subckt()->params()->parse(cmd);
 
   // body
   parse_module_body(cmd, x, x->subckt(), name() + "-subckt>", NO_EXIT_ON_BLANK, ".ends |.eom ");
@@ -557,6 +573,16 @@ BASE_SUBCKT* LANG_SPICE_BASE::parse_module(CS& cmd, BASE_SUBCKT* x)
 void LANG_SPICE_BASE::parse_module_body(CS& cmd, BASE_SUBCKT* x, CARD_LIST* Scope,
 		const std::string& prompt, EOB exit_on_blank, const std::string& exit_key)
 {
+  if (x && want_ground_zero) {
+    assert(x->scope()==x->subckt());
+    assert(x->scope()==Scope);
+    NODE* gnd = Scope->nodes()->new_node("0");
+    USER_NODE* g = prechecked_cast<USER_NODE*>(gnd);
+    assert(g);
+    g->set_to_ground();
+  }else{
+  }
+
   try {
     for (;;) {
       cmd.get_line(prompt);
@@ -686,7 +712,6 @@ static char fix_case(char c)
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
 {
-  assert(x);
   auto s = dynamic_cast<BASE_SUBCKT const*>(x->component_proto());
 
   if(s && s->id_letter()=='X'){
@@ -752,7 +777,7 @@ void LANG_SPICE_BASE::print_args(OMSTREAM& o, const MODEL_CARD* x)
   if (x->use_obsolete_callback_print()) {
     x->print_args_obsolete_callback(o, this);  //BUG//callback//
   }else{
-    for (int ii = 0; ii < x->param_count(); ++ii) {
+    for (int ii = 0;  ii < x->param_count()-x->param_count_dont_print();  ++ii) {
       if (x->param_is_printable(ii)) {
 	std::string arg = " " + x->param_name(ii) + "=" + x->param_value(ii);
 	o << arg;
@@ -910,7 +935,10 @@ static void getmerge(CS& cmd, Skip_Header skip_header, CARD_LIST* Scope)
   }
   cmd.check(bWARNING, "need section, echo, list, or quiet");
 
+ // lang_spice.set_ground(Scope);
+
   CS file(CS::_INC_FILE, file_name);
+  trace2("file_name", file_name, bool(file));
 
   if (skip_header) { // get and store the header line
     file.get_line(">>>>");
@@ -997,7 +1025,7 @@ DISPATCHER<CMD>::INSTALL d4(&command_dispatcher, ".merge|merge", &p4);
 class CMD_RUN : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST* Scope)override {
-    while (cmd.match1('<')) {
+    while (cmd.match1('<')) {untested();
       command("clear", Scope);
       cmd.skip();
       cmd.skipbl();
@@ -1045,6 +1073,7 @@ class CMD_SPICE : public CMD {
 public:
   void do_it(CS&, CARD_LIST* Scope)override {
     command("options lang=spice", Scope);
+   // lang_spice.set_ground(Scope);
   }
 } p8;
 DISPATCHER<CMD>::INSTALL d8(&command_dispatcher, "spice|`spice", &p8);

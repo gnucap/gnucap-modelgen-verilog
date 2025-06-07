@@ -307,15 +307,14 @@ int COMMON_ZIFILTER::set_param_by_name(std::string Name, std::string Value)
 /*--------------------------------------------------------------------------*/
 void COMMON_ZIFILTER::set_param_by_index(int I, std::string& Value, int Offset)
 {
-	incomplete();
-  switch (COMMON_ZIFILTER::param_count() - 1 - I) {
+  switch (I) {
   case 0: _period = Value;
 	  break;
   case 1: _ttime = Value;
 	  break;
   case 2: _delay = Value;
 	  break;
-  default: COMMON_RF_BASE::set_param_by_index(I, Value, Offset);
+  default: COMMON_RF_BASE::set_param_by_index(I-3, Value, Offset+3);
   }
 }
 /*--------------------------------------------------------------------------*/

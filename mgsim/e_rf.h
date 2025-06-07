@@ -256,10 +256,11 @@ bool COMMON_RF_BASE::operator==(const COMMON_COMPONENT& x)const
 /*--------------------------------------------------------------------------*/
 void COMMON_RF_BASE::set_param_by_index(int I, std::string& Value, int Offset)
 {
-  if(I==-1){
+  if(I<0){
     // reset;
     _type = rf_unknown;
   }else{ untested();
+    assert(0);
     incomplete();
     switch (COMMON_RF_BASE::param_count() - 1 - I) {
     default: COMMON_COMPONENT::set_param_by_index(I, Value, Offset);

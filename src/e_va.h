@@ -28,6 +28,7 @@
 #include <e_logic.h>
 #include <m_union.h>
 #include <e_node.h>
+#include <bm.h> // BUG
 /*--------------------------------------------------------------------------*/
 extern NODE ground_node;
 /*--------------------------------------------------------------------------*/
@@ -43,12 +44,17 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 // tmp kludge. nodes don't have disciplines yet...
-class COMMON_VASRC : public COMMON_COMPONENT {
+class COMMON_VASRC : public EVAL_BM_BASE {
 public:
-  explicit COMMON_VASRC(int i) : COMMON_COMPONENT(i) {}
+  explicit COMMON_VASRC(int i) : EVAL_BM_BASE(i) {}
+  explicit COMMON_VASRC(COMMON_VASRC const& i) : EVAL_BM_BASE(i) {}
   ~COMMON_VASRC() {}
 public:
   virtual DISCIPLINE const* discipline()const{return nullptr;};
+  COMMON_COMPONENT* clone()const override {unreachable(); return nullptr;}
+  bool operator==(COMMON_COMPONENT const&p)const override {
+    return dynamic_cast<COMMON_VASRC const*>(&p);
+  }
   double flow_abstol() const{
     if(!discipline()){ untested();
       return OPT::abstol;
@@ -74,6 +80,7 @@ public:
   explicit COMMON_FILT(int i=CC_STATIC) : COMMON_COMPONENT(i) { }
   ~COMMON_FILT() { }
 public:
+  bool operator==(COMMON_COMPONENT const&)const override {untested(); return false;}
   //virtual DISCIPLINE const* discipline()const{untested(); return nullptr;};
   virtual int args(int) const{ untested(); return 0; }
 };

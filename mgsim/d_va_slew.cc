@@ -36,7 +36,7 @@ public:
   explicit DEV_SLEW() :ELEMENT() {}
 private: // override virtual
   char	   id_letter()const override	{ untested();unreachable(); return '\0';}
-  std::string value_name()const override { untested();unreachable(); return "";}
+  std::string value_name()const override {unreachable(); return "";}
   std::string dev_type()const override	{ untested();unreachable(); return "slew";}
   CARD*	   clone()const override	{return new DEV_SLEW(*this);}
   std::string port_name(int)const override { untested();unreachable(); return "";}
