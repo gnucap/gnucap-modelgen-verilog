@@ -226,8 +226,8 @@ static void map_subdev_nodes(std::ostream& o, const Element_2& e)
   }
   {
     o << "};\n";
-    o____ "c->set_parameters(\"" << e.short_label() << "\", this";
-    o << ", c->mutable_common()";
+    o____ "subc->set_parameters(\"" << e.short_label() << "\", this";
+    o << ", subc->mutable_common()";
     o << ", 0."; // value
     o << ", 0, nullptr";
     o << ", " << e.num_nodes() << ", nodes);\n";
@@ -245,12 +245,12 @@ static void make_renew_sckt(std::ostream& o, Module const& m)
     o__ "assert(!" << e->code_name() << ");\n";
     o__ "assert(pp->" << e->code_name() << ");\n";
     o__ "{\n";
-    o____ "auto c = prechecked_cast<COMPONENT*>(pp->" << e->code_name() << "->clone());\n";
-    o____ "assert(c);\n";
-    o____ "subckt()->push_back(c);\n";
-    o____ "c->set_owner(this);\n";
-    o____ e->code_name() << " = c;\n";
-    o____ "trace1(\"renew\", " << e->code_name() << "->long_label());\n";
+    o____ "auto subc = prechecked_cast<COMPONENT*>(pp->" << e->code_name() << "->clone());\n";
+    o____ "assert(subc);\n";
+    o____ "subckt()->push_back(subc);\n";
+    o____ "subc->set_owner(this);\n";
+    o____ e->code_name() << " = subc;\n";
+    o____ "trace2(\"renew\", " << e->code_name() << "->long_label(), c->_netlist_params.size());\n";
     map_subdev_nodes(o, *e);
     o__ "}\n";
   }
@@ -1006,12 +1006,14 @@ static void make_module_precalc_first(std::ostream& o, Module const& m)
   }
 
   o__ "if(subckt()){\n";
-  if(m.circuit()->element_list().size()){
-    o__ "subckt()->attach_params(&(c->_netlist_params), scope());\n";
-  }else{
-  }
   o____ "attach_common(nullptr);\n";
   o____ "attach_common(cc);\n";
+  if(m.circuit()->element_list().size()){
+    o____ "c = static_cast<COMMON_" << mid << "*>(mutable_common());\n";
+    o____ "subckt()->attach_params(&(c->_netlist_params), scope());\n";
+    o____ "trace2(\"" << m.identifier() <<"::pf\", long_label(), c->_netlist_params.size());\n";
+  }else{
+  }
   o____ "subckt()->precalc_first();\n";
   o__ "}else{\n";
   o__ "}\n";

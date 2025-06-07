@@ -9,8 +9,8 @@ verilog
 module test_sckt4a(a, b);
 	inout a, b;
 	parameter real r=1;
-	resistor #(.r(r)) r1(.p(a), .n(i));
-	resistor #(.r(r)) r2(.n(i), .p(b));
+	resistor #(.r(r)) r1a(.p(a), .n(i));
+	resistor #(.r(r)) r2a(.n(i), .p(b));
 endmodule;
 
 `modelgen

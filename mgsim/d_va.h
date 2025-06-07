@@ -57,7 +57,7 @@ public:
   ~DEV_CPOLY_G();
 protected: // override virtual
   char	   id_letter()const override	{ untested();unreachable(); return '\0';}
-  std::string value_name()const override{incomplete(); return "";}
+  std::string value_name()const override{return "";}
   std::string dev_type()const override	{ untested();unreachable(); return "cpoly_g";}
   int	   max_nodes()const override	{return net_nodes();}
   int	   ext_nodes()const override	{return _n_ports*2;}

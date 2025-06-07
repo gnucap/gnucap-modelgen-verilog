@@ -67,6 +67,10 @@ static void make_common_copy_constructor(std::ostream& o, const Module& d)
   o <<
     "COMMON_" << d.identifier() << "::COMMON_" << d.identifier() << "(const COMMON_" << d.identifier() << "& p)\n"
     "  :COMMON_COMPONENT(p)";
+  if(d.circuit()->element_list().size()){
+    o << ",\n    _netlist_params(p._netlist_params)";
+  }else{
+  }
   make_copy_construct_parameter_list(o, d.parameters());
   //o << ",\n   _sdp(0)";
   //make_copy_construct_parameter_list(o, d.common().calculated());
@@ -118,6 +122,9 @@ static void make_common_operator_equal(std::ostream& o, const Module& d)
     "{\n"
     "  const COMMON_" << d.identifier() << "* p = dynamic_cast<const COMMON_" << d.identifier() << "*>(&x);\n"
     "  return (p\n";
+  if(d.circuit()->element_list().size()){
+    o << "      && _netlist_params == p->_netlist_params\n";
+  }
   for (Parameter_List_Collection::const_iterator
        q = d.parameters().begin();
        q != d.parameters().end();
@@ -561,6 +568,7 @@ static void make_eval_subdevice_parameters(std::ostream& o , const Element_2& e)
     o____ "vReal r(t0);\n";
     o____ "p.set_fixed(&r);\n";
     o____ "_netlist_params.set(\"["<< e.short_label() <<"]"<< p->name() <<"\", p);\n";
+    o____ "trace2(\"make eval ["<< e.short_label() <<"]"<< p->name() <<"\", p, _netlist_params.size());\n";
     o__ "}\n";
   }
 
