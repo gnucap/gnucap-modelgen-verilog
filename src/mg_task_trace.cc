@@ -38,7 +38,7 @@ public:
   explicit TRACE_TASK() : MGVAMS_TASK(){
   }
 private:
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
     unreachable();
     return "$$debug";
   }

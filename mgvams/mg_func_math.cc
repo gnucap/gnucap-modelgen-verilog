@@ -258,7 +258,7 @@ public:
     set_label("abs");
   }
   ~abs() { }
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const override { untested();
+  std::string eval(CS& Cmd, const PARAM_LIST* Scope)const override { untested();
     PARAMETER<double> x;
     Cmd >> x;
     x.e_val(NOT_INPUT, Scope);
@@ -510,7 +510,7 @@ public:
     set_label("max");
   }
   ~max() { }
-  std::string eval(CS&, const CARD_LIST*)const override { untested();
+  std::string eval(CS&, const PARAM_LIST*)const override { untested();
     unreachable();
     return "..";
   }
@@ -560,7 +560,7 @@ public:
     set_label("min");
   }
   ~min() { }
-  std::string eval(CS&, const CARD_LIST*)const override { untested();
+  std::string eval(CS&, const PARAM_LIST*)const override { untested();
     unreachable();
     return "..";
   }

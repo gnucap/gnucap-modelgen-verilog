@@ -175,8 +175,8 @@ public:
     int sum = int(_p_num.size()) + int(_p_den.size());
     return sum + COMMON_COMPONENT::param_count();
   }
-  void precalc_first(const CARD_LIST*)override;
-  void precalc_last(const CARD_LIST*)override;
+  void precalc_first(const PARAM_LIST*)override;
+  void precalc_last(const PARAM_LIST*)override;
   void set_rp() { _type = rf_rp; }
   void set_zx() { _type = rf_type(_type | rf_zx); }
   void set_nx() { _type = rf_type(_type | rf_nx); }
@@ -210,7 +210,7 @@ protected:
   void reduce_shift();
   void convert_nd();
 private:
-  void precalc(const CARD_LIST*);
+  void precalc(const PARAM_LIST*);
   template<class IN>
   void convert(IN& data, std::string const& what)const;
   template<class IN>
@@ -471,14 +471,14 @@ bool COMMON_RF_BASE::is_valid() const
   return true; //COMMON_COMPONENT::is_valid();
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_RF_BASE::precalc_first(const CARD_LIST* par_scope)
+void COMMON_RF_BASE::precalc_first(const PARAM_LIST* par_scope)
 {
   assert(par_scope);
   COMMON_COMPONENT::precalc_first(par_scope);
   precalc(par_scope);
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_RF_BASE::precalc(const CARD_LIST* par_scope)
+void COMMON_RF_BASE::precalc(const PARAM_LIST* par_scope)
 {
   for(auto &pp : _p_num) {
     e_val(&(pp),     0. , par_scope);
@@ -511,7 +511,7 @@ void COMMON_RF_BASE::reduce_shift()
   trace2("reduce_shift done", a.size(), b.size());
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_RF_BASE::precalc_last(const CARD_LIST* par_scope)
+void COMMON_RF_BASE::precalc_last(const PARAM_LIST* par_scope)
 {
   assert(par_scope);
   COMMON_COMPONENT::precalc_last(par_scope);

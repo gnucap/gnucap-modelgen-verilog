@@ -263,7 +263,7 @@ public:
     o__ "return ret;\n";
     o << "}\n";
   }
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
     unreachable();
     return "ac_stim";
   }

@@ -21,13 +21,13 @@
  *------------------------------------------------------------------
  * noise
  */
-#include <e_elemnt.h>
 #include <globals.h>
 #include <io_trace.h>
 #include <u_xprobe.h>
 #include <u_status.h>
 #include <u_cardst.h>
-
+#include <e_elemnt.h>
+#include <e_cardlist.h>
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -116,7 +116,7 @@ public:
       throw Exception_No_Match(N);
     }
   }
-  void precalc_last(CARD_LIST const* scope)override {
+  void precalc_last(PARAM_LIST const* scope)override {
     COMMON_COMPONENT::precalc_last(scope);
     _value.e_val(1., scope);
     trace2("pl", _value, _value.string());
@@ -303,7 +303,7 @@ public:
     double freq = _sim->_freq;
     return std::pow(freq, -_e) * COMMON_NOISE::do_noise(e, what);
   }
-  void precalc_last(CARD_LIST const* scope)override {
+  void precalc_last(PARAM_LIST const* scope)override {
     _e.e_val(1., scope);
     COMMON_NOISE::precalc_last(scope);
   }

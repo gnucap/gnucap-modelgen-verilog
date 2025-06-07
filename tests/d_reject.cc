@@ -21,8 +21,9 @@
  * reject a time step. for testing.
  */
 #include "globals.h"
-#include "e_compon.h"
 #include "u_xprobe.h"
+#include "e_cardlist.h"
+#include "e_compon.h"
 #include "e_node.h"
 /*--------------------------------------------------------------------------*/
 namespace {
@@ -55,7 +56,8 @@ private: // override virtual
   // bool     tr_needs_eval()override;
   void precalc_last()override {
 	  COMPONENT::precalc_last();
-	  _rejecttime.e_val(1., scope());
+	  assert(scope());
+	  _rejecttime.e_val(1., scope()->params());
   }
   void tr_advance()override{ _time1 = _time0; _time0 = _sim->_time0; }
 

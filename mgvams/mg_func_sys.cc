@@ -78,7 +78,7 @@ public:
   }
 private:
   bool static_code()const override {return true;}
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
     unreachable(); // SFCALL won't eval
     return "$$mfactor";
   }

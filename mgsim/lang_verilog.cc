@@ -482,7 +482,7 @@ public:
       pl->print(IO::mstdout, OPT::language);
       IO::mstdout << '\n';
     }else{
-      parse(cmd, Scope);
+      parse(cmd, pl);
       DEV_DOT* dd = new DEV_DOT();
       assert(dd);
       dd->set_owner(nullptr);
@@ -492,9 +492,9 @@ public:
     }
   }
 private:
-  void parse(CS& cmd, CARD_LIST*)const;
+  void parse(CS& cmd, PARAM_LIST*)const;
   void parse_def(CS& cmd, PARAM_INSTANCE& par)const;
-  void parse_range(CS& cmd, CARD_LIST* Scope, std::string Name)const;
+  void parse_range(CS& cmd, PARAM_LIST* Scope, std::string Name)const;
 } module_param;
 /*--------------------------------------------------------------------------*/
 class CMD_NET_DECL : public CMD {
@@ -636,7 +636,7 @@ public:
     return _value;
   }
   bool has_good_value()const override { untested();unreachable(); return false;}
-  Base const* e_val_(const Base* def, const CARD_LIST* s, int)const override {
+  Base const* e_val_(const Base* def, const PARAM_LIST* s, int)const override {
     // def does not seem to carry type info...
     // see s_dc.vcvs1{a,b,c}.gc
     error(bDEBUG, "assuming double in " + _s + "\n");
@@ -662,9 +662,9 @@ void CMD_PARAM::parse_def(CS& cmd, PARAM_INSTANCE& par) const
   par = s.str();
 }
 /*--------------------------------------------------------------------------*/
-void CMD_PARAM::parse(CS& cmd, CARD_LIST* Scope) const
+void CMD_PARAM::parse(CS& cmd, PARAM_LIST* Scope) const
 {
-  PARAM_LIST* pl = Scope->params();
+  PARAM_LIST* pl = Scope;
   assert(pl);
   PARAM_INSTANCE par;
   if(cmd >> "real"){
@@ -699,7 +699,7 @@ void CMD_PARAM::parse(CS& cmd, CARD_LIST* Scope) const
       break;
     }else if(cmd >> ',') { untested();
     }else{
-      parse_range(cmd, Scope, Name);
+      parse_range(cmd, pl, Name);
     }
 
     if(cmd >> ';') {
@@ -718,11 +718,11 @@ void CMD_PARAM::parse(CS& cmd, CARD_LIST* Scope) const
   }
 }
 /*--------------------------------------------------------------------------*/
-void CMD_PARAM::parse_range(CS& cmd, CARD_LIST* Scope, std::string Name) const
+void CMD_PARAM::parse_range(CS& cmd, PARAM_LIST* Scope, std::string Name) const
 {
   assert(Scope);
-  Scope->set_verilog_math();
-  PARAM_LIST* pl = Scope->params();
+  Scope->set_verilog();
+  PARAM_LIST* pl = Scope;
   {
     std::string range_expr = "1";
     std::string range_type;
@@ -783,10 +783,10 @@ void CMD_PARAM::parse_range(CS& cmd, CARD_LIST* Scope, std::string Name) const
 	  if(!lb_){ untested();
 	    incomplete();
 	  }else if(auto ii = dynamic_cast<Integer const*>(lb_)){
-	    incomplete();
+	    // incomplete();
 	    lb = to_string(ii->value());
 	  }else if(auto ff = dynamic_cast<Float const*>(lb_)){
-	    incomplete();
+	    // incomplete();
 	    lb = to_string(ff->value());
 	  }else{ untested();
 	    incomplete();

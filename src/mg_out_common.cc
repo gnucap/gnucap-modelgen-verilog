@@ -628,7 +628,7 @@ static void make_common_expand(std::ostream& o , const Module& m)
 
 #endif
   o << "/*--------------------------------------------------------------------------*/\n";
-  o << "void COMMON_" << m.identifier() << "::precalc_first(const CARD_LIST* par_scope)\n{\n";
+  o << "void COMMON_" << m.identifier() << "::precalc_first(const PARAM_LIST* par_scope)\n{\n";
   o__ "assert(par_scope);\n";
   o__ "COMMON_COMPONENT::precalc_first(par_scope);\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
@@ -638,7 +638,7 @@ static void make_common_expand(std::ostream& o , const Module& m)
   o  << "}\n"
     "/*--------------------------------------------------------------------------*/\n";
 
-  o << "void COMMON_" << m.identifier() << "::precalc_last(const CARD_LIST* par_scope)\n{\n";
+  o << "void COMMON_" << m.identifier() << "::precalc_last(const PARAM_LIST* par_scope)\n{\n";
   o__ "assert(par_scope);\n"
     "  COMMON_COMPONENT::precalc_last(par_scope);\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";

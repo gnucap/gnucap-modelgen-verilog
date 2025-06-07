@@ -86,7 +86,7 @@ public:
 
   bool operator==(const COMMON_COMPONENT& x)const override;
   void set_param_by_index(int I, std::string& Value, int Offset)override;
-  void precalc_last(const CARD_LIST* par_scope)override;
+  void precalc_last(const PARAM_LIST* par_scope)override;
 }; //COMMON_LAPLACE
 COMMON_LAPLACE cl(CC_STATIC);
 /*--------------------------------------------------------------------------*/
@@ -98,7 +98,7 @@ public:
   COMMON_LAPLACE_ND(COMMON_LAPLACE_ND const& x) : COMMON_LAPLACE(x) {}
   COMMON_LAPLACE_ND* clone()const override {return new COMMON_LAPLACE_ND(*this);}
 
-  void precalc_last(const CARD_LIST* par_scope)override{
+  void precalc_last(const PARAM_LIST* par_scope)override{
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();
   }
@@ -123,7 +123,7 @@ public:
   COMMON_LAPLACE_ZD(COMMON_LAPLACE_ZD const& x) : COMMON_LAPLACE(x) { untested();}
   COMMON_LAPLACE_ZD* clone()const override { untested();return new COMMON_LAPLACE_ZD(*this);}
 
-  void precalc_last(const CARD_LIST* par_scope)override{ untested();
+  void precalc_last(const PARAM_LIST* par_scope)override{ untested();
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();
   }
@@ -138,14 +138,14 @@ public:
   COMMON_LAPLACE_NP(COMMON_LAPLACE_NP const& x) : COMMON_LAPLACE(x) {}
   COMMON_LAPLACE_NP* clone()const override {return new COMMON_LAPLACE_NP(*this);}
 
-  void precalc_last(const CARD_LIST* par_scope)override {
+  void precalc_last(const PARAM_LIST* par_scope)override {
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();
     for(auto x : _p_den){
       trace1("NP den", x);
     }
   }
-  void precalc_first(const CARD_LIST* par_scope)override {
+  void precalc_first(const PARAM_LIST* par_scope)override {
     COMMON_LAPLACE::precalc_first(par_scope);
     convert_nd();
   }
@@ -180,7 +180,7 @@ public:
   COMMON_LAPLACE_ZP(COMMON_LAPLACE_ZP const& x) : COMMON_LAPLACE(x) {}
   COMMON_LAPLACE_ZP* clone()const override {return new COMMON_LAPLACE_ZP(*this);}
 
-  void precalc_last(const CARD_LIST* par_scope)override {
+  void precalc_last(const PARAM_LIST* par_scope)override {
     COMMON_LAPLACE::precalc_last(par_scope);
     if(!_p_num.size()){
       set_zx();
@@ -219,7 +219,7 @@ public:
   COMMON_LAPLACE_RP(COMMON_LAPLACE_RP const& x) : COMMON_LAPLACE(x) {}
   COMMON_LAPLACE_RP* clone()const override {return new COMMON_LAPLACE_RP(*this);}
 
-  void precalc_last(const CARD_LIST* par_scope)override {
+  void precalc_last(const PARAM_LIST* par_scope)override {
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();
   }
@@ -230,7 +230,7 @@ public:
       return 0;
     }
   }
- // void precalc_first(const CARD_LIST* par_scope)override { untested();
+ // void precalc_first(const PARAM_LIST* par_scope)override { untested();
  //   COMMON_LAPLACE::precalc_first(par_scope);
  //   convert_nd();
  // }
@@ -384,7 +384,7 @@ bool COMMON_LAPLACE::operator==(const COMMON_COMPONENT& x)const
     && COMMON_RF_BASE::operator==(x));
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_LAPLACE::precalc_last(const CARD_LIST* par_scope)
+void COMMON_LAPLACE::precalc_last(const PARAM_LIST* par_scope)
 {
   COMMON_RF_BASE::precalc_last(par_scope);
   e_val(&_tolerance, 0. , par_scope);

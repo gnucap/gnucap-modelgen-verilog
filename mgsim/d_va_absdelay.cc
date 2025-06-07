@@ -62,7 +62,7 @@ public:
   bool operator==(const COMMON_COMPONENT& x)const override;
   void set_param_by_index(int I, std::string& Value, int Offset)override;
   int set_param_by_name(std::string Name, std::string Value)override;
-  void precalc_last(const CARD_LIST* par_scope)override;
+  void precalc_last(const PARAM_LIST* par_scope)override;
 
   void tr_eval(ELEMENT* c)const override;
   void tr_accept(COMPONENT*c)const override;
@@ -86,7 +86,7 @@ public:
   bool operator==(const COMMON_COMPONENT& x)const override;
   void set_param_by_index(int I, std::string& Value, int Offset)override;
   int set_param_by_name(std::string Name, std::string Value)override;
-  void precalc_last(const CARD_LIST* par_scope)override;
+  void precalc_last(const PARAM_LIST* par_scope)override;
 
   void tr_eval(ELEMENT* c)const override;
   void tr_accept(COMPONENT*c)const override;
@@ -210,7 +210,7 @@ COMMON_ABSDELAY::~COMMON_ABSDELAY()
 {
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_ABSDELAY::precalc_last(const CARD_LIST* par_scope)
+void COMMON_ABSDELAY::precalc_last(const PARAM_LIST* par_scope)
 {
   COMMON_COMPONENT::precalc_last(par_scope);
   e_val(&_maxdelay, 1. , par_scope);
@@ -751,7 +751,7 @@ COMMON_TRANSITION::~COMMON_TRANSITION()
 {
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_TRANSITION::precalc_last(const CARD_LIST* par_scope)
+void COMMON_TRANSITION::precalc_last(const PARAM_LIST* par_scope)
 {
   COMMON_DELAY::precalc_last(par_scope);
   e_val(&_delay, 1. , par_scope);

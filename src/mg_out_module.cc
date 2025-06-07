@@ -1034,7 +1034,8 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   o__ "CARD::precalc_last();\n";
 
   o__ "try {\n";
-  o____ "mutable_common()->precalc_last(scope());\n"; // for now.
+  o____ "assert(scope());\n";
+  o____ "mutable_common()->precalc_last(scope()->params());\n"; // for now.
   o__ "}catch (Exception_Precalc& e) { untested();\n";
   o____ "error(bWARNING, long_label() + \": \" + e.message());\n";
   o__ "}\n;";

@@ -43,7 +43,7 @@ private:
     m.install(this);
     return new Token_CALL("@", this);
   }
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
     return "@";
   }
   void stack_op(Expression*)const override { untested();

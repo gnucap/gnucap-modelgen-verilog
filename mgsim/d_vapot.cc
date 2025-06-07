@@ -59,6 +59,7 @@ public:
   //		      const double* inputs[]=0);
 protected:
   double abstol() const{
+    assert(has_common());
     auto cv = prechecked_cast<COMMON_VASRC const*>(common());
     assert(cv); // TODO: give feedback
     return cv->potential_abstol();

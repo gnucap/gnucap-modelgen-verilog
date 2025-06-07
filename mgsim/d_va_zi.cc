@@ -82,7 +82,7 @@ public:
   bool operator==(const COMMON_COMPONENT& x)const override;
   void set_param_by_index(int I, std::string& Value, int Offset)override;
   int set_param_by_name(std::string Name, std::string Value)override;
-  void precalc_last(const CARD_LIST* par_scope)override;
+  void precalc_last(const PARAM_LIST* par_scope)override;
 }; //COMMON_ZIFILTER
 COMMON_ZIFILTER czi(CC_STATIC);
 /*--------------------------------------------------------------------------*/
@@ -94,7 +94,7 @@ public:
   COMMON_ZIFILTER_ND(COMMON_ZIFILTER_ND const& x) : COMMON_ZIFILTER(x) {}
   COMMON_ZIFILTER_ND* clone()const override {return new COMMON_ZIFILTER_ND(*this);}
 
-  void precalc_last(const CARD_LIST* par_scope)override{
+  void precalc_last(const PARAM_LIST* par_scope)override{
     COMMON_ZIFILTER::precalc_last(par_scope);
     convert_nd();
     reduce_shift();
@@ -110,7 +110,7 @@ public:
   COMMON_ZIFILTER_ZD(COMMON_ZIFILTER_ZD const& x) : COMMON_ZIFILTER(x) {}
   COMMON_ZIFILTER_ZD* clone()const override {return new COMMON_ZIFILTER_ZD(*this);}
 
-  void precalc_last(const CARD_LIST* par_scope)override{
+  void precalc_last(const PARAM_LIST* par_scope)override{
     COMMON_ZIFILTER::precalc_last(par_scope);
     convert_nd();
     reduce_shift();
@@ -127,7 +127,7 @@ public:
   COMMON_ZIFILTER_NP(COMMON_ZIFILTER_NP const& x) : COMMON_ZIFILTER(x) { untested();}
   COMMON_ZIFILTER_NP* clone()const override { untested();return new COMMON_ZIFILTER_NP(*this);}
 
-  void precalc_last(const CARD_LIST* par_scope)override{ untested();
+  void precalc_last(const PARAM_LIST* par_scope)override{ untested();
     COMMON_ZIFILTER::precalc_last(par_scope);
     convert_nd();
     reduce_shift();
@@ -143,7 +143,7 @@ public:
   COMMON_ZIFILTER_ZP(COMMON_ZIFILTER_ZP const& x) : COMMON_ZIFILTER(x) {}
   COMMON_ZIFILTER_ZP* clone()const override { return new COMMON_ZIFILTER_ZP(*this);}
 
-  void precalc_last(const CARD_LIST* par_scope)override{
+  void precalc_last(const PARAM_LIST* par_scope)override{
     COMMON_ZIFILTER::precalc_last(par_scope);
     convert_nd();
     reduce_shift();
@@ -160,7 +160,7 @@ public:
   COMMON_ZIFILTER_RP(COMMON_ZIFILTER_RP const& x) = default;
   COMMON_ZIFILTER_RP* clone()const override { untested();return new COMMON_ZIFILTER_RP(*this);}
 
-  void precalc_last(const CARD_LIST* par_scope)override{ untested();
+  void precalc_last(const PARAM_LIST* par_scope)override{ untested();
     COMMON_ZIFILTER::precalc_last(par_scope);
     convert_nd();
     reduce_shift();
@@ -272,7 +272,7 @@ COMMON_ZIFILTER::~COMMON_ZIFILTER()
 {
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_ZIFILTER::precalc_last(const CARD_LIST* par_scope)
+void COMMON_ZIFILTER::precalc_last(const PARAM_LIST* par_scope)
 {
   COMMON_RF_BASE::precalc_last(par_scope);
   e_val(&_period, 1. , par_scope);

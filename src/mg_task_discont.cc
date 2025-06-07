@@ -37,7 +37,7 @@ public:
     set_label("discontinuity");
   }
 private:
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
     return "$$discontinuity";
   }
   DISCONT* clone()const override { untested();

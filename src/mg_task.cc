@@ -39,7 +39,7 @@ public:
   bool has_modes()const override {return true;}
   bool has_tr_review()const override {return true;}
 private:
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
     unreachable(); // SFCALL won't eval
     return "$$bound_step";
   }
@@ -70,7 +70,7 @@ public:
     set_label("t_finish");
   }
 private:
-  std::string eval(CS& cmd, const CARD_LIST*)const override{ untested();
+  std::string eval(CS& cmd, const PARAM_LIST*)const override{ untested();
     return "$finish" + cmd.fullstring();
   }
   MGVAMS_TASK* clone()const override{ untested();

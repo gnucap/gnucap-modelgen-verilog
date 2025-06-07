@@ -456,7 +456,7 @@ private:
     o__ "// time_by.min_event(" << _code_name << ".review(this));\n";
   }
 
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
     unreachable();
     return "";
   }

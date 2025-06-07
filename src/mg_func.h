@@ -105,7 +105,7 @@ public:
 }; // FUNCTION_
 /*--------------------------------------------------------------------------*/
 class MGVAMS_FUNCTION : public FUNCTION_ {
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
 	  unreachable();
 	  return "func";
   }

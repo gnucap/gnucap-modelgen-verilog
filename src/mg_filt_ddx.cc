@@ -151,7 +151,7 @@ public:
   void make_cc_impl(std::ostream&)const override{
     // nothing
   }
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
     unreachable();
     return "ddx";
   }

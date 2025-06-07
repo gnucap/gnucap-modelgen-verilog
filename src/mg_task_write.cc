@@ -37,7 +37,7 @@ public:
   explicit DEBUG_TASK() : MGVAMS_TASK(){
   }
 private:
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
     unreachable();
     return "$$debug";
   }
@@ -85,7 +85,7 @@ public:
     set_label("$write");
   }
 private:
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
     return "$$strobe";
   }
   WRITE* clone()const override {

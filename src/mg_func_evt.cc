@@ -45,7 +45,7 @@ private:
     m.install(this);
     return new Token_EVT(label(), this);
   }
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
     unreachable();
     return "";
   }
@@ -71,7 +71,7 @@ private:
     m.install(this);
     return new Token_EVT(label(), this);
   }
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
     unreachable();
     return "";
   }
@@ -242,7 +242,7 @@ private:
     o__ "// time_by.min_event(" << _code_name << ".review(this));\n";
   }
 
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
     unreachable();
     return "";
   }

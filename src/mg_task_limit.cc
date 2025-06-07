@@ -34,7 +34,7 @@ namespace{
 static size_t cnt;
 /*--------------------------------------------------------------------------*/
 class LIMIT : public MGVAMS_TASK {
-  std::string eval(CS&, const CARD_LIST*)const override{ untested();
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
     return "$limit";
   }
   LIMIT* clone()const override{

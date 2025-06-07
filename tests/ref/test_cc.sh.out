@@ -1018,9 +1018,9 @@ public:
   std::string param_name(int,int)const override;
   std::string param_value(int)const override;
   int param_count()const override {return 1 + COMMON_COMPONENT::param_count();}
-  void precalc_first(const CARD_LIST*)override;
+  void precalc_first(const PARAM_LIST*)override;
   void expand(const COMPONENT*)override;
-  void precalc_last(const CARD_LIST*)override;
+  void precalc_last(const PARAM_LIST*)override;
   void tr_eval_analog(MOD_resistor*)const;
   void tr_advance_analog(MOD_resistor*)const;
   void tr_regress_analog(MOD_resistor*)const;
@@ -1300,7 +1300,7 @@ void COMMON_resistor::expand(const COMPONENT* d)
   COMMON_COMPONENT::expand(d);
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_resistor::precalc_first(const CARD_LIST* par_scope)
+void COMMON_resistor::precalc_first(const PARAM_LIST* par_scope)
 {
   assert(par_scope);
   COMMON_COMPONENT::precalc_first(par_scope);
@@ -1350,7 +1350,7 @@ void COMMON_resistor::precalc_first(const CARD_LIST* par_scope)
   }
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_resistor::precalc_last(const CARD_LIST* par_scope)
+void COMMON_resistor::precalc_last(const PARAM_LIST* par_scope)
 {
   assert(par_scope);
   COMMON_COMPONENT::precalc_last(par_scope);
@@ -2219,7 +2219,8 @@ void MOD_resistor::precalc_last()
 {
   CARD::precalc_last();
   try {
-    mutable_common()->precalc_last(scope());
+    assert(scope());
+    mutable_common()->precalc_last(scope()->params());
   }catch (Exception_Precalc& e) { untested();
     error(bWARNING, long_label() + ": " + e.message());
   }
@@ -2294,9 +2295,9 @@ public:
   std::string param_name(int,int)const override;
   std::string param_value(int)const override;
   int param_count()const override {return 5 + COMMON_COMPONENT::param_count();}
-  void precalc_first(const CARD_LIST*)override;
+  void precalc_first(const PARAM_LIST*)override;
   void expand(const COMPONENT*)override;
-  void precalc_last(const CARD_LIST*)override;
+  void precalc_last(const PARAM_LIST*)override;
   void tr_eval_analog(MOD_resistor*)const;
   void tr_advance_analog(MOD_resistor*)const;
   void tr_regress_analog(MOD_resistor*)const;
@@ -2624,7 +2625,7 @@ void COMMON_resistor::expand(const COMPONENT* d)
   COMMON_COMPONENT::expand(d);
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_resistor::precalc_first(const CARD_LIST* par_scope)
+void COMMON_resistor::precalc_first(const PARAM_LIST* par_scope)
 {
   assert(par_scope);
   COMMON_COMPONENT::precalc_first(par_scope);
@@ -2667,7 +2668,7 @@ void COMMON_resistor::precalc_first(const CARD_LIST* par_scope)
   }
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_resistor::precalc_last(const CARD_LIST* par_scope)
+void COMMON_resistor::precalc_last(const PARAM_LIST* par_scope)
 {
   assert(par_scope);
   COMMON_COMPONENT::precalc_last(par_scope);
@@ -3787,7 +3788,8 @@ void MOD_resistor::precalc_last()
 {
   CARD::precalc_last();
   try {
-    mutable_common()->precalc_last(scope());
+    assert(scope());
+    mutable_common()->precalc_last(scope()->params());
   }catch (Exception_Precalc& e) { untested();
     error(bWARNING, long_label() + ": " + e.message());
   }
@@ -4858,9 +4860,9 @@ public:
   std::string param_name(int,int)const override;
   std::string param_value(int)const override;
   int param_count()const override {return 1 + COMMON_COMPONENT::param_count();}
-  void precalc_first(const CARD_LIST*)override;
+  void precalc_first(const PARAM_LIST*)override;
   void expand(const COMPONENT*)override;
-  void precalc_last(const CARD_LIST*)override;
+  void precalc_last(const PARAM_LIST*)override;
   void tr_eval_analog(MOD_capacitor*)const;
   void tr_review_analog(MOD_capacitor*)const;
   void tr_accept_analog(MOD_capacitor*)const;
@@ -5172,7 +5174,7 @@ void COMMON_capacitor::expand(const COMPONENT* d)
   COMMON_COMPONENT::expand(d);
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_capacitor::precalc_first(const CARD_LIST* par_scope)
+void COMMON_capacitor::precalc_first(const PARAM_LIST* par_scope)
 {
   assert(par_scope);
   COMMON_COMPONENT::precalc_first(par_scope);
@@ -5201,7 +5203,7 @@ void COMMON_capacitor::precalc_first(const CARD_LIST* par_scope)
   }
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_capacitor::precalc_last(const CARD_LIST* par_scope)
+void COMMON_capacitor::precalc_last(const PARAM_LIST* par_scope)
 {
   assert(par_scope);
   COMMON_COMPONENT::precalc_last(par_scope);
@@ -5758,7 +5760,8 @@ void MOD_capacitor::precalc_last()
 {
   CARD::precalc_last();
   try {
-    mutable_common()->precalc_last(scope());
+    assert(scope());
+    mutable_common()->precalc_last(scope()->params());
   }catch (Exception_Precalc& e) { untested();
     error(bWARNING, long_label() + ": " + e.message());
   }
@@ -5825,9 +5828,9 @@ public:
   std::string param_name(int,int)const override;
   std::string param_value(int)const override;
   int param_count()const override {return 2 + COMMON_COMPONENT::param_count();}
-  void precalc_first(const CARD_LIST*)override;
+  void precalc_first(const PARAM_LIST*)override;
   void expand(const COMPONENT*)override;
-  void precalc_last(const CARD_LIST*)override;
+  void precalc_last(const PARAM_LIST*)override;
   void tr_eval_analog(MOD_capacitor*)const;
   void tr_review_analog(MOD_capacitor*)const;
   void tr_accept_analog(MOD_capacitor*)const;
@@ -6153,7 +6156,7 @@ void COMMON_capacitor::expand(const COMPONENT* d)
   COMMON_COMPONENT::expand(d);
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_capacitor::precalc_first(const CARD_LIST* par_scope)
+void COMMON_capacitor::precalc_first(const PARAM_LIST* par_scope)
 {
   assert(par_scope);
   COMMON_COMPONENT::precalc_first(par_scope);
@@ -6189,7 +6192,7 @@ void COMMON_capacitor::precalc_first(const CARD_LIST* par_scope)
   }
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_capacitor::precalc_last(const CARD_LIST* par_scope)
+void COMMON_capacitor::precalc_last(const PARAM_LIST* par_scope)
 {
   assert(par_scope);
   COMMON_COMPONENT::precalc_last(par_scope);
@@ -6810,7 +6813,8 @@ void MOD_capacitor::precalc_last()
 {
   CARD::precalc_last();
   try {
-    mutable_common()->precalc_last(scope());
+    assert(scope());
+    mutable_common()->precalc_last(scope()->params());
   }catch (Exception_Precalc& e) { untested();
     error(bWARNING, long_label() + ": " + e.message());
   }

@@ -342,7 +342,8 @@ int PARAMSET::is_valid() const
   if(_parent->subckt()){
     PARAM_LIST const* params = _parent->subckt()->params();
     PARAM_INSTANCE v = params->deep_lookup("_..is_valid");
-    Base const* x = v.e_val(nullptr, subckt());
+    assert(subckt());
+    Base const* x = v.e_val(nullptr, subckt()->params());
     Integer c;
     Integer* res = c.assign(x);
     if(!res) {
@@ -517,8 +518,8 @@ void resolve_copy(CARD_LIST* t, PARAM_LIST const& p, const CARD_LIST*)
     if (i->second.has_hard_value()) {
       CS cmd(CS::_STRING, i->second.string());
       Expression f(cmd);
-      CARD_LIST empty;
-      empty.set_verilog_math();
+      PARAM_LIST empty;
+      empty.set_verilog();
       Expression e(f, &empty);
       Expression E;
 	
@@ -598,7 +599,7 @@ CARD* PARAMSET::deflate()
     trace3("PARAMSET::deflate args fwd2", dev->long_label(), pi->first, pi->second.string());
     CS cmd(CS::_STRING, pi->second.string());
     Expression e(cmd);
-    Expression r(e, subckt());
+    Expression r(e, subckt()->params());
     std::stringstream s;
     r.dump(s);
 

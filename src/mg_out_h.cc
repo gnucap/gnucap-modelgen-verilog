@@ -326,9 +326,9 @@ static void make_common(std::ostream& o, const Module& m)
   o__ "int param_count()const override {return "
         << m.parameters().count_nonlocal()
         << " + " << base_class_name << "::param_count();}\n";
-  o__ "void precalc_first(const CARD_LIST*)override;\n";
+  o__ "void precalc_first(const PARAM_LIST*)override;\n";
   o__ "void expand(const COMPONENT*)override;\n";
-  o__ "void precalc_last(const CARD_LIST*)override;\n";
+  o__ "void precalc_last(const PARAM_LIST*)override;\n";
   // if has_analog?
   o__ "void tr_eval_analog(MOD_" << m.identifier() << "*)const;\n";
   if(m.has_tr_review() && m.has_analog_block()){
