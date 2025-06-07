@@ -1038,8 +1038,7 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   o__ "}\n;";
 
   if(m.circuit()->element_list().size()) {
-    o__ "assert(subckt());\n";
-    o__ "subckt()->precalc_last();\n";
+    //  below?
   }else{
   }
 
@@ -1064,6 +1063,7 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   }else{
   }
 
+  // if(m.circuit()->element_list().size()) ?
   o__ "if(subckt()){\n";
   o____ "subckt()->precalc_last();\n";
   o__ "}else{untested();\n";
