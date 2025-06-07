@@ -8,7 +8,7 @@ main m(2 0);
        ^ ? invalid identifier
 main m(2 0);
          ^ ? invalid identifier
-.model ddd diode ( $mfactor=NA( NA))
+.model ddd diode ( af=NA( NA))
 .subckt main ( 1 2 )
 d1 ( 1 2 )  ddd  area=1.
 .ends main

@@ -1,4 +1,4 @@
-.model ddd diode ( $mfactor=NA( NA))
+.model ddd diode ( af=NA( NA))
 .subckt main ( 2 1 )
 d1 ( 1 2 )  ddd  area=1.
 .ends main

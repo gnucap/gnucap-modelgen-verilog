@@ -1,5 +1,6 @@
 main #() dut(in out 0)
                     ^ ? invalid identifier
+dut.c1 ambiguous overload in capacitor
 #           v(in)      v(out)     v(s)       iter(0)   
  0.         0.9        0.9        0.9        4.        
 #Time       v(in)      v(out)     v(s)       timef(C1)  timef(dut.c1) iter(0)   

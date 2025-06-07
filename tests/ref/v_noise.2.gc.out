@@ -16,6 +16,7 @@ noise_probe #(.name("thermal")) noise3(3);
                                        ^ ? invalid identifier
 noise_probe #(.name("thermal")) noise4(4);
                                        ^ ? invalid identifier
+m.r0 ambiguous overload in resistor
 probe ac npwr(noise*) x(m.r1.*) x(m.r0.*)
                                   ^ ? no match
 ground \0 ;

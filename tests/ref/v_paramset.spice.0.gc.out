@@ -17,7 +17,7 @@ endmodule // main
 main #() m (.\1 (\0 ),.\2 (\1 ),.\3 (\2 ),.\4 (\4 ));
 >>>>>spice
 >>>>>.list 
-.model myres resistor ( $mfactor=NA( NA))
+.model myres resistor ( r=NA( NA))
 .subckt main ( 1 2 3 4 )
   parameter five=5;
 v ( 3 1 )  vsource  =1.
