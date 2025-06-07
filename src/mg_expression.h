@@ -21,29 +21,7 @@
 /*--------------------------------------------------------------------------*/
 #ifndef MG_EXPRESSION_H
 #define MG_EXPRESSION_H
-#define Token_TERNARY KO_Token_TERNARY
 #include <m_expression.h>
-#undef Token_TERNARY
-/*--------------------------------------------------------------------------*/
-// temporary hack.
-class Token_TERNARY : public Token {
-  Expression const* _true{nullptr};
-  Expression const* _false{nullptr};
-protected:
-  explicit Token_TERNARY(std::string /*Name*/, Base const* Data)
-    : Token(Data) { untested();}
-public:
-  explicit Token_TERNARY(std::string /*Name*/, Expression const* t, Expression const* f, Base const* d)
-    : Token(d), _true(t), _false(f) {}
-  explicit Token_TERNARY(const Token_TERNARY& P) : Token(P) { untested();}
-  ~Token_TERNARY();
-  Token* clone()const override{ untested();return new Token_TERNARY(*this);}
-  Token* op(const Token* t1, const Token* t2, const Token* t3)const;
-  void stack_op(Expression*)const override;
-public:
-  Expression const* true_part() const{ return _true; }
-  Expression const* false_part() const{ return _false; }
-};
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class TData;

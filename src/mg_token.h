@@ -261,13 +261,9 @@ private:
 class Token_TERNARY_ : public Token_TERNARY {
   Token const* _cond{nullptr}; // stuff into data?
 public:
-//  explicit Token_TERNARY_(Token_TERNARY const& b, Base const* d)
-//    : Token_TERNARY(b.name(), d) { untested(); }
-  explicit Token_TERNARY_(std::string const& b, Base const* d)
-    : Token_TERNARY(b, d) { untested(); }
-  explicit Token_TERNARY_(std::string const& b, Token const* Cond,
+  explicit Token_TERNARY_(std::string const&, Token const* Cond,
       Expression const* t1, Expression const* t2, Base const* d=nullptr)
-    : Token_TERNARY(b, t1, t2, d), _cond(Cond) {}
+    : Token_TERNARY(t1, t2, d), _cond(Cond) {}
   ~Token_TERNARY_();
 
   Token* clone()const override { untested();
