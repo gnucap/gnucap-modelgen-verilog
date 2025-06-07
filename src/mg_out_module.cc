@@ -56,7 +56,7 @@ static String_Arg const& flow_abstol(Branch const& b)
 /*--------------------------------------------------------------------------*/
 static void make_module_is_valid(std::ostream& o, const Module& m)
 {
-  o << "bool MOD_" << m.identifier() << "::is_valid()const\n{\n";
+  o << "int MOD_" << m.identifier() << "::is_valid()const\n{\n";
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "return c->is_valid();\n";

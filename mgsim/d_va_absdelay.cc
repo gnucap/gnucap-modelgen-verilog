@@ -156,7 +156,7 @@ private: // BASE_SUBCKT
   void map_nodes()override;
 private: // overrides
   double tr_amps()const override;
-  bool is_valid()const override;
+  int is_valid()const override;
   void precalc_first()override;
   void expand()override;
   void precalc_last()override;
@@ -425,7 +425,7 @@ void DELAY::precalc_first()
   }
 }
 /*--------------------------------------------------------------------------*/
-bool DELAY::is_valid()const
+int DELAY::is_valid()const
 { untested();
   COMMON_COMPONENT const* c = prechecked_cast<COMMON_COMPONENT const*>(common());
   assert(c);

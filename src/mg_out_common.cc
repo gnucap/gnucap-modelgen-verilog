@@ -427,7 +427,7 @@ static void make_param_check_range(std::ostream& o, ValueRange const& p,
 static void make_common_is_valid(std::ostream& o, const Module& m)
 {
   make_tag(o);
-  o << "bool COMMON_" << m.identifier() << "::is_valid() const\n{\n";
+  o << "int COMMON_" << m.identifier() << "::is_valid() const\n{\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
   o__ "(void)pc;\n";
 

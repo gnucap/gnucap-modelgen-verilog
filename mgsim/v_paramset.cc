@@ -120,7 +120,7 @@ private:
   CARD* clone() const override;
   CARD* clone_instance() const override;
 
-  bool is_valid() const override;
+  int is_valid() const override;
 /*--------------------------------------------------------------------------*/
 
   int set_param_by_name(std::string Name, std::string Value) override;
@@ -334,7 +334,7 @@ CARD* PARAMSET::clone() const
   return n;
 }
 /*--------------------------------------------------------------------------*/
-bool PARAMSET::is_valid() const
+int PARAMSET::is_valid() const
 {
   // assert(scope());
   assert(_parent);

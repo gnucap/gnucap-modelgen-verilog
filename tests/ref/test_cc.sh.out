@@ -1005,7 +1005,7 @@ public:
   COMMON_COMPONENT* clone()const override {return new COMMON_resistor(*this);}
   void     set_param_by_index(int, std::string&, int)override;
   aidx     set_param_by_name(std::string, std::string)override;
-  bool     is_valid()const;
+  int      is_valid()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
   std::string param_name(int,int)const override;
@@ -1082,7 +1082,7 @@ public:
   explicit MOD_resistor(); // : BASE_SUBCKT() { _n = _nodes; }
   CARD* clone()const override;
 private: // overrides
-  bool is_valid()const override;
+  int is_valid()const override;
   void precalc_first()override;
   void expand()override;
   void precalc_last()override;
@@ -1262,7 +1262,7 @@ std::string COMMON_resistor::param_value(int I)const
   }
 }
 /*--------------------------------------------------------------------------*/
-bool COMMON_resistor::is_valid() const
+int COMMON_resistor::is_valid() const
 {
   COMMON_resistor const* pc = this;
   (void)pc;
@@ -2084,7 +2084,7 @@ void MOD_resistor::precalc_first()
   }
 }
 /*--------------------------------------------------------------------------*/
-bool MOD_resistor::is_valid()const
+int MOD_resistor::is_valid()const
 {
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
   return c->is_valid();
@@ -2281,7 +2281,7 @@ public:
   COMMON_COMPONENT* clone()const override {return new COMMON_resistor(*this);}
   void     set_param_by_index(int, std::string&, int)override;
   aidx     set_param_by_name(std::string, std::string)override;
-  bool     is_valid()const;
+  int      is_valid()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
   std::string param_name(int,int)const override;
@@ -2358,7 +2358,7 @@ public:
   CARD* clone()const override;
 private: // overrides
   aidx     set_param_by_name(std::string, std::string)override;
-  bool is_valid()const override;
+  int is_valid()const override;
   void precalc_first()override;
   void expand()override;
   void precalc_last()override;
@@ -2567,7 +2567,7 @@ std::string COMMON_resistor::param_value(int I)const
   }
 }
 /*--------------------------------------------------------------------------*/
-bool COMMON_resistor::is_valid() const
+int COMMON_resistor::is_valid() const
 {
   COMMON_resistor const* pc = this;
   (void)pc;
@@ -3652,7 +3652,7 @@ void MOD_resistor::precalc_first()
   }
 }
 /*--------------------------------------------------------------------------*/
-bool MOD_resistor::is_valid()const
+int MOD_resistor::is_valid()const
 {
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
   return c->is_valid();
@@ -4838,7 +4838,7 @@ public:
   COMMON_COMPONENT* clone()const override {return new COMMON_capacitor(*this);}
   void     set_param_by_index(int, std::string&, int)override;
   aidx     set_param_by_name(std::string, std::string)override;
-  bool     is_valid()const;
+  int      is_valid()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
   std::string param_name(int,int)const override;
@@ -4954,7 +4954,7 @@ public:
   explicit MOD_capacitor(); // : BASE_SUBCKT() { _n = _nodes; }
   CARD* clone()const override;
 private: // overrides
-  bool is_valid()const override;
+  int is_valid()const override;
   void precalc_first()override;
   void expand()override;
   void precalc_last()override;
@@ -5127,7 +5127,7 @@ std::string COMMON_capacitor::param_value(int I)const
   }
 }
 /*--------------------------------------------------------------------------*/
-bool COMMON_capacitor::is_valid() const
+int COMMON_capacitor::is_valid() const
 {
   COMMON_capacitor const* pc = this;
   (void)pc;
@@ -5616,7 +5616,7 @@ void MOD_capacitor::precalc_first()
   }
 }
 /*--------------------------------------------------------------------------*/
-bool MOD_capacitor::is_valid()const
+int MOD_capacitor::is_valid()const
 {
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   return c->is_valid();
@@ -5805,7 +5805,7 @@ public:
   COMMON_COMPONENT* clone()const override {return new COMMON_capacitor(*this);}
   void     set_param_by_index(int, std::string&, int)override;
   aidx     set_param_by_name(std::string, std::string)override;
-  bool     is_valid()const;
+  int      is_valid()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
   std::string param_name(int,int)const override;
@@ -5925,7 +5925,7 @@ public:
   explicit MOD_capacitor(); // : BASE_SUBCKT() { _n = _nodes; }
   CARD* clone()const override;
 private: // overrides
-  bool is_valid()const override;
+  int is_valid()const override;
   void precalc_first()override;
   void expand()override;
   void precalc_last()override;
@@ -6108,7 +6108,7 @@ std::string COMMON_capacitor::param_value(int I)const
   }
 }
 /*--------------------------------------------------------------------------*/
-bool COMMON_capacitor::is_valid() const
+int COMMON_capacitor::is_valid() const
 {
   COMMON_capacitor const* pc = this;
   (void)pc;
@@ -6668,7 +6668,7 @@ void MOD_capacitor::precalc_first()
   }
 }
 /*--------------------------------------------------------------------------*/
-bool MOD_capacitor::is_valid()const
+int MOD_capacitor::is_valid()const
 {
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   return c->is_valid();
