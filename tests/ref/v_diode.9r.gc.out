@@ -1,6 +1,6 @@
 paramset ddd diode;
     parameter real area=1;
- .af=1.; .area=area; .bv=50; .cjo=1.p; .eg=1.11; .fc=0.5; .ibv=0.001; .is=10.f; .kf=0.; .level=0; .m=0.5; .n=1.; .polarity=-1; .rs=0.; .tt=0.; .vj=1.; .xti=3.;
+ .area=area; .level=0; .is=10.f; .rs=0.; .n=1.; .tt=0.; .cjo=1.p; .vj=1.; .m=0.5; .eg=1.11; .xti=3.; .kf=0.; .af=1.; .fc=0.5; .bv=50; .ibv=0.001; .polarity=-1;
 endparamset
 
 module main (.\2 (\2 ),.\1 (\1 ));

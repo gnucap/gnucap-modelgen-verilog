@@ -56,8 +56,8 @@ class _COMMON_VASRC_electrical : public COMMON_VASRC {
 public:
   _COMMON_VASRC_electrical(int i) : COMMON_VASRC(i){}
 private:
-  _COMMON_VASRC_electrical(_COMMON_VASRC_electrical const&p)     : COMMON_VASRC(p){ untested();}
-  COMMON_COMPONENT* clone()const override{ untested();
+  _COMMON_VASRC_electrical(_COMMON_VASRC_electrical const&p)     : COMMON_VASRC(p){}
+  COMMON_COMPONENT* clone()const override{
     return new _COMMON_VASRC_electrical(*this);
   }
   std::string name()const override{untested(); return "electrical";}

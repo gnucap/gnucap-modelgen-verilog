@@ -25,14 +25,14 @@ paramset tln tln1;
     parameter integer length from [2:999];
     parameter r;
     parameter c;
- .c=c; .length=length; .r=r;
+ .length=length; .r=r; .c=c;
 endparamset
 
 paramset tln tln0;
     parameter integer length from [1:1];
     parameter r;
     parameter c;
- .c=c; .r=r;
+ .r=r; .c=c;
 endparamset
 
 module main (.\1 (\1 ),.\2 (\2 ));

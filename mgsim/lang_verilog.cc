@@ -1052,6 +1052,7 @@ void LANG_VERILOG::print_args_paramset(OMSTREAM& o, const T* x)
     unreachable();
     // x->print_args_obsolete_callback(o, this);  //BUG//callback//
   }else{
+#if 0
     if(0 && x->subckt()){ untested();
       for(auto p : *x->subckt()->params()){ untested();
 	std::string const& f = p.first;
@@ -1067,6 +1068,7 @@ void LANG_VERILOG::print_args_paramset(OMSTREAM& o, const T* x)
     }else{
     	//  DEV_DOT for now.
     }
+#endif
 
 
     { // slow? use common->_params..?
