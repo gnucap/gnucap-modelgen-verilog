@@ -7,7 +7,7 @@ module main (.AA(AA));
   port_names #() p (.A(AA),.B(\0 ));
 endmodule // main
 
-main #() m (.AA(AA));
+main #() m (AA);
 #           v(AA)     
  27.        1.        
 Gnucap   System status

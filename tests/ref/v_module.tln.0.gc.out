@@ -40,7 +40,7 @@ module main (.\1 (\1 ),.\2 (\2 ));
   tln #(.length(len),.c(1./len),.r(1./len)) t1 (\1 ,\2 );
 endmodule // main
 
-main #() m (.\1 (\1 ),.\2 (\2 ));
+main #() m (\1 ,\2 );
 #Time       v(1)       v(2)      
  0.         0.         0.        
  42.E-9     263.87E-9  0.        

@@ -18,6 +18,8 @@ module main(1 2);
   ports p (.a(2) .b(0) .c(0));
                           ^ ? invalid identifier
 >>>>>print dc v(nodes)
+m: main from top level
+m: 1 candidate found for main
 main.p: ports from top level
 main.p: ports from top level
 main.p: ports from top level

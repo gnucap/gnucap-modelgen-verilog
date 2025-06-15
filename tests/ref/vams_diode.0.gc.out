@@ -3,6 +3,8 @@
 >>>>>.model dd d cjo=1pf is=1e-15 
 >>>>>.parameter v=0 
 >>>>>.print dc v(nodes) i(V1) i(V2) z(m.D1) iter(0) 
+m: main from top level
+m: 1 candidate found for main
 main.D1: diode from device_dispatcher
 main.D1: diode:0 from device_dispatcher
 main.D1 discarded: no match: tf

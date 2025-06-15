@@ -26,6 +26,8 @@ module main (.a(a),.b(b));
 endmodule // main
 
 >>>>>print dc v(nodes)
+m1: main from top level
+m1: 1 candidate found for main
 main.n1: Resistor from top level: A
 r already set. replacing
 main.n1: Resistor from top level: B

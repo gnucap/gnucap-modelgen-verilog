@@ -13,6 +13,8 @@ main #() m(\0 ,1,2,4);
 main #() m(\0 ,1,2,4);
                    ^ ? invalid identifier
 >>>>>list
+m: main from top level
+m: 1 candidate found for main
 paramset myres resistor;
  .r=1;
 endparamset
@@ -26,7 +28,7 @@ module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
   myv #() V1 (.n(\1 ),.p(\3 ));
 endmodule // main
 
-main #() m (.\1 (\0 ),.\2 (\1 ),.\3 (\2 ),.\4 (\4 ));
+main #() m (\0 ,\1 ,\2 ,\4 );
 >>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
 main.v: myres from top level
 main.v: 1 candidate found for myres

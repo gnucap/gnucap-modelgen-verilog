@@ -649,7 +649,11 @@ void PARAMSET::expand()
     // assert(net_nodes() == proto->net_nodes());
     // assert(net_nodes() == _parent->_dev->net_nodes());
     assert(subckt());
-    assert(scope()==owner()->subckt());
+    if(owner()){
+      assert(scope()==owner()->subckt());
+    }else{
+      assert(scope()==&CARD_LIST::card_list);
+    }
 
     auto c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
 

@@ -14,6 +14,8 @@ main m(\1 ,2,3,\0 );
 main m(\1 ,2,3,\0 );
              ^ ? invalid identifier
 >>>>>list
+m: main from top level
+m: 1 candidate found for main
 module modwrong (.A(A),.b(b));
 endmodule // modwrong
 
@@ -32,7 +34,7 @@ module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
   bob #() b1 (.a(\1 ),.b(\2 ));
 endmodule // main
 
-main #() m (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\0 ));
+main #() m (\1 ,\2 ,\3 ,\0 );
 >>>>>op
 main.b1: bob from top level
 main.b1: bob from top level

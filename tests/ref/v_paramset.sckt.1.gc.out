@@ -5,6 +5,8 @@
 >>>>>spice
 >>>>>.options noinsensitive 
 >>>>>.print dc v(nodes) y(m.t1.tttt.r) y(m.t1.rrrr) 
+m: main from top level
+m: 1 candidate found for main
 main.t1: tln from top level
 main.t1: 1 candidate found for tln
 assuming double in r0

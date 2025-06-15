@@ -21,6 +21,8 @@ module main (.a(a),.b(b));
 endmodule // main
 
 >>>>>print dc v(nodes)
+m1: main from top level
+m1: 1 candidate found for main
 main.n1: mynet from top level: A
 main.n1: mynet from top level: B
 main.n1: 2 candidates found for mynet

@@ -5,6 +5,8 @@
 >>>>>paramset invalid test_bug1
 >>>>>module main()
 >>>>>dc
+m: main from top level
+m: 1 candidate found for main
 main.dut: invalid from top level
 main.dut: 1 candidate found for invalid
 invalid prototype for m.dut

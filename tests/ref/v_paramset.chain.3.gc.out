@@ -10,6 +10,8 @@ module main(1 2);
 >>>>>spice
 >>>>>.options noinsensitive 
 >>>>>.print dc v(nodes) y(m.t1.r) y(m.t1.t.r) 
+m: main from top level
+m: 1 candidate found for main
 main.t1: tln from top level
 main.t1: tln from top level
 main.t1: 2 candidates found for tln

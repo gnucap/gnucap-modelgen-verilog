@@ -21,13 +21,14 @@ main m(.\1 (\1 ) .b(\0 ));
 list
 print op v(m.r1) v(1)
 op
+list
 
 delete m
 main m(.b(\1 ));
 list
 print op v(m.r1) v(1)
 op
-
 list
+op
 
 status notime

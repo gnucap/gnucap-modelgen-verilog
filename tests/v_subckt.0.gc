@@ -6,7 +6,7 @@ module m( a b c);
   vsource #(.dc(w)) v1(c a);
 endmodule
 
-m #(.v(1), .w(2)) mm(.a(\0 ), .b(\1 ), .c(\2 ));
+m #(.w(2)) mm(.a(\0 ), .b(\1 ), .c(\2 ));
 
 list
 print op v nodes

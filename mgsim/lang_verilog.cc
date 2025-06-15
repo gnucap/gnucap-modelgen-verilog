@@ -102,6 +102,7 @@ private: // override virtual, called by print_item
   void print_comment(OMSTREAM&, const DEV_COMMENT*)override;
   void print_command(OMSTREAM& o, const DEV_DOT*)override;
 private: // local
+  void new_instance_(CS& cmd, BASE_SUBCKT* Owner, CARD_LIST* Scope);
   void print_attributes(OMSTREAM&, tag_t)const;
   void print_args(OMSTREAM&, const MODEL_CARD*);
   void print_args(OMSTREAM&, const COMPONENT*);
@@ -1014,13 +1015,44 @@ std::string LANG_VERILOG::find_type_in_string(CS& cmd)
   return type;
 }
 /*--------------------------------------------------------------------------*/
+void LANG_VERILOG::new_instance_(CS& cmd, BASE_SUBCKT* Owner, CARD_LIST* Scope)
+{
+  if (cmd.is_end()) {itested();
+    // nothing
+  }else{
+    std::string type = find_type_in_string(cmd);
+    const CARD* proto = find_proto(type, Owner);
+    if (dynamic_cast<MODEL_CARD const*>(proto)) {
+      proto = device_dispatcher["instance"];
+      assert(proto);
+    }else{
+    }
+
+    if(proto){
+      if (CARD* new_instance = proto->clone_instance()) {
+       new_instance->set_owner(Owner);
+       CARD* x = parse_item(cmd, new_instance);
+       if (x) {
+         assert(Scope);
+         Scope->push_back(x);
+       }else{
+       }
+      }else{
+       cmd.warn(bDANGER, type + ": incomplete prototype");
+      }
+    }else{
+      cmd.warn(bDANGER, type + ": no match");
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 void LANG_VERILOG::parse_top_item(CS& cmd, CARD_LIST* Scope)
 {
   cmd.getline("gnucap-verilog>");
   while(!parse_attributes(cmd, tag_t(&cmd)).more()) {
     cmd.getline("gnucap-verilog>");
   }
-  new__instance(cmd, NULL, Scope);
+  new_instance_(cmd, NULL, Scope);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

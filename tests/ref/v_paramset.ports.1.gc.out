@@ -14,6 +14,8 @@ main #() m(\0 ,1,2,4);
 main #() m(\0 ,1,2,4);
                    ^ ? invalid identifier
 >>>>>list
+m: main from top level
+m: 1 candidate found for main
 module myres (.a(a),.b(b));
   resistor #(.r(0)) r (a,b);
 endmodule // myres
@@ -31,7 +33,7 @@ module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
   myres #() R1 (.p(\1 ),.n(\3 ));
 endmodule // main
 
-main #() m (.\1 (\0 ),.\2 (\1 ),.\3 (\2 ),.\4 (\4 ));
+main #() m (\0 ,\1 ,\2 ,\4 );
 >>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
 main.v: vsource from device_dispatcher
 main.v: 1 candidate found for vsource

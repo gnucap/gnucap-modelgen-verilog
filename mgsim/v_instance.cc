@@ -85,7 +85,7 @@ protected:
 public:
   explicit	INSTANCE();
 		~INSTANCE();
-  CARD*		clone_instance()const override { untested();
+  CARD*		clone_instance()const override {
     // incomplete();
     return clone();
   }
@@ -409,7 +409,7 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
     trace1("node", n.first);
   }
 
-  if (_parent){ untested();
+  if (_parent){
     // getting here in modelgen...?
   }else if (modelname == "") { untested();
     throw Exception(Proto->long_label() + ": missing args -- need model name");
@@ -527,13 +527,14 @@ CARD* INSTANCE::deflate()
       trace4("rewire", long_label(), ii, c->n_(ii).e_(), n_(ii).e_());
     }
 #endif
-    for(int ii=0; ii<net_nodes(); ++ii){
+    for(int ii=0; ii<c->net_nodes(); ++ii){
       if(ii < c->net_nodes()) {
 	trace3("rewire do", ii, c->n_(ii).e_(), _parent->port_name(ii));
 	if( _parent->port_name(ii)[0] == '*'){
 	  c->n_(ii) = n_(ii); // why?
-	}else{
+	}else if(c->n_(ii).e_() != -1){
 	  c->n_(ii) = n_(c->n_(ii).e_());
+	}else{
 	}
       }else if(ii < c->net_nodes()+c->num_current_ports()){
       }else{ untested();
@@ -574,6 +575,7 @@ INSTANCE::INSTANCE(const INSTANCE& p)
   ,_cloned_from(&p)
   ,_parent(p._parent)
   ,_proto(nullptr)
+  ,_port_names(p._port_names)
   ,_node_capacity(0)
 {
   trace2("INSTANCE::INSTANCE", p.short_label(), p._net_nodes);
@@ -807,7 +809,7 @@ void INSTANCE::precalc_first()
   trace3("INSTANCE::precalc_first", short_label(), _parent, common()->modelname());
   trace1("INSTANCE::precalc_first", _sim->is_first_expand());
 
-  if(!owner()){ untested();
+  if(!owner()){
     build_proto();
     _parent = _proto; // common->proto?
   }else if(_cloned_from){
