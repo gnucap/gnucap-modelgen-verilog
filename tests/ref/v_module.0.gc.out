@@ -2,9 +2,9 @@ module main (.\1 (\1 ),.b(\2 ));
   ground \0 ;
     electrical \1 , \2 ;
     inout \1 , \2 ;
-  resistor #(1) r1 (\1 ,\2 );
-  resistor #(1) r2 (\2 ,\0 );
-  isource #(1) i1 (\0 ,\1 );
+  resistor #(1) r1 (\1 , \2 );
+  resistor #(1) r2 (\2 , \0 );
+  isource #(1) i1 (\0 , \1 );
 endmodule // main
 
 main #() m (.\1 (\1 ));
@@ -14,9 +14,9 @@ module main (.\1 (\1 ),.b(\2 ));
   ground \0 ;
     electrical \1 , \2 ;
     inout \1 , \2 ;
-  resistor #(1) r1 (\1 ,\2 );
-  resistor #(1) r2 (\2 ,\0 );
-  isource #(1) i1 (\0 ,\1 );
+  resistor #(1) r1 (\1 , \2 );
+  resistor #(1) r2 (\2 , \0 );
+  isource #(1) i1 (\0 , \1 );
 endmodule // main
 
 main #() m (.\1 (\1 ),.b(\0 ));
@@ -26,9 +26,9 @@ module main (.\1 (\1 ),.b(\2 ));
   ground \0 ;
     electrical \1 , \2 ;
     inout \1 , \2 ;
-  resistor #(1) r1 (\1 ,\2 );
-  resistor #(1) r2 (\2 ,\0 );
-  isource #(1) i1 (\0 ,\1 );
+  resistor #(1) r1 (\1 , \2 );
+  resistor #(1) r2 (\2 , \0 );
+  isource #(1) i1 (\0 , \1 );
 endmodule // main
 
 main #() m (.\1 (\1 ),.b(\0 ));
@@ -36,9 +36,9 @@ module main (.\1 (\1 ),.b(\2 ));
   ground \0 ;
     electrical \1 , \2 ;
     inout \1 , \2 ;
-  resistor #(1) r1 (\1 ,\2 );
-  resistor #(1) r2 (\2 ,\0 );
-  isource #(1) i1 (\0 ,\1 );
+  resistor #(1) r1 (\1 , \2 );
+  resistor #(1) r2 (\2 , \0 );
+  isource #(1) i1 (\0 , \1 );
 endmodule // main
 
 main #() m (.b(\1 ));
@@ -48,9 +48,9 @@ module main (.\1 (\1 ),.b(\2 ));
   ground \0 ;
     electrical \1 , \2 ;
     inout \1 , \2 ;
-  resistor #(1) r1 (\1 ,\2 );
-  resistor #(1) r2 (\2 ,\0 );
-  isource #(1) i1 (\0 ,\1 );
+  resistor #(1) r1 (\1 , \2 );
+  resistor #(1) r2 (\2 , \0 );
+  isource #(1) i1 (\0 , \1 );
 endmodule // main
 
 main #() m (.b(\1 ));

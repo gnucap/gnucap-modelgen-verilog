@@ -22,7 +22,7 @@ endparamset
 module main (.a(a),.b(b));
   Resistor #(.r(0.)) n1 (.p(a),.n(c));
   Resistor #(.r(1.)) n2 (.p(c),.n(b));
-  isource #(1) i0 (b,a);
+  isource #(1) i0 (b, a);
 endmodule // main
 
 >>>>>print dc v(nodes)

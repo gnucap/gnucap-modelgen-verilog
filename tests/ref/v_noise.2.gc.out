@@ -22,11 +22,11 @@ probe ac npwr(noise*) x(m.r1.*) x(m.r0.*)
 ground \0 ;
 module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
   ground \0 ;
-  resistor #(.r(1.),.$mfactor(1)) r0 (\1 ,\0 );
-  resistor #(.r(1.),.noisy(1.)) r1 (\2 ,\0 );
-  resistor #(.r(1.),.noisy(1.)) r2 (\3 ,\0 );
-  resistor #(.r(1.),.noisy(1.)) r3 (\3 ,\0 );
-  resistor #(.$mfactor(2),.r(1.),.noisy(1.)) r4 (\4 ,\0 );
+  resistor #(.r(1.),.$mfactor(1)) r0 (\1 , \0 );
+  resistor #(.r(1.),.noisy(1.)) r1 (\2 , \0 );
+  resistor #(.r(1.),.noisy(1.)) r2 (\3 , \0 );
+  resistor #(.r(1.),.noisy(1.)) r3 (\3 , \0 );
+  resistor #(.$mfactor(2),.r(1.),.noisy(1.)) r4 (\4 , \0 );
 endmodule // main
 
 main #() m (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));

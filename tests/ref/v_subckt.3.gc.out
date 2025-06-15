@@ -1,5 +1,5 @@
 module port_names (.A(A_),.B(B_));
-  vsource #(.dc(1)) v (A_,B_);
+  vsource #(.dc(1)) v (A_, B_);
 endmodule // port_names
 
 module main (.AA(AA));

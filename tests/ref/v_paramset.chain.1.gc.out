@@ -14,12 +14,12 @@ m0: main from top level
 m0: 1 candidate found for main
 module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
     parameter real v=0;
-  C #(.PC(1.)) v1 (\2 ,\1 );
-  B #(.PB(2.)) v2 (\3 ,\1 );
-  A #(.PA(v)) v3 (\4 ,\1 );
+  C #(.PC(1.)) v1 (\2 , \1 );
+  B #(.PB(2.)) v2 (\3 , \1 );
+  A #(.PA(v)) v3 (\4 , \1 );
 endmodule // main
 
-main #(.v(v)) m0 (\0 ,\1 ,\2 ,\3 );
+main #(.v(v)) m0 (\0 , \1 , \2 , \3 );
 paramset A B;
     parameter real PA;
  .PB=PA;

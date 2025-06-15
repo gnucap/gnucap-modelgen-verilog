@@ -2,17 +2,17 @@
 ground gnd;
 module main0 (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
     parameter R=1;
-  ccvs #(.gain(R)) vs1 (\3i ,\2 ,vp2);
-  vsource #(.dc(0)) vp1 (\3 ,\3i );
-  ccvs #(.gain(R)) vs2 (\1 ,\4i ,vp1);
-  vsource #(.dc(0)) vp2 (\4 ,\4i );
+  ccvs #(.gain(R)) vs1 (\3i , \2 , vp2);
+  vsource #(.dc(0)) vp1 (\3 , \3i );
+  ccvs #(.gain(R)) vs2 (\1 , \4i , vp1);
+  vsource #(.dc(0)) vp2 (\4 , \4i );
 endmodule // main0
 
 // same without current ports...
 module main1 (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
     parameter R=1;
-  vccs #(1/R) cs1 (\2 ,\3 ,\4 ,\1 );
-  vccs #(1/R) cs2 (\1 ,\4 ,\2 ,\3 );
+  vccs #(1/R) cs1 (\2 , \3 , \4 , \1 );
+  vccs #(1/R) cs2 (\1 , \4 , \2 , \3 );
 endmodule // main1
 
 main0 #(.R(.34)) m (.\1 (A),.\2 (B),.\3 (gnd),.\4 (gnd));

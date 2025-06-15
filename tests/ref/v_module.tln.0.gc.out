@@ -7,8 +7,8 @@ module tln0 (.a(a),.b(b));
     ground \0 ;
     parameter r;
     parameter c;
-  resistor #(.r(r)) r (a,b);
-  capacitor #(.c(c)) c (b,\0 );
+  resistor #(.r(r)) r (a, b);
+  capacitor #(.c(c)) c (b, \0 );
 endmodule // tln0
 
 module tln1 (.a(a),.b(b));
@@ -16,9 +16,9 @@ module tln1 (.a(a),.b(b));
     parameter integer length;
     parameter r;
     parameter c;
-  resistor #(.r(r)) r (a,i);
-  capacitor #(.c(c)) c (i,\0 );
-  tln #(.length(length - 1),.c(c),.r(r)) t (i,b);
+  resistor #(.r(r)) r (a, i);
+  capacitor #(.c(c)) c (i, \0 );
+  tln #(.length(length - 1),.c(c),.r(r)) t (i, b);
 endmodule // tln1
 
 paramset tln tln1;
@@ -37,10 +37,10 @@ endparamset
 
 module main (.\1 (\1 ),.\2 (\2 ));
     parameter len=10;
-  tln #(.length(len),.c(1./len),.r(1./len)) t1 (\1 ,\2 );
+  tln #(.length(len),.c(1./len),.r(1./len)) t1 (\1 , \2 );
 endmodule // main
 
-main #() m (\1 ,\2 );
+main #() m (\1 , \2 );
 #Time       v(1)       v(2)      
  0.         0.         0.        
  42.E-9     263.87E-9  0.        

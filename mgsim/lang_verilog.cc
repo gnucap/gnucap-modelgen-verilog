@@ -1133,10 +1133,11 @@ void LANG_VERILOG::print_args(OMSTREAM& o, const COMPONENT* x)
 	std::string pn = x->param_name(ii);
 	if(pn==""){
 	  o << x->param_value(ii);
+	  sep = ", ";
 	}else{
 	  o << "." << pn << "(" << x->param_value(ii) << ")";
+	  sep = ",";
 	}
-	sep = ",";
       }else{
       }
     }
@@ -1169,14 +1170,15 @@ void LANG_VERILOG::print_ports_long(OMSTREAM& o, const COMPONENT* x)
     if(x->node_is_connected(ii)){
       if(!x->port_name(ii).size()){
 	dump_identifier(o, x->port_value(ii));
+	sep = ", ";
       }else{
 	o << '.';
 	dump_identifier(o, x->port_name(ii));
 	o << '(';
 	dump_identifier(o, x->port_value(ii));
 	o << ')';
+	sep = ',';
       }
-      sep = ',';
     }else{
     }
   }

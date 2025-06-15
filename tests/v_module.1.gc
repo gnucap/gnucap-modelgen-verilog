@@ -40,7 +40,7 @@ L1 0 D 1u
 
 .print tran v(nodes)
 .list
-.tran 1m basic | {tee aa.out}
+.tran 1m basic
 
 .print ac vm(nodes)
 .ac .1k 100k * 10

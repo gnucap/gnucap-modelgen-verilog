@@ -1,0 +1,17 @@
+mm: no candidates found for m
+module m (.a(a),.b(b),.c(c));
+    parameter w=1;
+  vsource #(.dc(v)) v1 (a, b);
+  vsource #(.dc(w)) v1 (c, a);
+endmodule // m
+
+m #(.v(1),.w(2)) mm (.a(\0 ),.b(\1 ),.c(\2 ));
+mm: no candidates found for m
+mm: no valid prototype found for m
+mm: no candidates found for m
+mm: no valid prototype found for m
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=0, total=1
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=0, subckt=0, model=0, total=0
+dctran density=0.0%, ac density=0.0%

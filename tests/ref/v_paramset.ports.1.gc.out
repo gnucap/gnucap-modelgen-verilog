@@ -17,7 +17,7 @@ main #() m(\0 ,1,2,4);
 m: main from top level
 m: 1 candidate found for main
 module myres (.a(a),.b(b));
-  resistor #(.r(0)) r (a,b);
+  resistor #(.r(0)) r (a, b);
 endmodule // myres
 
 paramset myres resistor;
@@ -25,15 +25,15 @@ paramset myres resistor;
 endparamset
 
 module myres (.a(a),.b(b));
-  resistor #(.r(0)) r (a,b);
+  resistor #(.r(0)) r (a, b);
 endmodule // myres
 
 module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
-  vsource #(1.) v (\3 ,\1 );
+  vsource #(1.) v (\3 , \1 );
   myres #() R1 (.p(\1 ),.n(\3 ));
 endmodule // main
 
-main #() m (\0 ,\1 ,\2 ,\4 );
+main #() m (\0 , \1 , \2 , \4 );
 >>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
 main.v: vsource from device_dispatcher
 main.v: 1 candidate found for vsource

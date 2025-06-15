@@ -17,7 +17,7 @@ endparamset
 module main (.a(a),.b(b));
   mynet #(.r(1.)) n1 (.p(a),.n(c));
   mynet #(.r(1.)) n2 (.p(c),.n(b));
-  isource #(1) i0 (b,a);
+  isource #(1) i0 (b, a);
 endmodule // main
 
 >>>>>print dc v(nodes)

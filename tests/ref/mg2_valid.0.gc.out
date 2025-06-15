@@ -5,12 +5,12 @@ test m(1 2)
 // name clash..
 module test (.\1 (\1 ),.\2 (\2 ));
    ground \0 ;
-  resistor #(.r(0.)) r0 (\1 ,\0 );
-  resistor #(.r(1.)) r1 (\1 ,\2 );
-  vsource #(.dc(1.)) v1 (\2 ,\0 );
+  resistor #(.r(0.)) r0 (\1 , \0 );
+  resistor #(.r(1.)) r1 (\1 , \2 );
+  vsource #(.dc(1.)) v1 (\2 , \0 );
 endmodule // test
 
-test #() m (\1 ,\2 );
+test #() m (\1 , \2 );
 m.r1 ambiguous overload in resistor
 #           v(1)       v(2)      
 m.r0: short circuit

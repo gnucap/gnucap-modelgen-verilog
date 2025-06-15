@@ -13,9 +13,9 @@ paramset mynet resistor;
 endparamset
 
 module main (.a(a),.b(b));
-  mynet #(.r(0.)) n1 (a,c);
-  mynet #(.r(1.)) n2 (c,b);
-  isource #(1) i0 (b,a);
+  mynet #(.r(0.)) n1 (a, c);
+  mynet #(.r(1.)) n2 (c, b);
+  isource #(1) i0 (b, a);
 endmodule // main
 
 #           v(a)       v(gnd)    
