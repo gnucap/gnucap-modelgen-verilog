@@ -285,9 +285,8 @@ void make_common_set_param_by_index(std::ostream& o, const Module& m)
     }
   }
 
-  int s = int(m.parameters().size());
   o____ "default: incomplete(); // throw? COMMON_COMPONENT::set_param_by_index(I - "
-	 << s << ", Value, Offset + " << s << ");\n";
+	 << i << ", Value, Offset + " << i << ");\n";
   o__ "}\n";
   o__ "(void) Value;\n";
   o << "}\n"
@@ -333,12 +332,15 @@ void make_common_param_is_printable(std::ostream& o, const Module& m)
 	  o << (*p)->code_name() << ".has_hard_value());\n";
 	}
       }
+    }else{
+      for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
+	o << "// local " << (*p)->code_name() << "\n";
+      }
     }
   }
 //  assert(i == m.common().override().size() + m.common().raw().size());
   o <<
-    "  default: return COMMON_COMPONENT::param_is_printable(I - "
-        << m.parameters().size() << ");\n"
+    "  default: return COMMON_COMPONENT::param_is_printable(I - " << i << ");\n"
     "  }\n"
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";
@@ -373,7 +375,7 @@ void make_common_param_name(std::ostream& o, const Module& m)
   }
 //  assert(i == m.common().override().size() + m.common().raw().size());
   o <<
-    "  default: return COMMON_COMPONENT::param_name(I);\n"
+    "  default: return COMMON_COMPONENT::param_name(I - " << i << ");\n"
     "  }\n"
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";
@@ -549,7 +551,7 @@ void make_common_param_value(std::ostream& o, const Module& m)
 
 //  assert(i == m.common().override().size() + m.common().raw().size());
   o <<
-    "  default: return COMMON_COMPONENT::param_value(I);\n"
+    "  default: return COMMON_COMPONENT::param_value(I - " << i << ");\n"
     "  }\n"
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";
