@@ -44,21 +44,20 @@ install : $(INSTALL_FILES)  $(INSTALL_FILES_1)  $(INSTALL_FILES_2)
 %.s: %.cc
 	${CXX} -S ${GNUCAP_CPPFLAGS} ${CPPFLAGS} ${MAKE_CPPFLAGS} -DNDEBUG -O2 -fPIC ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< -o $@ # MakeBaseB
 
-// BUG/FEATURE/HACK: store Make.depend in $srcdir
-depend ${srcdir}/Make.depend: # $(SRCS) ${GENERATED_SRCS} $(HDRS)
-	: > ${srcdir}/Make.depend
+depend Make.depend: # $(SRCS) ${GENERATED_SRCS} $(HDRS)
+	: > Make.depend
 	if [ -n "$(RAW_SRCS)" ]; then \
 		( cd ${srcdir}; $(CXX) -MM $(CXXFLAGS) -I../src -isystem ${GNUCAP_INCLUDEDIR} ${CPPFLAGS} \
 		${MAKE_CPPFLAGS} ${RAW_SRCS} -DDEPEND ) \
-		>> ${srcdir}/Make.depend; \
+		>> Make.depend; \
 	fi
 	if [ -n "$(GENERATED_SRCS)" ]; then \
 		$(CXX) -MM $(CXXFLAGS) -isystem ${GNUCAP_INCLUDEDIR} ${CPPFLAGS} \
 		${MAKE_CPPFLAGS} $(GENERATED_SRCS) -DDEPEND \
-		>> ${srcdir}/Make.depend; \
+		>> Make.depend; \
 	fi
 
-.PRECIOUS: ${srcdir}/Make.depend
+.PRECIOUS: Make.depend
 #-----------------------------------------------------------------------------
 clean:
 	rm -rf $(CLEANFILES)

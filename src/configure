@@ -61,7 +61,7 @@ include \${srcdir}/MakeList
 
 include ../MakeConf
 include $top_srcdir/MakeBase # use from gnucap?
-include \${srcdir}/Make.depend
+-include Make.depend
 
 \$(TARGET): \$(OBJS)
 #	\$(CXX) \$(MAKE_CXXFLAGS) \$(CXXFLAGS) \$(MAKE_CPPFLAGS) \$(CPPFLAGS) \$(OBJS) -o \$@ \$(TARGET_LIBS) \$(LDFLAGS)

@@ -188,8 +188,7 @@ sub_makefile() {
 	echo "include \${srcdir}/MakeList" >> $1
 	echo "include ../MakeConf" >> $1
 	echo "include \${srcdir}/../MakeBase" >> $1
-	[ -f ${srcdir}/Make.depend ] && \
-	echo "include \${srcdir}/Make.depend" >> $1
+	echo "-include Make.depend" >> $1
 }
 #------------------------------------------------------------------------
 if [ -f $srcdir/Makefile.in ]; then
