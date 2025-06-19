@@ -1,0 +1,37 @@
+
+attach ./modelgen_0.so
+
+verilog
+
+`modelgen test_noise2
+module test_noise2(p, n);
+	electrical p, n;
+	inout p, n;
+	analog begin
+		I(p,n) <+ white_noise(4.,"");
+		I(p,n) <+ white_noise(2.,"A");
+		I(p,n) <+ white_noise(1.,"B");
+		I(p,n) <+ flicker_noise(1.,2.,"F");
+		I(p,n) <+ V(p,n);
+	end
+endmodule
+
+list
+
+!make test_noise2.so > /dev/null
+attach ./test_noise2.so
+
+test_noise2 #() dut(\1 , \0 );
+noise_probe #() nAll(\1 );
+noise_probe #(.name("A")) nA(\1 );
+noise_probe #(.name("B")) nB(\1 );
+noise_probe #(.name("F")) nF(\1 );
+
+list
+
+print ac npwr(n*)
+
+dc
+ac 1 8 * 2
+status notime
+end

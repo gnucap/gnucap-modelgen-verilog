@@ -1,13 +1,3 @@
-module main(1 2)
-            ^ ? invalid identifier
-module main(1 2)
-              ^ ? invalid identifier
-  ddd #(.area(1.), .$mfactor(4.)) d1 (1  \2 );
-                                      ^ ? invalid identifier
-main #(.$mfactor(1.)) m(2 \0 );
-                        ^ ? invalid identifier
-resistor #(.r(100k)) R1(\1 ,2);
-                            ^ ? invalid identifier
 paramset ddd diode;
     parameter real area=1;
  .area=area; .level=0; .is=10.f; .rs=0.; .n=1.; .tt=0.; .cjo=1.p; .vj=1.; .m=0.5; .eg=1.11; .xti=3.; .kf=0.; .af=1.; .fc=0.5; .bv=50; .ibv=0.001;

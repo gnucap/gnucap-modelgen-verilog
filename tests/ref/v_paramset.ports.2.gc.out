@@ -1,17 +1,11 @@
 >>>>>verilog 
 >>>>>paramset myres resistor;
 >>>>>paramset myv vsource;
->>>>>module main(\1 ,\2 , \3 , \4 );
+>>>>>module main(\1 , \2 , \3 , \4 );
 myv #() V1(.n(1), .p(3));
               ^ ? invalid identifier
 myv #() V1(.n(1), .p(3));
                      ^ ? invalid identifier
-main #() m(\0 ,1,2,4);
-               ^ ? invalid identifier
-main #() m(\0 ,1,2,4);
-                 ^ ? invalid identifier
-main #() m(\0 ,1,2,4);
-                   ^ ? invalid identifier
 >>>>>list
 m: main from top level
 m: 1 candidate found for main

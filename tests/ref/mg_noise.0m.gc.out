@@ -1,33 +1,4 @@
-noise_probe n1(1)
-               ^ ? invalid identifier
-noise_probe n2(2)
-               ^ ? invalid identifier
-va_white_noise #() w2(3, \0 );
-                      ^ ? invalid identifier
-va_white_noise #() w2(3, \0 );
-                      ^ ? invalid identifier
-resistor #(.r(1)) r1(3,\0 );
-                     ^ ? invalid identifier
-noise_probe n3(3)
-               ^ ? invalid identifier
-va_white_noise #(.$mfactor(2)) w4(4, \0 );
-                                  ^ ? invalid identifier
-resistor #(.r(1)) r1(4,\0 );
-                     ^ ? invalid identifier
-noise_probe n4(4)
-               ^ ? invalid identifier
-test_noise0m #(.nn(2)) w5(5, \0 );
-                          ^ ? invalid identifier
-resistor #(.r(1)) r1(5,\0 );
-                     ^ ? invalid identifier
-noise_probe n5(5)
-               ^ ? invalid identifier
-test_noise0m #(.mm(1.41)) w5(6, \0 );
-                             ^ ? invalid identifier
-resistor #(.r(1)) r1(6,\0 );
-                     ^ ? invalid identifier
-noise_probe n6(6)
-               ^ ? invalid identifier
+ground \0 ;
 test_noise0m #() w1a (.p(\1 ),.n(\0 ));
 test_noise0m #() w1b (.p(\1 ),.n(\0 ));
 resistor #(.r(1)) r1 (.p(\1 ),.n(\0 ));

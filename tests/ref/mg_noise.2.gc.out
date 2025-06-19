@@ -1,11 +1,3 @@
-noise_probe #() nAll(1)
-                     ^ ? invalid identifier
-noise_probe #(.name("A")) nA(1)
-                             ^ ? invalid identifier
-noise_probe #(.name("B")) nB(1)
-                             ^ ? invalid identifier
-noise_probe #(.name("F")) nF(1)
-                             ^ ? invalid identifier
 test_noise2 #() dut (.p(\1 ),.n(\0 ));
 meas_noise #() nAll (.p(\1 ));
 meas_noise #(.name("A")) nA (.p(\1 ));
