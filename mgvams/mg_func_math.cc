@@ -323,14 +323,14 @@ public:
     double x = get_double(e);
     subs_double(e, std::atan(x));
   }
-  void make_cc_common(std::ostream& o)const override{ untested();
+  void make_cc_common(std::ostream& o)const override{ itested();
     declare_f1(o, code_name());
     o____ "chain(ret, 1./(1.+double(d)*double(d)));\n";
     o____ "::set_value(ret, std::atan(double(d)));\n";
     o____ "return ret;\n";
     o__ "}\n";
   }
-  std::string code_name()const override{ untested();
+  std::string code_name()const override{ itested();
     return "_f_atan";
   }
 } p_atan;

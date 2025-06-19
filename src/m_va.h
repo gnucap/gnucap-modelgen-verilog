@@ -405,7 +405,7 @@ ddouble_<T> operator/(PARAMETER<double> const& a, ddouble_<T> const& b)
 }
 template<int T>
 ddouble_<T> operator/(PARAMETER<int> const& a, ddouble_<T> const& b)
-{ untested();
+{ itested();
   ddouble_<T> c(a);
   c /= b;
   return c;
@@ -449,7 +449,7 @@ ddouble_<T> operator*(double const& a, ddouble_<T> const& b)
 }
 template<int T>
 ddouble_<T> operator*(int const& a, ddouble_<T> const& b)
-{ untested();
+{ itested();
   ddouble_<T> c(b);
   c *= a;
   return c;
