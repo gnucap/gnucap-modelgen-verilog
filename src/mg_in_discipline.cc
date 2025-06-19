@@ -76,6 +76,7 @@ void Nature::dump(std::ostream& out)const
   out << "nature " << identifier();
   if (parent_nature() != "") { untested();
     out << " : " << parent_nature();
+  }else{ untested();
   }
   out << "\n"
       << attributes()
@@ -162,9 +163,13 @@ void Discipline::parse(CS& file)
 void Discipline::dump(std::ostream& out)const
 {
   out <<
-    "discipline "    << identifier()      << "\n"
-    "  potential \"" << potential_ident() << "\";\n"
-    "  flow \""	     << flow_ident()	  << "\";\n"
+    "discipline "   << identifier()      << "\n"
+    "  potential "  << potential_ident() << ";\n";
+  if(flow_ident() != ""){
+	  out << "  flow "	     << flow_ident()	  << ";\n";
+  }else{
+  }
+  out <<
     "enddiscipline\n\n";
 }
 /*--------------------------------------------------------------------------*/

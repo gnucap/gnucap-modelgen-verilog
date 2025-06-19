@@ -1,52 +1,52 @@
 nature current
-  access = "I";
+  access = I;
   units = "A";
-  abstol = "1e-12";
+  abstol = 1e-12;
 endnature
 
 nature voltage
-  access = "V";
+  access = V;
   units = "V";
-  abstol = "1e-6";
+  abstol = 1e-6;
 endnature
 
 nature power
-  access = "Pwr";
+  access = Pwr;
   units = "W";
-  abstol = "0.00101010";
+  abstol = 0.00101010;
 endnature
 
 nature flux
-  access = "Phi";
+  access = Phi;
   units = "We";
-  abstol = "1e-5";
+  abstol = 1e-5;
 endnature
 
 nature temperature
-  access = "Temp";
+  access = Temp;
   units = "K";
-  abstol = "3.14";
+  abstol = 3.14;
 endnature
 
 
 discipline thermal
-  potential "temperature";
-  flow "power";
+  potential temperature;
+  flow power;
 enddiscipline
 
 discipline electrical
-  potential "voltage";
-  flow "current";
+  potential voltage;
+  flow current;
 enddiscipline
 
 discipline magnetic
-  potential "voltage";
-  flow "current";
+  potential voltage;
+  flow current;
 enddiscipline
 
 discipline rotational_omega
-  potential "voltage";
-  flow "current";
+  potential voltage;
+  flow current;
 enddiscipline
 
 

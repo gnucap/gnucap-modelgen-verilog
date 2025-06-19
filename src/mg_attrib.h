@@ -73,9 +73,13 @@ class Attribute : public Base {
   String_Arg _value;
 public:
   void set_owner(Block const*){}
-  void parse(CS& f)override {f >> _name >> '=' >> _value >> ';';}
+  void parse(CS& f)override {
+    f >> _name >> '=';
+    _value = f.ctos(";", "", "");
+    f >> ";";
+  }
   void dump(std::ostream& f)const override
-	  {f << "  " << name() << " = \"" << value() << "\";\n";}
+	  {f << "  " << name() << " = " << value() << ";\n";}
   Attribute() {}
   const String_Arg&  key()const	  {return _name;}
   const String_Arg&  name()const  {return _name;}
