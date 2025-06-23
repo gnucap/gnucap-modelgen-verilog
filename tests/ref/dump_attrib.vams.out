@@ -5,7 +5,7 @@ module device(p, n);
   electrical p, n;
   parameter real c =  1.;
   (* units="m^2", type="instance",            desc="Bottom area of source junction", *)
-  parameter real ABSOURCE =  1.E-12;
+  parameter real ABSOURCE =  1.e-12;
 
   (* desc="dummy" *)
   real x;

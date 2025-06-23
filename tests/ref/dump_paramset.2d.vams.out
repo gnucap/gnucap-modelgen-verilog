@@ -21,7 +21,7 @@ module const_res(a, b);
   real __R;
 
   analog begin
-    __R = __r;
+    __R = 1;
     I(a, b) <+ (V(a, b) / __R);
   end
 

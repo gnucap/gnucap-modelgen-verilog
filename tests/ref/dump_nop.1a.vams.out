@@ -26,12 +26,12 @@ module test(a, b);
     if (x) begin
       V(a) <+  5.;
     end
-    case (arg)
+    case ( 0.)
       0: begin
         V(b) <+  1.2;
       end
     endcase
-    case (arg)
+    case ( 0.)
       0: begin
         V(b) <+  2.;
       end

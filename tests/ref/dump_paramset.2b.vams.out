@@ -17,7 +17,7 @@ module my_res(a, b);
   localparam real __r =  10.;
 
   analog begin
-    I(a, b) <+ (V(a, b) / __r);
+    I(a, b) <+ (V(a, b) /  10.);
   end
 
 endmodule

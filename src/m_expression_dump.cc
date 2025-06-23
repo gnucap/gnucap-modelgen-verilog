@@ -24,6 +24,7 @@
  */
 #include "mg_token.h"
 #include "mg_.h"
+#include <l_stlextra.h>
 /*--------------------------------------------------------------------------*/
 static void dump_token(Token const* t, std::ostream& out)
 {
@@ -233,8 +234,19 @@ void Expression_::dump(std::ostream& out)const
     }
   }
   std::string comma;
-  for(auto const& i : stack){
-    out << comma << i->full_name();
+  for(Token const* i : stack){
+    out << comma;
+    if(!dynamic_cast<Token_CONSTANT const*>(i)) {
+      out << i->full_name();
+    }else if(auto f = dynamic_cast<Float const*>(i->data())){
+      std::string val = ftos(*f, 0, 15, ftos_EXP);
+      notstd::to_lower(&val);
+      out << val;
+    }else if(auto g = dynamic_cast<Integer const*>(i->data())){
+      out << *g;
+    }else{
+      out << i->full_name();
+    }
     comma = ", ";
   }
   while (!locals.empty()) {

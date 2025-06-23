@@ -12,13 +12,13 @@ module test(a, b);
     else begin
       V(a) <+  2.;
     end
-    if (arg) begin
+    if ( 0.) begin
       V(b) <+  3.;
     end
     if (0) begin
       V(a) <+  4.;
     end
-    case (arg)
+    case ( 0.)
       0: begin
         V(b) <+  2.2;
       end

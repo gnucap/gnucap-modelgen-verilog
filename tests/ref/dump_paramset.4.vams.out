@@ -10,7 +10,7 @@ module d1(a, b);
       V(a, b) <+ __p;
     end
     if ( 0.) begin
-      V(a, b) <+ __P;
+      V(a, b) <+ 0;
     end
   end
 
@@ -26,7 +26,7 @@ module d2(a, b);
       V(a, b) <+ __p;
     end
     if ( 0.) begin
-      V(a, b) <+ __P;
+      V(a, b) <+ 0;
     end
   end
 
@@ -39,7 +39,7 @@ module d2a(a, b);
 
   analog begin
     if ( 0.) begin
-      V(a, b) <+ __p;
+      V(a, b) <+ 0;
     end
     if ( 1.) begin
       V(a, b) <+ __P;
@@ -54,10 +54,10 @@ module d3(a, b);
 
   analog begin
     if ( 1.) begin
-      V(a, b) <+ __p;
+      V(a, b) <+ 1;
     end
     if ( 0.) begin
-      V(a, b) <+ __P;
+      V(a, b) <+ 0;
     end
   end
 
@@ -69,10 +69,10 @@ module d4(a, b);
 
   analog begin
     if ( 0.) begin
-      V(a, b) <+ __p;
+      V(a, b) <+ 0;
     end
     if ( 0.) begin
-      V(a, b) <+ __P;
+      V(a, b) <+ 0;
     end
   end
 
