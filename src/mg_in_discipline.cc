@@ -76,7 +76,7 @@ void Nature::dump(std::ostream& out)const
   out << "nature " << identifier();
   if (parent_nature() != "") { untested();
     out << " : " << parent_nature();
-  }else{ untested();
+  }else{
   }
   out << "\n"
       << attributes()

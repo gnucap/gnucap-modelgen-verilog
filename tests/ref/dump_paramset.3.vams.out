@@ -11,7 +11,7 @@ module my_res(a, b);
 endmodule
 module my_res(a, b);
   electrical a, b;
-  parameter real R =  1.E+3 from [( 1.E+3):( 1.E+3)];
+  parameter real R =  1.E+3 from [ 1.E+3: 1.E+3];
   localparam real __r = R;
 
   analog begin

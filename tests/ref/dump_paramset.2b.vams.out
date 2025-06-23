@@ -13,7 +13,7 @@ endmodule
 // paramsets
 module my_res(a, b);
   electrical a, b;
-  parameter real r =  1. from [( 2.):( 2.)];
+  parameter real r =  1. from [ 2.: 2.];
   localparam real __r =  10.;
 
   analog begin

@@ -372,9 +372,15 @@ void ConstExpression::parse(CS& file)
 /*--------------------------------------------------------------------------*/
 void ConstExpression::dump(std::ostream& o) const
 {
-  o << "(";
-  o << _expression;
-  o << ")";
+  if(_expression.size()!=1) { untested();
+    o << "(";
+      o << _expression;
+    o << ")";
+  }else if(_expression.front()->name() == " Inf"){
+    o << " inf";
+  }else{
+    o << _expression;
+  }
 }
 /*--------------------------------------------------------------------------*/
 TData const& Expression_::data() const
