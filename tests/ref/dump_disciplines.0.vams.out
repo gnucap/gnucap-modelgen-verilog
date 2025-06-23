@@ -17,11 +17,9 @@ discipline electrical
 enddiscipline
 
 discipline logic
-  potential ;
 enddiscipline
 
 discipline ddiscrete
-  potential ;
 enddiscipline
 
 

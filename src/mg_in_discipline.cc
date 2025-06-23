@@ -163,8 +163,11 @@ void Discipline::parse(CS& file)
 void Discipline::dump(std::ostream& out)const
 {
   out <<
-    "discipline "   << identifier()      << "\n"
-    "  potential "  << potential_ident() << ";\n";
+    "discipline "   << identifier()      << "\n";
+  if(potential_ident() != ""){
+    out << "  potential "  << potential_ident() << ";\n";
+  }else{
+  }
   if(flow_ident() != ""){
 	  out << "  flow "	     << flow_ident()	  << ";\n";
   }else{
