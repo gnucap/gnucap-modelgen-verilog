@@ -831,7 +831,8 @@ public:
   virtual DISCIPLINE const* discipline()const{return nullptr;};
   COMMON_COMPONENT* clone()const override {unreachable(); return nullptr;}
   bool operator==(COMMON_COMPONENT const&p)const override {
-    return dynamic_cast<COMMON_VASRC const*>(&p);
+    return dynamic_cast<COMMON_VASRC const*>(&p)
+      && EVAL_BM_BASE::operator==(p);
   }
   double flow_abstol() const{
     if(!discipline()){ untested();
@@ -4678,7 +4679,8 @@ public:
   virtual DISCIPLINE const* discipline()const{return nullptr;};
   COMMON_COMPONENT* clone()const override {unreachable(); return nullptr;}
   bool operator==(COMMON_COMPONENT const&p)const override {
-    return dynamic_cast<COMMON_VASRC const*>(&p);
+    return dynamic_cast<COMMON_VASRC const*>(&p)
+      && EVAL_BM_BASE::operator==(p);
   }
   double flow_abstol() const{
     if(!discipline()){ untested();
