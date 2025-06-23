@@ -140,7 +140,7 @@ private:
   }
   void make_cc_common(std::ostream& o)const override {
     o__ "double " << code_name() << "()const {\n";
-    o____ "return P_CELSIUS0 + _sim->_temp_c;\n";
+    o____ "return temp_k();\n";
     o__ "}\n";
   }
 public:
@@ -166,7 +166,7 @@ private:
   }
   void make_cc_common(std::ostream& o)const override {
     o__ "double " << code_name() << "()const {\n";
-    o____ "return P_K * (P_CELSIUS0 + _sim->_temp_c) / P_Q;\n";
+    o____ "return P_K * temp_k() / P_Q;\n";
     o__ "}\n";
     o__ "double " << code_name() << "(double T)const {\n";
     o____ "assert(T>=-P_CELSIUS0);\n";

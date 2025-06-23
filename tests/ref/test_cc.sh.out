@@ -1041,7 +1041,7 @@ private: // funcs
     return p.has_hard_value();
   }
   double f_temp()const {
-    return P_CELSIUS0 + _sim->_temp_c;
+    return temp_k();
   }
 // Probe no refs: potential_p_n
 // Probe no refs: potential_white_noise_1_p_
@@ -2322,7 +2322,7 @@ private: // funcs
     return p.has_hard_value();
   }
   double f_temp()const {
-    return P_CELSIUS0 + _sim->_temp_c;
+    return temp_k();
   }
 // Probe no refs: potential_p_n
 // Probe no refs: potential_white_noise_0_p_
