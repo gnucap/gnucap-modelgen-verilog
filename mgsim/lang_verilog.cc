@@ -554,18 +554,19 @@ public:
   PARA_BASE* clone()const override{ untested();return new PARAM_ANY(*this);}
   PARA_BASE* pclone(void*p)const override{return new(p) PARAM_ANY(*this);}
   bool operator==(const PARA_BASE& v)const override {
-    // PARAMETER const* p = dynamic_cast<PARAMETER const*>(&b);
+    auto p = dynamic_cast<PARAM_ANY const*>(&v);
     // return (p && _v == p->_v  &&  _s == p->_s);
     Base* eq = nullptr;
     bool ret = false;
-   // if(_s != v._s){ untested();
-   //   return false;
-   // }else
-    if(auto f = dynamic_cast<Float const*>(v.value())){
+    if(!p || _s != p->_s) {
+      return false;
+    }else if(value()==nullptr && v.value()==nullptr) {
+      return true;
+    }else if(auto f = dynamic_cast<Float const*>(v.value())){
       eq = f->equal(_value);
-    }else if(auto i = dynamic_cast<Integer const*>(v.value())){ untested();
+    }else if(auto i = dynamic_cast<Integer const*>(v.value())){
       eq = i->equal(_value);
-    }else if(v.value() == nullptr) {
+    }else if(v.value() == nullptr) { untested();
       ret = _value == nullptr;
     }else{ untested();
       incomplete();
