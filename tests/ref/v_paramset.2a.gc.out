@@ -1,13 +1,3 @@
-module main(\1 ,2);
-                ^ ? invalid identifier
-vs #(.dc(1)) v1(1 2)
-                ^ ? invalid identifier
-vs #(.dc(1)) v1(1 2)
-                  ^ ? invalid identifier
-main #() m1(0 1)
-            ^ ? invalid identifier
-main #() m1(0 1)
-              ^ ? invalid identifier
 // BUG // need one token per line
 paramset vs vsource;
   paramset vs vsource; parameter dc; .dc=dc; endparamset;
@@ -18,6 +8,7 @@ module main (.\1 (\1 ),.\2 (\2 ));
   vs #(.dc(1)) v1 (\1 , \2 );
 endmodule // main
 
+ground \0 ;
 main #() m1 (\0 , \1 );
 print dc v(nodes) v(m1.v1) v(m1.v1.*)
                              ^ ? no match

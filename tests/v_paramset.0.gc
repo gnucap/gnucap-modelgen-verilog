@@ -7,13 +7,14 @@ paramset vs vsource
  .dc=voltage;
 endparamset
 
-module main(\1 ,2);
+module main(\1 , \2 );
   parameter v;
-  vs #(.voltage(v)) v1(1 2)
+  vs #(.voltage(v)) v1(\1 , \2 );
 endmodule
 
-main #(.v(1)) m1(1 0)
-main #(.v(2)) m2(2 0)
+ground \0 ;
+main #(.v(1)) m1(\1 , \0 );
+main #(.v(2)) m2(\2 , \0 );
 
 list
 
