@@ -26,14 +26,14 @@
  * BUG3: current input not currently implemented
  */
 #include <globals.h>
+#include <u_nodemap.h>
+#include <u_limit.h>
 #include <e_compon.h>
 #include <e_subckt.h>
 #include <e_node.h>
 #include <e_elemnt.h>
-#include <u_nodemap.h>
 #include "e_va.h"
 #include "e_rf.h"
-#include <u_limit.h>
 /*--------------------------------------------------------------------------*/
 
 /*--------------------------------------------------------------------------*/
@@ -760,6 +760,7 @@ void LAPLACE::expand()
 	}else{
 	}
 	subckt()->push_front(_output);
+	_output->set_owner(this);
       }else{
       }
 
@@ -1012,21 +1013,21 @@ void LAPLACE::precalc_last()
   }
 
   assert(m->_st_s);
-  if(subckt()){
-    subckt()->precalc_last();
-  }else{untested();
-  }
-
   trace1("LAPLACE::precalc_last mfactor?", _st_b_in_[1]);
     // _st_b_in_[1] = 1.;
   if(_set_parameters) {
     assert(_output);
     ((COMPONENT*)_output)->set_param_by_name("$mfactor", "");
     ((COMPONENT*)_output)->set_param_by_name("$mfactor", to_string(mhack));
-    _output->COMPONENT::precalc_first();
   }else{
   }
-  trace5("LAPLACE::precalc_last2", num_s, _pivot, num_num, c->_type, mfactor());
+  if(subckt()){
+    subckt()->precalc_last();
+  }else{untested();
+  }
+
+  //trace6("LAPLACE::precalc_last2", num_s, _pivot, num_num, c->_type);
+  trace3("LAPLACE::precalc_last2", mhack, mfactor(), _output->mfactor());
 } // precalc_last
 /*--------------------------------------------------------------------------*/
 void LAPLACE::set_parameters(const std::string& Label, CARD *Owner,
