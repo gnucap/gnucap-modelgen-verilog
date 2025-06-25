@@ -210,7 +210,7 @@ private: // override virtual
     if(_loss0){
       trace1("AC_LOAD", value());
       incomplete();
-      _acg = 100;//value(); // 1; // _vy0[1] * _sim->_jomega; BUG. value?
+      _acg = 1e99; // unused. value(); // 1; // _vy0[1] * _sim->_jomega; BUG. value?
  //     ac_load_source();
       ac_load_shunt(); // 4 pt +- loss
     }else{

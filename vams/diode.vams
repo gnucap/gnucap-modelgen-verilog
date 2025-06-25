@@ -68,7 +68,7 @@ module diode (a, c);
 		real ii;
 
 		if($param_given(tnom)) begin
-			tempratio = $temperature / tnom + `P_CELSIUS0;
+			tempratio = $temperature / (tnom + `P_CELSIUS0);
 		end else begin
 			tempratio = 1.;
 		end
