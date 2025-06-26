@@ -17,7 +17,7 @@ flicker_noise #(.pwr(1),.$mfactor(2)) fn1 (.p(\1 ),.n(\0 ));
 flicker_noise #(.pwr(2),.$mfactor(1)) fn2 (.p(\2 ),.n(\0 ));
 flicker_noise #(.pwr(1),.$mfactor(1)) fn3a (.p(\3 ),.n(\0 ));
 flicker_noise #(.pwr(1),.$mfactor(1)) fn3b (.p(\3 ),.n(\0 ));
-flicker_noise #(.pwr(1),.e(2),.$mfactor(1)) fn4 (.p(\4 ),.n(\0 ));
+flicker_noise #(.pwr(1),.$mfactor(1),.e(2)) fn4 (.p(\4 ),.n(\0 ));
 resistor #(.r(1)) r1 (.p(\1 ),.n(\0 ));
 resistor #(.r(1)) r2 (.p(\2 ),.n(\0 ));
 resistor #(.r(1)) r3 (.p(\3 ),.n(\0 ));

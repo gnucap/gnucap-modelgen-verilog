@@ -31,11 +31,11 @@ main.n2: mynet from top level: B
 main.n2: 2 candidates found for mynet
 main.i0: isource from device_dispatcher
 main.i0: 1 candidate found for isource
-m1.n2 .. candidate: A, params: 10
-m1.n2 .. candidate: B, params: 9
+m1.n2 .. candidate: A, params: 2
+m1.n2 .. candidate: B, params: 1
 m1.n2 found fewer params: B.
-m1.n1 .. candidate: A, params: 10
-m1.n1 .. candidate: B, params: 9
+m1.n1 .. candidate: A, params: 2
+m1.n1 .. candidate: B, params: 1
 m1.n1 found fewer params: B.
 >>>>>dc
 #           v(a)      

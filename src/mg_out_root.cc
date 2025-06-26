@@ -36,13 +36,14 @@ static void make_header(std::ostream& o, const File& in,
     "------------------------------------*/\n";
   o <<
     "#include <globals.h>\n"
+    "#include <u_nodemap.h>\n" // if submodules are used anywhere
     "#include <e_compon.h>\n"
     "#include <e_subckt.h>\n"
     "#include <e_node.h>\n"
     "#include <e_elemnt.h>\n"
     "#include <e_storag.h>\n"
-    "// #include <e_paramlist.h>\n"
-    "#include <u_nodemap.h>\n"; // if submodules are used anywhere
+    "#include <e_hsparam.h>\n"
+    "// #include <e_paramlist.h>\n";
 #ifdef DEPEND
   // nothing. just compute deps.
 #elif defined(RETEST)

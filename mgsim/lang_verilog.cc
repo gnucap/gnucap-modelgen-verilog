@@ -549,6 +549,8 @@ public:
       _value = p._value->clone();
     }else{
     }
+    assert(operator==(p));
+    assert(p.operator==(*this));
   }
   ~PARAM_ANY() { delete _value; _value=nullptr;}
   PARA_BASE* clone()const override{ untested();return new PARAM_ANY(*this);}
@@ -564,7 +566,7 @@ public:
       return true;
     }else if(auto f = dynamic_cast<Float const*>(v.value())){
       eq = f->equal(_value);
-    }else if(auto i = dynamic_cast<Integer const*>(v.value())){
+    }else if(auto i = dynamic_cast<Integer const*>(v.value())){ untested();
       eq = i->equal(_value);
     }else if(v.value() == nullptr) { untested();
       ret = _value == nullptr;

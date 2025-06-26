@@ -25,17 +25,19 @@ endmodule // main
 main #() m (\0 , \1 , \2 , \4 );
 >>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
 main.v: myres from top level
-main.v: 1 candidate found for myres
+main.v discarded: too many: requested=1 max=0
+main.v: no candidates found for myres
 main.V1: myv from top level
 main.V1: 1 candidate found for myv
-print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
-                                  ^ ? no match
+m.v: no valid prototype found for myres
 >>>>>dc
-#           v(1)       v(2)       v(4)       i(m.v)     y(m.v)     y(m.V1)   
- 0.         0.         0.99999    0.         0.99999    1.         0.        
+main.v: myres from top level
+main.v discarded: too many: requested=1 max=0
+main.v: no candidates found for myres
+m.v: no valid prototype found for myres
 >>>>>status notime
 Gnucap   System status
-iterations: op=0, dc=4, tran=0, fourier=0, total=4
+iterations: op=0, dc=0, tran=0, fourier=0, total=1
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=3, subckt=0, model=0, total=3
-dctran density=33.3%, ac density=33.3%
+nodes: user=0, subckt=0, model=0, total=0
+dctran density=0.0%, ac density=0.0%

@@ -74,7 +74,7 @@ public:
       return "pwr";
     }else if(idx==1){
       return "name";
-    }else{ untested();
+    }else{
       return COMMON_COMPONENT::param_name(idx-2);
     }
   }
@@ -83,7 +83,7 @@ public:
       return _value.string();
     }else if(idx==1) {
       return "\"" + _name + "\"";
-    }else{ untested();
+    }else{
       return COMMON_COMPONENT::param_value(idx-2);
     }
   }
@@ -92,7 +92,7 @@ public:
       return _value.has_hard_value();
     }else if(idx==1) {
       return _name!="";
-    }else{ untested();
+    }else{
       return COMMON_COMPONENT::param_is_printable(idx-2);
     }
   }
@@ -108,12 +108,9 @@ public:
     }else if(N == "pwr"){
       _value = V;
       return 2;
-    }else if(N == "$mfactor"){ untested();
       // incomplete, mfactor transition.
-      try{ untested(); COMMON_COMPONENT::set_param_by_name("$mfactor", V); }catch(Exception const&){}
-      return 2+COMMON_COMPONENT::set_param_by_name("m", V);
-    }else{ untested();
-      throw Exception_No_Match(N);
+    }else{
+      return COMMON_COMPONENT::set_param_by_name(N, V);
     }
   }
   void precalc_last(PARAM_LIST const* scope)override {
@@ -153,8 +150,8 @@ public: // make noise
     auto cc = prechecked_cast<COMMON_NOISE const*>(common());
     assert(cc);
     double ev = cc->do_noise(this, n);
-    trace4("DEV_NOISE::noise_num", long_label(), mfactor(), ev, _loss0);
     if(_values){
+      trace4("DEV_NOISE::noise_num", long_label(), mfactor(), ev, _values[1]);
       return mfactor() * _values[1] * ev;
     }else if(_loss0){ untested();
       return mfactor() * ev;
@@ -361,12 +358,15 @@ static DISPATCHER<CARD>::INSTALL d(&device_dispatcher, "noise_probe|meas_noise",
 /*--------------------------------------------------------------------------*/
 void DEV_NOISE::precalc_last()
 {
-  ELEMENT::precalc_last();
   if(_values){
-    set_mfactor(_values[1]);
-    COMPONENT::precalc_first(); // latch _mfactor_fixed
+    COMMON_COMPONENT* cc = mutable_common();
+    assert(cc);
+    cc = cc->mutable_clone();
+    cc->set_mfactor(_values[1]);
+    attach_common(cc);
   }else{
   }
+  ELEMENT::precalc_last();
   auto cc = prechecked_cast<COMMON_NOISE const*>(common());
   assert(cc);
   if(_values){

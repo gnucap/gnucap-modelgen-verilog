@@ -21,13 +21,14 @@
  *------------------------------------------------------------------
  * module stuff
  */
+#include <globals.h>
+#include <io_trace.h>
 #include <u_nodemap.h>
 #include <e_node.h>
-#include <globals.h>
 #include <e_paramlist.h>
 #include <e_subckt.h>
-#include <io_trace.h>
 #include <e_model.h>
+#include <e_hsparam.h>
 #include <c_comand.h>
 #include <set>
 /*--------------------------------------------------------------------------*/
@@ -370,9 +371,6 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
       std::string value = _params[i].second;
       if(_params[i].first == ""){
 	c->set_param_by_index(i, value, 0);
-      }else if(_params[i].first == "$mfactor"){
-	// needed?
-	c->set_param_by_name(_params[i].first, value);
       }else{
 	trace2("stub param fwd2", _params[i].first, value);
 	c->set_param_by_name(_params[i].first, value);
@@ -381,6 +379,7 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
     Proto->subckt()->push_back(c);
 //    c->precalc_first(); // latch mfactor.??
   }catch(Exception const& e){
+    trace1("discard", long_label());
     // TODO: include proto name attribute
     error(bLOG, long_label() + " discarded: " + e.message() + "\n");
     delete (CARD*) c;
@@ -405,9 +404,11 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
   assert(Proto->scope()==Proto->subckt());
   assert(!Proto->scope()->size());
 
+#ifdef DO_TRACE
   for(auto n : *(Proto->subckt()->nodes())){
     trace1("node", n.first);
   }
+#endif
 
   if (_parent){
     // getting here in modelgen...?
@@ -635,6 +636,19 @@ std::string INSTANCE::port_name(int i)const
   }
 }
 /*--------------------------------------------------------------------------*/
+static int eff_param_count(CARD const* x)
+{
+  auto c = prechecked_cast<COMPONENT const*>(x);
+  assert(c);
+  HS_PARAM const* h = c->hsparam();
+  return c->param_count() - (h?h->param_count():0);
+}
+/*--------------------------------------------------------------------------*/
+static std::string param_count_string(CARD const* c)
+{
+  return to_string(eff_param_count(c));
+}
+/*--------------------------------------------------------------------------*/
 void INSTANCE::expand()
 {
   BASE_SUBCKT::expand();
@@ -710,7 +724,7 @@ void INSTANCE::expand()
 	  desc = "";
 	}else{
 	  desc = ": " + desc;
-	  error(bTRACE, long_label() + " .. candidate"+desc+", params: "+to_string(s->param_count())+"\n");
+	  error(bTRACE, long_label() + " .. candidate"+desc+", params: "+param_count_string(s)+"\n");
 	}
       }else{ untested();
 	// error(bTRACE, long_label() + " .. anonymous candidate.\n");
@@ -727,19 +741,19 @@ void INSTANCE::expand()
       gotit = prechecked_cast<COMPONENT*>(*j);
       assert(gotit);
       *j = nullptr;
-    }else if(d->param_count() > gotit->param_count()){
+    }else if(eff_param_count(d) > eff_param_count(gotit)){
       if(desc.size()){ untested();
 	error(bTRACE, long_label() + " rejecting candidate, more params"+desc+".\n");
       }else{
-	error(bDEBUG, long_label() + " tie break: " + to_string(gotit->param_count()) + " vs. " +
-	    to_string(d->param_count()) + "\n");
+	error(bDEBUG, long_label() + " tie break: " + param_count_string(gotit) + " vs. " +
+	    param_count_string(d) + "\n");
       }
     }else if(d->param_count() < gotit->param_count()){
       if(desc.size()){
 	error(bTRACE, long_label() + " found fewer params"+desc+".\n");
       }else{
-	error(bDEBUG, long_label() + " tie break: " + to_string(gotit->param_count()) + " vs. " +
-	    to_string(d->param_count()) + "\n");
+	error(bDEBUG, long_label() + " tie break: " + param_count_string(gotit) + " vs. " +
+	    param_count_string(d) + "\n");
       }
       delete (CARD*) gotit;
       gotit = prechecked_cast<COMPONENT*>(*j);

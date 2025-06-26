@@ -10,6 +10,7 @@
 - bogus error message on wrong filter args
 - seems to crash on V(x) if x is parameter.
 - v_instance: port name issue with case insensitive
+- hsp does not play well with paramset
 
 == simulator plugins
 - missing localparam rules in overload

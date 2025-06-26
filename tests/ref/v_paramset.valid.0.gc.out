@@ -50,14 +50,14 @@ main.R1: res from top level: res4
 main.R1: res from top level: res5
 main.R1: res from model_dispatcher
 main.R1: 5 candidates found for res
-m.R1 .. candidate: res1, params: 9
+m.R1 .. candidate: res1, params: 1
 m.R1 dropped invalid candidate: res1.
-m.R1 .. candidate: res2, params: 9
-m.R1 .. candidate: res3, params: 9
+m.R1 .. candidate: res2, params: 1
+m.R1 .. candidate: res3, params: 1
 m.R1 dropped invalid candidate: res3.
-m.R1 .. candidate: res4, params: 9
+m.R1 .. candidate: res4, params: 1
 m.R1 dropped invalid candidate: res4.
-m.R1 .. candidate: res5, params: 9
+m.R1 .. candidate: res5, params: 1
 m.R1 dropped invalid candidate: res5.
 print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
                                   ^ ? no match

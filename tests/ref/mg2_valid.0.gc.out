@@ -11,12 +11,12 @@ module test (.\1 (\1 ),.\2 (\2 ));
 endmodule // test
 
 test #() m (\1 , \2 );
-m.r1 ambiguous overload in resistor
+m.r1 tie break: 1 vs. 1
 #           v(1)       v(2)      
 m.r0: short circuit
  0.         9.9998u    0.99999   
 Gnucap   System status
-iterations: op=0, dc=3, tran=0, fourier=0, total=3
+iterations: op=0, dc=2, tran=0, fourier=0, total=2
 transient timesteps: accepted=0, rejected=0, total=0
 nodes: user=2, subckt=0, model=0, total=2
 dctran density=100.0%, ac density=100.0%

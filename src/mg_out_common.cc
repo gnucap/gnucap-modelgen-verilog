@@ -189,6 +189,7 @@ void make_common_set_param_by_name(std::ostream& o, const Module& m)
 	  alias.push_back(0);
 	}
       }
+    }else{
     }
   }
 
@@ -254,7 +255,8 @@ void make_common_set_param_by_name(std::ostream& o, const Module& m)
     o____ "break; // " << alias[n] << "\n";
     --cnt;
   }
-  o____ "case 0: throw Exception_No_Match(Name);\n";
+  o____ "case 0: return COMMON_COMPONENT::set_param_by_name(Name, Value);\n";
+
 
   o__ "}\n";
   o__ "return lb;\n";
@@ -641,12 +643,12 @@ static void make_common_expand(std::ostream& o , const Module& m)
     "/*--------------------------------------------------------------------------*/\n";
 
   o << "void COMMON_" << m.identifier() << "::precalc_last(const PARAM_LIST* par_scope)\n{\n";
-  o__ "assert(par_scope);\n"
-    "  COMMON_COMPONENT::precalc_last(par_scope);\n";
+  o__ "assert(par_scope);\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
   o__ "(void)pc;\n";
   make_final_adjust_eval_parameter_list(o , m.parameters());
   make_eval_netlist_parameters(o, m);
+  o__ "COMMON_COMPONENT::precalc_last(par_scope);\n";
     o << "}\n"
     "/*--------------------------------------------------------------------------*/\n";
 #if 0

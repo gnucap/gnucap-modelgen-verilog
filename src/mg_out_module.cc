@@ -1031,14 +1031,14 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   String_Arg const& mid = m.identifier();
   o << "void MOD_" << mid << "::precalc_last()\n{\n";
 //    o__ baseclass(m) << "::precalc_last();\n";
-  o__ "CARD::precalc_last();\n";
+  o__ "COMPONENT::precalc_last();\n";
 
-  o__ "try {\n";
-  o____ "assert(scope());\n";
-  o____ "mutable_common()->precalc_last(scope()->params());\n"; // for now.
-  o__ "}catch (Exception_Precalc& e) { untested();\n";
-  o____ "error(bWARNING, long_label() + \": \" + e.message());\n";
-  o__ "}\n;";
+  // o__ "try {\n";
+  // o____ "assert(scope());\n";
+  // o____ "mutable_common()->precalc_last(scope()->params());\n"; // for now.
+  // o__ "}catch (Exception_Precalc& e) { untested();\n";
+  // o____ "error(bWARNING, long_label() + \": \" + e.message());\n";
+  // o__ "}\n;";
 
   if(m.circuit()->element_list().size()) {
     //  below?
@@ -1049,11 +1049,6 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   o__ "auto c = static_cast<COMMON_" << mid << "*>(mutable_common());\n";
   o__ "assert(c);\n";
   o__ "(void)c;\n";
-
-  if(m.circuit()->element_list().size()){
-    o__ "subckt()->attach_params(&(c->_netlist_params), scope());\n";
-  }else{
-  }
 
   if(m.has_analog_block()){
     o__ "zero_filter_readout();\n";
@@ -1068,6 +1063,17 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
 
   // if(m.circuit()->element_list().size()) ?
   o__ "if(subckt()){\n";
+  if(m.circuit()->element_list().size()){
+    o__ "subckt()->params()->set_try_again(nullptr);\n";
+    o__ "subckt()->params()->eval_copy(c->_netlist_params, scope()->params());\n";
+    o__ "subckt()->params()->set_try_again(&c->_netlist_params);\n";
+
+  }else{
+  }
+  o____ "if(HS_PARAM const* h = hsparam()){\n";
+  o______ "h->export_to(subckt()->params());\n";
+  o____ "}else{ untested();\n";
+  o____ "}\n";
   o____ "subckt()->precalc_last();\n";
   o__ "}else{untested();\n";
   o__ "}\n";

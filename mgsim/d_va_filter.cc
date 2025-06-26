@@ -30,6 +30,7 @@
  */
 #include <globals.h>
 #include <e_storag.h>
+#include <e_hsparam.h>
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -371,7 +372,7 @@ bool DEV_CPOLY_CAP::do_tr_con_chk_and_q()
   {
     trace1("DEV_CPOLY_CAP::q_load", _sim->_time0);
     q_load();
- // }else{
+ // }else{ untested();
   }
 
   assert(_vy1);
@@ -542,29 +543,29 @@ void DEV_IDT::tr_advance()
   STORAGE::tr_advance();
 
 #if 0 // later
-  if(_sim->_v0){
-    for (int i=2; i<=_n_ports; ++i) {
+  if(_sim->_v0){ untested();
+    for (int i=2; i<=_n_ports; ++i) { untested();
       _vi0[i] = tr_l_to_g(_vy0[i], _vi0[i], _time, _method_a, _dt);
-      if(_loss0){
+      if(_loss0){ untested();
 	_vi0[i] *= -_loss0;
-      }else{
+      }else{ untested();
       }
       _vi0[0] -= volts_limited(n_(2*i-2],n_(2*i-1]) * _vi0[i];
       assert(_vi0[i] == _vi0[i]);
       assert(_vi0[0] == _vi0[0]);
     }
-    for (int i=0; i<=_n_ports; ++i) {
+    for (int i=0; i<=_n_ports; ++i) { untested();
       assert(_vi0[i] == _vi0[i]);
     }
   }else{ untested();
   }
 #endif
 
-   // if(_sim->_last_time == 0.) {
+   // if(_sim->_last_time == 0.) { untested();
    //   // breaks idt..
    //   _y[0].x = tr_outvolts();
    //   _y[0].f0 = _vy0[0]; // state, from owner, "charge".
-   // }else{
+   // }else{ untested();
    // }
 }
 /*--------------------------------------------------------------------------*/
@@ -786,13 +787,13 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
 /*--------------------------------------------------------------------------*/
 double DEV_CPOLY_CAP::tr_probe_num(const std::string& x)const
 {
-  if (Umatch(x, "loss ")) {
+  if (Umatch(x, "loss ")) { untested();
     return _loss0;
   }else if (Umatch(x, "conv ")) { untested();
     return converged();
   }else if (Umatch(x, "st0 ")) {
     return _vy0[0];
-  }else if (Umatch(x, "v0 ")) {
+  }else if (Umatch(x, "v0 ")) { untested();
     return n_(0).v0();
   }else{
     return STORAGE::tr_probe_num(x);
@@ -801,13 +802,24 @@ double DEV_CPOLY_CAP::tr_probe_num(const std::string& x)const
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_CAP::precalc_last()
 {
-  assert(!common());
-  {
-    assert(_vy0);
-    trace1("set_mfactor", _vy0[1]);
-    set_mfactor(_vy0[1]);
-    COMPONENT::precalc_first();
+  trace2("DCC::pl", long_label(), hsparam());
+  HS_PARAM* c;
+  if(common()){
+    COMMON_COMPONENT* cc = mutable_common()->mutable_clone();
+    c = prechecked_cast<HS_PARAM*>(cc);
+  }else{
+    // incomplete();
+    c = new HS_PARAM();
   }
+
+  if(_vy0[1]){
+  }else{
+  }
+  c->set_mfactor(_vy0[1]); // HACK
+  attach_common(c);
+
+  STORAGE::precalc_last();
+  trace1("DCC::pl", _method_a);
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_CAP::expand_last()
