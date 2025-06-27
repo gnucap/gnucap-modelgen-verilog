@@ -9,7 +9,7 @@ endmodule
 
 paramset myres foo;
   parameter real foo;
- .R={foo+5.};
+ .R=foo+5.;
 endparamset
 
 module main(\1 , \2 , \3 );

@@ -14,7 +14,7 @@ m: main from top level
 m: 1 candidate found for main
 paramset res resistor;
     parameter R from (1:2];
- .r=R+1k;
+ .r=(R + 1k);
 endparamset
 
 paramset res resistor;
@@ -24,7 +24,7 @@ endparamset
 
 paramset res resistor;
     parameter R from [100:200];
- .r=R+1k;
+ .r=(R + 1k);
 endparamset
 
 module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));

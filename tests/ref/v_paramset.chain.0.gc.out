@@ -22,14 +22,14 @@ main #(.x(x)) m (\0 , \1 , \2 , \4 );
 paramset res2 resistor;
     parameter R;
     parameter S=0;
- .r=R+S;
+ .r=(R + S);
 endparamset
 
 paramset res res2;
     parameter r;
     parameter s=0;
     parameter x;
- .R=r+s+x;
+ .R=((r + s) + x);
 endparamset
 
 parameter x=0
@@ -48,11 +48,11 @@ assuming double in x
 assuming double in 1
 assuming double in 0
 assuming double in x
-assuming double in r+s+x
+assuming double in ((r + s) + x)
 assuming double in 0
-assuming double in r+s+x
+assuming double in ((r + s) + x)
 assuming double in 0
-assuming double in r+s+x
+assuming double in ((r + s) + x)
 assuming double in 0
 print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
                                   ^ ? no match

@@ -2,6 +2,8 @@ module main(\1 ,2);
                 ^ ? invalid identifier
   paramset vs vsource
   ^ ? ERROR: This will not work. Need top level.
+    .dc=voltage
+               ^ ? vs: expecting ';'
   vs #(.voltage(v)) v1(1 2)
                        ^ ? invalid identifier
   vs #(.voltage(v)) v1(1 2)

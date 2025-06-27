@@ -33,7 +33,7 @@ paramset cmosp mosfet;
  .is= 0.;
  .pb= 0.7;
  .cgso= 218.971p;
- .cgdo= 218.971p
+ .cgdo= 218.971p;
  .cgbo= 0.;
  .rsh= 0.;
  .cj= 384.4u;

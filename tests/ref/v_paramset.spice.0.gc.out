@@ -6,7 +6,7 @@ m: main from top level
 m: 1 candidate found for main
 paramset myres resistor;
   parameter foo=33;
- .r=foo+5;
+ .r=(foo + 5);
 endparamset
 
 module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));

@@ -167,8 +167,16 @@ void LANG_VERILOG::parse_args_paramset(CS& cmd, CARD* x)
     size_t here = cmd.cursor();
     std::string Name, value;
     try{
-      cmd >> Name >> '=' >> value >> ';';
-      x->set_param_by_name(Name, value);
+      cmd >> Name >> '=';
+      Expression e(cmd);
+      std::stringstream s;
+      e.dump(s);
+      trace2("got expression", cmd.fullstring(), cmd.tail());
+      if(cmd >> ';') {
+      }else{
+	cmd.warn(bDANGER, x->long_label() + ": expecting ';'");
+      }
+      x->set_param_by_name(Name, s.str());
     }catch (Exception_No_Match&) {untested();
       cmd.warn(bDANGER, here, x->long_label() + ": bad parameter " + Name + " ignored");
     }
@@ -418,10 +426,10 @@ void LANG_VERILOG::parse_ports(CS& cmd, COMPONENT* x, bool all_new)
     cmd >> ')';
   }else{
     cmd.warn(bDANGER, "'(' required (parse ports) (grounding)");
-    for (int Index = 0;  Index < x->min_nodes();  ++Index) {
-      if (!(x->node_is_connected(Index))) {
+    for (int Index = 0;  Index < x->min_nodes();  ++Index) { untested();
+      if (!(x->node_is_connected(Index))) { untested();
 	if (all_new) {untested();
-	}else{
+	}else{ untested();
 	}
 	cmd.warn(bDANGER, x->port_name(Index) + ": port unconnected, grounding");
 	x->set_port_to_ground(Index);
@@ -566,7 +574,7 @@ public:
       return true;
     }else if(auto f = dynamic_cast<Float const*>(v.value())){
       eq = f->equal(_value);
-    }else if(auto i = dynamic_cast<Integer const*>(v.value())){ untested();
+    }else if(auto i = dynamic_cast<Integer const*>(v.value())){
       eq = i->equal(_value);
     }else if(v.value() == nullptr) { untested();
       ret = _value == nullptr;
@@ -576,7 +584,7 @@ public:
 
     if(auto ii=dynamic_cast<Integer const*>(eq)){
       ret = ii->value();
-    }else{
+    }else{ untested();
     }
     delete eq;
 
@@ -906,7 +914,7 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
       cmd.getline("verilog-paramset>");
     }else if (!cmd.more()) {
       cmd.getline("verilog-paramset>");
-    }else{
+    }else{ untested();
       cmd.check(bWARNING, "what's this?");
       break;
     }
@@ -1040,7 +1048,7 @@ void LANG_VERILOG::new_instance_(CS& cmd, BASE_SUBCKT* Owner, CARD_LIST* Scope)
          Scope->push_back(x);
        }else{
        }
-      }else{
+      }else{ untested();
        cmd.warn(bDANGER, type + ": incomplete prototype");
       }
     }else{
@@ -1100,7 +1108,7 @@ void LANG_VERILOG::print_args_paramset(OMSTREAM& o, const T* x)
 	  // move to instance?
 	}
       }
-    }else{
+    }else{ untested();
     	//  DEV_DOT for now.
     }
 #endif
@@ -1111,7 +1119,7 @@ void LANG_VERILOG::print_args_paramset(OMSTREAM& o, const T* x)
 	if (x->param_is_printable(ii)) {
 	  o << " ." << x->param_name(ii) << '=' << x->param_value(ii) << ";";
 //	  o << arg;
-	}else{
+	}else{ untested();
 	}
       }
 //      o << "\\\n";

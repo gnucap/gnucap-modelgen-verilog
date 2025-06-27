@@ -10,7 +10,7 @@ m: main from top level
 m: 1 candidate found for main
 (* desc="res1" *) paramset res resistor;
     parameter real R from (1:2];
- .r=R+1k;
+ .r=(R + 1k);
 endparamset
 
 (* desc="res2" *) paramset res resistor;
@@ -20,7 +20,7 @@ endparamset
 
 (* desc="res3" *) paramset res resistor;
     parameter real R from [100:200];
- .r=R+1k;
+ .r=(R + 1k);
 endparamset
 
 (* desc="res4" *) paramset res resistor;

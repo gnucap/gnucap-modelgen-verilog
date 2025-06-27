@@ -4,7 +4,7 @@ verilog
 
 paramset myres resistor;
 parameter foo=33;
- .r={foo+5};
+ .r=foo+5;
 endparamset
 
 module main(\1 ,\2 , \3 , \4 );
