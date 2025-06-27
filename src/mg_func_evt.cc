@@ -290,7 +290,8 @@ protected:
   }
   virtual void make_tr_eval(std::ostream& o)const {
     o____ "bool tr_eval(" << args(o) << ") {\n";
-    o________ "tr_eval_("<<evalargs(o)<<");\n";
+    o______ "(void) dir;\n";
+    o______ "tr_eval_("<<evalargs(o)<<");\n";
     o______ "return false;\n";
     o____ "}\n";
     o____ "bool tr_eval_(" << args(o) << ") {\n";
@@ -353,7 +354,10 @@ protected:
     o________ "ret = false;\n";
     o______ "}\n";
     o______ "if(ret) trace4(\"cross::tr_accept\", input, _state[0], _state[1], _in[0]);\n";
-    o______ "return ret;\n";
+    o______ "if(enable){\n";
+    o______ "}else{ untested();\n";
+    o______ "}\n";
+    o______ "return ret&&enable;\n";
     o____ "}\n";
 
   }
@@ -368,7 +372,8 @@ public:
   ABOVE* clone()const override {return new ABOVE(*this);}
   void make_tr_eval(std::ostream& o)const override {
     o____ "bool tr_eval(" << args(o) << ") {\n";
-    o________ "tr_eval_("<<evalargs(o)<<");\n";
+    o______ "(void) dir;\n";
+    o______ "tr_eval_("<<evalargs(o)<<");\n";
     o______ "return false;\n";
     o____ "}\n";
     o____ "bool tr_eval_(" << args(o) << ") {\n";
