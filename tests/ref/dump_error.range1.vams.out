@@ -1,0 +1,4 @@
+... , gnd);
+ parameter real x=0 from [0 1 2];
+                              ^ ? Syntax error
+

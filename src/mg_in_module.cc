@@ -415,16 +415,16 @@ static std::string get_identifier(CS& cmd, std::string const& term)
       bool plain = true;
       for(size_t i = 0; plain && i<id.size() ; ++i) {
 	if (isalnum(id[i])) {
-	}else if (id[i] == '$') {
+	}else if (id[i] == '$') { untested();
 	  plain = false;
-	}else{
+	}else{ untested();
 	  plain = false;
 	}
       }
 
       if(plain) {
 	// don't touch, for now.
-      }else{
+      }else{ untested();
 	// store escaped string.
 	id = "\\" + id;
       }
@@ -590,7 +590,7 @@ static std::string mangle(std::string const& name)
 {
   if(isdigit(name[0])) {
     return '\\' + name + " ";
-  }else if(name[0] == '\\') {
+  }else if(name[0] == '\\') { untested();
     return name + " ";
   }else{
     // ok, for now.
@@ -938,18 +938,32 @@ void ValueRangeInterval::parse(CS& file)
   assert(owner());
   _lb.set_owner(owner());
   _ub.set_owner(owner());
-  file >> _lb; //_lb = file.ctos(":");
-  file.skip1(":");
-  file >> _ub; // _ub = file.ctos("])");
-  trace1("ValueRangeInterval::parse", file.tail().substr(0,19));
+  untested();
+  try{
+    file >> _lb;
+  }catch(Exception const&){ untested();
+    throw Exception_CS_("Syntax error\n", file);
+  }
+  if(file >> ':'){
+  }else if(file >> ','){
+    file.warn(bWARNING, file.cursor()-1, "maybe ':'?");
+  }else{
+    throw Exception_CS_("Syntax error\n", file);
+  }
+  trace1("ValueRangeInterval::parse0", file.tail().substr(0,19));
+  try{ untested();
+    file >> _ub;
+  }catch(Exception const&){ untested();
+    throw Exception_CS_("Syntax error\n", file);
+  }
+  trace1("ValueRangeInterval::parse1", file.tail().substr(0,19));
 
-  if(file.match1(']')) {
-    file.skip1(']');
+  if(file >> ']') {
     _ub_is_closed = true;
-  }else if(file.match1(')')) {
-    file.skip1(')');
+  }else if(file >> ')') {
     _ub_is_closed = false;
   }else{ untested();
+    trace1("ValueRangeInterval::parse2", file.tail().substr(0,19));
     throw Exception_CS_("need ')' or ']'", file);
   }
 }

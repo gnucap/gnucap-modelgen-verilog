@@ -215,8 +215,8 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       tta.stack_op(&E);
     }else if(FUNCTION_ const* af = analog_function(n, Scope)) {
       // assert(r); // BUG, use refs.
-     // if(dynamic_cast<Token_PARLIST*>(E.back())){
-     // }else{
+     // if(dynamic_cast<Token_PARLIST*>(E.back())){ untested();
+     // }else{ untested();
      // }
 	Token* tt = resolve_function(af, &E, scope());
        //  assert(dynamic_cast<FUNCTION_ const*>(r));
@@ -264,7 +264,7 @@ void Expression_::set_owner(Base* o)
   }else if(auto s = dynamic_cast<Statement*>(o)){
     _owner = s;
     _scope = s->scope();
-  }else{
+  }else{ untested();
     incomplete();
     _owner = o;
 //    _scope = o->owner();

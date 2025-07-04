@@ -1,0 +1,5 @@
+`include "sub/disciplines.few"
+
+module commatest (a, b, gnd);
+             parameter real y=0 from [1:2:,; // something wrong
+endmodule;

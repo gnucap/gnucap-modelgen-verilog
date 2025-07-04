@@ -1,0 +1,2 @@
+...         parameter real y=0 from [1:2:,; endmodule;
+                                        ^ ? need ')' or ']'

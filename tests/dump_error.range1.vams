@@ -1,0 +1,5 @@
+`include "sub/disciplines.few"
+
+module test123(a, b, gnd);
+	parameter real x=0 from [0 1 2];
+endmodule;
