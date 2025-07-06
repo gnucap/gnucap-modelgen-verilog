@@ -1,19 +1,26 @@
 == gnucap modelgen tests
 
-Run with "make check". Optionally a TESTSELECT may be specified to subselect
+Run with "make check". Optionally TESTSELECT may be specified to subselect
 tests
 
-$ make check TESTSELECT=dump # will only test "dump*"
+$ make check TESTSELECT=dump # will only run tests matching "dump*"
 
 Desired output is stored in ref, actual output will be in check/*.out
 See check/${TESTSELECT}.diffs for results (no diff == good).
 
+Code coverage and status are reported during testing. If you are not
+interested, redirect stderr, as in
+
+$ make check 2>/dev/null
+
+see below otherwise.
+
 == Code coverage testing
 
-Test coverage is computed following this protocol, see [1] for more
-background.
+Test coverage is computed according to the following protocol, see [1] for
+more background.
 
-- Places "untested calls" at each test hook.
+- Place "untested calls" at each test hook.
   There is an "untest" target in the top level Makefile.
 
 - Compile the program with CPPFLAGS=-DTRACE_UNTESTED.
