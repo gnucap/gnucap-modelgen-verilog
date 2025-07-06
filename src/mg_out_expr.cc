@@ -722,7 +722,7 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
       o__ "{\n";
       {
 	indent y;
-	o__ "ddouble& tt0 = t0;\n"; // BUG: float??
+	o__ "ddouble& tt0 = " << s.code_name() << ";\n"; // BUG: float??
 	o__ "if(" << arg1 << "){\n";
 	{
 	  indent x;

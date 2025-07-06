@@ -1,0 +1,39 @@
+#          
+ar 1 1
+
+ 0.        
+ar 0.81 0.81
+
+ 0.1       
+ar 0.64 0.64
+
+ 0.2       
+ar 0.408333 0.408333
+
+ 0.3       
+ar 0.225 0.225
+
+ 0.4       
+ar 0.125 0.125
+
+ 0.5       
+ar 0.0666667 0.0666667
+
+ 0.6       
+ar 0.0321429 0.0321429
+
+ 0.7       
+ar 0.0125 0.0125
+
+ 0.8       
+ar 0.00277778 0.00277778
+
+ 0.9       
+ar 0 0
+
+ 1.        
+Gnucap   System status
+iterations: op=0, dc=22, tran=0, fourier=0, total=22
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%

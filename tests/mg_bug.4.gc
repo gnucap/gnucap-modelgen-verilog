@@ -1,0 +1,35 @@
+
+attach ./modelgen_1.so
+
+
+verilog
+
+`modelgen
+module test_bug4(p, n);
+	electrical p, n;
+	analog begin : test
+		real y1;
+		real y2;
+		real x;
+		x = V(p,n);
+		y1 = (((x - 1.) * (x - 1.)) / ((((x * 4.) > 1))? ((x * 4.)):( 1)));
+		if(x*4 > 1)
+			y2 = (((x - 1.) * (x - 1.)) / (x * 4.));
+		else
+			y2 = (((x - 1.) * (x - 1.)) / 1);
+		$strobe("ar %g %g\n", y1, y2);
+	end
+endmodule
+`endmodelgen
+
+
+!make test_bug4.so > /dev/null
+attach ./test_bug4.so
+
+
+parameter x=0;
+vsource #(.dc(x)) v1(\1 , \0 );
+test_bug4 #() dut(\1 ,\0 );
+
+dc x 0 1 .1
+status notime
