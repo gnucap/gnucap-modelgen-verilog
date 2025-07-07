@@ -31,7 +31,7 @@
  * the expansion (attact to the X) has all comments removed
  *	- need to process the entire ring - for doesn't work
  */
-#if 0 // use module from library
+#if 1 // use overlay
 #include "u_nodemap.h"
 #include "e_node.h"
 #include "globals.h"
@@ -86,6 +86,7 @@ private:
   void		set_port_by_index(int Index, std::string& Value) override;
   int		set_port_by_name(std::string&, std::string&) override;
   int set_param_by_name(std::string Name, std::string Value)override;
+  void set_param_by_index(int i, std::string& Value, int j)override;
 private: // override virtual
   bool		is_device()const override	{return true;}
   char		id_letter()const override	{return 'X';}
@@ -426,6 +427,28 @@ int DEV_SUBCKT::set_param_by_name(std::string Name, std::string Value)
     }else{itested();
       throw Exception_No_Match(Name);
     }
+  }
+}
+/*--------------------------------------------------------------------------*/
+void DEV_SUBCKT::set_param_by_index(int i, std::string& Value, int Offset)
+{
+  COMMON_PARAMLIST* c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
+  assert(c);
+  auto p=dynamic_cast<const DEV_SUBCKT*>(_parent);
+  assert(p);
+  int param_count = p->subckt()->params()->size();
+  // assert(param_count == p->param_count()); BUG, incomplete
+
+  if(p && i<param_count){
+    std::string param_name = p->subckt()->params()->name(i);
+    auto cc = c->mutable_clone();
+    trace2("DS::spbi found name", i, param_name);
+    cc->set_param_by_name(param_name, "");
+    cc->set_param_by_name(param_name, Value);
+    attach_common(cc);
+  }else{ untested();
+    trace2("DS::spbi out of range", long_label(), i);
+    throw Exception_Too_Many(i+1, 0, Offset);
   }
 }
 /*--------------------------------------------------------------------------*/

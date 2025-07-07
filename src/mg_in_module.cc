@@ -938,7 +938,6 @@ void ValueRangeInterval::parse(CS& file)
   assert(owner());
   _lb.set_owner(owner());
   _ub.set_owner(owner());
-  untested();
   try{
     file >> _lb;
   }catch(Exception const&){ untested();
@@ -951,7 +950,7 @@ void ValueRangeInterval::parse(CS& file)
     throw Exception_CS_("Syntax error\n", file);
   }
   trace1("ValueRangeInterval::parse0", file.tail().substr(0,19));
-  try{ untested();
+  try{
     file >> _ub;
   }catch(Exception const&){ untested();
     throw Exception_CS_("Syntax error\n", file);
@@ -962,7 +961,7 @@ void ValueRangeInterval::parse(CS& file)
     _ub_is_closed = true;
   }else if(file >> ')') {
     _ub_is_closed = false;
-  }else{ untested();
+  }else{
     trace1("ValueRangeInterval::parse2", file.tail().substr(0,19));
     throw Exception_CS_("need ')' or ']'", file);
   }
