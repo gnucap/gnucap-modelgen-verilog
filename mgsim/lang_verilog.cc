@@ -618,10 +618,13 @@ public:
       vInteger n;
       _value = n.assign(v);
       trace3("now integer", _s, v->val_string(), _value->val_string());
-    }else{ untested();
+    }else if(v){ untested();
       _value = v->assign(v);
       assert(_value);
       trace3("don't know", _s, v->val_string(), _value->val_string());
+    }else{ itested();
+      // fall back
+      _value = new Float(NOT_INPUT);
     }
     assert(_value);
     _s = "#";
