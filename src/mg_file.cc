@@ -65,7 +65,7 @@ File::File() : _file(CS::_STRING, "")
 /*--------------------------------------------------------------------------*/
 /* A.1.2
 + source_text ::=
-+	  { untested(); description }
++	  { description }
 + description ::=
 +	  module_declaration
 -	| udp_declaration

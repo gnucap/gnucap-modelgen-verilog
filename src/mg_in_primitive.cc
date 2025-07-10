@@ -30,16 +30,16 @@
 /*
 - udp_declaration ::= (From A.5.1)
 -    { attribute_instance } primitive udp_identifier ( udp_port_list ) ;
--    udp_port_declaration { untested(); udp_port_declaration }
+-    udp_port_declaration { udp_port_declaration }
 +    udp_body
 -    endprimitive
 -    | { attribute_instance } primitive udp_identifier ( udp_declaration_port_list ) ;
 -    udp_body
 +    endprimitive
 - udp_port_list ::= (From A.5.2)
--    output_port_identifier , input_port_identifier { untested(); , input_port_identifier }
+-    output_port_identifier , input_port_identifier { , input_port_identifier }
 - udp_declaration_port_list ::=
--    udp_output_declaration , udp_input_declaration { untested(); , udp_input_declaration }
+-    udp_output_declaration , udp_input_declaration { , udp_input_declaration }
 */
 void Primitive::parse(CS& f)
 {
@@ -107,9 +107,9 @@ void Primitive::dump(std::ostream& o)const
 - seq_input_list ::=
 - level_input_list | edge_input_list
 - level_input_list ::=
-- level_symbol { untested(); level_symbol }
+- level_symbol { level_symbol }
 - edge_input_list ::=
-- { untested(); level_symbol } edge_indicator { level_symbol }
+- { level_symbol } edge_indicator { level_symbol }
 - edge_indicator ::=
 - ( level_symbol level_symbol ) | edge_symbol
 - current_state ::= level_symbol

@@ -32,13 +32,13 @@
 + module_instantiation ::=
 +	  module_or_paramset_identifier [ parameter_value_assignment ] 
 +	  module_instance
--	  { untested(); "," module_instance }
+-	  { "," module_instance }
 +	  ";"
 + parameter_value_assignment ::=
 +	  "# (" list_of_parameter_assignments ")"
 + list_of_parameter_assignments ::=
--	  ordered_parameter_assignment { untested(); "," ordered_parameter_assignment }
-+	| named_parameter_assigmnent { untested(); "," named_parameter_assignment }
+-	  ordered_parameter_assignment { "," ordered_parameter_assignment }
++	| named_parameter_assigmnent { "," named_parameter_assignment }
 
 + module_instance ::=
 +	   name_of_module_instance "(" [ list_of_port_connections ] ")"
@@ -46,8 +46,8 @@
 +	   module_instance_identifier
 -	  [ range ]
 + list_of_port_connections ::=
-+	  ordered_port_connection { untested(); "," ordered_port_connection }
--	| named_port_connection { untested(); "," named_port_connection }
++	  ordered_port_connection { "," ordered_port_connection }
+-	| named_port_connection { "," named_port_connection }
 + ordered_port_connection ::=
 +	  {attribute_instance} [ expression ]
 - named_port_connection ::=
@@ -128,11 +128,11 @@ void Parameter_3::dump(std::ostream& out)const
 +	  "aliasparam" parameter_identifier "=" parameter_identifier ";"
 // A.2.3
 + list_of_param_assignments ::=
-+	  param_assignment { untested(); "," param_assignment }
++	  param_assignment { "," param_assignment }
 // A.2.4
 + param_assignment ::=
-+	  parameter_identifier "=" constant_mintypmax_expression { untested(); value_range }
--	| parameter_identifier range "=" constant_arrayinit { untested(); value_range }
++	  parameter_identifier "=" constant_mintypmax_expression { value_range }
+-	| parameter_identifier range "=" constant_arrayinit { value_range }
 */
 void Parameter_2::parse(CS& f)
 {
@@ -612,11 +612,11 @@ void Port_3::dump(std::ostream& out)const
 + module_declaration ::=
 +	  {attribute_instance}  module_keyword  module_identifier
 -		[ module_parameter_port_list ]
-+		list_of_ports ";" { untested(); module_item }
++		list_of_ports ";" { module_item }
 +	  "endmodule"
 -	| {attribute_instance}  module_keyword  module_identifier
 -		[ module_parameter_port_list ]
--		[ list_of_port_declarations ] ";" { untested(); non_port_module_item }
+-		[ list_of_port_declarations ] ";" { non_port_module_item }
 -	  "endmodule"
 + module_keyword ::=
 +	  "module"
@@ -821,7 +821,7 @@ void Module::parse_body(CS& f)
 - | hierarchical_net_identifier [ constant_expression ]
 - | hierarchical_net_identifier [ constant_range_expression ]
 - list_of_branch_identifiers ::=
-- branch_identifier [ range ] { untested(); , branch_identifier [ range ] }
+- branch_identifier [ range ] { , branch_identifier [ range ] }
 */
 /*--------------------------------------------------------------------------*/
 void Branch_Declaration::dump(std::ostream& o) const

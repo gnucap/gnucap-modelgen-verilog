@@ -25,7 +25,7 @@
 /* A.1.6    3.6.1
 + nature_declaration ::=
 +	  "nature"  nature_identifier  [  ":"  parent_nature  ]  [  ";"  ]
-+		{ untested(); nature_item }
++		{ nature_item }
 +	  "endnature"
 + parent_nature ::=
 +	  nature_identifier
@@ -86,7 +86,7 @@ void Nature::dump(std::ostream& out)const
 /* A.1.7    3.6.2
 + discipline_declaration ::=
 +	  "discipline"  discipline_identifier [ ";" ]
-+		{ untested(); discipline_item }
++		{ discipline_item }
 +	  "enddiscipline"
 + discipline_item ::=
 +	  nature_binding
