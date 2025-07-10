@@ -153,14 +153,18 @@ void Parameter_2::parse(CS& f)
     trace3("not there", _name, name(), dynamic_cast<Module const*>(owner()) );
   }
 
-  f >> '=';
+  if(f >> '='){
+  }else{
+    throw Exception_CS_("expecting '='", f);
+  }
 
   try{
     f >> _default_val;
   }catch(Exception_CS_ const& ec){
     throw ec;
   }catch(Exception const& e){ untested();
-    throw e;
+    incomplete();
+    throw Exception_CS_("sth wrong: " + e.message(), f);
   }
   {
     f >> _value_range_list;
