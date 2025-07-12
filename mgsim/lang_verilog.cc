@@ -1122,7 +1122,7 @@ void LANG_VERILOG::print_args_paramset(OMSTREAM& o, const T* x)
 	if (x->param_is_printable(ii)) {
 	  o << " ." << x->param_name(ii) << '=' << x->param_value(ii) << ";";
 //	  o << arg;
-	}else{ untested();
+	}else{
 	}
       }
 //      o << "\\\n";

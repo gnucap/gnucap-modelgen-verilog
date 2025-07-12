@@ -788,6 +788,7 @@ void INSTANCE::expand()
     assert(d);
     assert(d->is_valid());
     d->set_label(short_label());
+    d->set_dev_type(dev_type()); // make spice happier..
   }else{ untested();
     // TODO: include name attributes, once available
     throw Exception(long_label() + ": ambiguous overload: " + dev_type());

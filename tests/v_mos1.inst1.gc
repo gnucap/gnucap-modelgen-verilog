@@ -1,0 +1,19 @@
+
+options trace
+.model nmos nmos ( level=1 lambda=0. rd=0. rs=0. cbd=0. cbs=0. is=10.E-15 )
+
+module  main(a,b,c,d);
+  nmos #(.l(9u), .w(9u)) n1(a,b,c,d);
+endmodule;
+
+verilog
+ground gnd;
+
+vsource #(.dc(2)) v1(\1 , gnd);
+main dut(\2 , \1 , gnd gnd);
+vsource #(.dc(1)) v2(\2 , gnd);
+
+list
+print op i(v*)
+op
+end
