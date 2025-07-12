@@ -550,7 +550,7 @@ void DELAY::ac_begin()
 void DELAY::do_ac()
 {
   trace1("DELAY::do_ac", mfactor());
-  COMMON_ABSDELAY const* c = prechecked_cast<COMMON_ABSDELAY const*>(common());
+  COMMON_DELAY const* c = prechecked_cast<COMMON_DELAY const*>(common());
   assert(c);
 
   double td(c->_delay);

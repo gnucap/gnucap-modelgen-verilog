@@ -1,0 +1,13 @@
+
+attach ../vams/vsine.so
+attach ../vams/vpulse.so
+
+
+verilog
+
+vsine #(.ampl(1), .freq(1)) v1(in, \0 );
+vpulse #(.val0(1)) v1(in, \0 );
+
+ac
+status notime
+end
