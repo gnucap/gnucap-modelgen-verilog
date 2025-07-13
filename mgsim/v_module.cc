@@ -31,7 +31,7 @@
  * the expansion (attact to the X) has all comments removed
  *	- need to process the entire ring - for doesn't work
  */
-#if 1 // use overlay
+#if 0 // use from main
 #include "u_nodemap.h"
 #include "e_node.h"
 #include "globals.h"

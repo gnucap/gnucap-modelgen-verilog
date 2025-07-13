@@ -603,7 +603,7 @@ void DELAY::map_nodes()
 void DELAY::ac_load()
 {
   ac_load_shunt();
-  if(_ctrl_in){ untested();
+  if(_ctrl_in){
     assert(_ctrl_in);
     trace4("acload", input_idx(), n_(input_idx()).m_(), _acg, _n_ports);
     // ac_load_active(); but other input.
