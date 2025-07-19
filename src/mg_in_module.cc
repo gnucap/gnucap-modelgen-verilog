@@ -1263,11 +1263,19 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args)
     }
   }else if( (t = f->new_token(*this, num_args)) ){
     import_flags(f);
+  }else if(f){ untested();
+    FUNCTION_* cl = f->clone();
+    assert(cl);
+    std::string label = f->label();
+    static int cnt;
+    cl->set_label("t_" + f->label() + std::to_string(cnt++));
+    cl->set_num_args(num_args);
+    push_back(cl);
+
+    import_flags(f);
+    t = new Token_CALL(label, cl);
   }else{
-    // call?
-    // import_flags..
-    incomplete();
-    assert(t);
+    unreachable();
   }
 
   return t;
