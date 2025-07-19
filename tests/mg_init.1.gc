@@ -28,11 +28,15 @@ list
 !make test_init1.so > /dev/null
 attach ./test_init1.so
 
-test_init1 #(.p(42.)) dut0();
+parameter pp=1;
+test_init1 #(.p(pp)) dut0();
 reject #(.time(2)) r();
 
 list
 
+print dc t1(dut0) t2(dut0) iter(0) control(0)
+dc
+parameter pp=42;
 print tran t1(dut0) t2(dut0) iter(0) control(0)
 tran 1 basic
 
