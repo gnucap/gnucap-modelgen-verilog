@@ -31,6 +31,30 @@
 #include <u_parameter.h>
 #include "f__.cc" // TODO
 /*--------------------------------------------------------------------------*/
+// BUG: use flag
+void Module::install(FUNCTION_ const* f)
+{
+  _funcs.insert(f);
+}
+/*--------------------------------------------------------------------------*/
+// BUG: don't use install
+bool Statement::propagate_rdeps(RDeps const& r)
+{
+  trace2("Statement::propagate_rdeps", typeid(*this).name(), r.size());
+  assert(owner());
+  auto s = prechecked_cast<Statement*>(owner_());
+  assert(s);
+  bool ret = false;
+  for(auto n : r) {
+    auto p = _rdeps.insert(n);
+    if(p.second){
+      ret = s->propagate_rdep(*p.first);
+    }else{
+    }
+  }
+  return ret;
+}
+/*--------------------------------------------------------------------------*/
 void Expression_::set_owner(Base* o)
 {
 	// _scope = b;
@@ -95,7 +119,7 @@ public:
 private:
   bool static_code()const override {return false;}
   Token* new_token(Module& m, size_t)const override {
-    m.install(this);
+    m.install(this); // BUG,  use flag.
     return new Token_PF(label(), this);
   }
   bool has_precalc()const override {return true;}

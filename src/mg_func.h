@@ -25,6 +25,7 @@
 #include <u_function.h>
 #include "mg_token.h" // BUG?
 #include "mg_base.h"
+#include "mg_lib.h"
 //#include <m_expression.h>
 /*--------------------------------------------------------------------------*/
 #ifndef MG_FUNCTION_H
@@ -58,7 +59,6 @@ public:
 
 public: // characteristics
   std::string const& label()const { return short_label(); }
-  std::string const& key()const { return label(); } // free?
   void set_num_args(size_t n){ _num_args = n; }
   size_t num_args() const { return _num_args; }
   virtual bool is_output_arg(int)const {return false;}
@@ -233,6 +233,12 @@ inline FUNCTION_::~FUNCTION_()
 }
 /*--------------------------------------------------------------------------*/
 void stack_op(FUNCTION_ const* f, Expression const& args, Expression* out);
+/*--------------------------------------------------------------------------*/
+template<>
+inline std::string key_(FUNCTION_ const* t)
+{
+  return t->short_label();
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

@@ -27,14 +27,20 @@
 #include <set>
 /*--------------------------------------------------------------------------*/
 template<class T>
+std::string key_(T const* t)
+{ untested();
+  return t->key();
+}
+/*--------------------------------------------------------------------------*/
+template<class T>
 struct ptrCmp {
   bool operator()( T const* a, T const* b ) const {
     assert(a);
     assert(b);
-    assert(a->key().size());
-    assert(b->key().size());
-    assert(a==b || (a->key() != b->key()));
-    return a->key() < b->key();
+    assert(key_(a).size());
+    assert(key_(b).size());
+    assert(a==b || (key_(a) != key_(b)));
+    return key_(a) < key_(b);
   }
 };
 /*--------------------------------------------------------------------------*/

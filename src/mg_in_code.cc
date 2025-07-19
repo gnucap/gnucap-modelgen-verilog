@@ -602,5 +602,22 @@ void Variable_List_Collection::dump(std::ostream& o)const
   // Collection<Parameter_2_List>::dump(o);
 }
 /*--------------------------------------------------------------------------*/
+bool Statement::propagate_rdeps(RDeps const& r)
+{
+  trace2("Statement::propagate_rdeps", typeid(*this).name(), r.size());
+  assert(owner());
+  auto s = prechecked_cast<Statement*>(owner_());
+  assert(s);
+  bool ret = false;
+  for(auto n : r) {
+    auto p = _rdeps.insert(n);
+    if(p.second){
+      ret = s->propagate_rdep(*p.first);
+    }else{
+    }
+  }
+  return ret;
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

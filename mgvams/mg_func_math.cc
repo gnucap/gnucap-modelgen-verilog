@@ -28,20 +28,6 @@
 #include "mg_module.h"
 #include <globals.h>
 #include <u_parameter.h>
-#include "f__.cc"
-/*--------------------------------------------------------------------------*/
-bool Statement::propagate_rdep(Base const* )
-{
-  unreachable();
-  incomplete();
-  return false;
-}
-/*--------------------------------------------------------------------------*/
-void Expression_::dump(std::ostream& ) const
-{
-  unreachable();
-  incomplete();
-}
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
