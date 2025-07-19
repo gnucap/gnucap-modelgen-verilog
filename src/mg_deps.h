@@ -98,8 +98,8 @@ class DDeps {
 public:
   typedef D::const_iterator const_iterator;
 
-  const_iterator begin() const;
-  const_iterator end() const;
+  const_iterator begin()const { return _s.begin(); }
+  const_iterator end()const { return _s.end(); }
   size_t size() const{
     return _s.size();
   }

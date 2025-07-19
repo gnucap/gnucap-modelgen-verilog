@@ -515,16 +515,6 @@ bool Block::new_var_ref(Base* what)
   return ret;
 }
 /*--------------------------------------------------------------------------*/
-DDeps::const_iterator DDeps::begin() const
-{
-  return _s.begin();
-}
-/*--------------------------------------------------------------------------*/
-DDeps::const_iterator DDeps::end() const
-{
-  return _s.end();
-}
-/*--------------------------------------------------------------------------*/
 bool is_true(Expression const& x)
 {
   Base const* e = x.value();
