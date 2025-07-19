@@ -522,6 +522,7 @@ static void make_module(std::ostream& o, const Module& m)
   std::string common_name = "COMMON_" + m.identifier().to_string();
   std::string precalc_name = "PRECALC_" + m.identifier().to_string();
   o << "class " << class_name << " : public " << base_name << " {\n";
+  o__ "typedef " << class_name << " MOD;\n";
   o__ "typedef " << common_name << " COMMON;\n";
   o << "private:\n";
   o__ "static int _count;\n";

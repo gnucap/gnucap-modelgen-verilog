@@ -1049,6 +1049,7 @@ private: // funcs
 }; //COMMON_resistor
 /*--------------------------------------------------------------------------*/
 class MOD_resistor : public BASE_SUBCKT {
+  typedef MOD_resistor MOD;
   typedef COMMON_resistor COMMON;
 private:
   static int _count;
@@ -2328,6 +2329,7 @@ private: // funcs
 }; //COMMON_resistor
 /*--------------------------------------------------------------------------*/
 class MOD_resistor : public BASE_SUBCKT {
+  typedef MOD_resistor MOD;
   typedef COMMON_resistor COMMON;
 private:
   static int _count;
@@ -4905,6 +4907,7 @@ private: // funcs
 }; //COMMON_capacitor
 /*--------------------------------------------------------------------------*/
 class MOD_capacitor : public BASE_SUBCKT {
+  typedef MOD_capacitor MOD;
   typedef COMMON_capacitor COMMON;
 private:
   static int _count;
@@ -5877,6 +5880,7 @@ private: // funcs
 }; //COMMON_capacitor
 /*--------------------------------------------------------------------------*/
 class MOD_capacitor : public BASE_SUBCKT {
+  typedef MOD_capacitor MOD;
   typedef COMMON_capacitor COMMON;
 private:
   static int _count;

@@ -1257,13 +1257,12 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args)
     install(f);
     t = f->new_token(*this, num_args);
     if(!t){
-      // incomplete(); // BUG missing new_token?
       t = new Token_CALL(f->label(), f);
-    }else{ untested();
+    }else{
     }
   }else if( (t = f->new_token(*this, num_args)) ){
     import_flags(f);
-  }else if(f){ untested();
+  }else if(f){
     FUNCTION_* cl = f->clone();
     assert(cl);
     std::string label = f->label();
