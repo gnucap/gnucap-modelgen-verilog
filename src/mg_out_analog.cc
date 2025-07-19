@@ -31,18 +31,19 @@ public:
     modeSTATIC = 1,
     modeDYNAMIC = 2,
     modePROBE = 3,
-    modeTR_BEGIN = 4,
-    modeTR_RESTORE = 5,
-    modeTR_ADVANCE = 6,
-    modeTR_REGRESS = 7,
-    modeTR_REVIEW = 8,
-    modeTR_ACCEPT = 9,
-    modeNUM = 10
+    modeTR_INITIAL = 4,
+    modeTR_BEGIN = 5,
+    modeTR_RESTORE = 6,
+    modeTR_ADVANCE = 7,
+    modeTR_REGRESS = 8,
+    modeTR_REVIEW = 9,
+    modeTR_ACCEPT = 10,
+    modeNUM = 11
   }_mode;
   Base const* _src{nullptr};
   std::string ctx()const {
     char const* names[modeNUM] = { //
-      "precalc", "static", "tr_eval", "probe", "tr_begin", "tr_restore",
+      "precalc", "static", "tr_eval", "probe", "tr_initial", "tr_begin", "tr_restore",
       "tr_advance", "tr_regress", "tr_review", "tr_accept"
     };
     return names[_mode];
@@ -55,9 +56,13 @@ public:
 
 public:
   bool is_dynamic()const { return _mode==modeDYNAMIC; }
-  bool is_static()const { return _mode==modeSTATIC || _mode==modeTR_BEGIN || _mode==modeTR_REVIEW ; } // || ...?
+  bool is_static()const { return _mode==modeSTATIC
+                              || _mode==modeTR_BEGIN
+                              || _mode==modeTR_INITIAL
+			      || _mode==modeTR_REVIEW ; } // || ...?
   bool is_precalc()const { return _mode==modePRECALC; }
   bool is_probe()const   { untested(); return _mode==modePROBE; }
+  bool is_tr_initial()const  { return _mode==modeTR_INITIAL; }
   bool is_tr_begin()const  { return _mode==modeTR_BEGIN; }
   bool is_tr_review()const  { untested(); return _mode==modeTR_REVIEW; }
   bool is_tr_accept()const  { return _mode==modeTR_ACCEPT; }
@@ -454,7 +459,7 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
     make_evt(o, *ev);
     //throw Exception("analogevtctl unsupported");
   }else if(auto is=dynamic_cast<AnalogInitialStmt const*>(&ab)) {
-    if(is_tr_begin()){
+    if(is_tr_initial()){
       make_initial(o, *is);
     }else{
       o__ "// omit initial\n";
@@ -667,8 +672,8 @@ void OUT_ANALOG::make_for(std::ostream& o, AnalogForStmt const& s) const
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_initial(std::ostream& o, AnalogInitialStmt const& s) const
 {
-  if(is_tr_begin()) {
-    o__ "{\n";
+  if(is_tr_initial()) {
+    o__ "{ // initial statement\n";
     make_ctrl(o, s.body());
     o__ "}\n";
   }else{
@@ -834,7 +839,7 @@ void OUT_ANALOG::make_seq_block(std::ostream& o, AnalogSeqBlock const& s) const
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_construct(std::ostream& o, AnalogConstruct const& ab) const
 {
-  if(is_tr_begin()){
+  if(is_tr_initial()){
   }else{
   }
 
@@ -1211,7 +1216,7 @@ static void make_cc_ac_begin(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_analog_list(std::ostream& o, const Module& m) const
 {
-  if(is_tr_begin()){
+  if(is_tr_initial() || is_tr_begin() ){
     o__ "//initial analog list\n";
     o__ "MOD_" << m.identifier() << " const* p = m;\n";
     o__ "MOD_" << m.identifier() << "* d = m;\n";
@@ -1236,12 +1241,12 @@ void OUT_ANALOG::make_analog_list(std::ostream& o, const Module& m) const
       o__ "// omit2 " << typeid(*bb).name() << "\n";
     }else if(auto in = dynamic_cast<AnalogInitialStmt const*>(bb)){
       o__ "// AnalogInitialStmt\n";
-      if(is_tr_begin()){
+      if(is_tr_initial()){
 	make_stmt(o, *in);
       }else{
       }
-    }else if(is_tr_begin()){
-      o__ "// is_tr_begin\n";
+    }else if(is_tr_initial()){
+      o__ "// is_tr_initial\n";
     }else if(auto ab = dynamic_cast<AnalogConstruct const*>(bb)){
       o__ "{ // AnalogConstruct\n";
       {
@@ -1306,8 +1311,10 @@ static void make_cc_common_tr(std::ostream& o, const Module& m, OUT_ANALOG::mode
 
   oo.make_load_variables(o, m);
   oo.make_analog_list(o, m);
-  if(oo.is_tr_begin()) {
+  if(oo.is_tr_initial()){
     o__ "m->_v_1 = m->_v_;\n";
+  }else if(oo.is_tr_begin()) {
+    o__ "// m->_v_1 = m->_v_;\n";
   }else{
   }
   o << "}\n"
@@ -1413,6 +1420,9 @@ void make_cc_analog(std::ostream& o, const Module& m)
   // assert(m.has_analog_block());
   // assert(m.has_analog_stuff()); // in always blocks..
   if(m.has_tr_begin_analog()){
+    o__ "// tr_initial ...\n";
+    make_cc_common_tr(o, m, OUT_ANALOG::modeTR_INITIAL, &tr_begin_tag);
+    o__ "// tr_begin ...\n";
     make_cc_common_tr(o, m, OUT_ANALOG::modeTR_BEGIN, &tr_begin_tag);
   }else{
     o__ "// !has_tr_begin_analog\n";

@@ -10,7 +10,7 @@ module test_strobe1()
 	analog begin : main
 		real one;
 		$strobe("0 %f", one);
-		one = 1.;
+		one = one + 1.;
 		if(one) begin
 			$strobe("1 %f", one);
 		end
@@ -30,7 +30,6 @@ list
 print dc iter(0)
 dc
 
-options gmin 1e-6
 print tr iter(0)
 tr 1
 status notime

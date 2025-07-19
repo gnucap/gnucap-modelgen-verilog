@@ -184,6 +184,7 @@ private:
     // o________ "set_event(d, delay, 0);\n";
     o______ "d->q_accept();\n"; // BUG. don't know where to put it.
 				// need to recover when omitted.
+    o______ "return false;\n"; // _previous_evt == 0.;\n";
     o______ "return _previous_evt == 0.;\n";
     o____ "}\n";
     /*----------------------------------------------------------------------*/
@@ -362,6 +363,13 @@ private:
     /*----------------------------------------------------------------------*/
     o____ "bool tr_accept_static" << args() << " {\n";
     o______ "(void)tol;\n";
+    o______ "trace5(\"timer::tr_accept static\", _sim->_time0, _req_evt, _previous_evt, delay, _sim->analysis_is_static());\n";
+    o______ "bool accept_init = false;\n";
+    o______ "if(!_previous_evt) {\n";
+    o________ "_previous_evt = 0.;\n";
+    o________ "accept_init = true;\n";
+    o______ "}else{\n";
+    o______ "}\n";
     o______ "if(delay){\n";
     o________ "_previous_evt = -NEVER;\n";
     o________ "_req_evt = delay;\n";
@@ -377,14 +385,15 @@ private:
     o________ "set_event(d, _req_evt, " << tol() << ");\n";
     o______ "}\n";
     o______ "assert(is_q(_req_evt));\n";
+    o______ "trace5(\"timer::tr_accept done s\", _sim->_time0, _req_evt, _previous_evt, delay, _sim->analysis_is_static());\n";
     o______ "if(!delay) {\n";
     o________ "_previous_evt = 0.;\n";
     o______ "}else{\n";
     o______ "}\n";
-    o______ "trace6(\"timer::tr_accept done s\", _sim->_time0, _req_evt, _sim->_dtmin, _previous_evt, delay, _sim->analysis_is_static());\n";
     o______ "assert(is_q(_sim->_time0));\n";
     o______ "assert(is_q(_req_evt));\n";
-    o______ "return !delay && en;\n";
+  //  o______ "return true;\n";
+    o______ "return (!delay || accept_init) && en;\n";
     o____ "}\n";
     /*----------------------------------------------------------------------*/
     o____ "bool tr_accept" << args() << " {\n";

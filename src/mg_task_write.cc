@@ -136,6 +136,18 @@ private:
     o << ")const { (void)d; }\n";
 
     assert(_m);
+    o____ "void tr_initial(MOD_" <<_m->identifier()<<"* d, std::string s";
+    for(size_t i=1; i<num_args(); ++i) {
+      o____  ", double a" << i << "";
+    }
+    o << ")const {\n";
+    o______ "tr_accept(d, s\n";
+    for(size_t i=1; i<num_args(); ++i) {
+      o << ", a" << i;
+    }
+    o << ");\n";
+    o____"}\n";
+
     o____ "void tr_begin(MOD_" <<_m->identifier()<<"* d, std::string s";
     for(size_t i=1; i<num_args(); ++i) {
       o____  ", double a" << i << "";
@@ -143,11 +155,7 @@ private:
     o << ")const {\n";
     o______ "trace1(\"write::tr_begin\", _sim->_time0);\n";
     //o______ "assert(d); return d->q_accept();\n";
-    o______ "tr_accept(d, s\n";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", a" << i;
-    }
-    o << ");\n";
+    o______ " assert(d); d->q_accept();\n";
     o____"}\n";
 
     o____ "void tr_review("; args(o); o << ") {\n";

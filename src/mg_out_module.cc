@@ -428,11 +428,13 @@ static void make_tr_begin(std::ostream& o, const Module& m)
   o__ "assert(c);\n";
   o__ "(void)c;\n";
   if(m.has_tr_begin_analog()) {
-  o__ "c->tr_begin_analog(this);\n"; // call from COMMON::tr_begin?
+    o__ "c->tr_initial_analog(this);\n"; // call from COMMON::tr_begin?
+    o__ "c->tr_begin_analog(this);\n"; // call from COMMON::tr_begin?
   }else{
   }
   if(m.has_tr_begin_digital()) { untested();
-  o__ "c->tr_begin_digital(this);\n"; // call from COMMON::tr_begin?
+    o__ "c->tr_initial_digital(this);\n"; // call from COMMON::tr_begin?
+    o__ "c->tr_begin_digital(this);\n"; // call from COMMON::tr_begin?
   }else{
   }
   o << "}\n"

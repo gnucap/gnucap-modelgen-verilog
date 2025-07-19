@@ -4947,6 +4947,7 @@ private: // func decl
     return _b_ddt_1(t0);
   }
   ddouble _b_ddt_1tr_restore(ddouble t0){
+(void)t0;
     return 0.;
   }
   ddouble _b_ddt_1tr_accept(ddouble t0) {
@@ -5918,6 +5919,7 @@ private: // func decl
     return _b_ddt_2(t0);
   }
   ddouble _b_ddt_2tr_restore(ddouble t0){
+(void)t0;
     return 0.;
   }
   ddouble _b_ddt_2tr_accept(ddouble t0) {

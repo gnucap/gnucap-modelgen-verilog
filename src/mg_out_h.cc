@@ -336,6 +336,7 @@ static void make_common(std::ostream& o, const Module& m)
   }else{
   }
   if(m.has_tr_begin_analog()) {
+    o__ "void tr_initial_analog(MOD_" << m.identifier() << "*)const;\n";
     o__ "void tr_begin_analog(MOD_" << m.identifier() << "*)const;\n";
   }else{
   }
