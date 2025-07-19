@@ -236,6 +236,8 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
       o__ lhsname << " = t0; // (prec)\n";
     }else if(is_static()){
       o__ lhsname << " = t0.value(); // (s)\n";
+    }else if(_mode==modeTR_RESTORE){
+      o__ lhsname << " = t0.value(); // (s)\n";
     }else if(_mode==modeTR_ADVANCE){
       o__ lhsname << " = t0.value(); // (s)\n";
     }else if(_mode==modeTR_REGRESS){

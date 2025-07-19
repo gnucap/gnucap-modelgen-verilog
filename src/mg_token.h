@@ -164,7 +164,7 @@ public:
   explicit Token_PARLIST_(Token_PARLIST_ const& p)
     : Token_PARLIST(p) { assert(!_args); }
   explicit Token_PARLIST_(const std::string Name, Base* L=nullptr)
-    : Token_PARLIST(Name, L) { untested(); assert(!L); assert(!_args); }
+    : Token_PARLIST(Name, L) { assert(!L); assert(!_args); }
   ~Token_PARLIST_() { delete _args; _args = nullptr; }
 /*--------------------------------------------------------------------------*/
 public:

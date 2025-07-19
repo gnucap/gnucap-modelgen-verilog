@@ -14,6 +14,11 @@ connected: p
 connected: p
 connected: p
 connected: n
+connected: n
+connected: p
+connected: p
+connected: p
+connected: n
  27.       
 Gnucap   System status
 iterations: op=2, dc=0, tran=0, fourier=0, total=2

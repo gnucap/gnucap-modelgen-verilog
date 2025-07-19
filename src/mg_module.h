@@ -257,6 +257,7 @@ public:
   void set_tr_advance(mode_mask_t m=mm_ANALOG) {set_pid(if_TR_ADVANCE, m);}
 
 private:
+  void import_flags(FUNCTION_ const*);
   void set_pid  (iface_id_t p, mode_mask_t m=mm_ANALOG) {_has_pid[p] = (mode_mask_t)(_has_pid[p] | m);}
 
 public:

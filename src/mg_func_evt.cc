@@ -108,6 +108,7 @@ private:
   bool has_tr_review()const override {return true;}
   bool has_tr_accept()const override {return true;}
   bool has_tr_advance()const override {return true;}
+  bool has_tr_restore()const override { return false;}
   // bool is_class()const override { untested();return true;}
 
   Token* new_token(Module& m, size_t na)const override {
@@ -126,10 +127,6 @@ private:
       cl->_m = &m;
       m.push_back(cl);
       // BUG: use has_* above
-      m.set_tr_begin();
-      m.set_tr_review();
-      m.set_tr_advance();
-      m.set_tr_accept();
       m.set_times(2);
     }
     return new Token_EVT(label(), cl);
@@ -152,6 +149,7 @@ private:
     make_tr_eval(o);
     make_tr_begin(o);
     make_tr_accept(o);
+    make_tr_restore(o);
 
     o____ "bool tr_advance(" << args(o) << ") {\n";
     o______ "(void)d;\n";
@@ -324,6 +322,17 @@ protected:
     o______ "}else{\n";
     o________ "return false;\n";
     o______ "}\n";
+    o____ "}\n";
+  }
+  virtual void make_tr_restore(std::ostream& o)const {
+    o____ "bool tr_restore(" << args(o) << ") {\n";
+    o______ "(void)d;\n";
+    o______ "(void)time_tol;\n";
+    o______ "(void)expr_tol;\n";
+    o______ "(void)input;\n";
+    o______ "(void)dir;\n";
+    o______ "(void)enable;\n";
+    o______ "return false;\n"; // incomplete.
     o____ "}\n";
   }
   virtual void make_tr_accept(std::ostream& o)const {

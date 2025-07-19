@@ -1205,6 +1205,34 @@ void Module::dump_variables(std::ostream& o) const
   }
 }
 /*--------------------------------------------------------------------------*/
+void Module::import_flags(FUNCTION_ const* f)
+{
+  if(f->has_tr_begin()){
+    set_tr_begin();
+  }else{
+  }
+  if(f->has_tr_restore()){
+    set_tr_restore();
+  }else{
+  }
+  if(f->has_tr_review()){
+    set_tr_review();
+  }else{
+  }
+  if(f->has_tr_advance()){
+    set_tr_advance();
+  }else{
+  }
+  if(f->has_tr_accept()){
+    set_tr_accept();
+  }else{
+  }
+  if(f->has_set_event()){
+    set_set_event();
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
 Token* Module::new_token(FUNCTION const* f_, size_t num_args)
 {
   auto f = prechecked_cast<FUNCTION_ const*>(f_);
@@ -1233,8 +1261,13 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args)
       t = new Token_CALL(f->label(), f);
     }else{
     }
+  }else if( (t = f->new_token(*this, num_args)) ){
+    import_flags(f);
   }else{
-    t = f->new_token(*this, num_args);
+    // call?
+    // import_flags..
+    incomplete();
+    assert(t);
   }
 
   return t;

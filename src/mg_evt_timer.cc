@@ -50,6 +50,7 @@ private:
   bool has_tr_review()const override {return true;}
   bool has_tr_accept()const override {return true;}
   bool has_tr_advance()const override {return true;}
+  bool has_set_event()const override {return true;}
   // bool is_class()const override { untested();return true;}
 
   Token* new_token(Module& m, size_t na)const override {
@@ -67,13 +68,6 @@ private:
       cl->_m = &m;
       m.push_back(cl);
       m.set_times(2);
-      // TODO
-      m.set_tr_begin();
-      m.set_tr_restore();
-      m.set_tr_review();
-      m.set_tr_advance();
-      m.set_set_event();
-      m.set_tr_accept();
     }
     return new Token_EVT(label(), cl);
   }

@@ -202,6 +202,12 @@ public:
     o__ "ddouble " << raw_code_name() << "tr_regress("; args(o); o << "){\n";
     o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
     o__ "}\n";
+    o__ "ddouble " << raw_code_name() << "tr_restore("; args(o); o << "){\n";
+    for(size_t n=0; n<num_args(); ++n){
+      o << "(void)t" << n << ";\n";
+    }
+    o____ "return 0.;\n"; // incomplete?
+    o__ "}\n";
 
   }
   void make_cc_impl_comm(std::ostream&)const{ untested();
