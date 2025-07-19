@@ -628,7 +628,7 @@ void Token_CALL::stack_op(Expression* e) const
     if(f){
       // this is wrong. need different token...
       try{
-	f->stack_op(*arg_expr, E);
+	::stack_op(f, *arg_expr, E);
       }catch(Exception const&){
 	// incomplete(); later
 	f = nullptr;

@@ -92,7 +92,6 @@ public: // code generation
   }
   using FUNCTION::stack_op;
   void stack_op(Expression*)const override = 0;
-  void stack_op(Expression const& args, Expression* out) const;
   virtual double evalf(double const*)const {
     throw Exception("not implemented");
   }
@@ -237,6 +236,8 @@ inline FUNCTION_::~FUNCTION_()
   }
 //  assert(!has_refs()); // base class
 }
+/*--------------------------------------------------------------------------*/
+void stack_op(FUNCTION_ const* f, Expression const& args, Expression* out);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
