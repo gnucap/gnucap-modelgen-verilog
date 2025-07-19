@@ -71,7 +71,7 @@ class DDX : public MGVAMS_FILTER {
   mutable Probe const* _ddxprobe{nullptr}; // hack.
 public:
   explicit DDX(){ set_label("ddx"); }
-  DDX* clone()const /*override*/{
+  DDX* clone()const override {
     return new DDX(*this);
   }
   Token* new_token(Module& m, size_t na)const override{

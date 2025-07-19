@@ -82,7 +82,7 @@ protected:
   ~XDT(){
 //    delete _prb;
   }
-  virtual XDT* clone()const = 0;
+  virtual XDT* clone()const override = 0;
   std::string id()const {
     assert(_m);
     return _m->identifier().to_string();

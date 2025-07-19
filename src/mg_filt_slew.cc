@@ -41,7 +41,7 @@ public:
   explicit SLEW() : MGVAMS_FILTER() {
     set_label("slew");
   }
-  SLEW* clone()const /*override*/{
+  SLEW* clone()const override {
     return new SLEW(*this);
   }
   std::string code_name()const override {

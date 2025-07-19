@@ -93,7 +93,7 @@ public: // HACK
   ~TRANSITION(){
 //    delete _prb; belongs to _m
   }
-  virtual TRANSITION* clone()const {
+  virtual TRANSITION* clone()const override {
     return new TRANSITION(*this);
   }
 protected:

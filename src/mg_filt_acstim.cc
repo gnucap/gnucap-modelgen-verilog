@@ -100,7 +100,7 @@ public: // HACK
   }
   bool static_code()const override {return false;}
 protected:
-  ACSTIM* clone()const {
+  ACSTIM* clone()const override {
     return new ACSTIM(*this);
   }
   void make_assign(std::ostream&)const { untested();

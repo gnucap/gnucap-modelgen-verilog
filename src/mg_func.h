@@ -51,6 +51,10 @@ public:
 //  	_label = l;
 //  }
   ~FUNCTION_();
+  virtual FUNCTION_* clone()const { untested();
+         unreachable();
+         return nullptr;
+  }
 
 public: // characteristics
   std::string const& label()const { return short_label(); }
@@ -110,10 +114,6 @@ class MGVAMS_FUNCTION : public FUNCTION_ {
   }
 public:
   ~MGVAMS_FUNCTION() {}
-  virtual MGVAMS_FUNCTION* clone()const { untested();
-	  unreachable();
-	  return nullptr;
-  }
   virtual void make_cc_dev(std::ostream&)const override {}
 //  Token* new_token(Module& m, size_t na) const override;
   bool static_code()const override {return true;}
@@ -156,7 +156,6 @@ public:
    // _rdeps = p._rdeps.clone();
   }
   ~MGVAMS_EVENT() {} //  {delete _rdeps;}
-  virtual MGVAMS_EVENT* clone()const {untested(); unreachable(); return nullptr; }
 
  // RDeps const& rdeps() {
  //   assert(_rdeps);
@@ -199,10 +198,6 @@ class MGVAMS_TASK : public FUNCTION_ {
   }
 public:
   ~MGVAMS_TASK() {}
-  virtual MGVAMS_TASK* clone()const { untested();
-	  unreachable();
-	  return nullptr;
-  }
   std::string code_name()const override{ untested();
 	  return "";
   }

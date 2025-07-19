@@ -75,7 +75,7 @@ public: // HACK
   }
   bool static_code()const override {return false;}
 protected:
-  NOISE* clone()const {
+  NOISE* clone()const override {
     return new NOISE(*this);
   }
   void make_assign(std::ostream&)const { untested();

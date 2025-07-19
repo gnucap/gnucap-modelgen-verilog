@@ -96,7 +96,7 @@ protected:
   ~ZIF(){
 //    delete _prb; belongs to _m
   }
-  virtual ZIF* clone()const = 0;
+  virtual ZIF* clone()const override = 0;
   void set_code_name(std::string x){
     _code_name = x;
   }

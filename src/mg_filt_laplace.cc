@@ -93,7 +93,7 @@ protected:
   ~LAP(){
 //    delete _prb; belongs to _m
   }
-  virtual LAP* clone()const = 0;
+  virtual LAP* clone()const override = 0;
   void set_code_name(std::string x){
     _code_name = x;
   }

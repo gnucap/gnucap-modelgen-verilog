@@ -91,7 +91,7 @@ public: // HACK
   ~ABSDELAY(){
 //    delete _prb; belongs to _m
   }
-  virtual ABSDELAY* clone()const {
+  virtual ABSDELAY* clone()const override {
     return new ABSDELAY(*this);
   }
 protected:
