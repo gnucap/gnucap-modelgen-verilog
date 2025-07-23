@@ -99,6 +99,8 @@ public: // HACK
 //    delete _prb;
   }
   bool static_code()const override {return false;}
+  bool is_common()const override {return false;}
+  bool has_state()const override {return true;}
 protected:
   ACSTIM* clone()const override {
     return new ACSTIM(*this);
@@ -109,7 +111,7 @@ protected:
     _code_name = x;
   }
   std::string code_name()const override{
-    return "d->" + _code_name;
+    return _code_name;
   }
 public:
   Token* new_token(Module& m, size_t na)const override {

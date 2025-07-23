@@ -91,6 +91,9 @@ public:
     return "/*DDX*/" + label();
   }
   bool has_precalc()const override {return false;}
+  bool is_common()const override {return true;}
+  bool static_code()const override {return false;}
+  bool needs_context()const override {return false;} // BUG
   void make_cc_dev(std::ostream&)const override{ }
   void make_cc_common(std::ostream& o)const override{
     o__ "class FILTER" << label() << "{\n";

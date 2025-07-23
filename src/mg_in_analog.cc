@@ -1713,6 +1713,8 @@ public:
 
  // bool context_arg()const override { return true; }
   bool is_common()const override { return true; }
+  bool needs_context()const { return true; }
+ // bool has_state()const override { return true; }
   // TODO: fix linear search
   bool is_output_arg(int I)const override {
     assert(_af);

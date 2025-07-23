@@ -608,10 +608,19 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
 	s.new_ddouble(o);
 	o__ s.code_name() << " = ";
       }
+      if(_ctx=="adjust"){
+      }else if((*F)->is_in_common()) {
+      }else{
+	o << "/*a*/ d->";
+      }
 
       o << F->code_name();
       if((*F)->has_modes()){
-	o << _ctx;
+	if(_ctx=="adjust"){
+	  o << "precalc";
+	}else{
+	  o << _ctx;
+	}
       }else if(_ctx=="precalc" && (*F)->has_precalc()){
 	// TODO: cleanup.
 	o << "__" + _ctx;
@@ -620,8 +629,12 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
 
       o << "(";
       std::string comma = "";
-      if((*F)->is_common()){
-	o << "d /*is_common*/";
+     // if(_ctx=="precalc"){
+     // }else
+      if(_ctx=="adjust"){
+	// there is no context in adjust
+      }else if((*F)->needs_context()){
+	o << "d /* "<<_ctx<<"*/";
 	comma = ", ";
       }else{
       }

@@ -64,6 +64,9 @@ protected:
   std::string raw_code_name()const {return _code_name;}
 public:
   bool has_modes()const override {return true;}
+  bool has_state()const override {return true;}
+  bool is_common()const override {return false;} // TODO
+  bool needs_context()const override {return false;} // TODO
   bool has_tr_begin()const override {return false;}
   bool has_tr_review()const override {return false;}
   bool has_tr_accept()const override {return false;}
@@ -92,7 +95,7 @@ protected:
     _code_name = x;
   }
   std::string code_name()const override{
-    return "/*XDT*/ d->" + _code_name;
+    return "/*XDT*/" + _code_name;
   }
   virtual int max_args()const = 0;
 public:

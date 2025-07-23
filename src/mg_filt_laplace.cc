@@ -98,7 +98,7 @@ protected:
     _code_name = x;
   }
   std::string code_name()const override{
-    return "/*LAP*/ d->" + _code_name;
+    return _code_name;
   }
 public:
   void set_n_to_gnd()const {

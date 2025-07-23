@@ -49,9 +49,10 @@ class LIMIT : public MGVAMS_TASK {
     return new Token_CALL("$limit", cl);
   }
   std::string code_name()const override{
-    return "d->" + label();
+    return label();
   }
   bool has_modes()const override {return true;}
+  bool has_state()const override {return true;}
   void make_cc_common(std::ostream&)const override {
     // nothing.
   }
@@ -65,6 +66,7 @@ class LIMIT : public MGVAMS_TASK {
       o << ", double const& a" << i;
     }
     o << "){\n";
+    o______ "(void)d;\n";
    // o______ "double old = in;\n";
    // o______ "auto dd=prechecked_cast<MOD const*>(d);\n";
     o______ "auto cc=prechecked_cast<COMMON const*>(d->common());\n";

@@ -1,0 +1,37 @@
+verilog
+
+attach ./modelgen_1.so
+attach vams/resistor.so
+
+`modelgen
+module test_rdist_lp0(p, n)
+	electrical p,n;
+	inout p,n;
+	parameter real r0 = 1k;
+	parameter integer seed = 0;
+	localparam real r = $rdist_normal(seed, r0, r0/100);
+
+	analog begin
+		I(p, n) <+ V(p, n) / r;
+	end
+endmodule
+`endmodelgen
+
+!make test_rdist_lp0.so > /dev/null
+attach ./test_rdist_lp0.so
+
+
+ground gnd;
+parameter integer s=0;
+
+isource #(.dc(1.)) r1(gnd, n1);
+isource #(.dc(1.)) r2(gnd, n2);
+isource #(.dc(1.)) r3(gnd, n3);
+isource #(.dc(1.)) r4(gnd, n4);
+test_rdist_lp0 #(.seed(s), .r0(1.)) dut1(gnd, n1);
+test_rdist_lp0 #(.seed(s), .r0(1.)) dut2(gnd, n2);
+test_rdist_lp0 #(.seed(s), .r0(1.)) dut3(gnd, n3);
+test_rdist_lp0 #(.seed(s), .r0(1.)) dut4(gnd, n4);
+
+print dc v(n*)
+dc s 100 1000 100

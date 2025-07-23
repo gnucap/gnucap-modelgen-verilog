@@ -45,7 +45,7 @@ public:
     return new SLEW(*this);
   }
   std::string code_name()const override {
-    return "d->" + label();
+    return label();
   }
 private:
   Token* new_token(Module& m, size_t na)const override{

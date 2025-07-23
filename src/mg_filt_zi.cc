@@ -101,7 +101,7 @@ protected:
     _code_name = x;
   }
   std::string code_name()const override{
-    return "/*ZIF*/ d->" + _code_name;
+    return _code_name;
   }
 public:
   // Token* new_token(Expression_ const* e) ...

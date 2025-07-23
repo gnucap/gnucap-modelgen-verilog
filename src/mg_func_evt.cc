@@ -65,7 +65,9 @@ public:
   }
   ~INITIAL_STEP(){ }
 private:
-  bool static_code()const override {return false;} // really?
+  bool static_code()const override {return true;}
+  bool needs_context()const override {return false;}
+  bool is_common()const override {return true;}
   Token* new_token(Module& m, size_t)const override {
     m.set_tr_advance();
     m.install(this);
@@ -101,8 +103,7 @@ public:
   ~CROSS(){ }
   virtual CROSS* clone()const override {return new CROSS(*this);}
 private:
-  bool static_code()const override {return false;}
-  bool is_common()const override {return true;}
+  bool is_common()const override {return false;}
   bool has_modes()const override {return true;}
   bool has_tr_begin()const override {return true;}
   bool has_tr_review()const override {return true;}
@@ -246,17 +247,16 @@ private:
   }
   // "call_name"...
   std::string code_name()const override{
-    return "d->"+_code_name+".";
+    return _code_name+".";
   }
 //   void stack_op(Expression const& args, Expression* out) const override { untested();
 //     incomplete();
 //   }
   void make_cc_common(std::ostream& o)const override {
-    incomplete();
-    o__ "bool " << _code_name << "()const {\n";
-    o____ "incomplete();\n";
-    o____ "assert(0);\n";
-    o__ "}\n";
+   // o__ "bool " << _code_name << "()const {\n";
+   // o____ "incomplete();\n";
+   // o____ "assert(0);\n";
+   // o__ "}\n";
   }
 protected:
   virtual std::string args(std::ostream& o)const {

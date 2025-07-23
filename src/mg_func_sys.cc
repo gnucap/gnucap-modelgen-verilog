@@ -45,7 +45,9 @@ public:
   std::string code_name()const override{
     return "_f_analysis";
   }
-  bool static_code()const override {return false;}
+  bool static_code()const override {return true;}
+  bool is_common()const override {return true;}
+  bool has_state()const override {return false;}
   Token* new_token(Module& m, size_t)const override {
     m.set_analysis();
     m.install(this);
@@ -141,7 +143,8 @@ public:
   }
   ~PARAM_GIVEN(){ }
 private:
-  bool static_code()const override {return false;}
+  bool static_code()const override {return true;}
+  bool is_common()const override {return true;}
   Token* new_token(Module& m, size_t)const override {
     m.install(this);
     return new Token_PG(label(), this);

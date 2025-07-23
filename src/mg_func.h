@@ -73,12 +73,16 @@ public: // characteristics
   virtual bool has_tr_advance()const{return false;}
   virtual bool has_tr_regress()const{return has_tr_advance();}
   virtual bool has_set_event()const {return false;}
-
-  virtual bool static_code()const {return false;}
-  virtual bool is_common()const {return false;}
+  virtual bool has_state()const {return false;}
   virtual bool has_modes()const {return false;}
-  virtual bool context_arg()const {return false;}
 
+public: // non-virtual. TODO
+  virtual bool static_code()const {return false;}
+  virtual bool is_common()const {return static_code();}
+  virtual bool is_in_common()const {return is_common();}
+  virtual bool needs_context()const {
+    return (is_common() && !static_code())
+       ||  (is_common() && has_tr_accept()) ;}
   virtual bool returns_void()const { return false; } // use return_type?
 
 public: // code generation
@@ -125,42 +129,10 @@ private:
     throw Exception("invalid");
   }
 public:
-  MGVAMS_EVENT() : FUNCTION_() {
-//    if(has_tr_restore()){
-//      add_rdep(&tr_begin_tag);
-//    }else{
-//    }
-//    if(has_tr_begin()){
-//      add_rdep(&tr_begin_tag);
-//    }else{
-//    }
-//    if(has_tr_eval()){
-//      add_rdep(&tr_eval_tag);
-//    }else{ untested();
-//    }
-//    if(has_tr_review()){
-//      add_rdep(&tr_review_tag);
-//    }else{
-//    }
-//    if(has_tr_accept()){
-//      add_rdep(&tr_accept_tag);
-//    }else{
-//    }
-//    if(has_tr_advance()){
-//      add_rdep(&tr_advance_tag);
-//    }else{
-//    }
-  }
-  MGVAMS_EVENT(MGVAMS_EVENT const& p) : FUNCTION_(p) {
-   // assert(p._rdeps());
-   // _rdeps = p._rdeps.clone();
-  }
+  MGVAMS_EVENT() : FUNCTION_() { }
+  MGVAMS_EVENT(MGVAMS_EVENT const& p) : FUNCTION_(p) { }
   ~MGVAMS_EVENT() {} //  {delete _rdeps;}
-
- // RDeps const& rdeps() {
- //   assert(_rdeps);
- //   return _rdeps;
- // }
+  bool needs_context()const override{ return true; }
 };
 /*--------------------------------------------------------------------------*/
 class Node_Ref;

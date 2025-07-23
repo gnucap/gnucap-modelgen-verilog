@@ -37,6 +37,8 @@ public:
     set_label("bound_step");
   }
   bool has_modes()const override {return true;}
+  bool is_common()const override {return false;}
+  bool has_state()const override {return true;}
   bool has_tr_review()const override {return true;}
 private:
   std::string eval(CS&, const PARAM_LIST*)const override{ untested();
@@ -49,7 +51,7 @@ private:
     return new Token_CALL("$bound_step", this);
   }
   std::string code_name()const override{
-    return "d->_f_bound_step_";
+    return "_f_bound_step_";
   }
   void make_cc_dev(std::ostream& o)const override {
     // o__ "double _bound_step{NEVER};\n";
@@ -95,7 +97,7 @@ private:
     o__ "void t_finish__precalc(double x){return t_finish(int(x));}\n";
   }
   std::string code_name()const override{
-    return "d->" + label();
+    return label();
   }
   bool returns_void()const override { return true; }
 } finish;

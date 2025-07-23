@@ -51,12 +51,12 @@ static void make_final_adjust_eval_local_parameter(std::ostream& o, const Parame
   //   out << "    this->" << p.code_name() << " = " << p.calculate() << ";\n";
   // }else{ untested();
   // }
-  o__ "{\n";
+  o__ "{ // final adjust localparam\n";
 //  o__ p.type() << " val = ";
   if (!(p.default_val().empty())) {
     // o << p.default_val();
     indent i2;
-    make_cc_expression(o, p.default_val().expression());
+    make_cc_expression(o, p.default_val().expression(), false, "adjust");
   }else{ untested();
     o << "NA;";
   }

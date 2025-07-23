@@ -44,6 +44,8 @@ public:
 private:
   bool static_code()const override {return false;}
   bool is_common()const override {return true;}
+  bool is_in_common()const override {return false;}
+  bool has_state()const override {return true;}
   bool has_modes()const override {return true;}
   bool has_tr_begin()const override {return true;}
   bool has_tr_restore()const override {return true;}
@@ -118,11 +120,7 @@ private:
     o____ "}\n";
     /*----------------------------------------------------------------------*/
     o__ "public:\n";
-    o____ "bool precalc(void*,\n";
-    o____ "             double, double period=0., double tol=0., int en=1) {\n";
-    o______ "(void)period;\n";
-    o______ "(void)tol;\n";
-    o______ "(void)en;\n";
+    o____ "bool precalc(CARD*, double, double=0., double=0., double=0., double=0.) {\n";
     o______ "return false;\n";
     o____ "}\n";
     /*----------------------------------------------------------------------*/
@@ -465,7 +463,7 @@ private:
   }
   // "call_name"...
   std::string code_name()const override{
-    return "d->"+_code_name+".";
+    return _code_name+".";
   }
 //   void stack_op(Expression const& args, Expression* out) const override { untested();
 //     incomplete();

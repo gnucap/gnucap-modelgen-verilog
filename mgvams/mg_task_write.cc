@@ -65,7 +65,7 @@ private:
     o__ "}\n";
   }
   std::string code_name()const override{
-    return "d->" + label();
+    return "/*d*/" + label();
   }
   bool returns_void()const override { return true; }
 } debug;
@@ -83,8 +83,11 @@ private:
   WRITE* clone()const override {
     return new WRITE(*this);
   }
-  bool is_common()const override {return true;} // extra CARD*
-  bool has_modes()const override {return true;}
+  bool is_common()const override {untested(); return true;}
+  bool is_in_common()const override { return false;} // BUG?
+  bool has_modes()const override { return true;}
+  bool has_state()const override {untested(); return false;}
+  bool needs_context()const override { return true;} // has accept?
   bool has_tr_review()const override {return true;}
   bool has_tr_advance()const override {return true;}
   bool has_tr_regress()const override { untested();return false;}
@@ -94,7 +97,7 @@ private:
   bool static_code()const override {return false;}
   // Token* new_token(Module&, size_t)const override{ return nullptr; }
   void args(std::ostream& o, bool names=false)const {
-    o << "MOD* d, std::string";
+    o << "std::string";
     for(size_t i=1; i<num_args(); ++i) {
       o____  ", double";
       if(names){ untested();
@@ -118,6 +121,7 @@ private:
     }
     o << ")const { (void)d; }\n";
 
+    o____ "template<class MOD>\n";
     o____ "void tr_initial(MOD* d, std::string s";
     for(size_t i=1; i<num_args(); ++i) {
       o____  ", double a" << i << "";
@@ -130,6 +134,7 @@ private:
     o << ");\n";
     o____"}\n";
 
+    o____ "template<class MOD>\n";
     o____ "void tr_begin(MOD* d, std::string";
     for(size_t i=1; i<num_args(); ++i) {
       o____  ", double a" << i << "";
@@ -141,22 +146,24 @@ private:
     o______ " assert(d); d->q_accept();\n";
     o____"}\n";
 
-    o____ "void tr_review("; args(o); o << ") {\n";
+    o____ "template<class MOD>\n";
+    o____ "void tr_review(MOD* d, "; args(o); o << ") {\n";
     o______ "(void)d;\n";
     o______ " assert(d); d->q_accept();\n";
     o____"}\n";
 
-    o____ "void tr_advance("; args(o); o << ") {\n";
+    o____ "template<class MOD>\n";
+    o____ "void tr_advance(MOD* d, "; args(o); o << ") {\n";
     o______ "(void)d;\n";
     o______ "trace1(\"write::tr_advance\", _sim->_time0);\n";
     o______ "assert(d); d->q_accept();\n";
     o____"}\n";
 
-    o____ "void tr_regress("; args(o); o << ") {\n";
-    o______ "(void)d;\n";
+    o____ "void tr_regress(CARD*, "; args(o); o << ") {\n";
     o____"}\n";
 
-    o____ "void tr_accept(CARD*, std::string a0";
+    o____ "template<class MOD>\n";
+    o____ "void tr_accept(MOD*, std::string a0";
     for(size_t i=1; i<num_args(); ++i) {
       o____  ", double a" << i << "";
     }
@@ -173,11 +180,11 @@ private:
     o << ");\n";
     o____ "}\n";
 
-    o____ "void precalc("; args(o); o << ") { (void)d; /*nop*/ }\n";
+    o____ "void precalc(CARD const*, "; args(o); o << ")const { /*nop*/ }\n";
     o__ "}_" << label() << ";\n";
   }
   std::string code_name()const override{
-    return "d->_" + label() + ".";
+    return "/*w*/_" + label() + ".";
   }
   bool returns_void()const override { return true; }
   virtual std::string end()const{return "";}

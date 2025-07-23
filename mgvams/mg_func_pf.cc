@@ -124,7 +124,7 @@ private:
   }
   bool has_precalc()const override {return true;}
   std::string code_name()const override{
-    return "d->PORT_FLOW";
+    return "PORT_FLOW";
   }
   void make_cc_dev(std::ostream& o)const override {
     o << "  " <<  "double PORT_FLOW(int i){\n";

@@ -31,30 +31,32 @@
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
-class RDIST : public MGVAMS_TASK {
+class RDIST : public MGVAMS_FUNCTION {
 private:
   std::string _what;
   std::string _args;
 public:
   explicit RDIST(std::string const& what, std::string const& args)
-    : MGVAMS_TASK(), _what(what), _args(args) {
+    : MGVAMS_FUNCTION(), _what(what), _args(args) {
     set_label("$rdist_"+what);
   }
 protected:
-  RDIST(RDIST const& p) : MGVAMS_TASK(p), _what(p._what), _args(p._args) {}
-  MGVAMS_TASK* clone()const override {return new RDIST(*this);}
+  RDIST(RDIST const& p) : MGVAMS_FUNCTION(p), _what(p._what), _args(p._args) {}
+  MGVAMS_FUNCTION* clone()const override {return new RDIST(*this);}
 private:
-  bool is_common()const override {return true;} // extra CARD*
+  bool is_common()const override {return false;} // extra CARD* arg
+  bool needs_context()const override {return true;}
+  bool has_precalc()const override {return false;}
   bool has_modes()const override {return true;}
   bool has_tr_begin()const override {return true;}
   bool has_tr_review()const override {return true;}
   bool has_tr_accept()const override {return true;}
   bool has_tr_advance()const override {return true;}
   bool returns_void()const override { return false; }
+  bool static_code()const override {return false;}
 private:
-  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
-    unreachable(); // SFCALL won't eval
-    return "$$rdist_"+_what;
+  void stack_op(Expression*)const override {
+    throw Exception("invalid");
   }
   Token* new_token(Module&, size_t)const override {
    return nullptr; // leave it to m;
@@ -86,16 +88,26 @@ private:
       }
     }
   }
+  void make_cc_common(std::ostream&o)const override {
+    o__ "struct cls" << label() << "{\n";
+    o__ "  double _value{0};\n";
+
+    o____ "double precalc(int32_t&"; args(o); o << ")const {\n";
+    voidargs(o);
+    o______ "unreachable(); return 0.;\n";
+    o____ "}\n";
+    o____ "double precalc(int32_t const& slot"; args(o); o << ")const {\n";
+    voidargs(o);
+    o______ "return rdist::"+_what+"(random_seed(slot)"; argnames(o); o << ");\n";
+    o____ "}\n";
+    o__ "}_" << label() << ";\n";
+  }
+  void make_cc_impl(std::ostream&)const override {
+    // o____ "double COMMON::cls" << label() << "::tr_advance(MOD* d, int32_t& seed"; args(o); o << ") {\n";
+  }
   void make_cc_dev(std::ostream& o)const override {
     o__ "struct cls" << label() << "{\n";
     o____ "double _value{0};\n";
-    o____ "int32_t _seed{0};\n";
-
-    o____ "double precalc(CARD*, int32_t& seed"; args(o); o << ") {\n";
-    o______ "trace3(\"random::precalc\", CKT_BASE::_sim->_time0, seed, _value);\n";
-    o______ "(void)seed;\n"; voidargs(o);
-    o______ "return _value;\n";
-    o____ "}\n";
 
     o____ "double precalc(CARD*, int32_t const& seed"; args(o); o << "){\n";
     o______ "trace3(\"random::precalc1\", CKT_BASE::_sim->_time0, seed, _value);\n";
@@ -124,7 +136,7 @@ private:
     o____ "}\n";
 
     o____ "double tr_eval(CARD*, int32_t const& seed"; args(o); o << ") {\n";
-    o______ "trace3(\"random::eval\", _seed, seed, _value);\n";
+    o______ "trace2(\"random::eval\", seed, _value);\n";
     o______ "(void)seed;\n"; voidargs(o);
     o______ "return _value;\n";
     o____ "}\n";
@@ -136,6 +148,7 @@ private:
     o______ "return _value;\n";
     o____ "}\n";
 
+    o____ "template<class MOD>\n";
     o____ "double tr_advance(MOD* d, int32_t& seed"; args(o); o << ") {\n";
     o______ "trace3(\"random::advance1\", CKT_BASE::_sim->_time0, seed, _value);\n";
     o______ "d->q_accept();\n";
@@ -145,6 +158,7 @@ private:
     o______ "return _value;\n";
     o____ "}\n";
 
+    o____ "template<class MOD>\n";
     o____ "double tr_advance(MOD* d, int32_t const& slot"; args(o); o << ") {\n";
     o______ "trace4(\"random::advance2\", CKT_BASE::_sim->_time0, slot, _value, OPT::foooo);\n";
     o______ "int32_t& s = random_seed(slot);\n";
@@ -173,6 +187,7 @@ private:
     o__ "}_" << label() << ";\n";
   }
   std::string code_name()const override{
+    return "_" + label() + ".";
     return "d->_" + label() + ".";
   }
 };

@@ -85,7 +85,7 @@ private:
     o__ "}\n";
   }
   std::string code_name()const override{
-    return "d->" + label();
+    return label();
   }
   bool returns_void()const override { return true; }
 } trace;
