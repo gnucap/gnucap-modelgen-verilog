@@ -1,0 +1,14 @@
+#          
+uniform     1.00068
+normal      5.37241
+exponential 1.29904
+poisson     9
+chi_square  0.874268
+t           0.0203203
+erlangian   1.48951
+ 0.        
+Gnucap   System status
+iterations: op=0, dc=2, tran=0, fourier=0, total=2
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%

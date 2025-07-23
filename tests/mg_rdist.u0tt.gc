@@ -1,0 +1,42 @@
+
+attach ./modelgen_0.so
+attach vams/resistor.so
+
+verilog
+
+`modelgen test_u0t
+module test_u0t(p, n);
+	electrical p, n;
+	inout p, n;
+	(*desc="s"*) integer s;
+	(*desc="random1"*) real r1;
+	parameter real ts = 1u;
+	analog initial begin
+	  r1 = $rdist_uniform(s, -1., 1.);
+	end
+	analog begin
+		@(timer(0., ts*.99)) begin
+			r1 = $rdist_uniform(s, -1., 1.);
+      end
+		I(p,n) <+ transition(r1, .0, ts, ts);
+	end
+endmodule
+
+list
+
+!make test_u0t.so > /dev/null
+attach ./test_u0t.so
+
+ground gnd;
+
+resistor #(.r(1.)) r(gnd, n1);
+test_u0t #(.ts(.01)) dut1(gnd, n1);
+
+print dc v(nodes) s(dut1) spl(dut1) r1(dut1)
+print tran v(n1)
+
+dc
+tran 1 .005
+
+status notime
+end

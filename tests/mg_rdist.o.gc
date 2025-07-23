@@ -1,0 +1,36 @@
+
+attach ./modelgen_0.so
+attach vams/resistor.so
+
+verilog
+
+`modelgen test_rdist_o
+module test_rdist_o(p, n);
+	electrical p, n;
+	inout p, n;
+	parameter integer s=42;
+	(*desc="random1"*) real r1;
+	analog begin
+		$write("uniform     %g\n",  $rdist_uniform(s, 1, 2));
+		$write("normal      %g\n",  $rdist_normal(s, 1, 2));
+		$write("exponential %g\n",  $rdist_exponential(s, 1));
+		$write("poisson     %g\n",  $rdist_poisson(s, 10));
+		$write("chi_square  %g\n",  $rdist_chi_square(s, 1));
+		$write("t           %g\n",  $rdist_t(s, 1));
+		$write("erlangian   %g\n",  $rdist_erlangian(s, 1, 2));
+	end
+endmodule
+
+list
+
+!make test_rdist_o.so > /dev/null
+attach ./test_rdist_o.so
+
+ground gnd;
+
+test_rdist_o #() dut1(gnd, n1);
+
+dc
+
+status notime
+end
