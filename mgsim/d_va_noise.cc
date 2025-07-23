@@ -441,7 +441,7 @@ void set_sens_port(const node_t& n1, const node_t& n2)
   }else{ untested();
     // noises[0] shouldnt do anything
   }
-  if(n2.m_()>0){ untested();
+  if(n2.m_()>0){ itested();
     assert(n2.m_()<int(noise_size));
     CKT_BASE::_sim->_noise[n2.m_()] = -1.;
   }else{

@@ -41,8 +41,8 @@ public:
     return new PORT_CONNECTED(*this);
   }
 private:
-  bool static_code()const override { untested();return true;}
-  Token* new_token(Module&, size_t)const override { untested();
+  bool static_code()const override {return true;}
+  Token* new_token(Module&, size_t)const override {
     return nullptr;
   }
   std::string eval(CS&, const PARAM_LIST*)const override{ untested();
@@ -51,10 +51,10 @@ private:
   void stack_op(Expression*)const override { untested();
     throw Exception("invalid");
   }
-  std::string code_name()const override{ untested();
+  std::string code_name()const override{
     return "d->node_is_connected";
   }
-  void make_cc_dev(std::ostream& o)const override { untested();
+  void make_cc_dev(std::ostream& o)const override {
     o__ "bool node_is_connected(int i)const override {\n";
     o____ "trace2(\"conn\", i, n_(i).e_());\n";
     o____ "return n_(i).e_() != INVALID_NODE;\n";
