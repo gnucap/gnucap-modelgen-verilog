@@ -316,11 +316,15 @@ inline void WAVE::new_transition(double t, double rt, double ft, double new_fv)
       assert(sign*new_slope <= sign*old_slope);
       double new_ft = start + new_tt;
       assert(t_int <= new_ft);
-      assert(start <= t_int);
-
-      double v_int = old_fv + new_slope * (t_int - start);
-      trace5("nt2 push", start, old_ft, old_slope, new_slope, v_int);
-      _w.push_back(DPAIR(t_int, v_int));
+      if(start < t_int){
+	double v_int = old_fv + new_slope * (t_int - start);
+	assert(_w.back().first < t_int);
+	_w.push_back(DPAIR(t_int, v_int));
+      }else{ itested();
+	// numerical noise, as close as it gets.
+	// no need for another sample.
+	assert(start < t_int + 1e-12);
+      }
     }
   }else if(start == final_time){ untested();
     trace3("nt incomplete?", start, _w.back().second, new_fv);
