@@ -9,6 +9,7 @@
 #include <e_storag.h>
 #include <e_hsparam.h>
 // #include <e_paramlist.h>
+#include <m_random.h>
 /*                        -*- C++ -*-
  * Copyright (C) 2023 Felix Salfelder
  * Author: Felix Salfelder
@@ -3856,6 +3857,7 @@ ddouble MOD_resistor::_b_white_noise_0__precalc(ddouble, std::string what) {
 #include <e_storag.h>
 #include <e_hsparam.h>
 // #include <e_paramlist.h>
+#include <m_random.h>
 /*                        -*- C++ -*-
  * Copyright (C) 2023 Felix Salfelder
  * Author: Felix Salfelder

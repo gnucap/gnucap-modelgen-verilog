@@ -438,6 +438,7 @@ Block* Expression_::scope()
   if(_scope) {
     return _scope;
   }else if(auto s=dynamic_cast<Block*>(_owner)){ untested();
+    unreachable();
     return s;
   }else{ untested();
     incomplete();

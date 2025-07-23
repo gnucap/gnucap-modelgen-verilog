@@ -1,0 +1,46 @@
+
+attach ./modelgen_0.so
+attach vams/resistor.so
+
+verilog
+
+`modelgen test_rdist_u1
+module test_rdist_u1(p, n);
+	electrical p, n;
+	inout p, n;
+	(*desc="s"*) integer s;
+	(*desc="random1"*) real r1;
+	(*desc="random2"*) real r2;
+   analog initial begin
+		s = 42;
+	end
+	analog begin
+		$bound_step(.1);
+      r1 = $rdist_uniform(s, 1., 2.);
+      r2 = $rdist_uniform(42, 1., 2.);
+		I(p,n)<+r1;
+	end
+endmodule
+
+list
+
+!make test_rdist_u1.so > /dev/null
+attach ./test_rdist_u1.so
+
+ground gnd;
+
+resistor #(.r(1.)) r(gnd, n1);
+test_rdist_u1 #() dut1(gnd, n1);
+
+print dc v(nodes) s(dut1) r1(dut1) r2(dut1)
+print tran v(nodes) s(dut1) r1(dut1) r2(dut1)
+
+options rndseed=0
+tran 1
+options rndseed=0
+dc trace iter
+options rndseed=0
+tran 1
+
+status notime
+end

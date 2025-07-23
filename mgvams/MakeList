@@ -5,6 +5,7 @@ TARGET = \
   mg_func_math.so \
   mg_func_pf.so \
   mg_func_port.so \
+  mg_task_random.so \
   mg_func_sys.so \
   mg_task_write.so
 

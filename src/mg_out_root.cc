@@ -43,7 +43,8 @@ static void make_header(std::ostream& o, const File& in,
     "#include <e_elemnt.h>\n"
     "#include <e_storag.h>\n"
     "#include <e_hsparam.h>\n"
-    "// #include <e_paramlist.h>\n";
+    "// #include <e_paramlist.h>\n"
+    "#include <m_random.h>\n";
 #ifdef DEPEND
   // nothing. just compute deps.
 #elif defined(RETEST)

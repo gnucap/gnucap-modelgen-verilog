@@ -1,0 +1,45 @@
+
+attach ./modelgen_0.so
+attach vams/resistor.so
+
+verilog
+
+`modelgen test_n0
+module test_n0(p, n);
+	electrical p, n;
+	inout p, n;
+	(*desc="s"*) integer s;
+	(*desc="random1"*) real r1;
+	parameter real ts = 1u;
+	analog initial begin
+	  r1 = $rdist_normal(s, 1., 1.);
+	end
+	analog begin
+		@(timer(0., ts*.99)) begin
+			r1 = $rdist_normal(s, -1., 1.);
+      end
+		I(p,n) <+ transition(r1, .0, ts, ts);
+	end
+endmodule
+
+list
+
+!make test_n0.so > /dev/null
+attach ./test_n0.so
+
+ground gnd;
+
+resistor #(.r(1.)) r(gnd, n1);
+test_n0 #(.ts(.0001)) dut1(gnd, n1);
+
+print tran v(n1)
+store tran v(n1)
+
+dc
+// tran 1 .1
+
+print fourier v(n1)
+fourier 0 1k 100
+
+status notime
+end

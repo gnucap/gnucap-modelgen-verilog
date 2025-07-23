@@ -70,7 +70,7 @@ Base* TData::combine(const Base* X)const
   return n;
 }
 /*--------------------------------------------------------------------------*/
-inline TData* TData::multiply(const Base* X) const
+TData* TData::multiply(const Base* X) const
 {
   auto n = clone();
   auto o = prechecked_cast<TData const*>(X);
@@ -93,7 +93,7 @@ inline TData* TData::multiply(const Base* X) const
   return n;
 }
 /*--------------------------------------------------------------------------*/
-inline Base* TData::divide(const Base* X) const
+Base* TData::divide(const Base* X) const
 {
   auto n = clone();
   auto o = prechecked_cast<TData const*>(X);

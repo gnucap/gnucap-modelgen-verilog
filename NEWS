@@ -2,6 +2,10 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
+20250***-dev
+============
+- random distribution functions
+
 20250525-dev
 ============
 - improve overloading diagnostics

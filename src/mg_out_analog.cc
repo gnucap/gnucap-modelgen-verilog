@@ -1244,6 +1244,7 @@ void OUT_ANALOG::make_analog_list(std::ostream& o, const Module& m) const
       if(is_tr_initial()){
 	make_stmt(o, *in);
       }else{
+	o__ "// omit AnalogInitialStmt\n";
       }
     }else if(is_tr_initial()){
       o__ "// is_tr_initial\n";
