@@ -1,0 +1,16 @@
+verilog
+
+attach mgsim
+attach ./trnoise.so
+
+ground gnd
+resistor #(.r(1.)) r(gnd, n1);
+itrnoise #(.ts(.01)) dut1(gnd, n1);
+
+
+print tran v(n1)
+tran 1 > tr.out
+
+
+status notime
+end

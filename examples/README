@@ -2,6 +2,10 @@
 
 See README files in subdirectories.
 
+rc     - build and simulate rc lowpass variants
+cpl    - coupled transmission lines
+rnd    - statistical modelling
+
 == Prerequisites
 
 For this to work, gnucap, gnucap-modelgen-verilog and g++ are generally

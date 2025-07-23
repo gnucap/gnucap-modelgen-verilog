@@ -1,0 +1,20 @@
+verilog
+load mgsim
+
+// the model we just compiled
+load ./basic.so
+
+ground n;
+isource #(.dc(1)) i1(n, p1);
+isource #(.dc(1)) i2(n, p2);
+rres #(.r(1k)) r1(p1,n);
+rres #(.r(1k)) r2(p2,n);
+print op v(p*)
+op
+
+// but it does not change randomly
+op
+
+// different seed gives different result
+options rndseed=31415
+op

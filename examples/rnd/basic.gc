@@ -1,0 +1,16 @@
+verilog
+
+parameter r = $rdist_normal(42,1,1)
+
+// r is still a random variable when used in a parameter assignment
+resistor #(.r(1k+r)) r1(p,n);
+resistor #(.r(1k+r)) r2(p,n);
+print op r(r*)
+op
+
+// but it does not change randomly
+op
+
+// different seed gives different result
+options rndseed=31415
+op

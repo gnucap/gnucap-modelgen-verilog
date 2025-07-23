@@ -1,0 +1,35 @@
+nature current
+  access = I;
+  units = "A";
+  abstol = 1e-12; // OPT::abstol
+endnature
+
+// Electrical potential
+nature voltage
+  access = V;
+  units = "V";
+  abstol = 1e-6; // OPT::vntol
+endnature
+
+// Electrical discipline
+discipline electrical
+  potential voltage;
+  flow current;
+enddiscipline
+
+module itrnoise(p, n);
+  electrical p, n;
+  inout p, n;
+  (*desc="s"*) integer s;
+  (*desc="random1"*) real r1;
+  parameter real ts = 1u;
+  analog initial begin
+    r1 = $rdist_uniform(s, -1., 1.);
+  end
+  analog begin
+    @(timer(0., ts)) begin
+      r1 = $rdist_uniform(s, -1., 1.);
+    end
+    I(p,n) <+ transition(r1, .0, ts, ts);
+  end
+endmodule

@@ -1,0 +1,30 @@
+
+nature current
+  access = I;
+  units = "A";
+  abstol = 1e-12; // OPT::abstol
+endnature
+
+// Electrical potential
+nature voltage
+  access = V;
+  units = "V";
+  abstol = 1e-6; // OPT::vntol
+endnature
+
+// Electrical discipline
+discipline electrical
+  potential voltage;
+  flow current;
+enddiscipline
+
+module rres(p, n)
+	electrical p,n;
+	inout p,n;
+	parameter real r = 1k;
+	localparam real G = 1/ $rdist_normal(42, r+1, 1);
+
+	analog begin
+		I(p, n) <+ V(p, n) * G;
+	end
+endmodule

@@ -1,0 +1,21 @@
+verilog
+
+parameter r = $rdist_normal(42,1,1)
+
+// draw 3 samples
+eval r
+eval r
+eval r
+
+// assign a sample to a parameter x.
+measure x = eval(r)
+// x is a constant.
+eval x
+eval x
+eval x
+
+// change random seed. x is still a constant.
+// .. and r is not.
+options rndseed=101
+eval x
+eval r

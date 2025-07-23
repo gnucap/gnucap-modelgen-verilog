@@ -1,0 +1,21 @@
+Verilog-AMS defines random distribution functions, such as $rdist_normal.
+
+== simulator level examples
+
+sampling.gc:   random variable sampling and random constants
+basic.gc:      run simulations with random parameters
+
+== behavioural modelling
+
+Can do the same as in "basic.gc" with a compiled model. See basic.vams.
+
+$ gnucap-mg-vams --cc basic.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o basic.so
+$ gnucap basic_compiled.gc
+
+== transient noise
+
+A transient noise source makes transtions to periodic random samples.
+
+$ gnucap-mg-vams --cc trnoise.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o trnoise.so
+$ gnucap trnoise.gc
+
