@@ -1313,6 +1313,7 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args_)
   }else if( (t = f->new_token(*this, num_args)) ){
     import_flags(f);
   }else if(f && f->is_analog_filter()) { // cast to MGVAMS_FILTER?
+    import_flags(f);
     t = new_filter_token(num_args, f, this);
   }else if(f){
     FUNCTION_* cl = f->clone();
