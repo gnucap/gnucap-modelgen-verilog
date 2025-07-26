@@ -167,6 +167,7 @@ public: // bug
   void set_p_to_gnd(Module*)const;
 public: // XDT refactor
   virtual bool port_hack()const { incomplete(); return true;}
+  virtual int max_args()const {assert(0); return 0; }
   virtual Branch* branch__() const {assert(0); return nullptr;}
   virtual void set_n_to_gnd__()const {assert(0);}
   virtual void set_p_to_gnd__()const {assert(0);}

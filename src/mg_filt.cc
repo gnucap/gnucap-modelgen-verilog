@@ -72,7 +72,6 @@ protected:
   std::string code_name()const override {
     return "_b_" + short_label();
   }
-  virtual int max_args()const = 0;
 public:
   Token* new_token(Module& m, size_t na)const override {
     assert(na != size_t(-1));
