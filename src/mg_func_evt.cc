@@ -252,7 +252,7 @@ private:
 //   void stack_op(Expression const& args, Expression* out) const override { untested();
 //     incomplete();
 //   }
-  void make_cc_common(std::ostream& o)const override {
+  void make_cc_common(std::ostream&)const override {
    // o__ "bool " << _code_name << "()const {\n";
    // o____ "incomplete();\n";
    // o____ "assert(0);\n";
