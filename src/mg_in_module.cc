@@ -1240,10 +1240,9 @@ static Token* new_filter_token(int na, FUNCTION_ const* func, Module* m)
   auto f = prechecked_cast<MGVAMS_FILTER const*>(func);
   assert(f);
 
-  incomplete();
   assert(na != -1);
 
-    static int n_filters;
+  static int n_filters;
   std::string filter_code_name = f->label() + "_" + std::to_string(n_filters++);
 
   FUNCTION* fc = f->clone();

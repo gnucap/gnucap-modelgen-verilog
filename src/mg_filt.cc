@@ -31,8 +31,6 @@
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
-static int n_filters;
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class XDT : public MGVAMS_FILTER {
 public:
@@ -69,43 +67,7 @@ protected:
     return "_b_" + short_label();
   }
 public:
-  Token* new_token(Module& m, size_t na)const override {
-    assert(na != size_t(-1));
-
-    std::string filter_code_name = label() + "_" + std::to_string(n_filters++);
-
-    MGVAMS_FILTER* cl = clone();
-    {
-      cl->set_label(filter_code_name); // label()); // "_b_" + filter_code_name);
-      if(int(na) < max_args()) {
-      }else{
-	incomplete();
-	error(bDANGER, "too many arguments\n");
-      }
-      cl->set_num_args(na);
-      cl->set_owner(&m);
-      m.push_back(cl); // cl?
-    }
-
-    Node* np = m.new_node(filter_code_name + "_p");
-    Node* nn = m.new_node(filter_code_name + "_n"); // &mg_ground_node
-    np->set_to(&Node_Map::mg_ground_node, "_short_b_"+filter_code_name+"()");
-
-    {
-      Branch* br = m.new_branch(np, nn);
-//      br->set_source();
-      assert(br);
-      assert(const_cast<Branch const*>(br)->owner());
-      Branch_Ref prb(br);
-      cl->set_branch(br);
-
-      br->set_filter(cl);
-      assert(m.circuit());
-      m.new_filter();
-    }
-
-    return new Token_FILTER(label(), cl); // BUG. in_module
-  }
+  Token* new_token(Module&, size_t)const override { return nullptr; }
   void make_cc_precalc_(std::ostream& o)const{
     make_tag(o);
     o__ "ddouble " << code_name() << "precalc(";
