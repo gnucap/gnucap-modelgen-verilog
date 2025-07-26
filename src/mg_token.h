@@ -459,6 +459,27 @@ private:
   }
 };
 /*--------------------------------------------------------------------------*/
+class Token_FILTER : public Token_CALL {
+public:
+  explicit Token_FILTER(const std::string Name, FUNCTION_ const* f)
+    : Token_CALL(Name, f) {}
+private:
+  explicit Token_FILTER(const Token_FILTER& P, Base const* data, Expression_ const* e = nullptr)
+    : Token_CALL(P, data, e) {} // , _item(P._item) {}
+  Token* clone()const override { untested(); return new Token_FILTER(*this);}
+
+private:
+  void stack_op(Expression* e)const override;
+  Branch* branch() const;
+  Expression_ const* args() const{ untested();
+    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){ untested();
+      return a;
+    }else{ untested();
+      assert(!Token_CALL::args());
+      return nullptr;
+    }
+  }
+};
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

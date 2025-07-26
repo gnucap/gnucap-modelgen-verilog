@@ -4894,7 +4894,7 @@ private: // funcs
       return false;
     }
   }
-// Probe no refs: potential_ddt_1_p_
+// Probe no refs: potential_ddt_1_p_ddt_1_n
 // Probe no refs: potential_p_n
 }; //COMMON_capacitor
 /*--------------------------------------------------------------------------*/
@@ -4957,8 +4957,8 @@ private: // func decl
   } // ddt tr_accept
   ddouble _b_ddt_1tr_review(ddouble){
     return 0.;  } // ddt tr_review
-//probe potential_ddt_1_p_
-  ddouble xs_potential_b_ddt_1_p_ddt_1_n() const { // potential_ddt_1_p_
+//probe potential_ddt_1_p_ddt_1_n
+  ddouble xs_potential_b_ddt_1_p_ddt_1_n() const { // potential_ddt_1_p_ddt_1_n
     ddouble t;
       t = 0.;
     return t;
@@ -5293,7 +5293,7 @@ bool MOD_capacitor::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 #if 0
 // tr_eval_branch _b_ddt_1_p_ddt_1_n
-static EVAL__b_ddt_1_p_ddt_1_n_ Eval_(ddt_1_p, )(CC_STATIC);
+static EVAL__b_ddt_1_p_ddt_1_n_ Eval_(ddt_1_p, ddt_1_n)(CC_STATIC);
 void EVAL__b_ddt_1_p_ddt_1_n_::tr_eval(ELEMENT* d)const
 {
   assert(d);
@@ -5684,7 +5684,7 @@ void MOD_capacitor::expand()
     precalc_first();
 
   // clone branches
-  // filter (ddt_1_p, )
+  // filter (ddt_1_p, ddt_1_n)
     {
     if (!_b_ddt_1_p_ddt_1_n) {
       const CARD* p = device_dispatcher["va_ddt"]; // va_ddt
@@ -5865,7 +5865,7 @@ private: // funcs
       return false;
     }
   }
-// Probe no refs: potential_ddt_2_p_
+// Probe no refs: potential_ddt_2_p_ddt_2_n
 // Probe no refs: potential_p_n
 }; //COMMON_capacitor
 /*--------------------------------------------------------------------------*/
@@ -5933,8 +5933,8 @@ private: // func decl
   } // ddt tr_accept
   ddouble _b_ddt_2tr_review(ddouble){
     return 0.;  } // ddt tr_review
-//probe potential_ddt_2_p_
-  ddouble xs_potential_b_ddt_2_p_ddt_2_n() const { // potential_ddt_2_p_
+//probe potential_ddt_2_p_ddt_2_n
+  ddouble xs_potential_b_ddt_2_p_ddt_2_n() const { // potential_ddt_2_p_ddt_2_n
     ddouble t;
     t = _potential_b_ddt_2_p_ddt_2_n; // unnamed
     t[d_potential_b_ddt_2_p_ddt_2_n] = 1; // unnamed
@@ -6294,7 +6294,7 @@ bool MOD_capacitor::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 #if 0
 // tr_eval_branch _b_ddt_2_p_ddt_2_n
-static EVAL__b_ddt_2_p_ddt_2_n_ Eval_(ddt_2_p, )(CC_STATIC);
+static EVAL__b_ddt_2_p_ddt_2_n_ Eval_(ddt_2_p, ddt_2_n)(CC_STATIC);
 void EVAL__b_ddt_2_p_ddt_2_n_::tr_eval(ELEMENT* d)const
 {
   assert(d);
@@ -6747,7 +6747,7 @@ void MOD_capacitor::expand()
     precalc_first();
 
   // clone branches
-  // filter (ddt_2_p, )
+  // filter (ddt_2_p, ddt_2_n)
     {
     if (!_b_ddt_2_p_ddt_2_n) {
       const CARD* p = device_dispatcher["va_ddt"]; // va_ddt

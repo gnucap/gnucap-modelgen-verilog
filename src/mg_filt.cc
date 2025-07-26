@@ -33,28 +33,6 @@ namespace{
 /*--------------------------------------------------------------------------*/
 static int n_filters;
 /*--------------------------------------------------------------------------*/
-class Token_XDT : public Token_CALL {
-public:
-  explicit Token_XDT(const std::string Name, FUNCTION_ const* f)
-    : Token_CALL(Name, f) {}
-private:
-  explicit Token_XDT(const Token_XDT& P, Base const* data, Expression_ const* e = nullptr)
-    : Token_CALL(P, data, e) {} // , _item(P._item) {}
-  Token* clone()const override { untested(); return new Token_XDT(*this);}
-
-private:
-  void stack_op(Expression* e)const override;
-  Branch* branch() const;
-  Expression_ const* args() const{ untested();
-    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){ untested();
-      return a;
-    }else{ untested();
-      assert(!Token_CALL::args());
-      return nullptr;
-    }
-  }
-};
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class XDT : public MGVAMS_FILTER {
   Module* _m{nullptr};
@@ -72,6 +50,7 @@ public:
 
 public: // HACK
   Branch* _br{nullptr};
+   Branch* branch__() const override {return _br;}
   Node_Ref _p;
   Node_Ref _n;
 protected:
@@ -133,7 +112,7 @@ public:
       m.new_filter();
     }
 
-    return new Token_XDT(label(), cl);
+    return new Token_FILTER(label(), cl); // BUG. in_module
   }
   void make_cc_precalc_(std::ostream& o)const{
     make_tag(o);
@@ -230,7 +209,8 @@ public:
     unreachable();
     return "ddt";
   }
-  Probe const* prb()const {return _prb;}
+  Probe const* prb()const {assert(0); return _prb;}
+  Probe const* prb__()const override {return _prb;}
 #if 0
   void set_n_to_gnd()const { untested();
     assert(_m);
@@ -241,11 +221,11 @@ public:
     _m->set_to_ground(_br->p());
   }
 #else
-  void set_n_to_gnd()const {
+  void set_n_to_gnd__()const override {
     assert(_m);
     return MGVAMS_FILTER::set_n_to_gnd(_m);
   }
-  void set_p_to_gnd()const {
+  void set_p_to_gnd__()const override {
     assert(_m);
     return MGVAMS_FILTER::set_p_to_gnd(_m);
   }
@@ -437,98 +417,6 @@ private:
 } idt;
 DISPATCHER<FUNCTION>::INSTALL d_idt(&function_dispatcher, "idt", &idt);
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-Branch* Token_XDT::branch() const
-{
-  auto func = prechecked_cast<XDT const*>(f());
-  assert( func);
-  assert( func->_br);
-  return func->_br;
-}
-/*--------------------------------------------------------------------------*/
-static Expression_* clone_args(Base const* e)
-{
-  if(auto e_ = dynamic_cast<Expression_ const*>(e)) {
-    return e_->clone();
-  }else{ untested();
-    unreachable();
-    return nullptr;
-  }
-}
-/*--------------------------------------------------------------------------*/
-void Token_XDT::stack_op(Expression* e)const
-{
-  assert(e);
-  Token_CALL::stack_op(e);
-  assert(!e->is_empty());
-  auto cc = prechecked_cast<Token_CALL const*>(e->back());
-  assert(cc);
-  e->pop_back();
-  // assert(!e->is_empty());
-
-  auto func = prechecked_cast<XDT const*>(f());
-  assert(func);
-  Expression_* args = nullptr;
-
-  assert(cc->args()->size());
-  if(is_zero(*cc->args())){
-    trace2("Token_XDT::stack_op1", name(), cc->args()->size());
-    Float* f = new Float(0.);
-    e->push_back(new Token_CONSTANT(f, ""));
-    delete cc;
-    cc = nullptr;
-    func->set_p_to_gnd();
-  }else if(auto dd = prechecked_cast<TData const*>(cc->data())) {
-    trace2("Token_XDT::stack_op2", name(), cc->args()->size());
-
-    branch()->deps().clear();
-    branch()->deps() = *dd; // HACK
-    if(1){
-      assert(func->branch());
-      func->set_n_to_gnd();
-    }else if(0 /*sth linear*/){ untested();
-      // somehow set loss=0 and output ports to target.
-    }else{ untested();
-    }
-
-    auto d = new TData;
-    trace1("xdt output dep", func->prb()->code_name());
-    d->insert(Dep(func->prb(), Dep::_LINEAR)); // BUG?
-    args = clone_args(cc->args());
-    auto N = new Token_XDT(*this, d, args);
-    assert(N->data());
-    assert(dynamic_cast<TData const*>(N->data()));
-    e->push_back(N);
-    assert(f()==N->f());
-    delete(cc);
-  }else if(!e->size()) { untested();
-    unreachable();
-  }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) { untested();
-    trace2("Token_XDT::stack_op3", name(), cc->args()->size());
-    auto d = new TData;
-    d->insert(Dep(func->prb())); // BUG?
-    auto N = new Token_XDT(*this, d);
-    assert(N->data());
-    assert(dynamic_cast<TData const*>(N->data()));
-    e->push_back(N);
-  }else{ untested();
-    unreachable();
-  }
-
-  if(args){
-    RDeps rr;
-    if(func->has_tr_accept()){
-      rr.insert(&tr_accept_tag);
-    }else{
-    }
-    rr.insert(func->prb()->branch());
-    trace1("Token_XDT::stackop 4", args->size());
-    args->update(&rr); // bug. more generic path.
-  }else{
-  }
-  // ------------------------
-  // branch: function->_br
-}
 /*--------------------------------------------------------------------------*/
 Branch const* XDT::output() const
 {

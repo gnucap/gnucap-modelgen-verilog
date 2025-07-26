@@ -162,8 +162,12 @@ protected:
 public: // bug
   void set_n_to_gnd(Module*)const;
   void set_p_to_gnd(Module*)const;
-
+public: // XDT refactor
   virtual bool port_hack()const { incomplete(); return true;}
+  virtual Branch* branch__() const {assert(0); return nullptr;}
+  virtual void set_n_to_gnd__()const {assert(0);}
+  virtual void set_p_to_gnd__()const {assert(0);}
+  virtual Probe const* prb__()const {assert(0); return nullptr;}
 };
 /*--------------------------------------------------------------------------*/
 class MGVAMS_TASK : public FUNCTION_ {

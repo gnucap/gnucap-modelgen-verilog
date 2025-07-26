@@ -1429,4 +1429,96 @@ inline void Token_PARLIST_::stack_op(Expression* E) const
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+Branch* Token_FILTER::branch() const
+{
+  auto func = prechecked_cast<MGVAMS_FILTER const*>(f());
+  assert( func);
+  assert( func->branch__());
+  return func->branch__();
+}
+/*--------------------------------------------------------------------------*/
+static Expression_* clone_args(Base const* e)
+{
+  if(auto e_ = dynamic_cast<Expression_ const*>(e)) {
+    return e_->clone();
+  }else{ untested();
+    unreachable();
+    return nullptr;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Token_FILTER::stack_op(Expression* e)const
+{
+  assert(e);
+  Token_CALL::stack_op(e);
+  assert(!e->is_empty());
+  auto cc = prechecked_cast<Token_CALL const*>(e->back());
+  assert(cc);
+  e->pop_back();
+  // assert(!e->is_empty());
+
+  auto func = prechecked_cast<MGVAMS_FILTER const*>(f());
+  assert(func);
+  Expression_* args = nullptr;
+
+  assert(cc->args()->size());
+  if(is_zero(*cc->args())){
+    trace2("Token_FILTER::stack_op1", name(), cc->args()->size());
+    Float* f = new Float(0.);
+    e->push_back(new Token_CONSTANT(f, ""));
+    delete cc;
+    cc = nullptr;
+    func->set_p_to_gnd__();
+  }else if(auto dd = prechecked_cast<TData const*>(cc->data())) {
+    trace2("Token_FILTER::stack_op2", name(), cc->args()->size());
+
+    branch()->deps().clear();
+    branch()->deps() = *dd; // HACK
+    if(1){
+      func->set_n_to_gnd__();
+    }else if(0 /*sth linear*/){ untested();
+      // somehow set loss=0 and output ports to target.
+    }else{ untested();
+    }
+
+    auto d = new TData;
+    trace1("xdt output dep", func->prb__()->code_name());
+    d->insert(Dep(func->prb__(), Dep::_LINEAR)); // BUG?
+    args = clone_args(cc->args());
+    auto N = new Token_FILTER(*this, d, args);
+    assert(N->data());
+    assert(dynamic_cast<TData const*>(N->data()));
+    e->push_back(N);
+    assert(f()==N->f());
+    delete(cc);
+  }else if(!e->size()) { untested();
+    unreachable();
+  }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) { untested();
+    trace2("Token_FILTER::stack_op3", name(), cc->args()->size());
+    auto d = new TData;
+    d->insert(Dep(func->prb__())); // BUG?
+    auto N = new Token_FILTER(*this, d);
+    assert(N->data());
+    assert(dynamic_cast<TData const*>(N->data()));
+    e->push_back(N);
+  }else{ untested();
+    unreachable();
+  }
+
+  if(args){
+    RDeps rr;
+    if(func->has_tr_accept()){
+      rr.insert(&tr_accept_tag);
+    }else{
+    }
+    rr.insert(func->prb__()->branch());
+    trace1("Token_FILTER::stackop 4", args->size());
+    args->update(&rr); // bug. more generic path.
+  }else{
+  }
+  // ------------------------
+  // branch: function->_br
+}
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet
