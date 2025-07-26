@@ -140,7 +140,8 @@ public:
 class Node_Ref;
 class Branch;
 class MGVAMS_FILTER : public FUNCTION_ {
-protected:
+protected: // BUG
+  Module* _m{nullptr};
   mutable Branch const* _output{nullptr};
 public:
   ~MGVAMS_FILTER() {}
@@ -172,6 +173,7 @@ public: // XDT refactor
   virtual void set_n_to_gnd__()const {assert(0);}
   virtual void set_p_to_gnd__()const {assert(0);}
   virtual Probe const* prb__()const {assert(0); return nullptr;}
+  void set_owner(Module* m) {_m=m;}
 };
 /*--------------------------------------------------------------------------*/
 class MGVAMS_TASK : public FUNCTION_ {
