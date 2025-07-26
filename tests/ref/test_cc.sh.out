@@ -4936,10 +4936,12 @@ private: // func decl
     return _b_ddt_1(t0);
   }
   ddouble _b_ddt_1tr_advance(ddouble t0){
-    return _b_ddt_1(t0);
+    // subdevice
+    t0 = 0.;
+    return t0;
   }
   ddouble _b_ddt_1tr_regress(ddouble t0){
-    return _b_ddt_1(t0);
+    return _b_ddt_1tr_advance(t0);
   }
   ddouble _b_ddt_1tr_restore(ddouble t0){
 (void)t0;
@@ -5402,7 +5404,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
             t0.set_no_deps();
             t0 = p->xs_potential_b_p_n();
             t0 = (_p___c) /*rhspar*/ * t0;
-            t0 = /*a*/ d->/*XDT*/_b_ddt_1tr_eval(t0);
+            t0 = /*a*/ d->_b_ddt_1tr_eval(t0);
             d->_value_b_p_n /* contrib sign: */ += t0.value();
             // dep _potential_b_ddt_1_p_ddt_1_n
             // short: _potential_b_ddt_1_p_ddt_1_n
@@ -5433,7 +5435,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
             ddouble t0;
             t0 = 0.; // precalc.
             t0 = (_p___c) /*rhspar*/ * t0;
-            t0 = /*a*/ d->/*XDT*/_b_ddt_1precalc(t0);
+            t0 = /*a*/ d->_b_ddt_1precalc(t0);
             m->_st_b_ddt_1_p_ddt_1_n[1] = +t0[d_potential_b_ddt_1_p_ddt_1_n]; // (3p)
           }
         }
@@ -5905,10 +5907,14 @@ private: // func decl
     return _b_ddt_2(t0);
   }
   ddouble _b_ddt_2tr_advance(ddouble t0){
-    return _b_ddt_2(t0);
+    auto e = prechecked_cast<ELEMENT const*>(_b_ddt_2_p_ddt_2_n);
+    assert(e);
+    t0 = e->tr_amps(); // (236b)
+  t0[d_potential_b_ddt_2_p_ddt_2_n] = 1.;
+    return t0;
   }
   ddouble _b_ddt_2tr_regress(ddouble t0){
-    return _b_ddt_2(t0);
+    return _b_ddt_2tr_advance(t0);
   }
   ddouble _b_ddt_2tr_restore(ddouble t0){
 (void)t0;
@@ -6430,7 +6436,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
               t0.set_no_deps();
               t0 = p->xs_potential_b_p_n();
               t0 = (_p___c) /*rhspar*/ * t0;
-              t0 = /*a*/ d->/*XDT*/_b_ddt_2tr_eval(t0);
+              t0 = /*a*/ d->_b_ddt_2tr_eval(t0);
               if (d->_pot_b_p_n){
                 d->_pot_b_p_n = false;
                 d->_value_b_p_n = 0.;
@@ -6485,7 +6491,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
               ddouble t0;
               t0 = 0.; // precalc.
               t0 = (_p___c) /*rhspar*/ * t0;
-              t0 = /*a*/ d->/*XDT*/_b_ddt_2precalc(t0);
+              t0 = /*a*/ d->_b_ddt_2precalc(t0);
               m->_st_b_ddt_2_p_ddt_2_n[1] = +1; // (3q)
             }
           }

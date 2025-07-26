@@ -193,10 +193,25 @@ public:
     o____ "return " << code_name() << "("; argnames(o); o << ");\n";
     o__ "}\n";
     o__ "ddouble " << code_name() << "tr_advance("; args(o); o << "){\n";
-    o____ "return " << code_name() << "("; argnames(o); o << ");\n";
+    std::string cn = _br->code_name();
+    if(_output || !has_refs()) {
+      o____ "// subdevice\n";
+      o____ "t0 = 0.;\n";
+    }else{
+      o____ "auto e = prechecked_cast<ELEMENT const*>("<< cn << ");\n";
+      o____ "assert(e);\n";
+      o____ "t0 = e->tr_amps(); // (236b)\n";
+    }
+    make_assign(o);
+    if(_br->is_short()){
+      // output sent to other branch
+    }else{
+      o__ "t0[d_potential" << cn << "] = 1.;\n";
+    }
+    o____ "return t0;\n";
     o__ "}\n";
     o__ "ddouble " << code_name() << "tr_regress("; args(o); o << "){\n";
-    o____ "return " << code_name() << "("; argnames(o); o << ");\n";
+    o____ "return " << code_name() << "tr_advance("; argnames(o); o << ");\n";
     o__ "}\n";
     o__ "ddouble " << code_name() << "tr_restore("; args(o); o << "){\n";
     for(size_t n=0; n<num_args(); ++n){
