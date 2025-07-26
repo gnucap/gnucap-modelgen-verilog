@@ -59,9 +59,6 @@ private:
 class XDT : public MGVAMS_FILTER {
   Module* _m{nullptr};
   Probe const* _prb{nullptr};
-  std::string _code_name;
-protected:
-  std::string raw_code_name()const {return _code_name;}
 public:
   bool has_modes()const override {return true;}
   bool has_state()const override {return true;}
@@ -91,11 +88,8 @@ protected:
     return _m->identifier().to_string();
   }
   virtual void make_assign(std::ostream& o) const = 0;
-  void set_code_name(std::string x){
-    _code_name = x;
-  }
-  std::string code_name()const override{
-    return "/*XDT*/" + _code_name;
+  std::string code_name()const override {
+    return "_b_" + short_label();
   }
   virtual int max_args()const = 0;
 public:
@@ -107,7 +101,6 @@ public:
     XDT* cl = clone();
     {
       cl->set_label(filter_code_name); // label()); // "_b_" + filter_code_name);
-      cl->set_code_name("_b_" + filter_code_name);
       if(int(na) < max_args()) {
       }else{
 	incomplete();
@@ -143,7 +136,7 @@ public:
   }
   void make_cc_precalc_(std::ostream& o)const{
     make_tag(o);
-    o__ "ddouble " << _code_name << "precalc(";
+    o__ "ddouble " << code_name() << "precalc(";
       std::string comma;
       if(num_args() > 4) {
 	incomplete();
@@ -180,32 +173,32 @@ public:
     }
   }
   void make_cc_dev(std::ostream& o)const override { // XDT
-    o__ "ddouble " << _code_name << "(";
+    o__ "ddouble " << code_name() << "(";
       std::string comma;
       for(size_t n=0; n<num_args(); ++n){
 	o << comma << "ddouble t" << n;
 	comma = ", ";
       }
     o << ");\n";
-    o__ "bool _short"+_code_name+"()const {return " << bool(_output) << ";}\n";
+    o__ "bool _short"+code_name()+"()const {return " << bool(_output) << ";}\n";
     make_cc_precalc_(o);
 
-    o__ "ddouble " << raw_code_name() << "tr_begin("; args(o); o << "){\n";
+    o__ "ddouble " << code_name() << "tr_begin("; args(o); o << "){\n";
     for(size_t n=0; n<num_args(); ++n){
       o << "(void)t" << n << ";\n";
     }
     o____ "return 0.;\n";
     o__ "}\n";
-    o__ "ddouble " << raw_code_name() << "tr_eval("; args(o); o << "){\n";
-    o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
+    o__ "ddouble " << code_name() << "tr_eval("; args(o); o << "){\n";
+    o____ "return " << code_name() << "("; argnames(o); o << ");\n";
     o__ "}\n";
-    o__ "ddouble " << raw_code_name() << "tr_advance("; args(o); o << "){\n";
-    o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
+    o__ "ddouble " << code_name() << "tr_advance("; args(o); o << "){\n";
+    o____ "return " << code_name() << "("; argnames(o); o << ");\n";
     o__ "}\n";
-    o__ "ddouble " << raw_code_name() << "tr_regress("; args(o); o << "){\n";
-    o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
+    o__ "ddouble " << code_name() << "tr_regress("; args(o); o << "){\n";
+    o____ "return " << code_name() << "("; argnames(o); o << ");\n";
     o__ "}\n";
-    o__ "ddouble " << raw_code_name() << "tr_restore("; args(o); o << "){\n";
+    o__ "ddouble " << code_name() << "tr_restore("; args(o); o << "){\n";
     for(size_t n=0; n<num_args(); ++n){
       o << "(void)t" << n << ";\n";
     }
@@ -266,7 +259,7 @@ private:
     XDT::make_cc_dev(o);
     std::string comma;
     comma = "";
-    o__ "ddouble " << raw_code_name() << "tr_accept(";
+    o__ "ddouble " << code_name() << "tr_accept(";
       for(size_t n=0; n<num_args(); ++n){
 	o << comma << "ddouble t" << n;
 	comma = ", ";
@@ -290,7 +283,7 @@ private:
     }
 #endif
 
-  //  o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
+  //  o____ "return " << code_name() << "("; argnames(o); o << ");\n";
     if(has_refs()) {
       std::string cn = _br->code_name();
       o____ "typedef MOD_" << id() << " MOD;\n";
@@ -320,7 +313,7 @@ private:
     o__ "} // ddt tr_accept\n";
 /*--------------------------------------------------------------------------*/
     comma = "";
-    o__ "ddouble " << raw_code_name() << "tr_review(";
+    o__ "ddouble " << code_name() << "tr_review(";
       for(size_t n=0; n<num_args(); ++n){
 	o << comma << "ddouble";
 	comma = ", ";
@@ -356,7 +349,7 @@ private:
     XDT::make_cc_dev(o);
     std::string comma;
     comma = "";
-    o__ "ddouble " << raw_code_name() << "tr_accept(";
+    o__ "ddouble " << code_name() << "tr_accept(";
       for(size_t n=0; n<num_args(); ++n){
 	o << comma << "ddouble t" << n;
 	comma = ", ";
@@ -377,7 +370,7 @@ private:
     }else{
     }
 
-  //  o____ "return " << raw_code_name() << "("; argnames(o); o << ");\n";
+  //  o____ "return " << code_name() << "("; argnames(o); o << ");\n";
     if(has_refs()) {
       std::string cn = _br->code_name();
       std::string state = "_st" + cn;
@@ -408,7 +401,7 @@ private:
     o__ "} // idt tr_accept\n";
 /*--------------------------------------------------------------------------*/
     comma = "";
-    o__ "ddouble " << raw_code_name() << "tr_review(";
+    o__ "ddouble " << code_name() << "tr_review(";
       for(size_t n=0; n<num_args(); ++n){
 	o << comma << "ddouble";
 	comma = ", ";
@@ -547,7 +540,7 @@ void XDT::make_cc_impl(std::ostream&o) const
   std::string cn = _br->code_name();
   std::string id = _m->identifier().to_string();
   o << "//cc impl\n";
-  o << "MOD_"<< id <<"::ddouble MOD_" << id << "::" << _code_name << "(";
+  o << "MOD_"<< id <<"::ddouble MOD_" << id << "::" << code_name() << "(";
   std::string comma;
   for(size_t n=0; n<num_args(); ++n){
     o << comma << "ddouble t" << n;

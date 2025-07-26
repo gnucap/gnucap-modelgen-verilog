@@ -408,6 +408,7 @@ bool DEV_CPOLY_CAP::do_tr()
 /*--------------------------------------------------------------------------*/
 void DEV_DDT::tr_advance()
 {
+  trace2("DEV_DDT::tr_advance", _sim->_time0, long_label());
    if(_sim->_last_time == 0.) {
      // breaks idt..
      _y[0].x = tr_outvolts();
@@ -531,15 +532,13 @@ void DEV_IDT::tr_begin()
 /*--------------------------------------------------------------------------*/
 void DEV_IDT::tr_advance()
 {
+  trace3("DEV_IDT::tr_advance", long_label(), _sim->_time0, _reset);
   if(_reset){
-    trace2("DEV_IDT::tr_advance reset", long_label(), _sim->_time0);
     _reset = false;
     _i[0] = _i[1] = FPOLY1(0., 0., 0.);
   }else{
-    trace2("DEV_IDT::tr_advance no reset", long_label(), _sim->_time0);
   }
 
-  trace2("DEV_IDT::tr_advance", long_label(), _sim->_time0);
   STORAGE::tr_advance();
 
 #if 0 // later
@@ -571,7 +570,6 @@ void DEV_IDT::tr_advance()
 /*--------------------------------------------------------------------------*/
 bool DEV_IDT::do_tr()
 {
-  double oldtramps = tr_amps();
   assert((_time[0] == 0) || (_vy0[0] == _vy0[0]));
 
   if(_sim->_v0){
@@ -617,8 +615,8 @@ bool DEV_IDT::do_tr()
   }else{
   }
 
-  trace4("idttramp", oldtramps, tr_amps(), n_(0).v0(), n_(1).v0());
-  trace4("idttramp", oldtramps, tr_amps(), n_(0).m_(), n_(1).m_());
+  //trace4("idttramp", oldtramps, tr_amps(), n_(0).v0(), n_(1).v0());
+  //trace4("idttramp", oldtramps, tr_amps(), n_(0).m_(), n_(1).m_());
   //_m0 = CPOLY1(0., _vi0[0], _vi0[1]);
 //  _vi0[0] = 0;
 //  _vi0[1] = 0;
@@ -690,6 +688,7 @@ double DEV_CPOLY_CAP::tr_amps() const
   }else{
   }
 
+  trace3("DEV_CPOLY_CAP::tr_amps", long_label(), _sim->_time0, amps);
   return amps;
 }
 /*--------------------------------------------------------------------------*/
