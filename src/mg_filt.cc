@@ -35,8 +35,6 @@ static int n_filters;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class XDT : public MGVAMS_FILTER {
-  Module* _m{nullptr};
-  Probe const* _prb{nullptr};
 public:
   bool port_hack()const override {return false;}
   bool is_analog_filter()const override {return true;}
@@ -50,8 +48,6 @@ public:
   bool has_tr_advance()const override {return true;}
 
 public: // HACK
-  Branch* _br{nullptr};
-   Branch* branch__() const override {return _br;}
   Node_Ref _p;
   Node_Ref _n;
 protected:
@@ -87,7 +83,7 @@ public:
 	error(bDANGER, "too many arguments\n");
       }
       cl->set_num_args(na);
-      cl->_m = &m;
+      cl->set_owner(&m);
       m.push_back(cl); // cl?
     }
 
@@ -101,12 +97,12 @@ public:
       assert(br);
       assert(const_cast<Branch const*>(br)->owner());
       Branch_Ref prb(br);
-      cl->_br = br;
+      cl->set_branch(br);
 
     cl->_p = nullptr;
     cl->_n = nullptr;
 
-      cl->_prb = m.new_probe("potential", prb);
+     cl->_prb = m.new_probe("potential", prb);
       br->set_filter(cl);
       assert(m.circuit());
       m.new_filter();

@@ -142,6 +142,8 @@ class Branch;
 class MGVAMS_FILTER : public FUNCTION_ {
 protected: // BUG
   Module* _m{nullptr};
+  Branch* _br{nullptr};
+  Probe const* _prb{nullptr};
   mutable Branch const* _output{nullptr};
 public:
   ~MGVAMS_FILTER() {}
@@ -160,7 +162,7 @@ public:
   bool is_standalone()const { return _output; }
  // bool is_analog_filter()const {return true;} not yet
 private:
-  virtual Branch* branch() const {return nullptr;}
+  virtual Branch* branch() const {untested(); return nullptr;}
   void setup(Module*)override;
 protected:
 public: // bug
@@ -169,11 +171,12 @@ public: // bug
 public: // XDT refactor
   virtual bool port_hack()const { incomplete(); return true;}
   virtual int max_args()const {assert(0); return 0; }
-  virtual Branch* branch__() const {assert(0); return nullptr;}
+  virtual Branch* branch__() const {return _br;}
   virtual void set_n_to_gnd__()const {assert(0);}
   virtual void set_p_to_gnd__()const {assert(0);}
   virtual Probe const* prb__()const {assert(0); return nullptr;}
   void set_owner(Module* m) {_m=m;}
+  void set_branch(Branch* br);
 };
 /*--------------------------------------------------------------------------*/
 class MGVAMS_TASK : public FUNCTION_ {

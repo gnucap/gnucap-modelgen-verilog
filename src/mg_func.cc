@@ -263,5 +263,14 @@ void MGVAMS_FILTER::set_p_to_gnd(Module* m) const
   assert(p()->is_ground());
 }
 /*--------------------------------------------------------------------------*/
+void MGVAMS_FILTER::set_branch(Branch* br)
+{
+  assert(br);
+  assert(!_br);
+  _br = br;
+  Branch_Ref prb(br);
+  assert(_m);
+  _prb = _m->new_probe("potential", prb);
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet
