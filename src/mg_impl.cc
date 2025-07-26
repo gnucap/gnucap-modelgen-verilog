@@ -638,6 +638,10 @@ Branch const* Branch::output() const
 Node_Ref Branch::p() const
 {
   if(auto f = dynamic_cast<MGVAMS_FILTER const*>(_ctrl)){
+    if(!f->port_hack()){
+      return _p;
+    }else{
+    }
     return f->p();
   }else{
   }
@@ -647,6 +651,10 @@ Node_Ref Branch::p() const
 Node_Ref Branch::n() const
 {
   if(auto f = dynamic_cast<MGVAMS_FILTER const*>(_ctrl)){
+    if(!f->port_hack()){
+      return _n;
+    }else{
+    }
     return f->n();
   }else{
   }

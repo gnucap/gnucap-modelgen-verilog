@@ -60,6 +60,7 @@ class XDT : public MGVAMS_FILTER {
   Module* _m{nullptr};
   Probe const* _prb{nullptr};
 public:
+  bool port_hack()const override {return false;}
   bool has_modes()const override {return true;}
   bool has_state()const override {return true;}
   bool is_common()const override {return false;} // TODO
@@ -115,15 +116,16 @@ public:
     Node* nn = m.new_node(filter_code_name + "_n"); // &mg_ground_node
     np->set_to(&Node_Map::mg_ground_node, "_short_b_"+filter_code_name+"()");
 
-    cl->_p = np;
-    cl->_n = nn;
     {
-      Branch* br = m.new_branch(np, &Node_Map::mg_ground_node);
+      Branch* br = m.new_branch(np, nn);
 //      br->set_source();
       assert(br);
       assert(const_cast<Branch const*>(br)->owner());
       Branch_Ref prb(br);
       cl->_br = br;
+
+    cl->_p = nullptr;
+    cl->_n = nullptr;
 
       cl->_prb = m.new_probe("potential", prb);
       br->set_filter(cl);
@@ -255,6 +257,7 @@ private:
   Node_Ref p()const override;
   Node_Ref n()const override;
 private: // setup
+public: // HACK
   Branch* branch()const override { return _br; }
 }; // XDT
 /*--------------------------------------------------------------------------*/
@@ -481,6 +484,7 @@ void Token_XDT::stack_op(Expression* e)const
     branch()->deps().clear();
     branch()->deps() = *dd; // HACK
     if(1){
+      assert(func->branch());
       func->set_n_to_gnd();
     }else if(0 /*sth linear*/){ untested();
       // somehow set loss=0 and output ports to target.
@@ -538,12 +542,14 @@ Branch const* XDT::output() const
 #if 1
 Node_Ref XDT::p() const
 {
-  return _p;
+  assert(_br);
+  return _br->p();
 }
 /*--------------------------------------------------------------------------*/
 Node_Ref XDT::n() const
 {
-  return _n;
+  assert(_br);
+  return _br->n();
 }
 #endif
 /*--------------------------------------------------------------------------*/

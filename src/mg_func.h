@@ -162,6 +162,8 @@ protected:
 public: // bug
   void set_n_to_gnd(Module*)const;
   void set_p_to_gnd(Module*)const;
+
+  virtual bool port_hack()const { incomplete(); return true;}
 };
 /*--------------------------------------------------------------------------*/
 class MGVAMS_TASK : public FUNCTION_ {
