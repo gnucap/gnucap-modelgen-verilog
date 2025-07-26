@@ -75,6 +75,8 @@ public: // characteristics
   virtual bool has_set_event()const {return false;}
   virtual bool has_state()const {return false;}
   virtual bool has_modes()const {return false;}
+  virtual bool context_arg()const {return false;}
+  virtual bool is_analog_filter()const {return false;}
 
 public: // non-virtual. TODO
   virtual bool static_code()const {return false;}
@@ -155,6 +157,7 @@ public:
   }
   bool has_precalc()const override { return true;}
   bool is_standalone()const { return _output; }
+ // bool is_analog_filter()const {return true;} not yet
 private:
   virtual Branch* branch() const {return nullptr;}
   void setup(Module*)override;

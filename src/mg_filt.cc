@@ -39,6 +39,7 @@ class XDT : public MGVAMS_FILTER {
   Probe const* _prb{nullptr};
 public:
   bool port_hack()const override {return false;}
+  bool is_analog_filter()const override {return true;}
   bool has_modes()const override {return true;}
   bool has_state()const override {return true;}
   bool is_common()const override {return false;} // TODO
