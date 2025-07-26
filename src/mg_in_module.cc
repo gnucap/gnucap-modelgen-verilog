@@ -1333,10 +1333,15 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args_)
   return t;
 }
 /*--------------------------------------------------------------------------*/
+void filter_setup(MGVAMS_FILTER*, Module*);
 void Module::setup_functions()
 {
   for(FUNCTION_* f : _func){
-    f->setup(this);
+    if(auto ff=dynamic_cast<MGVAMS_FILTER*>(f)){
+      filter_setup(ff, this);
+    }else{
+      f->setup(this);
+    }
   }
 }
 /*--------------------------------------------------------------------------*/

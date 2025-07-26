@@ -105,7 +105,7 @@ public: // code generation
   virtual double evalf(double const*)const {
     throw Exception("not implemented");
   }
-  virtual void setup(Module*) {};
+  void setup(Module*) {};
 /*--------------------------------------------------------------------------*/
 public:
   void	      inc_refs()const	{++_refs;}
@@ -161,13 +161,17 @@ public:
   bool has_precalc()const override { return true;}
   bool is_standalone()const { return _output; }
  // bool is_analog_filter()const {return true;} not yet
+public:
+  virtual Branch* branch() const {untested(); return _br;}
 private:
-  virtual Branch* branch() const {untested(); return nullptr;}
-  void setup(Module*)override;
+ // void has_setup()const override{return true;}
+ // void setup(Module*)override;
 protected:
 public: // bug
   void set_n_to_gnd(Module*)const;
   void set_p_to_gnd(Module*)const;
+  void set_output(Branch const*b){_output=b;}
+  bool has_output()const {return _output;}
 public: // XDT refactor
   virtual bool port_hack()const { incomplete(); return true;}
   virtual int max_args()const {assert(0); return 0; }
