@@ -25,6 +25,7 @@
 #include "mg_in.h"
 #include "mg_options.h"
 #include "mg_analog.h" // BUG: Analog_Function_Arg, push_back
+#include "mg_token.h"
 #include "l_stlextra.h"
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1233,8 +1234,58 @@ void Module::import_flags(FUNCTION_ const* f)
   }
 }
 /*--------------------------------------------------------------------------*/
-Token* Module::new_token(FUNCTION const* f_, size_t num_args)
+// in_analog.cc?
+static Token* new_filter_token(int na, FUNCTION_ const* func, Module* m)
 {
+  auto f = prechecked_cast<MGVAMS_FILTER const*>(func);
+  assert(f);
+
+  incomplete();
+  assert(na != -1);
+
+    static int n_filters;
+  std::string filter_code_name = f->label() + "_" + std::to_string(n_filters++);
+
+  FUNCTION* fc = f->clone();
+  auto fcl = prechecked_cast<MGVAMS_FILTER*>(fc);
+
+#if 1
+  {
+    fcl->set_label(filter_code_name); // label()); // "_b_" + filter_code_name);
+    if(int(na) < f->max_args()) {
+    }else{
+      incomplete();
+      error(bDANGER, "too many arguments\n");
+    }
+    fcl->set_num_args(na);
+    fcl->set_owner(m);
+    m->push_back(fcl);
+  }
+
+  Node* np = m->new_node(filter_code_name + "_p");
+  Node* nn = m->new_node(filter_code_name + "_n"); // &mg_ground_node
+  np->set_to(&Node_Map::mg_ground_node, "_short_b_"+filter_code_name+"()");
+
+  {
+    Branch* br = m->new_branch(np, nn);
+    //      br->set_source();
+    assert(br);
+    assert(const_cast<Branch const*>(br)->owner());
+    Branch_Ref prb(br);
+    fcl->set_branch(br);
+
+    br->set_filter(fcl); // needed?
+    assert(m->circuit());
+    m->new_filter();
+  }
+#endif
+
+  return new Token_FILTER(f->label(), fcl); // BUG. in_module
+}
+/*--------------------------------------------------------------------------*/
+Token* Module::new_token(FUNCTION const* f_, size_t num_args_)
+{
+  int num_args = int(num_args_);
   auto f = prechecked_cast<FUNCTION_ const*>(f_);
   assert(f);
   Token* t = nullptr;
@@ -1262,6 +1313,8 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args)
     }
   }else if( (t = f->new_token(*this, num_args)) ){
     import_flags(f);
+  }else if(f && f->is_analog_filter()) { // cast to MGVAMS_FILTER?
+    t = new_filter_token(num_args, f, this);
   }else if(f){
     FUNCTION_* cl = f->clone();
     assert(cl);

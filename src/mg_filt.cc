@@ -74,7 +74,7 @@ public:
 
     std::string filter_code_name = label() + "_" + std::to_string(n_filters++);
 
-    XDT* cl = clone();
+    MGVAMS_FILTER* cl = clone();
     {
       cl->set_label(filter_code_name); // label()); // "_b_" + filter_code_name);
       if(int(na) < max_args()) {
@@ -99,10 +99,6 @@ public:
       Branch_Ref prb(br);
       cl->set_branch(br);
 
-    cl->_p = nullptr;
-    cl->_n = nullptr;
-
-     cl->_prb = m.new_probe("potential", prb);
       br->set_filter(cl);
       assert(m.circuit());
       m.new_filter();
