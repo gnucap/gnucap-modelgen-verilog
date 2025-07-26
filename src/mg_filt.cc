@@ -67,7 +67,7 @@ public:
   bool has_tr_begin()const override {return false;}
   bool has_tr_review()const override {return false;}
   bool has_tr_accept()const override {return false;}
-  bool has_tr_advance()const override {return false;}
+  bool has_tr_advance()const override {return true;}
 
 public: // HACK
   Branch* _br{nullptr};
@@ -108,7 +108,6 @@ public:
       }
       cl->set_num_args(na);
       cl->_m = &m;
-      m.set_tr_advance();
       m.push_back(cl); // cl?
     }
 
