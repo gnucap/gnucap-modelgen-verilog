@@ -31,47 +31,6 @@
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
-class ANALYSIS : public FUNCTION_ {
-public:
-  explicit ANALYSIS() : FUNCTION_(){
-    set_label("analysis");
-  }
-  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
-    return "analysis";
-  }
-  void stack_op(Expression*)const override {
-    throw Exception("invalid");
-  }
-  std::string code_name()const override{
-    return "_f_analysis";
-  }
-  bool static_code()const override {return true;}
-  bool is_common()const override {return true;}
-  bool has_state()const override {return false;}
-  Token* new_token(Module& m, size_t)const override {
-    m.set_analysis();
-    m.install(this);
-    return new Token_CALL(label(), this);
-  }
-  void make_cc_common(std::ostream& o)const override {
-    o__ "double " << code_name() << "(std::string const& what)const {\n";
-    o____ "if(what==\"ic\"){\n";
-    o______ "return _sim->analysis_is_tran_static();\n";
-    o____ "}else if(what==\"static\"){\n";
-    o______ "return _sim->analysis_is_static();\n";
-    o____ "}else if(what==\"dc\"){\n";
-    o______ "return _sim->analysis_is_dcop();\n";
-    o____ "}else if(what==\"noise\"){ itested();\n";
-    o______ "return false; // later\n";
-    o____ "}else{ untested();\n";
-    o______ "incomplete();\n";
-    o______ "return false;\n";
-    o____ "}\n";
-    o__ "}\n";
-  }
-} analysis;
-DISPATCHER<FUNCTION>::INSTALL d_analysis(&function_dispatcher, "analysis", &analysis);
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class Token_PG : public Token_CALL {
 public:

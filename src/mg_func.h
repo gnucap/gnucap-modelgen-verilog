@@ -64,6 +64,7 @@ public: // characteristics
   virtual bool is_output_arg(int)const {return false;}
   virtual Data_Type const* arg_type(int)const{return nullptr;}
   virtual Data_Type const* return_type()const{return nullptr;}
+  virtual bool has_analysis()const  {return false;}
   virtual bool has_precalc()const   {return false;}
   virtual bool has_tr_begin()const  {return false;}
   virtual bool has_tr_restore()const{return has_tr_begin();}

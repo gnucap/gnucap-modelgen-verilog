@@ -1208,6 +1208,10 @@ void Module::dump_variables(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 void Module::import_flags(FUNCTION_ const* f)
 {
+  if(f->has_analysis()){
+    set_analysis();
+  }else{
+  }
   if(f->has_tr_begin()){
     set_tr_begin();
   }else{
@@ -1308,6 +1312,7 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args_)
     t = f->new_token(*this, num_args);
     if(!t){
       t = new Token_CALL(f->label(), f);
+      import_flags(f);
     }else{
     }
   }else if( (t = f->new_token(*this, num_args)) ){
