@@ -68,49 +68,6 @@ void stack_op(FUNCTION_ const* f, Expression const& arg, Expression* E)
     }
     throw Exception("failed.");
   }
-
-  return;
-
-  Expression const* ee = &arg;
-  bool all_float = false;
-  double argv[5];
-  argv[0] = NOT_VALID;
-  argv[1] = NOT_VALID;
-  argv[2] = NOT_VALID;
-  argv[3] = NOT_VALID;
-  argv[4] = NOT_VALID;
-  double* seek = argv;
-  for (Expression::const_iterator i = ee->begin(); i != ee->end(); ++i) { untested();
-    trace1("float?", (**i).name());
-    auto F = dynamic_cast<Float const*>((**i).data());
-    all_float = F;
-    if(!all_float){ untested();
-      break;
-    }else{ untested();
-      *seek = F->value();
-      ++seek;
-      assert(seek<argv+5);
-    }
-  }
-
-  if(!all_float){ untested();
-    throw Exception("invalid");
-    // restore argument.
-  }else if(arg.size()==1){ untested();
-    double value = f->evalf(argv);
-    const Float* v = new Float(value);
-    E->push_back(new Token_CONSTANT(v, ""));
-  }else if(arg.size()==2){ untested();
-    double value = f->evalf(argv);
-    const Float* v = new Float(value);
-    E->push_back(new Token_CONSTANT(v, ""));
-  }else if(arg.size()==3){ untested();
-    double value = f->evalf(argv);
-    const Float* v = new Float(value);
-    E->push_back(new Token_CONSTANT(v, ""));
-  }else{ untested();
-    incomplete();
-  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
