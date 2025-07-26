@@ -162,7 +162,7 @@ public:
   bool is_standalone()const { return _output; }
  // bool is_analog_filter()const {return true;} not yet
 public:
-  virtual Branch* branch() const {untested(); return _br;}
+  virtual /*BUG*/ Branch* branch() const { return _br;}
 private:
  // void has_setup()const override{return true;}
  // void setup(Module*)override;
@@ -173,7 +173,7 @@ public: // bug
   void set_output(Branch const*b){_output=b;}
   bool has_output()const {return _output;}
 public: // XDT refactor
-  virtual bool port_hack()const { incomplete(); return true;}
+  virtual bool port_hack()const {return true;} // TODO
   virtual int max_args()const {assert(0); return 0; }
   virtual Branch* branch__() const {return _br;}
   virtual void set_n_to_gnd__()const {assert(0);}

@@ -1252,7 +1252,7 @@ static Token* new_filter_token(int na, FUNCTION_ const* func, Module* m)
   {
     fcl->set_label(filter_code_name); // label()); // "_b_" + filter_code_name);
     if(int(na) < f->max_args()) {
-    }else{
+    }else{ untested();
       incomplete();
       error(bDANGER, "too many arguments\n");
     }

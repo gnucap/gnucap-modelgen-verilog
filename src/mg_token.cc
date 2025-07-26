@@ -1469,12 +1469,24 @@ void Token_FILTER::stack_op(Expression* e)const
     delete cc;
     cc = nullptr;
     func->set_p_to_gnd__();
+   //  m->set_to_ground(branch()->p());
   }else if(auto dd = prechecked_cast<TData const*>(cc->data())) {
     trace2("Token_FILTER::stack_op2", name(), cc->args()->size());
 
-    branch()->deps().clear();
-    branch()->deps() = *dd; // HACK
-    if(1){
+    Branch* br = branch();
+    assert(br);
+    assert(br == func->branch()); // really?
+
+    br->deps().clear();
+    br->deps() = *dd; // HACK
+    if(func->branch()){
+      // yikes. where is m?
+      // m->set_to_ground(func->branch()->n());
+      Node_Ref n = br->n();
+      Node* nn = n.mutable_node();
+      nn->set_to_ground(nullptr);
+    }else if(1){
+      unreachable(); // encapsulation problem
       func->set_n_to_gnd__();
     }else if(0 /*sth linear*/){ untested();
       // somehow set loss=0 and output ports to target.

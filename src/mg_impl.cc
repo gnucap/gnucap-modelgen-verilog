@@ -641,6 +641,7 @@ Node_Ref Branch::p() const
     if(!f->port_hack()){
       return _p;
     }else{
+      // incomplete();
     }
     return f->p();
   }else{

@@ -399,6 +399,9 @@ public:
   Node const* operator->() const{ assert(_node); return _node; }
   operator bool() const{ return _node; }
   operator Node const*() const{ return _node; }
+  Node* mutable_node() const{
+    return _node;
+  }
 private:
   friend class Module;
   Node* mutable_node(Module&) const{

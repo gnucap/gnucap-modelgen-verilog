@@ -2,6 +2,7 @@
 PACKAGE = mgvams
 
 TARGET = \
+  mg_filt_xdt.so \
   mg_func_math.so \
   mg_func_pf.so \
   mg_func_port.so \
