@@ -3,6 +3,7 @@ PACKAGE = mgvams
 
 TARGET = \
   mg_filt_xdt.so \
+  mg_filt_noise.so \
   mg_func_analysis.so \
   mg_func_math.so \
   mg_func_pf.so \

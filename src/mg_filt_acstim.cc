@@ -268,6 +268,7 @@ static Expression_* clone_args(Base const* e)
   }
 }
 /*--------------------------------------------------------------------------*/
+// dup in noise
 bool is_zero(Token const* t)
 {
   assert(t);

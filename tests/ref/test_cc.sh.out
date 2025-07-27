@@ -1046,7 +1046,7 @@ private: // funcs
     return temp_k();
   }
 // Probe no refs: potential_p_n
-// Probe no refs: potential_white_noise_1_p_
+// Probe no refs: potential_white_noise_1_p_white_noise_1_n
 }; //COMMON_resistor
 /*--------------------------------------------------------------------------*/
 class MOD_resistor : public BASE_SUBCKT {
@@ -1077,16 +1077,16 @@ private: // func decl
     t[d_potential_b_p_n] = 1; // unnamed
     return t;
   }
-//probe potential_white_noise_1_p_
-  ddouble xs_potential_b_white_noise_1_p_white_noise_1_n() const { // potential_white_noise_1_p_
+//probe potential_white_noise_1_p_white_noise_1_n
+  ddouble xs_potential_b_white_noise_1_p_white_noise_1_n() const { // potential_white_noise_1_p_white_noise_1_n
     ddouble t;
       t = 0.;
     return t;
   }
 //filt white_noise_1
-  ddouble _b_white_noise_1(ddouble t0, std::string what);
-  bool _short_b_white_noise_1()const {return 1;}
-  ddouble _b_white_noise_1__precalc(ddouble, std::string what="");
+ddouble _b_white_noise_1(ddouble t0, std::string what);
+bool _short_b_white_noise_1()const {return 1;}
+ddouble _b_white_noise_1__precalc(ddouble, std::string what="");
 private: // construct
   explicit MOD_resistor(MOD_resistor const&);
 public:
@@ -1461,7 +1461,7 @@ bool MOD_resistor::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 #if 0
 // tr_eval_branch _b_white_noise_1_p_white_noise_1_n
-static EVAL__b_white_noise_1_p_white_noise_1_n_ Eval_(white_noise_1_p, )(CC_STATIC);
+static EVAL__b_white_noise_1_p_white_noise_1_n_ Eval_(white_noise_1_p, white_noise_1_n)(CC_STATIC);
 void EVAL__b_white_noise_1_p_white_noise_1_n_::tr_eval(ELEMENT* d)const
 {
   assert(d);
@@ -2138,7 +2138,7 @@ void MOD_resistor::expand()
     precalc_first();
 
   // clone branches
-  // filter (white_noise_1_p, )
+  // filter (white_noise_1_p, white_noise_1_n)
     {
     if (!_b_white_noise_1_p_white_noise_1_n) {
       const CARD* p = device_dispatcher["va_white_noise"]; // va_white_noise
@@ -2316,7 +2316,7 @@ private: // funcs
     return temp_k();
   }
 // Probe no refs: potential_p_n
-// Probe no refs: potential_white_noise_0_p_
+// Probe no refs: potential_white_noise_0_p_white_noise_0_n
 }; //COMMON_resistor
 /*--------------------------------------------------------------------------*/
 class MOD_resistor : public BASE_SUBCKT {
@@ -2347,16 +2347,16 @@ private: // func decl
     t[d_potential_b_p_n] = 1; // unnamed
     return t;
   }
-//probe potential_white_noise_0_p_
-  ddouble xs_potential_b_white_noise_0_p_white_noise_0_n() const { // potential_white_noise_0_p_
+//probe potential_white_noise_0_p_white_noise_0_n
+  ddouble xs_potential_b_white_noise_0_p_white_noise_0_n() const { // potential_white_noise_0_p_white_noise_0_n
     ddouble t;
       t = 0.;
     return t;
   }
 //filt white_noise_0
-  ddouble _b_white_noise_0(ddouble t0, std::string what);
-  bool _short_b_white_noise_0()const {return 1;}
-  ddouble _b_white_noise_0__precalc(ddouble, std::string what="");
+ddouble _b_white_noise_0(ddouble t0, std::string what);
+bool _short_b_white_noise_0()const {return 1;}
+ddouble _b_white_noise_0__precalc(ddouble, std::string what="");
 private: // construct
   explicit MOD_resistor(MOD_resistor const&);
 public:
@@ -2770,7 +2770,7 @@ bool MOD_resistor::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 #if 0
 // tr_eval_branch _b_white_noise_0_p_white_noise_0_n
-static EVAL__b_white_noise_0_p_white_noise_0_n_ Eval_(white_noise_0_p, )(CC_STATIC);
+static EVAL__b_white_noise_0_p_white_noise_0_n_ Eval_(white_noise_0_p, white_noise_0_n)(CC_STATIC);
 void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
 {
   assert(d);
@@ -2844,8 +2844,60 @@ void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
       }
     }_v_g(d);
 #pragma GCC diagnostic pop
-// omit Statement 21AnalogConditionalStmt
-// omit Statement 21AnalogConditionalStmt
+      {
+        // F $param_given args:0
+        ddouble t0;
+        //t0.set_no_deps();
+        t0 = param_given((_p_tnom) /*rhspar*/);
+        if (t0) {
+          { // anonymous block
+            { // Assignment real 'dt'.
+              // function $temperature args:0
+              ddouble t0;
+              //t0.set_no_deps();
+              t0 = f_temp(); // no parlist
+              t0 = t0 - (_p_tnom) /*rhspar*/;
+              _v_dt = t0.value(); // (*)
+            }
+          }
+        }
+      }
+      {
+        // F $param_given args:0
+        ddouble t0;
+        //t0.set_no_deps();
+        t0 = param_given((_p_tc1) /*rhspar*/);
+        // F $param_given args:0
+        ddouble t1;
+        //t1.set_no_deps();
+        t1 = param_given((_p_tc2) /*rhspar*/);
+        t0 = t0 || t1;
+        if (t0) {
+          { // anonymous block
+            { // Assignment real 'g'.
+              ddouble t0;
+              //t0.set_no_deps();
+              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/;
+              t0 = (_p_tc1) /*rhspar*/ + t0;
+              t0 = t0 * _v_dt/*rhsvar*/;
+              t0 = t0 +  1.;
+              t0 = (_p_r) /*rhspar*/ * t0;
+              t0 =  1. / t0;
+              _v_g = t0.value(); // (*)
+            }
+          }
+        }else {
+          { // anonymous block
+            { // Assignment real 'g'.
+              ddouble t0;
+              //t0.set_no_deps();
+              t0 =  1. / (_p_r) /*rhspar*/;
+              _v_g = t0.value(); // (*)
+            }
+          }
+        }
+
+      }
 // omit Statement 26AnalogProceduralAssignment
 // omit Statement 12Contribution
 // omit Statement 12Contribution
@@ -3706,7 +3758,7 @@ void MOD_resistor::expand()
     precalc_first();
 
   // clone branches
-  // filter (white_noise_0_p, )
+  // filter (white_noise_0_p, white_noise_0_n)
     {
     if (!_b_white_noise_0_p_white_noise_0_n) {
       const CARD* p = device_dispatcher["va_white_noise"]; // va_white_noise

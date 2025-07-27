@@ -1255,10 +1255,11 @@ static Token* new_filter_token(int na, FUNCTION_ const* func, Module* m)
 #if 1
   {
     fcl->set_label(filter_code_name); // label()); // "_b_" + filter_code_name);
-    if(int(na) < f->max_args()) {
+    if(int(na) <= f->max_args()) {
     }else{ untested();
       incomplete();
-      error(bDANGER, "too many arguments\n");
+      throw Exception_Too_Many(na, f->max_args(), 0);
+      error(bDANGER, "too many arguments, have " + to_string(na) + "\n");
     }
     fcl->set_num_args(na);
     fcl->set_owner(m);

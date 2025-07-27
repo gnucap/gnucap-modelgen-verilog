@@ -179,7 +179,7 @@ public: // XDT refactor
   virtual Branch* branch__() const {return _br;}
   virtual void set_n_to_gnd__()const {assert(0);}
   virtual void set_p_to_gnd__()const {assert(0);}
-  virtual Probe const* prb__()const {assert(0); return nullptr;}
+  virtual Probe const* prb__()const {return _prb;}
   void set_owner(Module* m) {_m=m;}
   void set_branch(Branch* br);
 };

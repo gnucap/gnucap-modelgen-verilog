@@ -1,0 +1,12 @@
+`include "sub/disciplines.few"
+
+module fct(p,n);
+	electrical p,n;
+
+	analog begin : main
+		I(p,n) <+ white_noise(13);
+		I(p,n) <+ white_noise(0.);
+		I(p,n) <+ white_noise(0);
+		I(p,n) <+ white_noise(1-exp(0.));
+	end
+endmodule

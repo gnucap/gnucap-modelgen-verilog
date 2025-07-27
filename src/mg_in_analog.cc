@@ -568,7 +568,7 @@ bool AnalogSwitchStmt::update()
   bool ret = false;
   while(true){
     _body.clear_vars();
-    if (_body.update()){ untested();
+    if (_body.update()){itested();
       ret = true;
     }else{
       break;
@@ -918,7 +918,7 @@ void AnalogSeqStmt::parse(CS& f)
     _block.set_never();
   }else if(is_always()) {
     _block.set_always();
-  }else{ untested();
+  }else{itested();
   }
 
   f >> _block;

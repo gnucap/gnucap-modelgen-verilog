@@ -114,14 +114,14 @@ int main(int argc, char** argv)
 
   for(; argc>1; --argc, ++argv) try{
     trace2("main", argc, argv[0]);
-    if (strcmp(argv[0],"-o")==0) { untested();
+    if (strcmp(argv[0],"-o")==0) {itested();
       output.set(argv[1]);
       --argc;
       ++argv;
-    }else if (strcasecmp(argv[0], "-a") == 0) { untested();
+    }else if (strcasecmp(argv[0], "-a") == 0) {itested();
       --argc;
       ++argv;
-      if (argc) { untested();
+      if (argc) {itested();
 	CMD::command(std::string("attach ") + argv[0], &CARD_LIST::card_list);
       }else{untested();
       }

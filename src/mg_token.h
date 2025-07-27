@@ -132,7 +132,7 @@ inline std::string Token_FUNCTION::code_name()const
   assert(f());
   if(f()->code_name() != "") {
     return f()->code_name();
-  }else if(f()->label() != "") { untested();
+  }else if(f()->label() != "") {itested();
     // incomplete(); // m_va.h, TODO
     return "/*INCOMPLETE*/ va::" + f()->label();
   }else{ untested();

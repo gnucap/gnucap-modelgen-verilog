@@ -622,7 +622,6 @@ void Token_CALL::stack_op(Expression* e) const
   }
 
   if (arg_expr) {
-    trace2("CALL got parlist", name(), arg_expr->size());
     FUNCTION_ const* f = function();
 
     if(f){
@@ -1452,9 +1451,14 @@ void Token_FILTER::stack_op(Expression* e)const
   assert(e);
   Token_CALL::stack_op(e);
   assert(!e->is_empty());
-  auto cc = prechecked_cast<Token_CALL const*>(e->back());
-  assert(cc);
-  e->pop_back();
+  auto cc = dynamic_cast<Token_CALL const*>(e->back());
+  if(cc){
+    e->pop_back();
+  }else if(dynamic_cast<Token_CONSTANT const*>(e->back())){
+    return;
+  }else{
+    unreachable();
+  }
   // assert(!e->is_empty());
 
   auto func = prechecked_cast<MGVAMS_FILTER const*>(f());

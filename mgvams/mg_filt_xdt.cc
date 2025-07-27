@@ -59,10 +59,6 @@ public:
   bool has_tr_review()const override {return false;}
   bool has_tr_accept()const override {return false;}
   bool has_tr_advance()const override {return true;}
-
-public: // HACK
-  Node_Ref _p;
-  Node_Ref _n;
 protected:
   explicit XDT() : MGVAMS_FILTER() {
     set_label("XDT");

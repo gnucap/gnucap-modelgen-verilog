@@ -53,6 +53,7 @@ void stack_op(FUNCTION_ const* f, Expression const& arg, Expression* E)
 
   if(literal){
     try{
+      trace0("free stack_op, f");
       f->stack_op(E);
     }catch(Exception const& x){
       while (E->size()>s){

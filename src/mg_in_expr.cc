@@ -118,6 +118,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       Float* f = new vReal(std::numeric_limits<double>::quiet_NaN());
       E.push_back(new Token_CONSTANT(f, ""));
     }else if(auto pl = dynamic_cast<Token_PARLIST*>(t)) {
+      trace0("resolve PARLIST");
 //      trace1("resolve PARLIST");
       Token_PARLIST_ tt(*pl);
       tt.stack_op(&E);

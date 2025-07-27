@@ -1,0 +1,13 @@
+module fct(p, n);
+  electrical p, n;
+  analog begin : main
+    I(p, n) <+ white_noise(13);
+    I(p, n) <+  0.;
+    I(p, n) <+  0.;
+    I(p, n) <+  0.;
+  end
+
+endmodule
+
+
+

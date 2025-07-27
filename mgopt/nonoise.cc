@@ -40,19 +40,19 @@ namespace{
 /*--------------------------------------------------------------------------*/
 class STUB : public MGVAMS_FUNCTION {
 public:
-  explicit STUB(std::string const l) : MGVAMS_FUNCTION() { untested();
+  explicit STUB(std::string const l) : MGVAMS_FUNCTION() {itested();
     set_label(l);
   }
   ~STUB() { }
 private:
-  std::string code_name()const override{ untested();
-    if(label()!=""){ untested();
+  std::string code_name()const override{itested();
+    if(label()!=""){itested();
       return "";
     }else{ untested();
       return "va::" + label();
     }
   }
-  void make_cc_common(std::ostream& o)const override { untested();
+  void make_cc_common(std::ostream& o)const override {itested();
     o << "// dummy " << label() << "\n";
   }
   void stack_op(Expression*)const override { untested();
