@@ -23,4 +23,4 @@ Gnucap   System status
 iterations: op=0, dc=0, tran=126, fourier=0, total=161
 transient timesteps: accepted=29, rejected=4, total=33
 nodes: user=1, subckt=0, model=6, total=7
-dctran density=46.9%, ac density=38.8%
+dctran density=44.9%, ac density=26.5%

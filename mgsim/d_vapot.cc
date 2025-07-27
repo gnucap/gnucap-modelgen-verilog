@@ -32,7 +32,7 @@ public:
   ~VAPOT() {}
 protected: // override virtual
   CARD*	   clone()const override	{return new VAPOT(*this);}
-  void	   tr_iwant_matrix()override	{tr_iwant_matrix_extended();}
+ // void	   tr_iwant_matrix()override	// CPOLY_G
   bool	   do_tr()override;
   void	   tr_load()override;
   void	   tr_begin()override{
@@ -42,7 +42,7 @@ protected: // override virtual
   double   tr_involts()const override	{ return tr_outvolts();}
   double   tr_involts_limited()const override { untested();return tr_outvolts_limited();}
   double   tr_amps()const override;
-  void	   ac_iwant_matrix()override	{ac_iwant_matrix_extended();}
+  // void	   ac_iwant_matrix()override	// CPOLY_G
   void	   ac_load()override;
   COMPLEX  ac_involts()const override	{itested(); return NOT_VALID;}
   COMPLEX  ac_amps()const override	{itested(); return NOT_VALID;}
@@ -182,7 +182,7 @@ void VAPOT::tr_load()
     trace2("load port", long_label(), _m0_[i-2]);
     trace2("load port", long_label(), n_(2*i-2)->short_label());
     trace2("load port", long_label(), n_(2*i-1)->short_label());
-    tr_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), &(_m0_[i-2]), &(_m1_[i-2]));
+    tr_load_asymmetric(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), &(_m0_[i-2]), &(_m1_[i-2]));
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -217,9 +217,9 @@ void VAPOT::ac_load()
 
   for (int i=2; i<=_n_ports; ++i) {
     if(_loss0){
-      ac_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), - _values[i] * _loss0);
+      ac_load_asymmetric(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), - _values[i] * _loss0);
     }else{ untested();
-      ac_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), _values[i]);
+      ac_load_asymmetric(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), _values[i]);
     }
   }
 }

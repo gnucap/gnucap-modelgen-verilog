@@ -32,13 +32,13 @@ public:
   ~VAFLOW() {}
 protected: // override virtual
   CARD*	   clone()const override	{return new VAFLOW(*this);}
-  void	   tr_iwant_matrix()override	{tr_iwant_matrix_extended();}
+  // void	   tr_iwant_matrix()override // POLY_G
   bool	   do_tr()override;
   void	   tr_load()override;
   double   tr_involts()const override	{ untested();unreachable(); return NOT_VALID;}
   double   tr_involts_limited()const override { untested();unreachable(); return NOT_VALID;}
   double   tr_amps()const override;
-  void	   ac_iwant_matrix()override	{ac_iwant_matrix_extended();}
+  //void	   ac_iwant_matrix()override // POLY_G
   void	   ac_load()override;
   COMPLEX  ac_involts()const override	{itested(); return NOT_VALID;}
   COMPLEX  ac_amps()const override	{itested(); return NOT_VALID;}
@@ -125,7 +125,7 @@ void VAFLOW::ac_load()
   ac_load_passive();
   for (int i=2; i<=_n_ports; ++i) {
     trace4("acload", long_label(), i, _values[i], _old_values[i]);
-    ac_load_extended(_nN[OUT1], _nN[OUT2], _nN[2*i-2], _nN[2*i-1], _values[i]);
+    ac_load_asymmetric(_nN[OUT1], _nN[OUT2], _nN[2*i-2], _nN[2*i-1], _values[i]);
   }
 }
 /*--------------------------------------------------------------------------*/

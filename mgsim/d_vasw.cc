@@ -32,7 +32,7 @@ public:
   ~VAPOT() {}
 protected: // override virtual
   CARD*	   clone()const override	{return new VAPOT(*this);}
-  void	   tr_iwant_matrix()override	{tr_iwant_matrix_extended();}
+ // void	   tr_iwant_matrix()override// CPOLY
   bool	   do_tr()override;
   void	   tr_load()override;
   void	   tr_begin()override{
@@ -42,7 +42,7 @@ protected: // override virtual
   double   tr_involts()const override	{return tr_outvolts();}
   double   tr_involts_limited()const override {return tr_outvolts_limited();}
   double   tr_amps()const override;
-  void	   ac_iwant_matrix()override	{ac_iwant_matrix_extended();}
+ // void	   ac_iwant_matrix()override // CPOLY
   void	   ac_load()override;
   COMPLEX  ac_involts()const override	{itested(); return NOT_VALID;}
   COMPLEX  ac_amps()const override	{itested(); return NOT_VALID;}

@@ -51,7 +51,7 @@ Gnucap   System status
 iterations: op=0, dc=0, tran=12, fourier=0, total=202
 transient timesteps: accepted=45, rejected=5, total=50
 nodes: user=2, subckt=0, model=3, total=5
-dctran density=76.0%, ac density=76.0%
+dctran density=64.0%, ac density=64.0%
 name   ...
 have 5 nodes. model: 3 sckt: 0
 

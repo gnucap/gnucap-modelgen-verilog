@@ -26,7 +26,7 @@ Gnucap   System status
 iterations: op=11, dc=213, tran=0, fourier=0, total=224
 transient timesteps: accepted=0, rejected=0, total=0
 nodes: user=7, subckt=0, model=112, total=119
-dctran density=10.2%, ac density=10.2%
+dctran density=9.6%, ac density=9.6%
 #Time       v(1)       v(2)       v(3)       v(4)       v(5)       v(6)       v(7)       iter(0)   
  0.         5.         0.         5.         4.5801     5.         4.2964     5.         11.       
  100.p      5.         0.         5.0003     4.5801     5.0003     4.2964     5.         20.       
@@ -83,4 +83,4 @@ Gnucap   System status
 iterations: op=11, dc=213, tran=301, fourier=0, total=593
 transient timesteps: accepted=66, rejected=2, total=68
 nodes: user=7, subckt=0, model=112, total=119
-dctran density=10.2%, ac density=10.2%
+dctran density=9.6%, ac density=9.6%

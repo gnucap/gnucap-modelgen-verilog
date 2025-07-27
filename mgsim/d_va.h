@@ -65,14 +65,14 @@ protected: // override virtual
   int	   matrix_nodes()const override	{ return ext_nodes() + int_nodes();}
   int	   net_nodes()const override	{return _n_ports*2 - int(_current_port_names.size());}
   CARD*	   clone()const override	{ untested();return new DEV_CPOLY_G(*this);}
-  void	   tr_iwant_matrix()override	{ untested();tr_iwant_matrix_extended();}
+  void	   tr_iwant_matrix()override	{tr_iwant_matrix_shunt(); tr_iwant_matrix_control();}
   bool	   do_tr()override;
   void	   tr_load()override;
   void	   tr_unload()override;
   double   tr_involts()const override	{ untested();unreachable(); return NOT_VALID;}
   double   tr_involts_limited()const override { untested();unreachable(); return NOT_VALID;}
   double   tr_amps()const override;
-  void	   ac_iwant_matrix()override	{ untested();ac_iwant_matrix_extended();}
+  void	   ac_iwant_matrix()override	{ac_iwant_matrix_shunt(); ac_iwant_matrix_control();}
   void	   ac_load()override;
   COMPLEX  ac_involts()const override	{itested(); return NOT_VALID;}
   COMPLEX  ac_amps()const override	{itested(); return NOT_VALID;}
