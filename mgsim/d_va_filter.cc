@@ -755,7 +755,7 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
 
     if (net_nodes() > NODES_PER_BRANCH) {
       // allocate a bigger node list
-      _nN = new node_t[net_nodes()];
+      _nN = new node_t[matrix_nodes()];
     }else{
       // use the default node list, already set
     }      

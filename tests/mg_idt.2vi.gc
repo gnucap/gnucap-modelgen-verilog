@@ -1,0 +1,37 @@
+attach ./modelgen_0.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen
+module test_idt2vi(p, n, cp, cn, vp, vn);
+	electrical p, n, cp, cn, vp, vn;
+	analog begin
+		I(p,n) <+ idt(V(vp, vn) + I(cp, cn), 1.1);
+	end
+endmodule
+
+!make test_idt2vi.so > /dev/null
+attach ./test_idt2vi.so
+
+verilog
+parameter r=1
+parameter v=0
+parameter pi=3.1415926535897932384626433832795028841972
+
+test_idt2vi #() dut(\0 ,\3 ,\1 ,\0 , \0 , \0 );
+vsine #(.freq(1 /6.28), .dc(v), .ampl(1 )) v1 (a , \0 );
+resistor #(1) r(a ,\1 )
+resistor #(1) r(\0 ,\3 )
+
+list
+
+print tran v(1) v(3)
+print tran + iter(0)
+tran 0 {2*pi} {.2*pi} trace=n
+
+options trtol=1
+
+tran 0 {2*pi} {.2*pi} trace=n
+status notime
+end
