@@ -2,9 +2,14 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
-20250***-dev
+20250731-dev
 ============
 - random distribution functions
+- modularise functions and filters
+- generate code for $rdist_* calls
+- adjust precalc logic
+- fix current control in idt/ddt
+- follow various library improvements
 
 20250525-dev
 ============

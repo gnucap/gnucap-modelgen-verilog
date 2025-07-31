@@ -5,6 +5,7 @@ See README files in subdirectories.
 rc     - build and simulate rc lowpass variants
 cpl    - coupled transmission lines
 rnd    - statistical modelling
+trln   - transmission line models
 
 == Prerequisites
 
