@@ -1163,10 +1163,8 @@ void Contribution::parse(CS& cmd)
   }else{
   }
 
-  if(!_branch->discipline()) { untested();
+  if(!_branch->discipline()) { itested();
     cmd.reset(here);
-    unreachable();
-    assert(0);
     throw Exception_CS_("bad discipline.", cmd);
   }else{
   }

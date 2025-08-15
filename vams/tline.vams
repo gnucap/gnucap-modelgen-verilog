@@ -1,0 +1,36 @@
+// (c) Felix Salfelder 2023, 2024
+// GPLv3+
+`include "disciplines.vams"
+`include "constants.vams"
+
+// Gnucap built-in transmission line, simplified.
+// Delay line with reflections, for testing
+module tline0(t1, b1, t2, b2)
+	electrical t1, b1;
+	electrical t2, b2;
+	electrical fwd, ref;
+	branch (t1, b1) out;
+	branch (t2, b2) in;
+	parameter real delay = 1. from (0:inf);
+	parameter real len = 1. from [0:inf);
+	parameter real nl = 1. from (0:inf);
+	parameter real f = 0. from (0:inf);
+	parameter real z0 = 50. from (0:inf);
+	// BUG "not constant"
+	// localparam real real_td = nl*(f?(len / f):delay);
+	localparam real real_td = nl*len / f;
+	(*desc="v"*)real vref, vfwd;
+	analog begin
+      I(out) <+ V(out)/z0;
+      I(in) <+ V(in)/z0;
+
+		vfwd = absdelay(2.*V(in) - V(ref), real_td);
+		vref = absdelay(2.*V(out)- V(fwd), real_td);
+
+		I(fwd) <+ V(fwd) - vfwd;
+		I(ref) <+ V(ref) - vref;
+
+		I(out) <+ - vfwd/z0;
+		I(in) <+ - vref/z0;
+	end
+endmodule
