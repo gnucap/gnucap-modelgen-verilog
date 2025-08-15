@@ -8,6 +8,7 @@ MODELS = \
 	inductor.vams \
 	isine.vams \
 	mosfet.vams \
+	tline.vams \
 	vccs.vams \
 	vcvs.vams \
 	vpulse.vams \
