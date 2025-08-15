@@ -19,6 +19,8 @@ resistor #(.r(25.)) R4l (.p(\42 ),.n(\0 ));
 resistor #(.r( rs )) R5s (.p(\1 ),.n(\51 ));
 tline0 #(.nl(.25),.f(10e6),.z0(50)) T5 (.t1(\51 ),.b1(\0 ),.t2(\52 ),.b2(\0 ));
 resistor #(.r(100.)) R5l (.p(\52 ),.n(\0 ));
+vsine #(.mag(1)) v1 (.p(\1 ),.n(\0 ));
+ground \0 ;
 #          
  27.       
 #Freq       vp(1)      vp(11)     vp(12)     vp(21)     vp(22)     vp(31)     vp(32)     vp(41)     vp(42)     vp(51)     vp(52)    
@@ -118,5 +120,5 @@ resistor #(.r(100.)) R5l (.p(\52 ),.n(\0 ));
 Gnucap   System status
 iterations: op=2, dc=0, tran=0, fourier=0, total=93
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=11, subckt=0, model=30, total=41
-dctran density=16.6%, ac density=30.3%
+nodes: user=11, subckt=0, model=31, total=42
+dctran density=17.7%, ac density=30.7%

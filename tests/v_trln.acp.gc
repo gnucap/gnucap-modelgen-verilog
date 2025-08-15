@@ -1,6 +1,7 @@
 verilog
 options nowarn
 load vams/tline.so
+load vams/vsine.so
 // Transmission lines
 width out=160
 
@@ -26,11 +27,10 @@ resistor #(.r( rs )) R5s (.p(\1 ),.n(\51 ));
 tline0 #(.z0(50),.f(10e6),.nl(.25)) T5 (.t1(\51 ),.b1(\0 ),.t2(\52 ),.b2(\0 ));
 resistor #( 100.) R5l (.p(\52 ),.n(\0 ));
 
+vsine #(.mag(1)) v1(\1 , \0 );
+ground \0 ;
+
 list
-// TODO vsine .mag(1) ..
-spice
-V1 1 0 ac 1
-.verilog
 
 // nominal-z drive
 parameter rs=50.
