@@ -31,9 +31,9 @@ main.p discarded: no match: c
 main.p: ports from top level
 main.p discarded: no match: b
 main.p: 1 candidate found for ports
+m.p port tie break: 3 vs. 2
 ports.c: vsource from device_dispatcher
 ports.c: 1 candidate found for vsource
-m.p port tie break: 3 vs. 2
 ports.c: vsource from device_dispatcher
 ports.c: 1 candidate found for vsource
 >>>>>dc

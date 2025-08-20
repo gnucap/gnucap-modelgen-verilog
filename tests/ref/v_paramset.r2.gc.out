@@ -40,12 +40,12 @@ r already set. replacing
 main.n2: 2 candidates found for Resistor
 main.i0: isource from device_dispatcher
 main.i0: 1 candidate found for isource
-m1.n2 .. candidate: A, params: 1
-m1.n2 dropped invalid candidate: A.
-m1.n2 .. candidate: B, params: 2
 m1.n1 .. candidate: A, params: 1
 m1.n1 .. candidate: B, params: 2
 m1.n1 dropped invalid candidate: B.
+m1.n2 .. candidate: A, params: 1
+m1.n2 dropped invalid candidate: A.
+m1.n2 .. candidate: B, params: 2
 >>>>>dc
 #           v(a)       v(gnd)    
  0.         1.         0.        

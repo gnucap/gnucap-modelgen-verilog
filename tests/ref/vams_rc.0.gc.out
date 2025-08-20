@@ -1,7 +1,7 @@
-dut.r1 tie break: 5 vs. 1
-dut.r1 ambiguous overload in resistor
 dut.c1 tie break: 2 vs. 1
 dut.c1 ambiguous overload in capacitor
+dut.r1 tie break: 5 vs. 1
+dut.r1 ambiguous overload in resistor
 #           v(in)      v(out)     iter(0)   
  0.         0.9        0.9        3.        
 #Time       v(in)      v(out)     iter(0)   

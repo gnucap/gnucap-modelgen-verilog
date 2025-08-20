@@ -29,7 +29,7 @@ endmodule // main
 main #(.v(1)) m1 (\0 , \1 );
 main #(.v(2)) m2 (\0 , \2 );
 main.v1: no candidates found for vs
-m2.v1: no valid prototype found for vs
+m1.v1: no valid prototype found for vs
 Gnucap   System status
 iterations: op=0, dc=0, tran=0, fourier=0, total=1
 transient timesteps: accepted=0, rejected=0, total=0
