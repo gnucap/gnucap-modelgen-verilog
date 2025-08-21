@@ -158,6 +158,7 @@ void VAPOT::tr_load()
     tr_load_shunt(); // 4 pt +- loss
     trace3("CPG.. ", long_label(), _loss0, _loss1);
     tr_load_source();
+    _m1.c1 = _m0.c1;
   }
 
   for (int i=2; i<=_n_ports; ++i) {

@@ -180,7 +180,7 @@ private: // overrides
     }
     return ii;
   }
-  int matrix_nodes()const override {return 2;}
+  int matrix_nodes()const override {return _n_ports*2 + bool(_ctrl_in);}
   std::string value_name()const override { return "";}
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
