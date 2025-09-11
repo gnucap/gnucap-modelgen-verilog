@@ -507,7 +507,6 @@ void OUT_EXPRESSION::make_cc_array(std::ostream& o, Token_ARRAY_ const* A)
     o << " /*(312b)*/ "; //  << A->code_name();
   }else if(!argnames.size()){
     //	o << A->code_name() << "(); // no args\n";
-    vars().args_pop();
     o << "; /*(312a)*/ "; //  << A->code_name();
   }else{
     o << " /*(312)*/ "; //  << A->code_name();
@@ -519,17 +518,17 @@ void OUT_EXPRESSION::make_cc_array(std::ostream& o, Token_ARRAY_ const* A)
       comma = ", ";
     }
     o << ");\n";
-    vars().args_pop();
   }
+  vars().args_pop();
 }
 /*--------------------------------------------------------------------------*/
 void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
 {
+  vars().stop();
   if(F->args()){
     o__ "// F " << F->name() << " args:" << vars().have_args() << "\n";
     auto se = prechecked_cast<Expression const*>(F->args());
     assert(se);
-    vars().stop();
     make_cc_expression_(o, *se);
   }else{
     o__ "// function " << F->name() << " args:" << vars().have_args() << "\n";
@@ -584,11 +583,7 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
   }else{
   }
   if(!F->args()) {
-    o << "); // no parlist\n";
     assert(!argnames.size());
-  }else if(!argnames.size()){
-    o << "); // no args\n";
-    vars().args_pop();
   }else{
     assert(F->code_name()!="");
     for(int nn=0; nn<int(argnames.size()); ++nn) {
@@ -601,9 +596,9 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
       }
       comma = ", ";
     }
-    o << ");\n";
-    vars().args_pop();
   }
+  o << ");\n";
+  vars().args_pop();
 }
 /*--------------------------------------------------------------------------*/
 void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
@@ -671,6 +666,7 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
       make_cc_call(o, F);
     }else if (auto ff=dynamic_cast<const Token_FUNCTION*>(*i)) {
       vars().new_ref("&COMMON::" + ff->code_name());
+#if 0
     }else if (auto pl=dynamic_cast<const Token_PARLIST_*>(*i)) { untested();
       if(auto se = dynamic_cast<Expression const*>(pl->args())){ untested();
 	o__ "// start parlist\n";
@@ -685,6 +681,7 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
       }else{ untested();
 	unreachable(); // ?
       }
+#endif
     }else if (auto bo = dynamic_cast<const Token_BINOP_*>(*i)) {
 
       assert(bo->op1());
