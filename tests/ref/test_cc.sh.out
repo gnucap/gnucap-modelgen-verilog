@@ -1482,15 +1482,15 @@ void EVAL__b_white_noise_1_p_white_noise_1_n_::tr_eval(ELEMENT* d)const
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
     // tmp block proxy (823b)
     class _V_dt : public ddouble {
-      MOD__ * const _m;
+      MOD__ * const _m{nullptr};
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_dt(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
-      _V_dt(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_dt(_V_dt const& p) : ddouble(p), _m(nullptr) {}
-      explicit _V_dt() : ddouble(), _m(nullptr) {set_all_deps();}
+      _V_dt(ddouble const& p) : ddouble(p) { itested(); }
+      _V_dt(double const& p) : ddouble(p) {set_all_deps();}
+      _V_dt(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
+      _V_dt(_V_dt const& p) : ddouble(p) {}
+      explicit _V_dt() : ddouble() {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
         if(_m){
@@ -1509,15 +1509,15 @@ void EVAL__b_white_noise_1_p_white_noise_1_n_::tr_eval(ELEMENT* d)const
     }_v_dt(d);
     // tmp block proxy (823b)
     class _V_g : public ddouble {
-      MOD__ * const _m;
+      MOD__ * const _m{nullptr};
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
-      _V_g(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p), _m(nullptr) {}
-      explicit _V_g() : ddouble(), _m(nullptr) {set_all_deps();}
+      _V_g(ddouble const& p) : ddouble(p) { itested(); }
+      _V_g(double const& p) : ddouble(p) {set_all_deps();}
+      _V_g(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
+      _V_g(_V_g const& p) : ddouble(p) {}
+      explicit _V_g() : ddouble() {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
         if(_m){
@@ -1566,15 +1566,15 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
     // tmp block proxy (823b)
     class _V_dt : public ddouble {
-      MOD__ * const _m;
+      MOD__ * const _m{nullptr};
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_dt(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
-      _V_dt(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_dt(_V_dt const& p) : ddouble(p), _m(nullptr) {}
-      explicit _V_dt() : ddouble(), _m(nullptr) {set_all_deps();}
+      _V_dt(ddouble const& p) : ddouble(p) { itested(); }
+      _V_dt(double const& p) : ddouble(p) {set_all_deps();}
+      _V_dt(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
+      _V_dt(_V_dt const& p) : ddouble(p) {}
+      explicit _V_dt() : ddouble() {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
         if(_m){
@@ -1593,15 +1593,15 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
     }_v_dt(d);
     // tmp block proxy (823b)
     class _V_g : public ddouble {
-      MOD__ * const _m;
+      MOD__ * const _m{nullptr};
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
-      _V_g(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p), _m(nullptr) {}
-      explicit _V_g() : ddouble(), _m(nullptr) {set_all_deps();}
+      _V_g(ddouble const& p) : ddouble(p) { itested(); }
+      _V_g(double const& p) : ddouble(p) {set_all_deps();}
+      _V_g(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
+      _V_g(_V_g const& p) : ddouble(p) {}
+      explicit _V_g() : ddouble() {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
         if(_m){
@@ -1625,7 +1625,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
           { // Assignment real 'g'.
             ddouble t0;
             //t0.set_no_deps();
-            t0 =  1. / (_p___r) /*rhspar*/;
+            t0 =  1. / (_p___r) /*rhspar*/; // (703)
             _v_g = t0.value(); // (*)
           }
         }
@@ -1636,7 +1636,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        t0 = t0 * _v_g/*rhsvar*/;
+        t0 = t0 * _v_g/*rhsvar*/; // (703)
         _v___i = t0.value(); // (*)
         _v___i[d_potential_b_p_n] = t0[d_potential_b_p_n]; // (2b)
         assert(_v___i[d_potential_b_p_n] == t0[d_potential_b_p_n]); // (2b2)
@@ -1646,7 +1646,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0 = _v___i/*rhsvar*/;
-        d->_value_b_p_n /* contrib sign: */ += t0.value();
+        d->_value_b_p_n /* contrib sign: */ += t0.value(); // (342)
         assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
         d->_st_b_p_n[1] += t0[d_potential_b_p_n];
         // dep _potential_b_p_n
@@ -1663,7 +1663,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
           // --- 
           t0 = /*a*/ d->_b_white_noise_1( 0., s0); // (659)
         } // scope
-        d->_value_b_p_n /* contrib sign: */ += t0.value();
+        d->_value_b_p_n /* contrib sign: */ += t0.value(); // (342)
         // dep _potential_b_white_noise_1_p_white_noise_1_n
         // short: _potential_b_white_noise_1_p_white_noise_1_n
       }
@@ -1727,15 +1727,15 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
   class _V___i : public ddouble {
-    MOD__ * const _m;
+    MOD__ * const _m{nullptr};
   public:
     typedef ddouble base;
     typedef va::ddouble_tag base_tag;
-    _V___i(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
-    _V___i(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-    _V___i(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-    _V___i(_V___i const& p) : ddouble(p), _m(nullptr) {}
-    explicit _V___i() : ddouble(), _m(nullptr) {set_all_deps();}
+    _V___i(ddouble const& p) : ddouble(p) { itested(); }
+    _V___i(double const& p) : ddouble(p) {set_all_deps();}
+    _V___i(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
+    _V___i(_V___i const& p) : ddouble(p) {}
+    explicit _V___i() : ddouble() {set_all_deps();}
     _V___i(MOD__* m) : ddouble(m->_v_.___i), _m(m) {}
     ~_V___i() {
       if(_m){
@@ -1766,15 +1766,15 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
     // tmp block proxy (823b)
     class _V_dt : public ddouble {
-      MOD__ * const _m;
+      MOD__ * const _m{nullptr};
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_dt(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
-      _V_dt(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_dt(_V_dt const& p) : ddouble(p), _m(nullptr) {}
-      explicit _V_dt() : ddouble(), _m(nullptr) {set_all_deps();}
+      _V_dt(ddouble const& p) : ddouble(p) { itested(); }
+      _V_dt(double const& p) : ddouble(p) {set_all_deps();}
+      _V_dt(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
+      _V_dt(_V_dt const& p) : ddouble(p) {}
+      explicit _V_dt() : ddouble() {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
         if(_m){
@@ -1793,15 +1793,15 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
     }_v_dt(d);
     // tmp block proxy (823b)
     class _V_g : public ddouble {
-      MOD__ * const _m;
+      MOD__ * const _m{nullptr};
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
-      _V_g(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p), _m(nullptr) {}
-      explicit _V_g() : ddouble(), _m(nullptr) {set_all_deps();}
+      _V_g(ddouble const& p) : ddouble(p) { itested(); }
+      _V_g(double const& p) : ddouble(p) {set_all_deps();}
+      _V_g(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
+      _V_g(_V_g const& p) : ddouble(p) {}
+      explicit _V_g() : ddouble() {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
         if(_m){
@@ -1826,7 +1826,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
           { // Assignment real 'g'.
             ddouble t0;
             //t0.set_no_deps();
-            t0 =  1. / (_p___r) /*rhspar*/;
+            t0 =  1. / (_p___r) /*rhspar*/; // (703)
             _v_g = t0.value(); // (*)
           }
         }
@@ -1837,7 +1837,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        t0 = t0 * _v_g/*rhsvar*/;
+        t0 = t0 * _v_g/*rhsvar*/; // (703)
         _v___i = t0.value(); // (*)
         _v___i[d_potential_b_p_n] = t0[d_potential_b_p_n]; // (2b)
         assert(_v___i[d_potential_b_p_n] == t0[d_potential_b_p_n]); // (2b2)
@@ -1847,7 +1847,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0 = _v___i/*rhsvar*/;
-        d->_value_b_p_n /* contrib sign: */ += t0.value();
+        d->_value_b_p_n /* contrib sign: */ += t0.value(); // (342)
         assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
         d->_st_b_p_n[1] += t0[d_potential_b_p_n];
         // dep _potential_b_p_n
@@ -1864,7 +1864,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
           // --- 
           t0 = /*a*/ d->_b_white_noise_1( 0., s0); // (659)
         } // scope
-        d->_value_b_p_n /* contrib sign: */ += t0.value();
+        d->_value_b_p_n /* contrib sign: */ += t0.value(); // (342)
         // dep _potential_b_white_noise_1_p_white_noise_1_n
         // short: _potential_b_white_noise_1_p_white_noise_1_n
       }
@@ -1898,7 +1898,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
           { // Assignment real 'g'.
             ddouble t0;
             //t0.set_no_deps();
-            t0 =  1. / (_p___r) /*rhspar*/;
+            t0 =  1. / (_p___r) /*rhspar*/; // (703)
             _v_g = t0; // (prec)
           }
         }
@@ -1909,7 +1909,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = 0.; // precalc.
-        t0 = t0 * _v_g/*rhsvar*/;
+        t0 = t0 * _v_g/*rhsvar*/; // (703)
         _v___i = t0; // (prec)
       }
       { // Contribution I(p, n) lin: 1
@@ -1967,7 +1967,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
           { // Assignment real 'g'.
             ddouble t0;
             //t0.set_no_deps();
-            t0 =  1. / (_p___r) /*rhspar*/;
+            t0 =  1. / (_p___r) /*rhspar*/; // (703)
             _v_g = t0.value(); // (s)
           }
         }
@@ -1978,7 +1978,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        t0 = t0 * _v_g/*rhsvar*/;
+        t0 = t0 * _v_g/*rhsvar*/; // (703)
         _v___i = t0.value(); // (s)
       }
 // omit Statement 12Contribution
@@ -2018,7 +2018,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
           { // Assignment real 'g'.
             ddouble t0;
             //t0.set_no_deps();
-            t0 =  1. / (_p___r) /*rhspar*/;
+            t0 =  1. / (_p___r) /*rhspar*/; // (703)
             _v_g = t0.value(); // (s)
           }
         }
@@ -2029,7 +2029,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        t0 = t0 * _v_g/*rhsvar*/;
+        t0 = t0 * _v_g/*rhsvar*/; // (703)
         _v___i = t0.value(); // (s)
       }
 // omit Statement 12Contribution
@@ -2808,15 +2808,15 @@ void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
     // tmp block proxy (823b)
     class _V_dt : public ddouble {
-      MOD__ * const _m;
+      MOD__ * const _m{nullptr};
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_dt(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
-      _V_dt(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_dt(_V_dt const& p) : ddouble(p), _m(nullptr) {}
-      explicit _V_dt() : ddouble(), _m(nullptr) {set_all_deps();}
+      _V_dt(ddouble const& p) : ddouble(p) { itested(); }
+      _V_dt(double const& p) : ddouble(p) {set_all_deps();}
+      _V_dt(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
+      _V_dt(_V_dt const& p) : ddouble(p) {}
+      explicit _V_dt() : ddouble() {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
         if(_m){
@@ -2835,15 +2835,15 @@ void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
     }_v_dt(d);
     // tmp block proxy (823b)
     class _V_g : public ddouble {
-      MOD__ * const _m;
+      MOD__ * const _m{nullptr};
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
-      _V_g(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p), _m(nullptr) {}
-      explicit _V_g() : ddouble(), _m(nullptr) {set_all_deps();}
+      _V_g(ddouble const& p) : ddouble(p) { itested(); }
+      _V_g(double const& p) : ddouble(p) {set_all_deps();}
+      _V_g(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
+      _V_g(_V_g const& p) : ddouble(p) {}
+      explicit _V_g() : ddouble() {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
         if(_m){
@@ -2879,7 +2879,7 @@ void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
                 // --- 
                 t0 = f_temp(); // (659)
               } // scope
-              t0 = t0 - (_p_tnom) /*rhspar*/;
+              t0 = t0 - (_p_tnom) /*rhspar*/; // (703)
               _v_dt = t0.value(); // (*)
             }
           }
@@ -2900,18 +2900,18 @@ void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
           // --- 
           t1 = param_given((_p_tc2) /*rhspar*/); // (659)
         } // scope
-        t0 = t0 || t1;
+        t0 = t0 || t1; // (703)
         if (t0) {
           { // anonymous block
             { // Assignment real 'g'.
               ddouble t0;
               //t0.set_no_deps();
-              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/;
-              t0 = (_p_tc1) /*rhspar*/ + t0;
-              t0 = t0 * _v_dt/*rhsvar*/;
-              t0 = t0 +  1.;
-              t0 = (_p_r) /*rhspar*/ * t0;
-              t0 =  1. / t0;
+              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
+              t0 = (_p_tc1) /*rhspar*/ + t0; // (703)
+              t0 = t0 * _v_dt/*rhsvar*/; // (703)
+              t0 = t0 +  1.; // (703)
+              t0 = (_p_r) /*rhspar*/ * t0; // (703)
+              t0 =  1. / t0; // (703)
               _v_g = t0.value(); // (*)
             }
           }
@@ -2920,7 +2920,7 @@ void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
             { // Assignment real 'g'.
               ddouble t0;
               //t0.set_no_deps();
-              t0 =  1. / (_p_r) /*rhspar*/;
+              t0 =  1. / (_p_r) /*rhspar*/; // (703)
               _v_g = t0.value(); // (*)
             }
           }
@@ -2956,15 +2956,15 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
     // tmp block proxy (823b)
     class _V_dt : public ddouble {
-      MOD__ * const _m;
+      MOD__ * const _m{nullptr};
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_dt(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
-      _V_dt(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_dt(_V_dt const& p) : ddouble(p), _m(nullptr) {}
-      explicit _V_dt() : ddouble(), _m(nullptr) {set_all_deps();}
+      _V_dt(ddouble const& p) : ddouble(p) { itested(); }
+      _V_dt(double const& p) : ddouble(p) {set_all_deps();}
+      _V_dt(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
+      _V_dt(_V_dt const& p) : ddouble(p) {}
+      explicit _V_dt() : ddouble() {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
         if(_m){
@@ -2983,15 +2983,15 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
     }_v_dt(d);
     // tmp block proxy (823b)
     class _V_g : public ddouble {
-      MOD__ * const _m;
+      MOD__ * const _m{nullptr};
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
-      _V_g(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p), _m(nullptr) {}
-      explicit _V_g() : ddouble(), _m(nullptr) {set_all_deps();}
+      _V_g(ddouble const& p) : ddouble(p) { itested(); }
+      _V_g(double const& p) : ddouble(p) {set_all_deps();}
+      _V_g(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
+      _V_g(_V_g const& p) : ddouble(p) {}
+      explicit _V_g() : ddouble() {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
         if(_m){
@@ -3027,7 +3027,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
                 // --- 
                 t0 = f_temp(); // (659)
               } // scope
-              t0 = t0 - (_p_tnom) /*rhspar*/;
+              t0 = t0 - (_p_tnom) /*rhspar*/; // (703)
               _v_dt = t0.value(); // (*)
             }
           }
@@ -3048,18 +3048,18 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
           // --- 
           t1 = param_given((_p_tc2) /*rhspar*/); // (659)
         } // scope
-        t0 = t0 || t1;
+        t0 = t0 || t1; // (703)
         if (t0) {
           { // anonymous block
             { // Assignment real 'g'.
               ddouble t0;
               //t0.set_no_deps();
-              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/;
-              t0 = (_p_tc1) /*rhspar*/ + t0;
-              t0 = t0 * _v_dt/*rhsvar*/;
-              t0 = t0 +  1.;
-              t0 = (_p_r) /*rhspar*/ * t0;
-              t0 =  1. / t0;
+              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
+              t0 = (_p_tc1) /*rhspar*/ + t0; // (703)
+              t0 = t0 * _v_dt/*rhsvar*/; // (703)
+              t0 = t0 +  1.; // (703)
+              t0 = (_p_r) /*rhspar*/ * t0; // (703)
+              t0 =  1. / t0; // (703)
               _v_g = t0.value(); // (*)
             }
           }
@@ -3068,7 +3068,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
             { // Assignment real 'g'.
               ddouble t0;
               //t0.set_no_deps();
-              t0 =  1. / (_p_r) /*rhspar*/;
+              t0 =  1. / (_p_r) /*rhspar*/; // (703)
               _v_g = t0.value(); // (*)
             }
           }
@@ -3081,7 +3081,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        t0 = t0 * _v_g/*rhsvar*/;
+        t0 = t0 * _v_g/*rhsvar*/; // (703)
         _v_i = t0.value(); // (*)
         _v_i[d_potential_b_p_n] = t0[d_potential_b_p_n]; // (2b)
         assert(_v_i[d_potential_b_p_n] == t0[d_potential_b_p_n]); // (2b2)
@@ -3091,7 +3091,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0 = _v_i/*rhsvar*/;
-        d->_value_b_p_n /* contrib sign: */ += t0.value();
+        d->_value_b_p_n /* contrib sign: */ += t0.value(); // (342)
         assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
         d->_st_b_p_n[1] += t0[d_potential_b_p_n];
         // dep _potential_b_p_n
@@ -3106,8 +3106,8 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
           ddouble t1;
           //t1.set_no_deps();
           //t1[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
-          t1 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24;
-          t1 = t1 * _v_g/*rhsvar*/;
+          t1 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24; // (703)
+          t1 = t1 * _v_g/*rhsvar*/; // (703)
           ddouble t2;
           //t2.set_no_deps();
           //t2[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
@@ -3116,13 +3116,13 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
             // --- 
             t2 = f_temp(); // (659)
           } // scope
-          t1 = t1 * t2;
+          t1 = t1 * t2; // (703)
           std::string s0;
           s0 = "thermal";
           // --- 
           t0 = /*a*/ d->_b_white_noise_0(t1, s0); // (659)
         } // scope
-        d->_value_b_p_n /* contrib sign: */ += t0.value();
+        d->_value_b_p_n /* contrib sign: */ += t0.value(); // (342)
         // dep _potential_b_white_noise_0_p_white_noise_0_n
         // short: _potential_b_white_noise_0_p_white_noise_0_n
       }
@@ -3186,15 +3186,15 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
   class _V_i : public ddouble {
-    MOD__ * const _m;
+    MOD__ * const _m{nullptr};
   public:
     typedef ddouble base;
     typedef va::ddouble_tag base_tag;
-    _V_i(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
-    _V_i(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-    _V_i(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-    _V_i(_V_i const& p) : ddouble(p), _m(nullptr) {}
-    explicit _V_i() : ddouble(), _m(nullptr) {set_all_deps();}
+    _V_i(ddouble const& p) : ddouble(p) { itested(); }
+    _V_i(double const& p) : ddouble(p) {set_all_deps();}
+    _V_i(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
+    _V_i(_V_i const& p) : ddouble(p) {}
+    explicit _V_i() : ddouble() {set_all_deps();}
     _V_i(MOD__* m) : ddouble(m->_v_._i), _m(m) {}
     ~_V_i() {
       if(_m){
@@ -3225,15 +3225,15 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
     // tmp block proxy (823b)
     class _V_dt : public ddouble {
-      MOD__ * const _m;
+      MOD__ * const _m{nullptr};
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_dt(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
-      _V_dt(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_dt(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_dt(_V_dt const& p) : ddouble(p), _m(nullptr) {}
-      explicit _V_dt() : ddouble(), _m(nullptr) {set_all_deps();}
+      _V_dt(ddouble const& p) : ddouble(p) { itested(); }
+      _V_dt(double const& p) : ddouble(p) {set_all_deps();}
+      _V_dt(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
+      _V_dt(_V_dt const& p) : ddouble(p) {}
+      explicit _V_dt() : ddouble() {set_all_deps();}
       _V_dt(MOD__* m) : ddouble(m->_v_._main._dt), _m(m) {}
       ~_V_dt() {
         if(_m){
@@ -3252,15 +3252,15 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
     }_v_dt(d);
     // tmp block proxy (823b)
     class _V_g : public ddouble {
-      MOD__ * const _m;
+      MOD__ * const _m{nullptr};
     public:
       typedef ddouble base;
       typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }
-      _V_g(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p), _m(nullptr) {}
-      explicit _V_g() : ddouble(), _m(nullptr) {set_all_deps();}
+      _V_g(ddouble const& p) : ddouble(p) { itested(); }
+      _V_g(double const& p) : ddouble(p) {set_all_deps();}
+      _V_g(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
+      _V_g(_V_g const& p) : ddouble(p) {}
+      explicit _V_g() : ddouble() {set_all_deps();}
       _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
       ~_V_g() {
         if(_m){
@@ -3296,7 +3296,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
                 // --- 
                 t0 = f_temp(); // (659)
               } // scope
-              t0 = t0 - (_p_tnom) /*rhspar*/;
+              t0 = t0 - (_p_tnom) /*rhspar*/; // (703)
               _v_dt = t0.value(); // (*)
             }
           }
@@ -3317,18 +3317,18 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
           // --- 
           t1 = param_given((_p_tc2) /*rhspar*/); // (659)
         } // scope
-        t0 = t0 || t1;
+        t0 = t0 || t1; // (703)
         if (t0) {
           { // anonymous block
             { // Assignment real 'g'.
               ddouble t0;
               //t0.set_no_deps();
-              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/;
-              t0 = (_p_tc1) /*rhspar*/ + t0;
-              t0 = t0 * _v_dt/*rhsvar*/;
-              t0 = t0 +  1.;
-              t0 = (_p_r) /*rhspar*/ * t0;
-              t0 =  1. / t0;
+              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
+              t0 = (_p_tc1) /*rhspar*/ + t0; // (703)
+              t0 = t0 * _v_dt/*rhsvar*/; // (703)
+              t0 = t0 +  1.; // (703)
+              t0 = (_p_r) /*rhspar*/ * t0; // (703)
+              t0 =  1. / t0; // (703)
               _v_g = t0.value(); // (*)
             }
           }
@@ -3337,7 +3337,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
             { // Assignment real 'g'.
               ddouble t0;
               //t0.set_no_deps();
-              t0 =  1. / (_p_r) /*rhspar*/;
+              t0 =  1. / (_p_r) /*rhspar*/; // (703)
               _v_g = t0.value(); // (*)
             }
           }
@@ -3350,7 +3350,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        t0 = t0 * _v_g/*rhsvar*/;
+        t0 = t0 * _v_g/*rhsvar*/; // (703)
         _v_i = t0.value(); // (*)
         _v_i[d_potential_b_p_n] = t0[d_potential_b_p_n]; // (2b)
         assert(_v_i[d_potential_b_p_n] == t0[d_potential_b_p_n]); // (2b2)
@@ -3360,7 +3360,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0 = _v_i/*rhsvar*/;
-        d->_value_b_p_n /* contrib sign: */ += t0.value();
+        d->_value_b_p_n /* contrib sign: */ += t0.value(); // (342)
         assert(t0[d_potential_b_p_n] == t0[d_potential_b_p_n]);
         d->_st_b_p_n[1] += t0[d_potential_b_p_n];
         // dep _potential_b_p_n
@@ -3375,8 +3375,8 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
           ddouble t1;
           //t1.set_no_deps();
           //t1[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
-          t1 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24;
-          t1 = t1 * _v_g/*rhsvar*/;
+          t1 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24; // (703)
+          t1 = t1 * _v_g/*rhsvar*/; // (703)
           ddouble t2;
           //t2.set_no_deps();
           //t2[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
@@ -3385,13 +3385,13 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
             // --- 
             t2 = f_temp(); // (659)
           } // scope
-          t1 = t1 * t2;
+          t1 = t1 * t2; // (703)
           std::string s0;
           s0 = "thermal";
           // --- 
           t0 = /*a*/ d->_b_white_noise_0(t1, s0); // (659)
         } // scope
-        d->_value_b_p_n /* contrib sign: */ += t0.value();
+        d->_value_b_p_n /* contrib sign: */ += t0.value(); // (342)
         // dep _potential_b_white_noise_0_p_white_noise_0_n
         // short: _potential_b_white_noise_0_p_white_noise_0_n
       }
@@ -3436,7 +3436,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
                 // --- 
                 t0 = f_temp(); // (659)
               } // scope
-              t0 = t0 - (_p_tnom) /*rhspar*/;
+              t0 = t0 - (_p_tnom) /*rhspar*/; // (703)
               _v_dt = t0; // (prec)
             }
           }
@@ -3457,18 +3457,18 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
           // --- 
           t1 = param_given((_p_tc2) /*rhspar*/); // (659)
         } // scope
-        t0 = t0 || t1;
+        t0 = t0 || t1; // (703)
         if (t0) {
           { // anonymous block
             { // Assignment real 'g'.
               ddouble t0;
               //t0.set_no_deps();
-              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/;
-              t0 = (_p_tc1) /*rhspar*/ + t0;
-              t0 = t0 * _v_dt/*rhsvar*/;
-              t0 = t0 +  1.;
-              t0 = (_p_r) /*rhspar*/ * t0;
-              t0 =  1. / t0;
+              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
+              t0 = (_p_tc1) /*rhspar*/ + t0; // (703)
+              t0 = t0 * _v_dt/*rhsvar*/; // (703)
+              t0 = t0 +  1.; // (703)
+              t0 = (_p_r) /*rhspar*/ * t0; // (703)
+              t0 =  1. / t0; // (703)
               _v_g = t0; // (prec)
             }
           }
@@ -3477,7 +3477,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
             { // Assignment real 'g'.
               ddouble t0;
               //t0.set_no_deps();
-              t0 =  1. / (_p_r) /*rhspar*/;
+              t0 =  1. / (_p_r) /*rhspar*/; // (703)
               _v_g = t0; // (prec)
             }
           }
@@ -3490,7 +3490,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = 0.; // precalc.
-        t0 = t0 * _v_g/*rhsvar*/;
+        t0 = t0 * _v_g/*rhsvar*/; // (703)
         _v_i = t0; // (prec)
       }
       { // Contribution I(p, n) lin: 1
@@ -3509,8 +3509,8 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
           ddouble t1;
           //t1.set_no_deps();
           //t1[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
-          t1 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24;
-          t1 = t1 * _v_g/*rhsvar*/;
+          t1 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24; // (703)
+          t1 = t1 * _v_g/*rhsvar*/; // (703)
           ddouble t2;
           //t2.set_no_deps();
           //t2[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
@@ -3519,7 +3519,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
             // --- 
             t2 = f_temp(); // (659)
           } // scope
-          t1 = t1 * t2;
+          t1 = t1 * t2; // (703)
           std::string s0;
           s0 = "thermal";
           // --- 
@@ -3573,7 +3573,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
                 // --- 
                 t0 = f_temp(); // (659)
               } // scope
-              t0 = t0 - (_p_tnom) /*rhspar*/;
+              t0 = t0 - (_p_tnom) /*rhspar*/; // (703)
               _v_dt = t0.value(); // (s)
             }
           }
@@ -3594,18 +3594,18 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
           // --- 
           t1 = param_given((_p_tc2) /*rhspar*/); // (659)
         } // scope
-        t0 = t0 || t1;
+        t0 = t0 || t1; // (703)
         if (t0) {
           { // anonymous block
             { // Assignment real 'g'.
               ddouble t0;
               //t0.set_no_deps();
-              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/;
-              t0 = (_p_tc1) /*rhspar*/ + t0;
-              t0 = t0 * _v_dt/*rhsvar*/;
-              t0 = t0 +  1.;
-              t0 = (_p_r) /*rhspar*/ * t0;
-              t0 =  1. / t0;
+              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
+              t0 = (_p_tc1) /*rhspar*/ + t0; // (703)
+              t0 = t0 * _v_dt/*rhsvar*/; // (703)
+              t0 = t0 +  1.; // (703)
+              t0 = (_p_r) /*rhspar*/ * t0; // (703)
+              t0 =  1. / t0; // (703)
               _v_g = t0.value(); // (s)
             }
           }
@@ -3614,7 +3614,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
             { // Assignment real 'g'.
               ddouble t0;
               //t0.set_no_deps();
-              t0 =  1. / (_p_r) /*rhspar*/;
+              t0 =  1. / (_p_r) /*rhspar*/; // (703)
               _v_g = t0.value(); // (s)
             }
           }
@@ -3627,7 +3627,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        t0 = t0 * _v_g/*rhsvar*/;
+        t0 = t0 * _v_g/*rhsvar*/; // (703)
         _v_i = t0.value(); // (s)
       }
 // omit Statement 12Contribution
@@ -3678,7 +3678,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
                 // --- 
                 t0 = f_temp(); // (659)
               } // scope
-              t0 = t0 - (_p_tnom) /*rhspar*/;
+              t0 = t0 - (_p_tnom) /*rhspar*/; // (703)
               _v_dt = t0.value(); // (s)
             }
           }
@@ -3699,18 +3699,18 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
           // --- 
           t1 = param_given((_p_tc2) /*rhspar*/); // (659)
         } // scope
-        t0 = t0 || t1;
+        t0 = t0 || t1; // (703)
         if (t0) {
           { // anonymous block
             { // Assignment real 'g'.
               ddouble t0;
               //t0.set_no_deps();
-              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/;
-              t0 = (_p_tc1) /*rhspar*/ + t0;
-              t0 = t0 * _v_dt/*rhsvar*/;
-              t0 = t0 +  1.;
-              t0 = (_p_r) /*rhspar*/ * t0;
-              t0 =  1. / t0;
+              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
+              t0 = (_p_tc1) /*rhspar*/ + t0; // (703)
+              t0 = t0 * _v_dt/*rhsvar*/; // (703)
+              t0 = t0 +  1.; // (703)
+              t0 = (_p_r) /*rhspar*/ * t0; // (703)
+              t0 =  1. / t0; // (703)
               _v_g = t0.value(); // (s)
             }
           }
@@ -3719,7 +3719,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
             { // Assignment real 'g'.
               ddouble t0;
               //t0.set_no_deps();
-              t0 =  1. / (_p_r) /*rhspar*/;
+              t0 =  1. / (_p_r) /*rhspar*/; // (703)
               _v_g = t0.value(); // (s)
             }
           }
@@ -3732,7 +3732,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        t0 = t0 * _v_g/*rhsvar*/;
+        t0 = t0 * _v_g/*rhsvar*/; // (703)
         _v_i = t0.value(); // (s)
       }
 // omit Statement 12Contribution
@@ -5590,11 +5590,11 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
               //t1[d_potential_b_ddt_1_p_ddt_1_n] = 0.; // (output dep)
               t1.set_no_deps();
               t1 = p->xs_potential_b_p_n();
-              t1 = (_p___c) /*rhspar*/ * t1;
+              t1 = (_p___c) /*rhspar*/ * t1; // (703)
               // --- 
               t0 = /*a*/ d->_b_ddt_1tr_eval(t1); // (659)
             } // scope
-            d->_value_b_p_n /* contrib sign: */ += t0.value();
+            d->_value_b_p_n /* contrib sign: */ += t0.value(); // (342)
             // dep _potential_b_ddt_1_p_ddt_1_n
             // short: _potential_b_ddt_1_p_ddt_1_n
           }
@@ -5630,7 +5630,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
               //t1[d_potential_b_ddt_1_p_ddt_1_n] = 0.; // (output dep)
               t1.set_no_deps();
               t1 = 0.; // precalc.
-              t1 = (_p___c) /*rhspar*/ * t1;
+              t1 = (_p___c) /*rhspar*/ * t1; // (703)
               // --- 
               t0 = /*a*/ d->_b_ddt_1precalc(t1); // (659)
             } // scope
@@ -6611,7 +6611,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
           // --- 
           t0 = _f_analysis(s0); // (659)
         } // scope
-        t0 =  1. && t0;
+        t0 =  1. && t0; // (703)
         if (t0) {
           { // anonymous block
             { // Contribution V(p, n) lin: 1
@@ -6624,7 +6624,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
                 std::fill_n(d->_st_b_p_n+1, 2, 0.);
               }else{
               }
-              d->_value_b_p_n /* contrib sign: */ += t0.value();
+              d->_value_b_p_n /* contrib sign: */ += t0.value(); // (342)
             }
           }
         }else {
@@ -6640,7 +6640,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
                 //t1[d_potential_b_ddt_2_p_ddt_2_n] = 0.; // (output dep)
                 t1.set_no_deps();
                 t1 = p->xs_potential_b_p_n();
-                t1 = (_p___c) /*rhspar*/ * t1;
+                t1 = (_p___c) /*rhspar*/ * t1; // (703)
                 // --- 
                 t0 = /*a*/ d->_b_ddt_2tr_eval(t1); // (659)
               } // scope
@@ -6650,10 +6650,10 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
                 std::fill_n(d->_st_b_p_n+1, 2, 0.);
               }else{
               }
-              d->_value_b_p_n /* contrib sign: */ += t0.value();
+              d->_value_b_p_n /* contrib sign: */ += t0.value(); // (342)
               // dep _potential_b_ddt_2_p_ddt_2_n
               assert(t0[d_potential_b_ddt_2_p_ddt_2_n] == t0[d_potential_b_ddt_2_p_ddt_2_n]);
-              d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_ddt_2_p_ddt_2_n] += t0[d_potential_b_ddt_2_p_ddt_2_n]; // (3)
+              d->_st_b_p_n[MOD::_st_b_p_n_::dep_potential_b_ddt_2_p_ddt_2_n] += t0[d_potential_b_ddt_2_p_ddt_2_n]; // (382)
             }
           }
         }
@@ -6686,7 +6686,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
           // --- 
           t0 = _f_analysis(s0); // (659)
         } // scope
-        t0 =  1. && t0;
+        t0 =  1. && t0; // (703)
         if (t0) {
           { // anonymous block
             { // Contribution V(p, n) lin: 1
@@ -6709,7 +6709,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
                 //t1[d_potential_b_ddt_2_p_ddt_2_n] = 0.; // (output dep)
                 t1.set_no_deps();
                 t1 = 0.; // precalc.
-                t1 = (_p___c) /*rhspar*/ * t1;
+                t1 = (_p___c) /*rhspar*/ * t1; // (703)
                 // --- 
                 t0 = /*a*/ d->_b_ddt_2precalc(t1); // (659)
               } // scope

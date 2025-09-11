@@ -38,13 +38,14 @@ public:
     modeTR_REGRESS = 8,
     modeTR_REVIEW = 9,
     modeTR_ACCEPT = 10,
-    modeNUM = 11
+    modeAF = 11,
+    modeNUM = 12
   }_mode;
   Base const* _src{nullptr};
   std::string ctx()const {
     char const* names[modeNUM] = { //
       "precalc", "static", "tr_eval", "probe", "tr_initial", "tr_begin", "tr_restore",
-      "tr_advance", "tr_regress", "tr_review", "tr_accept"
+      "tr_advance", "tr_regress", "tr_review", "tr_accept", "af"
     };
     return names[_mode];
   }
@@ -569,7 +570,7 @@ void OUT_ANALOG::make_af_body(std::ostream& o, const Analog_Function& f) const
 /*--------------------------------------------------------------------------*/
 void make_cc_af(std::ostream& o, const Analog_Function& f)
 {
-  OUT_ANALOG oo(OUT_ANALOG::modeDYNAMIC);
+  OUT_ANALOG oo(OUT_ANALOG::modeAF);
   oo.make_af(o, f);
 }
 /*--------------------------------------------------------------------------*/

@@ -791,7 +791,9 @@ void make_cc_expression(std::ostream& o, Expression const& e, bool dynamic,
   if(ctx=="precalc"){
   }else{
   }
-  if(!dynamic && ctx!="precalc"){
+  if(ctx == "af"){
+    // no deps-> use ddouble..
+  }else if(!dynamic && ctx!="precalc"){
   }else if(auto ex = dynamic_cast<Expression_ const*>(&e)){
     deps = &ex->data();
   }else{ untested();

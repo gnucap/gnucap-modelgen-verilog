@@ -63,6 +63,12 @@ private:
     //o__ "struct cls" << label() << "{\n";
 
     //template?
+    o____ "void "<<n<<"af(int i=0) {\n";
+    o______ "if(i==-1){\n";
+    o________ "/*d->*/set_converged(false);\n";
+    o______ "}else{\n";
+    o______ "}\n";
+    o____ "}\n";
     o____ "void "<<n<<"tr_eval(int i=0) {\n";
     o______ "if(i==-1){\n";
     o________ "/*d->*/set_converged(false);\n";
