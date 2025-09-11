@@ -423,20 +423,23 @@ public:
 }; // RPN_VARS
 /*--------------------------------------------------------------------------*/
 class OUT_EXPRESSION {
-  RPN_VARS& s;
+  RPN_VARS& _s;
   std::string _ctx;
 public:
   explicit OUT_EXPRESSION(RPN_VARS& r, std::string ctx)
-    : s(r), _ctx(ctx) {}
+    : _s(r), _ctx(ctx) {}
 
   void make_cc_expression_(std::ostream& o, Expression const& e);
 private:
+  RPN_VARS& vars() {return _s;}
   void make_cc_expression_(std::ostream& o, Token const* t) {
     Expression_ e;
     e.push_back(const_cast<Token*>(t));
     make_cc_expression_(o, e);
     e.pop_back();
   }
+  void make_cc_array(std::ostream& o, Token_ARRAY_ const* t);
+  void make_cc_call(std::ostream& o, Token_CALL const* t);
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -477,6 +480,132 @@ void RPN_VARS::new_literal(std::ostream& o, Token_CONSTANT const& c)
   }
 }
 /*--------------------------------------------------------------------------*/
+void OUT_EXPRESSION::make_cc_array(std::ostream& o, Token_ARRAY_ const* A)
+{
+  if(A->args()){
+    auto se = prechecked_cast<Expression const*>(A->args());
+    assert(se);
+    vars().stop();
+    make_cc_expression_(o, *se);
+  }else{ untested();
+  }
+  std::vector<std::string> argnames;
+  if(A->args()) {
+    assert(vars().have_args());
+    argnames.resize(vars().num_args());
+    for(auto n=argnames.begin(); n!=argnames.end(); ++n){
+      *n = vars().code_name();
+      vars().pop();
+    }
+  }else{ untested();
+  }
+  vars().new_array(o, *A);
+
+  if(!A->args()) { untested();
+    //	o << A->code_name() << "(); // no parlist\n";
+    assert(!argnames.size());
+    o << " /*(312b)*/ "; //  << A->code_name();
+  }else if(!argnames.size()){
+    //	o << A->code_name() << "(); // no args\n";
+    vars().args_pop();
+    o << "; /*(312a)*/ "; //  << A->code_name();
+  }else{
+    o << " /*(312)*/ "; //  << A->code_name();
+
+    o << "(";
+    std::string comma = "";
+    for(size_t ii=argnames.size(); ii; --ii){
+      o << comma << argnames[ii-1];
+      comma = ", ";
+    }
+    o << ");\n";
+    vars().args_pop();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
+{
+  if(F->args()){
+    o__ "// F " << F->name() << " args:" << vars().have_args() << "\n";
+    auto se = prechecked_cast<Expression const*>(F->args());
+    assert(se);
+    vars().stop();
+    make_cc_expression_(o, *se);
+  }else{
+    o__ "// function " << F->name() << " args:" << vars().have_args() << "\n";
+  }
+
+  std::vector<std::string> argnames;
+  if(F->args()) {
+    assert(vars().have_args());
+    argnames.resize(vars().num_args());
+    for(auto n=argnames.begin(); n!=argnames.end(); ++n){
+      *n = vars().code_name();
+      vars().pop();
+    }
+  }else{
+  }
+
+  if((*F)->returns_void()) {
+    vars().new_float(o); // TODO
+    o__"(void)" <<  vars().code_name() << ";\n";
+  }else{
+    vars().new_ddouble(o);
+    o__ vars().code_name() << " = ";
+  }
+  if(_ctx=="adjust"){
+  }else if((*F)->is_in_common()) {
+  }else{
+    o << "/*a*/ d->";
+  }
+
+  o << F->code_name();
+  if((*F)->has_modes()){
+    if(_ctx=="adjust"){
+      o << "precalc";
+    }else{
+      o << _ctx;
+    }
+  }else if(_ctx=="precalc" && (*F)->has_precalc()){
+    // TODO: cleanup.
+    o << "__" + _ctx;
+  }else{
+  }
+
+  o << "(";
+  std::string comma = "";
+  // if(_ctx=="precalc"){
+  // }else
+  if(_ctx=="adjust"){
+    // there is no context in adjust
+  }else if((*F)->needs_context()){
+    o << "d /* "<<_ctx<<"*/";
+    comma = ", ";
+  }else{
+  }
+  if(!F->args()) {
+    o << "); // no parlist\n";
+    assert(!argnames.size());
+  }else if(!argnames.size()){
+    o << "); // no args\n";
+    vars().args_pop();
+  }else{
+    assert(F->code_name()!="");
+    for(int nn=0; nn<int(argnames.size()); ++nn) {
+      int ii = int(argnames.size())-nn-1;
+      o << comma; //  << "/* arg " << nn << "*/";
+      if((*F)->is_output_arg(nn)){
+	o << "io_arg(" << cxx_name((*F)->arg_type(nn)) << "(), " << argnames[ii] << ")";
+      }else{
+	o << argnames[ii];
+      }
+      comma = ", ";
+    }
+    o << ");\n";
+    vars().args_pop();
+  }
+}
+/*--------------------------------------------------------------------------*/
 void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
 {
   typedef Expression::const_iterator const_iterator;
@@ -499,177 +628,58 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
   // The _list is the expression in RPN.
   // print a program that computes the function and the derivatives.
   for (const_iterator i = e.begin(); i != e.end(); ++i) {
-    trace3("mg_out_expr loop", (*i)->name(), (*i)->data(), s.size());
+    trace3("mg_out_expr loop", (*i)->name(), (*i)->data(), vars().size());
 
     if (auto var = dynamic_cast<const Token_VAR_REF*>(*i)) {
-      s.new_rhs(var); // if linear?
+      vars().new_rhs(var); // if linear?
 //    }else if (auto t = dynamic_cast<const Token_OUT_VAR*>(*i)) { untested();
-//      s.new_rhs(t); // if linear?
+//      vars().new_rhs(t); // if linear?
 //      //incomplete();
 //      //o__ "0.; // OUTVAR?!\n";
     }else if(auto pp = dynamic_cast<const Token_ACCESS*>(*i)) {
-      s.new_ddouble(o);
-      if(!s.has_deps()){
+      vars().new_ddouble(o);
+      if(!vars().has_deps()){
       }else if(options().optimize_deriv()){
-	o__ s.code_name() << ".set_no_deps();\n";
-	// for(auto i: s.deps()){ untested();
-	//   o__ s.code_name() << "[d" << i->code_name() << "] = 0.; // (output dep)\n";
+	o__ vars().code_name() << ".set_no_deps();\n";
+	// for(auto i: vars().deps()){ untested();
+	//   o__ vars().code_name() << "[d" << i->code_name() << "] = 0.; // (output dep)\n";
 	// }
       }else{itested();
       }
 
      //  if(_mode == modePRECALC){ untested();
-     //    o__ s.code_name() << " = 0.; // precalc.\n";
+     //    o__ vars().code_name() << " = 0.; // precalc.\n";
      //  }else
-      if(!s.has_deps()){
+      if(!vars().has_deps()){
 	// incomplete(); // use ctx instead.
-        o__ s.code_name() << " = 0.; // precalc.\n";
-//	o__ s.code_name() << " = p->xs" << pp->code_name_() << "precalc();\n";
+        o__ vars().code_name() << " = 0.; // precalc.\n";
+//	o__ vars().code_name() << " = p->xs" << pp->code_name_() << "precalc();\n";
       }else if(pp->is_short()){
-	o__ s.code_name() << " = 0.; // short probe\n";
+	o__ vars().code_name() << " = 0.; // short probe\n";
       }else{
-	o__ s.code_name() << " = p->xs" << pp->code_name_() << "();\n";
+	o__ vars().code_name() << " = p->xs" << pp->code_name_() << "();\n";
       }
     }else if (auto p = dynamic_cast<const Token_PAR_REF*>(*i)) {
-      s.new_rhs(p);
+      vars().new_rhs(p);
     }else if (auto pb = dynamic_cast<const Token_PORT_BRANCH*>(*i)) {
-      s.new_ref(pb->code_name());
+      vars().new_ref(pb->code_name());
     }else if (auto A = dynamic_cast<const Token_ARRAY_*>(*i)) {
-      // TODO: move out of here.
-      if(A->args()){
-	auto se = prechecked_cast<Expression const*>(A->args());
-	assert(se);
-	s.stop();
-	make_cc_expression_(o, *se);
-      }else{ untested();
-      }
-      // o__ "// array " << (*i)->name() << " " << s.have_args() << "\n";
-      // o__ s.code_name() << " = ";
-      std::vector<std::string> argnames;
-      if(A->args()) {
-	assert(s.have_args());
-	argnames.resize(s.num_args());
-	for(auto n=argnames.begin(); n!=argnames.end(); ++n){
-	  *n = s.code_name();
-	  s.pop();
-	}
-      }else{ untested();
-      }
-      s.new_array(o, *A);
-
-      if(!A->args()) { untested();
-//	o << A->code_name() << "(); // no parlist\n";
-	assert(!argnames.size());
-	o << " /*(312b)*/ "; //  << A->code_name();
-      }else if(!argnames.size()){
-//	o << A->code_name() << "(); // no args\n";
-	s.args_pop();
-	o << "; /*(312a)*/ "; //  << A->code_name();
-      }else{
-	o << " /*(312)*/ "; //  << A->code_name();
-
-	o << "(";
-       	std::string comma = "";
-	for(size_t ii=argnames.size(); ii; --ii){
-	  o << comma << argnames[ii-1];
-	  comma = ", ";
-	}
-	o << ");\n";
-	s.args_pop();
-      }
+      make_cc_array(o, A);
     }else if (auto c = dynamic_cast<const Token_CONSTANT*>(*i)) {
-      s.new_literal(o, *c);
+      vars().new_literal(o, *c);
     }else if(auto F = dynamic_cast<const Token_CALL*>(*i)) {
-      if(F->args()){
-        o__ "// F " << (*i)->name() << " args:" << s.have_args() << "\n";
-	auto se = prechecked_cast<Expression const*>(F->args());
-	assert(se);
-	s.stop();
-	make_cc_expression_(o, *se);
-      }else{
-	o__ "// function " << (*i)->name() << " args:" << s.have_args() << "\n";
-      }
-
-      std::vector<std::string> argnames;
-      if(F->args()) {
-	assert(s.have_args());
-	argnames.resize(s.num_args());
-	for(auto n=argnames.begin(); n!=argnames.end(); ++n){
-	  *n = s.code_name();
-	  s.pop();
-	}
-      }else{
-      }
-
-      if((*F)->returns_void()) {
-	s.new_float(o); // TODO
-	o__"(void)" <<  s.code_name() << ";\n";
-      }else{
-	s.new_ddouble(o);
-	o__ s.code_name() << " = ";
-      }
-      if(_ctx=="adjust"){
-      }else if((*F)->is_in_common()) {
-      }else{
-	o << "/*a*/ d->";
-      }
-
-      o << F->code_name();
-      if((*F)->has_modes()){
-	if(_ctx=="adjust"){
-	  o << "precalc";
-	}else{
-	  o << _ctx;
-	}
-      }else if(_ctx=="precalc" && (*F)->has_precalc()){
-	// TODO: cleanup.
-	o << "__" + _ctx;
-      }else{
-      }
-
-      o << "(";
-      std::string comma = "";
-     // if(_ctx=="precalc"){
-     // }else
-      if(_ctx=="adjust"){
-	// there is no context in adjust
-      }else if((*F)->needs_context()){
-	o << "d /* "<<_ctx<<"*/";
-	comma = ", ";
-      }else{
-      }
-      if(!F->args()) {
-	o << "); // no parlist\n";
-	assert(!argnames.size());
-      }else if(!argnames.size()){
-	o << "); // no args\n";
-	s.args_pop();
-      }else{
-	assert(F->code_name()!="");
-	for(int nn=0; nn<int(argnames.size()); ++nn) {
-	  int ii = int(argnames.size())-nn-1;
-	  o << comma; //  << "/* arg " << nn << "*/";
-	  if((*F)->is_output_arg(nn)){
-	    o << "io_arg(" << cxx_name((*F)->arg_type(nn)) << "(), " << argnames[ii] << ")";
-	  }else{
-	    o << argnames[ii];
-	  }
-	  comma = ", ";
-	}
-	o << ");\n";
-	s.args_pop();
-      }
+      make_cc_call(o, F);
     }else if (auto ff=dynamic_cast<const Token_FUNCTION*>(*i)) {
-      s.new_ref("&COMMON::" + ff->code_name());
+      vars().new_ref("&COMMON::" + ff->code_name());
     }else if (auto pl=dynamic_cast<const Token_PARLIST_*>(*i)) { untested();
       if(auto se = dynamic_cast<Expression const*>(pl->args())){ untested();
 	o__ "// start parlist\n";
-	s.stop();
+	vars().stop();
 	make_cc_expression_(o, *se);
 	o__ "// end parlist\n";
       }else if(auto eee = dynamic_cast<Expression const*>((*i)->data())){ untested();
 	o__ "// start parlist\n";
-	s.stop();
+	vars().stop();
 	make_cc_expression_(o, *eee);
 	o__ "// end parlist\n";
       }else{ untested();
@@ -683,11 +693,11 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
       make_cc_expression_(o, bo->op2());
 
       assert((*i)->name().size());
-      std::string idy = s.code_name();
-      s.pop();
-      std::string arg1 = s.code_name();
-      s.pop();
-      s.new_ddouble(o);
+      std::string idy = vars().code_name();
+      vars().pop();
+      std::string arg1 = vars().code_name();
+      vars().pop();
+      vars().new_ddouble(o);
 
       auto op = (*i)->name()[0];
       if ( op == '-'
@@ -700,9 +710,9 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
 	|| op == '&'
 	|| op == '|'
 	|| op == '!' ){
-	o__ s.code_name() << " = " << arg1 << " " << (*i)->name() << " " << idy << ";\n";
+	o__ vars().code_name() << " = " << arg1 << " " << (*i)->name() << " " << idy << ";\n";
       }else if(op == '%'){itested();
-	o__ s.code_name() << " = va::fmod(" << arg1 << ", " << idy << ");\n";
+	o__ vars().code_name() << " = va::fmod(" << arg1 << ", " << idy << ");\n";
       }else{ untested();
 	unreachable();
 	assert(false);
@@ -712,30 +722,30 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
       assert(u->op1());
       make_cc_expression_(o, u->op1());
 
-      std::string arg1 = s.code_name();
-      s.pop();
-      s.new_ddouble(o);
+      std::string arg1 = vars().code_name();
+      vars().pop();
+      vars().new_ddouble(o);
 
       auto op = (*i)->name()[0];
       if(op == '-' || op == '!' || op == '+') {
-	o__ s.code_name() << " = " << op << arg1 << ";\n";
+	o__ vars().code_name() << " = " << op << arg1 << ";\n";
       }else{ untested();
 	incomplete();
 	unreachable();
-	o__ s.code_name() << " INCOMPLETE = " << op << arg1 << ";\n";
+	o__ vars().code_name() << " INCOMPLETE = " << op << arg1 << ";\n";
       }
     }else if (auto t = dynamic_cast<const Token_TERNARY_*>(*i)) {
       assert(t->cond());
       make_cc_expression_(o, t->cond());
 
-      std::string arg1 = s.code_name();
-      s.pop();
-      s.new_ddouble(o);
+      std::string arg1 = vars().code_name();
+      vars().pop();
+      vars().new_ddouble(o);
 
       o__ "{\n";
       {
 	indent y;
-	o__ "ddouble& tt0 = " << s.code_name() << ";\n"; // BUG: float??
+	o__ "ddouble& tt0 = " << vars().code_name() << ";\n"; // BUG: float??
 	o__ "if(" << arg1 << "){\n";
 	{
 	  indent x;
@@ -752,7 +762,7 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
       }
       o__ "}\n";
     }else if (auto n = dynamic_cast<const Token_NODE*>(*i)) {
-      s.new_rhs(n);
+      vars().new_rhs(n);
     }else{ untested();
       assert(!dynamic_cast<const Token_UNARY*>(*i));
       assert(!dynamic_cast<const Token_SYMBOL*>(*i));
@@ -760,7 +770,7 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
       assert(!dynamic_cast<const Token_TERNARY*>(*i));
       assert(!dynamic_cast<const Token_PARLIST*>(*i));
       assert(!dynamic_cast<const Token_STOP*>(*i));
-      s.stop();
+      vars().stop();
       incomplete();
       unreachable();
     }
