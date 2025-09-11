@@ -328,7 +328,7 @@ public:
 	o__ "ddouble t" << _ddo_idx << ";\n"; // TODO? some deps?
       }
       if(!_deps){
-      }else if(!options().optimize_deriv()){ untested();
+      }else if(!options().optimize_deriv()){
 	o__ "t" << _ddo_idx << ".set_all_deps(); // (all deriv)\n"; // code_name??
       }else{
 	o__ "//t" << _ddo_idx << ".set_no_deps();\n"; // ...

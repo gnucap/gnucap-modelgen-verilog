@@ -29,6 +29,26 @@ Base& modelgen_opts()
   return opt;
 }
 /*--------------------------------------------------------------------------*/
+Options::Options() :
+  _optimize_binop(true),  // fold binary operators
+  _optimize_swap(true),   // swap operands.
+  _optimize_deriv(true), // suppress zero derivative propagation
+  _optimize_deps(true),   // consider dependency types
+  _optimize_unused(true), // dont emit unused sources
+  _optimize_nodes(true),  // prune unused nodes
+  _gen_module(true),
+  _gen_paramset(true),
+  _dump_module(true),
+  _dump_paramset(true),
+  _store_unreachable(true), // ignore unreachable structures (TODO)
+  _dump_unreachable(true),
+  _dump_discipline(true),
+  _dump_nature(true),
+  _dump_annotate(false),
+  _expand_paramset(true)
+{
+}
+/*--------------------------------------------------------------------------*/
 void Options::parse(CS& f)
 {
   bool changed = false;

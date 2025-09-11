@@ -231,12 +231,6 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
       o__ lhsname << " = int(t0); // (*)\n";
     }else if(within_af(&a)){
       o__ lhsname << " = t0; // (1a)\n";
-    }else if(!options().optimize_deriv()) { untested();
-      o__ lhsname << " = t0; // (*)\n";
-      for(auto v : a.data().ddeps()) { untested();
-	o__ "// " << a.lhs().code_name() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // (2a)\n";
-	o__ "assert(" << a.lhs().code_name() << "[d" << v->code_name() << "] == " << "t0[d" << v->code_name() << "]); // (2a2)\n";
-      }
     }else if(_mode==modePRECALC){
       o__ lhsname << " = t0; // (prec)\n";
     }else if(is_static()){
@@ -249,6 +243,12 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
       o__ lhsname << " = t0.value(); // (s)\n";
     }else if(_mode==modeTR_ACCEPT){
       o__ lhsname << " = t0.value(); // (s)\n";
+    }else if(!options().optimize_deriv()) {
+      o__ lhsname << " = t0; // (*)\n";
+      for(auto v : a.data().ddeps()) {
+	o__ "// " << a.lhs().code_name() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // (2a)\n";
+	o__ "assert(" << a.lhs().code_name() << "[d" << v->code_name() << "] == " << "t0[d" << v->code_name() << "]); // (2a2)\n";
+      }
     }else{
       o__ lhsname << " = t0.value(); // (*)\n";
       // o__ lhsname << ".set_no_deps(); // (42)\n";
@@ -1141,10 +1141,12 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o,
 	o << V.code_name() << "(d);\n";
       }
     }else if(options().optimize_deriv()) {
+      incomplete();
       make_one_variable_proxy(o, V);
       o << V.code_name() << "(d);\n";
-    }else{untested();
-      o__ "ddouble " << V.code_name() << "(d->" << V.code_name() << "); // (828)\n";
+    }else{
+      make_one_variable_proxy(o, V);
+      o << V.code_name() << "(d);\n";
     }
   }else{ untested();
   }

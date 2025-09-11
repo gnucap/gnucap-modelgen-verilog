@@ -23,24 +23,24 @@
 #include <m_base.h>
 /*--------------------------------------------------------------------------*/
 class Options : public Base {
-  bool _optimize_binop{true};  // fold binary operators
-  bool _optimize_swap{true};   // swap operands.
-  bool _optimize_deriv{true};  // suppress zero derivative propagation
-  bool _optimize_deps{true};   // consider dependency types
-  bool _optimize_unused{true}; // dont emit unused sources
-  bool _optimize_nodes{true};  // prune unused nodes
-  bool _gen_module{true};
-  bool _gen_paramset{true};
-  bool _dump_module{true};
-  bool _dump_paramset{true};
-  bool _store_unreachable{true}; // ignore unreachable structures (TODO)
-  bool _dump_unreachable{true};
-  bool _dump_discipline{true};
-  bool _dump_nature{true};
-  bool _dump_annotate{false};
-  bool _expand_paramset{true};
+  bool _optimize_binop;  // fold binary operators
+  bool _optimize_swap;   // swap operands.
+  bool _optimize_deriv;  // suppress zero derivative propagation
+  bool _optimize_deps;   // consider dependency types
+  bool _optimize_unused; // dont emit unused sources
+  bool _optimize_nodes;  // prune unused nodes
+  bool _gen_module;
+  bool _gen_paramset;
+  bool _dump_module;
+  bool _dump_paramset;
+  bool _store_unreachable; // ignore unreachable structures (TODO)
+  bool _dump_unreachable;
+  bool _dump_discipline;
+  bool _dump_nature;
+  bool _dump_annotate;
+  bool _expand_paramset;
 public:
-  explicit Options(){ }
+  explicit Options();
   void parse(CS& f) override;
   void dump(std::ostream&)const override{ untested();unreachable();}
 public:
