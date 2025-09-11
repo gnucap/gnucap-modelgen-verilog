@@ -718,12 +718,11 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
 	|| op == '&'
 	|| op == '|'
 	|| op == '!' ){
-	o__ vars().code_name() << " = " << arg1 << " " << (*i)->name() << " " << idy << ";\n";
-      }else if(op == '%'){itested();
+	o__ vars().code_name() << " = " << arg1 << " " << (*i)->name() << " " << idy << "; // (703)\n";
+      }else if(op == '%'){untested();
 	o__ vars().code_name() << " = va::fmod(" << arg1 << ", " << idy << ");\n";
       }else{ untested();
 	unreachable();
-	assert(false);
 	throw Exception("run time error in make_cc_expression: " + (*i)->name());
       }
     }else if (auto u = dynamic_cast<const Token_UNARY_*>(*i)) {

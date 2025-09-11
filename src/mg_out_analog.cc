@@ -339,7 +339,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
     }
 
     if(is_dynamic()) {
-      o__ "d->_value" << bcn << " /* contrib sign: */ " << sign << "= t0.value();\n";
+      o__ "d->_value" << bcn << " /* contrib sign: */ " << sign << "= t0.value(); // (342)\n";
     }else{
      //  o__ "d->_value" << bcn << " " << sign << "= t0;\n";
     }
@@ -379,7 +379,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	  // o__ "d->" << C.branch()->state() << "["
 	  o__ "d->_st" << bcn << "["
 	     << "MOD::" << C.branch()->state() << "_::dep" << v->code_name() << "] "
-	     << sign << "= " << "t0[d" << v->code_name() << "]; // (3)\n";
+	     << sign << "= " << "t0[d" << v->code_name() << "]; // (382)\n";
 	}
       }
     }else if(is_precalc()) {
