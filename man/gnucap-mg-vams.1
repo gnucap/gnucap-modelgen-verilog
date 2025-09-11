@@ -14,7 +14,7 @@ into C++ code implementing Gnucap component plugins.
 Basic usage (with bash, on a posix system) may look as follows.
 For more examples, see the \fIexamples\fP directory.
 
-$ gnucap-mg-vams \-I /path/to/include\ -o mymodel.cc\ --cc mymodel.vams
+$ gnucap-mg-vams \-I path/to/include\ -o mymodel.cc\ --cc mymodel.vams
 .br
 $ g++ `gnucap-conf --cppflags` -fPIC -shared mymodel.cc -o mymodel.so
 .br
@@ -28,10 +28,10 @@ The \fImgsim\fP directory contains the plugins used when simulating modelgen mod
 
 .TP
 \fI-I path
-Set preprocessor include path
+Set preprocessor include path, relative to cwd.
 .TP
 \fI-D "name\ value"
-Set preprocessor constant
+Set preprocessor constant.
 .TP
 \fI-o "filename"
 Send output to filename (default: stdout).
@@ -40,7 +40,7 @@ Send output to filename (default: stdout).
 Various flags, under construction, see mg_options.{h,cc}. Also available through `pragma during preprocessing.
 .TP
 \fI-a plugin
-Load plugin, add and replace functionality. Example plugin: mgopt/nonoise.so
+Load plugin, add and replace functionality. Example plugin: mgopt/nonoise.so.
 
 .SH ACTIONS
 
