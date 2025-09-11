@@ -1071,15 +1071,15 @@ static void make_cc_set_branch_contributions(std::ostream& o, const Module& m)
 static void make_one_variable_proxy(std::ostream& o, Token_VAR_REF const& V)
 {
   o__ "class _V_" << V.name() << " : public ddouble {\n";
-  o____ "MOD__ * const _m;\n";
+  o____ "MOD__ * const _m{nullptr};\n";
   o__ "public:\n";
   o____ "typedef ddouble base;\n";
   o____ "typedef va::ddouble_tag base_tag;\n";
-  o____ "_V_" << V.name() << "(ddouble const& p) : ddouble(p), _m(nullptr) { itested(); }\n";
-  o____ "_V_" << V.name() << "(double const& p) : ddouble(p), _m(nullptr) {set_all_deps();}\n";
-  o____ "_V_" << V.name() << "(PARAMETER<double> const& p) : ddouble(p), _m(nullptr) {set_all_deps();}\n";
-  o____ "_V_" << V.name() << "(_V_" << V.name() << " const& p) : ddouble(p), _m(nullptr) {}\n";
-  o____ "explicit _V_" << V.name() << "() : ddouble(), _m(nullptr) {set_all_deps();}\n";
+  o____ "_V_" << V.name() << "(ddouble const& p) : ddouble(p) { itested(); }\n";
+  o____ "_V_" << V.name() << "(double const& p) : ddouble(p) {set_all_deps();}\n";
+  o____ "_V_" << V.name() << "(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}\n";
+  o____ "_V_" << V.name() << "(_V_" << V.name() << " const& p) : ddouble(p) {}\n";
+  o____ "explicit _V_" << V.name() << "() : ddouble() {set_all_deps();}\n";
   o____ "_V_" << V.name() << "(MOD__* m) : "
     << "ddouble(m->_v_" << V.long_code_name() << "), _m(m) {}\n";
   o____ "~_V_" << V.name() << "() {\n";
