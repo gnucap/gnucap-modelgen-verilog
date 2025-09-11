@@ -248,7 +248,6 @@ class RPN_VARS {
   std::stack<type> _types;
   std::stack<int> _args;
   std::stack<std::string> _refs;
-//  int _idx_alloc{0};
 
   int _flt_idx{-1};
   int _flt_alloc{0};
@@ -393,6 +392,12 @@ public:
     assert(!_args.empty());
     return _types.size() - 1 - size_t(_args.top());
   }
+  void leave_scope(){
+    _flt_alloc = _flt_idx+1;
+    _ddo_alloc = _ddo_idx+1;
+    _str_alloc = _str_idx+1;
+    _arr_alloc = _arr_idx+1;
+  }
   void args_pop(){
     assert(!_args.empty());
     _args.pop();
@@ -524,7 +529,14 @@ void OUT_EXPRESSION::make_cc_array(std::ostream& o, Token_ARRAY_ const* A)
 /*--------------------------------------------------------------------------*/
 void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
 {
+  if((*F)->returns_void()) {
+    vars().new_float(o); // TODO
+  }else{
+    vars().new_ddouble(o);
+  }
   vars().stop();
+  o__ "{ // scope\n"; {
+  indent x;
   if(F->args()){
     o__ "// F " << F->name() << " args:" << vars().have_args() << "\n";
     auto se = prechecked_cast<Expression const*>(F->args());
@@ -544,14 +556,15 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
     }
   }else{
   }
-
+  o__ "// --- \n";
+  vars().args_pop();
+  vars().leave_scope();
   if((*F)->returns_void()) {
-    vars().new_float(o); // TODO
     o__"(void)" <<  vars().code_name() << ";\n";
   }else{
-    vars().new_ddouble(o);
     o__ vars().code_name() << " = ";
   }
+
   if(_ctx=="adjust"){
   }else if((*F)->is_in_common()) {
   }else{
@@ -597,8 +610,8 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
       comma = ", ";
     }
   }
-  o << ");\n";
-  vars().args_pop();
+  o << "); // (659)\n";
+  } o__ "} // scope\n";
 }
 /*--------------------------------------------------------------------------*/
 void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)

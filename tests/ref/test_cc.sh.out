@@ -1653,13 +1653,16 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
-        // F white_noise args:1
-        std::string s0;
-        s0 = "thermal";
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_white_noise_1_p_white_noise_1_n] = 0.; // (output dep)
-        t0 = /*a*/ d->_b_white_noise_1( 0., s0);
+        { // scope
+          // F white_noise args:1
+          std::string s0;
+          s0 = "thermal";
+          // --- 
+          t0 = /*a*/ d->_b_white_noise_1( 0., s0); // (659)
+        } // scope
         d->_value_b_p_n /* contrib sign: */ += t0.value();
         // dep _potential_b_white_noise_1_p_white_noise_1_n
         // short: _potential_b_white_noise_1_p_white_noise_1_n
@@ -1851,13 +1854,16 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
-        // F white_noise args:1
-        std::string s0;
-        s0 = "thermal";
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_white_noise_1_p_white_noise_1_n] = 0.; // (output dep)
-        t0 = /*a*/ d->_b_white_noise_1( 0., s0);
+        { // scope
+          // F white_noise args:1
+          std::string s0;
+          s0 = "thermal";
+          // --- 
+          t0 = /*a*/ d->_b_white_noise_1( 0., s0); // (659)
+        } // scope
         d->_value_b_p_n /* contrib sign: */ += t0.value();
         // dep _potential_b_white_noise_1_p_white_noise_1_n
         // short: _potential_b_white_noise_1_p_white_noise_1_n
@@ -1908,11 +1914,14 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
-        // F white_noise args:1
-        std::string s0;
-        s0 = "thermal";
         ddouble t0;
-        t0 = /*a*/ d->_b_white_noise_1__precalc( 0., s0);
+        { // scope
+          // F white_noise args:1
+          std::string s0;
+          s0 = "thermal";
+          // --- 
+          t0 = /*a*/ d->_b_white_noise_1__precalc( 0., s0); // (659)
+        } // scope
         m->_st_b_white_noise_1_p_white_noise_1_n[1] = +t0[d_potential_b_white_noise_1_p_white_noise_1_n]; // (3p)
       }
     }
@@ -2845,17 +2854,23 @@ void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
     }_v_g(d);
 #pragma GCC diagnostic pop
       {
-        // F $param_given args:1
         ddouble t0;
         //t0.set_no_deps();
-        t0 = param_given((_p_tnom) /*rhspar*/);
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t0 = param_given((_p_tnom) /*rhspar*/); // (659)
+        } // scope
         if (t0) {
           { // anonymous block
             { // Assignment real 'dt'.
-              // function $temperature args:1
               ddouble t0;
               //t0.set_no_deps();
-              t0 = f_temp();
+              { // scope
+                // function $temperature args:1
+                // --- 
+                t0 = f_temp(); // (659)
+              } // scope
               t0 = t0 - (_p_tnom) /*rhspar*/;
               _v_dt = t0.value(); // (*)
             }
@@ -2863,14 +2878,20 @@ void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
         }
       }
       {
-        // F $param_given args:1
         ddouble t0;
         //t0.set_no_deps();
-        t0 = param_given((_p_tc1) /*rhspar*/);
-        // F $param_given args:1
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t0 = param_given((_p_tc1) /*rhspar*/); // (659)
+        } // scope
         ddouble t1;
         //t1.set_no_deps();
-        t1 = param_given((_p_tc2) /*rhspar*/);
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t1 = param_given((_p_tc2) /*rhspar*/); // (659)
+        } // scope
         t0 = t0 || t1;
         if (t0) {
           { // anonymous block
@@ -2981,17 +3002,23 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
     }_v_g(d);
 #pragma GCC diagnostic pop
       {
-        // F $param_given args:1
         ddouble t0;
         //t0.set_no_deps();
-        t0 = param_given((_p_tnom) /*rhspar*/);
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t0 = param_given((_p_tnom) /*rhspar*/); // (659)
+        } // scope
         if (t0) {
           { // anonymous block
             { // Assignment real 'dt'.
-              // function $temperature args:1
               ddouble t0;
               //t0.set_no_deps();
-              t0 = f_temp();
+              { // scope
+                // function $temperature args:1
+                // --- 
+                t0 = f_temp(); // (659)
+              } // scope
               t0 = t0 - (_p_tnom) /*rhspar*/;
               _v_dt = t0.value(); // (*)
             }
@@ -2999,14 +3026,20 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         }
       }
       {
-        // F $param_given args:1
         ddouble t0;
         //t0.set_no_deps();
-        t0 = param_given((_p_tc1) /*rhspar*/);
-        // F $param_given args:1
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t0 = param_given((_p_tc1) /*rhspar*/); // (659)
+        } // scope
         ddouble t1;
         //t1.set_no_deps();
-        t1 = param_given((_p_tc2) /*rhspar*/);
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t1 = param_given((_p_tc2) /*rhspar*/); // (659)
+        } // scope
         t0 = t0 || t1;
         if (t0) {
           { // anonymous block
@@ -3057,21 +3090,30 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
-        // F white_noise args:1
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
-        t0 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24;
-        t0 = t0 * _v_g/*rhsvar*/;
-        // function $temperature args:1
-        ddouble t1;
-        //t1.set_no_deps();
-        //t1[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
-        t1 = f_temp();
-        t0 = t0 * t1;
-        std::string s0;
-        s0 = "thermal";
-        t0 = /*a*/ d->_b_white_noise_0(t0, s0);
+        { // scope
+          // F white_noise args:1
+          ddouble t1;
+          //t1.set_no_deps();
+          //t1[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
+          t1 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24;
+          t1 = t1 * _v_g/*rhsvar*/;
+          ddouble t2;
+          //t2.set_no_deps();
+          //t2[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
+          { // scope
+            // function $temperature args:1
+            // --- 
+            t2 = f_temp(); // (659)
+          } // scope
+          t1 = t1 * t2;
+          std::string s0;
+          s0 = "thermal";
+          // --- 
+          t0 = /*a*/ d->_b_white_noise_0(t1, s0); // (659)
+        } // scope
         d->_value_b_p_n /* contrib sign: */ += t0.value();
         // dep _potential_b_white_noise_0_p_white_noise_0_n
         // short: _potential_b_white_noise_0_p_white_noise_0_n
@@ -3229,17 +3271,23 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
     }_v_g(d);
 #pragma GCC diagnostic pop
       {
-        // F $param_given args:1
         ddouble t0;
         //t0.set_no_deps();
-        t0 = param_given((_p_tnom) /*rhspar*/);
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t0 = param_given((_p_tnom) /*rhspar*/); // (659)
+        } // scope
         if (t0) {
           { // anonymous block
             { // Assignment real 'dt'.
-              // function $temperature args:1
               ddouble t0;
               //t0.set_no_deps();
-              t0 = f_temp();
+              { // scope
+                // function $temperature args:1
+                // --- 
+                t0 = f_temp(); // (659)
+              } // scope
               t0 = t0 - (_p_tnom) /*rhspar*/;
               _v_dt = t0.value(); // (*)
             }
@@ -3247,14 +3295,20 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         }
       }
       {
-        // F $param_given args:1
         ddouble t0;
         //t0.set_no_deps();
-        t0 = param_given((_p_tc1) /*rhspar*/);
-        // F $param_given args:1
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t0 = param_given((_p_tc1) /*rhspar*/); // (659)
+        } // scope
         ddouble t1;
         //t1.set_no_deps();
-        t1 = param_given((_p_tc2) /*rhspar*/);
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t1 = param_given((_p_tc2) /*rhspar*/); // (659)
+        } // scope
         t0 = t0 || t1;
         if (t0) {
           { // anonymous block
@@ -3305,21 +3359,30 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
-        // F white_noise args:1
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
-        t0 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24;
-        t0 = t0 * _v_g/*rhsvar*/;
-        // function $temperature args:1
-        ddouble t1;
-        //t1.set_no_deps();
-        //t1[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
-        t1 = f_temp();
-        t0 = t0 * t1;
-        std::string s0;
-        s0 = "thermal";
-        t0 = /*a*/ d->_b_white_noise_0(t0, s0);
+        { // scope
+          // F white_noise args:1
+          ddouble t1;
+          //t1.set_no_deps();
+          //t1[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
+          t1 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24;
+          t1 = t1 * _v_g/*rhsvar*/;
+          ddouble t2;
+          //t2.set_no_deps();
+          //t2[d_potential_b_white_noise_0_p_white_noise_0_n] = 0.; // (output dep)
+          { // scope
+            // function $temperature args:1
+            // --- 
+            t2 = f_temp(); // (659)
+          } // scope
+          t1 = t1 * t2;
+          std::string s0;
+          s0 = "thermal";
+          // --- 
+          t0 = /*a*/ d->_b_white_noise_0(t1, s0); // (659)
+        } // scope
         d->_value_b_p_n /* contrib sign: */ += t0.value();
         // dep _potential_b_white_noise_0_p_white_noise_0_n
         // short: _potential_b_white_noise_0_p_white_noise_0_n
@@ -3348,15 +3411,21 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
     ddouble _v_g(m->_v_._main._g); // precalc 1068
     (void) _v_g;
       {
-        // F $param_given args:1
         ddouble t0;
-        t0 = param_given((_p_tnom) /*rhspar*/);
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t0 = param_given((_p_tnom) /*rhspar*/); // (659)
+        } // scope
         if (t0) {
           { // anonymous block
             { // Assignment real 'dt'.
-              // function $temperature args:1
               ddouble t0;
-              t0 = f_temp();
+              { // scope
+                // function $temperature args:1
+                // --- 
+                t0 = f_temp(); // (659)
+              } // scope
               t0 = t0 - (_p_tnom) /*rhspar*/;
               _v_dt = t0; // (prec)
             }
@@ -3364,12 +3433,18 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
         }
       }
       {
-        // F $param_given args:1
         ddouble t0;
-        t0 = param_given((_p_tc1) /*rhspar*/);
-        // F $param_given args:1
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t0 = param_given((_p_tc1) /*rhspar*/); // (659)
+        } // scope
         ddouble t1;
-        t1 = param_given((_p_tc2) /*rhspar*/);
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t1 = param_given((_p_tc2) /*rhspar*/); // (659)
+        } // scope
         t0 = t0 || t1;
         if (t0) {
           { // anonymous block
@@ -3407,17 +3482,24 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
-        // F white_noise args:1
         ddouble t0;
-        t0 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24;
-        t0 = t0 * _v_g/*rhsvar*/;
-        // function $temperature args:1
-        ddouble t1;
-        t1 = f_temp();
-        t0 = t0 * t1;
-        std::string s0;
-        s0 = "thermal";
-        t0 = /*a*/ d->_b_white_noise_0__precalc(t0, s0);
+        { // scope
+          // F white_noise args:1
+          ddouble t1;
+          t1 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24;
+          t1 = t1 * _v_g/*rhsvar*/;
+          ddouble t2;
+          { // scope
+            // function $temperature args:1
+            // --- 
+            t2 = f_temp(); // (659)
+          } // scope
+          t1 = t1 * t2;
+          std::string s0;
+          s0 = "thermal";
+          // --- 
+          t0 = /*a*/ d->_b_white_noise_0__precalc(t1, s0); // (659)
+        } // scope
         m->_st_b_white_noise_0_p_white_noise_0_n[1] = +t0[d_potential_b_white_noise_0_p_white_noise_0_n]; // (3p)
       }
     }
@@ -3449,17 +3531,23 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
     double& _v_g(m->_v_._main._g); // (1068)
     (void) _v_g;
       {
-        // F $param_given args:1
         ddouble t0;
         //t0.set_no_deps();
-        t0 = param_given((_p_tnom) /*rhspar*/);
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t0 = param_given((_p_tnom) /*rhspar*/); // (659)
+        } // scope
         if (t0) {
           { // anonymous block
             { // Assignment real 'dt'.
-              // function $temperature args:1
               ddouble t0;
               //t0.set_no_deps();
-              t0 = f_temp();
+              { // scope
+                // function $temperature args:1
+                // --- 
+                t0 = f_temp(); // (659)
+              } // scope
               t0 = t0 - (_p_tnom) /*rhspar*/;
               _v_dt = t0.value(); // (s)
             }
@@ -3467,14 +3555,20 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
         }
       }
       {
-        // F $param_given args:1
         ddouble t0;
         //t0.set_no_deps();
-        t0 = param_given((_p_tc1) /*rhspar*/);
-        // F $param_given args:1
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t0 = param_given((_p_tc1) /*rhspar*/); // (659)
+        } // scope
         ddouble t1;
         //t1.set_no_deps();
-        t1 = param_given((_p_tc2) /*rhspar*/);
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t1 = param_given((_p_tc2) /*rhspar*/); // (659)
+        } // scope
         t0 = t0 || t1;
         if (t0) {
           { // anonymous block
@@ -3542,17 +3636,23 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
     double& _v_g(m->_v_._main._g); // (1068)
     (void) _v_g;
       {
-        // F $param_given args:1
         ddouble t0;
         //t0.set_no_deps();
-        t0 = param_given((_p_tnom) /*rhspar*/);
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t0 = param_given((_p_tnom) /*rhspar*/); // (659)
+        } // scope
         if (t0) {
           { // anonymous block
             { // Assignment real 'dt'.
-              // function $temperature args:1
               ddouble t0;
               //t0.set_no_deps();
-              t0 = f_temp();
+              { // scope
+                // function $temperature args:1
+                // --- 
+                t0 = f_temp(); // (659)
+              } // scope
               t0 = t0 - (_p_tnom) /*rhspar*/;
               _v_dt = t0.value(); // (s)
             }
@@ -3560,14 +3660,20 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
         }
       }
       {
-        // F $param_given args:1
         ddouble t0;
         //t0.set_no_deps();
-        t0 = param_given((_p_tc1) /*rhspar*/);
-        // F $param_given args:1
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t0 = param_given((_p_tc1) /*rhspar*/); // (659)
+        } // scope
         ddouble t1;
         //t1.set_no_deps();
-        t1 = param_given((_p_tc2) /*rhspar*/);
+        { // scope
+          // F $param_given args:1
+          // --- 
+          t1 = param_given((_p_tc2) /*rhspar*/); // (659)
+        } // scope
         t0 = t0 || t1;
         if (t0) {
           { // anonymous block
@@ -5449,14 +5555,20 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
       {
         { // anonymous block
           { // Contribution I(p, n) lin: 1
-            // F ddt args:1
             ddouble t0;
             //t0.set_no_deps();
             //t0[d_potential_b_ddt_1_p_ddt_1_n] = 0.; // (output dep)
-            t0.set_no_deps();
-            t0 = p->xs_potential_b_p_n();
-            t0 = (_p___c) /*rhspar*/ * t0;
-            t0 = /*a*/ d->_b_ddt_1tr_eval(t0);
+            { // scope
+              // F ddt args:1
+              ddouble t1;
+              //t1.set_no_deps();
+              //t1[d_potential_b_ddt_1_p_ddt_1_n] = 0.; // (output dep)
+              t1.set_no_deps();
+              t1 = p->xs_potential_b_p_n();
+              t1 = (_p___c) /*rhspar*/ * t1;
+              // --- 
+              t0 = /*a*/ d->_b_ddt_1tr_eval(t1); // (659)
+            } // scope
             d->_value_b_p_n /* contrib sign: */ += t0.value();
             // dep _potential_b_ddt_1_p_ddt_1_n
             // short: _potential_b_ddt_1_p_ddt_1_n
@@ -5483,11 +5595,15 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
       {
         { // anonymous block
           { // Contribution I(p, n) lin: 1
-            // F ddt args:1
             ddouble t0;
-            t0 = 0.; // precalc.
-            t0 = (_p___c) /*rhspar*/ * t0;
-            t0 = /*a*/ d->_b_ddt_1precalc(t0);
+            { // scope
+              // F ddt args:1
+              ddouble t1;
+              t1 = 0.; // precalc.
+              t1 = (_p___c) /*rhspar*/ * t1;
+              // --- 
+              t0 = /*a*/ d->_b_ddt_1precalc(t1); // (659)
+            } // scope
             m->_st_b_ddt_1_p_ddt_1_n[1] = +t0[d_potential_b_ddt_1_p_ddt_1_n]; // (3p)
           }
         }
@@ -6456,12 +6572,15 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
 // construct block...
     { // anonymous block
       {
-        // F analysis args:1
-        std::string s0;
-        s0 = "ic";
         ddouble t0;
         //t0.set_no_deps();
-        t0 = _f_analysis(s0);
+        { // scope
+          // F analysis args:1
+          std::string s0;
+          s0 = "ic";
+          // --- 
+          t0 = _f_analysis(s0); // (659)
+        } // scope
         t0 =  1. && t0;
         if (t0) {
           { // anonymous block
@@ -6481,14 +6600,20 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
         }else {
           { // anonymous block
             { // Contribution I(p, n) lin: 1
-              // F ddt args:1
               ddouble t0;
               //t0.set_no_deps();
               //t0[d_potential_b_ddt_2_p_ddt_2_n] = 0.; // (output dep)
-              t0.set_no_deps();
-              t0 = p->xs_potential_b_p_n();
-              t0 = (_p___c) /*rhspar*/ * t0;
-              t0 = /*a*/ d->_b_ddt_2tr_eval(t0);
+              { // scope
+                // F ddt args:1
+                ddouble t1;
+                //t1.set_no_deps();
+                //t1[d_potential_b_ddt_2_p_ddt_2_n] = 0.; // (output dep)
+                t1.set_no_deps();
+                t1 = p->xs_potential_b_p_n();
+                t1 = (_p___c) /*rhspar*/ * t1;
+                // --- 
+                t0 = /*a*/ d->_b_ddt_2tr_eval(t1); // (659)
+              } // scope
               if (d->_pot_b_p_n){
                 d->_pot_b_p_n = false;
                 d->_value_b_p_n = 0.;
@@ -6522,11 +6647,14 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
 // construct block...
     { // anonymous block
       {
-        // F analysis args:1
-        std::string s0;
-        s0 = "ic";
         ddouble t0;
-        t0 = _f_analysis(s0);
+        { // scope
+          // F analysis args:1
+          std::string s0;
+          s0 = "ic";
+          // --- 
+          t0 = _f_analysis(s0); // (659)
+        } // scope
         t0 =  1. && t0;
         if (t0) {
           { // anonymous block
@@ -6539,11 +6667,15 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
         }else {
           { // anonymous block
             { // Contribution I(p, n) lin: 1
-              // F ddt args:1
               ddouble t0;
-              t0 = 0.; // precalc.
-              t0 = (_p___c) /*rhspar*/ * t0;
-              t0 = /*a*/ d->_b_ddt_2precalc(t0);
+              { // scope
+                // F ddt args:1
+                ddouble t1;
+                t1 = 0.; // precalc.
+                t1 = (_p___c) /*rhspar*/ * t1;
+                // --- 
+                t0 = /*a*/ d->_b_ddt_2precalc(t1); // (659)
+              } // scope
               m->_st_b_ddt_2_p_ddt_2_n[1] = +1; // (3q)
             }
           }
