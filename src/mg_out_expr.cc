@@ -445,6 +445,7 @@ private:
   }
   void make_cc_array(std::ostream& o, Token_ARRAY_ const* t);
   void make_cc_call(std::ostream& o, Token_CALL const* t);
+  bool is_precalc()const {return _ctx == "precalc";}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -655,15 +656,12 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
       }else{itested();
       }
 
-     //  if(_mode == modePRECALC){ untested();
-     //    o__ vars().code_name() << " = 0.; // precalc.\n";
-     //  }else
       if(!vars().has_deps()){
-	// incomplete(); // use ctx instead.
-        o__ vars().code_name() << " = 0.; // precalc.\n";
-//	o__ vars().code_name() << " = p->xs" << pp->code_name_() << "precalc();\n";
+        o__ vars().code_name() << " = 0.; // no deps.\n";
       }else if(pp->is_short()){
 	o__ vars().code_name() << " = 0.; // short probe\n";
+      }else if(is_precalc()){
+        o__ vars().code_name() << " = 0.; // precalc.\n";
       }else{
 	o__ vars().code_name() << " = p->xs" << pp->code_name_() << "();\n";
       }
@@ -791,7 +789,10 @@ void make_cc_expression(std::ostream& o, Expression const& e, bool dynamic,
     std::string ctx)
 {
   TData const* deps = nullptr;
-  if(!dynamic){
+  if(ctx=="precalc"){
+  }else{
+  }
+  if(!dynamic && ctx!="precalc"){
   }else if(auto ex = dynamic_cast<Expression_ const*>(&e)){
     deps = &ex->data();
   }else{ untested();

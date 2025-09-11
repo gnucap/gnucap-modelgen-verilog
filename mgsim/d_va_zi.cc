@@ -339,7 +339,7 @@ double ZFILTER::tr_involts()const
 }
 /*--------------------------------------------------------------------------*/
 double ZFILTER::tr_probe_num(std::string const& n) const
-{ untested();
+{
   auto c = prechecked_cast<COMMON_RF_BASE const*>(common());
   assert(c);
   int num_den = c->den_size();
@@ -350,14 +350,14 @@ double ZFILTER::tr_probe_num(std::string const& n) const
       return _regs[idx];
     }else{ untested();
     }
-  }else{ untested();
+  }else{
   }
 
-  if(n == "vin") { untested();
+  if(n == "vin") {
     return tr_involts();
   }else if(n == "conv") { untested();
     return converged();
-  }else{ untested();
+  }else{
     return ELEMENT::tr_probe_num(n);
   }
 }

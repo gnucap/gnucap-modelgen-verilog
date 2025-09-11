@@ -117,7 +117,7 @@ private: // construct
 public:
   explicit DELAY(COMMON_COMPONENT*);
   ~DELAY() {
-    if (net_nodes() > NODES_PER_BRANCH) { untested();
+    if (net_nodes() > NODES_PER_BRANCH) {
       delete [] _nN;
     }else{
       // it is part of a base class
@@ -612,7 +612,7 @@ void DELAY::ac_load()
 //	0, n_(input_idx()].m_(), mfactor_hack * _acg);
 
     auto _values = _ctrl_in;
-    for (int i=2; i<=_n_ports; ++i) { untested();
+    for (int i=2; i<=_n_ports; ++i) {
       ac_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), _values[i] * _acg);
     }
   }else{

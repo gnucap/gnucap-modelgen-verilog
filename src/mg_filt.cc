@@ -77,7 +77,7 @@ void filter_setup(MGVAMS_FILTER* f, Module* m)
 
       }else if(auto bb=dynamic_cast<Branch const*>(b)){
 	trace1("use in branch", bb->code_name());
-	if(f->branch() == bb){ untested();
+	if(f->branch() == bb){
 	}else{
 	  rdeps_ = true;
 	}
