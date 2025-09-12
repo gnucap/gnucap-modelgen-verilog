@@ -140,6 +140,7 @@ public:
 /*--------------------------------------------------------------------------*/
 class Node_Ref;
 class Branch;
+class Probe;
 class MGVAMS_FILTER : public FUNCTION_ {
 protected: // BUG
   Module* _m{nullptr};

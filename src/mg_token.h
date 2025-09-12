@@ -21,7 +21,7 @@
 /*--------------------------------------------------------------------------*/
 #ifndef MG_TOKEN_H
 #define MG_TOKEN_H
-#include "mg_expression.h"
+#include <m_expression.h>
 #include "mg_func.h" // BUG?
 #include "mg_deps.h" // BUG?
 #include "mg_base.h"
@@ -464,13 +464,14 @@ public:
   explicit Token_FILTER(const std::string Name, FUNCTION_ const* f)
     : Token_CALL(Name, f) {}
 private:
-  explicit Token_FILTER(const Token_FILTER& P, Base const* data, Expression_ const* e = nullptr)
+  explicit Token_FILTER(const Token_FILTER& P, Base const* data, Expression const* e = nullptr)
     : Token_CALL(P, data, e) {} // , _item(P._item) {}
   Token* clone()const override { untested(); return new Token_FILTER(*this);}
 
 private:
   void stack_op(Expression* e)const override;
   Branch* branch() const;
+#if 0
   Expression_ const* args() const{ untested();
     if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){ untested();
       return a;
@@ -479,6 +480,7 @@ private:
       return nullptr;
     }
   }
+#endif
 };
 /*--------------------------------------------------------------------------*/
 #endif

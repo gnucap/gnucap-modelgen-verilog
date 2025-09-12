@@ -216,20 +216,10 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       tta.stack_op(&E);
     }else if(FUNCTION_ const* af = analog_function(n, Scope)) {
       // assert(r); // BUG, use refs.
-     // if(dynamic_cast<Token_PARLIST*>(E.back())){ untested();
-     // }else{ untested();
-     // }
-	Token* tt = resolve_function(af, &E, scope());
-       //  assert(dynamic_cast<FUNCTION_ const*>(r));
-       //  assert(r == af);
-	// Token_AFCALL a(n, af);
-	assert(tt);
-	tt->stack_op(&E);
-	delete tt;
-     // }else{ untested();
-     //   incomplete();
-     //   E.push_back(tt->clone());
-     // }
+      Token* tt = resolve_function(af, &E, scope());
+      assert(tt);
+      tt->stack_op(&E);
+      delete tt;
     }else if(FUNCTION_ const* vaf = va_function(n)) {
       Token* tt = resolve_function(vaf, &E, scope());
       assert(tt);
@@ -292,9 +282,7 @@ bool Expression_::update(RDeps const* rd)
     (*i)->stack_op(this);
 
     // propagate here??
-    if(!size()) { untested();
-      assert(0);
-    }else if(rd) {
+    if(rd) {
       rdd |= propagate_rdeps(*rd); // set deps.rdeps?
     }else {
     }

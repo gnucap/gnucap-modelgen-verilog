@@ -455,6 +455,7 @@ bool Assignment::update(RDeps const* r)
 
   if (store_deps(Expression_::data())) {
     // something new there.. pass it on.
+    // TODO: only pass on what's new..
     assert(_lhsref);
     _lhsref->propagate_deps(*_token);
     assert(_token->operator->());
