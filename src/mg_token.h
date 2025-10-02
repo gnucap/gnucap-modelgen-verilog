@@ -386,7 +386,6 @@ protected:
   Token_VAR_REF(Token_VAR_REF const*p, Base* owner);
 public:
   Token_VAR_REF* clone()const override;
-  virtual Token_VAR_REF* deep_copy(Base* owner, std::string prefix="")const;
 public:
   void stack_op(Expression* e)const override;
   Base const* operator->() const{ return _item; }
@@ -430,7 +429,6 @@ public:
   explicit Token_VAR_DECL() : Token_VAR_REF("",nullptr,nullptr) { untested();unreachable();}
   explicit Token_VAR_DECL(std::string Name, Base* item, Base const* data)
     : Token_VAR_REF(Name, item, data) {}
-  // Token_VAR_DECL* deep_copy(Base* owner, std::string prefix)const override;
   ~Token_VAR_DECL() { untested(); delete _default; }
   Data_Type const& type()const override;
 

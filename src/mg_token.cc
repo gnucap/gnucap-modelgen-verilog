@@ -1093,8 +1093,10 @@ bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
   }else if(auto p = dynamic_cast<Variable_Decl*>(_item)){
     return p->propagate_deps(from);
   }else if(dynamic_cast<Analog_Function*>(_item)){
-  }else{
+  }else if(dynamic_cast<Block const*>(_item)){ untested();
     unreachable();
+  }else{
+    // incomplete();
   }
 
   return false;
@@ -1128,22 +1130,6 @@ Data_Type const& Token_ARGUMENT::type() const
     return t;
   }
 }
-#if 0
-void Token_VAR_REAL::clear_deps()
-{ untested();
-  if(auto it=dynamic_cast<TData*>(_item)){ untested();
-    it->clear();
-  }else{ untested();
-    assert(false);
-  }
-}
-/*--------------------------------------------------------------------------*/
-Data_Type const& Token_VAR_REAL::type() const
-{ untested();
-  static Data_Type_Real t;
-  return t;
-};
-#endif
 /*--------------------------------------------------------------------------*/
 Data_Type const& Token_VAR_DECL::type() const
 {
@@ -1298,68 +1284,10 @@ void Token_ARGUMENT::dump(std::ostream& o) const
   o << name();
 }
 /*--------------------------------------------------------------------------*/
-// bool Token_VAR_REAL::propagate_deps(Token_VAR_REF const& from)
-// { untested();
-//     assert(!(options().optimize_unused() && !scope()->is_reachable()));
-//   // TODO //
-//   if(auto it=dynamic_cast<Assignment*>(_item)){ untested();
-//     return it->propagate_deps(from);
-//   }else{ untested();
-//     auto p = prechecked_cast<Variable_Decl*>(_item);
-//     assert(p);
-//     return p->propagate_deps(from);
-//   }
-// 
-//   return false;
-// }
-/*--------------------------------------------------------------------------*/
 Token_VAR_REF* Token_VAR_REF::clone()const
 {
   return new Token_VAR_REF(*this);
 }
-/*--------------------------------------------------------------------------*/
-Token_VAR_REF* Token_VAR_REF::deep_copy(Base* /*owner*/, std::string prefix)const
-{ untested();
-  assert(0); // not needed.
-  if(dynamic_cast<TData const*>(_item)) { untested();
-    auto cl = new TData;
-    auto n = new Token_VAR_REF(prefix + name(), cl, cl);
-    attr.set_attributes(tag_t(n)) = attr.attributes(tag_t(this));
-    return n;
-  }else{ untested();
-    unreachable();
-    return new Token_VAR_REF(*this);
-  }
-}
-/*--------------------------------------------------------------------------*/
-#if 0
-Token_VAR_REAL* Token_VAR_REAL::deep_copy(Base* /*owner*/, std::string prefix)const
-{ untested();
-  if(dynamic_cast<TData const*>(_item)) { untested();
-    auto cl = new TData;
-    auto n = new Token_VAR_REAL(prefix + name(), cl, cl);
-    attributes(n) = attributes(this);
-    return n;
-  }else{ untested();
-    unreachable();
-    return new Token_VAR_REAL(*this);
-  }
-}
-#endif
-/*--------------------------------------------------------------------------*/
-// Token_VAR_DECL* Token_VAR_DECL::deep_copy(Variable_Decl* owner, std::string prefix)const
-// { untested();
-//   unreachable();
-//   if(dynamic_cast<TData const*>(_item)) { untested();
-//     auto cl = new TData;
-//     auto n = new Token_VAR_DECL(prefix + name(), owner, cl);
-//     attributes(n) = attributes(this);
-//     return n;
-//   }else{ untested();
-//     unreachable();
-//     return new Token_VAR_DECL(*this);
-//   }
-// }
 /*--------------------------------------------------------------------------*/
 std::string Token_NODE::code_name() const
 {
@@ -1408,6 +1336,7 @@ inline void Token_PARLIST_::stack_op(Expression* E) const
     auto parlist = new Token_PARLIST("", arg_exp);
     E->push_back(parlist);
   }else if(args()){ untested();
+    unreachable();
     auto arg_exp = new Expression_();
     for(auto const& i : *args()){ untested();
       // just clone?
