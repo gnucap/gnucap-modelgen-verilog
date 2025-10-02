@@ -70,31 +70,6 @@ static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
   }
 }
 /*--------------------------------------------------------------------------*/
-#if 0
-static int n_filters;
-/*--------------------------------------------------------------------------*/
-class Token_ACSTIM : public Token_CALL {
-public:
-  explicit Token_ACSTIM(const std::string Name, FUNCTION_ const* f)
-    : Token_CALL(Name, f) {}
-private:
-  explicit Token_ACSTIM(const Token_ACSTIM& P, Base const* data, Expression_ const* e = nullptr)
-    : Token_CALL(P, data, e) {} // , _item(P._item) {}
-  Token* clone()const override {untested(); return new Token_ACSTIM(*this);}
-
-  void stack_op(Expression* e)const override;
-  Branch* branch() const;
-  Expression_ const* args() const{ untested();
-    if(auto a=prechecked_cast<Expression_ const*>(Token_CALL::args())){ untested();
-      return a;
-    }else{ untested();
-      assert(!Token_CALL::args());
-      return nullptr;
-    }
-  }
-};
-#endif
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class ACSTIM : public MGVAMS_FILTER {
  // Module* _m{nullptr};
@@ -169,43 +144,6 @@ public:
 /*--------------------------------------------------------------------------*/
   Token* new_token(Module& , size_t)const override {
     return nullptr;
-#if 0
-    assert(na != size_t(-1));
-
-    std::string filter_code_name = label() + "_" + std::to_string(n_filters++);
-
-    ACSTIM* cl = clone();
-    {
-      cl->set_label(filter_code_name); // label()); // "_b_" + filter_code_name);
-      cl->set_code_name("_b_" + filter_code_name);
-      assert(na<3);
-      cl->set_num_args(na);
-      cl->_m = &m;
-      m.push_back(cl);
-    }
-
-    Node* np = m.new_node(filter_code_name + "_p");
-    cl->_p = np;
-    Node* nn = m.new_node(filter_code_name + "_n"); // &mg_ground_node
-   // np->set_to(nn, "_short_"+code_name()+"()");
-    nn->set_to(np, "_short_b_"+filter_code_name+"()");
-    cl->_n = nn;
-    {
-      // Branch* br = m.new_branch(np, &Node_Map::mg_ground_node);
-      Branch* br = m.new_branch(&Node_Map::mg_ground_node, nn);
-//      br->set_source();
-      assert(br);
-      assert(const_cast<Branch const*>(br)->owner());
-      Branch_Ref prb(br);
-      cl->_br = br;
-
-      cl->_prb = m.new_probe("potential", prb);
-      br->set_filter(cl);
-      m.new_filter();
-    }
-
-    return new Token_ACSTIM(label(), cl);
-#endif
   }
   void make_cc_dev(std::ostream& o)const override{
     o__ "ddouble " << code_name() << "(";
@@ -302,96 +240,6 @@ private: // setup
 /*--------------------------------------------------------------------------*/
 DISPATCHER<FUNCTION>::INSTALL dacs(&function_dispatcher, "ac_stim", &ac_stim);
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-//Branch* Token_ACSTIM::branch() const
-//{
-//  auto func = prechecked_cast<ACSTIM const*>(f());
-//  assert( func);
-//  assert( func->_br);
-//  return func->_br;
-//}
-/*--------------------------------------------------------------------------*/
-//static Expression_* clone_args(Base const* e)
-//{
-//  if(auto e_ = dynamic_cast<Expression_ const*>(e)) {
-//    return e_->clone();
-//  }else{ untested();
-//    unreachable();
-//    return nullptr;
-//  }
-//}
-/*--------------------------------------------------------------------------*/
-//bool is_zero(Token const* t)
-//{
-//  assert(t);
-//  const Float* f = dynamic_cast<const Float*>(t->data());
-//  return f && f->value() == 0.;
-//}
-/*--------------------------------------------------------------------------*/
-#if 0
-void Token_ACSTIM::stack_op(Expression* e)const
-{
-  assert(e);
-  Token_CALL::stack_op(e);
-  assert(!e->is_empty());
-  auto cc = prechecked_cast<Token_CALL const*>(e->back());
-  assert(cc);
-  e->pop_back();
-  // assert(!e->is_empty());
-
-  auto func = prechecked_cast<ACSTIM const*>(f());
-  assert(func);
-
-  if(!cc->args()){ untested();
-    unreachable();
-  }else if(!cc->args()->size()){ untested();
-    throw Exception("syntax error, need args");
-  }else if(cc->args()->size()>1 &&
-           is_zero(cc->args()->back())){
-    Float* f = new Float(0.);
-    e->push_back(new Token_CONSTANT(f, ""));
-    delete cc;
-    cc = nullptr;
-//    func->set_p_to_gnd();
-  }else if(auto dd = prechecked_cast<TData const*>(cc->data())) {
-    assert(dd);
-    for(auto i : dd->ddeps()){ untested();
-      trace1("acstim arg deps", i->code_name());
-    }
-
-    branch()->deps().clear();
-    branch()->deps() = *dd; // HACK
-    if(1){
-      func->set_n_to_gnd();
-    }else if(0 /*sth linear*/){ untested();
-      // somehow set loss=0 and output ports to target.
-    }else{ untested();
-    }
-
-    auto d = new TData;
-    trace1("acstim output dep", func->prb()->code_name());
-    d->insert(Dep(func->prb(), Dep::_LINEAR)); // BUG?
-    auto N = new Token_ACSTIM(*this, d, clone_args(cc->args()));
-    assert(N->data());
-    assert(dynamic_cast<TData const*>(N->data()));
-    e->push_back(N);
-    assert(f()==N->f());
-    delete(cc);
-  }else if(!e->size()) { untested();
-    unreachable();
-  }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) { untested();
-    auto d = new TData;
-    d->insert(Dep(func->prb())); // BUG?
-    auto N = new Token_ACSTIM(*this, d);
-    assert(N->data());
-    assert(dynamic_cast<TData const*>(N->data()));
-    e->push_back(N);
-  }else{ untested();
-    unreachable();
-  }
-
-}
-#endif
 /*--------------------------------------------------------------------------*/
 Branch const* ACSTIM::output() const
 {
