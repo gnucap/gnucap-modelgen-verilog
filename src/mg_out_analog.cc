@@ -256,7 +256,7 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
       o__ "trace1(\"assign\", " << lhsname << ");\n";
 #endif
 
-      for(auto v : a.data().ddeps()) {
+      for(auto v : e.data().ddeps()) {
 	assert(v->branch());
 	if(v.is_linear()){
 	  // TODO incomplete();
