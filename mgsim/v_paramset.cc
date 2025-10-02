@@ -406,7 +406,7 @@ int PARAMSET::set_param_by_name(std::string Name, std::string Value)
 /*--------------------------------------------------------------------------*/
 COMPONENT const* PARAMSET::prepare_dev(CARD const* proto)
 {
-  auto dev = prechecked_cast<COMPONENT const*>(proto);
+  auto dev = dynamic_cast<COMPONENT const*>(proto);
 
 #if 0
   // this does not work, proto could be a paramset.
