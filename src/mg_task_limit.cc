@@ -53,6 +53,10 @@ class LIMIT : public MGVAMS_TASK {
   }
   bool has_modes()const override {return true;}
   bool has_state()const override {return true;}
+  Data_Type const* return_type()const override {
+    static Data_Type_Real r;
+    return &r;
+  }
   void make_cc_common(std::ostream&)const override {
     // nothing.
   }
@@ -88,9 +92,15 @@ class LIMIT : public MGVAMS_TASK {
 
     o____ "ddouble operator()(COMPONENT* d, ddouble in, std::string const& what";
     for(size_t i=0; i<num_args()-2; ++i) {
-      o << ", double const& a" << i;
+      o << ", double const&";
+      if(num_args()==4){
+	o << " a" << i;
+      }else{
+      }
     }
     o << "){\n";
+    o______ "(void)d;\n";
+    o______ "(void)what;\n";
     // o______ "assert(what == \"pnjlim\"); // for now\n";
     o______ "if(_sim->is_initial_step()) {\n";
     o________ "in.set_value(0.);\n";

@@ -89,6 +89,9 @@ public:
 private:
   void make_cc_dev(std::ostream&)const override;
   void make_cc_common(std::ostream&)const override;
+  Data_Type const* return_type()const override { untested();
+    static Data_Type_Real r; return &r;
+  }
 }; // Probe
 /*--------------------------------------------------------------------------*/
 class AF_Arg_List : public Owned_Base { // was : public LiSt<Analog_Function_Arg, '\0', ',', ';'> 

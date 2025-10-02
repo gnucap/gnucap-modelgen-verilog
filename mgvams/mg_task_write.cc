@@ -67,7 +67,7 @@ private:
   std::string code_name()const override{
     return "/*d*/" + label();
   }
-  bool returns_void()const override { return true; }
+  Data_Type const* return_type()const override { return nullptr; }
 } debug;
 DISPATCHER<FUNCTION>::INSTALL d_debug(&function_dispatcher, "$debug", &debug);
 /*--------------------------------------------------------------------------*/
@@ -186,7 +186,7 @@ private:
   std::string code_name()const override{
     return "/*w*/_" + label() + ".";
   }
-  bool returns_void()const override { return true; }
+  // Data_Type const* return_type()const override { return nullptr; }
   virtual std::string end()const{return "";}
 } write;
 DISPATCHER<FUNCTION>::INSTALL d_write(&function_dispatcher, "$write", &write);

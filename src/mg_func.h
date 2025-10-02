@@ -26,6 +26,7 @@
 #include "mg_token.h" // BUG?
 #include "mg_base.h"
 #include "mg_lib.h"
+#include "mg_type.h"
 //#include <m_expression.h>
 /*--------------------------------------------------------------------------*/
 #ifndef MG_FUNCTION_H
@@ -61,9 +62,10 @@ public: // characteristics
   std::string const& label()const { return short_label(); }
   void set_num_args(size_t n){ _num_args = n; }
   size_t num_args() const { return _num_args; }
+
   virtual bool is_output_arg(int)const {return false;}
   virtual Data_Type const* arg_type(int)const{return nullptr;}
-  virtual Data_Type const* return_type()const{return nullptr;}
+  virtual Data_Type const* return_type()const = 0;
   virtual bool has_analysis()const  {return false;}
   virtual bool has_precalc()const   {return false;}
   virtual bool has_tr_begin()const  {return false;}
@@ -86,7 +88,6 @@ public: // non-virtual. TODO
   virtual bool needs_context()const {
     return (is_common() && !static_code())
        ||  (is_common() && has_tr_accept()) ;}
-  virtual bool returns_void()const { return false; } // use return_type?
 
 public: // code generation
   virtual void make_cc_impl(std::ostream&)const {}
@@ -124,18 +125,7 @@ public:
   virtual void make_cc_dev(std::ostream&)const override {}
 //  Token* new_token(Module& m, size_t na) const override;
   bool static_code()const override {return true;}
-};
-/*--------------------------------------------------------------------------*/
-class MGVAMS_EVENT : public FUNCTION_ {
-private:
-  void stack_op(Expression*)const override {
-    throw Exception("invalid");
-  }
-public:
-  MGVAMS_EVENT() : FUNCTION_() { }
-  MGVAMS_EVENT(MGVAMS_EVENT const& p) : FUNCTION_(p) { }
-  ~MGVAMS_EVENT() {} //  {delete _rdeps;}
-  bool needs_context()const override{ return true; }
+  Data_Type const* return_type()const override;
 };
 /*--------------------------------------------------------------------------*/
 class Node_Ref;
@@ -162,6 +152,9 @@ public:
   }
   bool has_precalc()const override { return true;}
   bool is_standalone()const { return _output; }
+  Data_Type const* return_type()const override {
+    static Data_Type_Real r; return &r;
+  }
  // bool is_analog_filter()const {return true;} not yet
 public:
   virtual /*BUG*/ Branch* branch() const { return _br;}
@@ -194,6 +187,7 @@ public:
   std::string code_name()const override{ untested();
 	  return "";
   }
+  Data_Type const* return_type()const override {return nullptr;}
 };
 /*--------------------------------------------------------------------------*/
 class VAMS_ACCESS : public FUNCTION_ {

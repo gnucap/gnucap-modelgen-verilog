@@ -28,6 +28,7 @@
 #include "mg_token.h"
 #include <globals.h>
 #include "mg_.h" // BUG
+#include "f__.cc"
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
@@ -59,6 +60,10 @@ private:
     o____ "trace2(\"conn\", i, n_(i).e_());\n";
     o____ "return n_(i).e_() != INVALID_NODE;\n";
     o__ "}\n";
+  }
+  Data_Type const* return_type()const override {
+    static Data_Type_Int r;
+    return &r;
   }
 } pg;
 DISPATCHER<FUNCTION>::INSTALL d_pg(&function_dispatcher, "$port_connected", &pg);

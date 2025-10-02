@@ -71,6 +71,11 @@ void stack_op(FUNCTION_ const* f, Expression const& arg, Expression* E)
   }
 }
 /*--------------------------------------------------------------------------*/
+Data_Type const* MGVAMS_FUNCTION::return_type() const
+{ untested();
+  static Data_Type_Real r;
+  return &r;
+}
 /*--------------------------------------------------------------------------*/
 Node_Ref MGVAMS_FILTER::p() const
 { untested();

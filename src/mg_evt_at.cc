@@ -68,6 +68,10 @@ private:
 //       o << "    va_end(args);\n";
 //       o << "  }\n";
   }
+  Data_Type const* return_type()const override {
+    static Data_Type_Int r; // bool?
+    return &r;
+  }
 } at;
 DISPATCHER<FUNCTION>::INSTALL d_at(&function_dispatcher, "@", &at);
 /*--------------------------------------------------------------------------*/

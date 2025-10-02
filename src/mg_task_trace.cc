@@ -87,7 +87,6 @@ private:
   std::string code_name()const override{
     return label();
   }
-  bool returns_void()const override { return true; }
 } trace;
 DISPATCHER<FUNCTION>::INSTALL d_trace(&function_dispatcher, "$trace", &trace);
 /*--------------------------------------------------------------------------*/

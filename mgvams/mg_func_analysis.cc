@@ -24,6 +24,7 @@
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"
 #include "mg_out.cc"
+#include "mg_in.cc"
 #include "mg_token.h"
 #include <globals.h>
 #include "mg_.h" // BUG
@@ -63,6 +64,10 @@ public:
     o______ "return false;\n";
     o____ "}\n";
     o__ "}\n";
+  }
+  Data_Type const* return_type()const override {
+    static Data_Type_Int r;
+    return &r;
   }
 } analysis;
 DISPATCHER<FUNCTION>::INSTALL d_analysis(&function_dispatcher, "analysis", &analysis);

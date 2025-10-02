@@ -122,6 +122,9 @@ private:
     o____ "return p.has_hard_value();\n";
     o__ "}\n";
   }
+  Data_Type const* return_type()const override {
+    static Data_Type_Int r; return &r;
+  }
 } pg;
 DISPATCHER<FUNCTION>::INSTALL d_pg(&function_dispatcher, "$param_given", &pg);
 /*--------------------------------------------------------------------------*/

@@ -163,6 +163,10 @@ private:
     o__ "}\n";
   }
 #endif
+  Data_Type const* return_type()const override {
+    static Data_Type_Real r;
+    return &r;
+  }
 } pf;
 DISPATCHER<FUNCTION>::INSTALL d_pf(&function_dispatcher, ".port_flow", &pf);
 /*--------------------------------------------------------------------------*/

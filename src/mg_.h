@@ -439,7 +439,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-void make_cc_expression(std::ostream& o, Expression const& e, bool deriv=true,
+std::string make_cc_expression(std::ostream& o, Expression const& e, bool deriv=true,
     std::string ctx="");
 void dump_analog(std::ostream& o, Module const& m);
 /*--------------------------------------------------------------------------*/

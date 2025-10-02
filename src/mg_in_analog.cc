@@ -1776,7 +1776,9 @@ public:
     }
     o << ") const;\n";
   }
-
+  Data_Type const* return_type()const override {
+    static Data_Type_Real r; return &r;
+  }
 };
 /*--------------------------------------------------------------------------*/
 } // namespace
@@ -2102,8 +2104,8 @@ void AnalogEvtExpression::set_rdeps()
     Token_CALL const* call = prechecked_cast<Token_CALL const*>(i);
     assert(call);
     auto& f = *call;
-    auto e = prechecked_cast<MGVAMS_EVENT const*>(f.f());
-    assert(e);
+   //  auto e = prechecked_cast<MGVAMS_EVENT const*>(f.f());
+   //  assert(e);
     if(f->has_tr_begin()){
       add_rdep(&tr_begin_tag);
     }else{

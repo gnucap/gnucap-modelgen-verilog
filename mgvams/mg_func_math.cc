@@ -24,6 +24,7 @@
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"
 #include "mg_out.cc"
+#include "mg_in.cc"
 #include "mg_token.h"
 #include "mg_module.h"
 #include <globals.h>
@@ -224,6 +225,7 @@ private:
   void make_cc_common(std::ostream& o)const override {
     o << "// dummy " << label() << "\n";
   }
+
 };
 /*--------------------------------------------------------------------------*/
 void declare_f1(std::ostream& o, std::string const& cn)

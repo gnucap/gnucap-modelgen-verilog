@@ -62,7 +62,6 @@ private:
     o__ "}\n";
     o__ "void " << "_f_bound_step_precalc(double)const{}\n";
   }
-  bool returns_void()const override { return true; }
 } bound_step;
 DISPATCHER<FUNCTION>::INSTALL d_bound_step(&function_dispatcher, "$bound_step", &bound_step);
 /*--------------------------------------------------------------------------*/
@@ -99,7 +98,6 @@ private:
   std::string code_name()const override{
     return label();
   }
-  bool returns_void()const override { return true; }
 } finish;
 DISPATCHER<FUNCTION>::INSTALL d_finish(&function_dispatcher, "$finish", &finish);
 /*--------------------------------------------------------------------------*/

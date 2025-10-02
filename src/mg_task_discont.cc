@@ -95,7 +95,6 @@ private:
   std::string code_name()const override{
     return label();
   }
-  bool returns_void()const override { return true; }
   virtual std::string end()const{ untested();return "";}
 } disc;
 DISPATCHER<FUNCTION>::INSTALL d_disc(&function_dispatcher, "$discontinuity", &disc);

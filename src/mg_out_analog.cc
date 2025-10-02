@@ -106,8 +106,7 @@ private:
   void make_one_variable_load(std::ostream& o, Token_VAR_REF const& V)const;
   void make_one_variable_store(std::ostream& o, Token_VAR_REF const& V)const;
 
-  void make_cc_expression(std::ostream& o, Expression const& e, bool b=false)const {
-    (void)b;
+  std::string make_cc_expression(std::ostream& o, Expression const& e, bool=false)const {
     return ::make_cc_expression(o, e, _mode!=modePRECALC, ctx());
   }
 }; // OUT_ANALOG
@@ -610,8 +609,8 @@ void OUT_ANALOG::make_evt(std::ostream& o, AnalogEvtCtlStmt const& s) const
   {
     trace1("AnalogEvtCtlStmt", s.cond().size());
     indent x;
-    make_cc_expression(o, s.cond());
-    o__ "if (t0 /*?*/) {\n";
+    std::string name = make_cc_expression(o, s.cond());
+    o__ "if ("<<name<<") {\n";
     {
       indent y;
       make_ctrl(o, s.code());
@@ -629,8 +628,8 @@ void OUT_ANALOG::make_loop(std::ostream& o, AnalogWhileStmt const& s) const
   o__ "while(true) {\n";
   {
     indent x;
-    make_cc_expression(o, s.conditional());
-    o__ "if (t0) {\n";
+    std::string name = make_cc_expression(o, s.conditional());
+    o__ "if ("<<name<<") {\n";
     if(s.has_body()) {
       indent y;
       if(auto bb = dynamic_cast<AnalogCtrlBlock const*>(&s.body())){
@@ -698,8 +697,8 @@ void OUT_ANALOG::make_cond(std::ostream& o, AnalogConditionalStmt const& s) cons
     }
   }else{
     indent x;
-    make_cc_expression(o, s.conditional());
-    o__ "if (t0) {\n";
+    std::string name = make_cc_expression(o, s.conditional());
+    o__ "if ("<<name<<") {\n";
     if(s.true_part()) {
       indent y;
       make_ctrl(o, s.true_part());

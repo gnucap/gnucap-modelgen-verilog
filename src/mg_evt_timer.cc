@@ -22,7 +22,7 @@
  * Verilog-AMS timer
  */
 /*--------------------------------------------------------------------------*/
-#include "mg_func.h"
+#include "mg_event.h"
 #include "mg_out.h"
 #include "mg_token.h"
 #include <globals.h>

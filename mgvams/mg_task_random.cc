@@ -28,6 +28,7 @@
 #include "mg_token.h"
 #include <globals.h>
 #include <u_parameter.h>
+#include "f__.cc"
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
@@ -52,7 +53,6 @@ private:
   bool has_tr_review()const override {return true;}
   bool has_tr_accept()const override {return true;}
   bool has_tr_advance()const override {return true;}
-  bool returns_void()const override { return false; }
   bool static_code()const override {return false;}
 private:
   void stack_op(Expression*)const override {

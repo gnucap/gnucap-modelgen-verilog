@@ -26,6 +26,7 @@
 #include "mg_out.h"
 #include "mg_token.h"
 #include <globals.h>
+#include "mg_event.h"
 #include "mg_.h" // BUG
 /*--------------------------------------------------------------------------*/
 namespace {

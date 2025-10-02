@@ -24,6 +24,7 @@
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"
 #include "mg_out.cc"
+#include "mg_in.cc"
 #include "mg_analog.h"
 #include "mg_token.h"
 #include <globals.h>
@@ -54,6 +55,10 @@ public: // HACK
   bool is_analog_filter()const override {return true;}
   bool port_hack()const override {return false;}
   int max_args()const override {return _na;}
+  Data_Type const* return_type()const override {
+    static Data_Type_Real r;
+    return &r;
+  }
 protected:
   NOISE* clone()const override {
     return new NOISE(*this);

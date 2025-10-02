@@ -245,9 +245,15 @@ class RPN_VARS {
     t_ref,
     t_arr,
   } type;
+  typedef std::stack<int> stack;
   std::stack<type> _types;
   std::stack<int> _args;
   std::stack<std::string> _refs;
+
+  stack _flt_stack;
+  stack _ddo_stack;
+  stack _str_stack;
+  stack _arr_stack;
 
   int _flt_idx{-1};
   int _flt_alloc{0};
@@ -392,11 +398,21 @@ public:
     assert(!_args.empty());
     return _types.size() - 1 - size_t(_args.top());
   }
+  void enter_scope(){
+    _flt_stack.push(_flt_alloc);
+    _ddo_stack.push(_ddo_alloc);
+    _str_stack.push(_str_alloc);
+    _arr_stack.push(_arr_alloc);
+  }
   void leave_scope(){
-    _flt_alloc = _flt_idx+1;
-    _ddo_alloc = _ddo_idx+1;
-    _str_alloc = _str_idx+1;
-    _arr_alloc = _arr_idx+1;
+    _flt_alloc = _flt_stack.top();
+    _flt_stack.pop();
+    _ddo_alloc = _ddo_stack.top();
+    _ddo_stack.pop();
+    _str_alloc = _str_stack.top();
+    _str_stack.pop();
+    _arr_alloc = _arr_stack.top();
+    _arr_stack.pop();
   }
   void args_pop(){
     assert(!_args.empty());
@@ -434,14 +450,15 @@ public:
   explicit OUT_EXPRESSION(RPN_VARS& r, std::string ctx)
     : _s(r), _ctx(ctx) {}
 
-  void make_cc_expression_(std::ostream& o, Expression const& e);
+  std::string make_cc_expression_(std::ostream& o, Expression const& e);
 private:
   RPN_VARS& vars() {return _s;}
-  void make_cc_expression_(std::ostream& o, Token const* t) {
+  std::string make_cc_expression_(std::ostream& o, Token const* t) {
     Expression_ e;
     e.push_back(const_cast<Token*>(t));
-    make_cc_expression_(o, e);
+    std::string name = make_cc_expression_(o, e);
     e.pop_back();
+    return name;
   }
   void make_cc_array(std::ostream& o, Token_ARRAY_ const* t);
   void make_cc_call(std::ostream& o, Token_CALL const* t);
@@ -530,12 +547,17 @@ void OUT_EXPRESSION::make_cc_array(std::ostream& o, Token_ARRAY_ const* A)
 /*--------------------------------------------------------------------------*/
 void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
 {
-  if((*F)->returns_void()) {
+  Data_Type const* rt = (*F)->return_type();
+  if(!rt) {
+    o__ "/* void? */\n";
     vars().new_float(o); // TODO
-  }else{
+  }else if(rt->is_real()){
     vars().new_ddouble(o);
+  }else{
+    vars().new_float(o); // TODO
   }
   vars().stop();
+  vars().enter_scope();
   o__ "{ // scope\n"; {
   indent x;
   if(F->args()){
@@ -560,7 +582,7 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
   o__ "// --- \n";
   vars().args_pop();
   vars().leave_scope();
-  if((*F)->returns_void()) {
+  if(!rt) {
     o__"(void)" <<  vars().code_name() << ";\n";
   }else{
     o__ vars().code_name() << " = ";
@@ -615,7 +637,7 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
   } o__ "} // scope\n";
 }
 /*--------------------------------------------------------------------------*/
-void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
+std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
 {
   typedef Expression::const_iterator const_iterator;
 
@@ -782,9 +804,10 @@ void OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
       unreachable();
     }
   }
+  return vars().code_name();
 }
 /*--------------------------------------------------------------------------*/
-void make_cc_expression(std::ostream& o, Expression const& e, bool dynamic,
+std::string make_cc_expression(std::ostream& o, Expression const& e, bool dynamic,
     std::string ctx)
 {
   TData const* deps = nullptr;
@@ -800,7 +823,7 @@ void make_cc_expression(std::ostream& o, Expression const& e, bool dynamic,
   }
   RPN_VARS s(deps);
   OUT_EXPRESSION ex(s, ctx);
-  ex.make_cc_expression_(o, e);
+  std::string name = ex.make_cc_expression_(o, e);
 
   if(s.is_ref()){
     s.new_ddouble(o);
@@ -809,6 +832,7 @@ void make_cc_expression(std::ostream& o, Expression const& e, bool dynamic,
   }else{
   }
   s.pop();
+  return name;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

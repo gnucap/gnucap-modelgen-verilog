@@ -1,0 +1,31 @@
+
+attach ./modelgen_1.so
+
+
+verilog
+
+`modelgen
+module test_if0(p, n);
+  electrical p, n;
+  parameter real A=1.;
+  parameter real B=1.;
+  parameter real C=1.;
+  real foo;
+  analog begin
+    foo = A;
+    if (($param_given(A) == 1) || ($param_given(B) == 1) || ($param_given(C)==1) )
+      V(p,n) <+ 1 + foo;
+  end
+
+endmodule
+`endmodelgen
+
+
+!make test_if0.so > /dev/null
+attach ./test_if0.so
+
+
+test_if0 #() dut(\1 ,\0 );
+
+print dc v(nodes)
+dc
