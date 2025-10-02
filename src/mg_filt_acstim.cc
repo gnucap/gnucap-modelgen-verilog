@@ -29,6 +29,18 @@
 #include <globals.h>
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/
+static bool is_zero(Token const* t)
+{
+  assert(t);
+  if(Float const* f = dynamic_cast<const Float*>(t->data())){
+    return f->value() == 0.;
+  }else if(Integer const* ii = dynamic_cast<const Integer*>(t->data())){
+    return ii->value() == 0;
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
 static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
@@ -58,6 +70,7 @@ static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
   }
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 static int n_filters;
 /*--------------------------------------------------------------------------*/
 class Token_ACSTIM : public Token_CALL {
@@ -80,16 +93,17 @@ private:
     }
   }
 };
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class ACSTIM : public MGVAMS_FILTER {
-  Module* _m{nullptr};
+ // Module* _m{nullptr};
   Probe const* _prb{nullptr};
-  std::string _code_name;
+ // std::string _code_name;
 public: // HACK
-  Branch* _br{nullptr};
-  Node_Ref _p;
-  Node_Ref _n;
+  //Branch* _br{nullptr};
+  //Node_Ref _p;
+  //Node_Ref _n;
   explicit ACSTIM() : MGVAMS_FILTER() {
     set_label("acs");
   }
@@ -101,20 +115,61 @@ public: // HACK
   bool static_code()const override {return false;}
   bool is_common()const override {return false;}
   bool has_state()const override {return true;}
+  int max_args()const override { untested(); return 2;}
+  bool port_hack()const override {return false;}
+  bool is_analog_filter()const override {return true;}
 protected:
   ACSTIM* clone()const override {
     return new ACSTIM(*this);
   }
   void make_assign(std::ostream&)const { untested();
   }
-  void set_code_name(std::string x){
-    _code_name = x;
-  }
-  std::string code_name()const override{
-    return _code_name;
+  //void set_code_name(std::string x){
+  //  _code_name = x;
+  //}
+  //std::string code_name()const override{
+  //  return _code_name;
+  //}
+  std::string code_name()const override {
+    return "_b_" + short_label();
   }
 public:
-  Token* new_token(Module& m, size_t na)const override {
+  void stack_op(Expression* e)const override {
+    assert(e);
+    if(!e->size()) { untested();
+      throw Exception("invalid");
+      // }else if(auto pp = dynamic_cast<Token_PARLIST_ const*>(e->back())){ untested();
+      //   unreachable();
+      //   throw Exception("invalid");
+  }else if(dynamic_cast<Token_PARLIST const*>(e->back())){
+    Token* pl = e->back();
+    e->pop_back();
+    if(is_zero(e->back())){
+      while(!dynamic_cast<Token_STOP const*>(e->back())) {
+	delete e->back();
+	e->pop_back();
+      }
+      delete e->back();
+      e->pop_back();
+      Float* f = new Float(0.);
+      e->push_back(new Token_CONSTANT(f, ""));
+      delete(pl);
+    }else{
+      e->push_back(pl);
+      throw Exception("invalid");
+    }
+    // func->set_p_to_gnd(); ??
+    // }else if(auto cc = prechecked_cast<Token_CALL const*>(e->back())){
+    //   incomplete();
+    //   throw Exception("invalid");
+  }else{ untested();
+    throw Exception("invalid");
+  }
+  }
+/*--------------------------------------------------------------------------*/
+  Token* new_token(Module& , size_t)const override {
+    return nullptr;
+#if 0
     assert(na != size_t(-1));
 
     std::string filter_code_name = label() + "_" + std::to_string(n_filters++);
@@ -150,17 +205,18 @@ public:
     }
 
     return new Token_ACSTIM(label(), cl);
+#endif
   }
   void make_cc_dev(std::ostream& o)const override{
-    o__ "ddouble " << _code_name << "(";
+    o__ "ddouble " << code_name() << "(";
       o << "std::string what";
       assert(num_args() < 3);
       for(size_t n=1; n<num_args(); ++n){
 	o << ", ddouble t" << n;
       }
     o << ");\n";
-    o__ "bool _short"+_code_name+"()const {return " << bool(_output) << ";}\n";
-    o__ "ddouble " << _code_name << "__precalc(std::string";
+    o__ "bool _short"+code_name()+"()const {return " << bool(_output) << ";}\n";
+    o__ "ddouble " << code_name() << "__precalc(std::string";
       assert(num_args() < 3);
       for(size_t n=1; n<num_args(); ++n){
 	o << ", ddouble";
@@ -170,7 +226,7 @@ public:
   void make_cc_impl(std::ostream&o)const override {
     std::string cn = _br->code_name();
     std::string id = _m->identifier().to_string();
-    o << "MOD_"<< id <<"::ddouble MOD_" << id << "::" << _code_name << "(";
+    o << "MOD_"<< id <<"::ddouble MOD_" << id << "::" << code_name() << "(";
     o << "std::string what";
     for(size_t n=1; n<num_args(); ++n){
       o << ", ddouble t" << n;
@@ -206,7 +262,7 @@ public:
     o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
-    o << "ddouble MOD_" << id << "::" << _code_name << "__precalc(";
+    o << "ddouble MOD_" << id << "::" << code_name() << "__precalc(";
     o << "std::string what";
     for(size_t n=1; n<num_args(); ++n){
       o << ", ddouble t" << n;
@@ -229,9 +285,6 @@ public:
     }
     o << "}\n";
   }
-  void stack_op(Expression*)const override {
-    throw Exception("invalid");
-  }
   Probe const* prb()const {return _prb;}
   void set_n_to_gnd()const {
     assert(_m);
@@ -250,32 +303,32 @@ private: // setup
 DISPATCHER<FUNCTION>::INSTALL dacs(&function_dispatcher, "ac_stim", &ac_stim);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-Branch* Token_ACSTIM::branch() const
-{
-  auto func = prechecked_cast<ACSTIM const*>(f());
-  assert( func);
-  assert( func->_br);
-  return func->_br;
-}
+//Branch* Token_ACSTIM::branch() const
+//{
+//  auto func = prechecked_cast<ACSTIM const*>(f());
+//  assert( func);
+//  assert( func->_br);
+//  return func->_br;
+//}
 /*--------------------------------------------------------------------------*/
-static Expression_* clone_args(Base const* e)
-{
-  if(auto e_ = dynamic_cast<Expression_ const*>(e)) {
-    return e_->clone();
-  }else{ untested();
-    unreachable();
-    return nullptr;
-  }
-}
+//static Expression_* clone_args(Base const* e)
+//{
+//  if(auto e_ = dynamic_cast<Expression_ const*>(e)) {
+//    return e_->clone();
+//  }else{ untested();
+//    unreachable();
+//    return nullptr;
+//  }
+//}
 /*--------------------------------------------------------------------------*/
-// dup in noise
-bool is_zero(Token const* t)
-{
-  assert(t);
-  const Float* f = dynamic_cast<const Float*>(t->data());
-  return f && f->value() == 0.;
-}
+//bool is_zero(Token const* t)
+//{
+//  assert(t);
+//  const Float* f = dynamic_cast<const Float*>(t->data());
+//  return f && f->value() == 0.;
+//}
 /*--------------------------------------------------------------------------*/
+#if 0
 void Token_ACSTIM::stack_op(Expression* e)const
 {
   assert(e);
@@ -338,6 +391,7 @@ void Token_ACSTIM::stack_op(Expression* e)const
   }
 
 }
+#endif
 /*--------------------------------------------------------------------------*/
 Branch const* ACSTIM::output() const
 {
@@ -351,12 +405,12 @@ Branch const* ACSTIM::output() const
 #if 1
 Node_Ref ACSTIM::p() const
 {
-  return _p;
+  return _br->p();
 }
 /*--------------------------------------------------------------------------*/
 Node_Ref ACSTIM::n() const
 {
-  return _n;
+  return _br->n();
 }
 #endif
 /*--------------------------------------------------------------------------*/

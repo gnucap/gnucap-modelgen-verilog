@@ -155,6 +155,7 @@ public:
   Data_Type const* return_type()const override {
     static Data_Type_Real r; return &r;
   }
+  virtual std::string eval_name()const { return ""; }
  // bool is_analog_filter()const {return true;} not yet
 public:
   virtual /*BUG*/ Branch* branch() const { return _br;}
