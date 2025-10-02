@@ -177,7 +177,7 @@ void System_Task::parse(CS& f)
     add_rdep(&tr_begin_tag);
   }else{
   }
-  if(function()->has_tr_restore()){
+  if(function()->has_tr_restore()){ untested();
     add_rdep(&tr_restore_tag);
   }else{
   }
@@ -419,7 +419,7 @@ bool AnalogInitialStmt::is_used_in(Base const* b) const
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogInitialStmt::update()
-{
+{ untested();
   bool ret = AnalogCtrlStmt::update();
   ret |= propagate_rdep(&tr_begin_tag);
   return ret;
@@ -453,7 +453,7 @@ void AnalogConditionalStmt::parse(CS& f)
     }else if(_cond.is_false()) {
       if(is_always()) {
 	_false_part.set_always();
-      }else{
+      }else{ untested();
       }
       _body.set_never();
     }else{
@@ -723,7 +723,7 @@ void CaseGen::calc_reach(Expression const& ctrl)
       b.pop();
       assert(result.size());
 
-      if(is_false(result)) {
+      if(is_false(result)) { untested();
       }else{
 	all_never = false;
       }
@@ -733,7 +733,7 @@ void CaseGen::calc_reach(Expression const& ctrl)
       }else{
       }
     }
-    if(all_never){
+    if(all_never){ untested();
       set_never();
     }else{
     }
@@ -746,7 +746,7 @@ void CaseGen::calc_reach(Expression const& ctrl)
 /*--------------------------------------------------------------------------*/
 void CaseGen::parse(CS&)
 { untested();
-  assert(0);
+  unreachable();
 }
 /*--------------------------------------------------------------------------*/
 void CaseGen::dump(std::ostream& o)const
@@ -894,7 +894,6 @@ void AnalogConstruct::new_block()
 /*--------------------------------------------------------------------------*/
 void AnalogConstruct::push_back(Statement*s)
 {
-  // assert(0); // no longer used?
   assert(_block);
   _block->push_back(s);
 }
@@ -961,7 +960,6 @@ void AnalogSeqBlock::parse(CS& f)
     sb->add_block(this); // re-use var_ref?
   }else if(dynamic_cast<Statement const*>(owner())) { untested();
   }else{ untested();
-    assert(0);
     unreachable();
   }
   for (;;) {
@@ -1082,7 +1080,7 @@ void Branch_Ref::parse(CS& f)
   std::string pn = f.ctos(",)");
   f >> ")";
 
-  assert(0); // incomplete. parse Branch_Decl?
+  unreachable();
 #if 0
   assert(owner());
   trace3("Branch_Ref::parse", pp, pn, _br);
@@ -1646,7 +1644,7 @@ bool AnalogEvtCtlStmt::update()
     _body.clear_vars();
     if ( _ctrl.update() ){ untested();
       ret = true;
-    }else if (_body.update()){
+    }else if (_body.update()){ untested();
       ret = true;
     }else{
       break;
@@ -1709,10 +1707,10 @@ public:
 #endif
   }
 
- // bool context_arg()const override { return true; }
+ // bool context_arg()const override { untested(); return true; }
   bool is_common()const override { return true; }
   bool needs_context()const override { return true; }
- // bool has_state()const override { return true; }
+ // bool has_state()const override { untested(); return true; }
   // TODO: fix linear search
   bool is_output_arg(int I)const override {
     assert(_af);
@@ -1982,7 +1980,6 @@ bool AnalogFunctionArgs::new_var_ref(Base* b)
     }else if(auto tt = dynamic_cast<Token*>(ex)){ untested();
       return Block::new_var_ref(tt);
     }else if(ex){ untested();
-      assert(0);
       unreachable();
     }else{
       return Block::new_var_ref(b);
@@ -2003,15 +2000,15 @@ bool AnalogFunctionArgs::new_var_ref(Base* b)
     }else if(auto tt = dynamic_cast<Token*>(ex)){ untested();
       return Block::new_var_ref(tt);
     }else if(ex){ untested();
-      assert(0);
       unreachable();
     }else{
       return Block::new_var_ref(b);
     }
   }else if(dynamic_cast<Token_VAR_REF*>(b)) { untested();
+    unreachable();
     return Block::new_var_ref(b);
   }else{ untested();
-    assert(0);
+    unreachable();
     return Block::new_var_ref(b);
   }
   return false;
@@ -2585,7 +2582,7 @@ FUNCTION_ const* xs_function_call(std::string const& f, Block const* owner)
   }
 
   assert(file);
-  if(f=="flow" || f=="potential") {
+  if(f=="flow" || f=="potential") { untested();
     // TODO: return FUNCTION_*, VAMS_XS* from nature
     return (FUNCTION_*)(1); // TODO true;
   }else{
