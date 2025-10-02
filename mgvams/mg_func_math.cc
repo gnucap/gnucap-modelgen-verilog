@@ -692,7 +692,7 @@ public:
     double x = get_double(e);
     subs_double(e, std::log1p(x));
   }
-  void make_cc_common(std::ostream& o)const override { untested();
+  void make_cc_common(std::ostream& o)const override {
     declare_f1(o, code_name());
     o____ "double l=-1e99;\n";
     o____ "if(double(d)>-1.) {\n";

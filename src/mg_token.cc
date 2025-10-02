@@ -679,8 +679,8 @@ void Token_FUNCTION::stack_op(Expression* e) const
   assert(E);
   Expression const* arg_expr = NULL;
 
-  if (arg_expr) {
-  }else if (E->is_empty()) {
+  if (arg_expr) { untested();
+  }else if (E->is_empty()) { untested();
   }else if(auto pl=dynamic_cast<Token_PARLIST_*>(E->back())) {
     // del_args = true;
     arg_expr = pl->args();
@@ -697,7 +697,7 @@ void Token_FUNCTION::stack_op(Expression* e) const
   if (arg_expr) {
     Token_CALL t(*this, nullptr, arg_expr); // check: does it delete arg_expr?
     return t.stack_op(E);
-  }else if (E->is_empty()){
+  }else if (E->is_empty()){ untested();
     incomplete();
     E->push_back(new Token_CALL(*this, const_deps.clone()));
   }else if(!dynamic_cast<const Token_PARLIST*>(E->back())) {
@@ -944,7 +944,7 @@ void Token_VAR_REF::stack_op(Expression* e)const
       // nd = deps().clone();
       nd = dd->clone();
 //      nd->add_sens(_item); not yet.
-   //  }else if(!_item){
+   //  }else if(!_item){ untested();
    //    assert(prechecked_cast<Token_ARGUMENT const*>(this));
    //    nd = new TData(); // BUG.
     }else{ untested();
@@ -1122,7 +1122,7 @@ Data_Type const& Token_ARGUMENT::type() const
 {
   if(auto v = dynamic_cast<Token_VAR_DECL const*>(_var)) {
     return v->type();
-  }else{
+  }else{ untested();
   unreachable();
     static Data_Type_Real t;
     return t;
@@ -1456,7 +1456,7 @@ void Token_FILTER::stack_op(Expression* e)const
     e->pop_back();
   }else if(dynamic_cast<Token_CONSTANT const*>(e->back())){
     return;
-  }else{
+  }else{ untested();
     unreachable();
   }
   // assert(!e->is_empty());
@@ -1489,7 +1489,7 @@ void Token_FILTER::stack_op(Expression* e)const
       Node_Ref n = br->n();
       Node* nn = n.mutable_node();
       nn->set_to_ground(nullptr);
-    }else if(1){
+    }else if(1){ untested();
       unreachable(); // encapsulation problem
       func->set_n_to_gnd__();
     }else if(0 /*sth linear*/){ untested();

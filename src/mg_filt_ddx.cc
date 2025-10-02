@@ -137,7 +137,7 @@ public:
 	  o__ "ret " << (rev?'-':'+') << "= t0[d_potential" << x->code_name() << "]; // fwd?\n";
 	}else if(x->p() == n && x->n() == p){ untested();
 	  unreachable();
-	}else{ untested();
+	}else{
 	}
 
       }else{
