@@ -90,7 +90,7 @@ public: // HACK
   bool static_code()const override {return false;}
   bool is_common()const override {return false;}
   bool has_state()const override {return true;}
-  int max_args()const override { untested(); return 2;}
+  int max_args()const override { return 2;}
   bool port_hack()const override {return false;}
   bool is_analog_filter()const override {return true;}
 protected:

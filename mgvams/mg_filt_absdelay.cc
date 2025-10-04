@@ -33,10 +33,10 @@
 Node_Ref MGVAMS_FILTER::p() const { untested();unreachable(); return nullptr;}
 Node_Ref MGVAMS_FILTER::n() const { untested();unreachable(); return nullptr;}
 /*--------------------------------------------------------------------------*/
-Node_Ref Branch::p() const { untested();return _p;}
+Node_Ref Branch::p() const {return _p;}
 Node_Ref Branch::n() const { untested();return _n;}
 bool Branch::is_short() const
-{ untested();
+{
   assert(_p);
   assert(_n);
   return _p->number() == _n->number();
@@ -48,20 +48,20 @@ void MGVAMS_FILTER::set_n_to_gnd(Module*) const{ untested(); unreachable(); }
 namespace{
 /*--------------------------------------------------------------------------*/
 static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
-{ untested();
+{
 
-  { untested();
+  {
     char sign = '+';
     indent a;
     o__ "d->" << state << "[0] = " << sign << " " << "t0.value();\n";
     size_t k = 2;
 
-    for(auto v : deps.ddeps()) { untested();
+    for(auto v : deps.ddeps()) {
       // char sign = f.reversed()?'-':'+';
       o__ "// dep " << v->code_name() << "\n";
       // if(f->branch() == v->branch()){ untested(); }
       if(v->branch()->is_short()){ untested();
-      }else{ untested();
+      }else{
 	o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
 	o__ "// assert(!d->" << state << "[" << k << "]);\n";
 	o__ "d->" << state << "[" //  << k << "]"
@@ -97,27 +97,27 @@ public: // HACK
 //  Node_Ref _p;
 //  Node_Ref _n;
 
-  explicit ABSDELAY() : MGVAMS_FILTER() { untested();
+  explicit ABSDELAY() : MGVAMS_FILTER() {
     set_label("absdelay");
   }
-  explicit ABSDELAY(ABSDELAY const& p) : MGVAMS_FILTER(p) { untested();
+  explicit ABSDELAY(ABSDELAY const& p) : MGVAMS_FILTER(p) {
   }
-  ~ABSDELAY(){ untested();
+  ~ABSDELAY(){
 //    delete _prb; belongs to _m
   }
-  int max_args()const override { untested(); return 3;}
+  int max_args()const override { return 3;}
   bool port_hack()const override {return false;}
   bool is_analog_filter()const override {return true;}
   std::string eval_name()const override {
     if(_m){
       std::string id = _m->identifier().to_string();
       return "COMMON_" + id + "::_common" + code_name();
-    }else{ untested();
+    }else{
       // unreachable();
       return "missing_m??";
     }
   }
-  virtual ABSDELAY* clone()const override { untested();
+  virtual ABSDELAY* clone()const override {
     return new ABSDELAY(*this);
   }
 protected:
@@ -133,7 +133,7 @@ protected:
 public:
   // Token* new_token(Expression_ const* e) ...
   // Module* m = e->owner()...
-  Token* new_token(Module&, size_t)const override { untested();
+  Token* new_token(Module&, size_t)const override {
     return nullptr;
 #if 0
     assert(na != size_t(-1));
@@ -175,7 +175,7 @@ public:
 #endif
   }
 
-  void make_cc_common(std::ostream& o)const override{ untested();
+  void make_cc_common(std::ostream& o)const override{
     o << "public:\n";
     o__ "class common" << code_name() <<": public COMMON_FILT {\n";
     o____ "COMMON_COMPONENT* clone()const override{unreachable(); return nullptr;}\n";
@@ -189,12 +189,12 @@ public:
       << " _common" << code_name() << ";\n";
   }
 
-  void make_cc_dev(std::ostream& o)const override{ untested();
+  void make_cc_dev(std::ostream& o)const override{
     indent x(2);
     o__ "ddouble " << code_name() << "(ddouble t0";
       assert(num_args());
       assert(num_args() < 4);
-      for(int n=1; n < int(num_args()); ++n){ untested();
+      for(int n=1; n < int(num_args()); ++n){
 	o << ", double t" << n;
       }
 
@@ -203,22 +203,22 @@ public:
     o__ "ddouble " << code_name() << "__precalc(ddouble const&";
       assert(num_args());
       assert(num_args() < 4);
-      for(int n=1; n < int(num_args()); ++n){ untested();
+      for(int n=1; n < int(num_args()); ++n){
 	o << ", double t" << n;
       }
     o << ");\n";
   }
 
-  void make_cc_impl(std::ostream&o)const override { untested();
+  void make_cc_impl(std::ostream&o)const override {
     std::string cn = _br->code_name();
     std::string id = _m->identifier().to_string();
     o << "MOD_"<< id <<"::ddouble MOD_" << id << "::" << code_name() << "(ddouble t0";
-    for(int n=1; n < int(num_args()); ++n){ untested();
+    for(int n=1; n < int(num_args()); ++n){
       o << ", double t" << n;
     }
     o << ")\n{\n";
     indent xx(2);
-    for(int n=1; n < int(num_args()); ++n){ untested();
+    for(int n=1; n < int(num_args()); ++n){
       o__ "(void) " << "t" << n << ";\n";
     }
     o__ "MOD_" << id << "* d = this;\n";
@@ -229,7 +229,7 @@ public:
     if(_output){ untested();
       o__ "// subdevice\n";
       o__ "t0 = 0.;\n";
-    }else{ untested();
+    }else{
       o__ "t0 = d->" << cn << "->tr_amps();\n";
  //     o__ "d->_potential" << cn << " = t0;\n";
     }
@@ -239,7 +239,7 @@ public:
 
     if(_output){ untested();
       o__ "return t0; // (output)\n";
-    }else{ untested();
+    }else{
       o__ "return t0; // (node)\n";
     }
 
@@ -254,22 +254,22 @@ public:
     o << "ddouble MOD_" << id << "::" << code_name() << "__precalc(ddouble const&";
     assert(num_args());
     assert(num_args() < 4);
-    if(num_args()>1){ untested();
+    if(num_args()>1){
       o << ", double delay=1";
     }else{ untested();
       unreachable();
     }
     if(num_args()>2){ untested();
       o << ", double maxdelay=1";
-    }else{ untested();
+    }else{
     }
     o << ")\n{\n";
-    { untested();
+    {
       o__ "ddouble ret = 0.;\n";
       o__ "COMPONENT* l = " << cn << ";\n";
       o__ "assert(l);\n";
       o__ "std::string reset;\n";
-      if(num_args()>1){ untested();
+      if(num_args()>1){
 	o__ "l->set_param_by_name(\"delay\", \"\");\n";
 	o__ "l->set_param_by_name(\"delay\", to_string(delay));\n";
       }else{ untested();
@@ -278,7 +278,7 @@ public:
       if(num_args()>2){ untested();
 	o__ "l->set_param_by_name(\"maxdelay\", \"\");\n";
 	o__ "l->set_param_by_name(\"maxdelay\", to_string(maxdelay));\n";
-      }else{ untested();
+      }else{
       }
       o__ "ret[d_potential" << cn << "] = -1.;\n";
       o__ "return ret;\n";
@@ -305,7 +305,7 @@ private:
   Node_Ref p()const override;
   Node_Ref n()const override;
 private: // setup
-  Branch* branch()const override { untested(); return _br; }
+  Branch* branch()const override { return _br; }
 } absdel;
 DISPATCHER<FUNCTION>::INSTALL d0(&function_dispatcher, "absdelay", &absdel);
 /*--------------------------------------------------------------------------*/
@@ -389,17 +389,17 @@ void Token_ABSDELAY::stack_op(Expression* e)const
 #endif
 /*--------------------------------------------------------------------------*/
 Branch const* ABSDELAY::output() const
-{ untested();
+{
   if(_output){ untested();
     return _output;
-  }else{ untested();
+  }else{
     return _br;
   }
 }
 /*--------------------------------------------------------------------------*/
 #if 1
 Node_Ref ABSDELAY::p() const
-{ untested();
+{
   return _br->p();
 }
 /*--------------------------------------------------------------------------*/

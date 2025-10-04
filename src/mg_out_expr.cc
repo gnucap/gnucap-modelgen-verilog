@@ -347,7 +347,7 @@ public:
   }
   void new_float(std::ostream& o){
     ++_flt_idx;
-    if(_flt_idx < _flt_alloc){ untested();
+    if(_flt_idx < _flt_alloc){
     }else{
       assert(_flt_idx==_flt_alloc);
       ++_flt_alloc;
@@ -741,7 +741,7 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
 	|| op == '|'
 	|| op == '!' ){
 	o__ vars().code_name() << " = " << arg1 << " " << (*i)->name() << " " << idy << "; // (703)\n";
-      }else if(op == '%'){untested();
+      }else if(op == '%'){itested();
 	o__ vars().code_name() << " = va::fmod(" << arg1 << ", " << idy << ");\n";
       }else{ untested();
 	unreachable();

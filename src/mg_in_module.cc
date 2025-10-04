@@ -1253,7 +1253,7 @@ static Token* new_filter_token(int na, FUNCTION_ const* func, Module* m)
   auto fcl = prechecked_cast<MGVAMS_FILTER*>(fc);
 
 #if 1
-  { untested();
+  {
     fcl->set_label(filter_code_name); // label()); // "_b_" + filter_code_name);
     if(int(na) <= f->max_args()) {
     }else{ untested();
@@ -1282,7 +1282,7 @@ static Token* new_filter_token(int na, FUNCTION_ const* func, Module* m)
     assert(m->circuit());
     m->new_filter();
 
-    if(f->eval_name()!=""){ untested();
+    if(f->eval_name()!=""){
       br->set_eval(fcl->eval_name());
     }else{
     }

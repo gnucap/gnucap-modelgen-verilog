@@ -177,7 +177,7 @@ void System_Task::parse(CS& f)
     add_rdep(&tr_begin_tag);
   }else{
   }
-  if(function()->has_tr_restore()){ untested();
+  if(function()->has_tr_restore()){
     add_rdep(&tr_restore_tag);
   }else{
   }
@@ -453,7 +453,7 @@ void AnalogConditionalStmt::parse(CS& f)
     }else if(_cond.is_false()) {
       if(is_always()) {
 	_false_part.set_always();
-      }else{ untested();
+      }else{
       }
       _body.set_never();
     }else{
@@ -723,7 +723,7 @@ void CaseGen::calc_reach(Expression const& ctrl)
       b.pop();
       assert(result.size());
 
-      if(is_false(result)) { untested();
+      if(is_false(result)) {
       }else{
 	all_never = false;
       }
@@ -733,7 +733,7 @@ void CaseGen::calc_reach(Expression const& ctrl)
       }else{
       }
     }
-    if(all_never){ untested();
+    if(all_never){
       set_never();
     }else{
     }
@@ -2582,7 +2582,7 @@ FUNCTION_ const* xs_function_call(std::string const& f, Block const* owner)
   }
 
   assert(file);
-  if(f=="flow" || f=="potential") { untested();
+  if(f=="flow" || f=="potential") {
     // TODO: return FUNCTION_*, VAMS_XS* from nature
     return (FUNCTION_*)(1); // TODO true;
   }else{
