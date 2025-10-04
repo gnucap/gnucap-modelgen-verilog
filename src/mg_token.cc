@@ -1199,7 +1199,7 @@ void Token_VAR_DECL::dump(std::ostream& o) const
   o << name();
   if(!options().dump_annotate()){ untested();
   }else if(deps().ddeps().size()){ untested();
-    for(auto d : deps().ddeps()){ untested();
+    for(Dep const& d : deps().ddeps()){ untested();
       o << "// dep " << d->code_name();
     }
     o << "\n";

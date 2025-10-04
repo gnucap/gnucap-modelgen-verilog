@@ -60,7 +60,7 @@ public:
   Probe const* operator->() const{ return _prb; }
   Probe const* operator*() const{ return _prb; }
   operator Probe const*() const{ return _prb; }
-  std::string code_name()const;
+  std::string name()const;
 };
 /*--------------------------------------------------------------------------*/
 class Sensitivities {

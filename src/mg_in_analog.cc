@@ -1287,23 +1287,23 @@ void Contribution::parse(CS& cmd)
 /*--------------------------------------------------------------------------*/
 void Contribution::add_dep(Dep const& d)
 {
-  trace3("contrib dep", d->code_name(), d.is_linear(), _branch->deps().is_linear());
+  trace3("contrib dep", code_name(d), d.is_linear(), _branch->deps().is_linear());
   _branch->add_dep(d);
 
   if(!is_direct()){
-  }else if(d->branch() != _branch){
-  }else if(is_flow_contrib() && d->is_flow_probe()){ untested();
+  }else if(::branch(d) != _branch){
+  }else if(is_flow_contrib() && probe(d)->is_flow_probe()){ untested();
     _branch->set_selfdep();
-  }else if(is_pot_contrib() && d->is_pot_probe()){
+  }else if(is_pot_contrib() && probe(d)->is_pot_probe()){
     _branch->set_selfdep();
   }else{
   }
 
 
   if(owner()->is_reachable()){
-    d->branch()->inc_use();
+    ::branch(d)->inc_use();
     trace2("inc_use1", name(), branch()->name());
-    (*d)->set_used_in(this);
+    probe(d)->set_used_in(this);
   }else{
   }
 }
@@ -2356,10 +2356,10 @@ Contribution::~Contribution()
 //    }
 
     for(Dep const& i : deps().ddeps()){
-      assert(i->branch());
-      i->branch()->dec_use();
+      assert(::branch(i));
+      ::branch(i)->dec_use();
       try{
-	(*i)->unset_used_in(this);
+	probe(i)->unset_used_in(this);
       }catch(std::logic_error const& e){ untested();
 	unreachable();
 	std::cerr << " logic error in " << name() << ": ";
@@ -2383,11 +2383,11 @@ size_t Branch::num_nodes() const
 {
   size_t ret=1;
 
-  for(auto i : ddeps()){
-    if(i->branch()->is_short()){
-    }else if(i->branch() == this){
+  for(Dep const& i : ddeps()){
+    if(branch(i)->is_short()){
+    }else if(branch(i) == this){
       // self conductance
-    }else if(i->is_pot_probe()){
+    }else if(probe(i)->is_pot_probe()){
       ++ret;
 //     }else if(i->is_filter_probe()){ untested();
 //       assert(i->is_pot_probe());
@@ -2403,12 +2403,11 @@ size_t Branch::num_states() const
 {
   size_t k = 2;
   // TODO: cleanup
-  for(auto i : ddeps()){
-    assert(i);
+  for(Dep const& i : ddeps()){
     // if(i->is_reversed()){ untested();
     //}else
-    if(i->branch() == this){
-    }else if(i->branch()->is_short()){
+    if(branch(i) == this){
+    }else if(branch(i)->is_short()){
     }else{
       ++k;
     }

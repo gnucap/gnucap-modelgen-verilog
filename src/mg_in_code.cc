@@ -193,7 +193,7 @@ void Variable_Decl::dump(std::ostream& o)const
   if(options().dump_annotate()){
     std::string nl;
     for(Dep const& d : deps().ddeps()){
-      o << "// dep " << d.code_name();
+      o << "// dep " << d.name();
       nl = "\n";
     }
     o << nl;

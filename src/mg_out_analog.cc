@@ -125,7 +125,7 @@ void OUT_ANALOG::make_real_variable(std::ostream& o, Token_VAR_DECL const& v) co
   }else{
     o__ "ddouble _v_" << v.name() << "; // Token_VAR_DECL";
 
-    for(auto const& i : v.deps().ddeps()) { untested();
+    for(Dep const& i : v.deps().ddeps()) { untested();
       o__ " Dep: " << i->code_name() << " lin: " << i.is_linear();
     }
     o << "\n";
@@ -161,7 +161,7 @@ void OUT_ANALOG::make_variable(std::ostream& o, Variable_Decl const& v) const
   }else{
     o__ "ddouble _v_" << v.name() << "; // Variable_Decl";
 
-    for(auto const& i : v.deps().ddeps()) { untested();
+    for(Dep const& i : v.deps().ddeps()) { untested();
       o__ " Dep: " << i->code_name() << " lin: " << i.is_linear();
     }
     o << "\n";
@@ -245,9 +245,9 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
       o__ lhsname << " = t0.value(); // (s)\n";
     }else if(!options().optimize_deriv()) {
       o__ lhsname << " = t0; // (*)\n";
-      for(auto v : a.data().ddeps()) {
-	o__ "// " << a.lhs().code_name() << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // (2a)\n";
-	o__ "assert(" << a.lhs().code_name() << "[d" << v->code_name() << "] == " << "t0[d" << v->code_name() << "]); // (2a2)\n";
+      for(Dep const& v : a.data().ddeps()) {
+	o__ "// " << a.lhs().code_name() << "[d" << code_name(v) << "] = " << "t0[d" << code_name(v) << "]; // (2a)\n";
+	o__ "assert(" << a.lhs().code_name() << "[d" << code_name(v) << "] == " << "t0[d" << code_name(v) << "]); // (2a2)\n";
       }
     }else{
       o__ lhsname << " = t0.value(); // (*)\n";
@@ -256,8 +256,8 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
       o__ "trace1(\"assign\", " << lhsname << ");\n";
 #endif
 
-      for(auto v : e.data().ddeps()) {
-	assert(v->branch());
+      for(Dep const& v : e.data().ddeps()) {
+	assert(branch(v));
 	if(v.is_linear()){
 	  // TODO incomplete();
 	}else if(v.is_quadratic()){ untested();
@@ -271,11 +271,11 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
 	}else{
 	}
 
-	if(v->branch()->is_short()) {
-	  o__ "// " << lhsname << "[d" << v->code_name() << "] short\n";
+	if(branch(v)->is_short()) {
+	  o__ "// " << lhsname << "[d" << code_name(v) << "] short\n";
 	}else{
-	  o__ lhsname << "[d" << v->code_name() << "] = " << "t0[d" << v->code_name() << "]; // (2b)\n";
-	  o__ "assert(" << lhsname << "[d" << v->code_name() << "] == " << "t0[d" << v->code_name() << "]); // (2b2)\n";
+	  o__ lhsname << "[d" << code_name(v) << "] = " << "t0[d" << code_name(v) << "]; // (2b)\n";
+	  o__ "assert(" << lhsname << "[d" << code_name(v) << "] == " << "t0[d" << code_name(v) << "]); // (2b2)\n";
 	}
 #ifdef TRACE_ASSIGN
 	o__ "trace1(\"assign\", " << lhsname << "[d" << v->code_name() << "]);\n";
@@ -290,8 +290,8 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 {
   Expression const& e = C.rhs();
 
-  for(auto v : C.data().ddeps()) {
-    trace2("contrib dep", C.name(), v->code_name());
+  for(Dep const& v : C.data().ddeps()) {
+    trace2("contrib dep", C.name(), code_name(v));
   }
 
   o__ "{ // Contribution " << C.name() << C.branch_ref() << " lin: " << C.data().is_linear() << "\n";
@@ -353,50 +353,50 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
     }
 
     if(is_dynamic()) {
-      for(auto v : C.data().ddeps()) {
-	if(C.branch() == v->branch()){
-	  o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
+      for(Dep const& v : C.data().ddeps()) {
+	if(C.branch() == branch(v)){
+	  o__ "assert(" << "t0[d" << code_name(v) << "] == t0[d" << code_name(v) << "]" << ");\n";
 	  o__ "d->_st" << bcn << "[1]"
-	    " " << sign << "= " << "t0[d" << v->code_name() << "];\n";
+	    " " << sign << "= " << "t0[d" << code_name(v) << "];\n";
 	}else{
 	}
       }
-      for(auto v : C.data().ddeps()) {
-	o__ "// dep " << v->code_name() << "\n";
-	assert(v->branch());
-	if(C.branch() == v->branch()){
-	  o__ "// same2 " << v->code_name() << "\n";
-	}else if(v->branch()->is_short()) {
-	  o__ "// short: " << v->code_name() << "\n";
+      for(Dep const& v : C.data().ddeps()) {
+	o__ "// dep " << code_name(v) << "\n";
+	assert(branch(v));
+	if(C.branch() == branch(v)){
+	  o__ "// same2 " << code_name(v) << "\n";
+	}else if(branch(v)->is_short()) {
+	  o__ "// short: " << code_name(v) << "\n";
 #if 1
-	}else if(v->is_flow_probe() && v->branch()->has_flow_source()) {
+	}else if(is_flow_probe(v) && branch(v)->has_flow_source()) {
 	  // incomplete untested(); mg4_current2,3
 	  // copy dep values from source?
-	  o__ "// source " << v->code_name() << "\n";
+	  o__ "// source " << code_name(v) << "\n";
 #endif
 	}else{
-	  o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
+	  o__ "assert(" << "t0[d" << code_name(v) << "] == t0[d" << code_name(v) << "]" << ");\n";
 	  // o__ "d->" << C.branch()->state() << "["
 	  o__ "d->_st" << bcn << "["
-	     << "MOD::" << C.branch()->state() << "_::dep" << v->code_name() << "] "
-	     << sign << "= " << "t0[d" << v->code_name() << "]; // (382)\n";
+	     << "MOD::" << C.branch()->state() << "_::dep" << code_name(v) << "] "
+	     << sign << "= " << "t0[d" << code_name(v) << "]; // (382)\n";
 	}
       }
     }else if(is_precalc()) {
-      for(auto v : C.data().ddeps()) {
-	assert(v->branch());
-	if(C.branch() == v->branch()) {
-	  o__ "// same2 " << v->code_name() << "\n";
-	}else if(v->branch()->is_detached_filter()){
-	  o__ "m->" << v->branch()->state() << "[1] = " << sign << "t0[d" << v->code_name() << "]; // (3p)\n";
-	}else if(v->branch()->is_filter()){
-	  o__ "m->" << v->branch()->state() << "[1] = " << sign << "1; // (3q)\n"; // mfactor hack
-	}else if(v->branch()->is_short()) {
-	  o__ "// short: " << v->code_name() << "\n";
-	}else if(v->branch()->has_element()){
-	  o__ "// elt? " << v->code_name() << "\n";
+      for(Dep const& v : C.data().ddeps()) {
+	assert(branch(v));
+	if(C.branch() == branch(v)) {
+	  o__ "// same2 " << code_name(v) << "\n";
+	}else if(branch(v)->is_detached_filter()){
+	  o__ "m->" << branch(v)->state() << "[1] = " << sign << "t0[d" << code_name(v) << "]; // (3p)\n";
+	}else if(branch(v)->is_filter()){
+	  o__ "m->" << branch(v)->state() << "[1] = " << sign << "1; // (3q)\n"; // mfactor hack
+	}else if(branch(v)->is_short()) {
+	  o__ "// short: " << code_name(v) << "\n";
+	}else if(branch(v)->has_element()){
+	  o__ "// elt? " << code_name(v) << "\n";
 	}else{
-	  o__ "//noelt: " << v->code_name() << "\n";
+	  o__ "//noelt: " << code_name(v) << "\n";
 	}
       }
       if(C.data().ddeps().empty()) {
@@ -885,26 +885,26 @@ static void make_set_self_contribution(std::ostream& o, Dep const& d)
   // geting here if V(br) <+ .. I(br) or
   //                I(br) <+ .. V(br)
   //    .. what if both?
-  Branch const* b = d->branch();
-  o__ "trace2(\"" <<  b->state() << "self\", " << b->state() << "[1], "<<  d->code_name() <<");\n";
+  Branch const* b = branch(d);
+  o__ "trace2(\"" <<  b->state() << "self\", " << b->state() << "[1], "<<  code_name(d) <<");\n";
   o__ "// generic: " << b->is_generic() << "\n";
   bool both = b->has_flow_source() && b->has_pot_source();
 
-  if(both && d->is_pot_probe()) {
+  if(both && is_pot_probe(d)) {
     o__ "// self pot\n";
     o__ "if (_pot"<< b->code_name() << "){\n";
     o__ "}else{\n";
-    o____ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
+    o____ b->state() << "[0] -= " << b->state() << "[1] * " << code_name(d) << "; // (4)\n";
     o__ "}\n";
-  }else if(both && d->is_flow_probe()) {
+  }else if(both && is_flow_probe(d)) {
     o__ "// self flow\n";
     o__ "if (_pot"<< b->code_name() << "){\n";
-    o____ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
+    o____ b->state() << "[0] -= " << b->state() << "[1] * " << code_name(d) << "; // (4)\n";
     o__ "}else{\n";
     o__ "}\n";
   }else{
     o__ "// self\n";
-    o__ b->state() << "[0] -= " << b->state() << "[1] * " << d->code_name() << "; // (4)\n";
+    o__ b->state() << "[0] -= " << b->state() << "[1] * " << code_name(d) << "; // (4)\n";
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -916,27 +916,27 @@ static void make_cc_set_state(std::ostream& o, Branch const& b, std::string cn)
     o__ "long double sp = 0.;\n";
   }else{
   }
-  for(auto const& d : b.deps().ddeps()){
-    o__ "// " << d->code_name() << " lin: " <<  d.is_linear() << "\n";
-    if(d->branch() == &b){
+  for(Dep const& d : b.deps().ddeps()){
+    o__ "// " << code_name(d) << " lin: " <<  d.is_linear() << "\n";
+    if(branch(d) == &b){
       // move make_set_self_contribution here?
-    }else if(d->branch()->is_short()) {
-    }else if(d->is_pot_probe()){
+    }else if(branch(d)->is_short()) {
+    }else if(is_pot_probe(d)){
       o__ "sp += (long double)(" << b.state(cn) << "["
-	<< b.state() << "_::dep" << d->code_name()
-	<< "] * "<< d->code_name() << ");\n";
-    }else if(d->is_flow_probe()){
+	<< b.state() << "_::dep" << code_name(d)
+	<< "] * "<< code_name(d) << ");\n";
+    }else if(is_flow_probe(d)){
       o__ "sp += (long double)(" << b.state(cn) << "["
-	<< b.state() << "_::dep" << d->code_name()
-	<< "] * "<< d->code_name() << "); // (5)\n";
+	<< b.state() << "_::dep" << code_name(d)
+	<< "] * "<< code_name(d) << "); // (5)\n";
       o__ b.state(cn) << "["
-	<< b.state() << "_::dep" << d->code_name()
-	<<"] *= " << d->branch()->code_name() <<"->_loss0;\n"; // maybe let src decide?
+	<< b.state() << "_::dep" << code_name(d)
+	<<"] *= " << branch(d)->code_name() <<"->_loss0;\n"; // maybe let src decide?
     }else{ untested();
-      o__ "// bogus probe " << b.state() << " : " << d->code_name() << "\n";
+      o__ "// bogus probe " << b.state() << " : " << code_name(d) << "\n";
     }
-    if(d->branch() == &b){
-    }else if(d->is_flow_probe()){
+    if(branch(d) == &b){
+    }else if(is_flow_probe(d)){
       // todo?
     }
   }
@@ -961,9 +961,9 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
   }else{
   }
 
-  for(auto const& d : b->deps().ddeps()){
-    if(d->branch() == b){
-      o__ "// same1 " << d->code_name() << "\n";
+  for(Dep const& d : b->deps().ddeps()){
+    if(branch(d) == b){
+      o__ "// same1 " << code_name(d) << "\n";
       if(b->has_pot_source() && b->has_flow_probe()){
 	if(br.num_states()<=2){
 	}else{
@@ -1459,20 +1459,20 @@ void make_cc_analog(std::ostream& o, const Module& m)
 void make_node_ref(std::ostream& o, const Node& n, bool used=true);
 void make_cc_branch_ctrl(std::ostream& o, Branch const* br)
 {
-  for(auto i : br->ddeps()){
-    Branch const* bb = i->branch();
+  for(Dep const& i : br->ddeps()){
+    Branch const* bb = branch(i);
     if(bb->is_short()){
       // here: skip filter dependency.
     }else if(bb == br){
-    }else if(i->is_pot_probe()){
-      assert(i->branch());
+    }else if(is_pot_probe(i)){
+      assert(branch(i));
       o << ", ";
-      make_node_ref(o, *i->branch()->p());
+      make_node_ref(o, *branch(i)->p());
       o << ", ";
-      make_node_ref(o, *i->branch()->n());
-    }else if(i->is_flow_probe()){
+      make_node_ref(o, *branch(i)->n());
+    }else if(is_flow_probe(i)){
     }else{ untested();
-      o << "/* nothing " << i->code_name() << " */";
+      o << "/* nothing " << code_name(i) << " */";
     }
   }
 }
@@ -1481,19 +1481,19 @@ void make_cc_current_ports(std::ostream& o, Branch const* br, Element_2 const& e
 {
   // set_current ports.
   int kk = 1;
-  for(auto i : br->ddeps()){
-    if(!i->is_flow_probe()){
-    }else if(i->branch() == br){
+  for(Dep const& i : br->ddeps()){
+    if(!is_flow_probe(i)){
+    }else if(branch(i) == br){
       // self control is current
       o______ "{\n";
       o________ "std::string tmp = \"\";"; // BUG: passing ref.
       o________ e.code_name() << "->set_port_by_index(-1,tmp);\n";
       o______ "}\n";
-    }else if(i->branch()){
-      if(i->branch()->is_short()){
+    }else if(branch(i)){
+      if(branch(i)->is_short()){
       }else{
 	o______ "{\n";
-	o________ "std::string tmp = \"" << i->branch()->code_name() << "\";"; // BUG: passing ref.
+	o________ "std::string tmp = \"" << branch(i)->code_name() << "\";"; // BUG: passing ref.
 	o________ e.code_name() << "->set_port_by_index( -1-"<< kk << ", tmp);\n";
 	o______ "}\n";
 	++kk;

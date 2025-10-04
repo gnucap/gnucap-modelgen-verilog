@@ -45,7 +45,7 @@ void dump_annotate(std::ostream& o, A const& a)
     }
     for(const Dep& d : a.data().ddeps()) {
       o << " dep: ";
-      o << d.code_name();
+      o << d.name();
     }
 #if 1
     if(a.has_sensitivities()){

@@ -137,16 +137,16 @@ public:
       // possibly unneeded. cf. ac_stim
       for(auto v : deps.ddeps()) {
 	// char sign = f.reversed()?'-':'+';
-	o__ "// dep " << v->code_name() << "\n";
+	o__ "// dep " << ::code_name(v) << "\n";
 	// if(f->branch() == v->branch()){ untested(); }
 //	if(v->branch()->is_short()){ untested();
 //	} else
 	{
-	  o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
+	  o__ "assert(" << "t0[d" << ::code_name(v) << "] == t0[d" << ::code_name(v) << "]" << ");\n";
 	  o__ "// assert(!d->" << state << "[" << k << "]);\n";
 	  o__ "d->" << state << "[" //  << k << "]"
-	    << "MOD::" << state << "_::dep" << v->code_name() << "] "
-	    " = " << sign << " " << "t0[d" << v->code_name() << "]; // (4)\n";
+	    << "MOD::" << state << "_::dep" << ::code_name(v) << "] "
+	    " = " << sign << " " << "t0[d" << ::code_name(v) << "]; // (4)\n";
 	  ++k;
 	}
       }

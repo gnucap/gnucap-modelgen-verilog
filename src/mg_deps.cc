@@ -35,7 +35,7 @@ bool TData::is_linear() const
     return false;
   }else{
   }
-  for(auto const& i : ddeps()) {
+  for(Dep const& i : ddeps()) {
     if (i.is_linear()) {
     }else{
       return false;
@@ -51,7 +51,7 @@ bool TData::is_quadratic() const
     return false;
   }else{ untested();
   }
-  for(auto const& i : ddeps()) { untested();
+  for(Dep const& i : ddeps()) { untested();
     if (i.is_quadratic()) { untested();
     }else{ untested();
       return false;
@@ -140,7 +140,7 @@ void TData::update(TData const& o)
 /*--------------------------------------------------------------------------*/
 void TData::merge_ddeps(TData const& o)
 {
-  for(auto& i : o.ddeps()){
+  for(Dep const& i : o.ddeps()){
     insert(i);
   }
 }
@@ -206,7 +206,7 @@ bool Dep::propagate_rdeps_(RDeps const& r) const
   return _prb->propagate_rdeps_(r);
 }
 /*--------------------------------------------------------------------------*/
-std::string Dep::code_name() const
+std::string Dep::name() const
 {
   assert(_prb);
   return _prb->code_name();

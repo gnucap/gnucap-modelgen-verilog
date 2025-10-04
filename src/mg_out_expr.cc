@@ -338,7 +338,7 @@ public:
 	o__ "t" << _ddo_idx << ".set_all_deps(); // (all deriv)\n"; // code_name??
       }else{
 	o__ "//t" << _ddo_idx << ".set_no_deps();\n"; // ...
-	for(auto i: _deps->ddeps()){
+	for(Dep const& i: _deps->ddeps()){
 	  o__ "//t" << _ddo_idx << "[d" << i->code_name() << "] = 0.; // (output dep)\n";
 	}
       }

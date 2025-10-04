@@ -52,7 +52,7 @@ private:
     auto dd = prechecked_cast<TData const*>(t->data());
     assert(dd);
     assert(dd->ddeps().size()==1);
-    return *dd->ddeps().begin();
+    return probe(*dd->ddeps().begin());
   }
 
   Expression_ const* args() const{

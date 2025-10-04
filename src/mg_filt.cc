@@ -110,8 +110,8 @@ void filter_setup(MGVAMS_FILTER* f, Module* m)
       // BUG.
     }else if(c_cnt == 1 && always && !output_var){
       assert(cont);
-      for(auto d : cont->ddeps()){
-	if(d->branch() != f->branch()) {
+      for(Dep const& d : cont->ddeps()){
+	if(branch(d) != f->branch()) {
 	}else if(d.is_linear()){
 	  if(cont->is_pot_contrib()){ untested();
 	    incomplete(); // propagate loss?

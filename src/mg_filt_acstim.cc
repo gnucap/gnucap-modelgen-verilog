@@ -53,17 +53,17 @@ static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
     size_t k = 2;
 
   // possibly unneeded. cf. ac_stim
-    for(auto v : deps.ddeps()) { untested();
+    for(auto const& v : deps.ddeps()) { untested();
       // char sign = f.reversed()?'-':'+';
-      o__ "// dep " << v->code_name() << "\n";
+      o__ "// dep " << code_name(v) << "\n";
       // if(f->branch() == v->branch()){ untested(); }
-      if(v->branch()->is_short()){ untested();
+      if(branch(v)->is_short()){ untested();
       }else{ untested();
-	o__ "assert(" << "t1[d" << v->code_name() << "] == t1[d" << v->code_name() << "]" << ");\n";
+	o__ "assert(" << "t1[d" << probe(v)->code_name() << "] == t1[d" << probe(v)->code_name() << "]" << ");\n";
 	o__ "// assert(!d->" << state << "[" << k << "]);\n";
 	o__ "d->" << state << "[" //  << k << "]"
-	  << "MOD::" << state << "_::dep" << v->code_name() << "] "
-	  " = " << sign << " " << "t1[d" << v->code_name() << "]; // (4)\n";
+	  << "MOD::" << state << "_::dep" << probe(v)->code_name() << "] "
+	  " = " << sign << " " << "t1[d" << probe(v)->code_name() << "]; // (4)\n";
 	++k;
       }
     }

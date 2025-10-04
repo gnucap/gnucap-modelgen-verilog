@@ -40,17 +40,17 @@ static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
     o__ "d->" << state << "[0] = " << sign << " " << "t0.value();\n";
     size_t k = 2;
 
-    for(auto v : deps.ddeps()) {
+    for(auto const& v : deps.ddeps()) {
       // char sign = f.reversed()?'-':'+';
-      o__ "// dep " << v->code_name() << "\n";
+      o__ "// dep " << code_name(v) << "\n";
       // if(f->branch() == v->branch()){ untested(); }
-      if(v->branch()->is_short()){ untested();
+      if(branch(v)->is_short()){ untested();
       }else{
-	o__ "assert(" << "t0[d" << v->code_name() << "] == t0[d" << v->code_name() << "]" << ");\n";
+	o__ "assert(" << "t0[d" << code_name(v) << "] == t0[d" << code_name(v) << "]" << ");\n";
 	o__ "// assert(!d->" << state << "[" << k << "]);\n";
 	o__ "d->" << state << "[" //  << k << "]"
-	  << "MOD::" << state << "_::dep" << v->code_name() << "] "
-	  " = " << sign << " " << "t0[d" << v->code_name() << "]; // (4)\n";
+	  << "MOD::" << state << "_::dep" << code_name(v) << "] "
+	  " = " << sign << " " << "t0[d" << code_name(v) << "]; // (4)\n";
 	++k;
       }
     }
@@ -348,8 +348,8 @@ void Token_TRANSITION::stack_op(Expression* e)const
   if(auto dd = prechecked_cast<TData const*>(cc->data())) {
     // cc->args()[0]->data?
     assert(dd);
-    for(auto i : dd->ddeps()) {
-      trace1("xdt arg deps", i->code_name());
+    for(Dep const& i : dd->ddeps()) {
+      trace1("xdt arg deps", ::code_name(i));
     }
 
     branch()->deps().clear();
