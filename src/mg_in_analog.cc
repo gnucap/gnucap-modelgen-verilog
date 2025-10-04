@@ -664,9 +664,11 @@ bool AnalogProceduralAssignment::update()
 {
   trace2("AnalogProceduralAssignment::update", _a.lhs().name(), rdeps().size());
 //  trace1("AnalogProceduralAssignment::update",  _a.data().size());
+#ifdef DO_TRACE
   for(auto& r : rdeps()){
     trace2("AnalogProceduralAssignment::update", _a.lhs().name(), typeid(*r).name());
   }
+#endif
 
   bool ret;
   if(options().optimize_unused() && !scope()->is_reachable()) {
@@ -1675,6 +1677,17 @@ bool AnalogEvtCtlStmt::is_used_in(Base const* b)const
 }
 /*--------------------------------------------------------------------------*/
 void make_cc_af(std::ostream& o, const Analog_Function& f); // BUG
+/*--------------------------------------------------------------------------*/
+bool Token_ARGUMENT::is_output() const
+{
+  if(auto args = dynamic_cast<AF_Arg_List const*>(item())) {
+    return args->is_output();
+  }else{ untested();
+    unreachable();
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
 class AF : public MGVAMS_FUNCTION {
@@ -1716,40 +1729,13 @@ public:
   bool is_common()const override { return true; }
   bool needs_context()const override { return true; }
  // bool has_state()const override { untested(); return true; }
-  // TODO: fix linear search
   bool is_output_arg(int I)const override {
     assert(_af);
-    int n = 0;
-    for (Base const* x : _af->header()){
-      auto coll = prechecked_cast<AF_Arg_List const*>(x);
-      assert(coll);
-      for(Token_ARGUMENT const* i : *coll){
-	(void)i;
-	if(n++ == I) {
-	  return coll->is_output();
-	}else{
-	}
-      }
-    }
-    unreachable();
-    return false;
+    return _af->is_output_arg(I);
   }
-  // TODO: fix linear search
   Data_Type const* arg_type(int I)const override {
     assert(_af);
-    int n = 0;
-    for (Base const* x : _af->header()){
-      auto coll = prechecked_cast<AF_Arg_List const*>(x);
-      assert(coll);
-      for(Token_ARGUMENT const* i : *coll){
-	if(n++ == I) {
-	  return &i->type();
-	}else{
-	}
-      }
-    }
-    unreachable();
-    return nullptr;
+    return _af->arg_type(I);
   }
 
   /// BUG: belongs to mg_out_analog.
@@ -1762,7 +1748,8 @@ public:
     trace1("af::make_cc_common", label());
     // BUG? make_cc_af_args
     std::string sep = ", ";
-    for (Base const* x : F.header()){
+    AnalogFunctionArgs const& h = F.header();
+    for (Base const* x : h){
       auto coll = prechecked_cast<AF_Arg_List const*>(x);
       assert(coll);
 
@@ -1798,9 +1785,6 @@ void Analog_Function::parse(CS& f)
   trace1("PAF", name);
   _block.new_var_ref(_variable);
 
- // parse_block_variables(f, _block._variables);
-  _args._variables.set_owner(&_args); // ..
-
   for (;;) {
     size_t here = f.cursor();
     Variable_Stmt* s = nullptr;
@@ -1817,7 +1801,7 @@ void Analog_Function::parse(CS& f)
       trace1("done?", _args.lookup("x"));
     }
     if (s){
-      _args._variables.push_back(s);
+      _args.push_back(s);
     }else if (!f.more()) { untested();
       f.warn(bWARNING, "premature EOF (analog function)");
       break;
@@ -1843,10 +1827,76 @@ void Analog_Function::parse(CS& f)
   _function = new AF(this);
 }
 /*--------------------------------------------------------------------------*/
+bool Analog_Function::is_output_arg(int I) const
+{
+  AnalogFunctionArgs const& h = header();
+  Token const* t = h.arg_by_idx(I);
+  auto a = prechecked_cast<Token_ARGUMENT const*>(t);
+  assert(a);
+  return a->is_output();
+#if 0
+  int n = 0;
+  for (Base const* x : h){
+    auto coll = prechecked_cast<AF_Arg_List const*>(x);
+    assert(coll);
+    for(Token_ARGUMENT const* i : *coll){
+      (void)i;
+      if(n++ == I) { untested();
+	assert(i == header().arg_by_idx(I));
+	assert(i->is_output() == coll->is_output());
+	return coll->is_output();
+      }else{
+      }
+    }
+  }
+  unreachable();
+  return false;
+#endif
+}
+/*--------------------------------------------------------------------------*/
+// TODO: fix linear search
+Data_Type const* Analog_Function::arg_type(int I) const
+{
+  AnalogFunctionArgs const& h = header();
+  Token const* t = h.arg_by_idx(I);
+  auto a = prechecked_cast<Token_ARGUMENT const*>(t);
+  assert(a);
+  return &a->type();
+#if 0
+  int n = 0;
+  AnalogFunctionArgs const& h = header();
+  for (Base const* x : h){
+    auto coll = prechecked_cast<AF_Arg_List const*>(x);
+    assert(coll);
+    for(Token_ARGUMENT const* i : *coll){
+      if(n++ == I) {
+	return &i->type();
+      }else{
+      }
+    }
+  }
+  unreachable();
+  return nullptr;
+#endif
+}
+/*--------------------------------------------------------------------------*/
 Block* AnalogFunctionBody::scope()
 {
   auto o = prechecked_cast<Analog_Function*>(owner());
   return &o->_args;
+}
+/*--------------------------------------------------------------------------*/
+AnalogFunctionArgs::AnalogFunctionArgs() : Block()
+{
+  _variables.set_owner(this);
+}
+/*--------------------------------------------------------------------------*/
+void AnalogFunctionArgs::push_back(Variable_Stmt* b)
+{
+  _variables.push_back(b);
+ // for(Variable_Decl const* t : *b){
+ //   assert(t);
+ // }
 }
 /*--------------------------------------------------------------------------*/
 Base* AnalogFunctionArgs::lookup(std::string const& k, bool recurse)
@@ -1862,8 +1912,8 @@ Base* AnalogFunctionArgs::lookup(std::string const& k, bool recurse)
   if(auto n = dynamic_cast<Token_ARGUMENT const*>(b)){
     trace2("AnalogFunctionArgs::lookup1 arg", k, n->_var);
     if(n->_var){
+      assert(n->item());
       return b;
-      return n->_var; // need var in Expression::resolve...
     }else{
       return b;
     }
@@ -1946,7 +1996,11 @@ void Analog_Function::dump(std::ostream& o) const
 void AnalogFunctionArgs::parse(CS& f)
 {
   auto n = new AF_Arg_List(f, this);
-  push_back(n);
+  Block::push_back(n);
+
+  for(Token* p : *n){
+    _arg_by_idx.push_back(p);
+  }
 }
 /*--------------------------------------------------------------------------*/
 void AnalogFunctionArgs::dump(std::ostream& o) const
@@ -2184,7 +2238,7 @@ void AF_Arg_List::parse(CS& f)
     }else{
     }
 
-    auto t = new Token_ARGUMENT(i->to_string());
+    auto t = new Token_ARGUMENT(i->to_string(), this);
     t->_var = v;
     trace1("stash", t->name());
     try{

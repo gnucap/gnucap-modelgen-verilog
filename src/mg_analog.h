@@ -94,8 +94,7 @@ private:
   }
 }; // Probe
 /*--------------------------------------------------------------------------*/
-class AF_Arg_List : public Owned_Base { // was : public LiSt<Analog_Function_Arg, '\0', ',', ';'> 
-//  Data_Type _type;
+class AF_Arg_List : public Owned_Base {
   typedef LiSt<Token_ARGUMENT, '\0', ',', ';'> list_t;
   typedef list_t::const_iterator const_iterator;
   enum{
@@ -178,9 +177,14 @@ public:
 }; // AnalogCtrlBlock
 /*--------------------------------------------------------------------------*/
 class AnalogFunctionArgs : public Block {
-public:
   Variable_List_Collection _variables;
+  std::vector<Token const*> _arg_by_idx; // Expression?
+public:
+  explicit AnalogFunctionArgs();
 public: // can't resolve these..
+  Token const* arg_by_idx(int i)const {assert(i<int(_arg_by_idx.size()));
+                                       return _arg_by_idx[i];}
+  void push_back(Variable_Stmt* b);
   void parse(CS&)override;
   bool new_var_ref(Base* what)override;
   void dump(std::ostream& f)const override;
@@ -323,6 +327,8 @@ public:
   bool is_used_in(Base const*)const override{ untested();
     return true;
   }
+  bool is_output_arg(int I)const;
+  Data_Type const* arg_type(int I)const;
 private:
   // parse_identifier?
   void set_identifier(std::string const& name) { _identifier = name; }

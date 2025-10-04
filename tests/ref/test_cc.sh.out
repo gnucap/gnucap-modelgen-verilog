@@ -626,7 +626,7 @@ class wrap_arg{
 public:
    wrap_arg(T& d) : _d(d) { _a = d; }
    operator A&() { return _a; }
-   ~wrap_arg() { _d = _a; }
+   ~wrap_arg() { _d = std::move(T(_a)); }
 };
 /*--------------------------------------------------------------------------*/
 template<class S, class T>
@@ -1506,6 +1506,10 @@ void EVAL__b_white_noise_1_p_white_noise_1_n_::tr_eval(ELEMENT* d)const
         ddouble::operator=(t);
         return *this;
       }
+      ddouble& operator=(_V_dt const & t){
+        ddouble::operator=(t);
+        return *this;
+      }
     }_v_dt(d);
     // tmp block proxy (823b)
     class _V_g : public ddouble {
@@ -1530,6 +1534,10 @@ void EVAL__b_white_noise_1_p_white_noise_1_n_::tr_eval(ELEMENT* d)const
         return *this;
       }
       ddouble& operator=(ddouble t){
+        ddouble::operator=(t);
+        return *this;
+      }
+      ddouble& operator=(_V_g const & t){
         ddouble::operator=(t);
         return *this;
       }
@@ -1590,6 +1598,10 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         ddouble::operator=(t);
         return *this;
       }
+      ddouble& operator=(_V_dt const & t){
+        ddouble::operator=(t);
+        return *this;
+      }
     }_v_dt(d);
     // tmp block proxy (823b)
     class _V_g : public ddouble {
@@ -1614,6 +1626,10 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         return *this;
       }
       ddouble& operator=(ddouble t){
+        ddouble::operator=(t);
+        return *this;
+      }
+      ddouble& operator=(_V_g const & t){
         ddouble::operator=(t);
         return *this;
       }
@@ -1751,6 +1767,10 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
       ddouble::operator=(t);
       return *this;
     }
+    ddouble& operator=(_V___i const & t){
+      ddouble::operator=(t);
+      return *this;
+    }
   }_v___i(d);
 #pragma GCC diagnostic pop
   MOD_resistor const* p = d;
@@ -1790,6 +1810,10 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         ddouble::operator=(t);
         return *this;
       }
+      ddouble& operator=(_V_dt const & t){
+        ddouble::operator=(t);
+        return *this;
+      }
     }_v_dt(d);
     // tmp block proxy (823b)
     class _V_g : public ddouble {
@@ -1814,6 +1838,10 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         return *this;
       }
       ddouble& operator=(ddouble t){
+        ddouble::operator=(t);
+        return *this;
+      }
+      ddouble& operator=(_V_g const & t){
         ddouble::operator=(t);
         return *this;
       }
@@ -2832,6 +2860,10 @@ void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
         ddouble::operator=(t);
         return *this;
       }
+      ddouble& operator=(_V_dt const & t){
+        ddouble::operator=(t);
+        return *this;
+      }
     }_v_dt(d);
     // tmp block proxy (823b)
     class _V_g : public ddouble {
@@ -2856,6 +2888,10 @@ void EVAL__b_white_noise_0_p_white_noise_0_n_::tr_eval(ELEMENT* d)const
         return *this;
       }
       ddouble& operator=(ddouble t){
+        ddouble::operator=(t);
+        return *this;
+      }
+      ddouble& operator=(_V_g const & t){
         ddouble::operator=(t);
         return *this;
       }
@@ -2979,6 +3015,10 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         ddouble::operator=(t);
         return *this;
       }
+      ddouble& operator=(_V_dt const & t){
+        ddouble::operator=(t);
+        return *this;
+      }
     }_v_dt(d);
     // tmp block proxy (823b)
     class _V_g : public ddouble {
@@ -3003,6 +3043,10 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         return *this;
       }
       ddouble& operator=(ddouble t){
+        ddouble::operator=(t);
+        return *this;
+      }
+      ddouble& operator=(_V_g const & t){
         ddouble::operator=(t);
         return *this;
       }
@@ -3208,6 +3252,10 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
       ddouble::operator=(t);
       return *this;
     }
+    ddouble& operator=(_V_i const & t){
+      ddouble::operator=(t);
+      return *this;
+    }
   }_v_i(d);
 #pragma GCC diagnostic pop
   MOD_resistor const* p = d;
@@ -3247,6 +3295,10 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         ddouble::operator=(t);
         return *this;
       }
+      ddouble& operator=(_V_dt const & t){
+        ddouble::operator=(t);
+        return *this;
+      }
     }_v_dt(d);
     // tmp block proxy (823b)
     class _V_g : public ddouble {
@@ -3271,6 +3323,10 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         return *this;
       }
       ddouble& operator=(ddouble t){
+        ddouble::operator=(t);
+        return *this;
+      }
+      ddouble& operator=(_V_g const & t){
         ddouble::operator=(t);
         return *this;
       }
@@ -4641,7 +4697,7 @@ class wrap_arg{
 public:
    wrap_arg(T& d) : _d(d) { _a = d; }
    operator A&() { return _a; }
-   ~wrap_arg() { _d = _a; }
+   ~wrap_arg() { _d = std::move(T(_a)); }
 };
 /*--------------------------------------------------------------------------*/
 template<class S, class T>

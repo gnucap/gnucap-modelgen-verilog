@@ -598,6 +598,23 @@ static TData* new_deps(Base const* data)
   }
 }
 /*--------------------------------------------------------------------------*/
+static void stack_op_args(Expression* EE, Expression const* arg_expr, FUNCTION_ const* f)
+{
+  int ii = 0;
+  for (Expression::const_iterator i = arg_expr->begin(); i != arg_expr->end(); ++i) {
+    trace2("stackop stash arg", (**i).name(), f->is_output_arg(ii));
+    if(!f->is_output_arg(ii)){
+      (**i).stack_op(EE);
+    }else if(auto tt = dynamic_cast<Token_VAR_REF*>(*i)){
+      tt->stack_op(EE);
+    }else{
+      unreachable();
+      (**i).stack_op(EE);
+    }
+    ++ii;
+  }
+}
+/*--------------------------------------------------------------------------*/
 void Token_CALL::stack_op(Expression* e) const
 {
   Expression_* E = prechecked_cast<Expression_*>(e);
@@ -606,19 +623,12 @@ void Token_CALL::stack_op(Expression* e) const
   assert(E);
   Expression const* arg_expr = args();
 
-  Token const* T1 = nullptr;
-  bool del_args = false;
+  Token_PARLIST_* pl = nullptr;
   if (arg_expr) {
   }else if (E->is_empty()) {
-  }else if(auto pl=dynamic_cast<Token_PARLIST_*>(E->back())) {
-    del_args = true;
+  }else if((pl=dynamic_cast<Token_PARLIST_*>(E->back()))) {
     arg_expr = pl->args();
-    if(arg_expr){
-      pl->set_args(nullptr);
-      E->pop_back();
-      delete(pl);
-    }else{ untested();
-    }
+    E->pop_back();
   }else{
     assert(!dynamic_cast<Token_PARLIST const*>(E->back()));
   }
@@ -640,14 +650,12 @@ void Token_CALL::stack_op(Expression* e) const
       // incomplete();
       trace2("CALL stackopped", name(), E->back()->name());
     }else{
+      trace1("CALL stash", name());
       auto SE = prechecked_cast<Expression_*>(E);
       auto EE = new Expression_;
       EE->set_owner(SE->owner());
       assert(EE->scope());
-      for (Expression::const_iterator i = arg_expr->begin(); i != arg_expr->end(); ++i) {
-	trace1("stackop stash arg", (**i).name());
-	(**i).stack_op(EE);
-      }
+      stack_op_args(EE, arg_expr, function());
 
       // here?
       TData* deps = new_deps(arg_expr);
@@ -655,11 +663,6 @@ void Token_CALL::stack_op(Expression* e) const
       deps->set_any();
 
       E->push_back(new Token_CALL(*this, deps, EE));
-    }
-    delete T1;
-    if(del_args){
-      delete(arg_expr); // really?
-    }else{
     }
   }else if (E->is_empty()){
     // SFCALL?
@@ -671,6 +674,7 @@ void Token_CALL::stack_op(Expression* e) const
     trace2("no params?", name(), E->back()->name());
     incomplete();
   }
+  delete pl;
 }
 /*--------------------------------------------------------------------------*/
 void Token_FUNCTION::stack_op(Expression* e) const
@@ -1105,8 +1109,9 @@ bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
     return p->propagate_deps(from);
   }else if(dynamic_cast<Analog_Function*>(_item)){
   }else if(dynamic_cast<Block const*>(_item)){ untested();
-    unreachable();
+  }else if(dynamic_cast<Token_ARGUMENT*>(this)){
   }else{
+    unreachable();
     // incomplete();
   }
 

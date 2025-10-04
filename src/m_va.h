@@ -614,7 +614,7 @@ class wrap_arg{
 public:
    wrap_arg(T& d) : _d(d) { _a = d; }
    operator A&() { return _a; }
-   ~wrap_arg() { _d = _a; }
+   ~wrap_arg() { _d = std::move(T(_a)); }
 };
 /*--------------------------------------------------------------------------*/
 template<class S, class T>

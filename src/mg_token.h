@@ -411,12 +411,17 @@ public:
   Data_Type const& type()const override;
 public:
   explicit Token_ARGUMENT() : Token_VAR_REF("", nullptr){ untested();unreachable();}
-  explicit Token_ARGUMENT(std::string Name)
-    : Token_VAR_REF(Name, nullptr, new TData()) {}
+  explicit Token_ARGUMENT(std::string Name, Base* b)
+    : Token_VAR_REF(Name, b, new TData()) {}
   void dump(std::ostream& o)const override;
 public: // LiSt
   std::string key() const { untested();unreachable();return "";}
   void set_owner(Base*){ untested();unreachable();}
+  bool is_output()const;
+//protected:
+  Base const* item()const {
+    return _item;
+  }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
