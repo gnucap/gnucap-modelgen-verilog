@@ -1173,72 +1173,6 @@ void Token_VAR_DECL::stack_op(Expression* e)const
   }
 }
 /*--------------------------------------------------------------------------*/
-#if 0
-void Token_VAR_REAL::stack_op(Expression* e)const
-{ untested();
-  auto E = prechecked_cast<Expression_*>(e);
-  assert(E);
-  auto xx = dynamic_cast<Statement*>(E->owner());
-  auto mm = dynamic_cast<Module*>(E->owner());
-  auto af = dynamic_cast<Analog_Function*>(E->owner());// BUG?
-  assert(xx||mm||af);
-  assert(_item);
-  auto oi = prechecked_cast<TData const*>(_item);
-  assert(oi);
-
-  { untested();
-    TData* nd = nullptr;
-    if(auto a = dynamic_cast<Assignment const*>(_item)){ untested();
-      nd = a->data().clone();
-//      nd->add_sens(_item); not yet.
-      trace3("var::stackop a", name(), nd->size(), deps().size());
-    }else if(auto dd = dynamic_cast<TData const*>(data())){ untested();
-      nd = dd->clone();
-//      nd->add_sens(_item); not yet.
-    }else{ untested();
-      incomplete();
-      trace1("var::stackop no assignment", name());
-    }
-
-    auto nn = new Token_VAR_REF(name(), E->scope(), nd);
-    assert(nn->scope());
-    e->push_back(nn);
-
-  }
-}
-/*--------------------------------------------------------------------------*/
-// same as VAR_REAL::stack_op?
-void Token_VAR_INT::stack_op(Expression* e)const
-{ untested();
-  auto E = prechecked_cast<Expression_*>(e);
-  assert(E);
-  auto xx = dynamic_cast<Statement*>(E->owner());
-  auto mm = dynamic_cast<Module*>(E->owner());
-  auto af = dynamic_cast<Analog_Function*>(E->owner());// BUG?
-  assert(xx||mm||af);
-  assert(_item);
-  auto oi = prechecked_cast<TData const*>(_item);
-  assert(oi);
-  auto nd = deps().clone();
-
-  { untested();
-    if(auto a = dynamic_cast<Assignment const*>(_item)){ untested();
-      nd = a->data().clone();
-      trace3("var::stackop a", name(), nd->size(), deps().size());
-    }else if(auto dd = dynamic_cast<TData const*>(data())){ untested();
-      nd = dd->clone();
-    }else{ untested();
-      incomplete();
-      trace1("var::stackop no assignment", name());
-    }
-
-    auto nn = new Token_VAR_REF(name(), E->scope(), nd);
-    assert(nn->scope());
-    e->push_back(nn);
-  }
-}
-#endif
-/*--------------------------------------------------------------------------*/
 void Token_VAR_DECL::dump(std::ostream& o) const
 { untested();
   incomplete();
@@ -1252,32 +1186,6 @@ void Token_VAR_DECL::dump(std::ostream& o) const
   }else{ untested();
   }
 }
-/*--------------------------------------------------------------------------*/
-#if 0
-void Token_VAR_REAL::dump(std::ostream& o) const
-{ untested();
-  o << name();
-  if(!options().dump_annotate()){ untested();
-  }else if(deps().ddeps().size()){ untested();
-    for(auto d : deps().ddeps()){ untested();
-      o << "// dep " << d->code_name();
-    }
-    o << "\n";
-  }else{ untested();
-  }
-}
-/*--------------------------------------------------------------------------*/
-Data_Type const& Token_VAR_INT::type() const
-{ itested();
-  static Data_Type_Int t;
-  return t;
-};
-/*--------------------------------------------------------------------------*/
-void Token_VAR_INT::dump(std::ostream& o) const
-{ untested();
-  o << name();
-}
-#endif
 /*--------------------------------------------------------------------------*/
 void Token_ARGUMENT::dump(std::ostream& o) const
 {
