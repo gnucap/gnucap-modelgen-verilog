@@ -23,7 +23,6 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"
-#include "mg_out.cc"
 #include "mg_token.h"
 #include "mg_module.h"
 #include <globals.h>

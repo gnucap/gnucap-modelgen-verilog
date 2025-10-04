@@ -23,10 +23,9 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"
-#include "mg_out.cc"
-#include "mg_in.cc"
 #include "mg_token.h"
 #include <globals.h>
+#include "f__.cc"
 #include "mg_.h" // BUG
 /*--------------------------------------------------------------------------*/
 namespace{

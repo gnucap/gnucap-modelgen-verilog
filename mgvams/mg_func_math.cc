@@ -23,10 +23,9 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"
-#include "mg_out.cc"
-#include "mg_in.cc"
 #include "mg_token.h"
 #include "mg_module.h"
+#include "f__.cc"
 #include <globals.h>
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/

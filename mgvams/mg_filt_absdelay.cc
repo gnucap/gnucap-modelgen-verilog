@@ -23,28 +23,13 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"
-#include "mg_in.cc"
-#include "mg_out.cc"
 #include "mg_analog.h"
 #include "mg_token.h"
 #include <globals.h>
 #include <u_parameter.h>
-/*--------------------------------------------------------------------------*/
-Node_Ref MGVAMS_FILTER::p() const { untested();unreachable(); return nullptr;}
-Node_Ref MGVAMS_FILTER::n() const { untested();unreachable(); return nullptr;}
-/*--------------------------------------------------------------------------*/
-Node_Ref Branch::p() const {return _p;}
-Node_Ref Branch::n() const { untested();return _n;}
-bool Branch::is_short() const
-{
-  assert(_p);
-  assert(_n);
-  return _p->number() == _n->number();
-}
+#include "f__.cc"
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-void MGVAMS_FILTER::set_p_to_gnd(Module*) const{ untested(); unreachable(); }
-void MGVAMS_FILTER::set_n_to_gnd(Module*) const{ untested(); unreachable(); }
 namespace{
 /*--------------------------------------------------------------------------*/
 static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)

@@ -23,17 +23,11 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"
-#include "mg_out.cc"
-#include "mg_in.cc"
 #include "mg_analog.h"
 #include "mg_token.h"
 #include <globals.h>
 #include <u_parameter.h>
-/*--------------------------------------------------------------------------*/
-Node_Ref MGVAMS_FILTER::p() const {unreachable(); return nullptr;}
-Node_Ref MGVAMS_FILTER::n() const {unreachable(); return nullptr;}
-Node_Ref Branch::p() const {return _p;}
-Node_Ref Branch::n() const {return _n;}
+#include "f__.cc"
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
