@@ -170,7 +170,7 @@ void Variable_Decl::parse(CS& f)
   assert(l->type());
   set_type(l->type());
 
-  trace1("already declared?", name);
+  trace2("already declared?", name, l->type());
   if(l->scope()->new_var_ref(_token)){
   }else{
     throw Exception_CS_("already declared", f);
@@ -213,15 +213,23 @@ TData const& Assignment::data()const
 /*--------------------------------------------------------------------------*/
 bool Variable_Decl::propagate_deps(Token_VAR_REF const& v)
 {
-  if(!v.data()){ untested();
-    incomplete();
-    return false;
+  trace2("Variable_Decl::propagate_deps", type(), data().type());
+  assert(v.data());
+
+  if(type() != Data_Type_Real()){
   }else{
   }
   TData const& incoming = v.deps();
   assert(&deps() != &incoming);
-  data().update(incoming);
-  assert(deps().ddeps().size() >= incoming.ddeps().size());
+
+  data().merge_sens(incoming);
+  data().merge_flags(incoming);
+
+  if(type().is_int()) {
+  }else{
+    data().merge_ddeps(incoming);
+    assert(deps().ddeps().size() >= incoming.ddeps().size());
+  }
   return false;
 }
 /*--------------------------------------------------------------------------*/
@@ -282,6 +290,7 @@ bool SeqBlock::update()
     for(auto i: _variables){
       if(auto s = dynamic_cast<Statement*>(i)){
 	ret += s->update();
+	trace1("AnalogSeqBlock::update var", ret);
       }else{ untested();
 	unreachable(); // comment? later..
       }
@@ -289,6 +298,7 @@ bool SeqBlock::update()
     for(auto i: *this){
       if(auto s = dynamic_cast<Statement*>(i)){
 	ret += s->update();
+	trace1("AnalogSeqBlock::update lst", ret);
       }else{ untested();
 	unreachable(); // comment? later..
       }
@@ -296,6 +306,11 @@ bool SeqBlock::update()
   }else{
   }
   trace1("AnalogSeqBlock::update done", ret);
+
+  if(ret){
+    // propagate variable deps to parent scope..
+  }else{
+  }
   return ret;
 }
 /*--------------------------------------------------------------------------*/
@@ -384,6 +399,9 @@ void Assignment::parse(CS& f)
     }else{ untested();
     }
 
+    if(type() == Data_Type_Int()){
+    }else{
+    }
     {
       assert(_token->data());
       assert(_token->scope());
@@ -461,24 +479,38 @@ bool Assignment::update(RDeps const* r)
     assert(_token->operator->());
     ret = true;
     assert(_token->data());
+  }else if(_lhsref->scope() != _token->scope()){
+    ret = false;
+    assert(_token->data());
+    trace3("Assignment::update1", _token->name(), _token->deps().size(), Expression_::data().size());
+    if(type().is_real()){
+      assert(_token->deps().size() >= Expression_::data().size());
+    }else{
+    }
   }else{
     ret = false;
     assert(_token->data());
 //    trace2("Assignment::update", _token->deps().size(), Expression_::deps().size());
-    assert(_token->deps().size() >= Expression_::data().size());
+
+    if(type().is_real()){
+      assert(_token->deps().size() >= Expression_::data().size());
+    }else{
+    }
   }
-  scope()->new_var_ref(_token); // always needed?
+  scope()->new_var_ref(_token); // needed in mg4_dep.2 ..
 				//
  //  if(!r){ untested();
  //  }else if(auto s = dynamic_cast<Statement*>(owner())){ untested();
  //    ret |= s->propagate_rdeps(*r);
  //  }else{ untested();
  //  }
+  trace2("Assignment::update3", _token->name(), ret);
   return ret;
 }
 /*--------------------------------------------------------------------------*/
 bool Assignment::store_deps(TData const& d)
 {
+  trace1("Assignment::store_deps0", d.type());
   assert(_lhsref);
   size_t ii = 0;
   bool ret = false;
@@ -492,12 +524,21 @@ bool Assignment::store_deps(TData const& d)
       ii = _data->ddeps().size();
     }else{
       assert(!_data);
+      // _data = d.clone(); // new TData();
       _data = new TData();
+      _data->set_type(_lhsref->type());
       _token = new Token_VAR_REF(_lhsref->name(), this, _data);
       assert(_token->data());
       assert(_token->scope());
     }
-    _data->update(d);
+
+    trace1("Assignment::store_deps", _data->type());
+    _data->merge_sens(d);
+    _data->merge_flags(d);
+    if(type().is_int()){
+    }else{
+      _data->merge_ddeps(d);
+    }
 
     assert(ii <= _data->ddeps().size());
 
@@ -516,9 +557,13 @@ bool Assignment::store_deps(TData const& d)
       dd.set_used_in(this);
     }
 //    assert(&deps() == _data);
-    assert(d.ddeps().size() <= _data->ddeps().size());
+    if(type().is_int()) {
+    }else{
+      assert(d.ddeps().size() <= _data->ddeps().size());
+    }
   }
 
+  trace1("Assignment::store_deps done", ret);
   return ret;
 } // Assignment::store_deps
 /*--------------------------------------------------------------------------*/
@@ -527,7 +572,13 @@ bool Assignment::propagate_deps(Token_VAR_REF const& from)
   TData const& d = from.deps();
   assert(from.scope());
   bool ret = false;
-  if(from.scope() == scope()) {
+  if(type()) {
+  }else{ untested();
+    unreachable();
+  }
+  if(type().is_int()) {
+  }else if(from.type().is_int()) { untested();
+  }else if(from.scope() == scope()) {
     ret = _lhsref->propagate_deps(from);
   }else{
     ret |= store_deps(d);

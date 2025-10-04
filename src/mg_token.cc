@@ -253,6 +253,8 @@ TData const* Token_BINOP_::op_deps(Token const* t1, Token const* t2)const
     b = d2->divide(d1);
   }else if (name() == "+") {
     b = d2->combine(d1);
+  }else if (name() == "-") {
+    b = d2->combine(d1);
   }else{
     b = d2->combine(d1);
   }
@@ -925,11 +927,13 @@ void Token_VAR_REF::stack_op(Expression* e)const
       }
 
   Base const* r = scope->lookup(name());
+  TData const* more = nullptr;
   if(!r){ untested();
     assert(dynamic_cast<Paramset const*>(scope)); // ?
   }else if(r==this){
   }else if(auto x = dynamic_cast<Token_VAR_REF const*>(r)){
-    return x->stack_op(e); // BUG.
+    more = &x->deps();
+    assert(more);
   }else{ untested();
   }
 
@@ -950,6 +954,11 @@ void Token_VAR_REF::stack_op(Expression* e)const
     }else{ untested();
       incomplete();
       trace1("var::stackop no assignment", name());
+    }
+    assert(nd);
+    if(more){
+      nd->update(*more);
+    }else{
     }
 
     auto nn = new Token_VAR_REF(*this, nd);
@@ -1087,10 +1096,12 @@ bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
     dd->update(incoming);
     assert(deps().ddeps().size() >= incoming.ddeps().size());
   }else if(auto it=dynamic_cast<Assignment*>(_item)){
+    trace2("Token_VAR_REF::propagate assign", type(), from.type());
     assert(it->scope());
     assert(from.scope());
     return it->propagate_deps(from);
   }else if(auto p = dynamic_cast<Variable_Decl*>(_item)){
+    trace2("Token_VAR_REF::propagate decl", type(), from.type());
     return p->propagate_deps(from);
   }else if(dynamic_cast<Analog_Function*>(_item)){
   }else if(dynamic_cast<Block const*>(_item)){ untested();
@@ -1107,11 +1118,11 @@ Block const* Token_VAR_REF::scope() const
   // TODO //
   if(auto b=dynamic_cast<Block*>(_item)){
     return b;
-  }else if(auto it=dynamic_cast<Owned_Base*>(_item)){ untested();
+  }else if(auto it=dynamic_cast<Owned_Base*>(_item)){
     return it->scope();
   }else if(auto ex=dynamic_cast<Expression_*>(_item)){
     return ex->scope();
-  }else{ untested();
+  }else{
     return nullptr;
     unreachable();
     auto p = prechecked_cast<Variable_Decl*>(_item);
@@ -1136,7 +1147,11 @@ Data_Type const& Token_VAR_DECL::type() const
   assert(_item);
   auto oi = prechecked_cast<Variable_Decl const*>(_item);
   assert(oi);
-  assert(oi->type());
+  if(oi->type()){
+  }else{
+    // paramset bug?
+    assert(0);
+  }
   return oi->type();
 };
 /*--------------------------------------------------------------------------*/

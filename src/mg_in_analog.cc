@@ -553,6 +553,7 @@ bool AnalogWhileStmt::update()
     _body.clear_vars();
     if (_body.update()){
       ret = true;
+      trace1("AnalogWhileStmt::update1", ret);
     }else{
       break;
     }
@@ -1331,7 +1332,7 @@ bool Contribution::update()
   _rdeps.insert(&tr_accept_tag);
 
   size_t s = _deps->ddeps().size();
-  bool rdd = _rhs.update(&_rdeps);
+  bool rdd = _rhs.update(&_rdeps); // BUG
   TData const* D = &_rhs.data();
   s = _deps->ddeps().size();
 
@@ -1348,7 +1349,11 @@ bool Contribution::update()
   _sens.merge(_deps->sensitivities());
 
   trace4("Contribution::update C", rdd, ret, _deps->ddeps().size(),  D->ddeps().size());
-  return AnalogStmt::update() || rdd || ret || (_deps->ddeps().size() != s);
+  if(rdd){
+    // ret=true;
+  }else{
+  }
+  return AnalogStmt::update() || ret || (_deps->ddeps().size() != s);
 } // Contribution::update
 /*--------------------------------------------------------------------------*/
 void Branch_Map::parse(CS& f)

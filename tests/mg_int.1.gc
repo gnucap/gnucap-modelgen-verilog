@@ -1,0 +1,30 @@
+
+attach ./modelgen_1.so
+
+
+verilog
+
+`modelgen
+module test_int1(a, b);
+	electrical a, b;
+	integer i;
+	analog begin
+		i = V(a);
+		V(b) <+ i;
+	end
+
+endmodule
+`endmodelgen
+
+
+!make test_int1.so > /dev/null
+attach ./test_int1.so
+
+ground g;
+test_int1 #() dut(in ,out);
+parameter s= 0.;
+vsource #(.dc(s)) v(in, g);
+
+print dc v(nodes)
+dc s 0 5 .3
+status notime

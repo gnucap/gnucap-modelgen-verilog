@@ -65,6 +65,7 @@ Base* TData::combine(const Base* X)const
   auto n = clone();
   auto o = prechecked_cast<TData const*>(X);
   assert(o);
+  trace2("TData::combine", type(), o->type());
   n->update(*o);
   n->set_offset();
   return n;
@@ -114,15 +115,44 @@ Base* TData::divide(const Base* X) const
   return n;
 }
 /*--------------------------------------------------------------------------*/
-void TData::update(TData const& other)
+#if 0
+void TData::merge(TData const& o)
 {
-  for(auto& i : other.ddeps()){
+  merge_sens(o);
+  merge_flags(o);
+
+  if(is_real()){
+    merge_ddeps(o);
+  }else{
+  }
+}
+#endif
+/*--------------------------------------------------------------------------*/
+// merge?
+void TData::update(TData const& o)
+{
+  trace2("TData::update", type(), o.type());
+
+  merge_ddeps(o);
+  merge_sens(o);
+  merge_flags(o);
+}
+/*--------------------------------------------------------------------------*/
+void TData::merge_ddeps(TData const& o)
+{
+  for(auto& i : o.ddeps()){
     insert(i);
   }
-  trace1("update", other.sensitivities().empty());
-  _sens.merge(other.sensitivities());
-
-  if(other.is_constant()){
+}
+/*--------------------------------------------------------------------------*/
+void TData::merge_sens(TData const& o)
+{
+  _sens.merge(o.sensitivities());
+}
+/*--------------------------------------------------------------------------*/
+void TData::merge_flags(TData const& o)
+{
+  if(o.is_constant()){
   }else{
     set_constant(false);
   }

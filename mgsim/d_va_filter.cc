@@ -440,7 +440,7 @@ bool DEV_DDT::do_tr()
   
   trace4("DEV_DDT::do_tr0", _sim->_time0, _y[0].f0, _y[1].f0, _y1.f0);
   trace3("DEV_DDT::do_tr", long_label(), _sim->iteration_tag(), _sim->_time0);
-  if(_sim->is_advance_iteration()){ untested();
+  if(_sim->is_advance_iteration()){ itested();
     // return true;
   }else if(_sim->_v0){
     _i[0] = differentiate(_y, _i, _time, _method_a);

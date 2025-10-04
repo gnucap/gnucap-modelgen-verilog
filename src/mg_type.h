@@ -7,7 +7,7 @@ protected:
   type_t _type;
   Data_Type(type_t type) : Base(), _type(type){}
 public:
-  Data_Type(Data_Type const& t) : Base(), _type(t._type){ untested();}
+  Data_Type(Data_Type const& t) : Base(), _type(t._type){}
   Data_Type() : Base(), _type(t_default){}
   Data_Type& operator=(Data_Type const& o){ _type = o._type; return *this;}
   void parse(CS& f)override;
@@ -17,6 +17,8 @@ public:
   bool is_string() const{ return _type==t_string; }
   bool is_function() const{ return _type==t_fun; }
   operator bool() const {return _type!=t_default;}
+  bool operator==(Data_Type const& o)const { return _type == o._type;}
+  bool operator!=(Data_Type const& o)const { return !operator==(o);}
   std::string cxx_name()const {
     static std::string names[] = {"??", "ddouble", "integer", "std::string"};
     return names[_type];

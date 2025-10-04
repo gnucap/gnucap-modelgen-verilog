@@ -149,6 +149,7 @@ Variable_Decl* Variable_Decl::deep_copy(Base* b, std::string s) const
 
   auto n = new Variable_Decl;
   n->set_owner(b);
+  n->new_data();
   assert(type());
   n->set_type(type());
   assert(n->type());
@@ -156,14 +157,16 @@ Variable_Decl* Variable_Decl::deep_copy(Base* b, std::string s) const
     attr.set_attributes(tag_t(n)) = attr.attributes(tag_t(l));
   }else{
   }
-  n->new_data();
   assert(n->_data);
   n->_token = new Token_VAR_DECL(s+_token->name(), n, n->_data);
   if(attr.has_attributes(tag_t(l))) {
     attr.set_attributes(tag_t(n->_token)) = attr.attributes(tag_t(l));
   }else{
   }
-  assert(n->_token->type());
+  if(n->_token->type()){
+  }else{
+    // bug?
+  }
   l->scope()->new_var_ref(n->_token);
 
   if(n->_token->data()){

@@ -25,6 +25,7 @@
 #define MG_DEPS_H
 #include <m_base.h>
 #include "mg_lib.h"
+#include "mg_type.h"
 /*--------------------------------------------------------------------------*/
 class RDeps;
 class Probe;
@@ -148,6 +149,7 @@ class Branch;
 class TData : public Base {
   DDeps _ddeps;
   Sensitivities _sens;
+  Data_Type _type;
   // V _sens; // discrete_deps?
   // R _range; // discrete_deps?
   bool _offset{false}; // -> dynamic_deps.
@@ -157,7 +159,7 @@ public:
 public:
   explicit TData() : Base() {}
   explicit TData(TData const& o) : Base(), _ddeps(o._ddeps),
-    _sens(o._sens),
+    _sens(o._sens), _type(o._type),
     _offset(o._offset), _constant(o._constant) { }
   ~TData() { _ddeps.clear(); }
   TData* clone()const {
@@ -167,9 +169,14 @@ public:
     return _ddeps.insert(d);
   }
   void update(TData const& other);
+  void merge_sens(TData const& other);
+  void merge_ddeps(TData const& other);
+  void merge_flags(TData const& other);
   Dep back(){ untested(); return _ddeps.back(); }
   void clear();
 
+  void set_type(Data_Type const& t) {_type = t;}
+  Data_Type const& type()const {return _type;}
   DDeps& ddeps() {return _ddeps;}
   DDeps const& ddeps()const {return _ddeps;}
 

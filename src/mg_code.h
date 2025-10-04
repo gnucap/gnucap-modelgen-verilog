@@ -122,7 +122,6 @@ class Token_PROBE; //bug?
 class Node;
 class TData;
 class Variable_Decl : public Expression_ {
-  Data_Type _type;
   TData* _data{nullptr};
   Token_VAR_REF* _token{nullptr};
   RDeps _rdeps; // Expression_?
@@ -132,8 +131,16 @@ public:
   ~Variable_Decl();
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
-  virtual /*?*/ Data_Type const& type()const { return _type; }
-  void set_type(Data_Type const& d){ _type=d; }
+  virtual /*?*/ Data_Type const& type()const {
+    if(_data){
+      return _data->type(); 
+    }else{
+      // ?
+      static Data_Type d;
+      return d;
+    }
+  }
+  void set_type(Data_Type const& d){ if(_data){ _data->set_type(d); }else{ /*huh?*/ } }
   bool propagate_deps(Token_VAR_REF const&);
   bool propagate_rdeps(RDeps const&);
   bool is_state_var()const;

@@ -142,7 +142,7 @@ module cond5(p, n);
     real S;
     real T;
     integer i;
-    i = 1; // s3 r3
+    i = 1; // s1 r3
     if (i) begin
       // i : 0
       i = 2; // s1 r3
