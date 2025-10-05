@@ -497,12 +497,18 @@ class Token_POTENTIAL : public Token_PROBE {
 public:
   explicit Token_POTENTIAL(std::string const& name, Branch const* b, Base* tdata)
     : Token_PROBE(name, b, tdata) {}
+
+  Token* clone()const override {unreachable(); return nullptr;}
+  Probe const* probe()const {incomplete(); return nullptr;}
 };
 /*--------------------------------------------------------------------------*/
 class Token_FLOW : public Token_PROBE {
 public:
   explicit Token_FLOW(std::string const& name, Branch const* b, Base* tdata)
     : Token_PROBE(name, b, tdata) {}
+
+  Token* clone()const override {unreachable(); return nullptr;}
+  Probe const* probe()const {incomplete(); return nullptr;}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

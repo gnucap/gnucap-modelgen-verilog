@@ -176,14 +176,30 @@ void Branch::add_dep(Dep const& b)
 /*--------------------------------------------------------------------------*/
 Token const* Branch::flow_dep()
 {
-  incomplete();
+  if(_flow){
+  }else{
+    _flow = new Token_FLOW("NAME", this, nullptr);
+  }
   return _flow;
 }
 /*--------------------------------------------------------------------------*/
 Token const* Branch::potential_dep()
 {
-  incomplete();
+  if(_potential){
+  }else{
+    _potential = new Token_POTENTIAL("NAME", this, nullptr);
+  }
   return _potential;
+}
+/*--------------------------------------------------------------------------*/
+void Branch::delete_deps()
+{
+  delete _deps;
+  _deps = nullptr;
+
+  delete _flow;
+  delete _potential;
+  _flow = _potential = nullptr;
 }
 /*--------------------------------------------------------------------------*/
 bool Branch::has_pot_probe() const

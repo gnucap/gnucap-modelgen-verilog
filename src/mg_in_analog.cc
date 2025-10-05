@@ -1383,8 +1383,7 @@ Branch::~Branch()
   assert(!_has_pot_probe);
   assert(!_has_flow_probe);
 
-  delete _deps;
-  _deps = nullptr;
+  delete_deps();
 
   if(_use){ untested();
     unreachable();
@@ -2423,9 +2422,11 @@ Probe::Probe(std::string const& xs, Branch_Ref br) : _br(br)
   if( (xs == "V") || (xs == "potential") ){
     _type = t_pot;
     _br->inc_pot_probe();
+    assert(_br->potential_dep());
   }else if( (xs == "I") || (xs == "flow") ){
     _type = t_flow;
     _br->inc_flow_probe();
+    assert(_br->flow_dep());
     _br->set_probe(); // shadow
   }else{ untested();
     unreachable();

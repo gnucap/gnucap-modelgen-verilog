@@ -45,28 +45,33 @@ private:
   dep_order _order{_ANY};
 public:
   Dep(Dep const& p) = default;
-  explicit Dep(Branch const* br, Probe const* p)
-    : _prb(p), _branch(br) {
+  explicit Dep(Token const* t, Branch const* br, Probe const* p)
+    : _token(t), _prb(p), _branch(br) {
   }
-  explicit Dep(Probe const* p, dep_order d, Branch const* br)
-    : _prb(p), _branch(br), _order(d) {
+  explicit Dep(Token const* t, Probe const* p, dep_order d, Branch const* br)
+    : _token(t), _prb(p), _branch(br), _order(d) {
   }
 
   int order()const { untested();return _order;}
   bool is_linear()const { return _order<=_LINEAR; }
   bool is_quadratic()const { return _order<=_QUADRATIC; }
 
-  bool same_data(Dep const& o)const;
-  void set_any(){
-    _order = _ANY;
-  }
+  bool operator==(Dep const& o)const { return _token == o._token; }
+  void set_any() { _order = _ANY; }
   bool propagate_rdeps_(RDeps const&) const;
   void set_used_in(Base const*) const;
 
 public:
-  Token const* token() const{ return _token; }
-  Probe const* probe() const{ return _prb; }
-  operator bool() const{ return _prb; }
+  Token const* token()const { return _token; }
+  Branch const* branch()const { return _branch; }
+  Probe const* probe()const { return _prb; } // code_name?
+  bool is_flow_probe()const {
+    return dynamic_cast<Token_FLOW const*>(_token);
+  }
+  bool is_pot_probe()const {
+    return dynamic_cast<Token_POTENTIAL const*>(_token);
+  }
+  operator bool()const { return _prb; }
   std::string name()const;
 }; // Dep
 /*--------------------------------------------------------------------------*/

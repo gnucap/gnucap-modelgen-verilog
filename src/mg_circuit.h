@@ -192,8 +192,8 @@ public:
   std::string state(std::string const& n)const;
   virtual bool has_element() const;
 
-  void inc_flow_probe(){ ++_has_flow_probe; }
-  virtual void inc_pot_probe(){ ++_has_pot_probe; }
+  void inc_flow_probe(){ flow_dep(); ++_has_flow_probe; }
+  virtual void inc_pot_probe(){ potential_dep(); ++_has_pot_probe; }
   void inc_flow_source(){ ++_has_flow_src; }
   void inc_pot_source(){ ++_has_pot_src; }
   void inc_short(){ ++_has_short; }
@@ -241,9 +241,12 @@ public:
   virtual bool has_name()const{return false;}
 private:
   void new_deps();
+  void delete_deps();
 public:
   Token const* flow_dep();
   Token const* potential_dep();
+  Token const* flow_dep()const {assert(_flow); return _flow;}
+  Token const* potential_dep()const {assert(_potential); return _potential;}
 }; // Branch
 class Branch;
 class Named_Branch;

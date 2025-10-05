@@ -640,9 +640,8 @@ private:
 inline Probe const* probe(Token const* t)
 { untested();
   assert(t);
-  auto p = prechecked_cast<Probe const*>(t->data());
-  assert(p);
-  return p;
+  unreachable();
+  return nullptr;
 }
 /*--------------------------------------------------------------------------*/
 inline Probe const* probe(Token_PROBE const* t)
@@ -659,14 +658,12 @@ inline Probe const* probe(Dep const& d)
 /*--------------------------------------------------------------------------*/
 inline bool is_flow_probe(Dep const& d)
 {
-//  assert(d.is_flow_probe() == d.probe()->is_flow_probe());
-  return probe(d)->is_flow_probe();
+  return d.is_flow_probe();
 }
 /*--------------------------------------------------------------------------*/
 inline bool is_pot_probe(Dep const& d)
 {
-//  assert(d.is_potential_probe() == d.probe()->is_potential_probe());
-  return probe(d)->is_pot_probe();
+  return d.is_pot_probe();
 }
 /*--------------------------------------------------------------------------*/
 inline std::string /*const&*/ code_name(Dep const& d)
@@ -676,16 +673,14 @@ inline std::string /*const&*/ code_name(Dep const& d)
 /*--------------------------------------------------------------------------*/
 inline Branch const* branch(Dep const& d)
 {
-  return d.probe()->branch();
+  return d.branch();
 }
 /*--------------------------------------------------------------------------*/
 inline Branch const* branch(Token const* t)
 { untested();
   assert(t);
-  auto p = prechecked_cast<Probe const*>(t->data());
-  assert(p);
-  assert(p->branch());
-  return p->branch();
+  unreachable();
+  return nullptr;
 }
 /*--------------------------------------------------------------------------*/
 #endif

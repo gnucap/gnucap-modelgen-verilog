@@ -1047,7 +1047,11 @@ Token* Probe::new_token(Module&, size_t na)const
   name += ")";
 
   TData* deps = new TData;
-  deps->ddeps().insert(Dep(this, Dep::_LINEAR, branch()));
+  if(_type==t_pot){
+    deps->ddeps().insert(Dep(branch()->potential_dep(), this, Dep::_LINEAR, branch()));
+  }else{
+    deps->ddeps().insert(Dep(branch()->flow_dep(), this, Dep::_LINEAR, branch()));
+  }
 
   trace1("stackop probe, new TA", name);
   Token_ACCESS* nt = new Token_ACCESS(name, deps, this);
@@ -1340,8 +1344,7 @@ void Token_FILTER::stack_op(Expression* e)const
     }
 
     auto d = new TData;
-    trace1("xdt output dep", func->prb__()->code_name());
-    d->ddeps().insert(Dep(func->prb__(), Dep::_LINEAR, branch())); // BUG?
+    d->ddeps().insert(Dep(branch()->potential_dep(), func->prb__(), Dep::_LINEAR, branch())); // BUG?
     args = clone_args(cc->args());
     auto N = new Token_FILTER(*this, d, args);
     assert(N->data());
@@ -1349,16 +1352,12 @@ void Token_FILTER::stack_op(Expression* e)const
     e->push_back(N);
     assert(f()==N->f());
     delete(cc);
+#ifndef NDEBUG
   }else if(!e->size()) { untested();
     unreachable();
   }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) { untested();
-    trace2("Token_FILTER::stack_op3", name(), cc->args()->size());
-    auto d = new TData;
-    d->ddeps().insert(Dep(branch(), func->prb__())); // BUG?
-    auto N = new Token_FILTER(*this, d);
-    assert(N->data());
-    assert(dynamic_cast<TData const*>(N->data()));
-    e->push_back(N);
+    unreachable();
+#endif
   }else{ untested();
     unreachable();
   }

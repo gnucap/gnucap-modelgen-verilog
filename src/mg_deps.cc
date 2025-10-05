@@ -168,21 +168,13 @@ void TData::clear()
 std::pair<DDeps::const_iterator, bool> DDeps::insert(Dep const& x)
 {
   for(auto s = begin(); s!=end(); ++s){
-    if (s->same_data(x)){
+    if (*s == x) {
       return std::make_pair(s, false);
     }else{
     }
   }
   _s.push_back(x);
   return std::make_pair(begin()+(int(size())-1), true);
-}
-/*--------------------------------------------------------------------------*/
-bool Dep::same_data(Dep const& o) const
-{
-  assert(_prb);
-  assert(o._prb);
-  assert(_branch == _prb->branch()); // no need for prb here?
-  return _prb->same_data(*o._prb);
 }
 /*--------------------------------------------------------------------------*/
 bool TData::has_sensitivities()const
