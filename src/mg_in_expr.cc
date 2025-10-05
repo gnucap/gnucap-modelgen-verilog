@@ -413,7 +413,7 @@ bool Expression_::propagate_rdeps(RDeps const& r)
     assert(0);
   }
   // BUG.
-  for(Dep p : data().ddeps()){
+  for(Dep const& p : data().ddeps()){
     ret |= p.propagate_rdeps_(r);
   }
  //  for(auto& p : data().pdeps()){ untested();

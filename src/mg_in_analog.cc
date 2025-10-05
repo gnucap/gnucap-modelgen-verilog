@@ -1476,6 +1476,7 @@ bool Branch::is_short() const
 {
   assert(_p);
   assert(_n);
+  trace2("short", _p->number(), _n->number());
   return _p->number() == _n->number();
 }
 /*--------------------------------------------------------------------------*/
@@ -2417,7 +2418,7 @@ size_t Branch::num_states() const
 /*--------------------------------------------------------------------------*/
 Probe::Probe(std::string const& xs, Branch_Ref br) : _br(br)
 {
-  trace3("::Probe", xs, code_name(), br.has_name());
+  trace4("::Probe", xs, code_name(), br.has_name(), br.code_name());
   // TODO: disciplines.h
   if( (xs == "V") || (xs == "potential") ){
     _type = t_pot;
@@ -2436,6 +2437,7 @@ Probe::Probe(std::string const& xs, Branch_Ref br) : _br(br)
   }else{
   }
 
+  trace1("::Probe1", k);
   set_label(k);
 }
 /*--------------------------------------------------------------------------*/

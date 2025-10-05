@@ -64,14 +64,8 @@ public:
   Nature const* nature() const;
   Discipline const* discipline() const;
 
-  bool operator==(Probe const& o) const{ untested();
-    return _br == o._br && _type == o._type;
-  }
   bool same_data(Probe const& o) const{
     return branch() == o.branch() && _type == o._type;
-  }
-  bool operator!=(Probe const& o) const{ untested();
-    return !operator==(o);
   }
 private:
   void stack_op(Expression*)const override {

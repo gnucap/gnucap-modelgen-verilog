@@ -91,6 +91,7 @@ void MGVAMS_FILTER::set_n_to_gnd(Module* m) const
 {
   assert(m);
   assert(branch());
+  trace2("n_to_gnd", branch()->code_name(), branch()->n()->code_name());
   m->set_to_ground(branch()->n());
   assert(n()->is_ground());
 }
@@ -99,6 +100,7 @@ void MGVAMS_FILTER::set_p_to_gnd(Module* m) const
 {
   assert(m);
   assert(branch());
+  trace2("p_to_gnd", branch()->code_name(), branch()->p()->code_name());
   m->set_to_ground(branch()->p());
   assert(p()->is_ground());
 }

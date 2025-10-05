@@ -1011,22 +1011,6 @@ void Token_ARRAY_::stack_op(Expression* E) const
   }
 }
 /*--------------------------------------------------------------------------*/
-Token* VAMS_ACCESS::new_token(Module& m, size_t na)const
-{ untested();
-  unreachable(); // obsolete.
-  // use na?
-  Branch_Ref br = m.new_branch(_arg0, _arg1);
-  //  br->set_owner(this);
-  assert(br);
-  assert(const_cast<Branch const*>(br.operator->())->owner());
-  // Probe const* p = m.new_probe(_name, _arg0, _arg1);
-  //
-  // install clone?
-  FUNCTION_ const* p = m.new_probe(_name, br);
-
-  return p->new_token(m, na);
-}
-/*--------------------------------------------------------------------------*/
 Token* Probe::new_token(Module&, size_t na)const
 {
   std::string name;
@@ -1065,6 +1049,7 @@ Token* Probe::new_token(Module&, size_t na)const
   TData* deps = new TData;
   deps->insert(Dep(this, Dep::_LINEAR));
 
+  trace1("stackop probe, new TA", name);
   Token_ACCESS* nt = new Token_ACCESS(name, deps, this);
   // d.insert(Dep(nt->prb(), Dep::_LINEAR));
   return nt;
@@ -1384,6 +1369,7 @@ void Token_FILTER::stack_op(Expression* e)const
       rr.insert(&tr_accept_tag);
     }else{
     }
+    trace1("Token_FILTER::stackop", func->prb__()->branch()->code_name());
     rr.insert(func->prb__()->branch());
     trace1("Token_FILTER::stackop 4", args->size());
     args->update(&rr); // bug. more generic path.

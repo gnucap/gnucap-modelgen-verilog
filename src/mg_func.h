@@ -201,7 +201,7 @@ private:
   void stack_op(Expression*)const override { untested();
     throw Exception("invalid");
   }
-  Token* new_token(Module& m, size_t na)const override;
+  Token* new_token(Module&, size_t)const override {unreachable();return nullptr;}
   void make_cc_common(std::ostream&)const override { untested(); unreachable(); }
 };
 /*--------------------------------------------------------------------------*/
