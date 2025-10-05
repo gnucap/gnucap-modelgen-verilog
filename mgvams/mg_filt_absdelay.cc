@@ -250,7 +250,7 @@ public:
     }
     o << ")\n{\n";
     {
-      o__ "ddouble ret = 0.;\n";
+      o__ "ddouble ret(0.);\n";
       o__ "COMPONENT* l = " << cn << ";\n";
       o__ "assert(l);\n";
       o__ "std::string reset;\n";

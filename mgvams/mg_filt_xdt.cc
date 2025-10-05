@@ -77,7 +77,7 @@ public:
 	comma = ", ";
       }
     o << "){\n";
-    o__ "ddouble ret = 0.;\n";
+    o____ "ddouble ret(0.);\n";
     std::string cn = _br->code_name();
 
     if(_br->is_short()){
@@ -114,9 +114,9 @@ public:
     o__ "bool _short"+code_name()+"()const {return " << bool(_output) << ";}\n";
     make_cc_precalc_(o);
 
-    o__ "ddouble " << code_name() << "tr_begin("; args(o); o << "){\n";
+    o__ "double " << code_name() << "tr_begin("; args(o); o << "){\n";
     for(size_t n=0; n<num_args(); ++n){
-      o << "(void)t" << n << ";\n";
+      o____ "(void)t" << n << ";\n";
     }
     o____ "return 0.;\n";
     o__ "}\n";
@@ -147,9 +147,9 @@ public:
     o____ "return " << code_name() << "tr_advance("; argnames(o); o << ");\n";
     o__ "}\n";
 
-    o__ "ddouble " << code_name() << "tr_restore("; args(o); o << "){\n";
+    o__ "double " << code_name() << "tr_restore("; args(o); o << "){\n";
     for(size_t n=0; n<num_args(); ++n){
-      o << "(void)t" << n << ";\n";
+      o____ "(void)t" << n << ";\n";
     }
     o____ "return 0.;\n"; // incomplete?
     o__ "}\n";
@@ -265,13 +265,13 @@ private:
     o__ "} // ddt tr_accept\n";
 /*--------------------------------------------------------------------------*/
     comma = "";
-    o__ "ddouble " << code_name() << "tr_review(";
+    o__ "double " << code_name() << "tr_review(";
       for(size_t n=0; n<num_args(); ++n){
 	o << comma << "ddouble";
 	comma = ", ";
       }
     o << "){\n";
-    o____ "return 0.;";
+    o____ "return 0.;\n";
     o__ "} // ddt tr_review\n";
   }
 } ddt;

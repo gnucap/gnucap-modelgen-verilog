@@ -5157,12 +5157,12 @@ private: // func decl
   ddouble _b_ddt_1(ddouble t0);
   bool _short_b_ddt_1()const {return 1;}
   ddouble _b_ddt_1precalc(ddouble){
-  ddouble ret = 0.;
+    ddouble ret(0.);
     /* short, mfactor hack */ ret[d_potential_b_ddt_1_p_ddt_1_n] = 1.;
     return ret;
   }
-  ddouble _b_ddt_1tr_begin(ddouble t0){
-(void)t0;
+  double _b_ddt_1tr_begin(ddouble t0){
+    (void)t0;
     return 0.;
   }
   ddouble _b_ddt_1tr_eval(ddouble t0){
@@ -5176,8 +5176,8 @@ private: // func decl
   ddouble _b_ddt_1tr_regress(ddouble t0){
     return _b_ddt_1tr_advance(t0);
   }
-  ddouble _b_ddt_1tr_restore(ddouble t0){
-(void)t0;
+  double _b_ddt_1tr_restore(ddouble t0){
+    (void)t0;
     return 0.;
   }
   ddouble _b_ddt_1tr_accept(ddouble t0) {
@@ -5188,8 +5188,9 @@ private: // func decl
     assert(t0 == t0);
     return t0;
   } // ddt tr_accept
-  ddouble _b_ddt_1tr_review(ddouble){
-    return 0.;  } // ddt tr_review
+  double _b_ddt_1tr_review(ddouble){
+    return 0.;
+  } // ddt tr_review
 //probe potential_ddt_1_p_ddt_1_n
   ddouble xs_potential_b_ddt_1_p_ddt_1_n() const { // potential_ddt_1_p_ddt_1_n
     ddouble t;
@@ -6143,12 +6144,12 @@ private: // func decl
   ddouble _b_ddt_2(ddouble t0);
   bool _short_b_ddt_2()const {return 0;}
   ddouble _b_ddt_2precalc(ddouble){
-  ddouble ret = 0.;
+    ddouble ret(0.);
     ret[d_potential_b_ddt_2_p_ddt_2_n] = 1.; // not short.
     return ret;
   }
-  ddouble _b_ddt_2tr_begin(ddouble t0){
-(void)t0;
+  double _b_ddt_2tr_begin(ddouble t0){
+    (void)t0;
     return 0.;
   }
   ddouble _b_ddt_2tr_eval(ddouble t0){
@@ -6164,8 +6165,8 @@ private: // func decl
   ddouble _b_ddt_2tr_regress(ddouble t0){
     return _b_ddt_2tr_advance(t0);
   }
-  ddouble _b_ddt_2tr_restore(ddouble t0){
-(void)t0;
+  double _b_ddt_2tr_restore(ddouble t0){
+    (void)t0;
     return 0.;
   }
   ddouble _b_ddt_2tr_accept(ddouble t0) {
@@ -6179,8 +6180,9 @@ private: // func decl
     assert(t0 == t0);
     return t0;
   } // ddt tr_accept
-  ddouble _b_ddt_2tr_review(ddouble){
-    return 0.;  } // ddt tr_review
+  double _b_ddt_2tr_review(ddouble){
+    return 0.;
+  } // ddt tr_review
 //probe potential_ddt_2_p_ddt_2_n
   ddouble xs_potential_b_ddt_2_p_ddt_2_n() const { // potential_ddt_2_p_ddt_2_n
     ddouble t;

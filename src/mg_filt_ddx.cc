@@ -146,7 +146,7 @@ public:
     }
 
     // incomplete(); no second derivatives..
-    o__ "return ret;\n";
+    o__ "return ddouble(ret);\n";
     o__ "}\n";
 
     o__  "} " << label() << ";\n";

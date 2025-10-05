@@ -258,7 +258,7 @@ public:
       }
     o << ")\n{\n";
     {
-      o__ "ddouble ret = 0.;\n";
+      o__ "ddouble ret(0.);\n";
 //      std::string cn = _br->code_name();
       o__ "trace2(\"precalc" << cn << "\", num.size(), den.size());\n";
       o__ "COMPONENT* l = " << cn << ";\n";

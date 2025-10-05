@@ -217,7 +217,7 @@ public:
       o__ "l->set_param_by_name(\"mag\", to_string(t1));\n";
       //o__ "l->set_param_by_name(\"phase\", to_string(t1));\n";
 
-      o__ "ddouble ret = 0.;\n";
+      o__ "ddouble ret(0.);\n";
       o__ "ret[d_potential" << cn << "] = -1.;\n";
       o__ "return ret;\n";
     }
