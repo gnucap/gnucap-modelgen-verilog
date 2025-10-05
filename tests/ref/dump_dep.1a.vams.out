@@ -13,13 +13,13 @@ module dep0(d, g);
     while (1) begin
       // S : 1
       // T : 1
-      T = T; // dep: _potential_b_g_ s7 r3
-      S = T; // dep: _potential_b_g_ s7 r3
-      T = V(g); // dep: _potential_b_g_ s1 r3
+      T = T; // dep: V(g) s7 r3
+      S = T; // dep: V(g) s7 r3
+      T = V(g); // dep: V(g) s1 r3
     end
-    U = S; // dep: _potential_b_g_ s6 r3
-    T = U; // dep: _potential_b_g_ s7 r3
-    X = U; // dep: _potential_b_g_ s7 r3
+    U = S; // dep: V(g) s6 r3
+    T = U; // dep: V(g) s7 r3
+    X = U; // dep: V(g) s7 r3
   end
 
 endmodule

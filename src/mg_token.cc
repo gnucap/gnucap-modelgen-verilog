@@ -1378,5 +1378,14 @@ void Token_FILTER::stack_op(Expression* e)const
   // branch: function->_br
 }
 /*--------------------------------------------------------------------------*/
+std::string Token_FLOW::val_string() const
+{
+    return "I" + _branch->name();
+}
+/*--------------------------------------------------------------------------*/
+std::string Token_POTENTIAL::val_string() const
+{
+    return "V" + _branch->name();
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

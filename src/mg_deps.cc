@@ -199,12 +199,6 @@ bool Dep::propagate_rdeps_(RDeps const& r) const
   return _prb->propagate_rdeps_(r);
 }
 /*--------------------------------------------------------------------------*/
-std::string Dep::name() const
-{
-  assert(_prb);
-  return _prb->code_name();
-}
-/*--------------------------------------------------------------------------*/
 void Dep::set_used_in(Base const* b) const
 {
   assert(_prb);

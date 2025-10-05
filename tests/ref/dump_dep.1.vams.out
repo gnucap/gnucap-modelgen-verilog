@@ -12,10 +12,10 @@ module dep0(d, g);
     while (1) begin
       // T : 1
       // c : 1
-      c = T; // dep: _potential_b_g_ s3 r3
-      T = V(g); // dep: _potential_b_g_ s1 r3
+      c = T; // dep: V(g) s3 r3
+      T = V(g); // dep: V(g) s1 r3
     end
-    S = T; // dep: _potential_b_g_ s3 r3
+    S = T; // dep: V(g) s3 r3
   end
 
 endmodule

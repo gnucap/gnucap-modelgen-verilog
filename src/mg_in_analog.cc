@@ -1468,7 +1468,12 @@ void Contribution::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 std::string Branch::name() const
 {
-  return "(" + _p->name()+", "+_n->name()+")";
+  std::string buf = "(" + _p->name();
+  if(_n->name()==""){
+  }else{
+    buf += ", "+_n->name();
+  }
+  return buf + ")";
 }
 /*--------------------------------------------------------------------------*/
 bool Branch::is_short() const

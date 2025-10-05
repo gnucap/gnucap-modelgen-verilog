@@ -486,7 +486,7 @@ private:
 };
 /*--------------------------------------------------------------------------*/
 class Token_PROBE : public Token {
- // std::string _name;
+protected:
   Branch const* _branch{nullptr};
 public:
   explicit Token_PROBE(std::string const&, Branch const* b, Base* tdata)
@@ -500,6 +500,7 @@ public:
 
   Token* clone()const override {unreachable(); return nullptr;}
   Probe const* probe()const {incomplete(); return nullptr;}
+  std::string val_string()const override;
 };
 /*--------------------------------------------------------------------------*/
 class Token_FLOW : public Token_PROBE {
@@ -509,6 +510,7 @@ public:
 
   Token* clone()const override {unreachable(); return nullptr;}
   Probe const* probe()const {incomplete(); return nullptr;}
+  std::string val_string()const override;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

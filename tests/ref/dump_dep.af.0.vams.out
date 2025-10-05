@@ -23,10 +23,10 @@ module dep0(d, g);
     begin
     // a : 1
     // c : 1
-      a = V(g); // dep: _potential_b_g_ s1 r4
-      c = testaf(a, b); // dep: _potential_b_g_ s3 r4
+      a = V(g); // dep: V(g) s1 r4
+      c = testaf(a, b); // dep: V(g) s3 r4
       I(d) <+ b; // s1 r1
-      I(g) <+ c; // dep: _potential_b_g_ s3 r1
+      I(g) <+ c; // dep: V(g) s3 r1
     end
   end
 

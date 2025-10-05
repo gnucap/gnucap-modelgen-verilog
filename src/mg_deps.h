@@ -72,7 +72,7 @@ public:
     return dynamic_cast<Token_POTENTIAL const*>(_token);
   }
   operator bool()const { return _prb; }
-  std::string name()const;
+  std::string name()const { return _token->name(); }
 }; // Dep
 /*--------------------------------------------------------------------------*/
 class Sensitivities {
