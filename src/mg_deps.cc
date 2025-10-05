@@ -181,6 +181,7 @@ bool Dep::same_data(Dep const& o) const
 {
   assert(_prb);
   assert(o._prb);
+  assert(_branch == _prb->branch()); // no need for prb here?
   return _prb->same_data(*o._prb);
 }
 /*--------------------------------------------------------------------------*/

@@ -339,7 +339,7 @@ public:
       }else{
 	o__ "//t" << _ddo_idx << ".set_no_deps();\n"; // ...
 	for(Dep const& i: _deps->ddeps()){
-	  o__ "//t" << _ddo_idx << "[d" << i->code_name() << "] = 0.; // (output dep)\n";
+	  o__ "//t" << _ddo_idx << "[d" << i.probe()->code_name() << "] = 0.; // (output dep)\n";
 	}
       }
     }

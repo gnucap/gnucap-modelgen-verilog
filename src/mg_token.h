@@ -23,7 +23,6 @@
 #define MG_TOKEN_H
 #include <m_expression.h>
 #include "mg_func.h" // BUG?
-#include "mg_deps.h" // BUG?
 #include "mg_base.h"
 #include <stack> // BUG
 /*--------------------------------------------------------------------------*/
@@ -142,7 +141,7 @@ inline std::string Token_FUNCTION::code_name()const
 /*--------------------------------------------------------------------------*/
 class TData;
 /*--------------------------------------------------------------------------*/
-TData* copy_deps(Base const* b);
+Base* copy_deps(Base const* b);
 /*--------------------------------------------------------------------------*/
 static Token* copy(Token const* b)
 { untested();
@@ -411,8 +410,8 @@ public:
   Data_Type const& type()const override;
 public:
   explicit Token_ARGUMENT() : Token_VAR_REF("", nullptr){ untested();unreachable();}
-  explicit Token_ARGUMENT(std::string Name, Base* b)
-    : Token_VAR_REF(Name, b, new TData()) {}
+  explicit Token_ARGUMENT(std::string Name, Base* b, Base* tdata)
+    : Token_VAR_REF(Name, b, tdata) {}
   void dump(std::ostream& o)const override;
 public: // LiSt
   std::string key() const { untested();unreachable();return "";}
@@ -485,6 +484,27 @@ private:
   }
 #endif
 };
+/*--------------------------------------------------------------------------*/
+class Token_PROBE : public Token {
+ // std::string _name;
+  Branch const* _branch{nullptr};
+public:
+  explicit Token_PROBE(std::string const&, Branch const* b, Base* tdata)
+    : Token(tdata), _branch(b) { }
+};
+/*--------------------------------------------------------------------------*/
+class Token_POTENTIAL : public Token_PROBE {
+public:
+  explicit Token_POTENTIAL(std::string const& name, Branch const* b, Base* tdata)
+    : Token_PROBE(name, b, tdata) {}
+};
+/*--------------------------------------------------------------------------*/
+class Token_FLOW : public Token_PROBE {
+public:
+  explicit Token_FLOW(std::string const& name, Branch const* b, Base* tdata)
+    : Token_PROBE(name, b, tdata) {}
+};
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

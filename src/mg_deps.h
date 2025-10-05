@@ -26,6 +26,7 @@
 #include <m_base.h>
 #include "mg_lib.h"
 #include "mg_type.h"
+#include "mg_token.h"
 /*--------------------------------------------------------------------------*/
 class RDeps;
 class Probe;
@@ -38,12 +39,18 @@ public: // types
     _ANY,
   } dep_order;
 private:
-  Probe const* _prb{nullptr};
+  Token const* _token{nullptr};
+  Probe const* _prb{nullptr}; // remove.
+  Branch const* _branch{nullptr};
   dep_order _order{_ANY};
 public:
-  Dep(Dep const& p) : _prb(p._prb), _order(p._order) {}
-  explicit Dep(Probe const* p) : _prb(p) {}
-  explicit Dep(Probe const* p, dep_order d) : _prb(p), _order(d) {}
+  Dep(Dep const& p) = default;
+  explicit Dep(Branch const* br, Probe const* p)
+    : _prb(p), _branch(br) {
+  }
+  explicit Dep(Probe const* p, dep_order d, Branch const* br)
+    : _prb(p), _branch(br), _order(d) {
+  }
 
   int order()const { untested();return _order;}
   bool is_linear()const { return _order<=_LINEAR; }
@@ -57,11 +64,11 @@ public:
   void set_used_in(Base const*) const;
 
 public:
-  Probe const* operator->() const{ return _prb; }
-  Probe const* operator*() const{ return _prb; }
-  operator Probe const*() const{ return _prb; }
+  Token const* token() const{ return _token; }
+  Probe const* probe() const{ return _prb; }
+  operator bool() const{ return _prb; }
   std::string name()const;
-};
+}; // Dep
 /*--------------------------------------------------------------------------*/
 class Sensitivities {
   typedef pSet<Base> set;

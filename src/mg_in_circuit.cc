@@ -174,6 +174,18 @@ void Branch::add_dep(Dep const& b)
   deps().insert(b);
 }
 /*--------------------------------------------------------------------------*/
+Token const* Branch::flow_dep()
+{
+  incomplete();
+  return _flow;
+}
+/*--------------------------------------------------------------------------*/
+Token const* Branch::potential_dep()
+{
+  incomplete();
+  return _potential;
+}
+/*--------------------------------------------------------------------------*/
 bool Branch::has_pot_probe() const
 {
   return _has_pot_probe;

@@ -2239,7 +2239,7 @@ void AF_Arg_List::parse(CS& f)
     }else{
     }
 
-    auto t = new Token_ARGUMENT(i->to_string(), this);
+    auto t = new Token_ARGUMENT(i->to_string(), this, new TData());
     t->_var = v;
     trace1("stash", t->name());
     try{

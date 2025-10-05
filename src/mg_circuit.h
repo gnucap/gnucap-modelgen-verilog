@@ -154,6 +154,8 @@ class Branch : public Element_2 {
   mutable /*really?*/ int _use{0};
 //  std::vector<Branch const*> _controlled_by; // move to FUNCTION_
   std::vector<Base const*> _used_in; //?
+  Token_PROBE const* _flow{nullptr};
+  Token_PROBE const* _potential{nullptr};
 public: // use in contributions
   bool is_used()const override;
 //  bool is_used_in_branch()const override;
@@ -239,6 +241,9 @@ public:
   virtual bool has_name()const{return false;}
 private:
   void new_deps();
+public:
+  Token const* flow_dep();
+  Token const* potential_dep();
 }; // Branch
 class Branch;
 class Named_Branch;

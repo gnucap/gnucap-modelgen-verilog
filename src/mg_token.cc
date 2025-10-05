@@ -1047,7 +1047,7 @@ Token* Probe::new_token(Module&, size_t na)const
   name += ")";
 
   TData* deps = new TData;
-  deps->insert(Dep(this, Dep::_LINEAR));
+  deps->ddeps().insert(Dep(this, Dep::_LINEAR, branch()));
 
   trace1("stackop probe, new TA", name);
   Token_ACCESS* nt = new Token_ACCESS(name, deps, this);
@@ -1185,7 +1185,7 @@ void Token_VAR_DECL::dump(std::ostream& o) const
   if(!options().dump_annotate()){ untested();
   }else if(deps().ddeps().size()){ untested();
     for(Dep const& d : deps().ddeps()){ untested();
-      o << "// dep " << d->code_name();
+      o << "// dep " << d.probe()->code_name();
     }
     o << "\n";
   }else{ untested();
@@ -1341,7 +1341,7 @@ void Token_FILTER::stack_op(Expression* e)const
 
     auto d = new TData;
     trace1("xdt output dep", func->prb__()->code_name());
-    d->insert(Dep(func->prb__(), Dep::_LINEAR)); // BUG?
+    d->ddeps().insert(Dep(func->prb__(), Dep::_LINEAR, branch())); // BUG?
     args = clone_args(cc->args());
     auto N = new Token_FILTER(*this, d, args);
     assert(N->data());
@@ -1354,7 +1354,7 @@ void Token_FILTER::stack_op(Expression* e)const
   }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) { untested();
     trace2("Token_FILTER::stack_op3", name(), cc->args()->size());
     auto d = new TData;
-    d->insert(Dep(func->prb__())); // BUG?
+    d->ddeps().insert(Dep(branch(), func->prb__())); // BUG?
     auto N = new Token_FILTER(*this, d);
     assert(N->data());
     assert(dynamic_cast<TData const*>(N->data()));

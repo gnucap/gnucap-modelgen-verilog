@@ -654,7 +654,7 @@ inline Probe const* probe(Token_PROBE const* t)
 /*--------------------------------------------------------------------------*/
 inline Probe const* probe(Dep const& d)
 {
-  return d.operator->();
+  return d.probe();
 }
 /*--------------------------------------------------------------------------*/
 inline bool is_flow_probe(Dep const& d)
@@ -671,12 +671,12 @@ inline bool is_pot_probe(Dep const& d)
 /*--------------------------------------------------------------------------*/
 inline std::string /*const&*/ code_name(Dep const& d)
 {
-  return d->code_name();
+  return d.probe()->code_name();
 }
 /*--------------------------------------------------------------------------*/
 inline Branch const* branch(Dep const& d)
 {
-  return d->branch();
+  return d.probe()->branch();
 }
 /*--------------------------------------------------------------------------*/
 inline Branch const* branch(Token const* t)

@@ -562,7 +562,7 @@ bool is_zero(Expression const& x)
   return is_false(x);
 }
 /*--------------------------------------------------------------------------*/
-TData* copy_deps(Base const* b)
+Base* copy_deps(Base const* b)
 {
   if(auto t=dynamic_cast<TData const*>(b)){
     return t->clone();

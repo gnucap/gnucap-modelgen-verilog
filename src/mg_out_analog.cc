@@ -126,7 +126,7 @@ void OUT_ANALOG::make_real_variable(std::ostream& o, Token_VAR_DECL const& v) co
     o__ "ddouble _v_" << v.name() << "; // Token_VAR_DECL";
 
     for(Dep const& i : v.deps().ddeps()) { untested();
-      o__ " Dep: " << i->code_name() << " lin: " << i.is_linear();
+      o__ " Dep: " << i.probe()->code_name() << " lin: " << i.is_linear();
     }
     o << "\n";
     //if(options().fpi()){ untested();
@@ -162,7 +162,7 @@ void OUT_ANALOG::make_variable(std::ostream& o, Variable_Decl const& v) const
     o__ "ddouble _v_" << v.name() << "; // Variable_Decl";
 
     for(Dep const& i : v.deps().ddeps()) { untested();
-      o__ " Dep: " << i->code_name() << " lin: " << i.is_linear();
+      o__ " Dep: " << i.probe()->code_name() << " lin: " << i.is_linear();
     }
     o << "\n";
     //if(options().fpi()){ untested();
