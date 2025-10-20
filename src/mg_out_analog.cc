@@ -932,7 +932,7 @@ static void make_cc_set_state(std::ostream& o, Branch const& b, std::string cn)
       o__ b.state(cn) << "["
 	<< b.state() << "_::dep" << code_name(d)
 	<<"] *= " << branch(d)->code_name() <<"->_loss0;\n"; // maybe let src decide?
-    }else{ untested();
+    }else{
       o__ "// bogus probe " << b.state() << " : " << code_name(d) << "\n";
     }
     if(branch(d) == &b){
@@ -1471,7 +1471,7 @@ void make_cc_branch_ctrl(std::ostream& o, Branch const* br)
       o << ", ";
       make_node_ref(o, *branch(i)->n());
     }else if(is_flow_probe(i)){
-    }else{ untested();
+    }else{
       o << "/* nothing " << code_name(i) << " */";
     }
   }

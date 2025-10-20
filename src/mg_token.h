@@ -497,26 +497,8 @@ private: // Base
   void dump(std::ostream&)const override {unreachable();}
 public:
   virtual std::string code_name()const = 0;
-};
-/*--------------------------------------------------------------------------*/
-class Token_POTENTIAL : public Token_PROBE {
-public:
-  explicit Token_POTENTIAL(std::string const& name, Branch const* b, TData* tdata)
-    : Token_PROBE(name, b, tdata) {}
-
-  Probe const* probe()const {incomplete(); return nullptr;}
-  std::string val_string()const override;
-  std::string code_name()const override;
-};
-/*--------------------------------------------------------------------------*/
-class Token_FLOW : public Token_PROBE {
-public:
-  explicit Token_FLOW(std::string const& name, Branch const* b, TData* tdata)
-    : Token_PROBE(name, b, tdata) {}
-
-  Probe const* probe()const {incomplete(); return nullptr;}
-  std::string val_string()const override;
-  std::string code_name()const override;
+  virtual bool is_pot_probe()const {return false;}
+  virtual bool is_flow_probe()const {return false;}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

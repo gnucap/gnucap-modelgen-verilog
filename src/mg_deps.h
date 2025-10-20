@@ -65,12 +65,12 @@ public:
   Base const* item()const { return _token; }
   Base const* token()const { return _token; }
   Probe const* probe__()const { return _prb; } // remove
-  bool is_flow_probe()const {
-    return dynamic_cast<Token_FLOW const*>(_token);
-  }
-  bool is_pot_probe()const {
-    return dynamic_cast<Token_POTENTIAL const*>(_token);
-  }
+//  bool is_flow_probe()const {
+//    return dynamic_cast<Token_FLOW const*>(_token);
+//  }
+//  bool is_pot_probe()const {
+//    return dynamic_cast<Token_POTENTIAL const*>(_token);
+//  }
   operator bool()const { return _prb; }
   std::string name()const { return _token->val_string(); }
 }; // Dep

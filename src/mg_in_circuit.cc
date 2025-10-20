@@ -174,6 +174,59 @@ void Branch::add_dep(Dep const& b)
   deps().insert(b);
 }
 /*--------------------------------------------------------------------------*/
+class Token_POTENTIAL : public Token_PROBE {
+public:
+  explicit Token_POTENTIAL(std::string const& name, Branch const* b, TData* tdata)
+    : Token_PROBE(name, b, tdata) {}
+
+  Probe const* probe()const {incomplete(); return nullptr;}
+  std::string val_string()const override;
+  std::string code_name()const override {
+    assert(_branch); return "_potential"+_branch->code_name();
+  }
+  bool is_pot_probe()const override { return true;}
+};
+/*--------------------------------------------------------------------------*/
+class Token_FLOW : public Token_PROBE {
+public:
+  explicit Token_FLOW(std::string const& name, Branch const* b, TData* tdata)
+    : Token_PROBE(name, b, tdata) {}
+
+  Probe const* probe()const {incomplete(); return nullptr;}
+  std::string val_string()const override;
+  std::string code_name()const override {
+    assert(_branch); return "_flow"+_branch->code_name();
+  }
+  bool is_flow_probe()const override {return true;}
+};
+/*--------------------------------------------------------------------------*/
+class Filter_output : public Token_PROBE {
+public:
+  explicit Filter_output(std::string const& name, Branch const* b, TData* tdata)
+    : Token_PROBE(name, b, tdata) {}
+
+  Probe const* probe()const {incomplete(); return nullptr;}
+  std::string val_string()const override {
+    return "F" + _branch->name();
+  }
+  bool is_pot_probe()const override {untested(); return true;}//...
+  std::string code_name()const override { untested();
+    assert(_branch);
+    return "_value"+_branch->code_name();
+  }
+/*--------------------------------------------------------------------------*/
+};
+/*--------------------------------------------------------------------------*/
+std::string Token_FLOW::val_string() const
+{
+    return "I" + _branch->name();
+}
+/*--------------------------------------------------------------------------*/
+std::string Token_POTENTIAL::val_string() const
+{
+    return "V" + _branch->name();
+}
+/*--------------------------------------------------------------------------*/
 Base const* Branch::flow_dep()
 {
   if(_flow){
@@ -186,6 +239,8 @@ Base const* Branch::flow_dep()
 Base const* Branch::potential_dep()
 {
   if(_potential){
+  }else if(is_filter()){ untested();
+    _potential = new Filter_output(code_name(), this, nullptr);
   }else{
     _potential = new Token_POTENTIAL("NAME", this, nullptr);
   }

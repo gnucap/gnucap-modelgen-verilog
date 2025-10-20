@@ -245,8 +245,22 @@ private:
 public:
   Base const* flow_dep();
   Base const* potential_dep();
-  Base const* flow_dep()const {assert(_flow); return _flow;}
-  Base const* potential_dep()const {assert(_potential); return _potential;}
+  Base const* flow_dep()const {
+    if(has_flow_probe()){
+      assert(_flow);
+      return _flow;
+    }else{
+      return nullptr;
+    }
+  }
+  Base const* potential_dep()const {
+    if(has_pot_probe()){
+      assert(_potential);
+      return _potential;
+    }else{
+      return nullptr;
+    }
+  }
 }; // Branch
 class Branch;
 class Named_Branch;

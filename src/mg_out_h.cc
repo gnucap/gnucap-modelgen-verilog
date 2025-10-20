@@ -38,17 +38,24 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
     assert(x);
     Branch const* b = x;
     if(b->is_filter()){
-      o << "    d_potential" << b->code_name() << ",\n";
-    }else
-    if(b->is_short()){
+      assert(!b->has_flow_probe());
+      assert(b->has_pot_probe());
+      if(b->is_short()){
+      }else{
+      }
+      Base const* f = b->potential_dep(); // BUG
+      Dep F(f, nullptr);
+      o << "    d" << code_name(F) << ",\n";
+    }else if(b->is_short()){
       // !has_element?
     }else{
-      if(b->has_flow_probe()){
-	o << "    d_flow" << b->code_name() << ",\n";
+      if(Base const* f = b->flow_dep()){
+	Dep F(f, nullptr);
+	o << "    d" << code_name(F) << ",\n";
       }else{
       }
 
-      if(!b->has_pot_probe()){
+      if(!b->potential_dep()){
       }else if(!b->has_name()){
 	Base const* f = b->potential_dep();
 	Dep F(f, nullptr);

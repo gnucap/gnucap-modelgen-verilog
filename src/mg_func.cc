@@ -112,6 +112,7 @@ void MGVAMS_FILTER::set_branch(Branch* br)
   _br = br;
   Branch_Ref prb(br);
   assert(_m);
+  // assert(br->is_filter());
   _prb = _m->new_probe("potential", prb);
 }
 /*--------------------------------------------------------------------------*/

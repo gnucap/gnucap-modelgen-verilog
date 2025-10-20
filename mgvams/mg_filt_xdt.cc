@@ -37,7 +37,7 @@ public:
   bool port_hack()const override {return false;}
   bool is_analog_filter()const override {return true;}
   bool has_modes()const override {return true;}
-  bool has_state()const override {return true;}
+  bool has_state()const override { untested();return true;}
   bool is_common()const override {return false;} // TODO
   bool needs_context()const override {return false;} // TODO
   bool has_tr_begin()const override {return false;}
@@ -68,7 +68,7 @@ public:
     make_tag(o);
     o__ "ddouble " << code_name() << "precalc(";
       std::string comma;
-      if(num_args() > 4) {
+      if(num_args() > 4) { untested();
 	incomplete();
       }else{
       }
@@ -163,7 +163,7 @@ public:
     unreachable();
     return "ddt";
   }
-  Probe const* prb()const {assert(0); return _prb;}
+  Probe const* prb()const { untested();assert(0); return _prb;}
   Probe const* prb__()const override {return _prb;}
 #if 0
   void set_n_to_gnd()const { untested();
@@ -175,7 +175,7 @@ public:
     _m->set_to_ground(_br->p());
   }
 #else
-  void set_n_to_gnd__()const override {
+  void set_n_to_gnd__()const override { untested();
     assert(_m);
     return MGVAMS_FILTER::set_n_to_gnd(_m);
   }
@@ -217,21 +217,21 @@ private:
 	comma = ", ";
       }
     o << ") {\n";
-    if(num_args()>1){
+    if(num_args()>1){ untested();
       o____ "(void)t0;\n";
       o____ "(void)t1;\n";
     }else if(num_args()>0){
       o____ "(void)t0;\n";
-    }else{
+    }else{ untested();
     }
 
 #if 0 // IDT only. merge?
-    if(num_args()>2){
+    if(num_args()>2){ untested();
       o____ "std::string tmp;\n";
       std::string cn = _br->code_name();
       o____ "((COMPONENT*)" << cn << ")->set_param_by_index(123456, tmp, int(t2));\n";
       // o____ "if(t2) return 0.;\n";
-    }else{
+    }else{ untested();
     }
 #endif
 
@@ -313,7 +313,7 @@ private:
       o____ "(void)t1;\n";
     }else if(num_args()>0){
       o____ "(void)t0;\n";
-    }else{
+    }else{ untested();
     }
     if(num_args()>2){
       o____ "std::string tmp;\n";
@@ -391,7 +391,7 @@ Node_Ref XDT::p() const
 }
 /*--------------------------------------------------------------------------*/
 Node_Ref XDT::n() const
-{
+{ untested();
   assert(_br);
   return _br->n();
 }

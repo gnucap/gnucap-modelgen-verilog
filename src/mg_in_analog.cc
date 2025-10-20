@@ -2436,7 +2436,6 @@ Probe::Probe(std::string const& xs, Branch_Ref br) : _br(br)
   if( (xs == "V") || (xs == "potential") ){
     _type = t_pot;
     _br->inc_pot_probe();
-    assert(_br->potential_dep());
   }else if( (xs == "I") || (xs == "flow") ){
     _type = t_flow;
     _br->inc_flow_probe();
