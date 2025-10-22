@@ -24,6 +24,9 @@ gnucap> ...
 
 The \fImgsim\fP directory contains the plugins used when simulating modelgen models.
 
+The following options, actions and pragmas are supported, they are processed in
+the order specified at the command line.
+
 .SH OPTIONS
 
 .TP
@@ -54,8 +57,41 @@ dump contents as parsed
 \fI--cc\fI
 generate c++ file
 
+.SH PRAGMAS
+
+Pragmas control the behaviour of the program. The preprocessor supports the
+`pragma command, and will act upon pragmas directed to "modelgen".
+
+.TP
+\fI--{pragma_name}\fI
+enables pragma the way \`pragma modelgen {pragma_name} does. But in the order
+specified at command line.
+
+.TP
+\fI--gen-module | --nogen-module\fI
+Affects --cc. Generate (no) code for devices specified in terms of a "module".
+
+.TP
+\fI--gen-paramset | --nogen-paramset\fI
+Affects --cc. Generate (no) code for devices specified in terms of a "paramset".
+
+.TP
+\fI--dump-module | --nodump-module\fI
+Affects --dump. Output (no) source for "modules".
+
+.TP
+\fI--dump-paramset | --nodump-paramset\fI
+Affects --dump. Output (no) source for "paramsets".
+
+.TP
+\fI--dump-annotate | --nodump-annotate\fI
+Affects --dump. Annotate verilog code. Mostly for testing and debugging.
+
+.TP
+[..] see mg_options.h
+
 .SH COMPILER FLAGS
-These may be passed to the compiler supplementing `gnucap-conf --cppflags`.
+These may be passed to a/the C++ compiler supplementing `gnucap-conf --cppflags`.
 .TP
 \fI-O0, -O2
 Turn on, off optimisation respectively. For details, consult your compiler manual.
