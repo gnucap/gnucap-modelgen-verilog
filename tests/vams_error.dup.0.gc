@@ -1,0 +1,12 @@
+options log
+
+verilog
+
+module main();
+	resistor #(.r(1k) .r(2)) r1(in, out)
+endmodule
+
+main #() dut()
+
+list
+dc

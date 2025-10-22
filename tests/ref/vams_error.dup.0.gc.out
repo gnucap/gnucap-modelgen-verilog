@@ -1,0 +1,10 @@
+dut: main from top level
+module main ();
+  resistor #(.r(1k),.r(2)) r1 (in, out);
+endmodule // main
+
+main #() dut ();
+main.r1: resistor from device_dispatcher
+main.r1 discarded: parameter r already set
+main.r1: no candidates found for resistor
+dut.r1: no valid prototype found for resistor

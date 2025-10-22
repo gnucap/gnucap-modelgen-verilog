@@ -368,12 +368,16 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
 //    assert(cp);
     for(int i=0; i<int(_params.size()); ++i){
       trace4("stub param fwd1", c->short_label(), i, _params[i].first, _params[i].second);
+      std::string name = _params[i].first;
       std::string value = _params[i].second;
-      if(_params[i].first == ""){
+      if(name == ""){
 	c->set_param_by_index(i, value, 0);
       }else{
-	trace2("stub param fwd2", _params[i].first, value);
-	c->set_param_by_name(_params[i].first, value);
+	try{
+	  c->set_param_by_name(name, value);
+	}catch(Exception_Clash const& e){
+	  throw(Exception_Clash("parameter " + name + " already set"));
+	}
       }
     }
     Proto->subckt()->push_back(c);
