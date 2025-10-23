@@ -1130,7 +1130,7 @@ private: // impl
 public: // instance vars
   struct state_{
     double ___i{0.};
-    struct namespace_main{
+    struct { // main
       double _dt{0.};
       double _g{0.};
     }_main;
@@ -2446,7 +2446,7 @@ private: // impl
 public: // instance vars
   struct state_{
     double _i{0.};
-    struct namespace_main{
+    struct { // main
       double _dt{0.};
       double _g{0.};
     }_main;

@@ -1,0 +1,28 @@
+
+attach ./modelgen_1.so
+
+
+verilog
+
+`modelgen
+module test_bug_block0(p, n);
+	electrical p, n;
+
+	analog begin : NAME
+		begin : NAME
+			I(p,n) <+ V(p, n);
+		end
+	end
+endmodule
+`endmodelgen
+
+
+!make test_bug_block0.so > /dev/null
+attach ./test_bug_block0.so
+
+test_bug_block0 #() dut(\1 ,\0 );
+isource #(3) ii(\1 , \0 );
+
+print dc v(nodes)
+dc
+status notime

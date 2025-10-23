@@ -265,7 +265,7 @@ static void make_block_variable_decl(std::ostream& o, SeqBlock const& s)
 {
   Variable_List_Collection const& P = s.variables_();
   if(s.has_identifier()){
-    o__ "struct namespace_" << s.identifier() << "{\n";
+    o__ "struct { // " << s.identifier() << "\n";
     {
       indent ns;
       make_variable_collection(o, P);
