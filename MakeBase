@@ -47,7 +47,7 @@ install : $(INSTALL_FILES)  $(INSTALL_FILES_1)  $(INSTALL_FILES_2)
 depend Make.depend: # $(SRCS) ${GENERATED_SRCS} $(HDRS)
 	: > Make.depend
 	if [ -n "$(RAW_SRCS)" ]; then \
-		( cd ${srcdir}; $(CXX) -MM $(CXXFLAGS) -I../src -isystem ${GNUCAP_INCLUDEDIR} ${CPPFLAGS} \
+		( cd ${srcdir}; $(CXX) -MM $(CXXFLAGS) -I../src -I${PWD} -isystem ${GNUCAP_INCLUDEDIR} ${CPPFLAGS} \
 		${MAKE_CPPFLAGS} ${RAW_SRCS} -DDEPEND ) \
 		>> Make.depend; \
 	fi
@@ -73,9 +73,8 @@ distclean: clean
 #	rm -f *~ \#*\#
 #-----------------------------------------------------------------------------
 # include/MakeConf.default says (let's try)
-MAKE_CXXFLAGS = ${GNUCAP_CXXFLAGS}
-MAKE_EXE = $(CXX) $(CCFLAGS) $(MAKE_CXXFLAGS) $(CXXFLAGS) ${MAKE_CPPFLAGS} ${GNUCAP_CPPFLAGS} ${CPPFLAGS} $(OBJS) $(LIBS) $(LDFLAGS) -o $@
-MAKE_LIB = $(CXX) $(CCFLAGS) $(MAKE_CXXFLAGS) $(CXXFLAGS) ${MAKE_CPPFLAGS} ${GNUCAP_CPPFLAGS} ${CPPFLAGS} $(OBJS) $(LIBS) $(LDFLAGS) -shared -o $@
+MAKE_EXE = $(CXX) $(CCFLAGS) $(MAKE_CXXFLAGS) $(CXXFLAGS) ${MAKE_CPPFLAGS} ${GNUCAP_CPPFLAGS} ${CPPFLAGS} $(OBJS) $(LIBS) $(LDFLAGS) -o $@ # mgvams/MakeBase
+MAKE_LIB = $(CXX) $(CCFLAGS) $(MAKE_CXXFLAGS) ${GNUCAP_CXXFLAGS} $(CXXFLAGS) ${MAKE_CPPFLAGS} ${GNUCAP_CPPFLAGS} ${CPPFLAGS} $(OBJS) $(LIBS) $(LDFLAGS) -shared -o $@ # mgvams/MakeBase
 # MAKE_EXE = $(CXX) $(CCFLAGS) $(OBJS) $(TARGET_LIBS) $(LDFLAGS) -o
 # MAKE_LIB = $(CXX) $(CCFLAGS) $(OBJS) $(TARGET_LIBS) $(LDFLAGS) -shared -o
 #
