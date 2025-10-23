@@ -429,6 +429,7 @@ int DELAY::is_valid()const
 { untested();
   COMMON_COMPONENT const* c = prechecked_cast<COMMON_COMPONENT const*>(common());
   assert(c);
+  (void)c;
   return true; // c->is_valid();
 }
 /*--------------------------------------------------------------------------*/
@@ -437,6 +438,7 @@ void DELAY::expand()
   assert(common());
   auto c = static_cast</*const*/ COMMON_COMPONENT*>(mutable_common());
   assert(c);
+  (void)c;
 
   if(!_ctrl_in) {
   }else if (!subckt()) {
@@ -510,6 +512,7 @@ void DELAY::set_parameters(const std::string& Label, CARD *Owner,
   _ctrl_in = states;
   auto p = prechecked_cast<COMMON_FILT const*>(Common);
   assert(p);
+  (void)p; //?
 //  int num_regs = std::max(dens, nums);
   _n_ports = n_nodes/2; // TODO: current ports
   trace2("DELAY::set_parameters", n_states, max_nodes());

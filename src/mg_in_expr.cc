@@ -440,13 +440,10 @@ bool Expression_::is_constant() const
 {
   if(size() > 1) {
     bool c = true;
-    for(auto const& i : *this) {
-      assert(i);
-      if(auto const* d = dynamic_cast<TData const*>(back()->data())){
-	c &= d->is_constant();
-      }else{
-	incomplete();
-      }
+    if(auto const* d = dynamic_cast<TData const*>(back()->data())){
+      c &= d->is_constant();
+    }else{ untested();
+      incomplete();
     }
     return c;
   }else{

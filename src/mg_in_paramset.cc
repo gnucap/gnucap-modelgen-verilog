@@ -330,6 +330,7 @@ static void import_proto_vars(Module* sub, Module const* proto)
       assert(!dynamic_cast<Variable_Decl const*>(p));
       auto P = dynamic_cast<Parameter_2 const*>(p);
       assert(!p||P);
+      (void)P;
 
       trace2("import_var2", x->type(), y->name());
       o << comma << PS_MANGLE_PREFIX << y->name();

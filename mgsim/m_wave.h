@@ -314,8 +314,7 @@ inline void WAVE::new_transition(double t, double rt, double ft, double new_fv)
       double t_int = (start * new_slope - old_ft * old_slope ) / ( new_slope - old_slope );
       trace5("nt2", start, old_ft, old_slope, new_slope, t_int);
       assert(sign*new_slope <= sign*old_slope);
-      double new_ft = start + new_tt;
-      assert(t_int <= new_ft);
+      assert(t_int <= start + new_tt);
       if(start < t_int){
 	double v_int = old_fv + new_slope * (t_int - start);
 	assert(_w.back().first < t_int);

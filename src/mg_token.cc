@@ -1157,13 +1157,13 @@ void Token_VAR_DECL::stack_op(Expression* e)const
   auto mm = dynamic_cast<Module*>(E->owner());
   auto af = dynamic_cast<Analog_Function*>(E->owner());// BUG?
   assert(xx||mm||af);
+  (void)(xx||mm||af);
   assert(_item);
-  auto oi = prechecked_cast<Variable_Decl const*>(_item);
-  assert(oi);
 
   {
     TData* nd = nullptr;
     if(auto a = dynamic_cast<Assignment const*>(_item)){ untested();
+      unreachable();
       nd = a->data().clone();
 //      nd->add_sens(_item); not yet.
       trace3("var::stackop a", name(), nd->size(), deps().size());
@@ -1171,8 +1171,8 @@ void Token_VAR_DECL::stack_op(Expression* e)const
       nd = dd->clone();
 //      nd->add_sens(_item); not yet.
     }else{ untested();
+      unreachable();
       incomplete();
-      trace1("var::stackop no assignment", name());
     }
 
     auto nn = new Token_VAR_REF(name(), E->scope(), nd);

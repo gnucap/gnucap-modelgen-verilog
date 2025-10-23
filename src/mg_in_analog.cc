@@ -2226,8 +2226,10 @@ void AF_Arg_List::parse(CS& f)
   }
   Analog_Function* o = prechecked_cast<Analog_Function*>(scope()->owner());
   assert(o);
+  (void) o;
   AnalogFunctionArgs* oo = prechecked_cast<AnalogFunctionArgs*>(owner());
   assert(oo);
+  (void) oo;
 
   // Can't parse Tokens, cf AnalogDeclareVars::parse
   LiSt<String_Arg, '\0', ',', ';'> l;

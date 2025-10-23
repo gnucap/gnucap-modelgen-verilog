@@ -248,6 +248,7 @@ private:
 	o____ "MOD* d = this;\n";
 	o____ "auto e = prechecked_cast<ELEMENT const*>(d->"<< cn << ");\n";
 	o____ "assert(e);\n";
+	o____ "(void)e;\n";
 	// o____ "d->_potential" << cn << " = t0 = e->tr_amps(); // (313)\n";
 	o____ "t0 = d->_potential" << cn << ";// = t0 = e->tr_amps(); // (313)\n";
       }

@@ -949,10 +949,6 @@ void LAPLACE::precalc_last()
   assert(c);
   trace1("LAPLACE::precalc_last0b", c->_type);
 
-  LAPLACE* m = this;
-  LAPLACE const* p = this;
-  assert(p);
-
   int dens = int(c->den_size());
   int num_num = int(c->num_size());
   int num_s = std::max(dens, num_num);
@@ -1012,7 +1008,6 @@ void LAPLACE::precalc_last()
     _st_s[num_s0_states + 2 + (jj-1)*3] = 1.; // deriv.
   }
 
-  assert(m->_st_s);
   trace1("LAPLACE::precalc_last mfactor?", _st_b_in_[1]);
     // _st_b_in_[1] = 1.;
   if(_set_parameters) {

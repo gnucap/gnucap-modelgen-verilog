@@ -45,6 +45,7 @@ void Primitive::parse(CS& f)
 {
   File* o = prechecked_cast<File*>(owner());
   assert(o);
+  (void)o;
   attr.move_attributes(tag_t(&f), tag_t(this));
 
   _ports.set_owner(this);

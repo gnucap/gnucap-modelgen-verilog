@@ -45,6 +45,7 @@ static Base* parse_switch(CS& file, Block* o)
 { untested();
   (void)file;
   assert(o);
+  (void) o;
   assert(!dynamic_cast<Module const*>(o));
   incomplete();
   return nullptr;
@@ -1382,6 +1383,7 @@ void Always::dump(std::ostream& o) const
 {
   Module const* m = to_module(owner());
   assert(m);
+  (void) m;
 
   for(auto const& i: blocks()){
     o << *i << "\n";

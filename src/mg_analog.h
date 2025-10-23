@@ -637,20 +637,6 @@ private:
 };
 #endif
 /*--------------------------------------------------------------------------*/
-inline Probe const* probe(Token const* t)
-{ untested();
-  assert(t);
-  unreachable();
-  return nullptr;
-}
-/*--------------------------------------------------------------------------*/
-inline Probe const* probe(Token_PROBE const* t)
-{ untested();
-  incomplete();
-  (void) t;
-  return nullptr;
-}
-/*--------------------------------------------------------------------------*/
 inline Probe const* probe(Dep const& d)
 {
   return d.probe();
@@ -676,12 +662,6 @@ inline Branch const* branch(Dep const& d)
   return d.branch();
 }
 /*--------------------------------------------------------------------------*/
-inline Branch const* branch(Token const* t)
-{ untested();
-  assert(t);
-  unreachable();
-  return nullptr;
-}
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

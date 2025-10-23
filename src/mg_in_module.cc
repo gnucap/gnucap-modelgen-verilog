@@ -319,6 +319,7 @@ void Parameter_2_List::parse(CS& file)
 {
   Module* m = prechecked_cast<Module*>(owner());
   assert(m);
+  (void)m;
   attr.move_attributes(tag_t(&file), tag_t(this));
 
   assert(file.last_match().size());
@@ -728,6 +729,7 @@ void Module::parse(CS& f)
   _circuit->set_owner(this);
   File* o = prechecked_cast<File*>(owner());
   assert(o);
+  (void)o;
   attr.move_attributes(tag_t(&f), tag_t(this));
 
   // f >> "module |macromodule |connectmodule "; from caller

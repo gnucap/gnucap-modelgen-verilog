@@ -443,9 +443,7 @@ void ZFILTER::tr_advance()
   double raw_time = d->_sim->_time0;
 
   node_t gnd(&ground_node);
-  int num_den = int(c->den_size());
-  assert(num_den);
-
+  assert(c->den_size());
 
   double ev;
 
@@ -680,8 +678,9 @@ void ZFILTER::expand()
 void ZFILTER::precalc_last()
 {
   ELEMENT::precalc_last();
-  auto c = static_cast<COMMON_RF_BASE*>(mutable_common());
+  auto c = prechecked_cast<COMMON_RF_BASE*>(mutable_common());
   assert(c);
+  (void)c;
 
   if(_ctrl_in){
   }else{
@@ -821,8 +820,6 @@ void ZFILTER::tr_load()
 /*--------------------------------------------------------------------------*/
 void ZFILTER::new_sample_event(double ne)
 {
-  auto c = prechecked_cast<COMMON_ZIFILTER const*>(common());
-  assert(c);
   trace2("ZFILTER::new_sample_evt", _sim->_time0, ne);
   _new_event = _sim->new_event(ne, this);
 }
