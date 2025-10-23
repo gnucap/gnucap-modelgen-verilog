@@ -1,0 +1,33 @@
+module test_bug_block1(p, n);
+  electrical p, n;
+  analog begin : NAME // always
+    // G_s : 0
+    // ms : 0
+    // xgt : 1
+    real xgt, ms;
+    real G_s;
+    begin : A
+      if ((abs(xgt) <= ms)) begin
+      end
+      else begin
+        if ((xgt > ms)) begin
+        end
+        else begin
+          begin : B
+            real N;
+          // G_s : 0
+          // N : 0
+            N = xgt; // s3 r3
+            G_s = N; // s4 r3
+          end
+        end
+      end
+    end
+    xgt = V(p); // dep: V(p) s1 r3
+    I(p, n) <+ V(p, n); // dep: V(p, n) r1
+  end
+
+endmodule
+
+
+

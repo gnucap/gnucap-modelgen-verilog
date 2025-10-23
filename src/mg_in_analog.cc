@@ -960,6 +960,7 @@ void AnalogSeqBlock::parse(CS& f)
   }else if(dynamic_cast<Module const*>(scope())) {
     set_always();
   }else if(auto sb = dynamic_cast<SeqBlock*>(scope())) {
+    // BUG?: why doesnt the caller add the block?
     sb->add_block(this); // re-use var_ref?
   }else if(dynamic_cast<Statement const*>(owner())) { untested();
   }else{ untested();
@@ -1011,9 +1012,11 @@ void AnalogCtrlBlock::set_owner(Statement* st)
 /*--------------------------------------------------------------------------*/
 void AnalogCtrlBlock::parse(CS& f)
 {
+  auto sb = dynamic_cast<SeqBlock*>(scope());
   if(dynamic_cast<Module const*>(owner())) { untested();
     set_always();
   }else{
+    // assert(sb);
   }
   // _block.set_owner(owner());
   assert(owner());
@@ -1026,6 +1029,10 @@ void AnalogCtrlBlock::parse(CS& f)
       assert(!b);
     }else if(b){
       push_back(b);
+      if(sb){
+	sb->add_block(this); // BUG? possybly wrong place.
+      }else{
+      }
     }else{
       delete b;
     }

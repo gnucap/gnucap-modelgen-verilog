@@ -1,0 +1,28 @@
+
+`include "sub/disciplines.few"
+`pragma modelgen nodump-nature
+`pragma modelgen nodump-discipline
+`pragma modelgen dump-annotate
+
+module test_bug_block1(p, n);
+	electrical p, n;
+
+	analog begin : NAME
+		real xgt, ms;
+		real G_s;
+		begin : A
+			if (abs(xgt)<=ms) begin
+			end else if (xgt>ms) begin
+			end else begin
+				begin : B
+					real N;
+					N =  xgt;
+					G_s  =  N;
+				end
+			end
+		end
+		xgt=V(p);
+
+		I(p,n) <+ V(p, n);
+	end
+endmodule

@@ -712,7 +712,7 @@ void CMD_PARAM::parse(CS& cmd, PARAM_LIST* Scope) const
     if(cmd >> ';') {
       assert(cmd);
       break;
-    }else if(cmd >> ',') { untested();
+    }else if(cmd >> ',') { itested();
     }else{
       parse_range(cmd, pl, Name);
     }
@@ -724,7 +724,7 @@ void CMD_PARAM::parse(CS& cmd, PARAM_LIST* Scope) const
 
     if (cmd.stuck(&here)) { untested();
       break;
-    }else{ untested();
+    }else{ itested();
     }
   }
   if(!cmd){ untested();

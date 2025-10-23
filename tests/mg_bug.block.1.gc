@@ -1,0 +1,41 @@
+
+attach ./modelgen_1.so
+
+
+verilog
+
+`modelgen
+module test_bug_block1(p, n);
+	electrical p, n;
+
+	analog begin : NAME
+		real xgt, ms;
+		real G_s;
+		begin : A
+			if (abs(xgt)<=ms) begin
+			end else if (xgt>ms) begin
+			end else begin
+				begin : B
+					real N;
+					N =  xgt;
+					G_s  =  N;
+				end
+			end
+		end
+		xgt=V(p);
+
+		I(p,n) <+ V(p, n);
+	end
+endmodule
+`endmodelgen
+
+
+!make test_bug_block1.so > /dev/null
+attach ./test_bug_block1.so
+
+test_bug_block1 #() dut(\1 ,\0 );
+isource #(3) ii(\1 , \0 );
+
+print dc v(nodes)
+dc
+status notime
