@@ -761,11 +761,12 @@ void Module::parse_body(CS& f)
   // _validate.set_owner(this);
 
 
-  size_t here = f.cursor();
   bool end = false;
+  bool reserved = false;
   for (;;) {
     trace1("module body parse", f.tail().substr(0,20));
     parse_attributes(f, &f);
+    size_t here = f.cursor();
     ONE_OF	// module_item
       || f.umatch(";")
       // mi, port_declaration
@@ -791,6 +792,9 @@ void Module::parse_body(CS& f)
       || ((f >> "analog ") && f >> *_analog)
       || ((f >> "always ") && f >> *_always)
       || ((f >> "endmodule ") && (end = true))
+      // subdevice instances. can't use reserved keywords.
+      || ((f >> "paramset ") && (reserved = true))
+      || ((f >> "module ") && (reserved = true))
       || (f >> _circuit->element_list())	// module_instantiation
       ;
     if (attr.has_attributes(tag_t(&f))) { untested();
@@ -798,7 +802,11 @@ void Module::parse_body(CS& f)
 	   + attr.attributes(tag_t(&f))->string(tag_t(nullptr)));
     }else{
     }
-    if (end){
+    trace2("endloop", end, f.last_match());
+    if (reserved){
+      f.reset(here);
+      throw Exception_CS_("not allowed here: " + f.last_match(), f);
+    }else if (end){
       break;
     }else if (!f.more()) { untested();
       f.warn(0, "premature EOF (module)");

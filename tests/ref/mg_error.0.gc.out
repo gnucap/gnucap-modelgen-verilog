@@ -1,0 +1,2 @@
+... t_error0(p, n); electrical p, n, i; paramset a b; endpar
+                                        ^ ? not allowed here: paramset 

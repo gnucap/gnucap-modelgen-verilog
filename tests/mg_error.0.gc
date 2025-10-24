@@ -1,0 +1,18 @@
+attach ./modelgen_1.so
+
+
+verilog
+
+`modelgen
+module test_error0(p, n);
+	electrical p, n, i;
+
+	paramset a b;
+   endparamset
+
+	analog begin
+		I(p,n) <+ 17.;
+	end
+endmodule
+`endmodelgen
+
