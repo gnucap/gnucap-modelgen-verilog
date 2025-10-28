@@ -599,6 +599,9 @@ static void make_module(std::ostream& o, const Module& m)
   }
   if(m.has_tr_begin()){
     o__ "void tr_begin()override;\n";
+  }else{
+  }
+  if(m.has_tr_restore()){
     o__ "void tr_restore()override;\n";
   }else{
   }

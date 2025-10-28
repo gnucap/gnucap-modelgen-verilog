@@ -1315,7 +1315,7 @@ void COMMON_resistor::precalc_first(const PARAM_LIST* par_scope)
   COMMON_COMPONENT::precalc_first(par_scope);
   COMMON_resistor const* pc = this;
   (void)pc;
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 =  1.;
@@ -1359,7 +1359,7 @@ void COMMON_resistor::precalc_last(const PARAM_LIST* par_scope)
   assert(par_scope);
   COMMON_resistor const* pc = this;
   (void)pc;
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 =  1.;
@@ -2077,6 +2077,7 @@ inline void MOD_resistor::tr_advance()
   }
   set_not_converged();
   _v_1 = _v_;
+  c->tr_advance_analog(this);
   BASE_SUBCKT::tr_advance();
 } // tr_advance
 /*--------------------------------------------------------------------------*/
@@ -2674,35 +2675,35 @@ void COMMON_resistor::precalc_first(const PARAM_LIST* par_scope)
   COMMON_COMPONENT::precalc_first(par_scope);
   COMMON_resistor const* pc = this;
   (void)pc;
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 =  1.;
     real def = real(t0.value());
     e_val(&(this->_p_r),     def , par_scope);
   }
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 =  0.;
     real def = real(t0.value());
     e_val(&(this->_p_tc1),     def , par_scope);
   }
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 =  0.;
     real def = real(t0.value());
     e_val(&(this->_p_tc2),     def , par_scope);
   }
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 =  0.;
     real def = real(t0.value());
     e_val(&(this->_p_noisy),     def , par_scope);
   }
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 =  0.;
@@ -2716,35 +2717,35 @@ void COMMON_resistor::precalc_last(const PARAM_LIST* par_scope)
   assert(par_scope);
   COMMON_resistor const* pc = this;
   (void)pc;
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 =  1.;
     real def = real(t0.value());
     e_val(&(this->_p_r),     def , par_scope);
   }
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 =  0.;
     real def = real(t0.value());
     e_val(&(this->_p_tc1),     def , par_scope);
   }
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 =  0.;
     real def = real(t0.value());
     e_val(&(this->_p_tc2),     def , par_scope);
   }
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 =  0.;
     real def = real(t0.value());
     e_val(&(this->_p_noisy),     def , par_scope);
   }
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 =  0.;
@@ -3802,6 +3803,7 @@ inline void MOD_resistor::tr_advance()
   }
   set_not_converged();
   _v_1 = _v_;
+  c->tr_advance_analog(this);
   BASE_SUBCKT::tr_advance();
 } // tr_advance
 /*--------------------------------------------------------------------------*/
@@ -5422,7 +5424,7 @@ void COMMON_capacitor::precalc_first(const PARAM_LIST* par_scope)
   COMMON_COMPONENT::precalc_first(par_scope);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 =  1.;
@@ -5448,7 +5450,7 @@ void COMMON_capacitor::precalc_last(const PARAM_LIST* par_scope)
   assert(par_scope);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 =  1.;
@@ -6426,14 +6428,14 @@ void COMMON_capacitor::precalc_first(const PARAM_LIST* par_scope)
   COMMON_COMPONENT::precalc_first(par_scope);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 =  1.;
     real def = real(t0.value());
     e_val(&(this->_p_c),     def , par_scope);
   }
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 = 0;
@@ -6459,14 +6461,14 @@ void COMMON_capacitor::precalc_last(const PARAM_LIST* par_scope)
   assert(par_scope);
   COMMON_capacitor const* pc = this;
   (void)pc;
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 =  1.;
     real def = real(t0.value());
     e_val(&(this->_p_c),     def , par_scope);
   }
-  {
+  { // final adjust
     ddouble t0;
     //t0.set_no_deps();
     t0 = 0;

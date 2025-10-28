@@ -565,7 +565,7 @@ static void make_eval_subdevice_parameters(std::ostream& o , const Element_2& e)
     o__ "{\n";
     {
       indent x;
-      make_cc_expression(o, p->default_val().expression());
+      make_cc_expression(o, p->default_val().expression(), false, "adjust");
     }
     o____ "PARAM_INSTANCE p;\n";
     o____ "p = PARAMETER<vReal>();\n";

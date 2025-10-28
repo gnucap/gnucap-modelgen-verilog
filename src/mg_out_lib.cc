@@ -29,7 +29,7 @@ static void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2&
   //   out << "    this->" << p.code_name() << " = " << p.calculate() << ";\n";
   // }else{ untested();
   // }
-  o__ "{\n";
+  o__ "{ // final adjust\n";
 //  o__ p.type() << " val = ";
   if (!(p.default_val().empty())) {
     // o << p.default_val();

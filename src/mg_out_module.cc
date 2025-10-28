@@ -427,7 +427,7 @@ static void make_tr_begin(std::ostream& o, const Module& m)
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
   o__ "(void)c;\n";
-  if(m.has_tr_begin_analog()) {
+  if(m.has_analog_block()) {
     o__ "c->tr_initial_analog(this);\n"; // call from COMMON::tr_begin?
     o__ "c->tr_begin_analog(this);\n"; // call from COMMON::tr_begin?
   }else{
@@ -463,7 +463,7 @@ static void make_tr_restore(std::ostream& o, const Module& m)
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
   o__ "(void)c;\n";
-  if(m.has_tr_restore_analog()) {
+  if(m.has_tr_restore_analog() && m.has_analog_block()){
     o__ "c->tr_restore_analog(this);\n";
   }else{
   }
@@ -496,7 +496,8 @@ static void make_tr_advance(std::ostream& o, const Module& m)
   }else{
   }
 
-  if(m.has_analysis()) { // BUG?
+  if(m.has_analysis() // BUG?
+    && m.has_analog_block()){
     o__ "if(_sim->_last_time == 0.){\n";
     o__ "incomplete();\n";
     o__ "c->tr_eval_analog(this);\n";
@@ -516,7 +517,7 @@ static void make_tr_advance(std::ostream& o, const Module& m)
   o__ "set_not_converged();\n";
 
   o__ "_v_1 = _v_;\n";
-  if(m.has_tr_advance_analog()){
+  if(m.has_analog_block()){
     o__ "c->tr_advance_analog(this);\n";
   }else{
   }
@@ -564,7 +565,10 @@ static void make_tr_regress(std::ostream& o, const Module& m)
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
+  if(m.has_analog_block()){
   o__ "c->tr_regress_analog(this);\n";
+  }else{
+  }
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -593,7 +597,10 @@ static void make_tr_review(std::ostream& o, const Module& m)
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
   o__ "trace1(\"review0\", _time_by._event);\n";
-  o__ "c->tr_review_analog(this);\n";
+  if(m.has_analog_block()){
+    o__ "c->tr_review_analog(this);\n";
+  }else{
+  }
   for(auto f : m.funcs()){
     f->make_cc_tr_review(o);
   }
@@ -627,7 +634,10 @@ static void make_tr_accept(std::ostream& o, const Module& m)
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
-  o__ "c->tr_accept_analog(this);\n"; // call from COMMON::tr_accept?
+  if(m.has_analog_block()){
+    o__ "c->tr_accept_analog(this);\n"; // call from COMMON::tr_accept?
+  }else{
+  }
   for(auto f : m.funcs()){
     f->make_cc_tr_accept(o);
   }
@@ -766,6 +776,9 @@ static void make_module_class(std::ostream& o, Module const& m)
 
   if(m.has_tr_begin()) {
     make_tr_begin(o, m);
+  }else{
+  }
+  if(m.has_tr_restore()) {
     make_tr_restore(o, m);
   }else{
   }
