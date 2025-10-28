@@ -1,0 +1,10 @@
+load mgsim
+load ./params.so
+verilog
+
+parameter s=3;
+rdist_demo #(.seed(s)) tt(a, b);
+
+print dc r(tt.r*)
+dc
+dc s 1 5 1

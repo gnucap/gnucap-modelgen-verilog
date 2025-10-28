@@ -1,0 +1,33 @@
+nature current
+  access = I;
+  units = "A";
+  abstol = 1e-12; // OPT::abstol
+endnature
+
+// Electrical potential
+nature voltage
+  access = V;
+  units = "V";
+  abstol = 1e-6; // OPT::vntol
+endnature
+
+// Electrical discipline
+discipline electrical
+  potential voltage;
+  flow current;
+enddiscipline
+
+module rdist_demo(p, n)
+	electrical p,n;
+	inout p,n;
+	parameter integer seed = 1;
+	parameter integer mm_ok = 1;
+	localparam real r
+           = (1 + $rdist_normal(seed, 0., 1.) * (mm_ok != 1 ? 0 : 1));
+
+	resistor #(.r(r)) r0(p,n);
+	resistor #(.r(r)) r1(p,n);
+
+	resistor #(.r(1 + $rdist_normal(seed, 0., 1.) * (mm_ok != 1 ? 0 : 1))) r2(p,n);
+	resistor #(.r(1 + $rdist_normal(seed, 0., 1.) * (mm_ok != 1 ? 0 : 1))) r3(p,n);
+endmodule

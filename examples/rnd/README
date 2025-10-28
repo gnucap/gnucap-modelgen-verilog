@@ -19,3 +19,11 @@ A transient noise source makes transtions to periodic random samples.
 $ gnucap-mg-vams --cc trnoise.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o trnoise.so
 $ gnucap trnoise.gc
 
+== parameters and subdevices
+
+An example involving parameters, local parameters, subdevices and $rdist.
+
+$ gnucap-mg-vams --cc params.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o params.so
+$ gnucap params.gc
+
+see also tests/mg_rdist.tern.0.gc
