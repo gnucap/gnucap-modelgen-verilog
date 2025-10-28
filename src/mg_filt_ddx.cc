@@ -52,7 +52,8 @@ private:
     auto dd = prechecked_cast<TData const*>(t->data());
     assert(dd);
     assert(dd->ddeps().size()==1);
-    return probe(*dd->ddeps().begin());
+    trace1("ddxprobe", t->name());
+    return probe_(*dd->ddeps().begin());
   }
 
   Expression_ const* args() const{
@@ -98,7 +99,8 @@ public:
   void make_cc_common(std::ostream& o)const override{
     o__ "class FILTER" << label() << "{\n";
     o__ "public:\n";
-    o____ "ddouble operator()(";
+    indent i1;
+    o__ "ddouble operator()(";
     std::string comma;
     for(size_t n=0; n<num_args(); ++n){
       o << comma << "ddouble t" << n;
@@ -108,6 +110,7 @@ public:
     assert(_ddxprobe);
 
     o__ "{ // NEW  ddx " <<  code_name() << "\n";
+    indent i2;
     if(_ddxprobe->is_pot_probe()){
     }else{ untested();
       incomplete();
@@ -132,9 +135,8 @@ public:
 	if(n->is_ground()) {
 	}else if(p->is_ground()) { untested();
 	}else if(x->p() == p && x->n() == n){
-	  // oops. what does the standard say about reversed ddx?
-	  bool rev = _ddxprobe->is_reversed();
-	  o__ "ret " << (rev?'-':'+') << "= t0[d_potential" << x->code_name() << "]; // fwd?\n";
+	  o__ "ret = t0[d_potential" << x->code_name() << "] *"
+	    "t1[d_potential" << x->code_name() << "]; // fwd?\n";
 	}else if(x->p() == n && x->n() == p){ untested();
 	  unreachable();
 	}else{
@@ -147,8 +149,10 @@ public:
 
     // incomplete(); no second derivatives..
     o__ "return ddouble(ret);\n";
+    i2.unindent();
     o__ "}\n";
 
+    i1.unindent();
     o__  "} " << label() << ";\n";
   }
   void make_cc_impl(std::ostream&)const override{

@@ -243,10 +243,10 @@ private:
   void new_deps();
   void delete_deps();
 public:
-  Token const* flow_dep();
-  Token const* potential_dep();
-  Token const* flow_dep()const {assert(_flow); return _flow;}
-  Token const* potential_dep()const {assert(_potential); return _potential;}
+  Base const* flow_dep();
+  Base const* potential_dep();
+  Base const* flow_dep()const {assert(_flow); return _flow;}
+  Base const* potential_dep()const {assert(_potential); return _potential;}
 }; // Branch
 class Branch;
 class Named_Branch;

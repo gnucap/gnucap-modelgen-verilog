@@ -41,6 +41,7 @@ extern std::string ind;
 /*--------------------------------------------------------------------------*/
 // obsolete.
 struct indent{
+  std::string _old;
   explicit indent(int i=2){
     _old = ind;
     if(i<0){ untested();
@@ -54,10 +55,8 @@ struct indent{
     _old = ind;
     ind = ind + s;
   }
-  ~indent(){
-    ind = _old;
-  }
-  std::string _old;
+  ~indent(){ unindent(); }
+  void unindent(){ ind = _old; }
 };
 /*--------------------------------------------------------------------------*/
 class oindent : private std::streambuf, public std::ostream{

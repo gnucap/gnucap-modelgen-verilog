@@ -485,30 +485,32 @@ private:
 #endif
 };
 /*--------------------------------------------------------------------------*/
-class Token_PROBE : public Token {
+class Token_PROBE : public Base {
 protected:
+  TData* _data;
   Branch const* _branch{nullptr};
 public:
-  explicit Token_PROBE(std::string const&, Branch const* b, Base* tdata)
-    : Token(tdata), _branch(b) { }
+  explicit Token_PROBE(std::string const&, Branch const* b, TData* tdata)
+    : _data(tdata), _branch(b) { }
+private: // Base
+  void parse(CS&)override {unreachable();}
+  void dump(std::ostream&)const override {unreachable();}
 };
 /*--------------------------------------------------------------------------*/
 class Token_POTENTIAL : public Token_PROBE {
 public:
-  explicit Token_POTENTIAL(std::string const& name, Branch const* b, Base* tdata)
+  explicit Token_POTENTIAL(std::string const& name, Branch const* b, TData* tdata)
     : Token_PROBE(name, b, tdata) {}
 
-  Token* clone()const override {unreachable(); return nullptr;}
   Probe const* probe()const {incomplete(); return nullptr;}
   std::string val_string()const override;
 };
 /*--------------------------------------------------------------------------*/
 class Token_FLOW : public Token_PROBE {
 public:
-  explicit Token_FLOW(std::string const& name, Branch const* b, Base* tdata)
+  explicit Token_FLOW(std::string const& name, Branch const* b, TData* tdata)
     : Token_PROBE(name, b, tdata) {}
 
-  Token* clone()const override {unreachable(); return nullptr;}
   Probe const* probe()const {incomplete(); return nullptr;}
   std::string val_string()const override;
 };

@@ -174,7 +174,7 @@ void Branch::add_dep(Dep const& b)
   deps().insert(b);
 }
 /*--------------------------------------------------------------------------*/
-Token const* Branch::flow_dep()
+Base const* Branch::flow_dep()
 {
   if(_flow){
   }else{
@@ -183,7 +183,7 @@ Token const* Branch::flow_dep()
   return _flow;
 }
 /*--------------------------------------------------------------------------*/
-Token const* Branch::potential_dep()
+Base const* Branch::potential_dep()
 {
   if(_potential){
   }else{

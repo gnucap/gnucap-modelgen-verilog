@@ -60,7 +60,13 @@ public:
   Branch const* branch()const {
     return _br;
   }
-  bool is_reversed() const;
+private:
+  friend Probe const* probe(Dep const&);
+  bool is_reversed() const {
+    incomplete();
+    return _br.is_reversed();
+  }
+public:
   Nature const* nature() const;
   Discipline const* discipline() const;
 
@@ -75,10 +81,10 @@ private:
 public:
   bool propagate_rdeps_(RDeps const&)const;
   void set_used_in(Base const*b)const{
-    return _br.set_used_in(b);
+    _br.set_used_in(b);
   }
   void unset_used_in(Base const*b)const{
-    return _br.unset_used_in(b);
+    _br.unset_used_in(b);
   }
 private:
   void make_cc_dev(std::ostream&)const override;
@@ -637,9 +643,17 @@ private:
 };
 #endif
 /*--------------------------------------------------------------------------*/
+inline Probe const* probe_(Dep const& d)
+{
+  assert(d.probe__());
+  return d.probe__();
+}
+/*--------------------------------------------------------------------------*/
 inline Probe const* probe(Dep const& d)
 {
-  return d.probe();
+  assert(d.probe__());
+  // assert(!d.probe__()->is_reversed());
+  return d.probe__();
 }
 /*--------------------------------------------------------------------------*/
 inline bool is_flow_probe(Dep const& d)
@@ -654,13 +668,16 @@ inline bool is_pot_probe(Dep const& d)
 /*--------------------------------------------------------------------------*/
 inline std::string /*const&*/ code_name(Dep const& d)
 {
-  return d.probe()->code_name();
+  return d.probe__()->code_name();
 }
 /*--------------------------------------------------------------------------*/
 inline Branch const* branch(Dep const& d)
 {
-  return d.branch();
+  assert(probe_(d));
+  assert(probe_(d)->branch());
+  return probe_(d)->branch();
 }
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

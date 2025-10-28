@@ -430,7 +430,8 @@ void Token_ZIF::stack_op(Expression* e)const
 
     auto d = new TData;
     trace1("xdt output dep", func->prb()->code_name());
-    d->ddeps().insert(Dep(branch()->potential_dep(), func->prb(), Dep::_LINEAR, branch())); // BUG?
+    assert(func->prb()->branch() == branch());
+    d->ddeps().insert(Dep(branch()->potential_dep(), func->prb(), Dep::_LINEAR)); // BUG?
     auto N = new Token_ZIF(*this, d, clone_args(cc->args()));
     assert(N->data());
     assert(dynamic_cast<TData const*>(N->data()));
@@ -440,12 +441,13 @@ void Token_ZIF::stack_op(Expression* e)const
   }else if(!e->size()) { untested();
     unreachable();
   }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) { untested();
-    auto d = new TData;
-    d->ddeps().insert(Dep(branch()->potential_dep(), branch(), func->prb())); // BUG?
-    auto N = new Token_ZIF(*this, d);
-    assert(N->data());
-    assert(dynamic_cast<TData const*>(N->data()));
-    e->push_back(N);
+  unreachable();
+//    auto d = new TData;
+//    d->ddeps().insert(Dep(branch()->potential_dep(), branch(), func->prb())); // BUG?
+//    auto N = new Token_ZIF(*this, d);
+//    assert(N->data());
+//    assert(dynamic_cast<TData const*>(N->data()));
+//    e->push_back(N);
   }else{ untested();
     unreachable();
   }

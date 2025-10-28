@@ -1310,7 +1310,7 @@ void Contribution::add_dep(Dep const& d)
   if(owner()->is_reachable()){
     ::branch(d)->inc_use();
     trace2("inc_use1", name(), branch()->name());
-    probe(d)->set_used_in(this);
+    probe_(d)->set_used_in(this);
   }else{
   }
 }
@@ -2373,7 +2373,7 @@ Contribution::~Contribution()
       assert(::branch(i));
       ::branch(i)->dec_use();
       try{
-	probe(i)->unset_used_in(this);
+	probe_(i)->unset_used_in(this);
       }catch(std::logic_error const& e){ untested();
 	unreachable();
 	std::cerr << " logic error in " << name() << ": ";
@@ -2401,7 +2401,7 @@ size_t Branch::num_nodes() const
     if(branch(i)->is_short()){
     }else if(branch(i) == this){
       // self conductance
-    }else if(probe(i)->is_pot_probe()){
+    }else if(probe_(i)->is_pot_probe()){
       ++ret;
 //     }else if(i->is_filter_probe()){ untested();
 //       assert(i->is_pot_probe());
@@ -2476,11 +2476,6 @@ Probe::~Probe()
 //  }
 
 //  assert(!_use);
-}
-/*--------------------------------------------------------------------------*/
-bool Probe::is_reversed() const
-{
-  return _br.is_reversed();
 }
 /*--------------------------------------------------------------------------*/
 Discipline const* Probe::discipline() const

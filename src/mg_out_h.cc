@@ -406,26 +406,26 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
   o____ "VALUE, SELF";
   for(Dep const& d : br.ddeps()){
 //      o << "/* found " << d->code_name() << "*/";
-    Branch const* bbb = d.branch();
+    Branch const* bbb = ::branch(d);
     assert(bbb);
     if(bbb->is_short()){
     }else if(bbb == &br){
     }else if(bbb->has_flow_probe()){
     }else{
       assert(d);
-      o << ", dep" << d.probe()->code_name();
+      o << ", dep" << probe(d)->code_name();
     }
   }
   o << "/* : */\n";
   for(Dep const& d : br.ddeps()){
-    Branch const* bbb = d.probe()->branch();
+    Branch const* bbb = probe(d)->branch();
     assert(bbb);
     if(bbb->is_short()){
     }else if(bbb == &br){
     }else if(!bbb->has_flow_probe()){
     }else{
       assert(d);
-      o << ", dep" << d.probe()->code_name();
+      o << ", dep" << probe(d)->code_name();
     }
   }
   o____ "};\n";

@@ -39,17 +39,17 @@ public: // types
     _ANY,
   } dep_order;
 private:
-  Token const* _token{nullptr};
-  Probe const* _prb{nullptr}; // remove.
-  Branch const* _branch{nullptr};
+  // Base* _item{nullptr}; // TODO
+  Base const* _token{nullptr}; // xs + branch
+  Probe const* _prb{nullptr}; // remove
   dep_order _order{_ANY};
 public:
   Dep(Dep const& p) = default;
-  explicit Dep(Token const* t, Branch const* br, Probe const* p)
-    : _token(t), _prb(p), _branch(br) {
+  explicit Dep(Base const* t, Probe const* p)
+    : _token(t), _prb(p) {
   }
-  explicit Dep(Token const* t, Probe const* p, dep_order d, Branch const* br)
-    : _token(t), _prb(p), _branch(br), _order(d) {
+  explicit Dep(Base const* t, Probe const* p, dep_order d)
+    : _token(t), _prb(p), _order(d) {
   }
 
   int order()const { untested();return _order;}
@@ -62,9 +62,9 @@ public:
   void set_used_in(Base const*) const;
 
 public:
-  Token const* token()const { return _token; }
-  Branch const* branch()const { return _branch; }
-  Probe const* probe()const { return _prb; } // code_name?
+  // Base const* item()const {untested(); return _item; }
+  Base const* token()const { return _token; }
+  Probe const* probe__()const { return _prb; } // remove
   bool is_flow_probe()const {
     return dynamic_cast<Token_FLOW const*>(_token);
   }
@@ -72,7 +72,7 @@ public:
     return dynamic_cast<Token_POTENTIAL const*>(_token);
   }
   operator bool()const { return _prb; }
-  std::string name()const { return _token->name(); }
+  std::string name()const { return _token->val_string(); }
 }; // Dep
 /*--------------------------------------------------------------------------*/
 class Sensitivities {

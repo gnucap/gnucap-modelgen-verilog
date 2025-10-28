@@ -869,7 +869,8 @@ bool Token_ACCESS::is_reversed() const
 { untested();
   auto p = prb();
   assert(p);
-  return p->is_reversed();
+  unreachable();
+  return false;// p->is_reversed();
 }
 /*--------------------------------------------------------------------------*/
 std::string Token_ACCESS::code_name() const
@@ -1048,16 +1049,16 @@ Token* Probe::new_token(Module&, size_t na)const
 
   TData* deps = new TData;
   if(_type==t_pot){
-    deps->ddeps().insert(Dep(branch()->potential_dep(), this, Dep::_LINEAR, branch()));
+    deps->ddeps().insert(Dep(branch()->potential_dep(), this, Dep::_LINEAR));
   }else{
-    deps->ddeps().insert(Dep(branch()->flow_dep(), this, Dep::_LINEAR, branch()));
+    deps->ddeps().insert(Dep(branch()->flow_dep(), this, Dep::_LINEAR));
   }
 
   trace1("stackop probe, new TA", name);
   Token_ACCESS* nt = new Token_ACCESS(name, deps, this);
   // d.insert(Dep(nt->prb(), Dep::_LINEAR));
   return nt;
-}
+} // Probe::new_token
 /*--------------------------------------------------------------------------*/
 TData const& Token_VAR_REF::deps() const
 {
@@ -1189,7 +1190,7 @@ void Token_VAR_DECL::dump(std::ostream& o) const
   if(!options().dump_annotate()){ untested();
   }else if(deps().ddeps().size()){ untested();
     for(Dep const& d : deps().ddeps()){ untested();
-      o << "// dep " << d.probe()->code_name();
+      o << "// dep " << probe(d)->code_name();
     }
     o << "\n";
   }else{ untested();
@@ -1344,7 +1345,8 @@ void Token_FILTER::stack_op(Expression* e)const
     }
 
     auto d = new TData;
-    d->ddeps().insert(Dep(branch()->potential_dep(), func->prb__(), Dep::_LINEAR, branch())); // BUG?
+    assert(func->prb__()->branch() == branch());
+    d->ddeps().insert(Dep(branch()->potential_dep(), func->prb__(), Dep::_LINEAR)); // BUG?
     args = clone_args(cc->args());
     auto N = new Token_FILTER(*this, d, args);
     assert(N->data());
