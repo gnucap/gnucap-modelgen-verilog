@@ -48,29 +48,13 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
       }else{
       }
 
-      if(b->has_name()){
-	o << " // named:   d_potential" << b->code_name() << ",\n";
-      }else if(b->has_pot_probe()){
+      if(!b->has_pot_probe()){
+      }else if(!b->has_name()){
 	o << "    d_potential" << b->code_name() << ",\n";
       }else{
-      }
-    }
-  }
-  for(auto x : m.circuit()->branches()){
-    assert(x);
-    Branch const* b = x;
-    if(b->is_short()){
-      // !has_element?
-	o << "// short " << b->code_name() << "\n";
-    }else{
-      if(!b->has_name()){
-	o << "// not named: " << b->code_name() << "\n";
-      }else if(b->has_pot_probe()){
 	auto nb = prechecked_cast<Named_Branch const*>(b);
-	assert(nb);
 	o << "    d_potential" << nb->code_name()
 	  << " = d_potential" << nb->base()->code_name() << ",\n";
-      }else{
       }
     }
   }

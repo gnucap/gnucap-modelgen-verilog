@@ -1004,8 +1004,6 @@ class COMMON_resistor :public COMMON_COMPONENT{
   enum {
     d_potential_b_white_noise_1_p_white_noise_1_n,
     d_potential_b_p_n,
-// short _b_white_noise_1_p_white_noise_1_n
-// not named: _b_p_n
      num_branches__  };
 public:
   explicit COMMON_resistor(const COMMON_resistor& p);
@@ -1059,8 +1057,6 @@ public:
   enum {
     d_potential_b_white_noise_1_p_white_noise_1_n,
     d_potential_b_p_n,
-// short _b_white_noise_1_p_white_noise_1_n
-// not named: _b_p_n
      num_branches__  };
 private: // data
   mutable node_t _nodes[4];
@@ -2321,8 +2317,6 @@ class COMMON_resistor :public COMMON_COMPONENT{
   enum {
     d_potential_b_white_noise_0_p_white_noise_0_n,
     d_potential_b_p_n,
-// short _b_white_noise_0_p_white_noise_0_n
-// not named: _b_p_n
      num_branches__  };
 public:
   explicit COMMON_resistor(const COMMON_resistor& p);
@@ -2375,8 +2369,6 @@ public:
   enum {
     d_potential_b_white_noise_0_p_white_noise_0_n,
     d_potential_b_p_n,
-// short _b_white_noise_0_p_white_noise_0_n
-// not named: _b_p_n
      num_branches__  };
 private: // data
   mutable node_t _nodes[4];
@@ -5077,8 +5069,6 @@ class COMMON_capacitor :public COMMON_COMPONENT{
   enum {
     d_potential_b_ddt_1_p_ddt_1_n,
     d_potential_b_p_n,
-// short _b_ddt_1_p_ddt_1_n
-// not named: _b_p_n
      num_branches__  };
 public:
   explicit COMMON_capacitor(const COMMON_capacitor& p);
@@ -5144,8 +5134,6 @@ public:
   enum {
     d_potential_b_ddt_1_p_ddt_1_n,
     d_potential_b_p_n,
-// short _b_ddt_1_p_ddt_1_n
-// not named: _b_p_n
      num_branches__  };
 private: // data
   mutable node_t _nodes[4];
@@ -6064,8 +6052,6 @@ class COMMON_capacitor :public COMMON_COMPONENT{
   enum {
     d_potential_b_ddt_2_p_ddt_2_n,
     d_potential_b_p_n,
-// not named: _b_ddt_2_p_ddt_2_n
-// not named: _b_p_n
      num_branches__  };
 public:
   explicit COMMON_capacitor(const COMMON_capacitor& p);
@@ -6131,8 +6117,6 @@ public:
   enum {
     d_potential_b_ddt_2_p_ddt_2_n,
     d_potential_b_p_n,
-// not named: _b_ddt_2_p_ddt_2_n
-// not named: _b_p_n
      num_branches__  };
 private: // data
   mutable node_t _nodes[4];
