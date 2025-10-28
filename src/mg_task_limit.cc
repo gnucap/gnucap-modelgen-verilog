@@ -156,6 +156,7 @@ class LIMIT : public MGVAMS_TASK {
 
     make_cc_dev(o, "ac_begin");
     make_cc_dev(o, "tr_begin");
+    make_cc_dev(o, "tr_review");
     // make_cc_dev(o, "tr_eval");
     make_cc_dev(o, "tr_accept");
     make_cc_dev(o, "tr_advance");
