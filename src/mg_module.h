@@ -295,6 +295,8 @@ public: //filters may need this..
   Node* new_node(std::string const& p) override;
   Branch_Ref new_branch(Node*, Node*) override;
   void set_to_ground(Node const*);
+public:
+  Branch_Ref new_filter(Node*);
 }; // Module
 typedef Collection<Module> Module_List;
 /*--------------------------------------------------------------------------*/

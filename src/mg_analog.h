@@ -668,7 +668,11 @@ inline bool is_pot_probe(Dep const& d)
 /*--------------------------------------------------------------------------*/
 inline std::string /*const&*/ code_name(Dep const& d)
 {
-  return d.probe__()->code_name();
+  if(auto pp=dynamic_cast<Token_PROBE const*>(d.item())){
+    return pp->code_name();
+  }else{
+    return d.probe__()->code_name();
+  }
 }
 /*--------------------------------------------------------------------------*/
 inline Branch const* branch(Dep const& d)
@@ -678,6 +682,15 @@ inline Branch const* branch(Dep const& d)
   return probe_(d)->branch();
 }
 /*--------------------------------------------------------------------------*/
+inline std::string Token_POTENTIAL::code_name() const
+{
+  assert(_branch); return "_potential"+_branch->code_name();
+}
+/*--------------------------------------------------------------------------*/
+inline std::string Token_FLOW::code_name() const
+{
+  assert(_branch); return "_flow"+_branch->code_name();
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

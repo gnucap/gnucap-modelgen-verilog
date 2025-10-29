@@ -3,7 +3,7 @@ meas_noise #() n1 (.p(\1 ));
 meas_noise #() n2 (.p(\1 ),.n(\0 ));
 #          
  0.        
-#Freq       n(dut._b_p_n) n(dut._b_white_noise_1_p_white_noise_1_n) npwr(n1)  
+#Freq       n(dut._b_p_n) n(dut._b_white_noise_1_p_) npwr(n1)  
  0.         ??         2.         18.       
 Gnucap   System status
 iterations: op=0, dc=3, tran=0, fourier=0, total=4

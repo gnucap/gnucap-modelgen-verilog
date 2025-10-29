@@ -122,13 +122,13 @@ public:
     }
 
     Node* np = m.new_node(filter_code_name + "_p");
-    Node* nn = m.new_node(filter_code_name + "_n"); // &mg_ground_node
+    Node* nn = &Node_Map::mg_ground_node;
     np->set_to(&Node_Map::mg_ground_node, "_short_b_"+filter_code_name+"()");
 
     cl->_p = np;
     cl->_n = nn;
     {
-      Branch* br = m.new_branch(np, &Node_Map::mg_ground_node);
+      Branch* br = m.new_filter(np);
 //      br->set_source();
       assert(br);
       assert(const_cast<Branch const*>(br)->owner());

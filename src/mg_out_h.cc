@@ -50,13 +50,20 @@ static void declare_deriv_enum(std::ostream& o, const Module& m)
 
       if(!b->has_pot_probe()){
       }else if(!b->has_name()){
-	o << "    d_potential" << b->code_name() << ",\n";
+	Base const* f = b->potential_dep();
+	Dep F(f, nullptr);
+	o << "    d" << code_name(F) << ",\n";
       }else{
+	Dep F(b->potential_dep(), nullptr);
 	auto nb = prechecked_cast<Named_Branch const*>(b);
-	o << "    d_potential" << nb->code_name()
+	o << "    d" << code_name(F)
 	  << " = d_potential" << nb->base()->code_name() << ",\n";
       }
     }
+  }
+  for(auto x : m.circuit()->filters()){
+    (void)x;
+    o << "//filter. incomplete\n";
   }
   o << "     num_branches__";
   o__ "};\n";

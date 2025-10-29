@@ -495,6 +495,8 @@ public:
 private: // Base
   void parse(CS&)override {unreachable();}
   void dump(std::ostream&)const override {unreachable();}
+public:
+  virtual std::string code_name()const = 0;
 };
 /*--------------------------------------------------------------------------*/
 class Token_POTENTIAL : public Token_PROBE {
@@ -504,6 +506,7 @@ public:
 
   Probe const* probe()const {incomplete(); return nullptr;}
   std::string val_string()const override;
+  std::string code_name()const override;
 };
 /*--------------------------------------------------------------------------*/
 class Token_FLOW : public Token_PROBE {
@@ -513,6 +516,7 @@ public:
 
   Probe const* probe()const {incomplete(); return nullptr;}
   std::string val_string()const override;
+  std::string code_name()const override;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

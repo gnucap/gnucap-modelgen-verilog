@@ -1277,7 +1277,7 @@ static Token* new_filter_token(int na, FUNCTION_ const* func, Module* m)
   }
 
   Node* np = m->new_node(filter_code_name + "_p");
-  Node* nn = m->new_node(filter_code_name + "_n"); // &mg_ground_node
+  Node* nn = &Node_Map::mg_ground_node;
   np->set_to(&Node_Map::mg_ground_node, "_short_b_"+filter_code_name+"()");
 
   {
@@ -1369,6 +1369,11 @@ void Module::setup_functions()
 void Module::install(FUNCTION_ const* f)
 {
   _funcs.insert(f);
+}
+/*--------------------------------------------------------------------------*/
+Branch_Ref Module::new_filter(Node* x)
+{
+  return new_branch(x, &Node_Map::mg_ground_node);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -62,7 +62,7 @@ public:
   void set_used_in(Base const*) const;
 
 public:
-  // Base const* item()const {untested(); return _item; }
+  Base const* item()const { return _token; }
   Base const* token()const { return _token; }
   Probe const* probe__()const { return _prb; } // remove
   bool is_flow_probe()const {
