@@ -1,0 +1,17 @@
+attach ./modelgen_1.so
+verilog
+
+`modelgen
+module test_pc1(a);
+  parameter real mm_ok = 1;
+  parameter real aa = (mm_ok?1:0);
+
+endmodule
+`endmodelgen
+
+!make test_pc1.so > /dev/null
+attach ./test_pc1.so
+
+test_pc1 #() a(x);
+list
+dc

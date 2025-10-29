@@ -50,7 +50,10 @@ static bool is_constant(Token const* t)
     return true;
   }else if(auto data = dynamic_cast<const TData*>(t->data())){
     return data->is_constant();
-  }else{
+  }else if(dynamic_cast<Token_PAR_REF const*>(t)){
+    // why does it not carry data?
+    return true;
+  }else{ untested();
     // unreachable(); incomplete?
     return false;
   }
@@ -539,6 +542,7 @@ void Token_TERNARY_::stack_op(Expression* E)const
 
   }else{
     TData* deps = new TData;
+    trace1("TERNARY0", is_constant(cond));
     if(is_constant(cond)){
       deps->set_constant();
     }else{
@@ -557,6 +561,7 @@ void Token_TERNARY_::stack_op(Expression* E)const
       (**i).stack_op(t);
     }
     deps->update(t->data());
+    trace1("TERNARY1", deps->is_constant());
 
     Expression_* f = new Expression_;
     f->set_owner(SE->owner());
