@@ -57,6 +57,15 @@ void add_n(InputIter first, Size count, OutputIter result)
 }
 /*--------------------------------------------------------------------------*/
 }
+/*--------------------------------------------------------------------------*/
+struct Exception_OutOfRange_ :public Exception{
+  std::string _key, _range;
+  Exception_OutOfRange_(std::string const& key, std::string const& range)
+    :Exception(key + " is not " + std::string(1,'"') + range + std::string(1,'"')),
+     _key(key), _range(range) {
+  }
+};
+/*--------------------------------------------------------------------------*/
 
 namespace{
 
@@ -1293,7 +1302,7 @@ int COMMON_resistor::is_valid() const
   ub = t0;
   }
   if(!(lb<=_p_r && _p_r<ub)){
-      return false;
+      throw Exception_OutOfRange_("r","from " + to_string(lb) + " .." + to_string(ub));
     }else{
     }
   }
@@ -2135,7 +2144,12 @@ void MOD_resistor::precalc_first()
 int MOD_resistor::is_valid()const
 {
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
-  return c->is_valid();
+  try{
+    return c->is_valid();
+  }catch(Exception_OutOfRange_ const& e){
+    error(bDEBUG, long_label() + " invalid: " + e.message() + "\n");
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
@@ -2630,7 +2644,7 @@ int COMMON_resistor::is_valid() const
   ub = t0;
   }
   if(!(lb<=_p_r && _p_r<ub)){
-      return false;
+      throw Exception_OutOfRange_("r","from " + to_string(lb) + " .." + to_string(ub));
     }else{
     }
   }
@@ -2649,7 +2663,7 @@ int COMMON_resistor::is_valid() const
   ub = t0;
   }
   if(!(lb<=_p_noisy && _p_noisy<=ub)){
-      return false;
+      throw Exception_OutOfRange_("noisy","from " + to_string(lb) + " .." + to_string(ub));
     }else{
     }
   }
@@ -3888,7 +3902,12 @@ void MOD_resistor::precalc_first()
 int MOD_resistor::is_valid()const
 {
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
-  return c->is_valid();
+  try{
+    return c->is_valid();
+  }catch(Exception_OutOfRange_ const& e){
+    error(bDEBUG, long_label() + " invalid: " + e.message() + "\n");
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
@@ -4122,6 +4141,15 @@ void add_n(InputIter first, Size count, OutputIter result)
 }
 /*--------------------------------------------------------------------------*/
 }
+/*--------------------------------------------------------------------------*/
+struct Exception_OutOfRange_ :public Exception{
+  std::string _key, _range;
+  Exception_OutOfRange_(std::string const& key, std::string const& range)
+    :Exception(key + " is not " + std::string(1,'"') + range + std::string(1,'"')),
+     _key(key), _range(range) {
+  }
+};
+/*--------------------------------------------------------------------------*/
 
 namespace{
 
@@ -5394,7 +5422,7 @@ int COMMON_capacitor::is_valid() const
   ub = t0;
   }
   if(!(lb<=_p_c && _p_c<ub)){
-      return false;
+      throw Exception_OutOfRange_("c","from " + to_string(lb) + " .." + to_string(ub));
     }else{
     }
   }
@@ -5878,7 +5906,12 @@ void MOD_capacitor::precalc_first()
 int MOD_capacitor::is_valid()const
 {
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
-  return c->is_valid();
+  try{
+    return c->is_valid();
+  }catch(Exception_OutOfRange_ const& e){
+    error(bDEBUG, long_label() + " invalid: " + e.message() + "\n");
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
@@ -6394,7 +6427,7 @@ int COMMON_capacitor::is_valid() const
   ub = t0;
   }
   if(!(lb<=_p_c && _p_c<ub)){
-      return false;
+      throw Exception_OutOfRange_("c","from " + to_string(lb) + " .." + to_string(ub));
     }else{
     }
   }
@@ -6959,7 +6992,12 @@ void MOD_capacitor::precalc_first()
 int MOD_capacitor::is_valid()const
 {
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
-  return c->is_valid();
+  try{
+    return c->is_valid();
+  }catch(Exception_OutOfRange_ const& e){
+    error(bDEBUG, long_label() + " invalid: " + e.message() + "\n");
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()

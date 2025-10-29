@@ -12,6 +12,7 @@ main.D1: diode:1 from device_dispatcher
 main.D1: diode:2 from device_dispatcher
 main.D1: 3 candidates found for diode
 m.D1 tie break: 28 vs. 25
+m.D1:p2 invalid: rs is not "from  0. .. Inf"
 m.D1 dropped invalid candidate.
 >>>>>.dc v -1 0.65 .05 
 #           v(n)       v(n2)      i(V1)      i(V2)      z(m.D1)    iter(0)   
