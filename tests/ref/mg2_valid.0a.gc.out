@@ -1,0 +1,11 @@
+// name clash..
+module test (.\1 (\1 ),.\2 (\2 ));
+   ground \0 ;
+  test_valid1a #(.r(1.)) r1 (\1 , \2 );
+  test_valid1a #(.r(0.)) r0 (\1 , \0 );
+  vsource #(.dc(1.)) v1 (\2 , \0 );
+endmodule // test
+
+test #() m (\1 , \2 );
+m.r1:p0 invalid: r is not "exclude 1."
+m.r1: no candidates test_valid1a

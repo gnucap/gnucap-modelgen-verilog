@@ -11,6 +11,7 @@ module test (.\1 (\1 ),.\2 (\2 ));
 endmodule // test
 
 test #() m (\1 , \2 );
+m.r0:p0 invalid: r is not "from  0. .. Inf"
 m.r1 tie break: 1 vs. 1
 #           v(1)       v(2)      
 m.r0: short circuit

@@ -45,6 +45,15 @@ void add_n(InputIter first, Size count, OutputIter result)
 }
 /*--------------------------------------------------------------------------*/
 }
+/*--------------------------------------------------------------------------*/
+struct Exception_OutOfRange_ :public Exception{
+  std::string _key, _range;
+  Exception_OutOfRange_(std::string const& key, std::string const& range)
+    :Exception(key + " is not " + std::string(1,'"') + range + std::string(1,'"')),
+     _key(key), _range(range) {
+  }
+};
+/*--------------------------------------------------------------------------*/
 
 namespace{
 

@@ -59,8 +59,12 @@ static void make_module_is_valid(std::ostream& o, const Module& m)
   o << "int MOD_" << m.identifier() << "::is_valid()const\n{\n";
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
-  o__ "return c->is_valid();\n";
-
+  o__ "try{\n";
+  o____ "return c->is_valid();\n";
+  o__ "}catch(Exception_OutOfRange_ const& e){\n";
+  o____ "error(bDEBUG, long_label() + \" invalid: \" + e.message() + \"\\n\");\n";
+  o____ "return false;\n";
+  o__ "}\n";
   o << "}\n"
     "/*--------------------------------------------------------------------------*/\n";
 }

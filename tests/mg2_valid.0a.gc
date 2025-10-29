@@ -6,10 +6,10 @@ options debug
 verilog
 
 `modelgen test_valid
-module resistor(p, n);
+module test_valid1a(p, n);
 	electrical p, n;
 	inout p, n;
-	parameter real r = 1. from (0:inf);
+	parameter real r = 1. from (0:inf) exclude 1.;
 	analog begin
 		I(p,n) <+ V(p,n) / r;
 	end
@@ -18,23 +18,18 @@ endmodule
 list
 
 // name clash..
-!make resistor.so > /dev/null
-attach ./resistor.so
+!make test_valid1a.so > /dev/null
+attach ./test_valid1a.so
 
 module test(\1 , \2 );
 	ground \0 ;
-	resistor #(.r(0.)) r0(\1 ,\0 );
-	resistor #(.r(1.)) r1(\1 ,\2 );
+	test_valid1a #(.r(1.)) r1(\1 ,\2 );
+	test_valid1a #(.r(0.)) r0(\1 ,\0 );
 	vsource #(.dc(1.)) v1(\2 ,\0 );
 endmodule
 
-test m(1 2)
+test m(\1 , \2 );
 
 list
 
 print dc v(nodes)
-
-dc
-status notime
-end
-end
