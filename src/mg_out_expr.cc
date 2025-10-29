@@ -591,7 +591,7 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
   if(_ctx=="adjust"){
   }else if((*F)->is_in_common()) {
   }else{
-    o << "/*a*/ d->";
+    o << "/*"<<_ctx<<"*/ d->";
   }
 
   o << F->code_name();
@@ -771,20 +771,22 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
       vars().pop();
       vars().new_ddouble(o);
 
-      o__ "{\n";
+      o__ "{ // ternary " << _ctx << "\n";
       {
 	indent y;
 	o__ "ddouble& tt0 = " << vars().code_name() << ";\n"; // BUG: float??
-	o__ "if(" << arg1 << "){\n";
+	o__ "if(" << arg1 << "){ // true part\n";
 	{
 	  indent x;
-	  make_cc_expression(o, *t->true_part());
+	  // BUG: nest?
+	  make_cc_expression(o, *t->true_part(), true, _ctx);
 	  o__ "tt0 = t0;\n";
 	}
-	o__ "}else{\n";
+	o__ "}else{ // false part\n";
 	{
 	  indent x;
-	  make_cc_expression(o, *t->false_part());
+	  // BUG: nest?
+	  make_cc_expression(o, *t->false_part(), true, _ctx);
 	  o__ "tt0 = t0;\n";
 	}
 	o__ "}\n";
@@ -828,7 +830,7 @@ std::string make_cc_expression(std::ostream& o, Expression const& e, bool dynami
   if(s.is_ref()){
     s.new_ddouble(o);
     s.pop();
-    o__ "t0 = " << s.code_name() << ";\n";
+    o__ "t0 = " << s.code_name() << "; // " << ctx << "\n";
   }else{
   }
   s.pop();

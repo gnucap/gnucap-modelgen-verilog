@@ -567,7 +567,7 @@ void make_common_param_value(std::ostream& o, const Module& m)
 static void make_eval_subdevice_parameters(std::ostream& o , const Element_2& e)
 {
   for(auto p : e.list_of_parameter_assignments()){
-    o__ "{\n";
+    o__ "{ // eval_subdevice_parameters \n";
     {
       indent x;
       make_cc_expression(o, p->default_val().expression(), false, "adjust");

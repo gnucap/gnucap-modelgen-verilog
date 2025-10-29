@@ -1,0 +1,28 @@
+attach ./modelgen_1.so
+verilog
+
+options trace
+
+`modelgen
+module test_rppd(node_1, node_2, node_bn);
+  inout node_1, node_2, node_bn;
+  electrical node_1, node_2, node_bn;
+  parameter integer _rdist_seed = 0;
+  parameter real mm_ok = 1;
+  parameter real aa = ((mm_ok? (0):(1)) <= 0)? (1):($rdist_normal(_rdist_seed, 1, ((mm_ok))? (0):(1)));
+
+  stub #(.nsmm_rsh(((mm_ok? (0):(1)) <= 0)? (1):($rdist_normal(_rdist_seed, 1, ((mm_ok))? (0):(1))))) R1(node_1, node_bn, node_2, node_dt);
+
+endmodule
+`endmodelgen
+
+module stub(a,b,c,d);
+parameter real nsmm_rsh=1;
+endmodule
+
+!make test_rppd.so > /dev/null
+attach ./test_rppd.so
+
+test_rppd #() a(x,y,z);
+list
+dc

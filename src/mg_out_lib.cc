@@ -34,7 +34,7 @@ static void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2&
   if (!(p.default_val().empty())) {
     // o << p.default_val();
     indent i2;
-    make_cc_expression(o, p.default_val().expression());
+    make_cc_expression(o, p.default_val().expression(), false, "adjust");
   }else{ untested();
     o << "NA;";
   }
