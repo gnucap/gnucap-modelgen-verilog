@@ -1088,11 +1088,11 @@ static void make_one_variable_proxy(std::ostream& o, Token_VAR_REF const& V)
   o______ "}else{\n";
   o______ "}\n";
   o____ "}\n";
-  o____ "ddouble& operator=(double t){\n";
+  o____ "ddouble& operator=(double const& t){\n";
   o______ "ddouble::operator=(t);\n";
   o______ "return *this;\n";
   o____ "}\n";
-  o____ "ddouble& operator=(ddouble t){\n";
+  o____ "ddouble& operator=(ddouble const& t){\n";
   o______ "ddouble::operator=(t);\n";
   o______ "return *this;\n";
   o____ "}\n";

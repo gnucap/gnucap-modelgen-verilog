@@ -1500,11 +1500,11 @@ void EVAL__b_white_noise_1_p__::tr_eval(ELEMENT* d)const
         }else{
         }
       }
-      ddouble& operator=(double t){
+      ddouble& operator=(double const& t){
         ddouble::operator=(t);
         return *this;
       }
-      ddouble& operator=(ddouble t){
+      ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
       }
@@ -1531,11 +1531,11 @@ void EVAL__b_white_noise_1_p__::tr_eval(ELEMENT* d)const
         }else{
         }
       }
-      ddouble& operator=(double t){
+      ddouble& operator=(double const& t){
         ddouble::operator=(t);
         return *this;
       }
-      ddouble& operator=(ddouble t){
+      ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
       }
@@ -1592,11 +1592,11 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         }else{
         }
       }
-      ddouble& operator=(double t){
+      ddouble& operator=(double const& t){
         ddouble::operator=(t);
         return *this;
       }
-      ddouble& operator=(ddouble t){
+      ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
       }
@@ -1623,11 +1623,11 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         }else{
         }
       }
-      ddouble& operator=(double t){
+      ddouble& operator=(double const& t){
         ddouble::operator=(t);
         return *this;
       }
-      ddouble& operator=(ddouble t){
+      ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
       }
@@ -1761,11 +1761,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
       }else{
       }
     }
-    ddouble& operator=(double t){
+    ddouble& operator=(double const& t){
       ddouble::operator=(t);
       return *this;
     }
-    ddouble& operator=(ddouble t){
+    ddouble& operator=(ddouble const& t){
       ddouble::operator=(t);
       return *this;
     }
@@ -1804,11 +1804,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         }else{
         }
       }
-      ddouble& operator=(double t){
+      ddouble& operator=(double const& t){
         ddouble::operator=(t);
         return *this;
       }
-      ddouble& operator=(ddouble t){
+      ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
       }
@@ -1835,11 +1835,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         }else{
         }
       }
-      ddouble& operator=(double t){
+      ddouble& operator=(double const& t){
         ddouble::operator=(t);
         return *this;
       }
-      ddouble& operator=(ddouble t){
+      ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
       }
@@ -2842,11 +2842,11 @@ void EVAL__b_white_noise_0_p__::tr_eval(ELEMENT* d)const
         }else{
         }
       }
-      ddouble& operator=(double t){
+      ddouble& operator=(double const& t){
         ddouble::operator=(t);
         return *this;
       }
-      ddouble& operator=(ddouble t){
+      ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
       }
@@ -2873,11 +2873,11 @@ void EVAL__b_white_noise_0_p__::tr_eval(ELEMENT* d)const
         }else{
         }
       }
-      ddouble& operator=(double t){
+      ddouble& operator=(double const& t){
         ddouble::operator=(t);
         return *this;
       }
-      ddouble& operator=(ddouble t){
+      ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
       }
@@ -2997,11 +2997,11 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         }else{
         }
       }
-      ddouble& operator=(double t){
+      ddouble& operator=(double const& t){
         ddouble::operator=(t);
         return *this;
       }
-      ddouble& operator=(ddouble t){
+      ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
       }
@@ -3028,11 +3028,11 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         }else{
         }
       }
-      ddouble& operator=(double t){
+      ddouble& operator=(double const& t){
         ddouble::operator=(t);
         return *this;
       }
-      ddouble& operator=(ddouble t){
+      ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
       }
@@ -3234,11 +3234,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
       }else{
       }
     }
-    ddouble& operator=(double t){
+    ddouble& operator=(double const& t){
       ddouble::operator=(t);
       return *this;
     }
-    ddouble& operator=(ddouble t){
+    ddouble& operator=(ddouble const& t){
       ddouble::operator=(t);
       return *this;
     }
@@ -3277,11 +3277,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         }else{
         }
       }
-      ddouble& operator=(double t){
+      ddouble& operator=(double const& t){
         ddouble::operator=(t);
         return *this;
       }
-      ddouble& operator=(ddouble t){
+      ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
       }
@@ -3308,11 +3308,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         }else{
         }
       }
-      ddouble& operator=(double t){
+      ddouble& operator=(double const& t){
         ddouble::operator=(t);
         return *this;
       }
-      ddouble& operator=(ddouble t){
+      ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
       }
