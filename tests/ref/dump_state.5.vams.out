@@ -1,0 +1,23 @@
+module test_strobe3(a, b);
+  inout a, b;
+  electrical a, b;
+  parameter integer p = 1 from [0:1];
+
+  integer P;
+
+  analog begin // always
+    begin
+    // P : 0
+      P = p; // s1 r5
+      if ((P == 1)) begin
+      end
+      else begin
+        $strobe("BUG"); // r5
+      end
+    end
+  end
+
+endmodule
+
+
+

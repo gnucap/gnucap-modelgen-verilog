@@ -17,7 +17,7 @@ module test_while0a(p, n);
     x =  0.; // dep: V(p, n) s4 r4
     z = x; // dep: V(p, n) s5 r3
     y =  0.; // dep: V(p, n) s3 r4
-    i = r; // s1 r3
+    i = r; // s1 r4
     while ((i > 0)) begin
       // i : 0
       // x : 1

@@ -515,6 +515,13 @@ bool AnalogConditionalStmt::is_used_in(Base const* b) const
   }
 }
 /*--------------------------------------------------------------------------*/
+bool AnalogConditionalStmt::update()
+{
+  bool ret = _false_part.update();
+  _cond.update(&rdeps());
+  return AnalogCtrlStmt::update() || ret;
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void AnalogCtrlStmt::parse(CS& f)
 {
@@ -548,7 +555,7 @@ bool AnalogWhileStmt::update()
 {
 //  _ctrl?
   bool ret = false;
-  while(true){
+  while(true){ itested();
     trace0("AnalogWhileStmt::update");
     _body.clear_vars();
     if (_body.update()){
@@ -558,6 +565,7 @@ bool AnalogWhileStmt::update()
       break;
     }
   }
+  _cond.update(&rdeps()); // CtrlStmt?
   return // propagate_rdeps(_rdeps) ||
      AnalogStmt::update() || ret;
 }
@@ -1657,6 +1665,7 @@ bool AnalogEvtCtlStmt::update()
 {
   trace1("AnalogEvtCtlStmt::update", rdeps_size());
 
+  _ctrl.update(&rdeps());
  // bool rdd = _rhs.update(&_deps->rdeps());
   bool ret = propagate_rdeps(_ctrl.rdeps());
   while(true){

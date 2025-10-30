@@ -459,6 +459,7 @@ public:
   RDeps const& rdeps()const override{ return _rdeps; }
 }; // AnalogSwitchStmt
 /*--------------------------------------------------------------------------*/
+// just code?
 class AnalogConditionalStmt : public AnalogCtrlStmt {
   AnalogConstExpression _cond; // Const?
   AnalogCtrlBlock _false_part;
@@ -467,7 +468,6 @@ public:
     set_owner(o);
     parse(file);
   }
-/*--------------------------------------------------------------------------*/
   ~AnalogConditionalStmt(){ }
 public:
   void parse(CS& file) override;
@@ -476,10 +476,7 @@ public:
   const AnalogCtrlBlock& true_part() const{ return _body; }
   const AnalogCtrlBlock& false_part() const{ return _false_part; }
   bool is_used_in(Base const*)const override;
-  bool update()override {
-    bool ret = _false_part.update();
-    return AnalogCtrlStmt::update() || ret;
-  }
+  bool update()override;
 
   TData const& deps()const override{ return _cond.data(); } // ?
 }; // AnalogConditionalStmt
