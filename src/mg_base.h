@@ -28,6 +28,8 @@
 #include <u_attrib.h>
 #include "mg_error.h"
 /*--------------------------------------------------------------------------*/
+typedef enum{ a_unset, a_input, a_output, a_inout} direction_t;
+/*--------------------------------------------------------------------------*/
 class rdep_tag : public Base{
   virtual void parse(CS&)override { untested();unreachable();}
   virtual void dump(std::ostream&)const override { untested();unreachable();}

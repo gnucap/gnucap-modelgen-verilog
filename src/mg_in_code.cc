@@ -213,7 +213,7 @@ TData const& Assignment::data()const
 /*--------------------------------------------------------------------------*/
 bool Variable_Decl::propagate_deps(Token_VAR_REF const& v)
 {
-  trace2("Variable_Decl::propagate_deps", type(), data().type());
+  trace3("Variable_Decl::propagate_deps", type(), data().type(), v.name());
   assert(v.data());
 
   if(type() != Data_Type_Real()){
@@ -405,6 +405,8 @@ void Assignment::parse(CS& f)
     {
       assert(_token->data());
       assert(_token->scope());
+      trace2("Assignment::parse prop?", _token->name(), data().size());
+      trace1("Assignment::parse prop2", typeid(_lhsref).name());
       _lhsref->propagate_deps(*_token);
       assert(_lhsref->name() == _token->name());
       trace2("parsedone", _token->name(), data().size());
@@ -470,8 +472,10 @@ bool Assignment::update(RDeps const* r)
 
   assert(_token);
   assert(scope());
-
+  assert(_lhsref);
+  trace3("Assignment::update", _lhsref->name(), _token->name(),  Expression_::data().size());
   if (store_deps(Expression_::data())) {
+    trace3("Assignment::update0", _token->name(), _token->deps().size(), Expression_::data().size());
     // something new there.. pass it on.
     // TODO: only pass on what's new..
     assert(_lhsref);
@@ -576,6 +580,8 @@ bool Assignment::propagate_deps(Token_VAR_REF const& from)
   }else{ untested();
     unreachable();
   }
+  assert(_lhsref);
+  trace2("Assignment::propagate_deps", from.name(), _lhsref->name());
   if(type().is_int()) {
   }else if(from.type().is_int()) { untested();
   }else if(from.scope() == scope()) {
@@ -583,6 +589,7 @@ bool Assignment::propagate_deps(Token_VAR_REF const& from)
   }else{
     ret |= store_deps(d);
     assert(_lhsref);
+    trace0("Assignment::propagate_deps1 lhs?");
     ret |= _lhsref->propagate_deps(*_token);
   }
   // if(auto s = dynamic_cast<Statement*>(owner())) { untested();

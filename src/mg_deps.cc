@@ -195,14 +195,21 @@ bool TData::has_sensitivities()const
 /*--------------------------------------------------------------------------*/
 bool Dep::propagate_rdeps_(RDeps const& r) const
 {
-  assert(_prb);
-  return _prb->propagate_rdeps_(r);
+  if(_prb){
+    return _prb->propagate_rdeps_(r);
+  }else{
+    return false;
+    // analog function. probably.
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Dep::set_used_in(Base const* b) const
 {
-  assert(_prb);
-  _prb->set_used_in(b);
+  if(_prb){
+    _prb->set_used_in(b);
+  }else{
+    // analog function. probably.
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

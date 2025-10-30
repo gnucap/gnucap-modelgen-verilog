@@ -5,11 +5,13 @@ module dep0(d, g);
     real a, b;
     input a;
     inout b;
+    // arg 0 a 0
+    // arg 1 b 1 dep a
     begin // always
-      // b : 0
-      // testaf : 0
-      b = a; // s1 r3
-      testaf = a; // s1 r3
+      // b : 1
+      // testaf : 1
+      b = a; // dep: a s1 r3
+      testaf = a; // dep: a s1 r3
     end
   endfunction
 

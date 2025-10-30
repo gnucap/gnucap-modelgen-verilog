@@ -11,6 +11,7 @@
 - seems to crash on V(x) if x is parameter.
 - v_instance: port name issue with case insensitive
 - hsp does not play well with paramset
+- should reject named blocks in analog functions
 
 == simulator plugins
 - missing localparam rules in overload

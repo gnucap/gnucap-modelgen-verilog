@@ -404,9 +404,11 @@ private:
   size_t num_deps() const;
 }; // Token_VAR_REF
 /*--------------------------------------------------------------------------*/
+  // TODO split into Base+DECL
 class Token_ARGUMENT : public Token_VAR_REF {
 public:
   Token * _var{nullptr}; // why not use VAR_REF::_item?
+  direction_t _dir{a_unset};
   Data_Type const& type()const override;
 public:
   explicit Token_ARGUMENT() : Token_VAR_REF("", nullptr){ untested();unreachable();}
@@ -416,11 +418,16 @@ public:
 public: // LiSt
   std::string key() const { untested();unreachable();return "";}
   void set_owner(Base*){ untested();unreachable();}
-  bool is_output()const;
+  void set_dir(direction_t const& t) { _dir = t; }
+  void set_input() {untested(); _dir = a_input; }
+  void set_output() {untested(); _dir = a_output; }
+  void set_inout() {untested(); _dir = a_inout; }
+  bool is_output()const { return _dir==a_output || _dir==a_inout; }
 //protected:
   Base const* item()const {
     return _item;
   }
+  void stack_op(Expression* e)const override;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

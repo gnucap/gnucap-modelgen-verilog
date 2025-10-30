@@ -1090,7 +1090,13 @@ Data_Type const& Token_VAR_REF::type() const
 /*--------------------------------------------------------------------------*/
 bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
 {
-  if(auto dd=dynamic_cast<TData*>(_item)){ untested();
+  if(dynamic_cast<Token_ARGUMENT*>(this)){
+    // BUG: encapsulation problem.
+   auto ad = dynamic_cast<TData*>(_item);
+   assert(ad);
+   ad->update(from.deps());
+  }else if(auto dd=dynamic_cast<TData*>(_item)){ untested();
+    unreachable();
     TData const& incoming = from.deps();
     dd->update(incoming);
     assert(deps().ddeps().size() >= incoming.ddeps().size());
@@ -1104,7 +1110,6 @@ bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
     return p->propagate_deps(from);
   }else if(dynamic_cast<Analog_Function*>(_item)){
   }else if(dynamic_cast<Block const*>(_item)){ untested();
-  }else if(dynamic_cast<Token_ARGUMENT*>(this)){
   }else{
     unreachable();
     // incomplete();
@@ -1205,6 +1210,43 @@ void Token_VAR_DECL::dump(std::ostream& o) const
 void Token_ARGUMENT::dump(std::ostream& o) const
 {
   o << name();
+}
+/*--------------------------------------------------------------------------*/
+// should Token_ARGUMENT be Base?
+void Token_ARGUMENT::stack_op(Expression* e) const
+{
+  auto E = prechecked_cast<Expression_*>(e);
+  assert(E);
+//  assert(_item); // or !reachable
+//  auto oi = prechecked_cast<Owned_Base const*>(_item);
+//  assert(oi);
+  auto scope = E->scope(); // prechecked_cast<Block const*>(oi->owner());
+  assert(scope);
+
+      if(!E->is_empty() && dynamic_cast<Token_PARLIST*>(E->back())){ untested();
+	throw Exception("syntax_error: ...");
+      }else{
+      }
+
+  // Base const* r = scope->lookup(name()); // VAR_REF
+  Base const* r = _var;
+  assert(r!=this);
+  TData const* more = nullptr;
+  if(!r){ untested();
+    unreachable();
+  }else if(auto x = dynamic_cast<Token_VAR_REF const*>(r)){
+    more = &x->deps();
+    assert(more);
+  }else{ untested();
+  }
+
+  {
+    TData* nd = new TData();
+    nd->insert(Dep(this));
+
+    auto nn = new Token_VAR_REF(*this, nd);
+    e->push_back(nn);
+  }
 }
 /*--------------------------------------------------------------------------*/
 Token_VAR_REF* Token_VAR_REF::clone()const

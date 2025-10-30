@@ -51,6 +51,7 @@ public:
   explicit Dep(Base const* t, Probe const* p, dep_order d)
     : _token(t), _prb(p), _order(d) {
   }
+  explicit Dep(Token const* t) : _token(t) { }
 
   int order()const { untested();return _order;}
   bool is_linear()const { return _order<=_LINEAR; }

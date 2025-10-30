@@ -125,8 +125,8 @@ void OUT_ANALOG::make_real_variable(std::ostream& o, Token_VAR_DECL const& v) co
   }else{
     o__ "ddouble _v_" << v.name() << "; // Token_VAR_DECL";
 
-    for(Dep const& i : v.deps().ddeps()) { untested();
-      o__ " Dep: " << probe(i)->code_name() << " lin: " << i.is_linear();
+    for(Dep const& i : v.deps().ddeps()) {
+      o__ " Dep: " << i.name() << " lin: " << i.is_linear();
     }
     o << "\n";
     //if(options().fpi()){ untested();

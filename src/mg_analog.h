@@ -94,14 +94,11 @@ private:
   }
 }; // Probe
 /*--------------------------------------------------------------------------*/
+// BUG: implementation detail
 class AF_Arg_List : public Owned_Base {
   typedef LiSt<Token_ARGUMENT, '\0', ',', ';'> list_t;
   typedef list_t::const_iterator const_iterator;
-  enum{
-    a_input,
-    a_output,
-    a_inout
-  } _direction;
+  direction_t _direction;
   list_t _l;
 public:
   explicit AF_Arg_List(CS& cmd, Block* owner) : Owned_Base() {
@@ -178,7 +175,8 @@ public:
 /*--------------------------------------------------------------------------*/
 class AnalogFunctionArgs : public Block {
   Variable_List_Collection _variables;
-  std::vector<Token const*> _arg_by_idx; // Expression?
+  std::vector<Token*> _arg_by_idx; // Expression?
+  std::vector<TData*> _data;
 public:
   explicit AnalogFunctionArgs();
 public: // can't resolve these..
@@ -186,9 +184,11 @@ public: // can't resolve these..
                                        return _arg_by_idx[i];}
   void push_back(Variable_Stmt* b);
   void parse(CS&)override;
+  void set_deps(Block::map const&);
   bool new_var_ref(Base* what)override;
   void dump(std::ostream& f)const override;
   Base* lookup(std::string const& f, bool recurse=true)override;
+  Token_ARGUMENT* new_arg(std::string const& name, Base* owner);
 };
 /*--------------------------------------------------------------------------*/
 class AnalogFunctionBody : // public AnalogSeqBlock
@@ -309,7 +309,7 @@ class Analog_Function : public /*UserFunction?*/ Statement {
   FUNCTION_ const* _function{nullptr};
   AnalogFunctionArgs _args;
   friend class AnalogFunctionBody; // uuh
-  bool update()override { untested(); return false; }
+  bool update()override;
   std::string _identifier;
 protected:
   AnalogFunctionBody _block;
@@ -328,11 +328,14 @@ public:
     return true;
   }
   bool is_output_arg(int I)const;
+  TData const* arg_data(int I)const; // needed?
+  Token const* arg_token(int I)const;
   Data_Type const* arg_type(int I)const;
 private:
   // parse_identifier?
   void set_identifier(std::string const& name) { _identifier = name; }
-};
+  AnalogFunctionArgs& header() {return _args;}
+}; // Analog_Function
 typedef Collection<Analog_Function> Analog_Functions;
 /*--------------------------------------------------------------------------*/
 class Analog : public Owned_Base {
