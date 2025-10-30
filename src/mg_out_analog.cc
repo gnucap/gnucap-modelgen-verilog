@@ -518,7 +518,7 @@ void OUT_ANALOG::make_af_args(std::ostream& o, const Analog_Function& f) const
       qual = "";
     }
     for(Token_ARGUMENT const* i : *coll){
-      o << sep << cxx_name(&i->type());
+      o << sep << ::code_name(&i->type());
       if(coll->is_output()){
 	o << "&";
       }else{

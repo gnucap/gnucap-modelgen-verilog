@@ -19,11 +19,9 @@ public:
   operator bool() const {return _type!=t_default;}
   bool operator==(Data_Type const& o)const { return _type == o._type;}
   bool operator!=(Data_Type const& o)const { return !operator==(o);}
-  std::string cxx_name()const {
-    static std::string names[] = {"??", "ddouble", "integer", "std::string"};
-    return names[_type];
-  }
 };
+/*--------------------------------------------------------------------------*/
+char const* code_name(Data_Type const*x);
 /*--------------------------------------------------------------------------*/
 class Data_Type_Real : public Data_Type{
 public:

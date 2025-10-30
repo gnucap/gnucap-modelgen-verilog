@@ -201,6 +201,30 @@ void Variable_Decl::dump(std::ostream& o)const
   }
 }
 /*--------------------------------------------------------------------------*/
+bool is_output_var(tag_t t)
+{
+  if(attr.has_attributes(t)) {
+    ATTRIB_LIST_p const& a = attr.attributes(t);
+    if(   a->operator[](std::string("desc")) != "0"
+	||a->operator[](std::string("units")) != "0") {
+      return true;
+    }else{
+    }
+  }else{
+  }
+  return false;
+}
+/*--------------------------------------------------------------------------*/
+bool Assignment::is_output_var() const
+{
+  return :: is_output_var(tag_t(_lhsref));
+}
+/*--------------------------------------------------------------------------*/
+bool Assignment::is_state_var() const
+{
+  return _lhsref->is_state_var();
+}
+/*--------------------------------------------------------------------------*/
 TData const& Assignment::data()const
 {
   if(_token){
@@ -209,6 +233,24 @@ TData const& Assignment::data()const
   }
   assert(_data);
   return *_data;
+}
+/*--------------------------------------------------------------------------*/
+void Variable_Decl::new_data()
+{
+  assert(owner());
+  auto l = prechecked_cast<Variable_Stmt const*>(owner());
+  assert(l);
+  Module const* mod = dynamic_cast<Module const*>(l->owner()); // scope?
+  Variable_List_Collection const* p=nullptr;
+  if(!mod){ untested();
+  }else if(is_output_var(tag_t(this))) { untested();
+    // todo: tag?
+    p = &mod->variables();
+    (void)p;
+    // set_rdep(tag_probe);
+  }else{
+  }
+  _data = new TData();
 }
 /*--------------------------------------------------------------------------*/
 bool Variable_Decl::propagate_deps(Token_VAR_REF const& v)

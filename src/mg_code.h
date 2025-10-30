@@ -307,27 +307,6 @@ inline bool Statement::is_used_in(Base const* b) const
   return false;
 }
 /*--------------------------------------------------------------------------*/
-inline std::string cxx_name(Data_Type const*x)
-{
-  if(!x) { untested();
-    return "??";
-  }else{
-    return x->cxx_name();
-  }
-#if 0 // ?
-  else if(x->is_real()) { untested();
-    return "ddouble";
-  }else if(x->is_int()) { untested();
-    return "int";
-  }else if(x->is_string()) { untested();
-    return "std::string";
-  }else{ untested();
-    unreachable();
-    return "??";
-  }
-#endif
-}
-/*--------------------------------------------------------------------------*/
 class System_Task : public Statement {
   Expression_ _e; // Analog?
   RDeps _rdeps;

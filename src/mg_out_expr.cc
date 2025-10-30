@@ -626,7 +626,7 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
       int ii = int(argnames.size())-nn-1;
       o << comma; //  << "/* arg " << nn << "*/";
       if((*F)->is_output_arg(nn)){
-	o << "io_arg(" << cxx_name((*F)->arg_type(nn)) << "(), " << argnames[ii] << ")";
+	o << "io_arg(" << ::code_name((*F)->arg_type(nn)) << "(), " << argnames[ii] << ")";
       }else{
 	o << argnames[ii];
       }

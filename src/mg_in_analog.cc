@@ -1768,7 +1768,7 @@ public:
       assert(coll);
 
       for(Token_ARGUMENT const* i : *coll){
-	o << sep << cxx_name(&i->type());
+	o << sep << ::code_name(&i->type());
 
 	if(coll->is_output()){
 	  o << "&";
