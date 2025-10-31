@@ -434,7 +434,7 @@ static std::string expand_macro(CS& file, Define_List const& d)
     Define_List::const_iterator x = d.find(String_Arg(token));
     if (x != d.end()) {
       assert(*x);
-      auto values = eval_args(file, (*x)->num_args(), d);
+      String_Arg_List values = eval_args(file, (*x)->num_args(), d);
       std::string subst = (*x)->substitute(values, d);
       stripped_file += subst; //  + "\n";
     }else{
@@ -725,6 +725,7 @@ void Preprocessor::parse(CS& file)
   for (;;) {
     append_to(file, _stripped_file, "\"/`");
     if (!file.ns_more()){
+      _stripped_file += "\n";
     }else if (file >> quoted_string) {
       _stripped_file += quoted_string.val_string();
     }else if (file >> "/*") /* C comment */ {
@@ -749,8 +750,7 @@ void Preprocessor::parse(CS& file)
     }else if (file >> "`include") {
       std::string include_file_name;
       file >> include_file_name;
-//      _stripped_file += 
-	include(include_file_name);
+      include(include_file_name);
     }else if (file >> "`ifdef") {
       Define_List::const_iterator x = define_list().find(file);
       if (x != define_list().end()) {
@@ -811,25 +811,28 @@ void Preprocessor::parse(CS& file)
       Define_List::const_iterator x = define_list().find(id);
       if (x != define_list().end()) {
 	assert(*x);
-	auto values = eval_args(file, (*x)->num_args(), define_list());
+	String_Arg_List values = eval_args(file, (*x)->num_args(), define_list());
 	std::string subst = (*x)->substitute(values, define_list());
 	trace1("match macro", subst);
-	_stripped_file += subst + " ";
+	_stripped_file += subst;
       }else{
 	throw Exception_CS("undefined macro", file);
+      }
+      if (!file.ns_more()) { untested();
+	_stripped_file += '\n';
+      }else if(isgraph(file.peek())) {
+	_stripped_file += ' ';
+      }else{
       }
     }else if (file.skip1('/')) {
       _stripped_file += "/";
     }else{ untested();
       unreachable();
-//      _stripped_file += "\n";
-      // move on, just copy
     }
 
     if (!file.ns_more()) {
       try {
 	getline_(file);
-	_stripped_file += "\n";
       }catch (Exception_End_Of_Input const&) {
 	break;
       }

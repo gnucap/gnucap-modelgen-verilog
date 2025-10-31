@@ -2,7 +2,7 @@
 
 
 
-
-
- $write("abc1.\n"); 
- $write("abc2.n"); 
+ $write("abc1.\n");
+ $write("abc2.n");
+ $write("abc2.n"); a
+ $write("abc2.n");

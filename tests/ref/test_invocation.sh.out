@@ -11,11 +11,6 @@ endmodule;
 
 
 
-
-
-
-
-
 nature current
   access = I;
   units = "A";
@@ -32,7 +27,6 @@ discipline electrical
   potential voltage;
   flow current;
 enddiscipline
-
 
 
 module conductor0 (p, n);

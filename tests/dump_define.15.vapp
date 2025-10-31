@@ -6,3 +6,5 @@ $write("abc2.\n");
 
 `STRING1(1,2,3)
 `STRING2(1,2,3)
+`STRING2(1,2,3) a
+`STRING2(1,2,3)
