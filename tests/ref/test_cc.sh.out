@@ -77,6 +77,8 @@ typedef int integer;
 
 template<int numderiv>
 class ddouble_ {
+  typedef PARAMETER<double> Pdbl;
+  typedef PARAMETER<int> Pint;
 protected:
   double _data[1+numderiv];
 public:
@@ -87,7 +89,8 @@ public:
   // fixme: implicit conversion in af args..
   /*explicit*/ ddouble_(int const& d) { clear(); *_data = d; }
   /*explicit*/ ddouble_(double const& d) { clear(); *_data = d; }
-  /*explicit*/ ddouble_(PARAMETER<double> const& d) { clear(); *_data = d; }
+  /*explicit*/ ddouble_(Pdbl const& d) { clear(); *_data = d; }
+  /*explicit*/ ddouble_(Pint const& d) { clear(); *_data = d; }
   void set_all_deps() {
     std::fill_n(_data+1, numderiv, 0.);
   }
@@ -117,7 +120,13 @@ public:
     return *this;
   }
 #endif
-  ddouble_& operator=(PARAMETER<double> const& o) {
+  ddouble_& operator=(Pdbl const& o) {
+    assert(o == o);
+    *_data = o;
+    reset_deriv();
+    return *this;
+  }
+  ddouble_& operator=(Pint const& o) {
     assert(o == o);
     *_data = o;
     reset_deriv();
@@ -319,6 +328,11 @@ public:
     ret *= (double)o;
     return ret;
   }
+  ddouble_ operator*(Pint const& o) const {
+    ddouble_ ret = *this;
+    ret *= (double)o;
+    return ret;
+  }
 
 
   ddouble_& operator/=(ddouble_ const& o) {
@@ -485,7 +499,7 @@ template<int T>
 ddouble_<T> operator*(PARAMETER<int> const& a, ddouble_<T> const& b)
 {
   ddouble_<T> c(b);
-  c *= a;
+  c *= double(a);
   return c;
 }
 
@@ -4141,6 +4155,8 @@ typedef int integer;
 
 template<int numderiv>
 class ddouble_ {
+  typedef PARAMETER<double> Pdbl;
+  typedef PARAMETER<int> Pint;
 protected:
   double _data[1+numderiv];
 public:
@@ -4151,7 +4167,8 @@ public:
   // fixme: implicit conversion in af args..
   /*explicit*/ ddouble_(int const& d) { clear(); *_data = d; }
   /*explicit*/ ddouble_(double const& d) { clear(); *_data = d; }
-  /*explicit*/ ddouble_(PARAMETER<double> const& d) { clear(); *_data = d; }
+  /*explicit*/ ddouble_(Pdbl const& d) { clear(); *_data = d; }
+  /*explicit*/ ddouble_(Pint const& d) { clear(); *_data = d; }
   void set_all_deps() {
     std::fill_n(_data+1, numderiv, 0.);
   }
@@ -4181,7 +4198,13 @@ public:
     return *this;
   }
 #endif
-  ddouble_& operator=(PARAMETER<double> const& o) {
+  ddouble_& operator=(Pdbl const& o) {
+    assert(o == o);
+    *_data = o;
+    reset_deriv();
+    return *this;
+  }
+  ddouble_& operator=(Pint const& o) {
     assert(o == o);
     *_data = o;
     reset_deriv();
@@ -4383,6 +4406,11 @@ public:
     ret *= (double)o;
     return ret;
   }
+  ddouble_ operator*(Pint const& o) const {
+    ddouble_ ret = *this;
+    ret *= (double)o;
+    return ret;
+  }
 
 
   ddouble_& operator/=(ddouble_ const& o) {
@@ -4549,7 +4577,7 @@ template<int T>
 ddouble_<T> operator*(PARAMETER<int> const& a, ddouble_<T> const& b)
 {
   ddouble_<T> c(b);
-  c *= a;
+  c *= double(a);
   return c;
 }
 

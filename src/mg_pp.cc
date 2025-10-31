@@ -818,7 +818,7 @@ void Preprocessor::parse(CS& file)
       }else{
 	throw Exception_CS("undefined macro", file);
       }
-      if (!file.ns_more()) { untested();
+      if (!file.ns_more()) {
 	_stripped_file += '\n';
       }else if(isgraph(file.peek())) {
 	_stripped_file += ' ';
