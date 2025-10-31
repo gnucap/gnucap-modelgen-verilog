@@ -750,7 +750,7 @@ public:
     o__ "template<class T, class S>\n";
     o__ "typename va::ddouble_if<T, S>::type " << code_name() << "(T b, S e)const {\n";
     o____ "typedef typename va::ddouble_if<T, S>::type ret_t;\n";
-    o____ "ret_t ret(b);\n";
+    o____ "ret_t ret; ret = b;\n";
     o____ "assert(b==b);\n";
     o____ "assert(e==e);\n";
     o____ "double p;\n";
@@ -775,7 +775,7 @@ public:
     o____ "::set_value(ret, p);\n";
     o____ "::set_value(e, 0.);\n";
 //    o____ "ret = b;\n";
-    o____ "ret += ret_t(e);\n";
+    o____ "ret = ret + ret_t(e);\n";
     o____ "return ret;\n";
     o__ "}\n";
   }
