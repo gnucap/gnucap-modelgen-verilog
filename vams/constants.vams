@@ -30,6 +30,10 @@
 `define P_Q_NIST2018 1.602176634e-19
 `define P_K_NIST2018 1.380649e-23
 
+// from https://physics.nist.gov/cuu/pdf/all_1998.pdf
+`define P_Q_NIST1998 = 1.602176462e-19;
+`define P_K_NIST1998 = 1.3806503e-23;
+
 // extra physical constants from constant.h
 `define P_EPS_SI 11.7*`P_EPS0 // permittivity of silicon (1.0359e-10)
 `define P_EPS_OX 3.9*`P_EPS0  // permittivity of oxide (3.45e-11)
