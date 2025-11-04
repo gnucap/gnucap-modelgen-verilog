@@ -22,12 +22,13 @@ or     8.3337e-08 1.00002
  415.79E-9  1.0095     6.        
  416.67E-9  1.         5.        
  416.67E-9  0.99997    2.        
-or dbg 5e-07 1.30777e-14
-or     5e-07 1.30777e-14
-or dbg 5e-07 -1.30777e-14
-or     5e-07 -1.30777e-14
- 500.E-9   -13.E-15    6.        
+ 500.E-9    1.E-15     6.        
+or dbg 5.00002e-07 2.51327e-05
+or     5.00002e-07 2.51327e-05
+or dbg 5.00002e-07 -2.51327e-05
+or     5.00002e-07 -2.51327e-05
  500.E-9   -25.133E-6  3.        
+ 500.E-9   -50.265E-6  3.        
  579.58E-9 -0.95885    3.        
  582.99E-9 -0.99628    3.        
  583.33E-9 -0.99997    3.        
@@ -43,13 +44,9 @@ or     5.83337e-07 1.00002
  916.23E-9 -1.0047     6.        
  916.67E-9 -1.         5.        
  916.67E-9 -0.99997    2.        
-or dbg 1e-06 -2.61934e-14
-or     1e-06 -2.61934e-14
-or dbg 1e-06 2.61934e-14
-or     1e-06 2.61934e-14
- 1.E-6      26.E-15    3.        
+ 1.E-6     -2.E-15     3.        
 Gnucap   System status
-iterations: op=0, dc=3, tran=114, fourier=0, total=158
-transient timesteps: accepted=32, rejected=9, total=41
+iterations: op=0, dc=3, tran=117, fourier=0, total=162
+transient timesteps: accepted=33, rejected=9, total=42
 nodes: user=1, subckt=0, model=1, total=2
 dctran density=75.0%, ac density=75.0%

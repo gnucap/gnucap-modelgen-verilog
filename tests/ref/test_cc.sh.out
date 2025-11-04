@@ -3152,7 +3152,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
           ddouble t1;
           //t1.set_no_deps();
           //t1[d_potential_b_white_noise_0_p_] = 0.; // (output dep)
-          t1 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24; // (703)
+          t1 = (_p_noisy) /*rhspar*/ *  55.2260200000000001E-24; // (703)
           t1 = t1 * _v_g/*rhsvar*/; // (703)
           ddouble t2;
           //t2.set_no_deps();
@@ -3432,7 +3432,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
           ddouble t1;
           //t1.set_no_deps();
           //t1[d_potential_b_white_noise_0_p_] = 0.; // (output dep)
-          t1 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24; // (703)
+          t1 = (_p_noisy) /*rhspar*/ *  55.2260200000000001E-24; // (703)
           t1 = t1 * _v_g/*rhsvar*/; // (703)
           ddouble t2;
           //t2.set_no_deps();
@@ -3565,7 +3565,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
           ddouble t1;
           //t1.set_no_deps();
           //t1[d_potential_b_white_noise_0_p_] = 0.; // (output dep)
-          t1 = (_p_noisy) /*rhspar*/ *  55.22602000000000899E-24; // (703)
+          t1 = (_p_noisy) /*rhspar*/ *  55.2260200000000001E-24; // (703)
           t1 = t1 * _v_g/*rhsvar*/; // (703)
           ddouble t2;
           //t2.set_no_deps();

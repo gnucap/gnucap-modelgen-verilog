@@ -35,8 +35,8 @@ open circuit: internal node 5
 @tr_advance:qgs 1e-12
 @tr_eval:qgs 1e-12
 @tr_eval:qgs 1e-12
-@tr_accept:qgs 2.27374e-19
- 2.p       -0.99993   -0.99993    227.E-21  
+@tr_accept:qgs 0
+ 2.p       -0.99993   -0.99993    0.        
 @precalc:qgs 0
 #Freq       vm(1)      vm(2)      vp(1)      vp(2)     
  1.         1.         0.99998   -3.5999u   -0.36      
