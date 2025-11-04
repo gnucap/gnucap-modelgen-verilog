@@ -6,10 +6,14 @@ module dep0(d, g);
     // T : 1
     // U : 1
     // X : 1
-    real T;
-    real S;
-    real U;
-    real X;
+    real T// [] *
+;
+    real S// [] *
+;
+    real U// [] +
+;
+    real X// [] +
+;
     while (1) begin
       // S : 1
       // T : 1

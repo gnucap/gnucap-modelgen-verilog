@@ -1,0 +1,34 @@
+
+attach ./modelgen_0.so
+
+
+verilog
+
+`modelgen
+module test_seq0(p, n);
+	electrical p, n;
+	inout p, n;
+	parameter real v=0;
+	analog begin : main
+		real i;
+		i = 2*v;
+		V(p,n) <+ i;
+		i = -v;
+		V(p,n) <+ i;
+	end
+endmodule
+
+list
+
+!make test_seq0.so > /dev/null
+attach ./test_seq0.so
+
+test_seq0 #(.v(1)) dut(\1 ,\0 );
+test_seq0 #(.v(2)) dut(\2 ,\0 );
+test_seq0 #(.v(3)) dut(\3 ,\0 );
+
+list
+
+print dc v(nodes) iter(0)
+dc
+end

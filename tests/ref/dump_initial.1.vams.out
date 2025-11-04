@@ -1,5 +1,6 @@
 module test();
-  real T;
+  real T// [] *
+;
 
   analog   initial begin
     // T : 0

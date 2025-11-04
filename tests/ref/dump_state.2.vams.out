@@ -1,0 +1,30 @@
+// paramsets
+module st1(p);
+  electrical p;
+  localparam real __x = 1;
+
+  analog begin : main // always
+    // c : 0
+    real c// [] +
+;
+    if (1) begin // always
+      // c : 0
+      c = (c + 1); // s2 r3
+    end
+  end
+
+endmodule
+module st0(p);
+  electrical p;
+  localparam real __x = 0;
+
+  analog begin : main // always
+    // c : 0
+    real c// [] 
+;
+    if (0) begin // never
+    end
+  end
+
+endmodule
+

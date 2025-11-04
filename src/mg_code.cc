@@ -130,6 +130,11 @@ Variable_Decl* Variable_Decl::deep_copy(Base* b, std::string s) const
   if(n->_token->data()){
   }else{ untested();
   }
+
+  if(_stt.is_override()){
+    n->_stt = _stt;
+  }else{
+  }
   return n;
 }
 /*--------------------------------------------------------------------------*/

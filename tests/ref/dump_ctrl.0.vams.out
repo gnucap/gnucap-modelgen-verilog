@@ -3,7 +3,10 @@ module cond0(p, n);
     // S : 0
     // T : 0
     // U : 0
-    real S, T, U;
+    real S// [] *
+, T// [] 
+, U// [] 
+;
     if ( 1.) begin
     end
     if (((S + 1) == 3)) begin
@@ -16,7 +19,8 @@ endmodule
 module cond1(p, n);
   analog begin : main // always
     // S : 0
-    real S;
+    real S// [] -
+;
     if (1) begin // always
       // S : 0
       S = 3; // s1 r3
@@ -42,8 +46,10 @@ module cond2(p, n);
   analog begin : main // always
     // S : 0
     // T : 0
-    real S;
-    real T;
+    real S// [] 
+;
+    real T// [] -
+;
     if (0) begin // never
       // S : 0
       S = 1; // --
@@ -67,8 +73,10 @@ module cond3(p, n);
   analog begin : main // always
     // S : 0
     // T : 0
-    real S;
-    real T;
+    real S// [] -
+;
+    real T// [] +
+;
     if (1) begin // always
       if (2) begin // always
         // S : 0
@@ -125,8 +133,10 @@ module cond4(p, n);
   analog begin : main // always
     // S : 0
     // T : 0
-    real S;
-    real T;
+    real S// [] 
+;
+    real T// [] 
+;
     if (1) begin // always
       if (2) begin
       end
@@ -139,9 +149,12 @@ module cond5(p, n);
     // S : 0
     // T : 0
     // i : 0
-    real S;
-    real T;
-    integer i;
+    real S// [] 
+;
+    real T// [] 
+;
+    integer i// [] +
+;
     i = 1; // s1 r3
     if (i) begin
       // i : 0

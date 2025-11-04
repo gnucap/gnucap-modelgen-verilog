@@ -4,8 +4,10 @@ module dep0(d, g);
   analog begin : main // always
     // T : 0
     // c : 0
-    real c;
-    integer T;
+    real c// [] +
+;
+    integer T// [] +
+;
     T = V(g); // s1 r4
     c = T; // s2 r4
     I(d) <+ c; // s2 r1

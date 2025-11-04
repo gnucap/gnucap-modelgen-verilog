@@ -1,0 +1,15 @@
+module st(p);
+  inout p;
+  electrical p;
+  analog begin : main // always
+    // c : 0
+    real c// [] 
+;
+    if (0) begin // never
+    end
+  end
+
+endmodule
+
+
+

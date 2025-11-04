@@ -118,6 +118,56 @@ public:
 /*--------------------------------------------------------------------------*/
 class Token_VAR_REF;
 /*--------------------------------------------------------------------------*/
+// keep track of storage type..
+// a variable that is used before it is set is a state variable.
+// a variable that is not a state variable that is set after it has
+// been used is a temporary
+class STORAGE_TYPE {
+  typedef enum {
+    s_unknown = 0,
+    s_set = 1,
+    s_used = 2,
+    s_tmp = 3,
+    s_state = 4
+  } state_t;
+  state_t _actual{s_unknown};
+  state_t _override{s_unknown};
+  bool _assert{false};
+public:
+  void set();
+  void use();
+public: // attributes
+  void override_set()   {untested(); _override = s_set;}
+  void override_state() { _override = s_state;}
+  void override_tmp()   { _override = s_tmp;}
+
+public: // query
+  bool is_state()const {
+    if(is_override()){
+      return _override == s_state;
+    }else{
+      return _actual == s_state;
+    }
+  }
+  bool is_temporary()const {
+    if(is_override()){
+      return _override == s_tmp;
+    }else{
+      return _actual == s_tmp;
+    }
+  }
+  bool is_common()const {
+    if(is_override()){
+      return _override == s_set
+	||   _override == s_used;
+    }else{
+      return _actual == s_set
+	||   _actual == s_used;
+    }
+  }
+  bool is_override()const      { return _override;}
+};
+/*--------------------------------------------------------------------------*/
 class Token_PROBE; //bug?
 class Node;
 class TData;
@@ -126,6 +176,7 @@ class Variable_Decl : public Expression_ {
   Token_VAR_REF* _token{nullptr};
   RDeps _rdeps; // Expression_?
   std::string /*TODO*/ _dimensions;
+  STORAGE_TYPE _stt;
 public:
   explicit Variable_Decl() : Expression_() { }
   ~Variable_Decl();
@@ -143,7 +194,13 @@ public:
   void set_type(Data_Type const& d){ if(_data){ _data->set_type(d); }else{ /*huh?*/ } }
   bool propagate_deps(Token_VAR_REF const&);
   bool propagate_rdeps(RDeps const&);
+public: // query storage
+  bool is_common()const;
+  bool is_temporary()const;
   bool is_state_var()const;
+public: // manipulate storage
+  void assign_var() {_stt.set();}
+  void use_var() {_stt.use();}
 protected:
   void clear_deps();
 private:
@@ -220,6 +277,7 @@ public:
   void parse(CS& cmd) override;
   void dump(std::ostream&)const override;
   bool propagate_deps(Token_VAR_REF const&);
+  bool propagate_rdeps(RDeps const& incoming);
  // bool update();
   bool update(RDeps const* r=nullptr);
 
@@ -231,8 +289,13 @@ public:
   bool is_used_in(Base const*b)const;
   bool is_used()const;
   operator bool() const {return _token;}
-  bool is_output_var()const;
+  bool is_output_var()const; // BUG
   bool is_state_var()const;
+  bool is_common()const;
+  bool is_temporary()const;
+public: // storage
+  void assign_var()const;
+  void use_var()const;
 private: // implementation
   bool store_deps(TData const&);
   std::string code_name()const;

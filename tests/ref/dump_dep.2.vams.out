@@ -5,9 +5,12 @@ module dep0(d, g);
     // T : 0
     // c : 0
     // d : 1
-    real c;
-    real d;
-    real T;
+    real c// [] *
+;
+    real d// [] +
+;
+    real T// [] *
+;
     while (1) begin
       // T : 1
       // c : 1
@@ -27,7 +30,7 @@ module dep1(out0, out1, in0, in1);
   branch (in0, in1) in;
   parameter real pp = -100.;
 
-  real vfwd// dep V(ddt_0_p)
+  real vfwd// [V(ddt_0_p)] +
 ;
 
   analog begin // always

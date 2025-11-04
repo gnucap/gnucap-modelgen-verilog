@@ -5,9 +5,12 @@ module dep0(d, g);
     // S : 0
     // T : 1
     // U : 1
-    real T;
-    real S;
-    real U;
+    real T// [] +
+;
+    real S// [] *
+;
+    real U// [] +
+;
     T = T; // dep: V(g) s4 r3
     U = T; // dep: V(g) s5 r3
     while (1) begin

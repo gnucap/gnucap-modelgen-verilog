@@ -1,0 +1,34 @@
+// paramsets
+module st1(p);
+  electrical p;
+  localparam real __x = 1;
+
+  analog begin : main // always
+    // c : 0
+    (* _state *)
+    real c// [] *
+;
+    if (1) begin // always
+      // c : 0
+      c = (c + 1); // s2 r4
+    end
+    V(p) <+ c; // s2 r1
+  end
+
+endmodule
+module st0(p);
+  electrical p;
+  localparam real __x = 0;
+
+  analog begin : main // always
+    // c : 0
+    (* _state *)
+    real c// [] *
+;
+    if (0) begin // never
+    end
+    V(p) <+ c; // s1 r1
+  end
+
+endmodule
+

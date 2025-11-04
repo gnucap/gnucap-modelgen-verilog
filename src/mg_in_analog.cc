@@ -555,7 +555,7 @@ bool AnalogWhileStmt::update()
 {
 //  _ctrl?
   bool ret = false;
-  while(true){ itested();
+  while(true){
     trace0("AnalogWhileStmt::update");
     _body.clear_vars();
     if (_body.update()){
@@ -940,6 +940,7 @@ static void parse_block_variables(CS& f, Variable_List_Collection& P)
 {
   for (;;) {
     trace1("AnalogSeqBlock::parse loop", f.tail().substr(0,20));
+    parse_attributes(f, &f);
     if( 0 // || ((f >> "parameter ") && (f >> _parameters))
 	|| ((f >> "real ") && (f >> P))
 	|| ((f >> "integer ") && (f >> P))) {
@@ -948,7 +949,12 @@ static void parse_block_variables(CS& f, Variable_List_Collection& P)
 	f.skip();
       }else{
       }
+    }else if (attr.has_attributes(tag_t(&f))) { untested();
+      f.warn(bWARNING, "dangling attributes "
+	   + attr.attributes(tag_t(&f))->string(tag_t(nullptr)));
+      break;
     }else{
+      // break if stuck?
       break;
     }
   }
@@ -2815,6 +2821,8 @@ AnalogStmt::~AnalogStmt()
 // propagate individually?
 bool AnalogProceduralAssignment::propagate_rdeps(RDeps const& r)
 {
+  _a.propagate_rdeps(r);
+#if 1 // movt to Assignment::propagate_rdeps?
   assert(owner());
   auto s = dynamic_cast<Statement*>(owner_());
   if(s){
@@ -2825,6 +2833,7 @@ bool AnalogProceduralAssignment::propagate_rdeps(RDeps const& r)
     ret |= propagate_rdep(n);
   }
   return ret;
+#endif
 }
 /*--------------------------------------------------------------------------*/
 bool Probe::propagate_rdeps_(RDeps const& r) const

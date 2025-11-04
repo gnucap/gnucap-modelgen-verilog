@@ -2,8 +2,10 @@ module foo(p, x);
   inout p;
   electrical p;
   electrical x;
-  real A, B;
-  real y// dep V(p)
+  real A// [] -
+, B// [] +
+;
+  real y// [V(p)] +
 ;
 
   analog begin : main // always
@@ -11,7 +13,8 @@ module foo(p, x);
     // B : 0
     // C : 0
     // y : 0
-    real C;
+    real C// [] +
+;
     A = 1; // s1 r5
     B = A; // s2 r5
     C = B; // s3 r5

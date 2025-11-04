@@ -1187,7 +1187,7 @@ void OUT_ANALOG::make_load_block_variables(std::ostream& o, const
       Variable_Decl const* V = *p;
       assert(V);
 
-      if(V->is_state_var()){
+      if(1 || V->is_state_var()){
 	make_one_variable_load(o, V->token());
       }else{ untested();
 	make_one_local_var(o, V->token());

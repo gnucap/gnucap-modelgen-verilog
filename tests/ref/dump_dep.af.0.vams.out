@@ -2,7 +2,9 @@ module dep0(d, g);
   inout d, g;
   electrical d, g;
   analog function real testaf;
-    real a, b;
+    real a// [] 
+, b// [] 
+;
     input a;
     inout b;
     // arg 0 a 0
@@ -19,9 +21,12 @@ module dep0(d, g);
     // a : 0
     // b : 0
     // c : 0
-    real a;
-    real b;
-    real c;
+    real a// [] +
+;
+    real b// [] *
+;
+    real c// [] +
+;
     begin
     // a : 1
     // c : 1

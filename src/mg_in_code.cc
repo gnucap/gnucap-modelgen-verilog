@@ -140,7 +140,10 @@ void Variable_Decl::update()
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::parse(CS& f)
 {
-  f >> ','; // ?? BUG.
+  if(f >> ',') { untested();
+    // ?? BUG.
+  }else{
+  }
   assert(owner());
   assert(!_data);
   assert(!_token);
@@ -170,14 +173,30 @@ void Variable_Decl::parse(CS& f)
   assert(l->type());
   set_type(l->type());
 
-  trace2("already declared?", name, l->type());
   if(l->scope()->new_var_ref(_token)){
   }else{
     throw Exception_CS_("already declared", f);
   }
 
   if(attr.has_attributes(tag_t(&f))) {
-    attr.set_attributes(tag_t(_token)) = attr.attributes(tag_t(&f));
+    ATTRIB_LIST_p const& a = attr.attributes(tag_t(&f));
+    attr.set_attributes(tag_t(_token)) = a;
+    if(  a->operator[]("_state ") != "0"
+      || a->operator[]("desc ") != "0"
+      || a->operator[]("units ") != "0" ){
+      _stt.override_state();
+      if(a->operator[]("_nostate ") != "0" ){ untested();
+	incomplete(); // conflicting request.
+      }else if(a->operator[]("_common ") != "0" ){ untested();
+	incomplete(); // conflicting request.
+      }else{
+      }
+    }else if(a->operator[]("_common ") != "0" ){ untested();
+      _stt.override_set();
+    }else if(a->operator[]("_nostate ") != "0" ){ untested();
+      _stt.override_tmp();
+    }else{
+    }
   }else{
   }
 }
@@ -191,12 +210,25 @@ void Variable_Decl::dump(std::ostream& o)const
   }else{
   }
   if(options().dump_annotate()){
-    std::string nl;
-    for(Dep const& d : deps().ddeps()){
-      o << "// dep " << d.name();
-      nl = "\n";
+    o << "// [";
+    if(deps().ddeps().size()){
+      std::string sep;
+      for(Dep const& d : deps().ddeps()){
+	o << sep << d.name();
+	sep = ",";
+      }
+    }else{
     }
-    o << nl;
+    o << "] ";
+    if(is_state_var()){
+      o << '*';
+    }else if(is_temporary()){
+      o << '+';
+    }else if(is_common()){
+      o << '-';
+    }else{
+    }
+    o << '\n';
   }else{
   }
 }
@@ -222,7 +254,20 @@ bool Assignment::is_output_var() const
 /*--------------------------------------------------------------------------*/
 bool Assignment::is_state_var() const
 {
+  assert(_lhsref);
   return _lhsref->is_state_var();
+}
+/*--------------------------------------------------------------------------*/
+bool Assignment::is_common() const
+{
+  assert(_lhsref);
+  return _lhsref->is_common();
+}
+/*--------------------------------------------------------------------------*/
+bool Assignment::is_temporary() const
+{
+  assert(_lhsref);
+  return _lhsref->is_temporary();
 }
 /*--------------------------------------------------------------------------*/
 TData const& Assignment::data()const
@@ -275,8 +320,17 @@ bool Variable_Decl::propagate_deps(Token_VAR_REF const& v)
   return false;
 }
 /*--------------------------------------------------------------------------*/
+bool Assignment::propagate_rdeps(RDeps const& incoming)
+{
+  (void)incoming;
+  // incomplete. cf analogprocassign
+  _lhsref->use_var();
+  return false;
+}
+/*--------------------------------------------------------------------------*/
 bool Variable_Decl::propagate_rdeps(RDeps const& incoming)
 {
+  _stt.use();
   return _rdeps.merge(incoming);
 }
 /*--------------------------------------------------------------------------*/
@@ -288,8 +342,17 @@ bool Variable_Decl::propagate_rdeps(RDeps const& incoming)
 /*--------------------------------------------------------------------------*/
 bool Variable_Decl::is_state_var() const
 {
-  assert(_token);
-  return _token->is_state_var();
+  return _stt.is_state();
+}
+/*--------------------------------------------------------------------------*/
+bool Variable_Decl::is_common() const
+{
+  return _stt.is_common();
+}
+/*--------------------------------------------------------------------------*/
+bool Variable_Decl::is_temporary() const
+{
+  return _stt.is_temporary();
 }
 /*--------------------------------------------------------------------------*/
 bool Variable_Stmt::update()
@@ -433,6 +496,24 @@ void Assignment::parse(CS& f)
     assert(f);
     assert(l->data());
     assert(!_token);
+
+    if(scope()->is_always()) {
+      trace1("assign always", _lhsref->name());
+      _lhsref->assign_var();
+      if(!rhs().is_constant()) {
+	// temporary.
+	_lhsref->use_var();
+	_lhsref->assign_var();
+      }else{
+      }
+
+    }else if(scope()->is_reachable()) {
+      trace1("assign sometimes", _lhsref->name());
+      // kludge. make it a state. need more analysis
+      _lhsref->use_var();
+      _lhsref->assign_var();
+    }
+
     store_deps(Expression_::data());
     assert(_token);
     if(owner()){
@@ -478,6 +559,18 @@ std::string Assignment::code_name() const
 { untested();
   assert(_lhsref);
   return _lhsref->code_name();
+}
+/*--------------------------------------------------------------------------*/
+void Assignment::assign_var() const
+{
+  assert(_lhsref);
+  _lhsref->assign_var();
+}
+/*--------------------------------------------------------------------------*/
+void Assignment::use_var() const
+{
+  assert(_lhsref);
+  _lhsref->use_var();
 }
 /*--------------------------------------------------------------------------*/
 Data_Type const& Assignment::type() const
@@ -718,6 +811,50 @@ bool Statement::propagate_rdeps(RDeps const& r)
     }
   }
   return ret;
+}
+/*--------------------------------------------------------------------------*/
+void STORAGE_TYPE::set()
+{
+  switch(_actual){
+  case s_unknown:
+    _actual = s_set;
+    break;
+  case s_set:
+    break;
+  case s_used:
+    _actual = s_tmp;
+    break;
+  case s_tmp:
+    break;
+  case s_state:
+    break;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void STORAGE_TYPE::use()
+{
+  if(_actual == s_unknown){
+    _actual = s_state;
+  }else if(_actual == s_set){
+    _actual = s_used;
+  }else if(_actual == s_tmp){
+  }else if(_actual == s_state){
+  }else{
+  }
+  switch(_actual){
+  case s_unknown:
+    _actual = s_state;
+    break;
+  case s_set:
+    _actual = s_used;
+    break;
+  case s_used:
+    break;
+  case s_tmp:
+    break;
+  case s_state:
+    break;
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

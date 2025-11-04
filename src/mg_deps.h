@@ -167,6 +167,7 @@ class TData : public Base {
   // R _range; // discrete_deps?
   bool _offset{false}; // -> dynamic_deps.
   bool _constant{false};
+//  bool _set{false};
 public:
   static TData _no_deps;
 public:

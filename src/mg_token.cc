@@ -1065,6 +1065,31 @@ Token* Probe::new_token(Module&, size_t na)const
   return nt;
 } // Probe::new_token
 /*--------------------------------------------------------------------------*/
+void Token_VAR_REF::assign_var()
+{
+  if(auto p = dynamic_cast<Variable_Decl*>(_item)){
+    trace1("assign_var decl", name());
+    p->assign_var();
+  }else if(auto a = dynamic_cast<Assignment*>(_item)){
+    trace1("assign_var assign", name());
+    a->assign_var();
+  }else{
+    // unreachable(); analogfunction
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Token_VAR_REF::use_var()
+{
+  if(auto p = dynamic_cast<Variable_Decl*>(_item)){
+    trace1("use_var decl", name());
+    p->use_var();
+  }else if(auto a = dynamic_cast<Assignment*>(_item)){
+    trace1("use_var assign", name());
+    a->use_var();
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
 TData const& Token_VAR_REF::deps() const
 {
   auto d = prechecked_cast<TData const*>(data());
@@ -1285,7 +1310,20 @@ std::string Token_VAR_REF::long_code_name() const
 /*--------------------------------------------------------------------------*/
 bool Token_VAR_REF::is_state_var() const
 {
-  return true; // TODO
+  // incomplete();
+  return true;
+}
+/*--------------------------------------------------------------------------*/
+bool Token_VAR_REF::is_common() const
+{
+  // incomplete();
+  return false;
+}
+/*--------------------------------------------------------------------------*/
+bool Token_VAR_REF::is_temporary() const
+{
+  // incomplete();
+  return false;
 }
 /*--------------------------------------------------------------------------*/
 inline void Token_PARLIST_::stack_op(Expression* E) const

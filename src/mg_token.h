@@ -391,6 +391,8 @@ public:
   virtual Data_Type const& type()const;
   bool propagate_deps(Token_VAR_REF const&);
   TData const& deps()const;
+  void assign_var();
+  void use_var();
   Block const* scope() const;
   std::string code_name() const { return "_v_"+name(); }
   std::string long_code_name()const;
@@ -400,6 +402,8 @@ public:
   std::string key() const { untested();unreachable();return "";}
   void set_owner(Base*){ untested();unreachable();}
   bool is_state_var()const;
+  bool is_common()const;
+  bool is_temporary()const;
 private:
   size_t num_deps() const;
 }; // Token_VAR_REF

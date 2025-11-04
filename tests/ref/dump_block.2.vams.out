@@ -4,8 +4,11 @@ module test_bug_block1(p, n);
     // G_s : 0
     // ms : 0
     // xgt : 1
-    real xgt, ms;
-    real G_s;
+    real xgt// [] *
+, ms// [] *
+;
+    real G_s// [] *
+;
     begin : A
       if ((abs(xgt) <= ms)) begin
       end
@@ -14,7 +17,8 @@ module test_bug_block1(p, n);
         end
         else begin
           begin : B
-            real N;
+            real N// [] *
+;
           // G_s : 0
           // N : 0
             N = xgt; // s3 r3
