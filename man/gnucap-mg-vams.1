@@ -33,7 +33,7 @@ the order specified at the command line.
 \fI-I path
 Set preprocessor include path, relative to cwd.
 .TP
-\fI-D "name\ value"
+\fI-D "name\ value" | -D name=value
 Set preprocessor constant.
 .TP
 \fI-o "filename"
@@ -86,6 +86,10 @@ Affects --dump. Output (no) source for "paramsets".
 .TP
 \fI--dump-annotate | --nodump-annotate\fI
 Affects --dump. Annotate verilog code. Mostly for testing and debugging.
+
+.TP
+\fI--debug | --log | --trace\fI
+Set error level to "debug", "log" or "trace" respectively.
 
 .TP
 [..] see mg_options.h

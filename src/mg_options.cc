@@ -20,6 +20,7 @@
  * 02110-1301, USA.
  */
 /*--------------------------------------------------------------------------*/
+#include <u_opt.h>
 #include "mg_options.h"
 /*--------------------------------------------------------------------------*/
 // global?
@@ -69,6 +70,18 @@ void Options::parse(CS& f)
       || Get(f, "dump-nature",     &_dump_nature)
       || Get(f, "dump-annotate",   &_dump_annotate)
       || Get(f, "expand-paramset", &_expand_paramset)
+      || Set(f, "nag",		   &OPT::picky,	bNOERROR)
+      || Set(f, "nonag",	   &OPT::picky,	bTRACE)
+      || Set(f, "trace",	   &OPT::picky,	bTRACE)
+      || Set(f, "notrace",	   &OPT::picky,	bLOG)
+      || Set(f, "log",		   &OPT::picky,	bLOG)
+      || Set(f, "nolog",	   &OPT::picky,	bDEBUG)
+      || Set(f, "debug",	   &OPT::picky,	bDEBUG)
+      || Set(f, "nodebug",	   &OPT::picky,	bPICKY)
+      || Set(f, "picky",	   &OPT::picky,	bPICKY)
+      || Set(f, "nopicky",	   &OPT::picky,	bWARNING)
+      || Set(f, "warn{ing}",	   &OPT::picky,	bWARNING)
+      || Set(f, "nowarn",	   &OPT::picky,	bDANGER)
       || (f.check(bWARNING, "what's this?"), f.skiparg());
       ;
 
