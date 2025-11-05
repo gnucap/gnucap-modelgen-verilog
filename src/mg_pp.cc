@@ -363,6 +363,9 @@ void Define::parse(CS& f)
   String_Arg_List args;
   if(f.peek() == '('){
     f >> args;
+  }else if(f.peek() == '='){
+    error(bLOG, "ignoring stray '=' in `define");
+    f.skip();
   }else{
   }
 

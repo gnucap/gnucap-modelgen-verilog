@@ -2,5 +2,5 @@
 
 
 module test;
-parameter real p=(=1 <= 0) ?  1.0000;
-                    ^ ? what's this?
+  parameter real p=(=1 <= 0) ?  1.0000;
+                      ^ ? what's this?

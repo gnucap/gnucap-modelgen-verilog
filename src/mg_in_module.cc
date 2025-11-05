@@ -103,8 +103,8 @@ void Parameter_3::parse(CS& file)
 {
   _default_val.set_owner(owner());
   file >> '.' >> _name >> '(' >> _default_val >> ')' >> ',';
-  if(file){ untested();
-  }else{ untested();
+  if(file){
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/

@@ -381,7 +381,7 @@ void Expression_::parse(CS& f)
 {
   try{
     Expression::parse(f);
-  }catch (Exception_CS const& e){ untested();
+  }catch (Exception_CS const& e){
     // use the other one.
     throw(Exception_CS_("what's this?", f));
   }
