@@ -103,6 +103,9 @@ void Parameter_3::parse(CS& file)
 {
   _default_val.set_owner(owner());
   file >> '.' >> _name >> '(' >> _default_val >> ')' >> ',';
+  if(file){ untested();
+  }else{ untested();
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Parameter_3::dump(std::ostream& out)const
@@ -1347,7 +1350,7 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args_)
 
     import_flags(f);
     t = new Token_CALL(label, cl);
-  }else{
+  }else{ untested();
     unreachable();
   }
 

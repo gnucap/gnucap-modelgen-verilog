@@ -39,6 +39,7 @@ public:
   void resolve_symbols(Expression const& e);
   void set_owner(Base* b);
 //  void set_scope(Block* b){ untested(); _scope = b; }
+  void parse(CS& f)override;
   void dump(std::ostream& out)const override;
 // private:
   Base* owner(){ return _owner; }

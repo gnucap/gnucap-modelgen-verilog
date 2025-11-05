@@ -673,7 +673,7 @@ bool AnalogProceduralAssignment::update()
   trace2("AnalogProceduralAssignment::update", _a.lhs().name(), rdeps().size());
 //  trace1("AnalogProceduralAssignment::update",  _a.data().size());
 #ifdef DO_TRACE
-  for(auto& r : rdeps()){
+  for(auto& r : rdeps()){ untested();
     trace2("AnalogProceduralAssignment::update", _a.lhs().name(), typeid(*r).name());
   }
 #endif
@@ -1707,8 +1707,8 @@ void make_cc_af(std::ostream& o, const Analog_Function& f); // BUG
 /*--------------------------------------------------------------------------*/
 #if 0
 bool Token_ARGUMENT::is_output() const
-{
-  if(auto args = dynamic_cast<AF_Arg_List const*>(item())) {
+{ untested();
+  if(auto args = dynamic_cast<AF_Arg_List const*>(item())) { untested();
     return args->is_output();
   }else{ untested();
     unreachable();
@@ -1860,12 +1860,12 @@ bool Analog_Function::update()
   }
 
 #if 0
-  for(int i=0; i<header().num_args(); ++i) {
+  for(int i=0; i<header().num_args(); ++i) { untested();
     trace2("header arg", i, header().arg_by_idx(i)->name());
   }
 #endif
 
-//   for(auto& p : body().variables()) {
+//   for(auto& p : body().variables()) { untested();
 //     Token* tt = prechecked_cast<Token*>(p.second);
 //     assert(tt);
 //     trace2("blockvar", p.first, tt->name());
@@ -1877,18 +1877,18 @@ bool Analog_Function::update()
 }
 /*--------------------------------------------------------------------------*/
 Token const* Analog_Function::arg_token(int I) const
-{
+{ untested();
   AnalogFunctionArgs const& h = header();
   Token const* t = h.arg_by_idx(I);
   return t;
 }
 /*--------------------------------------------------------------------------*/
 TData const* Analog_Function::arg_data(int I) const
-{
+{ untested();
   Token const* t = arg_token(I);
   auto a = prechecked_cast<Token_ARGUMENT const*>(t);
   assert(a);
-  if(a->_var){
+  if(a->_var){ untested();
     auto ret = prechecked_cast<TData const*>(a->_var->data());
     assert(ret);
     return ret;
@@ -1944,7 +1944,7 @@ void AnalogFunctionArgs::set_deps(Block::map const& m)
   for(auto* t_ : _arg_by_idx){
     auto t = dynamic_cast<Token_ARGUMENT const*>(t_);
     assert(t);
-   // if(!t){
+   // if(!t){ untested();
    //   trace0("AFA::update no arg?");
    // }else
     if(t->is_output()) {
@@ -1980,7 +1980,7 @@ void AnalogFunctionArgs::set_deps(Block::map const& m)
 void AnalogFunctionArgs::push_back(Variable_Stmt* b)
 {
   _variables.push_back(b);
- // for(Variable_Decl const* t : *b){
+ // for(Variable_Decl const* t : *b){ untested();
  //   assert(t);
  // }
 }
@@ -2005,7 +2005,7 @@ Base* AnalogFunctionArgs::lookup(std::string const& k, bool recurse)
     }
   }else if(dynamic_cast<Token_VAR_DECL const*>(b)){
     return nullptr;
-  }else if(dynamic_cast<Token_VAR_REF const*>(b)){
+  }else if(dynamic_cast<Token_VAR_REF const*>(b)){ untested();
     return b;
   }else if(dynamic_cast<Token_NODE const*>(b)){ untested();
       // nodes not allowed here.
@@ -2084,7 +2084,7 @@ void AnalogFunctionArgs::parse(CS& f)
   auto n = new AF_Arg_List(f, this);
   Block::push_back(n);
 
-//  for(Token* p : *n){
+//  for(Token* p : *n){ untested();
 //    _arg_by_idx.push_back(p);
 //  }
 }
@@ -2164,7 +2164,7 @@ bool AnalogFunctionArgs::new_var_ref(Base* b)
     }else{
       return Block::new_var_ref(b);
     }
-  }else if(auto r = dynamic_cast<Token_VAR_REF*>(b)) {
+  }else if(auto r = dynamic_cast<Token_VAR_REF*>(b)) { untested();
     trace1("AF_args::new_var_ref REF", r->name());
     // getting here during update, linking back body var refs
     return Block::new_var_ref(b);

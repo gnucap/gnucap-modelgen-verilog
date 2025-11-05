@@ -308,6 +308,11 @@ void ConstantMinTypMaxExpression::parse(CS& file)
   assert(_e.is_empty());
   Expression_ e;
   file >> e;
+  if(file){
+  }else{
+//    incomplete();
+//    file.warn(bWARNING, "possible syntax error?");
+  }
   assert(_owner);
   _e.set_owner(_owner);
   _e.resolve_symbols(e);
@@ -369,6 +374,16 @@ void ConstExpression::dump(std::ostream& o) const
     o << " inf";
   }else{
     o << _expression;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Expression_::parse(CS& f)
+{
+  try{
+    Expression::parse(f);
+  }catch (Exception_CS const& e){ untested();
+    // use the other one.
+    throw(Exception_CS_("what's this?", f));
   }
 }
 /*--------------------------------------------------------------------------*/
