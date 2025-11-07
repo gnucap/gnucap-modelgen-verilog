@@ -10,7 +10,7 @@ paramset myres resistor;
 endparamset
 
 module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
-    parameter five=5;
+  parameter five=5;
   vsource #(1.) v (\3 , \1 );
   myres #(.foo(five)) R1 (\4 , \2 );
   resistor #(.r(10)) r (\1 , \2 );
@@ -21,7 +21,7 @@ main #() m (\0 , \1 , \2 , \4 );
 >>>>>.list 
 .model myres resistor ( r=NA( NA))
 .subckt main ( 1 2 3 4 )
-  parameter five=5;
+parameter five=5;
 v ( 3 1 )  vsource  =1.
 R1 ( 4 2 )  myres  foo=five
 r ( 1 2 )  resistor  r=10

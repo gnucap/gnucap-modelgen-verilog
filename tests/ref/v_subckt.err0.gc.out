@@ -1,6 +1,6 @@
 mm: no candidates found for m
 module m (.a(a),.b(b),.c(c));
-    parameter w=1;
+  parameter w=1;
   vsource #(.dc(v)) v1 (a, b);
   vsource #(.dc(w)) v1 (c, a);
 endmodule // m

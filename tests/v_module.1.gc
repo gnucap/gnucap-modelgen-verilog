@@ -4,7 +4,7 @@ verilog
 ground gnd;
 
 module main0 (\1 , \2 , \3 , \4 );
-  parameter R=1;
+  (*aaa*) parameter R=1;
   ccvs #(.gain(R)) vs1(\3i , \2 , vp2);
   vsource #(.dc(0)) vp1(\3 , \3i );
 
@@ -14,7 +14,7 @@ endmodule
 
 // same without current ports...
 module main1 (\1 , \2 , \3 , \4 );
-  parameter R=1;
+  (*bbb=42, red*) parameter R=1;
   vccs #(1/R) cs1(\2 , \3 , \4 , \1 );
   vccs #(1/R) cs2(\1 , \4 , \2 , \3 );
 endmodule

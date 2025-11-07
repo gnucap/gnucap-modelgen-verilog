@@ -17,7 +17,7 @@ endmodule // main
 
 main #() m (\0 , \1 , \2 , \4 );
 paramset res resistor;
-    parameter R=.5 from (0:1];
+  parameter R=.5 from (0:1];
  .r=R;
 endparamset
 

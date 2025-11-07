@@ -121,6 +121,15 @@ DISPATCHER<LANGUAGE>::INSTALL
 /*--------------------------------------------------------------------------*/
 static std::string parse_identifier(CS& cmd, std::string const& term);
 /*--------------------------------------------------------------------------*/
+#if 0
+void LANG_VERILOG::skip_attributes(CS& cmd)
+{
+  while (cmd >> "(*") {
+    cmd.skipto1('*') && (cmd >> "*)");
+  }
+}
+#endif
+/*--------------------------------------------------------------------------*/
 std::string LANG_VERILOG::parse_attributes(CS& cmd)
 {
   std::string attrib_string = "";
@@ -491,11 +500,13 @@ public:
       pl->print(IO::mstdout, OPT::language);
       IO::mstdout << '\n';
     }else{
+      std::string tail = cmd.tail();
       parse(cmd, pl);
       DEV_DOT* dd = new DEV_DOT();
       assert(dd);
+      lang_verilog.move_attributes(tag_t(&cmd), dd->id_tag());
       dd->set_owner(nullptr);
-      dd->set(cmd.fullstring());
+      dd->set("parameter " + tail);
       dd->set_owner(nullptr); // ?
       Scope->push_back(dd);
     }
@@ -1401,6 +1412,7 @@ void LANG_VERILOG::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
 void LANG_VERILOG::print_command(OMSTREAM& o, const DEV_DOT* x)
 {
   assert(x);
+  print_attributes(o, x->id_tag());
   o << x->s() << '\n';
 }
 /*--------------------------------------------------------------------------*/
@@ -1430,12 +1442,12 @@ class CMD_PARAMSET : public CMD {
     paramset = device_dispatcher.clone("paramset");
     paramset->set_owner(nullptr); // m?
     auto dev = prechecked_cast<BASE_SUBCKT*>(paramset);
+    lang_verilog.move_attributes(tag_t(&cmd), dev->id_tag());
     assert(dev);
     cmd.reset(here);
     lang_verilog.parse_paramset_(cmd, dev);
-    trace3("CMD_PARAMSET", paramset->long_label(), paramset->dev_type(), paramset);
     auto m = new PARAMSET_MODEL(dev);
-    lang_verilog.move_attributes(tag_t(&cmd), m->id_tag());
+    lang_verilog.move_attributes(dev->id_tag(), m->id_tag());
     m->set_owner(nullptr);
     Scope->push_back(m);
 

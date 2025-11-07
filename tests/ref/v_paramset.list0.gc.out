@@ -1,5 +1,5 @@
 paramset testvs vsource;
-    parameter real p;
+  parameter real p;
  .dc=(p + 1);
 endparamset
 
@@ -8,7 +8,7 @@ testvs #(.p(3)) v1 (p, g);
 parameter x=3;
 testvs #(.p((3*x)+2)) v1 (p, g);
 paramset testvs vsource;
-    parameter real p;
+  parameter real p;
  .dc=(p + 1);
 endparamset
 

@@ -6,12 +6,12 @@
 m: main from top level
 m: 1 candidate found for main
 module foo (.\1 (\1 ),.\2 (\2 ));
-    parameter R=1;
+  parameter R=1;
   resistor #(.r(R)) rr (\1 , \2 );
 endmodule // foo
 
 paramset myres foo;
-    parameter real foo;
+  parameter real foo;
  .R=(foo + 5.);
 endparamset
 

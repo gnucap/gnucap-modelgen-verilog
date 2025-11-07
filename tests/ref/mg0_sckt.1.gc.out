@@ -5,8 +5,8 @@ module vsin (.p(p),.n(n));
 endmodule // vsin
 
 module net1 (.a(a),.b(b),.gnd(gnd));
-   parameter r = 1.;
-   parameter c = 1.;
+  parameter r = 1.;
+  parameter c = 1.;
   resistor #(.r(r)) r1 (a, \1 );
   resistor #(.r(2*r)) r2 (\1 , \2 );
   resistor #(.r(r)) r3 (\2 , b);

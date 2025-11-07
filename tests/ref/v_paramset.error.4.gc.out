@@ -5,7 +5,7 @@
 m: main from top level
 m: 1 candidate found for main
 paramset test_invalid resistor;
-    parameter R=0 from (1:2];
+  parameter R=0 from (1:2];
  .r=R;
 endparamset
 
