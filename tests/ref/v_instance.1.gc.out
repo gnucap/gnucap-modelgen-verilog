@@ -1,0 +1,19 @@
+  module bbb (a,b);
+  ^ ? nonstandard nesting in aaa.
+  macromodule bbb (a,b);
+  ^ ? nonstandard nesting in aaa.
+module aaa (.a(a),.b(b));
+  module bbb (.a(a),.b(b));
+    resistor #(1) r1 (a, b);
+  endmodule // bbb
+
+  module bbb (.a(a),.b(b));
+    resistor #(2) r1 (a, b);
+  endmodule // bbb
+
+  bbb #() r2 (a, b);
+endmodule // aaa
+
+a1.r2 ambiguous overload in bbb
+#           v(a)      
+ 0.         1.        

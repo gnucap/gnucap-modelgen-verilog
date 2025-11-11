@@ -19,7 +19,7 @@ main #(.v(2)) m2(0 2)
 module main (.\1 (\1 ),.\2 (\2 ));
   parameter v;
   paramset vs vsource;
-  parameter voltage;
+    parameter voltage;
  .dc=voltage;
 endparamset
 

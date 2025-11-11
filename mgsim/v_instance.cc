@@ -191,6 +191,8 @@ private: // overrides
 
 private:
   void collect_overloads(DEV_INSTANCE_PROTO* scope) const;
+  void collect_overloads_from_scope(std::string const& modelname,
+      CARD_LIST const& scope, DEV_INSTANCE_PROTO*)const;
   void prepare_overload(CARD* proto, std::string modelname, DEV_INSTANCE_PROTO* p) const;
 
   node_t& n_(int i)const override {
@@ -390,6 +392,36 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
   }
 } // prepare_overload
 /*--------------------------------------------------------------------------*/
+void INSTANCE::collect_overloads_from_scope(std::string const& modelname,
+    CARD_LIST const& Scope, DEV_INSTANCE_PROTO* Proto) const
+{
+    CARD_LIST::const_iterator i = Scope.find_(modelname);
+    while(i != Scope.end()) {
+      std::string desc;
+      if(has_attributes((*i)->id_tag())) {
+	auto const& a = attributes((*i)->id_tag());
+	if(a){
+	  desc = a->operator[](std::string("desc"));
+	  if(desc == "0") { untested();
+	    desc = "";
+	  }else{
+	    desc = ": " + desc;
+	  }
+	}else{ untested();
+	}
+      }else{
+      }
+      if(&Scope == &CARD_LIST::card_list){
+	error(bLOG, long_label() + ": " + modelname + " from top level" + desc + "\n");
+      }else{
+	error(bLOG, long_label() + ": nested " + modelname + " " + desc + "\n");
+      }
+
+      prepare_overload(*i, modelname, Proto);
+      i = Scope.find_again(modelname, ++i);
+    }
+}
+/*--------------------------------------------------------------------------*/
 void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
 {
   if(Proto->subckt()->size()){
@@ -423,27 +455,23 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
   }else{
     assert(Proto->subckt());
     CARD_LIST const& toplevel = CARD_LIST::card_list;
+#if 1
+    // assert(owner());
+    assert(scope());
+    collect_overloads_from_scope(modelname, *scope(), Proto);
+#else
+    try{
+      CARD const* p = owner()->find_in_my_scope(modelname);
+      error(bLOG, long_label() + ": " + modelname + " from my scope\n");
+      prepare_overload(p, modelname, Proto);
+    }catch (Exception_Cant_Find& e) {
+      trace1("no local", modelname);
+    }
+#endif
 
-    CARD_LIST::const_iterator i = toplevel.find_(modelname);
-    while(i != toplevel.end()) {
-      std::string desc;
-      if(has_attributes((*i)->id_tag())) {
-	auto const& a = attributes((*i)->id_tag());
-	if(a){
-	  desc = a->operator[](std::string("desc"));
-	  if(desc == "0") { untested();
-	    desc = "";
-	  }else{
-	    desc = ": " + desc;
-	  }
-	}else{ untested();
-	}
-      }else{
-      }
-      error(bLOG, long_label() + ": " + modelname + " from top level" + desc + "\n");
-
-      prepare_overload(*i, modelname, Proto);
-      i = toplevel.find_again(modelname, ++i);
+    if(&toplevel != scope()){
+      collect_overloads_from_scope(modelname, toplevel, Proto);
+    }else{
     }
 
     MODEL_CARD* m = model_dispatcher[modelname];
