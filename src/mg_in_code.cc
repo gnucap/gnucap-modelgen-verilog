@@ -135,7 +135,7 @@ void Variable_Decl::update()
 {
   assert(_token);
   _data->clear();
-  new_var_ref_(); // already declared
+  new_var_ref(); // already declared
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::parse(CS& f)

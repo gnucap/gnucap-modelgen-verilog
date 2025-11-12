@@ -56,10 +56,6 @@ Block const* Variable_Decl::scope() const
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::new_var_ref()
-{ untested();
-  incomplete();
-}
-void Variable_Decl::new_var_ref_()
 {
   assert(owner());
   auto l = prechecked_cast<Variable_Stmt*>(owner());

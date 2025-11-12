@@ -229,7 +229,6 @@ public:
 protected:
   TData& data() { assert(_data); return *_data; }
   void new_var_ref();
-  void new_var_ref_();
 }; // Variable_Decl
 /*--------------------------------------------------------------------------*/
 class Variable_Stmt : public Statement {
