@@ -6,11 +6,11 @@ module dep0(d, g);
     // T : 0
     // c : 0
     // k : 0
-    real c// *
+    real c// * [V(g)]
 ;
-    real T// *
+    real T// * [V(g)]
 ;
-    real S// +
+    real S// + [V(g)]
 ;
     integer k// +
 ;

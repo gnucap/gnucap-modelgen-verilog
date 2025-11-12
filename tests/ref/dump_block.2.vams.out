@@ -4,7 +4,7 @@ module test_bug_block1(p, n);
     // G_s : 0
     // ms : 0
     // xgt : 1
-    real xgt// *
+    real xgt// * [V(p)]
 , ms// *
 ;
     real G_s// *

@@ -302,7 +302,7 @@ void Data_Type::parse(CS& file)
     _type = t_real;
   }else if(file.umatch("integer")){
     _type = t_int;
-  }else{ untested();
+  }else{
     throw Exception_CS_("need \"real\", \"integer\"\n", file);
   }
 }

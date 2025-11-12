@@ -6,7 +6,7 @@ module dep0(d, g);
     // c : 0
     real c// +
 ;
-    real T// *
+    real T// * [V(g)]
 ;
     c = T; // s3 r4
     T = V(g); // [V(g)] s1 r4

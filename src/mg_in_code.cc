@@ -133,8 +133,8 @@ void Variable_Stmt::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::update()
 {
-  assert(_token);
-  _data->clear();
+  assert(_token_data);
+  _token_data->clear();
   new_var_ref(); // already declared
 }
 /*--------------------------------------------------------------------------*/
@@ -145,7 +145,7 @@ void Variable_Decl::parse(CS& f)
   }else{
   }
   assert(owner());
-  assert(!_data);
+  assert(!_token_data);
   assert(!_token);
   std::string name;
 
@@ -162,10 +162,10 @@ void Variable_Decl::parse(CS& f)
   }
 
   // new_data();
-  _data = new TData();
-  _data->add_sens(this); // here? owner?
+  _token_data = new TData();
+  _token_data->add_sens(this); // here? owner?
 			 //
-  _token = new Token_VAR_DECL(name, this, _data);
+  _token = new Token_VAR_DECL(name, this, _token_data);
   trace1("variable decl", name);
 
   auto l = prechecked_cast<Variable_Stmt*>(owner());
@@ -219,10 +219,10 @@ void Variable_Decl::dump(std::ostream& o)const
       o << " -";
     }else{
     }
-    if(deps().ddeps().size()){
+    if(data().ddeps().size()){
       o << " [";
       std::string sep;
-      for(Dep const& d : deps().ddeps()){
+      for(Dep const& d : data().ddeps()){
 	o << sep << d.name();
 	sep = ",";
       }
@@ -296,7 +296,8 @@ void Variable_Decl::new_data()
     // set_rdep(tag_probe);
   }else{
   }
-  _data = new TData();
+  assert(!_token_data);
+  _token_data = new TData();
 }
 /*--------------------------------------------------------------------------*/
 bool Variable_Decl::propagate_deps(Token_VAR_REF const& v)
@@ -308,7 +309,7 @@ bool Variable_Decl::propagate_deps(Token_VAR_REF const& v)
   }else{
   }
   TData const& incoming = v.deps();
-  assert(&deps() != &incoming);
+  assert(&data() != &incoming);
 
   data().merge_sens(incoming);
   data().merge_flags(incoming);
@@ -316,8 +317,10 @@ bool Variable_Decl::propagate_deps(Token_VAR_REF const& v)
   if(type().is_int()) {
   }else{
     data().merge_ddeps(incoming);
-    assert(deps().ddeps().size() >= incoming.ddeps().size());
+    assert(data().ddeps().size() >= incoming.ddeps().size());
   }
+
+  token_data().merge(data());
   return false;
 }
 /*--------------------------------------------------------------------------*/

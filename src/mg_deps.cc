@@ -129,7 +129,7 @@ void TData::merge(TData const& o)
 #endif
 /*--------------------------------------------------------------------------*/
 // merge?
-void TData::update(TData const& o)
+void TData::merge(TData const& o)
 {
   trace2("TData::update", type(), o.type());
 

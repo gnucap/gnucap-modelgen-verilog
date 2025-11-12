@@ -5,11 +5,11 @@ module dep0(d, g);
     // S : 0
     // T : 1
     // U : 1
-    real T// +
+    real T// + [V(g)]
 ;
-    real S// *
+    real S// * [V(g)]
 ;
-    real U// +
+    real U// + [V(g)]
 ;
     T = T; // [V(g)] s4 r3
     U = T; // [V(g)] s5 r3

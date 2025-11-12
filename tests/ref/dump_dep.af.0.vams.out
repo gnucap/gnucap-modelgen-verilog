@@ -21,11 +21,11 @@ module dep0(d, g);
     // a : 0
     // b : 0
     // c : 0
-    real a// +
+    real a// + [V(g)]
 ;
     real b// *
 ;
-    real c// +
+    real c// + [V(g)]
 ;
     begin
     // a : 1

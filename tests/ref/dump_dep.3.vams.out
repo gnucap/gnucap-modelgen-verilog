@@ -13,8 +13,8 @@ module test_while0a(p, n);
     // z : 1
     integer i// +
 ;
-    real x// +
-, y// +
+    real x// + [V(p, n)]
+, y// + [V(p, n)]
 ;
     x =  0.; // s1 r3
     x =  0.; // [V(p, n)] s4 r4

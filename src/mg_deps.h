@@ -182,7 +182,10 @@ public:
   std::pair<DDeps::const_iterator, bool> insert(Dep const& d){
     return _ddeps.insert(d);
   }
-  void update(TData const& other);
+  void update(TData const& other){
+    merge(other); // BUG
+  }
+  void merge(TData const& other);
   void merge_sens(TData const& other);
   void merge_ddeps(TData const& other);
   void merge_flags(TData const& other);

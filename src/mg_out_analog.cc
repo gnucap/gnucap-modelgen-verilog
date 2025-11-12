@@ -161,7 +161,7 @@ void OUT_ANALOG::make_variable(std::ostream& o, Variable_Decl const& v) const
   }else{
     o__ "ddouble _v_" << v.name() << "; // Variable_Decl";
 
-    for(Dep const& i : v.deps().ddeps()) { untested();
+    for(Dep const& i : v.data().ddeps()) { untested();
       o__ " Dep: " << probe(i)->code_name() << " lin: " << i.is_linear();
     }
     o << "\n";

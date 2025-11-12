@@ -178,7 +178,8 @@ class Token_PROBE; //bug?
 class Node;
 class TData;
 class Variable_Decl : public Expression_ {
-  TData* _data{nullptr};
+  TData _data;
+  TData* _token_data{nullptr};
   Token_VAR_REF* _token{nullptr};
   RDeps _rdeps; // Expression_?
   std::string /*TODO*/ _dimensions;
@@ -189,15 +190,9 @@ public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   virtual /*?*/ Data_Type const& type()const {
-    if(_data){
-      return _data->type(); 
-    }else{
-      // ?
-      static Data_Type d;
-      return d;
-    }
+    return _data.type();
   }
-  void set_type(Data_Type const& d){ if(_data){ _data->set_type(d); }else{ /*huh?*/ } }
+  void set_type(Data_Type const& d){ _data.set_type(d); }
   bool propagate_deps(Token_VAR_REF const&);
   bool propagate_rdeps(RDeps const&);
 public: // query storage
@@ -207,8 +202,6 @@ public: // query storage
 public: // manipulate storage
   void assign_var() {_stt.set();}
   void use_var() {_stt.use();}
-protected:
-  void clear_deps();
 private:
   void new_deps();
   void new_data();
@@ -222,12 +215,16 @@ public:
 
   virtual Base const* value()const { unreachable(); return nullptr;}
   Block const* scope() const;
-  TData const& deps()const { assert(_data); return *_data; }
+//  TData const& deps()const { assert(_data); return *_data; }
   Variable_Decl* deep_copy(Base* owner, std::string prefix="") const;
   Token_VAR_REF const& token()const { assert(_token); return *_token; }
   void update();
+private:
+  TData& token_data() { assert(_token_data); return *_token_data; }
+  TData& data() { return _data; }
+public: // code gen
+  TData const& data()const { return _data; }
 protected:
-  TData& data() { assert(_data); return *_data; }
   void new_var_ref();
 }; // Variable_Decl
 /*--------------------------------------------------------------------------*/

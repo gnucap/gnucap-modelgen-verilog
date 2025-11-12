@@ -9,8 +9,8 @@ module dep7(a, g);
   analog begin : main // always
     // c : 1
     // d : 0
-    real c// +
-, d// *
+    real c// + [V(a)]
+, d// * [V(a)]
 ;
     c = V(a); // [V(a)] s1 r4
     if ((V(g) > 1)) begin : b0
@@ -27,7 +27,7 @@ module dep7(a, g);
     // b1
       if ((c > 0)) begin : b1
         // f : 1
-        real f// *
+        real f// * [V(a)]
 ;
         I(g) <+ d; // [V(a)] s3 r1
         f = d; // [V(a)] s4 r3
@@ -53,8 +53,8 @@ module dep7p(a, g);
   analog begin : main // always
     // c : 1
     // d : 0
-    real c// +
-, d// *
+    real c// + [V(a)]
+, d// * [V(a)]
 ;
     c = V(a); // [V(a)] s1 r4
     if ((V(g) > 1)) begin : b0
@@ -71,7 +71,7 @@ module dep7p(a, g);
     // b1
       if ((c > 0)) begin : b1
         // f : 1
-        real f// *
+        real f// * [V(a)]
 ;
         I(g) <+ d; // [V(a)] s3 r1
         f = d; // [V(a)] s4 r3

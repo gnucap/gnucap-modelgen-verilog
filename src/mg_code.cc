@@ -30,12 +30,6 @@ Variable_Decl::~Variable_Decl()
 {
 }
 /*--------------------------------------------------------------------------*/
-void Variable_Decl::clear_deps()
-{ untested();
-  trace2("Variable_Decl::clear_deps", name(), deps().ddeps().size());
-  data().clear();
-}
-/*--------------------------------------------------------------------------*/
 // void Variable_Decl::new_deps()
 // { untested();
 //   assert(!_deps);
@@ -111,8 +105,9 @@ Variable_Decl* Variable_Decl::deep_copy(Base* b, std::string s) const
     attr.set_attributes(tag_t(n)) = attr.attributes(tag_t(l));
   }else{
   }
-  assert(n->_data);
-  n->_token = new Token_VAR_DECL(s+_token->name(), n, n->_data);
+  // BUG: cleanup encap
+  assert(n->_token_data);
+  n->_token = new Token_VAR_DECL(s+_token->name(), n, n->_token_data);
   if(attr.has_attributes(tag_t(l))) {
     attr.set_attributes(tag_t(n->_token)) = attr.attributes(tag_t(l));
   }else{
