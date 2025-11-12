@@ -210,22 +210,23 @@ void Variable_Decl::dump(std::ostream& o)const
   }else{
   }
   if(options().dump_annotate()){
-    o << "// [";
+    o << "//";
+    if(is_state_var()){
+      o << " *";
+    }else if(is_temporary()){
+      o << " +";
+    }else if(is_common()){
+      o << " -";
+    }else{
+    }
     if(deps().ddeps().size()){
+      o << " [";
       std::string sep;
       for(Dep const& d : deps().ddeps()){
 	o << sep << d.name();
 	sep = ",";
       }
-    }else{
-    }
-    o << "] ";
-    if(is_state_var()){
-      o << '*';
-    }else if(is_temporary()){
-      o << '+';
-    }else if(is_common()){
-      o << '-';
+      o << "]";
     }else{
     }
     o << '\n';

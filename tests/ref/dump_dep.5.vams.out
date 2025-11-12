@@ -3,10 +3,10 @@ module test_dep5(np, n);
   electrical p, n;
   analog begin : main // always
     // AA : 1
-    real AA// [] +
+    real AA// +
 ;
-    AA = V(p, n); // dep: V(p, n) s1 r4
-    I(p, n) <+ ddt((AA * V(p, n))); // dep: V(ddt_0_p) r1
+    AA = V(p, n); // [V(p, n)] s1 r4
+    I(p, n) <+ ddt((AA * V(p, n))); // [V(ddt_0_p)] r1
   end
 
 endmodule

@@ -4,7 +4,7 @@ module my_res(a, b);
   parameter real g = 1;
   localparam real __r = ( 1. / g);
 
-  real __i// [V(a, b)] +
+  real __i// + [V(a, b)]
 ;
 
   analog begin // always
@@ -14,10 +14,10 @@ module my_res(a, b);
       __i =  3.; // s1 r3
       begin
       // __i : 1
-        __i = V(a, b); // dep: V(a, b) s1 r3
+        __i = V(a, b); // [V(a, b)] s1 r3
       end
     end
-    __i = __i; // dep: V(a, b) s3 r3
+    __i = __i; // [V(a, b)] s3 r3
   end
 
 endmodule

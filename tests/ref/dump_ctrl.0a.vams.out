@@ -3,9 +3,9 @@ module cond0(p, n);
     // S : 0
     // T : 0
     // U : 0
-    real S// [] -
-, T// [] 
-, U// [] 
+    real S// -
+, T//
+, U//
 ;
     begin
     end
@@ -20,7 +20,7 @@ endmodule
 module cond1(p, n);
   analog begin : main // always
     // S : 0
-    real S// [] -
+    real S// -
 ;
     begin // always
       // S : 0
@@ -37,9 +37,9 @@ module cond2(p, n);
   analog begin : main // always
     // S : 0
     // T : 0
-    real S// [] 
+    real S//
 ;
-    real T// [] -
+    real T// -
 ;
     begin // always
       // T : 0
@@ -52,9 +52,9 @@ module cond3(p, n);
   analog begin : main // always
     // S : 0
     // T : 0
-    real S// [] -
+    real S// -
 ;
-    real T// [] +
+    real T// +
 ;
     begin // always
       begin // always
@@ -95,9 +95,9 @@ module cond4(p, n);
   analog begin : main // always
     // S : 0
     // T : 0
-    real S// [] 
+    real S//
 ;
-    real T// [] 
+    real T//
 ;
     begin // always
       begin

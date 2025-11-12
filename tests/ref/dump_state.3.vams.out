@@ -1,12 +1,12 @@
 module base(p, n);
   electrical p, n;
   (* desc="y" *)
-  real y// [V(p, n)] *
+  real y// * [V(p, n)]
 ;
 
   analog begin // always
     // y : 1
-    y = (V(p, n) - 1); // dep: V(p, n) s1 r3
+    y = (V(p, n) - 1); // [V(p, n)] s1 r3
   end
 
 endmodule
@@ -17,15 +17,15 @@ endmodule
 module test_ps3a(p, n);
   electrical p, n;
   (* desc="y" *)
-  real __y// [] *
+  real __y// *
 ;
   (* desc="y" *)
-  real y// [V(p, n)] *
+  real y// * [V(p, n)]
 ;
 
   analog begin // always
     // y : 1
-    y = (V(p, n) - 1); // dep: V(p, n) s1 r3
+    y = (V(p, n) - 1); // [V(p, n)] s1 r3
   end
 
   analog begin

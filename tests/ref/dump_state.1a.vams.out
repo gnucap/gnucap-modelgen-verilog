@@ -2,7 +2,7 @@ module st(p);
   inout p;
   electrical p;
   (* _state *)
-  real c// [] *
+  real c// *
 ;
 
   analog begin : main // always

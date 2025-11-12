@@ -43,9 +43,15 @@ void dump_annotate(std::ostream& o, A const& a)
       o << " // c";
     }else{ untested();
     }
-    for(const Dep& d : a.data().ddeps()) {
-      o << " dep: ";
-      o << d.name();
+    if(a.data().ddeps().size()){
+      o << " [";
+      std::string sep;
+      for(const Dep& d : a.data().ddeps()) {
+	o << sep << d.name();
+	sep = ", ";
+      }
+      o << "]";
+    }else{
     }
 #if 1
     if(a.has_sensitivities()){

@@ -6,11 +6,11 @@ module dep6(d, g);
     // T : 0
     // U : 0
     // c : 0
-    real c// [] *
+    real c// *
 ;
-    real T// [] +
-, S// [] +
-, U// [] +
+    real T// +
+, S// +
+, U// +
 ;
     @(initial_step) begin
       // c : 0

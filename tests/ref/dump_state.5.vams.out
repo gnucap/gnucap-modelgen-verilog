@@ -3,7 +3,7 @@ module test_strobe3(a, b);
   electrical a, b;
   parameter integer p = 1 from [0:1];
 
-  integer P// [] -
+  integer P// -
 ;
 
   analog begin // always

@@ -1,13 +1,13 @@
 module st(p);
   inout p;
   electrical p;
-  real d// [] +
+  real d// +
 ;
 
   analog begin : main // always
     // c : 0
     // d : 0
-    real c// [] +
+    real c// +
 ;
     c = (c + 1); // s2 r3
     d = c; // s3 r3

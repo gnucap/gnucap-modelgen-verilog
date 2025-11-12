@@ -3,7 +3,7 @@ module st(p);
   electrical p;
   analog begin : main // always
     // c : 0
-    real c// [] 
+    real c//
 ;
     if (0) begin // never
     end

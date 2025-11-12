@@ -3,34 +3,34 @@ module dep7(a, g);
   electrical a, g;
   parameter real p =  0.;
 
-  real T// [] 
+  real T//
 ;
 
   analog begin : main // always
     // c : 1
     // d : 0
-    real c// [] +
-, d// [] *
+    real c// +
+, d// *
 ;
-    c = V(a); // dep: V(a) s1 r4
+    c = V(a); // [V(a)] s1 r4
     if ((V(g) > 1)) begin : b0
       // t : 0
-      real t// [] *
+      real t// *
 ;
       t = 4; // s1 r3
     end
     else begin
       // d : 1
-      d = c; // dep: V(a) s2 r4
+      d = c; // [V(a)] s2 r4
     end
     begin : stuff
     // b1
       if ((c > 0)) begin : b1
         // f : 1
-        real f// [] *
+        real f// *
 ;
-        I(g) <+ d; // dep: V(a) s3 r1
-        f = d; // dep: V(a) s4 r3
+        I(g) <+ d; // [V(a)] s3 r1
+        f = d; // [V(a)] s4 r3
       end
       else begin
         I(g) <+ 1; // r1
@@ -47,34 +47,34 @@ module dep7p(a, g);
   electrical a, g;
   localparam real __p =  0.;
 
-  real __T// [] 
+  real __T//
 ;
 
   analog begin : main // always
     // c : 1
     // d : 0
-    real c// [] +
-, d// [] *
+    real c// +
+, d// *
 ;
-    c = V(a); // dep: V(a) s1 r4
+    c = V(a); // [V(a)] s1 r4
     if ((V(g) > 1)) begin : b0
       // t : 0
-      real t// [] *
+      real t// *
 ;
       t = 4; // s1 r3
     end
     else begin
       // d : 1
-      d = c; // dep: V(a) s2 r4
+      d = c; // [V(a)] s2 r4
     end
     begin : stuff
     // b1
       if ((c > 0)) begin : b1
         // f : 1
-        real f// [] *
+        real f// *
 ;
-        I(g) <+ d; // dep: V(a) s3 r1
-        f = d; // dep: V(a) s4 r3
+        I(g) <+ d; // [V(a)] s3 r1
+        f = d; // [V(a)] s4 r3
       end
       else begin
         I(g) <+ 1; // r1
