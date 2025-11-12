@@ -38,7 +38,7 @@ main #() m (\1 , \2 , \3 , \0 );
 >>>>>op
 main.b1: bob from top level
 main.b1: bob from top level
-main.b1 discarded: no match: a
+main.b1 discarded (ports): no match: a
 main.b1: 1 candidate found for bob
 #          
  27.       

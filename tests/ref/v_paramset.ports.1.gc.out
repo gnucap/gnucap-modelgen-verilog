@@ -38,10 +38,10 @@ main #() m (\0 , \1 , \2 , \4 );
 main.v: vsource from device_dispatcher
 main.v: 1 candidate found for vsource
 main.R1: myres from top level
-main.R1 discarded: no match: p
+main.R1 discarded (ports): no match: p
 main.R1: myres from top level
 main.R1: myres from top level
-main.R1 discarded: no match: p
+main.R1 discarded (ports): no match: p
 main.R1: 1 candidate found for myres
 print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
                                   ^ ? no match

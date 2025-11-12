@@ -365,7 +365,15 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
 	    + std::to_string(c->min_nodes()) +"\n");
     }else{
     }
+  }catch(Exception const& e){
+    trace1("discard", long_label());
+    // TODO: include proto name attribute
+    error(bLOG, long_label() + " discarded (ports): " + e.message() + "\n");
+    delete (CARD*) c;
+    c = nullptr;
+  }
 
+  if(c) try{
 //    COMMON_PARAMLIST const* cp = prechecked_cast<COMMON_PARAMLIST const*>(Proto->common());
 //    assert(cp);
     for(int i=0; i<int(_params.size()); ++i){
@@ -382,13 +390,17 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
 	}
       }
     }
-    Proto->subckt()->push_back(c);
-//    c->precalc_first(); // latch mfactor.??
   }catch(Exception const& e){
     trace1("discard", long_label());
     // TODO: include proto name attribute
-    error(bLOG, long_label() + " discarded: " + e.message() + "\n");
+    error(bLOG, long_label() + " discarded (params): " + e.message() + "\n");
     delete (CARD*) c;
+    c = nullptr;
+  }
+
+  if(c){
+    Proto->subckt()->push_back(c);
+  }else{
   }
 } // prepare_overload
 /*--------------------------------------------------------------------------*/

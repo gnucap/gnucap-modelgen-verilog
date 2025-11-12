@@ -44,7 +44,7 @@ param v=0
 >>>>>print dc v(nodes) v(m0.*) y(m0.v*.*)
 main.v1: C from top level
 main.v1: C from device_dispatcher
-main.v1 discarded: no match: PC
+main.v1 discarded (params): no match: PC
 main.v1: 1 candidate found for C
 main.v2: B from top level
 main.v2: 1 candidate found for B
