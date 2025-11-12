@@ -328,16 +328,8 @@ void Parameter_2_List::parse(CS& file)
   assert(file.last_match().size());
 
   _is_local = file.last_match()[0]=='l';
-//  file >> _type;
-  if(file.umatch("real")){
-    _type = std::string("real"); // TODO: enum
-  }else if(file.umatch("integer")){
-    _type = std::string("integer"); // TODO: enum
-  }else{
-    throw Exception_CS_("parameter: need \"real\", \"integer\"\n", file);
-  }
-  std::string type = _type.to_string();
-  trace2("Parameter_2_List", _type, _is_local);
+
+  file >> _type;
 
   try{
     LiSt<Parameter_2, '\0', ',', ';'>::parse(file);
@@ -345,7 +337,7 @@ void Parameter_2_List::parse(CS& file)
     throw e;
   }
   for(auto& i : *this){
-    i->set_type(type);
+    i->set_type(_type);
     i->set_local(_is_local);
     i->resolve();
   }

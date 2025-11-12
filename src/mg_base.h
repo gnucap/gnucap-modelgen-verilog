@@ -27,6 +27,7 @@
 #include <l_indirect.h>
 #include <u_attrib.h>
 #include "mg_error.h"
+#include "mg_type.h"
 /*--------------------------------------------------------------------------*/
 typedef enum{ a_unset, a_input, a_output, a_inout} direction_t;
 /*--------------------------------------------------------------------------*/
@@ -581,7 +582,7 @@ class Parameter_Base : public Base { // Owned_Base?
   Block* _owner{nullptr};
 protected:
   std::string _name;
-  std::string _type;
+  Data_Type _type;
   std::string _code_name;
   std::string _user_name;
   std::string _alt_name;
@@ -598,7 +599,7 @@ protected:
 public:
   Parameter_Base() {}
   explicit Parameter_Base(std::string const& name) : _name(name) {}
-  const std::string& type()const		{return _type;}
+  const Data_Type& type()const {return _type;}
   const std::string code_name()const		{return "_p_" + _name;}
   const std::string& user_name()const		{ untested();return _user_name;}
   const std::string& alt_name()const		{ untested();return _alt_name;}

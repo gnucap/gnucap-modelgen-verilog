@@ -77,7 +77,7 @@ public:
   ~Parameter_2();
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
-  void set_type(std::string const& a){_type=a;}
+  void set_type(Data_Type const& a) {_type = a;}
   void set_local( bool x=true ) {_is_local = x;}
   bool is_local()const {return _is_local;}
   void set_given( bool x=true ) {_is_given = x;}
@@ -91,14 +91,14 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class Parameter_2_List : public LiSt<Parameter_2, '\0', ',', ';'> {
-  String_Arg _type;
+  Data_Type _type;
   bool _is_local{false};
 public:
   explicit Parameter_2_List()
      : LiSt<Parameter_2, '\0', ',', ';'>() { }
   ~Parameter_2_List() { }
   bool is_local()const;
-  String_Arg const& type()const {return _type;}
+  Data_Type const& type()const {return _type;}
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
 };
