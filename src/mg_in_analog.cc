@@ -1959,7 +1959,8 @@ void AnalogFunctionArgs::set_deps(Block::map const& m)
 	trace1("AFA::update arg", t->name());
       }else if(dynamic_cast<Token_VAR_DECL const*>(l)){ untested();
 	trace1("AFA::update decl", t->name());
-      }else if(auto r = dynamic_cast<Token_VAR_REF const*>(l)){
+      }else if(auto r = dynamic_cast<Token_VAR_REF*>(l)){
+//	r->assign_var();
 	incomplete();
 	trace1("AFA::update ref", t->name());
 	for(Dep const& d : r->deps().ddeps()){

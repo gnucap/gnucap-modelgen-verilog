@@ -138,7 +138,6 @@ class STORAGE_TYPE {
   } state_t;
   state_t _actual{s_unknown};
   state_t _override{s_unknown};
-  bool _assert{false};
 public:
   void set();
   void use();

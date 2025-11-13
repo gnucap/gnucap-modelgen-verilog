@@ -611,6 +611,8 @@ static void stack_op_args(Expression* EE, Expression const* arg_expr, FUNCTION_ 
     if(!f->is_output_arg(ii)){
       (**i).stack_op(EE);
     }else if(auto tt = dynamic_cast<Token_VAR_REF*>(*i)){
+      tt->use_var(); // needed?
+      tt->assign_var(); // maybe..
       tt->stack_op(EE);
     }else{
       unreachable();
