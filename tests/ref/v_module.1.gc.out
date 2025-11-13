@@ -20,9 +20,9 @@ main1 #(.R(.34)) m (.\1 (C),.\2 (D),.\3 (gnd),.\4 (gnd));
 #           v(A)       v(B)       v(C)       v(D)       v(gnd)    
  27.        0.         0.         0.         0.         0.        
 *// test current port in instance
-ground gnd;
+.ground gnd;
 .subckt main0 ( 1 2 3 4 )
-parameter R=1;
+.parameter R=1;
 vs1 ( 3i 2 vp2 )  ccvs  gain=R
 vp1 ( 3 3i )  vsource  dc=0
 vs2 ( 1 4i vp1 )  ccvs  gain=R
@@ -30,7 +30,7 @@ vp2 ( 4 4i )  vsource  dc=0
 .ends main0
 *// same without current ports...
 .subckt main1 ( 1 2 3 4 )
-parameter R=1;
+.parameter R=1;
 cs1 ( 2 3 4 1 )  vccs  =1/R
 cs2 ( 1 4 2 3 )  vccs  =1/R
 .ends main1
