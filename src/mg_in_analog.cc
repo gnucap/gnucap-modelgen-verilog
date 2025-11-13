@@ -1288,11 +1288,6 @@ void Contribution::parse(CS& cmd)
   }else{
   }
 
-  if(owner()->is_reachable()){
-    // update(); // later. need return value
-  }else{
-  }
-
   if(options().optimize_unused() && !owner()->is_reachable()) {
   }else{
     trace2("inc_use0", name(), branch()->name());
@@ -1304,6 +1299,12 @@ void Contribution::parse(CS& cmd)
   }
 
   assert(_deps);
+
+  if(owner()->is_reachable()){
+    update();
+  }else{
+  }
+
 } // Contribution::parse
 /*--------------------------------------------------------------------------*/
 void Contribution::add_dep(Dep const& d)
