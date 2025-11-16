@@ -2,7 +2,7 @@ module test (.y(y),.a(a),.b(b));
   ground \0 ;
   vpulse #(.val0(0),.val1(5),.width(.2),.period(.5)) v1 (a, \0 );
   vpulse #(.val0(0),.val1(5),.td(.1),.width(.2),.period(.5)) v1 (b, \0 );
-  myand0 #(10000) b (.y(y),.a(a),.b(b));
+  myand1 #(10000) b (.y(y),.a(a),.b(b));
 endmodule // test
 
 paramset logic logic;
@@ -10,7 +10,7 @@ paramset logic logic;
 endparamset
 
 test #() t (y, a, b);
-t.b: can't find subckt: logicmyand02, forcing digital
+t.b: can't find subckt: logicmyand12, forcing digital
 #           v(a)       v(b)       v(y)      
  27.        0.         0.         0.        
 #Time       v(a)       v(b)       v(y)       l(a)       l(b)       l(y)      

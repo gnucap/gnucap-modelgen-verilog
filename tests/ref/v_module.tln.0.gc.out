@@ -4,7 +4,7 @@ module main(1 2);
               ^ ? invalid identifier
 ground \0 ;
 module tln0 (.a(a),.b(b));
-    ground \0 ;
+  ground \0 ;
   parameter r;
   parameter c;
   resistor #(.r(r)) r (a, b);
@@ -12,7 +12,7 @@ module tln0 (.a(a),.b(b));
 endmodule // tln0
 
 module tln1 (.a(a),.b(b));
-    ground \0 ;
+  ground \0 ;
   parameter integer length;
   parameter r;
   parameter c;
