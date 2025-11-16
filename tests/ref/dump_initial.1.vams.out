@@ -4,20 +4,20 @@ module test();
 
   analog   initial begin
     // T : 0
-    T = 1; // s1 r3
+    T = 1; // s1 r3{bax}
   end
 
   analog   initial begin // always
     if ((T == 1)) begin
       // T : 0
-      T = 2; // s1 r3
+      T = 2; // s1 r3{bax}
     end
   end
 
   analog   initial begin // always
     if ((T == 2)) begin
       // T : 0
-      T = 3; // s1 r3
+      T = 3; // s1 r3{bax}
     end
   end
 

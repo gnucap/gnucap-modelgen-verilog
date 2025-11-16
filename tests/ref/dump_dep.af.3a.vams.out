@@ -10,7 +10,7 @@ module test_af_1a(p, n);
     begin // always
       // fct : 0
       // x : 0
-      x = exp(x); // s1 r3
+      x = exp(x); // s1 r3{bax}
     end
   endfunction
 
@@ -18,8 +18,8 @@ module test_af_1a(p, n);
     // xxint : 0
     integer xxint// +
 ;
-    xxint = v; // s1 r4
-    V(p, n) <+ fct(xxint); // s1 r1
+    xxint = v; // s1 r4{bax}
+    V(p, n) <+ fct(xxint); // s1 r1{}
   end
 
 endmodule

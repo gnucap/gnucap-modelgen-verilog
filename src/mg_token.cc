@@ -29,12 +29,12 @@
 #include <stack>
 #include <globals.h> // TODO: Expression->resolve?
 /*--------------------------------------------------------------------------*/
-rdep_tag tr_begin_tag;
-rdep_tag tr_restore_tag;
-rdep_tag tr_eval_tag;
-rdep_tag tr_review_tag;
-rdep_tag tr_advance_tag;
-rdep_tag tr_accept_tag;
+rdep_tag tr_begin_tag("b");
+rdep_tag tr_restore_tag("r");
+rdep_tag tr_eval_tag("e");
+rdep_tag tr_review_tag("v");
+rdep_tag tr_advance_tag("a");
+rdep_tag tr_accept_tag("x");
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/

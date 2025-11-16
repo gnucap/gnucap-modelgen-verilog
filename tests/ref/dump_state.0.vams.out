@@ -9,8 +9,8 @@ module st(p);
     // d : 0
     real c// +
 ;
-    c = (c + 1); // s2 r3
-    d = c; // s3 r3
+    c = (c + 1); // s2 r3{bax}
+    d = c; // s3 r3{bax}
   end
 
 endmodule

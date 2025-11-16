@@ -566,13 +566,6 @@ class Contribution : public AnalogStmt {
   TData* _deps{nullptr};
   RDeps _rdeps; // dump_annotate
   Sensitivities _sens;
-private:
-  void set_pot_contrib();
-  void set_flow_contrib();
-  void set_short();
-  void set_always_pot();
-  void set_direct(bool d=true);
-  TData const& deps()const override; // data?
 public:
   Contribution(CS& f, Block* o)
     : AnalogStmt(), _branch(nullptr, false) {
@@ -580,6 +573,15 @@ public:
     parse(f);
   }
   ~Contribution();
+
+  std::string val_string()const override {untested(); return _name; }
+private:
+  void set_pot_contrib();
+  void set_flow_contrib();
+  void set_short();
+  void set_always_pot();
+  void set_direct(bool d=true);
+  TData const& deps()const override; // data?
 public:
 
   DDeps const& ddeps() const;

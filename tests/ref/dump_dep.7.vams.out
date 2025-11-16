@@ -14,11 +14,11 @@ module dep7(d, g);
     @(initial_step) begin
       if ((! $param_given(p))) begin
         // c : 0
-        c =  1.; // s2 r4
+        c =  1.; // s2 r4{bax}
       end
     end
-    T = c; // s4 r3
-    I(d, g) <+ c; // s3 r1
+    T = c; // s4 r3{bax}
+    I(d, g) <+ c; // s3 r1{}
   end
 
 endmodule

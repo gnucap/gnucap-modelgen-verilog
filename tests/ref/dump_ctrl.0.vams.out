@@ -23,7 +23,7 @@ module cond1(p, n);
 ;
     if (1) begin // always
       // S : 0
-      S = 3; // s1 r3
+      S = 3; // s1 r3{bax}
     end
     else begin : bla // never
       // S : 0
@@ -37,7 +37,7 @@ module cond1(p, n);
     end
     else begin : bla // always
       // S : 0
-      S = 1; // s1 r3
+      S = 1; // s1 r3{bax}
     end
   end
 
@@ -57,7 +57,7 @@ module cond2(p, n);
     end
     if (1) begin // always
       // T : 0
-      T = 1; // s1 r3
+      T = 1; // s1 r3{bax}
     end
     else begin // never
       if (0) begin // never
@@ -80,7 +80,7 @@ module cond3(p, n);
     if (1) begin // always
       if (2) begin // always
         // S : 0
-        S = 2; // s1 r3
+        S = 2; // s1 r3{bax}
       end
     end
     if (1) begin // always
@@ -89,7 +89,7 @@ module cond3(p, n);
           if (4) begin // always
             if (5) begin // always
               // T : 0
-              T = 1; // s1 r3
+              T = 1; // s1 r3{bax}
             end
             else begin // never
               if (5) begin // never
@@ -104,16 +104,16 @@ module cond3(p, n);
     end
     if (T) begin
       // T : 0
-      T = 0; // s1 r3
+      T = 0; // s1 r3{bax}
     end
     else begin
       // T : 0
-      T = 2; // s1 r3
+      T = 2; // s1 r3{bax}
     end
     if (1) begin // always
       if (2) begin // always
         // S : 0
-        S = 2; // s1 r3
+        S = 2; // s1 r3{bax}
       end
       else begin // never
         // S : 0
@@ -155,14 +155,14 @@ module cond5(p, n);
 ;
     integer i// +
 ;
-    i = 1; // s1 r3
+    i = 1; // s1 r3{bax}
     if (i) begin
       // i : 0
-      i = 2; // s1 r3
+      i = 2; // s1 r3{bax}
     end
     else begin
       // i : 0
-      i = 3; // s1 r3
+      i = 3; // s1 r3{bax}
     end
   end
 

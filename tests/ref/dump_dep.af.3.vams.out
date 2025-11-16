@@ -15,8 +15,8 @@ module test_af_1a(p, n);
     // xxint : 0
     integer xxint// +
 ;
-    xxint = v; // s1 r4
-    V(p, n) <+ fct(xxint); // s1 r1
+    xxint = v; // s1 r4{bax}
+    V(p, n) <+ fct(xxint); // s1 r1{}
   end
 
 endmodule

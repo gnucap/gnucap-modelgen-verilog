@@ -6,7 +6,7 @@ module base(p, n);
 
   analog begin // always
     // y : 1
-    y = (V(p, n) - 1); // [V(p, n)] s1 r3
+    y = (V(p, n) - 1); // [V(p, n)] s1 r3{bax}
   end
 
 endmodule
@@ -25,12 +25,12 @@ module test_ps3a(p, n);
 
   analog begin // always
     // y : 1
-    y = (V(p, n) - 1); // [V(p, n)] s1 r3
+    y = (V(p, n) - 1); // [V(p, n)] s1 r3{bax}
   end
 
   analog begin
     // y : 0
-    y = 9; // s1 r3
+    y = 9; // s1 r3{bax}
   end
 
 endmodule

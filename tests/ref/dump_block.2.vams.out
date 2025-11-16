@@ -21,14 +21,14 @@ module test_bug_block1(p, n);
 ;
           // G_s : 0
           // N : 0
-            N = xgt; // s3 r3
-            G_s = N; // s4 r3
+            N = xgt; // s3 r3{bax}
+            G_s = N; // s4 r3{bax}
           end
         end
       end
     end
-    xgt = V(p); // [V(p)] s1 r3
-    I(p, n) <+ V(p, n); // [V(p, n)] r1
+    xgt = V(p); // [V(p)] s1 r3{bax}
+    I(p, n) <+ V(p, n); // [V(p, n)] r1{}
   end
 
 endmodule

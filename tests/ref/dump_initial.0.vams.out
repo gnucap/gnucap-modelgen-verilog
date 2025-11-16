@@ -5,7 +5,7 @@ module test(d, g, s, b);
   analog begin // always
     @(initial_step) begin
       // T : 0
-      T = $temperature; // s2 r3
+      T = $temperature; // s2 r3{bax}
     end
   end
 

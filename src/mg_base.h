@@ -32,8 +32,12 @@
 typedef enum{ a_unset, a_input, a_output, a_inout} direction_t;
 /*--------------------------------------------------------------------------*/
 class rdep_tag : public Base{
+  std::string _s;
+public:
+  rdep_tag(std::string const& s) : _s(s) {}
   virtual void parse(CS&)override { untested();unreachable();}
   virtual void dump(std::ostream&)const override { untested();unreachable();}
+  std::string val_string()const override {return _s;}
 };
 extern rdep_tag tr_begin_tag;
 extern rdep_tag tr_restore_tag;

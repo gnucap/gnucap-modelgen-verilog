@@ -9,7 +9,7 @@ module st1(p);
 ;
     if (1) begin // always
       // c : 0
-      c = (c + 1); // s2 r3
+      c = (c + 1); // s2 r3{bax}
     end
   end
 

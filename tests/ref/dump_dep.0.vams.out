@@ -8,10 +8,10 @@ module dep0(d, g);
 ;
     real T// * [V(g)]
 ;
-    c = T; // s3 r4
-    T = V(g); // [V(g)] s1 r4
-    I(d) <+ c; // s3 r1
-    I(g) <+ V(g); // [V(g)] r1
+    c = T; // s3 r4{bax}
+    T = V(g); // [V(g)] s1 r4{bax}
+    I(d) <+ c; // s3 r1{}
+    I(g) <+ V(g); // [V(g)] r1{}
   end
 
 endmodule

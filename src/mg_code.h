@@ -60,7 +60,14 @@ void dump_annotate(std::ostream& o, A const& a)
     }
 #endif
     if(a.rdeps_().size()){
-      o << " r" << a.rdeps_().size();
+      o << " r" << a.rdeps_().size() << "{";
+      for(Base const* r : a.rdeps_()){
+	if(r->val_string().size() == 1){ // HACK
+	  o << r->val_string();
+	}else{
+	}
+      }
+      o << "}";
     }else{
     }
   }

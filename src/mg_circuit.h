@@ -171,6 +171,7 @@ public:
   Branch( Branch const&) = delete;
   ~Branch();
   virtual std::string name()const; // use label?
+  std::string val_string()const override {return name();}
   // later.
   void parse(CS&)override { untested();incomplete();}
   void dump(std::ostream&)const override;

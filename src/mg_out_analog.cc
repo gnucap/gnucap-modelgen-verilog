@@ -421,7 +421,7 @@ void OUT_ANALOG::make_block(std::ostream& o, Block const& ab) const
 void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
 {
   if(_src && !ab.is_used_in(_src)){
-    o << "// omit Statement " << typeid(ab).name() << "\n";
+    o << "// omit Statement " << typeid(ab).name() << " " << _src->val_string() << "\n";
     return;
     o << "#if 0 // omit Statement " << typeid(ab).name() << "\n";
   }else{
