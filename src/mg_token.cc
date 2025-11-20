@@ -951,7 +951,9 @@ void Token_VAR_REF::stack_op(Expression* e)const
 
   {
     TData* nd = nullptr;
-    if(auto a = dynamic_cast<Assignment const*>(_item)){
+    if(dynamic_cast<Variable_Decl const*>(_item)){
+      incomplete();
+    }else if(auto a = dynamic_cast<Assignment const*>(_item)){
       // nd = deps().clone();
       nd = a->data().clone();
 //      nd->add_sens(_item); not yet.
@@ -1101,15 +1103,15 @@ TData const& Token_VAR_REF::deps() const
 /*--------------------------------------------------------------------------*/
 RDeps const& Token_VAR_REF::rdeps() const
 {
-  if(auto s=dynamic_cast<Statement const*>(_item)){ untested();
+  if(auto s=dynamic_cast<Statement const*>(_item)){
     return s->rdeps();
-  }else if(auto it=dynamic_cast<Assignment const*>(_item)){
-    return it->rdeps();
   }else if(auto p = dynamic_cast<Variable_Decl const*>(_item)){
     assert(p);
     return p->rdeps();
+  }else if(auto it=dynamic_cast<Assignment const*>(_item)){
+    return it->rdeps();
   }else if(dynamic_cast<Analog_Function const*>(_item)){ untested();
-  }else{ untested();
+  }else{
     unreachable();
   }
   static RDeps t;
@@ -1118,11 +1120,11 @@ RDeps const& Token_VAR_REF::rdeps() const
 /*--------------------------------------------------------------------------*/
 Data_Type const& Token_VAR_REF::type() const
 {
-  if(auto it=dynamic_cast<Assignment const*>(_item)){
-    return it->type();
-  }else if(auto p = dynamic_cast<Variable_Decl const*>(_item)){ untested();
+  if(auto p = dynamic_cast<Variable_Decl const*>(_item)){ untested();
     assert(p);
     return p->type();
+  }else if(auto it=dynamic_cast<Assignment const*>(_item)){
+    return it->type();
   }else if(auto af = dynamic_cast<Analog_Function const*>(_item)){
     return af->type();
   }else{ untested();
@@ -1144,14 +1146,14 @@ bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
     TData const& incoming = from.deps();
     dd->update(incoming);
     assert(deps().ddeps().size() >= incoming.ddeps().size());
+  }else if(auto p = dynamic_cast<Variable_Decl*>(_item)){
+    trace2("Token_VAR_REF::propagate decl", type(), from.type());
+    return p->propagate_deps(from);
   }else if(auto it=dynamic_cast<Assignment*>(_item)){
     trace2("Token_VAR_REF::propagate assign", type(), from.type());
     assert(it->scope());
     assert(from.scope());
     return it->propagate_deps(from);
-  }else if(auto p = dynamic_cast<Variable_Decl*>(_item)){
-    trace2("Token_VAR_REF::propagate decl", type(), from.type());
-    return p->propagate_deps(from);
   }else if(dynamic_cast<Analog_Function*>(_item)){
   }else if(dynamic_cast<Block const*>(_item)){ untested();
   }else{
@@ -1217,7 +1219,14 @@ void Token_VAR_DECL::stack_op(Expression* e)const
 
   {
     TData* nd = nullptr;
-    if(auto a = dynamic_cast<Assignment const*>(_item)){ untested();
+    if(dynamic_cast<Variable_Decl const*>(_item)){
+      if(auto dd = dynamic_cast<TData const*>(data())){
+	nd = dd->clone();
+      }else{
+	unreachable();
+	incomplete();
+      }
+    }else if(auto a = dynamic_cast<Assignment const*>(_item)){ untested();
       unreachable();
       nd = a->data().clone();
 //      nd->add_sens(_item); not yet.

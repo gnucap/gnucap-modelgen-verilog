@@ -144,6 +144,15 @@ void Variable_Decl::update()
   new_var_ref(); // already declared
 }
 /*--------------------------------------------------------------------------*/
+void Assignment::new_token(std::string const& name)
+{
+  assert(!_token);
+  assert(!_token_data);
+  _token_data = new TData();
+  _token_data->add_sens(this); // here? owner?
+  _token = new Token_VAR_DECL(name, this, _token_data); // BUG. REF?
+}
+/*--------------------------------------------------------------------------*/
 void Variable_Decl::parse(CS& f)
 {
   if(f >> ',') { untested();
@@ -152,7 +161,6 @@ void Variable_Decl::parse(CS& f)
   }
   assert(owner());
   assert(!_token_data);
-  assert(!_token);
   std::string name;
 
   name = f.ctos(",=(){};[]");
@@ -167,11 +175,7 @@ void Variable_Decl::parse(CS& f)
   }else{
   }
 
-  // new_data();
-  _token_data = new TData();
-  _token_data->add_sens(this); // here? owner?
-			 //
-  _token = new Token_VAR_DECL(name, this, _token_data);
+  new_token(name);
   trace1("variable decl", name);
 
   auto l = prechecked_cast<Variable_Stmt*>(owner());
@@ -179,14 +183,14 @@ void Variable_Decl::parse(CS& f)
   assert(l->type());
   set_type(l->type());
 
-  if(l->scope()->new_var_ref(_token)){
+  if(l->scope()->new_var_ref(&token())){
   }else{
     throw Exception_CS_("already declared", f);
   }
 
   if(attr.has_attributes(tag_t(&f))) {
     ATTRIB_LIST_p const& a = attr.attributes(tag_t(&f));
-    attr.set_attributes(tag_t(_token)) = a;
+    attr.set_attributes(tag_t(&token())) = a;
     if(  a->operator[]("_state ") != "0"
       || a->operator[]("desc ") != "0"
       || a->operator[]("units ") != "0" ){
@@ -280,30 +284,21 @@ bool Assignment::is_temporary() const
 TData const& Assignment::data()const
 {
   if(_token){
-    assert(_token->data() == _data);
+    assert(_token->data() == _token_data);
   }else{ untested();
   }
-  assert(_data);
-  return *_data;
+  assert(_token_data);
+  return *_token_data;
 }
 /*--------------------------------------------------------------------------*/
+// obsolete
 void Variable_Decl::new_data()
 {
-  assert(owner());
-  auto l = prechecked_cast<Variable_Stmt const*>(owner());
-  assert(l);
-  Module const* mod = dynamic_cast<Module const*>(l->owner()); // scope?
-  Variable_List_Collection const* p=nullptr;
-  if(!mod){ untested();
-  }else if(is_output_var(tag_t(this))) { untested();
-    // todo: tag?
-    p = &mod->variables();
-    (void)p;
-    // set_rdep(tag_probe);
-  }else{
-  }
-  assert(!_token_data);
-  _token_data = new TData();
+ if (_token_data){
+//    delete _token_data;
+//    _token_data = nullptr;
+ }else{
+ }
 }
 /*--------------------------------------------------------------------------*/
 bool Variable_Decl::propagate_deps(Token_VAR_REF const& v)
@@ -418,7 +413,7 @@ void SeqBlock::parse(CS& f)
   if(f >> ":"){
     parse_identifier(f);
     parse_block_variables(f, _variables);
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -562,8 +557,8 @@ void Assignment::parse(CS& f)
     store_deps(Expression_::data());
     assert(_token);
     if(owner()){
-      assert(_data);
-      _data->add_sens(owner());
+      assert(_token_data);
+      _token_data->add_sens(owner());
     }else{ untested();
     }
 
@@ -707,46 +702,46 @@ bool Assignment::store_deps(TData const& d)
   }else{
 
     if(_token) {
-      assert(_data);
-      ii = _data->ddeps().size();
+      assert(_token_data);
+      ii = _token_data->ddeps().size();
     }else{
-      assert(!_data);
-      // _data = d.clone(); // new TData();
-      _data = new TData();
-      _data->set_type(_lhsref->type());
-      _token = new Token_VAR_REF(_lhsref->name(), this, _data);
+      assert(!_token_data);
+      // _token_data = d.clone(); // new TData();
+      _token_data = new TData();
+      _token_data->set_type(_lhsref->type());
+      _token = new Token_VAR_REF(_lhsref->name(), this, _token_data);
       assert(_token->data());
       assert(_token->scope());
     }
 
-    trace1("Assignment::store_deps", _data->type());
-    _data->merge_sens(d);
-    _data->merge_flags(d);
+    trace1("Assignment::store_deps", _token_data->type());
+    _token_data->merge_sens(d);
+    _token_data->merge_flags(d);
     if(type().is_int()){
     }else{
-      _data->merge_ddeps(d);
+      _token_data->merge_ddeps(d);
     }
 
-    assert(ii <= _data->ddeps().size());
+    assert(ii <= _token_data->ddeps().size());
 
     if(auto x = dynamic_cast<SeqBlock const*>(scope())) {
       if(x->has_sensitivities()) {
-	_data->add_sens(*x->sensitivities());
+	_token_data->add_sens(*x->sensitivities());
       }else{
       }
     }else{
     }
 
-    for(; ii < _data->ddeps().size(); ++ii) {
+    for(; ii < _token_data->ddeps().size(); ++ii) {
       ret = true;
-      Dep const& dd = _data->ddeps()[ii];
+      Dep const& dd = _token_data->ddeps()[ii];
      // trace2("inc_use2", (*dd)->code_name(), this);
       dd.set_used_in(this);
     }
-//    assert(&deps() == _data);
+//    assert(&deps() == _token_data);
     if(type().is_int()) {
     }else{
-      assert(d.ddeps().size() <= _data->ddeps().size());
+      assert(d.ddeps().size() <= _token_data->ddeps().size());
     }
   }
 
@@ -797,7 +792,7 @@ void Assignment::dump(std::ostream& o) const
 Assignment::~Assignment()
 {
   if(options().optimize_unused() && !scope()->is_reachable()) {
-  }else if(_data){
+  }else if(_token_data){
     trace3("~Assignment", _token->name(), this, data().ddeps().size());
     try{
 //      for(Dep d : data().ddeps()) { untested();
@@ -823,7 +818,7 @@ void Assignment::parse_rhs(CS& cmd)
   Expression rhs(cmd);
   assert(Expression_::is_empty());
 
-  assert(!_data);
+  assert(!_token_data);
   // assert(deps().ddeps().empty());
   //_rhs.set_owner(owner()); // this? AssignmentStatement?
   resolve_symbols(rhs);

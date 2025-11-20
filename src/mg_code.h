@@ -183,18 +183,77 @@ public: // query
   bool is_override()const      { return _override;}
 };
 /*--------------------------------------------------------------------------*/
+// actually a token?
+class Assignment : public Expression_ {
+protected:
+  TData* _token_data{nullptr};
+private:
+  Token_VAR_REF* _token{nullptr};
+protected:
+  Token_VAR_REF* _lhsref{nullptr};
+  STORAGE_TYPE _stt;
+public:
+  explicit Assignment(CS& f, Base* o);
+  explicit Assignment() : Expression_() {}
+  ~Assignment();
+public:
+  //bool has_deps()const { untested(); return _data; }
+  TData const& data()const;
+  bool is_int() const;
+  Data_Type const& type()const;
+  Expression_ const& rhs()const {return *this;}
+  Token_VAR_REF const& lhs() const{
+    assert(_lhsref);
+    return *_lhsref;
+  }
+  Token_VAR_REF const& token()const { assert(_token); return *_token; }
+  std::string name() const { assert(_token); return _token->name(); }
+  void parse(CS& cmd) override;
+  std::string lhsname()const { return lhs().name(); }
+  void dump(std::ostream&)const override;
+  bool propagate_deps(Token_VAR_REF const&);
+  bool propagate_rdeps(RDeps const& incoming);
+ // bool update();
+  bool update(RDeps const* r=nullptr);
+
+  void parse_rhs(CS& cmd);
+  RDeps const& rdeps() const;
+  Sensitivities const& sensitivities()const;
+  bool has_sensitivities()const;
+//  Block const* scope() const;
+  bool is_used_in(Base const*b)const;
+  bool is_used()const;
+  operator bool() const {return _token;}
+  bool is_output_var()const; // BUG
+  bool is_state_var()const;
+  bool is_common()const;
+  bool is_temporary()const;
+public: // storage
+  void assign_var()const;
+  void use_var()const;
+private: // implementation
+  bool store_deps(TData const&);
+  std::string code_name()const;
+protected:
+  void new_token(std::string const&);
+  Token_VAR_REF& token() { assert(_token); return *_token; }
+}; // Assignment
+/*--------------------------------------------------------------------------*/
 class Token_PROBE; //bug?
 class Node;
 class TData;
-class Variable_Decl : public Expression_ {
+class Variable_Decl : public Assignment {
   TData _data;
-  TData* _token_data{nullptr};
-  Token_VAR_REF* _token{nullptr};
   RDeps _rdeps; // Expression_?
   std::string /*TODO*/ _dimensions;
-  STORAGE_TYPE _stt;
 public:
-  explicit Variable_Decl() : Expression_() { }
+  explicit Variable_Decl() : Assignment() { }
+  explicit Variable_Decl(std::string const& name) : Assignment() {
+    // new_data(); // ??
+    assert(!_token_data);
+    new_token(name);
+   // n->_token = new Token_VAR_DECL(s+_token->name(), n, n->_token_data);
+  }
   ~Variable_Decl();
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
@@ -220,14 +279,13 @@ public:
   bool is_real()const { untested(); return type().is_real(); }
   bool is_int()const { untested(); return type().is_int(); }
   std::string const identifier()const { untested();return name();}
-  std::string const name()const; //  { untested();return name();}
+  //std::string const name()const; //  { untested();return name();}
   virtual std::string code_name()const {unreachable(); return "";}
 
   virtual Base const* value()const { unreachable(); return nullptr;}
   Block const* scope() const;
 //  TData const& deps()const { assert(_data); return *_data; }
   Variable_Decl* deep_copy(Base* owner, std::string prefix="") const;
-  Token_VAR_REF const& token()const { assert(_token); return *_token; }
   void update();
 private:
   TData& token_data() { assert(_token_data); return *_token_data; }
@@ -266,54 +324,6 @@ public:
   // }
 }; // Variable_Stmt
 /*--------------------------------------------------------------------------*/
-// actually a token?
-class Assignment : public Expression_ {
-protected:
-  TData* _data{nullptr};
-  Token_VAR_REF* _token{nullptr};
-protected:
-  Token_VAR_REF* _lhsref{nullptr};
-public:
-  explicit Assignment(CS& f, Base* o);
-  explicit Assignment() : Expression_() {}
-  ~Assignment();
-public:
-  //bool has_deps()const { untested(); return _data; }
-  TData const& data()const;
-  bool is_int() const;
-  Data_Type const& type()const;
-  Expression_ const& rhs()const {return *this;}
-  Token_VAR_REF const& lhs() const{
-    assert(_lhsref);
-    return *_lhsref;
-  }
-  void parse(CS& cmd) override;
-  std::string lhsname()const { return lhs().name(); }
-  void dump(std::ostream&)const override;
-  bool propagate_deps(Token_VAR_REF const&);
-  bool propagate_rdeps(RDeps const& incoming);
- // bool update();
-  bool update(RDeps const* r=nullptr);
-
-  void parse_rhs(CS& cmd);
-  RDeps const& rdeps() const;
-  Sensitivities const& sensitivities()const;
-  bool has_sensitivities()const;
-//  Block const* scope() const;
-  bool is_used_in(Base const*b)const;
-  bool is_used()const;
-  operator bool() const {return _token;}
-  bool is_output_var()const; // BUG
-  bool is_state_var()const;
-  bool is_common()const;
-  bool is_temporary()const;
-public: // storage
-  void assign_var()const;
-  void use_var()const;
-private: // implementation
-  bool store_deps(TData const&);
-  std::string code_name()const;
-}; // Assignment
 /*--------------------------------------------------------------------------*/
 // class AnalogExpression?
 class ConstantMinTypMaxExpression : public Base {
