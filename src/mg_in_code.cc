@@ -236,6 +236,11 @@ void Variable_Decl::dump(std::ostream& o)const
 	o << sep << d.name();
 	sep = ",";
       }
+      if(is_common()){ untested();
+	unreachable();
+	o << "-BUG-";
+      }else{
+      }
       o << "]";
     }else{
     }
