@@ -10,7 +10,7 @@ module dep0(d, g);
 ;
     T = V(g); // s1 r4{bax}
     c = T; // s2 r4{bax}
-    I(d) <+ c; // s2 r1{}
+    I(d) <+ c; // s2 r2{x}
   end
 
 endmodule

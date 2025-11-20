@@ -140,6 +140,7 @@ inline std::string Token_FUNCTION::code_name()const
 }
 /*--------------------------------------------------------------------------*/
 class TData;
+class RDeps;
 /*--------------------------------------------------------------------------*/
 Base* copy_deps(Base const* b);
 /*--------------------------------------------------------------------------*/
@@ -391,6 +392,7 @@ public:
   virtual Data_Type const& type()const;
   bool propagate_deps(Token_VAR_REF const&);
   TData const& deps()const;
+  RDeps const& rdeps()const;
   void assign_var();
   void use_var();
   Block const* scope() const;
@@ -511,6 +513,14 @@ public:
   virtual bool is_pot_probe()const {return false;}
   virtual bool is_flow_probe()const {return false;}
 };
+/*--------------------------------------------------------------------------*/
+#if 0
+class Token_ASSIGN : public Token_BINOP_ {
+  Token_VAR_REF* lhs() {return op1();}
+  Token* rhs() {return op2();}
+  [...]
+};
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

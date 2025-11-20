@@ -18,7 +18,7 @@ module dep7(d, g);
       end
     end
     T = c; // s4 r3{bax}
-    I(d, g) <+ c; // s3 r1{}
+    I(d, g) <+ c; // s3 r2{x}
   end
 
 endmodule

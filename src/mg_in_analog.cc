@@ -674,9 +674,11 @@ bool AnalogProceduralAssignment::update()
 //  trace1("AnalogProceduralAssignment::update",  _a.data().size());
 #ifdef DO_TRACE
   for(auto& r : rdeps()){ untested();
-    trace2("AnalogProceduralAssignment::update", _a.lhs().name(), typeid(*r).name());
+    trace2("AnalogProceduralAssignment::update0", _a.lhs().name(), r->val_string());
   }
 #endif
+
+ // _rdeps.merge(_a.lhsrdeps()); // sowas. inside _a.
 
   bool ret;
   if(options().optimize_unused() && !scope()->is_reachable()) {
@@ -684,14 +686,17 @@ bool AnalogProceduralAssignment::update()
   }else{
     RDeps r(rdeps());
     assert(r.size()==rdeps().size());
+  // TODO copy from _rdeps to _a._rdeps..?
     ret = _a.update(&r);
-    assert(r.size()==rdeps().size());
-    //_rdeps.merge(_a.data().rdeps());
+    if(r.size()==rdeps().size()){
+    }else{
+    }
+    ret |= merge_rdeps(r); // into Statement
   }
 
-  trace1("AnalogProceduralAssignment::update1",  rdeps().size());
+  trace2("AnalogProceduralAssignment::update1", _a.lhsname(), rdeps().size());
  // trace1("AnalogProceduralAssignment::update1",  _a.data().size());
-  trace1("AnalogProceduralAssignment::update1",  deps().size());
+ // trace1("AnalogProceduralAssignment::update1",  deps().size());
   ret |= propagate_rdep(&tr_begin_tag); // BUG. propagates across event block boundaries.
   // ret |= propagate_rdep(&tr_restore_tag);
   if(is_state_var()){
@@ -699,6 +704,13 @@ bool AnalogProceduralAssignment::update()
     ret |= propagate_rdep(&tr_accept_tag);
   }else{ untested();
   }
+#ifdef DO_TRACE
+  trace1("AnalogProceduralAssignment::update2", _a.lhsname());
+  for(auto i: _a.lhs().rdeps()){
+    trace2("AnalogProceduralAssignment::update2", _a.lhsname(), i->val_string());
+  }
+#endif
+
   return AnalogStmt::update() || ret;
 } // AnalogProceduralAssignment::update()
 /*--------------------------------------------------------------------------*/
@@ -1670,22 +1682,22 @@ void AnalogEvtCtlStmt::dump(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 bool AnalogEvtCtlStmt::update()
 {
-  trace1("AnalogEvtCtlStmt::update", rdeps_size());
+ // trace1("AnalogEvtCtlStmt::update", rdeps_size());
 
-  _ctrl.update(&rdeps());
+  bool ret = _ctrl.update(&rdeps());
  // bool rdd = _rhs.update(&_deps->rdeps());
-  bool ret = propagate_rdeps(_ctrl.rdeps());
+  ret |= propagate_rdeps(_ctrl.rdeps());
   while(true){
     _body.clear_vars();
     if ( _ctrl.update() ){ untested();
       ret = true;
+      _body.update();
     }else if (_body.update()){ untested();
       ret = true;
     }else{
       break;
     }
   }
-  trace1("AnalogEvtCtlStmt::update done", rdeps_size());
 
   // set_rdeps(_ctrl.rdeps());
   return AnalogStmt::update() || ret;
@@ -2818,6 +2830,12 @@ bool AnalogProceduralAssignment::is_used_in(Base const*b)const
 /*--------------------------------------------------------------------------*/
 AnalogStmt::~AnalogStmt()
 {
+}
+/*--------------------------------------------------------------------------*/
+// obsolete. need bulk propagate...
+bool AnalogProceduralAssignment::propagate_rdep(Base const* incoming)
+{
+  return Statement::propagate_rdep(incoming);
 }
 /*--------------------------------------------------------------------------*/
 // propagate individually?

@@ -31,6 +31,11 @@ bool Statement::set_used_in(Base const* b)
   return _rdeps.insert(b).second;
 }
 /*--------------------------------------------------------------------------*/
+bool Statement::merge_rdeps(RDeps const& r)
+{
+  return _rdeps.merge(r);
+}
+/*--------------------------------------------------------------------------*/
 void Statement::set_rdeps(TData const& )
 { untested();
       unreachable(); // still
@@ -393,7 +398,7 @@ void SeqBlock::parse_identifier(CS& f)
 /*--------------------------------------------------------------------------*/
 bool SeqBlock::update()
 {
-  trace0("AnalogSeqBlock::update");
+  trace1("AnalogSeqBlock::update", is_reachable());
   int ret = 0;
   if(is_reachable()){
     for(auto i: _variables){
@@ -407,7 +412,7 @@ bool SeqBlock::update()
     for(auto i: *this){
       if(auto s = dynamic_cast<Statement*>(i)){
 	ret += s->update();
-	trace1("AnalogSeqBlock::update lst", ret);
+	trace2("AnalogSeqBlock::update lst", ret, typeid(*s).name());
       }else{ untested();
 	unreachable(); // comment? later..
       }
@@ -599,19 +604,22 @@ bool Assignment::has_sensitivities()const
   return data().has_sensitivities();
 }
 /*--------------------------------------------------------------------------*/
-bool Assignment::update(RDeps const* r)
+bool Assignment::update(RDeps const* incoming)
 {
   bool ret;
-  if(r){
-    trace2("Assignment::update", r->size(), Expression_::data().size());
+  assert(_lhsref);
+  RDeps rdeps(_lhsref->rdeps());
+  trace2("Assignment::update0", lhsname(), rdeps.size());
+  if(incoming){
+    trace2("Assignment::update", incoming->size(), Expression_::data().size());
+    rdeps.merge(*incoming);
   }else{
   }
 
-  ret = Expression_::update(r);
+  ret = Expression_::update(&rdeps);
 
   assert(_token);
   assert(scope());
-  assert(_lhsref);
   trace3("Assignment::update", _lhsref->name(), _token->name(),  Expression_::data().size());
   if (store_deps(Expression_::data())) {
     trace3("Assignment::update0", _token->name(), _token->deps().size(), Expression_::data().size());
@@ -785,6 +793,17 @@ void Assignment::parse_rhs(CS& cmd)
   resolve_symbols(rhs);
   cmd.reset(cmd.cursor());
   trace1("Assignment::parse_rhs", bool(cmd));
+}
+/*--------------------------------------------------------------------------*/
+RDeps const& Assignment::rdeps() const
+{
+  if(_lhsref){
+    trace2("Assignment::rdeps", lhsname(), _lhsref->rdeps().size());
+    return _lhsref->rdeps();
+  }else{ untested();
+    static RDeps r;
+    return r;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Variable_List_Collection::parse(CS& f)

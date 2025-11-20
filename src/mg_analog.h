@@ -525,7 +525,6 @@ private:
 class AnalogProceduralAssignment : public AnalogStmt {
   Assignment _a;
   TData _deps;
- // RDeps _rdeps;
 public:
   // explicit AnalogProceduralAssignment(Block* o) { untested();
   //   set_owner(o);
@@ -538,6 +537,7 @@ public:
   bool is_used_in(Base const*b)const override;
   Statement* deep_copy(Base* no)const override;
   bool propagate_rdeps(RDeps const& r)override;
+  bool propagate_rdep(Base const*);
 private:
   bool update()override;
   TData const& deps()const override {return _deps;};

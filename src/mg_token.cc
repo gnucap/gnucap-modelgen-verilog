@@ -1099,6 +1099,23 @@ TData const& Token_VAR_REF::deps() const
   return *d;
 }
 /*--------------------------------------------------------------------------*/
+RDeps const& Token_VAR_REF::rdeps() const
+{
+  if(auto s=dynamic_cast<Statement const*>(_item)){ untested();
+    return s->rdeps();
+  }else if(auto it=dynamic_cast<Assignment const*>(_item)){
+    return it->rdeps();
+  }else if(auto p = dynamic_cast<Variable_Decl const*>(_item)){
+    assert(p);
+    return p->rdeps();
+  }else if(dynamic_cast<Analog_Function const*>(_item)){ untested();
+  }else{ untested();
+    unreachable();
+  }
+  static RDeps t;
+  return t;
+}
+/*--------------------------------------------------------------------------*/
 Data_Type const& Token_VAR_REF::type() const
 {
   if(auto it=dynamic_cast<Assignment const*>(_item)){

@@ -29,11 +29,11 @@ module dep7(a, g);
         // f : 1
         real f// * [V(a)]
 ;
-        I(g) <+ d; // [V(a)] s3 r1{}
+        I(g) <+ d; // [V(a)] s3 r2{x}
         f = d; // [V(a)] s4 r3{bax}
       end
       else begin
-        I(g) <+ 1; // r1{}
+        I(g) <+ 1; // r2{x}
       end
     end
   end
@@ -73,11 +73,11 @@ module dep7p(a, g);
         // f : 1
         real f// * [V(a)]
 ;
-        I(g) <+ d; // [V(a)] s3 r1{}
+        I(g) <+ d; // [V(a)] s3 r2{x}
         f = d; // [V(a)] s4 r3{bax}
       end
       else begin
-        I(g) <+ 1; // r1{}
+        I(g) <+ 1; // r2{x}
       end
     end
   end

@@ -122,6 +122,7 @@ public:
 /*--------------------------------------------------------------------------*/
 class DigitalCtrlStmt : public DigitalStmt {
   TData _deps; // here?
+  RDeps _rdeps;
 protected:
   DigitalCtrlBlock _body;
 public:
@@ -132,6 +133,7 @@ public:
   DigitalCtrlBlock const& body()const { return _body; }
 private:
   TData const& deps()const override { return _deps;}; // ?
+  RDeps const& rdeps()const override { untested(); return _rdeps;};
 protected:
   bool update()override {
     bool ret = _body.update();

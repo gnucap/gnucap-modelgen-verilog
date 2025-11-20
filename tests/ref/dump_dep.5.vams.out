@@ -6,7 +6,7 @@ module test_dep5(np, n);
     real AA// + [V(p, n)]
 ;
     AA = V(p, n); // [V(p, n)] s1 r4{bax}
-    I(p, n) <+ ddt((AA * V(p, n))); // [V(ddt_0_p)] r1{}
+    I(p, n) <+ ddt((AA * V(p, n))); // [V(ddt_0_p)] r2{x}
   end
 
 endmodule

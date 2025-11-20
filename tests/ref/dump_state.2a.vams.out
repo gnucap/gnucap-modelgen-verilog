@@ -12,7 +12,7 @@ module st1(p);
       // c : 0
       c = (c + 1); // s2 r4{bax}
     end
-    V(p) <+ c; // s2 r1{}
+    V(p) <+ c; // s2 r2{x}
   end
 
 endmodule
@@ -27,7 +27,7 @@ module st0(p);
 ;
     if (0) begin // never
     end
-    V(p) <+ c; // s1 r1{}
+    V(p) <+ c; // s1 r2{x}
   end
 
 endmodule

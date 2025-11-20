@@ -90,9 +90,10 @@ public:
     { untested();unreachable();return nullptr;}
   virtual bool propagate_rdeps(RDeps const&);
   /*virtual?*/ bool propagate_rdep(Base const*);
-  virtual bool update(){
-    trace2("Statement::update nop", typeid(*this).name(), _rdeps.size());
-    return false; }
+  virtual bool update() {
+    trace2("Statement::update base", typeid(*this).name(), rdeps().size());
+    return false;
+  }
 //  virtual Statement* parent_stmt();
   // Block* scope() { return Owned_Base::owner(); }
   // Block const* scope() const { return Owned_Base::owner(); }
@@ -111,7 +112,7 @@ public:
   void dump(std::ostream&)const override{unreachable();}
 
 public:
-  virtual RDeps const& rdeps()const { return _rdeps; }
+  virtual RDeps const& rdeps()const {return _rdeps;}
 private:
   void set_rdeps(TData const&);
 //protected:
@@ -119,9 +120,11 @@ private:
 public:
   bool set_used_in(Base const*b);
   void unset_used_in(Base const*){} // later.
-  RDeps const& rdeps_()const {return _rdeps;} // dump_annotate
+  RDeps const& rdeps_()const {return rdeps();} // dump_annotate
+protected: // assign.
+  bool merge_rdeps(RDeps const&);
 protected: // dbg.
-  int rdeps_size()const { return int(_rdeps.size()); }
+ // int rdeps_size()const { return int(_rdeps.size()); }
  // void set_rdeps(TData const&);
 public:
   bool is_reachable()const;
@@ -201,6 +204,7 @@ public:
   void set_type(Data_Type const& d){ _data.set_type(d); }
   bool propagate_deps(Token_VAR_REF const&);
   bool propagate_rdeps(RDeps const&);
+ RDeps const& rdeps()const {return _rdeps;}
 public: // query storage
   bool is_common()const;
   bool is_temporary()const;
@@ -257,11 +261,12 @@ public:
     { untested();unreachable();return nullptr;}
   bool update() override;
   bool is_used_in(Base const* b)const override;
-  RDeps const& rdeps()const override{
-    static RDeps r; return r;
-  }
-};
+  // RDeps const& rdeps()const override{
+  //   static RDeps r; return r;
+  // }
+}; // Variable_Stmt
 /*--------------------------------------------------------------------------*/
+// actually a token?
 class Assignment : public Expression_ {
 protected:
   TData* _data{nullptr};
@@ -283,6 +288,7 @@ public:
     return *_lhsref;
   }
   void parse(CS& cmd) override;
+  std::string lhsname()const { return lhs().name(); }
   void dump(std::ostream&)const override;
   bool propagate_deps(Token_VAR_REF const&);
   bool propagate_rdeps(RDeps const& incoming);
@@ -290,7 +296,7 @@ public:
   bool update(RDeps const* r=nullptr);
 
   void parse_rhs(CS& cmd);
-  RDeps const& rdeps() const { static RDeps r; return r; } // dump_annotate.
+  RDeps const& rdeps() const;
   Sensitivities const& sensitivities()const;
   bool has_sensitivities()const;
 //  Block const* scope() const;

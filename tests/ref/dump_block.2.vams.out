@@ -28,7 +28,7 @@ module test_bug_block1(p, n);
       end
     end
     xgt = V(p); // [V(p)] s1 r3{bax}
-    I(p, n) <+ V(p, n); // [V(p, n)] r1{}
+    I(p, n) <+ V(p, n); // [V(p, n)] r2{x}
   end
 
 endmodule

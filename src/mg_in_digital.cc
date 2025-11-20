@@ -1188,7 +1188,6 @@ void DigitalEvtCtlStmt::dump(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 bool DigitalEvtCtlStmt::update()
 { untested();
-  trace1("DigitalEvtCtlStmt::update", rdeps_size());
 
  // bool rdd = _rhs.update(&_deps->rdeps());
   bool ret = propagate_rdeps(_ctrl.rdeps());
@@ -1202,7 +1201,6 @@ bool DigitalEvtCtlStmt::update()
       break;
     }
   }
-  trace1("DigitalEvtCtlStmt::update done", rdeps_size());
 
   // set_rdeps(_ctrl.rdeps());
   return DigitalStmt::update() || ret;

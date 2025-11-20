@@ -30,7 +30,7 @@ module test_while0a(p, n);
       y = (x + V(p, n)); // [V(p, n)] s3 r4{bax}
     end
     x = x; // [V(p, n)] s5 r4{bax}
-    I(p, n) <+ x; // [V(p, n)] s5 r1{}
+    I(p, n) <+ x; // [V(p, n)] s5 r2{x}
   end
 
 endmodule
