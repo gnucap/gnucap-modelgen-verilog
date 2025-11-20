@@ -25,6 +25,7 @@
 #include "mg_token.h"
 #include "mg_attrib.h"
 #include "mg_options.h"
+#include "mg_in.h"
 /*--------------------------------------------------------------------------*/
 bool Statement::set_used_in(Base const* b)
 {
@@ -383,6 +384,41 @@ bool Variable_Stmt::is_used_in(Base const* b) const
   }else{ untested();
     return true; // mg_strobe.0.gc.out 
     return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+    // f >> _variables; ?
+static void parse_block_variables(CS& f, Variable_List_Collection& P)
+{
+  for (;;) {
+    trace1("AnalogSeqBlock::parse loop", f.tail().substr(0,20));
+    parse_attributes(f, &f);
+    if( 0 // || ((f >> "parameter ") && (f >> _parameters))
+	|| ((f >> "real ") && (f >> P))
+	|| ((f >> "integer ") && (f >> P))) {
+      if(f.peek() == ';') { untested();
+	f.warn(bWARNING, "stray semicolon\n");
+	f.skip();
+      }else{
+      }
+    }else if (attr.has_attributes(tag_t(&f))) { untested();
+      f.warn(bWARNING, "dangling attributes "
+	   + attr.attributes(tag_t(&f))->string(tag_t(nullptr)));
+      break;
+    }else{
+      // break if stuck?
+      break;
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+void SeqBlock::parse(CS& f)
+{
+  _variables.set_owner(this);
+  if(f >> ":"){
+    parse_identifier(f);
+    parse_block_variables(f, _variables);
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/

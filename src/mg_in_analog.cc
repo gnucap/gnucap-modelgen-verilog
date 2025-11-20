@@ -947,40 +947,10 @@ void AnalogSeqStmt::parse(CS& f)
   // _block.update();
 }
 /*--------------------------------------------------------------------------*/
-    // f >> _variables; ?
-static void parse_block_variables(CS& f, Variable_List_Collection& P)
-{
-  for (;;) {
-    trace1("AnalogSeqBlock::parse loop", f.tail().substr(0,20));
-    parse_attributes(f, &f);
-    if( 0 // || ((f >> "parameter ") && (f >> _parameters))
-	|| ((f >> "real ") && (f >> P))
-	|| ((f >> "integer ") && (f >> P))) {
-      if(f.peek() == ';') { untested();
-	f.warn(bWARNING, "stray semicolon\n");
-	f.skip();
-      }else{
-      }
-    }else if (attr.has_attributes(tag_t(&f))) { untested();
-      f.warn(bWARNING, "dangling attributes "
-	   + attr.attributes(tag_t(&f))->string(tag_t(nullptr)));
-      break;
-    }else{
-      // break if stuck?
-      break;
-    }
-  }
-}
-/*--------------------------------------------------------------------------*/
 void AnalogSeqBlock::parse(CS& f)
 {
   assert(owner());
-  if(f >> ":"){
-    parse_identifier(f);
-    _variables.set_owner(this);
-    parse_block_variables(f, _variables);
-  }else{
-  }
+  SeqBlock::parse(f); // _variables
   if(dynamic_cast<Module const*>(owner())) { untested();
     set_always();
   }else if(dynamic_cast<Module const*>(scope())) {

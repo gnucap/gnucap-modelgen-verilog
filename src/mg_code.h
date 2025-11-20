@@ -334,12 +334,11 @@ public:
 class Sensitivities;
 class SeqBlock : public Block {
   Sensitivities* _sens{nullptr}; // here?
-protected: // AF
   Variable_List_Collection _variables;
 public:
   explicit SeqBlock() : Block() {}
   ~SeqBlock();
-  void parse(CS&)override{ untested();incomplete();}
+  void parse(CS&)override;
 //  void dump(std::ostream& o)const override;
   void parse_identifier(CS& f);
   bool has_identifier()const {return _identifier != "";}
