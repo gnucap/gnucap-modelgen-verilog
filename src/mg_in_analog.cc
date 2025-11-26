@@ -919,23 +919,25 @@ bool AnalogConstruct::is_used_in(Base const*) const
 void AnalogConstruct::new_block()
 {
   assert(!_block);
-  _block = new AnalogCtrlBlock();
-  _block->set_owner(this);
+//  _block = new AnalogCtrlBlock();
+  _block.set_owner(this);
 }
 /*--------------------------------------------------------------------------*/
 void AnalogConstruct::push_back(Statement*s)
 {
   assert(_block);
-  _block->push_back(s);
+  _block.push_back(s);
 }
 /*--------------------------------------------------------------------------*/
 void AnalogConstruct::parse(CS& f)
 {
   assert(owner());
   assert(!_block);
-  auto ab = new AnalogCtrlBlock(f, this);
-  _block = ab;
-  while(ab->update()){
+  _block.set_owner(this);
+  f >> _block;
+//  auto ab = new AnalogCtrlBlock(f, this);
+//  _block = ab;
+  while(_block.update()){
     trace0("AnalogConstruct update");
   }
 }
@@ -1044,7 +1046,7 @@ void AnalogCtrlBlock::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 void AnalogConstruct::dump(std::ostream& o)const
 {
-  Base* b = _block;
+  Base const* b = &_block;
   b->dump(o);
 }
 /*--------------------------------------------------------------------------*/

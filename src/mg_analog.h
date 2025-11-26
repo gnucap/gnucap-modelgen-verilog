@@ -25,6 +25,7 @@
 #include "mg_.h"
 #include "mg_code.h"
 /*--------------------------------------------------------------------------*/
+typedef Collection<Statement> AnalogList;
 class AnalogStmt : public Statement {
 public:
   ~AnalogStmt();
@@ -172,6 +173,24 @@ public:
   operator bool()const{ return size() || identifier() !=""; }
   void set_owner(Statement* owner);
 }; // AnalogCtrlBlock
+/*--------------------------------------------------------------------------*/
+class AnalogConstruct : public Statement {
+  AnalogCtrlBlock _block;
+public:
+  AnalogConstruct(){ }
+  ~AnalogConstruct(){ }
+
+public:
+  void parse(CS& cmd)override;
+  void dump(std::ostream& o)const override;
+  bool update()override { untested(); incomplete(); return false; }
+  void new_block();
+  Block const* block_or_null() const{ return &_block; }
+  Block* block(){ return &_block; }
+  Block const* block()const{ return &_block; }
+  void push_back(Statement*); // push into _block...
+  bool is_used_in(Base const*)const override; // BUG?
+}; // AnalogConstruct
 /*--------------------------------------------------------------------------*/
 class AnalogFunctionArgs : public Block {
   Variable_List_Collection _variables;

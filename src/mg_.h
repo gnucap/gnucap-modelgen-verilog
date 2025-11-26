@@ -186,29 +186,6 @@ public:
 class Sensitivities;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-// BUG. analog.h?
-class AnalogConstruct : public Statement {
-  Block* _block{nullptr};
-public:
-  AnalogConstruct(){
-  }
-  ~AnalogConstruct(){
-    delete _block;
-    _block = nullptr;
-  }
-
-public:
-  void parse(CS& cmd)override;
-  void dump(std::ostream& o)const override;
-  bool update()override { untested(); incomplete(); return false; }
-  void new_block();
-  Block const* block_or_null() const{ return _block; }
-  Block* block(){ return _block; }
-  Block const* block()const{ return _block; }
-  void push_back(Statement*);
-  bool is_used_in(Base const*)const override; // BUG?
-};
-typedef Collection<Statement> AnalogList;
 #if 0
 class Eval : public Base {
 protected:
