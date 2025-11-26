@@ -402,6 +402,7 @@ void AnalogInitialStmt::parse(CS& f)
   _body.set_owner(this);
 
   if(f >> _body){
+    scope()->add_block(&_body); //?
   }else{ untested();
     throw Exception_CS_("expecting statement", f);
   }
@@ -460,17 +461,19 @@ void AnalogConditionalStmt::parse(CS& f)
     }
 
     if(f >> _body){
+      scope()->add_block(&_body);
     }else{
       throw Exception_CS_("expecting statement", f);
     }
     size_t here = f.cursor();
     if(f >> "else "){
       f >> _false_part;
+      scope()->add_block(&_false_part);
     }else{
       f.reset(here);
     }
   }
-}
+} // AnalogConditionalStmt::parse
 /*--------------------------------------------------------------------------*/
 void AnalogConditionalStmt::dump(std::ostream& o) const
 {
@@ -527,6 +530,7 @@ void AnalogCtrlStmt::parse(CS& f)
 {
   _body.set_owner(this);
   f >> _body;
+  scope()->add_block(&_body);
 }
 /*--------------------------------------------------------------------------*/
 void AnalogCtrlStmt::dump(std::ostream& o) const
@@ -596,6 +600,7 @@ void AnalogWhileStmt::parse(CS& file)
   }else{
     _body.set_owner(this);
     file >> _body;
+    scope()->add_block(&_body);
   }
 
   update();
@@ -663,10 +668,11 @@ void AnalogForStmt::parse(CS& f)
   }else{
     _body.set_owner(this); // needed?
     f >> _body;
+    scope()->add_block(&_body);
   }
 
   update();
-}
+} // AnalogForStmt::parse
 /*--------------------------------------------------------------------------*/
 bool AnalogProceduralAssignment::update()
 {
@@ -844,9 +850,9 @@ void AnalogSwitchStmt::parse(CS& f)
   //_ctrl.set_owner(scope());
   _ctrl.set_owner(this);
   _body.set_owner(this);
-  auto sb = dynamic_cast<SeqBlock*>(scope());
+  auto sb = prechecked_cast<SeqBlock*>(scope());
   assert(sb);
-  sb->add_block(&_body); // re-use var_ref?
+  // sb->add_block(&_body); // re-use var_ref?
 
   f >> "(" >> _ctrl >> ")";
   CaseGen* def = nullptr;
@@ -888,6 +894,8 @@ void AnalogSwitchStmt::parse(CS& f)
       }
 
       _body.push_back(g);
+      assert(sb);
+      sb->add_block(g->body());
     }
   }
 }
@@ -944,6 +952,10 @@ void AnalogSeqStmt::parse(CS& f)
   }
 
   f >> _block;
+
+  auto sb = prechecked_cast<SeqBlock*>(scope());
+  sb->add_block(&_block);
+
   // _block.update();
 }
 /*--------------------------------------------------------------------------*/
@@ -952,13 +964,12 @@ void AnalogSeqBlock::parse(CS& f)
   assert(owner());
   SeqBlock::parse(f); // _variables
   if(dynamic_cast<Module const*>(owner())) { untested();
+    unreachable();
     set_always();
   }else if(dynamic_cast<Module const*>(scope())) {
     set_always();
-  }else if(auto sb = dynamic_cast<SeqBlock*>(scope())) {
-    // BUG?: why doesnt the caller add the block?
-    sb->add_block(this); // re-use var_ref?
-  }else if(dynamic_cast<Statement const*>(owner())) { untested();
+  }else if(prechecked_cast<SeqBlock*>(scope())) {
+  }else if(prechecked_cast<Statement const*>(owner())) {
   }else{ untested();
     unreachable();
   }
@@ -1008,8 +1019,8 @@ void AnalogCtrlBlock::set_owner(Statement* st)
 /*--------------------------------------------------------------------------*/
 void AnalogCtrlBlock::parse(CS& f)
 {
-  auto sb = dynamic_cast<SeqBlock*>(scope());
   if(dynamic_cast<Module const*>(owner())) { untested();
+    unreachable();
     set_always();
   }else{
     // assert(sb);
@@ -1025,10 +1036,6 @@ void AnalogCtrlBlock::parse(CS& f)
       assert(!b);
     }else if(b){
       push_back(b);
-      if(sb){
-	sb->add_block(this); // BUG? possybly wrong place.
-      }else{
-      }
     }else{
       delete b;
     }
@@ -1539,44 +1546,13 @@ void AnalogCtrlBlock::dump(std::ostream& o)const
 	i->dump(o);
       }
       if(size()){
-	SeqBlock::dump(o);
+	Block::dump(o);
       }else{
       }
     }
   }else{
     o<< "\n";
     // (why not) annotate?
-  }
-  o__ "end\n";
-}
-/*--------------------------------------------------------------------------*/
-void AnalogSeqBlock::dump(std::ostream& o)const
-{
-  // SeqBlock::dump, code?
-  o__ "begin";
-  if(identifier() != ""){
-    o << " : " << identifier() << "\n";
-    indent x;
-    for(auto* i : variables_()) {
-      i->dump(o);
-    }
-  }else{
-    assert(!variables_().size());
-    o << "\n";
-  }
-  if(options().dump_annotate()){
-    for(auto i : variables()){
-      if(auto v = dynamic_cast<Token_VAR_REF const*>(i.second)){
-	o__ "// " << v->name() << " : " << v->deps().size() << "\n";
-      }else{
-	o__ "// " << i.first << "\n";
-      }
-    }
-  }else{
-  }
-  {
-    indent x;
-    Block::dump(o);
   }
   o__ "end\n";
 }
@@ -1625,6 +1601,7 @@ void AnalogEvtCtlStmt::parse(CS& file)
   _body.set_owner(this);
   _body.set_sens(this); // BUG
   file >> _body;
+  scope()->add_block(&_body);
 }
 /*--------------------------------------------------------------------------*/
 void AnalogEvtCtlStmt::dump(std::ostream& o) const

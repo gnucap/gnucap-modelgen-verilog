@@ -26,6 +26,7 @@
 #include "mg_attrib.h"
 #include "mg_options.h"
 #include "mg_in.h"
+#include "mg_out.h"
 /*--------------------------------------------------------------------------*/
 bool Statement::set_used_in(Base const* b)
 {
@@ -391,7 +392,7 @@ bool Variable_Stmt::is_used_in(Base const* b) const
 static void parse_block_variables(CS& f, Variable_List_Collection& P)
 {
   for (;;) {
-    trace1("AnalogSeqBlock::parse loop", f.tail().substr(0,20));
+    trace1("SeqBlock::parse loop", f.tail().substr(0,20));
     parse_attributes(f, &f);
     if( 0 // || ((f >> "parameter ") && (f >> _parameters))
 	|| ((f >> "real ") && (f >> P))
@@ -412,6 +413,10 @@ static void parse_block_variables(CS& f, Variable_List_Collection& P)
   }
 }
 /*--------------------------------------------------------------------------*/
+void SwitchBlock::parse(CS&)
+{
+}
+/*--------------------------------------------------------------------------*/
 void SeqBlock::parse(CS& f)
 {
   _variables.set_owner(this);
@@ -422,6 +427,41 @@ void SeqBlock::parse(CS& f)
   }
 }
 /*--------------------------------------------------------------------------*/
+void SwitchBlock::dump(std::ostream& o)const
+{
+  Block::dump(o);
+}
+/*--------------------------------------------------------------------------*/
+void SeqBlock::dump(std::ostream& o)const
+{
+  o__ "begin";
+  if(identifier() != ""){
+    o << " : " << identifier() << "\n";
+    indent x;
+    for(auto* i : variables_()) {
+      i->dump(o);
+    }
+  }else{
+    assert(!variables_().size());
+    o << "\n";
+  }
+  if(options().dump_annotate()){
+    for(auto i : variables()){
+      if(auto v = dynamic_cast<Token_VAR_REF const*>(i.second)){
+	o__ "// " << v->name() << " : " << v->deps().size() << "\n";
+      }else{
+	o__ "// " << i.first << "\n";
+      }
+    }
+  }else{
+  }
+  {
+    indent x;
+    Block::dump(o);
+  }
+  o__ "end\n";
+}
+/*--------------------------------------------------------------------------*/
 void SeqBlock::parse_identifier(CS& f)
 {
   f >> _identifier;
@@ -430,6 +470,50 @@ void SeqBlock::parse_identifier(CS& f)
     scope()->new_var_ref(this);
   }else{ untested();
   }
+}
+/*--------------------------------------------------------------------------*/
+Base* SwitchBlock::lookup(std::string const& k, bool recurse)
+{
+  Base* v = Block::lookup(k, recurse);
+  if(dynamic_cast<Token_VAR_REF*>(v)){
+    // bug. not here.
+   // _variable_access.push_use(r);
+  }else{
+  }
+  return v;
+}
+/*--------------------------------------------------------------------------*/
+bool SwitchBlock::update()
+{
+  trace1("AnalogSeqBlock::update", is_reachable());
+  int ret = 0;
+  if(is_reachable()){
+//    for(auto i: _variables){
+//      if(auto s = dynamic_cast<Statement*>(i)){
+//	ret += s->update();
+//	trace1("AnalogSeqBlock::update var", ret);
+//      }else{ untested();
+//	unreachable(); // comment? later..
+//      }
+//    }
+    for(auto i: *this){
+      if(auto s = dynamic_cast<Statement*>(i)){
+	ret += s->update();
+	trace2("AnalogSeqBlock::update lst", ret, typeid(*s).name());
+      }else{ untested();
+	unreachable(); // comment? later..
+      }
+    }
+  }else{
+  }
+  trace1("AnalogSeqBlock::update done", ret);
+
+  if(ret){
+    // propagate variable deps to parent scope..
+  }else{
+    // propagate variable xs to parent scop
+  }
+  return ret;
 }
 /*--------------------------------------------------------------------------*/
 bool SeqBlock::update()
@@ -480,6 +564,12 @@ void SeqBlock::set_sens(Base* s)
     _sens = new Sensitivities;
   }
   _sens->add(s);
+}
+/*--------------------------------------------------------------------------*/
+SwitchBlock::~SwitchBlock()
+{
+  delete _sens;
+  _sens = nullptr;
 }
 /*--------------------------------------------------------------------------*/
 SeqBlock::~SeqBlock()

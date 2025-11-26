@@ -349,7 +349,7 @@ public:
   explicit SeqBlock() : Block() {}
   ~SeqBlock();
   void parse(CS&)override;
-//  void dump(std::ostream& o)const override;
+  void dump(std::ostream& o)const override;
   void parse_identifier(CS& f);
   bool has_identifier()const {return _identifier != "";}
 
@@ -381,6 +381,44 @@ public:
   //bool propagate_rdeps(RDeps const&);
 }; // SeqBlock
 /*--------------------------------------------------------------------------*/
+class SwitchBlock : public Block {
+  Sensitivities* _sens{nullptr}; // here?
+public:
+  explicit SwitchBlock() : Block() { }
+  ~SwitchBlock();
+  void parse(CS&)override;
+  void dump(std::ostream& o)const override;
+  void parse_identifier(CS& f);
+  bool has_identifier()const {return _identifier != "";}
+
+public:
+
+  Branch_Ref new_branch(std::string const& p, std::string const& n)override {
+    assert(owner());
+    return scope()->new_branch(p, n);
+  }
+  Branch_Ref new_branch(Node* p, Node* n)override { untested();
+    assert(owner());
+    return scope()->new_branch(p, n);
+  }
+  Node_Ref node(std::string const& n)const override {
+    assert(owner());
+    return scope()->node(n);
+  }
+  Branch_Ref lookup_branch(std::string const& n)const override {
+    assert(owner());
+    return scope()->lookup_branch(n);
+  }
+  String_Arg const& identifier() const{ return _identifier; }
+  bool has_sensitivities()const {return _sens;}
+  Sensitivities const* sensitivities()const {return _sens;}
+  void set_sens(Base* s);
+  void merge_sens(Sensitivities const& s);
+  map const& variables()const {return _var_refs;}
+  bool update();
+public:
+  Base* lookup(std::string const& k, bool recurse=true)override;
+}; // SeqBlock
 inline bool Statement::is_used_in(Base const* b) const
 {
   // "used in vs rdeps?"

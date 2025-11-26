@@ -125,7 +125,7 @@ public:
   }
 public:
   void parse(CS& cmd)override;
-  void dump(std::ostream& o)const override;
+  // void dump(std::ostream& o)const override; // SeqBlock??
   SeqBlock const& block()const {
     return *this;
   }
@@ -414,6 +414,7 @@ public:
   bool is_reachable()const {return _body.is_reachable() ;}
   bool is_always()const {return _body.is_always() ;}
   void calc_reach(Expression const& cond);
+  Block* body() {return &_body;}
 
   String_Arg key() const{ untested();return String_Arg("CaseGen");}
   RDeps const& rdeps()const override { untested(); return _rdeps; }
@@ -440,7 +441,7 @@ public:
 class AnalogSwitchStmt : public AnalogStmt { // CtrlStmt?
   TData _deps; // here?
   AnalogConstExpression _ctrl; // Const??
-  SeqBlock _body;
+  SwitchBlock _body;
   RDeps _rdeps; // here?
 public:
   AnalogSwitchStmt(Block* o, CS& file) {
@@ -452,7 +453,7 @@ public:
   void parse(CS& file) override;
   void dump(std::ostream& o)const override;
   AnalogConstExpression const& control() const{return _ctrl;}
-  SeqBlock const& cases()const {return _body;}
+  SwitchBlock const& cases()const {return _body;}
   bool update()override;
   TData const& deps()const override { return _deps;};
  // TData const& data()const override {return _deps;}; // ctrl?
