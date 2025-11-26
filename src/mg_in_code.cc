@@ -189,6 +189,8 @@ void Variable_Decl::parse(CS& f)
     throw Exception_CS_("already declared", f);
   }
 
+  assert(token().item()==this);
+
   if(attr.has_attributes(tag_t(&f))) {
     ATTRIB_LIST_p const& a = attr.attributes(tag_t(&f));
     attr.set_attributes(tag_t(&token())) = a;
@@ -924,7 +926,7 @@ void Assignment::parse_rhs(CS& cmd)
 RDeps const& Assignment::rdeps() const
 {
   if(_lhsref){
-    trace2("Assignment::rdeps", lhsname(), _lhsref->rdeps().size());
+//    trace2("Assignment::rdeps", lhsname(), _lhsref->rdeps().size());
     return _lhsref->rdeps();
   }else{ untested();
     static RDeps r;

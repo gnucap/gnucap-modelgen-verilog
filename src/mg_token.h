@@ -371,14 +371,11 @@ class Token_VAR_REF : public Token_SYMBOL {
 protected:
   Base* _item;
 public:
-  explicit Token_VAR_REF(std::string Name, Base* item)
-    : Token_SYMBOL(Name, ""), _item(item) {}
-  explicit Token_VAR_REF(std::string Name, Base* item, Base const* data)
+  explicit Token_VAR_REF(std::string Name, Base* item, Base const* data=nullptr)
     : Token_SYMBOL(Name, data), _item(item) {}
 // protected: //??
   explicit Token_VAR_REF(const Token_VAR_REF& P, Base* d=nullptr)
-    : Token_SYMBOL(P.name(), d), _item(P._item) {}
-  explicit Token_VAR_REF() : Token_SYMBOL("","")  { untested(); unreachable(); }
+    : Token_SYMBOL(P.name(), d), _item(P._item) { }
   ~Token_VAR_REF() {
     trace1("~Token_VAR_REF", name());
   }
@@ -389,6 +386,7 @@ public:
 public:
   void stack_op(Expression* e)const override;
   Base const* operator->() const{ return _item; }
+  Base const* item()const { return _item; }
   virtual Data_Type const& type()const;
   bool propagate_deps(Token_VAR_REF const&);
   TData const& deps()const;

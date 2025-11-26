@@ -614,6 +614,15 @@ static void stack_op_args(Expression* EE, Expression const* arg_expr, FUNCTION_ 
       tt->use_var(); // needed?
       tt->assign_var(); // maybe..
       tt->stack_op(EE);
+
+#if 1 // def DEBUG
+      assert(EE->size());
+      auto ttt = prechecked_cast<Token_VAR_REF*>(EE->back());
+      assert(ttt);
+      trace2("stackop io arg", ttt->name(), typeid(*ttt).name());
+      assert(prechecked_cast<Assignment const*>(ttt->item()));
+#endif
+
     }else{
       unreachable();
       (**i).stack_op(EE);
@@ -951,8 +960,9 @@ void Token_VAR_REF::stack_op(Expression* e)const
 
   {
     TData* nd = nullptr;
-    if(dynamic_cast<Variable_Decl const*>(_item)){
-      incomplete();
+    if(auto vd = dynamic_cast<Variable_Decl const*>(_item)){
+//       nd = vd->data().clone();
+       nd = new TData();
     }else if(auto a = dynamic_cast<Assignment const*>(_item)){
       // nd = deps().clone();
       nd = a->data().clone();
@@ -980,6 +990,7 @@ void Token_VAR_REF::stack_op(Expression* e)const
     assert(!_item || nn->num_deps() == nd->ddeps().size());
     e->push_back(nn);
     assert(nn->_item == _item);
+    trace2("var::stackop", name(), typeid(*_item).name());
 
   }
 }
@@ -1239,7 +1250,7 @@ void Token_VAR_DECL::stack_op(Expression* e)const
       incomplete();
     }
 
-    auto nn = new Token_VAR_REF(name(), E->scope(), nd);
+    auto nn = new Token_VAR_REF(name(), _item, nd);
     assert(nn->scope());
     e->push_back(nn);
 
