@@ -129,7 +129,7 @@ static Base* new_evt_ctl_stmt(CS& file, Block* o)
 static Statement* parse_seq(CS& f, Block* owner)
 {
   size_t here = f.cursor();
-  if(f >> "begin") {
+  if(f >> "begin ") {
     f.reset(here);
     return new AnalogSeqStmt(f, owner);
   }else{
@@ -978,7 +978,7 @@ void AnalogSeqBlock::parse(CS& f)
   assert(owner());
 
 //  size_t here = f.cursor();
-  bool begin = f >> "begin"; // ctos, :?
+  bool begin = f >> "begin ";
   if(begin){
     // f.reset(here);
     SeqBlock::parse(f); // _variables

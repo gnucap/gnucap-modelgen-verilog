@@ -1,0 +1,18 @@
+module dep0(d, g);
+  inout d, g;
+  electrical d, g;
+  real beginvar = 0// -
+;
+
+  analog begin : main // always
+  end
+
+  analog begin // always
+    // beginvar : 0
+    beginvar = 0; // s1 r3{bax}
+  end
+
+endmodule
+
+
+
