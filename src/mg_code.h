@@ -345,8 +345,24 @@ class Sensitivities;
 class SeqBlock : public Block {
   Sensitivities* _sens{nullptr}; // here?
   Variable_List_Collection _variables;
+  enum context{
+    ctx_unknown,
+    ctx_default,
+    ctx_function,
+    ctx_initial
+  } _ctx{ctx_unknown};
 public:
-  explicit SeqBlock() : Block() {}
+  explicit SeqBlock(Base const* owner) : Block() {
+    (void)owner;
+    incomplete();
+  }
+  explicit SeqBlock(Block const* scope) : Block() {
+    if(auto b = dynamic_cast<SeqBlock const*>(scope)){
+      _ctx = b->_ctx;;
+    }else{
+      _ctx = ctx_unknown;
+    }
+  }
   ~SeqBlock();
   void parse(CS&)override;
   void dump(std::ostream& o)const override;

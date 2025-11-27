@@ -7,8 +7,8 @@ module test_strobe3(a, b);
 ;
 
   analog begin // always
-    begin
-    // P : 0
+    begin // always
+      // P : 0
       P = p; // s1 r5{bevax}
       if ((P == 1)) begin
       end

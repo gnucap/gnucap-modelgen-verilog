@@ -117,10 +117,9 @@ public:
 class AnalogSeqBlock : public SeqBlock {
 protected: // BUG?
   TData _deps;
-protected:
 public:
-  explicit AnalogSeqBlock() : SeqBlock() {}
-  explicit AnalogSeqBlock(CS& cmd, Base* owner) : SeqBlock() { untested();
+  explicit AnalogSeqBlock() : SeqBlock((Block*)nullptr) {}
+  explicit AnalogSeqBlock(CS& cmd, Base* owner) : SeqBlock(owner) { untested();
     set_owner(owner);
     parse(cmd);
   }
@@ -152,14 +151,13 @@ public:
     parse(cmd);
   }
   void parse(CS& cmd)override;
-  void dump(std::ostream& o)const override {
-    _block.dump(o);
-  }
+  void dump(std::ostream& o)const override;
   bool update()override { return _block.update(); }
   AnalogSeqBlock const& block()const { return _block; }
   TData const& deps()const override { untested(); return _block.deps(); }
 };
 /*--------------------------------------------------------------------------*/
+// AnalogSeqBlock + some parse quirks
 class AnalogCtrlBlock : public AnalogSeqBlock {
 public:
   explicit AnalogCtrlBlock() : AnalogSeqBlock() {}
@@ -168,8 +166,8 @@ public:
     parse(f);
   }
 
-  void parse(CS& cmd)override;
-  void dump(std::ostream& o)const override;
+//  void parse(CS& cmd)override;
+//  void dump(std::ostream& o)const override;
   operator bool()const{ return size() || identifier() !=""; }
   void set_owner(Statement* owner);
 }; // AnalogCtrlBlock
@@ -228,7 +226,7 @@ public: // can't resolve these..
   Base* lookup(std::string const& f, bool recurse=true)override;
 
   bool new_var_ref(Base* what)override;
-  void dump(std::ostream& f)const override;
+//  void dump(std::ostream& f)const override { AnalogCtrlBlock::dump(o); }
   Block* scope();
 };
 /*--------------------------------------------------------------------------*/

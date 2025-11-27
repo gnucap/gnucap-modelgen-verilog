@@ -9,11 +9,11 @@ module my_res(a, b);
 
   analog begin // always
     // __i : 1
-    begin
-    // __i : 0
+    begin // always
+      // __i : 0
       __i =  3.; // s1 r3{bax}
-      begin
-      // __i : 1
+      begin // always
+        // __i : 1
         __i = V(a, b); // [V(a, b)] s1 r3{bax}
       end
     end

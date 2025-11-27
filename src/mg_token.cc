@@ -960,8 +960,7 @@ void Token_VAR_REF::stack_op(Expression* e)const
 
   {
     TData* nd = nullptr;
-    if(auto vd = dynamic_cast<Variable_Decl const*>(_item)){
-//       nd = vd->data().clone();
+    if(dynamic_cast<Variable_Decl const*>(_item)){
        nd = new TData();
     }else if(auto a = dynamic_cast<Assignment const*>(_item)){
       // nd = deps().clone();

@@ -436,29 +436,41 @@ void SwitchBlock::dump(std::ostream& o)const
 /*--------------------------------------------------------------------------*/
 void SeqBlock::dump(std::ostream& o)const
 {
-  o__ "begin";
-  if(identifier() != ""){
-    o << " : " << identifier() << "\n";
-    indent x;
-    for(auto* i : variables_()) {
-      i->dump(o);
+  o << "begin";
+  if(identifier() != "" || size()){
+    if(identifier() != ""){
+      o << " : " << identifier();
+    }else{
     }
+    if(!options().dump_annotate()){
+    }else if(is_always()){
+      o << " // always";
+    }else if(is_never()){
+      o << " // never";
+    }else{
+    }
+    o << "\n";
   }else{
     assert(!variables_().size());
     o << "\n";
   }
-  if(options().dump_annotate()){
-    for(auto i : variables()){
-      if(auto v = dynamic_cast<Token_VAR_REF const*>(i.second)){
-	o__ "// " << v->name() << " : " << v->deps().size() << "\n";
-      }else{
-	o__ "// " << i.first << "\n";
-      }
-    }
-  }else{
-  }
   {
     indent x;
+    if(options().dump_annotate()){
+      for(auto i : variables()){
+	if(auto v = dynamic_cast<Token_VAR_REF const*>(i.second)){
+	  o__ "// " << v->name() << " : " << v->deps().size() << "\n";
+	}else if(dynamic_cast<Block const*>(i.second)){
+	  // later.
+	}else{
+	  o__ "// " << i.first << "\n";
+	}
+      }
+    }else{
+    }
+    for(auto* i : variables_()) {
+      i->dump(o);
+    }
     Block::dump(o);
   }
   o__ "end\n";
@@ -596,7 +608,6 @@ static Token_VAR_REF* parse_variable(CS& f, Block* o)
   }else if (b) { untested();
     f.reset_fail(here);
     trace1("not a variable", f.tail().substr(0,10));
-    assert(0);
   }else{
     f.reset_fail(here);
     trace1("not found", f.tail().substr(0,10));

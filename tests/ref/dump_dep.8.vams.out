@@ -23,8 +23,7 @@ module dep7(a, g);
       // d : 1
       d = c; // [V(a)] s2 r4{bax}
     end
-    begin : stuff
-    // b1
+    begin : stuff // always
       if ((c > 0)) begin : b1
         // f : 1
         real f// * [V(a)]
@@ -67,8 +66,7 @@ module dep7p(a, g);
       // d : 1
       d = c; // [V(a)] s2 r4{bax}
     end
-    begin : stuff
-    // b1
+    begin : stuff // always
       if ((c > 0)) begin : b1
         // f : 1
         real f// * [V(a)]

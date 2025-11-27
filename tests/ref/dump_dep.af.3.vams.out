@@ -8,6 +8,7 @@ module test_af_1a(p, n);
     inout x;
     // arg 0 x 1
     begin
+      // fct : 0
     end
   endfunction
 

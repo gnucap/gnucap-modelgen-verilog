@@ -128,7 +128,13 @@ static Base* new_evt_ctl_stmt(CS& file, Block* o)
 /*--------------------------------------------------------------------------*/
 static Statement* parse_seq(CS& f, Block* owner)
 {
-  return new AnalogSeqStmt(f, owner);
+  size_t here = f.cursor();
+  if(f >> "begin") {
+    f.reset(here);
+    return new AnalogSeqStmt(f, owner);
+  }else{
+    return nullptr;
+  }
 }
 /*--------------------------------------------------------------------------*/
 // static Base* parse_int(CS& f, Block* o)
@@ -356,7 +362,7 @@ static Base* parse_analog_stmt_or_null(CS& file, Block* scope)
   trace1("parse_analog_stmt_or_null", file.tail().substr(0,30));
   ONE_OF	// module_item
     || (file >> ";")
-    || ((file >> "begin") && (ret = parse_seq(file, scope)))
+    || (ret = parse_seq(file, scope))
     || ((file >> "if ") && (ret = parse_cond(file, scope)))
     || ((file >> "case ") && (ret = parse_switch(file, scope)))
     || ((file >> "while ") && (ret = new AnalogWhileStmt(file, scope)))
@@ -925,7 +931,6 @@ void AnalogConstruct::new_block()
 /*--------------------------------------------------------------------------*/
 void AnalogConstruct::push_back(Statement*s)
 {
-  assert(_block);
   _block.push_back(s);
 }
 /*--------------------------------------------------------------------------*/
@@ -953,6 +958,7 @@ void AnalogSeqStmt::parse(CS& f)
   }else{itested();
   }
 
+  trace1("SeqStmt::parse", f.tail().substr(0,20));
   f >> _block;
 
   auto sb = prechecked_cast<SeqBlock*>(scope());
@@ -961,10 +967,23 @@ void AnalogSeqStmt::parse(CS& f)
   // _block.update();
 }
 /*--------------------------------------------------------------------------*/
+void AnalogSeqStmt::dump(std::ostream& o) const
+{
+  o__ "";
+  _block.dump(o);
+}
+/*--------------------------------------------------------------------------*/
 void AnalogSeqBlock::parse(CS& f)
 {
   assert(owner());
-  SeqBlock::parse(f); // _variables
+
+//  size_t here = f.cursor();
+  bool begin = f >> "begin"; // ctos, :?
+  if(begin){
+    // f.reset(here);
+    SeqBlock::parse(f); // _variables
+  }else{
+  }
   if(dynamic_cast<Module const*>(owner())) { untested();
     unreachable();
     set_always();
@@ -975,7 +994,7 @@ void AnalogSeqBlock::parse(CS& f)
   }else{ untested();
     unreachable();
   }
-  for (;;) {
+  while (begin) {
     trace1("AnalogSeqBlock::parse loop", f.tail().substr(0,20));
     if(f >> "end "){
       trace0("AnalogSeqBlock::parse, end");
@@ -994,12 +1013,18 @@ void AnalogSeqBlock::parse(CS& f)
       push_back(s);
     }
   }
+  if(!begin){
+    Base* b = parse_analog_stmt_or_null(f, this);
+    if(!f) {
+      assert(!b);
+    }else if(b){
+      push_back(b);
+    }else{
+      delete b;
+    }
+  }else{
+  }
 }
-/*--------------------------------------------------------------------------*/
-//void AnalogSeqBlock::clear_vars()
-//{ untested();
-//  _block.clear_vars();
-//}
 /*--------------------------------------------------------------------------*/
 #if 1
 void AnalogCtrlBlock::set_owner(Statement* st)
@@ -1018,31 +1043,6 @@ void AnalogCtrlBlock::set_owner(Statement* st)
   assert(owner());
 }
 #endif
-/*--------------------------------------------------------------------------*/
-void AnalogCtrlBlock::parse(CS& f)
-{
-  if(dynamic_cast<Module const*>(owner())) { untested();
-    unreachable();
-    set_always();
-  }else{
-    // assert(sb);
-  }
-  // _block.set_owner(owner());
-  assert(owner());
-//  size_t here = f.cursor();
-  if(f >> "begin"){
-    AnalogSeqBlock::parse(f);
-  }else{
-    Base* b = parse_analog_stmt_or_null(f, this);
-    if(!f) {
-      assert(!b);
-    }else if(b){
-      push_back(b);
-    }else{
-      delete b;
-    }
-  }
-}
 /*--------------------------------------------------------------------------*/
 void AnalogConstruct::dump(std::ostream& o)const
 {
@@ -1508,57 +1508,6 @@ bool Branch::req_short() const
   }
 }
 /*--------------------------------------------------------------------------*/
-void AnalogCtrlBlock::dump(std::ostream& o)const
-{
-  // base?
-  o << "begin";
-  if(size() || identifier() != ""){
-    if(identifier() != ""){
-      o << " : " << identifier();
-    }else{
-    }
-    if(!options().dump_annotate()){
-    }else if(is_always()){
-      o << " // always";
-    }else if(is_never()){
-      o << " // never";
-    }else{
-    }
-    o << "\n";
-    {
-      indent x;
-      if(options().dump_annotate()){
-	for(auto i : variables()){
-	  if(auto v = dynamic_cast<Token_VAR_REF const*>(i.second)){
-	    o__ "// " << v->name();
-	    if(v->data()){
-	      o << " : " << v->deps().size() << "\n";
-	    }else{ untested();
-	      o << "???\n";
-	    }
-	  }else if(dynamic_cast<Block const*>(i.second)){
-	    // later.
-	  }else{ untested();
-	    o__ "// " << i.first << "\n";
-	  }
-	}
-      }else{
-      }
-      for(auto* i : variables_()) {
-	i->dump(o);
-      }
-      if(size()){
-	Block::dump(o);
-      }else{
-      }
-    }
-  }else{
-    o<< "\n";
-    // (why not) annotate?
-  }
-  o__ "end\n";
-}
-/*--------------------------------------------------------------------------*/
 #if 1
 void AnalogExpression::parse(CS& file)
 {
@@ -2002,21 +1951,6 @@ Base* AnalogFunctionBody::lookup(std::string const& k, bool recurse)
     return scope()->lookup(k, false);
     return nullptr;
   }
-}
-/*--------------------------------------------------------------------------*/
-void AnalogFunctionBody::dump(std::ostream& o) const
-{
- AnalogCtrlBlock::dump(o);
- return;
-  for(auto* i : variables_()) { untested();
-    i->dump(o);
-  }
-  o__ "begin\n";
-  { untested();
-    indent x;
-    Block::dump(o);
-  }
-  o__ "end\n";
 }
 /*--------------------------------------------------------------------------*/
 Analog_Function::~Analog_Function()

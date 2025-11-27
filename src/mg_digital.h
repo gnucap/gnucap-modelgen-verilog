@@ -64,8 +64,8 @@ protected: // BUG?
   TData _deps;
 protected:
 public:
-  explicit DigitalSeqBlock() : SeqBlock() {}
-  explicit DigitalSeqBlock(CS& cmd, Base* owner) : SeqBlock() { untested();
+  explicit DigitalSeqBlock() : SeqBlock((Base*)nullptr) {}
+  explicit DigitalSeqBlock(CS& cmd, Base* owner) : SeqBlock(owner) { untested();
     set_owner(owner);
     parse(cmd);
   }

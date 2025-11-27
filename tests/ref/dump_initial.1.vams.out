@@ -1,8 +1,8 @@
 module test();
-  real T// *
+  real T// +
 ;
 
-  analog   initial begin
+  analog   initial begin // always
     // T : 0
     T = 1; // s1 r3{bax}
   end

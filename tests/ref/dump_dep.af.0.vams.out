@@ -27,9 +27,9 @@ module dep0(d, g);
 ;
     real c// + [V(g)]
 ;
-    begin
-    // a : 1
-    // c : 1
+    begin // always
+      // a : 1
+      // c : 1
       a = V(g); // [V(g)] s1 r4{bax}
       c = testaf(a, b); // [V(g)] s3 r4{bax}
       I(d) <+ b; // s1 r2{x}

@@ -9,7 +9,7 @@ module test_bug_block1(p, n);
 ;
     real G_s// *
 ;
-    begin : A
+    begin : A // always
       if ((abs(xgt) <= ms)) begin
       end
       else begin
@@ -17,10 +17,10 @@ module test_bug_block1(p, n);
         end
         else begin
           begin : B
+            // G_s : 0
+            // N : 0
             real N// *
 ;
-          // G_s : 0
-          // N : 0
             N = xgt; // s3 r3{bax}
             G_s = N; // s4 r3{bax}
           end
