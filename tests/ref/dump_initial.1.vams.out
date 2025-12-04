@@ -2,20 +2,20 @@ module test();
   real T// +
 ;
 
-  analog   initial begin // always
+  analog   initial begin // i
     // T : 0
     T = 1; // s1 r3{bax}
   end
 
-  analog   initial begin // always
-    if ((T == 1)) begin
+  analog   initial begin // i
+    if ((T == 1)) begin // i
       // T : 0
       T = 2; // s1 r3{bax}
     end
   end
 
-  analog   initial begin // always
-    if ((T == 2)) begin
+  analog   initial begin // i
+    if ((T == 2)) begin // i
       // T : 0
       T = 3; // s1 r3{bax}
     end

@@ -1,0 +1,34 @@
+`include "disciplines.vams"
+`include "constants.vams"
+`pragma modelgen dump-annotate
+`pragma modelgen nodump-nature
+`pragma modelgen nodump-discipline
+
+module dep0(d, g);
+  inout      d, g;
+  electrical d, g;
+  analog function real testaf;
+    real a, b, c;
+    input a;
+    inout b;
+    inout c;
+    begin
+       if(a>0) begin
+          b = a;
+       end
+       c = b;
+    end
+  endfunction
+
+  analog begin : main
+      real x, y, z;
+      begin
+			x=V(g);
+         if(x>0) begin
+            y = x;
+         end
+			z = y;
+      end
+  end
+
+endmodule

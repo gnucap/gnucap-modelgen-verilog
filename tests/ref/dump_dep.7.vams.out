@@ -11,8 +11,8 @@ module dep7(d, g);
     // c : 0
     real c// *
 ;
-    @(initial_step) begin
-      if ((! $param_given(p))) begin
+    @(initial_step) begin // e
+      if ((! $param_given(p))) begin // e
         // c : 0
         c =  1.; // s2 r4{bax}
       end

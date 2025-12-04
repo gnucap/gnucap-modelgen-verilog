@@ -12,11 +12,11 @@ module dep6(d, g);
 , S// +
 , U// +
 ;
-    @(initial_step) begin
+    @(initial_step) begin // e
       // c : 0
       c =  1.; // s2 r3{bax}
     end
-    @(initial_step) begin
+    @(initial_step) begin // e
       // c : 0
       c =  2.; // s2 r3{bax}
     end

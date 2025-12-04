@@ -6,7 +6,7 @@ module test_idt3a(p, n);
   analog begin // always
     // rst : 0
     rst = 0; // s1 r4{bax}
-    @(timer(1, 1)) begin
+    @(timer(1, 1)) begin // e
       // rst : 0
       rst = 1; // s2 r3{bax}
       discontinuity(); // r3{evx}

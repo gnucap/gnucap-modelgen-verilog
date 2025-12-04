@@ -63,6 +63,33 @@ void Statement::set_rdeps(TData const& )
 //  }
 //}
 /*--------------------------------------------------------------------------*/
+bool Statement::is_ctx_initial() const
+{
+  if(auto x = dynamic_cast<SeqBlock const*>(scope())) {
+    return x->is_ctx_initial();
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool Statement::is_ctx_event() const
+{
+  if(auto x = dynamic_cast<SeqBlock const*>(scope())) {
+    return x->is_ctx_event();
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool Statement::is_ctx_function() const
+{
+  if(auto x = dynamic_cast<SeqBlock const*>(scope())) {
+    return x->is_ctx_function();
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
 bool Statement::is_reachable() const
 { untested();
   assert(scope());
@@ -442,11 +469,19 @@ void SeqBlock::dump(std::ostream& o)const
       o << " : " << identifier();
     }else{
     }
-    if(!options().dump_annotate()){
-    }else if(is_always()){
-      o << " // always";
-    }else if(is_never()){
-      o << " // never";
+    if(options().dump_annotate()){
+      if(is_ctx_function()){
+	o << " // f";
+      }else if(is_ctx_event()){
+	o << " // e";
+      }else if(is_ctx_initial()){
+	o << " // i";
+      }else if(is_always()){
+	o << " // always";
+      }else if(is_never()){
+	o << " // never";
+      }else{
+      }
     }else{
     }
     o << "\n";

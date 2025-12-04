@@ -85,9 +85,10 @@ class Statement : public Owned_Base {
 protected:
 public: //BUG, mg_base.h: 315
   explicit Statement() : Owned_Base() {}
-public:
   virtual Statement* deep_copy(Base*)const // = 0;?
     { untested();unreachable();return nullptr;}
+
+public:
   virtual bool propagate_rdeps(RDeps const&);
   /*virtual?*/ bool propagate_rdep(Base const*);
   virtual bool update() {
@@ -106,6 +107,9 @@ public:
       return nullptr;
     }
   }
+//  virtual bool makes_own_scope()const  {return false;}
+  virtual Block* scope() {return Owned_Base::scope();}
+  Block const* scope()const {return const_cast<Statement*>(this)->scope();}
 
 public:
   void parse(CS&)override {unreachable();};
@@ -127,10 +131,13 @@ protected: // dbg.
  // int rdeps_size()const { return int(_rdeps.size()); }
  // void set_rdeps(TData const&);
 public:
+  bool is_ctx_initial()const;
+  bool is_ctx_function()const;
+  bool is_ctx_event()const;
   bool is_reachable()const;
   bool is_always()const;
   bool is_never()const;
-};
+}; // Statement
 /*--------------------------------------------------------------------------*/
 class Token_VAR_REF;
 /*--------------------------------------------------------------------------*/
@@ -349,6 +356,7 @@ class SeqBlock : public Block {
     ctx_unknown,
     ctx_default,
     ctx_function,
+    ctx_event,
     ctx_initial
   } _ctx{ctx_unknown};
 public:
@@ -364,6 +372,12 @@ public:
     }
   }
   ~SeqBlock();
+
+public:
+  void set_owner(Statement* s) {
+    init_context(s);
+    Block::set_owner(s);
+  }
   void parse(CS&)override;
   void dump(std::ostream& o)const override;
   void parse_identifier(CS& f);
@@ -393,6 +407,26 @@ public:
   map const& variables()const {return _var_refs;}
   Variable_List_Collection const& variables_()const {return _variables;}
   bool update();
+public:
+  bool is_ctx_initial()const { return _ctx == ctx_initial; }
+  bool is_ctx_function()const { return _ctx == ctx_function; }
+  bool is_ctx_event()const { return _ctx == ctx_event; }
+  void set_ctx_initial() { _ctx = ctx_initial; }
+  void set_ctx_function() { _ctx = ctx_function; }
+  void set_ctx_event() { _ctx = ctx_event; }
+private:
+protected: // bug
+  void init_context(Statement* s) {
+    // reachability here?
+    if(s->is_ctx_initial()){
+      set_ctx_initial();
+    }else if(s->is_ctx_event()){
+      set_ctx_event();
+    }else if(s->is_ctx_function()){
+      set_ctx_function();
+    }else{
+    }
+  }
 //public:
   //bool propagate_rdeps(RDeps const&);
 }; // SeqBlock

@@ -406,6 +406,7 @@ void AnalogInitialStmt::parse(CS& f)
   assert(m);
   m->set_tr_begin();
   _body.set_owner(this);
+  _body.set_ctx_initial();
 
   if(f >> _body){
     scope()->add_block(&_body); //?
@@ -1029,6 +1030,7 @@ void AnalogSeqBlock::parse(CS& f)
 #if 1
 void AnalogCtrlBlock::set_owner(Statement* st)
 {
+  init_context(st);
   Block* o = st->scope();
   if(auto x = dynamic_cast<SeqBlock const*>(o)) {
     if(x->has_sensitivities()){
@@ -1549,6 +1551,7 @@ void AnalogEvtCtlStmt::parse(CS& file)
     file.warn(bDANGER, "need ')'");
   }
   assert(owner());
+  _body.set_ctx_event();
   _body.set_owner(this);
   _body.set_sens(this); // BUG
   file >> _body;
@@ -1716,6 +1719,8 @@ public:
 void Analog_Function::parse(CS& f)
 {
   _args.set_owner(this);
+  _block.set_owner(this);
+  _block.set_ctx_function();
   std::string name;
   f >> _type >> name;
   assert(!_variable);
@@ -1751,7 +1756,6 @@ void Analog_Function::parse(CS& f)
     }
   }
   trace1("body?", f.tail().substr(0,20));
-  _block.set_owner(this);
 
   f >> _block; // actually a Statement, but always a CtrlBlock, for simplicity
 

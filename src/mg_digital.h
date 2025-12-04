@@ -65,7 +65,7 @@ protected: // BUG?
 protected:
 public:
   explicit DigitalSeqBlock() : SeqBlock((Base*)nullptr) {}
-  explicit DigitalSeqBlock(CS& cmd, Base* owner) : SeqBlock(owner) { untested();
+  explicit DigitalSeqBlock(CS& cmd, Statement* owner) : SeqBlock(owner) { untested();
     set_owner(owner);
     parse(cmd);
   }

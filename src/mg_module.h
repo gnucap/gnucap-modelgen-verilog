@@ -324,6 +324,7 @@ inline Module const* to_module(Block const* owner)
     if(auto m = dynamic_cast<Module const*>(owner)){
       return m;
     }else if(auto b = dynamic_cast<Block const*>(owner->owner())){ untested();
+      unreachable();
       owner = b;
     }else if(auto st = dynamic_cast<Statement const*>(owner->owner())){
       owner = st->scope();

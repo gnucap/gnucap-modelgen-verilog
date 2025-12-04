@@ -119,7 +119,7 @@ protected: // BUG?
   TData _deps;
 public:
   explicit AnalogSeqBlock() : SeqBlock((Block*)nullptr) {}
-  explicit AnalogSeqBlock(CS& cmd, Base* owner) : SeqBlock(owner) { untested();
+  explicit AnalogSeqBlock(CS& cmd, Statement* owner) : SeqBlock(owner) { untested();
     set_owner(owner);
     parse(cmd);
   }
@@ -344,6 +344,8 @@ public:
   bool is_used_in(Base const*)const override{ untested();
     return true;
   }
+//  bool makes_own_scope()const override {return true;}
+public: // args
   bool is_output_arg(int I)const;
   TData const* arg_data(int I)const; // needed?
   Token const* arg_token(int I)const;

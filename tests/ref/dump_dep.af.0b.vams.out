@@ -1,0 +1,49 @@
+module dep0(d, g);
+  inout d, g;
+  electrical d, g;
+  analog function real testaf;
+    real a//
+, b//
+, c//
+;
+    input a;
+    inout b;
+    inout c;
+    // arg 0 a 0
+    // arg 1 b 1 dep a
+    // arg 2 c 1 dep b dep a
+    begin // f
+      // c : 2
+      // testaf : 0
+      if ((a > 0)) begin // f
+        // b : 1
+        b = a; // [a] s1 r3{bax}
+      end
+      c = b; // [b, a] s2 r3{bax}
+    end
+  endfunction
+
+  analog begin : main // always
+    // x : 0
+    // y : 0
+    // z : 0
+    real x// + [V(g)]
+, y// * [V(g)]
+, z// + [V(g)]
+;
+    begin // always
+      // x : 1
+      // z : 1
+      x = V(g); // [V(g)] s1 r3{bax}
+      if ((x > 0)) begin
+        // y : 1
+        y = x; // [V(g)] s2 r3{bax}
+      end
+      z = y; // [V(g)] s4 r3{bax}
+    end
+  end
+
+endmodule
+
+
+

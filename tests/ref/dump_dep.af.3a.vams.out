@@ -7,7 +7,7 @@ module test_af_1a(p, n);
 ;
     inout x;
     // arg 0 x 1
-    begin // always
+    begin // f
       // fct : 0
       // x : 0
       x = exp(x); // s1 r3{bax}
