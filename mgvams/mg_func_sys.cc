@@ -107,6 +107,7 @@ public:
   ~SIMPARAM(){ }
 private:
   bool static_code()const override {return true;}
+  bool is_constant()const override {return false;}
   void stack_op(Expression*)const override {
     throw Exception("invalid");
   }

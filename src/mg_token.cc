@@ -681,17 +681,22 @@ void Token_CALL::stack_op(Expression* e) const
       // incomplete();
       trace2("CALL stackopped", name(), E->back()->name());
     }else{
-      trace1("CALL stash", name());
+      f = function();
+      assert(f);
       auto SE = prechecked_cast<Expression_*>(E);
       auto EE = new Expression_;
       EE->set_owner(SE->owner());
       assert(EE->scope());
-      stack_op_args(EE, arg_expr, function());
+      stack_op_args(EE, arg_expr, f);
 
       // here?
       TData* deps = new_deps(arg_expr);
       trace1("stackop stashed arg", deps->is_constant());
       deps->set_any();
+      if(f->is_constant()){
+      }else{
+	deps->set_constant(false);
+      }
 
       E->push_back(new Token_CALL(*this, deps, EE));
     }
