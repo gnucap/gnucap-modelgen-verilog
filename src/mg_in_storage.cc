@@ -20,24 +20,36 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_storage.h"
-void Variable_Access::push_assign(Token_VAR_REF* a)
+/*--------------------------------------------------------------------------*/
+void Variable_Access::push_init(Token_VAR_REF* v)
 {
-  assert(a);
-  assert(a->item());
-  trace1("XS push assign", a->name());
-  auto A = prechecked_cast<Assignment*>(a->mutable_item());
+  assert(v);
+  trace1("XS push init", v->name());
+  _list.push_back(xs(v, xs_init, true));
+}
+/*--------------------------------------------------------------------------*/
+void Variable_Access::push_assign(Token_VAR_REF* v,
+    bool is_const, bool always)
+{
+  assert(v);
+  assert(v->item());
+  trace2("XS push assign", v->name(), is_const);
+  auto A = prechecked_cast<Assignment*>(v->mutable_item());
   assert(A);
 
   // _list.push_back(xs(A));
-  assert(a);
-  _list.push_back(xs(a, xs_assign));
+  assert(v);
+  xs x(v, is_const?xs_const_assign:xs_assign, always);
+  assert(x.is_constant() == is_const);
+  _list.push_back(x);
+  assert(_list.back().is_constant() == is_const);
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Access::push_use(Token_VAR_REF* v)
 {
   assert(v);
   trace1("XS push use", v->name());
-  _list.push_back(xs(v, xs_use));
+  _list.push_back(xs(v, xs_use, false));
 }
 /*--------------------------------------------------------------------------*/
 Block const* Variable_Access::xs::scope() const
@@ -66,33 +78,23 @@ Block const* Variable_Access::xs::var_scope() const
   }
 }
 /*--------------------------------------------------------------------------*/
-Variable_Access::xs::xs(Token_VAR_REF* v, Variable_Access::mode_t mode) : _v(v), _mode(mode)
+Variable_Access::xs::xs(Token_VAR_REF* v, Variable_Access::mode_t mode,
+    bool always) : _v(v), _mode(mode), _always(always)
 {
-  if(mode==xs_assign){
-    auto a = prechecked_cast<Assignment const*>(v->item());
-
-    /// af arg hack
-    // auto b = prechecked_cast<Variable_Decl const*>(_v->item());
-    // assert(!b);
-
-    if(a->rhs().is_constant()){
-      _mode = xs_const_assign;
-    }else{
-      _mode = xs_assign;
-    }
-  }else{
-  }
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Access::propagate(SeqBlock const* scope)
 {
+  assert(scope);
   if(!scope->is_reachable()){
   }else{
     auto parent_scope = dynamic_cast<SeqBlock*>(scope->scope());
     bool top_level = !parent_scope;
+    bool initial = scope->is_initial();
+    trace2("XS propagate", top_level, initial);
 
     for(xs const& i : _list){
-      bool always = i.scope() && i.scope()->is_always();
+      bool always = i.is_always();
       bool reachable = i.scope() && i.scope()->is_reachable();
       bool local = scope == i.var_scope();
       bool constant = i.is_constant();
@@ -103,11 +105,13 @@ void Variable_Access::propagate(SeqBlock const* scope)
 	trace2("XS replay, unreachable", i._v->name(), reachable);
 	// incomplete(); local var in analog function
       }else if(i.is_assign()) {
-	trace4("XS replay, assign", i._v->name(), reachable, always, constant);
+	trace5("XS replay, assign", i._v->name(), reachable, always, constant, initial);
 	if(!local && !top_level) {
 	  trace4("XS push assign, !local", i._v->name(), reachable, always, constant);
 	  assert(parent_scope);
 	  parent_scope->variable_access().push(i);
+	}else if(initial && always) {
+	  i._v->init_var();
 	}else if(always) {
 	  i._v->assign_var();
 	  if(!constant) {
@@ -140,7 +144,7 @@ void Variable_Access::propagate(SeqBlock const* scope)
 }
 /*--------------------------------------------------------------------------*/
 void STORAGE_TYPE::init()
-{ untested();
+{
   switch(_actual){
   case s_unknown:
     _actual = s_initial;
@@ -168,7 +172,7 @@ void STORAGE_TYPE::assign()
     _actual = s_set;
     break;
   case s_initial:
-    _actual = s_set;
+    _actual = s_state;
     break;
   case s_set:
     break;

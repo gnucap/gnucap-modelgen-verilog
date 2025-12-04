@@ -183,14 +183,16 @@ public: // query
   bool is_common()const {
     if(is_override()){
       return _override == s_set
-	||   _override == s_used;
+	||   _override == s_used
+	||   _override == s_initial;
     }else{
       return _actual == s_set
-	||   _actual == s_used;
+	||   _actual == s_used
+	||   _actual == s_initial;
     }
   }
   bool is_override()const      { return _override;}
-};
+}; // STORAGE_TYPE
 /*--------------------------------------------------------------------------*/
 // actually a token?
 class Assignment : public Expression_ {
@@ -243,6 +245,7 @@ public: // storage
 private: // implementation
   bool store_deps(TData const&);
   std::string code_name()const;
+  Token_VAR_REF* decl_token();
 protected:
   void new_token(std::string const&);
   Token_VAR_REF& token() { assert(_token); return *_token; }
@@ -279,6 +282,7 @@ public: // query storage
   bool is_temporary()const;
   bool is_state_var()const;
 public: // manipulate storage
+  void init_var() {_stt.init();}
   void assign_var() {_stt.assign();}
   void use_var() {_stt.use();}
 private:
@@ -426,6 +430,7 @@ public:
   bool update();
 public:
   bool is_ctx_initial()const { return _ctx == ctx_initial; }
+  bool is_initial()const { return is_ctx_initial(); } // REMOVE
   bool is_ctx_function()const { return _ctx == ctx_function; }
   bool is_ctx_event()const { return _ctx == ctx_event; }
   void set_ctx_initial() { _ctx = ctx_initial; }

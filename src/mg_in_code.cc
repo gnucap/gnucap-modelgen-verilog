@@ -628,12 +628,6 @@ void SeqBlock::set_sens(Base* s)
   _sens->add(s);
 }
 /*--------------------------------------------------------------------------*/
-SwitchBlock::~SwitchBlock()
-{
-  delete _sens;
-  _sens = nullptr;
-}
-/*--------------------------------------------------------------------------*/
 void SeqBlock::new_variable_access()
 {
   _variable_access = new Variable_Access;
@@ -642,6 +636,12 @@ void SeqBlock::new_variable_access()
 void SeqBlock::delete_variable_access()
 {
   delete _variable_access;
+}
+/*--------------------------------------------------------------------------*/
+SwitchBlock::~SwitchBlock()
+{
+  delete _sens;
+  _sens = nullptr;
 }
 /*--------------------------------------------------------------------------*/
 SeqBlock::~SeqBlock()
@@ -704,25 +704,6 @@ void Assignment::parse(CS& f)
     assert(l->data());
     assert(!_token);
 
-#if 0
-    if(scope()->is_always()) { untested();
-      trace1("assign always", _lhsref->name());
-      _lhsref->assign_var();
-      if(!rhs().is_constant()) { untested();
-	// temporary.
-	_lhsref->use_var();
-	_lhsref->assign_var();
-      }else{ untested();
-      }
-
-    }else if(scope()->is_reachable()) { untested();
-      trace1("assign sometimes", _lhsref->name());
-      // kludge. make it a state. need more analysis
-      _lhsref->use_var();
-      _lhsref->assign_var();
-    }
-#endif
-
     store_deps(Expression_::data());
     assert(_token);
     if(owner()){
@@ -747,16 +728,39 @@ void Assignment::parse(CS& f)
     assert(scope());
     scope()->new_var_ref(_token);
     if(auto sb = dynamic_cast<SeqBlock*>(scope())) {
-      trace1("XS assignpush", name());
       assert(_token->item() == this); // push _token instead?
       // sb->access_assign(this);
-      sb->variable_access().push_assign(_token);
+      assert(_lhsref);
+      if(sb->is_initial()){
+        if(rhs().is_constant()){
+	}else{
+	  // BUG: rdist not considered constant here..
+	}
+	sb->variable_access().push_init(decl_token());
+      }else{
+	sb->variable_access().push_assign(decl_token(), rhs().is_constant(),
+	    scope()->is_always());
+      }
     }else{
     }
   }else{
     // possibly not a variable..
   }
 } // Assignment::parse
+/*--------------------------------------------------------------------------*/
+Token_VAR_REF* Assignment::decl_token()
+{
+  if(!_lhsref){
+    return _token;
+  }else if(auto p = dynamic_cast<Assignment*>(_lhsref->mutable_item())) {
+    assert(p!=this);
+    return p->decl_token();
+  }else{
+    unreachable(); // af??
+    return _token;
+    return nullptr;
+  }
+}
 /*--------------------------------------------------------------------------*/
 bool Assignment::is_used_in(Base const* b) const
 {
@@ -779,6 +783,7 @@ std::string Assignment::code_name() const
 /*--------------------------------------------------------------------------*/
 void Assignment::assign_var() const
 {
+  trace2("Assignment::assign_var", lhsname(), _lhsref);
   if(_lhsref){
     if(scope()==_lhsref->scope()){
       // ...
@@ -802,7 +807,7 @@ void Assignment::use_var() const
     }else{
     }
     _lhsref->use_var(); // for now
-  }else{
+  }else{ untested();
     assert(_token->item()==this);
     auto pp = prechecked_cast<Variable_Decl*>(_token->mutable_item());
     assert(pp);
@@ -982,7 +987,7 @@ void Assignment::dump(std::ostream& o) const
   if(_token){
     o << _token->name() << " = ";
     Expression_::dump(o);
-  }else{ untested();
+  }else{
 //    o << "/// unreachable?\n";
   }
 }
@@ -1064,6 +1069,20 @@ bool Statement::propagate_rdeps(RDeps const& r)
   }
   return ret;
 }
+/*--------------------------------------------------------------------------*/
+#if 0
+void Variable_Decl::use_var()
+{
+  trace1("Variable_Decl::use_var", name());
+  _stt.use();
+}
+/*--------------------------------------------------------------------------*/
+void Variable_Decl::assign_var()
+{
+  trace1("Variable_Decl::assign_var", name());
+  _stt.assign();
+}
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

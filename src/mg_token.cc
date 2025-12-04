@@ -634,7 +634,8 @@ static void stack_op_args(Expression* EE, Expression const* arg_expr, FUNCTION_ 
 	}else{
 	  // something with AF
 	}
-	sb->variable_access().push_assign(AA->token_hack());
+	sb->variable_access().push_assign(AA->token_hack(),
+	       false, EE_->scope()->is_always());
       }else{
       }
     }else{
@@ -1097,6 +1098,15 @@ Token* Probe::new_token(Module&, size_t na)const
   // d.insert(Dep(nt->prb(), Dep::_LINEAR));
   return nt;
 } // Probe::new_token
+/*--------------------------------------------------------------------------*/
+void Token_VAR_REF::init_var()
+{
+  if(auto p = dynamic_cast<Variable_Decl*>(_item)){
+    p->init_var();
+  }else{
+    unreachable();
+  }
+}
 /*--------------------------------------------------------------------------*/
 void Token_VAR_REF::assign_var()
 {

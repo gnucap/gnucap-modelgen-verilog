@@ -491,9 +491,9 @@ public:
   bool is_reachable()const { return _reachable; }
   bool is_always()const { return _reachable == r_always; }
   bool is_never()const { return _reachable == r_never; }
-  bool is_initial()const { return _reachable == r_initial; }
 //  void set_unreachable() { untested(); untested(); _reachable = r_never; }
 //  void set_reachable() { untested(); untested(); _reachable = r_unknown; }
+  void set_initial() { _reachable = r_initial; }
   void set_always() { _reachable = r_always; }
   void set_never() { _reachable = r_never; }
   virtual bool new_var_ref(Base* what);

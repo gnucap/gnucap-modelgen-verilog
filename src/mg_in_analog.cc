@@ -408,12 +408,14 @@ void AnalogInitialStmt::parse(CS& f)
   m->set_tr_begin();
   _body.set_owner(this);
   _body.set_ctx_initial();
+  assert(_body.is_initial());
 
   if(f >> _body){
     scope()->add_block(&_body); //?
   }else{ untested();
     throw Exception_CS_("expecting statement", f);
   }
+  assert(_body.is_initial());
 }
 /*--------------------------------------------------------------------------*/
 void AnalogInitialStmt::dump(std::ostream& o) const
@@ -687,7 +689,7 @@ bool AnalogProceduralAssignment::update()
   trace2("AnalogProceduralAssignment::update", _a.lhs().name(), rdeps().size());
 //  trace1("AnalogProceduralAssignment::update",  _a.data().size());
 #ifdef DO_TRACE
-  for(auto& r : rdeps()){ untested();
+  for(auto& r : rdeps()){
     trace2("AnalogProceduralAssignment::update0", _a.lhs().name(), r->val_string());
   }
 #endif
@@ -860,7 +862,6 @@ void AnalogSwitchStmt::parse(CS& f)
   _body.set_owner(this);
   auto sb = prechecked_cast<SeqBlock*>(scope());
   assert(sb);
-  // sb->add_block(&_body); // re-use var_ref?
 
   f >> "(" >> _ctrl >> ")";
   CaseGen* def = nullptr;
@@ -903,9 +904,11 @@ void AnalogSwitchStmt::parse(CS& f)
 
       _body.push_back(g);
       assert(sb);
+    //  _body.add_block(g->body()); // var xs here?
       sb->add_block(g->body());
     }
   }
+  //sb->add_block(&_body); // re-use var_ref?
 }
 /*--------------------------------------------------------------------------*/
 void AnalogSwitchStmt::dump(std::ostream& o)const
@@ -986,7 +989,8 @@ void AnalogSeqBlock::parse(CS& f)
     SeqBlock::parse(f); // _variables
   }else{
   }
-  if(dynamic_cast<Module const*>(owner())) { untested();
+  if(is_initial()){
+  }else if(dynamic_cast<Module const*>(owner())) { untested();
     unreachable();
     set_always();
   }else if(dynamic_cast<Module const*>(scope())) {

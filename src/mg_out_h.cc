@@ -282,6 +282,7 @@ static void make_variable_decl(std::ostream& o, Block const& b)
   }else if(auto s = dynamic_cast<SeqBlock const*>(&b)){
     make_block_variable_decl(o, *s);
   }else{ untested();
+    incomplete();
   }
 }
 /*--------------------------------------------------------------------------*/

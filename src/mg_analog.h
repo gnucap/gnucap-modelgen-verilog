@@ -436,7 +436,7 @@ public:
   Block* body() {return &_body;}
 
   String_Arg key() const{ untested();return String_Arg("CaseGen");}
-  RDeps const& rdeps()const override { untested(); return _rdeps; }
+  RDeps const& rdeps()const override { return _rdeps; }
  // bool update() override { untested(); incomplete(); }
 };
 /*--------------------------------------------------------------------------*/

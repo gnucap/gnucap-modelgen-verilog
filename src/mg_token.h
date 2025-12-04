@@ -392,6 +392,7 @@ public:
   bool propagate_deps(Token_VAR_REF const&);
   TData const& deps()const;
   RDeps const& rdeps()const;
+  void init_var();
   void assign_var();
   void use_var();
   Block const* scope() const;

@@ -28,16 +28,21 @@ class Variable_Access {
   typedef enum{
     xs_assign,
     xs_const_assign,
-    xs_use
+    xs_use,
+    xs_init
   }mode_t;
   struct xs{
     Token_VAR_REF* _v{nullptr};
     mode_t _mode;
+    bool _always{false};
 
     explicit xs(xs const& x) = default;
-    xs(Token_VAR_REF* v, mode_t mode);
+    xs(Token_VAR_REF* v, mode_t mode, bool always);
     bool is_use()const {return _mode == xs_use;}
-    bool is_assign()const {return _mode == xs_assign || _mode == xs_const_assign;}
+    bool is_assign()const {return _mode == xs_assign || _mode == xs_const_assign
+                                 || _mode == xs_init;}
+    bool is_init()const {untested(); return _mode == xs_init;}
+    bool is_always()const {return _always;}
     bool is_constant()const {return _mode == xs_const_assign;}
 
     Block const* scope()const;
@@ -47,10 +52,12 @@ class Variable_Access {
   std::map<Token_VAR_REF*, STORAGE_TYPE> _map;
 public:
   void clear() { _list.clear(); }
-  void push(xs const& x) { _list.push_back(xs(x)); }
-  void push_assign(Token_VAR_REF* a);
+  void push_init(Token_VAR_REF* v);
+  void push_assign(Token_VAR_REF* a, bool is_const, bool always);
   void push_use(Token_VAR_REF* v);
   void propagate(SeqBlock const* scope);
+private:
+  void push(xs const& x) {_list.push_back(xs(x));}
 }; // Variable_Access
 /*--------------------------------------------------------------------------*/
 #endif

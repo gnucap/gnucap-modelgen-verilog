@@ -458,7 +458,7 @@ bool Expression_::is_constant() const
     bool c = true;
     if(auto const* d = dynamic_cast<TData const*>(back()->data())){
       c &= d->is_constant();
-    }else{ untested();
+    }else{
       incomplete();
     }
     return c;
