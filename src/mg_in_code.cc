@@ -305,13 +305,13 @@ bool Assignment::is_state_var() const
 }
 /*--------------------------------------------------------------------------*/
 bool Assignment::is_common() const
-{
+{ untested();
   assert(_lhsref);
   return _lhsref->is_common();
 }
 /*--------------------------------------------------------------------------*/
 bool Assignment::is_temporary() const
-{
+{ untested();
   assert(_lhsref);
   return _lhsref->is_temporary();
 }
@@ -332,7 +332,7 @@ void Variable_Decl::new_data()
  if (_token_data){
 //    delete _token_data;
 //    _token_data = nullptr;
- }else{
+ }else{ untested();
  }
 }
 /*--------------------------------------------------------------------------*/
@@ -363,14 +363,14 @@ bool Variable_Decl::propagate_deps(Token_VAR_REF const& v)
 bool Assignment::propagate_rdeps(RDeps const& incoming)
 {
   (void)incoming;
-  // incomplete. cf analogprocassign
-  _lhsref->use_var();
+  // incomplete(); // . cf analogprocassign
+//  _lhsref->use_var();
   return false;
 }
 /*--------------------------------------------------------------------------*/
 bool Variable_Decl::propagate_rdeps(RDeps const& incoming)
 {
-  _stt.use();
+//  _stt.use();
   return _rdeps.merge(incoming);
 }
 /*--------------------------------------------------------------------------*/
@@ -532,6 +532,17 @@ Base* SwitchBlock::lookup(std::string const& k, bool recurse)
   return v;
 }
 /*--------------------------------------------------------------------------*/
+Base* SeqBlock::lookup(std::string const& k, bool recurse)
+{
+  Base* v = Block::lookup(k, recurse);
+  if(dynamic_cast<Token_VAR_REF*>(v)){
+    // bug. not here.
+   // _variable_access.push_use(r);
+  }else{
+  }
+  return v;
+}
+/*--------------------------------------------------------------------------*/
 bool SwitchBlock::update()
 {
   trace1("AnalogSeqBlock::update", is_reachable());
@@ -593,8 +604,99 @@ bool SeqBlock::update()
   if(ret){
     // propagate variable deps to parent scope..
   }else{
+    // propagate variable xs to parent scop
   }
   return ret;
+}
+/*--------------------------------------------------------------------------*/
+void Variable_Access::push_assign(Assignment* a)
+{
+  assert(a);
+  trace1("XS push assign", a->name());
+  _list.push_back(xs(a));
+}
+/*--------------------------------------------------------------------------*/
+void Variable_Access::push_use(Token_VAR_REF* v)
+{
+  assert(v);
+  trace1("XS push use", v->name());
+  _list.push_back(xs(v));
+}
+/*--------------------------------------------------------------------------*/
+Block const* Variable_Access::xs::scope() const
+{
+  if(_a) {
+    return _a->scope();
+  }else{
+    assert(_v);
+    return _v->scope();
+  }
+}
+/*--------------------------------------------------------------------------*/
+Block const* Variable_Access::xs::var_scope() const
+{
+  if(dynamic_cast<Variable_Decl*>(_a)) {
+    // af output arg getting here
+    return _a->scope();
+  }else if(_a) {
+    return _a->lhs_scope();
+  }else{
+    assert(_v);
+    return _v->scope();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Variable_Access::propagate(SeqBlock const* scope)
+{
+  if(!scope->is_reachable()){
+  }else{
+    auto parent_scope = dynamic_cast<SeqBlock*>(scope->scope());
+    for(xs const& i : _list){
+      bool always = i.scope() && i.scope()->is_always();
+      bool reachable = i.scope() && i.scope()->is_reachable();
+      bool local = scope == i.var_scope();
+      bool top_level = !parent_scope;
+      bool constant = i.is_constant();
+
+      if(!reachable) {
+	assert(i._v);
+	trace2("XS replay, unreachable", i._v->name(), reachable);
+	// incomplete(); local var in analog function
+      }else if(i.is_assign()) {
+	trace4("XS replay, assign", i._a->name(), reachable, always, constant);
+	if(!local && !top_level) {
+	  trace4("XS push assign, !local", i._a->name(), reachable, always, constant);
+	  assert(parent_scope);
+	  parent_scope->access_assign(i._a);
+	}else if(always) {
+	  i._a->assign_var();
+	  if(!constant) {
+	    // temporary.
+	    i._a->use_var();
+	    i._a->assign_var();
+	  }else{
+	  }
+	}else{
+	  trace1("XS replay assign sometimes", i._a->name());
+	  // kludge. make it a state. need more analysis
+	  i._a->use_var();
+	  i._a->assign_var();
+	}
+      }else if(i.is_use()){
+	trace2("XS replay, use", i._v->name(), local);
+	local = top_level || dynamic_cast<Variable_Decl const*>(i._v->item());
+	if(!local) {
+	  trace2("XS replay, push use", i._v->name(), local);
+	  assert(parent_scope);
+	  parent_scope->access_use(i._v);
+	}else if(reachable) {
+	  trace2("XS replay use", i._v->name(), local);
+	  i._v->use_var();
+	}else{ untested();
+	}
+      }
+    } // loop
+  }
 }
 /*--------------------------------------------------------------------------*/
 void SeqBlock::merge_sens(Sensitivities const& s)
@@ -680,22 +782,24 @@ void Assignment::parse(CS& f)
     assert(l->data());
     assert(!_token);
 
-    if(scope()->is_always()) {
+#if 0
+    if(scope()->is_always()) { untested();
       trace1("assign always", _lhsref->name());
       _lhsref->assign_var();
-      if(!rhs().is_constant()) {
+      if(!rhs().is_constant()) { untested();
 	// temporary.
 	_lhsref->use_var();
 	_lhsref->assign_var();
-      }else{
+      }else{ untested();
       }
 
-    }else if(scope()->is_reachable()) {
+    }else if(scope()->is_reachable()) { untested();
       trace1("assign sometimes", _lhsref->name());
       // kludge. make it a state. need more analysis
       _lhsref->use_var();
       _lhsref->assign_var();
     }
+#endif
 
     store_deps(Expression_::data());
     assert(_token);
@@ -720,10 +824,15 @@ void Assignment::parse(CS& f)
     assert(_token);
     assert(scope());
     scope()->new_var_ref(_token);
+    if(auto sb = dynamic_cast<SeqBlock*>(scope())) {
+      trace1("XS assignpush", name());
+      sb->access_assign(this);
+    }else{
+    }
   }else{
     // possibly not a variable..
   }
-}
+} // Assignment::parse
 /*--------------------------------------------------------------------------*/
 bool Assignment::is_used_in(Base const* b) const
 {
@@ -746,14 +855,36 @@ std::string Assignment::code_name() const
 /*--------------------------------------------------------------------------*/
 void Assignment::assign_var() const
 {
-  assert(_lhsref);
-  _lhsref->assign_var();
+  if(_lhsref){
+    if(scope()==_lhsref->scope()){
+      // ...
+    }else{
+    }
+    _lhsref->assign_var();
+  }else{
+    // af args getting here.
+    assert(_token->item()==this);
+    auto pp = prechecked_cast<Variable_Decl*>(_token->mutable_item());
+    assert(pp);
+    pp->assign_var();
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Assignment::use_var() const
 {
-  assert(_lhsref);
-  _lhsref->use_var();
+  if(_lhsref){
+    if(scope()==_lhsref->scope()){
+      // ...
+    }else{
+    }
+    _lhsref->use_var(); // for now
+  }else{
+    assert(_token->item()==this);
+    auto pp = prechecked_cast<Variable_Decl*>(_token->mutable_item());
+    assert(pp);
+    pp->use_var();
+
+  }
 }
 /*--------------------------------------------------------------------------*/
 Data_Type const& Assignment::type() const
@@ -927,7 +1058,7 @@ void Assignment::dump(std::ostream& o) const
   if(_token){
     o << _token->name() << " = ";
     Expression_::dump(o);
-  }else{
+  }else{ untested();
 //    o << "/// unreachable?\n";
   }
 }
@@ -1010,10 +1141,35 @@ bool Statement::propagate_rdeps(RDeps const& r)
   return ret;
 }
 /*--------------------------------------------------------------------------*/
-void STORAGE_TYPE::set()
+void STORAGE_TYPE::init()
+{ untested();
+  switch(_actual){
+  case s_unknown:
+    _actual = s_initial;
+    break;
+  case s_initial:
+    break;
+  case s_set:
+    _actual = s_initial;
+    break;
+  case s_used:
+    _actual = s_initial;
+    break;
+  case s_tmp:
+    _actual = s_initial;
+    break;
+  case s_state:
+    break;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void STORAGE_TYPE::assign()
 {
   switch(_actual){
   case s_unknown:
+    _actual = s_set;
+    break;
+  case s_initial:
     _actual = s_set;
     break;
   case s_set:
@@ -1030,17 +1186,12 @@ void STORAGE_TYPE::set()
 /*--------------------------------------------------------------------------*/
 void STORAGE_TYPE::use()
 {
-  if(_actual == s_unknown){
-    _actual = s_state;
-  }else if(_actual == s_set){
-    _actual = s_used;
-  }else if(_actual == s_tmp){
-  }else if(_actual == s_state){
-  }else{
-  }
+  trace0("STORAGE_TYPE::use");
   switch(_actual){
   case s_unknown:
     _actual = s_state;
+    break;
+  case s_initial:
     break;
   case s_set:
     _actual = s_used;

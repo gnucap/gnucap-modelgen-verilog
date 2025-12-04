@@ -3,7 +3,7 @@ module cond0(p, n);
     // S : 0
     // T : 0
     // U : 0
-    real S// -
+    real S// *
 , T//
 , U//
 ;

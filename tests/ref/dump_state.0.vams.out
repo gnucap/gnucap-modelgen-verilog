@@ -7,7 +7,7 @@ module st(p);
   analog begin : main // always
     // c : 0
     // d : 0
-    real c// +
+    real c// *
 ;
     c = (c + 1); // s2 r3{bax}
     d = c; // s3 r3{bax}

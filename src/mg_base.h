@@ -473,6 +473,7 @@ private:
     r_unknown = -1,
     r_never = 0,
     r_always = 1,
+    r_initial = 2,
   } block_reach_t;
   block_reach_t _reachable{r_unknown};
 protected:
@@ -490,6 +491,7 @@ public:
   bool is_reachable()const { return _reachable; }
   bool is_always()const { return _reachable == r_always; }
   bool is_never()const { return _reachable == r_never; }
+  bool is_initial()const { return _reachable == r_initial; }
 //  void set_unreachable() { untested(); untested(); _reachable = r_never; }
 //  void set_reachable() { untested(); untested(); _reachable = r_unknown; }
   void set_always() { _reachable = r_always; }

@@ -148,15 +148,17 @@ class Token_VAR_REF;
 class STORAGE_TYPE {
   typedef enum {
     s_unknown = 0,
-    s_set = 1,
-    s_used = 2,
-    s_tmp = 3,
-    s_state = 4
+    s_initial = 1,
+    s_set = 2,
+    s_used = 3,
+    s_tmp = 4,
+    s_state = 5
   } state_t;
   state_t _actual{s_unknown};
   state_t _override{s_unknown};
 public:
-  void set();
+  void init();
+  void assign();
   void use();
 public: // attributes
   void override_set()   {untested(); _override = s_set;}
@@ -227,7 +229,7 @@ public:
   RDeps const& rdeps() const;
   Sensitivities const& sensitivities()const;
   bool has_sensitivities()const;
-//  Block const* scope() const;
+  Block const* lhs_scope()const { assert(_lhsref); return _lhsref->scope(); }
   bool is_used_in(Base const*b)const;
   bool is_used()const;
   operator bool() const {return _token;}
@@ -276,7 +278,7 @@ public: // query storage
   bool is_temporary()const;
   bool is_state_var()const;
 public: // manipulate storage
-  void assign_var() {_stt.set();}
+  void assign_var() {_stt.assign();}
   void use_var() {_stt.use();}
 private:
   void new_deps();
@@ -348,6 +350,42 @@ public:
   Base const* value() const;
 };
 /*--------------------------------------------------------------------------*/
+class SeqBlock;
+class Variable_Access {
+  struct xs{
+    Assignment* _a{nullptr};
+    Token_VAR_REF* _v{nullptr};
+    enum{
+      xs_assign,
+      xs_const_assign,
+      xs_use
+    }_mode;
+
+    xs(Assignment* a) : _a(a), _mode(xs_assign) {
+      assert(a);
+      if(a->rhs().is_constant()){
+	_mode = xs_const_assign;
+      }else{
+	_mode = xs_assign;
+      }
+    }
+    xs(Token_VAR_REF* v) : _v(v), _mode(xs_use) {}
+    bool is_use()const {return _mode == xs_use;}
+    bool is_assign()const {return _mode == xs_assign || _mode == xs_const_assign;}
+    bool is_constant()const {return _mode == xs_const_assign;}
+
+    Block const* scope()const;
+    Block const* var_scope()const;
+  };
+  std::list<xs> _list;
+  std::map<Token_VAR_REF*, STORAGE_TYPE> _map;
+public:
+  void clear() { _list.clear(); }
+  void push_assign(Assignment* a);
+  void push_use(Token_VAR_REF* v);
+  void propagate(SeqBlock const* scope);
+};
+/*--------------------------------------------------------------------------*/
 class Sensitivities;
 class SeqBlock : public Block {
   Sensitivities* _sens{nullptr}; // here?
@@ -359,6 +397,7 @@ class SeqBlock : public Block {
     ctx_event,
     ctx_initial
   } _ctx{ctx_unknown};
+  Variable_Access _variable_access;
 public:
   explicit SeqBlock(Base const* owner) : Block() {
     (void)owner;
@@ -427,8 +466,12 @@ protected: // bug
     }else{
     }
   }
-//public:
-  //bool propagate_rdeps(RDeps const&);
+public:
+  void clear_access() { _variable_access.clear(); }
+  void propagate_access() { _variable_access.propagate(this); }
+  void access_assign(Assignment* a) { assert(a); _variable_access.push_assign(a); }
+  void access_use(Token_VAR_REF* v) { assert(v); _variable_access.push_use(v); }
+  Base* lookup(std::string const& k, bool recurse=true)override;
 }; // SeqBlock
 /*--------------------------------------------------------------------------*/
 class SwitchBlock : public Block {

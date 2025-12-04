@@ -190,12 +190,12 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 //	p->stack_op(&E); // ?
 	Token_PAR_REF PP(p->name(), p);
 	PP.stack_op(&E);
-      }else if(auto v = dynamic_cast<Variable_Decl*>(r)) { untested();
-	assert(0);
-	unreachable();
-	Token_VAR_REF a(v->name(), v);
-	a.stack_op(&E);
       }else if(auto vt = dynamic_cast<Token_VAR_REF*>(r)) {
+	auto sb = dynamic_cast<SeqBlock*>(Scope);
+	if(sb){
+	  sb->access_use(vt);
+	}else{
+	}
 	trace2("resolve VAR_REF", n, vt->deps().size());
 	vt->stack_op(&E);
       }else if(auto pp = dynamic_cast<Port_3 const*>(r)) {
@@ -391,7 +391,7 @@ TData const& Expression_::data() const
 {
   static TData no_deps;
   no_deps.set_constant();
-  if(is_empty()){ untested();
+  if(is_empty()){
     return no_deps;
   }else if(auto d = dynamic_cast<TData const*>(back()->data())){
     // really? see is_constant...

@@ -1025,7 +1025,8 @@ void AnalogSeqBlock::parse(CS& f)
     }
   }else{
   }
-}
+  propagate_access();
+} // AnalogSeqBlock::parse
 /*--------------------------------------------------------------------------*/
 #if 1
 void AnalogCtrlBlock::set_owner(Statement* st)

@@ -387,6 +387,7 @@ public:
   void stack_op(Expression* e)const override;
   Base const* operator->() const{ return _item; }
   Base const* item()const { return _item; }
+  Base* mutable_item()const { return _item; } // AF hack
   virtual Data_Type const& type()const;
   bool propagate_deps(Token_VAR_REF const&);
   TData const& deps()const;

@@ -5,7 +5,7 @@ module st1(p);
 
   analog begin : main // always
     // c : 0
-    real c// +
+    real c// *
 ;
     if (1) begin // always
       // c : 0

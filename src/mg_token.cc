@@ -385,7 +385,7 @@ void Token_BINOP_::stack_op(Expression* E)const
     }else if(n=='-' && is_literal(t1, 0.)) {
       t1.erase();
       t2.push();
-    }else if(n=='+' && is_literal(t1, 0.)) { untested();
+    }else if(n=='+' && is_literal(t1, 0.)) { itested();
       t1.erase();
       t2.push();
     }else if(name()=="&&" && is_literal(t1, 0.)){
@@ -611,18 +611,28 @@ static void stack_op_args(Expression* EE, Expression const* arg_expr, FUNCTION_ 
     if(!f->is_output_arg(ii)){
       (**i).stack_op(EE);
     }else if(auto tt = dynamic_cast<Token_VAR_REF*>(*i)){
-      tt->use_var(); // needed?
-      tt->assign_var(); // maybe..
+      auto EE_ = prechecked_cast<Expression_*>(EE);
+      assert(EE_);
+      Block* scope = EE_->scope();
+//      tt->use_var(); // needed?
+//      tt->assign_var(); // maybe..
       tt->stack_op(EE);
 
-#if 1 // def DEBUG
       assert(EE->size());
       auto ttt = prechecked_cast<Token_VAR_REF*>(EE->back());
+#if 1 // def DEBUG
       assert(ttt);
       trace2("stackop io arg", ttt->name(), typeid(*ttt).name());
-      assert(prechecked_cast<Assignment const*>(ttt->item()));
 #endif
+      auto AA = prechecked_cast<Assignment*>(ttt->mutable_item());
+      assert(AA);
 
+      trace2("stackop io arg", ttt->name(), typeid(*ttt->item()).name());
+      if(auto sb = dynamic_cast<SeqBlock*>(scope)) {
+//	sb->access_use(ttt);
+	sb->access_assign(AA);
+      }else{
+      }
     }else{
       unreachable();
       (**i).stack_op(EE);
@@ -1099,6 +1109,7 @@ void Token_VAR_REF::assign_var()
 /*--------------------------------------------------------------------------*/
 void Token_VAR_REF::use_var()
 {
+  trace1("Token_VAR_REF::use_var", name());
   if(auto p = dynamic_cast<Variable_Decl*>(_item)){
     trace1("use_var decl", name());
     p->use_var();
