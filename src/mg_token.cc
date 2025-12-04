@@ -28,6 +28,7 @@
 #include "mg_analog.h" // BUG
 #include <stack>
 #include <globals.h> // TODO: Expression->resolve?
+#include "mg_storage.h" // BUG
 /*--------------------------------------------------------------------------*/
 rdep_tag tr_begin_tag("b");
 rdep_tag tr_restore_tag("r");
@@ -629,8 +630,11 @@ static void stack_op_args(Expression* EE, Expression const* arg_expr, FUNCTION_ 
 
       trace2("stackop io arg", ttt->name(), typeid(*ttt->item()).name());
       if(auto sb = dynamic_cast<SeqBlock*>(scope)) {
-//	sb->access_use(ttt);
-	sb->access_assign(AA);
+	if(ttt == AA->token_hack()){
+	}else{
+	  // something with AF
+	}
+	sb->variable_access().push_assign(AA->token_hack());
       }else{
       }
     }else{

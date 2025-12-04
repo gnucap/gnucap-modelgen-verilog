@@ -37,10 +37,16 @@ Variable_Decl::~Variable_Decl()
 // }
 /*--------------------------------------------------------------------------*/
 Block const* Variable_Decl::scope() const
-{ untested();
-  auto b = prechecked_cast<Block const*>(owner());
-  assert(b);
-  return b;
+{
+  assert(owner());
+  if(auto vs = dynamic_cast<Variable_Stmt const*>(owner())) {
+      // AF hack
+    return vs->scope();
+  }else{ untested();
+    auto b = prechecked_cast<Block const*>(owner());
+    assert(b);
+    return b;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::new_var_ref()

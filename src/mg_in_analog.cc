@@ -29,6 +29,7 @@
 #include <e_cardlist.h> // TODO: really?
 #include <u_opt.h>
 #include "globals.h"
+#include "mg_storage.h"
 /*--------------------------------------------------------------------------*/
 
 /* So analog initial block shall not contain the fol-
@@ -1025,7 +1026,7 @@ void AnalogSeqBlock::parse(CS& f)
     }
   }else{
   }
-  propagate_access();
+  variable_access().propagate(this);
 } // AnalogSeqBlock::parse
 /*--------------------------------------------------------------------------*/
 #if 1

@@ -29,6 +29,7 @@
 #include <globals.h>
 #include "mg_.h" // TODO
 #include "mg_error.h" // TODO
+#include "mg_storage.h" // TODO
 /*--------------------------------------------------------------------------*/
 void Expression_::clear()
 { untested();
@@ -193,7 +194,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       }else if(auto vt = dynamic_cast<Token_VAR_REF*>(r)) {
 	auto sb = dynamic_cast<SeqBlock*>(Scope);
 	if(sb){
-	  sb->access_use(vt);
+	  sb->variable_access().push_use(vt);
 	}else{
 	}
 	trace2("resolve VAR_REF", n, vt->deps().size());
