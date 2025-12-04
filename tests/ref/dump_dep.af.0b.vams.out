@@ -29,7 +29,7 @@ module dep0(d, g);
     // z : 0
     real x// + [V(g)]
 , y// * [V(g)]
-, z// + [V(g)]
+, z// [V(g)]
 ;
     begin // always
       // x : 1

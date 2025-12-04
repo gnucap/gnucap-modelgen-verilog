@@ -26,6 +26,7 @@
 #include "mg_code.h"
 /*--------------------------------------------------------------------------*/
 typedef Collection<Statement> AnalogList;
+/*--------------------------------------------------------------------------*/
 class AnalogStmt : public Statement {
 public:
   ~AnalogStmt();
@@ -35,6 +36,9 @@ public:
 //    incomplete();
 //    return nullptr;
 //  }
+  std::string val_string()const override {
+    return std::string("analog statement ") + typeid(*this).name();
+  }
 };
 /*--------------------------------------------------------------------------*/
 // class access_function?
@@ -155,6 +159,8 @@ public:
   bool update()override { return _block.update(); }
   AnalogSeqBlock const& block()const { return _block; }
   TData const& deps()const override { untested(); return _block.deps(); }
+private:
+  void submit_variable_access(Variable_Access&)const override;
 };
 /*--------------------------------------------------------------------------*/
 // AnalogSeqBlock + some parse quirks
@@ -175,8 +181,10 @@ public:
 class AnalogConstruct : public Statement {
   AnalogCtrlBlock _block;
 public:
-  AnalogConstruct(){ }
-  ~AnalogConstruct(){ }
+  AnalogConstruct() : Statement() { }
+  ~AnalogConstruct() { }
+private: // Statement
+  void submit_variable_access(Variable_Access&)const override;
 
 public:
   void parse(CS& cmd)override;
@@ -230,7 +238,7 @@ public: // can't resolve these..
   Block* scope();
 };
 /*--------------------------------------------------------------------------*/
-class AnalogCtrlStmt : public AnalogStmt {
+class AnalogCtrlStmt : public AnalogStmt /*SeqStmt??*/ {
   TData _deps; // here?
 protected:
   AnalogCtrlBlock _body;
@@ -240,6 +248,8 @@ public:
   void dump(std::ostream&)const override;
   void parse(CS& cmd)override;
   AnalogCtrlBlock const& body()const { return _body; }
+private:
+  void submit_variable_access(Variable_Access&)const override;
 private:
   TData const& deps()const override { return _deps;}; // ?
 protected:
@@ -308,6 +318,7 @@ public:
 class AnalogEvtCtlStmt : public AnalogCtrlStmt {
   AnalogEvtExpression _ctrl;
 public:
+  explicit AnalogEvtCtlStmt() : AnalogCtrlStmt() { }
   ~AnalogEvtCtlStmt() { }
   void parse(CS&)override;
   void dump(std::ostream&)const override;
@@ -317,6 +328,8 @@ public:
 
   bool is_used_in(Base const* b)const override;
   // TODO bool propagate_rdep(Base const*) override; // block unused tags.
+private:
+  void submit_variable_access(Variable_Access&)const override;
 }; // AnalogEvtCtlStmt
 typedef Collection<AnalogEvtCtlStmt> Analog_Events;
 /*--------------------------------------------------------------------------*/
@@ -331,7 +344,14 @@ class Analog_Function : public /*UserFunction?*/ Statement {
 protected:
   AnalogFunctionBody _block;
 public:
+  explicit Analog_Function() {}
   ~Analog_Function();
+private:
+  void submit_variable_access(Variable_Access&)const override { untested();
+    unreachable();
+    incomplete();
+  }
+public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   std::string const key()const { assert(_variable); return _variable->name(); }
@@ -357,8 +377,8 @@ private:
 }; // Analog_Function
 typedef Collection<Analog_Function> Analog_Functions;
 /*--------------------------------------------------------------------------*/
-class Analog : public Owned_Base {
-  AnalogList _list;
+class Analog : public Owned_Base /*Block?*/ {
+  AnalogList _list; // Statements.
   Analog_Functions _functions;
   Probe_Map* _probes{nullptr};
   Analog_Events _events;
@@ -377,6 +397,7 @@ public:
 
   void new_probe_map(); // analog?
   Probe const* new_probe(std::string const& xs, Branch_Ref const& br, Module* m);
+  void setup_storage();
 };
 /*--------------------------------------------------------------------------*/
 inline Analog const& analog(Module const& m)
@@ -391,6 +412,7 @@ inline AnalogList const& analog_list(Module const& m)
   return analog(m).list();
 }
 /*--------------------------------------------------------------------------*/
+// just Expression_?
 class AnalogExpression : public Expression_ {
 public:
   explicit AnalogExpression() : Expression_() {}
@@ -410,7 +432,16 @@ public:
 //  void dump(std::ostream& o)const override;
   String_Arg key() const{return String_Arg("ACE");}
 };
-typedef LiSt<AnalogConstExpression, '\0', ',', ':'> AnalogConstExpressionList;
+/*--------------------------------------------------------------------------*/
+class AnalogConstExpressionList : public LiSt<AnalogConstExpression, '\0', ',', ':'> {
+public:
+  void submit_variable_use(Variable_Access& va)const {
+    for(AnalogConstExpression const* i : *this){
+      assert(i);
+      i->submit_variable_xs(va);
+    }
+  }
+};
 /*--------------------------------------------------------------------------*/
 class CaseGen : public AnalogCtrlStmt {
   AnalogConstExpressionList* _cond{nullptr};
@@ -424,6 +455,9 @@ public:
   }
   void parse(CS&)override;
   void dump(std::ostream& o)const override;
+  void submit_variable_access(Variable_Access&)const override;
+private:
+  SeqBlock const& body()const {return _body;}
 public:
   AnalogConstExpressionList const* cond_or_null()const {return _cond;}
   bool is_default()const {return !_cond;}
@@ -460,14 +494,20 @@ public:
 class AnalogSwitchStmt : public AnalogStmt { // CtrlStmt?
   TData _deps; // here?
   AnalogConstExpression _ctrl; // Const??
-  SwitchBlock _body;
+  SwitchBlock _body; // Abuse SeqBlock and turn into CtrlStmt?
   RDeps _rdeps; // here?
+  CaseGen const* _always{nullptr};
+  CaseGen const* _default{nullptr};
 public:
   AnalogSwitchStmt(Block* o, CS& file) {
     set_owner(o);
     parse(file);
   }
   ~AnalogSwitchStmt() { }
+private:
+  bool have_always()const {return _always;}
+  bool have_default()const {return _default;}
+  void submit_variable_access(Variable_Access&)const override;
 public:
   void parse(CS& file) override;
   void dump(std::ostream& o)const override;
@@ -489,6 +529,9 @@ public:
     parse(file);
   }
   ~AnalogConditionalStmt(){ }
+private:
+  AnalogConstExpression const& cond()const {return _cond;}
+  void submit_variable_access(Variable_Access&)const override;
 public:
   void parse(CS& file) override;
   void dump(std::ostream& o)const override;
@@ -513,11 +556,11 @@ public:
   void dump(std::ostream& o)const override;
   AnalogExpression const& conditional()const {return _cond;}
   bool has_body() const{ return _body; }
-  const Base& body() const{assert(_body); return _body; }
   virtual bool has_tail() const{ return false; }
   virtual Base const& tail() const{ untested(); return _cond; }
 private:
   bool update()override;
+  void submit_variable_access(Variable_Access& va)const override;
 };
 /*--------------------------------------------------------------------------*/
 class AnalogForStmt : public AnalogWhileStmt {
@@ -551,6 +594,11 @@ public:
   //   _a.set_owner(o);
   // }
   explicit AnalogProceduralAssignment(CS&, Block*);
+private:
+  void submit_variable_access(Variable_Access& va)const override {
+    _a.submit_variable_access(va);
+  }
+public:
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
   Assignment const& expression()const {return _a;}
@@ -594,7 +642,7 @@ public:
   }
   ~Contribution();
 
-  std::string val_string()const override {untested(); return _name; }
+  std::string val_string()const override {return "contribution " + _name; }
 private:
   void set_pot_contrib();
   void set_flow_contrib();
@@ -602,6 +650,7 @@ private:
   void set_always_pot();
   void set_direct(bool d=true);
   TData const& deps()const override; // data?
+  void submit_variable_access(Variable_Access& va)const override;
 public:
 
   DDeps const& ddeps() const;

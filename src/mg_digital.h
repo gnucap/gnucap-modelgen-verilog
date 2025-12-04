@@ -25,7 +25,7 @@
 #include "mg_.h"
 #include "mg_code.h"
 /*--------------------------------------------------------------------------*/
-class AlwaysConstruct : public Statement {
+class AlwaysConstruct : public Statement /* CtrlStatement? */ {
   Block* _block{nullptr};
 public:
   AlwaysConstruct(){
@@ -33,6 +33,10 @@ public:
   ~AlwaysConstruct(){
     delete _block;
     _block = nullptr;
+  }
+private:
+  void submit_variable_access(Variable_Access&)const override {
+    incomplete();
   }
 
 public:
@@ -57,6 +61,8 @@ public:
 //    incomplete();
 //    return nullptr;
 //  }
+private:
+  void submit_variable_access(Variable_Access&)const override{incomplete();}
 };
 /*--------------------------------------------------------------------------*/
 class DigitalSeqBlock : public SeqBlock {
@@ -120,6 +126,7 @@ public:
 }; // DigitalCtrlBlock
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// just CtrlStmt?
 class DigitalCtrlStmt : public DigitalStmt {
   TData _deps; // here?
   RDeps _rdeps;
@@ -134,6 +141,7 @@ public:
 private:
   TData const& deps()const override { return _deps;}; // ?
   RDeps const& rdeps()const override { untested(); return _rdeps;};
+//  void submit_variable_access(Variable_Access&)const override;
 protected:
   bool update()override {
     bool ret = _body.update();

@@ -80,6 +80,7 @@ public:
   void dump(std::ostream& f)const override;
 };
 /*--------------------------------------------------------------------------*/
+class Variable_Access;
 class Statement : public Owned_Base {
   RDeps _rdeps;
 protected:
@@ -114,7 +115,12 @@ public:
 public:
   void parse(CS&)override {unreachable();};
   void dump(std::ostream&)const override{unreachable();}
+  virtual void submit_variable_access(Variable_Access&)const { untested();
+    unreachable();
+  }
 
+public: // called from Expression_::resolve
+  virtual void push_use(Token_VAR_REF const*){unreachable();};
 public:
   virtual RDeps const& rdeps()const {return _rdeps;}
 private:
@@ -140,59 +146,6 @@ public:
 }; // Statement
 /*--------------------------------------------------------------------------*/
 class Token_VAR_REF;
-/*--------------------------------------------------------------------------*/
-// keep track of storage type..
-// a variable that is used before it is set is a state variable.
-// a variable that is not a state variable that is set after it has
-// been used is a temporary
-class STORAGE_TYPE {
-  typedef enum {
-    s_unknown = 0,
-    s_initial = 1,
-    s_set = 2,
-    s_used = 3,
-    s_tmp = 4,
-    s_state = 5
-  } state_t;
-  state_t _actual{s_unknown};
-  state_t _override{s_unknown};
-public:
-  void init();
-  void assign();
-  void use();
-public: // attributes
-  void override_set()   {untested(); _override = s_set;}
-  void override_state() { _override = s_state;}
-  void override_tmp()   { _override = s_tmp;}
-
-public: // query
-  bool is_state()const {
-    if(is_override()){
-      return _override == s_state;
-    }else{
-      return _actual == s_state;
-    }
-  }
-  bool is_temporary()const {
-    if(is_override()){
-      return _override == s_tmp;
-    }else{
-      return _actual == s_tmp;
-    }
-  }
-  bool is_common()const {
-    if(is_override()){
-      return _override == s_set
-	||   _override == s_used
-	||   _override == s_initial;
-    }else{
-      return _actual == s_set
-	||   _actual == s_used
-	||   _actual == s_initial;
-    }
-  }
-  bool is_override()const      { return _override;}
-}; // STORAGE_TYPE
 /*--------------------------------------------------------------------------*/
 // actually a token?
 class Assignment : public Expression_ {
@@ -242,10 +195,12 @@ public:
 public: // storage
   void assign_var()const;
   void use_var()const;
+  void submit_variable_access(Variable_Access& va)const;
 private: // implementation
   bool store_deps(TData const&);
   std::string code_name()const;
-  Token_VAR_REF* decl_token();
+public: // BUG
+  Token_VAR_REF const* decl_token()const;
 protected:
   void new_token(std::string const&);
   Token_VAR_REF& token() { assert(_token); return *_token; }
@@ -258,7 +213,15 @@ class Variable_Decl : public Assignment {
   TData _data;
   RDeps _rdeps; // Expression_?
   std::string /*TODO*/ _dimensions;
-  STORAGE_TYPE _stt;
+  enum storage_t{
+    st_unknown = 0,
+    st_common,
+    st_state,
+    st_temporary,
+    st_override_common,
+    st_override_state,
+    st_override_temporary
+  } _stt{st_unknown};
 public:
   explicit Variable_Decl() : Assignment() { }
   explicit Variable_Decl(std::string const& name) : Assignment() {
@@ -277,14 +240,21 @@ public:
   bool propagate_deps(Token_VAR_REF const&);
   bool propagate_rdeps(RDeps const&);
  RDeps const& rdeps()const {return _rdeps;}
-public: // query storage
-  bool is_common()const;
-  bool is_temporary()const;
-  bool is_state_var()const;
-public: // manipulate storage
-  void init_var() {_stt.init();}
-  void assign_var() {_stt.assign();}
-  void use_var() {_stt.use();}
+public: // storage
+  void set_common_var() {_stt = st_common;}
+  void set_temporary_var() {_stt = st_temporary;}
+  void set_state_var() {_stt = st_state;};
+  void set_common_override() {_stt = st_override_common;}
+  void set_temporary_override() {_stt = st_override_temporary;}
+  void set_state_override() {_stt = st_override_state;};
+  bool is_common()const {/*assert(_stt);*/ return _stt==st_common || _stt==st_override_common;}
+  bool is_temporary()const {/*assert(_stt);*/ return _stt==st_temporary || _stt==st_override_temporary;}
+  bool is_state_var()const {/*assert(_stt);*/ return _stt==st_state || _stt==st_override_state;}
+  bool is_override_var()const {/*assert(_stt);*/ return _stt>=st_override_common;}
+// public: // manipulate storage
+//   void init_var() {_stt.init();}
+//   void assign_var() {_stt.assign();}
+//   void use_var() {_stt.use();}
 private:
   void new_deps();
   void new_data();
@@ -310,6 +280,9 @@ protected:
   void new_var_ref();
 }; // Variable_Decl
 /*--------------------------------------------------------------------------*/
+// Verilog needs variable declarations at the top of a (named) block.
+// Technically, they are just Statements and could be anywhere.
+// A Variable_Statement can host multiple declarations.
 class Variable_Stmt : public Statement {
   typedef LiSt<Variable_Decl, '\0', ',', ';'> list_;
   typedef list_::const_iterator const_iterator;
@@ -336,6 +309,8 @@ public:
   // RDeps const& rdeps()const override{
   //   static RDeps r; return r;
   // }
+private:
+  void submit_variable_access(Variable_Access&)const override {untested(); unreachable();}
 }; // Variable_Stmt
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -395,6 +370,9 @@ public:
   bool has_identifier()const {return _identifier != "";}
 
   Variable_Access& variable_access() {
+    assert(_variable_access); return *_variable_access;
+  }
+  Variable_Access const& variable_access()const {
     assert(_variable_access); return *_variable_access;
   }
 private:
@@ -503,6 +481,7 @@ inline bool Statement::is_used_in(Base const* b) const
   return false;
 }
 /*--------------------------------------------------------------------------*/
+// SystemTaskCall
 class System_Task : public Statement {
   Expression_ _e; // Analog?
   RDeps _rdeps;
@@ -521,9 +500,8 @@ public:
   TData const& data()const { return _e.data(); }
   RDeps const& rdeps()const override { return _rdeps; }
 private:
-  bool add_rdep(Base const* b) {
-    return _rdeps.insert(b).second;
-  }
+  bool add_rdep(Base const* b) { return _rdeps.insert(b).second; }
+  void submit_variable_access(Variable_Access&)const override;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

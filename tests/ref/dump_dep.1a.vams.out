@@ -8,13 +8,13 @@ module dep0(d, g);
     // X : 1
     real T// * [V(g)]
 ;
-    real S// * [V(g)]
+    real S// + [V(g)]
 ;
     real U// + [V(g)]
 ;
-    real X// + [V(g)]
+    real X// [V(g)]
 ;
-    while (1) begin
+    while (1) begin // always
       // S : 1
       // T : 1
       T = T; // [V(g)] s7 r3{bax}

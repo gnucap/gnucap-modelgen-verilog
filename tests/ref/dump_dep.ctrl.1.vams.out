@@ -3,22 +3,17 @@ module test_while0a(p, n);
   electrical p, n;
   parameter real r = 0;
 
-  real z// [V(p, n)]
-;
-
   analog begin : main // always
     // i : 0
     // x : 1
     // y : 1
-    // z : 1
     integer i// +
 ;
     real x// + [V(p, n)]
-, y// + [V(p, n)]
 ;
-    x =  0.; // s1 r3{bax}
+    real y// + [V(p, n)]
+;
     x =  0.; // [V(p, n)] s4 r4{bax}
-    z = x; // [V(p, n)] s5 r3{bax}
     y =  0.; // [V(p, n)] s3 r4{bax}
     i = r; // s1 r4{bax}
     while ((i > 0)) begin
@@ -29,8 +24,7 @@ module test_while0a(p, n);
       x = y; // [V(p, n)] s3 r4{bax}
       y = (x + V(p, n)); // [V(p, n)] s3 r4{bax}
     end
-    x = x; // [V(p, n)] s5 r4{bax}
-    I(p, n) <+ x; // [V(p, n)] s5 r2{x}
+    I(p, n) <+ x; // [V(p, n)] s4 r2{x}
   end
 
 endmodule

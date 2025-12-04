@@ -225,7 +225,7 @@ void Variable_Decl::parse(CS& f)
     if(  a->operator[]("_state ") != "0"
       || a->operator[]("desc ") != "0"
       || a->operator[]("units ") != "0" ){
-      _stt.override_state();
+      set_state_override();
       if(a->operator[]("_nostate ") != "0" ){ untested();
 	incomplete(); // conflicting request.
       }else if(a->operator[]("_common ") != "0" ){ untested();
@@ -233,9 +233,9 @@ void Variable_Decl::parse(CS& f)
       }else{
       }
     }else if(a->operator[]("_common ") != "0" ){ untested();
-      _stt.override_set();
+      set_common_override();
     }else if(a->operator[]("_nostate ") != "0" ){ untested();
-      _stt.override_tmp();
+      set_temporary_override();
     }else{
     }
   }else{
@@ -381,21 +381,6 @@ bool Variable_Decl::propagate_rdeps(RDeps const& incoming)
 //   return true;
 // }
 /*--------------------------------------------------------------------------*/
-bool Variable_Decl::is_state_var() const
-{
-  return _stt.is_state();
-}
-/*--------------------------------------------------------------------------*/
-bool Variable_Decl::is_common() const
-{
-  return _stt.is_common();
-}
-/*--------------------------------------------------------------------------*/
-bool Variable_Decl::is_temporary() const
-{
-  return _stt.is_temporary();
-}
-/*--------------------------------------------------------------------------*/
 bool Variable_Stmt::update()
 {
   //trace1("Variable_Stmt::update", _rdeps.size());
@@ -455,6 +440,10 @@ void SeqBlock::parse(CS& f)
     parse_block_variables(f, _variables);
   }else{
   }
+
+  // TODO? parse contents here.
+
+//  variable_access().collect(this);
 }
 /*--------------------------------------------------------------------------*/
 void SwitchBlock::dump(std::ostream& o)const
@@ -731,14 +720,19 @@ void Assignment::parse(CS& f)
       assert(_token->item() == this); // push _token instead?
       // sb->access_assign(this);
       assert(_lhsref);
-      if(sb->is_initial()){
-        if(rhs().is_constant()){
-	}else{
+      if(1){
+      }else if(!decl_token()){ untested();
+	incomplete();
+      }else if(sb->is_ctx_initial()){ untested();
+        if(rhs().is_constant()){ untested();
+	}else{ untested();
 	  // BUG: rdist not considered constant here..
 	}
-	sb->variable_access().push_init(decl_token());
-      }else{
-	sb->variable_access().push_assign(decl_token(), rhs().is_constant(),
+	sb->variable_access().init_variable(decl_token());
+      }else if(sb->is_ctx_event()){ untested();
+//	sb->variable_access().assign_variable(decl_token());
+      }else{ untested();
+	sb->variable_access().assign_variable(decl_token(), rhs().is_constant(),
 	    scope()->is_always());
       }
     }else{
@@ -748,7 +742,20 @@ void Assignment::parse(CS& f)
   }
 } // Assignment::parse
 /*--------------------------------------------------------------------------*/
-Token_VAR_REF* Assignment::decl_token()
+void Assignment::submit_variable_access(Variable_Access& va)const
+{
+  submit_variable_xs(va);
+  auto sb = prechecked_cast<SeqBlock const*>(scope());
+  if(sb->is_ctx_initial()){
+    va.init_variable(decl_token());
+  }else if(sb->is_ctx_event()){
+    va.event_variable(decl_token());
+  }else{
+    va.assign_variable(decl_token(), rhs().is_constant(), true);
+  }
+}
+/*--------------------------------------------------------------------------*/
+Token_VAR_REF const* Assignment::decl_token() const
 {
   if(!_lhsref){
     return _token;
@@ -757,7 +764,7 @@ Token_VAR_REF* Assignment::decl_token()
     return p->decl_token();
   }else{
     unreachable(); // af??
-    return _token;
+    // return _token;
     return nullptr;
   }
 }
@@ -779,41 +786,6 @@ std::string Assignment::code_name() const
 { untested();
   assert(_lhsref);
   return _lhsref->code_name();
-}
-/*--------------------------------------------------------------------------*/
-void Assignment::assign_var() const
-{
-  trace2("Assignment::assign_var", lhsname(), _lhsref);
-  if(_lhsref){
-    if(scope()==_lhsref->scope()){
-      // ...
-    }else{
-    }
-    _lhsref->assign_var();
-  }else{
-    // af args getting here.
-    assert(_token->item()==this);
-    auto pp = prechecked_cast<Variable_Decl*>(_token->mutable_item());
-    assert(pp);
-    pp->assign_var();
-  }
-}
-/*--------------------------------------------------------------------------*/
-void Assignment::use_var() const
-{
-  if(_lhsref){
-    if(scope()==_lhsref->scope()){
-      // ...
-    }else{
-    }
-    _lhsref->use_var(); // for now
-  }else{ untested();
-    assert(_token->item()==this);
-    auto pp = prechecked_cast<Variable_Decl*>(_token->mutable_item());
-    assert(pp);
-    pp->use_var();
-
-  }
 }
 /*--------------------------------------------------------------------------*/
 Data_Type const& Assignment::type() const
@@ -1069,20 +1041,6 @@ bool Statement::propagate_rdeps(RDeps const& r)
   }
   return ret;
 }
-/*--------------------------------------------------------------------------*/
-#if 0
-void Variable_Decl::use_var()
-{
-  trace1("Variable_Decl::use_var", name());
-  _stt.use();
-}
-/*--------------------------------------------------------------------------*/
-void Variable_Decl::assign_var()
-{
-  trace1("Variable_Decl::assign_var", name());
-  _stt.assign();
-}
-#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

@@ -1,0 +1,14 @@
+`include "sub/disciplines.few"
+
+`pragma modelgen dump-annotate
+`pragma modelgen nodump-unreachable
+
+module cond0(p,n);
+   real S;
+	analog initial
+		if (1 + S == 3);
+	analog begin : main
+		S=1;
+   end
+endmodule
+

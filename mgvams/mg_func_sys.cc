@@ -136,6 +136,7 @@ public:
   ~TEMPERATURE(){ }
 private:
   bool static_code()const override {return true;}
+  // bool is_const()const override { return true; }
   void stack_op(Expression*)const override {
     throw Exception("invalid");
   }
@@ -161,6 +162,7 @@ private:
   void stack_op(Expression*)const override {
     throw Exception("invalid");
   }
+  // bool is_const()const override { return num_args; }
   bool static_code()const override {return true;}
   std::string code_name()const override{
     return "_f_vt";

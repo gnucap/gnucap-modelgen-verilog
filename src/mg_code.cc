@@ -118,7 +118,7 @@ Variable_Decl* Variable_Decl::deep_copy(Base* b, std::string s) const
   }else{ untested();
   }
 
-  if(_stt.is_override()){
+  if(is_override_var()){
     n->_stt = _stt;
   }else{
   }

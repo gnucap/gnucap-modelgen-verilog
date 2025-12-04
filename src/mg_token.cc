@@ -469,7 +469,7 @@ void Token_BINOP_::stack_op(Expression* E)const
 //  }else if(t1==t2, '-'){ ...
   }else{
     // t2 is constant?
-    if(n=='+' && is_literal(t2, 0.)){ untested();
+    if(n=='+' && is_literal(t2, 0.)){itested();
       t2.erase();
       t1.push();
     }else if(n=='*' && is_literal(t2, 1.)){
@@ -574,8 +574,15 @@ void Token_TERNARY_::stack_op(Expression* E)const
     deps->update(f->data());
     trace1("TERNARY", deps->is_constant());
 
+    // somehow pull in use?
+    // if reachable
+    f->submit_variable_xs(*SE);
+
+    // if reachable
+    t->submit_variable_xs(*SE);
+
     E->push_back(new Token_TERNARY_(name(), cond, t, f, deps));
-  }
+  } // not literal
 }
 /*--------------------------------------------------------------------------*/
 Token_TERNARY_::~Token_TERNARY_()
@@ -614,9 +621,6 @@ static void stack_op_args(Expression* EE, Expression const* arg_expr, FUNCTION_ 
     }else if(auto tt = dynamic_cast<Token_VAR_REF*>(*i)){
       auto EE_ = prechecked_cast<Expression_*>(EE);
       assert(EE_);
-      Block* scope = EE_->scope();
-//      tt->use_var(); // needed?
-//      tt->assign_var(); // maybe..
       tt->stack_op(EE);
 
       assert(EE->size());
@@ -628,16 +632,11 @@ static void stack_op_args(Expression* EE, Expression const* arg_expr, FUNCTION_ 
       auto AA = prechecked_cast<Assignment*>(ttt->mutable_item());
       assert(AA);
 
-      trace2("stackop io arg", ttt->name(), typeid(*ttt->item()).name());
-      if(auto sb = dynamic_cast<SeqBlock*>(scope)) {
-	if(ttt == AA->token_hack()){
-	}else{
-	  // something with AF
-	}
-	sb->variable_access().push_assign(AA->token_hack(),
-	       false, EE_->scope()->is_always());
-      }else{
-      }
+      //if(dynamic_cast<SeqBlock*>(scope)) { untested();
+      // here?
+      EE_->push_assign(AA->decl_token());
+      //}else{ untested(); // af?
+      //}
     }else{
       unreachable();
       (**i).stack_op(EE);
@@ -665,6 +664,7 @@ void Token_CALL::stack_op(Expression* e) const
   }
 
   if (arg_expr) {
+    trace1("CALL stackop1", name());
     FUNCTION_ const* f = function();
 
     if(f){
@@ -691,7 +691,7 @@ void Token_CALL::stack_op(Expression* e) const
 
       // here?
       TData* deps = new_deps(arg_expr);
-      trace1("stackop stashed arg", deps->is_constant());
+      trace2("CALL stash", name(), deps->is_constant());
       deps->set_any();
       if(f->is_constant()){
       }else{
@@ -699,11 +699,13 @@ void Token_CALL::stack_op(Expression* e) const
       }
 
       E->push_back(new Token_CALL(*this, deps, EE));
+      EE->submit_variable_xs(*SE);
     }
   }else if (E->is_empty()){
     // SFCALL?
     E->push_back(new Token_CALL(*this, const_deps.clone()));
   }else if(!dynamic_cast<const Token_PARLIST*>(E->back())) {
+    trace2("CALL stackop3", name(), const_deps.is_constant());
     // SFCALL
     E->push_back(new Token_CALL(*this, const_deps.clone()));
   }else{ untested();
@@ -1016,6 +1018,13 @@ void Token_VAR_REF::stack_op(Expression* e)const
     assert(nn->_item == _item);
     trace2("var::stackop", name(), typeid(*_item).name());
 
+    // DUP in var_decl
+    if(auto a = dynamic_cast<Assignment const*>(_item)){
+      E->push_use(a->decl_token());
+    }else{
+      incomplete();
+    }
+
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1103,41 +1112,6 @@ Token* Probe::new_token(Module&, size_t na)const
   // d.insert(Dep(nt->prb(), Dep::_LINEAR));
   return nt;
 } // Probe::new_token
-/*--------------------------------------------------------------------------*/
-void Token_VAR_REF::init_var()
-{
-  if(auto p = dynamic_cast<Variable_Decl*>(_item)){
-    p->init_var();
-  }else{
-    unreachable();
-  }
-}
-/*--------------------------------------------------------------------------*/
-void Token_VAR_REF::assign_var()
-{
-  if(auto p = dynamic_cast<Variable_Decl*>(_item)){
-    trace1("assign_var decl", name());
-    p->assign_var();
-  }else if(auto a = dynamic_cast<Assignment*>(_item)){
-    trace1("assign_var assign", name());
-    a->assign_var();
-  }else{
-    // unreachable(); analogfunction
-  }
-}
-/*--------------------------------------------------------------------------*/
-void Token_VAR_REF::use_var()
-{
-  trace1("Token_VAR_REF::use_var", name());
-  if(auto p = dynamic_cast<Variable_Decl*>(_item)){
-    trace1("use_var decl", name());
-    p->use_var();
-  }else if(auto a = dynamic_cast<Assignment*>(_item)){
-    trace1("use_var assign", name());
-    a->use_var();
-  }else{
-  }
-}
 /*--------------------------------------------------------------------------*/
 TData const& Token_VAR_REF::deps() const
 {
@@ -1287,6 +1261,13 @@ void Token_VAR_DECL::stack_op(Expression* e)const
     auto nn = new Token_VAR_REF(name(), _item, nd);
     assert(nn->scope());
     e->push_back(nn);
+
+    // DUP in VAR_REF?
+    if(auto a = dynamic_cast<Assignment const*>(_item)){
+      E->push_use(a->decl_token());
+    }else{
+      incomplete();
+    }
 
   }
 }

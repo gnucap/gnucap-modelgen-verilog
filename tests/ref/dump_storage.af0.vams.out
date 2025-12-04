@@ -1,0 +1,26 @@
+module test();
+  electrical p, n;
+  analog function real fct;
+    integer x//
+;
+    inout x;
+    // arg 0 x 1
+    begin // f
+      // fct : 0
+      // x : 0
+      x = 2; // s1 r3{bax}
+    end
+  endfunction
+
+  analog begin : main // always
+    // xxint : 0
+    integer xxint// +
+;
+    xxint = 1; // s1 r4{bax}
+    V(p, n) <+ fct(xxint); // s1 r2{x}
+  end
+
+endmodule
+
+
+

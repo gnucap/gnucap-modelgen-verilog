@@ -1,5 +1,5 @@
 module test(d, g, s, b);
-  real T// *
+  real T//
 ;
 
   analog begin // always

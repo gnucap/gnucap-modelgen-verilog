@@ -258,6 +258,11 @@ bool System_Task::update()
   return propagate_rdeps(_rdeps) || Statement::update() || ret;
 }
 /*--------------------------------------------------------------------------*/
+void System_Task::submit_variable_access(Variable_Access& va) const
+{
+  expression().submit_variable_xs(va);
+}
+/*--------------------------------------------------------------------------*/
 void AnalogProceduralAssignment::parse(CS& f)
 {
   // assert(owner()); ?
@@ -519,6 +524,25 @@ void AnalogConditionalStmt::dump(std::ostream& o) const
   }
 }
 /*--------------------------------------------------------------------------*/
+void AnalogConditionalStmt::submit_variable_access(Variable_Access& va) const
+{
+  cond().submit_variable_xs(va);
+//  trace2("AnalogConditionalStmt::submit_variable_access",
+//      false_part().is_reachable(), true_part().is_reachable());
+
+  if(false_part().is_reachable() && true_part().is_reachable()) {
+    Variable_Access a = false_part().variable_access() | true_part().variable_access();
+    va &= a;
+  }else{
+    if(true_part().is_reachable()) {
+      va &= true_part().variable_access();
+    }else if(false_part().is_reachable()) {
+      va &= false_part().variable_access();
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 bool AnalogConditionalStmt::is_used_in(Base const* b) const
 {
   if (_cond.is_used_in(b)){ untested();
@@ -551,6 +575,11 @@ void AnalogCtrlStmt::dump(std::ostream& o) const
     o << " ";
     _body.dump(o);
   }
+}
+/*--------------------------------------------------------------------------*/
+void AnalogCtrlStmt::submit_variable_access(Variable_Access& va) const
+{
+  va &= _body.variable_access();
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogCtrlStmt::propagate_rdeps(RDeps const& r)
@@ -606,6 +635,13 @@ void AnalogWhileStmt::parse(CS& file)
   //_cond.set_owner(scope());
   _cond.set_owner(this);
   file >> "(" >> _cond >> ")";
+  if(_cond.is_true()) {
+    if(is_always()) {
+      _body.set_always();
+    }else{ untested();
+    }
+  }else{
+  }
   if(file >> ";"){
   }else{
     _body.set_owner(this);
@@ -620,6 +656,22 @@ void AnalogWhileStmt::dump(std::ostream& o)const
 {
   o__ "while (" << _cond << ")";
   AnalogCtrlStmt::dump(o);
+}
+/*--------------------------------------------------------------------------*/
+void AnalogWhileStmt::submit_variable_access(Variable_Access& va) const
+{
+  conditional().submit_variable_xs(va);
+  Variable_Access a = body().variable_access();
+
+  if(body().is_always()) {
+    va &= a;
+    va &= a;
+  }else if(body().is_reachable()) {
+    Variable_Access b;
+    va &= a | b;
+    va &= a;
+  }else{ untested();
+  }
 }
 /*--------------------------------------------------------------------------*/
 static Assignment* parse_assignment_or_null(CS& f, Statement* owner)
@@ -864,15 +916,13 @@ void AnalogSwitchStmt::parse(CS& f)
   assert(sb);
 
   f >> "(" >> _ctrl >> ")";
-  CaseGen* def = nullptr;
   bool have_reachable = false;
-  bool have_always = false;
 
   while(true){
     if(f >> "endcase"){
       break;
     }else{
-      if(def){
+      if(have_default()){
 	// default is out of order. reachability messed up.
 	// CS.warn ...
 	// use update() to fix reachability?
@@ -881,25 +931,25 @@ void AnalogSwitchStmt::parse(CS& f)
 
       size_t here = f.cursor();
       CaseGen* g = new CaseGen(f, &_body, _ctrl.expression(),
-	  have_reachable, have_always);
+	  have_reachable, have_always());
 //      g->set_owner(owner());
 //      g->set_ctrl(&_ctrl.expression());
 //      f >> *g;
 //
       if(g->is_always()){
-	have_always = true;
+	_always = g;
       }else if(g->is_reachable()){
 	have_reachable = true;
       }else{
       }
 
       if(!g->is_default()) {
-      }else if(def){
+      }else if(have_default()){
 	f.reset_fail(here);
 	delete g;
 	throw Exception_CS_("multiple default: not allowed", f);
       }else{
-	def = g;
+	_default = g;
       }
 
       _body.push_back(g);
@@ -907,6 +957,10 @@ void AnalogSwitchStmt::parse(CS& f)
     //  _body.add_block(g->body()); // var xs here?
       sb->add_block(g->body());
     }
+  }
+  if(!have_default()){
+    incomplete();
+  }else{
   }
   //sb->add_block(&_body); // re-use var_ref?
 }
@@ -920,6 +974,61 @@ void AnalogSwitchStmt::dump(std::ostream& o)const
   }
   o__ "endcase\n";
 }
+/*--------------------------------------------------------------------------*/
+void CaseGen::submit_variable_access(Variable_Access& va) const
+{
+  if(_cond){
+    _cond->submit_variable_use(va);
+  }else{
+    // default
+  }
+  va &= body().variable_access();
+}
+/*--------------------------------------------------------------------------*/
+void AnalogSwitchStmt::submit_variable_access(Variable_Access& va) const
+{
+  control().submit_variable_xs(va);
+
+  if(_always){
+    _always->submit_variable_access(va);
+  }else if(1 || have_default()){
+    Variable_Access a;
+    bool first = have_default();
+    for(auto i : _body){
+      auto c = prechecked_cast<CaseGen const*>(i);
+      assert(c);
+      if(c->is_reachable()){
+	Variable_Access b;
+	c->submit_variable_access(b);
+	if(first){
+	  a = b;
+	}else{
+	  a = a | b;
+	}
+	first = false;
+      }else{
+      }
+    }
+    va &= a;
+  }else{
+    incomplete();
+  }
+
+#if 0
+  if(false_part().is_reachable() && true_part().is_reachable()) {
+    Variable_Access a = false_part().variable_access() | true_part().variable_access();
+    va &= a;
+  }else{
+    if(true_part().is_reachable()) {
+      va &= true_part().variable_access();
+    }else if(false_part().is_reachable()) {
+      va &= false_part().variable_access();
+    }else{
+    }
+  }
+#endif
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 bool AnalogConstruct::is_used_in(Base const*) const
 {
@@ -950,6 +1059,19 @@ void AnalogConstruct::parse(CS& f)
   while(_block.update()){
     trace0("AnalogConstruct update");
   }
+
+}
+/*--------------------------------------------------------------------------*/
+void AnalogConstruct::dump(std::ostream& o)const
+{
+  Base const* b = &_block;
+  b->dump(o);
+}
+/*--------------------------------------------------------------------------*/
+// DUP: SeqStmt?
+void AnalogConstruct::submit_variable_access(Variable_Access& va) const
+{
+  va &= _block.variable_access();
 }
 /*--------------------------------------------------------------------------*/
 void AnalogSeqStmt::parse(CS& f)
@@ -976,6 +1098,11 @@ void AnalogSeqStmt::dump(std::ostream& o) const
 {
   o__ "";
   _block.dump(o);
+}
+/*--------------------------------------------------------------------------*/
+void AnalogSeqStmt::submit_variable_access(Variable_Access& va) const
+{
+  va &= block().variable_access();
 }
 /*--------------------------------------------------------------------------*/
 void AnalogSeqBlock::parse(CS& f)
@@ -1030,7 +1157,10 @@ void AnalogSeqBlock::parse(CS& f)
     }
   }else{
   }
-  variable_access().propagate(this);
+  // variable_access().propagate(this);
+
+  // visit all statements and grab assign/use
+  variable_access().collect(this);
 } // AnalogSeqBlock::parse
 /*--------------------------------------------------------------------------*/
 #if 1
@@ -1051,12 +1181,6 @@ void AnalogCtrlBlock::set_owner(Statement* st)
   assert(owner());
 }
 #endif
-/*--------------------------------------------------------------------------*/
-void AnalogConstruct::dump(std::ostream& o)const
-{
-  Base const* b = &_block;
-  b->dump(o);
-}
 /*--------------------------------------------------------------------------*/
 Branch_Ref parse_branch(Block* owner, CS& f)
 {
@@ -1379,6 +1503,12 @@ bool Contribution::update()
   return AnalogStmt::update() || ret || (_deps->ddeps().size() != s);
 } // Contribution::update
 /*--------------------------------------------------------------------------*/
+void Contribution::submit_variable_access(Variable_Access& va) const
+{
+  trace2("Contribution::submit va", this, &_rhs);
+  _rhs.submit_variable_xs(va);
+}
+/*--------------------------------------------------------------------------*/
 void Branch_Map::parse(CS& f)
 { untested();
   trace1("Branch_Map::parse", f.tail().substr(0,20));
@@ -1621,6 +1751,14 @@ bool AnalogEvtCtlStmt::is_used_in(Base const* b)const
   }else{
     return AnalogCtrlStmt::is_used_in(b);
   }
+}
+/*--------------------------------------------------------------------------*/
+void AnalogEvtCtlStmt::submit_variable_access(Variable_Access& va) const
+{
+  cond().submit_variable_xs(va);
+  Variable_Access b;
+  Variable_Access a = b | body().variable_access();
+  va &= a;
 }
 /*--------------------------------------------------------------------------*/
 void make_cc_af(std::ostream& o, const Analog_Function& f); // BUG
@@ -2694,8 +2832,11 @@ void Analog::parse(CS& f)
     ab->parse(f);
     _list.set_owner(owner()); // needed?
     push_back(ab);
+
+
   }
-}
+  // variable_access().collect(this); // later.
+} // Analog::parse
 /*--------------------------------------------------------------------------*/
 Branch_Ref Branch_Map::lookup(std::string const& n)const
 {
@@ -2822,6 +2963,40 @@ Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
   auto pr = prechecked_cast<Probe const*>(f);
   assert(pr);
   return pr;
+}
+/*--------------------------------------------------------------------------*/
+void Analog::setup_storage()
+{
+//  SeqBlock::variable_access().collect(this);
+  Variable_Access va;
+  for(Statement* bb : _list){
+    if(dynamic_cast<AnalogInitialStmt const*>(bb)){
+      bb->submit_variable_access(va);
+    }else if(prechecked_cast<AnalogConstruct const*>(bb)){
+    }else{ untested();
+      incomplete();
+    }
+  }
+  va.prune_dynamic();
+
+  for(Statement* bb : _list){
+    if(dynamic_cast<AnalogConstruct const*>(bb)){
+      bb->submit_variable_access(va);
+    }else if(prechecked_cast<AnalogInitialStmt const*>(bb)){
+    }else{ untested();
+      incomplete();
+    }
+  }
+
+  va.sift_locals(scope());
+  assert(!va.size());
+}
+/*--------------------------------------------------------------------------*/
+void analog_setup_storage(Base* b)
+{
+  auto a = prechecked_cast<Analog*>(b);
+  assert(a);
+  a->setup_storage();
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

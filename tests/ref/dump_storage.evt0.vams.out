@@ -1,0 +1,33 @@
+module test_evtana0c(p, n);
+  inout p, n;
+  electrical p, n;
+  integer cnt// *
+;
+  real v// *
+;
+
+  analog begin // always
+    if (analysis("static")) begin
+      // v : 0
+      $trace("static %g\n", $abstime); // r4{brax}
+      v =  0.4; // s1 r4{bax}
+    end
+    else begin
+      if (0) begin // never
+        $trace("not static %g\n", $abstime); // --
+
+      end
+      @(timer( 0.,  0.5)) begin // e
+        // cnt : 0
+        // v : 0
+        v = 1; // s2 r4{bax}
+        cnt = (cnt + 1); // s3 r3{bax}
+      end
+    end
+    V(p, n) <+ v; // s4 r2{x}
+  end
+
+endmodule
+
+
+

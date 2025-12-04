@@ -1,0 +1,29 @@
+`pragma modelgen dump-annotate
+`pragma modelgen nodump-discipline
+`pragma modelgen nodump-nature
+`include "disciplines.vams"
+`include "constants.vams"
+
+
+module test();
+real gmf;
+integer dummy;
+
+	analog begin
+
+
+	gmf=0;
+
+		if (dummy) begin
+			dummy = gmf;
+			gmf = 0.;
+		end else begin
+		end
+
+	end
+
+
+
+endmodule
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/

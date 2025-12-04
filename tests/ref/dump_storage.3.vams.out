@@ -1,0 +1,21 @@
+module test();
+  real gmf// +
+;
+  integer dummy// *
+;
+
+  analog begin // always
+    // gmf : 0
+    gmf = 0; // s2 r3{bax}
+    if (dummy) begin
+      // dummy : 0
+      // gmf : 0
+      dummy = gmf; // s3 r3{bax}
+      gmf =  0.; // s1 r3{bax}
+    end
+  end
+
+endmodule
+
+
+

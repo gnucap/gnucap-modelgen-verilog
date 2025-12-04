@@ -3,7 +3,7 @@ module cond0(p, n);
     // S : 0
     // T : 0
     // U : 0
-    real S// *
+    real S// +
 , T//
 , U//
 ;
@@ -19,7 +19,7 @@ endmodule
 module cond1(p, n);
   analog begin : main // always
     // S : 0
-    real S// -
+    real S//
 ;
     if (1) begin // always
       // S : 0
@@ -48,7 +48,7 @@ module cond2(p, n);
     // T : 0
     real S//
 ;
-    real T// -
+    real T//
 ;
     if (0) begin // never
       // S : 0
@@ -73,7 +73,7 @@ module cond3(p, n);
   analog begin : main // always
     // S : 0
     // T : 0
-    real S// -
+    real S//
 ;
     real T// +
 ;

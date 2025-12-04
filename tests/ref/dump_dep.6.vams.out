@@ -9,8 +9,8 @@ module dep6(d, g);
     real c// *
 ;
     real T// +
-, S// +
-, U// +
+, S//
+, U//
 ;
     @(initial_step) begin // e
       // c : 0

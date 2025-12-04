@@ -7,13 +7,13 @@ module dep0(d, g);
     // U : 1
     real T// * [V(g)]
 ;
-    real S// * [V(g)]
+    real S// [V(g)]
 ;
-    real U// + [V(g)]
+    real U// [V(g)]
 ;
     T = T; // [V(g)] s4 r3{bax}
     U = T; // [V(g)] s5 r3{bax}
-    while (1) begin
+    while (1) begin // always
       // S : 1
       // T : 1
       S = T; // [V(g)] s5 r3{bax}

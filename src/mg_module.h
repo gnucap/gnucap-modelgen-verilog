@@ -277,6 +277,8 @@ public: // for now.
   void parse_ports(CS& f);
   virtual Module* deflate() { untested();return this;}
   Parameter_List_Collection& parameters()	{return _parameters;}
+protected: // Paramset::deflate
+  void setup_storage();
   void setup_functions();
   void setup_nodes();
 

@@ -811,7 +811,8 @@ void Module::parse_body(CS& f)
     }else{
     }
   }
-}
+  setup_storage();
+} // Module::parse_body
 /*--------------------------------------------------------------------------*/
 /*
 // A.2.1.3
@@ -1162,6 +1163,7 @@ bool Node::is_used() const
   if(1 && is_ground()){
     trace1("Node::is_used, ground", name());
   }else{
+    incomplete();
     trace2("Node::is_used", name(), _fanout.size());
     for(Element_2 const* e : _fanout){
       if(e->is_used()){
@@ -1347,6 +1349,18 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args_)
   }
 
   return t;
+}
+/*--------------------------------------------------------------------------*/
+void analog_setup_storage(Base*);
+void Module::setup_storage()
+{
+  if(_analog){
+    analog_setup_storage(_analog);
+  }else{ untested();
+  }
+  // incomplete();
+//  for i in analog_list(*this)
+//     i.setup_storage();
 }
 /*--------------------------------------------------------------------------*/
 void filter_setup(MGVAMS_FILTER*, Module*);

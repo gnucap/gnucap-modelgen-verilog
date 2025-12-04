@@ -77,7 +77,7 @@ static bool is_xs_function(std::string const& f, Block const* owner)
 /*--------------------------------------------------------------------------*/
 void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 {
-  Expression& E = *this;
+  Expression_& E = *this;
   trace0("resolve symbols ===========");
   Block* Scope = scope();
   Base* Owner = owner();
@@ -192,13 +192,16 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 	Token_PAR_REF PP(p->name(), p);
 	PP.stack_op(&E);
       }else if(auto vt = dynamic_cast<Token_VAR_REF*>(r)) {
-	auto sb = dynamic_cast<SeqBlock*>(Scope);
-	if(sb){
-	  sb->variable_access().push_use(vt);
-	}else{
-	}
-	trace2("resolve VAR_REF", n, vt->deps().size());
 	vt->stack_op(&E);
+
+#if 0
+	// move to stack op?
+	if(auto a = dynamic_cast<Assignment const*>(vt->item())){ untested();
+	  E.push_use(a->decl_token());
+	}else{
+	  incomplete();
+	}
+#endif
       }else if(auto pp = dynamic_cast<Port_3 const*>(r)) {
 	assert(symbol);
 	Token_PORT_BRANCH a(*symbol, pp);
@@ -464,6 +467,55 @@ bool Expression_::is_constant() const
     return c;
   }else{
     return data().is_constant();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Expression_::submit_variable_xs(Variable_Access& va) const
+{
+  trace3("Expression_::submit_variable_xs", this, _used_variables.size(), _assignments.size());
+  for(Token const* t : _used_variables){
+    if(!t){
+      // af hack??
+      continue;
+    }else{
+    }
+    auto r = prechecked_cast<Token_VAR_REF const*>(t);
+    assert(r);
+    if(dynamic_cast<Variable_Decl const*>(r->item())){
+    }else{ untested();
+    }
+    va.use_variable(t);
+  }
+  for(Token const* t : _assignments){
+    assert(t);
+    auto r = prechecked_cast<Token_VAR_REF const*>(t);
+    assert(r);
+    if(dynamic_cast<Variable_Decl const*>(r->item())){
+    }else{ untested();
+    }
+    // TODO: flags
+    va.assign_variable(r, false, false);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Expression_::submit_variable_xs(Expression_& ee) const
+{
+  trace3("Expression_::submit_variable_xs2", this, _used_variables.size(), _assignments.size());
+  for(Token const* t : _used_variables){
+    auto r = prechecked_cast<Token_VAR_REF const*>(t);
+    assert(r);
+    if(dynamic_cast<Variable_Decl const*>(r->item())){
+    }else{ untested();
+    }
+    ee.push_use(t);
+  } untested();
+  for(Token const* t : _assignments){
+    auto r = prechecked_cast<Token_VAR_REF const*>(t);
+    assert(r);
+    if(dynamic_cast<Variable_Decl const*>(r->item())){
+    }else{ untested();
+    }
+    ee.push_assign(r);
   }
 }
 /*--------------------------------------------------------------------------*/
