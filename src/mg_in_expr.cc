@@ -508,7 +508,7 @@ void Expression_::submit_variable_xs(Expression_& ee) const
     }else{ untested();
     }
     ee.push_use(t);
-  } untested();
+  }
   for(Token const* t : _assignments){
     auto r = prechecked_cast<Token_VAR_REF const*>(t);
     assert(r);

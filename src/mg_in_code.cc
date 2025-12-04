@@ -306,13 +306,13 @@ bool Assignment::is_state_var() const
 }
 /*--------------------------------------------------------------------------*/
 bool Assignment::is_common() const
-{ untested();
+{
   assert(_lhsref);
   return _lhsref->is_common();
 }
 /*--------------------------------------------------------------------------*/
 bool Assignment::is_temporary() const
-{ untested();
+{
   assert(_lhsref);
   return _lhsref->is_temporary();
 }
@@ -325,6 +325,11 @@ TData const& Assignment::data()const
   }
   assert(_token_data);
   return *_token_data;
+}
+/*--------------------------------------------------------------------------*/
+bool Variable_Decl::has_deps() const
+{
+  return _data.has_deps();
 }
 /*--------------------------------------------------------------------------*/
 // obsolete

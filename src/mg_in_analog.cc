@@ -588,8 +588,16 @@ bool AnalogCtrlStmt::propagate_rdeps(RDeps const& r)
   return Statement::propagate_rdeps(r);
 }
 /*--------------------------------------------------------------------------*/
+AnalogForStmt::AnalogForStmt(CS& file, Block* o) : AnalogWhileStmt()
+{
+  options().disable_optimize_common(); // for now.
+  set_owner(o);
+  parse(file);
+}
+/*--------------------------------------------------------------------------*/
 AnalogWhileStmt::AnalogWhileStmt(CS& file, Block* o)
 {
+  options().disable_optimize_common(); // for now.
   set_owner(o);
   parse(file);
 }
@@ -770,7 +778,7 @@ bool AnalogProceduralAssignment::update()
   if(is_state_var()){
     ret |= propagate_rdep(&tr_advance_tag);
     ret |= propagate_rdep(&tr_accept_tag);
-  }else{ untested();
+  }else{
   }
 #ifdef DO_TRACE
   trace1("AnalogProceduralAssignment::update2", _a.lhsname());

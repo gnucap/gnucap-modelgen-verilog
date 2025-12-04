@@ -567,10 +567,7 @@ class AnalogForStmt : public AnalogWhileStmt {
   Assignment* _init{nullptr};
   Assignment* _tail{nullptr};
 public:
-  explicit AnalogForStmt(CS& file, Block* o) : AnalogWhileStmt() {
-    set_owner(o);
-    parse(file);
-  }
+  explicit AnalogForStmt(CS& file, Block* o);
 
   void parse(CS& file) override;
   void dump(std::ostream& o)const override;

@@ -32,8 +32,9 @@ Base& modelgen_opts()
 /*--------------------------------------------------------------------------*/
 Options::Options() :
   _optimize_binop(true),  // fold binary operators
+  _optimize_common(true), // put aside model constants
   _optimize_swap(true),   // swap operands.
-  _optimize_deriv(true), // suppress zero derivative propagation
+  _optimize_deriv(true),  // suppress zero derivative propagation
   _optimize_deps(true),   // consider dependency types
   _optimize_unused(true), // dont emit unused sources
   _optimize_nodes(true),  // prune unused nodes
@@ -57,6 +58,7 @@ void Options::parse(CS& f)
   do{
     ONE_OF
       || Get(f, "optimize-binop",  &_optimize_binop)
+      || Get(f, "optimize-common", &_optimize_common)
       || Get(f, "optimize-swap",   &_optimize_swap)
       || Get(f, "optimize-deriv",  &_optimize_deriv)
       || Get(f, "optimize-deps",   &_optimize_deps)

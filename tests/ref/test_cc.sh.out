@@ -1048,7 +1048,7 @@ public:
   void tr_eval_analog(MOD_resistor*)const;
   void tr_advance_analog(MOD_resistor*)const;
   void tr_regress_analog(MOD_resistor*)const;
-  void precalc_analog(MOD_resistor*)const;
+  void precalc_analog(MOD_resistor*);
   std::string name()const override {itested();return "resistor";}
     static int  count() {return _count;}
 private: // strictly internal
@@ -1059,6 +1059,14 @@ public: // input parameters
   real _p___tc1 /*  */, _p___tc2 /*  */;
   real _p___noisy /*  */;
   real _p___tnom /*  */;
+public: // common values
+  struct state_{
+    // instance double ___i{0.};
+    struct { // main
+      // instance double _dt{0.};
+      double _g{0.};
+    }_main;
+  }_v_;
 private: // funcs
   bool param_given(PARA_BASE const& p)const {
     return p.has_hard_value();
@@ -1151,7 +1159,7 @@ public: // instance vars
     double ___i{0.};
     struct { // main
       double _dt{0.};
-      double _g{0.};
+      // common double _g{0.};
     }_main;
   }_v_;
   state_ _v_1;
@@ -1201,7 +1209,8 @@ COMMON_resistor::COMMON_resistor(int c)
 /*--------------------------------------------------------------------------*/
 COMMON_resistor::COMMON_resistor(const COMMON_resistor& p)
   :COMMON_COMPONENT(p),
-   _p_r(p._p_r)
+   _p_r(p._p_r),
+   _v_(p._v_)
 {
   ++_count;
 }
@@ -1527,37 +1536,7 @@ void EVAL__b_white_noise_1_p__::tr_eval(ELEMENT* d)const
         return *this;
       }
     }_v_dt(d);
-    // tmp block proxy (823b)
-    class _V_g : public ddouble {
-      MOD__ * const _m{nullptr};
-    public:
-      typedef ddouble base;
-      typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p) { itested(); }
-      _V_g(double const& p) : ddouble(p) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p) {}
-      explicit _V_g() : ddouble() {set_all_deps();}
-      _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
-      ~_V_g() {
-        if(_m){
-          _m->_v_._main._g = value();
-        }else{
-        }
-      }
-      ddouble& operator=(double const& t){
-        ddouble::operator=(t);
-        return *this;
-      }
-      ddouble& operator=(ddouble const& t){
-        ddouble::operator=(t);
-        return *this;
-      }
-      ddouble& operator=(_V_g const & t){
-        ddouble::operator=(t);
-        return *this;
-      }
-    }_v_g(d);
+    auto& _v_g = _v_._main._g;
 #pragma GCC diagnostic pop
 // omit Statement 21AnalogConditionalStmt (white_noise_1_p)
 // omit Statement 21AnalogConditionalStmt (white_noise_1_p)
@@ -1619,46 +1598,13 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         return *this;
       }
     }_v_dt(d);
-    // tmp block proxy (823b)
-    class _V_g : public ddouble {
-      MOD__ * const _m{nullptr};
-    public:
-      typedef ddouble base;
-      typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p) { itested(); }
-      _V_g(double const& p) : ddouble(p) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p) {}
-      explicit _V_g() : ddouble() {set_all_deps();}
-      _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
-      ~_V_g() {
-        if(_m){
-          _m->_v_._main._g = value();
-        }else{
-        }
-      }
-      ddouble& operator=(double const& t){
-        ddouble::operator=(t);
-        return *this;
-      }
-      ddouble& operator=(ddouble const& t){
-        ddouble::operator=(t);
-        return *this;
-      }
-      ddouble& operator=(_V_g const & t){
-        ddouble::operator=(t);
-        return *this;
-      }
-    }_v_g(d);
+    auto& _v_g = _v_._main._g;
 #pragma GCC diagnostic pop
 // omit Statement 21AnalogConditionalStmt (p, n)
       {
         { // anonymous block
           { // Assignment real 'g'.
-            ddouble t0;
-            //t0.set_no_deps();
-            t0 =  1. / (_p___r) /*rhspar*/; // (703)
-            _v_g = t0.value(); // (*)
+          // _v_g is common
           }
         }
       }
@@ -1831,47 +1777,14 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         return *this;
       }
     }_v_dt(d);
-    // tmp block proxy (823b)
-    class _V_g : public ddouble {
-      MOD__ * const _m{nullptr};
-    public:
-      typedef ddouble base;
-      typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p) { itested(); }
-      _V_g(double const& p) : ddouble(p) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p) {}
-      explicit _V_g() : ddouble() {set_all_deps();}
-      _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
-      ~_V_g() {
-        if(_m){
-          _m->_v_._main._g = value();
-        }else{
-        }
-      }
-      ddouble& operator=(double const& t){
-        ddouble::operator=(t);
-        return *this;
-      }
-      ddouble& operator=(ddouble const& t){
-        ddouble::operator=(t);
-        return *this;
-      }
-      ddouble& operator=(_V_g const & t){
-        ddouble::operator=(t);
-        return *this;
-      }
-    }_v_g(d);
+    auto& _v_g = _v_._main._g;
 #pragma GCC diagnostic pop
       {
       }
       {
         { // anonymous block
           { // Assignment real 'g'.
-            ddouble t0;
-            //t0.set_no_deps();
-            t0 =  1. / (_p___r) /*rhspar*/; // (703)
-            _v_g = t0.value(); // (*)
+          // _v_g is common
           }
         }
       }
@@ -1916,7 +1829,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
   }
 }
 /*--------------------------------------------------------------------------*/
-inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
+inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
 {
 //OUT_ANALOG precalc
   ddouble _v___i(m->_v_.___i); // precalc 1068
@@ -1933,8 +1846,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
     { // : main
     ddouble _v_dt(m->_v_._main._dt); // precalc 1068
     (void) _v_dt;
-    ddouble _v_g(m->_v_._main._g); // precalc 1068
-    (void) _v_g;
+    auto& _v_g = _v_._main._g;
       {
       }
       {
@@ -2002,17 +1914,13 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
     { // : main
     double& _v_dt(m->_v_._main._dt); // (1068)
     (void) _v_dt;
-    double& _v_g(m->_v_._main._g); // (1068)
-    (void) _v_g;
+    auto& _v_g = _v_._main._g;
       {
       }
       {
         { // anonymous block
           { // Assignment real 'g'.
-            ddouble t0;
-            //t0.set_no_deps();
-            t0 =  1. / (_p___r) /*rhspar*/; // (703)
-            _v_g = t0.value(); // (s)
+          // _v_g is common
           }
         }
       }
@@ -2053,17 +1961,13 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
     { // : main
     double& _v_dt(m->_v_._main._dt); // (1068)
     (void) _v_dt;
-    double& _v_g(m->_v_._main._g); // (1068)
-    (void) _v_g;
+    auto& _v_g = _v_._main._g;
       {
       }
       {
         { // anonymous block
           { // Assignment real 'g'.
-            ddouble t0;
-            //t0.set_no_deps();
-            t0 =  1. / (_p___r) /*rhspar*/; // (703)
-            _v_g = t0.value(); // (s)
+          // _v_g is common
           }
         }
       }
@@ -2360,7 +2264,7 @@ public:
   void tr_eval_analog(MOD_resistor*)const;
   void tr_advance_analog(MOD_resistor*)const;
   void tr_regress_analog(MOD_resistor*)const;
-  void precalc_analog(MOD_resistor*)const;
+  void precalc_analog(MOD_resistor*);
   std::string name()const override {itested();return "resistor";}
     static int  count() {return _count;}
 private: // strictly internal
@@ -2370,6 +2274,14 @@ public: // input parameters
   PARAMETER<real> _p_tc1 /*  */, _p_tc2 /*  */;
   PARAMETER<real> _p_noisy /*  */;
   PARAMETER<real> _p_tnom /*  */;
+public: // common values
+  struct state_{
+    // instance double _i{0.};
+    struct { // main
+      // instance double _dt{0.};
+      // temporary double _g{0.};
+    }_main;
+  }_v_;
 private: // funcs
   bool param_given(PARA_BASE const& p)const {
     return p.has_hard_value();
@@ -2463,7 +2375,7 @@ public: // instance vars
     double _i{0.};
     struct { // main
       double _dt{0.};
-      double _g{0.};
+      // temporary double _g{0.};
     }_main;
   }_v_;
   state_ _v_1;
@@ -2516,7 +2428,8 @@ COMMON_resistor::COMMON_resistor(const COMMON_resistor& p)
    _p_tc1(p._p_tc1),
    _p_tc2(p._p_tc2),
    _p_noisy(p._p_noisy),
-   _p_tnom(p._p_tnom)
+   _p_tnom(p._p_tnom),
+   _v_(p._v_)
 {
   ++_count;
 }
@@ -2869,37 +2782,7 @@ void EVAL__b_white_noise_0_p__::tr_eval(ELEMENT* d)const
         return *this;
       }
     }_v_dt(d);
-    // tmp block proxy (823b)
-    class _V_g : public ddouble {
-      MOD__ * const _m{nullptr};
-    public:
-      typedef ddouble base;
-      typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p) { itested(); }
-      _V_g(double const& p) : ddouble(p) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p) {}
-      explicit _V_g() : ddouble() {set_all_deps();}
-      _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
-      ~_V_g() {
-        if(_m){
-          _m->_v_._main._g = value();
-        }else{
-        }
-      }
-      ddouble& operator=(double const& t){
-        ddouble::operator=(t);
-        return *this;
-      }
-      ddouble& operator=(ddouble const& t){
-        ddouble::operator=(t);
-        return *this;
-      }
-      ddouble& operator=(_V_g const & t){
-        ddouble::operator=(t);
-        return *this;
-      }
-    }_v_g(d);
+    double /*?*/ _v_g; // local_var
 #pragma GCC diagnostic pop
       {
         double f0;
@@ -3024,37 +2907,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         return *this;
       }
     }_v_dt(d);
-    // tmp block proxy (823b)
-    class _V_g : public ddouble {
-      MOD__ * const _m{nullptr};
-    public:
-      typedef ddouble base;
-      typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p) { itested(); }
-      _V_g(double const& p) : ddouble(p) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p) {}
-      explicit _V_g() : ddouble() {set_all_deps();}
-      _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
-      ~_V_g() {
-        if(_m){
-          _m->_v_._main._g = value();
-        }else{
-        }
-      }
-      ddouble& operator=(double const& t){
-        ddouble::operator=(t);
-        return *this;
-      }
-      ddouble& operator=(ddouble const& t){
-        ddouble::operator=(t);
-        return *this;
-      }
-      ddouble& operator=(_V_g const & t){
-        ddouble::operator=(t);
-        return *this;
-      }
-    }_v_g(d);
+    double /*?*/ _v_g; // local_var
 #pragma GCC diagnostic pop
       {
         double f0;
@@ -3304,37 +3157,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         return *this;
       }
     }_v_dt(d);
-    // tmp block proxy (823b)
-    class _V_g : public ddouble {
-      MOD__ * const _m{nullptr};
-    public:
-      typedef ddouble base;
-      typedef va::ddouble_tag base_tag;
-      _V_g(ddouble const& p) : ddouble(p) { itested(); }
-      _V_g(double const& p) : ddouble(p) {set_all_deps();}
-      _V_g(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}
-      _V_g(_V_g const& p) : ddouble(p) {}
-      explicit _V_g() : ddouble() {set_all_deps();}
-      _V_g(MOD__* m) : ddouble(m->_v_._main._g), _m(m) {}
-      ~_V_g() {
-        if(_m){
-          _m->_v_._main._g = value();
-        }else{
-        }
-      }
-      ddouble& operator=(double const& t){
-        ddouble::operator=(t);
-        return *this;
-      }
-      ddouble& operator=(ddouble const& t){
-        ddouble::operator=(t);
-        return *this;
-      }
-      ddouble& operator=(_V_g const & t){
-        ddouble::operator=(t);
-        return *this;
-      }
-    }_v_g(d);
+    double /*?*/ _v_g; // local_var
 #pragma GCC diagnostic pop
       {
         double f0;
@@ -3456,7 +3279,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
   }
 }
 /*--------------------------------------------------------------------------*/
-inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
+inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
 {
 //OUT_ANALOG precalc
   ddouble _v_i(m->_v_._i); // precalc 1068
@@ -3473,8 +3296,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m) const
     { // : main
     ddouble _v_dt(m->_v_._main._dt); // precalc 1068
     (void) _v_dt;
-    ddouble _v_g(m->_v_._main._g); // precalc 1068
-    (void) _v_g;
+    double /*?*/ _v_g; // local_var
       {
         double f0;
         { // scope
@@ -3609,8 +3431,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
     { // : main
     double& _v_dt(m->_v_._main._dt); // (1068)
     (void) _v_dt;
-    double& _v_g(m->_v_._main._g); // (1068)
-    (void) _v_g;
+    double /*?*/ _v_g; // local_var
       {
         double f0;
         { // scope
@@ -3713,8 +3534,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
     { // : main
     double& _v_dt(m->_v_._main._dt); // (1068)
     (void) _v_dt;
-    double& _v_g(m->_v_._main._g); // (1068)
-    (void) _v_g;
+    double /*?*/ _v_g; // local_var
       {
         double f0;
         { // scope
@@ -5128,7 +4948,7 @@ public:
   void tr_accept_analog(MOD_capacitor*)const;
   void tr_advance_analog(MOD_capacitor*)const;
   void tr_regress_analog(MOD_capacitor*)const;
-  void precalc_analog(MOD_capacitor*)const;
+  void precalc_analog(MOD_capacitor*);
   std::string name()const override {itested();return "capacitor";}
     static int  count() {return _count;}
 private: // strictly internal
@@ -5137,6 +4957,9 @@ public: // input parameters
   PARAMETER<real> _p_c /*  */;
   real _p___c /*  */;
   real _p___ic /*  */;
+public: // common values
+  struct state_{
+  }_v_;
 private: // funcs
   bool param_given(PARA_BASE const& p)const {
     return p.has_hard_value();
@@ -5318,7 +5141,8 @@ COMMON_capacitor::COMMON_capacitor(int c)
 /*--------------------------------------------------------------------------*/
 COMMON_capacitor::COMMON_capacitor(const COMMON_capacitor& p)
   :COMMON_COMPONENT(p),
-   _p_c(p._p_c)
+   _p_c(p._p_c),
+   _v_(p._v_)
 {
   ++_count;
 }
@@ -5678,7 +5502,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
   }
 }
 /*--------------------------------------------------------------------------*/
-inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
+inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
 {
 //OUT_ANALOG precalc
   MOD_capacitor const* p = m;
@@ -6110,7 +5934,7 @@ public:
   void tr_accept_analog(MOD_capacitor*)const;
   void tr_advance_analog(MOD_capacitor*)const;
   void tr_regress_analog(MOD_capacitor*)const;
-  void precalc_analog(MOD_capacitor*)const;
+  void precalc_analog(MOD_capacitor*);
   std::string name()const override {itested();return "capacitor";}
     static int  count() {return _count;}
 private: // strictly internal
@@ -6119,6 +5943,9 @@ public: // input parameters
   PARAMETER<real> _p_c /*  */;
   PARAMETER<real> _p_ic /*  */;
   real _p___c /*  */, _p___ic /*  */;
+public: // common values
+  struct state_{
+  }_v_;
 private: // funcs
   bool param_given(PARA_BASE const& p)const {
     return p.has_hard_value();
@@ -6311,7 +6138,8 @@ COMMON_capacitor::COMMON_capacitor(int c)
 COMMON_capacitor::COMMON_capacitor(const COMMON_capacitor& p)
   :COMMON_COMPONENT(p),
    _p_c(p._p_c),
-   _p_ic(p._p_ic)
+   _p_ic(p._p_ic),
+   _v_(p._v_)
 {
   ++_count;
 }
@@ -6733,7 +6561,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
   }
 }
 /*--------------------------------------------------------------------------*/
-inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m) const
+inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
 {
 //OUT_ANALOG precalc
   MOD_capacitor const* p = m;

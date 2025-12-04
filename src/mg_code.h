@@ -255,6 +255,8 @@ public: // storage
 //   void init_var() {_stt.init();}
 //   void assign_var() {_stt.assign();}
 //   void use_var() {_stt.use();}
+protected:
+  bool has_deps()const;
 private:
   void new_deps();
   void new_data();
@@ -263,8 +265,7 @@ public:
   bool is_real()const { untested(); return type().is_real(); }
   bool is_int()const { untested(); return type().is_int(); }
   std::string const identifier()const { untested();return name();}
-  //std::string const name()const; //  { untested();return name();}
-  virtual std::string code_name()const {unreachable(); return "";}
+  std::string code_name()const;
 
   virtual Base const* value()const { unreachable(); return nullptr;}
   Block const* scope() const;

@@ -1364,20 +1364,32 @@ std::string Token_VAR_REF::long_code_name() const
 /*--------------------------------------------------------------------------*/
 bool Token_VAR_REF::is_state_var() const
 {
-  // incomplete();
-  return true;
+  return !is_temporary() && !is_common();
 }
 /*--------------------------------------------------------------------------*/
 bool Token_VAR_REF::is_common() const
 {
-  // incomplete();
-  return false;
+  if( auto v = dynamic_cast<Variable_Decl const*>(item())) {
+    return v->is_common();
+  }else if(auto a = dynamic_cast<Assignment const*>(item())) {
+    return a->is_common();
+  }else{
+    // unreachable(); nope. analogfunction
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool Token_VAR_REF::is_temporary() const
 {
-  // incomplete();
-  return false;
+  if( auto v = dynamic_cast<Variable_Decl const*>(item())) {
+    return v->is_temporary();
+  }else
+    if(auto a = dynamic_cast<Assignment const*>(item())) {
+      return a->is_temporary();
+    }else{
+    // unreachable(); nope. analogfunction
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 inline void Token_PARLIST_::stack_op(Expression* E) const

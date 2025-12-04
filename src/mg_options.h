@@ -24,6 +24,7 @@
 /*--------------------------------------------------------------------------*/
 class Options : public Base {
   bool _optimize_binop;  // fold binary operators
+  bool _optimize_common; // put aside model constants
   bool _optimize_swap;   // swap operands.
   bool _optimize_deriv;  // suppress zero derivative propagation
   bool _optimize_deps;   // consider dependency types
@@ -46,6 +47,7 @@ public:
   void dump(std::ostream&)const override{ untested();unreachable();}
 public:
   bool optimize_binop()   const{ return _optimize_binop; }
+  bool optimize_common()  const{ return _optimize_common; }
   bool optimize_swap()    const{ return _optimize_swap; }
   bool optimize_deriv()   const{ return _optimize_deriv; }
   bool optimize_deps()    const{ untested(); return _optimize_deps; }
@@ -65,6 +67,8 @@ public:
 public:
   friend class option_nodump_annotate;
   friend class option_nodump_unreachable;
+public: // optimisation tweaks
+  void disable_optimize_common() { /*_optimize_common = false; */}
 };
 /*--------------------------------------------------------------------------*/
 Base& modelgen_opts(); //?

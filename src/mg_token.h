@@ -440,7 +440,7 @@ public: // LiSt
 class Variable_Stmt;
 class Token_VAR_DECL : public Token_VAR_REF {
   // Variable_Stmt const* _owner{nullptr}; // _item?
-  Base const* _default{0};
+  Base const* _default{0}; // BUG. move to _item
   // type //
 public:
   explicit Token_VAR_DECL() : Token_VAR_REF("",nullptr,nullptr) { untested();unreachable();}
