@@ -478,9 +478,6 @@ void STORAGE_TYPE::apply(Token const* t) const
   if(!A){ untested();
     incomplete();
     // AF??
-  }else if(A->is_override_var()){ // BUG, encap
-    incomplete();
-    unreachable();
   }else if(is_state()){
     trace2("STORAGE_TYPE::apply state", tt->name(), *this);
     assert(!is_common());

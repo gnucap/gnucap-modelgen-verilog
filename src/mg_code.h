@@ -241,15 +241,16 @@ public:
   bool propagate_rdeps(RDeps const&);
  RDeps const& rdeps()const {return _rdeps;}
 public: // storage
-  void set_common_var() {_stt = st_common;}
-  void set_temporary_var() {_stt = st_temporary;}
-  void set_state_var() {_stt = st_state;};
+  void set_common_var() { if(is_override_var()) {}else{_stt = st_common;} }
+  void set_temporary_var() { if(is_override_var()) {}else{_stt = st_temporary;} }
+  void set_state_var() { if(is_override_var()) {}else{_stt = st_state;} }
   void set_common_override() {_stt = st_override_common;}
   void set_temporary_override() {_stt = st_override_temporary;}
   void set_state_override() {_stt = st_override_state;};
   bool is_common()const {/*assert(_stt);*/ return _stt==st_common || _stt==st_override_common;}
   bool is_temporary()const {/*assert(_stt);*/ return _stt==st_temporary || _stt==st_override_temporary;}
   bool is_state_var()const {/*assert(_stt);*/ return _stt==st_state || _stt==st_override_state;}
+private:
   bool is_override_var()const {/*assert(_stt);*/ return _stt>=st_override_common;}
 // public: // manipulate storage
 //   void init_var() {_stt.init();}
