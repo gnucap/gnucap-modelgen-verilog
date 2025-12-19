@@ -46,7 +46,7 @@ private:
   std::string eval(CS&, const PARAM_LIST*)const override{ untested();
     return "@";
   }
-  void stack_op(Expression*)const override { untested();
+  void stack_op(Expression*)const override {
     throw Exception("invalid");
   }
   std::string code_name()const override{

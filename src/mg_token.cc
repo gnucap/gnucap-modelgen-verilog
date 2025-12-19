@@ -691,8 +691,8 @@ void Token_CALL::stack_op(Expression* e) const
 
       // here?
       TData* deps = new_deps(arg_expr);
-      trace2("CALL stash", name(), deps->is_constant());
       deps->set_any();
+      trace2("CALL stash", name(), f->is_constant());
       if(f->is_constant()){
       }else{
 	deps->set_constant(false);

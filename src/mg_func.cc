@@ -51,7 +51,7 @@ void stack_op(FUNCTION_ const* f, Expression const& arg, Expression* E)
   }
   E->push_back(new Token_PARLIST("("));
 
-  if(literal){
+  if(1||literal){
     try{
       trace0("free stack_op, f");
       f->stack_op(E);
@@ -62,8 +62,8 @@ void stack_op(FUNCTION_ const* f, Expression const& arg, Expression* E)
       }
       throw x;
     }
-  }else{
-    while (E->size()>s) {
+  }else{ untested();
+    while (E->size()>s) { untested();
       delete E->back();
       E->pop_back();
     }
