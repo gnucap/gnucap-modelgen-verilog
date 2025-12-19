@@ -1,0 +1,25 @@
+`include "sub/disciplines.few"
+`pragma modelgen dump-annotate
+`pragma modelgen nodump-nature
+`pragma modelgen nodump-discipline
+
+module device(a,c);
+	inout a,c;
+	electrical a,c;
+
+	parameter real s=1;
+   real gg;
+   real hh;
+   real ii;
+   real jj;
+
+   analog begin
+		gg = $simparam("gmin",0.0);
+		hh = $simparam("gmin");
+		ii = $simparam("scale", s);
+		jj = $simparam("scale");
+
+		I(a,c) <+ gg * hh;
+		I(a,c) <+ ii * jj;
+	end
+endmodule

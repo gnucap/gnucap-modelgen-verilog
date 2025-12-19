@@ -47,6 +47,7 @@ bool Statement::propagate_rdep(Base const* )
 namespace {
 /*--------------------------------------------------------------------------*/
 class SIMPARAM : public MGVAMS_FUNCTION {
+  mutable bool _const{true};
 public:
   explicit SIMPARAM() {
     set_label("$simparam");
@@ -54,8 +55,42 @@ public:
   ~SIMPARAM(){ }
 private:
   bool static_code()const override {return true;}
-  bool is_constant()const override {return false;}
-  void stack_op(Expression*)const override { untested();
+  bool is_constant()const override {return _const;}
+  void stack_op(Expression* e)const override {
+    _const = true;
+    assert(e);
+    assert(e->size());
+    trace1("simparam", typeid(*e->back()).name());
+    Token* parlist = e->back();
+    e->pop_back();
+    if(dynamic_cast<Token_PARLIST const*>(parlist)){
+      assert(e->size());
+      Token* b = e->back();
+      e->pop_back();
+      Token const* arg = e->back();
+
+      if(dynamic_cast<Token_STOP const*>(arg)){
+	arg = b;
+      }else{
+      }
+
+      if(auto c = dynamic_cast<Token_CONSTANT const*>(arg)){
+	auto s = dynamic_cast<String const*>(c->data());
+	trace1("simparam const?", c->name());
+	if(!s){ untested();
+	}else if(std::string(*s) == "gmin"){
+	  trace1("simparam gmin", c->name());
+	  _const = false;
+	}else{
+	}
+      }else{
+	trace1("simparam noconst", b->name());
+      }
+      e->push_back(b);
+    }else{
+      trace1("simparam nopar", typeid(*e->back()).name());
+    }
+    e->push_back(parlist);
     throw Exception("invalid");
   }
   std::string code_name()const override{
@@ -78,3 +113,4 @@ DISPATCHER<FUNCTION>::INSTALL d_simparam(&function_dispatcher, "$simparam", &sim
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet

@@ -1792,7 +1792,7 @@ public:
     assert(_af);
     set_label(af->variable()->name());
   }
-  void stack_op(Expression*)const override { untested();
+  void stack_op(Expression*)const override {
     throw Exception("invalid"); // really?
   }
 

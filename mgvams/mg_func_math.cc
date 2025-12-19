@@ -78,9 +78,9 @@ std::pair<Base const*, Base const*> get_constant2(Expression* E)
     --it;
     if(auto c2=dynamic_cast<Token_CONSTANT const*>(*it)) {
       ret.first = c2->data();
-    }else{ untested();
+    }else{
     }
-  }else{ untested();
+  }else{
   }
 
   if(!pl){ untested();
@@ -375,7 +375,7 @@ public:
   explicit cos() : MGVAMS_FUNCTION(){
     set_label("cos");
   }
-  void stack_op(Expression* e)const override { untested();
+  void stack_op(Expression* e)const override {
     double x = get_double(e);
     subs_double(e, std::cos(x));
   }
@@ -500,7 +500,7 @@ public:
     unreachable();
     return "..";
   }
-  void stack_op(Expression* e)const override { untested();
+  void stack_op(Expression* e)const override {
     auto args = get_constant2(e);
     if(auto a = dynamic_cast<Float const*>(args.first)) { untested();
       if(auto b = dynamic_cast<Float const*>(args.second)) { untested();
@@ -550,7 +550,7 @@ public:
     unreachable();
     return "..";
   }
-  void stack_op(Expression* e)const override { untested();
+  void stack_op(Expression* e)const override {
     auto args = get_constant2(e);
     if(auto a = dynamic_cast<Float const*>(args.first)) { untested();
       if(auto b = dynamic_cast<Float const*>(args.second)) { untested();
@@ -688,7 +688,7 @@ public:
   explicit ln1p() : MGVAMS_FUNCTION(){
     set_label("ln1p");
   }
-  void stack_op(Expression* e)const override { untested();
+  void stack_op(Expression* e)const override {
     double x = get_double(e);
     subs_double(e, std::log1p(x));
   }
@@ -786,7 +786,7 @@ public:
   explicit sin() : MGVAMS_FUNCTION(){
     set_label("sin");
   }
-  void stack_op(Expression* e)const override { untested();
+  void stack_op(Expression* e)const override {
     double x = get_double(e);
     subs_double(e, std::sin(x));
   }
@@ -883,7 +883,7 @@ public:
   explicit tanh() : MGVAMS_FUNCTION(){
     set_label("tanh");
   }
-  void stack_op(Expression* e)const override { untested();
+  void stack_op(Expression* e)const override {
     double x = get_double(e);
     subs_double(e, std::tanh(x));
   }
