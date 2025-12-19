@@ -233,7 +233,7 @@ public:
     }
     if(num_args()>3){
       o << ", double fall_time=0.";
-    }else{ untested();
+    }else{
     }
     if(num_args()>4){ untested();
       o << ", double time_tol=0";
@@ -248,10 +248,13 @@ public:
       o____ "rise_time = _sim->_dtmin;\n";
       o__ "}else{\n";
       o__ "}\n";
-      o__ "if(fall_time < _sim->_dtmin) {\n";
-      o____ "fall_time = _sim->_dtmin;\n";
-      o__ "}else{\n";
-      o__ "}\n";
+      if(num_args()>3){
+	o__ "if(fall_time < _sim->_dtmin) {\n";
+	o____ "fall_time = _sim->_dtmin;\n";
+	o__ "}else{\n";
+	o__ "}\n";
+      }else{
+      }
       // todo: arguments are dynamic, move to accept (or so)
       if(num_args()>1){
 	o__ "l->set_param_by_name(\"delay\", \"\");\n";
@@ -267,7 +270,7 @@ public:
       if(num_args()>3){
 	o__ "l->set_param_by_name(\"fall\", \"\");\n";
 	o__ "l->set_param_by_name(\"fall\", to_string(fall_time));\n";
-      }else{ untested();
+      }else{
       }
       if(num_args()>4){ untested();
 	o__ "l->set_param_by_name(\"tol\", \"\");\n";

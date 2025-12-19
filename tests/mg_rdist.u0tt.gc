@@ -18,7 +18,7 @@ module test_u0t(p, n);
 		@(timer(0., ts*.99)) begin
 			r1 = $rdist_uniform(s, -1., 1.);
       end
-		I(p,n) <+ transition(r1, .0, ts, ts);
+		I(p,n) <+ transition(r1, .0, ts);
 	end
 endmodule
 
