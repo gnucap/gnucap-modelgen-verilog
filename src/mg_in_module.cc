@@ -103,6 +103,9 @@ void Parameter_3::parse(CS& file)
 {
   _default_val.set_owner(owner());
   file >> '.' >> _name >> '(' >> _default_val >> ')' >> ',';
+  if(file){
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Parameter_3::dump(std::ostream& out)const
@@ -299,7 +302,7 @@ void Data_Type::parse(CS& file)
     _type = t_real;
   }else if(file.umatch("integer")){
     _type = t_int;
-  }else{ untested();
+  }else{
     throw Exception_CS_("need \"real\", \"integer\"\n", file);
   }
 }
@@ -325,16 +328,8 @@ void Parameter_2_List::parse(CS& file)
   assert(file.last_match().size());
 
   _is_local = file.last_match()[0]=='l';
-//  file >> _type;
-  if(file.umatch("real")){
-    _type = std::string("real"); // TODO: enum
-  }else if(file.umatch("integer")){
-    _type = std::string("integer"); // TODO: enum
-  }else{
-    throw Exception_CS_("parameter: need \"real\", \"integer\"\n", file);
-  }
-  std::string type = _type.to_string();
-  trace2("Parameter_2_List", _type, _is_local);
+
+  file >> _type;
 
   try{
     LiSt<Parameter_2, '\0', ',', ';'>::parse(file);
@@ -342,7 +337,7 @@ void Parameter_2_List::parse(CS& file)
     throw e;
   }
   for(auto& i : *this){
-    i->set_type(type);
+    i->set_type(_type);
     i->set_local(_is_local);
     i->resolve();
   }
@@ -816,7 +811,8 @@ void Module::parse_body(CS& f)
     }else{
     }
   }
-}
+  setup_storage();
+} // Module::parse_body
 /*--------------------------------------------------------------------------*/
 /*
 // A.2.1.3
@@ -1167,6 +1163,7 @@ bool Node::is_used() const
   if(1 && is_ground()){
     trace1("Node::is_used, ground", name());
   }else{
+    incomplete();
     trace2("Node::is_used", name(), _fanout.size());
     for(Element_2 const* e : _fanout){
       if(e->is_used()){
@@ -1347,11 +1344,23 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args_)
 
     import_flags(f);
     t = new Token_CALL(label, cl);
-  }else{
+  }else{ untested();
     unreachable();
   }
 
   return t;
+}
+/*--------------------------------------------------------------------------*/
+void analog_setup_storage(Base*);
+void Module::setup_storage()
+{
+  if(_analog){
+    analog_setup_storage(_analog);
+  }else{ untested();
+  }
+  // incomplete();
+//  for i in analog_list(*this)
+//     i.setup_storage();
 }
 /*--------------------------------------------------------------------------*/
 void filter_setup(MGVAMS_FILTER*, Module*);

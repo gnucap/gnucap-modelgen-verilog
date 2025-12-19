@@ -456,6 +456,7 @@ Module* Paramset::deflate()
     _sub->set_owner(scope());
     assert(dynamic_cast<Paramset*>(_sub));
     _sub = nullptr;
+    sub->setup_storage();
     sub->setup_functions();
     sub->setup_nodes();
     return sub;

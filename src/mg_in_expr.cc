@@ -29,6 +29,7 @@
 #include <globals.h>
 #include "mg_.h" // TODO
 #include "mg_error.h" // TODO
+#include "mg_storage.h" // TODO
 /*--------------------------------------------------------------------------*/
 void Expression_::clear()
 { untested();
@@ -76,7 +77,7 @@ static bool is_xs_function(std::string const& f, Block const* owner)
 /*--------------------------------------------------------------------------*/
 void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 {
-  Expression& E = *this;
+  Expression_& E = *this;
   trace0("resolve symbols ===========");
   Block* Scope = scope();
   Base* Owner = owner();
@@ -190,14 +191,17 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 //	p->stack_op(&E); // ?
 	Token_PAR_REF PP(p->name(), p);
 	PP.stack_op(&E);
-      }else if(auto v = dynamic_cast<Variable_Decl*>(r)) { untested();
-	assert(0);
-	unreachable();
-	Token_VAR_REF a(v->name(), v);
-	a.stack_op(&E);
       }else if(auto vt = dynamic_cast<Token_VAR_REF*>(r)) {
-	trace2("resolve VAR_REF", n, vt->deps().size());
 	vt->stack_op(&E);
+
+#if 0
+	// move to stack op?
+	if(auto a = dynamic_cast<Assignment const*>(vt->item())){ untested();
+	  E.push_use(a->decl_token());
+	}else{
+	  incomplete();
+	}
+#endif
       }else if(auto pp = dynamic_cast<Port_3 const*>(r)) {
 	assert(symbol);
 	Token_PORT_BRANCH a(*symbol, pp);
@@ -308,6 +312,11 @@ void ConstantMinTypMaxExpression::parse(CS& file)
   assert(_e.is_empty());
   Expression_ e;
   file >> e;
+  if(file){
+  }else{
+//    incomplete();
+//    file.warn(bWARNING, "possible syntax error?");
+  }
   assert(_owner);
   _e.set_owner(_owner);
   _e.resolve_symbols(e);
@@ -372,11 +381,21 @@ void ConstExpression::dump(std::ostream& o) const
   }
 }
 /*--------------------------------------------------------------------------*/
+void Expression_::parse(CS& f)
+{
+  try{
+    Expression::parse(f);
+  }catch (Exception_CS const& e){
+    // use the other one.
+    throw(Exception_CS_("what's this?", f));
+  }
+}
+/*--------------------------------------------------------------------------*/
 TData const& Expression_::data() const
 {
   static TData no_deps;
   no_deps.set_constant();
-  if(is_empty()){ untested();
+  if(is_empty()){
     return no_deps;
   }else if(auto d = dynamic_cast<TData const*>(back()->data())){
     // really? see is_constant...
@@ -442,12 +461,61 @@ bool Expression_::is_constant() const
     bool c = true;
     if(auto const* d = dynamic_cast<TData const*>(back()->data())){
       c &= d->is_constant();
-    }else{ untested();
+    }else{
       incomplete();
     }
     return c;
   }else{
     return data().is_constant();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Expression_::submit_variable_xs(Variable_Access& va) const
+{
+  trace3("Expression_::submit_variable_xs", this, _used_variables.size(), _assignments.size());
+  for(Token const* t : _used_variables){
+    if(!t){
+      // af hack??
+      continue;
+    }else{
+    }
+    auto r = prechecked_cast<Token_VAR_REF const*>(t);
+    assert(r);
+    if(dynamic_cast<Variable_Decl const*>(r->item())){
+    }else{ untested();
+    }
+    va.use_variable(t);
+  }
+  for(Token const* t : _assignments){
+    assert(t);
+    auto r = prechecked_cast<Token_VAR_REF const*>(t);
+    assert(r);
+    if(dynamic_cast<Variable_Decl const*>(r->item())){
+    }else{ untested();
+    }
+    // TODO: flags
+    va.assign_variable(r, false, false);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Expression_::submit_variable_xs(Expression_& ee) const
+{
+  trace3("Expression_::submit_variable_xs2", this, _used_variables.size(), _assignments.size());
+  for(Token const* t : _used_variables){
+    auto r = prechecked_cast<Token_VAR_REF const*>(t);
+    assert(r);
+    if(dynamic_cast<Variable_Decl const*>(r->item())){
+    }else{ untested();
+    }
+    ee.push_use(t);
+  }
+  for(Token const* t : _assignments){
+    auto r = prechecked_cast<Token_VAR_REF const*>(t);
+    assert(r);
+    if(dynamic_cast<Variable_Decl const*>(r->item())){
+    }else{ untested();
+    }
+    ee.push_assign(r);
   }
 }
 /*--------------------------------------------------------------------------*/

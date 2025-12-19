@@ -1,0 +1,20 @@
+module test_idt3a(p, n);
+  electrical p, n;
+  integer rst// +
+;
+
+  analog begin // always
+    // rst : 0
+    rst = 0; // s1 r4{bax}
+    @(timer(1, 1)) begin // e
+      // rst : 0
+      rst = 1; // s2 r3{bax}
+      discontinuity(); // r3{evx}
+    end
+    V(p, n) <+ idt( 1., 0, rst); // [V(idt_0_p)] r2{x}
+  end
+
+endmodule
+
+
+

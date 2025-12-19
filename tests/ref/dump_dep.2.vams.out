@@ -5,17 +5,20 @@ module dep0(d, g);
     // T : 0
     // c : 0
     // d : 1
-    real c;
-    real d;
-    real T;
-    while (1) begin
+    real c// * [V(g)]
+;
+    real d// [V(g)]
+;
+    real T// * [V(g)]
+;
+    while (1) begin // always
       // T : 1
       // c : 1
-      I(d) <+ c; // dep: V(g) s4 r1
-      c = T; // dep: V(g) s3 r4
-      T = V(g); // dep: V(g) s1 r4
+      I(d) <+ c; // [V(g)] s4 r2{x}
+      c = T; // [V(g)] s3 r4{bax}
+      T = V(g); // [V(g)] s1 r4{bax}
     end
-    d = c; // dep: V(g) s5 r3
+    d = c; // [V(g)] s5 r3{bax}
   end
 
 endmodule
@@ -27,14 +30,14 @@ module dep1(out0, out1, in0, in1);
   branch (in0, in1) in;
   parameter real pp = -100.;
 
-  real vfwd// dep V(ddt_0_p)
+  real vfwd// + [V(ddt_0_p)]
 ;
 
   analog begin // always
     // vfwd : 1
-    I(out) <+ (V(out) / 2); // dep: Vout r1
-    vfwd = ddt(((V(in) *  2.) - V(ref))); // dep: V(ddt_0_p) s1 r4
-    I(out) <+ vfwd; // dep: V(ddt_0_p) s1 r1
+    I(out) <+ (V(out) / 2); // [Vout] r2{x}
+    vfwd = ddt(((V(in) *  2.) - V(ref))); // [V(ddt_0_p)] s1 r4{bax}
+    I(out) <+ vfwd; // [V(ddt_0_p)] s1 r2{x}
   end
 
 endmodule

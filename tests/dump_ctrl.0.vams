@@ -87,18 +87,3 @@ module cond4(p,n);
 		end
 	end
 endmodule
-
-module cond5(p,n);
-	analog begin : main
-		real S;
-		real T;
-		integer i;
-		i = 1;
-		if(i) begin
-			// TODO: always.
-			i = 2;
-		end else begin
-			i = 3;
-		end
-	end
-endmodule

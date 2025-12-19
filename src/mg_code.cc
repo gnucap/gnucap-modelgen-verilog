@@ -30,47 +30,36 @@ Variable_Decl::~Variable_Decl()
 {
 }
 /*--------------------------------------------------------------------------*/
-void Variable_Decl::clear_deps()
-{ untested();
-  trace2("Variable_Decl::clear_deps", name(), deps().ddeps().size());
-  data().clear();
-}
-/*--------------------------------------------------------------------------*/
 // void Variable_Decl::new_deps()
 // { untested();
 //   assert(!_deps);
 //   _deps = new TData;
 // }
 /*--------------------------------------------------------------------------*/
-std::string const Variable_Decl::name() const
-{
-  assert(_token);
-  return _token->name();
-}
-/*--------------------------------------------------------------------------*/
 Block const* Variable_Decl::scope() const
-{ untested();
-  auto b = prechecked_cast<Block const*>(owner());
-  assert(b);
-  return b;
+{
+  assert(owner());
+  if(auto vs = dynamic_cast<Variable_Stmt const*>(owner())) {
+      // AF hack
+    return vs->scope();
+  }else{ untested();
+    auto b = prechecked_cast<Block const*>(owner());
+    assert(b);
+    return b;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::new_var_ref()
-{ untested();
-  incomplete();
-}
-void Variable_Decl::new_var_ref_()
 {
   assert(owner());
   auto l = prechecked_cast<Variable_Stmt*>(owner());
   assert(l);
 
 //  incomplete();
-  assert(_token);
   if(auto m = dynamic_cast<Module*>(l->scope())){ untested();
-    m->new_var_ref(_token);
+    m->new_var_ref(&token());
   }else if(auto b = dynamic_cast<Block*>(l->scope())){
-    b->new_var_ref(_token);
+    b->new_var_ref(&token());
   }else{ untested();
     unreachable();
   }
@@ -105,7 +94,7 @@ Variable_Decl* Variable_Decl::deep_copy(Base* b, std::string s) const
   auto l = prechecked_cast<Variable_Stmt*>(b);
   assert(l);
 
-  auto n = new Variable_Decl;
+  auto n = new Variable_Decl(s + token().name());
   n->set_owner(b);
   n->new_data();
   assert(type());
@@ -115,20 +104,23 @@ Variable_Decl* Variable_Decl::deep_copy(Base* b, std::string s) const
     attr.set_attributes(tag_t(n)) = attr.attributes(tag_t(l));
   }else{
   }
-  assert(n->_data);
-  n->_token = new Token_VAR_DECL(s+_token->name(), n, n->_data);
   if(attr.has_attributes(tag_t(l))) {
-    attr.set_attributes(tag_t(n->_token)) = attr.attributes(tag_t(l));
+    attr.set_attributes(tag_t(&n->token())) = attr.attributes(tag_t(l));
   }else{
   }
-  if(n->_token->type()){
+  if(n->token().type()){
   }else{
     // bug?
   }
-  l->scope()->new_var_ref(n->_token);
+  l->scope()->new_var_ref(&n->token());
 
-  if(n->_token->data()){
+  if(n->token().data()){
   }else{ untested();
+  }
+
+  if(is_override_var()){
+    n->_stt = _stt;
+  }else{
   }
   return n;
 }

@@ -1,5 +1,5 @@
 module m (.a(ia),.b(ib),.c(ic));
-    parameter w=1;
+  parameter w=1;
   vsource #(.dc(v)) v1 (.p(ia),.n(ib));
   vsource #(.dc(w)) v1 (.n(ia),.p(ic));
 endmodule // m

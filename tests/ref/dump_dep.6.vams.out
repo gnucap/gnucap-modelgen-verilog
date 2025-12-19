@@ -6,19 +6,23 @@ module dep6(d, g);
     // T : 0
     // U : 0
     // c : 0
-    real c;
-    real T, S, U;
-    @(initial_step) begin
+    real c// *
+;
+    real T// +
+, S//
+, U//
+;
+    @(initial_step) begin // e
       // c : 0
-      c =  1.; // s2 r3
+      c =  1.; // s2 r3{bax}
     end
-    @(initial_step) begin
+    @(initial_step) begin // e
       // c : 0
-      c =  2.; // s2 r3
+      c =  2.; // s2 r3{bax}
     end
-    T = c; // s6 r3
-    S = (T * T); // s7 r3
-    U = exp(c); // s6 r3
+    T = c; // s6 r3{bax}
+    S = (T * T); // s7 r3{bax}
+    U = exp(c); // s6 r3{bax}
   end
 
 endmodule

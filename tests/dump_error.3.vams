@@ -1,0 +1,5 @@
+
+
+module test;
+  parameter real p=(=1 <= 0) ?  1.0000;
+endmodule

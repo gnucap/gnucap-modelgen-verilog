@@ -1,0 +1,26 @@
+module test_af_1a(p, n);
+  electrical p, n;
+  parameter real v = 1;
+
+  analog function real fct;
+    integer x//
+;
+    inout x;
+    // arg 0 x 1
+    begin
+      // fct : 0
+    end
+  endfunction
+
+  analog begin : main // always
+    // xxint : 0
+    integer xxint// +
+;
+    xxint = v; // s1 r4{bax}
+    V(p, n) <+ fct(xxint); // s1 r2{x}
+  end
+
+endmodule
+
+
+

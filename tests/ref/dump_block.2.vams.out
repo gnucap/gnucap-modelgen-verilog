@@ -4,9 +4,12 @@ module test_bug_block1(p, n);
     // G_s : 0
     // ms : 0
     // xgt : 1
-    real xgt, ms;
-    real G_s;
-    begin : A
+    real xgt// * [V(p)]
+, ms// +
+;
+    real G_s//
+;
+    begin : A // always
       if ((abs(xgt) <= ms)) begin
       end
       else begin
@@ -14,17 +17,18 @@ module test_bug_block1(p, n);
         end
         else begin
           begin : B
-            real N;
-          // G_s : 0
-          // N : 0
-            N = xgt; // s3 r3
-            G_s = N; // s4 r3
+            // G_s : 0
+            // N : 0
+            real N// +
+;
+            N = xgt; // s3 r3{bax}
+            G_s = N; // s4 r3{bax}
           end
         end
       end
     end
-    xgt = V(p); // dep: V(p) s1 r3
-    I(p, n) <+ V(p, n); // dep: V(p, n) r1
+    xgt = V(p); // [V(p)] s1 r3{bax}
+    I(p, n) <+ V(p, n); // [V(p, n)] r2{x}
   end
 
 endmodule

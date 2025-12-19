@@ -165,125 +165,109 @@ static void make_parameter_decl(std::ostream& o, const Parameter_List_Collection
   }
 }
 /*--------------------------------------------------------------------------*/
-// lib?
-void make_one_variable_decl(std::ostream& o, Token_VAR_REF const& V)
-{
-  if(V.type().is_real()) {
-    o__ "double _" << V.name() << "{0.}";
-    if(attr.has_attributes(tag_t(&V))){
-#if 0
-   }else if(options().optimize_deriv()) { untested();
-      o__ "struct _V_" << V.name() << " : ddouble {\n";
-      o____ "typedef ddouble base;\n";
-      o____ "typedef va::ddouble_tag base_tag;\n";
-      o____ "_V_" << V.name() << "(ddouble x) : ddouble(x){}\n";
-      o____ "template<class A>\n";
-      o____ "explicit _V_" << V.name() << "(A x) : ddouble(x){}\n";
-      o____ "_V_" << V.name() << "(){ zeroderiv(); }\n";
-      o____ "void zeroderiv(){\n";
-      for(auto d : V.deps()){itested();
-	o______ "set_no_deps();\n";
-	o______ "_data[1+d" << d->code_name() << "] = 0.; // " << d.order() << "\n";
-      }
-      o____ "}\n";
-      o____ "ddouble& operator=(ddouble t){\n";
-      o______ "ddouble::operator=(t);\n";
-      o______ "return *this;\n";
-      o____ "}\n";
-      o____ "ddouble& operator=(double t){\n";
-      o______ "ddouble::operator=(t);\n";
-      o______ "return *this;\n";
-      o____ "}\n";
-      o__ "}";
-#endif
-    }else{
-//      o__ "ddouble ";
-    }
-  }else if(V.type().is_int()) {
-    o__ "int _" << V.name() << "{0}";
-  }else{ untested();
-    incomplete();
-    o__ "unknown";
-  }
-  o << ";\n";
-}
 /*--------------------------------------------------------------------------*/
-void make_one_variable_decl(std::ostream& o, Variable_Decl const& V)
-{
-  return make_one_variable_decl(o, V.token());
-}
-/*--------------------------------------------------------------------------*/
-static void make_variable_collection(std::ostream& o,
-    Variable_List_Collection const& P)
-{
-  for (auto q = P.begin(); q != P.end(); ++q) {
-    for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
-      Variable_Decl const* V = *p;
-      assert(V);
-      make_one_variable_decl(o, *V);
-    }
-  }
-}
-/*--------------------------------------------------------------------------*/
-static void make_variable_decl(std::ostream& o, Block const& b);
-/*--------------------------------------------------------------------------*/
-static void make_module_variable_decl(std::ostream& o, Module const& m)
-{
-  Variable_List_Collection const& P = m.variables();
-  o__ "struct state_{\n";
-  {
-    indent x;
-    make_variable_collection(o, P);
-
-    for(auto s : analog(m).list()){
-      if(auto a = dynamic_cast<AnalogConstruct const*>(s)){
-	assert(a->block());
-	make_variable_decl(o, *a->block());
-      }else{
-      }
-    }
-  }
-  o__ "}_v_;\n";
-  o__ "state_ _v_1;\n";
-}
-/*--------------------------------------------------------------------------*/
-static void make_block_variable_decl(std::ostream& o, SeqBlock const& s);
-static void make_subblock_variable_decl(std::ostream& o, SeqBlock const& s)
-{
-  for(int i=0; i<s.num_blocks(); ++i){
-    assert(s.blocks(i));
-    if(auto sb = dynamic_cast<SeqBlock const*>(s.blocks(i))){
-      make_block_variable_decl(o, *sb);
+class VAR_DECL {
+public:
+  typedef enum {
+    _instance = 1,
+    _common = 2,
+    _all = 3
+  } select_t;
+  typedef Variable_List_Collection VLC;
+private:
+  select_t _mode;
+public:
+  VAR_DECL(select_t m) : _mode(m) {}
+private:
+  bool mode_is_instance()const {return _mode == _instance || _mode == _all; }
+  bool mode_is_common()const {return _mode == _common || _mode == _all; }
+  void make_one_variable_decl(std::ostream& o, Token_VAR_REF const& V)const {
+    if(V.type().is_real()) {
+      o << "double _" << V.name() << "{0.}";
+    }else if(V.type().is_int()) {
+      o << "int _" << V.name() << "{0}";
     }else{ untested();
+      incomplete();
+      o << "unknown";
+    }
+    o << ";\n";
+  }
+  void make_one_variable_decl(std::ostream& o, Variable_Decl const& V)const {
+    if(V.is_common() && !mode_is_common()){
+      o__ "// common ";
+    }else if(V.is_temporary()){
+      o__ "// temporary ";
+    }else if(!V.is_common() && !mode_is_instance()){
+      o__ "// instance ";
+    }else{
+      o__ "";
+    }
+    return make_one_variable_decl(o, V.token());
+  }
+  void make_variable_collection(std::ostream& o, VLC const& P) {
+    for (auto q = P.begin(); q != P.end(); ++q) {
+      for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
+	Variable_Decl const* V = *p;
+	assert(V);
+	make_one_variable_decl(o, *V);
+      }
     }
   }
-}
-/*--------------------------------------------------------------------------*/
-static void make_block_variable_decl(std::ostream& o, SeqBlock const& s)
-{
-  Variable_List_Collection const& P = s.variables_();
-  if(s.has_identifier()){
-    o__ "struct { // " << s.identifier() << "\n";
+  void make_module_variable_decl(std::ostream& o, Module const& m) {
+    Variable_List_Collection const& P = m.variables();
+    o__ "struct state_{\n";
     {
-      indent ns;
+      indent x;
       make_variable_collection(o, P);
+
+      for(auto s : analog(m).list()){
+	if(auto a = dynamic_cast<AnalogConstruct const*>(s)){
+	  assert(a->block());
+	  make_variable_decl(o, *a->block());
+	}else{
+	}
+      }
+    }
+    o__ "}_v_;\n";
+    if (mode_is_instance()) {
+      o__ "state_ _v_1;\n";
+    }else{
+    }
+  }
+  void make_subblock_variable_decl(std::ostream& o, SeqBlock const& s) {
+    for(int i=0; i<s.num_blocks(); ++i){
+      assert(s.blocks(i));
+      if(auto sb = dynamic_cast<SeqBlock const*>(s.blocks(i))){
+	make_block_variable_decl(o, *sb);
+      }else{ untested();
+      }
+    }
+  }
+  void make_block_variable_decl(std::ostream& o, SeqBlock const& s) {
+    Variable_List_Collection const& P = s.variables_();
+    if(s.has_identifier()){
+      o__ "struct { // " << s.identifier() << "\n";
+      {
+	indent ns;
+	make_variable_collection(o, P);
+	make_subblock_variable_decl(o, s);
+      }
+      o__ "}" << s.code_name() << ";\n";
+    }else{
       make_subblock_variable_decl(o, s);
     }
-    o__ "}" << s.code_name() << ";\n";
-  }else{
-    make_subblock_variable_decl(o, s);
   }
-}
-/*--------------------------------------------------------------------------*/
-static void make_variable_decl(std::ostream& o, Block const& b)
-{
-  if(auto m = dynamic_cast<Module const*>(&b)){
-    make_module_variable_decl(o, *m);
-  }else if(auto s = dynamic_cast<SeqBlock const*>(&b)){
-    make_block_variable_decl(o, *s);
-  }else{ untested();
+public:
+  void make_variable_decl(std::ostream& o, Block const& b) {
+    if(auto m = dynamic_cast<Module const*>(&b)){
+      make_module_variable_decl(o, *m);
+    }else if(auto s = dynamic_cast<SeqBlock const*>(&b)){
+      make_block_variable_decl(o, *s);
+    }else{ untested();
+    incomplete();
+    }
   }
-}
+}; // VAR_DECL
 /*--------------------------------------------------------------------------*/
 static void make_common(std::ostream& o, const Module& m)
 {
@@ -334,7 +318,7 @@ static void make_common(std::ostream& o, const Module& m)
   }else{
   }
   if(m.has_tr_begin_analog()) {
-    o__ "void tr_initial_analog(MOD_" << m.identifier() << "*)const;\n";
+    o__ "void tr_initial_analog(MOD_" << m.identifier() << "*);\n";
     o__ "void tr_begin_analog(MOD_" << m.identifier() << "*)const;\n";
   }else{
   }
@@ -351,7 +335,7 @@ static void make_common(std::ostream& o, const Module& m)
     o__ "void tr_regress_analog(MOD_" << m.identifier() << "*)const;\n";
   }else{
   }
-  o__ "void precalc_analog(MOD_" << m.identifier() << "*)const;\n";
+  o__ "void precalc_analog(MOD_" << m.identifier() << "*);\n";
   o__ "std::string name()const override {itested();return \"" << m.identifier() << "\";}\n";
 //    "  const SDP_CARD* sdp()const {return _sdp;}\n"
 //    "  bool     has_sdp()const {untested();return _sdp;}\n"
@@ -377,6 +361,14 @@ static void make_common(std::ostream& o, const Module& m)
 //       ++p) { untested();
 //    out << "  COMMON_COMPONENT* _" << (**p).name() << ";\n";
 //  }
+  if(options().optimize_common()){
+    incomplete();
+    o << "public: // common values\n";
+    VAR_DECL vv(VAR_DECL::_common);
+    vv.make_variable_decl(o, m);
+  }else{ untested();
+    o << "// public: common values; disabled\n";
+  }
   o << "private: // funcs\n";
   make_funcs_common(o, m.funcs());
 
@@ -677,7 +669,13 @@ static void make_module(std::ostream& o, const Module& m)
   o << "/* ========== */\n";
 
   o << "public: // instance vars\n";
-  make_variable_decl(o, m);
+  if(options().optimize_common()){
+    VAR_DECL vv(VAR_DECL::_instance);
+    vv.make_variable_decl(o, m);
+  }else{
+    VAR_DECL vv(VAR_DECL::_all);
+    vv.make_variable_decl(o, m);
+  }
   o << "private: // branch state\n";
   make_branch_states(o, m);
   o << "private: // node list\n";

@@ -153,9 +153,11 @@ private:
   int max_nodes()const override{
     if(_dev){
       return _dev->max_nodes();
-    }else{ untested();
-      assert(_parent);
+    }else if(_parent){
       return _parent->max_nodes();
+    }else{
+      incomplete();
+      return 0;
     }
   }
 

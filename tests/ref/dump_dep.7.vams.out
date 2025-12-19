@@ -3,20 +3,22 @@ module dep7(d, g);
   electrical d, g;
   parameter real p =  0.;
 
-  real T;
+  real T//
+;
 
   analog begin : main // always
     // T : 0
     // c : 0
-    real c;
-    @(initial_step) begin
-      if ((! $param_given(p))) begin
+    real c// *
+;
+    @(initial_step) begin // e
+      if ((! $param_given(p))) begin // e
         // c : 0
-        c =  1.; // s2 r4
+        c =  1.; // s2 r4{bax}
       end
     end
-    T = c; // s4 r3
-    I(d, g) <+ c; // s3 r1
+    T = c; // s4 r3{bax}
+    I(d, g) <+ c; // s3 r2{x}
   end
 
 endmodule

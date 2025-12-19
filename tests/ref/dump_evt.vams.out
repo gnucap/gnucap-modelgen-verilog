@@ -1,18 +1,19 @@
 module device(p, n);
   inout p, n;
-  real r;
+  real r//
+;
 
   analog begin // always
-    @(initial_step) begin
+    @(initial_step) begin // e
       // r : 0
-      r = 3; // s2 r3
+      r = 3; // s2 r3{bax}
     end
   end
 
   analog begin // always
-    @(initial_step) begin
+    @(initial_step) begin // e
       // r : 0
-      r = 2; // s2 r3
+      r = 2; // s2 r3{bax}
     end
   end
 

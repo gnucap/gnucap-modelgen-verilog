@@ -1,10 +1,11 @@
 module test(d, g, s, b);
-  real T;
+  real T//
+;
 
   analog begin // always
-    @(initial_step) begin
+    @(initial_step) begin // e
       // T : 0
-      T = $temperature; // s2 r3
+      T = $temperature; // s2 r3{bax}
     end
   end
 

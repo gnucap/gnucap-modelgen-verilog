@@ -6,20 +6,24 @@ module dep0(d, g);
     // T : 1
     // U : 1
     // X : 1
-    real T;
-    real S;
-    real U;
-    real X;
-    while (1) begin
+    real T// * [V(g)]
+;
+    real S// + [V(g)]
+;
+    real U// + [V(g)]
+;
+    real X// [V(g)]
+;
+    while (1) begin // always
       // S : 1
       // T : 1
-      T = T; // dep: V(g) s7 r3
-      S = T; // dep: V(g) s7 r3
-      T = V(g); // dep: V(g) s1 r3
+      T = T; // [V(g)] s7 r3{bax}
+      S = T; // [V(g)] s7 r3{bax}
+      T = V(g); // [V(g)] s1 r3{bax}
     end
-    U = S; // dep: V(g) s6 r3
-    T = U; // dep: V(g) s7 r3
-    X = U; // dep: V(g) s7 r3
+    U = S; // [V(g)] s6 r3{bax}
+    T = U; // [V(g)] s7 r3{bax}
+    X = U; // [V(g)] s7 r3{bax}
   end
 
 endmodule

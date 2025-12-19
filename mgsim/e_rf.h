@@ -501,7 +501,7 @@ void COMMON_RF_BASE::reduce_shift()
   trace2("reduce_shift", a.size(), b.size());
 
   while(a.size() && b.size()){
-    if(!a[0] && !b[0]){
+    if((a[0] == 0.) && (b[0] == 0.)){
       a.erase(a.begin());
       b.erase(b.begin());
     }else{

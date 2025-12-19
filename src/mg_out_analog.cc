@@ -102,9 +102,8 @@ private:
   void make_real_variable  (std::ostream& o, Token_VAR_DECL const&)const;
   void make_seq_block      (std::ostream& o, AnalogSeqBlock const&)const;
 private:
-  void make_one_local_var(std::ostream& o, Token_VAR_REF const& V)const;
+  void make_one_local_var(std::ostream& o, Variable_Decl const& V)const;
   void make_one_variable_load(std::ostream& o, Token_VAR_REF const& V)const;
-  void make_one_variable_store(std::ostream& o, Token_VAR_REF const& V)const;
 
   std::string make_cc_expression(std::ostream& o, Expression const& e, bool=false)const {
     return ::make_cc_expression(o, e, _mode!=modePRECALC, ctx());
@@ -161,7 +160,7 @@ void OUT_ANALOG::make_variable(std::ostream& o, Variable_Decl const& v) const
   }else{
     o__ "ddouble _v_" << v.name() << "; // Variable_Decl";
 
-    for(Dep const& i : v.deps().ddeps()) { untested();
+    for(Dep const& i : v.data().ddeps()) { untested();
       o__ " Dep: " << probe(i)->code_name() << " lin: " << i.is_linear();
     }
     o << "\n";
@@ -224,7 +223,12 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
 //   if(!a.is_used()){ untested();
 //     o__ "// not used\n";
 //   }else
-  {
+  if(a.lhs().is_common() && options().optimize_common()
+      && _mode!=modePRECALC
+      && _mode!=modeTR_INITIAL
+      && !within_af(&a)) {
+    o__ "// " << lhsname << " is common\n";
+  }else{
     indent x;
     make_cc_expression(o, e);
     if(a.is_int()){
@@ -421,7 +425,7 @@ void OUT_ANALOG::make_block(std::ostream& o, Block const& ab) const
 void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
 {
   if(_src && !ab.is_used_in(_src)){
-    o << "// omit Statement " << typeid(ab).name() << "\n";
+    o << "// omit Statement " << typeid(ab).name() << " " << _src->val_string() << "\n";
     return;
     o << "#if 0 // omit Statement " << typeid(ab).name() << "\n";
   }else{
@@ -1103,9 +1107,21 @@ static void make_one_variable_proxy(std::ostream& o, Token_VAR_REF const& V)
   o__ "}";
 }
 /*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_one_local_var(std::ostream& , const Token_VAR_REF& ) const
-{ untested();
-  incomplete();
+void OUT_ANALOG::make_one_local_var(std::ostream& o, Variable_Decl const& V) const
+{
+  o__ "";
+  if(!V.type().is_real()){
+    o << code_name(&V.type());
+  }else if(V.data().ddeps().size()){
+    o << code_name(&V.type());
+    o << "/*" << V.data().ddeps().size() << "*/";
+  }else{
+    o << "double /*?*/";
+  }
+  o << " ";
+  assert(V.code_name().size());
+  o << V.code_name();
+  o << "; // local_var\n";
 }
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_one_variable_load(std::ostream& o,
@@ -1156,22 +1172,6 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o,
   }
 }
 /*--------------------------------------------------------------------------*/
-// no longer needed.
-void OUT_ANALOG::make_one_variable_store(std::ostream& o, Token_VAR_REF const& V) const
-{ untested();
-  if(!V.type().is_real()) { untested();
-  }else if(is_precalc()) { untested();
-    o__ "// d->" << V.code_name() << " = " << V.code_name() << ";\n";
-  }else if(is_tr_review()) { untested();
-  }else if(V.deps().ddeps().size() == 0){ untested();
-    // it's a reference.
-  }else if(options().optimize_deriv()) { untested();
-    // use destructor
-  }else{untested();
-    o__ "d->" << V.code_name() << " = " << V.code_name() << ".value();\n";
-  }
-}
-/*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_load_block_variables(std::ostream& o, const
     Variable_List_Collection& P) const
 {
@@ -1187,11 +1187,12 @@ void OUT_ANALOG::make_load_block_variables(std::ostream& o, const
       Variable_Decl const* V = *p;
       assert(V);
 
-      if(V->is_state_var()){
+      if(options().optimize_common() && V->is_common()){
+	o__ "auto& _v_" << V->name() << " = _v_" << V->token().long_code_name() << ";\n";
+      }else if(options().optimize_common() && V->is_temporary()){
+	make_one_local_var(o, *V);
+      }else{
 	make_one_variable_load(o, V->token());
-      }else{ untested();
-	make_one_local_var(o, V->token());
-	incomplete();
       }
     }
   }
@@ -1312,7 +1313,12 @@ static void make_cc_common_tr(std::ostream& o, const Module& m, OUT_ANALOG::mode
   OUT_ANALOG oo(mode, dep);
   o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
   o << "inline void COMMON_" << m.identifier() <<
-    "::" << oo.ctx() << "_analog(MOD_" << m.identifier() << "* m) const\n{\n";
+    "::" << oo.ctx() << "_analog(MOD_" << m.identifier() << "* m)";
+  if(oo.is_tr_initial()){
+  }else{
+    o << "const";
+  }
+  o<< "\n{\n";
  // o__ "trace1(\"" << m.identifier() <<"::tr_begin_analog\", d);\n";
  o__ "trace1(\"" << m.identifier() <<"::tr_"<<oo.ctx()<<"_analog\", m->long_label());\n";
 
@@ -1383,7 +1389,7 @@ static void make_cc_common_tr_accept(std::ostream& o, const Module& m)
 static void make_cc_common_precalc(std::ostream& o, const Module& m)
 {
   o << "inline void COMMON_" << m.identifier() << 
-    "::precalc_analog(MOD_" << m.identifier() << "* m) const\n{\n";
+    "::precalc_analog(MOD_" << m.identifier() << "* m)\n{\n";
   o << "//OUT_ANALOG precalc\n";
 
   OUT_ANALOG oo(OUT_ANALOG::modePRECALC);

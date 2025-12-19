@@ -20,6 +20,7 @@
  * 02110-1301, USA.
  */
 /*--------------------------------------------------------------------------*/
+#include <u_opt.h>
 #include "mg_options.h"
 /*--------------------------------------------------------------------------*/
 // global?
@@ -31,8 +32,9 @@ Base& modelgen_opts()
 /*--------------------------------------------------------------------------*/
 Options::Options() :
   _optimize_binop(true),  // fold binary operators
+  _optimize_common(true), // put aside model constants
   _optimize_swap(true),   // swap operands.
-  _optimize_deriv(true), // suppress zero derivative propagation
+  _optimize_deriv(true),  // suppress zero derivative propagation
   _optimize_deps(true),   // consider dependency types
   _optimize_unused(true), // dont emit unused sources
   _optimize_nodes(true),  // prune unused nodes
@@ -56,6 +58,7 @@ void Options::parse(CS& f)
   do{
     ONE_OF
       || Get(f, "optimize-binop",  &_optimize_binop)
+      || Get(f, "optimize-common", &_optimize_common)
       || Get(f, "optimize-swap",   &_optimize_swap)
       || Get(f, "optimize-deriv",  &_optimize_deriv)
       || Get(f, "optimize-deps",   &_optimize_deps)
@@ -69,6 +72,18 @@ void Options::parse(CS& f)
       || Get(f, "dump-nature",     &_dump_nature)
       || Get(f, "dump-annotate",   &_dump_annotate)
       || Get(f, "expand-paramset", &_expand_paramset)
+      || Set(f, "nag",		   &OPT::picky,	bNOERROR)
+      || Set(f, "nonag",	   &OPT::picky,	bTRACE)
+      || Set(f, "trace",	   &OPT::picky,	bTRACE)
+      || Set(f, "notrace",	   &OPT::picky,	bLOG)
+      || Set(f, "log",		   &OPT::picky,	bLOG)
+      || Set(f, "nolog",	   &OPT::picky,	bDEBUG)
+      || Set(f, "debug",	   &OPT::picky,	bDEBUG)
+      || Set(f, "nodebug",	   &OPT::picky,	bPICKY)
+      || Set(f, "picky",	   &OPT::picky,	bPICKY)
+      || Set(f, "nopicky",	   &OPT::picky,	bWARNING)
+      || Set(f, "warn{ing}",	   &OPT::picky,	bWARNING)
+      || Set(f, "nowarn",	   &OPT::picky,	bDANGER)
       || (f.check(bWARNING, "what's this?"), f.skiparg());
       ;
 

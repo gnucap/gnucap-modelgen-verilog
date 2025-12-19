@@ -251,11 +251,11 @@ public:
     x.e_val(NOT_INPUT, Scope);
     return to_string(std::abs(x));
   }
-  void stack_op(Expression* e)const override { untested();
+  void stack_op(Expression* e)const override {
     Base const* x = get_constant(e);
     if(auto f = dynamic_cast<Float const*>(x)) { untested();
       subs_double(e, std::abs(f->value()));
-    }else if(auto i = dynamic_cast<Integer const*>(x)) { untested();
+    }else if(auto i = dynamic_cast<Integer const*>(x)) {
       subs_double(e, std::abs(i->value()));
     }else{
       throw Exception("invalid arg");
@@ -606,10 +606,10 @@ public:
       throw Exception("invalid arg");
     }
   }
-  std::string code_name()const override{ untested();
+  std::string code_name()const override{itested();
     return "_f_floor";
   }
-  void make_cc_common(std::ostream& o)const override { untested();
+  void make_cc_common(std::ostream& o)const override {itested();
     o__ "template<class T>\n";
     o__ "T " << code_name() << "(T d)const {itested();\n";
     o____ "return int(std::floor(d));\n";

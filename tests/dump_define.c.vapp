@@ -1,0 +1,3 @@
+`pragma modelgen log
+`define constant=value
+`constant

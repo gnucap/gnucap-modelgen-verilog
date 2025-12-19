@@ -30,6 +30,7 @@
 /*--------------------------------------------------------------------------*/
 static const std::string IS_VALID = "_..is_valid";
 static bool instanciate_unused = false;
+static int nest;
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -120,6 +121,15 @@ DISPATCHER<LANGUAGE>::INSTALL
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 static std::string parse_identifier(CS& cmd, std::string const& term);
+/*--------------------------------------------------------------------------*/
+#if 0
+void LANG_VERILOG::skip_attributes(CS& cmd)
+{
+  while (cmd >> "(*") {
+    cmd.skipto1('*') && (cmd >> "*)");
+  }
+}
+#endif
 /*--------------------------------------------------------------------------*/
 std::string LANG_VERILOG::parse_attributes(CS& cmd)
 {
@@ -491,11 +501,13 @@ public:
       pl->print(IO::mstdout, OPT::language);
       IO::mstdout << '\n';
     }else{
+      std::string tail = cmd.tail();
       parse(cmd, pl);
       DEV_DOT* dd = new DEV_DOT();
       assert(dd);
+      lang_verilog.move_attributes(tag_t(&cmd), dd->id_tag());
       dd->set_owner(nullptr);
-      dd->set(cmd.fullstring());
+      dd->set("parameter " + tail);
       dd->set_owner(nullptr); // ?
       Scope->push_back(dd);
     }
@@ -969,6 +981,10 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
       new__instance(cmd, x, x->subckt());
     }else if (cmd >> "wire|electrical|inout|input|output") {
       net_decl.do_it(cmd, x->subckt());
+    }else if (cmd >> "module |macromodule ") {
+      cmd.reset();
+      cmd.check(bWARNING, "nonstandard nesting in " + x->long_label() + ".");
+      new__instance(cmd, x, x->subckt());
     }else if (cmd >> "paramset ") {
       cmd.reset();
       cmd.check(bDANGER, "ERROR: This will not work. Need top level.");
@@ -1179,9 +1195,9 @@ void LANG_VERILOG::print_ports_long(OMSTREAM& o, const COMPONENT* x)
   o << " (";
   std::string sep = "";
   for (int ii = 0;  x->port_exists(ii);  ++ii) {
-    o << sep;
-    print_attributes(o, x->port_id_tag(ii));
     if(x->node_is_connected(ii)){
+      o << sep;
+      print_attributes(o, x->port_id_tag(ii));
       if(!x->port_name(ii).size()){
 	dump_identifier(o, x->port_value(ii));
 	sep = ", ";
@@ -1224,11 +1240,12 @@ void LANG_VERILOG::print_ports_short(OMSTREAM& o, const COMPONENT* x)
 void LANG_VERILOG::print_items_sckt(OMSTREAM& o, const COMPONENT* x)
 {
   assert(dynamic_cast<BASE_SUBCKT const*>(x));
-  for (CARD_LIST::const_iterator
-      ci = x->subckt()->begin(); ci != x->subckt()->end(); ++ci) {
-    o << "  ";
+  ++nest;
+  for (CARD_LIST::const_iterator ci = x->subckt()->begin(); ci != x->subckt()->end(); ++ci) {
+    o << std::string(nest*2, ' ');
     print_item(o, *ci);
   }
+  --nest;
 }
 /*--------------------------------------------------------------------------*/
 class PARAMSET_MODEL : public MODEL_CARD {
@@ -1256,6 +1273,7 @@ public:
   }
 
   int param_count()const override {
+    assert(component_proto());
     return component_proto()->param_count();
   }
   std::string param_name(int i)const override {
@@ -1273,18 +1291,25 @@ private:
 /*--------------------------------------------------------------------------*/
 class MODULE_PROTO : public PARAMSET_MODEL {
   mutable bool _instanciated{!instanciate_unused};
+  bool _own_proto{true}; // use different type?
   explicit MODULE_PROTO(MODULE_PROTO const& p)
-    : PARAMSET_MODEL(p), _instanciated(p._instanciated) {untested(); }
+    : PARAMSET_MODEL(p),
+      _instanciated(p._instanciated),
+      _own_proto(false) { }
 public:
   explicit MODULE_PROTO() : PARAMSET_MODEL() { untested(); }
   explicit MODULE_PROTO(COMPONENT* c)
     : PARAMSET_MODEL(c) { }
-  ~MODULE_PROTO() { delete component_proto(); }
+  ~MODULE_PROTO() {
+    if(_own_proto){
+      delete component_proto();
+    }else{
+    }
+  }
 
-  PARAMSET_MODEL* clone()const override { untested();
+  PARAMSET_MODEL* clone()const override {
     _instanciated = true; //??
-    incomplete();
-    return new MODULE_PROTO(*this);
+    return new MODULE_PROTO(*this); // use different type?
   }
   CARD* clone_instance()const override {
     _instanciated = true;
@@ -1368,6 +1393,7 @@ void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
 //    o << "  parameter " << i.first << " = " << i.second << ";\n";
 //  }
   print_items_sckt(o, x);
+  o << std::string(nest*2, ' ');
   o << "endmodule // " << x->short_label() << "\n\n";
 }
 /*--------------------------------------------------------------------------*/
@@ -1401,6 +1427,7 @@ void LANG_VERILOG::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
 void LANG_VERILOG::print_command(OMSTREAM& o, const DEV_DOT* x)
 {
   assert(x);
+  print_attributes(o, x->id_tag());
   o << x->s() << '\n';
 }
 /*--------------------------------------------------------------------------*/
@@ -1430,12 +1457,12 @@ class CMD_PARAMSET : public CMD {
     paramset = device_dispatcher.clone("paramset");
     paramset->set_owner(nullptr); // m?
     auto dev = prechecked_cast<BASE_SUBCKT*>(paramset);
+    lang_verilog.move_attributes(tag_t(&cmd), dev->id_tag());
     assert(dev);
     cmd.reset(here);
     lang_verilog.parse_paramset_(cmd, dev);
-    trace3("CMD_PARAMSET", paramset->long_label(), paramset->dev_type(), paramset);
     auto m = new PARAMSET_MODEL(dev);
-    lang_verilog.move_attributes(tag_t(&cmd), m->id_tag());
+    lang_verilog.move_attributes(dev->id_tag(), m->id_tag());
     m->set_owner(nullptr);
     Scope->push_back(m);
 

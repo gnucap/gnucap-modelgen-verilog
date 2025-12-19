@@ -167,6 +167,7 @@ class TData : public Base {
   // R _range; // discrete_deps?
   bool _offset{false}; // -> dynamic_deps.
   bool _constant{false};
+//  bool _set{false};
 public:
   static TData _no_deps;
 public:
@@ -181,7 +182,10 @@ public:
   std::pair<DDeps::const_iterator, bool> insert(Dep const& d){
     return _ddeps.insert(d);
   }
-  void update(TData const& other);
+  void update(TData const& other){
+    merge(other); // BUG
+  }
+  void merge(TData const& other);
   void merge_sens(TData const& other);
   void merge_ddeps(TData const& other);
   void merge_flags(TData const& other);
@@ -196,6 +200,7 @@ public:
   void set_offset(bool v = true){_offset = v;}
   void set_constant(bool v = true){_constant = v;} // attrib/sens?
   size_t size()const {return _ddeps.size(); } // { + _rdeps.size(); }
+  bool has_deps()const {return _ddeps.size(); /* +? */ }
   bool is_offset()const {return _offset;}
   bool is_constant()const {return _constant;}
   bool is_linear()const;

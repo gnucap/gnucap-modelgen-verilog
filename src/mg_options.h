@@ -24,11 +24,13 @@
 /*--------------------------------------------------------------------------*/
 class Options : public Base {
   bool _optimize_binop;  // fold binary operators
+  bool _optimize_common; // put aside model constants
   bool _optimize_swap;   // swap operands.
   bool _optimize_deriv;  // suppress zero derivative propagation
   bool _optimize_deps;   // consider dependency types
   bool _optimize_unused; // dont emit unused sources
   bool _optimize_nodes;  // prune unused nodes
+  bool _optimize_state;  // remove non-state vars from instance
   bool _gen_module;
   bool _gen_paramset;
   bool _dump_module;
@@ -45,11 +47,13 @@ public:
   void dump(std::ostream&)const override{ untested();unreachable();}
 public:
   bool optimize_binop()   const{ return _optimize_binop; }
+  bool optimize_common()  const{ return _optimize_common; }
   bool optimize_swap()    const{ return _optimize_swap; }
   bool optimize_deriv()   const{ return _optimize_deriv; }
   bool optimize_deps()    const{ untested(); return _optimize_deps; }
   bool optimize_unused()  const{ return _optimize_unused; }
   bool optimize_nodes()   const{ return _optimize_nodes; }
+  bool optimize_state()   const{ return _optimize_state; }
   bool gen_module()       const{ return _gen_module; }
   bool gen_paramset()     const{ return _gen_paramset; }
   bool dump_module()      const{ return _dump_module; }
@@ -63,6 +67,8 @@ public:
 public:
   friend class option_nodump_annotate;
   friend class option_nodump_unreachable;
+public: // optimisation tweaks
+  void disable_optimize_common() { /*_optimize_common = false; */}
 };
 /*--------------------------------------------------------------------------*/
 Base& modelgen_opts(); //?

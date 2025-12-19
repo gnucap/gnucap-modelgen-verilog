@@ -28,13 +28,14 @@
 #include "mg_analog.h" // BUG
 #include <stack>
 #include <globals.h> // TODO: Expression->resolve?
+#include "mg_storage.h" // BUG
 /*--------------------------------------------------------------------------*/
-rdep_tag tr_begin_tag;
-rdep_tag tr_restore_tag;
-rdep_tag tr_eval_tag;
-rdep_tag tr_review_tag;
-rdep_tag tr_advance_tag;
-rdep_tag tr_accept_tag;
+rdep_tag tr_begin_tag("b");
+rdep_tag tr_restore_tag("r");
+rdep_tag tr_eval_tag("e");
+rdep_tag tr_review_tag("v");
+rdep_tag tr_advance_tag("a");
+rdep_tag tr_accept_tag("x");
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -385,7 +386,7 @@ void Token_BINOP_::stack_op(Expression* E)const
     }else if(n=='-' && is_literal(t1, 0.)) {
       t1.erase();
       t2.push();
-    }else if(n=='+' && is_literal(t1, 0.)) { untested();
+    }else if(n=='+' && is_literal(t1, 0.)) { itested();
       t1.erase();
       t2.push();
     }else if(name()=="&&" && is_literal(t1, 0.)){
@@ -468,7 +469,7 @@ void Token_BINOP_::stack_op(Expression* E)const
 //  }else if(t1==t2, '-'){ ...
   }else{
     // t2 is constant?
-    if(n=='+' && is_literal(t2, 0.)){ untested();
+    if(n=='+' && is_literal(t2, 0.)){itested();
       t2.erase();
       t1.push();
     }else if(n=='*' && is_literal(t2, 1.)){
@@ -573,8 +574,15 @@ void Token_TERNARY_::stack_op(Expression* E)const
     deps->update(f->data());
     trace1("TERNARY", deps->is_constant());
 
+    // somehow pull in use?
+    // if reachable
+    f->submit_variable_xs(*SE);
+
+    // if reachable
+    t->submit_variable_xs(*SE);
+
     E->push_back(new Token_TERNARY_(name(), cond, t, f, deps));
-  }
+  } // not literal
 }
 /*--------------------------------------------------------------------------*/
 Token_TERNARY_::~Token_TERNARY_()
@@ -611,7 +619,24 @@ static void stack_op_args(Expression* EE, Expression const* arg_expr, FUNCTION_ 
     if(!f->is_output_arg(ii)){
       (**i).stack_op(EE);
     }else if(auto tt = dynamic_cast<Token_VAR_REF*>(*i)){
+      auto EE_ = prechecked_cast<Expression_*>(EE);
+      assert(EE_);
       tt->stack_op(EE);
+
+      assert(EE->size());
+      auto ttt = prechecked_cast<Token_VAR_REF*>(EE->back());
+#if 1 // def DEBUG
+      assert(ttt);
+      trace2("stackop io arg", ttt->name(), typeid(*ttt).name());
+#endif
+      auto AA = prechecked_cast<Assignment*>(ttt->mutable_item());
+      assert(AA);
+
+      //if(dynamic_cast<SeqBlock*>(scope)) { untested();
+      // here?
+      EE_->push_assign(AA->decl_token());
+      //}else{ untested(); // af?
+      //}
     }else{
       unreachable();
       (**i).stack_op(EE);
@@ -639,6 +664,7 @@ void Token_CALL::stack_op(Expression* e) const
   }
 
   if (arg_expr) {
+    trace1("CALL stackop1", name());
     FUNCTION_ const* f = function();
 
     if(f){
@@ -655,24 +681,31 @@ void Token_CALL::stack_op(Expression* e) const
       // incomplete();
       trace2("CALL stackopped", name(), E->back()->name());
     }else{
-      trace1("CALL stash", name());
+      f = function();
+      assert(f);
       auto SE = prechecked_cast<Expression_*>(E);
       auto EE = new Expression_;
       EE->set_owner(SE->owner());
       assert(EE->scope());
-      stack_op_args(EE, arg_expr, function());
+      stack_op_args(EE, arg_expr, f);
 
       // here?
       TData* deps = new_deps(arg_expr);
-      trace1("stackop stashed arg", deps->is_constant());
+      trace2("CALL stash", name(), deps->is_constant());
       deps->set_any();
+      if(f->is_constant()){
+      }else{
+	deps->set_constant(false);
+      }
 
       E->push_back(new Token_CALL(*this, deps, EE));
+      EE->submit_variable_xs(*SE);
     }
   }else if (E->is_empty()){
     // SFCALL?
     E->push_back(new Token_CALL(*this, const_deps.clone()));
   }else if(!dynamic_cast<const Token_PARLIST*>(E->back())) {
+    trace2("CALL stackop3", name(), const_deps.is_constant());
     // SFCALL
     E->push_back(new Token_CALL(*this, const_deps.clone()));
   }else{ untested();
@@ -949,7 +982,14 @@ void Token_VAR_REF::stack_op(Expression* e)const
 
   {
     TData* nd = nullptr;
-    if(auto a = dynamic_cast<Assignment const*>(_item)){
+    if(dynamic_cast<Variable_Decl const*>(_item)){
+      if(auto dd = dynamic_cast<TData const*>(data())){
+	nd = dd->clone();
+      }else{ untested();
+	unreachable();
+	nd = new TData();
+      }
+    }else if(auto a = dynamic_cast<Assignment const*>(_item)){
       // nd = deps().clone();
       nd = a->data().clone();
 //      nd->add_sens(_item); not yet.
@@ -976,6 +1016,14 @@ void Token_VAR_REF::stack_op(Expression* e)const
     assert(!_item || nn->num_deps() == nd->ddeps().size());
     e->push_back(nn);
     assert(nn->_item == _item);
+    trace2("var::stackop", name(), typeid(*_item).name());
+
+    // DUP in var_decl
+    if(auto a = dynamic_cast<Assignment const*>(_item)){
+      E->push_use(a->decl_token());
+    }else{
+      incomplete();
+    }
 
   }
 }
@@ -1072,13 +1120,30 @@ TData const& Token_VAR_REF::deps() const
   return *d;
 }
 /*--------------------------------------------------------------------------*/
+RDeps const& Token_VAR_REF::rdeps() const
+{
+  if(auto s=dynamic_cast<Statement const*>(_item)){
+    return s->rdeps();
+  }else if(auto p = dynamic_cast<Variable_Decl const*>(_item)){
+    assert(p);
+    return p->rdeps();
+  }else if(auto it=dynamic_cast<Assignment const*>(_item)){
+    return it->rdeps();
+  }else if(dynamic_cast<Analog_Function const*>(_item)){ untested();
+  }else{
+    unreachable();
+  }
+  static RDeps t;
+  return t;
+}
+/*--------------------------------------------------------------------------*/
 Data_Type const& Token_VAR_REF::type() const
 {
-  if(auto it=dynamic_cast<Assignment const*>(_item)){
-    return it->type();
-  }else if(auto p = dynamic_cast<Variable_Decl const*>(_item)){ untested();
+  if(auto p = dynamic_cast<Variable_Decl const*>(_item)){ untested();
     assert(p);
     return p->type();
+  }else if(auto it=dynamic_cast<Assignment const*>(_item)){
+    return it->type();
   }else if(auto af = dynamic_cast<Analog_Function const*>(_item)){
     return af->type();
   }else{ untested();
@@ -1100,14 +1165,14 @@ bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
     TData const& incoming = from.deps();
     dd->update(incoming);
     assert(deps().ddeps().size() >= incoming.ddeps().size());
+  }else if(auto p = dynamic_cast<Variable_Decl*>(_item)){
+    trace2("Token_VAR_REF::propagate decl", type(), from.type());
+    return p->propagate_deps(from);
   }else if(auto it=dynamic_cast<Assignment*>(_item)){
     trace2("Token_VAR_REF::propagate assign", type(), from.type());
     assert(it->scope());
     assert(from.scope());
     return it->propagate_deps(from);
-  }else if(auto p = dynamic_cast<Variable_Decl*>(_item)){
-    trace2("Token_VAR_REF::propagate decl", type(), from.type());
-    return p->propagate_deps(from);
   }else if(dynamic_cast<Analog_Function*>(_item)){
   }else if(dynamic_cast<Block const*>(_item)){ untested();
   }else{
@@ -1173,7 +1238,14 @@ void Token_VAR_DECL::stack_op(Expression* e)const
 
   {
     TData* nd = nullptr;
-    if(auto a = dynamic_cast<Assignment const*>(_item)){ untested();
+    if(dynamic_cast<Variable_Decl const*>(_item)){
+      if(auto dd = dynamic_cast<TData const*>(data())){
+	nd = dd->clone();
+      }else{
+	unreachable();
+	incomplete();
+      }
+    }else if(auto a = dynamic_cast<Assignment const*>(_item)){ untested();
       unreachable();
       nd = a->data().clone();
 //      nd->add_sens(_item); not yet.
@@ -1186,9 +1258,16 @@ void Token_VAR_DECL::stack_op(Expression* e)const
       incomplete();
     }
 
-    auto nn = new Token_VAR_REF(name(), E->scope(), nd);
+    auto nn = new Token_VAR_REF(name(), _item, nd);
     assert(nn->scope());
     e->push_back(nn);
+
+    // DUP in VAR_REF?
+    if(auto a = dynamic_cast<Assignment const*>(_item)){
+      E->push_use(a->decl_token());
+    }else{
+      incomplete();
+    }
 
   }
 }
@@ -1285,7 +1364,32 @@ std::string Token_VAR_REF::long_code_name() const
 /*--------------------------------------------------------------------------*/
 bool Token_VAR_REF::is_state_var() const
 {
-  return true; // TODO
+  return !is_temporary() && !is_common();
+}
+/*--------------------------------------------------------------------------*/
+bool Token_VAR_REF::is_common() const
+{
+  if( auto v = dynamic_cast<Variable_Decl const*>(item())) {
+    return v->is_common();
+  }else if(auto a = dynamic_cast<Assignment const*>(item())) {
+    return a->is_common();
+  }else{
+    // unreachable(); nope. analogfunction
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool Token_VAR_REF::is_temporary() const
+{
+  if( auto v = dynamic_cast<Variable_Decl const*>(item())) {
+    return v->is_temporary();
+  }else
+    if(auto a = dynamic_cast<Assignment const*>(item())) {
+      return a->is_temporary();
+    }else{
+    // unreachable(); nope. analogfunction
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 inline void Token_PARLIST_::stack_op(Expression* E) const

@@ -1,19 +1,21 @@
 module dep0(d, g);
   inout d, g;
   electrical d, g;
-  real S;
-  real T;
+  real S// -
+;
+  real T// -
+;
 
   analog begin // always
     // S : 0
     // T : 0
-    T = 1; // s1 r5
-    S = 2; // s1 r5
+    T = 1; // s1 r5{bevax}
+    S = 2; // s1 r5{bevax}
     if (analysis("static")) begin
-      $strobe("%f", T); // s1 r5
+      $strobe("%f", T); // s1 r5{bevax}
     end
     else begin
-      $strobe("%f", S); // s1 r5
+      $strobe("%f", S); // s1 r5{bevax}
     end
   end
 

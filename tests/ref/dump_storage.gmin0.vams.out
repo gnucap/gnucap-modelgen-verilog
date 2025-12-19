@@ -1,0 +1,16 @@
+module test_gmin(a, c);
+  inout a, c;
+  electrical a, c;
+  real gg// +
+;
+
+  analog begin // always
+    // gg : 0
+    gg = $simparam("gmin",  0.); // s1 r4{bax}
+    I(a, c) <+ (gg * V(a, c)); // [V(a, c)] s1 r2{x}
+  end
+
+endmodule
+
+
+

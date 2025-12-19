@@ -17,9 +17,9 @@ main #(.v(2)) m2(0 2)
 main #(.v(2)) m2(0 2)
                    ^ ? invalid identifier
 module main (.\1 (\1 ),.\2 (\2 ));
-    parameter v;
+  parameter v;
   paramset vs vsource;
-      parameter voltage;
+    parameter voltage;
  .dc=voltage;
 endparamset
 

@@ -27,12 +27,17 @@
 #include <l_indirect.h>
 #include <u_attrib.h>
 #include "mg_error.h"
+#include "mg_type.h"
 /*--------------------------------------------------------------------------*/
 typedef enum{ a_unset, a_input, a_output, a_inout} direction_t;
 /*--------------------------------------------------------------------------*/
 class rdep_tag : public Base{
+  std::string _s;
+public:
+  rdep_tag(std::string const& s) : _s(s) {}
   virtual void parse(CS&)override { untested();unreachable();}
   virtual void dump(std::ostream&)const override { untested();unreachable();}
+  std::string val_string()const override {return _s;}
 };
 extern rdep_tag tr_begin_tag;
 extern rdep_tag tr_restore_tag;
@@ -468,6 +473,7 @@ private:
     r_unknown = -1,
     r_never = 0,
     r_always = 1,
+    r_initial = 2,
   } block_reach_t;
   block_reach_t _reachable{r_unknown};
 protected:
@@ -487,6 +493,7 @@ public:
   bool is_never()const { return _reachable == r_never; }
 //  void set_unreachable() { untested(); untested(); _reachable = r_never; }
 //  void set_reachable() { untested(); untested(); _reachable = r_unknown; }
+  void set_initial() { _reachable = r_initial; }
   void set_always() { _reachable = r_always; }
   void set_never() { _reachable = r_never; }
   virtual bool new_var_ref(Base* what);
@@ -581,7 +588,7 @@ class Parameter_Base : public Base { // Owned_Base?
   Block* _owner{nullptr};
 protected:
   std::string _name;
-  std::string _type;
+  Data_Type _type;
   std::string _code_name;
   std::string _user_name;
   std::string _alt_name;
@@ -598,7 +605,7 @@ protected:
 public:
   Parameter_Base() {}
   explicit Parameter_Base(std::string const& name) : _name(name) {}
-  const std::string& type()const		{return _type;}
+  const Data_Type& type()const {return _type;}
   const std::string code_name()const		{return "_p_" + _name;}
   const std::string& user_name()const		{ untested();return _user_name;}
   const std::string& alt_name()const		{ untested();return _alt_name;}

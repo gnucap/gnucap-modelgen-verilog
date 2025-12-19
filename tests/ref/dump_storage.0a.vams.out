@@ -1,0 +1,23 @@
+module test_state(a, c);
+  inout a, c;
+  electrical a, c;
+  parameter integer init = 0;
+
+  real vv// -
+;
+
+  analog   initial begin // i
+    if (init) begin // i
+      // vv : 0
+      vv = init; // s1 r4{bax}
+    end
+  end
+
+  analog begin // always
+    V(a, c) <+ vv; // s2 r2{x}
+  end
+
+endmodule
+
+
+

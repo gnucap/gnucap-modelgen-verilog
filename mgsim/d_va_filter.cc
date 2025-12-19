@@ -764,7 +764,7 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
     assert(_vy1);
     assert(_vi0);
     assert(_vi1);
-    assert(net_nodes() == n_nodes);
+    assert(net_nodes() == n_nodes + int(_current_port_names.size()));
     // assert could fail if changing the number of nodes after a run
   }
 

@@ -22,6 +22,7 @@
 #include "mg_out.h"
 #include "mg_circuit.h"
 #include "mg_.h" // TODO
+#include "mg_options.h"
 #include <numeric>
 /*--------------------------------------------------------------------------*/
 static void make_common_default_constructor(std::ostream& o, const Module& d)
@@ -72,6 +73,10 @@ static void make_common_copy_constructor(std::ostream& o, const Module& d)
   }else{
   }
   make_copy_construct_parameter_list(o, d.parameters());
+  if (options().optimize_common()){
+    o << ",\n   _v_(p._v_)";
+  }else{
+  }
   //o << ",\n   _sdp(0)";
   //make_copy_construct_parameter_list(o, d.common().calculated());
 //  for (Args_List::const_iterator

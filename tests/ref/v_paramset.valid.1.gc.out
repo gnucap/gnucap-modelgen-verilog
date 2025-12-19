@@ -6,12 +6,12 @@
 m: main from top level
 m: 1 candidate found for main
 (* desc="res1" *) paramset res resistor;
-    parameter string what from '{"one", "ONE"};
+  parameter string what from '{"one", "ONE"};
  .r=1;
 endparamset
 
 (* desc="res2" *) paramset res resistor;
-    parameter string what from '{"two", "TWO"};
+  parameter string what from '{"two", "TWO"};
  .r=2;
 endparamset
 

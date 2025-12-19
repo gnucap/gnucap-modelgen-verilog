@@ -80,6 +80,7 @@ public: // characteristics
   virtual bool has_modes()const {return false;}
   virtual bool context_arg()const {return false;}
   virtual bool is_analog_filter()const {return false;}
+  virtual bool is_constant()const {return true;}
 
 public: // non-virtual. TODO
   virtual bool static_code()const {return false;}

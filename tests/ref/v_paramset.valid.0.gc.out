@@ -9,27 +9,27 @@
 m: main from top level
 m: 1 candidate found for main
 (* desc="res1" *) paramset res resistor;
-    parameter real R from (1:2];
+  parameter real R from (1:2];
  .r=(R + 1k);
 endparamset
 
 (* desc="res2" *) paramset res resistor;
-    parameter real R=.5 from (0:1];
+  parameter real R=.5 from (0:1];
  .r=R;
 endparamset
 
 (* desc="res3" *) paramset res resistor;
-    parameter real R from [100:200];
+  parameter real R from [100:200];
  .r=(R + 1k);
 endparamset
 
 (* desc="res4" *) paramset res resistor;
-    parameter real R from [(1k):(2k));
+  parameter real R from [(1k):(2k));
  .r=R;
 endparamset
 
 (* desc="res5" *) paramset res resistor;
-    parameter real R from [(2k):(3k)];
+  parameter real R from [(2k):(3k)];
  .r=R;
 endparamset
 

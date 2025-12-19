@@ -86,6 +86,15 @@ void Expression_::dump(std::ostream& o) const
 	Expression::dump(o);
 }
 /*--------------------------------------------------------------------------*/
+void Expression_::parse(CS& f)
+{ untested();
+//  try{ untested();
+    incomplete();
+    Expression::parse(f);
+//  }catch (Exception_CS const& e){ untested();
+//    throw(Exception_CS_(e.message(), f));
+//  }
+}
 /*--------------------------------------------------------------------------*/
 namespace {
 class Token_PF : public Token_CALL {

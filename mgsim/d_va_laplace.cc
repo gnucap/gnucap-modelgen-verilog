@@ -242,14 +242,14 @@ class LAPLACE : public ELEMENT {
 private:
   int _n_ports{2};
 public: // netlist
-  ELEMENT* _input{NULL};
-  ELEMENT* _output{NULL};
+  ELEMENT* _input{nullptr};
+  ELEMENT* _output{nullptr};
   std::vector<ELEMENT*> _s_;
 private:
-  double* _state{NULL};
-  double* _st_b_in_{NULL};
-  double* _st_b_out_{NULL};
-  double* _st_s{NULL}; // s0: 1+dens, s1 .. sk:  3 each.
+  double* _state{nullptr};
+  double* _st_b_in_{nullptr};
+  double* _st_b_out_{nullptr};
+  double* _st_s{nullptr}; // s0: 1+dens, s1 .. sk:  3 each.
   bool _set_parameters{false};
   int _pivot{-1};
 private: // construct
@@ -264,15 +264,15 @@ public:
       // it is part of a base class
     }
     delete[] _st_s;
-    _st_s = NULL;
+    _st_s = nullptr;
     delete[] _st_b_out_;
-    _st_b_out_ = NULL;
+    _st_b_out_ = nullptr;
     delete[] _state;
-    _state = NULL;
+    _state = nullptr;
     // if(_set_parameters){ untested();
     // }else{ untested();
     //   delete[] _st_b_in_;
-    //   _st_b_in_ = NULL;
+    //   _st_b_in_ = nullptr;
     // }
   }
   CARD* clone()const override;
@@ -294,7 +294,7 @@ private: // BASE_SUBCKT
       if(_set_parameters){
 //	_output->_loss0 = _loss0; // no loss in vaflow
       }else{
-	assert(!_loss0);
+	assert(_loss0 == 0.);
       }
 //      _output->_loss1 = _loss1;
   }
@@ -588,7 +588,7 @@ void LAPLACE::precalc_first()
   assert(c);
   auto cc = c->clone();
   if(subckt()){
-    attach_common(NULL);
+    attach_common(nullptr);
     attach_common(cc);
     subckt()->precalc_first();
   }else{
@@ -973,7 +973,7 @@ void LAPLACE::precalc_last()
   assert(_st_b_in_);
   trace2("mhack", _st_b_in_[0], _st_b_in_[1]);
   double mhack = _st_b_in_[1];
-  if(_loss0){
+  if(_loss0 != 0.){
     assert(_loss0 == 1);
     mhack = - _loss0 * mhack;
   }else{
@@ -992,8 +992,9 @@ void LAPLACE::precalc_last()
     // _st_b_in_[jj+2] = - c->_p_den[jj] / piv;
     _st_s[jj+2] = - c->_p_den[jj] / piv;
   }
-  for(++jj; jj<num_s; ++jj){
+  for(++jj; jj<dens; ++jj){
     // _st_b_in_[jj+2] = - c->_p_den[jj] / piv;
+    assert(jj < num_s + (num_s-1)*3);
     _st_s[jj+1] = - c->_p_den[jj] / piv;
   }
 
@@ -1091,7 +1092,7 @@ void LAPLACE::ac_load()
 //    _acg = _values[1];
   //  ac_load_source();
   COMPLEX _acout = _acg;
-  if(_loss0) {
+  if(_loss0 != 0.) {
     // BUG: duplicate in other filters.
     _acout *= -1; // - _loss0 * _output->mfactor();
   }else{
@@ -1138,7 +1139,7 @@ void LAPLACE::tr_load()
 {
   tr_load_shunt();
   assert(subckt());
-  assert(!_output->_loss0);
+  assert(_output->_loss0 == 0.);
   subckt()->tr_load();
 }
 /*--------------------------------------------------------------------------*/
@@ -1152,17 +1153,17 @@ double LAPLACE::tr_amps() const
 {
   assert(_output);
   double r = _output->tr_amps();
-  if(_loss0){
-    assert(!_output->_loss0); // no loss in vaflow
+  if(_loss0 != 0.){
+    assert(_output->_loss0 == 0.); // no loss in vaflow
   }else{ untested();
-    assert(!_output->_loss0);
+    assert(_output->_loss0 == 0.);
   }
   if(_set_parameters){
     trace5("LAPLACE::tr_amps", r, _loss0, _input->tr_amps(), *_st_b_in_, n_(0).v0());
     trace3("LAPLACE::tr_amps", _st_b_in_[2], _output->tr_outvolts(), _output->tr_amps());
   }else{ untested();
   }
-  if(_loss0){
+  if(_loss0 != 0.){
     assert(_loss0==1.);
 //    r = -r;
   }else{

@@ -1,0 +1,18 @@
+`include "sub/disciplines.few"
+
+`pragma modelgen dump-annotate
+`pragma modelgen dump-unreachable
+`pragma modelgen nooptimize-unused
+
+module cond5(p,n);
+	analog initial begin : main
+		integer i;
+		i = 1;
+		if(i) begin
+			// TODO: always.
+			i = 2;
+		end else begin
+			i = 3;
+		end
+	end
+endmodule

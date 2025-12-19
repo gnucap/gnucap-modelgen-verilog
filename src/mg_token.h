@@ -140,6 +140,7 @@ inline std::string Token_FUNCTION::code_name()const
 }
 /*--------------------------------------------------------------------------*/
 class TData;
+class RDeps;
 /*--------------------------------------------------------------------------*/
 Base* copy_deps(Base const* b);
 /*--------------------------------------------------------------------------*/
@@ -370,14 +371,11 @@ class Token_VAR_REF : public Token_SYMBOL {
 protected:
   Base* _item;
 public:
-  explicit Token_VAR_REF(std::string Name, Base* item)
-    : Token_SYMBOL(Name, ""), _item(item) {}
-  explicit Token_VAR_REF(std::string Name, Base* item, Base const* data)
+  explicit Token_VAR_REF(std::string Name, Base* item, Base const* data=nullptr)
     : Token_SYMBOL(Name, data), _item(item) {}
 // protected: //??
   explicit Token_VAR_REF(const Token_VAR_REF& P, Base* d=nullptr)
-    : Token_SYMBOL(P.name(), d), _item(P._item) {}
-  explicit Token_VAR_REF() : Token_SYMBOL("","")  { untested(); unreachable(); }
+    : Token_SYMBOL(P.name(), d), _item(P._item) { }
   ~Token_VAR_REF() {
     trace1("~Token_VAR_REF", name());
   }
@@ -388,9 +386,15 @@ public:
 public:
   void stack_op(Expression* e)const override;
   Base const* operator->() const{ return _item; }
+  Base const* item()const { return _item; }
+  Base* mutable_item()const { return _item; } // AF hack
   virtual Data_Type const& type()const;
   bool propagate_deps(Token_VAR_REF const&);
   TData const& deps()const;
+  RDeps const& rdeps()const;
+  void init_var();
+  void assign_var();
+  void use_var();
   Block const* scope() const;
   std::string code_name() const { return "_v_"+name(); }
   std::string long_code_name()const;
@@ -400,6 +404,8 @@ public:
   std::string key() const { untested();unreachable();return "";}
   void set_owner(Base*){ untested();unreachable();}
   bool is_state_var()const;
+  bool is_common()const;
+  bool is_temporary()const;
 private:
   size_t num_deps() const;
 }; // Token_VAR_REF
@@ -434,13 +440,13 @@ public: // LiSt
 class Variable_Stmt;
 class Token_VAR_DECL : public Token_VAR_REF {
   // Variable_Stmt const* _owner{nullptr}; // _item?
-  Base const* _default{0};
+  Base const* _default{0}; // BUG. move to _item
   // type //
 public:
   explicit Token_VAR_DECL() : Token_VAR_REF("",nullptr,nullptr) { untested();unreachable();}
   explicit Token_VAR_DECL(std::string Name, Base* item, Base const* data)
     : Token_VAR_REF(Name, item, data) {}
-  ~Token_VAR_DECL() { untested(); delete _default; }
+  ~Token_VAR_DECL() { delete _default; }
   Data_Type const& type()const override;
 
 //  void set_owner(Variable_Stmt* b){ untested();_item = b;}
@@ -507,6 +513,14 @@ public:
   virtual bool is_pot_probe()const {return false;}
   virtual bool is_flow_probe()const {return false;}
 };
+/*--------------------------------------------------------------------------*/
+#if 0
+class Token_ASSIGN : public Token_BINOP_ {
+  Token_VAR_REF* lhs() {return op1();}
+  Token* rhs() {return op2();}
+  [...]
+};
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

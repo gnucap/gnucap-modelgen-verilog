@@ -25,14 +25,14 @@ endmodule // main
 main #() m (\0 , \1 , \2 , \4 );
 >>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
 main.v: myres from top level
-main.v discarded: too many: requested=1 max=0
+main.v discarded (params): too many: requested=1 max=0
 main.v: no candidates found for myres
 main.V1: myv from top level
 main.V1: 1 candidate found for myv
 m.v: no valid prototype found for myres
 >>>>>dc
 main.v: myres from top level
-main.v discarded: too many: requested=1 max=0
+main.v discarded (params): too many: requested=1 max=0
 main.v: no candidates found for myres
 m.v: no valid prototype found for myres
 >>>>>status notime

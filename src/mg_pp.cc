@@ -363,6 +363,9 @@ void Define::parse(CS& f)
   String_Arg_List args;
   if(f.peek() == '('){
     f >> args;
+  }else if(f.peek() == '='){
+    error(bLOG, "ignoring stray '=' in `define");
+    f.skip();
   }else{
   }
 
@@ -861,7 +864,7 @@ void Preprocessor::dump(std::ostream& out)const
 void Preprocessor::add_include_path(std::string const& what)
 {
   std::string colon = "";
-  if(_include_path.size()){ untested();
+  if(_include_path.size()){ itested();
     colon = ":";
   }else{
   }

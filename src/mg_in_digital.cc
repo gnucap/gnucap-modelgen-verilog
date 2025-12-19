@@ -704,34 +704,10 @@ void DigitalSeqStmt::parse(CS& f)
   // _block.update();
 }
 /*--------------------------------------------------------------------------*/
-    // f >> _variables; ?
-static void parse_block_variables(CS& f, Variable_List_Collection& P)
-{
-  for (;;) {
-    trace1("DigitalSeqBlock::parse loop", f.tail().substr(0,20));
-    if( 0 // || ((f >> "parameter ") && (f >> _parameters))
-	|| ((f >> "real ") && (f >> P))
-	|| ((f >> "integer ") && (f >> P))) { untested();
-      if(f.peek() == ';') { untested();
-	f.warn(bWARNING, "stray semicolon\n");
-	f.skip();
-      }else{ untested();
-      }
-    }else{
-      break;
-    }
-  }
-}
-/*--------------------------------------------------------------------------*/
 void DigitalSeqBlock::parse(CS& f)
 {
   assert(owner());
-  if(f >> ":"){
-    parse_identifier(f);
-    _variables.set_owner(this);
-    parse_block_variables(f, _variables);
-  }else{ untested();
-  }
+  SeqBlock::parse(f); // _variables...
   if(dynamic_cast<Module const*>(owner())) { untested();
     set_always();
   }else if(dynamic_cast<Module const*>(scope())) {
@@ -1188,7 +1164,6 @@ void DigitalEvtCtlStmt::dump(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 bool DigitalEvtCtlStmt::update()
 { untested();
-  trace1("DigitalEvtCtlStmt::update", rdeps_size());
 
  // bool rdd = _rhs.update(&_deps->rdeps());
   bool ret = propagate_rdeps(_ctrl.rdeps());
@@ -1202,7 +1177,6 @@ bool DigitalEvtCtlStmt::update()
       break;
     }
   }
-  trace1("DigitalEvtCtlStmt::update done", rdeps_size());
 
   // set_rdeps(_ctrl.rdeps());
   return DigitalStmt::update() || ret;

@@ -1,0 +1,25 @@
+module test_seq0(p, n);
+  inout p, n;
+  electrical p, n;
+  parameter real v = 0;
+
+  analog begin : main // always
+    // i : 0
+    real i// +
+;
+    i = 0; // s3 r4{bax}
+    if ((v == 0)) begin
+      // i : 0
+      i = 1; // s1 r4{bax}
+    end
+    else begin
+      // i : 0
+      i = 2; // s1 r4{bax}
+    end
+    V(p, n) <+ i; // s3 r2{x}
+  end
+
+endmodule
+
+
+

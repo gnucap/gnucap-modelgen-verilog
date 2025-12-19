@@ -30,21 +30,31 @@ class Probe;
 class Branch_Ref;
 class Block;
 class RDeps;
+class Variable_Access;
 class Expression_ : public Expression {
   Base* _owner{nullptr};
   Block* _scope{nullptr}; // remove. later.
+  std::list<Token const*> _used_variables;
+  std::list<Token const*> _assignments;
 public:
   explicit Expression_() : Expression() {}
   ~Expression_() {}
   void resolve_symbols(Expression const& e);
   void set_owner(Base* b);
 //  void set_scope(Block* b){ untested(); _scope = b; }
+  void parse(CS& f)override;
   void dump(std::ostream& out)const override;
 // private:
   Base* owner(){ return _owner; }
   Base const* owner() const { return _owner; }
   Block* scope();
   Block const* scope()const { return const_cast<Expression_*>(this)->scope(); }
+public: // assign. AF kludge. TODO, one list.
+  void push_assign(Token const* t) { _assignments.push_back(t); }
+public:
+  void push_use(Token const* t) { _used_variables.push_back(t); }
+  void submit_variable_xs(Variable_Access&)const;
+  void submit_variable_xs(Expression_&)const; // ternary hack
 public:
   void clear();
   Expression_* clone()const;
