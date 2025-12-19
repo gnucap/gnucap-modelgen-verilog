@@ -99,35 +99,6 @@ private:
 } mfactor;
 DISPATCHER<FUNCTION>::INSTALL d_mfactor(&function_dispatcher, "$mfactor", &mfactor);
 /*--------------------------------------------------------------------------*/
-class SIMPARAM : public MGVAMS_FUNCTION {
-public:
-  explicit SIMPARAM() {
-    set_label("$simparam");
-  }
-  ~SIMPARAM(){ }
-private:
-  bool static_code()const override {return true;}
-  bool is_constant()const override {return false;}
-  void stack_op(Expression*)const override {
-    throw Exception("invalid");
-  }
-  std::string code_name()const override{
-    return "_f_simparam";
-  }
-  void make_cc_common(std::ostream& o)const override {
-    o__ "double " << code_name() << "(std::string const& what, double def=0)const {\n";
-    o____ "if(what==\"gmin\") {\n";
-    o______ "return OPT::gmin;\n";
-    o____ "}else if(what==\"iteration\") {\n";
-    o______ "return CKT_BASE::_sim->_iter[sCOUNT];\n";
-    o____ "}else{\n";
-    o______ "return def;\n";
-    o____ "}\n";
-    o__ "}\n";
-  }
-} simparam;
-DISPATCHER<FUNCTION>::INSTALL d_simparam(&function_dispatcher, "$simparam", &simparam);
-/*--------------------------------------------------------------------------*/
 class TEMPERATURE : public MGVAMS_FUNCTION {
 public:
   explicit TEMPERATURE() {
@@ -180,3 +151,4 @@ private:
 DISPATCHER<FUNCTION>::INSTALL d_vt(&function_dispatcher, "$vt", &vt);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet
