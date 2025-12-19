@@ -84,13 +84,12 @@ std::pair<Base const*, Base const*> get_constant2(Expression* E)
   }
 
   if(!pl){ untested();
-  }else if(it == E->begin()) { untested();
-    unreachable();
+  }else if(it == E->begin()) {
+    ret.first = ret.second = nullptr;
   }else{
     --it;
     if(dynamic_cast<Token_STOP const*>(*it)) {
-    }else{ untested();
-      unreachable(); // hopefully.
+    }else{
       ret.first = ret.second = nullptr;
     }
   }
