@@ -100,8 +100,12 @@ private:
     o__ "double " << code_name() << "(std::string const& what, double def=0)const {\n";
     o____ "if(what==\"gmin\") {\n";
     o______ "return OPT::gmin;\n";
+    o____ "}else if(what==\"scale\") {\n";
+    o______ "return OPT::scale;\n";
     o____ "}else if(what==\"iteration\") {\n";
     o______ "return CKT_BASE::_sim->_iter[sCOUNT];\n";
+    o____ "}else if(what==\"simulatorVersion\") {\n";
+    o______ "return simulatorVersion();\n";
     o____ "}else{\n";
     o______ "return def;\n";
     o____ "}\n";

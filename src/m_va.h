@@ -34,6 +34,20 @@
 // attribute index
 typedef int aidx;
 
+/*--------------------------------------------------------------------------*/
+inline int simulatorVersion()
+{
+  std::string lv = lib_version();
+  int l = int(lv.size());
+  if(l < 10){ untested();
+    return 0;
+  }else{ itested();
+    return atoi(lv.substr(l-2,l).c_str())
+         + atoi(lv.substr(l-5,l-3).c_str()) * 100
+         + atoi(lv.substr(l-10,l-6).c_str()) * 10000;
+  }
+}
+/*--------------------------------------------------------------------------*/
 namespace notstd {
 /*--------------------------------------------------------------------------*/
 template <class InputIter, class Size, class OutputIter>

@@ -9,6 +9,7 @@ This file summarizes new features and important changes between snapshots.
 - generate code for $rdist_* calls
 - adjust precalc logic
 - fix current control in idt/ddt
+- simparam: "scale" and "simulatorVersion"
 - follow various library improvements
 
 20250525-dev
