@@ -1,0 +1,33 @@
+attach ./modelgen_1.so
+attach vams/resistor.so
+
+verilog
+
+`modelgen
+module test_scale0(p, n);
+	electrical p, n
+	inout p, n;
+	parameter real scale = $simparam("scale", 1.);
+	analog begin
+		V(p,n) <+ I(p,n) * scale;
+	end
+endmodule
+`endmodelgen
+
+list
+
+!make test_scale0.so > /dev/null
+attach ./test_scale0.so
+
+`options scale = 2.
+isource #(.dc(1)) i(\0 ,\1 );
+test_scale0 #() dut(\1 ,\0 );
+
+`print dc v(nodes)
+`dc
+
+`options scale = 5.
+`dc
+
+status notime
+end
