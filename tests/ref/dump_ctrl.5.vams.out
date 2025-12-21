@@ -1,0 +1,26 @@
+module cond5(p, n);
+  analog begin : main // always
+    // S : 0
+    // T : 0
+    // i : 0
+    real S//
+;
+    real T//
+;
+    integer i// +
+;
+    i = 1; // s1 r3{bax}
+    if (i) begin
+      // i : 0
+      i = 2; // s1 r3{bax}
+    end
+    else begin
+      // i : 0
+      i = 3; // s1 r3{bax}
+    end
+  end
+
+endmodule
+
+
+
