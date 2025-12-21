@@ -104,6 +104,8 @@ private:
     o______ "return OPT::scale;\n";
     o____ "}else if(what==\"iteration\") {\n";
     o______ "return CKT_BASE::_sim->_iter[sCOUNT];\n";
+    o____ "}else if(what==\"simulatorVersion\") {\n";
+    o______ "return simulatorVersion();\n";
     o____ "}else{\n";
     o______ "return def;\n";
     o____ "}\n";
