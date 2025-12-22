@@ -4,8 +4,8 @@ attach vams/resistor.so
 
 verilog
 
-`modelgen test_u0t
-module test_u0t(p, n);
+`modelgen test_u0tt
+module test_u0tt(p, n);
 	electrical p, n;
 	inout p, n;
 	(*desc="s"*) integer s;
@@ -24,13 +24,13 @@ endmodule
 
 list
 
-!make test_u0t.so > /dev/null
-attach ./test_u0t.so
+!make test_u0tt.so > /dev/null
+attach ./test_u0tt.so
 
 ground gnd;
 
 resistor #(.r(1.)) r(gnd, n1);
-test_u0t #(.ts(.01)) dut1(gnd, n1);
+test_u0tt #(.ts(.01)) dut1(gnd, n1);
 
 print dc v(nodes) s(dut1) spl(dut1) r1(dut1)
 print tran v(n1)
