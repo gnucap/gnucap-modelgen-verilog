@@ -272,6 +272,8 @@ STORAGE_TYPE::set_t STORAGE_TYPE::set_t::operator|(STORAGE_TYPE::set_t const& o)
     r._s = s_maybe;
   }else if(!s && os == s_set){ itested();
     r._s = s_maybe;
+  }else if(!s && os == s_const){ itested();
+    r._s = s_maybe;
   }else{
     error(bDANGER, "internal error %d %d\n", s, os);
     incomplete();
