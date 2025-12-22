@@ -1,6 +1,6 @@
 == modelgen
-- all variables are static, some speed impact.
 - ac needs operating point, even if linear: mg2_cccs.0.gc
+- dependency tracking glitch aka rram bug
 - ddx, flow(<port>): no derivatives (feature?)
 - filter contribution to potential, uses internal node.
 - V<+ddt(I) does not work on same branch (related?)

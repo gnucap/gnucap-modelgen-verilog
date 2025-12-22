@@ -2,6 +2,17 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
+20251222-dev
+============
+- infer variable storage type (instance/common/temp)
+- honour storage type in code generation
+- improve annotation dumps
+- add P_{K,Q}_NIST1998 to constants.vams
+- add/test absdelay based transmission line
+- fix lost context in parse error reporting
+- fix a bunch of issues with const expressions
+- fix "transition" 3-arg invocation
+
 20250731-dev
 ============
 - random distribution functions

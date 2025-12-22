@@ -1163,7 +1163,7 @@ bool Node::is_used() const
   if(1 && is_ground()){
     trace1("Node::is_used, ground", name());
   }else{
-    incomplete();
+    // incomplete();
     trace2("Node::is_used", name(), _fanout.size());
     for(Element_2 const* e : _fanout){
       if(e->is_used()){
