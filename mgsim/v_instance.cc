@@ -684,8 +684,15 @@ static int eff_param_count(CARD const* x)
 {
   auto c = prechecked_cast<COMPONENT const*>(x);
   assert(c);
-  HS_PARAM const* h = c->hsparam();
-  return c->param_count() - (h?h->param_count():0);
+  auto common = c->common();
+  if(!common){ untested();
+    // assert(!c->param_count());
+    return c->param_count();
+  }else if(HS_PARAM const* h = common->hsparam()){ untested();
+    return(c->param_count() - h->param_count());
+  }else{ untested();
+    return c->param_count();
+  }
 }
 /*--------------------------------------------------------------------------*/
 static std::string param_count_string(CARD const* c)
@@ -792,7 +799,7 @@ void INSTANCE::expand()
 	error(bDEBUG, long_label() + " tie break: " + param_count_string(gotit) + " vs. " +
 	    param_count_string(d) + "\n");
       }
-    }else if(d->param_count() < gotit->param_count()){
+    }else if(eff_param_count(d) < eff_param_count(gotit)){
       if(desc.size()){
 	error(bTRACE, long_label() + " found fewer params"+desc+".\n");
       }else{

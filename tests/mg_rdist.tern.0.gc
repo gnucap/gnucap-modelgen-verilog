@@ -1,7 +1,6 @@
 verilog
 
 attach ./modelgen_1.so
-attach vams/resistor.so
 
 `modelgen
 module test_rdist_tern(p, n)
