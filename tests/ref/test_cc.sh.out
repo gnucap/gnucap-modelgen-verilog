@@ -1085,8 +1085,9 @@ private: // funcs
   bool param_given(PARA_BASE const& p)const {
     return p.has_hard_value();
   }
+  double _temp_k{0.};
   double f_temp()const {
-    return temp_k();
+    return _temp_k;
   }
 // Probe no refs: potential_p_n
 // Probe no refs: potential_white_noise_1_p_
@@ -1435,6 +1436,7 @@ void COMMON_resistor::precalc_last(const PARAM_LIST* par_scope)
     real def = real(t0.value());
     this->_p___tnom = def;
   }
+_temp_k = temp_k();
   COMMON_COMPONENT::precalc_last(par_scope);
 }
 /*--------------------------------------------------------------------------*/
@@ -2300,8 +2302,9 @@ private: // funcs
   bool param_given(PARA_BASE const& p)const {
     return p.has_hard_value();
   }
+  double _temp_k{0.};
   double f_temp()const {
-    return temp_k();
+    return _temp_k;
   }
 // Probe no refs: potential_p_n
 // Probe no refs: potential_white_noise_0_p_
@@ -2682,6 +2685,7 @@ void COMMON_resistor::precalc_last(const PARAM_LIST* par_scope)
     real def = real(t0.value());
     e_val(&(this->_p_tnom),     def , par_scope);
   }
+_temp_k = temp_k();
   COMMON_COMPONENT::precalc_last(par_scope);
 }
 /*--------------------------------------------------------------------------*/

@@ -1052,7 +1052,7 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   make_tag(o);
   String_Arg const& mid = m.identifier();
   o << "void MOD_" << mid << "::precalc_last()\n{\n";
-//    o__ baseclass(m) << "::precalc_last();\n";
+//  o__ baseclass(m) << "::precalc_last();\n";
   o__ "COMPONENT::precalc_last();\n";
 
   // o__ "try {\n";

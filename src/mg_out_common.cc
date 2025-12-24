@@ -658,6 +658,15 @@ static void make_common_expand(std::ostream& o , const Module& m)
   o__ "(void)pc;\n";
   make_final_adjust_eval_parameter_list(o , m.parameters());
   make_eval_netlist_parameters(o, m);
+
+  for(FUNCTION_ const* f : m.funcs()){
+    make_tag(o);
+    if(f->has_refs()){
+      f->make_cc_common_precalc(o);
+    }else{
+    }
+  }
+
   o__ "COMMON_COMPONENT::precalc_last(par_scope);\n";
     o << "}\n"
     "/*--------------------------------------------------------------------------*/\n";
