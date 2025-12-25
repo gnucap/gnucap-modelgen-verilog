@@ -112,7 +112,7 @@ private:
     throw Exception("invalid");
   }
   void make_cc_common_precalc(std::ostream& o)const override {
-    o__ "_temp_k = temp_k();\n";
+    o__ "_temp_k = temp_k(par_scope);\n";
   }
   void make_cc_common(std::ostream& o)const override {
     o__ "double _temp_k{0.};\n";
@@ -143,7 +143,7 @@ private:
     return "_f_vt";
   }
   void make_cc_common_precalc(std::ostream& o)const override {
-    o__ "_vt = P_K * temp_k() / P_Q;\n";
+    o__ "_vt = P_K * temp_k(par_scope) / P_Q;\n";
   }
   void make_cc_common(std::ostream& o)const override {
     o__ "double _vt{0.};\n";

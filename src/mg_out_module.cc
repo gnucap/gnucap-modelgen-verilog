@@ -1093,7 +1093,8 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   }else{
   }
   o____ "if(HS_PARAM const* h = hsparam()){\n";
-  o______ "h->export_to(subckt()->params());\n";
+  o______ "PARAM_LIST const* s = scope()->params();\n";
+  o______ "h->precalc_hierarchy(s, subckt()->params());\n";
   o____ "}else{ untested();\n";
   o____ "}\n";
   o____ "subckt()->precalc_last();\n";

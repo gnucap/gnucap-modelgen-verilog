@@ -1436,7 +1436,7 @@ void COMMON_resistor::precalc_last(const PARAM_LIST* par_scope)
     real def = real(t0.value());
     this->_p___tnom = def;
   }
-_temp_k = temp_k();
+_temp_k = temp_k(par_scope);
   COMMON_COMPONENT::precalc_last(par_scope);
 }
 /*--------------------------------------------------------------------------*/
@@ -2208,7 +2208,8 @@ void MOD_resistor::precalc_last()
   c->precalc_analog(this);
   if(subckt()){
     if(HS_PARAM const* h = hsparam()){
-      h->export_to(subckt()->params());
+      PARAM_LIST const* s = scope()->params();
+      h->precalc_hierarchy(s, subckt()->params());
     }else{ untested();
     }
     subckt()->precalc_last();
@@ -2685,7 +2686,7 @@ void COMMON_resistor::precalc_last(const PARAM_LIST* par_scope)
     real def = real(t0.value());
     e_val(&(this->_p_tnom),     def , par_scope);
   }
-_temp_k = temp_k();
+_temp_k = temp_k(par_scope);
   COMMON_COMPONENT::precalc_last(par_scope);
 }
 /*--------------------------------------------------------------------------*/
@@ -3870,7 +3871,8 @@ void MOD_resistor::precalc_last()
   c->precalc_analog(this);
   if(subckt()){
     if(HS_PARAM const* h = hsparam()){
-      h->export_to(subckt()->params());
+      PARAM_LIST const* s = scope()->params();
+      h->precalc_hierarchy(s, subckt()->params());
     }else{ untested();
     }
     subckt()->precalc_last();
@@ -5900,7 +5902,8 @@ void MOD_capacitor::precalc_last()
   c->precalc_analog(this);
   if(subckt()){
     if(HS_PARAM const* h = hsparam()){
-      h->export_to(subckt()->params());
+      PARAM_LIST const* s = scope()->params();
+      h->precalc_hierarchy(s, subckt()->params());
     }else{ untested();
     }
     subckt()->precalc_last();
@@ -6982,7 +6985,8 @@ void MOD_capacitor::precalc_last()
   c->precalc_analog(this);
   if(subckt()){
     if(HS_PARAM const* h = hsparam()){
-      h->export_to(subckt()->params());
+      PARAM_LIST const* s = scope()->params();
+      h->precalc_hierarchy(s, subckt()->params());
     }else{ untested();
     }
     subckt()->precalc_last();
