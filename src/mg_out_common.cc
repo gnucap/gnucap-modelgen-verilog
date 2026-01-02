@@ -42,8 +42,7 @@ static void make_common_default_constructor(std::ostream& o, const Module& d)
 //  }
   o <<
     "\n"
-    "{\n"
-    "  ++_count;\n";
+    "{\n";
 //  for (Parameter_1_List::const_iterator
 //       p = d.common().override().begin();
 //       p != d.common().override().end();
@@ -87,8 +86,7 @@ static void make_common_copy_constructor(std::ostream& o, const Module& d)
 //  }
   o << 
     "\n"
-    "{\n"
-    "  ++_count;\n";
+    "{\n";
 //  for (Parameter_1_List::const_iterator
 //       p = d.common().override().begin();
 //       p != d.common().override().end();
@@ -113,7 +111,6 @@ static void make_common_destructor(std::ostream& o, const Module& d)
 //     o << "  detach_common(&_" << (**p).name() << ");\n";
 //   }
   o <<
-    "  --_count;\n"
 //    "  delete _sdp;\n"
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";

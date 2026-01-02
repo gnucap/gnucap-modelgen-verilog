@@ -367,7 +367,6 @@ void make_module_default_constructor(std::ostream& o, const Module& m)
   o << "    :" << baseclass(m) << "()";
   o << "\n{\n"
     "  attach_common(&Default_" << m.identifier() << ");\n"
-    "  ++_count;\n"
     "  set_owner(nullptr);\n";
 
   make_build_netlist(o, m);
@@ -1364,7 +1363,6 @@ void make_cc_module(std::ostream& o, const Module& m)
   make_cc_decl(o, m);
   make_cc_common(o, m);
   o <<
-      "int COMMON_" << m.identifier() << "::_count = -1;\n"
       "static COMMON_" << m.identifier() << " Default_" << m.identifier()
 	<< "(CC_STATIC);\n"
       "/*--------------------------------------"
@@ -1377,7 +1375,6 @@ void make_cc_module(std::ostream& o, const Module& m)
       "/*--------------------------------------"
       "------------------------------------*/\n";
   make_module_class(o, m);
-    o << "int MOD_" << m.identifier() << "::_count = -1;\n";
   make_module_dispatcher(o, m);
   make_module_clone(o, m);
 //  make_module_evals(o, m);
