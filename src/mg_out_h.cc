@@ -292,8 +292,9 @@ static void make_common(std::ostream& o, const Module& m)
   }else{
   }
   declare_ddouble(o, m);
+  o << "private:\n";
+  o__ "explicit " << class_name << "(const " << class_name << "& p) = default;\n";
   o << "public:\n";
-  o__ "explicit " << class_name << "(const " << class_name << "& p);\n";
   o__ "explicit " << class_name << "(int c=0);\n";
   o__ "         ~" << class_name << "();\n";
   o__ "bool     operator==(const COMMON_COMPONENT&)const override;\n";

@@ -63,6 +63,7 @@ static void make_common_default_constructor(std::ostream& o, const Module& d)
 /*--------------------------------------------------------------------------*/
 static void make_common_copy_constructor(std::ostream& o, const Module& d)
 {
+  o<< "#if 0\n";
   make_tag(o);
   o <<
     "COMMON_" << d.identifier() << "::COMMON_" << d.identifier() << "(const COMMON_" << d.identifier() << "& p)\n"
@@ -96,6 +97,7 @@ static void make_common_copy_constructor(std::ostream& o, const Module& d)
   o <<
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";
+  o << "#endif\n";
 }
 /*--------------------------------------------------------------------------*/
 static void make_common_destructor(std::ostream& o, const Module& d)

@@ -114,6 +114,11 @@ private:
   void make_cc_common_precalc(std::ostream& o)const override {
     o__ "_temp_k = temp_k(par_scope);\n";
   }
+  void make_cc_common_compare(std::ostream& o)const override { untested();
+    o__ "if(double tt = _temp_k - p->_temp_k){\n";
+    o____ "return tt>0?1:-1;\n";
+    o__ "}\n";
+  }
   void make_cc_common(std::ostream& o)const override {
     o__ "double _temp_k{0.};\n";
     o__ "double " << code_name() << "()const {\n";
@@ -144,6 +149,11 @@ private:
   }
   void make_cc_common_precalc(std::ostream& o)const override {
     o__ "_vt = P_K * temp_k(par_scope) / P_Q;\n";
+  }
+  void make_cc_common_compare(std::ostream& o)const override { untested();
+    o__ "if(double vtt = _vt - p->_vt){\n";
+    o____ "return vtt>0?1:-1;\n";
+    o__ "}\n";
   }
   void make_cc_common(std::ostream& o)const override {
     o__ "double _vt{0.};\n";
