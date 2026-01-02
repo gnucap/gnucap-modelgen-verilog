@@ -367,7 +367,6 @@ void make_module_default_constructor(std::ostream& o, const Module& m)
   o << "    :" << baseclass(m) << "()";
   o << "\n{\n"
     "  attach_common(&Default_" << m.identifier() << ");\n"
-    "  ++_count;\n"
     "  set_owner(nullptr);\n";
 
   make_build_netlist(o, m);
@@ -1052,7 +1051,7 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   make_tag(o);
   String_Arg const& mid = m.identifier();
   o << "void MOD_" << mid << "::precalc_last()\n{\n";
-//    o__ baseclass(m) << "::precalc_last();\n";
+//  o__ baseclass(m) << "::precalc_last();\n";
   o__ "COMPONENT::precalc_last();\n";
 
   // o__ "try {\n";
@@ -1093,7 +1092,8 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   }else{
   }
   o____ "if(HS_PARAM const* h = hsparam()){\n";
-  o______ "h->export_to(subckt()->params());\n";
+  o______ "PARAM_LIST const* s = scope()->params();\n";
+  o______ "h->precalc_hierarchy(s, subckt()->params());\n";
   o____ "}else{ untested();\n";
   o____ "}\n";
   o____ "subckt()->precalc_last();\n";
@@ -1363,7 +1363,6 @@ void make_cc_module(std::ostream& o, const Module& m)
   make_cc_decl(o, m);
   make_cc_common(o, m);
   o <<
-      "int COMMON_" << m.identifier() << "::_count = -1;\n"
       "static COMMON_" << m.identifier() << " Default_" << m.identifier()
 	<< "(CC_STATIC);\n"
       "/*--------------------------------------"
@@ -1376,7 +1375,6 @@ void make_cc_module(std::ostream& o, const Module& m)
       "/*--------------------------------------"
       "------------------------------------*/\n";
   make_module_class(o, m);
-    o << "int MOD_" << m.identifier() << "::_count = -1;\n";
   make_module_dispatcher(o, m);
   make_module_clone(o, m);
 //  make_module_evals(o, m);

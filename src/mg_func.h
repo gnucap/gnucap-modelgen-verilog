@@ -93,6 +93,8 @@ public: // non-virtual. TODO
 public: // code generation
   virtual void make_cc_impl(std::ostream&)const {}
   virtual void make_cc_common(std::ostream&)const {}
+  virtual void make_cc_common_precalc(std::ostream&)const {}
+  virtual void make_cc_common_compare(std::ostream&)const {}
   virtual void make_cc_dev(std::ostream&)const {}
   virtual void make_cc_tr_advance(std::ostream&)const {}
   virtual void make_cc_tr_review(std::ostream&)const {}

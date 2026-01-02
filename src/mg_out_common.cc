@@ -42,8 +42,7 @@ static void make_common_default_constructor(std::ostream& o, const Module& d)
 //  }
   o <<
     "\n"
-    "{\n"
-    "  ++_count;\n";
+    "{\n";
 //  for (Parameter_1_List::const_iterator
 //       p = d.common().override().begin();
 //       p != d.common().override().end();
@@ -64,6 +63,7 @@ static void make_common_default_constructor(std::ostream& o, const Module& d)
 /*--------------------------------------------------------------------------*/
 static void make_common_copy_constructor(std::ostream& o, const Module& d)
 {
+  o<< "#if 0\n";
   make_tag(o);
   o <<
     "COMMON_" << d.identifier() << "::COMMON_" << d.identifier() << "(const COMMON_" << d.identifier() << "& p)\n"
@@ -87,8 +87,7 @@ static void make_common_copy_constructor(std::ostream& o, const Module& d)
 //  }
   o << 
     "\n"
-    "{\n"
-    "  ++_count;\n";
+    "{\n";
 //  for (Parameter_1_List::const_iterator
 //       p = d.common().override().begin();
 //       p != d.common().override().end();
@@ -98,6 +97,7 @@ static void make_common_copy_constructor(std::ostream& o, const Module& d)
   o <<
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";
+  o << "#endif\n";
 }
 /*--------------------------------------------------------------------------*/
 static void make_common_destructor(std::ostream& o, const Module& d)
@@ -113,7 +113,6 @@ static void make_common_destructor(std::ostream& o, const Module& d)
 //     o << "  detach_common(&_" << (**p).name() << ");\n";
 //   }
   o <<
-    "  --_count;\n"
 //    "  delete _sdp;\n"
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";
@@ -658,6 +657,15 @@ static void make_common_expand(std::ostream& o , const Module& m)
   o__ "(void)pc;\n";
   make_final_adjust_eval_parameter_list(o , m.parameters());
   make_eval_netlist_parameters(o, m);
+
+  for(FUNCTION_ const* f : m.funcs()){
+    make_tag(o);
+    if(f->has_refs()){
+      f->make_cc_common_precalc(o);
+    }else{
+    }
+  }
+
   o__ "COMMON_COMPONENT::precalc_last(par_scope);\n";
     o << "}\n"
     "/*--------------------------------------------------------------------------*/\n";

@@ -1042,8 +1042,9 @@ class COMMON_resistor :public COMMON_COMPONENT{
     d_potential_b_white_noise_1_p_,
     d_potential_b_p_n,
      num_branches__  };
+private:
+  explicit COMMON_resistor(const COMMON_resistor& p) = default;
 public:
-  explicit COMMON_resistor(const COMMON_resistor& p);
   explicit COMMON_resistor(int c=0);
            ~COMMON_resistor();
   bool     operator==(const COMMON_COMPONENT&)const override;
@@ -1064,9 +1065,6 @@ public:
   void tr_regress_analog(MOD_resistor*)const;
   void precalc_analog(MOD_resistor*);
   std::string name()const override {itested();return "resistor";}
-    static int  count() {return _count;}
-private: // strictly internal
-  static int _count;
 public: // input parameters
   PARAMETER<real> _p_r /*  */;
   real _p___r /*  */;
@@ -1085,8 +1083,9 @@ private: // funcs
   bool param_given(PARA_BASE const& p)const {
     return p.has_hard_value();
   }
+  double _temp_k{0.};
   double f_temp()const {
-    return temp_k();
+    return _temp_k;
   }
 // Probe no refs: potential_p_n
 // Probe no refs: potential_white_noise_1_p_
@@ -1096,7 +1095,6 @@ class MOD_resistor : public BASE_SUBCKT {
   typedef MOD_resistor MOD;
   typedef COMMON_resistor COMMON;
 private:
-  static int _count;
 public:
   typedef ddouble_<2> ddouble;
   enum {
@@ -1218,20 +1216,19 @@ COMMON_resistor::COMMON_resistor(int c)
    _p___noisy(/*default*/),
    _p___tnom(/*default*/)
 {
-  ++_count;
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 COMMON_resistor::COMMON_resistor(const COMMON_resistor& p)
   :COMMON_COMPONENT(p),
    _p_r(p._p_r),
    _v_(p._v_)
 {
-  ++_count;
 }
 /*--------------------------------------------------------------------------*/
+#endif
 COMMON_resistor::~COMMON_resistor()
 {
-  --_count;
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_resistor::operator==(const COMMON_COMPONENT& x)const
@@ -1435,11 +1432,11 @@ void COMMON_resistor::precalc_last(const PARAM_LIST* par_scope)
     real def = real(t0.value());
     this->_p___tnom = def;
   }
+_temp_k = temp_k(par_scope);
   COMMON_COMPONENT::precalc_last(par_scope);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-int COMMON_resistor::_count = -1;
 static COMMON_resistor Default_resistor(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1469,7 +1466,6 @@ MOD_resistor::MOD_resistor()
     :BASE_SUBCKT()
 {
   attach_common(&Default_resistor);
-  ++_count;
   set_owner(nullptr);
   // build netlist
   // ports:2
@@ -2037,7 +2033,6 @@ inline void MOD_resistor::tr_regress()
     return names[i];
   }
 /*--------------------------------------------------------------------------*/
-int MOD_resistor::_count = -1;
 MOD_resistor m_resistor;
 DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "resistor", &m_resistor);
 /*--------------------------------------------------------------------------*/
@@ -2206,7 +2201,8 @@ void MOD_resistor::precalc_last()
   c->precalc_analog(this);
   if(subckt()){
     if(HS_PARAM const* h = hsparam()){
-      h->export_to(subckt()->params());
+      PARAM_LIST const* s = scope()->params();
+      h->precalc_hierarchy(s, subckt()->params());
     }else{ untested();
     }
     subckt()->precalc_last();
@@ -2258,8 +2254,9 @@ class COMMON_resistor :public COMMON_COMPONENT{
     d_potential_b_white_noise_0_p_,
     d_potential_b_p_n,
      num_branches__  };
+private:
+  explicit COMMON_resistor(const COMMON_resistor& p) = default;
 public:
-  explicit COMMON_resistor(const COMMON_resistor& p);
   explicit COMMON_resistor(int c=0);
            ~COMMON_resistor();
   bool     operator==(const COMMON_COMPONENT&)const override;
@@ -2280,9 +2277,6 @@ public:
   void tr_regress_analog(MOD_resistor*)const;
   void precalc_analog(MOD_resistor*);
   std::string name()const override {itested();return "resistor";}
-    static int  count() {return _count;}
-private: // strictly internal
-  static int _count;
 public: // input parameters
   PARAMETER<real> _p_r /*  */;
   PARAMETER<real> _p_tc1 /*  */, _p_tc2 /*  */;
@@ -2300,8 +2294,9 @@ private: // funcs
   bool param_given(PARA_BASE const& p)const {
     return p.has_hard_value();
   }
+  double _temp_k{0.};
   double f_temp()const {
-    return temp_k();
+    return _temp_k;
   }
 // Probe no refs: potential_p_n
 // Probe no refs: potential_white_noise_0_p_
@@ -2311,7 +2306,6 @@ class MOD_resistor : public BASE_SUBCKT {
   typedef MOD_resistor MOD;
   typedef COMMON_resistor COMMON;
 private:
-  static int _count;
 public:
   typedef ddouble_<2> ddouble;
   enum {
@@ -2433,9 +2427,9 @@ COMMON_resistor::COMMON_resistor(int c)
    _p_noisy(/*default*/),
    _p_tnom(/*default*/)
 {
-  ++_count;
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 COMMON_resistor::COMMON_resistor(const COMMON_resistor& p)
   :COMMON_COMPONENT(p),
    _p_r(p._p_r),
@@ -2445,12 +2439,11 @@ COMMON_resistor::COMMON_resistor(const COMMON_resistor& p)
    _p_tnom(p._p_tnom),
    _v_(p._v_)
 {
-  ++_count;
 }
 /*--------------------------------------------------------------------------*/
+#endif
 COMMON_resistor::~COMMON_resistor()
 {
-  --_count;
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_resistor::operator==(const COMMON_COMPONENT& x)const
@@ -2682,11 +2675,11 @@ void COMMON_resistor::precalc_last(const PARAM_LIST* par_scope)
     real def = real(t0.value());
     e_val(&(this->_p_tnom),     def , par_scope);
   }
+_temp_k = temp_k(par_scope);
   COMMON_COMPONENT::precalc_last(par_scope);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-int COMMON_resistor::_count = -1;
 static COMMON_resistor Default_resistor(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2715,7 +2708,6 @@ MOD_resistor::MOD_resistor()
     :BASE_SUBCKT()
 {
   attach_common(&Default_resistor);
-  ++_count;
   set_owner(nullptr);
   // build netlist
   // ports:2
@@ -3666,7 +3658,6 @@ inline void MOD_resistor::tr_regress()
     return names[i];
   }
 /*--------------------------------------------------------------------------*/
-int MOD_resistor::_count = -1;
 MOD_resistor m_resistor;
 DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "resistor", &m_resistor);
 /*--------------------------------------------------------------------------*/
@@ -3866,7 +3857,8 @@ void MOD_resistor::precalc_last()
   c->precalc_analog(this);
   if(subckt()){
     if(HS_PARAM const* h = hsparam()){
-      h->export_to(subckt()->params());
+      PARAM_LIST const* s = scope()->params();
+      h->precalc_hierarchy(s, subckt()->params());
     }else{ untested();
     }
     subckt()->precalc_last();
@@ -4954,8 +4946,9 @@ class COMMON_capacitor :public COMMON_COMPONENT{
     d_potential_b_ddt_1_p_,
     d_potential_b_p_n,
      num_branches__  };
+private:
+  explicit COMMON_capacitor(const COMMON_capacitor& p) = default;
 public:
-  explicit COMMON_capacitor(const COMMON_capacitor& p);
   explicit COMMON_capacitor(int c=0);
            ~COMMON_capacitor();
   bool     operator==(const COMMON_COMPONENT&)const override;
@@ -4978,9 +4971,6 @@ public:
   void tr_regress_analog(MOD_capacitor*)const;
   void precalc_analog(MOD_capacitor*);
   std::string name()const override {itested();return "capacitor";}
-    static int  count() {return _count;}
-private: // strictly internal
-  static int _count;
 public: // input parameters
   PARAMETER<real> _p_c /*  */;
   real _p___c /*  */;
@@ -5014,7 +5004,6 @@ class MOD_capacitor : public BASE_SUBCKT {
   typedef MOD_capacitor MOD;
   typedef COMMON_capacitor COMMON;
 private:
-  static int _count;
   bool _accept{false};
 public:
   typedef ddouble_<2> ddouble;
@@ -5164,20 +5153,19 @@ COMMON_capacitor::COMMON_capacitor(int c)
    _p___c(/*default*/),
    _p___ic(/*default*/)
 {
-  ++_count;
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 COMMON_capacitor::COMMON_capacitor(const COMMON_capacitor& p)
   :COMMON_COMPONENT(p),
    _p_c(p._p_c),
    _v_(p._v_)
 {
-  ++_count;
 }
 /*--------------------------------------------------------------------------*/
+#endif
 COMMON_capacitor::~COMMON_capacitor()
 {
-  --_count;
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_capacitor::operator==(const COMMON_COMPONENT& x)const
@@ -5346,7 +5334,6 @@ void COMMON_capacitor::precalc_last(const PARAM_LIST* par_scope)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-int COMMON_capacitor::_count = -1;
 static COMMON_capacitor Default_capacitor(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -5371,7 +5358,6 @@ MOD_capacitor::MOD_capacitor()
     :BASE_SUBCKT()
 {
   attach_common(&Default_capacitor);
-  ++_count;
   set_owner(nullptr);
   // build netlist
   // ports:2
@@ -5727,7 +5713,6 @@ inline void MOD_capacitor::tr_regress()
     return names[i];
   }
 /*--------------------------------------------------------------------------*/
-int MOD_capacitor::_count = -1;
 MOD_capacitor m_capacitor;
 DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "capacitor", &m_capacitor);
 /*--------------------------------------------------------------------------*/
@@ -5896,7 +5881,8 @@ void MOD_capacitor::precalc_last()
   c->precalc_analog(this);
   if(subckt()){
     if(HS_PARAM const* h = hsparam()){
-      h->export_to(subckt()->params());
+      PARAM_LIST const* s = scope()->params();
+      h->precalc_hierarchy(s, subckt()->params());
     }else{ untested();
     }
     subckt()->precalc_last();
@@ -5940,8 +5926,9 @@ class COMMON_capacitor :public COMMON_COMPONENT{
     d_potential_b_ddt_2_p_,
     d_potential_b_p_n,
      num_branches__  };
+private:
+  explicit COMMON_capacitor(const COMMON_capacitor& p) = default;
 public:
-  explicit COMMON_capacitor(const COMMON_capacitor& p);
   explicit COMMON_capacitor(int c=0);
            ~COMMON_capacitor();
   bool     operator==(const COMMON_COMPONENT&)const override;
@@ -5964,9 +5951,6 @@ public:
   void tr_regress_analog(MOD_capacitor*)const;
   void precalc_analog(MOD_capacitor*);
   std::string name()const override {itested();return "capacitor";}
-    static int  count() {return _count;}
-private: // strictly internal
-  static int _count;
 public: // input parameters
   PARAMETER<real> _p_c /*  */;
   PARAMETER<real> _p_ic /*  */;
@@ -6000,7 +5984,6 @@ class MOD_capacitor : public BASE_SUBCKT {
   typedef MOD_capacitor MOD;
   typedef COMMON_capacitor COMMON;
 private:
-  static int _count;
   bool _accept{false};
 public:
   typedef ddouble_<2> ddouble;
@@ -6160,21 +6143,20 @@ COMMON_capacitor::COMMON_capacitor(int c)
    _p___c(/*default*/),
    _p___ic(/*default*/)
 {
-  ++_count;
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 COMMON_capacitor::COMMON_capacitor(const COMMON_capacitor& p)
   :COMMON_COMPONENT(p),
    _p_c(p._p_c),
    _p_ic(p._p_ic),
    _v_(p._v_)
 {
-  ++_count;
 }
 /*--------------------------------------------------------------------------*/
+#endif
 COMMON_capacitor::~COMMON_capacitor()
 {
-  --_count;
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_capacitor::operator==(const COMMON_COMPONENT& x)const
@@ -6361,7 +6343,6 @@ void COMMON_capacitor::precalc_last(const PARAM_LIST* par_scope)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-int COMMON_capacitor::_count = -1;
 static COMMON_capacitor Default_capacitor(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -6386,7 +6367,6 @@ MOD_capacitor::MOD_capacitor()
     :BASE_SUBCKT()
 {
   attach_common(&Default_capacitor);
-  ++_count;
   set_owner(nullptr);
   // build netlist
   // ports:2
@@ -6809,7 +6789,6 @@ inline void MOD_capacitor::tr_regress()
     return names[i];
   }
 /*--------------------------------------------------------------------------*/
-int MOD_capacitor::_count = -1;
 MOD_capacitor m_capacitor;
 DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "capacitor", &m_capacitor);
 /*--------------------------------------------------------------------------*/
@@ -6978,7 +6957,8 @@ void MOD_capacitor::precalc_last()
   c->precalc_analog(this);
   if(subckt()){
     if(HS_PARAM const* h = hsparam()){
-      h->export_to(subckt()->params());
+      PARAM_LIST const* s = scope()->params();
+      h->precalc_hierarchy(s, subckt()->params());
     }else{ untested();
     }
     subckt()->precalc_last();

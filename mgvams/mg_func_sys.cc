@@ -111,9 +111,18 @@ private:
   void stack_op(Expression*)const override {
     throw Exception("invalid");
   }
+  void make_cc_common_precalc(std::ostream& o)const override {
+    o__ "_temp_k = temp_k(par_scope);\n";
+  }
+  void make_cc_common_compare(std::ostream& o)const override { untested();
+    o__ "if(double tt = _temp_k - p->_temp_k){\n";
+    o____ "return tt>0?1:-1;\n";
+    o__ "}\n";
+  }
   void make_cc_common(std::ostream& o)const override {
+    o__ "double _temp_k{0.};\n";
     o__ "double " << code_name() << "()const {\n";
-    o____ "return temp_k();\n";
+    o____ "return _temp_k;\n";
     o__ "}\n";
   }
 public:
@@ -138,9 +147,18 @@ private:
   std::string code_name()const override{
     return "_f_vt";
   }
+  void make_cc_common_precalc(std::ostream& o)const override {
+    o__ "_vt = P_K * temp_k(par_scope) / P_Q;\n";
+  }
+  void make_cc_common_compare(std::ostream& o)const override { untested();
+    o__ "if(double vtt = _vt - p->_vt){\n";
+    o____ "return vtt>0?1:-1;\n";
+    o__ "}\n";
+  }
   void make_cc_common(std::ostream& o)const override {
+    o__ "double _vt{0.};\n";
     o__ "double " << code_name() << "()const {\n";
-    o____ "return P_K * temp_k() / P_Q;\n";
+    o____ "return _vt;\n";
     o__ "}\n";
     o__ "double " << code_name() << "(double T)const {\n";
     o____ "assert(T>=-P_CELSIUS0);\n";

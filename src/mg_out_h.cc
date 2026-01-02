@@ -292,8 +292,9 @@ static void make_common(std::ostream& o, const Module& m)
   }else{
   }
   declare_ddouble(o, m);
+  o << "private:\n";
+  o__ "explicit " << class_name << "(const " << class_name << "& p) = default;\n";
   o << "public:\n";
-  o__ "explicit " << class_name << "(const " << class_name << "& p);\n";
   o__ "explicit " << class_name << "(int c=0);\n";
   o__ "         ~" << class_name << "();\n";
   o__ "bool     operator==(const COMMON_COMPONENT&)const override;\n";
@@ -339,10 +340,7 @@ static void make_common(std::ostream& o, const Module& m)
   o__ "std::string name()const override {itested();return \"" << m.identifier() << "\";}\n";
 //    "  const SDP_CARD* sdp()const {return _sdp;}\n"
 //    "  bool     has_sdp()const {untested();return _sdp;}\n"
-  o__ "  static int  count() {return _count;}\n"
-    "private: // strictly internal\n"
-    "  static int _count;\n"
-    "public: // input parameters\n";
+  o << "public: // input parameters\n";
   make_parameter_decl(o, m.parameters());
 //  out <<
 //    "public: // calculated parameters\n"
@@ -515,7 +513,6 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "typedef " << class_name << " MOD;\n";
   o__ "typedef " << common_name << " COMMON;\n";
   o << "private:\n";
-  o__ "static int _count;\n";
  // o__ "bool _eval{false};\n";
   if(m.has_tr_accept()){
     o__ "bool _accept{false};\n";
