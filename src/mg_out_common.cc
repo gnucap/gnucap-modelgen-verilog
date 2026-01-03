@@ -118,6 +118,27 @@ static void make_common_destructor(std::ostream& o, const Module& d)
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_common_operator_compare(std::ostream& o, const Module& d)
+{
+  make_tag(o);
+  o <<
+    "int COMMON_" << d.identifier() << "::compare(const COMMON_COMPONENT& x)const\n{\n"
+    "  const COMMON_" << d.identifier() << "* p = dynamic_cast<const COMMON_" << d.identifier() << "*>(&x);\n"
+    "  assert (p);\n";
+
+  for(FUNCTION_ const* f : d.funcs()){
+    make_tag(o);
+    if(f->has_refs()){
+      f->make_cc_common_compare(o);
+    }else{
+    }
+  }
+  o__ "return 0;\n";
+  o <<
+    "}\n"
+    "/*--------------------------------------------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
 static void make_common_operator_equal(std::ostream& o, const Module& d)
 {
   make_tag(o);
@@ -144,7 +165,7 @@ static void make_common_operator_equal(std::ostream& o, const Module& d)
     }
   }
   o << 
-//    "    && _sdp == p->_sdp\n"
+    "    && !compare(*p)\n" // kludge.
     "    && COMMON_COMPONENT::operator==(x));\n"
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";
@@ -715,6 +736,7 @@ void make_cc_common(std::ostream& o , const Module& m)
   make_common_default_constructor(o, m);
   make_common_copy_constructor(o, m);
   make_common_destructor(o, m);
+  make_common_operator_compare(o, m);
   make_common_operator_equal(o, m);
   make_common_set_param_by_index(o, m);
   make_common_set_param_by_name(o, m);

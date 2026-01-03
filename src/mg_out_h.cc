@@ -297,6 +297,7 @@ static void make_common(std::ostream& o, const Module& m)
   o << "public:\n";
   o__ "explicit " << class_name << "(int c=0);\n";
   o__ "         ~" << class_name << "();\n";
+  o__ "int      compare(const COMMON_COMPONENT&)const override;\n";
   o__ "bool     operator==(const COMMON_COMPONENT&)const override;\n";
   o__ "COMMON_COMPONENT* clone()const override {return new "<<class_name<<"(*this);}\n";
   o__ "void     set_param_by_index(int, std::string&, int)override;\n";
