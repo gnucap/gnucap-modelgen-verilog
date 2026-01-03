@@ -154,7 +154,7 @@ static void make_common_operator_equal(std::ostream& o, const Module& d)
        q = d.parameters().begin();
        q != d.parameters().end();
        ++q) {
-    if(!(*q)->is_local()) {
+    if(1 || !(*q)->is_local()) {
       for (Parameter_2_List::const_iterator
 	   p = (*q)->begin();
 	   p != (*q)->end();

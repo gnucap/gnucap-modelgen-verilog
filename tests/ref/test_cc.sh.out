@@ -1243,6 +1243,11 @@ bool COMMON_resistor::operator==(const COMMON_COMPONENT& x)const
   const COMMON_resistor* p = dynamic_cast<const COMMON_resistor*>(&x);
   return (p
     && _p_r == p->_p_r
+    && _p___r == p->_p___r
+    && _p___tc1 == p->_p___tc1
+    && _p___tc2 == p->_p___tc2
+    && _p___noisy == p->_p___noisy
+    && _p___tnom == p->_p___tnom
     && !compare(*p)
     && COMMON_COMPONENT::operator==(x));
 }
@@ -5205,6 +5210,8 @@ bool COMMON_capacitor::operator==(const COMMON_COMPONENT& x)const
   const COMMON_capacitor* p = dynamic_cast<const COMMON_capacitor*>(&x);
   return (p
     && _p_c == p->_p_c
+    && _p___c == p->_p___c
+    && _p___ic == p->_p___ic
     && !compare(*p)
     && COMMON_COMPONENT::operator==(x));
 }
@@ -6210,6 +6217,8 @@ bool COMMON_capacitor::operator==(const COMMON_COMPONENT& x)const
   return (p
     && _p_c == p->_p_c
     && _p_ic == p->_p_ic
+    && _p___c == p->_p___c
+    && _p___ic == p->_p___ic
     && !compare(*p)
     && COMMON_COMPONENT::operator==(x));
 }
