@@ -152,7 +152,7 @@ static void make_common_operator_equal(std::ostream& o, const Module& d)
 /*--------------------------------------------------------------------------*/
 void make_common_set_param_by_name(std::ostream& o, const Module& m)
 {
-  o << "aidx COMMON_" << m.identifier() << "::set_param_by_name("
+  o << "int COMMON_" << m.identifier() << "::set_param_by_name("
        "std::string Name, std::string Value)\n{\n";
   o__ "trace2(\"spbn " << m.identifier() << "\", Name, Value);\n";
 

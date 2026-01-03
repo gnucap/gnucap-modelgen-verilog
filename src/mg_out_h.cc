@@ -300,7 +300,7 @@ static void make_common(std::ostream& o, const Module& m)
   o__ "bool     operator==(const COMMON_COMPONENT&)const override;\n";
   o__ "COMMON_COMPONENT* clone()const override {return new "<<class_name<<"(*this);}\n";
   o__ "void     set_param_by_index(int, std::string&, int)override;\n";
-  o__ "aidx     set_param_by_name(std::string, std::string)override;\n";
+  o__ "int     set_param_by_name(std::string, std::string)override;\n";
   o__ "int      is_valid()const;\n";
   o__ "bool     param_is_printable(int)const override;\n";
   o__ "std::string param_name(int)const override;\n";
@@ -568,7 +568,7 @@ static void make_module(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 
   if(m.has_hsparam()){
-    o__ "aidx     set_param_by_name(std::string, std::string)override;\n";
+    o__ "int     set_param_by_name(std::string, std::string)override;\n";
   }else{
   }
   o__ "int is_valid()const override;\n";

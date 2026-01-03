@@ -1277,7 +1277,7 @@ static void make_cc_func(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 static void make_module_set_param_by_name(std::ostream& o, const Module& m)
 {
-  o << "aidx MOD_" << m.identifier() << "::set_param_by_name("
+  o << "int MOD_" << m.identifier() << "::set_param_by_name("
        "std::string Name, std::string Value)\n{\n";
   o__ "trace2(\"spbn " << m.identifier() << "\", Name, Value);\n";
 
