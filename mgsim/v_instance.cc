@@ -63,7 +63,11 @@ public:
 public:
   DEV_INSTANCE_PROTO* _proto{nullptr};
 };
-static COMMON_INSTANCE Default_SUBCKT(CC_STATIC);
+static COMMON_INSTANCE* Default_SUBCKT()
+{
+  static COMMON_INSTANCE ci(CC_STATIC);
+  return &ci;
+}
 /*--------------------------------------------------------------------------*/
 // looks like INSTANCE from d_subckt.cc, but isnt.
 // this one is never part of a simulation, because of deflation.
@@ -610,7 +614,7 @@ INSTANCE::INSTANCE()
   ,_proto(nullptr)
   ,_node_capacity(0)
 {
-  attach_common(&Default_SUBCKT);
+  attach_common(Default_SUBCKT());
   assert(_n == nullptr);
   ++_count;
 }

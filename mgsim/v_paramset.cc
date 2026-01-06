@@ -33,7 +33,10 @@ const int node_capacity_floor = 2;
 /*--------------------------------------------------------------------------*/
 static const std::string IS_VALID = "_..is_valid";
 /*--------------------------------------------------------------------------*/
-static COMMON_PARAMLIST Default_PARAMSET(CC_STATIC);
+COMMON_PARAMLIST& Default_PARAMSET(){
+  static COMMON_PARAMLIST cp(CC_STATIC);
+  return cp;
+}
 /*--------------------------------------------------------------------------*/
 // from u_lang.cc, cut down a bit.
 static CARD const* find_proto(const std::string& Name, const CARD* Scope)
@@ -271,7 +274,7 @@ PARAMSET::PARAMSET()
   ,_parent(NULL)
   ,_dev(NULL)
 {
-  attach_common(&Default_PARAMSET);
+  attach_common(&Default_PARAMSET());
 }
 /*--------------------------------------------------------------------------*/
 PARAMSET::PARAMSET(PARAMSET const& p)
