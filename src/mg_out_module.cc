@@ -366,7 +366,7 @@ void make_module_default_constructor(std::ostream& o, const Module& m)
   o << "MOD_" << m.identifier() << "::MOD_" << m.identifier() << "()\n";
   o << "    :" << baseclass(m) << "()";
   o << "\n{\n"
-    "  attach_common(&Default_" << m.identifier() << ");\n"
+    "  attach_common(&Default_" << m.identifier() << "());\n"
     "  set_owner(nullptr);\n";
 
   make_build_netlist(o, m);
@@ -1277,7 +1277,7 @@ static void make_cc_func(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 static void make_module_set_param_by_name(std::ostream& o, const Module& m)
 {
-  o << "aidx MOD_" << m.identifier() << "::set_param_by_name("
+  o << "int MOD_" << m.identifier() << "::set_param_by_name("
        "std::string Name, std::string Value)\n{\n";
   o__ "trace2(\"spbn " << m.identifier() << "\", Name, Value);\n";
 
@@ -1363,8 +1363,10 @@ void make_cc_module(std::ostream& o, const Module& m)
   make_cc_decl(o, m);
   make_cc_common(o, m);
   o <<
-      "static COMMON_" << m.identifier() << " Default_" << m.identifier()
-	<< "(CC_STATIC);\n"
+      "COMMON_" << m.identifier() << "& Default_" << m.identifier() << "()\n{\n"
+      "  static COMMON_" << m.identifier() << " d(CC_STATIC);\n"
+      "  return d;\n"
+      "}\n"
       "/*--------------------------------------"
       "------------------------------------*/\n";
   o <<

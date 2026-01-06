@@ -42,10 +42,6 @@
 #include <e_storag.h>
 #include <e_base.h> // CKT_BASE
 #include <u_sim_data.h> // see simparam
-
-// attribute index
-typedef int aidx;
-
 /*--------------------------------------------------------------------------*/
 inline int simulatorVersion()
 {
@@ -1047,10 +1043,11 @@ private:
 public:
   explicit COMMON_resistor(int c=0);
            ~COMMON_resistor();
+  int      compare(const COMMON_COMPONENT&)const override;
   bool     operator==(const COMMON_COMPONENT&)const override;
   COMMON_COMPONENT* clone()const override {return new COMMON_resistor(*this);}
   void     set_param_by_index(int, std::string&, int)override;
-  aidx     set_param_by_name(std::string, std::string)override;
+  int     set_param_by_name(std::string, std::string)override;
   int      is_valid()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
@@ -1231,11 +1228,27 @@ COMMON_resistor::~COMMON_resistor()
 {
 }
 /*--------------------------------------------------------------------------*/
+int COMMON_resistor::compare(const COMMON_COMPONENT& x)const
+{
+  const COMMON_resistor* p = dynamic_cast<const COMMON_resistor*>(&x);
+  assert (p);
+if(double tt = _temp_k - p->_temp_k){
+  return tt>0?1:-1;
+}
+  return 0;
+}
+/*--------------------------------------------------------------------------*/
 bool COMMON_resistor::operator==(const COMMON_COMPONENT& x)const
 {
   const COMMON_resistor* p = dynamic_cast<const COMMON_resistor*>(&x);
   return (p
     && _p_r == p->_p_r
+    && _p___r == p->_p___r
+    && _p___tc1 == p->_p___tc1
+    && _p___tc2 == p->_p___tc2
+    && _p___noisy == p->_p___noisy
+    && _p___tnom == p->_p___tnom
+    && !compare(*p)
     && COMMON_COMPONENT::operator==(x));
 }
 /*--------------------------------------------------------------------------*/
@@ -1248,7 +1261,7 @@ void COMMON_resistor::set_param_by_index(int I, std::string& Value, int /*Offset
   (void) Value;
 }
 /*--------------------------------------------------------------------------*/
-aidx COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
+int COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
 {
   trace2("spbn resistor", Name, Value);
   {
@@ -1437,7 +1450,11 @@ _temp_k = temp_k(par_scope);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-static COMMON_resistor Default_resistor(CC_STATIC);
+COMMON_resistor& Default_resistor()
+{
+  static COMMON_resistor d(CC_STATIC);
+  return d;
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1465,7 +1482,7 @@ inline void MOD_resistor::read_probes()
 MOD_resistor::MOD_resistor()
     :BASE_SUBCKT()
 {
-  attach_common(&Default_resistor);
+  attach_common(&Default_resistor());
   set_owner(nullptr);
   // build netlist
   // ports:2
@@ -2259,10 +2276,11 @@ private:
 public:
   explicit COMMON_resistor(int c=0);
            ~COMMON_resistor();
+  int      compare(const COMMON_COMPONENT&)const override;
   bool     operator==(const COMMON_COMPONENT&)const override;
   COMMON_COMPONENT* clone()const override {return new COMMON_resistor(*this);}
   void     set_param_by_index(int, std::string&, int)override;
-  aidx     set_param_by_name(std::string, std::string)override;
+  int     set_param_by_name(std::string, std::string)override;
   int      is_valid()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
@@ -2343,7 +2361,7 @@ public:
   explicit MOD_resistor(); // : BASE_SUBCKT() { _n = _nodes; }
   CARD* clone()const override;
 private: // overrides
-  aidx     set_param_by_name(std::string, std::string)override;
+  int     set_param_by_name(std::string, std::string)override;
   int is_valid()const override;
   void precalc_first()override;
   void expand()override;
@@ -2446,6 +2464,16 @@ COMMON_resistor::~COMMON_resistor()
 {
 }
 /*--------------------------------------------------------------------------*/
+int COMMON_resistor::compare(const COMMON_COMPONENT& x)const
+{
+  const COMMON_resistor* p = dynamic_cast<const COMMON_resistor*>(&x);
+  assert (p);
+if(double tt = _temp_k - p->_temp_k){
+  return tt>0?1:-1;
+}
+  return 0;
+}
+/*--------------------------------------------------------------------------*/
 bool COMMON_resistor::operator==(const COMMON_COMPONENT& x)const
 {
   const COMMON_resistor* p = dynamic_cast<const COMMON_resistor*>(&x);
@@ -2455,6 +2483,7 @@ bool COMMON_resistor::operator==(const COMMON_COMPONENT& x)const
     && _p_tc2 == p->_p_tc2
     && _p_noisy == p->_p_noisy
     && _p_tnom == p->_p_tnom
+    && !compare(*p)
     && COMMON_COMPONENT::operator==(x));
 }
 /*--------------------------------------------------------------------------*/
@@ -2471,7 +2500,7 @@ void COMMON_resistor::set_param_by_index(int I, std::string& Value, int /*Offset
   (void) Value;
 }
 /*--------------------------------------------------------------------------*/
-aidx COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
+int COMMON_resistor::set_param_by_name(std::string Name, std::string Value)
 {
   trace2("spbn resistor", Name, Value);
   {
@@ -2680,7 +2709,11 @@ _temp_k = temp_k(par_scope);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-static COMMON_resistor Default_resistor(CC_STATIC);
+COMMON_resistor& Default_resistor()
+{
+  static COMMON_resistor d(CC_STATIC);
+  return d;
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2707,7 +2740,7 @@ inline void MOD_resistor::read_probes()
 MOD_resistor::MOD_resistor()
     :BASE_SUBCKT()
 {
-  attach_common(&Default_resistor);
+  attach_common(&Default_resistor());
   set_owner(nullptr);
   // build netlist
   // ports:2
@@ -3675,7 +3708,7 @@ MOD_resistor::MOD_resistor(MOD_resistor const&p) : BASE_SUBCKT(p)
     }
 }
 /*--------------------------------------------------------------------------*/
-aidx MOD_resistor::set_param_by_name(std::string Name, std::string Value)
+int MOD_resistor::set_param_by_name(std::string Name, std::string Value)
 {
   trace2("spbn resistor", Name, Value);
   {
@@ -3946,10 +3979,6 @@ ddouble MOD_resistor::_b_white_noise_0__precalc(ddouble, std::string what) {
 #include <e_storag.h>
 #include <e_base.h> // CKT_BASE
 #include <u_sim_data.h> // see simparam
-
-// attribute index
-typedef int aidx;
-
 /*--------------------------------------------------------------------------*/
 inline int simulatorVersion()
 {
@@ -4951,10 +4980,11 @@ private:
 public:
   explicit COMMON_capacitor(int c=0);
            ~COMMON_capacitor();
+  int      compare(const COMMON_COMPONENT&)const override;
   bool     operator==(const COMMON_COMPONENT&)const override;
   COMMON_COMPONENT* clone()const override {return new COMMON_capacitor(*this);}
   void     set_param_by_index(int, std::string&, int)override;
-  aidx     set_param_by_name(std::string, std::string)override;
+  int     set_param_by_name(std::string, std::string)override;
   int      is_valid()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
@@ -5168,11 +5198,21 @@ COMMON_capacitor::~COMMON_capacitor()
 {
 }
 /*--------------------------------------------------------------------------*/
+int COMMON_capacitor::compare(const COMMON_COMPONENT& x)const
+{
+  const COMMON_capacitor* p = dynamic_cast<const COMMON_capacitor*>(&x);
+  assert (p);
+  return 0;
+}
+/*--------------------------------------------------------------------------*/
 bool COMMON_capacitor::operator==(const COMMON_COMPONENT& x)const
 {
   const COMMON_capacitor* p = dynamic_cast<const COMMON_capacitor*>(&x);
   return (p
     && _p_c == p->_p_c
+    && _p___c == p->_p___c
+    && _p___ic == p->_p___ic
+    && !compare(*p)
     && COMMON_COMPONENT::operator==(x));
 }
 /*--------------------------------------------------------------------------*/
@@ -5185,7 +5225,7 @@ void COMMON_capacitor::set_param_by_index(int I, std::string& Value, int /*Offse
   (void) Value;
 }
 /*--------------------------------------------------------------------------*/
-aidx COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
+int COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
 {
   trace2("spbn capacitor", Name, Value);
   {
@@ -5334,7 +5374,11 @@ void COMMON_capacitor::precalc_last(const PARAM_LIST* par_scope)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-static COMMON_capacitor Default_capacitor(CC_STATIC);
+COMMON_capacitor& Default_capacitor()
+{
+  static COMMON_capacitor d(CC_STATIC);
+  return d;
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -5357,7 +5401,7 @@ inline void MOD_capacitor::read_probes()
 MOD_capacitor::MOD_capacitor()
     :BASE_SUBCKT()
 {
-  attach_common(&Default_capacitor);
+  attach_common(&Default_capacitor());
   set_owner(nullptr);
   // build netlist
   // ports:2
@@ -5931,10 +5975,11 @@ private:
 public:
   explicit COMMON_capacitor(int c=0);
            ~COMMON_capacitor();
+  int      compare(const COMMON_COMPONENT&)const override;
   bool     operator==(const COMMON_COMPONENT&)const override;
   COMMON_COMPONENT* clone()const override {return new COMMON_capacitor(*this);}
   void     set_param_by_index(int, std::string&, int)override;
-  aidx     set_param_by_name(std::string, std::string)override;
+  int     set_param_by_name(std::string, std::string)override;
   int      is_valid()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
@@ -6159,12 +6204,22 @@ COMMON_capacitor::~COMMON_capacitor()
 {
 }
 /*--------------------------------------------------------------------------*/
+int COMMON_capacitor::compare(const COMMON_COMPONENT& x)const
+{
+  const COMMON_capacitor* p = dynamic_cast<const COMMON_capacitor*>(&x);
+  assert (p);
+  return 0;
+}
+/*--------------------------------------------------------------------------*/
 bool COMMON_capacitor::operator==(const COMMON_COMPONENT& x)const
 {
   const COMMON_capacitor* p = dynamic_cast<const COMMON_capacitor*>(&x);
   return (p
     && _p_c == p->_p_c
     && _p_ic == p->_p_ic
+    && _p___c == p->_p___c
+    && _p___ic == p->_p___ic
+    && !compare(*p)
     && COMMON_COMPONENT::operator==(x));
 }
 /*--------------------------------------------------------------------------*/
@@ -6178,7 +6233,7 @@ void COMMON_capacitor::set_param_by_index(int I, std::string& Value, int /*Offse
   (void) Value;
 }
 /*--------------------------------------------------------------------------*/
-aidx COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
+int COMMON_capacitor::set_param_by_name(std::string Name, std::string Value)
 {
   trace2("spbn capacitor", Name, Value);
   {
@@ -6343,7 +6398,11 @@ void COMMON_capacitor::precalc_last(const PARAM_LIST* par_scope)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-static COMMON_capacitor Default_capacitor(CC_STATIC);
+COMMON_capacitor& Default_capacitor()
+{
+  static COMMON_capacitor d(CC_STATIC);
+  return d;
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -6366,7 +6425,7 @@ inline void MOD_capacitor::read_probes()
 MOD_capacitor::MOD_capacitor()
     :BASE_SUBCKT()
 {
-  attach_common(&Default_capacitor);
+  attach_common(&Default_capacitor());
   set_owner(nullptr);
   // build netlist
   // ports:2
