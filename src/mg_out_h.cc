@@ -314,6 +314,7 @@ static void make_common(std::ostream& o, const Module& m)
   o____ "return " << class_name << "::operator<=>(x) < 0;\n";
   o__ "}\n";
   o__ "int      operator<=>(const COMMON_COMPONENT&)const;\n";
+  o__ "bool     has_less()const override {return true;}\n";
   o << "#else\n";
   o__ "int      compare(const COMMON_COMPONENT&)const override;\n";
   o__ "bool     operator==(const COMMON_COMPONENT&)const override;\n";

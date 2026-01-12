@@ -123,6 +123,10 @@ static void make_common_operator_threeway(std::ostream& o, const Module& d)
   make_tag(o);
   o <<
     "int COMMON_" << d.identifier() << "::operator<=>(const COMMON_COMPONENT& x) const\n{\n";
+  o__ "if(this == &x){\n";
+  o____ "return 0;\n";
+  o__ "}else{\n";
+  o__ "}\n";
   o__ "std::type_index a(typeid(*this));\n";
   o__ "std::type_index b(typeid(x));\n";
   o__ "if(a < b){\n";
@@ -203,6 +207,11 @@ static void make_common_operator_compare(std::ostream& o, const Module& d)
     "int COMMON_" << d.identifier() << "::compare(const COMMON_COMPONENT& x)const\n{\n"
     "  const COMMON_" << d.identifier() << "* p = dynamic_cast<const COMMON_" << d.identifier() << "*>(&x);\n"
     "  assert (p);\n";
+
+  o__ "if(this == &x){\n";
+  o____ "return 0;\n";
+  o__ "}else{\n";
+  o__ "}\n";
 
   for(FUNCTION_ const* f : d.funcs()){
     make_tag(o);

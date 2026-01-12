@@ -1045,6 +1045,7 @@ public:
     return COMMON_resistor::operator<=>(x) < 0;
   }
   int      operator<=>(const COMMON_COMPONENT&)const;
+  bool     has_less()const override {return true;}
 #else
   int      compare(const COMMON_COMPONENT&)const override;
   bool     operator==(const COMMON_COMPONENT&)const override;
@@ -1248,6 +1249,10 @@ COMMON_resistor::~COMMON_resistor()
 #if __cplusplus >= 202002L
 int COMMON_resistor::operator<=>(const COMMON_COMPONENT& x) const
 {
+  if(this == &x){
+    return 0;
+  }else{
+  }
   std::type_index a(typeid(*this));
   std::type_index b(typeid(x));
   if(a < b){
@@ -1308,6 +1313,10 @@ int COMMON_resistor::compare(const COMMON_COMPONENT& x)const
 {
   const COMMON_resistor* p = dynamic_cast<const COMMON_resistor*>(&x);
   assert (p);
+  if(this == &x){
+    return 0;
+  }else{
+  }
 if(double tt = _temp_k - p->_temp_k){
   return tt>0?1:-1;
 }
@@ -2373,6 +2382,7 @@ public:
     return COMMON_resistor::operator<=>(x) < 0;
   }
   int      operator<=>(const COMMON_COMPONENT&)const;
+  bool     has_less()const override {return true;}
 #else
   int      compare(const COMMON_COMPONENT&)const override;
   bool     operator==(const COMMON_COMPONENT&)const override;
@@ -2579,6 +2589,10 @@ COMMON_resistor::~COMMON_resistor()
 #if __cplusplus >= 202002L
 int COMMON_resistor::operator<=>(const COMMON_COMPONENT& x) const
 {
+  if(this == &x){
+    return 0;
+  }else{
+  }
   std::type_index a(typeid(*this));
   std::type_index b(typeid(x));
   if(a < b){
@@ -2627,6 +2641,10 @@ int COMMON_resistor::compare(const COMMON_COMPONENT& x)const
 {
   const COMMON_resistor* p = dynamic_cast<const COMMON_resistor*>(&x);
   assert (p);
+  if(this == &x){
+    return 0;
+  }else{
+  }
 if(double tt = _temp_k - p->_temp_k){
   return tt>0?1:-1;
 }
@@ -5154,6 +5172,7 @@ public:
     return COMMON_capacitor::operator<=>(x) < 0;
   }
   int      operator<=>(const COMMON_COMPONENT&)const;
+  bool     has_less()const override {return true;}
 #else
   int      compare(const COMMON_COMPONENT&)const override;
   bool     operator==(const COMMON_COMPONENT&)const override;
@@ -5384,6 +5403,10 @@ COMMON_capacitor::~COMMON_capacitor()
 #if __cplusplus >= 202002L
 int COMMON_capacitor::operator<=>(const COMMON_COMPONENT& x) const
 {
+  if(this == &x){
+    return 0;
+  }else{
+  }
   std::type_index a(typeid(*this));
   std::type_index b(typeid(x));
   if(a < b){
@@ -5429,6 +5452,10 @@ int COMMON_capacitor::compare(const COMMON_COMPONENT& x)const
 {
   const COMMON_capacitor* p = dynamic_cast<const COMMON_capacitor*>(&x);
   assert (p);
+  if(this == &x){
+    return 0;
+  }else{
+  }
   return 0;
 }
 /*--------------------------------------------------------------------------*/
@@ -6223,6 +6250,7 @@ public:
     return COMMON_capacitor::operator<=>(x) < 0;
   }
   int      operator<=>(const COMMON_COMPONENT&)const;
+  bool     has_less()const override {return true;}
 #else
   int      compare(const COMMON_COMPONENT&)const override;
   bool     operator==(const COMMON_COMPONENT&)const override;
@@ -6464,6 +6492,10 @@ COMMON_capacitor::~COMMON_capacitor()
 #if __cplusplus >= 202002L
 int COMMON_capacitor::operator<=>(const COMMON_COMPONENT& x) const
 {
+  if(this == &x){
+    return 0;
+  }else{
+  }
   std::type_index a(typeid(*this));
   std::type_index b(typeid(x));
   if(a < b){
@@ -6511,6 +6543,10 @@ int COMMON_capacitor::compare(const COMMON_COMPONENT& x)const
 {
   const COMMON_capacitor* p = dynamic_cast<const COMMON_capacitor*>(&x);
   assert (p);
+  if(this == &x){
+    return 0;
+  }else{
+  }
   return 0;
 }
 /*--------------------------------------------------------------------------*/
