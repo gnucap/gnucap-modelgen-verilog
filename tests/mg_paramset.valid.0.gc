@@ -1,0 +1,40 @@
+
+attach ./modelgen_1.so
+options trace
+
+verilog
+
+`modelgen
+module base(p, n);
+  electrical p, n;
+  parameter integer i = 0;
+  analog begin
+    V(p,n) <+ i;
+  end
+endmodule
+paramset test_psv0 base
+  parameter string s = "A" from '{"A", "B"};
+  .i(1);
+endparamset
+paramset test_psv0 base
+  parameter string s = "X" from '{"C", "D"};
+  .i(2);
+endparamset
+`endmodelgen
+
+!make test_psv0.so > /dev/null
+attach ./test_psv0.so
+
+verilog
+
+module main(a, c);
+  ground \0;
+  test_psv0 #(.s("A")) a(a , \0 );
+  test_psv0 #(.s("C")) b(c , \0 );
+endmodule
+
+main m(a,c);
+
+print dc v(nodes)
+dc
+status notime

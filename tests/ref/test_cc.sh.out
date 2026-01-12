@@ -81,6 +81,7 @@ namespace{
 
 typedef double real;
 typedef int integer;
+typedef vString string;
 // double inf = std::numeric_limits<double>::infinity();
 #define inf std::numeric_limits<double>::infinity()
 #define Inf inf
@@ -4018,6 +4019,7 @@ namespace{
 
 typedef double real;
 typedef int integer;
+typedef vString string;
 // double inf = std::numeric_limits<double>::infinity();
 #define inf std::numeric_limits<double>::infinity()
 #define Inf inf

@@ -302,14 +302,16 @@ void Data_Type::parse(CS& file)
     _type = t_real;
   }else if(file.umatch("integer")){
     _type = t_int;
+  }else if(file.umatch("string")){
+    _type = t_string;
   }else{
-    throw Exception_CS_("need \"real\", \"integer\"\n", file);
+    throw Exception_CS_("need \"real\", \"integer\", \"string\"\n", file);
   }
 }
 /*--------------------------------------------------------------------------*/
 void Data_Type::dump(std::ostream& o)const
 {
-  static std::string names[] = {"unknown", "real", "integer"};
+  static std::string names[] = {"unknown", "real", "integer", "string"};
   o << names[_type];
 }
 /*--------------------------------------------------------------------------*/
@@ -993,6 +995,40 @@ void ValueRangeInterval::dump(std::ostream& o)const
   }
 }
 /*--------------------------------------------------------------------------*/
+// ValueRangeArray??
+void ValueRangeStrings::parse(CS& file)
+{
+  trace1("ValueRangeStrings::parse", file.tail().substr(0,20));
+
+  // use array parse?
+  if(file >> '{') {
+  }else{
+    throw Exception_CS_("need '{'", file);
+  }
+  while(file.peek() == '"'){
+    auto v = new vString(file);
+    _array.push_back(v);
+    file >> ',';
+  }
+  if(file >> '}') {
+  }else{
+    throw Exception_CS_("need '}'", file);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void ValueRangeStrings::dump(std::ostream& o)const
+{
+  // BUG? escape properly
+  std::string sep;
+  o << "'{";
+  for(auto s : _array){
+    assert(s);
+    o << sep << "\"" << *s << "\"";
+    sep = ", ";
+  }
+  o << "}";
+}
+/*--------------------------------------------------------------------------*/
 void ValueRange::parse(CS& file)
 {
   assert(owner());
@@ -1002,9 +1038,15 @@ void ValueRange::parse(CS& file)
       _what = new ValueRangeInterval;
       _what->set_owner(owner());
       file >> *_what;
+    }else if(file >> "'"){
+      // _what = new ValueRangeArray?
+      _what = new ValueRangeStrings;
+      _what->set_owner(owner());
+      file >> *_what;
     }else{ untested();
       incomplete();
     }
+    trace1("ValueRange::parse from ", file.tail().substr(0,10));
   }else if(file >> "exclude"){
     _type = vr_EXCLUDE;
     if(file >> "[" || file >> "("){ untested();

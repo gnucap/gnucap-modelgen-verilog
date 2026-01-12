@@ -1,0 +1,29 @@
+>>>>>verilog 
+>>>>>`modelgen
+>>>>>!make test_psv0.so > /dev/null
+>>>>>attach ./test_psv0.so
+>>>>>verilog
+>>>>>module main(a, c);
+>>>>>  ground \0;
+>>>>>print dc v(nodes)
+m: main from top level
+m: 1 candidate found for main
+main.a: test_psv0 from device_dispatcher
+main.a: test_psv0:0 from device_dispatcher
+main.a: 2 candidates found for test_psv0
+main.b: test_psv0 from device_dispatcher
+main.b: test_psv0:0 from device_dispatcher
+main.b: 2 candidates found for test_psv0
+m.a:p0 invalid: s is not "from '{"C", "D"}"
+m.a dropped invalid candidate.
+m.b:p1 invalid: s is not "from '{"A", "B"}"
+m.b dropped invalid candidate.
+>>>>>dc
+#           v(a)       v(c)      
+ 0.         1.         2.        
+>>>>>status notime
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=3
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=50.0%, ac density=50.0%

@@ -69,6 +69,7 @@ namespace{
 
 typedef double real;
 typedef int integer;
+typedef vString string;
 // double inf = std::numeric_limits<double>::infinity();
 #define inf std::numeric_limits<double>::infinity()
 #define Inf inf
@@ -207,7 +208,7 @@ public:
   bool operator>(int const& o)const {
     return *_data > o;
   }
-  bool operator>(PARAMETER<double> const& o)const { untested();
+  bool operator>(PARAMETER<double> const& o)const {
     return *_data > double(o);
   }
 

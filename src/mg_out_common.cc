@@ -439,10 +439,13 @@ static void make_param_eval_range(std::ostream& o, ValueRange const& p)
 static void make_param_check_range(std::ostream& o, ValueRange const& p,
     std::string const& n, std::string const& nn)
 {
+  std::string q;
   o__ "if(";
   if(p.is_from()){
     o << "!";
+    q = "from";
   }else if(p.is_exclude()){
+    q = "exclude";
   }else{ untested();
     unreachable();
   }
@@ -461,7 +464,22 @@ static void make_param_check_range(std::ostream& o, ValueRange const& p,
 	o << "ub)";
 	o << "){\n";
 	o______ "throw Exception_OutOfRange_(\"" << nn << "\","
-		<< "\"from \" + to_string(lb) + \" ..\" + to_string(ub));\n";
+		<< "\"" << q << " \" + to_string(lb) + \" ..\" + to_string(ub));\n";
+  }else if(auto s = dynamic_cast<ValueRangeStrings const*>(spec)){
+    o << "(ONE_OF";
+    for(auto ss : s->strings()){
+      assert(ss);
+      o << "|| (" << n << " == vString(std::string(\"" << *ss << "\")))";
+    }
+    o << ")){\n";
+    o______ "throw Exception_OutOfRange_(\"" << nn << "\","
+            << "\"" << q << " '{";
+    std::string sep;
+    for(auto ss : s->strings()){
+      o << sep << "\\\"" << *ss << "\\\"";
+      sep = ", ";
+    }
+    o << "}\");\n"; // BUG? evaluate c->expr?
   }else if(auto c = dynamic_cast<ValueRangeConstant const*>(spec)){
     o << "(" << c->expr() << "==" << n << ")";
 	o << "){\n";
@@ -472,9 +490,9 @@ static void make_param_check_range(std::ostream& o, ValueRange const& p,
     incomplete();
     assert(false);
   }
-	o____ "}else{\n";
-	o____ "}\n";
-	o__ "}\n";
+  o____ "}else{\n";
+  o____ "}\n";
+  o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
 static void make_common_is_valid(std::ostream& o, const Module& m)

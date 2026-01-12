@@ -39,7 +39,12 @@ static void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2&
     o << "NA;";
   }
 //  o << ";\n";
-  o____ p.type() << " def = " << p.type() << "(t0.value());\n";
+  o____ p.type() << " def = ";
+  if( p.type().is_string()){
+    o << "vString(s0);\n";
+  }else{
+    o << p.type() << "(t0.value());\n";
+  }
   o____ "e_val(&(this->" << p.code_name() << "), ";
   o____ "def , par_scope);\n";
   o__ "}\n";
@@ -61,7 +66,12 @@ static void make_final_adjust_eval_local_parameter(std::ostream& o, const Parame
     o << "NA;";
   }
 //  o << ";\n";
-  o____ p.type() << " def = " << p.type() << "(t0.value());\n";
+  o____ p.type() << " def = ";
+  if( p.type().is_string()){ untested();
+    o << "vString(s0);\n";
+  }else{
+    o << p.type() << "(t0.value());\n";
+  }
   o____ "this->" << p.code_name() << " = def;\n";
   o__ "}\n";
 }

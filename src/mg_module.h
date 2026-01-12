@@ -45,6 +45,13 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class ValueRangeStrings : public ValueRangeSpec {
+  std::vector<vString const*> _array;
+public:
+  explicit ValueRangeStrings() : ValueRangeSpec() {}
+
+  void parse(CS& f) override;
+  void dump(std::ostream& f)const override;
+  std::vector<vString const*> const& strings()const {return _array;}
 };
 /*--------------------------------------------------------------------------*/
 class ValueRange : public Owned_Base {
