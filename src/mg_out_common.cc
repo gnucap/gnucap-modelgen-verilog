@@ -193,7 +193,7 @@ static void make_common_operator_threeway(std::ostream& o, const Module& d)
   o__ "}else if(ord == std::weak_ordering::greater){\n";
   o____ "return 1;\n";
   o__ "}else{untested();\n";
-  o____ "unreachable()\n";
+  o____ "unreachable();\n";
   o____ "return 0;\n";
   o__ "}\n";
 

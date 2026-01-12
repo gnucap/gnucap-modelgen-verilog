@@ -1303,7 +1303,7 @@ if(double tt = _temp_k - p->_temp_k){
   }else if(ord == std::weak_ordering::greater){
     return 1;
   }else{untested();
-    unreachable()
+    unreachable();
     return 0;
   }
 }
@@ -2631,7 +2631,7 @@ if(double tt = _temp_k - p->_temp_k){
   }else if(ord == std::weak_ordering::greater){
     return 1;
   }else{untested();
-    unreachable()
+    unreachable();
     return 0;
   }
 }
@@ -5442,7 +5442,7 @@ int COMMON_capacitor::operator<=>(const COMMON_COMPONENT& x) const
   }else if(ord == std::weak_ordering::greater){
     return 1;
   }else{untested();
-    unreachable()
+    unreachable();
     return 0;
   }
 }
@@ -6533,7 +6533,7 @@ int COMMON_capacitor::operator<=>(const COMMON_COMPONENT& x) const
   }else if(ord == std::weak_ordering::greater){
     return 1;
   }else{untested();
-    unreachable()
+    unreachable();
     return 0;
   }
 }
