@@ -246,7 +246,7 @@ private:
   }
   void make_operators(std::ostream& o, std::string const& s) {
     o << "#if __cplusplus >= 202002L\n";
-    o__ "bool operator==(state_" << s << " const&)const = default;\n";
+    o__ "constexpr std::partial_ordering operator<=>(state_" << s << " const&)const = default;\n";
     o << "#endif\n";
   }
   void make_block_variable_decl(std::ostream& o, SeqBlock const& s) {
@@ -306,8 +306,18 @@ static void make_common(std::ostream& o, const Module& m)
   o << "public:\n";
   o__ "explicit " << class_name << "(int c=0);\n";
   o__ "         ~" << class_name << "();\n";
+  o << "#if __cplusplus >= 202002L\n";
+  o__ "bool     operator==(const COMMON_COMPONENT& x)const override {\n";
+  o____ "return " << class_name << "::operator<=>(x) == 0;\n";
+  o__ "}\n";
+  o__ "bool     operator<(const COMMON_COMPONENT& x)const override {\n";
+  o____ "return " << class_name << "::operator<=>(x) < 0;\n";
+  o__ "}\n";
+  o__ "int      operator<=>(const COMMON_COMPONENT&)const;\n";
+  o << "#else\n";
   o__ "int      compare(const COMMON_COMPONENT&)const override;\n";
   o__ "bool     operator==(const COMMON_COMPONENT&)const override;\n";
+  o << "#endif\n";
   o__ "COMMON_COMPONENT* clone()const override {return new "<<class_name<<"(*this);}\n";
   o__ "void     set_param_by_index(int, std::string&, int)override;\n";
   o__ "int     set_param_by_name(std::string, std::string)override;\n";
@@ -660,7 +670,7 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "double tr_probe_num(std::string const&)const override;\n";
   o__ "  //void    ac_load();           //BASE_SUBCKT\n";
   o__ "  //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing\n";
-//  o << ind << "std::string dev_type()const override {return \"demo\";}\n";
+  o__ "std::string dev_type()const override {return \"" << m.identifier() << "\";}\n";
   o__ "int max_nodes()const override {return "<< m.circuit()->ports().size() <<";}\n";
  // o__ "int net_nodes()const override {return "<< m.circuit()->ports().size() <<";}\n";
   o__ "int min_nodes()const override {return 0;}\n";

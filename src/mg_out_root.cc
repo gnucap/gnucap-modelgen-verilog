@@ -62,6 +62,7 @@ static void make_header(std::ostream& o, const File& in,
   o <<
     "#include <u_limit.h>\n"
     "#include <bitset>\n"
+    "#include <typeindex>\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 

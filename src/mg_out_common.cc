@@ -118,6 +118,84 @@ static void make_common_destructor(std::ostream& o, const Module& d)
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_common_operator_threeway(std::ostream& o, const Module& d)
+{
+  make_tag(o);
+  o <<
+    "int COMMON_" << d.identifier() << "::operator<=>(const COMMON_COMPONENT& x) const\n{\n";
+  o__ "std::type_index a(typeid(*this));\n";
+  o__ "std::type_index b(typeid(x));\n";
+  o__ "if(a < b){\n";
+  o____ "return -1;\n";
+  o__ "}else if(a > b){\n";
+  o____ "return 1;\n";
+  o__ "}else{\n";
+  o__ "}\n";
+
+  o__ "int c;\n";
+  o__ "if((c = COMMON_COMPONENT::compare(x))){\n";
+  o____ "return c;\n";
+  o__ "}else{\n";
+  o__ "}\n";
+
+  o__ "auto p = prechecked_cast<const COMMON_" << d.identifier() << "*>(&x);\n";
+  o__ "assert(p);\n";
+
+  if(d.circuit()->element_list().size()){
+    o__ "if((c = _netlist_params.compare(p->_netlist_params))) {\n";
+    o____ "return c;\n";
+    o__ "}else{\n";
+    o__ "}\n";
+  }else{
+  }
+
+  std::string sep;
+  for (Parameter_List_Collection::const_iterator
+       q = d.parameters().begin();
+       q != d.parameters().end();
+       ++q) {
+    Parameter_2_List::const_iterator p = (*q)->begin();
+    if((*q)->is_local()) {
+      for ( ; p != (*q)->end(); ++p) {
+	o__ sep << "if(" << (*p)->code_name() << " < p->" << (*p)->code_name() << ") {\n";
+	o____ "return -1;\n";
+	o__ "}else if(" << (*p)->code_name() << " > p->" << (*p)->code_name() << ") {\n";
+	o____ "return 1;\n";
+	sep = "}else ";
+      }
+    }else{
+      for ( ; p != (*q)->end(); ++p) {
+	o__ sep << "if((c = " << (*p)->code_name() << ".compare(p->" << (*p)->code_name() << "))){\n";
+	o____ "return c;\n";
+	sep = "}else ";
+      }
+    }
+  }
+  o__ sep << "{\n";
+  o__ "}\n";
+
+  for(FUNCTION_ const* f : d.funcs()){
+    make_tag(o);
+    if(f->has_refs()){
+      f->make_cc_common_compare(o);
+    }else{
+    }
+  }
+  o__ "auto ord = _v_ <=> p->_v_;\n";
+  o__ "if(ord == std::weak_ordering::equivalent){\n";
+  o____ "return 0;\n";
+  o__ "}else if(ord == std::weak_ordering::less){\n";
+  o____ "return -1;\n";
+  o__ "}else if(ord == std::weak_ordering::greater){\n";
+  o____ "return 1;\n";
+  o__ "}else{untested();\n";
+  o____ "unreachable()\n";
+  o____ "return 0;\n";
+  o__ "}\n";
+
+  o <<  "}\n"
+    "/*--------------------------------------------------------------------------*/\n";
+}
 static void make_common_operator_compare(std::ostream& o, const Module& d)
 {
   make_tag(o);
@@ -756,8 +834,12 @@ void make_cc_common(std::ostream& o , const Module& m)
   make_common_default_constructor(o, m);
   make_common_copy_constructor(o, m);
   make_common_destructor(o, m);
+  o << "#if __cplusplus >= 202002L\n";
+  make_common_operator_threeway(o, m);
+  o << "#else\n";
   make_common_operator_compare(o, m);
   make_common_operator_equal(o, m);
+  o << "#endif\n";
   make_common_set_param_by_index(o, m);
   make_common_set_param_by_name(o, m);
   make_common_param_is_printable(o, m);
