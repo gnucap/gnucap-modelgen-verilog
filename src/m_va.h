@@ -540,14 +540,6 @@ inline bool operator==(PARAMETER<int> const& b, double const& a)
 { itested();
   return double(b) == a;
 }
-inline bool operator==(PARAMETER<double> const& b, int const& a)
-{ untested();
-  return int(b) == a;
-}
-// inline bool operator==(PARAMETER<int> const& b, int const& a)
-// { untested();
-// 	return int(b) == a;
-// }
 
 template<class T>
 T& set_value(T& t, double const& d)

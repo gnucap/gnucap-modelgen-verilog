@@ -164,9 +164,11 @@ static void make_common_operator_equal(std::ostream& o, const Module& d)
     }else{
     }
   }
-  o << 
-    "    && !compare(*p)\n" // kludge.
-    "    && COMMON_COMPONENT::operator==(x));\n"
+  o << "#if __cplusplus >= 202002L\n";
+  o____ "&& _v_ == p->_v_\n";
+  o << "#endif\n";
+  o____ "&& !compare(*p)\n"; // kludge.
+  o____ "&& COMMON_COMPONENT::operator==(x));\n"
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";
 }

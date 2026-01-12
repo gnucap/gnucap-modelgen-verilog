@@ -1067,7 +1067,12 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   }
 
   // bug? using mutable_common.. again.
-  o__ "auto c = static_cast<COMMON_" << mid << "*>(mutable_common());\n";
+  o << "#if __cplusplus >= 202002L\n";
+  o__ "auto c = prechecked_cast<COMMON_" << mid << "*>(common()->clone());\n";
+  o << "#else\n";
+  o__ "auto c = prechecked_cast<COMMON_" << mid << "*>(mutable_common());\n";
+  o << "#endif\n";
+
   o__ "assert(c);\n";
   o__ "(void)c;\n";
 
@@ -1099,6 +1104,12 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   o____ "subckt()->precalc_last();\n";
   o__ "}else{untested();\n";
   o__ "}\n";
+
+  o << "#if __cplusplus >= 202002L\n";
+  o__ "{itested();\n";
+  o____ "attach_common(c);\n";
+  o__ "}\n";
+  o << "#endif\n";
 
   o << "}\n"
       "/*--------------------------------------"

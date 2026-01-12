@@ -218,6 +218,7 @@ private:
     o__ "struct state_{\n";
     {
       indent x;
+      make_operators(o, "");
       make_variable_collection(o, P);
 
       for(auto s : analog(m).list()){
@@ -243,12 +244,20 @@ private:
       }
     }
   }
+  void make_operators(std::ostream& o, std::string const& s) {
+    o << "#if __cplusplus >= 202002L\n";
+    o__ "bool operator==(state_" << s << " const&)const = default;\n";
+    o << "#endif\n";
+  }
   void make_block_variable_decl(std::ostream& o, SeqBlock const& s) {
     Variable_List_Collection const& P = s.variables_();
     if(s.has_identifier()){
-      o__ "struct { // " << s.identifier() << "\n";
+      static int count;
+      std::string name = to_string(count++);
+      o__ "struct state_" << name << "{\n";
       {
 	indent ns;
+	make_operators(o, name);
 	make_variable_collection(o, P);
 	make_subblock_variable_decl(o, s);
       }
