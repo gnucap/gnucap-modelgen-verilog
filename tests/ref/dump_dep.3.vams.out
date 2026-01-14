@@ -16,7 +16,7 @@ module test_while0a(p, n);
     real x// + [V(p, n)]
 , y// + [V(p, n)]
 ;
-    x =  0.; // s1 r3{bax}
+    x =  0.; // s1 r1{b}
     x =  0.; // [V(p, n)] s4 r4{bax}
     z = x; // [V(p, n)] s5 r3{bax}
     y =  0.; // [V(p, n)] s3 r4{bax}
@@ -29,7 +29,7 @@ module test_while0a(p, n);
       x = y; // [V(p, n)] s3 r4{bax}
       y = (x + V(p, n)); // [V(p, n)] s3 r4{bax}
     end
-    x = x; // [V(p, n)] s5 r4{bax}
+    x = x; // [V(p, n)] s5 r3{bx}
     I(p, n) <+ x; // [V(p, n)] s5 r2{x}
   end
 

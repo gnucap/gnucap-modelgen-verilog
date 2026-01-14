@@ -3,14 +3,14 @@ module cond5(p, n);
     // i : 0
     integer i// +
 ;
-    i = 1; // s1 r3{bax}
+    i = 1; // s1 r1{b}
     if (i) begin // i
       // i : 0
-      i = 2; // s1 r3{bax}
+      i = 2; // s1 r1{b}
     end
     else begin // i
       // i : 0
-      i = 3; // s1 r3{bax}
+      i = 3; // s1 r1{b}
     end
   end
 

@@ -16,7 +16,7 @@ module test();
     // xxint : 0
     integer xxint// +
 ;
-    xxint = 1; // s1 r4{bax}
+    xxint = 1; // s1 r3{bx}
     V(p, n) <+ fct(xxint); // s1 r2{x}
   end
 

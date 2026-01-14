@@ -10,19 +10,19 @@ module dep_test(d, g);
     case (sel)
       0: begin
         // c : 0
-        c = 1; // s1 r4{bax}
+        c = 1; // s1 r3{bx}
       end
       1: begin
         // c : 0
-        c = sel; // s1 r4{bax}
+        c = sel; // s1 r3{bx}
       end
       default: begin
         // c : 0
-        c = 17; // s1 r4{bax}
+        c = 17; // s1 r3{bx}
       end
     endcase
     I(d) <+ c; // s5 r2{x}
-    c = 4; // s1 r4{bax}
+    c = 4; // s1 r3{bx}
   end
 
 endmodule

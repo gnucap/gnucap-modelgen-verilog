@@ -61,7 +61,7 @@ public:
   TData const& data()const; // hmm
 //  TData const& deps()const{ untested();return data();}
   // Attrib const& attrib()const;
-  bool update(RDeps const* r=nullptr);
+  bool update(RDeps const* r);
   void set_dep(Base*);
   void set_rdeps(RDeps const&);
   bool is_used_in(Base const*)const;

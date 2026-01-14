@@ -13,7 +13,7 @@ module test_while0a(p, n);
 ;
     real y// + [V(p, n)]
 ;
-    x =  0.; // [V(p, n)] s4 r4{bax}
+    x =  0.; // [V(p, n)] s4 r3{bx}
     y =  0.; // [V(p, n)] s3 r4{bax}
     i = r; // s1 r4{bax}
     while ((i > 0)) begin

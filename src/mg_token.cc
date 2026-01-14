@@ -641,13 +641,7 @@ static void stack_op_args(Expression* EE, Expression const* arg_expr, FUNCTION_ 
       assert(AA);
 
       assert(EE_);
-      Block* scope = EE_->scope();
-
-      //if(dynamic_cast<SeqBlock*>(scope)) { untested();
-      // here?
       EE_->push_assign(AA->decl_token());
-      //}else{ untested(); // af?
-      //}
 
       trace3("stackop dep args?", (**i).name(), ii, f->arg_data(ii)->size());
       for(Dep const& d : f->arg_data(ii)->ddeps()) {

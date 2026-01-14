@@ -8,8 +8,8 @@ module dep_tern0(d, g);
 ;
     real T// + [V(g)]
 ;
-    c = V(d); // [V(d)] s1 r4{bax}
-    T = V(g); // [V(g)] s1 r4{bax}
+    c = V(d); // [V(d)] s1 r3{bx}
+    T = V(g); // [V(g)] s1 r3{bx}
     I(d) <+ pow(T, c); // [V(g), V(d)] s2 r2{x}
   end
 

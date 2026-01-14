@@ -8,7 +8,7 @@ module dep0(d, g);
 ;
     real T// * [V(g)]
 ;
-    c = T; // s3 r4{bax}
+    c = T; // s3 r3{bx}
     T = V(g); // [V(g)] s1 r4{bax}
     I(d) <+ c; // s3 r2{x}
     I(g) <+ V(g); // [V(g)] r2{x}

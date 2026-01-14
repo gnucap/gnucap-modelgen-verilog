@@ -7,14 +7,14 @@ module test_seq0(p, n);
     // i : 0
     real i// +
 ;
-    i = 0; // s3 r4{bax}
+    i = 0; // s3 r3{bx}
     if ((v == 0)) begin
       // i : 0
-      i = 1; // s1 r4{bax}
+      i = 1; // s1 r3{bx}
     end
     else begin
       // i : 0
-      i = 2; // s1 r4{bax}
+      i = 2; // s1 r3{bx}
     end
     V(p, n) <+ i; // s3 r2{x}
   end

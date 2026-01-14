@@ -68,7 +68,7 @@ module cond3(p, n);
           begin // always
             begin // always
               // T : 0
-              T = 1; // s1 r3{bax}
+              T = 1; // s1 r1{b}
             end
           end
         end
@@ -76,11 +76,11 @@ module cond3(p, n);
     end
     if (T) begin
       // T : 0
-      T = 0; // s1 r3{bax}
+      T = 0; // s1 r1{b}
     end
     else begin
       // T : 0
-      T = 2; // s1 r3{bax}
+      T = 2; // s1 r1{b}
     end
     begin // always
       begin // always

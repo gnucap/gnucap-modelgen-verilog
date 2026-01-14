@@ -544,7 +544,6 @@ bool SwitchBlock::update()
   int ret = 0;
   // assert(!_variables.size()); ?
   if(is_reachable()){
-//    for(auto i: _variables){
 //      if(auto s = dynamic_cast<Statement*>(i)){
 //	ret += s->update();
 //	trace1("AnalogSeqBlock::update var", ret);

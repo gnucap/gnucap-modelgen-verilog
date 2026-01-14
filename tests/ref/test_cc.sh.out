@@ -2031,8 +2031,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
     double& _v_dt(m->_v_._main._dt); // (1068)
     (void) _v_dt;
     auto& _v_g = _v_._main._g;
-      {
-      }
+// omit Statement 21AnalogConditionalStmt a
       {
         { // anonymous block
           { // Assignment real 'g'.
@@ -2078,8 +2077,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
     double& _v_dt(m->_v_._main._dt); // (1068)
     (void) _v_dt;
     auto& _v_g = _v_._main._g;
-      {
-      }
+// omit Statement 21AnalogConditionalStmt a
       {
         { // anonymous block
           { // Assignment real 'g'.

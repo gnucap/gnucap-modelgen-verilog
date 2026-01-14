@@ -1169,7 +1169,7 @@ bool DigitalEvtCtlStmt::update()
   bool ret = propagate_rdeps(_ctrl.rdeps());
   while(true){ untested();
     _body.clear_vars();
-    if ( _ctrl.update() ){ untested();
+    if ( _ctrl.update(nullptr) ){ untested();
       ret = true;
     }else if (_body.update()){ untested();
       ret = true;
@@ -1249,7 +1249,7 @@ void DigitalEvtExpression::parse(CS& file)
   rhs.push_back(new Token_CALL("@", f_));
 
   resolve_symbols(rhs);
-  update();
+  update(nullptr); // BUG?
 
   set_rdeps();
 }

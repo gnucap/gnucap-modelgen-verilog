@@ -109,7 +109,7 @@ public: // code generation
   }
   using FUNCTION::stack_op;
   void stack_op(Expression*)const override = 0;
-  virtual double evalf(double const*)const {
+  virtual double evalf(double const*)const { untested();
     throw Exception("not implemented");
   }
   void setup(Module*) {};

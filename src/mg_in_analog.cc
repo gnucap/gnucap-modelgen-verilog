@@ -280,7 +280,6 @@ void AnalogProceduralAssignment::parse(CS& f)
   }
   if(f >> _a){
     trace1("preupdate", _a);
-    update(); // hmm, analysis?
    // _a.data().add_sens(this);
     trace1("postupdate", _a);
     if(f >> ";"){
@@ -1064,16 +1063,22 @@ void AnalogConstruct::parse(CS& f)
   f >> _block;
 //  auto ab = new AnalogCtrlBlock(f, this);
 //  _block = ab;
-  while(_block.update()){
-    trace0("AnalogConstruct update");
-  }
-
 }
 /*--------------------------------------------------------------------------*/
 void AnalogConstruct::dump(std::ostream& o)const
 {
   Base const* b = &_block;
   b->dump(o);
+}
+/*--------------------------------------------------------------------------*/
+bool AnalogConstruct::update()
+{
+  bool ret = false;
+  while(_block.update()){
+    ret = true;
+    trace0("AnalogConstruct update");
+  }
+  return ret;
 }
 /*--------------------------------------------------------------------------*/
 // DUP: SeqStmt?
@@ -1729,12 +1734,13 @@ bool AnalogEvtCtlStmt::update()
 {
  // trace1("AnalogEvtCtlStmt::update", rdeps_size());
 
-  bool ret = _ctrl.update(&rdeps());
+  bool ret = 0; // _ctrl.update();
+  ret |= _ctrl.update(&rdeps());
  // bool rdd = _rhs.update(&_deps->rdeps());
   ret |= propagate_rdeps(_ctrl.rdeps());
   while(true){
     _body.clear_vars();
-    if ( _ctrl.update() ){ untested();
+    if ( _ctrl.update(nullptr) ){ untested();
       ret = true;
       _body.update();
     }else if (_body.update()){ untested();
@@ -2297,7 +2303,7 @@ void AnalogEvtExpression::parse(CS& file)
   rhs.push_back(new Token_CALL("@", f_));
 
   resolve_symbols(rhs);
-  update();
+  update(nullptr); // BUG?
 
   set_rdeps();
 }
@@ -2838,6 +2844,7 @@ void Analog::parse(CS& f)
   }else if(f >> "initial "){
     AnalogInitialStmt* is = new AnalogInitialStmt(owner(), f);
     is->set_owner(owner());
+    is->update(); // here??
     push_back(is);
   }else{
     AnalogConstruct* ab = new AnalogConstruct();
@@ -2848,6 +2855,11 @@ void Analog::parse(CS& f)
     ab->parse(f);
     _list.set_owner(owner()); // needed?
     push_back(ab);
+
+    ab->update();
+    // while(_block.update()){
+    //   trace0("AnalogConstruct update");
+    // }
 
 
   }
