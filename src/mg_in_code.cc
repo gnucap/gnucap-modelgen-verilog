@@ -540,8 +540,9 @@ Base* SeqBlock::lookup(std::string const& k, bool recurse)
 /*--------------------------------------------------------------------------*/
 bool SwitchBlock::update()
 {
-  trace1("AnalogSeqBlock::update", is_reachable());
+  trace1("AnalogSwitchBlock::update", is_reachable());
   int ret = 0;
+  // assert(!_variables.size()); ?
   if(is_reachable()){
 //    for(auto i: _variables){
 //      if(auto s = dynamic_cast<Statement*>(i)){
@@ -554,14 +555,14 @@ bool SwitchBlock::update()
     for(auto i: *this){
       if(auto s = dynamic_cast<Statement*>(i)){
 	ret += s->update();
-	trace2("AnalogSeqBlock::update lst", ret, typeid(*s).name());
+	trace2("AnalogSwitchBlock::update lst", ret, typeid(*s).name());
       }else{ untested();
 	unreachable(); // comment? later..
       }
     }
   }else{
   }
-  trace1("AnalogSeqBlock::update done", ret);
+  trace1("AnalogSwitchBlock::update done", ret);
 
   if(ret){
     // propagate variable deps to parent scope..
@@ -573,13 +574,13 @@ bool SwitchBlock::update()
 /*--------------------------------------------------------------------------*/
 bool SeqBlock::update()
 {
-  trace1("AnalogSeqBlock::update", is_reachable());
+  trace1("SeqBlock::update", is_reachable());
   int ret = 0;
   if(is_reachable()){
     for(auto i: _variables){
       if(auto s = dynamic_cast<Statement*>(i)){
 	ret += s->update();
-	trace1("AnalogSeqBlock::update var", ret);
+	trace1("SeqBlock::update var", ret);
       }else{ untested();
 	unreachable(); // comment? later..
       }
@@ -587,14 +588,14 @@ bool SeqBlock::update()
     for(auto i: *this){
       if(auto s = dynamic_cast<Statement*>(i)){
 	ret += s->update();
-	trace2("AnalogSeqBlock::update lst", ret, typeid(*s).name());
+	trace2("SeqBlock::update lst", ret, typeid(*s).name());
       }else{ untested();
 	unreachable(); // comment? later..
       }
     }
   }else{
   }
-  trace1("AnalogSeqBlock::update done", ret);
+  trace1("SeqBlock::update done", ret);
 
   if(ret){
     // propagate variable deps to parent scope..
