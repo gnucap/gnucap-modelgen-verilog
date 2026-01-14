@@ -15,6 +15,22 @@ $ make check 2>/dev/null
 
 see below otherwise.
 
+== Running single tests
+
+Individual tests may be run directly in exactly the way "make check" does.
+Normally, this involves some additional args and/or environment. To trigger
+the run, regenerate the corresponding .out file.
+
+$ make check/<test_file>.out
+
+To also display the status, "regenerate" the .diff file, as in
+
+$ make check/<test_file>.diff
+
+Here, "pass", "fail" indicate match and mismatch with the reference
+respectively. An empty diff will be deleted. "MISS" hints at the missing
+reference.
+
 == Code coverage testing
 
 Test coverage is computed according to the following protocol, see [1] for
