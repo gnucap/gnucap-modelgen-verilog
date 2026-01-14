@@ -1832,6 +1832,14 @@ public:
     assert(_af);
     return _af->arg_type(I);
   }
+  TData const* arg_data(int I)const override {
+    assert(_af);
+    return _af->arg_data(I);
+  }
+  Token const* arg_token(int I)const override {
+    assert(_af);
+    return _af->arg_token(I);
+  }
 
   /// BUG: belongs to mg_out_analog.
   void make_cc_common(std::ostream& o)const override {

@@ -220,7 +220,7 @@ public:
   bool operator>(int const& o)const {
     return *_data > o;
   }
-  bool operator>(PARAMETER<double> const& o)const { untested();
+  bool operator>(PARAMETER<double> const& o)const {
     return *_data > double(o);
   }
 
@@ -4347,7 +4347,7 @@ public:
   bool operator>(int const& o)const {
     return *_data > o;
   }
-  bool operator>(PARAMETER<double> const& o)const { untested();
+  bool operator>(PARAMETER<double> const& o)const {
     return *_data > double(o);
   }
 

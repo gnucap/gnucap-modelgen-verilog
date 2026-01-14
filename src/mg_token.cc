@@ -613,33 +613,62 @@ static TData* new_deps(Base const* data)
 /*--------------------------------------------------------------------------*/
 static void stack_op_args(Expression* EE, Expression const* arg_expr, FUNCTION_ const* f)
 {
+  trace0("stackop args");
+  std::vector<Token*> args;
+  for (Expression::const_iterator i = arg_expr->begin(); i != arg_expr->end(); ++i) {
+    (**i).stack_op(EE);
+    args.push_back(EE->back());
+  }
   int ii = 0;
   for (Expression::const_iterator i = arg_expr->begin(); i != arg_expr->end(); ++i) {
+    TData iideps;
     trace2("stackop stash arg", (**i).name(), f->is_output_arg(ii));
-    if(!f->is_output_arg(ii)){
-      (**i).stack_op(EE);
-    }else if(auto tt = dynamic_cast<Token_VAR_REF*>(*i)){
-      auto EE_ = prechecked_cast<Expression_*>(EE);
-      assert(EE_);
-      tt->stack_op(EE);
+    assert(!dynamic_cast<Token_VAR_DECL*>(*i));
+    assert(!dynamic_cast<Token_ARGUMENT*>(*i));
+    assert(EE->size());
 
-      assert(EE->size());
-      auto ttt = prechecked_cast<Token_VAR_REF*>(EE->back());
-#if 1 // def DEBUG
-      assert(ttt);
-      trace2("stackop io arg", ttt->name(), typeid(*ttt).name());
-#endif
-      auto AA = prechecked_cast<Assignment*>(ttt->mutable_item());
+    if(!f->is_output_arg(ii)){
+    }else if(auto tt = dynamic_cast<Token_VAR_REF*>(args[ii])){
+      auto dd = prechecked_cast<TData const*>(tt->data());
+      assert(dd);
+      assert(f->arg_data(ii));
+
+//      assert(EE->size());
+//      auto ttt = prechecked_cast<Token_VAR_REF*>(EE->back());
+
+      auto EE_ = prechecked_cast<Expression_*>(EE);
+      auto AA = prechecked_cast<Assignment*>(tt->mutable_item());
       assert(AA);
+
+      assert(EE_);
+      Block* scope = EE_->scope();
 
       //if(dynamic_cast<SeqBlock*>(scope)) { untested();
       // here?
       EE_->push_assign(AA->decl_token());
       //}else{ untested(); // af?
       //}
-    }else{
+
+      trace3("stackop dep args?", (**i).name(), ii, f->arg_data(ii)->size());
+      for(Dep const& d : f->arg_data(ii)->ddeps()) {
+	trace2("stackop dep arg", (**i).name(), d.name());
+	for(int k = 0; k < int(arg_expr->size()); ++k){
+	  auto input_arg = prechecked_cast<Token_VAR_REF*>(args[k]);
+	  assert(input_arg); // really?
+	  if(d.token() == f->arg_token(k)) {
+	    assert(tt);
+	    // "ii" depends on "k"
+	    trace2("stackop prop dep", tt->name(), input_arg->name());
+	    tt->propagate_deps(*input_arg);
+	    // input_arg->propagate_deps(*tt);
+	  }else{
+	    trace2("stackop prop dep miss", tt->name(), input_arg->name());
+	  }
+	}
+      }
+
+    }else{ untested();
       unreachable();
-      (**i).stack_op(EE);
     }
     ++ii;
   }

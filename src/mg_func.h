@@ -64,6 +64,8 @@ public: // characteristics
   size_t num_args() const { return _num_args; }
 
   virtual bool is_output_arg(int)const {return false;}
+  virtual TData const* arg_data(int)const {return nullptr;}
+  virtual Token const* arg_token(int)const {return nullptr;}
   virtual Data_Type const* arg_type(int)const{return nullptr;}
   virtual Data_Type const* return_type()const = 0;
   virtual bool has_analysis()const  {return false;}
