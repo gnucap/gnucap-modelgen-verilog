@@ -1,0 +1,27 @@
+// converter folloving an example from designers-guide
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+attach ../vams/vpulse.so
+verilog
+
+`modelgen
+module test_strobe4 ();
+  localparam integer NUMBER=42;
+
+  analog begin
+	 $strobe("int?   %d", NUMBER);
+	 $strobe("float? %f", NUMBER);
+  end
+endmodule
+`endmodelgen
+
+!make test_strobe4.so >/dev/null
+
+`load ./test_strobe4.so
+
+
+test_strobe4 d();
+
+`print tran v(nodes)
+`tran 1.1

@@ -1,0 +1,155 @@
+// converter folloving an example from designers-guide
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+attach ../vams/vpulse.so
+verilog
+
+`modelgen
+module adc (out7, out6, out5, out4, out3, out2, out1, out0, in, clk);
+  parameter integer bits = 8 from [8:8];
+  parameter real vmin = 0.0;
+  parameter real vmax = 1.0 from (vmin:inf);
+  parameter real td = 0 from [0:inf);
+  parameter real tt = 0 from [0:inf);
+  parameter real vdd = 5;
+  parameter real vss = 0;
+  parameter real thresh = (vdd+vss)/2;
+  parameter integer dir = +1 from [-1:1] exclude 0;
+  localparam integer levels = 256;
+
+  input in, clk;
+  output out0, out1, out2, out3, out4, out5, out6, out7;
+  electrical in, clk;
+  electrical out0, out1, out2, out3, out4, out5, out6, out7;
+  integer result;
+
+  analog begin
+    @(cross(V(clk)-thresh, dir) or initial_step) begin
+      result = levels*((V(in) - vmin))/(vmax - vmin);
+        if (result > levels-1)
+            result = levels-1;
+        else if (result < 0)
+            result = 0;
+    end
+
+    V(out0) <+ transition((((result % 2))? (vdd):(vss)), td, tt);
+    V(out1) <+ transition(((((result / 2) % 2))? (vdd):(vss)), td, tt);
+    V(out2) <+ transition(((((result / 4) % 2))? (vdd):(vss)), td, tt);
+    V(out3) <+ transition(((((result / 8) % 2))? (vdd):(vss)), td, tt);
+    V(out4) <+ transition(((((result / 16) % 2))? (vdd):(vss)), td, tt);
+    V(out5) <+ transition(((((result / 32) % 2))? (vdd):(vss)), td, tt);
+    V(out6) <+ transition(((((result / 64) % 2))? (vdd):(vss)), td, tt);
+    V(out7) <+ transition(((((result / 128) % 2))? (vdd):(vss)), td, tt);
+  end
+endmodule
+`endmodelgen
+
+`modelgen
+module dac(out, in7, in6, in5, in4, in3, in2, in1, in0, clk);
+  parameter integer bits = 8 from [8:8];
+  parameter real vmin = 0.0;
+  parameter real vmax = 1.0 from (vmin:inf);
+  parameter real td = 0;
+  parameter real tt = 0;
+  parameter real vdd = 5.0;
+  parameter real vss = 0;
+  parameter real thresh = (vdd+vss)/2;
+  parameter integer dir = +1 from [-1:1] exclude 0;
+  localparam real fullscale = vmax - vmin;
+
+  output out;
+  input in7, in6, in5, in4, in3, in2, in1, in0;
+  input clk;
+  electrical out, clk;
+  electrical in7, in6, in5, in4, in3, in2, in1, in0;
+  real aout;
+  integer weight;
+
+    analog begin
+    @(cross(V(clk) - thresh, dir) or initial_step) begin
+        aout = 0;
+        weight = 2;
+    	if (V(in7) > thresh) begin
+    	    aout = aout + fullscale/weight;
+    	end
+    	weight = weight*2;
+    	if (V(in6) > thresh) begin
+    	    aout = aout + fullscale/weight;
+    	end
+    	weight = weight*2;
+    	if (V(in5) > thresh) begin
+    	    aout = aout + fullscale/weight;
+    	end
+    	weight = weight*2;
+    	if (V(in4) > thresh) begin
+    	    aout = aout + fullscale/weight;
+    	end
+    	weight = weight*2;
+    	if (V(in3) > thresh) begin
+    	    aout = aout + fullscale/weight;
+    	end
+    	weight = weight*2;
+    	if (V(in2) > thresh) begin
+    	    aout = aout + fullscale/weight;
+    	end
+    	weight = weight*2;
+    	if (V(in1) > thresh) begin
+    	    aout = aout + fullscale/weight;
+    	end
+    	weight = weight*2;
+    	if (V(in0) > thresh) begin
+    	    aout = aout + fullscale/weight;
+    	end
+    end
+	V(out) <+ transition(aout + vmin, td, tt);
+    end
+endmodule
+`endmodelgen
+
+!make adc.so >/dev/null
+!make dac.so >/dev/null
+
+`load ./adc.so
+`load ./dac.so
+
+paramset vsource vsine
+  parameter string type="sine" from '{"sine"};
+  parameter real ampl=1.;
+  parameter real dc=0.;
+  parameter real freq=1.;
+  parameter real delay=1.;
+  .ampl(ampl);
+  .dc(dc);
+  .freq(freq);
+//  .delay(delay); not implemented
+endparamset
+
+paramset vsource vpulse
+  parameter string type="pulse" from '{"pulse"};
+  parameter real val0=0;
+  parameter real val1=1;
+  parameter real period=1;
+  .val0(val0);
+  .val1(val1);
+  .period(period);
+  .width(period/2.);
+endparamset
+
+
+module dut(in, out);
+  ground g;
+  vsource #(.type("sine"), .ampl(0.55), .dc(0.), .freq(1), .delay(100m)) Vin(in, g);
+  vsource #(.type("pulse"), .val0(0), .val1(1), .period(1m)) Vclk(clk, g);
+
+  adc #(.vdd(1), .td(100u), .tt(100u), .vmin(-.5), .vmax(.5) a1 (b7, b6, b5, b4, b3, b2, b1, b0, in, clk);
+  dac #(.vdd(1), .td(100u), .tt(100u), .vmin(-.5), .vmax(.5) d1 (out, b7, b6, b5, b4, b3, b2, b1, b0, clk);
+endmodule
+
+dut d(in, out);
+
+`print tran v(nodes) iter(0)
+`tran .1
+
+status notime
+

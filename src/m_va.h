@@ -70,6 +70,11 @@ namespace{
 typedef double real;
 typedef int integer;
 typedef vString string;
+/*--------------------------------------------------------------------------*/
+template<class T>
+double plain_value(T const& x) { return x; }
+inline int plain_value(int const& x) { untested(); return x; }
+/*--------------------------------------------------------------------------*/
 // double inf = std::numeric_limits<double>::infinity();
 #define inf std::numeric_limits<double>::infinity()
 #define Inf inf
@@ -658,12 +663,12 @@ T fmod(T d, T e)
 }
 /*--------------------------------------------------------------------------*/
 inline double fmod(double d, int e)
-{ untested();
+{
   return std::fmod(d, e);
 }
 /*--------------------------------------------------------------------------*/
 inline int fmod(int d, int e)
-{ untested();
+{
   return d % e;
 }
 /*--------------------------------------------------------------------------*/
