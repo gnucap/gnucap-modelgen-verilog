@@ -65,7 +65,9 @@ public:
   void precalc_last(const PARAM_LIST* par_scope)override;
 
   void tr_eval(ELEMENT* c)const override;
+#ifndef DO_TRACE
   void tr_accept(COMPONENT*c)const override;
+#endif
   void tr_advance(COMPONENT*c)const override;
 }; //COMMON_ABSDELAY
 COMMON_ABSDELAY cdel(CC_STATIC);
@@ -660,13 +662,15 @@ void DELAY::tr_load()
   _out1 = _out0;
 }
 /*--------------------------------------------------------------------------*/
+#ifndef DO_TRACE
 void DELAY::tr_accept()
 {
+  trace2("DELAY::tr_accept", _sim->_time0, long_label());
   ELEMENT::tr_accept();
   auto c = prechecked_cast<COMMON_DELAY const*>(common());
   assert(c);
-  c->tr_accept(this);
 }
+#endif
 /*--------------------------------------------------------------------------*/
 TIME_PAIR DELAY::tr_review()
 {
