@@ -2,6 +2,14 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
+2026****-dev
+============
+- fix param count bug in overload selection
+- support common pooling (with C++>=20)
+- string parameters
+- fix dcop in $absdelay and $transition
+- ..
+
 20251222-dev
 ============
 - infer variable storage type (instance/common/temp)

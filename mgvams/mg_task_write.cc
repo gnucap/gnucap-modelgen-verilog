@@ -46,14 +46,24 @@ private:
   bool has_tr_accept()const override {return true;}
   // Token* new_token(Module&, size_t)const override{ return nullptr; }
   void make_cc_dev(std::ostream& o)const override {
+    if(num_args()>1){
+      o____ "template<";
+      std::string sep;
+      for(size_t i=1; i<num_args(); ++i) {
+	o << sep << "class T" << i;
+	sep = ", ";
+      }
+      o << ">\n";
+    }else{
+    }
     o__ "void " << label() << "(std::string const& a0";
     for(size_t i=1; i<num_args(); ++i) {
-      o << ", double a" << i;
+      o << ", T" << i << " a" << i;
     }
     o << ") {\n";
     o______ "fprintf(stdout, a0.c_str()";
     for(size_t i=1; i<num_args(); ++i) {
-      o << ", a" << i;
+      o << ", plain_value(a" << i << ")";
     }
     o << ");\n";
     o__ "}\n";
@@ -98,7 +108,7 @@ private:
   // Token* new_token(Module&, size_t)const override{ return nullptr; }
   void args(std::ostream& o, bool names=false)const {
     o << "std::string";
-    for(size_t i=1; i<num_args(); ++i) {
+    for(int i=1; i<int(num_args()); ++i) {
       o____  ", double";
       if(names){ untested();
        o << " a " << i;
@@ -162,10 +172,14 @@ private:
     o____ "void tr_regress(CARD*, "; args(o); o << ") {\n";
     o____"}\n";
 
-    o____ "template<class MOD>\n";
+    o____ "template<class MOD";
+    for(size_t i=1; i<num_args(); ++i) {
+      o <<  ", class T" << i;
+    }
+    o << ">\n";
     o____ "void tr_accept(MOD*, std::string a0";
     for(size_t i=1; i<num_args(); ++i) {
-      o____  ", double a" << i << "";
+      o << ", T" << i << " const& a" << i;
     }
     o << ")const {\n";
     o______ "trace1(\"write::tr_accept\", _sim->_time0);\n";
@@ -175,7 +189,7 @@ private:
     }
     o______ "fprintf(stdout, a0.c_str()";
     for(size_t i=1; i<num_args(); ++i) {
-      o << ", a" << i;
+      o << ", plain_value(a" << i << ")";
     }
     o << ");\n";
     o____ "}\n";

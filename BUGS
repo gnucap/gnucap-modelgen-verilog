@@ -1,3 +1,7 @@
+== limitations
+- rise, fall, delay in $transition are constant.
+- delay in $absdelay is a constant.
+
 == modelgen
 - ac needs operating point, even if linear: mg2_cccs.0.gc
 - dependency tracking glitch aka rram bug

@@ -82,6 +82,11 @@ namespace{
 typedef double real;
 typedef int integer;
 typedef vString string;
+/*--------------------------------------------------------------------------*/
+template<class T>
+double plain_value(T const& x) { return x; }
+inline int plain_value(int const& x) { return x; }
+/*--------------------------------------------------------------------------*/
 // double inf = std::numeric_limits<double>::infinity();
 #define inf std::numeric_limits<double>::infinity()
 #define Inf inf
@@ -670,12 +675,12 @@ T fmod(T d, T e)
 }
 /*--------------------------------------------------------------------------*/
 inline double fmod(double d, int e)
-{ untested();
+{
   return std::fmod(d, e);
 }
 /*--------------------------------------------------------------------------*/
 inline int fmod(int d, int e)
-{ untested();
+{
   return d % e;
 }
 /*--------------------------------------------------------------------------*/
@@ -4207,6 +4212,11 @@ namespace{
 typedef double real;
 typedef int integer;
 typedef vString string;
+/*--------------------------------------------------------------------------*/
+template<class T>
+double plain_value(T const& x) { return x; }
+inline int plain_value(int const& x) { return x; }
+/*--------------------------------------------------------------------------*/
 // double inf = std::numeric_limits<double>::infinity();
 #define inf std::numeric_limits<double>::infinity()
 #define Inf inf
@@ -4795,12 +4805,12 @@ T fmod(T d, T e)
 }
 /*--------------------------------------------------------------------------*/
 inline double fmod(double d, int e)
-{ untested();
+{
   return std::fmod(d, e);
 }
 /*--------------------------------------------------------------------------*/
 inline int fmod(int d, int e)
-{ untested();
+{
   return d % e;
 }
 /*--------------------------------------------------------------------------*/
@@ -5949,7 +5959,7 @@ inline TIME_PAIR MOD_capacitor::tr_review()
   c->tr_review_analog(this);
   if(_accept){
     COMPONENT::q_accept();
-    trace1("capacitor::_accept", _sim->_time0);
+    trace1("capacitor::q_accept", _sim->_time0);
   }else{
   }
   trace3("review done", long_label(), _sim->_time0, _time_by._event);
@@ -7125,7 +7135,7 @@ inline TIME_PAIR MOD_capacitor::tr_review()
   c->tr_review_analog(this);
   if(_accept){
     COMPONENT::q_accept();
-    trace1("capacitor::_accept", _sim->_time0);
+    trace1("capacitor::q_accept", _sim->_time0);
   }else{
   }
   trace3("review done", long_label(), _sim->_time0, _time_by._event);

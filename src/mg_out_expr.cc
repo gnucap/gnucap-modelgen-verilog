@@ -637,6 +637,18 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
   } o__ "} // scope\n";
 }
 /*--------------------------------------------------------------------------*/
+static Data_Type data_type(Base const* d)
+{
+  if(auto td = dynamic_cast<TData const*>(d)){
+    return td->type();
+  }else if(dynamic_cast<Integer const*>(d)){
+    return Data_Type_Int();
+  }else{ untested();
+    incomplete();
+    return Data_Type();
+  }
+}
+/*--------------------------------------------------------------------------*/
 std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression const& e)
 {
   typedef Expression::const_iterator const_iterator;
@@ -718,7 +730,9 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
     }else if (auto bo = dynamic_cast<const Token_BINOP_*>(*i)) {
 
       assert(bo->op1());
+      // assert(bo->op1()->data());
       assert(bo->op2());
+      // assert(bo->op2()->data());
       make_cc_expression_(o, bo->op1());
       make_cc_expression_(o, bo->op2());
 
@@ -742,7 +756,17 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
 	|| op == '!' ){
 	o__ vars().code_name() << " = " << arg1 << " " << (*i)->name() << " " << idy << "; // (703)\n";
       }else if(op == '%'){itested();
-	o__ vars().code_name() << " = va::fmod(" << arg1 << ", " << idy << ");\n";
+	Data_Type type_1 = data_type(bo->op1()->data());
+	Data_Type type_2 = data_type(bo->op2()->data());
+//	o__ "// " << bo->op1()->name() << " " <<  type_1 << "\n";
+//	o__ "// " << bo->op2()->name() << " " <<  type_2 << "\n";
+	o__ vars().code_name() << " = ";
+        if(type_1.is_int() && type_2.is_int()){
+	  // BUG: cast should not be needed.
+	  o << "( int(" << arg1 << ") \% int(" << idy << "));\n";
+	}else{
+	  o << "va::fmod(" << arg1 << ", " << idy << ");\n";
+	}
       }else{ untested();
 	unreachable();
 	throw Exception("run time error in make_cc_expression: " + (*i)->name());

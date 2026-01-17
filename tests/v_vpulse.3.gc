@@ -1,0 +1,13 @@
+verilog
+
+attach vams/resistor.so
+attach vams/vpulse.so
+
+vpulse #(.rise(1e-8)) vv(in, 0 );
+resistor #(1) r(out \0 );
+
+print tran v(nodes)
+tran 1e-8 basic
+
+status notime
+end

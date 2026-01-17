@@ -27,7 +27,7 @@ t.b: can't find subckt: logicmymux03, forcing digital
  1.8        0.         0.         0.         0.        
  2.         0.         0.         0.         0.        
 Gnucap   System status
-iterations: op=3, dc=0, tran=251, fourier=0, total=357
-transient timesteps: accepted=79, rejected=24, total=103
+iterations: op=3, dc=0, tran=254, fourier=0, total=361
+transient timesteps: accepted=80, rejected=24, total=104
 nodes: user=4, subckt=0, model=6, total=10
 dctran density=22.0%, ac density=22.0%
