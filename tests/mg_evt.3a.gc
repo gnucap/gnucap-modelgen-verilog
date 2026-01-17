@@ -12,10 +12,10 @@ module test_evt3a(p, n);
 	(*desc=""*) integer cnt;
 	analog begin
 		@(timer(0,2)) begin
-			$trace("timerd %g %g\n", $abstime, cnt);
-			$write("timer0 %g %g\n", $abstime, cnt);
+			$trace("timerd %g %d\n", $abstime, cnt);
+			$write("timer0 %g %d\n", $abstime, cnt);
 			cnt = cnt + 1;
-			$write("timer1 %g %g\n", $abstime, cnt);
+			$write("timer1 %g %d\n", $abstime, cnt);
       end
 	end
 endmodule
