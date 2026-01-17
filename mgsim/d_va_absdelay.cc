@@ -65,9 +65,7 @@ public:
   void precalc_last(const PARAM_LIST* par_scope)override;
 
   void tr_eval(ELEMENT* c)const override;
-#ifndef DO_TRACE
   void tr_accept(COMPONENT*c)const override;
-#endif
   void tr_advance(COMPONENT*c)const override;
 }; //COMMON_ABSDELAY
 COMMON_ABSDELAY cdel(CC_STATIC);
@@ -150,7 +148,9 @@ private: // BASE_SUBCKT
   void	  tr_load()override;
   TIME_PAIR tr_review()override;
 
+#ifdef DO_TRACE
   void tr_accept()override;
+#endif
   void tr_unload()override;
   void ac_begin()override;
   void do_ac()override;
@@ -173,7 +173,7 @@ private: // overrides
     bool linear_input = !_ctrl_in; // TODO.
     int ii;
 
-    if(linear_input){
+    if(linear_input){ untested();
       ii = 2;
     }else if(_ctrl_in){
       ii = net_nodes();
@@ -183,7 +183,7 @@ private: // overrides
     return ii;
   }
   int matrix_nodes()const override {return _n_ports*2 + bool(_ctrl_in);}
-  std::string value_name()const override { return "";}
+  std::string value_name()const override { untested(); return "";}
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
   node_t& n_(int i)const override {
@@ -293,7 +293,7 @@ bool DELAY::tr_needs_eval()const
   node_t gnd(&ground_node);
   if (is_q_for_eval()) { untested();
     return false;
-  }else if (!converged()) { untested();
+  }else if (!converged()) {
     return true;
   }else if(_sim->_time0==0.){
     return true;
@@ -373,26 +373,28 @@ void DELAY::tr_begin()
 
     _rise = cd->_rise;
     _fall = cd->_fall;
-    if(_rise < _sim->_dtmin){
-      _rise = _sim->_dtmin;
+    double dtmin = _sim->_dtmin;
+    if(dtmin){
+    }else{
+      dtmin = OPT::dtmin;
+    }
+    assert(dtmin);
+    if(_rise < dtmin){
+      _rise = dtmin;
     }else{
     }
-    if(_fall < _sim->_dtmin){
-      _fall = _sim->_dtmin;
+    if(_fall < dtmin){
+      _fall = dtmin;
     }else{
     }
-    trace3("PL", _rise, _fall, _sim->_dtmin);
-    trace2("PL", double(_rise), double(_fall));
-    if(_sim->analysis_is_tran()){
-      assert(_rise);
-      assert(_fall);
-    }else{
-    }
+    assert(_rise>0);
+    assert(_fall>0);
+    trace4("DELAY::tr_begin1", _rise, _fall, _sim->_dtmin, _sim->analysis_is_tran());
   }else{ untested();
    // auto* cc=prechecked_cast<const COMMON_DELAY*>(common());
     incomplete();
   }
-}
+} // DELAY::tr_begin
 /*--------------------------------------------------------------------------*/
 inline void DELAY::dc_advance()
 {
@@ -407,9 +409,9 @@ inline void DELAY::dc_advance()
 // 
 //   trace2("DELAY::dc_advance", _out0, _out1);
 // 
-//   if (!conchk(_out0, _out1, OPT::abstol, OPT::reltol*.01)) {
+//   if (!conchk(_out0, _out1, OPT::abstol, OPT::reltol*.01)) { untested();
 //     q_load();
-//   }else{
+//   }else{ untested();
 //   }
 }
 /*--------------------------------------------------------------------------*/
@@ -428,7 +430,7 @@ CARD* DELAY::clone()const
 /*--------------------------------------------------------------------------*/
 DELAY::DELAY(DELAY const&p) : ELEMENT(p), _nN(_nodes)
 {
-  if(p._nN){
+  if(p._nN){ untested();
     assert(_nN);
     assert(int_nodes() + max_nodes() <= NODES_PER_BRANCH); // not expanded yet.
   }else{
@@ -679,9 +681,9 @@ void DELAY::tr_load()
   _out1 = _out0;
 }
 /*--------------------------------------------------------------------------*/
-#ifndef DO_TRACE
+#ifdef DO_TRACE
 void DELAY::tr_accept()
-{
+{ untested();
   trace2("DELAY::tr_accept", _sim->_time0, long_label());
   ELEMENT::tr_accept();
   auto c = prechecked_cast<COMMON_DELAY const*>(common());
@@ -691,9 +693,10 @@ void DELAY::tr_accept()
 /*--------------------------------------------------------------------------*/
 TIME_PAIR DELAY::tr_review()
 {
+  trace2("DELAY::trr", long_label(), _sim->_time0);
   ELEMENT::tr_review();
   const COMMON_ABSDELAY* c=dynamic_cast<const COMMON_ABSDELAY*>(common());
-  if(c){ untested();
+  if(c){
     q_accept();
     // incomplete();
     _time_by.min_event(_sim->_time0 + c->_delay);
@@ -711,7 +714,6 @@ TIME_PAIR DELAY::tr_review()
     }else{ untested();
     }
   }
-  trace1("DELAY::trr", _time_by._error_estimate);
   return _time_by;
 }
 /*--------------------------------------------------------------------------*/
@@ -742,7 +744,7 @@ void COMMON_ABSDELAY::tr_accept(COMPONENT* c) const
   DELAY* e = prechecked_cast<DELAY*>(c);
   assert(e);
 
-  if(!_sim->_time0){ untested();
+  if(!_sim->_time0){
     e->_forward.push(-e->_forward.delay(), e->tr_involts());
     e->_forward.push(0., e->tr_involts());
     assert(e->_forward.v_out(_delay/2).f0 == e->tr_involts());
@@ -805,28 +807,42 @@ void COMMON_TRANSITION::tr_accept(COMPONENT* c) const
   DELAY* e = prechecked_cast<DELAY*>(c);
   assert(e);
 
-  trace4("COMMON_TRANSITION::accept", _sim->_time0, e->tr_involts(), _delay, e->_current);
-  //  e->_forward->set_delay(_delay);
-
-  if(!c->_sim->_dtmin){
-    // dc analysis?
-  }else if(e->tr_involts() != e->_old_input){
-    trace4("COMMON_TRANSITION::accept nt", _sim->_time0, e->tr_involts(), e->_rise, e->_fall);
-    e->_forward.new_transition(_sim->_time0+_delay, e->_rise, e->_fall, e->tr_involts());
-    e->_old_input = e->tr_involts();
+  if(_sim->analysis_is_tran_static()){
+    if(e->tr_involts() != e->_old_input){
+      e->_forward.initialize().push(0., e->_out0);
+      assert(e->_rise);
+      assert(e->_fall);
+      e->_forward.new_transition(_sim->_time0+_delay, e->_rise, e->_fall, e->tr_involts());
+      e->_old_input = e->tr_involts();
+      double pending = e->_forward.cleanup(0);
+      if(pending < NEVER){
+	_sim->new_event(pending);
+      }else{
+      }
+      e->_current = pending;
+    }else{
+    }
   }else{
+    if(e->tr_involts() != e->_old_input){
+      trace4("COMMON_TRANSITION::accept nt", _sim->_time0, e->tr_involts(), e->_rise, e->_fall);
+      assert(e->_rise);
+      assert(e->_fall);
+      e->_forward.new_transition(_sim->_time0+_delay, e->_rise, e->_fall, e->tr_involts());
+      e->_old_input = e->tr_involts();
+    }else{
+    }
+    double pending = e->_forward.cleanup(_sim->_time0);
+    if(pending == _sim->_time0) { untested();
+    }else if(pending == e->_current) {
+    }else if(pending < NEVER) {
+      trace3("DELAY::accept q0", _sim->_time0, pending, e->_current);
+      trace2("DELAY::accept q0", _sim->_time0 - pending, e->_current);
+      pending = _sim->new_event(pending + _sim->_dtmin);
+    }else{
+      trace3("DELAY::accept q1", _sim->_time0, pending, e->_current);
+    }
+    e->_current = pending;
   }
-  double pending = e->_forward.cleanup(_sim->_time0);
-  if(pending == _sim->_time0) { untested();
-  }else if(pending == e->_current) {
-  }else if(pending < NEVER) {
-    trace3("DELAY::accept q0", _sim->_time0, pending, e->_current);
-    trace2("DELAY::accept q0", _sim->_time0 - pending, e->_current);
-    pending = _sim->new_event(pending + _sim->_dtmin);
-  }else{
-    trace3("DELAY::accept q1", _sim->_time0, pending, e->_current);
-  }
-  e->_current = pending;
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_TRANSITION::tr_advance(COMPONENT* c) const

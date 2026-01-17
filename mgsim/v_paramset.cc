@@ -398,7 +398,7 @@ int PARAMSET::set_param_by_name(std::string Name, std::string Value)
   }else if(_parent && _parent->subckt()){
     PARAM_LIST const* p = _parent->subckt()->params();
 
-    if(p->find(Name) == p->end()){ untested();
+    if(p->find(Name) == p->end()){
       throw Exception_No_Match("invalid parameter: " + Name);
     }else{
     }

@@ -434,7 +434,7 @@ bool AnalogInitialStmt::is_used_in(Base const* b) const
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogInitialStmt::update()
-{ untested();
+{
   bool ret = AnalogCtrlStmt::update();
   ret |= propagate_rdep(&tr_begin_tag);
   return ret;
@@ -702,7 +702,7 @@ bool AnalogForStmt::update()
   while(true){
     if ( init_ && init_->update() ){ untested();
       ret = true;
-    }else if (_body.update()){ untested();
+    }else if (_body.update()){
       ret = true;
     }else if ( tail_ && tail_->update() ) { untested();
       ret = true;
@@ -1743,7 +1743,7 @@ bool AnalogEvtCtlStmt::update()
     if ( _ctrl.update(nullptr) ){ untested();
       ret = true;
       _body.update();
-    }else if (_body.update()){ untested();
+    }else if (_body.update()){
       ret = true;
     }else{
       break;
@@ -1937,7 +1937,7 @@ void Analog_Function::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 bool Analog_Function::update()
 {
-  while(_block.update()){ untested();
+  while(_block.update()){
   }
 
 #if 0
@@ -1958,18 +1958,18 @@ bool Analog_Function::update()
 }
 /*--------------------------------------------------------------------------*/
 Token const* Analog_Function::arg_token(int I) const
-{ untested();
+{
   AnalogFunctionArgs const& h = header();
   Token const* t = h.arg_by_idx(I);
   return t;
 }
 /*--------------------------------------------------------------------------*/
 TData const* Analog_Function::arg_data(int I) const
-{ untested();
+{
   Token const* t = arg_token(I);
   auto a = prechecked_cast<Token_ARGUMENT const*>(t);
   assert(a);
-  if(a->_var){ untested();
+  if(a->_var){
     auto ret = prechecked_cast<TData const*>(a->_var->data());
     assert(ret);
     return ret;

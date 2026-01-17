@@ -149,7 +149,7 @@ endmodule
 dut d(in, out);
 
 `print tran v(nodes) iter(0)
-`tran .1
+`tran .1 trace=n
 
 status notime
 

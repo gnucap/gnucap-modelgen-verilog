@@ -254,7 +254,7 @@ inline void WAVE::new_transition(double t, double rt, double ft, double new_fv)
      new_tt = rt;
   }else if(new_slope < 0) {
      new_tt = ft;
-  }else{ untested();
+  }else{
   }
 
   new_slope /= new_tt;
@@ -263,7 +263,7 @@ inline void WAVE::new_transition(double t, double rt, double ft, double new_fv)
   double final_time = old_pair.first;
 
   trace6("nt0", start, new_tt, old_fv, new_fv, new_origin, _w.size());
-  if(new_slope == 0.){ untested();
+  if(new_slope == 0.){
     trace3("nt flat", start, old_ft, new_slope);
     incomplete();
   }else if(start > old_pair.first) { untested();

@@ -613,7 +613,7 @@ static void make_tr_review(std::ostream& o, const Module& m)
   if(m.has_tr_accept()){
     o__ "if(_accept){\n";
     o____ "COMPONENT::q_accept();\n";
-    o____ "trace1(\"" << m.identifier() <<"::_accept\", _sim->_time0);\n";
+    o____ "trace1(\"" << m.identifier() <<"::q_accept\", _sim->_time0);\n";
     o__ "}else{\n";
     o__ "}\n";
   }

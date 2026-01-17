@@ -73,7 +73,7 @@ typedef vString string;
 /*--------------------------------------------------------------------------*/
 template<class T>
 double plain_value(T const& x) { return x; }
-inline int plain_value(int const& x) { untested(); return x; }
+inline int plain_value(int const& x) { return x; }
 /*--------------------------------------------------------------------------*/
 // double inf = std::numeric_limits<double>::infinity();
 #define inf std::numeric_limits<double>::infinity()

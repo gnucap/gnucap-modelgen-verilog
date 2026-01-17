@@ -5,9 +5,8 @@ vpulse #(.rise(1e-8)) vv(in, 0 );
  100.E-12   0.01       0.        
  200.E-12   0.02       0.        
  10.E-9     1.         0.        
- 10.001E-9  1.         0.        
 Gnucap   System status
-iterations: op=0, dc=0, tran=14, fourier=0, total=19
-transient timesteps: accepted=5, rejected=0, total=5
+iterations: op=0, dc=0, tran=12, fourier=0, total=16
+transient timesteps: accepted=4, rejected=0, total=4
 nodes: user=2, subckt=0, model=2, total=4
 dctran density=37.5%, ac density=37.5%

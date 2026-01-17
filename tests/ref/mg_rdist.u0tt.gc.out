@@ -2,7 +2,7 @@
  0.         0.         0.14127    1.0827G    ??        -0.49581   
 #Time       v(n1)     
  0.         0.14127   
- 0.005     -0.2479    
+ 0.005     -0.17727   
  0.01      -0.49581   
  0.015     -0.73262   
  0.02      -0.9576    
@@ -203,7 +203,7 @@
  0.995      0.32186   
  1.         0.27586   
 Gnucap   System status
-iterations: op=0, dc=4, tran=2151, fourier=0, total=2880
-transient timesteps: accepted=724, rejected=1, total=725
+iterations: op=0, dc=4, tran=2131, fourier=0, total=2853
+transient timesteps: accepted=718, rejected=0, total=718
 nodes: user=1, subckt=0, model=1, total=2
 dctran density=50.0%, ac density=50.0%
