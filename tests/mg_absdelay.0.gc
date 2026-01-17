@@ -1,6 +1,8 @@
 attach ./modelgen_0.so
 attach ../vams/vsine.so
 
+* options numdgt 20
+
 verilog
 ground \0 ;
 
@@ -24,17 +26,19 @@ verilog
 parameter r=1
 parameter v=0
 
-test_absdel0 #() dut(\1 ,\0 );
+test_absdel0 #() dut1(\1 ,\0 );
 vsine #(.dc(v), .ampl(1)) v1(\1 , \0 );
+test_absdel0 #() dut2(\2 ,\0 );
+vsine #(.phase(90), .dc(v), .ampl(1)) v1(\2 , \0 );
 
 list
 
-print tran v(1) ll1(dut) vin(dut.*)
+print tran v(1) ll1(dut1) v(2) ll1(dut2) vin(dut1.*)
 tran 1 .1 trace=n
 
 end
 // incomplete probes...
-print ac v(1) ll1(dut) ll2(dut) ll3(dut)
+print ac v(1) ll1(dut1) v(2) ll1(dut2) ll3(dut)
 ac 2 4 * 2
 status notime
 end

@@ -49,6 +49,7 @@ public:
   const_iterator begin()const { untested();return _w.begin();}
   const_iterator end()const { untested();return _w.end();}
   size_t size()const {return _w.size();}
+  double delay()const {return _delay;}
 
   double last_time()const {
     if(_w.size()){

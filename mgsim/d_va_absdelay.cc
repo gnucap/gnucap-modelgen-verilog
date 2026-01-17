@@ -309,16 +309,24 @@ bool DELAY::do_tr()
   const COMMON_DELAY* c=prechecked_cast<const COMMON_DELAY*>(common());
   assert(c);
   c->tr_eval(this);
-  store_values();
-  q_load();
-  assert(converged());
-  return true;
 
-  //if (_out0 != _out1) { untested();
-  if (!conchk(_out0, _out1, OPT::abstol, OPT::reltol*.01)) { untested();
+  if(!_sim->analysis_is_static()){
     q_load();
-  }else{ untested();
+    assert(converged());
+  }else{
+    trace3("DELAY::do_tr static", _sim->_time0, _y[0].f0, tr_involts());
+    _y[0].f0 = _out0 = tr_involts();
+
+    set_converged(conchk(_y[0].f0, _y1.f0, OPT::abstol, OPT::reltol*.01));
+
+    if(!converged()){
+      q_load();
+    }else{
+    }
   }
+  store_values();
+
+  return converged();
 }
 /*--------------------------------------------------------------------------*/
 void DELAY::tr_advance()
@@ -394,6 +402,15 @@ inline void DELAY::dc_advance()
     _out0 = _forward.v_out(_sim->_time0).f0;
   }else{
   }
+//   _y[0].f1 = tr_involts();
+//   _out0 = tr_involts();
+// 
+//   trace2("DELAY::dc_advance", _out0, _out1);
+// 
+//   if (!conchk(_out0, _out1, OPT::abstol, OPT::reltol*.01)) {
+//     q_load();
+//   }else{
+//   }
 }
 /*--------------------------------------------------------------------------*/
 std::string DELAY::port_name(int i)const
@@ -676,7 +693,7 @@ TIME_PAIR DELAY::tr_review()
 {
   ELEMENT::tr_review();
   const COMMON_ABSDELAY* c=dynamic_cast<const COMMON_ABSDELAY*>(common());
-  if(c){
+  if(c){ untested();
     q_accept();
     // incomplete();
     _time_by.min_event(_sim->_time0 + c->_delay);
@@ -717,7 +734,7 @@ void COMMON_ABSDELAY::tr_eval(ELEMENT* e) const
     c->q_load();
   }else{
   }
-  assert(c->converged());
+  // assert(c->converged());
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_ABSDELAY::tr_accept(COMPONENT* c) const
@@ -725,10 +742,11 @@ void COMMON_ABSDELAY::tr_accept(COMPONENT* c) const
   DELAY* e = prechecked_cast<DELAY*>(c);
   assert(e);
 
-  trace2("DELAY::accept", _sim->_time0, e->tr_involts());
-  if(!_sim->_time0){
-    //??
-  }else if( e->_forward.last_time() == _delay + _sim->_time0){
+  if(!_sim->_time0){ untested();
+    e->_forward.push(-e->_forward.delay(), e->tr_involts());
+    e->_forward.push(0., e->tr_involts());
+    assert(e->_forward.v_out(_delay/2).f0 == e->tr_involts());
+  }else if( e->_forward.last_time() == _delay + _sim->_time0){ untested();
     // BUG
   }else {
     trace1("DELAY::accept", _sim->_time0 - e->_forward.last_time());
@@ -744,6 +762,7 @@ void COMMON_ABSDELAY::tr_advance(COMPONENT* c) const
   try{
     e->_y[0] = e->_forward.v_out(_sim->_time0);
     e->_out0 = e->_y[0].f0;
+    trace2("ABSDELAY::tr_advance", _sim->_time0, e->_out0);
   }catch(Exception const&){ untested();
     for(auto p : e->_forward){ untested();
       trace2("bug", p.first, p.second);
@@ -779,7 +798,6 @@ void COMMON_TRANSITION::tr_eval(ELEMENT* e) const
   }else{
     c->q_load();
   }
-  assert(c->converged());
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_TRANSITION::tr_accept(COMPONENT* c) const
