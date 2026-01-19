@@ -267,7 +267,7 @@ static std::string get_identifier(CS& f)
 class PP_Quoted_String : public String {
 public:
   void parse(CS& f) override {
-    if(f >> "\"") {
+    if(f.skip1('\"')) {
       parse_(f);
     }else{
     }
@@ -296,16 +296,13 @@ private:
       if (f.peek() == '"') {
 	f.skip();
 	break;
-      }else if (f.peek() == '\n') { untested();
-	data += '\\';
-	data += f.ctoc();
       }else if (f.peek() == '\\') {
 	data += f.ctoc();
 	if(f.peek() == '\\'){
 	  data += f.ctoc();
-	}else if(f.peek() == '\"'){
+	}else if(f.peek() == '"'){
 	  data += f.ctoc();
-	}else if(f.peek() == '\n'){ untested();
+	}else if(f.peek() == 'n'){
 	  data += f.ctoc();
 	}else{
 	}

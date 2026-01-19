@@ -8,6 +8,7 @@ This file summarizes new features and important changes between snapshots.
 - support common pooling (with C++>=20)
 - string parameters
 - fix dcop in $absdelay and $transition
+- preprocessor fix. whitespace in string literals
 - ..
 
 20251222-dev
