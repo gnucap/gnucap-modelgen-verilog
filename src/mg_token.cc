@@ -230,6 +230,7 @@ TData const* Token_BINOP_::op_deps(Token const* t1, Token const* t2)const
     assert(dynamic_cast<Token_CONSTANT const*>(t1)
          ||dynamic_cast<Token_OUT_VAR const*>(t1)
          ||dynamic_cast<Token_PAR_REF const*>(t1)
+         ||dynamic_cast<Token_HIER_REF const*>(t1)
          ||dynamic_cast<Token_VAR_REF const*>(t1) // ARGUMENT?
          ||dynamic_cast<Token_UNARY const*>(t1));
     d1 = &const_deps;
@@ -242,6 +243,7 @@ TData const* Token_BINOP_::op_deps(Token const* t1, Token const* t2)const
     assert(dynamic_cast<Token_CONSTANT const*>(t2)
          ||dynamic_cast<Token_OUT_VAR const*>(t2)
          ||dynamic_cast<Token_PAR_REF const*>(t2)
+         ||dynamic_cast<Token_HIER_REF const*>(t2)
          ||dynamic_cast<Token_VAR_REF const*>(t2) // ARGUMENT?
          ||dynamic_cast<Token_UNARY const*>(t2));
     d2 = &const_deps;
@@ -954,6 +956,12 @@ bool Token_ACCESS::is_short() const
   assert(p);
   assert(p->branch());
   return p->branch()->is_short();
+}
+/*--------------------------------------------------------------------------*/
+int Token_HIER_REF::_howmany;
+void Token_HIER_REF::stack_op(Expression* e)const
+{
+  e->push_back(clone());
 }
 /*--------------------------------------------------------------------------*/
 void Token_PAR_REF::stack_op(Expression* e)const

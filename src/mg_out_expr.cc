@@ -378,6 +378,11 @@ public:
     }
     _types.push(t_ref);
   }
+  void new_rhs(Token_HIER_REF const* v){
+    // TODO: what type is it??
+    _refs.push("pc->" + v->code_name() + ".get_double()");
+    _types.push(t_ref); // what?
+  }
   void new_rhs(Token_PAR_REF const* v){
     // _refs.push("ddouble(" + (*v)->code_name() + ")/*rhsvar*/");
     // _refs.push((*v)->type() + "(" + (*v)->code_name() + ") /*rhspar*/");
@@ -681,6 +686,8 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
 //      vars().new_rhs(t); // if linear?
 //      //incomplete();
 //      //o__ "0.; // OUTVAR?!\n";
+    }else if (auto hh = dynamic_cast<const Token_HIER_REF*>(*i)) {
+      vars().new_rhs(hh);
     }else if(auto pp = dynamic_cast<const Token_ACCESS*>(*i)) {
       vars().new_ddouble(o);
       if(!vars().has_deps()){

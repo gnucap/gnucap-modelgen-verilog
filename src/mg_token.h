@@ -321,9 +321,32 @@ private:
   size_t num_deps() const;
 };
 /*--------------------------------------------------------------------------*/
+class Token_HIER_REF : public Token_SYMBOL {
+  // Parameter_Base const* _item;
+  const int _id;
+  static int _howmany;
+public:
+  explicit Token_HIER_REF(const std::string Name)
+    : Token_SYMBOL(Name, nullptr), _id(++_howmany) {}
+private:
+  explicit Token_HIER_REF(const Token_HIER_REF& P)
+    : Token_SYMBOL(P), _id(P._id) {}
+  Token* clone()const override {
+    return new Token_HIER_REF(*this);
+  }
+public:
+  void stack_op(Expression* e)const override;
+public:
+  std::string key()const { return name(); }
+  std::string code_name()const {
+    return "_href_" + to_string(_id);
+  }
+  // std::string val_string()const override {return _name;}
+};
+/*--------------------------------------------------------------------------*/
 class Parameter_Base;
 class Token_PAR_REF : public Token_CONSTANT {
-  std::string _name;
+  std::string _name; // Token::_name?
   Parameter_Base const* _item;
 public:
   explicit Token_PAR_REF(const std::string Name, Parameter_Base const* item)

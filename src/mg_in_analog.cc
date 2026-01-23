@@ -2645,16 +2645,16 @@ Nature const* Probe::nature() const
   return _br->nature();
 }
 /*--------------------------------------------------------------------------*/
-void Module::new_analog()
+void new_analog(Owned_Base** analog)
 {
-  assert(!_analog);
-  _analog = new Analog;
+  assert(!*analog);
+  *analog = new Analog;
 }
 /*--------------------------------------------------------------------------*/
-void Module::delete_analog()
+void delete_analog(Owned_Base** analog)
 {
-  delete _analog;
-  _analog = nullptr;
+  delete *analog;
+  *analog = nullptr;
 }
 /*--------------------------------------------------------------------------*/
 bool Module::has_analog_block() const
