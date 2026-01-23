@@ -1,0 +1,32 @@
+nature current
+  access = I;
+  units = "A";
+  abstol = 1e-12; // OPT::abstol
+endnature
+
+// Electrical potential
+nature voltage
+  access = V;
+  units = "V";
+  abstol = 1e-6; // OPT::vntol
+endnature
+
+// Electrical discipline
+discipline electrical
+  potential voltage;
+  flow current;
+enddiscipline
+
+module mc_res(p, n);
+	electrical p,n;
+	inout p,n;
+	parameter real seed = 0;
+	parameter real mean = 10;
+	localparam real r = global_pp.roffset + $rdist_exponential(seed, mean);
+
+	(* desc="current" *) real i;
+	analog begin
+		i = V(p,n) / r;
+		I(p,n) <+ i;
+	end
+endmodule
