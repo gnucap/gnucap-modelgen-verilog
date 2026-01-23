@@ -7,6 +7,8 @@ ground g;
 testvs #(.p(3)) v1 (p, g);
 parameter x=3;
 testvs #(.p((3*x)+2)) v1 (p, g);
+#           v(p)      
+ 0.         8.        
 paramset testvs vsource;
   parameter real p;
  .dc=(p + 1);
@@ -15,9 +17,9 @@ endparamset
 ground g;
 vsource #(.dc(4)) v1 (.p(p),.n(g));
 parameter x=3;
-vsource #(.dc(((  x * 3) + 3))) v1 (.p(p),.n(g));
+vsource #(.dc(((\x    * 3) + 3))) v1 (.p(p),.n(g));
 Gnucap   System status
-iterations: op=0, dc=0, tran=0, fourier=0, total=0
+iterations: op=0, dc=2, tran=0, fourier=0, total=2
 transient timesteps: accepted=0, rejected=0, total=0
 nodes: user=1, subckt=0, model=0, total=1
 dctran density=100.0%, ac density=100.0%

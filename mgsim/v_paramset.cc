@@ -495,7 +495,19 @@ void PARAMSET::precalc_first()
   assert(!is_constant()); /* because I have more work to do */
 } // precalc_first
 /*--------------------------------------------------------------------------*/
-// THIS IS A HACK. variables with "_." prefix survive e_val. remove prefix.
+// THIS IS A HACK. variables with "_." postfix survive e_val. remove prefix.
+static std::string mangle(std::string const& value)
+{
+  if(*value.c_str() == '\\'){
+    assert(value.size()>1);
+    auto s = value.size();
+    std::string ret(value.substr(0, s-1));
+    return value + "_. ";
+  }else{
+    return value + "_.";
+  }
+}
+/*--------------------------------------------------------------------------*/
 static void demangle(std::string& value)
 {
   assert(value.size());
@@ -551,7 +563,7 @@ void resolve_copy(CARD_LIST* t, PARAM_LIST const& p, const CARD_LIST*)
 	}else if(dynamic_cast<Token_SYMBOL*>(*ii)) {
 	  assert(!dynamic_cast<const Float*>((*ii)->data()));
 	  assert(!dynamic_cast<const Integer*>((*ii)->data()));
-	  E.push_back(new Token_SYMBOL("_." + (*ii)->name()));
+	  E.push_back(new Token_SYMBOL(mangle((*ii)->name())));
 	  delete(*ii);
 	}else{
 	  E.push_back(*ii);

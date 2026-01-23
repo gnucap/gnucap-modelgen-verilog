@@ -1045,7 +1045,7 @@ void Token_VAR_REF::stack_op(Expression* e)const
     if(auto a = dynamic_cast<Assignment const*>(_item)){
       E->push_use(a->decl_token());
     }else{
-      incomplete();
+      // incomplete();
     }
 
   }

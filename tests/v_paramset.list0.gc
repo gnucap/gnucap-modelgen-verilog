@@ -12,5 +12,6 @@ testvs #(.p((3*x)+2)) v1(p, g);
 
 list
 print dc v(p)
+dc
 list
 status notime

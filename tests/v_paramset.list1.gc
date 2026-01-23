@@ -1,0 +1,21 @@
+verilog
+
+paramset testvs vsource;
+  parameter real p;
+ .dc=p + 1;
+endparamset
+
+module dut(p)
+  ground g;
+  parameter real \fred! = 3.;
+  testvs #(.p(3)) v1(p, g);
+  testvs #(.p((3*\fred! )+2)) v1(p, g);
+endmodule
+
+dut #() d(p);
+
+list
+print dc v(p)
+list
+dc
+status notime
