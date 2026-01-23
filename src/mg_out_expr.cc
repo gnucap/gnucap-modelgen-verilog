@@ -553,6 +553,8 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
     vars().new_float(o); // TODO
   }else if(rt->is_real()){
     vars().new_ddouble(o);
+  }else if(rt->is_string()){
+    vars().new_string(o);
   }else{
     vars().new_float(o); // TODO
   }

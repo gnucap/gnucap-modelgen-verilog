@@ -1,0 +1,25 @@
+attach ./modelgen_0.so
+
+verilog
+
+`modelgen
+module test_simparamstr0()
+
+	analog begin : main
+		$strobe("module is %s", $simparam$str("module"));
+		$strobe("instance is %s", $simparam$str("instance"));
+		$strobe("path is %s", $simparam$str("path"));
+	end
+
+endmodule
+
+!make test_simparamstr0.so > /dev/null
+attach ./test_simparamstr0.so
+
+test_simparamstr0 #() dutA();
+test_simparamstr0 #() dutB();
+
+list
+
+print dc iter(0)
+dc
