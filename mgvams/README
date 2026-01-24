@@ -44,6 +44,7 @@ Some of them are not here, but still in ../src.
   - ($stime)
   - $abstime
 - Table 9-10 -- Probabilistic
+  - $rist_*
   - ($random)
   - ($arandom)
 - Table 9-11 -- Math system functions
@@ -56,7 +57,7 @@ Some of them are not here, but still in ../src.
   - $temperature
   - $vt
   - $simparam
-  - ($simparam$str)
+  - $simparam$str
 - Table 9-13 -- Dynamic simulation probe
   - ($simprobe)
 - Table 9-14 -- Analog kernel control

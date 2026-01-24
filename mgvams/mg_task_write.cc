@@ -108,10 +108,14 @@ private:
   // Token* new_token(Module&, size_t)const override{ return nullptr; }
   void args(std::ostream& o, bool names=false)const {
     o << "std::string";
+    if(names){
+      o << " s";
+    }else{
+    }
     for(int i=1; i<int(num_args()); ++i) {
-      o____  ", double";
-      if(names){ untested();
-       o << " a " << i;
+      o____  ", T" << i;
+      if(names){
+       o << " a" << i;
       }else{
       }
     }
@@ -121,22 +125,37 @@ private:
       o << " (void) a" << i << ";\n";
     }
   }
+private:
+  void template_header(std::ostream& o, bool mod=false)const {
+    if(mod || num_args()>1){
+      o____ "template<";
+      std::string sep;
+      if(mod){
+	o << "class MOD";
+	sep = ", ";
+      }else{
+      }
+      for(size_t i=1; i<num_args(); ++i) {
+	o << sep << "class T" << i;
+	sep = ", ";
+      }
+      o << ">\n";
+    }else{
+    }
+  }
+public: //overrides
   void make_cc_dev(std::ostream& o)const override {
     o__ "struct cls" << label() << "{\n";
 
-    //template?
+    template_header(o, false);
     o____ "void tr_eval(CARD* d, std::string";
     for(size_t i=1; i<num_args(); ++i) {
-      o____  ", double";
+      o____  ", T" << i <<" const&";
     }
     o << ")const { (void)d; }\n";
 
-    o____ "template<class MOD>\n";
-    o____ "void tr_initial(MOD* d, std::string s";
-    for(size_t i=1; i<num_args(); ++i) {
-      o____  ", double a" << i << "";
-    }
-    o << ")const {\n";
+    template_header(o, true);
+    o____ "void tr_initial(MOD* d, "; args(o, true); o << ")const {\n";
     o______ "tr_accept(d, s\n";
     for(size_t i=1; i<num_args(); ++i) {
       o << ", a" << i;
@@ -144,10 +163,10 @@ private:
     o << ");\n";
     o____"}\n";
 
-    o____ "template<class MOD>\n";
+    template_header(o, true);
     o____ "void tr_begin(MOD* d, std::string";
     for(size_t i=1; i<num_args(); ++i) {
-      o____  ", double a" << i << "";
+      o____  ", T" << i << " a" << i << "";
     }
     o << ")const {\n";
     voidargs(o);
@@ -156,28 +175,25 @@ private:
     o______ " assert(d); d->q_accept();\n";
     o____"}\n";
 
-    o____ "template<class MOD>\n";
+    template_header(o, true);
     o____ "void tr_review(MOD* d, "; args(o); o << ") {\n";
     o______ "(void)d;\n";
     o______ " assert(d); d->q_accept();\n";
     o____"}\n";
 
-    o____ "template<class MOD>\n";
+    template_header(o, true);
     o____ "void tr_advance(MOD* d, "; args(o); o << ") {\n";
     o______ "(void)d;\n";
     o______ "trace1(\"write::tr_advance\", _sim->_time0);\n";
     o______ "assert(d); d->q_accept();\n";
     o____"}\n";
 
+    template_header(o);
     o____ "void tr_regress(CARD*, "; args(o); o << ") {\n";
     o____"}\n";
 
-    o____ "template<class MOD";
-    for(size_t i=1; i<num_args(); ++i) {
-      o <<  ", class T" << i;
-    }
-    o << ">\n";
-    o____ "void tr_accept(MOD*, std::string a0";
+    template_header(o);
+    o____ "void tr_accept(CARD*, std::string a0";
     for(size_t i=1; i<num_args(); ++i) {
       o << ", T" << i << " const& a" << i;
     }
@@ -194,6 +210,7 @@ private:
     o << ");\n";
     o____ "}\n";
 
+    template_header(o);
     o____ "void precalc(CARD const*, "; args(o); o << ")const { /*nop*/ }\n";
     o__ "}_" << label() << ";\n";
   }

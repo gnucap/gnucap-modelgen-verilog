@@ -146,6 +146,7 @@ class File;
 class Filter; // BUG. probably
 class Analog;
 class Circuit;
+class Hierarchical_Refs;
 class Module : public Block {
   typedef enum : int{
     if_AC_BEGIN = 0,
@@ -172,6 +173,7 @@ private: // verilog input data
   Owned_Base* _always{nullptr};
   Owned_Base* _analog{nullptr};
   Circuit* _circuit{nullptr};
+  Hierarchical_Refs* _hrefs{nullptr};
 //  Block _module_body;
 protected:
   Variable_List_Collection _variables;
@@ -186,20 +188,15 @@ private: // merge?
 
   mode_mask_t _has_pid[if_COUNT]{mm_NONE};
   int _times{0}; // _time array size
+  bool _has_expand_last{false};
 private: // elaboration data
-  void new_analog();
   void new_always();
   void new_circuit();
-  void delete_analog();
   void delete_always();
   void delete_circuit();
   void detach_out_vars();
 public:
-  Module() {
-    new_analog();
-    new_always();
-    new_circuit();
-  }
+  Module();
   ~Module();
 public:
   String_Arg const& key()const	  {return _identifier;}
@@ -219,9 +216,11 @@ public: // TODO
   }
   const Variable_List_Collection& variables()const	{return _variables;}
   const Circuit*	  circuit()const	{return _circuit;}
+  const Hierarchical_Refs& hrefs()const	{assert(_hrefs); return *_hrefs;}
   const Owned_Base& analog() const {assert(_analog); return *_analog;}
   const Owned_Base& always() const {assert(_always); return *_always;}
   bool has_analysis()const {return _has_analysis;}
+  bool has_expand_last()const {return _has_expand_last;}
 
   bool has_events()const    { return _has_pid[if_SET_EVENT];}
   bool has_tr_begin()const  { return _has_pid[if_TR_BEGIN]   || times(); }
@@ -270,6 +269,7 @@ private:
 public:
   void set_times(int h) {if(h > _times){_times = h;}else{}}
   void set_analysis() {_has_analysis = mm_ANALOG; }
+  void set_expand_last(bool v=true) {_has_expand_last = v; }
   void push_back(FUNCTION_* f);
   void push_back(Filter /*const*/ * f);
   void push_back(Token* x);
@@ -298,6 +298,9 @@ private:
   Node_Ref node(std::string const& p) const override;
   Branch_Ref lookup_branch(std::string const& p) const override;
 public:
+  Base* lookup(std::string const&, bool recurse=true)override;
+  Base const* lookup(CS& c)const { return Block::lookup(c); }
+public:
   bool new_var_ref(Base* what)override;
   Node* node(Node_Ref r) { return r.mutable_node(*this); }
 public: //filters may need this..
@@ -306,6 +309,7 @@ public: //filters may need this..
   void set_to_ground(Node const*);
 public:
   Branch_Ref new_filter(Node*);
+  Base /*const*/ * new_href(std::string const&n);
 }; // Module
 typedef Collection<Module> Module_List;
 /*--------------------------------------------------------------------------*/

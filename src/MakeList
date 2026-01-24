@@ -58,6 +58,7 @@ mg_func.cc \
 mg_func_evt.cc \
 mg_func_port.cc \
 mg_func_sys.cc \
+mg_href.cc \
 mg_impl.cc \
 mg_in_analog.cc \
 mg_in.cc \

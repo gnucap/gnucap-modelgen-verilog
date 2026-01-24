@@ -1,0 +1,10 @@
+test_simparamstr0 #() dutA ();
+test_simparamstr0 #() dutB ();
+#           iter(0)   
+module is test_simparamstr0
+instance is dutA
+path is path.incomplete
+module is test_simparamstr0
+instance is dutB
+path is path.incomplete
+ 0.         2.        

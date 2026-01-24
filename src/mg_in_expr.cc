@@ -202,6 +202,8 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 	  incomplete();
 	}
 #endif
+      }else if(auto ht = dynamic_cast<Token_HIER_REF const*>(r)){
+	ht->stack_op(&E);
       }else if(auto pp = dynamic_cast<Port_3 const*>(r)) {
 	assert(symbol);
 	Token_PORT_BRANCH a(*symbol, pp);

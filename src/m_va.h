@@ -74,6 +74,7 @@ typedef vString string;
 template<class T>
 double plain_value(T const& x) { return x; }
 inline int plain_value(int const& x) { return x; }
+inline char const* plain_value(std::string const& x) { return x.c_str(); }
 /*--------------------------------------------------------------------------*/
 // double inf = std::numeric_limits<double>::infinity();
 #define inf std::numeric_limits<double>::infinity()
@@ -650,6 +651,158 @@ public:
 /*--------------------------------------------------------------------------*/
 template<class S, class T>
 wrap_arg<S, T> io_arg(S, T& d) { return wrap_arg<S, T>(d); }
+/*--------------------------------------------------------------------------*/
+class Href_{
+  CARD const* _card{nullptr};
+  Base const* _ref{nullptr};
+  std::string _tail;
+  // const std::string _path;
+public:
+  explicit Href_() {}
+ // explicit Href_(std::string const& path) : _path(path) {}
+  explicit Href_(Href_ const&) = default;
+  void link_card(CARD const* scope, std::string const& path);
+  Base const* link_item(){
+    return _ref = find_item(_card?_card->subckt():&CARD_LIST::card_list, _tail);
+  }
+  double get_double()const {
+    Base const* ref = _ref;
+    CARD_LIST const* scope = _card?_card->subckt():&CARD_LIST::card_list;
+    if(ref){
+    }else{
+      // incomplete();
+      ref = find_item(scope, _tail);
+    }
+    if(auto f = dynamic_cast<Float const*>(ref)) {
+      trace1("href float", *f);
+      return *f;
+    }else if(scope){
+      trace1("href no float", _tail);
+      PARAMETER<double> pp; pp = _tail;
+      pp.e_val(NOT_VALID, scope->params());
+      return pp;
+    }else{
+      return NOT_VALID;
+    }
+  }
+  bool operator==(Href_ const& o)const {
+    return _card == o._card && _ref == o._ref && _tail == o._tail;
+  }
+private:
+  void link_device_(CARD const*, std::string const& path);
+  bool find_device_up(CARD const*, std::string const&, std::string const& tail);
+  bool find_device_down(CARD_LIST const*, std::string const& path);
+  bool find_device_down(CARD_LIST const*, std::string const& dev, std::string const& tail);
+  Base const* find_item(CARD_LIST const* scope, std::string const& path)const;
+};
+/*--------------------------------------------------------------------------*/
+// found a device. store the remainder of the path.
+inline void Href_::link_device_(CARD const* device, std::string const& path)
+{
+  if(!device){ untested();
+    // top level thing?
+    incomplete();
+  }else{
+    trace2("found link device", device->long_label(), path);
+  }
+
+  _card = device;
+  _tail = path;
+}
+/*--------------------------------------------------------------------------*/
+inline Base const* Href_::find_item(CARD_LIST const* scope, std::string const& path) const
+{
+  // trace2("find_item", path, _card?_card->long_label():"(null)");
+  auto dotplace = path.find(".");
+  if(dotplace == std::string::npos){
+    assert(scope);
+    PARAM_LIST const* p = scope->params();
+    assert(p);
+    PARAM_LIST::const_iterator it = p->find(path);
+    if(it == p->end()){
+    }else{
+      PARAM_INSTANCE const& pi = it.ref();
+      return pi.value();
+    }
+  }else{ untested();
+    incomplete();
+  }
+  return nullptr;
+}
+/*--------------------------------------------------------------------------*/
+inline bool Href_::find_device_up(CARD const* device,
+     std::string const& name, std::string const& tail)
+{
+  assert(device);
+  trace3("find_device_up", device->long_label(), name, tail);
+  if(*device != name){
+    if(find_device_down(device->subckt(), name, tail)){
+      return true;
+    }else if(CARD const* o = device->owner()){ untested();
+      return find_device_up(o, name, tail);
+    }else{
+      _card = device;
+      _tail = tail;
+      return true;
+    }
+  }else{
+    return find_device_down(device->subckt(), tail);
+  }
+}
+/*--------------------------------------------------------------------------*/
+inline bool Href_::find_device_down(CARD_LIST const* scope, std::string const& dev,
+    std::string const& tail)
+{
+  assert(scope);
+  auto it = scope->find_(dev);
+  if(it == scope->end()){ untested();
+    trace1("href::find_dev_down, miss", dev);
+    return false;
+  }else if(find_device_down((*it)->subckt(), tail)) {
+    return true;
+  }else{
+    _card = *it;
+    _tail = tail;
+    return true;
+  }
+}
+inline bool Href_::find_device_down(CARD_LIST const* scope, std::string const& path)
+{
+  trace2("href::find_dev_down", scope, path);
+  auto dotplace = path.find(".");
+  if(!scope){ untested();
+    return false;
+  }else if(dotplace == std::string::npos) {
+    return false;
+  }else{
+    std::string tail = path.substr(dotplace+1, std::string::npos);
+    std::string dev = path.substr(0, dotplace);
+    return find_device_down(scope, dev, tail);
+  }
+}
+/*--------------------------------------------------------------------------*/
+inline void Href_::link_card(CARD const* dev, std::string const& path)
+{
+  assert(dev);
+  trace2("href::link_card", path, dev->long_label());
+  auto dotplace = path.find(".");
+  std::string name = path.substr(0, dotplace);
+  std::string tail = path.substr(dotplace+1, std::string::npos);
+
+  bool ret;
+  if(name == "$root") {
+    ret = find_device_down(&CARD_LIST::card_list, tail);
+  }else if(CARD const* o = dev->owner()){
+    ret = find_device_up(o, name, tail);
+  }else{
+    ret = find_device_down(&CARD_LIST::card_list, path);
+  }
+
+  if(ret){
+  }else{
+    throw Exception_Cant_Find(name, tail);
+  }
+}
 /*--------------------------------------------------------------------------*/
 } // namespace
 namespace va {

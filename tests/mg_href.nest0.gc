@@ -1,0 +1,68 @@
+attach ./modelgen_0.so
+
+verilog
+
+`modelgen
+module test_hrefn0(p, n);
+	electrical p, n;
+	inout p, n;
+	parameter real P = dd.aa.foo;
+	analog begin
+		$strobe("P in %s is %f", $simparam$str("instance"), P);
+	end
+endmodule
+
+list
+
+!make test_hrefn0.so > /dev/null
+attach ./test_hrefn0.so
+
+module nn();
+  parameter real foo = 1;
+endmodule
+
+module numbers();
+  parameter real bar = 2;
+  nn #(.foo(1.)) aa();
+endmodule
+
+numbers #(.bar(3.14)) dd();
+
+test_hrefn0 #() dut1(gnd, n1);
+`op
+
+clear
+
+module nn();
+  parameter real foo = 1;
+endmodule
+
+module numbers();
+  parameter real bar = 2;
+  nn #(.foo(bar)) aa();
+endmodule
+
+numbers #(.bar(bar)) dd();
+
+parameter real bar=3.14
+test_hrefn0 #() dut1(gnd, n1);
+`op
+parameter real bar=2.17
+`op
+
+delete dut1;
+delete dd;
+
+module dut2()
+	test_hrefn0 #() dutnest(gnd, n1);
+	numbers #(.bar(19)) dd();
+endmodule
+
+dut2 #() d2();
+
+`op
+`end
+// BUG: this does not work (segv)
+delete dd
+numbers #(.bar(2.17)) dd();
+`op

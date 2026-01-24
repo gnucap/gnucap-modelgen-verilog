@@ -24,6 +24,7 @@
 #include "mg_options.h"
 #include "mg_analog.h" // BUG. Probe
 #include "mg_token.h" // Deps
+#include "mg_href.h" // Deps
 /*--------------------------------------------------------------------------*/
 static void declare_deriv_enum(std::ostream& o, const Module& m)
 {
@@ -137,6 +138,14 @@ static void make_funcs_common(std::ostream& o, pSet<FUNCTION_ const> const& P)
       unreachable();
       o<<"// func no refs " << (*q)->label() << "\n";
     }
+  }
+}
+/*--------------------------------------------------------------------------*/
+static void make_hrefs_common(std::ostream& o, Hierarchical_Refs const& H)
+{
+  for (auto q = H.begin(); q != H.end(); ++q) {
+    //o__ "Href_ "<< (*q)->code_name() << "(\"" << (*q)->name() << "\");\n";
+    o__ "Href_ "<< (*q)->code_name() << "; // " << (*q)->name() << "\n";
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -332,6 +341,10 @@ static void make_common(std::ostream& o, const Module& m)
         << " + " << base_class_name << "::param_count();}\n";
   o__ "void precalc_first(const PARAM_LIST*)override;\n";
   o__ "void expand(const COMPONENT*)override;\n";
+  if(m.has_expand_last()){
+    o__ "void expand_last(const COMPONENT*); // override\n";
+  }else{
+  }
   o__ "void precalc_last(const PARAM_LIST*)override;\n";
   // if has_analog?
   o__ "void tr_eval_analog(MOD_" << m.identifier() << "*)const;\n";
@@ -390,7 +403,8 @@ static void make_common(std::ostream& o, const Module& m)
   }
   o << "private: // funcs\n";
   make_funcs_common(o, m.funcs());
-
+  o << "private: // hrefs\n";
+  make_hrefs_common(o, m.hrefs());
   o << "}; //" << class_name << "\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -595,6 +609,10 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "int is_valid()const override;\n";
   o__ "void precalc_first()override;\n";
   o__ "void expand()override;\n";
+  if(m.has_expand_last()){
+    o__ "void expand_last()override;\n";
+  }else{
+  }
   o__ "void precalc_last()override;\n";
   o__ "void zero_filter_readout();\n";
   o__ "//void    map_nodes();         //BASE_SUBCKT\n";

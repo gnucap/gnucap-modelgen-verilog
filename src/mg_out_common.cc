@@ -23,6 +23,7 @@
 #include "mg_circuit.h"
 #include "mg_.h" // TODO
 #include "mg_options.h"
+#include "mg_href.h"
 #include <numeric>
 /*--------------------------------------------------------------------------*/
 static void make_common_default_constructor(std::ostream& o, const Module& d)
@@ -251,9 +252,10 @@ static void make_common_operator_equal(std::ostream& o, const Module& d)
     }else{
     }
   }
-  o << "#if __cplusplus >= 202002L\n";
-  o____ "&& _v_ == p->_v_\n";
-  o << "#endif\n";
+  Hierarchical_Refs const& H = d.hrefs();
+  for (auto q = H.begin(); q != H.end(); ++q) {
+    o____ "&& " << (*q)->code_name() << " == p-> " << (*q)->code_name() << "\n";
+  }
   o____ "&& !compare(*p)\n"; // kludge.
   o____ "&& COMMON_COMPONENT::operator==(x));\n"
     "}\n"
@@ -722,13 +724,31 @@ static void make_eval_netlist_parameters(std::ostream& o , const Module& m)
   }
 }
 /*--------------------------------------------------------------------------*/
+static void make_common_expand_last(std::ostream& o , const Module& m)
+{
+  make_tag(o);
+  o  <<
+    "void COMMON_" << m.identifier() << "::expand_last(const COMPONENT* d)\n{\n";
+    o__ "// COMMON_COMPONENT::expand_last(d);\n";
+
+  Hierarchical_Refs const& H = m.hrefs();
+  for (auto q = H.begin(); q != H.end(); ++q) {
+    o__ "try{\n";
+    o____ (*q)->code_name() << ".link_card(d, \"" << (*q)->name() << "\");\n";
+    o__ "}catch(Exception_Cant_Find const& e){\n";
+    o____ "throw(Exception_Precalc(d->long_label() + \": cant find " << (*q)->name() << "\"));\n";
+    o__ "}\n";
+  }
+  o << "}\n";
+}
+/*--------------------------------------------------------------------------*/
 static void make_common_expand(std::ostream& o , const Module& m)
 {
   make_tag(o);
   o  <<
     "void COMMON_" << m.identifier() << "::expand(const COMPONENT* d)\n{\n";
-    o__ "COMMON_COMPONENT::expand(d);\n"
-    "}\n";
+    o__ "COMMON_COMPONENT::expand(d);\n";
+  o << "}\n";
 #if 0
     "  attach_model(d);\n"
     "  COMMON_" << d.identifier() << "* c = this;\n"
@@ -774,6 +794,7 @@ static void make_common_expand(std::ostream& o , const Module& m)
   o__ "COMMON_COMPONENT::precalc_first(par_scope);\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
   o__ "(void)pc;\n";
+  // BUG: only structurally relevant
   make_final_adjust_eval_parameter_list(o , m.parameters());
   make_eval_netlist_parameters(o, m);
   o  << "}\n"
@@ -783,6 +804,7 @@ static void make_common_expand(std::ostream& o , const Module& m)
   o__ "assert(par_scope);\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
   o__ "(void)pc;\n";
+  // BUG: omit structurally relevant?
   make_final_adjust_eval_parameter_list(o , m.parameters());
   make_eval_netlist_parameters(o, m);
 
@@ -857,6 +879,10 @@ void make_cc_common(std::ostream& o , const Module& m)
   make_common_param_value(o, m);
   make_common_is_valid(o, m);
   make_common_expand(o, m);
+  if(m.has_expand_last()){
+    make_common_expand_last(o, m);
+  }else{
+  }
   o  << "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/

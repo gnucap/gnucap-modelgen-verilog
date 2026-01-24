@@ -1,9 +1,13 @@
-== limitations
+== limitations and work in progress
 - rise, fall, delay in $transition are constant.
 - delay in $absdelay is a constant.
+- no refcounting in hierarchical refs, use with care
+  c.f. mg_href.nest0.gc
+- localparam not considered in overloading
+- ac needs operating point, even if linear:
+  c.f. mg2_cccs.0.gc
 
 == modelgen
-- ac needs operating point, even if linear: mg2_cccs.0.gc
 - dependency tracking glitch aka rram bug
 - ddx, flow(<port>): no derivatives (feature?)
 - filter contribution to potential, uses internal node.

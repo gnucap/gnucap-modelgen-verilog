@@ -1,0 +1,38 @@
+attach ./modelgen_0.so
+
+verilog
+
+`modelgen
+module test_href1(p, n);
+	electrical p, n;
+	inout p, n;
+	parameter real P = dd.p;
+	parameter real Q = dd.q;
+	parameter real R = Q + $rdist_uniform(1,2,3);
+	analog begin
+		$strobe("P in %s is %f", $simparam$str("instance"), P);
+		$strobe("Q in %s is %f", $simparam$str("instance"), Q);
+		$strobe("R in %s is %f", $simparam$str("instance"), R);
+	end
+endmodule
+
+list
+
+!make test_href1.so > /dev/null
+attach ./test_href1.so
+
+module numbers();
+  parameter real p = 1;
+  parameter real q = \$rdist_exponential:0 (1,2);
+endmodule
+
+list
+
+numbers #(.p(\$rdist_normal:0 (1,2,3))) dd();
+
+test_href1 #() dut1(gnd, n1);
+test_href1 #() dut2(gnd, n1);
+dc
+`options rndseed=42
+dc
+dc

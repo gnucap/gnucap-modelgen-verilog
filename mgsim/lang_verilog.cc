@@ -706,11 +706,16 @@ void CMD_PARAM::parse(CS& cmd, PARAM_LIST* Scope) const
   }
   size_t here = cmd.cursor();
   for (;;) {
-    if (!(cmd.more() && (cmd.is_alpha() || cmd.match1('_')))) { untested();
+    if (!cmd.more()){ untested();
       break;
+    }else if(cmd.is_alpha()){
+    }else if(cmd.match1('_')){ untested();
+    }else if(cmd.match1('\\')){
+      // escaped identifier
     }else{
+      break;
     }
-    std::string Name;
+    Name_String Name;
     cmd >> Name;
     trace1("CMD_PARAM::parse", Name);
     par = "";

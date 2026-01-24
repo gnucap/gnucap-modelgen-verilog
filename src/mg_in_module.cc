@@ -26,6 +26,7 @@
 #include "mg_options.h"
 #include "mg_analog.h" // BUG: Analog_Function_Arg, push_back
 #include "mg_token.h"
+#include "mg_href.h"
 #include "l_stlextra.h"
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -474,6 +475,19 @@ void Port_3::parse(CS& f)
   if(owner()){
     _node = owner()->new_node(value());
   }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+// BUG Base const*
+Base* Module::lookup(std::string const& n, bool r)
+{
+  size_t dot = n.find(".");
+  if(dot == 0){
+    return Block::lookup(n, r);
+  }else if(dot == std::string::npos){
+    return Block::lookup(n, r);
+  }else{
+    return new_href(n);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1193,11 +1207,25 @@ void Module::detach_out_vars()
 #endif
 }
 /*--------------------------------------------------------------------------*/
+void new_analog(Owned_Base**);
+void delete_analog(Owned_Base**);
+void new_hier_refs(Hierarchical_Refs**);
+void delete_hier_refs(Hierarchical_Refs**);
+/*--------------------------------------------------------------------------*/
+Module::Module()
+{
+  new_analog(&_analog);
+  new_always();
+  new_circuit();
+  new_hier_refs(&_hrefs);
+}
+/*--------------------------------------------------------------------------*/
 Module::~Module()
 {
-  delete_analog();
+  delete_analog(&_analog);
   detach_out_vars(); // delete variables?
   delete_circuit();
+  delete_hier_refs(&_hrefs);
 }
 /*--------------------------------------------------------------------------*/
 bool Node::is_used() const
@@ -1420,6 +1448,13 @@ void Module::setup_functions()
 void Module::install(FUNCTION_ const* f)
 {
   _funcs.insert(f);
+}
+/*--------------------------------------------------------------------------*/
+Base /*const*/ * Module::new_href(std::string const&n)
+{
+  set_expand_last();
+  assert(_hrefs);
+  return _hrefs->get(n);
 }
 /*--------------------------------------------------------------------------*/
 Branch_Ref Module::new_filter(Node* x)

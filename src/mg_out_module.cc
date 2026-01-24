@@ -1118,6 +1118,21 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
  //  assert(!is_constant()); /* because I have more work to do */
 }
 /*--------------------------------------------------------------------------*/
+static void make_module_expand_last(std::ostream& o, Module const& m)
+{
+  make_tag(o);
+  String_Arg const& mid = m.identifier();
+  o << "void MOD_" << mid << "::expand_last()\n{\n";
+  o__ "trace1(\"expand_last\", long_label());\n";
+  o__ "auto cc = prechecked_cast<COMMON_" << m.identifier() << "*>(common()->clone());\n";
+  o__ "assert(cc);\n";
+  o__ "cc->expand_last(this);\n";
+  o__ "attach_common(cc);\n";
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
 static void make_module_expand(std::ostream& o, Module const& m)
 {
   make_tag(o);
@@ -1400,6 +1415,10 @@ void make_cc_module(std::ostream& o, const Module& m)
   make_module_precalc_first(o, m);
   make_module_is_valid(o, m);
   make_module_expand(o, m);
+  if(m.has_expand_last()){
+    make_module_expand_last(o, m);
+  }else{
+  }
   make_module_precalc_last(o, m);
   make_cc_func(o, m);
 //  make_module_probe(o, m);

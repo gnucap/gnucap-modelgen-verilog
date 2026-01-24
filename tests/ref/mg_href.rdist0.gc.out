@@ -1,0 +1,29 @@
+module numbers ();
+  parameter real p = 1;
+  parameter real q = \$rdist_exponential:0 (1,2);
+endmodule // numbers
+
+#          
+P in dut1 is -5.103383
+Q in dut1 is 0.250689
+R in dut1 is 2.436469
+P in dut2 is -5.103383
+Q in dut2 is 0.896328
+R in dut2 is 3.165541
+ 0.        
+#          
+P in dut1 is -1.756462
+Q in dut1 is 2.632162
+R in dut1 is 4.843226
+P in dut2 is -1.756462
+Q in dut2 is 0.113762
+R in dut2 is 3.050197
+ 0.        
+#          
+P in dut1 is -1.756462
+Q in dut1 is 2.632162
+R in dut1 is 4.843226
+P in dut2 is -1.756462
+Q in dut2 is 0.113762
+R in dut2 is 3.050197
+ 0.        

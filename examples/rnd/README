@@ -27,3 +27,19 @@ $ gnucap-mg-vams --cc params.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -sh
 $ gnucap params.gc
 
 see also tests/mg_rdist.tern.0.gc
+
+== monte carlo
+
+Simple example with a resistor subject to process parameters. Note that
+repeated dc runs are inefficient, as they repeatedly recomute the bias point.
+Modify d_dc.cc to sweeps the seed like a temperature.
+
+$ gnucap-mg-vams --cc mc_res.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o mc_res.so
+$ gnucap mc_res.gc
+
+A sweep also facilitates postprocessing (here: with a parameter cheat).
+
+$ gnucap mc_res_swp.gc | tail -n 3
+imin=-0.00494296042597853
+imax=-0.00481391535140574
+irms= 0.00488693645873694

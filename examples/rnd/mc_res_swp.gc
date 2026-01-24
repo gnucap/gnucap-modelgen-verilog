@@ -1,0 +1,29 @@
+load mgsim
+load ./mc_res.so
+verilog
+
+module process_params()
+  parameter real roffset=0.;
+endmodule
+
+process_params #(.roffset($rdist_normal(2, 1k, 5)) global_pp();
+
+ground gnd;
+parameter real seed = 0;
+
+mc_res #(.seed(seed)) r1(n1, gnd);
+mc_res #(.seed(seed)) r2(n1, gnd);
+mc_res #(.seed(seed)) r3(n1, gnd);
+mc_res #(.seed(seed)) r4(n1, gnd);
+mc_res #(.seed(seed)) r5(n1, gnd);
+
+vsource #(.dc(1)) vsupp(n1, gnd);
+
+print dc i(r*) i(vsupp)
+store dc i(vsupp)
+
+`dc seed 0 100 1
+
+`measure imin = min(probe="i(vsupp)")
+`measure imax = max(probe="i(vsupp)")
+`measure irms = rms(probe="i(vsupp)")
