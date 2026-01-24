@@ -22,6 +22,7 @@
 #include "mg_func.h"
 #include "mg_circuit.h"
 #include "mg_token.h"
+#include "mg_options.h"
 #include <stack>
 #include <numeric> // iota
 #include "mg_.h" // TODO
@@ -680,12 +681,10 @@ static void make_tr_eval_branch(std::ostream& o, Module const& m,
 /*--------------------------------------------------------------------------*/
 static void make_tr_eval_branches(std::ostream& o, const Module& m)
 {
-  o << "#if 0\n";
   for(auto br : m.circuit()->branches()) {
     o << "// tr_eval_branch " << br->code_name() << "\n";
     make_tr_eval_branch(o, m, *br);
   }
-  o << "#endif\n";
 }
 /*--------------------------------------------------------------------------*/
 static void make_read_probes(std::ostream& o, const Module& m)
@@ -774,7 +773,12 @@ static void make_module_class(std::ostream& o, Module const& m)
     "------------------------------------*/\n";
   if(m.has_analog_block()){
     make_tr_needs_eval(o, m);
-    make_tr_eval_branches(o, m);
+    if(options().decompose_eval()){
+      o << "#if 0\n";
+      make_tr_eval_branches(o, m);
+      o << "#endif\n";
+    }else{
+    }
     make_do_tr(o, m);
     make_cc_analog(o, m);
   }else{
