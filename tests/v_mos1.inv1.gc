@@ -2,10 +2,10 @@ load ../vams/mosfet.so
 load ../vams/diode.so
 ground \0 ;
 
-*options noincmode
+options noincmode
 *options nobypass
 *options method euler
-options itl4=400
+*options itl4=400
 
 paramset nmos mosfet;
   parameter real l;
