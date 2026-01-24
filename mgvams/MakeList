@@ -2,6 +2,7 @@
 PACKAGE = mgvams
 
 TARGET = \
+  mg_debug.so \
   mg_filt_xdt.so \
   mg_filt_noise.so \
   mg_filt_absdelay.so \

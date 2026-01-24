@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * Verilog-AMS builtin functions
+ * Verilog-AMS display tasks
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"
@@ -30,56 +30,6 @@
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/
 namespace{
-/*--------------------------------------------------------------------------*/
-class DEBUG_TASK : public MGVAMS_TASK {
-public:
-  explicit DEBUG_TASK() : MGVAMS_TASK(){
-  }
-private:
-  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
-    unreachable();
-    return "$$debug";
-  }
-  MGVAMS_TASK* clone()const override {
-    return new DEBUG_TASK(*this);
-  }
-  bool has_tr_accept()const override {return true;}
-  // Token* new_token(Module&, size_t)const override{ return nullptr; }
-  void make_cc_dev(std::ostream& o)const override {
-    if(num_args()>1){
-      o____ "template<";
-      std::string sep;
-      for(size_t i=1; i<num_args(); ++i) {
-	o << sep << "class T" << i;
-	sep = ", ";
-      }
-      o << ">\n";
-    }else{
-    }
-    o__ "void " << label() << "(std::string const& a0";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", T" << i << " a" << i;
-    }
-    o << ") {\n";
-    o______ "fprintf(stdout, a0.c_str()";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", plain_value(a" << i << ")";
-    }
-    o << ");\n";
-    o__ "}\n";
-    o__ "void " << label() << "__precalc(std::string const&";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", double";
-    }
-    o << "){\n";
-    o__ "}\n";
-  }
-  std::string code_name()const override{
-    return "/*d*/" + label();
-  }
-  Data_Type const* return_type()const override { return nullptr; }
-} debug;
-DISPATCHER<FUNCTION>::INSTALL d_debug(&function_dispatcher, "$debug", &debug);
 /*--------------------------------------------------------------------------*/
 class WRITE : public MGVAMS_TASK {
 public:
