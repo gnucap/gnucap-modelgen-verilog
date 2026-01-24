@@ -1970,7 +1970,7 @@ TData const* Analog_Function::arg_data(int I) const
   auto a = prechecked_cast<Token_ARGUMENT const*>(t);
   assert(a);
   if(a->_var){
-    auto ret = prechecked_cast<TData const*>(a->_var->data());
+    auto ret = prechecked_cast<TData const*>(a->data());
     assert(ret);
     return ret;
   }else{ untested();

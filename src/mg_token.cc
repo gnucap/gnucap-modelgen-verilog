@@ -1170,7 +1170,7 @@ RDeps const& Token_VAR_REF::rdeps() const
 /*--------------------------------------------------------------------------*/
 Data_Type const& Token_VAR_REF::type() const
 {
-  if(auto p = dynamic_cast<Variable_Decl const*>(_item)){ untested();
+  if(auto p = dynamic_cast<Variable_Decl const*>(_item)){
     assert(p);
     return p->type();
   }else if(auto it=dynamic_cast<Assignment const*>(_item)){
