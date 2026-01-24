@@ -15,14 +15,14 @@ module foo(p, x);
     // y : 0
     real C// +
 ;
-    A = 1; // s1 r5{bevax}
-    B = A; // s2 r5{bevax}
-    C = B; // s3 r5{bevax}
-    $strobe("some strobe %f.", (C + V(x))); // [V(x)] s3 r5{bevax}
-    y = V(p); // [V(p)] s1 r5{bevax}
-    $strobe("some strobe %f.", y); // [V(p)] s1 r5{bevax}
+    A = 1; // s1 r5{abevx}
+    B = A; // s2 r5{abevx}
+    C = B; // s3 r5{abevx}
+    $strobe("some strobe %f.", (C + V(x))); // [V(x)] s3 r5{abevx}
+    y = V(p); // [V(p)] s1 r5{abevx}
+    $strobe("some strobe %f.", y); // [V(p)] s1 r5{abevx}
     $finish(1); // c
-    y = 0; // s1 r3{bax}
+    y = 0; // s1 r3{abx}
   end
 
 endmodule

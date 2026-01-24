@@ -9,13 +9,13 @@ module dep0(d, g);
   analog begin // always
     // S : 0
     // T : 0
-    T = 1; // s1 r5{bevax}
-    S = 2; // s1 r5{bevax}
+    T = 1; // s1 r5{abevx}
+    S = 2; // s1 r5{abevx}
     if (analysis("static")) begin
-      $strobe("%f", T); // s1 r5{bevax}
+      $strobe("%f", T); // s1 r5{abevx}
     end
     else begin
-      $strobe("%f", S); // s1 r5{bevax}
+      $strobe("%f", S); // s1 r5{abevx}
     end
   end
 

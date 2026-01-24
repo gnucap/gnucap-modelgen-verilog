@@ -21,13 +21,13 @@ module test_bug_block1(p, n);
             // N : 0
             real N// +
 ;
-            N = xgt; // s3 r3{bax}
-            G_s = N; // s4 r3{bax}
+            N = xgt; // s3 r3{abx}
+            G_s = N; // s4 r3{abx}
           end
         end
       end
     end
-    xgt = V(p); // [V(p)] s1 r3{bax}
+    xgt = V(p); // [V(p)] s1 r3{abx}
     I(p, n) <+ V(p, n); // [V(p, n)] r2{x}
   end
 

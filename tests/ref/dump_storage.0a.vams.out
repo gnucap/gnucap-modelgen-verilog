@@ -9,7 +9,7 @@ module test_state(a, c);
   analog   initial begin // i
     if (init) begin // i
       // vv : 0
-      vv = init; // s1 r4{bax}
+      vv = init; // s1 r4{abx}
     end
   end
 

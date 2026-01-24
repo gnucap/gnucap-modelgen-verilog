@@ -9,7 +9,7 @@ module cond0(p, n);
 
   analog begin : main // always
     // S : 0
-    S = 1; // s1 r3{bax}
+    S = 1; // s1 r3{abx}
   end
 
 endmodule

@@ -15,10 +15,10 @@ module dep0(d, g);
       // T : 1
       // c : 1
       I(d) <+ c; // [V(g)] s4 r2{x}
-      c = T; // [V(g)] s3 r4{bax}
-      T = V(g); // [V(g)] s1 r4{bax}
+      c = T; // [V(g)] s3 r4{abx}
+      T = V(g); // [V(g)] s1 r4{abx}
     end
-    d = c; // [V(g)] s5 r3{bax}
+    d = c; // [V(g)] s5 r3{abx}
   end
 
 endmodule
@@ -36,7 +36,7 @@ module dep1(out0, out1, in0, in1);
   analog begin // always
     // vfwd : 1
     I(out) <+ (V(out) / 2); // [Vout] r2{x}
-    vfwd = ddt(((V(in) *  2.) - V(ref))); // [V(ddt_0_p)] s1 r4{bax}
+    vfwd = ddt(((V(in) *  2.) - V(ref))); // [V(ddt_0_p)] s1 r4{abx}
     I(out) <+ vfwd; // [V(ddt_0_p)] s1 r2{x}
   end
 

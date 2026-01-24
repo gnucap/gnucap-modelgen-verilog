@@ -12,16 +12,16 @@ module dep7(a, g);
     real c// + [V(a)]
 , d// * [V(a)]
 ;
-    c = V(a); // [V(a)] s1 r4{bax}
+    c = V(a); // [V(a)] s1 r4{abx}
     if ((V(g) > 1)) begin : b0
       // t : 0
       real t//
 ;
-      t = 4; // s1 r3{bax}
+      t = 4; // s1 r3{abx}
     end
     else begin
       // d : 1
-      d = c; // [V(a)] s2 r4{bax}
+      d = c; // [V(a)] s2 r4{abx}
     end
     begin : stuff // always
       if ((c > 0)) begin : b1
@@ -29,7 +29,7 @@ module dep7(a, g);
         real f// [V(a)]
 ;
         I(g) <+ d; // [V(a)] s3 r2{x}
-        f = d; // [V(a)] s4 r3{bax}
+        f = d; // [V(a)] s4 r3{abx}
       end
       else begin
         I(g) <+ 1; // r2{x}
@@ -55,16 +55,16 @@ module dep7p(a, g);
     real c// + [V(a)]
 , d// * [V(a)]
 ;
-    c = V(a); // [V(a)] s1 r4{bax}
+    c = V(a); // [V(a)] s1 r4{abx}
     if ((V(g) > 1)) begin : b0
       // t : 0
       real t//
 ;
-      t = 4; // s1 r3{bax}
+      t = 4; // s1 r3{abx}
     end
     else begin
       // d : 1
-      d = c; // [V(a)] s2 r4{bax}
+      d = c; // [V(a)] s2 r4{abx}
     end
     begin : stuff // always
       if ((c > 0)) begin : b1
@@ -72,7 +72,7 @@ module dep7p(a, g);
         real f// [V(a)]
 ;
         I(g) <+ d; // [V(a)] s3 r2{x}
-        f = d; // [V(a)] s4 r3{bax}
+        f = d; // [V(a)] s4 r3{abx}
       end
       else begin
         I(g) <+ 1; // r2{x}

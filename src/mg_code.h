@@ -61,11 +61,16 @@ void dump_annotate(std::ostream& o, A const& a)
 #endif
     if(a.rdeps_().size()){
       o << " r" << a.rdeps_().size() << "{";
+      std::set<char> ordered_tags;
       for(Base const* r : a.rdeps_()){
-	if(r->val_string().size() == 1){ // HACK
-	  o << r->val_string();
+	std::string s = r->val_string();
+	if(s.size() == 1){ // HACK
+	  ordered_tags.insert(s[0]);
 	}else{
 	}
+      }
+      for(char c : ordered_tags){
+	o << c;
       }
       o << "}";
     }else{

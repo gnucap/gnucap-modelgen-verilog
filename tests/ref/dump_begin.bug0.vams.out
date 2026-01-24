@@ -9,7 +9,7 @@ module dep0(d, g);
 
   analog begin // always
     // beginvar : 0
-    beginvar = 0; // s1 r3{bax}
+    beginvar = 0; // s1 r3{abx}
   end
 
 endmodule

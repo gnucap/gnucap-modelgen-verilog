@@ -11,14 +11,14 @@ module dep0(d, g);
 ;
     real S// [V(g)]
 ;
-    S = T; // s3 r3{bax}
+    S = T; // s3 r3{abx}
     while (1) begin // always
       // T : 1
       // c : 1
-      c = T; // [V(g)] s3 r3{bax}
-      T = V(g); // [V(g)] s1 r3{bax}
+      c = T; // [V(g)] s3 r3{abx}
+      T = V(g); // [V(g)] s1 r3{abx}
     end
-    S = T; // [V(g)] s3 r3{bax}
+    S = T; // [V(g)] s3 r3{abx}
   end
 
 endmodule

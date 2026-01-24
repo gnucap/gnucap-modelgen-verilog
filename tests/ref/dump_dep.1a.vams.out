@@ -17,13 +17,13 @@ module dep0(d, g);
     while (1) begin // always
       // S : 1
       // T : 1
-      T = T; // [V(g)] s7 r3{bax}
-      S = T; // [V(g)] s7 r3{bax}
-      T = V(g); // [V(g)] s1 r3{bax}
+      T = T; // [V(g)] s7 r3{abx}
+      S = T; // [V(g)] s7 r3{abx}
+      T = V(g); // [V(g)] s1 r3{abx}
     end
-    U = S; // [V(g)] s6 r3{bax}
-    T = U; // [V(g)] s7 r3{bax}
-    X = U; // [V(g)] s7 r3{bax}
+    U = S; // [V(g)] s6 r3{abx}
+    T = U; // [V(g)] s7 r3{abx}
+    X = U; // [V(g)] s7 r3{abx}
   end
 
 endmodule

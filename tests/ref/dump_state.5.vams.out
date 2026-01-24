@@ -9,11 +9,11 @@ module test_strobe3(a, b);
   analog begin // always
     begin // always
       // P : 0
-      P = p; // s1 r5{bevax}
+      P = p; // s1 r5{abevx}
       if ((P == 1)) begin
       end
       else begin
-        $strobe("BUG"); // r5{bevax}
+        $strobe("BUG"); // r5{abevx}
       end
     end
   end

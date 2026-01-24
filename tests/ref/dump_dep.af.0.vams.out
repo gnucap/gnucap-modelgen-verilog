@@ -12,8 +12,8 @@ module dep0(d, g);
     begin // f
       // b : 1
       // testaf : 1
-      b = a; // [a] s1 r3{bax}
-      testaf = a; // [a] s1 r3{bax}
+      b = a; // [a] s1 r3{abx}
+      testaf = a; // [a] s1 r3{abx}
     end
   endfunction
 
