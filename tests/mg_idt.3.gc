@@ -11,7 +11,7 @@ module test_idt3(p, n);
 		rst = 0;
 		@(timer(1, 1)) begin
 			rst = 1;
-			$trace("timer %g\n", rst);
+			$trace("timer %d\n", rst);
 			$discontinuity();
 		end
 		V(p, n) <+ idt(1.0, 0, rst);

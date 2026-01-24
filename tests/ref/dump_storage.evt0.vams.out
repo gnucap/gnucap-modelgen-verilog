@@ -9,7 +9,7 @@ module test_evtana0c(p, n);
   analog begin // always
     if (analysis("static")) begin
       // v : 0
-      $trace("static %g\n", $abstime); // r4{abrx}
+      $debug("static %g\n", $abstime); // r1{x}
       v =  0.4; // s1 r4{abx}
     end
     else begin
