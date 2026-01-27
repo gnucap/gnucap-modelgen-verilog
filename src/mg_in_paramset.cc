@@ -470,7 +470,12 @@ void Paramset_Stmt::parse(CS& f)
   assert(owner());
   _rhs.set_owner(owner());
   Expression_ ex;
-  f >> "=" >> ex >> ";";
+  if(f >> '='){
+  }else if(f.peek() == '('){
+    f.warn(bDANGER, "nonstandard syntax");
+  }else{ untested();
+  }
+  f >> ex >> ";";
   if(f){
     _rhs.resolve_symbols(ex);
   }else{ untested();
