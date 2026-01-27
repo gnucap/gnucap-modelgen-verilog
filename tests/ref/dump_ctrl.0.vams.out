@@ -23,7 +23,7 @@ module cond1(p, n);
 ;
     if (1) begin // always
       // S : 0
-      S = 3; // s1 r3{bax}
+      S = 3; // s1 r3{abx}
     end
     else begin : bla // never
       // S : 0
@@ -37,7 +37,7 @@ module cond1(p, n);
     end
     else begin : bla // always
       // S : 0
-      S = 1; // s1 r3{bax}
+      S = 1; // s1 r3{abx}
     end
   end
 
@@ -57,7 +57,7 @@ module cond2(p, n);
     end
     if (1) begin // always
       // T : 0
-      T = 1; // s1 r3{bax}
+      T = 1; // s1 r3{abx}
     end
     else begin // never
       if (0) begin // never
@@ -80,7 +80,7 @@ module cond3(p, n);
     if (1) begin // always
       if (2) begin // always
         // S : 0
-        S = 2; // s1 r3{bax}
+        S = 2; // s1 r3{abx}
       end
     end
     if (1) begin // always
@@ -113,7 +113,7 @@ module cond3(p, n);
     if (1) begin // always
       if (2) begin // always
         // S : 0
-        S = 2; // s1 r3{bax}
+        S = 2; // s1 r3{abx}
       end
       else begin // never
         // S : 0

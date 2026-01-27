@@ -10,15 +10,15 @@ module dep_test(d, g);
     case (sel)
       0: begin
         // c : 0
-        c = 1; // s1 r4{bax}
+        c = 1; // s1 r4{abx}
       end
       1: begin
         // c : 0
-        c = sel; // s1 r4{bax}
+        c = sel; // s1 r4{abx}
       end
     endcase
     I(d) <+ c; // s4 r2{x}
-    c = 4; // s1 r4{bax}
+    c = 4; // s1 r4{abx}
   end
 
 endmodule

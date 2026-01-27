@@ -12,27 +12,27 @@ module dep0(d, g);
     begin // f
       // b : 1
       // testaf : 1
-      b = a; // [a] s1 r3{bax}
-      testaf = a; // [a] s1 r3{bax}
+      b = a; // [a] s1 r3{abx}
+      testaf = a; // [a] s1 r3{abx}
     end
   endfunction
 
   analog begin : main // always
     // a : 0
-    // b : 0
+    // b : 1
     // c : 0
     real a// + [V(g)]
 ;
-    real b// *
+    real b// * [V(g)]
 ;
     real c// + [V(g)]
 ;
     begin // always
       // a : 1
       // c : 1
-      a = V(g); // [V(g)] s1 r3{bx}
+      a = V(g); // [V(g)] s1 r4{bx}
       c = testaf(a, b); // [V(g)] s3 r3{bx}
-      I(d) <+ b; // s1 r2{x}
+      I(d) <+ b; // [V(g)] s2 r2{x}
       I(g) <+ c; // [V(g)] s3 r2{x}
     end
   end

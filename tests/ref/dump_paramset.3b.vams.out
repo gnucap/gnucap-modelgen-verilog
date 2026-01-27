@@ -11,13 +11,13 @@ module my_res(a, b);
     // __i : 1
     begin // always
       // __i : 0
-      __i =  3.; // s1 r3{bax}
+      __i =  3.; // s1 r3{abx}
       begin // always
         // __i : 1
-        __i = V(a, b); // [V(a, b)] s1 r3{bax}
+        __i = V(a, b); // [V(a, b)] s1 r3{abx}
       end
     end
-    __i = __i; // [V(a, b)] s4 r3{bax}
+    __i = __i; // [V(a, b)] s4 r3{abx}
   end
 
 endmodule

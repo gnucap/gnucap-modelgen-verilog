@@ -8,7 +8,7 @@ module test();
     begin // f
       // fct : 0
       // x : 0
-      x = 2; // s1 r3{bax}
+      x = 2; // s1 r3{abx}
     end
   endfunction
 

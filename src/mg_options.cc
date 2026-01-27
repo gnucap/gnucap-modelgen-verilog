@@ -38,6 +38,7 @@ Options::Options() :
   _optimize_deps(true),   // consider dependency types
   _optimize_unused(true), // dont emit unused sources
   _optimize_nodes(true),  // prune unused nodes
+  _decompose_eval(false),
   _gen_module(true),
   _gen_paramset(true),
   _dump_module(true),
@@ -63,6 +64,7 @@ void Options::parse(CS& f)
       || Get(f, "optimize-deriv",  &_optimize_deriv)
       || Get(f, "optimize-deps",   &_optimize_deps)
       || Get(f, "optimize-unused", &_optimize_unused)
+      || Get(f, "decompose-eval",  &_decompose_eval)
       || Get(f, "gen-module",      &_gen_module)
       || Get(f, "gen-paramset",    &_gen_paramset)
       || Get(f, "dump-module",     &_dump_module)

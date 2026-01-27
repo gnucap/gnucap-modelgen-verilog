@@ -6,14 +6,14 @@ module device(p, n);
   analog begin // always
     @(initial_step) begin // e
       // r : 0
-      r = 3; // s2 r3{bax}
+      r = 3; // s2 r3{abx}
     end
   end
 
   analog begin // always
     @(initial_step) begin // e
       // r : 0
-      r = 2; // s2 r3{bax}
+      r = 2; // s2 r3{abx}
     end
   end
 

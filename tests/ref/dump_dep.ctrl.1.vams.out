@@ -14,15 +14,15 @@ module test_while0a(p, n);
     real y// + [V(p, n)]
 ;
     x =  0.; // [V(p, n)] s4 r3{bx}
-    y =  0.; // [V(p, n)] s3 r4{bax}
-    i = r; // s1 r4{bax}
+    y =  0.; // [V(p, n)] s3 r4{abx}
+    i = r; // s1 r4{abx}
     while ((i > 0)) begin
       // i : 0
       // x : 1
       // y : 1
-      i = (i - 1); // s2 r3{bax}
-      x = y; // [V(p, n)] s3 r4{bax}
-      y = (x + V(p, n)); // [V(p, n)] s3 r4{bax}
+      i = (i - 1); // s2 r3{abx}
+      x = y; // [V(p, n)] s3 r4{abx}
+      y = (x + V(p, n)); // [V(p, n)] s3 r4{abx}
     end
     I(p, n) <+ x; // [V(p, n)] s4 r2{x}
   end

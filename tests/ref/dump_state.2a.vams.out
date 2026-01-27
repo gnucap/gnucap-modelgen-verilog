@@ -10,7 +10,7 @@ module st1(p);
 ;
     if (1) begin // always
       // c : 0
-      c = (c + 1); // s2 r4{bax}
+      c = (c + 1); // s2 r4{abx}
     end
     V(p) <+ c; // s2 r2{x}
   end

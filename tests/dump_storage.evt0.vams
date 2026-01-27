@@ -11,7 +11,7 @@ module test_evtana0c(p, n);
 	real v;
 	analog begin
 		if(analysis("static")) begin
-			$trace("static %g\n", $abstime);
+			$debug("static %g\n", $abstime);
 			v = .4;
 		end else begin
 			if(0) $trace("not static %g\n", $abstime);

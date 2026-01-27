@@ -4,7 +4,8 @@ ground \0 ;
 load ../vams
 
 options method gear
-options itl4=40
+options noincmode
+//options itl4=40
 
 paramset nmos mosfet;
   parameter real l;
