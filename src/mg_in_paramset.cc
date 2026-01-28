@@ -472,7 +472,7 @@ void Paramset_Stmt::parse(CS& f)
   Expression_ ex;
   if(f >> '='){
   }else if(f.peek() == '('){
-    f.warn(bDANGER, "nonstandard syntax");
+    f.warn(bWARNING, "nonstandard syntax");
   }else{ untested();
   }
   f >> ex >> ";";
