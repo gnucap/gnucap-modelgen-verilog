@@ -81,6 +81,7 @@ protected: // override virtual
   }
 
   bool has_iv_probe()const override { untested();return true;}
+  void expand()override;
   void expand_last()override;
   void expand_current_port(int i);
 
@@ -160,6 +161,15 @@ DEV_CPOLY_G::DEV_CPOLY_G()
    _time(NOT_VALID),
    _nN(_nodes)
 {
+}
+/*--------------------------------------------------------------------------*/
+void DEV_CPOLY_G::expand()
+{
+  ELEMENT::expand();
+  if(_current_port_names.size()){
+    q_expand_last();
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::expand_last()

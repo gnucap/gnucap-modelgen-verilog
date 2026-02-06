@@ -160,6 +160,7 @@ protected: // override virtual
     return "";
   }
 
+  void expand()override;
   void expand_last()override;
   void expand_current_port(int i);
 
@@ -819,6 +820,15 @@ void DEV_CPOLY_CAP::precalc_last()
 
   STORAGE::precalc_last();
   trace1("DCC::pl", _method_a);
+}
+/*--------------------------------------------------------------------------*/
+void DEV_CPOLY_CAP::expand()
+{
+  STORAGE::expand();
+  if(_current_port_names.size()){
+    q_expand_last();
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_CAP::expand_last()

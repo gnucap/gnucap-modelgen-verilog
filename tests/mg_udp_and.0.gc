@@ -1,5 +1,6 @@
 
 load ./modelgen_1.so
+load ./c_debug.so
 load vams/vpulse.so
 
 `modelgen test_myand0
@@ -44,3 +45,4 @@ list t
 print tran v(nodes) l(nodes)
 tran 1 trace n
 status notime
+portdump

@@ -1246,11 +1246,10 @@ static void make_module_expand(std::ostream& o, Module const& m)
     //   o__ "n_(n_" << nn->name() << ").set_to_ground(nullptr);\n";
     }else if(pos < n){
     }else if(n <= int(m.circuit()->ports().size())){
-      o__ "trace2(\"float0?\", long_label(), n_("<<pos-1<<").e_());\n";
-      o__ "n_("<<pos-1<<").allocate(2); // no-op unless floating\n";
-      o__ "trace2(\"float1?\", long_label(), n_("<<pos-1<<").e_());\n";
+      // todo: use new_model_node for floating ports.
+      o__ "n_("<<pos-1<<").allocate(3); // no-op unless floating\n";
     }else{
-      o__ "n_("<<pos-1<<").allocate(2);\n";
+      // handled by new_model_node
     }
   }
 
@@ -1270,6 +1269,10 @@ static void make_module_expand(std::ostream& o, Module const& m)
   o__ "    *i = d;\n";
   o__ "  }\n";
   o__ "}\n";
+  if(m.has_expand_last()){
+    o__ "q_expand_last();\n";
+  }else{
+  }
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";

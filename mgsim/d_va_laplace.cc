@@ -929,9 +929,6 @@ void LAPLACE::expand()
   }else{
   }
 
-  for(int i=ext_nodes()+int_nodes(); i>net_nodes();){
-    n_(--i).allocate(2);
-  }
   // after precalc_last
 //  assert( c->_p_num.size());
 //  assert( c->_p_den.size());

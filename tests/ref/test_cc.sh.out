@@ -752,12 +752,14 @@ inline bool Href_::find_device_up(CARD const* device,
       return true;
     }else if(CARD const* o = device->owner()){ untested();
       return find_device_up(o, name, tail);
+    }else if(find_device_down(device->scope(), name, tail)){
+      return true;
     }else{
       _card = device;
       _tail = tail;
       return true;
     }
-  }else{
+  }else{ untested();
     return find_device_down(device->subckt(), tail);
   }
 }
@@ -766,8 +768,11 @@ inline bool Href_::find_device_down(CARD_LIST const* scope, std::string const& d
     std::string const& tail)
 {
   assert(scope);
+  if(scope == &CARD_LIST::card_list){
+  }else{
+  }
   auto it = scope->find_(dev);
-  if(it == scope->end()){ untested();
+  if(it == scope->end()){
     trace1("href::find_dev_down, miss", dev);
     return false;
   }else if(find_device_down((*it)->subckt(), tail)) {
@@ -2433,12 +2438,8 @@ void MOD_resistor::expand()
   subckt()->expand();
   //subckt()->precalc();
   // alloc ground
-  trace2("float0?", long_label(), n_(1).e_());
-  n_(1).allocate(2); // no-op unless floating
-  trace2("float1?", long_label(), n_(1).e_());
-  trace2("float0?", long_label(), n_(0).e_());
-  n_(0).allocate(2); // no-op unless floating
-  trace2("float1?", long_label(), n_(0).e_());
+  n_(1).allocate(3); // no-op unless floating
+  n_(0).allocate(3); // no-op unless floating
   assert(!is_constant());
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();
@@ -4195,12 +4196,8 @@ void MOD_resistor::expand()
   subckt()->expand();
   //subckt()->precalc();
   // alloc ground
-  trace2("float0?", long_label(), n_(1).e_());
-  n_(1).allocate(2); // no-op unless floating
-  trace2("float1?", long_label(), n_(1).e_());
-  trace2("float0?", long_label(), n_(0).e_());
-  n_(0).allocate(2); // no-op unless floating
-  trace2("float1?", long_label(), n_(0).e_());
+  n_(1).allocate(3); // no-op unless floating
+  n_(0).allocate(3); // no-op unless floating
   assert(!is_constant());
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();
@@ -5031,12 +5028,14 @@ inline bool Href_::find_device_up(CARD const* device,
       return true;
     }else if(CARD const* o = device->owner()){ untested();
       return find_device_up(o, name, tail);
+    }else if(find_device_down(device->scope(), name, tail)){
+      return true;
     }else{
       _card = device;
       _tail = tail;
       return true;
     }
-  }else{
+  }else{ untested();
     return find_device_down(device->subckt(), tail);
   }
 }
@@ -5045,8 +5044,11 @@ inline bool Href_::find_device_down(CARD_LIST const* scope, std::string const& d
     std::string const& tail)
 {
   assert(scope);
+  if(scope == &CARD_LIST::card_list){
+  }else{
+  }
   auto it = scope->find_(dev);
-  if(it == scope->end()){ untested();
+  if(it == scope->end()){
     trace1("href::find_dev_down, miss", dev);
     return false;
   }else if(find_device_down((*it)->subckt(), tail)) {
@@ -6463,12 +6465,8 @@ void MOD_capacitor::expand()
   subckt()->expand();
   //subckt()->precalc();
   // alloc ground
-  trace2("float0?", long_label(), n_(1).e_());
-  n_(1).allocate(2); // no-op unless floating
-  trace2("float1?", long_label(), n_(1).e_());
-  trace2("float0?", long_label(), n_(0).e_());
-  n_(0).allocate(2); // no-op unless floating
-  trace2("float1?", long_label(), n_(0).e_());
+  n_(1).allocate(3); // no-op unless floating
+  n_(0).allocate(3); // no-op unless floating
   assert(!is_constant());
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();
@@ -7636,13 +7634,8 @@ void MOD_capacitor::expand()
   //precalc();
   subckt()->expand();
   //subckt()->precalc();
-  n_(2).allocate(2);
-  trace2("float0?", long_label(), n_(1).e_());
-  n_(1).allocate(2); // no-op unless floating
-  trace2("float1?", long_label(), n_(1).e_());
-  trace2("float0?", long_label(), n_(0).e_());
-  n_(0).allocate(2); // no-op unless floating
-  trace2("float1?", long_label(), n_(0).e_());
+  n_(1).allocate(3); // no-op unless floating
+  n_(0).allocate(3); // no-op unless floating
   assert(!is_constant());
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();
