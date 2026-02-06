@@ -490,15 +490,17 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
     }else{
     }
 
-    MODEL_CARD* m = model_dispatcher[modelname];
     std::string extended_name = modelname;
     int bin_count = 0;
+#if 0
+    MODEL_CARD* m = model_dispatcher[modelname];
     while(m){
       error(bLOG, long_label() + ": " + extended_name + " from model_dispatcher\n");
       prepare_overload(m, modelname, Proto);
       extended_name = modelname + ':' + to_string(bin_count++);
       m = model_dispatcher[extended_name];
     }
+#endif
 
     CARD* p = device_dispatcher[modelname];
     extended_name = modelname;

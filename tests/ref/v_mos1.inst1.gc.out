@@ -20,9 +20,7 @@ main #() dut (\2 , \1 , gnd, gnd);
 vsource #(.dc(1)) v2 (.p(\2 ),.n(gnd));
 >>>>>print op i(v*)
 main.n1: nmos from top level
-main.n1: nmos from model_dispatcher
-main.n1: 2 candidates found for nmos
-dut.n1 ambiguous overload in nmos
+main.n1: 1 candidate found for nmos
 >>>>>op
 #           i(v1)      i(v2)     
  27.        0.        -30.u      
