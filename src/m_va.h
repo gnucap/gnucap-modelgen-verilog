@@ -740,12 +740,14 @@ inline bool Href_::find_device_up(CARD const* device,
       return true;
     }else if(CARD const* o = device->owner()){ untested();
       return find_device_up(o, name, tail);
+    }else if(find_device_down(device->scope(), name, tail)){
+      return true;
     }else{
       _card = device;
       _tail = tail;
       return true;
     }
-  }else{
+  }else{ untested();
     return find_device_down(device->subckt(), tail);
   }
 }
@@ -754,8 +756,11 @@ inline bool Href_::find_device_down(CARD_LIST const* scope, std::string const& d
     std::string const& tail)
 {
   assert(scope);
+  if(scope == &CARD_LIST::card_list){
+  }else{
+  }
   auto it = scope->find_(dev);
-  if(it == scope->end()){ untested();
+  if(it == scope->end()){
     trace1("href::find_dev_down, miss", dev);
     return false;
   }else if(find_device_down((*it)->subckt(), tail)) {

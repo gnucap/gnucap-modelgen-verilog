@@ -1,0 +1,35 @@
+attach ./modelgen_0.so
+
+verilog
+
+`modelgen
+module test_href2(p, n);
+	electrical p, n;
+	inout p, n;
+	parameter real P = $root.dd.foo + $root.dd.bar;
+	parameter real Q = dd.foo;
+	analog begin
+		$strobe("P is %f", P);
+		$strobe("Q is %f", Q);
+	end
+endmodule
+
+list
+
+!make test_href2.so > /dev/null
+attach ./test_href2.so
+
+module numbers();
+  parameter real foo = 1;
+  parameter real bar = 2;
+endmodule
+
+numbers #(.foo(3.14)) dd();
+
+module href_tb();
+  test_href2 #() dut1(gnd, n1);
+endmodule
+
+href_tb #() tb();
+
+`op

@@ -774,7 +774,7 @@ void PARAMSET::expand()
 	}else{
 	}
       }
-      dev->expand_last();
+//      dev->expand_last();
     }
 
     if(dev->is_valid()){

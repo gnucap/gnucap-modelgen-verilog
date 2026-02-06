@@ -1269,6 +1269,10 @@ static void make_module_expand(std::ostream& o, Module const& m)
   o__ "    *i = d;\n";
   o__ "  }\n";
   o__ "}\n";
+  if(m.has_expand_last()){
+    o__ "q_expand_last();\n";
+  }else{
+  }
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
