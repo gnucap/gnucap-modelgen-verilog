@@ -91,6 +91,7 @@ protected:
 /*--------------------------------------------------------------------------*/
 void VA_BREQN::expand()
 {
+  DEV_CPOLY_G::expand();
   if (_sim->is_first_expand()) {
     for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
       n_(i).clear();
@@ -103,7 +104,6 @@ void VA_BREQN::expand()
     assert(BR() < int_nodes()+ext_nodes());
   }else{ untested();
   }
-  DEV_CPOLY_G::expand();
 }
 /*--------------------------------------------------------------------------*/
 void VA_BREQN::tr_iwant_matrix_extended_branch()
