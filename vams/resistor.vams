@@ -29,5 +29,5 @@ endmodule
 
 paramset resistor resistor
 	parameter real r = 1. from [0.:inf);
-	.r(r);
+	.r = r;
 endparamset

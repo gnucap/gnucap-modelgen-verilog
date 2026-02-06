@@ -11,7 +11,7 @@ module base(p, n);
 endmodule
 paramset test_ps1 base
   parameter real r=1;
-  .r = r;
+  .r(r);
 endparamset
 `endmodelgen
 

@@ -1,3 +1,17 @@
+  .ampl(ampl);
+       ^ ? nonstandard syntax
+  .dc(dc);
+     ^ ? nonstandard syntax
+  .freq(freq);
+       ^ ? nonstandard syntax
+  .val0(val0);
+       ^ ? nonstandard syntax
+  .val1(val1);
+       ^ ? nonstandard syntax
+  .period(period);
+         ^ ? nonstandard syntax
+  .width(period/2.);
+        ^ ? nonstandard syntax
 #Time       v(in)      v(out)     iter(0)   
  0.         0.         0.         6.        
  100.p      345.57p    0.         3.        

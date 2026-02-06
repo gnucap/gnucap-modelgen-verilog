@@ -177,7 +177,12 @@ void LANG_VERILOG::parse_args_paramset(CS& cmd, CARD* x)
     size_t here = cmd.cursor();
     std::string Name, value;
     try{
-      cmd >> Name >> '=';
+      cmd >> Name;
+      if(cmd >> '='){
+      }else if(cmd.peek() == '('){
+	cmd.warn(bDANGER, "nonstandard syntax" );
+      }else{ untested();
+      }
       Expression e(cmd);
       std::stringstream s;
       e.dump(s);

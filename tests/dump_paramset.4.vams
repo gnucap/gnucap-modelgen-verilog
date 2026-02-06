@@ -22,22 +22,22 @@ endmodule
 
 paramset d1 p_;
 	parameter real p = 1.;
-	.p(p);
+	.p = p;
 endparamset;
 
 paramset d2 p_;
 	parameter real P = 1.;
-	.p(P);
+	.p = P;
 endparamset;
 
 paramset d2a p_;
 	parameter real P = 1.;
-	.P(P);
+	.P = P;
 endparamset;
 
 
 paramset d3 p_;
-	.p(1);
+	.p = 1;
 endparamset;
 
 paramset d4 p_;

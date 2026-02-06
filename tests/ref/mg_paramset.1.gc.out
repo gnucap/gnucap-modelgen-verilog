@@ -1,3 +1,5 @@
+module base(p,  ... rameter real r=1; .r(r); endparamset 
+                                        ^ ? nonstandard syntax
 isource #(.dc(5)) i(\0 , 1);
                          ^ ? invalid identifier
 #           v(1)       iter(0)   

@@ -1,5 +1,9 @@
 >>>>>verilog 
 >>>>>`modelgen
+module base(p,  ... from '{"A", "B"}; .i(1); endparamset paramset test_psv0 
+                                        ^ ? nonstandard syntax
+module base(p,  ... from '{"C", "D"}; .i(2); endparamset 
+                                        ^ ? nonstandard syntax
 >>>>>!make test_psv0.so > /dev/null
 >>>>>attach ./test_psv0.so
 >>>>>verilog
