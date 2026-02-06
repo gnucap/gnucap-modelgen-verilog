@@ -663,16 +663,6 @@ void ZFILTER::expand()
 
   assert(input_idx() < ext_nodes()+int_nodes());
   assert(!is_constant());
-
-#if 0
-  for(int i=ext_nodes()+int_nodes(); i>net_nodes(); ) {
-    n_(--i).allocate(2);
-  }
-#else
-  for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i) {
-    n_(i).allocate(2);
-  }
-#endif
 } //expand
 /*--------------------------------------------------------------------------*/
 void ZFILTER::precalc_last()

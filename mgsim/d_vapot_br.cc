@@ -104,15 +104,6 @@ void VA_BREQN::expand()
   }else{ untested();
   }
   DEV_CPOLY_G::expand();
-
-  trace5("VA_BREQN::expand alloc", long_label(), net_nodes(), ext_nodes(), int_nodes(), BR());
-  for(int i=ext_nodes()+int_nodes(); i>net_nodes();){
-    --i;
-    trace3("VA_BREQN::expand alloc1", long_label(), i, n_(i).n_());
-    trace1("VA_BREQN::expand alloc2", _sim->_model_nodes);
-    n_(i).allocate(2);
-    trace1("VA_BREQN::expand alloc2b", _sim->_model_nodes);
-  }
 }
 /*--------------------------------------------------------------------------*/
 void VA_BREQN::tr_iwant_matrix_extended_branch()

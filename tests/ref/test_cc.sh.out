@@ -2433,12 +2433,8 @@ void MOD_resistor::expand()
   subckt()->expand();
   //subckt()->precalc();
   // alloc ground
-  trace2("float0?", long_label(), n_(1).e_());
-  n_(1).allocate(2); // no-op unless floating
-  trace2("float1?", long_label(), n_(1).e_());
-  trace2("float0?", long_label(), n_(0).e_());
-  n_(0).allocate(2); // no-op unless floating
-  trace2("float1?", long_label(), n_(0).e_());
+  n_(1).allocate(3); // no-op unless floating
+  n_(0).allocate(3); // no-op unless floating
   assert(!is_constant());
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();
@@ -4195,12 +4191,8 @@ void MOD_resistor::expand()
   subckt()->expand();
   //subckt()->precalc();
   // alloc ground
-  trace2("float0?", long_label(), n_(1).e_());
-  n_(1).allocate(2); // no-op unless floating
-  trace2("float1?", long_label(), n_(1).e_());
-  trace2("float0?", long_label(), n_(0).e_());
-  n_(0).allocate(2); // no-op unless floating
-  trace2("float1?", long_label(), n_(0).e_());
+  n_(1).allocate(3); // no-op unless floating
+  n_(0).allocate(3); // no-op unless floating
   assert(!is_constant());
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();
@@ -6463,12 +6455,8 @@ void MOD_capacitor::expand()
   subckt()->expand();
   //subckt()->precalc();
   // alloc ground
-  trace2("float0?", long_label(), n_(1).e_());
-  n_(1).allocate(2); // no-op unless floating
-  trace2("float1?", long_label(), n_(1).e_());
-  trace2("float0?", long_label(), n_(0).e_());
-  n_(0).allocate(2); // no-op unless floating
-  trace2("float1?", long_label(), n_(0).e_());
+  n_(1).allocate(3); // no-op unless floating
+  n_(0).allocate(3); // no-op unless floating
   assert(!is_constant());
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();
@@ -7636,13 +7624,8 @@ void MOD_capacitor::expand()
   //precalc();
   subckt()->expand();
   //subckt()->precalc();
-  n_(2).allocate(2);
-  trace2("float0?", long_label(), n_(1).e_());
-  n_(1).allocate(2); // no-op unless floating
-  trace2("float1?", long_label(), n_(1).e_());
-  trace2("float0?", long_label(), n_(0).e_());
-  n_(0).allocate(2); // no-op unless floating
-  trace2("float1?", long_label(), n_(0).e_());
+  n_(1).allocate(3); // no-op unless floating
+  n_(0).allocate(3); // no-op unless floating
   assert(!is_constant());
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
     CARD* d = (*i)->deflate();
