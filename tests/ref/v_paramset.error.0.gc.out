@@ -39,7 +39,6 @@ main.v: 1 candidate found for vsource
 main.R1: res from top level
 main.R1: res from top level
 main.R1: res from top level
-main.R1: res from model_dispatcher
 main.R1: 3 candidates found for res
 assuming double in 201
 assuming double in 201

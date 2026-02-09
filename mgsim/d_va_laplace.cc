@@ -319,7 +319,6 @@ private: // BASE_SUBCKT
   void	  ac_load()override;
 private: // overrides
   double tr_amps()const override;
-  int is_valid()const override;
   void precalc_first()override;
   void expand()override;
   void precalc_last()override;
@@ -593,13 +592,6 @@ void LAPLACE::precalc_first()
     subckt()->precalc_first();
   }else{
   }
-}
-/*--------------------------------------------------------------------------*/
-int LAPLACE::is_valid()const
-{ untested();
-  COMMON_LAPLACE const* c = prechecked_cast<COMMON_LAPLACE const*>(common());
-  assert(c);
-  return c->is_valid();
 }
 /*--------------------------------------------------------------------------*/
 int COMMON_LAPLACE::pivot() const

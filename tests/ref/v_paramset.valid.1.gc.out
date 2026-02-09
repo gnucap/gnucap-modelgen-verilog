@@ -30,11 +30,9 @@ main.v: isource from device_dispatcher
 main.v: 1 candidate found for isource
 main.R1: res from top level: res1
 main.R1: res from top level: res2
-main.R1: res from model_dispatcher
 main.R1: 2 candidates found for res
 main.R1: res from top level: res1
 main.R1: res from top level: res2
-main.R1: res from model_dispatcher
 main.R1: 2 candidates found for res
 m.R1 .. candidate: res1, params: 1
 m.R1 .. candidate: res2, params: 1

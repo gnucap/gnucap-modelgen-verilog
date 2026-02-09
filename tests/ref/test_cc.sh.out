@@ -1216,7 +1216,9 @@ public:
   COMMON_COMPONENT* clone()const override {return new COMMON_resistor(*this);}
   void     set_param_by_index(int, std::string&, int)override;
   int     set_param_by_name(std::string, std::string)override;
-  int      is_valid()const;
+  int      is_valid(COMPONENT const*)const override;
+private:
+  int      is_valid_()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
   std::string param_name(int,int)const override;
@@ -1225,6 +1227,7 @@ public:
   void precalc_first(const PARAM_LIST*)override;
   void expand(const COMPONENT*)override;
   void precalc_last(const PARAM_LIST*)override;
+public:
   void tr_eval_analog(MOD_resistor*)const;
   void tr_advance_analog(MOD_resistor*)const;
   void tr_regress_analog(MOD_resistor*)const;
@@ -1304,7 +1307,6 @@ public:
   explicit MOD_resistor(); // : BASE_SUBCKT() { _n = _nodes; }
   CARD* clone()const override;
 private: // overrides
-  int is_valid()const override;
   void precalc_first()override;
   void expand()override;
   void precalc_last()override;
@@ -1579,7 +1581,18 @@ std::string COMMON_resistor::param_value(int I)const
   }
 }
 /*--------------------------------------------------------------------------*/
-int COMMON_resistor::is_valid() const
+int COMMON_resistor::is_valid(COMPONENT const* x)const
+{
+  assert(x);
+  try{
+    return is_valid_();
+  }catch(Exception_OutOfRange_ const& e){
+    error(bDEBUG, x->long_label() + " invalid: " + e.message() + "\n");
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+int COMMON_resistor::is_valid_() const
 {
   COMMON_resistor const* pc = this;
   (void)pc;
@@ -2330,17 +2343,6 @@ void MOD_resistor::precalc_first()
   }
 }
 /*--------------------------------------------------------------------------*/
-int MOD_resistor::is_valid()const
-{
-  COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
-  try{
-    return c->is_valid();
-  }catch(Exception_OutOfRange_ const& e){
-    error(bDEBUG, long_label() + " invalid: " + e.message() + "\n");
-    return false;
-  }
-}
-/*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
 {
   trace1("expand", long_label());
@@ -2545,7 +2547,9 @@ public:
   COMMON_COMPONENT* clone()const override {return new COMMON_resistor(*this);}
   void     set_param_by_index(int, std::string&, int)override;
   int     set_param_by_name(std::string, std::string)override;
-  int      is_valid()const;
+  int      is_valid(COMPONENT const*)const override;
+private:
+  int      is_valid_()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
   std::string param_name(int,int)const override;
@@ -2554,6 +2558,7 @@ public:
   void precalc_first(const PARAM_LIST*)override;
   void expand(const COMPONENT*)override;
   void precalc_last(const PARAM_LIST*)override;
+public:
   void tr_eval_analog(MOD_resistor*)const;
   void tr_advance_analog(MOD_resistor*)const;
   void tr_regress_analog(MOD_resistor*)const;
@@ -2633,7 +2638,6 @@ public:
   CARD* clone()const override;
 private: // overrides
   int     set_param_by_name(std::string, std::string)override;
-  int is_valid()const override;
   void precalc_first()override;
   void expand()override;
   void precalc_last()override;
@@ -2915,7 +2919,18 @@ std::string COMMON_resistor::param_value(int I)const
   }
 }
 /*--------------------------------------------------------------------------*/
-int COMMON_resistor::is_valid() const
+int COMMON_resistor::is_valid(COMPONENT const* x)const
+{
+  assert(x);
+  try{
+    return is_valid_();
+  }catch(Exception_OutOfRange_ const& e){
+    error(bDEBUG, x->long_label() + " invalid: " + e.message() + "\n");
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+int COMMON_resistor::is_valid_() const
 {
   COMMON_resistor const* pc = this;
   (void)pc;
@@ -4085,17 +4100,6 @@ void MOD_resistor::precalc_first()
     attach_common(cc);
     subckt()->precalc_first();
   }else{
-  }
-}
-/*--------------------------------------------------------------------------*/
-int MOD_resistor::is_valid()const
-{
-  COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
-  try{
-    return c->is_valid();
-  }catch(Exception_OutOfRange_ const& e){
-    error(bDEBUG, long_label() + " invalid: " + e.message() + "\n");
-    return false;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -5492,7 +5496,9 @@ public:
   COMMON_COMPONENT* clone()const override {return new COMMON_capacitor(*this);}
   void     set_param_by_index(int, std::string&, int)override;
   int     set_param_by_name(std::string, std::string)override;
-  int      is_valid()const;
+  int      is_valid(COMPONENT const*)const override;
+private:
+  int      is_valid_()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
   std::string param_name(int,int)const override;
@@ -5501,6 +5507,7 @@ public:
   void precalc_first(const PARAM_LIST*)override;
   void expand(const COMPONENT*)override;
   void precalc_last(const PARAM_LIST*)override;
+public:
   void tr_eval_analog(MOD_capacitor*)const;
   void tr_review_analog(MOD_capacitor*)const;
   void tr_accept_analog(MOD_capacitor*)const;
@@ -5617,7 +5624,6 @@ public:
   explicit MOD_capacitor(); // : BASE_SUBCKT() { _n = _nodes; }
   CARD* clone()const override;
 private: // overrides
-  int is_valid()const override;
   void precalc_first()override;
   void expand()override;
   void precalc_last()override;
@@ -5858,7 +5864,18 @@ std::string COMMON_capacitor::param_value(int I)const
   }
 }
 /*--------------------------------------------------------------------------*/
-int COMMON_capacitor::is_valid() const
+int COMMON_capacitor::is_valid(COMPONENT const* x)const
+{
+  assert(x);
+  try{
+    return is_valid_();
+  }catch(Exception_OutOfRange_ const& e){
+    error(bDEBUG, x->long_label() + " invalid: " + e.message() + "\n");
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+int COMMON_capacitor::is_valid_() const
 {
   COMMON_capacitor const* pc = this;
   (void)pc;
@@ -6357,17 +6374,6 @@ void MOD_capacitor::precalc_first()
   }
 }
 /*--------------------------------------------------------------------------*/
-int MOD_capacitor::is_valid()const
-{
-  COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
-  try{
-    return c->is_valid();
-  }catch(Exception_OutOfRange_ const& e){
-    error(bDEBUG, long_label() + " invalid: " + e.message() + "\n");
-    return false;
-  }
-}
-/*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
 {
   trace1("expand", long_label());
@@ -6564,7 +6570,9 @@ public:
   COMMON_COMPONENT* clone()const override {return new COMMON_capacitor(*this);}
   void     set_param_by_index(int, std::string&, int)override;
   int     set_param_by_name(std::string, std::string)override;
-  int      is_valid()const;
+  int      is_valid(COMPONENT const*)const override;
+private:
+  int      is_valid_()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
   std::string param_name(int,int)const override;
@@ -6573,6 +6581,7 @@ public:
   void precalc_first(const PARAM_LIST*)override;
   void expand(const COMPONENT*)override;
   void precalc_last(const PARAM_LIST*)override;
+public:
   void tr_eval_analog(MOD_capacitor*)const;
   void tr_review_analog(MOD_capacitor*)const;
   void tr_accept_analog(MOD_capacitor*)const;
@@ -6696,7 +6705,6 @@ public:
   explicit MOD_capacitor(); // : BASE_SUBCKT() { _n = _nodes; }
   CARD* clone()const override;
 private: // overrides
-  int is_valid()const override;
   void precalc_first()override;
   void expand()override;
   void precalc_last()override;
@@ -6949,7 +6957,18 @@ std::string COMMON_capacitor::param_value(int I)const
   }
 }
 /*--------------------------------------------------------------------------*/
-int COMMON_capacitor::is_valid() const
+int COMMON_capacitor::is_valid(COMPONENT const* x)const
+{
+  assert(x);
+  try{
+    return is_valid_();
+  }catch(Exception_OutOfRange_ const& e){
+    error(bDEBUG, x->long_label() + " invalid: " + e.message() + "\n");
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+int COMMON_capacitor::is_valid_() const
 {
   COMMON_capacitor const* pc = this;
   (void)pc;
@@ -7524,17 +7543,6 @@ void MOD_capacitor::precalc_first()
     attach_common(cc);
     subckt()->precalc_first();
   }else{
-  }
-}
-/*--------------------------------------------------------------------------*/
-int MOD_capacitor::is_valid()const
-{
-  COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
-  try{
-    return c->is_valid();
-  }catch(Exception_OutOfRange_ const& e){
-    error(bDEBUG, long_label() + " invalid: " + e.message() + "\n");
-    return false;
   }
 }
 /*--------------------------------------------------------------------------*/

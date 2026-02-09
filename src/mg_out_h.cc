@@ -331,7 +331,9 @@ static void make_common(std::ostream& o, const Module& m)
   o__ "COMMON_COMPONENT* clone()const override {return new "<<class_name<<"(*this);}\n";
   o__ "void     set_param_by_index(int, std::string&, int)override;\n";
   o__ "int     set_param_by_name(std::string, std::string)override;\n";
-  o__ "int      is_valid()const;\n";
+  o__ "int      is_valid(COMPONENT const*)const override;\n";
+  o << "private:\n";
+  o__ "int      is_valid_()const;\n";
   o__ "bool     param_is_printable(int)const override;\n";
   o__ "std::string param_name(int)const override;\n";
   o__ "std::string param_name(int,int)const override;\n";
@@ -341,11 +343,12 @@ static void make_common(std::ostream& o, const Module& m)
         << " + " << base_class_name << "::param_count();}\n";
   o__ "void precalc_first(const PARAM_LIST*)override;\n";
   o__ "void expand(const COMPONENT*)override;\n";
+  o__ "void precalc_last(const PARAM_LIST*)override;\n";
+  o << "public:\n";
   if(m.has_expand_last()){
     o__ "void expand_last(const COMPONENT*); // override\n";
   }else{
   }
-  o__ "void precalc_last(const PARAM_LIST*)override;\n";
   // if has_analog?
   o__ "void tr_eval_analog(MOD_" << m.identifier() << "*)const;\n";
   if(m.has_tr_review() && m.has_analog_block()){
@@ -606,7 +609,6 @@ static void make_module(std::ostream& o, const Module& m)
     o__ "int     set_param_by_name(std::string, std::string)override;\n";
   }else{
   }
-  o__ "int is_valid()const override;\n";
   o__ "void precalc_first()override;\n";
   o__ "void expand()override;\n";
   if(m.has_expand_last()){

@@ -37,7 +37,6 @@ parameter x=0
 main.v: vsource from device_dispatcher
 main.v: 1 candidate found for vsource
 main.R1: res from top level
-main.R1: res from model_dispatcher
 main.R1: 1 candidate found for res
 assuming double in 1
 assuming double in 0

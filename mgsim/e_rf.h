@@ -166,7 +166,6 @@ public:
   bool     operator==(const COMMON_COMPONENT&)const override;
   void     set_param_by_index(int, std::string&, int)override;
   int      set_param_by_name(std::string, std::string)override;
-  bool     is_valid()const;
   bool     param_is_printable(int)const override;
   std::string param_name(int)const override;
   std::string param_name(int,int)const override;
@@ -464,11 +463,6 @@ std::string COMMON_RF_BASE::param_value(int idx)const
   }else{ untested();
   }
   return COMMON_COMPONENT::param_value(idx);
-}
-/*--------------------------------------------------------------------------*/
-bool COMMON_RF_BASE::is_valid() const
-{ untested();
-  return true; //COMMON_COMPONENT::is_valid();
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_RF_BASE::precalc_first(const PARAM_LIST* par_scope)

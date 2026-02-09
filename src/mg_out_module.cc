@@ -55,21 +55,6 @@ static String_Arg const& flow_abstol(Branch const& b)
   }
 }
 /*--------------------------------------------------------------------------*/
-static void make_module_is_valid(std::ostream& o, const Module& m)
-{
-  o << "int MOD_" << m.identifier() << "::is_valid()const\n{\n";
-  o__ "COMMON_" << m.identifier() << " const* c = "
-    "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
-  o__ "try{\n";
-  o____ "return c->is_valid();\n";
-  o__ "}catch(Exception_OutOfRange_ const& e){\n";
-  o____ "error(bDEBUG, long_label() + \" invalid: \" + e.message() + \"\\n\");\n";
-  o____ "return false;\n";
-  o__ "}\n";
-  o << "}\n"
-    "/*--------------------------------------------------------------------------*/\n";
-}
-/*--------------------------------------------------------------------------*/
 void make_node_ref(std::ostream& o, const Node& n, bool used=true)
 {
   if(n.is_ground()) {
@@ -1420,7 +1405,6 @@ void make_cc_module(std::ostream& o, const Module& m)
   }else{
   }
   make_module_precalc_first(o, m);
-  make_module_is_valid(o, m);
   make_module_expand(o, m);
   if(m.has_expand_last()){
     make_module_expand_last(o, m);

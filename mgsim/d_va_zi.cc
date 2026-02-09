@@ -224,7 +224,6 @@ private: // BASE_SUBCKT
   void map_nodes()override;
 private: // overrides
   double tr_amps()const override;
-  int is_valid()const override;
   void precalc_first()override;
   void expand()override;
   void precalc_last()override;
@@ -578,13 +577,6 @@ void ZFILTER::precalc_first()
     _input->precalc_first();
   }else{
   }
-}
-/*--------------------------------------------------------------------------*/
-int ZFILTER::is_valid()const
-{ untested();
-  COMMON_RF_BASE const* c = prechecked_cast<COMMON_RF_BASE const*>(common());
-  assert(c);
-  return c->is_valid();
 }
 /*--------------------------------------------------------------------------*/
 void ZFILTER::expand()

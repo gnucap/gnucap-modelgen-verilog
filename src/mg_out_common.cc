@@ -588,8 +588,22 @@ static void make_param_check_range(std::ostream& o, ValueRange const& p,
 /*--------------------------------------------------------------------------*/
 static void make_common_is_valid(std::ostream& o, const Module& m)
 {
+  o << "int COMMON_" << m.identifier() << "::is_valid(COMPONENT const* x)const\n{\n";
+  o__ "assert(x);\n";
+  o__ "try{\n";
+  o____ "return is_valid_();\n";
+  o__ "}catch(Exception_OutOfRange_ const& e){\n";
+  o____ "error(bDEBUG, x->long_label() + \" invalid: \" + e.message() + \"\\n\");\n";
+  o____ "return false;\n";
+  o__ "}\n";
+  o << "}\n"
+    "/*--------------------------------------------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_common_is_valid_(std::ostream& o, const Module& m)
+{
   make_tag(o);
-  o << "int COMMON_" << m.identifier() << "::is_valid() const\n{\n";
+  o << "int COMMON_" << m.identifier() << "::is_valid_() const\n{\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
   o__ "(void)pc;\n";
 
@@ -878,6 +892,7 @@ void make_cc_common(std::ostream& o , const Module& m)
 //  make_common_param_name_or_alias(o, m);
   make_common_param_value(o, m);
   make_common_is_valid(o, m);
+  make_common_is_valid_(o, m);
   make_common_expand(o, m);
   if(m.has_expand_last()){
     make_common_expand_last(o, m);
