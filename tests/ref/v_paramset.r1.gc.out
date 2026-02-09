@@ -21,22 +21,16 @@ module main (.a(a),.b(b));
 endmodule // main
 
 >>>>>print dc v(nodes)
-m1: main from top level
 m1: 1 candidate found for main
-main.n1: mynet from top level: A
-main.n1: mynet from top level: B
+m1 is "main from top level"
 main.n1: 2 candidates found for mynet
-main.n2: mynet from top level: A
-main.n2: mynet from top level: B
 main.n2: 2 candidates found for mynet
-main.i0: isource from device_dispatcher
 main.i0: 1 candidate found for isource
-m1.n1 .. candidate: A, params: 2
-m1.n1 .. candidate: B, params: 1
-m1.n1 found fewer params: B.
-m1.n2 .. candidate: A, params: 2
-m1.n2 .. candidate: B, params: 1
-m1.n2 found fewer params: B.
+m1.n1 found fewer params in "B".
+m1.n1 is "B"
+m1.n2 found fewer params in "B".
+m1.n2 is "B"
+m1.i0 is "isource from device_dispatcher"
 >>>>>dc
 #           v(a)      
  0.         2.        

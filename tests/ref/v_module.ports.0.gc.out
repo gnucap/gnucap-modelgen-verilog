@@ -6,12 +6,12 @@ module main(1 2);
               ^ ? invalid identifier
 >>>>>  ground \0 ;
 >>>>>print dc v(nodes)
-m: main from top level
 m: 1 candidate found for main
-main.p: ports from top level
+m is "main from top level"
 main.p: 1 candidate found for ports
-ports.c: vsource from device_dispatcher
+m.p is "ports from top level"
 ports.c: 1 candidate found for vsource
+m.p.c is "vsource from device_dispatcher"
 >>>>>dc
 #           v(1)       v(2)      
  0.         2.         0.        

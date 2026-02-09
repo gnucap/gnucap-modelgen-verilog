@@ -32,8 +32,8 @@ CS& Paramset::parse_stmt(CS& f)
   f.skipbl();
   size_t here = f.cursor();
   if (f >> ".") {
-    assert(_proto);
-    Base const* b = _proto->lookup(f);
+    assert(has_proto());
+    Base const* b = proto().lookup(f);
 
     Paramset_Stmt* s = new Paramset_Stmt();
 
@@ -124,6 +124,17 @@ void Paramset::parse(CS& f)
   _parameters.set_owner(this);
   _variables.set_owner(this);
 
+  std::string desc="0";
+  if(attr.has_attributes(tag_t(this))) {
+    ATTRIB_LIST_p const& a = attr.attributes(tag_t(this));
+    desc = a->operator[](std::string("desc"));
+  }else{
+  }
+  if(desc!="0"){
+    set_description(desc);
+  }else{
+  }
+
   f >> _identifier;
   size_t here = f.cursor();
   String_Arg proto_name;
@@ -136,7 +147,7 @@ void Paramset::parse(CS& f)
     throw Exception_CS_("prototype does not exist", f);
   }else{
   }
-  _proto = *it;
+  set_proto(*it);
   if(o->modules().find_again(++it, proto_name) != o->modules().end()){
     f.reset_fail(here);
     throw Exception_CS_("too many", f);
@@ -410,27 +421,28 @@ void Paramset::expand()
 {
   option_nodump_unreachable while_expanding_ps_and;
   option_nodump_annotate while_expanding_ps;
-  assert(_proto);
+  assert(has_proto());
   _sub = new Paramset(); // new Module();?
   _sub->set_owner(this);
   assert(_sub->file() == file());
 //  _sub->set_file(file());
   _sub->_identifier = _identifier;
+  _sub->set_description(description());
 
   trace1("1. copyparams ========", _identifier);
   copy_ps_params(_sub, this);
   trace0("2. dotparams ========");
-  import_dot_params(_sub, _proto, this);
+  import_dot_params(_sub, &proto(), this);
   trace0("3. protoparams ========");
-  import_proto_params(_sub, _proto);
+  import_proto_params(_sub, &proto());
 
   trace0("3b. proto vars ========");
-  import_proto_vars(_sub, _proto);
+  import_proto_vars(_sub, &proto());
   trace0("5. variables ========");
   import_ps_vars(_sub, this);
 
   trace0("4. implementation ========");
-  import_proto_impl(_sub, _proto);
+  import_proto_impl(_sub, &proto());
 
   trace0("6. assignments ========");
   import_assignments(_sub, this);
@@ -493,10 +505,10 @@ void Paramset_Stmt::dump(std::ostream& o) const
 void Paramset::dump(std::ostream& o) const
 {
   print_attributes(o, this);
-  if(!_proto){
+  if(!has_proto()){
     return Module::dump(o);
   }else{
-    o << "paramset " << _identifier << " " << _proto->identifier() << ";\n";
+    o << "paramset " << _identifier << " " << proto().identifier() << ";\n";
     {
       indent a;
       dump_parameters(o);

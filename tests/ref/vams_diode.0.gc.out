@@ -3,17 +3,14 @@
 >>>>>.model dd d cjo=1pf is=1e-15 
 >>>>>.parameter v=0 
 >>>>>.print dc v(nodes) i(V1) i(V2) z(m.D1) iter(0) 
-m: main from top level
 m: 1 candidate found for main
-main.D1: diode from device_dispatcher
-main.D1: diode:0 from device_dispatcher
+m is "main from top level"
 main.D1 discarded (params): no match: tf
-main.D1: diode:1 from device_dispatcher
-main.D1: diode:2 from device_dispatcher
 main.D1: 3 candidates found for diode
-m.D1 tie break: 28 vs. 25
+m.D1 found fewer params in "vams diode w/o rs".
 m.D1:p2 invalid: rs is not "from  0. .. Inf"
-m.D1 dropped invalid candidate.
+m.D1 dropped invalid candidate: "vams diode w/ rs".
+m.D1 is "vams diode w/o rs"
 >>>>>.dc v -1 0.65 .05 
 #           v(n)       v(n2)      i(V1)      i(V2)      z(m.D1)    iter(0)   
 -1.        -1.        -1.         0.         0.         ??         4.        

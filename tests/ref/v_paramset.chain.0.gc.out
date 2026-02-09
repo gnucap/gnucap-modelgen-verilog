@@ -10,7 +10,6 @@ main #(.x(x)) m(\0 ,1,2,4);
 >>>>>paramset res res2;
 >>>>>parameter x=0
 >>>>>list
-m: main from top level
 m: 1 candidate found for main
 module main (.a(a),.b(b),.c(c),.d(d));
   parameter x=0;
@@ -34,13 +33,14 @@ endparamset
 
 parameter x=0
 >>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
-main.v: vsource from device_dispatcher
+m is "main from top level"
 main.v: 1 candidate found for vsource
-main.R1: res from top level
 main.R1: 1 candidate found for res
+m.v is "vsource from device_dispatcher"
 assuming double in 1
 assuming double in 0
 assuming double in x
+m.R1 is "res from top level"
 assuming double in 1
 assuming double in 0
 assuming double in x

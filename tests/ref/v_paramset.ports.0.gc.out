@@ -12,7 +12,6 @@ main #() m(\0 ,1,2,4);
 main #() m(\0 ,1,2,4);
                    ^ ? invalid identifier
 >>>>>list
-m: main from top level
 m: 1 candidate found for main
 paramset myv vsource;
  .dc=1;
@@ -25,10 +24,11 @@ endmodule // main
 
 main #() m (\0 , \1 , \2 , \4 );
 >>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
-main.v: resistor from device_dispatcher
+m is "main from top level"
 main.v: 1 candidate found for resistor
-main.R1: myv from top level
 main.R1: 1 candidate found for myv
+m.v is "resistor from device_dispatcher"
+m.R1 is "myv from top level"
 print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
                                   ^ ? no match
 >>>>>dc

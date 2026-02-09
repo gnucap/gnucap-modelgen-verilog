@@ -769,6 +769,7 @@ void PARAMSET::expand()
 	COMPONENT* ddd = dynamic_cast<COMPONENT*>(dev->deflate());
 	if(ddd!=dev){
 	  *subckt()->begin() = ddd;
+	  dev->purge();
 	  delete (CARD*)dev;
 	  dev = ddd;
 	}else{

@@ -8,7 +8,6 @@ main m(\0 ,1,2,4);
                ^ ? invalid identifier
 >>>>>paramset res resistor;
 >>>>>list
-m: main from top level
 m: 1 candidate found for main
 module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
   vsource #(1.) v (\3 , \1 );
@@ -22,11 +21,12 @@ paramset res resistor;
 endparamset
 
 >>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
-main.v: vsource from device_dispatcher
+m is "main from top level"
 main.v: 1 candidate found for vsource
-main.R1: res from top level
 main.R1: 1 candidate found for res
+m.v is "vsource from device_dispatcher"
 assuming double in 1
+m.R1 is "res from top level"
 assuming double in 1
 assuming double in 1
 print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)

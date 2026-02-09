@@ -3,6 +3,7 @@
 `include "disciplines.vams"
 `include "constants.vams"
 
+(*desc="vams vsine"*)
 module vsine(p, n);
 	output p, n;
 	electrical p, n;

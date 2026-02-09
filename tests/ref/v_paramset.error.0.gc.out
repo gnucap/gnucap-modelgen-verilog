@@ -10,7 +10,6 @@ main m(\0 ,1,2,4);
 main m(\0 ,1,2,4);
                ^ ? invalid identifier
 >>>>>list
-m: main from top level
 m: 1 candidate found for main
 paramset res resistor;
   parameter R from (1:2];
@@ -34,18 +33,16 @@ endmodule // main
 
 main #() m (\0 , \1 , \2 , \4 );
 >>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
-main.v: vsource from device_dispatcher
+m is "main from top level"
 main.v: 1 candidate found for vsource
-main.R1: res from top level
-main.R1: res from top level
-main.R1: res from top level
 main.R1: 3 candidates found for res
+m.v is "vsource from device_dispatcher"
 assuming double in 201
 assuming double in 201
 assuming double in 201
-m.R1 dropped invalid candidate.
-m.R1 dropped invalid candidate.
-m.R1 dropped invalid candidate.
+m.R1 dropped invalid candidate: "res from top level".
+m.R1 dropped invalid candidate: "res from top level".
+m.R1 dropped invalid candidate: "res from top level".
 m.R1: no candidates res
 >>>>>status notime
 Gnucap   System status

@@ -594,6 +594,7 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "explicit MOD_" << m.identifier() << "(MOD_" << m.identifier() << " const&);\n";
   o << "public:\n";
   o__ "explicit MOD_" << m.identifier() << "(); // : "<< base_name <<"() { _n = _nodes; }\n";
+  o__ "~MOD_" << m.identifier() << "();\n";
   o__ "CARD* clone()const override;\n";
   o << "private: // overrides\n";
   if(m.circuit()->element_list().size()){

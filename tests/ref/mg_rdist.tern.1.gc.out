@@ -9,7 +9,7 @@ endmodule // stub
 
 test_rppd #() a (.node_1(x),.node_2(y),.node_bn(z));
 >>>>>dc
-.R1: stub from top level
 .R1: 1 candidate found for stub
+a.R1 is "stub from top level"
 #          
  0.        

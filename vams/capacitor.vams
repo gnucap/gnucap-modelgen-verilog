@@ -2,6 +2,7 @@
 `pragma modelgen expand-paramset
 `pragma modelgen nogen-module
 
+(*desc="vams capacitor"*)
 module capacitor(p,n);
 	inout p,n;
 	electrical p,n;
@@ -16,11 +17,13 @@ module capacitor(p,n);
 	end
 endmodule
 
+(* desc="vams w/o ic" *)
 paramset capacitor capacitor
 	parameter real c = 1. from [0:inf);
 	.c = c;
 endparamset
 
+(* desc="vams w/ ic" *)
 paramset capacitor capacitor
 	parameter real c = 1. from [0:inf);
 	parameter real ic = 0;

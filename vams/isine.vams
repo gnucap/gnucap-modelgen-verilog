@@ -1,6 +1,7 @@
 `include "disciplines.vams"
 `include "constants.vams"
 
+(*desc="vams isine"*)
 module isine(p, n);
 	output p, n;
 	electrical p, n;

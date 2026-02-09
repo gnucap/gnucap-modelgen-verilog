@@ -14,6 +14,6 @@ module aaa (.a(a),.b(b));
   bbb #() r2 (a, b);
 endmodule // aaa
 
-a1.r2 ambiguous overload in bbb
+a1.r2: ambiguous overload for in bbb
 #           v(a)      
  0.         1.        

@@ -9,6 +9,7 @@ This file summarizes new features and important changes between snapshots.
 - string parameters
 - fix dcop in $absdelay and $transition
 - preprocessor fix. whitespace in string literals
+- overloading diagnostics: use "desc" attribute
 - ..
 
 20251222-dev

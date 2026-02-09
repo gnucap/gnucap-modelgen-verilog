@@ -197,7 +197,7 @@ private:
   void collect_overloads(DEV_INSTANCE_PROTO* scope) const;
   void collect_overloads_from_scope(std::string const& modelname,
       CARD_LIST const& scope, DEV_INSTANCE_PROTO*)const;
-  void prepare_overload(CARD* proto, std::string modelname, DEV_INSTANCE_PROTO* p) const;
+  CARD* prepare_overload(CARD* proto, std::string modelname, DEV_INSTANCE_PROTO* p) const;
 
   node_t& n_(int i)const override {
     assert(_n); assert(i>=0); assert(i<_node_capacity); return _n[i];
@@ -290,14 +290,17 @@ public:
 }pp; // DEV_INSTANCE_PROTO
 DISPATCHER<CARD>::INSTALL dd(&device_dispatcher, "instance_proto", &pp);
 /*--------------------------------------------------------------------------*/
-class attributes : public CKT_BASE{
+class attributes_xs : public CKT_BASE{
 public:
   ATTRIB_LIST_p& set(tag_t t){
     return set_attributes(t);
   }
+  bool has_attributes(tag_t x)const {return CKT_BASE::has_attributes(x); }
+  const ATTRIB_LIST_p& attributes(tag_t x)const {return CKT_BASE::attributes(x); }
+  ATTRIB_LIST_p&   set_attributes(tag_t x)	{return CKT_BASE::set_attributes(x); }
 }attr;
 /*--------------------------------------------------------------------------*/
-void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE_PROTO* Proto) const
+CARD* INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE_PROTO* Proto) const
 {
   assert(Proto);
   assert(Proto->subckt());
@@ -307,7 +310,9 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
   COMPONENT* c = prechecked_cast<COMPONENT*>(cl);
   assert(c || !cl);
 
-  if(cl && has_attributes(model->id_tag())) {
+  if(cl && has_attributes(cl->id_tag())) {
+    trace2("INSTANCE::prepare_overload attr?", modelname, attributes(cl->id_tag())->string(tag_t()));
+  }else if(cl && has_attributes(model->id_tag())) {
     trace2("INSTANCE::prepare_overload attr?", modelname, attributes(model->id_tag())->string(tag_t()));
     attr.set(cl->id_tag()) = attributes(model->id_tag());
   }else{
@@ -315,7 +320,7 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
   }
 
   if(!cl){
-    return;
+    return nullptr;
   }else if(!c->common()){
     c->set_dev_type(modelname);
   }else if(auto m=dynamic_cast<MODEL_CARD const*>(model)){
@@ -398,6 +403,8 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
     trace1("discard", long_label());
     // TODO: include proto name attribute
     error(bLOG, long_label() + " discarded (params): " + e.message() + "\n");
+    assert(c);
+    c->purge();
     delete (CARD*) c;
     c = nullptr;
   }
@@ -406,34 +413,56 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
     Proto->subckt()->push_back(c);
   }else{
   }
+
+  return c;
 } // prepare_overload
+/*--------------------------------------------------------------------------*/
+static std::string get_description(tag_t T)
+{
+  std::string desc = "";
+  if(attr.has_attributes(T)) {
+    auto const& a = attr.attributes(T);
+    if(a){
+      desc = a->operator[](std::string("desc"));
+      if(desc == "0"){ untested();
+	desc = "";
+      }else{
+      }
+    }else{ untested();
+    }
+  }else{
+  }
+  return desc;
+}
+/*--------------------------------------------------------------------------*/
+static void describe_if(tag_t t, std::string const& desc)
+{
+  if(OPT::picky <= bDEBUG) {
+    std::string current = get_description(t);
+
+    if(current.size()){
+    }else{
+      attr.set_attributes(t).add_to("desc=\"" +desc+ "\"", t);
+    }
+  }else{
+  }
+}
 /*--------------------------------------------------------------------------*/
 void INSTANCE::collect_overloads_from_scope(std::string const& modelname,
     CARD_LIST const& Scope, DEV_INSTANCE_PROTO* Proto) const
 {
     CARD_LIST::const_iterator i = Scope.find_(modelname);
     while(i != Scope.end()) {
-      std::string desc;
-      if(has_attributes((*i)->id_tag())) {
-	auto const& a = attributes((*i)->id_tag());
-	if(a){
-	  desc = a->operator[](std::string("desc"));
-	  if(desc == "0") { untested();
-	    desc = "";
-	  }else{
-	    desc = ": " + desc;
-	  }
-	}else{ untested();
-	}
-      }else{
-      }
+      std::string desc = get_description((**i).id_tag());
+
+      CARD* p = prepare_overload(*i, modelname, Proto);
+
       if(&Scope == &CARD_LIST::card_list){
-	error(bLOG, long_label() + ": " + modelname + " from top level" + desc + "\n");
+	describe_if(p->id_tag(), modelname + " from top level" + desc);
       }else{
-	error(bLOG, long_label() + ": nested " + modelname + " " + desc + "\n");
+	describe_if(p->id_tag(), "nested " + modelname + " " + desc);
       }
 
-      prepare_overload(*i, modelname, Proto);
       i = Scope.find_again(modelname, ++i);
     }
 }
@@ -495,8 +524,8 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
 #if 0
     MODEL_CARD* m = model_dispatcher[modelname];
     while(m){
-      error(bLOG, long_label() + ": " + extended_name + " from model_dispatcher\n");
-      prepare_overload(m, modelname, Proto);
+      CARD* p = prepare_overload(m, modelname, Proto);
+      describe_if(p->id_tag(), extended_name + " from model_dispatcher");
       extended_name = modelname + ':' + to_string(bin_count++);
       m = model_dispatcher[extended_name];
     }
@@ -506,8 +535,8 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
     extended_name = modelname;
     bin_count = 0;
     while(p){
-      error(bLOG, long_label() + ": " + extended_name + " from device_dispatcher\n");
-      prepare_overload(p, modelname, Proto);
+      p = prepare_overload(p, modelname, Proto);
+      describe_if(p->id_tag(), extended_name + " from device_dispatcher");
       extended_name = modelname + ':' + to_string(bin_count++);
       p = device_dispatcher[extended_name];
     }
@@ -772,27 +801,10 @@ void INSTANCE::expand()
     CARD_LIST::iterator j = i;
     ++i;
 
-    std::string desc;
-    if(has_attributes(s->id_tag())) {
-      auto const& a = attributes(s->id_tag());
-      if(a){
-	desc = a->operator[](std::string("desc"));
-	if(desc == "0"){ untested();
-	  desc = "";
-	}else{
-	  desc = ": " + desc;
-	  error(bTRACE, long_label() + " .. candidate"+desc+", params: "+param_count_string(s)+"\n");
-	}
-      }else{ untested();
-	// error(bTRACE, long_label() + " .. anonymous candidate.\n");
-      }
-    }else{
-      // error(bTRACE, long_label() + s->dev_type() + " .. no attr candidate.\n");
-      // error(bTRACE, long_label() + " .. params " + to_string(d->param_count()) + "\n");
-    }
+    std::string desc = get_description(s->id_tag());
 
     if(!d->is_valid()){
-      error(bTRACE, long_label() + " dropped invalid candidate"+desc+".\n");
+      error(bDEBUG, long_label() + " dropped invalid candidate: \"" + desc + "\".\n");
     }else if(!gotit){
 //      error(bTRACE, long_label() + " found valid candidate.\n");
       gotit = prechecked_cast<COMPONENT*>(*j);
@@ -800,40 +812,50 @@ void INSTANCE::expand()
       *j = nullptr;
     }else if(eff_param_count(d) > eff_param_count(gotit)){
       if(desc.size()){ untested();
-	error(bTRACE, long_label() + " rejecting candidate, more params"+desc+".\n");
+	error(bLOG, long_label() + " rejecting candidate, more params: \"" + desc + "\".\n");
       }else{
-	error(bDEBUG, long_label() + " tie break: " + param_count_string(gotit) + " vs. " +
+	error(bLOG, long_label() + " tie break: " + param_count_string(gotit) + " vs. " +
 	    param_count_string(d) + "\n");
       }
     }else if(eff_param_count(d) < eff_param_count(gotit)){
       if(desc.size()){
-	error(bTRACE, long_label() + " found fewer params"+desc+".\n");
+	error(bLOG, long_label() + " found fewer params in \"" + desc + "\".\n");
       }else{
-	error(bDEBUG, long_label() + " tie break: " + param_count_string(gotit) + " vs. " +
+	error(bLOG, long_label() + " tie break: " + param_count_string(gotit) + " vs. " +
 	    param_count_string(d) + "\n");
       }
+      assert(gotit);
+      gotit->purge();
       delete (CARD*) gotit;
       gotit = prechecked_cast<COMPONENT*>(*j);
       assert(gotit);
       *j = nullptr;
     }else if(d->max_nodes() > gotit->max_nodes()){ untested();
-      error(bDEBUG, long_label() + " port tie break: " + to_string(gotit->max_nodes()) + " vs. " +
+      error(bLOG, long_label() + " port tie break: " + to_string(gotit->max_nodes()) + " vs. " +
 	  to_string(d->max_nodes()) + "\n");
     }else if(d->max_nodes() < gotit->max_nodes()){
-      error(bDEBUG, long_label() + " port tie break: " + to_string(gotit->max_nodes()) + " vs. " +
+      error(bLOG, long_label() + " port tie break: " + to_string(gotit->max_nodes()) + " vs. " +
 	  to_string(d->max_nodes()) + "\n");
+      assert(gotit);
+      gotit->purge();
       delete (CARD*) gotit;
       gotit = prechecked_cast<COMPONENT*>(*j);
       assert(gotit);
       *j = nullptr;
+    }else if(desc.size()){
+      error(bWARNING, long_label() + ": ambiguous " + dev_type() + ": \"" + desc + "\"\n");
     }else{
-      error(bWARNING, long_label() + " ambiguous overload in " + dev_type() + "\n");
+      error(bWARNING, long_label() + ": ambiguous overload for in " + dev_type() + "\n");
     }
     subckt()->erase(j);
   }
   if(gotit){
-   // error(bDEBUG, long_label() + " got one: " + to_string(gotit->param_count()) + "\n");
     subckt()->push_back(gotit);
+    if(has_attributes(gotit->id_tag())) {
+      trace2("INSTANCE got it attr?", gotit->long_label(), attributes(gotit->id_tag())->string(tag_t()));
+    }else{
+      trace1("INSTANCE got it attr?", gotit->long_label());
+    }
   }else{
   }
 
@@ -846,6 +868,12 @@ void INSTANCE::expand()
     assert(d->is_valid());
     d->set_label(short_label());
     d->set_dev_type(dev_type()); // make spice happier..
+    std::string desc = get_description(d->id_tag());
+    if(desc.size()){
+      error(bDEBUG, long_label() + " is \"" + desc + "\"\n");
+    }else{
+      error(bDEBUG, long_label() + " is anonymous " + dev_type() + "\n");
+    }
   }else{ untested();
     // TODO: include name attributes, once available
     throw Exception(long_label() + ": ambiguous overload: " + dev_type());
@@ -854,24 +882,7 @@ void INSTANCE::expand()
   trace2("INSTANCE::expand, pre expand sckt", long_label(), dev_type());
 
   COMPONENT* dev = dynamic_cast<COMPONENT*>(*subckt()->begin());
-  if(0){
-    // cannot expand_last
-    subckt()->expand();
-  }else{
-    dev->precalc_first();
-    dev->expand_first();
-    dev->expand();
-    if(0){
-    }else{
-      COMPONENT* ddd = dynamic_cast<COMPONENT*>(dev->deflate());
-      if(ddd!=dev){
-	*subckt()->begin() = ddd;
-	delete (CARD*)dev;
-	dev = ddd;
-      }else{
-      }
-    }
-  }
+  subckt()->expand();
 }
 /*--------------------------------------------------------------------------*/
 // Kludge: build proto in stub, so it only needs doing once.

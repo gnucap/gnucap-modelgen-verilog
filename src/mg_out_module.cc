@@ -308,6 +308,18 @@ static void make_module_construct_stub(std::ostream& o, const Element_2& e, Modu
   o__ "}\n";
 } // construct_stub
 /*--------------------------------------------------------------------------*/
+void make_module_descructor(std::ostream& o, const Module& m)
+{
+  o << "MOD_" << m.identifier() << "::~MOD_" << m.identifier() << "()\n{\n";
+  o__ "if(this == &m_" << m.identifier() << "){\n";
+  o____ "purge();\n";
+  o__ "}else{\n";
+  o__ "}\n";
+  o << "}\n" <<
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
 void make_module_copy_constructor(std::ostream& o, const Module& m)
 {
   o << "MOD_" << m.identifier() << "::MOD_" << m.identifier() << "(MOD_" << m.identifier() << " const&p) : "
@@ -371,6 +383,11 @@ void make_module_default_constructor(std::ostream& o, const Module& m)
 //    }else{untested();
 //    }
 //  }
+  std::string desc = m.description();
+  if(desc.size()) {
+    o__ "set_attributes(id_tag()).add_to(\"desc=\\\"" << desc << "\\\"\", id_tag());\n";
+  }else{
+  }
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -1399,6 +1416,7 @@ void make_cc_module(std::ostream& o, const Module& m)
   make_module_clone(o, m);
 //  make_module_evals(o, m);
 //  make_module_default_constructor(o, m);
+  make_module_descructor(o, m);
   make_module_copy_constructor(o, m);
   if(m.has_hsparam()) {
     make_module_set_param_by_name(o, m);

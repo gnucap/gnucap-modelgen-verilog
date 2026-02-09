@@ -1305,6 +1305,7 @@ private: // construct
   explicit MOD_resistor(MOD_resistor const&);
 public:
   explicit MOD_resistor(); // : BASE_SUBCKT() { _n = _nodes; }
+  ~MOD_resistor();
   CARD* clone()const override;
 private: // overrides
   void precalc_first()override;
@@ -1750,6 +1751,7 @@ MOD_resistor::MOD_resistor()
   // build netlist
   // ports:2
   // overrides
+  set_attributes(id_tag()).add_to("desc=\"vams resistor, plain\"", id_tag());
 }
 /*--------------------------------------------------------------------------*/
 // seq blocks
@@ -2321,6 +2323,14 @@ CARD* MOD_resistor::clone()const
   return new_instance;
 }
 /*--------------------------------------------------------------------------*/
+MOD_resistor::~MOD_resistor()
+{
+  if(this == &m_resistor){
+    purge();
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
 MOD_resistor::MOD_resistor(MOD_resistor const&p) : BASE_SUBCKT(p)
 {
   for (int ii = 0; ii < max_nodes(); ++ii) {
@@ -2635,6 +2645,7 @@ private: // construct
   explicit MOD_resistor(MOD_resistor const&);
 public:
   explicit MOD_resistor(); // : BASE_SUBCKT() { _n = _nodes; }
+  ~MOD_resistor();
   CARD* clone()const override;
 private: // overrides
   int     set_param_by_name(std::string, std::string)override;
@@ -3094,6 +3105,7 @@ MOD_resistor::MOD_resistor()
   // build netlist
   // ports:2
   // overrides
+  set_attributes(id_tag()).add_to("desc=\"vams resistor\"", id_tag());
 }
 /*--------------------------------------------------------------------------*/
 // seq blocks
@@ -4048,6 +4060,14 @@ CARD* MOD_resistor::clone()const
   MOD_resistor* new_instance = new MOD_resistor(*this);
   assert(!new_instance->subckt());
   return new_instance;
+}
+/*--------------------------------------------------------------------------*/
+MOD_resistor::~MOD_resistor()
+{
+  if(this == &m_resistor){
+    purge();
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 MOD_resistor::MOD_resistor(MOD_resistor const&p) : BASE_SUBCKT(p)
@@ -5622,6 +5642,7 @@ private: // construct
   explicit MOD_capacitor(MOD_capacitor const&);
 public:
   explicit MOD_capacitor(); // : BASE_SUBCKT() { _n = _nodes; }
+  ~MOD_capacitor();
   CARD* clone()const override;
 private: // overrides
   void precalc_first()override;
@@ -5991,6 +6012,7 @@ MOD_capacitor::MOD_capacitor()
   // build netlist
   // ports:2
   // overrides
+  set_attributes(id_tag()).add_to("desc=\"vams w/o ic\"", id_tag());
 }
 /*--------------------------------------------------------------------------*/
 // seq blocks
@@ -6352,6 +6374,14 @@ CARD* MOD_capacitor::clone()const
   return new_instance;
 }
 /*--------------------------------------------------------------------------*/
+MOD_capacitor::~MOD_capacitor()
+{
+  if(this == &m_capacitor){
+    purge();
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
 MOD_capacitor::MOD_capacitor(MOD_capacitor const&p) : BASE_SUBCKT(p)
 {
   for (int ii = 0; ii < max_nodes(); ++ii) {
@@ -6703,6 +6733,7 @@ private: // construct
   explicit MOD_capacitor(MOD_capacitor const&);
 public:
   explicit MOD_capacitor(); // : BASE_SUBCKT() { _n = _nodes; }
+  ~MOD_capacitor();
   CARD* clone()const override;
 private: // overrides
   void precalc_first()override;
@@ -7096,6 +7127,7 @@ MOD_capacitor::MOD_capacitor()
   // build netlist
   // ports:2
   // overrides
+  set_attributes(id_tag()).add_to("desc=\"vams w/ ic\"", id_tag());
 }
 /*--------------------------------------------------------------------------*/
 // seq blocks
@@ -7522,6 +7554,14 @@ CARD* MOD_capacitor::clone()const
   MOD_capacitor* new_instance = new MOD_capacitor(*this);
   assert(!new_instance->subckt());
   return new_instance;
+}
+/*--------------------------------------------------------------------------*/
+MOD_capacitor::~MOD_capacitor()
+{
+  if(this == &m_capacitor){
+    purge();
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 MOD_capacitor::MOD_capacitor(MOD_capacitor const&p) : BASE_SUBCKT(p)

@@ -2,6 +2,7 @@
 `include "constants.vams"
 
 
+(*desc="vams resistor"*)
 module resistor(p, n);
 	electrical p, n;
 	inout p, n;
@@ -27,6 +28,7 @@ module resistor(p, n);
 	end
 endmodule
 
+(*desc="vams resistor, plain"*)
 paramset resistor resistor
 	parameter real r = 1. from [0.:inf);
 	.r = r;
