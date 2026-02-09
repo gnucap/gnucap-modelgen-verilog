@@ -1,6 +1,7 @@
 /*                     -*- C++ -*-
+ *
  * Copyright (C) 2006 Albert Davis
- *               2024 Felix Salfelder
+ *               2024-2026 Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -19,6 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+//testing=script 2015.01.27
 #include "u_nodemap.h"
 #include "globals.h"
 #include "u_status.h"
@@ -110,6 +112,17 @@ public:
 } lang_acs;
 DISPATCHER<LANGUAGE>::INSTALL
 	da(&language_dispatcher, lang_acs.name(), &lang_acs);
+/*--------------------------------------------------------------------------*/
+class LANG_COMMAND : public LANG_SPICE_BASE {
+public:
+  LANG_COMMAND() {}
+  ~LANG_COMMAND() {}
+  std::string name()const override {return "command";}
+  bool case_insensitive()const override {return false;}
+  UNITS units()const override {return uSI;}
+} lang_command;
+DISPATCHER<LANGUAGE>::INSTALL
+	dsa(&language_dispatcher, lang_command.name(), &lang_command);
 /*--------------------------------------------------------------------------*/
 DEV_COMMENT p0;
 DISPATCHER<CARD>::INSTALL
@@ -391,11 +404,11 @@ void LANG_SPICE_BASE::parse_element_using_obsolete_callback(CS& cmd, COMPONENT* 
   // dc == deflated_common
   // It might be just "c".
   // It might be something else that is simpler but equivalent.
+  x->attach_common(dc);
   if (dc != c) {
     delete c;
   }else{
   }
-  x->attach_common(dc);
   cmd.check(bDANGER, "what's this?");
 }
 /*--------------------------------------------------------------------------*/
@@ -491,11 +504,31 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
   }
 }
 /*--------------------------------------------------------------------------*/
+// canonicalise name for internal storage
+// return name in spice if it differs, empty string otherwise
+static std::string spice_cname(std::string& Name)
+{
+  std::string spice_name = "";
+  std::string::size_type dotplace = Name.find_first_of(".");
+  if (dotplace != std::string::npos) {
+    spice_name = Name;
+    Name = Name.substr(0, dotplace);
+  }else{
+  }
+  return spice_name;
+}
+/*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::parse_label(CS& cmd, CARD* x)
 {
   assert(x);
   std::string my_name;
   if (cmd >> my_name) {
+    std::string spice_name = spice_cname(my_name);
+    if(spice_name != ""){
+      tag_t t = x->id_tag();
+      set_attributes(t).add_to("spice_name=\"" + spice_name + "\"", t);
+    }else{
+    }
     x->set_label(my_name);
   }else{untested();
     x->set_label(x->id_letter() + std::string("_unnamed")); //BUG// not unique
@@ -712,15 +745,26 @@ static char fix_case(char c)
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
 {
+  assert(x);
   auto s = dynamic_cast<BASE_SUBCKT const*>(x->component_proto());
 
   if(s && s->id_letter()=='X'){
-    print_module(o, s);
+    return print_module(o, s);
   }else{
-    o << ".model " << x->short_label() << ' ' << x->dev_type() << " (";
-    print_args(o, x);
-    o << ")\n";
   }
+  std::string name = x->short_label();
+  tag_t t = x->id_tag();
+  if(!has_attributes(t)) {
+  }else{
+    std::string n = attributes(t)->operator[]("spice_name");
+    if(n!="0"){
+      name = n;
+    }else{ untested();
+    }
+  }
+  o << ".model " << name << ' ' << x->dev_type() << " (";
+  print_args(o, x);
+  o << ")\n";
 }
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
@@ -1077,7 +1121,6 @@ class CMD_SPICE : public CMD {
 public:
   void do_it(CS&, CARD_LIST* Scope)override {
     command("options lang=spice", Scope);
-   // lang_spice.set_ground(Scope);
   }
 } p8;
 DISPATCHER<CMD>::INSTALL d8(&command_dispatcher, "spice|`spice", &p8);
@@ -1103,8 +1146,8 @@ DISPATCHER<CMD>::INSTALL d88(&command_dispatcher, ".endc", &p88);
 /*--------------------------------------------------------------------------*/
 class CMD_CONTROL : public CMD {
 public:
-  void do_it(CS&, CARD_LIST* Scope)override {untested();
-    if (OPT::language == &lang_spice) {untested();
+  void do_it(CS&, CARD_LIST* Scope)override {
+    if (OPT::language == &lang_spice) {
       command("options lang=acs", Scope);
     }else{untested();
     }
