@@ -200,8 +200,7 @@ void LANG_VERILOG::parse_args_paramset(CS& cmd, CARD* x)
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::move_attributes(tag_t from, tag_t to)
 {
-  if(has_attributes(to)){ untested();
-    unreachable();
+  if(has_attributes(to)){
     erase_attributes(to, to+1);
   }else{
   }
@@ -1312,6 +1311,8 @@ public:
     : PARAMSET_MODEL(c) { }
   ~MODULE_PROTO() {
     if(_own_proto){
+      assert(component_proto());
+      const_cast<CARD*>(component_proto())->purge();
       delete component_proto();
     }else{
     }

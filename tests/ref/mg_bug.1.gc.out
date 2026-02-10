@@ -5,10 +5,10 @@
 >>>>>paramset invalid test_bug1
 >>>>>module main()
 >>>>>dc
-m: main from top level
 m: 1 candidate found for main
-main.dut: invalid from top level
+m is "main from top level"
 main.dut: 1 candidate found for invalid
+m.dut is "invalid from top level"
 m.dut._ invalid: rs is not "from  0. .. 0."
 invalid prototype for m.dut
 >>>>>status notime

@@ -5,6 +5,7 @@
 
 // Gnucap built-in transmission line, simplified.
 // Delay line with reflections, for testing
+(*desc="vams tline0"*)
 module tline0(t1, b1, t2, b2)
 	electrical t1, b1;
 	electrical t2, b2;

@@ -1,9 +1,5 @@
-test m(1 2)
-       ^ ? invalid identifier
-test m(1 2)
-         ^ ? invalid identifier
 // name clash..
-module test (.\1 (\1 ),.\2 (\2 ));
+(* desc="A" *) module test (.\1 (\1 ),.\2 (\2 ));
   ground \0 ;
   resistor #(.r(0.)) r0 (\1 , \0 );
   resistor #(.r(1.)) r1 (\1 , \2 );
@@ -11,8 +7,13 @@ module test (.\1 (\1 ),.\2 (\2 ));
 endmodule // test
 
 test #() m (\1 , \2 );
+m is "A"
 m.r0:p0 invalid: r is not "from  0. .. Inf"
-m.r1 ambiguous overload in resistor
+m.r0 dropped invalid candidate: "resistor from device_dispatcher".
+m.r0 is "resistor:0 from device_dispatcher"
+m.r1: ambiguous resistor: "resistor:0 from device_dispatcher"
+m.r1 is "resistor from device_dispatcher"
+m.v1 is "vsource from device_dispatcher"
 #           v(1)       v(2)      
 m.r0: short circuit
  0.         9.9998u    0.99999   

@@ -3,7 +3,6 @@
 >>>>>paramset myres foo;
 >>>>>module main(\1 , \2 , \3 );
 >>>>>list
-m: main from top level
 m: 1 candidate found for main
 module foo (.\1 (\1 ),.\2 (\2 ));
   parameter R=1;
@@ -23,14 +22,15 @@ endmodule // main
 
 main #() m (\0 , \1 , \2 );
 >>>>>print dc v(nodes) i(m.v)
-main.v: vsource from device_dispatcher
+m is "main from top level"
 main.v: 1 candidate found for vsource
-main.R1: myres from top level
 main.R1: 1 candidate found for myres
-main.r: resistor from device_dispatcher
 main.r: 1 candidate found for resistor
-foo.rr: resistor from device_dispatcher
+m.v is "vsource from device_dispatcher"
+m.R1 is "myres from top level"
 foo.rr: 1 candidate found for resistor
+m.R1._.rr is "resistor from device_dispatcher"
+m.r is "resistor from device_dispatcher"
 >>>>>dc
 #           v(1)       v(2)       i(m.v)    
  0.        -1.        -0.5       -0.05      

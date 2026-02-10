@@ -10,7 +10,6 @@ paramset A B;
 >>>>>paramset D vsource;
 >>>>>param v=0
 >>>>>list
-m0: main from top level
 m0: 1 candidate found for main
 module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
   parameter real v=0;
@@ -42,14 +41,14 @@ endparamset
 
 param v=0
 >>>>>print dc v(nodes) v(m0.*) y(m0.v*.*)
-main.v1: C from top level
-main.v1: C from device_dispatcher
+m0 is "main from top level"
 main.v1 discarded (params): no match: PC
 main.v1: 1 candidate found for C
-main.v2: B from top level
 main.v2: 1 candidate found for B
-main.v3: A from top level
 main.v3: 1 candidate found for A
+m0.v1 is "C from top level"
+m0.v2 is "B from top level"
+m0.v3 is "A from top level"
 print dc v(nodes) v(m0.*) y(m0.v*.*)
                             ^ ? no match
 >>>>>param v=1

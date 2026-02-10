@@ -4,6 +4,7 @@
 
 `include "disciplines.vams"
 
+(*desc="vams vcvs"*)
 module vcvs(p,n,cp,cn);
 	inout p,n,cp,cn;
 	electrical p,n,cp,cn;

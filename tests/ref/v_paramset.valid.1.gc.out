@@ -3,7 +3,6 @@
 >>>>>(* desc="res2" *) paramset res resistor;
 >>>>>module main(\1 ,\2 , \3 , \4 );
 >>>>>list
-m: main from top level
 m: 1 candidate found for main
 (* desc="res1" *) paramset res resistor;
   parameter string what from '{"one", "ONE"};
@@ -24,24 +23,17 @@ endmodule // main
 
 main #() m (\0 , \1 , \2 , \4 );
 >>>>>print dc v(nodes)
-main.v: isource from device_dispatcher
+m is "main from top level"
 main.v: 1 candidate found for isource
-main.v: isource from device_dispatcher
 main.v: 1 candidate found for isource
-main.R1: res from top level: res1
-main.R1: res from top level: res2
-main.R1: res from model_dispatcher
 main.R1: 2 candidates found for res
-main.R1: res from top level: res1
-main.R1: res from top level: res2
-main.R1: res from model_dispatcher
 main.R1: 2 candidates found for res
-m.R1 .. candidate: res1, params: 1
-m.R1 .. candidate: res2, params: 1
-m.R1 dropped invalid candidate: res2.
-m.R1 .. candidate: res1, params: 1
-m.R1 dropped invalid candidate: res1.
-m.R1 .. candidate: res2, params: 1
+m.v is "isource from device_dispatcher"
+m.v is "isource from device_dispatcher"
+m.R1 dropped invalid candidate: "res2".
+m.R1 is "res1"
+m.R1 dropped invalid candidate: "res1".
+m.R1 is "res2"
 >>>>>dc
 #           v(1)       v(2)       v(4)      
  0.         0.         1.         2.        

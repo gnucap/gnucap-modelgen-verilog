@@ -1,5 +1,8 @@
 rc myrc(out, 0);
              ^ ? invalid identifier
+myrc is "rc from top level"
+myrc.c1 is "vams w/ ic"
+myrc.r1 is "vams resistor"
 #Time       v(out)     iter(0)   
  0.         0.99999    3.        
  0.01       0.99009    3.        

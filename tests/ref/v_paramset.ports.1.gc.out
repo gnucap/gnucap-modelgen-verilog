@@ -14,7 +14,6 @@ main #() m(\0 ,1,2,4);
 main #() m(\0 ,1,2,4);
                    ^ ? invalid identifier
 >>>>>list
-m: main from top level
 m: 1 candidate found for main
 module myres (.a(a),.b(b));
   resistor #(.r(0)) r (a, b);
@@ -35,14 +34,13 @@ endmodule // main
 
 main #() m (\0 , \1 , \2 , \4 );
 >>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
-main.v: vsource from device_dispatcher
+m is "main from top level"
 main.v: 1 candidate found for vsource
-main.R1: myres from top level
 main.R1 discarded (ports): no match: p
-main.R1: myres from top level
-main.R1: myres from top level
 main.R1 discarded (ports): no match: p
 main.R1: 1 candidate found for myres
+m.v is "vsource from device_dispatcher"
+m.R1 is "myres from top level"
 print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
                                   ^ ? no match
 >>>>>dc

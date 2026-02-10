@@ -179,8 +179,11 @@ protected:
   Variable_List_Collection _variables;
   Parameter_List_Collection _parameters;
   // Code_Block		_validate;
-  String_Arg	_identifier;
+private:
+  std::string _description;
   Module const* _proto{nullptr};
+protected: // BUG?
+  String_Arg	_identifier;
 private: // merge?
   std::list<FUNCTION_*> _func;
   pSet<FUNCTION_ const> _funcs;
@@ -204,6 +207,13 @@ public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
   const String_Arg&	  identifier()const	{return _identifier;}
+protected:
+  void set_proto(Module const* m) {_proto = m;}
+  bool has_proto()const {return _proto;}
+  Module const& proto()const {assert(_proto); return *_proto;}
+  void set_description(std::string const& d) {_description = d;}
+public:
+  std::string const& description()const {return _description;}
 protected:
   void dump_parameters(std::ostream& f)const;
   void dump_variables(std::ostream& f)const;

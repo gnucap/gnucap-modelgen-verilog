@@ -1,4 +1,4 @@
-XI10.C1 ambiguous overload in capacitor
+XI10.C1: ambiguous capacitor: "vams w/o ic"
 #           v(1)       v(2)       v(4)       v(5)       z(5)       iter(0)   
  0.         0.         0.         0.         0.         NaN        0.        
 -1.         5.         0.         2.6873     0.         265.02G    1.        

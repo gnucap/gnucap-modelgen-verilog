@@ -4,14 +4,15 @@ load ../vams/capacitor.so
 load ../vams/resistor.so
 
 options bypass
+options debug
 verilog
 
 module main(in out gnd);
-capacitor #(.c(.5) .$mfactor(2)) c1(gnd, out);
+capacitor #(.c(.5), .$mfactor(2)) c1(gnd, out);
 resistor #(.r(2) .m(2)) r1(in, out)
 endmodule
 
-main #() dut(in out 0)
+main #() dut(in out \0 );
 
 spice
 

@@ -9,6 +9,7 @@
 `pragma modelgen gen-module
 `pragma modelgen gen-paramset
 
+(*desc="vams diode"*)
 module diode (a, c);
 	parameter integer polarity = 1 from [-1:1]; //  exclude 0;
 	parameter real is=1e-15 from [0:inf);	// saturation current (A)
@@ -166,7 +167,7 @@ module diode (a, c);
 	end
 endmodule
 
-(*desc="nors"*)
+(*desc="vams diode w/o rs"*)
 paramset diode diode
 	parameter real is=1e-15 from (0:inf);	// saturation current (A)
 	parameter real tf=0. from [0:inf);	// forward transit time (s)
@@ -228,6 +229,7 @@ paramset diode diode
 	.level = level;
 endparamset;
 
+(*desc="vams diode w/ rs"*)
 paramset diode diode
 	parameter real is=1e-15 from (0:inf);	// saturation current (A)
 	parameter real tf=0. from [0:inf);	// forward transit time (s)

@@ -4,7 +4,6 @@
 >>>>>verilog 
 >>>>>ground gnd;
 >>>>>list
-dut: main from top level
 dut: 1 candidate found for main
 paramset nmos nmos1;
  .level=1; .kp=NA( 20.u); .vto=NA( NA); .gamma= 0.; .phi= 0.6; .lambda=0.; .uo=NA( 600.); .tpg=1; .tnom=NA( 27.); .fc=NA( 0.5); .pb=NA( 0.8); .cj=NA( 0.); .mj=NA( 0.5); .cjsw=NA( 0.); .mjsw=NA( 0.5); .is=10.E-15; .rd=0.; .rs=0.; .cbd=0.; .cbs=0.; .cgso=NA( 0.); .cgdo=NA( 0.); .cgbo=NA( 0.); .ld=NA( 0.);
@@ -19,10 +18,9 @@ vsource #(.dc(2)) v1 (.p(\1 ),.n(gnd));
 main #() dut (\2 , \1 , gnd, gnd);
 vsource #(.dc(1)) v2 (.p(\2 ),.n(gnd));
 >>>>>print op i(v*)
-main.n1: nmos from top level
-main.n1: nmos from model_dispatcher
-main.n1: 2 candidates found for nmos
-dut.n1 ambiguous overload in nmos
+dut is "main from top level"
+main.n1: 1 candidate found for nmos
+dut.n1 is "nmos from top level"
 >>>>>op
 #           i(v1)      i(v2)     
  27.        0.        -30.u      

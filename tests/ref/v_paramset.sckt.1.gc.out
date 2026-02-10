@@ -5,19 +5,19 @@
 >>>>>spice
 >>>>>.options noinsensitive 
 >>>>>.print dc v(nodes) y(m.t1.tttt.r) y(m.t1.rrrr) 
-m: main from top level
 m: 1 candidate found for main
-main.t1: tln from top level
+m is "main from top level"
 main.t1: 1 candidate found for tln
 assuming double in r0
+m.t1 is "tln from top level"
 assuming double in r0
 assuming double in r0
-tln1.rrrr: resistor from device_dispatcher
 tln1.rrrr: 1 candidate found for resistor
-tln1.tttt: tln0 from top level
 tln1.tttt: 1 candidate found for tln0
-tln0.r: resistor from device_dispatcher
+m.t1._.rrrr is "resistor from device_dispatcher"
+m.t1._.tttt is "tln0 from top level"
 tln0.r: 1 candidate found for resistor
+m.t1._.tttt.r is "resistor from device_dispatcher"
 >>>>>.dc 
 #           v(1)       v(2)       y(m.t1.tttt.r) y(m.t1.rrrr)
  0.         1.         0.33333    0.25       0.25      

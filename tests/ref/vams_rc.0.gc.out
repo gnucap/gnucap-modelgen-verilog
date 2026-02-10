@@ -1,7 +1,8 @@
-dut.c1 tie break: 2 vs. 1
-dut.c1 ambiguous overload in capacitor
-dut.r1 tie break: 5 vs. 1
-dut.r1 ambiguous overload in resistor
+dut is "main from top level"
+dut.c1: ambiguous capacitor: "vams w/o ic"
+dut.c1 is "capacitor:0 from device_dispatcher"
+dut.r1: ambiguous resistor: "vams resistor, plain"
+dut.r1 is "resistor:0 from device_dispatcher"
 #           v(in)      v(out)     iter(0)   
  0.         0.9        0.9        3.        
 #Time       v(in)      v(out)     iter(0)   

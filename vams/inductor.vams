@@ -1,5 +1,6 @@
 `include "disciplines.vams"
 
+(*desc="vams inductor"*)
 module inductor(p,n);
 	inout p,n;
 	electrical p,n;
@@ -11,6 +12,7 @@ module inductor(p,n);
 	end
 endmodule
 
+(*desc="vams inductor w/ ic"*)
 module inductor(p,n);
 	inout p,n;
 	electrical p,n;

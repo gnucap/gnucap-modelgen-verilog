@@ -11,7 +11,6 @@
   zap  r2 (2 0);
              ^ ? invalid identifier
 >>>>>list
-m: main from top level
 m: 1 candidate found for main
 paramset bob resistor;
  .r=10k;
@@ -30,12 +29,13 @@ endmodule // main
 
 main #() m (\1 , \2 , \3 , \4 );
 >>>>>print op v(nodes)
-main.r1: bob from top level
+m is "main from top level"
 main.r1: 1 candidate found for bob
-main.r2: zap from top level
 main.r2: 1 candidate found for zap
-main.v1: vsource from device_dispatcher
 main.v1: 1 candidate found for vsource
+m.r1 is "bob from top level"
+m.r2 is "zap from top level"
+m.v1 is "vsource from device_dispatcher"
 >>>>>op
 #           v(1)       v(2)       v(3)       v(4)      
  27.        1.         0.5        0.         0.        

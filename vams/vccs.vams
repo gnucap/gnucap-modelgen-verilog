@@ -4,6 +4,7 @@
 
 `include "disciplines.vams"
 
+(*desc="vams vccs"*)
 module vccs(sink, src, ps, ns);
 	electrical sink, src, ps, ns;
 	parameter real gm = 1.;

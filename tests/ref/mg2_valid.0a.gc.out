@@ -7,5 +7,7 @@ module test (.\1 (\1 ),.\2 (\2 ));
 endmodule // test
 
 test #() m (\1 , \2 );
+m is "test from top level"
 m.r1:p0 invalid: r is not "exclude 1."
+m.r1 dropped invalid candidate: "test_valid1a from device_dispatcher".
 m.r1: no candidates test_valid1a

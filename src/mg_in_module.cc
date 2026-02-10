@@ -743,6 +743,17 @@ void Module::parse(CS& f)
   (void)o;
   attr.move_attributes(tag_t(&f), tag_t(this));
 
+  std::string desc="0";
+  if(attr.has_attributes(tag_t(this))) {
+    ATTRIB_LIST_p const& a = attr.attributes(tag_t(this));
+    desc = a->operator[](std::string("desc"));
+  }else{
+  }
+  if(desc!="0"){
+    set_description(desc);
+  }else{
+  }
+
   // f >> "module |macromodule |connectmodule "; from caller
   f >> _identifier;
   f >> *_circuit; // HACK
