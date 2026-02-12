@@ -162,6 +162,9 @@ public: //overrides
 
     template_header(o);
     o____ "void precalc(CARD const*, "; args(o); o << ")const { /*nop*/ }\n";
+
+    template_header(o);
+    o____ "void af(CARD const*, "; args(o); o << ")const { incomplete(); /* BUG */ }\n";
     o__ "}_" << label() << ";\n";
   }
   std::string code_name()const override{

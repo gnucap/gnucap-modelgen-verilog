@@ -1,0 +1,43 @@
+
+attach ./modelgen_0.so
+
+
+verilog
+
+`modelgen
+module test_strobe_af0(p, n);
+	electrical p, n;
+	parameter real v = 1;
+
+	analog function real fct;
+		input x;
+		real x;
+		real a;
+		begin
+		  $warning("hello %f\n", a);
+		  $debug("hello %f\n", a);
+			if(1) begin
+			  $warning("world %f\n", a);
+			  $debug("world %f\n", a);
+			end
+			a = .2;
+			fct = exp(a*x);
+		end
+	endfunction
+
+	analog begin
+		V(p, n) <+ fct(v);
+	end
+endmodule
+
+!make test_strobe_af0.so > /dev/null
+attach ./test_strobe_af0.so
+
+parameter v1=0
+test_strobe_af0 #(.v(v1)) dut(\1 ,\0 );
+
+list
+
+print dc v(nodes) iter(0)
+dc v1 -1 1 1
+end
