@@ -112,6 +112,11 @@ int main(int argc, char** argv)
     exit(1);
   }
 
+  // move to config.h or rc?
+  p.define("__VAMS_ENABLE__");
+  p.define("__VAMS_COMPACT_MODELING__");
+  p.define("__VAMS_GNUCAP__");
+
   for(; argc>1; --argc, ++argv) try{
     trace2("main", argc, argv[0]);
     if (strcmp(argv[0],"-o")==0) {itested();
