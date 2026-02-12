@@ -397,7 +397,9 @@ public:
 
   void new_probe_map(); // analog?
   Probe const* new_probe(std::string const& xs, Branch_Ref const& br, Module* m);
-  void setup_storage();
+
+  // kind of submit_variable_access
+  void setup_storage(Variable_Access&)const;
 };
 /*--------------------------------------------------------------------------*/
 inline Analog const& analog(Module const& m)

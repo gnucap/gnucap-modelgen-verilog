@@ -1105,6 +1105,16 @@ static void make_one_variable_proxy(std::ostream& o, Token_VAR_REF const& V)
   o______ "return *this;\n";
   o____ "}\n";
   o__ "}";
+
+  auto d = dynamic_cast<Variable_Decl const*>(V.item());
+  if(!d){
+  }else if(d->rhs().is_empty()){
+  }else if(d->is_state_var()){
+    incomplete();
+    error(bDANGER, d->name() + ": block state variable initialiser unsupported.\n");
+  }else{
+  }
+
 }
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_one_local_var(std::ostream& o, Variable_Decl const& V) const
@@ -1122,6 +1132,17 @@ void OUT_ANALOG::make_one_local_var(std::ostream& o, Variable_Decl const& V) con
   assert(V.code_name().size());
   o << V.code_name();
   o << "; // local_var\n";
+
+  if(V.rhs().is_empty()){
+  }else if(V.is_state_var()){ untested();
+    incomplete();
+    error(bDANGER, V.name() + ": block state variable initialiser unsupported.\n");
+  }else{
+    o__ "{\n";
+    std::string name = make_cc_expression(o, V.rhs());
+    o____ V.code_name() << " = " << name << ";\n";
+    o__ "}\n";
+  }
 }
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_one_variable_load(std::ostream& o,

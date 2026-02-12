@@ -1,3 +1,4 @@
+b: block state variable initialiser unsupported.
 test_init0 #(.period(.5)) dut0 ();
 reject #() r ();
 #Time       t(dut0)    iter(0)    control(0)

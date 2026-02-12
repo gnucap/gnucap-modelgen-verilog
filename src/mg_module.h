@@ -161,9 +161,10 @@ class Module : public Block {
 public:
   typedef enum : int{
     mm_NONE = 0,
-    mm_ANALOG = 1,
-    mm_DIGITAL = 2,
-    mm_BOTH = 3
+    mm_YES = 1,
+    mm_ANALOG = 2,
+    mm_DIGITAL = 4,
+    mm_BOTH = 6
   } mode_mask_t;
 private: // verilog input data
   File const* _file{nullptr};
@@ -232,6 +233,8 @@ public: // TODO
   bool has_analysis()const {return _has_analysis;}
   bool has_expand_last()const {return _has_expand_last;}
 
+  bool has_states()const;
+  bool has_constants()const;
   bool has_events()const    { return _has_pid[if_SET_EVENT];}
   bool has_tr_begin()const  { return _has_pid[if_TR_BEGIN]   || times(); }
   bool has_tr_restore()const{ return _has_pid[if_TR_RESTORE] || times(); }
@@ -264,14 +267,19 @@ public:
   bool has_analog_block()const;
   bool has_always_block()const;
 
-  void set_set_event (mode_mask_t m=mm_ANALOG) {set_pid(if_SET_EVENT, m);}
-  void set_ac_begin  (mode_mask_t m=mm_ANALOG) {set_pid(if_AC_BEGIN, m);}
-  void set_tr_begin  (mode_mask_t m=mm_ANALOG) {set_pid(if_TR_BEGIN, m);}
-  void set_tr_restore(mode_mask_t m=mm_ANALOG) {set_pid(if_TR_RESTORE, m);}
-  void set_tr_review (mode_mask_t m=mm_ANALOG) {set_pid(if_TR_REVIEW, m);}
-  void set_tr_accept (mode_mask_t m=mm_ANALOG) {set_pid(if_TR_ACCEPT, m);}
-  void set_tr_advance(mode_mask_t m=mm_ANALOG) {set_pid(if_TR_ADVANCE, m);}
+  void set_set_event (mode_mask_t m=mm_YES) {set_pid(if_SET_EVENT, m);}
+  void set_ac_begin  (mode_mask_t m=mm_YES) {set_pid(if_AC_BEGIN, m);}
+  void set_tr_begin  (mode_mask_t m=mm_YES) {set_pid(if_TR_BEGIN, m);}
+  void set_tr_restore(mode_mask_t m=mm_YES) {set_pid(if_TR_RESTORE, m);}
+  void set_tr_review (mode_mask_t m=mm_YES) {set_pid(if_TR_REVIEW, m);}
+  void set_tr_accept (mode_mask_t m=mm_YES) {set_pid(if_TR_ACCEPT, m);}
+  void set_tr_advance(mode_mask_t m=mm_YES) {set_pid(if_TR_ADVANCE, m);}
 
+  void set_tr_begin_analog  () {set_tr_begin(mm_ANALOG);}
+  void set_tr_restore_analog() {set_tr_restore(mm_ANALOG);}
+  void set_tr_review_analog () {set_tr_review (mm_ANALOG);}
+  void set_tr_accept_analog () {set_tr_accept (mm_ANALOG);}
+  void set_tr_advance_analog() {set_tr_advance(mm_ANALOG);}
 private:
   void import_flags(FUNCTION_ const*);
   void set_pid  (iface_id_t p, mode_mask_t m=mm_ANALOG) {_has_pid[p] = (mode_mask_t)(_has_pid[p] | m);}

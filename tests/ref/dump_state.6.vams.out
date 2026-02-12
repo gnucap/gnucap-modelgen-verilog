@@ -1,0 +1,20 @@
+module test_init4(p, n);
+  electrical p, n;
+  real s = 17// -
+;
+  real t = 42// -
+;
+
+  analog   initial begin // i
+    // t : 0
+    t = 17; // s1 r3{abx}
+  end
+
+  analog begin // always
+    $debug("%g %g\n", t, s); // s3 r1{x}
+  end
+
+endmodule
+
+
+

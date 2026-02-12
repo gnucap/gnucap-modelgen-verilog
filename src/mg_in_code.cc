@@ -130,9 +130,6 @@ void Variable_Stmt::parse(CS& f)
   size_t here = f.cursor();
   assert(owner());
   Module* mod = prechecked_cast<Module*>(owner());
-  if(mod){
-  }else{
-  }
 
   char t = f.last_match()[0];
   if(t=='r') {
@@ -161,9 +158,10 @@ void Variable_Stmt::parse(CS& f)
     throw Exception_CS_(e.message(), f);
   }
 
+  if(mod){
+  }else{
+  }
   attr.move_attributes(tag_t(&f), tag_t(this));
-
-//  update();
 } // Variable_Stmt::parse
 /*--------------------------------------------------------------------------*/
 void Variable_Decl::update()
@@ -405,6 +403,17 @@ bool Variable_Stmt::is_used_in(Base const* b) const
   }else{ untested();
     return true; // mg_strobe.0.gc.out 
     return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Variable_Stmt::submit_variable_access(Variable_Access& va) const
+{
+  if(dynamic_cast<Module const*>(scope())) {
+    for(auto i : _l) {
+      assert(i);
+      va.init_variable(i->decl_token());
+    }
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/

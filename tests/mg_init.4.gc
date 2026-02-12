@@ -1,0 +1,24 @@
+attach ./modelgen_1.so
+verilog
+
+`modelgen
+module test_init4(p, n);
+	electrical p, n;
+	real s = $simparam("scale", 1);
+	real t = 42;
+	analog begin
+		$debug("%g %g %g\n", s, t, $simparam("gmin", 1));
+		V(p, n) <+ s + t;
+	end
+endmodule
+`endmodelgen
+
+
+!make test_init4.so > /dev/null
+attach ./test_init4.so
+
+test_init4 #() dut(\1 ,\0 );
+
+print dc v(nodes)
+dc
+status notime

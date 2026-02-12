@@ -20,6 +20,9 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_storage.h"
+#ifndef NDEBUG
+#include "mg_module.h"
+#endif
 /*--------------------------------------------------------------------------*/
 void Variable_Access::push_init(Token_VAR_REF* v)
 { untested();
@@ -116,6 +119,9 @@ Variable_Access::xs::xs(Token_VAR_REF* v, Variable_Access::mode_t mode,
 /*--------------------------------------------------------------------------*/
 void Variable_Access::submit(assignment const& p) const
 {
+  auto tt = prechecked_cast<Token_VAR_REF const*>(p.first);
+  assert(tt);
+  trace1("VAC submitting", tt->name());
   p.second.apply(p.first);
 }
 /*--------------------------------------------------------------------------*/
@@ -154,6 +160,13 @@ void Variable_Access::sift_locals(Block const* Scope)
 //     is_initial_ctx =  sb->is_ctx_initial();
 //   }else{ untested();
 //   }
+#ifndef NDEBUG
+  if(dynamic_cast<Module const*>(Scope)) {
+    trace0("VAC sift module");
+  }else{
+    trace0("VAC sift no module");
+  }
+#endif
 
   for(auto i = _map.begin(); i != _map.end(); ) {
     auto tt = dynamic_cast<Token_VAR_REF const*>(i->first);
@@ -174,7 +187,6 @@ void Variable_Access::sift_locals(Block const* Scope)
     }else{
       ++i;
     }
-    trace2("VAC collected", tt->name(), local);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -339,16 +351,16 @@ STORAGE_TYPE::set_t& STORAGE_TYPE::set_t::operator&=(STORAGE_TYPE::set_t const& 
     break;
   case s_maybe_init:
     switch(o._s){
-    case s_unset: untested();
+    case s_unset:
       break;
-    case s_maybe: untested();
+    case s_maybe:
       break;
     case s_maybe_init:
       break;
     case s_event:
       new_set = o._s;
       break;
-    case s_const: untested();
+    case s_const:
       new_set = o._s;
       break;
     case s_set:
@@ -492,7 +504,7 @@ void STORAGE_TYPE::apply(Token const* t) const
     trace2("STORAGE_TYPE::apply tmp", tt->name(), *this);
     A->set_temporary_var();
   }else{
-    trace2("STORAGE_TYPE::apply BUG", tt->name(), *this);
+    trace2("STORAGE_TYPE::apply unused", tt->name(), *this);
     assert(is_unused());
   }
 }

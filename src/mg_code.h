@@ -317,7 +317,7 @@ public:
   //   static RDeps r; return r;
   // }
 private:
-  void submit_variable_access(Variable_Access&)const override {untested(); unreachable();}
+  void submit_variable_access(Variable_Access&)const override;
 }; // Variable_Stmt
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
