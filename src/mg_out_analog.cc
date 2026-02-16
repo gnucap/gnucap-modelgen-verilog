@@ -564,7 +564,7 @@ void OUT_ANALOG::make_af_body(std::ostream& o, const Analog_Function& f) const
      // make_block_variables(o, *ard);
     }else if(auto st = dynamic_cast<AnalogStmt const*>(i)){
       make_stmt(o, *st);
-    }else{ untested();
+    }else{
       unreachable();
     }
   }

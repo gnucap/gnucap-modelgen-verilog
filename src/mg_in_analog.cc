@@ -695,16 +695,14 @@ static Assignment* parse_assignment_or_null(CS& f, Statement* owner)
 bool AnalogForStmt::update()
 {
   trace0("AnalogForStatement::update");
-  auto init_ = dynamic_cast<Assignment*>(_init);
-  auto tail_ = dynamic_cast<Assignment*>(_tail);
   bool ret = false;
 
   while(true){
-    if ( init_ && init_->update() ){ untested();
+    if ( has_init() && init().update() ){ untested();
       ret = true;
     }else if (_body.update()){
       ret = true;
-    }else if ( tail_ && tail_->update() ) { untested();
+    }else if ( has_tail() && tail_().update() ) { untested();
       ret = true;
     }else{
       break;
@@ -717,7 +715,7 @@ bool AnalogForStmt::update()
 void AnalogForStmt::parse(CS& f)
 {
   assert(owner());
-  _cond.set_owner(owner());
+  _cond.set_owner(this); // owner());
   f >> "(";
   Assignment* init = parse_assignment_or_null(f, this);
   _init = init;
@@ -742,6 +740,19 @@ void AnalogForStmt::parse(CS& f)
 
   update();
 } // AnalogForStmt::parse
+/*--------------------------------------------------------------------------*/
+void AnalogForStmt::submit_variable_access(Variable_Access& va) const
+{
+  if(has_init()){
+    init().submit_variable_access(va);
+  }else{
+  }
+  AnalogWhileStmt::submit_variable_access(va);
+  if(has_tail()){
+    tail().submit_variable_access(va);
+  }else{
+  }
+}
 /*--------------------------------------------------------------------------*/
 bool AnalogProceduralAssignment::update()
 {

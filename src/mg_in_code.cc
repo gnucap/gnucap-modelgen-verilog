@@ -758,7 +758,7 @@ void Assignment::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 void Assignment::submit_variable_access(Variable_Access& va)const
 {
-  submit_variable_xs(va);
+  Expression_::submit_variable_xs(va);
   auto sb = prechecked_cast<SeqBlock const*>(scope());
   if(sb->is_ctx_initial()){
     va.init_variable(decl_token());

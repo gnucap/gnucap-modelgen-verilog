@@ -1,0 +1,19 @@
+module dep12();
+  integer i// +
+;
+  integer k// *
+;
+
+  analog begin : main // always
+    // i : 0
+    for (i = 0; (i < 5); i = (i + 1)) begin
+      // k : 0
+      $debug("%d", i); // s1 r1{x}
+      k = (k + i); // s3 r3{abx}
+    end
+  end
+
+endmodule
+
+
+
