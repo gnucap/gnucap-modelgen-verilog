@@ -12,9 +12,11 @@ module test_init0();
 	(*desc="state"*) integer state;
 	(*desc="time"*) real t;
 
-	analog begin
+	analog begin : a
+		real b = 4;
 		@(timer(period, period)) begin
-			t = $abstime;
+			b = 0;
+			t = $abstime + b;
 		end
 	end
 endmodule

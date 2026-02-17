@@ -397,7 +397,9 @@ public:
 
   void new_probe_map(); // analog?
   Probe const* new_probe(std::string const& xs, Branch_Ref const& br, Module* m);
-  void setup_storage();
+
+  // kind of submit_variable_access
+  void setup_storage(Variable_Access&)const;
 };
 /*--------------------------------------------------------------------------*/
 inline Analog const& analog(Module const& m)
@@ -560,6 +562,7 @@ public:
   virtual Base const& tail() const{ untested(); return _cond; }
 private:
   bool update()override;
+protected:
   void submit_variable_access(Variable_Access& va)const override;
 };
 /*--------------------------------------------------------------------------*/
@@ -573,12 +576,15 @@ public:
   void dump(std::ostream& o)const override;
 
   bool has_init()const{ return _init; }
-  Assignment const& init()const{ assert(_init); return *_init; }
-
   bool has_tail()const override{ return _tail; }
+  Assignment const& init()const{ assert(_init); return *_init; }
   Assignment const& tail()const override{ assert(_tail); return *_tail; }
 private:
+  Assignment& init() { assert(_init); return *_init; }
+  Assignment& tail_() { assert(_tail); return *_tail; }
+private:
   bool update()override;
+  void submit_variable_access(Variable_Access& va)const override;
 };
 /*--------------------------------------------------------------------------*/
 // just AssignStatement?

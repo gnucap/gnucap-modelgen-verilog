@@ -222,12 +222,33 @@ private:
       }
     }
   }
+  void make_obsolete_comparison(std::ostream& o, Variable_List_Collection const& P) {
+    o__ "bool operator==(state_" << " const& o)const {\n";
+    o____ "(void)o;\n";
+    o____ "return true";
+    for (auto q = P.begin(); q != P.end(); ++q) {
+      for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
+	Variable_Decl const* V = *p;
+	assert(V);
+	if(V->is_common() && mode_is_common()) {
+	  o << "&& _" << V->name() << "== o._" << V->name() << "\n";
+	}else{
+	}
+      }
+    }
+    o__ ";\n";
+    o__ "}\n";
+  }
   void make_module_variable_decl(std::ostream& o, Module const& m) {
     Variable_List_Collection const& P = m.variables();
     o__ "struct state_{\n";
     {
       indent x;
       make_operators(o, "");
+      o << "#if __cplusplus >= 202002L\n";
+      o << "#else\n";
+      make_obsolete_comparison(o, P);
+      o << "#endif\n";
       make_variable_collection(o, P);
 
       for(auto s : analog(m).list()){
@@ -351,6 +372,10 @@ static void make_common(std::ostream& o, const Module& m)
   }
   // if has_analog?
   o__ "void tr_eval_analog(MOD_" << m.identifier() << "*)const;\n";
+  if(m.has_tr_begin()){
+    o__ "void tr_begin(COMPONENT*)const;\n";
+  }else{
+  }
   if(m.has_tr_review() && m.has_analog_block()){
     o__ "void tr_review_analog(MOD_" << m.identifier() << "*)const;\n";
   }else{

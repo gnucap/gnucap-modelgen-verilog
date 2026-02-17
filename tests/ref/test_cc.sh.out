@@ -1229,6 +1229,7 @@ private:
   void precalc_last(const PARAM_LIST*)override;
 public:
   void tr_eval_analog(MOD_resistor*)const;
+  void tr_begin(COMPONENT*)const;
   void tr_advance_analog(MOD_resistor*)const;
   void tr_regress_analog(MOD_resistor*)const;
   void precalc_analog(MOD_resistor*);
@@ -1243,6 +1244,13 @@ public: // common values
   struct state_{
 #if __cplusplus >= 202002L
     constexpr std::partial_ordering operator<=>(state_ const&)const = default;
+#endif
+#if __cplusplus >= 202002L
+#else
+    bool operator==(state_ const& o)const {
+      (void)o;
+      return true    ;
+    }
 #endif
     // instance double ___i{0.};
     struct state_0{
@@ -1315,6 +1323,7 @@ private: // overrides
   //void    map_nodes();         //BASE_SUBCKT
   //void    tr_restore();        //BASE_SUBCKT
   void    tr_load()override{ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
+  void tr_begin()override;
   void tr_advance()override;
   void tr_regress()override;
   //TIME_PAIR  tr_review()override;         //BASE_SUBCKT
@@ -1346,6 +1355,13 @@ public: // instance vars
   struct state_{
 #if __cplusplus >= 202002L
     constexpr std::partial_ordering operator<=>(state_ const&)const = default;
+#endif
+#if __cplusplus >= 202002L
+#else
+    bool operator==(state_ const& o)const {
+      (void)o;
+      return true    ;
+    }
 #endif
     double ___i{0.};
     struct state_1{
@@ -1487,7 +1503,11 @@ int COMMON_resistor::compare(const COMMON_COMPONENT& x)const
 if(double tt = _temp_k - p->_temp_k){
   return tt>0?1:-1;
 }
-  return 0;
+  if(_v_ == p->_v_){
+    return 0;
+  }else{
+    return 1;
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_resistor::operator==(const COMMON_COMPONENT& x)const
@@ -1709,8 +1729,16 @@ void COMMON_resistor::precalc_last(const PARAM_LIST* par_scope)
     real def = real(t0.value());
     this->_p___tnom = def;
   }
+  { // init common constants
+  };
 _temp_k = temp_k(par_scope);
   COMMON_COMPONENT::precalc_last(par_scope);
+}
+/*--------------------------------------------------------------------------*/
+void COMMON_resistor::tr_begin(COMPONENT* c) const
+{
+  auto d = prechecked_cast<MOD_resistor*>(c);
+  (void)d;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2276,6 +2304,18 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
   }
 } // tr_regress_analog
 /*--------------------------------------------------------------------------*/
+inline void MOD_resistor::tr_begin()
+{
+  BASE_SUBCKT::tr_begin();
+  _v_ = state_();
+  auto c = prechecked_cast<COMMON_resistor const*>(common());
+  assert(c);
+  c->tr_begin(this);
+  auto mc = prechecked_cast<COMMON_resistor*>(mutable_common());
+  assert(mc);
+  _v_1 = _v_;
+}
+/*--------------------------------------------------------------------------*/
 inline void MOD_resistor::tr_advance()
 {
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
@@ -2570,6 +2610,7 @@ private:
   void precalc_last(const PARAM_LIST*)override;
 public:
   void tr_eval_analog(MOD_resistor*)const;
+  void tr_begin(COMPONENT*)const;
   void tr_advance_analog(MOD_resistor*)const;
   void tr_regress_analog(MOD_resistor*)const;
   void precalc_analog(MOD_resistor*);
@@ -2583,6 +2624,13 @@ public: // common values
   struct state_{
 #if __cplusplus >= 202002L
     constexpr std::partial_ordering operator<=>(state_ const&)const = default;
+#endif
+#if __cplusplus >= 202002L
+#else
+    bool operator==(state_ const& o)const {
+      (void)o;
+      return true    ;
+    }
 #endif
     // instance double _i{0.};
     struct state_2{
@@ -2656,6 +2704,7 @@ private: // overrides
   //void    map_nodes();         //BASE_SUBCKT
   //void    tr_restore();        //BASE_SUBCKT
   void    tr_load()override{ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
+  void tr_begin()override;
   void tr_advance()override;
   void tr_regress()override;
   //TIME_PAIR  tr_review()override;         //BASE_SUBCKT
@@ -2687,6 +2736,13 @@ public: // instance vars
   struct state_{
 #if __cplusplus >= 202002L
     constexpr std::partial_ordering operator<=>(state_ const&)const = default;
+#endif
+#if __cplusplus >= 202002L
+#else
+    bool operator==(state_ const& o)const {
+      (void)o;
+      return true    ;
+    }
 #endif
     double _i{0.};
     struct state_3{
@@ -2819,7 +2875,11 @@ int COMMON_resistor::compare(const COMMON_COMPONENT& x)const
 if(double tt = _temp_k - p->_temp_k){
   return tt>0?1:-1;
 }
-  return 0;
+  if(_v_ == p->_v_){
+    return 0;
+  }else{
+    return 1;
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_resistor::operator==(const COMMON_COMPONENT& x)const
@@ -3064,8 +3124,16 @@ void COMMON_resistor::precalc_last(const PARAM_LIST* par_scope)
     real def = real(t0.value());
     e_val(&(this->_p_tnom),     def , par_scope);
   }
+  { // init common constants
+  };
 _temp_k = temp_k(par_scope);
   COMMON_COMPONENT::precalc_last(par_scope);
+}
+/*--------------------------------------------------------------------------*/
+void COMMON_resistor::tr_begin(COMPONENT* c) const
+{
+  auto d = prechecked_cast<MOD_resistor*>(c);
+  (void)d;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -4014,6 +4082,18 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
     }
   }
 } // tr_regress_analog
+/*--------------------------------------------------------------------------*/
+inline void MOD_resistor::tr_begin()
+{
+  BASE_SUBCKT::tr_begin();
+  _v_ = state_();
+  auto c = prechecked_cast<COMMON_resistor const*>(common());
+  assert(c);
+  c->tr_begin(this);
+  auto mc = prechecked_cast<COMMON_resistor*>(mutable_common());
+  assert(mc);
+  _v_1 = _v_;
+}
 /*--------------------------------------------------------------------------*/
 inline void MOD_resistor::tr_advance()
 {
@@ -5544,6 +5624,13 @@ public: // common values
 #if __cplusplus >= 202002L
     constexpr std::partial_ordering operator<=>(state_ const&)const = default;
 #endif
+#if __cplusplus >= 202002L
+#else
+    bool operator==(state_ const& o)const {
+      (void)o;
+      return true    ;
+    }
+#endif
   }_v_;
 private: // funcs
   bool param_given(PARA_BASE const& p)const {
@@ -5685,6 +5772,13 @@ public: // instance vars
 #if __cplusplus >= 202002L
     constexpr std::partial_ordering operator<=>(state_ const&)const = default;
 #endif
+#if __cplusplus >= 202002L
+#else
+    bool operator==(state_ const& o)const {
+      (void)o;
+      return true    ;
+    }
+#endif
   }_v_;
   state_ _v_1;
 private: // branch state
@@ -5796,7 +5890,11 @@ int COMMON_capacitor::compare(const COMMON_COMPONENT& x)const
     return 0;
   }else{
   }
-  return 0;
+  if(_v_ == p->_v_){
+    return 0;
+  }else{
+    return 1;
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_capacitor::operator==(const COMMON_COMPONENT& x)const
@@ -5976,6 +6074,8 @@ void COMMON_capacitor::precalc_last(const PARAM_LIST* par_scope)
     real def = real(t0.value());
     this->_p___ic = def;
   }
+  { // init common constants
+  };
   COMMON_COMPONENT::precalc_last(par_scope);
 }
 /*--------------------------------------------------------------------------*/
@@ -6628,6 +6728,13 @@ public: // common values
 #if __cplusplus >= 202002L
     constexpr std::partial_ordering operator<=>(state_ const&)const = default;
 #endif
+#if __cplusplus >= 202002L
+#else
+    bool operator==(state_ const& o)const {
+      (void)o;
+      return true    ;
+    }
+#endif
   }_v_;
 private: // funcs
   bool param_given(PARA_BASE const& p)const {
@@ -6776,6 +6883,13 @@ public: // instance vars
 #if __cplusplus >= 202002L
     constexpr std::partial_ordering operator<=>(state_ const&)const = default;
 #endif
+#if __cplusplus >= 202002L
+#else
+    bool operator==(state_ const& o)const {
+      (void)o;
+      return true    ;
+    }
+#endif
   }_v_;
   state_ _v_1;
 private: // branch state
@@ -6893,7 +7007,11 @@ int COMMON_capacitor::compare(const COMMON_COMPONENT& x)const
     return 0;
   }else{
   }
-  return 0;
+  if(_v_ == p->_v_){
+    return 0;
+  }else{
+    return 1;
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_capacitor::operator==(const COMMON_COMPONENT& x)const
@@ -7091,6 +7209,8 @@ void COMMON_capacitor::precalc_last(const PARAM_LIST* par_scope)
     real def = real(t0.value());
     this->_p___ic = def;
   }
+  { // init common constants
+  };
   COMMON_COMPONENT::precalc_last(par_scope);
 }
 /*--------------------------------------------------------------------------*/

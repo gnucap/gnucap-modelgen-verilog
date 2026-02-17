@@ -409,7 +409,7 @@ void AnalogInitialStmt::parse(CS& f)
   assert(owner());
   Module* m = to_module(owner());
   assert(m);
-  m->set_tr_begin();
+  m->set_tr_begin_analog();
   _body.set_owner(this);
   _body.set_ctx_initial();
   assert(_body.is_initial());
@@ -695,16 +695,14 @@ static Assignment* parse_assignment_or_null(CS& f, Statement* owner)
 bool AnalogForStmt::update()
 {
   trace0("AnalogForStatement::update");
-  auto init_ = dynamic_cast<Assignment*>(_init);
-  auto tail_ = dynamic_cast<Assignment*>(_tail);
   bool ret = false;
 
   while(true){
-    if ( init_ && init_->update() ){ untested();
+    if ( has_init() && init().update() ){ untested();
       ret = true;
     }else if (_body.update()){
       ret = true;
-    }else if ( tail_ && tail_->update() ) { untested();
+    }else if ( has_tail() && tail_().update() ) { untested();
       ret = true;
     }else{
       break;
@@ -717,7 +715,7 @@ bool AnalogForStmt::update()
 void AnalogForStmt::parse(CS& f)
 {
   assert(owner());
-  _cond.set_owner(owner());
+  _cond.set_owner(this); // owner());
   f >> "(";
   Assignment* init = parse_assignment_or_null(f, this);
   _init = init;
@@ -742,6 +740,19 @@ void AnalogForStmt::parse(CS& f)
 
   update();
 } // AnalogForStmt::parse
+/*--------------------------------------------------------------------------*/
+void AnalogForStmt::submit_variable_access(Variable_Access& va) const
+{
+  if(has_init()){
+    init().submit_variable_access(va);
+  }else{
+  }
+  AnalogWhileStmt::submit_variable_access(va);
+  if(has_tail()){
+    tail().submit_variable_access(va);
+  }else{
+  }
+}
 /*--------------------------------------------------------------------------*/
 bool AnalogProceduralAssignment::update()
 {
@@ -2993,10 +3004,9 @@ Probe const* Module::new_probe(std::string const& xs, Branch_Ref const& br)
   return pr;
 }
 /*--------------------------------------------------------------------------*/
-void Analog::setup_storage()
+void Analog::setup_storage(Variable_Access& va) const
 {
 //  SeqBlock::variable_access().collect(this);
-  Variable_Access va;
   for(Statement* bb : _list){
     if(dynamic_cast<AnalogInitialStmt const*>(bb)){
       bb->submit_variable_access(va);
@@ -3016,15 +3026,21 @@ void Analog::setup_storage()
     }
   }
 
-  va.sift_locals(scope());
-  assert(!va.size());
+  if(dynamic_cast<Module const*>(scope())){
+  }else{ untested();
+    unreachable();
+  }
+
+//  va.sift_locals(scope());
+//  assert(!va.size());
 }
 /*--------------------------------------------------------------------------*/
-void analog_setup_storage(Base* b)
+// BUG? should an analog block be a Statement
+void analog_setup_storage(Base* b, Variable_Access& va)
 {
   auto a = prechecked_cast<Analog*>(b);
   assert(a);
-  a->setup_storage();
+  return a->setup_storage(va);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

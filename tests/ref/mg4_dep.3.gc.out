@@ -1,0 +1,11 @@
+parameter v=1
+test_dep3 #() dut (.p(\1 ),.n(\0 ));
+01234#           v(1)      
+01234012340123401234 1.         10.       
+012340123401234 2.         10.       
+012340123401234 3.         10.       
+Gnucap   System status
+iterations: op=0, dc=7, tran=0, fourier=0, total=7
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%

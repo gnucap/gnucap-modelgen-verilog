@@ -1,0 +1,17 @@
+`include "disciplines.vams"
+`include "constants.vams"
+`pragma modelgen dump-annotate
+`pragma modelgen nodump-nature
+`pragma modelgen nodump-discipline
+
+module dep12();
+  integer i;
+  integer k;
+  analog begin : main
+				for (i = 0; i < 5; i = i + 1) begin
+					$debug("%d", i);
+					k = k + i;
+				end
+  end
+
+endmodule

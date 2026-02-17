@@ -1,0 +1,38 @@
+
+attach ./modelgen_0.so
+
+
+verilog
+
+`modelgen
+module test_dep3(p, n);
+	electrical p, n;
+	inout p, n;
+	(*__state=1*)integer i;
+	real k;
+	analog begin
+		begin
+		k=0;
+				for (i = 0; i < 5; i = i + 1) begin
+					$debug("%d", i);
+					k = k + i;
+				end
+				V(p, n) <+ k;
+		end
+	end
+endmodule
+
+!make test_dep3.so > /dev/null
+attach ./test_dep3.so
+
+parameter v=1
+
+test_dep3 #() dut(\1 ,\0 );
+
+list
+
+print dc v nodes
+
+dc v 1 3 1
+status notime
+end

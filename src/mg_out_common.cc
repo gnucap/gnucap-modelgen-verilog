@@ -221,9 +221,14 @@ static void make_common_operator_compare(std::ostream& o, const Module& d)
     }else{
     }
   }
-  o__ "return 0;\n";
-  o <<
-    "}\n"
+
+  o__ "if(_v_ == p->_v_){\n";
+  o____ "return 0;\n";
+  o__ "}else{\n";
+  o____ "return 1;\n";
+  o__ "}\n";
+
+  o << "}\n"
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
@@ -743,7 +748,6 @@ static void make_common_expand_last(std::ostream& o , const Module& m)
   make_tag(o);
   o  <<
     "void COMMON_" << m.identifier() << "::expand_last(const COMPONENT* d)\n{\n";
-    o__ "// COMMON_COMPONENT::expand_last(d);\n";
 
   Hierarchical_Refs const& H = m.hrefs();
   for (auto q = H.begin(); q != H.end(); ++q) {
@@ -753,7 +757,8 @@ static void make_common_expand_last(std::ostream& o , const Module& m)
     o____ "throw(Exception_Precalc(d->long_label() + \": cant find " << (*q)->name() << "\"));\n";
     o__ "}\n";
   }
-  o << "}\n";
+  o << "}\n"
+    "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
 static void make_common_expand(std::ostream& o , const Module& m)
@@ -813,13 +818,80 @@ static void make_common_expand(std::ostream& o , const Module& m)
   make_eval_netlist_parameters(o, m);
   o  << "}\n"
     "/*--------------------------------------------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+// It is important to note that for parametric sweep type analyses like dc
+// sweep, the tool shall re-evaluate the Elaboration and Pre-simulation steps
+// as outlined in Figure 8-1 for each sweep point to ensure that all parameter
+// value changes are captured.
+static void make_common_init_constants(std::ostream& o, const Variable_List_Collection& V)
+{
+  make_tag(o);
+  o__ "{ // init common constants\n";
+  for(Variable_Stmt const* i : V) {
+    indent x;
+    assert(i);
+    for(Variable_Decl const* j : *i) {
+      assert(j);
+      if(j->rhs().is_empty()){
+      }else if(j->is_common()){
+	o__ "{\n";
 
+	{ indent y;
+	  std::string name = make_cc_expression(o, j->rhs(), false, "adjust");
+	  // o__ "_v_." << j->code_name() << " = " << name << ";\n";
+	  o__ "_v_._" << j->name() << " = " << name << ";\n";
+	}
+	o__ "}\n";
+      }else{
+	incomplete();
+      }
+    }
+  }
+
+  o__ "};\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_common_tr_begin(std::ostream& o, Module const& m)
+{
+  make_tag(o);
+  Variable_List_Collection const& V = m.variables();
+  o << "void COMMON_" << m.identifier() << "::tr_begin(COMPONENT* c) const\n{\n";
+  o__ "auto d = prechecked_cast<MOD_" << m.identifier() << "*>(c);\n";
+  o__ "(void)d;\n";
+  for(Variable_Stmt const* i : V) {
+    indent x;
+    assert(i);
+    for(Variable_Decl const* j : *i) {
+      assert(j);
+      if(j->rhs().is_empty()){
+      }else if(j->is_state_var()){
+	o__ "{\n";
+
+	{ indent y;
+	  std::string name = make_cc_expression(o, j->rhs(), false, "adjust");
+	  // o__ "_v_." << j->code_name() << " = " << name << ";\n";
+	  o__ "d->_v_._" << j->name() << " = " << name << ";\n";
+	}
+	o__ "}\n";
+      }else{
+	incomplete();
+      }
+    }
+  }
+  o << "}\n"
+    "/*--------------------------------------------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_common_precalc_last(std::ostream& o , const Module& m)
+{
   o << "void COMMON_" << m.identifier() << "::precalc_last(const PARAM_LIST* par_scope)\n{\n";
   o__ "assert(par_scope);\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
   o__ "(void)pc;\n";
   // BUG: omit structurally relevant?
   make_final_adjust_eval_parameter_list(o , m.parameters());
+  make_common_init_constants(o , m.variables());
   make_eval_netlist_parameters(o, m);
 
   for(FUNCTION_ const* f : m.funcs()){
@@ -871,7 +943,8 @@ static void make_common_expand(std::ostream& o , const Module& m)
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";
 #endif
-}
+/*--------------------------------------------------------------------------*/
+} // common::expand
 /*--------------------------------------------------------------------------*/
 void make_cc_common(std::ostream& o , const Module& m)
 {
@@ -896,6 +969,11 @@ void make_cc_common(std::ostream& o , const Module& m)
   make_common_expand(o, m);
   if(m.has_expand_last()){
     make_common_expand_last(o, m);
+  }else{
+  }
+  make_common_precalc_last(o, m);
+  if(m.has_tr_begin()){
+    make_common_tr_begin(o, m);
   }else{
   }
   o  << "/*--------------------------------------------------------------------------*/\n";

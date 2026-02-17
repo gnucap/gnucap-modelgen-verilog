@@ -6,6 +6,7 @@
 - localparam not considered in overloading
 - ac needs operating point, even if linear:
   c.f. mg2_cccs.0.gc
+- $write etc. not working in analog functions
 
 == modelgen
 - dependency tracking glitch aka rram bug

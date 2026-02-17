@@ -27,6 +27,7 @@
 #include "mg_analog.h" // BUG: Analog_Function_Arg, push_back
 #include "mg_token.h"
 #include "mg_href.h"
+#include "mg_storage.h"
 #include "l_stlextra.h"
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1302,22 +1303,27 @@ void Module::import_flags(FUNCTION_ const* f)
   }
   if(f->has_tr_begin()){
     set_tr_begin();
+    set_tr_begin_analog(); // ?
   }else{
   }
   if(f->has_tr_restore()){
     set_tr_restore();
+    set_tr_restore_analog(); // ?
   }else{
   }
   if(f->has_tr_review()){
     set_tr_review();
+    set_tr_review_analog(); // ?
   }else{
   }
   if(f->has_tr_advance()){
     set_tr_advance();
+    set_tr_advance_analog(); // ?
   }else{
   }
   if(f->has_tr_accept()){
     set_tr_accept();
+    set_tr_accept_analog(); // ?
   }else{
   }
   if(f->has_set_event()){
@@ -1432,16 +1438,43 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args_)
   return t;
 }
 /*--------------------------------------------------------------------------*/
-void analog_setup_storage(Base*);
+void analog_setup_storage(Base*, Variable_Access&);
 void Module::setup_storage()
 {
+  Variable_Access va;
+  for(Statement* bb : variables()){
+    if(dynamic_cast<Variable_Stmt const*>(bb)){
+      bb->submit_variable_access(va);
+    }else{ untested();
+      incomplete();
+    }
+  }
+  trace1("Module::setup_storage0", va.size());
+  if(va.size()){
+    // only needed for state variables..
+    set_tr_begin();
+  }else{
+  }
+
+  // TODO: use normal procedure.
   if(_analog){
-    analog_setup_storage(_analog);
+    analog_setup_storage(_analog, va);
   }else{ untested();
   }
-  // incomplete();
-//  for i in analog_list(*this)
-//     i.setup_storage();
+
+  va.sift_locals(this); // should all be local at top level..
+}
+/*--------------------------------------------------------------------------*/
+bool Module::has_states() const
+{
+  incomplete();
+  return true;
+}
+/*--------------------------------------------------------------------------*/
+bool Module::has_constants() const
+{
+  // possible false positives
+  return variables().size();
 }
 /*--------------------------------------------------------------------------*/
 void filter_setup(MGVAMS_FILTER*, Module*);

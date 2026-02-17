@@ -428,14 +428,20 @@ static void make_tr_begin(std::ostream& o, const Module& m)
     o__ "}\n";
   }else{
   }
-  o__ "_v_1 = _v_ = state_();\n";
+  o__ "_v_ = state_();\n";
   if(m.has_tr_begin_analog() ||m.has_tr_begin_digital()) {
+    assert(m.has_tr_begin());
+  }else{
+  }
+  if(m.has_tr_begin()){
     o__ "auto c = prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
     o__ "assert(c);\n";
+    o__ "c->tr_begin(this);\n";
     o__ "auto mc = prechecked_cast<COMMON_" << m.identifier() << "*>(mutable_common());\n";
     o__ "assert(mc);\n";
   }else{
   }
+  o__ "_v_1 = _v_;\n";
   if(m.has_analog_block() && m.has_tr_begin_analog()) {
     o__ "mc->tr_initial_analog(this);\n"; // call from COMMON::tr_begin?
     o__ "c->tr_begin_analog(this);\n"; // call from COMMON::tr_begin?

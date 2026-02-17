@@ -1,0 +1,38 @@
+
+attach ./modelgen_1.so
+attach ../vams/vsine.so
+
+
+verilog
+
+`modelgen
+module test_init5a(p, n);
+	electrical p, n;
+	inout p, n;
+	(*desc="state"*) real s;
+	analog begin : main
+		real t = .5;
+		if(V(p,n) > .7) begin
+			t = .9;
+		end else if(t>.5 && V(p,n) < .3) begin
+			t = 0.1;
+      end
+		s = t;
+	end
+endmodule
+
+list
+
+!make test_init5a.so > /dev/null
+attach ./test_init5a.so
+parameter v = 0;
+
+test_init5a dut0(x, \0 );
+vsource #(v) v(x, \0 );
+
+list
+
+print dc v(nodes) s(dut0) iter(0)
+dc v 0 1 .05 loop
+
+end
