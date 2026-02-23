@@ -220,7 +220,7 @@ void VA_BREQN::tr_load()
   tr_load_ones();
 
   tr_load_source_point(n_(BR()), &_values[0], &_old_values[0]);
-  if(_current_port_names.size()){
+  if(_n_current_inputs){
     incomplete();
   }else{
   }
@@ -308,7 +308,7 @@ void VA_BREQN::ac_load()
       ac_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), _values[i]);
     }
   }
-  if(_current_port_names.size()){ untested();
+  if(_n_current_inputs){ untested();
     incomplete();
   }else{
   }

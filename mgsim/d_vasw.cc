@@ -221,7 +221,7 @@ void VAPOT::ac_load()
     ac_load_shunt(); // 4 pt +- loss
   }else{
   }
-  if(_current_port_names.size()){ untested();
+  if(_n_current_inputs){ untested();
     incomplete();
   }else{
   }
