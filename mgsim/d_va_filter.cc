@@ -219,6 +219,7 @@ private: // override virtual
   std::string dev_type()const override	{ untested();unreachable(); return "ddt";}
   CARD*	   clone()const override	{return new DEV_DDT(*this);}
   bool	   do_tr()override;
+  bool	   do_tr_last()override;
   void	   ac_load()override; // TODO: ac_eval
   double   tr_amps()const override      { return DEV_CPOLY_CAP::tr_amps(); }
   void	   tr_begin()override;
@@ -458,6 +459,8 @@ bool DEV_DDT::do_tr()
     _vi0[1] = _i[0].f1;
   }
   assert(_vi0[0] == _vi0[0]);
+
+  bool q = false;
   
   if(_sim->_v0){
     int i = 2;
@@ -474,12 +477,18 @@ bool DEV_DDT::do_tr()
       assert(_vi0[0] == _vi0[0]);
     }
 
+#if 1
     assert( i == _n_ports - int(_input.size()) + 1);
 
     // current port input
     for (; int(i)<=_n_ports; ++i) {
       int k = int(i)-int(_n_ports - _input.size() + 1);
-      assert(_input[k]->has_iv_probe()); // for now.
+      if(_input[k]->has_iv_probe()){
+	q = true;
+	continue;
+      }else if(_input[k]->has_inode()){
+	incomplete();
+      }
       // _m0.c0 += _y[0].f1 * _input->_m0.c0;
       // _m0.c1  = _y[0].f1 * (_input->_loss0 + _input->_m0.c1);
       double scale = _input[k]->_loss0 + _input[k]->_m0.c1 ;
@@ -503,6 +512,7 @@ bool DEV_DDT::do_tr()
     for (int ii=0; ii<=_n_ports; ++ii) {
       assert(_vi0[ii] == _vi0[ii]);
     }
+#endif
   }else{ untested();
   }
 
@@ -518,13 +528,55 @@ bool DEV_DDT::do_tr()
   }else{
   }
 
-  trace4("trampsdbg", _sim->_time0, tramps1, tr_amps(), _i[0].f0);
-  _m0 = CPOLY1(0., _vi0[0], 0.); // _vi0[1]);
-
-  // q_load();
+  if (q){
+    _sim->_late_evalq.push_back(this);
+  }else{
+    trace4("trampsdbg", _sim->_time0, tramps1, tr_amps(), _i[0].f0);
+    _m0 = CPOLY1(0., _vi0[0], 0.); // _vi0[1]);
+  }
   return do_tr_con_chk_and_q();
 }
 /*--------------------------------------------------------------------------*/
+bool DEV_DDT::do_tr_last()
+{
+  if(_sim->_v0){
+    int i = _n_ports - int(_input.size()) + 1;
+
+    // current port input
+    for (; int(i)<=_n_ports; ++i) {
+      int k = int(i)-int(_n_ports - _input.size() + 1);
+      if(_input[k]->has_iv_probe()){
+      }else{
+	continue;
+      }
+      // _m0.c0 += _y[0].f1 * _input->_m0.c0;
+      // _m0.c1  = _y[0].f1 * (_input->_loss0 + _input->_m0.c1);
+      double scale = _input[k]->_loss0 + _input[k]->_m0.c1 ;
+      if(_input[k]->_m0.c1){ untested();
+      }else{
+      }
+      if(_input[k]->_loss0){
+      }else{ untested();
+      }
+
+     // _vi0[i] = tr_c_to_g(scale*_vy0[i], _vi0[i]);
+      if(_loss0){
+	_vi0[i] = -_loss0 * scale * tr_c_to_g(_vy0[i], _vi0[i]);
+      }else{ untested();
+	_vi0[i] = scale * tr_c_to_g(_vy0[i], _vi0[i]);
+      }
+
+      _vi0[0] -= volts_limited(n_(2*i-2),n_(2*i-1)) * _vi0[i];
+    }
+
+    for (int ii=0; ii<=_n_ports; ++ii) {
+      assert(_vi0[ii] == _vi0[ii]);
+    }
+  }else{
+  }
+  _m0 = CPOLY1(0., _vi0[0], 0.); // _vi0[1]);
+  return true; //?
+}
 /*--------------------------------------------------------------------------*/
 void DEV_IDT::tr_begin()
 {

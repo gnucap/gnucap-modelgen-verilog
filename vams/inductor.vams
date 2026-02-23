@@ -25,4 +25,3 @@ module inductor(p,n);
 		I(p,n) <+ idt(V(p,n), ic*l) / l;
 	end
 endmodule
-

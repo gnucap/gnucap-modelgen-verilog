@@ -70,7 +70,6 @@ public:
       std::fill_n(_m1_, _n_ports-1, 0.);
     }
   }
-/*--------------------------------------------------------------------------*/
 protected:
   double abstol() const{
     auto cv = prechecked_cast<COMMON_VASRC const*>(common());
@@ -137,6 +136,8 @@ bool VAPOT::do_tr()
     }
 
   }else{
+    // it's a voltage source..
+    trace3("do_tr noflip", long_label(), _values[0], _values[1]);
     for (int i=2; i<=_n_ports; ++i) {
       _m0_[i-2] = - _values[i] * _loss0;
     }
