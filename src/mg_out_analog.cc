@@ -1640,5 +1640,38 @@ void make_cc_analog_list(std::ostream& o, const Module& m, Branch const*
   oo.make_analog_list(o, m);
 }
 /*--------------------------------------------------------------------------*/
+// BUG: free
+std::string Branch::dev_type()const
+{
+//  if( .. attribute .. )?
+  if(is_filter()) {
+    std::string label = "va_" + _ctrl->label();
+    auto pos = label.find_last_of("_");
+    return label.substr(0, pos);
+  }else if(!is_direct()){
+    if(has_pot_source()){
+      return "va_pot_br";
+    }else{ untested();
+      return "incomplete_dev_type";
+    }
+  }else if(has_flow_probe()) {
+    return "va_sw"; // ?
+  }else if(has_pot_source()){
+    if(_selfdep){
+      return "va_pot_br";
+    }else if(has_always_pot() && !has_flow_source()) {
+      return "va_pot";
+    }else{
+      return "va_sw";
+    }
+  }else if(has_flow_source()){
+    return "va_flow";
+  }else{ untested();
+    return "va_sw";
+  }
+  unreachable();
+  return "";
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet
