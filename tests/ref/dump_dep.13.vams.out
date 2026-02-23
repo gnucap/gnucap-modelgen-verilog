@@ -1,0 +1,28 @@
+module dep13(d, g);
+  inout d, g;
+  electrical d, g;
+  parameter real p =  0.;
+
+  real T//
+;
+  real tmp// +
+;
+  real c// *
+;
+
+  analog begin : main // always
+    // T : 0
+    if ((p != 0)) begin
+      // c : 0
+      // tmp : 0
+      tmp = p; // s1 r4{abx}
+      c = tmp; // s2 r4{abx}
+    end
+    T = c; // s4 r3{abx}
+    I(d, g) <+ c; // s3 r2{x}
+  end
+
+endmodule
+
+
+

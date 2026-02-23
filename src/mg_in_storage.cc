@@ -24,6 +24,40 @@
 #include "mg_module.h"
 #endif
 /*--------------------------------------------------------------------------*/
+#ifdef DO_TRACE
+static std::ostream& operator<<(std::ostream& o, STORAGE_TYPE::set_t const& s)
+{
+  s.dump(o);
+  return o;
+}
+/*--------------------------------------------------------------------------*/
+static std::ostream& operator<<(std::ostream& o, STORAGE_TYPE const& s)
+{
+  o << "(" << s._set << ":";
+  static std::string str[11] = {
+    "not_used",
+    "used",
+    "init",
+    "used_unset"
+  };
+  o << str[s._use] << ")";
+  return o;
+}
+/*--------------------------------------------------------------------------*/
+inline void STORAGE_TYPE::set_t::dump(std::ostream& o) const
+{
+  static std::string str[11] = {
+    "not_set",
+    "maybe",
+    "maybe_i",
+    "evt",
+    "const",
+    "set"
+  };
+  o << str[_s];
+}
+#endif
+/*--------------------------------------------------------------------------*/
 void Variable_Access::push_init(Token_VAR_REF* v)
 { untested();
   assert(v);
@@ -250,6 +284,12 @@ STORAGE_TYPE STORAGE_TYPE::maybe() const
   set_t s = _set.maybe();
   use_t u = _use;
 
+  if(_set.is_set() && u == u_used){
+    s._s = set_t::s_maybe;
+    u = u_init;
+  }else{
+  }
+
   STORAGE_TYPE r(s, u);
   trace2("STT maybe", *this, r);
   return r;
@@ -257,6 +297,7 @@ STORAGE_TYPE STORAGE_TYPE::maybe() const
 /*--------------------------------------------------------------------------*/
 STORAGE_TYPE::set_t STORAGE_TYPE::set_t::operator|(STORAGE_TYPE::set_t const& o) const
 {
+  trace2("STT |", *this, o);
   int s = _s;
   int os = o._s;
   if(s == s_event){
@@ -432,6 +473,12 @@ STORAGE_TYPE& STORAGE_TYPE::operator&=(STORAGE_TYPE const& o)
   }else if(_set.is_init() && !_use && o.is_unset() && o._use == u_unset){
     _use = u_used;
     trace1("STT out1b", *this);
+
+//    @#@STT in  *this=(maybe_i:not_used)  o=(maybe:init)  o.is_state()=0
+  }else if(!_set.is_set() && !o._set.is_set() && o.is_used_init()){
+    _set &= o._set;
+    _use = u_init;
+    trace1("STT out2a", *this);
   }else if(!_set.is_set() && !o._set.is_set() && o.is_used()){
     _set &= o._set;
     _use = u_unset;

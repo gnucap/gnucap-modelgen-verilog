@@ -94,6 +94,7 @@ public:
 private:
   bool is_unset()const{ return _set.is_unset(); }
   bool is_used()const{ return _use; }
+  bool is_used_init()const{ return _use==u_init; }
 
 public: // query
   bool is_common()const { return _use && _use!=u_unset && _use!=u_init && _set.is_common(); }
@@ -131,39 +132,6 @@ inline void STORAGE_TYPE::assign_const()
   *this &= s;
 }
 /*--------------------------------------------------------------------------*/
-#ifdef DO_TRACE
-inline std::ostream& operator<<(std::ostream& o, STORAGE_TYPE::set_t const& s)
-{
-  s.dump(o);
-  return o;
-}
-/*--------------------------------------------------------------------------*/
-inline std::ostream& operator<<(std::ostream& o, STORAGE_TYPE const& s)
-{
-  o << "(" << s._set << ":";
-  static std::string str[11] = {
-    "not_used",
-    "used",
-    "init",
-    "used_unset"
-  };
-  o << str[s._use] << ")";
-  return o;
-}
-/*--------------------------------------------------------------------------*/
-inline void STORAGE_TYPE::set_t::dump(std::ostream& o) const
-{
-  static std::string str[11] = {
-    "not_set",
-    "maybe",
-    "maybe_i",
-    "evt",
-    "const",
-    "set"
-  };
-  o << str[_s];
-}
-#endif
 /*--------------------------------------------------------------------------*/
 class SeqBlock;
 class Variable_Access {
