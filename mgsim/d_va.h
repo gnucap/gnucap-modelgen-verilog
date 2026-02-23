@@ -33,15 +33,22 @@
 #include <globals.h>
 #include <e_elemnt.h>
 /*--------------------------------------------------------------------------*/
+inline node_t* root(node_t const* n)
+{
+  node_t* m = const_cast<node_t*>(n);
+  return &m->root();
+}
+/*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
 class DEV_CPOLY_G : public ELEMENT {
 protected:
-  double*  _values{nullptr};
-  double*  _old_values{nullptr};
+  double*  _values{nullptr};     // from parent
+  double*  _old_values{nullptr}; // local, loaded
   int	   _n_ports{0};
   double   _time;
   node_t*  _nN{nullptr};
+protected: // possibly defer to specialisation
   std::vector<std::string> _current_port_names;
   std::vector<ELEMENT const*> _input;
 #ifndef NDEBUG
@@ -81,7 +88,7 @@ protected: // override virtual
   bool has_iv_probe()const override { untested();return true;}
   void expand()override;
   void expand_last()override;
-  void expand_current_port(int i);
+  void expand_current_port(int i, std::string n);
 
   void set_port_by_index(int i, /*const*/ std::string& s) override {
     if(i>=0){ untested();
@@ -173,16 +180,24 @@ void DEV_CPOLY_G::expand()
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::expand_last()
 {
+  int k = int(_current_port_names.size());
+  std::vector<std::string> current_port_names(k);
+  while(k--){
+    assert(net_nodes()-k-1 < matrix_nodes());
+    assert(root(&n_(net_nodes()-k-1)));
+    assert(_current_port_names[k] == root(&n_(net_nodes()-k-1))->short_label());
+    current_port_names[k] = root(&n_(net_nodes()-k-1))->short_label();
+  }
   // squeeze in current ports.
   for(int i=0; i<int(_current_port_names.size()); ++i){
-    expand_current_port(i);
+    expand_current_port(i, current_port_names[i]);
   }
   ELEMENT::expand_last(); // internal nodes allocated here (kludge)
 }
 /*--------------------------------------------------------------------------*/
-void DEV_CPOLY_G::expand_current_port(int i)
+void DEV_CPOLY_G::expand_current_port(int i, std::string input_label)
 {
-  std::string const& input_label = _current_port_names[i];
+  assert(input_label == _current_port_names[i]);
   ELEMENT const* input = _input[i];
 
   int in1 = first_current_port() + 2*i;
@@ -215,7 +230,7 @@ void DEV_CPOLY_G::expand_current_port(int i)
 DEV_CPOLY_G::~DEV_CPOLY_G()
 {
   delete [] _old_values;
-  if (net_nodes() > NODES_PER_BRANCH) {
+  if (matrix_nodes() > NODES_PER_BRANCH) {
     delete [] _nN;
   }else{
     // it is part of a base class
@@ -310,7 +325,33 @@ void DEV_CPOLY_G::ac_load()
 }
 /*--------------------------------------------------------------------------*/
 /* set: set parameters, used in model building
+ *
+ * possible node layout..
+ * i3 i2 i1 p n v1 v2 v3 br
+ *    nodes ^
+ *             net_nodes ^
+ * p n v1p v1n v2p v2n i1 i2 i3 br
+ *                    ext_nodes ^
+ *
+ * nodes=2 * states=1 => constant source
+ * nodes=2 * states=2 => current or voltage controlled?
+ *
+ * funnel a label through nodes array??
+ *
  */
+static int count_pot_nodes(const node_t nodes[], int n_max)
+{
+  int i = 0;
+  for(; i<n_max; ++i){
+    node_t* nh = (node_t*) &nodes[i];
+    if(dynamic_cast<CURRENT_CTRL const*>(root(nh)->n_())){
+      break;
+    }else{
+    }
+  }
+  return i;
+}
+/*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
 				 COMMON_COMPONENT *Common, double Value,
 				 int n_states, double states[],
@@ -326,16 +367,22 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
   attach_common(Common);
 
   if (first_time) {
-    _current_port_names.resize(n_states - 1 - n_nodes/2);
-    _input.resize(n_states - 1 - n_nodes/2);
-    _n_ports = n_states-1; // set net_nodes
-    assert(size_t(_n_ports) == n_nodes/2 + _current_port_names.size());
+    _n_ports = n_states-1; // set net_nodes TODO
+    int pot_nodes = count_pot_nodes(nodes, n_nodes);
+
+    _current_port_names.resize(n_states - 1 - pot_nodes/2);
+    assert(int(_current_port_names.size()) == n_nodes - pot_nodes);
+    _input.resize(n_nodes - pot_nodes);
+    assert(size_t(_n_ports) == pot_nodes/2 + _current_port_names.size());
 
     assert(!_old_values);
     _old_values = new double[n_states];
 
+    assert(matrix_nodes() == 2* _n_ports
+	|| matrix_nodes() == 2* _n_ports + 1); // branch.
+
     if (matrix_nodes() > NODES_PER_BRANCH) {
-      // allocate a bigger node list
+      // BUG: matrix_nodes is wrong.
       _nN = new node_t[matrix_nodes()];
     }else{
       // use the default node list, already set
@@ -352,6 +399,7 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
   std::fill_n(_values, n_states, 0.);
   std::fill_n(_old_values, n_states, 0.);
   assert(n_nodes <= net_nodes());
+  assert(n_nodes <= matrix_nodes());
   notstd::copy_n(nodes, n_nodes, _nN); // copy more in expand_last
   assert(net_nodes() == _n_ports * 2 - int(_current_port_names.size()));
 }

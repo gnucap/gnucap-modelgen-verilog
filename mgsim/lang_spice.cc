@@ -864,7 +864,7 @@ void LANG_SPICE_BASE::print_args(OMSTREAM& o, const COMPONENT* x)
 	if ((ii != 0) || (x->param_name(ii) != x->value_name())) {
 	  // skip name if plain value
 	  o << " " << x->param_name(ii) << "=";
-	}else{ untested();
+	}else{
 	}
 	o << x->param_value(ii);
       }else{

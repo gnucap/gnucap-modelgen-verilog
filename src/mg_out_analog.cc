@@ -1504,8 +1504,33 @@ void make_cc_branch_ctrl(std::ostream& o, Branch const* br)
   }
 }
 /*--------------------------------------------------------------------------*/
+void make_cc_current_ctrl(std::ostream& o, Branch const* br)
+{
+  // obsolete.
+  // set_current ports.
+  int kk = 1;
+  for(Dep const& i : br->ddeps()){
+    if(!is_flow_probe(i)){
+    }else if(branch(i) == br){
+      // self control is current
+      o << ",\n";
+      o______ "     _c" << branch(i)->code_name() << ".nn()";
+    }else if(branch(i)){
+      if(branch(i)->is_short()){
+      }else{
+	o << ",\n";
+	o______ "     _c" << branch(i)->code_name() << ".nn()";
+	++kk;
+      }
+    }else{ untested();
+      untested();
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 void make_cc_current_ports(std::ostream& o, Branch const* br, Element_2 const& e)
 {
+  // obsolete.
   // set_current ports.
   int kk = 1;
   for(Dep const& i : br->ddeps()){

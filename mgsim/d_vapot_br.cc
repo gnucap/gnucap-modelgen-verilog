@@ -220,7 +220,7 @@ void VA_BREQN::tr_load()
   tr_load_ones();
 
   tr_load_source_point(n_(BR()), &_values[0], &_old_values[0]);
-  if(_current_port_names.size()){ untested();
+  if(_current_port_names.size()){
     incomplete();
   }else{
   }
@@ -236,7 +236,7 @@ void VA_BREQN::tr_load()
   }else{
     trace2("VA_BREQN::tr_load I", _values[0], _values[1]);
 
-    for (int i=1; i<=_n_ports; ++i) { untested();
+    for (int i=1; i<=_n_ports; ++i) {
       tr_load_extended(gnd, n_(BR()), n_(2*i-2), n_(2*i-1), &(_values[i]), &(_old_values[i]));
     }
   }

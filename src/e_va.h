@@ -92,6 +92,19 @@ inline void e_val(double* p, const double& x, const CARD_LIST*)
   *p = x;
 }
 /*--------------------------------------------------------------------------*/
+class CURRENT_CTRL : public NODE {
+  node_t _nn;
+public:
+  explicit CURRENT_CTRL(std::string const& n) : NODE(), _nn(this) {
+    set_label(n);
+  }
+  virtual ELEMENT const* get(COMPONENT const*)const {untested();
+    unreachable();
+    return nullptr;
+  }
+  node_t& nn() {return _nn;}
+};
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:

@@ -949,7 +949,6 @@ inline node_t& ground()
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 #endif
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet
@@ -1046,6 +1045,19 @@ inline void e_val(double* p, const double& x, const CARD_LIST*)
   assert(p);
   *p = x;
 }
+/*--------------------------------------------------------------------------*/
+class CURRENT_CTRL : public NODE {
+  node_t _nn;
+public:
+  explicit CURRENT_CTRL(std::string const& n) : NODE(), _nn(this) {
+    set_label(n);
+  }
+  virtual ELEMENT const* get(COMPONENT const*)const {untested();
+    unreachable();
+    return nullptr;
+  }
+  node_t& nn() {return _nn;}
+};
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
@@ -1274,7 +1286,23 @@ private: // data
   mutable node_t _nodes[3];
 public: // netlist
   ELEMENT* _b_white_noise_1_p_{nullptr}; // filter
+  static struct CURRENT_CTRL__b_white_noise_1_p_:public CURRENT_CTRL {
+    explicit CURRENT_CTRL__b_white_noise_1_p_() : CURRENT_CTRL("_b_white_noise_1_p_"){}
+    ELEMENT const* e(COMPONENT const* c)const {
+      auto m = prechecked_cast<MOD_resistor const*>(c);
+      assert(m);
+      return m->_b_white_noise_1_p_;
+    }
+  } _c_b_white_noise_1_p_;
   ELEMENT* _b_p_n{nullptr}; // branch
+  static struct CURRENT_CTRL__b_p_n:public CURRENT_CTRL {
+    explicit CURRENT_CTRL__b_p_n() : CURRENT_CTRL("_b_p_n"){}
+    ELEMENT const* e(COMPONENT const* c)const {
+      auto m = prechecked_cast<MOD_resistor const*>(c);
+      assert(m);
+      return m->_b_p_n;
+    }
+  } _c_b_p_n;
 private: // func decl
 //other: $param_given
 //func $temperature
@@ -1390,6 +1418,8 @@ private: // impl
   friend class COMMON_resistor;
   friend class PRECALC_resistor;
 }; // m_resistor;
+  MOD_resistor::CURRENT_CTRL__b_white_noise_1_p_ MOD_resistor::_c_b_white_noise_1_p_;
+  MOD_resistor::CURRENT_CTRL__b_p_n MOD_resistor::_c_b_p_n;
 /*--------------------------------------------------------------------------*/
 COMMON_resistor::COMMON_resistor(int c)
   :COMMON_COMPONENT(c),
@@ -2654,7 +2684,23 @@ private: // data
   mutable node_t _nodes[3];
 public: // netlist
   ELEMENT* _b_white_noise_0_p_{nullptr}; // filter
+  static struct CURRENT_CTRL__b_white_noise_0_p_:public CURRENT_CTRL {
+    explicit CURRENT_CTRL__b_white_noise_0_p_() : CURRENT_CTRL("_b_white_noise_0_p_"){}
+    ELEMENT const* e(COMPONENT const* c)const {
+      auto m = prechecked_cast<MOD_resistor const*>(c);
+      assert(m);
+      return m->_b_white_noise_0_p_;
+    }
+  } _c_b_white_noise_0_p_;
   ELEMENT* _b_p_n{nullptr}; // branch
+  static struct CURRENT_CTRL__b_p_n:public CURRENT_CTRL {
+    explicit CURRENT_CTRL__b_p_n() : CURRENT_CTRL("_b_p_n"){}
+    ELEMENT const* e(COMPONENT const* c)const {
+      auto m = prechecked_cast<MOD_resistor const*>(c);
+      assert(m);
+      return m->_b_p_n;
+    }
+  } _c_b_p_n;
 private: // func decl
 //other: $param_given
 //func $temperature
@@ -2771,6 +2817,8 @@ private: // impl
   friend class COMMON_resistor;
   friend class PRECALC_resistor;
 }; // m_resistor;
+  MOD_resistor::CURRENT_CTRL__b_white_noise_0_p_ MOD_resistor::_c_b_white_noise_0_p_;
+  MOD_resistor::CURRENT_CTRL__b_p_n MOD_resistor::_c_b_p_n;
 /*--------------------------------------------------------------------------*/
 COMMON_resistor::COMMON_resistor(int c)
   :COMMON_COMPONENT(c),
@@ -5315,7 +5363,6 @@ inline node_t& ground()
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 #endif
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet
@@ -5412,6 +5459,19 @@ inline void e_val(double* p, const double& x, const CARD_LIST*)
   assert(p);
   *p = x;
 }
+/*--------------------------------------------------------------------------*/
+class CURRENT_CTRL : public NODE {
+  node_t _nn;
+public:
+  explicit CURRENT_CTRL(std::string const& n) : NODE(), _nn(this) {
+    set_label(n);
+  }
+  virtual ELEMENT const* get(COMPONENT const*)const {untested();
+    unreachable();
+    return nullptr;
+  }
+  node_t& nn() {return _nn;}
+};
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
@@ -5642,7 +5702,23 @@ private: // data
   mutable node_t _nodes[3];
 public: // netlist
   ELEMENT* _b_ddt_1_p_{nullptr}; // filter
+  static struct CURRENT_CTRL__b_ddt_1_p_:public CURRENT_CTRL {
+    explicit CURRENT_CTRL__b_ddt_1_p_() : CURRENT_CTRL("_b_ddt_1_p_"){}
+    ELEMENT const* e(COMPONENT const* c)const {
+      auto m = prechecked_cast<MOD_capacitor const*>(c);
+      assert(m);
+      return m->_b_ddt_1_p_;
+    }
+  } _c_b_ddt_1_p_;
   ELEMENT* _b_p_n{nullptr}; // branch
+  static struct CURRENT_CTRL__b_p_n:public CURRENT_CTRL {
+    explicit CURRENT_CTRL__b_p_n() : CURRENT_CTRL("_b_p_n"){}
+    ELEMENT const* e(COMPONENT const* c)const {
+      auto m = prechecked_cast<MOD_capacitor const*>(c);
+      assert(m);
+      return m->_b_p_n;
+    }
+  } _c_b_p_n;
 private: // func decl
 //other: $param_given
 //other: analysis
@@ -5784,6 +5860,8 @@ private: // impl
   friend class COMMON_capacitor;
   friend class PRECALC_capacitor;
 }; // m_capacitor;
+  MOD_capacitor::CURRENT_CTRL__b_ddt_1_p_ MOD_capacitor::_c_b_ddt_1_p_;
+  MOD_capacitor::CURRENT_CTRL__b_p_n MOD_capacitor::_c_b_p_n;
 /*--------------------------------------------------------------------------*/
 COMMON_capacitor::COMMON_capacitor(int c)
   :COMMON_COMPONENT(c),
@@ -6746,7 +6824,23 @@ private: // data
   mutable node_t _nodes[3];
 public: // netlist
   ELEMENT* _b_ddt_2_p_{nullptr}; // filter
+  static struct CURRENT_CTRL__b_ddt_2_p_:public CURRENT_CTRL {
+    explicit CURRENT_CTRL__b_ddt_2_p_() : CURRENT_CTRL("_b_ddt_2_p_"){}
+    ELEMENT const* e(COMPONENT const* c)const {
+      auto m = prechecked_cast<MOD_capacitor const*>(c);
+      assert(m);
+      return m->_b_ddt_2_p_;
+    }
+  } _c_b_ddt_2_p_;
   ELEMENT* _b_p_n{nullptr}; // branch
+  static struct CURRENT_CTRL__b_p_n:public CURRENT_CTRL {
+    explicit CURRENT_CTRL__b_p_n() : CURRENT_CTRL("_b_p_n"){}
+    ELEMENT const* e(COMPONENT const* c)const {
+      auto m = prechecked_cast<MOD_capacitor const*>(c);
+      assert(m);
+      return m->_b_p_n;
+    }
+  } _c_b_p_n;
 private: // func decl
 //other: $param_given
 //other: analysis
@@ -6897,6 +6991,8 @@ private: // impl
   friend class COMMON_capacitor;
   friend class PRECALC_capacitor;
 }; // m_capacitor;
+  MOD_capacitor::CURRENT_CTRL__b_ddt_2_p_ MOD_capacitor::_c_b_ddt_2_p_;
+  MOD_capacitor::CURRENT_CTRL__b_p_n MOD_capacitor::_c_b_p_n;
 /*--------------------------------------------------------------------------*/
 COMMON_capacitor::COMMON_capacitor(int c)
   :COMMON_COMPONENT(c),
