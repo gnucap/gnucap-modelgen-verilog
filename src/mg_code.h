@@ -102,8 +102,8 @@ public:
     return false;
   }
 //  virtual Statement* parent_stmt();
-  // Block* scope() { return Owned_Base::owner(); }
-  // Block const* scope() const { return Owned_Base::owner(); }
+  // Block* scope() { untested(); return Owned_Base::owner(); }
+  // Block const* scope() const { untested(); return Owned_Base::owner(); }
 
   virtual bool is_used_in(Base const*)const;
   virtual Base* owner_() {
@@ -113,13 +113,13 @@ public:
       return nullptr;
     }
   }
-//  virtual bool makes_own_scope()const  {return false;}
+//  virtual bool makes_own_scope()const  { untested();return false;}
   virtual Block* scope() {return Owned_Base::scope();}
   Block const* scope()const {return const_cast<Statement*>(this)->scope();}
 
 public:
   void parse(CS&)override {unreachable();};
-  void dump(std::ostream&)const override{unreachable();}
+  void dump(std::ostream&)const override{ untested();unreachable();}
   virtual void submit_variable_access(Variable_Access&)const { untested();
     unreachable();
   }
@@ -139,7 +139,7 @@ public:
 protected: // assign.
   bool merge_rdeps(RDeps const&);
 protected: // dbg.
- // int rdeps_size()const { return int(_rdeps.size()); }
+ // int rdeps_size()const { untested(); return int(_rdeps.size()); }
  // void set_rdeps(TData const&);
 public:
   bool is_ctx_initial()const;
@@ -175,10 +175,10 @@ public:
     return *_lhsref;
   }
   Token_VAR_REF const& token()const { assert(_token); return *_token; }
-  Token_VAR_REF* token_hack()const { /* incomplete(); */ assert(_token); return _token; }
+  Token_VAR_REF* token_hack()const { untested(); /* incomplete(); */ assert(_token); return _token; }
   std::string name() const { assert(_token); return _token->name(); }
   void parse(CS& cmd) override;
-  std::string lhsname()const { return lhs().name(); }
+  std::string lhsname()const { untested(); return lhs().name(); }
   void dump(std::ostream&)const override;
   bool propagate_deps(Token_VAR_REF const&);
   bool propagate_rdeps(RDeps const& incoming);
@@ -189,7 +189,7 @@ public:
   RDeps const& rdeps() const;
   Sensitivities const& sensitivities()const;
   bool has_sensitivities()const;
-  Block const* lhs_scope()const { assert(_lhsref); return _lhsref->scope(); }
+  Block const* lhs_scope()const { untested(); assert(_lhsref); return _lhsref->scope(); }
   bool is_used_in(Base const*b)const;
   bool is_used()const;
   operator bool() const {return _token;}
@@ -249,8 +249,8 @@ public: // storage
   void set_common_var() { if(is_override_var()) {}else{_stt = st_common;} }
   void set_temporary_var() { if(is_override_var()) {}else{_stt = st_temporary;} }
   void set_state_var() { if(is_override_var()) {}else{_stt = st_state;} }
-  void set_common_override() {_stt = st_override_common;}
-  void set_temporary_override() {_stt = st_override_temporary;}
+  void set_common_override() { untested();_stt = st_override_common;}
+  void set_temporary_override() { untested();_stt = st_override_temporary;}
   void set_state_override() {_stt = st_override_state;};
   bool is_common()const {/*assert(_stt);*/ return _stt==st_common || _stt==st_override_common;}
   bool is_temporary()const {/*assert(_stt);*/ return _stt==st_temporary || _stt==st_override_temporary;}
@@ -258,24 +258,24 @@ public: // storage
 private:
   bool is_override_var()const {/*assert(_stt);*/ return _stt>=st_override_common;}
 // public: // manipulate storage
-//   void init_var() {_stt.init();}
-//   void assign_var() {_stt.assign();}
-//   void use_var() {_stt.use();}
+//   void init_var() { untested();_stt.init();}
+//   void assign_var() { untested();_stt.assign();}
+//   void use_var() { untested();_stt.use();}
 protected:
   bool has_deps()const;
 private:
   void new_deps();
   void new_data();
 public:
-  String_Arg key()const { return String_Arg(name()); }
+  String_Arg key()const { untested(); return String_Arg(name()); }
   bool is_real()const { untested(); return type().is_real(); }
   bool is_int()const { untested(); return type().is_int(); }
   std::string const identifier()const { untested();return name();}
   std::string code_name()const;
 
-  virtual Base const* value()const { unreachable(); return nullptr;}
+  virtual Base const* value()const { untested(); unreachable(); return nullptr;}
   Block const* scope() const;
-//  TData const& deps()const { assert(_data); return *_data; }
+//  TData const& deps()const { untested(); assert(_data); return *_data; }
   Variable_Decl* deep_copy(Base* owner, std::string prefix="") const;
   void update();
 private:
@@ -313,7 +313,7 @@ public:
     { untested();unreachable();return nullptr;}
   bool update() override;
   bool is_used_in(Base const* b)const override;
-  // RDeps const& rdeps()const override{
+  // RDeps const& rdeps()const override{ untested();
   //   static RDeps r; return r;
   // }
 private:
@@ -358,7 +358,7 @@ public:
   }
   explicit SeqBlock(Block const* scope) : Block() {
     new_variable_access();
-    if(auto b = dynamic_cast<SeqBlock const*>(scope)){
+    if(auto b = dynamic_cast<SeqBlock const*>(scope)){ untested();
       _ctx = b->_ctx;;
     }else{
       _ctx = ctx_unknown;
@@ -446,7 +446,7 @@ public:
   void parse(CS&)override;
   void dump(std::ostream& o)const override;
   void parse_identifier(CS& f);
-  bool has_identifier()const {return _identifier != "";}
+  bool has_identifier()const { untested();return _identifier != "";}
 
 public:
 
@@ -462,16 +462,16 @@ public:
     assert(owner());
     return scope()->node(n);
   }
-  Branch_Ref lookup_branch(std::string const& n)const override {
+  Branch_Ref lookup_branch(std::string const& n)const override { untested();
     assert(owner());
     return scope()->lookup_branch(n);
   }
-  String_Arg const& identifier() const{ return _identifier; }
-  bool has_sensitivities()const {return _sens;}
-  Sensitivities const* sensitivities()const {return _sens;}
+  String_Arg const& identifier() const{ untested(); return _identifier; }
+  bool has_sensitivities()const { untested();return _sens;}
+  Sensitivities const* sensitivities()const { untested();return _sens;}
   void set_sens(Base* s);
   void merge_sens(Sensitivities const& s);
-  map const& variables()const {return _var_refs;}
+  map const& variables()const { untested();return _var_refs;}
   bool update();
 public:
   Base* lookup(std::string const& k, bool recurse=true)override;

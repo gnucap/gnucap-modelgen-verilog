@@ -55,7 +55,7 @@ public:
 		      int node_count, const node_t nodes[])override;
   //		      const double* inputs[]=0);
 protected:
-  double abstol() const{
+  double abstol() const{ untested();
     auto cv = prechecked_cast<COMMON_VASRC const*>(common());
     assert(cv); // TODO: give feedback
     return cv->flow_abstol();

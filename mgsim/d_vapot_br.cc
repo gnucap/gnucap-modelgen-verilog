@@ -96,7 +96,7 @@ void VA_BREQN::expand()
     for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
       n_(i).clear();
     }
-  }else{
+  }else{ untested();
   }
   assert(BR());
   if (_sim->is_first_expand()) {

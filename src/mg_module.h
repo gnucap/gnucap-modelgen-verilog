@@ -68,7 +68,7 @@ public:
   ValueRangeSpec const* spec() const{ return _what; }
   Base const* value()const;
 
-  String_Arg key()const { return String_Arg("ValueRange"); }
+  String_Arg key()const { untested(); return String_Arg("ValueRange"); }
 };
 /*--------------------------------------------------------------------------*/
 typedef LiSt<ValueRange, '\0', '\0', '\0', ',', ';'> ValueRangeList;
@@ -229,7 +229,7 @@ public: // TODO
   const Circuit*	  circuit()const	{return _circuit;}
   const Hierarchical_Refs& hrefs()const	{assert(_hrefs); return *_hrefs;}
   const Owned_Base& analog() const {assert(_analog); return *_analog;}
-  const Owned_Base& always() const {assert(_always); return *_always;}
+  const Owned_Base& always() const { untested();assert(_always); return *_always;}
   bool has_analysis()const {return _has_analysis;}
   bool has_expand_last()const {return _has_expand_last;}
 
@@ -248,7 +248,7 @@ public: // TODO
   bool has_tr_begin_analog()const   { return _has_pid[if_TR_BEGIN]   & mm_ANALOG; }
   bool has_tr_restore_analog()const { return _has_pid[if_TR_RESTORE]   & mm_ANALOG; }
   bool has_tr_review_analog()const  {untested(); return _has_pid[if_TR_REVIEW]   & mm_ANALOG; }
-  bool has_tr_advance_analog()const { return _has_pid[if_TR_ADVANCE] & mm_ANALOG; }
+  bool has_tr_advance_analog()const { untested(); return _has_pid[if_TR_ADVANCE] & mm_ANALOG; }
   bool has_tr_accept_analog()const  {untested(); return _has_pid[if_TR_ACCEPT]  & mm_ANALOG; }
 
   bool has_tr_begin_digital()const   { return _has_pid[if_TR_BEGIN]   & mm_DIGITAL; }
@@ -268,18 +268,18 @@ public:
   bool has_always_block()const;
 
   void set_set_event (mode_mask_t m=mm_YES) {set_pid(if_SET_EVENT, m);}
-  void set_ac_begin  (mode_mask_t m=mm_YES) {set_pid(if_AC_BEGIN, m);}
+  void set_ac_begin  (mode_mask_t m=mm_YES) { untested();set_pid(if_AC_BEGIN, m);}
   void set_tr_begin  (mode_mask_t m=mm_YES) {set_pid(if_TR_BEGIN, m);}
   void set_tr_restore(mode_mask_t m=mm_YES) {set_pid(if_TR_RESTORE, m);}
   void set_tr_review (mode_mask_t m=mm_YES) {set_pid(if_TR_REVIEW, m);}
   void set_tr_accept (mode_mask_t m=mm_YES) {set_pid(if_TR_ACCEPT, m);}
   void set_tr_advance(mode_mask_t m=mm_YES) {set_pid(if_TR_ADVANCE, m);}
 
-  void set_tr_begin_analog  () {set_tr_begin(mm_ANALOG);}
-  void set_tr_restore_analog() {set_tr_restore(mm_ANALOG);}
-  void set_tr_review_analog () {set_tr_review (mm_ANALOG);}
-  void set_tr_accept_analog () {set_tr_accept (mm_ANALOG);}
-  void set_tr_advance_analog() {set_tr_advance(mm_ANALOG);}
+  void set_tr_begin_analog  () { set_tr_begin(mm_ANALOG);}
+  void set_tr_restore_analog() { set_tr_restore(mm_ANALOG);}
+  void set_tr_review_analog () { set_tr_review (mm_ANALOG);}
+  void set_tr_accept_analog () { set_tr_accept (mm_ANALOG);}
+  void set_tr_advance_analog() { set_tr_advance(mm_ANALOG);}
 private:
   void import_flags(FUNCTION_ const*);
   void set_pid  (iface_id_t p, mode_mask_t m=mm_ANALOG) {_has_pid[p] = (mode_mask_t)(_has_pid[p] | m);}

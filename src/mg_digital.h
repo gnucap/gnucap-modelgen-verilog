@@ -35,7 +35,7 @@ public:
     _block = nullptr;
   }
 private:
-  void submit_variable_access(Variable_Access&)const override {
+  void submit_variable_access(Variable_Access&)const override { untested();
     incomplete();
   }
 
@@ -44,8 +44,8 @@ public:
   void dump(std::ostream& o)const override;
   bool update()override { untested(); incomplete(); return false; }
   void new_block();
-  Block const* block_or_null() const{ return _block; }
-  Block* block(){ return _block; }
+  Block const* block_or_null() const{ untested(); return _block; }
+  Block* block(){ untested(); return _block; }
   void push_back(Statement*);
   bool is_used_in(Base const*)const override; // BUG?
 };
@@ -62,7 +62,7 @@ public:
 //    return nullptr;
 //  }
 private:
-  void submit_variable_access(Variable_Access&)const override{incomplete();}
+  void submit_variable_access(Variable_Access&)const override{ untested();incomplete();}
 };
 /*--------------------------------------------------------------------------*/
 class DigitalSeqBlock : public SeqBlock {
@@ -78,7 +78,7 @@ public:
 public:
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
-  SeqBlock const& block()const {
+  SeqBlock const& block()const { untested();
     return *this;
   }
 public: // sensitivities?
@@ -98,22 +98,22 @@ class DigitalSeqStmt : public DigitalStmt {
   DigitalSeqBlock _block; // SeqBlock?
 public:
   explicit DigitalSeqStmt() : DigitalStmt() { untested();}
-  explicit DigitalSeqStmt(CS& cmd, Block* owner) : DigitalStmt() {
+  explicit DigitalSeqStmt(CS& cmd, Block* owner) : DigitalStmt() { untested();
     set_owner(owner);
     parse(cmd);
   }
   void parse(CS& cmd)override;
-  void dump(std::ostream& o)const override {
+  void dump(std::ostream& o)const override { untested();
     _block.dump(o);
   }
-  bool update()override { return _block.update(); }
-  DigitalSeqBlock const& block()const { return _block; }
+  bool update()override { untested(); return _block.update(); }
+  DigitalSeqBlock const& block()const { untested(); return _block; }
   TData const& deps()const override { untested(); return _block.deps(); }
 };
 /*--------------------------------------------------------------------------*/
 class DigitalCtrlBlock : public DigitalSeqBlock {
 public:
-  explicit DigitalCtrlBlock() : DigitalSeqBlock() {}
+  explicit DigitalCtrlBlock() : DigitalSeqBlock() { untested();}
   explicit DigitalCtrlBlock(CS& f, Statement* o) : DigitalSeqBlock() {
     set_owner(o);
     parse(f);
@@ -121,7 +121,7 @@ public:
 
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
-  operator bool()const{ return size() || identifier() !=""; }
+  operator bool()const{ untested(); return size() || identifier() !=""; }
   void set_owner(Statement* owner);
 }; // DigitalCtrlBlock
 /*--------------------------------------------------------------------------*/
@@ -133,17 +133,17 @@ class DigitalCtrlStmt : public DigitalStmt {
 protected:
   DigitalCtrlBlock _body;
 public:
-  DigitalCtrlStmt() : _body() { }
-  ~DigitalCtrlStmt(){ }
+  DigitalCtrlStmt() : _body() { untested(); }
+  ~DigitalCtrlStmt(){ untested(); }
   void dump(std::ostream&)const override;
   void parse(CS& cmd)override;
-  DigitalCtrlBlock const& body()const { return _body; }
+  DigitalCtrlBlock const& body()const { untested(); return _body; }
 private:
   TData const& deps()const override { return _deps;}; // ?
   RDeps const& rdeps()const override { untested(); return _rdeps;};
 //  void submit_variable_access(Variable_Access&)const override;
 protected:
-  bool update()override {
+  bool update()override { untested();
     bool ret = _body.update();
     return DigitalStmt::update() || ret;
   }
@@ -154,8 +154,8 @@ public:
 class DigitalEvtExpression : public Expression_ {
   RDeps _rdeps;
 public:
-  explicit DigitalEvtExpression() : Expression_() {}
-  ~DigitalEvtExpression(){ }
+  explicit DigitalEvtExpression() : Expression_() { untested();}
+  ~DigitalEvtExpression(){ untested(); }
   void parse(CS&)override;
   void dump(std::ostream&)const override;
 //  Expression const& expression() const{return _expression;};
@@ -164,22 +164,22 @@ public:
 //
 private: // incomplete
   void set_rdeps(); // pull in rdeps from functions
-  bool add_rdep(Base const* b) {
+  bool add_rdep(Base const* b) { untested();
     return _rdeps.insert(b).second;
   }
   FUNCTION_ const* function()const;
 public:
-  RDeps const& rdeps()const { return _rdeps; }
+  RDeps const& rdeps()const { untested(); return _rdeps; }
 };
 /*--------------------------------------------------------------------------*/
 class DigitalEvtCtlStmt : public DigitalCtrlStmt {
   DigitalEvtExpression _ctrl;
 public:
-  ~DigitalEvtCtlStmt() { }
+  ~DigitalEvtCtlStmt() { untested(); }
   void parse(CS&)override;
   void dump(std::ostream&)const override;
   Expression_ const& cond()const { return _ctrl; } // override?
-  const DigitalCtrlBlock& code()const { return _body; }
+  const DigitalCtrlBlock& code()const { untested(); return _body; }
   bool update()override;
 
   bool is_used_in(Base const* b)const override;
@@ -198,32 +198,32 @@ public:
   void dump(std::ostream& o)const override;
 
   bool has_block() const;
-  AlwaysList const& list()const { return _list; }
+  AlwaysList const& list()const { untested(); return _list; }
   AlwaysList const& blocks()const { return _list; }
   Digital_Events const& events()const { untested(); return _events; }
   void push_back(Base*);
 };
 /*--------------------------------------------------------------------------*/
 inline Always const& always(Module const& m)
-{
+{ untested();
   Always const* a = prechecked_cast<Always const*>(&m.always());
   assert(a);
   return *a;
 }
 /*--------------------------------------------------------------------------*/
 inline AlwaysList const& always_list(Module const& m)
-{
+{ untested();
   return always(m).list();
 }
 /*--------------------------------------------------------------------------*/
 class DigitalExpression : public Expression_ {
 public:
-  explicit DigitalExpression() : Expression_() {}
+  explicit DigitalExpression() : Expression_() { untested();}
   ~DigitalExpression();
   void parse(CS& file) override;
 //  void dump(std::ostream& o)const override;
 //  Block* owner() { untested();return Owned_Base::owner();}
-  Expression const& expression() const{ return *this;}
+  Expression const& expression() const{ untested(); return *this;}
   bool is_true() const;
   bool is_false() const;
 //  bool has_sensitivities()const { untested(); return !_sens.empty(); }
@@ -233,7 +233,7 @@ class DigitalConstExpression : public DigitalExpression {
 public:
 //  void parse(CS& file) override;
 //  void dump(std::ostream& o)const override;
-  String_Arg key() const{return String_Arg("ACE");}
+  String_Arg key() const{ untested();return String_Arg("ACE");}
 };
 typedef LiSt<DigitalConstExpression, '\0', ',', ':'> DigitalConstExpressionList;
 /*--------------------------------------------------------------------------*/
@@ -245,19 +245,19 @@ private:
   CaseGen() : AnalogCtrlStmt(){ untested(); unreachable(); }
 public:
   CaseGen(CS&, Block*, Expression const&, bool, bool);
-  ~CaseGen(){
+  ~CaseGen(){ untested();
     delete _cond;
   }
   void parse(CS&)override;
   void dump(std::ostream& o)const override;
 public:
-  DigitalConstExpressionList const* cond_or_null()const {return _cond;}
-  bool is_default()const {return !_cond;}
-  void set_never() {return _body.set_never() ;}
+  DigitalConstExpressionList const* cond_or_null()const { untested();return _cond;}
+  bool is_default()const { untested();return !_cond;}
+  void set_never() { untested();return _body.set_never() ;}
   void set_always() { untested();return _body.set_always() ;}
-  bool is_never()const {return _body.is_never() ;}
-  bool is_reachable()const {return _body.is_reachable() ;}
-  bool is_always()const {return _body.is_always() ;}
+  bool is_never()const { untested();return _body.is_never() ;}
+  bool is_reachable()const { untested();return _body.is_reachable() ;}
+  bool is_always()const { untested();return _body.is_always() ;}
   void calc_reach(Expression const& cond);
 
   String_Arg key() const{ untested();return String_Arg("CaseGen");}
@@ -269,11 +269,11 @@ public:
 /*--------------------------------------------------------------------------*/
 class InitialStmt : public DigitalCtrlStmt {
 public:
-  explicit InitialStmt(Block* o, CS& file) {
+  explicit InitialStmt(Block* o, CS& file) { untested();
     set_owner(o);
     parse(file);
   }
-  ~InitialStmt(){ }
+  ~InitialStmt(){ untested(); }
 public:
   void parse(CS& file) override;
   void dump(std::ostream& o)const override;
@@ -288,20 +288,20 @@ class DigitalSwitchStmt : public DigitalStmt { // CtrlStmt?
   SeqBlock _body;
   RDeps _rdeps; // here?
 public:
-  DigitalSwitchStmt(Block* o, CS& file) {
+  DigitalSwitchStmt(Block* o, CS& file) { untested();
     set_owner(o);
     parse(file);
   }
-  ~DigitalSwitchStmt() { }
+  ~DigitalSwitchStmt() { untested(); }
 public:
   void parse(CS& file) override;
   void dump(std::ostream& o)const override;
-  DigitalConstExpression const& control() const{return _ctrl;}
-  SeqBlock const& cases()const {return _body;}
+  DigitalConstExpression const& control() const{ untested();return _ctrl;}
+  SeqBlock const& cases()const { untested();return _body;}
   bool update()override;
   TData const& deps()const override { return _deps;};
  // TData const& data()const override {return _deps;}; // ctrl?
-  RDeps const& rdeps()const override{ return _rdeps; }
+  RDeps const& rdeps()const override{ untested(); return _rdeps; }
 }; // DigitalSwitchStmt
 #endif
 /*--------------------------------------------------------------------------*/
@@ -309,20 +309,20 @@ class DigitalConditionalStmt : public DigitalCtrlStmt {
   DigitalConstExpression _cond; // Const?
   DigitalCtrlBlock _false_part;
 public:
-  explicit DigitalConditionalStmt(Block* o, CS& file) {
+  explicit DigitalConditionalStmt(Block* o, CS& file) { untested();
     set_owner(o);
     parse(file);
   }
 /*--------------------------------------------------------------------------*/
-  ~DigitalConditionalStmt(){ }
+  ~DigitalConditionalStmt(){ untested(); }
 public:
   void parse(CS& file) override;
   void dump(std::ostream& o)const override;
-  DigitalConstExpression const& conditional() const{return _cond;}
-  const DigitalCtrlBlock& true_part() const{ return _body; }
-  const DigitalCtrlBlock& false_part() const{ return _false_part; }
+  DigitalConstExpression const& conditional() const{ untested();return _cond;}
+  const DigitalCtrlBlock& true_part() const{ untested(); return _body; }
+  const DigitalCtrlBlock& false_part() const{ untested(); return _false_part; }
   bool is_used_in(Base const*)const override;
-  bool update()override {
+  bool update()override { untested();
     bool ret = _false_part.update();
     return DigitalCtrlStmt::update() || ret;
   }
@@ -333,17 +333,17 @@ public:
 class DigitalWhileStmt : public DigitalCtrlStmt {
 protected:
   DigitalExpression _cond; // -> DigitalCtrlStmt?
-  explicit DigitalWhileStmt() { }
+  explicit DigitalWhileStmt() { untested(); }
 public:
   explicit DigitalWhileStmt(CS& file, Block* o);
-  ~DigitalWhileStmt() { }
+  ~DigitalWhileStmt() { untested(); }
 public:
   void parse(CS& file) override;
   void dump(std::ostream& o)const override;
-  DigitalExpression const& conditional()const {return _cond;}
-  bool has_body() const{ return _body; }
-  const Base& body() const{assert(_body); return _body; }
-  virtual bool has_tail() const{ return false; }
+  DigitalExpression const& conditional()const { untested();return _cond;}
+  bool has_body() const{ untested(); return _body; }
+  const Base& body() const{ untested();assert(_body); return _body; }
+  virtual bool has_tail() const{ untested(); return false; }
   virtual Base const& tail() const{ untested(); return _cond; }
 private:
   bool update()override;
@@ -353,7 +353,7 @@ class DigitalForStmt : public DigitalWhileStmt {
   Assignment* _init{nullptr};
   Assignment* _tail{nullptr};
 public:
-  explicit DigitalForStmt(CS& file, Block* o) : DigitalWhileStmt() {
+  explicit DigitalForStmt(CS& file, Block* o) : DigitalWhileStmt() { untested();
     set_owner(o);
     parse(file);
   }
@@ -361,11 +361,11 @@ public:
   void parse(CS& file) override;
   void dump(std::ostream& o)const override;
 
-  bool has_init()const{ return _init; }
-  Assignment const& init()const{ assert(_init); return *_init; }
+  bool has_init()const{ untested(); return _init; }
+  Assignment const& init()const{ untested(); assert(_init); return *_init; }
 
-  bool has_tail()const override{ return _tail; }
-  Assignment const& tail()const override{ assert(_tail); return *_tail; }
+  bool has_tail()const override{ untested(); return _tail; }
+  Assignment const& tail()const override{ untested(); assert(_tail); return *_tail; }
 private:
   bool update()override;
 };
@@ -383,7 +383,7 @@ public:
   explicit DigitalProceduralAssignment(CS&, Block*);
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
-  Assignment const& expression()const {return _a;}
+  Assignment const& expression()const { untested();return _a;}
   bool is_used_in(Base const*b)const override;
   Statement* deep_copy(Base* no)const override;
   bool propagate_rdeps(RDeps const& r)override;
@@ -392,11 +392,11 @@ private:
   TData const& deps()const override {return _deps;};
 public: // dump_annotate
   TData const& data()const {return _a.data();};
-  bool has_sensitivities()const {
+  bool has_sensitivities()const { untested();
     return _a.has_sensitivities();
   }
-  Sensitivities const& sensitivities()const {return _a.sensitivities();}
-  bool is_state_var()const {return _a.is_state_var();}
+  Sensitivities const& sensitivities()const { untested();return _a.sensitivities();}
+  bool is_state_var()const { untested();return _a.is_state_var();}
 }; // DigitalProceduralAssignment
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -8,11 +8,12 @@ retest: check-git retest.subs
 retest.log:
 	# ${MAKE} untest
 	mkdir -p retest;
-	( cd retest; ../configure )
-	${MAKE} -C retest CPPFLAGS=-DTRACE_UNTESTED\ -DTRACE_UNTESTED_ONCE\ -DRETEST
+	( cd retest; ../configure --enable-debug )
+	${MAKE} -C retest/vams clean
+	${MAKE} -C retest CPPFLAGS=-DTRACE_UNTESTED\ -DTRACE_UNTESTED_ONCE\ -DRETEST 2>retest.log
 
 	# TODO: parallel
-	${MAKE} -j1 -C retest check 2> retest.log
+	${MAKE} -j1 -C retest check 2>> retest.log
 
 retest.subs: retest.log
 	grep -e ^@@@: -e ^@i@ retest.log | \

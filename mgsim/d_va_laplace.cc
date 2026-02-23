@@ -49,7 +49,7 @@ class NATURE_voltage : public NATURE {
 }_N_voltage;
 class DISCIPLINE_electrical : public DISCIPLINE {
 public:
-  NATURE const* flow()const override{
+  NATURE const* flow()const override{ untested();
     return &_N_current;
   }
   NATURE const* potential()const override{
@@ -78,8 +78,8 @@ public:
 public:
   ~COMMON_LAPLACE() {}
   COMMON_LAPLACE(int x) : COMMON_RF_BASE(x) {}
-  COMMON_LAPLACE(COMMON_LAPLACE const& x) :
-    COMMON_RF_BASE(x), _tolerance(x._tolerance) {}
+  COMMON_LAPLACE(COMMON_LAPLACE const& x)
+    : COMMON_RF_BASE(x), _tolerance(x._tolerance) {}
   COMMON_LAPLACE* clone()const override { untested();return new COMMON_LAPLACE(*this);}
 
   virtual int pivot()const;
@@ -564,14 +564,14 @@ CARD* LAPLACE::clone()const
 /*--------------------------------------------------------------------------*/
 LAPLACE::LAPLACE(LAPLACE const&p) : ELEMENT(p)
 {
-  if(p._nN){
+  if(p._nN){ untested();
     trace2("laplace", int_nodes(), max_nodes());
     assert(_nN);
-    if(int_nodes() + max_nodes() <= NODES_PER_BRANCH){
+    if(int_nodes() + max_nodes() <= NODES_PER_BRANCH){ untested();
        // not expanded yet...?
-    }else{
+    }else{ untested();
       _nN = new node_t[int_nodes() + max_nodes()];
-      for (int ii = 0; ii < p.net_nodes(); ++ii) {
+      for (int ii = 0; ii < p.net_nodes(); ++ii) { untested();
 	n_(ii) = p.n_(ii);
       }
     }
@@ -1155,7 +1155,7 @@ double LAPLACE::tr_amps() const
   if(_loss0 != 0.){
     assert(_loss0==1.);
 //    r = -r;
-  }else{
+  }else{ untested();
   }
   return r;
 }

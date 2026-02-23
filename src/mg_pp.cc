@@ -437,7 +437,7 @@ static std::string expand_macro(CS& file, Define_List const& d)
       String_Arg_List values = eval_args(file, (*x)->num_args(), d);
       std::string subst = (*x)->substitute(values, d);
       stripped_file += subst; //  + "\n";
-    }else{
+    }else{ untested();
       throw(Exception_CS("undefined macro", file));
     }
   }
@@ -678,7 +678,7 @@ Preprocessor::Preprocessor() : CS(CS::_STRING, "")
 void Preprocessor::read(std::string const& file_name)
 {
   if(OPT::case_insensitive == 0){
-  }else{
+  }else{ untested();
   }
   // _name = file_name;
   std::string::size_type sepplace;

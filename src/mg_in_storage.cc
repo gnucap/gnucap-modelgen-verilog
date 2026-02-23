@@ -67,7 +67,7 @@ void Variable_Access::push_init(Token_VAR_REF* v)
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Access::push_assign(Token_VAR_REF*, bool, bool)
-{
+{ untested();
   unreachable();
 }
 #if 0
@@ -190,7 +190,7 @@ void Variable_Access::prune_dynamic()
 void Variable_Access::sift_locals(Block const* Scope)
 {
 //   bool is_initial_ctx = false;
-//   if(auto sb = dynamic_cast<SeqBlock const*>(Scope)) {
+//   if(auto sb = dynamic_cast<SeqBlock const*>(Scope)) { untested();
 //     is_initial_ctx =  sb->is_ctx_initial();
 //   }else{ untested();
 //   }
@@ -302,7 +302,7 @@ STORAGE_TYPE::set_t STORAGE_TYPE::set_t::operator|(STORAGE_TYPE::set_t const& o)
   int os = o._s;
   if(s == s_event){
     return *this;
-  }else if(os == s_event) {
+  }else if(os == s_event) { untested();
     return o;
   }else if(s > os){
     std::swap(s, os);
@@ -327,7 +327,7 @@ STORAGE_TYPE::set_t STORAGE_TYPE::set_t::operator|(STORAGE_TYPE::set_t const& o)
     r._s = s_maybe;
   }else if(!s && os == s_const){ itested();
     r._s = s_maybe;
-  }else{
+  }else{ untested();
     error(bDANGER, "internal error %d %d\n", s, os);
     incomplete();
   }

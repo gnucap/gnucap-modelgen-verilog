@@ -155,7 +155,7 @@ static void make_tr_probe_num(std::ostream& o, const Module& m)
     }
   }
 #ifdef DEBUG_PROBES
-  for(int i = 0; i<m.circuit()->nodes().size(); ++i){
+  for(int i = 0; i<m.circuit()->nodes().size(); ++i){ untested();
 	o__ "if(n == \"NV0_" << i << "\"){\n";
 	o____ "return n_(" << i << ").v0();\n";
 	o__ "}\n";
@@ -439,7 +439,7 @@ static void make_tr_begin(std::ostream& o, const Module& m)
     o__ "c->tr_begin(this);\n";
     o__ "auto mc = prechecked_cast<COMMON_" << m.identifier() << "*>(mutable_common());\n";
     o__ "assert(mc);\n";
-  }else{
+  }else{ untested();
   }
   o__ "_v_1 = _v_;\n";
   if(m.has_analog_block() && m.has_tr_begin_analog()) {

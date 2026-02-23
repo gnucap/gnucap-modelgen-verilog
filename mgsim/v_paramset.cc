@@ -102,18 +102,18 @@ private:
     BASE_SUBCKT::set_port_by_index(Index, Value);
   }
 
- // bool param_is_printable(int i)const override {
+ // bool param_is_printable(int i)const override { untested();
  //   return true;
  // }
   int param_count()const override {
       return BASE_SUBCKT::param_count();
-    if(_parent && _parent->subckt()){
+    if(_parent && _parent->subckt()){ untested();
       trace2("PARAMSET::param_count0", short_label(), BASE_SUBCKT::param_count());
       return(_parent->param_count());
-    }else if(subckt()){
+    }else if(subckt()){ untested();
       trace3("PARAMSET::param_count1", short_label(), BASE_SUBCKT::param_count(), subckt()->params()->size());
       return BASE_SUBCKT::param_count();
-    }else{
+    }else{ untested();
       trace2("PARAMSET::param_count2", short_label(), BASE_SUBCKT::param_count());
       return BASE_SUBCKT::param_count();
     }
@@ -361,7 +361,7 @@ int PARAMSET::is_valid() const
       delete res;
       return a;
     }
-  }else{
+  }else{ untested();
     trace1("PARAMSET::invalid?", long_label());
     return false;
   }
@@ -457,7 +457,7 @@ void PARAMSET::precalc_first()
   }else{
   }
 
- // if(!owner()){
+ // if(!owner()){ untested();
  //   // this does not work.
  // }else
   if(_parent && _parent->subckt()) {
@@ -498,7 +498,7 @@ void PARAMSET::precalc_first()
 // THIS IS A HACK. variables with "_." postfix survive e_val. remove prefix.
 static std::string mangle(std::string const& value)
 {
-  if(*value.c_str() == '\\'){
+  if(*value.c_str() == '\\'){ untested();
     assert(value.size()>1);
     auto s = value.size();
     std::string ret(value.substr(0, s-1));
@@ -656,7 +656,7 @@ CARD* PARAMSET::deflate()
 #endif
   auto dd = prechecked_cast<COMPONENT const*>(deflated);
   if(dd->common()){
-  }else{
+  }else{ untested();
   }
 
   deflated->precalc_first();
@@ -757,7 +757,7 @@ void PARAMSET::expand()
     assert(subckt()->size()==1);
     assert(dev==d);
 
-    if(0){
+    if(0){ untested();
       // cannot deflate yet
       subckt()->expand();
     }else{
@@ -767,7 +767,7 @@ void PARAMSET::expand()
       if(dynamic_cast<PARAMSET*>(dev)){
       }else{
 	COMPONENT* ddd = dynamic_cast<COMPONENT*>(dev->deflate());
-	if(ddd!=dev){
+	if(ddd!=dev){ untested();
 	  *subckt()->begin() = ddd;
 	  dev->purge();
 	  delete (CARD*)dev;

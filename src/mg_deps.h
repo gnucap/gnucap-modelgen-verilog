@@ -66,10 +66,10 @@ public:
   Base const* item()const { return _token; }
   Base const* token()const { return _token; }
   Probe const* probe__()const { return _prb; } // remove
-//  bool is_flow_probe()const {
+//  bool is_flow_probe()const { untested();
 //    return dynamic_cast<Token_FLOW const*>(_token);
 //  }
-//  bool is_pot_probe()const {
+//  bool is_pot_probe()const { untested();
 //    return dynamic_cast<Token_POTENTIAL const*>(_token);
 //  }
   operator bool()const { return _prb; }
@@ -200,7 +200,7 @@ public:
   void set_offset(bool v = true){_offset = v;}
   void set_constant(bool v = true){_constant = v;} // attrib/sens?
   size_t size()const {return _ddeps.size(); } // { + _rdeps.size(); }
-  bool has_deps()const {return _ddeps.size(); /* +? */ }
+  bool has_deps()const { untested();return _ddeps.size(); /* +? */ }
   bool is_offset()const {return _offset;}
   bool is_constant()const {return _constant;}
   bool is_linear()const;

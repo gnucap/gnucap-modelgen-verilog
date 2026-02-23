@@ -302,7 +302,7 @@ public:
   }
   void new_string(std::ostream& o){
     ++_str_idx;
-    if(_str_idx < _str_alloc){
+    if(_str_idx < _str_alloc){ untested();
     }else{
       assert(_str_idx==_str_alloc);
       ++_str_alloc;
@@ -334,7 +334,7 @@ public:
 	o__ "ddouble t" << _ddo_idx << ";\n"; // TODO? some deps?
       }
       if(!_deps){
-      }else if(!options().optimize_deriv()){
+      }else if(!options().optimize_deriv()){ untested();
 	o__ "t" << _ddo_idx << ".set_all_deps(); // (all deriv)\n"; // code_name??
       }else{
 	o__ "//t" << _ddo_idx << ".set_no_deps();\n"; // ...
@@ -616,7 +616,7 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
 
   o << "(";
   std::string comma = "";
-  // if(_ctx=="precalc"){
+  // if(_ctx=="precalc"){ untested();
   // }else
   if(_ctx=="adjust"){
     // there is no context in adjust
@@ -690,7 +690,7 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
       vars().new_rhs(hh);
     }else if(auto pp = dynamic_cast<const Token_ACCESS*>(*i)) {
       vars().new_ddouble(o);
-      if(!vars().has_deps()){
+      if(!vars().has_deps()){ untested();
       }else if(options().optimize_deriv()){
 	o__ vars().code_name() << ".set_no_deps();\n";
 	// for(auto i: vars().deps()){ untested();
@@ -699,7 +699,7 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
       }else{itested();
       }
 
-      if(!vars().has_deps()){
+      if(!vars().has_deps()){ untested();
         o__ vars().code_name() << " = 0.; // no deps.\n";
       }else if(pp->is_short()){
 	o__ vars().code_name() << " = 0.; // short probe\n";
@@ -770,7 +770,7 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
 //	o__ "// " << bo->op1()->name() << " " <<  type_1 << "\n";
 //	o__ "// " << bo->op2()->name() << " " <<  type_2 << "\n";
 	o__ vars().code_name() << " = ";
-        if(type_1.is_int() && type_2.is_int()){
+        if(type_1.is_int() && type_2.is_int()){ untested();
 	  // BUG: cast should not be needed.
 	  o << "( int(" << arg1 << ") \% int(" << idy << "));\n";
 	}else{

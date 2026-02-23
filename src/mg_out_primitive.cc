@@ -70,7 +70,7 @@ static std::string mkval(std::vector<int> const& line)
     return "lvSTABLE0";
   }else if (out == 1){
     return "lvSTABLE1";
-  }else{
+  }else{ untested();
     unreachable();
     return "lv...";
   }
@@ -121,7 +121,7 @@ static void make_cc_common(std::ostream& o, const Primitive& p)
       o__ "       && in1 == (in1 & " << mkmask(line, UDP_Table::udp_1) << ")\n";
       o__ "       && inx == (inx & " << mkmask(line, UDP_Table::udp_x) << ")) {\n";
       o____ "out = " << mkval(line) << ";\n";
-    }else{
+    }else{ untested();
     }
   }
   o__ "}else{\n";

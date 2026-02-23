@@ -63,7 +63,7 @@ private:
 //       o << "    va_list args;\n";
 //       o << "    va_start(args, t);\n";
 //        [..]
-//       o << "    if(va_arg(args,bool)) {
+//       o << "    if(va_arg(args,bool)) { untested();
 //       o << "    }
 //       o << "    va_end(args);\n";
 //       o << "  }\n";

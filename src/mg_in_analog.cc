@@ -759,7 +759,7 @@ bool AnalogProceduralAssignment::update()
   trace2("AnalogProceduralAssignment::update", _a.lhs().name(), rdeps().size());
 //  trace1("AnalogProceduralAssignment::update",  _a.data().size());
 #ifdef DO_TRACE
-  for(auto& r : rdeps()){
+  for(auto& r : rdeps()){ untested();
     trace2("AnalogProceduralAssignment::update0", _a.lhs().name(), r->val_string());
   }
 #endif
@@ -767,7 +767,7 @@ bool AnalogProceduralAssignment::update()
  // _rdeps.merge(_a.lhsrdeps()); // sowas. inside _a.
 
   bool ret;
-  if(options().optimize_unused() && !scope()->is_reachable()) {
+  if(options().optimize_unused() && !scope()->is_reachable()) { untested();
     ret = false;
   }else{
     RDeps r(rdeps());
@@ -792,7 +792,7 @@ bool AnalogProceduralAssignment::update()
   }
 #ifdef DO_TRACE
   trace1("AnalogProceduralAssignment::update2", _a.lhsname());
-  for(auto i: _a.lhs().rdeps()){
+  for(auto i: _a.lhs().rdeps()){ untested();
     trace2("AnalogProceduralAssignment::update2", _a.lhsname(), i->val_string());
   }
 #endif
@@ -1028,20 +1028,20 @@ void AnalogSwitchStmt::submit_variable_access(Variable_Access& va) const
       }
     }
     va &= a;
-  }else{
+  }else{ untested();
     incomplete();
   }
 
 #if 0
-  if(false_part().is_reachable() && true_part().is_reachable()) {
+  if(false_part().is_reachable() && true_part().is_reachable()) { untested();
     Variable_Access a = false_part().variable_access() | true_part().variable_access();
     va &= a;
-  }else{
-    if(true_part().is_reachable()) {
+  }else{ untested();
+    if(true_part().is_reachable()) { untested();
       va &= true_part().variable_access();
-    }else if(false_part().is_reachable()) {
+    }else if(false_part().is_reachable()) { untested();
       va &= false_part().variable_access();
-    }else{
+    }else{ untested();
     }
   }
 #endif
@@ -2868,7 +2868,7 @@ void Analog::parse(CS& f)
     push_back(ab);
 
     ab->update();
-    // while(_block.update()){
+    // while(_block.update()){ untested();
     //   trace0("AnalogConstruct update");
     // }
 

@@ -277,11 +277,11 @@ public:
     return "absdelay";
   }
   Probe const* prb()const { untested();return _prb;}
-  void set_n_to_gnd__()const override {
+  void set_n_to_gnd__()const override { untested();
     assert(_m);
     return MGVAMS_FILTER::set_n_to_gnd(_m);
   }
-  void set_p_to_gnd__()const override {
+  void set_p_to_gnd__()const override { untested();
     assert(_m);
     return MGVAMS_FILTER::set_p_to_gnd(_m);
   }

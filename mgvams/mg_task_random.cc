@@ -83,7 +83,7 @@ private:
       o << " const&";
       if(names) {
 	o << " a" << i++;
-      }else{
+      }else{ untested();
       }
     }
   }

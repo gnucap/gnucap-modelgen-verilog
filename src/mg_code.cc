@@ -37,9 +37,9 @@ Variable_Decl::~Variable_Decl()
 // }
 /*--------------------------------------------------------------------------*/
 Block const* Variable_Decl::scope() const
-{
+{ untested();
   assert(owner());
-  if(auto vs = dynamic_cast<Variable_Stmt const*>(owner())) {
+  if(auto vs = dynamic_cast<Variable_Stmt const*>(owner())) { untested();
       // AF hack
     return vs->scope();
   }else{ untested();
@@ -109,7 +109,7 @@ Variable_Decl* Variable_Decl::deep_copy(Base* b, std::string s) const
   }else{
   }
   if(n->token().type()){
-  }else{
+  }else{ untested();
     // bug?
   }
   l->scope()->new_var_ref(&n->token());

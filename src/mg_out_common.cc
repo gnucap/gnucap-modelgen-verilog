@@ -76,7 +76,7 @@ static void make_common_copy_constructor(std::ostream& o, const Module& d)
   make_copy_construct_parameter_list(o, d.parameters());
   if (options().optimize_common()){
     o << ",\n   _v_(p._v_)";
-  }else{
+  }else{ untested();
   }
   //o << ",\n   _sdp(0)";
   //make_copy_construct_parameter_list(o, d.common().calculated());
@@ -254,7 +254,7 @@ static void make_common_operator_equal(std::ostream& o, const Module& d)
 	   ++p) {
 	o << "    && " << (**p).code_name() << " == p->" << (**p).code_name() << '\n';
       }
-    }else{
+    }else{ untested();
     }
   }
   Hierarchical_Refs const& H = d.hrefs();

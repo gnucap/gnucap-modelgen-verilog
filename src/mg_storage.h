@@ -43,7 +43,7 @@ public:
 #ifdef DO_TRACE
     void dump(std::ostream&)const;
 #endif
-//    bool is_init()const {return _s == s_maybe_init;}
+//    bool is_init()const { untested();return _s == s_maybe_init;}
     bool is_unset()const {return _s == s_unset;}
     bool is_set()const {return _s >= s_const;}
     bool is_event()const {return _s == s_event;}
@@ -51,7 +51,7 @@ public:
     bool is_init()const {return _s == s_const || _s == s_maybe_init;}
     bool is_common()const {return _s == s_const || _s == s_maybe_init;}
     bool is_maybe()const {return _s == s_maybe;}
-    bool is_maybe_init()const {return _s == s_maybe_init;}
+    bool is_maybe_init()const { untested();return _s == s_maybe_init;}
     set_t maybe()const;
     void set_event() {_s = s_event;}
     void set_init() {_s = s_maybe_init;}
@@ -77,7 +77,7 @@ private:
 public:
   explicit STORAGE_TYPE() {}
   STORAGE_TYPE(STORAGE_TYPE const& o) = default;
-   //  : _st(o._st), _set(o._set), _use(o._use) {
+   //  : _st(o._st), _set(o._set), _use(o._use) { untested();
   //  }
 public:
   STORAGE_TYPE operator|(STORAGE_TYPE const&)const;
@@ -150,12 +150,12 @@ class Variable_Access {
 
     explicit xs(xs const& x) = default;
     xs(Token_VAR_REF* v, mode_t mode, bool always);
-    bool is_use()const {return _mode == xs_use;}
+    bool is_use()const { untested();return _mode == xs_use;}
     bool is_assign()const {return _mode == xs_assign || _mode == xs_const_assign
                                  || _mode == xs_init;}
     bool is_init()const {untested(); return _mode == xs_init;}
-    bool is_always()const {return _always;}
-    bool is_constant()const {return _mode == xs_const_assign;}
+    bool is_always()const { untested();return _always;}
+    bool is_constant()const { untested();return _mode == xs_const_assign;}
 
     Block const* scope()const;
     Block const* var_scope()const;
@@ -166,7 +166,7 @@ public:
   Variable_Access operator|(Variable_Access const& b) const;
 
 public:
-  void clear() { _map.clear(); }
+  void clear() { untested(); _map.clear(); }
   size_t size()const {return _map.size(); }
   void push_init(Token_VAR_REF* v);
   void init_variable(Token_VAR_REF const* v);
@@ -180,7 +180,7 @@ public:
   void sift_locals(Block const* scope);
   void prune_dynamic();
 private:
-//  void push(xs const& x) {_list.push_back(xs(x));}
+//  void push(xs const& x) { untested();_list.push_back(xs(x));}
   void push(Token const* k, STORAGE_TYPE const& t) { _map[k] = t; }
   assignment maybe(assignment const& a)const {
     return std::make_pair(a.first, a.second.maybe());

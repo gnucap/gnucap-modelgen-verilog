@@ -54,7 +54,7 @@ public:
   bool optimize_deps()    const{ untested(); return _optimize_deps; }
   bool optimize_unused()  const{ return _optimize_unused; }
   bool optimize_nodes()   const{ return _optimize_nodes; }
-  bool optimize_state()   const{ return _optimize_state; }
+  bool optimize_state()   const{ untested(); return _optimize_state; }
   bool decompose_eval()   const{ return _decompose_eval; }
   bool gen_module()       const{ return _gen_module; }
   bool gen_paramset()     const{ return _gen_paramset; }

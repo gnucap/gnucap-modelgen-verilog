@@ -30,7 +30,7 @@
 #include "f__.cc"
 /*--------------------------------------------------------------------------*/
 bool Statement::propagate_rdep(Base const* )
-{
+{ untested();
   unreachable();
   incomplete();
   return false;
@@ -83,11 +83,11 @@ private:
 	  _const = false;
 	}else{
 	}
-      }else{
+      }else{ untested();
 	trace1("simparam noconst", b->name());
       }
       e->push_back(b);
-    }else{
+    }else{ untested();
       trace1("simparam nopar", typeid(*e->back()).name());
     }
     e->push_back(parlist);

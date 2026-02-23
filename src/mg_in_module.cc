@@ -1028,7 +1028,7 @@ void ValueRangeStrings::parse(CS& file)
 
   // use array parse?
   if(file >> '{') {
-  }else{
+  }else{ untested();
     throw Exception_CS_("need '{'", file);
   }
   while(file.peek() == '"'){
@@ -1037,7 +1037,7 @@ void ValueRangeStrings::parse(CS& file)
     file >> ',';
   }
   if(file >> '}') {
-  }else{
+  }else{ untested();
     throw Exception_CS_("need '}'", file);
   }
 }

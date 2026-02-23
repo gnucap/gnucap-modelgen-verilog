@@ -242,7 +242,7 @@ protected:
 	  delete p;
 	  file.warn(0, "not valid here");
 	  break;
-	}else if (max==size()){
+	}else if (max==size()){ untested();
 	  delete p;
 	  throw Exception_Too_Many(int(size()+1), int(max), 0);
 	}else{
@@ -493,7 +493,7 @@ public:
   bool is_never()const { return _reachable == r_never; }
 //  void set_unreachable() { untested(); untested(); _reachable = r_never; }
 //  void set_reachable() { untested(); untested(); _reachable = r_unknown; }
-  void set_initial() { _reachable = r_initial; }
+  void set_initial() { untested(); _reachable = r_initial; }
   void set_always() { _reachable = r_always; }
   void set_never() { _reachable = r_never; }
   virtual bool new_var_ref(Base* what);
@@ -619,7 +619,7 @@ public:
   const std::string& quiet_min()const		{ untested();return _quiet_min;}
   const std::string& quiet_max()const		{ untested();return _quiet_max;}
   const std::string& final_default()const	{ untested();return _final_default;}
-  String_Arg key()const { return String_Arg(_name); }
+  String_Arg key()const { untested(); return String_Arg(_name); }
 
 #if 0
   // needed?
@@ -635,7 +635,7 @@ public:
   std::string const& name() const{ return _name; }
   bool operator!=(const std::string& s)const {return _name != s;}
 //  virtual bool is_constant()const { untested();untested(); return false;}
-  virtual Base const* value()const { unreachable(); return nullptr; }
+  virtual Base const* value()const { untested(); unreachable(); return nullptr; }
 protected:
   Block* owner(){ return _owner; }
 }; // Parameter_Base

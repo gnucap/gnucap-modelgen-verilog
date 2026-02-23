@@ -213,7 +213,7 @@ public:
     return "ac_stim";
   }
   Probe const* prb()const {return _prb;}
-  void set_n_to_gnd()const {
+  void set_n_to_gnd()const { untested();
     assert(_m);
     return MGVAMS_FILTER::set_n_to_gnd(_m);
   }
@@ -268,7 +268,7 @@ void NOISE::stack_op(Expression* e) const
       throw Exception("invalid");
     }
   // func->set_p_to_gnd(); ??
- // }else if(auto cc = prechecked_cast<Token_CALL const*>(e->back())){
+ // }else if(auto cc = prechecked_cast<Token_CALL const*>(e->back())){ untested();
  //   incomplete();
  //   throw Exception("invalid");
   }else{ untested();
@@ -299,7 +299,7 @@ Node_Ref NOISE::p() const
 }
 /*--------------------------------------------------------------------------*/
 Node_Ref NOISE::n() const
-{
+{ untested();
   assert(_br);
   return _br->n();
 }

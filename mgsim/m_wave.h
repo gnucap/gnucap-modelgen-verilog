@@ -36,7 +36,7 @@ public:
 
   explicit WAVE(double d=0);
   explicit WAVE(const WAVE&);
-	  ~WAVE() {}
+	  ~WAVE() { untested();}
   WAVE&	   set_delay(double d);
   WAVE&	   initialize();
   WAVE&	   push(double t, double v);
@@ -330,7 +330,7 @@ inline void WAVE::new_transition(double t, double rt, double ft, double new_fv)
     trace3("nt incomplete?", start, _w.back().second, new_fv);
     assert(_w.back().first <= final_time);
     _w.push_back(DPAIR(old_pair));
-  }else{
+  }else{ untested();
 
   }
 

@@ -64,23 +64,23 @@ public: // characteristics
   size_t num_args() const { return _num_args; }
 
   virtual bool is_output_arg(int)const {return false;}
-  virtual TData const* arg_data(int)const {return nullptr;}
-  virtual Token const* arg_token(int)const {return nullptr;}
+  virtual TData const* arg_data(int)const { untested();return nullptr;}
+  virtual Token const* arg_token(int)const { untested();return nullptr;}
   virtual Data_Type const* arg_type(int)const{untested(); return nullptr;}
   virtual Data_Type const* return_type()const = 0;
   virtual bool has_analysis()const  {return false;}
   virtual bool has_precalc()const   {return false;}
   virtual bool has_tr_begin()const  {return false;}
   virtual bool has_tr_restore()const{return has_tr_begin();}
-  virtual bool has_tr_eval()const   {return true;}
+  virtual bool has_tr_eval()const   { untested();return true;}
   virtual bool has_tr_review()const {return false;}
   virtual bool has_tr_accept()const {return false;}
   virtual bool has_tr_advance()const{return false;}
-  virtual bool has_tr_regress()const{return has_tr_advance();}
+  virtual bool has_tr_regress()const{ untested();return has_tr_advance();}
   virtual bool has_set_event()const {return false;}
-  virtual bool has_state()const {return false;}
+  virtual bool has_state()const { untested();return false;}
   virtual bool has_modes()const {return false;}
-  virtual bool context_arg()const {return false;}
+  virtual bool context_arg()const { untested();return false;}
   virtual bool is_analog_filter()const {return false;}
   virtual bool is_constant()const {return true;}
 
@@ -165,7 +165,7 @@ public:
 public:
   virtual /*BUG*/ Branch* branch() const { return _br;}
 private:
- // void has_setup()const override{return true;}
+ // void has_setup()const override{ untested();return true;}
  // void setup(Module*)override;
 protected:
 public: // bug
@@ -175,10 +175,10 @@ public: // bug
   bool has_output()const {return _output;}
 public: // XDT refactor
   virtual bool port_hack()const {return true;} // TODO
-  virtual int max_args()const {assert(0); return 0; }
+  virtual int max_args()const { untested();assert(0); return 0; }
   virtual Branch* branch__() const {return _br;}
-  virtual void set_n_to_gnd__()const {assert(0);}
-  virtual void set_p_to_gnd__()const {assert(0);}
+  virtual void set_n_to_gnd__()const { untested();assert(0);}
+  virtual void set_p_to_gnd__()const { untested();assert(0);}
   virtual Probe const* prb__()const {return _prb;}
   void set_owner(Module* m) {_m=m;}
   void set_branch(Branch* br);
@@ -206,7 +206,7 @@ private:
   void stack_op(Expression*)const override { untested();
     throw Exception("invalid");
   }
-  Token* new_token(Module&, size_t)const override {unreachable();return nullptr;}
+  Token* new_token(Module&, size_t)const override { untested();unreachable();return nullptr;}
   void make_cc_common(std::ostream&)const override { untested(); unreachable(); }
 };
 /*--------------------------------------------------------------------------*/

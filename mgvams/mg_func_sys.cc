@@ -30,7 +30,7 @@
 #include "f__.cc"
 /*--------------------------------------------------------------------------*/
 bool Statement::propagate_rdep(Base const* )
-{
+{ untested();
   unreachable();
   incomplete();
   return false;

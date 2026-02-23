@@ -280,7 +280,7 @@ protected:
     o______ "(void)dir;\n";
     o______ "_state[0] = _state[1] = _UNKNOWN;\n";
     o______ "_in[0] = _in[1] = 0.;\n";
-    if(0&&above_hack()){
+    if(0&&above_hack()){ untested();
       o______ "return input>0.;\n";
     }else{
       o______ "return false;\n";

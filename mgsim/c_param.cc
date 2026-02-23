@@ -38,14 +38,14 @@ void parse(CS& cmd, PARAM_LIST* pl, CARD_LIST* Scope)
     type = 1;
   }else if(cmd >> "integer"){
     type = 2;
-  }else if(cmd >> "string"){
+  }else if(cmd >> "string"){ untested();
     type = 3;
   }else{
   }
   assert(Scope);
-  if(Scope->is_verilog_math()){
+  if(Scope->is_verilog_math()){ untested();
     type += 10;
-    if(Scope == &CARD_LIST::card_list) {
+    if(Scope == &CARD_LIST::card_list) { untested();
       error(bLOG, "Top level parameter. Not within spec, use with care\n");
     }else{ untested();
     }
@@ -57,22 +57,22 @@ void parse(CS& cmd, PARAM_LIST* pl, CARD_LIST* Scope)
   case 1:
 	  par = PARAMETER<Float>();
 	  break;
-  case 11:
+  case 11:untested();
 	  par = PARAMETER<vReal>();
 	  break;
   case 2:
 	  par = PARAMETER<Integer>();
 	  break;
-  case 12:
+  case 12:untested();
 	  par = PARAMETER<vInteger>();
 	  break;
-  case 3:
+  case 3:untested();
 	  par = PARAMETER<vString>(); // !
 	  break;
-  case 13:
+  case 13:untested();
 	  par = PARAMETER<vString>();
 	  break;
-  case 10:
+  case 10:untested();
 	  par = PARAMETER<vReal>();
 	  // fallback. see lang_verilog.
 	  break;
@@ -109,7 +109,7 @@ class CMD_PARAM : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST* Scope)override {
     PARAM_LIST* pl = Scope->params();
-    if (cmd.is_end()) {
+    if (cmd.is_end()) { untested();
       pl->print(IO::mstdout, OPT::language);
       IO::mstdout << '\n';
     }else{

@@ -51,17 +51,17 @@ public:
   ~COMMON_VASRC() {}
 public:
   virtual DISCIPLINE const* discipline()const{return nullptr;};
-  COMMON_COMPONENT* clone()const override {unreachable(); return nullptr;}
+  COMMON_COMPONENT* clone()const override { untested();unreachable(); return nullptr;}
   bool operator==(COMMON_COMPONENT const&p)const override {
     return dynamic_cast<COMMON_VASRC const*>(&p)
       && EVAL_BM_BASE::operator==(p);
   }
-  double flow_abstol() const{
+  double flow_abstol() const{ untested();
     if(!discipline()){ untested();
       return OPT::abstol;
     }else if(!discipline()->flow()){ untested();
       return OPT::abstol;
-    }else{
+    }else{ untested();
       return discipline()->flow()->abstol();
     }
   }

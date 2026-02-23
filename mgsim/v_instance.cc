@@ -259,12 +259,12 @@ public:
     _port_names.push_back(name);
 
     if(subckt()){
-    }else{
+    }else{ untested();
     }
     assert(scope());
 
 
-    if(_proto){
+    if(_proto){ untested();
       { // INSTANCE::set_port_by_index(i, ext_name);
 	grow_nodes(i, _n, _node_capacity, node_capacity_floor);
 	BASE_SUBCKT::set_port_by_index(i, ext_name);
@@ -319,7 +319,7 @@ CARD* INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANC
     trace1("INSTANCE::prepare_overload no attr", modelname);
   }
 
-  if(!cl){
+  if(!cl){ untested();
     return nullptr;
   }else if(!c->common()){
     c->set_dev_type(modelname);
@@ -486,7 +486,7 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
   assert(!Proto->scope()->size());
 
 #ifdef DO_TRACE
-  for(auto n : *(Proto->subckt()->nodes())){
+  for(auto n : *(Proto->subckt()->nodes())){ untested();
     trace1("node", n.first);
   }
 #endif
@@ -505,11 +505,11 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
     assert(scope());
     collect_overloads_from_scope(modelname, *scope(), Proto);
 #else
-    try{
+    try{ untested();
       CARD const* p = owner()->find_in_my_scope(modelname);
       error(bLOG, long_label() + ": " + modelname + " from my scope\n");
       prepare_overload(p, modelname, Proto);
-    }catch (Exception_Cant_Find& e) {
+    }catch (Exception_Cant_Find& e) { untested();
       trace1("no local", modelname);
     }
 #endif
@@ -523,7 +523,7 @@ void INSTANCE::collect_overloads(DEV_INSTANCE_PROTO* Proto) const
     int bin_count = 0;
 #if 0
     MODEL_CARD* m = model_dispatcher[modelname];
-    while(m){
+    while(m){ untested();
       CARD* p = prepare_overload(m, modelname, Proto);
       describe_if(p->id_tag(), extended_name + " from model_dispatcher");
       extended_name = modelname + ':' + to_string(bin_count++);
@@ -616,7 +616,7 @@ CARD* INSTANCE::deflate()
 	  c->n_(ii) = n_(c->n_(ii).e_());
 	}else{
 	}
-      }else if(ii < c->net_nodes()+c->num_current_ports()){
+      }else if(ii < c->net_nodes()+c->num_current_ports()){ untested();
       }else{ untested();
       }
     }
@@ -810,10 +810,10 @@ void INSTANCE::expand()
       gotit = prechecked_cast<COMPONENT*>(*j);
       assert(gotit);
       *j = nullptr;
-    }else if(eff_param_count(d) > eff_param_count(gotit)){
+    }else if(eff_param_count(d) > eff_param_count(gotit)){ untested();
       if(desc.size()){ untested();
 	error(bLOG, long_label() + " rejecting candidate, more params: \"" + desc + "\".\n");
-      }else{
+      }else{ untested();
 	error(bLOG, long_label() + " tie break: " + param_count_string(gotit) + " vs. " +
 	    param_count_string(d) + "\n");
       }
@@ -880,8 +880,6 @@ void INSTANCE::expand()
   }
 
   trace2("INSTANCE::expand, pre expand sckt", long_label(), dev_type());
-
-  COMPONENT* dev = dynamic_cast<COMPONENT*>(*subckt()->begin());
   subckt()->expand();
 }
 /*--------------------------------------------------------------------------*/
@@ -983,7 +981,7 @@ int INSTANCE::set_port_by_name(std::string& name, std::string& ext_name)
   if(_proto){
     _proto->set_port_by_index(i, name);
     assert(scope()!=subckt());
-  }else{
+  }else{ untested();
     trace4("INSTANCE::pbn proto", long_label(), net_nodes(), name, ext_name);
     set_port_by_index(i, ext_name);
   }

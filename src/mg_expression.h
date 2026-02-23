@@ -46,7 +46,7 @@ public:
   void dump(std::ostream& out)const override;
 // private:
   Base* owner(){ return _owner; }
-  Base const* owner() const { return _owner; }
+  Base const* owner() const { untested(); return _owner; }
   Block* scope();
   Block const* scope()const { return const_cast<Expression_*>(this)->scope(); }
 public: // assign. AF kludge. TODO, one list.

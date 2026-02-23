@@ -509,7 +509,7 @@ void Token_BINOP_::stack_op(Expression* E)const
 } // Token_BINOP_::stack_op
 /*--------------------------------------------------------------------------*/
 void Token_OUT_VAR::stack_op(Expression* E)const
-{
+{ untested();
   E->push_back(clone());
 }
 /*--------------------------------------------------------------------------*/
@@ -1170,7 +1170,7 @@ RDeps const& Token_VAR_REF::rdeps() const
 /*--------------------------------------------------------------------------*/
 Data_Type const& Token_VAR_REF::type() const
 {
-  if(auto p = dynamic_cast<Variable_Decl const*>(_item)){
+  if(auto p = dynamic_cast<Variable_Decl const*>(_item)){ untested();
     assert(p);
     return p->type();
   }else if(auto it=dynamic_cast<Assignment const*>(_item)){
@@ -1206,7 +1206,7 @@ bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
     return it->propagate_deps(from);
   }else if(dynamic_cast<Analog_Function*>(_item)){
   }else if(dynamic_cast<Block const*>(_item)){ untested();
-  }else{
+  }else{ untested();
     unreachable();
     // incomplete();
   }
@@ -1217,7 +1217,7 @@ bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
 Block const* Token_VAR_REF::scope() const
 {
   // TODO //
-  if(auto b=dynamic_cast<Block*>(_item)){
+  if(auto b=dynamic_cast<Block*>(_item)){ untested();
     return b;
   }else if(auto it=dynamic_cast<Owned_Base*>(_item)){
     return it->scope();
@@ -1249,7 +1249,7 @@ Data_Type const& Token_VAR_DECL::type() const
   auto oi = prechecked_cast<Variable_Decl const*>(_item);
   assert(oi);
   if(oi->type()){
-  }else{
+  }else{ untested();
     // paramset bug?
     assert(0);
   }
@@ -1272,7 +1272,7 @@ void Token_VAR_DECL::stack_op(Expression* e)const
     if(dynamic_cast<Variable_Decl const*>(_item)){
       if(auto dd = dynamic_cast<TData const*>(data())){
 	nd = dd->clone();
-      }else{
+      }else{ untested();
 	unreachable();
 	incomplete();
       }
@@ -1281,7 +1281,7 @@ void Token_VAR_DECL::stack_op(Expression* e)const
       nd = a->data().clone();
 //      nd->add_sens(_item); not yet.
       trace3("var::stackop a", name(), nd->size(), deps().size());
-    }else if(auto dd = dynamic_cast<TData const*>(data())){
+    }else if(auto dd = dynamic_cast<TData const*>(data())){ untested();
       nd = dd->clone();
 //      nd->add_sens(_item); not yet.
     }else{ untested();
@@ -1296,7 +1296,7 @@ void Token_VAR_DECL::stack_op(Expression* e)const
     // DUP in VAR_REF?
     if(auto a = dynamic_cast<Assignment const*>(_item)){
       E->push_use(a->decl_token());
-    }else{
+    }else{ untested();
       incomplete();
     }
 

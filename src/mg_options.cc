@@ -30,8 +30,8 @@ Base& modelgen_opts()
   return opt;
 }
 /*--------------------------------------------------------------------------*/
-Options::Options() :
-  _optimize_binop(true),  // fold binary operators
+Options::Options()
+ :_optimize_binop(true),  // fold binary operators
   _optimize_common(true), // put aside model constants
   _optimize_swap(true),   // swap operands.
   _optimize_deriv(true),  // suppress zero derivative propagation

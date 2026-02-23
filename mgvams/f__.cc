@@ -8,14 +8,14 @@
 #include "mg_out.cc"
 /*--------------------------------------------------------------------------*/
 void Token_FUNCTION::stack_op(Expression*) const
-{
+{ untested();
   unreachable();
   incomplete();
 }
 /*--------------------------------------------------------------------------*/
 #if 1
 void Token_CALL::stack_op(Expression*) const
-{
+{ untested();
   unreachable();
   incomplete();
 }

@@ -36,7 +36,7 @@ public:
 //    incomplete();
 //    return nullptr;
 //  }
-  std::string val_string()const override {
+  std::string val_string()const override { untested();
     return std::string("analog statement ") + typeid(*this).name();
   }
 };
@@ -67,7 +67,7 @@ public:
   }
 private:
   friend Probe const* probe(Dep const&);
-  bool is_reversed() const {
+  bool is_reversed() const { untested();
     incomplete();
     return _br.is_reversed();
   }
@@ -75,11 +75,11 @@ public:
   Nature const* nature() const;
   Discipline const* discipline() const;
 
-  bool same_data(Probe const& o) const{
+  bool same_data(Probe const& o) const{ untested();
     return branch() == o.branch() && _type == o._type;
   }
 private:
-  void stack_op(Expression*)const override {
+  void stack_op(Expression*)const override { untested();
     throw Exception("invalid");
   }
   Token* new_token(Module&, size_t)const override;
@@ -167,7 +167,7 @@ private:
 class AnalogCtrlBlock : public AnalogSeqBlock {
 public:
   explicit AnalogCtrlBlock() : AnalogSeqBlock() {}
-  explicit AnalogCtrlBlock(CS& f, Statement* o) : AnalogSeqBlock() {
+  explicit AnalogCtrlBlock(CS& f, Statement* o) : AnalogSeqBlock() { untested();
     set_owner(o);
     parse(f);
   }
@@ -234,7 +234,7 @@ public: // can't resolve these..
   Base* lookup(std::string const& f, bool recurse=true)override;
 
   bool new_var_ref(Base* what)override;
-//  void dump(std::ostream& f)const override { AnalogCtrlBlock::dump(o); }
+//  void dump(std::ostream& f)const override { untested(); AnalogCtrlBlock::dump(o); }
   Block* scope();
 };
 /*--------------------------------------------------------------------------*/
@@ -364,7 +364,7 @@ public:
   bool is_used_in(Base const*)const override{ untested();
     return true;
   }
-//  bool makes_own_scope()const override {return true;}
+//  bool makes_own_scope()const override { untested();return true;}
 public: // args
   bool is_output_arg(int I)const;
   TData const* arg_data(int I)const; // needed?
@@ -432,7 +432,7 @@ class AnalogConstExpression : public AnalogExpression {
 public:
 //  void parse(CS& file) override;
 //  void dump(std::ostream& o)const override;
-  String_Arg key() const{return String_Arg("ACE");}
+  String_Arg key() const{ untested();return String_Arg("ACE");}
 };
 /*--------------------------------------------------------------------------*/
 class AnalogConstExpressionList : public LiSt<AnalogConstExpression, '\0', ',', ':'> {
@@ -472,7 +472,7 @@ public:
   Block* body() {return &_body;}
 
   String_Arg key() const{ untested();return String_Arg("CaseGen");}
-  RDeps const& rdeps()const override { return _rdeps; }
+  RDeps const& rdeps()const override { untested(); return _rdeps; }
  // bool update() override { untested(); incomplete(); }
 };
 /*--------------------------------------------------------------------------*/
@@ -645,7 +645,7 @@ public:
   }
   ~Contribution();
 
-  std::string val_string()const override {return "contribution " + _name; }
+  std::string val_string()const override { untested();return "contribution " + _name; }
 private:
   void set_pot_contrib();
   void set_flow_contrib();
@@ -734,7 +734,7 @@ inline bool is_flow_probe(Dep const& d)
 {
   if(auto pp=dynamic_cast<Token_PROBE const*>(d.item())){
     return pp->is_flow_probe();
-  }else{
+  }else{ untested();
     return false;
   }
 }
@@ -752,7 +752,7 @@ inline std::string /*const&*/ code_name(Dep const& d)
 {
   if(auto pp=dynamic_cast<Token_PROBE const*>(d.item())){
     return pp->code_name();
-  }else{
+  }else{ untested();
     return d.probe__()->code_name();
   }
 }

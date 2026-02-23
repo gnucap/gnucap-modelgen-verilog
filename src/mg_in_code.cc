@@ -326,7 +326,7 @@ TData const& Assignment::data()const
 }
 /*--------------------------------------------------------------------------*/
 bool Variable_Decl::has_deps() const
-{
+{ untested();
   return _data.has_deps();
 }
 /*--------------------------------------------------------------------------*/
@@ -443,7 +443,7 @@ static void parse_block_variables(CS& f, Variable_List_Collection& P)
 }
 /*--------------------------------------------------------------------------*/
 void SwitchBlock::parse(CS&)
-{
+{ untested();
 }
 /*--------------------------------------------------------------------------*/
 void SeqBlock::parse(CS& f)
@@ -501,7 +501,7 @@ void SeqBlock::dump(std::ostream& o)const
 	  o__ "// " << v->name() << " : " << v->deps().size() << "\n";
 	}else if(dynamic_cast<Block const*>(i.second)){
 	  // later.
-	}else{
+	}else{ untested();
 	  o__ "// " << i.first << "\n";
 	}
       }
@@ -553,7 +553,7 @@ bool SwitchBlock::update()
   int ret = 0;
   // assert(!_variables.size()); ?
   if(is_reachable()){
-//      if(auto s = dynamic_cast<Statement*>(i)){
+//      if(auto s = dynamic_cast<Statement*>(i)){ untested();
 //	ret += s->update();
 //	trace1("AnalogSeqBlock::update var", ret);
 //      }else{ untested();
@@ -568,7 +568,7 @@ bool SwitchBlock::update()
 	unreachable(); // comment? later..
       }
     }
-  }else{
+  }else{ untested();
   }
   trace1("AnalogSwitchBlock::update done", ret);
 
@@ -973,7 +973,7 @@ void Assignment::dump(std::ostream& o) const
   if(_token){
     o << _token->name() << " = ";
     Expression_::dump(o);
-  }else{
+  }else{ untested();
 //    o << "/// unreachable?\n";
   }
 }

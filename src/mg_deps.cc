@@ -117,13 +117,13 @@ Base* TData::divide(const Base* X) const
 /*--------------------------------------------------------------------------*/
 #if 0
 void TData::merge(TData const& o)
-{
+{ untested();
   merge_sens(o);
   merge_flags(o);
 
-  if(is_real()){
+  if(is_real()){ untested();
     merge_ddeps(o);
-  }else{
+  }else{ untested();
   }
 }
 #endif

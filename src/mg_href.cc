@@ -43,7 +43,7 @@ Base /*const*/ * Hierarchical_Refs::get(std::string const& n)
     auto h = new Token_HIER_REF(n);
     _refs.push_back(h);
     return h;
-  }else{
+  }else{ untested();
     return *f;
   }
 }

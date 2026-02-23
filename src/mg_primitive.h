@@ -86,7 +86,7 @@ public:
   Primitive();
   ~Primitive();
 public:
-  String_Arg const& key()const	  {return _identifier;}
+  String_Arg const& key()const	  { untested();return _identifier;}
   File const* file() const{ return _file; }; // owner?
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
@@ -100,8 +100,8 @@ public: // Component.
 
 public: // share "circuit" with Module?
 	// stash here, for now.
-  const Node_Map& nodes()const		{assert(_nodes); return *_nodes;}
-  Block* scope() /* override */ {
+  const Node_Map& nodes()const		{ untested();assert(_nodes); return *_nodes;}
+  Block* scope() /* override */ { untested();
     return this; // need _circuit?
   }
   Node* new_node(std::string const& p)override;
@@ -113,7 +113,7 @@ private:
   Node_Map& nodes() {assert(_nodes); return *_nodes;}
   Port_3_List_3& input()  {return _input;}
   Port_3_List_3& output() {return _output;}
-  Port_3_List_3& inout()  {return _inout;}
+  Port_3_List_3& inout()  { untested();return _inout;}
   UDP_Table& table() {return _table;}
 };
 /*--------------------------------------------------------------------------*/

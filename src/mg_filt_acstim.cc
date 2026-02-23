@@ -34,9 +34,9 @@ static bool is_zero(Token const* t)
   assert(t);
   if(Float const* f = dynamic_cast<const Float*>(t->data())){
     return f->value() == 0.;
-  }else if(Integer const* ii = dynamic_cast<const Integer*>(t->data())){
+  }else if(Integer const* ii = dynamic_cast<const Integer*>(t->data())){ untested();
     return ii->value() == 0;
-  }else{
+  }else{ untested();
     return false;
   }
 }
@@ -99,10 +99,10 @@ protected:
   }
   void make_assign(std::ostream&)const { untested();
   }
-  //void set_code_name(std::string x){
+  //void set_code_name(std::string x){ untested();
   //  _code_name = x;
   //}
-  //std::string code_name()const override{
+  //std::string code_name()const override{ untested();
   //  return _code_name;
   //}
   std::string code_name()const override {
@@ -134,7 +134,7 @@ public:
       throw Exception("invalid");
     }
     // func->set_p_to_gnd(); ??
-    // }else if(auto cc = prechecked_cast<Token_CALL const*>(e->back())){
+    // }else if(auto cc = prechecked_cast<Token_CALL const*>(e->back())){ untested();
     //   incomplete();
     //   throw Exception("invalid");
   }else{ untested();
@@ -224,7 +224,7 @@ public:
     o << "}\n";
   }
   Probe const* prb()const {return _prb;}
-  void set_n_to_gnd()const {
+  void set_n_to_gnd()const { untested();
     assert(_m);
     _m->set_to_ground(_br->p());
   }
@@ -257,7 +257,7 @@ Node_Ref ACSTIM::p() const
 }
 /*--------------------------------------------------------------------------*/
 Node_Ref ACSTIM::n() const
-{
+{ untested();
   return _br->n();
 }
 #endif

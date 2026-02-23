@@ -558,7 +558,7 @@ CARD* ZFILTER::clone()const
 /*--------------------------------------------------------------------------*/
 ZFILTER::ZFILTER(ZFILTER const&p) : ELEMENT(p), _nN(_nodes)
 {
-  if(p._nN){
+  if(p._nN){ untested();
     trace2("laplace", int_nodes(), max_nodes());
     assert(_nN);
     assert(int_nodes() + max_nodes() <= NODES_PER_BRANCH); // not expanded yet.

@@ -736,7 +736,7 @@ static void make_module(std::ostream& o, const Module& m)
   if(options().optimize_common()){
     VAR_DECL vv(VAR_DECL::_instance);
     vv.make_variable_decl(o, m);
-  }else{
+  }else{ untested();
     VAR_DECL vv(VAR_DECL::_all);
     vv.make_variable_decl(o, m);
   }

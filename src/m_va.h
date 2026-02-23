@@ -95,7 +95,7 @@ public:
   /*explicit*/ ddouble_(int const& d) { clear(); *_data = d; }
   /*explicit*/ ddouble_(double const& d) { clear(); *_data = d; }
   /*explicit*/ ddouble_(Pdbl const& d) { clear(); *_data = d; }
-  /*explicit*/ ddouble_(Pint const& d) { clear(); *_data = d; }
+  /*explicit*/ ddouble_(Pint const& d) { untested(); clear(); *_data = d; }
   void set_all_deps() {
     std::fill_n(_data+1, numderiv, 0.);
   }
@@ -143,8 +143,8 @@ public:
     reset_deriv();
     return *this;
   }
-  bool is_same(const ddouble_& o)const {
-    for(int i=0; i<=numderiv; ++i){
+  bool is_same(const ddouble_& o)const { untested();
+    for(int i=0; i<=numderiv; ++i){ untested();
       if(_data[i] != _data[i]){ itested();
 	if( o._data[i] == o._data[i] ){ untested();
 	  return false;
@@ -152,7 +152,7 @@ public:
 	}
       }else if(_data[i] != o._data[i]){ untested();
 	return false;
-      }else{
+      }else{ untested();
       }
     }
     return true;
@@ -333,7 +333,7 @@ public:
     ret *= (double)o;
     return ret;
   }
-  ddouble_ operator*(Pint const& o) const {
+  ddouble_ operator*(Pint const& o) const { untested();
     ddouble_ ret = *this;
     ret *= (double)o;
     return ret;
@@ -438,7 +438,7 @@ ddouble_<T> operator/(double const& a, ddouble_<T> b)
 }
 template<int T>
 ddouble_<T> operator/(PARAMETER<double> const& a, ddouble_<T> const& b)
-{
+{ untested();
   ddouble_<T> c(a);
   c /= b;
   return c;
@@ -659,16 +659,16 @@ class Href_{
   // const std::string _path;
 public:
   explicit Href_() {}
- // explicit Href_(std::string const& path) : _path(path) {}
+ // explicit Href_(std::string const& path) : _path(path) { untested();}
   explicit Href_(Href_ const&) = default;
   void link_card(CARD const* scope, std::string const& path);
-  Base const* link_item(){
+  Base const* link_item(){ untested();
     return _ref = find_item(_card?_card->subckt():&CARD_LIST::card_list, _tail);
   }
   double get_double()const {
     Base const* ref = _ref;
     CARD_LIST const* scope = _card?_card->subckt():&CARD_LIST::card_list;
-    if(ref){
+    if(ref){ untested();
     }else{
       // incomplete();
       ref = find_item(scope, _tail);
@@ -681,7 +681,7 @@ public:
       PARAMETER<double> pp; pp = _tail;
       pp.e_val(NOT_VALID, scope->params());
       return pp;
-    }else{
+    }else{ untested();
       return NOT_VALID;
     }
   }
@@ -698,11 +698,11 @@ private:
 /*--------------------------------------------------------------------------*/
 // found a device. store the remainder of the path.
 inline void Href_::link_device_(CARD const* device, std::string const& path)
-{
+{ untested();
   if(!device){ untested();
     // top level thing?
     incomplete();
-  }else{
+  }else{ untested();
     trace2("found link device", device->long_label(), path);
   }
 
@@ -742,7 +742,7 @@ inline bool Href_::find_device_up(CARD const* device,
       return find_device_up(o, name, tail);
     }else if(find_device_down(device->scope(), name, tail)){
       return true;
-    }else{
+    }else{ untested();
       _card = device;
       _tail = tail;
       return true;
@@ -804,7 +804,7 @@ inline void Href_::link_card(CARD const* dev, std::string const& path)
   }
 
   if(ret){
-  }else{
+  }else{ untested();
     throw Exception_Cant_Find(name, tail);
   }
 }
@@ -943,7 +943,7 @@ inline double PORT_FLOW(int i, BASE_SUBCKT const* m)
 }
 /*--------------------------------------------------------------------------*/
 inline node_t& ground()
-{
+{ untested();
   assert(CARD_LIST::card_list.nodes());
  // assert(CARD_LIST::card_list.nodes()->at(0).m_()==0);
   return CARD_LIST::card_list.nodes()->at(0);

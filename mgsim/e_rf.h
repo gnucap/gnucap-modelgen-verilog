@@ -276,7 +276,7 @@ int COMMON_RF_BASE::set_param_by_name(std::string Name, std::string Value)
     cmd >> idx;
     if(idx < 0){ untested();
       throw Exception_No_Match(Name);
-    }else if(cmd.more()){
+    }else if(cmd.more()){ untested();
       throw Exception_No_Match(Name);
     }else if(is_rp() || den_is_p()){ untested();
       throw Exception_No_Match(Name);
@@ -291,7 +291,7 @@ int COMMON_RF_BASE::set_param_by_name(std::string Name, std::string Value)
 
     if(idx < 0){ untested();
       throw Exception_No_Match(Name);
-    }else if(cmd.more()){
+    }else if(cmd.more()){ untested();
       throw Exception_No_Match(Name);
     }else if(is_rp() || num_is_z()){ untested();
       throw Exception_No_Match(Name);
@@ -404,7 +404,7 @@ bool COMMON_RF_BASE::param_is_printable(int i)const
     return _p_num[idx].has_hard_value();
   }else if(idx - nn < pp){
     return _p_den[idx-nn].has_hard_value();
-  }else{
+  }else{ untested();
     trace3("is_printable", _p_num.size(), _p_den.size(), is_rp());
   }
   return COMMON_COMPONENT::param_is_printable(i);

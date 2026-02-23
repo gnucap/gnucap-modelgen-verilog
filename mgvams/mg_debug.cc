@@ -118,15 +118,15 @@ private:
     make_cc_dev_(o, "precalc");
   }
 #if 0 // share with DEBUG?
-  void make_cc_dev_(std::ostream& o, std::string s)const {
+  void make_cc_dev_(std::ostream& o, std::string s)const { untested();
     o__ "void " << label() << s << "(std::string a0";
-    for(size_t i=1; i<num_args(); ++i) {
+    for(size_t i=1; i<num_args(); ++i) { untested();
       o << ", double a" << i;
     }
     o << ") {\n";
     o______ "a0 = std::string(\"@" << s << ":\") + a0;\n";
     o______ "fprintf(stdout, a0.c_str()";
-    for(size_t i=1; i<num_args(); ++i) {
+    for(size_t i=1; i<num_args(); ++i) { untested();
       o << ", a" << i;
     }
     o << ");\n";

@@ -164,7 +164,7 @@ public:
   explicit Token_PARLIST_(Token_PARLIST_ const& p)
     : Token_PARLIST(p) { assert(!_args); }
   explicit Token_PARLIST_(const std::string Name, Base* L=nullptr)
-    : Token_PARLIST(Name, L) { assert(!L); assert(!_args); }
+    : Token_PARLIST(Name, L) { untested(); assert(!L); assert(!_args); }
   ~Token_PARLIST_() { delete _args; _args = nullptr; }
 public:
   void stack_op(Expression* E)const override;
@@ -341,7 +341,7 @@ public:
   std::string code_name()const {
     return "_href_" + to_string(_id);
   }
-  // std::string val_string()const override {return _name;}
+  // std::string val_string()const override { untested();return _name;}
 };
 /*--------------------------------------------------------------------------*/
 class Parameter_Base;
@@ -378,8 +378,8 @@ public:
   void stack_op(Expression* e)const override;
 private:
   explicit Token_OUT_VAR(Token_OUT_VAR const& p)
-    : Token_SYMBOL(p.name(), "") { }
-  Token_OUT_VAR* clone()const override{
+    : Token_SYMBOL(p.name(), "") { untested(); }
+  Token_OUT_VAR* clone()const override{ untested();
     return new Token_OUT_VAR(*this);
   }
   // std::string code_name() const { untested(); return "_v_"+name(); }
@@ -529,8 +529,8 @@ public:
   explicit Token_PROBE(std::string const&, Branch const* b, TData* tdata)
     : _data(tdata), _branch(b) { }
 private: // Base
-  void parse(CS&)override {unreachable();}
-  void dump(std::ostream&)const override {unreachable();}
+  void parse(CS&)override { untested();unreachable();}
+  void dump(std::ostream&)const override { untested();unreachable();}
 public:
   virtual std::string code_name()const = 0;
   virtual bool is_pot_probe()const {return false;}
@@ -539,8 +539,8 @@ public:
 /*--------------------------------------------------------------------------*/
 #if 0
 class Token_ASSIGN : public Token_BINOP_ {
-  Token_VAR_REF* lhs() {return op1();}
-  Token* rhs() {return op2();}
+  Token_VAR_REF* lhs() { untested();return op1();}
+  Token* rhs() { untested();return op2();}
   [...]
 };
 #endif

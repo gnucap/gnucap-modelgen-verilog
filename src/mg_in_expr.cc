@@ -153,7 +153,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       Token_TERNARY_ t3(t->name(), nullptr, tp, fp, nullptr);
       t3.stack_op(&E);
     }else if (n[0]=='.'){
-      if(strchr("0123456789", n[1])){
+      if(strchr("0123456789", n[1])){ untested();
 	Float* f = new vReal(n);
 	E.push_back(new Token_CONSTANT(f, ""));
       }else if(auto r = Scope->lookup(PS_MANGLE_PREFIX + n.substr(1))) {
@@ -181,7 +181,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       Base* N;
       if(is_int) {
 	N = new vInteger(n);
-      }else{
+      }else{ untested();
 	N = new vReal(n);
       }
       E.push_back(new Token_CONSTANT(N));
@@ -198,7 +198,7 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 	// move to stack op?
 	if(auto a = dynamic_cast<Assignment const*>(vt->item())){ untested();
 	  E.push_use(a->decl_token());
-	}else{
+	}else{ untested();
 	  incomplete();
 	}
 #endif
@@ -296,7 +296,7 @@ bool Expression_::update(RDeps const* rd)
 
   if(n<data().ddeps().size()) {
   }else if(n==data().ddeps().size()) {
-  }else{
+  }else{ untested();
   }
 
 
@@ -314,7 +314,7 @@ void ConstantMinTypMaxExpression::parse(CS& file)
   assert(_e.is_empty());
   Expression_ e;
   file >> e;
-  if(file){
+  if(file){ untested();
   }else{
 //    incomplete();
 //    file.warn(bWARNING, "possible syntax error?");
@@ -397,7 +397,7 @@ TData const& Expression_::data() const
 {
   static TData no_deps;
   no_deps.set_constant();
-  if(is_empty()){
+  if(is_empty()){ untested();
     return no_deps;
   }else if(auto d = dynamic_cast<TData const*>(back()->data())){
     // really? see is_constant...
@@ -459,11 +459,11 @@ Block* Expression_::scope()
 /*--------------------------------------------------------------------------*/
 bool Expression_::is_constant() const
 {
-  if(size() > 1) {
+  if(size() > 1) { untested();
     bool c = true;
-    if(auto const* d = dynamic_cast<TData const*>(back()->data())){
+    if(auto const* d = dynamic_cast<TData const*>(back()->data())){ untested();
       c &= d->is_constant();
-    }else{
+    }else{ untested();
       incomplete();
     }
     return c;

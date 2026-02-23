@@ -15,7 +15,7 @@ public:
   bool is_real() const{ return _type==t_real; }
   bool is_int() const{ return _type==t_int; }
   bool is_string() const{ return _type==t_string; }
-  bool is_function() const{ return _type==t_fun; }
+  bool is_function() const{ untested(); return _type==t_fun; }
   operator bool() const {return _type!=t_default;}
   bool operator==(Data_Type const& o)const { return _type == o._type;}
   bool operator!=(Data_Type const& o)const { return !operator==(o);}

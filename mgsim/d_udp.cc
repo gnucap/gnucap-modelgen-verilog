@@ -144,7 +144,7 @@ DEV_LOGIC::DEV_LOGIC(const DEV_LOGIC& p)
 void DEV_LOGIC::precalc_last()
 {
   ELEMENT::precalc_last();
-  if (subckt()) {
+  if (subckt()) { untested();
     subckt()->precalc_last();
   }else{
   }
@@ -159,7 +159,7 @@ void DEV_LOGIC::expand()
   assert(c);
 
   const MODEL_LOGIC* m = dynamic_cast<const MODEL_LOGIC*>(c->model());
-  if (!m) {
+  if (!m) { untested();
     throw Exception_Model_Type_Mismatch(long_label(), c->modelname(), "logic family (LOGIC)");
   }else{
   }
@@ -171,7 +171,7 @@ void DEV_LOGIC::expand()
     if(!dynamic_cast<const BASE_SUBCKT*>(model)) {untested();
       error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)),
 	    long_label() + ": " + subckt_name + " is not a subckt, forcing digital\n");
-    }else{
+    }else{ untested();
       _gatemode = OPT::mode;    
       renew_subckt(model, nullptr/*&(c->_params)*/);    
       subckt()->expand();
@@ -184,7 +184,7 @@ void DEV_LOGIC::expand()
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_iwant_matrix()
 {
-  if (subckt()) {
+  if (subckt()) { untested();
     subckt()->tr_iwant_matrix();
   }else{
   }
@@ -198,7 +198,7 @@ void DEV_LOGIC::tr_begin()
     _gatemode = moDIGITAL;
     n_(OUTNODE)->set_mode(_gatemode);
     _oldgatemode = _gatemode;
-  }else{
+  }else{ untested();
     _gatemode = (OPT::mode==moMIXED) ? moANALOG : OPT::mode;
     n_(OUTNODE)->set_mode(_gatemode);
     _oldgatemode = _gatemode;
@@ -230,7 +230,7 @@ void DEV_LOGIC::dc_advance()
   switch (_gatemode) {
   case moUNKNOWN: unreachable(); break;
   case moMIXED:   unreachable(); break;
-  case moANALOG:
+  case moANALOG:untested();
     assert(subckt());
     subckt()->dc_advance();
     break;
@@ -251,7 +251,7 @@ void DEV_LOGIC::tr_advance()
 {
   ELEMENT::tr_advance();
 
-  if (_gatemode != _oldgatemode) {
+  if (_gatemode != _oldgatemode) { untested();
     tr_unload();
     n_(OUTNODE)->set_mode(_gatemode);
     _oldgatemode = _gatemode;
@@ -260,7 +260,7 @@ void DEV_LOGIC::tr_advance()
   switch (_gatemode) {
   case moUNKNOWN: unreachable(); break;
   case moMIXED:   unreachable(); break;
-  case moANALOG:
+  case moANALOG:untested();
     assert(subckt());
     subckt()->tr_advance();
     break;
@@ -398,8 +398,8 @@ void DEV_LOGIC::tr_load()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_unload()
-{
-  if (subckt()) {
+{ untested();
+  if (subckt()) { untested();
     switch (_gatemode) {
     case moUNKNOWN: unreachable(); break;
     case moMIXED:   unreachable(); break;
@@ -463,7 +463,7 @@ void DEV_LOGIC::tr_accept()
     
     for (int ii = BEGIN_IN;  ii < net_nodes();  ++ii) {
       n_(ii)->to_logic(m);
-      if (n_(ii)->quality() < _quality) {
+      if (n_(ii)->quality() < _quality) { untested();
 	_quality = n_(ii)->quality();
 	_failuremode = n_(ii)->failure_mode();
       }else{
@@ -471,7 +471,7 @@ void DEV_LOGIC::tr_accept()
       if (n_(ii)->d_iter() >= lastchangeiter) {
 	lastchangeiter = n_(ii)->d_iter();
 	_lastchangenode = ii;
-      }else{
+      }else{ untested();
       }
       trace2(n_(ii)->failure_mode().c_str(), ii, n_(ii)->quality());
     }
@@ -483,18 +483,18 @@ void DEV_LOGIC::tr_accept()
     trace3(_failuremode.c_str(), _lastchangenode, lastchangeiter, _quality);
   }
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */  
-  if (want_analog()) {
+  if (want_analog()) { untested();
     if (_gatemode == moDIGITAL) {untested();
       error(bTRACE, "%s:%u:%g switch to analog, %s\n", long_label().c_str(),
 	    _sim->iteration_tag(), _sim->_time0, _failuremode.c_str());
       _oldgatemode = _gatemode;
       _gatemode = moANALOG;
-    }else{
+    }else{ untested();
     }
     assert(_gatemode == moANALOG);
   }else{
     assert(want_digital());
-    if (_gatemode == moANALOG) {
+    if (_gatemode == moANALOG) { untested();
       error(bTRACE, "%s:%u:%g switch to digital\n",
 	    long_label().c_str(), _sim->iteration_tag(), _sim->_time0);
       _oldgatemode = _gatemode;
@@ -550,7 +550,7 @@ void DEV_LOGIC::tr_accept()
 	}
       }else{
       }
-    }else{
+    }else{ untested();
     }
     n_(OUTNODE)->store_old_last_change_time();
     n_(OUTNODE)->store_old_lv(); // needed? yes
@@ -559,7 +559,7 @@ void DEV_LOGIC::tr_accept()
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::ac_iwant_matrix()
 {
-  if (subckt()) {
+  if (subckt()) { untested();
     subckt()->ac_iwant_matrix();
   }else{
   }
@@ -575,7 +575,7 @@ void DEV_LOGIC::ac_begin()
 }
 /*--------------------------------------------------------------------------*/
 double DEV_LOGIC::tr_probe_num(const std::string& what)const
-{
+{ untested();
   return n_(OUTNODE)->tr_probe_num(what);
 }
 /*--------------------------------------------------------------------------*/

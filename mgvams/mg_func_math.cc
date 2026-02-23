@@ -40,7 +40,7 @@ Base const* get_constant(Expression* E)
   if(dynamic_cast<Token_PARLIST*>(pl)){
     E->pop_back();
     assert(E->size());
-  }else{
+  }else{ untested();
     pl = nullptr;
   }
 
@@ -51,7 +51,7 @@ Base const* get_constant(Expression* E)
 
   if(pl){
     E->push_back(pl);
-  }else{
+  }else{ untested();
   }
 
   return p;
@@ -120,19 +120,19 @@ double get_double(Expression* E)
 /*--------------------------------------------------------------------------*/
 #if 0
 int get_int(Expression* E)
-{
+{ untested();
   Base const* b = get_constant(E);
   bool ok = false;
   int p;
-  if(auto f = dynamic_cast<Integer const*>(b)){
+  if(auto f = dynamic_cast<Integer const*>(b)){ untested();
     p = f->value();
     ok = true;
-  }else{
+  }else{ untested();
   }
 
-  if(ok){
+  if(ok){ untested();
     return p;
-  }else{
+  }else{ untested();
     throw Exception("not double\n");
   }
 }
@@ -149,7 +149,7 @@ void subs_double(Expression* E, double x)
     assert(dynamic_cast<Token_STOP const*>(E->back()));
     delete E->back();
     E->pop_back();
-  }else{
+  }else{ untested();
     assert(dynamic_cast<Token_CONSTANT const*>(E->back()));
     delete E->back();
     E->pop_back();
@@ -171,7 +171,7 @@ void subs_double2(Expression* E, double x)
     assert(dynamic_cast<Token_STOP const*>(E->back()));
     delete E->back();
     E->pop_back();
-  }else{
+  }else{ untested();
     assert(dynamic_cast<Token_CONSTANT const*>(E->back()));
     delete E->back();
     E->pop_back();
@@ -184,7 +184,7 @@ void subs_double2(Expression* E, double x)
 }
 /*--------------------------------------------------------------------------*/
 void subs_int(Expression* E, int x)
-{
+{ untested();
   assert(E->size());
   if(dynamic_cast<Token_PARLIST*>(E->back())) { untested();
     delete E->back();
@@ -194,7 +194,7 @@ void subs_int(Expression* E, int x)
     assert(dynamic_cast<Token_STOP const*>(E->back()));
     delete E->back();
     E->pop_back();
-  }else{
+  }else{ untested();
     assert(dynamic_cast<Token_CONSTANT const*>(E->back()));
     delete E->back();
     E->pop_back();
@@ -217,10 +217,10 @@ private:
       return "va::" + label();
     }
   }
-  void stack_op(Expression*)const override {
+  void stack_op(Expression*)const override { untested();
     throw Exception("invalid");
   }
-  void make_cc_common(std::ostream& o)const override {
+  void make_cc_common(std::ostream& o)const override { untested();
     o << "// dummy " << label() << "\n";
   }
 
@@ -254,7 +254,7 @@ public:
     Base const* x = get_constant(e);
     if(auto f = dynamic_cast<Float const*>(x)) { untested();
       subs_double(e, std::abs(f->value()));
-    }else if(auto i = dynamic_cast<Integer const*>(x)) {
+    }else if(auto i = dynamic_cast<Integer const*>(x)) { untested();
       subs_double(e, std::abs(i->value()));
     }else{
       throw Exception("invalid arg");
@@ -442,13 +442,13 @@ public:
     double x = get_double(e);
     subs_double(e, std::expm1(x));
   }
-  void make_cc_common(std::ostream& o)const override{
+  void make_cc_common(std::ostream& o)const override{ untested();
     declare_f1(o, code_name());
     o____ "::set_value(ret, std::expm1(double(d)));\n";
     o____ "return chain(ret, double(ret)+1.);\n";
     o__ "}\n";
   }
-  std::string code_name()const override{
+  std::string code_name()const override{ untested();
     return "_f_expm1";
   }
 } p_expm1;
@@ -572,7 +572,7 @@ public:
       throw Exception("invalid");
     }
   }
-  void make_cc_common(std::ostream& o)const override{
+  void make_cc_common(std::ostream& o)const override{ untested();
     o__ "template<class T, class S>\n";
     o__ "typename va::ddouble_if<T, S>::type\n";
     o__ "    " << code_name() << "(T d, S e)const {\n";
@@ -584,7 +584,7 @@ public:
     o____ "}\n";
     o__ "}\n";
   }
-  std::string code_name()const override{
+  std::string code_name()const override{ untested();
     return "_f_min";
   }
 } p_min;
@@ -692,7 +692,7 @@ public:
     double x = get_double(e);
     subs_double(e, std::log1p(x));
   }
-  void make_cc_common(std::ostream& o)const override {
+  void make_cc_common(std::ostream& o)const override { untested();
     declare_f1(o, code_name());
     o____ "double l=-1e99;\n";
     o____ "if(double(d)>-1.) {\n";
@@ -707,7 +707,7 @@ public:
     o____ "return ret;\n";
     o____ "}\n";
   }
-  std::string code_name()const override{
+  std::string code_name()const override{ untested();
     return "_f_ln1p";
   }
 } p_ln1p;

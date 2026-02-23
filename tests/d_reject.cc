@@ -78,9 +78,9 @@ private: // override virtual
 	  }
   }
   std::string param_name(int I, int J)const override { untested();
-	  if (J == 0) {
+	  if (J == 0) { untested();
 		  return param_name(I);
-	  }else{
+	  }else{ untested();
 		  return "";
 	  }
   }

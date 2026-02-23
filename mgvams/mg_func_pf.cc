@@ -39,17 +39,17 @@ void Module::install(FUNCTION_ const* f)
 /*--------------------------------------------------------------------------*/
 // BUG: don't use install
 bool Statement::propagate_rdeps(RDeps const& r)
-{
+{ untested();
   trace2("Statement::propagate_rdeps", typeid(*this).name(), r.size());
   assert(owner());
   auto s = prechecked_cast<Statement*>(owner_());
   assert(s);
   bool ret = false;
-  for(auto n : r) {
+  for(auto n : r) { untested();
     auto p = _rdeps.insert(n);
-    if(p.second){
+    if(p.second){ untested();
       ret = s->propagate_rdep(*p.first);
-    }else{
+    }else{ untested();
     }
   }
   return ret;
@@ -67,14 +67,14 @@ void Expression_::set_owner(Base* o)
 }
 /*--------------------------------------------------------------------------*/
 bool Statement::propagate_rdep(Base const* b)
-{
+{ untested();
   bool new_dep = _rdeps.insert(b).second;
   Base* o = owner_();
-  if(!new_dep){
-  }else if(auto s = dynamic_cast<Statement*>(o)){
+  if(!new_dep){ untested();
+  }else if(auto s = dynamic_cast<Statement*>(o)){ untested();
     s->propagate_rdep(b);
- // }else if(dynamic_cast<Module*>(o)){
- // }else if(is_file(o)) {
+ // }else if(dynamic_cast<Module*>(o)){ untested();
+ // }else if(is_file(o)) { untested();
   }else{ untested();
     unreachable();
   }

@@ -206,7 +206,7 @@ public:
     : Token_PROBE(name, b, tdata) {}
 
   Probe const* probe()const {incomplete(); return nullptr;}
-  std::string val_string()const override {
+  std::string val_string()const override { untested();
     return "F" + _branch->name();
   }
   bool is_pot_probe()const override {untested(); return true;}//...

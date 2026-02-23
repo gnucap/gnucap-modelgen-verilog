@@ -193,7 +193,7 @@ public:
     set_label("$warning");
   }
   std::string end()const override{return "\\n";}
-  WRITE* clone()const override {
+  WRITE* clone()const override { untested();
     incomplete(); // need stderr or error(bWARNING..)
     return new WARNING(*this);
   }
@@ -206,7 +206,7 @@ public:
     set_label("$error");
   }
   std::string end()const override{return "\\n";}
-  WRITE* clone()const override {
+  WRITE* clone()const override { untested();
     incomplete(); // need stderr or error(bDANGER..)
     return new ERROR(*this);
   }

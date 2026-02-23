@@ -32,13 +32,13 @@
 void Data_Type::parse(CS&) {unreachable();}
 void Data_Type::dump(std::ostream&)const {unreachable();}
 Data_Type const* MGVAMS_FUNCTION::return_type() const
-{
+{ untested();
   static Data_Type_Real r;
   return &r;
 }
 /*--------------------------------------------------------------------------*/
 bool Statement::propagate_rdep(Base const* )
-{
+{ untested();
   unreachable();
   incomplete();
   return false;

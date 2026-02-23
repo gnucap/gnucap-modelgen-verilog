@@ -51,7 +51,7 @@ class CMD_ : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST*)override {
     if(OPT::case_insensitive == 0){
-    }else{
+    }else{ untested();
       error(bWARNING, "running modelgen in insensitive mode\n");
     }
 

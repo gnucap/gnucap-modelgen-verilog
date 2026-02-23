@@ -247,9 +247,9 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
       o__ lhsname << " = t0.value(); // (s)\n";
     }else if(_mode==modeTR_ACCEPT){
       o__ lhsname << " = t0.value(); // (s)\n";
-    }else if(!options().optimize_deriv()) {
+    }else if(!options().optimize_deriv()) { untested();
       o__ lhsname << " = t0; // (*)\n";
-      for(Dep const& v : a.data().ddeps()) {
+      for(Dep const& v : a.data().ddeps()) { untested();
 	o__ "// " << a.lhs().code_name() << "[d" << code_name(v) << "] = " << "t0[d" << code_name(v) << "]; // (2a)\n";
 	o__ "assert(" << a.lhs().code_name() << "[d" << code_name(v) << "] == " << "t0[d" << code_name(v) << "]); // (2a2)\n";
       }
@@ -465,7 +465,7 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
   }else if(auto is=dynamic_cast<AnalogInitialStmt const*>(&ab)) {
     if(is_tr_initial()){
       make_initial(o, *is);
-    }else{
+    }else{ untested();
       o__ "// omit initial\n";
     }
   }else if(auto ct = dynamic_cast<AnalogCtrlStmt const*>(&ab)){
@@ -680,7 +680,7 @@ void OUT_ANALOG::make_initial(std::ostream& o, AnalogInitialStmt const& s) const
     o__ "{ // initial statement\n";
     make_ctrl(o, s.body());
     o__ "}\n";
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -843,7 +843,7 @@ void OUT_ANALOG::make_seq_block(std::ostream& o, AnalogSeqBlock const& s) const
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_construct(std::ostream& o, AnalogConstruct const& ab) const
 {
-  if(is_tr_initial()){
+  if(is_tr_initial()){ untested();
   }else{
   }
 
@@ -900,7 +900,7 @@ static void make_set_self_contribution(std::ostream& o, Dep const& d)
     o__ "}else{\n";
     o____ b->state() << "[0] -= " << b->state() << "[1] * " << code_name(d) << "; // (4)\n";
     o__ "}\n";
-  }else if(both && is_flow_probe(d)) {
+  }else if(both && is_flow_probe(d)) { untested();
     o__ "// self flow\n";
     o__ "if (_pot"<< b->code_name() << "){\n";
     o____ b->state() << "[0] -= " << b->state() << "[1] * " << code_name(d) << "; // (4)\n";
@@ -936,7 +936,7 @@ static void make_cc_set_state(std::ostream& o, Branch const& b, std::string cn)
       o__ b.state(cn) << "["
 	<< b.state() << "_::dep" << code_name(d)
 	<<"] *= " << branch(d)->code_name() <<"->_loss0;\n"; // maybe let src decide?
-    }else{
+    }else{ untested();
       o__ "// bogus probe " << b.state() << " : " << code_name(d) << "\n";
     }
     if(branch(d) == &b){
@@ -970,7 +970,7 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
       o__ "// same1 " << code_name(d) << "\n";
       if(b->has_pot_source() && b->has_flow_probe()){
 	if(br.num_states()<=2){
-	}else{
+	}else{ untested();
 	  incomplete(); // the other ones??
 	}
       }else{
@@ -1185,7 +1185,7 @@ void OUT_ANALOG::make_one_variable_load(std::ostream& o,
       incomplete();
       make_one_variable_proxy(o, V);
       o << V.code_name() << "(d);\n";
-    }else{
+    }else{ untested();
       make_one_variable_proxy(o, V);
       o << V.code_name() << "(d);\n";
     }
@@ -1498,7 +1498,7 @@ void make_cc_branch_ctrl(std::ostream& o, Branch const* br)
       o << ", ";
       make_node_ref(o, *branch(i)->n());
     }else if(is_flow_probe(i)){
-    }else{
+    }else{ untested();
       o << "/* nothing " << code_name(i) << " */";
     }
   }
@@ -1537,7 +1537,7 @@ std::string Probe::code_name() const
     return "_flow" + _br->code_name(); // BUG. named_branch.
   }else if (_type == t_pot){
     return "_potential" + _br->code_name();
-  }else{
+  }else{ untested();
     return("unreachable_probe"); // trace.
   }
 }

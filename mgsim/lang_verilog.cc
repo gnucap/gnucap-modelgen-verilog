@@ -124,8 +124,8 @@ static std::string parse_identifier(CS& cmd, std::string const& term);
 /*--------------------------------------------------------------------------*/
 #if 0
 void LANG_VERILOG::skip_attributes(CS& cmd)
-{
-  while (cmd >> "(*") {
+{ untested();
+  while (cmd >> "(*") { untested();
     cmd.skipto1('*') && (cmd >> "*)");
   }
 }
@@ -584,7 +584,7 @@ public:
     // return (p && _v == p->_v  &&  _s == p->_s);
     Base* eq = nullptr;
     bool ret = false;
-    if(!p || _s != p->_s) {
+    if(!p || _s != p->_s) { untested();
       return false;
     }else if(value()==nullptr && v.value()==nullptr) {
       return true;
@@ -716,7 +716,7 @@ void CMD_PARAM::parse(CS& cmd, PARAM_LIST* Scope) const
     }else if(cmd.match1('_')){ untested();
     }else if(cmd.match1('\\')){
       // escaped identifier
-    }else{
+    }else{ untested();
       break;
     }
     Name_String Name;

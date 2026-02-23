@@ -95,7 +95,7 @@ class LIMIT : public MGVAMS_TASK {
       o << ", double const&";
       if(num_args()==4){
 	o << " a" << i;
-      }else{
+      }else{ untested();
       }
     }
     o << "){\n";
@@ -116,7 +116,7 @@ class LIMIT : public MGVAMS_TASK {
       o________ "}\n";
       o________ "_old = old;\n";
 #if 0 // debug.
-    }else if(num_args()==3){
+    }else if(num_args()==3){ untested();
       o______ "}else if(what == \"fet_limit_vgs\") {\n"; // TODO.
       o________ "double old = in;\n";
       o________ "in.set_value(fet_limit_vgs(in, _old, a0));\n";
@@ -125,7 +125,7 @@ class LIMIT : public MGVAMS_TASK {
       o________ "}else{\n";
       o________ "}\n";
       o________ "_old = in;\n";
-    }else if(num_args()==2){
+    }else if(num_args()==2){ untested();
       o______ "}else if(what == \"fet_limit_vds\") {\n"; // TODO.
       o________ "double old = in;\n";
       o________ "in.set_value(fet_limit_vds(in, _old));\n";
@@ -135,7 +135,7 @@ class LIMIT : public MGVAMS_TASK {
       o________ "}\n";
       o________ "_old = old;\n";
 #endif
-    }else{
+    }else{ untested();
       incomplete();
     }
     o______ "}\n";

@@ -249,7 +249,7 @@ std::string COMMON_TRANSLINE::param_name(int I, int j)const
     switch (I) {
     default: return "";
     }
-  }else{
+  }else{ untested();
     return COMMON_COMPONENT::param_name(I, j);
   }
   //BUG// does not print IC
@@ -455,7 +455,7 @@ void DEV_TRANSLINE::do_ac()
   double lenth = _sim->_freq * c->real_td * 4;  /* length in quarter waves */
 
   double dif = lenth - floor(lenth+.5);	/* avoid divide by zero if close to */
-  if (std::abs(dif) < LINLENTOL) {	/* resonance by tweeking a little */
+  if (std::abs(dif) < LINLENTOL) {untested();	/* resonance by tweeking a little */
     error(bDEBUG,
 	  long_label() + ": transmission line too close to resonance\n");
     lenth = (dif<0.) ? floor(lenth+.5)-LINLENTOL : floor(lenth+.5)+LINLENTOL;
