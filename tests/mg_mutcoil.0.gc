@@ -1,0 +1,56 @@
+verilog
+// Mutual inductance test circuit
+
+attach ./modelgen_1.so
+
+`modelgen
+module test_cpl0(a, ref, b);
+	inout a, ref, b;
+	electrical a, ref, b, i;
+
+	parameter real la = 1. from [0.:inf);
+	parameter real lb = 1. from [0.:inf);
+	parameter real k = 1. from [0.:1.];
+
+	localparam real m = k * sqrt(la*lb);
+
+	analog begin
+		I(a,i) <+ idt(V(a,i)) / (la-m);
+		I(b,i) <+ idt(V(b,i)) / (lb-m);
+		I(ref,i) <+ idt(V(ref,i)) / m;
+
+	end
+endmodule
+`endmodelgen
+
+!make test_cpl0.so > /dev/null
+load ./test_cpl0.so
+
+
+parameter real k = .75
+test_cpl0 #(.la(.56) .lb(.79) .k(k)) dut(b, \0 , c);
+
+spice
+v1 a 0  pulse(0 1 .002 .002 .002 .002 .01) ac 1
+r1a a b 22
+r1b c 0 75
+
+
+v1 1 0  pulse(0 1 .002 .002 .002 .002 .01) ac 1
+r1a 1 2 22
+l1a 2 0 .56
+l1b 3 0 .79
+k1 l1a l1b {k}
+r1b 3 0 75
+
+.print tran v(1) v(a) v(2) v(b) v(c)
+.tran 0.01 basic
+
+.parameter k=.9
+.tran 0 0.01 basic
+
+.print ac v(1) v(a) v(2) v(b)
+.ac dec 2 .1 1k
+
+.status notime
+.end

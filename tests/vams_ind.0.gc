@@ -6,14 +6,14 @@ attach ../vams/inductor.so
 
 verilog
 
-module main(1 2 ref)
-parameter p=1;
-// inductor #(.l(p)) L3(1  \2 ); // default plugin
-inductor  #(.l(p) .$mfactor(1)) L3(1,  \2 );
-resistor  #(.r(p)) r2( 2  ref);
+module main(\1 , \2 , ref)
+  parameter p=1;
+  // inductor #(.l(p)) L3(\1 , \2 ); // default plugin
+  inductor  #(.which("vams"), .l(p) .$mfactor(1)) L3(\1 , \2 );
+  resistor  #(.r(p)) r2(\2 , ref);
 endmodule
 
-main m(1 2 0)
+main m(\1 , \2 , \0 );
 
 spice
 V1   1  0  sin a=1 f=1 ac 1

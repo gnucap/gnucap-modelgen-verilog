@@ -6,6 +6,7 @@ module inductor(p,n);
 	electrical p,n;
 
 	parameter real l = 1. from [0.:inf);
+	parameter string which = "vams" from '{"vams"};
 
 	analog begin
 		I(p,n) <+ idt(V(p,n)) / l;
