@@ -1035,7 +1035,7 @@ static void make_cc_set_branch_contributions(std::ostream& o, const Module& m)
     }else if(b->has_flow_probe()) {
       o__ "// flow prb " << b->name() << "\n";
       o__ "if(" << b->code_name() << "){\n";
-      o____ b->code_name() << "->_loss0 = 1./OPT::shortckt; // (L0)\n";
+      o____ "set_pot_source(" << b->code_name() << "); // (L0)\n";
       o__ "}else{\n";
       o__ "}\n";
     }else{
@@ -1046,9 +1046,9 @@ static void make_cc_set_branch_contributions(std::ostream& o, const Module& m)
       o__ "// pot src " << b->name() << "\n";
       o__ "if(!" << b->code_name() << "){\n";
       o__ "}else if(_pot" << b->code_name() << "){\n";
-      o____ b->code_name() << "->_loss0 = 1./OPT::shortckt;\n";
+      o____ "set_pot_source(" << b->code_name() << "); // AA\n";
       o__ "}else{\n";
-      o____ b->code_name() << "->_loss0 = 0.; // AA\n";
+      o____ "unset_pot_source(" << b->code_name() << "); // AA\n";
       o__ "}\n";
 
 

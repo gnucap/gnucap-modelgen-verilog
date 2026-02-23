@@ -54,6 +54,15 @@ protected: // override virtual
     return bool(_loss0); // HACK.
   }
 
+  void set_param_by_index(int i, std::string&, int j)override {
+    assert(i==123457);
+    if(j){
+      _loss0 = 1.;
+    }else{
+      _loss0 = 0.;
+    }
+  }
+
   double   tr_involts()const override	{ untested();unreachable(); return NOT_VALID;}
   double   tr_involts_limited()const override { untested();unreachable(); return NOT_VALID;}
   double   tr_amps()const override;
@@ -67,6 +76,7 @@ protected: // override virtual
   }
 
   bool has_iv_probe()const override{ untested();incomplete(); return false;}
+  bool has_inode()const override{ untested();incomplete(); return true;}
   void expand()override;
  // void expand_last()override{assert(0);}
 

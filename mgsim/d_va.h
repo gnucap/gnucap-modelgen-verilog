@@ -97,6 +97,14 @@ protected: // override virtual
     ELEMENT::set_port_by_index(i, s);
   }
 #endif
+  void set_param_by_index(int i, std::string&, int j)override {
+    assert(i==123457);
+    if(j){
+      _loss0 = 1./OPT::shortckt;
+    }else{
+      _loss0 = 0.;
+    }
+  }
 private:
   int first_current_port()const { return (_n_ports - _n_current_inputs)*2; }
   int last_current_port()const { return 2*_n_ports - _n_current_inputs; }
