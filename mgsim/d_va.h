@@ -71,7 +71,6 @@ protected: // override virtual
   int	   min_nodes()const override	{return net_nodes();}
   int	   matrix_nodes()const override	{ return ext_nodes() + int_nodes();}
   int	   net_nodes()const override	{return _net_nodes;}
-  int	   net_nodes_()const	{return _n_ports*2 - _n_current_inputs;}
   CARD*	   clone()const override	{ untested();return new DEV_CPOLY_G(*this);}
   void	   tr_iwant_matrix()override	{tr_iwant_matrix_shunt(); tr_iwant_matrix_control();}
   bool	   do_tr()override;
@@ -184,11 +183,11 @@ void DEV_CPOLY_G::expand_last()
 {
   int k = _n_current_inputs;
   std::vector<std::string> current_port_names(k);
+  int  net_nodes_ =  _n_ports*2 - _n_current_inputs;
   while(k--){
-    assert(net_nodes_()-k-1 < matrix_nodes());
-    assert(root(&n_(net_nodes_()-k-1)));
-  //  assert(_current_port_names[k] == root(&n_(net_nodes_()-k-1))->short_label());
-    current_port_names[k] = root(&n_(net_nodes_()-k-1))->short_label();
+    assert(net_nodes_-k-1 < matrix_nodes());
+    assert(root(&n_(net_nodes_-k-1)));
+    current_port_names[k] = root(&n_(net_nodes_-k-1))->short_label();
   }
   // squeeze in current ports.
   for(int i=0; i<_n_current_inputs; ++i) { untested();
