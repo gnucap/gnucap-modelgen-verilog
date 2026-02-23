@@ -25,11 +25,16 @@
 namespace {
 /*--------------------------------------------------------------------------*/
 class VAPOT : public DEV_CPOLY_G {
+  double*  _m0_{nullptr};
+  double*  _m1_{nullptr};
 protected:
   explicit VAPOT(const VAPOT& p) : DEV_CPOLY_G(p) {}
 public:
   explicit VAPOT() : DEV_CPOLY_G() {}
-  ~VAPOT() {}
+  ~VAPOT() {
+    delete [] _m0_;
+    delete [] _m1_;
+  }
 protected: // override virtual
   CARD*	   clone()const override	{return new VAPOT(*this);}
  // void	   tr_iwant_matrix()override// CPOLY
@@ -48,6 +53,24 @@ protected: // override virtual
   COMPLEX  ac_amps()const override	{itested(); return NOT_VALID;}
 
   bool has_iv_probe()const override{return true;}
+public:
+  void set_parameters(const std::string& Label, CARD* Parent,
+                     COMMON_COMPONENT* Common, double Value,
+                     int n_states, double state[],
+                     int node_count, const node_t nodes[])override {
+    DEV_CPOLY_G::set_parameters(Label, Parent, Common, Value,
+	n_states, state, node_count, nodes);
+    if(_sim->is_first_expand()){
+      assert(n_states > 1);
+      _m0_ = new double[n_states-2];
+#ifndef NDEBUG
+      std::fill_n(_m0_, n_states-2, 0.);
+#endif
+      _m1_ = new double[n_states-2];
+      std::fill_n(_m1_, _n_ports-1, 0.);
+    }
+  }
+/*--------------------------------------------------------------------------*/
 protected:
   double abstol() const{
     auto cv = prechecked_cast<COMMON_VASRC const*>(common());
@@ -212,7 +235,6 @@ void VAPOT::ac_load()
     }
   }
 }
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 DISPATCHER<CARD>::INSTALL d2(&device_dispatcher, "va_sw", &d);
 }

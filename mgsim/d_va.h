@@ -39,8 +39,6 @@ class DEV_CPOLY_G : public ELEMENT {
 protected:
   double*  _values{nullptr};
   double*  _old_values{nullptr};
-  double*  _m0_{nullptr};
-  double*  _m1_{nullptr};
   int	   _n_ports{0};
   double   _time;
   node_t*  _nN{nullptr};
@@ -217,8 +215,6 @@ void DEV_CPOLY_G::expand_current_port(int i)
 DEV_CPOLY_G::~DEV_CPOLY_G()
 {
   delete [] _old_values;
-  delete [] _m0_;
-  delete [] _m1_;
   if (net_nodes() > NODES_PER_BRANCH) {
     delete [] _nN;
   }else{
@@ -337,13 +333,6 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
 
     assert(!_old_values);
     _old_values = new double[n_states];
-    assert(n_states > 1);
-    _m0_ = new double[n_states-2];
-#ifndef NDEBUG
-    std::fill_n(_m0_, n_states-2, 0.);
-#endif
-    _m1_ = new double[n_states-2];
-    std::fill_n(_m1_, _n_ports-1, 0.);
 
     if (matrix_nodes() > NODES_PER_BRANCH) {
       // allocate a bigger node list
