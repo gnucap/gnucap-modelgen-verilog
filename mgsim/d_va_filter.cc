@@ -487,7 +487,7 @@ bool DEV_DDT::do_tr()
 	q = true;
 	continue;
       }else if(_input[k]->has_inode()){
-	incomplete();
+	// incomplete();
       }
       // _m0.c0 += _y[0].f1 * _input->_m0.c0;
       // _m0.c1  = _y[0].f1 * (_input->_loss0 + _input->_m0.c1);

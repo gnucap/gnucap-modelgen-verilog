@@ -3,7 +3,7 @@ verilog
 attach ./modelgen_1.so
 
 `modelgen
-module test_coil0d(p, n);
+module test_coil0e(p, n);
   inout p, n;
   electrical p, n;
   branch (p, n) br;
@@ -12,25 +12,26 @@ module test_coil0d(p, n);
 
   real flux = 0;
   real volt = 0;
+  real req = 0;
 
   analog begin
     flux = l * I(br);
     if(0) $debug("flux %g\n", flux);
     volt = ddt(flux);
-    V(br) <+ volt;
+    V(br) <+ volt + req*I(br);
   end
 endmodule
 `endmodelgen
 
-!make test_coil0d.so > /dev/null
-load ./test_coil0d.so
+!make test_coil0e.so > /dev/null
+load ./test_coil0e.so
 
 * options noincmode
 * options method=euler
 
 module main(\1 , \2 , ref)
   parameter p=1;
-  test_coil0d #(.l(p)) l1(\1 , \2 );
+  test_coil0e #(.l(p)) l1(\1 , \2 );
   resistor  #(.r(p)) r2(\2 , ref);
 endmodule
 

@@ -104,6 +104,7 @@ void VA_BREQN::expand()
   }
   assert(BR());
   if (_sim->is_first_expand()) {
+    n_(BR()) = node_t(); // knock out possible net_node
     n_(BR()).new_model_node( long_label() + ".br", this);
     assert(BR() < int_nodes()+ext_nodes());
   }else{ untested();
@@ -186,7 +187,12 @@ bool VA_BREQN::do_tr()
        // possibly incomplete();
     }else{
     }
-    _m0 = CPOLY1(0., _values[0], _values[1]);
+    if(p0_is_cc()){
+      incomplete();
+      _m0 = CPOLY1(0., _values[0], 0.);
+    }else{
+      _m0 = CPOLY1(0., _values[0], _values[1]);
+    }
   }
   return do_tr_con_chk_and_q();
 }
@@ -229,26 +235,27 @@ void VA_BREQN::tr_load()
   }
   tr_load_ones();
 
+  int vv = 1;
+  trace2("VA_BREQN::tr_load vs", is_vs(),_values[0]);
   tr_load_source_point(n_(BR()), &_values[0], &_old_values[0]);
-  if(_n_current_inputs){
-    incomplete();
+  if(!_n_current_inputs){
+  }else if(_n_current_inputs == 1){
+    if(p0_is_cc()){
+      vv = 2;
+      if(_values[1]){
+	incomplete();
+      }else{
+      }
+    }else{
+      vv = 1; // really?
+    }
   }else{
+    incomplete();
   }
 
-  if(is_vs()){
-    // is_voltage_source
-    trace1("VA_BREQN::tr_load vs", _values[0]);
-
-    for (int i=1; i<=_n_ports; ++i) {
-      trace2("VA_BREQN::tr_load vs", i, _values[i]);
-      tr_load_extended(gnd, n_(BR()), n_(2*i-2), n_(2*i-1), &(_values[i]), &(_old_values[i]));
-    }
-  }else{
-    trace2("VA_BREQN::tr_load I", _values[0], _values[1]);
-
-    for (int i=1; i<=_n_ports; ++i) {
-      tr_load_extended(gnd, n_(BR()), n_(2*i-2), n_(2*i-1), &(_values[i]), &(_old_values[i]));
-    }
+  for (int i=vv; i<_n_ports + 1; ++i) {
+    trace5("VA_BREQN::tr_load vs", i, vv, _n_ports, matrix_nodes(), _values[i]);
+    tr_load_extended(gnd, n_(BR()), n_(2*i-2), n_(2*i-1), &(_values[i]), &(_old_values[i]));
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -318,7 +325,7 @@ void VA_BREQN::ac_load()
       ac_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), _values[i]);
     }
   }
-  if(_n_current_inputs){ untested();
+  if(_n_current_inputs){
     incomplete();
   }else{
   }
