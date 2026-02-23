@@ -70,12 +70,6 @@ protected: // override virtual
   void expand()override;
  // void expand_last()override{assert(0);}
 
-public:
-  void set_parameters(const std::string& Label, CARD* Parent,
-		      COMMON_COMPONENT* Common, double Value,
-		      int state_count, double state[],
-		      int node_count, const node_t nodes[])override;
-  //		      const double* inputs[]=0);
 protected:
   double abstol() const{
     auto cv = prechecked_cast<COMMON_VASRC const*>(common());
@@ -178,6 +172,10 @@ bool VA_BREQN::do_tr()
     _m0.c1 = 0; // -_loss0 * _values[1];
   }else{
     // current source.
+    if(_values[0] || _values[1]){ untested();
+       // possibly incomplete();
+    }else{
+    }
     _m0 = CPOLY1(0., _values[0], _values[1]);
   }
   return do_tr_con_chk_and_q();
@@ -317,52 +315,6 @@ void VA_BREQN::ac_load()
   _acg = _values[1];
 //  ac_load_passive();
 
-}
-/*--------------------------------------------------------------------------*/
-/* set: set parameters, used in model building
- */
-void VA_BREQN::set_parameters(const std::string& Label, CARD *Owner,
-				 COMMON_COMPONENT *Common, double Value,
-				 int n_states, double states[],
-				 int n_nodes, const node_t nodes[])
-  //				 const double* inputs[])
-{
-  bool first_time = (net_nodes() == 0);
-
-  set_label(Label);
-  trace3("VA_BREQN::set_parameters", short_label(), n_nodes, n_states);
-  set_owner(Owner);
-  set_value(Value);
-  attach_common(Common);
-  _current_port_names.resize(n_states - 1 - n_nodes/2);
-  _input.resize(n_states - 1 - n_nodes/2);
-
-  if (first_time) {
-    _n_ports = n_states-1; // set net_nodes
-    assert(size_t(_n_ports) == n_nodes/2 + _current_port_names.size());
-
-    assert(!_old_values);
-    _old_values = new double[n_states];
-
-    if (matrix_nodes() > NODES_PER_BRANCH) {
-      // allocate a bigger node list
-      _nN = new node_t[matrix_nodes()];
-    }else{
-      // use the default node list, already set
-    }      
-  }else{
-    assert(_n_ports == n_states-1);
-    assert(_old_values);
-    assert(net_nodes() == n_nodes);
-    // assert could fail if changing the number of nodes after a run
-  }
-
-  _values = states;
-  std::fill_n(_values, n_states, 0.);
-  std::fill_n(_old_values, n_states, 0.);
-  assert(n_nodes <= net_nodes());
-  notstd::copy_n(nodes, n_nodes, _nN); // copy more in expand_last
-  assert(ext_nodes() == _n_ports * 2);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

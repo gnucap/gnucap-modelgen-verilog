@@ -1513,7 +1513,7 @@ void make_cc_current_ports(std::ostream& o, Branch const* br, Element_2 const& e
     }else if(branch(i) == br){
       // self control is current
       o______ "{\n";
-      o________ "std::string tmp = \"\";"; // BUG: passing ref.
+      o________ "std::string tmp = \"" << branch(i)->code_name() << "\";"; // BUG: passing ref.
       o________ e.code_name() << "->set_port_by_index(-1,tmp);\n";
       o______ "}\n";
     }else if(branch(i)){

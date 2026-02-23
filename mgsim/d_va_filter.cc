@@ -845,7 +845,10 @@ void DEV_CPOLY_CAP::expand_current_port(int i)
 {
   std::string const& input_label = _current_port_names[i];
   ELEMENT const*& input = _input[i];
-//  node_t* n = _n + net_nodes() + 2*(i-_input.size()) - IN1;
+
+  int in1 = ext_nodes() - 2*int(_current_port_names.size()) + 2*i;
+  // int in1 = first_current_port() + 2*i;
+  int in2 = in1 + 1;
 
   assert (input_label != "");
   CARD const* e = find_in_my_scope(input_label);
@@ -859,14 +862,11 @@ void DEV_CPOLY_CAP::expand_current_port(int i)
     throw Exception(long_label() + ": " + input_label
 		    + " has a subckt, cannot be used as current probe");
   }else if (input->has_inode()) {untested();
-    incomplete(); // wrong N1
-    n_(IN1) = input->n_(IN1);
-    n_(IN2).set_to_ground(nullptr);
+    n_(in1) = input->n_(input()->ext_nodes());
+    n_(in2).set_to_ground(nullptr);
   }else if (input->has_iv_probe()) {
-    int IN1 = ext_nodes() - 2*int(_current_port_names.size()) + 2*i;
-    trace4("flow ecp", i, IN1, ext_nodes(), _current_port_names.size());
-    n_(IN1) = input->n_(OUT1);
-    n_(IN1+1) = input->n_(OUT2);
+    n_(in1) = input->n_(OUT1);
+    n_(in2) = input->n_(OUT2);
   }else{ untested();
     throw Exception(long_label() + ": " + input_label + " cannot be used as current probe");
   }

@@ -48,12 +48,6 @@ protected: // override virtual
 
   bool has_iv_probe()const override { untested();return true;}
 
-public:
-  void set_parameters(const std::string& Label, CARD* Parent,
-		      COMMON_COMPONENT* Common, double Value,
-		      int state_count, double state[],
-		      int node_count, const node_t nodes[])override;
-  //		      const double* inputs[]=0);
 protected:
   double abstol() const{ untested();
     auto cv = prechecked_cast<COMMON_VASRC const*>(common());
@@ -129,51 +123,6 @@ void VAFLOW::ac_load()
   }
 }
 /*--------------------------------------------------------------------------*/
-/* set: set parameters, used in model building
- */
-void VAFLOW::set_parameters(const std::string& Label, CARD *Owner,
-				 COMMON_COMPONENT *Common, double Value,
-				 int n_states, double states[],
-				 int n_nodes, const node_t nodes[])
-  //				 const double* inputs[])
-{
-  bool first_time = (net_nodes() == 0);
-
-  set_label(Label);
-  set_owner(Owner);
-  set_value(Value);
-  attach_common(Common);
-
-  if (first_time) {
-    _current_port_names.resize(n_states - 1 - n_nodes/2);
-    _input.resize(n_states - 1 - n_nodes/2);
-    _n_ports = n_states-1; // set net_nodes
-    assert(size_t(_n_ports) == n_nodes/2 + _current_port_names.size());
-
-    assert(!_old_values);
-    _old_values = new double[n_states];
-
-    if (net_nodes() > NODES_PER_BRANCH) {
-      // allocate a bigger node list
-      _nN = new node_t[ext_nodes()];
-    }else{
-      // use the default node list, already set
-    }      
-  }else{
-    assert(_n_ports == n_states-1);
-    assert(_old_values);
-    assert(int(_input.size()) == n_states - 1 - n_nodes/2);
-    // assert could fail if changing the number of nodes after a run
-  }
-
-  _values = states;
-  std::fill_n(_values, n_states, 0.);
-  std::fill_n(_old_values, n_states, 0.);
-  assert(n_nodes <= net_nodes());
-  notstd::copy_n(nodes, n_nodes, _nN); // copy more in expand_last
-  assert(ext_nodes() == _n_ports * 2); // c.f. e_ccsrc.h
-}
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class DEV_FPOLY_G : public VAFLOW {
 private:
@@ -182,7 +131,7 @@ private:
 public:
   explicit DEV_FPOLY_G() :VAFLOW() {}
 private: // override virtual
-  char	   id_letter()const override { untested();unreachable(); return '\0';}
+  char	   id_letter()const override {unreachable(); return '\0';}
   std::string dev_type()const override { untested();unreachable(); return "va_fpoly_g";}
   CARD*	   clone()const override { return new DEV_FPOLY_G(*this);}
   bool	   do_tr() override;
