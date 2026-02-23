@@ -1700,7 +1700,7 @@ std::string Branch::dev_type()const
     }else if(has_pot_source()){
       for(auto const& i : _used_in){
 	if(i == this){ untested();
-	}else if(dynamic_cast<Branch const*>(i)){ untested();
+	}else if(dynamic_cast<Branch const*>(i)){
 	  return "va_pot_br"; // ind.
 	}else if(dynamic_cast<Probe const*>(i)){ untested();
 	}else{

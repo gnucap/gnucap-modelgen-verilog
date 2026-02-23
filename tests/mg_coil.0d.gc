@@ -1,0 +1,50 @@
+verilog
+
+attach ./modelgen_1.so
+
+`modelgen
+module test_indvadist(p, n);
+  inout p, n;
+  electrical p, n;
+  branch (p, n) br;
+
+  parameter real l=0;
+
+  real flux = 0;
+  real volt = 0;
+
+  analog begin
+    flux = l * I(br);
+    if(0) $debug("flux %g\n", flux);
+    volt = ddt(flux);
+    V(br) <+ volt;
+  end
+endmodule
+`endmodelgen
+
+!make test_indvadist.so > /dev/null
+load ./test_indvadist.so
+
+* options noincmode
+* options method=euler
+
+module main(\1 , \2 , ref)
+  parameter p=1;
+  test_indvadist #(.l(p)) l1(\1 , \2 );
+  resistor  #(.r(p)) r2(\2 , ref);
+endmodule
+
+main m(\1 , \2 , \0 );
+
+spice
+V1   1  0  sin a=1 f=1 ac 1
+.parameter p=.01
+
+.print tran v(nodes)
+.tran 1 trace=a basic
+
+.print ac v(nodes)
+.ac .1 100 * 10
+
+
+.status notime

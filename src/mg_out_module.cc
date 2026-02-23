@@ -1010,7 +1010,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
       o______ "}\n";
     }
 
-    if (br && br->is_filter()) { untested();
+    if (br && br->is_filter()) {
       make_cc_current_ports(o, br, e);
     }else{
     }
