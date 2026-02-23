@@ -197,14 +197,14 @@ double VAPOT::tr_amps()const
     // amps = _m0.c0 + _m0.c1 * tr_outvolts();
     amps = fixzero((_m0.c1 * tr_involts() + _m0.c0), _m0.c0);
   }
-  trace3("VAPOT::tr_amps self", tr_outvolts(), _loss0, amps);
+  trace4("VAPOT::tr_amps self", tr_outvolts(), _loss0, _input.size(), _p0_is_cc);
 
   int i=2;
-  for (; i<=int(_n_ports - _input.size()); ++i) {
+  for (; i<=int(_n_ports - _input.size() + _p0_is_cc); ++i) {
     trace3("VAPOT::tr_amps", tr_outvolts(), _loss0, _m0_[i-2]);
     amps += dn_diff(n_(2*i-2).v0(), n_(2*i-1).v0()) * _m0_[i-2];
   }
-  trace3("VAPOT::tr_amps h", tr_outvolts(), _loss0, amps);
+  trace4("VAPOT::tr_amps h", tr_outvolts(), _loss0, amps, _n_ports);
   for (; i<=_n_ports; ++i) { untested();
     assert(0); // later.
     int k = i-int(_n_ports - _input.size() + 1);
