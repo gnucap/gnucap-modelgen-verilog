@@ -900,7 +900,7 @@ static void make_set_self_contribution(std::ostream& o, Dep const& d)
     o__ "}else{\n";
     o____ b->state() << "[0] -= " << b->state() << "[1] * " << code_name(d) << "; // (4)\n";
     o__ "}\n";
-  }else if(both && is_flow_probe(d)) { untested();
+  }else if(both && is_flow_probe(d)) {
     o__ "// self flow\n";
     o__ "if (_pot"<< b->code_name() << "){\n";
     o____ b->state() << "[0] -= " << b->state() << "[1] * " << code_name(d) << "; // (4)\n";
@@ -970,7 +970,7 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
       o__ "// same1 " << code_name(d) << "\n";
       if(b->has_pot_source() && b->has_flow_probe()){
 	if(br.num_states()<=2){
-	}else{ untested();
+	}else{
 	  incomplete(); // the other ones??
 	}
       }else{
@@ -1666,6 +1666,17 @@ void make_cc_analog_list(std::ostream& o, const Module& m, Branch const*
 }
 /*--------------------------------------------------------------------------*/
 // BUG: free
+bool Branch::is_self_only() const
+{
+  if(deps().ddeps().size()==1){
+    Branch const* p = branch(deps().ddeps()[0]);
+    return p == this;
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+// BUG: free
 std::string Branch::dev_type()const
 {
 //  if( .. attribute .. )?
@@ -1679,8 +1690,34 @@ std::string Branch::dev_type()const
     }else{ untested();
       return "incomplete_dev_type";
     }
+  }else if(has_flow_source() && has_pot_source()){
+    return "va_sw"; // dio?
   }else if(has_flow_probe()) {
-    return "va_sw"; // ?
+    if(deps().ddeps().size() == 0){
+      return "va_sw"; // ?
+    }else if(is_self_only()){
+      return "va_sw"; // ?
+    }else if(has_pot_source()){
+      for(auto const& i : _used_in){
+	if(i == this){ untested();
+	}else if(dynamic_cast<Branch const*>(i)){ untested();
+	  return "va_pot_br"; // ind.
+	}else if(dynamic_cast<Probe const*>(i)){ untested();
+	}else{
+	}
+      }
+      for(auto const& i : deps().ddeps()){
+	if(branch(i) != this){
+	  return "va_sw"; // vsine?
+	}else{ untested();
+	}
+      }
+      { untested();
+        return "va_sw"; // vsine?
+      }
+    }else{
+      return "va_sw"; // ?
+    }
   }else if(has_pot_source()){
     if(_selfdep){
       return "va_pot_br";

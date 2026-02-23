@@ -75,8 +75,8 @@ protected: // override virtual
     assert(_nN); assert(i>=0); assert(i<matrix_nodes()); return _nN[i];
   }
 
-  bool has_iv_probe()const override{ untested();incomplete(); return false;}
-  bool has_inode()const override{ untested();incomplete(); return true;}
+  bool has_iv_probe()const override{return false;}
+  bool has_inode()const override{return true;}
   void expand()override;
  // void expand_last()override{assert(0);}
 
@@ -253,7 +253,7 @@ void VA_BREQN::tr_load()
 }
 /*--------------------------------------------------------------------------*/
 double VA_BREQN::tr_amps()const
-{ untested();
+{
   return n_(BR()).v0();
 }
 /*--------------------------------------------------------------------------*/

@@ -36,7 +36,7 @@ static bool is_zero(Token const* t)
     return f->value() == 0.;
   }else if(Integer const* ii = dynamic_cast<const Integer*>(t->data())){ untested();
     return ii->value() == 0;
-  }else{ untested();
+  }else{
     return false;
   }
 }
