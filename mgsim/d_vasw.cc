@@ -121,16 +121,15 @@ bool VAPOT::do_tr()
     for (int i=2; i<=_n_ports; ++i) {
       _m0_[i-2] = _values[i];
     }
-  }else if(_self_is_current && fabs(_values[1]) > OPT::shortckt){
+  }else if(p0_is_cc() && (fabs(_values[1]) > OPT::shortckt)){
     // loss but switch to CS mode.
     // V(br) <+ f(I(br) ...) = v0 + I * v1
     _loss0 = 0.;
-    double amps = tr_amps();
+//    double amps = tr_amps();
 
     _m0.x = tr_involts_limited(); // like d_admit...?
     _m0.c1 = 1./_values[1];
     _m0.c0 = - _values[0] * _m0.c1;
-    trace7("do_tr", long_label(), _self_is_current, _loss0, _values[0], _values[1], tr_amps(), amps);
 
      // _values[1] = _m0.c1;
     for (int i=2; i<=_n_ports; ++i) {
@@ -145,7 +144,6 @@ bool VAPOT::do_tr()
     // _m0.c0 = -_loss0 * _y[0].f1; // d_vs.
     _m0.c0 = -_loss0 * _values[0];
     _m0.c1 = 0.; // really?
-    trace4("do_tr", long_label(), _self_is_current, _loss0, tr_amps());
     assert(_m0.c1 == 0.); // d_vs
   }
   return do_tr_con_chk_and_q();
@@ -163,7 +161,7 @@ void VAPOT::tr_load()
     }
 
     tr_load_passive();
-  }else if(_self_is_current && fabs(_values[1]) > OPT::shortckt){ untested();
+  }else if(p0_is_cc() && fabs(_values[1]) > OPT::shortckt){ untested();
     // loss but CS mode.
     //
     if(_loss1){ untested();
@@ -221,7 +219,7 @@ void VAPOT::ac_load()
     ac_load_shunt(); // 4 pt +- loss
   }else{
   }
-  if(_n_current_inputs){ untested();
+  if(_n_current_inputs){
     incomplete();
   }else{
   }

@@ -117,7 +117,6 @@ bool VAPOT::do_tr_con_chk_and_q()
 /*--------------------------------------------------------------------------*/
 bool VAPOT::do_tr()
 {
-  trace6("VAPOT::do_tr", long_label(), _self_is_current, _loss0, _values[0], _values[1], tr_amps());
   assert(_values);
 
   assert(_loss0);
@@ -131,7 +130,7 @@ bool VAPOT::do_tr()
     assert(_m0.c1 == 0.); // d_vs
   }else
 #endif
-  if(_self_is_current && fabs(_values[1]) > OPT::shortckt){ untested();
+  if(p0_is_cc() && fabs(_values[1]) > OPT::shortckt){ untested();
     _loss0 = 0.;
     // loss but switch to CS mode.
     // V(br) <+ f(I(br) ...)
@@ -174,7 +173,7 @@ void VAPOT::tr_load()
     }
 
     tr_load_passive();
-  }else if(_self_is_current && fabs(_values[1]) > OPT::shortckt){ untested();
+  }else if(p0_is_cc() && fabs(_values[1]) > OPT::shortckt){ untested();
     assert(!_loss0);
     // loss but CS mode.
     //

@@ -55,7 +55,6 @@ protected: // possibly defer to specialisation
 #ifndef NDEBUG
   int _reason{0};
 #endif
-  bool _self_is_current{false};
   bool _p0_is_cc{false};
 protected:
   explicit DEV_CPOLY_G(const DEV_CPOLY_G& p);
@@ -71,6 +70,7 @@ protected: // override virtual
   int	   min_nodes()const override	{return net_nodes();}
   int	   matrix_nodes()const override	{ return ext_nodes() + int_nodes();}
   int	   net_nodes()const override	{return _net_nodes;}
+  bool     p0_is_cc()const		{return _p0_is_cc;}
   CARD*	   clone()const override	{ untested();return new DEV_CPOLY_G(*this);}
   void	   tr_iwant_matrix()override	{tr_iwant_matrix_shunt(); tr_iwant_matrix_control();}
   bool	   do_tr()override;
@@ -92,13 +92,11 @@ protected: // override virtual
   void expand_last()override;
   void expand_current_port(int i, std::string n);
 
+#ifdef DTRACE_UNTESTED
   void set_port_by_index(int i, /*const*/ std::string& s) override {
-    if(i>=0){ untested();
-      ELEMENT::set_port_by_index(i, s);
-    }else{
-      obsolete_set_current_port_by_index(-i-1, s);
-    }
+    ELEMENT::set_port_by_index(i, s);
   }
+#endif
 private:
   int first_current_port()const { return (_n_ports - _n_current_inputs)*2; }
   int last_current_port()const { return 2*_n_ports - _n_current_inputs; }
@@ -109,16 +107,6 @@ private:
       return true; // no names set // BUG.
     }else{ untested();
       return false;
-    }
-  }
-  void obsolete_set_current_port_by_index(int i, const std::string& s) {
-    if(i==0){
-      assert(s==short_label());
-      _self_is_current = true;
-    }else if(i<=_n_current_inputs){
-      //_current_port_names[i-1] = s;
-    }else{ untested();
-//      throw Exception_Too_Many(i, int(_current_port_names.size()), 0);
     }
   }
   std::string port_name(int)const override {untested();
@@ -190,7 +178,7 @@ void DEV_CPOLY_G::expand_last()
     current_port_names[k] = root(&n_(net_nodes_-k-1))->short_label();
   }
   // squeeze in current ports.
-  for(int i=0; i<_n_current_inputs; ++i) { untested();
+  for(int i=0; i<_n_current_inputs; ++i) {
     if(i == 0 && _p0_is_cc ){
     }else{
       expand_current_port(i, current_port_names[i]);

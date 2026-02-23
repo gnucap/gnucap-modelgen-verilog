@@ -1010,7 +1010,10 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
       o______ "}\n";
     }
 
-    make_cc_current_ports(o, br, e);
+    if (br && br->is_filter()) { untested();
+      make_cc_current_ports(o, br, e);
+    }else{
+    }
   }else{
     o << "gnd, gnd"; // filt subs hack.
     o << "}; // nodes\n";
