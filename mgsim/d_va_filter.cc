@@ -862,7 +862,7 @@ void DEV_CPOLY_CAP::expand_current_port(int i)
     throw Exception(long_label() + ": " + input_label
 		    + " has a subckt, cannot be used as current probe");
   }else if (input->has_inode()) {untested();
-    n_(in1) = input->n_(input()->ext_nodes());
+    n_(in1) = input->n_(input->ext_nodes());
     n_(in2).set_to_ground(nullptr);
   }else if (input->has_iv_probe()) {
     n_(in1) = input->n_(OUT1);
