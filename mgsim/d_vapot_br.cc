@@ -193,15 +193,14 @@ inline void VA_BREQN::tr_load_ones()
 {
   double d = dampdiff(&_one0, _one1);
   if (d != 0.) {
-//     tr_load_shunt(); // 4 pt +- loss
-// 		     return;
-    _sim->_aa.load_asymmetric(n_(OUT1).m_(), n_(OUT2).m_(), n_(BR()).m_(), 0,  d);
-
     if(is_vs()){
       trace4("BREQN::tr_load_ones vs", long_label(), _one0, _one1, d);
-      _sim->_aa.load_asymmetric(n_(BR()).m_(), 0, n_(OUT1).m_(), n_(OUT2).m_(), d);
+      // like tr_load inode, but use branch index.
+      _sim->_aa.load_couple(n_(OUT1).m_(), n_(BR()).m_(), -d);
+      _sim->_aa.load_couple(n_(OUT2).m_(), n_(BR()).m_(),  d);
     }else{
       trace4("BREQN::tr_load_ones cs", long_label(), _one0, _one1, d);
+      _sim->_aa.load_asymmetric(n_(OUT1).m_(), n_(OUT2).m_(), n_(BR()).m_(), 0,  d);
       _sim->_aa.load_diagonal_point(n_(BR()).m_(), d);
     }
   }else{
@@ -222,10 +221,15 @@ void VA_BREQN::tr_load()
   }
   tr_load_ones();
 
+  tr_load_source_point(n_(BR()), &_values[0], &_old_values[0]);
+  if(_current_port_names.size()){ untested();
+    incomplete();
+  }else{
+  }
+
   if(is_vs()){
     // is_voltage_source
     trace1("VA_BREQN::tr_load vs", _values[0]);
-    tr_load_source_point(n_(BR()), &_values[0], &_old_values[0]); // rhs.
 
     for (int i=1; i<=_n_ports; ++i) {
       trace2("VA_BREQN::tr_load vs", i, _values[i]);
@@ -234,9 +238,8 @@ void VA_BREQN::tr_load()
   }else{
     trace2("VA_BREQN::tr_load I", _values[0], _values[1]);
 
-    for (int i=1; i<=_n_ports; ++i) {
-      trace4("tr_load", long_label(), i, _values[i], _old_values[i]);
-      tr_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), &(_values[i]), &(_old_values[i]));
+    for (int i=1; i<=_n_ports; ++i) { untested();
+      tr_load_extended(gnd, n_(BR()), n_(2*i-2), n_(2*i-1), &(_values[i]), &(_old_values[i]));
     }
   }
 }
@@ -281,11 +284,14 @@ void VA_BREQN::ac_iwant_matrix()
 inline void VA_BREQN::ac_load_ones()
 {
   double d = 1.;
-  _sim->_acx.load_asymmetric(n_(OUT1).m_(), n_(OUT2).m_(),n_(BR()).m_(), 0,  d);
 
   if(is_vs()){
-    _sim->_acx.load_asymmetric(n_(BR()).m_(), 0, n_(OUT1).m_(), n_(OUT2).m_(), d);
+//    _sim->_acx.load_asymmetric(n_(OUT1).m_(), n_(OUT2).m_(),n_(BR()).m_(), 0,  d);
+//    _sim->_acx.load_asymmetric(n_(BR()).m_(), 0, n_(OUT1).m_(), n_(OUT2).m_(), d);
+    _sim->_acx.load_couple(n_(OUT1).m_(), n_(BR()).m_(), -d);
+    _sim->_acx.load_couple(n_(OUT2).m_(), n_(BR()).m_(),  d);
   }else{
+    _sim->_acx.load_asymmetric(n_(OUT1).m_(), n_(OUT2).m_(),n_(BR()).m_(), 0,  d);
     _sim->_acx.load_diagonal_point(n_(BR()).m_(), d);
   }
 }
