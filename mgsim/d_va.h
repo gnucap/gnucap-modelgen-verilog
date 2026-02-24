@@ -46,7 +46,6 @@ protected:
   double*  _values{nullptr};     // from parent
   double*  _old_values{nullptr}; // local, loaded
   int	   _n_ports{0};
-  int	   _net_nodes{0};
   int	   _n_current_inputs{0};
   double   _time;
   node_t*  _nN{nullptr};
@@ -360,7 +359,7 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
 {
   assert(n_nodes);
   bool first_time = (_net_nodes == 0);
-  _net_nodes = n_nodes;
+  _net_nodes = short(n_nodes);
 
   set_label(Label);
   set_owner(Owner);
