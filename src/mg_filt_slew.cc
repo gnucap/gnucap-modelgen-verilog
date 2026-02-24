@@ -79,7 +79,14 @@ private:
   void make_cc_dev(std::ostream& o)const override{
     assert(_f);
     std::string cn = _f->code_name();
-    o__ "double " << cn << "state[" << _f->num_states() << "]\n;"; // filter/num_states?
+    int k = int(_f->num_states());
+    o__ "struct {\n"; // _state" << br.code_name();
+    o____ "double _s[" << k << "]; // (s)\n";
+    o____ "double* ptr() {return _s;}\n";
+    o____ "double& operator[](int k) {return _s[k];}\n";
+    o____ "void clear(){std::fill_n(_s+1, " << k-1 << ", 0.);}\n";
+    o__ "}" << cn << "state\n;"; // filter/num_states?
+
     o__ "ELEMENT* _f" << label() << "{nullptr};\n";
     make_cc_dev_(o);
     o__ "ddouble " << label() << "__precalc(";
@@ -96,7 +103,7 @@ private:
     assert(_f);
     char sign = '+';
     std::string cn = _f->code_name();
-    o__ "double* st = d->" << cn << "state;\n";
+    o__ "auto& st = d->" << cn << "state;\n";
     if(num_args() > 1){
       o__ "st[3] = t1;\n";
       o__ "trace1(\"slew\", st[3]);\n";

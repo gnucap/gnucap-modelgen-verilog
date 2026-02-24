@@ -321,9 +321,8 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	o____ "d->_pot" << bcn << " = false;\n";
       }
 
-      // DUP, clear.
       o____ "d->_value" << bcn << " = 0.;\n";
-      o____ "std::fill_n(d->_st" << bcn << "+1, " << C.branch()->num_states()-1 << ", 0.);\n";
+      o____ "d->_st" << bcn << ".clear();\n";
       o__ "}else{\n";
       o__ "}\n";
     }else if(C.branch()->has_flow_probe()){
@@ -1432,7 +1431,7 @@ static void make_clear_branch_contributions(std::ostream& o, const Module& m)
       }else{
       }
       o____ "_value" << x->code_name() << " = 0.;\n";
-      o____ "std::fill_n(_st" << x->code_name() << "+1, " << x->num_states()-1 << ", 0.);\n";
+      o____ "_st" << x->code_name() << ".clear();\n";
     }else{
     }
   }

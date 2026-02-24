@@ -190,7 +190,7 @@ static void make_set_parameters(std::ostream& o, const Element_2& e, std::string
   }
   o << ", 0."; // value
   if (e.state() != "") {
-    o << ", /*states:*/" << e.num_states() << ", " << e.state();
+    o << ", /*states:*/" << e.num_states() << ", " << e.state() << ".ptr()";
   }else{ untested();
     o << ", 0, nullptr";
   }
@@ -1231,11 +1231,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
     if(i->has_branch()){ untested();
       unreachable();
     }else{
-      // TODO incomplete();
-      o__ "// no branch? " << i->name() << "\n";
       make_module_expand_one_branch(o, *i, m, "");
-      // make_module_expand_one_filter(o, *i);
-      o__ "// =====/no branch===== // \n";
     }
   }
 #endif

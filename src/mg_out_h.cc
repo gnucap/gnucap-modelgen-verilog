@@ -457,9 +457,13 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
   }else{
   }
   o__ "double _value" << br.code_name() << ";\n";
-  o__ "double _st" << br.code_name();
   size_t k = br.num_states();
-  o__ "[" << k << "]; // (s)\n";
+  o__ "struct {\n"; // _state" << br.code_name();
+  o____ "double _s[" << k << "]; // (s)\n";
+  o____ "double* ptr() {return _s;}\n";
+  o____ "double& operator[](int k) {return _s[k];}\n";
+  o____ "void clear(){std::fill_n(_s+1, " << k-1 << ", 0.);}\n";
+  o__ "}_st" << br.code_name() << ";\n";
 
 //  for(auto n : br.names()){ untested();
 //    o__ "double _value_br_" << n << ";\n";
