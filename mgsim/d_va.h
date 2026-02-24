@@ -89,7 +89,7 @@ protected: // override virtual
   bool has_iv_probe()const override { untested();return true;}
   void expand()override;
   void expand_last()override;
-  void expand_current_port(int i, std::string n);
+  void expand_current_port(int i, std::string const& n);
 
 #ifdef DTRACE_UNTESTED
   void set_port_by_index(int i, /*const*/ std::string& s) override {
@@ -155,7 +155,7 @@ DEV_CPOLY_G::DEV_CPOLY_G(const DEV_CPOLY_G& p)
   assert(p._n_ports == 0);
 }
 /*--------------------------------------------------------------------------*/
-DEV_CPOLY_G::DEV_CPOLY_G()
+inline DEV_CPOLY_G::DEV_CPOLY_G()
   :ELEMENT(),
    _values(nullptr),
    _old_values(nullptr),
@@ -194,7 +194,7 @@ void DEV_CPOLY_G::expand_last()
   ELEMENT::expand_last(); // internal nodes allocated here (kludge)
 }
 /*--------------------------------------------------------------------------*/
-void DEV_CPOLY_G::expand_current_port(int i, std::string input_label)
+void DEV_CPOLY_G::expand_current_port(int i, std::string const& input_label)
 {
 //  assert(input_label == _current_port_names[i]);
   ELEMENT const* input = _input[i];
