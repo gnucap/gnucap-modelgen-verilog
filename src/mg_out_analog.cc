@@ -1527,34 +1527,6 @@ void make_cc_current_ctrl(std::ostream& o, Branch const* br)
   }
 }
 /*--------------------------------------------------------------------------*/
-void make_cc_current_ports(std::ostream& o, Branch const* br, Element_2 const& e)
-{
-  // obsolete.
-  // set_current ports.
-  int kk = 1;
-  for(Dep const& i : br->ddeps()){
-    if(!is_flow_probe(i)){
-    }else if(branch(i) == br){
-      // self control is current
-      o______ "{\n";
-      o________ "std::string tmp = \"" << branch(i)->code_name() << "\";"; // BUG: passing ref.
-      o________ e.code_name() << "->set_port_by_index(-1,tmp);\n";
-      o______ "}\n";
-    }else if(branch(i)){
-      if(branch(i)->is_short()){
-      }else{
-	o______ "{\n";
-	o________ "std::string tmp = \"" << branch(i)->code_name() << "\";"; // BUG: passing ref.
-	o________ e.code_name() << "->set_port_by_index( -1-"<< kk << ", tmp);\n";
-	o______ "}\n";
-	++kk;
-      }
-    }else{ untested();
-      untested();
-    }
-  }
-}
-/*--------------------------------------------------------------------------*/
 std::string Probe::code_name() const
 {
   if ( _type == t_flow ){

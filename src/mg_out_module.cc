@@ -77,7 +77,6 @@ static void make_cc_branch_output(std::ostream& o, Branch const* br)
 // TODO: mg_out_analog.cc
 void make_cc_branch_ctrl(std::ostream& o, Branch const* br);
 void make_cc_current_ctrl(std::ostream& o, Branch const* br);
-void make_cc_current_ports(std::ostream& o, Branch const* br, Element_2 const&);
 /*--------------------------------------------------------------------------*/
 static void make_tr_needs_eval(std::ostream& o, const Module& m)
 {
@@ -1008,11 +1007,6 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
       o________ "e->_loss1 = 0.;\n";
       o______ "}else{\n";
       o______ "}\n";
-    }
-
-    if (br && br->is_filter()) {
-      make_cc_current_ports(o, br, e);
-    }else{
     }
   }else{
     o << "gnd, gnd"; // filt subs hack.
