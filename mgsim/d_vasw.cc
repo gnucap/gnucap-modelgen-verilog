@@ -25,11 +25,16 @@
 namespace {
 /*--------------------------------------------------------------------------*/
 class VAPOT : public DEV_CPOLY_G {
+  double*  _m0_{nullptr};
+  double*  _m1_{nullptr};
 protected:
   explicit VAPOT(const VAPOT& p) : DEV_CPOLY_G(p) {}
 public:
   explicit VAPOT() : DEV_CPOLY_G() {}
-  ~VAPOT() {}
+  ~VAPOT() {
+    delete [] _m0_;
+    delete [] _m1_;
+  }
 protected: // override virtual
   CARD*	   clone()const override	{return new VAPOT(*this);}
  // void	   tr_iwant_matrix()override// CPOLY
@@ -50,10 +55,21 @@ protected: // override virtual
   bool has_iv_probe()const override{return true;}
 public:
   void set_parameters(const std::string& Label, CARD* Parent,
-		      COMMON_COMPONENT* Common, double Value,
-		      int state_count, double state[],
-		      int node_count, const node_t nodes[])override;
-  //		      const double* inputs[]=0);
+                     COMMON_COMPONENT* Common, double Value,
+                     int n_states, double state[],
+                     int node_count, const node_t nodes[])override {
+    DEV_CPOLY_G::set_parameters(Label, Parent, Common, Value,
+	n_states, state, node_count, nodes);
+    if(_sim->is_first_expand()){
+      assert(n_states > 1);
+      _m0_ = new double[n_states-2];
+#ifndef NDEBUG
+      std::fill_n(_m0_, n_states-2, 0.);
+#endif
+      _m1_ = new double[n_states-2];
+      std::fill_n(_m1_, _n_ports-1, 0.);
+    }
+  }
 protected:
   double abstol() const{
     auto cv = prechecked_cast<COMMON_VASRC const*>(common());
@@ -104,16 +120,15 @@ bool VAPOT::do_tr()
     for (int i=2; i<=_n_ports; ++i) {
       _m0_[i-2] = _values[i];
     }
-  }else if(_self_is_current && fabs(_values[1]) > OPT::shortckt){
+  }else if(p0_is_cc() && (fabs(_values[1]) > OPT::shortckt)){
     // loss but switch to CS mode.
     // V(br) <+ f(I(br) ...) = v0 + I * v1
     _loss0 = 0.;
-    double amps = tr_amps();
+//    double amps = tr_amps();
 
     _m0.x = tr_involts_limited(); // like d_admit...?
     _m0.c1 = 1./_values[1];
     _m0.c0 = - _values[0] * _m0.c1;
-    trace7("do_tr", long_label(), _self_is_current, _loss0, _values[0], _values[1], tr_amps(), amps);
 
      // _values[1] = _m0.c1;
     for (int i=2; i<=_n_ports; ++i) {
@@ -121,6 +136,8 @@ bool VAPOT::do_tr()
     }
 
   }else{
+    // it's a voltage source..
+    trace3("do_tr noflip", long_label(), _values[0], _values[1]);
     for (int i=2; i<=_n_ports; ++i) {
       _m0_[i-2] = - _values[i] * _loss0;
     }
@@ -128,7 +145,6 @@ bool VAPOT::do_tr()
     // _m0.c0 = -_loss0 * _y[0].f1; // d_vs.
     _m0.c0 = -_loss0 * _values[0];
     _m0.c1 = 0.; // really?
-    trace4("do_tr", long_label(), _self_is_current, _loss0, tr_amps());
     assert(_m0.c1 == 0.); // d_vs
   }
   return do_tr_con_chk_and_q();
@@ -146,7 +162,7 @@ void VAPOT::tr_load()
     }
 
     tr_load_passive();
-  }else if(_self_is_current && fabs(_values[1]) > OPT::shortckt){ untested();
+  }else if(p0_is_cc() && fabs(_values[1]) > OPT::shortckt){ untested();
     // loss but CS mode.
     //
     if(_loss1){ untested();
@@ -180,14 +196,14 @@ double VAPOT::tr_amps()const
     // amps = _m0.c0 + _m0.c1 * tr_outvolts();
     amps = fixzero((_m0.c1 * tr_involts() + _m0.c0), _m0.c0);
   }
-  trace3("VAPOT::tr_amps self", tr_outvolts(), _loss0, amps);
+  trace4("VAPOT::tr_amps self", tr_outvolts(), _loss0, _input.size(), _p0_is_cc);
 
   int i=2;
-  for (; i<=int(_n_ports - _input.size()); ++i) {
+  for (; i<=int(_n_ports - _input.size() + _p0_is_cc); ++i) {
     trace3("VAPOT::tr_amps", tr_outvolts(), _loss0, _m0_[i-2]);
     amps += dn_diff(n_(2*i-2).v0(), n_(2*i-1).v0()) * _m0_[i-2];
   }
-  trace3("VAPOT::tr_amps h", tr_outvolts(), _loss0, amps);
+  trace4("VAPOT::tr_amps h", tr_outvolts(), _loss0, amps, _n_ports);
   for (; i<=_n_ports; ++i) { untested();
     assert(0); // later.
     int k = i-int(_n_ports - _input.size() + 1);
@@ -204,7 +220,7 @@ void VAPOT::ac_load()
     ac_load_shunt(); // 4 pt +- loss
   }else{
   }
-  if(_current_port_names.size()){ untested();
+  if(_n_current_inputs){
     incomplete();
   }else{
   }
@@ -218,59 +234,6 @@ void VAPOT::ac_load()
     }
   }
 }
-/*--------------------------------------------------------------------------*/
-/* set: set parameters, used in model building
- */
-void VAPOT::set_parameters(const std::string& Label, CARD *Owner,
-				 COMMON_COMPONENT *Common, double Value,
-				 int n_states, double states[],
-				 int n_nodes, const node_t nodes[])
-  //				 const double* inputs[])
-{
-  bool first_time = (net_nodes() == 0);
-
-  set_label(Label);
-  trace3("VAPOT::set_parameters", short_label(), n_nodes, n_states);
-  set_owner(Owner);
-  set_value(Value);
-  attach_common(Common);
-
-  if (first_time) {
-    _current_port_names.resize(n_states - 1 - n_nodes/2);
-    _input.resize(n_states - 1 - n_nodes/2);
-    _n_ports = n_states-1; // set net_nodes
-    assert(size_t(_n_ports) == n_nodes/2 + _current_port_names.size());
-
-    assert(!_old_values);
-    _old_values = new double[n_states];
-
-    _m0_ = new double[n_states-2];
-    _m1_ = new double[n_states-2];
-    std::fill_n(_m0_, n_states-2, 0.);
-    std::fill_n(_m1_, n_states-2, 0.);
-
-    if (matrix_nodes() > NODES_PER_BRANCH) {
-      // allocate a bigger node list
-      _nN = new node_t[matrix_nodes()];
-    }else{
-      // use the default node list, already set
-    }      
-  }else{
-    assert(_n_ports == n_states-1);
-    assert(_old_values);
-    assert(net_nodes() == n_nodes);
-    assert(int(_input.size()) == n_states - 1 - n_nodes/2);
-    // assert could fail if changing the number of nodes after a run
-  }
-
-  _values = states;
-  std::fill_n(_values, n_states, 0.);
-  std::fill_n(_old_values, n_states, 0.);
-  assert(n_nodes <= net_nodes());
-  notstd::copy_n(nodes, n_nodes, _nN); // copy more in expand_last
-  assert(net_nodes() == _n_ports * 2);
-}
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 DISPATCHER<CARD>::INSTALL d2(&device_dispatcher, "va_sw", &d);
 }

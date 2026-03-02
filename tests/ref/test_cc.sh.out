@@ -701,26 +701,11 @@ public:
     return _card == o._card && _ref == o._ref && _tail == o._tail;
   }
 private:
-  void link_device_(CARD const*, std::string const& path);
   bool find_device_up(CARD const*, std::string const&, std::string const& tail);
   bool find_device_down(CARD_LIST const*, std::string const& path);
   bool find_device_down(CARD_LIST const*, std::string const& dev, std::string const& tail);
   Base const* find_item(CARD_LIST const* scope, std::string const& path)const;
 };
-/*--------------------------------------------------------------------------*/
-// found a device. store the remainder of the path.
-inline void Href_::link_device_(CARD const* device, std::string const& path)
-{ untested();
-  if(!device){ untested();
-    // top level thing?
-    incomplete();
-  }else{ untested();
-    trace2("found link device", device->long_label(), path);
-  }
-
-  _card = device;
-  _tail = path;
-}
 /*--------------------------------------------------------------------------*/
 inline Base const* Href_::find_item(CARD_LIST const* scope, std::string const& path) const
 {
@@ -783,6 +768,7 @@ inline bool Href_::find_device_down(CARD_LIST const* scope, std::string const& d
     return true;
   }
 }
+/*--------------------------------------------------------------------------*/
 inline bool Href_::find_device_down(CARD_LIST const* scope, std::string const& path)
 {
   trace2("href::find_dev_down", scope, path);
@@ -963,7 +949,6 @@ inline node_t& ground()
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 #endif
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet
@@ -1059,6 +1044,31 @@ inline void e_val(double* p, const double& x, const CARD_LIST*)
 { untested();
   assert(p);
   *p = x;
+}
+/*--------------------------------------------------------------------------*/
+class CURRENT_CTRL : public NODE {
+  node_t _nn;
+public:
+  explicit CURRENT_CTRL(std::string const& n) : NODE(), _nn(this) {
+    set_label(n);
+  }
+  virtual ELEMENT const* get(COMPONENT const*)const {untested();
+    unreachable();
+    return nullptr;
+  }
+  node_t& nn() {return _nn;}
+};
+/*--------------------------------------------------------------------------*/
+void set_pot_source(CARD* e)
+{
+  std::string x;
+  e->set_param_by_index(123457, x, 1);
+}
+/*--------------------------------------------------------------------------*/
+void unset_pot_source(CARD* e)
+{
+  std::string x;
+  e->set_param_by_index(123457, x, 0);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1288,7 +1298,23 @@ private: // data
   mutable node_t _nodes[3];
 public: // netlist
   ELEMENT* _b_white_noise_1_p_{nullptr}; // filter
+  static struct CURRENT_CTRL__b_white_noise_1_p_:public CURRENT_CTRL {
+    explicit CURRENT_CTRL__b_white_noise_1_p_() : CURRENT_CTRL("_b_white_noise_1_p_"){}
+    ELEMENT const* e(COMPONENT const* c)const {
+      auto m = prechecked_cast<MOD_resistor const*>(c);
+      assert(m);
+      return m->_b_white_noise_1_p_;
+    }
+  } _c_b_white_noise_1_p_;
   ELEMENT* _b_p_n{nullptr}; // branch
+  static struct CURRENT_CTRL__b_p_n:public CURRENT_CTRL {
+    explicit CURRENT_CTRL__b_p_n() : CURRENT_CTRL("_b_p_n"){}
+    ELEMENT const* e(COMPONENT const* c)const {
+      auto m = prechecked_cast<MOD_resistor const*>(c);
+      assert(m);
+      return m->_b_p_n;
+    }
+  } _c_b_p_n;
 private: // func decl
 //other: $param_given
 //func $temperature
@@ -1376,14 +1402,24 @@ public: // instance vars
 private: // branch state
 public: // states, _b_white_noise_1_p_;
   double _value_b_white_noise_1_p_;
-  double _st_b_white_noise_1_p_  [2]; // (s)
+  struct {
+    double _s[2]; // (s)
+    double* ptr() {return _s;}
+    double& operator[](int k) {return _s[k];}
+    void clear(){std::fill_n(_s+1, 1, 0.);}
+  }_st_b_white_noise_1_p_;
   struct _st_b_white_noise_1_p__ {
     enum {     VALUE, SELF/* : */
     };
   } _dep_b_white_noise_1_p_;
 public: // states, _b_p_n;
   double _value_b_p_n;
-  double _st_b_p_n  [2]; // (s)
+  struct {
+    double _s[2]; // (s)
+    double* ptr() {return _s;}
+    double& operator[](int k) {return _s[k];}
+    void clear(){std::fill_n(_s+1, 1, 0.);}
+  }_st_b_p_n;
   struct _st_b_p_n_ {
     enum {     VALUE, SELF/* : */
     };
@@ -1404,6 +1440,8 @@ private: // impl
   friend class COMMON_resistor;
   friend class PRECALC_resistor;
 }; // m_resistor;
+  MOD_resistor::CURRENT_CTRL__b_white_noise_1_p_ MOD_resistor::_c_b_white_noise_1_p_;
+  MOD_resistor::CURRENT_CTRL__b_p_n MOD_resistor::_c_b_p_n;
 /*--------------------------------------------------------------------------*/
 COMMON_resistor::COMMON_resistor(int c)
   :COMMON_COMPONENT(c),
@@ -2015,7 +2053,7 @@ inline void MOD_resistor::set_branch_contributions()
 inline void MOD_resistor::clear_branch_contributions()
 {
     _value_b_p_n = 0.;
-    std::fill_n(_st_b_p_n+1, 1, 0.);
+    _st_b_p_n.clear();
 }
 /*--------------------------------------------------------------------------*/
 typedef MOD_resistor::ddouble ddouble;
@@ -2451,7 +2489,7 @@ void MOD_resistor::expand()
     }
       {
         node_t nodes[] = {n_(n_p), n_(n_n)}; // nodes
-        _b_white_noise_1_p_->set_parameters("_b_white_noise_1_p_", this, _b_white_noise_1_p_->mutable_common(), 0., /*states:*/2, _st_b_white_noise_1_p_, 2, nodes);
+        _b_white_noise_1_p_->set_parameters("_b_white_noise_1_p_", this, _b_white_noise_1_p_->mutable_common(), 0., /*states:*/2, _st_b_white_noise_1_p_.ptr(), 2, nodes);
         if(auto e = dynamic_cast<ELEMENT*>(_b_white_noise_1_p_)){
           e->_loss0 = 0.;
           e->_loss1 = 0.;
@@ -2477,7 +2515,7 @@ void MOD_resistor::expand()
     }
       {
         node_t nodes[] = {n_(n_p), n_(n_n)}; // nodes
-        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/2, _st_b_p_n, 2, nodes);
+        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/2, _st_b_p_n.ptr(), 2, nodes);
       }
     }
 
@@ -2668,7 +2706,23 @@ private: // data
   mutable node_t _nodes[3];
 public: // netlist
   ELEMENT* _b_white_noise_0_p_{nullptr}; // filter
+  static struct CURRENT_CTRL__b_white_noise_0_p_:public CURRENT_CTRL {
+    explicit CURRENT_CTRL__b_white_noise_0_p_() : CURRENT_CTRL("_b_white_noise_0_p_"){}
+    ELEMENT const* e(COMPONENT const* c)const {
+      auto m = prechecked_cast<MOD_resistor const*>(c);
+      assert(m);
+      return m->_b_white_noise_0_p_;
+    }
+  } _c_b_white_noise_0_p_;
   ELEMENT* _b_p_n{nullptr}; // branch
+  static struct CURRENT_CTRL__b_p_n:public CURRENT_CTRL {
+    explicit CURRENT_CTRL__b_p_n() : CURRENT_CTRL("_b_p_n"){}
+    ELEMENT const* e(COMPONENT const* c)const {
+      auto m = prechecked_cast<MOD_resistor const*>(c);
+      assert(m);
+      return m->_b_p_n;
+    }
+  } _c_b_p_n;
 private: // func decl
 //other: $param_given
 //func $temperature
@@ -2757,14 +2811,24 @@ public: // instance vars
 private: // branch state
 public: // states, _b_white_noise_0_p_;
   double _value_b_white_noise_0_p_;
-  double _st_b_white_noise_0_p_  [2]; // (s)
+  struct {
+    double _s[2]; // (s)
+    double* ptr() {return _s;}
+    double& operator[](int k) {return _s[k];}
+    void clear(){std::fill_n(_s+1, 1, 0.);}
+  }_st_b_white_noise_0_p_;
   struct _st_b_white_noise_0_p__ {
     enum {     VALUE, SELF/* : */
     };
   } _dep_b_white_noise_0_p_;
 public: // states, _b_p_n;
   double _value_b_p_n;
-  double _st_b_p_n  [2]; // (s)
+  struct {
+    double _s[2]; // (s)
+    double* ptr() {return _s;}
+    double& operator[](int k) {return _s[k];}
+    void clear(){std::fill_n(_s+1, 1, 0.);}
+  }_st_b_p_n;
   struct _st_b_p_n_ {
     enum {     VALUE, SELF/* : */
     };
@@ -2785,6 +2849,8 @@ private: // impl
   friend class COMMON_resistor;
   friend class PRECALC_resistor;
 }; // m_resistor;
+  MOD_resistor::CURRENT_CTRL__b_white_noise_0_p_ MOD_resistor::_c_b_white_noise_0_p_;
+  MOD_resistor::CURRENT_CTRL__b_p_n MOD_resistor::_c_b_p_n;
 /*--------------------------------------------------------------------------*/
 COMMON_resistor::COMMON_resistor(int c)
   :COMMON_COMPONENT(c),
@@ -3543,7 +3609,7 @@ inline void MOD_resistor::set_branch_contributions()
 inline void MOD_resistor::clear_branch_contributions()
 {
     _value_b_p_n = 0.;
-    std::fill_n(_st_b_p_n+1, 1, 0.);
+    _st_b_p_n.clear();
 }
 /*--------------------------------------------------------------------------*/
 typedef MOD_resistor::ddouble ddouble;
@@ -4261,7 +4327,7 @@ void MOD_resistor::expand()
     }
       {
         node_t nodes[] = {n_(n_p), n_(n_n)}; // nodes
-        _b_white_noise_0_p_->set_parameters("_b_white_noise_0_p_", this, _b_white_noise_0_p_->mutable_common(), 0., /*states:*/2, _st_b_white_noise_0_p_, 2, nodes);
+        _b_white_noise_0_p_->set_parameters("_b_white_noise_0_p_", this, _b_white_noise_0_p_->mutable_common(), 0., /*states:*/2, _st_b_white_noise_0_p_.ptr(), 2, nodes);
         if(auto e = dynamic_cast<ELEMENT*>(_b_white_noise_0_p_)){
           e->_loss0 = 0.;
           e->_loss1 = 0.;
@@ -4287,7 +4353,7 @@ void MOD_resistor::expand()
     }
       {
         node_t nodes[] = {n_(n_p), n_(n_n)}; // nodes
-        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/2, _st_b_p_n, 2, nodes);
+        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/2, _st_b_p_n.ptr(), 2, nodes);
       }
     }
 
@@ -5081,26 +5147,11 @@ public:
     return _card == o._card && _ref == o._ref && _tail == o._tail;
   }
 private:
-  void link_device_(CARD const*, std::string const& path);
   bool find_device_up(CARD const*, std::string const&, std::string const& tail);
   bool find_device_down(CARD_LIST const*, std::string const& path);
   bool find_device_down(CARD_LIST const*, std::string const& dev, std::string const& tail);
   Base const* find_item(CARD_LIST const* scope, std::string const& path)const;
 };
-/*--------------------------------------------------------------------------*/
-// found a device. store the remainder of the path.
-inline void Href_::link_device_(CARD const* device, std::string const& path)
-{ untested();
-  if(!device){ untested();
-    // top level thing?
-    incomplete();
-  }else{ untested();
-    trace2("found link device", device->long_label(), path);
-  }
-
-  _card = device;
-  _tail = path;
-}
 /*--------------------------------------------------------------------------*/
 inline Base const* Href_::find_item(CARD_LIST const* scope, std::string const& path) const
 {
@@ -5163,6 +5214,7 @@ inline bool Href_::find_device_down(CARD_LIST const* scope, std::string const& d
     return true;
   }
 }
+/*--------------------------------------------------------------------------*/
 inline bool Href_::find_device_down(CARD_LIST const* scope, std::string const& path)
 {
   trace2("href::find_dev_down", scope, path);
@@ -5343,7 +5395,6 @@ inline node_t& ground()
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 #endif
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet
@@ -5439,6 +5490,31 @@ inline void e_val(double* p, const double& x, const CARD_LIST*)
 { untested();
   assert(p);
   *p = x;
+}
+/*--------------------------------------------------------------------------*/
+class CURRENT_CTRL : public NODE {
+  node_t _nn;
+public:
+  explicit CURRENT_CTRL(std::string const& n) : NODE(), _nn(this) {
+    set_label(n);
+  }
+  virtual ELEMENT const* get(COMPONENT const*)const {untested();
+    unreachable();
+    return nullptr;
+  }
+  node_t& nn() {return _nn;}
+};
+/*--------------------------------------------------------------------------*/
+void set_pot_source(CARD* e)
+{
+  std::string x;
+  e->set_param_by_index(123457, x, 1);
+}
+/*--------------------------------------------------------------------------*/
+void unset_pot_source(CARD* e)
+{
+  std::string x;
+  e->set_param_by_index(123457, x, 0);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -5670,7 +5746,23 @@ private: // data
   mutable node_t _nodes[3];
 public: // netlist
   ELEMENT* _b_ddt_1_p_{nullptr}; // filter
+  static struct CURRENT_CTRL__b_ddt_1_p_:public CURRENT_CTRL {
+    explicit CURRENT_CTRL__b_ddt_1_p_() : CURRENT_CTRL("_b_ddt_1_p_"){}
+    ELEMENT const* e(COMPONENT const* c)const {
+      auto m = prechecked_cast<MOD_capacitor const*>(c);
+      assert(m);
+      return m->_b_ddt_1_p_;
+    }
+  } _c_b_ddt_1_p_;
   ELEMENT* _b_p_n{nullptr}; // branch
+  static struct CURRENT_CTRL__b_p_n:public CURRENT_CTRL {
+    explicit CURRENT_CTRL__b_p_n() : CURRENT_CTRL("_b_p_n"){}
+    ELEMENT const* e(COMPONENT const* c)const {
+      auto m = prechecked_cast<MOD_capacitor const*>(c);
+      assert(m);
+      return m->_b_p_n;
+    }
+  } _c_b_p_n;
 private: // func decl
 //other: $param_given
 //other: analysis
@@ -5784,14 +5876,24 @@ public: // instance vars
 private: // branch state
 public: // states, _b_ddt_1_p_;
   double _value_b_ddt_1_p_;
-  double _st_b_ddt_1_p_  [3]; // (s)
+  struct {
+    double _s[3]; // (s)
+    double* ptr() {return _s;}
+    double& operator[](int k) {return _s[k];}
+    void clear(){std::fill_n(_s+1, 2, 0.);}
+  }_st_b_ddt_1_p_;
   struct _st_b_ddt_1_p__ {
     enum {     VALUE, SELF, dep_potential_b_p_n/* : */
     };
   } _dep_b_ddt_1_p_;
 public: // states, _b_p_n;
   double _value_b_p_n;
-  double _st_b_p_n  [2]; // (s)
+  struct {
+    double _s[2]; // (s)
+    double* ptr() {return _s;}
+    double& operator[](int k) {return _s[k];}
+    void clear(){std::fill_n(_s+1, 1, 0.);}
+  }_st_b_p_n;
   struct _st_b_p_n_ {
     enum {     VALUE, SELF/* : */
     };
@@ -5812,6 +5914,8 @@ private: // impl
   friend class COMMON_capacitor;
   friend class PRECALC_capacitor;
 }; // m_capacitor;
+  MOD_capacitor::CURRENT_CTRL__b_ddt_1_p_ MOD_capacitor::_c_b_ddt_1_p_;
+  MOD_capacitor::CURRENT_CTRL__b_p_n MOD_capacitor::_c_b_p_n;
 /*--------------------------------------------------------------------------*/
 COMMON_capacitor::COMMON_capacitor(int c)
   :COMMON_COMPONENT(c),
@@ -6224,7 +6328,7 @@ inline void MOD_capacitor::set_branch_contributions()
 inline void MOD_capacitor::clear_branch_contributions()
 {
     _value_b_p_n = 0.;
-    std::fill_n(_st_b_p_n+1, 1, 0.);
+    _st_b_p_n.clear();
 }
 /*--------------------------------------------------------------------------*/
 typedef MOD_capacitor::ddouble ddouble;
@@ -6562,7 +6666,7 @@ void MOD_capacitor::expand()
     }
       {
         node_t nodes[] = {n_(n_p), n_(n_n), n_(n_p), n_(n_n)}; // nodes
-        _b_ddt_1_p_->set_parameters("_b_ddt_1_p_", this, _b_ddt_1_p_->mutable_common(), 0., /*states:*/3, _st_b_ddt_1_p_, 4, nodes);
+        _b_ddt_1_p_->set_parameters("_b_ddt_1_p_", this, _b_ddt_1_p_->mutable_common(), 0., /*states:*/3, _st_b_ddt_1_p_.ptr(), 4, nodes);
         if(auto e = dynamic_cast<ELEMENT*>(_b_ddt_1_p_)){
           e->_loss0 = 0.;
           e->_loss1 = 0.;
@@ -6588,7 +6692,7 @@ void MOD_capacitor::expand()
     }
       {
         node_t nodes[] = {n_(n_p), n_(n_n)}; // nodes
-        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/2, _st_b_p_n, 2, nodes);
+        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/2, _st_b_p_n.ptr(), 2, nodes);
       }
     }
 
@@ -6774,7 +6878,23 @@ private: // data
   mutable node_t _nodes[3];
 public: // netlist
   ELEMENT* _b_ddt_2_p_{nullptr}; // filter
+  static struct CURRENT_CTRL__b_ddt_2_p_:public CURRENT_CTRL {
+    explicit CURRENT_CTRL__b_ddt_2_p_() : CURRENT_CTRL("_b_ddt_2_p_"){}
+    ELEMENT const* e(COMPONENT const* c)const {
+      auto m = prechecked_cast<MOD_capacitor const*>(c);
+      assert(m);
+      return m->_b_ddt_2_p_;
+    }
+  } _c_b_ddt_2_p_;
   ELEMENT* _b_p_n{nullptr}; // branch
+  static struct CURRENT_CTRL__b_p_n:public CURRENT_CTRL {
+    explicit CURRENT_CTRL__b_p_n() : CURRENT_CTRL("_b_p_n"){}
+    ELEMENT const* e(COMPONENT const* c)const {
+      auto m = prechecked_cast<MOD_capacitor const*>(c);
+      assert(m);
+      return m->_b_p_n;
+    }
+  } _c_b_p_n;
 private: // func decl
 //other: $param_given
 //other: analysis
@@ -6895,7 +7015,12 @@ public: // instance vars
 private: // branch state
 public: // states, _b_ddt_2_p_;
   double _value_b_ddt_2_p_;
-  double _st_b_ddt_2_p_  [3]; // (s)
+  struct {
+    double _s[3]; // (s)
+    double* ptr() {return _s;}
+    double& operator[](int k) {return _s[k];}
+    void clear(){std::fill_n(_s+1, 2, 0.);}
+  }_st_b_ddt_2_p_;
   struct _st_b_ddt_2_p__ {
     enum {     VALUE, SELF, dep_potential_b_p_n/* : */
     };
@@ -6903,7 +7028,12 @@ public: // states, _b_ddt_2_p_;
 public: // states, _b_p_n;
   bool _pot_b_p_n;
   double _value_b_p_n;
-  double _st_b_p_n  [3]; // (s)
+  struct {
+    double _s[3]; // (s)
+    double* ptr() {return _s;}
+    double& operator[](int k) {return _s[k];}
+    void clear(){std::fill_n(_s+1, 2, 0.);}
+  }_st_b_p_n;
   struct _st_b_p_n_ {
     enum {     VALUE, SELF, dep_potential_b_ddt_2_p_/* : */
     };
@@ -6925,6 +7055,8 @@ private: // impl
   friend class COMMON_capacitor;
   friend class PRECALC_capacitor;
 }; // m_capacitor;
+  MOD_capacitor::CURRENT_CTRL__b_ddt_2_p_ MOD_capacitor::_c_b_ddt_2_p_;
+  MOD_capacitor::CURRENT_CTRL__b_p_n MOD_capacitor::_c_b_p_n;
 /*--------------------------------------------------------------------------*/
 COMMON_capacitor::COMMON_capacitor(int c)
   :COMMON_COMPONENT(c),
@@ -7357,9 +7489,9 @@ inline void MOD_capacitor::set_branch_contributions()
   // pot src (p, n)
   if(!_b_p_n){
   }else if(_pot_b_p_n){
-    _b_p_n->_loss0 = 1./OPT::shortckt;
+    set_pot_source(_b_p_n); // AA
   }else{
-    _b_p_n->_loss0 = 0.; // AA
+    unset_pot_source(_b_p_n); // AA
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -7367,7 +7499,7 @@ inline void MOD_capacitor::clear_branch_contributions()
 {
     _pot_b_p_n = false;
     _value_b_p_n = 0.;
-    std::fill_n(_st_b_p_n+1, 2, 0.);
+    _st_b_p_n.clear();
 }
 /*--------------------------------------------------------------------------*/
 typedef MOD_capacitor::ddouble ddouble;
@@ -7404,7 +7536,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
               if (!d->_pot_b_p_n){
                 d->_pot_b_p_n = true;
                 d->_value_b_p_n = 0.;
-                std::fill_n(d->_st_b_p_n+1, 2, 0.);
+                d->_st_b_p_n.clear();
               }else{
               }
               d->_value_b_p_n /* contrib sign: */ += t0.value(); // (342)
@@ -7430,7 +7562,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
               if (d->_pot_b_p_n){
                 d->_pot_b_p_n = false;
                 d->_value_b_p_n = 0.;
-                std::fill_n(d->_st_b_p_n+1, 2, 0.);
+                d->_st_b_p_n.clear();
               }else{
               }
               d->_value_b_p_n /* contrib sign: */ += t0.value(); // (342)
@@ -7769,7 +7901,7 @@ void MOD_capacitor::expand()
     }
       {
         node_t nodes[] = {n_(n_ddt_2_p), gnd, n_(n_p), n_(n_n)}; // nodes
-        _b_ddt_2_p_->set_parameters("_b_ddt_2_p_", this, _b_ddt_2_p_->mutable_common(), 0., /*states:*/3, _st_b_ddt_2_p_, 4, nodes);
+        _b_ddt_2_p_->set_parameters("_b_ddt_2_p_", this, _b_ddt_2_p_->mutable_common(), 0., /*states:*/3, _st_b_ddt_2_p_.ptr(), 4, nodes);
       }
     }
   // branch (p, n)
@@ -7790,7 +7922,7 @@ void MOD_capacitor::expand()
     }
       {
         node_t nodes[] = {n_(n_p), n_(n_n), n_(n_ddt_2_p), gnd}; // nodes
-        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/3, _st_b_p_n, 4, nodes);
+        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/3, _st_b_p_n.ptr(), 4, nodes);
       }
     }
 

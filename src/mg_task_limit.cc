@@ -95,7 +95,7 @@ class LIMIT : public MGVAMS_TASK {
       o << ", double const&";
       if(num_args()==4){
 	o << " a" << i;
-      }else{ untested();
+      }else{
       }
     }
     o << "){\n";
@@ -135,7 +135,7 @@ class LIMIT : public MGVAMS_TASK {
       o________ "}\n";
       o________ "_old = old;\n";
 #endif
-    }else{ untested();
+    }else{
       incomplete();
     }
     o______ "}\n";

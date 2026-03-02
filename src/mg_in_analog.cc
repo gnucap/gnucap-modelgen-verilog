@@ -2564,22 +2564,25 @@ Probe* new_Probe(std::string const& xs, Branch_Ref const& br)
 /*--------------------------------------------------------------------------*/
 size_t Branch::num_nodes() const
 {
-  size_t ret=1;
+  size_t ret=2;
 
   for(Dep const& i : ddeps()){
     if(branch(i)->is_short()){
-    }else if(branch(i) == this){
-      // self conductance
-    }else if(probe_(i)->is_pot_probe()){
+    }else if(probe_(i)->is_flow_probe()){
       ++ret;
 //     }else if(i->is_filter_probe()){ untested();
 //       assert(i->is_pot_probe());
 //       unreachable();
 //       ++ret;
+    }else if(branch(i) == this){
+      // self conductance
+    }else if(probe_(i)->is_pot_probe()){
+      ++ret;
+      ++ret;
     }else{
     }
   }
-  return 2*ret;
+  return ret;
 }
 /*--------------------------------------------------------------------------*/
 size_t Branch::num_states() const

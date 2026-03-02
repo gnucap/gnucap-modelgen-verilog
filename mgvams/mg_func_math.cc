@@ -442,13 +442,13 @@ public:
     double x = get_double(e);
     subs_double(e, std::expm1(x));
   }
-  void make_cc_common(std::ostream& o)const override{ untested();
+  void make_cc_common(std::ostream& o)const override{
     declare_f1(o, code_name());
     o____ "::set_value(ret, std::expm1(double(d)));\n";
     o____ "return chain(ret, double(ret)+1.);\n";
     o__ "}\n";
   }
-  std::string code_name()const override{ untested();
+  std::string code_name()const override{
     return "_f_expm1";
   }
 } p_expm1;
@@ -572,7 +572,7 @@ public:
       throw Exception("invalid");
     }
   }
-  void make_cc_common(std::ostream& o)const override{ untested();
+  void make_cc_common(std::ostream& o)const override{
     o__ "template<class T, class S>\n";
     o__ "typename va::ddouble_if<T, S>::type\n";
     o__ "    " << code_name() << "(T d, S e)const {\n";
@@ -584,7 +584,7 @@ public:
     o____ "}\n";
     o__ "}\n";
   }
-  std::string code_name()const override{ untested();
+  std::string code_name()const override{
     return "_f_min";
   }
 } p_min;
@@ -692,7 +692,7 @@ public:
     double x = get_double(e);
     subs_double(e, std::log1p(x));
   }
-  void make_cc_common(std::ostream& o)const override { untested();
+  void make_cc_common(std::ostream& o)const override {
     declare_f1(o, code_name());
     o____ "double l=-1e99;\n";
     o____ "if(double(d)>-1.) {\n";
@@ -707,7 +707,7 @@ public:
     o____ "return ret;\n";
     o____ "}\n";
   }
-  std::string code_name()const override{ untested();
+  std::string code_name()const override{
     return "_f_ln1p";
   }
 } p_ln1p;

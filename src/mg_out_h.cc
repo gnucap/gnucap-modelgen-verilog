@@ -457,9 +457,13 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
   }else{
   }
   o__ "double _value" << br.code_name() << ";\n";
-  o__ "double _st" << br.code_name();
   size_t k = br.num_states();
-  o__ "[" << k << "]; // (s)\n";
+  o__ "struct {\n"; // _state" << br.code_name();
+  o____ "double _s[" << k << "]; // (s)\n";
+  o____ "double* ptr() {return _s;}\n";
+  o____ "double& operator[](int k) {return _s[k];}\n";
+  o____ "void clear(){std::fill_n(_s+1, " << k-1 << ", 0.);}\n";
+  o__ "}_st" << br.code_name() << ";\n";
 
 //  for(auto n : br.names()){ untested();
 //    o__ "double _value_br_" << n << ";\n";
@@ -566,6 +570,34 @@ static void make_cc_elements(std::ostream& o, Element_2_List const& L)
   }
 }
 /*--------------------------------------------------------------------------*/
+static void make_current_nodes(std::ostream& o, const Module& m)
+{
+  for (auto br : m.circuit()->branches()){
+    std::string bcn = br->code_name();
+    bool needed = false;
+    if(br->is_filter()){
+      if(!br->is_used() && options().optimize_unused()){
+	o__ "// ELEMENT* " << br->code_name() << "{nullptr}; // unused filter\n";
+      }else{
+	needed = true;
+      }
+    }else if(br->is_short()){
+      o__ "// short : " << br->code_name() << "\n";
+    }else if(!br->is_used() && options().optimize_unused()){
+      o__ "// ELEMENT* " << br->code_name() << "{nullptr}; // unused\n";
+    }else if(br->has_element()){
+      needed = true;
+    }else{
+      o__ "// ELEMENT* " << br->code_name() << "{nullptr}; // no element (not used)\n";
+    }
+    if(needed) {
+      o__ "MOD_" << m.identifier();
+      o << "::CURRENT_CTRL_" << bcn << " MOD_" << m.identifier() << "::_c" << bcn << ";\n";
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 static void make_module(std::ostream& o, const Module& m)
 {
   std::string class_name = "MOD_" + m.identifier().to_string();
@@ -597,20 +629,35 @@ static void make_module(std::ostream& o, const Module& m)
   }else{
   }
   for (auto br : m.circuit()->branches()){
+    std::string bcn = br->code_name();
+    bool needed = false;
     if(br->is_filter()){
       if(!br->is_used() && options().optimize_unused()){
 	o__ "// ELEMENT* " << br->code_name() << "{nullptr}; // unused filter\n";
       }else{
-	o__ "ELEMENT* " << br->code_name() << "{nullptr}; // filter\n";
+	o__ "ELEMENT* " << bcn << "{nullptr}; // filter\n";
+	needed = true;
       }
     }else if(br->is_short()){
       o__ "// short : " << br->code_name() << "\n";
     }else if(!br->is_used() && options().optimize_unused()){
       o__ "// ELEMENT* " << br->code_name() << "{nullptr}; // unused\n";
     }else if(br->has_element()){
-      o__ "ELEMENT* " << br->code_name() << "{nullptr}; // branch\n";
+	o__ "ELEMENT* " << bcn << "{nullptr}; // branch\n";
+	needed = true;
     }else{
       o__ "// ELEMENT* " << br->code_name() << "{nullptr}; // no element (not used)\n";
+    }
+    if(needed) {
+      o__ "static struct CURRENT_CTRL_" << bcn << ":public CURRENT_CTRL {\n";
+      o____ "explicit CURRENT_CTRL_" << bcn << "() : CURRENT_CTRL(\"" << bcn << "\"){}\n";
+      o____ "ELEMENT const* e(COMPONENT const* c)const {\n";
+      o______ "auto m = prechecked_cast<MOD_" << m.identifier() << " const*>(c);\n";
+      o______ "assert(m);\n";
+      o______ "return m->" << bcn << ";\n";
+      o____ "}\n";
+      o__ "} _c" << bcn << ";\n";
+    }else{
     }
   }
   o << "private: // func decl\n";
@@ -766,8 +813,9 @@ static void make_module(std::ostream& o, const Module& m)
   o << ind << "friend class " << common_name << ";\n";
   o << ind << "friend class " << precalc_name << ";\n";
 
-  o << "}; // m_" << m.identifier() << ";\n"
-    "/*--------------------------------------"
+  o << "}; // m_" << m.identifier() << ";\n";
+  make_current_nodes(o, m);
+  o << "/*--------------------------------------"
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/

@@ -1,18 +1,3 @@
-module main(1 2 ref)
-            ^ ? invalid identifier
-module main(1 2 ref)
-              ^ ? invalid identifier
-inductor  #(.l(p) .$mfactor(1)) L3(1,  \2 );
-                                   ^ ? invalid identifier
-resistor  #(.r(p)) r2( 2  ref);
-                       ^ ? invalid identifier
-main m(1 2 0)
-       ^ ? invalid identifier
-main m(1 2 0)
-         ^ ? invalid identifier
-main m(1 2 0)
-           ^ ? invalid identifier
-m.L3: ambiguous inductor: "vams inductor"
 #Time       v(1)       v(2)      
  0.         0.         0.        
  498.n      3.129u     1.558p    
@@ -47,7 +32,7 @@ m.L3: ambiguous inductor: "vams inductor"
  10.        1.         0.015913  
  100.       1.         0.0015915 
 Gnucap   System status
-iterations: op=0, dc=0, tran=92, fourier=0, total=127
+iterations: op=0, dc=0, tran=93, fourier=0, total=128
 transient timesteps: accepted=27, rejected=4, total=31
 nodes: user=2, subckt=0, model=0, total=2
 dctran density=100.0%, ac density=100.0%

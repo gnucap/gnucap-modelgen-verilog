@@ -25,11 +25,16 @@
 namespace {
 /*--------------------------------------------------------------------------*/
 class VAPOT : public DEV_CPOLY_G {
+  double*  _m0_{nullptr};
+  double*  _m1_{nullptr};
 protected:
   explicit VAPOT(const VAPOT& p) : DEV_CPOLY_G(p) {}
 public:
   explicit VAPOT() : DEV_CPOLY_G() {}
-  ~VAPOT() {}
+  ~VAPOT() {
+    delete [] _m0_;
+    delete [] _m1_;
+  }
 protected: // override virtual
   CARD*	   clone()const override	{return new VAPOT(*this);}
  // void	   tr_iwant_matrix()override	// CPOLY_G
@@ -51,12 +56,22 @@ protected: // override virtual
   }
 
   bool has_iv_probe()const override{ untested();return true;}
-public:
   void set_parameters(const std::string& Label, CARD* Parent,
-		      COMMON_COMPONENT* Common, double Value,
-		      int state_count, double state[],
-		      int node_count, const node_t nodes[])override;
-  //		      const double* inputs[]=0);
+                     COMMON_COMPONENT* Common, double Value,
+                     int n_states, double state[],
+                     int node_count, const node_t nodes[])override {
+    DEV_CPOLY_G::set_parameters(Label, Parent, Common, Value,
+	n_states, state, node_count, nodes);
+    if(_sim->is_first_expand()){
+      assert(n_states > 1);
+      _m0_ = new double[n_states-2];
+#ifndef NDEBUG
+      std::fill_n(_m0_, n_states-2, 0.);
+#endif
+      _m1_ = new double[n_states-2];
+      std::fill_n(_m1_, _n_ports-1, 0.);
+    }
+  }
 protected:
   double abstol() const{
     assert(has_common());
@@ -102,7 +117,6 @@ bool VAPOT::do_tr_con_chk_and_q()
 /*--------------------------------------------------------------------------*/
 bool VAPOT::do_tr()
 {
-  trace6("VAPOT::do_tr", long_label(), _self_is_current, _loss0, _values[0], _values[1], tr_amps());
   assert(_values);
 
   assert(_loss0);
@@ -116,7 +130,7 @@ bool VAPOT::do_tr()
     assert(_m0.c1 == 0.); // d_vs
   }else
 #endif
-  if(_self_is_current && fabs(_values[1]) > OPT::shortckt){ untested();
+  if(p0_is_cc() && fabs(_values[1]) > OPT::shortckt){ untested();
     _loss0 = 0.;
     // loss but switch to CS mode.
     // V(br) <+ f(I(br) ...)
@@ -159,7 +173,7 @@ void VAPOT::tr_load()
     }
 
     tr_load_passive();
-  }else if(_self_is_current && fabs(_values[1]) > OPT::shortckt){ untested();
+  }else if(p0_is_cc() && fabs(_values[1]) > OPT::shortckt){ untested();
     assert(!_loss0);
     // loss but CS mode.
     //
@@ -208,7 +222,7 @@ void VAPOT::ac_load()
     ac_load_shunt(); // 4 pt +- loss
   }else{ untested();
   }
-  if(_current_port_names.size()){ untested();
+  if(_n_current_inputs){
     incomplete();
   }else{
   }
@@ -223,61 +237,6 @@ void VAPOT::ac_load()
     }
   }
 }
-/*--------------------------------------------------------------------------*/
-/* set: set parameters, used in model building
- */
-void VAPOT::set_parameters(const std::string& Label, CARD *Owner,
-				 COMMON_COMPONENT *Common, double Value,
-				 int n_states, double states[],
-				 int n_nodes, const node_t nodes[])
-  //				 const double* inputs[])
-{
-  bool first_time = (net_nodes() == 0);
-
-  set_label(Label);
-  trace3("VAPOT::set_parameters", long_label(), n_nodes, n_states);
-  set_owner(Owner);
-  set_value(Value);
-  attach_common(Common);
-
-  if (first_time) {
-    _current_port_names.resize(n_states - 1 - n_nodes/2);
-    _input.resize(n_states - 1 - n_nodes/2);
-    _n_ports = n_states-1; // set net_nodes
-    assert(size_t(_n_ports) == n_nodes/2 + _current_port_names.size());
-
-    assert(!_old_values);
-    _old_values = new double[n_states];
-    assert(n_states > 1);
-    _m0_ = new double[n_states-2];
-#ifndef NDEBUG
-    std::fill_n(_m0_, n_states-2, 0.);
-#endif
-    _m1_ = new double[n_states-2];
-    std::fill_n(_m1_, _n_ports-1, 0.);
-
-    if (matrix_nodes() > NODES_PER_BRANCH) {
-      // allocate a bigger node list
-      _nN = new node_t[matrix_nodes()];
-    }else{
-      // use the default node list, already set
-    }      
-  }else{
-    assert(_n_ports == n_states-1);
-    assert(_old_values);
-    assert(net_nodes() == n_nodes);
-    assert(int(_input.size()) == n_states - 1 - n_nodes/2);
-    // assert could fail if changing the number of nodes after a run
-  }
-
-  _values = states;
-  std::fill_n(_values, n_states, 0.);
-  std::fill_n(_old_values, n_states, 0.);
-  assert(n_nodes <= net_nodes());
-  notstd::copy_n(nodes, n_nodes, _nN); // copy more in expand_last
-  assert(net_nodes() == _n_ports * 2 - int(_current_port_names.size()));
-}
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 DISPATCHER<CARD>::INSTALL d2(&device_dispatcher, "va_pot", &d);
 }

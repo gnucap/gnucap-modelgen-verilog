@@ -31,6 +31,7 @@
 #include <globals.h>
 #include <e_storag.h>
 #include <e_hsparam.h>
+#include "d_va.h" // count_pot_nodes
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -116,8 +117,8 @@ protected:
   double*  _vi1; // vector form of _i1
   COMPLEX _acout; // TODO: use _vi*?
   int	   _n_ports{-1};
+  int      _n_current_inputs{0};
   double   _load_time{0.};
-  std::vector<std::string> _current_port_names;
   std::vector<ELEMENT const*> _input;
 private:
   node_t* _nN{nullptr};
@@ -133,7 +134,7 @@ protected: // override virtual
   int	   max_nodes()const override	{return net_nodes();}
   int	   min_nodes()const override	{return net_nodes();}
   int	   matrix_nodes()const override	{return _n_ports*2;}
-  int	   net_nodes()const override	{return _n_ports*2 - int(_current_port_names.size());}
+  int	   net_nodes()const override	{return _net_nodes;}
   int	   ext_nodes()const override	{return _n_ports*2;}
   CARD*	   clone()const override        { untested();unreachable();return new DEV_CPOLY_CAP(*this);}
   void	   tr_iwant_matrix()override	{tr_iwant_matrix_extended();}
@@ -162,35 +163,26 @@ protected: // override virtual
 
   void expand()override;
   void expand_last()override;
-  void expand_current_port(int i);
+  void expand_current_port(int i, std::string const&);
 
   void set_port_by_index(int i, /*const*/ std::string& s) override {
     if(i>=0){ untested();
       ELEMENT::set_port_by_index(i, s);
     }else{
-      obsolete_set_current_port_by_index(-i-1, s);
+      incomplete();
+      // obsolete_set_current_port_by_index(-i-1, s);
     }
   }
 private:
-  int first_current_port()const { return (_n_ports - int(_current_port_names.size()))*2; }
-  int last_current_port()const { return 2*_n_ports - int(_current_port_names.size()); }
+  int first_current_port()const { return (_n_ports - int(_n_current_inputs))*2; }
+  int last_current_port()const { return 2*_n_ports - int(_n_current_inputs); }
   bool node_is_connected(int i)const override {
     if(i < first_current_port()){
       return ELEMENT::node_is_connected(i);
     }else if(i < last_current_port()) {
       return true; // no names set // BUG.
-      return _current_port_names[i-_n_ports*2] != "";
     }else{ untested();
       return false;
-    }
-  }
-  void obsolete_set_current_port_by_index(int i, const std::string& s) {
-    if(i==0){ untested();
-      // _self_is_current = true;
-    }else if(i<=int(_current_port_names.size())){
-      _current_port_names[i-1] = s;
-    }else{ untested();
-      throw Exception_Too_Many(i, int(_current_port_names.size()), 0);
     }
   }
 public:
@@ -219,6 +211,7 @@ private: // override virtual
   std::string dev_type()const override	{ untested();unreachable(); return "ddt";}
   CARD*	   clone()const override	{return new DEV_DDT(*this);}
   bool	   do_tr()override;
+  bool	   do_tr_last()override;
   void	   ac_load()override; // TODO: ac_eval
   double   tr_amps()const override      { return DEV_CPOLY_CAP::tr_amps(); }
   void	   tr_begin()override;
@@ -458,6 +451,8 @@ bool DEV_DDT::do_tr()
     _vi0[1] = _i[0].f1;
   }
   assert(_vi0[0] == _vi0[0]);
+
+  bool q = false;
   
   if(_sim->_v0){
     int i = 2;
@@ -474,12 +469,78 @@ bool DEV_DDT::do_tr()
       assert(_vi0[0] == _vi0[0]);
     }
 
+#if 1
     assert( i == _n_ports - int(_input.size()) + 1);
 
     // current port input
     for (; int(i)<=_n_ports; ++i) {
       int k = int(i)-int(_n_ports - _input.size() + 1);
-      assert(_input[k]->has_iv_probe()); // for now.
+      if(_input[k]->has_iv_probe()){
+	q = true;
+	continue;
+      }else if(_input[k]->has_inode()){
+	// incomplete();
+      }
+      // _m0.c0 += _y[0].f1 * _input->_m0.c0;
+      // _m0.c1  = _y[0].f1 * (_input->_loss0 + _input->_m0.c1);
+      double scale = _input[k]->_loss0 + _input[k]->_m0.c1 ;
+      if(_input[k]->_m0.c1){ untested();
+      }else{
+      }
+      if(_input[k]->_loss0){
+      }else{ untested();
+      }
+
+     // _vi0[i] = tr_c_to_g(scale*_vy0[i], _vi0[i]);
+      if(_loss0){
+	_vi0[i] = -_loss0 * scale * tr_c_to_g(_vy0[i], _vi0[i]);
+      }else{ untested();
+	_vi0[i] = scale * tr_c_to_g(_vy0[i], _vi0[i]);
+      }
+
+      _vi0[0] -= volts_limited(n_(2*i-2),n_(2*i-1)) * _vi0[i];
+    }
+
+    for (int ii=0; ii<=_n_ports; ++ii) {
+      assert(_vi0[ii] == _vi0[ii]);
+    }
+#endif
+  }else{ untested();
+  }
+
+  if( CKT_BASE::_sim->analysis_is_static() ) {
+    if(_vi0[0]){ untested();
+//      incomplete(); // TODO: MOD_*::tr_begin?
+      _vi0[0] = 0.;
+    }
+    if(_vi0[1]){ untested();
+//      incomplete(); // TODO: MOD_*::tr_begin?
+      _vi0[1] = 0.;
+    }
+  }else{
+  }
+
+  if (q){
+    _sim->_late_evalq.push_back(this);
+  }else{
+    trace4("trampsdbg", _sim->_time0, tramps1, tr_amps(), _i[0].f0);
+    _m0 = CPOLY1(0., _vi0[0], 0.); // _vi0[1]);
+  }
+  return do_tr_con_chk_and_q();
+}
+/*--------------------------------------------------------------------------*/
+bool DEV_DDT::do_tr_last()
+{
+  if(_sim->_v0){
+    int i = _n_ports - int(_input.size()) + 1;
+
+    // current port input
+    for (; int(i)<=_n_ports; ++i) {
+      int k = int(i)-int(_n_ports - _input.size() + 1);
+      if(_input[k]->has_iv_probe()){
+      }else{ untested();
+	continue;
+      }
       // _m0.c0 += _y[0].f1 * _input->_m0.c0;
       // _m0.c1  = _y[0].f1 * (_input->_loss0 + _input->_m0.c1);
       double scale = _input[k]->_loss0 + _input[k]->_m0.c1 ;
@@ -505,26 +566,9 @@ bool DEV_DDT::do_tr()
     }
   }else{ untested();
   }
-
-  if( CKT_BASE::_sim->analysis_is_static() ) {
-    if(_vi0[0]){ untested();
-//      incomplete(); // TODO: MOD_*::tr_begin?
-      _vi0[0] = 0.;
-    }
-    if(_vi0[1]){ untested();
-//      incomplete(); // TODO: MOD_*::tr_begin?
-      _vi0[1] = 0.;
-    }
-  }else{
-  }
-
-  trace4("trampsdbg", _sim->_time0, tramps1, tr_amps(), _i[0].f0);
   _m0 = CPOLY1(0., _vi0[0], 0.); // _vi0[1]);
-
-  // q_load();
-  return do_tr_con_chk_and_q();
+  return true; //?
 }
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void DEV_IDT::tr_begin()
 {
@@ -731,6 +775,7 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
   //				   const double* inputs[])
 {
   bool first_time = (net_nodes() == 0);
+  _net_nodes = short(n_nodes);
 
   set_label(Label);
   set_owner(Owner);
@@ -738,14 +783,14 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
   attach_common(Common);
 
   if (first_time) {
-    _current_port_names.resize(n_states - 1 - n_nodes/2);
-    _input.resize(n_states - 1 - n_nodes/2);
-    _n_ports = n_nodes/2; // sets num_nodes() = _n_ports*2
-    trace3("DEV_CPOLY_CAP::set_parameters", _n_ports, n_nodes, n_states);
+    int pot_nodes = count_pot_nodes(nodes, n_nodes);
+    _input.resize(pot_nodes);
+    _n_ports = n_states-1; // set net_nodes TODO
+    trace5("DEV_CPOLY_CAP::set_parameters", _n_ports, n_nodes, n_states, pot_nodes, _net_nodes);
+    _n_current_inputs = n_nodes - pot_nodes;
+    _input.resize(n_nodes - pot_nodes);
 
     _n_ports = n_states-1; // set net_nodes
-    // assert(_n_ports == n_states-1);
-    assert(size_t(_n_ports) == n_nodes/2 + _current_port_names.size());
 
     assert(!_vy1);
     assert(!_vi0);
@@ -765,8 +810,6 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
     assert(_vy1);
     assert(_vi0);
     assert(_vi1);
-    assert(net_nodes() == n_nodes + int(_current_port_names.size()));
-    // assert could fail if changing the number of nodes after a run
   }
 
   _vy0 = states;
@@ -825,7 +868,7 @@ void DEV_CPOLY_CAP::precalc_last()
 void DEV_CPOLY_CAP::expand()
 {
   STORAGE::expand();
-  if(_current_port_names.size()){
+  if(_n_current_inputs){
     q_expand_last();
   }else{
   }
@@ -833,19 +876,33 @@ void DEV_CPOLY_CAP::expand()
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_CAP::expand_last()
 {
-  ELEMENT::expand_last();
-  for(int i=0; i<int(_current_port_names.size()); ++i){
-    expand_current_port(i);
-    // expand_current_port(&_input[i], _current_port_names[i], this); // or so.
+  int k = _n_current_inputs;
+  std::vector<std::string> current_port_names(k);
+  int  net_nodes_ =  _n_ports*2 - _n_current_inputs;
+  while(k--){
+    assert(net_nodes_-k-1 < matrix_nodes());
+    assert(root(&n_(net_nodes_-k-1)));
+    current_port_names[k] = root(&n_(net_nodes_-k-1))->short_label();
   }
+  // squeeze in current ports.
+  for(int i=0; i<_n_current_inputs; ++i) {
+   // if(i == 0 && _p0_is_cc ){ untested();
+   // }else
+    {
+      expand_current_port(i, current_port_names[i]);
+    }
+  }
+  ELEMENT::expand_last(); // internal nodes allocated here (kludge)
 }
 /*--------------------------------------------------------------------------*/
 // !! duplicate in d_va.h
-void DEV_CPOLY_CAP::expand_current_port(int i)
+void DEV_CPOLY_CAP::expand_current_port(int i, std::string const& input_label)
 {
-  std::string const& input_label = _current_port_names[i];
   ELEMENT const*& input = _input[i];
-//  node_t* n = _n + net_nodes() + 2*(i-_input.size()) - IN1;
+
+  int in1 = ext_nodes() - 2*_n_current_inputs + 2*i;
+  // int in1 = first_current_port() + 2*i;
+  int in2 = in1 + 1;
 
   assert (input_label != "");
   CARD const* e = find_in_my_scope(input_label);
@@ -858,15 +915,12 @@ void DEV_CPOLY_CAP::expand_current_port(int i)
   }else if (input->subckt()) {untested();
     throw Exception(long_label() + ": " + input_label
 		    + " has a subckt, cannot be used as current probe");
-  }else if (input->has_inode()) {untested();
-    incomplete(); // wrong N1
-    n_(IN1) = input->n_(IN1);
-    n_(IN2).set_to_ground(nullptr);
+  }else if (input->has_inode()) {
+    n_(in1) = input->n_(input->ext_nodes());
+    n_(in2).set_to_ground(nullptr);
   }else if (input->has_iv_probe()) {
-    int IN1 = ext_nodes() - 2*int(_current_port_names.size()) + 2*i;
-    trace4("flow ecp", i, IN1, ext_nodes(), _current_port_names.size());
-    n_(IN1) = input->n_(OUT1);
-    n_(IN1+1) = input->n_(OUT2);
+    n_(in1) = input->n_(OUT1);
+    n_(in2) = input->n_(OUT2);
   }else{ untested();
     throw Exception(long_label() + ": " + input_label + " cannot be used as current probe");
   }

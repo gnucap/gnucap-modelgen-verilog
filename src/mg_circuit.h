@@ -215,6 +215,7 @@ public:
   bool has_flow_probe() const;
   bool has_pot_probe() const;
   bool has_flow_source() const { return _has_flow_src; }
+  bool is_self_only()const; // analog
   bool has_short() const { untested(); return _has_short; }
   bool has_always_pot() const { return _has_always_pot; }
   bool is_filter() const { return _ctrl; }

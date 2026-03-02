@@ -321,9 +321,8 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
 	o____ "d->_pot" << bcn << " = false;\n";
       }
 
-      // DUP, clear.
       o____ "d->_value" << bcn << " = 0.;\n";
-      o____ "std::fill_n(d->_st" << bcn << "+1, " << C.branch()->num_states()-1 << ", 0.);\n";
+      o____ "d->_st" << bcn << ".clear();\n";
       o__ "}else{\n";
       o__ "}\n";
     }else if(C.branch()->has_flow_probe()){
@@ -900,7 +899,7 @@ static void make_set_self_contribution(std::ostream& o, Dep const& d)
     o__ "}else{\n";
     o____ b->state() << "[0] -= " << b->state() << "[1] * " << code_name(d) << "; // (4)\n";
     o__ "}\n";
-  }else if(both && is_flow_probe(d)) { untested();
+  }else if(both && is_flow_probe(d)) {
     o__ "// self flow\n";
     o__ "if (_pot"<< b->code_name() << "){\n";
     o____ b->state() << "[0] -= " << b->state() << "[1] * " << code_name(d) << "; // (4)\n";
@@ -970,7 +969,7 @@ static void make_set_one_branch_contribution(std::ostream& o, const Branch& br)
       o__ "// same1 " << code_name(d) << "\n";
       if(b->has_pot_source() && b->has_flow_probe()){
 	if(br.num_states()<=2){
-	}else{ untested();
+	}else{
 	  incomplete(); // the other ones??
 	}
       }else{
@@ -1035,7 +1034,7 @@ static void make_cc_set_branch_contributions(std::ostream& o, const Module& m)
     }else if(b->has_flow_probe()) {
       o__ "// flow prb " << b->name() << "\n";
       o__ "if(" << b->code_name() << "){\n";
-      o____ b->code_name() << "->_loss0 = 1./OPT::shortckt; // (L0)\n";
+      o____ "set_pot_source(" << b->code_name() << "); // (L0)\n";
       o__ "}else{\n";
       o__ "}\n";
     }else{
@@ -1046,9 +1045,9 @@ static void make_cc_set_branch_contributions(std::ostream& o, const Module& m)
       o__ "// pot src " << b->name() << "\n";
       o__ "if(!" << b->code_name() << "){\n";
       o__ "}else if(_pot" << b->code_name() << "){\n";
-      o____ b->code_name() << "->_loss0 = 1./OPT::shortckt;\n";
+      o____ "set_pot_source(" << b->code_name() << "); // AA\n";
       o__ "}else{\n";
-      o____ b->code_name() << "->_loss0 = 0.; // AA\n";
+      o____ "unset_pot_source(" << b->code_name() << "); // AA\n";
       o__ "}\n";
 
 
@@ -1432,7 +1431,7 @@ static void make_clear_branch_contributions(std::ostream& o, const Module& m)
       }else{
       }
       o____ "_value" << x->code_name() << " = 0.;\n";
-      o____ "std::fill_n(_st" << x->code_name() << "+1, " << x->num_states()-1 << ", 0.);\n";
+      o____ "_st" << x->code_name() << ".clear();\n";
     }else{
     }
   }
@@ -1504,25 +1503,22 @@ void make_cc_branch_ctrl(std::ostream& o, Branch const* br)
   }
 }
 /*--------------------------------------------------------------------------*/
-void make_cc_current_ports(std::ostream& o, Branch const* br, Element_2 const& e)
+void make_cc_current_ctrl(std::ostream& o, Branch const* br)
 {
+  // obsolete.
   // set_current ports.
   int kk = 1;
   for(Dep const& i : br->ddeps()){
     if(!is_flow_probe(i)){
     }else if(branch(i) == br){
       // self control is current
-      o______ "{\n";
-      o________ "std::string tmp = \"\";"; // BUG: passing ref.
-      o________ e.code_name() << "->set_port_by_index(-1,tmp);\n";
-      o______ "}\n";
+      o << ",\n";
+      o______ "     _c" << branch(i)->code_name() << ".nn()";
     }else if(branch(i)){
       if(branch(i)->is_short()){
       }else{
-	o______ "{\n";
-	o________ "std::string tmp = \"" << branch(i)->code_name() << "\";"; // BUG: passing ref.
-	o________ e.code_name() << "->set_port_by_index( -1-"<< kk << ", tmp);\n";
-	o______ "}\n";
+	o << ",\n";
+	o______ "     _c" << branch(i)->code_name() << ".nn()";
 	++kk;
       }
     }else{ untested();
@@ -1638,6 +1634,76 @@ void make_cc_analog_list(std::ostream& o, const Module& m, Branch const*
 {
   OUT_ANALOG oo(OUT_ANALOG::modeDYNAMIC, src);
   oo.make_analog_list(o, m);
+}
+/*--------------------------------------------------------------------------*/
+// BUG: free
+bool Branch::is_self_only() const
+{
+  if(deps().ddeps().size()==1){
+    Branch const* p = branch(deps().ddeps()[0]);
+    return p == this;
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+// BUG: free
+std::string Branch::dev_type()const
+{
+//  if( .. attribute .. )?
+  if(is_filter()) {
+    std::string label = "va_" + _ctrl->label();
+    auto pos = label.find_last_of("_");
+    return label.substr(0, pos);
+  }else if(!is_direct()){
+    if(has_pot_source()){
+      return "va_pot_br";
+    }else{ untested();
+      return "incomplete_dev_type";
+    }
+  }else if(has_flow_source() && has_pot_source()){
+    return "va_sw"; // dio?
+  }else if(has_flow_probe()) {
+    if(deps().ddeps().size() == 0){
+      return "va_sw"; // ?
+    }else if(is_self_only()){
+      return "va_sw"; // ?
+    }else if(has_pot_source()){
+      for(auto const& i : _used_in){
+	if(i == this){ untested();
+	}else if(dynamic_cast<Branch const*>(i)){
+	  return "va_pot_br"; // ind.
+	}else if(dynamic_cast<Probe const*>(i)){ untested();
+	}else{
+	}
+      }
+      for(auto const& i : deps().ddeps()){
+	if(branch(i) != this){
+	  return "va_sw"; // vsine?
+	}else{ untested();
+	}
+      }
+      { untested();
+        return "va_sw"; // vsine?
+      }
+    }else{
+      return "va_sw"; // ?
+    }
+  }else if(has_pot_source()){
+    if(_selfdep){
+      return "va_pot_br";
+    }else if(has_always_pot() && !has_flow_source()) {
+      return "va_pot";
+    }else{
+      return "va_sw";
+    }
+  }else if(has_flow_source()){
+    return "va_flow";
+  }else{ untested();
+    return "va_sw";
+  }
+  unreachable();
+  return "";
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

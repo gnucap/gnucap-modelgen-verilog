@@ -54,6 +54,15 @@ protected: // override virtual
     return bool(_loss0); // HACK.
   }
 
+  void set_param_by_index(int i, std::string&, int j)override {
+    assert(i==123457);
+    if(j){
+      _loss0 = 1.;
+    }else{
+      _loss0 = 0.;
+    }
+  }
+
   double   tr_involts()const override	{ untested();unreachable(); return NOT_VALID;}
   double   tr_involts_limited()const override { untested();unreachable(); return NOT_VALID;}
   double   tr_amps()const override;
@@ -66,16 +75,11 @@ protected: // override virtual
     assert(_nN); assert(i>=0); assert(i<matrix_nodes()); return _nN[i];
   }
 
-  bool has_iv_probe()const override{ untested();incomplete(); return false;}
+  bool has_iv_probe()const override{return false;}
+  bool has_inode()const override{return true;}
   void expand()override;
  // void expand_last()override{assert(0);}
 
-public:
-  void set_parameters(const std::string& Label, CARD* Parent,
-		      COMMON_COMPONENT* Common, double Value,
-		      int state_count, double state[],
-		      int node_count, const node_t nodes[])override;
-  //		      const double* inputs[]=0);
 protected:
   double abstol() const{
     auto cv = prechecked_cast<COMMON_VASRC const*>(common());
@@ -100,6 +104,7 @@ void VA_BREQN::expand()
   }
   assert(BR());
   if (_sim->is_first_expand()) {
+    n_(BR()) = node_t(); // knock out possible net_node
     n_(BR()).new_model_node( long_label() + ".br", this);
     assert(BR() < int_nodes()+ext_nodes());
   }else{ untested();
@@ -178,7 +183,16 @@ bool VA_BREQN::do_tr()
     _m0.c1 = 0; // -_loss0 * _values[1];
   }else{
     // current source.
-    _m0 = CPOLY1(0., _values[0], _values[1]);
+    if(_values[0] || _values[1]){ untested();
+       // possibly incomplete();
+    }else{
+    }
+    if(p0_is_cc()){
+      incomplete();
+      _m0 = CPOLY1(0., _values[0], 0.);
+    }else{
+      _m0 = CPOLY1(0., _values[0], _values[1]);
+    }
   }
   return do_tr_con_chk_and_q();
 }
@@ -193,15 +207,14 @@ inline void VA_BREQN::tr_load_ones()
 {
   double d = dampdiff(&_one0, _one1);
   if (d != 0.) {
-//     tr_load_shunt(); // 4 pt +- loss
-// 		     return;
-    _sim->_aa.load_asymmetric(n_(OUT1).m_(), n_(OUT2).m_(), n_(BR()).m_(), 0,  d);
-
     if(is_vs()){
       trace4("BREQN::tr_load_ones vs", long_label(), _one0, _one1, d);
-      _sim->_aa.load_asymmetric(n_(BR()).m_(), 0, n_(OUT1).m_(), n_(OUT2).m_(), d);
+      // like tr_load inode, but use branch index.
+      _sim->_aa.load_couple(n_(OUT1).m_(), n_(BR()).m_(), -d);
+      _sim->_aa.load_couple(n_(OUT2).m_(), n_(BR()).m_(),  d);
     }else{
       trace4("BREQN::tr_load_ones cs", long_label(), _one0, _one1, d);
+      _sim->_aa.load_asymmetric(n_(OUT1).m_(), n_(OUT2).m_(), n_(BR()).m_(), 0,  d);
       _sim->_aa.load_diagonal_point(n_(BR()).m_(), d);
     }
   }else{
@@ -222,27 +235,32 @@ void VA_BREQN::tr_load()
   }
   tr_load_ones();
 
-  if(is_vs()){
-    // is_voltage_source
-    trace1("VA_BREQN::tr_load vs", _values[0]);
-    tr_load_source_point(n_(BR()), &_values[0], &_old_values[0]); // rhs.
-
-    for (int i=1; i<=_n_ports; ++i) {
-      trace2("VA_BREQN::tr_load vs", i, _values[i]);
-      tr_load_extended(gnd, n_(BR()), n_(2*i-2), n_(2*i-1), &(_values[i]), &(_old_values[i]));
+  int vv = 1;
+  trace2("VA_BREQN::tr_load vs", is_vs(),_values[0]);
+  tr_load_source_point(n_(BR()), &_values[0], &_old_values[0]);
+  if(!_n_current_inputs){
+  }else if(_n_current_inputs == 1){
+    if(p0_is_cc()){
+      vv = 2;
+      if(_values[1]){
+	incomplete();
+      }else{
+      }
+    }else{
+      vv = 1; // really?
     }
   }else{
-    trace2("VA_BREQN::tr_load I", _values[0], _values[1]);
+    incomplete();
+  }
 
-    for (int i=1; i<=_n_ports; ++i) {
-      trace4("tr_load", long_label(), i, _values[i], _old_values[i]);
-      tr_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), &(_values[i]), &(_old_values[i]));
-    }
+  for (int i=vv; i<_n_ports + 1; ++i) {
+    trace5("VA_BREQN::tr_load vs", i, vv, _n_ports, matrix_nodes(), _values[i]);
+    tr_load_extended(gnd, n_(BR()), n_(2*i-2), n_(2*i-1), &(_values[i]), &(_old_values[i]));
   }
 }
 /*--------------------------------------------------------------------------*/
 double VA_BREQN::tr_amps()const
-{ untested();
+{
   return n_(BR()).v0();
 }
 /*--------------------------------------------------------------------------*/
@@ -281,11 +299,14 @@ void VA_BREQN::ac_iwant_matrix()
 inline void VA_BREQN::ac_load_ones()
 {
   double d = 1.;
-  _sim->_acx.load_asymmetric(n_(OUT1).m_(), n_(OUT2).m_(),n_(BR()).m_(), 0,  d);
 
   if(is_vs()){
-    _sim->_acx.load_asymmetric(n_(BR()).m_(), 0, n_(OUT1).m_(), n_(OUT2).m_(), d);
+//    _sim->_acx.load_asymmetric(n_(OUT1).m_(), n_(OUT2).m_(),n_(BR()).m_(), 0,  d);
+//    _sim->_acx.load_asymmetric(n_(BR()).m_(), 0, n_(OUT1).m_(), n_(OUT2).m_(), d);
+    _sim->_acx.load_couple(n_(OUT1).m_(), n_(BR()).m_(), -d);
+    _sim->_acx.load_couple(n_(OUT2).m_(), n_(BR()).m_(),  d);
   }else{
+    _sim->_acx.load_asymmetric(n_(OUT1).m_(), n_(OUT2).m_(),n_(BR()).m_(), 0,  d);
     _sim->_acx.load_diagonal_point(n_(BR()).m_(), d);
   }
 }
@@ -304,59 +325,13 @@ void VA_BREQN::ac_load()
       ac_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), _values[i]);
     }
   }
-  if(_current_port_names.size()){ untested();
+  if(_n_current_inputs){
     incomplete();
   }else{
   }
   _acg = _values[1];
 //  ac_load_passive();
 
-}
-/*--------------------------------------------------------------------------*/
-/* set: set parameters, used in model building
- */
-void VA_BREQN::set_parameters(const std::string& Label, CARD *Owner,
-				 COMMON_COMPONENT *Common, double Value,
-				 int n_states, double states[],
-				 int n_nodes, const node_t nodes[])
-  //				 const double* inputs[])
-{
-  bool first_time = (net_nodes() == 0);
-
-  set_label(Label);
-  trace3("VA_BREQN::set_parameters", short_label(), n_nodes, n_states);
-  set_owner(Owner);
-  set_value(Value);
-  attach_common(Common);
-  _current_port_names.resize(n_states - 1 - n_nodes/2);
-  _input.resize(n_states - 1 - n_nodes/2);
-
-  if (first_time) {
-    _n_ports = n_states-1; // set net_nodes
-    assert(size_t(_n_ports) == n_nodes/2 + _current_port_names.size());
-
-    assert(!_old_values);
-    _old_values = new double[n_states];
-
-    if (matrix_nodes() > NODES_PER_BRANCH) {
-      // allocate a bigger node list
-      _nN = new node_t[matrix_nodes()];
-    }else{
-      // use the default node list, already set
-    }      
-  }else{
-    assert(_n_ports == n_states-1);
-    assert(_old_values);
-    assert(net_nodes() == n_nodes);
-    // assert could fail if changing the number of nodes after a run
-  }
-
-  _values = states;
-  std::fill_n(_values, n_states, 0.);
-  std::fill_n(_old_values, n_states, 0.);
-  assert(n_nodes <= net_nodes());
-  notstd::copy_n(nodes, n_nodes, _nN); // copy more in expand_last
-  assert(ext_nodes() == _n_ports * 2);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

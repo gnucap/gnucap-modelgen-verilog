@@ -92,6 +92,31 @@ inline void e_val(double* p, const double& x, const CARD_LIST*)
   *p = x;
 }
 /*--------------------------------------------------------------------------*/
+class CURRENT_CTRL : public NODE {
+  node_t _nn;
+public:
+  explicit CURRENT_CTRL(std::string const& n) : NODE(), _nn(this) {
+    set_label(n);
+  }
+  virtual ELEMENT const* get(COMPONENT const*)const {untested();
+    unreachable();
+    return nullptr;
+  }
+  node_t& nn() {return _nn;}
+};
+/*--------------------------------------------------------------------------*/
+void set_pot_source(CARD* e)
+{
+  std::string x;
+  e->set_param_by_index(123457, x, 1);
+}
+/*--------------------------------------------------------------------------*/
+void unset_pot_source(CARD* e)
+{
+  std::string x;
+  e->set_param_by_index(123457, x, 0);
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:

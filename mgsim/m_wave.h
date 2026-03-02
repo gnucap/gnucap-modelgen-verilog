@@ -36,7 +36,7 @@ public:
 
   explicit WAVE(double d=0);
   explicit WAVE(const WAVE&);
-	  ~WAVE() { untested();}
+	  ~WAVE() {}
   WAVE&	   set_delay(double d);
   WAVE&	   initialize();
   WAVE&	   push(double t, double v);

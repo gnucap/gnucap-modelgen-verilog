@@ -76,7 +76,7 @@ static void make_cc_branch_output(std::ostream& o, Branch const* br)
 /*--------------------------------------------------------------------------*/
 // TODO: mg_out_analog.cc
 void make_cc_branch_ctrl(std::ostream& o, Branch const* br);
-void make_cc_current_ports(std::ostream& o, Branch const* br, Element_2 const&);
+void make_cc_current_ctrl(std::ostream& o, Branch const* br);
 /*--------------------------------------------------------------------------*/
 static void make_tr_needs_eval(std::ostream& o, const Module& m)
 {
@@ -189,7 +189,7 @@ static void make_set_parameters(std::ostream& o, const Element_2& e, std::string
   }
   o << ", 0."; // value
   if (e.state() != "") {
-    o << ", /*states:*/" << e.num_states() << ", " << e.state();
+    o << ", /*states:*/" << e.num_states() << ", " << e.state() << ".ptr()";
   }else{ untested();
     o << ", 0, nullptr";
   }
@@ -992,6 +992,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
   if(e.num_nodes()){
     make_cc_branch_output(o, br);
     make_cc_branch_ctrl(o, br);
+    make_cc_current_ctrl(o, br);
 
     o << "}; // nodes\n";
 
@@ -1007,8 +1008,6 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
       o______ "}else{\n";
       o______ "}\n";
     }
-
-    make_cc_current_ports(o, br, e);
   }else{
     o << "gnd, gnd"; // filt subs hack.
     o << "}; // nodes\n";
@@ -1226,11 +1225,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
     if(i->has_branch()){ untested();
       unreachable();
     }else{
-      // TODO incomplete();
-      o__ "// no branch? " << i->name() << "\n";
       make_module_expand_one_branch(o, *i, m, "");
-      // make_module_expand_one_filter(o, *i);
-      o__ "// =====/no branch===== // \n";
     }
   }
 #endif

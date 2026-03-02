@@ -689,26 +689,11 @@ public:
     return _card == o._card && _ref == o._ref && _tail == o._tail;
   }
 private:
-  void link_device_(CARD const*, std::string const& path);
   bool find_device_up(CARD const*, std::string const&, std::string const& tail);
   bool find_device_down(CARD_LIST const*, std::string const& path);
   bool find_device_down(CARD_LIST const*, std::string const& dev, std::string const& tail);
   Base const* find_item(CARD_LIST const* scope, std::string const& path)const;
 };
-/*--------------------------------------------------------------------------*/
-// found a device. store the remainder of the path.
-inline void Href_::link_device_(CARD const* device, std::string const& path)
-{ untested();
-  if(!device){ untested();
-    // top level thing?
-    incomplete();
-  }else{ untested();
-    trace2("found link device", device->long_label(), path);
-  }
-
-  _card = device;
-  _tail = path;
-}
 /*--------------------------------------------------------------------------*/
 inline Base const* Href_::find_item(CARD_LIST const* scope, std::string const& path) const
 {
@@ -771,6 +756,7 @@ inline bool Href_::find_device_down(CARD_LIST const* scope, std::string const& d
     return true;
   }
 }
+/*--------------------------------------------------------------------------*/
 inline bool Href_::find_device_down(CARD_LIST const* scope, std::string const& path)
 {
   trace2("href::find_dev_down", scope, path);
@@ -950,7 +936,6 @@ inline node_t& ground()
 }
 /*--------------------------------------------------------------------------*/
 }
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 /*--------------------------------------------------------------------------*/
