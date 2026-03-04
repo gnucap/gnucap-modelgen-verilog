@@ -91,6 +91,9 @@ $(TARGET_EXE)$(TARGET_EXE_EXT): $(TARGET_DEPENDS)
 	rm -f $@
 	$(MAKE_EXE) # -o $@
 #------------------------------------------------------------------------
+%.a: ${OBJS}
+	${CXX} ${OBJS} -shared -o $@
+#------------------------------------------------------------------------
 
 .PHONY: clean distclean install all uninstall depend
 .SECONDARY: ${TARGET:.so=.cc}

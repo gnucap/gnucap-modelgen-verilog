@@ -24,9 +24,10 @@ TARGET = gnucap-mg-vams
 TARGET_EXE = gnucap-mg-vams
 TARGET_LIBS = -lgnucap
 LIBS = -lgnucap # used in MakeConf.default
+noinst_LIBS = libmgvams.a
 #------------------------------------------------------------------------
 # BUG
-all: ${TARGET}
+all: ${TARGET} ${noinst_LIBS}
 #------------------------------------------------------------------------
 MANPAGE = ${TARGET}.1
 #------------------------------------------------------------------------
