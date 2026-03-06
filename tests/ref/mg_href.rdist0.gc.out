@@ -5,25 +5,25 @@ endmodule // numbers
 
 #          
 P in dut1 is -5.103383
-Q in dut1 is 0.250689
-R in dut1 is 2.436469
+Q in dut1 is 3.366383
+R in dut1 is 6.005183
 P in dut2 is -5.103383
-Q in dut2 is 0.896328
-R in dut2 is 3.165541
+Q in dut2 is 2.799303
+R in dut2 is 4.935474
  0.        
 #          
 P in dut1 is -1.756462
-Q in dut1 is 2.632162
-R in dut1 is 4.843226
+Q in dut1 is 3.111192
+R in dut1 is 6.055899
 P in dut2 is -1.756462
-Q in dut2 is 0.113762
-R in dut2 is 3.050197
+Q in dut2 is 0.814027
+R in dut2 is 3.560575
  0.        
 #          
 P in dut1 is -1.756462
-Q in dut1 is 2.632162
-R in dut1 is 4.843226
+Q in dut1 is 3.111192
+R in dut1 is 6.055899
 P in dut2 is -1.756462
-Q in dut2 is 0.113762
-R in dut2 is 3.050197
+Q in dut2 is 0.814027
+R in dut2 is 3.560575
  0.        

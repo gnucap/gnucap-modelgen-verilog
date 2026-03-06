@@ -236,6 +236,35 @@ static char* ftos_(double num, int fieldwidth, int len, int fmt)
   return str;
 }
 /*--------------------------------------------------------------------------*/
+bool is_cc_ref(Token const* t)
+{
+  if (dynamic_cast<Token_PAR_REF const*>(t)) {
+    return true;
+  }else if (dynamic_cast<Token_VAR_REF const*>(t)) {
+    return true;
+  }else if (dynamic_cast<Token_PORT_BRANCH const*>(t)) {
+    return true;
+  }else if (dynamic_cast<Token_CONSTANT const*>(t)) {
+    return true;
+  }else if (dynamic_cast<Token_HIER_REF const*>(t)) {
+    return true;
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool is_cc_ref(Expression const* e)
+{
+  assert(e);
+  assert(e->size());
+
+  if(e->size()==1){
+    return is_cc_ref(*e->begin());
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
 class RPN_VARS {
   typedef enum{
     t_flt,
@@ -362,10 +391,7 @@ public:
   }
   void new_literal(std::ostream& o, Token_CONSTANT const& c);
   void new_rhs(Token_NODE const* v){
-    {
-      _refs.push("MOD::n_" + v->code_name() + "/*node*/");
-    }
-    _types.push(t_ref);
+    new_ref("MOD::n_" + v->code_name() + "/*node*/");
   }
   void new_rhs(Token_VAR_REF const* v){
     // TODO: linear?
@@ -373,21 +399,16 @@ public:
     //   // crash?
     //   _refs.push("ddouble(" + (*v)->code_name() + ")/*rhsvar*/");
     // }else
-    {
-      _refs.push("" + v->code_name() + "/*rhsvar*/");
-    }
-    _types.push(t_ref);
+    new_ref(v->code_name() + "/*rhsvar*/");
   }
   void new_rhs(Token_HIER_REF const* v){
     // TODO: what type is it??
-    _refs.push("pc->" + v->code_name() + ".get_double()");
-    _types.push(t_ref); // what?
+    new_ref("pc->" + v->code_name() + ".get_double()");
   }
   void new_rhs(Token_PAR_REF const* v){
     // _refs.push("ddouble(" + (*v)->code_name() + ")/*rhsvar*/");
     // _refs.push((*v)->type() + "(" + (*v)->code_name() + ") /*rhspar*/");
-    _refs.push("(" + (*v)->code_name() + ") /*rhspar*/");
-    _types.push(t_ref);
+    new_ref("(" + (*v)->code_name() + ") /*rhspar*/");
   }
   void new_ref(std::string name){
     _refs.push(name);
@@ -425,6 +446,25 @@ public:
   }
   size_t size() const{ untested();
     return _refs.size();
+  }
+  std::string cpptype()const {
+    assert(_types.size());
+    switch(_types.top()) {
+    case t_flt: untested();
+      return "double";
+    case t_ddo:
+      return "ddouble";
+    case t_arr: untested();
+      incomplete();
+      return "incomplete_cpptype";
+    case t_str: untested();
+      return "std::string";
+    case t_ref: untested();
+      return "auto&"; // really?
+    default:untested();
+      unreachable();
+      return "";
+    }
   }
   std::string code_name() const{
     assert(_types.size());
@@ -691,9 +731,10 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
       vars().new_rhs(hh);
     }else if(auto pp = dynamic_cast<const Token_ACCESS*>(*i)) {
       vars().new_ddouble(o);
+      std::string lhsname = vars().code_name();
       if(!vars().has_deps()){ untested();
       }else if(options().optimize_deriv()){
-	o__ vars().code_name() << ".set_no_deps();\n";
+	o__ lhsname << ".set_no_deps();\n";
 	// for(auto i: vars().deps()){ untested();
 	//   o__ vars().code_name() << "[d" << i->code_name() << "] = 0.; // (output dep)\n";
 	// }
@@ -701,13 +742,13 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
       }
 
       if(!vars().has_deps()){ untested();
-        o__ vars().code_name() << " = 0.; // no deps.\n";
+        o__ lhsname << " = 0.; // no deps.\n";
       }else if(pp->is_short()){
-	o__ vars().code_name() << " = 0.; // short probe\n";
+	o__ lhsname << " = 0.; // short probe\n";
       }else if(is_precalc()){
-        o__ vars().code_name() << " = 0.; // precalc.\n";
+        o__ lhsname << " = 0.; // precalc.\n";
       }else{
-	o__ vars().code_name() << " = p->xs" << pp->code_name_() << "();\n";
+	o__ lhsname << " = p->xs" << pp->code_name_() << "();\n";
       }
     }else if (auto p = dynamic_cast<const Token_PAR_REF*>(*i)) {
       vars().new_rhs(p);
@@ -808,20 +849,20 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
       o__ "{ // ternary " << _ctx << "\n";
       {
 	indent y;
-	o__ "ddouble& tt0 = " << vars().code_name() << ";\n"; // BUG: float??
+	o__ vars().cpptype() << "& tt0 = " << vars().code_name() << ";\n"; // BUG: float??
 	o__ "if(" << arg1 << "){ // true part\n";
 	{
 	  indent x;
 	  // BUG: nest?
-	  make_cc_expression(o, *t->true_part(), true, _ctx);
-	  o__ "tt0 = t0;\n";
+	  std::string name = make_cc_expression(o, *t->true_part(), true, _ctx);
+	  o__ "tt0 = " << name << ";\n";
 	}
 	o__ "}else{ // false part\n";
 	{
 	  indent x;
 	  // BUG: nest?
-	  make_cc_expression(o, *t->false_part(), true, _ctx);
-	  o__ "tt0 = t0;\n";
+	  std::string name = make_cc_expression(o, *t->false_part(), true, _ctx);
+	  o__ "tt0 = " << name << ";\n";
 	}
 	o__ "}\n";
       }
@@ -862,10 +903,20 @@ std::string make_cc_expression(std::ostream& o, Expression const& e, bool dynami
   OUT_EXPRESSION ex(s, ctx);
   std::string name = ex.make_cc_expression_(o, e);
 
-  if(s.is_ref()){
+  // BUG: this does not belong here.
+  if(ctx == "adjust"){
+    o__ "(void)" << name << ";\n";
+  }else if(deps && deps->size() && (dynamic || ctx == "precalc")){
+    // o__ "// dynamic & deps " << ctx << " " << deps->size() << "\n";
     s.new_ddouble(o);
     s.pop();
     o__ "t0 = " << s.code_name() << "; // " << ctx << "\n";
+  }else if(s.is_ref()){
+    o__ "// ref. type?\n";
+    s.new_float(o);
+    s.pop();
+    o__ "f0 = " << s.code_name() << "; // " << ctx << "\n";
+    o__ "(void) f0;\n"; // BUG
   }else{
   }
   s.pop();
