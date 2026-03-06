@@ -58,7 +58,12 @@ public:
 public:
   bool is_dynamic()const { return _mode==modeDYNAMIC; }
   bool is_static()const { return _mode==modeSTATIC
+                              || _mode==modePRECALC
                               || _mode==modeTR_BEGIN
+                              || _mode==modeTR_RESTORE
+                              || _mode==modeTR_ADVANCE
+                              || _mode==modeTR_REGRESS
+                              || _mode==modeTR_ACCEPT
                               || _mode==modeTR_INITIAL
 			      || _mode==modeTR_REVIEW ; } // || ...?
   bool is_precalc()const { return _mode==modePRECALC; }
@@ -234,19 +239,11 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
     if(a.is_int()){
       o__ lhsname << " = int(t0); // (*)\n";
     }else if(within_af(&a)){
-      o__ lhsname << " = t0; // (1a)\n";
+      o__ lhsname << " = t0; // (af)\n";
     }else if(_mode==modePRECALC){
       o__ lhsname << " = t0; // (prec)\n";
     }else if(is_static()){
-      o__ lhsname << " = t0.value(); // (s)\n";
-    }else if(_mode==modeTR_RESTORE){
-      o__ lhsname << " = t0.value(); // (s)\n";
-    }else if(_mode==modeTR_ADVANCE){
-      o__ lhsname << " = t0.value(); // (s)\n";
-    }else if(_mode==modeTR_REGRESS){
-      o__ lhsname << " = t0.value(); // (s)\n";
-    }else if(_mode==modeTR_ACCEPT){
-      o__ lhsname << " = t0.value(); // (s)\n";
+      o__ lhsname << " = t0.value(); // (static)\n";
     }else if(!options().optimize_deriv()) { untested();
       o__ lhsname << " = t0; // (*)\n";
       for(Dep const& v : a.data().ddeps()) { untested();

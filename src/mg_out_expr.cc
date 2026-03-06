@@ -468,6 +468,7 @@ private:
   void make_cc_array(std::ostream& o, Token_ARRAY_ const* t);
   void make_cc_call(std::ostream& o, Token_CALL const* t);
   bool is_precalc()const {return _ctx == "precalc";}
+  bool is_adjust()const {return _ctx == "adjust";}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -595,7 +596,7 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
     o__ vars().code_name() << " = ";
   }
 
-  if(_ctx=="adjust"){
+  if(is_adjust()) {
   }else if((*F)->is_in_common()) {
   }else{
     o << "/*"<<_ctx<<"*/ d->";
@@ -603,12 +604,12 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
 
   o << F->code_name();
   if((*F)->has_modes()){
-    if(_ctx=="adjust"){
+    if(is_adjust()) {
       o << "precalc";
     }else{
       o << _ctx;
     }
-  }else if(_ctx=="precalc" && (*F)->has_precalc()){
+  }else if(is_precalc() && (*F)->has_precalc()){
     // TODO: cleanup.
     o << "__" + _ctx;
   }else{
@@ -618,7 +619,7 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
   std::string comma = "";
   // if(_ctx=="precalc"){ untested();
   // }else
-  if(_ctx=="adjust"){
+  if(is_adjust()) {
     // there is no context in adjust
   }else if((*F)->needs_context()){
     o << "d /* "<<_ctx<<"*/";
@@ -847,6 +848,7 @@ std::string make_cc_expression(std::ostream& o, Expression const& e, bool dynami
 {
   TData const* deps = nullptr;
   if(ctx=="precalc"){
+    // assert(!dynamic);
   }else{
   }
   if(ctx == "af"){
