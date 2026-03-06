@@ -209,8 +209,9 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 	Token_PORT_BRANCH a(*symbol, pp);
 	a.stack_op(&E);
       }else if(Node_Ref a = Scope->node(t->name())) {
+	incomplete();
 	// use r??
-	Token_NODE tn(*symbol, a);
+	Token_NODE tn(*symbol, a.mutable_node());
 	tn.stack_op(&E);
       }else{
 	throw Exception("unresolved symbol: " + n);
@@ -232,8 +233,9 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       tt->stack_op(&E);
       delete tt;
     }else if(Node_Ref a = Scope->node(t->name())) { untested();
-      Token_NODE tn(*symbol, a);
-      tn.stack_op(&E);
+      assert(0); // obsolete.
+     // Token_NODE tn(*symbol, a);
+     // tn.stack_op(&E);
     }else if(Scope->lookup_branch(t->name())) {
       trace1("unresolved branch", t->name());
       // incomplete();

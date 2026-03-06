@@ -667,7 +667,7 @@ static Token_VAR_REF* parse_variable(CS& f, Block* o)
   if(v){
     assert(f);
     // assert(v->data()); no. unreachable?
-  }else if (b) { untested();
+  }else if (b) {
     f.reset_fail(here);
     trace1("not a variable", f.tail().substr(0,10));
   }else{

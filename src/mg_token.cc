@@ -1365,7 +1365,7 @@ Token_VAR_REF* Token_VAR_REF::clone()const
 }
 /*--------------------------------------------------------------------------*/
 std::string Token_NODE::code_name() const
-{
+{ untested();
   return name();
   return "_n[n_" + name() + "]";
 }

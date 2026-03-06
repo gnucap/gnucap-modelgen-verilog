@@ -25,6 +25,7 @@
 #include "mg_options.h"
 #include "mg_discipline.h"
 #include "mg_token.h"
+#include "mg_event.h"
 #include <e_cardlist.h> // TODO: really?
 #include <u_opt.h>
 #include "globals.h"
@@ -53,10 +54,10 @@ static Base* parse_switch(CS& file, Block* o)
 }
 /*--------------------------------------------------------------------------*/
 static Base* new_evt_ctl_stmt(CS& file, Block* o)
-{ untested();
+{
   auto cb = new DigitalEvtCtlStmt();
   cb->set_owner(o);
-  try{ untested();
+  try{
     file >> *cb;
     return cb;
   }catch(Exception_No_Match const& e){ untested();
@@ -90,7 +91,7 @@ static Base* parse_system_task(CS& f, Block* o)
 }
 /*--------------------------------------------------------------------------*/
 void DigitalProceduralAssignment::parse(CS& f)
-{ untested();
+{
   // assert(owner()); ?
   _a.set_owner(this);
   size_t here = f.cursor();
@@ -101,7 +102,7 @@ void DigitalProceduralAssignment::parse(CS& f)
   if(what == ""){ untested();
     f.reset_fail(here);
     throw Exception_No_Match("need name");
-  }else{ untested();
+  }else{
     f.reset(here);
   }
   if(f >> _a){ untested();
@@ -151,11 +152,11 @@ void DigitalProceduralAssignment::dump(std::ostream& o)const
 }
 /*--------------------------------------------------------------------------*/
 static Base* parse_proc_assignment(CS& f, Block* o)
-{ untested();
+{
   assert(o);
   f.skipbl();
   trace1("parse_proc_assignment", f.tail().substr(0,30));
-  try{ untested();
+  try{
     auto n = new DigitalProceduralAssignment(f, o);
     if(f){ untested();
       return n;
@@ -169,14 +170,14 @@ static Base* parse_proc_assignment(CS& f, Block* o)
 /*--------------------------------------------------------------------------*/
 DigitalProceduralAssignment::DigitalProceduralAssignment(CS& file, Block* o)
   : DigitalStmt()
-{ untested();
+{
   set_owner(o);
   _a.set_owner(this);
   parse(file);
 }
 /*--------------------------------------------------------------------------*/
 static Base* parse_stmt_or_null(CS& file, Block* scope)
-{ untested();
+{
   size_t here = file.cursor();
   assert(scope);
   Base* ret = nullptr;
@@ -749,10 +750,10 @@ void DigitalSeqBlock::parse(CS& f)
 void DigitalCtrlBlock::set_owner(Statement* st)
 {
   Block* o = st->scope();
-  if(auto x = dynamic_cast<SeqBlock const*>(o)) { untested();
+  if(auto x = dynamic_cast<SeqBlock const*>(o)) {
     if(x->has_sensitivities()){ untested();
       merge_sens(*x->sensitivities());
-    }else{ untested();
+    }else{
     }
   }else{
   }
@@ -774,7 +775,7 @@ void DigitalCtrlBlock::parse(CS& f)
 //  size_t here = f.cursor();
   if(f >> "begin"){
     DigitalSeqBlock::parse(f);
-  }else{ untested();
+  }else{
     Base* b = parse_stmt_or_null(f, this);
     if(!f) { untested();
       assert(!b);
@@ -1122,14 +1123,14 @@ bool DigitalExpression::is_false() const
 #endif
 /*--------------------------------------------------------------------------*/
 void DigitalEvtCtlStmt::parse(CS& file)
-{ untested();
+{
   _ctrl.set_owner(owner()); // ?
-  if(file >> '('){ untested();
+  if(file >> '('){
   }else{ untested();
     file.warn(bDANGER, "expecting '('");
   }
   file >> _ctrl;
-  if(file >> ')'){ untested();
+  if(file >> ')'){
   }else{ untested();
     file.warn(bDANGER, "need ')'");
   }
@@ -1213,7 +1214,7 @@ bool DigitalEvtExpression::is_used_in(Base const* b)const
 }
 /*--------------------------------------------------------------------------*/
 void DigitalEvtExpression::parse(CS& file)
-{ untested();
+{
   assert(!size());
  // assert(!function());
 
@@ -1262,7 +1263,7 @@ void DigitalEvtExpression::dump(std::ostream& o) const
 // TODO // dup in SystemTask
 // TODO // dup in AnalogEvtExpression
 void DigitalEvtExpression::set_rdeps()
-{ untested();
+{
   assert(size());
   Token const* t = back();
   assert(t);
@@ -1272,33 +1273,33 @@ void DigitalEvtExpression::set_rdeps()
   Expression const* a = c->args();
   assert(a);
 
-  for(auto i : *a) { untested();
+  for(auto i : *a) {
     Token_CALL const* call = prechecked_cast<Token_CALL const*>(i);
     assert(call);
     auto& f = *call;
-   // auto e = prechecked_cast<MGVAMS_EVENT const*>(f.f());
-   // assert(e);
-    if(f->has_tr_begin()){ untested();
+    auto e = prechecked_cast<MGVAMS_EVENT const*>(f.f());
+    assert(e);
+    if(f->has_tr_begin()){
       add_rdep(&tr_begin_tag);
     }else{ untested();
     }
     if(f->has_tr_restore()){ untested();
       add_rdep(&tr_restore_tag);
-    }else{ untested();
+    }else{
     }
-    if(f->has_tr_review()){ untested();
+    if(f->has_tr_review()){
       add_rdep(&tr_eval_tag);
     }else{ untested();
     }
-    if(f->has_tr_review()){ untested();
+    if(f->has_tr_review()){
       add_rdep(&tr_review_tag);
     }else{ untested();
     }
-    if(f->has_tr_accept()){ untested();
+    if(f->has_tr_accept()){
       add_rdep(&tr_accept_tag);
     }else{ untested();
     }
-    if(f->has_tr_advance()){ untested();
+    if(f->has_tr_advance()){
       add_rdep(&tr_advance_tag);
     }else{ untested();
     }
