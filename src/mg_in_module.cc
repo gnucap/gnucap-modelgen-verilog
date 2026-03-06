@@ -956,11 +956,7 @@ void Module::dump(std::ostream& o)const
 //    o << local_params() << "\n";
 //  }else{ untested();
 //  }
-  if(circuit()->element_list().size()){
-//    o__ "// circuit\n";
-    o << circuit()->element_list() << "\n";
-  }else{
-  }
+  o << *circuit();
 
   assert(_assign);
   _assign->dump(o);

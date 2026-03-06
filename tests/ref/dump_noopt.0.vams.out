@@ -7,7 +7,6 @@ module test(d, g, s, b);
 
   electrical #() d();
   g #() ();
-
   analog begin
     T = (0 * P);
     T = (0 * U);

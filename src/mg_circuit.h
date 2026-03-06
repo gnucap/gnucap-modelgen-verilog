@@ -425,7 +425,7 @@ public:
   explicit Circuit();
   ~Circuit();
   void parse(CS&) override;
-  void dump(std::ostream&)const override{ untested();incomplete();}
+  void dump(std::ostream&)const override;
 
   Port_3* find_port(std::string const& n);
 

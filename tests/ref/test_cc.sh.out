@@ -2480,7 +2480,8 @@ void MOD_resistor::expand()
   auto c = static_cast</*const*/ COMMON_resistor*>(mutable_common());
   assert(c);
   (void)c;
-  if (!subckt()) {
+  bool is_first_expand = !subckt();
+  if (is_first_expand) {
     new_subckt();
   }else{
   }
@@ -4415,7 +4416,8 @@ void MOD_resistor::expand()
   auto c = static_cast</*const*/ COMMON_resistor*>(mutable_common());
   assert(c);
   (void)c;
-  if (!subckt()) {
+  bool is_first_expand = !subckt();
+  if (is_first_expand) {
     new_subckt();
   }else{
   }
@@ -6767,7 +6769,8 @@ void MOD_capacitor::expand()
   auto c = static_cast</*const*/ COMMON_capacitor*>(mutable_common());
   assert(c);
   (void)c;
-  if (!subckt()) {
+  bool is_first_expand = !subckt();
+  if (is_first_expand) {
     new_subckt();
   }else{
   }
@@ -8012,7 +8015,8 @@ void MOD_capacitor::expand()
   auto c = static_cast</*const*/ COMMON_capacitor*>(mutable_common());
   assert(c);
   (void)c;
-  if (!subckt()) {
+  bool is_first_expand = !subckt();
+  if (is_first_expand) {
     new_subckt();
   }else{
   }

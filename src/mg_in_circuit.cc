@@ -55,6 +55,17 @@ void Circuit::parse(CS&)
   _element_list.set_owner(owner());
 }
 /*--------------------------------------------------------------------------*/
+void Circuit::dump(std::ostream& o) const
+{
+  for(auto const& e : element_list()){
+    assert(e);
+    if(e->eval()==""){
+      o << *e;
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 void New_Port::parse(CS& file)
 {
   Port_3::parse(file); // TODO: port_base?

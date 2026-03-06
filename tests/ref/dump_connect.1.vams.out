@@ -6,7 +6,6 @@ module elect_to_logic(el, cm);
   electrical el;
   reg #() cm();
   ddiscrete #() cm();
-
   always begin
     @(cross((V(el) -  2.5), 1)) begin
       cm = 1;
@@ -25,7 +24,6 @@ module logic_to_elect(cm, el);
   output el;
   electrical el;
   ddiscrete #() cm();
-
   analog begin
     V(el) <+ transition((((cm == 1))? ( 5.):( 0.)));
   end
