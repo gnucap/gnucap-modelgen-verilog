@@ -140,6 +140,11 @@ Port_3* Circuit::find_port(std::string const& n)
   }
 }
 /*--------------------------------------------------------------------------*/
+void Circuit::push_back(Filter /*const?*/ * f)
+{
+  _filters.push_back(f);
+}
+/*--------------------------------------------------------------------------*/
 bool Branch::is_used_in(Base const* b)const
 {
   for(auto& i : _used_in){

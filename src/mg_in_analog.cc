@@ -2562,9 +2562,9 @@ Probe* new_Probe(std::string const& xs, Branch_Ref const& br)
   return new Probe(xs, br);
 }
 /*--------------------------------------------------------------------------*/
-size_t Branch::num_nodes() const
+int Branch::net_nodes() const
 {
-  size_t ret=2;
+  int ret=2;
 
   for(Dep const& i : ddeps()){
     if(branch(i)->is_short()){
@@ -2585,9 +2585,9 @@ size_t Branch::num_nodes() const
   return ret;
 }
 /*--------------------------------------------------------------------------*/
-size_t Branch::num_states() const
+int Branch::num_states() const
 {
-  size_t k = 2;
+  int k = 2;
   // TODO: cleanup
   for(Dep const& i : ddeps()){
     // if(i->is_reversed()){ untested();

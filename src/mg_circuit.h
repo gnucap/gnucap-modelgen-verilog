@@ -114,6 +114,7 @@ public:
   const Port_Connection_List& ports()const	  {return _list_of_port_connections;}
   const Port_1_List& current_ports() const{ untested();return _current_port_list;}
   virtual std::string instance_name()const  { untested();return _name_of_module_instance;}
+  void set_label(std::string const& l) {_name_of_module_instance = l;}
   virtual std::string short_label()const 	  {return _name_of_module_instance;}
   virtual std::string code_name()const  {return "_e_" + _name_of_module_instance;}
   const std::string& eval()const 	{return _eval;}
@@ -122,10 +123,14 @@ public:
   virtual const std::string& omit()const 	{return _omit;}
   const std::string& reverse()const 	{ untested();return _reverse;}
   virtual std::string state()const	{return _state;}
-  virtual size_t	     num_nodes()const	{return ports().size();}
-  virtual size_t	     num_states()const	{ untested();unreachable(); return 0;}
+  virtual int	     net_nodes()const	{return int(ports().size());}
+  virtual int	     num_nodes()const	{return int(ports().size());}
+  virtual int	     num_states()const	{ untested();unreachable(); return 0;}
   virtual bool is_used()const {return true;} // incomplete.
   virtual bool is_used_in_branch()const {return true;} // incomplete.
+  virtual std::string const& port_name(int)const {
+    unreachable(); static std::string s("err"); return s;
+  }
 }; // Element_2
 /*--------------------------------------------------------------------------*/
 class Dep;
@@ -188,7 +193,8 @@ public:
   std::string const& omit()const override;
   std::string dev_type()const override;
   void add_dep(Dep const&);
-  size_t num_nodes()const override;
+  int num_nodes()const override { return net_nodes(); }
+  int net_nodes()const override;
   std::string state()const override;
   std::string state(std::string const& n)const;
   virtual bool has_element() const;
@@ -223,7 +229,7 @@ public:
   bool has_pot_source()const;
   bool is_source()const {return _source || has_pot_source() || has_flow_source();}
   bool is_shadow_source()const;
-  size_t num_states()const override;
+  int num_states()const override;
   Discipline const* discipline()const override;
   Nature const* nature()const override;
 public:
@@ -447,6 +453,7 @@ public:
 
 public: //TODO
   void push_back(Filter /*const?*/ * f);
+  void push_back(Element_2 /*const?*/ * f);
   New_Port_List&	  ports()		{return _ports;}
   Port_3_List_3&	  input()		{return _input;}
   Port_3_List_3&	  output()		{return _output;}

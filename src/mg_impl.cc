@@ -215,13 +215,13 @@ std::string Filter::code_name()const
   return "_f_" + _name; // name()?
 }
 /*--------------------------------------------------------------------------*/
-size_t Filter::num_states() const
+int Filter::num_states() const
 {
-  return size_t(_num_states);
+  return int(_num_states);
 }
 /*--------------------------------------------------------------------------*/
 // BUG: delegate to branch
-size_t Filter::num_nodes() const
+int Filter::num_nodes() const
 {
   // slew? BUG
   return 0;

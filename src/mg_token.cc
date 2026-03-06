@@ -1177,7 +1177,7 @@ Data_Type const& Token_VAR_REF::type() const
     return it->type();
   }else if(auto af = dynamic_cast<Analog_Function const*>(_item)){
     return af->type();
-  }else if(auto n = dynamic_cast<Node const*>(_item)){
+  }else if(dynamic_cast<Node const*>(_item)){
     incomplete();
     static Data_Type_Real t;
     return t;
