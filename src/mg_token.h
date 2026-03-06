@@ -423,8 +423,10 @@ class Token_NODE : public Token_VAR_REF {
  // Token_NODE(Token_NODE const& s)
  //   : Token_VAR_REF(s, s._node) { }
 public:
-  Token_NODE(Token_SYMBOL const& s, Base* p)
+  explicit Token_NODE(Token_SYMBOL const& s, Base* p)
     : Token_VAR_REF(s.name(), p) { }
+  explicit Token_NODE(std::string const& s, Base* p)
+    : Token_VAR_REF(s, p) { }
 
   Token_NODE* clone()const override { return new Token_NODE(*this); }
 

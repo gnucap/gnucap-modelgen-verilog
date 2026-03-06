@@ -134,19 +134,6 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
   }
 }
 /*--------------------------------------------------------------------------*/
-Node* Node_Map::new_node(std::string const& p, Block* owner)
-{
-  Node*& cc = _map[p];
-  if(cc) {
-  }else{
-    // new_ref here?
-    cc = new Node(p, int(_nodes.size()));
-    owner->new_var_ref(cc);
-    _nodes.push_back(cc);
-  }
-  return cc;
-}
-/*--------------------------------------------------------------------------*/
 Node_Map::Node_Map()
 {
   assert(mg_ground_node.number() == 0);
