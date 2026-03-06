@@ -87,6 +87,9 @@ inline Expression_* Expression_::clone() const
   return n;
 }
 /*--------------------------------------------------------------------------*/
+std::string make_cc_expression(std::ostream& o, Expression const& e, bool deriv=true,
+    std::string ctx="");
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet

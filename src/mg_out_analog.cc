@@ -251,15 +251,20 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
     }else if(_mode==modePRECALC){
       o__ lhsname << " = " << rhsname << "; // (prec)\n";
     }else if(is_static()){
-      o__ lhsname << " = " << rhsname << ".value(); // (s)\n";
+      o__ lhsname << " = " << rhsname << "; // (s)\n";
     }else if(!options().optimize_deriv()) {
-      o__ lhsname << " = " << rhsname << "; // (*)\n";
+      o__ lhsname << " = " << rhsname << "; // (*1)\n";
       for(Dep const& v : a.data().ddeps()) {
 	o__ "// " << a.lhs().code_name() << "[d" << code_name(v) << "] = " << "" << rhsname << "[d" << code_name(v) << "]; // (2a)\n";
 	o__ "assert(" << a.lhs().code_name() << "[d" << code_name(v) << "] == " << "" << rhsname << "[d" << code_name(v) << "]); // (2a2)\n";
       }
     }else{
-      o__ lhsname << " = " << rhsname << ".value(); // (*)\n";
+      // actual type?
+      if(!e.data().ddeps().size()){
+	o__ lhsname << " = " << rhsname << "; // (*2)\n";
+      }else{
+	o__ lhsname << " = " << rhsname << ".value(); // (*3)\n";
+      }
       // o__ lhsname << ".set_no_deps(); // (42)\n";
 #ifdef TRACE_ASSIGN
       o__ "trace1(\"assign\", " << lhsname << ");\n";

@@ -498,6 +498,7 @@ public:
   std::string make_cc_expression_(std::ostream& o, Expression const& e);
 private:
   RPN_VARS& vars() {return _s;}
+  void new_variable(std::ostream& o, Token const* t);
   std::string make_cc_expression_(std::ostream& o, Token const* t) {
     Expression_ e;
     e.push_back(const_cast<Token*>(t));
@@ -511,6 +512,27 @@ private:
   bool is_adjust()const {return _ctx == "adjust";}
 };
 /*--------------------------------------------------------------------------*/
+void OUT_EXPRESSION::new_variable(std::ostream& o, Token const* t)
+{
+  Data_Type const* d = nullptr;
+  if(auto F = dynamic_cast<const Token_CALL*>(t)){
+    d = (*F)->return_type(); // BUG.
+  }else{
+    incomplete();
+  }
+
+  if(!d) {
+    // incomplete();
+    o__ "/* void? */\n";
+    vars().new_ddouble(o); // TODO
+  }else if(d->is_real()){
+    vars().new_ddouble(o);
+  }else if(d->is_string()){
+    vars().new_string(o);
+  }else{
+    vars().new_float(o); // TODO
+  }
+}
 /*--------------------------------------------------------------------------*/
 static void make_cc_string(std::ostream& o, String const& e)
 {
@@ -593,17 +615,7 @@ void OUT_EXPRESSION::make_cc_array(std::ostream& o, Token_ARRAY_ const* A)
 /*--------------------------------------------------------------------------*/
 void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
 {
-  Data_Type const* rt = (*F)->return_type();
-  if(!rt) {
-    o__ "/* void? */\n";
-    vars().new_float(o); // TODO
-  }else if(rt->is_real()){
-    vars().new_ddouble(o);
-  }else if(rt->is_string()){
-    vars().new_string(o);
-  }else{
-    vars().new_float(o); // TODO
-  }
+  new_variable(o, F);
   vars().stop();
   vars().enter_scope();
   o__ "{ // scope\n"; {
@@ -630,6 +642,7 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
   o__ "// --- \n";
   vars().args_pop();
   vars().leave_scope();
+  Data_Type const* rt = (*F)->return_type();
   if(!rt) {
     o__"(void)" <<  vars().code_name() << ";\n";
   }else{
@@ -779,6 +792,7 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
       }
 #endif
     }else if (auto bo = dynamic_cast<const Token_BINOP_*>(*i)) {
+      // make_cc_binop(..);
 
       assert(bo->op1());
       // assert(bo->op1()->data());
@@ -792,7 +806,8 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
       vars().pop();
       std::string arg1 = vars().code_name();
       vars().pop();
-      vars().new_ddouble(o);
+
+      new_variable(o, *i);
 
       auto op = (*i)->name()[0];
       if ( op == '-'
@@ -823,12 +838,13 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
 	throw Exception("run time error in make_cc_expression: " + (*i)->name());
       }
     }else if (auto u = dynamic_cast<const Token_UNARY_*>(*i)) {
+      // make_cc_unary(..);
       assert(u->op1());
       make_cc_expression_(o, u->op1());
 
       std::string arg1 = vars().code_name();
       vars().pop();
-      vars().new_ddouble(o);
+      new_variable(o, *i);
 
       auto op = (*i)->name()[0];
       if(op == '-' || op == '!' || op == '+') {
