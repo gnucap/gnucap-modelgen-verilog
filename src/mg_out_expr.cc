@@ -267,124 +267,101 @@ bool is_cc_ref(Expression const* e)
 /*--------------------------------------------------------------------------*/
 class RPN_VARS {
   typedef enum{
+    t_log = 0,
     t_flt,
     t_ddo,
     // t_int,
     t_str,
     t_ref,
     t_arr,
+    t_count,
   } type;
   typedef std::stack<int> stack;
   std::stack<type> _types;
   std::stack<int> _args;
   std::stack<std::string> _refs;
 
-  stack _flt_stack;
-  stack _ddo_stack;
-  stack _str_stack;
-  stack _arr_stack;
-
-  int _flt_idx{-1};
-  int _flt_alloc{0};
-  int _ddo_idx{-1};
-  int _ddo_alloc{0};
-  int _str_idx{-1};
-  int _str_alloc{0};
-  int _arr_idx{-1};
-  int _arr_alloc{0};
+  stack _stack[t_count];
+  int _idx[t_count];
+  int _alloc[t_count];
   TData const* _deps;
 public:
-  explicit RPN_VARS(TData const* d) : _deps(d) {}
+  explicit RPN_VARS(TData const* d) : _deps(d) {
+    std::fill(_idx, _idx+t_count, -1);
+    std::fill(_alloc, _alloc+t_count, 0);
+    assert(_idx[0] == -1);
+    assert(_idx[1] == -1);
+    assert(_alloc[0] == 0);
+    assert(_refs.empty());
+  }
   ~RPN_VARS(){
-    assert(_flt_idx == -1);
-    assert(_ddo_idx == -1);
-    assert(_arr_idx == -1);
-    assert(_str_idx == -1);
+    assert(_idx[0] == -1);
+    assert(_idx[1] == -1);
     assert(_refs.empty());
   }
   void pop() {
     assert(!_types.empty());
-    switch(_types.top()){
-    case t_flt:
-      assert(_flt_idx>-1);
-      --_flt_idx;
-      break;
-    case t_arr:
-      assert(_arr_idx>-1);
-      --_arr_idx;
-      break;
-    case t_ddo:
-      assert(_ddo_idx>-1);
-      --_ddo_idx;
-      break;
-    case t_ref:
+    int t = _types.top();
+    if(t == t_ref){
       _refs.pop();
-      break;
-    case t_str:
-      assert(_str_idx>-1);
-      --_str_idx;
-      break;
-    default:untested();
-      unreachable();
+    }else{
+      assert(_idx[t]>-1);
+      --_idx[t];
     }
     _types.pop();
   }
-  void new_string(std::ostream& o){
-    ++_str_idx;
-    if(_str_idx < _str_alloc){ untested();
-    }else{
-      assert(_str_idx==_str_alloc);
-      ++_str_alloc;
-      o__ "std::string s" << _str_idx << ";\n";
-    }
-    _types.push(t_str);
-  }
+  void new_string(std::ostream& o) { new_(o, t_str); }
   void new_array(std::ostream& o, Token_ARRAY_ const& /*TODO*/){
-    ++_arr_idx;
+    ++_idx[t_arr];
     _types.push(t_arr);
-    if(_arr_idx < _arr_alloc){ untested();
-//      o__ "a" << _arr_idx << "= array_";
+    if(_idx[t_arr] < _alloc[t_arr]){ untested();
       o__ code_name() << "= array_";
     }else{
       o__ "array_ " << code_name();
-      ++_arr_alloc;
+      ++_alloc[t_arr];
     }
   }
   void new_ddouble(std::ostream& o){
-    ++_ddo_idx;
-    if(_ddo_idx < _ddo_alloc){
+    ++_idx[t_ddo];
+    if(_idx[t_ddo] < _alloc[t_ddo]){
     }else{
-      assert(_ddo_idx==_ddo_alloc);
-      ++_ddo_alloc;
-      assert(_ddo_idx>=0);
+      assert(_idx[t_ddo]==_alloc[t_ddo]);
+      ++_alloc[t_ddo];
+      assert(_idx[t_ddo]>=0);
       if(_deps){
-	o__ "ddouble t" << _ddo_idx << ";\n";
+	o__ "ddouble t" << _idx[t_ddo] << ";\n";
       }else{
-	o__ "ddouble t" << _ddo_idx << ";\n"; // TODO? some deps?
+	o__ "ddouble t" << _idx[t_ddo] << ";\n"; // TODO? some deps?
       }
       if(!_deps){
       }else if(!options().optimize_deriv()){ untested();
-	o__ "t" << _ddo_idx << ".set_all_deps(); // (all deriv)\n"; // code_name??
+	o__ "t" << _idx[t_ddo] << ".set_all_deps(); // (all deriv)\n"; // code_name??
       }else{
-	o__ "//t" << _ddo_idx << ".set_no_deps();\n"; // ...
+	o__ "//t" << _idx[t_ddo] << ".set_no_deps();\n"; // ...
 	for(Dep const& i: _deps->ddeps()){
-	  o__ "//t" << _ddo_idx << "[d" << probe(i)->code_name() << "] = 0.; // (output dep)\n";
+	  o__ "//t" << _idx[t_ddo] << "[d" << probe(i)->code_name() << "] = 0.; // (output dep)\n";
 	}
       }
     }
     _types.push(t_ddo);
   }
-  void new_float(std::ostream& o){
-    ++_flt_idx;
-    if(_flt_idx < _flt_alloc){
+  void new_logic(std::ostream& o) { untested(); new_(o, t_log); }
+  void new_float(std::ostream& o) { new_(o, t_flt); }
+private:
+  void new_(std::ostream& o, int t){
+    ++_idx[t];
+    if(_idx[t] < _alloc[t]){
+      _types.push(type(t));
     }else{
-      assert(_flt_idx==_flt_alloc);
-      ++_flt_alloc;
-      assert(_flt_idx>=0);
-      o__ "double f" << _flt_idx << ";\n"; // code_name?
+      trace3("DBG??", t, _idx[t], _alloc[t]);
+      assert(_idx[t]==_alloc[t]);
+      ++_alloc[t];
+      assert(_idx[t]>=0);
+      _types.push(type(t));
+      o__ cpptype() << " " << code_name() << ";\n"; // code_name?
     }
-    _types.push(t_flt);
   }
+public:
   bool is_ref() const{
     assert(!_types.empty());
     return _types.top() == t_ref;
@@ -425,20 +402,15 @@ public:
     return _types.size() - 1 - size_t(_args.top());
   }
   void enter_scope(){
-    _flt_stack.push(_flt_alloc);
-    _ddo_stack.push(_ddo_alloc);
-    _str_stack.push(_str_alloc);
-    _arr_stack.push(_arr_alloc);
+    for(int i = 0 ; i<t_count; ++i){
+      _stack[i].push(_alloc[i]);
+    }
   }
   void leave_scope(){
-    _flt_alloc = _flt_stack.top();
-    _flt_stack.pop();
-    _ddo_alloc = _ddo_stack.top();
-    _ddo_stack.pop();
-    _str_alloc = _str_stack.top();
-    _str_stack.pop();
-    _arr_alloc = _arr_stack.top();
-    _arr_stack.pop();
+    for(int i = 0 ; i<t_count; ++i){
+      _alloc[i] = _stack[i].top();
+      _stack[i].pop();
+    }
   }
   void args_pop(){
     assert(!_args.empty());
@@ -449,39 +421,29 @@ public:
   }
   std::string cpptype()const {
     assert(_types.size());
-    switch(_types.top()) {
-    case t_flt: untested();
-      return "double";
-    case t_ddo:
-      return "ddouble";
-    case t_arr: untested();
-      incomplete();
-      return "incomplete_cpptype";
-    case t_str: untested();
-      return "std::string";
-    case t_ref: untested();
-      return "auto&"; // really?
-    default:untested();
-      unreachable();
-      return "";
-    }
+    int t = _types.top();
+    assert(t<t_count);
+    static std::string names[] = {
+       "LOGICVAL", "double", "ddouble",
+       "std::string", "auto&",
+       "incomplete_cpptype"
+    };
+    return names[t];
   }
+private:
+  char var_name(int i)const {
+    static char names[] = "lftsra";
+    assert(i<t_count);
+    return names[i];
+  }
+public:
   std::string code_name() const{
     assert(_types.size());
-    switch(_types.top()) {
-    case t_flt:
-      return "f" + std::to_string(_flt_idx);
-    case t_ddo:
-      return "t" + std::to_string(_ddo_idx);
-    case t_arr:
-      return "a" + std::to_string(_arr_idx);
-    case t_str:
-      return "s" + std::to_string(_str_idx);
-    case t_ref:
+    int t = _types.top();
+    if(t == t_ref) {
       return _refs.top();
-    default:untested();
-      unreachable();
-      return "";
+    }else{
+      return std::string(1, var_name(t)) + std::to_string(_idx[t]);
     }
   }
   bool has_deps()const { return _deps; }
@@ -521,7 +483,10 @@ void OUT_EXPRESSION::new_variable(std::ostream& o, Token const* t)
     incomplete();
   }
 
-  if(!d) {
+  if(_ctx == "logic") { untested();
+    // hack
+    vars().new_logic(o);
+  }else if(!d) {
     // incomplete();
     o__ "/* void? */\n";
     vars().new_ddouble(o); // TODO
