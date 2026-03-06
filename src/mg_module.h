@@ -173,6 +173,7 @@ private: // verilog input data
   // Port_1_List _local_nodes;
   Owned_Base* _always{nullptr};
   Owned_Base* _analog{nullptr};
+  Owned_Base* _assign{nullptr};
   Circuit* _circuit{nullptr};
   Hierarchical_Refs* _hrefs{nullptr};
 //  Block _module_body;
@@ -195,8 +196,10 @@ private: // merge?
   bool _has_expand_last{false};
 private: // elaboration data
   void new_always();
+  void new_assign();
   void new_circuit();
   void delete_always();
+  void delete_assign();
   void delete_circuit();
   void detach_out_vars();
 public:
@@ -229,7 +232,8 @@ public: // TODO
   const Circuit*	  circuit()const	{return _circuit;}
   const Hierarchical_Refs& hrefs()const	{assert(_hrefs); return *_hrefs;}
   const Owned_Base& analog() const {assert(_analog); return *_analog;}
-  const Owned_Base& always() const { untested();assert(_always); return *_always;}
+  const Owned_Base& assigns() const {assert(_assign); return *_assign;}
+  const Owned_Base& always() const {assert(_always); return *_always;}
   bool has_analysis()const {return _has_analysis;}
   bool has_expand_last()const {return _has_expand_last;}
 

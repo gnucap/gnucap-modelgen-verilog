@@ -1177,7 +1177,12 @@ Data_Type const& Token_VAR_REF::type() const
     return it->type();
   }else if(auto af = dynamic_cast<Analog_Function const*>(_item)){
     return af->type();
-  }else{ untested();
+  }else if(auto n = dynamic_cast<Node const*>(_item)){
+    incomplete();
+    static Data_Type_Real t;
+    return t;
+  }else{
+    assert(0);
     unreachable();
     static Data_Type_Real t;
     return t;
@@ -1205,6 +1210,8 @@ bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
     assert(from.scope());
     return it->propagate_deps(from);
   }else if(dynamic_cast<Analog_Function*>(_item)){
+  }else if(dynamic_cast<Node*>(_item)){
+   // return p->propagate_deps(from);
   }else if(dynamic_cast<Block const*>(_item)){ untested();
   }else{ untested();
     unreachable();

@@ -660,7 +660,7 @@ void Port_3::dump(std::ostream& out)const
 +	  {attribute_instance}  module_or_generate_item_declaration
 +	| {attribute_instance}  local_parameter_declaration  ";"
 -	| {attribute_instance}  parameter_override
--	| {attribute_instance}  continuous_assign
++	| {attribute_instance}  continuous_assign
 -	| {attribute_instance}  gate_instantiation
 -	| {attribute_instance}  udp_instantiation
 +	| {attribute_instance}  module_instantiation
@@ -780,6 +780,8 @@ void Module::parse_body(CS& f)
   _analog->set_owner(this);
   assert(_always);
   _always->set_owner(this);
+  assert(_assign);
+  _assign->set_owner(this);
   // _tr_eval.set_owner(this);
   // _validate.set_owner(this);
 
@@ -812,6 +814,7 @@ void Module::parse_body(CS& f)
       || ((f >> "parameter ") && (f >> _parameters))
       || ((f >> "localparam ") && (f >> _parameters))
       || ((f >> "aliasparam ") && (f >> _aliasparam))
+      || ((f >> "assign ") && (f >> *_assign))
       || ((f >> "analog ") && f >> *_analog)
       || ((f >> "always ") && f >> *_always)
       || ((f >> "endmodule ") && (end = true))
@@ -957,6 +960,8 @@ void Module::dump(std::ostream& o)const
   }else{
   }
 
+  assert(_assign);
+  _assign->dump(o);
   assert(_analog);
   _analog->dump(o);
   assert(_always);
@@ -1228,6 +1233,7 @@ Module::Module()
 {
   new_analog(&_analog);
   new_always();
+  new_assign();
   new_circuit();
   new_hier_refs(&_hrefs);
 }
@@ -1238,6 +1244,8 @@ Module::~Module()
   detach_out_vars(); // delete variables?
   delete_circuit();
   delete_hier_refs(&_hrefs);
+  delete_always();
+  delete_assign();
 }
 /*--------------------------------------------------------------------------*/
 bool Node::is_used() const

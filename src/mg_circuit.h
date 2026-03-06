@@ -369,12 +369,15 @@ public:
   void clear();
 };
 /*--------------------------------------------------------------------------*/
+class Token_NODE;
 class Node_Map{
   typedef std::map<std::string, Node*> map; // use set??
   typedef std::vector<Node*> nodes;
+  typedef std::vector<Token_NODE*> tokens; // move to Module?
   typedef nodes::const_iterator const_iterator;
   typedef nodes::const_reverse_iterator const_reverse_iterator;
   nodes _nodes;
+  tokens _tokens;
   map _map;
 public:
   static Node mg_ground_node;

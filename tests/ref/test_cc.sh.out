@@ -1795,6 +1795,10 @@ double MOD_resistor::tr_probe_num(std::string const& n) const
   if(n == "i"){
     return _v_.___i;
   }
+  //n:n
+  //p:p
+  //white_noise_1_n:white_noise_1_n
+  //white_noise_1_p:white_noise_1_p
   if(n == "conv") {
     return converged();
   }
@@ -3249,6 +3253,10 @@ double MOD_resistor::tr_probe_num(std::string const& n) const
   if(n == "i"){
     return _v_._i;
   }
+  //n:n
+  //p:p
+  //white_noise_0_n:white_noise_0_n
+  //white_noise_0_p:white_noise_0_p
   if(n == "conv") {
     return converged();
   }
@@ -6326,6 +6334,10 @@ COMMON_capacitor& Default_capacitor()
 /*--------------------------------------------------------------------------*/
 double MOD_capacitor::tr_probe_num(std::string const& n) const
 {
+  //ddt_1_n:ddt_1_n
+  //ddt_1_p:ddt_1_p
+  //n:n
+  //p:p
   if(n == "conv") {
     return converged();
   }
@@ -7497,6 +7509,10 @@ COMMON_capacitor& Default_capacitor()
 /*--------------------------------------------------------------------------*/
 double MOD_capacitor::tr_probe_num(std::string const& n) const
 {
+  //ddt_2_n:ddt_2_n
+  //ddt_2_p:ddt_2_p
+  //n:n
+  //p:p
   if(n == "conv") {
     return converged();
   }

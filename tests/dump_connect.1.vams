@@ -1,0 +1,22 @@
+`include "sub/disciplines.few"
+`pragma modelgen nodump-nature
+`pragma modelgen nodump-discipline
+
+connectmodule elect_to_logic(el,cm);
+  input el;
+  output cm;
+  reg cm;
+  electrical el;
+  ddiscrete cm;
+  always @(cross(V(el) - 2.5, 1)) cm = 1;
+  always @(cross(V(el) - 2.5, -1)) cm = 0;
+endmodule
+
+connectmodule logic_to_elect(cm,el);
+  input cm;
+  output el;
+  ddiscrete cm;
+  electrical el;
+  analog
+    V(el) <+ transition((cm == 1) ? 5.0 : 0.0);
+endmodule

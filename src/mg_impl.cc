@@ -146,6 +146,9 @@ Node_Map::~Node_Map()
   for(; i < _nodes.size(); ++i){
     delete _nodes[i];
   }
+  for(; i < _tokens.size(); ++i){
+    delete _tokens[i];
+  }
 }
 /*--------------------------------------------------------------------------*/
 Node_Ref Node_Map::operator[](std::string const& key) const
@@ -486,7 +489,8 @@ bool Block::new_var_ref(Base* what)
   }else if(auto ps = dynamic_cast<Paramset_Stmt const*>(what)){ untested();
     unreachable();
     p = "."+ps->name();
-  }else if(auto nn = dynamic_cast<Node const*>(what)){
+  }else if(auto nn = dynamic_cast<Node const*>(what)){ untested();
+    incomplete(); // token?
     p = nn->name();
   }else if(auto blk = dynamic_cast<SeqBlock const*>(what)){
     p = blk->identifier().to_string();

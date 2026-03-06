@@ -63,6 +63,11 @@ void New_Port::parse(CS& file)
   owner()->new_node(name());
 }
 /*--------------------------------------------------------------------------*/
+class Wire : public Discipline{
+public:
+  explicit Wire() : Discipline("wire") {}
+}wire;
+/*--------------------------------------------------------------------------*/
 void Net_Declarations::parse(CS& f)
 {
   assert(owner()); // Module
@@ -95,6 +100,18 @@ void Net_Declarations::parse(CS& f)
     }
 
     d = m;
+  }else if(f.umatch("wire ")){
+    auto m = new Net_Decl_List_Discipline();
+    m->set_discipline(&wire);
+
+    m->set_owner(owner());
+    f >> *m;
+    for(auto i : *m){
+      i->set_discipline(*ii, mod);
+    }
+
+    d = m;
+
   }else if(f.umatch("ground ")){
     auto m = new Net_Decl_List_Ground();
     m->set_owner(owner());

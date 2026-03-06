@@ -32,12 +32,15 @@ class Discipline : public Base {
   Nature const* _potential{nullptr};
   Block const* _owner{nullptr};
 public:
+  explicit Discipline() : Base() {}
+protected:
+  explicit Discipline(std::string const& s) : Base(), _identifier(s) {}
+public:
   void set_owner(Block const* c) {_owner=c;}
   Block const* owner() {return _owner;}
   const String_Arg&  key()const	  {return _identifier;}
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;
-  explicit Discipline() {}
   const String_Arg&  identifier()const	    {return _identifier;}
   const String_Arg&  potential_ident()const {return _potential_ident;}
   const String_Arg&  domain_ident()const    { untested();return _domain_ident;}

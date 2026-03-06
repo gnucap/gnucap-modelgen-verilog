@@ -1,0 +1,18 @@
+
+
+module test1(in, out);
+  input in;
+  output out;
+  wire foo;
+  assign out = (! in);
+  assign out = (! in), foo = (! out);
+endmodule
+module test2(in, out);
+  input in;
+  output out;
+  wire foo;
+  assign #3 out = (! in), foo = (! out);
+endmodule
+
+
+

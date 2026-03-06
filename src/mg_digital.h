@@ -25,15 +25,48 @@
 #include "mg_.h"
 #include "mg_code.h"
 /*--------------------------------------------------------------------------*/
-class AlwaysConstruct : public Statement /* CtrlStatement? */ {
-  Block* _block{nullptr};
+class NetAssignment : public Assignment {
+  Node* _node_hack{nullptr};
 public:
-  AlwaysConstruct(){
+  explicit NetAssignment(CS& f, Base* o);
+  explicit NetAssignment() {}
+  ~NetAssignment() {}
+  void parse(CS& cmd)override;
+  void dump(std::ostream& o)const override;
+};
+/*--------------------------------------------------------------------------*/
+class VariableAssignment : Assignment {
+};
+/*--------------------------------------------------------------------------*/
+class ContinuousAssign : public Block {
+  int _delay{-1};
+public:
+  ContinuousAssign(){
   }
-  ~AlwaysConstruct(){
-    delete _block;
-    _block = nullptr;
+  ~ContinuousAssign(){
   }
+private:
+//  void new_block();
+//  Block const* block_or_null() const{ untested(); return _block; }
+//  Block* block(){ untested(); return _block; }
+
+public:
+  void parse(CS& cmd)override;
+  void dump(std::ostream& o)const override;
+  void push_back(NetAssignment*);
+  void push_back(Statement*);
+};
+/*--------------------------------------------------------------------------*/
+typedef Collection<ContinuousAssign> AssignList;
+/*--------------------------------------------------------------------------*/
+class ProcContAssign : public Statement {
+  VariableAssignment _assign;
+public:
+  ProcContAssign(){
+  }
+  ~ProcContAssign(){
+  }
+
 private:
   void submit_variable_access(Variable_Access&)const override { untested();
     incomplete();
@@ -43,14 +76,7 @@ public:
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
   bool update()override { untested(); incomplete(); return false; }
-  void new_block();
-  Block const* block_or_null() const{ untested(); return _block; }
-  Block* block(){ untested(); return _block; }
-  void push_back(Statement*);
-  bool is_used_in(Base const*)const override; // BUG?
 };
-/*--------------------------------------------------------------------------*/
-typedef Collection<AlwaysConstruct> AlwaysList;
 /*--------------------------------------------------------------------------*/
 class DigitalStmt : public Statement {
 public:
@@ -119,9 +145,13 @@ public:
     parse(f);
   }
 
-  void parse(CS& cmd)override;
-  void dump(std::ostream& o)const override;
-  operator bool()const{ untested(); return size() || identifier() !=""; }
+  void parse(CS& cmd)override { untested();
+    return DigitalSeqBlock::parse(cmd);
+  }
+  void dump(std::ostream& o)const override { untested();
+    return DigitalSeqBlock::dump(o);
+  }
+  operator bool()const{ return size() || identifier() !=""; }
   void set_owner(Statement* owner);
 }; // DigitalCtrlBlock
 /*--------------------------------------------------------------------------*/
@@ -150,6 +180,29 @@ protected:
 public:
   bool propagate_rdeps(RDeps const& incoming)override;
 }; // DigitalCtrlStmt
+/*--------------------------------------------------------------------------*/
+class AlwaysConstruct : public Statement /* CtrlStatement? */ {
+  DigitalCtrlBlock _block;
+public:
+  AlwaysConstruct(){ }
+  ~AlwaysConstruct(){ }
+private:
+  void submit_variable_access(Variable_Access&)const override {
+    incomplete();
+  }
+
+public:
+  void parse(CS& cmd)override;
+  void dump(std::ostream& o)const override;
+  bool update()override { untested(); incomplete(); return false; }
+  void new_block();
+  Block const* block_or_null() const{ return &_block; }
+  Block* block(){ return &_block; }
+  void push_back(Statement*);
+  bool is_used_in(Base const*)const override; // BUG?
+};
+typedef Collection<AlwaysConstruct> AlwaysList; // needed?
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class DigitalEvtExpression : public Expression_ {
   RDeps _rdeps;
@@ -215,6 +268,19 @@ inline AlwaysList const& always_list(Module const& m)
 { untested();
   return always(m).list();
 }
+/*--------------------------------------------------------------------------*/
+class Assign : public Owned_Base {
+  AssignList _list;
+public:
+  explicit Assign();
+  ~Assign();
+  void parse(CS& file) override;
+  void dump(std::ostream& o)const override;
+
+  bool has_block() const;
+  AssignList const& list()const { return _list; }
+  void push_back(Base*);
+};
 /*--------------------------------------------------------------------------*/
 class DigitalExpression : public Expression_ {
 public:
