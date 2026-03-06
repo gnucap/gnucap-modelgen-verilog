@@ -270,6 +270,7 @@ public:
   bool has_submodule()const;
   bool has_analog_block()const;
   bool has_always_block()const;
+  bool has_assign()const;
 
   void set_set_event (mode_mask_t m=mm_YES) {set_pid(if_SET_EVENT, m);}
   void set_ac_begin  (mode_mask_t m=mm_YES) { untested();set_pid(if_AC_BEGIN, m);}
@@ -287,6 +288,7 @@ public:
 private:
   void import_flags(FUNCTION_ const*);
   void set_pid  (iface_id_t p, mode_mask_t m=mm_ANALOG) {_has_pid[p] = (mode_mask_t)(_has_pid[p] | m);}
+  Circuit&  mutable_circuit()	{assert(_circuit); return *_circuit;}
 
 public:
   void set_times(int h) {if(h > _times){_times = h;}else{}}
@@ -307,6 +309,7 @@ public: // for now.
   virtual Module* deflate() { untested();return this;}
   Parameter_List_Collection& parameters()	{return _parameters;}
 protected: // Paramset::deflate
+  void setup_assign();
   void setup_storage();
   void setup_functions();
   void setup_nodes();

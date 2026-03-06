@@ -31,7 +31,7 @@ public:
   TData const& deps()const { untested(); assert(_deps); return *_deps; }
 
   int num_states()const override;
-  int num_nodes()const override;
+  int net_nodes()const override;
   std::string state()const override;
   std::string short_label()const override;
 //  Probe const* prb() const;

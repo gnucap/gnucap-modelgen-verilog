@@ -28,6 +28,7 @@
 #include "mg_token.h"
 #include "mg_href.h"
 #include "mg_storage.h"
+#include "mg_assign.h"
 #include "l_stlextra.h"
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -761,6 +762,7 @@ void Module::parse(CS& f)
   _circuit->parse_ports(f);
   f >> ';';
   parse_body(f);
+  setup_assign();
   setup_functions();
   setup_nodes();
 }
@@ -1165,6 +1167,8 @@ void Module::push_back(Base* x)
     auto A = prechecked_cast<Analog*>(_analog); // needed? use LiSt?
     assert(A);
     A->push_back(a);
+  }else if(auto e = dynamic_cast<Element_2*>(x)){
+    mutable_circuit().push_back(e);
   }else{
     Block::push_back(x);
   }
@@ -1468,6 +1472,19 @@ void Module::setup_storage()
   va.sift_locals(this); // should all be local at top level..
 }
 /*--------------------------------------------------------------------------*/
+bool Module::has_submodule() const
+{
+  assert(circuit());
+  auto aa = prechecked_cast<Assign const*>(&assigns());
+  assert(aa);
+  return !circuit()->element_list().is_empty() || !aa->is_empty();
+}
+/*--------------------------------------------------------------------------*/
+// bool Module::has_assign() const
+// {
+//   return _assign->size();
+// }
+/*--------------------------------------------------------------------------*/
 bool Module::has_states() const
 {
   incomplete();
@@ -1478,6 +1495,11 @@ bool Module::has_constants() const
 {
   // possible false positives
   return variables().size();
+}
+/*--------------------------------------------------------------------------*/
+void Module::setup_assign()
+{
+  ::setup_assign(*this);
 }
 /*--------------------------------------------------------------------------*/
 void filter_setup(MGVAMS_FILTER*, Module*);
@@ -1507,6 +1529,12 @@ Base /*const*/ * Module::new_href(std::string const&n)
 Branch_Ref Module::new_filter(Node* x)
 {
   return new_branch(x, &Node_Map::mg_ground_node);
+}
+/*--------------------------------------------------------------------------*/
+// BUG
+void Circuit::push_back(Element_2 /*const?*/ * f)
+{
+  _element_list.push_back(f);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

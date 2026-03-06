@@ -1,0 +1,51 @@
+module test (.a(a),.b(b));
+  ground \0 ;
+  vpulse #(.val0(0),.val1(5),.width(.2),.period(.5)) v1 (b, \0 );
+  test_assign0 #() b (.in(b),.out(a));
+endmodule // test
+
+paramset logic logic;
+ .delay=NA( 1.n); .vmax=NA( 5.); .vmin=NA( 0.); .unknown=NA( 2.5); .rise=NA( 500.p); .fall=NA( 500.p); .rs=NA( 100.); .rw=NA( 1.G); .thh=NA( 0.75); .thl=NA( 0.25); .mr=NA( 5.); .mf=NA( 5.); .over=NA( 0.1); .tnom=NA( 27.);
+endparamset
+
+test #() t (a, b);
+t is "test from top level"
+t.v1 is "vams vpulse"
+t.b is "test_assign0 from device_dispatcher"
+falling back to default logic
+falling back to default logic
+t.b._na0_v_foo: can't find subckt: logic_na0_v_foo1, forcing digital
+t.b._na1_v_out: can't find subckt: logic_na1_v_out1, forcing digital
+#           v(a)       v(b)      
+ 27.        5.         0.        
+#Time       v(a)       v(b)       l(a)       l(b)      
+ 0.         5.         0.         3.         0.01      
+ 1.n        5.         5.         2.         3.01      
+ 2.n        0.         5.         0.         3.01      
+ 3.n        0.         5.         0.         3.01      
+ 4.n        0.         5.         0.         3.01      
+ 5.n        0.         5.         0.         3.01      
+ 0.2        0.         5.         0.         3.01      
+ 0.2        0.         0.         1.         0.01      
+ 0.2        5.         0.         3.         0.01      
+ 0.2        5.         0.         3.         0.01      
+ 0.2        5.         0.         3.         0.01      
+ 0.2        5.         0.         3.         0.01      
+ 0.5        5.         0.         3.         0.01      
+ 0.5        5.         5.         2.         3.01      
+ 0.5        0.         5.         0.         3.01      
+ 0.5        0.         5.         0.         3.01      
+ 0.5        0.         5.         0.         3.01      
+ 0.5        0.         5.         0.         3.01      
+ 0.7        0.         5.         0.         3.01      
+ 0.7        0.         0.         1.         0.01      
+ 0.7        5.         0.         3.         0.01      
+ 0.7        5.         0.         3.         0.01      
+ 0.7        5.         0.         3.         0.01      
+ 0.7        5.         0.         3.         0.01      
+ 1.         5.         0.         3.         0.01      
+Gnucap   System status
+iterations: op=3, dc=0, tran=74, fourier=0, total=106
+transient timesteps: accepted=25, rejected=4, total=29
+nodes: user=2, subckt=0, model=2, total=4
+dctran density=31.2%, ac density=31.2%

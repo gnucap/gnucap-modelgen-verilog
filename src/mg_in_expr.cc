@@ -485,7 +485,7 @@ bool Expression_::is_constant() const
 void Expression_::submit_variable_xs(Variable_Access& va) const
 {
   trace3("Expression_::submit_variable_xs", this, _used_variables.size(), _assignments.size());
-  for(Token const* t : _used_variables){
+  for(Token const* t : _used_variables){ untested();
     if(!t){
       // af hack??
       continue;
@@ -513,7 +513,7 @@ void Expression_::submit_variable_xs(Variable_Access& va) const
 void Expression_::submit_variable_xs(Expression_& ee) const
 {
   trace3("Expression_::submit_variable_xs2", this, _used_variables.size(), _assignments.size());
-  for(Token const* t : _used_variables){
+  for(Token const* t : _used_variables){ untested();
     auto r = prechecked_cast<Token_VAR_REF const*>(t);
     assert(r);
     if(dynamic_cast<Variable_Decl const*>(r->item())){

@@ -84,7 +84,6 @@ class Element_2 : public Owned_Base {
   std::string _module_or_paramset_identifier;
   std::string _name_of_module_instance;
   Port_Connection_List _list_of_port_connections;
-  Port_1_List _current_port_list;
   Parameter_3_List _list_of_parameter_assignments;
   std::string _eval;
   std::string _value;
@@ -112,7 +111,6 @@ public:
   const Parameter_3_List&
 		     list_of_parameter_assignments()const {return _list_of_parameter_assignments;}
   const Port_Connection_List& ports()const	  {return _list_of_port_connections;}
-  const Port_1_List& current_ports() const{ untested();return _current_port_list;}
   virtual std::string instance_name()const  { untested();return _name_of_module_instance;}
   void set_label(std::string const& l) {_name_of_module_instance = l;}
   virtual std::string short_label()const 	  {return _name_of_module_instance;}
@@ -124,11 +122,13 @@ public:
   const std::string& reverse()const 	{ untested();return _reverse;}
   virtual std::string state()const	{return _state;}
   virtual int	     net_nodes()const	{return int(ports().size());}
-  virtual int	     num_nodes()const	{return int(ports().size());}
   virtual int	     num_states()const	{ untested();unreachable(); return 0;}
   virtual bool is_used()const {return true;} // incomplete.
   virtual bool is_used_in_branch()const {return true;} // incomplete.
   virtual std::string const& port_name(int)const {
+    unreachable(); static std::string s("err"); return s;
+  }
+  virtual std::string const& port_value(int)const {
     unreachable(); static std::string s("err"); return s;
   }
 }; // Element_2
@@ -193,7 +193,6 @@ public:
   std::string const& omit()const override;
   std::string dev_type()const override;
   void add_dep(Dep const&);
-  int num_nodes()const override { return net_nodes(); }
   int net_nodes()const override;
   std::string state()const override;
   std::string state(std::string const& n)const;

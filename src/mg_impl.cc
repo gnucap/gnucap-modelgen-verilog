@@ -30,12 +30,6 @@ bool ConstantMinTypMaxExpression::empty() const
   return _e.is_empty();
 }
 /*--------------------------------------------------------------------------*/
-bool Module::has_submodule() const
-{
-  assert(circuit());
-  return !circuit()->element_list().is_empty();
-}
-/*--------------------------------------------------------------------------*/
 Branch_Ref Branch_Map::new_branch(Branch_Ref const& b, std::string name)
 {
   assert(name!="");
@@ -169,6 +163,7 @@ Node* Module::new_node(std::string const& p)
   // new_var_ref(n);
   return n;
 }
+/*--------------------------------------------------------------------------*/
 Node* Primitive::new_node(std::string const& p)
 {
   Node* n = nodes().new_node(p, this);
@@ -221,7 +216,7 @@ int Filter::num_states() const
 }
 /*--------------------------------------------------------------------------*/
 // BUG: delegate to branch
-int Filter::num_nodes() const
+int Filter::net_nodes() const
 {
   // slew? BUG
   return 0;
@@ -489,7 +484,7 @@ bool Block::new_var_ref(Base* what)
   }else if(auto ps = dynamic_cast<Paramset_Stmt const*>(what)){ untested();
     unreachable();
     p = "."+ps->name();
-  }else if(auto nn = dynamic_cast<Node const*>(what)){ untested();
+  }else if(auto nn = dynamic_cast<Node const*>(what)){
     incomplete(); // token?
     p = nn->name();
   }else if(auto blk = dynamic_cast<SeqBlock const*>(what)){

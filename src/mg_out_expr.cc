@@ -345,7 +345,7 @@ public:
     }
     _types.push(t_ddo);
   }
-  void new_logic(std::ostream& o) { untested(); new_(o, t_log); }
+  void new_logic(std::ostream& o) { new_(o, t_log); }
   void new_float(std::ostream& o) { new_(o, t_flt); }
 private:
   void new_(std::ostream& o, int t){
@@ -483,7 +483,7 @@ void OUT_EXPRESSION::new_variable(std::ostream& o, Token const* t)
     incomplete();
   }
 
-  if(_ctx == "logic") { untested();
+  if(_ctx == "logic") {
     // hack
     vars().new_logic(o);
   }else if(!d) {
@@ -707,7 +707,7 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
 //      //o__ "0.; // OUTVAR?!\n";
     }else if (auto hh = dynamic_cast<const Token_HIER_REF*>(*i)) {
       vars().new_rhs(hh);
-    }else if(auto pp = dynamic_cast<const Token_ACCESS*>(*i)) {
+    }else if(auto pp = dynamic_cast<const Token_ACCESS*>(*i)) { untested();
       vars().new_ddouble(o);
       std::string lhsname = vars().code_name();
       if(!vars().has_deps()){ untested();
@@ -874,6 +874,7 @@ std::string make_cc_expression(std::ostream& o, Expression const& e, bool dynami
   }else{
   }
   if(ctx == "af"){
+  }else if(ctx == "logic"){
     // no deps-> use ddouble..
   }else if(!dynamic && ctx!="precalc"){
   }else if(auto ex = dynamic_cast<Expression_ const*>(&e)){
@@ -882,7 +883,9 @@ std::string make_cc_expression(std::ostream& o, Expression const& e, bool dynami
   }
   RPN_VARS s(deps);
   OUT_EXPRESSION ex(s, ctx);
+  // o__ "// expression\n";
   std::string name = ex.make_cc_expression_(o, e);
+  // o__ "// /expression\n";
 
   // BUG: this does not belong here.
   if(ctx == "adjust"){

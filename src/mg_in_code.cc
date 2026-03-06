@@ -819,7 +819,7 @@ bool Assignment::is_used() const
 }
 /*--------------------------------------------------------------------------*/
 std::string Assignment::code_name() const
-{ untested();
+{
   assert(_lhsref);
   return _lhsref->code_name();
 }

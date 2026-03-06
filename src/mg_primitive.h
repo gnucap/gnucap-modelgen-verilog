@@ -27,6 +27,7 @@
 #include "mg_code.h"
 #include "mg_component.h"
 #include "mg_circuit.h" // for now.
+#include "mg_logic.h"
 /*--------------------------------------------------------------------------*/
 class Node_Map;
 /*--------------------------------------------------------------------------*/
@@ -71,7 +72,7 @@ public:
 /*--------------------------------------------------------------------------*/
 class Port_3;
 class Node;
-class Primitive : public Block /*Component?*/ {
+class Primitive : public Block {
   File const* _file{nullptr};
   New_Port_List	_ports;
   Node_Map* _nodes{nullptr};
@@ -94,15 +95,22 @@ public:
 private:
   void parse_body(CS& f);
 
-public: // Component.
-  New_Port_List const& ports()const {return _ports;}
-  int net_nodes()const {return int(ports().size());}
+public: // Component?
+//  New_Port_List const& ports()const override {return _ports;}
+  int net_nodes()const {return int(_ports.size());}
+  std::string const& port_name(int i)const {
+    assert(i < int(_ports.size()));
+    auto b = _ports.begin();
+    std::advance(b, i);
+    return (*b)->name();
+  }
 
 public: // share "circuit" with Module?
 	// stash here, for now.
   const Node_Map& nodes()const		{ untested();assert(_nodes); return *_nodes;}
   Block* scope() /* override */ { untested();
-    return this; // need _circuit?
+    unreachable();
+    incomplete(); return this;
   }
   Node* new_node(std::string const& p)override;
   Port_3_List_3 const& input()const  {return _input;}

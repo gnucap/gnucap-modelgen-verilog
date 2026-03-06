@@ -1449,7 +1449,7 @@ void Always::parse(CS& f)
   }
 }
 /*--------------------------------------------------------------------------*/
-static Node* parse_net(CS& f, Block* o)
+static Token_NODE* parse_net(CS& f, Block* o)
 {
   size_t here = f.cursor();
   std::string what;
@@ -1461,6 +1461,7 @@ static Node* parse_net(CS& f, Block* o)
     assert(f);
     // assert(v->data()); no. unreachable?
   }else if(auto t = dynamic_cast<Token_NODE*>(b)) {
+    return t;
     v = prechecked_cast<Node*>(t->item());
     assert(v);
   }else if (b) { untested();
@@ -1472,11 +1473,14 @@ static Node* parse_net(CS& f, Block* o)
     f.reset_fail(here);
     trace1("not found", f.tail().substr(0,10));
   }
-  return v;
+  unreachable(); incomplete();
+  return nullptr;
+//  return v;
 }
 /*--------------------------------------------------------------------------*/
-//needed??
-NetAssignment::NetAssignment(CS& f, Base* o) : Assignment()
+static int _nacount;
+NetAssignment::NetAssignment(CS& f, Base* o)
+  : Assignment(), _seq(_nacount++)
 {
   set_owner(o);
   parse(f);
@@ -1487,12 +1491,10 @@ void NetAssignment::parse(CS& f)
   assert(owner());
   assert(scope());
   size_t here = f.cursor();
-  Node* l = parse_net(f, scope());
+  _lhsref = parse_net(f, scope());
   // assert(l->name() == name());?
 
   if(f && f >> "="){
-    assert(l);
-    _node_hack = l;
     parse_rhs(f);
   }else{ untested();
     //assert(!_lhsref);
@@ -1502,8 +1504,8 @@ void NetAssignment::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 void NetAssignment::dump(std::ostream& o)const
 {
-  if(_node_hack){
-    o << _node_hack->name()
+  if(_lhsref){
+    o << _lhsref->name()
       << " = ";
     Expression_::dump(o);
   }else{ untested();

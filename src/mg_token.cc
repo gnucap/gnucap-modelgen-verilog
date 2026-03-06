@@ -1372,18 +1372,23 @@ Token_VAR_REF* Token_VAR_REF::clone()const
 }
 /*--------------------------------------------------------------------------*/
 std::string Token_NODE::code_name() const
-{ untested();
+{
   return name();
   return "_n[n_" + name() + "]";
 }
 /*--------------------------------------------------------------------------*/
-void Token_NODE::stack_op(Expression* E) const
+void Token_NODE::stack_op(Expression* e) const
 {
+  auto E = prechecked_cast<Expression_*>(e);
+  assert(E);
   if(!E->is_empty() && dynamic_cast<Token_PARLIST*>(E->back())){
     throw Exception("syntax_error: Node " + name() + " does not take args");
   }else{
   }
   E->push_back(clone());
+  auto n = dynamic_cast<Node const*>(_item);
+  assert(n);
+  E->push_use(n->token());
 }
 /*--------------------------------------------------------------------------*/
 std::string Token_PORT_BRANCH::code_name() const

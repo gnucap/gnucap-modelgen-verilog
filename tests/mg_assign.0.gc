@@ -1,0 +1,39 @@
+attach ./modelgen_1.so
+attach vams/resistor.so
+attach vams/vpulse.so
+
+options debug
+
+`modelgen
+module test_assign0(in, out);
+  input in;
+  output out;
+  wire foo;
+  assign foo = !in;
+  assign out = !in;
+endmodule
+`endmodelgen
+
+verilog
+
+!make test_assign0.so >/dev/null
+load ./test_assign0.so
+
+module test(a, b);
+  ground \0 ;
+  vpulse #(.val0(0) .val1(5) .width(.2) .period(.5)) v1(b, \0 );
+  test_assign0 #() b(.in(b), .out(a));
+endmodule
+
+.model logic logic
+
+test #() t(a, b)
+
+list
+
+print op v(nodes)
+op
+
+print tran v(nodes) l(nodes)
+tran 1 trace n
+status notime

@@ -26,6 +26,7 @@
 #include <stack>
 #include <numeric> // iota
 #include "mg_.h" // TODO
+#include "mg_assign.h"
 /*--------------------------------------------------------------------------*/
 static String_Arg const& potential_abstol(Branch const& b)
 {
@@ -193,15 +194,20 @@ static void make_set_parameters(std::ostream& o, const Element_2& e, std::string
   }else{ untested();
     o << ", 0, nullptr";
   }
-  o << ", " << e.num_nodes() << ", nodes);\n";
+  o << ", " << e.net_nodes() << ", nodes);\n";
 }
 /*--------------------------------------------------------------------------*/
 static void map_subdev_nodes(std::ostream& o, const Element_2& e)
 {
   o____ "node_t nodes[] = {";
   std::string comma;
-  // yikes, name vs. value
-  if(e.ports().has_names()){
+  if(!e.ports().size()){
+    for (int i = 0 ; i < e.net_nodes(); ++i) {
+      o << comma << "n_(n_" << e.port_value(i) << ")";
+      comma = ",";
+    }
+  }else if(e.ports().has_names()){
+    // yikes, name vs. value
     Port_3_List_2::const_iterator p = e.ports().begin();
     for (;p != e.ports().end(); ++p) {
       o << comma << "n_(n_" << (**p).value() << ")";
@@ -217,16 +223,21 @@ static void map_subdev_nodes(std::ostream& o, const Element_2& e)
   {
     o << "};\n";
     o____ "subc->set_parameters(\"" << e.short_label() << "\", this";
-    o << ", const_cast<COMPONENT*>(" << e.code_name() << ")->mutable_common()";
+    if(e.eval()!=""){
+      o << ", &Eval_" << e.eval();
+    }else{
+      o << ", const_cast<COMPONENT*>(" << e.code_name() << ")->mutable_common()";
+    }
     o << ", 0."; // value
     o << ", 0, nullptr";
-    o << ", " << e.num_nodes() << ", nodes);\n";
+    o << ", " << e.net_nodes() << ", nodes);\n";
   }
 }
 /*--------------------------------------------------------------------------*/
 static void make_renew_sckt(std::ostream& o, Module const& m)
 {
  //    o__ "renew_subckt(_parent, &(c->_netlist_params));\n";
+ //       (does not work, because there is no node map)
   o__ "auto pp = prechecked_cast<MOD_" << m.identifier() << " const*>(_parent);\n";
   o__ "assert(pp);\n";
   o__ "assert(subckt());\n";
@@ -236,12 +247,9 @@ static void make_renew_sckt(std::ostream& o, Module const& m)
     o__ "if(!" << e->code_name() << ") {\n";
     o____ "auto subc = prechecked_cast<COMPONENT*>(pp->" << e->code_name() << "->clone());\n";
     o____ "assert(subc);\n";
-    o____ "subckt()->push_back(subc);\n";
+    o____ "subckt()->push_back(subc);\n"; // TODO: stash, push back deflated version.
     o____ "subc->set_owner(this);\n";
     o____ e->code_name() << " = subc;\n";
-//     o__ "}else{\n";
-//     o__ "}\n";
-//     o__ "{\n";
     o____ "trace2(\"renew\", " << e->code_name() << "->long_label(), c->_netlist_params.size());\n";
     map_subdev_nodes(o, *e);
     o__ "}\n";
@@ -259,8 +267,12 @@ static void make_set_subdevice_parameters(std::ostream& o, const Element_2& e)
 static void make_module_construct_stub(std::ostream& o, const Element_2& e, Module const&)
 {
   make_tag(o);
-  // std::string dev_type = "instance_proto";
-  std::string dev_type = "instance";
+  std::string dev_type = "__stub";
+  if(e.eval()!=""){
+    dev_type = e.dev_type();
+  }else{
+    dev_type = "__stub";
+  }
   assert(!dynamic_cast<Branch const*>(&e));
 
   o__ "const CARD* p = device_dispatcher[\"" << dev_type << "\"]; // " << e.dev_type() << "\n";
@@ -269,7 +281,11 @@ static void make_module_construct_stub(std::ostream& o, const Element_2& e, Modu
   o__ "}else{\n";
   o__ "}\n";
   o__ "auto compon = dynamic_cast<COMPONENT*>(p->clone());\n";
-  o__ "compon->set_dev_type(\"" << e.dev_type() << "\");\n";
+  if(e.eval()!=""){
+  }else{
+    dev_type = "__stub";
+    o__ "compon->set_dev_type(\"" << e.dev_type() << "\");\n";
+  }
   o__ "compon->set_label(\"" << e.short_label() << "\");\n";
   o__ "compon->set_owner(this);\n";
   o__ "if(!compon){\n";
@@ -277,7 +293,7 @@ static void make_module_construct_stub(std::ostream& o, const Element_2& e, Modu
   o__ "}else{\n";
   o__ "}\n";
   o__ "assert(subckt());\n";
-  o__ "// subckt()->push_front(" << e.code_name() << ");\n";
+  o__ "// TODO: subckt()->push_front(" << e.code_name() << ");\n";
   o__ e.code_name() << " = compon;\n";
 
   o__ "{\n";
@@ -343,7 +359,7 @@ static void make_build_netlist(std::ostream& o, const Module& m)
 {
   o__ "// build netlist\n";
   o__ "// ports:" << m.circuit()->ports().size() << "\n";
-  if(m.circuit()->element_list().size()){
+  if(m.has_submodule()){
     o__ "new_subckt();\n";
   }else{
   }
@@ -358,6 +374,7 @@ static void make_build_netlist(std::ostream& o, const Module& m)
     }
     o__ "}\n";
   }
+  // make_assign_proto(o, m);
 }
 /*--------------------------------------------------------------------------*/
 void make_module_default_constructor(std::ostream& o, const Module& m)
@@ -755,7 +772,7 @@ static void make_module_clone(std::ostream& o, Module const& m)
   o__ "MOD_" << m.identifier() << "* new_instance = new MOD_" << m.identifier() << "(*this);\n";
   o__ "assert(!new_instance->subckt());\n";
 
-  if(m.circuit()->element_list().size()){
+  if(m.has_submodule()){
     o__ "if(_parent){\n";
     o__ "  new_instance->_parent = _parent;\n";
     o__ "  assert(new_instance->is_device());\n";
@@ -903,6 +920,7 @@ static void make_module_new_local_node(std::ostream& o, const Node& p)
   }
 }
 /*--------------------------------------------------------------------------*/
+// out_circuit?
 static void make_module_new_local_nodes(std::ostream& o, Module const& m)
 {
   for (int n=1; n<=int(m.circuit()->nodes().size()); ++n) {
@@ -937,14 +955,10 @@ static void make_module_new_local_nodes(std::ostream& o, Module const& m)
 }
 /*--------------------------------------------------------------------------*/
 // out_analog??
-static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, Module const&, std::string cn_)
+static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, Module const&)
 {
   std::string cn;
-  if(cn_==""){
-    cn = e.code_name();
-  }else{ untested();
-    cn = cn_;
-  }
+  cn = e.code_name();
 
   make_tag(o);
   auto br = dynamic_cast<Branch const*>(&e);
@@ -991,7 +1005,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
   
 #if 1
 //  auto ee = Named_Branch(e, cn_); // TODO
-  if(e.num_nodes()){
+  if(e.net_nodes()){
     make_cc_branch_output(o, br);
     make_cc_branch_ctrl(o, br);
     make_cc_current_ctrl(o, br);
@@ -1042,7 +1056,7 @@ static void make_module_precalc_first(std::ostream& o, Module const& m)
   o__ "if(subckt()){\n";
   o____ "attach_common(nullptr);\n";
   o____ "attach_common(cc);\n";
-  if(m.circuit()->element_list().size()){
+  if(m.has_submodule()) {
     o____ "c = static_cast<COMMON_" << mid << "*>(mutable_common());\n";
     o____ "subckt()->attach_params(&(c->_netlist_params), scope());\n";
     o____ "trace2(\"" << m.identifier() <<"::pf\", long_label(), c->_netlist_params.size());\n";
@@ -1102,7 +1116,7 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
 
   // if(m.circuit()->element_list().size()) ?
   o__ "if(subckt()){\n";
-  if(m.circuit()->element_list().size()){
+  if(m.has_submodule()) {
     o__ "subckt()->params()->set_try_again(nullptr);\n";
     o__ "subckt()->params()->eval_copy(c->_netlist_params, scope()->params());\n";
     o__ "subckt()->params()->set_try_again(&c->_netlist_params);\n";
@@ -1158,17 +1172,18 @@ static void make_module_expand(std::ostream& o, Module const& m)
   o__ "auto c = static_cast</*const*/ COMMON_" << mid << "*>(mutable_common());\n"; // const?!
   o__ "assert(c);\n";
   o__ "(void)c;\n";
-  o__ "if (!subckt()) {\n"
-    "    new_subckt();\n"
-    "  }else{\n"
-    "  }\n"
-    "\n";
+  o__ "bool is_first_expand = !subckt();\n";
+  o__ "if (is_first_expand) {\n";
+  o____ "new_subckt();\n";
+  o__ "}else{\n";
+  o__ "}\n";
+  o << "\n";
   o__ "node_t gnd;\n";
   o__ "gnd.set_to_ground(nullptr);\n";
   o__ "if (_sim->is_first_expand()) {\n";
   make_module_clear_local_nodes(o, m);
   make_module_new_local_nodes(o, m);
-  if(m.circuit()->element_list().size()){
+  if(m.has_submodule()) {
     o__ "assert(_parent);\n";
     o__ "assert(_parent->subckt());\n";
     o__ "assert(_parent->subckt()->nodes());\n";
@@ -1179,15 +1194,11 @@ static void make_module_expand(std::ostream& o, Module const& m)
     o__ "assert(pl);\n";
 
     // o__ "c->_params.set_try_again(pl);\n";
+    make_renew_sckt(o, m);
   }else{
   }
-  // o__ "if (_sim->is_first_expand()) {\n";
 
-    if(m.circuit()->element_list().size()){
-      make_renew_sckt(o, m);
-    }else{
-    }
-    o____ "precalc_first();\n";
+  o____ "precalc_first();\n";
 //    "    // optional nodes\n";
 //  for (Port_1_List::const_iterator
 //       p = d.circuit().opt_nodes().begin();
@@ -1202,7 +1213,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
       o__ "// filter " << i->name() << "\n";
       indent x;
       if(i->is_used()) {
-	make_module_expand_one_branch(o, *i, m, "");
+	make_module_expand_one_branch(o, *i, m);
       }else{
 	o__ "//unused filter\n";
       }
@@ -1211,7 +1222,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
     }else if(i->has_element()) {
       o__ "// branch " << i->name() << "\n";
       indent x;
-      make_module_expand_one_branch(o, *i, m, "");
+      make_module_expand_one_branch(o, *i, m);
 //      for(auto n : i->names()){ untested();
 //	make_module_expand_one_branch(o, *i, m, "_br_" + n);
 //      }
@@ -1227,7 +1238,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
     if(i->has_branch()){ untested();
       unreachable();
     }else{
-      make_module_expand_one_branch(o, *i, m, "");
+      make_module_expand_one_branch(o, *i, m);
     }
   }
 #endif
@@ -1237,6 +1248,8 @@ static void make_module_expand(std::ostream& o, Module const& m)
   o____ "  //precalc();\n";
   o__ "}\n";
   o__ "//precalc();\n";
+
+  // make_assign_expand(o, m);
 
   // TODO: deflate
   o__ "subckt()->expand();\n";
@@ -1410,6 +1423,7 @@ void make_cc_module(std::ostream& o, const Module& m)
   o <<
       "/*--------------------------------------"
       "------------------------------------*/\n";
+  // make_assign_common(o, m);
   //make_precalc_class(o, m);
   o <<
       "/*--------------------------------------"
@@ -1417,6 +1431,7 @@ void make_cc_module(std::ostream& o, const Module& m)
   make_module_class(o, m);
   make_module_dispatcher(o, m);
   make_module_clone(o, m);
+
 //  make_module_evals(o, m);
 //  make_module_default_constructor(o, m);
   make_module_descructor(o, m);
@@ -1433,9 +1448,10 @@ void make_cc_module(std::ostream& o, const Module& m)
   }
   make_module_precalc_last(o, m);
   make_cc_func(o, m);
+  make_assign_eval(o, m);
 //  make_module_probe(o, m);
 //  make_module_aux(o, m);
-  if(m.circuit()->element_list().size()){
+  if(m.has_submodule()) {
     o << "CARD_LIST* MOD_" << m.identifier() << "::scope()\n{\n";
     o__ "if(_parent){\n";
     o__ "  return COMPONENT::scope();\n";

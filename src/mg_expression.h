@@ -32,10 +32,13 @@ class Block;
 class RDeps;
 class Variable_Access;
 class Expression_ : public Expression {
+protected:
+  typedef std::list<Token const*> tokenlist;
+private:
   Base* _owner{nullptr};
   Block* _scope{nullptr}; // remove. later.
-  std::list<Token const*> _used_variables;
-  std::list<Token const*> _assignments;
+  tokenlist _used_variables;
+  tokenlist _assignments;
 public:
   explicit Expression_() : Expression() {}
   ~Expression_() {}
@@ -53,8 +56,11 @@ public: // assign. AF kludge. TODO, one list.
   void push_assign(Token const* t) { _assignments.push_back(t); }
 public:
   void push_use(Token const* t) { _used_variables.push_back(t); }
+  int num_used_variables()const { return int(_used_variables.size()); }
   void submit_variable_xs(Variable_Access&)const;
   void submit_variable_xs(Expression_&)const; // ternary hack
+protected:
+  std::list<Token const*> const& used_variables()const { return _used_variables; }
 public:
   void clear();
   Expression_* clone()const;

@@ -62,6 +62,7 @@ mg_func_sys.cc \
 mg_href.cc \
 mg_impl.cc \
 mg_in_analog.cc \
+mg_in_assign.cc \
 mg_in.cc \
 mg_in_circuit.cc \
 mg_in_code.cc \
@@ -77,6 +78,7 @@ mg_main.cc \
 mg_nodes.cc \
 mg_options.cc \
 mg_out_analog.cc \
+mg_out_assign.cc \
 mg_out.cc \
 mg_out_code.cc \
 mg_out_common.cc \

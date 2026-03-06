@@ -25,6 +25,7 @@
 #include "mg_analog.h" // BUG. Probe
 #include "mg_token.h" // Deps
 #include "mg_href.h" // Deps
+#include "mg_assign.h"
 /*--------------------------------------------------------------------------*/
 static void declare_deriv_enum(std::ostream& o, const Module& m)
 {
@@ -325,7 +326,7 @@ static void make_common(std::ostream& o, const Module& m)
   o__ "typedef " << common_name << " COMMON;\n";
   o__ "typedef MOD_" << m.identifier() << " MOD;\n";
   o__ "typedef enum { m_TR_ADVANCE, m_TR_ACCEPT, m_PRECALC, m_TR_REVIEW }eval_t;\n";
-  if(m.circuit()->element_list().size()){
+  if(m.has_submodule()) {
   o << "public:\n";
     o__ "PARAM_LIST _netlist_params;\n";
   }else{
@@ -624,7 +625,7 @@ static void make_module(std::ostream& o, const Module& m)
   }else{
   }
   o << "public: // netlist\n";
-  if(m.circuit()->element_list().size()){
+  if(m.has_submodule()) {
     make_cc_elements(o, m.circuit()->element_list());
   }else{
   }
@@ -669,7 +670,7 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "~MOD_" << m.identifier() << "();\n";
   o__ "CARD* clone()const override;\n";
   o << "private: // overrides\n";
-  if(m.circuit()->element_list().size()){
+  if(m.has_submodule()) {
     o__ "bool is_device() const override{return _parent;}\n";
     o__ "CARD_LIST* scope() override;\n";
     o__ "const CARD_LIST* scope()const override " <<
@@ -819,11 +820,105 @@ static void make_module(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-void make_cc_decl(std::ostream& out, const Module& d)
+#if 0
+static void make_eval(std::ofstream& out, const Eval& e,
+		      const String_Arg& dev_name)
 {
-  make_common(out, d);
-  make_precalc(out, d);
-  make_module(out, d);
+  std::string class_name = "EVAL_" + dev_name.to_string() + '_' 
+    + e.name().to_string();
+  out <<
+    "class " << class_name << " : public COMMON_COMPONENT {\n"
+    "private:\n"
+    "  explicit "<< class_name << "(const "<< class_name << "& p)\n"
+    "    :COMMON_COMPONENT(p) {}\n"
+    "public:\n"
+    "  explicit "<< class_name << "(int c=0) :COMMON_COMPONENT(c) {}\n"
+    "  bool operator==(const COMMON_COMPONENT& x)const override"
+		"{return COMMON_COMPONENT::operator==(x);}\n"
+    "  COMMON_COMPONENT* clone()const override{return new "<<class_name<<"(*this);}\n"
+    "  std::string name()const override {untested(); return \""<< class_name << "\";}\n"
+    "  void tr_eval(ELEMENT*d)const override;\n"
+    "  bool has_tr_eval()const override {return true;}\n"
+    "  bool has_ac_eval()const override {return false;}\n"
+    "};\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+#endif
+/*--------------------------------------------------------------------------*/
+// make_any_eval...
+static void make_elt_eval(std::ostream& o, const Element_2& p)
+{
+  std::string id = p.short_label();
+  std::string class_name = "COMMON_" + id;
+  std::string base_class_name;
+  base_class_name = "COMMON_LOGIC";
+  o << "class " << class_name << " :public " << base_class_name << "{\n";
+  o__ "explicit " << class_name << "(const " << class_name << "& p) : "
+                  << base_class_name << "(p) { }\n";
+  o__ "COMMON_COMPONENT* clone()const override {return new "<<class_name<<"(*this);}\n";
+  o << "public:\n";
+  o__ "explicit " << class_name << "(int c=0) : " << base_class_name << "(c) {}\n";
+  o__ "         ~" << class_name << "() {}\n";
+  o << "private:\n";
+  o__ "bool    operator==(const COMMON_COMPONENT& x)const override {\n";
+  o____ class_name << " const* p = dynamic_cast<const " << class_name << "*>(&x);\n";
+  o____ "bool rv = p && " << base_class_name << "::operator==(x);\n";
+  o____ "return rv;\n";
+  o__ "}\n";
+  o__ "virtual LOGICVAL logic_eval(node_t const*, int)const override;\n";
+  o__ "std::string name()const override {itested();return \"" << id << "\";}\n";
+  o__ "std::string port_name(int i)const override {\n";
+  o____ "assert(i >= 0);\n";
+  o____ "static std::string names[] = {";
+  std::string comma = "";
+  for (int nn = 0; nn < p.net_nodes(); ++nn){
+    o << comma << '"' << p.port_name(nn) << '"';
+    comma = ", ";
+  }
+  o____ "};\n";
+  o____ "if(i < " << p.net_nodes() << "){\n";
+  o______ "return names[i];\n";
+  o____ "}else{ untested();\n";
+  o______ "return \"\";\n";
+  o____ "}\n";
+  o__ "}\n";
+
+  o << "}; //" << class_name << "\n";
+  o << "static " << class_name << " Eval_" << p.eval() << "(CC_STATIC);\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+} // make_elt_eval
+/*--------------------------------------------------------------------------*/
+static void make_evals(std::ostream& o, const Module& m)
+{
+#if 0
+  for (Eval_List::const_iterator
+       e = d.eval_list().begin();
+       e != d.eval_list().end();
+       ++e) {
+    make_eval(out, **e, d.name());
+  }
+#endif
+  Element_2_List const& L = m.circuit()->element_list();
+  for (auto e = L.begin(); e != L.end(); ++e) {
+    if((*e)->eval()!=""){
+      make_elt_eval(o, **e);
+    }else{ untested();
+      o << "// no eval in " << (*e)->short_label() << "\n";
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+void make_cc_decl(std::ostream& o, const Module& m)
+{
+  make_common(o, m);
+  make_precalc(o, m);
+  make_module(o, m);
+  if(m.has_submodule()){
+    make_evals(o, m);
+  }else{ untested();
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

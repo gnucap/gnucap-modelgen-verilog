@@ -22,42 +22,12 @@
 #ifndef GNUCAP_MG_DIGITAL_H
 #define GNUCAP_MG_DIGITAL_H
 /*--------------------------------------------------------------------------*/
-#include "mg_.h"
 #include "mg_code.h"
-/*--------------------------------------------------------------------------*/
-class NetAssignment : public Assignment {
-  Node* _node_hack{nullptr};
-public:
-  explicit NetAssignment(CS& f, Base* o);
-  explicit NetAssignment() {}
-  ~NetAssignment() {}
-  void parse(CS& cmd)override;
-  void dump(std::ostream& o)const override;
-};
+#include "mg_assign.h"
+#include "mg_.h"
 /*--------------------------------------------------------------------------*/
 class VariableAssignment : Assignment {
 };
-/*--------------------------------------------------------------------------*/
-class ContinuousAssign : public Block {
-  int _delay{-1};
-public:
-  ContinuousAssign(){
-  }
-  ~ContinuousAssign(){
-  }
-private:
-//  void new_block();
-//  Block const* block_or_null() const{ untested(); return _block; }
-//  Block* block(){ untested(); return _block; }
-
-public:
-  void parse(CS& cmd)override;
-  void dump(std::ostream& o)const override;
-  void push_back(NetAssignment*);
-  void push_back(Statement*);
-};
-/*--------------------------------------------------------------------------*/
-typedef Collection<ContinuousAssign> AssignList;
 /*--------------------------------------------------------------------------*/
 class ProcContAssign : public Statement {
   VariableAssignment _assign;
@@ -268,19 +238,6 @@ inline AlwaysList const& always_list(Module const& m)
 { untested();
   return always(m).list();
 }
-/*--------------------------------------------------------------------------*/
-class Assign : public Owned_Base {
-  AssignList _list;
-public:
-  explicit Assign();
-  ~Assign();
-  void parse(CS& file) override;
-  void dump(std::ostream& o)const override;
-
-  bool has_block() const;
-  AssignList const& list()const { return _list; }
-  void push_back(Base*);
-};
 /*--------------------------------------------------------------------------*/
 class DigitalExpression : public Expression_ {
 public:
