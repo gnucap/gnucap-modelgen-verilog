@@ -37,7 +37,7 @@ module adc (out7, out6, out5, out4, out3, out2, out1, out0, in, clk);
     V(out1) <+ transition(((((result / 2) % 2))? (vdd):(vss)), td, tt);
     V(out2) <+ transition(((((result / 4) % 2))? (vdd):(vss)), td, tt);
     V(out3) <+ transition(((((result / 8) % 2))? (vdd):(vss)), td, tt);
-    V(out4) <+ transition(((((result / 16) % 2))? (vdd):(vss)), td, tt);
+    V(out4) <+ transition((result & 16? vdd:vss), td, tt);
     V(out5) <+ transition(((((result / 32) % 2))? (vdd):(vss)), td, tt);
     V(out6) <+ transition(((((result / 64) % 2))? (vdd):(vss)), td, tt);
     V(out7) <+ transition(((((result / 128) % 2))? (vdd):(vss)), td, tt);
