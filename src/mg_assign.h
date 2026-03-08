@@ -74,6 +74,8 @@ public:
   void dump(std::ostream& o)const override;
   void push_back(NetAssignment*);
   void push_back(Statement*);
+  bool has_delay()const;
+  std::string delay_string()const;
 };
 /*--------------------------------------------------------------------------*/
 class Module;

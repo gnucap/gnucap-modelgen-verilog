@@ -222,13 +222,18 @@ static void map_subdev_nodes(std::ostream& o, const Element_2& e)
   }
   {
     o << "};\n";
+    std::string value = e.value();
+    if(value == ""){
+      value = "0.";
+    }else{
+    }
     o____ "subc->set_parameters(\"" << e.short_label() << "\", this";
     if(e.eval()!=""){
       o << ", &Eval_" << e.eval();
     }else{
       o << ", const_cast<COMPONENT*>(" << e.code_name() << ")->mutable_common()";
     }
-    o << ", 0."; // value
+    o << ", " << value;
     o << ", 0, nullptr";
     o << ", " << e.net_nodes() << ", nodes);\n";
   }

@@ -904,7 +904,7 @@ static void make_evals(std::ostream& o, const Module& m)
   for (auto e = L.begin(); e != L.end(); ++e) {
     if((*e)->eval()!=""){
       make_elt_eval(o, **e);
-    }else{ untested();
+    }else{
       o << "// no eval in " << (*e)->short_label() << "\n";
     }
   }
@@ -917,7 +917,7 @@ void make_cc_decl(std::ostream& o, const Module& m)
   make_module(o, m);
   if(m.has_submodule()){
     make_evals(o, m);
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/

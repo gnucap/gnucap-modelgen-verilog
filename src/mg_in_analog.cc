@@ -2096,7 +2096,7 @@ Base* AnalogFunctionArgs::lookup(std::string const& k, bool recurse)
     }else{
       return b;
     }
-  }else if(dynamic_cast<Token_NODE const*>(b)){ untested();
+  }else if(dynamic_cast<Token_NODE const*>(b)){
       // nodes not allowed here.
     return nullptr;
   }else if(dynamic_cast<Token_VAR_DECL const*>(b)){

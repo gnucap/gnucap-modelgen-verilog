@@ -30,7 +30,6 @@ module test(p, n, x);
   electrical p;
   electrical x, y;
   voltage #() n();
-
 endmodule
 
 

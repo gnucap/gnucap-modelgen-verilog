@@ -109,16 +109,16 @@ public:
 /*--------------------------------------------------------------------------*/
 class DigitalCtrlBlock : public DigitalSeqBlock {
 public:
-  explicit DigitalCtrlBlock() : DigitalSeqBlock() { untested();}
+  explicit DigitalCtrlBlock() : DigitalSeqBlock() {}
   explicit DigitalCtrlBlock(CS& f, Statement* o) : DigitalSeqBlock() {
     set_owner(o);
     parse(f);
   }
 
-  void parse(CS& cmd)override { untested();
+  void parse(CS& cmd)override {
     return DigitalSeqBlock::parse(cmd);
   }
-  void dump(std::ostream& o)const override { untested();
+  void dump(std::ostream& o)const override {
     return DigitalSeqBlock::dump(o);
   }
   operator bool()const{ return size() || identifier() !=""; }
@@ -133,8 +133,8 @@ class DigitalCtrlStmt : public DigitalStmt {
 protected:
   DigitalCtrlBlock _body;
 public:
-  DigitalCtrlStmt() : _body() { untested(); }
-  ~DigitalCtrlStmt(){ untested(); }
+  DigitalCtrlStmt() : _body() { }
+  ~DigitalCtrlStmt(){ }
   void dump(std::ostream&)const override;
   void parse(CS& cmd)override;
   DigitalCtrlBlock const& body()const { untested(); return _body; }
@@ -177,8 +177,8 @@ typedef Collection<AlwaysConstruct> AlwaysList; // needed?
 class DigitalEvtExpression : public Expression_ {
   RDeps _rdeps;
 public:
-  explicit DigitalEvtExpression() : Expression_() { untested();}
-  ~DigitalEvtExpression(){ untested(); }
+  explicit DigitalEvtExpression() : Expression_() {}
+  ~DigitalEvtExpression(){ }
   void parse(CS&)override;
   void dump(std::ostream&)const override;
 //  Expression const& expression() const{return _expression;};
@@ -187,7 +187,7 @@ public:
 //
 private: // incomplete
   void set_rdeps(); // pull in rdeps from functions
-  bool add_rdep(Base const* b) { untested();
+  bool add_rdep(Base const* b) {
     return _rdeps.insert(b).second;
   }
   FUNCTION_ const* function()const;
@@ -198,7 +198,7 @@ public:
 class DigitalEvtCtlStmt : public DigitalCtrlStmt {
   DigitalEvtExpression _ctrl;
 public:
-  ~DigitalEvtCtlStmt() { untested(); }
+  ~DigitalEvtCtlStmt() { }
   void parse(CS&)override;
   void dump(std::ostream&)const override;
   Expression_ const& cond()const { return _ctrl; } // override?
@@ -419,7 +419,7 @@ public: // dump_annotate
     return _a.has_sensitivities();
   }
   Sensitivities const& sensitivities()const { untested();return _a.sensitivities();}
-  bool is_state_var()const { untested();return _a.is_state_var();}
+  bool is_state_var()const {return _a.is_state_var();}
 }; // DigitalProceduralAssignment
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

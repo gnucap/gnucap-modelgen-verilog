@@ -1513,25 +1513,6 @@ void NetAssignment::dump(std::ostream& o)const
   }
 }
 /*--------------------------------------------------------------------------*/
-void ContinuousAssign::parse(CS& f)
-{
-  if(f >> '#'){
-    f >> _delay;
-  }else{
-  }
-  auto n = new NetAssignment(f, owner());
-  push_back(n);
-  while(f >> ','){
-    f.skipbl();
-    auto a = new NetAssignment(f, owner());
-    push_back(a);
-  }
-  if(f >> ';'){
-  }else{ untested();
-    incomplete();
-  }
-}
-/*--------------------------------------------------------------------------*/
 void ContinuousAssign::push_back(NetAssignment* n)
 {
   Block::push_back(n);
@@ -1545,7 +1526,7 @@ void ContinuousAssign::dump(std::ostream& o)const
   }else{
   }
   std::string sep;
-  for(auto b : *this){
+  for(Base const* b : *this){
     o << sep;
     assert(b);
     b->dump(o);

@@ -104,6 +104,7 @@ public:
 //  const std::string& module_or_paramset_identifier()const { untested();return _module_or_paramset_identifier;}
   void set_dev_type(std::string const& s){_module_or_paramset_identifier = s;}
   void set_eval(std::string const& s){_eval = s;}
+  void set_value(std::string const& s){_value = s;}
   void set_state(std::string const& s){_state = s;}
   virtual std::string dev_type()const {return _module_or_paramset_identifier;}
   virtual Nature const* nature()const { untested();return nullptr;}
@@ -116,7 +117,7 @@ public:
   virtual std::string short_label()const 	  {return _name_of_module_instance;}
   virtual std::string code_name()const  {return "_e_" + _name_of_module_instance;}
   const std::string& eval()const 	{return _eval;}
-  const std::string& value()const 	{ untested();return _value;}
+  const std::string& value()const 	{return _value;}
   const std::string& args()const 	{ untested();return _args;}
   virtual const std::string& omit()const 	{return _omit;}
   const std::string& reverse()const 	{ untested();return _reverse;}

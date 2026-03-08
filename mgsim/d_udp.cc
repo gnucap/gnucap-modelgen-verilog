@@ -149,14 +149,20 @@ DEV_LOGIC::DEV_LOGIC(const DEV_LOGIC& p)
 /* set: set parameters, used in model building
  */
 void DEV_LOGIC::set_parameters(const std::string& Label, CARD *Owner,
-			       COMMON_COMPONENT *Common, double,
+			       COMMON_COMPONENT *Common, double Value,
 			       int , double [],
 			       int node_count, const node_t Nodes[])
 {
   set_label(Label);
   set_owner(Owner);
+  if(Value==0.){
+  }else if(Common){
+    Common = Common->clone();
+    Common->set_param_by_name("delay", to_string(Value));
+  }else{ untested();
+    incomplete();
+  }
   attach_common(Common);
-  // obsolete_set_value(Value);
 
   assert(node_count <= max_nodes());
   _net_nodes = short(node_count);

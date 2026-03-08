@@ -707,7 +707,7 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
 //      //o__ "0.; // OUTVAR?!\n";
     }else if (auto hh = dynamic_cast<const Token_HIER_REF*>(*i)) {
       vars().new_rhs(hh);
-    }else if(auto pp = dynamic_cast<const Token_ACCESS*>(*i)) { untested();
+    }else if(auto pp = dynamic_cast<const Token_ACCESS*>(*i)) {
       vars().new_ddouble(o);
       std::string lhsname = vars().code_name();
       if(!vars().has_deps()){ untested();

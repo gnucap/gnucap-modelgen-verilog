@@ -881,7 +881,7 @@ bool Assignment::update(RDeps const* incoming)
       assert(_token->deps().size() >= Expression_::data().size());
     }else{
     }
-  }else{ untested();
+  }else{
     ret = false;
     assert(_token->data());
 //    trace2("Assignment::update", _token->deps().size(), Expression_::deps().size());
