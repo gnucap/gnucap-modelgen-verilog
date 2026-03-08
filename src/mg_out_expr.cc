@@ -699,7 +699,14 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
   for (const_iterator i = e.begin(); i != e.end(); ++i) {
     trace3("mg_out_expr loop", (*i)->name(), (*i)->data(), vars().size());
 
-    if (auto var = dynamic_cast<const Token_VAR_REF*>(*i)) {
+    if (auto n = dynamic_cast<const Token_NODE*>(*i)) {
+      if(_ctx != "logic") {
+	vars().new_rhs(n);
+      }else{
+	Token_VAR_REF const* r = n;
+	vars().new_rhs(r);
+      }
+    }else if (auto var = dynamic_cast<const Token_VAR_REF*>(*i)) {
       vars().new_rhs(var); // if linear?
 //    }else if (auto t = dynamic_cast<const Token_OUT_VAR*>(*i)) { untested();
 //      vars().new_rhs(t); // if linear?
@@ -848,8 +855,6 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
 	o__ "}\n";
       }
       o__ "}\n";
-    }else if (auto n = dynamic_cast<const Token_NODE*>(*i)) {
-      vars().new_rhs(n);
     }else{ untested();
       assert(!dynamic_cast<const Token_UNARY*>(*i));
       assert(!dynamic_cast<const Token_SYMBOL*>(*i));
