@@ -156,7 +156,7 @@ static void make_parameter_decl(std::ostream& o, const Parameter_List_Collection
     if((*q)->is_local()){
       o__ (**q).type();
     }else{
-      o__ "PARAMETER<" << (**q).type() << ">";
+      o__ "PARAMETER<p_" << (**q).type() << ">";
     }
     std::string comma = " ";
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {

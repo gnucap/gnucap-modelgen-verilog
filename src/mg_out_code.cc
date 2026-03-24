@@ -30,7 +30,7 @@ char const* code_name(Data_Type const*x)
   }else if(x->is_int()) {
     return "int";
   }else if(x->is_string()) { untested();
-    return "std::string";
+    return "string";
   }else{ untested();
     unreachable();
     return "??";

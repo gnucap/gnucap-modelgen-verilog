@@ -65,7 +65,7 @@ private:
       o << " fd";
     }else{
     }
-    o << ", std::string";
+    o << ", string";
     if(names){
       o << " a1";
     }else{

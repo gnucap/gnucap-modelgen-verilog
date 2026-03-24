@@ -103,7 +103,7 @@ public: //overrides
 
     o____ "integer tr_eval(CARD* d, "; args(o) << ")const { (void)d; return 0; }\n";
 
-    o____ "integer tr_initial(CARD* d, std::string fn, std::string mode=\"\") {\n";
+    o____ "integer tr_initial(CARD* d, string fn, string mode=\"\") {\n";
     o______ "return tr_accept(d, fn, mode);\n";
     o____ "}\n";
 
@@ -121,7 +121,7 @@ public: //overrides
 
     o____ "integer tr_regress(CARD*, "; args(o) << ") { return 0; }\n";
 
-    o____ "integer tr_accept(CARD*, std::string fn, std::string mode=\"\")const {\n";
+    o____ "integer tr_accept(CARD*, string fn, string mode=\"\")const {\n";
     o______ "integer fd;\n";
     o______ "if(mode.size()) {\n";
     o________ "FILE* f = fopen(fn.c_str(), mode.c_str());\n";

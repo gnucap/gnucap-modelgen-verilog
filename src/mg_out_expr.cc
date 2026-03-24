@@ -425,7 +425,7 @@ public:
     assert(t<t_count);
     static std::string names[] = {
        "LOGICVAL", "double", "ddouble",
-       "std::string", "auto&",
+       "string", "auto&",
        "incomplete_cpptype"
     };
     return names[t];

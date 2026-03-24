@@ -57,7 +57,7 @@ private:
   bool static_code()const override {return false;}
   // Token* new_token(Module&, size_t)const override{ return nullptr; }
   std::ostream& args(std::ostream& o, bool names=false)const {
-    o << "std::string";
+    o << "string";
     if(names){
       o << " s";
     }else{
@@ -99,7 +99,7 @@ public: //overrides
     o__ "struct cls" << label() << "{\n";
 
     template_header(o, false);
-    o____ "void tr_eval(CARD* d, std::string";
+    o____ "void tr_eval(CARD* d, string";
     for(size_t i=1; i<num_args(); ++i) {
       o____  ", T" << i <<" const&";
     }
@@ -124,7 +124,7 @@ public: //overrides
     o____"}\n";
 
     template_header(o, true);
-    o____ "void tr_begin(MOD* d, std::string";
+    o____ "void tr_begin(MOD* d, string";
     for(size_t i=1; i<num_args(); ++i) {
       o____  ", T" << i << " a" << i << "";
     }
@@ -152,7 +152,7 @@ public: //overrides
     o____"}\n";
 
     template_header(o);
-    o____ "void tr_accept(CARD*, std::string a0";
+    o____ "void tr_accept(CARD*, string a0";
     for(size_t i=1; i<num_args(); ++i) {
       o << ", T" << i << " const& a" << i;
     }

@@ -69,7 +69,27 @@ namespace{
 
 typedef double real;
 typedef int integer;
-typedef vString string;
+struct string : public std::string {
+  string() : std::string(){}
+  string(char const* s) : std::string(s){}
+  string(vString const&x){ untested();
+    String const& s = x;
+    std::string::operator=(s);
+  }
+  string(PARAMETER<vString> const&x){
+    String const& s = x;
+    std::string::operator=(s);
+  }
+  string& operator=(vString const&x){
+    String const& s = x;
+    std::string::operator=(s);
+    return *this;
+  }
+};
+/*--------------------------------------------------------------------------*/
+typedef double p_real;
+typedef int p_integer;
+typedef vString p_string;
 /*--------------------------------------------------------------------------*/
 template<class T>
 double plain_value(T const& x) { return x; }
