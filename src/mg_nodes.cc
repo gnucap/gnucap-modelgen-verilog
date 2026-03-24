@@ -40,7 +40,6 @@ Node* Node_Map::new_node(std::string const& p, Block* owner)
   }else{
     // new_ref here?
     cc = new Node(p, int(_nodes.size()));
-    owner->new_var_ref(cc);
     owner->new_var_ref(cc->token());
     _nodes.push_back(cc);
   }

@@ -480,14 +480,13 @@ void OUT_EXPRESSION::new_variable(std::ostream& o, Token const* t)
   if(auto F = dynamic_cast<const Token_CALL*>(t)){
     d = (*F)->return_type(); // BUG.
   }else{
-    incomplete();
   }
 
   if(_ctx == "logic") {
     // hack
     vars().new_logic(o);
   }else if(!d) {
-    // incomplete();
+    incomplete();
     o__ "/* void? */\n";
     vars().new_ddouble(o); // TODO
   }else if(d->is_real()){

@@ -484,7 +484,8 @@ bool Block::new_var_ref(Base* what)
   }else if(auto ps = dynamic_cast<Paramset_Stmt const*>(what)){ untested();
     unreachable();
     p = "."+ps->name();
-  }else if(auto nn = dynamic_cast<Node const*>(what)){
+  }else if(auto nn = dynamic_cast<Node const*>(what)){ untested();
+    unreachable();
     incomplete(); // token?
     p = nn->name();
   }else if(auto blk = dynamic_cast<SeqBlock const*>(what)){

@@ -1718,7 +1718,7 @@ void AnalogEvtCtlStmt::parse(CS& file)
   _body.set_ctx_event();
   if(_ctrl.is_final()){
     _body.set_ctx_final();
-  }else{ untested();
+  }else{
   }
   _body.set_owner(this);
   _body.set_sens(this); // BUG

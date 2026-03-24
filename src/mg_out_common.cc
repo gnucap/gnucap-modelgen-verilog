@@ -1000,7 +1000,7 @@ void make_cc_common(std::ostream& o , const Module& m)
   }
   if(m.has_final()){
     make_common_final(o, m);
-  }else{ untested();
+  }else{
   }
   o  << "/*--------------------------------------------------------------------------*/\n";
 }

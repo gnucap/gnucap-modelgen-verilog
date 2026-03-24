@@ -80,7 +80,7 @@ public:
      }
      return r;
   }
-  bool contains(T const* t)const { untested();
+  bool contains(T const* t)const {
     return _s.count(t);
   }
 //  T*& operator[](std::string const& k){ untested();
