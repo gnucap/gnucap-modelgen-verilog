@@ -156,7 +156,8 @@ class Module : public Block {
     if_TR_REVIEW = 4,
     if_TR_ACCEPT = 5,
     if_SET_EVENT = 6,
-    if_COUNT = 7
+    if_FINAL = 7,
+    if_COUNT = 8
   } iface_id_t;
 public:
   typedef enum : int{
@@ -247,6 +248,7 @@ public: // TODO
   bool has_tr_advance()const{ return _has_pid[if_TR_ADVANCE] || has_analysis()
        || has_analog_block(); // why?
   }
+  bool has_final()const  { return _has_pid[if_FINAL]; }
 
   bool has_ac_begin_analog()const   {untested(); return _has_pid[if_TR_BEGIN]   & mm_ANALOG; }
   bool has_tr_begin_analog()const   { return _has_pid[if_TR_BEGIN]   & mm_ANALOG; }
@@ -254,12 +256,14 @@ public: // TODO
   bool has_tr_review_analog()const  {untested(); return _has_pid[if_TR_REVIEW]   & mm_ANALOG; }
   bool has_tr_advance_analog()const { untested(); return _has_pid[if_TR_ADVANCE] & mm_ANALOG; }
   bool has_tr_accept_analog()const  {untested(); return _has_pid[if_TR_ACCEPT]  & mm_ANALOG; }
+  bool has_final_analog()const      { return _has_pid[if_FINAL] & mm_ANALOG; }
 
   bool has_tr_begin_digital()const   { return _has_pid[if_TR_BEGIN]   & mm_DIGITAL; }
   bool has_tr_restore_digital()const { return _has_pid[if_TR_RESTORE]   & mm_DIGITAL; }
   bool has_tr_review_digital()const  {untested(); return _has_pid[if_TR_REVIEW]   & mm_DIGITAL; }
   bool has_tr_advance_digital()const {untested(); return _has_pid[if_TR_ADVANCE] & mm_DIGITAL; }
   bool has_tr_accept_digital()const  {untested(); return _has_pid[if_TR_ACCEPT]  & mm_DIGITAL; }
+  bool has_final_digital()const      { return _has_pid[if_FINAL] & mm_DIGITAL; }
 
   int times()const {return _times;}
   void new_filter();
@@ -279,12 +283,14 @@ public:
   void set_tr_review (mode_mask_t m=mm_YES) {set_pid(if_TR_REVIEW, m);}
   void set_tr_accept (mode_mask_t m=mm_YES) {set_pid(if_TR_ACCEPT, m);}
   void set_tr_advance(mode_mask_t m=mm_YES) {set_pid(if_TR_ADVANCE, m);}
+  void set_final(mode_mask_t m=mm_BOTH) {set_pid(if_FINAL, m);}
 
   void set_tr_begin_analog  () { set_tr_begin(mm_ANALOG);}
   void set_tr_restore_analog() { set_tr_restore(mm_ANALOG);}
   void set_tr_review_analog () { set_tr_review (mm_ANALOG);}
   void set_tr_accept_analog () { set_tr_accept (mm_ANALOG);}
   void set_tr_advance_analog() { set_tr_advance(mm_ANALOG);}
+  void set_final_analog()      { untested(); set_final(mm_ANALOG);}
 private:
   void import_flags(FUNCTION_ const*);
   void set_pid  (iface_id_t p, mode_mask_t m=mm_ANALOG) {_has_pid[p] = (mode_mask_t)(_has_pid[p] | m);}

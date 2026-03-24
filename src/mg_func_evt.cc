@@ -93,6 +93,44 @@ private:
 } initial_step;
 DISPATCHER<FUNCTION>::INSTALL d_initial_step(&function_dispatcher, "initial_step", &initial_step);
 /*--------------------------------------------------------------------------*/
+class FINAL_STEP : public MGVAMS_EVENT {
+public:
+  explicit FINAL_STEP() : MGVAMS_EVENT() {
+    set_label("final_step");
+  }
+  ~FINAL_STEP(){ }
+private:
+  bool static_code()const override {return true;}
+  bool needs_context()const override {return false;}
+  bool is_common()const override {return true;}
+  bool has_final()const override { return true;}
+  Token* new_token(Module& m, size_t)const override {
+    m.set_final();
+    m.install(this);
+    return new Token_EVT(label(), this);
+  }
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
+    unreachable();
+    return "";
+  }
+  std::string code_name()const override {
+    return "final_hack_";
+  }
+//   void stack_op(Expression const& args, Expression* out) const override { untested();
+//     incomplete();
+//   }
+  void make_cc_common(std::ostream& o)const override {
+    o__ "bool " << code_name() << "()const { return false; }\n";
+  }
+//  void make_cc_impl(std::ostream& o)const override {
+//    o__ "bool " << code_name() << "(CARD const* d)const {\n";
+//    o____ "auto m = prechecked_cast<MOD const*>(d);\n";
+//    o____ "return m->is_final();\n";
+//    o__ "}\n";
+//  }
+} final_step;
+DISPATCHER<FUNCTION>::INSTALL d_final_step(&function_dispatcher, "final_step", &final_step);
+/*--------------------------------------------------------------------------*/
 class CROSS : public MGVAMS_EVENT {
 protected:
   std::string _code_name;

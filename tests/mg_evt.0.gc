@@ -17,6 +17,7 @@ module test_evt0_0(p, n);
 			w = w + v;
 		end
 		V(p,n) <+ w;
+		@(final_step) $strobe("done");
 	end
 endmodule
 

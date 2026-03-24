@@ -56,7 +56,7 @@ private:
   bool has_tr_restore()const override {return false;}
   bool static_code()const override {return false;}
   // Token* new_token(Module&, size_t)const override{ return nullptr; }
-  void args(std::ostream& o, bool names=false)const {
+  std::ostream& args(std::ostream& o, bool names=false)const {
     o << "std::string";
     if(names){
       o << " s";
@@ -69,6 +69,7 @@ private:
       }else{
       }
     }
+    return o;
   }
   void voidargs(std::ostream& o)const {
     for(size_t i=1; i<num_args(); ++i) {
@@ -105,7 +106,16 @@ public: //overrides
     o << ")const { (void)d; }\n";
 
     template_header(o, true);
-    o____ "void tr_initial(MOD* d, "; args(o, true); o << ")const {\n";
+    o____ "void tr_initial(MOD* d, "; args(o, true) << ")const {\n";
+    o______ "tr_accept(d, s\n";
+    for(size_t i=1; i<num_args(); ++i) {
+      o << ", a" << i;
+    }
+    o << ");\n";
+    o____"}\n";
+
+    template_header(o, true);
+    o____ "void finish(MOD* d, "; args(o, true) << ")const {\n";
     o______ "tr_accept(d, s\n";
     for(size_t i=1; i<num_args(); ++i) {
       o << ", a" << i;
@@ -121,25 +131,24 @@ public: //overrides
     o << ")const {\n";
     voidargs(o);
     o______ "trace1(\"write::tr_begin\", _sim->_time0);\n";
-    //o______ "assert(d); return d->q_accept();\n";
     o______ " assert(d); d->q_accept();\n";
     o____"}\n";
 
     template_header(o, true);
-    o____ "void tr_review(MOD* d, "; args(o); o << ") {\n";
+    o____ "void tr_review(MOD* d, "; args(o) << ") {\n";
     o______ "(void)d;\n";
     o______ " assert(d); d->q_accept();\n";
     o____"}\n";
 
     template_header(o, true);
-    o____ "void tr_advance(MOD* d, "; args(o); o << ") {\n";
+    o____ "void tr_advance(MOD* d, "; args(o) << ") {\n";
     o______ "(void)d;\n";
     o______ "trace1(\"write::tr_advance\", _sim->_time0);\n";
     o______ "assert(d); d->q_accept();\n";
     o____"}\n";
 
     template_header(o);
-    o____ "void tr_regress(CARD*, "; args(o); o << ") {\n";
+    o____ "void tr_regress(CARD*, "; args(o) << ") {\n";
     o____"}\n";
 
     template_header(o);
@@ -161,7 +170,7 @@ public: //overrides
     o____ "}\n";
 
     template_header(o);
-    o____ "void precalc(CARD const*, "; args(o); o << ")const { /*nop*/ }\n";
+    o____ "void precalc(CARD const*, "; args(o) << ")const { /*nop*/ }\n";
 
     template_header(o);
     o____ "void af(CARD const*, "; args(o); o << ")const { incomplete(); /* BUG */ }\n";

@@ -710,6 +710,21 @@ static void make_tr_accept(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_final(std::ostream& o, const Module& m)
+{
+  o << "inline void MOD_" << m.identifier() << "::final_()\n{\n";
+  if(m.has_tr_begin()){
+    o__ "auto c = prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
+    o__ "assert(c);\n";
+//    o__ "_final = true;\n";
+    o__ "c->final_(this);\n";
+  }else{ untested();
+  }
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
 void make_cc_analog_list(std::ostream& o, const Module& m, Branch const*
     src=nullptr);
 /*--------------------------------------------------------------------------*/
@@ -846,6 +861,10 @@ static void make_module_class(std::ostream& o, Module const& m)
   }
   if(m.has_tr_restore()) {
     make_tr_restore(o, m);
+  }else{
+  }
+  if(m.has_final()) {
+    make_final(o, m);
   }else{
   }
 

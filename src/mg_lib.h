@@ -80,6 +80,9 @@ public:
      }
      return r;
   }
+  bool contains(T const* t)const { untested();
+    return _s.count(t);
+  }
 //  T*& operator[](std::string const& k){ untested();
 //    T K(k);
 //    auto p = _s.insert(&K);

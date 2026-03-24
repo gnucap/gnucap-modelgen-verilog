@@ -77,6 +77,7 @@ public: // characteristics
   virtual bool has_tr_accept()const {return false;}
   virtual bool has_tr_advance()const{return false;}
   virtual bool has_tr_regress()const{ untested();return has_tr_advance();}
+  virtual bool has_final()const{return false; }
   virtual bool has_set_event()const {return false;}
   virtual bool has_state()const { untested();return false;}
   virtual bool has_modes()const {return false;}

@@ -56,6 +56,7 @@ private:
   bool has_tr_accept()const override {return true;}
   bool has_tr_begin()const override {return true;}
   bool has_tr_restore()const override {return false;}
+  bool has_final()const override {return false;}
   bool static_code()const override {return false;}
   // Token* new_token(Module&, size_t)const override{ return nullptr; }
   std::ostream& args(std::ostream& o, bool names=false)const {
@@ -145,7 +146,7 @@ public: //overrides
       o______ "a1 += \"" << end() << "\";\n";
     }else{
     }
-    o______ "if(fd & (1<<31)){ untested();\n";
+    o______ "if(fd & (1<<31)){\n";
     o________ "dprintf(fd ^ (1<<31), a1.c_str()";
     for(int i=2; i<int(num_args()); ++i) {
       o << ", plain_value(a" << i << ")";
@@ -153,6 +154,15 @@ public: //overrides
     o << ");\n";
     o______ "}else{ incomplete();\n";
     o______ "}\n";
+    o____ "}\n";
+
+    template_header(o);
+    o____ "void finish(CARD* d, "; args(o, true) << ")const {\n";
+    o______ "tr_accept(d, fd\n";
+    for(int i=1; i<int(num_args()); ++i) {
+      o << ", a" << i;
+    }
+    o << ");\n";
     o____ "}\n";
 
     template_header(o);

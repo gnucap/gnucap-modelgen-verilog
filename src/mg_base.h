@@ -45,6 +45,7 @@ extern rdep_tag tr_eval_tag;
 extern rdep_tag tr_review_tag;
 extern rdep_tag tr_advance_tag;
 extern rdep_tag tr_accept_tag;
+extern rdep_tag final_tag;
 /*--------------------------------------------------------------------------*/
 class ckt_attr : protected CKT_BASE{
 public:

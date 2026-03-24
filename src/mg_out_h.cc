@@ -399,6 +399,18 @@ static void make_common(std::ostream& o, const Module& m)
     o__ "void tr_regress_analog(MOD_" << m.identifier() << "*)const;\n";
   }else{
   }
+  if(m.has_final()){
+    o__ "void final_(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
+  if(m.has_final_analog()){
+    o__ "void final_analog(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
+  if(m.has_final_digital()){
+    o__ "void final_digital(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
   o__ "void precalc_analog(MOD_" << m.identifier() << "*);\n";
   o__ "std::string name()const override {itested();return \"" << m.identifier() << "\";}\n";
 //    "  const SDP_CARD* sdp()const {return _sdp;}\n"
@@ -756,10 +768,12 @@ static void make_module(std::ostream& o, const Module& m)
 //    o__ "void      ac_begin() override;\n";
 //    o__ " void    do_ac();\n";
   }
-  { // todo
-  o__ "void ac_final()override {}\n";
-  o__ "void dc_final()override {}\n";
-  o__ "void tr_final()override {}\n";
+  if(m.has_final()){
+    o__ "void ac_final()override {BASE_SUBCKT::ac_final(); final_();}\n";
+    o__ "void dc_final()override {BASE_SUBCKT::dc_final(); final_();}\n";
+    o__ "void tr_final()override {BASE_SUBCKT::tr_final(); final_();}\n";
+    o__ "void final_();\n";
+  }else{
   }
   o__ "double tr_probe_num(std::string const&)const override;\n";
   o__ "  //void    ac_load();           //BASE_SUBCKT\n";

@@ -204,6 +204,10 @@ void System_Task::parse(CS& f)
     add_rdep(&tr_advance_tag);
   }else{
   }
+  if(function()->has_final()){
+    add_rdep(&final_tag);
+  }else{
+  }
 
   // assert(rdeps());
   trace1("System_Task::parse2", rdeps().size());
@@ -1712,6 +1716,10 @@ void AnalogEvtCtlStmt::parse(CS& file)
   }
   assert(owner());
   _body.set_ctx_event();
+  if(_ctrl.is_final()){
+    _body.set_ctx_final();
+  }else{ untested();
+  }
   _body.set_owner(this);
   _body.set_sens(this); // BUG
   file >> _body;
@@ -2364,6 +2372,10 @@ void AnalogEvtExpression::set_rdeps()
     }
     if(f->has_tr_advance()){
       add_rdep(&tr_advance_tag);
+    }else{
+    }
+    if(f->has_final()){
+      add_rdep(&final_tag);
     }else{
     }
   }
