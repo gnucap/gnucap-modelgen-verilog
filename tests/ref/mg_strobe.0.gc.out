@@ -5,6 +5,7 @@ test_strobe0 #() dut ();
 time is \ foo 0.000000
 gmin is 1e-12
 iter is 1.000000, def 42.000000
+initial_step evt 2.000000
  0.         2.        
 #Time       iter(0)   
 1hello 1.000000
@@ -12,6 +13,7 @@ iter is 1.000000, def 42.000000
 time is \ foo 0.000000
 gmin is 1e-06
 iter is 1.000000, def 42.000000
+initial_step evt 2.000000
  0.         2.        
 1hello 1.000000
 2hello            foo 1.000000

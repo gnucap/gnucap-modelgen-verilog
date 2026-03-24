@@ -156,7 +156,7 @@ static void make_parameter_decl(std::ostream& o, const Parameter_List_Collection
     if((*q)->is_local()){
       o__ (**q).type();
     }else{
-      o__ "PARAMETER<" << (**q).type() << ">";
+      o__ "PARAMETER<p_" << (**q).type() << ">";
     }
     std::string comma = " ";
     for (auto p = (*q)->begin(); p != (*q)->end(); ++p) {
@@ -397,6 +397,18 @@ static void make_common(std::ostream& o, const Module& m)
   if(m.has_tr_advance() && m.has_analog_block()){
     o__ "void tr_advance_analog(MOD_" << m.identifier() << "*)const;\n";
     o__ "void tr_regress_analog(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
+  if(m.has_final()){
+    o__ "void final_(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
+  if(m.has_final_analog()){
+    o__ "void final_analog(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
+  if(m.has_final_digital()){
+    o__ "void final_digital(MOD_" << m.identifier() << "*)const;\n";
   }else{
   }
   o__ "void precalc_analog(MOD_" << m.identifier() << "*);\n";
@@ -741,15 +753,14 @@ static void make_module(std::ostream& o, const Module& m)
     o__ "//void    tr_accept()override;         //BASE_SUBCKT\n";
   }
   o__ "//void    tr_unload();         //BASE_SUBCKT\n";
+  o__ "void      dc_advance()override;\n";
   if (!m.has_analog_block()) {
-    o__ "//void    dc_advance();        //BASE_SUBCKT\n";
     o__ "//void    tr_advance();        //BASE_SUBCKT\n";
     o__ "//void    tr_regress();        //BASE_SUBCKT\n";
     o__ "//bool    tr_needs_eval()const;//BASE_SUBCKT\n";
     o__ "//void    tr_queue_eval();     //BASE_SUBCKT\n";
     o__ "//bool    do_tr();             //BASE_SUBCKT\n";
   }else{
-    o__ "void      dc_advance()override {set_not_converged(); BASE_SUBCKT::dc_advance();}\n";
     o__ "bool      tr_needs_eval()const override;\n";
     o__ "void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }\n";
    //  o__ "void q_eval() { COMPONENT::q_eval(); }\n";
@@ -757,10 +768,12 @@ static void make_module(std::ostream& o, const Module& m)
 //    o__ "void      ac_begin() override;\n";
 //    o__ " void    do_ac();\n";
   }
-  { // todo
-  o__ "void ac_final()override {}\n";
-  o__ "void dc_final()override {}\n";
-  o__ "void tr_final()override {}\n";
+  if(m.has_final()){
+    o__ "void ac_final()override {BASE_SUBCKT::ac_final(); final_();}\n";
+    o__ "void dc_final()override {BASE_SUBCKT::dc_final(); final_();}\n";
+    o__ "void tr_final()override {BASE_SUBCKT::tr_final(); final_();}\n";
+    o__ "void final_();\n";
+  }else{
   }
   o__ "double tr_probe_num(std::string const&)const override;\n";
   o__ "  //void    ac_load();           //BASE_SUBCKT\n";

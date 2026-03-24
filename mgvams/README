@@ -7,7 +7,7 @@ Some of them are not here, but still in ../src.
 
 - A.6.5 Timing control Statements
   - initial_step
-  - (final_step)
+  - final_step
   - cross
   - above
   - timer
@@ -31,6 +31,29 @@ Some of them are not here, but still in ../src.
   - ($monitor)
   - $write
   - $debug
+- Table 9-2 -- I/O
+  - $fclose, $fopen
+  - ($fdisplay)
+  - ($fdisplayb, $fdisplayh, $fdisplayo)
+  - $fwrite
+  - ($fwriteb, $fwriteh, $fwriteo)
+  - $fstrobe
+  - ($fstrobeb, $fstrobeh, $fstrobeo)
+  - ($fmonitor)
+  - ($fmonitorb, $fmonitorh, $fmonitoro)
+  - ($fgetc, $ungetc)
+  - ($fgets)
+  - ($fscanf)
+  - ($swrite, $sformat, $sscanf)
+  - ($swriteb, $swriteh, $swriteo)
+  - ($fread)
+  - ($rewind, $fseek, $ftell)
+  - ($fflush)
+  - ($ferror)
+  - ($feof)
+  - ($readmemb, $readmemh)
+  - ($sdf_annotate)
+  - ($fdebug)
 - Table 9-4 -- Simulation control system tasks
   - $finish
   - ($stop)

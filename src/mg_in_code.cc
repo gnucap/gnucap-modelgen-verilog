@@ -92,6 +92,15 @@ bool Statement::is_ctx_function() const
   }
 }
 /*--------------------------------------------------------------------------*/
+bool Statement::is_ctx_final() const
+{
+  if(auto x = dynamic_cast<SeqBlock const*>(scope())) {
+    return x->is_ctx_final();
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
 bool Statement::is_reachable() const
 { untested();
   assert(scope());
@@ -477,10 +486,12 @@ void SeqBlock::dump(std::ostream& o)const
     if(options().dump_annotate()){
       if(is_ctx_function()){
 	o << " // f";
-      }else if(is_ctx_event()){
-	o << " // e";
       }else if(is_ctx_initial()){
 	o << " // i";
+      }else if(is_ctx_final()){
+	o << " // F";
+      }else if(is_ctx_event()){
+	o << " // e";
       }else if(is_always()){
 	o << " // always";
       }else if(is_never()){

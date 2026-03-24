@@ -38,14 +38,15 @@ public:
     modeTR_REGRESS = 8,
     modeTR_REVIEW = 9,
     modeTR_ACCEPT = 10,
-    modeAF = 11,
-    modeNUM = 12
+    modeFINAL = 11,
+    modeAF = 12,
+    modeNUM = 13
   }_mode;
   Base const* _src{nullptr};
   std::string ctx()const {
     char const* names[modeNUM] = { //
       "precalc", "static", "tr_eval", "probe", "tr_initial", "tr_begin", "tr_restore",
-      "tr_advance", "tr_regress", "tr_review", "tr_accept", "af"
+      "tr_advance", "tr_regress", "tr_review", "tr_accept", "finish", "af"
     };
     return names[_mode];
   }
@@ -74,6 +75,7 @@ public:
   bool is_tr_accept()const  { return _mode==modeTR_ACCEPT; }
   bool is_tr_advance()const  { untested(); return _mode==modeTR_ADVANCE; }
   bool is_tr_restore()const { return _mode==modeTR_RESTORE; }
+  bool is_final()const  { return _mode==modeFINAL; }
 public:
   void make_analog_list(std::ostream& o, const Module& m)const;
   void make_construct  (std::ostream& o, AnalogConstruct const& ab)const;
@@ -1105,6 +1107,10 @@ static void make_one_variable_proxy(std::ostream& o, Token_VAR_REF const& V)
   o______ "ddouble::operator=(t);\n";
   o______ "return *this;\n";
   o____ "}\n";
+  o____ "ddouble& operator=(PARAMETER<double> const& t){\n";
+  o______ "ddouble::operator=(t);\n";
+  o______ "return *this;\n";
+  o____ "}\n";
   o____ "ddouble& operator=(ddouble const& t){\n";
   o______ "ddouble::operator=(t);\n";
   o______ "return *this;\n";
@@ -1297,7 +1303,7 @@ void OUT_ANALOG::make_analog_list(std::ostream& o, const Module& m) const
   }
 }
 /*--------------------------------------------------------------------------*/
-static void make_cc_common_tr_advance(std::ostream& o, const Module& m)
+static void make_cc_tr_advance_analog(std::ostream& o, const Module& m)
 {
   o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
   o << "inline void COMMON_" << m.identifier() <<
@@ -1315,7 +1321,7 @@ static void make_cc_common_tr_advance(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_cc_common_tr_regress(std::ostream& o, const Module& m)
+static void make_cc_tr_regress_analog(std::ostream& o, const Module& m)
 {
   o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
   o << "inline void COMMON_" << m.identifier() <<
@@ -1450,6 +1456,23 @@ static void make_clear_branch_contributions(std::ostream& o, const Module& m)
       "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_cc_final_analog(std::ostream& o, const Module& m)
+{
+  o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
+  o << "inline void COMMON_" << m.identifier() <<
+    "::final_analog(MOD_" << m.identifier() << "* m) const\n{\n";
+
+//  o__ "m->_v_ = m->_v_1;\n";
+    o__ "struct FF { bool operator()() const{return true;}}final_hack_;\n";
+
+  OUT_ANALOG oo(OUT_ANALOG::modeFINAL, &final_tag);
+  oo.make_load_variables(o, m);
+  oo.make_analog_list(o, m);
+  o << "} // final_analog \n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
 void make_cc_analog(std::ostream& o, const Module& m)
 {
   o << "typedef MOD_" << m.identifier() << " MOD__;\n"; // here?
@@ -1486,9 +1509,13 @@ void make_cc_analog(std::ostream& o, const Module& m)
     o__ "// !has_tr_accept\n";
   }
   if(m.has_tr_advance()){
-    make_cc_common_tr_advance(o, m);
-    make_cc_common_tr_regress(o, m);
+    make_cc_tr_advance_analog(o, m);
+    make_cc_tr_regress_analog(o, m);
   }else{ untested();
+  }
+  if(m.has_final_analog()){
+    make_cc_final_analog(o, m);
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/

@@ -36,6 +36,7 @@ rdep_tag tr_eval_tag("e");
 rdep_tag tr_review_tag("v");
 rdep_tag tr_advance_tag("a");
 rdep_tag tr_accept_tag("x");
+rdep_tag final_tag("f");
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -272,6 +273,8 @@ TData const* Token_BINOP_::op_deps(Token const* t1, Token const* t2)const
   }else{ untested();
     ret = const_deps.clone();
   }
+
+  // assert(ret->type()); incomplete();
   return ret;
 }
 /*--------------------------------------------------------------------------*/

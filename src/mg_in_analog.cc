@@ -204,6 +204,10 @@ void System_Task::parse(CS& f)
     add_rdep(&tr_advance_tag);
   }else{
   }
+  if(function()->has_final()){
+    add_rdep(&final_tag);
+  }else{
+  }
 
   // assert(rdeps());
   trace1("System_Task::parse2", rdeps().size());
@@ -412,14 +416,14 @@ void AnalogInitialStmt::parse(CS& f)
   m->set_tr_begin_analog();
   _body.set_owner(this);
   _body.set_ctx_initial();
-  assert(_body.is_initial());
+  assert(_body.is_ctx_initial());
 
   if(f >> _body){
     scope()->add_block(&_body); //?
   }else{ untested();
     throw Exception_CS_("expecting statement", f);
   }
-  assert(_body.is_initial());
+  assert(_body.is_ctx_initial());
 }
 /*--------------------------------------------------------------------------*/
 void AnalogInitialStmt::dump(std::ostream& o) const
@@ -1140,7 +1144,7 @@ void AnalogSeqBlock::parse(CS& f)
     SeqBlock::parse(f); // _variables
   }else{
   }
-  if(is_initial()){
+  if(is_ctx_initial()){
   }else if(dynamic_cast<Module const*>(owner())) { untested();
     unreachable();
     set_always();
@@ -1712,6 +1716,10 @@ void AnalogEvtCtlStmt::parse(CS& file)
   }
   assert(owner());
   _body.set_ctx_event();
+  if(_ctrl.is_final()){
+    _body.set_ctx_final();
+  }else{
+  }
   _body.set_owner(this);
   _body.set_sens(this); // BUG
   file >> _body;
@@ -2364,6 +2372,10 @@ void AnalogEvtExpression::set_rdeps()
     }
     if(f->has_tr_advance()){
       add_rdep(&tr_advance_tag);
+    }else{
+    }
+    if(f->has_final()){
+      add_rdep(&final_tag);
     }else{
     }
   }

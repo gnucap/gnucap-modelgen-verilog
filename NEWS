@@ -12,6 +12,8 @@ This file summarizes new features and important changes between snapshots.
 - overloading diagnostics: use "desc" attribute
 - generate code for variable initialiser expressions
 - generate code for "net_assign"
+- fopen, fclose, fwrite etc.
+- final_step (without arg)
 - ..
 
 20251222-dev

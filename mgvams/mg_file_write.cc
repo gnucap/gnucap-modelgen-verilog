@@ -1,6 +1,5 @@
 /*                        -*- C++ -*-
- * Copyright (C) 2024 Felix Salfelder
- * Author: Felix Salfelder
+ * Copyright (C) 2026 Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -19,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * Verilog-AMS display tasks
+ * Verilog-AMS file io tasks
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"
@@ -29,19 +28,22 @@
 #include <globals.h>
 #include <u_parameter.h>
 /*--------------------------------------------------------------------------*/
+void Data_Type::parse(CS&){unreachable();}
+void Data_Type::dump(std::ostream&)const{unreachable();}
+/*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
-class WRITE : public MGVAMS_TASK {
+class FWRITE : public MGVAMS_TASK {
 public:
-  explicit WRITE() : MGVAMS_TASK(){
-    set_label("$write");
+  explicit FWRITE() : MGVAMS_TASK(){
+    set_label("$fwrite");
   }
 private:
   std::string eval(CS&, const PARAM_LIST*)const override{ untested();
-    return "$$strobe";
+    return "$$fwrite";
   }
-  WRITE* clone()const override {
-    return new WRITE(*this);
+  FWRITE* clone()const override {
+    return new FWRITE(*this);
   }
   bool is_common()const override {untested(); return true;}
   bool is_in_common()const override { return false;} // BUG?
@@ -54,15 +56,21 @@ private:
   bool has_tr_accept()const override {return true;}
   bool has_tr_begin()const override {return true;}
   bool has_tr_restore()const override {return false;}
+  bool has_final()const override {return false;}
   bool static_code()const override {return false;}
   // Token* new_token(Module&, size_t)const override{ return nullptr; }
   std::ostream& args(std::ostream& o, bool names=false)const {
-    o << "string";
+    o << "int";
     if(names){
-      o << " s";
+      o << " fd";
     }else{
     }
-    for(int i=1; i<int(num_args()); ++i) {
+    o << ", string";
+    if(names){
+      o << " a1";
+    }else{
+    }
+    for(int i=2; i<int(num_args()); ++i) {
       o____  ", T" << i;
       if(names){
        o << " a" << i;
@@ -72,13 +80,13 @@ private:
     return o;
   }
   void voidargs(std::ostream& o)const {
-    for(size_t i=1; i<num_args(); ++i) {
+    for(size_t i=2; i<num_args(); ++i) {
       o << " (void) a" << i << ";\n";
     }
   }
 private:
   void template_header(std::ostream& o, bool mod=false)const {
-    if(mod || num_args()>1){
+    if(mod || num_args()>2){
       o____ "template<";
       std::string sep;
       if(mod){
@@ -86,7 +94,7 @@ private:
 	sep = ", ";
       }else{
       }
-      for(size_t i=1; i<num_args(); ++i) {
+      for(size_t i=2; i<num_args(); ++i) {
 	o << sep << "class T" << i;
 	sep = ", ";
       }
@@ -99,15 +107,11 @@ public: //overrides
     o__ "struct cls" << label() << "{\n";
 
     template_header(o, false);
-    o____ "void tr_eval(CARD* d, string";
-    for(size_t i=1; i<num_args(); ++i) {
-      o____  ", T" << i <<" const&";
-    }
-    o << ")const { (void)d; }\n";
+    o____ "void tr_eval(CARD* d, "; args(o, false) << ")const { (void)d; }\n";
 
     template_header(o, true);
-    o____ "void tr_initial(MOD* d, "; args(o, true) << ")const {\n";
-    o______ "tr_accept(d, s\n";
+    o____ "void tr_initial(MOD* d, "; args(o, true); o << ")const {\n";
+    o______ "tr_accept(d, fd\n";
     for(size_t i=1; i<num_args(); ++i) {
       o << ", a" << i;
     }
@@ -115,33 +119,18 @@ public: //overrides
     o____"}\n";
 
     template_header(o, true);
-    o____ "void finish(MOD* d, "; args(o, true) << ")const {\n";
-    o______ "tr_accept(d, s\n";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", a" << i;
-    }
-    o << ");\n";
-    o____"}\n";
-
-    template_header(o, true);
-    o____ "void tr_begin(MOD* d, string";
-    for(size_t i=1; i<num_args(); ++i) {
-      o____  ", T" << i << " a" << i << "";
-    }
-    o << ")const {\n";
-    voidargs(o);
-    o______ "trace1(\"write::tr_begin\", _sim->_time0);\n";
+    o____ "void tr_begin(MOD* d,"; args(o, false) << ")const {\n";
     o______ " assert(d); d->q_accept();\n";
     o____"}\n";
 
     template_header(o, true);
-    o____ "void tr_review(MOD* d, "; args(o) << ") {\n";
+    o____ "void tr_review(MOD* d,"; args(o); o << ") {\n";
     o______ "(void)d;\n";
     o______ " assert(d); d->q_accept();\n";
     o____"}\n";
 
     template_header(o, true);
-    o____ "void tr_advance(MOD* d, "; args(o) << ") {\n";
+    o____ "void tr_advance(MOD* d, "; args(o); o << ") {\n";
     o______ "(void)d;\n";
     o______ "trace1(\"write::tr_advance\", _sim->_time0);\n";
     o______ "assert(d); d->q_accept();\n";
@@ -152,25 +141,42 @@ public: //overrides
     o____"}\n";
 
     template_header(o);
-    o____ "void tr_accept(CARD*, string a0";
-    for(size_t i=1; i<num_args(); ++i) {
-      o << ", T" << i << " const& a" << i;
-    }
-    o << ")const {\n";
-    o______ "trace1(\"write::tr_accept\", _sim->_time0);\n";
+    o____ "void tr_accept(CARD*, "; args(o, true) << ")const {\n";
     if(end().size()){
-      o______ "a0 += \"" << end() << "\";\n";
+      o______ "a1 += \"" << end() << "\";\n";
     }else{
     }
-    o______ "fprintf(stdout, a0.c_str()";
-    for(size_t i=1; i<num_args(); ++i) {
+    o______ "if(fd & (1<<31)){\n";
+    o________ "dprintf(fd ^ (1<<31), a1.c_str()";
+    for(int i=2; i<int(num_args()); ++i) {
       o << ", plain_value(a" << i << ")";
+    }
+    o << ");\n";
+    o______ "}else{\n";
+    o________ "for(int i=1; i<31; ++i) {\n";
+    o__________ "if(fd & (1<<i)){\n";
+    o__________ "  dprintf(i, a1.c_str()";
+    for(int i=2; i<int(num_args()); ++i) {
+      o << ", plain_value(a" << i << ")";
+    }
+    o << ");\n";
+    o__________ "}else{\n";
+    o__________ "}\n";
+    o________ "}\n";
+    o______ "}\n";
+    o____ "}\n";
+
+    template_header(o);
+    o____ "void finish(CARD* d, "; args(o, true) << ")const {\n";
+    o______ "tr_accept(d, fd\n";
+    for(int i=1; i<int(num_args()); ++i) {
+      o << ", a" << i;
     }
     o << ");\n";
     o____ "}\n";
 
     template_header(o);
-    o____ "void precalc(CARD const*, "; args(o) << ")const { /*nop*/ }\n";
+    o____ "void precalc(CARD const*, "; args(o); o << ")const { /*nop*/ }\n";
 
     template_header(o);
     o____ "void af(CARD const*, "; args(o); o << ")const { incomplete(); /* BUG */ }\n";
@@ -181,49 +187,22 @@ public: //overrides
   }
   // Data_Type const* return_type()const override { return nullptr; }
   virtual std::string end()const{return "";}
-} write;
-DISPATCHER<FUNCTION>::INSTALL d_write(&function_dispatcher, "$write", &write);
+} fwrite;
+DISPATCHER<FUNCTION>::INSTALL d_fwrite(&function_dispatcher, "$fwrite", &fwrite);
 /*--------------------------------------------------------------------------*/
-class STROBE : public WRITE {
+class FSTROBE : public FWRITE {
 public:
-  explicit STROBE() : WRITE() {
-    set_label("$strobe");
+  explicit FSTROBE() : FWRITE() {
+    set_label("$fstrobe");
   }
-  std::string end()const override{return "\\n";}
-  WRITE* clone()const override {
-    return new STROBE(*this);
+  std::string end()const override { untested(); return "\\n";}
+  FWRITE* clone()const override { untested();
+    return new FSTROBE(*this);
   }
-} strobe;
-DISPATCHER<FUNCTION>::INSTALL d_strobe(&function_dispatcher, "$strobe", &strobe);
+} fstrobe;
+DISPATCHER<FUNCTION>::INSTALL d_fstrobe(&function_dispatcher, "$fstrobe", &fstrobe);
 /*--------------------------------------------------------------------------*/
-class WARNING : public WRITE {
-public:
-  explicit WARNING() : WRITE() {
-    set_label("$warning");
-  }
-  std::string end()const override{return "\\n";}
-  WRITE* clone()const override {
-    incomplete(); // need stderr or error(bWARNING..)
-    return new WARNING(*this);
-  }
-} warning;
-DISPATCHER<FUNCTION>::INSTALL d_warning(&function_dispatcher, "$warning", &warning);
-/*--------------------------------------------------------------------------*/
-class ERROR : public WRITE {
-public:
-  explicit ERROR() : WRITE() {
-    set_label("$error");
-  }
-  std::string end()const override{return "\\n";}
-  WRITE* clone()const override { untested();
-    incomplete(); // need stderr or error(bDANGER..)
-    return new ERROR(*this);
-  }
-} error;
-DISPATCHER<FUNCTION>::INSTALL d_error(&function_dispatcher, "$error", &error);
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-}
+} // namespace
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

@@ -304,7 +304,8 @@ public:
 //  Expression const& expression() const{return _expression;};
   bool is_used_in(Base const*)const;
  // bool update(RDeps const* r) // not virtual
-//
+  bool is_final()const {return is_used_in(&final_tag)
+    || _rdeps.contains(&final_tag); }
 private: // incomplete
   void set_rdeps(); // pull in rdeps from functions
   bool add_rdep(Base const* b) {

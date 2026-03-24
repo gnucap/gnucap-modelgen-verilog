@@ -17,6 +17,7 @@ module test_strobe0()
 		$strobe("time is \\ foo %f", $abstime);
 		$strobe("gmin is %g", $simparam("gmin"));
 		$strobe("iter is %f, def %f", $simparam("iteration")-1, $simparam("foo", 42.));
+		@(initial_step) $strobe("initial_step evt %f", one+1.);
 	end
 
 endmodule

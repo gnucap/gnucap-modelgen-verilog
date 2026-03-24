@@ -9,6 +9,7 @@
 - $write etc. not working in analog functions
 - net assign: only nodes in rhs expression
 - net assign: delay arg is constant
+- final_step, initial_step lacks arg
 
 == modelgen
 - dependency tracking glitch aka rram bug

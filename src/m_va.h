@@ -69,12 +69,49 @@ namespace{
 
 typedef double real;
 typedef int integer;
-typedef vString string;
+struct string : public std::string {
+  string() : std::string(){}
+
+  string(string const& s) : std::string(s){}
+  string(std::string const& s) : std::string(s){}
+  string(char const* s) : std::string(s){}
+  string(vString const&x){ untested();
+    String const& s = x;
+    std::string::operator=(s);
+  }
+  string(PARAMETER<vString> const&x){
+    String const& s = x;
+    std::string::operator=(s);
+  }
+
+  string& operator=(std::string const&x){
+    std::string::operator=(x);
+    return *this;
+  }
+  string& operator=(char const*x){
+    std::string::operator=(x);
+    return *this;
+  }
+  string& operator=(vString const&x){
+    String const& s = x;
+    std::string::operator=(s);
+    return *this;
+  }
+  string& operator=(string const&x){
+    std::string::operator=(x);
+    return *this;
+  }
+};
+/*--------------------------------------------------------------------------*/
+typedef double p_real;
+typedef int p_integer;
+typedef vString p_string;
 /*--------------------------------------------------------------------------*/
 template<class T>
 double plain_value(T const& x) { return x; }
 inline int plain_value(int const& x) { return x; }
-inline char const* plain_value(std::string const& x) { return x.c_str(); }
+inline char const* plain_value(std::string const& x) { untested(); return x.c_str(); }
+inline char const* plain_value(string const& x) { return x.c_str(); }
 /*--------------------------------------------------------------------------*/
 // double inf = std::numeric_limits<double>::infinity();
 #define inf std::numeric_limits<double>::infinity()

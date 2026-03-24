@@ -884,6 +884,27 @@ static void make_common_tr_begin(std::ostream& o, Module const& m)
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_common_final(std::ostream& o, Module const& m)
+{
+  make_tag(o);
+  // Variable_List_Collection const& V = m.variables();
+  o << "void COMMON_" << m.identifier() << "::final_(MOD_"
+    << m.identifier() << "* c) const\n{\n";
+  if(m.has_final_analog()){
+    o__ "final_analog(c);\n";
+  }else{
+    assert(!m.has_final());
+  }
+  if(m.has_final_digital()){
+    incomplete();
+//    o__ "final_digital(c);\n";
+  }else{
+    assert(!m.has_final());
+  }
+  o << "}\n"
+    "/*--------------------------------------------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
 static void make_common_precalc_last(std::ostream& o , const Module& m)
 {
   o << "void COMMON_" << m.identifier() << "::precalc_last(const PARAM_LIST* par_scope)\n{\n";
@@ -975,6 +996,10 @@ void make_cc_common(std::ostream& o , const Module& m)
   make_common_precalc_last(o, m);
   if(m.has_tr_begin()){
     make_common_tr_begin(o, m);
+  }else{
+  }
+  if(m.has_final()){
+    make_common_final(o, m);
   }else{
   }
   o  << "/*--------------------------------------------------------------------------*/\n";

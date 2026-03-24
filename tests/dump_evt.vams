@@ -12,5 +12,8 @@ module device(p,n);
 		@(initial_step) begin
 			r=2;
 		end
+		@(final_step) begin
+			r=1;
+		end
 	end
 endmodule

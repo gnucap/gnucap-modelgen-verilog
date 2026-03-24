@@ -1,5 +1,7 @@
 #           v(gnd)     v(n1)      v(n2)      s(dut1)    r1(dut1)   r2(dut1)  
- 0.         0.         1.5706     1.5706    -1.8441G    1.5706     ??        
+ 1.         0.         1.5706     1.5706     1.0827G    1.2521     ??        
+ 2.         0.         1.2521     1.2521     75.814Meg  1.0177     ??        
+ 3.         0.         1.0177     1.0177     837.83Meg  1.1951     ??        
 #Time       v(gnd)     v(n1)      v(n2)      s(dut1)    r1(dut1)   r2(dut1)  
  0.         0.         1.5706     1.5706    -1.8441G    1.5706     ??        
  0.01       0.         1.2521     1.2521     1.0827G    1.2521     ??        
@@ -14,7 +16,7 @@
  0.901      0.         1.731      1.731     -1.1553G    1.731      ??        
  1.         0.         1.6194     1.6194    -1.6349G    1.6194     ??        
 Gnucap   System status
-iterations: op=0, dc=3, tran=35, fourier=0, total=50
+iterations: op=0, dc=9, tran=36, fourier=0, total=57
 transient timesteps: accepted=12, rejected=0, total=12
 nodes: user=2, subckt=0, model=0, total=2
 dctran density=50.0%, ac density=50.0%

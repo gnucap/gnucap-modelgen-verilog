@@ -358,7 +358,7 @@ private:
       ++_alloc[t];
       assert(_idx[t]>=0);
       _types.push(type(t));
-      o__ cpptype() << " " << code_name() << ";\n"; // code_name?
+      o__ "/*361, "<<t<<"*/" << cpptype() << " " << code_name() << ";\n"; // code_name?
     }
   }
 public:
@@ -425,7 +425,7 @@ public:
     assert(t<t_count);
     static std::string names[] = {
        "LOGICVAL", "double", "ddouble",
-       "std::string", "auto&",
+       "string", "auto&",
        "incomplete_cpptype"
     };
     return names[t];
@@ -476,25 +476,42 @@ private:
 /*--------------------------------------------------------------------------*/
 void OUT_EXPRESSION::new_variable(std::ostream& o, Token const* t)
 {
+  assert(t);
   Data_Type const* d = nullptr;
+  auto td = dynamic_cast<TData const*>(t->data());
+
   if(auto F = dynamic_cast<const Token_CALL*>(t)){
     d = (*F)->return_type(); // BUG.
+  }else if(td){
+    d = &td->type();
   }else{
-    incomplete();
   }
 
   if(_ctx == "logic") {
     // hack
     vars().new_logic(o);
   }else if(!d) {
-    // incomplete();
     o__ "/* void? */\n";
     vars().new_ddouble(o); // TODO
   }else if(d->is_real()){
+    o__ "//real? ddouble?\n";
     vars().new_ddouble(o);
+  }else if(d->is_int()){
+    o__ "//int, incomplete\n";
+    vars().new_float(o);
   }else if(d->is_string()){
     vars().new_string(o);
-  }else{
+  }else if(td){
+    if(td->ddeps().size()){ untested();
+      o__ "//ddeps. ddouble??\n";
+      vars().new_ddouble(o); // TODO
+    }else{ untested();
+      incomplete();
+      o__ "//no ddeps. float??\n";
+      vars().new_float(o); // TODO
+    }
+  }else{ untested();
+    o__ "/* what is it? " << *d << " */\n";
     vars().new_float(o); // TODO
   }
 }
@@ -837,7 +854,7 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
       o__ "{ // ternary " << _ctx << "\n";
       {
 	indent y;
-	o__ vars().cpptype() << "& tt0 = " << vars().code_name() << ";\n"; // BUG: float??
+	o__ "/*tt*/" << vars().cpptype() << "& tt0 = " << vars().code_name() << ";\n"; // BUG: float??
 	o__ "if(" << arg1 << "){ // true part\n";
 	{
 	  indent x;
@@ -896,7 +913,7 @@ std::string make_cc_expression(std::ostream& o, Expression const& e, bool dynami
   if(ctx == "adjust"){
     o__ "(void)" << name << ";\n";
   }else if(deps && deps->size() && (dynamic || ctx == "precalc")){
-    // o__ "// dynamic & deps " << ctx << " " << deps->size() << "\n";
+    o__ "// dynamic & deps " << ctx << " " << deps->size() << "\n";
     s.new_ddouble(o);
     s.pop();
     o__ "t0 = " << s.code_name() << "; // " << ctx << "\n";

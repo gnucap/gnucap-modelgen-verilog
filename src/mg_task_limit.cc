@@ -90,7 +90,7 @@ class LIMIT : public MGVAMS_TASK {
     o____ "}\n";
     o____ "void set(ddouble in){_old=in;}\n";
 
-    o____ "ddouble operator()(COMPONENT* d, ddouble in, std::string const& what";
+    o____ "ddouble operator()(COMPONENT* d, ddouble in, string const& what";
     for(size_t i=0; i<num_args()-2; ++i) {
       o << ", double const&";
       if(num_args()==4){
@@ -145,7 +145,7 @@ class LIMIT : public MGVAMS_TASK {
      // o________ "}\n";
     o______ "return in;\n";
     o____ "}\n";
-    o____ "ddouble " << label() << "precalc(ddouble, std::string const&";
+    o____ "ddouble " << label() << "precalc(ddouble, string const&";
     for(size_t i=0; i<num_args()-2; ++i) {
       o << ", double const&";
     }

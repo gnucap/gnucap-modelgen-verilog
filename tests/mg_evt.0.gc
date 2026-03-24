@@ -12,8 +12,12 @@ module test_evt0_0(p, n);
 	real w;
 	analog @(initial_step) w = 1;
 	analog begin
-		@(initial_step) w = w + v;
+		@(initial_step) begin
+			$strobe("init");
+			w = w + v;
+		end
 		V(p,n) <+ w;
+		@(final_step) $strobe("done");
 	end
 endmodule
 
@@ -27,6 +31,9 @@ test_evt0_0 #(.v(1)) dut(\1 ,\0 );
 list
 
 print dc v(nodes) iter(0)
-dc
+print tran v(nodes) iter(0)
+parameter x = 0;
+dc x 1 5 1 trace=n
+tran 1
 status notime
 end

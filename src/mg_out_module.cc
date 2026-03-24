@@ -465,7 +465,7 @@ static void make_tr_begin(std::ostream& o, const Module& m)
     o__ "assert(mc);\n";
   }else{ untested();
   }
-  o__ "_v_1 = _v_;\n";
+  o__ "_v_1 = _v_;\n"; // "store values"
   if(m.has_analog_block() && m.has_tr_begin_analog()) {
     o__ "mc->tr_initial_analog(this);\n"; // call from COMMON::tr_begin?
     o__ "c->tr_begin_analog(this);\n"; // call from COMMON::tr_begin?
@@ -515,6 +515,30 @@ static void make_tr_restore(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_dc_advance(std::ostream& o, const Module& m)
+{
+  o << "inline void MOD_" << m.identifier() << "::dc_advance()\n{\n";
+  o__ "COMMON_" << m.identifier() << " const* c = "
+    "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
+  if (m.has_analog_block()) {
+    o__ "set_not_converged();\n";
+  }else{
+  }
+  o__ "BASE_SUBCKT::dc_advance();\n";
+  o__ "assert(c);\n";
+  o__ "(void)c;\n";
+  // if (m.has_states()) {
+  o__ "if(_sim->analysis_is_dcop()){\n";
+  o____ "_v_1 = _v_;\n"; // "store values"
+  o__ "}else{\n";
+  // ?
+  o__ "}\n";
+  // }
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
 static void make_tr_advance(std::ostream& o, const Module& m)
 {
   o << "inline void MOD_" << m.identifier() << "::tr_advance()\n{\n";
@@ -555,7 +579,7 @@ static void make_tr_advance(std::ostream& o, const Module& m)
   }
   o__ "set_not_converged();\n";
 
-  o__ "_v_1 = _v_;\n";
+  o__ "_v_1 = _v_;\n"; // "store values"
   if(m.has_analog_block()){
     o__ "c->tr_advance_analog(this);\n";
   }else{
@@ -682,6 +706,21 @@ static void make_tr_accept(std::ostream& o, const Module& m)
   }
   o__ "return " << baseclass(m) << "::tr_accept();\n";
   o << "} // tr_accept\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_final(std::ostream& o, const Module& m)
+{
+  o << "inline void MOD_" << m.identifier() << "::final_()\n{\n";
+  if(m.has_tr_begin()){
+    o__ "auto c = prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
+    o__ "assert(c);\n";
+//    o__ "_final = true;\n";
+    o__ "c->final_(this);\n";
+  }else{ untested();
+  }
+  o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
@@ -824,6 +863,10 @@ static void make_module_class(std::ostream& o, Module const& m)
     make_tr_restore(o, m);
   }else{
   }
+  if(m.has_final()) {
+    make_final(o, m);
+  }else{
+  }
 
   if(m.has_analysis()){
     make_tr_review(o, m);
@@ -835,6 +878,9 @@ static void make_module_class(std::ostream& o, Module const& m)
     make_tr_accept(o, m);
   }else{
   }
+  // if(m.has_dc_advance()){
+  make_dc_advance(o, m);
+  // }
   if(m.has_tr_advance()){
     make_tr_advance(o, m);
     make_tr_regress(o, m);

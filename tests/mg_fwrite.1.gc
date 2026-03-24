@@ -1,0 +1,37 @@
+attach ./modelgen_1.so
+attach vams/resistor.so
+
+verilog
+
+`modelgen
+module test_fw1(p, n);
+	electrical p, n, i;
+	inout p, n;
+	parameter real r=1;
+	parameter real mm=1;
+	integer f;
+	analog initial begin
+		$fflush(2);
+		$fwrite(2, "hello stdout\n");
+		$fflush(2);
+		f = $fopen("fw1");
+		$fwrite(f, "hello\n");
+	end
+	analog begin : main
+		integer f_and_stdout = f | 2;
+		$fwrite(f_and_stdout, "main test\n");
+		@(final_step) $fclose(f);
+	end
+endmodule
+
+list
+
+!make test_fw1.so > /dev/null
+attach ./test_fw1.so
+
+test_fw1 #() dut(\8 , \0 );
+
+op
+
+status notime
+end

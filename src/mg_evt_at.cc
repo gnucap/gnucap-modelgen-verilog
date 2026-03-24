@@ -46,6 +46,7 @@ private:
   std::string eval(CS&, const PARAM_LIST*)const override{ untested();
     return "@";
   }
+//  bool is_final()const override { untested(); return false; }
   void stack_op(Expression*)const override {
     throw Exception("invalid");
   }

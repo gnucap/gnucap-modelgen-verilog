@@ -1,0 +1,16 @@
+== basic printing
+
+Gnucap has built-in print commands, but Verilog offers some more flexibility,
+and a more standard way to tailor data files.
+
+$ gnucap-mg-vams --cc printer0.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o printer0.so
+$ gnucap printer0.gc
+[..]
+
+== read in
+
+WIP
+
+== vcd
+
+WIP

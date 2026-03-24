@@ -1,0 +1,24 @@
+attach ./modelgen_1.so
+attach vams/resistor.so
+
+verilog
+
+`modelgen
+module test_string0();
+	parameter string s = "hello ";
+
+	analog initial begin : main
+		$write(s);
+		$strobe(s);
+	end
+endmodule
+
+list
+
+!make test_string0.so > /dev/null
+attach ./test_string0.so
+
+test_string0 #() dut();
+test_string0 #(.s("world ") dut();
+
+dc

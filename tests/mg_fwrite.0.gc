@@ -1,0 +1,33 @@
+attach ./modelgen_1.so
+attach vams/resistor.so
+
+verilog
+
+`modelgen test_fw0
+module test_fw0(p, n);
+	electrical p, n, i;
+	inout p, n;
+	parameter real r=1;
+	parameter real mm=1;
+	integer f;
+	analog initial begin
+		f = $fopen("fw0", "w+");
+		$fwrite(f, "hello\n");
+	end
+	analog begin
+		$fwrite(f, "test\n");
+		@(final_step) $fclose(f);
+	end
+endmodule
+
+list
+
+!make test_fw0.so > /dev/null
+attach ./test_fw0.so
+
+test_fw0 #() dut(\8 , \0 );
+
+op
+
+status notime
+end

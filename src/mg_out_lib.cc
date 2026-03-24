@@ -42,7 +42,7 @@ static void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2&
     o << "NA;";
   }
 //  o << ";\n";
-  o____ p.type() << " def = ";
+  o____ "p_" << p.type() << " def = ";
   if( p.type().is_string()){
     o << "vString(s0);\n";
   }else{
