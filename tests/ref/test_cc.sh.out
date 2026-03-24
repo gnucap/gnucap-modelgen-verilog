@@ -1355,7 +1355,7 @@ private: // overrides
   //TIME_PAIR  tr_review()override;         //BASE_SUBCKT
   //void    tr_accept()override;         //BASE_SUBCKT
   //void    tr_unload();         //BASE_SUBCKT
-  void      dc_advance()override {set_not_converged(); BASE_SUBCKT::dc_advance();}
+  void      dc_advance()override;
   bool      tr_needs_eval()const override;
   void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }
   bool      do_tr() override;
@@ -2395,6 +2395,19 @@ inline void MOD_resistor::tr_begin()
   _v_1 = _v_;
 }
 /*--------------------------------------------------------------------------*/
+inline void MOD_resistor::dc_advance()
+{
+  COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
+  set_not_converged();
+  BASE_SUBCKT::dc_advance();
+  assert(c);
+  (void)c;
+  if(_sim->analysis_is_dcop()){
+    _v_1 = _v_;
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
 inline void MOD_resistor::tr_advance()
 {
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
@@ -2806,7 +2819,7 @@ private: // overrides
   //TIME_PAIR  tr_review()override;         //BASE_SUBCKT
   //void    tr_accept()override;         //BASE_SUBCKT
   //void    tr_unload();         //BASE_SUBCKT
-  void      dc_advance()override {set_not_converged(); BASE_SUBCKT::dc_advance();}
+  void      dc_advance()override;
   bool      tr_needs_eval()const override;
   void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }
   bool      do_tr() override;
@@ -4298,6 +4311,19 @@ inline void MOD_resistor::tr_begin()
   auto mc = prechecked_cast<COMMON_resistor*>(mutable_common());
   assert(mc);
   _v_1 = _v_;
+}
+/*--------------------------------------------------------------------------*/
+inline void MOD_resistor::dc_advance()
+{
+  COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
+  set_not_converged();
+  BASE_SUBCKT::dc_advance();
+  assert(c);
+  (void)c;
+  if(_sim->analysis_is_dcop()){
+    _v_1 = _v_;
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 inline void MOD_resistor::tr_advance()
@@ -5977,7 +6003,7 @@ private: // overrides
   void tr_advance()override;
   void tr_regress()override;
   //void    tr_unload();         //BASE_SUBCKT
-  void      dc_advance()override {set_not_converged(); BASE_SUBCKT::dc_advance();}
+  void      dc_advance()override;
   bool      tr_needs_eval()const override;
   void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }
   bool      do_tr() override;
@@ -6678,6 +6704,19 @@ inline void MOD_capacitor::tr_accept()
   return BASE_SUBCKT::tr_accept();
 } // tr_accept
 /*--------------------------------------------------------------------------*/
+inline void MOD_capacitor::dc_advance()
+{
+  COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
+  set_not_converged();
+  BASE_SUBCKT::dc_advance();
+  assert(c);
+  (void)c;
+  if(_sim->analysis_is_dcop()){
+    _v_1 = _v_;
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::tr_advance()
 {
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
@@ -7130,7 +7169,7 @@ private: // overrides
   void tr_advance()override;
   void tr_regress()override;
   //void    tr_unload();         //BASE_SUBCKT
-  void      dc_advance()override {set_not_converged(); BASE_SUBCKT::dc_advance();}
+  void      dc_advance()override;
   bool      tr_needs_eval()const override;
   void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }
   bool      do_tr() override;
@@ -7923,6 +7962,19 @@ inline void MOD_capacitor::tr_accept()
   c->tr_accept_analog(this);
   return BASE_SUBCKT::tr_accept();
 } // tr_accept
+/*--------------------------------------------------------------------------*/
+inline void MOD_capacitor::dc_advance()
+{
+  COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
+  set_not_converged();
+  BASE_SUBCKT::dc_advance();
+  assert(c);
+  (void)c;
+  if(_sim->analysis_is_dcop()){
+    _v_1 = _v_;
+  }else{
+  }
+}
 /*--------------------------------------------------------------------------*/
 inline void MOD_capacitor::tr_advance()
 {

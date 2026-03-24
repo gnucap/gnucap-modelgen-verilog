@@ -15,6 +15,31 @@ module test_idt3a(p, n);
   end
 
 endmodule
+module test_evt0_0(p, n);
+  inout p, n;
+  electrical p, n;
+  parameter real v = 0;
+
+  real w// *
+;
+
+  analog begin // always
+    @(initial_step) begin // e
+      // w : 0
+      w = 1; // s2 r4{abx}
+    end
+  end
+
+  analog begin // always
+    @(initial_step) begin // e
+      // w : 0
+      $strobe("init"); // r5{abevx}
+      w = (w + v); // s5 r4{abx}
+    end
+    V(p, n) <+ w; // s5 r2{x}
+  end
+
+endmodule
 
 
 

@@ -1,8 +1,18 @@
 test_evt0_0 #(.v(1)) dut (.p(\1 ),.n(\0 ));
 #           v(1)       iter(0)   
- 0.         2.         3.        
+init
+ 1.         2.         3.        
+ 2.         2.         2.        
+ 3.         2.         2.        
+ 4.         2.         2.        
+ 5.         2.         2.        
+#Time       v(1)       iter(0)   
+init
+ 0.         2.         2.        
+ 0.01       2.         3.        
+ 1.         2.         3.        
 Gnucap   System status
-iterations: op=0, dc=3, tran=0, fourier=0, total=3
-transient timesteps: accepted=0, rejected=0, total=0
+iterations: op=0, dc=11, tran=8, fourier=0, total=22
+transient timesteps: accepted=3, rejected=0, total=3
 nodes: user=1, subckt=0, model=0, total=1
 dctran density=100.0%, ac density=100.0%

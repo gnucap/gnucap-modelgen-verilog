@@ -741,15 +741,14 @@ static void make_module(std::ostream& o, const Module& m)
     o__ "//void    tr_accept()override;         //BASE_SUBCKT\n";
   }
   o__ "//void    tr_unload();         //BASE_SUBCKT\n";
+  o__ "void      dc_advance()override;\n";
   if (!m.has_analog_block()) {
-    o__ "//void    dc_advance();        //BASE_SUBCKT\n";
     o__ "//void    tr_advance();        //BASE_SUBCKT\n";
     o__ "//void    tr_regress();        //BASE_SUBCKT\n";
     o__ "//bool    tr_needs_eval()const;//BASE_SUBCKT\n";
     o__ "//void    tr_queue_eval();     //BASE_SUBCKT\n";
     o__ "//bool    do_tr();             //BASE_SUBCKT\n";
   }else{
-    o__ "void      dc_advance()override {set_not_converged(); BASE_SUBCKT::dc_advance();}\n";
     o__ "bool      tr_needs_eval()const override;\n";
     o__ "void      tr_queue_eval()override {if(tr_needs_eval()){q_eval();}else{} }\n";
    //  o__ "void q_eval() { COMPONENT::q_eval(); }\n";
