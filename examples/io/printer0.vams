@@ -1,0 +1,46 @@
+
+nature current
+  access = I;
+  units = "A";
+  abstol = 1e-12; // OPT::abstol
+endnature
+
+// Electrical potential
+nature voltage
+  access = V;
+  units = "V";
+  abstol = 1e-6; // OPT::vntol
+endnature
+
+// Electrical discipline
+discipline electrical
+  potential voltage;
+  flow current;
+enddiscipline
+
+module printer0(in3, in2, in1, in0);
+	electrical in3, in2, in1, in0;
+	input in3, in2, in1, in0;
+	parameter string filename = "data.out";
+	parameter integer time_col = 1;
+	integer fn;
+
+	analog initial begin : main
+		fn = $fopen(filename, "w");
+		if(time_col) $fwrite(fn, "#Time");
+		if($port_connected(in3)) $fwrite(fn, " in3");
+		if($port_connected(in2)) $fwrite(fn, " in2");
+		if($port_connected(in1)) $fwrite(fn, " in1");
+		if($port_connected(in0)) $fwrite(fn, " in0");
+		$fwrite(fn, "\n");
+	end
+	analog begin
+		if(time_col) $fwrite(fn, "%g", $abstime());
+		if($port_connected(in3)) $fwrite(fn, " %g", V(in3));
+		if($port_connected(in2)) $fwrite(fn, " %g", V(in2));
+		if($port_connected(in1)) $fwrite(fn, " %g", V(in1));
+		if($port_connected(in0)) $fwrite(fn, " %g", V(in0));
+		$fwrite(fn, "\n");
+	end
+
+endmodule

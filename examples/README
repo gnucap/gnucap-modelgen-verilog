@@ -2,6 +2,7 @@
 
 See README files in subdirectories.
 
+io     - file io, get the data out
 rc     - build and simulate rc lowpass variants
 cpl    - coupled transmission lines
 rnd    - statistical modelling

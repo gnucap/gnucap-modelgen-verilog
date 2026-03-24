@@ -1,0 +1,18 @@
+load mgsim
+load vams/vsine.so
+load ./printer0.so
+
+options trtol=1
+
+verilog
+ground gnd;
+
+printer0 #(.filename("printer0.out") b(out, in);
+vsine #(.ampl(1), .freq(1/2/3.1415)) v1(in, gnd);
+
+resistor #(.r(1)) r1(in, out);
+capacitor #(.c(1)) c1(gnd, out);
+
+tran 20 basic
+
+status notime
