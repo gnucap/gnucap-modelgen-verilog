@@ -97,6 +97,10 @@ struct string : public std::string {
     std::string::operator=(s);
     return *this;
   }
+  string& operator=(string const&x){
+    std::string::operator=(x);
+    return *this;
+  }
 };
 /*--------------------------------------------------------------------------*/
 typedef double p_real;
@@ -1676,14 +1680,14 @@ int COMMON_resistor::is_valid_() const
   double lb, ub;
   {
   // ref. type?
-  double f0;
+  /*361, 1*/double f0;
   f0 =  0.; // precalc
   (void) f0;
   lb = f0;
   }
   {
   // ref. type?
-  double f0;
+  /*361, 1*/double f0;
   f0 =  Inf; // precalc
   (void) f0;
   ub = f0;
@@ -1905,6 +1909,10 @@ void EVAL__b_white_noise_1_p__::tr_eval(ELEMENT* d)const
         ddouble::operator=(t);
         return *this;
       }
+      ddouble& operator=(PARAMETER<double> const& t){
+        ddouble::operator=(t);
+        return *this;
+      }
       ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
@@ -1967,6 +1975,10 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         ddouble::operator=(t);
         return *this;
       }
+      ddouble& operator=(PARAMETER<double> const& t){
+        ddouble::operator=(t);
+        return *this;
+      }
       ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
@@ -1992,8 +2004,9 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        /* void? */
+        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
+        // dynamic & deps tr_eval 1
         ddouble t1;
         //t1.set_no_deps();
         //t1[d_potential_b_p_n] = 0.; // (output dep)
@@ -2003,6 +2016,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         assert(_v___i[d_potential_b_p_n] == t0[d_potential_b_p_n]); // (2b2)
       }
       { // Contribution I(p, n) lin: 1
+        // dynamic & deps tr_eval 1
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
@@ -2014,16 +2028,18 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        //real? ddouble?
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_white_noise_1_p_] = 0.; // (output dep)
         { // scope
           // F white_noise args:1
-          string s0;
+          /*361, 3*/string s0;
           s0 = "thermal";
           // --- 
           t0 = /*tr_eval*/ d->_b_white_noise_1( 0., s0); // (659)
         } // scope
+        // dynamic & deps tr_eval 1
         ddouble t1;
         //t1.set_no_deps();
         //t1[d_potential_b_white_noise_1_p_] = 0.; // (output dep)
@@ -2112,6 +2128,10 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
       ddouble::operator=(t);
       return *this;
     }
+    ddouble& operator=(PARAMETER<double> const& t){
+      ddouble::operator=(t);
+      return *this;
+    }
     ddouble& operator=(ddouble const& t){
       ddouble::operator=(t);
       return *this;
@@ -2155,6 +2175,10 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         ddouble::operator=(t);
         return *this;
       }
+      ddouble& operator=(PARAMETER<double> const& t){
+        ddouble::operator=(t);
+        return *this;
+      }
       ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
@@ -2181,8 +2205,9 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        /* void? */
+        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
+        // dynamic & deps tr_eval 1
         ddouble t1;
         //t1.set_no_deps();
         //t1[d_potential_b_p_n] = 0.; // (output dep)
@@ -2192,6 +2217,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         assert(_v___i[d_potential_b_p_n] == t0[d_potential_b_p_n]); // (2b2)
       }
       { // Contribution I(p, n) lin: 1
+        // dynamic & deps tr_eval 1
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
@@ -2203,16 +2229,18 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        //real? ddouble?
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_white_noise_1_p_] = 0.; // (output dep)
         { // scope
           // F white_noise args:1
-          string s0;
+          /*361, 3*/string s0;
           s0 = "thermal";
           // --- 
           t0 = /*tr_eval*/ d->_b_white_noise_1( 0., s0); // (659)
         } // scope
+        // dynamic & deps tr_eval 1
         ddouble t1;
         //t1.set_no_deps();
         //t1[d_potential_b_white_noise_1_p_] = 0.; // (output dep)
@@ -2248,11 +2276,10 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
       {
         { // anonymous block
           { // Assignment real 'g'.
-            /* void? */
-            ddouble t0;
-            //t0.set_no_deps();
-            t0 =  1. / (_p___r) /*rhspar*/; // (703)
-            _v_g = t0; // (prec)
+            //no ddeps. float??
+            /*361, 1*/double f0;
+            f0 =  1. / (_p___r) /*rhspar*/; // (703)
+            _v_g = f0; // (prec)
           }
         }
       }
@@ -2262,8 +2289,9 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = 0.; // precalc.
-        /* void? */
+        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
+        // dynamic & deps precalc 1
         ddouble t1;
         //t1.set_no_deps();
         //t1[d_potential_b_p_n] = 0.; // (output dep)
@@ -2271,6 +2299,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         _v___i = t0; // (prec)
       }
       { // Contribution I(p, n) lin: 1
+        // dynamic & deps precalc 1
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
@@ -2278,16 +2307,18 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        //real? ddouble?
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_white_noise_1_p_] = 0.; // (output dep)
         { // scope
           // F white_noise args:1
-          string s0;
+          /*361, 3*/string s0;
           s0 = "thermal";
           // --- 
           t0 = /*precalc*/ d->_b_white_noise_1__precalc( 0., s0); // (659)
         } // scope
+        // dynamic & deps precalc 1
         ddouble t1;
         //t1.set_no_deps();
         //t1[d_potential_b_white_noise_1_p_] = 0.; // (output dep)
@@ -2335,8 +2366,9 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        /* void? */
+        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
+        // dynamic & deps tr_advance 1
         ddouble t1;
         //t1.set_no_deps();
         //t1[d_potential_b_p_n] = 0.; // (output dep)
@@ -2386,8 +2418,9 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        /* void? */
+        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
+        // dynamic & deps tr_regress 1
         ddouble t1;
         //t1.set_no_deps();
         //t1[d_potential_b_p_n] = 0.; // (output dep)
@@ -3144,14 +3177,14 @@ int COMMON_resistor::is_valid_() const
   double lb, ub;
   {
   // ref. type?
-  double f0;
+  /*361, 1*/double f0;
   f0 =  0.; // precalc
   (void) f0;
   lb = f0;
   }
   {
   // ref. type?
-  double f0;
+  /*361, 1*/double f0;
   f0 =  Inf; // precalc
   (void) f0;
   ub = f0;
@@ -3165,14 +3198,14 @@ int COMMON_resistor::is_valid_() const
   double lb, ub;
   {
   // ref. type?
-  double f0;
+  /*361, 1*/double f0;
   f0 = 0; // precalc
   (void) f0;
   lb = f0;
   }
   {
   // ref. type?
-  double f0;
+  /*361, 1*/double f0;
   f0 = 1; // precalc
   (void) f0;
   ub = f0;
@@ -3373,6 +3406,10 @@ void EVAL__b_white_noise_0_p__::tr_eval(ELEMENT* d)const
         ddouble::operator=(t);
         return *this;
       }
+      ddouble& operator=(PARAMETER<double> const& t){
+        ddouble::operator=(t);
+        return *this;
+      }
       ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
@@ -3385,7 +3422,8 @@ void EVAL__b_white_noise_0_p__::tr_eval(ELEMENT* d)const
     double /*?*/ _v_g; // local_var
 #pragma GCC diagnostic pop
       {
-        double f0;
+        //int, incomplete
+        /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
@@ -3394,6 +3432,7 @@ void EVAL__b_white_noise_0_p__::tr_eval(ELEMENT* d)const
         if (f0) {
           { // anonymous block
             { // Assignment real 'dt'.
+              //real? ddouble?
               ddouble t0;
               //t0.set_no_deps();
               { // scope
@@ -3401,58 +3440,57 @@ void EVAL__b_white_noise_0_p__::tr_eval(ELEMENT* d)const
                 // --- 
                 t0 = f_temp(); // (659)
               } // scope
-              /* void? */
-              t0 = t0 - (_p_tnom) /*rhspar*/; // (703)
-              _v_dt = t0; // (*2)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 = t0 - (_p_tnom) /*rhspar*/; // (703)
+              _v_dt = f0; // (*2)
             }
           }
         }
       }
       {
-        double f0;
+        //int, incomplete
+        /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        double f1;
+        //int, incomplete
+        /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
           // --- 
           f1 = param_given((_p_tc2) /*rhspar*/); // (659)
         } // scope
-        /* void? */
-        ddouble t0;
-        //t0.set_no_deps();
-        t0 = f0 || f1; // (703)
-        if (t0) {
+        //no ddeps. float??
+        f0 = f0 || f1; // (703)
+        if (f0) {
           { // anonymous block
             { // Assignment real 'g'.
-              /* void? */
-              ddouble t0;
-              //t0.set_no_deps();
-              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
-              /* void? */
-              t0 = (_p_tc1) /*rhspar*/ + t0; // (703)
-              /* void? */
-              t0 = t0 * _v_dt/*rhsvar*/; // (703)
-              /* void? */
-              t0 = t0 +  1.; // (703)
-              /* void? */
-              t0 = (_p_r) /*rhspar*/ * t0; // (703)
-              /* void? */
-              t0 =  1. / t0; // (703)
-              _v_g = t0; // (*2)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
+              //no ddeps. float??
+              f0 = (_p_tc1) /*rhspar*/ + f0; // (703)
+              //no ddeps. float??
+              f0 = f0 * _v_dt/*rhsvar*/; // (703)
+              //no ddeps. float??
+              f0 = f0 +  1.; // (703)
+              //no ddeps. float??
+              f0 = (_p_r) /*rhspar*/ * f0; // (703)
+              //no ddeps. float??
+              f0 =  1. / f0; // (703)
+              _v_g = f0; // (*2)
             }
           }
         }else {
           { // anonymous block
             { // Assignment real 'g'.
-              /* void? */
-              ddouble t0;
-              //t0.set_no_deps();
-              t0 =  1. / (_p_r) /*rhspar*/; // (703)
-              _v_g = t0; // (*2)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 =  1. / (_p_r) /*rhspar*/; // (703)
+              _v_g = f0; // (*2)
             }
           }
         }
@@ -3507,6 +3545,10 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         ddouble::operator=(t);
         return *this;
       }
+      ddouble& operator=(PARAMETER<double> const& t){
+        ddouble::operator=(t);
+        return *this;
+      }
       ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
@@ -3519,7 +3561,8 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
     double /*?*/ _v_g; // local_var
 #pragma GCC diagnostic pop
       {
-        double f0;
+        //int, incomplete
+        /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
@@ -3528,6 +3571,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         if (f0) {
           { // anonymous block
             { // Assignment real 'dt'.
+              //real? ddouble?
               ddouble t0;
               //t0.set_no_deps();
               { // scope
@@ -3535,58 +3579,57 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
                 // --- 
                 t0 = f_temp(); // (659)
               } // scope
-              /* void? */
-              t0 = t0 - (_p_tnom) /*rhspar*/; // (703)
-              _v_dt = t0; // (*2)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 = t0 - (_p_tnom) /*rhspar*/; // (703)
+              _v_dt = f0; // (*2)
             }
           }
         }
       }
       {
-        double f0;
+        //int, incomplete
+        /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        double f1;
+        //int, incomplete
+        /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
           // --- 
           f1 = param_given((_p_tc2) /*rhspar*/); // (659)
         } // scope
-        /* void? */
-        ddouble t0;
-        //t0.set_no_deps();
-        t0 = f0 || f1; // (703)
-        if (t0) {
+        //no ddeps. float??
+        f0 = f0 || f1; // (703)
+        if (f0) {
           { // anonymous block
             { // Assignment real 'g'.
-              /* void? */
-              ddouble t0;
-              //t0.set_no_deps();
-              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
-              /* void? */
-              t0 = (_p_tc1) /*rhspar*/ + t0; // (703)
-              /* void? */
-              t0 = t0 * _v_dt/*rhsvar*/; // (703)
-              /* void? */
-              t0 = t0 +  1.; // (703)
-              /* void? */
-              t0 = (_p_r) /*rhspar*/ * t0; // (703)
-              /* void? */
-              t0 =  1. / t0; // (703)
-              _v_g = t0; // (*2)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
+              //no ddeps. float??
+              f0 = (_p_tc1) /*rhspar*/ + f0; // (703)
+              //no ddeps. float??
+              f0 = f0 * _v_dt/*rhsvar*/; // (703)
+              //no ddeps. float??
+              f0 = f0 +  1.; // (703)
+              //no ddeps. float??
+              f0 = (_p_r) /*rhspar*/ * f0; // (703)
+              //no ddeps. float??
+              f0 =  1. / f0; // (703)
+              _v_g = f0; // (*2)
             }
           }
         }else {
           { // anonymous block
             { // Assignment real 'g'.
-              /* void? */
-              ddouble t0;
-              //t0.set_no_deps();
-              t0 =  1. / (_p_r) /*rhspar*/; // (703)
-              _v_g = t0; // (*2)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 =  1. / (_p_r) /*rhspar*/; // (703)
+              _v_g = f0; // (*2)
             }
           }
         }
@@ -3598,8 +3641,9 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        /* void? */
+        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
+        // dynamic & deps tr_eval 1
         ddouble t1;
         //t1.set_no_deps();
         //t1[d_potential_b_p_n] = 0.; // (output dep)
@@ -3609,6 +3653,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         assert(_v_i[d_potential_b_p_n] == t0[d_potential_b_p_n]); // (2b2)
       }
       { // Contribution I(p, n) lin: 1
+        // dynamic & deps tr_eval 1
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
@@ -3620,33 +3665,34 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        //real? ddouble?
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_white_noise_0_p_] = 0.; // (output dep)
         { // scope
           // F white_noise args:1
-          /* void? */
+          //no ddeps. float??
+          /*361, 1*/double f0;
+          f0 = (_p_noisy) /*rhspar*/ *  55.2260200000000001E-24; // (703)
+          //no ddeps. float??
+          f0 = f0 * _v_g/*rhsvar*/; // (703)
+          //real? ddouble?
           ddouble t1;
           //t1.set_no_deps();
           //t1[d_potential_b_white_noise_0_p_] = 0.; // (output dep)
-          t1 = (_p_noisy) /*rhspar*/ *  55.2260200000000001E-24; // (703)
-          /* void? */
-          t1 = t1 * _v_g/*rhsvar*/; // (703)
-          ddouble t2;
-          //t2.set_no_deps();
-          //t2[d_potential_b_white_noise_0_p_] = 0.; // (output dep)
           { // scope
             // function $temperature args:1
             // --- 
-            t2 = f_temp(); // (659)
+            t1 = f_temp(); // (659)
           } // scope
-          /* void? */
-          t1 = t1 * t2; // (703)
-          string s0;
+          //no ddeps. float??
+          f0 = f0 * t1; // (703)
+          /*361, 3*/string s0;
           s0 = "thermal";
           // --- 
-          t0 = /*tr_eval*/ d->_b_white_noise_0(t1, s0); // (659)
+          t0 = /*tr_eval*/ d->_b_white_noise_0(f0, s0); // (659)
         } // scope
+        // dynamic & deps tr_eval 1
         ddouble t1;
         //t1.set_no_deps();
         //t1[d_potential_b_white_noise_0_p_] = 0.; // (output dep)
@@ -3735,6 +3781,10 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
       ddouble::operator=(t);
       return *this;
     }
+    ddouble& operator=(PARAMETER<double> const& t){
+      ddouble::operator=(t);
+      return *this;
+    }
     ddouble& operator=(ddouble const& t){
       ddouble::operator=(t);
       return *this;
@@ -3778,6 +3828,10 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         ddouble::operator=(t);
         return *this;
       }
+      ddouble& operator=(PARAMETER<double> const& t){
+        ddouble::operator=(t);
+        return *this;
+      }
       ddouble& operator=(ddouble const& t){
         ddouble::operator=(t);
         return *this;
@@ -3790,7 +3844,8 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
     double /*?*/ _v_g; // local_var
 #pragma GCC diagnostic pop
       {
-        double f0;
+        //int, incomplete
+        /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
@@ -3799,6 +3854,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         if (f0) {
           { // anonymous block
             { // Assignment real 'dt'.
+              //real? ddouble?
               ddouble t0;
               //t0.set_no_deps();
               { // scope
@@ -3806,58 +3862,57 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
                 // --- 
                 t0 = f_temp(); // (659)
               } // scope
-              /* void? */
-              t0 = t0 - (_p_tnom) /*rhspar*/; // (703)
-              _v_dt = t0; // (*2)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 = t0 - (_p_tnom) /*rhspar*/; // (703)
+              _v_dt = f0; // (*2)
             }
           }
         }
       }
       {
-        double f0;
+        //int, incomplete
+        /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        double f1;
+        //int, incomplete
+        /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
           // --- 
           f1 = param_given((_p_tc2) /*rhspar*/); // (659)
         } // scope
-        /* void? */
-        ddouble t0;
-        //t0.set_no_deps();
-        t0 = f0 || f1; // (703)
-        if (t0) {
+        //no ddeps. float??
+        f0 = f0 || f1; // (703)
+        if (f0) {
           { // anonymous block
             { // Assignment real 'g'.
-              /* void? */
-              ddouble t0;
-              //t0.set_no_deps();
-              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
-              /* void? */
-              t0 = (_p_tc1) /*rhspar*/ + t0; // (703)
-              /* void? */
-              t0 = t0 * _v_dt/*rhsvar*/; // (703)
-              /* void? */
-              t0 = t0 +  1.; // (703)
-              /* void? */
-              t0 = (_p_r) /*rhspar*/ * t0; // (703)
-              /* void? */
-              t0 =  1. / t0; // (703)
-              _v_g = t0; // (*2)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
+              //no ddeps. float??
+              f0 = (_p_tc1) /*rhspar*/ + f0; // (703)
+              //no ddeps. float??
+              f0 = f0 * _v_dt/*rhsvar*/; // (703)
+              //no ddeps. float??
+              f0 = f0 +  1.; // (703)
+              //no ddeps. float??
+              f0 = (_p_r) /*rhspar*/ * f0; // (703)
+              //no ddeps. float??
+              f0 =  1. / f0; // (703)
+              _v_g = f0; // (*2)
             }
           }
         }else {
           { // anonymous block
             { // Assignment real 'g'.
-              /* void? */
-              ddouble t0;
-              //t0.set_no_deps();
-              t0 =  1. / (_p_r) /*rhspar*/; // (703)
-              _v_g = t0; // (*2)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 =  1. / (_p_r) /*rhspar*/; // (703)
+              _v_g = f0; // (*2)
             }
           }
         }
@@ -3869,8 +3924,9 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        /* void? */
+        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
+        // dynamic & deps tr_eval 1
         ddouble t1;
         //t1.set_no_deps();
         //t1[d_potential_b_p_n] = 0.; // (output dep)
@@ -3880,6 +3936,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         assert(_v_i[d_potential_b_p_n] == t0[d_potential_b_p_n]); // (2b2)
       }
       { // Contribution I(p, n) lin: 1
+        // dynamic & deps tr_eval 1
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
@@ -3891,33 +3948,34 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        //real? ddouble?
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_white_noise_0_p_] = 0.; // (output dep)
         { // scope
           // F white_noise args:1
-          /* void? */
+          //no ddeps. float??
+          /*361, 1*/double f0;
+          f0 = (_p_noisy) /*rhspar*/ *  55.2260200000000001E-24; // (703)
+          //no ddeps. float??
+          f0 = f0 * _v_g/*rhsvar*/; // (703)
+          //real? ddouble?
           ddouble t1;
           //t1.set_no_deps();
           //t1[d_potential_b_white_noise_0_p_] = 0.; // (output dep)
-          t1 = (_p_noisy) /*rhspar*/ *  55.2260200000000001E-24; // (703)
-          /* void? */
-          t1 = t1 * _v_g/*rhsvar*/; // (703)
-          ddouble t2;
-          //t2.set_no_deps();
-          //t2[d_potential_b_white_noise_0_p_] = 0.; // (output dep)
           { // scope
             // function $temperature args:1
             // --- 
-            t2 = f_temp(); // (659)
+            t1 = f_temp(); // (659)
           } // scope
-          /* void? */
-          t1 = t1 * t2; // (703)
-          string s0;
+          //no ddeps. float??
+          f0 = f0 * t1; // (703)
+          /*361, 3*/string s0;
           s0 = "thermal";
           // --- 
-          t0 = /*tr_eval*/ d->_b_white_noise_0(t1, s0); // (659)
+          t0 = /*tr_eval*/ d->_b_white_noise_0(f0, s0); // (659)
         } // scope
+        // dynamic & deps tr_eval 1
         ddouble t1;
         //t1.set_no_deps();
         //t1[d_potential_b_white_noise_0_p_] = 0.; // (output dep)
@@ -3949,7 +4007,8 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
     (void) _v_dt;
     double /*?*/ _v_g; // local_var
       {
-        double f0;
+        //int, incomplete
+        /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
@@ -3958,6 +4017,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         if (f0) {
           { // anonymous block
             { // Assignment real 'dt'.
+              //real? ddouble?
               ddouble t0;
               //t0.set_no_deps();
               { // scope
@@ -3965,58 +4025,57 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
                 // --- 
                 t0 = f_temp(); // (659)
               } // scope
-              /* void? */
-              t0 = t0 - (_p_tnom) /*rhspar*/; // (703)
-              _v_dt = t0; // (prec)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 = t0 - (_p_tnom) /*rhspar*/; // (703)
+              _v_dt = f0; // (prec)
             }
           }
         }
       }
       {
-        double f0;
+        //int, incomplete
+        /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        double f1;
+        //int, incomplete
+        /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
           // --- 
           f1 = param_given((_p_tc2) /*rhspar*/); // (659)
         } // scope
-        /* void? */
-        ddouble t0;
-        //t0.set_no_deps();
-        t0 = f0 || f1; // (703)
-        if (t0) {
+        //no ddeps. float??
+        f0 = f0 || f1; // (703)
+        if (f0) {
           { // anonymous block
             { // Assignment real 'g'.
-              /* void? */
-              ddouble t0;
-              //t0.set_no_deps();
-              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
-              /* void? */
-              t0 = (_p_tc1) /*rhspar*/ + t0; // (703)
-              /* void? */
-              t0 = t0 * _v_dt/*rhsvar*/; // (703)
-              /* void? */
-              t0 = t0 +  1.; // (703)
-              /* void? */
-              t0 = (_p_r) /*rhspar*/ * t0; // (703)
-              /* void? */
-              t0 =  1. / t0; // (703)
-              _v_g = t0; // (prec)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
+              //no ddeps. float??
+              f0 = (_p_tc1) /*rhspar*/ + f0; // (703)
+              //no ddeps. float??
+              f0 = f0 * _v_dt/*rhsvar*/; // (703)
+              //no ddeps. float??
+              f0 = f0 +  1.; // (703)
+              //no ddeps. float??
+              f0 = (_p_r) /*rhspar*/ * f0; // (703)
+              //no ddeps. float??
+              f0 =  1. / f0; // (703)
+              _v_g = f0; // (prec)
             }
           }
         }else {
           { // anonymous block
             { // Assignment real 'g'.
-              /* void? */
-              ddouble t0;
-              //t0.set_no_deps();
-              t0 =  1. / (_p_r) /*rhspar*/; // (703)
-              _v_g = t0; // (prec)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 =  1. / (_p_r) /*rhspar*/; // (703)
+              _v_g = f0; // (prec)
             }
           }
         }
@@ -4028,8 +4087,9 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = 0.; // precalc.
-        /* void? */
+        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
+        // dynamic & deps precalc 1
         ddouble t1;
         //t1.set_no_deps();
         //t1[d_potential_b_p_n] = 0.; // (output dep)
@@ -4037,6 +4097,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         _v_i = t0; // (prec)
       }
       { // Contribution I(p, n) lin: 1
+        // dynamic & deps precalc 1
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
@@ -4044,33 +4105,34 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        //real? ddouble?
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_white_noise_0_p_] = 0.; // (output dep)
         { // scope
           // F white_noise args:1
-          /* void? */
+          //no ddeps. float??
+          /*361, 1*/double f0;
+          f0 = (_p_noisy) /*rhspar*/ *  55.2260200000000001E-24; // (703)
+          //no ddeps. float??
+          f0 = f0 * _v_g/*rhsvar*/; // (703)
+          //real? ddouble?
           ddouble t1;
           //t1.set_no_deps();
           //t1[d_potential_b_white_noise_0_p_] = 0.; // (output dep)
-          t1 = (_p_noisy) /*rhspar*/ *  55.2260200000000001E-24; // (703)
-          /* void? */
-          t1 = t1 * _v_g/*rhsvar*/; // (703)
-          ddouble t2;
-          //t2.set_no_deps();
-          //t2[d_potential_b_white_noise_0_p_] = 0.; // (output dep)
           { // scope
             // function $temperature args:1
             // --- 
-            t2 = f_temp(); // (659)
+            t1 = f_temp(); // (659)
           } // scope
-          /* void? */
-          t1 = t1 * t2; // (703)
-          string s0;
+          //no ddeps. float??
+          f0 = f0 * t1; // (703)
+          /*361, 3*/string s0;
           s0 = "thermal";
           // --- 
-          t0 = /*precalc*/ d->_b_white_noise_0__precalc(t1, s0); // (659)
+          t0 = /*precalc*/ d->_b_white_noise_0__precalc(f0, s0); // (659)
         } // scope
+        // dynamic & deps precalc 1
         ddouble t1;
         //t1.set_no_deps();
         //t1[d_potential_b_white_noise_0_p_] = 0.; // (output dep)
@@ -4105,7 +4167,8 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
     (void) _v_dt;
     double /*?*/ _v_g; // local_var
       {
-        double f0;
+        //int, incomplete
+        /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
@@ -4114,6 +4177,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
         if (f0) {
           { // anonymous block
             { // Assignment real 'dt'.
+              //real? ddouble?
               ddouble t0;
               //t0.set_no_deps();
               { // scope
@@ -4121,58 +4185,57 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
                 // --- 
                 t0 = f_temp(); // (659)
               } // scope
-              /* void? */
-              t0 = t0 - (_p_tnom) /*rhspar*/; // (703)
-              _v_dt = t0; // (s)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 = t0 - (_p_tnom) /*rhspar*/; // (703)
+              _v_dt = f0; // (s)
             }
           }
         }
       }
       {
-        double f0;
+        //int, incomplete
+        /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        double f1;
+        //int, incomplete
+        /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
           // --- 
           f1 = param_given((_p_tc2) /*rhspar*/); // (659)
         } // scope
-        /* void? */
-        ddouble t0;
-        //t0.set_no_deps();
-        t0 = f0 || f1; // (703)
-        if (t0) {
+        //no ddeps. float??
+        f0 = f0 || f1; // (703)
+        if (f0) {
           { // anonymous block
             { // Assignment real 'g'.
-              /* void? */
-              ddouble t0;
-              //t0.set_no_deps();
-              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
-              /* void? */
-              t0 = (_p_tc1) /*rhspar*/ + t0; // (703)
-              /* void? */
-              t0 = t0 * _v_dt/*rhsvar*/; // (703)
-              /* void? */
-              t0 = t0 +  1.; // (703)
-              /* void? */
-              t0 = (_p_r) /*rhspar*/ * t0; // (703)
-              /* void? */
-              t0 =  1. / t0; // (703)
-              _v_g = t0; // (s)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
+              //no ddeps. float??
+              f0 = (_p_tc1) /*rhspar*/ + f0; // (703)
+              //no ddeps. float??
+              f0 = f0 * _v_dt/*rhsvar*/; // (703)
+              //no ddeps. float??
+              f0 = f0 +  1.; // (703)
+              //no ddeps. float??
+              f0 = (_p_r) /*rhspar*/ * f0; // (703)
+              //no ddeps. float??
+              f0 =  1. / f0; // (703)
+              _v_g = f0; // (s)
             }
           }
         }else {
           { // anonymous block
             { // Assignment real 'g'.
-              /* void? */
-              ddouble t0;
-              //t0.set_no_deps();
-              t0 =  1. / (_p_r) /*rhspar*/; // (703)
-              _v_g = t0; // (s)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 =  1. / (_p_r) /*rhspar*/; // (703)
+              _v_g = f0; // (s)
             }
           }
         }
@@ -4184,8 +4247,9 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        /* void? */
+        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
+        // dynamic & deps tr_advance 1
         ddouble t1;
         //t1.set_no_deps();
         //t1[d_potential_b_p_n] = 0.; // (output dep)
@@ -4222,7 +4286,8 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
     (void) _v_dt;
     double /*?*/ _v_g; // local_var
       {
-        double f0;
+        //int, incomplete
+        /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
@@ -4231,6 +4296,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
         if (f0) {
           { // anonymous block
             { // Assignment real 'dt'.
+              //real? ddouble?
               ddouble t0;
               //t0.set_no_deps();
               { // scope
@@ -4238,58 +4304,57 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
                 // --- 
                 t0 = f_temp(); // (659)
               } // scope
-              /* void? */
-              t0 = t0 - (_p_tnom) /*rhspar*/; // (703)
-              _v_dt = t0; // (s)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 = t0 - (_p_tnom) /*rhspar*/; // (703)
+              _v_dt = f0; // (s)
             }
           }
         }
       }
       {
-        double f0;
+        //int, incomplete
+        /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        double f1;
+        //int, incomplete
+        /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
           // --- 
           f1 = param_given((_p_tc2) /*rhspar*/); // (659)
         } // scope
-        /* void? */
-        ddouble t0;
-        //t0.set_no_deps();
-        t0 = f0 || f1; // (703)
-        if (t0) {
+        //no ddeps. float??
+        f0 = f0 || f1; // (703)
+        if (f0) {
           { // anonymous block
             { // Assignment real 'g'.
-              /* void? */
-              ddouble t0;
-              //t0.set_no_deps();
-              t0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
-              /* void? */
-              t0 = (_p_tc1) /*rhspar*/ + t0; // (703)
-              /* void? */
-              t0 = t0 * _v_dt/*rhsvar*/; // (703)
-              /* void? */
-              t0 = t0 +  1.; // (703)
-              /* void? */
-              t0 = (_p_r) /*rhspar*/ * t0; // (703)
-              /* void? */
-              t0 =  1. / t0; // (703)
-              _v_g = t0; // (s)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
+              //no ddeps. float??
+              f0 = (_p_tc1) /*rhspar*/ + f0; // (703)
+              //no ddeps. float??
+              f0 = f0 * _v_dt/*rhsvar*/; // (703)
+              //no ddeps. float??
+              f0 = f0 +  1.; // (703)
+              //no ddeps. float??
+              f0 = (_p_r) /*rhspar*/ * f0; // (703)
+              //no ddeps. float??
+              f0 =  1. / f0; // (703)
+              _v_g = f0; // (s)
             }
           }
         }else {
           { // anonymous block
             { // Assignment real 'g'.
-              /* void? */
-              ddouble t0;
-              //t0.set_no_deps();
-              t0 =  1. / (_p_r) /*rhspar*/; // (703)
-              _v_g = t0; // (s)
+              //no ddeps. float??
+              /*361, 1*/double f0;
+              f0 =  1. / (_p_r) /*rhspar*/; // (703)
+              _v_g = f0; // (s)
             }
           }
         }
@@ -4301,8 +4366,9 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        /* void? */
+        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
+        // dynamic & deps tr_regress 1
         ddouble t1;
         //t1.set_no_deps();
         //t1[d_potential_b_p_n] = 0.; // (output dep)
@@ -4721,6 +4787,10 @@ struct string : public std::string {
   string& operator=(vString const&x){
     String const& s = x;
     std::string::operator=(s);
+    return *this;
+  }
+  string& operator=(string const&x){
+    std::string::operator=(x);
     return *this;
   }
 };
@@ -6303,14 +6373,14 @@ int COMMON_capacitor::is_valid_() const
   double lb, ub;
   {
   // ref. type?
-  double f0;
+  /*361, 1*/double f0;
   f0 = 0; // precalc
   (void) f0;
   lb = f0;
   }
   {
   // ref. type?
-  double f0;
+  /*361, 1*/double f0;
   f0 =  Inf; // precalc
   (void) f0;
   ub = f0;
@@ -6547,6 +6617,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
       {
         { // anonymous block
           { // Contribution I(p, n) lin: 1
+            //real? ddouble?
             ddouble t0;
             //t0.set_no_deps();
             //t0[d_potential_b_ddt_1_p_] = 0.; // (output dep)
@@ -6557,11 +6628,12 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
               //t1[d_potential_b_ddt_1_p_] = 0.; // (output dep)
               t1.set_no_deps();
               t1 = p->xs_potential_b_p_n();
-              /* void? */
+              //ddeps. ddouble??
               t1 = (_p___c) /*rhspar*/ * t1; // (703)
               // --- 
               t0 = /*tr_eval*/ d->_b_ddt_1tr_eval(t1); // (659)
             } // scope
+            // dynamic & deps tr_eval 1
             ddouble t1;
             //t1.set_no_deps();
             //t1[d_potential_b_ddt_1_p_] = 0.; // (output dep)
@@ -6592,6 +6664,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
       {
         { // anonymous block
           { // Contribution I(p, n) lin: 1
+            //real? ddouble?
             ddouble t0;
             //t0.set_no_deps();
             //t0[d_potential_b_ddt_1_p_] = 0.; // (output dep)
@@ -6602,11 +6675,12 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
               //t1[d_potential_b_ddt_1_p_] = 0.; // (output dep)
               t1.set_no_deps();
               t1 = 0.; // precalc.
-              /* void? */
+              //ddeps. ddouble??
               t1 = (_p___c) /*rhspar*/ * t1; // (703)
               // --- 
               t0 = /*precalc*/ d->_b_ddt_1precalc(t1); // (659)
             } // scope
+            // dynamic & deps precalc 1
             ddouble t1;
             //t1.set_no_deps();
             //t1[d_potential_b_ddt_1_p_] = 0.; // (output dep)
@@ -7478,14 +7552,14 @@ int COMMON_capacitor::is_valid_() const
   double lb, ub;
   {
   // ref. type?
-  double f0;
+  /*361, 1*/double f0;
   f0 = 0; // precalc
   (void) f0;
   lb = f0;
   }
   {
   // ref. type?
-  double f0;
+  /*361, 1*/double f0;
   f0 =  Inf; // precalc
   (void) f0;
   ub = f0;
@@ -7738,23 +7812,22 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
 // construct block...
     { // anonymous block
       {
-        double f0;
+        //int, incomplete
+        /*361, 1*/double f0;
         { // scope
           // F analysis args:1
-          string s0;
+          /*361, 3*/string s0;
           s0 = "ic";
           // --- 
           f0 = _f_analysis(s0); // (659)
         } // scope
-        /* void? */
-        ddouble t0;
-        //t0.set_no_deps();
-        t0 =  1. && f0; // (703)
-        if (t0) {
+        //no ddeps. float??
+        f0 =  1. && f0; // (703)
+        if (f0) {
           { // anonymous block
             { // Contribution V(p, n) lin: 1
               // ref. type?
-              double f0;
+              /*361, 1*/double f0;
               f0 = (_p___ic) /*rhspar*/; // tr_eval
               (void) f0;
               if (!d->_pot_b_p_n){
@@ -7769,6 +7842,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
         }else {
           { // anonymous block
             { // Contribution I(p, n) lin: 1
+              //real? ddouble?
               ddouble t0;
               //t0.set_no_deps();
               //t0[d_potential_b_ddt_2_p_] = 0.; // (output dep)
@@ -7779,11 +7853,12 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
                 //t1[d_potential_b_ddt_2_p_] = 0.; // (output dep)
                 t1.set_no_deps();
                 t1 = p->xs_potential_b_p_n();
-                /* void? */
+                //ddeps. ddouble??
                 t1 = (_p___c) /*rhspar*/ * t1; // (703)
                 // --- 
                 t0 = /*tr_eval*/ d->_b_ddt_2tr_eval(t1); // (659)
               } // scope
+              // dynamic & deps tr_eval 1
               ddouble t1;
               //t1.set_no_deps();
               //t1[d_potential_b_ddt_2_p_] = 0.; // (output dep)
@@ -7821,23 +7896,22 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
 // construct block...
     { // anonymous block
       {
-        double f0;
+        //int, incomplete
+        /*361, 1*/double f0;
         { // scope
           // F analysis args:1
-          string s0;
+          /*361, 3*/string s0;
           s0 = "ic";
           // --- 
           f0 = _f_analysis(s0); // (659)
         } // scope
-        /* void? */
-        ddouble t0;
-        //t0.set_no_deps();
-        t0 =  1. && f0; // (703)
-        if (t0) {
+        //no ddeps. float??
+        f0 =  1. && f0; // (703)
+        if (f0) {
           { // anonymous block
             { // Contribution V(p, n) lin: 1
               // ref. type?
-              double f0;
+              /*361, 1*/double f0;
               f0 = (_p___ic) /*rhspar*/; // precalc
               (void) f0;
               //noddeps..
@@ -7846,6 +7920,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
         }else {
           { // anonymous block
             { // Contribution I(p, n) lin: 1
+              //real? ddouble?
               ddouble t0;
               //t0.set_no_deps();
               //t0[d_potential_b_ddt_2_p_] = 0.; // (output dep)
@@ -7856,11 +7931,12 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
                 //t1[d_potential_b_ddt_2_p_] = 0.; // (output dep)
                 t1.set_no_deps();
                 t1 = 0.; // precalc.
-                /* void? */
+                //ddeps. ddouble??
                 t1 = (_p___c) /*rhspar*/ * t1; // (703)
                 // --- 
                 t0 = /*precalc*/ d->_b_ddt_2precalc(t1); // (659)
               } // scope
+              // dynamic & deps precalc 1
               ddouble t1;
               //t1.set_no_deps();
               //t1[d_potential_b_ddt_2_p_] = 0.; // (output dep)

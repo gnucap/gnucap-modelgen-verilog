@@ -10,6 +10,7 @@ module test_valid1a(p, n);
 	electrical p, n;
 	inout p, n;
 	parameter real r = 1. from (0:inf) exclude 1.;
+	parameter real b = 1. from [0:1/r];
 	analog begin
 		I(p,n) <+ V(p,n) / r;
 	end

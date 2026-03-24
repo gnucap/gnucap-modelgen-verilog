@@ -273,6 +273,8 @@ TData const* Token_BINOP_::op_deps(Token const* t1, Token const* t2)const
   }else{ untested();
     ret = const_deps.clone();
   }
+
+  // assert(ret->type()); incomplete();
   return ret;
 }
 /*--------------------------------------------------------------------------*/
