@@ -1459,7 +1459,7 @@ static void make_cc_final_analog(std::ostream& o, const Module& m)
     "::final_analog(MOD_" << m.identifier() << "* m) const\n{\n";
 
 //  o__ "m->_v_ = m->_v_1;\n";
-    o__ "struct FF { bool operator()() const{untested(); return true;}}final_hack_;\n";
+    o__ "struct FF { bool operator()() const{return true;}}final_hack_;\n";
 
   OUT_ANALOG oo(OUT_ANALOG::modeFINAL, &final_tag);
   oo.make_load_variables(o, m);

@@ -152,7 +152,17 @@ public: //overrides
       o << ", plain_value(a" << i << ")";
     }
     o << ");\n";
-    o______ "}else{ incomplete();\n";
+    o______ "}else{\n";
+    o________ "for(int i=1; i<31; ++i) {\n";
+    o__________ "if(fd & (1<<i)){\n";
+    o__________ "  dprintf(i, a1.c_str()";
+    for(int i=2; i<int(num_args()); ++i) {
+      o << ", plain_value(a" << i << ")";
+    }
+    o << ");\n";
+    o__________ "}else{\n";
+    o__________ "}\n";
+    o________ "}\n";
     o______ "}\n";
     o____ "}\n";
 
