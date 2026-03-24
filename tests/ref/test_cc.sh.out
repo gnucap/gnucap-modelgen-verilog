@@ -83,6 +83,9 @@ typedef double real;
 typedef int integer;
 struct string : public std::string {
   string() : std::string(){}
+
+  string(string const& s) : std::string(s){}
+  string(std::string const& s) : std::string(s){}
   string(char const* s) : std::string(s){}
   string(vString const&x){ untested();
     String const& s = x;
@@ -91,6 +94,15 @@ struct string : public std::string {
   string(PARAMETER<vString> const&x){
     String const& s = x;
     std::string::operator=(s);
+  }
+
+  string& operator=(std::string const&x){
+    std::string::operator=(x);
+    return *this;
+  }
+  string& operator=(char const*x){
+    std::string::operator=(x);
+    return *this;
   }
   string& operator=(vString const&x){
     String const& s = x;
@@ -110,7 +122,8 @@ typedef vString p_string;
 template<class T>
 double plain_value(T const& x) { return x; }
 inline int plain_value(int const& x) { return x; }
-inline char const* plain_value(std::string const& x) { return x.c_str(); }
+inline char const* plain_value(std::string const& x) { untested(); return x.c_str(); }
+inline char const* plain_value(string const& x) { return x.c_str(); }
 /*--------------------------------------------------------------------------*/
 // double inf = std::numeric_limits<double>::infinity();
 #define inf std::numeric_limits<double>::infinity()
@@ -4775,6 +4788,9 @@ typedef double real;
 typedef int integer;
 struct string : public std::string {
   string() : std::string(){}
+
+  string(string const& s) : std::string(s){}
+  string(std::string const& s) : std::string(s){}
   string(char const* s) : std::string(s){}
   string(vString const&x){ untested();
     String const& s = x;
@@ -4783,6 +4799,15 @@ struct string : public std::string {
   string(PARAMETER<vString> const&x){
     String const& s = x;
     std::string::operator=(s);
+  }
+
+  string& operator=(std::string const&x){
+    std::string::operator=(x);
+    return *this;
+  }
+  string& operator=(char const*x){
+    std::string::operator=(x);
+    return *this;
   }
   string& operator=(vString const&x){
     String const& s = x;
@@ -4802,7 +4827,8 @@ typedef vString p_string;
 template<class T>
 double plain_value(T const& x) { return x; }
 inline int plain_value(int const& x) { return x; }
-inline char const* plain_value(std::string const& x) { return x.c_str(); }
+inline char const* plain_value(std::string const& x) { untested(); return x.c_str(); }
+inline char const* plain_value(string const& x) { return x.c_str(); }
 /*--------------------------------------------------------------------------*/
 // double inf = std::numeric_limits<double>::infinity();
 #define inf std::numeric_limits<double>::infinity()

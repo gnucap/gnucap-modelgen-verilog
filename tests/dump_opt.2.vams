@@ -3,7 +3,39 @@
 
 module test(d, g, s, b);
 	real T;
+	parameter real r = 1 from [1:1];
+	parameter real i = Inf from [Inf:Inf];
 	analog begin
+
+		if(r==1)
+			T = 10;
+		else
+			T = 20;
+
+		if(r==5)
+			T = 10;
+		else
+			T = 20;
+
+		if(i==Inf)
+			T = 11;
+		else
+			T = 21;
+
+		if(i > 4)
+			T = 12;
+		else
+			T = 22;
+
+		if(i < T)
+			T = 13;
+		else
+			T = 23;
+
+		if(i >= T)
+			T = 14;
+		else
+			T = 24;
 
 		if(T)
 			T = 1;
