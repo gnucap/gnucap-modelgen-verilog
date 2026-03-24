@@ -81,7 +81,27 @@ namespace{
 
 typedef double real;
 typedef int integer;
-typedef vString string;
+struct string : public std::string {
+  string() : std::string(){}
+  string(char const* s) : std::string(s){}
+  string(vString const&x){ untested();
+    String const& s = x;
+    std::string::operator=(s);
+  }
+  string(PARAMETER<vString> const&x){
+    String const& s = x;
+    std::string::operator=(s);
+  }
+  string& operator=(vString const&x){
+    String const& s = x;
+    std::string::operator=(s);
+    return *this;
+  }
+};
+/*--------------------------------------------------------------------------*/
+typedef double p_real;
+typedef int p_integer;
+typedef vString p_string;
 /*--------------------------------------------------------------------------*/
 template<class T>
 double plain_value(T const& x) { return x; }
@@ -1245,7 +1265,7 @@ public:
   void precalc_analog(MOD_resistor*);
   std::string name()const override {itested();return "resistor";}
 public: // input parameters
-  PARAMETER<real> _p_r /*  */;
+  PARAMETER<p_real> _p_r /*  */;
   real _p___r /*  */;
   real _p___tc1 /*  */, _p___tc2 /*  */;
   real _p___noisy /*  */;
@@ -1689,7 +1709,7 @@ void COMMON_resistor::precalc_first(const PARAM_LIST* par_scope)
   (void)pc;
   { // final adjust
     (void) 1.;
-    real def = real( 1.);
+    p_real def = real( 1.);
     e_val(&(this->_p_r),     def , par_scope);
   }
   { // final adjust localparam
@@ -1731,7 +1751,7 @@ void COMMON_resistor::precalc_last(const PARAM_LIST* par_scope)
   (void)pc;
   { // final adjust
     (void) 1.;
-    real def = real( 1.);
+    p_real def = real( 1.);
     e_val(&(this->_p_r),     def , par_scope);
   }
   { // final adjust localparam
@@ -1999,7 +2019,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         //t0[d_potential_b_white_noise_1_p_] = 0.; // (output dep)
         { // scope
           // F white_noise args:1
-          std::string s0;
+          string s0;
           s0 = "thermal";
           // --- 
           t0 = /*tr_eval*/ d->_b_white_noise_1( 0., s0); // (659)
@@ -2188,7 +2208,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         //t0[d_potential_b_white_noise_1_p_] = 0.; // (output dep)
         { // scope
           // F white_noise args:1
-          std::string s0;
+          string s0;
           s0 = "thermal";
           // --- 
           t0 = /*tr_eval*/ d->_b_white_noise_1( 0., s0); // (659)
@@ -2263,7 +2283,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         //t0[d_potential_b_white_noise_1_p_] = 0.; // (output dep)
         { // scope
           // F white_noise args:1
-          std::string s0;
+          string s0;
           s0 = "thermal";
           // --- 
           t0 = /*precalc*/ d->_b_white_noise_1__precalc( 0., s0); // (659)
@@ -2706,10 +2726,10 @@ public:
   void precalc_analog(MOD_resistor*);
   std::string name()const override {itested();return "resistor";}
 public: // input parameters
-  PARAMETER<real> _p_r /*  */;
-  PARAMETER<real> _p_tc1 /*  */, _p_tc2 /*  */;
-  PARAMETER<real> _p_noisy /*  */;
-  PARAMETER<real> _p_tnom /*  */;
+  PARAMETER<p_real> _p_r /*  */;
+  PARAMETER<p_real> _p_tc1 /*  */, _p_tc2 /*  */;
+  PARAMETER<p_real> _p_noisy /*  */;
+  PARAMETER<p_real> _p_tnom /*  */;
 public: // common values
   struct state_{
 #if __cplusplus >= 202002L
@@ -3178,27 +3198,27 @@ void COMMON_resistor::precalc_first(const PARAM_LIST* par_scope)
   (void)pc;
   { // final adjust
     (void) 1.;
-    real def = real( 1.);
+    p_real def = real( 1.);
     e_val(&(this->_p_r),     def , par_scope);
   }
   { // final adjust
     (void) 0.;
-    real def = real( 0.);
+    p_real def = real( 0.);
     e_val(&(this->_p_tc1),     def , par_scope);
   }
   { // final adjust
     (void) 0.;
-    real def = real( 0.);
+    p_real def = real( 0.);
     e_val(&(this->_p_tc2),     def , par_scope);
   }
   { // final adjust
     (void) 0.;
-    real def = real( 0.);
+    p_real def = real( 0.);
     e_val(&(this->_p_noisy),     def , par_scope);
   }
   { // final adjust
     (void) 0.;
-    real def = real( 0.);
+    p_real def = real( 0.);
     e_val(&(this->_p_tnom),     def , par_scope);
   }
 }
@@ -3210,27 +3230,27 @@ void COMMON_resistor::precalc_last(const PARAM_LIST* par_scope)
   (void)pc;
   { // final adjust
     (void) 1.;
-    real def = real( 1.);
+    p_real def = real( 1.);
     e_val(&(this->_p_r),     def , par_scope);
   }
   { // final adjust
     (void) 0.;
-    real def = real( 0.);
+    p_real def = real( 0.);
     e_val(&(this->_p_tc1),     def , par_scope);
   }
   { // final adjust
     (void) 0.;
-    real def = real( 0.);
+    p_real def = real( 0.);
     e_val(&(this->_p_tc2),     def , par_scope);
   }
   { // final adjust
     (void) 0.;
-    real def = real( 0.);
+    p_real def = real( 0.);
     e_val(&(this->_p_noisy),     def , par_scope);
   }
   { // final adjust
     (void) 0.;
-    real def = real( 0.);
+    p_real def = real( 0.);
     e_val(&(this->_p_tnom),     def , par_scope);
   }
   { // init common constants
@@ -3622,7 +3642,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
           } // scope
           /* void? */
           t1 = t1 * t2; // (703)
-          std::string s0;
+          string s0;
           s0 = "thermal";
           // --- 
           t0 = /*tr_eval*/ d->_b_white_noise_0(t1, s0); // (659)
@@ -3893,7 +3913,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
           } // scope
           /* void? */
           t1 = t1 * t2; // (703)
-          std::string s0;
+          string s0;
           s0 = "thermal";
           // --- 
           t0 = /*tr_eval*/ d->_b_white_noise_0(t1, s0); // (659)
@@ -4046,7 +4066,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
           } // scope
           /* void? */
           t1 = t1 * t2; // (703)
-          std::string s0;
+          string s0;
           s0 = "thermal";
           // --- 
           t0 = /*precalc*/ d->_b_white_noise_0__precalc(t1, s0); // (659)
@@ -4687,7 +4707,27 @@ namespace{
 
 typedef double real;
 typedef int integer;
-typedef vString string;
+struct string : public std::string {
+  string() : std::string(){}
+  string(char const* s) : std::string(s){}
+  string(vString const&x){ untested();
+    String const& s = x;
+    std::string::operator=(s);
+  }
+  string(PARAMETER<vString> const&x){
+    String const& s = x;
+    std::string::operator=(s);
+  }
+  string& operator=(vString const&x){
+    String const& s = x;
+    std::string::operator=(s);
+    return *this;
+  }
+};
+/*--------------------------------------------------------------------------*/
+typedef double p_real;
+typedef int p_integer;
+typedef vString p_string;
 /*--------------------------------------------------------------------------*/
 template<class T>
 double plain_value(T const& x) { return x; }
@@ -5852,7 +5892,7 @@ public:
   void precalc_analog(MOD_capacitor*);
   std::string name()const override {itested();return "capacitor";}
 public: // input parameters
-  PARAMETER<real> _p_c /*  */;
+  PARAMETER<p_real> _p_c /*  */;
   real _p___c /*  */;
   real _p___ic /*  */;
 public: // common values
@@ -6296,7 +6336,7 @@ void COMMON_capacitor::precalc_first(const PARAM_LIST* par_scope)
   (void)pc;
   { // final adjust
     (void) 1.;
-    real def = real( 1.);
+    p_real def = real( 1.);
     e_val(&(this->_p_c),     def , par_scope);
   }
   { // final adjust localparam
@@ -6320,7 +6360,7 @@ void COMMON_capacitor::precalc_last(const PARAM_LIST* par_scope)
   (void)pc;
   { // final adjust
     (void) 1.;
-    real def = real( 1.);
+    p_real def = real( 1.);
     e_val(&(this->_p_c),     def , par_scope);
   }
   { // final adjust localparam
@@ -7008,8 +7048,8 @@ public:
   void precalc_analog(MOD_capacitor*);
   std::string name()const override {itested();return "capacitor";}
 public: // input parameters
-  PARAMETER<real> _p_c /*  */;
-  PARAMETER<real> _p_ic /*  */;
+  PARAMETER<p_real> _p_c /*  */;
+  PARAMETER<p_real> _p_ic /*  */;
   real _p___c /*  */, _p___ic /*  */;
 public: // common values
   struct state_{
@@ -7471,12 +7511,12 @@ void COMMON_capacitor::precalc_first(const PARAM_LIST* par_scope)
   (void)pc;
   { // final adjust
     (void) 1.;
-    real def = real( 1.);
+    p_real def = real( 1.);
     e_val(&(this->_p_c),     def , par_scope);
   }
   { // final adjust
     (void)0;
-    real def = real(0);
+    p_real def = real(0);
     e_val(&(this->_p_ic),     def , par_scope);
   }
   { // final adjust localparam
@@ -7500,12 +7540,12 @@ void COMMON_capacitor::precalc_last(const PARAM_LIST* par_scope)
   (void)pc;
   { // final adjust
     (void) 1.;
-    real def = real( 1.);
+    p_real def = real( 1.);
     e_val(&(this->_p_c),     def , par_scope);
   }
   { // final adjust
     (void)0;
-    real def = real(0);
+    p_real def = real(0);
     e_val(&(this->_p_ic),     def , par_scope);
   }
   { // final adjust localparam
@@ -7701,7 +7741,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
         double f0;
         { // scope
           // F analysis args:1
-          std::string s0;
+          string s0;
           s0 = "ic";
           // --- 
           f0 = _f_analysis(s0); // (659)
@@ -7784,7 +7824,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
         double f0;
         { // scope
           // F analysis args:1
-          std::string s0;
+          string s0;
           s0 = "ic";
           // --- 
           f0 = _f_analysis(s0); // (659)

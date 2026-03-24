@@ -190,6 +190,18 @@ public: //overrides
 } fwrite;
 DISPATCHER<FUNCTION>::INSTALL d_fwrite(&function_dispatcher, "$fwrite", &fwrite);
 /*--------------------------------------------------------------------------*/
+class FSTROBE : public FWRITE {
+public:
+  explicit FSTROBE() : FWRITE() { untested();
+    set_label("$fstrobe");
+  }
+  std::string end()const override { untested(); return "\\n";}
+  FWRITE* clone()const override { untested();
+    return new FSTROBE(*this);
+  }
+} fstrobe;
+DISPATCHER<FUNCTION>::INSTALL d_fstrobe(&function_dispatcher, "$fstrobe", &fstrobe);
+/*--------------------------------------------------------------------------*/
 } // namespace
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
