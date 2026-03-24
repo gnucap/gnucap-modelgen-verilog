@@ -3,6 +3,8 @@ PACKAGE = mgvams
 
 TARGET = \
   mg_debug.so \
+  mg_file_io.so \
+  mg_file_write.so \
   mg_filt_xdt.so \
   mg_filt_noise.so \
   mg_filt_absdelay.so \
