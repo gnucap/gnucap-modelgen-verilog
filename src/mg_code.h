@@ -419,7 +419,6 @@ public:
   bool update();
 public:
   bool is_ctx_initial()const { return _ctx & ctx_initial; }
-  bool is_initial()const { return is_ctx_initial(); } // REMOVE
   bool is_ctx_function()const { return _ctx & ctx_function; }
   bool is_ctx_event()const { return _ctx & ctx_event; }
   bool is_ctx_final()const { return _ctx & ctx_final; }

@@ -412,14 +412,14 @@ void AnalogInitialStmt::parse(CS& f)
   m->set_tr_begin_analog();
   _body.set_owner(this);
   _body.set_ctx_initial();
-  assert(_body.is_initial());
+  assert(_body.is_ctx_initial());
 
   if(f >> _body){
     scope()->add_block(&_body); //?
   }else{ untested();
     throw Exception_CS_("expecting statement", f);
   }
-  assert(_body.is_initial());
+  assert(_body.is_ctx_initial());
 }
 /*--------------------------------------------------------------------------*/
 void AnalogInitialStmt::dump(std::ostream& o) const
@@ -1140,7 +1140,7 @@ void AnalogSeqBlock::parse(CS& f)
     SeqBlock::parse(f); // _variables
   }else{
   }
-  if(is_initial()){
+  if(is_ctx_initial()){
   }else if(dynamic_cast<Module const*>(owner())) { untested();
     unreachable();
     set_always();
