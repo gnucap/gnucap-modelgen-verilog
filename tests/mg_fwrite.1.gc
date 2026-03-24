@@ -11,7 +11,9 @@ module test_fw1(p, n);
 	parameter real mm=1;
 	integer f;
 	analog initial begin
+		$fflush(2);
 		$fwrite(2, "hello stdout\n");
+		$fflush(2);
 		f = $fopen("fw1");
 		$fwrite(f, "hello\n");
 	end

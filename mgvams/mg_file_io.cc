@@ -154,6 +154,110 @@ public: //overrides
 } fopen;
 DISPATCHER<FUNCTION>::INSTALL d_fopen(&function_dispatcher, "$fopen", &fopen);
 /*--------------------------------------------------------------------------*/
+class FILE_FLUSH : public MGVAMS_TASK {
+public:
+  explicit FILE_FLUSH() : MGVAMS_TASK(){
+    set_label("$fflush");
+  }
+private:
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
+    return "$$fflush";
+  }
+  FILE_FLUSH* clone()const override {
+    return new FILE_FLUSH(*this);
+  }
+  // Data_Type const* return_type()const override {
+  //   static Data_Type_Int r; return &r;
+  // }
+  bool is_common()const override {untested(); return true;}
+  bool is_in_common()const override { return false;} // BUG?
+  bool has_modes()const override { return true;}
+  bool has_state()const override {untested(); return false;}
+  bool needs_context()const override { return true;} // has accept?
+  bool has_tr_review()const override {return false;}
+  bool has_tr_advance()const override {return false;}
+  bool has_tr_regress()const override { untested();return false;}
+  bool has_tr_accept()const override {return true;}
+  bool has_tr_begin()const override {return true;}
+  bool has_tr_restore()const override {return false;}
+  bool has_final()const override { return true;}
+  bool static_code()const override {return false;}
+  // Token* new_token(Module&, size_t)const override{ return nullptr; }
+  std::ostream& args(std::ostream& o, bool names=false)const {
+    o << "integer";
+    if(names){
+      o << " fd";
+    }else{
+    }
+    return o;
+  }
+  void voidargs(std::ostream& o)const {
+    o__ "(void) fn;\n";
+  }
+private:
+  void template_header(std::ostream& o, bool mod=false)const {
+    if(mod || num_args()>1){
+      o____ "template<";
+      std::string sep;
+      if(mod){
+	o << "class MOD";
+	sep = ", ";
+      }else{
+      }
+      for(size_t i=1; i<num_args(); ++i) {
+	o << sep << "class T" << i;
+	sep = ", ";
+      }
+      o << ">\n";
+    }else{
+    }
+  }
+public: //overrides
+  void make_cc_dev(std::ostream& o)const override {
+    o__ "struct cls" << label() << "{\n";
+
+    o____ "void tr_eval(CARD*, "; args(o) << ")const { }\n";
+    o____ "void tr_initial(CARD* d, "; args(o, true) << ") {\n";
+    o______ "tr_accept(d, fd);\n";
+    o____ "};\n";
+    o____ "void tr_begin(CARD*, "; args(o) << ") { untested(); }\n";
+    o____ "void tr_review(CARD*, "; args(o) << ") { untested(); }\n";
+    o____ "void tr_advance(CARD*, "; args(o) << ") { untested(); }\n";
+    o____ "void tr_regress(CARD*, "; args(o) << ") { untested(); }\n";
+    o____ "void tr_accept(CARD*, "; args(o, true) << ") {\n";
+#if 1
+    o______ "fflush(nullptr);\n"; // flush them all, for now.
+#else
+    o______ "if(fd & (1<<31)){\n";
+    o________ "fflush(fd ^ (1<<31));\n";
+    o______ "}else{\n";
+    o________ "for(int i=0; i<31; ++i) {\n";
+    o__________ "if(!(fd & (1<<i))){\n";
+    o__________ "}else if(i<1){ untested();\n";
+    o__________ "  error(bWARNING, \"refusing to flush fd %d\", i);\n";
+    o__________ "}else{\n";
+    o__________ "  flush(i);\n";
+    o__________ "}\n";
+    o________ "}\n";
+    o______ "}\n";
+#endif
+    o____ "}\n";
+    o____ "void precalc(CARD*, "; args(o) << ") { untested(); }\n";
+    o____ "void finish(CARD* d, "; args(o, true) << ") {\n";
+    o______ "tr_accept(d, fd);\n";
+    o____ "}\n";
+
+    o____ "void af(CARD const*, "; args(o) << ")const { incomplete(); /* BUG */ }\n";
+    o__ "}_" << label() << ";\n";
+  }
+  std::string code_name()const override{
+    return "/*flush*/_" + label() + ".";
+  }
+  // Data_Type const* return_type()const override { return nullptr; }
+  virtual std::string end()const{return "";}
+} fflush;
+DISPATCHER<FUNCTION>::INSTALL d_fflush(&function_dispatcher, "$fflush", &fflush);
+/*--------------------------------------------------------------------------*/
 class FILE_CLOSE : public MGVAMS_TASK {
 public:
   explicit FILE_CLOSE() : MGVAMS_TASK(){
@@ -177,8 +281,8 @@ private:
   bool has_tr_review()const override {return false;}
   bool has_tr_advance()const override {return false;}
   bool has_tr_regress()const override { untested();return false;}
-  bool has_tr_accept()const override {return false;}
-  bool has_tr_begin()const override {return false;}
+  bool has_tr_accept()const override {return true;}
+  bool has_tr_begin()const override {return true;}
   bool has_tr_restore()const override {return false;}
   bool has_final()const override { return true;}
   bool static_code()const override {return false;}

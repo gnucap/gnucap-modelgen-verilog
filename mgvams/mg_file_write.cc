@@ -192,7 +192,7 @@ DISPATCHER<FUNCTION>::INSTALL d_fwrite(&function_dispatcher, "$fwrite", &fwrite)
 /*--------------------------------------------------------------------------*/
 class FSTROBE : public FWRITE {
 public:
-  explicit FSTROBE() : FWRITE() { untested();
+  explicit FSTROBE() : FWRITE() {
     set_label("$fstrobe");
   }
   std::string end()const override { untested(); return "\\n";}
