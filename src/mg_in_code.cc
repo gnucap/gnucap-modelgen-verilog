@@ -92,6 +92,15 @@ bool Statement::is_ctx_function() const
   }
 }
 /*--------------------------------------------------------------------------*/
+bool Statement::is_ctx_final() const
+{ untested();
+  if(auto x = dynamic_cast<SeqBlock const*>(scope())) { untested();
+    return x->is_ctx_final();
+  }else{ untested();
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
 bool Statement::is_reachable() const
 { untested();
   assert(scope());

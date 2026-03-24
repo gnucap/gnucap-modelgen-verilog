@@ -145,6 +145,7 @@ public:
   bool is_ctx_initial()const;
   bool is_ctx_function()const;
   bool is_ctx_event()const;
+  bool is_ctx_final()const;
   bool is_reachable()const;
   bool is_always()const;
   bool is_never()const;
@@ -344,12 +345,14 @@ class SeqBlock : public Block {
   Sensitivities* _sens{nullptr}; // here?
   Variable_List_Collection _variables;
   enum context{
-    ctx_unknown,
-    ctx_default,
-    ctx_function,
-    ctx_event,
-    ctx_initial
-  } _ctx{ctx_unknown};
+    ctx_unknown = 0,
+    ctx_default = 1,
+    ctx_function = 2,
+    ctx_event = 4,
+    ctx_initial = 8,
+    ctx_final = 16
+  };
+  int _ctx{0};
   Variable_Access* _variable_access{nullptr};
 public:
   explicit SeqBlock(Base const* owner) : Block() {
@@ -415,23 +418,31 @@ public:
   Variable_List_Collection const& variables_()const {return _variables;}
   bool update();
 public:
-  bool is_ctx_initial()const { return _ctx == ctx_initial; }
+  bool is_ctx_initial()const { return _ctx & ctx_initial; }
   bool is_initial()const { return is_ctx_initial(); } // REMOVE
-  bool is_ctx_function()const { return _ctx == ctx_function; }
-  bool is_ctx_event()const { return _ctx == ctx_event; }
-  void set_ctx_initial() { _ctx = ctx_initial; }
-  void set_ctx_function() { _ctx = ctx_function; }
-  void set_ctx_event() { _ctx = ctx_event; }
+  bool is_ctx_function()const { return _ctx & ctx_function; }
+  bool is_ctx_event()const { return _ctx & ctx_event; }
+  bool is_ctx_final()const { return _ctx & ctx_final; }
+  void set_ctx_initial() { _ctx |= ctx_initial; }
+  void set_ctx_function() { _ctx |= ctx_function; }
+  void set_ctx_event() { _ctx |= ctx_event; }
+  void set_ctx_final() { _ctx |= ctx_final; }
 private:
 protected: // bug
   void init_context(Statement* s) {
     // reachability here?
-    if(s->is_ctx_initial()){
-      set_ctx_initial();
-    }else if(s->is_ctx_event()){
+    if(s->is_ctx_event()){
       set_ctx_event();
     }else if(s->is_ctx_function()){
       set_ctx_function();
+    }else{
+    }
+    if(s->is_ctx_initial()){
+      set_ctx_initial();
+    }else{
+    }
+    if(s->is_ctx_final()){
+      set_ctx_final();
     }else{
     }
   }
