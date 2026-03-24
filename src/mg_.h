@@ -367,17 +367,21 @@ class Node : public Base {
   Node* _next{nullptr};
   mutable int _use{0};
   std::vector<Element_2 const*> _fanout;
+  Token_NODE* _token{nullptr};
+public:
+//  explicit Node(int n) : _number(n){ assert(!n); _next=this; }
+  explicit Node(CS&) { untested(); unreachable();}
+  explicit Node(std::string const& f, int n)
+    : _name(f), _number(n) { new_token(f); _next=this;}
+  ~Node();
 public:
   void parse(CS&)override {};
   void dump(std::ostream&)const override {};
-  Node(int n) : _number(n){ assert(!n); _next=this; }
-  Node() { untested();untested(); _next=this;}
-  Node(CS& f) { untested();parse(f); _next=this;}
-  Node(std::string const& f, int n) : _name(f), _number(n) { _next=this;}
-public:
-  ~Node();
-  const std::string& name()const	{return _name;}
-  std::string code_name()const	{return "n_" + _name;}
+  // std::string const& name()const{ assert(_token); return _token->name();} // BUG. dup
+  std::string const& name()const{ assert(_token); return _name;}
+  Token_NODE /* BUG const */ * token()const { return _token; }
+
+  std::string code_name()const	{return "n_" + name();}
   int number()const	{return _number;}
   Node const* short_to()const {return _short_to;}
   std::string const& short_if()const {return _short_if;}
@@ -399,6 +403,8 @@ public:
   void dec_use()const { untested();assert(_use); --_use;}
   void connect(Element_2 const*);
   bool is_ground() const{ return !_number; }
+private:
+  void new_token(std::string const& name);
 }; // Node
 /*--------------------------------------------------------------------------*/
 class Node_List : public List<Node> {
@@ -416,8 +422,6 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-std::string make_cc_expression(std::ostream& o, Expression const& e, bool deriv=true,
-    std::string ctx="");
 void dump_analog(std::ostream& o, Module const& m);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -2096,13 +2096,13 @@ Base* AnalogFunctionArgs::lookup(std::string const& k, bool recurse)
     }else{
       return b;
     }
+  }else if(dynamic_cast<Token_NODE const*>(b)){
+      // nodes not allowed here.
+    return nullptr;
   }else if(dynamic_cast<Token_VAR_DECL const*>(b)){
     return nullptr;
   }else if(dynamic_cast<Token_VAR_REF const*>(b)){ untested();
     return b;
-  }else if(dynamic_cast<Token_NODE const*>(b)){ untested();
-      // nodes not allowed here.
-    return nullptr;
   }else{
     return b;
   }
@@ -2562,9 +2562,9 @@ Probe* new_Probe(std::string const& xs, Branch_Ref const& br)
   return new Probe(xs, br);
 }
 /*--------------------------------------------------------------------------*/
-size_t Branch::num_nodes() const
+int Branch::net_nodes() const
 {
-  size_t ret=2;
+  int ret=2;
 
   for(Dep const& i : ddeps()){
     if(branch(i)->is_short()){
@@ -2585,9 +2585,9 @@ size_t Branch::num_nodes() const
   return ret;
 }
 /*--------------------------------------------------------------------------*/
-size_t Branch::num_states() const
+int Branch::num_states() const
 {
-  size_t k = 2;
+  int k = 2;
   // TODO: cleanup
   for(Dep const& i : ddeps()){
     // if(i->is_reversed()){ untested();

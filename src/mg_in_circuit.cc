@@ -55,6 +55,17 @@ void Circuit::parse(CS&)
   _element_list.set_owner(owner());
 }
 /*--------------------------------------------------------------------------*/
+void Circuit::dump(std::ostream& o) const
+{
+  for(auto const& e : element_list()){
+    assert(e);
+    if(e->eval()==""){
+      o << *e;
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 void New_Port::parse(CS& file)
 {
   Port_3::parse(file); // TODO: port_base?
@@ -62,6 +73,11 @@ void New_Port::parse(CS& file)
   trace1("New_Port::parse", name());
   owner()->new_node(name());
 }
+/*--------------------------------------------------------------------------*/
+class Wire : public Discipline{
+public:
+  explicit Wire() : Discipline("wire") {}
+}wire;
 /*--------------------------------------------------------------------------*/
 void Net_Declarations::parse(CS& f)
 {
@@ -95,6 +111,18 @@ void Net_Declarations::parse(CS& f)
     }
 
     d = m;
+  }else if(f.umatch("wire ")){
+    auto m = new Net_Decl_List_Discipline();
+    m->set_discipline(&wire);
+
+    m->set_owner(owner());
+    f >> *m;
+    for(auto i : *m){
+      i->set_discipline(*ii, mod);
+    }
+
+    d = m;
+
   }else if(f.umatch("ground ")){
     auto m = new Net_Decl_List_Ground();
     m->set_owner(owner());
@@ -121,6 +149,11 @@ Port_3* Circuit::find_port(std::string const& n)
     trace1("port not found", n);
     return nullptr;
   }
+}
+/*--------------------------------------------------------------------------*/
+void Circuit::push_back(Filter /*const?*/ * f)
+{
+  _filters.push_back(f);
 }
 /*--------------------------------------------------------------------------*/
 bool Branch::is_used_in(Base const* b)const

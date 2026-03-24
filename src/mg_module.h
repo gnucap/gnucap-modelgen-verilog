@@ -173,6 +173,7 @@ private: // verilog input data
   // Port_1_List _local_nodes;
   Owned_Base* _always{nullptr};
   Owned_Base* _analog{nullptr};
+  Owned_Base* _assign{nullptr};
   Circuit* _circuit{nullptr};
   Hierarchical_Refs* _hrefs{nullptr};
 //  Block _module_body;
@@ -195,8 +196,10 @@ private: // merge?
   bool _has_expand_last{false};
 private: // elaboration data
   void new_always();
+  void new_assign();
   void new_circuit();
   void delete_always();
+  void delete_assign();
   void delete_circuit();
   void detach_out_vars();
 public:
@@ -229,7 +232,8 @@ public: // TODO
   const Circuit*	  circuit()const	{return _circuit;}
   const Hierarchical_Refs& hrefs()const	{assert(_hrefs); return *_hrefs;}
   const Owned_Base& analog() const {assert(_analog); return *_analog;}
-  const Owned_Base& always() const { untested();assert(_always); return *_always;}
+  const Owned_Base& assigns() const {assert(_assign); return *_assign;}
+  const Owned_Base& always() const {assert(_always); return *_always;}
   bool has_analysis()const {return _has_analysis;}
   bool has_expand_last()const {return _has_expand_last;}
 
@@ -266,6 +270,7 @@ public:
   bool has_submodule()const;
   bool has_analog_block()const;
   bool has_always_block()const;
+  bool has_assign()const;
 
   void set_set_event (mode_mask_t m=mm_YES) {set_pid(if_SET_EVENT, m);}
   void set_ac_begin  (mode_mask_t m=mm_YES) { untested();set_pid(if_AC_BEGIN, m);}
@@ -283,6 +288,7 @@ public:
 private:
   void import_flags(FUNCTION_ const*);
   void set_pid  (iface_id_t p, mode_mask_t m=mm_ANALOG) {_has_pid[p] = (mode_mask_t)(_has_pid[p] | m);}
+  Circuit&  mutable_circuit()	{assert(_circuit); return *_circuit;}
 
 public:
   void set_times(int h) {if(h > _times){_times = h;}else{}}
@@ -303,6 +309,7 @@ public: // for now.
   virtual Module* deflate() { untested();return this;}
   Parameter_List_Collection& parameters()	{return _parameters;}
 protected: // Paramset::deflate
+  void setup_assign();
   void setup_storage();
   void setup_functions();
   void setup_nodes();

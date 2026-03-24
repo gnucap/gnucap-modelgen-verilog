@@ -28,6 +28,7 @@
 #include "mg_in.h"
 #include "mg_out.h"
 #include "mg_storage.h"
+#include "mg_.h" // Node BUG
 /*--------------------------------------------------------------------------*/
 bool Statement::set_used_in(Base const* b)
 {
@@ -663,18 +664,25 @@ static Token_VAR_REF* parse_variable(CS& f, Block* o)
   f >> what;
   trace1("parse_variable", what);
   Base* b = o->lookup(what);
-  Token_VAR_REF* v = dynamic_cast<Token_VAR_REF*>(b);
-  if(v){
-    assert(f);
+  if(dynamic_cast<Node*>(b)) {
+    incomplete();
+    return nullptr;
+  }else if(auto v = dynamic_cast<Token_VAR_REF*>(b)) {
     // assert(v->data()); no. unreachable?
+    return v;
+  }else if(auto n = dynamic_cast<Token_NODE*>(b)) {
+    // assert(v->data()); no. unreachable?
+    return n;
   }else if (b) { untested();
+    unreachable();
     f.reset_fail(here);
     trace1("not a variable", f.tail().substr(0,10));
+    return nullptr;
   }else{
     f.reset_fail(here);
     trace1("not found", f.tail().substr(0,10));
+    return nullptr;
   }
-  return v;
 }
 /*--------------------------------------------------------------------------*/
 Assignment::Assignment(CS& f, Base* o)
@@ -702,9 +710,23 @@ void Assignment::parse(CS& f)
   }
 
   if(options().optimize_unused() && !scope()->is_reachable()) {
+#if 0
+  }else if(_lhsref && !l->data()) {
+    incomplete();
+    assert(dynamic_cast<Token_NODE*>(l));
+    assert(!_token);
+    store_deps(Expression_::data());
+    assert(_token);
+
+    if(owner()){
+      assert(_data);
+      _data->add_sens(owner());
+    }else{ untested();
+    }
+#endif
   }else if(_lhsref) {
     assert(f);
-    assert(l->data());
+//    assert(l->data());
     assert(!_token);
 
     store_deps(Expression_::data());
@@ -797,7 +819,7 @@ bool Assignment::is_used() const
 }
 /*--------------------------------------------------------------------------*/
 std::string Assignment::code_name() const
-{ untested();
+{
   assert(_lhsref);
   return _lhsref->code_name();
 }
@@ -838,11 +860,12 @@ bool Assignment::update(RDeps const* incoming)
 
   ret = Expression_::update(&rdeps);
 
-  assert(_token);
   assert(scope());
   trace3("Assignment::update", _lhsref->name(), _token->name(),  Expression_::data().size());
-  if (store_deps(Expression_::data())) {
+  if(!_token){
+  }else if (store_deps(Expression_::data())) {
     trace3("Assignment::update0", _token->name(), _token->deps().size(), Expression_::data().size());
+    incomplete();
     // something new there.. pass it on.
     // TODO: only pass on what's new..
     assert(_lhsref);
@@ -868,7 +891,10 @@ bool Assignment::update(RDeps const* incoming)
     }else{
     }
   }
-  scope()->new_var_ref(_token); // needed in mg4_dep.2 ..
+  if(_token){
+    scope()->new_var_ref(_token); // always needed?
+  }else{ untested();
+  }
 				//
  //  if(!r){ untested();
  //  }else if(auto s = dynamic_cast<Statement*>(owner())){ untested();
@@ -1002,7 +1028,8 @@ void Assignment::parse_rhs(CS& cmd)
 {
   assert(owner());
   assert(scope());
-  assert(dynamic_cast<Statement*>(owner()));
+  assert(dynamic_cast<Statement*>(owner())
+       ||dynamic_cast<Module*>(owner())); // NetAssignment
   trace1("Assignment::parse_rhs", cmd.tail().substr(0,10));
   Expression rhs(cmd);
   assert(Expression_::is_empty());
@@ -1012,7 +1039,7 @@ void Assignment::parse_rhs(CS& cmd)
   //_rhs.set_owner(owner()); // this? AssignmentStatement?
   resolve_symbols(rhs);
   cmd.reset(cmd.cursor());
-  trace1("Assignment::parse_rhs", bool(cmd));
+  trace2("Assignment::parse_rhs", bool(cmd), size());
 }
 /*--------------------------------------------------------------------------*/
 RDeps const& Assignment::rdeps() const

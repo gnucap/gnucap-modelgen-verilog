@@ -5,8 +5,6 @@
 >>>>>parameter r=1
 >>>>>parameter c=1
 >>>>>parameter v=0
-test_sckt0 #(.r(r)) dut(\1 ,2);
-                            ^ ? invalid identifier
 >>>>>list
 parameter r=1
 parameter c=1
@@ -22,9 +20,16 @@ dut.r1 is "resistor from device_dispatcher"
  0.5        0.5        0.5        ??         500.04f    1.         0.5        0.5       
  1.         1.         1.         ??         1.0001p    1.         1.         1.        
 v already set. replacing
+>>>>>delete v1
+>>>>>dc v 0 1 .5
+#           v(1)       v(2)       v(dut)     v(dut.r1)  y(dut.r1)  v1(dut.r1) v2(dut.r1)
+ 0.         0.         0.         ??         0.         1.         0.         0.        
+ 0.5        0.5        0.5        ??         500.04f    1.         0.5        0.5       
+ 1.         1.         1.         ??         1.0001p    1.         1.         1.        
+v already set. replacing
 >>>>>status notime
 Gnucap   System status
-iterations: op=0, dc=7, tran=0, fourier=0, total=7
+iterations: op=0, dc=7, tran=0, fourier=0, total=14
 transient timesteps: accepted=0, rejected=0, total=0
 nodes: user=2, subckt=0, model=0, total=2
 dctran density=100.0%, ac density=100.0%

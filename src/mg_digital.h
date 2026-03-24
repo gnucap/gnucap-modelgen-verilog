@@ -22,18 +22,21 @@
 #ifndef GNUCAP_MG_DIGITAL_H
 #define GNUCAP_MG_DIGITAL_H
 /*--------------------------------------------------------------------------*/
-#include "mg_.h"
 #include "mg_code.h"
+#include "mg_assign.h"
+#include "mg_.h"
 /*--------------------------------------------------------------------------*/
-class AlwaysConstruct : public Statement /* CtrlStatement? */ {
-  Block* _block{nullptr};
+class VariableAssignment : Assignment {
+};
+/*--------------------------------------------------------------------------*/
+class ProcContAssign : public Statement {
+  VariableAssignment _assign;
 public:
-  AlwaysConstruct(){
+  ProcContAssign(){
   }
-  ~AlwaysConstruct(){
-    delete _block;
-    _block = nullptr;
+  ~ProcContAssign(){
   }
+
 private:
   void submit_variable_access(Variable_Access&)const override { untested();
     incomplete();
@@ -43,14 +46,7 @@ public:
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
   bool update()override { untested(); incomplete(); return false; }
-  void new_block();
-  Block const* block_or_null() const{ untested(); return _block; }
-  Block* block(){ untested(); return _block; }
-  void push_back(Statement*);
-  bool is_used_in(Base const*)const override; // BUG?
 };
-/*--------------------------------------------------------------------------*/
-typedef Collection<AlwaysConstruct> AlwaysList;
 /*--------------------------------------------------------------------------*/
 class DigitalStmt : public Statement {
 public:
@@ -113,15 +109,19 @@ public:
 /*--------------------------------------------------------------------------*/
 class DigitalCtrlBlock : public DigitalSeqBlock {
 public:
-  explicit DigitalCtrlBlock() : DigitalSeqBlock() { untested();}
+  explicit DigitalCtrlBlock() : DigitalSeqBlock() {}
   explicit DigitalCtrlBlock(CS& f, Statement* o) : DigitalSeqBlock() {
     set_owner(o);
     parse(f);
   }
 
-  void parse(CS& cmd)override;
-  void dump(std::ostream& o)const override;
-  operator bool()const{ untested(); return size() || identifier() !=""; }
+  void parse(CS& cmd)override {
+    return DigitalSeqBlock::parse(cmd);
+  }
+  void dump(std::ostream& o)const override {
+    return DigitalSeqBlock::dump(o);
+  }
+  operator bool()const{ return size() || identifier() !=""; }
   void set_owner(Statement* owner);
 }; // DigitalCtrlBlock
 /*--------------------------------------------------------------------------*/
@@ -133,8 +133,8 @@ class DigitalCtrlStmt : public DigitalStmt {
 protected:
   DigitalCtrlBlock _body;
 public:
-  DigitalCtrlStmt() : _body() { untested(); }
-  ~DigitalCtrlStmt(){ untested(); }
+  DigitalCtrlStmt() : _body() { }
+  ~DigitalCtrlStmt(){ }
   void dump(std::ostream&)const override;
   void parse(CS& cmd)override;
   DigitalCtrlBlock const& body()const { untested(); return _body; }
@@ -151,11 +151,34 @@ public:
   bool propagate_rdeps(RDeps const& incoming)override;
 }; // DigitalCtrlStmt
 /*--------------------------------------------------------------------------*/
+class AlwaysConstruct : public Statement /* CtrlStatement? */ {
+  DigitalCtrlBlock _block;
+public:
+  AlwaysConstruct(){ }
+  ~AlwaysConstruct(){ }
+private:
+  void submit_variable_access(Variable_Access&)const override {
+    incomplete();
+  }
+
+public:
+  void parse(CS& cmd)override;
+  void dump(std::ostream& o)const override;
+  bool update()override { untested(); incomplete(); return false; }
+  void new_block();
+  Block const* block_or_null() const{ return &_block; }
+  Block* block(){ return &_block; }
+  void push_back(Statement*);
+  bool is_used_in(Base const*)const override; // BUG?
+};
+typedef Collection<AlwaysConstruct> AlwaysList; // needed?
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 class DigitalEvtExpression : public Expression_ {
   RDeps _rdeps;
 public:
-  explicit DigitalEvtExpression() : Expression_() { untested();}
-  ~DigitalEvtExpression(){ untested(); }
+  explicit DigitalEvtExpression() : Expression_() {}
+  ~DigitalEvtExpression(){ }
   void parse(CS&)override;
   void dump(std::ostream&)const override;
 //  Expression const& expression() const{return _expression;};
@@ -164,7 +187,7 @@ public:
 //
 private: // incomplete
   void set_rdeps(); // pull in rdeps from functions
-  bool add_rdep(Base const* b) { untested();
+  bool add_rdep(Base const* b) {
     return _rdeps.insert(b).second;
   }
   FUNCTION_ const* function()const;
@@ -175,7 +198,7 @@ public:
 class DigitalEvtCtlStmt : public DigitalCtrlStmt {
   DigitalEvtExpression _ctrl;
 public:
-  ~DigitalEvtCtlStmt() { untested(); }
+  ~DigitalEvtCtlStmt() { }
   void parse(CS&)override;
   void dump(std::ostream&)const override;
   Expression_ const& cond()const { return _ctrl; } // override?
@@ -396,7 +419,7 @@ public: // dump_annotate
     return _a.has_sensitivities();
   }
   Sensitivities const& sensitivities()const { untested();return _a.sensitivities();}
-  bool is_state_var()const { untested();return _a.is_state_var();}
+  bool is_state_var()const {return _a.is_state_var();}
 }; // DigitalProceduralAssignment
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

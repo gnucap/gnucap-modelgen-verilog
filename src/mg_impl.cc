@@ -30,12 +30,6 @@ bool ConstantMinTypMaxExpression::empty() const
   return _e.is_empty();
 }
 /*--------------------------------------------------------------------------*/
-bool Module::has_submodule() const
-{
-  assert(circuit());
-  return !circuit()->element_list().is_empty();
-}
-/*--------------------------------------------------------------------------*/
 Branch_Ref Branch_Map::new_branch(Branch_Ref const& b, std::string name)
 {
   assert(name!="");
@@ -134,19 +128,6 @@ Branch_Ref Module::new_branch(std::string const& p, std::string const& n)
   }
 }
 /*--------------------------------------------------------------------------*/
-Node* Node_Map::new_node(std::string const& p, Block* owner)
-{
-  Node*& cc = _map[p];
-  if(cc) {
-  }else{
-    // new_ref here?
-    cc = new Node(p, int(_nodes.size()));
-    owner->new_var_ref(cc);
-    _nodes.push_back(cc);
-  }
-  return cc;
-}
-/*--------------------------------------------------------------------------*/
 Node_Map::Node_Map()
 {
   assert(mg_ground_node.number() == 0);
@@ -158,6 +139,9 @@ Node_Map::~Node_Map()
   size_t i = 1;
   for(; i < _nodes.size(); ++i){
     delete _nodes[i];
+  }
+  for(; i < _tokens.size(); ++i){
+    delete _tokens[i];
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -179,6 +163,7 @@ Node* Module::new_node(std::string const& p)
   // new_var_ref(n);
   return n;
 }
+/*--------------------------------------------------------------------------*/
 Node* Primitive::new_node(std::string const& p)
 {
   Node* n = nodes().new_node(p, this);
@@ -225,13 +210,13 @@ std::string Filter::code_name()const
   return "_f_" + _name; // name()?
 }
 /*--------------------------------------------------------------------------*/
-size_t Filter::num_states() const
+int Filter::num_states() const
 {
-  return size_t(_num_states);
+  return int(_num_states);
 }
 /*--------------------------------------------------------------------------*/
 // BUG: delegate to branch
-size_t Filter::num_nodes() const
+int Filter::net_nodes() const
 {
   // slew? BUG
   return 0;
@@ -500,6 +485,7 @@ bool Block::new_var_ref(Base* what)
     unreachable();
     p = "."+ps->name();
   }else if(auto nn = dynamic_cast<Node const*>(what)){
+    incomplete(); // token?
     p = nn->name();
   }else if(auto blk = dynamic_cast<SeqBlock const*>(what)){
     p = blk->identifier().to_string();

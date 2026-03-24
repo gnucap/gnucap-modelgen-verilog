@@ -398,7 +398,7 @@ public:
 /*--------------------------------------------------------------------------*/
 class Node;
 class Module;
-class Node_Ref {
+class Node_Ref { // Token?
   Node* _node{nullptr};
 public:
   explicit Node_Ref() {}
@@ -496,7 +496,7 @@ public:
   void set_initial() { untested(); _reachable = r_initial; }
   void set_always() { _reachable = r_always; }
   void set_never() { _reachable = r_never; }
-  virtual bool new_var_ref(Base* what);
+  virtual bool new_var_ref(Base* what); // bug? const what
   void clear_vars();
 //  void dump(std::ostream& f)const override{ untested();f << "???";}
 

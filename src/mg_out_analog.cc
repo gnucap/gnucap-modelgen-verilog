@@ -58,7 +58,12 @@ public:
 public:
   bool is_dynamic()const { return _mode==modeDYNAMIC; }
   bool is_static()const { return _mode==modeSTATIC
+                              || _mode==modePRECALC
                               || _mode==modeTR_BEGIN
+                              || _mode==modeTR_RESTORE
+                              || _mode==modeTR_ADVANCE
+                              || _mode==modeTR_REGRESS
+                              || _mode==modeTR_ACCEPT
                               || _mode==modeTR_INITIAL
 			      || _mode==modeTR_REVIEW ; } // || ...?
   bool is_precalc()const { return _mode==modePRECALC; }
@@ -211,6 +216,7 @@ static bool within_af(Base const* what)
   }
 }
 /*--------------------------------------------------------------------------*/
+bool is_cc_ref(Expression const* e);
 void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
 {
   Expression_ const& e = a.rhs();
@@ -228,33 +234,37 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
       && _mode!=modeTR_INITIAL
       && !within_af(&a)) {
     o__ "// " << lhsname << " is common\n";
+  }else if(is_cc_ref(&e)){
+    std::stringstream bin; // HACK.
+    auto rhsname = make_cc_expression(bin, e);
+    o__ lhsname << " = " << rhsname << ";\n";
   }else{
     indent x;
-    make_cc_expression(o, e);
+    auto rhsname = make_cc_expression(o, e);
+//    if(e.is_ref()){
+//      o__ lhsname << " = " << rhsname << ";\n";
+//    }else
     if(a.is_int()){
-      o__ lhsname << " = int(t0); // (*)\n";
+      o__ lhsname << " = int(" << rhsname << "); // (int*)\n";
     }else if(within_af(&a)){
-      o__ lhsname << " = t0; // (1a)\n";
+      o__ lhsname << " = " << rhsname << "; // (1a)\n";
     }else if(_mode==modePRECALC){
-      o__ lhsname << " = t0; // (prec)\n";
+      o__ lhsname << " = " << rhsname << "; // (prec)\n";
     }else if(is_static()){
-      o__ lhsname << " = t0.value(); // (s)\n";
-    }else if(_mode==modeTR_RESTORE){
-      o__ lhsname << " = t0.value(); // (s)\n";
-    }else if(_mode==modeTR_ADVANCE){
-      o__ lhsname << " = t0.value(); // (s)\n";
-    }else if(_mode==modeTR_REGRESS){
-      o__ lhsname << " = t0.value(); // (s)\n";
-    }else if(_mode==modeTR_ACCEPT){
-      o__ lhsname << " = t0.value(); // (s)\n";
-    }else if(!options().optimize_deriv()) { untested();
-      o__ lhsname << " = t0; // (*)\n";
-      for(Dep const& v : a.data().ddeps()) { untested();
-	o__ "// " << a.lhs().code_name() << "[d" << code_name(v) << "] = " << "t0[d" << code_name(v) << "]; // (2a)\n";
-	o__ "assert(" << a.lhs().code_name() << "[d" << code_name(v) << "] == " << "t0[d" << code_name(v) << "]); // (2a2)\n";
+      o__ lhsname << " = " << rhsname << "; // (s)\n";
+    }else if(!options().optimize_deriv()) {
+      o__ lhsname << " = " << rhsname << "; // (*1)\n";
+      for(Dep const& v : a.data().ddeps()) {
+	o__ "// " << a.lhs().code_name() << "[d" << code_name(v) << "] = " << "" << rhsname << "[d" << code_name(v) << "]; // (2a)\n";
+	o__ "assert(" << a.lhs().code_name() << "[d" << code_name(v) << "] == " << "" << rhsname << "[d" << code_name(v) << "]); // (2a2)\n";
       }
     }else{
-      o__ lhsname << " = t0.value(); // (*)\n";
+      // actual type?
+      if(!e.data().ddeps().size()){
+	o__ lhsname << " = " << rhsname << "; // (*2)\n";
+      }else{
+	o__ lhsname << " = " << rhsname << ".value(); // (*3)\n";
+      }
       // o__ lhsname << ".set_no_deps(); // (42)\n";
 #ifdef TRACE_ASSIGN
       o__ "trace1(\"assign\", " << lhsname << ");\n";
@@ -278,8 +288,8 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
 	if(branch(v)->is_short()) {
 	  o__ "// " << lhsname << "[d" << code_name(v) << "] short\n";
 	}else{
-	  o__ lhsname << "[d" << code_name(v) << "] = " << "t0[d" << code_name(v) << "]; // (2b)\n";
-	  o__ "assert(" << lhsname << "[d" << code_name(v) << "] == " << "t0[d" << code_name(v) << "]); // (2b2)\n";
+	  o__ lhsname << "[d" << code_name(v) << "] = " << "" << rhsname << "[d" << code_name(v) << "]; // (2b)\n";
+	  o__ "assert(" << lhsname << "[d" << code_name(v) << "] == " << "" << rhsname << "[d" << code_name(v) << "]); // (2b2)\n";
 	}
 #ifdef TRACE_ASSIGN
 	o__ "trace1(\"assign\", " << lhsname << "[d" << v->code_name() << "]);\n";
@@ -307,7 +317,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
   }else if(C.branch()->is_short()){
   }else{
     indent x;
-    make_cc_expression(o, e);
+    std::string t0 = make_cc_expression(o, e);
 
     char sign = C.reversed()?'-':'+';
     std::string bcn = C.branch_ref().code_name();
@@ -342,7 +352,7 @@ void OUT_ANALOG::make_contrib(std::ostream& o, Contribution const& C) const
     }
 
     if(is_dynamic()) {
-      o__ "d->_value" << bcn << " /* contrib sign: */ " << sign << "= t0.value(); // (342)\n";
+      o__ "d->_value" << bcn << " /* contrib sign: */ " << sign << "= double(" << t0 << "); // (342)\n";
     }else{
      //  o__ "d->_value" << bcn << " " << sign << "= t0;\n";
     }
@@ -727,9 +737,9 @@ static void make_cond_expressions(std::ostream& o, AnalogConstExpressionList con
   std::string paren="";
   for(auto e : l){
     assert(e);
-    make_cc_expression(o, *e, false);
+    std::string name = make_cc_expression(o, *e, false);
 
-    o__ "if(t0 == s){\n";
+    o__ "if(" << name << " == s){\n";
     o____ "cond = true;\n";
     o__ "}else{\n";
     paren += "}";
@@ -748,8 +758,8 @@ void OUT_ANALOG::make_switch(std::ostream& o, AnalogSwitchStmt const& s) const
     o__ "{\n";
     {
       indent y;
-      make_cc_expression(o, s.control(), false);
-      o__ "s = t0;\n";
+      std::string name = make_cc_expression(o, s.control(), false);
+      o__ "s = " << name << ";\n";
     }
     o__ "}\n";
     std::string paren="";
@@ -762,7 +772,7 @@ void OUT_ANALOG::make_switch(std::ostream& o, AnalogSwitchStmt const& s) const
       }else if(i->cond_or_null()){
 	o << "{\n";
 
-	o << "bool cond = false;\n";
+	o__ "bool cond = false;\n";
 	make_cond_expressions(o, *i->cond_or_null());
 
 	o__ "if (cond) {\n";

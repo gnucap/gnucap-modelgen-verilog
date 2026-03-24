@@ -28,6 +28,7 @@
 #include "mg_token.h"
 #include "mg_href.h"
 #include "mg_storage.h"
+#include "mg_assign.h"
 #include "l_stlextra.h"
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -660,7 +661,7 @@ void Port_3::dump(std::ostream& out)const
 +	  {attribute_instance}  module_or_generate_item_declaration
 +	| {attribute_instance}  local_parameter_declaration  ";"
 -	| {attribute_instance}  parameter_override
--	| {attribute_instance}  continuous_assign
++	| {attribute_instance}  continuous_assign
 -	| {attribute_instance}  gate_instantiation
 -	| {attribute_instance}  udp_instantiation
 +	| {attribute_instance}  module_instantiation
@@ -761,6 +762,7 @@ void Module::parse(CS& f)
   _circuit->parse_ports(f);
   f >> ';';
   parse_body(f);
+  setup_assign();
   setup_functions();
   setup_nodes();
 }
@@ -780,6 +782,8 @@ void Module::parse_body(CS& f)
   _analog->set_owner(this);
   assert(_always);
   _always->set_owner(this);
+  assert(_assign);
+  _assign->set_owner(this);
   // _tr_eval.set_owner(this);
   // _validate.set_owner(this);
 
@@ -812,6 +816,7 @@ void Module::parse_body(CS& f)
       || ((f >> "parameter ") && (f >> _parameters))
       || ((f >> "localparam ") && (f >> _parameters))
       || ((f >> "aliasparam ") && (f >> _aliasparam))
+      || ((f >> "assign ") && (f >> *_assign))
       || ((f >> "analog ") && f >> *_analog)
       || ((f >> "always ") && f >> *_always)
       || ((f >> "endmodule ") && (end = true))
@@ -951,12 +956,10 @@ void Module::dump(std::ostream& o)const
 //    o << local_params() << "\n";
 //  }else{ untested();
 //  }
-  if(circuit()->element_list().size()){
-//    o__ "// circuit\n";
-    o << circuit()->element_list() << "\n";
-  }else{
-  }
+  o << *circuit();
 
+  assert(_assign);
+  _assign->dump(o);
   assert(_analog);
   _analog->dump(o);
   assert(_always);
@@ -1145,11 +1148,6 @@ void Module::push_back(Filter /*const?*/ * f)
   _circuit->push_back(f);
 }
 /*--------------------------------------------------------------------------*/
-void Circuit::push_back(Filter /*const?*/ * f)
-{
-  _filters.push_back(f);
-}
-/*--------------------------------------------------------------------------*/
 void Module::push_back(FUNCTION_* f)
 {
   _func.push_back(f);
@@ -1165,6 +1163,8 @@ void Module::push_back(Base* x)
     auto A = prechecked_cast<Analog*>(_analog); // needed? use LiSt?
     assert(A);
     A->push_back(a);
+  }else if(auto e = dynamic_cast<Element_2*>(x)){
+    mutable_circuit().push_back(e);
   }else{
     Block::push_back(x);
   }
@@ -1228,6 +1228,7 @@ Module::Module()
 {
   new_analog(&_analog);
   new_always();
+  new_assign();
   new_circuit();
   new_hier_refs(&_hrefs);
 }
@@ -1238,6 +1239,8 @@ Module::~Module()
   detach_out_vars(); // delete variables?
   delete_circuit();
   delete_hier_refs(&_hrefs);
+  delete_always();
+  delete_assign();
 }
 /*--------------------------------------------------------------------------*/
 bool Node::is_used() const
@@ -1465,6 +1468,19 @@ void Module::setup_storage()
   va.sift_locals(this); // should all be local at top level..
 }
 /*--------------------------------------------------------------------------*/
+bool Module::has_submodule() const
+{
+  assert(circuit());
+  auto aa = prechecked_cast<Assign const*>(&assigns());
+  assert(aa);
+  return !circuit()->element_list().is_empty() || !aa->is_empty();
+}
+/*--------------------------------------------------------------------------*/
+// bool Module::has_assign() const
+// {
+//   return _assign->size();
+// }
+/*--------------------------------------------------------------------------*/
 bool Module::has_states() const
 {
   incomplete();
@@ -1475,6 +1491,11 @@ bool Module::has_constants() const
 {
   // possible false positives
   return variables().size();
+}
+/*--------------------------------------------------------------------------*/
+void Module::setup_assign()
+{
+  ::setup_assign(*this);
 }
 /*--------------------------------------------------------------------------*/
 void filter_setup(MGVAMS_FILTER*, Module*);
@@ -1504,6 +1525,12 @@ Base /*const*/ * Module::new_href(std::string const&n)
 Branch_Ref Module::new_filter(Node* x)
 {
   return new_branch(x, &Node_Map::mg_ground_node);
+}
+/*--------------------------------------------------------------------------*/
+// BUG
+void Circuit::push_back(Element_2 /*const?*/ * f)
+{
+  _element_list.push_back(f);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

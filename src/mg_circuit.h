@@ -84,7 +84,6 @@ class Element_2 : public Owned_Base {
   std::string _module_or_paramset_identifier;
   std::string _name_of_module_instance;
   Port_Connection_List _list_of_port_connections;
-  Port_1_List _current_port_list;
   Parameter_3_List _list_of_parameter_assignments;
   std::string _eval;
   std::string _value;
@@ -105,6 +104,7 @@ public:
 //  const std::string& module_or_paramset_identifier()const { untested();return _module_or_paramset_identifier;}
   void set_dev_type(std::string const& s){_module_or_paramset_identifier = s;}
   void set_eval(std::string const& s){_eval = s;}
+  void set_value(std::string const& s){_value = s;}
   void set_state(std::string const& s){_state = s;}
   virtual std::string dev_type()const {return _module_or_paramset_identifier;}
   virtual Nature const* nature()const { untested();return nullptr;}
@@ -112,20 +112,26 @@ public:
   const Parameter_3_List&
 		     list_of_parameter_assignments()const {return _list_of_parameter_assignments;}
   const Port_Connection_List& ports()const	  {return _list_of_port_connections;}
-  const Port_1_List& current_ports() const{ untested();return _current_port_list;}
   virtual std::string instance_name()const  { untested();return _name_of_module_instance;}
+  void set_label(std::string const& l) {_name_of_module_instance = l;}
   virtual std::string short_label()const 	  {return _name_of_module_instance;}
   virtual std::string code_name()const  {return "_e_" + _name_of_module_instance;}
   const std::string& eval()const 	{return _eval;}
-  const std::string& value()const 	{ untested();return _value;}
+  const std::string& value()const 	{return _value;}
   const std::string& args()const 	{ untested();return _args;}
   virtual const std::string& omit()const 	{return _omit;}
   const std::string& reverse()const 	{ untested();return _reverse;}
   virtual std::string state()const	{return _state;}
-  virtual size_t	     num_nodes()const	{return ports().size();}
-  virtual size_t	     num_states()const	{ untested();unreachable(); return 0;}
+  virtual int	     net_nodes()const	{return int(ports().size());}
+  virtual int	     num_states()const	{ untested();unreachable(); return 0;}
   virtual bool is_used()const {return true;} // incomplete.
   virtual bool is_used_in_branch()const {return true;} // incomplete.
+  virtual std::string const& port_name(int)const {
+    unreachable(); static std::string s("err"); return s;
+  }
+  virtual std::string const& port_value(int)const {
+    unreachable(); static std::string s("err"); return s;
+  }
 }; // Element_2
 /*--------------------------------------------------------------------------*/
 class Dep;
@@ -188,7 +194,7 @@ public:
   std::string const& omit()const override;
   std::string dev_type()const override;
   void add_dep(Dep const&);
-  size_t num_nodes()const override;
+  int net_nodes()const override;
   std::string state()const override;
   std::string state(std::string const& n)const;
   virtual bool has_element() const;
@@ -223,7 +229,7 @@ public:
   bool has_pot_source()const;
   bool is_source()const {return _source || has_pot_source() || has_flow_source();}
   bool is_shadow_source()const;
-  size_t num_states()const override;
+  int num_states()const override;
   Discipline const* discipline()const override;
   Nature const* nature()const override;
 public:
@@ -369,12 +375,15 @@ public:
   void clear();
 };
 /*--------------------------------------------------------------------------*/
+class Token_NODE;
 class Node_Map{
   typedef std::map<std::string, Node*> map; // use set??
   typedef std::vector<Node*> nodes;
+  typedef std::vector<Token_NODE*> tokens; // move to Module?
   typedef nodes::const_iterator const_iterator;
   typedef nodes::const_reverse_iterator const_reverse_iterator;
   nodes _nodes;
+  tokens _tokens;
   map _map;
 public:
   static Node mg_ground_node;
@@ -417,7 +426,7 @@ public:
   explicit Circuit();
   ~Circuit();
   void parse(CS&) override;
-  void dump(std::ostream&)const override{ untested();incomplete();}
+  void dump(std::ostream&)const override;
 
   Port_3* find_port(std::string const& n);
 
@@ -444,6 +453,7 @@ public:
 
 public: //TODO
   void push_back(Filter /*const?*/ * f);
+  void push_back(Element_2 /*const?*/ * f);
   New_Port_List&	  ports()		{return _ports;}
   Port_3_List_3&	  input()		{return _input;}
   Port_3_List_3&	  output()		{return _output;}

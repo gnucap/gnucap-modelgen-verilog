@@ -236,136 +236,139 @@ static char* ftos_(double num, int fieldwidth, int len, int fmt)
   return str;
 }
 /*--------------------------------------------------------------------------*/
+bool is_cc_ref(Token const* t)
+{
+  if (dynamic_cast<Token_PAR_REF const*>(t)) {
+    return true;
+  }else if (dynamic_cast<Token_VAR_REF const*>(t)) {
+    return true;
+  }else if (dynamic_cast<Token_PORT_BRANCH const*>(t)) {
+    return true;
+  }else if (dynamic_cast<Token_CONSTANT const*>(t)) {
+    return true;
+  }else if (dynamic_cast<Token_HIER_REF const*>(t)) {
+    return true;
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool is_cc_ref(Expression const* e)
+{
+  assert(e);
+  assert(e->size());
+
+  if(e->size()==1){
+    return is_cc_ref(*e->begin());
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
 class RPN_VARS {
   typedef enum{
+    t_log = 0,
     t_flt,
     t_ddo,
     // t_int,
     t_str,
     t_ref,
     t_arr,
+    t_count,
   } type;
   typedef std::stack<int> stack;
   std::stack<type> _types;
   std::stack<int> _args;
   std::stack<std::string> _refs;
 
-  stack _flt_stack;
-  stack _ddo_stack;
-  stack _str_stack;
-  stack _arr_stack;
-
-  int _flt_idx{-1};
-  int _flt_alloc{0};
-  int _ddo_idx{-1};
-  int _ddo_alloc{0};
-  int _str_idx{-1};
-  int _str_alloc{0};
-  int _arr_idx{-1};
-  int _arr_alloc{0};
+  stack _stack[t_count];
+  int _idx[t_count];
+  int _alloc[t_count];
   TData const* _deps;
 public:
-  explicit RPN_VARS(TData const* d) : _deps(d) {}
+  explicit RPN_VARS(TData const* d) : _deps(d) {
+    std::fill(_idx, _idx+t_count, -1);
+    std::fill(_alloc, _alloc+t_count, 0);
+    assert(_idx[0] == -1);
+    assert(_idx[1] == -1);
+    assert(_alloc[0] == 0);
+    assert(_refs.empty());
+  }
   ~RPN_VARS(){
-    assert(_flt_idx == -1);
-    assert(_ddo_idx == -1);
-    assert(_arr_idx == -1);
-    assert(_str_idx == -1);
+    assert(_idx[0] == -1);
+    assert(_idx[1] == -1);
     assert(_refs.empty());
   }
   void pop() {
     assert(!_types.empty());
-    switch(_types.top()){
-    case t_flt:
-      assert(_flt_idx>-1);
-      --_flt_idx;
-      break;
-    case t_arr:
-      assert(_arr_idx>-1);
-      --_arr_idx;
-      break;
-    case t_ddo:
-      assert(_ddo_idx>-1);
-      --_ddo_idx;
-      break;
-    case t_ref:
+    int t = _types.top();
+    if(t == t_ref){
       _refs.pop();
-      break;
-    case t_str:
-      assert(_str_idx>-1);
-      --_str_idx;
-      break;
-    default:untested();
-      unreachable();
+    }else{
+      assert(_idx[t]>-1);
+      --_idx[t];
     }
     _types.pop();
   }
-  void new_string(std::ostream& o){
-    ++_str_idx;
-    if(_str_idx < _str_alloc){ untested();
-    }else{
-      assert(_str_idx==_str_alloc);
-      ++_str_alloc;
-      o__ "std::string s" << _str_idx << ";\n";
-    }
-    _types.push(t_str);
-  }
+  void new_string(std::ostream& o) { new_(o, t_str); }
   void new_array(std::ostream& o, Token_ARRAY_ const& /*TODO*/){
-    ++_arr_idx;
+    ++_idx[t_arr];
     _types.push(t_arr);
-    if(_arr_idx < _arr_alloc){ untested();
-//      o__ "a" << _arr_idx << "= array_";
+    if(_idx[t_arr] < _alloc[t_arr]){ untested();
       o__ code_name() << "= array_";
     }else{
       o__ "array_ " << code_name();
-      ++_arr_alloc;
+      ++_alloc[t_arr];
     }
   }
   void new_ddouble(std::ostream& o){
-    ++_ddo_idx;
-    if(_ddo_idx < _ddo_alloc){
+    ++_idx[t_ddo];
+    if(_idx[t_ddo] < _alloc[t_ddo]){
     }else{
-      assert(_ddo_idx==_ddo_alloc);
-      ++_ddo_alloc;
-      assert(_ddo_idx>=0);
+      assert(_idx[t_ddo]==_alloc[t_ddo]);
+      ++_alloc[t_ddo];
+      assert(_idx[t_ddo]>=0);
       if(_deps){
-	o__ "ddouble t" << _ddo_idx << ";\n";
+	o__ "ddouble t" << _idx[t_ddo] << ";\n";
       }else{
-	o__ "ddouble t" << _ddo_idx << ";\n"; // TODO? some deps?
+	o__ "ddouble t" << _idx[t_ddo] << ";\n"; // TODO? some deps?
       }
       if(!_deps){
       }else if(!options().optimize_deriv()){ untested();
-	o__ "t" << _ddo_idx << ".set_all_deps(); // (all deriv)\n"; // code_name??
+	o__ "t" << _idx[t_ddo] << ".set_all_deps(); // (all deriv)\n"; // code_name??
       }else{
-	o__ "//t" << _ddo_idx << ".set_no_deps();\n"; // ...
+	o__ "//t" << _idx[t_ddo] << ".set_no_deps();\n"; // ...
 	for(Dep const& i: _deps->ddeps()){
-	  o__ "//t" << _ddo_idx << "[d" << probe(i)->code_name() << "] = 0.; // (output dep)\n";
+	  o__ "//t" << _idx[t_ddo] << "[d" << probe(i)->code_name() << "] = 0.; // (output dep)\n";
 	}
       }
     }
     _types.push(t_ddo);
   }
-  void new_float(std::ostream& o){
-    ++_flt_idx;
-    if(_flt_idx < _flt_alloc){
+  void new_logic(std::ostream& o) { new_(o, t_log); }
+  void new_float(std::ostream& o) { new_(o, t_flt); }
+private:
+  void new_(std::ostream& o, int t){
+    ++_idx[t];
+    if(_idx[t] < _alloc[t]){
+      _types.push(type(t));
     }else{
-      assert(_flt_idx==_flt_alloc);
-      ++_flt_alloc;
-      assert(_flt_idx>=0);
-      o__ "double f" << _flt_idx << ";\n"; // code_name?
+      trace3("DBG??", t, _idx[t], _alloc[t]);
+      assert(_idx[t]==_alloc[t]);
+      ++_alloc[t];
+      assert(_idx[t]>=0);
+      _types.push(type(t));
+      o__ cpptype() << " " << code_name() << ";\n"; // code_name?
     }
-    _types.push(t_flt);
   }
+public:
   bool is_ref() const{
     assert(!_types.empty());
     return _types.top() == t_ref;
   }
   void new_literal(std::ostream& o, Token_CONSTANT const& c);
   void new_rhs(Token_NODE const* v){
-    {
-      _refs.push("MOD::n_" + v->code_name() + "/*node*/");
-    }
-    _types.push(t_ref);
+    new_ref("MOD::n_" + v->code_name() + "/*node*/");
   }
   void new_rhs(Token_VAR_REF const* v){
     // TODO: linear?
@@ -373,21 +376,16 @@ public:
     //   // crash?
     //   _refs.push("ddouble(" + (*v)->code_name() + ")/*rhsvar*/");
     // }else
-    {
-      _refs.push("" + v->code_name() + "/*rhsvar*/");
-    }
-    _types.push(t_ref);
+    new_ref(v->code_name() + "/*rhsvar*/");
   }
   void new_rhs(Token_HIER_REF const* v){
     // TODO: what type is it??
-    _refs.push("pc->" + v->code_name() + ".get_double()");
-    _types.push(t_ref); // what?
+    new_ref("pc->" + v->code_name() + ".get_double()");
   }
   void new_rhs(Token_PAR_REF const* v){
     // _refs.push("ddouble(" + (*v)->code_name() + ")/*rhsvar*/");
     // _refs.push((*v)->type() + "(" + (*v)->code_name() + ") /*rhspar*/");
-    _refs.push("(" + (*v)->code_name() + ") /*rhspar*/");
-    _types.push(t_ref);
+    new_ref("(" + (*v)->code_name() + ") /*rhspar*/");
   }
   void new_ref(std::string name){
     _refs.push(name);
@@ -404,20 +402,15 @@ public:
     return _types.size() - 1 - size_t(_args.top());
   }
   void enter_scope(){
-    _flt_stack.push(_flt_alloc);
-    _ddo_stack.push(_ddo_alloc);
-    _str_stack.push(_str_alloc);
-    _arr_stack.push(_arr_alloc);
+    for(int i = 0 ; i<t_count; ++i){
+      _stack[i].push(_alloc[i]);
+    }
   }
   void leave_scope(){
-    _flt_alloc = _flt_stack.top();
-    _flt_stack.pop();
-    _ddo_alloc = _ddo_stack.top();
-    _ddo_stack.pop();
-    _str_alloc = _str_stack.top();
-    _str_stack.pop();
-    _arr_alloc = _arr_stack.top();
-    _arr_stack.pop();
+    for(int i = 0 ; i<t_count; ++i){
+      _alloc[i] = _stack[i].top();
+      _stack[i].pop();
+    }
   }
   void args_pop(){
     assert(!_args.empty());
@@ -426,22 +419,31 @@ public:
   size_t size() const{ untested();
     return _refs.size();
   }
+  std::string cpptype()const {
+    assert(_types.size());
+    int t = _types.top();
+    assert(t<t_count);
+    static std::string names[] = {
+       "LOGICVAL", "double", "ddouble",
+       "std::string", "auto&",
+       "incomplete_cpptype"
+    };
+    return names[t];
+  }
+private:
+  char var_name(int i)const {
+    static char names[] = "lftsra";
+    assert(i<t_count);
+    return names[i];
+  }
+public:
   std::string code_name() const{
     assert(_types.size());
-    switch(_types.top()) {
-    case t_flt:
-      return "f" + std::to_string(_flt_idx);
-    case t_ddo:
-      return "t" + std::to_string(_ddo_idx);
-    case t_arr:
-      return "a" + std::to_string(_arr_idx);
-    case t_str:
-      return "s" + std::to_string(_str_idx);
-    case t_ref:
+    int t = _types.top();
+    if(t == t_ref) {
       return _refs.top();
-    default:untested();
-      unreachable();
-      return "";
+    }else{
+      return std::string(1, var_name(t)) + std::to_string(_idx[t]);
     }
   }
   bool has_deps()const { return _deps; }
@@ -458,6 +460,7 @@ public:
   std::string make_cc_expression_(std::ostream& o, Expression const& e);
 private:
   RPN_VARS& vars() {return _s;}
+  void new_variable(std::ostream& o, Token const* t);
   std::string make_cc_expression_(std::ostream& o, Token const* t) {
     Expression_ e;
     e.push_back(const_cast<Token*>(t));
@@ -468,8 +471,33 @@ private:
   void make_cc_array(std::ostream& o, Token_ARRAY_ const* t);
   void make_cc_call(std::ostream& o, Token_CALL const* t);
   bool is_precalc()const {return _ctx == "precalc";}
+  bool is_adjust()const {return _ctx == "adjust";}
 };
 /*--------------------------------------------------------------------------*/
+void OUT_EXPRESSION::new_variable(std::ostream& o, Token const* t)
+{
+  Data_Type const* d = nullptr;
+  if(auto F = dynamic_cast<const Token_CALL*>(t)){
+    d = (*F)->return_type(); // BUG.
+  }else{
+    incomplete();
+  }
+
+  if(_ctx == "logic") {
+    // hack
+    vars().new_logic(o);
+  }else if(!d) {
+    // incomplete();
+    o__ "/* void? */\n";
+    vars().new_ddouble(o); // TODO
+  }else if(d->is_real()){
+    vars().new_ddouble(o);
+  }else if(d->is_string()){
+    vars().new_string(o);
+  }else{
+    vars().new_float(o); // TODO
+  }
+}
 /*--------------------------------------------------------------------------*/
 static void make_cc_string(std::ostream& o, String const& e)
 {
@@ -552,17 +580,7 @@ void OUT_EXPRESSION::make_cc_array(std::ostream& o, Token_ARRAY_ const* A)
 /*--------------------------------------------------------------------------*/
 void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
 {
-  Data_Type const* rt = (*F)->return_type();
-  if(!rt) {
-    o__ "/* void? */\n";
-    vars().new_float(o); // TODO
-  }else if(rt->is_real()){
-    vars().new_ddouble(o);
-  }else if(rt->is_string()){
-    vars().new_string(o);
-  }else{
-    vars().new_float(o); // TODO
-  }
+  new_variable(o, F);
   vars().stop();
   vars().enter_scope();
   o__ "{ // scope\n"; {
@@ -589,13 +607,14 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
   o__ "// --- \n";
   vars().args_pop();
   vars().leave_scope();
+  Data_Type const* rt = (*F)->return_type();
   if(!rt) {
     o__"(void)" <<  vars().code_name() << ";\n";
   }else{
     o__ vars().code_name() << " = ";
   }
 
-  if(_ctx=="adjust"){
+  if(is_adjust()) {
   }else if((*F)->is_in_common()) {
   }else{
     o << "/*"<<_ctx<<"*/ d->";
@@ -603,12 +622,12 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
 
   o << F->code_name();
   if((*F)->has_modes()){
-    if(_ctx=="adjust"){
+    if(is_adjust()) {
       o << "precalc";
     }else{
       o << _ctx;
     }
-  }else if(_ctx=="precalc" && (*F)->has_precalc()){
+  }else if(is_precalc() && (*F)->has_precalc()){
     // TODO: cleanup.
     o << "__" + _ctx;
   }else{
@@ -618,7 +637,7 @@ void OUT_EXPRESSION::make_cc_call(std::ostream& o, Token_CALL const* F)
   std::string comma = "";
   // if(_ctx=="precalc"){ untested();
   // }else
-  if(_ctx=="adjust"){
+  if(is_adjust()) {
     // there is no context in adjust
   }else if((*F)->needs_context()){
     o << "d /* "<<_ctx<<"*/";
@@ -680,7 +699,14 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
   for (const_iterator i = e.begin(); i != e.end(); ++i) {
     trace3("mg_out_expr loop", (*i)->name(), (*i)->data(), vars().size());
 
-    if (auto var = dynamic_cast<const Token_VAR_REF*>(*i)) {
+    if (auto n = dynamic_cast<const Token_NODE*>(*i)) {
+      if(_ctx != "logic") {
+	vars().new_rhs(n);
+      }else{
+	Token_VAR_REF const* r = n;
+	vars().new_rhs(r);
+      }
+    }else if (auto var = dynamic_cast<const Token_VAR_REF*>(*i)) {
       vars().new_rhs(var); // if linear?
 //    }else if (auto t = dynamic_cast<const Token_OUT_VAR*>(*i)) { untested();
 //      vars().new_rhs(t); // if linear?
@@ -690,9 +716,10 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
       vars().new_rhs(hh);
     }else if(auto pp = dynamic_cast<const Token_ACCESS*>(*i)) {
       vars().new_ddouble(o);
+      std::string lhsname = vars().code_name();
       if(!vars().has_deps()){ untested();
       }else if(options().optimize_deriv()){
-	o__ vars().code_name() << ".set_no_deps();\n";
+	o__ lhsname << ".set_no_deps();\n";
 	// for(auto i: vars().deps()){ untested();
 	//   o__ vars().code_name() << "[d" << i->code_name() << "] = 0.; // (output dep)\n";
 	// }
@@ -700,13 +727,13 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
       }
 
       if(!vars().has_deps()){ untested();
-        o__ vars().code_name() << " = 0.; // no deps.\n";
+        o__ lhsname << " = 0.; // no deps.\n";
       }else if(pp->is_short()){
-	o__ vars().code_name() << " = 0.; // short probe\n";
+	o__ lhsname << " = 0.; // short probe\n";
       }else if(is_precalc()){
-        o__ vars().code_name() << " = 0.; // precalc.\n";
+        o__ lhsname << " = 0.; // precalc.\n";
       }else{
-	o__ vars().code_name() << " = p->xs" << pp->code_name_() << "();\n";
+	o__ lhsname << " = p->xs" << pp->code_name_() << "();\n";
       }
     }else if (auto p = dynamic_cast<const Token_PAR_REF*>(*i)) {
       vars().new_rhs(p);
@@ -737,6 +764,7 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
       }
 #endif
     }else if (auto bo = dynamic_cast<const Token_BINOP_*>(*i)) {
+      // make_cc_binop(..);
 
       assert(bo->op1());
       // assert(bo->op1()->data());
@@ -750,7 +778,8 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
       vars().pop();
       std::string arg1 = vars().code_name();
       vars().pop();
-      vars().new_ddouble(o);
+
+      new_variable(o, *i);
 
       auto op = (*i)->name()[0];
       if ( op == '-'
@@ -781,12 +810,13 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
 	throw Exception("run time error in make_cc_expression: " + (*i)->name());
       }
     }else if (auto u = dynamic_cast<const Token_UNARY_*>(*i)) {
+      // make_cc_unary(..);
       assert(u->op1());
       make_cc_expression_(o, u->op1());
 
       std::string arg1 = vars().code_name();
       vars().pop();
-      vars().new_ddouble(o);
+      new_variable(o, *i);
 
       auto op = (*i)->name()[0];
       if(op == '-' || op == '!' || op == '+') {
@@ -807,26 +837,24 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
       o__ "{ // ternary " << _ctx << "\n";
       {
 	indent y;
-	o__ "ddouble& tt0 = " << vars().code_name() << ";\n"; // BUG: float??
+	o__ vars().cpptype() << "& tt0 = " << vars().code_name() << ";\n"; // BUG: float??
 	o__ "if(" << arg1 << "){ // true part\n";
 	{
 	  indent x;
 	  // BUG: nest?
-	  make_cc_expression(o, *t->true_part(), true, _ctx);
-	  o__ "tt0 = t0;\n";
+	  std::string name = make_cc_expression(o, *t->true_part(), true, _ctx);
+	  o__ "tt0 = " << name << ";\n";
 	}
 	o__ "}else{ // false part\n";
 	{
 	  indent x;
 	  // BUG: nest?
-	  make_cc_expression(o, *t->false_part(), true, _ctx);
-	  o__ "tt0 = t0;\n";
+	  std::string name = make_cc_expression(o, *t->false_part(), true, _ctx);
+	  o__ "tt0 = " << name << ";\n";
 	}
 	o__ "}\n";
       }
       o__ "}\n";
-    }else if (auto n = dynamic_cast<const Token_NODE*>(*i)) {
-      vars().new_rhs(n);
     }else{ untested();
       assert(!dynamic_cast<const Token_UNARY*>(*i));
       assert(!dynamic_cast<const Token_SYMBOL*>(*i));
@@ -847,9 +875,11 @@ std::string make_cc_expression(std::ostream& o, Expression const& e, bool dynami
 {
   TData const* deps = nullptr;
   if(ctx=="precalc"){
+    // assert(!dynamic);
   }else{
   }
   if(ctx == "af"){
+  }else if(ctx == "logic"){
     // no deps-> use ddouble..
   }else if(!dynamic && ctx!="precalc"){
   }else if(auto ex = dynamic_cast<Expression_ const*>(&e)){
@@ -858,12 +888,24 @@ std::string make_cc_expression(std::ostream& o, Expression const& e, bool dynami
   }
   RPN_VARS s(deps);
   OUT_EXPRESSION ex(s, ctx);
+  // o__ "// expression\n";
   std::string name = ex.make_cc_expression_(o, e);
+  // o__ "// /expression\n";
 
-  if(s.is_ref()){
+  // BUG: this does not belong here.
+  if(ctx == "adjust"){
+    o__ "(void)" << name << ";\n";
+  }else if(deps && deps->size() && (dynamic || ctx == "precalc")){
+    // o__ "// dynamic & deps " << ctx << " " << deps->size() << "\n";
     s.new_ddouble(o);
     s.pop();
     o__ "t0 = " << s.code_name() << "; // " << ctx << "\n";
+  }else if(s.is_ref()){
+    o__ "// ref. type?\n";
+    s.new_float(o);
+    s.pop();
+    o__ "f0 = " << s.code_name() << "; // " << ctx << "\n";
+    o__ "(void) f0;\n"; // BUG
   }else{
   }
   s.pop();

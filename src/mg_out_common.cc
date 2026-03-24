@@ -520,12 +520,12 @@ static void make_param_eval_range(std::ostream& o, ValueRange const& p)
   if(auto ri = dynamic_cast<ValueRangeInterval const*>(spec)){
     o__ "double lb, ub;\n";
     o__ "{\n";
-    make_cc_expression(o, ri->lb().expression());
-    o__ "lb = " << "t0" << ";\n";
+    make_cc_expression(o, ri->lb().expression(), false, "precalc");
+    o__ "lb = " << "f0" << ";\n";
     o__ "}\n";
     o__ "{\n";
-    make_cc_expression(o, ri->ub().expression());
-    o__ "ub = " << "t0" << ";\n";
+    make_cc_expression(o, ri->ub().expression(), false, "precalc");
+    o__ "ub = " << "f0" << ";\n";
     o__ "}\n";
 
   }else{
@@ -721,13 +721,14 @@ static void make_eval_subdevice_parameters(std::ostream& o , const Element_2& e)
 {
   for(auto p : e.list_of_parameter_assignments()){
     o__ "{ // eval_subdevice_parameters \n";
+    std::string t0;
     {
       indent x;
-      make_cc_expression(o, p->default_val().expression(), false, "adjust");
+      t0 = make_cc_expression(o, p->default_val().expression(), false, "adjust");
     }
     o____ "PARAM_INSTANCE p;\n";
     o____ "p = PARAMETER<vReal>();\n";
-    o____ "vReal r(t0);\n";
+    o____ "vReal r(" << t0 << ");\n";
     o____ "p.set_fixed(&r);\n";
     o____ "_netlist_params.set(\"["<< e.short_label() <<"]"<< p->name() <<"\", p);\n";
     o____ "trace2(\"make eval ["<< e.short_label() <<"]"<< p->name() <<"\", p, _netlist_params.size());\n";

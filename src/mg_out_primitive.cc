@@ -22,7 +22,8 @@
 #include "mg_primitive.h"
 #include "mg_.h" // TODO
 /*--------------------------------------------------------------------------*/
-static void make_cc_class(std::ostream& o, const Primitive& p)
+// make_eval?
+static void make_common_primitive(std::ostream& o, const Primitive& p)
 {
   std::string class_name = "COMMON_" + p.identifier().to_string();
   std::string base_class_name;
@@ -46,12 +47,12 @@ static void make_cc_class(std::ostream& o, const Primitive& p)
   o____ "assert(i >= 0);\n";
   o____ "static std::string names[] = {";
   std::string comma = "";
-  for (auto nn : p.ports()){
-    o << comma << '"' << nn->name() << '"';
+  for (int nn = 0; nn < p.net_nodes(); ++nn){
+    o << comma << '"' << p.port_name(nn) << '"';
     comma = ", ";
   }
   o____ "};\n";
-  o____ "if(i < " << p.ports().size() << "){\n";
+  o____ "if(i < " << p.net_nodes() << "){\n";
   o______ "return names[i];\n";
   o____ "}else{ untested();\n";
   o______ "return \"\";\n";
@@ -95,7 +96,7 @@ static std::string mkmask(std::vector<int> const& line, int what)
 }
 /*--------------------------------------------------------------------------*/
 // table lookup inspired by iverilog/vvp
-static void make_cc_common(std::ostream& o, const Primitive& p)
+static void make_cc_eval(std::ostream& o, const Primitive& p)
 {
   std::string class_name = "COMMON_" + p.identifier().to_string();
   o << "LOGICVAL " << class_name << "::logic_eval(node_t const* p, int incount) const\n{\n";
@@ -155,8 +156,8 @@ static void make_cc_install(std::ostream& o, const Primitive& p)
 void make_cc_primitive(std::ostream& o, const Primitive& p)
 {
   make_tag(o);
-  make_cc_class(o, p);
-  make_cc_common(o, p);
+  make_common_primitive(o, p);
+  make_cc_eval(o, p);
   make_cc_install(o, p);
 }
 /*--------------------------------------------------------------------------*/

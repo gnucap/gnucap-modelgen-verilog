@@ -203,6 +203,7 @@ public: // storage
   void submit_variable_access(Variable_Access& va)const;
 private: // implementation
   bool store_deps(TData const&);
+protected:
   std::string code_name()const;
 public: // BUG
   Token_VAR_REF const* decl_token()const;

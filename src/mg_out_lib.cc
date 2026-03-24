@@ -31,11 +31,14 @@ static void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2&
   // }
   o__ "{ // final adjust\n";
 //  o__ p.type() << " val = ";
+  std::string t0;
   if (!(p.default_val().empty())) {
     // o << p.default_val();
     indent i2;
-    make_cc_expression(o, p.default_val().expression(), false, "adjust");
+    t0 = make_cc_expression(o, p.default_val().expression(), false, "adjust");
   }else{ untested();
+    unreachable();
+    t0 = "NA";
     o << "NA;";
   }
 //  o << ";\n";
@@ -43,7 +46,7 @@ static void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2&
   if( p.type().is_string()){
     o << "vString(s0);\n";
   }else{
-    o << p.type() << "(t0.value());\n";
+    o << p.type() << "(" << t0 << ");\n";
   }
   o____ "e_val(&(this->" << p.code_name() << "), ";
   o____ "def , par_scope);\n";
@@ -58,19 +61,22 @@ static void make_final_adjust_eval_local_parameter(std::ostream& o, const Parame
   // }
   o__ "{ // final adjust localparam\n";
 //  o__ p.type() << " val = ";
+  std::string def;
   if (!(p.default_val().empty())) {
     // o << p.default_val();
+    o__ "// w default\n";
     indent i2;
-    make_cc_expression(o, p.default_val().expression(), false, "adjust");
+    def = make_cc_expression(o, p.default_val().expression(), false, "adjust");
   }else{ untested();
+    incomplete();
     o << "NA;";
   }
 //  o << ";\n";
   o____ p.type() << " def = ";
   if( p.type().is_string()){ untested();
-    o << "vString(s0);\n";
+    o << "vString(" << def << ");\n";
   }else{
-    o << p.type() << "(t0.value());\n";
+    o << p.type() << "(" << def << ");\n";
   }
   o____ "this->" << p.code_name() << " = def;\n";
   o__ "}\n";

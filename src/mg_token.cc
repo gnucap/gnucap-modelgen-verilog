@@ -1177,7 +1177,12 @@ Data_Type const& Token_VAR_REF::type() const
     return it->type();
   }else if(auto af = dynamic_cast<Analog_Function const*>(_item)){
     return af->type();
-  }else{ untested();
+  }else if(dynamic_cast<Node const*>(_item)){
+    incomplete();
+    static Data_Type_Real t;
+    return t;
+  }else{
+    assert(0);
     unreachable();
     static Data_Type_Real t;
     return t;
@@ -1205,6 +1210,8 @@ bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
     assert(from.scope());
     return it->propagate_deps(from);
   }else if(dynamic_cast<Analog_Function*>(_item)){
+  }else if(dynamic_cast<Node*>(_item)){
+   // return p->propagate_deps(from);
   }else if(dynamic_cast<Block const*>(_item)){ untested();
   }else{ untested();
     unreachable();
@@ -1370,13 +1377,18 @@ std::string Token_NODE::code_name() const
   return "_n[n_" + name() + "]";
 }
 /*--------------------------------------------------------------------------*/
-void Token_NODE::stack_op(Expression* E) const
+void Token_NODE::stack_op(Expression* e) const
 {
+  auto E = prechecked_cast<Expression_*>(e);
+  assert(E);
   if(!E->is_empty() && dynamic_cast<Token_PARLIST*>(E->back())){
     throw Exception("syntax_error: Node " + name() + " does not take args");
   }else{
   }
   E->push_back(clone());
+  auto n = dynamic_cast<Node const*>(_item);
+  assert(n);
+  E->push_use(n->token());
 }
 /*--------------------------------------------------------------------------*/
 std::string Token_PORT_BRANCH::code_name() const

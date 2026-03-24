@@ -100,20 +100,6 @@ public:
   std::string code_name()const;
 };
 /*--------------------------------------------------------------------------*/
-class Token_NODE : public Token_SYMBOL {
-  Node_Ref const _node;
-public:
-  Token_NODE(Token_NODE const& s)
-    : Token_SYMBOL(s), _node(s._node) { }
-  Token_NODE(Token_SYMBOL const& s, Node_Ref p)
-    : Token_SYMBOL(s), _node(p) { }
-
-  Token_NODE* clone()const override { return new Token_NODE(*this); }
-
-  void stack_op(Expression* E)const override;
-  std::string code_name()const;
-};
-/*--------------------------------------------------------------------------*/
 inline void Token_FUNCTION::attach()
 {
   assert(_function);
@@ -433,12 +419,26 @@ private:
   size_t num_deps() const;
 }; // Token_VAR_REF
 /*--------------------------------------------------------------------------*/
-  // TODO split into Base+DECL
+class Token_NODE : public Token_VAR_REF {
+ // Token_NODE(Token_NODE const& s)
+ //   : Token_VAR_REF(s, s._node) { }
+public:
+  explicit Token_NODE(Token_SYMBOL const& s, Base* p)
+    : Token_VAR_REF(s.name(), p) { }
+  explicit Token_NODE(std::string const& s, Base* p)
+    : Token_VAR_REF(s, p) { }
+
+  Token_NODE* clone()const override { return new Token_NODE(*this); }
+
+  void stack_op(Expression* E)const override;
+  std::string code_name()const;
+  Base* item() { return _item; }
+};
+/*--------------------------------------------------------------------------*/
 class Token_ARGUMENT : public Token_VAR_REF {
 public:
   Token * _var{nullptr}; // why not use VAR_REF::_item?
   direction_t _dir{a_unset};
-  Data_Type const& type()const override;
 public:
   explicit Token_ARGUMENT() : Token_VAR_REF("", nullptr){ untested();unreachable();}
   explicit Token_ARGUMENT(std::string Name, Base* b, Base* tdata)
@@ -457,6 +457,7 @@ public: // LiSt
     return _item;
   }
   void stack_op(Expression* e)const override;
+  Data_Type const& type()const override;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

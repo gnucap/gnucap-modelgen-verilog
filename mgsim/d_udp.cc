@@ -1,6 +1,6 @@
 /*$Id: d_logic.cc  $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
- * Author: Albert Davis <aldavis@gnu.org>
+ *               2026 Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -113,6 +113,11 @@ private:
   bool	   tr_eval_digital();
   bool	   want_analog()const;
   bool	   want_digital()const;
+public:
+  void set_parameters(const std::string& Label, CARD* Parent,
+		      COMMON_COMPONENT* Common, double Value,
+		      int state_count, double state[],
+		      int node_count, const node_t nodes[])override;
 };
 /*--------------------------------------------------------------------------*/
 DEV_LOGIC::DEV_LOGIC(COMMON_COMPONENT* c)
@@ -139,6 +144,32 @@ DEV_LOGIC::DEV_LOGIC(const DEV_LOGIC& p)
     _nodes[ii] = p._nodes[ii];
   }
   ++_count;
+}
+/*--------------------------------------------------------------------------*/
+/* set: set parameters, used in model building
+ */
+void DEV_LOGIC::set_parameters(const std::string& Label, CARD *Owner,
+			       COMMON_COMPONENT *Common, double Value,
+			       int , double [],
+			       int node_count, const node_t Nodes[])
+{
+  set_label(Label);
+  set_owner(Owner);
+  if(Value==0.){
+  }else if(Common){
+    Common = Common->clone();
+    Common->set_param_by_name("delay", to_string(Value));
+  }else{ untested();
+    incomplete();
+  }
+  attach_common(Common);
+
+  assert(node_count <= max_nodes());
+  _net_nodes = short(node_count);
+  if(node_count){
+    std::copy_n(Nodes, node_count, &n_(0));
+  }else{itested();
+  }
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::precalc_last()
@@ -599,7 +630,7 @@ bool DEV_LOGIC::want_digital()const
 int DEV_LOGIC::_count = -1;
 /*--------------------------------------------------------------------------*/
 static DEV_LOGIC p1(nullptr);
-static DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "logic", &p1);
+static DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "__assign", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

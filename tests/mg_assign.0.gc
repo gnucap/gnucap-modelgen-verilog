@@ -1,0 +1,40 @@
+attach ./modelgen_1.so
+attach vams/resistor.so
+attach vams/vpulse.so
+
+options nopicky
+
+`modelgen
+module test_assign0(in, a, b);
+  input in;
+  output a;
+  output b;
+  electrical foo;
+  assign a = !in;
+  assign #100 b = !in;
+endmodule
+`endmodelgen
+
+verilog
+
+!make test_assign0.so >/dev/null
+load ./test_assign0.so
+
+module test(a, b, c);
+  ground \0 ;
+  vpulse #(.val0(0) .val1(5) .width(.2u) .period(.5u)) v1(c, \0 );
+  test_assign0 #() b(.in(c), .a(a), .b(b));
+endmodule
+
+.model logic logic
+
+test #() t(a, b, c)
+
+list
+
+print op v(nodes)
+op
+
+print tran v(nodes) l(nodes)
+tran .5u trace n
+status notime

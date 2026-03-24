@@ -30,8 +30,8 @@ public:
   std::string code_name()const override;
   TData const& deps()const { untested(); assert(_deps); return *_deps; }
 
-  size_t num_states()const override;
-  size_t num_nodes()const override;
+  int num_states()const override;
+  int net_nodes()const override;
   std::string state()const override;
   std::string short_label()const override;
 //  Probe const* prb() const;

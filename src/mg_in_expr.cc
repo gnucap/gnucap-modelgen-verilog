@@ -191,6 +191,13 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 //	p->stack_op(&E); // ?
 	Token_PAR_REF PP(p->name(), p);
 	PP.stack_op(&E);
+      }else if(auto v = dynamic_cast<Variable_Decl*>(r)) { untested();
+	assert(0);
+	unreachable();
+	Token_VAR_REF a(v->name(), v);
+	a.stack_op(&E);
+      }else if(auto np = dynamic_cast<Token_NODE*>(r)) {
+	np->stack_op(&E);
       }else if(auto vt = dynamic_cast<Token_VAR_REF*>(r)) {
 	vt->stack_op(&E);
 
@@ -209,8 +216,10 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
 	Token_PORT_BRANCH a(*symbol, pp);
 	a.stack_op(&E);
       }else if(Node_Ref a = Scope->node(t->name())) {
+	incomplete();
 	// use r??
-	Token_NODE tn(*symbol, a);
+	Token_NODE tn(*symbol, a.mutable_node());
+	assert(!tn.data());
 	tn.stack_op(&E);
       }else{
 	throw Exception("unresolved symbol: " + n);
@@ -232,8 +241,9 @@ void Expression_::resolve_symbols(Expression const& e) // (, TData*)
       tt->stack_op(&E);
       delete tt;
     }else if(Node_Ref a = Scope->node(t->name())) { untested();
-      Token_NODE tn(*symbol, a);
-      tn.stack_op(&E);
+      assert(0); // obsolete.
+     // Token_NODE tn(*symbol, a);
+     // tn.stack_op(&E);
     }else if(Scope->lookup_branch(t->name())) {
       trace1("unresolved branch", t->name());
       // incomplete();
@@ -484,7 +494,7 @@ void Expression_::submit_variable_xs(Variable_Access& va) const
     auto r = prechecked_cast<Token_VAR_REF const*>(t);
     assert(r);
     if(dynamic_cast<Variable_Decl const*>(r->item())){
-    }else{ untested();
+    }else{
     }
     va.use_variable(t);
   }
@@ -507,7 +517,7 @@ void Expression_::submit_variable_xs(Expression_& ee) const
     auto r = prechecked_cast<Token_VAR_REF const*>(t);
     assert(r);
     if(dynamic_cast<Variable_Decl const*>(r->item())){
-    }else{ untested();
+    }else{
     }
     ee.push_use(t);
   }

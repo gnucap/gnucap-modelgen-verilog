@@ -1,0 +1,32 @@
+
+
+module elect_to_logic(el, cm);
+  input el;
+  output cm;
+  electrical el;
+  reg #() cm();
+  ddiscrete #() cm();
+  always begin
+    @(cross((V(el) -  2.5), 1)) begin
+      cm = 1;
+    end
+  end
+
+  always begin
+    @(cross((V(el) -  2.5), -1)) begin
+      cm = 0;
+    end
+  end
+
+endmodule
+module logic_to_elect(cm, el);
+  input cm;
+  output el;
+  electrical el;
+  ddiscrete #() cm();
+  analog begin
+    V(el) <+ transition((((cm == 1))? ( 5.):( 0.)));
+  end
+
+endmodule
+

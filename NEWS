@@ -11,6 +11,7 @@ This file summarizes new features and important changes between snapshots.
 - preprocessor fix. whitespace in string literals
 - overloading diagnostics: use "desc" attribute
 - generate code for variable initialiser expressions
+- generate code for "net_assign"
 - ..
 
 20251222-dev

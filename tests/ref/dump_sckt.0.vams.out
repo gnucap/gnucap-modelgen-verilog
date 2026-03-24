@@ -12,7 +12,6 @@ module net(a, b);
   capacitor #(.c(c)) cb(b, \0 );
   capacitor #(.c(c)) c1(\1 , \0 );
   capacitor #(.c(c)) c2(\2 , \0 );
-
 endmodule
 
 

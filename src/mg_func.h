@@ -115,8 +115,8 @@ public: // code generation
   void setup(Module*) {};
 /*--------------------------------------------------------------------------*/
 public:
-  void	      inc_refs()const	{++_refs;}
-  void	      dec_refs()const	{assert(_refs); --_refs;}
+  void	      inc_refs()const	{ ++_refs;}
+  void	      dec_refs()const	{ assert(_refs); --_refs;}
   bool	      has_refs()const	{return _refs;}
 }; // FUNCTION_
 /*--------------------------------------------------------------------------*/
@@ -218,7 +218,7 @@ private:
 inline FUNCTION_::~FUNCTION_()
 {
   if(has_refs()){
-    incomplete();
+    unreachable();
     std::cerr << "stale ref " << label() << "\n";
   }else{
   }

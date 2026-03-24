@@ -209,7 +209,7 @@ public:
 protected:
 } p1;
 int INSTANCE::_count = -1;
-DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "instance|device_stub", &p1);
+DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "instance|device_stub|__stub", &p1);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class DEV_INSTANCE_PROTO : public INSTANCE {
