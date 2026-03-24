@@ -30,6 +30,7 @@
 #include <e_storag.h>
 #include <e_base.h> // CKT_BASE
 #include <u_sim_data.h> // see simparam
+#include <e_logicnode.h>
 /*--------------------------------------------------------------------------*/
 inline int simulatorVersion()
 {
