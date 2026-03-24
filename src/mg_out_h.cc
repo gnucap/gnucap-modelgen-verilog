@@ -879,7 +879,7 @@ static void make_elt_eval(std::ostream& o, const Element_2& p)
   o____ "bool rv = p && " << base_class_name << "::operator==(x);\n";
   o____ "return rv;\n";
   o__ "}\n";
-  o__ "virtual LOGICVAL logic_eval(node_t const*, int)const override;\n";
+  o__ "virtual LOGICVAL logic_eval(node_l const*, int)const override;\n";
   o__ "std::string name()const override {itested();return \"" << id << "\";}\n";
   o__ "std::string port_name(int i)const override {\n";
   o____ "assert(i >= 0);\n";

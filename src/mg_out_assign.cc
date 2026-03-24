@@ -43,7 +43,7 @@ static void make_one_assign_eval(std::ostream& o, NetAssignment const& na)
 {
   o << "// ASSIGN EVAL\n";
   o << "LOGICVAL COMMON_" << na.code_name()
-    << "::logic_eval(node_t const* n, int i)const\n{\n";
+    << "::logic_eval(node_l const* n, int i)const\n{\n";
   o__ "assert(i == " << na.count_variables() << ");\n";
 
   int ii = 0;

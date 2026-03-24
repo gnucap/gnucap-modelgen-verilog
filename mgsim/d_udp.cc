@@ -31,6 +31,7 @@
 #include "u_xprobe.h"
 #include "e_logic.h"
 #include "e_elemnt.h"
+#include "e_logicnode.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -45,7 +46,7 @@ private:
   smode_t	_oldgatemode;
   smode_t	_gatemode;
   static int	_count;
-  mutable node_t _nodes[PORTS_PER_GATE];	/* PORTS_PER_GATE <= PORTSPERSUBCKT */
+  mutable node_l _nodes[PORTS_PER_GATE];	/* PORTS_PER_GATE <= PORTSPERSUBCKT */
 public:
   explicit	DEV_LOGIC(COMMON_COMPONENT* c=nullptr);
   explicit	DEV_LOGIC(const DEV_LOGIC& p);
@@ -94,7 +95,7 @@ private: // override virtuals
   COMPLEX  ac_amps()const override	{ untested();unreachable(); return 0.;}
   XPROBE   ac_probe_ext(const std::string&)const override;
 
-  node_t& n_(int i)const override {
+  node_l& n_(int i)const override {
     assert(_nodes); assert(i>=0); assert(i<PORTS_PER_GATE); return _nodes[i];
   }
   std::string port_name(int i)const override {
@@ -167,7 +168,7 @@ void DEV_LOGIC::set_parameters(const std::string& Label, CARD *Owner,
   assert(node_count <= max_nodes());
   _net_nodes = short(node_count);
   if(node_count){
-    std::copy_n(Nodes, node_count, &n_(0));
+    std::copy_n(Nodes, node_count, (node_t*)&n_(0));
   }else{itested();
   }
 }
