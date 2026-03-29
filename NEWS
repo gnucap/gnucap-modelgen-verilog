@@ -2,7 +2,7 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
-2026****-dev
+20260329-dev
 ============
 - fix param count bug in overload selection
 - support common pooling (with C++>=20)
@@ -14,7 +14,6 @@ This file summarizes new features and important changes between snapshots.
 - generate code for "net_assign"
 - fopen, fclose, fwrite etc.
 - final_step (without arg)
-- ..
 
 20251222-dev
 ============
