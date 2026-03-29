@@ -41,7 +41,7 @@ static void make_common_primitive(std::ostream& o, const Primitive& p)
   o____ "bool rv = p && " << base_class_name << "::operator==(x);\n";
   o____ "return rv;\n";
   o__ "}\n";
-  o__ "virtual LOGICVAL logic_eval(node_t const*, int)const override;\n";
+  o__ "virtual LOGICVAL logic_eval(node_l const*, int)const override;\n";
   o__ "std::string name()const override {itested();return \"" << p.identifier() << "\";}\n";
   o__ "std::string port_name(int i)const override {\n";
   o____ "assert(i >= 0);\n";
@@ -99,7 +99,7 @@ static std::string mkmask(std::vector<int> const& line, int what)
 static void make_cc_eval(std::ostream& o, const Primitive& p)
 {
   std::string class_name = "COMMON_" + p.identifier().to_string();
-  o << "LOGICVAL " << class_name << "::logic_eval(node_t const* p, int incount) const\n{\n";
+  o << "LOGICVAL " << class_name << "::logic_eval(node_l const* p, int incount) const\n{\n";
   o__ "assert(incount < " << p.net_nodes() << ");\n";
   o__ "std::bitset<" << p.net_nodes() - 1 << "> in0, in1, inx;\n";
   o__ "for(int i=0; i<incount; ++i){\n";

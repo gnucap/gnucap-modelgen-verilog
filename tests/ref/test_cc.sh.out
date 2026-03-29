@@ -42,6 +42,7 @@
 #include <e_storag.h>
 #include <e_base.h> // CKT_BASE
 #include <u_sim_data.h> // see simparam
+#include <e_logicnode.h>
 /*--------------------------------------------------------------------------*/
 inline int simulatorVersion()
 {
@@ -4747,6 +4748,7 @@ ddouble MOD_resistor::_b_white_noise_0__precalc(ddouble, std::string what) {
 #include <e_storag.h>
 #include <e_base.h> // CKT_BASE
 #include <u_sim_data.h> // see simparam
+#include <e_logicnode.h>
 /*--------------------------------------------------------------------------*/
 inline int simulatorVersion()
 {

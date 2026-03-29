@@ -3,6 +3,7 @@
 - delay in $absdelay is a constant.
 - no refcounting in hierarchical refs, use with care
   c.f. mg_href.nest0.gc
+- filter contribution to potential, uses internal node.
 - localparam not considered in overloading
 - ac needs operating point, even if linear:
   c.f. mg2_cccs.0.gc
@@ -12,9 +13,10 @@
 - final_step, initial_step lacks arg
 
 == modelgen
-- dependency tracking glitch aka rram bug
+- dependency tracking glitch aka rram bug (codeberg #2)
+- optimized node, probe bug (codeberg #3)
+- paramset bug (codeberg issue #tbd)
 - ddx, flow(<port>): no derivatives (feature?)
-- filter contribution to potential, uses internal node.
 - cleanup hack breaks detach_all
 - `default_transition missing, and some step control
 - bogus error message on wrong filter args
