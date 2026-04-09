@@ -102,30 +102,11 @@ private:
     BASE_SUBCKT::set_port_by_index(Index, Value);
   }
 
- // bool param_is_printable(int i)const override { untested();
- //   return true;
- // }
-  int param_count()const override {
-      return BASE_SUBCKT::param_count();
-    if(_parent && _parent->subckt()){ untested();
-      trace2("PARAMSET::param_count0", short_label(), BASE_SUBCKT::param_count());
-      return(_parent->param_count());
-    }else if(subckt()){ untested();
-      trace3("PARAMSET::param_count1", short_label(), BASE_SUBCKT::param_count(), subckt()->params()->size());
-      return BASE_SUBCKT::param_count();
-    }else{ untested();
-      trace2("PARAMSET::param_count2", short_label(), BASE_SUBCKT::param_count());
-      return BASE_SUBCKT::param_count();
-    }
-  }
-
 private:
-
   CARD* clone() const override;
   CARD* clone_instance() const override;
 
   int is_valid() const override;
-/*--------------------------------------------------------------------------*/
 
   int set_param_by_name(std::string Name, std::string Value) override;
 
@@ -171,7 +152,6 @@ private:
   CARD* deflate()override;
   void map_nodes()override { untested(); /*no-op*/ }
 private: // no ops for top level
-#if 1
   void precalc_last() override { untested(); assert(!is_device());}
   void tr_begin() override{ untested(); assert(!is_device());}
   void ac_begin() override{ untested(); assert(!is_device());}
@@ -185,83 +165,6 @@ private: // no ops for top level
   bool do_tr() override{ untested(); assert(!is_device()); return true;}
   void do_ac() override{ untested(); assert(!is_device());}
   void ac_load() override{ untested(); assert(!is_device());}
-#else
-  void tr_begin() override{ untested();
-    if(owner()){ untested();
-      BASE_SUBCKT::tr_begin();
-    }else{ untested();
-    }
-  }
-  void tr_load() override{ untested();
-    if(owner()){ untested();
-      BASE_SUBCKT::tr_load();
-    }else{ untested();
-    }
-  }
-  void tr_advance() override{ untested();
-    if(owner()){ untested();
-      BASE_SUBCKT::tr_advance();
-    }else{ untested();
-    }
-  }
-  void tr_restore() override{ untested();
-    if(owner()){ untested();
-      BASE_SUBCKT::tr_restore();
-    }else{ untested();
-    }
-  }
-  void tr_regress() override{ untested();
-    if(owner()){ untested();
-      BASE_SUBCKT::tr_regress();
-    }else{ untested();
-    }
-  }
-  void dc_advance() override{ untested();
-    if(owner()){ untested();
-      BASE_SUBCKT::dc_advance();
-    }else{ untested();
-    }
-  }
-  bool do_tr() override{ untested();
-    if(owner()){ untested();
-      return BASE_SUBCKT::do_tr();
-    }else{ untested();
-      return true;
-    }
-  }
-  bool do_tr_last() override{ untested();
-    if(owner()){ untested();
-      return BASE_SUBCKT::do_tr_last();
-    }else{ untested();
-      return true;
-    }
-  }
-  void do_ac() override{ untested();
-    if(owner()){ untested();
-      BASE_SUBCKT::do_ac();
-    }else{ untested();
-    }
-  }
-  void tr_accept() override{ untested();
-    if(owner()){ untested();
-      BASE_SUBCKT::tr_accept();
-    }else{ untested();
-    }
-  }
-  bool tr_needs_eval()const override{ untested();
-    if(owner()){ untested();
-      return BASE_SUBCKT::tr_needs_eval();
-    }else{ untested();
-      return false;
-    }
-  }
-  void tr_queue_eval()override{ untested();
-    if(owner()){ untested();
-      BASE_SUBCKT::tr_queue_eval();
-    }else{ untested();
-    }
-  }
-#endif
 private:
   COMPONENT const* prepare_dev(CARD const* proto);
 private: // base class?
@@ -313,6 +216,7 @@ CARD* PARAMSET::clone_instance() const
     for(int i=0; i<pl.size(); ++i){
       if(pl.name(i)!=IS_VALID){
 	c->_params.set(pl.name(i), pl[i]);
+	c->_params.set(pl.name(i), "");
       }else{
       }
     }
@@ -396,13 +300,12 @@ int PARAMSET::set_param_by_name(std::string Name, std::string Value)
   }else if(Name==""){ untested();
     throw Exception_No_Match("invalid parameter: " + Name);
   }else if(_parent && _parent->subckt()){
-    PARAM_LIST const* p = _parent->subckt()->params();
-
-    if(p->find(Name) == p->end()){
-      throw Exception_No_Match("invalid parameter: " + Name);
-    }else{
+    PARAM_LIST::const_iterator p = _parent->subckt()->params()->find(Name);
+    if(p != _parent->subckt()->params()->end()){
+      return BASE_SUBCKT::set_param_by_name(Name,Value);
+    }else{itested();
+      throw Exception_No_Match(Name);
     }
-    return BASE_SUBCKT::set_param_by_name(Name, Value);
   }else{
     return BASE_SUBCKT::set_param_by_name(Name, Value);
   }
@@ -466,28 +369,16 @@ void PARAMSET::precalc_first()
     auto c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
     assert(c);
 
-    {
-      PARAM_LIST const* pl = _parent->subckt()->params();
-      assert(pl);
-      c->_params.set_try_again(const_cast<PARAM_LIST*>(pl));
-    }
+    PARAM_LIST* pl = const_cast<PARAM_LIST*>(_parent->subckt()->params());
+    c->_params.set_try_again(pl);
 
-    subckt()->attach_params(&(c->_params), scope());
-    if(_parent){
-      assert(_parent->subckt());
-      subckt()->params()->set_try_again(_parent->subckt()->params());
-    }else{ untested();
-      unreachable(); 
-      subckt()->params()->set_try_again(scope()->params());
-    }
+    subckt()->params()->set_try_again(nullptr);
+    subckt()->params()->eval_copy(c->_params, scope()->params());
+    subckt()->params()->set_try_again(&c->_params);
 
     subckt()->precalc_first();
-  }else{
-    // auto c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
-    // assert(c);
-    // PARAM_LIST const* pl = subckt()->params();
-    // assert(pl);
-    // c->_params.set_try_again(pl);
+  }else if(_parent){
+  }else{ untested();
   }
 
   trace3("PARAMSET::pf done", long_label(), is_valid(), mfactor());
@@ -576,7 +467,7 @@ void resolve_copy(CARD_LIST* t, PARAM_LIST const& p, const CARD_LIST*)
       std::stringstream s;
       E.dump(s);
       out.set(i.name(), s.str());
-    }else{ untested();
+    }else{
     }
   }
 }

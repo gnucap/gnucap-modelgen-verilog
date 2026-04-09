@@ -25,7 +25,6 @@ assuming double in 1.5
 m.R1 is "test_invalid from top level"
 assuming double in 1.5
 assuming double in 1.5
-assuming double in 0
 m.R2 dropped invalid candidate: "test_invalid from top level".
 m.R2: no candidates test_invalid
 >>>>>status notime

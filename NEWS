@@ -2,6 +2,11 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
+20260***-dev
+============
+- fix parameter initialisers in interpreted paramset
+- ..
+
 20260329-dev
 ============
 - fix param count bug in overload selection

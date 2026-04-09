@@ -502,10 +502,10 @@ void OUT_EXPRESSION::new_variable(std::ostream& o, Token const* t)
   }else if(d->is_string()){
     vars().new_string(o);
   }else if(td){
-    if(td->ddeps().size()){ untested();
+    if(td->ddeps().size()){
       o__ "//ddeps. ddouble??\n";
       vars().new_ddouble(o); // TODO
-    }else{ untested();
+    }else{
       incomplete();
       o__ "//no ddeps. float??\n";
       vars().new_float(o); // TODO

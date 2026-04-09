@@ -1,0 +1,17 @@
+verilog
+
+parameter a = 0;
+paramset vs vsource
+  parameter real voltage=1.;
+  parameter real vv = 1. + voltage;
+ .dc=vv;
+endparamset
+
+ground g;
+
+vs #() v1(.p(q), .n(g));
+vs #(.voltage(2.)) v1(.p(p), .n(g));
+
+print dc v(nodes)
+dc
+status notime
