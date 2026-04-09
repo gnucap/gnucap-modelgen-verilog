@@ -2650,15 +2650,6 @@ void MOD_resistor::expand()
   n_(1).allocate(3); // no-op unless floating
   n_(0).allocate(3); // no-op unless floating
   assert(!is_constant());
-  for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
-    CARD* d = (*i)->deflate();
-    if(d == (*i)){
-    }else{
-      assert(d->owner() == this);
-      delete *i;
-      *i = d;
-    }
-  }
 }
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::precalc_last()
@@ -4629,15 +4620,6 @@ void MOD_resistor::expand()
   n_(1).allocate(3); // no-op unless floating
   n_(0).allocate(3); // no-op unless floating
   assert(!is_constant());
-  for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
-    CARD* d = (*i)->deflate();
-    if(d == (*i)){
-    }else{
-      assert(d->owner() == this);
-      delete *i;
-      *i = d;
-    }
-  }
 }
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::precalc_last()
@@ -7034,15 +7016,6 @@ void MOD_capacitor::expand()
   n_(1).allocate(3); // no-op unless floating
   n_(0).allocate(3); // no-op unless floating
   assert(!is_constant());
-  for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
-    CARD* d = (*i)->deflate();
-    if(d == (*i)){
-    }else{
-      assert(d->owner() == this);
-      delete *i;
-      *i = d;
-    }
-  }
 }
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::precalc_last()
@@ -8291,15 +8264,6 @@ void MOD_capacitor::expand()
   n_(1).allocate(3); // no-op unless floating
   n_(0).allocate(3); // no-op unless floating
   assert(!is_constant());
-  for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
-    CARD* d = (*i)->deflate();
-    if(d == (*i)){
-    }else{
-      assert(d->owner() == this);
-      delete *i;
-      *i = d;
-    }
-  }
 }
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::precalc_last()

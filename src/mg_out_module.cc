@@ -1302,7 +1302,6 @@ static void make_module_expand(std::ostream& o, Module const& m)
 
   // make_assign_expand(o, m);
 
-  // TODO: deflate
   o__ "subckt()->expand();\n";
   o__ "//subckt()->precalc();\n";
 
@@ -1322,22 +1321,11 @@ static void make_module_expand(std::ostream& o, Module const& m)
     }
   }
 
-
   o__ "assert(!is_constant());\n";
   if (m.sync()) {
 //    o << "  subckt()->set_slave();\n";
   }else{
   }
-  o__ "for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){\n";
-  o__ "  CARD* d = (*i)->deflate();\n";
-
-  o__ "  if(d == (*i)){\n";
-  o__ "  }else{\n";
-  o__ "    assert(d->owner() == this);\n";
-  o__ "    delete *i;\n";
-  o__ "    *i = d;\n";
-  o__ "  }\n";
-  o__ "}\n";
   if(m.has_expand_last()){
     o__ "q_expand_last();\n";
   }else{
