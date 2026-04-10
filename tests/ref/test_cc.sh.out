@@ -2583,8 +2583,10 @@ void MOD_resistor::expand()
     }
   // port p 1
   find_subset(&n_(n_p));
+  n_(n_p).allocate(3); // no-op unless floating
   // port n 2
   find_subset(&n_(n_n));
+  n_(n_n).allocate(3); // no-op unless floating
   // ground
   n_(n_white_noise_1_p).set_to_ground(nullptr);
     precalc_first();
@@ -2646,9 +2648,6 @@ void MOD_resistor::expand()
   //precalc();
   subckt()->expand();
   //subckt()->precalc();
-  // alloc ground
-  n_(1).allocate(3); // no-op unless floating
-  n_(0).allocate(3); // no-op unless floating
   assert(!is_constant());
 }
 /*--------------------------------------------------------------------------*/
@@ -4553,8 +4552,10 @@ void MOD_resistor::expand()
     }
   // port p 1
   find_subset(&n_(n_p));
+  n_(n_p).allocate(3); // no-op unless floating
   // port n 2
   find_subset(&n_(n_n));
+  n_(n_n).allocate(3); // no-op unless floating
   // ground
   n_(n_white_noise_0_p).set_to_ground(nullptr);
     precalc_first();
@@ -4616,9 +4617,6 @@ void MOD_resistor::expand()
   //precalc();
   subckt()->expand();
   //subckt()->precalc();
-  // alloc ground
-  n_(1).allocate(3); // no-op unless floating
-  n_(0).allocate(3); // no-op unless floating
   assert(!is_constant());
 }
 /*--------------------------------------------------------------------------*/
@@ -6949,8 +6947,10 @@ void MOD_capacitor::expand()
     }
   // port p 1
   find_subset(&n_(n_p));
+  n_(n_p).allocate(3); // no-op unless floating
   // port n 2
   find_subset(&n_(n_n));
+  n_(n_n).allocate(3); // no-op unless floating
   // ground
   n_(n_ddt_1_p).set_to_ground(nullptr);
     precalc_first();
@@ -7012,9 +7012,6 @@ void MOD_capacitor::expand()
   //precalc();
   subckt()->expand();
   //subckt()->precalc();
-  // alloc ground
-  n_(1).allocate(3); // no-op unless floating
-  n_(0).allocate(3); // no-op unless floating
   assert(!is_constant());
 }
 /*--------------------------------------------------------------------------*/
@@ -8198,8 +8195,10 @@ void MOD_capacitor::expand()
     }
   // port p 1
   find_subset(&n_(n_p));
+  n_(n_p).allocate(3); // no-op unless floating
   // port n 2
   find_subset(&n_(n_n));
+  n_(n_n).allocate(3); // no-op unless floating
   // internal ddt_2_p : 3
   // node ddt_2_p 3
     if (_short_b_ddt_2()) {
@@ -8261,8 +8260,6 @@ void MOD_capacitor::expand()
   //precalc();
   subckt()->expand();
   //subckt()->precalc();
-  n_(1).allocate(3); // no-op unless floating
-  n_(0).allocate(3); // no-op unless floating
   assert(!is_constant());
 }
 /*--------------------------------------------------------------------------*/

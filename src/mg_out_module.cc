@@ -985,6 +985,7 @@ static void make_module_new_local_nodes(std::ostream& o, Module const& m)
       o__ "// port " << nn->name() << " " << nn->number() << "\n";
       // BUG: allocate floating ports even if unused.
       o__ "find_subset(&n_(n_" << nn->name() << "));\n";
+      o__ "n_(n_" << nn->name() << ").allocate(3); // no-op unless floating\n";
     }else if(nn->is_used()){
       o__ "// internal " << nn->name() << " : " << nn->number() << "\n";
       make_module_new_local_node(o, *nn);
@@ -1304,22 +1305,6 @@ static void make_module_expand(std::ostream& o, Module const& m)
 
   o__ "subckt()->expand();\n";
   o__ "//subckt()->precalc();\n";
-
-  for (int n=int(m.circuit()->nodes().size()); n; --n) {
-    Node const* nn = m.circuit()->nodes()[n];
-    assert(nn);
-    int pos = nn->number();
-    if(pos == 0) {
-      o__ "// alloc ground\n";
-    //   o__ "n_(n_" << nn->name() << ").set_to_ground(nullptr);\n";
-    }else if(pos < n){
-    }else if(n <= int(m.circuit()->ports().size())){
-      // todo: use new_model_node for floating ports.
-      o__ "n_("<<pos-1<<").allocate(3); // no-op unless floating\n";
-    }else{
-      // handled by new_model_node
-    }
-  }
 
   o__ "assert(!is_constant());\n";
   if (m.sync()) {
