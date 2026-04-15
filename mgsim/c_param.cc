@@ -87,16 +87,19 @@ void parse(CS& cmd, PARAM_LIST* pl, CARD_LIST* Scope)
       break;
     }else{
     }
+    Name_String Name_;
     std::string Name;
 
-    cmd >> Name >> '=' >> par;
+    cmd >> Name_ >> '=' >> par;
+    Name = Name_;
 
     trace2("parsed", Name, par.string());
     if (cmd.stuck(&here)) {untested();
       break;
     }else{
     }
-    if (OPT::case_insensitive) {
+    if (OPT::case_insensitive) { untested();
+      // error(bPICKY, "parameter " + Name + " in insensitve mode\n");
       notstd::to_lower(&Name);
     }else{
     }

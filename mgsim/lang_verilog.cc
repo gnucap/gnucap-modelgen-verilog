@@ -716,7 +716,7 @@ void CMD_PARAM::parse(CS& cmd, PARAM_LIST* Scope) const
     }else if(cmd.match1('_')){ untested();
     }else if(cmd.match1('\\')){
       // escaped identifier
-    }else{ untested();
+    }else{
       break;
     }
     Name_String Name;
@@ -748,7 +748,7 @@ void CMD_PARAM::parse(CS& cmd, PARAM_LIST* Scope) const
     }else{ itested();
     }
   }
-  if(!cmd){ untested();
+  if(!cmd){
     cmd.warn(bDANGER, "syntax error");
   }else{
   }
@@ -868,7 +868,7 @@ void CMD_PARAM::parse_range(CS& cmd, PARAM_LIST* Scope, std::string Name) const
       }
     } // from/exclude loop
 
-    if (cmd.stuck(&here)) { untested();
+    if (cmd.stuck(&here)) {
       incomplete();
       trace2("c_param stuck", cmd.tail(), range_expr);
       return;
