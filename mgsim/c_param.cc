@@ -98,7 +98,7 @@ void parse(CS& cmd, PARAM_LIST* pl, CARD_LIST* Scope)
       break;
     }else{
     }
-    if (OPT::case_insensitive) { untested();
+    if (OPT::case_insensitive) {
       // error(bPICKY, "parameter " + Name + " in insensitve mode\n");
       notstd::to_lower(&Name);
     }else{

@@ -231,7 +231,7 @@ void LANG_VERILOG::parse_args_instance(CS& cmd, CARD* x)
 	  store_attributes(attribs,  x->param_id_tag(Index));
 	}catch (Exception_No_Match&) {
 	  cmd.warn(bDANGER, here, x->long_label() + ": bad parameter " + Name + " ignored");
-	}catch (Exception_Clash&) { untested();
+	}catch (Exception_Clash&) {
 	  cmd.warn(bDANGER, here, x->long_label() + ": already set " + Name + ", ignored");
 	}
 	attribs = parse_attributes(cmd);
