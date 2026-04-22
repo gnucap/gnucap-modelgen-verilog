@@ -529,7 +529,7 @@ public:
     assert(Scope);
     assert(cmd.last_match().size()>2);
     DEV_DOT* dot = new DEV_DOT();
-    dot->set(cmd.fullstring());
+    dot->set(cmd.last_match() + cmd.tail());
     Scope->push_back(dot);
     assert(Scope->nodes());
     NODE_MAP& nm = *Scope->nodes();
@@ -989,7 +989,7 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
     }else if (cmd >> "ground ") {
       cmd.reset();
       new__instance(cmd, x, x->subckt());
-    }else if (cmd >> "wire|electrical|inout|input|output") {
+    }else if (cmd >> "wire |electrical |inout |input |output ") {
       net_decl.do_it(cmd, x->subckt());
     }else if (cmd >> "module |macromodule ") {
       cmd.reset();
