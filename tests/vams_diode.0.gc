@@ -20,5 +20,6 @@ D1  (n2 0) dd
 
 .print dc v(nodes) i(V1) i(V2) z(m.D1) iter(0)
 .dc v -1 0.65 .05
+.list
 
 .status notime
