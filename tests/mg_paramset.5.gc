@@ -1,0 +1,36 @@
+attach ./modelgen_1.so
+verilog
+
+`modelgen
+module base(p, n);
+  electrical p, n;
+  parameter real r=1;
+  analog I(p,n) <+ V(p,n)/r;
+endmodule
+paramset test_ps5 base
+  parameter real rr = 2.*$root.bla1.rr;
+  parameter real b = 0.0;
+  parameter real leff = 1.1 * rr * b;
+  .r = rr;
+endparamset
+`endmodelgen
+
+!make test_ps5.so > /dev/null
+
+attach ./test_ps5.so
+
+verilog
+
+module bla();
+// must be localparam...?
+	parameter real rr=1;
+endmodule;
+
+bla #() bla1();
+
+test_ps5 #() r(\1 , \0 );
+isource #(.dc(5)) i(\0 , \1 );
+
+print dc v(nodes) iter(0)
+dc
+status notime

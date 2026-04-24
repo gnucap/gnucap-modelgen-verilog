@@ -809,6 +809,31 @@ static void make_common_expand(std::ostream& o , const Module& m)
 
 #endif
   o << "/*--------------------------------------------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+void make_final_cleanup_params(std::ostream& o, const Parameter_List_Collection& P)
+{
+  for(auto const& pl : P){
+    for (Parameter_2_List::const_iterator p=pl->begin(); p!=pl->end(); ++p) {
+      if( (**p).type().is_string()){
+      }else{
+	// TODO. is_valid() / set_invalid()
+	o__ "if(" << (**p).code_name() << " == " << (**p).code_name() << ") {\n";
+	o__ "}else{\n";
+	if((**p).is_local()) {
+	  o____ (**p).code_name() << " = NOT_VALID;\n";
+	}else{
+	  o____ (**p).code_name() << ".set_default(NOT_VALID);\n";
+	}
+	o__ "}\n";
+      }
+    }
+  }
+  o__ "std::feclearexcept(FE_ALL_EXCEPT);\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_common_precalc_first(std::ostream& o , const Module& m)
+{
   o << "void COMMON_" << m.identifier() << "::precalc_first(const PARAM_LIST* par_scope)\n{\n";
   o__ "assert(par_scope);\n";
   o__ "COMMON_COMPONENT::precalc_first(par_scope);\n";
@@ -816,6 +841,7 @@ static void make_common_expand(std::ostream& o , const Module& m)
   o__ "(void)pc;\n";
   // BUG: only structurally relevant
   make_final_adjust_eval_parameter_list(o , m.parameters());
+  make_final_cleanup_params(o, m.parameters());
   make_eval_netlist_parameters(o, m);
   o  << "}\n"
     "/*--------------------------------------------------------------------------*/\n";
@@ -989,6 +1015,7 @@ void make_cc_common(std::ostream& o , const Module& m)
   make_common_is_valid(o, m);
   make_common_is_valid_(o, m);
   make_common_expand(o, m);
+  make_common_precalc_first(o, m);
   if(m.has_expand_last()){
     make_common_expand_last(o, m);
   }else{

@@ -31,6 +31,7 @@
 #include <e_base.h> // CKT_BASE
 #include <u_sim_data.h> // see simparam
 #include <e_logicnode.h>
+#include <cfenv>
 /*--------------------------------------------------------------------------*/
 inline int simulatorVersion()
 {
@@ -813,7 +814,6 @@ inline bool Href_::find_device_down(CARD_LIST const* scope, std::string const& p
 inline void Href_::link_card(CARD const* dev, std::string const& path)
 {
   assert(dev);
-  trace2("href::link_card", path, dev->long_label());
   auto dotplace = path.find(".");
   std::string name = path.substr(0, dotplace);
   std::string tail = path.substr(dotplace+1, std::string::npos);

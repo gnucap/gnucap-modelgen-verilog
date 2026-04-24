@@ -53,6 +53,7 @@ static void make_final_adjust_eval_parameter(std::ostream& o, const Parameter_2&
   o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
+// bug. almost dup make_final_adjust_eval_parameter
 static void make_final_adjust_eval_local_parameter(std::ostream& o, const Parameter_2& p)
 {
   // if (!(p.calculate().empty())) {untested();

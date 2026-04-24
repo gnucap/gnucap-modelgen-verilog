@@ -506,7 +506,7 @@ void OUT_EXPRESSION::new_variable(std::ostream& o, Token const* t)
       o__ "//ddeps. ddouble??\n";
       vars().new_ddouble(o); // TODO
     }else{
-      incomplete();
+      // incomplete(); later.
       o__ "//no ddeps. float??\n";
       vars().new_float(o); // TODO
     }
