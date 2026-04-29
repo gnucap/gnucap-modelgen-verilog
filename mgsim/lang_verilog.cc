@@ -1306,67 +1306,6 @@ private:
   std::string dev_type()const override { return component_proto()->dev_type(); }
 };
 /*--------------------------------------------------------------------------*/
-class MODULE_PROTO : public PARAMSET_MODEL {
-  mutable bool _instanciated{!instanciate_unused};
-  bool _own_proto{true}; // use different type?
-  explicit MODULE_PROTO(MODULE_PROTO const& p)
-    : PARAMSET_MODEL(p),
-      _instanciated(p._instanciated),
-      _own_proto(false) { }
-public:
-  explicit MODULE_PROTO() : PARAMSET_MODEL() { untested(); }
-  explicit MODULE_PROTO(COMPONENT* c)
-    : PARAMSET_MODEL(c) { }
-  ~MODULE_PROTO() {
-    if(_own_proto){
-      assert(component_proto());
-      const_cast<CARD*>(component_proto())->purge();
-      delete component_proto();
-    }else{
-    }
-  }
-
-  PARAMSET_MODEL* clone()const override {
-    _instanciated = true; //??
-    return new MODULE_PROTO(*this); // use different type?
-  }
-  CARD* clone_instance()const override {
-    _instanciated = true;
-    return PARAMSET_MODEL::clone_instance();
-  }
-public:
-  void precalc_first()override {
-    auto* cp = prechecked_cast<COMPONENT const*>(component_proto());
-    assert(cp);
-    if(1||_instanciated){
-    }else if(cp->is_valid()){ untested();
-      auto i = CARD_LIST::card_list.begin();
-      while(i!=CARD_LIST::card_list.end() && *i !=this){ untested();
-	++i;
-      }
-
-      if(i==CARD_LIST::card_list.end()){ untested();
-	unreachable();
-      }else{ untested();
-	++i;
-	auto ii = clone_instance();
-	ii->set_owner(nullptr);
-	CARD_LIST::card_list.insert(i, ii);
-      }
-    }else{ untested();
-    }
-  }
-  void expand()override { }
-  void precalc_last()override { }
-  CARD* deflate()override {
-    //incomplete(); // later.
-    return this;
-  }
-
-public:
-  char id_letter()const override{ untested();return 'X';}
-};
-/*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
 {
   if(auto m = dynamic_cast<MODEL_SUBCKT const*>(x)){
@@ -1380,12 +1319,7 @@ void LANG_VERILOG::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_paramset_(OMSTREAM& o, const MODEL_CARD* x)
 {
-  if(dynamic_cast<MODULE_PROTO const*>(x)) {
-    // print_attributes(o, x->id_tag()); // in print_module
-    auto bs = prechecked_cast<BASE_SUBCKT const*>(x->component_proto());
-    assert(bs);
-    print_module(o, bs);
-  }else if(dynamic_cast<PARAMSET_MODEL const*>(x)) { // } ->short_label() == "paramset") { untested();
+  if(dynamic_cast<PARAMSET_MODEL const*>(x)) { // } ->short_label() == "paramset") { untested();
     COMPONENT const* bs = prechecked_cast<COMPONENT const*>(x->component_proto());
     print_attributes(o, x->id_tag());
     o << "paramset " << bs->short_label() << ' ' << x->dev_type() << ";\n";
