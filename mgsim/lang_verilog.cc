@@ -1271,6 +1271,7 @@ protected:
   explicit PARAMSET_MODEL() : MODEL_CARD(NULL) {untested();}
 public:
   explicit PARAMSET_MODEL(COMPONENT* c) : MODEL_CARD(c) {
+    (void) instanciate_unused;
     _p = c;
     assert(c);
     // set_label("paramset");

@@ -89,6 +89,7 @@ private:
   int		set_port_by_name(std::string&, std::string&) override;
   int set_param_by_name(std::string Name, std::string Value)override;
   void set_param_by_index(int i, std::string& Value, int j)override;
+  double localparam_value(std::string const&)const override;
 private: // override virtual
   char		id_letter()const override	{return 'X';}
   bool		print_type_in_spice()const override {return true;}
@@ -137,7 +138,7 @@ public:
   explicit	DEV_MODULE_PROTO(COMMON_COMPONENT* c=nullptr) : DEV_SUBCKT(c) {}
 		~DEV_MODULE_PROTO(){}
   CARD_LIST*	   scope()override		{ untested(); return subckt();}
-  const CARD_LIST* scope()const override	{ untested(); return subckt();}
+  const CARD_LIST* scope()const override	{ return subckt();}
   CARD*		clone()const override		{ return new DEV_MODULE_PROTO(*this);}
 } p0(&Default_SUBCKT);
 DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "module", &p0);
@@ -384,6 +385,41 @@ void DEV_SUBCKT::set_param_by_index(int i, std::string& Value, int Offset)
     trace2("DS::spbi out of range", long_label(), i);
     throw Exception_Too_Many(i+1, 0, Offset);
   }
+}
+/*--------------------------------------------------------------------------*/
+double DEV_SUBCKT::localparam_value(std::string const& path) const
+{ untested();
+  CARD_LIST const* scope = subckt();
+  auto dotplace = path.find(".");
+  if(dotplace == std::string::npos){
+    assert(scope);
+    PARAM_LIST const* p = scope->params();
+    assert(p);
+    PARAM_LIST::const_iterator it = p->find(path);
+    if(it == p->end()){ untested();
+	PARAMETER<double> pd; pd = path;
+	pd.e_val(NOT_VALID, scope->params());
+	return pd;
+    }else{ untested();
+      PARAM_INSTANCE const& pi = it.ref();
+      if(auto f = dynamic_cast<Float const*>(pi.value())) { untested();
+	PARAMETER<double> pd; pd = path;
+	pd.e_val(NOT_VALID, scope->params());
+	return pd;
+	trace3("lpv", long_label(), path, *f);
+
+	assert(*f);
+	return *f;
+      }else{ untested();
+	PARAMETER<double> pd; pd = path;
+	pd.e_val(NOT_VALID, scope->params());
+	return pd;
+      }
+    }
+  }else{ untested();
+    incomplete();
+  }
+  return NOT_VALID;
 }
 /*--------------------------------------------------------------------------*/
 std::string DEV_SUBCKT::port_name(int i)const

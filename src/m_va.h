@@ -31,6 +31,7 @@
 #include <e_base.h> // CKT_BASE
 #include <u_sim_data.h> // see simparam
 #include <e_logicnode.h>
+#include <e_model.h>
 #include <cfenv>
 /*--------------------------------------------------------------------------*/
 inline int simulatorVersion()
@@ -705,6 +706,10 @@ public:
     return _ref = find_item(_card?_card->subckt():&CARD_LIST::card_list, _tail);
   }
   double get_double()const {
+    if(_card){
+      return _card->localparam_value(_tail);
+    }else{ untested();
+    }
     Base const* ref = _ref;
     CARD_LIST const* scope = _card?_card->subckt():&CARD_LIST::card_list;
     if(ref){ untested();
@@ -716,7 +721,6 @@ public:
       trace1("href float", *f);
       return *f;
     }else if(scope){
-      trace1("href no float", _tail);
       PARAMETER<double> pp; pp = _tail;
       pp.e_val(NOT_VALID, scope->params());
       return pp;
@@ -760,7 +764,11 @@ inline bool Href_::find_device_up(CARD const* device,
   assert(device);
   trace3("find_device_up", device->long_label(), name, tail);
   if(*device != name){
-    if(find_device_down(device->subckt(), name, tail)){
+    if(dynamic_cast<MODEL_CARD const*>(device)) { untested();
+      _card = device;
+      _tail = tail;
+      return true;
+    }else if(find_device_down(device->subckt(), name, tail)){
       return true;
     }else if(CARD const* o = device->owner()){ untested();
       return find_device_up(o, name, tail);
@@ -771,6 +779,10 @@ inline bool Href_::find_device_up(CARD const* device,
       _tail = tail;
       return true;
     }
+  }else if(dynamic_cast<MODEL_CARD const*>(device)) { untested();
+      _card = device;
+      _tail = tail;
+      return true;
   }else{ untested();
     return find_device_down(device->subckt(), tail);
   }
