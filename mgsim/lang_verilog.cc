@@ -470,10 +470,17 @@ DEV_DOT* LANG_VERILOG::parse_command(CS& cmd, DEV_DOT* x)
   CARD_LIST* scope = (x->owner()) ? x->owner()->subckt() : &CARD_LIST::card_list;
 //  cmd.reset();
 //  parse_attributes(cmd, tag_t(x));
-  trace1("cmdproc", cmd.tail());
-  CMD::cmdproc(cmd, scope);
-  delete x; // push back if s()?
-  return NULL;
+  if(auto cc=dynamic_cast<CMD*>(x)){ untested();
+    std::string s;
+    cmd >> s;
+    cc->do_it(cmd, scope);
+    return x;
+  }else{
+    CMD::cmdproc(cmd, scope);
+    x->purge();
+    delete x;
+    return nullptr;
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* "paramset" <my_name> <base_name> ";"
