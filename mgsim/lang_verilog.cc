@@ -28,7 +28,7 @@
 #include <e_model.h>
 #include <u_lang.h>
 /*--------------------------------------------------------------------------*/
-static const std::string IS_VALID = "_..is_valid";
+static const std::string IS_VALID = "__is_valid";
 static bool instanciate_unused = false;
 static int nest;
 /*--------------------------------------------------------------------------*/

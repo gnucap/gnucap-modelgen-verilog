@@ -31,7 +31,7 @@ namespace{
 // components with one node are unlikely.
 const int node_capacity_floor = 2;
 /*--------------------------------------------------------------------------*/
-static const std::string IS_VALID = "_..is_valid";
+static const std::string IS_VALID = "__is_valid";
 /*--------------------------------------------------------------------------*/
 COMMON_PARAMLIST& Default_PARAMSET(){
   static COMMON_PARAMLIST cp(CC_STATIC);
@@ -251,7 +251,7 @@ int PARAMSET::is_valid() const
   trace1("PARAMSET::is_valid", long_label());
   if(_parent->subckt()){
     PARAM_LIST const* params = _parent->subckt()->params();
-    PARAM_INSTANCE v = params->deep_lookup("_..is_valid");
+    PARAM_INSTANCE v = params->deep_lookup(IS_VALID);
     assert(subckt());
     Base const* x = v.e_val(nullptr, subckt()->params());
     Integer c;

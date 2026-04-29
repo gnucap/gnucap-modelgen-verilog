@@ -44,6 +44,7 @@ namespace{
 /*--------------------------------------------------------------------------*/
 // components with one node are unlikely.
 const int node_capacity_floor = 2;
+static const std::string IS_VALID = "__is_valid";
 /*--------------------------------------------------------------------------*/
 static void grow_nodes(int Index, node_t*& n, int& capacity, int capacity_floor)
 {
@@ -98,7 +99,7 @@ private: // override virtual
   int		matrix_nodes()const override	{return 0;}
   int		net_nodes()const override	{return _net_nodes;}
   void		precalc_first()override;
-  bool		makes_own_scope()const override;
+  bool		makes_own_scope()const override	{return true;}
   int		is_valid()const override;
   CARD_LIST*	   scope()override;
   const CARD_LIST* scope()const override	{return const_cast<DEV_SUBCKT*>(this)->scope();}
@@ -135,9 +136,8 @@ private:
 public:
   explicit	DEV_MODULE_PROTO(COMMON_COMPONENT* c=nullptr) : DEV_SUBCKT(c) {}
 		~DEV_MODULE_PROTO(){}
-  bool		makes_own_scope()const override	{ return true;}
   CARD_LIST*	   scope()override		{ untested(); return subckt();}
-  const CARD_LIST* scope()const override	{ return subckt();}
+  const CARD_LIST* scope()const override	{ untested(); return subckt();}
   CARD*		clone()const override		{ return new DEV_MODULE_PROTO(*this);}
 } p0(&Default_SUBCKT);
 DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "module", &p0);
@@ -153,7 +153,6 @@ public:
 		~DEV_SUBCKT_PROTO(){}
 public: // override virtual
   char		id_letter()const override	{untested();return '\0';}
-  CARD*		clone_instance()const override;
   bool		print_type_in_spice()const override { untested();unreachable(); return false;}
   std::string   value_name()const override	{untested();incomplete(); return "";}
   std::string   dev_type()const override	{itested(); return "";}
@@ -162,7 +161,6 @@ public: // override virtual
   int		matrix_nodes()const override	{untested();return 0;}
   int		net_nodes()const override	{return _net_nodes;}
   CARD*		clone()const override		{return new DEV_SUBCKT_PROTO(*this);}
-  bool		makes_own_scope()const override	{return true;}
   CARD_LIST*	   scope()override		{return subckt();}
   const CARD_LIST* scope()const override	{return subckt();}
   std::string port_name(int i)const override;
@@ -192,24 +190,6 @@ std::string DEV_SUBCKT_PROTO::port_name(int i) const
   }else{ untested();
     return port_value(i);
   }
-}
-/*--------------------------------------------------------------------------*/
-CARD* DEV_SUBCKT_PROTO::clone_instance()const
-{
-#if 1
-  DEV_SUBCKT* new_instance = dynamic_cast<DEV_SUBCKT*>(p1.clone());
-#else
-  DEV_SUBCKT* new_instance = dynamic_cast<DEV_SUBCKT*>(DEV_SUBCKT::clone());
-  assert(new_instance);
-  for (int ii = 0;  ii < net_nodes();  ++ii) { untested();
-    new_instance->n_(ii) = node_t();
-  }
-  new_instance->_net_nodes = 0;
-#endif
-
-  new_instance->_parent = this;
-  assert(new_instance->is_device());
-  return new_instance;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -273,7 +253,7 @@ int DEV_SUBCKT::is_valid() const
   }
   assert(subckt());
   trace1("DEV_SUBCKT::is_valid I", long_label());
-  PARAM_INSTANCE v = params->deep_lookup("_..is_valid");
+  PARAM_INSTANCE v = params->deep_lookup(IS_VALID);
   trace2("DEV_SUBCKT::is_valid II", long_label(), v.string());
   Base const* x = v.e_val(nullptr, subckt()->params());
   Integer c;
@@ -543,11 +523,6 @@ void DEV_SUBCKT::precalc_first()
   }else{
   }
 
-}
-/*--------------------------------------------------------------------------*/
-bool DEV_SUBCKT::makes_own_scope() const
-{
-  return !_parent; //  || _parent == &pp;
 }
 /*--------------------------------------------------------------------------*/
 void DEV_SUBCKT::precalc_last()
