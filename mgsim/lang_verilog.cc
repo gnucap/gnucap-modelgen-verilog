@@ -533,7 +533,7 @@ public:
 private:
   void parse(CS& cmd, CARD* Owner, char what)const;
   void parse_def(CS& cmd, PARAM_INSTANCE& par)const;
-  void parse_range(CS& cmd, PARAM_LIST* Scope, std::string Name)const;
+  bool parse_range(CS& cmd, PARAM_LIST* Scope, std::string Name)const;
 } module_param;
 /*--------------------------------------------------------------------------*/
 class CMD_NET_DECL : public CMD {
@@ -759,8 +759,9 @@ void CMD_MODULE_PARAM::parse(CS& cmd, CARD* Owner, char what) const
       assert(cmd);
       break;
     }else if(cmd >> ',') { itested();
+    }else if( parse_range(cmd, pl, Name)) {
+      // increment valid if local??
     }else{
-      parse_range(cmd, pl, Name);
     }
 
     if(cmd >> ';') {
@@ -779,7 +780,7 @@ void CMD_MODULE_PARAM::parse(CS& cmd, CARD* Owner, char what) const
   }
 }
 /*--------------------------------------------------------------------------*/
-void CMD_MODULE_PARAM::parse_range(CS& cmd, PARAM_LIST* Scope, std::string Name) const
+bool CMD_MODULE_PARAM::parse_range(CS& cmd, PARAM_LIST* Scope, std::string Name) const
 {
   assert(Scope);
   Scope->set_verilog();
@@ -896,7 +897,7 @@ void CMD_MODULE_PARAM::parse_range(CS& cmd, PARAM_LIST* Scope, std::string Name)
     if (cmd.stuck(&here)) {
       incomplete();
       trace2("c_param stuck", cmd.tail(), range_expr);
-      return;
+      return false;
     }else{
       trace2("c_param more", cmd.tail(), range_expr);
     }
@@ -919,6 +920,7 @@ void CMD_MODULE_PARAM::parse_range(CS& cmd, PARAM_LIST* Scope, std::string Name)
       trace2("c_param", IS_VALID, range_expr);
       pl->set(IS_VALID, range_expr);
     }
+    return range_type.size();
   }
 }
 /*--------------------------------------------------------------------------*/

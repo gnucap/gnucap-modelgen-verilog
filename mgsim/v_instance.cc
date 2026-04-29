@@ -866,6 +866,7 @@ void INSTANCE::expand_sift()
   // - The paramset with the greatest number of local parameters with specified ranges shall be selected.
   // - The paramset with the fewest ports not connected in the instance line shall be selected.
   COMPONENT* gotit = nullptr;
+  int gval = 0;
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ){
     CARD const* s = *i;
     COMPONENT const* d = dynamic_cast<COMPONENT const*>(s);
@@ -875,11 +876,13 @@ void INSTANCE::expand_sift()
 
     std::string desc = get_description(s->id_tag());
 
-    if(!d->is_valid()){
+    int dval = d->is_valid();
+    if(!dval){
       error(bDEBUG, long_label() + " dropped invalid candidate: \"" + desc + "\".\n");
     }else if(!gotit){
 //      error(bTRACE, long_label() + " found valid candidate.\n");
       gotit = prechecked_cast<COMPONENT*>(*j);
+      gval = dval;
       assert(gotit);
       *j = nullptr;
     }else if(eff_param_count(d) > eff_param_count(gotit)){ untested();
@@ -900,6 +903,17 @@ void INSTANCE::expand_sift()
       gotit->purge();
       delete (CARD*) gotit;
       gotit = prechecked_cast<COMPONENT*>(*j);
+      gval = dval;
+      assert(gotit);
+      *j = nullptr;
+    }else if(gval < dval) { untested();
+      error(bLOG, long_label() + " valid value tie break: " + to_string(gval) + " vs. " +
+	  to_string(dval) + "\n");
+      assert(gotit);
+      gotit->purge();
+      delete (CARD*) gotit;
+      gotit = prechecked_cast<COMPONENT*>(*j);
+      gval = dval;
       assert(gotit);
       *j = nullptr;
     }else if(d->max_nodes() > gotit->max_nodes()){ untested();
@@ -912,6 +926,7 @@ void INSTANCE::expand_sift()
       gotit->purge();
       delete (CARD*) gotit;
       gotit = prechecked_cast<COMPONENT*>(*j);
+      gval = dval;
       assert(gotit);
       *j = nullptr;
     }else if(desc.size()){
