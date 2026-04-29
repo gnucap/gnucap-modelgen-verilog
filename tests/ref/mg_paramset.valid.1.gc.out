@@ -1,0 +1,12 @@
+module base(p,  ... meter real p = 5; .i(1); endparamset paramset test_psv1 
+                                        ^ ? nonstandard syntax
+module base(p,  ...  = p from (0:10); .i(2); endparamset 
+                                        ^ ? nonstandard syntax
+m.a: ambiguous overload for in test_psv1
+#           v(a)       v(b)       v(c)      
+ 0.         2.         2.         1.        
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=3
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=3, subckt=0, model=0, total=3
+dctran density=33.3%, ac density=33.3%

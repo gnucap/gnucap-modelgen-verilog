@@ -1723,7 +1723,7 @@ int COMMON_resistor::is_valid_() const
     }else{
     }
   }
-  return true; //COMMON_COMPONENT::is_valid();
+  return 1;
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_resistor::expand(const COMPONENT* d)
@@ -3256,7 +3256,7 @@ int COMMON_resistor::is_valid_() const
     }else{
     }
   }
-  return true; //COMMON_COMPONENT::is_valid();
+  return 1;
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_resistor::expand(const COMPONENT* d)
@@ -6468,7 +6468,7 @@ int COMMON_capacitor::is_valid_() const
     }else{
     }
   }
-  return true; //COMMON_COMPONENT::is_valid();
+  return 1;
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_capacitor::expand(const COMPONENT* d)
@@ -7650,7 +7650,7 @@ int COMMON_capacitor::is_valid_() const
     }else{
     }
   }
-  return true; //COMMON_COMPONENT::is_valid();
+  return 1;
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_capacitor::expand(const COMPONENT* d)

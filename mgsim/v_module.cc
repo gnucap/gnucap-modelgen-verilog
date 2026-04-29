@@ -365,7 +365,7 @@ int DEV_SUBCKT::set_param_by_name(std::string Name, std::string Value)
     PARAM_LIST::iterator p = c->_params.find(Name);
     if(p != c->_params.end()){
       return BASE_SUBCKT::set_param_by_name(Name,Value);
-    }else{itested();
+    }else{
       throw Exception_No_Match(Name);
     }
   }

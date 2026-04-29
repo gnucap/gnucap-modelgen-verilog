@@ -710,7 +710,7 @@ void CMD_MODULE_PARAM::parse_def(CS& cmd, PARAM_INSTANCE& par) const
 /*--------------------------------------------------------------------------*/
 void CMD_MODULE_PARAM::parse(CS& cmd, CARD* Owner, char what) const
 {
-  int valid = 0;
+  int inc_valid = 0;
   CARD_LIST* Scope;
   if(Owner) {
     Scope = Owner->subckt();
@@ -763,7 +763,7 @@ void CMD_MODULE_PARAM::parse(CS& cmd, CARD* Owner, char what) const
     }else if(cmd >> ',') { itested();
     }else if(!parse_range(cmd, pl, Name)) {
     }else if(what == 'l') {
-      ++valid;
+      ++inc_valid;
       // increment valid if local??
     }else{
     }
@@ -785,13 +785,16 @@ void CMD_MODULE_PARAM::parse(CS& cmd, CARD* Owner, char what) const
 
   {
     PARAM_INSTANCE v = pl->deep_lookup(HOW_VALID);
-    std::string vlvl = to_string(valid);
-    if(v.has_hard_value()){ untested();
+    if(!v.has_hard_value()){
+      // v = PARAMETER<vInteger>();
+      std::string vlvl = to_string(inc_valid+1);
+      pl->set(HOW_VALID, vlvl);
+    }else if(inc_valid){
+      std::string vlvl = to_string(inc_valid);
       vlvl = v.string() + "+" + vlvl;
       pl->set(HOW_VALID, vlvl);
-    }else{ untested();
-      // v = PARAMETER<vInteger>();
-      pl->set(HOW_VALID, vlvl);
+    }else{
+      pl->set(HOW_VALID, "1");
     }
   }
 }
@@ -911,7 +914,6 @@ bool CMD_MODULE_PARAM::parse_range(CS& cmd, PARAM_LIST* Scope, std::string Name)
     } // from/exclude loop
 
     if (cmd.stuck(&here)) {
-      incomplete();
       trace2("c_param stuck", cmd.tail(), range_expr);
       return false;
     }else{
@@ -934,7 +936,7 @@ bool CMD_MODULE_PARAM::parse_range(CS& cmd, PARAM_LIST* Scope, std::string Name)
     }else{
       v = PARAMETER<vInteger>();
       trace2("c_param", IS_VALID, range_expr);
-      pl->set(IS_VALID, range_expr);
+      pl->set(IS_VALID, HOW_VALID + "*" + range_expr);
     }
     return range_type.size();
   }

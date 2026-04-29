@@ -33,4 +33,11 @@ isource #(.dc(5)) i(\0 , \1 );
 
 print dc v(nodes) iter(0)
 dc
+
+delete bla1
+module bla1();
+  localparam real rr=2;
+endmodule
+print dc v(nodes) iter(0)
+dc
 status notime

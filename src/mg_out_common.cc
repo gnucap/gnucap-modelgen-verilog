@@ -611,17 +611,23 @@ static void make_common_is_valid_(std::ostream& o, const Module& m)
   o << "int COMMON_" << m.identifier() << "::is_valid_() const\n{\n";
   o__ "COMMON_" << m.identifier() << " const* pc = this;\n";
   o__ "(void)pc;\n";
+  int how_valid{1};
 
   // move to precalc?
   for (Parameter_List_Collection::const_iterator
        q = m.parameters().begin();
        q != m.parameters().end();
        ++q) {
-    if(!(*q)->is_local())
     for (Parameter_2_List::const_iterator
 	 p = (*q)->begin();
 	 p != (*q)->end();
 	 ++p) {
+      if(! (*q)->is_local()) {
+      }else if((*p)->value_range_list().size()){
+	++ how_valid;
+      }else{
+      }
+
       for(auto v : (*p)->value_range_list()){
 	assert(v);
 
@@ -632,7 +638,7 @@ static void make_common_is_valid_(std::ostream& o, const Module& m)
     }
   }
 
-  o__ "return true; //COMMON_COMPONENT::is_valid();\n";
+  o__ "return " << how_valid << ";\n";
   o << "}\n"
     "/*--------------------------------------------------------------------------*/\n";
 }

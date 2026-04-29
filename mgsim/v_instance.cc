@@ -875,8 +875,9 @@ void INSTANCE::expand_sift()
     ++i;
 
     std::string desc = get_description(s->id_tag());
-
     int dval = d->is_valid();
+
+    // error(bTRACE, long_label() + " got \"" + desc + "\" valid " + to_string(dval) + ".\n");
     if(!dval){
       error(bDEBUG, long_label() + " dropped invalid candidate: \"" + desc + "\".\n");
     }else if(!gotit){

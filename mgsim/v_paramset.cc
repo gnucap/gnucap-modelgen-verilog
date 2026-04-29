@@ -290,6 +290,9 @@ void PARAMSET::grow_nodes(int Index)
 /*--------------------------------------------------------------------------*/
 int PARAMSET::set_param_by_name(std::string Name, std::string Value)
 {
+  // assert(!_parent || _parent->subckt());
+  COMMON_PARAMLIST* c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
+  assert(c);
 //  assert(_parent);
   trace4("PARAMSET::set_param_by_name", short_label(), Name, Value, param_count());
 
@@ -313,10 +316,10 @@ int PARAMSET::set_param_by_name(std::string Name, std::string Value)
   }else if(Name==""){ untested();
     throw Exception_No_Match("invalid parameter: " + Name);
   }else if(_parent && _parent->subckt()){
-    PARAM_LIST::const_iterator p = _parent->subckt()->params()->find(Name);
-    if(p != _parent->subckt()->params()->end()){
+    PARAM_LIST::iterator p = c->_params.find(Name);
+    if(p != c->_params.end()){
       return BASE_SUBCKT::set_param_by_name(Name,Value);
-    }else{itested();
+    }else{
       throw Exception_No_Match(Name);
     }
   }else{
