@@ -1,0 +1,13 @@
+module foo(x, y):
+  parameter real a = 1;
+  localparam real b = a + 1;
+  resistor #(.r(b+1)) r1(x, y);
+endmodule
+
+verilog
+foo #(.a(2)) f1(gnd, n);
+isource #(.dc(1)) i1(gnd, n);
+ground gnd;
+
+print dc v(nodes)
+dc

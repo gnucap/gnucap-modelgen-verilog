@@ -5,6 +5,7 @@ This file summarizes new features and important changes between snapshots.
 20260***-dev
 ============
 - fix parameter initialisers in interpreted paramset
+- localparam in lang_spice
 - ..
 
 20260329-dev

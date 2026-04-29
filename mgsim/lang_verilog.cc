@@ -470,10 +470,10 @@ DEV_DOT* LANG_VERILOG::parse_command(CS& cmd, DEV_DOT* x)
   CARD_LIST* scope = (x->owner()) ? x->owner()->subckt() : &CARD_LIST::card_list;
 //  cmd.reset();
 //  parse_attributes(cmd, tag_t(x));
-  if(auto cc=dynamic_cast<CMD*>(x)){ untested();
+  if(auto cc=dynamic_cast<CMD*>(x)){
     std::string s;
     cmd >> s;
-    cc->do_it(cmd, scope);
+    cc->cmdproc(cmd);
     return x;
   }else{
     CMD::cmdproc(cmd, scope);
@@ -515,25 +515,23 @@ public:
     return new CMD_MODULE_PARAM(*this);
   }
 public:
-  void do_it(CS& cmd, CARD_LIST* Scope)override {untested(); unreachable();
-    return do_it_(cmd, Scope);
-  }
-  void do_it_(CS& cmd, CARD_LIST* Scope, CARD* owner=nullptr) {
+  void do_it(CS& cmd, CARD_LIST* Scope)override {
+    CARD* Owner = owner();
     PARAM_LIST* pl = Scope->params();
-    assert(!owner || Scope == owner->subckt());
+    assert(!Owner || Scope == Owner->subckt());
     std::string what = cmd.last_match();
     if (cmd.is_end()) { untested();
       pl->print(IO::mstdout, OPT::language);
       IO::mstdout << '\n';
     }else{
       std::string tail = cmd.tail();
-      parse(cmd, Scope, owner, what[0]);
+      parse(cmd, Owner, what[0]);
       lang_verilog.move_attributes(tag_t(&cmd), id_tag());
       set(what + tail);
     }
   }
 private:
-  void parse(CS& cmd, CARD_LIST* Scope, CARD* Owner, char what)const;
+  void parse(CS& cmd, CARD* Owner, char what)const;
   void parse_def(CS& cmd, PARAM_INSTANCE& par)const;
   void parse_range(CS& cmd, PARAM_LIST* Scope, std::string Name)const;
 } module_param;
@@ -709,9 +707,14 @@ void CMD_MODULE_PARAM::parse_def(CS& cmd, PARAM_INSTANCE& par) const
   par = s.str();
 }
 /*--------------------------------------------------------------------------*/
-void CMD_MODULE_PARAM::parse(CS& cmd, CARD_LIST* Scope, CARD* Owner, char what) const
+void CMD_MODULE_PARAM::parse(CS& cmd, CARD* Owner, char what) const
 {
-  assert(!Owner || Scope == Owner->subckt());
+  CARD_LIST* Scope;
+  if(Owner) {
+    Scope = Owner->subckt();
+  }else{ untested();
+    Scope = &CARD_LIST::card_list;
+  }
   PARAM_LIST* pl = Scope->params();
   assert(pl);
   PARAM_INSTANCE par;
@@ -938,7 +941,8 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
     size_t here = cmd.cursor();
     if (cmd >> "parameter |localparam ") {
       auto p = module_param.clone();
-      p->do_it_(cmd, x->subckt(), nullptr); // WIP
+      p->set_owner(x);
+      p->do_it(cmd, x->subckt());
       x->subckt()->push_back(p);
     }else if (cmd >> "//") {
       cmd.reset(here);
@@ -1006,7 +1010,8 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
       break;
     }else if (!have_instance && (cmd >> "parameter |localparam ")) {
       auto p = module_param.clone();
-      p->do_it_(cmd, x->subckt(), x);
+      p->set_owner(x);
+      p->do_it(cmd, x->subckt());
       x->subckt()->push_back(p);
     }else if (cmd >> "//") {
       cmd.reset();

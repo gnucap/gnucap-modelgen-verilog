@@ -109,14 +109,14 @@ private: // override virtual
 private:
   void		precalc_last()override;
   double	tr_probe_num(const std::string&)const override;
-  int param_count_dont_print()const override { untested();return 0; } // {common()->COMMON_COMPONENT::param_count();}
+  int param_count_dont_print()const override {return 0; } // {common()->COMMON_COMPONENT::param_count();}
 
   node_t& n_(int i)const override {
     assert(i>=0);
     if(i<_node_capacity) {
       assert(_nodes);
       return _nodes[i];
-    }else{ untested();
+    }else{
       // getting here in d_subckt.error3.ckt
       static node_t dummy;
       return dummy;
@@ -201,11 +201,11 @@ void DEV_SUBCKT::set_port_by_index(int Index, std::string& Value)
 }
 /*--------------------------------------------------------------------------*/
 int DEV_SUBCKT::set_port_by_name(std::string& name, std::string& value)
-{ untested();
-  if(_parent){ untested();
+{
+  if(_parent){
     trace2("DEV_SUBCKT::spbn", name, value);
     return BASE_SUBCKT::set_port_by_name(name, value);
-  }else{ untested();
+  }else{
     int index = net_nodes();
     // grow_nodes(index, _nodes, _node_capacity, node_capacity_floor);
     _port_name.push_back(name);
@@ -346,11 +346,11 @@ int DEV_SUBCKT::set_param_by_name(std::string Name, std::string Value)
   COMMON_PARAMLIST* c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
   assert(c);
 
-  if (!_parent){
+  if (!_parent || _parent == &pp){
     if (Name[0] == '$'){ untested();
-      incomplete(); // not allowed
-      return -1;
+      throw Exception_No_Match(Name);
     }else{
+      // TODO: unshared mutable_common?
       return BASE_SUBCKT::set_param_by_name(Name, Value);
     }
   }else if (Name[0] == '$'){
@@ -362,8 +362,8 @@ int DEV_SUBCKT::set_param_by_name(std::string Name, std::string Value)
     trace1("spbn done", common());
     return i;
   }else{
-    PARAM_LIST::const_iterator p = _parent->subckt()->params()->find(Name);
-    if(p != _parent->subckt()->params()->end()){
+    PARAM_LIST::iterator p = c->_params.find(Name);
+    if(p != c->_params.end()){
       return BASE_SUBCKT::set_param_by_name(Name,Value);
     }else{itested();
       throw Exception_No_Match(Name);
@@ -372,16 +372,16 @@ int DEV_SUBCKT::set_param_by_name(std::string Name, std::string Value)
 }
 /*--------------------------------------------------------------------------*/
 void DEV_SUBCKT::set_param_by_index(int i, std::string& Value, int Offset)
-{ untested();
+{
   COMMON_PARAMLIST* c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
   assert(c);
   auto p=dynamic_cast<const DEV_SUBCKT*>(_parent);
   assert(p);
-  int param_count = p->subckt()->params()->size();
+  int param_count = c->_params.size();
   // assert(param_count == p->param_count()); BUG, incomplete
 
-  if(p && i<param_count){ untested();
-    std::string param_name = p->subckt()->params()->name(i);
+  if(p && i<param_count){
+    std::string param_name = c->_params.name(i);
     auto cc = c->mutable_clone();
     trace2("DS::spbi found name", i, param_name);
     cc->set_param_by_name(param_name, "");
@@ -394,7 +394,7 @@ void DEV_SUBCKT::set_param_by_index(int i, std::string& Value, int Offset)
 }
 /*--------------------------------------------------------------------------*/
 double DEV_SUBCKT::localparam_value(std::string const& path) const
-{ untested();
+{
   CARD_LIST const* scope = subckt();
   auto dotplace = path.find(".");
   if(dotplace == std::string::npos){
@@ -402,13 +402,13 @@ double DEV_SUBCKT::localparam_value(std::string const& path) const
     PARAM_LIST const* p = scope->params();
     assert(p);
     PARAM_LIST::const_iterator it = p->find(path);
-    if(it == p->end()){ untested();
+    if(it == p->end()){
 	PARAMETER<double> pd; pd = path;
 	pd.e_val(NOT_VALID, scope->params());
 	return pd;
-    }else{ untested();
+    }else{
       PARAM_INSTANCE const& pi = it.ref();
-      if(auto f = dynamic_cast<Float const*>(pi.value())) { untested();
+      if(auto f = dynamic_cast<Float const*>(pi.value())) {
 	PARAMETER<double> pd; pd = path;
 	pd.e_val(NOT_VALID, scope->params());
 	return pd;
@@ -439,8 +439,8 @@ std::string DEV_SUBCKT::port_name(int i)const
   }else if(_parent) { untested();
     unreachable();
     return "";
-  }else if(i<int(_port_name.size())) { untested();
-    if(_port_name[i]!=""){ untested();
+  }else if(i<int(_port_name.size())) {
+    if(_port_name[i]!=""){
       return _port_name[i];
     }else{ untested();
       return  port_value(i);

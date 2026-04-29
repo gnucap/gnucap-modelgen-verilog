@@ -1,6 +1,6 @@
 module vsin (.p(p),.n(n));
-  .parameter ampl 
-  .parameter dc 
+  parameter ampl 
+  parameter dc 
   vsource #(sin.offset(NA( 0.)), .amplitude(ampl), .frequency( 1.), .delay(NA( 0.)), .damping(NA( 0.))  DC dc) V1 (.p(p),.n(n));
 endmodule // vsin
 

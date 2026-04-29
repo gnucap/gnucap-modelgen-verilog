@@ -293,11 +293,19 @@ int PARAMSET::set_param_by_name(std::string Name, std::string Value)
 //  assert(_parent);
   trace4("PARAMSET::set_param_by_name", short_label(), Name, Value, param_count());
 
-  if (!_parent || _parent == &ps){
+  if (_parent == &ps){
+    if(Value == ""){
+      // parameter declaration
+      return -1;
+    }else{
+      // parameter assignment
+      return BASE_SUBCKT::set_param_by_name(Name, Value);
+    }
+  }else if (!_parent){ untested();
     if (Name[0] == '$'){ untested();
       incomplete(); // not allowed
       return -1;
-    }else{
+    }else{ untested();
       return BASE_SUBCKT::set_param_by_name(Name, Value);
     }
   }else if(Name[0] == '$') {

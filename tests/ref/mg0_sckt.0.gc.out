@@ -2,9 +2,6 @@
 >>>>>`modelgen
 >>>>>!make test_sckt0.so > /dev/null
 >>>>>attach ./test_sckt0.so
->>>>>parameter r=1
->>>>>parameter c=1
->>>>>parameter v=0
 >>>>>list
 parameter r=1
 parameter c=1
