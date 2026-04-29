@@ -6,6 +6,7 @@ This file summarizes new features and important changes between snapshots.
 ============
 - fix parameter initialisers in interpreted paramset
 - localparam in lang_spice
+- overloading tie break: localparam range count
 - ..
 
 20260329-dev

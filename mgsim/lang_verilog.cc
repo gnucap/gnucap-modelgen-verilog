@@ -29,6 +29,7 @@
 #include <u_lang.h>
 /*--------------------------------------------------------------------------*/
 static const std::string IS_VALID = "__is_valid";
+static const std::string HOW_VALID = "__how_valid";
 static bool instanciate_unused = false;
 static int nest;
 /*--------------------------------------------------------------------------*/
@@ -709,6 +710,7 @@ void CMD_MODULE_PARAM::parse_def(CS& cmd, PARAM_INSTANCE& par) const
 /*--------------------------------------------------------------------------*/
 void CMD_MODULE_PARAM::parse(CS& cmd, CARD* Owner, char what) const
 {
+  int valid = 0;
   CARD_LIST* Scope;
   if(Owner) {
     Scope = Owner->subckt();
@@ -759,7 +761,9 @@ void CMD_MODULE_PARAM::parse(CS& cmd, CARD* Owner, char what) const
       assert(cmd);
       break;
     }else if(cmd >> ',') { itested();
-    }else if( parse_range(cmd, pl, Name)) {
+    }else if(!parse_range(cmd, pl, Name)) {
+    }else if(what == 'l') {
+      ++valid;
       // increment valid if local??
     }else{
     }
@@ -777,6 +781,18 @@ void CMD_MODULE_PARAM::parse(CS& cmd, CARD* Owner, char what) const
   if(!cmd){
     cmd.warn(bDANGER, "syntax error");
   }else{
+  }
+
+  {
+    PARAM_INSTANCE v = pl->deep_lookup(HOW_VALID);
+    std::string vlvl = to_string(valid);
+    if(v.has_hard_value()){ untested();
+      vlvl = v.string() + "+" + vlvl;
+      pl->set(HOW_VALID, vlvl);
+    }else{ untested();
+      // v = PARAMETER<vInteger>();
+      pl->set(HOW_VALID, vlvl);
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
