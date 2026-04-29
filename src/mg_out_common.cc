@@ -816,7 +816,7 @@ void make_final_cleanup_params(std::ostream& o, const Parameter_List_Collection&
   for(auto const& pl : P){
     for (Parameter_2_List::const_iterator p=pl->begin(); p!=pl->end(); ++p) {
       if( (**p).type().is_string()){
-      }else{
+      }else if((**p).type().is_real()){
 	// TODO. is_valid() / set_invalid()
 	o__ "if(" << (**p).code_name() << " == " << (**p).code_name() << ") {\n";
 	o__ "}else{\n";
@@ -826,6 +826,7 @@ void make_final_cleanup_params(std::ostream& o, const Parameter_List_Collection&
 	  o____ (**p).code_name() << ".set_default(NOT_VALID);\n";
 	}
 	o__ "}\n";
+      }else{
       }
     }
   }
