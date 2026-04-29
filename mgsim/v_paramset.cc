@@ -73,8 +73,8 @@ static CARD const* find_proto(const std::string& Name, const CARD* Scope)
 class PARAMSET : public BASE_SUBCKT {
   node_t* _n{nullptr};
 private: // partly redudant
-  PARAMSET const* _parent; // use _dev?
-  COMPONENT const* _dev; // owned by paramset instance.
+  PARAMSET const* _parent{nullptr}; // use _dev?
+  COMPONENT const* _dev{nullptr}; // owned by paramset instance.
   int _node_capacity;
 public:
   PARAMSET();
@@ -174,8 +174,6 @@ DISPATCHER<CARD>::INSTALL ds(&device_dispatcher, "paramset", &ps);
 /*--------------------------------------------------------------------------*/
 PARAMSET::PARAMSET()
   :BASE_SUBCKT()
-  ,_parent(NULL)
-  ,_dev(NULL)
 {
   attach_common(&Default_PARAMSET());
 }
@@ -295,7 +293,14 @@ int PARAMSET::set_param_by_name(std::string Name, std::string Value)
 //  assert(_parent);
   trace4("PARAMSET::set_param_by_name", short_label(), Name, Value, param_count());
 
-  if(Name[0] == '$') {
+  if (!_parent || _parent == &ps){
+    if (Name[0] == '$'){ untested();
+      incomplete(); // not allowed
+      return -1;
+    }else{
+      return BASE_SUBCKT::set_param_by_name(Name, Value);
+    }
+  }else if(Name[0] == '$') {
     return BASE_SUBCKT::set_param_by_name(Name, Value);
   }else if(Name==""){ untested();
     throw Exception_No_Match("invalid parameter: " + Name);
