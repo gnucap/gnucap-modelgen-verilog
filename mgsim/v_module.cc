@@ -91,7 +91,7 @@ private:
   void set_param_by_index(int i, std::string& Value, int j)override;
   double localparam_value(std::string const&)const override;
 private: // override virtual
-  char		id_letter()const override	{return 'X';}
+  char		id_letter()const override	{ untested();return 'X';}
   bool		print_type_in_spice()const override {return true;}
   std::string   value_name()const override	{return "#";}
   int		max_nodes()const override;
@@ -216,7 +216,7 @@ int DEV_SUBCKT::set_port_by_name(std::string& name, std::string& value)
 /*--------------------------------------------------------------------------*/
 int DEV_SUBCKT::max_nodes() const
 {
-  if(_parent == &pp){
+  if(_parent == &pp){ untested();
     // spice..
     return _parent->max_nodes();
   }else if(_parent){
@@ -275,7 +275,7 @@ CARD* DEV_SUBCKT::clone()const
   DEV_SUBCKT* new_instance = new DEV_SUBCKT(*this);
   assert(!new_instance->subckt());
 
-  if (this == &p1){
+  if (this == &p1){ untested();
     // cloning from static, empty model
     // has no parent.
     new_instance->new_subckt(); // from DEV_SUBCKT_PROTO::DEV_SUBCKT_PROTO
@@ -342,14 +342,20 @@ DEV_SUBCKT::DEV_SUBCKT(const DEV_SUBCKT& p)
 /*--------------------------------------------------------------------------*/
 int DEV_SUBCKT::set_param_by_name(std::string Name, std::string Value)
 {
-  assert(_parent);
-  assert(_parent->subckt());
+  assert(!_parent || _parent->subckt());
   COMMON_PARAMLIST* c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
   assert(c);
 
-  if (Name[0] == '$'){
+  if (!_parent){
+    if (Name[0] == '$'){ untested();
+      incomplete(); // not allowed
+      return -1;
+    }else{
+      return BASE_SUBCKT::set_param_by_name(Name, Value);
+    }
+  }else if (Name[0] == '$'){
     return BASE_SUBCKT::set_param_by_name(Name, Value);
-  }else if(_parent==&pp || !_parent) {
+  }else if(_parent==&pp || !_parent) { untested();
     // spice.
     trace3("spice spbn", Name, Value, c);
     int i = BASE_SUBCKT::set_param_by_name(Name,Value);
@@ -427,7 +433,7 @@ std::string DEV_SUBCKT::port_name(int i)const
   if (const DEV_SUBCKT* p=dynamic_cast<const DEV_SUBCKT*>(_parent)) {
     if (i<p->net_nodes()){
       return p->port_name(i);
-    }else{
+    }else{ untested();
       return "";
     }
   }else if(_parent) { untested();
@@ -512,7 +518,7 @@ void DEV_SUBCKT::precalc_first()
   }
 
   assert(is_device());
-  if(_parent == &pp){
+  if(_parent == &pp){ untested();
     COMMON_PARAMLIST const* c = prechecked_cast<COMMON_PARAMLIST const*>(common());
     assert(c);
     // first time spice
@@ -522,13 +528,13 @@ void DEV_SUBCKT::precalc_first()
       // good
     }else if ((_parent = dynamic_cast<const DEV_MODULE_PROTO*>(model))) { untested();
       // good
-    }else if (auto ms = dynamic_cast<const MODEL_SUBCKT*>(model)) {
+    }else if (auto ms = dynamic_cast<const MODEL_SUBCKT*>(model)) { untested();
       // good
       _parent = prechecked_cast<BASE_SUBCKT const*>(ms->component_proto());
       assert(_parent);
-    }else if (dynamic_cast<const BASE_SUBCKT*>(model)) {
+    }else if (dynamic_cast<const BASE_SUBCKT*>(model)) { untested();
       throw Exception_Type_Mismatch(long_label(), c->modelname(), "subckt proto");
-    }else{
+    }else{ untested();
       throw Exception_Type_Mismatch(long_label(), c->modelname(), "subckt");
     }
   }else{itested();
@@ -556,7 +562,7 @@ void DEV_SUBCKT::precalc_first()
     subckt()->params()->set_try_again(&c->_params);
 #endif
     subckt()->precalc_first();
-  }else{
+  }else{ untested();
   }
 
 }
