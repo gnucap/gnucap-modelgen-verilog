@@ -109,14 +109,14 @@ private: // override virtual
 private:
   void		precalc_last()override;
   double	tr_probe_num(const std::string&)const override;
-  int param_count_dont_print()const override {return 0; } // {common()->COMMON_COMPONENT::param_count();}
+  int param_count_dont_print()const override { untested();return 0; } // {common()->COMMON_COMPONENT::param_count();}
 
   node_t& n_(int i)const override {
     assert(i>=0);
     if(i<_node_capacity) {
       assert(_nodes);
       return _nodes[i];
-    }else{
+    }else{ untested();
       // getting here in d_subckt.error3.ckt
       static node_t dummy;
       return dummy;
@@ -201,11 +201,11 @@ void DEV_SUBCKT::set_port_by_index(int Index, std::string& Value)
 }
 /*--------------------------------------------------------------------------*/
 int DEV_SUBCKT::set_port_by_name(std::string& name, std::string& value)
-{
-  if(_parent){
+{ untested();
+  if(_parent){ untested();
     trace2("DEV_SUBCKT::spbn", name, value);
     return BASE_SUBCKT::set_port_by_name(name, value);
-  }else{
+  }else{ untested();
     int index = net_nodes();
     // grow_nodes(index, _nodes, _node_capacity, node_capacity_floor);
     _port_name.push_back(name);
@@ -372,7 +372,7 @@ int DEV_SUBCKT::set_param_by_name(std::string Name, std::string Value)
 }
 /*--------------------------------------------------------------------------*/
 void DEV_SUBCKT::set_param_by_index(int i, std::string& Value, int Offset)
-{
+{ untested();
   COMMON_PARAMLIST* c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
   assert(c);
   auto p=dynamic_cast<const DEV_SUBCKT*>(_parent);
@@ -380,7 +380,7 @@ void DEV_SUBCKT::set_param_by_index(int i, std::string& Value, int Offset)
   int param_count = p->subckt()->params()->size();
   // assert(param_count == p->param_count()); BUG, incomplete
 
-  if(p && i<param_count){
+  if(p && i<param_count){ untested();
     std::string param_name = p->subckt()->params()->name(i);
     auto cc = c->mutable_clone();
     trace2("DS::spbi found name", i, param_name);
@@ -439,8 +439,8 @@ std::string DEV_SUBCKT::port_name(int i)const
   }else if(_parent) { untested();
     unreachable();
     return "";
-  }else if(i<int(_port_name.size())) {
-    if(_port_name[i]!=""){
+  }else if(i<int(_port_name.size())) { untested();
+    if(_port_name[i]!=""){ untested();
       return _port_name[i];
     }else{ untested();
       return  port_value(i);

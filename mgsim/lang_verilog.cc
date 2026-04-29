@@ -505,27 +505,35 @@ MODEL_CARD* LANG_VERILOG::parse_paramset(CS&, MODEL_CARD* x)
   }
 }
 /*--------------------------------------------------------------------------*/
-class CMD_PARAM : public CMD {
+class CMD_MODULE_PARAM : public CMD {
 public:
-  void do_it(CS& cmd, CARD_LIST* Scope)override {
+  explicit CMD_MODULE_PARAM() {}
+private:
+  explicit CMD_MODULE_PARAM(CMD_MODULE_PARAM const& p) : CMD(p) {}
+public:
+  CMD_MODULE_PARAM* clone()const override {
+    return new CMD_MODULE_PARAM(*this);
+  }
+public:
+  void do_it(CS& cmd, CARD_LIST* Scope)override {untested(); unreachable();
+    return do_it_(cmd, Scope);
+  }
+  void do_it_(CS& cmd, CARD_LIST* Scope, CARD* owner=nullptr) {
     PARAM_LIST* pl = Scope->params();
+    assert(!owner || Scope == owner->subckt());
+    std::string what = cmd.last_match();
     if (cmd.is_end()) { untested();
       pl->print(IO::mstdout, OPT::language);
       IO::mstdout << '\n';
     }else{
       std::string tail = cmd.tail();
-      parse(cmd, pl);
-      DEV_DOT* dd = new DEV_DOT();
-      assert(dd);
-      lang_verilog.move_attributes(tag_t(&cmd), dd->id_tag());
-      dd->set_owner(nullptr);
-      dd->set("parameter " + tail);
-      dd->set_owner(nullptr); // ?
-      Scope->push_back(dd);
+      parse(cmd, Scope, owner, what[0]);
+      lang_verilog.move_attributes(tag_t(&cmd), id_tag());
+      set(what + tail);
     }
   }
 private:
-  void parse(CS& cmd, PARAM_LIST*)const;
+  void parse(CS& cmd, CARD_LIST* Scope, CARD* Owner, char what)const;
   void parse_def(CS& cmd, PARAM_INSTANCE& par)const;
   void parse_range(CS& cmd, PARAM_LIST* Scope, std::string Name)const;
 } module_param;
@@ -690,7 +698,7 @@ public:
   }
 }param_any;
 /*--------------------------------------------------------------------------*/
-void CMD_PARAM::parse_def(CS& cmd, PARAM_INSTANCE& par) const
+void CMD_MODULE_PARAM::parse_def(CS& cmd, PARAM_INSTANCE& par) const
 {
    // BUG // need to tokenize right here. strings may contain separators etc.
   Expression e(cmd);
@@ -701,9 +709,10 @@ void CMD_PARAM::parse_def(CS& cmd, PARAM_INSTANCE& par) const
   par = s.str();
 }
 /*--------------------------------------------------------------------------*/
-void CMD_PARAM::parse(CS& cmd, PARAM_LIST* Scope) const
+void CMD_MODULE_PARAM::parse(CS& cmd, CARD_LIST* Scope, CARD* Owner, char what) const
 {
-  PARAM_LIST* pl = Scope;
+  assert(!Owner || Scope == Owner->subckt());
+  PARAM_LIST* pl = Scope->params();
   assert(pl);
   PARAM_INSTANCE par;
   if(cmd >> "real"){
@@ -736,6 +745,11 @@ void CMD_PARAM::parse(CS& cmd, PARAM_LIST* Scope) const
     }else{
     }
     pl->set(Name, par);
+    if(!Owner){
+    }else if(what == 'p'){
+      Owner->set_param_by_name(Name, "");
+    }else{
+    }
     trace3("parsed", Name, par.string(), cmd.tail());
 
     if(cmd >> ';') {
@@ -762,7 +776,7 @@ void CMD_PARAM::parse(CS& cmd, PARAM_LIST* Scope) const
   }
 }
 /*--------------------------------------------------------------------------*/
-void CMD_PARAM::parse_range(CS& cmd, PARAM_LIST* Scope, std::string Name) const
+void CMD_MODULE_PARAM::parse_range(CS& cmd, PARAM_LIST* Scope, std::string Name) const
 {
   assert(Scope);
   Scope->set_verilog();
@@ -922,8 +936,10 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
 
   for (;;) {
     size_t here = cmd.cursor();
-    if (cmd >> "parameter ") {
-      module_param.do_it(cmd, x->subckt());
+    if (cmd >> "parameter |localparam ") {
+      auto p = module_param.clone();
+      p->do_it_(cmd, x->subckt(), nullptr); // WIP
+      x->subckt()->push_back(p);
     }else if (cmd >> "//") {
       cmd.reset(here);
       // new__instance(cmd, x, x->subckt()); // BUG
@@ -988,8 +1004,10 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
 
     if (cmd >> "endmodule ") {
       break;
-    }else if (!have_instance && (cmd >> "parameter ")) {
-      module_param.do_it(cmd, x->subckt());
+    }else if (!have_instance && (cmd >> "parameter |localparam ")) {
+      auto p = module_param.clone();
+      p->do_it_(cmd, x->subckt(), x);
+      x->subckt()->push_back(p);
     }else if (cmd >> "//") {
       cmd.reset();
       new__instance(cmd, x, x->subckt());
