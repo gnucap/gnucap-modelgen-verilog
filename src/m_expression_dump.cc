@@ -39,6 +39,7 @@ static void dump_token(Token const* t, std::ostream& out)
 //   out << _name << ' ';
 // }
 /*--------------------------------------------------------------------------*/
+char* ftos_(double num, int fieldwidth, int len, int fmt); // // mg_out_exp
 void Expression_::dump(std::ostream& out)const
 {
   std::vector<const Token*> locals; // a way of faking garbage collection.
@@ -115,7 +116,9 @@ void Expression_::dump(std::ostream& out)const
       Token* t = new Token_PARLIST(tmp);
       locals.push_back(t);
       stack.push_back(t);
-    }else if (dynamic_cast<const Token_CONSTANT*>(*i)|| dynamic_cast<const Token_SYMBOL*>(*i)) {
+    }else if (dynamic_cast<const Token_CONSTANT*>(*i)) {
+      stack.push_back(*i);
+    }else if (dynamic_cast<const Token_SYMBOL*>(*i)) {
       if (auto call = dynamic_cast<const Token_CALL*>(*i)) {
 	if (auto args = dynamic_cast<const Expression_* /*_?*/>(call->args())) {
 	  std::stringstream tmp;
@@ -239,7 +242,7 @@ void Expression_::dump(std::ostream& out)const
     if(!dynamic_cast<Token_CONSTANT const*>(i)) {
       out << i->full_name();
     }else if(auto f = dynamic_cast<Float const*>(i->data())){
-      std::string val = ftos(*f, 0, 15, ftos_EXP);
+      std::string val = ftos_(*f, 0, 15, ftos_1364);
       notstd::to_lower(&val);
       out << val;
     }else if(auto g = dynamic_cast<Integer const*>(i->data())){

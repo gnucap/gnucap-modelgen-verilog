@@ -11,7 +11,7 @@ module test_idt3a(p, n);
       rst = 1; // s2 r3{abx}
       discontinuity(); // r3{evx}
     end
-    V(p, n) <+ idt( 1., 0, rst); // [V(idt_0_p)] r2{x}
+    V(p, n) <+ idt( 1.0, 0, rst); // [V(idt_0_p)] r2{x}
   end
 
 endmodule

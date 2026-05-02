@@ -1,7 +1,7 @@
 // paramsets
 module my_res(a, b);
   electrical a, b;
-  parameter real r =  1.;
+  parameter real r =  1.0;
   localparam real __r = r;
 
   analog begin
@@ -11,18 +11,18 @@ module my_res(a, b);
 endmodule
 module my_res(a, b);
   electrical a, b;
-  parameter real R =  1.e+3 from [ 1.e+3: 1.e+3];
-  localparam real __r =  1.e+3;
+  parameter real R =  1.0e+3 from [ 1.0e+3: 1.0e+3];
+  localparam real __r =  1.0e+3;
 
   analog begin
-    I(a, b) <+ (V(a, b) /  1.e+3);
+    I(a, b) <+ (V(a, b) /  1.0e+3);
   end
 
 endmodule
 module my_res(a, b);
   electrical a, b;
-  parameter real R0 =  1.;
-  parameter real R1 =  1.;
+  parameter real R0 =  1.0;
+  parameter real R1 =  1.0;
   localparam real __r = (R0 + R1);
 
   analog begin

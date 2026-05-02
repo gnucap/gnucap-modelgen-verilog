@@ -28,7 +28,7 @@ module dep1(out0, out1, in0, in1);
   electrical fwd, ref;
   branch (out0, out1) out;
   branch (in0, in1) in;
-  parameter real pp = -100.;
+  parameter real pp = -100.0;
 
   real vfwd// + [V(ddt_0_p)]
 ;
@@ -36,7 +36,7 @@ module dep1(out0, out1, in0, in1);
   analog begin // always
     // vfwd : 1
     I(out) <+ (V(out) / 2); // [Vout] r2{x}
-    vfwd = ddt(((V(in) *  2.) - V(ref))); // [V(ddt_0_p)] s1 r4{abx}
+    vfwd = ddt(((V(in) *  2.0) - V(ref))); // [V(ddt_0_p)] s1 r4{abx}
     I(out) <+ vfwd; // [V(ddt_0_p)] s1 r2{x}
   end
 

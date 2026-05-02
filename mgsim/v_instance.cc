@@ -907,7 +907,7 @@ void INSTANCE::expand_sift()
       gval = dval;
       assert(gotit);
       *j = nullptr;
-    }else if(gval < dval) { untested();
+    }else if(gval < dval) {
       error(bLOG, long_label() + " valid value tie break: " + to_string(gval) + " vs. " +
 	  to_string(dval) + "\n");
       assert(gotit);

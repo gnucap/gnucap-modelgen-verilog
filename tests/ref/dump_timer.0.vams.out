@@ -5,10 +5,10 @@ module timer_test(out);
 
   analog begin
     rst = 0;
-    @(timer( 1.,  1.)) begin
+    @(timer( 1.0,  1.0)) begin
       rst = 1;
     end
-    V(out) <+ idt( 1.,  0., rst);
+    V(out) <+ idt( 1.0,  0.0, rst);
   end
 
 endmodule

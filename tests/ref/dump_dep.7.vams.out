@@ -1,7 +1,7 @@
 module dep7(d, g);
   inout d, g;
   electrical d, g;
-  parameter real p =  0.;
+  parameter real p =  0.0;
 
   real T//
 ;
@@ -14,7 +14,7 @@ module dep7(d, g);
     @(initial_step) begin // e
       if ((! $param_given(p))) begin // e
         // c : 0
-        c =  1.; // s2 r4{abx}
+        c =  1.0; // s2 r4{abx}
       end
     end
     T = c; // s4 r3{abx}

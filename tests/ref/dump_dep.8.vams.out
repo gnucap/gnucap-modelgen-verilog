@@ -1,7 +1,7 @@
 module dep7(a, g);
   inout a, g;
   electrical a, g;
-  parameter real p =  0.;
+  parameter real p =  0.0;
 
   real T//
 ;
@@ -44,7 +44,7 @@ endmodule
 // paramsets
 module dep7p(a, g);
   electrical a, g;
-  localparam real __p =  0.;
+  localparam real __p =  0.0;
 
   real __T//
 ;

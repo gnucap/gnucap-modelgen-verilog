@@ -1,6 +1,6 @@
 module test(a, b);
   electrical a, b;
-  parameter real arg = 0 from [ 0.: 0.];
+  parameter real arg = 0 from [ 0.0: 0.0];
 
   real T;
   real U;
@@ -11,7 +11,7 @@ module test(a, b);
       V(a) <+  1.1;
     end
     begin
-      V(b) <+  2.;
+      V(b) <+  2.0;
     end
     begin
       V(b) <+  3.1;
@@ -22,18 +22,18 @@ module test(a, b);
     else begin
       V(b) <+  3.7;
     end
-    x =  0.;
+    x =  0.0;
     if (x) begin
-      V(a) <+  5.;
+      V(a) <+  5.0;
     end
-    case ( 0.)
+    case ( 0.0)
       0: begin
         V(b) <+  1.2;
       end
     endcase
-    case ( 0.)
+    case ( 0.0)
       0: begin
-        V(b) <+  2.;
+        V(b) <+  2.0;
       end
     endcase
   end

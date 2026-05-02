@@ -5,12 +5,12 @@ module test_af();
     real x;
     input x;
     begin
-      if ((x >  17.)) begin
-        limitex = ((x + -16.) *  42.);
+      if ((x >  17.0)) begin
+        limitex = ((x + -16.0) *  42.0);
       end
       else begin
-        if ((x < -17.)) begin
-          limitex =  42.;
+        if ((x < -17.0)) begin
+          limitex =  42.0;
         end
         else begin
           limitex = exp(x);
@@ -32,7 +32,7 @@ module test_af();
     real y;
     input x;
     begin
-      y =  1.;
+      y =  1.0;
       fct2 = ln(max(x, y));
     end
   endfunction
@@ -43,7 +43,7 @@ module test_af();
     input x, y;
     output z;
     begin
-      something = ((x + sqrt(((x * x) + ((y *  4.) * y)))) *  0.5);
+      something = ((x + sqrt(((x * x) + ((y *  4.0) * y)))) *  0.5);
     end
   endfunction
 
@@ -51,7 +51,7 @@ module test_af();
     real i;
     real out;
     i = something(26,  20.0855369231877, out);
-    i = something(26,  1., out);
+    i = something(26,  1.0, out);
   end
 
 endmodule

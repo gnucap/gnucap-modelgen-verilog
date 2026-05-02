@@ -31,22 +31,19 @@
 const int POOLSIZE = 100;
 const int MAXLENGTH = 40;
 static double ftos_floor = 1e-101;
-static char* ftos_(double num, int fieldwidth, int len, int fmt)
+char* ftos_(double num, int fieldwidth, int len, int fmt)
 	// num = number to convert
 	// fieldwidth = size for fixed width, 0 for variable width
 	// len = max length of new string
 	// fmt = how to format it
 {
   if (len < 3) { untested();
-    untested();
     len = 3;
   }
   if (len > MAXLENGTH-6) { untested();
-    untested();
     len = MAXLENGTH-6;
   }
   if (fieldwidth > MAXLENGTH-1) { untested();
-    untested();
     fieldwidth = MAXLENGTH-1;
   }
   
@@ -60,6 +57,7 @@ static char* ftos_(double num, int fieldwidth, int len, int fmt)
     ++poolindex;
     if (poolindex >= POOLSIZE) {
       poolindex = 0;
+    }else{
     }
     str = strpool[poolindex];
   }
@@ -76,16 +74,12 @@ static char* ftos_(double num, int fieldwidth, int len, int fmt)
   
 #ifdef HAS_NUMERIC_LIMITS
   if (num == std::numeric_limits<double>::infinity()) { untested();
-    untested();
     memcpy(str, " Over", 5);
   }else if (num == -std::numeric_limits<double>::infinity()) { untested();
-    untested();
     memcpy(str, "-Over", 5);
   }else if (num == std::numeric_limits<double>::quiet_NaN()) { untested();
-    untested();
     memcpy(str, " NaN", 4);
   }else if (num == std::numeric_limits<double>::signaling_NaN()) { untested();
-    untested();
     memcpy(str, " NaN", 4);
   }else
 #endif
@@ -183,10 +177,12 @@ static char* ftos_(double num, int fieldwidth, int len, int fmt)
 	    if ((flg += digit)) {	/* if int part !=0		    */
 	      str[nnn++]=static_cast<char>(digit+'0');/*(not all zeros so far)*/
 	      --len;			/* stuff the digit into the string  */
+	    }else{
 	    }
 	    if (iii==0) {		/* if we found the dec.pt. and	    */
 	      str[nnn++] = '.';		/*   haven't used up all the space  */
-	    }				/* put a dec.pt. in the string	    */
+	    }else{			/* put a dec.pt. in the string	    */
+	    }
 	  }
 	}
       }
@@ -201,7 +197,13 @@ static char* ftos_(double num, int fieldwidth, int len, int fmt)
 	}
 	++nnn;
       }else{ untested();
-	untested();
+      }
+      if (fmt&ftos_PADD) {
+	if (str[nnn-1]=='.') {
+	  str[nnn++] = '0';
+	}else{
+	}
+      }else{
       }
     }
     
@@ -242,11 +244,11 @@ bool is_cc_ref(Token const* t)
     return true;
   }else if (dynamic_cast<Token_VAR_REF const*>(t)) {
     return true;
-  }else if (dynamic_cast<Token_PORT_BRANCH const*>(t)) {
+  }else if (dynamic_cast<Token_PORT_BRANCH const*>(t)) { untested();
     return true;
   }else if (dynamic_cast<Token_CONSTANT const*>(t)) {
     return true;
-  }else if (dynamic_cast<Token_HIER_REF const*>(t)) {
+  }else if (dynamic_cast<Token_HIER_REF const*>(t)) { untested();
     return true;
   }else{
     return false;
@@ -260,7 +262,7 @@ bool is_cc_ref(Expression const* e)
 
   if(e->size()==1){
     return is_cc_ref(*e->begin());
-  }else{
+  }else{ untested();
     return false;
   }
 }
@@ -423,7 +425,7 @@ public:
     assert(_types.size());
     int t = _types.top();
     assert(t<t_count);
-    static std::string names[] = {
+    static std::string names[] = { //
        "LOGICVAL", "double", "ddouble",
        "string", "auto&",
        "incomplete_cpptype"
