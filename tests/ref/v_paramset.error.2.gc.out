@@ -1,5 +1,5 @@
   paramset vs vsource;
-  ^ ? ERROR: This will not work. Need top level.
+  ^ ? nonstandard nesting in main.
 module main (.\2 (\2 ),.\1 (\1 ));
   parameter v;
   paramset vs vsource;

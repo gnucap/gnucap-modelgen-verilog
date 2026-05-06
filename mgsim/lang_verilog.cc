@@ -1047,7 +1047,7 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
       new__instance(cmd, x, x->subckt());
     }else if (cmd >> "paramset ") {
       cmd.reset();
-      cmd.check(bDANGER, "ERROR: This will not work. Need top level.");
+      cmd.check(bWARNING, "nonstandard nesting in " + x->long_label() + ".");
       new__instance(cmd, x, x->subckt());
     }else{
       if(has_attributes(tag_t(&cmd))){
