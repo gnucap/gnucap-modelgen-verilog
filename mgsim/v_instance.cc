@@ -160,7 +160,7 @@ class INSTANCE : public BASE_SUBCKT {
 protected: // stub stuff
   INSTANCE const* _cloned_from{nullptr}; // use common/mutable_common instead?
   const COMPONENT* _parent{nullptr};
-  mutable DEV_INSTANCE_PROTO* _proto{nullptr}; // use common->proto?
+  mutable INSTANCE* _proto{nullptr}; // use common->proto?
   int _node_capacity{0};
 protected:
   explicit	INSTANCE(const INSTANCE&);
@@ -168,14 +168,30 @@ public:
   explicit	INSTANCE();
 		~INSTANCE();
   CARD*		clone_instance()const override {
-    // incomplete();
+    if(!_parent) {
+    }else if(_parent->subckt()->size() == 1){ untested();
+      return (*_parent->subckt()->begin())->clone_instance();
+    }else{ untested();
+    }
+    if(!_proto) {
+      // return nullptr;
+    }else if(_proto->subckt()->size() == 1){ untested();
+      return (*_proto->subckt()->begin())->clone_instance();
+    }else{
+    }
+
+    // is this an error?
     return clone();
   }
   CARD*		clone()const override {
     INSTANCE* new_instance = new INSTANCE(*this);
 
     // BUG?
+  //  new_instance->_parent = (COMPONENT const*)_proto;
+  if(_proto){
     new_instance->_parent = (COMPONENT const*)_proto;
+  }else{
+  }
 
     return new_instance;
   }
@@ -392,19 +408,19 @@ CARD* INSTANCE::prepare_overload(CARD* model, std::string modelname, INSTANCE* P
   assert(Proto->subckt());
   assert(Proto->scope()==Proto->subckt());
   assert(model);
-  if(dynamic_cast<INSTANCE*>(model)){ untested();
+  if(dynamic_cast<INSTANCE*>(model)){
     error(bDEBUG, long_label() + " found instance \"" + model->long_label() + "\".\n");
     model->expand_first();
-  }else{ untested();
+  }else{
   }
 
   CARD* cl = model->clone_instance();
   COMPONENT* cur = prechecked_cast<COMPONENT*>(cl);
   assert(cur || !cl);
-  if(dynamic_cast<INSTANCE*>(cl)){ untested();
-    incomplete();
-    // does not work.
-    // return nullptr;
+  if(dynamic_cast<INSTANCE*>(cl)){
+    delete cl;
+    error(bLOG, long_label() + " discarded (not ready)\n");
+    return nullptr;
   }else{
   }
 
@@ -986,7 +1002,7 @@ void INSTANCE::expand_first()
   static int recursion;
   if(++recursion > OPT::recursion){
     recursion = 0;
-    throw Exception(long_label() + ": expand recursion too deep");
+    throw Exception(long_label() + ": recursion too deep");
   }else{
   }
   BASE_SUBCKT::expand_first();
@@ -995,8 +1011,8 @@ void INSTANCE::expand_first()
   trace3("INSTANCE::precalc_first", short_label(), _parent, common()->modelname());
   trace1("INSTANCE::precalc_first", _sim->is_first_expand());
 
-  if(defer_proto()){ untested();
-    if(_proto){ untested();
+  if(defer_proto()){
+    if(_proto){
       assert(_proto!=this);
       error(bDEBUG, long_label() + ": defer proto\n");
        delete _proto;
@@ -1006,9 +1022,28 @@ void INSTANCE::expand_first()
   }else if(!owner()){
     build_proto();
     _parent = _proto; // common->proto?
+  }else if(_cloned_from==&p1){
+    build_proto();
   }else if(_cloned_from){
     _cloned_from->build_proto();
-  }else{ untested();
+  }else { untested();
+  }
+
+  if(defer_proto()){
+  }else if(_cloned_from && !_parent && !_proto){
+  // incomplete(); // dup.1?
+    // BUG: move to clone_instance
+    trace1("INSTANCE::precalc_first afresh", long_label());
+    _proto = new DEV_INSTANCE_PROTO();
+    _proto->attach_common(mutable_common());
+    auto c = prechecked_cast<COMMON_INSTANCE const*>(common());
+    assert(c);
+    for(int i=0; i < int(c->_port_names.size()); ++i){
+      auto v = c->_port_names[i];
+      _proto->set_port_by_name(v, v);
+    }
+    build_proto();
+  }else{
   }
 
   if(_parent){
@@ -1029,7 +1064,7 @@ bool INSTANCE::defer_proto() const
     return false;
   }else if(_cloned_from != &p1){
     return false;
-  }else{ untested();
+  }else{
   }
   CARD_LIST::const_iterator i = scope()->find_(modelname);
   if(i == scope()->end()) { untested();
@@ -1095,7 +1130,11 @@ void INSTANCE::set_port_by_index(int Index, std::string& Value)
   BASE_SUBCKT::set_port_by_index(Index, Value);
 
   if(!_parent){
-    assert(_proto);
+    if(!_proto){
+      incomplete();
+      throw Exception(long_label() + ": no proto");
+    }else{
+    }
 
     std::string n = "*unnamed_port_" + std::to_string(Index);
     trace3("proto fwd", long_label(), n, Value);
