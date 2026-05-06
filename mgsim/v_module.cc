@@ -140,6 +140,10 @@ public:
   CARD_LIST*	   scope()override		{ return subckt();}
   const CARD_LIST* scope()const override	{ return subckt();}
   CARD*		clone()const override		{ return new DEV_MODULE_PROTO(*this);}
+private:
+  void precalc_first()override {
+    subckt()->precalc_first();
+  }
 } p0(&Default_SUBCKT);
 DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "module", &p0);
 /*--------------------------------------------------------------------------*/

@@ -1480,6 +1480,16 @@ DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "paramset", &p1);
 /*--------------------------------------------------------------------------*/
 class CMD_MODULE : public CMD {
   void do_it(CS& cmd, CARD_LIST* Scope)override {
+    class MODEL_SUBCKT_ : public MODEL_SUBCKT {
+    public:
+      explicit MODEL_SUBCKT_(COMPONENT* c) : MODEL_SUBCKT(c) {}
+      void precalc_first()override {
+	if(_proto){
+	  return _proto->precalc_first();
+	}else{ untested();
+	}
+      }
+    };
     BASE_SUBCKT* new_module = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("module"));
     assert(new_module);
     // assert(!new_module->owner());
@@ -1488,7 +1498,7 @@ class CMD_MODULE : public CMD {
     assert(new_module->subckt()->is_empty());
     try {
       lang_verilog.parse_module(cmd, new_module);
-      auto p = new MODEL_SUBCKT(new_module);
+      auto p = new MODEL_SUBCKT_(new_module);
       p->set_owner(owner());
       p->set_label(new_module->short_label());
       Scope->push_back(p);
