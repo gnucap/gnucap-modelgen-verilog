@@ -202,13 +202,14 @@ protected:
   int		min_nodes()const override	{return 0;}
   int		ext_nodes()const override	{return net_nodes();}
   int		matrix_nodes()const override	{ untested();return 0;}
-protected:
-  int		net_nodes()const override	{return _net_nodes;}
-  void		precalc_first()override;
 private:
   bool		makes_own_scope()const override { untested();return false;}
 
 protected:
+protected:
+  int		net_nodes()const override	{return _net_nodes;}
+  //void	precalc_first()override;
+  void		expand_first()override;
   void		expand()override;
   CARD*		deflate()override;
 private:
@@ -874,9 +875,10 @@ void INSTANCE::expand()
 void INSTANCE::expand_sift()
 {
   // tie break rules
-  // - The paramset with the fewest number of un-overridden parameters shall be selected.
-  // - The paramset with the greatest number of local parameters with specified ranges shall be selected.
-  // - The paramset with the fewest ports not connected in the instance line shall be selected.
+  // (- The device closest to the instance shall be selected)
+  // - The device with the fewest number of un-overridden parameters shall be selected.
+  // - The device with the greatest number of local parameters with specified ranges shall be selected.
+  // - The device with the fewest ports not connected in the instance line shall be selected.
   COMPONENT* gotit = nullptr;
   int gval = 0;
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ){
@@ -981,8 +983,10 @@ void INSTANCE::expand_sift()
 }
 /*--------------------------------------------------------------------------*/
 // Kludge: build proto in stub, so it only needs doing once.
-void INSTANCE::precalc_first()
+void INSTANCE::expand_first()
 {
+  BASE_SUBCKT::expand_first();
+
   assert(common());
   trace3("INSTANCE::precalc_first", short_label(), _parent, common()->modelname());
   trace1("INSTANCE::precalc_first", _sim->is_first_expand());
@@ -999,8 +1003,6 @@ void INSTANCE::precalc_first()
     trace2("INSTANCE::precalc_first w/ parent", short_label(), _parent->short_label());
   }else{
   }
-  // a device in a module instance
-  BASE_SUBCKT::precalc_first();
 
   assert(!is_constant()); /* because I have more work to do */
 }

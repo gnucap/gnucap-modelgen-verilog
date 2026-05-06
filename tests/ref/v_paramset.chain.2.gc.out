@@ -11,7 +11,6 @@
   zap  r2 (2 0);
              ^ ? invalid identifier
 >>>>>list
-m: 1 candidate found for main
 paramset bob resistor;
  .r=10k;
 endparamset
@@ -29,6 +28,7 @@ endmodule // main
 
 main #() m (\1 , \2 , \3 , \4 );
 >>>>>print op v(nodes)
+m: 1 candidate found for main
 m is "main from top level"
 main.r1: 1 candidate found for bob
 main.r2: 1 candidate found for zap
