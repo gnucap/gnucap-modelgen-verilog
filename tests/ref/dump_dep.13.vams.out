@@ -1,7 +1,7 @@
 module dep13(d, g);
   inout d, g;
   electrical d, g;
-  parameter real p =  0.;
+  parameter real p =  0.0;
 
   real T//
 ;

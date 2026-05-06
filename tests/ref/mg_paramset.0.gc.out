@@ -1,5 +1,3 @@
-isource #(.dc(5)) i(\0 , 1);
-                         ^ ? invalid identifier
 #           v(1)       iter(0)   
  0.         10.        4.        
 Gnucap   System status

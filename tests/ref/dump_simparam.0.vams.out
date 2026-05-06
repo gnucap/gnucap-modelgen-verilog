@@ -17,7 +17,7 @@ module device(a, c);
     // hh : 0
     // ii : 0
     // jj : 0
-    gg = $simparam("gmin",  0.); // s1 r4{abx}
+    gg = $simparam("gmin",  0.0); // s1 r4{abx}
     hh = $simparam("gmin"); // s1 r4{abx}
     ii = $simparam("scale", s); // s1 r4{abx}
     jj = $simparam("scale"); // s1 r4{abx}

@@ -11,7 +11,7 @@ module test();
       // dummy : 0
       // gmf : 0
       dummy = gmf; // s3 r3{abx}
-      gmf =  0.; // s1 r3{abx}
+      gmf =  0.0; // s1 r3{abx}
     end
   end
 

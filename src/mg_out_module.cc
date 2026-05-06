@@ -907,13 +907,13 @@ static void make_module_class(std::ostream& o, Module const& m)
 /*--------------------------------------------------------------------------*/
 static void make_module_clear_local_nodes(std::ostream& o, Module const& m)
 {
-  o____ "for(int i=0; i<ext_nodes()+int_nodes(); ++i){\n";
-  o______ "trace3(\"expand0 clear\", long_label(), i, n_(i).e_());\n";
-  o____ "}\n";
-  o____ "assert(scope());\n";
-  o____ "assert(scope()->nodes());\n";
-  o____ "NODE_MAP& nodes = *scope()->nodes();\n";
-  o____ "(void)nodes;\n";
+  o__ "for(int i=0; i<ext_nodes()+int_nodes(); ++i){\n";
+  o____ "trace3(\"expand0 clear\", long_label(), i, n_(i).e_());\n";
+  o__ "}\n";
+  o__ "assert(scope());\n";
+  o__ "assert(scope()->nodes());\n";
+  o__ "NODE_MAP& nodes = *scope()->nodes();\n";
+  o__ "(void)nodes;\n";
 
   int pp = 0;
   for (auto nn : m.circuit()->ports()) {
@@ -921,7 +921,7 @@ static void make_module_clear_local_nodes(std::ostream& o, Module const& m)
     int nnnn = nn->node()->number() - 1;
     if(nnnn!=pp){
       assert(nnnn<pp);
-      o______ "build_union(&n_("<<pp<<"), &n_("<<nnnn<<"));\n";
+      o____ "build_union(&n_("<<pp<<"), &n_("<<nnnn<<"));\n";
     }else{
     }
     ++pp;
@@ -933,12 +933,12 @@ static void make_module_clear_local_nodes(std::ostream& o, Module const& m)
   // o______ "trace3(\"expand1 union\", long_label(), i, n_(i).e_());\n";
   // o______ "build_union(&nodes[n_(i).e_()], &n_(i));\n";
   // o____ "}\n";
-  o____ "for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){\n";
-  o______ "n_(i).clear();\n";
-  o____ "}\n";
-  o____ "for(int i=0; i<ext_nodes()+int_nodes(); ++i){\n";
-  o______ "trace3(\"expand2 clear\", long_label(), i, n_(i).e_());\n";
-  o____ "}\n";
+  o__ "for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){\n";
+  o____ "n_(i).clear();\n";
+  o__ "}\n";
+  o__ "for(int i=0; i<ext_nodes()+int_nodes(); ++i){\n";
+  o____ "trace3(\"expand2 clear\", long_label(), i, n_(i).e_());\n";
+  o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
 static void make_module_new_local_node(std::ostream& o, const Node& p)
@@ -956,18 +956,18 @@ static void make_module_new_local_node(std::ostream& o, const Node& p)
   {
     if(p.short_to()){
       assert(!p.short_if().empty());
-      o____ "if (" << p.short_if() << ") {\n";
-      o______ "n_(n_" << p.name() << ") = "; // _n[n_" << p.short_to()->name() << "];\n";
+      o__ "if (" << p.short_if() << ") {\n";
+      o____ "n_(n_" << p.name() << ") = "; // _n[n_" << p.short_to()->name() << "];\n";
 	make_node_ref(o, *p.short_to());
 	o << ";\n";
-      o____ "}else";
+      o__ "}else";
     }else{
-      o____ "";
+      o__ "";
     }
     o << "{\n";
-    o______ "n_(n_" << p.name() << ").new_model_node(\".\" + long_label() + \"." << p.name() 
+    o____ "n_(n_" << p.name() << ").new_model_node(\".\" + long_label() + \"." << p.name() 
 			   << "\", this);\n";
-    o____ "}\n";
+    o__ "}\n";
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -985,6 +985,7 @@ static void make_module_new_local_nodes(std::ostream& o, Module const& m)
       o__ "// port " << nn->name() << " " << nn->number() << "\n";
       // BUG: allocate floating ports even if unused.
       o__ "find_subset(&n_(n_" << nn->name() << "));\n";
+      o__ "n_(n_" << nn->name() << ").allocate(3); // no-op unless floating\n";
     }else if(nn->is_used()){
       o__ "// internal " << nn->name() << " : " << nn->number() << "\n";
       make_module_new_local_node(o, *nn);
@@ -1232,9 +1233,13 @@ static void make_module_expand(std::ostream& o, Module const& m)
   o__ "node_t gnd;\n";
   o__ "gnd.set_to_ground(nullptr);\n";
   o__ "if (_sim->is_first_expand()) {\n";
-  make_module_clear_local_nodes(o, m);
-  make_module_new_local_nodes(o, m);
+  {
+    indent k;
+    make_module_clear_local_nodes(o, m);
+    make_module_new_local_nodes(o, m);
+  }
   if(m.has_submodule()) {
+    indent k;
     o__ "assert(_parent);\n";
     o__ "assert(_parent->subckt());\n";
     o__ "assert(_parent->subckt()->nodes());\n";
@@ -1302,42 +1307,14 @@ static void make_module_expand(std::ostream& o, Module const& m)
 
   // make_assign_expand(o, m);
 
-  // TODO: deflate
   o__ "subckt()->expand();\n";
   o__ "//subckt()->precalc();\n";
-
-  for (int n=int(m.circuit()->nodes().size()); n; --n) {
-    Node const* nn = m.circuit()->nodes()[n];
-    assert(nn);
-    int pos = nn->number();
-    if(pos == 0) {
-      o__ "// alloc ground\n";
-    //   o__ "n_(n_" << nn->name() << ").set_to_ground(nullptr);\n";
-    }else if(pos < n){
-    }else if(n <= int(m.circuit()->ports().size())){
-      // todo: use new_model_node for floating ports.
-      o__ "n_("<<pos-1<<").allocate(3); // no-op unless floating\n";
-    }else{
-      // handled by new_model_node
-    }
-  }
-
 
   o__ "assert(!is_constant());\n";
   if (m.sync()) {
 //    o << "  subckt()->set_slave();\n";
   }else{
   }
-  o__ "for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){\n";
-  o__ "  CARD* d = (*i)->deflate();\n";
-
-  o__ "  if(d == (*i)){\n";
-  o__ "  }else{\n";
-  o__ "    assert(d->owner() == this);\n";
-  o__ "    delete *i;\n";
-  o__ "    *i = d;\n";
-  o__ "  }\n";
-  o__ "}\n";
   if(m.has_expand_last()){
     o__ "q_expand_last();\n";
   }else{

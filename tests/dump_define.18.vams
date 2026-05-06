@@ -1,0 +1,15 @@
+
+
+`define k1 1.0e-101
+`define k2 1.0e-99
+
+`define MM(a) \
+analog a = `k1; \
+analog a = `k2;
+
+module t;
+real a = (1+1);
+`MM(a)
+analog a = `k1;
+analog a = `k2;
+endmodule

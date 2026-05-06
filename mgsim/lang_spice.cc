@@ -1,3 +1,4 @@
+#if 0
 /*                     -*- C++ -*-
  *
  * Copyright (C) 2006 Albert Davis
@@ -946,9 +947,11 @@ class CMD_SUBCKT : public CMD {
     new_module->set_owner(nullptr);
     assert(new_module->subckt());
     assert(new_module->subckt()->is_empty());
-    assert(!new_module->is_device());
     lang_spice.parse_module(cmd, new_module);
-    Scope->push_back(new_module);
+    auto p = new MODEL_SUBCKT(new_module);
+    p->set_label(new_module->short_label());
+    p->set_owner(owner());
+    Scope->push_back(p);
   }
 } p2;
 DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, ".subckt|.macro", &p2);
@@ -1160,3 +1163,4 @@ DISPATCHER<CMD>::INSTALL d99(&command_dispatcher, ".control", &p99);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:
+#endif

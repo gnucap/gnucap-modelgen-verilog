@@ -1,9 +1,11 @@
+ resistor #(.r(1k) .r(2)) r1(in, out)
+                   ^ ? main.: already set r, ignored
 module main ();
-  resistor #(.r(1k),.r(2)) r1 (in, out);
+  resistor #(.r(1k)) r1 (in, out);
 endmodule // main
 
 main #() dut ();
 dut is "main from top level"
-main.r1 discarded (params): parameter r already set
-main.r1: no candidates found for resistor
-dut.r1: no valid prototype found for resistor
+dut.r1 is "resistor from device_dispatcher"
+#          
+ 0.        

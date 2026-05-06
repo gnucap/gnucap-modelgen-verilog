@@ -1,15 +1,15 @@
 // paramsets
 module d1(a, b);
   electrical a, b;
-  parameter real p =  1.;
+  parameter real p =  1.0;
   localparam real __p = p;
   localparam real __P = 0;
 
   analog begin
-    if ( 1.) begin
+    if ( 1.0) begin
       V(a, b) <+ __p;
     end
-    if ( 0.) begin
+    if ( 0.0) begin
       V(a, b) <+ 0;
     end
   end
@@ -17,15 +17,15 @@ module d1(a, b);
 endmodule
 module d2(a, b);
   electrical a, b;
-  parameter real P =  1.;
+  parameter real P =  1.0;
   localparam real __p = P;
   localparam real __P = 0;
 
   analog begin
-    if ( 1.) begin
+    if ( 1.0) begin
       V(a, b) <+ __p;
     end
-    if ( 0.) begin
+    if ( 0.0) begin
       V(a, b) <+ 0;
     end
   end
@@ -33,15 +33,15 @@ module d2(a, b);
 endmodule
 module d2a(a, b);
   electrical a, b;
-  parameter real P =  1.;
+  parameter real P =  1.0;
   localparam real __P = P;
   localparam real __p = 0;
 
   analog begin
-    if ( 0.) begin
+    if ( 0.0) begin
       V(a, b) <+ 0;
     end
-    if ( 1.) begin
+    if ( 1.0) begin
       V(a, b) <+ __P;
     end
   end
@@ -53,10 +53,10 @@ module d3(a, b);
   localparam real __P = 0;
 
   analog begin
-    if ( 1.) begin
+    if ( 1.0) begin
       V(a, b) <+ 1;
     end
-    if ( 0.) begin
+    if ( 0.0) begin
       V(a, b) <+ 0;
     end
   end
@@ -68,10 +68,10 @@ module d4(a, b);
   localparam real __P = 0;
 
   analog begin
-    if ( 0.) begin
+    if ( 0.0) begin
       V(a, b) <+ 0;
     end
-    if ( 0.) begin
+    if ( 0.0) begin
       V(a, b) <+ 0;
     end
   end

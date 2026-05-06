@@ -28,11 +28,7 @@ endmodule // main
 >>>>>print dc v(nodes)
 m1: 1 candidate found for main
 m1 is "main from top level"
-r already set. replacing
-r already set. replacing
 main.n1: 2 candidates found for Resistor
-r already set. replacing
-r already set. replacing
 main.n2: 2 candidates found for Resistor
 main.i0: 1 candidate found for isource
 m1.n1 dropped invalid candidate: "B".

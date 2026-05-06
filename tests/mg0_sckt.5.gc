@@ -1,0 +1,30 @@
+attach ./modelgen_1.so
+
+`modelgen
+module test_sckt5(a, b);
+	inout a, b;
+	electrical a, b;
+	
+	thing #(.r(1)) r1(a, b);
+endmodule;
+`endmodelgen
+
+module thing(a, b);
+  parameter real r;
+  resistor #(.r(r))   r1(a, b);
+endmodule;
+
+!make test_sckt5.so > /dev/null
+attach ./test_sckt5.so
+
+verilog
+
+test_sckt5 #() dut(\1 ,\2 );
+isource #(.dc(2)) v1(\2 , \1 );
+
+list
+
+`print dc v(nodes) v(dut.r1.r1)
+`dc
+
+status notime

@@ -14,11 +14,11 @@ module dep6(d, g);
 ;
     @(initial_step) begin // e
       // c : 0
-      c =  1.; // s2 r3{abx}
+      c =  1.0; // s2 r3{abx}
     end
     @(initial_step) begin // e
       // c : 0
-      c =  2.; // s2 r3{abx}
+      c =  2.0; // s2 r3{abx}
     end
     T = c; // s6 r3{abx}
     S = (T * T); // s7 r3{abx}

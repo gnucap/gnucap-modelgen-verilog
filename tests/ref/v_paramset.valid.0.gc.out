@@ -41,7 +41,6 @@ main #() m (\0 , \1 , \2 , \4 );
 >>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
 m is "main from top level"
 main.v: 1 candidate found for vsource
-R already set. replacing
 main.R1: 5 candidates found for res
 m.v is "vsource from device_dispatcher"
 m.R1 dropped invalid candidate: "res1".

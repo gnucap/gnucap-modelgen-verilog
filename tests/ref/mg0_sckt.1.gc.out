@@ -1,6 +1,6 @@
 module vsin (.p(p),.n(n));
-  .parameter amplitude 
-  .parameter dc 
+  parameter amplitude 
+  parameter dc 
   vsource #(sin.offset(NA( 0.)), .amplitude(amplitude), .frequency( 1.), .delay(NA( 0.)), .damping(NA( 0.))  DC dc) V1 (.p(p),.n(n));
 endmodule // vsin
 
@@ -21,7 +21,7 @@ parameter c = 1m
 parameter v = 1
 test_net1 #(.r(r),.c(c)) dut (.a(\1 ),.b(\2 ),.gnd(\0 ));
 net1 #(.r(r),.c(c)) dut (\1 , \3 , \0 );
-vsin #(.amplitude(v),.dc(v)) v1 (.p(\1 ),.n(\0 ));
+vsin #(.amplitude(v),.dc(v)) v1 (\1 , \0 );
 #           v(1)       v(2)       v(3)      
  0.         0.         0.         0.        
  0.5        0.5        0.5        0.5       

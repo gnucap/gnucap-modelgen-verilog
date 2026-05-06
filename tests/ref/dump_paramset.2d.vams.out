@@ -1,6 +1,6 @@
 module resistor(a, b);
   electrical a, b;
-  parameter real r =  0.;
+  parameter real r =  0.0;
 
   real R;
 

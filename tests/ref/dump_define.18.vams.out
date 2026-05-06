@@ -1,0 +1,25 @@
+
+
+module t();
+  real a = 2;
+
+  analog begin
+    a =  10.0e-102;
+  end
+
+  analog begin
+    a =  1.0e-99;
+  end
+
+  analog begin
+    a =  10.0e-102;
+  end
+
+  analog begin
+    a =  1.0e-99;
+  end
+
+endmodule
+
+
+

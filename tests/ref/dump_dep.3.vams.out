@@ -16,10 +16,10 @@ module test_while0a(p, n);
     real x// + [V(p, n)]
 , y// + [V(p, n)]
 ;
-    x =  0.; // s1 r1{b}
-    x =  0.; // [V(p, n)] s4 r4{abx}
+    x =  0.0; // s1 r1{b}
+    x =  0.0; // [V(p, n)] s4 r4{abx}
     z = x; // [V(p, n)] s5 r3{abx}
-    y =  0.; // [V(p, n)] s3 r4{abx}
+    y =  0.0; // [V(p, n)] s3 r4{abx}
     i = r; // s1 r4{abx}
     while ((i > 0)) begin
       // i : 0

@@ -25,7 +25,7 @@ module logic_to_elect(cm, el);
   electrical el;
   ddiscrete #() cm();
   analog begin
-    V(el) <+ transition((((cm == 1))? ( 5.):( 0.)));
+    V(el) <+ transition((((cm == 1))? ( 5.0):( 0.0)));
   end
 
 endmodule

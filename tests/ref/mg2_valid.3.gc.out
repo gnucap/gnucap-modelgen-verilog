@@ -1,0 +1,38 @@
+>>>>>options debug 
+(* desc="A" *) module test_valid3 (.\1 (\1 ),.\2 (\2 ));
+  parameter real w = 10e-6;
+  parameter integer ng = 200;
+  // no localparam here
+endmodule // test_valid3
+
+(* desc="B" *) module test_valid3 (.\1 (\1 ),.\2 (\2 ));
+  parameter real w = 10e-6;
+  parameter integer ng = 200;
+  localparam real sum = w + ng from [1:2];
+  localparam real prod = w * ng from [1:2];
+  // no localparam here
+endmodule // test_valid3
+
+// from dispather (more ranges than A)
+// but not B, sum out of range
+test_valid3 #(.ng(2),.w(1)) m1 (\1 , \2 );
+// A
+test_valid3 #(.ng(1),.w(20)) m2 (\1 , \2 );
+// B, more ranges than A
+test_valid3 #(.ng(1),.w(1)) m3 (\1 , \2 );
+m1 dropped invalid candidate: "B".
+m1 is "test_valid3 from device_dispatcher"
+m2 dropped invalid candidate: "B".
+m2:p2 invalid: wg is not "from  1. .. 10."
+m2 dropped invalid candidate: "test_valid3 from device_dispatcher".
+m2 is "A"
+m3: ambiguous test_valid3: "test_valid3 from device_dispatcher"
+m3 is "B"
+#          
+mm module1: w=1.000000 ng=2.000000 wg=2.000000 
+ 0.        
+Gnucap   System status
+iterations: op=0, dc=2, tran=0, fourier=0, total=2
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=50.0%, ac density=50.0%

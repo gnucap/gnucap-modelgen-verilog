@@ -17,7 +17,7 @@ module test_evtana0c(p, n);
         $trace("not static %g\n", $abstime); // --
 
       end
-      @(timer( 0.,  0.5)) begin // e
+      @(timer( 0.0,  0.5)) begin // e
         // cnt : 0
         // v : 0
         v = 1; // s2 r4{abx}

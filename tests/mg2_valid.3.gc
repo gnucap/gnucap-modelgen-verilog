@@ -1,0 +1,56 @@
+attach ./modelgen_1.so
+options trace
+options debug
+
+verilog
+
+`modelgen
+module test_valid3(p, n);
+    parameter real w = 1 from [0:inf);
+    parameter real ng = 1;
+    localparam real wg=w*ng from [1:10];
+
+    inout p, n;
+    electrical p, n;
+
+    analog begin
+        @(initial_step) begin
+            $strobe("mm module1: w=%f ng=%f wg=%f ", w, ng, wg);
+        end
+    end
+endmodule
+
+
+list
+
+!make test_valid3.so > /dev/null
+attach ./test_valid3.so
+
+(*desc="A"*) module test_valid3(\1 , \2 );
+	parameter real w = 10e-6;
+	parameter integer ng = 200;
+// no localparam here
+endmodule
+(*desc="B"*) module test_valid3(\1 , \2 );
+	parameter real w = 10e-6;
+	parameter integer ng = 200;
+    localparam real sum = w + ng from [1:2];
+    localparam real prod = w * ng from [1:2];
+// no localparam here
+endmodule
+
+// from dispather (more ranges than A)
+// but not B, sum out of range
+test_valid3 #(.ng(2), .w(1))  m1(\1 , \2 );
+
+// A
+test_valid3 #(.ng(1), .w(20))  m2(\1 , \2 );
+
+// B, more ranges than A
+test_valid3 #(.ng(1), .w(1))  m3(\1 , \2 );
+
+list
+
+dc
+status notime
+end

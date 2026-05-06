@@ -26,6 +26,9 @@
 #include "mg_base.h"
 #include <stack> // BUG
 /*--------------------------------------------------------------------------*/
+static int ftos_PADD = 16;
+static int ftos_1364 = ftos_EXP | ftos_PADD;
+/*--------------------------------------------------------------------------*/
 class FUNCTION_;
 class Token_FUNCTION : public Token_SYMBOL {
 private: // stuff into data?

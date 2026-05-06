@@ -1,0 +1,8 @@
+parameter error*2=error; 
+                 ^ ? syntax error
+parameter error*3=error;
+               ^ ? syntax error
+module foo ();
+  parameter error*3=error;
+endmodule // foo
+

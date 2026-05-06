@@ -2,6 +2,14 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
+20260***-dev
+============
+- fix parameter initialisers in interpreted paramset
+- localparam in spice and (interpreted) module
+- overloading tie break: localparam range count
+- fix href elaboration bug (codeberg issue #8)
+- ..
+
 20260329-dev
 ============
 - fix param count bug in overload selection

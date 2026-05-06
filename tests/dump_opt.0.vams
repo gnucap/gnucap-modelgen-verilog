@@ -9,6 +9,10 @@ module test(d, g, s, b);
 	real T, U;
 	parameter real P = 3;
 	analog begin
+		T = 1 + 1;
+		T = 0./1.;
+		T = 0./P;
+		T = 0./U;
 		T = 0 * P;
 		T = 0 * U;
 		T = exp(V(d, g)*0.+1);
