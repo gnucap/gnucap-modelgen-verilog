@@ -771,7 +771,7 @@ INSTANCE::INSTANCE(const INSTANCE& p) :
   set_label(p.short_label());
   set_dev_type(p.dev_type());
 
-  if(_parent){ untested();
+  if(_parent){
   }else if(!common()){ untested();
     unreachable();
   }else if(common()->has_model()){ untested();
@@ -985,7 +985,7 @@ void INSTANCE::precalc_first()
 
   if(_parent){
     trace2("INSTANCE::precalc_first w/ parent", short_label(), _parent->short_label());
-  }else{ untested();
+  }else{
   }
   // a device in a module instance
   BASE_SUBCKT::precalc_first();
@@ -995,7 +995,7 @@ void INSTANCE::precalc_first()
 /*--------------------------------------------------------------------------*/
 void INSTANCE::build_proto() const
 {
-  if(!_proto){ untested();
+  if(!_proto){
     // static instance?
   }else{
     assert(scope());
@@ -1065,7 +1065,7 @@ void INSTANCE::set_port_by_index(int Index, std::string& Value)
     cc->_port_names[Index] = n;
 #endif
     attach_common(cc);
-  }else{ untested();
+  }else{
     incomplete();
   }
 }

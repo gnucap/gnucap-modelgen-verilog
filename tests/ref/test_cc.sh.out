@@ -720,7 +720,7 @@ public:
   double get_double()const {
     if(_card){
       return _card->localparam_value(_tail);
-    }else{ untested();
+    }else{
     }
     Base const* ref = _ref;
     CARD_LIST const* scope = _card?_card->subckt():&CARD_LIST::card_list;
@@ -824,7 +824,7 @@ inline bool Href_::find_device_down(CARD_LIST const* scope, std::string const& p
 {
   trace2("href::find_dev_down", scope, path);
   auto dotplace = path.find(".");
-  if(!scope){ untested();
+  if(!scope){
     return false;
   }else if(dotplace == std::string::npos) {
     return false;
@@ -1714,7 +1714,7 @@ int COMMON_resistor::is_valid_() const
   {
   // ref. type?
   /*361, 1*/double f0;
-  f0 =  Inf; // precalc
+  f0 =  inf; // precalc
   (void) f0;
   ub = f0;
   }
@@ -3226,7 +3226,7 @@ int COMMON_resistor::is_valid_() const
   {
   // ref. type?
   /*361, 1*/double f0;
-  f0 =  Inf; // precalc
+  f0 =  inf; // precalc
   (void) f0;
   ub = f0;
   }
@@ -3735,7 +3735,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
           // F white_noise args:1
           //no ddeps. float??
           /*361, 1*/double f0;
-          f0 = (_p_noisy) /*rhspar*/ *  55.2260200000000001E-24; // (703)
+          f0 = (_p_noisy) /*rhspar*/ *  55.2260200000000001e-24; // (703)
           //no ddeps. float??
           f0 = f0 * _v_g/*rhsvar*/; // (703)
           //real? ddouble?
@@ -4018,7 +4018,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
           // F white_noise args:1
           //no ddeps. float??
           /*361, 1*/double f0;
-          f0 = (_p_noisy) /*rhspar*/ *  55.2260200000000001E-24; // (703)
+          f0 = (_p_noisy) /*rhspar*/ *  55.2260200000000001e-24; // (703)
           //no ddeps. float??
           f0 = f0 * _v_g/*rhsvar*/; // (703)
           //real? ddouble?
@@ -4175,7 +4175,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
           // F white_noise args:1
           //no ddeps. float??
           /*361, 1*/double f0;
-          f0 = (_p_noisy) /*rhspar*/ *  55.2260200000000001E-24; // (703)
+          f0 = (_p_noisy) /*rhspar*/ *  55.2260200000000001e-24; // (703)
           //no ddeps. float??
           f0 = f0 * _v_g/*rhsvar*/; // (703)
           //real? ddouble?
@@ -5464,7 +5464,7 @@ public:
   double get_double()const {
     if(_card){
       return _card->localparam_value(_tail);
-    }else{ untested();
+    }else{
     }
     Base const* ref = _ref;
     CARD_LIST const* scope = _card?_card->subckt():&CARD_LIST::card_list;
@@ -5568,7 +5568,7 @@ inline bool Href_::find_device_down(CARD_LIST const* scope, std::string const& p
 {
   trace2("href::find_dev_down", scope, path);
   auto dotplace = path.find(".");
-  if(!scope){ untested();
+  if(!scope){
     return false;
   }else if(dotplace == std::string::npos) {
     return false;
@@ -6459,7 +6459,7 @@ int COMMON_capacitor::is_valid_() const
   {
   // ref. type?
   /*361, 1*/double f0;
-  f0 =  Inf; // precalc
+  f0 =  inf; // precalc
   (void) f0;
   ub = f0;
   }
@@ -7641,7 +7641,7 @@ int COMMON_capacitor::is_valid_() const
   {
   // ref. type?
   /*361, 1*/double f0;
-  f0 =  Inf; // precalc
+  f0 =  inf; // precalc
   (void) f0;
   ub = f0;
   }

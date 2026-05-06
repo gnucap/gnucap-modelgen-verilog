@@ -708,7 +708,7 @@ public:
   double get_double()const {
     if(_card){
       return _card->localparam_value(_tail);
-    }else{ untested();
+    }else{
     }
     Base const* ref = _ref;
     CARD_LIST const* scope = _card?_card->subckt():&CARD_LIST::card_list;
@@ -812,7 +812,7 @@ inline bool Href_::find_device_down(CARD_LIST const* scope, std::string const& p
 {
   trace2("href::find_dev_down", scope, path);
   auto dotplace = path.find(".");
-  if(!scope){ untested();
+  if(!scope){
     return false;
   }else if(dotplace == std::string::npos) {
     return false;

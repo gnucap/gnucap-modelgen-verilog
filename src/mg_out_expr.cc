@@ -30,7 +30,7 @@
 /*--------------------------------------------------------------------------*/
 const int POOLSIZE = 100;
 const int MAXLENGTH = 40;
-static double ftos_floor = 1e-101;
+static double ftos_floor = 0.;
 char* ftos_(double num, int fieldwidth, int len, int fmt)
 	// num = number to convert
 	// fieldwidth = size for fixed width, 0 for variable width
@@ -83,14 +83,16 @@ char* ftos_(double num, int fieldwidth, int len, int fmt)
     memcpy(str, " NaN", 4);
   }else
 #endif
-  if (num == NOT_VALID) { untested();
+  if (!(num == num)) { untested();
+    memcpy(str, " NaN", 4);
+  }else if (num == NOT_VALID) { untested();
     memcpy(str, " ??", 3);
   }else if (num == NOT_INPUT) { untested();
     memcpy(str, " NA", 3);
   }else if (num >= BIGBIG) {
-    memcpy(str, " Inf", 4);
+    memcpy(str, " inf", 4);
   }else if (num <= -BIGBIG) {itested();
-    memcpy(str, "-Inf", 4);
+    memcpy(str, "-inf", 4);
   }else if (num != num) { untested();
     memcpy(str, " NaN", 4);
   }else{
@@ -212,9 +214,9 @@ char* ftos_(double num, int fieldwidth, int len, int fmt)
 	// nothing;
       }else if (fmt&ftos_EXP || expo>10 || expo<-16) {/* exponential format  */
 	char c = str[nnn+4];
-	sprintf(&str[nnn], ((expo < 100) ? "E%+-3d" : "E%3u"), expo);
-	nnn+=4;
-	str[nnn++] = c;
+	trace1("ftos", c);
+	nnn += sprintf(&str[nnn], ((expo < 100) ? "e%+-3d" : "e%3u"), expo);
+	str[nnn++] = '\n';
       }else{				   /* if letter-scale format	    */
 	str[nnn++] = "fpnum KMGT"[(expo+15)/3];/* put the appropriate letter*/
       }				/* note that letter-scale is not valid	    */

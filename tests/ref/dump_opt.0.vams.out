@@ -9,6 +9,10 @@ module test(d, g, s, b);
   analog begin // always
     // T : 0
     // U : 0
+    T = 2; // s1 r3{abx}
+    T =  0.0; // s1 r3{abx}
+    T = ( 0.0 / P); // s1 r3{abx}
+    T = ( 0.0 / U); // s3 r3{abx}
     T = 0; // s1 r3{abx}
     T = 0; // s1 r3{abx}
     T =  2.71828182845905; // s1 r3{abx}

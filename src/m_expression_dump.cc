@@ -243,7 +243,6 @@ void Expression_::dump(std::ostream& out)const
       out << i->full_name();
     }else if(auto f = dynamic_cast<Float const*>(i->data())){
       std::string val = ftos_(*f, 0, 15, ftos_1364);
-      notstd::to_lower(&val);
       out << val;
     }else if(auto g = dynamic_cast<Integer const*>(i->data())){
       out << *g;
