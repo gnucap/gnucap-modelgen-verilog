@@ -1055,7 +1055,7 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
       }
       trace1("parse_module: instance", cmd.tail());
       have_instance = true;
-      BASE_SUBCKT* new_instance = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("instance"));
+      BASE_SUBCKT* new_instance = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("__stub"));
       assert(new_instance);
       CARD_LIST* Scope = x->subckt();
       trace3("parse_module instance", cmd.tail(), Scope, Scope->nodes());
@@ -1113,7 +1113,7 @@ void LANG_VERILOG::new_instance_(CS& cmd, BASE_SUBCKT* Owner, CARD_LIST* Scope)
     std::string type = find_type_in_string(cmd);
     const CARD* proto = find_proto(type, Owner);
     if (dynamic_cast<MODEL_CARD const*>(proto)) {
-      proto = device_dispatcher["instance"];
+      proto = device_dispatcher["__stub"];
       assert(proto);
     }else{
     }

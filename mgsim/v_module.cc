@@ -137,7 +137,7 @@ private:
 public:
   explicit	DEV_MODULE_PROTO(COMMON_COMPONENT* c=nullptr) : DEV_SUBCKT(c) {}
 		~DEV_MODULE_PROTO(){}
-  CARD_LIST*	   scope()override		{ untested(); return subckt();}
+  CARD_LIST*	   scope()override		{ return subckt();}
   const CARD_LIST* scope()const override	{ return subckt();}
   CARD*		clone()const override		{ return new DEV_MODULE_PROTO(*this);}
 } p0(&Default_SUBCKT);
@@ -562,7 +562,7 @@ void DEV_SUBCKT::precalc_first()
     subckt()->params()->set_try_again(&c->_params);
 #endif
     subckt()->precalc_first();
-  }else{ untested();
+  }else{
   }
 
 }

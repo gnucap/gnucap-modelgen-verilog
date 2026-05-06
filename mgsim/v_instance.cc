@@ -1,6 +1,6 @@
 /*                              -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
- *               2022, 2023 Felix Salfelder
+ *               2022-2026 Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * module stuff
+ * stub: generic, self-inflating device instance
  */
 #include <globals.h>
 #include <io_trace.h>
@@ -184,13 +184,14 @@ private: // override virtual
   bool		print_type_in_spice()const override{return true;}
   std::string   value_name()const override {return "#";}
 protected:
+  COMPONENT const* parent()const { untested();return _parent;}
   int		max_nodes()const override {
     // INT_MAX results in arithmetic overflow in lang_spice
     // (does not seem to work with lang_spice anyway)
     return INT_MAX-2;
   }
 public: // ?
-  void build_proto() const;
+  void build_proto()const;
 private:
 
 protected:
@@ -238,15 +239,15 @@ private: // overrides
       return "";
     }
   }
-   std::string param_name(int i) const override {
-     // assert(i<int(_params.size()));
-     std::string n = BASE_SUBCKT::param_name(i);
-     if(n[0]=='*'){
-       return "";
-     }else{
-       return n;
-     }
-   }
+  std::string param_name(int i) const override {
+    // assert(i<int(_params.size()));
+    std::string n = BASE_SUBCKT::param_name(i);
+    if(n[0]=='*'){
+      return "";
+    }else{
+      return n;
+    }
+  }
   void set_param_by_index(int I, std::string& Value, int i) override {
     assert(i==0);
     assert(I>=0);
@@ -288,7 +289,7 @@ protected:
     return p;
   }
 } p1;
-DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "instance|device_stub|__stub", &p1);
+DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "__stub", &p1);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class DEV_INSTANCE_PROTO : public INSTANCE {
@@ -390,9 +391,31 @@ CARD* INSTANCE::prepare_overload(CARD* model, std::string modelname, INSTANCE* P
   assert(Proto->subckt());
   assert(Proto->scope()==Proto->subckt());
   assert(model);
+  if(dynamic_cast<INSTANCE*>(model)){ untested();
+    incomplete();
+    error(bDEBUG, long_label() + " found instance \"" + model->long_label() + "\".\n");
+
+    return nullptr;
+  }else{
+  }
+
   CARD* cl = model->clone_instance();
   COMPONENT* cur = prechecked_cast<COMPONENT*>(cl);
   assert(cur || !cl);
+  if(dynamic_cast<INSTANCE*>(cl)){ untested();
+    incomplete();
+    // does not work.
+    // return nullptr;
+  }else{
+  }
+
+  if(cl){
+    for(int j=0; j < cl->net_nodes(); ++j){
+      // just assert? perhaps clone_instance should take care of this.
+      cl->n_(j) = nullptr;
+    }
+  }else{ untested();
+  }
 
   if(cl && has_attributes(cl->id_tag())) {
     trace2("INSTANCE::prepare_overload attr?", modelname, attributes(cl->id_tag())->string(tag_t()));
@@ -547,6 +570,9 @@ void INSTANCE::collect_overloads_from_scope(std::string const& modelname,
       std::string desc = get_description((**i).id_tag());
 
       CARD* p = prepare_overload(*i, modelname, Proto);
+      if(!p){
+      }else if(&Scope == &CARD_LIST::card_list){
+      }
 
       if(&Scope == &CARD_LIST::card_list){
 	describe_if(p->id_tag(), modelname + " from top level" + desc);
@@ -616,15 +642,6 @@ void INSTANCE::collect_overloads(INSTANCE* Proto) const
 
     std::string extended_name = modelname;
     int bin_count = 0;
-#if 0
-    MODEL_CARD* m = model_dispatcher[modelname];
-    while(m){ untested();
-      CARD* p = prepare_overload(m, modelname, Proto);
-      describe_if(p->id_tag(), extended_name + " from model_dispatcher");
-      extended_name = modelname + ':' + to_string(bin_count++);
-      m = model_dispatcher[extended_name];
-    }
-#endif
 
     CARD* p = device_dispatcher[modelname];
     extended_name = modelname;
@@ -756,14 +773,9 @@ INSTANCE::INSTANCE(const INSTANCE& p) :
   }else{
     assert(_n == nullptr);
   }
-  if(p.is_device()){
-    for (int ii = 0;  ii < net_nodes();  ++ii) {
-      _n[ii] = p._n[ii];
-    }
-  }else{ untested();
-    for (int ii = 0;  ii < net_nodes();  ++ii) { untested();
-      assert(!_n[ii].n_());
-    }
+  assert(p.is_device());
+  for (int ii = 0;  ii < net_nodes();  ++ii) {
+    _n[ii] = p._n[ii];
   }
 
   assert(!subckt());
@@ -1003,10 +1015,7 @@ void INSTANCE::build_proto() const
     assert(_proto->subckt());
     assert(_proto->subckt()->params());
 
-//    delete _proto;
-//    _proto = new DEV_INSTANCE_PROTO;
     _proto->attach_common(common()->clone());
-    // HERE: set ports.
     auto c = prechecked_cast<COMMON_INSTANCE const*>(common());
     assert(c);
     for(int i = 0; i<int(c->_port_names.size()); ++i) {
