@@ -193,7 +193,7 @@ protected:
 public: // ?
   void build_proto()const;
 private:
-
+  bool defer_proto()const;
 protected:
   void set_port_by_index(int Index, std::string& Value)override;
 
@@ -392,7 +392,7 @@ CARD* INSTANCE::prepare_overload(CARD* model, std::string modelname, INSTANCE* P
   assert(Proto->subckt());
   assert(Proto->scope()==Proto->subckt());
   assert(model);
-  if(dynamic_cast<INSTANCE*>(model)){ untested();
+  if(dynamic_cast<INSTANCE*>(model)){
     incomplete();
     error(bDEBUG, long_label() + " found instance \"" + model->long_label() + "\".\n");
 
@@ -991,7 +991,15 @@ void INSTANCE::expand_first()
   trace3("INSTANCE::precalc_first", short_label(), _parent, common()->modelname());
   trace1("INSTANCE::precalc_first", _sim->is_first_expand());
 
-  if(!owner()){
+  if(defer_proto()){ untested();
+    if(_proto){ untested();
+      assert(_proto!=this);
+      error(bDEBUG, long_label() + ": defer proto\n");
+       delete _proto;
+       _proto = nullptr;
+    }else{ untested();
+    }
+  }else if(!owner()){
     build_proto();
     _parent = _proto; // common->proto?
   }else if(_cloned_from){
@@ -1005,6 +1013,25 @@ void INSTANCE::expand_first()
   }
 
   assert(!is_constant()); /* because I have more work to do */
+}
+/*--------------------------------------------------------------------------*/
+bool INSTANCE::defer_proto() const
+{
+  auto c = prechecked_cast<COMMON_INSTANCE const*>(common());
+  assert(c);
+  std::string modelname = c->modelname();
+  if(!owner()){
+    return false;
+  }else if(_cloned_from != &p1){
+    return false;
+  }else{ untested();
+  }
+  CARD_LIST::const_iterator i = scope()->find_(modelname);
+  if(i == scope()->end()) { untested();
+    return false;
+  }else{
+    return true;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void INSTANCE::build_proto() const
