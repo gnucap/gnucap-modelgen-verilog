@@ -392,12 +392,10 @@ CARD* INSTANCE::prepare_overload(CARD* model, std::string modelname, INSTANCE* P
   assert(Proto->subckt());
   assert(Proto->scope()==Proto->subckt());
   assert(model);
-  if(dynamic_cast<INSTANCE*>(model)){
-    incomplete();
+  if(dynamic_cast<INSTANCE*>(model)){ untested();
     error(bDEBUG, long_label() + " found instance \"" + model->long_label() + "\".\n");
-
-    return nullptr;
-  }else{
+    model->expand_first();
+  }else{ untested();
   }
 
   CARD* cl = model->clone_instance();
@@ -985,6 +983,12 @@ void INSTANCE::expand_sift()
 // Kludge: build proto in stub, so it only needs doing once.
 void INSTANCE::expand_first()
 {
+  static int recursion;
+  if(++recursion > OPT::recursion){
+    recursion = 0;
+    throw Exception(long_label() + ": expand recursion too deep");
+  }else{
+  }
   BASE_SUBCKT::expand_first();
 
   assert(common());
@@ -1013,6 +1017,7 @@ void INSTANCE::expand_first()
   }
 
   assert(!is_constant()); /* because I have more work to do */
+  --recursion;
 }
 /*--------------------------------------------------------------------------*/
 bool INSTANCE::defer_proto() const
