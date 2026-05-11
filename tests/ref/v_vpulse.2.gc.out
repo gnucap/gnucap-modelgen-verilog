@@ -1,6 +1,6 @@
 vpulse #(.val0( ...  .period(5)) v1(in, 0 );
                                         ^ ? invalid identifier
-vpulse #(.val0(0),.val1(1),.width(2),.period(5)) v1 (.p(in),.n(\0 ));
+vpulse #(.val0(0),.val1(1),.width(2),.period(5)) v1 (in, \0 );
 #Time       v(in)      control(0)
  0.         0.         1.        
  0.1        1.         1.        

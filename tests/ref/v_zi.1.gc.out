@@ -1,7 +1,7 @@
 parameter T = {3.141592 / 4.}
 // H(z) = 1/ (z * z * (1-z)) = 1/(zz-zzz)
-va_zi_zp #(.zr0(0.),.pr0(0.)) b (.out0(\0 ),.out1(out2),.in0(in),.in1(\0 ));
-vsine #(.freq(1/2/3.1415),.ampl(1)) v1 (.p(in),.n(\0 ));
+va_zi_zp #(.pr0(0.),.zr0(0.),.T(T*.5),.tau(T*.1)) b (\0 , out2, in, \0 );
+vsine #(.ampl(1),.freq(1/2/3.1415)) v1 (in, \0 );
 #Time       v(in)      v(out2)    control(0)
  0.         0.         0.         1.        
  0.03927    0.039261   0.         9.        

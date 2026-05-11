@@ -1,0 +1,12 @@
+module main (.\1 (\1 ),.b(\2 ));
+  resistor #(1) r2 (\2 , \1 );
+endmodule // main
+
+main #() m (\0 );
+#          
+ 27.       
+module main (.\1 (\1 ),.b(\2 ));
+  resistor #(1) r2 (\2 , \1 );
+endmodule // main
+
+main #() m (.\1 (\0 ));

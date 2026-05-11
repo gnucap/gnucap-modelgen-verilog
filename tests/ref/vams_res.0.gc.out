@@ -2,6 +2,8 @@ resistor #(.r(2) .$mfactor(2)) r1(in, 0)
                                       ^ ? invalid identifier
 resistor #(.r(5) .$mfactor(5)) r2(in, 0)
                                       ^ ? invalid identifier
+r1: ambiguous resistor: "vams resistor, plain"
+r2: ambiguous resistor: "vams resistor, plain"
 #           v(in)      i(V1)      i(r1)      i(r2)     
  0.         0.89998   -1.8        0.44999    0.18      
 #Time       v(in)      i(V1)      i(r1)      i(r2)     
@@ -24,7 +26,7 @@ resistor #(.r(5) .$mfactor(5)) r2(in, 0)
  8.         0.99998    0.        
  16.        0.99998    0.        
 Gnucap   System status
-iterations: op=0, dc=3, tran=35, fourier=0, total=55
+iterations: op=0, dc=4, tran=47, fourier=0, total=68
 transient timesteps: accepted=12, rejected=0, total=12
 nodes: user=1, subckt=0, model=0, total=1
 dctran density=100.0%, ac density=100.0%

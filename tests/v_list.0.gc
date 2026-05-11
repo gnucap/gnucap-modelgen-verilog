@@ -1,0 +1,11 @@
+
+module main(.\1 (\1 ), .b(\2 ));
+  resistor #(1) r2(\2 , \1 );
+endmodule
+
+verilog
+
+main m(\0 );
+list
+op
+list

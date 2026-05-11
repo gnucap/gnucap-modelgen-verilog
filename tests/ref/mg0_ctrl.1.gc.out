@@ -1,7 +1,7 @@
-test_for0_0 #(.v(0)) dut (.p(n0),.n(\0 ));
-test_for0_0 #(.v(1)) dut (.p(n1),.n(\0 ));
-test_for0_0 #(.v(2)) dut (.p(n2),.n(\0 ));
-test_for0_0 #(.v(3)) dut (.p(n3),.n(\0 ));
-resistor #(.r(1k)) r (.p(n0),.n(n1));
+test_for0_0 #(.v(0)) dut (n0, \0 );
+test_for0_0 #(.v(1)) dut (n1, \0 );
+test_for0_0 #(.v(2)) dut (n2, \0 );
+test_for0_0 #(.v(3)) dut (n3, \0 );
+resistor #(1k) r (n0, n1);
 #           v(n0)      v(n1)      v(n2)      v(n3)      iter(0)   
  0.         1.         1.         1.         2.         3.        

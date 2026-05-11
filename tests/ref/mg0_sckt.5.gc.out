@@ -3,8 +3,8 @@ module thing (.a(a),.b(b));
   resistor #(.r(r)) r1 (a, b);
 endmodule // thing
 
-test_sckt5 #() dut (.a(\1 ),.b(\2 ));
-isource #(.dc(2)) v1 (.p(\2 ),.n(\1 ));
+test_sckt5 #() dut (\1 , \2 );
+isource #(.dc(2)) v1 (\2 , \1 );
 #           v(1)       v(2)       v(dut.r1.r1) v(dut.r1.r1)
  0.         1.        -1.         2.         2.        
 Gnucap   System status

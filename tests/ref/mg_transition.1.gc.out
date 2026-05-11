@@ -1,4 +1,4 @@
-test_trans1 #() dut (.p(\1 ),.n(\0 ));
+test_trans1 #() dut (\1 , \0 );
 #Time       v(dut)     pulse(dut) control(0) iter(0)   
  0.         1.         0.         1.         2.        
  0.025      1.         0.         9.         2.        

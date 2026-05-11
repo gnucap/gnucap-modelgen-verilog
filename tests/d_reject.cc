@@ -36,10 +36,10 @@ class REJECT : public COMPONENT {
 	double _time1{0.};
 //	PARAMETER<double> _rejectto; .5
 private:
-  explicit REJECT(const REJECT& p) :COMPONENT(p) {
+  explicit REJECT(const REJECT& p) :COMPONENT(p), _rejecttime(p._rejecttime) {
 	  trace1("REJECT", _net_nodes);
 	  for(int i = 0; i<_net_nodes; ++i){ untested();
-		  // _n[i] = p._n[i];
+		  _n[i] = p._n[i];
 	  }
   }
 public:
@@ -100,7 +100,7 @@ TIME_PAIR REJECT::tr_review()
 	TIME_PAIR t;
 	if(_done){
 	}else if(_sim->_time0 > _rejecttime){
-		trace2("reject", _sim->_time0, _time1);
+		trace3("reject", _sim->_time0, _time1, _rejecttime);
 		t.min_event((_sim->_time0 + _time1)*.5);
 		_done = true;
 	}

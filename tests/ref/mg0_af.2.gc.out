@@ -1,8 +1,8 @@
 isource #(.dc(1)) ii(\0 , 1);
                           ^ ? invalid identifier
 parameter rr=0
-isource #(.dc(1)) ii (.p(\0 ),.n(\1 ));
-test_af_2 #(.rr(rr)) dut (.p(\1 ),.n(\0 ));
+isource #(.dc(1)) ii (\0 , \1 );
+test_af_2 #(.rr(rr)) dut (\1 , \0 );
 #           v(1)       iter(0)   
 -5.         148.41     4.        
 -3.         20.086     3.        

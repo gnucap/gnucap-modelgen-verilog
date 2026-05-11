@@ -1,7 +1,7 @@
-test_vcvs2 #() d1 (.p(\2 ),.n(\0 ),.cp(a),.cn(\0 ),.x(b),.y(\0 ));
-resistor #(.r(1)) r1 (.p(\2 ),.n(\0 ));
-isource #(.dc(i)) i1 (.p(\0 ),.n(a));
-isource #(.dc(3*i)) i2 (.p(\0 ),.n(b));
+test_vcvs2 #() d1 (\2 , \0 , a, \0 , b, \0 );
+resistor #(.r(1)) r1 (\2 , \0 );
+isource #(.dc(i)) i1 (\0 , a);
+isource #(.dc(3*i)) i2 (\0 , b);
 parameter i=1
 #           v(2)       i(i1)      i(i2)      iter(0)   
  0.         0.         0.         0.         3.        

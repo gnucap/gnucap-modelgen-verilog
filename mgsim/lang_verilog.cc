@@ -31,7 +31,9 @@
 static const std::string IS_VALID = "__is_valid";
 static const std::string HOW_VALID = "__how_valid";
 static bool instanciate_unused = false;
-static int nest;
+static int print_nest;
+static std::string toplevel_stub = "__stub";
+static std::string subdevice_stub = "__stub";
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -1055,7 +1057,9 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
       }
       trace1("parse_module: instance", cmd.tail());
       have_instance = true;
-      BASE_SUBCKT* new_instance = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("__stub"));
+      CARD* stub = device_dispatcher.clone(subdevice_stub);
+      assert(stub);
+      auto new_instance = dynamic_cast<BASE_SUBCKT*>(stub);
       assert(new_instance);
       CARD_LIST* Scope = x->subckt();
       trace3("parse_module instance", cmd.tail(), Scope, Scope->nodes());
@@ -1112,10 +1116,12 @@ void LANG_VERILOG::new_instance_(CS& cmd, BASE_SUBCKT* Owner, CARD_LIST* Scope)
   }else{
     std::string type = find_type_in_string(cmd);
     const CARD* proto = find_proto(type, Owner);
-    if (dynamic_cast<MODEL_CARD const*>(proto)) {
-      proto = device_dispatcher["__stub"];
-      assert(proto);
+    if (dynamic_cast<DEV_DOT const*>(proto)) {
+    }else if (dynamic_cast<DEV_COMMENT const*>(proto)) {
+    }else if(toplevel_stub == ""){ untested();
     }else{
+      proto = device_dispatcher[toplevel_stub];
+      assert(proto);
     }
 
     if(proto){
@@ -1300,12 +1306,12 @@ void LANG_VERILOG::print_ports_short(OMSTREAM& o, const COMPONENT* x)
 void LANG_VERILOG::print_items_sckt(OMSTREAM& o, const COMPONENT* x)
 {
   assert(dynamic_cast<BASE_SUBCKT const*>(x));
-  ++nest;
+  ++print_nest;
   for (CARD_LIST::const_iterator ci = x->subckt()->begin(); ci != x->subckt()->end(); ++ci) {
-    o << std::string(nest*2, ' ');
+    o << std::string(print_nest*2, ' ');
     print_item(o, *ci);
   }
-  --nest;
+  --print_nest;
 }
 /*--------------------------------------------------------------------------*/
 class PARAMSET_MODEL : public MODEL_CARD {
@@ -1401,7 +1407,7 @@ void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
 //    o << "  parameter " << i.first << " = " << i.second << ";\n";
 //  }
   print_items_sckt(o, x);
-  o << std::string(nest*2, ' ');
+  o << std::string(print_nest*2, ' ');
   o << "endmodule // " << x->short_label() << "\n\n";
 }
 /*--------------------------------------------------------------------------*/

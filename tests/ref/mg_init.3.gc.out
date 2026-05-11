@@ -1,5 +1,5 @@
 test_init3 #() dut0 ();
-reject #() r ();
+reject #(.time(2)) r ();
 #Time       t1(dut0)  
 init
  0.         2.        

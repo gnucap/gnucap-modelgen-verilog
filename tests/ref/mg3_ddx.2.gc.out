@@ -1,7 +1,7 @@
 // test how deps play with control structures
-test_ddx2 #() dut (.p(\1 ),.n(\1 ),.cp(\1 ),.cn(\0 ));
+test_ddx2 #() dut (\1 , \1 , \1 , \0 );
 parameter v=0
-vsource #(.dc(v)) v1 (.p(\1 ),.n(\0 ));
+vsource #(.dc(v)) v1 (\1 , \0 );
 #           v(1)       zero(dut)  minus(dut) plus(dut)  iter(0)   
  0.         0.         0.        -1.         1.         2.        
 Gnucap   System status

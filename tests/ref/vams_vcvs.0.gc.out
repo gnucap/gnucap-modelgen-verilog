@@ -1,5 +1,7 @@
-#           v(in)      v(out)     y(vv._b_p_n)
- 0.         0.9        1.8        0.        
+.print dc v(nodes) y(vv.*) 
+                     ^ ? no match
+#           v(in)      v(out)    
+ 0.         0.9        1.8       
 #Time       v(in)      v(out)    
  0.         0.         0.        
  0.01       0.062791   0.12558   

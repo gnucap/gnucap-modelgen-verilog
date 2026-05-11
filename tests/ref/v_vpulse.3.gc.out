@@ -1,5 +1,6 @@
 vpulse #(.rise(1e-8)) vv(in, 0 );
                              ^ ? invalid identifier
+r: ambiguous resistor: "vams resistor, plain"
 #Time       v(in)      v(out)    
  0.         0.         0.        
  100.E-12   0.01       0.        

@@ -8,10 +8,12 @@ This file summarizes new features and important changes between snapshots.
 - localparam in spice and (interpreted) module
 - overloading tie break: localparam range count
 - fix href elaboration bug (codeberg issue #8)
+- overloading at top level, now like module body
 - ..
 
 20260329-dev
 ============
+- hierarchical references to parameters
 - fix param count bug in overload selection
 - support common pooling (with C++>=20)
 - string parameters

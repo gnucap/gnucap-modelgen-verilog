@@ -1,7 +1,7 @@
-va_laplace_zp #(.zr0(0.),.pr0(0.)) b0 (.out0(\0 ),.out1(out1),.in0(in),.in1(\0 ));
+va_laplace_zp #(.pr0(0.),.zr0(0.)) b0 (\0 , out1, in, \0 );
 // not checked
-va_laplace_zp #(.zr0(0.),.pr0(1.)) b0 (.out0(\0 ),.out1(out2),.in0(in),.in1(\0 ));
-va_laplace_zp #(.pr0(0.)) b0 (.out0(\0 ),.out1(out3),.in0(in),.in1(\0 ));
+va_laplace_zp #(.pr0(1.),.zr0(0.)) b0 (\0 , out2, in, \0 );
+va_laplace_zp #(.pr0(0.)) b0 (\0 , out3, in, \0 );
 no data, assuming no root, constant 1.
 #          
  0.        

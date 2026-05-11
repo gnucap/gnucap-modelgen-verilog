@@ -1,14 +1,14 @@
 ground \0 ;
-white_noise #(.pwr(1),.$mfactor(2)) w (.p(\1 ),.n(\0 ));
-white_noise #(.pwr(2),.$mfactor(1)) w (.p(\2 ),.n(\0 ));
-white_noise #(.pwr(1),.$mfactor(1)) w (.p(\3 ),.n(\0 ));
-white_noise #(.pwr(1),.$mfactor(1)) w (.p(\3 ),.n(\0 ));
-resistor #(.r(1)) r1 (.p(\1 ),.n(\0 ));
-resistor #(.r(1)) r2 (.p(\2 ),.n(\0 ));
-resistor #(.r(1)) r3 (.p(\3 ),.n(\0 ));
-meas_noise #() noise1 (.p(\1 ));
-meas_noise #() noise2 (.p(\2 ));
-meas_noise #() noise3 (.p(\3 ));
+white_noise #(.$mfactor(2),.pwr(1)) w (\1 , \0 );
+white_noise #(.$mfactor(1),.pwr(2)) w (\2 , \0 );
+white_noise #(.$mfactor(1),.pwr(1)) w (\3 , \0 );
+white_noise #(.$mfactor(1),.pwr(1)) w (\3 , \0 );
+resistor #(1) r1 (\1 , \0 );
+resistor #(1) r2 (\2 , \0 );
+resistor #(1) r3 (\3 , \0 );
+noise_probe #() noise1 (\1 );
+noise_probe #() noise2 (\2 );
+noise_probe #() noise3 (\3 );
 #Freq       nv(noise1) nv(noise2) nv(noise3) npwr(noise1) npwr(noise2) npwr(noise3)
  1.         1.4142     1.4142     1.4142     2.         2.         2.        
  2.         1.4142     1.4142     1.4142     2.         2.         2.        

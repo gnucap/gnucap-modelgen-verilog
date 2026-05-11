@@ -16,15 +16,15 @@ vsource #(.dc(1)) v6(6, \0 );
                      ^ ? invalid identifier
 parameter r=1
 parameter v=0
-test_res0 #(.r(r)) dut (.np(\1 ),.nn(\2 ));
-vsource #(.dc(v)) v1 (.p(\1 ),.n(\0 ));
-vsource #(.dc(1)) v2 (.p(\2 ),.n(\0 ));
-test_res1 #(.r(2*r)) dut (.np(\3 ),.nn(\4 ));
-vsource #(.dc(v)) v3 (.p(\3 ),.n(\0 ));
-vsource #(.dc(1)) v4 (.p(\4 ),.n(\0 ));
-test_res2 #(.r(4*r)) dut (.np(\5 ),.nn(\6 ));
-vsource #(.dc(v)) v5 (.p(\5 ),.n(\0 ));
-vsource #(.dc(1)) v6 (.p(\6 ),.n(\0 ));
+test_res0 #(.r(r)) dut (\1 , \2 );
+vsource #(.dc(v)) v1 (\1 , \0 );
+vsource #(.dc(1)) v2 (\2 , \0 );
+test_res1 #(.r(2*r)) dut (\3 , \4 );
+vsource #(.dc(v)) v3 (\3 , \0 );
+vsource #(.dc(1)) v4 (\4 , \0 );
+test_res2 #(.r(4*r)) dut (\5 , \6 );
+vsource #(.dc(v)) v5 (\5 , \0 );
+vsource #(.dc(1)) v6 (\6 , \0 );
 #           i(v1)      i(v3)      i(v5)      iter(0)   
  0.         0.01       0.005      0.0025     3.        
  0.25       0.0075     0.00375    0.001875   3.        

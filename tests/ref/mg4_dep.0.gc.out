@@ -1,6 +1,6 @@
 parameter v=1
-test_dep0 #() dut (.p(\1 ),.n(\0 ));
-vsource #(.dc(v)) v1 (.p(\1 ),.n(\0 ));
+test_dep0 #() dut (\1 , \0 );
+vsource #(.dc(v)) v1 (\1 , \0 );
 #           i(v1)     
  0.        -0.99999   
 Gnucap   System status

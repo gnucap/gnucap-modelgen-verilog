@@ -1,5 +1,5 @@
-test_pg0 #(.st(1)) dut (.p(\1 ),.n(\0 ));
-test_pg0 #() dut (.p(\2 ),.n(\0 ));
+test_pg0 #(.st(1)) dut (\1 , \0 );
+test_pg0 #() dut (\2 , \0 );
 #           v(1)       v(2)      
  0.         1.         2.        
 Gnucap   System status

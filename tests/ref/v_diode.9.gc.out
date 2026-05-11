@@ -9,8 +9,8 @@ endmodule // main
 
 main #(.$mfactor(1.)) m (\2 , \0 );
 parameter v1=10
-vsource #(.dc(v1)) V1 (.p(\1 ),.n(\0 ));
-resistor #(.r(100k)) R1 (.p(\1 ),.n(\2 ));
+vsource #(.dc(v1)) V1 (\1 , \0 );
+resistor #(.r(100k)) R1 (\1 , \2 );
 print op v(1) v(2) i(v1) i(r1) id(m.d1) vd(m.d1) gd(m.d1) cd(m.d1) zra
                      ^ ? no match
 print op v(1) v(2) i(v1) i(r1) id(m.d1) vd(m.d1) gd(m.d1) cd(m.d1) zra

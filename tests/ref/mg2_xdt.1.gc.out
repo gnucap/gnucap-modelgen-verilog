@@ -6,8 +6,8 @@ endmodule // vsin
 
 parameter r=1
 parameter v=0
-test_xdt1 #() dut (.p(\1 ),.n(\0 ),.ni(ii));
-resistor #(.r(1.)) r1 (.p(ii),.n(\0 ));
+test_xdt1 #() dut (\1 , \0 , ii);
+resistor #(1.) r1 (ii, \0 );
 vsin #(.dc(v),.ampl(1)) v1 (\1 , \0 );
 #Time       v(1)       v(r1)      iter(0)   
  0.         0.         0.         3.        

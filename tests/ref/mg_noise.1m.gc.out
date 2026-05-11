@@ -1,8 +1,8 @@
 ground gnd;
-test_noise1m #() dut (.p(\1 ),.n(gnd),.a(ctl),.b(ctl));
-resistor #(.r(1.)) r (.p(\1 ),.n(gnd));
-vsource #(.dc(1.)) v (.p(ctl),.n(gnd));
-meas_noise #() n1 (.p(\1 ));
+test_noise1m #() dut (\1 , gnd, ctl, ctl);
+resistor #(.r(1.)) r (\1 , gnd);
+vsource #(.dc(1.)) v (ctl, gnd);
+noise_probe #() n1 (\1 );
 #          
  0.        
 #Freq       npwr(n1)  

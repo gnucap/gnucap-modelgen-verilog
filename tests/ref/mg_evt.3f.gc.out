@@ -1,5 +1,5 @@
-test_timer3f #() dut0 (.p(\1 ),.n(\0 ));
-reject #() r ();
+test_timer3f #() dut0 (\1 , \0 );
+reject #(.time(.9)) r ();
 #           v(1)       iter(0)   
 time0 0 0
  0.         0.         2.        

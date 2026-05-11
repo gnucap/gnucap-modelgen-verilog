@@ -1,15 +1,10 @@
-test_temp1 #(.dc(dc)) dut(\1 , \0 );
-             ^ ? : bad parameter dc ignored
-test_temp1 #() dut (.q(\1 ),.n(\0 ));
-#           v(1)       iter(0)    T(dut)    
- 25.        0.025692   3.         ??        
- 26.        0.025778   3.         ??        
- 27.        0.025864   3.         ??        
- 28.        0.02595    3.         ??        
- 29.        0.026037   3.         ??        
- 30.        0.026123   3.         ??        
+test_temp1 #(.dc(dc)) dut (\1 , \0 );
+dut: no candidates found for test_temp1
+dut: no valid prototype found for test_temp1
+dut: no candidates found for test_temp1
+dut: no valid prototype found for test_temp1
 Gnucap   System status
-iterations: op=18, dc=0, tran=0, fourier=0, total=18
+iterations: op=0, dc=0, tran=0, fourier=0, total=1
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=1, subckt=0, model=0, total=1
-dctran density=100.0%, ac density=100.0%
+nodes: user=0, subckt=0, model=0, total=0
+dctran density=0.0%, ac density=0.0%

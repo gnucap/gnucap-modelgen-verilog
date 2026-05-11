@@ -13,14 +13,18 @@ module main (.a(a),.b(b),.c(c),.d(d));
 endmodule // main
 
 ground gnd;
-vsource #(.dc(2)) v1 (.p(\1 ),.n(gnd));
+vsource #(.dc(2)) v1 (\1 , gnd);
 main #() dut (\2 , \1 , gnd, gnd);
-vsource #(.dc(1)) v2 (.p(\2 ),.n(gnd));
+vsource #(.dc(1)) v2 (\2 , gnd);
 >>>>>print op i(v*)
+v1: 1 candidate found for vsource
 dut: 1 candidate found for main
+v2: 1 candidate found for vsource
+v1 is "vsource from device_dispatcher"
 dut is "main from top level"
 main.n1: 1 candidate found for mynmos
 dut.n1 is "mynmos from top level"
+v2 is "vsource from device_dispatcher"
 >>>>>op
 #           i(v1)      i(v2)     
  27.        0.        -30.u      

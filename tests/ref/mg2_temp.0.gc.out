@@ -1,5 +1,4 @@
-parameter dc not specified, using default
-test_temp0 #(.dc(dc),.tnom(300)) dut (.p(\1 ),.q(\2 ),.n(\0 ));
+test_temp0 #(.dc(dc),.tnom(300)) dut (\1 , \2 , \0 );
 #           v(1)       v(2)       iter(0)    T(dut)    
 delta 0.000159416
  25.        298.15     0.         3.         298.15    

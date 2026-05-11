@@ -3,7 +3,7 @@ attach ../vams/vsine.so
 attach ./c_debug.so
 
 verilog
-*options method=euler
+// options method=euler
 ground \0 ;
 
 `modelgen

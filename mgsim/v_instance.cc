@@ -957,7 +957,7 @@ void INSTANCE::expand_sift()
     }else if(desc.size()){
       error(bWARNING, long_label() + ": ambiguous " + dev_type() + ": \"" + desc + "\"\n");
     }else{
-      error(bWARNING, long_label() + ": ambiguous overload for in " + dev_type() + "\n");
+      error(bWARNING, long_label() + ": ambiguous overload for " + dev_type() + "\n");
     }
     subckt()->erase(j);
   }

@@ -7,8 +7,10 @@ module stub (.a(a),.b(b),.c(c),.d(d));
   parameter real nsmm_rsh=1;
 endmodule // stub
 
-test_rppd #() a (.node_1(x),.node_2(y),.node_bn(z));
+test_rppd #() a (x, y, z);
 >>>>>dc
+a: 1 candidate found for test_rppd
+a is "test_rppd from device_dispatcher"
 .R1: 1 candidate found for stub
 a.R1 is "stub from top level"
 #          

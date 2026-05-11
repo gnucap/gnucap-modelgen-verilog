@@ -1,5 +1,5 @@
-test_timer3h #() dut0 (.p(\1 ),.n(\0 ));
-reject #() r ();
+test_timer3h #() dut0 (\1 , \0 );
+reject #(.time(2.2)) r ();
 #Time       cnt(dut0)  v(1)       mytime(dut0) iter(0)    control(0)
 test event 0 0
  0.         1.         0.         1.         2.         1.        

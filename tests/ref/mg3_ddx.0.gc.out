@@ -1,8 +1,8 @@
 test_ddx0 #() dut(1);
                   ^ ? invalid identifier
-test_ddx0 #() dut (.n(\1 ));
+test_ddx0 #() dut (\1 );
 parameter v=0
-vsource #(.dc(v)) v1 (.p(\1 ),.n(\0 ));
+vsource #(.dc(v)) v1 (\1 , \0 );
 #           v(1)       dd(dut)    iter(0)   
  0.         0.         0.         2.        
  1.         1.         2.         3.        

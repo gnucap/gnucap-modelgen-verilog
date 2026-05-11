@@ -1,4 +1,4 @@
-test_timer4 #() dut (.p(p));
+test_timer4 #() dut (p);
 #Time       vv(dut)    v(p)      
  0.         0.         0.        
  0.1        1.         0.        
