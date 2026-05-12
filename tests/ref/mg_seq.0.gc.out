@@ -1,5 +1,5 @@
-test_seq0 #(.v(1)) dut (.p(\1 ),.n(\0 ));
-test_seq0 #(.v(2)) dut (.p(\2 ),.n(\0 ));
-test_seq0 #(.v(3)) dut (.p(\3 ),.n(\0 ));
+test_seq0 #(.v(1)) dut (\1 , \0 );
+test_seq0 #(.v(2)) dut (\2 , \0 );
+test_seq0 #(.v(3)) dut (\3 , \0 );
 #           v(1)       v(2)       v(3)       iter(0)   
  0.         1.         2.         3.         3.        

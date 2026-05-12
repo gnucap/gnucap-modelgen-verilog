@@ -1,6 +1,6 @@
 parameter v=0
-test_an2 #() dut (.np(\1 ),.nn(\0 ));
-resistor #(.r(1)) c1 (.p(\1 ),.n(\0 ));
+test_an2 #() dut (\1 , \0 );
+resistor #(.r(1)) c1 (\1 , \0 );
 #           v(1)       iter(0)   
  0.         0.         3.        
 #Time       v(1)       iter(0)   

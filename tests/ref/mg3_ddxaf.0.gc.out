@@ -1,7 +1,7 @@
 test_ddxaf #() dut(1);
                    ^ ? invalid identifier
-test_ddxaf #() dut (.a(\1 ));
-vsource #(.dc(1)) v (.p(\1 ),.n(\0 ));
+test_ddxaf #() dut (\1 );
+vsource #(1) v (\1 , \0 );
 #           tst1(dut)  tst2(dut)  tst3(dut) 
  0.         2.         2.         2.        
 Gnucap   System status

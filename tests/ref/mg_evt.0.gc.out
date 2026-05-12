@@ -1,4 +1,4 @@
-test_evt0_0 #(.v(1)) dut (.p(\1 ),.n(\0 ));
+test_evt0_0 #(.v(1)) dut (\1 , \0 );
 #           v(1)       iter(0)   
 init
  1.         2.         3.        

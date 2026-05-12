@@ -14,7 +14,6 @@ main #() m(\0 ,1,2,4);
 main #() m(\0 ,1,2,4);
                    ^ ? invalid identifier
 >>>>>list
-m: 1 candidate found for main
 module myres (.a(a),.b(b));
   resistor #(.r(0)) r (a, b);
 endmodule // myres
@@ -34,6 +33,7 @@ endmodule // main
 
 main #() m (\0 , \1 , \2 , \4 );
 >>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
+m: 1 candidate found for main
 m is "main from top level"
 main.v: 1 candidate found for vsource
 main.R1 discarded (ports): no match: p

@@ -1,3 +1,5 @@
+r: ambiguous resistor: "vams resistor, plain"
+r: ambiguous resistor: "vams resistor, plain"
 #           v(gnd)     v(n1)      v(n2)      s(dut1)    r1(dut1)   r2(dut1)  
  1.         0.         1.5706     1.5706     1.0827G    1.2521     ??        
  2.         0.         1.2521     1.2521     75.814Meg  1.0177     ??        

@@ -1,7 +1,7 @@
-test_deriv0 #() dut (.p(\1 ),.c(\2 ));
+test_deriv0 #() dut (\1 , \2 );
 parameter v=0
 // vsource #(.dc(v)) v1(\2 ,\0 );
-resistor #(.r(100 )) r1 (.p(\1 ),.n(\0 ));
+resistor #(.r(100 )) r1 (\1 , \0 );
 gain=-8.48642714486004K
 #           v(1)       v(2)       iter(0)   
  0.5        2.55K      0.5        5.        

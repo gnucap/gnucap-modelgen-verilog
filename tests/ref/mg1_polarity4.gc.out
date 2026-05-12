@@ -3,9 +3,9 @@ test_pol4 #() dut(\1 ,\0 ,2,\0 );
 vsource #(2) v(2,\0 )
                ^ ? invalid identifier
 parameter v=0
-test_pol4 #() dut (.p(\1 ),.n(\0 ),.cp(\2 ),.cn(\0 ));
-vsource #(.dc(2)) v (.p(\2 ),.n(\0 ));
-resistor #(.r(1)) r (.p(\1 ),.n(\0 ));
+test_pol4 #() dut (\1 , \0 , \2 , \0 );
+vsource #(2) v (\2 , \0 );
+resistor #(1) r (\1 , \0 );
 #           v(1)       v(2)      
  0.        -6.         2.        
 Gnucap   System status

@@ -1,7 +1,7 @@
 t: block state variable initialiser unsupported.
 parameter v = 0;
-test_init5a #() dut0 (.p(x),.n(\0 ));
-vsource #(.dc(v)) v (.p(x),.n(\0 ));
+test_init5a #() dut0 (x, \0 );
+vsource #(v) v (x, \0 );
 #           v(x)       s(dut0)    iter(0)   
  0.         0.         0.         2.        
  0.05       0.05       0.         3.        

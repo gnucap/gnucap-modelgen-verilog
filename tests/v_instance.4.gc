@@ -1,0 +1,20 @@
+options trace
+
+module r1(a,b);
+	parameter real x=1;
+endmodule
+
+module main(.\1 (\1 ), .b(\2 ));
+  ground \0 ;
+  electrical \1 , \2 ;
+  inout \1 , \2 ;
+  parameter real r = 1;
+  r0 #(r) r1(\1 , \2 );
+  r1 #(r) r0(\1 , \2 );
+endmodule
+
+verilog
+
+main m();
+
+op

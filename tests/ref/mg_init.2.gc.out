@@ -1,5 +1,5 @@
-test_init2 #(.p(42.)) dut0 (.n(p));
-reject #() r ();
+test_init2 #(.p(42.)) dut0 (p);
+reject #(.time(2)) r ();
 #Time       v(p)       t1(dut0)   t2(dut0)   iter(0)    control(0)
  0.         2.         2.         42.        3.         1.        
  0.01       2.         2.         42.        3.         9.        

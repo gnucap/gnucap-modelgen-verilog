@@ -1,25 +1,29 @@
 load ../vams/capacitor.so
+* load ./c_debug.so
+* options trace
 
 verilog
 
-module rc(1, 2, gnd)
-	parameter ic=1;
-	capacitor #(.c(1u) .ic(1) .$mfactor(1)) c(1 gnd);
-	resistor #(.r(1k)) r(\1 \2 );
+module rc(\1 , \2 , gnd)
+	parameter real ic=1.;
+	capacitor #(.c(1u), .ic(ic), .$mfactor(1)) c(\1 , gnd);
+	resistor #(.r(1k)) r(\1 , \2 );
 endmodule
 
-parameter ic=2
+parameter ic=1.
+rc #(.ic(ic)) myrc(\1 , \2 , \0 );
+
+list
+
 
 // Verilog does not define instances or nodes at top level. Gnucap only
-// simulates what is instanciated. The node denotes ground node.
-// (at the time of writing, the "ground" declarator is not implemented.)
-
-rc #(.ic(ic)) myrc(\1 , 2, \0 );
+// simulates what is instanciated. Top level "0" denotes ground node.
+// (at the time of writing, the "ground" declarator was not implemented.)
 
 print tran v(nodes) iter(0)
 tran 1m
 
-capacitor #(.c(1u)) ctop(\2 ,\0 );
+capacitor #(.c(1u), .ic(0)) ctop(\2 , \0 );
 
 tran 2m
 

@@ -1,8 +1,8 @@
 *// Mutual inductance test circuit. Floating coils
 .parameter real k = .75
 dut ( 2 g 3 h )  test_cpl1  l1=.56 l2=.79 k=k
-r1a ( 1 2 ) 22
-r1b ( 3 h ) 75
+r1a ( 1 2 )  resistor  r=22
+r1b ( 3 h )  resistor  r=75
 *// missing ac_stim. use spice pulse for now
 *// vpulse #(.mag(1), .val0(0), .val1(1), .td(.002), .rise(.002), .fall(.002), .width(.002)) v1(\1 , \0 );
 v1 ( 1 g ) pulse iv= 0. pv= 1. delay= 0.002 rise= 0.002 fall= 0.002 width= 0.002 period= 0.01  AC  1.

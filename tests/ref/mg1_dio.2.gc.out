@@ -2,10 +2,10 @@ resistor #(.r(1)) dut(\3 ,2);
                           ^ ? invalid identifier
 vsource v1(3, \0 );
            ^ ? invalid identifier
-resistor #(.r(1)) dut (.p(\3 ),.n(\2 ));
-test_dio2 #() dut (.np(\2 ),.nn(\1 ));
-test_dio2 #() dut (.np(\1 ),.nn(\0 ));
-vsource #() v1 (.p(\3 ),.n(\0 ));
+resistor #(.r(1)) dut (\3 , \2 );
+test_dio2 #() dut (\2 , \1 );
+test_dio2 #() dut (\1 , \0 );
+vsource #() v1 (\3 , \0 );
 #           v(1)       v(2)       v(3)       iter(0)   
  2.         0.22163    0.44326    2.         8.        
  3.         0.39644    0.79289    3.         6.        

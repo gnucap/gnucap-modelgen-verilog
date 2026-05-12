@@ -1,9 +1,9 @@
 // H(s) = 1/(1+s)
-va_laplace_nd #(.n0(1.),.n1(0),.d0(1.),.d1(2.)) b (.out0(\0 ),.out1(out1),.in0(in),.in1(\0 ));
-resistor #(.r(1.)) r1 (.p(out1),.n(\0 ));
-vsine #(.freq(1),.ampl(1)) v1 (.p(in),.n(\0 ));
-resistor #(.r(2.)) r1 (.p(in),.n(out2));
-capacitor #(.c(1.)) n1 (.p(out2),.n(\0 ));
+va_laplace_nd #(.d0(1.),.d1(2.),.n0(1.),.n1(0)) b (\0 , out1, in, \0 );
+resistor #(1.) r1 (out1, \0 );
+vsine #(.ampl(1),.freq(1)) v1 (in, \0 );
+resistor #(2.) r1 (in, out2);
+capacitor #(1.) n1 (out2, \0 );
 #Time       v(out1)    v(out2)    s0(b)      s1(b)     
  0.         0.         0.         0.         0.        
  498.E-9    779.E-15   779.E-15   1.558E-12  3.129E-6  

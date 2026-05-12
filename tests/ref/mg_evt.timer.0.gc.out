@@ -1,4 +1,4 @@
-test_evt_t0 #() dut (.p(\1 ),.n(\0 ));
+test_evt_t0 #() dut (\1 , \0 );
 // reject #(.time(.9)) r();
 #           v(1)       state(dut) iter(0)   
  0.         0.         0.         2.        

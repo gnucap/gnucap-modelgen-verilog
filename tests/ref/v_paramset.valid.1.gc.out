@@ -3,7 +3,6 @@
 >>>>>(* desc="res2" *) paramset res resistor;
 >>>>>module main(\1 ,\2 , \3 , \4 );
 >>>>>list
-m: 1 candidate found for main
 (* desc="res1" *) paramset res resistor;
   parameter string what from '{"one", "ONE"};
  .r=1;
@@ -23,6 +22,7 @@ endmodule // main
 
 main #() m (\0 , \1 , \2 , \4 );
 >>>>>print dc v(nodes)
+m: 1 candidate found for main
 m is "main from top level"
 main.v: 1 candidate found for isource
 main.v: 1 candidate found for isource

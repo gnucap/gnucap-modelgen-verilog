@@ -2,8 +2,8 @@ isine #(.offset ... , .ampl(1)) i1(\0 , 1);
                                         ^ ? invalid identifier
 parameter r=1
 parameter v=0
-test_ddt5a #() dut (.p(\1 ),.n(\0 ),.x(x));
-isine #(.ampl(1),.offset(-1),.phase(-3.141592/2)) i1 (.p(\0 ),.n(\1 ));
+test_ddt5a #() dut (\1 , \0 , x);
+isine #(.offset(-1),.phase(-3.141592/2),.ampl(1)) i1 (\0 , \1 );
 #Time       i(i1)      v(1)       v(x)       d0(dut)    d1(dut)    iter(0)   
  0.         ??         0.         0.         0.         ??         3.        
  108.n      ??         0.        -78.127n   -78.127n    ??         18.       

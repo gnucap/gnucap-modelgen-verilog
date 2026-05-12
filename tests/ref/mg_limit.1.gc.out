@@ -1,10 +1,10 @@
 // options nobypass
 // options noincmode
-resistor #(.r(1)) dut (.p(\3 ),.n(v));
-test_lt1 #(.is(5e-15)) dut (.p(\3 ),.n(\2 ));
-test_lt1 #() dut (.p(\2 ),.n(\1 ));
-test_lt1 #() dut (.p(\1 ),.n(\0 ));
-vsource #() v1 (.p(v),.n(\0 ));
+resistor #(.r(1)) dut (\3 , v);
+test_lt1 #(.is(5e-15)) dut (\3 , \2 );
+test_lt1 #() dut (\2 , \1 );
+test_lt1 #() dut (\1 , \0 );
+vsource #() v1 (v, \0 );
 #           v(1)       v(2)       v(3)       v(v)       i(v1)      iter(0)   
  2.5        0.79545    1.5909     2.3863     2.5       -0.11366    20.       
  3.5        0.85034    1.7007     2.551      3.5       -0.94898    11.       

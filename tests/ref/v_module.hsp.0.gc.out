@@ -2,7 +2,6 @@
 >>>>>module main(\1 , \2 );
 >>>>>  ground \0 ;
 >>>>>list
-m: 1 candidate found for main
 module hsp (.a(a),.b(b));
   vsource #(.dc(2),(* test=1 *) .$yposition(10)) c (a, b);
 endmodule // hsp
@@ -14,6 +13,7 @@ endmodule // main
 
 main #() m (\1 , \2 );
 >>>>>print dc v(nodes)
+m: 1 candidate found for main
 m is "main from top level"
 main.test: 1 candidate found for hsp
 m.test is "hsp from top level"

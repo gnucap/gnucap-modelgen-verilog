@@ -1,6 +1,6 @@
 parameter pp=1;
 test_init1 #(.p(pp)) dut0 ();
-reject #() r ();
+reject #(.time(2)) r ();
 #           t1(dut0)   t2(dut0)   iter(0)    control(0)
  0.         2.         1.         2.         0.        
 #Time       t1(dut0)   t2(dut0)   iter(0)    control(0)

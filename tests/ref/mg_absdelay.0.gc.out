@@ -1,10 +1,10 @@
 ground \0 ;
 parameter r=1
 parameter v=0
-test_absdel0 #() dut1 (.p(\1 ),.n(\0 ));
-vsine #(.ampl(1),.dc(v)) v1 (.p(\1 ),.n(\0 ));
-test_absdel0 #() dut2 (.p(\2 ),.n(\0 ));
-vsine #(.ampl(1),.phase(90),.dc(v)) v1 (.p(\2 ),.n(\0 ));
+test_absdel0 #() dut1 (\1 , \0 );
+vsine #(.dc(v),.ampl(1)) v1 (\1 , \0 );
+test_absdel0 #() dut2 (\2 , \0 );
+vsine #(.phase(90),.dc(v),.ampl(1)) v1 (\2 , \0 );
 #Time       v(1)       ll1(dut1)  v(2)       ll1(dut2)  vin(dut1._b_absdelay_0_p_)
  0.         0.         0.        -0.894     -0.894      0.        
  0.1        0.58779    0.        -0.98663   -0.894      0.58779   

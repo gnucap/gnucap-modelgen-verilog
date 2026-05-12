@@ -1,5 +1,5 @@
-test_evt_cross2 #() dut0 (.p(\1 ),.n(\0 ),.x(c));
-vsine #(.freq(1e6),.ampl(2),.samples(9)) vin (.p(\1 ),.n(\0 ));
+test_evt_cross2 #() dut0 (\1 , \0 , c);
+vsine #(.freq(1e6),.ampl(2),.samples(9)) vin (\1 , \0 );
 #           v(1)       v(c)       iter(0)   
  0.         0.         0.         3.        
 #Time       v(1)       v(c)       iter(0)    c(dut0)    v(c)      

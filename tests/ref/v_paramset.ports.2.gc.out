@@ -7,7 +7,6 @@ myv #() V1(.n(1), .p(3));
 myv #() V1(.n(1), .p(3));
                      ^ ? invalid identifier
 >>>>>list
-m: 1 candidate found for main
 paramset myres resistor;
  .r=1;
 endparamset
@@ -23,6 +22,7 @@ endmodule // main
 
 main #() m (\0 , \1 , \2 , \4 );
 >>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
+m: 1 candidate found for main
 m is "main from top level"
 main.v discarded (params): too many: requested=1 max=0
 main.v: no candidates found for myres

@@ -1,6 +1,6 @@
 test_temp2 #() dut(1);
                    ^ ? invalid identifier
-test_temp2 #() dut (.t(\1 ));
+test_temp2 #() dut (\1 );
 #           v(1)      
  0.         1.        
 Gnucap   System status

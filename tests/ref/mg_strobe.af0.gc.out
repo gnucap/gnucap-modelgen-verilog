@@ -1,5 +1,5 @@
 parameter v1=0
-test_strobe_af0 #(.v(v1)) dut (.p(\1 ),.n(\0 ));
+test_strobe_af0 #(.v(v1)) dut (\1 , \0 );
 world 0.000000
 #           v(1)       iter(0)   
 world 0.000000

@@ -14,7 +14,6 @@ main m(\1 ,2,3,\0 );
 main m(\1 ,2,3,\0 );
              ^ ? invalid identifier
 >>>>>list
-m: 1 candidate found for main
 module modwrong (.A(A),.b(b));
 endmodule // modwrong
 
@@ -35,6 +34,7 @@ endmodule // main
 
 main #() m (\1 , \2 , \3 , \0 );
 >>>>>op
+m: 1 candidate found for main
 m is "main from top level"
 main.b1 discarded (ports): no match: a
 main.b1: 1 candidate found for bob

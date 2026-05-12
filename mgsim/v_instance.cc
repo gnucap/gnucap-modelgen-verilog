@@ -1,6 +1,6 @@
 /*                              -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
- *               2022, 2023 Felix Salfelder
+ *               2022-2026 Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * module stuff
+ * stub: generic, self-inflating device instance
  */
 #include <globals.h>
 #include <io_trace.h>
@@ -69,7 +69,7 @@ public:
     _params(p._params),
     _port_names(p._port_names) {}
   COMMON_INSTANCE* clone()const override { return new COMMON_INSTANCE(*this); }
-  std::string name()const override {unreachable(); return "??";}
+  std::string name()const override { untested();unreachable(); return "??";}
   bool operator==(COMMON_COMPONENT const& p)const override {
     if(this == &p){ untested();
       return true;
@@ -84,18 +84,18 @@ public:
         && _modelname == x->_modelname;
   }
 #if __cplusplus >= 202002L
-  bool operator<(COMMON_COMPONENT const& p)const override {
+  bool operator<(COMMON_COMPONENT const& p)const override { untested();
     return compare(p) < 0;
   }
-  int compare(COMMON_COMPONENT const& p)const override {
-    if(this == &p){
+  int compare(COMMON_COMPONENT const& p)const override { untested();
+    if(this == &p){ untested();
       return 0;
-    }else{
+    }else{ untested();
     }
     int c;
-    if((c = COMMON_COMPONENT::compare(p))) {
+    if((c = COMMON_COMPONENT::compare(p))) { untested();
       return c;
-    }else{
+    }else{ untested();
     }
 
     auto x = prechecked_cast<COMMON_INSTANCE const*>(&p);
@@ -103,20 +103,20 @@ public:
 
     if(intptr_t cp = intptr_t(_proto) - intptr_t(x->_proto)) { untested();
       return cp<0?-1:1;
-    }else if((c = _params.compare(x->_params))) {
+    }else if((c = _params.compare(x->_params))) { untested();
       return c;
-    }else{
+    }else{ untested();
     }
     auto ord = _port_names <=> x->_port_names;
-    if(ord == std::weak_ordering::less){
+    if(ord == std::weak_ordering::less){ untested();
       return -1;
-    }else if(ord == std::weak_ordering::greater){
+    }else if(ord == std::weak_ordering::greater){ untested();
       return 1;
-    }else{
+    }else{ untested();
     }
     return 0;
   }
-  bool has_less() const override {return true;}
+  bool has_less() const override { untested();return true;}
 #endif // __cplusplus >= 202002L
   int set_param_by_name(std::string Name, std::string Value) override {
     if(_params.find(Name) == _params.end()){
@@ -129,7 +129,7 @@ public:
   std::string param_name(int i)const override
     { assert (i < int(_params.size())); return _params.name(i); }
   std::string param_name(int i, int j)const override
-    { assert(!j); return param_name(i);}
+    { untested(); assert(!j); return param_name(i);}
   std::string param_value(int i)const override
     { assert (i < int(_params.size())); return _params.value(i); }
   int param_count()const override {return static_cast<int>(_params.size()); }
@@ -160,7 +160,7 @@ class INSTANCE : public BASE_SUBCKT {
 protected: // stub stuff
   INSTANCE const* _cloned_from{nullptr}; // use common/mutable_common instead?
   const COMPONENT* _parent{nullptr};
-  mutable DEV_INSTANCE_PROTO* _proto{nullptr}; // use common->proto?
+  mutable INSTANCE* _proto{nullptr}; // use common->proto?
   int _node_capacity{0};
 protected:
   explicit	INSTANCE(const INSTANCE&);
@@ -168,14 +168,30 @@ public:
   explicit	INSTANCE();
 		~INSTANCE();
   CARD*		clone_instance()const override {
-    // incomplete();
+    if(!_parent) {
+    }else if(_parent->subckt()->size() == 1){ untested();
+      return (*_parent->subckt()->begin())->clone_instance();
+    }else{ untested();
+    }
+    if(!_proto) {
+      // return nullptr;
+    }else if(_proto->subckt()->size() == 1){ untested();
+      return (*_proto->subckt()->begin())->clone_instance();
+    }else{ untested();
+    }
+
+    // is this an error?
     return clone();
   }
   CARD*		clone()const override {
     INSTANCE* new_instance = new INSTANCE(*this);
 
     // BUG?
+  //  new_instance->_parent = (COMPONENT const*)_proto;
+  if(_proto){
     new_instance->_parent = (COMPONENT const*)_proto;
+  }else{
+  }
 
     return new_instance;
   }
@@ -184,30 +200,33 @@ private: // override virtual
   bool		print_type_in_spice()const override{return true;}
   std::string   value_name()const override {return "#";}
 protected:
+  COMPONENT const* parent()const { untested();return _parent;}
   int		max_nodes()const override {
     // INT_MAX results in arithmetic overflow in lang_spice
     // (does not seem to work with lang_spice anyway)
     return INT_MAX-2;
   }
 public: // ?
-  void build_proto() const;
+  void build_proto()const;
 private:
-
+  bool defer_proto()const;
 protected:
   void set_port_by_index(int Index, std::string& Value)override;
 
   // override. the base class does not know about _parent.
   int set_port_by_name(std::string& name, std::string& ext_name)override;
+  const std::string port_value(int)const override;
   int		min_nodes()const override	{return 0;}
   int		ext_nodes()const override	{return net_nodes();}
   int		matrix_nodes()const override	{ untested();return 0;}
-protected:
-  int		net_nodes()const override	{return _net_nodes;}
-  void		precalc_first()override;
 private:
   bool		makes_own_scope()const override { untested();return false;}
 
 protected:
+protected:
+  int		net_nodes()const override	{return _net_nodes;}
+  //void	precalc_first()override;
+  void		expand_first()override;
   void		expand()override;
   CARD*		deflate()override;
 private:
@@ -238,15 +257,15 @@ private: // overrides
       return "";
     }
   }
-   std::string param_name(int i) const override {
-     // assert(i<int(_params.size()));
-     std::string n = BASE_SUBCKT::param_name(i);
-     if(n[0]=='*'){
-       return "";
-     }else{
-       return n;
-     }
-   }
+  std::string param_name(int i) const override {
+    // assert(i<int(_params.size()));
+    std::string n = BASE_SUBCKT::param_name(i);
+    if(n[0]=='*'){
+      return "";
+    }else{
+      return n;
+    }
+  }
   void set_param_by_index(int I, std::string& Value, int i) override {
     assert(i==0);
     assert(I>=0);
@@ -276,8 +295,6 @@ protected:
     assert(c);
     if(size_t(i)>=c->_port_names.size()){ untested();
       return ""; // it has no name.
-    }else if(c->_port_names[i][0] == '*'){
-      return ""; // it has no name.Q
     }else{
       return c->_port_names[i];
     }
@@ -288,7 +305,7 @@ protected:
     return p;
   }
 } p1;
-DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "instance|device_stub|__stub", &p1);
+DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "__stub", &p1);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class DEV_INSTANCE_PROTO : public INSTANCE {
@@ -337,13 +354,13 @@ public:
     BASE_SUBCKT::set_port_by_index(Index, Value);
   }
 
-  int set_port_by_name(std::string&name, std::string&ext_name)override {
+  int set_port_by_name(std::string&name, std::string&ext_name)override { untested();
     int i = net_nodes();
     auto* cc = prechecked_cast<COMMON_INSTANCE*>(mutable_common()->mutable_clone());
     cc->_port_names.push_back(name);
     attach_common(cc);
 
-    if(subckt()){
+    if(subckt()){ untested();
     }else{ untested();
     }
     assert(scope());
@@ -353,9 +370,8 @@ public:
 	grow_nodes(i, _n, _node_capacity, node_capacity_floor);
 	BASE_SUBCKT::set_port_by_index(i, ext_name);
       }
-      _proto->set_port_by_index(i, name);
       assert(scope()!=subckt());
-    }else{
+    }else{ untested();
       trace4("INSTANCE::pbn proto", long_label(), net_nodes(), name, ext_name);
       set_port_by_index(i, ext_name);
     }
@@ -390,9 +406,29 @@ CARD* INSTANCE::prepare_overload(CARD* model, std::string modelname, INSTANCE* P
   assert(Proto->subckt());
   assert(Proto->scope()==Proto->subckt());
   assert(model);
+  if(dynamic_cast<INSTANCE*>(model)){
+    error(bDEBUG, long_label() + " found instance \"" + model->long_label() + "\".\n");
+    model->expand_first();
+  }else{
+  }
+
   CARD* cl = model->clone_instance();
   COMPONENT* cur = prechecked_cast<COMPONENT*>(cl);
   assert(cur || !cl);
+  if(dynamic_cast<INSTANCE*>(cl)){
+    delete cl;
+    error(bLOG, long_label() + " discarded (not ready)\n");
+    return nullptr;
+  }else{
+  }
+
+  if(cl){
+    for(int j=0; j < cl->net_nodes(); ++j){
+      // just assert? perhaps clone_instance should take care of this.
+      cl->n_(j) = nullptr;
+    }
+  }else{ untested();
+  }
 
   if(cl && has_attributes(cl->id_tag())) {
     trace2("INSTANCE::prepare_overload attr?", modelname, attributes(cl->id_tag())->string(tag_t()));
@@ -431,7 +467,7 @@ CARD* INSTANCE::prepare_overload(CARD* model, std::string modelname, INSTANCE* P
       std::string v = Proto->port_value(i); // .name(value) ..
 
       trace3("prep", i, nn, v);
-      if(nn[0] == '*'){
+      if(!nn.size()){
 	cur->set_port_by_index(i, v);
       }else{
 	cur->set_port_by_name(v, v);
@@ -547,6 +583,9 @@ void INSTANCE::collect_overloads_from_scope(std::string const& modelname,
       std::string desc = get_description((**i).id_tag());
 
       CARD* p = prepare_overload(*i, modelname, Proto);
+      if(!p){
+      }else if(&Scope == &CARD_LIST::card_list){
+      }
 
       if(&Scope == &CARD_LIST::card_list){
 	describe_if(p->id_tag(), modelname + " from top level" + desc);
@@ -581,7 +620,7 @@ void INSTANCE::collect_overloads(INSTANCE* Proto) const
   assert(!Proto->scope()->size());
 
 #ifdef DO_TRACE
-  for(auto n : *(Proto->subckt()->nodes())){
+  for(auto n : *(Proto->subckt()->nodes())){ untested();
     trace1("node", n.first);
   }
 #endif
@@ -616,15 +655,6 @@ void INSTANCE::collect_overloads(INSTANCE* Proto) const
 
     std::string extended_name = modelname;
     int bin_count = 0;
-#if 0
-    MODEL_CARD* m = model_dispatcher[modelname];
-    while(m){ untested();
-      CARD* p = prepare_overload(m, modelname, Proto);
-      describe_if(p->id_tag(), extended_name + " from model_dispatcher");
-      extended_name = modelname + ':' + to_string(bin_count++);
-      m = model_dispatcher[extended_name];
-    }
-#endif
 
     CARD* p = device_dispatcher[modelname];
     extended_name = modelname;
@@ -704,14 +734,12 @@ CARD* INSTANCE::deflate()
 #endif
     for(int ii=0; ii<c->net_nodes(); ++ii){
       if(ii < c->net_nodes()) {
-	if( _parent->port_name(ii)[0] == '*'){
-	  trace3("rewire do", ii, c->n_(ii).e_(), _parent->port_name(ii));
-//	  assert(ii == c->n_(ii).e_());
+	if(!_parent->port_name(ii).size() && n_(ii).is_connected()){
 	  c->n_(ii) = n_(ii); // why?
-	 // c->n_(ii) = n_(c->n_(ii).e_());
+	}else if(!_parent->port_name(ii).size()){
+	  c->n_(ii) = n_(c->n_(ii).e_());
 	}else if(c->n_(ii).e_() != -1){
 	  c->n_(ii) = n_(c->n_(ii).e_());
-	  // c->n_(ii) = n_(ii); // why?
 	}else{
 	}
       }else if(ii < c->net_nodes()+c->num_current_ports()){ untested();
@@ -756,14 +784,9 @@ INSTANCE::INSTANCE(const INSTANCE& p) :
   }else{
     assert(_n == nullptr);
   }
-  if(p.is_device()){
-    for (int ii = 0;  ii < net_nodes();  ++ii) {
-      _n[ii] = p._n[ii];
-    }
-  }else{ untested();
-    for (int ii = 0;  ii < net_nodes();  ++ii) { untested();
-      assert(!_n[ii].n_());
-    }
+  assert(p.is_device());
+  for (int ii = 0;  ii < net_nodes();  ++ii) {
+    _n[ii] = p._n[ii];
   }
 
   assert(!subckt());
@@ -771,7 +794,7 @@ INSTANCE::INSTANCE(const INSTANCE& p) :
   set_label(p.short_label());
   set_dev_type(p.dev_type());
 
-  if(_parent){
+  if(_parent){ untested();
   }else if(!common()){ untested();
     unreachable();
   }else if(common()->has_model()){ untested();
@@ -862,9 +885,10 @@ void INSTANCE::expand()
 void INSTANCE::expand_sift()
 {
   // tie break rules
-  // - The paramset with the fewest number of un-overridden parameters shall be selected.
-  // - The paramset with the greatest number of local parameters with specified ranges shall be selected.
-  // - The paramset with the fewest ports not connected in the instance line shall be selected.
+  // (- The device closest to the instance shall be selected)
+  // - The device with the fewest number of un-overridden parameters shall be selected.
+  // - The device with the greatest number of local parameters with specified ranges shall be selected.
+  // - The device with the fewest ports not connected in the instance line shall be selected.
   COMPONENT* gotit = nullptr;
   int gval = 0;
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ){
@@ -933,7 +957,7 @@ void INSTANCE::expand_sift()
     }else if(desc.size()){
       error(bWARNING, long_label() + ": ambiguous " + dev_type() + ": \"" + desc + "\"\n");
     }else{
-      error(bWARNING, long_label() + ": ambiguous overload for in " + dev_type() + "\n");
+      error(bWARNING, long_label() + ": ambiguous overload for " + dev_type() + "\n");
     }
     subckt()->erase(j);
   }
@@ -969,28 +993,81 @@ void INSTANCE::expand_sift()
 }
 /*--------------------------------------------------------------------------*/
 // Kludge: build proto in stub, so it only needs doing once.
-void INSTANCE::precalc_first()
+void INSTANCE::expand_first()
 {
+  static int recursion;
+  if(++recursion > OPT::recursion){ untested();
+    recursion = 0;
+    throw Exception(long_label() + ": recursion too deep");
+  }else{
+  }
+  BASE_SUBCKT::expand_first();
+
   assert(common());
   trace3("INSTANCE::precalc_first", short_label(), _parent, common()->modelname());
   trace1("INSTANCE::precalc_first", _sim->is_first_expand());
 
-  if(!owner()){
+  if(defer_proto()){
+    if(_proto){
+      assert(_proto!=this);
+      error(bDEBUG, long_label() + ": defer proto\n");
+       delete _proto;
+       _proto = nullptr;
+    }else{ untested();
+    }
+  }else if(!owner()){
     build_proto();
     _parent = _proto; // common->proto?
+  }else if(_cloned_from==&p1){ untested();
+    build_proto();
   }else if(_cloned_from){
     _cloned_from->build_proto();
-  }else{ untested();
+  }else { untested();
+  }
+
+  if(defer_proto()){
+  }else if(_cloned_from && !_parent && !_proto){ untested();
+  // incomplete(); // dup.1?
+    // BUG: move to clone_instance
+    trace1("INSTANCE::precalc_first afresh", long_label());
+    _proto = new DEV_INSTANCE_PROTO();
+    _proto->attach_common(mutable_common());
+    auto c = prechecked_cast<COMMON_INSTANCE const*>(common());
+    assert(c);
+    for(int i=0; i < int(c->_port_names.size()); ++i){ untested();
+      auto v = c->_port_names[i];
+      _proto->set_port_by_name(v, v);
+    }
+    build_proto();
+  }else{
   }
 
   if(_parent){
     trace2("INSTANCE::precalc_first w/ parent", short_label(), _parent->short_label());
   }else{
   }
-  // a device in a module instance
-  BASE_SUBCKT::precalc_first();
 
   assert(!is_constant()); /* because I have more work to do */
+  --recursion;
+}
+/*--------------------------------------------------------------------------*/
+bool INSTANCE::defer_proto() const
+{
+  auto c = prechecked_cast<COMMON_INSTANCE const*>(common());
+  assert(c);
+  std::string modelname = c->modelname();
+  if(!owner()){
+    return false;
+  }else if(_cloned_from != &p1){
+    return false;
+  }else{
+  }
+  CARD_LIST::const_iterator i = scope()->find_(modelname);
+  if(i == scope()->end()) { untested();
+    return false;
+  }else{
+    return true;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void INSTANCE::build_proto() const
@@ -1003,23 +1080,21 @@ void INSTANCE::build_proto() const
     assert(_proto->subckt());
     assert(_proto->subckt()->params());
 
-//    delete _proto;
-//    _proto = new DEV_INSTANCE_PROTO;
     _proto->attach_common(common()->clone());
-    // HERE: set ports.
     auto c = prechecked_cast<COMMON_INSTANCE const*>(common());
     assert(c);
     for(int i = 0; i<int(c->_port_names.size()); ++i) {
       std::string v = c->_port_names[i];
       if(c->_port_names.size()){
 	assert(c->_port_names[i] == v);
-	trace2("DBG", v, c->_port_names[i]);
-//	_proto->set_port_by_name(v, v);
-      }else{
-//	_proto->set_port_by_name(v, v);
-	trace2("DBG", v,v); // , _port_names[i]);
+	std::string nn = port_value(i);
+	if(!v.size()) {
+	  _proto->set_port_by_index(i, nn);
+	}else{
+	  _proto->set_port_by_index(i, v);
+	}
+      }else{ untested();
       }
- //     _proto->set_port_by_name(v, v);
     }
 
     collect_overloads(_proto);
@@ -1045,6 +1120,7 @@ CARD* DEV_INSTANCE_PROTO::clone()const
   return new_instance;
 }
 /*--------------------------------------------------------------------------*/
+// instance i1(.. Value ..);
 void INSTANCE::set_port_by_index(int Index, std::string& Value)
 {
   trace3("instance spbi", long_label(), Index, Value);
@@ -1052,24 +1128,19 @@ void INSTANCE::set_port_by_index(int Index, std::string& Value)
   BASE_SUBCKT::set_port_by_index(Index, Value);
 
   if(!_parent){
-    assert(_proto);
-
-    std::string n = "*unnamed_port_" + std::to_string(Index);
-    trace3("proto fwd", long_label(), n, Value);
-    _proto->set_port_by_name(n, Value);
     assert(common());
     auto* cc = prechecked_cast<COMMON_INSTANCE*>(mutable_common()->mutable_clone());
     assert(cc);
-#if 1
+    assert(int(cc->_port_names.size()) == Index);
     cc->_port_names.resize(Index+1);
-    cc->_port_names[Index] = n;
-#endif
+    assert(!cc->_port_names[Index].size());
     attach_common(cc);
-  }else{
+  }else{ untested();
     incomplete();
   }
 }
 /*--------------------------------------------------------------------------*/
+// instance i1(.. .name(ext_name) ..);
 int INSTANCE::set_port_by_name(std::string& name, std::string& ext_name)
 {
   int i = net_nodes();
@@ -1088,15 +1159,18 @@ int INSTANCE::set_port_by_name(std::string& name, std::string& ext_name)
     BASE_SUBCKT::set_port_by_index(i, ext_name);
   }
 
-  if(_proto){
-    _proto->set_port_by_index(i, name);
-    assert(scope()!=subckt());
-  }else{ untested();
-    trace4("INSTANCE::pbn proto", long_label(), net_nodes(), name, ext_name);
-    set_port_by_index(i, ext_name);
-  }
-
   return i; // TODO: test.
+}
+/*--------------------------------------------------------------------------*/
+const std::string INSTANCE::port_value(int i) const
+{
+  if(_cloned_from == &p1){
+    return COMPONENT::port_value(i);
+  }else if(_cloned_from){ untested();
+    return(_cloned_from->port_value(i));
+  }else{
+    return COMPONENT::port_value(i);
+  }
 }
 /*--------------------------------------------------------------------------*/
 void DEV_INSTANCE_PROTO::cleanup()

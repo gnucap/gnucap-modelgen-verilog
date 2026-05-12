@@ -1,3 +1,5 @@
+r: ambiguous resistor: "vams resistor, plain"
+r: ambiguous resistor: "vams resistor, plain"
 #           v(gnd)     v(n1)      v(n2)      r1(dut1)   r1(dut2)  
  0.         0.         1.0007     1.6505     1.0007     1.6505    
 #Time       v(gnd)     v(n1)      v(n2)      r1(dut1)   r1(dut2)  

@@ -1,8 +1,8 @@
-test_noise2 #() dut (.p(\1 ),.n(\0 ));
-meas_noise #() nAll (.p(\1 ));
-meas_noise #(.name("A")) nA (.p(\1 ));
-meas_noise #(.name("B")) nB (.p(\1 ));
-meas_noise #(.name("F")) nF (.p(\1 ));
+test_noise2 #() dut (\1 , \0 );
+noise_probe #() nAll (\1 );
+noise_probe #(.name("A")) nA (\1 );
+noise_probe #(.name("B")) nB (\1 );
+noise_probe #(.name("F")) nF (\1 );
 #          
  0.        
 #Freq       npwr(nAll) npwr(nA)   npwr(nB)   npwr(nF)  

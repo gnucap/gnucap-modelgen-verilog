@@ -566,8 +566,8 @@ LAPLACE::LAPLACE(LAPLACE const&p) : ELEMENT(p)
 {
   if(p._nN){ untested();
     trace2("laplace", int_nodes(), max_nodes());
-    assert(_nN);
     if(int_nodes() + max_nodes() <= NODES_PER_BRANCH){ untested();
+      assert(_nN);
        // not expanded yet...?
     }else{ untested();
       _nN = new node_t[int_nodes() + max_nodes()];
@@ -575,7 +575,10 @@ LAPLACE::LAPLACE(LAPLACE const&p) : ELEMENT(p)
 	n_(ii) = p.n_(ii);
       }
     }
+  }else if(int_nodes() + max_nodes() < NODES_PER_BRANCH) { untested();
+    _nN = _nodes;
   }else{
+    _nN = new node_t[int_nodes() + max_nodes()];
   }
 }
 /*--------------------------------------------------------------------------*/

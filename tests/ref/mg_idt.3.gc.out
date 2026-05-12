@@ -1,4 +1,4 @@
-test_idt3 #() dut (.p(a),.n(\0 ));
+test_idt3 #() dut (a, \0 );
 #Time       v(a)       iter(0)    control(0)
  0.         0.         3.         1.        
  0.1        0.1        30.        1.        

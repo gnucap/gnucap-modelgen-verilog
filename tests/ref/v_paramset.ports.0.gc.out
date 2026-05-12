@@ -12,7 +12,6 @@ main #() m(\0 ,1,2,4);
 main #() m(\0 ,1,2,4);
                    ^ ? invalid identifier
 >>>>>list
-m: 1 candidate found for main
 paramset myv vsource;
  .dc=1;
 endparamset
@@ -24,6 +23,7 @@ endmodule // main
 
 main #() m (\0 , \1 , \2 , \4 );
 >>>>>print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
+m: 1 candidate found for main
 m is "main from top level"
 main.v: 1 candidate found for resistor
 main.R1: 1 candidate found for myv

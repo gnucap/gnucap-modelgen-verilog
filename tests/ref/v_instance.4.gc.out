@@ -1,0 +1,14 @@
+>>>>>module r1(a,b); 
+>>>>> 
+>>>>>module main(.\1 (\1 ), .b(\2 )); 
+>>>>>ground \0 ;
+>>>>> 
+>>>>>verilog 
+>>>>>op
+m: 1 candidate found for main
+m is "main from top level"
+main.r1 found instance "main.r0".
+main.r0: defer proto
+main.r1 discarded (not ready)
+main.r1: no candidates found for r0
+m.r1: no valid prototype found for r0

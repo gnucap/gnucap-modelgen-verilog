@@ -1,6 +1,6 @@
-test_slw0 #() dut (.p(\2 ),.c(\1 ));
+test_slw0 #() dut (\2 , \1 );
 parameter v=1
-vsource #(.dc(v)) v1 (.p(\1 ),.n(\0 ));
+vsource #(.dc(v)) v1 (\1 , \0 );
 #           v(1)       v(2)       vin(dut)  
  0.         0.         0.         0.        
  0.1        0.1        0.1        0.1       

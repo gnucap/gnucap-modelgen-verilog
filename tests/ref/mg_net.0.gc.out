@@ -1,10 +1,10 @@
 parameter r=1
 parameter v=0
 ground gnd;
-test_net_0 #() N0 (.p(aa),.n(bb));
-test_net_0 #() N1 (.p(gnd),.n(gnd));
-test_net_0 #() N2 (.p(xx),.n(\0 ));
-vsource #(.dc(v)) v1 (.p(bb),.n(gnd));
+test_net_0 #() N0 (aa, bb);
+test_net_0 #() N1 (gnd, gnd);
+test_net_0 #() N2 (xx, \0 );
+vsource #(.dc(v)) v1 (bb, gnd);
 #           v(N0)      v(N1)      v(N2)     
  0.         0.         0.         0.        
  0.5        0.5        0.         0.        

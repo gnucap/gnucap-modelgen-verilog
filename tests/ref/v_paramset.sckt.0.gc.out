@@ -3,7 +3,6 @@
 >>>>>paramset myres foo;
 >>>>>module main(\1 , \2 , \3 );
 >>>>>list
-m: 1 candidate found for main
 module foo (.\1 (\1 ),.\2 (\2 ));
   parameter R=1;
   resistor #(.r(R)) rr (\1 , \2 );
@@ -22,6 +21,7 @@ endmodule // main
 
 main #() m (\0 , \1 , \2 );
 >>>>>print dc v(nodes) i(m.v)
+m: 1 candidate found for main
 m is "main from top level"
 main.v: 1 candidate found for vsource
 main.R1: 1 candidate found for myres

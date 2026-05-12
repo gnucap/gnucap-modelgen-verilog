@@ -1,0 +1,18 @@
+  module bbb (a,b);
+  ^ ? nonstandard nesting in aaa.
+  module bbb (a,b);
+  ^ ? nonstandard nesting in bbb.
+module aaa (.a(a),.b(b));
+  module bbb (.a(a),.b(b));
+    bbb #() r1 (a, b);
+    module bbb (.a(a),.b(b));
+      resistor #(2) r1 (a, b);
+    endmodule // bbb
+
+  endmodule // bbb
+
+  bbb #() r2 (a, b);
+endmodule // aaa
+
+#           v(a)      
+ 0.         2.        
