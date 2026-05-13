@@ -541,12 +541,16 @@ private:
 /*--------------------------------------------------------------------------*/
 class CMD_NET_DECL : public CMD {
 public:
+  explicit CMD_NET_DECL() : CMD() {}
+private:
+  explicit CMD_NET_DECL(CMD_NET_DECL const& p) : CMD(p) {}
+public:
+  CMD* clone()const override {return new CMD_NET_DECL(*this);}
+public:
   void do_it(CS& cmd, CARD_LIST* Scope)override {
     assert(Scope);
     assert(cmd.last_match().size()>2);
-    DEV_DOT* dot = new DEV_DOT();
-    dot->set(cmd.last_match() + cmd.tail());
-    Scope->push_back(dot);
+    set(cmd.last_match() + cmd.tail());
     assert(Scope->nodes());
     NODE_MAP& nm = *Scope->nodes();
 
@@ -1042,7 +1046,10 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
       cmd.reset();
       new__instance(cmd, x, x->subckt());
     }else if (cmd >> "wire |electrical |inout |input |output ") {
-      net_decl.do_it(cmd, x->subckt());
+      auto n = net_decl.clone();
+      n->set_owner(x);
+      n->do_it(cmd, x->subckt());
+      x->subckt()->push_back(n);
     }else if (cmd >> "module |macromodule ") {
       cmd.reset();
       cmd.check(bWARNING, "nonstandard nesting in " + x->long_label() + ".");

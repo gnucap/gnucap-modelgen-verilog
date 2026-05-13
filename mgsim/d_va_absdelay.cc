@@ -374,7 +374,7 @@ void DELAY::tr_begin()
     _rise = cd->_rise;
     _fall = cd->_fall;
     double dtmin = _sim->_dtmin;
-    if(dtmin){
+    if(dtmin != 0.){
     }else{
       dtmin = OPT::dtmin;
     }
