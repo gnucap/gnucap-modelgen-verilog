@@ -9,8 +9,8 @@ module vcvs(p,n,cp,cn);
 	inout p,n,cp,cn;
 	electrical p,n,cp,cn;
 
-   parameter real gain    = 1. from [0:inf);
-   parameter real offset  = 0.;
+   parameter real gain    = 1.0;
+   parameter real offset  = 0.0;
 
    analog begin
       V(p,n) <+ gain*V(cp,cn) + offset;
