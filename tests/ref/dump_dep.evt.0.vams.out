@@ -16,8 +16,8 @@ module test_idt3a(p, n);
 
 endmodule
 module test_evt0_0(p, n);
-  inout p, n;
   electrical p, n;
+  inout p, n;
   parameter real v = 0;
 
   real w// *

@@ -38,6 +38,22 @@ typedef LiSt<Port_3, '(', ',', ')'> Port_3_List_2;
 // list ::= port {"," port} ";"
 typedef LiSt<Port_3, '\0', ',', ';'> Port_3_List_3;
 /*--------------------------------------------------------------------------*/
+class Net_Identifier : public Port_3 {
+  Block* _owner{nullptr};
+public:
+  Net_Identifier() : Port_3() {}
+protected:
+  Block* owner(){return _owner;}
+public:
+  void set_owner(Base* c) { _owner = prechecked_cast<Block*>(c); assert(_owner); }
+  void parse(CS& f) override;
+};
+/*--------------------------------------------------------------------------*/
+class Net_Identifier_Discipline : public Net_Identifier {
+public:
+   void parse(CS& f)override;
+};
+/*--------------------------------------------------------------------------*/
 class Port_Connection_List : public LiSt<Port_3, '(', ',', ')'> {
   bool _has_names{false};
   // Block* _owner{nullptr};
@@ -45,6 +61,16 @@ public:
   void parse(CS& f)override;
   bool has_names() const {return _has_names;}
 //  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class Net_Decl_Dir : public Net_Identifier {
+public:
+   void parse(CS& f)override;
+};
+/*--------------------------------------------------------------------------*/
+class Net_Identifier_Ground : public Net_Identifier {
+public:
+   void parse(CS& f)override;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -289,6 +315,20 @@ class Net_Identifier;
 typedef LiSt<Net_Identifier, '\0', ',', ';'> Net_Decl_List;
 /*--------------------------------------------------------------------------*/
 class Net_Declarations : public Collection<Net_Decl_List>{
+public:
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class Net_Decl_List_Dir : public Net_Decl_List {
+  enum dir_t {
+    dir_none = 0,
+    dir_in   = 1,
+    dir_out  = 2,
+    dir_io   = 3
+  } _dir{dir_none};
+public:
+  explicit Net_Decl_List_Dir(char what);
 public:
   void parse(CS& f)override;
   void dump(std::ostream& f)const override;

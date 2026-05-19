@@ -1,6 +1,6 @@
 module shadow(p, n);
-  inout p, n;
   electrical p, n;
+  inout p, n;
   (* desc="1" *)
   real i;
 
@@ -16,6 +16,7 @@ endmodule
 // paramsets
 module my_sh(p, n);
   electrical p, n;
+  inout p, n;
   (* desc="1" *)
   real __i;
 

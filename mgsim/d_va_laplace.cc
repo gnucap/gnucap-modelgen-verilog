@@ -564,14 +564,14 @@ CARD* LAPLACE::clone()const
 /*--------------------------------------------------------------------------*/
 LAPLACE::LAPLACE(LAPLACE const&p) : ELEMENT(p)
 {
-  if(p._nN){ untested();
+  if(p._nN){
     trace2("laplace", int_nodes(), max_nodes());
     if(int_nodes() + max_nodes() <= NODES_PER_BRANCH){ untested();
       assert(_nN);
        // not expanded yet...?
-    }else{ untested();
+    }else{
       _nN = new node_t[int_nodes() + max_nodes()];
-      for (int ii = 0; ii < p.net_nodes(); ++ii) { untested();
+      for (int ii = 0; ii < p.net_nodes(); ++ii) {
 	n_(ii) = p.n_(ii);
       }
     }

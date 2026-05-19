@@ -169,7 +169,7 @@ public:
 		~INSTANCE();
   CARD*		clone_instance()const override {
     if(!_parent) {
-    }else if(_parent->subckt()->size() == 1){ untested();
+    }else if(_parent->subckt()->size() == 1){
       return (*_parent->subckt()->begin())->clone_instance();
     }else{ untested();
     }

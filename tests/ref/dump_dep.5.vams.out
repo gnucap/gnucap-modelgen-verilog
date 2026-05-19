@@ -1,6 +1,6 @@
 module test_dep5(np, n);
-  inout p, n;
   electrical p, n;
+  inout p, n;
   analog begin : main // always
     // AA : 1
     real AA// + [V(p, n)]

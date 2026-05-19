@@ -51,8 +51,8 @@ enddiscipline
 
 
 module heat(t);
-  inout t;
   thermal t;
+  inout t;
   real tt;
 
   analog begin

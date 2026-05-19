@@ -1,6 +1,6 @@
 module test_seq0(p, n);
-  inout p, n;
   electrical p, n;
+  inout p, n;
   parameter real v = 0;
 
   analog begin : main // always

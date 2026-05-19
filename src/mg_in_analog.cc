@@ -763,7 +763,7 @@ bool AnalogProceduralAssignment::update()
   trace2("AnalogProceduralAssignment::update", _a.lhs().name(), rdeps().size());
 //  trace1("AnalogProceduralAssignment::update",  _a.data().size());
 #ifdef DO_TRACE
-  for(auto& r : rdeps()){ untested();
+  for(auto& r : rdeps()){
     trace2("AnalogProceduralAssignment::update0", _a.lhs().name(), r->val_string());
   }
 #endif
@@ -796,7 +796,7 @@ bool AnalogProceduralAssignment::update()
   }
 #ifdef DO_TRACE
   trace1("AnalogProceduralAssignment::update2", _a.lhsname());
-  for(auto i: _a.lhs().rdeps()){ untested();
+  for(auto i: _a.lhs().rdeps()){
     trace2("AnalogProceduralAssignment::update2", _a.lhsname(), i->val_string());
   }
 #endif

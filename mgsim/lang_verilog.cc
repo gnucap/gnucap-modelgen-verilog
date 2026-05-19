@@ -1167,7 +1167,7 @@ void LANG_VERILOG::print_attributes(OMSTREAM& o, tag_t x) const
     std::string s = attributes(x)->string(x);
     if(s.size()) {
       o << "(* " << s << " *) ";
-    }else{ untested();
+    }else{
     }
   }else{
   }

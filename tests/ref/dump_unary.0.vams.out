@@ -1,6 +1,6 @@
 module test_res_8(p, n);
-  inout p, n;
   electrical p, n;
+  inout p, n;
   parameter real pp =  1.0;
 
   real a, b;
