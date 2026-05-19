@@ -860,14 +860,11 @@ void INSTANCE::expand()
     throw Exception(long_label() + ": no valid prototype found for " + modelname);
   }else {
     assert(_sim->is_first_expand());
-    // PARAM_LIST const* pl = _parent->subckt()->params();
-    // assert(pl);
-    // c->_params.set_try_again(pl);
-
-    // here: candidate has too many ports.
-    renew_subckt(_parent, &(c->_params)); // pass owner?
+    PARAM_LIST p;
+    PARAM_LIST const* pl = scope()->params();
+    p.set_try_again(pl);
+    renew_subckt(_parent, &p);
     assert(scope()!=subckt());
-    // subckt()->attach_params(&(c->_params), scope());
   }
 
   trace3("INSTANCE::expand sckt in", long_label(), subckt()->size(), _sim->is_first_expand());
