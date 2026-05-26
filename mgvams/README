@@ -67,7 +67,7 @@ Some of them are not here, but still in ../src.
   - ($stime)
   - $abstime
 - Table 9-10 -- Probabilistic
-  - $rist_*
+  - $rdist_* (missing "global" type_string)
   - ($random)
   - ($arandom)
 - Table 9-11 -- Math system functions

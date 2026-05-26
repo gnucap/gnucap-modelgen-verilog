@@ -11,13 +11,13 @@ module test_rdist_o(p, n);
 	parameter integer s=42;
 	(*desc="random1"*) real r1;
 	analog begin
-		$write("uniform     %g\n",  $rdist_uniform(s, 1, 2));
-		$write("normal      %g\n",  $rdist_normal(s, 1, 2));
-		$write("exponential %g\n",  $rdist_exponential(s, 1));
-		$write("poisson     %g\n",  $rdist_poisson(s, 10));
-		$write("chi_square  %g\n",  $rdist_chi_square(s, 1));
-		$write("t           %g\n",  $rdist_t(s, 1));
-		$write("erlangian   %g\n",  $rdist_erlangian(s, 1, 2));
+		$write("uniform     %g\n",  $rdist_uniform(s, 1, 2, "instance"));
+		$write("normal      %g\n",  $rdist_normal(s, 1, 2, "instance"));
+		$write("exponential %g\n",  $rdist_exponential(s, 1, "instance"));
+		$write("poisson     %g\n",  $rdist_poisson(s, 10, "instance"));
+		$write("chi_square  %g\n",  $rdist_chi_square(s, 1, "instance"));
+		$write("t           %g\n",  $rdist_t(s, 1, "instance"));
+		$write("erlangian   %g\n",  $rdist_erlangian(s, 1, 2, "global"));
 	end
 endmodule
 

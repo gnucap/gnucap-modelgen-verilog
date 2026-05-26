@@ -1,7 +1,9 @@
 r: ambiguous resistor: "vams resistor, plain"
 #           v(gnd)     v(n1)      s(dut1)    spl(dut1)  r1(dut1)  
+BUG: $rdist defaulting to "instance", not "global"
  0.         0.         0.14127    1.0827G    ??        -0.49581   
 #Time       v(n1)     
+BUG: $rdist defaulting to "instance", not "global"
  0.         0.14127   
  0.005     -0.17727   
  0.01      -0.49581   

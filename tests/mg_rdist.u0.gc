@@ -12,7 +12,7 @@ module test_rdist_u0(p, n);
 	(*desc="random1"*) real r1;
 	analog begin
 		$bound_step(.1);
-      r1 = $rdist_uniform(s, 1., 2.);
+      r1 = $rdist_uniform(s, 1., 2., "instance");
 		I(p,n) <+ r1;
 	end
 endmodule

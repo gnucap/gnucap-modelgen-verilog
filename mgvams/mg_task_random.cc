@@ -60,16 +60,36 @@ private:
   Token* new_token(Module&, size_t)const override {
    return nullptr; // leave it to m;
   }
-  void argnames(std::ostream& o)const {
+  void check_t(std::ostream& o)const {
+    o____ "if(t == \"\"){\n";
+    o______ "error(bPICKY, \"BUG: $rdist defaulting to \\\"instance\\\", not \\\"global\\\"\\n\");\n";
+    o____ "}else if(t==\"instance\"){\n";
+    o____ "}else if(t==\"global\"){ untested();\n";
+    o______ "error(bWARNING, \"$rdist: not implemented: \" + t + '\\n');\n";
+    o____ "}else{ untested();\n";
+    o______ "error(bWARNING, \"$rdist: bogus type string: \" + t + '\\n');\n";
+    o____ "}\n";
+  }
+  void argnames(std::ostream& o, bool s=true)const {
     int i = 0;
-    for(char _ : _args){
-      o << ", a" << i++;
+    for(char a : _args){
+      if(a!='t') {
+	o << ", a" << i++;
+      }else if(s){
+	o << ", t";
+      }else{
+      }
     }
   }
   void voidargs(std::ostream& o)const {
     int i = 0;
-    for(char _ : _args){
-      o << " (void) a" << i++ << ";";
+    for(char a : _args){
+      if(a == 't'){
+	o << " (void) t";
+      }else{
+	o << " (void) a" << i++;
+      }
+      o << ";";
     }
   }
   void args(std::ostream& o, bool names=true)const {
@@ -78,12 +98,22 @@ private:
       switch(a){
       case 'i': o << ", int"; break;
       case 'd': o << ", double"; break;
+      case 't': o << ", std::string";
+	if(names) {
+	  o << " t";
+	}else{ untested();
+	}
+	o << "=\"\"";
+	break;
       default: unreachable();
       }
-      o << " const&";
-      if(names) {
-	o << " a" << i++;
-      }else{ untested();
+      if(a == 't') {
+      }else{
+	o << " const&";
+	if(names) {
+	  o << " a" << i++;
+	}else{ untested();
+	}
       }
     }
   }
@@ -97,7 +127,7 @@ private:
     o____ "}\n";
     o____ "double precalc(int32_t const& slot"; args(o); o << ")const {\n";
     voidargs(o);
-    o______ "return rdist::"+_what+"(random_seed(slot)"; argnames(o); o << ");\n";
+    o______ "return rdist::"+_what+"(random_seed(slot)"; argnames(o, 0); o << ");\n";
     o____ "}\n";
     o__ "}_" << label() << ";\n";
   }
@@ -123,14 +153,16 @@ private:
 
     o____ "double tr_begin(CARD*, int32_t& seed"; args(o); o << ") {\n";
     o______ "trace2(\"random::begin01\", seed, _value);\n";
-    o______ "_value = rdist::"+_what+"(seed"; argnames(o); o << ");\n";
+    check_t(o);
+    o______ "_value = rdist::"+_what+"(seed"; argnames(o, 0); o << ");\n";
     o______ "trace2(\"random::begin02\", seed, _value);\n";
     o______ "return _value;\n";
     o____ "}\n";
 
     o____ "double tr_begin(CARD*, int32_t const& slot"; args(o); o << ") {\n";
     o______ "trace2(\"random::begin1\", slot, _value);\n";
-    o______ "_value = rdist::"+_what+"(random_seed(slot)"; argnames(o); o << ");\n";
+    check_t(o);
+    o______ "_value = rdist::"+_what+"(random_seed(slot)"; argnames(o, 0); o << ");\n";
     o______ "return _value;\n";
     o____ "}\n";
 
@@ -149,16 +181,18 @@ private:
 
     o____ "template<class MOD>\n";
     o____ "double tr_advance(MOD* d, int32_t& seed"; args(o); o << ") {\n";
+    o______ "(void)t;\n";
     o______ "trace3(\"random::advance1\", CKT_BASE::_sim->_time0, seed, _value);\n";
     o______ "d->q_accept();\n";
     o______ "int32_t s = seed;\n";
-    o______ "_value = rdist::"+_what+"(s"; argnames(o); o << ");\n";
+    o______ "_value = rdist::"+_what+"(s"; argnames(o, 0); o << ");\n";
     o______ "seed = s;\n";
     o______ "return _value;\n";
     o____ "}\n";
 
     o____ "template<class MOD>\n";
     o____ "double tr_advance(MOD* d, int32_t const& slot"; args(o); o << ") {\n";
+    o______ "(void)t;\n";
     o______ "trace4(\"random::advance2\", CKT_BASE::_sim->_time0, slot, _value, OPT::foooo);\n";
     o______ "int32_t& s = random_seed(slot);\n";
     o______ "tr_advance(d, s"; argnames(o); o << ");\n";
@@ -177,8 +211,9 @@ private:
     o____ "}\n";
 
     o____ "double tr_accept(CARD*, int32_t& seed"; args(o); o << ") {\n";
+    o______ "(void)t;\n";
     o______ "trace3(\"random::accept\", CKT_BASE::_sim->_time0, seed, _value);\n";
-    o______ "double new_value = rdist::"+_what+"(seed"; argnames(o); o << ");\n";
+    o______ "double new_value = rdist::"+_what+"(seed"; argnames(o, 0); o << ");\n";
     o______ "// assert(_value == new_value);\n";
     o______ "return _value = new_value;\n";
     o____ "}\n";
@@ -191,19 +226,19 @@ private:
   }
 };
 /*--------------------------------------------------------------------------*/
-RDIST d0("uniform", "dd");
+RDIST d0("uniform", "ddt");
 DISPATCHER<FUNCTION>::INSTALL p0(&function_dispatcher, "$rdist_uniform", &d0);
-RDIST d1("normal", "dd");
+RDIST d1("normal", "ddt");
 DISPATCHER<FUNCTION>::INSTALL p1(&function_dispatcher, "$rdist_normal", &d1);
-RDIST d2("exponential", "d");
+RDIST d2("exponential", "dt");
 DISPATCHER<FUNCTION>::INSTALL p2(&function_dispatcher, "$rdist_exponential", &d2);
-RDIST d3("poisson", "d");
+RDIST d3("poisson", "dt");
 DISPATCHER<FUNCTION>::INSTALL p3(&function_dispatcher, "$rdist_poisson", &d3);
-RDIST d4("chi_square", "i");
+RDIST d4("chi_square", "it");
 DISPATCHER<FUNCTION>::INSTALL p4(&function_dispatcher, "$rdist_chi_square", &d4);
-RDIST d5("t", "i");
+RDIST d5("t", "it");
 DISPATCHER<FUNCTION>::INSTALL p5(&function_dispatcher, "$rdist_t", &d5);
-RDIST d6("erlangian", "dd");
+RDIST d6("erlangian", "ddt");
 DISPATCHER<FUNCTION>::INSTALL p6(&function_dispatcher, "$rdist_erlangian", &d6);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

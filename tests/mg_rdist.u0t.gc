@@ -12,11 +12,11 @@ module test_u0t(p, n);
 	(*desc="spl"*) real spl;
 	(*desc="random1"*) real r1;
 	analog initial begin
-	  r1 = $rdist_uniform(s, 1., 2.);
+	  r1 = $rdist_uniform(s, 1., 2., "instance");
 	end
 	analog begin
 		@(timer(0., .1)) begin
-			r1 = $rdist_uniform(s, 1., 2.);
+			r1 = $rdist_uniform(s, 1., 2., "instance");
 			spl = spl + 1;
       end
 		I(p,n) <+ r1;
