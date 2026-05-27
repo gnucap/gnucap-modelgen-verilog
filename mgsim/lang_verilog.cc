@@ -34,6 +34,26 @@ static bool instanciate_unused = false;
 static int print_nest;
 static std::string toplevel_stub = "__stub";
 static std::string subdevice_stub = "__stub";
+static bool backslash_continue = true;
+/*--------------------------------------------------------------------------*/
+// continue reading if line ends with \\\n
+// gcc does it that way, too
+// (should probably become the default behaviour)
+static void getline(CS& cmd, std::string const& prompt)
+{
+  cmd.getline(prompt);
+  if(backslash_continue && cmd){
+    std::string const& f = cmd.fullstring();
+    if(!f.size()){
+    }else if(f[f.size()-1]=='\\'){ untested();
+      std::string F = f;
+      getline(cmd, prompt);
+      // this is inefficient
+      cmd = F.substr(0, f.size()-1) + cmd.fullstring();
+    }else{
+    }
+  }
+}
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -973,9 +993,9 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
     }else if (cmd >> "//") {
       cmd.reset(here);
       // new__instance(cmd, x, x->subckt()); // BUG
-      cmd.getline("verilog-paramset>");
+      getline(cmd, "verilog-paramset>");
     }else if (!cmd.more()) {
-      cmd.getline("verilog-paramset>");
+      getline(cmd, "verilog-paramset>");
     }else{
       break;
     }
@@ -989,9 +1009,9 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
     }else if (cmd >> "// ") {
       cmd.reset(here);
       // new__instance(cmd, x, x->subckt()); // BUG
-      cmd.getline("verilog-paramset>");
+      getline(cmd, "verilog-paramset>");
     }else if (!cmd.more()) {
-      cmd.getline("verilog-paramset>");
+      getline(cmd, "verilog-paramset>");
     }else{ untested();
       cmd.check(bWARNING, "what's this?");
       break;
@@ -1024,9 +1044,9 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
   // body
   for (;;) {
 
-    cmd.getline("verilog-module>");
+    getline(cmd, "verilog-module>");
     while (!parse_attributes(cmd, tag_t(&cmd)).more()){
-      cmd.getline("verilog-module>");
+      getline(cmd, "verilog-module>");
     }
     if(has_attributes(tag_t(&cmd))){
     }else{
@@ -1151,9 +1171,9 @@ void LANG_VERILOG::new_instance_(CS& cmd, BASE_SUBCKT* Owner, CARD_LIST* Scope)
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::parse_top_item(CS& cmd, CARD_LIST* Scope)
 {
-  cmd.getline("gnucap-verilog>");
+  getline(cmd, "gnucap-verilog>");
   while(!parse_attributes(cmd, tag_t(&cmd)).more()) {
-    cmd.getline("gnucap-verilog>");
+    getline(cmd, "gnucap-verilog>");
   }
   new_instance_(cmd, NULL, Scope);
 }
@@ -1518,7 +1538,7 @@ class CMD_MODULE : public CMD {
     }catch(Exception const& e) {
       cmd.warn(bDANGER, e.message());
       for (;;) {
-	cmd.getline("verilog-module>");
+	getline(cmd, "verilog-module>");
 
 	if (cmd >> "endmodule ") { untested();
 	  break;
