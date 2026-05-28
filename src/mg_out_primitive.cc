@@ -137,7 +137,7 @@ static void make_cc_install(std::ostream& o, const Primitive& p)
 {
   o << "class udp_installer : public CARD {\n";
   o__ "CARD* clone()const override {\n";
-  o____ "CARD* c = device_dispatcher.clone(\"logic\");\n";
+  o____ "CARD* c = device_dispatcher.clone(\"__udp\");\n";
   o____ "auto cc = prechecked_cast<COMPONENT*>(c);\n";
   o____ "assert(cc);\n";
   o____ "auto nc = new COMMON_" << p.identifier() << "();\n";

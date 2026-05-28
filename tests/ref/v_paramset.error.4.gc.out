@@ -22,6 +22,7 @@ main.R1: 1 candidate found for test_invalid
 main.R2: 1 candidate found for test_invalid
 m.v is "vsource from device_dispatcher"
 assuming double in 1.5
+assuming double in 1.5
 m.R1 is "test_invalid from top level"
 assuming double in 1.5
 assuming double in 1.5

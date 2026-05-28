@@ -17,6 +17,10 @@ assuming double in L
 assuming double in 1/L
 assuming double in L
 assuming double in 1/L
+assuming double in L
+assuming double in 1/L
+assuming double in L
+assuming double in 1/L
 m.t1 dropped invalid candidate: "tln from top level".
 m.t1 is "tln from top level"
 assuming double in L
@@ -26,6 +30,10 @@ assuming double in 1/L
 tln1.r: 1 candidate found for resistor
 tln1.t: 2 candidates found for tln
 m.t1._.r is "resistor from device_dispatcher"
+assuming double in length - 1
+assuming double in R
+assuming double in length - 1
+assuming double in R
 assuming double in length - 1
 assuming double in R
 assuming double in length - 1
@@ -41,6 +49,10 @@ assuming double in length - 1
 assuming double in R
 assuming double in length - 1
 assuming double in R
+assuming double in length - 1
+assuming double in R
+assuming double in length - 1
+assuming double in R
 m.t1._.t._.t dropped invalid candidate: "tln from top level".
 m.t1._.t._.t is "tln from top level"
 assuming double in length - 1
@@ -52,6 +64,10 @@ assuming double in length - 1
 assuming double in R
 assuming double in length - 1
 assuming double in R
+assuming double in length - 1
+assuming double in R
+assuming double in length - 1
+assuming double in R
 m.t1._.t._.t._.t dropped invalid candidate: "tln from top level".
 m.t1._.t._.t._.t is "tln from top level"
 assuming double in length - 1
@@ -59,6 +75,10 @@ assuming double in R
 assuming double in length - 1
 assuming double in R
 m.t1._.t._.t._.t._.r is "resistor from device_dispatcher"
+assuming double in length - 1
+assuming double in R
+assuming double in length - 1
+assuming double in R
 assuming double in length - 1
 assuming double in R
 assuming double in length - 1

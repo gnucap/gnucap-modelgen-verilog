@@ -9,6 +9,7 @@ m: 1 candidate found for main
 m is "main from top level"
 main.t1: 1 candidate found for tln
 assuming double in r0
+assuming double in r0
 m.t1 is "tln from top level"
 assuming double in r0
 assuming double in r0

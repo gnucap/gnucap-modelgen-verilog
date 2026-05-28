@@ -1044,6 +1044,8 @@ void INSTANCE::expand_first()
   }else{
   }
 
+  assert(!subckt() || !subckt()->params()->size());
+
   assert(!is_constant()); /* because I have more work to do */
   --recursion;
 }

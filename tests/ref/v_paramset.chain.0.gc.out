@@ -39,6 +39,8 @@ main.R1: 1 candidate found for res
 m.v is "vsource from device_dispatcher"
 assuming double in 1
 assuming double in x
+assuming double in 1
+assuming double in x
 m.R1 is "res from top level"
 assuming double in 1
 assuming double in x

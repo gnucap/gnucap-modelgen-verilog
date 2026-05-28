@@ -10,7 +10,6 @@ paramset logic logic;
 endparamset
 
 test #() t (y, a, b);
-t.b: can't find subckt: logicmyand12, forcing digital
 #           v(a)       v(b)       v(y)      
  27.        0.         0.         0.        
 #Time       v(a)       v(b)       v(y)       l(a)       l(b)       l(y)      

@@ -11,7 +11,6 @@ paramset logic logic;
 endparamset
 
 test #() t (y, s, a, b);
-t.b: can't find subckt: logicmymux03, forcing digital
 #           v(a)       v(b)       v(s)       v(y)      
  27.        0.         0.         0.         0.        
 #Time       v(a)       v(b)       v(s)       v(y)      

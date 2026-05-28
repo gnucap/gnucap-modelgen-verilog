@@ -9,8 +9,6 @@ paramset logic logic;
 endparamset
 
 test #() t (a, b, c);
-t.b._na0_v_a: can't find subckt: logic_na0_v_a1, forcing digital
-t.b._na1_v_b: can't find subckt: logic_na1_v_b1, forcing digital
 #           v(a)       v(b)       v(c)      
  27.        5.         5.         0.        
 #Time       v(a)       v(b)       v(c)       l(a)       l(b)       l(c)      
