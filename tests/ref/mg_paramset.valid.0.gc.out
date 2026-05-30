@@ -13,10 +13,10 @@ module base(p,  ... from '{"C", "D"}; .i(2); endparamset
 m: 1 candidate found for main
 m is "main from top level"
 main.a: 2 candidates found for test_psv0
-main.b: 2 candidates found for test_psv0
 m.a:p0 invalid: s is not "from '{"C", "D"}"
 m.a dropped invalid candidate: "test_psv0 from device_dispatcher".
 m.a is "test_psv0:0 from device_dispatcher"
+main.b: 2 candidates found for test_psv0
 m.b:p1 invalid: s is not "from '{"A", "B"}"
 m.b dropped invalid candidate: "test_psv0:0 from device_dispatcher".
 m.b is "test_psv0 from device_dispatcher"

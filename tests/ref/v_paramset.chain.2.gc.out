@@ -31,10 +31,10 @@ main #() m (\1 , \2 , \3 , \4 );
 m: 1 candidate found for main
 m is "main from top level"
 main.r1: 1 candidate found for bob
-main.r2: 1 candidate found for zap
-main.v1: 1 candidate found for vsource
 m.r1 is "bob from top level"
+main.r2: 1 candidate found for zap
 m.r2 is "zap from top level"
+main.v1: 1 candidate found for vsource
 m.v1 is "vsource from device_dispatcher"
 >>>>>op
 #           v(1)       v(2)       v(3)       v(4)      

@@ -230,6 +230,7 @@ protected:
   void		expand()override;
   CARD*		deflate()override;
 private:
+  void		expand_first_();
   void		expand_sift();
   void		precalc_last()override{ untested();
     trace1("INSTANCE::precalc_last", long_label());
@@ -838,9 +839,8 @@ static std::string param_count_string(CARD const* c)
   return to_string(eff_param_count(c));
 }
 /*--------------------------------------------------------------------------*/
-void INSTANCE::expand()
+void INSTANCE::expand_first_()
 {
-  BASE_SUBCKT::expand();
   auto c = prechecked_cast<COMMON_INSTANCE*>(mutable_common());
   assert(c);
 
@@ -875,7 +875,13 @@ void INSTANCE::expand()
   subckt()->precalc_first(); // here?
 
   expand_sift();
-  subckt()->expand();
+}
+/*--------------------------------------------------------------------------*/
+void INSTANCE::expand()
+{
+  BASE_SUBCKT::expand();
+  subckt()->expand_first();
+  subckt()->expand_();
 }
 /*--------------------------------------------------------------------------*/
 // sift. move to CARD_LIST::expand?
@@ -992,13 +998,13 @@ void INSTANCE::expand_sift()
 // Kludge: build proto in stub, so it only needs doing once.
 void INSTANCE::expand_first()
 {
+  BASE_SUBCKT::expand_first();
   static int recursion;
   if(++recursion > OPT::recursion){ untested();
     recursion = 0;
     throw Exception(long_label() + ": recursion too deep");
   }else{
   }
-  BASE_SUBCKT::expand_first();
 
   assert(common());
   trace3("INSTANCE::precalc_first", short_label(), _parent, common()->modelname());
@@ -1048,6 +1054,11 @@ void INSTANCE::expand_first()
 
   assert(!is_constant()); /* because I have more work to do */
   --recursion;
+
+  if(_parent){
+    expand_first_();
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool INSTANCE::defer_proto() const

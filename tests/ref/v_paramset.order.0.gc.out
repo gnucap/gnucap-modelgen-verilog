@@ -23,12 +23,11 @@ endparamset
 m: 1 candidate found for main
 m is "main from top level"
 main.v: 1 candidate found for vsource
-main.R1: 1 candidate found for res
 m.v is "vsource from device_dispatcher"
+main.R1: 1 candidate found for res
 assuming double in 1
 assuming double in 1
 m.R1 is "res from top level"
-assuming double in 1
 assuming double in 1
 print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
                                   ^ ? no match

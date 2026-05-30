@@ -45,7 +45,7 @@ static void getline(CS& cmd, std::string const& prompt)
   if(backslash_continue && cmd){
     std::string const& f = cmd.fullstring();
     if(!f.size()){
-    }else if(f[f.size()-1]=='\\'){ untested();
+    }else if(f[f.size()-1]=='\\'){
       std::string F = f;
       getline(cmd, prompt);
       // this is inefficient

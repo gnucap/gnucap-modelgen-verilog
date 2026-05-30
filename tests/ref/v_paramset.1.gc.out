@@ -3,7 +3,6 @@ assuming double in 1
 assuming double in 1
 m1.v1 is "my vs paramset"
 assuming double in 1
-assuming double in 1
 print dc v(nodes) v(m1.v1) v(m1.v1.*)
                              ^ ? no match
 Gnucap   System status

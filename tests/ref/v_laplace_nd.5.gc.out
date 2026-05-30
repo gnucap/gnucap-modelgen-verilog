@@ -9,10 +9,10 @@ resistor #(1.) r1 (in, \0 );
 >>>>>spice
 >>>>>.print op v(nodes) 
 b: 1 candidate found for va_laplace_nd
-r1: 1 candidate found for resistor
-r1: 1 candidate found for resistor
 b is "va_laplace_nd from device_dispatcher"
+r1: 1 candidate found for resistor
 r1 is "resistor from device_dispatcher"
+r1: 1 candidate found for resistor
 r1 is "resistor from device_dispatcher"
 >>>>>.op 
 #           v(in)      v(out1)   
