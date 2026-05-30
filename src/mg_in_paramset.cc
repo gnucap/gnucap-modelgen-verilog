@@ -572,7 +572,7 @@ bool Paramset::new_var_ref(Base* what)
     }
     trace1("PS::nvr mangle", p);
     _var_refs[p] = what;
-    return false;
+    return true;
   }else{
     return Module::new_var_ref(what);
   }
