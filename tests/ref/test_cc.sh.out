@@ -1393,6 +1393,7 @@ public:
   CARD* clone()const override;
 private: // overrides
   void precalc_first()override;
+  void expand_first()override;
   void expand()override;
   void precalc_last()override;
   void zero_filter_readout();
@@ -2586,6 +2587,17 @@ void MOD_resistor::precalc_first()
   }
 }
 /*--------------------------------------------------------------------------*/
+void MOD_resistor::expand_first()
+{
+  BASE_SUBCKT::expand_first();
+  for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
+    n_(i).clear();
+  }
+  for(int i=0; i<ext_nodes()+int_nodes(); ++i){
+    trace3("expand2 clear", long_label(), i, n_(i).e_());
+  }
+}
+/*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
 {
   trace1("expand", long_label());
@@ -2612,12 +2624,6 @@ void MOD_resistor::expand()
     (void)nodes;
 //port p 1
 //port n 2
-    for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
-      n_(i).clear();
-    }
-    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
-      trace3("expand2 clear", long_label(), i, n_(i).e_());
-    }
     // port p 1
     find_subset(&n_(n_p));
     n_(n_p).allocate(3); // no-op unless floating
@@ -2898,6 +2904,7 @@ public:
 private: // overrides
   int     set_param_by_name(std::string, std::string)override;
   void precalc_first()override;
+  void expand_first()override;
   void expand()override;
   void precalc_last()override;
   void zero_filter_readout();
@@ -4576,6 +4583,17 @@ void MOD_resistor::precalc_first()
   }
 }
 /*--------------------------------------------------------------------------*/
+void MOD_resistor::expand_first()
+{
+  BASE_SUBCKT::expand_first();
+  for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
+    n_(i).clear();
+  }
+  for(int i=0; i<ext_nodes()+int_nodes(); ++i){
+    trace3("expand2 clear", long_label(), i, n_(i).e_());
+  }
+}
+/*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
 {
   trace1("expand", long_label());
@@ -4602,12 +4620,6 @@ void MOD_resistor::expand()
     (void)nodes;
 //port p 1
 //port n 2
-    for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
-      n_(i).clear();
-    }
-    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
-      trace3("expand2 clear", long_label(), i, n_(i).e_());
-    }
     // port p 1
     find_subset(&n_(n_p));
     n_(n_p).allocate(3); // no-op unless floating
@@ -6173,6 +6185,7 @@ public:
   CARD* clone()const override;
 private: // overrides
   void precalc_first()override;
+  void expand_first()override;
   void expand()override;
   void precalc_last()override;
   void zero_filter_readout();
@@ -6996,6 +7009,17 @@ void MOD_capacitor::precalc_first()
   }
 }
 /*--------------------------------------------------------------------------*/
+void MOD_capacitor::expand_first()
+{
+  BASE_SUBCKT::expand_first();
+  for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
+    n_(i).clear();
+  }
+  for(int i=0; i<ext_nodes()+int_nodes(); ++i){
+    trace3("expand2 clear", long_label(), i, n_(i).e_());
+  }
+}
+/*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
 {
   trace1("expand", long_label());
@@ -7022,12 +7046,6 @@ void MOD_capacitor::expand()
     (void)nodes;
 //port p 1
 //port n 2
-    for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
-      n_(i).clear();
-    }
-    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
-      trace3("expand2 clear", long_label(), i, n_(i).e_());
-    }
     // port p 1
     find_subset(&n_(n_p));
     n_(n_p).allocate(3); // no-op unless floating
@@ -7343,6 +7361,7 @@ public:
   CARD* clone()const override;
 private: // overrides
   void precalc_first()override;
+  void expand_first()override;
   void expand()override;
   void precalc_last()override;
   void zero_filter_readout();
@@ -8261,6 +8280,17 @@ void MOD_capacitor::precalc_first()
   }
 }
 /*--------------------------------------------------------------------------*/
+void MOD_capacitor::expand_first()
+{
+  BASE_SUBCKT::expand_first();
+  for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
+    n_(i).clear();
+  }
+  for(int i=0; i<ext_nodes()+int_nodes(); ++i){
+    trace3("expand2 clear", long_label(), i, n_(i).e_());
+  }
+}
+/*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
 {
   trace1("expand", long_label());
@@ -8287,12 +8317,6 @@ void MOD_capacitor::expand()
     (void)nodes;
 //port p 1
 //port n 2
-    for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
-      n_(i).clear();
-    }
-    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
-      trace3("expand2 clear", long_label(), i, n_(i).e_());
-    }
     // port p 1
     find_subset(&n_(n_p));
     n_(n_p).allocate(3); // no-op unless floating
