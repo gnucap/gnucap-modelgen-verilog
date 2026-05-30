@@ -18,7 +18,7 @@ vsource #(.dc(1.)) v1 (in, \0 );
 name   ...
 have 3 nodes. model: 0 sckt: 0
 
-
+0
 b1 4 4 0
 0 0
 1 3
@@ -65,7 +65,7 @@ dctran density=37.5%, ac density=50.0%
 name   ...
 have 4 nodes. model: 1 sckt: 0
 
-
+0
 b1 4 4 0
 0 0
 1 4
