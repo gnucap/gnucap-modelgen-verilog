@@ -5,7 +5,6 @@
 >>>>>print dc v(nodes)
 f1 discarded (params): no match: b
 f1: no candidates found for foo
-i1: 1 candidate found for isource
 f1: no valid prototype found for foo
 >>>>>dc
 f1: no candidates found for foo

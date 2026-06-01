@@ -374,7 +374,7 @@ void DELAY::tr_begin()
     _rise = cd->_rise;
     _fall = cd->_fall;
     double dtmin = _sim->_dtmin;
-    if(dtmin){
+    if(dtmin != 0.){
     }else{
       dtmin = OPT::dtmin;
     }
@@ -430,7 +430,7 @@ CARD* DELAY::clone()const
 /*--------------------------------------------------------------------------*/
 DELAY::DELAY(DELAY const&p) : ELEMENT(p), _nN(_nodes)
 {
-  if(p._nN){ untested();
+  if(p._nN){
     assert(_nN);
     assert(int_nodes() + max_nodes() <= NODES_PER_BRANCH); // not expanded yet.
   }else{
@@ -447,7 +447,7 @@ void DELAY::precalc_first()
 }
 /*--------------------------------------------------------------------------*/
 int DELAY::is_valid()const
-{ untested();
+{
   COMMON_COMPONENT const* c = prechecked_cast<COMMON_COMPONENT const*>(common());
   assert(c);
   (void)c;

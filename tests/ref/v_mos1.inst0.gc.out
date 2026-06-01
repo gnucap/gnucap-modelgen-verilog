@@ -18,13 +18,13 @@ main #() dut (\2 , \1 , gnd, gnd);
 vsource #(.dc(1)) v2 (\2 , gnd);
 >>>>>print op i(v*)
 v1: 1 candidate found for vsource
-dut: 1 candidate found for main
-v2: 1 candidate found for vsource
 v1 is "vsource from device_dispatcher"
+dut: 1 candidate found for main
 dut is "main from top level"
+v2: 1 candidate found for vsource
+v2 is "vsource from device_dispatcher"
 main.n1: 1 candidate found for mynmos
 dut.n1 is "mynmos from top level"
-v2 is "vsource from device_dispatcher"
 >>>>>op
 #           i(v1)      i(v2)     
  27.        0.        -30.u      

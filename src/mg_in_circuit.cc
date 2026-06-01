@@ -1,6 +1,7 @@
 #include "mg_circuit.h"
 #include "mg_in.h" // TODO
 #include "mg_.h" // TODO
+#include "mg_dump.h"
 /*--------------------------------------------------------------------------*/
 void Port_1::parse(CS& file)
 { untested();
@@ -79,6 +80,23 @@ public:
   explicit Wire() : Discipline("wire") {}
 }wire;
 /*--------------------------------------------------------------------------*/
+void Net_Identifier::parse(CS& file)
+{
+  Port_3::parse(file); // TODO: port_base?
+}
+/*--------------------------------------------------------------------------*/
+Net_Decl_List_Dir::Net_Decl_List_Dir(char what): Net_Decl_List()
+{
+  if(what=='t'){
+    _dir = dir_out;
+  }else if(what=='o'){
+    _dir = dir_io;
+  }else if(what=='p'){
+    _dir = dir_in;
+  }else{
+    unreachable();
+  }
+}
 void Net_Declarations::parse(CS& f)
 {
   assert(owner()); // Module
@@ -99,6 +117,7 @@ void Net_Declarations::parse(CS& f)
   auto ii = root->discipline_list().find(f);
   Net_Decl_List* d = nullptr;
 
+  trace1("Net_Declarations::parse0", f.tail().substr(0,20));
   if(ii!=root->discipline_list().end()){
 //    size_t here = f.cursor();
     auto m = new Net_Decl_List_Discipline();
@@ -128,7 +147,14 @@ void Net_Declarations::parse(CS& f)
     m->set_owner(owner());
     f >> *m;
     d = m;
+  }else if(f.umatch("inout |input |output ")) {
+    trace2("Net_Declarations::parse-", f.last_match(), f.tail().substr(0,20));
+    auto m = new Net_Decl_List_Dir(f.last_match()[2]);
+    m->set_owner(owner());
+    f >> *m;
+    d = m;
   }else{
+    trace1("Net_Declarations::parse2", f.tail().substr(0,20));
     assert(!f);
   }
 
@@ -137,6 +163,80 @@ void Net_Declarations::parse(CS& f)
     push_back(d);
   }else{
   }
+}
+/*--------------------------------------------------------------------------*/
+void Net_Decl_List_Ground::dump(std::ostream& o) const
+{
+  o__ "ground ";
+  Net_Decl_List::dump(o);
+  o << "\n";
+}
+/*--------------------------------------------------------------------------*/
+void Net_Decl_List_Dir::parse(CS& f)
+{
+  return Net_Decl_List::parse_n_<Net_Decl_Dir>(f);
+}
+/*--------------------------------------------------------------------------*/
+void Net_Decl_List_Dir::dump(std::ostream& o) const
+{
+  static std::string s[4] = {"??", "input", "output", "inout"};
+  o__ s[_dir] << " ";
+  Net_Decl_List::dump(o);
+  o << "\n";
+}
+/*--------------------------------------------------------------------------*/
+void Net_Decl_Dir::parse(CS& f)
+{
+  Net_Identifier::parse(f);
+
+  assert(owner());
+  incomplete();
+//  set_dir(owner()->set_dir(name()));
+}
+/*--------------------------------------------------------------------------*/
+void Net_Identifier_Discipline::parse(CS& f)
+{
+  Net_Identifier::parse(f);
+
+  assert(owner());
+  set_node( owner()->new_node(name()));
+}
+/*--------------------------------------------------------------------------*/
+void Net_Identifier_Ground::parse(CS& f)
+{
+  assert(owner());
+  Net_Identifier::parse(f);
+  Module* mod = prechecked_cast<Module*>(owner());
+  assert(mod);
+  Node_Ref const& nn = owner()->node(name());
+  if(nn) {
+    set_node(mod->node(nn));
+  }else{ untested();
+    throw Exception_CS_("ground: need previously declared net", f);
+  }
+
+  Module* m = prechecked_cast<Module*>(owner());
+  assert(m);
+  assert(node());
+  m->set_to_ground(node());
+}
+/*--------------------------------------------------------------------------*/
+void Net_Decl_List_Discipline::parse(CS& f)
+{
+  trace1("Port_Disc_List::parse", f.last_match());
+  return Net_Decl_List::parse_n_<Net_Identifier_Discipline>(f);
+  // return Net_Identifier, '\0', ',', ';'>::parse(f);
+}
+/*--------------------------------------------------------------------------*/
+void Net_Decl_List_Discipline::dump(std::ostream& o)const
+{
+  assert(_disc);
+  // o__ "";
+  print_attributes(o, this);
+
+  o__ _disc->identifier() << " ";
+  Net_Decl_List::dump(o);
+  o << "\n";
 }
 /*--------------------------------------------------------------------------*/
 Port_3* Circuit::find_port(std::string const& n)

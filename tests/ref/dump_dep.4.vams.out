@@ -1,6 +1,6 @@
 module test_nop2(np, n);
-  inout p, n;
   electrical p, n;
+  inout p, n;
   analog begin // always
     begin // always
       I(p, n) <+  0.0; // r2{x}

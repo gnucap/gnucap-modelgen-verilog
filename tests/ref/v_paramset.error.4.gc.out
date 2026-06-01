@@ -18,13 +18,12 @@ main #() m (\0 , \1 , \2 , \4 );
 m: 1 candidate found for main
 m is "main from top level"
 main.v: 1 candidate found for vsource
-main.R1: 1 candidate found for test_invalid
-main.R2: 1 candidate found for test_invalid
 m.v is "vsource from device_dispatcher"
+main.R1: 1 candidate found for test_invalid
+assuming double in 1.5
 assuming double in 1.5
 m.R1 is "test_invalid from top level"
-assuming double in 1.5
-assuming double in 1.5
+main.R2: 1 candidate found for test_invalid
 m.R2 dropped invalid candidate: "test_invalid from top level".
 m.R2: no candidates test_invalid
 >>>>>status notime

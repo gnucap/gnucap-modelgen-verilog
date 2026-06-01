@@ -1,6 +1,6 @@
 module test_while0a(p, n);
-  inout p, n;
   electrical p, n;
+  inout p, n;
   parameter real r = 0;
 
   real z// [V(p, n)]

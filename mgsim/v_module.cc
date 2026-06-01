@@ -1,3 +1,4 @@
+#if 0
 /*                              -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  *               2022, 2023, 2025 Felix Salfelder
@@ -65,7 +66,59 @@ static void grow_nodes(int Index, node_t*& n, int& capacity, int capacity_floor)
   }
 }
 /*--------------------------------------------------------------------------*/
-static COMMON_PARAMLIST Default_SUBCKT(CC_STATIC);
+class COMMON_SUBCKT : public COMMON_PARAMLIST {
+public:
+  std::vector<std::string> _port_names;
+public:
+  explicit COMMON_SUBCKT(int i) : COMMON_PARAMLIST(i) {}
+private:
+  explicit COMMON_SUBCKT(COMMON_SUBCKT const& p)
+    : COMMON_PARAMLIST(p), _port_names(p._port_names) {}
+  COMMON_SUBCKT* clone()const override {return new COMMON_SUBCKT(*this);}
+public:
+  bool operator==(COMMON_COMPONENT const& p)const override {
+    if(this == &p){ untested();
+      return true;
+    }else{
+    }
+
+    auto x = dynamic_cast<COMMON_SUBCKT const*>(&p);
+    return x
+        && _port_names == x->_port_names
+        && COMMON_PARAMLIST::operator==(*x);
+  }
+#if __cplusplus >= 202002L
+  bool operator<(COMMON_COMPONENT const& p)const override {
+    return compare(p) < 0;
+  }
+  int compare(COMMON_COMPONENT const& p)const override {
+    if(this == &p){ untested();
+      return 0;
+    }else{
+    }
+    int c;
+    if((c = COMMON_PARAMLIST::compare(p))) {
+      return c;
+    }else{ untested();
+    }
+
+    auto x = prechecked_cast<COMMON_SUBCKT const*>(&p);
+    assert(x);
+
+    auto ord = _port_names <=> x->_port_names;
+    if(ord == std::weak_ordering::less){ untested();
+      return -1;
+    }else if(ord == std::weak_ordering::greater){ untested();
+      return 1;
+    }else{ untested();
+    }
+    return 0;
+  }
+  bool has_less() const override { return true;}
+#endif // __cplusplus >= 202002L
+};
+/*--------------------------------------------------------------------------*/
+static COMMON_SUBCKT Default_SUBCKT(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class DEV_SUBCKT : public BASE_SUBCKT {
   friend class DEV_SUBCKT_PROTO;
@@ -75,7 +128,6 @@ protected:
 private:
   node_t* _nodes{nullptr};
   int _node_capacity{0};
-  std::vector<std::string> _port_name; // common?
   static int	_count;
 private:
   explicit	DEV_SUBCKT(const DEV_SUBCKT&);
@@ -91,7 +143,7 @@ private:
   void set_param_by_index(int i, std::string& Value, int j)override;
   double localparam_value(std::string const&)const override;
 private: // override virtual
-  char		id_letter()const override	{ untested();return 'X';}
+  char		id_letter()const override	{return 'X';}
   bool		print_type_in_spice()const override {return true;}
   std::string   value_name()const override	{return "#";}
   int		max_nodes()const override;
@@ -100,10 +152,8 @@ private: // override virtual
   int		matrix_nodes()const override	{return 0;}
   int		net_nodes()const override	{return _net_nodes;}
   void		precalc_first()override;
-  bool		makes_own_scope()const override	{return true;}
+  bool		makes_own_scope()const override;
   int		is_valid()const override;
-  CARD_LIST*	   scope()override;
-  const CARD_LIST* scope()const override	{return const_cast<DEV_SUBCKT*>(this)->scope();}
 
   void		expand() override;
 private:
@@ -130,17 +180,16 @@ int DEV_SUBCKT::_count = -1;
 /*--------------------------------------------------------------------------*/
 class DEV_MODULE_PROTO : public DEV_SUBCKT {
 private:
-  explicit	DEV_MODULE_PROTO(const DEV_MODULE_PROTO&p) : DEV_SUBCKT(p)
-  {
+  explicit	DEV_MODULE_PROTO(const DEV_MODULE_PROTO&p) : DEV_SUBCKT(p) {
     new_subckt();
   }
 public:
   explicit	DEV_MODULE_PROTO(COMMON_COMPONENT* c=nullptr) : DEV_SUBCKT(c) {}
 		~DEV_MODULE_PROTO(){}
-  CARD_LIST*	   scope()override		{ return subckt();}
+  bool		makes_own_scope()const override	{ return true;}
+  CARD_LIST*	   scope()override		{ untested(); return subckt();}
   const CARD_LIST* scope()const override	{ return subckt();}
   CARD*		clone()const override		{ return new DEV_MODULE_PROTO(*this);}
-private:
   void precalc_first()override {
     subckt()->precalc_first();
   }
@@ -166,6 +215,7 @@ public: // override virtual
   int		matrix_nodes()const override	{untested();return 0;}
   int		net_nodes()const override	{return _net_nodes;}
   CARD*		clone()const override		{return new DEV_SUBCKT_PROTO(*this);}
+  bool		makes_own_scope()const override	{return true;}
   CARD_LIST*	   scope()override		{return subckt();}
   const CARD_LIST* scope()const override	{return subckt();}
   std::string port_name(int i)const override;
@@ -188,10 +238,12 @@ DEV_SUBCKT_PROTO::DEV_SUBCKT_PROTO(COMMON_COMPONENT* c)
 /*--------------------------------------------------------------------------*/
 std::string DEV_SUBCKT_PROTO::port_name(int i) const
 {
-  if(i>=int(_port_name.size())) {
+  auto c = prechecked_cast<COMMON_SUBCKT const*>(common());
+  assert(c);
+  if(i>=int(c->_port_names.size())) {
     return port_value(i);
-  }else if(_port_name[i]!="") { untested();
-    return _port_name[i];
+  }else if(c->_port_names[i]!="") { untested();
+    return c->_port_names[i];
   }else{ untested();
     return port_value(i);
   }
@@ -212,7 +264,9 @@ int DEV_SUBCKT::set_port_by_name(std::string& name, std::string& value)
   }else{
     int index = net_nodes();
     // grow_nodes(index, _nodes, _node_capacity, node_capacity_floor);
-    _port_name.push_back(name);
+    auto* cc = prechecked_cast<COMMON_SUBCKT*>(mutable_common()->mutable_clone());
+    cc->_port_names.push_back(name);
+    attach_common(cc);
     set_port_by_index(index, value); // bumps _net_nodes
     return index;
   }
@@ -220,7 +274,7 @@ int DEV_SUBCKT::set_port_by_name(std::string& name, std::string& value)
 /*--------------------------------------------------------------------------*/
 int DEV_SUBCKT::max_nodes() const
 {
-  if(_parent == &pp){ untested();
+  if(_parent == &pp){
     // spice..
     return _parent->max_nodes();
   }else if(_parent){
@@ -233,15 +287,6 @@ int DEV_SUBCKT::max_nodes() const
     // building proto. allow one more.
     // they come in order anyway.
     return std::min(INT_MAX, net_nodes() + 1);
-  }
-}
-/*--------------------------------------------------------------------------*/
-CARD_LIST* DEV_SUBCKT::scope()
-{
-  if(is_device()){
-    return COMPONENT::scope();
-  }else{ untested();
-    return subckt();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -279,16 +324,14 @@ CARD* DEV_SUBCKT::clone()const
   DEV_SUBCKT* new_instance = new DEV_SUBCKT(*this);
   assert(!new_instance->subckt());
 
-  if (this == &p1){ untested();
+  if (this == &p1){
     // cloning from static, empty model
     // has no parent.
     new_instance->new_subckt(); // from DEV_SUBCKT_PROTO::DEV_SUBCKT_PROTO
   }else if(_parent){
     new_instance->_parent = _parent;
-    assert(new_instance->is_device());
   }else{ untested();
     // verilog. build proto
-    // assert(!new_instance->is_device());
     if(new_instance->subckt()){ untested();
     }else{ untested();
      new_instance->new_subckt();
@@ -300,15 +343,14 @@ CARD* DEV_SUBCKT::clone()const
 /*--------------------------------------------------------------------------*/
 CARD* DEV_SUBCKT::clone_instance() const
 {
-  auto m = new DEV_SUBCKT(*this);
+  auto m = new DEV_SUBCKT(*this); // clone?
   auto s = prechecked_cast<DEV_SUBCKT*>(m);
-    for (int ii = 0;  ii < s->net_nodes();  ++ii) {
-      s->n_(ii) = nullptr;
-      assert(!s->n_(ii).is_connected());
-    }
+  for (int ii = 0;  ii < s->net_nodes();  ++ii) {
+    s->n_(ii) = nullptr;
+    assert(!s->n_(ii).is_connected());
+  }
   s->_net_nodes = 0; // needed in v_instance: 274?? v_paramset.module.1.gc
   s->_parent = this;
-  assert(s->is_device());
   return m;
 }
 /*--------------------------------------------------------------------------*/
@@ -331,14 +373,8 @@ DEV_SUBCKT::DEV_SUBCKT(const DEV_SUBCKT& p)
   }else{
     assert(_nodes == nullptr);
   }
-  if(p.is_device()){
-    for (int ii = 0;  ii < net_nodes();  ++ii) {
-      _nodes[ii] = p._nodes[ii];
-    }
-  }else{ untested();
-    for (int ii = 0;  ii < net_nodes();  ++ii) { untested();
-      assert(!_nodes[ii].n_());
-    }
+  for (int ii = 0;  ii < net_nodes();  ++ii) {
+    _nodes[ii] = p._nodes[ii];
   }
   assert(!subckt());
   ++_count;
@@ -346,25 +382,20 @@ DEV_SUBCKT::DEV_SUBCKT(const DEV_SUBCKT& p)
 /*--------------------------------------------------------------------------*/
 int DEV_SUBCKT::set_param_by_name(std::string Name, std::string Value)
 {
+  trace4("spbn", long_label(), Name, Value, _parent);
   assert(!_parent || _parent->subckt());
   COMMON_PARAMLIST* c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
   assert(c);
 
   if (!_parent || _parent == &pp){
-    if (Name[0] == '$'){ untested();
+    if (Name[0] == '$' && !Value.size()){ untested();
+      // building a proto. disallow $.*
       throw Exception_No_Match(Name);
     }else{
-      // TODO: unshared mutable_common?
       return BASE_SUBCKT::set_param_by_name(Name, Value);
     }
   }else if (Name[0] == '$'){
     return BASE_SUBCKT::set_param_by_name(Name, Value);
-  }else if(_parent==&pp || !_parent) { untested();
-    // spice.
-    trace3("spice spbn", Name, Value, c);
-    int i = BASE_SUBCKT::set_param_by_name(Name,Value);
-    trace1("spbn done", common());
-    return i;
   }else{
     PARAM_LIST::iterator p = c->_params.find(Name);
     if(p != c->_params.end()){
@@ -398,19 +429,19 @@ void DEV_SUBCKT::set_param_by_index(int i, std::string& Value, int Offset)
 }
 /*--------------------------------------------------------------------------*/
 double DEV_SUBCKT::localparam_value(std::string const& path) const
-{
+{ untested();
   CARD_LIST const* scope = subckt();
   auto dotplace = path.find(".");
-  if(dotplace == std::string::npos){
+  if(dotplace == std::string::npos){itested();
     assert(scope);
     PARAM_LIST const* p = scope->params();
     assert(p);
     PARAM_LIST::const_iterator it = p->find(path);
-    if(it == p->end()){
+    if(it == p->end()){ untested();
 	PARAMETER<double> pd; pd = path;
 	pd.e_val(NOT_VALID, scope->params());
 	return pd;
-    }else{
+    }else{ untested();
       PARAM_INSTANCE const& pi = it.ref();
       if(auto f = dynamic_cast<Float const*>(pi.value())) {
 	PARAMETER<double> pd; pd = path;
@@ -431,23 +462,24 @@ double DEV_SUBCKT::localparam_value(std::string const& path) const
   }
   return NOT_VALID;
 }
-/*--------------------------------------------------------------------------*/
 std::string DEV_SUBCKT::port_name(int i)const
 {
+  auto c = prechecked_cast<COMMON_SUBCKT const*>(common());
+  assert(c);
   if (const DEV_SUBCKT* p=dynamic_cast<const DEV_SUBCKT*>(_parent)) {
     if (i<p->net_nodes()){
       return p->port_name(i);
-    }else{ untested();
+    }else{
       return "";
     }
   }else if(_parent) { untested();
     unreachable();
     return "";
-  }else if(i<int(_port_name.size())) {
-    if(_port_name[i]!=""){
-      return _port_name[i];
+  }else if(i<int(c->_port_names.size())) {
+    if(c->_port_names[i]!=""){
+      return c->_port_names[i];
     }else{ untested();
-      return  port_value(i);
+      return port_value(i);
     }
   }else if(i<net_nodes()) {
     return port_value(i);
@@ -459,9 +491,8 @@ std::string DEV_SUBCKT::port_name(int i)const
 void DEV_SUBCKT::expand()
 {
   BASE_SUBCKT::expand();
-  trace4("DEV_SUBCKT::expand", long_label(), max_nodes(), is_device(), common());
+  trace3("DEV_SUBCKT::expand", long_label(), max_nodes(), common());
 
-  assert(is_device());
   if(_parent == &pp){ untested();
     COMMON_PARAMLIST const* c = prechecked_cast<COMMON_PARAMLIST const*>(common());
     assert(c);
@@ -481,7 +512,6 @@ void DEV_SUBCKT::expand()
     }else{ untested();
       // bad
     }
-    assert(!_parent->is_device()); // really?
   }else{itested();
   }
 
@@ -521,8 +551,7 @@ void DEV_SUBCKT::precalc_first()
     new_subckt();
   }
 
-  assert(is_device());
-  if(_parent == &pp){ untested();
+  if(_parent == &pp){
     COMMON_PARAMLIST const* c = prechecked_cast<COMMON_PARAMLIST const*>(common());
     assert(c);
     // first time spice
@@ -532,13 +561,13 @@ void DEV_SUBCKT::precalc_first()
       // good
     }else if ((_parent = dynamic_cast<const DEV_MODULE_PROTO*>(model))) { untested();
       // good
-    }else if (auto ms = dynamic_cast<const MODEL_SUBCKT*>(model)) { untested();
+    }else if (auto ms = dynamic_cast<const MODEL_SUBCKT*>(model)) {
       // good
       _parent = prechecked_cast<BASE_SUBCKT const*>(ms->component_proto());
       assert(_parent);
-    }else if (dynamic_cast<const BASE_SUBCKT*>(model)) { untested();
+    }else if (dynamic_cast<const BASE_SUBCKT*>(model)) {
       throw Exception_Type_Mismatch(long_label(), c->modelname(), "subckt proto");
-    }else{ untested();
+    }else{
       throw Exception_Type_Mismatch(long_label(), c->modelname(), "subckt");
     }
   }else{itested();
@@ -569,6 +598,11 @@ void DEV_SUBCKT::precalc_first()
   }else{
   }
 
+}
+/*--------------------------------------------------------------------------*/
+bool DEV_SUBCKT::makes_own_scope() const
+{
+  return !_parent; //  || _parent == &pp;
 }
 /*--------------------------------------------------------------------------*/
 void DEV_SUBCKT::precalc_last()
@@ -632,3 +666,4 @@ double DEV_SUBCKT::tr_probe_num(const std::string& x)const
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:
+#endif

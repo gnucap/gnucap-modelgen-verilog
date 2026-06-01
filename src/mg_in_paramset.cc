@@ -301,7 +301,7 @@ void streamcp(Module* sub, T const& t)
     o << "endmodule;";
 
     CS cmd(CS::_STRING, o.str());
-//    trace1("streamcp", cmd.fullstring());
+    trace1("streamcp", cmd.fullstring());
     sub->parse_body(cmd);
   }
 }
@@ -534,7 +534,7 @@ bool Paramset::new_var_ref(Base* what)
   std::string p;
   if(auto A = dynamic_cast<Aliasparam const*>(what)){ untested();
     p = A->name();
-  }else if(auto nn = dynamic_cast<Node const*>(what)){
+  }else if(auto nn = dynamic_cast<Node const*>(what)){ untested();
     p = nn->name();
   }else if(T){
     p = T->name();

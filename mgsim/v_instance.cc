@@ -169,7 +169,7 @@ public:
 		~INSTANCE();
   CARD*		clone_instance()const override {
     if(!_parent) {
-    }else if(_parent->subckt()->size() == 1){ untested();
+    }else if(_parent->subckt()->size() == 1){
       return (*_parent->subckt()->begin())->clone_instance();
     }else{ untested();
     }
@@ -230,6 +230,7 @@ protected:
   void		expand()override;
   CARD*		deflate()override;
 private:
+  void		expand_first_();
   void		expand_sift();
   void		precalc_last()override{ untested();
     trace1("INSTANCE::precalc_last", long_label());
@@ -838,9 +839,8 @@ static std::string param_count_string(CARD const* c)
   return to_string(eff_param_count(c));
 }
 /*--------------------------------------------------------------------------*/
-void INSTANCE::expand()
+void INSTANCE::expand_first_()
 {
-  BASE_SUBCKT::expand();
   auto c = prechecked_cast<COMMON_INSTANCE*>(mutable_common());
   assert(c);
 
@@ -860,14 +860,11 @@ void INSTANCE::expand()
     throw Exception(long_label() + ": no valid prototype found for " + modelname);
   }else {
     assert(_sim->is_first_expand());
-    // PARAM_LIST const* pl = _parent->subckt()->params();
-    // assert(pl);
-    // c->_params.set_try_again(pl);
-
-    // here: candidate has too many ports.
-    renew_subckt(_parent, &(c->_params)); // pass owner?
+    PARAM_LIST p;
+    PARAM_LIST const* pl = scope()->params();
+    p.set_try_again(pl);
+    renew_subckt(_parent, &p);
     assert(scope()!=subckt());
-    // subckt()->attach_params(&(c->_params), scope());
   }
 
   trace3("INSTANCE::expand sckt in", long_label(), subckt()->size(), _sim->is_first_expand());
@@ -878,7 +875,13 @@ void INSTANCE::expand()
   subckt()->precalc_first(); // here?
 
   expand_sift();
-  subckt()->expand();
+}
+/*--------------------------------------------------------------------------*/
+void INSTANCE::expand()
+{
+  BASE_SUBCKT::expand();
+  subckt()->expand_first();
+  subckt()->expand_();
 }
 /*--------------------------------------------------------------------------*/
 // sift. move to CARD_LIST::expand?
@@ -995,13 +998,13 @@ void INSTANCE::expand_sift()
 // Kludge: build proto in stub, so it only needs doing once.
 void INSTANCE::expand_first()
 {
+  BASE_SUBCKT::expand_first();
   static int recursion;
   if(++recursion > OPT::recursion){ untested();
     recursion = 0;
     throw Exception(long_label() + ": recursion too deep");
   }else{
   }
-  BASE_SUBCKT::expand_first();
 
   assert(common());
   trace3("INSTANCE::precalc_first", short_label(), _parent, common()->modelname());
@@ -1047,8 +1050,15 @@ void INSTANCE::expand_first()
   }else{
   }
 
+  assert(!subckt() || !subckt()->params()->size());
+
   assert(!is_constant()); /* because I have more work to do */
   --recursion;
+
+  if(_parent){
+    expand_first_();
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool INSTANCE::defer_proto() const

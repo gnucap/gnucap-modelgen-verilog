@@ -24,12 +24,12 @@ endmodule // main
 m1: 1 candidate found for main
 m1 is "main from top level"
 main.n1: 2 candidates found for mynet
-main.n2: 2 candidates found for mynet
-main.i0: 1 candidate found for isource
 m1.n1 found fewer params in "B".
 m1.n1 is "B"
+main.n2: 2 candidates found for mynet
 m1.n2 found fewer params in "B".
 m1.n2 is "B"
+main.i0: 1 candidate found for isource
 m1.i0 is "isource from device_dispatcher"
 >>>>>dc
 #           v(a)      

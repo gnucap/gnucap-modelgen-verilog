@@ -1,6 +1,6 @@
-/*$Id: mg_out.h,v 26.128 2009/11/10 04:21:03 al Exp $ -*- C++ -*-
+/*                             -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
- * Author: Albert Davis <aldavis@gnu.org>
+ *               2023-26 Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -24,14 +24,7 @@
 /*--------------------------------------------------------------------------*/
 #include <fstream>
 #include "mg_base.h"
-//#include "mg_.h"
-/*--------------------------------------------------------------------------*/
-extern std::string ind;
-#define o__ o << ind <<
-#define o____ o__ "  " <<
-#define o______ o____ "  " <<
-#define o________ o______ "  " <<
-#define o__________ o________ "  " <<
+#include "mg_dump.h"
 /*--------------------------------------------------------------------------*/
 #ifdef DO_TRACE_TAGS
 #define make_tag(o) (o << "//" << __FILE__ ":" << __func__ << ":" << __LINE__ << "\n")

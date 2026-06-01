@@ -214,27 +214,6 @@ typedef Collection<Function> Function_List;
 class Discipline;
 // TODO: Port_Base?
 class Node;
-class Net_Identifier : public Port_3 {
-  Block* _owner{nullptr};
-public:
-  Net_Identifier() : Port_3() {}
-protected:
-  Block* owner(){return _owner;}
-public:
-  void set_owner(Base* c) { _owner = prechecked_cast<Block*>(c); assert(_owner); }
-  void parse(CS& f) override;
-};
-/*--------------------------------------------------------------------------*/
-class Net_Identifier_Discipline : public Net_Identifier {
-public:
-   void parse(CS& f)override;
-};
-/*--------------------------------------------------------------------------*/
-class Net_Identifier_Ground : public Net_Identifier {
-public:
-   void parse(CS& f)override;
-};
-/*--------------------------------------------------------------------------*/
 class Net_Decl_List_Discipline : public Net_Decl_List {
   Discipline const* _disc{nullptr};
 public:

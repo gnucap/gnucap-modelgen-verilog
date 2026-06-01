@@ -26,7 +26,6 @@ m: 1 candidate found for main
 m is "main from top level"
 main.v discarded (params): too many: requested=1 max=0
 main.v: no candidates found for myres
-main.V1: 1 candidate found for myv
 m.v: no valid prototype found for myres
 >>>>>dc
 m is "main from top level"

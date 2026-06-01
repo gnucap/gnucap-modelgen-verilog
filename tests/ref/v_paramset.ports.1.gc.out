@@ -36,10 +36,10 @@ main #() m (\0 , \1 , \2 , \4 );
 m: 1 candidate found for main
 m is "main from top level"
 main.v: 1 candidate found for vsource
+m.v is "vsource from device_dispatcher"
 main.R1 discarded (ports): no match: p
 main.R1 discarded (ports): no match: p
 main.R1: 1 candidate found for myres
-m.v is "vsource from device_dispatcher"
 m.R1 is "myres from top level"
 print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
                                   ^ ? no match

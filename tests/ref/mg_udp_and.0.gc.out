@@ -10,7 +10,6 @@ paramset logic logic;
 endparamset
 
 testand #() t (y, a, b);
-t.b: can't find subckt: logicmyand02, forcing digital
 #           v(a)       v(b)       v(y)      
  27.        0.         0.         0.        
 testand #() t (.y(y),.a(a),.b(b));

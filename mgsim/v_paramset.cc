@@ -137,9 +137,9 @@ private:
   int max_nodes()const override{
     if(_dev){
       return _dev->max_nodes();
-    }else if(_parent){
+    }else if(_parent){ untested();
       return _parent->max_nodes();
-    }else{
+    }else{ untested();
       incomplete();
       return 0;
     }
@@ -322,7 +322,7 @@ int PARAMSET::set_param_by_name(std::string Name, std::string Value)
     }else{
       throw Exception_No_Match(Name);
     }
-  }else{
+  }else{ untested();
     return BASE_SUBCKT::set_param_by_name(Name, Value);
   }
 

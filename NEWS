@@ -9,6 +9,9 @@ This file summarizes new features and important changes between snapshots.
 - overloading tie break: localparam range count
 - fix href elaboration bug (codeberg issue #8)
 - overloading at top level, now like module body
+- fix: include port direction with verilog dumps
+- lang_verilog: (re)enable backslash line continuation
+- mgvams/$rdist: accept type_string arg
 - ..
 
 20260329-dev

@@ -179,7 +179,7 @@ public:
   Token_VAR_REF* token_hack()const { untested(); /* incomplete(); */ assert(_token); return _token; }
   std::string name() const { assert(_token); return _token->name(); }
   void parse(CS& cmd) override;
-  std::string lhsname()const { untested(); return lhs().name(); }
+  std::string lhsname()const { return lhs().name(); }
   void dump(std::ostream&)const override;
   bool propagate_deps(Token_VAR_REF const&);
   bool propagate_rdeps(RDeps const& incoming);
@@ -269,7 +269,7 @@ private:
   void new_deps();
   void new_data();
 public:
-  String_Arg key()const { untested(); return String_Arg(name()); }
+  String_Arg key()const { return String_Arg(name()); }
   bool is_real()const { untested(); return type().is_real(); }
   bool is_int()const { untested(); return type().is_int(); }
   std::string const identifier()const { untested();return name();}

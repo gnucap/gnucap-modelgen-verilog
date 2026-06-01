@@ -16,8 +16,8 @@ module test_rdist_u1(p, n);
 	end
 	analog begin
 		$bound_step(.1);
-      r1 = $rdist_uniform(s, 1., 2.);
-      r2 = $rdist_uniform(42, 1., 2.);
+      r1 = $rdist_uniform(s, 1., 2., "instance");
+      r2 = $rdist_uniform(42, 1., 2., "instance");
 		I(p,n)<+r1;
 	end
 endmodule

@@ -1,5 +1,6 @@
 // paramsets
 module st1(p);
+  inout p;
   electrical p;
   localparam real __x = 1;
 
@@ -17,6 +18,7 @@ module st1(p);
 
 endmodule
 module st0(p);
+  inout p;
   electrical p;
   localparam real __x = 0;
 

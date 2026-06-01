@@ -696,6 +696,7 @@ static void make_module(std::ostream& o, const Module& m)
   }else{
   }
   o__ "void precalc_first()override;\n";
+  o__ "void expand_first()override;\n";
   o__ "void expand()override;\n";
   if(m.has_expand_last()){
     o__ "void expand_last()override;\n";

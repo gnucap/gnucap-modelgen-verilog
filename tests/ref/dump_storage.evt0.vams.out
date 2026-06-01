@@ -1,6 +1,6 @@
 module test_evtana0c(p, n);
-  inout p, n;
   electrical p, n;
+  inout p, n;
   integer cnt// *
 ;
   real v// *

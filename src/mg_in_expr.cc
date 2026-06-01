@@ -469,11 +469,11 @@ Block* Expression_::scope()
 /*--------------------------------------------------------------------------*/
 bool Expression_::is_constant() const
 {
-  if(size() > 1) { untested();
+  if(size() > 1) {
     bool c = true;
-    if(auto const* d = dynamic_cast<TData const*>(back()->data())){ untested();
+    if(auto const* d = dynamic_cast<TData const*>(back()->data())){
       c &= d->is_constant();
-    }else{ untested();
+    }else{
       incomplete();
     }
     return c;

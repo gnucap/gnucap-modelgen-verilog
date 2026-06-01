@@ -10,7 +10,6 @@ paramset logic logic;
 endparamset
 
 test #() t (y, a, nen);
-t.b: can't find subckt: logicmybuf12, forcing digital
 #           v(a)       v(nen)     v(y)      
  27.        0.         0.         0.        
 #Time       v(a)       v(nen)     v(y)       l(a)       l(nen)     l(y)      

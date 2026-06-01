@@ -25,13 +25,13 @@ main #() m (\0 , \1 , \2 , \4 );
 m: 1 candidate found for main
 m is "main from top level"
 main.v: 1 candidate found for isource
+m.v is "isource from device_dispatcher"
 main.v: 1 candidate found for isource
-main.R1: 2 candidates found for res
-main.R1: 2 candidates found for res
 m.v is "isource from device_dispatcher"
-m.v is "isource from device_dispatcher"
+main.R1: 2 candidates found for res
 m.R1 dropped invalid candidate: "res2".
 m.R1 is "res1"
+main.R1: 2 candidates found for res
 m.R1 dropped invalid candidate: "res1".
 m.R1 is "res2"
 >>>>>dc

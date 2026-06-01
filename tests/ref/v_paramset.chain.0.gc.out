@@ -35,13 +35,13 @@ parameter x=0
 m: 1 candidate found for main
 m is "main from top level"
 main.v: 1 candidate found for vsource
-main.R1: 1 candidate found for res
 m.v is "vsource from device_dispatcher"
+main.R1: 1 candidate found for res
+assuming double in 1
+assuming double in x
 assuming double in 1
 assuming double in x
 m.R1 is "res from top level"
-assuming double in 1
-assuming double in x
 assuming double in 1
 assuming double in x
 assuming double in ((r + s) + x)

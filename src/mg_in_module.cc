@@ -543,63 +543,6 @@ void Net_Decl_List_Ground::parse(CS& f)
   return Net_Decl_List::parse_n_<Net_Identifier_Ground>(f);
 }
 /*--------------------------------------------------------------------------*/
-void Net_Identifier_Discipline::parse(CS& f)
-{
-  Net_Identifier::parse(f);
-
-  assert(owner());
-  set_node( owner()->new_node(name()));
-}
-/*--------------------------------------------------------------------------*/
-void Net_Identifier_Ground::parse(CS& f)
-{
-  assert(owner());
-  Net_Identifier::parse(f);
-  Module* mod = prechecked_cast<Module*>(owner());
-  assert(mod);
-  Node_Ref const& nn = owner()->node(name());
-  if(nn) {
-    set_node(mod->node(nn));
-  }else{ untested();
-    throw Exception_CS_("ground: need previously declared net", f);
-  }
-
-  Module* m = prechecked_cast<Module*>(owner());
-  assert(m);
-  assert(node());
-  m->set_to_ground(node());
-}
-/*--------------------------------------------------------------------------*/
-void Net_Decl_List_Ground::dump(std::ostream& o)const
-{
-  o__ "ground ";
-  Net_Decl_List::dump(o);
-  o << "\n";
-}
-/*--------------------------------------------------------------------------*/
-void Net_Decl_List_Discipline::parse(CS& f)
-{
-  trace1("Port_Disc_List::parse", f.last_match());
-  return Net_Decl_List::parse_n_<Net_Identifier_Discipline>(f);
-  // return Net_Identifier, '\0', ',', ';'>::parse(f);
-}
-/*--------------------------------------------------------------------------*/
-void Net_Decl_List_Discipline::dump(std::ostream& o)const
-{
-  assert(_disc);
-  // o__ "";
-  print_attributes(o, this);
-
-  o__ _disc->identifier() << " ";
-  Net_Decl_List::dump(o);
-  o << "\n";
-}
-/*--------------------------------------------------------------------------*/
-void Net_Identifier::parse(CS& file)
-{
-  Port_3::parse(file); // TODO: port_base?
-}
-/*--------------------------------------------------------------------------*/
 void Port_3::set_discipline(Discipline const* d, Module* owner)
 {
   owner->node(_node)->set_discipline(d);
@@ -798,11 +741,8 @@ void Module::parse_body(CS& f)
       || f.umatch(";")
       // mi, port_declaration
       // || (f >> _circuit)
-      || ((f >> "input ") && (f >> _circuit->input()))
-      || ((f >> "output ") && (f >> _circuit->output()))
-      || ((f >> "inout ") && (f >> _circuit->inout()))
       // mi, npmi, mogi, mogid
-      // net_declaration
+      // net_declaration, including directions
       || (f >> _circuit->net_decl())
       || ((f >> "ground ") && (f >> _circuit->net_decl())) // really?
       // mi, non_port_module_item
@@ -932,6 +872,7 @@ void Module::dump(std::ostream& o)const
     dump_annotate(*this, o);
   }else{
   }
+  // dump_port_directions(o);
   if(_circuit->input().size()){
     o__ "input " << circuit()->input() << "\n";
   }else{

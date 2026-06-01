@@ -201,7 +201,7 @@ void DEV_LOGIC::expand()
     const CARD* model = find_looking_out(subckt_name);
     
     if(!dynamic_cast<const BASE_SUBCKT*>(model)) {untested();
-      error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)),
+      error(((!_sim->is_first_expand()) ? (bLOG) : (bDEBUG)),
 	    long_label() + ": " + subckt_name + " is not a subckt, forcing digital\n");
     }else{ untested();
       _gatemode = OPT::mode;    
@@ -209,8 +209,8 @@ void DEV_LOGIC::expand()
       subckt()->expand();
     }
   }catch (Exception_Cant_Find&) {
-    error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)), 
-	  long_label() + ": can't find subckt: " + subckt_name + ", forcing digital\n");
+    error(((!_sim->is_first_expand()) ? (bLOG) : (bDEBUG)),
+	  long_label() + ": |can't find subckt: " + subckt_name + ", forcing digital\n");
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -631,7 +631,7 @@ bool DEV_LOGIC::want_digital()const
 int DEV_LOGIC::_count = -1;
 /*--------------------------------------------------------------------------*/
 static DEV_LOGIC p1(nullptr);
-static DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "__assign", &p1);
+static DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "__assign|__udp", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

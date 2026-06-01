@@ -26,8 +26,8 @@ main #() m (\0 , \1 , \2 , \4 );
 m: 1 candidate found for main
 m is "main from top level"
 main.v: 1 candidate found for resistor
-main.R1: 1 candidate found for myv
 m.v is "resistor from device_dispatcher"
+main.R1: 1 candidate found for myv
 m.R1 is "myv from top level"
 print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
                                   ^ ? no match

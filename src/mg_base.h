@@ -620,7 +620,7 @@ public:
   const std::string& quiet_min()const		{ untested();return _quiet_min;}
   const std::string& quiet_max()const		{ untested();return _quiet_max;}
   const std::string& final_default()const	{ untested();return _final_default;}
-  String_Arg key()const { untested(); return String_Arg(_name); }
+  String_Arg key()const { return String_Arg(_name); }
 
 #if 0
   // needed?

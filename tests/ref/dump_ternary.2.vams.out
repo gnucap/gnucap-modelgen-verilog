@@ -1,6 +1,6 @@
 module ternary(p, n);
-  inout p, n;
   electrical p, n;
+  inout p, n;
   parameter real c =  1.0;
 
   real a;

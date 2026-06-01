@@ -927,18 +927,6 @@ static void make_module_clear_local_nodes(std::ostream& o, Module const& m)
     ++pp;
   }
 
-  // o____ "for(int i=0; i<net_nodes(); ++i) {\n";
-  // o______ "assert(n_(i).e_()>=0);\n";
-  // o______ "assert(n_(i).e_()< nodes.size());\n";
-  // o______ "trace3(\"expand1 union\", long_label(), i, n_(i).e_());\n";
-  // o______ "build_union(&nodes[n_(i).e_()], &n_(i));\n";
-  // o____ "}\n";
-  o__ "for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){\n";
-  o____ "n_(i).clear();\n";
-  o__ "}\n";
-  o__ "for(int i=0; i<ext_nodes()+int_nodes(); ++i){\n";
-  o____ "trace3(\"expand2 clear\", long_label(), i, n_(i).e_());\n";
-  o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
 static void make_module_new_local_node(std::ostream& o, const Node& p)
@@ -1197,11 +1185,29 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
  //  assert(!is_constant()); /* because I have more work to do */
 }
 /*--------------------------------------------------------------------------*/
+static void make_module_expand_first(std::ostream& o, Module const& m)
+{
+  make_tag(o);
+  String_Arg const& mid = m.identifier();
+  o << "void MOD_" << mid << "::expand_first()\n{\n";
+  o__ "BASE_SUBCKT::expand_first();\n";
+  o__ "for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){\n";
+  o____ "n_(i).clear();\n";
+  o__ "}\n";
+  o__ "for(int i=0; i<ext_nodes()+int_nodes(); ++i){\n";
+  o____ "trace3(\"expand2 clear\", long_label(), i, n_(i).e_());\n";
+  o__ "}\n";
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
 static void make_module_expand_last(std::ostream& o, Module const& m)
 {
   make_tag(o);
   String_Arg const& mid = m.identifier();
   o << "void MOD_" << mid << "::expand_last()\n{\n";
+  o__ "// BASE_SUBCKT::expand_last();\n";
   o__ "trace1(\"expand_last\", long_label());\n";
   o__ "auto cc = prechecked_cast<COMMON_" << m.identifier() << "*>(common()->clone());\n";
   o__ "assert(cc);\n";
@@ -1469,6 +1475,7 @@ void make_cc_module(std::ostream& o, const Module& m)
   }else{
   }
   make_module_precalc_first(o, m);
+  make_module_expand_first(o, m);
   make_module_expand(o, m);
   if(m.has_expand_last()){
     make_module_expand_last(o, m);

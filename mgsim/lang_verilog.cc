@@ -34,6 +34,26 @@ static bool instanciate_unused = false;
 static int print_nest;
 static std::string toplevel_stub = "__stub";
 static std::string subdevice_stub = "__stub";
+static bool backslash_continue = true;
+/*--------------------------------------------------------------------------*/
+// continue reading if line ends with \\\n
+// gcc does it that way, too
+// (should probably become the default behaviour)
+static void getline(CS& cmd, std::string const& prompt)
+{
+  cmd.getline(prompt);
+  if(backslash_continue && cmd){
+    std::string const& f = cmd.fullstring();
+    if(!f.size()){
+    }else if(f[f.size()-1]=='\\'){
+      std::string F = f;
+      getline(cmd, prompt);
+      // this is inefficient
+      cmd = F.substr(0, f.size()-1) + cmd.fullstring();
+    }else{
+    }
+  }
+}
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -541,12 +561,16 @@ private:
 /*--------------------------------------------------------------------------*/
 class CMD_NET_DECL : public CMD {
 public:
+  explicit CMD_NET_DECL() : CMD() {}
+private:
+  explicit CMD_NET_DECL(CMD_NET_DECL const& p) : CMD(p) {}
+public:
+  CMD* clone()const override {return new CMD_NET_DECL(*this);}
+public:
   void do_it(CS& cmd, CARD_LIST* Scope)override {
     assert(Scope);
     assert(cmd.last_match().size()>2);
-    DEV_DOT* dot = new DEV_DOT();
-    dot->set(cmd.last_match() + cmd.tail());
-    Scope->push_back(dot);
+    set(cmd.last_match() + cmd.tail());
     assert(Scope->nodes());
     NODE_MAP& nm = *Scope->nodes();
 
@@ -969,9 +993,9 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
     }else if (cmd >> "//") {
       cmd.reset(here);
       // new__instance(cmd, x, x->subckt()); // BUG
-      cmd.getline("verilog-paramset>");
+      getline(cmd, "verilog-paramset>");
     }else if (!cmd.more()) {
-      cmd.getline("verilog-paramset>");
+      getline(cmd, "verilog-paramset>");
     }else{
       break;
     }
@@ -985,9 +1009,9 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
     }else if (cmd >> "// ") {
       cmd.reset(here);
       // new__instance(cmd, x, x->subckt()); // BUG
-      cmd.getline("verilog-paramset>");
+      getline(cmd, "verilog-paramset>");
     }else if (!cmd.more()) {
-      cmd.getline("verilog-paramset>");
+      getline(cmd, "verilog-paramset>");
     }else{ untested();
       cmd.check(bWARNING, "what's this?");
       break;
@@ -1020,9 +1044,9 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
   // body
   for (;;) {
 
-    cmd.getline("verilog-module>");
+    getline(cmd, "verilog-module>");
     while (!parse_attributes(cmd, tag_t(&cmd)).more()){
-      cmd.getline("verilog-module>");
+      getline(cmd, "verilog-module>");
     }
     if(has_attributes(tag_t(&cmd))){
     }else{
@@ -1042,7 +1066,10 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
       cmd.reset();
       new__instance(cmd, x, x->subckt());
     }else if (cmd >> "wire |electrical |inout |input |output ") {
-      net_decl.do_it(cmd, x->subckt());
+      auto n = net_decl.clone();
+      n->set_owner(x);
+      n->do_it(cmd, x->subckt());
+      x->subckt()->push_back(n);
     }else if (cmd >> "module |macromodule ") {
       cmd.reset();
       cmd.check(bWARNING, "nonstandard nesting in " + x->long_label() + ".");
@@ -1144,9 +1171,9 @@ void LANG_VERILOG::new_instance_(CS& cmd, BASE_SUBCKT* Owner, CARD_LIST* Scope)
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::parse_top_item(CS& cmd, CARD_LIST* Scope)
 {
-  cmd.getline("gnucap-verilog>");
+  getline(cmd, "gnucap-verilog>");
   while(!parse_attributes(cmd, tag_t(&cmd)).more()) {
-    cmd.getline("gnucap-verilog>");
+    getline(cmd, "gnucap-verilog>");
   }
   new_instance_(cmd, NULL, Scope);
 }
@@ -1160,7 +1187,7 @@ void LANG_VERILOG::print_attributes(OMSTREAM& o, tag_t x) const
     std::string s = attributes(x)->string(x);
     if(s.size()) {
       o << "(* " << s << " *) ";
-    }else{ untested();
+    }else{
     }
   }else{
   }
@@ -1511,7 +1538,7 @@ class CMD_MODULE : public CMD {
     }catch(Exception const& e) {
       cmd.warn(bDANGER, e.message());
       for (;;) {
-	cmd.getline("verilog-module>");
+	getline(cmd, "verilog-module>");
 
 	if (cmd >> "endmodule ") { untested();
 	  break;
