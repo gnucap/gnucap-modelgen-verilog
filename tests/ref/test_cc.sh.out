@@ -2625,11 +2625,9 @@ void MOD_resistor::expand()
 //port p 1
 //port n 2
     // port p 1
-    find_subset(&n_(n_p));
-    n_(n_p).allocate(3); // no-op unless floating
+    n_(n_p).set_type(OPT::default_logic);
     // port n 2
-    find_subset(&n_(n_n));
-    n_(n_n).allocate(3); // no-op unless floating
+    n_(n_n).set_type(OPT::default_logic);
     // ground
     n_(n_white_noise_1_p).set_to_ground(nullptr);
     precalc_first();
@@ -2691,6 +2689,10 @@ void MOD_resistor::expand()
   //precalc();
   subckt()->expand();
   //subckt()->precalc();
+  n_(n_p).set_used();
+  n_(n_p).allocate(3); // no-op unless floating
+  n_(n_n).set_used();
+  n_(n_n).allocate(3); // no-op unless floating
   assert(!is_constant());
 }
 /*--------------------------------------------------------------------------*/
@@ -4621,11 +4623,9 @@ void MOD_resistor::expand()
 //port p 1
 //port n 2
     // port p 1
-    find_subset(&n_(n_p));
-    n_(n_p).allocate(3); // no-op unless floating
+    n_(n_p).set_type(OPT::default_logic);
     // port n 2
-    find_subset(&n_(n_n));
-    n_(n_n).allocate(3); // no-op unless floating
+    n_(n_n).set_type(OPT::default_logic);
     // ground
     n_(n_white_noise_0_p).set_to_ground(nullptr);
     precalc_first();
@@ -4687,6 +4687,10 @@ void MOD_resistor::expand()
   //precalc();
   subckt()->expand();
   //subckt()->precalc();
+  n_(n_p).set_used();
+  n_(n_p).allocate(3); // no-op unless floating
+  n_(n_n).set_used();
+  n_(n_n).allocate(3); // no-op unless floating
   assert(!is_constant());
 }
 /*--------------------------------------------------------------------------*/
@@ -7047,11 +7051,9 @@ void MOD_capacitor::expand()
 //port p 1
 //port n 2
     // port p 1
-    find_subset(&n_(n_p));
-    n_(n_p).allocate(3); // no-op unless floating
+    n_(n_p).set_type(OPT::default_logic);
     // port n 2
-    find_subset(&n_(n_n));
-    n_(n_n).allocate(3); // no-op unless floating
+    n_(n_n).set_type(OPT::default_logic);
     // ground
     n_(n_ddt_1_p).set_to_ground(nullptr);
     precalc_first();
@@ -7113,6 +7115,10 @@ void MOD_capacitor::expand()
   //precalc();
   subckt()->expand();
   //subckt()->precalc();
+  n_(n_p).set_used();
+  n_(n_p).allocate(3); // no-op unless floating
+  n_(n_n).set_used();
+  n_(n_n).allocate(3); // no-op unless floating
   assert(!is_constant());
 }
 /*--------------------------------------------------------------------------*/
@@ -8318,17 +8324,15 @@ void MOD_capacitor::expand()
 //port p 1
 //port n 2
     // port p 1
-    find_subset(&n_(n_p));
-    n_(n_p).allocate(3); // no-op unless floating
+    n_(n_p).set_type(OPT::default_logic);
     // port n 2
-    find_subset(&n_(n_n));
-    n_(n_n).allocate(3); // no-op unless floating
+    n_(n_n).set_type(OPT::default_logic);
     // internal ddt_2_p : 3
     // node ddt_2_p 3
     if (_short_b_ddt_2()) {
       n_(n_ddt_2_p) = gnd;
     }else{
-      n_(n_ddt_2_p).new_model_node("." + long_label() + ".ddt_2_p", this);
+      n_(n_ddt_2_p).set_type(OPT::default_logic);
     }
     precalc_first();
 
@@ -8384,6 +8388,12 @@ void MOD_capacitor::expand()
   //precalc();
   subckt()->expand();
   //subckt()->precalc();
+  n_(n_p).set_used();
+  n_(n_p).allocate(3); // no-op unless floating
+  n_(n_n).set_used();
+  n_(n_n).allocate(3); // no-op unless floating
+  n_(n_ddt_2_p).set_used();
+  n_(n_ddt_2_p).allocate(3); // no-op unless floating
   assert(!is_constant());
 }
 /*--------------------------------------------------------------------------*/

@@ -953,8 +953,8 @@ static void make_module_new_local_node(std::ostream& o, const Node& p)
       o__ "";
     }
     o << "{\n";
-    o____ "n_(n_" << p.name() << ").new_model_node(\".\" + long_label() + \"." << p.name() 
-			   << "\", this);\n";
+    // TODO: put in discipline specified in module.
+    o____ "n_(n_" << p.name() << ").set_type(OPT::default_logic);\n";
     o__ "}\n";
   }
 }
@@ -972,8 +972,7 @@ static void make_module_new_local_nodes(std::ostream& o, Module const& m)
     }else if(n <= int(m.circuit()->ports().size())){
       o__ "// port " << nn->name() << " " << nn->number() << "\n";
       // BUG: allocate floating ports even if unused.
-      o__ "find_subset(&n_(n_" << nn->name() << "));\n";
-      o__ "n_(n_" << nn->name() << ").allocate(3); // no-op unless floating\n";
+      o__ "n_(n_" << nn->name() << ").set_type(OPT::default_logic);\n";
     }else if(nn->is_used()){
       o__ "// internal " << nn->name() << " : " << nn->number() << "\n";
       make_module_new_local_node(o, *nn);
@@ -989,6 +988,24 @@ static void make_module_new_local_nodes(std::ostream& o, Module const& m)
     if(nn->number() == 0) {
     }else if(nn->number() < n){
       o__ "n_(" << n - 1 << ") = n_(" << nn->number() - 1 << "); // (a)\n";
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+static void make_module_allocate_nodes(std::ostream& o, Module const& m)
+{
+  for (int n=1; n<=int(m.circuit()->nodes().size()); ++n) {
+    Node const* nn = m.circuit()->nodes()[n];
+    assert(nn);
+    if(nn->number() == 0) {
+    }else if(nn->number() < n){
+    }else if(n <= int(m.circuit()->ports().size())){
+      o__ "n_(n_" << nn->name() << ").set_used();\n"; // mg_port.0
+      o__ "n_(n_" << nn->name() << ").allocate(3); // no-op unless floating\n";
+    }else if(nn->is_used()){
+      o__ "n_(n_" << nn->name() << ").set_used();\n";
+      o__ "n_(n_" << nn->name() << ").allocate(3); // no-op unless floating\n";
     }else{
     }
   }
@@ -1315,6 +1332,8 @@ static void make_module_expand(std::ostream& o, Module const& m)
 
   o__ "subckt()->expand();\n";
   o__ "//subckt()->precalc();\n";
+
+  make_module_allocate_nodes(o, m);
 
   o__ "assert(!is_constant());\n";
   if (m.sync()) {

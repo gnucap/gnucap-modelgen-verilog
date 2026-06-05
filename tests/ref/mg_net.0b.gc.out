@@ -1,0 +1,66 @@
+module net_ (.p(a),.n(a));
+  electrical a;
+  inout a;
+endmodule // net_
+
+module net_ (.p(a),.n(a));
+  electrical a;
+  inout a;
+endmodule // net_
+
+parameter r=1
+parameter v=0
+ground gnd;
+test_net_0b #() N0 (aa, bb);
+test_net_0b #() N1 (gnd, gnd);
+test_net_0b #() N2 (xx, \0 );
+vsource #(.dc(v)) v1 (bb, gnd);
+#           v(N0)      v(N1)      v(N2)     
+ 0.         0.         0.         0.        
+ 0.5        0.5        0.         0.        
+ 1.         1.         0.         0.        
+Gnucap   System status
+iterations: op=0, dc=6, tran=0, fourier=0, total=6
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=0, subckt=0, model=3, total=3
+dctran density=33.3%, ac density=33.3%
+name   ...
+have 3 nodes. model: 3 sckt: 0
+
+net_
+
+
+
+N0 2 2 1
+0 1
+1 1
+2 1
+ N0.n1 2 2 0
+ 0 1
+ 1 1
+ N0.n2 2 2 0
+ 0 1
+ 1 1
+N1 2 2 1
+0 0
+1 0
+2 0
+ N1.n1 2 2 0
+ 0 0
+ 1 0
+ N1.n2 2 2 0
+ 0 0
+ 1 0
+N2 2 2 1
+0 0
+1 0
+2 0
+ N2.n1 2 2 0
+ 0 0
+ 1 0
+ N2.n2 2 2 0
+ 0 0
+ 1 0
+v1 2 2 0
+0 1
+1 0
