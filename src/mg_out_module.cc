@@ -249,7 +249,7 @@ static void make_renew_sckt(std::ostream& o, Module const& m)
   for (auto const& e : m.circuit()->element_list()) {
     assert(e);
     o__ "assert(pp->" << e->code_name() << ");\n";
-    o__ "if(!" << e->code_name() << ") {\n";
+    o__ "if(redo_sckt||!" << e->code_name() << ") {untested();\n";
     o____ "auto subc = prechecked_cast<COMPONENT*>(pp->" << e->code_name() << "->clone());\n";
     o____ "assert(subc);\n";
     o____ "subckt()->push_back(subc);\n"; // TODO: stash, push back deflated version.
@@ -257,7 +257,12 @@ static void make_renew_sckt(std::ostream& o, Module const& m)
     o____ e->code_name() << " = subc;\n";
     o____ "trace2(\"renew\", " << e->code_name() << "->long_label(), c->_netlist_params.size());\n";
     map_subdev_nodes(o, *e);
+    o__ "}else{untested();\n";
+    // o____ "auto subc = const_cast<COMPONENT*>(" << e->code_name() << ");\n";
+    // map_subdev_nodes(o, *e);
     o__ "}\n";
+//    o__ e->code_name() << "->precalc_first();\n";
+//    o__ e->code_name() << "->expand_first();\n";
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1039,7 +1044,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
 
   std::string dev_type = e.dev_type();
 
-  o__ "if (!" << cn << ") {\n";
+  o__ "if (!" << cn << " || redo_sckt) {\n";
   o____ "const CARD* p = device_dispatcher[\"" << dev_type << "\"]; // " << e.dev_type() << "\n";
   o____ "if(!p){\n";
   o______ "throw Exception(" << "\"Cannot find " << dev_type << ". Load module?\");\n";
@@ -1207,6 +1212,7 @@ static void make_module_expand_first(std::ostream& o, Module const& m)
   make_tag(o);
   String_Arg const& mid = m.identifier();
   o << "void MOD_" << mid << "::expand_first()\n{\n";
+  o__ "trace1(\"expand_first\", long_label());\n";
   o__ "BASE_SUBCKT::expand_first();\n";
   o__ "for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){\n";
   o____ "n_(i).clear();\n";
@@ -1240,7 +1246,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
   make_tag(o);
   String_Arg const& mid = m.identifier();
   o << "void MOD_" << mid << "::expand()\n{\n";
-  o__ "trace1(\"expand\", long_label());\n";
+  o__ "trace2(\"expand\", long_label(), _sim->is_first_expand());\n";
 
   o__ baseclass(m) << "::expand();\n";
   o__ "assert(common());\n";
@@ -1251,7 +1257,10 @@ static void make_module_expand(std::ostream& o, Module const& m)
   o__ "if (is_first_expand) {\n";
   o____ "new_subckt();\n";
   o__ "}else{\n";
+  //o__ "renew_subckt();\n";
+  o____ "subckt()->erase_all();\n";
   o__ "}\n";
+  o__ "bool redo_sckt = true;\n"; // for now.
   o << "\n";
   o__ "node_t gnd;\n";
   o__ "gnd.set_to_ground(nullptr);\n";

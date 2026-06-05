@@ -2589,6 +2589,7 @@ void MOD_resistor::precalc_first()
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand_first()
 {
+  trace1("expand_first", long_label());
   BASE_SUBCKT::expand_first();
   for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
     n_(i).clear();
@@ -2600,7 +2601,7 @@ void MOD_resistor::expand_first()
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
 {
-  trace1("expand", long_label());
+  trace2("expand", long_label(), _sim->is_first_expand());
   BASE_SUBCKT::expand();
   assert(common());
   auto c = static_cast</*const*/ COMMON_resistor*>(mutable_common());
@@ -2610,7 +2611,9 @@ void MOD_resistor::expand()
   if (is_first_expand) {
     new_subckt();
   }else{
+    subckt()->erase_all();
   }
+  bool redo_sckt = true;
 
   node_t gnd;
   gnd.set_to_ground(nullptr);
@@ -2635,7 +2638,7 @@ void MOD_resistor::expand()
   // clone branches
   // filter (white_noise_1_p)
     {
-    if (!_b_white_noise_1_p_) {
+    if (!_b_white_noise_1_p_ || redo_sckt) {
       const CARD* p = device_dispatcher["va_white_noise"]; // va_white_noise
       if(!p){
         throw Exception("Cannot find va_white_noise. Load module?");
@@ -2661,7 +2664,7 @@ void MOD_resistor::expand()
     }
   // branch (p, n)
     {
-    if (!_b_p_n) {
+    if (!_b_p_n || redo_sckt) {
       const CARD* p = device_dispatcher["va_flow"]; // va_flow
       if(!p){
         throw Exception("Cannot find va_flow. Load module?");
@@ -4587,6 +4590,7 @@ void MOD_resistor::precalc_first()
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand_first()
 {
+  trace1("expand_first", long_label());
   BASE_SUBCKT::expand_first();
   for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
     n_(i).clear();
@@ -4598,7 +4602,7 @@ void MOD_resistor::expand_first()
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
 {
-  trace1("expand", long_label());
+  trace2("expand", long_label(), _sim->is_first_expand());
   BASE_SUBCKT::expand();
   assert(common());
   auto c = static_cast</*const*/ COMMON_resistor*>(mutable_common());
@@ -4608,7 +4612,9 @@ void MOD_resistor::expand()
   if (is_first_expand) {
     new_subckt();
   }else{
+    subckt()->erase_all();
   }
+  bool redo_sckt = true;
 
   node_t gnd;
   gnd.set_to_ground(nullptr);
@@ -4633,7 +4639,7 @@ void MOD_resistor::expand()
   // clone branches
   // filter (white_noise_0_p)
     {
-    if (!_b_white_noise_0_p_) {
+    if (!_b_white_noise_0_p_ || redo_sckt) {
       const CARD* p = device_dispatcher["va_white_noise"]; // va_white_noise
       if(!p){
         throw Exception("Cannot find va_white_noise. Load module?");
@@ -4659,7 +4665,7 @@ void MOD_resistor::expand()
     }
   // branch (p, n)
     {
-    if (!_b_p_n) {
+    if (!_b_p_n || redo_sckt) {
       const CARD* p = device_dispatcher["va_flow"]; // va_flow
       if(!p){
         throw Exception("Cannot find va_flow. Load module?");
@@ -7015,6 +7021,7 @@ void MOD_capacitor::precalc_first()
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand_first()
 {
+  trace1("expand_first", long_label());
   BASE_SUBCKT::expand_first();
   for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
     n_(i).clear();
@@ -7026,7 +7033,7 @@ void MOD_capacitor::expand_first()
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
 {
-  trace1("expand", long_label());
+  trace2("expand", long_label(), _sim->is_first_expand());
   BASE_SUBCKT::expand();
   assert(common());
   auto c = static_cast</*const*/ COMMON_capacitor*>(mutable_common());
@@ -7036,7 +7043,9 @@ void MOD_capacitor::expand()
   if (is_first_expand) {
     new_subckt();
   }else{
+    subckt()->erase_all();
   }
+  bool redo_sckt = true;
 
   node_t gnd;
   gnd.set_to_ground(nullptr);
@@ -7061,7 +7070,7 @@ void MOD_capacitor::expand()
   // clone branches
   // filter (ddt_1_p)
     {
-    if (!_b_ddt_1_p_) {
+    if (!_b_ddt_1_p_ || redo_sckt) {
       const CARD* p = device_dispatcher["va_ddt"]; // va_ddt
       if(!p){
         throw Exception("Cannot find va_ddt. Load module?");
@@ -7087,7 +7096,7 @@ void MOD_capacitor::expand()
     }
   // branch (p, n)
     {
-    if (!_b_p_n) {
+    if (!_b_p_n || redo_sckt) {
       const CARD* p = device_dispatcher["va_flow"]; // va_flow
       if(!p){
         throw Exception("Cannot find va_flow. Load module?");
@@ -8288,6 +8297,7 @@ void MOD_capacitor::precalc_first()
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand_first()
 {
+  trace1("expand_first", long_label());
   BASE_SUBCKT::expand_first();
   for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
     n_(i).clear();
@@ -8299,7 +8309,7 @@ void MOD_capacitor::expand_first()
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
 {
-  trace1("expand", long_label());
+  trace2("expand", long_label(), _sim->is_first_expand());
   BASE_SUBCKT::expand();
   assert(common());
   auto c = static_cast</*const*/ COMMON_capacitor*>(mutable_common());
@@ -8309,7 +8319,9 @@ void MOD_capacitor::expand()
   if (is_first_expand) {
     new_subckt();
   }else{
+    subckt()->erase_all();
   }
+  bool redo_sckt = true;
 
   node_t gnd;
   gnd.set_to_ground(nullptr);
@@ -8339,7 +8351,7 @@ void MOD_capacitor::expand()
   // clone branches
   // filter (ddt_2_p)
     {
-    if (!_b_ddt_2_p_) {
+    if (!_b_ddt_2_p_ || redo_sckt) {
       const CARD* p = device_dispatcher["va_ddt"]; // va_ddt
       if(!p){
         throw Exception("Cannot find va_ddt. Load module?");
@@ -8360,7 +8372,7 @@ void MOD_capacitor::expand()
     }
   // branch (p, n)
     {
-    if (!_b_p_n) {
+    if (!_b_p_n || redo_sckt) {
       const CARD* p = device_dispatcher["va_sw"]; // va_sw
       if(!p){
         throw Exception("Cannot find va_sw. Load module?");
