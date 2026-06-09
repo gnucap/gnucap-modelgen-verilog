@@ -29,6 +29,7 @@
 #include <m_union.h>
 #include <e_node.h>
 #include <bm.h> // BUG
+#include <e_cardlist.h>
 /*--------------------------------------------------------------------------*/
 extern NODE ground_node;
 /*--------------------------------------------------------------------------*/
@@ -93,7 +94,7 @@ inline void e_val(double* p, const double& x, const CARD_LIST*)
 }
 /*--------------------------------------------------------------------------*/
 class CURRENT_CTRL : public NODE {
-  node_t _nn;
+  mutable node_t _nn;
 public:
   explicit CURRENT_CTRL(std::string const& n) : NODE(), _nn(this) {
     set_label(n);
@@ -102,7 +103,8 @@ public:
     unreachable();
     return nullptr;
   }
-  node_t& nn() {return _nn;}
+  node_t const& nn() {return _nn;}
+  node_t& n_(int)const override {return _nn;}
 };
 /*--------------------------------------------------------------------------*/
 void set_pot_source(CARD* e)
@@ -115,6 +117,25 @@ void unset_pot_source(CARD* e)
 {
   std::string x;
   e->set_param_by_index(123457, x, 0);
+}
+/*--------------------------------------------------------------------------*/
+void map_sckt_nodes(CARD_LIST* l, node_t* nodes)
+{
+  assert(l);
+  for (CARD_LIST::iterator ci = l->begin(); ci != l->end(); ++ci) {
+    assert ((**ci).is_device());
+    for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) {
+      auto& cni = (**ci).n_(ii);
+      if(cni.e_() == INVALID_NODE){
+      // }else if(nodes[cni.e_()].is_grounded()){ untested();
+      }else if(dynamic_cast<CURRENT_CTRL const*>(nodes[cni.e_()].n_())){
+	trace2("msn0a", (**ci).long_label(), ii);
+	cni = nodes[cni.e_()].n_(); // HACK, later.
+      }else{
+        cni.map_subckt_node(nodes, nullptr);
+      }
+    }
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

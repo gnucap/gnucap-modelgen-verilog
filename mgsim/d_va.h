@@ -180,9 +180,13 @@ void DEV_CPOLY_G::expand_last()
   std::vector<std::string> current_port_names(k);
   int  net_nodes_ =  _n_ports*2 - _n_current_inputs;
   while(k--){
-    assert(net_nodes_-k-1 < matrix_nodes());
-    assert(root(&n_(net_nodes_-k-1)));
-    current_port_names[k] = root(&n_(net_nodes_-k-1))->short_label();
+    int which = net_nodes_-k-1;
+    assert(which < matrix_nodes());
+    assert(root(&n_(which)));
+    // assert(n_(which).e_()!=INVALID_NODE);
+    current_port_names[k] = root(&n_(which))->short_label();
+    assert(current_port_names[k][0]!='?');
+    assert(current_port_names[k]!="electrical");
   }
   // squeeze in current ports.
   for(int i=0; i<_n_current_inputs; ++i) {
@@ -357,6 +361,9 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
 				 int n_nodes, const node_t nodes[])
   //				 const double* inputs[])
 {
+  for(int k =0; k < n_nodes; ++ k){
+    trace4("CPOLY_G::set_parameters", long_label(), k, nodes[k].e_(), nodes[k].n_());
+  }
   assert(n_nodes);
   bool first_time = (_net_nodes == 0);
   _net_nodes = short(n_nodes);
@@ -416,6 +423,9 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
   notstd::copy_n(nodes, n_nodes, _nN); // copy more in expand_last
   trace4("CPOLY_G::set_parameters", long_label(), net_nodes(), _n_ports, _n_current_inputs);
   assert(net_nodes() == _n_ports * 2 - _n_current_inputs + 2* _p0_is_cc);
+  for(int k =0; k < n_nodes; ++ k){
+    assert(nodes[k].e_() == _nN[k].e_());
+  }
 }
 /*--------------------------------------------------------------------------*/
 double DEV_CPOLY_G::tr_probe_num(const std::string& x)const
