@@ -1519,7 +1519,7 @@ void make_cc_analog(std::ostream& o, const Module& m)
   }
 }
 /*--------------------------------------------------------------------------*/
-void make_node_ref(std::ostream& o, const Node& n, bool used=true);
+void make_node_conn(std::ostream& o, const Node& n, bool used=true);
 void make_cc_branch_ctrl(std::ostream& o, Branch const* br)
 {
   for(Dep const& i : br->ddeps()){
@@ -1530,9 +1530,9 @@ void make_cc_branch_ctrl(std::ostream& o, Branch const* br)
     }else if(is_pot_probe(i)){
       assert(branch(i));
       o << ", ";
-      make_node_ref(o, *branch(i)->p());
+      make_node_conn(o, *branch(i)->p());
       o << ", ";
-      make_node_ref(o, *branch(i)->n());
+      make_node_conn(o, *branch(i)->n());
     }else if(is_flow_probe(i)){
     }else{ untested();
       o << "/* nothing " << code_name(i) << " */";

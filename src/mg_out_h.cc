@@ -517,6 +517,33 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
 
 }
 /*--------------------------------------------------------------------------*/
+static int make_current_node_decl(std::ostream& o, const Module& m)
+{
+  int n = 0;
+  for (auto br : m.circuit()->branches()){
+    std::string bcn = br->code_name();
+    bool needed = false;
+    if(br->is_filter()){
+      if(!br->is_used() && options().optimize_unused()){
+      }else{
+	needed = true;
+      }
+    }else if(br->is_short()){
+    }else if(!br->is_used() && options().optimize_unused()){
+    }else if(br->has_element()){
+	needed = true;
+    }else{
+    }
+    if(needed) {
+      ++n;
+      o____ "I" << bcn;
+      o << ",\n";
+    }else{
+    }
+  }
+  return n;
+}
+/*--------------------------------------------------------------------------*/
 static void make_node_decl(std::ostream& o, const Module& m)
 {
   std::string comma = "";
@@ -532,6 +559,12 @@ static void make_node_decl(std::ostream& o, const Module& m)
     o << comma << "    n_" << nn->name() << " /* used: " << nn->is_used() << " */";
     comma = ",\n";
   }
+  o << comma << "\n";
+  if(int i = make_current_node_decl(o, m)){
+    n+=i;
+  }else{
+  }
+  o__ "_n_total = " << --n;
   o << "\n";
   o__ "};\n";
 }
@@ -620,6 +653,8 @@ static void make_module(std::ostream& o, const Module& m)
   o << "class " << class_name << " : public " << base_name << " {\n";
   o__ "typedef " << class_name << " MOD;\n";
   o__ "typedef " << common_name << " COMMON;\n";
+  o << "private: // node list\n";
+  make_node_decl(o, m);
   o << "private:\n";
  // o__ "bool _eval{false};\n";
   if(m.has_tr_accept()){
@@ -629,8 +664,7 @@ static void make_module(std::ostream& o, const Module& m)
   o << "public:\n";
   declare_ddouble(o, m);
   o << "private: // data\n";
-  size_t total_nodes = m.circuit()->nodes().size();
-  o__ "mutable node_t _nodes[" << total_nodes << "];\n";
+  o__ "mutable node_t _nodes[_n_total];\n";
   if(m.times()){
     o__ "double _time[" << m.times() << "];\n";
     o__ "TIME_PAIR _time_by;\n";
@@ -663,12 +697,15 @@ static void make_module(std::ostream& o, const Module& m)
     }
     if(needed) {
       o__ "static struct CURRENT_CTRL_" << bcn << ":public CURRENT_CTRL {\n";
-      o____ "explicit CURRENT_CTRL_" << bcn << "() : CURRENT_CTRL(\"" << bcn << "\"){}\n";
+      o____ "explicit CURRENT_CTRL_" << bcn << "() : CURRENT_CTRL(\"" << bcn << "\"){\n";
+      o______ "n_(0) = this;\n";
+      o____ "}\n";
       o____ "ELEMENT const* e(COMPONENT const* c)const {\n";
       o______ "auto m = prechecked_cast<MOD_" << m.identifier() << " const*>(c);\n";
       o______ "assert(m);\n";
       o______ "return m->" << bcn << ";\n";
       o____ "}\n";
+      o____ "int user_number()const override {return I" << bcn << ";}\n";
       o__ "} _c" << bcn << ";\n";
     }else{
     }
@@ -789,7 +826,7 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "bool print_type_in_spice()const override {itested(); return false;}\n";
   o__ "std::string port_name(int i)const override;\n";
   o__ "node_t& n_(int i)const override {\n";
-  o____ "assert(_nodes); assert(i>=0); assert(i<" << total_nodes << "); return _nodes[i];\n";
+  o____ "assert(_nodes); assert(i>=0); assert(!i || i<_n_total); return _nodes[i];\n";
   o__ "}\n";
   o << "private: // impl\n";
   o << "/* ========== */\n";
@@ -804,8 +841,6 @@ static void make_module(std::ostream& o, const Module& m)
   }
   o << "private: // branch state\n";
   make_branch_states(o, m);
-  o << "private: // node list\n";
-  make_node_decl(o, m);
   o << "private: // probe values\n";
   for(auto x : m.circuit()->branches()){
     assert(x);

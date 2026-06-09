@@ -847,7 +847,7 @@ void INSTANCE::expand_first_()
   assert(_parent);
   assert(_parent->subckt());
   assert(_parent->subckt()->nodes());
-  trace3("INSTANCE::expand", long_label(), _parent->net_nodes(),  _parent->subckt()->nodes()->how_many());
+  trace3("INSTANCE::expand_first_1", long_label(), _parent->net_nodes(),  _parent->subckt()->nodes()->how_many());
   if(_parent->net_nodes() <= _parent->subckt()->nodes()->how_many()){
     // module
   }else{
@@ -867,7 +867,7 @@ void INSTANCE::expand_first_()
     assert(scope()!=subckt());
   }
 
-  trace3("INSTANCE::expand sckt in", long_label(), subckt()->size(), _sim->is_first_expand());
+  trace3("INSTANCE::expand_first_2 sckt in", long_label(), subckt()->size(), _sim->is_first_expand());
   // assert(subckt()->size());
   subckt()->set_owner(nullptr);
   subckt()->set_verilog_math();
@@ -1007,8 +1007,8 @@ void INSTANCE::expand_first()
   }
 
   assert(common());
-  trace3("INSTANCE::precalc_first", short_label(), _parent, common()->modelname());
-  trace1("INSTANCE::precalc_first", _sim->is_first_expand());
+  trace3("INSTANCE::expand_first", short_label(), _parent, common()->modelname());
+  trace1("INSTANCE::expand_first", _sim->is_first_expand());
 
   if(defer_proto()){
     if(_proto){
@@ -1032,7 +1032,7 @@ void INSTANCE::expand_first()
   }else if(_cloned_from && !_parent && !_proto){ untested();
   // incomplete(); // dup.1?
     // BUG: move to clone_instance
-    trace1("INSTANCE::precalc_first afresh", long_label());
+    trace1("INSTANCE::expand_first afresh", long_label());
     _proto = new DEV_INSTANCE_PROTO();
     _proto->attach_common(mutable_common());
     auto c = prechecked_cast<COMMON_INSTANCE const*>(common());
@@ -1046,7 +1046,7 @@ void INSTANCE::expand_first()
   }
 
   if(_parent){
-    trace2("INSTANCE::precalc_first w/ parent", short_label(), _parent->short_label());
+    trace2("INSTANCE::expand_first w/ parent", short_label(), _parent->short_label());
   }else{
   }
 

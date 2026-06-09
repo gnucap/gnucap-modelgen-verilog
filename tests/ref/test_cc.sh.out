@@ -1033,6 +1033,7 @@ inline node_t& ground()
 #include <m_union.h>
 #include <e_node.h>
 #include <bm.h> // BUG
+#include <e_cardlist.h>
 /*--------------------------------------------------------------------------*/
 extern NODE ground_node;
 /*--------------------------------------------------------------------------*/
@@ -1097,7 +1098,7 @@ inline void e_val(double* p, const double& x, const CARD_LIST*)
 }
 /*--------------------------------------------------------------------------*/
 class CURRENT_CTRL : public NODE {
-  node_t _nn;
+  mutable node_t _nn;
 public:
   explicit CURRENT_CTRL(std::string const& n) : NODE(), _nn(this) {
     set_label(n);
@@ -1106,7 +1107,8 @@ public:
     unreachable();
     return nullptr;
   }
-  node_t& nn() {return _nn;}
+  node_t const& nn() {return _nn;}
+  node_t& n_(int)const override {return _nn;}
 };
 /*--------------------------------------------------------------------------*/
 void set_pot_source(CARD* e)
@@ -1119,6 +1121,25 @@ void unset_pot_source(CARD* e)
 {
   std::string x;
   e->set_param_by_index(123457, x, 0);
+}
+/*--------------------------------------------------------------------------*/
+void map_sckt_nodes(CARD_LIST* l, node_t* nodes)
+{
+  assert(l);
+  for (CARD_LIST::iterator ci = l->begin(); ci != l->end(); ++ci) {
+    assert ((**ci).is_device());
+    for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) {
+      auto& cni = (**ci).n_(ii);
+      if(cni.e_() == INVALID_NODE){
+      // }else if(nodes[cni.e_()].is_grounded()){ untested();
+      }else if(dynamic_cast<CURRENT_CTRL const*>(nodes[cni.e_()].n_())){
+	trace2("msn0a", (**ci).long_label(), ii);
+	cni = nodes[cni.e_()].n_(); // HACK, later.
+      }else{
+        cni.map_subckt_node(nodes, nullptr);
+      }
+    }
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1337,6 +1358,16 @@ private: // hrefs
 class MOD_resistor : public BASE_SUBCKT {
   typedef MOD_resistor MOD;
   typedef COMMON_resistor COMMON;
+private: // node list
+  enum {
+    n_p /* used: 1 */,
+    n_n /* used: 1 */,
+    n_white_noise_1_p /* used: 0 */,
+
+    I_b_white_noise_1_p_,
+    I_b_p_n,
+  _n_total = 5
+  };
 private:
 public:
   typedef ddouble_<2> ddouble;
@@ -1345,25 +1376,31 @@ public:
     d_potential_b_p_n,
      num_branches__  };
 private: // data
-  mutable node_t _nodes[3];
+  mutable node_t _nodes[_n_total];
 public: // netlist
   ELEMENT* _b_white_noise_1_p_{nullptr}; // filter
   static struct CURRENT_CTRL__b_white_noise_1_p_:public CURRENT_CTRL {
-    explicit CURRENT_CTRL__b_white_noise_1_p_() : CURRENT_CTRL("_b_white_noise_1_p_"){}
+    explicit CURRENT_CTRL__b_white_noise_1_p_() : CURRENT_CTRL("_b_white_noise_1_p_"){
+      n_(0) = this;
+    }
     ELEMENT const* e(COMPONENT const* c)const {
       auto m = prechecked_cast<MOD_resistor const*>(c);
       assert(m);
       return m->_b_white_noise_1_p_;
     }
+    int user_number()const override {return I_b_white_noise_1_p_;}
   } _c_b_white_noise_1_p_;
   ELEMENT* _b_p_n{nullptr}; // branch
   static struct CURRENT_CTRL__b_p_n:public CURRENT_CTRL {
-    explicit CURRENT_CTRL__b_p_n() : CURRENT_CTRL("_b_p_n"){}
+    explicit CURRENT_CTRL__b_p_n() : CURRENT_CTRL("_b_p_n"){
+      n_(0) = this;
+    }
     ELEMENT const* e(COMPONENT const* c)const {
       auto m = prechecked_cast<MOD_resistor const*>(c);
       assert(m);
       return m->_b_p_n;
     }
+    int user_number()const override {return I_b_p_n;}
   } _c_b_p_n;
 private: // func decl
 //other: $param_given
@@ -1421,7 +1458,7 @@ private: // overrides
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
   node_t& n_(int i)const override {
-    assert(_nodes); assert(i>=0); assert(i<3); return _nodes[i];
+    assert(_nodes); assert(i>=0); assert(!i || i<_n_total); return _nodes[i];
   }
 private: // impl
 /* ========== */
@@ -1472,12 +1509,6 @@ public: // states, _b_p_n;
     enum {     VALUE, SELF/* : */
     };
   } _dep_b_p_n;
-private: // node list
-  enum {
-    n_p /* used: 1 */,
-    n_n /* used: 1 */,
-    n_white_noise_1_p /* used: 0 */
-  };
 private: // probe values
   double _potential_b_white_noise_1_p_{0.};
   double _potential_b_p_n{0.};
@@ -2569,7 +2600,9 @@ MOD_resistor::MOD_resistor(MOD_resistor const&p) : BASE_SUBCKT(p)
 {
   for (int ii = 0; ii < max_nodes(); ++ii) {
     n_(ii) = p.n_(ii);
-    }
+  }
+  n_(I_b_white_noise_1_p_) = &_c_b_white_noise_1_p_;
+  n_(I_b_p_n) = &_c_b_p_n;
 }
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::precalc_first()
@@ -2589,6 +2622,7 @@ void MOD_resistor::precalc_first()
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand_first()
 {
+  trace1("expand_first", long_label());
   BASE_SUBCKT::expand_first();
   for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
     n_(i).clear();
@@ -2600,7 +2634,7 @@ void MOD_resistor::expand_first()
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
 {
-  trace1("expand", long_label());
+  trace2("expand", long_label(), _sim->is_first_expand());
   BASE_SUBCKT::expand();
   assert(common());
   auto c = static_cast</*const*/ COMMON_resistor*>(mutable_common());
@@ -2610,7 +2644,9 @@ void MOD_resistor::expand()
   if (is_first_expand) {
     new_subckt();
   }else{
+    subckt()->erase_all();
   }
+  bool redo_sckt = true;
 
   node_t gnd;
   gnd.set_to_ground(nullptr);
@@ -2625,11 +2661,9 @@ void MOD_resistor::expand()
 //port p 1
 //port n 2
     // port p 1
-    find_subset(&n_(n_p));
-    n_(n_p).allocate(3); // no-op unless floating
+    n_(n_p).set_type(OPT::default_logic);
     // port n 2
-    find_subset(&n_(n_n));
-    n_(n_n).allocate(3); // no-op unless floating
+    n_(n_n).set_type(OPT::default_logic);
     // ground
     n_(n_white_noise_1_p).set_to_ground(nullptr);
     precalc_first();
@@ -2637,7 +2671,7 @@ void MOD_resistor::expand()
   // clone branches
   // filter (white_noise_1_p)
     {
-    if (!_b_white_noise_1_p_) {
+    if (!_b_white_noise_1_p_ || redo_sckt) {
       const CARD* p = device_dispatcher["va_white_noise"]; // va_white_noise
       if(!p){
         throw Exception("Cannot find va_white_noise. Load module?");
@@ -2652,7 +2686,7 @@ void MOD_resistor::expand()
     }else{
     }
       {
-        node_t nodes[] = {n_(n_p), n_(n_n)}; // nodes
+        node_t nodes[] = {node_t(n_p), node_t(n_n)}; // nodes
         _b_white_noise_1_p_->set_parameters("_b_white_noise_1_p_", this, _b_white_noise_1_p_->mutable_common(), 0., /*states:*/2, _st_b_white_noise_1_p_.ptr(), 2, nodes);
         if(auto e = dynamic_cast<ELEMENT*>(_b_white_noise_1_p_)){
           e->_loss0 = 0.;
@@ -2663,7 +2697,7 @@ void MOD_resistor::expand()
     }
   // branch (p, n)
     {
-    if (!_b_p_n) {
+    if (!_b_p_n || redo_sckt) {
       const CARD* p = device_dispatcher["va_flow"]; // va_flow
       if(!p){
         throw Exception("Cannot find va_flow. Load module?");
@@ -2678,7 +2712,7 @@ void MOD_resistor::expand()
     }else{
     }
       {
-        node_t nodes[] = {n_(n_p), n_(n_n)}; // nodes
+        node_t nodes[] = {node_t(n_p), node_t(n_n)}; // nodes
         _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/2, _st_b_p_n.ptr(), 2, nodes);
       }
     }
@@ -2689,10 +2723,16 @@ void MOD_resistor::expand()
       //precalc();
   }
   //precalc();
-  subckt()->expand();
-  //subckt()->precalc();
+  subckt()->precalc_first();
+  subckt()->expand_first();
+  map_sckt_nodes(subckt(), &n_(0));
+  subckt()->expand_();
+  n_(n_p).set_used();
+  n_(n_p).allocate(3); // no-op unless floating
+  n_(n_n).set_used();
+  n_(n_n).allocate(3); // no-op unless floating
   assert(!is_constant());
-}
+} // expand
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::precalc_last()
 {
@@ -2847,6 +2887,16 @@ private: // hrefs
 class MOD_resistor : public BASE_SUBCKT {
   typedef MOD_resistor MOD;
   typedef COMMON_resistor COMMON;
+private: // node list
+  enum {
+    n_p /* used: 1 */,
+    n_n /* used: 1 */,
+    n_white_noise_0_p /* used: 0 */,
+
+    I_b_white_noise_0_p_,
+    I_b_p_n,
+  _n_total = 5
+  };
 private:
 public:
   typedef ddouble_<2> ddouble;
@@ -2855,25 +2905,31 @@ public:
     d_potential_b_p_n,
      num_branches__  };
 private: // data
-  mutable node_t _nodes[3];
+  mutable node_t _nodes[_n_total];
 public: // netlist
   ELEMENT* _b_white_noise_0_p_{nullptr}; // filter
   static struct CURRENT_CTRL__b_white_noise_0_p_:public CURRENT_CTRL {
-    explicit CURRENT_CTRL__b_white_noise_0_p_() : CURRENT_CTRL("_b_white_noise_0_p_"){}
+    explicit CURRENT_CTRL__b_white_noise_0_p_() : CURRENT_CTRL("_b_white_noise_0_p_"){
+      n_(0) = this;
+    }
     ELEMENT const* e(COMPONENT const* c)const {
       auto m = prechecked_cast<MOD_resistor const*>(c);
       assert(m);
       return m->_b_white_noise_0_p_;
     }
+    int user_number()const override {return I_b_white_noise_0_p_;}
   } _c_b_white_noise_0_p_;
   ELEMENT* _b_p_n{nullptr}; // branch
   static struct CURRENT_CTRL__b_p_n:public CURRENT_CTRL {
-    explicit CURRENT_CTRL__b_p_n() : CURRENT_CTRL("_b_p_n"){}
+    explicit CURRENT_CTRL__b_p_n() : CURRENT_CTRL("_b_p_n"){
+      n_(0) = this;
+    }
     ELEMENT const* e(COMPONENT const* c)const {
       auto m = prechecked_cast<MOD_resistor const*>(c);
       assert(m);
       return m->_b_p_n;
     }
+    int user_number()const override {return I_b_p_n;}
   } _c_b_p_n;
 private: // func decl
 //other: $param_given
@@ -2932,7 +2988,7 @@ private: // overrides
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
   node_t& n_(int i)const override {
-    assert(_nodes); assert(i>=0); assert(i<3); return _nodes[i];
+    assert(_nodes); assert(i>=0); assert(!i || i<_n_total); return _nodes[i];
   }
 private: // impl
 /* ========== */
@@ -2983,12 +3039,6 @@ public: // states, _b_p_n;
     enum {     VALUE, SELF/* : */
     };
   } _dep_b_p_n;
-private: // node list
-  enum {
-    n_p /* used: 1 */,
-    n_n /* used: 1 */,
-    n_white_noise_0_p /* used: 0 */
-  };
 private: // probe values
   double _potential_b_white_noise_0_p_{0.};
   double _potential_b_p_n{0.};
@@ -4534,7 +4584,9 @@ MOD_resistor::MOD_resistor(MOD_resistor const&p) : BASE_SUBCKT(p)
 {
   for (int ii = 0; ii < max_nodes(); ++ii) {
     n_(ii) = p.n_(ii);
-    }
+  }
+  n_(I_b_white_noise_0_p_) = &_c_b_white_noise_0_p_;
+  n_(I_b_p_n) = &_c_b_p_n;
 }
 /*--------------------------------------------------------------------------*/
 int MOD_resistor::set_param_by_name(std::string Name, std::string Value)
@@ -4585,6 +4637,7 @@ void MOD_resistor::precalc_first()
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand_first()
 {
+  trace1("expand_first", long_label());
   BASE_SUBCKT::expand_first();
   for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
     n_(i).clear();
@@ -4596,7 +4649,7 @@ void MOD_resistor::expand_first()
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
 {
-  trace1("expand", long_label());
+  trace2("expand", long_label(), _sim->is_first_expand());
   BASE_SUBCKT::expand();
   assert(common());
   auto c = static_cast</*const*/ COMMON_resistor*>(mutable_common());
@@ -4606,7 +4659,9 @@ void MOD_resistor::expand()
   if (is_first_expand) {
     new_subckt();
   }else{
+    subckt()->erase_all();
   }
+  bool redo_sckt = true;
 
   node_t gnd;
   gnd.set_to_ground(nullptr);
@@ -4621,11 +4676,9 @@ void MOD_resistor::expand()
 //port p 1
 //port n 2
     // port p 1
-    find_subset(&n_(n_p));
-    n_(n_p).allocate(3); // no-op unless floating
+    n_(n_p).set_type(OPT::default_logic);
     // port n 2
-    find_subset(&n_(n_n));
-    n_(n_n).allocate(3); // no-op unless floating
+    n_(n_n).set_type(OPT::default_logic);
     // ground
     n_(n_white_noise_0_p).set_to_ground(nullptr);
     precalc_first();
@@ -4633,7 +4686,7 @@ void MOD_resistor::expand()
   // clone branches
   // filter (white_noise_0_p)
     {
-    if (!_b_white_noise_0_p_) {
+    if (!_b_white_noise_0_p_ || redo_sckt) {
       const CARD* p = device_dispatcher["va_white_noise"]; // va_white_noise
       if(!p){
         throw Exception("Cannot find va_white_noise. Load module?");
@@ -4648,7 +4701,7 @@ void MOD_resistor::expand()
     }else{
     }
       {
-        node_t nodes[] = {n_(n_p), n_(n_n)}; // nodes
+        node_t nodes[] = {node_t(n_p), node_t(n_n)}; // nodes
         _b_white_noise_0_p_->set_parameters("_b_white_noise_0_p_", this, _b_white_noise_0_p_->mutable_common(), 0., /*states:*/2, _st_b_white_noise_0_p_.ptr(), 2, nodes);
         if(auto e = dynamic_cast<ELEMENT*>(_b_white_noise_0_p_)){
           e->_loss0 = 0.;
@@ -4659,7 +4712,7 @@ void MOD_resistor::expand()
     }
   // branch (p, n)
     {
-    if (!_b_p_n) {
+    if (!_b_p_n || redo_sckt) {
       const CARD* p = device_dispatcher["va_flow"]; // va_flow
       if(!p){
         throw Exception("Cannot find va_flow. Load module?");
@@ -4674,7 +4727,7 @@ void MOD_resistor::expand()
     }else{
     }
       {
-        node_t nodes[] = {n_(n_p), n_(n_n)}; // nodes
+        node_t nodes[] = {node_t(n_p), node_t(n_n)}; // nodes
         _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/2, _st_b_p_n.ptr(), 2, nodes);
       }
     }
@@ -4685,10 +4738,16 @@ void MOD_resistor::expand()
       //precalc();
   }
   //precalc();
-  subckt()->expand();
-  //subckt()->precalc();
+  subckt()->precalc_first();
+  subckt()->expand_first();
+  map_sckt_nodes(subckt(), &n_(0));
+  subckt()->expand_();
+  n_(n_p).set_used();
+  n_(n_p).allocate(3); // no-op unless floating
+  n_(n_n).set_used();
+  n_(n_n).allocate(3); // no-op unless floating
   assert(!is_constant());
-}
+} // expand
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::precalc_last()
 {
@@ -5789,6 +5848,7 @@ inline node_t& ground()
 #include <m_union.h>
 #include <e_node.h>
 #include <bm.h> // BUG
+#include <e_cardlist.h>
 /*--------------------------------------------------------------------------*/
 extern NODE ground_node;
 /*--------------------------------------------------------------------------*/
@@ -5853,7 +5913,7 @@ inline void e_val(double* p, const double& x, const CARD_LIST*)
 }
 /*--------------------------------------------------------------------------*/
 class CURRENT_CTRL : public NODE {
-  node_t _nn;
+  mutable node_t _nn;
 public:
   explicit CURRENT_CTRL(std::string const& n) : NODE(), _nn(this) {
     set_label(n);
@@ -5862,7 +5922,8 @@ public:
     unreachable();
     return nullptr;
   }
-  node_t& nn() {return _nn;}
+  node_t const& nn() {return _nn;}
+  node_t& n_(int)const override {return _nn;}
 };
 /*--------------------------------------------------------------------------*/
 void set_pot_source(CARD* e)
@@ -5875,6 +5936,25 @@ void unset_pot_source(CARD* e)
 {
   std::string x;
   e->set_param_by_index(123457, x, 0);
+}
+/*--------------------------------------------------------------------------*/
+void map_sckt_nodes(CARD_LIST* l, node_t* nodes)
+{
+  assert(l);
+  for (CARD_LIST::iterator ci = l->begin(); ci != l->end(); ++ci) {
+    assert ((**ci).is_device());
+    for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) {
+      auto& cni = (**ci).n_(ii);
+      if(cni.e_() == INVALID_NODE){
+      // }else if(nodes[cni.e_()].is_grounded()){ untested();
+      }else if(dynamic_cast<CURRENT_CTRL const*>(nodes[cni.e_()].n_())){
+	trace2("msn0a", (**ci).long_label(), ii);
+	cni = nodes[cni.e_()].n_(); // HACK, later.
+      }else{
+        cni.map_subckt_node(nodes, nullptr);
+      }
+    }
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -6094,6 +6174,16 @@ private: // hrefs
 class MOD_capacitor : public BASE_SUBCKT {
   typedef MOD_capacitor MOD;
   typedef COMMON_capacitor COMMON;
+private: // node list
+  enum {
+    n_p /* used: 1 */,
+    n_n /* used: 1 */,
+    n_ddt_1_p /* used: 0 */,
+
+    I_b_ddt_1_p_,
+    I_b_p_n,
+  _n_total = 5
+  };
 private:
   bool _accept{false};
 public:
@@ -6103,25 +6193,31 @@ public:
     d_potential_b_p_n,
      num_branches__  };
 private: // data
-  mutable node_t _nodes[3];
+  mutable node_t _nodes[_n_total];
 public: // netlist
   ELEMENT* _b_ddt_1_p_{nullptr}; // filter
   static struct CURRENT_CTRL__b_ddt_1_p_:public CURRENT_CTRL {
-    explicit CURRENT_CTRL__b_ddt_1_p_() : CURRENT_CTRL("_b_ddt_1_p_"){}
+    explicit CURRENT_CTRL__b_ddt_1_p_() : CURRENT_CTRL("_b_ddt_1_p_"){
+      n_(0) = this;
+    }
     ELEMENT const* e(COMPONENT const* c)const {
       auto m = prechecked_cast<MOD_capacitor const*>(c);
       assert(m);
       return m->_b_ddt_1_p_;
     }
+    int user_number()const override {return I_b_ddt_1_p_;}
   } _c_b_ddt_1_p_;
   ELEMENT* _b_p_n{nullptr}; // branch
   static struct CURRENT_CTRL__b_p_n:public CURRENT_CTRL {
-    explicit CURRENT_CTRL__b_p_n() : CURRENT_CTRL("_b_p_n"){}
+    explicit CURRENT_CTRL__b_p_n() : CURRENT_CTRL("_b_p_n"){
+      n_(0) = this;
+    }
     ELEMENT const* e(COMPONENT const* c)const {
       auto m = prechecked_cast<MOD_capacitor const*>(c);
       assert(m);
       return m->_b_p_n;
     }
+    int user_number()const override {return I_b_p_n;}
   } _c_b_p_n;
 private: // func decl
 //other: $param_given
@@ -6213,7 +6309,7 @@ private: // overrides
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
   node_t& n_(int i)const override {
-    assert(_nodes); assert(i>=0); assert(i<3); return _nodes[i];
+    assert(_nodes); assert(i>=0); assert(!i || i<_n_total); return _nodes[i];
   }
 private: // impl
 /* ========== */
@@ -6256,12 +6352,6 @@ public: // states, _b_p_n;
     enum {     VALUE, SELF/* : */
     };
   } _dep_b_p_n;
-private: // node list
-  enum {
-    n_p /* used: 1 */,
-    n_n /* used: 1 */,
-    n_ddt_1_p /* used: 0 */
-  };
 private: // probe values
   double _potential_b_ddt_1_p_{0.};
   double _potential_b_p_n{0.};
@@ -6991,7 +7081,9 @@ MOD_capacitor::MOD_capacitor(MOD_capacitor const&p) : BASE_SUBCKT(p)
 {
   for (int ii = 0; ii < max_nodes(); ++ii) {
     n_(ii) = p.n_(ii);
-    }
+  }
+  n_(I_b_ddt_1_p_) = &_c_b_ddt_1_p_;
+  n_(I_b_p_n) = &_c_b_p_n;
 }
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::precalc_first()
@@ -7011,6 +7103,7 @@ void MOD_capacitor::precalc_first()
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand_first()
 {
+  trace1("expand_first", long_label());
   BASE_SUBCKT::expand_first();
   for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
     n_(i).clear();
@@ -7022,7 +7115,7 @@ void MOD_capacitor::expand_first()
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
 {
-  trace1("expand", long_label());
+  trace2("expand", long_label(), _sim->is_first_expand());
   BASE_SUBCKT::expand();
   assert(common());
   auto c = static_cast</*const*/ COMMON_capacitor*>(mutable_common());
@@ -7032,7 +7125,9 @@ void MOD_capacitor::expand()
   if (is_first_expand) {
     new_subckt();
   }else{
+    subckt()->erase_all();
   }
+  bool redo_sckt = true;
 
   node_t gnd;
   gnd.set_to_ground(nullptr);
@@ -7047,11 +7142,9 @@ void MOD_capacitor::expand()
 //port p 1
 //port n 2
     // port p 1
-    find_subset(&n_(n_p));
-    n_(n_p).allocate(3); // no-op unless floating
+    n_(n_p).set_type(OPT::default_logic);
     // port n 2
-    find_subset(&n_(n_n));
-    n_(n_n).allocate(3); // no-op unless floating
+    n_(n_n).set_type(OPT::default_logic);
     // ground
     n_(n_ddt_1_p).set_to_ground(nullptr);
     precalc_first();
@@ -7059,7 +7152,7 @@ void MOD_capacitor::expand()
   // clone branches
   // filter (ddt_1_p)
     {
-    if (!_b_ddt_1_p_) {
+    if (!_b_ddt_1_p_ || redo_sckt) {
       const CARD* p = device_dispatcher["va_ddt"]; // va_ddt
       if(!p){
         throw Exception("Cannot find va_ddt. Load module?");
@@ -7074,7 +7167,7 @@ void MOD_capacitor::expand()
     }else{
     }
       {
-        node_t nodes[] = {n_(n_p), n_(n_n), n_(n_p), n_(n_n)}; // nodes
+        node_t nodes[] = {node_t(n_p), node_t(n_n), node_t(n_p), node_t(n_n)}; // nodes
         _b_ddt_1_p_->set_parameters("_b_ddt_1_p_", this, _b_ddt_1_p_->mutable_common(), 0., /*states:*/3, _st_b_ddt_1_p_.ptr(), 4, nodes);
         if(auto e = dynamic_cast<ELEMENT*>(_b_ddt_1_p_)){
           e->_loss0 = 0.;
@@ -7085,7 +7178,7 @@ void MOD_capacitor::expand()
     }
   // branch (p, n)
     {
-    if (!_b_p_n) {
+    if (!_b_p_n || redo_sckt) {
       const CARD* p = device_dispatcher["va_flow"]; // va_flow
       if(!p){
         throw Exception("Cannot find va_flow. Load module?");
@@ -7100,7 +7193,7 @@ void MOD_capacitor::expand()
     }else{
     }
       {
-        node_t nodes[] = {n_(n_p), n_(n_n)}; // nodes
+        node_t nodes[] = {node_t(n_p), node_t(n_n)}; // nodes
         _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/2, _st_b_p_n.ptr(), 2, nodes);
       }
     }
@@ -7111,10 +7204,16 @@ void MOD_capacitor::expand()
       //precalc();
   }
   //precalc();
-  subckt()->expand();
-  //subckt()->precalc();
+  subckt()->precalc_first();
+  subckt()->expand_first();
+  map_sckt_nodes(subckt(), &n_(0));
+  subckt()->expand_();
+  n_(n_p).set_used();
+  n_(n_p).allocate(3); // no-op unless floating
+  n_(n_n).set_used();
+  n_(n_n).allocate(3); // no-op unless floating
   assert(!is_constant());
-}
+} // expand
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::precalc_last()
 {
@@ -7263,6 +7362,17 @@ private: // hrefs
 class MOD_capacitor : public BASE_SUBCKT {
   typedef MOD_capacitor MOD;
   typedef COMMON_capacitor COMMON;
+private: // node list
+  enum {
+    n_p /* used: 1 */,
+    n_n /* used: 1 */
+    /* ---- */,
+    n_ddt_2_p /* used: 1 */,
+
+    I_b_ddt_2_p_,
+    I_b_p_n,
+  _n_total = 5
+  };
 private:
   bool _accept{false};
 public:
@@ -7272,25 +7382,31 @@ public:
     d_potential_b_p_n,
      num_branches__  };
 private: // data
-  mutable node_t _nodes[3];
+  mutable node_t _nodes[_n_total];
 public: // netlist
   ELEMENT* _b_ddt_2_p_{nullptr}; // filter
   static struct CURRENT_CTRL__b_ddt_2_p_:public CURRENT_CTRL {
-    explicit CURRENT_CTRL__b_ddt_2_p_() : CURRENT_CTRL("_b_ddt_2_p_"){}
+    explicit CURRENT_CTRL__b_ddt_2_p_() : CURRENT_CTRL("_b_ddt_2_p_"){
+      n_(0) = this;
+    }
     ELEMENT const* e(COMPONENT const* c)const {
       auto m = prechecked_cast<MOD_capacitor const*>(c);
       assert(m);
       return m->_b_ddt_2_p_;
     }
+    int user_number()const override {return I_b_ddt_2_p_;}
   } _c_b_ddt_2_p_;
   ELEMENT* _b_p_n{nullptr}; // branch
   static struct CURRENT_CTRL__b_p_n:public CURRENT_CTRL {
-    explicit CURRENT_CTRL__b_p_n() : CURRENT_CTRL("_b_p_n"){}
+    explicit CURRENT_CTRL__b_p_n() : CURRENT_CTRL("_b_p_n"){
+      n_(0) = this;
+    }
     ELEMENT const* e(COMPONENT const* c)const {
       auto m = prechecked_cast<MOD_capacitor const*>(c);
       assert(m);
       return m->_b_p_n;
     }
+    int user_number()const override {return I_b_p_n;}
   } _c_b_p_n;
 private: // func decl
 //other: $param_given
@@ -7389,7 +7505,7 @@ private: // overrides
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
   node_t& n_(int i)const override {
-    assert(_nodes); assert(i>=0); assert(i<3); return _nodes[i];
+    assert(_nodes); assert(i>=0); assert(!i || i<_n_total); return _nodes[i];
   }
 private: // impl
 /* ========== */
@@ -7433,13 +7549,6 @@ public: // states, _b_p_n;
     enum {     VALUE, SELF, dep_potential_b_ddt_2_p_/* : */
     };
   } _dep_b_p_n;
-private: // node list
-  enum {
-    n_p /* used: 1 */,
-    n_n /* used: 1 */
-    /* ---- */,
-    n_ddt_2_p /* used: 1 */
-  };
 private: // probe values
   double _potential_b_ddt_2_p_{0.};
   double _potential_b_p_n{0.};
@@ -8262,7 +8371,9 @@ MOD_capacitor::MOD_capacitor(MOD_capacitor const&p) : BASE_SUBCKT(p)
 {
   for (int ii = 0; ii < max_nodes(); ++ii) {
     n_(ii) = p.n_(ii);
-    }
+  }
+  n_(I_b_ddt_2_p_) = &_c_b_ddt_2_p_;
+  n_(I_b_p_n) = &_c_b_p_n;
 }
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::precalc_first()
@@ -8282,6 +8393,7 @@ void MOD_capacitor::precalc_first()
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand_first()
 {
+  trace1("expand_first", long_label());
   BASE_SUBCKT::expand_first();
   for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
     n_(i).clear();
@@ -8293,7 +8405,7 @@ void MOD_capacitor::expand_first()
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
 {
-  trace1("expand", long_label());
+  trace2("expand", long_label(), _sim->is_first_expand());
   BASE_SUBCKT::expand();
   assert(common());
   auto c = static_cast</*const*/ COMMON_capacitor*>(mutable_common());
@@ -8303,7 +8415,9 @@ void MOD_capacitor::expand()
   if (is_first_expand) {
     new_subckt();
   }else{
+    subckt()->erase_all();
   }
+  bool redo_sckt = true;
 
   node_t gnd;
   gnd.set_to_ground(nullptr);
@@ -8318,24 +8432,22 @@ void MOD_capacitor::expand()
 //port p 1
 //port n 2
     // port p 1
-    find_subset(&n_(n_p));
-    n_(n_p).allocate(3); // no-op unless floating
+    n_(n_p).set_type(OPT::default_logic);
     // port n 2
-    find_subset(&n_(n_n));
-    n_(n_n).allocate(3); // no-op unless floating
+    n_(n_n).set_type(OPT::default_logic);
     // internal ddt_2_p : 3
     // node ddt_2_p 3
     if (_short_b_ddt_2()) {
       n_(n_ddt_2_p) = gnd;
     }else{
-      n_(n_ddt_2_p).new_model_node("." + long_label() + ".ddt_2_p", this);
+      n_(n_ddt_2_p).set_type(OPT::default_logic);
     }
     precalc_first();
 
   // clone branches
   // filter (ddt_2_p)
     {
-    if (!_b_ddt_2_p_) {
+    if (!_b_ddt_2_p_ || redo_sckt) {
       const CARD* p = device_dispatcher["va_ddt"]; // va_ddt
       if(!p){
         throw Exception("Cannot find va_ddt. Load module?");
@@ -8350,13 +8462,13 @@ void MOD_capacitor::expand()
     }else{
     }
       {
-        node_t nodes[] = {n_(n_ddt_2_p), gnd, n_(n_p), n_(n_n)}; // nodes
+        node_t nodes[] = {node_t(n_ddt_2_p), gnd, node_t(n_p), node_t(n_n)}; // nodes
         _b_ddt_2_p_->set_parameters("_b_ddt_2_p_", this, _b_ddt_2_p_->mutable_common(), 0., /*states:*/3, _st_b_ddt_2_p_.ptr(), 4, nodes);
       }
     }
   // branch (p, n)
     {
-    if (!_b_p_n) {
+    if (!_b_p_n || redo_sckt) {
       const CARD* p = device_dispatcher["va_sw"]; // va_sw
       if(!p){
         throw Exception("Cannot find va_sw. Load module?");
@@ -8371,7 +8483,7 @@ void MOD_capacitor::expand()
     }else{
     }
       {
-        node_t nodes[] = {n_(n_p), n_(n_n), n_(n_ddt_2_p), gnd}; // nodes
+        node_t nodes[] = {node_t(n_p), node_t(n_n), node_t(n_ddt_2_p), gnd}; // nodes
         _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/3, _st_b_p_n.ptr(), 4, nodes);
       }
     }
@@ -8382,10 +8494,18 @@ void MOD_capacitor::expand()
       //precalc();
   }
   //precalc();
-  subckt()->expand();
-  //subckt()->precalc();
+  subckt()->precalc_first();
+  subckt()->expand_first();
+  map_sckt_nodes(subckt(), &n_(0));
+  subckt()->expand_();
+  n_(n_p).set_used();
+  n_(n_p).allocate(3); // no-op unless floating
+  n_(n_n).set_used();
+  n_(n_n).allocate(3); // no-op unless floating
+  n_(n_ddt_2_p).set_used();
+  n_(n_ddt_2_p).allocate(3); // no-op unless floating
   assert(!is_constant());
-}
+} // expand
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::precalc_last()
 {

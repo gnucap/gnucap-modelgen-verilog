@@ -56,6 +56,17 @@ static String_Arg const& flow_abstol(Branch const& b)
   }
 }
 /*--------------------------------------------------------------------------*/
+void make_node_conn(std::ostream& o, const Node& n, bool used=true)
+{
+  if(n.is_ground()) {
+    o << "gnd";
+  }else if(!used){ untested();
+    o << "gnd";
+  }else{
+    o << "node_t(" << n.code_name() << ")";
+  }
+}
+/*--------------------------------------------------------------------------*/
 void make_node_ref(std::ostream& o, const Node& n, bool used=true)
 {
   if(n.is_ground()) {
@@ -70,9 +81,9 @@ void make_node_ref(std::ostream& o, const Node& n, bool used=true)
 static void make_cc_branch_output(std::ostream& o, Branch const* br)
 {
   Branch const* out = br->output();
-  make_node_ref(o, *out->p(), br->is_used());
+  make_node_conn(o, *out->p(), br->is_used());
   o << ", ";
-  make_node_ref(o, *out->n(), br->is_used());
+  make_node_conn(o, *out->n(), br->is_used());
 }
 /*--------------------------------------------------------------------------*/
 // TODO: mg_out_analog.cc
@@ -203,20 +214,20 @@ static void map_subdev_nodes(std::ostream& o, const Element_2& e)
   std::string comma;
   if(!e.ports().size()){
     for (int i = 0 ; i < e.net_nodes(); ++i) {
-      o << comma << "n_(n_" << e.port_value(i) << ")";
+      o << comma << "node_t(n_" << e.port_value(i) << ")";
       comma = ",";
     }
   }else if(e.ports().has_names()){
     // yikes, name vs. value
     Port_3_List_2::const_iterator p = e.ports().begin();
     for (;p != e.ports().end(); ++p) {
-      o << comma << "n_(n_" << (**p).value() << ")";
+      o << comma << "node_t(n_" << (**p).value() << ")";
       comma = ",";
     }
   }else{
     Port_3_List_2::const_iterator p = e.ports().begin();
     for (;p != e.ports().end(); ++p) {
-      o << comma << "n_(n_" << (**p).name() << ")";
+      o << comma << "node_t(n_" << (**p).name() << ")";
       comma = ",";
     }
   }
@@ -249,7 +260,7 @@ static void make_renew_sckt(std::ostream& o, Module const& m)
   for (auto const& e : m.circuit()->element_list()) {
     assert(e);
     o__ "assert(pp->" << e->code_name() << ");\n";
-    o__ "if(!" << e->code_name() << ") {\n";
+    o__ "if(redo_sckt||!" << e->code_name() << ") {\n";
     o____ "auto subc = prechecked_cast<COMPONENT*>(pp->" << e->code_name() << "->clone());\n";
     o____ "assert(subc);\n";
     o____ "subckt()->push_back(subc);\n"; // TODO: stash, push back deflated version.
@@ -257,7 +268,12 @@ static void make_renew_sckt(std::ostream& o, Module const& m)
     o____ e->code_name() << " = subc;\n";
     o____ "trace2(\"renew\", " << e->code_name() << "->long_label(), c->_netlist_params.size());\n";
     map_subdev_nodes(o, *e);
+    o__ "}else{untested();\n";
+    // o____ "auto subc = const_cast<COMPONENT*>(" << e->code_name() << ");\n";
+    // map_subdev_nodes(o, *e);
     o__ "}\n";
+//    o__ e->code_name() << "->precalc_first();\n";
+//    o__ e->code_name() << "->expand_first();\n";
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -331,7 +347,7 @@ static void make_module_construct_stub(std::ostream& o, const Element_2& e, Modu
   o__ "}\n";
 } // construct_stub
 /*--------------------------------------------------------------------------*/
-void make_module_descructor(std::ostream& o, const Module& m)
+void make_module_destructor(std::ostream& o, const Module& m)
 {
   o << "MOD_" << m.identifier() << "::~MOD_" << m.identifier() << "()\n{\n";
   o__ "if(this == &m_" << m.identifier() << "){\n";
@@ -343,6 +359,30 @@ void make_module_descructor(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_init_current_nodes(std::ostream& o, const Module& m)
+{
+  for (auto br : m.circuit()->branches()){
+    std::string bcn = br->code_name();
+    bool needed = false;
+    if(br->is_filter()){
+      if(!br->is_used() && options().optimize_unused()){
+      }else{
+	needed = true;
+      }
+    }else if(br->is_short()){
+    }else if(!br->is_used() && options().optimize_unused()){
+    }else if(br->has_element()){
+      needed = true;
+    }else{
+    }
+    if(needed) {
+  //    o__ "_c" << bcn << ".set_user_number(2);\n";
+      o__ "n_(I" << bcn << ") = &_c" << bcn << ";\n";
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 void make_module_copy_constructor(std::ostream& o, const Module& m)
 {
   o << "MOD_" << m.identifier() << "::MOD_" << m.identifier() << "(MOD_" << m.identifier() << " const&p) : "
@@ -352,8 +392,9 @@ void make_module_copy_constructor(std::ostream& o, const Module& m)
   }
   o << "\n{\n";
   o__ "for (int ii = 0; ii < max_nodes(); ++ii) {\n";
-  o__ ind << "n_(ii) = p.n_(ii);\n";
-  o__ ind << "}\n";
+  o____ "n_(ii) = p.n_(ii);\n";
+  o__ "}\n";
+  make_init_current_nodes(o, m);
   o << "}\n";
   o <<
     "/*--------------------------------------"
@@ -953,8 +994,8 @@ static void make_module_new_local_node(std::ostream& o, const Node& p)
       o__ "";
     }
     o << "{\n";
-    o____ "n_(n_" << p.name() << ").new_model_node(\".\" + long_label() + \"." << p.name() 
-			   << "\", this);\n";
+    // TODO: put in discipline specified in module.
+    o____ "n_(n_" << p.name() << ").set_type(OPT::default_logic);\n";
     o__ "}\n";
   }
 }
@@ -972,8 +1013,7 @@ static void make_module_new_local_nodes(std::ostream& o, Module const& m)
     }else if(n <= int(m.circuit()->ports().size())){
       o__ "// port " << nn->name() << " " << nn->number() << "\n";
       // BUG: allocate floating ports even if unused.
-      o__ "find_subset(&n_(n_" << nn->name() << "));\n";
-      o__ "n_(n_" << nn->name() << ").allocate(3); // no-op unless floating\n";
+      o__ "n_(n_" << nn->name() << ").set_type(OPT::default_logic);\n";
     }else if(nn->is_used()){
       o__ "// internal " << nn->name() << " : " << nn->number() << "\n";
       make_module_new_local_node(o, *nn);
@@ -989,6 +1029,24 @@ static void make_module_new_local_nodes(std::ostream& o, Module const& m)
     if(nn->number() == 0) {
     }else if(nn->number() < n){
       o__ "n_(" << n - 1 << ") = n_(" << nn->number() - 1 << "); // (a)\n";
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+static void make_module_allocate_nodes(std::ostream& o, Module const& m)
+{
+  for (int n=1; n<=int(m.circuit()->nodes().size()); ++n) {
+    Node const* nn = m.circuit()->nodes()[n];
+    assert(nn);
+    if(nn->number() == 0) {
+    }else if(nn->number() < n){
+    }else if(n <= int(m.circuit()->ports().size())){
+      o__ "n_(n_" << nn->name() << ").set_used();\n"; // mg_port.0
+      o__ "n_(n_" << nn->name() << ").allocate(3); // no-op unless floating\n";
+    }else if(nn->is_used()){
+      o__ "n_(n_" << nn->name() << ").set_used();\n";
+      o__ "n_(n_" << nn->name() << ").allocate(3); // no-op unless floating\n";
     }else{
     }
   }
@@ -1022,7 +1080,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
 
   std::string dev_type = e.dev_type();
 
-  o__ "if (!" << cn << ") {\n";
+  o__ "if (!" << cn << " || redo_sckt) {\n";
   o____ "const CARD* p = device_dispatcher[\"" << dev_type << "\"]; // " << e.dev_type() << "\n";
   o____ "if(!p){\n";
   o______ "throw Exception(" << "\"Cannot find " << dev_type << ". Load module?\");\n";
@@ -1190,6 +1248,7 @@ static void make_module_expand_first(std::ostream& o, Module const& m)
   make_tag(o);
   String_Arg const& mid = m.identifier();
   o << "void MOD_" << mid << "::expand_first()\n{\n";
+  o__ "trace1(\"expand_first\", long_label());\n";
   o__ "BASE_SUBCKT::expand_first();\n";
   o__ "for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){\n";
   o____ "n_(i).clear();\n";
@@ -1223,7 +1282,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
   make_tag(o);
   String_Arg const& mid = m.identifier();
   o << "void MOD_" << mid << "::expand()\n{\n";
-  o__ "trace1(\"expand\", long_label());\n";
+  o__ "trace2(\"expand\", long_label(), _sim->is_first_expand());\n";
 
   o__ baseclass(m) << "::expand();\n";
   o__ "assert(common());\n";
@@ -1234,7 +1293,10 @@ static void make_module_expand(std::ostream& o, Module const& m)
   o__ "if (is_first_expand) {\n";
   o____ "new_subckt();\n";
   o__ "}else{\n";
+  //o__ "renew_subckt();\n";
+  o____ "subckt()->erase_all();\n";
   o__ "}\n";
+  o__ "bool redo_sckt = true;\n"; // for now.
   o << "\n";
   o__ "node_t gnd;\n";
   o__ "gnd.set_to_ground(nullptr);\n";
@@ -1313,8 +1375,11 @@ static void make_module_expand(std::ostream& o, Module const& m)
 
   // make_assign_expand(o, m);
 
-  o__ "subckt()->expand();\n";
-  o__ "//subckt()->precalc();\n";
+  o__ "subckt()->precalc_first();\n";
+  o__ "subckt()->expand_first();\n";
+  o__ "map_sckt_nodes(subckt(), &n_(0));\n";
+  o__ "subckt()->expand_();\n";
+  make_module_allocate_nodes(o, m);
 
   o__ "assert(!is_constant());\n";
   if (m.sync()) {
@@ -1325,7 +1390,7 @@ static void make_module_expand(std::ostream& o, Module const& m)
     o__ "q_expand_last();\n";
   }else{
   }
-  o << "}\n"
+  o << "} // expand\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
@@ -1468,7 +1533,7 @@ void make_cc_module(std::ostream& o, const Module& m)
 
 //  make_module_evals(o, m);
 //  make_module_default_constructor(o, m);
-  make_module_descructor(o, m);
+  make_module_destructor(o, m);
   make_module_copy_constructor(o, m);
   if(m.has_hsparam()) {
     make_module_set_param_by_name(o, m);

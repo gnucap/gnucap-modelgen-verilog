@@ -15,7 +15,7 @@ dctran density=87.5%, ac density=87.5%
 name   ...
 have 4 nodes. model: 1 sckt: 0
 
-
+0
 
 dut 2 2 0
 0 4
