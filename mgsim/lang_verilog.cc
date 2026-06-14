@@ -27,6 +27,7 @@
 #include <e_subckt.h>
 #include <e_model.h>
 #include <u_lang.h>
+#include <e_node_type.h>
 /*--------------------------------------------------------------------------*/
 static const std::string IS_VALID = "__is_valid";
 static const std::string HOW_VALID = "__how_valid";
@@ -35,6 +36,7 @@ static int print_nest;
 static std::string toplevel_stub = "__stub";
 static std::string subdevice_stub = "__stub";
 static bool backslash_continue = true;
+static bool extended;
 /*--------------------------------------------------------------------------*/
 // continue reading if line ends with \\\n
 // gcc does it that way, too
@@ -106,6 +108,7 @@ public: // override virtual, called by commands
   CARD*		obsolete_parse_modelcard(CS&, MODEL_CARD*);
   BASE_SUBCKT*  parse_module(CS&, BASE_SUBCKT*)override;
   COMPONENT*	parse_instance(CS&, COMPONENT*)override;
+  CARD*		parse_node(CS&, NODE*)const override;
   std::string	find_type_in_string(CS&)override;
   void move_attributes(tag_t from, tag_t to);
 private: // local
@@ -123,6 +126,7 @@ private: // override virtual, called by print_item
   void print_paramset(OMSTREAM&, const MODEL_CARD*)override;
   void print_module(OMSTREAM&, const BASE_SUBCKT*)override;
   void print_instance(OMSTREAM&, const COMPONENT*)override;
+  void print_node(OMSTREAM&, const NODE*)const override;
   void print_comment(OMSTREAM&, const DEV_COMMENT*)override;
   void print_command(OMSTREAM& o, const DEV_DOT*)override;
 private: // local
@@ -371,9 +375,16 @@ static std::string parse_identifier(CS& cmd, std::string const& term)
     }
   }
 
-  if(!esc) {
+  if(esc) {
+  }else if(term.size()){
     id = cmd.ctos(term, "", "");
+  }else if(cmd.is_alpha() || cmd.match1('_')){
+    id += cmd.ctoc();
+    while(cmd.is_alnum() || cmd.match1("_$")) {
+      id += cmd.ctoc();
+    }
   }else{
+    throw(Exception_CS("syntax error", cmd));
   }
 
   trace1("identifier", id);
@@ -489,16 +500,29 @@ DEV_COMMENT* LANG_VERILOG::parse_comment(CS& cmd, DEV_COMMENT* x)
 DEV_DOT* LANG_VERILOG::parse_command(CS& cmd, DEV_DOT* x)
 {
   assert(x);
-  x->set(cmd.fullstring());
   CARD_LIST* scope = (x->owner()) ? x->owner()->subckt() : &CARD_LIST::card_list;
 //  cmd.reset();
 //  parse_attributes(cmd, tag_t(x));
   if(auto cc=dynamic_cast<CMD*>(x)){
-    std::string s;
-    cmd >> s;
+    if(extended){
+    }else{
+      x->set(cmd.fullstring());
+      std::string s;
+      cmd >> s;
+    }
+    trace1("PCOMM", cmd.tail());
     cc->cmdproc(cmd);
+    if (cmd >> ',') { untested();
+      // there will be another just like this one
+      extended = true;
+    }else{
+      cmd >> ';';
+      cmd.check(bWARNING, "what's this?");
+      extended = false;
+    }
     return x;
   }else{
+    x->set(cmd.fullstring());
     CMD::cmdproc(cmd, scope);
     x->purge();
     delete x;
@@ -1020,6 +1044,55 @@ COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
   trace2("LANG_VERILOG::parse_paramset_ done", x->long_label(), ((CARD*)x)->dev_type());
   return x;
 }
+/*--------------------------------------------------------------------------*/
+#if 1
+class CMD_NODE_DECL : public CMD {
+  mutable node_t _n;
+public:
+  explicit CMD_NODE_DECL() : CMD() {}
+  explicit CMD_NODE_DECL(NODE* t) : CMD() {_n = t;}
+  explicit CMD_NODE_DECL(CMD_NODE_DECL const& p) : CMD(p) {
+    _n = p._n.n_();
+  }
+  CMD* clone()const override {return new CMD_NODE_DECL(*this);}
+  void do_it(CS& cmd, CARD_LIST* Scope)override {
+    if(Scope == &CARD_LIST::card_list){
+    }else{
+      assert(owner());
+    }
+    trace2("decl", extended, cmd.tail());
+    std::string type, name;
+    if(!extended){
+      type = parse_identifier(cmd, "");
+    }else{
+    }
+
+    name = parse_identifier(cmd, "");
+    trace3("NODE_DECL", type, name, cmd.tail());
+    _n.new_node(name, this);
+    set_label(name);
+
+    // int s = param_count();
+    // try{ untested();
+    //   set_param_by_index(s, name, 0);
+    // }catch(Exception const& e) { untested();
+    //   cmd.warn(bDANGER, e.message());
+    // }
+    // node_t& nn = mn->n_(0);
+    trace2("NODE_DECL done", type, cmd.tail());
+  }
+//  void set_param_by_index(int num, std::string& ext_name, int)override;
+  // int param_count()const override {return int(_n.size());}
+  // std::string dev_type()const override {return _type;}
+  // void expand_first()override;
+public: // connection
+  node_t& n_(int i)const override { assert(!i); return _n; }
+  std::string dev_type()const override { return _n.n_()->short_label(); }
+private:
+//  int type_number()const override {return _disc_idx;}
+}node_decl;
+#endif
+/*--------------------------------------------------------------------------*/
 /* "module" <name> "(" <ports> ")" ";"
  *    <declarations>
  *    <netlist>
@@ -1044,15 +1117,23 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
   // body
   for (;;) {
 
-    getline(cmd, "verilog-module>");
-    while (!parse_attributes(cmd, tag_t(&cmd)).more()){
+    if(!extended) {
       getline(cmd, "verilog-module>");
+      while (!parse_attributes(cmd, tag_t(&cmd)).more()){
+	getline(cmd, "verilog-module>");
+      }
+    }else{
     }
     if(has_attributes(tag_t(&cmd))){
     }else{
     }
 
-    if (cmd >> "endmodule ") {
+    size_t here = cmd.cursor();
+    if (extended){
+      trace1("ext", cmd.tail());
+      new__instance(cmd, x, x->subckt());
+      trace1("ext2", cmd.tail());
+    }else if (cmd >> "endmodule ") {
       break;
     }else if (!have_instance && (cmd >> "parameter |localparam ")) {
       auto p = module_param.clone();
@@ -1078,6 +1159,20 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
       cmd.reset();
       cmd.check(bWARNING, "nonstandard nesting in " + x->long_label() + ".");
       new__instance(cmd, x, x->subckt());
+    }else if(auto t = node_dispatcher[cmd]){
+      // DUP in parse_node
+      CMD_NODE_DECL* nd = new CMD_NODE_DECL(t);
+      assert(nd);
+      nd->set_owner(x);
+      cmd.reset(here);
+      try{
+	nd->do_it(cmd, x->subckt());
+	trace1("NDD", cmd.tail());
+	x->subckt()->push_back(nd);
+      }catch(Exception const& e) { untested();
+	delete nd;
+	throw e;
+      }
     }else{
       if(has_attributes(tag_t(&cmd))){
       }else{
@@ -1097,7 +1192,16 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
 
       Scope->push_back(new_instance);
     }
+    if (cmd >> ',') {
+      // there will be another just like this one
+      extended = true;
+    }else{
+      cmd >> ';';
+      cmd.check(bWARNING, "what's this?");
+      extended = false;
+    }
   }
+  trace1("module", cmd.tail());
   return x;
 }
 /*--------------------------------------------------------------------------*/
@@ -1108,9 +1212,13 @@ COMPONENT* LANG_VERILOG::parse_instance(CS& cmd, COMPONENT* x)
   }else{
   }
   assert (!(cmd >> "(*"));
-  move_attributes(tag_t(&cmd), x->id_tag());
-  parse_type(cmd, x);
-  parse_args_instance(cmd, x);
+  if (extended) {
+    // hook to previous
+  }else{
+    move_attributes(tag_t(&cmd), x->id_tag());
+    parse_type(cmd, x);
+    parse_args_instance(cmd, x);
+  }
   parse_label(cmd, x);
   parse_ports(cmd, x, false/*allow dups*/);
   cmd >> ';';
@@ -1119,13 +1227,61 @@ COMPONENT* LANG_VERILOG::parse_instance(CS& cmd, COMPONENT* x)
   return x;
 }
 /*--------------------------------------------------------------------------*/
+CARD* LANG_VERILOG::parse_node(CS& cmd, NODE* N) const
+{
+
+  CARD_LIST* scope;
+  if(N->owner()) { untested();
+    scope = N->scope();
+  }else{
+    scope = &CARD_LIST::card_list;
+  }
+
+  CMD_NODE_DECL* nd = new CMD_NODE_DECL(N);
+  assert(nd);
+  nd->set_owner(N->owner());
+//  cmd.reset(here);
+  try{
+    nd->do_it(cmd, scope);
+    trace1("NDD", cmd.tail());
+  }catch(Exception const& e) { untested();
+    delete nd;
+    throw e;
+  }
+
+  return nd;
+
+  std::string type, name;
+  cmd >> type;
+  cmd >> name;
+  N->set_label(name);
+  trace2("parse_node", type, name);
+
+  assert(scope->nodes());
+  NODE_MAP& Map = *scope->nodes();
+  NODE* u = Map.new_node(name); // TODO: get from node_t::new-node
+
+  if(!u->n_(0)) { untested();
+    u->n_(0).set_type(N);
+  }else if(u->n_(0).n_()->type_number() == N->type_number()){
+  }else{ untested();
+    incomplete();
+//    u->set_disc(type_number());
+    throw Exception("replaced discipline");
+  }
+  return N;
+}
+/*--------------------------------------------------------------------------*/
 std::string LANG_VERILOG::find_type_in_string(CS& cmd)
 {
   size_t here = cmd.cursor();
   assert (!(cmd >> "(*"));
 
   std::string type;
-  if ((cmd >> "//")) {
+  if (extended) {
+    // another just like this one
+    return "";
+  }else if ((cmd >> "//")) {
     //assert(here == 0);
     type = "dev_comment";
   }else{
@@ -1145,8 +1301,11 @@ void LANG_VERILOG::new_instance_(CS& cmd, BASE_SUBCKT* Owner, CARD_LIST* Scope)
     const CARD* proto = find_proto(type, Owner);
     if (dynamic_cast<DEV_DOT const*>(proto)) {
     }else if (dynamic_cast<DEV_COMMENT const*>(proto)) {
+    }else if (dynamic_cast<NODE const*>(proto)) { untested();
+//      proto = node_decl.clone();
     }else if(toplevel_stub == ""){ untested();
     }else{
+      trace3("toplevel stub", cmd.tail(), proto, type);
       proto = device_dispatcher[toplevel_stub];
       assert(proto);
     }
@@ -1175,6 +1334,7 @@ void LANG_VERILOG::parse_top_item(CS& cmd, CARD_LIST* Scope)
   while(!parse_attributes(cmd, tag_t(&cmd)).more()) {
     getline(cmd, "gnucap-verilog>");
   }
+  trace1("PTI", cmd.tail());
   new_instance_(cmd, NULL, Scope);
 }
 /*--------------------------------------------------------------------------*/
@@ -1416,7 +1576,7 @@ void LANG_VERILOG::print_paramset_(OMSTREAM& o, const MODEL_CARD* x)
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
 {
-  if(((CARD const*)x)->dev_type()!=""){ untested();
+  if(((CARD const*)x)->dev_type()!=""){
     unreachable();
     // tmp hack. module type is the label, so dev_type is blank.
    // return print_paramset(o, x);
@@ -1426,7 +1586,13 @@ void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
   assert(x->subckt());
 
   print_attributes(o, x->id_tag());
-  o << "module " << x->short_label();
+  std::string type = ((CARD const*)x)->dev_type();
+  if(type.size()) {
+    o << type;
+  }else{
+    o << "module";
+  }
+  o << " " << x->short_label();
   print_ports_long(o, x);
   o << ";\n";
 //  auto p = x->subckt()->params();
@@ -1441,18 +1607,20 @@ void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
 void LANG_VERILOG::print_instance(OMSTREAM& o, const COMPONENT* x)
 {
   print_attributes(o, x->id_tag());
-  if(x->is_device()){
-    print_type(o, x);
+  print_type(o, x);
+  if(x->dev_type() != "connect") {
     print_args(o, x);
     print_label(o, x);
     print_ports_long(o, x);
-    o << ";\n";
-  }else{ untested();
-    incomplete();
-   // _mode = mPARAMSET;
-   // print_paramset(o, x);
-   // _mode = mDEFAULT;
+  }else{
+    o << " ";
+    print_label(o, x);
+    if(x->param_is_printable(0)){
+      o << " " << x->param_value(0);
+    }else{
+    }
   }
+  o << ";\n";
 }
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
@@ -1465,6 +1633,18 @@ void LANG_VERILOG::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
   o << x->comment() << '\n';
 }
 /*--------------------------------------------------------------------------*/
+void print_discipline(OMSTREAM& o, NODE const* x)
+{
+  o << "discipline " << x->short_label() << ";\n";
+  for(int ii=0; ii<x->param_count(); ++ii) {
+    if (x->param_is_printable(ii)) {
+      o << "  " << x->param_name(ii) << ' ' << x->param_value(ii) << ";\n";
+    }else{
+    }
+  }
+  o << "enddiscipline";
+}
+/*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_command(OMSTREAM& o, const DEV_DOT* x)
 {
   assert(x);
@@ -1473,8 +1653,7 @@ void LANG_VERILOG::print_command(OMSTREAM& o, const DEV_DOT* x)
   if(x->s().size()) {
     o << x->s() << '\n';
   }else if(tt == "discipline") {
-    o << x->short_label() << "\n";
-    // print_discipline(o, x->n_(0).n_());
+    print_discipline(o, x->n_(0).n_());
     o << ";\n";
   }else if(int pc = x->param_count()) {
     for(int i = 0; i < pc; ++i){
@@ -1487,6 +1666,30 @@ void LANG_VERILOG::print_command(OMSTREAM& o, const DEV_DOT* x)
   }else{
     // DOT fallback.
     o << x->s();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void LANG_VERILOG::print_node(OMSTREAM& o, const NODE* x) const
+{
+  if(0 && dynamic_cast<NODE_TYPE const*>(x)){ untested();
+    o << "discipline " << x->short_label() << ";\n";
+    for(int ii=0; ii<x->param_count(); ++ii) {
+      if (x->param_is_printable(ii)) {
+       o << "  " << x->param_name(ii) << ' ' << x->param_value(ii) << ";\n";
+      }else{
+      }
+    }
+    o << "enddiscipline\n";
+  }else{ untested();
+    o << x->dev_type() << " " << x->short_label() << "\n";
+#if 1
+    std::string sep;
+    for(int i=0; i<x->param_count(); ++i) {
+      o << sep << x->param_value(i);
+      sep = ", ";
+    }
+#endif
+    o << ";\n";
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1568,7 +1771,7 @@ class CMD_MODULE : public CMD {
     }
   }
 } p2;
-DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "module|macromodule", &p2);
+DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "module|macromodule|connectmodule", &p2);
 /*--------------------------------------------------------------------------*/
 class CMD_VERILOG : public CMD {
 public:

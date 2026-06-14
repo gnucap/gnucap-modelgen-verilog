@@ -3,6 +3,7 @@
 TEST_PLUGINS = \
   bm_pulse.so \
   c_debug.so \
+  c_debug_disc.so \
   d_reject.so \
   modelgen_0.so \
   modelgen_1.so

@@ -1,0 +1,24 @@
+verilog
+load ./c_debug_disc.so
+options trace
+
+discipline disc1;
+  domain discrete;
+enddiscipline
+discipline disc2;
+  domain continuous; flow A;
+  potential B
+enddiscipline
+discipline disc2;
+enddiscipline
+
+module main(a, b);
+  electrical a, i;
+  disc2 b, j;
+  inout a, b;
+endmodule
+
+disc1 x;
+
+list
+`disciplines

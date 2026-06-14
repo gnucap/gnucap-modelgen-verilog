@@ -920,7 +920,6 @@ void INSTANCE::expand_first_()
     lower.map_subckt_node(&n_(0), this);
   }
   for (;  ii < net_nodes();  ++ii) {
-    node_t& lower = dev->n_(ii);
     if(ii < dev->net_nodes() + dev->num_current_ports()){
       std::string branch_name = port_value(ii);
       dev->set_port_by_index(ii, branch_name);
