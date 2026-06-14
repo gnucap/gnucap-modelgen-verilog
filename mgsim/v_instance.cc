@@ -31,6 +31,7 @@
 #include <e_hsparam.h>
 #include <c_comand.h>
 #include <set>
+#include <e_logic.h>
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
@@ -61,12 +62,14 @@ class COMMON_INSTANCE : public COMMON_COMPONENT {
   DEV_INSTANCE_PROTO* _proto{nullptr};
   PARAM_LIST _params;
   std::vector<std::string> _port_names;
+  std::string _logic;
 public:
   COMMON_INSTANCE(int x) : COMMON_COMPONENT(x) {}
   COMMON_INSTANCE(COMMON_INSTANCE const& p) :
     COMMON_COMPONENT(p),
     _params(p._params),
-    _port_names(p._port_names) {}
+    _port_names(p._port_names),
+    _logic(p._logic) {}
   COMMON_INSTANCE* clone()const override { return new COMMON_INSTANCE(*this); }
   std::string name()const override { untested();unreachable(); return "??";}
   bool operator==(COMMON_COMPONENT const& p)const override {
@@ -78,6 +81,7 @@ public:
     auto x = prechecked_cast<COMMON_INSTANCE const*>(&p);
     return x
         && _proto == x->_proto
+        && _logic == x->_logic
         && _params == x->_params
         && _port_names == x->_port_names
         && _modelname == x->_modelname;
@@ -105,6 +109,8 @@ public:
 
     if(intptr_t cp = intptr_t(_proto) - intptr_t(x->_proto)) { untested();
       return cp<0?-1:1;
+    }else if((c = _logic.compare(x->_logic))) { untested();
+      return c;
     }else if((c = _params.compare(x->_params))) { untested();
       return c;
     }else{ untested();
@@ -130,11 +136,14 @@ public:
       throw(Exception_Clash("parameter " + Name + " already set"));
     }
   }
+  void set_logic(std::string const& l) { _logic = l; }
+  std::string logic_name()const { return _logic; }
+
   bool param_is_printable(int)const override { return true; }
   std::string param_name(int i)const override
     { assert (i < int(_params.size())); return _params.name(i); }
   std::string param_name(int i, int j)const override
-    { untested(); assert(!j); return param_name(i);}
+    { untested(); (void)j; assert(!j); return param_name(i);}
   std::string param_value(int i)const override
     { assert (i < int(_params.size())); return _params.value(i); }
   int param_count()const override {return static_cast<int>(_params.size()); }
@@ -186,7 +195,16 @@ public:
     }
 
     // is this an error?
-    return clone();
+    INSTANCE* new_instance = new INSTANCE(*this);
+    if(_proto){
+      new_instance->_parent = (COMPONENT const*)_proto;
+    }else{
+    }
+    // new_instance->set_logic(OPT::default_logic);
+    auto cp = prechecked_cast<COMMON_INSTANCE const*>(new_instance->common());
+    trace2("CI set logic", cp->logic_name(), OPT::default_logic->short_label());
+
+    return new_instance;
   }
   CARD*		clone()const override {
     INSTANCE* new_instance = new INSTANCE(*this);
@@ -275,17 +293,20 @@ private: // overrides
   }
   void set_param_by_index(int I, std::string& Value, int i) override {
     assert(i==0);
-    assert(I>=0);
     // BASE_SUBCKT::set_param_by_index(I, Value, 0);
     COMMON_COMPONENT* cc = common()->clone();
     auto cp = prechecked_cast<COMMON_INSTANCE*>(cc);
     assert(cp);
     trace2("spbi", I, Value);
 
-    cp->set_param_by_index(cp->param_count(), Value, 0);
+    if(I==-10){
+      cp->set_logic(Value);
+    }else{
+      assert(I>=0);
+      cp->set_param_by_index(cp->param_count(), Value, 0);
+    }
     attach_common(cp);
   }
-
 private:
   void collect_overloads(INSTANCE* scope) const;
   void collect_overloads_from_scope(std::string const& modelname,
@@ -859,12 +880,29 @@ void INSTANCE::renew_subckt_(const CARD* model, PARAM_LIST const* p)
     }
     subckt()->set_owner(this);
     subckt()->precalc_first();
-    subckt()->expand_first();
+//    subckt()->expand_first();
     // subckt()->map_subckt_nodes(model, this);
   }else{untested();
     unreachable();
     assert(subckt());
     subckt()->attach_params(p, scope());
+  }
+}
+/*--------------------------------------------------------------------------*/
+void set_logic_type(CARD_LIST* scope, std::string const& name)
+{
+  for(auto ci : *scope){
+    auto dev = prechecked_cast<COMPONENT*>(ci);
+    assert(dev);
+    if(!dev->common()){
+    }else if(dynamic_cast<COMMON_LOGIC const*>(dev->common())){
+
+      auto cc = dev->common()->clone();
+      cc->set_modelname(name);
+      trace2("LOGIC?", dev->long_label(), dev->common()->modelname());
+      dev->attach_common(cc);
+    }else{ untested();
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -887,7 +925,7 @@ void INSTANCE::expand_first_()
   if(!_parent->scope()->size()){
     std::string modelname = c->modelname();
     throw Exception(long_label() + ": no valid prototype found for " + modelname);
-  }else {
+  }else { untested();
     assert(_sim->is_first_expand());
     PARAM_LIST p;
     PARAM_LIST const* pl = scope()->params();
@@ -901,18 +939,22 @@ void INSTANCE::expand_first_()
   subckt()->set_owner(nullptr);
   subckt()->set_verilog_math();
   subckt()->set_owner(owner()); // TODO: renew_subckt with alternative owner?
+
+  set_logic_type(subckt(), c->logic_name());
   subckt()->precalc_first();
   expand_sift();
-  subckt()->expand_first();
 
   assert(subckt()->size() == 1);
   CARD* ci = *subckt()->begin();
   auto dev = prechecked_cast<COMPONENT*>(ci);
   assert(dev);
 
+  subckt()->expand_first();
+
   for (int ii = 0;  ii < net_nodes();  ++ii) {
     n_(ii).clear();
   }
+
 
   int ii = 0;
   for (;  ii < dev->net_nodes();  ++ii) {
@@ -930,6 +972,7 @@ void INSTANCE::expand_first_()
 /*--------------------------------------------------------------------------*/
 void INSTANCE::expand()
 {
+  trace1("INSTANCE expand", long_label());
   BASE_SUBCKT::expand();
   subckt()->expand_();
 }

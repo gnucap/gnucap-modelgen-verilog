@@ -1180,6 +1180,8 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
       trace1("parse_module: instance", cmd.tail());
       have_instance = true;
       CARD* stub = device_dispatcher.clone(subdevice_stub);
+      std::string ll = OPT::default_logic->short_label();
+      stub->set_param_by_index(-10, ll, 0);
       assert(stub);
       auto new_instance = dynamic_cast<BASE_SUBCKT*>(stub);
       assert(new_instance);
