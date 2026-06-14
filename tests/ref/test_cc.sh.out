@@ -997,6 +997,15 @@ inline node_t& ground()
   return CARD_LIST::card_list.nodes()->at(0);
 }
 /*--------------------------------------------------------------------------*/
+void set_type(node_t& n, std::string const& t)
+{
+  if(NODE* tt = node_dispatcher[t]){
+    n.set_type(tt);
+  }else{ untested();
+    throw Exception("discipline " + t + " does not exist");
+  }
+}
+/*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
 #endif
@@ -1136,8 +1145,8 @@ void map_sckt_nodes(CARD_LIST* l, node_t* nodes)
       if(cni.e_() == INVALID_NODE){
       // }else if(nodes[cni.e_()].is_grounded()){ untested();
       }else if(dynamic_cast<CURRENT_CTRL const*>(nodes[cni.e_()].n_())){
-	trace2("msn0a", (**ci).long_label(), ii);
-	cni = nodes[cni.e_()].n_(); // HACK, later.
+        trace2("msn0a", (**ci).long_label(), ii);
+        cni = nodes[cni.e_()].n_(); // HACK, later.
       }else{
         cni.map_subckt_node(nodes, nullptr);
       }
@@ -2693,6 +2702,22 @@ void MOD_resistor::expand_first()
   for(int i=0; i<ext_nodes()+int_nodes(); ++i){
     trace3("expand2 clear", long_label(), i, n_(i).e_());
   }
+  node_t gnd;
+  gnd.set_to_ground(nullptr);
+  (void)gnd;
+    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
+      trace3("expand0 clear", long_label(), i, n_(i).e_());
+    }
+    assert(scope());
+    assert(scope()->nodes());
+    NODE_MAP& nodes = *scope()->nodes();
+    (void)nodes;
+//port p 1
+//port n 2
+    // port p 1
+      va::set_type(n_(n_p), "electrical");
+    // port n 2
+      va::set_type(n_(n_n), "electrical");
 }
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
@@ -2714,21 +2739,6 @@ void MOD_resistor::expand()
   node_t gnd;
   gnd.set_to_ground(nullptr);
   if (_sim->is_first_expand()) {
-    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
-      trace3("expand0 clear", long_label(), i, n_(i).e_());
-    }
-    assert(scope());
-    assert(scope()->nodes());
-    NODE_MAP& nodes = *scope()->nodes();
-    (void)nodes;
-//port p 1
-//port n 2
-    // port p 1
-    n_(n_p).set_type(OPT::default_logic);
-    // port n 2
-    n_(n_n).set_type(OPT::default_logic);
-    // ground
-    n_(n_white_noise_1_p).set_to_ground(nullptr);
     precalc_first();
 
   // clone branches
@@ -2788,6 +2798,10 @@ void MOD_resistor::expand()
   //precalc();
   subckt()->precalc_first();
   subckt()->expand_first();
+  // port p 1
+  // port n 2
+  // ground
+  n_(n_white_noise_1_p).set_to_ground(nullptr);
   map_sckt_nodes(subckt(), &n_(0));
   subckt()->expand_();
   n_(n_p).set_used();
@@ -4708,6 +4722,22 @@ void MOD_resistor::expand_first()
   for(int i=0; i<ext_nodes()+int_nodes(); ++i){
     trace3("expand2 clear", long_label(), i, n_(i).e_());
   }
+  node_t gnd;
+  gnd.set_to_ground(nullptr);
+  (void)gnd;
+    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
+      trace3("expand0 clear", long_label(), i, n_(i).e_());
+    }
+    assert(scope());
+    assert(scope()->nodes());
+    NODE_MAP& nodes = *scope()->nodes();
+    (void)nodes;
+//port p 1
+//port n 2
+    // port p 1
+      va::set_type(n_(n_p), "electrical");
+    // port n 2
+      va::set_type(n_(n_n), "electrical");
 }
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
@@ -4729,21 +4759,6 @@ void MOD_resistor::expand()
   node_t gnd;
   gnd.set_to_ground(nullptr);
   if (_sim->is_first_expand()) {
-    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
-      trace3("expand0 clear", long_label(), i, n_(i).e_());
-    }
-    assert(scope());
-    assert(scope()->nodes());
-    NODE_MAP& nodes = *scope()->nodes();
-    (void)nodes;
-//port p 1
-//port n 2
-    // port p 1
-    n_(n_p).set_type(OPT::default_logic);
-    // port n 2
-    n_(n_n).set_type(OPT::default_logic);
-    // ground
-    n_(n_white_noise_0_p).set_to_ground(nullptr);
     precalc_first();
 
   // clone branches
@@ -4803,6 +4818,10 @@ void MOD_resistor::expand()
   //precalc();
   subckt()->precalc_first();
   subckt()->expand_first();
+  // port p 1
+  // port n 2
+  // ground
+  n_(n_white_noise_0_p).set_to_ground(nullptr);
   map_sckt_nodes(subckt(), &n_(0));
   subckt()->expand_();
   n_(n_p).set_used();
@@ -5875,6 +5894,15 @@ inline node_t& ground()
   return CARD_LIST::card_list.nodes()->at(0);
 }
 /*--------------------------------------------------------------------------*/
+void set_type(node_t& n, std::string const& t)
+{
+  if(NODE* tt = node_dispatcher[t]){
+    n.set_type(tt);
+  }else{ untested();
+    throw Exception("discipline " + t + " does not exist");
+  }
+}
+/*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
 #endif
@@ -6014,8 +6042,8 @@ void map_sckt_nodes(CARD_LIST* l, node_t* nodes)
       if(cni.e_() == INVALID_NODE){
       // }else if(nodes[cni.e_()].is_grounded()){ untested();
       }else if(dynamic_cast<CURRENT_CTRL const*>(nodes[cni.e_()].n_())){
-	trace2("msn0a", (**ci).long_label(), ii);
-	cni = nodes[cni.e_()].n_(); // HACK, later.
+        trace2("msn0a", (**ci).long_label(), ii);
+        cni = nodes[cni.e_()].n_(); // HACK, later.
       }else{
         cni.map_subckt_node(nodes, nullptr);
       }
@@ -7237,6 +7265,22 @@ void MOD_capacitor::expand_first()
   for(int i=0; i<ext_nodes()+int_nodes(); ++i){
     trace3("expand2 clear", long_label(), i, n_(i).e_());
   }
+  node_t gnd;
+  gnd.set_to_ground(nullptr);
+  (void)gnd;
+    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
+      trace3("expand0 clear", long_label(), i, n_(i).e_());
+    }
+    assert(scope());
+    assert(scope()->nodes());
+    NODE_MAP& nodes = *scope()->nodes();
+    (void)nodes;
+//port p 1
+//port n 2
+    // port p 1
+      va::set_type(n_(n_p), "electrical");
+    // port n 2
+      va::set_type(n_(n_n), "electrical");
 }
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
@@ -7258,21 +7302,6 @@ void MOD_capacitor::expand()
   node_t gnd;
   gnd.set_to_ground(nullptr);
   if (_sim->is_first_expand()) {
-    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
-      trace3("expand0 clear", long_label(), i, n_(i).e_());
-    }
-    assert(scope());
-    assert(scope()->nodes());
-    NODE_MAP& nodes = *scope()->nodes();
-    (void)nodes;
-//port p 1
-//port n 2
-    // port p 1
-    n_(n_p).set_type(OPT::default_logic);
-    // port n 2
-    n_(n_n).set_type(OPT::default_logic);
-    // ground
-    n_(n_ddt_1_p).set_to_ground(nullptr);
     precalc_first();
 
   // clone branches
@@ -7332,6 +7361,10 @@ void MOD_capacitor::expand()
   //precalc();
   subckt()->precalc_first();
   subckt()->expand_first();
+  // port p 1
+  // port n 2
+  // ground
+  n_(n_ddt_1_p).set_to_ground(nullptr);
   map_sckt_nodes(subckt(), &n_(0));
   subckt()->expand_();
   n_(n_p).set_used();
@@ -8528,6 +8561,22 @@ void MOD_capacitor::expand_first()
   for(int i=0; i<ext_nodes()+int_nodes(); ++i){
     trace3("expand2 clear", long_label(), i, n_(i).e_());
   }
+  node_t gnd;
+  gnd.set_to_ground(nullptr);
+  (void)gnd;
+    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
+      trace3("expand0 clear", long_label(), i, n_(i).e_());
+    }
+    assert(scope());
+    assert(scope()->nodes());
+    NODE_MAP& nodes = *scope()->nodes();
+    (void)nodes;
+//port p 1
+//port n 2
+    // port p 1
+      va::set_type(n_(n_p), "electrical");
+    // port n 2
+      va::set_type(n_(n_n), "electrical");
 }
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
@@ -8549,26 +8598,6 @@ void MOD_capacitor::expand()
   node_t gnd;
   gnd.set_to_ground(nullptr);
   if (_sim->is_first_expand()) {
-    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
-      trace3("expand0 clear", long_label(), i, n_(i).e_());
-    }
-    assert(scope());
-    assert(scope()->nodes());
-    NODE_MAP& nodes = *scope()->nodes();
-    (void)nodes;
-//port p 1
-//port n 2
-    // port p 1
-    n_(n_p).set_type(OPT::default_logic);
-    // port n 2
-    n_(n_n).set_type(OPT::default_logic);
-    // internal ddt_2_p : 3
-    // node ddt_2_p 3
-    if (_short_b_ddt_2()) {
-      n_(n_ddt_2_p) = gnd;
-    }else{
-      n_(n_ddt_2_p).set_type(OPT::default_logic);
-    }
     precalc_first();
 
   // clone branches
@@ -8623,6 +8652,15 @@ void MOD_capacitor::expand()
   //precalc();
   subckt()->precalc_first();
   subckt()->expand_first();
+  // port p 1
+  // port n 2
+  // internal ddt_2_p : 3
+  // node ddt_2_p 3
+  if (_short_b_ddt_2()) {
+    n_(n_ddt_2_p) = gnd;
+  }else{
+    n_(n_ddt_2_p).set_type(OPT::default_logic);
+  }
   map_sckt_nodes(subckt(), &n_(0));
   subckt()->expand_();
   n_(n_p).set_used();

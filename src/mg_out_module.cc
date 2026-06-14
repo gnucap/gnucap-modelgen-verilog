@@ -970,6 +970,15 @@ static void make_module_clear_local_nodes(std::ostream& o, Module const& m)
 
 }
 /*--------------------------------------------------------------------------*/
+static void make_set_node_type(std::ostream& o, const Node& p)
+{
+  if(p.discipline()){
+    o____ "va::set_type(n_(n_" << p.name() << "), \"" << p.discipline()->identifier() << "\");\n";
+  }else{
+    o____ "n_(n_" << p.name() << ").set_type(OPT::default_logic);\n";
+  }
+}
+/*--------------------------------------------------------------------------*/
 static void make_module_new_local_node(std::ostream& o, const Node& p)
 {
   make_tag(o);
@@ -995,8 +1004,26 @@ static void make_module_new_local_node(std::ostream& o, const Node& p)
     }
     o << "{\n";
     // TODO: put in discipline specified in module.
-    o____ "n_(n_" << p.name() << ").set_type(OPT::default_logic);\n";
+    make_set_node_type(o, p);
+
     o__ "}\n";
+  }
+}
+/*--------------------------------------------------------------------------*/
+static void make_module_set_ports(std::ostream& o, Module const& m)
+{
+  for (int n=1; n<=int(m.circuit()->nodes().size()); ++n) {
+    Node const* nn = m.circuit()->nodes()[n];
+    assert(nn);
+    if(nn->number() == 0) {
+    }else if(nn->number() < n){
+    }else if(n <= int(m.circuit()->ports().size())){
+      o__ "// port " << nn->name() << " " << nn->number() << "\n";
+      // BUG: allocate floating ports even if unused.
+      make_set_node_type(o, *nn);
+    }else if(nn->is_used()){
+    }else{
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1013,7 +1040,7 @@ static void make_module_new_local_nodes(std::ostream& o, Module const& m)
     }else if(n <= int(m.circuit()->ports().size())){
       o__ "// port " << nn->name() << " " << nn->number() << "\n";
       // BUG: allocate floating ports even if unused.
-      o__ "n_(n_" << nn->name() << ").set_type(OPT::default_logic);\n";
+//      make_set_node_type(o, *nn);
     }else if(nn->is_used()){
       o__ "// internal " << nn->name() << " : " << nn->number() << "\n";
       make_module_new_local_node(o, *nn);
@@ -1256,6 +1283,14 @@ static void make_module_expand_first(std::ostream& o, Module const& m)
   o__ "for(int i=0; i<ext_nodes()+int_nodes(); ++i){\n";
   o____ "trace3(\"expand2 clear\", long_label(), i, n_(i).e_());\n";
   o__ "}\n";
+  o__ "node_t gnd;\n";
+  o__ "gnd.set_to_ground(nullptr);\n";
+  o__ "(void)gnd;\n";
+  {
+    indent k;
+    make_module_clear_local_nodes(o, m);
+    make_module_set_ports(o, m);
+  }
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -1301,11 +1336,6 @@ static void make_module_expand(std::ostream& o, Module const& m)
   o__ "node_t gnd;\n";
   o__ "gnd.set_to_ground(nullptr);\n";
   o__ "if (_sim->is_first_expand()) {\n";
-  {
-    indent k;
-    make_module_clear_local_nodes(o, m);
-    make_module_new_local_nodes(o, m);
-  }
   if(m.has_submodule()) {
     indent k;
     o__ "assert(_parent);\n";
@@ -1377,6 +1407,8 @@ static void make_module_expand(std::ostream& o, Module const& m)
 
   o__ "subckt()->precalc_first();\n";
   o__ "subckt()->expand_first();\n";
+
+  make_module_new_local_nodes(o, m);
   o__ "map_sckt_nodes(subckt(), &n_(0));\n";
   o__ "subckt()->expand_();\n";
   make_module_allocate_nodes(o, m);

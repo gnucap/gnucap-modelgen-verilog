@@ -2,7 +2,7 @@ test_timer3f #() dut0 (\1 , \0 );
 reject #(.time(.9)) r ();
 #           v(1)       iter(0)   
 time0 0 0
- 0.         0.         2.        
+ 0.         ??         2.        
 #Time       state(dut0) count(dut0) iter(0)   
 time0 0 0
  0.         0.         0.         2.        
@@ -20,5 +20,5 @@ time0 2 1
 Gnucap   System status
 iterations: op=0, dc=2, tran=12, fourier=0, total=20
 transient timesteps: accepted=5, rejected=1, total=6
-nodes: user=1, subckt=0, model=0, total=1
-dctran density=100.0%, ac density=100.0%
+nodes: user=0, subckt=0, model=0, total=0
+dctran density=0.0%, ac density=0.0%
