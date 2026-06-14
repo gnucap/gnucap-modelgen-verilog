@@ -1469,7 +1469,25 @@ void LANG_VERILOG::print_command(OMSTREAM& o, const DEV_DOT* x)
 {
   assert(x);
   print_attributes(o, x->id_tag());
-  o << x->s() << '\n';
+  std::string tt = ((CARD const*)x)->dev_type();
+  if(x->s().size()) {
+    o << x->s() << '\n';
+  }else if(tt == "discipline") {
+    o << x->short_label() << "\n";
+    // print_discipline(o, x->n_(0).n_());
+    o << ";\n";
+  }else if(int pc = x->param_count()) {
+    for(int i = 0; i < pc; ++i){
+      o << ' ' << x->param_value(i);
+    }
+    o << ";\n";
+  }else if(((CARD const*)x)->dev_type() != "") {
+    o << tt << " " << x->short_label();
+    o << ";\n";
+  }else{
+    // DOT fallback.
+    o << x->s();
+  }
 }
 /*--------------------------------------------------------------------------*/
 class CMD_PARAMSET : public CMD {
