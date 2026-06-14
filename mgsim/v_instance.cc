@@ -59,8 +59,8 @@ static void grow_nodes(int Index, node_t*& n, int& capacity, int capacity_floor)
 class DEV_INSTANCE_PROTO;
 class COMMON_INSTANCE : public COMMON_COMPONENT {
   DEV_INSTANCE_PROTO* _proto{nullptr};
-public:
   PARAM_LIST _params;
+public:
   std::vector<std::string> _port_names;
 public:
   COMMON_INSTANCE(int x) : COMMON_COMPONENT(x) {}
@@ -118,6 +118,9 @@ public:
   }
   bool has_less() const override { untested();return true;}
 #endif // __cplusplus >= 202002L
+  void set_param_by_index(int I, std::string& Value, int)override { untested();
+    _params.set("*" + to_string(I), Value);
+  }
   int set_param_by_name(std::string Name, std::string Value) override {
     if(_params.find(Name) == _params.end()){
       return _params.set(Name, Value);
@@ -276,7 +279,7 @@ private: // overrides
     assert(cp);
     trace2("spbi", I, Value);
 
-    cp->_params.set("*" + to_string(cp->param_count()), Value);
+    cp->set_param_by_index(cp->param_count(), Value, 0);
     attach_common(cp);
   }
 
