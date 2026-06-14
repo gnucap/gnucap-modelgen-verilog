@@ -735,11 +735,7 @@ CARD* INSTANCE::deflate()
 #endif
     for(int ii=0; ii<c->net_nodes(); ++ii){
       if(ii < c->net_nodes()) {
-	if(!_parent->port_name(ii).size() && n_(ii).is_connected()){
-	  c->n_(ii) = n_(ii); // why?
-	}else if(!_parent->port_name(ii).size()){
-	  c->n_(ii) = n_(c->n_(ii).e_());
-	}else if(c->n_(ii).e_() != -1){
+	if(c->n_(ii).e_()!=INVALID_NODE){ untested();
 	  c->n_(ii) = n_(c->n_(ii).e_());
 	}else{
 	}
