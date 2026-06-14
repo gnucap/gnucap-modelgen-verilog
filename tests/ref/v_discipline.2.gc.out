@@ -1,0 +1,16 @@
+discipline ddisc;
+  domain discrete;
+enddiscipline;
+`default_discipline hybrid
+                    ^ ? not a discrete discipline. nonstandard
+
+hybrid
+ddisc
+`default_discipline electrical
+                    ^ ? not a discrete discipline. nonstandard
+
+electrical
+`default_discipline bleh
+                    ^ ? need a node (ddisc electrical hybrid logic)
+`default_discipline foo;
+                    ^ ? need a node (ddisc electrical hybrid logic)

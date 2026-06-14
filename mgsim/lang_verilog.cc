@@ -1197,7 +1197,7 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
       extended = true;
     }else{
       cmd >> ';';
-      cmd.check(bWARNING, "what's this?");
+      cmd.check(bWARNING, "missing semicolon");
       extended = false;
     }
   }

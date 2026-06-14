@@ -186,5 +186,49 @@ DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "discipline", &p1);
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
+namespace {
+/*--------------------------------------------------------------------------*/
+class CMD_DEFAULT_DISC : public CMD {
+  CMD_DEFAULT_DISC(CMD_DEFAULT_DISC const&p)  : CMD(p) {}
+public:
+  explicit CMD_DEFAULT_DISC() {}
+  CMD* clone()const override {return new CMD_DEFAULT_DISC(*this);}
+
+  void do_it(CS& cmd, CARD_LIST*)override {
+    trace1("do_it", cmd.tail());
+    size_t here = cmd.cursor();
+    if(!cmd.more()){
+      if(OPT::default_logic){
+	IO::mstdout << OPT::default_logic->short_label();
+      }else{
+	IO::mstdout << "(null)";
+      }
+      IO::mstdout << '\n';
+    }else if(NODE* n = node_dispatcher[cmd]) {
+      if(n->param_value(0) != "discrete"){
+	trace1("", OPT::default_logic->param_value(3));
+	cmd.warn(bWARNING, here, "not a discrete discipline. nonstandard\n");
+      }else{
+      }
+      OPT::default_logic = n;
+    }else{
+      std::string choices;
+      std::string sep;
+      for(DISPATCHER<NODE>::const_iterator
+	  i = node_dispatcher.begin(); i != node_dispatcher.end(); ++i) {
+	if (i->second) {
+	  choices += sep + i->first;
+	  sep = " ";
+	}else{
+	}
+      }
+      cmd.warn(bWARNING, "need a node (" + choices + ")");
+      cmd >> sep;
+    }
+}
+} p2;
+DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "`default_discipline", &p2);
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:
