@@ -120,7 +120,7 @@ public:
   }
   bool has_less() const override { untested();return true;}
 #endif // __cplusplus >= 202002L
-  void set_param_by_index(int I, std::string& Value, int)override { untested();
+  void set_param_by_index(int I, std::string& Value, int)override {
     _params.set("*" + to_string(I), Value);
   }
   int set_param_by_name(std::string Name, std::string Value) override {
@@ -235,6 +235,7 @@ protected:
   void		expand()override;
   CARD*		deflate()override;
 private:
+  void		renew_subckt_(const CARD* model, PARAM_LIST const* p);
   void		expand_first_();
   void		expand_sift();
   void		precalc_last()override{ untested();
@@ -348,7 +349,7 @@ public:
   std::string port_name(int i)const override {
     auto c = prechecked_cast<COMMON_INSTANCE const*>(common());
     assert(c);
-    if(i >= c->num_ports()) {
+    if(i >= c->num_ports()) { untested();
       trace1("port_name0", i);
       return ""; // it has no name.Y
     }else{
@@ -689,6 +690,7 @@ CARD* INSTANCE::deflate()
 {
 //  return this; // keep it all. for debugging
   trace1("INSTANCE::deflate", long_label());
+
   CARD_LIST* s = subckt();
   assert(s);
   assert(_parent);
@@ -731,17 +733,15 @@ CARD* INSTANCE::deflate()
       trace3("rewire p", a, _parent->port_name(a), _parent->port_value(a));
     }
     trace3("rewire", long_label(), h, net_nodes());
-#if 0
-    for(int ii=0; ii<net_nodes(); ++ii){ untested();
-      std::string nn = _n[ii].n_()->short_label();
-      trace4("rewire", long_label(), ii, nn, c->n_(ii).n_()->short_label());
-      trace4("rewire", long_label(), ii, c->n_(ii).e_(), n_(ii).e_());
-    }
-#endif
     for(int ii=0; ii<c->net_nodes(); ++ii){
       if(ii < c->net_nodes()) {
-	if(c->n_(ii).e_()!=INVALID_NODE){ untested();
-	  c->n_(ii) = n_(c->n_(ii).e_());
+	if(c->n_(ii).e_() != INVALID_NODE){
+	  const node_t& nn = n_(c->n_(ii).e_());
+	  c->n_(ii) = nn;
+	}else{
+	}
+	if(c->n_(ii).is_used()) {
+	  n_(ii).set_used();
 	}else{
 	}
       }else if(ii < c->net_nodes()+c->num_current_ports()){ untested();
@@ -840,6 +840,34 @@ static std::string param_count_string(CARD const* c)
   return to_string(eff_param_count(c));
 }
 /*--------------------------------------------------------------------------*/
+// avoid CARD::renew_sckt, because it maps nodes.
+void INSTANCE::renew_subckt_(const CARD* model, PARAM_LIST const* p)
+{
+  if (_sim->is_first_expand()) {
+    if(subckt()){
+      subckt()->erase_all();
+    }else{
+      new_subckt();
+    }
+    { // new CARD_LIST(Model, this, scope(), Params);
+      subckt()->set_verilog_math(model->subckt()->is_verilog_math());
+
+      subckt()->attach_params(p, scope());
+      subckt()->shallow_copy(model->subckt());
+      //set_owner(owner);
+      // subckt()->_nm = model->subckt()->nodes()->clone();
+    }
+    subckt()->set_owner(this);
+    subckt()->precalc_first();
+    subckt()->expand_first();
+    // subckt()->map_subckt_nodes(model, this);
+  }else{untested();
+    unreachable();
+    assert(subckt());
+    subckt()->attach_params(p, scope());
+  }
+}
+/*--------------------------------------------------------------------------*/
 void INSTANCE::expand_first_()
 {
   auto c = prechecked_cast<COMMON_INSTANCE*>(mutable_common());
@@ -851,7 +879,7 @@ void INSTANCE::expand_first_()
   trace3("INSTANCE::expand_first_1", long_label(), _parent->net_nodes(),  _parent->subckt()->nodes()->how_many());
   if(_parent->net_nodes() <= _parent->subckt()->nodes()->how_many()){
     // module
-  }else{
+  }else{ untested();
     // modelgen
   }
   assert(_parent->subckt()->params());
@@ -864,7 +892,7 @@ void INSTANCE::expand_first_()
     PARAM_LIST p;
     PARAM_LIST const* pl = scope()->params();
     p.set_try_again(pl);
-    renew_subckt(_parent, &p);
+    renew_subckt_(_parent, &p);
     assert(scope()!=subckt());
   }
 
@@ -873,15 +901,37 @@ void INSTANCE::expand_first_()
   subckt()->set_owner(nullptr);
   subckt()->set_verilog_math();
   subckt()->set_owner(owner()); // TODO: renew_subckt with alternative owner?
-  subckt()->precalc_first(); // here?
-
+  subckt()->precalc_first();
   expand_sift();
+  subckt()->expand_first();
+
+  assert(subckt()->size() == 1);
+  CARD* ci = *subckt()->begin();
+  auto dev = prechecked_cast<COMPONENT*>(ci);
+  assert(dev);
+
+  for (int ii = 0;  ii < net_nodes();  ++ii) {
+    n_(ii).clear();
+  }
+
+  int ii = 0;
+  for (;  ii < dev->net_nodes();  ++ii) {
+    node_t& lower = dev->n_(ii);
+    lower.map_subckt_node(&n_(0), this);
+  }
+  for (;  ii < net_nodes();  ++ii) {
+    node_t& lower = dev->n_(ii);
+    if(ii < dev->net_nodes() + dev->num_current_ports()){
+      std::string branch_name = port_value(ii);
+      dev->set_port_by_index(ii, branch_name);
+    }else{ untested();
+    }
+  }
 }
 /*--------------------------------------------------------------------------*/
 void INSTANCE::expand()
 {
   BASE_SUBCKT::expand();
-  subckt()->expand_first();
   subckt()->expand_();
 }
 /*--------------------------------------------------------------------------*/
@@ -999,7 +1049,7 @@ void INSTANCE::expand_sift()
 // Kludge: build proto in stub, so it only needs doing once.
 void INSTANCE::expand_first()
 {
-  BASE_SUBCKT::expand_first();
+//  BASE_SUBCKT::expand_first();
   static int recursion;
   if(++recursion > OPT::recursion){ untested();
     recursion = 0;
@@ -1083,7 +1133,7 @@ bool INSTANCE::defer_proto() const
 /*--------------------------------------------------------------------------*/
 void INSTANCE::build_proto() const
 {
-  if(!_proto){
+  if(!_proto){ untested();
     // static instance?
   }else{
     assert(scope());
@@ -1097,10 +1147,10 @@ void INSTANCE::build_proto() const
     for(int i = 0; i < c->num_ports(); ++i) {
       std::string v = c->port_name(i);
       if(c->num_ports()) {
-	assert(c->port_name(i) == v);
 	std::string nn = port_value(i);
 	if(!v.size()) {
-	  _proto->set_port_by_index(i, nn);
+	  std::string in = std::to_string(i);
+	  _proto->set_port_by_index(i, in);
 	}else{
 	  _proto->set_port_by_index(i, v);
 	}
@@ -1178,7 +1228,7 @@ const std::string INSTANCE::port_value(int i) const
 {
   if(_cloned_from == &p1){
     return COMPONENT::port_value(i);
-  }else if(_cloned_from){ untested();
+  }else if(_cloned_from){
     return(_cloned_from->port_value(i));
   }else{
     return COMPONENT::port_value(i);
