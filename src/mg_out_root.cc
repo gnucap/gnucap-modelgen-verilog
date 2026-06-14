@@ -1,6 +1,6 @@
-/*$Id: mg_out_root.cc,v 26.81 2008/05/27 05:33:43 al Exp $ -*- C++ -*-
+/*                          -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
- * Author: Albert Davis <aldavis@gnu.org>
+ *               2022-26 Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -59,6 +59,10 @@ static void make_header(std::ostream& o, const File& in,
 #include "e_va.raw"
      ;
 #endif
+  if(options().gen_discipline()){
+    o << "#include <e_node_type.h>\n";
+  }else{ untested();
+  }
   o <<
     "#include <u_limit.h>\n"
     "#include <bitset>\n"
@@ -91,6 +95,9 @@ static void make_tail(std::ostream& o, const File&)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+void make_continuous_discipline(std::ostream& o, Discipline const& d);
+void make_discrete_discipline(std::ostream& o, Discipline const& d);
+/*--------------------------------------------------------------------------*/
 static void make_common_nature(std::ostream& o, const File& f)
 {
   for(auto i : f.nature_list()) {
@@ -100,44 +107,23 @@ static void make_common_nature(std::ostream& o, const File& f)
   }
   o << "/*--------------------------------------"
        "------------------------------------*/\n";
-  o << "/*--------------------------------------"
-       "------------------------------------*/\n";
-  for(auto i : f.discipline_list()) {
-    o << "class DISCIPLINE_" << i->identifier() << " : public DISCIPLINE {\n";
-    o << "public:\n";
-    if(i->flow()){
-      o__ "NATURE const* flow()const override{\n";
-      o____ "return &_N_" << i->flow()->identifier() << ";\n" ;
-      o__ "}\n";
-    }else{itested();
-    }
-    if(i->potential()){
-      o__ "NATURE const* potential()const override{\n";
-      o____ "return &_N_" << i->potential()->identifier() << ";\n" ;
-      o__ "}\n";
-    }else{itested();
-    }
-    o << "}_D_"<<i->identifier()<<";\n";
-    o << "class _COMMON_VASRC_" << i->identifier() << " : public COMMON_VASRC {\n";
-    o << "public:\n";
-    o__ "_COMMON_VASRC_" << i->identifier() << "(int i) : COMMON_VASRC(i){}\n";
-    o << "private:\n";
-    o__ "_COMMON_VASRC_" << i->identifier() << "(_COMMON_VASRC_" << i->identifier() << " const&p)";
-    o____ " : COMMON_VASRC(p){}\n";
-    o__ "COMMON_COMPONENT* clone()const override{\n";
-    o____ "return new _COMMON_VASRC_" << i->identifier() << "(*this);\n";
-    o__ "}\n";
-    o__ "std::string name()const override{untested(); return \""<<i->identifier()<<"\";}\n";
-    o__ "DISCIPLINE const* discipline()const override {return &_D_"<<i->identifier()<<";}\n";
-
-    o << "public:\n";
-    o << "};\n";
-    o << "static _COMMON_VASRC_" << i->identifier() << " _C_V_"<<i->identifier()<<"(CC_STATIC);\n"
-     "/*--------------------------------------"
-     "------------------------------------*/\n";
-  }
 }
 /*--------------------------------------------------------------------------*/
+static void make_cc_discipline(std::ostream& o, File const& f)
+{
+  o << "namespace {\n";
+  for(auto d : f.discipline_list()) {
+    assert(d);
+    if(d->is_discrete()) {
+      make_discrete_discipline(o, *d);
+    }else{
+      make_continuous_discipline(o, *d);
+    }
+  }
+  o << "}\n";
+  o << "/*--------------------------------------"
+       "------------------------------------*/\n";
+}
 /*--------------------------------------------------------------------------*/
 void make_cc(std::ostream& out, const File& in)
 {
@@ -145,6 +131,11 @@ void make_cc(std::ostream& out, const File& in)
   int num = 0;
   make_header(out, in, "dumpname");
   make_common_nature(out, in);
+
+  if(options().gen_discipline()){
+    make_cc_discipline(out, in);
+  }else{ untested();
+  }
 
   if(options().gen_paramset()){
     for (Paramset_List::const_iterator

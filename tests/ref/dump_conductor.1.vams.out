@@ -49,6 +49,10 @@ discipline rotational_omega
   flow current;
 enddiscipline
 
+discipline logic
+  domain discrete;
+enddiscipline
+
 
 module conductor(p, n);
   inout p, n;

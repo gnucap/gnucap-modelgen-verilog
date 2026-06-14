@@ -43,11 +43,12 @@ public:
   void dump(std::ostream& f)const override;
   const String_Arg&  identifier()const	    {return _identifier;}
   const String_Arg&  potential_ident()const {return _potential_ident;}
-  const String_Arg&  domain_ident()const    { untested();return _domain_ident;}
+  const String_Arg&  domain_ident()const    {return _domain_ident;}
   const String_Arg&  flow_ident()const	    {return _flow_ident;}
 
   Nature const* flow() const{return _flow;}
   Nature const* potential()const{return _potential;}
+  bool is_discrete()const { return _domain_ident == "discrete";}
 };
 typedef Collection<Discipline> Discipline_List;
 /*--------------------------------------------------------------------------*/

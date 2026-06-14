@@ -1032,6 +1032,9 @@ inline node_t& ground()
 #include <e_logic.h>
 #include <m_union.h>
 #include <e_node.h>
+#define NATURE NATURE_
+#include <e_node_type.h>
+#undef NATURE
 #include <bm.h> // BUG
 #include <e_cardlist.h>
 /*--------------------------------------------------------------------------*/
@@ -1145,6 +1148,7 @@ void map_sckt_nodes(CARD_LIST* l, node_t* nodes)
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:
+#include <e_node_type.h>
 #include <u_limit.h>
 #include <bitset>
 #include <typeindex>
@@ -1172,7 +1176,7 @@ class NATURE_temperature : public NATURE {
   double abstol()const override {return 3.14;}
 }_N_temperature;
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
+namespace {
 class DISCIPLINE_thermal : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
@@ -1195,6 +1199,18 @@ private:
 public:
 };
 static _COMMON_VASRC_thermal _C_V_thermal(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+class CDISC_thermal : public NODE_TYPE {
+  explicit CDISC_thermal(CDISC_thermal const& p ) : NODE_TYPE(p) {}
+public:
+  explicit CDISC_thermal() : NODE_TYPE("thermal") {}
+  NODE_TYPE* clone()const override {untested();
+    return new CDISC_thermal(*this);
+  }
+  NODE* deflate()override {untested();
+    return new LOGIC_NODE();
+  }
+}cdisc_1;
 /*--------------------------------------------------------------------------*/
 class DISCIPLINE_electrical : public DISCIPLINE {
 public:
@@ -1219,6 +1235,18 @@ public:
 };
 static _COMMON_VASRC_electrical _C_V_electrical(CC_STATIC);
 /*--------------------------------------------------------------------------*/
+class CDISC_electrical : public NODE_TYPE {
+  explicit CDISC_electrical(CDISC_electrical const& p ) : NODE_TYPE(p) {}
+public:
+  explicit CDISC_electrical() : NODE_TYPE("electrical") {}
+  NODE_TYPE* clone()const override {untested();
+    return new CDISC_electrical(*this);
+  }
+  NODE* deflate()override {untested();
+    return new LOGIC_NODE();
+  }
+}cdisc_2;
+/*--------------------------------------------------------------------------*/
 class DISCIPLINE_magnetic : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
@@ -1242,6 +1270,18 @@ public:
 };
 static _COMMON_VASRC_magnetic _C_V_magnetic(CC_STATIC);
 /*--------------------------------------------------------------------------*/
+class CDISC_magnetic : public NODE_TYPE {
+  explicit CDISC_magnetic(CDISC_magnetic const& p ) : NODE_TYPE(p) {}
+public:
+  explicit CDISC_magnetic() : NODE_TYPE("magnetic") {}
+  NODE_TYPE* clone()const override {untested();
+    return new CDISC_magnetic(*this);
+  }
+  NODE* deflate()override {untested();
+    return new LOGIC_NODE();
+  }
+}cdisc_3;
+/*--------------------------------------------------------------------------*/
 class DISCIPLINE_rotational_omega : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
@@ -1264,6 +1304,29 @@ private:
 public:
 };
 static _COMMON_VASRC_rotational_omega _C_V_rotational_omega(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+class CDISC_rotational_omega : public NODE_TYPE {
+  explicit CDISC_rotational_omega(CDISC_rotational_omega const& p ) : NODE_TYPE(p) {}
+public:
+  explicit CDISC_rotational_omega() : NODE_TYPE("rotational_omega") {}
+  NODE_TYPE* clone()const override {untested();
+    return new CDISC_rotational_omega(*this);
+  }
+  NODE* deflate()override {untested();
+    return new LOGIC_NODE();
+  }
+}cdisc_4;
+/*--------------------------------------------------------------------------*/
+class DDISC_logic : public NODE_TYPE {
+  explicit DDISC_logic(DDISC_logic const& p ) : NODE_TYPE(p) {}
+public:
+  explicit DDISC_logic() : NODE_TYPE("logic") {}
+  NODE_TYPE* clone()const override{untested();
+    return new DDISC_logic(*this);
+  }
+}ddisc_1;
+/*--------------------------------------------------------------------------*/
+}
 /*--------------------------------------------------------------------------*/
 namespace n0{
 class MOD_resistor;
@@ -5847,6 +5910,9 @@ inline node_t& ground()
 #include <e_logic.h>
 #include <m_union.h>
 #include <e_node.h>
+#define NATURE NATURE_
+#include <e_node_type.h>
+#undef NATURE
 #include <bm.h> // BUG
 #include <e_cardlist.h>
 /*--------------------------------------------------------------------------*/
@@ -5960,6 +6026,7 @@ void map_sckt_nodes(CARD_LIST* l, node_t* nodes)
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:
+#include <e_node_type.h>
 #include <u_limit.h>
 #include <bitset>
 #include <typeindex>
@@ -5987,7 +6054,7 @@ class NATURE_temperature : public NATURE {
   double abstol()const override {return 3.14;}
 }_N_temperature;
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
+namespace {
 class DISCIPLINE_thermal : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
@@ -6010,6 +6077,18 @@ private:
 public:
 };
 static _COMMON_VASRC_thermal _C_V_thermal(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+class CDISC_thermal : public NODE_TYPE {
+  explicit CDISC_thermal(CDISC_thermal const& p ) : NODE_TYPE(p) {}
+public:
+  explicit CDISC_thermal() : NODE_TYPE("thermal") {}
+  NODE_TYPE* clone()const override {untested();
+    return new CDISC_thermal(*this);
+  }
+  NODE* deflate()override {untested();
+    return new LOGIC_NODE();
+  }
+}cdisc_1;
 /*--------------------------------------------------------------------------*/
 class DISCIPLINE_electrical : public DISCIPLINE {
 public:
@@ -6034,6 +6113,18 @@ public:
 };
 static _COMMON_VASRC_electrical _C_V_electrical(CC_STATIC);
 /*--------------------------------------------------------------------------*/
+class CDISC_electrical : public NODE_TYPE {
+  explicit CDISC_electrical(CDISC_electrical const& p ) : NODE_TYPE(p) {}
+public:
+  explicit CDISC_electrical() : NODE_TYPE("electrical") {}
+  NODE_TYPE* clone()const override {untested();
+    return new CDISC_electrical(*this);
+  }
+  NODE* deflate()override {untested();
+    return new LOGIC_NODE();
+  }
+}cdisc_2;
+/*--------------------------------------------------------------------------*/
 class DISCIPLINE_magnetic : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
@@ -6057,6 +6148,18 @@ public:
 };
 static _COMMON_VASRC_magnetic _C_V_magnetic(CC_STATIC);
 /*--------------------------------------------------------------------------*/
+class CDISC_magnetic : public NODE_TYPE {
+  explicit CDISC_magnetic(CDISC_magnetic const& p ) : NODE_TYPE(p) {}
+public:
+  explicit CDISC_magnetic() : NODE_TYPE("magnetic") {}
+  NODE_TYPE* clone()const override {untested();
+    return new CDISC_magnetic(*this);
+  }
+  NODE* deflate()override {untested();
+    return new LOGIC_NODE();
+  }
+}cdisc_3;
+/*--------------------------------------------------------------------------*/
 class DISCIPLINE_rotational_omega : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
@@ -6079,6 +6182,29 @@ private:
 public:
 };
 static _COMMON_VASRC_rotational_omega _C_V_rotational_omega(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+class CDISC_rotational_omega : public NODE_TYPE {
+  explicit CDISC_rotational_omega(CDISC_rotational_omega const& p ) : NODE_TYPE(p) {}
+public:
+  explicit CDISC_rotational_omega() : NODE_TYPE("rotational_omega") {}
+  NODE_TYPE* clone()const override {untested();
+    return new CDISC_rotational_omega(*this);
+  }
+  NODE* deflate()override {untested();
+    return new LOGIC_NODE();
+  }
+}cdisc_4;
+/*--------------------------------------------------------------------------*/
+class DDISC_logic : public NODE_TYPE {
+  explicit DDISC_logic(DDISC_logic const& p ) : NODE_TYPE(p) {}
+public:
+  explicit DDISC_logic() : NODE_TYPE("logic") {}
+  NODE_TYPE* clone()const override{untested();
+    return new DDISC_logic(*this);
+  }
+}ddisc_1;
+/*--------------------------------------------------------------------------*/
+}
 /*--------------------------------------------------------------------------*/
 namespace n0{
 class MOD_capacitor;

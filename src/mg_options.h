@@ -32,6 +32,7 @@ class Options : public Base {
   bool _optimize_nodes;  // prune unused nodes
   bool _optimize_state;  // remove non-state vars from instance
   bool _decompose_eval;
+  bool _gen_discipline;
   bool _gen_module;
   bool _gen_paramset;
   bool _dump_module;
@@ -56,6 +57,7 @@ public:
   bool optimize_nodes()   const{ return _optimize_nodes; }
   bool optimize_state()   const{ untested(); return _optimize_state; }
   bool decompose_eval()   const{ return _decompose_eval; }
+  bool gen_discipline()   const{ return _gen_discipline; }
   bool gen_module()       const{ return _gen_module; }
   bool gen_paramset()     const{ return _gen_paramset; }
   bool dump_module()      const{ return _dump_module; }

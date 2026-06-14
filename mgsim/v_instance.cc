@@ -901,7 +901,7 @@ void set_logic_type(CARD_LIST* scope, std::string const& name)
       cc->set_modelname(name);
       trace2("LOGIC?", dev->long_label(), dev->common()->modelname());
       dev->attach_common(cc);
-    }else{ untested();
+    }else{
     }
   }
 }
@@ -925,7 +925,7 @@ void INSTANCE::expand_first_()
   if(!_parent->scope()->size()){
     std::string modelname = c->modelname();
     throw Exception(long_label() + ": no valid prototype found for " + modelname);
-  }else { untested();
+  }else {
     assert(_sim->is_first_expand());
     PARAM_LIST p;
     PARAM_LIST const* pl = scope()->params();

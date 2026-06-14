@@ -3,7 +3,7 @@ parameter error*2=error;
 parameter error*3=error;
                ^ ? syntax error
 parameter error*3=error;
-               ^ ? what's this?
+               ^ ? missing semicolon
 module foo ();
   parameter error*3=error;
 endmodule // foo

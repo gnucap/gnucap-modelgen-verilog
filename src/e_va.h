@@ -28,6 +28,9 @@
 #include <e_logic.h>
 #include <m_union.h>
 #include <e_node.h>
+#define NATURE NATURE_
+#include <e_node_type.h>
+#undef NATURE
 #include <bm.h> // BUG
 #include <e_cardlist.h>
 /*--------------------------------------------------------------------------*/
