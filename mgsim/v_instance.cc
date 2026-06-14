@@ -60,7 +60,6 @@ class DEV_INSTANCE_PROTO;
 class COMMON_INSTANCE : public COMMON_COMPONENT {
   DEV_INSTANCE_PROTO* _proto{nullptr};
   PARAM_LIST _params;
-public:
   std::vector<std::string> _port_names;
 public:
   COMMON_INSTANCE(int x) : COMMON_COMPONENT(x) {}
@@ -83,6 +82,9 @@ public:
         && _port_names == x->_port_names
         && _modelname == x->_modelname;
   }
+  int num_ports()const {return int(_port_names.size()); }
+  std::string const& port_name(int i)const {return _port_names[i]; }
+  void set_port(std::string const& p) {_port_names.push_back(p);}
 #if __cplusplus >= 202002L
   bool operator<(COMMON_COMPONENT const& p)const override { untested();
     return compare(p) < 0;
@@ -297,10 +299,10 @@ protected:
   std::string port_name(int i)const override {
     auto c = prechecked_cast<COMMON_INSTANCE const*>(common());
     assert(c);
-    if(size_t(i)>=c->_port_names.size()){ untested();
+    if(i >= c->num_ports()) { untested();
       return ""; // it has no name.
     }else{
-      return c->_port_names[i];
+      return c->port_name(i);
     }
   }
 protected:
@@ -346,11 +348,11 @@ public:
   std::string port_name(int i)const override {
     auto c = prechecked_cast<COMMON_INSTANCE const*>(common());
     assert(c);
-    if(size_t(i)>=c->_port_names.size()){
+    if(i >= c->num_ports()) {
       trace1("port_name0", i);
       return ""; // it has no name.Y
     }else{
-      return c->_port_names[i];
+      return c->port_name(i);
     }
   }
   void set_port_by_index(int Index, std::string& Value)override {
@@ -361,7 +363,7 @@ public:
   int set_port_by_name(std::string&name, std::string&ext_name)override { untested();
     int i = net_nodes();
     auto* cc = prechecked_cast<COMMON_INSTANCE*>(mutable_common()->mutable_clone());
-    cc->_port_names.push_back(name);
+    cc->set_port(name);
     attach_common(cc);
 
     if(subckt()){ untested();
@@ -1036,8 +1038,8 @@ void INSTANCE::expand_first()
     _proto->attach_common(mutable_common());
     auto c = prechecked_cast<COMMON_INSTANCE const*>(common());
     assert(c);
-    for(int i=0; i < int(c->_port_names.size()); ++i){ untested();
-      auto v = c->_port_names[i];
+    for(int i = 0; i < c->num_ports(); ++i){ untested();
+      auto v = c->port_name(i);
       _proto->set_port_by_name(v, v);
     }
     build_proto();
@@ -1092,10 +1094,10 @@ void INSTANCE::build_proto() const
     _proto->attach_common(common()->clone());
     auto c = prechecked_cast<COMMON_INSTANCE const*>(common());
     assert(c);
-    for(int i = 0; i<int(c->_port_names.size()); ++i) {
-      std::string v = c->_port_names[i];
-      if(c->_port_names.size()){
-	assert(c->_port_names[i] == v);
+    for(int i = 0; i < c->num_ports(); ++i) {
+      std::string v = c->port_name(i);
+      if(c->num_ports()) {
+	assert(c->port_name(i) == v);
 	std::string nn = port_value(i);
 	if(!v.size()) {
 	  _proto->set_port_by_index(i, nn);
@@ -1140,9 +1142,9 @@ void INSTANCE::set_port_by_index(int Index, std::string& Value)
     assert(common());
     auto* cc = prechecked_cast<COMMON_INSTANCE*>(mutable_common()->mutable_clone());
     assert(cc);
-    assert(int(cc->_port_names.size()) == Index);
-    cc->_port_names.resize(Index+1);
-    assert(!cc->_port_names[Index].size());
+    assert(cc->num_ports() == Index);
+    cc->set_port(""); // _port_names.resize(Index+1);
+    assert(!cc->port_name(Index).size());
     attach_common(cc);
   }else{ untested();
     incomplete();
@@ -1154,8 +1156,9 @@ int INSTANCE::set_port_by_name(std::string& name, std::string& ext_name)
 {
   int i = net_nodes();
   auto* cc = prechecked_cast<COMMON_INSTANCE*>(mutable_common()->mutable_clone());
-  cc->_port_names.resize(i+1);
-  cc->_port_names[i] = name;
+  assert(cc->num_ports() == i);
+//  cc->_port_names.resize(i+1);
+  cc->set_port(name);
   attach_common(cc);
 
   if(subckt()){ untested();
