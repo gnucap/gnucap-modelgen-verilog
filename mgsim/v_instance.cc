@@ -220,7 +220,7 @@ protected:
   int		ext_nodes()const override	{return net_nodes();}
   int		matrix_nodes()const override	{ untested();return 0;}
 private:
-  bool		makes_own_scope()const override { untested();return false;}
+  bool		makes_own_scope()const override {return false;}
 
 protected:
 protected:

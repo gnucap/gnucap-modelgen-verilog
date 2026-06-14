@@ -4,6 +4,7 @@ module resistor(a, b);
   (* attrib=yes *)
   parameter real r =  0.0;
   parameter real aa = 0, bb =  0.0;
+  parameter integer ii = 0, jj =  0.0;
 
   analog begin
     I(a, b) <+ (V(a, b) / r);
@@ -23,5 +24,7 @@ paramset const_res resistor;
 
   .r = 1
   .aa = (xx + ll)
+  .ii = 0
+  .jj = 0
 endparamset;
 

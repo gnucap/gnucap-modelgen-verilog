@@ -25,6 +25,7 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class TData;
+class Data_Type;
 class FUNCTION_;
 class Probe;
 class Branch_Ref;
@@ -65,6 +66,7 @@ public:
   void clear();
   Expression_* clone()const;
   TData const& data()const; // hmm
+  Data_Type const& data_type()const;
 //  TData const& deps()const{ untested();return data();}
   // Attrib const& attrib()const;
   bool update(RDeps const* r);

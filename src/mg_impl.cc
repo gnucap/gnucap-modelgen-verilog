@@ -24,6 +24,7 @@
 #include "mg_discipline.h"
 #include "mg_token.h" // TData
 #include "mg_options.h" // TData
+#include "mg_paramset.h" // bug?
 /*--------------------------------------------------------------------------*/
 bool ConstantMinTypMaxExpression::empty() const
 {

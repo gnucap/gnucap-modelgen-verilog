@@ -25,6 +25,7 @@
 #include "mg_error.h"
 #include "l_stlextra.h"
 #include "mg_analog.h"
+#include "mg_paramset.h"
 /*--------------------------------------------------------------------------*/
 Base* parse_assignment(CS& f, Block* o); // in_analog.cc
 CS& Paramset::parse_stmt(CS& f)
@@ -207,15 +208,14 @@ static void copy_ps_params(Module* sub, Paramset const* thiS)
   sub->parse_body(cmd);
 }
 /*--------------------------------------------------------------------------*/
-static void import_dot_params(Module* sub, Module const*, Block* thiS)
+Data_Type const& Paramset_Stmt::type() const
 {
-  auto dots = new Parameter_2_List;
-  dots->set_owner(sub);
-
-  std::stringstream s;
-  bool have_dots = false;
-  std::string comma;
-  s << "l real "; // TODO: type.
+  // assert(_rhs);
+  return _rhs.data_type();
+}
+/*--------------------------------------------------------------------------*/
+static void import_dot_params(Module* sub, Module const* m, Block* thiS)
+{
   for(auto i : *thiS) {
     auto dot=dynamic_cast<Paramset_Stmt*>(i);
     if(!dot){
@@ -232,25 +232,52 @@ static void import_dot_params(Module* sub, Module const*, Block* thiS)
      l->set_local();
      l->parse_rhs(dot->value());
      */
+      dot->type();
+      trace1("DBG", dot->type());
+
+      CS pp(CS::_STRING, dot->name());
+      Base const* t = m->lookup(pp);
+      Data_Type const* dd = nullptr;
+      if(dynamic_cast<Token_PAR_REF const*>(t)){
+	trace1("DBG param", "ii");
+      }else if(auto p2 = dynamic_cast<Parameter_2 const*>(t)) {
+	dd = &p2->type();
+      }else{
+	trace1("DBG nothing", "ii");
+      }
+
+      std::stringstream s;
+      std::string comma;
+      if(!dd){ untested();
+	s << "l real ";
+      }else if(dd->is_int()){
+	s << "l integer ";
+      }else if(dd->is_string()){
+	s << "l string ";
+      }else if(dd->is_real()){
+	s << "l real ";
+      }else{ untested();
+	// incomplete();
+	s << "l real ";
+      }
 
       // TODO: add '_' as needed.
-      s << comma << PS_MANGLE_PREFIX << dot->name() << " = " <<
-	 dot->value();
+      s << comma << PS_MANGLE_PREFIX << dot->name() << " = " << dot->value();
       comma = ", ";
-      have_dots = true;
+      s << ";";
+
+      auto pl = new Parameter_2_List;
+      pl->set_owner(sub);
+
+      CS cmd(CS::_STRING, s.str());
+      cmd >> "l";
+      cmd >> *pl;
+      for (auto j : *pl){
+	j->set_given();
+      }
+      sub->parameters().push_back(pl);
 
     }
-  }
-  s << ";";
-
-  if(have_dots){
-    CS cmd(CS::_STRING, s.str());
-    cmd >> "l" >> *dots;
-    for (auto i : *dots){
-      i->set_given();
-    }
-    sub->parameters().push_back(dots);
-  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -493,6 +520,8 @@ void Paramset_Stmt::parse(CS& f)
   }else{ untested();
     throw Exception_CS_("bad expression", f);
   }
+
+  _rhs.update(nullptr);
 }
 /*--------------------------------------------------------------------------*/
 void Paramset_Stmt::dump(std::ostream& o) const

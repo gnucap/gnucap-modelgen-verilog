@@ -7322,7 +7322,8 @@ public:
 public: // input parameters
   PARAMETER<p_real> _p_c /*  */;
   PARAMETER<p_real> _p_ic /*  */;
-  real _p___c /*  */, _p___ic /*  */;
+  real _p___c /*  */;
+  real _p___ic /*  */;
 public: // common values
   struct state_{
 #if __cplusplus >= 202002L

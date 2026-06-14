@@ -318,22 +318,6 @@ public:
   ~Probe_Map();
 };
 /*--------------------------------------------------------------------------*/
-class Paramset_Stmt : public Owned_Base {
-  Parameter_Base const* _what{nullptr};
-  Expression_ _rhs;
-  bool _overridden{false};
-public:
-  explicit Paramset_Stmt() : Owned_Base() {}
-  void set_parameter(Parameter_Base const* b) {_what = b;}
-  void parse(CS& f)override;
-  void dump(std::ostream& f)const override;
-  void set_overridden() {_overridden = true;}
-  bool is_overridden()const {return _overridden;}
-public:
-  std::string name()const;
-  Expression_ const& value()const;
-};
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class Node : public Base {
