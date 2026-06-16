@@ -6,9 +6,11 @@ attach ./c_debug.so
 verilog
 
 `modelgen
-module test_net_0(.p(a), .n(a));
+module test_net_0(.p(a), .n(a), .q(b), .A(A));
 	electrical a;
 	inout a;
+	inout b;
+	electrical i;
 	(*desc=""*) real v;
 	analog begin
 		v = V(a);

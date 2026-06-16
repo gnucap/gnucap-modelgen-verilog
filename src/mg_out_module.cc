@@ -946,30 +946,6 @@ static void make_module_class(std::ostream& o, Module const& m)
     "------------------------------------*/\n";
 } // make_module_class
 /*--------------------------------------------------------------------------*/
-static void make_module_clear_local_nodes(std::ostream& o, Module const& m)
-{
-  o__ "for(int i=0; i<ext_nodes()+int_nodes(); ++i){\n";
-  o____ "trace3(\"expand0 clear\", long_label(), i, n_(i).e_());\n";
-  o__ "}\n";
-  o__ "assert(scope());\n";
-  o__ "assert(scope()->nodes());\n";
-  o__ "NODE_MAP& nodes = *scope()->nodes();\n";
-  o__ "(void)nodes;\n";
-
-  int pp = 0;
-  for (auto nn : m.circuit()->ports()) {
-    o << "//port " << nn->name() << " " << nn->node()->number() << "\n";
-    int nnnn = nn->node()->number() - 1;
-    if(nnnn!=pp){
-      assert(nnnn<pp);
-      o____ "build_union(&n_("<<pp<<"), &n_("<<nnnn<<"));\n";
-    }else{
-    }
-    ++pp;
-  }
-
-}
-/*--------------------------------------------------------------------------*/
 static void make_set_node_type(std::ostream& o, const Node& p)
 {
   if(p.discipline()){
@@ -1012,18 +988,13 @@ static void make_module_new_local_node(std::ostream& o, const Node& p)
 /*--------------------------------------------------------------------------*/
 static void make_module_set_ports(std::ostream& o, Module const& m)
 {
-  for (int n=1; n<=int(m.circuit()->nodes().size()); ++n) {
-    Node const* nn = m.circuit()->nodes()[n];
-    assert(nn);
-    if(nn->number() == 0) {
-    }else if(nn->number() < n){
-    }else if(n <= int(m.circuit()->ports().size())){
-      o__ "// port " << nn->name() << " " << nn->number() << "\n";
-      // BUG: allocate floating ports even if unused.
-      make_set_node_type(o, *nn);
-    }else if(nn->is_used()){
+  for (auto pp : m.circuit()->ports()) {
+    o____ "// port " << pp->value() << " " << pp->code_name() << " " << pp->node_number() << "\n";
+    if(pp->node()) {
+      make_set_node_type(o, *pp->node());
     }else{
     }
+    o____ "build_union(&n_(" << pp->code_name() << "), &n_(n_"<<pp->value()<<"));\n";
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1050,12 +1021,13 @@ static void make_module_new_local_nodes(std::ostream& o, Module const& m)
     }
   }
 
+  auto& nodes = m.circuit()->nodes();
   for (int n=1; n<=int(m.circuit()->nodes().size()); ++n) {
-    Node const* nn = m.circuit()->nodes()[n];
+    Node const* nn = nodes[n];
     assert(nn);
     if(nn->number() == 0) {
-    }else if(nn->number() < n){
-      o__ "n_(" << n - 1 << ") = n_(" << nn->number() - 1 << "); // (a)\n";
+    }else if(nn->number() < n){ untested();
+      // o__ "n_(" << n - 1 << ") = n_(" << nn->number() - 1 << "); // (a)\n";
     }else{
     }
   }
@@ -1063,17 +1035,29 @@ static void make_module_new_local_nodes(std::ostream& o, Module const& m)
 /*--------------------------------------------------------------------------*/
 static void make_module_allocate_nodes(std::ostream& o, Module const& m)
 {
+  for (auto p : m.circuit()->ports()) {
+//    o____ p->code_name() << ", // " << p->node_number() << "\n";
+    o__ "n_(" << p->code_name() << ").set_used();\n"; // mg_port.0
+    o__ "n_(" << p->code_name() << ").allocate(3); // no-op unless floating\n";
+//    if(p->node()){
+////      o____ p->node()->code_name() << " = " << p->code_name() << ",\n";
+//    }else{
+//    }
+//    if(p->node_number()!=-1){
+//      o << "// is node number " << p->node_number() << "\n";
+//      isport[p->node_number()] = n;
+//    }else{
+//    }
+//    ++n;
+  }
   for (int n=1; n<=int(m.circuit()->nodes().size()); ++n) {
     Node const* nn = m.circuit()->nodes()[n];
     assert(nn);
     if(nn->number() == 0) {
     }else if(nn->number() < n){
-    }else if(n <= int(m.circuit()->ports().size())){
-      o__ "n_(n_" << nn->name() << ").set_used();\n"; // mg_port.0
-      o__ "n_(n_" << nn->name() << ").allocate(3); // no-op unless floating\n";
     }else if(nn->is_used()){
       o__ "n_(n_" << nn->name() << ").set_used();\n";
-      o__ "n_(n_" << nn->name() << ").allocate(3); // no-op unless floating\n";
+      o__ "n_(n_" << nn->name() << ").allocate(3);\n";
     }else{
     }
   }
@@ -1288,10 +1272,9 @@ static void make_module_expand_first(std::ostream& o, Module const& m)
   o__ "(void)gnd;\n";
   {
     indent k;
-    make_module_clear_local_nodes(o, m);
     make_module_set_ports(o, m);
   }
-  o << "}\n"
+  o << "} // expand_first\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }

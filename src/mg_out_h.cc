@@ -517,9 +517,8 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
 
 }
 /*--------------------------------------------------------------------------*/
-static int make_current_node_decl(std::ostream& o, const Module& m)
+static int make_current_node_decl(std::ostream& o, const Module& m, int n)
 {
-  int n = 0;
   for (auto br : m.circuit()->branches()){
     std::string bcn = br->code_name();
     bool needed = false;
@@ -535,9 +534,7 @@ static int make_current_node_decl(std::ostream& o, const Module& m)
     }else{
     }
     if(needed) {
-      ++n;
-      o____ "I" << bcn;
-      o << ",\n";
+      o____ "I" << bcn << " = " << n++ <<",\n";
     }else{
     }
   }
@@ -548,24 +545,33 @@ static void make_node_decl(std::ostream& o, const Module& m)
 {
   std::string comma = "";
   o__ "enum {\n";
-  int n = 1;
-  for (; n <= int(m.circuit()->nodes().size()); ++n) {
-    Node const* nn = m.circuit()->nodes()[n];
-    // TODO: node aliases, shorts etc.
-    if(nn->number() == int(1+m.circuit()->ports().size())){
-      o << "\n    /* ---- */";
+  std::vector<int> isport(m.circuit()->nodes().size()+1);
+  int n = 0;
+  for (auto p : m.circuit()->ports()) {
+    o____ p->code_name() << ", // " << p->node_number() << "\n";
+    ++n;
+    if(p->node_number()!=-1){
+      o << "// is node number " << p->node_number() << "\n";
+      isport[p->node_number()] = n;
     }else{
     }
-    o << comma << "    n_" << nn->name() << " /* used: " << nn->is_used() << " */";
-    comma = ",\n";
   }
-  o << comma << "\n";
-  if(int i = make_current_node_decl(o, m)){
-    n+=i;
+  if (m.circuit()->nodes().size()){
+    o____ "/* ---- */\n";
   }else{
   }
-  o__ "_n_total = " << --n;
-  o << "\n";
+  for (int k=1; k <= int(m.circuit()->nodes().size()); ++k) {
+    Node const* nn = m.circuit()->nodes()[k];
+    if(isport[nn->number()]) {
+      o____ "n_" << nn->name() << " = " << isport[nn->number()] - 1 << ", // .. connected to port\n";
+    }else{
+      o____ "";
+      o << "n_" << nn->name() << " = " << n << " /* used: " << nn->is_used() << " */,\n";
+      ++n;
+    }
+  }
+  n = make_current_node_decl(o, m, n);
+  o____ "_n_total = " << n << "\n";
   o__ "};\n";
 }
 /*--------------------------------------------------------------------------*/

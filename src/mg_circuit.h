@@ -26,7 +26,7 @@
 #ifndef MG_CIRCUIT_H
 #define MG_CIRCUIT_H
 #include "mg_base.h"
-#include "mg_module.h" // New_Port_List (BUG?)
+#include "mg_module.h" // Port_3 (bug)
 #include "mg_discipline.h"
 #include "mg_code.h" // MinTypMaxExpression??
 #include "mg_expression.h"

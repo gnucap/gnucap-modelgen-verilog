@@ -1432,13 +1432,17 @@ class MOD_resistor : public BASE_SUBCKT {
   typedef COMMON_resistor COMMON;
 private: // node list
   enum {
-    n_p /* used: 1 */,
-    n_n /* used: 1 */,
-    n_white_noise_1_p /* used: 0 */,
-
-    I_b_white_noise_1_p_,
-    I_b_p_n,
-  _n_total = 5
+    p_p, // 1
+// is node number 1
+    p_n, // 2
+// is node number 2
+    /* ---- */
+    n_p = 0, // .. connected to port
+    n_n = 1, // .. connected to port
+    n_white_noise_1_p = 2 /* used: 0 */,
+    I_b_white_noise_1_p_ = 3,
+    I_b_p_n = 4,
+    _n_total = 5
   };
 private:
 public:
@@ -2705,20 +2709,13 @@ void MOD_resistor::expand_first()
   node_t gnd;
   gnd.set_to_ground(nullptr);
   (void)gnd;
-    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
-      trace3("expand0 clear", long_label(), i, n_(i).e_());
-    }
-    assert(scope());
-    assert(scope()->nodes());
-    NODE_MAP& nodes = *scope()->nodes();
-    (void)nodes;
-//port p 1
-//port n 2
-    // port p 1
+      // port p p_p 1
       va::set_type(n_(n_p), "electrical");
-    // port n 2
+      build_union(&n_(p_p), &n_(n_p));
+      // port n p_n 2
       va::set_type(n_(n_n), "electrical");
-}
+      build_union(&n_(p_n), &n_(n_n));
+} // expand_first
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
 {
@@ -2804,10 +2801,14 @@ void MOD_resistor::expand()
   n_(n_white_noise_1_p).set_to_ground(nullptr);
   map_sckt_nodes(subckt(), &n_(0));
   subckt()->expand_();
+  n_(p_p).set_used();
+  n_(p_p).allocate(3); // no-op unless floating
+  n_(p_n).set_used();
+  n_(p_n).allocate(3); // no-op unless floating
   n_(n_p).set_used();
-  n_(n_p).allocate(3); // no-op unless floating
+  n_(n_p).allocate(3);
   n_(n_n).set_used();
-  n_(n_n).allocate(3); // no-op unless floating
+  n_(n_n).allocate(3);
   assert(!is_constant());
 } // expand
 /*--------------------------------------------------------------------------*/
@@ -2966,13 +2967,17 @@ class MOD_resistor : public BASE_SUBCKT {
   typedef COMMON_resistor COMMON;
 private: // node list
   enum {
-    n_p /* used: 1 */,
-    n_n /* used: 1 */,
-    n_white_noise_0_p /* used: 0 */,
-
-    I_b_white_noise_0_p_,
-    I_b_p_n,
-  _n_total = 5
+    p_p, // 1
+// is node number 1
+    p_n, // 2
+// is node number 2
+    /* ---- */
+    n_p = 0, // .. connected to port
+    n_n = 1, // .. connected to port
+    n_white_noise_0_p = 2 /* used: 0 */,
+    I_b_white_noise_0_p_ = 3,
+    I_b_p_n = 4,
+    _n_total = 5
   };
 private:
 public:
@@ -4725,20 +4730,13 @@ void MOD_resistor::expand_first()
   node_t gnd;
   gnd.set_to_ground(nullptr);
   (void)gnd;
-    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
-      trace3("expand0 clear", long_label(), i, n_(i).e_());
-    }
-    assert(scope());
-    assert(scope()->nodes());
-    NODE_MAP& nodes = *scope()->nodes();
-    (void)nodes;
-//port p 1
-//port n 2
-    // port p 1
+      // port p p_p 1
       va::set_type(n_(n_p), "electrical");
-    // port n 2
+      build_union(&n_(p_p), &n_(n_p));
+      // port n p_n 2
       va::set_type(n_(n_n), "electrical");
-}
+      build_union(&n_(p_n), &n_(n_n));
+} // expand_first
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
 {
@@ -4824,10 +4822,14 @@ void MOD_resistor::expand()
   n_(n_white_noise_0_p).set_to_ground(nullptr);
   map_sckt_nodes(subckt(), &n_(0));
   subckt()->expand_();
+  n_(p_p).set_used();
+  n_(p_p).allocate(3); // no-op unless floating
+  n_(p_n).set_used();
+  n_(p_n).allocate(3); // no-op unless floating
   n_(n_p).set_used();
-  n_(n_p).allocate(3); // no-op unless floating
+  n_(n_p).allocate(3);
   n_(n_n).set_used();
-  n_(n_n).allocate(3); // no-op unless floating
+  n_(n_n).allocate(3);
   assert(!is_constant());
 } // expand
 /*--------------------------------------------------------------------------*/
@@ -6330,13 +6332,17 @@ class MOD_capacitor : public BASE_SUBCKT {
   typedef COMMON_capacitor COMMON;
 private: // node list
   enum {
-    n_p /* used: 1 */,
-    n_n /* used: 1 */,
-    n_ddt_1_p /* used: 0 */,
-
-    I_b_ddt_1_p_,
-    I_b_p_n,
-  _n_total = 5
+    p_p, // 1
+// is node number 1
+    p_n, // 2
+// is node number 2
+    /* ---- */
+    n_p = 0, // .. connected to port
+    n_n = 1, // .. connected to port
+    n_ddt_1_p = 2 /* used: 0 */,
+    I_b_ddt_1_p_ = 3,
+    I_b_p_n = 4,
+    _n_total = 5
   };
 private:
   bool _accept{false};
@@ -7268,20 +7274,13 @@ void MOD_capacitor::expand_first()
   node_t gnd;
   gnd.set_to_ground(nullptr);
   (void)gnd;
-    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
-      trace3("expand0 clear", long_label(), i, n_(i).e_());
-    }
-    assert(scope());
-    assert(scope()->nodes());
-    NODE_MAP& nodes = *scope()->nodes();
-    (void)nodes;
-//port p 1
-//port n 2
-    // port p 1
+      // port p p_p 1
       va::set_type(n_(n_p), "electrical");
-    // port n 2
+      build_union(&n_(p_p), &n_(n_p));
+      // port n p_n 2
       va::set_type(n_(n_n), "electrical");
-}
+      build_union(&n_(p_n), &n_(n_n));
+} // expand_first
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
 {
@@ -7367,10 +7366,14 @@ void MOD_capacitor::expand()
   n_(n_ddt_1_p).set_to_ground(nullptr);
   map_sckt_nodes(subckt(), &n_(0));
   subckt()->expand_();
+  n_(p_p).set_used();
+  n_(p_p).allocate(3); // no-op unless floating
+  n_(p_n).set_used();
+  n_(p_n).allocate(3); // no-op unless floating
   n_(n_p).set_used();
-  n_(n_p).allocate(3); // no-op unless floating
+  n_(n_p).allocate(3);
   n_(n_n).set_used();
-  n_(n_n).allocate(3); // no-op unless floating
+  n_(n_n).allocate(3);
   assert(!is_constant());
 } // expand
 /*--------------------------------------------------------------------------*/
@@ -7524,14 +7527,17 @@ class MOD_capacitor : public BASE_SUBCKT {
   typedef COMMON_capacitor COMMON;
 private: // node list
   enum {
-    n_p /* used: 1 */,
-    n_n /* used: 1 */
-    /* ---- */,
-    n_ddt_2_p /* used: 1 */,
-
-    I_b_ddt_2_p_,
-    I_b_p_n,
-  _n_total = 5
+    p_p, // 1
+// is node number 1
+    p_n, // 2
+// is node number 2
+    /* ---- */
+    n_p = 0, // .. connected to port
+    n_n = 1, // .. connected to port
+    n_ddt_2_p = 2 /* used: 1 */,
+    I_b_ddt_2_p_ = 3,
+    I_b_p_n = 4,
+    _n_total = 5
   };
 private:
   bool _accept{false};
@@ -8564,20 +8570,13 @@ void MOD_capacitor::expand_first()
   node_t gnd;
   gnd.set_to_ground(nullptr);
   (void)gnd;
-    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
-      trace3("expand0 clear", long_label(), i, n_(i).e_());
-    }
-    assert(scope());
-    assert(scope()->nodes());
-    NODE_MAP& nodes = *scope()->nodes();
-    (void)nodes;
-//port p 1
-//port n 2
-    // port p 1
+      // port p p_p 1
       va::set_type(n_(n_p), "electrical");
-    // port n 2
+      build_union(&n_(p_p), &n_(n_p));
+      // port n p_n 2
       va::set_type(n_(n_n), "electrical");
-}
+      build_union(&n_(p_n), &n_(n_n));
+} // expand_first
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
 {
@@ -8663,12 +8662,16 @@ void MOD_capacitor::expand()
   }
   map_sckt_nodes(subckt(), &n_(0));
   subckt()->expand_();
+  n_(p_p).set_used();
+  n_(p_p).allocate(3); // no-op unless floating
+  n_(p_n).set_used();
+  n_(p_n).allocate(3); // no-op unless floating
   n_(n_p).set_used();
-  n_(n_p).allocate(3); // no-op unless floating
+  n_(n_p).allocate(3);
   n_(n_n).set_used();
-  n_(n_n).allocate(3); // no-op unless floating
+  n_(n_n).allocate(3);
   n_(n_ddt_2_p).set_used();
-  n_(n_ddt_2_p).allocate(3); // no-op unless floating
+  n_(n_ddt_2_p).allocate(3);
   assert(!is_constant());
 } // expand
 /*--------------------------------------------------------------------------*/

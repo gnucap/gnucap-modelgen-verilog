@@ -71,8 +71,36 @@ void New_Port::parse(CS& file)
 {
   Port_3::parse(file); // TODO: port_base?
   assert(owner());
-  trace1("New_Port::parse", name());
-  owner()->new_node(name());
+  trace2("New_Port::parse", name(), value());
+  if(name() == value()){
+    set_node(owner()->new_node(value()));
+  }else{
+    owner()->new_node(value());
+  }
+}
+/*--------------------------------------------------------------------------*/
+std::string const& New_Port::node_name() const
+{
+  if(node()){
+    return node()->name();
+  }else{
+    static std::string inv="(invalid)";
+    return inv;
+  }
+}
+/*--------------------------------------------------------------------------*/
+int New_Port::node_number() const
+{
+  if(node()){
+    return node()->number();
+  }else{
+    return -1;
+  }
+}
+/*--------------------------------------------------------------------------*/
+std::string New_Port::code_name() const
+{
+  return "p_" + name();
 }
 /*--------------------------------------------------------------------------*/
 class Wire : public Discipline{
