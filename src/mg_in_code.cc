@@ -337,7 +337,7 @@ TData const& Assignment::data()const
 /*--------------------------------------------------------------------------*/
 bool Variable_Decl::has_deps() const
 { untested();
-  return _data.has_deps();
+  return _data.has_ddeps();
 }
 /*--------------------------------------------------------------------------*/
 // obsolete

@@ -2163,7 +2163,6 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps tr_eval 1
         ddouble t1;
@@ -2364,7 +2363,6 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps tr_eval 1
         ddouble t1;
@@ -2448,7 +2446,6 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = 0.; // precalc.
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps precalc 1
         ddouble t1;
@@ -2525,7 +2522,6 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps tr_advance 1
         ddouble t1;
@@ -2577,7 +2573,6 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps tr_regress 1
         ddouble t1;
@@ -3623,7 +3618,7 @@ void EVAL__b_white_noise_0_p__::tr_eval(ELEMENT* d)const
     double /*?*/ _v_g; // local_var
 #pragma GCC diagnostic pop
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
@@ -3650,14 +3645,14 @@ void EVAL__b_white_noise_0_p__::tr_eval(ELEMENT* d)const
         }
       }
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
@@ -3762,7 +3757,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
     double /*?*/ _v_g; // local_var
 #pragma GCC diagnostic pop
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
@@ -3789,14 +3784,14 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         }
       }
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
@@ -3842,7 +3837,6 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps tr_eval 1
         ddouble t1;
@@ -4045,7 +4039,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
     double /*?*/ _v_g; // local_var
 #pragma GCC diagnostic pop
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
@@ -4072,14 +4066,14 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         }
       }
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
@@ -4125,7 +4119,6 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps tr_eval 1
         ddouble t1;
@@ -4208,7 +4201,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
     (void) _v_dt;
     double /*?*/ _v_g; // local_var
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
@@ -4235,14 +4228,14 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         }
       }
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
@@ -4288,7 +4281,6 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = 0.; // precalc.
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps precalc 1
         ddouble t1;
@@ -4368,7 +4360,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
     (void) _v_dt;
     double /*?*/ _v_g; // local_var
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
@@ -4395,14 +4387,14 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
         }
       }
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
@@ -4448,7 +4440,6 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps tr_advance 1
         ddouble t1;
@@ -4487,7 +4478,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
     (void) _v_dt;
     double /*?*/ _v_g; // local_var
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
@@ -4514,14 +4505,14 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
         }
       }
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
@@ -4567,7 +4558,6 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps tr_regress 1
         ddouble t1;
@@ -6982,7 +6972,6 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
               //t1[d_potential_b_ddt_1_p_] = 0.; // (output dep)
               t1.set_no_deps();
               t1 = p->xs_potential_b_p_n();
-              //ddeps. ddouble??
               t1 = (_p___c) /*rhspar*/ * t1; // (703)
               // --- 
               t0 = /*tr_eval*/ d->_b_ddt_1tr_eval(t1); // (659)
@@ -7029,7 +7018,6 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
               //t1[d_potential_b_ddt_1_p_] = 0.; // (output dep)
               t1.set_no_deps();
               t1 = 0.; // precalc.
-              //ddeps. ddouble??
               t1 = (_p___c) /*rhspar*/ * t1; // (703)
               // --- 
               t0 = /*precalc*/ d->_b_ddt_1precalc(t1); // (659)
@@ -8204,7 +8192,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
 // construct block...
     { // anonymous block
       {
-        //int, incomplete
+        //int, incomplete, analysis
         /*361, 1*/double f0;
         { // scope
           // F analysis args:1
@@ -8245,7 +8233,6 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
                 //t1[d_potential_b_ddt_2_p_] = 0.; // (output dep)
                 t1.set_no_deps();
                 t1 = p->xs_potential_b_p_n();
-                //ddeps. ddouble??
                 t1 = (_p___c) /*rhspar*/ * t1; // (703)
                 // --- 
                 t0 = /*tr_eval*/ d->_b_ddt_2tr_eval(t1); // (659)
@@ -8288,7 +8275,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
 // construct block...
     { // anonymous block
       {
-        //int, incomplete
+        //int, incomplete, analysis
         /*361, 1*/double f0;
         { // scope
           // F analysis args:1
@@ -8323,7 +8310,6 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
                 //t1[d_potential_b_ddt_2_p_] = 0.; // (output dep)
                 t1.set_no_deps();
                 t1 = 0.; // precalc.
-                //ddeps. ddouble??
                 t1 = (_p___c) /*rhspar*/ * t1; // (703)
                 // --- 
                 t0 = /*precalc*/ d->_b_ddt_2precalc(t1); // (659)

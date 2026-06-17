@@ -1026,7 +1026,7 @@ static void make_module_new_local_nodes(std::ostream& o, Module const& m)
     Node const* nn = nodes[n];
     assert(nn);
     if(nn->number() == 0) {
-    }else if(nn->number() < n){ untested();
+    }else if(nn->number() < n){
       // o__ "n_(" << n - 1 << ") = n_(" << nn->number() - 1 << "); // (a)\n";
     }else{
     }
