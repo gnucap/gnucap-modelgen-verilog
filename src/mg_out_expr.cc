@@ -500,8 +500,11 @@ void OUT_EXPRESSION::new_variable(std::ostream& o, Token const* t)
   }else if(d->is_real()){
     o__ "//real? ddouble?\n";
     vars().new_ddouble(o);
+  }else if(td && td->has_ddeps()){
+    // assert(d->is_real()); // TODO
+    vars().new_ddouble(o);
   }else if(d->is_int()){
-    o__ "//int, incomplete\n";
+    o__ "//int, incomplete, " << t->name() << "\n";
     vars().new_float(o);
   }else if(d->is_string()){
     vars().new_string(o);

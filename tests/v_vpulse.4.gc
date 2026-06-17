@@ -1,0 +1,14 @@
+verilog
+load vams/vpulse.so
+
+ground gnd;
+
+vpulse #(.val0(1.0), .val1(-1.0), .rise(200u), .fall(200u), .phase(90), .width(0u), .period(700u)) v1(in, gnd);
+
+spice
+R1  in nin 10k
+R2  nin out  10k
+.print tran v nodes
+
+.tran 10m basic
+.end

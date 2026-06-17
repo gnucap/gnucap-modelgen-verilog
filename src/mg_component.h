@@ -50,6 +50,7 @@ public:
   void set_node(Node*n){_node = n;}
   void set_discipline(Discipline const* d, Module* owner);
 };
+/*--------------------------------------------------------------------------*/
 // TODO: Port_Base?
 class New_Port : public Port_3 {
 //  Block* _owner{nullptr};
@@ -57,6 +58,9 @@ public:
 //  void set_owner(Block* c) { untested(); _owner = c; }
   void parse(CS& f) override;
   New_Port() : Port_3() {}
+  std::string const& node_name()const;
+  std::string code_name()const;
+  int node_number()const;
 };
 // list ::= "(" port {"," port} ")"
 typedef LiSt<New_Port, '(', ',', ')'> New_Port_List;

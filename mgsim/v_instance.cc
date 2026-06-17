@@ -31,6 +31,7 @@
 #include <e_hsparam.h>
 #include <c_comand.h>
 #include <set>
+#include <e_logic.h>
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
@@ -59,15 +60,16 @@ static void grow_nodes(int Index, node_t*& n, int& capacity, int capacity_floor)
 class DEV_INSTANCE_PROTO;
 class COMMON_INSTANCE : public COMMON_COMPONENT {
   DEV_INSTANCE_PROTO* _proto{nullptr};
-public:
   PARAM_LIST _params;
   std::vector<std::string> _port_names;
+  std::string _logic;
 public:
   COMMON_INSTANCE(int x) : COMMON_COMPONENT(x) {}
   COMMON_INSTANCE(COMMON_INSTANCE const& p) :
     COMMON_COMPONENT(p),
     _params(p._params),
-    _port_names(p._port_names) {}
+    _port_names(p._port_names),
+    _logic(p._logic) {}
   COMMON_INSTANCE* clone()const override { return new COMMON_INSTANCE(*this); }
   std::string name()const override { untested();unreachable(); return "??";}
   bool operator==(COMMON_COMPONENT const& p)const override {
@@ -79,10 +81,14 @@ public:
     auto x = prechecked_cast<COMMON_INSTANCE const*>(&p);
     return x
         && _proto == x->_proto
+        && _logic == x->_logic
         && _params == x->_params
         && _port_names == x->_port_names
         && _modelname == x->_modelname;
   }
+  int num_ports()const {return int(_port_names.size()); }
+  std::string const& port_name(int i)const {return _port_names[i]; }
+  void set_port(std::string const& p) {_port_names.push_back(p);}
 #if __cplusplus >= 202002L
   bool operator<(COMMON_COMPONENT const& p)const override { untested();
     return compare(p) < 0;
@@ -103,6 +109,8 @@ public:
 
     if(intptr_t cp = intptr_t(_proto) - intptr_t(x->_proto)) { untested();
       return cp<0?-1:1;
+    }else if((c = _logic.compare(x->_logic))) { untested();
+      return c;
     }else if((c = _params.compare(x->_params))) { untested();
       return c;
     }else{ untested();
@@ -118,6 +126,9 @@ public:
   }
   bool has_less() const override { untested();return true;}
 #endif // __cplusplus >= 202002L
+  void set_param_by_index(int I, std::string& Value, int)override {
+    _params.set("*" + to_string(I), Value);
+  }
   int set_param_by_name(std::string Name, std::string Value) override {
     if(_params.find(Name) == _params.end()){
       return _params.set(Name, Value);
@@ -125,11 +136,14 @@ public:
       throw(Exception_Clash("parameter " + Name + " already set"));
     }
   }
+  void set_logic(std::string const& l) { _logic = l; }
+  std::string logic_name()const { return _logic; }
+
   bool param_is_printable(int)const override { return true; }
   std::string param_name(int i)const override
     { assert (i < int(_params.size())); return _params.name(i); }
   std::string param_name(int i, int j)const override
-    { untested(); assert(!j); return param_name(i);}
+    { untested(); (void)j; assert(!j); return param_name(i);}
   std::string param_value(int i)const override
     { assert (i < int(_params.size())); return _params.value(i); }
   int param_count()const override {return static_cast<int>(_params.size()); }
@@ -181,7 +195,16 @@ public:
     }
 
     // is this an error?
-    return clone();
+    INSTANCE* new_instance = new INSTANCE(*this);
+    if(_proto){
+      new_instance->_parent = (COMPONENT const*)_proto;
+    }else{
+    }
+    // new_instance->set_logic(OPT::default_logic);
+    auto cp = prechecked_cast<COMMON_INSTANCE const*>(new_instance->common());
+    trace2("CI set logic", cp->logic_name(), OPT::default_logic->short_label());
+
+    return new_instance;
   }
   CARD*		clone()const override {
     INSTANCE* new_instance = new INSTANCE(*this);
@@ -220,7 +243,7 @@ protected:
   int		ext_nodes()const override	{return net_nodes();}
   int		matrix_nodes()const override	{ untested();return 0;}
 private:
-  bool		makes_own_scope()const override { untested();return false;}
+  bool		makes_own_scope()const override {return false;}
 
 protected:
 protected:
@@ -230,6 +253,7 @@ protected:
   void		expand()override;
   CARD*		deflate()override;
 private:
+  void		renew_subckt_(const CARD* model, PARAM_LIST const* p);
   void		expand_first_();
   void		expand_sift();
   void		precalc_last()override{ untested();
@@ -269,17 +293,20 @@ private: // overrides
   }
   void set_param_by_index(int I, std::string& Value, int i) override {
     assert(i==0);
-    assert(I>=0);
     // BASE_SUBCKT::set_param_by_index(I, Value, 0);
     COMMON_COMPONENT* cc = common()->clone();
     auto cp = prechecked_cast<COMMON_INSTANCE*>(cc);
     assert(cp);
     trace2("spbi", I, Value);
 
-    cp->_params.set("*" + to_string(cp->param_count()), Value);
+    if(I==-10){
+      cp->set_logic(Value);
+    }else{
+      assert(I>=0);
+      cp->set_param_by_index(cp->param_count(), Value, 0);
+    }
     attach_common(cp);
   }
-
 private:
   void collect_overloads(INSTANCE* scope) const;
   void collect_overloads_from_scope(std::string const& modelname,
@@ -294,10 +321,10 @@ protected:
   std::string port_name(int i)const override {
     auto c = prechecked_cast<COMMON_INSTANCE const*>(common());
     assert(c);
-    if(size_t(i)>=c->_port_names.size()){ untested();
+    if(i >= c->num_ports()) { untested();
       return ""; // it has no name.
     }else{
-      return c->_port_names[i];
+      return c->port_name(i);
     }
   }
 protected:
@@ -343,11 +370,11 @@ public:
   std::string port_name(int i)const override {
     auto c = prechecked_cast<COMMON_INSTANCE const*>(common());
     assert(c);
-    if(size_t(i)>=c->_port_names.size()){
+    if(i >= c->num_ports()) { untested();
       trace1("port_name0", i);
       return ""; // it has no name.Y
     }else{
-      return c->_port_names[i];
+      return c->port_name(i);
     }
   }
   void set_port_by_index(int Index, std::string& Value)override {
@@ -358,7 +385,7 @@ public:
   int set_port_by_name(std::string&name, std::string&ext_name)override { untested();
     int i = net_nodes();
     auto* cc = prechecked_cast<COMMON_INSTANCE*>(mutable_common()->mutable_clone());
-    cc->_port_names.push_back(name);
+    cc->set_port(name);
     attach_common(cc);
 
     if(subckt()){ untested();
@@ -684,6 +711,7 @@ CARD* INSTANCE::deflate()
 {
 //  return this; // keep it all. for debugging
   trace1("INSTANCE::deflate", long_label());
+
   CARD_LIST* s = subckt();
   assert(s);
   assert(_parent);
@@ -726,21 +754,15 @@ CARD* INSTANCE::deflate()
       trace3("rewire p", a, _parent->port_name(a), _parent->port_value(a));
     }
     trace3("rewire", long_label(), h, net_nodes());
-#if 0
-    for(int ii=0; ii<net_nodes(); ++ii){ untested();
-      std::string nn = _n[ii].n_()->short_label();
-      trace4("rewire", long_label(), ii, nn, c->n_(ii).n_()->short_label());
-      trace4("rewire", long_label(), ii, c->n_(ii).e_(), n_(ii).e_());
-    }
-#endif
     for(int ii=0; ii<c->net_nodes(); ++ii){
       if(ii < c->net_nodes()) {
-	if(!_parent->port_name(ii).size() && n_(ii).is_connected()){
-	  c->n_(ii) = n_(ii); // why?
-	}else if(!_parent->port_name(ii).size()){
-	  c->n_(ii) = n_(c->n_(ii).e_());
-	}else if(c->n_(ii).e_() != -1){
-	  c->n_(ii) = n_(c->n_(ii).e_());
+	if(c->n_(ii).e_() != INVALID_NODE){
+	  const node_t& nn = n_(c->n_(ii).e_());
+	  c->n_(ii) = nn;
+	}else{
+	}
+	if(c->n_(ii).is_used()) {
+	  n_(ii).set_used();
 	}else{
 	}
       }else if(ii < c->net_nodes()+c->num_current_ports()){ untested();
@@ -839,6 +861,51 @@ static std::string param_count_string(CARD const* c)
   return to_string(eff_param_count(c));
 }
 /*--------------------------------------------------------------------------*/
+// avoid CARD::renew_sckt, because it maps nodes.
+void INSTANCE::renew_subckt_(const CARD* model, PARAM_LIST const* p)
+{
+  if (_sim->is_first_expand()) {
+    if(subckt()){
+      subckt()->erase_all();
+    }else{
+      new_subckt();
+    }
+    { // new CARD_LIST(Model, this, scope(), Params);
+      subckt()->set_verilog_math(model->subckt()->is_verilog_math());
+
+      subckt()->attach_params(p, scope());
+      subckt()->shallow_copy(model->subckt());
+      //set_owner(owner);
+      // subckt()->_nm = model->subckt()->nodes()->clone();
+    }
+    subckt()->set_owner(this);
+    subckt()->precalc_first();
+//    subckt()->expand_first();
+    // subckt()->map_subckt_nodes(model, this);
+  }else{untested();
+    unreachable();
+    assert(subckt());
+    subckt()->attach_params(p, scope());
+  }
+}
+/*--------------------------------------------------------------------------*/
+void set_logic_type(CARD_LIST* scope, std::string const& name)
+{
+  for(auto ci : *scope){
+    auto dev = prechecked_cast<COMPONENT*>(ci);
+    assert(dev);
+    if(!dev->common()){
+    }else if(dynamic_cast<COMMON_LOGIC const*>(dev->common())){
+
+      auto cc = dev->common()->clone();
+      cc->set_modelname(name);
+      trace2("LOGIC?", dev->long_label(), dev->common()->modelname());
+      dev->attach_common(cc);
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 void INSTANCE::expand_first_()
 {
   auto c = prechecked_cast<COMMON_INSTANCE*>(mutable_common());
@@ -850,7 +917,7 @@ void INSTANCE::expand_first_()
   trace3("INSTANCE::expand_first_1", long_label(), _parent->net_nodes(),  _parent->subckt()->nodes()->how_many());
   if(_parent->net_nodes() <= _parent->subckt()->nodes()->how_many()){
     // module
-  }else{
+  }else{ untested();
     // modelgen
   }
   assert(_parent->subckt()->params());
@@ -863,7 +930,7 @@ void INSTANCE::expand_first_()
     PARAM_LIST p;
     PARAM_LIST const* pl = scope()->params();
     p.set_try_again(pl);
-    renew_subckt(_parent, &p);
+    renew_subckt_(_parent, &p);
     assert(scope()!=subckt());
   }
 
@@ -872,15 +939,41 @@ void INSTANCE::expand_first_()
   subckt()->set_owner(nullptr);
   subckt()->set_verilog_math();
   subckt()->set_owner(owner()); // TODO: renew_subckt with alternative owner?
-  subckt()->precalc_first(); // here?
 
+  set_logic_type(subckt(), c->logic_name());
+  subckt()->precalc_first();
   expand_sift();
+
+  assert(subckt()->size() == 1);
+  CARD* ci = *subckt()->begin();
+  auto dev = prechecked_cast<COMPONENT*>(ci);
+  assert(dev);
+
+  subckt()->expand_first();
+
+  for (int ii = 0;  ii < net_nodes();  ++ii) {
+    n_(ii).clear();
+  }
+
+
+  int ii = 0;
+  for (;  ii < dev->net_nodes();  ++ii) {
+    node_t& lower = dev->n_(ii);
+    lower.map_subckt_node(&n_(0), this);
+  }
+  for (;  ii < net_nodes();  ++ii) {
+    if(ii < dev->net_nodes() + dev->num_current_ports()){
+      std::string branch_name = port_value(ii);
+      dev->set_port_by_index(ii, branch_name);
+    }else{ untested();
+    }
+  }
 }
 /*--------------------------------------------------------------------------*/
 void INSTANCE::expand()
 {
+  trace1("INSTANCE expand", long_label());
   BASE_SUBCKT::expand();
-  subckt()->expand_first();
   subckt()->expand_();
 }
 /*--------------------------------------------------------------------------*/
@@ -998,7 +1091,7 @@ void INSTANCE::expand_sift()
 // Kludge: build proto in stub, so it only needs doing once.
 void INSTANCE::expand_first()
 {
-  BASE_SUBCKT::expand_first();
+//  BASE_SUBCKT::expand_first();
   static int recursion;
   if(++recursion > OPT::recursion){ untested();
     recursion = 0;
@@ -1037,8 +1130,8 @@ void INSTANCE::expand_first()
     _proto->attach_common(mutable_common());
     auto c = prechecked_cast<COMMON_INSTANCE const*>(common());
     assert(c);
-    for(int i=0; i < int(c->_port_names.size()); ++i){ untested();
-      auto v = c->_port_names[i];
+    for(int i = 0; i < c->num_ports(); ++i){ untested();
+      auto v = c->port_name(i);
       _proto->set_port_by_name(v, v);
     }
     build_proto();
@@ -1082,7 +1175,7 @@ bool INSTANCE::defer_proto() const
 /*--------------------------------------------------------------------------*/
 void INSTANCE::build_proto() const
 {
-  if(!_proto){
+  if(!_proto){ untested();
     // static instance?
   }else{
     assert(scope());
@@ -1093,13 +1186,13 @@ void INSTANCE::build_proto() const
     _proto->attach_common(common()->clone());
     auto c = prechecked_cast<COMMON_INSTANCE const*>(common());
     assert(c);
-    for(int i = 0; i<int(c->_port_names.size()); ++i) {
-      std::string v = c->_port_names[i];
-      if(c->_port_names.size()){
-	assert(c->_port_names[i] == v);
+    for(int i = 0; i < c->num_ports(); ++i) {
+      std::string v = c->port_name(i);
+      if(c->num_ports()) {
 	std::string nn = port_value(i);
 	if(!v.size()) {
-	  _proto->set_port_by_index(i, nn);
+	  std::string in = std::to_string(i);
+	  _proto->set_port_by_index(i, in);
 	}else{
 	  _proto->set_port_by_index(i, v);
 	}
@@ -1141,9 +1234,9 @@ void INSTANCE::set_port_by_index(int Index, std::string& Value)
     assert(common());
     auto* cc = prechecked_cast<COMMON_INSTANCE*>(mutable_common()->mutable_clone());
     assert(cc);
-    assert(int(cc->_port_names.size()) == Index);
-    cc->_port_names.resize(Index+1);
-    assert(!cc->_port_names[Index].size());
+    assert(cc->num_ports() == Index);
+    cc->set_port(""); // _port_names.resize(Index+1);
+    assert(!cc->port_name(Index).size());
     attach_common(cc);
   }else{ untested();
     incomplete();
@@ -1155,8 +1248,9 @@ int INSTANCE::set_port_by_name(std::string& name, std::string& ext_name)
 {
   int i = net_nodes();
   auto* cc = prechecked_cast<COMMON_INSTANCE*>(mutable_common()->mutable_clone());
-  cc->_port_names.resize(i+1);
-  cc->_port_names[i] = name;
+  assert(cc->num_ports() == i);
+//  cc->_port_names.resize(i+1);
+  cc->set_port(name);
   attach_common(cc);
 
   if(subckt()){ untested();
@@ -1176,7 +1270,7 @@ const std::string INSTANCE::port_value(int i) const
 {
   if(_cloned_from == &p1){
     return COMPONENT::port_value(i);
-  }else if(_cloned_from){ untested();
+  }else if(_cloned_from){
     return(_cloned_from->port_value(i));
   }else{
     return COMPONENT::port_value(i);

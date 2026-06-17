@@ -81,5 +81,8 @@ discipline rotational_omega
   flow current; // FIXME
 enddiscipline
 
+discipline logic
+  domain discrete
+enddiscipline
 
 `endif // DISCIPLINES_VAMS

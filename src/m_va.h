@@ -985,6 +985,15 @@ inline node_t& ground()
   return CARD_LIST::card_list.nodes()->at(0);
 }
 /*--------------------------------------------------------------------------*/
+void set_type(node_t& n, std::string const& t)
+{
+  if(NODE* tt = node_dispatcher[t]){
+    n.set_type(tt);
+  }else{ untested();
+    throw Exception("discipline " + t + " does not exist");
+  }
+}
+/*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
 #endif

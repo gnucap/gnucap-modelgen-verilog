@@ -134,6 +134,7 @@ public:
   void operator=(const std::string& s)	 {_s = s;}
   void operator+=(const std::string& s)	 { untested();_s += s;}
   bool operator!=(const std::string& s)const {return _s != s;}
+  bool operator==(const char* s)const {return _s == s;}
   bool operator==(const String_Arg& s)const {return _s == s._s;}
   bool operator!=(const String_Arg& s)const { untested();return _s != s._s;}
   bool			is_empty()const	 { untested();return _s.empty();}

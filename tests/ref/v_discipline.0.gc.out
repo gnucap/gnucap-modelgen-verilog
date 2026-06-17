@@ -1,0 +1,43 @@
+>>>>>discipline disc1;
+>>>>>discipline disc2;
+  potential B
+             ^ ? expecting ';'
+>>>>>discipline disc2;
+>>>>>module main(a, b);
+>>>>>  disc2 b, j;
+>>>>>list
+discipline disc1;
+  domain discrete;
+enddiscipline;
+discipline disc2;
+  domain continuous;
+  potential B;
+  flow A;
+enddiscipline;
+discipline disc2;
+enddiscipline;
+module main (.a(a),.b(b));
+  electrical a, i;
+  disc2 b;
+  disc2 j;
+  inout a, b;
+endmodule // main
+
+disc1 x;
+>>>>>`disciplines
+discipline disc1;
+  domain discrete;
+enddiscipline
+discipline disc2;
+enddiscipline
+discipline disc2:0;
+  domain continuous;
+  potential B;
+  flow A;
+enddiscipline
+discipline electrical;
+enddiscipline
+discipline hybrid;
+enddiscipline
+discipline logic;
+enddiscipline

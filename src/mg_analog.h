@@ -36,7 +36,7 @@ public:
 //    incomplete();
 //    return nullptr;
 //  }
-  std::string val_string()const override { untested();
+  std::string val_string()const override {
     return std::string("analog statement ") + typeid(*this).name();
   }
 };
@@ -646,7 +646,7 @@ public:
   }
   ~Contribution();
 
-  std::string val_string()const override { untested();return "contribution " + _name; }
+  std::string val_string()const override {return "contribution " + _name; }
 private:
   void set_pot_contrib();
   void set_flow_contrib();

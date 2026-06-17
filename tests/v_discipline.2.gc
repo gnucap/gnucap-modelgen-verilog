@@ -1,0 +1,15 @@
+verilog 
+
+discipline ddisc;
+  domain discrete;
+enddiscipline
+list
+
+`default_discipline hybrid
+`default_discipline
+`default_discipline ddisc
+`default_discipline
+`default_discipline electrical
+`default_discipline
+`default_discipline bleh
+`default_discipline foo;

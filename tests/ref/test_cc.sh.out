@@ -997,6 +997,15 @@ inline node_t& ground()
   return CARD_LIST::card_list.nodes()->at(0);
 }
 /*--------------------------------------------------------------------------*/
+void set_type(node_t& n, std::string const& t)
+{
+  if(NODE* tt = node_dispatcher[t]){
+    n.set_type(tt);
+  }else{ untested();
+    throw Exception("discipline " + t + " does not exist");
+  }
+}
+/*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
 #endif
@@ -1032,6 +1041,9 @@ inline node_t& ground()
 #include <e_logic.h>
 #include <m_union.h>
 #include <e_node.h>
+#define NATURE NATURE_
+#include <e_node_type.h>
+#undef NATURE
 #include <bm.h> // BUG
 #include <e_cardlist.h>
 /*--------------------------------------------------------------------------*/
@@ -1133,8 +1145,8 @@ void map_sckt_nodes(CARD_LIST* l, node_t* nodes)
       if(cni.e_() == INVALID_NODE){
       // }else if(nodes[cni.e_()].is_grounded()){ untested();
       }else if(dynamic_cast<CURRENT_CTRL const*>(nodes[cni.e_()].n_())){
-	trace2("msn0a", (**ci).long_label(), ii);
-	cni = nodes[cni.e_()].n_(); // HACK, later.
+        trace2("msn0a", (**ci).long_label(), ii);
+        cni = nodes[cni.e_()].n_(); // HACK, later.
       }else{
         cni.map_subckt_node(nodes, nullptr);
       }
@@ -1145,6 +1157,7 @@ void map_sckt_nodes(CARD_LIST* l, node_t* nodes)
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:
+#include <e_node_type.h>
 #include <u_limit.h>
 #include <bitset>
 #include <typeindex>
@@ -1172,7 +1185,7 @@ class NATURE_temperature : public NATURE {
   double abstol()const override {return 3.14;}
 }_N_temperature;
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
+namespace {
 class DISCIPLINE_thermal : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
@@ -1195,6 +1208,18 @@ private:
 public:
 };
 static _COMMON_VASRC_thermal _C_V_thermal(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+class CDISC_thermal : public NODE_TYPE {
+  explicit CDISC_thermal(CDISC_thermal const& p ) : NODE_TYPE(p) {}
+public:
+  explicit CDISC_thermal() : NODE_TYPE("thermal") {}
+  NODE_TYPE* clone()const override {untested();
+    return new CDISC_thermal(*this);
+  }
+  NODE* deflate()override {untested();
+    return new LOGIC_NODE();
+  }
+}cdisc_1;
 /*--------------------------------------------------------------------------*/
 class DISCIPLINE_electrical : public DISCIPLINE {
 public:
@@ -1219,6 +1244,18 @@ public:
 };
 static _COMMON_VASRC_electrical _C_V_electrical(CC_STATIC);
 /*--------------------------------------------------------------------------*/
+class CDISC_electrical : public NODE_TYPE {
+  explicit CDISC_electrical(CDISC_electrical const& p ) : NODE_TYPE(p) {}
+public:
+  explicit CDISC_electrical() : NODE_TYPE("electrical") {}
+  NODE_TYPE* clone()const override {untested();
+    return new CDISC_electrical(*this);
+  }
+  NODE* deflate()override {untested();
+    return new LOGIC_NODE();
+  }
+}cdisc_2;
+/*--------------------------------------------------------------------------*/
 class DISCIPLINE_magnetic : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
@@ -1242,6 +1279,18 @@ public:
 };
 static _COMMON_VASRC_magnetic _C_V_magnetic(CC_STATIC);
 /*--------------------------------------------------------------------------*/
+class CDISC_magnetic : public NODE_TYPE {
+  explicit CDISC_magnetic(CDISC_magnetic const& p ) : NODE_TYPE(p) {}
+public:
+  explicit CDISC_magnetic() : NODE_TYPE("magnetic") {}
+  NODE_TYPE* clone()const override {untested();
+    return new CDISC_magnetic(*this);
+  }
+  NODE* deflate()override {untested();
+    return new LOGIC_NODE();
+  }
+}cdisc_3;
+/*--------------------------------------------------------------------------*/
 class DISCIPLINE_rotational_omega : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
@@ -1264,6 +1313,29 @@ private:
 public:
 };
 static _COMMON_VASRC_rotational_omega _C_V_rotational_omega(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+class CDISC_rotational_omega : public NODE_TYPE {
+  explicit CDISC_rotational_omega(CDISC_rotational_omega const& p ) : NODE_TYPE(p) {}
+public:
+  explicit CDISC_rotational_omega() : NODE_TYPE("rotational_omega") {}
+  NODE_TYPE* clone()const override {untested();
+    return new CDISC_rotational_omega(*this);
+  }
+  NODE* deflate()override {untested();
+    return new LOGIC_NODE();
+  }
+}cdisc_4;
+/*--------------------------------------------------------------------------*/
+class DDISC_logic : public NODE_TYPE {
+  explicit DDISC_logic(DDISC_logic const& p ) : NODE_TYPE(p) {}
+public:
+  explicit DDISC_logic() : NODE_TYPE("logic") {}
+  NODE_TYPE* clone()const override{untested();
+    return new DDISC_logic(*this);
+  }
+}ddisc_1;
+/*--------------------------------------------------------------------------*/
+}
 /*--------------------------------------------------------------------------*/
 namespace n0{
 class MOD_resistor;
@@ -1360,13 +1432,17 @@ class MOD_resistor : public BASE_SUBCKT {
   typedef COMMON_resistor COMMON;
 private: // node list
   enum {
-    n_p /* used: 1 */,
-    n_n /* used: 1 */,
-    n_white_noise_1_p /* used: 0 */,
-
-    I_b_white_noise_1_p_,
-    I_b_p_n,
-  _n_total = 5
+    p_p, // 1
+// is node number 1
+    p_n, // 2
+// is node number 2
+    /* ---- */
+    n_p = 0, // .. connected to port
+    n_n = 1, // .. connected to port
+    n_white_noise_1_p = 2 /* used: 0 */,
+    I_b_white_noise_1_p_ = 3,
+    I_b_p_n = 4,
+    _n_total = 5
   };
 private:
 public:
@@ -2087,7 +2163,6 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps tr_eval 1
         ddouble t1;
@@ -2288,7 +2363,6 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps tr_eval 1
         ddouble t1;
@@ -2372,7 +2446,6 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = 0.; // precalc.
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps precalc 1
         ddouble t1;
@@ -2449,7 +2522,6 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps tr_advance 1
         ddouble t1;
@@ -2501,7 +2573,6 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps tr_regress 1
         ddouble t1;
@@ -2630,7 +2701,16 @@ void MOD_resistor::expand_first()
   for(int i=0; i<ext_nodes()+int_nodes(); ++i){
     trace3("expand2 clear", long_label(), i, n_(i).e_());
   }
-}
+  node_t gnd;
+  gnd.set_to_ground(nullptr);
+  (void)gnd;
+      // port p p_p 1
+      va::set_type(n_(n_p), "electrical");
+      build_union(&n_(p_p), &n_(n_p));
+      // port n p_n 2
+      va::set_type(n_(n_n), "electrical");
+      build_union(&n_(p_n), &n_(n_n));
+} // expand_first
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
 {
@@ -2651,21 +2731,6 @@ void MOD_resistor::expand()
   node_t gnd;
   gnd.set_to_ground(nullptr);
   if (_sim->is_first_expand()) {
-    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
-      trace3("expand0 clear", long_label(), i, n_(i).e_());
-    }
-    assert(scope());
-    assert(scope()->nodes());
-    NODE_MAP& nodes = *scope()->nodes();
-    (void)nodes;
-//port p 1
-//port n 2
-    // port p 1
-    n_(n_p).set_type(OPT::default_logic);
-    // port n 2
-    n_(n_n).set_type(OPT::default_logic);
-    // ground
-    n_(n_white_noise_1_p).set_to_ground(nullptr);
     precalc_first();
 
   // clone branches
@@ -2725,12 +2790,20 @@ void MOD_resistor::expand()
   //precalc();
   subckt()->precalc_first();
   subckt()->expand_first();
+  // port p 1
+  // port n 2
+  // ground
+  n_(n_white_noise_1_p).set_to_ground(nullptr);
   map_sckt_nodes(subckt(), &n_(0));
   subckt()->expand_();
+  n_(p_p).set_used();
+  n_(p_p).allocate(3); // no-op unless floating
+  n_(p_n).set_used();
+  n_(p_n).allocate(3); // no-op unless floating
   n_(n_p).set_used();
-  n_(n_p).allocate(3); // no-op unless floating
+  n_(n_p).allocate(3);
   n_(n_n).set_used();
-  n_(n_n).allocate(3); // no-op unless floating
+  n_(n_n).allocate(3);
   assert(!is_constant());
 } // expand
 /*--------------------------------------------------------------------------*/
@@ -2889,13 +2962,17 @@ class MOD_resistor : public BASE_SUBCKT {
   typedef COMMON_resistor COMMON;
 private: // node list
   enum {
-    n_p /* used: 1 */,
-    n_n /* used: 1 */,
-    n_white_noise_0_p /* used: 0 */,
-
-    I_b_white_noise_0_p_,
-    I_b_p_n,
-  _n_total = 5
+    p_p, // 1
+// is node number 1
+    p_n, // 2
+// is node number 2
+    /* ---- */
+    n_p = 0, // .. connected to port
+    n_n = 1, // .. connected to port
+    n_white_noise_0_p = 2 /* used: 0 */,
+    I_b_white_noise_0_p_ = 3,
+    I_b_p_n = 4,
+    _n_total = 5
   };
 private:
 public:
@@ -3541,7 +3618,7 @@ void EVAL__b_white_noise_0_p__::tr_eval(ELEMENT* d)const
     double /*?*/ _v_g; // local_var
 #pragma GCC diagnostic pop
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
@@ -3568,14 +3645,14 @@ void EVAL__b_white_noise_0_p__::tr_eval(ELEMENT* d)const
         }
       }
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
@@ -3680,7 +3757,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
     double /*?*/ _v_g; // local_var
 #pragma GCC diagnostic pop
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
@@ -3707,14 +3784,14 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         }
       }
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
@@ -3760,7 +3837,6 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps tr_eval 1
         ddouble t1;
@@ -3963,7 +4039,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
     double /*?*/ _v_g; // local_var
 #pragma GCC diagnostic pop
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
@@ -3990,14 +4066,14 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         }
       }
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
@@ -4043,7 +4119,6 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps tr_eval 1
         ddouble t1;
@@ -4126,7 +4201,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
     (void) _v_dt;
     double /*?*/ _v_g; // local_var
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
@@ -4153,14 +4228,14 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         }
       }
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
@@ -4206,7 +4281,6 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = 0.; // precalc.
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps precalc 1
         ddouble t1;
@@ -4286,7 +4360,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
     (void) _v_dt;
     double /*?*/ _v_g; // local_var
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
@@ -4313,14 +4387,14 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
         }
       }
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
@@ -4366,7 +4440,6 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps tr_advance 1
         ddouble t1;
@@ -4405,7 +4478,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
     (void) _v_dt;
     double /*?*/ _v_g; // local_var
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
@@ -4432,14 +4505,14 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
         }
       }
       {
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
           // F $param_given args:1
           // --- 
           f0 = param_given((_p_tc1) /*rhspar*/); // (659)
         } // scope
-        //int, incomplete
+        //int, incomplete, $param_given
         /*361, 1*/double f1;
         { // scope
           // F $param_given args:1
@@ -4485,7 +4558,6 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
         //t0[d_potential_b_p_n] = 0.; // (output dep)
         t0.set_no_deps();
         t0 = p->xs_potential_b_p_n();
-        //ddeps. ddouble??
         t0 = t0 * _v_g/*rhsvar*/; // (703)
         // dynamic & deps tr_regress 1
         ddouble t1;
@@ -4645,7 +4717,16 @@ void MOD_resistor::expand_first()
   for(int i=0; i<ext_nodes()+int_nodes(); ++i){
     trace3("expand2 clear", long_label(), i, n_(i).e_());
   }
-}
+  node_t gnd;
+  gnd.set_to_ground(nullptr);
+  (void)gnd;
+      // port p p_p 1
+      va::set_type(n_(n_p), "electrical");
+      build_union(&n_(p_p), &n_(n_p));
+      // port n p_n 2
+      va::set_type(n_(n_n), "electrical");
+      build_union(&n_(p_n), &n_(n_n));
+} // expand_first
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
 {
@@ -4666,21 +4747,6 @@ void MOD_resistor::expand()
   node_t gnd;
   gnd.set_to_ground(nullptr);
   if (_sim->is_first_expand()) {
-    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
-      trace3("expand0 clear", long_label(), i, n_(i).e_());
-    }
-    assert(scope());
-    assert(scope()->nodes());
-    NODE_MAP& nodes = *scope()->nodes();
-    (void)nodes;
-//port p 1
-//port n 2
-    // port p 1
-    n_(n_p).set_type(OPT::default_logic);
-    // port n 2
-    n_(n_n).set_type(OPT::default_logic);
-    // ground
-    n_(n_white_noise_0_p).set_to_ground(nullptr);
     precalc_first();
 
   // clone branches
@@ -4740,12 +4806,20 @@ void MOD_resistor::expand()
   //precalc();
   subckt()->precalc_first();
   subckt()->expand_first();
+  // port p 1
+  // port n 2
+  // ground
+  n_(n_white_noise_0_p).set_to_ground(nullptr);
   map_sckt_nodes(subckt(), &n_(0));
   subckt()->expand_();
+  n_(p_p).set_used();
+  n_(p_p).allocate(3); // no-op unless floating
+  n_(p_n).set_used();
+  n_(p_n).allocate(3); // no-op unless floating
   n_(n_p).set_used();
-  n_(n_p).allocate(3); // no-op unless floating
+  n_(n_p).allocate(3);
   n_(n_n).set_used();
-  n_(n_n).allocate(3); // no-op unless floating
+  n_(n_n).allocate(3);
   assert(!is_constant());
 } // expand
 /*--------------------------------------------------------------------------*/
@@ -5812,6 +5886,15 @@ inline node_t& ground()
   return CARD_LIST::card_list.nodes()->at(0);
 }
 /*--------------------------------------------------------------------------*/
+void set_type(node_t& n, std::string const& t)
+{
+  if(NODE* tt = node_dispatcher[t]){
+    n.set_type(tt);
+  }else{ untested();
+    throw Exception("discipline " + t + " does not exist");
+  }
+}
+/*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
 #endif
@@ -5847,6 +5930,9 @@ inline node_t& ground()
 #include <e_logic.h>
 #include <m_union.h>
 #include <e_node.h>
+#define NATURE NATURE_
+#include <e_node_type.h>
+#undef NATURE
 #include <bm.h> // BUG
 #include <e_cardlist.h>
 /*--------------------------------------------------------------------------*/
@@ -5948,8 +6034,8 @@ void map_sckt_nodes(CARD_LIST* l, node_t* nodes)
       if(cni.e_() == INVALID_NODE){
       // }else if(nodes[cni.e_()].is_grounded()){ untested();
       }else if(dynamic_cast<CURRENT_CTRL const*>(nodes[cni.e_()].n_())){
-	trace2("msn0a", (**ci).long_label(), ii);
-	cni = nodes[cni.e_()].n_(); // HACK, later.
+        trace2("msn0a", (**ci).long_label(), ii);
+        cni = nodes[cni.e_()].n_(); // HACK, later.
       }else{
         cni.map_subckt_node(nodes, nullptr);
       }
@@ -5960,6 +6046,7 @@ void map_sckt_nodes(CARD_LIST* l, node_t* nodes)
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:
+#include <e_node_type.h>
 #include <u_limit.h>
 #include <bitset>
 #include <typeindex>
@@ -5987,7 +6074,7 @@ class NATURE_temperature : public NATURE {
   double abstol()const override {return 3.14;}
 }_N_temperature;
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
+namespace {
 class DISCIPLINE_thermal : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
@@ -6010,6 +6097,18 @@ private:
 public:
 };
 static _COMMON_VASRC_thermal _C_V_thermal(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+class CDISC_thermal : public NODE_TYPE {
+  explicit CDISC_thermal(CDISC_thermal const& p ) : NODE_TYPE(p) {}
+public:
+  explicit CDISC_thermal() : NODE_TYPE("thermal") {}
+  NODE_TYPE* clone()const override {untested();
+    return new CDISC_thermal(*this);
+  }
+  NODE* deflate()override {untested();
+    return new LOGIC_NODE();
+  }
+}cdisc_1;
 /*--------------------------------------------------------------------------*/
 class DISCIPLINE_electrical : public DISCIPLINE {
 public:
@@ -6034,6 +6133,18 @@ public:
 };
 static _COMMON_VASRC_electrical _C_V_electrical(CC_STATIC);
 /*--------------------------------------------------------------------------*/
+class CDISC_electrical : public NODE_TYPE {
+  explicit CDISC_electrical(CDISC_electrical const& p ) : NODE_TYPE(p) {}
+public:
+  explicit CDISC_electrical() : NODE_TYPE("electrical") {}
+  NODE_TYPE* clone()const override {untested();
+    return new CDISC_electrical(*this);
+  }
+  NODE* deflate()override {untested();
+    return new LOGIC_NODE();
+  }
+}cdisc_2;
+/*--------------------------------------------------------------------------*/
 class DISCIPLINE_magnetic : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
@@ -6057,6 +6168,18 @@ public:
 };
 static _COMMON_VASRC_magnetic _C_V_magnetic(CC_STATIC);
 /*--------------------------------------------------------------------------*/
+class CDISC_magnetic : public NODE_TYPE {
+  explicit CDISC_magnetic(CDISC_magnetic const& p ) : NODE_TYPE(p) {}
+public:
+  explicit CDISC_magnetic() : NODE_TYPE("magnetic") {}
+  NODE_TYPE* clone()const override {untested();
+    return new CDISC_magnetic(*this);
+  }
+  NODE* deflate()override {untested();
+    return new LOGIC_NODE();
+  }
+}cdisc_3;
+/*--------------------------------------------------------------------------*/
 class DISCIPLINE_rotational_omega : public DISCIPLINE {
 public:
   NATURE const* flow()const override{
@@ -6079,6 +6202,29 @@ private:
 public:
 };
 static _COMMON_VASRC_rotational_omega _C_V_rotational_omega(CC_STATIC);
+/*--------------------------------------------------------------------------*/
+class CDISC_rotational_omega : public NODE_TYPE {
+  explicit CDISC_rotational_omega(CDISC_rotational_omega const& p ) : NODE_TYPE(p) {}
+public:
+  explicit CDISC_rotational_omega() : NODE_TYPE("rotational_omega") {}
+  NODE_TYPE* clone()const override {untested();
+    return new CDISC_rotational_omega(*this);
+  }
+  NODE* deflate()override {untested();
+    return new LOGIC_NODE();
+  }
+}cdisc_4;
+/*--------------------------------------------------------------------------*/
+class DDISC_logic : public NODE_TYPE {
+  explicit DDISC_logic(DDISC_logic const& p ) : NODE_TYPE(p) {}
+public:
+  explicit DDISC_logic() : NODE_TYPE("logic") {}
+  NODE_TYPE* clone()const override{untested();
+    return new DDISC_logic(*this);
+  }
+}ddisc_1;
+/*--------------------------------------------------------------------------*/
+}
 /*--------------------------------------------------------------------------*/
 namespace n0{
 class MOD_capacitor;
@@ -6176,13 +6322,17 @@ class MOD_capacitor : public BASE_SUBCKT {
   typedef COMMON_capacitor COMMON;
 private: // node list
   enum {
-    n_p /* used: 1 */,
-    n_n /* used: 1 */,
-    n_ddt_1_p /* used: 0 */,
-
-    I_b_ddt_1_p_,
-    I_b_p_n,
-  _n_total = 5
+    p_p, // 1
+// is node number 1
+    p_n, // 2
+// is node number 2
+    /* ---- */
+    n_p = 0, // .. connected to port
+    n_n = 1, // .. connected to port
+    n_ddt_1_p = 2 /* used: 0 */,
+    I_b_ddt_1_p_ = 3,
+    I_b_p_n = 4,
+    _n_total = 5
   };
 private:
   bool _accept{false};
@@ -6822,7 +6972,6 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
               //t1[d_potential_b_ddt_1_p_] = 0.; // (output dep)
               t1.set_no_deps();
               t1 = p->xs_potential_b_p_n();
-              //ddeps. ddouble??
               t1 = (_p___c) /*rhspar*/ * t1; // (703)
               // --- 
               t0 = /*tr_eval*/ d->_b_ddt_1tr_eval(t1); // (659)
@@ -6869,7 +7018,6 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
               //t1[d_potential_b_ddt_1_p_] = 0.; // (output dep)
               t1.set_no_deps();
               t1 = 0.; // precalc.
-              //ddeps. ddouble??
               t1 = (_p___c) /*rhspar*/ * t1; // (703)
               // --- 
               t0 = /*precalc*/ d->_b_ddt_1precalc(t1); // (659)
@@ -7111,7 +7259,16 @@ void MOD_capacitor::expand_first()
   for(int i=0; i<ext_nodes()+int_nodes(); ++i){
     trace3("expand2 clear", long_label(), i, n_(i).e_());
   }
-}
+  node_t gnd;
+  gnd.set_to_ground(nullptr);
+  (void)gnd;
+      // port p p_p 1
+      va::set_type(n_(n_p), "electrical");
+      build_union(&n_(p_p), &n_(n_p));
+      // port n p_n 2
+      va::set_type(n_(n_n), "electrical");
+      build_union(&n_(p_n), &n_(n_n));
+} // expand_first
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
 {
@@ -7132,21 +7289,6 @@ void MOD_capacitor::expand()
   node_t gnd;
   gnd.set_to_ground(nullptr);
   if (_sim->is_first_expand()) {
-    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
-      trace3("expand0 clear", long_label(), i, n_(i).e_());
-    }
-    assert(scope());
-    assert(scope()->nodes());
-    NODE_MAP& nodes = *scope()->nodes();
-    (void)nodes;
-//port p 1
-//port n 2
-    // port p 1
-    n_(n_p).set_type(OPT::default_logic);
-    // port n 2
-    n_(n_n).set_type(OPT::default_logic);
-    // ground
-    n_(n_ddt_1_p).set_to_ground(nullptr);
     precalc_first();
 
   // clone branches
@@ -7206,12 +7348,20 @@ void MOD_capacitor::expand()
   //precalc();
   subckt()->precalc_first();
   subckt()->expand_first();
+  // port p 1
+  // port n 2
+  // ground
+  n_(n_ddt_1_p).set_to_ground(nullptr);
   map_sckt_nodes(subckt(), &n_(0));
   subckt()->expand_();
+  n_(p_p).set_used();
+  n_(p_p).allocate(3); // no-op unless floating
+  n_(p_n).set_used();
+  n_(p_n).allocate(3); // no-op unless floating
   n_(n_p).set_used();
-  n_(n_p).allocate(3); // no-op unless floating
+  n_(n_p).allocate(3);
   n_(n_n).set_used();
-  n_(n_n).allocate(3); // no-op unless floating
+  n_(n_n).allocate(3);
   assert(!is_constant());
 } // expand
 /*--------------------------------------------------------------------------*/
@@ -7322,7 +7472,8 @@ public:
 public: // input parameters
   PARAMETER<p_real> _p_c /*  */;
   PARAMETER<p_real> _p_ic /*  */;
-  real _p___c /*  */, _p___ic /*  */;
+  real _p___c /*  */;
+  real _p___ic /*  */;
 public: // common values
   struct state_{
 #if __cplusplus >= 202002L
@@ -7364,14 +7515,17 @@ class MOD_capacitor : public BASE_SUBCKT {
   typedef COMMON_capacitor COMMON;
 private: // node list
   enum {
-    n_p /* used: 1 */,
-    n_n /* used: 1 */
-    /* ---- */,
-    n_ddt_2_p /* used: 1 */,
-
-    I_b_ddt_2_p_,
-    I_b_p_n,
-  _n_total = 5
+    p_p, // 1
+// is node number 1
+    p_n, // 2
+// is node number 2
+    /* ---- */
+    n_p = 0, // .. connected to port
+    n_n = 1, // .. connected to port
+    n_ddt_2_p = 2 /* used: 1 */,
+    I_b_ddt_2_p_ = 3,
+    I_b_p_n = 4,
+    _n_total = 5
   };
 private:
   bool _accept{false};
@@ -8038,7 +8192,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
 // construct block...
     { // anonymous block
       {
-        //int, incomplete
+        //int, incomplete, analysis
         /*361, 1*/double f0;
         { // scope
           // F analysis args:1
@@ -8079,7 +8233,6 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
                 //t1[d_potential_b_ddt_2_p_] = 0.; // (output dep)
                 t1.set_no_deps();
                 t1 = p->xs_potential_b_p_n();
-                //ddeps. ddouble??
                 t1 = (_p___c) /*rhspar*/ * t1; // (703)
                 // --- 
                 t0 = /*tr_eval*/ d->_b_ddt_2tr_eval(t1); // (659)
@@ -8122,7 +8275,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
 // construct block...
     { // anonymous block
       {
-        //int, incomplete
+        //int, incomplete, analysis
         /*361, 1*/double f0;
         { // scope
           // F analysis args:1
@@ -8157,7 +8310,6 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
                 //t1[d_potential_b_ddt_2_p_] = 0.; // (output dep)
                 t1.set_no_deps();
                 t1 = 0.; // precalc.
-                //ddeps. ddouble??
                 t1 = (_p___c) /*rhspar*/ * t1; // (703)
                 // --- 
                 t0 = /*precalc*/ d->_b_ddt_2precalc(t1); // (659)
@@ -8401,7 +8553,16 @@ void MOD_capacitor::expand_first()
   for(int i=0; i<ext_nodes()+int_nodes(); ++i){
     trace3("expand2 clear", long_label(), i, n_(i).e_());
   }
-}
+  node_t gnd;
+  gnd.set_to_ground(nullptr);
+  (void)gnd;
+      // port p p_p 1
+      va::set_type(n_(n_p), "electrical");
+      build_union(&n_(p_p), &n_(n_p));
+      // port n p_n 2
+      va::set_type(n_(n_n), "electrical");
+      build_union(&n_(p_n), &n_(n_n));
+} // expand_first
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
 {
@@ -8422,26 +8583,6 @@ void MOD_capacitor::expand()
   node_t gnd;
   gnd.set_to_ground(nullptr);
   if (_sim->is_first_expand()) {
-    for(int i=0; i<ext_nodes()+int_nodes(); ++i){
-      trace3("expand0 clear", long_label(), i, n_(i).e_());
-    }
-    assert(scope());
-    assert(scope()->nodes());
-    NODE_MAP& nodes = *scope()->nodes();
-    (void)nodes;
-//port p 1
-//port n 2
-    // port p 1
-    n_(n_p).set_type(OPT::default_logic);
-    // port n 2
-    n_(n_n).set_type(OPT::default_logic);
-    // internal ddt_2_p : 3
-    // node ddt_2_p 3
-    if (_short_b_ddt_2()) {
-      n_(n_ddt_2_p) = gnd;
-    }else{
-      n_(n_ddt_2_p).set_type(OPT::default_logic);
-    }
     precalc_first();
 
   // clone branches
@@ -8496,14 +8637,27 @@ void MOD_capacitor::expand()
   //precalc();
   subckt()->precalc_first();
   subckt()->expand_first();
+  // port p 1
+  // port n 2
+  // internal ddt_2_p : 3
+  // node ddt_2_p 3
+  if (_short_b_ddt_2()) {
+    n_(n_ddt_2_p) = gnd;
+  }else{
+    n_(n_ddt_2_p).set_type(OPT::default_logic);
+  }
   map_sckt_nodes(subckt(), &n_(0));
   subckt()->expand_();
+  n_(p_p).set_used();
+  n_(p_p).allocate(3); // no-op unless floating
+  n_(p_n).set_used();
+  n_(p_n).allocate(3); // no-op unless floating
   n_(n_p).set_used();
-  n_(n_p).allocate(3); // no-op unless floating
+  n_(n_p).allocate(3);
   n_(n_n).set_used();
-  n_(n_n).allocate(3); // no-op unless floating
+  n_(n_n).allocate(3);
   n_(n_ddt_2_p).set_used();
-  n_(n_ddt_2_p).allocate(3); // no-op unless floating
+  n_(n_ddt_2_p).allocate(3);
   assert(!is_constant());
 } // expand
 /*--------------------------------------------------------------------------*/

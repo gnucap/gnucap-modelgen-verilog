@@ -52,6 +52,8 @@ modelgen_0.so: modelgen_0.cc ../src/gnucap-mg-vams
 	${CXX} -shared -fPIC ${GNUCAP_CPPFLAGS} ${CPPFLAGS} ${MAKE_CPPFLAGS} ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< ../src/libmgvams.a -o $@ # makefile.in
 modelgen_1.so: modelgen_1.cc ../src/gnucap-mg-vams
 	${CXX} -shared -fPIC ${GNUCAP_CPPFLAGS} ${CPPFLAGS} ${MAKE_CPPFLAGS} ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< ../src/libmgvams.a -o $@ # makefile.in
+modelgen_2.so: modelgen_2.cc ../src/gnucap-mg-vams
+	${CXX} -shared -fPIC ${GNUCAP_CPPFLAGS} ${CPPFLAGS} ${MAKE_CPPFLAGS} ${GNUCAP_CXXFLAGS} ${CXXFLAGS} $< ../src/libmgvams.a -o $@ # makefile.in
 
 ${diff}: ${TARGETDIR}/%.diff: ${TARGETDIR}/%.out
 	@if [ ! -f ${ref}/$*.out ]; then \

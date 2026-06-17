@@ -200,7 +200,8 @@ public:
   void set_offset(bool v = true){_offset = v;}
   void set_constant(bool v = true){_constant = v;} // attrib/sens?
   size_t size()const {return _ddeps.size(); } // { + _rdeps.size(); }
-  bool has_deps()const { untested();return _ddeps.size(); /* +? */ }
+  bool has_ddeps()const {return _ddeps.size();}
+  bool has_deps()const {untested(); return _ddeps.size(); /* +? */ }
   bool is_offset()const {return _offset;}
   bool is_constant()const {return _constant;}
   bool is_linear()const;

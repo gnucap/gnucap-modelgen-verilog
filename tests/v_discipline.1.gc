@@ -1,0 +1,43 @@
+verilog
+load ./c_debug_disc.so
+options trace
+
+discipline disc1;
+enddiscipline
+discipline disc2;
+enddiscipline
+discipline disc2;
+enddiscipline
+discipline disc3;
+enddiscipline
+
+connectmodule cm0(out, in);
+  disc1 in;
+  hybrid out, another;
+  output out;
+  input in;
+endmodule
+connectmodule cm1(out, in);
+output out;
+input in;
+endmodule
+connectmodule cm2(out, in);
+output out;
+input in;
+endmodule
+
+connectrules foo;
+	connect disc1 disc2 resolveto disc3;
+	connect cm0;
+	connect cm1 merged;
+	connect cm2 split;
+endconnectrules
+
+list
+`disciplines
+
+delete disc2
+`disciplines
+
+delete disc2
+`disciplines

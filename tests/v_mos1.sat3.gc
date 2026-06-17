@@ -3,6 +3,7 @@ verilog
 ground \0 ;
 attach ../vams/mosfet.so
 attach ../vams/diode.so
+load ./c_debug.so
 
 // .model cmosn  nmos ( level=1  vto= 0.844345  kp= 41.5964u  gamma= 0.863074 
 // + phi= 0.6  rd= 0.  rs= 0.  cbd= 0.  cbs= 0.   pb= 0.7  cgso= 218.971p 
@@ -90,4 +91,5 @@ Vbs   4  0  0.
 .print op v(dsb.m1.d) i(dsb.m1.d) p(dsb.m1.d) cap(dsb.m1.d) r(dsb.m1.d) region(dsb.m1.d)
 .op
 .status notime
+.portdump
 .end

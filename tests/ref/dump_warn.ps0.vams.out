@@ -7,6 +7,6 @@ paramset my_res resistor;
   .rrr = R1
 endparamset;
 
-:66:
+:69:
  .rrr = R1;
       ^ ? duplicate parameter assignment

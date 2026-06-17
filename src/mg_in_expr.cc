@@ -531,5 +531,27 @@ void Expression_::submit_variable_xs(Expression_& ee) const
   }
 }
 /*--------------------------------------------------------------------------*/
+Data_Type const& Expression_::data_type() const
+{
+  if(size() != 1){ untested();
+    return data().type();
+  }else if(auto c = dynamic_cast<Token_CONSTANT const*>(*begin())) {
+    if(dynamic_cast<Float const*>(c->data())) {
+      static Data_Type_Real s;
+      return s;
+    }else if(dynamic_cast<Integer const*>(c->data())) {
+      static Data_Type_Int s;
+      return s;
+    }else if(dynamic_cast<String const*>(c->data())) {
+      static Data_Type_String s;
+      return s;
+    }else{
+    }
+  }else{
+  }
+  static Data_Type unknown;
+  return unknown;
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

@@ -17,9 +17,11 @@ discipline electrical
 enddiscipline
 
 discipline logic
+  domain discrete;
 enddiscipline
 
 discipline ddiscrete
+  domain discrete;
 enddiscipline
 
 

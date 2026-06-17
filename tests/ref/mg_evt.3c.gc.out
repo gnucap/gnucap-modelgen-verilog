@@ -2,7 +2,7 @@ test_evt3c #() dut0 (\1 , \0 );
 #           v(1)       iter(0)   
 time3   0
 time2   0
- 0.         0.         2.        
+ 0.         ??         2.        
 #Time       iter(0)    control(0)
 time3   0
 time2   0
@@ -26,5 +26,5 @@ time2   10
 Gnucap   System status
 iterations: op=0, dc=2, tran=18, fourier=0, total=29
 transient timesteps: accepted=9, rejected=0, total=9
-nodes: user=1, subckt=0, model=0, total=1
-dctran density=100.0%, ac density=100.0%
+nodes: user=0, subckt=0, model=0, total=0
+dctran density=0.0%, ac density=0.0%

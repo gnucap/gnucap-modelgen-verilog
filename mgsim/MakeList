@@ -2,7 +2,10 @@
 PACKAGE = mgsim
 
 TARGET = \
+  c_connect.so \
+  c_discipline.so \
   c_param.so \
+  d_connect.so \
   d_ltra.so \
   d_udp.so \
   d_va_acs.so \

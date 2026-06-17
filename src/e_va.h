@@ -28,6 +28,9 @@
 #include <e_logic.h>
 #include <m_union.h>
 #include <e_node.h>
+#define NATURE NATURE_
+#include <e_node_type.h>
+#undef NATURE
 #include <bm.h> // BUG
 #include <e_cardlist.h>
 /*--------------------------------------------------------------------------*/
@@ -129,8 +132,8 @@ void map_sckt_nodes(CARD_LIST* l, node_t* nodes)
       if(cni.e_() == INVALID_NODE){
       // }else if(nodes[cni.e_()].is_grounded()){ untested();
       }else if(dynamic_cast<CURRENT_CTRL const*>(nodes[cni.e_()].n_())){
-	trace2("msn0a", (**ci).long_label(), ii);
-	cni = nodes[cni.e_()].n_(); // HACK, later.
+        trace2("msn0a", (**ci).long_label(), ii);
+        cni = nodes[cni.e_()].n_(); // HACK, later.
       }else{
         cni.map_subckt_node(nodes, nullptr);
       }

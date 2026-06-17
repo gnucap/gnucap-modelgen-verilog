@@ -1,6 +1,7 @@
 // nmos n gate, linear, lambda specified
 attach ../vams/mosfet.so
 attach ../vams/diode.so
+load ./c_debug.so
 verilog
 ground \0 ;
 
@@ -62,4 +63,5 @@ Vbs   4  0 -1.234875
 .width out=80
 .list
 .status notime
+.portdump
 .end
