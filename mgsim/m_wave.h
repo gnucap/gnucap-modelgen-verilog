@@ -25,6 +25,8 @@
 #define M_WAVE_H
 #include <l_denoise.h>
 #include <m_interp.h>
+#include "u_sim_data.h"
+#include "e_base.h"
 /*--------------------------------------------------------------------------*/
 class WAVE {
 private:
@@ -210,15 +212,17 @@ int sgn(T val)
   return (T(0) < val) - (val < T(0));
 }
 /*--------------------------------------------------------------------------*/
-inline void WAVE::new_transition(double t, double rt, double ft, double new_fv)
+inline void WAVE::new_transition(double start, double rt, double ft, double new_fv)
 {
-  double start = t; // + _delay...
+  // start = t + delay...
   trace5("nt0", start, rt, ft, new_fv, _w.size());
   for(auto w : _w){
     trace2("nt0", w.first, w.second);
   }
   assert(_w.size());
   DPAIR old_pair = DPAIR(NEVER, _w.back().second);
+
+  // drop all sample points past the starting point of the new transition
   while(start < _w.back().first){
     trace3("cleanup", _w.size(), _w.back().first, start);
     old_pair = _w.back();
@@ -244,7 +248,6 @@ inline void WAVE::new_transition(double t, double rt, double ft, double new_fv)
   double old_ft = old_pair.first;
   double old_fv = old_pair.second;
 
-
   double new_origin = old_fv;
   double new_slope = (new_fv - old_fv);
   double abs_slope = (new_fv - vcur);
@@ -259,8 +262,6 @@ inline void WAVE::new_transition(double t, double rt, double ft, double new_fv)
 
   new_slope /= new_tt;
   abs_slope /= new_tt;
-  // double last_sample = _w.back().first;
-  double final_time = old_pair.first;
 
   trace6("nt0", start, new_tt, old_fv, new_fv, new_origin, _w.size());
   if(new_slope == 0.){
@@ -316,7 +317,12 @@ inline void WAVE::new_transition(double t, double rt, double ft, double new_fv)
       trace5("nt2", start, old_ft, old_slope, new_slope, t_int);
       assert(sign*new_slope <= sign*old_slope);
       assert(t_int <= start + new_tt);
-      if(start < t_int){
+
+      if(t_int < start && start < old_ft ) {
+        double v_int = old_fv + new_slope * (t_int - start);
+        assert(_w.back().first < t_int);
+        _w.push_back(DPAIR(t_int, v_int));
+      }else if(start <= t_int){
 	double v_int = old_fv + new_slope * (t_int - start);
 	assert(_w.back().first < t_int);
 	_w.push_back(DPAIR(t_int, v_int));
@@ -326,9 +332,9 @@ inline void WAVE::new_transition(double t, double rt, double ft, double new_fv)
 	assert(start < t_int + 1e-12);
       }
     }
-  }else if(start == final_time){ untested();
+  }else if(start == old_ft){ untested();
     trace3("nt incomplete?", start, _w.back().second, new_fv);
-    assert(_w.back().first <= final_time);
+    assert(_w.back().first <= old_ft);
     _w.push_back(DPAIR(old_pair));
   }else{ untested();
 
