@@ -57,7 +57,7 @@ private:
     {
       f = new Filter(filter_code_name);
       f->set_owner(&m);
-      f->set_dev_type("va_" + label());
+      f->set_dev_type("__va_" + label());
 
       cl->set_label("_" + filter_code_name);
       cl->set_num_args(na);
@@ -69,7 +69,7 @@ private:
     f->set_state("_f_" + filter_code_name + "state");
     f->set_num_states(int(na)+2);
     f->set_owner(&m);
-    f->set_dev_type("va_" + label());
+    f->set_dev_type("__va_" + label());
     m.push_back(f);
     cl->_f = f;
 

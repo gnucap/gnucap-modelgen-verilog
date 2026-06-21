@@ -35,6 +35,7 @@
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
+const std::string poly_source = "__va_fpoly_g";
 /*--------------------------------------------------------------------------*/
 class NATURE_current : public NATURE {
   double abstol()const override { untested();return 1e-12;}
@@ -538,17 +539,17 @@ std::string ZFILTER::port_name(int i)const
 }
 /*--------------------------------------------------------------------------*/
 ZFILTER zi(&czi);
-DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "va_zi", &zi);
+DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "__va_zi", &zi);
 ZFILTER zi_nd(&czi_nd);
-DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "va_zi_nd", &zi_nd);
+DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "__va_zi_nd", &zi_nd);
 ZFILTER zi_zd(&czi_zd);
-DISPATCHER<CARD>::INSTALL d2(&device_dispatcher, "va_zi_zd", &zi_zd);
+DISPATCHER<CARD>::INSTALL d2(&device_dispatcher, "__va_zi_zd", &zi_zd);
 ZFILTER zi_np(&czi_np);
-DISPATCHER<CARD>::INSTALL d3(&device_dispatcher, "va_zi_np", &zi_np);
+DISPATCHER<CARD>::INSTALL d3(&device_dispatcher, "__va_zi_np", &zi_np);
 ZFILTER zi_zp(&czi_zp);
-DISPATCHER<CARD>::INSTALL d4(&device_dispatcher, "va_zi_zp", &zi_zp);
+DISPATCHER<CARD>::INSTALL d4(&device_dispatcher, "__va_zi_zp", &zi_zp);
 ZFILTER zi_rp(&czi_rp);
-DISPATCHER<CARD>::INSTALL d5(&device_dispatcher, "va_zi_rp", &zi_rp);
+DISPATCHER<CARD>::INSTALL d5(&device_dispatcher, "__va_zi_rp", &zi_rp);
 /*--------------------------------------------------------------------------*/
 CARD* ZFILTER::clone()const
 {
@@ -614,7 +615,7 @@ void ZFILTER::expand()
     // ...
     int n_inputs = _n_ports - 1;
     if(_ctrl_in) {
-      std::string input_dev_type = "va_fpoly_g";
+      std::string input_dev_type = poly_source;
       if (!_input) {
 	const CARD* input_dev = device_dispatcher[input_dev_type];
 	if(!input_dev){ untested();

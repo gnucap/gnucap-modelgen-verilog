@@ -1689,55 +1689,55 @@ std::string Branch::dev_type()const
 {
 //  if( .. attribute .. )?
   if(is_filter()) {
-    std::string label = "va_" + _ctrl->label();
+    std::string label = "__va_" + _ctrl->label();
     auto pos = label.find_last_of("_");
     return label.substr(0, pos);
   }else if(!is_direct()){
     if(has_pot_source()){
-      return "va_pot_br";
+      return "__va_pot_br";
     }else{ untested();
       return "incomplete_dev_type";
     }
   }else if(has_flow_source() && has_pot_source()){
-    return "va_sw"; // dio?
+    return "__va_sw"; // dio?
   }else if(has_flow_probe()) {
     if(deps().ddeps().size() == 0){
-      return "va_sw"; // ?
+      return "__va_sw"; // ?
     }else if(is_self_only()){
-      return "va_sw"; // ?
+      return "__va_sw"; // ?
     }else if(has_pot_source()){
       for(auto const& i : _used_in){
 	if(i == this){ untested();
 	}else if(dynamic_cast<Branch const*>(i)){
-	  return "va_pot_br"; // ind.
+	  return "__va_pot_br"; // ind.
 	}else if(dynamic_cast<Probe const*>(i)){ untested();
 	}else{
 	}
       }
       for(auto const& i : deps().ddeps()){
 	if(branch(i) != this){
-	  return "va_sw"; // vsine?
+	  return "__va_sw"; // vsine?
 	}else{ untested();
 	}
       }
       { untested();
-        return "va_sw"; // vsine?
+        return "__va_sw"; // vsine?
       }
     }else{
-      return "va_sw"; // ?
+      return "__va_sw"; // ?
     }
   }else if(has_pot_source()){
     if(_selfdep){
-      return "va_pot_br";
+      return "__va_pot_br";
     }else if(has_always_pot() && !has_flow_source()) {
-      return "va_pot";
+      return "__va_pot";
     }else{
-      return "va_sw";
+      return "__va_sw";
     }
   }else if(has_flow_source()){
-    return "va_flow";
+    return "__va_flow";
   }else{ untested();
-    return "va_sw";
+    return "__va_sw";
   }
   unreachable();
   return "";

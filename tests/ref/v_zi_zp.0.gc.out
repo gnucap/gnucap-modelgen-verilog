@@ -4,26 +4,12 @@ parameter r=1
 parameter v=0
 vsine #(.dc(v),.ampl(.2)) v1 (\1 , \0 );
 va_zi_zp #(.zr0(0.),.pr0(0.)) b (\0 , out1, \1 , \0 );
-print tran v(1) ll1(dut) ll2(dut) ll3(dut)
-                    ^ ? no match
-print tran v(1) ll1(dut) ll2(dut) ll3(dut)
-                             ^ ? no match
-print tran v(1) ll1(dut) ll2(dut) ll3(dut)
-                                      ^ ? no match
-#Time       v(1)      
- 0.         0.        
- 0.1        0.11756   
- 0.2        0.19021   
- 0.3        0.19021   
- 0.4        0.11756   
- 0.5        0.        
- 0.6       -0.11756   
- 0.7       -0.19021   
- 0.8       -0.19021   
- 0.9       -0.11756   
- 1.         0.        
+b: no candidates found for va_zi_zp
+b: no valid prototype found for va_zi_zp
+b: no candidates found for va_zi_zp
+b: no valid prototype found for va_zi_zp
 Gnucap   System status
-iterations: op=0, dc=0, tran=36, fourier=0, total=48
-transient timesteps: accepted=12, rejected=0, total=12
-nodes: user=2, subckt=0, model=1, total=3
-dctran density=55.6%, ac density=66.7%
+iterations: op=0, dc=0, tran=0, fourier=0, total=1
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=0, subckt=0, model=0, total=0
+dctran density=0.0%, ac density=0.0%

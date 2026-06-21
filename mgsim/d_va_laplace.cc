@@ -40,6 +40,11 @@
 namespace {
 /*--------------------------------------------------------------------------*/
 bool ac_use_sckt = false;
+static std::string d_ddt_type = "__va_ddt";
+static std::string d_idt_type = "__va_idt";
+static std::string flow_source = "__va_flow";
+static std::string poly_source = "__va_fpoly_g";
+static std::string potential_source = "__va_pot";
 /*--------------------------------------------------------------------------*/
 class NATURE_current : public NATURE {
   double abstol()const override { untested();return 1e-12;}
@@ -91,13 +96,13 @@ public:
 COMMON_LAPLACE cl(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class COMMON_LAPLACE_ND : public COMMON_LAPLACE {
-  std::string name()const override {return "va_laplace_nd";}
 public:
   ~COMMON_LAPLACE_ND() {}
   COMMON_LAPLACE_ND(int x) : COMMON_LAPLACE(x) {set_xd(); set_nx();}
   COMMON_LAPLACE_ND(COMMON_LAPLACE_ND const& x) : COMMON_LAPLACE(x) {}
   COMMON_LAPLACE_ND* clone()const override {return new COMMON_LAPLACE_ND(*this);}
 
+  std::string name()const override {return "va_laplace_nd";}
   void precalc_last(const PARAM_LIST* par_scope)override{
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();
@@ -116,13 +121,13 @@ public:
 COMMON_LAPLACE_ND cl_nd(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class COMMON_LAPLACE_ZD : public COMMON_LAPLACE {
-  std::string name()const override { untested();return "va_laplace_zd";}
 public:
   ~COMMON_LAPLACE_ZD() {}
   COMMON_LAPLACE_ZD(int x) : COMMON_LAPLACE(x) { set_xd(); set_zx(); }
   COMMON_LAPLACE_ZD(COMMON_LAPLACE_ZD const& x) : COMMON_LAPLACE(x) { untested();}
   COMMON_LAPLACE_ZD* clone()const override { untested();return new COMMON_LAPLACE_ZD(*this);}
 
+  std::string name()const override { untested();return "va_laplace_zd";}
   void precalc_last(const PARAM_LIST* par_scope)override{ untested();
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();
@@ -131,13 +136,13 @@ public:
 COMMON_LAPLACE_ZD cl_zd(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class COMMON_LAPLACE_NP : public COMMON_LAPLACE {
-  std::string name()const override {return "va_laplace_np";}
 public:
   ~COMMON_LAPLACE_NP() {}
   COMMON_LAPLACE_NP(int x) : COMMON_LAPLACE(x) { set_nx(); set_xp(); }
   COMMON_LAPLACE_NP(COMMON_LAPLACE_NP const& x) : COMMON_LAPLACE(x) {}
   COMMON_LAPLACE_NP* clone()const override {return new COMMON_LAPLACE_NP(*this);}
 
+  std::string name()const override {return "va_laplace_np";}
   void precalc_last(const PARAM_LIST* par_scope)override {
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();
@@ -170,7 +175,6 @@ public:
 COMMON_LAPLACE_NP cl_np(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class COMMON_LAPLACE_ZP : public COMMON_LAPLACE {
-  std::string name()const override {return "va_laplace_zp";}
 public:
   ~COMMON_LAPLACE_ZP() {}
   COMMON_LAPLACE_ZP(int x) : COMMON_LAPLACE(x) { set_zx(); set_xp();
@@ -180,6 +184,7 @@ public:
   COMMON_LAPLACE_ZP(COMMON_LAPLACE_ZP const& x) : COMMON_LAPLACE(x) {}
   COMMON_LAPLACE_ZP* clone()const override {return new COMMON_LAPLACE_ZP(*this);}
 
+  std::string name()const override {return "va_laplace_zp";}
   void precalc_last(const PARAM_LIST* par_scope)override {
     COMMON_LAPLACE::precalc_last(par_scope);
     if(!_p_num.size()){
@@ -219,6 +224,7 @@ public:
   COMMON_LAPLACE_RP(COMMON_LAPLACE_RP const& x) : COMMON_LAPLACE(x) {}
   COMMON_LAPLACE_RP* clone()const override {return new COMMON_LAPLACE_RP(*this);}
 
+  std::string name()const override {return "va_laplace_rp";}
   void precalc_last(const PARAM_LIST* par_scope)override {
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();
@@ -544,18 +550,23 @@ std::string LAPLACE::port_name(int i)const
 	return names[i];
 }
 /*--------------------------------------------------------------------------*/
+std::string u(std::string const& n)
+{
+  return "__" + n;
+}
+/*--------------------------------------------------------------------------*/
 LAPLACE laplace(&cl);
-DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "va_laplace", &laplace);
-LAPLACE laplace_nd(&cl_nd);
-DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "va_laplace_nd", &laplace_nd);
-LAPLACE laplace_zd(&cl_zd);
-DISPATCHER<CARD>::INSTALL d2(&device_dispatcher, "va_laplace_zd", &laplace_zd);
-LAPLACE laplace_zp(&cl_zp);
-DISPATCHER<CARD>::INSTALL d3(&device_dispatcher, "va_laplace_zp", &laplace_zp);
-LAPLACE laplace_np(&cl_np);
-DISPATCHER<CARD>::INSTALL d4(&device_dispatcher, "va_laplace_np", &laplace_np);
-LAPLACE laplace_rp(&cl_rp);
-DISPATCHER<CARD>::INSTALL d5(&device_dispatcher, "va_laplace_rp", &laplace_rp);
+DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, u(cl.name()), &laplace);
+LAPLACE lap_nd(&cl_nd);
+DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, u(cl_nd.name()), &lap_nd);
+LAPLACE lap_zd(&cl_zd);
+DISPATCHER<CARD>::INSTALL d2(&device_dispatcher, u(cl_zd.name()), &lap_zd);
+LAPLACE lap_zp(&cl_zp);
+DISPATCHER<CARD>::INSTALL d3(&device_dispatcher, u(cl_zp.name()), &lap_zp);
+LAPLACE lap_np(&cl_np);
+DISPATCHER<CARD>::INSTALL d4(&device_dispatcher, u(cl_np.name()), &lap_np);
+LAPLACE lap_rp(&cl_rp);
+DISPATCHER<CARD>::INSTALL d5(&device_dispatcher, u(cl_rp.name()), &lap_rp);
 /*--------------------------------------------------------------------------*/
 CARD* LAPLACE::clone()const
 {
@@ -737,11 +748,7 @@ void LAPLACE::expand()
 
     trace2("expand2a", long_label(), c->_p_den.size());
 
-    std::string output_elt_type;
-    std::string d_ddt_type = "va_ddt";
-    std::string d_idt_type = "va_idt";
-
-    output_elt_type = "va_flow";
+    std::string output_elt_type = flow_source;
 
     {
       if (!_output) {
@@ -797,9 +804,9 @@ void LAPLACE::expand()
     {
       std::string input_dev_type;
       if(_set_parameters) {
-	input_dev_type = "va_fpoly_g";
+	input_dev_type = poly_source;
       }else{
-	input_dev_type = "va_flow";
+	input_dev_type = flow_source;
       }
       if (!_input) {
 	const CARD* input_dev = device_dispatcher[input_dev_type];
@@ -833,7 +840,7 @@ void LAPLACE::expand()
     trace1("expand", num_s0_states);
     {
       if (!_s_[0]) {
-	const CARD* s0_dev = device_dispatcher["va_pot"];
+	const CARD* s0_dev = device_dispatcher[potential_source];
 	if(!s0_dev){ untested();
 	  throw Exception("Cannot find va_pot. Load module?");
 	}else{

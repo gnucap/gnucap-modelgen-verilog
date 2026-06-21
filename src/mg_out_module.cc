@@ -1092,7 +1092,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
   std::string dev_type = e.dev_type();
 
   o__ "if (!" << cn << " || redo_sckt) {\n";
-  o____ "const CARD* p = device_dispatcher[\"" << dev_type << "\"]; // " << e.dev_type() << "\n";
+  o____ "const CARD* p = device_dispatcher[\"" << dev_type << "\"];\n";
   o____ "if(!p){\n";
   o______ "throw Exception(" << "\"Cannot find " << dev_type << ". Load module?\");\n";
   o____ "}else{\n";
@@ -1103,7 +1103,6 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
   o____ "}else{\n";
   o____ "}\n";
   o____ "subckt()->push_front(" << cn << ");\n";
-//o____ e.code_name() << "->set_dev_type(\"" << e.dev_type() << "\");\n";
   o__ "}else{\n";
   o__ "}\n";
 

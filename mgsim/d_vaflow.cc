@@ -56,7 +56,7 @@ protected:
   }
   bool do_tr_con_chk_and_q();
 }f; // VAFLOW;
-DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "flow_src|va_flow", &f);
+DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "__va_flow", &f);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 bool VAFLOW::do_tr_con_chk_and_q()
@@ -136,7 +136,7 @@ private: // override virtual
   CARD*	   clone()const override { return new DEV_FPOLY_G(*this);}
   bool	   do_tr() override;
 }ff;
-DISPATCHER<CARD>::INSTALL dff(&device_dispatcher, "va_fpoly_g", &ff);
+DISPATCHER<CARD>::INSTALL dff(&device_dispatcher, "__va_fpoly_g", &ff);
 /*--------------------------------------------------------------------------*/
 bool DEV_FPOLY_G::do_tr()
 {

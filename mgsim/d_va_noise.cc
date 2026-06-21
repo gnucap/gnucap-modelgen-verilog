@@ -231,7 +231,8 @@ private:
   }
 };
 DEV_NOISE ww(&ccn);
-static DISPATCHER<CARD>::INSTALL dwn(&device_dispatcher, "white_noise|va_white_noise", &ww);
+static DISPATCHER<CARD>::INSTALL dwn(&device_dispatcher,
+                            "__va_white_noise", &ww);
 /*--------------------------------------------------------------------------*/
 class COMMON_FLICK : public COMMON_NOISE {
 protected:
@@ -308,7 +309,8 @@ public:
 };
 COMMON_FLICK ccf(CC_STATIC);
 static DEV_NOISE dfn(&ccf);
-static DISPATCHER<CARD>::INSTALL ddf(&device_dispatcher, "flicker_noise|va_flicker_noise", &dfn);
+static DISPATCHER<CARD>::INSTALL ddf(&device_dispatcher,
+                              "__va_flicker_noise", &dfn);
 /*--------------------------------------------------------------------------*/
 class MEAS_NOISE : public ELEMENT {
 private:

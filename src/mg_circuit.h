@@ -107,7 +107,7 @@ typedef LiSt<Parameter_3, '(', ',', ')'> Parameter_3_List;
 class Nature;
 // Component?
 class Element_2 : public Owned_Base {
-  std::string _module_or_paramset_identifier;
+  std::string _dev_type;
   std::string _name_of_module_instance;
   Port_Connection_List _list_of_port_connections;
   Parameter_3_List _list_of_parameter_assignments;
@@ -127,12 +127,11 @@ public:
     parse(f);
   }
 //  void set_owner(Block* b) { untested(); _owner = b; }
-//  const std::string& module_or_paramset_identifier()const { untested();return _module_or_paramset_identifier;}
-  void set_dev_type(std::string const& s){_module_or_paramset_identifier = s;}
+  void set_dev_type(std::string const& s){_dev_type = s;}
   void set_eval(std::string const& s){_eval = s;}
   void set_value(std::string const& s){_value = s;}
   void set_state(std::string const& s){_state = s;}
-  virtual std::string dev_type()const {return _module_or_paramset_identifier;}
+  virtual std::string dev_type()const {return _dev_type;}
   virtual Nature const* nature()const { untested();return nullptr;}
   virtual Discipline const* discipline()const {return nullptr;}
   const Parameter_3_List&

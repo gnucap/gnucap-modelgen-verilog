@@ -79,7 +79,7 @@ private: // override virtual
   }
 /*--------------------------------------------------------------------------*/
 }slew;
-DISPATCHER<CARD>::INSTALL d4(&device_dispatcher, "va_slew", &slew);
+DISPATCHER<CARD>::INSTALL d4(&device_dispatcher, "__va_slew", &slew);
 /*--------------------------------------------------------------------------*/
 void DEV_SLEW::set_parameters(const std::string& Label, CARD *Owner,
 				   COMMON_COMPONENT *Common, double Value,

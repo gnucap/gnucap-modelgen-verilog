@@ -30,12 +30,12 @@ test_noise0m #(.$mfactor(2)) w2(\2 , \0 );
 resistor #(.r(1)) r1(\2 , \0 );
 noise_probe n2(\2 );
 
-va_white_noise #() w2(\3 , \0 );
-va_white_noise #() w2(\3 , \0 );
+__va_white_noise #() w2(\3 , \0 );
+__va_white_noise #() w2(\3 , \0 );
 resistor #(.r(1)) r1(\3 , \0 );
 noise_probe n3(\3 );
 
-va_white_noise #(.$mfactor(2)) w4(\4 , \0 );
+__va_white_noise #(.$mfactor(2)) w4(\4 , \0 );
 resistor #(.r(1)) r1(\4 , \0 );
 noise_probe n4(\4 );
 

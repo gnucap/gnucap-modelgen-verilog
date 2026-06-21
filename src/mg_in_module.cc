@@ -72,7 +72,7 @@ void Element_2::parse(CS& file)
   _list_of_parameter_assignments.set_owner(owner());
   _list_of_port_connections.set_owner(owner());
 
-  file >> _module_or_paramset_identifier
+  file >> _dev_type
        >> '#' >> _list_of_parameter_assignments
        >> _name_of_module_instance >> _list_of_port_connections >> ';';
 

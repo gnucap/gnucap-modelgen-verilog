@@ -204,9 +204,9 @@ private: // node list
 }; // DELAY
 /*--------------------------------------------------------------------------*/
 DELAY delay(&cdel);
-DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "va_absdelay", &delay);
+DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "va_absdelay|__va_absdelay", &delay);
 DELAY trans(&ctrans);
-DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "va_transition", &trans);
+DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "va_transition|__va_transition", &trans);
 /*--------------------------------------------------------------------------*/
 COMMON_ABSDELAY::~COMMON_ABSDELAY()
 {

@@ -2737,14 +2737,14 @@ void MOD_resistor::expand()
   // filter (white_noise_1_p)
     {
     if (!_b_white_noise_1_p_ || redo_sckt) {
-      const CARD* p = device_dispatcher["va_white_noise"]; // va_white_noise
+      const CARD* p = device_dispatcher["__va_white_noise"];
       if(!p){
-        throw Exception("Cannot find va_white_noise. Load module?");
+        throw Exception("Cannot find __va_white_noise. Load module?");
       }else{
       }
       _b_white_noise_1_p_ = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_white_noise_1_p_){
-        throw Exception("Cannot use va_white_noise: wrong type");
+        throw Exception("Cannot use __va_white_noise: wrong type");
       }else{
       }
       subckt()->push_front(_b_white_noise_1_p_);
@@ -2763,14 +2763,14 @@ void MOD_resistor::expand()
   // branch (p, n)
     {
     if (!_b_p_n || redo_sckt) {
-      const CARD* p = device_dispatcher["va_flow"]; // va_flow
+      const CARD* p = device_dispatcher["__va_flow"];
       if(!p){
-        throw Exception("Cannot find va_flow. Load module?");
+        throw Exception("Cannot find __va_flow. Load module?");
       }else{
       }
       _b_p_n = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_p_n){
-        throw Exception("Cannot use va_flow: wrong type");
+        throw Exception("Cannot use __va_flow: wrong type");
       }else{
       }
       subckt()->push_front(_b_p_n);
@@ -4753,14 +4753,14 @@ void MOD_resistor::expand()
   // filter (white_noise_0_p)
     {
     if (!_b_white_noise_0_p_ || redo_sckt) {
-      const CARD* p = device_dispatcher["va_white_noise"]; // va_white_noise
+      const CARD* p = device_dispatcher["__va_white_noise"];
       if(!p){
-        throw Exception("Cannot find va_white_noise. Load module?");
+        throw Exception("Cannot find __va_white_noise. Load module?");
       }else{
       }
       _b_white_noise_0_p_ = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_white_noise_0_p_){
-        throw Exception("Cannot use va_white_noise: wrong type");
+        throw Exception("Cannot use __va_white_noise: wrong type");
       }else{
       }
       subckt()->push_front(_b_white_noise_0_p_);
@@ -4779,14 +4779,14 @@ void MOD_resistor::expand()
   // branch (p, n)
     {
     if (!_b_p_n || redo_sckt) {
-      const CARD* p = device_dispatcher["va_flow"]; // va_flow
+      const CARD* p = device_dispatcher["__va_flow"];
       if(!p){
-        throw Exception("Cannot find va_flow. Load module?");
+        throw Exception("Cannot find __va_flow. Load module?");
       }else{
       }
       _b_p_n = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_p_n){
-        throw Exception("Cannot use va_flow: wrong type");
+        throw Exception("Cannot use __va_flow: wrong type");
       }else{
       }
       subckt()->push_front(_b_p_n);
@@ -7295,14 +7295,14 @@ void MOD_capacitor::expand()
   // filter (ddt_1_p)
     {
     if (!_b_ddt_1_p_ || redo_sckt) {
-      const CARD* p = device_dispatcher["va_ddt"]; // va_ddt
+      const CARD* p = device_dispatcher["__va_ddt"];
       if(!p){
-        throw Exception("Cannot find va_ddt. Load module?");
+        throw Exception("Cannot find __va_ddt. Load module?");
       }else{
       }
       _b_ddt_1_p_ = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_ddt_1_p_){
-        throw Exception("Cannot use va_ddt: wrong type");
+        throw Exception("Cannot use __va_ddt: wrong type");
       }else{
       }
       subckt()->push_front(_b_ddt_1_p_);
@@ -7321,14 +7321,14 @@ void MOD_capacitor::expand()
   // branch (p, n)
     {
     if (!_b_p_n || redo_sckt) {
-      const CARD* p = device_dispatcher["va_flow"]; // va_flow
+      const CARD* p = device_dispatcher["__va_flow"];
       if(!p){
-        throw Exception("Cannot find va_flow. Load module?");
+        throw Exception("Cannot find __va_flow. Load module?");
       }else{
       }
       _b_p_n = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_p_n){
-        throw Exception("Cannot use va_flow: wrong type");
+        throw Exception("Cannot use __va_flow: wrong type");
       }else{
       }
       subckt()->push_front(_b_p_n);
@@ -8589,14 +8589,14 @@ void MOD_capacitor::expand()
   // filter (ddt_2_p)
     {
     if (!_b_ddt_2_p_ || redo_sckt) {
-      const CARD* p = device_dispatcher["va_ddt"]; // va_ddt
+      const CARD* p = device_dispatcher["__va_ddt"];
       if(!p){
-        throw Exception("Cannot find va_ddt. Load module?");
+        throw Exception("Cannot find __va_ddt. Load module?");
       }else{
       }
       _b_ddt_2_p_ = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_ddt_2_p_){
-        throw Exception("Cannot use va_ddt: wrong type");
+        throw Exception("Cannot use __va_ddt: wrong type");
       }else{
       }
       subckt()->push_front(_b_ddt_2_p_);
@@ -8610,14 +8610,14 @@ void MOD_capacitor::expand()
   // branch (p, n)
     {
     if (!_b_p_n || redo_sckt) {
-      const CARD* p = device_dispatcher["va_sw"]; // va_sw
+      const CARD* p = device_dispatcher["__va_sw"];
       if(!p){
-        throw Exception("Cannot find va_sw. Load module?");
+        throw Exception("Cannot find __va_sw. Load module?");
       }else{
       }
       _b_p_n = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_p_n){
-        throw Exception("Cannot use va_sw: wrong type");
+        throw Exception("Cannot use __va_sw: wrong type");
       }else{
       }
       subckt()->push_front(_b_p_n);
