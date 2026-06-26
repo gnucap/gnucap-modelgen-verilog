@@ -75,7 +75,7 @@ static Statement* parse_seq(CS& f, Block* owner)
 }
 /*--------------------------------------------------------------------------*/
 static Base* parse_system_task(CS& f, Block* o)
-{ untested();
+{
   trace1("parse_system_task", f.tail().substr(0,10));
   size_t here = f.cursor();
   std::string name;
@@ -88,7 +88,7 @@ static Base* parse_system_task(CS& f, Block* o)
     }catch(Exception const& e){ untested();
       return nullptr;
     }
-  }else{ untested();
+  }else{
     return nullptr;
   }
 }
@@ -117,7 +117,7 @@ void DigitalProceduralAssignment::parse(CS& f)
     }else{ untested();
       f.warn(bWARNING, "missing semicolon?");
     }
-  }else{ untested();
+  }else{
   }
 
 }
@@ -163,7 +163,7 @@ static Base* parse_proc_assignment(CS& f, Block* o)
     auto n = new DigitalProceduralAssignment(f, o);
     if(f){
       return n;
-    }else{ untested();
+    }else{
       delete n;
     }
   }catch(Exception_No_Match const&){ untested();
@@ -198,7 +198,7 @@ static Base* parse_stmt_or_null(CS& file, Block* scope)
     || (ret = parse_system_task(file, scope))
     ;
 
-  if(file.stuck(&here)) { untested();
+  if(file.stuck(&here)) {
     trace1("parse_digital_stmt_or_null? stuck", file.tail().substr(0,30));
     file.reset_fail(here);
   }else{
@@ -322,7 +322,7 @@ void DigitalCtrlStmt::parse(CS& f)
 /*--------------------------------------------------------------------------*/
 void DigitalCtrlStmt::dump(std::ostream& o) const
 {
-  if(!_body){ untested();
+  if(!_body){
     o << ";\n";
   }else{
     o << " ";
@@ -753,7 +753,7 @@ void DigitalSeqBlock::parse(CS& f)
       assert(!b);
     }else if(b){
       push_back(b);
-    }else{
+    }else{ untested();
       delete b;
     }
   }else{
@@ -1297,34 +1297,16 @@ void DigitalEvtExpression::set_rdeps()
   assert(a);
 
   for(auto i : *a) {
-    Token_CALL const* call = prechecked_cast<Token_CALL const*>(i);
-    assert(call);
-    auto& f = *call;
-    auto e = prechecked_cast<MGVAMS_EVENT const*>(f.f());
-    assert(e);
-    if(f->has_tr_begin()){
-      add_rdep(&tr_begin_tag);
-    }else{ untested();
-    }
-    if(f->has_tr_restore()){ untested();
-      add_rdep(&tr_restore_tag);
-    }else{
-    }
-    if(f->has_tr_review()){
-      add_rdep(&tr_eval_tag);
-    }else{ untested();
-    }
-    if(f->has_tr_review()){
-      add_rdep(&tr_review_tag);
-    }else{ untested();
-    }
-    if(f->has_tr_accept()){
+    if(prechecked_cast<Token_NODE const*>(i)) {
       add_rdep(&tr_accept_tag);
-    }else{ untested();
-    }
-    if(f->has_tr_advance()){
       add_rdep(&tr_advance_tag);
+    }else if(auto call = prechecked_cast<Token_CALL const*>(i)) {
+      incomplete(); // TODO cf in AnalogEvtExpression
+		    (void)call;
+      // auto& f = *call;
+ //     add_rdeps(call)
     }else{ untested();
+      incomplete();
     }
   }
 }

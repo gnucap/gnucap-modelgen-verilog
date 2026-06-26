@@ -1,7 +1,16 @@
 
+discipline logic
+  domain discrete;
+enddiscipline
 
-module test();
+
+module test(L);
+  logic L;
   always begin : stuff
+  end
+
+  always begin
+    @(L);
   end
 
 endmodule
