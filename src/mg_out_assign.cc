@@ -56,7 +56,7 @@ static void make_one_assign_eval(std::ostream& o, NetAssignment const& na)
   }
 
   std::string v = make_cc_expression(o, na, false, "logic");
-  o__ "return " << v << ";\n";
+  o__ "return va::to_logic_(" << v << ");\n";
   o << "}\n";
 }
 /*--------------------------------------------------------------------------*/

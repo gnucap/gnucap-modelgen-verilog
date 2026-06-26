@@ -44,6 +44,7 @@
 #include <u_sim_data.h> // see simparam
 #include <e_logicnode.h>
 #include <e_model.h>
+#include <e_logicval.h>
 #include <cfenv>
 /*--------------------------------------------------------------------------*/
 inline int simulatorVersion()
@@ -997,7 +998,7 @@ inline node_t& ground()
   return CARD_LIST::card_list.nodes()->at(0);
 }
 /*--------------------------------------------------------------------------*/
-void set_type(node_t& n, std::string const& t)
+inline void set_type(node_t& n, std::string const& t)
 {
   if(NODE* tt = node_dispatcher[t]){
     n.set_type(tt);
@@ -1006,6 +1007,39 @@ void set_type(node_t& n, std::string const& t)
   }
 }
 /*--------------------------------------------------------------------------*/
+inline LOGICVAL to_logic_(LOGICVAL l) {return l;}
+inline LOGICVAL to_logic_(int i)
+{
+  if(i==1) {
+    return lvSTABLE1;
+  }else if(i==0) {
+    return lvSTABLE0;
+  }else{ untested();
+    return lvUNKNOWN;
+  }
+}
+/*--------------------------------------------------------------------------*/
+}
+/*--------------------------------------------------------------------------*/
+LOGICVAL operator& (LOGICVAL const& a, LOGICVAL const& b)
+{
+  LOGICVAL c(a);
+  c &= b;
+  return c;
+}
+/*--------------------------------------------------------------------------*/
+LOGICVAL operator| (LOGICVAL const& a, LOGICVAL const& b)
+{
+  LOGICVAL c(a);
+  c |= b;
+  return c;
+}
+/*--------------------------------------------------------------------------*/
+LOGICVAL operator| (int const& a, LOGICVAL const& b)
+{
+  LOGICVAL c(va::to_logic_(a));
+  c |= b;
+  return c;
 }
 /*--------------------------------------------------------------------------*/
 #endif
@@ -4933,6 +4967,7 @@ ddouble MOD_resistor::_b_white_noise_0__precalc(ddouble, std::string what) {
 #include <u_sim_data.h> // see simparam
 #include <e_logicnode.h>
 #include <e_model.h>
+#include <e_logicval.h>
 #include <cfenv>
 /*--------------------------------------------------------------------------*/
 inline int simulatorVersion()
@@ -5886,7 +5921,7 @@ inline node_t& ground()
   return CARD_LIST::card_list.nodes()->at(0);
 }
 /*--------------------------------------------------------------------------*/
-void set_type(node_t& n, std::string const& t)
+inline void set_type(node_t& n, std::string const& t)
 {
   if(NODE* tt = node_dispatcher[t]){
     n.set_type(tt);
@@ -5895,6 +5930,39 @@ void set_type(node_t& n, std::string const& t)
   }
 }
 /*--------------------------------------------------------------------------*/
+inline LOGICVAL to_logic_(LOGICVAL l) {return l;}
+inline LOGICVAL to_logic_(int i)
+{
+  if(i==1) {
+    return lvSTABLE1;
+  }else if(i==0) {
+    return lvSTABLE0;
+  }else{ untested();
+    return lvUNKNOWN;
+  }
+}
+/*--------------------------------------------------------------------------*/
+}
+/*--------------------------------------------------------------------------*/
+LOGICVAL operator& (LOGICVAL const& a, LOGICVAL const& b)
+{
+  LOGICVAL c(a);
+  c &= b;
+  return c;
+}
+/*--------------------------------------------------------------------------*/
+LOGICVAL operator| (LOGICVAL const& a, LOGICVAL const& b)
+{
+  LOGICVAL c(a);
+  c |= b;
+  return c;
+}
+/*--------------------------------------------------------------------------*/
+LOGICVAL operator| (int const& a, LOGICVAL const& b)
+{
+  LOGICVAL c(va::to_logic_(a));
+  c |= b;
+  return c;
 }
 /*--------------------------------------------------------------------------*/
 #endif
