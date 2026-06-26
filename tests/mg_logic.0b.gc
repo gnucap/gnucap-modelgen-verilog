@@ -1,0 +1,48 @@
+attach ./modelgen_2.so
+load vams/vpulse.so
+// options method=euler
+options trtol=1
+// options trace
+
+verilog
+
+`modelgen test_logic_0b
+module clock(out, en);
+  output out;
+  input en;
+  logic out, en;
+  assign #5000 out = !(out & en);
+endmodule
+module edgtest(a, b);
+	electrical a;
+	logic b;
+	input b;
+	inout a;
+
+	(*desc="st"*) real st = 0;
+	always begin
+		@(posedge(b)) st = 5;
+	end
+	always @(negedge(b)) st = 0;
+	analog V(a) <+ transition(st, 1p, 5p);
+endmodule
+`endmodelgen
+
+
+!make test_logic_0b.so > /dev/null
+attach ./test_logic_0b.so
+
+vpulse #(.val0(0), .val1(5), .td(2e-12)) en1(en, \0 );
+clock #() c1(clk, en);
+edgtest #() dut(a , clk );
+
+ground gnd
+
+.model logic logic delay=1p rise=10p fall=10p
+
+list
+
+print tran l(clk) st(dut) v(a)
+tran 20n basic
+status notime
+end

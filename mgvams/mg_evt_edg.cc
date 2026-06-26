@@ -1,0 +1,153 @@
+/*                        -*- C++ -*-
+ * Copyright (C) 2026 Felix Salfelder
+ * Author: Felix Salfelder
+ *
+ * This file is part of "Gnucap", the Gnu Circuit Analysis Package
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+ *------------------------------------------------------------------
+ * Verilog-AMS timer
+ */
+/*--------------------------------------------------------------------------*/
+#include "f__.cc"
+#include "mg_event.h"
+#include <globals.h>
+/*--------------------------------------------------------------------------*/
+namespace {
+/*--------------------------------------------------------------------------*/
+class EDG : public MGVAMS_EVENT {
+  enum dir{
+    dNeg = -1,
+    dPos = 1
+  }_dir;
+  std::string _code_name;
+protected:
+  Module* _m{nullptr};
+  EDG(EDG const& e) : MGVAMS_EVENT(e), _dir(e._dir) { untested(); }
+public:
+  explicit EDG(int d) : MGVAMS_EVENT(), _dir(dir(d)) {
+    set_label((d == 1)?"posedge":"negedge");
+  }
+  ~EDG(){ }
+  virtual EDG* clone()const override {untested(); return new EDG(*this);}
+private:
+  bool static_code()const override {return true;}
+  bool is_common()const override { untested();return true;}
+  bool is_in_common()const override {return false;}
+  bool has_state()const override { untested();return true;}
+  bool has_modes()const override {return true;}
+  bool has_tr_begin()const override {return false;}
+  bool has_tr_restore()const override {return true;}
+  bool has_tr_review()const override {return true;}
+  bool has_tr_accept()const override {return true;}
+  bool has_tr_advance()const override {return true;}
+  bool has_set_event()const override {return true;}
+  bool needs_context()const override {return false;}
+  Token* new_token(Module&, size_t)const override {
+    return nullptr;
+  }
+
+private:
+
+  void make_cc_tr_review(std::ostream& o)const override {
+    o__ "// time_by.min_event(" << _code_name << ".review(this));\n";
+  }
+
+  std::string eval(CS&, const PARAM_LIST*)const override{ untested();
+    unreachable();
+    return "";
+  }
+  // "call_name"...
+  std::string code_name()const override{
+    return label() + "__"; // some_evt"; // _code_name+".";
+  }
+//   void stack_op(Expression const& args, Expression* out) const override { untested();
+//     incomplete();
+//   }
+  void make_cc_dev(std::ostream& o)const override {
+    indent x;
+    o__ "// edge dev\n";
+    std::string trans;
+    std::string stable;
+    std::string trans2;
+    if(_dir==1){
+       trans = "1";
+       trans2 = "2";
+       stable = "3";
+    }else{
+       trans = "2";
+       trans2 = "1";
+       stable = "0";
+    }
+    o__ "bool " << label() + "__tr_advance(int i) {\n";
+    o____ "auto l = prechecked_cast<LOGIC_NODE const*>(n_(i).n_());\n";
+    o____ "assert(l);\n";
+    o____ "bool ret1 = _sim->_time0 == l->last_change_time();\n";
+    o____ "bool ret2 = _sim->_time0 == l->final_time();\n";
+    o____ "ret1 = ret1 && (l->lv() == " + trans + " || l->lv() == " +stable+ ");\n";
+    o____ "ret2 = ret2 && l->lv() == " + trans + ";\n";
+    o____ "if(ret1){\n";
+    o____ "}else if(ret2){\n";
+    o____ "}\n";
+    o____ "bool ret = ret1 || ret2;\n";
+    o____ "if(ret){ \n";
+    o______ "q_eval();\n"; // hack?
+    o____ "}else{\n";
+    o____ "}\n";
+    o____ "return false; // ret;\n";
+    o__ "}\n";
+    o__ "bool " << label() + "__tr_eval(int i) {\n";
+    o____ "return false;\n";
+    o__ "}\n";
+    o__ "bool " << label() + "__tr_accept(int i) {\n";
+    o____ "return " << label() + "__is_evt(i);\n";
+    o__ "}\n";
+    o__ "bool " << label() + "__is_evt(int i) {\n";
+    o____ "auto l = prechecked_cast<LOGIC_NODE const*>(n_(i).n_());\n";
+    o____ "assert(l);\n";
+    o____ "bool ret1 = _sim->_time0 == l->last_change_time();\n";
+    o____ "bool ret2 = _sim->_time0 == l->final_time();\n";
+    o____ "ret1 = ret1 && (l->lv() == " + trans2 + " || l->lv() == " +stable+ ");\n";
+    o____ "ret2 = ret2 && l->lv() == " + trans + ";\n";
+    o____ "if(ret1){\n";
+    o____ "}else if(ret2){\n";
+    o____ "}\n";
+    o____ "return ret1 || ret2;\n";
+    o__ "}\n";
+    o__ "bool " << label() + "__tr_regress(int) { untested();\n";
+    o____ "incomplete(); return true;\n";
+    o__ "}\n";
+    o__ "bool " << label() + "__tr_review(int i) {\n";
+    o____ "if(" << label() + "__is_evt(i)) {\n";
+    o______ "q_accept();\n"; // hack? only needed if there is an event.
+    o____ "}else{\n";
+    o____ "}\n";
+    o____ "return false;\n";
+    o__ "}\n";
+  }
+  void make_cc_common(std::ostream& o)const override {
+    o__ "// edge common\n";
+  }
+};
+EDG pos(1);
+EDG neg(-1);
+DISPATCHER<FUNCTION>::INSTALL d_pos(&function_dispatcher, "posedge", &pos);
+DISPATCHER<FUNCTION>::INSTALL d_neg(&function_dispatcher, "negedge", &neg);
+/*--------------------------------------------------------------------------*/
+} // namespace
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet

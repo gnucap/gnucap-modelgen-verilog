@@ -33,6 +33,7 @@ class OUT_CODE {
   virtual bool is_tr_accept()const = 0;
   virtual bool is_precalc()const = 0;
   virtual bool is_tr_restore()const = 0;
+  virtual bool is_tr_eval()const {return is_dynamic();}
 protected:
   void make_one_local_var(std::ostream& o, Variable_Decl const& V)const;
   void make_one_variable_load(std::ostream& o, Token_VAR_REF const& V)const;

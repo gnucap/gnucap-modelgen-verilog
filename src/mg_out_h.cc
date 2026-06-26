@@ -378,6 +378,10 @@ static void make_common(std::ostream& o, const Module& m)
   }else{
   }
   if(m.has_tr_begin_digital()){
+    o__ "void tr_begin_digital(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
+  if(m.has_tr_eval_digital()){
     o__ "void tr_eval_digital(MOD_" << m.identifier() << "*)const;\n";
   }else{
   }
@@ -410,6 +414,10 @@ static void make_common(std::ostream& o, const Module& m)
   if(m.has_tr_advance_digital()){
     o__ "void tr_advance_digital(MOD_" << m.identifier() << "*)const;\n";
     o__ "void tr_regress_digital(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
+  if(m.has_tr_review_digital()){
+    o__ "void tr_review_digital(MOD_" << m.identifier() << "*)const;\n";
   }else{
   }
   if(m.has_final()){

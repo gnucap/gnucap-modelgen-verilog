@@ -1,0 +1,49 @@
+attach ./modelgen_0.so
+load vams/vpulse.so
+options method=euler
+options trtol=1
+
+verilog
+
+`modelgen
+module test_logic_0(a, b);
+	electrical a;
+	logic b;
+	input b;
+	inout a;
+
+	(*desc="cnt"*) integer cnt;
+	(*desc="st"*) real st = 0;
+	always @(posedge(b)) begin
+		$strobe("pa");
+		cnt = cnt + 1;
+	end
+	always begin
+		@(posedge(b)) st = 1.2;
+	end
+	always @(negedge(b)) st = 0;
+	analog V(a) <+ transition(st, 30p, 13p);
+endmodule
+
+list
+
+!make test_logic_0.so > /dev/null
+attach ./test_logic_0.so
+
+test_logic_0 #() dut(\1 , clk );
+resistor #(.r(1k)) dut(\1 ,\2 );
+capacitor #(.c(5f)) dut(\2 , gnd);
+
+
+ground gnd
+vpulse #(.val0(0) .val1(5) .width(100p) .period(200p)) v1(aclk, gnd);
+nand #(20) n1(clk, aclk);
+
+.model logic logic delay=1p rise=10p fall=15p
+
+list
+
+print tran l(clk) v(1) v(2) st(dut) cnt(dut)
+tran 1n basic
+status notime
+end

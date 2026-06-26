@@ -1,0 +1,92 @@
+attach ./modelgen_2.so
+load vams/vpulse.so
+
+verilog
+
+`modelgen test_logic_1
+module clock(out, en);
+  output out;
+  input en;
+  logic out, en;
+  assign #5000 out = !out & en;
+endmodule
+module comp (inp, inn, clk, outp, outn, vdd, vss);
+
+  input inp, inn, clk, vdd, vss;
+  output outp, outn;
+
+  electrical inp, inn
+  logic clk;
+  electrical outp, outn;
+  electrical vdd, vss;
+
+  parameter real vos = 0.0;
+  parameter real tdelay = 20n;
+  parameter real trise = 30p;
+  parameter real meta = 0.0;
+
+  integer state = -1;
+  real vhigh;
+  real vlow;
+  real voutp_target;
+  real voutn_target;
+
+  always @(posedge(clk)) state = (V(inp)-V(inn)+vos > meta)
+                               - (V(inp)-V(inn)+vos < -meta) ;
+  always @(negedge(clk)) state = 0;
+
+  analog begin
+
+    vhigh = V(vdd);
+    vlow = V(vss);
+    if (state == 0) begin
+        voutp_target = vhigh;
+        voutn_target = vhigh;
+    end else if (state == 1) begin
+        voutp_target = vhigh;
+        voutn_target = vlow;
+    end else begin
+        voutp_target = vlow;
+        voutn_target = vhigh;
+    end
+
+    V(outp) <+ transition(voutp_target, tdelay, trise);
+    V(outn) <+ transition(voutn_target, tdelay, trise);
+
+  end
+endmodule
+`endmodelgen
+
+list
+
+!make test_logic_1.so > /dev/null
+attach ./test_logic_1.so
+
+ground gnd;
+
+vsource #(.dc(1.2)) VDD_SRC(vdd, gnd);
+vsource #(.dc(0.6)) VINN_SRC(inn, gnd);
+
+vpulse #(.val0(0), .val1(5), .td(5n+2e-12)) en1(en, gnd);
+// vpulse #(.val0(0.45), .val1(0.75), .rise(120e-9)) V1 (inp, gnd);
+
+comp #(.vos(0.), .tdelay(200e-12), .trise(20.0e-12), .meta(100.0e-9)) u1(inp, inn, clk, outp, outn, vdd, gnd);
+clock #() c1(clk, en);
+
+vpulse #(.dc(0.0), .val0(0.0), .val1(1.2), .td(2.0e-12), .rise(10.0e-12), .fall(10.0e-12), .width(5.0e-9), .period(10.0e-9)) VCLK_SRC(clka, gnd);
+
+resistor #(.r(1.0e6)) RLOAD_P(outp, gnd);
+resistor #(.r(1.0e6)) RLOAD_N(outn, gnd);
+
+spice
+
+V1 inp gnd pwl 0 0.45 120e-9 .75
+
+# kludge
+.model logic logic delay=1p rise=10p fall=10p
+
+.print op v(vdd) v(inp) v(inn) v(clk) v(outp) v(outn)
+.op
+
+.print tran v(inp) v(inn) l(clk) v(outp) v(outn) iter(0) control(0)
+.tran 120n

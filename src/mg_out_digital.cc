@@ -28,20 +28,21 @@ class OUT_DIGITAL : OUT_CODE {
 public:
   enum mode{
     modePRECALC = 0,
-    modeTR_INITIAL = 1,
-    modeTR_BEGIN = 2,
-    modeTR_RESTORE = 3,
-    modeTR_ADVANCE = 4,
-    modeTR_REGRESS = 5,
-    modeTR_REVIEW = 6,
-    modeTR_ACCEPT = 7,
-    modeFINAL = 8,
-    modeNUM = 9
+    modeTR_EVAL = 1,
+    modeTR_INITIAL = 2,
+    modeTR_BEGIN = 3,
+    modeTR_RESTORE = 4,
+    modeTR_ADVANCE = 5,
+    modeTR_REGRESS = 6,
+    modeTR_REVIEW = 7,
+    modeTR_ACCEPT = 8,
+    modeFINAL = 9,
+    modeNUM = 10
   }_mode;
   Base const* _src{nullptr};
   std::string ctx()const {
     char const* names[modeNUM] = { //
-      "precalc", "initial", "tr_begin", "tr_restore",
+      "precalc", "tr_eval", "initial", "tr_begin", "tr_restore",
       "tr_advance", "tr_regress", "tr_review", "tr_accept", "finish"
     };
     return names[_mode];
@@ -54,6 +55,7 @@ public:
 
 public:
   bool is_precalc()const override { return _mode==modePRECALC; }
+  bool is_tr_eval()const override { return _mode==modeTR_EVAL; }
   bool is_tr_restore()const override { return _mode==modeTR_RESTORE; }
   bool is_tr_accept()const override { return _mode==modeTR_ACCEPT; }
   bool is_tr_initial()const  { return _mode==modeTR_INITIAL; }
@@ -103,12 +105,26 @@ void make_tr_advance_digital(std::ostream& o, const Module& m)
   // o << "eval_t mode = m_TR_ADVANCE;\n";
   // o << "(void)mode;\n";
 
-  o__ "m->_v_1 = m->_v_;\n";
-
   OUT_DIGITAL oo(OUT_DIGITAL::modeTR_ADVANCE, &tr_advance_tag);
   oo.make_load_variables(o, m);
   oo.make_list(o, m);
   o << "} // tr_advance_digital\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+void make_tr_accept_digital(std::ostream& o, const Module& m)
+{
+  o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
+  o << "inline void COMMON_" << m.identifier() <<
+    "::tr_accept_digital(MOD_" << m.identifier() << "* m) const\n{\n";
+  // o << "eval_t mode = m_TR_ADVANCE;\n";
+  // o << "(void)mode;\n";
+
+  OUT_DIGITAL oo(OUT_DIGITAL::modeTR_ACCEPT, &tr_accept_tag);
+  oo.make_load_variables(o, m);
+  oo.make_list(o, m);
+  o << "} // tr_accept_digital\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
@@ -126,14 +142,53 @@ void make_tr_regress_digital(std::ostream& o, const Module& m)
   o__ "}\n";
 #endif
 
-  o__ "m->_v_ = m->_v_1;\n";
-
   OUT_DIGITAL oo(OUT_DIGITAL::modeTR_REGRESS, &tr_advance_tag);
   oo.make_load_variables(o, m);
   oo.make_list(o, m);
   o << "} // tr_regress_analog\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_common_tr_eval(std::ostream& o, const Module& m)
+{
+  o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
+  o << "inline void COMMON_" << m.identifier() <<
+    "::tr_eval_digital(MOD_" << m.identifier() << "* m) const\n{\n";
+  o__ "trace1(\"" << m.identifier() <<"::tr_eval_digital\", m->long_label());\n";
+
+  OUT_DIGITAL oo(OUT_DIGITAL::modeTR_EVAL);
+
+  oo.make_load_variables(o, m);
+  oo.make_list(o, m);
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_common_tr_review(std::ostream& o, const Module& m)
+{
+  o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
+  o << "inline void COMMON_" << m.identifier() <<
+    "::tr_review_digital(MOD_" << m.identifier() << "* m) const\n{\n";
+
+  OUT_DIGITAL oo(OUT_DIGITAL::modeTR_REVIEW, &tr_review_tag);
+  oo.make_load_variables(o, m);
+  oo.make_list(o, m);
+
+  o__ "trace1(\"review analog2\", m->_time_by._event);\n";
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+void make_cc_digital(std::ostream& o, const Module& m)
+{
+  o << "typedef MOD_" << m.identifier() << " MOD__;\n"; // here?
+//  make_cc_ac_begin(o, m);
+  make_cc_common_tr_eval(o, m);
+  make_cc_common_tr_review(o, m);
+  // make_cc_common_precalc(o, m);
 }
 /*--------------------------------------------------------------------------*/
 void OUT_DIGITAL::make_block(std::ostream& o, Block const& ab) const

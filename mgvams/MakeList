@@ -3,6 +3,7 @@ PACKAGE = mgvams
 
 TARGET = \
   mg_debug.so \
+  mg_evt_edg.so \
   mg_file_io.so \
   mg_file_write.so \
   mg_filt_xdt.so \

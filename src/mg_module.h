@@ -259,8 +259,15 @@ public: // TODO
   bool has_final_analog()const      { return _has_pid[if_FINAL] & mm_ANALOG; }
 
   bool has_tr_begin_digital()const   { return _has_pid[if_TR_BEGIN]   & mm_DIGITAL; }
+  bool has_tr_eval_digital()const   {
+    // return _has_pid[if_TR_BEGIN]   & mm_DIGITAL; 
+    return has_always_block();
+  }
   bool has_tr_restore_digital()const { return _has_pid[if_TR_RESTORE]   & mm_DIGITAL; }
-  bool has_tr_review_digital()const  {untested(); return _has_pid[if_TR_REVIEW]   & mm_DIGITAL; }
+  bool has_tr_review_digital()const  {
+    // return _has_pid[if_TR_REVIEW]   & mm_DIGITAL; 
+    return has_always_block();
+  }
   bool has_tr_advance_digital()const {
     if(_has_pid[if_TR_ADVANCE] & mm_DIGITAL) { untested();
       return true;
@@ -270,7 +277,15 @@ public: // TODO
       return false;
     }
   }
-  bool has_tr_accept_digital()const  { return _has_pid[if_TR_ACCEPT]  & mm_DIGITAL; }
+  bool has_tr_accept_digital()const  {
+    if(_has_pid[if_TR_ACCEPT]  & mm_DIGITAL) { untested();
+      return true;
+    }else if(has_always_block()) {
+      return true;
+    }else{
+      return false;
+    }
+  }
   bool has_final_digital()const      { return _has_pid[if_FINAL] & mm_DIGITAL; }
 
   int times()const {return _times;}

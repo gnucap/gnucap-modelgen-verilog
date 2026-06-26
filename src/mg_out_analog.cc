@@ -1202,7 +1202,6 @@ static void make_cc_tr_regress_analog(std::ostream& o, const Module& m)
   o__ "if(_sim->_phase == p_RESTORE) {untested();\n";
   o____ "return;\n";
   o__ "}else{\n";
-    // o__ "m->_v_ = m->_v_1;\n";
   o__ "}\n";
 #endif
 
