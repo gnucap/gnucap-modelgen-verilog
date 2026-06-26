@@ -669,6 +669,7 @@ static void make_tr_regress(std::ostream& o, const Module& m)
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
+  o__ "_v_ = _v_1;\n"; // "restore values"
   if(m.has_analog_block()){
   o__ "c->tr_regress_analog(this);\n";
   }else{
@@ -739,6 +740,7 @@ static void make_tr_accept(std::ostream& o, const Module& m)
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
   if(m.has_analog_block()){
+    o__ "_v_ = _v_1;\n"; // "replay.."
     o__ "c->tr_accept_analog(this);\n"; // call from COMMON::tr_accept?
   }else{
   }

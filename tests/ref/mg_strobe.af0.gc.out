@@ -1,19 +1,32 @@
 parameter v1=0
 test_strobe_af0 #(.v(v1)) dut (\1 , \0 );
+hello 0.000000
 world 0.000000
 #           v(1)       iter(0)   
+hello 0.000000
 world 0.000000
+hello 0.000000
 world 0.000000
+hello 0.000000
 world 0.000000
+hello 0.000000
 world 0.000000
 -1.         0.81873    3.        
+hello 0.000000
 world 0.000000
+hello 0.000000
 world 0.000000
+hello 0.000000
 world 0.000000
+hello 0.000000
 world 0.000000
  0.         1.         3.        
+hello 0.000000
 world 0.000000
+hello 0.000000
 world 0.000000
+hello 0.000000
 world 0.000000
+hello 0.000000
 world 0.000000
  1.         1.2214     3.        

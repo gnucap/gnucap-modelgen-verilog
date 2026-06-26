@@ -127,7 +127,7 @@ public:
   COMMON_LAPLACE_ZD(COMMON_LAPLACE_ZD const& x) : COMMON_LAPLACE(x) { untested();}
   COMMON_LAPLACE_ZD* clone()const override { untested();return new COMMON_LAPLACE_ZD(*this);}
 
-  std::string name()const override { untested();return "va_laplace_zd";}
+  std::string name()const override {return "va_laplace_zd";}
   void precalc_last(const PARAM_LIST* par_scope)override{ untested();
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();

@@ -311,7 +311,7 @@ void dump_identifier(OMSTREAM& o, std::string const& name)
 
   if(isalpha(name[0])){
   }else if(name[0] == '$'){ untested();
-  }else if(name[0] == '_'){ untested();
+  }else if(name[0] == '_'){
   }else{
     plain = false;
   }

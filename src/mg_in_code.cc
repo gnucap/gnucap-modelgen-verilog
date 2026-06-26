@@ -675,13 +675,13 @@ static Token_VAR_REF* parse_variable(CS& f, Block* o)
   f >> what;
   trace1("parse_variable", what);
   Base* b = o->lookup(what);
-  if(dynamic_cast<Node*>(b)) {
+  if(dynamic_cast<Node*>(b)) { untested();
     incomplete();
     return nullptr;
   }else if(auto v = dynamic_cast<Token_VAR_REF*>(b)) {
     // assert(v->data()); no. unreachable?
     return v;
-  }else if(auto n = dynamic_cast<Token_NODE*>(b)) {
+  }else if(auto n = dynamic_cast<Token_NODE*>(b)) { untested();
     // assert(v->data()); no. unreachable?
     return n;
   }else if (b) { untested();
@@ -722,14 +722,14 @@ void Assignment::parse(CS& f)
 
   if(options().optimize_unused() && !scope()->is_reachable()) {
 #if 0
-  }else if(_lhsref && !l->data()) {
+  }else if(_lhsref && !l->data()) { untested();
     incomplete();
     assert(dynamic_cast<Token_NODE*>(l));
     assert(!_token);
     store_deps(Expression_::data());
     assert(_token);
 
-    if(owner()){
+    if(owner()){ untested();
       assert(_data);
       _data->add_sens(owner());
     }else{ untested();
@@ -873,7 +873,7 @@ bool Assignment::update(RDeps const* incoming)
 
   assert(scope());
   trace3("Assignment::update", _lhsref->name(), _token->name(),  Expression_::data().size());
-  if(!_token){
+  if(!_token){ untested();
   }else if (store_deps(Expression_::data())) {
     trace3("Assignment::update0", _token->name(), _token->deps().size(), Expression_::data().size());
     incomplete();
@@ -1092,6 +1092,105 @@ bool Statement::propagate_rdeps(RDeps const& r)
     }
   }
   return ret;
+}
+/*--------------------------------------------------------------------------*/
+CtrlStmt::~CtrlStmt()
+{
+}
+/*--------------------------------------------------------------------------*/
+System_Task::System_Task(CS& f, Block* o) : Statement()
+{
+  set_owner(o);
+  parse(f);
+}
+/*--------------------------------------------------------------------------*/
+void System_Task::parse(CS& f)
+{
+  assert(owner());
+  _e.set_owner(this);
+  Expression rhs(f);
+  _e.resolve_symbols(rhs);
+  f >> ";";
+
+  assert(function());
+
+  // add_rdeps(function()->rdeps()); /// TODO // 
+  if(function()->has_tr_begin()){
+    add_rdep(&tr_begin_tag);
+  }else{
+  }
+  if(function()->has_tr_restore()){
+    add_rdep(&tr_restore_tag);
+  }else{
+  }
+  if(function()->has_tr_review()){
+    add_rdep(&tr_eval_tag);
+  }else{
+  }
+  if(function()->has_tr_review()){
+    add_rdep(&tr_review_tag);
+  }else{
+  }
+  if(function()->has_tr_accept()){
+    add_rdep(&tr_accept_tag);
+  }else{
+  }
+  if(function()->has_tr_advance()){
+    add_rdep(&tr_advance_tag);
+  }else{
+  }
+  if(function()->has_final()){
+    add_rdep(&final_tag);
+  }else{
+  }
+
+  // assert(rdeps());
+  trace1("System_Task::parse2", rdeps().size());
+  update(); // rdeps?
+  trace0("System_Task::update1");
+}
+/*--------------------------------------------------------------------------*/
+void System_Task::dump(std::ostream&o)const
+{
+  o__ _e << ";";
+
+  if(options().dump_annotate()){
+    dump_annotate(o, *this);
+  }else{
+  }
+  o << "\n";
+}
+/*--------------------------------------------------------------------------*/
+bool System_Task::is_used_in(Base const*b) const
+{
+  if(_e.is_used_in(b)){ untested();
+    return true;
+  }else if( Statement::is_used_in(b)) {
+    return true;
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+FUNCTION_ const* System_Task::function() const
+{
+  assert(_e.size());
+  Token const* t = *_e.begin();
+  assert(t);
+  Token_CALL const* c = prechecked_cast<Token_CALL const*>(t);
+  assert(c);
+  return c->f();
+}
+/*--------------------------------------------------------------------------*/
+bool System_Task::update()
+{
+  bool ret = _e.update(&_rdeps);
+  return propagate_rdeps(_rdeps) || Statement::update() || ret;
+}
+/*--------------------------------------------------------------------------*/
+void System_Task::submit_variable_access(Variable_Access& va) const
+{
+  expression().submit_variable_xs(va);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

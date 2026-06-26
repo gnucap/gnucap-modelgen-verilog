@@ -290,20 +290,6 @@ public:
 #endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class InitialStmt : public DigitalCtrlStmt {
-public:
-  explicit InitialStmt(Block* o, CS& file) { untested();
-    set_owner(o);
-    parse(file);
-  }
-  ~InitialStmt(){ untested(); }
-public:
-  void parse(CS& file) override;
-  void dump(std::ostream& o)const override;
-  bool is_used_in(Base const*)const override; // needed?
-  bool update()override;
-}; // InitialStmt
-/*--------------------------------------------------------------------------*/
 #if 0 // later, code?
 class DigitalSwitchStmt : public DigitalStmt { // CtrlStmt?
   TData _deps; // here?

@@ -121,6 +121,7 @@ public:
   void parse(CS&)override {unreachable();};
   void dump(std::ostream&)const override{ untested();unreachable();}
   virtual void submit_variable_access(Variable_Access&)const { untested();
+    assert(0);
     unreachable();
   }
 
@@ -498,6 +499,30 @@ inline bool Statement::is_used_in(Base const* b) const
   }
   return false;
 }
+/*--------------------------------------------------------------------------*/
+class CtrlStmt : public Statement {
+protected:
+  explicit CtrlStmt() : Statement() {}
+  ~CtrlStmt();
+
+  virtual TData const& deps()const = 0;
+};
+/*--------------------------------------------------------------------------*/
+class InitialStmt : public CtrlStmt {
+public:
+  explicit InitialStmt(Block* o, CS& file) {
+    set_owner(o);
+    parse(file);
+  }
+  ~InitialStmt(){ }
+public:
+  void parse(CS&) override {incomplete();}
+  void dump(std::ostream&)const override {incomplete();}
+  bool is_used_in(Base const*)const override;
+  bool update()override;
+
+ // TData const& deps()const override // AnalogCtrlStmt
+}; // AnalogInitialStmt
 /*--------------------------------------------------------------------------*/
 // SystemTaskCall
 class System_Task : public Statement {
