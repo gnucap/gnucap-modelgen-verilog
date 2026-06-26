@@ -625,6 +625,14 @@ static void make_tr_advance(std::ostream& o, const Module& m)
     o__ "c->tr_advance_analog(this);\n";
   }else{
   }
+  if(m.has_tr_advance_digital()){
+    o__ "c->tr_advance_digital(this);\n";
+  }else{
+  }
+  if(m.has_tr_accept_digital()){
+    o__ "c->tr_accept_digital(this);\n";
+  }else{
+  }
   for(auto f : m.funcs()){
     // needed?
     f->make_cc_tr_advance(o);
@@ -742,6 +750,10 @@ static void make_tr_accept(std::ostream& o, const Module& m)
   if(m.has_analog_block()){
     o__ "_v_ = _v_1;\n"; // "replay.."
     o__ "c->tr_accept_analog(this);\n"; // call from COMMON::tr_accept?
+  }else{
+  }
+  if(m.has_always_block()){
+    o__ "c->tr_accept_digital(this);\n";
   }else{
   }
   for(auto f : m.funcs()){

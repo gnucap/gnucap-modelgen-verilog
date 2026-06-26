@@ -75,7 +75,7 @@ public:
       }
     }
 
-    while (cmd >> "module"){ untested();
+    while (cmd >> "module"){
       module_content += cmd.fullstring();
       for (;;) {
 	cmd.get_line("verilog-module>");

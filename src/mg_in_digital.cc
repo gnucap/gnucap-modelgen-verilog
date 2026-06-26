@@ -209,7 +209,7 @@ static Base* parse_stmt_or_null(CS& file, Block* scope)
 }
 /*--------------------------------------------------------------------------*/
 static Base* parse_stmt(CS& file, Block* owner)
-{ untested();
+{
   size_t here = file.cursor();
   Base* a = parse_stmt_or_null(file, owner);
   if(file.stuck(&here)) { untested();
@@ -738,7 +738,7 @@ void DigitalSeqBlock::parse(CS& f)
       }else{
       }
       break;
-    }else{ untested();
+    }else{
     }
     Base* s = parse_stmt(f, this);
     if(!s){ untested();
@@ -1369,7 +1369,7 @@ void Module::delete_assign()
 }
 /*--------------------------------------------------------------------------*/
 bool Module::has_always_block() const
-{ untested();
+{
   return ::always(*this).has_block();
 }
 /*--------------------------------------------------------------------------*/
@@ -1385,7 +1385,7 @@ Always::~Always()
 }
 /*--------------------------------------------------------------------------*/
 bool Always::has_block() const
-{ untested();
+{
   return !list().is_empty();
 }
 /*--------------------------------------------------------------------------*/

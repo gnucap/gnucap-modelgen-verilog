@@ -2526,7 +2526,6 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
 typedef MOD_resistor::ddouble ddouble;
 inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
 {
-  m->_v_1 = m->_v_;
   double& _v___i(m->_v_.___i); // (1068)
   (void) _v___i;
   MOD_resistor const* p = m;
@@ -2577,7 +2576,6 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
     return;
   }else{
   }
-  m->_v_ = m->_v_1;
   double& _v___i(m->_v_.___i); // (1068)
   (void) _v___i;
   MOD_resistor const* p = m;
@@ -2672,6 +2670,7 @@ inline void MOD_resistor::tr_regress()
   }
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
   assert(c);
+  _v_ = _v_1;
   c->tr_regress_analog(this);
 }
 /*--------------------------------------------------------------------------*/
@@ -4377,7 +4376,6 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
 typedef MOD_resistor::ddouble ddouble;
 inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
 {
-  m->_v_1 = m->_v_;
   double& _v_i(m->_v_._i); // (1068)
   (void) _v_i;
   MOD_resistor const* p = m;
@@ -4495,7 +4493,6 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
     return;
   }else{
   }
-  m->_v_ = m->_v_1;
   double& _v_i(m->_v_._i); // (1068)
   (void) _v_i;
   MOD_resistor const* p = m;
@@ -4657,6 +4654,7 @@ inline void MOD_resistor::tr_regress()
   }
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
   assert(c);
+  _v_ = _v_1;
   c->tr_regress_analog(this);
 }
 /*--------------------------------------------------------------------------*/
@@ -7127,7 +7125,6 @@ inline void COMMON_capacitor::tr_review_analog(MOD_capacitor* m) const
 /*--------------------------------------------------------------------------*/
 inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 {
-  m->_v_ = m->_v_1;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -7146,7 +7143,6 @@ inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
 {
-  m->_v_1 = m->_v_;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -7169,7 +7165,6 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
     return;
   }else{
   }
-  m->_v_ = m->_v_1;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -7215,6 +7210,7 @@ inline void MOD_capacitor::tr_accept()
   trace1("capacitor::tr_accept", _sim->_time0);
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
+  _v_ = _v_1;
   c->tr_accept_analog(this);
   return BASE_SUBCKT::tr_accept();
 } // tr_accept
@@ -7264,6 +7260,7 @@ inline void MOD_capacitor::tr_regress()
   }
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
+  _v_ = _v_1;
   c->tr_regress_analog(this);
 }
 /*--------------------------------------------------------------------------*/
@@ -8421,7 +8418,6 @@ inline void COMMON_capacitor::tr_review_analog(MOD_capacitor* m) const
 /*--------------------------------------------------------------------------*/
 inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 {
-  m->_v_ = m->_v_1;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -8440,7 +8436,6 @@ inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
 {
-  m->_v_1 = m->_v_;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -8463,7 +8458,6 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
     return;
   }else{
   }
-  m->_v_ = m->_v_1;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -8509,6 +8503,7 @@ inline void MOD_capacitor::tr_accept()
   trace1("capacitor::tr_accept", _sim->_time0);
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
+  _v_ = _v_1;
   c->tr_accept_analog(this);
   return BASE_SUBCKT::tr_accept();
 } // tr_accept
@@ -8558,6 +8553,7 @@ inline void MOD_capacitor::tr_regress()
   }
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
+  _v_ = _v_1;
   c->tr_regress_analog(this);
 }
 /*--------------------------------------------------------------------------*/

@@ -221,14 +221,14 @@ public:
   void dump(std::ostream& o)const override;
 
   bool has_block() const;
-  AlwaysList const& list()const { untested(); return _list; }
+  AlwaysList const& list()const { return _list; }
   AlwaysList const& blocks()const { return _list; }
   Digital_Events const& events()const { untested(); return _events; }
   void push_back(Base*);
 };
 /*--------------------------------------------------------------------------*/
 inline Always const& always(Module const& m)
-{ untested();
+{
   Always const* a = prechecked_cast<Always const*>(&m.always());
   assert(a);
   return *a;
