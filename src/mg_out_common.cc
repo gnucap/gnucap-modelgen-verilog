@@ -1001,6 +1001,10 @@ static void make_common_precalc_last(std::ostream& o , const Module& m)
 /*--------------------------------------------------------------------------*/
 } // common::expand
 /*--------------------------------------------------------------------------*/
+// mg_out_digital
+void make_tr_advance_digital(std::ostream&, const Module&);
+void make_tr_regress_digital(std::ostream&, const Module&);
+/*--------------------------------------------------------------------------*/
 void make_cc_common(std::ostream& o , const Module& m)
 {
   make_tag(o);
@@ -1036,6 +1040,12 @@ void make_cc_common(std::ostream& o , const Module& m)
     make_common_final(o, m);
   }else{
   }
+  if(m.has_tr_advance_digital()){
+    make_tr_advance_digital(o, m);
+    make_tr_regress_digital(o, m);
+  }else{
+  }
+
   o  << "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/

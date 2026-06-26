@@ -13,6 +13,10 @@ module test(L);
     @(L);
   end
 
+  always begin
+    @(L);
+  end
+
 endmodule
 
 

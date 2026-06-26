@@ -1098,6 +1098,9 @@ CtrlStmt::~CtrlStmt()
 {
 }
 /*--------------------------------------------------------------------------*/
+bool InitialStmt::is_used_in(Base const*) const {incomplete(); return true;}
+bool InitialStmt::update() {incomplete(); return true;};
+/*--------------------------------------------------------------------------*/
 System_Task::System_Task(CS& f, Block* o) : Statement()
 {
   set_owner(o);

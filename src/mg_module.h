@@ -261,7 +261,15 @@ public: // TODO
   bool has_tr_begin_digital()const   { return _has_pid[if_TR_BEGIN]   & mm_DIGITAL; }
   bool has_tr_restore_digital()const { return _has_pid[if_TR_RESTORE]   & mm_DIGITAL; }
   bool has_tr_review_digital()const  {untested(); return _has_pid[if_TR_REVIEW]   & mm_DIGITAL; }
-  bool has_tr_advance_digital()const { return _has_pid[if_TR_ADVANCE] & mm_DIGITAL; }
+  bool has_tr_advance_digital()const {
+    if(_has_pid[if_TR_ADVANCE] & mm_DIGITAL) { untested();
+      return true;
+    }else if(has_always_block()) {
+      return true;
+    }else{
+      return false;
+    }
+  }
   bool has_tr_accept_digital()const  { return _has_pid[if_TR_ACCEPT]  & mm_DIGITAL; }
   bool has_final_digital()const      { return _has_pid[if_FINAL] & mm_DIGITAL; }
 

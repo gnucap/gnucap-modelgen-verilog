@@ -8,4 +8,7 @@ module test(L);
  end
  always @(L) begin
  end
+ always begin
+    @(L) begin end
+ end
 endmodule
