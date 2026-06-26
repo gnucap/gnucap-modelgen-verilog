@@ -12,6 +12,10 @@ Some of them are not here, but still in ../src.
   - above
   - timer
   - (absdelta)
+- A.7.5.3 System Timing check event definitions
+  - posedge
+  - negedge
+  - (edge)
 - A.8.2 Function calls
   - ln, log.. (see Table 9-11)
   - ac_stim

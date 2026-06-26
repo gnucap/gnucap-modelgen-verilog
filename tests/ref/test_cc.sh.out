@@ -44,6 +44,7 @@
 #include <u_sim_data.h> // see simparam
 #include <e_logicnode.h>
 #include <e_model.h>
+#include <e_logicval.h>
 #include <cfenv>
 /*--------------------------------------------------------------------------*/
 inline int simulatorVersion()
@@ -997,7 +998,7 @@ inline node_t& ground()
   return CARD_LIST::card_list.nodes()->at(0);
 }
 /*--------------------------------------------------------------------------*/
-void set_type(node_t& n, std::string const& t)
+inline void set_type(node_t& n, std::string const& t)
 {
   if(NODE* tt = node_dispatcher[t]){
     n.set_type(tt);
@@ -1006,6 +1007,39 @@ void set_type(node_t& n, std::string const& t)
   }
 }
 /*--------------------------------------------------------------------------*/
+inline LOGICVAL to_logic_(LOGICVAL l) {return l;}
+inline LOGICVAL to_logic_(int i)
+{
+  if(i==1) {
+    return lvSTABLE1;
+  }else if(i==0) {
+    return lvSTABLE0;
+  }else{ untested();
+    return lvUNKNOWN;
+  }
+}
+/*--------------------------------------------------------------------------*/
+}
+/*--------------------------------------------------------------------------*/
+LOGICVAL operator& (LOGICVAL const& a, LOGICVAL const& b)
+{
+  LOGICVAL c(a);
+  c &= b;
+  return c;
+}
+/*--------------------------------------------------------------------------*/
+LOGICVAL operator| (LOGICVAL const& a, LOGICVAL const& b)
+{
+  LOGICVAL c(a);
+  c |= b;
+  return c;
+}
+/*--------------------------------------------------------------------------*/
+LOGICVAL operator| (int const& a, LOGICVAL const& b)
+{
+  LOGICVAL c(va::to_logic_(a));
+  c |= b;
+  return c;
 }
 /*--------------------------------------------------------------------------*/
 #endif
@@ -2492,7 +2526,6 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
 typedef MOD_resistor::ddouble ddouble;
 inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
 {
-  m->_v_1 = m->_v_;
   double& _v___i(m->_v_.___i); // (1068)
   (void) _v___i;
   MOD_resistor const* p = m;
@@ -2543,7 +2576,6 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
     return;
   }else{
   }
-  m->_v_ = m->_v_1;
   double& _v___i(m->_v_.___i); // (1068)
   (void) _v___i;
   MOD_resistor const* p = m;
@@ -2638,6 +2670,11 @@ inline void MOD_resistor::tr_regress()
   }
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
   assert(c);
+  if(_sim->_phase == p_RESTORE) {untested();
+    return;
+  }else{
+    _v_ = _v_1;
+  }
   c->tr_regress_analog(this);
 }
 /*--------------------------------------------------------------------------*/
@@ -2737,14 +2774,14 @@ void MOD_resistor::expand()
   // filter (white_noise_1_p)
     {
     if (!_b_white_noise_1_p_ || redo_sckt) {
-      const CARD* p = device_dispatcher["va_white_noise"]; // va_white_noise
+      const CARD* p = device_dispatcher["__va_white_noise"];
       if(!p){
-        throw Exception("Cannot find va_white_noise. Load module?");
+        throw Exception("Cannot find __va_white_noise. Load module?");
       }else{
       }
       _b_white_noise_1_p_ = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_white_noise_1_p_){
-        throw Exception("Cannot use va_white_noise: wrong type");
+        throw Exception("Cannot use __va_white_noise: wrong type");
       }else{
       }
       subckt()->push_front(_b_white_noise_1_p_);
@@ -2763,14 +2800,14 @@ void MOD_resistor::expand()
   // branch (p, n)
     {
     if (!_b_p_n || redo_sckt) {
-      const CARD* p = device_dispatcher["va_flow"]; // va_flow
+      const CARD* p = device_dispatcher["__va_flow"];
       if(!p){
-        throw Exception("Cannot find va_flow. Load module?");
+        throw Exception("Cannot find __va_flow. Load module?");
       }else{
       }
       _b_p_n = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_p_n){
-        throw Exception("Cannot use va_flow: wrong type");
+        throw Exception("Cannot use __va_flow: wrong type");
       }else{
       }
       subckt()->push_front(_b_p_n);
@@ -4343,7 +4380,6 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
 typedef MOD_resistor::ddouble ddouble;
 inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
 {
-  m->_v_1 = m->_v_;
   double& _v_i(m->_v_._i); // (1068)
   (void) _v_i;
   MOD_resistor const* p = m;
@@ -4461,7 +4497,6 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
     return;
   }else{
   }
-  m->_v_ = m->_v_1;
   double& _v_i(m->_v_._i); // (1068)
   (void) _v_i;
   MOD_resistor const* p = m;
@@ -4623,6 +4658,11 @@ inline void MOD_resistor::tr_regress()
   }
   COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
   assert(c);
+  if(_sim->_phase == p_RESTORE) {untested();
+    return;
+  }else{
+    _v_ = _v_1;
+  }
   c->tr_regress_analog(this);
 }
 /*--------------------------------------------------------------------------*/
@@ -4753,14 +4793,14 @@ void MOD_resistor::expand()
   // filter (white_noise_0_p)
     {
     if (!_b_white_noise_0_p_ || redo_sckt) {
-      const CARD* p = device_dispatcher["va_white_noise"]; // va_white_noise
+      const CARD* p = device_dispatcher["__va_white_noise"];
       if(!p){
-        throw Exception("Cannot find va_white_noise. Load module?");
+        throw Exception("Cannot find __va_white_noise. Load module?");
       }else{
       }
       _b_white_noise_0_p_ = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_white_noise_0_p_){
-        throw Exception("Cannot use va_white_noise: wrong type");
+        throw Exception("Cannot use __va_white_noise: wrong type");
       }else{
       }
       subckt()->push_front(_b_white_noise_0_p_);
@@ -4779,14 +4819,14 @@ void MOD_resistor::expand()
   // branch (p, n)
     {
     if (!_b_p_n || redo_sckt) {
-      const CARD* p = device_dispatcher["va_flow"]; // va_flow
+      const CARD* p = device_dispatcher["__va_flow"];
       if(!p){
-        throw Exception("Cannot find va_flow. Load module?");
+        throw Exception("Cannot find __va_flow. Load module?");
       }else{
       }
       _b_p_n = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_p_n){
-        throw Exception("Cannot use va_flow: wrong type");
+        throw Exception("Cannot use __va_flow: wrong type");
       }else{
       }
       subckt()->push_front(_b_p_n);
@@ -4933,6 +4973,7 @@ ddouble MOD_resistor::_b_white_noise_0__precalc(ddouble, std::string what) {
 #include <u_sim_data.h> // see simparam
 #include <e_logicnode.h>
 #include <e_model.h>
+#include <e_logicval.h>
 #include <cfenv>
 /*--------------------------------------------------------------------------*/
 inline int simulatorVersion()
@@ -5886,7 +5927,7 @@ inline node_t& ground()
   return CARD_LIST::card_list.nodes()->at(0);
 }
 /*--------------------------------------------------------------------------*/
-void set_type(node_t& n, std::string const& t)
+inline void set_type(node_t& n, std::string const& t)
 {
   if(NODE* tt = node_dispatcher[t]){
     n.set_type(tt);
@@ -5895,6 +5936,39 @@ void set_type(node_t& n, std::string const& t)
   }
 }
 /*--------------------------------------------------------------------------*/
+inline LOGICVAL to_logic_(LOGICVAL l) {return l;}
+inline LOGICVAL to_logic_(int i)
+{
+  if(i==1) {
+    return lvSTABLE1;
+  }else if(i==0) {
+    return lvSTABLE0;
+  }else{ untested();
+    return lvUNKNOWN;
+  }
+}
+/*--------------------------------------------------------------------------*/
+}
+/*--------------------------------------------------------------------------*/
+LOGICVAL operator& (LOGICVAL const& a, LOGICVAL const& b)
+{
+  LOGICVAL c(a);
+  c &= b;
+  return c;
+}
+/*--------------------------------------------------------------------------*/
+LOGICVAL operator| (LOGICVAL const& a, LOGICVAL const& b)
+{
+  LOGICVAL c(a);
+  c |= b;
+  return c;
+}
+/*--------------------------------------------------------------------------*/
+LOGICVAL operator| (int const& a, LOGICVAL const& b)
+{
+  LOGICVAL c(va::to_logic_(a));
+  c |= b;
+  return c;
 }
 /*--------------------------------------------------------------------------*/
 #endif
@@ -7059,7 +7133,6 @@ inline void COMMON_capacitor::tr_review_analog(MOD_capacitor* m) const
 /*--------------------------------------------------------------------------*/
 inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 {
-  m->_v_ = m->_v_1;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -7078,7 +7151,6 @@ inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
 {
-  m->_v_1 = m->_v_;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -7101,7 +7173,6 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
     return;
   }else{
   }
-  m->_v_ = m->_v_1;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -7147,6 +7218,7 @@ inline void MOD_capacitor::tr_accept()
   trace1("capacitor::tr_accept", _sim->_time0);
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
+  _v_ = _v_1;
   c->tr_accept_analog(this);
   return BASE_SUBCKT::tr_accept();
 } // tr_accept
@@ -7196,6 +7268,11 @@ inline void MOD_capacitor::tr_regress()
   }
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
+  if(_sim->_phase == p_RESTORE) {untested();
+    return;
+  }else{
+    _v_ = _v_1;
+  }
   c->tr_regress_analog(this);
 }
 /*--------------------------------------------------------------------------*/
@@ -7295,14 +7372,14 @@ void MOD_capacitor::expand()
   // filter (ddt_1_p)
     {
     if (!_b_ddt_1_p_ || redo_sckt) {
-      const CARD* p = device_dispatcher["va_ddt"]; // va_ddt
+      const CARD* p = device_dispatcher["__va_ddt"];
       if(!p){
-        throw Exception("Cannot find va_ddt. Load module?");
+        throw Exception("Cannot find __va_ddt. Load module?");
       }else{
       }
       _b_ddt_1_p_ = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_ddt_1_p_){
-        throw Exception("Cannot use va_ddt: wrong type");
+        throw Exception("Cannot use __va_ddt: wrong type");
       }else{
       }
       subckt()->push_front(_b_ddt_1_p_);
@@ -7321,14 +7398,14 @@ void MOD_capacitor::expand()
   // branch (p, n)
     {
     if (!_b_p_n || redo_sckt) {
-      const CARD* p = device_dispatcher["va_flow"]; // va_flow
+      const CARD* p = device_dispatcher["__va_flow"];
       if(!p){
-        throw Exception("Cannot find va_flow. Load module?");
+        throw Exception("Cannot find __va_flow. Load module?");
       }else{
       }
       _b_p_n = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_p_n){
-        throw Exception("Cannot use va_flow: wrong type");
+        throw Exception("Cannot use __va_flow: wrong type");
       }else{
       }
       subckt()->push_front(_b_p_n);
@@ -8353,7 +8430,6 @@ inline void COMMON_capacitor::tr_review_analog(MOD_capacitor* m) const
 /*--------------------------------------------------------------------------*/
 inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 {
-  m->_v_ = m->_v_1;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -8372,7 +8448,6 @@ inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
 {
-  m->_v_1 = m->_v_;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -8395,7 +8470,6 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
     return;
   }else{
   }
-  m->_v_ = m->_v_1;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -8441,6 +8515,7 @@ inline void MOD_capacitor::tr_accept()
   trace1("capacitor::tr_accept", _sim->_time0);
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
+  _v_ = _v_1;
   c->tr_accept_analog(this);
   return BASE_SUBCKT::tr_accept();
 } // tr_accept
@@ -8490,6 +8565,11 @@ inline void MOD_capacitor::tr_regress()
   }
   COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
   assert(c);
+  if(_sim->_phase == p_RESTORE) {untested();
+    return;
+  }else{
+    _v_ = _v_1;
+  }
   c->tr_regress_analog(this);
 }
 /*--------------------------------------------------------------------------*/
@@ -8589,14 +8669,14 @@ void MOD_capacitor::expand()
   // filter (ddt_2_p)
     {
     if (!_b_ddt_2_p_ || redo_sckt) {
-      const CARD* p = device_dispatcher["va_ddt"]; // va_ddt
+      const CARD* p = device_dispatcher["__va_ddt"];
       if(!p){
-        throw Exception("Cannot find va_ddt. Load module?");
+        throw Exception("Cannot find __va_ddt. Load module?");
       }else{
       }
       _b_ddt_2_p_ = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_ddt_2_p_){
-        throw Exception("Cannot use va_ddt: wrong type");
+        throw Exception("Cannot use __va_ddt: wrong type");
       }else{
       }
       subckt()->push_front(_b_ddt_2_p_);
@@ -8610,14 +8690,14 @@ void MOD_capacitor::expand()
   // branch (p, n)
     {
     if (!_b_p_n || redo_sckt) {
-      const CARD* p = device_dispatcher["va_sw"]; // va_sw
+      const CARD* p = device_dispatcher["__va_sw"];
       if(!p){
-        throw Exception("Cannot find va_sw. Load module?");
+        throw Exception("Cannot find __va_sw. Load module?");
       }else{
       }
       _b_p_n = dynamic_cast<ELEMENT*>(p->clone()); // elt
       if(!_b_p_n){
-        throw Exception("Cannot use va_sw: wrong type");
+        throw Exception("Cannot use __va_sw: wrong type");
       }else{
       }
       subckt()->push_front(_b_p_n);

@@ -12,6 +12,8 @@ This file summarizes new features and important changes between snapshots.
 - fix: include port direction with verilog dumps
 - lang_verilog: (re)enable backslash line continuation
 - mgvams/$rdist: accept type_string arg
+- generate code for always blocks
+- pos/neg edge triggered events
 - ..
 
 20260329-dev

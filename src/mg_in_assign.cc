@@ -56,6 +56,7 @@ public:
   int num_states()const override { return 0; }
   int net_nodes()const override { return _assign->num_used_variables()+1; }
   std::string const& port_value(int i)const override {
+    trace4("port_value", i, _arg, _assign->vars().size(), _assign->num_used_variables());
     assert(_assign);
     static std::string stringhack;
     if(i==0){
@@ -64,9 +65,12 @@ public:
       --i;
       assert(i < net_nodes());
       auto b = _assign->vars().begin();
+      trace1("port_value adv", i);
       std::advance(b, i);
+      assert(b!=_assign->vars().end());
       stringhack = (*b)->name();
     }
+    trace2("port_value", i, stringhack);
     return stringhack;
   }
 };

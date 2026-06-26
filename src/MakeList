@@ -83,6 +83,7 @@ mg_out.cc \
 mg_out_code.cc \
 mg_out_common.cc \
 mg_out_dev.cc \
+mg_out_digital.cc \
 mg_out_discipline.cc \
 mg_out_dump.cc \
 mg_out_expr.cc \

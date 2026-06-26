@@ -222,7 +222,7 @@ private: // override virtual
   }
   TIME_PAIR tr_review()override; //		{ untested();return _time_by.reset();}//BUG//review(_i0.f0, _it1.f0);}
 }p4;
-DISPATCHER<CARD>::INSTALL d_ddt(&device_dispatcher, "va_ddt", &p4);
+DISPATCHER<CARD>::INSTALL d_ddt(&device_dispatcher, "va_ddt|__va_ddt", &p4);
 // DEV_DDT p4i(I);
 // DISPATCHER<CARD>::INSTALL d_ddt_i(&device_dispatcher, "va_ddt_i", &p4i); // TODO
 /*--------------------------------------------------------------------------*/
@@ -284,7 +284,7 @@ public:
   }
 }p1;
 DISPATCHER<CARD>::INSTALL
-  d1(&device_dispatcher, "va_idt", &p1);
+  d1(&device_dispatcher, "va_idt|__va_idt", &p1);
 /*--------------------------------------------------------------------------*/
 void DEV_IDT::ac_load()
 {

@@ -277,10 +277,10 @@ void NOISE::stack_op(Expression* e) const
 }
 /*--------------------------------------------------------------------------*/
 NOISE wn("white", 2);
-DISPATCHER<FUNCTION>::INSTALL dwn(&function_dispatcher, "white_noise", &wn);
+DISPATCHER<FUNCTION>::INSTALL dwn(&function_dispatcher, "white_noise|__white_noise", &wn);
 /*--------------------------------------------------------------------------*/
 NOISE fn("flicker", 3);
-DISPATCHER<FUNCTION>::INSTALL dfn(&function_dispatcher, "flicker_noise", &fn);
+DISPATCHER<FUNCTION>::INSTALL dfn(&function_dispatcher, "flicker_noise|__flicker_noise", &fn);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 Branch const* NOISE::output() const

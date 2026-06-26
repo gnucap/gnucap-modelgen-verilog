@@ -470,6 +470,11 @@ static void make_do_tr(std::ostream& o, const Module& m)
 
   // if has_analog
   o__ "set_converged();\n";
+  if(m.has_tr_eval_digital()) {
+    o__ "c->tr_eval_digital(this);\n";
+  }else{
+  }
+  // if(has_eval_analog) ...
   o__ "c->tr_eval_analog(this);\n";
   o__ "set_branch_contributions();\n";
 
@@ -621,8 +626,13 @@ static void make_tr_advance(std::ostream& o, const Module& m)
   o__ "set_not_converged();\n";
 
   o__ "_v_1 = _v_;\n"; // "store values"
+		       //
   if(m.has_analog_block()){
     o__ "c->tr_advance_analog(this);\n";
+  }else{
+  }
+  if(m.has_tr_advance_digital()){
+    o__ "c->tr_advance_digital(this);\n";
   }else{
   }
   for(auto f : m.funcs()){
@@ -669,6 +679,11 @@ static void make_tr_regress(std::ostream& o, const Module& m)
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
+  o__ "if(_sim->_phase == p_RESTORE) {untested();\n";
+  o____ "return;\n";
+  o__ "}else{\n";
+  o____ "_v_ = _v_1;\n"; // "restore values"
+  o__ "}\n";
   if(m.has_analog_block()){
   o__ "c->tr_regress_analog(this);\n";
   }else{
@@ -705,6 +720,10 @@ static void make_tr_review(std::ostream& o, const Module& m)
     o__ "c->tr_review_analog(this);\n";
   }else{
   }
+  if(m.has_tr_review_digital()){
+    o__ "c->tr_review_digital(this);\n";
+  }else{
+  }
   for(auto f : m.funcs()){
     f->make_cc_tr_review(o);
   }
@@ -738,6 +757,12 @@ static void make_tr_accept(std::ostream& o, const Module& m)
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
+
+  o__ "_v_ = _v_1;\n"; // restore & replay
+  if(m.has_tr_accept_digital()){
+    o__ "c->tr_accept_digital(this);\n";
+  }else{
+  }
   if(m.has_analog_block()){
     o__ "c->tr_accept_analog(this);\n"; // call from COMMON::tr_accept?
   }else{
@@ -893,6 +918,10 @@ static void make_module_class(std::ostream& o, Module const& m)
     }
     make_do_tr(o, m);
     make_cc_analog(o, m);
+  }else{
+  }
+  if(m.has_always_block()){
+    make_cc_digital(o, m);
   }else{
   }
 
@@ -1092,7 +1121,7 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
   std::string dev_type = e.dev_type();
 
   o__ "if (!" << cn << " || redo_sckt) {\n";
-  o____ "const CARD* p = device_dispatcher[\"" << dev_type << "\"]; // " << e.dev_type() << "\n";
+  o____ "const CARD* p = device_dispatcher[\"" << dev_type << "\"];\n";
   o____ "if(!p){\n";
   o______ "throw Exception(" << "\"Cannot find " << dev_type << ". Load module?\");\n";
   o____ "}else{\n";
@@ -1103,7 +1132,6 @@ static void make_module_expand_one_branch(std::ostream& o, const Element_2& e, M
   o____ "}else{\n";
   o____ "}\n";
   o____ "subckt()->push_front(" << cn << ");\n";
-//o____ e.code_name() << "->set_dev_type(\"" << e.dev_type() << "\");\n";
   o__ "}else{\n";
   o__ "}\n";
 

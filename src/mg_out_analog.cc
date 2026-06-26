@@ -19,12 +19,13 @@
  * 02110-1301, USA.
  */
 /*--------------------------------------------------------------------------*/
-#include "mg_out.h"
 #include "mg_analog.h"
 #include "mg_options.h"
+#include "mg_out.h"
+#include "mg_out_code.h"
 #include <typeinfo>
 /*--------------------------------------------------------------------------*/
-class OUT_ANALOG {
+class OUT_ANALOG : OUT_CODE {
 public:
   enum mode{
     modePRECALC = 0,
@@ -57,7 +58,7 @@ public:
       _src(src){}
 
 public:
-  bool is_dynamic()const { return _mode==modeDYNAMIC; }
+  bool is_dynamic()const override { return _mode==modeDYNAMIC; }
   bool is_static()const { return _mode==modeSTATIC
                               || _mode==modePRECALC
                               || _mode==modeTR_BEGIN
@@ -67,14 +68,14 @@ public:
                               || _mode==modeTR_ACCEPT
                               || _mode==modeTR_INITIAL
 			      || _mode==modeTR_REVIEW ; } // || ...?
-  bool is_precalc()const { return _mode==modePRECALC; }
+  bool is_precalc()const override { return _mode==modePRECALC; }
   bool is_probe()const   { untested(); return _mode==modePROBE; }
   bool is_tr_initial()const  { return _mode==modeTR_INITIAL; }
   bool is_tr_begin()const  { return _mode==modeTR_BEGIN; }
   bool is_tr_review()const  { untested(); return _mode==modeTR_REVIEW; }
-  bool is_tr_accept()const  { return _mode==modeTR_ACCEPT; }
+  bool is_tr_accept()const override { return _mode==modeTR_ACCEPT; }
   bool is_tr_advance()const  { untested(); return _mode==modeTR_ADVANCE; }
-  bool is_tr_restore()const { return _mode==modeTR_RESTORE; }
+  bool is_tr_restore()const override { return _mode==modeTR_RESTORE; }
   bool is_final()const  { return _mode==modeFINAL; }
 public:
   void make_analog_list(std::ostream& o, const Module& m)const;
@@ -95,7 +96,7 @@ private:
   void make_for        (std::ostream& o, AnalogForStmt const& s)const;
   void make_while      (std::ostream& o, AnalogWhileStmt const& s)const;
   void make_seq        (std::ostream& o, AnalogSeqStmt const& s)const;
-  void make_ctrl       (std::ostream& o, AnalogCtrlBlock const& s)const;
+  void make_ctrl       (std::ostream& o, AnalogSeqBlock const& s)const;
   void make_assignment (std::ostream& o, Assignment const& a)const;
   void make_contrib    (std::ostream& o, Contribution const& C)const;
   void make_evt        (std::ostream& o, AnalogEvtCtlStmt const& s)const;
@@ -109,9 +110,6 @@ private:
   void make_real_variable  (std::ostream& o, Token_VAR_DECL const&)const;
   void make_seq_block      (std::ostream& o, AnalogSeqBlock const&)const;
 private:
-  void make_one_local_var(std::ostream& o, Variable_Decl const& V)const;
-  void make_one_variable_load(std::ostream& o, Token_VAR_REF const& V)const;
-
   std::string make_cc_expression(std::ostream& o, Expression const& e, bool=false)const {
     return ::make_cc_expression(o, e, _mode!=modePRECALC, ctx());
   }
@@ -573,7 +571,7 @@ void OUT_ANALOG::make_af_body(std::ostream& o, const Analog_Function& f) const
       unreachable();
       // make_stmt(o, *i);
      // make_block_variables(o, *ard);
-    }else if(auto st = dynamic_cast<AnalogStmt const*>(i)){
+    }else if(auto st = dynamic_cast<Statement const*>(i)){
       make_stmt(o, *st);
     }else{
       unreachable();
@@ -647,7 +645,7 @@ void OUT_ANALOG::make_loop(std::ostream& o, AnalogWhileStmt const& s) const
     o__ "if ("<<name<<") {\n";
     if(s.has_body()) {
       indent y;
-      if(auto bb = dynamic_cast<AnalogCtrlBlock const*>(&s.body())){
+      if(auto bb = dynamic_cast<AnalogSeqBlock const*>(&s.body())){
 	make_ctrl(o, *bb);
       }else{ untested();
 	assert(0);
@@ -807,7 +805,7 @@ void OUT_ANALOG::make_switch(std::ostream& o, AnalogSwitchStmt const& s) const
   o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_ctrl(std::ostream& o, AnalogCtrlBlock const& s) const
+void OUT_ANALOG::make_ctrl(std::ostream& o, AnalogSeqBlock const& s) const
 {
   make_seq_block(o, s);
 }
@@ -1083,131 +1081,6 @@ static void make_cc_set_branch_contributions(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_one_variable_proxy(std::ostream& o, Token_VAR_REF const& V)
-{
-  o__ "class _V_" << V.name() << " : public ddouble {\n";
-  o____ "MOD__ * const _m{nullptr};\n";
-  o__ "public:\n";
-  o____ "typedef ddouble base;\n";
-  o____ "typedef va::ddouble_tag base_tag;\n";
-  o____ "_V_" << V.name() << "(ddouble const& p) : ddouble(p) { itested(); }\n";
-  o____ "_V_" << V.name() << "(double const& p) : ddouble(p) {set_all_deps();}\n";
-  o____ "_V_" << V.name() << "(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}\n";
-  o____ "_V_" << V.name() << "(_V_" << V.name() << " const& p) : ddouble(p) {}\n";
-  o____ "explicit _V_" << V.name() << "() : ddouble() {set_all_deps();}\n";
-  o____ "_V_" << V.name() << "(MOD__* m) : "
-    << "ddouble(m->_v_" << V.long_code_name() << "), _m(m) {}\n";
-  o____ "~_V_" << V.name() << "() {\n";
-  o______ "if(_m){\n";
-  o________ "_m->_v_" << V.long_code_name() << " = value();\n";
-  o______ "}else{\n";
-  o______ "}\n";
-  o____ "}\n";
-  o____ "ddouble& operator=(double const& t){\n";
-  o______ "ddouble::operator=(t);\n";
-  o______ "return *this;\n";
-  o____ "}\n";
-  o____ "ddouble& operator=(PARAMETER<double> const& t){\n";
-  o______ "ddouble::operator=(t);\n";
-  o______ "return *this;\n";
-  o____ "}\n";
-  o____ "ddouble& operator=(ddouble const& t){\n";
-  o______ "ddouble::operator=(t);\n";
-  o______ "return *this;\n";
-  o____ "}\n";
-  o____ "ddouble& operator=(_V_" << V.name() <<" const & t){\n";
-  o______ "ddouble::operator=(t);\n";
-  o______ "return *this;\n";
-  o____ "}\n";
-  o__ "}";
-
-  auto d = dynamic_cast<Variable_Decl const*>(V.item());
-  if(!d){
-  }else if(d->rhs().is_empty()){
-  }else if(d->is_state_var()){
-    incomplete();
-    error(bDANGER, d->name() + ": block state variable initialiser unsupported.\n");
-  }else{
-  }
-
-}
-/*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_one_local_var(std::ostream& o, Variable_Decl const& V) const
-{
-  o__ "";
-  if(!V.type().is_real()){
-    o << code_name(&V.type());
-  }else if(V.data().ddeps().size()){
-    o << code_name(&V.type());
-    o << "/*" << V.data().ddeps().size() << "*/";
-  }else{
-    o << "double /*?*/";
-  }
-  o << " ";
-  assert(V.code_name().size());
-  o << V.code_name();
-  o << "; // local_var\n";
-
-  if(V.rhs().is_empty()){
-  }else if(V.is_state_var()){ untested();
-    incomplete();
-    error(bDANGER, V.name() + ": block state variable initialiser unsupported.\n");
-  }else{
-    o__ "{\n";
-    std::string name = make_cc_expression(o, V.rhs());
-    o____ V.code_name() << " = " << name << ";\n";
-    o__ "}\n";
-  }
-}
-/*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_one_variable_load(std::ostream& o,
-                                        const Token_VAR_REF& V) const
-{
-  if(!is_dynamic() || is_tr_accept() ) {
-    if(V.type().is_int()) {
-      o__ "int";
-    }else if(V.type().is_real()) {
-      if(is_precalc()) {
-	o__ "ddouble"; // precalc hacks derivatives a bit.
-      }else{
-	o__ "double";
-      }
-    }else{ untested();
-      unreachable();
-    }
-
-    if(is_tr_accept()) {
-      o << "& " << V.code_name() << "(m->_v_" << V.long_code_name() << "); // accept 1113\n";
-      // TODO? assert post-accept values against _v_
-    }else if(is_precalc() || is_tr_restore()) {
-      o << " " << V.code_name() << "(m->_v_" << V.long_code_name() << "); // precalc 1068\n";
-    }else{
-      o << "& " << V.code_name() << "(m->_v_" << V.long_code_name() << "); // (1068)\n";
-    }
-    o__ "(void) " << V.code_name() << ";\n";
-  }else if(V.type().is_int()) {
-    o__ "int& " << V.code_name() << "(d->_v_" << V.long_code_name() << ");\n";
-  }else if(V.type().is_real()) {
-    if(V.deps().ddeps().size() == 0){
-      if(dynamic_cast<Module const*>(V.scope())) {
-	o__ "double& " << V.code_name() << "(d->_v_" << V.long_code_name() << "); // (823)\n";
-      }else{
-	o__ "// tmp block proxy (823b)\n";
-	make_one_variable_proxy(o, V);
-	o << V.code_name() << "(d);\n";
-      }
-    }else if(options().optimize_deriv()) {
-      incomplete();
-      make_one_variable_proxy(o, V);
-      o << V.code_name() << "(d);\n";
-    }else{ untested();
-      make_one_variable_proxy(o, V);
-      o << V.code_name() << "(d);\n";
-    }
-  }else{ untested();
-  }
-}
-/*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_load_block_variables(std::ostream& o, const
     Variable_List_Collection& P) const
 {
@@ -1311,8 +1184,6 @@ static void make_cc_tr_advance_analog(std::ostream& o, const Module& m)
   // o << "eval_t mode = m_TR_ADVANCE;\n";
   // o << "(void)mode;\n";
 
-  o__ "m->_v_1 = m->_v_;\n";
-
   OUT_ANALOG oo(OUT_ANALOG::modeTR_ADVANCE, &tr_advance_tag);
   oo.make_load_variables(o, m);
   oo.make_analog_list(o, m);
@@ -1333,8 +1204,6 @@ static void make_cc_tr_regress_analog(std::ostream& o, const Module& m)
   o__ "}else{\n";
   o__ "}\n";
 #endif
-
-  o__ "m->_v_ = m->_v_1;\n";
 
   OUT_ANALOG oo(OUT_ANALOG::modeTR_REGRESS, &tr_advance_tag);
   oo.make_load_variables(o, m);
@@ -1412,8 +1281,6 @@ static void make_cc_common_tr_accept(std::ostream& o, const Module& m)
     "::tr_accept_analog(MOD_" << m.identifier() << "* m) const\n{\n";
 
   OUT_ANALOG oo(OUT_ANALOG::modeTR_ACCEPT, &tr_accept_tag);
-
-  o__ "m->_v_ = m->_v_1;\n"; // restore & replay
 
   oo.make_load_variables(o, m);
   oo.make_analog_list(o, m);
@@ -1689,55 +1556,55 @@ std::string Branch::dev_type()const
 {
 //  if( .. attribute .. )?
   if(is_filter()) {
-    std::string label = "va_" + _ctrl->label();
+    std::string label = "__va_" + _ctrl->label();
     auto pos = label.find_last_of("_");
     return label.substr(0, pos);
   }else if(!is_direct()){
     if(has_pot_source()){
-      return "va_pot_br";
+      return "__va_pot_br";
     }else{ untested();
       return "incomplete_dev_type";
     }
   }else if(has_flow_source() && has_pot_source()){
-    return "va_sw"; // dio?
+    return "__va_sw"; // dio?
   }else if(has_flow_probe()) {
     if(deps().ddeps().size() == 0){
-      return "va_sw"; // ?
+      return "__va_sw"; // ?
     }else if(is_self_only()){
-      return "va_sw"; // ?
+      return "__va_sw"; // ?
     }else if(has_pot_source()){
       for(auto const& i : _used_in){
 	if(i == this){ untested();
 	}else if(dynamic_cast<Branch const*>(i)){
-	  return "va_pot_br"; // ind.
+	  return "__va_pot_br"; // ind.
 	}else if(dynamic_cast<Probe const*>(i)){ untested();
 	}else{
 	}
       }
       for(auto const& i : deps().ddeps()){
 	if(branch(i) != this){
-	  return "va_sw"; // vsine?
+	  return "__va_sw"; // vsine?
 	}else{ untested();
 	}
       }
       { untested();
-        return "va_sw"; // vsine?
+        return "__va_sw"; // vsine?
       }
     }else{
-      return "va_sw"; // ?
+      return "__va_sw"; // ?
     }
   }else if(has_pot_source()){
     if(_selfdep){
-      return "va_pot_br";
+      return "__va_pot_br";
     }else if(has_always_pot() && !has_flow_source()) {
-      return "va_pot";
+      return "__va_pot";
     }else{
-      return "va_sw";
+      return "__va_sw";
     }
   }else if(has_flow_source()){
-    return "va_flow";
+    return "__va_flow";
   }else{ untested();
-    return "va_sw";
+    return "__va_sw";
   }
   unreachable();
   return "";

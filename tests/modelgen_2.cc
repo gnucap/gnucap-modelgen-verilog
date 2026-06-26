@@ -75,16 +75,18 @@ public:
       }
     }
 
-    module_content += cmd.fullstring();
-    for (;;) {
-      cmd.get_line("verilog-module>");
-      trace1("content", cmd.fullstring());
-
+    while (cmd >> "module"){
       module_content += cmd.fullstring();
-      if (cmd >> "endmodule ") {
+      for (;;) {
 	cmd.get_line("verilog-module>");
-	break;
-      }else{
+	trace1("content", cmd.fullstring());
+
+	module_content += cmd.fullstring();
+	if (cmd >> "endmodule ") {
+	  cmd.get_line("verilog-module>");
+	  break;
+	}else{
+	}
       }
     }
 

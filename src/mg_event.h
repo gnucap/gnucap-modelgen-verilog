@@ -35,6 +35,7 @@ public:
   MGVAMS_EVENT(MGVAMS_EVENT const& p) : FUNCTION_(p) { }
   ~MGVAMS_EVENT() {} //  {delete _rdeps;}
   bool needs_context()const override{ return true; }
+  bool is_event_function()const final override {return true;}
   Data_Type const* return_type()const override {
     static Data_Type_Int r; // bool?
     return &r;

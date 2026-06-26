@@ -20,6 +20,10 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_code.h"
+#include "mg_module.h"
+#include "mg_options.h"
+#include "mg_out_code.h"
+/*--------------------------------------------------------------------------*/
 char const* code_name(Data_Type const*x)
 {
   if(!x) { untested();
@@ -40,6 +44,131 @@ char const* code_name(Data_Type const*x)
 std::string Variable_Decl::code_name() const
 {
   return token().code_name();
+}
+/*--------------------------------------------------------------------------*/
+static void make_one_variable_proxy(std::ostream& o, Token_VAR_REF const& V)
+{
+  o__ "class _V_" << V.name() << " : public ddouble {\n";
+  o____ "MOD__ * const _m{nullptr};\n";
+  o__ "public:\n";
+  o____ "typedef ddouble base;\n";
+  o____ "typedef va::ddouble_tag base_tag;\n";
+  o____ "_V_" << V.name() << "(ddouble const& p) : ddouble(p) { itested(); }\n";
+  o____ "_V_" << V.name() << "(double const& p) : ddouble(p) {set_all_deps();}\n";
+  o____ "_V_" << V.name() << "(PARAMETER<double> const& p) : ddouble(p) {set_all_deps();}\n";
+  o____ "_V_" << V.name() << "(_V_" << V.name() << " const& p) : ddouble(p) {}\n";
+  o____ "explicit _V_" << V.name() << "() : ddouble() {set_all_deps();}\n";
+  o____ "_V_" << V.name() << "(MOD__* m) : "
+    << "ddouble(m->_v_" << V.long_code_name() << "), _m(m) {}\n";
+  o____ "~_V_" << V.name() << "() {\n";
+  o______ "if(_m){\n";
+  o________ "_m->_v_" << V.long_code_name() << " = value();\n";
+  o______ "}else{\n";
+  o______ "}\n";
+  o____ "}\n";
+  o____ "ddouble& operator=(double const& t){\n";
+  o______ "ddouble::operator=(t);\n";
+  o______ "return *this;\n";
+  o____ "}\n";
+  o____ "ddouble& operator=(PARAMETER<double> const& t){\n";
+  o______ "ddouble::operator=(t);\n";
+  o______ "return *this;\n";
+  o____ "}\n";
+  o____ "ddouble& operator=(ddouble const& t){\n";
+  o______ "ddouble::operator=(t);\n";
+  o______ "return *this;\n";
+  o____ "}\n";
+  o____ "ddouble& operator=(_V_" << V.name() <<" const & t){\n";
+  o______ "ddouble::operator=(t);\n";
+  o______ "return *this;\n";
+  o____ "}\n";
+  o__ "}";
+
+  auto d = dynamic_cast<Variable_Decl const*>(V.item());
+  if(!d){
+  }else if(d->rhs().is_empty()){
+  }else if(d->is_state_var()){
+    incomplete();
+    error(bDANGER, d->name() + ": block state variable initialiser unsupported.\n");
+  }else{
+  }
+
+}
+/*--------------------------------------------------------------------------*/
+void OUT_CODE::make_one_variable_load(std::ostream& o,
+                                        const Token_VAR_REF& V) const
+{
+  if(!is_dynamic() || is_tr_accept() ) {
+    if(V.type().is_int()) {
+      o__ "int";
+    }else if(V.type().is_real()) {
+      if(is_precalc()) {
+	o__ "ddouble"; // precalc hacks derivatives a bit.
+      }else{
+	o__ "double";
+      }
+    }else{ untested();
+      unreachable();
+    }
+
+    if(is_tr_accept()) {
+      o << "& " << V.code_name() << "(m->_v_" << V.long_code_name() << "); // accept 1113\n";
+      // TODO? assert post-accept values against _v_
+    }else if(is_precalc() || is_tr_restore()) {
+      o << " " << V.code_name() << "(m->_v_" << V.long_code_name() << "); // precalc 1068\n";
+    }else{
+      o << "& " << V.code_name() << "(m->_v_" << V.long_code_name() << "); // (1068)\n";
+    }
+    o__ "(void) " << V.code_name() << ";\n";
+  }else if(V.type().is_int()) {
+    o__ "int& " << V.code_name() << "(d->_v_" << V.long_code_name() << ");\n";
+  }else if(V.type().is_real()) {
+    if(V.deps().ddeps().size() == 0){
+      if(dynamic_cast<Module const*>(V.scope())) {
+	o__ "double& " << V.code_name() << "(d->_v_" << V.long_code_name() << "); // (823)\n";
+      }else{
+	o__ "// tmp block proxy (823b)\n";
+	make_one_variable_proxy(o, V);
+	o << V.code_name() << "(d);\n";
+      }
+    }else if(options().optimize_deriv()) {
+      incomplete();
+      make_one_variable_proxy(o, V);
+      o << V.code_name() << "(d);\n";
+    }else{ untested();
+      make_one_variable_proxy(o, V);
+      o << V.code_name() << "(d);\n";
+    }
+  }else{ untested();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void OUT_CODE::make_one_local_var(std::ostream& o, Variable_Decl const& V) const
+{
+  o__ "";
+  if(!V.type().is_real()){
+    o << code_name(&V.type());
+  }else if(V.data().ddeps().size()){
+    o << code_name(&V.type());
+    o << "/*" << V.data().ddeps().size() << "*/";
+  }else{
+    o << "double /*?*/";
+  }
+  o << " ";
+  assert(V.code_name().size());
+  o << V.code_name();
+  o << "; // local_var\n";
+
+  if(V.rhs().is_empty()){
+  }else if(V.is_state_var()){ untested();
+    incomplete();
+    error(bDANGER, V.name() + ": block state variable initialiser unsupported.\n");
+  }else{
+    o__ "{\n";
+    std::string name = make_cc_expression(o, V.rhs());
+    o____ V.code_name() << " = " << name << ";\n";
+    o__ "}\n";
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

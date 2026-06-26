@@ -26,18 +26,16 @@ noise_probe #() noise1 (\1 );
 noise_probe #() noise2 (\2 );
 noise_probe #() noise3 (\3 );
 noise_probe #() noise4 (\4 );
-#Freq       npwr(noise1) npwr(noise2) npwr(noise3) npwr(noise4)
- 1.         2.         2.         2.         1.        
- 2.         1.         1.         1.         0.25      
- 4.         0.5        0.5        0.5        0.0625    
- 8.         0.25       0.25       0.25       0.015625  
-#Freq       nv(noise1) nv(noise2) nv(noise3) nv(noise4)
- 1.         1.4142     1.4142     1.4142     1.        
- 2.         1.         1.         1.         0.5       
- 4.         0.70711    0.70711    0.70711    0.25      
- 8.         0.5        0.5        0.5        0.125     
+fn1: no candidates found for flicker_noise
+fn1: no valid prototype found for flicker_noise
+fn1: no candidates found for flicker_noise
+fn1: no valid prototype found for flicker_noise
+fn1: no candidates found for flicker_noise
+fn1: no valid prototype found for flicker_noise
+fn1: no candidates found for flicker_noise
+fn1: no valid prototype found for flicker_noise
 Gnucap   System status
-iterations: op=0, dc=0, tran=0, fourier=0, total=8
+iterations: op=0, dc=0, tran=0, fourier=0, total=2
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=4, subckt=0, model=0, total=4
-dctran density=25.0%, ac density=25.0%
+nodes: user=0, subckt=0, model=0, total=0
+dctran density=0.0%, ac density=0.0%

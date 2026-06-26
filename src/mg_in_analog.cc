@@ -163,110 +163,6 @@ static Base* parse_system_task(CS& f, Block* o)
   }
 }
 /*--------------------------------------------------------------------------*/
-System_Task::System_Task(CS& f, Block* o) : Statement()
-{
-  set_owner(o);
-  parse(f);
-}
-/*--------------------------------------------------------------------------*/
-void System_Task::parse(CS& f)
-{
-  assert(owner());
-  _e.set_owner(this);
-  Expression rhs(f);
-  _e.resolve_symbols(rhs);
-  f >> ";";
-
-  assert(function());
-
-  // add_rdeps(function()->rdeps()); /// TODO // 
-  if(function()->has_tr_begin()){
-    add_rdep(&tr_begin_tag);
-  }else{
-  }
-  if(function()->has_tr_restore()){
-    add_rdep(&tr_restore_tag);
-  }else{
-  }
-  if(function()->has_tr_review()){
-    add_rdep(&tr_eval_tag);
-  }else{
-  }
-  if(function()->has_tr_review()){
-    add_rdep(&tr_review_tag);
-  }else{
-  }
-  if(function()->has_tr_accept()){
-    add_rdep(&tr_accept_tag);
-  }else{
-  }
-  if(function()->has_tr_advance()){
-    add_rdep(&tr_advance_tag);
-  }else{
-  }
-  if(function()->has_final()){
-    add_rdep(&final_tag);
-  }else{
-  }
-
-  // assert(rdeps());
-  trace1("System_Task::parse2", rdeps().size());
-  update(); // rdeps?
-  trace0("System_Task::update1");
-}
-/*--------------------------------------------------------------------------*/
-void System_Task::dump(std::ostream&o)const
-{
-  o__ _e << ";";
-
-  if(options().dump_annotate()){
-    dump_annotate(o, *this);
-  }else{
-  }
-  o << "\n";
-}
-/*--------------------------------------------------------------------------*/
-bool System_Task::is_used_in(Base const*b) const
-{
-  if(_e.is_used_in(b)){ untested();
-    return true;
-  }else if( Statement::is_used_in(b)) {
-    return true;
-  }else{
-    return false;
-  }
-}
-/*--------------------------------------------------------------------------*/
-FUNCTION_ const* System_Task::function() const
-{
-  assert(_e.size());
-  Token const* t = *_e.begin();
-  assert(t);
-  Token_CALL const* c = prechecked_cast<Token_CALL const*>(t);
-  assert(c);
-  return c->f();
-}
-/*--------------------------------------------------------------------------*/
-// code?
-bool System_Task::update()
-{
-  // Expression_::update(rdeps());
- //  auto& rd = _e.data().rdeps(); // also collect from control block?
- //  size_t rs = rd.size();
- // //  _rdeps.merge(rd); // needed?
- //  trace2("System_Task::update2", rd.size(), rdeps().size());
-  bool ret = _e.update(&_rdeps);
-//  assert(rs<=_e.data().rdeps().size()); // WIP
-
- // trace3("System_Task::update3", ret, rd.size(), rdeps().size());
-  return propagate_rdeps(_rdeps) || Statement::update() || ret;
-}
-/*--------------------------------------------------------------------------*/
-void System_Task::submit_variable_access(Variable_Access& va) const
-{
-  expression().submit_variable_xs(va);
-}
-/*--------------------------------------------------------------------------*/
 void AnalogProceduralAssignment::parse(CS& f)
 {
   // assert(owner()); ?
@@ -327,12 +223,12 @@ void AnalogProceduralAssignment::dump(std::ostream& o)const
   }
 }
 /*--------------------------------------------------------------------------*/
-//code?
-Base* parse_assignment(CS& f, Block* o)
+//code? used in paramset..
+Base* parse_proc_assignment(CS& f, Block* o)
 {
   assert(o);
   f.skipbl();
-  trace1("parse_assignment", f.tail().substr(0,30));
+  trace1("parse_proc_assignment", f.tail().substr(0,30));
   try{
     auto n = new AnalogProceduralAssignment(f, o);
     if(f){
@@ -362,13 +258,13 @@ static Base* parse_contribution(CS& f, Block* owner)
   }
 }
 /*--------------------------------------------------------------------------*/
-static Base* parse_analog_stmt_or_null(CS& file, Block* scope)
+static Base* parse_stmt_or_null(CS& file, Block* scope)
 {
   size_t here = file.cursor();
   assert(scope);
   Base* ret = nullptr;
 
-  trace1("parse_analog_stmt_or_null", file.tail().substr(0,30));
+  trace1("parse_stmt_or_null", file.tail().substr(0,30));
   ONE_OF	// module_item
     || (file >> ";")
     || (ret = parse_seq(file, scope))
@@ -378,25 +274,25 @@ static Base* parse_analog_stmt_or_null(CS& file, Block* scope)
     || ((file >> "for ") && (ret = new AnalogForStmt(file, scope)))
     || ((file >> "@ ") && (ret = new_evt_ctl_stmt(file, scope)))
    // || ((file >> "initial ") && (ret = parse_initial(file, scope)))
-    || (ret = parse_assignment(file, scope))
+    || (ret = parse_proc_assignment(file, scope))
     || (ret = parse_system_task(file, scope))
     || (ret = parse_contribution(file, scope))
     ;
 
   if(file.stuck(&here)) {
-    trace1("parse_analog_stmt_or_null? stuck", file.tail().substr(0,30));
+    trace1("parse_stmt_or_null? stuck", file.tail().substr(0,30));
     file.reset_fail(here);
   }else{
-    trace1("parse_analog_stmt_or_null? cont", file.tail().substr(0,30));
+    trace1("parse_stmt_or_null? cont", file.tail().substr(0,30));
   }
 
   return ret;
 }
 /*--------------------------------------------------------------------------*/
-static Base* parse_analog_stmt(CS& file, Block* owner)
+static Base* parse_stmt(CS& file, Block* owner)
 {
   size_t here = file.cursor();
-  Base* a = parse_analog_stmt_or_null(file, owner);
+  Base* a = parse_stmt_or_null(file, owner);
   if(file.stuck(&here)) {
     delete a;
     trace1("what?", file.tail().substr(0,20));
@@ -434,7 +330,7 @@ void AnalogInitialStmt::dump(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 bool AnalogInitialStmt::is_used_in(Base const* b) const
 {
-  return AnalogStmt::is_used_in(b);
+  return CtrlStmt::is_used_in(b);
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogInitialStmt::update()
@@ -551,7 +447,7 @@ bool AnalogConditionalStmt::is_used_in(Base const* b) const
   if (_cond.is_used_in(b)){ untested();
     return true;
   }else{
-    return AnalogStmt::is_used_in(b);
+    return CtrlStmt::is_used_in(b);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -607,7 +503,6 @@ AnalogWhileStmt::AnalogWhileStmt(CS& file, Block* o)
 /*--------------------------------------------------------------------------*/
 bool AnalogWhileStmt::update()
 {
-//  _ctrl?
   bool ret = false;
   while(true){
     trace0("AnalogWhileStmt::update");
@@ -621,13 +516,12 @@ bool AnalogWhileStmt::update()
   }
   _cond.update(&rdeps()); // CtrlStmt?
   return // propagate_rdeps(_rdeps) ||
-     AnalogStmt::update() || ret;
+     CtrlStmt::update() || ret;
 }
 /*--------------------------------------------------------------------------*/
 // duplicate?
 bool AnalogSwitchStmt::update()
 {
-//  _ctrl?
   bool ret = false;
   while(true){
     _body.clear_vars();
@@ -638,7 +532,7 @@ bool AnalogSwitchStmt::update()
     }
   }
   return // propagate_rdeps(_rdeps) ||
-     AnalogStmt::update() || ret; // bypass ctrlStmt?
+     CtrlStmt::update() || ret; // bypass ctrlStmt?
 }
 /*--------------------------------------------------------------------------*/
 void AnalogWhileStmt::parse(CS& file)
@@ -713,7 +607,7 @@ bool AnalogForStmt::update()
     }
   }
   return // propagate_rdeps(_rdeps) ||
-     AnalogStmt::update() || ret;
+     CtrlStmt::update() || ret;
 }
 /*--------------------------------------------------------------------------*/
 void AnalogForStmt::parse(CS& f)
@@ -760,16 +654,6 @@ void AnalogForStmt::submit_variable_access(Variable_Access& va) const
 /*--------------------------------------------------------------------------*/
 bool AnalogProceduralAssignment::update()
 {
-  trace2("AnalogProceduralAssignment::update", _a.lhs().name(), rdeps().size());
-//  trace1("AnalogProceduralAssignment::update",  _a.data().size());
-#ifdef DO_TRACE
-  for(auto& r : rdeps()){
-    trace2("AnalogProceduralAssignment::update0", _a.lhs().name(), r->val_string());
-  }
-#endif
-
- // _rdeps.merge(_a.lhsrdeps()); // sowas. inside _a.
-
   bool ret;
   if(options().optimize_unused() && !scope()->is_reachable()) { untested();
     ret = false;
@@ -784,9 +668,6 @@ bool AnalogProceduralAssignment::update()
     ret |= merge_rdeps(r); // into Statement
   }
 
-  trace2("AnalogProceduralAssignment::update1", _a.lhsname(), rdeps().size());
- // trace1("AnalogProceduralAssignment::update1",  _a.data().size());
- // trace1("AnalogProceduralAssignment::update1",  deps().size());
   ret |= propagate_rdep(&tr_begin_tag); // BUG. propagates across event block boundaries.
   // ret |= propagate_rdep(&tr_restore_tag);
   if(is_state_var()){
@@ -794,12 +675,6 @@ bool AnalogProceduralAssignment::update()
     ret |= propagate_rdep(&tr_accept_tag);
   }else{
   }
-#ifdef DO_TRACE
-  trace1("AnalogProceduralAssignment::update2", _a.lhsname());
-  for(auto i: _a.lhs().rdeps()){
-    trace2("AnalogProceduralAssignment::update2", _a.lhsname(), i->val_string());
-  }
-#endif
 
   return AnalogStmt::update() || ret;
 } // AnalogProceduralAssignment::update()
@@ -1061,7 +936,7 @@ bool AnalogConstruct::is_used_in(Base const*) const
 void AnalogConstruct::new_block()
 {
   assert(!_block);
-//  _block = new AnalogCtrlBlock();
+//  _block = new AnalogSeqBlock();
   _block.set_owner(this);
 }
 /*--------------------------------------------------------------------------*/
@@ -1076,7 +951,7 @@ void AnalogConstruct::parse(CS& f)
   assert(!_block);
   _block.set_owner(this);
   f >> _block;
-//  auto ab = new AnalogCtrlBlock(f, this);
+//  auto ab = new AnalogSeqBlock(f, this);
 //  _block = ab;
 }
 /*--------------------------------------------------------------------------*/
@@ -1136,8 +1011,6 @@ void AnalogSeqStmt::submit_variable_access(Variable_Access& va) const
 void AnalogSeqBlock::parse(CS& f)
 {
   assert(owner());
-
-//  size_t here = f.cursor();
   bool begin = f >> "begin ";
   if(begin){
     // f.reset(here);
@@ -1167,7 +1040,7 @@ void AnalogSeqBlock::parse(CS& f)
       break;
     }else{
     }
-    Base* s = parse_analog_stmt(f, this);
+    Base* s = parse_stmt(f, this);
     if(!s){
       throw Exception_CS_("bad analog block", f);
     }else{
@@ -1175,7 +1048,7 @@ void AnalogSeqBlock::parse(CS& f)
     }
   }
   if(!begin){
-    Base* b = parse_analog_stmt_or_null(f, this);
+    Base* b = parse_stmt_or_null(f, this);
     if(!f) {
       assert(!b);
     }else if(b){
@@ -1185,14 +1058,12 @@ void AnalogSeqBlock::parse(CS& f)
     }
   }else{
   }
-  // variable_access().propagate(this);
 
-  // visit all statements and grab assign/use
   variable_access().collect(this);
 } // AnalogSeqBlock::parse
 /*--------------------------------------------------------------------------*/
 #if 1
-void AnalogCtrlBlock::set_owner(Statement* st)
+void AnalogSeqBlock::set_owner(Statement* st)
 {
   init_context(st);
   Block* o = st->scope();
@@ -1770,7 +1641,7 @@ bool AnalogEvtCtlStmt::update()
   }
 
   // set_rdeps(_ctrl.rdeps());
-  return AnalogStmt::update() || ret;
+  return CtrlStmt::update() || ret;
 }
 /*--------------------------------------------------------------------------*/
 bool AnalogEvtCtlStmt::is_used_in(Base const* b)const
@@ -2118,7 +1989,7 @@ Base* AnalogFunctionArgs::lookup(std::string const& k, bool recurse)
 /*--------------------------------------------------------------------------*/
 Base* AnalogFunctionBody::lookup(std::string const& k, bool recurse)
 {
-  Base* b = AnalogCtrlBlock::lookup(k, false);
+  Base* b = AnalogSeqBlock::lookup(k, false);
   if(b){
     return b;
   }else if(recurse){
@@ -2350,33 +2221,35 @@ void AnalogEvtExpression::set_rdeps()
     auto& f = *call;
    //  auto e = prechecked_cast<MGVAMS_EVENT const*>(f.f());
    //  assert(e);
-    if(f->has_tr_begin()){
-      add_rdep(&tr_begin_tag);
-    }else{
-    }
-    if(f->has_tr_restore()){
-      add_rdep(&tr_restore_tag);
-    }else{
-    }
-    if(f->has_tr_review()){
-      add_rdep(&tr_eval_tag);
-    }else{
-    }
-    if(f->has_tr_review()){
-      add_rdep(&tr_review_tag);
-    }else{
-    }
-    if(f->has_tr_accept()){
-      add_rdep(&tr_accept_tag);
-    }else{
-    }
-    if(f->has_tr_advance()){
-      add_rdep(&tr_advance_tag);
-    }else{
-    }
-    if(f->has_final()){
-      add_rdep(&final_tag);
-    }else{
+    {
+      if(f->has_tr_begin()){
+	add_rdep(&tr_begin_tag);
+      }else{
+      }
+      if(f->has_tr_restore()){
+	add_rdep(&tr_restore_tag);
+      }else{
+      }
+      if(f->has_tr_review()){
+	add_rdep(&tr_eval_tag);
+      }else{
+      }
+      if(f->has_tr_review()){
+	add_rdep(&tr_review_tag);
+      }else{
+      }
+      if(f->has_tr_accept()){
+	add_rdep(&tr_accept_tag);
+      }else{
+      }
+      if(f->has_tr_advance()){
+	add_rdep(&tr_advance_tag);
+      }else{
+      }
+      if(f->has_final()){
+	add_rdep(&final_tag);
+      }else{
+      }
     }
   }
 }

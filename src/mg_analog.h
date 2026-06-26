@@ -30,15 +30,7 @@ typedef Collection<Statement> AnalogList;
 class AnalogStmt : public Statement {
 public:
   ~AnalogStmt();
-
   virtual TData const& deps()const = 0;
-//  Statement* parent_stmt()override { untested();
-//    incomplete();
-//    return nullptr;
-//  }
-  std::string val_string()const override {
-    return std::string("analog statement ") + typeid(*this).name();
-  }
 };
 /*--------------------------------------------------------------------------*/
 // class access_function?
@@ -144,13 +136,15 @@ public: // sensitivities?
 
   TData const& deps(){ return _deps;};
   TData const& deps()const { return _deps;};
+  operator bool()const{ return size() || identifier() !=""; }
+  void set_owner(Statement* owner);
 }; // AnalogSeqBlock
 /*--------------------------------------------------------------------------*/
-class AnalogSeqStmt : public AnalogStmt {
+class AnalogSeqStmt : public CtrlStmt {
   AnalogSeqBlock _block; // SeqBlock?
 public:
-  explicit AnalogSeqStmt() : AnalogStmt() { untested();}
-  explicit AnalogSeqStmt(CS& cmd, Block* owner) : AnalogStmt() {
+  explicit AnalogSeqStmt() : CtrlStmt() { untested();}
+  explicit AnalogSeqStmt(CS& cmd, Block* owner) : CtrlStmt() {
     set_owner(owner);
     parse(cmd);
   }
@@ -163,23 +157,8 @@ private:
   void submit_variable_access(Variable_Access&)const override;
 };
 /*--------------------------------------------------------------------------*/
-// AnalogSeqBlock + some parse quirks
-class AnalogCtrlBlock : public AnalogSeqBlock {
-public:
-  explicit AnalogCtrlBlock() : AnalogSeqBlock() {}
-  explicit AnalogCtrlBlock(CS& f, Statement* o) : AnalogSeqBlock() { untested();
-    set_owner(o);
-    parse(f);
-  }
-
-//  void parse(CS& cmd)override;
-//  void dump(std::ostream& o)const override;
-  operator bool()const{ return size() || identifier() !=""; }
-  void set_owner(Statement* owner);
-}; // AnalogCtrlBlock
-/*--------------------------------------------------------------------------*/
 class AnalogConstruct : public Statement {
-  AnalogCtrlBlock _block;
+  AnalogSeqBlock _block;
 public:
   AnalogConstruct() : Statement() { }
   ~AnalogConstruct() { }
@@ -216,8 +195,7 @@ public: // can't resolve these..
   Token_ARGUMENT* new_arg(std::string const& name, Base* owner);
 };
 /*--------------------------------------------------------------------------*/
-class AnalogFunctionBody : // public AnalogSeqBlock
-			  public AnalogCtrlBlock { //
+class AnalogFunctionBody : public AnalogSeqBlock {
 public: // can't resolve these..
   Branch_Ref new_branch(std::string const&, std::string const&)override { untested();
     return Branch_Ref();
@@ -234,20 +212,20 @@ public: // can't resolve these..
   Base* lookup(std::string const& f, bool recurse=true)override;
 
   bool new_var_ref(Base* what)override;
-//  void dump(std::ostream& f)const override { untested(); AnalogCtrlBlock::dump(o); }
+//  void dump(std::ostream& f)const override { untested(); AnalogSeqBlock::dump(o); }
   Block* scope();
 };
 /*--------------------------------------------------------------------------*/
-class AnalogCtrlStmt : public AnalogStmt /*SeqStmt??*/ {
+class AnalogCtrlStmt : public CtrlStmt {
   TData _deps; // here?
 protected:
-  AnalogCtrlBlock _body;
+  AnalogSeqBlock _body;
 public:
   AnalogCtrlStmt() : _body() { }
   ~AnalogCtrlStmt(){ }
   void dump(std::ostream&)const override;
   void parse(CS& cmd)override;
-  AnalogCtrlBlock const& body()const { return _body; }
+  AnalogSeqBlock const& body()const { return _body; }
 private:
   void submit_variable_access(Variable_Access&)const override;
 private:
@@ -255,7 +233,7 @@ private:
 protected:
   bool update()override {
     bool ret = _body.update();
-    return AnalogStmt::update() || ret;
+    return CtrlStmt::update() || ret;
   }
 public:
   bool propagate_rdeps(RDeps const& incoming)override;
@@ -324,7 +302,7 @@ public:
   void parse(CS&)override;
   void dump(std::ostream&)const override;
   Expression_ const& cond()const { return _ctrl; } // override?
-  const AnalogCtrlBlock& code()const { return _body; }
+  const AnalogSeqBlock& code()const { return _body; }
   bool update()override;
 
   bool is_used_in(Base const* b)const override;
@@ -478,7 +456,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class AnalogInitialStmt : public AnalogCtrlStmt {
+class AnalogInitialStmt : public AnalogCtrlStmt /*InitialStmt*/ {
 public:
   explicit AnalogInitialStmt(Block* o, CS& file) {
     set_owner(o);
@@ -494,7 +472,7 @@ public:
  // TData const& deps()const override // AnalogCtrlStmt
 }; // AnalogInitialStmt
 /*--------------------------------------------------------------------------*/
-class AnalogSwitchStmt : public AnalogStmt { // CtrlStmt?
+class AnalogSwitchStmt : public CtrlStmt {
   TData _deps; // here?
   AnalogConstExpression _ctrl; // Const??
   SwitchBlock _body; // Abuse SeqBlock and turn into CtrlStmt?
@@ -525,7 +503,7 @@ public:
 // just code?
 class AnalogConditionalStmt : public AnalogCtrlStmt {
   AnalogConstExpression _cond; // Const?
-  AnalogCtrlBlock _false_part;
+  AnalogSeqBlock _false_part;
 public:
   explicit AnalogConditionalStmt(Block* o, CS& file) {
     set_owner(o);
@@ -539,8 +517,8 @@ public:
   void parse(CS& file) override;
   void dump(std::ostream& o)const override;
   AnalogConstExpression const& conditional() const{return _cond;}
-  const AnalogCtrlBlock& true_part() const{ return _body; }
-  const AnalogCtrlBlock& false_part() const{ return _false_part; }
+  const AnalogSeqBlock& true_part() const{ return _body; }
+  const AnalogSeqBlock& false_part() const{ return _false_part; }
   bool is_used_in(Base const*)const override;
   bool update()override;
 

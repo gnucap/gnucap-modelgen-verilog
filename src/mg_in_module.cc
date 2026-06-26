@@ -24,6 +24,7 @@
 #include "mg_out.h"
 #include "mg_in.h"
 #include "mg_options.h"
+#include "mg_event.h"
 #include "mg_analog.h" // BUG: Analog_Function_Arg, push_back
 #include "mg_token.h"
 #include "mg_href.h"
@@ -72,7 +73,7 @@ void Element_2::parse(CS& file)
   _list_of_parameter_assignments.set_owner(owner());
   _list_of_port_connections.set_owner(owner());
 
-  file >> _module_or_paramset_identifier
+  file >> _dev_type
        >> '#' >> _list_of_parameter_assignments
        >> _name_of_module_instance >> _list_of_port_connections >> ';';
 
@@ -1276,6 +1277,37 @@ void Module::import_flags(FUNCTION_ const* f)
   }
 }
 /*--------------------------------------------------------------------------*/
+static Token* new_event_token(int na, FUNCTION_ const* func, Module* m)
+{
+  auto f = prechecked_cast<MGVAMS_EVENT const*>(func);
+  assert(f);
+
+  assert(na != -1);
+
+  static int n_evt;
+  std::string code_name = f->label() + "_" + std::to_string(n_evt++);
+
+  FUNCTION* fc = f->clone();
+  auto fcl = prechecked_cast<MGVAMS_EVENT*>(fc);
+
+#if 1
+  {
+    fcl->set_label(code_name);
+//    if(int(na) <= f->max_args()) {
+//    }else{ untested();
+//      incomplete();
+//      throw Exception_Too_Many(na, f->max_args(), 0);
+//      error(bDANGER, "too many arguments, have " + to_string(na) + "\n");
+//    }
+    fcl->set_num_args(na);
+//    fcl->set_owner(m);
+    m->push_back(fcl);
+  }
+#endif
+
+  return new Token_EVT(f->label(), fcl);
+}
+/*--------------------------------------------------------------------------*/
 // in_analog.cc?
 static Token* new_filter_token(int na, FUNCTION_ const* func, Module* m)
 {
@@ -1361,6 +1393,9 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args_)
     }
   }else if( (t = f->new_token(*this, num_args)) ){
     import_flags(f);
+  }else if(f && f->is_event_function()) {
+    import_flags(f);
+    t = new_event_token(num_args, f, this);
   }else if(f && f->is_analog_filter()) {
     import_flags(f);
     t = new_filter_token(num_args, f, this);
@@ -1383,6 +1418,7 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args_)
 }
 /*--------------------------------------------------------------------------*/
 void analog_setup_storage(Base*, Variable_Access&);
+void always_setup_storage(Base*, Variable_Access&);
 void Module::setup_storage()
 {
   Variable_Access va;
@@ -1403,6 +1439,10 @@ void Module::setup_storage()
   // TODO: use normal procedure.
   if(_analog){
     analog_setup_storage(_analog, va);
+  }else{ untested();
+  }
+  if(_always){
+    always_setup_storage(_always, va);
   }else{ untested();
   }
 

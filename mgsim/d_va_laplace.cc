@@ -40,9 +40,14 @@
 namespace {
 /*--------------------------------------------------------------------------*/
 bool ac_use_sckt = false;
+static std::string d_ddt_type = "__va_ddt";
+static std::string d_idt_type = "__va_idt";
+static std::string flow_source = "__va_flow";
+static std::string poly_source = "__va_fpoly_g";
+static std::string potential_source = "__va_pot";
 /*--------------------------------------------------------------------------*/
 class NATURE_current : public NATURE {
-  double abstol()const override {return 1e-12;}
+  double abstol()const override { untested();return 1e-12;}
 }_N_current;
 class NATURE_voltage : public NATURE {
   double abstol()const override {return 1e-6;}
@@ -91,13 +96,13 @@ public:
 COMMON_LAPLACE cl(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class COMMON_LAPLACE_ND : public COMMON_LAPLACE {
-  std::string name()const override {return "va_laplace_nd";}
 public:
   ~COMMON_LAPLACE_ND() {}
   COMMON_LAPLACE_ND(int x) : COMMON_LAPLACE(x) {set_xd(); set_nx();}
   COMMON_LAPLACE_ND(COMMON_LAPLACE_ND const& x) : COMMON_LAPLACE(x) {}
   COMMON_LAPLACE_ND* clone()const override {return new COMMON_LAPLACE_ND(*this);}
 
+  std::string name()const override {return "va_laplace_nd";}
   void precalc_last(const PARAM_LIST* par_scope)override{
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();
@@ -116,13 +121,13 @@ public:
 COMMON_LAPLACE_ND cl_nd(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class COMMON_LAPLACE_ZD : public COMMON_LAPLACE {
-  std::string name()const override { untested();return "va_laplace_zd";}
 public:
   ~COMMON_LAPLACE_ZD() {}
   COMMON_LAPLACE_ZD(int x) : COMMON_LAPLACE(x) { set_xd(); set_zx(); }
   COMMON_LAPLACE_ZD(COMMON_LAPLACE_ZD const& x) : COMMON_LAPLACE(x) { untested();}
   COMMON_LAPLACE_ZD* clone()const override { untested();return new COMMON_LAPLACE_ZD(*this);}
 
+  std::string name()const override {return "va_laplace_zd";}
   void precalc_last(const PARAM_LIST* par_scope)override{ untested();
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();
@@ -131,13 +136,13 @@ public:
 COMMON_LAPLACE_ZD cl_zd(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class COMMON_LAPLACE_NP : public COMMON_LAPLACE {
-  std::string name()const override {return "va_laplace_np";}
 public:
   ~COMMON_LAPLACE_NP() {}
   COMMON_LAPLACE_NP(int x) : COMMON_LAPLACE(x) { set_nx(); set_xp(); }
   COMMON_LAPLACE_NP(COMMON_LAPLACE_NP const& x) : COMMON_LAPLACE(x) {}
   COMMON_LAPLACE_NP* clone()const override {return new COMMON_LAPLACE_NP(*this);}
 
+  std::string name()const override {return "va_laplace_np";}
   void precalc_last(const PARAM_LIST* par_scope)override {
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();
@@ -170,7 +175,6 @@ public:
 COMMON_LAPLACE_NP cl_np(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 class COMMON_LAPLACE_ZP : public COMMON_LAPLACE {
-  std::string name()const override {return "va_laplace_zp";}
 public:
   ~COMMON_LAPLACE_ZP() {}
   COMMON_LAPLACE_ZP(int x) : COMMON_LAPLACE(x) { set_zx(); set_xp();
@@ -180,6 +184,7 @@ public:
   COMMON_LAPLACE_ZP(COMMON_LAPLACE_ZP const& x) : COMMON_LAPLACE(x) {}
   COMMON_LAPLACE_ZP* clone()const override {return new COMMON_LAPLACE_ZP(*this);}
 
+  std::string name()const override {return "va_laplace_zp";}
   void precalc_last(const PARAM_LIST* par_scope)override {
     COMMON_LAPLACE::precalc_last(par_scope);
     if(!_p_num.size()){
@@ -219,6 +224,7 @@ public:
   COMMON_LAPLACE_RP(COMMON_LAPLACE_RP const& x) : COMMON_LAPLACE(x) {}
   COMMON_LAPLACE_RP* clone()const override {return new COMMON_LAPLACE_RP(*this);}
 
+  std::string name()const override {return "va_laplace_rp";}
   void precalc_last(const PARAM_LIST* par_scope)override {
     COMMON_LAPLACE::precalc_last(par_scope);
     convert_nd();
@@ -320,6 +326,7 @@ private: // BASE_SUBCKT
 private: // overrides
   double tr_amps()const override;
   void precalc_first()override;
+  void expand_first()override;
   void expand()override;
   void precalc_last()override;
   double tr_probe_num(std::string const&)const override;
@@ -340,14 +347,14 @@ private: // overrides
 //  int matrix_nodes()const override { untested();
 //    return int_nodes() + max_nodes();
 //  }
-  std::string value_name()const override { return "";}
+  std::string value_name()const override { untested(); return "";}
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
   node_t& n_(int i)const override {
     assert(_nN); assert(i>=0); assert(i<max_nodes() + int_nodes()); return _nN[i];
   }
   void set_port_by_index(int Index, std::string& Value)override {
-    if(!_nN){
+    if(!_nN){ untested();
       trace2("spbi", long_label(), matrix_nodes());
       _nN = new node_t[max_nodes()];
     }else{
@@ -369,8 +376,9 @@ private: // node list
     n_in0,
     n_in1,
   };
-  node_t const& state_node(int k)const {return _nN[net_nodes()+k];}
-  node_t& state_node(int k) {return _nN[net_nodes()+k];}
+  int state_idx(int k)const {return net_nodes()+k;}
+  node_t const& state_node(int k)const {return _nN[state_idx(k)];}
+  node_t& state_node(int k) {return _nN[state_idx(k)];}
 private: // impl
   friend class COMMON_LAPLACE;
 }; // LAPLACE
@@ -542,18 +550,23 @@ std::string LAPLACE::port_name(int i)const
 	return names[i];
 }
 /*--------------------------------------------------------------------------*/
+std::string u(std::string const& n)
+{
+  return "__" + n;
+}
+/*--------------------------------------------------------------------------*/
 LAPLACE laplace(&cl);
-DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "va_laplace", &laplace);
-LAPLACE laplace_nd(&cl_nd);
-DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "va_laplace_nd", &laplace_nd);
-LAPLACE laplace_zd(&cl_zd);
-DISPATCHER<CARD>::INSTALL d2(&device_dispatcher, "va_laplace_zd", &laplace_zd);
-LAPLACE laplace_zp(&cl_zp);
-DISPATCHER<CARD>::INSTALL d3(&device_dispatcher, "va_laplace_zp", &laplace_zp);
-LAPLACE laplace_np(&cl_np);
-DISPATCHER<CARD>::INSTALL d4(&device_dispatcher, "va_laplace_np", &laplace_np);
-LAPLACE laplace_rp(&cl_rp);
-DISPATCHER<CARD>::INSTALL d5(&device_dispatcher, "va_laplace_rp", &laplace_rp);
+DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, u(cl.name()), &laplace);
+LAPLACE lap_nd(&cl_nd);
+DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, u(cl_nd.name()), &lap_nd);
+LAPLACE lap_zd(&cl_zd);
+DISPATCHER<CARD>::INSTALL d2(&device_dispatcher, u(cl_zd.name()), &lap_zd);
+LAPLACE lap_zp(&cl_zp);
+DISPATCHER<CARD>::INSTALL d3(&device_dispatcher, u(cl_zp.name()), &lap_zp);
+LAPLACE lap_np(&cl_np);
+DISPATCHER<CARD>::INSTALL d4(&device_dispatcher, u(cl_np.name()), &lap_np);
+LAPLACE lap_rp(&cl_rp);
+DISPATCHER<CARD>::INSTALL d5(&device_dispatcher, u(cl_rp.name()), &lap_rp);
 /*--------------------------------------------------------------------------*/
 CARD* LAPLACE::clone()const
 {
@@ -628,7 +641,7 @@ int COMMON_LAPLACE::pivot() const
   }
 }
 /*--------------------------------------------------------------------------*/
-void LAPLACE::expand()
+void LAPLACE::expand_first()
 {
   assert(common());
   auto c = prechecked_cast</*const*/ COMMON_LAPLACE*>(mutable_common());
@@ -647,17 +660,32 @@ void LAPLACE::expand()
   }else{
   }
 
+  for(int i = 0; i < net_nodes(); ++i ){
+    n_(i).clear();
+  }
+
   auto nn = new node_t[net_nodes() + num_s];
   notstd::copy_n(_nN, net_nodes(), nn);
   delete[] _nN;
   _nN = nn;
-
+  ELEMENT::expand_first();
+}
+/*--------------------------------------------------------------------------*/
+void LAPLACE::expand()
+{
   ELEMENT::expand();
+  assert(common());
+  auto c = prechecked_cast</*const*/ COMMON_LAPLACE*>(mutable_common());
+  assert(c);
+  int dens = int(c->den_size());
+  assert(dens);
+  int num_num = int(c->num_size());
+  int num_s = std::max(dens, num_num);
 
   if(_pivot==0){
   }else if(_pivot==1){
   }else if(_pivot==2){
-  }else if(_pivot==3){ untested();
+  }else if(_pivot==3){
   }else if(_pivot==4){ untested();
   }else{ untested();
   }
@@ -685,16 +713,6 @@ void LAPLACE::expand()
   }else{
     _state = new double[int_nodes()];
     std::fill_n(_state, int_nodes(), 0.);
-  }
-
-  // node_t* _ni = _nN + 4;
-  for(int jj = num_s; jj; ) {
-    --jj;
-    if (!(state_node(jj).n_())) {
-      state_node(jj).new_model_node("." + long_label() + ".s" + to_string(jj), this);
-    }else{ untested();
-	//n_(n_s].new_model_node("s." + long_label(), this);
-    }
   }
 
   if (_sim->is_first_expand()) {
@@ -730,16 +748,7 @@ void LAPLACE::expand()
 
     trace2("expand2a", long_label(), c->_p_den.size());
 
-    std::string output_elt_type;
-    std::string d_ddt_type = "va_ddt";
-    std::string d_idt_type = "va_idt";
-
-    if(_set_parameters) {
-      output_elt_type = "va_sw";
-    }else{
-    }
-    output_elt_type = "va_flow";
-//    s_elt_type = "va_idt"; needs reverse order num coeffs
+    std::string output_elt_type = flow_source;
 
     {
       if (!_output) {
@@ -761,18 +770,18 @@ void LAPLACE::expand()
 
       assert(num_s >= num_num);
       std::vector<node_t> nodes(num_s*2 + 2);
-      nodes[0] = n_(n_out0);
-      nodes[1] = n_(n_out1);
+      nodes[0] = node_t(n_out0);
+      nodes[1] = node_t(n_out1);
       int jj;
       for(jj = 0; jj < _pivot; ++jj) {
-	nodes[2+jj*2] = state_node(jj);
+	nodes[2+jj*2] = node_t(state_idx(jj));
 	nodes[2+jj*2 + 1] = gnd;
       }
 
 //      jj = num_num-_pivot
 
       for(; jj < num_num; ++jj) {
-	nodes[2+jj*2] = state_node(jj);
+	nodes[2+jj*2] = node_t(state_idx(jj));
 	nodes[2+jj*2 + 1] = gnd;
       }
 
@@ -795,9 +804,9 @@ void LAPLACE::expand()
     {
       std::string input_dev_type;
       if(_set_parameters) {
-	input_dev_type = "va_fpoly_g";
+	input_dev_type = poly_source;
       }else{
-	input_dev_type = "va_flow";
+	input_dev_type = flow_source;
       }
       if (!_input) {
 	const CARD* input_dev = device_dispatcher[input_dev_type];
@@ -814,11 +823,11 @@ void LAPLACE::expand()
       }else{
       }
       std::vector<node_t> nodes(dens*2 + 2 + 2*n_inputs);
-      nodes[1] = state_node(_pivot);
+      nodes[1] = node_t(state_idx(_pivot));
       nodes[0] = gnd;
 
       for(int k=0; k<2*n_inputs; ++k){
-	nodes[2+k] = n_(n_in0+k);
+	nodes[2+k] = node_t(n_in0+k);
       }
 
       trace2("expand4 input", long_label(), c->_p_den.size());
@@ -831,7 +840,7 @@ void LAPLACE::expand()
     trace1("expand", num_s0_states);
     {
       if (!_s_[0]) {
-	const CARD* s0_dev = device_dispatcher["va_pot"];
+	const CARD* s0_dev = device_dispatcher[potential_source];
 	if(!s0_dev){ untested();
 	  throw Exception("Cannot find va_pot. Load module?");
 	}else{
@@ -846,15 +855,17 @@ void LAPLACE::expand()
       }
       std::vector<node_t> nodes(num_s*2);
 
-      nodes[0] = state_node(_pivot);
+      nodes[0] = node_t(state_idx(_pivot));
       nodes[1] = gnd;
       int jj;
       for(jj = 0; jj < _pivot; ++jj) {
-	nodes[jj*2 + 2] = state_node(jj);
+	nodes[jj*2 + 2] = node_t(state_idx(jj));
+	assert(nodes[jj*2 + 2].e_() == state_idx(jj));
+
 	nodes[jj*2 + 3] = gnd;
       }
       for(++jj; jj < dens; ++jj) {
-	nodes[jj*2] = state_node(jj);
+	nodes[jj*2] = node_t(state_idx(jj));
 	nodes[jj*2 + 1] = gnd;
       }
 
@@ -875,7 +886,7 @@ void LAPLACE::expand()
       }else{
       }
       {
-	node_t nodes[] = {state_node(jj), gnd, state_node(jj-1), gnd};
+	node_t nodes[] = {node_t(state_idx(jj)), gnd, node_t(state_idx(jj-1)), gnd};
 	_s_[jj]->set_parameters("s" + to_string(jj), this, _s_[jj]->mutable_common(), 0.,
 	                          3, &_st_s[3*(jj-1)+num_s0_states], 4, nodes);
 	_s_[jj]->_loss0 = 1.;
@@ -896,7 +907,7 @@ void LAPLACE::expand()
       }else{
       }
       {
-	node_t nodes[] = {state_node(jj), gnd, state_node(jj+1), gnd};
+	node_t nodes[] = {node_t(state_idx(jj)), gnd, node_t(state_idx(jj+1)), gnd};
 	_s_[jj+1]->set_parameters("s" + to_string(jj), this, _s_[jj+1]->mutable_common(), 0.,
 	                          3, &_st_s[3*(jj)+num_s0_states], 4, nodes);
 	_s_[jj+1]->_loss0 = 1.;
@@ -906,7 +917,27 @@ void LAPLACE::expand()
   }else{ untested();
   }
 
-  subckt()->expand();
+  subckt()->precalc_first();
+  subckt()->expand_first();
+  map_sckt_nodes(subckt(), &n_(0)); // e_va.h
+  subckt()->expand_();
+
+#if 1
+  // node_t* _ni = _nN + 4;
+  for(int jj = num_s; jj; ) {
+    --jj;
+  //  if (!(state_node(jj).n_())) { untested();
+    state_node(jj).set_type(OPT::default_logic);
+  state_node(jj).set_used();
+  state_node(jj).allocate(3); // no-op unless floating
+//      state_node(jj).new_model_node("." + long_label() + ".s" + to_string(jj), this);
+  //  }else{ untested();
+	//n_(n_s].new_model_node("s." + long_label(), this);
+   // }
+  }
+#endif
+
+
   //subckt()->precalc();
   assert(!is_constant());
   for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){

@@ -377,6 +377,14 @@ static void make_common(std::ostream& o, const Module& m)
     o__ "void tr_begin(COMPONENT*)const;\n";
   }else{
   }
+  if(m.has_tr_begin_digital()){
+    o__ "void tr_begin_digital(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
+  if(m.has_tr_eval_digital()){
+    o__ "void tr_eval_digital(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
   if(m.has_tr_review() && m.has_analog_block()){
     o__ "void tr_review_analog(MOD_" << m.identifier() << "*)const;\n";
   }else{
@@ -394,9 +402,22 @@ static void make_common(std::ostream& o, const Module& m)
     o__ "void tr_accept_analog(MOD_" << m.identifier() << "*)const;\n";
   }else{
   }
+  if(m.has_tr_accept_digital()){
+    o__ "void tr_accept_digital(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
   if(m.has_tr_advance() && m.has_analog_block()){
     o__ "void tr_advance_analog(MOD_" << m.identifier() << "*)const;\n";
     o__ "void tr_regress_analog(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
+  if(m.has_tr_advance_digital()){
+    o__ "void tr_advance_digital(MOD_" << m.identifier() << "*)const;\n";
+    o__ "void tr_regress_digital(MOD_" << m.identifier() << "*)const;\n";
+  }else{
+  }
+  if(m.has_tr_review_digital()){
+    o__ "void tr_review_digital(MOD_" << m.identifier() << "*)const;\n";
   }else{
   }
   if(m.has_final()){

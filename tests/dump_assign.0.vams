@@ -11,5 +11,7 @@ module test2(in, out);
 input in;
 output out;
 wire foo;
+wire en;
 assign #3 out = !in, foo = !out;
+assign #17 en = 1;
 endmodule

@@ -204,7 +204,7 @@ void Variable_Access::sift_locals(Block const* Scope)
 
   for(auto i = _map.begin(); i != _map.end(); ) {
     auto tt = dynamic_cast<Token_VAR_REF const*>(i->first);
-    if(!tt){ untested();
+    if(!tt){
       incomplete(); // af??
       ++i;
       continue;

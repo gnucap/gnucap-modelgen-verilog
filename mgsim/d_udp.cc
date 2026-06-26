@@ -503,7 +503,7 @@ void DEV_LOGIC::tr_accept()
       if (n_(ii)->d_iter() >= lastchangeiter) {
 	lastchangeiter = n_(ii)->d_iter();
 	_lastchangenode = ii;
-      }else{ untested();
+      }else{
       }
       trace2(n_(ii)->failure_mode().c_str(), ii, n_(ii)->quality());
     }
