@@ -1,0 +1,48 @@
+verilog
+load ../vams
+
+discipline logicfast;
+  domain discrete;
+enddiscipline
+discipline logicslow;
+  domain discrete;
+enddiscipline
+
+`default_discipline logicfast
+module invfast(out, in);
+	inout out, in;
+	electrical out, in;
+	nand #(1) n1(out, in);
+	c_d_a d1(out, out);
+	c_a_d d2(in, in);
+endmodule
+
+`default_discipline logicslow
+module invslow(out, in);
+	inout out, in;
+	electrical out, in;
+	nand #(20) n1(out, in);
+	c_d_a d1(out, out);
+	c_a_d d2(in, in);
+endmodule
+
+ground gnd;
+vpulse #(.val0(0) .val1(5) .width(100p) .period(200p)) v1(clk, gnd);
+resistor #(1) r1(clk1, clk);
+resistor #(1) r2(clk2, clk);
+invfast i1(c1 , clk1);
+invslow i2(c0 , clk2);
+resistor #(1e9) r1(c0, gnd);
+resistor #(1e9) r1(c1, gnd);
+
+
+// band aid: legacy logic models..
+.model logicslow logic delay=1p rise=10p fall=15p
+.model logicfast logic delay=1p rise=1p fall=1p
+
+list
+
+print tran v(clk) v(c0) v(c1)
+tran 1n
+
+status notime
