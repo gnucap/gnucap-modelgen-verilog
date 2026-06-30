@@ -1246,7 +1246,14 @@ static _COMMON_VASRC_thermal _C_V_thermal(CC_STATIC);
 class CDISC_thermal : public NODE_TYPE {
   explicit CDISC_thermal(CDISC_thermal const& p ) : NODE_TYPE(p) {}
 public:
-  explicit CDISC_thermal() : NODE_TYPE("thermal") {}
+  explicit CDISC_thermal() : NODE_TYPE() {
+    set_label("thermal");
+    set_analog();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override {untested();
     return new CDISC_thermal(*this);
   }
@@ -1281,7 +1288,14 @@ static _COMMON_VASRC_electrical _C_V_electrical(CC_STATIC);
 class CDISC_electrical : public NODE_TYPE {
   explicit CDISC_electrical(CDISC_electrical const& p ) : NODE_TYPE(p) {}
 public:
-  explicit CDISC_electrical() : NODE_TYPE("electrical") {}
+  explicit CDISC_electrical() : NODE_TYPE() {
+    set_label("electrical");
+    set_analog();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override {untested();
     return new CDISC_electrical(*this);
   }
@@ -1316,7 +1330,14 @@ static _COMMON_VASRC_magnetic _C_V_magnetic(CC_STATIC);
 class CDISC_magnetic : public NODE_TYPE {
   explicit CDISC_magnetic(CDISC_magnetic const& p ) : NODE_TYPE(p) {}
 public:
-  explicit CDISC_magnetic() : NODE_TYPE("magnetic") {}
+  explicit CDISC_magnetic() : NODE_TYPE() {
+    set_label("magnetic");
+    set_analog();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override {untested();
     return new CDISC_magnetic(*this);
   }
@@ -1351,7 +1372,14 @@ static _COMMON_VASRC_rotational_omega _C_V_rotational_omega(CC_STATIC);
 class CDISC_rotational_omega : public NODE_TYPE {
   explicit CDISC_rotational_omega(CDISC_rotational_omega const& p ) : NODE_TYPE(p) {}
 public:
-  explicit CDISC_rotational_omega() : NODE_TYPE("rotational_omega") {}
+  explicit CDISC_rotational_omega() : NODE_TYPE() {
+    set_label("rotational_omega");
+    set_analog();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override {untested();
     return new CDISC_rotational_omega(*this);
   }
@@ -1363,7 +1391,14 @@ public:
 class DDISC_logic : public NODE_TYPE {
   explicit DDISC_logic(DDISC_logic const& p ) : NODE_TYPE(p) {}
 public:
-  explicit DDISC_logic() : NODE_TYPE("logic") {}
+  explicit DDISC_logic() : NODE_TYPE() {
+    set_label("logic");
+    set_digital();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override{untested();
     return new DDISC_logic(*this);
   }
@@ -6175,7 +6210,14 @@ static _COMMON_VASRC_thermal _C_V_thermal(CC_STATIC);
 class CDISC_thermal : public NODE_TYPE {
   explicit CDISC_thermal(CDISC_thermal const& p ) : NODE_TYPE(p) {}
 public:
-  explicit CDISC_thermal() : NODE_TYPE("thermal") {}
+  explicit CDISC_thermal() : NODE_TYPE() {
+    set_label("thermal");
+    set_analog();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override {untested();
     return new CDISC_thermal(*this);
   }
@@ -6210,7 +6252,14 @@ static _COMMON_VASRC_electrical _C_V_electrical(CC_STATIC);
 class CDISC_electrical : public NODE_TYPE {
   explicit CDISC_electrical(CDISC_electrical const& p ) : NODE_TYPE(p) {}
 public:
-  explicit CDISC_electrical() : NODE_TYPE("electrical") {}
+  explicit CDISC_electrical() : NODE_TYPE() {
+    set_label("electrical");
+    set_analog();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override {untested();
     return new CDISC_electrical(*this);
   }
@@ -6245,7 +6294,14 @@ static _COMMON_VASRC_magnetic _C_V_magnetic(CC_STATIC);
 class CDISC_magnetic : public NODE_TYPE {
   explicit CDISC_magnetic(CDISC_magnetic const& p ) : NODE_TYPE(p) {}
 public:
-  explicit CDISC_magnetic() : NODE_TYPE("magnetic") {}
+  explicit CDISC_magnetic() : NODE_TYPE() {
+    set_label("magnetic");
+    set_analog();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override {untested();
     return new CDISC_magnetic(*this);
   }
@@ -6280,7 +6336,14 @@ static _COMMON_VASRC_rotational_omega _C_V_rotational_omega(CC_STATIC);
 class CDISC_rotational_omega : public NODE_TYPE {
   explicit CDISC_rotational_omega(CDISC_rotational_omega const& p ) : NODE_TYPE(p) {}
 public:
-  explicit CDISC_rotational_omega() : NODE_TYPE("rotational_omega") {}
+  explicit CDISC_rotational_omega() : NODE_TYPE() {
+    set_label("rotational_omega");
+    set_analog();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override {untested();
     return new CDISC_rotational_omega(*this);
   }
@@ -6292,7 +6355,14 @@ public:
 class DDISC_logic : public NODE_TYPE {
   explicit DDISC_logic(DDISC_logic const& p ) : NODE_TYPE(p) {}
 public:
-  explicit DDISC_logic() : NODE_TYPE("logic") {}
+  explicit DDISC_logic() : NODE_TYPE() {
+    set_label("logic");
+    set_digital();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override{untested();
     return new DDISC_logic(*this);
   }

@@ -15,6 +15,7 @@ discipline disc2;
   flow A;
 enddiscipline;
 discipline disc2;
+  domain discrete;
 enddiscipline;
 module main (.a(a),.b(b));
   electrical a, i;
@@ -29,6 +30,7 @@ discipline disc1;
   domain discrete;
 enddiscipline
 discipline disc2;
+  domain discrete;
 enddiscipline
 discipline disc2:0;
   domain continuous;

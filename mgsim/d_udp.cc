@@ -52,11 +52,11 @@ public:
   explicit	DEV_LOGIC(const DEV_LOGIC& p);
 		~DEV_LOGIC()		{--_count;}
 private: // override virtuals
-  char	   id_letter()const override	{return 'U';}
-  std::string value_name()const override{return "";}
-  bool	      print_type_in_spice()const override{return true;}
+  char	   id_letter()const override	{ untested();return 'U';}
+  std::string value_name()const override{ untested();return "";}
+  bool	      print_type_in_spice()const override{ untested();return true;}
   std::string dev_type()const override{assert(has_common()); return common()->name();}
-  int	   tail_size()const override {return 2;}
+  int	   tail_size()const override { untested();return 2;}
   int	   max_nodes()const override {return PORTS_PER_GATE;}
   int	   min_nodes()const override {return BEGIN_IN+1;}
   int	   matrix_nodes()const override	{ untested();return 2;}
@@ -153,11 +153,11 @@ void DEV_LOGIC::set_parameters(const std::string& Label, CARD *Owner,
 			       COMMON_COMPONENT *Common, double Value,
 			       int , double [],
 			       int node_count, const node_t Nodes[])
-{
+{ untested();
   set_label(Label);
   set_owner(Owner);
-  if(Value==0.){
-  }else if(Common){
+  if(Value==0.){ untested();
+  }else if(Common){ untested();
     Common = Common->clone();
     Common->set_param_by_name("delay", to_string(Value));
   }else{ untested();
@@ -167,7 +167,7 @@ void DEV_LOGIC::set_parameters(const std::string& Label, CARD *Owner,
 
   assert(node_count <= max_nodes());
   _net_nodes = short(node_count);
-  if(node_count){
+  if(node_count){ untested();
     std::copy_n(Nodes, node_count, (node_t*)&n_(0));
   }else{itested();
   }
@@ -301,7 +301,7 @@ void DEV_LOGIC::tr_advance()
       q_eval();
       if (_sim->_time0 >= n_(OUTNODE)->final_time()) {
 	n_(OUTNODE)->propagate();
-      }else{
+      }else{ untested();
 	// not ready to propagate.
       }
     }else{
@@ -328,7 +328,7 @@ void DEV_LOGIC::tr_regress()
     break;
   case moDIGITAL:
     q_eval();
-    if (n_(OUTNODE)->last_change_time() > _sim->_time0) {
+    if (n_(OUTNODE)->last_change_time() > _sim->_time0) { untested();
       n_(OUTNODE)->unpropagate();
       assert(_sim->_time0 < n_(OUTNODE)->final_time());
     }else if (_sim->_time0 >= n_(OUTNODE)->final_time()) {untested();
@@ -503,7 +503,7 @@ void DEV_LOGIC::tr_accept()
       if (n_(ii)->d_iter() >= lastchangeiter) {
 	lastchangeiter = n_(ii)->d_iter();
 	_lastchangenode = ii;
-      }else{
+      }else{ untested();
       }
       trace2(n_(ii)->failure_mode().c_str(), ii, n_(ii)->quality());
     }
@@ -578,7 +578,7 @@ void DEV_LOGIC::tr_accept()
 		  long_label().c_str(), _sim->iteration_tag(), _sim->_time0);
 	  }else{
 	  }
-	}else{
+	}else{ untested();
 	}
       }else{
       }

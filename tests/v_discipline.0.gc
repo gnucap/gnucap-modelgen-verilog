@@ -10,6 +10,7 @@ discipline disc2;
   potential B
 enddiscipline
 discipline disc2;
+  domain discrete;
 enddiscipline
 
 module main(a, b);
