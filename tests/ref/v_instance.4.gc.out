@@ -2,6 +2,7 @@
 >>>>> 
 >>>>>module main(.\1 (\1 ), .b(\2 )); 
 >>>>>ground \0 ;
+>>>>>  electrical \1 , \2 ;
 >>>>> 
 >>>>>verilog 
 >>>>>op

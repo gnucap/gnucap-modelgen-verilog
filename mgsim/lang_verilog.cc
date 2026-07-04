@@ -608,19 +608,14 @@ public:
       (void) nn;
       switch(cmd.last_match()[2]) {
       case 'p': // inPut
-	// nn.set_input();
+	nn.set_input();
 	break;
       case 't': // ouTput
-	// nn.set_output();
+	nn.set_output();
 	break;
       case 'o': // inOut
-	// nn.set_output();
-	// nn.set_input();
-	break;
-      case 'e': // elEctrical
-      case 'r': // wiRe
-	// not yet.
-      default:
+	nn.set_output();
+	nn.set_input();
 	break;
       }
     }
@@ -1146,7 +1141,7 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
     }else if (cmd >> "ground ") {
       cmd.reset();
       new__instance(cmd, x, x->subckt());
-    }else if (cmd >> "wire |electrical |inout |input |output ") {
+    }else if (cmd >> "inout |input |output ") {
       auto n = net_decl.clone();
       n->set_owner(x);
       n->do_it(cmd, x->subckt());
@@ -1663,7 +1658,8 @@ void LANG_VERILOG::print_command(OMSTREAM& o, const DEV_DOT* x)
     }
     o << ";\n";
   }else if(((CARD const*)x)->dev_type() != "") {
-    o << tt << " " << x->short_label();
+    o << tt << " ";
+    dump_identifier(o, x->short_label());
     o << ";\n";
   }else{
     // DOT fallback.

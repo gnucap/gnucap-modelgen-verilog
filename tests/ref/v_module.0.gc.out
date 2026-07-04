@@ -1,6 +1,7 @@
 module main (.\1 (\1 ),.b(\2 ));
   ground \0 ;
-  electrical \1 , \2 ;
+  electrical \1 ;
+  electrical \2 ;
   inout \1 , \2 ;
   parameter real r = 1;
   localparam real a = r;
@@ -14,7 +15,8 @@ main #() m (.\1 (\1 ));
  27.        1.         2.        
 module main (.\1 (\1 ),.b(\2 ));
   ground \0 ;
-  electrical \1 , \2 ;
+  electrical \1 ;
+  electrical \2 ;
   inout \1 , \2 ;
   parameter real r = 1;
   localparam real a = r;
@@ -28,7 +30,8 @@ main #() m (.\1 (\1 ),.b(\0 ));
  27.        1.         1.        
 module main (.\1 (\1 ),.b(\2 ));
   ground \0 ;
-  electrical \1 , \2 ;
+  electrical \1 ;
+  electrical \2 ;
   inout \1 , \2 ;
   parameter real r = 1;
   localparam real a = r;
@@ -40,7 +43,8 @@ endmodule // main
 main #() m (.\1 (\1 ),.b(\0 ));
 module main (.\1 (\1 ),.b(\2 ));
   ground \0 ;
-  electrical \1 , \2 ;
+  electrical \1 ;
+  electrical \2 ;
   inout \1 , \2 ;
   parameter real r = 1;
   localparam real a = r;
@@ -54,7 +58,8 @@ main #() m (.b(\1 ));
  27.        1.         1.        
 module main (.\1 (\1 ),.b(\2 ));
   ground \0 ;
-  electrical \1 , \2 ;
+  electrical \1 ;
+  electrical \2 ;
   inout \1 , \2 ;
   parameter real r = 1;
   localparam real a = r;

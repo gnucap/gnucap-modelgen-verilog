@@ -4,6 +4,7 @@
              ^ ? expecting ';'
 >>>>>discipline disc2;
 >>>>>module main(a, b);
+>>>>>  electrical a, i;
 >>>>>  disc2 b, j;
 >>>>>list
 discipline disc1;
@@ -18,7 +19,8 @@ discipline disc2;
   domain discrete;
 enddiscipline;
 module main (.a(a),.b(b));
-  electrical a, i;
+  electrical a;
+  electrical i;
   disc2 b;
   disc2 j;
   inout a, b;
