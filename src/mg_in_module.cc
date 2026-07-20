@@ -535,15 +535,6 @@ void Net_Declarations::dump(std::ostream& o) const
 //   Collection<Port_Discipline_List>::dump(out);
 // }
 /*--------------------------------------------------------------------------*/
-// 3.6.4 Ground declaration
-// Each ground declaration is associated with an already declared net of continuous discipline. The node asso-
-// ciated with the net will be the global reference node in the circuit. The net must be assigned a continuous
-// discipline to be declared ground.
-void Net_Decl_List_Ground::parse(CS& f)
-{
-  return Net_Decl_List::parse_n_<Net_Identifier_Ground>(f);
-}
-/*--------------------------------------------------------------------------*/
 void Port_3::set_discipline(Discipline const* d, Module* owner)
 {
   owner->node(_node)->set_discipline(d);

@@ -222,12 +222,6 @@ public:
   void set_discipline(Discipline const* d){_disc = d;}
 };
 /*--------------------------------------------------------------------------*/
-class Net_Decl_List_Ground : public Net_Decl_List {
-public:
-  void parse(CS& f)override;
-  void dump(std::ostream& f)const override;
-};
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class Arg : public Base {
   String_Arg _identifier;
