@@ -239,9 +239,9 @@ void DEV_LOGIC::tr_begin()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_restore()
-{untested();
+{
   ELEMENT::tr_restore();
-  if (!subckt()) {untested();
+  if (!subckt()) {
     _gatemode = moDIGITAL;
   }else{untested();
     _gatemode = (OPT::mode==moMIXED) ? moANALOG : OPT::mode;
@@ -350,7 +350,7 @@ bool DEV_LOGIC::tr_needs_eval()const
   case moMIXED:   unreachable(); break;
   case moDIGITAL:
     //assert(!is_q_for_eval());
-    if (_sim->analysis_is_restore()) {untested();
+    if (_sim->analysis_is_restore()) {
     }else if (_sim->analysis_is_static()) {
     }else{
     }
@@ -378,7 +378,7 @@ void DEV_LOGIC::tr_queue_eval()
 bool DEV_LOGIC::tr_eval_digital()
 {
   assert(_gatemode == moDIGITAL);
-  if (_sim->analysis_is_restore()) {untested();
+  if (_sim->analysis_is_restore()) {
   }else if (_sim->analysis_is_static()) {
   }else{
   }
@@ -534,7 +534,7 @@ void DEV_LOGIC::tr_accept()
     }else{
     }
     assert(_gatemode == moDIGITAL);
-    if (_sim->analysis_is_restore()) {untested();
+    if (_sim->analysis_is_restore()) {
     }else if (_sim->analysis_is_static()) {
     }else{
     }

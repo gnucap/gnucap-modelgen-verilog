@@ -372,7 +372,7 @@ public:
   }
   void new_literal(std::ostream& o, Token_CONSTANT const& c);
   void new_rhs(Token_NODE const* v){
-    new_ref("va::LNR(d->n_(MOD::n_" + v->code_name() + ").operator->())");
+    new_ref("va::LNR(d->n_(MOD::n_" + v->code_name() + "))");
   }
   void new_rhs(Token_VAR_REF const* v){
     // TODO: linear?

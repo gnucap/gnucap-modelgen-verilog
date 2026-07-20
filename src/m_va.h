@@ -1008,13 +1008,20 @@ inline LOGICVAL to_logic_(int i)
 }
 /*--------------------------------------------------------------------------*/
 class LNR {
-  LOGIC_NODE const* _ln;
+  const node_t& _ln;
 public:
-  explicit LNR(NODE* ln) : _ln(prechecked_cast<LOGIC_NODE const*>(ln)){
-    assert(_ln);
-  };
-  operator int()const { return _ln->lv_future(); }
-  LOGIC_NODE const* ptr()const {return _ln;}
+  explicit LNR(node_t const& ln) : _ln(ln) { };
+  operator int()const { return lptr()->lv_future(); }
+  LOGIC_NODE const* lptr()const {
+    LOGIC_NODE const* ln = prechecked_cast<LOGIC_NODE const*>(_ln.operator->());
+    assert(ln);
+    return ln;
+  }
+  NODE const* ptr()const { return _ln.operator->(); }
+  bool is_evt()const {incomplete(); return false;}
+  bool is_connected()const{
+    return _ln.e_() != INVALID_NODE;
+  }
 };
 /*--------------------------------------------------------------------------*/
 } // va
