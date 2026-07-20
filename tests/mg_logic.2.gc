@@ -1,0 +1,45 @@
+attach ./modelgen_2.so
+load vams/vpulse.so
+
+verilog
+
+`modelgen test_logic_2
+module clock(out, en);
+  output out;
+  input en;
+  logic out, en;
+  assign #5000 out = !out & en;
+endmodule
+module trans (t, clk);
+  input clk;
+  output t;
+
+  electrical t
+  logic clk;
+
+  integer state = 0;
+
+  always @(edge(clk)) state = clk;
+
+  analog begin
+    V(t) <+ transition(state, 1n, 1n);
+  end
+endmodule
+`endmodelgen
+
+list
+
+!make test_logic_2.so > /dev/null
+attach ./test_logic_2.so
+
+ground gnd;
+
+vpulse #(.val0(0), .val1(5), .td(5n+2e-12)) en1(en, gnd);
+trans #() u1(t, clk);
+clock #() c1(clk, en);
+
+.model logic logic delay=1p rise=10p fall=10p
+
+print tran v(t) l(clk) iter(0)
+tran 44n
+tran 44n 48n .1n

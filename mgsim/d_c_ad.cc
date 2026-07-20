@@ -342,10 +342,10 @@ void DEV_A_D::tr_accept()
   to_logic(n_(OUTNODE), m, n_(INNODE)->v0());
   bool future_state = n_(OUTNODE)->lv_future();
   if(future_state == oldstate) {
-  }else if(future_state){ untested();
+  }else if(future_state){
     n_(OUTNODE)->set_event(1e-20, lvSTABLE1);
     n_(OUTNODE)->set_quality(qGOOD);
-  }else{ untested();
+  }else{
     n_(OUTNODE)->set_event(1e-20, lvSTABLE0);
     n_(OUTNODE)->set_quality(qGOOD);
   }
