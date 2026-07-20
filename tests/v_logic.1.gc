@@ -42,7 +42,7 @@ resistor #(1e9) r1(c1, gnd);
 
 list
 
-print tran v(clk) v(c0) v(c1)
+print tran v(clk) v(c0) v(c1) iter(0)
 tran 1n
 
 status notime

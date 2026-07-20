@@ -267,7 +267,7 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, double input)
 	 //  n->dont_set_quality("begin good rise");
 	  break;
 	case lvRISING:
-	  if (diff < dt/(process()->mr * process()->rise)) {
+	  if (diff < dt/(process()->mr * process()->rise)) { untested();
 	    n->set_quality(qBAD);
 	  }else{
 	    // n->dont_set_quality("continuing good rise");
@@ -279,7 +279,7 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, double input)
 	case lvSTABLE1:untested();
 	  n->set_quality(qBAD); // //( "negative glitch in 1");
 	  break;
-	case lvUNKNOWN:
+	case lvUNKNOWN: untested();
 	  n->set_quality(qBAD); //( "initial rise");
 	  break;
 	}
@@ -287,14 +287,13 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, double input)
       }else if (diff < 0) {	/* falling */
 	switch (n->lv()) {
 	case lvSTABLE0:untested();
-	  untested();
 	  n->set_quality(qBAD); // "positive glitch in 0");
 	  break;
-	case lvRISING:
+	case lvRISING: untested();
 	  n->set_quality(qBAD); // "negative glitch in rise");
 	  break;
 	case lvFALLING:
-	  if (-diff < dt/(process()->mf * process()->fall)) {
+	  if (-diff < dt/(process()->mf * process()->fall)) { untested();
 	    n->set_quality(qBAD); // ("slow fall");
 	  }else{
 	    // n->dont_set_quality("continuing good fall");
@@ -314,7 +313,7 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, double input)
 	/* state (rise/fall)  unchanged */
       }
     }
-    if (sv > 1.+process()->over || sv < -process()->over) {/* out of range */
+    if (sv > 1.+process()->over || sv < -process()->over) { untested(); /* out of range */
       n->set_quality(qBAD); // "out of range");
     }
     if (n->just_reached_stable()) { /* A bad node gets a little better */
@@ -339,7 +338,17 @@ void DEV_A_D::tr_accept()
   const MODEL_LOGIC* m = prechecked_cast<const MODEL_LOGIC*>(c->model());
   assert(m);
 
+  bool oldstate = n_(OUTNODE)->lv_future();
   to_logic(n_(OUTNODE), m, n_(INNODE)->v0());
+  bool future_state = n_(OUTNODE)->lv_future();
+  if(future_state == oldstate) {
+  }else if(future_state){ untested();
+    n_(OUTNODE)->set_event(1e-20, lvSTABLE1);
+    n_(OUTNODE)->set_quality(qGOOD);
+  }else{ untested();
+    n_(OUTNODE)->set_event(1e-20, lvSTABLE0);
+    n_(OUTNODE)->set_quality(qGOOD);
+  }
 }
 /*--------------------------------------------------------------------------*/
 int DEV_A_D::_count = -1;
