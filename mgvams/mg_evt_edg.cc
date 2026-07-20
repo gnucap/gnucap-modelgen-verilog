@@ -92,8 +92,8 @@ private:
        trans2 = "1";
        stable = "0";
     }
-    o__ "bool " << label() + "__tr_advance(int i) {\n";
-    o____ "auto l = prechecked_cast<LOGIC_NODE const*>(n_(i).n_());\n";
+    o__ "bool " << label() + "__tr_advance(va::LNR const& ll) {\n";
+    o____ "auto l = prechecked_cast<LOGIC_NODE const*>(ll.ptr());\n";
     o____ "assert(l);\n";
     o____ "bool ret1 = _sim->_time0 == l->last_change_time();\n";
     o____ "bool ret2 = _sim->_time0 == l->final_time();\n";
@@ -109,14 +109,14 @@ private:
     o____ "}\n";
     o____ "return false; // ret;\n";
     o__ "}\n";
-    o__ "bool " << label() + "__tr_eval(int i) {\n";
+    o__ "bool " << label() + "__tr_eval(va::LNR const&) {\n";
     o____ "return false;\n";
     o__ "}\n";
-    o__ "bool " << label() + "__tr_accept(int i) {\n";
+    o__ "bool " << label() + "__tr_accept(va::LNR const& i) {\n";
     o____ "return " << label() + "__is_evt(i);\n";
     o__ "}\n";
-    o__ "bool " << label() + "__is_evt(int i) {\n";
-    o____ "auto l = prechecked_cast<LOGIC_NODE const*>(n_(i).n_());\n";
+    o__ "bool " << label() + "__is_evt(va::LNR const& ll) {\n";
+    o____ "auto l = prechecked_cast<LOGIC_NODE const*>(ll.ptr());\n";
     o____ "assert(l);\n";
     o____ "bool ret1 = _sim->_time0 == l->last_change_time();\n";
     o____ "bool ret2 = _sim->_time0 == l->final_time();\n";
@@ -127,10 +127,10 @@ private:
     o____ "}\n";
     o____ "return ret1 || ret2;\n";
     o__ "}\n";
-    o__ "bool " << label() + "__tr_regress(int) { untested();\n";
+    o__ "bool " << label() + "__tr_regress(va::LNR const&) { untested();\n";
     o____ "incomplete(); return true;\n";
     o__ "}\n";
-    o__ "bool " << label() + "__tr_review(int i) {\n";
+    o__ "bool " << label() + "__tr_review(va::LNR const& i) {\n";
     o____ "if(" << label() + "__is_evt(i)) {\n";
     o______ "q_accept();\n"; // hack? only needed if there is an event.
     o____ "}else{\n";

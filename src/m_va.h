@@ -1007,7 +1007,17 @@ inline LOGICVAL to_logic_(int i)
   }
 }
 /*--------------------------------------------------------------------------*/
-}
+class LNR {
+  LOGIC_NODE const* _ln;
+public:
+  explicit LNR(NODE* ln) : _ln(prechecked_cast<LOGIC_NODE const*>(ln)){
+    assert(_ln);
+  };
+  operator int()const { return _ln->lv_future(); }
+  LOGIC_NODE const* ptr()const {return _ln;}
+};
+/*--------------------------------------------------------------------------*/
+} // va
 /*--------------------------------------------------------------------------*/
 LOGICVAL operator& (LOGICVAL const& a, LOGICVAL const& b)
 {
