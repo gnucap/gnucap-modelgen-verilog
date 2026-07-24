@@ -59,14 +59,14 @@ class CMD_CONNECTRULES : public CMD {
       parse_connectrules(cmd, new_cr);
       Scope->push_back(new CR_ENV(new_cr));
       OPT::connect_rules = new_cr;
-    }catch(Exception const& e) { untested();
+    }catch(Exception const& e) {
       cmd.warn(bDANGER, e.message());
-      for (;;) { untested();
+      for (;;) {
 	cmd.getline("verilog-connect>");
 
-	if (cmd >> "endconnectrules ") { untested();
+	if (cmd >> "endconnectrules ") {
 	  break;
-	}else{ untested();
+	}else{
 	}
       }
       delete new_cr;
@@ -231,7 +231,7 @@ void CMD_CONNECTRULES::parse_connectrules(CS& cmd, BASE_SUBCKT* cr) const
     cmd.getline("cr>");
   }
   if(cmd >> "endconnectrules "){
-  }else{ untested();
+  }else{
     throw Exception_CS("expecting endconnectrules", cmd);
   }
 }

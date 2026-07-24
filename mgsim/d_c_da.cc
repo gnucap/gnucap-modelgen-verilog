@@ -144,7 +144,7 @@ void DEV_D_A::expand()
 void DEV_D_A::dc_advance()
 {
   ELEMENT::dc_advance();
-  if (n_(INNODE)->in_transit()) {untested();
+  if (n_(INNODE)->in_transit()) {
     //q_eval(); evalq is not used for DC
     n_(INNODE)->propagate();
   }else{
@@ -160,7 +160,7 @@ void DEV_D_A::tr_advance()
 
   if (n_(INNODE)->in_transit()) {
     q_eval();
-    if (_sim->_time0 >= n_(INNODE)->final_time()) {untested();untested();
+    if (_sim->_time0 >= n_(INNODE)->final_time()) {
       n_(INNODE)->propagate();
     }else{
       // not ready to propagate.
@@ -170,7 +170,7 @@ void DEV_D_A::tr_advance()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_D_A::tr_regress()
-{untested();
+{
   ELEMENT::tr_regress();
 
   q_eval();
@@ -179,7 +179,7 @@ void DEV_D_A::tr_regress()
     assert(_sim->_time0 < n_(INNODE)->final_time());
   }else if (_sim->_time0 >= n_(INNODE)->final_time()) {untested();
     n_(INNODE)->propagate();
-  }else{untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/

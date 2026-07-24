@@ -1031,9 +1031,9 @@ void accept_node_value(node_t& n, bool lv, double delay)
   delay += 1e-20; // HACK
 
   LOGICVAL lvl(lv?lvSTABLE1:lvSTABLE0);
-  if(nl->lv().is_unknown()){ untested();
+  if(nl->lv().is_unknown()){
     nl->set_event(delay, lvl);
-  }else if(nl->lv_future() != lv){ untested();
+  }else if(nl->lv_future() != lv){
     nl->set_event(delay, lvl);
   }else if(nl->in_transit()){ untested();
     nl->set_event(delay, lvl);
