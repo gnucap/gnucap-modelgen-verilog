@@ -6,8 +6,9 @@ verilog
 
 `modelgen test_logic_3
 module test (out, in);
-  inout in;
-  inout out;
+  input in;
+  output out;
+  reg out;
 
   electrical in;
   logic out;
@@ -26,10 +27,12 @@ ground gnd;
 // vpulse #(.val0(0) .val1(5) .width(100p) .period(200p)) v1(clk, gnd);
 vsine #(.ampl(2.5), .offset(2.5), .freq(1e9)) v1(clk, gnd);
 test #() u1(ll, clk);
-c_d_a #(.model("logic")) d1(.out(dd), .in(ll));
 
 .model logic logic delay=1p rise=10p fall=10p
 
+print tran v(clk) l(ll) iter(0)
+tran 3n
+c_d_a #(.model("logic")) d1(.out(dd), .in(ll));
 print tran v(clk) l(ll) iter(0)
 tran 3n
 status notime

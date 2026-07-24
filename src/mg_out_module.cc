@@ -1037,6 +1037,10 @@ static void make_module_set_ports(std::ostream& o, Module const& m)
     }else{
     }
     o____ "build_union(&n_(" << pp->code_name() << "), &n_(n_"<<pp->value()<<"));\n";
+    if(pp->node()->is_reg()) {
+      o____ "n_(" << pp->code_name() << ").set_used(); // reg\n";
+    }else{
+    }
   }
 }
 /*--------------------------------------------------------------------------*/

@@ -248,6 +248,11 @@ Nature const* Branch::nature() const
   return nullptr;
 }
 /*--------------------------------------------------------------------------*/
+bool Node::is_reg() const
+{
+  return _is_reg;
+}
+/*--------------------------------------------------------------------------*/
 void Node::set_to(Node* p)
 {
   if(number()==p->number()) {
@@ -596,22 +601,15 @@ Base const* ValueRangeInterval::value() const
   }
 }
 /*--------------------------------------------------------------------------*/
+void Node::set_reg(Module*)
+{
+  _is_reg = true;
+}
+/*--------------------------------------------------------------------------*/
 void Node::set_to_ground(Module*)
 {
   _fanout.clear();
   _number = 0;
-}
-/*--------------------------------------------------------------------------*/
-void Module::set_to_ground(Node const* n)
-{
-  trace1("stc", n->number());
-  assert(_circuit);
-  if(n->number()){
-    assert(*(_circuit->nodes().begin() + n->number()) == n);
-    (*(_circuit->nodes().begin() + n->number()))->set_to_ground(this);
-  }else{
-    // already ground
-  }
 }
 /*--------------------------------------------------------------------------*/
 Branch const* Branch::output() const

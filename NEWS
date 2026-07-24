@@ -15,6 +15,7 @@ This file summarizes new features and important changes between snapshots.
 - generate code for always blocks
 - pos/neg edge triggered events
 - system tasks in always blocks
+- reg, assign to reg in event block
 - ..
 
 20260329-dev

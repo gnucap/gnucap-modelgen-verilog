@@ -230,7 +230,7 @@ void Net_Decl_Reg::parse(CS& f)
   Module* m = prechecked_cast<Module*>(owner());
   assert(m);
   assert(node());
-//  m->set_reg(node());
+  m->set_reg(node());
 }
 /*--------------------------------------------------------------------------*/
 void Net_Decl_List_Reg::parse(CS& f)

@@ -607,7 +607,7 @@ void Port_3::dump(std::ostream& out)const
 -	| {attribute_instance}  analog_construct
 + module_or_generate_item_declaration ::=
 +	  net_declaration
--	| reg_declaration
++	| reg_declaration
 -	| integer_declaration
 +	| real_declaration
 -	| time_declaration
@@ -1503,6 +1503,30 @@ Branch_Ref Module::new_filter(Node* x)
 void Circuit::push_back(Element_2 /*const?*/ * f)
 {
   _element_list.push_back(f);
+}
+/*--------------------------------------------------------------------------*/
+void Module::set_to_ground(Node const* n)
+{
+  trace1("stc", n->number());
+  assert(_circuit);
+  if(n->number()){
+    assert(*(_circuit->nodes().begin() + n->number()) == n);
+    (*(_circuit->nodes().begin() + n->number()))->set_to_ground(this);
+  }else{
+    // already ground
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Module::set_reg(Node const* n)
+{
+  trace1("stc", n->number());
+  assert(_circuit);
+  if(n->number()){
+    assert(*(_circuit->nodes().begin() + n->number()) == n);
+    (*(_circuit->nodes().begin() + n->number()))->set_reg(this);
+  }else{
+    // already ground
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -361,6 +361,7 @@ public: //filters may need this..
   Node* new_node(std::string const& p) override;
   Branch_Ref new_branch(Node*, Node*) override;
   void set_to_ground(Node const*);
+  void set_reg(Node const*);
 public:
   Branch_Ref new_filter(Node*);
   Base /*const*/ * new_href(std::string const&n);

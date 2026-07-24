@@ -1035,7 +1035,8 @@ void accept_node_value(node_t& n, bool lv, double delay)
     nl->set_event(delay, lvl);
   }else if(nl->lv_future() != lv){
     nl->set_event(delay, lvl);
-  }else if(nl->in_transit()){ untested();
+  }else if(nl->final_time() > CKT_BASE::_sim->_time0){ untested();
+    // (hack)
     nl->set_event(delay, lvl);
   }else{ untested();
   }
