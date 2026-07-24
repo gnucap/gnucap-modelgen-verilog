@@ -94,23 +94,24 @@ private:
     o__ "bool " << label() + "__tr_advance(va::LNR const& ll) {\n";
     o____ "auto l = prechecked_cast<LOGIC_NODE const*>(ll.ptr());\n";
     o____ "assert(l);\n";
-    o____ "bool ret1 = _sim->_time0 == l->last_change_time();\n";
-    o____ "bool ret2 = _sim->_time0 == l->final_time();\n";
+    o____ "trace2(\"DBG\", l->final_time(), _sim->_time0);\n";
+    o____ "bool is_final = l->final_time() == _sim->_time0;\n";
+    o____ "bool is_lct   = l->last_change_time() == _sim->_time0;\n";
     if(_dir){
-      o____ "ret1 = ret1 && (l->lv() == " + trans + " || l->lv() == " +stable+ ");\n";
-      o____ "ret2 = ret2 && l->lv() == " + trans + ";\n";
+      o____ label() + "now = is_final && (l->lv() == " << trans <<
+                                       "||l->lv() == " << stable << ");\n";
+      o____ label() + "now |= is_lct && (l->lv() == " << stable << ");\n";
     }else{
+      o____ label() + "now = is_final;\n";
+      o____ label() + "now |= is_lct && (l->lv() == " << 0 << ");\n";
+      o____ label() + "now |= is_lct && (l->lv() == " << 3 << ");\n";
     }
-    o____ "if(ret1){\n";
-    o____ "}else if(ret2){\n";
-    o____ "}\n";
-    o____ "bool ret = ret1 || ret2;\n";
-    o____ label() + "now = ret;\n";
-    o____ "if(ret){ \n";
+    o____ "if(" << label() << "now){\n";
     o______ "q_eval();\n"; // hack?
     o____ "}else{\n";
     o____ "}\n";
-    o____ "return false; // ret;\n";
+//    o____ "return " << label() + "now;\n";
+    o____ "return false;\n";
     o__ "}\n";
     o__ "bool " << label() + "__tr_eval(va::LNR const&) {\n";
     o____ "return false;\n";
@@ -121,11 +122,11 @@ private:
     o____ "return r;\n";
     o__ "}\n";
     o__ "bool " << label() + "__is_evt(va::LNR const&) {\n";
-    o____ "bool r = " << label() + "now;\n";
-    o____ "return r;\n";
+    o____ "return " << label() + "now;\n";
     o__ "}\n";
-    o__ "bool " << label() + "__tr_regress(va::LNR const&) { untested();\n";
-    o____ "incomplete(); return true;\n";
+    o__ "bool " << label() + "__tr_regress(va::LNR const&) {\n";
+    o____ label() + "now = false;\n";
+    o____ "return true;\n";
     o__ "}\n";
     o__ "bool " << label() + "__tr_review(va::LNR const& i) {\n";
     o____ "if(" << label() + "__is_evt(i)) {\n";

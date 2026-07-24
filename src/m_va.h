@@ -1024,6 +1024,26 @@ public:
   }
 };
 /*--------------------------------------------------------------------------*/
+void accept_node_value(node_t& n, bool lv, double delay)
+{
+  node_l& nl = reinterpret_cast<node_l&>(n);
+  nl->set_mode(moDIGITAL); // assert?..
+  delay += 1e-20; // HACK
+
+  LOGICVAL lvl(lv?lvSTABLE1:lvSTABLE0);
+  if(nl->lv().is_unknown()){ untested();
+    nl->set_event(delay, lvl);
+  }else if(nl->lv_future() != lv){ untested();
+    nl->set_event(delay, lvl);
+  }else if(nl->in_transit()){ untested();
+    nl->set_event(delay, lvl);
+  }else{ untested();
+  }
+    // nl->propagate();
+    // nl->set_quality(qGOOD);
+    // nl->improve_quality();
+}
+/*--------------------------------------------------------------------------*/
 } // va
 /*--------------------------------------------------------------------------*/
 LOGICVAL operator& (LOGICVAL const& a, LOGICVAL const& b)

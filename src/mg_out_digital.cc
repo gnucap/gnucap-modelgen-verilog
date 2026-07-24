@@ -40,7 +40,7 @@ public:
     modeNUM = 10
   }_mode;
   Base const* _src{nullptr};
-  std::string ctx()const {
+  std::string ctx()const override {
     char const* names[modeNUM] = { //
       "precalc", "tr_eval", "initial", "tr_begin", "tr_restore",
       "tr_advance", "tr_regress", "tr_review", "tr_accept", "finish"
@@ -403,10 +403,23 @@ void OUT_DIGITAL::make_assignment(std::ostream& o, Assignment const& a) const
       && _mode!=modePRECALC
       && _mode!=modeTR_INITIAL) {
     o__ "// " << lhsname << " is common\n";
-  }else if(is_cc_ref(&e)){
-    std::stringstream bin; // HACK.
-    auto rhsname = make_cc_expression(bin, e);
-    o__ lhsname << " = " << rhsname << ";\n";
+  }else if(!is_tr_accept()){
+    o__ "// ! accept.. " << lhsname << "\n";
+  }else if(dynamic_cast<Token_NODE const*>(&a.lhs())){
+     if(is_cc_ref(&e)){
+     }else{ untested();
+     }
+     std::stringstream bin; // HACK.
+     o__ "bool rhs;\n";
+     o__ "{ // rhs eval\n";
+     {
+       indent rhsindent;
+       auto rhsname = make_cc_expression(o, e);
+       o__ "rhs = " << rhsname << ";\n";
+     }
+     o__ "} // rhs eval\n";
+     o__ "_LOGICVAL lv = rhs?lvSTABLE1:lvSTABLE0;\n";
+     o__ "va::accept_node_value(d->n_(" << lhsname << "), lv, 0.);\n";
   }else{
     indent x;
     auto rhsname = make_cc_expression(o, e);
