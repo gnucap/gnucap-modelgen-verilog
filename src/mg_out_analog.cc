@@ -1290,7 +1290,7 @@ static void make_cc_common_precalc(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_clear_branch_contributions(std::ostream& o, const Module& m)
+void make_clear_branch_contributions(std::ostream& o, const Module& m)
 {
   o << "inline void MOD_" << m.identifier() << "::clear_branch_contributions()\n{\n";
   for(auto x : m.circuit()->branches()){
@@ -1332,7 +1332,6 @@ void make_cc_analog(std::ostream& o, const Module& m)
   o << "typedef MOD_" << m.identifier() << " MOD__;\n"; // here?
   make_cc_zero_filter_readout(o, m);
   make_cc_set_branch_contributions(o, m);
-  make_clear_branch_contributions(o, m);
 //  make_cc_ac_begin(o, m);
   make_cc_common_tr_eval(o, m);
   make_cc_common_precalc(o, m);

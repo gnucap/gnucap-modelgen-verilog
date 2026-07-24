@@ -475,8 +475,11 @@ static void make_do_tr(std::ostream& o, const Module& m)
   }else{
   }
   // if(has_eval_analog) ...
-  o__ "c->tr_eval_analog(this);\n";
-  o__ "set_branch_contributions();\n";
+  if(m.has_analog_block()) {
+    o__ "c->tr_eval_analog(this);\n";
+    o__ "set_branch_contributions();\n";
+  }else{
+  }
 
   o__ "assert(subckt());\n";
   o__ "set_converged(subckt()->do_tr() && converged());\n";
@@ -903,6 +906,8 @@ static void make_module_clone(std::ostream& o, Module const& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+void make_clear_branch_contributions(std::ostream& o, const Module& m); // out_analog
+/*--------------------------------------------------------------------------*/
 static void make_module_class(std::ostream& o, Module const& m)
 {
   make_tr_probe_num(o, m);
@@ -912,15 +917,19 @@ static void make_module_class(std::ostream& o, Module const& m)
   o << "// seq blocks\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
-  if(m.has_analog_block()){
+  if(m.has_analog_block() || m.has_always_block()){
     make_tr_needs_eval(o, m);
+    make_do_tr(o, m);
+    make_clear_branch_contributions(o, m);
+  }else{
+  }
+  if(m.has_analog_block()){
     if(options().decompose_eval()){
       o << "#if 0\n";
       make_tr_eval_branches(o, m);
       o << "#endif\n";
     }else{
     }
-    make_do_tr(o, m);
     make_cc_analog(o, m);
   }else{
   }
