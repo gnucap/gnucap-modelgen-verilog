@@ -71,7 +71,7 @@ private: // override virtuals
   void	   tr_load()override;
   void	   tr_unload()override;
   TIME_PAIR tr_review()override;
-  void     to_logic(node_l&, MODEL_LOGIC const* f, double v);
+  void     to_logic(node_l&, MODEL_LOGIC const* f, node_t& in);
   void	   tr_accept()override;
   double   tr_involts()const override	{ untested();unreachable(); return 0;}
   //double tr_input()const		//ELEMENT
@@ -194,8 +194,9 @@ TIME_PAIR DEV_A_D::tr_review()
   return _time_by;
 }
 /*--------------------------------------------------------------------------*/
-void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, double input)
+void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
 {
+  double input = in->v0();
 //  if (n->is_analog()){
     n->set_a_iter();
 //  }else{ untested();
@@ -212,7 +213,7 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, double input)
   }
   // set_process(f);
 
-  if (/*n->is_analog() && */  n->d_iter() < n->a_iter()) {
+  if (1||/*n->is_analog() && */  n->d_iter() < n->a_iter()) {
     if (_sim->analysis_is_restore()) {untested();
     }else if (_sim->analysis_is_static()) {
     }else{
@@ -338,16 +339,22 @@ void DEV_A_D::tr_accept()
   const MODEL_LOGIC* m = prechecked_cast<const MODEL_LOGIC*>(c->model());
   assert(m);
 
-  bool oldstate = n_(OUTNODE)->lv_future();
-  to_logic(n_(OUTNODE), m, n_(INNODE)->v0());
-  bool future_state = n_(OUTNODE)->lv_future();
+  LOGICVAL oldstate = n_(OUTNODE)->lv();
+  to_logic(n_(OUTNODE), m, n_(INNODE));
+  LOGICVAL future_state = n_(OUTNODE)->lv();
   if(future_state == oldstate) {
-  }else if(future_state){
+  }else if(future_state == lvSTABLE1){
     n_(OUTNODE)->set_event(1e-20, lvSTABLE1);
     n_(OUTNODE)->set_quality(qGOOD);
-  }else{
+    n_(OUTNODE)->set_d_iter();
+    n_(OUTNODE)->set_mode(moDIGITAL);
+  }else if(future_state == lvSTABLE0){
     n_(OUTNODE)->set_event(1e-20, lvSTABLE0);
     n_(OUTNODE)->set_quality(qGOOD);
+    n_(OUTNODE)->set_d_iter();
+    n_(OUTNODE)->set_mode(moDIGITAL);
+  }else{ untested();
+    incomplete();
   }
 }
 /*--------------------------------------------------------------------------*/
