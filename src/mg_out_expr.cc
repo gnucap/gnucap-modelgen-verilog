@@ -897,13 +897,14 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
 std::string make_cc_expression(std::ostream& o, Expression const& e, bool dynamic,
     std::string ctx)
 {
+  // o__ "// expression " << ctx << dynamic << "\n";
   TData const* deps = nullptr;
   if(ctx=="precalc"){
     // assert(!dynamic);
   }else{
   }
   if(ctx == "af"){
-  }else if(ctx == "logic"){
+  }else if(ctx == "logic"){ untested();
     // no deps-> use ddouble..
   }else if(!dynamic && ctx!="precalc"){
   }else if(auto ex = dynamic_cast<Expression_ const*>(&e)){

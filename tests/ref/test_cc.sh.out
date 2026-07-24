@@ -1899,6 +1899,7 @@ int COMMON_resistor::is_valid_() const
   {
   double lb, ub;
   {
+  // expression precalc0
   // ref. type?
   /*361, 1*/double f0;
   f0 =  0.; // precalc
@@ -1906,6 +1907,7 @@ int COMMON_resistor::is_valid_() const
   lb = f0;
   }
   {
+  // expression precalc0
   // ref. type?
   /*361, 1*/double f0;
   f0 =  inf; // precalc
@@ -1932,36 +1934,42 @@ void COMMON_resistor::precalc_first(const PARAM_LIST* par_scope)
   COMMON_resistor const* pc = this;
   (void)pc;
   { // final adjust
+    // expression adjust0
     (void) 1.;
     p_real def = real( 1.);
     e_val(&(this->_p_r),     def , par_scope);
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void)(_p_r) /*rhspar*/;
     real def = real((_p_r) /*rhspar*/);
     this->_p___r = def;
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void) 0.;
     real def = real( 0.);
     this->_p___tc1 = def;
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void) 0.;
     real def = real( 0.);
     this->_p___tc2 = def;
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void) 0.;
     real def = real( 0.);
     this->_p___noisy = def;
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void) 0.;
     real def = real( 0.);
     this->_p___tnom = def;
@@ -1999,36 +2007,42 @@ void COMMON_resistor::precalc_last(const PARAM_LIST* par_scope)
   COMMON_resistor const* pc = this;
   (void)pc;
   { // final adjust
+    // expression adjust0
     (void) 1.;
     p_real def = real( 1.);
     e_val(&(this->_p_r),     def , par_scope);
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void)(_p_r) /*rhspar*/;
     real def = real((_p_r) /*rhspar*/);
     this->_p___r = def;
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void) 0.;
     real def = real( 0.);
     this->_p___tc1 = def;
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void) 0.;
     real def = real( 0.);
     this->_p___tc2 = def;
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void) 0.;
     real def = real( 0.);
     this->_p___noisy = def;
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void) 0.;
     real def = real( 0.);
     this->_p___tnom = def;
@@ -2244,6 +2258,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         }
       }
       { // Assignment real '__i'.
+        // expression tr_eval1
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
@@ -2260,6 +2275,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         assert(_v___i[d_potential_b_p_n] == t0[d_potential_b_p_n]); // (2b2)
       }
       { // Contribution I(p, n) lin: 1
+        // expression tr_eval1
         // dynamic & deps tr_eval 1
         ddouble t0;
         //t0.set_no_deps();
@@ -2272,6 +2288,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        // expression tr_eval1
         //real? ddouble?
         ddouble t0;
         //t0.set_no_deps();
@@ -2444,6 +2461,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         }
       }
       { // Assignment real '__i'.
+        // expression tr_eval1
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
@@ -2460,6 +2478,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         assert(_v___i[d_potential_b_p_n] == t0[d_potential_b_p_n]); // (2b2)
       }
       { // Contribution I(p, n) lin: 1
+        // expression tr_eval1
         // dynamic & deps tr_eval 1
         ddouble t0;
         //t0.set_no_deps();
@@ -2472,6 +2491,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        // expression tr_eval1
         //real? ddouble?
         ddouble t0;
         //t0.set_no_deps();
@@ -2519,6 +2539,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
       {
         { // anonymous block
           { // Assignment real 'g'.
+            // expression precalc0
             //no ddeps. float??
             /*361, 1*/double f0;
             f0 =  1. / (_p___r) /*rhspar*/; // (703)
@@ -2527,6 +2548,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         }
       }
       { // Assignment real '__i'.
+        // expression precalc0
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
@@ -2541,6 +2563,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         _v___i = t0; // (prec)
       }
       { // Contribution I(p, n) lin: 1
+        // expression precalc0
         // dynamic & deps precalc 1
         ddouble t0;
         //t0.set_no_deps();
@@ -2549,6 +2572,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        // expression precalc0
         //real? ddouble?
         ddouble t0;
         //t0.set_no_deps();
@@ -2602,6 +2626,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
         }
       }
       { // Assignment real '__i'.
+        // expression tr_advance1
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
@@ -2652,6 +2677,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
         }
       }
       { // Assignment real '__i'.
+        // expression tr_regress1
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
@@ -3440,6 +3466,7 @@ int COMMON_resistor::is_valid_() const
   {
   double lb, ub;
   {
+  // expression precalc0
   // ref. type?
   /*361, 1*/double f0;
   f0 =  0.; // precalc
@@ -3447,6 +3474,7 @@ int COMMON_resistor::is_valid_() const
   lb = f0;
   }
   {
+  // expression precalc0
   // ref. type?
   /*361, 1*/double f0;
   f0 =  inf; // precalc
@@ -3461,6 +3489,7 @@ int COMMON_resistor::is_valid_() const
   {
   double lb, ub;
   {
+  // expression precalc0
   // ref. type?
   /*361, 1*/double f0;
   f0 = 0; // precalc
@@ -3468,6 +3497,7 @@ int COMMON_resistor::is_valid_() const
   lb = f0;
   }
   {
+  // expression precalc0
   // ref. type?
   /*361, 1*/double f0;
   f0 = 1; // precalc
@@ -3494,26 +3524,31 @@ void COMMON_resistor::precalc_first(const PARAM_LIST* par_scope)
   COMMON_resistor const* pc = this;
   (void)pc;
   { // final adjust
+    // expression adjust0
     (void) 1.;
     p_real def = real( 1.);
     e_val(&(this->_p_r),     def , par_scope);
   }
   { // final adjust
+    // expression adjust0
     (void) 0.;
     p_real def = real( 0.);
     e_val(&(this->_p_tc1),     def , par_scope);
   }
   { // final adjust
+    // expression adjust0
     (void) 0.;
     p_real def = real( 0.);
     e_val(&(this->_p_tc2),     def , par_scope);
   }
   { // final adjust
+    // expression adjust0
     (void) 0.;
     p_real def = real( 0.);
     e_val(&(this->_p_noisy),     def , par_scope);
   }
   { // final adjust
+    // expression adjust0
     (void) 0.;
     p_real def = real( 0.);
     e_val(&(this->_p_tnom),     def , par_scope);
@@ -3547,26 +3582,31 @@ void COMMON_resistor::precalc_last(const PARAM_LIST* par_scope)
   COMMON_resistor const* pc = this;
   (void)pc;
   { // final adjust
+    // expression adjust0
     (void) 1.;
     p_real def = real( 1.);
     e_val(&(this->_p_r),     def , par_scope);
   }
   { // final adjust
+    // expression adjust0
     (void) 0.;
     p_real def = real( 0.);
     e_val(&(this->_p_tc1),     def , par_scope);
   }
   { // final adjust
+    // expression adjust0
     (void) 0.;
     p_real def = real( 0.);
     e_val(&(this->_p_tc2),     def , par_scope);
   }
   { // final adjust
+    // expression adjust0
     (void) 0.;
     p_real def = real( 0.);
     e_val(&(this->_p_noisy),     def , par_scope);
   }
   { // final adjust
+    // expression adjust0
     (void) 0.;
     p_real def = real( 0.);
     e_val(&(this->_p_tnom),     def , par_scope);
@@ -3707,6 +3747,7 @@ void EVAL__b_white_noise_0_p__::tr_eval(ELEMENT* d)const
     double /*?*/ _v_g; // local_var
 #pragma GCC diagnostic pop
       {
+        // expression tr_eval1
         //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
@@ -3717,6 +3758,7 @@ void EVAL__b_white_noise_0_p__::tr_eval(ELEMENT* d)const
         if (f0) {
           { // anonymous block
             { // Assignment real 'dt'.
+              // expression tr_eval1
               //real? ddouble?
               ddouble t0;
               //t0.set_no_deps();
@@ -3734,6 +3776,7 @@ void EVAL__b_white_noise_0_p__::tr_eval(ELEMENT* d)const
         }
       }
       {
+        // expression tr_eval1
         //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
@@ -3753,6 +3796,7 @@ void EVAL__b_white_noise_0_p__::tr_eval(ELEMENT* d)const
         if (f0) {
           { // anonymous block
             { // Assignment real 'g'.
+              // expression tr_eval1
               //no ddeps. float??
               /*361, 1*/double f0;
               f0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
@@ -3772,6 +3816,7 @@ void EVAL__b_white_noise_0_p__::tr_eval(ELEMENT* d)const
         }else {
           { // anonymous block
             { // Assignment real 'g'.
+              // expression tr_eval1
               //no ddeps. float??
               /*361, 1*/double f0;
               f0 =  1. / (_p_r) /*rhspar*/; // (703)
@@ -3846,6 +3891,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
     double /*?*/ _v_g; // local_var
 #pragma GCC diagnostic pop
       {
+        // expression tr_eval1
         //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
@@ -3856,6 +3902,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         if (f0) {
           { // anonymous block
             { // Assignment real 'dt'.
+              // expression tr_eval1
               //real? ddouble?
               ddouble t0;
               //t0.set_no_deps();
@@ -3873,6 +3920,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         }
       }
       {
+        // expression tr_eval1
         //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
@@ -3892,6 +3940,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         if (f0) {
           { // anonymous block
             { // Assignment real 'g'.
+              // expression tr_eval1
               //no ddeps. float??
               /*361, 1*/double f0;
               f0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
@@ -3911,6 +3960,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         }else {
           { // anonymous block
             { // Assignment real 'g'.
+              // expression tr_eval1
               //no ddeps. float??
               /*361, 1*/double f0;
               f0 =  1. / (_p_r) /*rhspar*/; // (703)
@@ -3921,6 +3971,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
 
       }
       { // Assignment real 'i'.
+        // expression tr_eval1
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
@@ -3937,6 +3988,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         assert(_v_i[d_potential_b_p_n] == t0[d_potential_b_p_n]); // (2b2)
       }
       { // Contribution I(p, n) lin: 1
+        // expression tr_eval1
         // dynamic & deps tr_eval 1
         ddouble t0;
         //t0.set_no_deps();
@@ -3949,6 +4001,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        // expression tr_eval1
         //real? ddouble?
         ddouble t0;
         //t0.set_no_deps();
@@ -4128,6 +4181,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
     double /*?*/ _v_g; // local_var
 #pragma GCC diagnostic pop
       {
+        // expression tr_eval1
         //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
@@ -4138,6 +4192,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         if (f0) {
           { // anonymous block
             { // Assignment real 'dt'.
+              // expression tr_eval1
               //real? ddouble?
               ddouble t0;
               //t0.set_no_deps();
@@ -4155,6 +4210,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         }
       }
       {
+        // expression tr_eval1
         //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
@@ -4174,6 +4230,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         if (f0) {
           { // anonymous block
             { // Assignment real 'g'.
+              // expression tr_eval1
               //no ddeps. float??
               /*361, 1*/double f0;
               f0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
@@ -4193,6 +4250,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         }else {
           { // anonymous block
             { // Assignment real 'g'.
+              // expression tr_eval1
               //no ddeps. float??
               /*361, 1*/double f0;
               f0 =  1. / (_p_r) /*rhspar*/; // (703)
@@ -4203,6 +4261,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
 
       }
       { // Assignment real 'i'.
+        // expression tr_eval1
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
@@ -4219,6 +4278,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         assert(_v_i[d_potential_b_p_n] == t0[d_potential_b_p_n]); // (2b2)
       }
       { // Contribution I(p, n) lin: 1
+        // expression tr_eval1
         // dynamic & deps tr_eval 1
         ddouble t0;
         //t0.set_no_deps();
@@ -4231,6 +4291,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* d) const
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        // expression tr_eval1
         //real? ddouble?
         ddouble t0;
         //t0.set_no_deps();
@@ -4290,6 +4351,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
     (void) _v_dt;
     double /*?*/ _v_g; // local_var
       {
+        // expression precalc0
         //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
@@ -4300,6 +4362,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         if (f0) {
           { // anonymous block
             { // Assignment real 'dt'.
+              // expression precalc0
               //real? ddouble?
               ddouble t0;
               //t0.set_no_deps();
@@ -4317,6 +4380,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         }
       }
       {
+        // expression precalc0
         //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
@@ -4336,6 +4400,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         if (f0) {
           { // anonymous block
             { // Assignment real 'g'.
+              // expression precalc0
               //no ddeps. float??
               /*361, 1*/double f0;
               f0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
@@ -4355,6 +4420,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         }else {
           { // anonymous block
             { // Assignment real 'g'.
+              // expression precalc0
               //no ddeps. float??
               /*361, 1*/double f0;
               f0 =  1. / (_p_r) /*rhspar*/; // (703)
@@ -4365,6 +4431,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
 
       }
       { // Assignment real 'i'.
+        // expression precalc0
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
@@ -4379,6 +4446,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         _v_i = t0; // (prec)
       }
       { // Contribution I(p, n) lin: 1
+        // expression precalc0
         // dynamic & deps precalc 1
         ddouble t0;
         //t0.set_no_deps();
@@ -4387,6 +4455,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
         // same2 _potential_b_p_n
       }
       { // Contribution I(p, n) lin: 1
+        // expression precalc0
         //real? ddouble?
         ddouble t0;
         //t0.set_no_deps();
@@ -4448,6 +4517,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
     (void) _v_dt;
     double /*?*/ _v_g; // local_var
       {
+        // expression tr_advance1
         //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
@@ -4458,6 +4528,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
         if (f0) {
           { // anonymous block
             { // Assignment real 'dt'.
+              // expression tr_advance1
               //real? ddouble?
               ddouble t0;
               //t0.set_no_deps();
@@ -4475,6 +4546,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
         }
       }
       {
+        // expression tr_advance1
         //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
@@ -4494,6 +4566,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
         if (f0) {
           { // anonymous block
             { // Assignment real 'g'.
+              // expression tr_advance1
               //no ddeps. float??
               /*361, 1*/double f0;
               f0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
@@ -4513,6 +4586,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
         }else {
           { // anonymous block
             { // Assignment real 'g'.
+              // expression tr_advance1
               //no ddeps. float??
               /*361, 1*/double f0;
               f0 =  1. / (_p_r) /*rhspar*/; // (703)
@@ -4523,6 +4597,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
 
       }
       { // Assignment real 'i'.
+        // expression tr_advance1
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
@@ -4565,6 +4640,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
     (void) _v_dt;
     double /*?*/ _v_g; // local_var
       {
+        // expression tr_regress1
         //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
@@ -4575,6 +4651,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
         if (f0) {
           { // anonymous block
             { // Assignment real 'dt'.
+              // expression tr_regress1
               //real? ddouble?
               ddouble t0;
               //t0.set_no_deps();
@@ -4592,6 +4669,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
         }
       }
       {
+        // expression tr_regress1
         //int, incomplete, $param_given
         /*361, 1*/double f0;
         { // scope
@@ -4611,6 +4689,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
         if (f0) {
           { // anonymous block
             { // Assignment real 'g'.
+              // expression tr_regress1
               //no ddeps. float??
               /*361, 1*/double f0;
               f0 = (_p_tc2) /*rhspar*/ * _v_dt/*rhsvar*/; // (703)
@@ -4630,6 +4709,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
         }else {
           { // anonymous block
             { // Assignment real 'g'.
+              // expression tr_regress1
               //no ddeps. float??
               /*361, 1*/double f0;
               f0 =  1. / (_p_r) /*rhspar*/; // (703)
@@ -4640,6 +4720,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
 
       }
       { // Assignment real 'i'.
+        // expression tr_regress1
         ddouble t0;
         //t0.set_no_deps();
         //t0[d_potential_b_p_n] = 0.; // (output dep)
@@ -6881,6 +6962,7 @@ int COMMON_capacitor::is_valid_() const
   {
   double lb, ub;
   {
+  // expression precalc0
   // ref. type?
   /*361, 1*/double f0;
   f0 = 0; // precalc
@@ -6888,6 +6970,7 @@ int COMMON_capacitor::is_valid_() const
   lb = f0;
   }
   {
+  // expression precalc0
   // ref. type?
   /*361, 1*/double f0;
   f0 =  inf; // precalc
@@ -6914,18 +6997,21 @@ void COMMON_capacitor::precalc_first(const PARAM_LIST* par_scope)
   COMMON_capacitor const* pc = this;
   (void)pc;
   { // final adjust
+    // expression adjust0
     (void) 1.;
     p_real def = real( 1.);
     e_val(&(this->_p_c),     def , par_scope);
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void)(_p_c) /*rhspar*/;
     real def = real((_p_c) /*rhspar*/);
     this->_p___c = def;
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void)0;
     real def = real(0);
     this->_p___ic = def;
@@ -6951,18 +7037,21 @@ void COMMON_capacitor::precalc_last(const PARAM_LIST* par_scope)
   COMMON_capacitor const* pc = this;
   (void)pc;
   { // final adjust
+    // expression adjust0
     (void) 1.;
     p_real def = real( 1.);
     e_val(&(this->_p_c),     def , par_scope);
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void)(_p_c) /*rhspar*/;
     real def = real((_p_c) /*rhspar*/);
     this->_p___c = def;
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void)0;
     real def = real(0);
     this->_p___ic = def;
@@ -7139,6 +7228,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
       {
         { // anonymous block
           { // Contribution I(p, n) lin: 1
+            // expression tr_eval1
             //real? ddouble?
             ddouble t0;
             //t0.set_no_deps();
@@ -7185,6 +7275,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
       {
         { // anonymous block
           { // Contribution I(p, n) lin: 1
+            // expression precalc0
             //real? ddouble?
             ddouble t0;
             //t0.set_no_deps();
@@ -8095,6 +8186,7 @@ int COMMON_capacitor::is_valid_() const
   {
   double lb, ub;
   {
+  // expression precalc0
   // ref. type?
   /*361, 1*/double f0;
   f0 = 0; // precalc
@@ -8102,6 +8194,7 @@ int COMMON_capacitor::is_valid_() const
   lb = f0;
   }
   {
+  // expression precalc0
   // ref. type?
   /*361, 1*/double f0;
   f0 =  inf; // precalc
@@ -8128,23 +8221,27 @@ void COMMON_capacitor::precalc_first(const PARAM_LIST* par_scope)
   COMMON_capacitor const* pc = this;
   (void)pc;
   { // final adjust
+    // expression adjust0
     (void) 1.;
     p_real def = real( 1.);
     e_val(&(this->_p_c),     def , par_scope);
   }
   { // final adjust
+    // expression adjust0
     (void)0;
     p_real def = real(0);
     e_val(&(this->_p_ic),     def , par_scope);
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void)(_p_c) /*rhspar*/;
     real def = real((_p_c) /*rhspar*/);
     this->_p___c = def;
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void)(_p_ic) /*rhspar*/;
     real def = real((_p_ic) /*rhspar*/);
     this->_p___ic = def;
@@ -8174,23 +8271,27 @@ void COMMON_capacitor::precalc_last(const PARAM_LIST* par_scope)
   COMMON_capacitor const* pc = this;
   (void)pc;
   { // final adjust
+    // expression adjust0
     (void) 1.;
     p_real def = real( 1.);
     e_val(&(this->_p_c),     def , par_scope);
   }
   { // final adjust
+    // expression adjust0
     (void)0;
     p_real def = real(0);
     e_val(&(this->_p_ic),     def , par_scope);
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void)(_p_c) /*rhspar*/;
     real def = real((_p_c) /*rhspar*/);
     this->_p___c = def;
   }
   { // final adjust localparam
   // w default
+    // expression adjust0
     (void)(_p_ic) /*rhspar*/;
     real def = real((_p_ic) /*rhspar*/);
     this->_p___ic = def;
@@ -8373,6 +8474,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
 // construct block...
     { // anonymous block
       {
+        // expression tr_eval1
         //int, incomplete, analysis
         /*361, 1*/double f0;
         { // scope
@@ -8387,6 +8489,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
         if (f0) {
           { // anonymous block
             { // Contribution V(p, n) lin: 1
+              // expression tr_eval1
               // ref. type?
               /*361, 1*/double f0;
               f0 = (_p___ic) /*rhspar*/; // tr_eval
@@ -8403,6 +8506,7 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* d) const
         }else {
           { // anonymous block
             { // Contribution I(p, n) lin: 1
+              // expression tr_eval1
               //real? ddouble?
               ddouble t0;
               //t0.set_no_deps();
@@ -8456,6 +8560,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
 // construct block...
     { // anonymous block
       {
+        // expression precalc0
         //int, incomplete, analysis
         /*361, 1*/double f0;
         { // scope
@@ -8470,6 +8575,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
         if (f0) {
           { // anonymous block
             { // Contribution V(p, n) lin: 1
+              // expression precalc0
               // ref. type?
               /*361, 1*/double f0;
               f0 = (_p___ic) /*rhspar*/; // precalc
@@ -8480,6 +8586,7 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
         }else {
           { // anonymous block
             { // Contribution I(p, n) lin: 1
+              // expression precalc0
               //real? ddouble?
               ddouble t0;
               //t0.set_no_deps();

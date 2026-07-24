@@ -688,6 +688,10 @@ static void make_tr_regress(std::ostream& o, const Module& m)
   o__ "c->tr_regress_analog(this);\n";
   }else{
   }
+  if(m.has_always_block()){
+  o__ "c->tr_regress_digital(this);\n";
+  }else{
+  }
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";

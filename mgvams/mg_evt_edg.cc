@@ -115,12 +115,12 @@ private:
     o__ "bool " << label() + "__tr_eval(va::LNR const&) {\n";
     o____ "return false;\n";
     o__ "}\n";
-    o__ "bool " << label() + "__tr_accept(va::LNR const& i) {\n";
+    o__ "bool " << label() + "__tr_accept(va::LNR const&) {\n";
     o____ "bool r = " << label() + "now;\n";
     o____ label() + "now = false;\n";
     o____ "return r;\n";
     o__ "}\n";
-    o__ "bool " << label() + "__is_evt(va::LNR const& ll) {\n";
+    o__ "bool " << label() + "__is_evt(va::LNR const&) {\n";
     o____ "bool r = " << label() + "now;\n";
     o____ "return r;\n";
     o__ "}\n";

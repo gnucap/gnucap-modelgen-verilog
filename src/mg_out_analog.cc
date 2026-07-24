@@ -44,7 +44,7 @@ public:
     modeNUM = 13
   }_mode;
   Base const* _src{nullptr};
-  std::string ctx()const {
+  std::string ctx()const override {
     char const* names[modeNUM] = { //
       "precalc", "static", "tr_eval", "probe", "tr_initial", "tr_begin", "tr_restore",
       "tr_advance", "tr_regress", "tr_review", "tr_accept", "finish", "af"
@@ -101,7 +101,6 @@ private:
   void make_contrib    (std::ostream& o, Contribution const& C)const;
   void make_evt        (std::ostream& o, AnalogEvtCtlStmt const& s)const;
   void make_loop       (std::ostream& o, AnalogWhileStmt const& s) const;
-  void make_system_task(std::ostream& o, System_Task const& s)const;
   void make_task       (std::ostream& o, System_Task const& s)const;
   void make_variable   (std::ostream& o, Token_VAR_REF const& v)const;
   void make_variable   (std::ostream& o, Variable_Decl const& v)const;
@@ -109,10 +108,6 @@ private:
   void make_block_variables(std::ostream& o, Variable_Stmt const&)const;
   void make_real_variable  (std::ostream& o, Token_VAR_DECL const&)const;
   void make_seq_block      (std::ostream& o, AnalogSeqBlock const&)const;
-private:
-  std::string make_cc_expression(std::ostream& o, Expression const& e, bool=false)const {
-    return ::make_cc_expression(o, e, _mode!=modePRECALC, ctx());
-  }
 }; // OUT_ANALOG
 /*--------------------------------------------------------------------------*/
 static void make_int_variable(std::ostream& o, Token_VAR_DECL const& v)
@@ -584,14 +579,6 @@ void make_cc_af(std::ostream& o, const Analog_Function& f)
 {
   OUT_ANALOG oo(OUT_ANALOG::modeAF);
   oo.make_af(o, f);
-}
-/*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_system_task(std::ostream& o, System_Task const& s) const
-{
-  o__ "{\n";
-  make_cc_expression(o, s.expression());
-  o << "\n";
-  o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
 // TODO: use FUNCTION_?

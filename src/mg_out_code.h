@@ -22,11 +22,14 @@
 #ifndef MG_OUT_CODE_H
 #define MG_OUT_CODE_H
 /*--------------------------------------------------------------------------*/
+#include "mg_expression.h"
 #include "mg_out.h"
 #include "mg_out_code.h"
 /*--------------------------------------------------------------------------*/
 class Variable_Decl;
 class Token_VAR_REF;
+class System_Task;
+class Expression;
 /*--------------------------------------------------------------------------*/
 class OUT_CODE {
   virtual bool is_dynamic()const {return false;}
@@ -37,6 +40,12 @@ class OUT_CODE {
 protected:
   void make_one_local_var(std::ostream& o, Variable_Decl const& V)const;
   void make_one_variable_load(std::ostream& o, Token_VAR_REF const& V)const;
+  void make_system_task(std::ostream& o, System_Task const& s)const;
+  std::string make_cc_expression(std::ostream& o, Expression const& e, bool=false)const {
+    return ::make_cc_expression(o, e, !is_precalc(), ctx());
+  }
+private:
+  virtual std::string ctx()const = 0;
 }; // OUT_CODE
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

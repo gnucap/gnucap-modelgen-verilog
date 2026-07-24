@@ -83,7 +83,6 @@ private:
   void make_assignment (std::ostream& o, Assignment const& a)const;
   void make_evt        (std::ostream& o, DigitalEvtCtlStmt const& s)const;
 //  void make_loop       (std::ostream& o, WhileStmt const& s) const;
-  void make_system_task(std::ostream& o, System_Task const& s)const;
   void make_task       (std::ostream& o, System_Task const& s)const;
   void make_variable   (std::ostream& o, Token_VAR_REF const& v)const;
   void make_variable   (std::ostream& o, Variable_Decl const& v)const;
@@ -369,10 +368,9 @@ void OUT_DIGITAL::make_stmt(std::ostream& o, Statement const& ab) const
     incomplete();
 //    make_ctrl(o, ct->body());
   }else if(auto t=dynamic_cast<System_Task const*>(&ab)) {
-    (void)t;
+    make_system_task(o, *t);
+  }else if(dynamic_cast<DigitalSeqStmt const*>(&ab)) { untested();
     incomplete();
-    // make_system_task(o, *t);
-//  }else if(auto ass=dynamic_cast<SeqStmt const*>(&ab)) {
 //    make_seq(o, *ass);
   }else{ untested();
     incomplete();
