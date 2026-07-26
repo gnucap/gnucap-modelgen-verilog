@@ -1,0 +1,28 @@
+
+// regular, but nonstandard syntax..
+`ifdef __VAMS_GNUCAP__
+`define edge(a) edge(a)
+`else
+`define edge(a) a
+`endif
+
+discipline logic
+  domain discrete;
+enddiscipline
+
+module rise(out, in, p1);
+  logic in;
+  logic out;
+  input in;
+  output out;
+  output p1;
+  inv #(.delay(19)) i1(p1, in);
+  and #(.delay(17)) i2(out, p1, in);
+
+  always @(posedge(in)) $strobe("rise in %g", $abstime());
+  always @(negedge(in)) $strobe("fall in %g", $abstime());
+  always @(posedge(p1)) $strobe("rise p1 %g", $abstime());
+  always @(negedge(p1)) $strobe("fall p1 %g", $abstime());
+  always @(`edge(out)) $strobe("edg out %g", $abstime());
+endmodule
+

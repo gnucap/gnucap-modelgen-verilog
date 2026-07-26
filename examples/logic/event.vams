@@ -1,0 +1,41 @@
+
+discipline logic
+  domain discrete;
+enddiscipline
+
+nature current
+  access = I;
+  units = "A";
+  abstol = 1e-12; // OPT::abstol
+endnature
+
+nature voltage
+  access = V;
+  units = "V";
+  abstol = 1e-6; // OPT::vntol
+endnature
+
+discipline electrical
+  potential voltage;
+  flow current;
+enddiscipline
+
+module count(in);
+	logic in;
+	input in;
+	(*desc="count"*) integer count;
+	always @(edge(in)) count = count+1;
+endmodule
+module cross(out, in, en);
+  electrical en;
+  input en;
+  electrical in;
+  logic out;
+  input in;
+  output out;
+  reg out;
+
+  always @(cross(V(in) - .2, 1)) out = V(en)>1;
+  always @(cross(V(in) + .2, -1)) out = 0;
+endmodule
+

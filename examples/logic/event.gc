@@ -1,0 +1,26 @@
+load mgsim
+load vams/vsine.so
+load vams/vpulse.so
+load ./event.so
+verilog
+
+`include logic
+
+module dd(vs, en, u);
+  ground gnd;
+  electrical gnd;
+  electrical vs;
+  electrical en;
+  logic u;
+  vsine #(.ampl(1), .freq(100k), .samples(6)) v1(vs, gnd);
+  vpulse #(.td(.05m), .val1(2)) v1(en, gnd);
+  cross #() c1(u, vs, en);
+  count #() c2(u);
+endmodule;
+
+dd #() d1(aa, en, u);
+
+list
+
+print tran v(aa) count(d1.c2) v(en) l(u) iter(0) control(0)
+tran .1m

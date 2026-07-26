@@ -5,6 +5,8 @@ Verilog-AMS defines random distribution functions, such as $rdist_normal.
 sampling.gc:   random variable sampling and random constants
 basic.gc:      run simulations with random parameters
 
+$ gnucap {sampling,basic}.gc
+
 == behavioural modelling
 
 Can do the same as in "basic.gc" with a compiled model. See basic.vams.
