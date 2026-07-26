@@ -1,0 +1,8 @@
+module test (.a(a),.b(b),.c(c),.d(d));
+  electrical a;
+  electrical b;
+  electrical c;
+  electrical d;
+  inout a,b,c,d;
+endmodule // test
+

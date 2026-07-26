@@ -1074,7 +1074,6 @@ public:
     //   cmd.warn(bDANGER, e.message());
     // }
     // node_t& nn = mn->n_(0);
-    trace2("NODE_DECL done", type, cmd.tail());
   }
 //  void set_param_by_index(int num, std::string& ext_name, int)override;
   // int param_count()const override {return int(_n.size());}
@@ -1189,7 +1188,7 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
 
       Scope->push_back(new_instance);
     }
-    if (cmd >> ',') {
+    if (extended || cmd >> ',') {
       // there will be another just like this one
       extended = true;
     }else{
