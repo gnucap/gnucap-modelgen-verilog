@@ -6,12 +6,14 @@ module test (p, n);
 
 	parameter real a = 2.;
 	localparam integer two_a = 2*a;
+	localparam integer five = 5;
+	localparam integer six = 5 from [4:7];
 
 	analog begin : main
 		real b;
 		real c, d;
 		b = two_a;
-		c = 0;
+		c = five;
 		d = 0;
 		I(p,n) <+ b + c + d;
 

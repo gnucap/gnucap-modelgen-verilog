@@ -349,19 +349,31 @@ void Parameter_2_List::parse(CS& file)
   }
 }
 /*--------------------------------------------------------------------------*/
+bool Parameter_2::is_literal() const
+{
+  return _default_val.is_literal();
+}
+/*--------------------------------------------------------------------------*/
 void Parameter_2_List::dump(std::ostream& o)const
 {
-  print_attributes(o, this);
-
   if(is_local()){
-    o__ "localparam";
+    for(auto& i : *this) {
+      if(i->is_printable()){
+	print_attributes(o, this);
+	o__ "localparam";
+	o << " " << _type << " ";
+	i->dump(o);
+	o << ";\n";
+      }else{
+      }
+    }
   }else{
+    print_attributes(o, this);
     o__ "parameter";
+    o << " " << _type << " ";
+    LiSt<Parameter_2, '\0', ',', ';'>::dump(o);
+    o << "\n";
   }
-  // "specparam" ...
-  o << " " << _type << " ";
-  LiSt<Parameter_2, '\0', ',', ';'>::dump(o);
-  o << "\n";
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Stmt::dump(std::ostream& o)const

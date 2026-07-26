@@ -2,7 +2,6 @@
 module st1(p);
   inout p;
   electrical p;
-  localparam real __x = 1;
 
   analog begin : main // always
     // c : 0
@@ -20,7 +19,6 @@ endmodule
 module st0(p);
   inout p;
   electrical p;
-  localparam real __x = 0;
 
   analog begin : main // always
     // c : 0

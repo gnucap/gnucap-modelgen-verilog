@@ -15,7 +15,6 @@ module underscore0();
 
 endmodule
 module underscore1();
-  localparam real __L =  0.0;
 
   analog begin : main
     real R;

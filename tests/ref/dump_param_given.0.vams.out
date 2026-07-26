@@ -1,7 +1,6 @@
 module test_pg0(p, n);
   electrical p, n;
   parameter real st =  3.0;
-  localparam real l =  5.0;
 
   analog begin
     if ($param_given(st)) begin
