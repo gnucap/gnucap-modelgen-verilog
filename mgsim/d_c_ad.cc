@@ -377,5 +377,19 @@ DEV_A_D d_buf(&c_buf);
 DISPATCHER<CARD>::INSTALL dd_buf(&device_dispatcher, "c_a_d", &d_buf);
 }
 /*--------------------------------------------------------------------------*/
+static bool newly_stable[lvUNKNOWN+1][lvUNKNOWN+1] = { // oldlv, _lv
+  /*	   s0	  rise   fall	s1     u */
+  /* s0 */{false, false, false, true,  false},
+  /*rise*/{false, false, false, true,  false},
+  /*fall*/{true,  false, false, false, false},
+  /* s1 */{true,  false, false, false, false},
+  /* u  */{true,  false, false, true,  false}
+};
+/*--------------------------------------------------------------------------*/
+inline bool LOGIC_NODE::just_reached_stable()const
+{
+  return newly_stable[old_lv()][lv()];
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:
