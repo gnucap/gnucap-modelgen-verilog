@@ -263,7 +263,7 @@ void Net_Decl_Dir::parse(CS& f)
   Net_Identifier::parse(f);
 
   assert(owner());
-  incomplete();
+  // incomplete(); but not in use yet.
 //  set_dir(owner()->set_dir(name()));
 }
 /*--------------------------------------------------------------------------*/

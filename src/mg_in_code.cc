@@ -809,11 +809,16 @@ Token_VAR_REF const* Assignment::decl_token() const
   }else if(auto p = dynamic_cast<Assignment*>(_lhsref->mutable_item())) {
     assert(p!=this);
     return p->decl_token();
+  }else if(dynamic_cast<Token_ARGUMENT const*>(_lhsref)) {
+    // something af?
+  }else if(dynamic_cast<Token_VAR_REF const*>(_lhsref)) {
+    // something af?
   }else{
-    unreachable(); // af??
+    assert(0);
+    unreachable();
     // return _token;
-    return nullptr;
   }
+  return nullptr;
 }
 /*--------------------------------------------------------------------------*/
 bool Assignment::is_used_in(Base const* b) const
@@ -876,8 +881,7 @@ bool Assignment::update(RDeps const* incoming)
   if(!_token){ untested();
   }else if (store_deps(Expression_::data())) {
     trace3("Assignment::update0", _token->name(), _token->deps().size(), Expression_::data().size());
-    incomplete();
-    // something new there.. pass it on.
+    // incomplete(); something new there.. pass it on.
     // TODO: only pass on what's new..
     assert(_lhsref);
     _lhsref->propagate_deps(*_token);

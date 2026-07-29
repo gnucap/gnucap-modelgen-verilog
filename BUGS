@@ -1,16 +1,14 @@
 == limitations and work in progress
 - rise, fall, delay in $transition are constant.
 - delay in $absdelay is a constant.
-- no refcounting in hierarchical refs, use with care
-  c.f. mg_href.nest0.gc
 - filter contribution to potential, uses internal node.
-- localparam not considered in overloading
 - ac needs operating point, even if linear:
   c.f. mg2_cccs.0.gc
 - $write etc. not working in analog functions
 - net assign: only nodes in rhs expression
 - net assign: delay arg is constant
 - final_step, initial_step lacks arg
+- paramset expansion uses localparam "kludge"
 
 == modelgen
 - dependency tracking glitch aka rram bug (codeberg #2)
@@ -21,18 +19,15 @@
 - `default_transition missing, and some step control
 - bogus error message on wrong filter args
 - seems to crash on V(x) if x is parameter.
-- v_instance: port name issue with case insensitive
 - hsp does not play well with paramset
 - should reject named blocks in analog functions
 
 == simulator plugins
-- missing localparam rules in overload
 - paramset: requires newlines, v_paramset.2a.gc
-- not (yet) instanciating unused modules
+- not fully instanciating unused modules
 
 == libgnucap, TODO
 - BUG: port probes awaiting node rework
-- need NODE_P, discrete nodes
 - BUG: padding long lines with whitespace
 - tab/newline handling in cmd.warn Exception_CS
 - branch node order is suboptimal
