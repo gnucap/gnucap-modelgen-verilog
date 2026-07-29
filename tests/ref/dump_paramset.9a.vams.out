@@ -1,6 +1,7 @@
 // paramsets
 module const_res(a, b);
   electrical a, b;
+  localparam real __t = 1;
 
   integer __T;
 

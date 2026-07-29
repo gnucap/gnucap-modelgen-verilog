@@ -358,7 +358,7 @@ void Parameter_2_List::dump(std::ostream& o)const
 {
   if(is_local()){
     for(auto& i : *this) {
-      if(i->is_printable()){
+      if(1 || i->is_printable()){
 	print_attributes(o, this);
 	o__ "localparam";
 	o << " " << _type << " ";

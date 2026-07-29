@@ -14,6 +14,7 @@ endmodule
 module my_res(a, b);
   electrical a, b;
   parameter real R =  1.0 from [ 1.0: 1.0];
+  localparam real __r =  1.0;
 
   analog begin
     I(a, b) <+ V(a, b);

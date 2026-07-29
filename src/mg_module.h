@@ -97,7 +97,7 @@ public:
   void resolve();
   Base const* value()const override;
   ConstantMinTypMaxExpression const& default_val()const 	{return _default_val;}
-  bool is_printable() { return !is_local() || !is_literal() || has_range(); }
+  bool is_printable() { untested(); return !is_local() || !is_literal() || has_range(); }
 };
 /*--------------------------------------------------------------------------*/
 class Parameter_2_List : public LiSt<Parameter_2, '\0', ',', ';'> {

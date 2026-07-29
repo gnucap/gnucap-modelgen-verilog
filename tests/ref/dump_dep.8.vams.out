@@ -45,6 +45,7 @@ endmodule
 module dep7p(a, g);
   inout a, g;
   electrical a, g;
+  localparam real __p =  0.0;
 
   real __T//
 ;
