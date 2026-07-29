@@ -1,0 +1,38 @@
+attach ./modelgen_2.so
+load vams/vpulse.so
+load vams/vsine.so
+
+verilog
+
+`modelgen test_logic_3
+module test (out, in);
+  input in;
+  output out;
+  reg out;
+
+  electrical in;
+  logic out;
+
+  always @(cross(V(in) - 2.5, 1)) out = 1;
+  always @(cross(V(in) - 2.5, -1)) out = 0;
+endmodule
+`endmodelgen
+
+list
+
+!make test_logic_3.so > /dev/null
+attach ./test_logic_3.so
+
+ground gnd;
+// vpulse #(.val0(0) .val1(5) .width(100p) .period(200p)) v1(clk, gnd);
+vsine #(.ampl(2.5), .offset(2.5), .freq(1e9)) v1(clk, gnd);
+test #() u1(ll, clk);
+
+.model logic logic delay=1p rise=10p fall=10p
+
+print tran v(clk) l(ll) iter(0)
+tran 3n
+c_d_a #(.model("logic")) d1(.out(dd), .in(ll));
+print tran v(clk) l(ll) iter(0)
+tran 3n
+status notime

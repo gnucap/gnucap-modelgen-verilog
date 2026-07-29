@@ -54,7 +54,7 @@ public:
     return "_na" + to_string(_seq) + Assignment::code_name();
   }
   int count_variables()const;
-  tokenlist const& vars()const {return Expression_::used_variables();}
+  tokenset const& vars()const {return Expression_::used_variables();}
 };
 /*--------------------------------------------------------------------------*/
 class ContinuousAssign : public Block {

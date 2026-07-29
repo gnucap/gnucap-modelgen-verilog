@@ -1,0 +1,126 @@
+discipline logicfast;
+  domain discrete;
+enddiscipline;
+discipline logicslow;
+  domain discrete;
+enddiscipline;
+`default_discipline logicfast
+module invfast (.out(out),.in(in));
+  inout out, in;
+  electrical out;
+  electrical in;
+  nand #(1) n1 (out, in);
+  c_d_a #() d1 (out, out);
+  c_a_d #() d2 (in, in);
+endmodule // invfast
+
+`default_discipline logicslow
+module invslow (.out(out),.in(in));
+  inout out, in;
+  electrical out;
+  electrical in;
+  nand #(20) n1 (out, in);
+  c_d_a #() d1 (out, out);
+  c_a_d #() d2 (in, in);
+endmodule // invslow
+
+ground gnd;
+vpulse #(.val0(0),.val1(5),.width(100p),.period(200p)) v1 (clk, gnd);
+resistor #(1) r1 (clk1, clk);
+resistor #(1) r2 (clk2, clk);
+invfast #() i1 (c1, clk1);
+invslow #() i2 (c0, clk2);
+resistor #(1e9) r1 (c0, gnd);
+resistor #(1e9) r1 (c1, gnd);
+// band aid: legacy logic models..
+paramset logicslow logic;
+ .delay=1p; .vmax=NA( 5.); .vmin=NA( 0.); .unknown=NA( 2.5); .rise=10p; .fall=15p; .rs=NA( 100.); .rw=NA( 1.G); .thh=NA( 0.75); .thl=NA( 0.25); .mr=NA( 5.); .mf=NA( 5.); .over=NA( 0.1); .tnom=NA( 27.);
+endparamset
+
+paramset logicfast logic;
+ .delay=1p; .vmax=NA( 5.); .vmin=NA( 0.); .unknown=NA( 2.5); .rise=1p; .fall=1p; .rs=NA( 100.); .rw=NA( 1.G); .thh=NA( 0.75); .thl=NA( 0.25); .mr=NA( 5.); .mf=NA( 5.); .over=NA( 0.1); .tnom=NA( 27.);
+endparamset
+
+r1: ambiguous resistor: "vams resistor, plain"
+r2: ambiguous resistor: "vams resistor, plain"
+r1: ambiguous resistor: "vams resistor, plain"
+r1: ambiguous resistor: "vams resistor, plain"
+i1.n1: can't find subckt: logicfastnand1, forcing digital
+i2.n1: can't find subckt: logicslownand1, forcing digital
+#Time       v(clk)     v(c0)      v(c1)     
+ 0.         0.         5.         5.        
+ 1.p        5.         5.         5.        
+ 2.p        5.         5.         0.        
+ 3.p        5.         5.         0.        
+ 4.p        5.         5.         0.        
+ 5.p        5.         5.         0.        
+ 21.p       5.         0.         0.        
+ 100.p      5.         0.         0.        
+ 102.p      0.         0.         0.        
+ 103.p      0.         0.         5.        
+ 104.p      0.         0.         5.        
+ 105.p      0.         0.         5.        
+ 106.p      0.         0.         5.        
+ 122.p      0.         5.         5.        
+ 200.p      0.         5.         5.        
+ 202.p      5.         5.         5.        
+ 203.p      5.         5.         0.        
+ 210.p      5.         4.         0.        
+ 214.p      5.         2.6667     0.        
+ 218.p      5.         1.3333     0.        
+ 222.p      5.        -1.f        0.        
+ 300.p      5.        -1.f        0.        
+ 302.p      0.        -1.f        0.        
+ 303.p      0.        -1.f        5.        
+ 304.p      0.        -1.f        5.        
+ 305.p      0.        -1.f        5.        
+ 306.p      0.        -1.f        5.        
+ 322.p      0.         5.         5.        
+ 400.p      0.         5.         5.        
+ 402.p      5.         5.         5.        
+ 403.p      5.         5.         0.        
+ 410.p      5.         4.         0.        
+ 414.p      5.         2.6667     0.        
+ 418.p      5.         1.3333     0.        
+ 422.p      5.        -1.f        0.        
+ 500.p      5.        -1.f        0.        
+ 502.p      0.        -1.f        0.        
+ 503.p      0.        -1.f        0.        
+ 504.p      0.        -1.f        5.        
+ 505.p      0.        -1.f        5.        
+ 506.p      0.        -1.f        5.        
+ 522.p      0.         5.         5.        
+ 600.p      0.         5.         5.        
+ 602.p      5.         5.         5.        
+ 603.p      5.         5.         0.        
+ 610.p      5.         4.         0.        
+ 614.p      5.         2.6667     0.        
+ 618.p      5.         1.3333     0.        
+ 622.p      5.        -1.f        0.        
+ 700.p      5.        -1.f        0.        
+ 702.p      0.        -1.f        0.        
+ 703.p      0.        -1.f        5.        
+ 704.p      0.        -1.f        5.        
+ 705.p      0.        -1.f        5.        
+ 706.p      0.        -1.f        5.        
+ 722.p      0.         5.         5.        
+ 800.p      0.         5.         5.        
+ 802.p      5.         5.         5.        
+ 803.p      5.         5.         0.        
+ 810.p      5.         4.         0.        
+ 814.p      5.         2.6667     0.        
+ 818.p      5.         1.3333     0.        
+ 822.p      5.         0.         0.        
+ 900.p      5.         0.         0.        
+ 902.p      0.         0.         0.        
+ 903.p      0.         0.         5.        
+ 904.p      0.         0.         5.        
+ 905.p      0.         0.         5.        
+ 906.p      0.         0.         5.        
+ 922.p      0.         5.         5.        
+ 1.n        0.         5.         5.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=195, fourier=0, total=266
+transient timesteps: accepted=71, rejected=0, total=71
+nodes: user=5, subckt=0, model=2, total=7
+dctran density=28.6%, ac density=28.6%

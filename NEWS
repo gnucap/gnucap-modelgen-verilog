@@ -2,7 +2,7 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
-20260***-dev
+20260729-dev
 ============
 - fix parameter initialisers in interpreted paramset
 - localparam in spice and (interpreted) module
@@ -14,7 +14,9 @@ This file summarizes new features and important changes between snapshots.
 - mgvams/$rdist: accept type_string arg
 - generate code for always blocks
 - pos/neg edge triggered events
-- ..
+- system tasks in always blocks
+- reg, assign to reg in event block
+- logic examples
 
 20260329-dev
 ============

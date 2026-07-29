@@ -1,0 +1,21 @@
+load mgsim
+load ./latch.so
+load vams/vpulse.so
+verilog
+
+`include logic
+
+clock #() c1(clk, en);
+vpulse #(.val0(0), .val1(5)) en1(en, \0 );
+
+vpulse #(.val0(0), .val1(5), .width(.25n), .td(.5n), .period(.3n)) er(r, \0 );
+vpulse #(.val0(0), .val1(5), .width(.25n), .td(40p), .period(.3n)) es(s, \0 );
+latch l1(q, r, s);
+
+print op v(nodes) l(nodes)
+op
+
+print tran l(q r s)
+
+tran 2n basic
+status notime

@@ -3,12 +3,16 @@ load ./c_debug_disc.so
 options trace
 
 discipline disc1;
+  domain discrete;
 enddiscipline
 discipline disc2;
+  domain discrete;
 enddiscipline
 discipline disc2;
+  domain discrete;
 enddiscipline
 discipline disc3;
+  domain discrete;
 enddiscipline
 
 connectmodule cm0(out, in);

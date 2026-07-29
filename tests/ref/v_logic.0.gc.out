@@ -7,14 +7,16 @@ enddiscipline;
 `default_discipline logicfast
 module invfast (.out(out),.in(in));
   inout out, in;
-  electrical out, in;
+  electrical out;
+  electrical in;
   nand #(1) n1 (out, in);
 endmodule // invfast
 
 `default_discipline logicslow
 module invslow (.out(out),.in(in));
   inout out, in;
-  electrical out, in;
+  electrical out;
+  electrical in;
   nand #(20) n1 (out, in);
 endmodule // invslow
 

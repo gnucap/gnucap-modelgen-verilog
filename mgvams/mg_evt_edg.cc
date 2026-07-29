@@ -36,15 +36,15 @@ class EDG : public MGVAMS_EVENT {
   std::string _code_name;
 protected:
   Module* _m{nullptr};
-  EDG(EDG const& e) : MGVAMS_EVENT(e), _dir(e._dir) { untested(); }
+  EDG(EDG const& e) : MGVAMS_EVENT(e), _dir(e._dir) { }
 public:
   explicit EDG(int d) : MGVAMS_EVENT(), _dir(dir(d)) {
     set_label((d == 1)?"posedge":"negedge");
   }
   ~EDG(){ }
-  virtual EDG* clone()const override {untested(); return new EDG(*this);}
+  virtual EDG* clone()const override { return new EDG(*this);}
 private:
-  bool static_code()const override {return true;}
+  bool static_code()const override {return false;}
   bool is_common()const override { untested();return true;}
   bool is_in_common()const override {return false;}
   bool has_state()const override { untested();return true;}
@@ -82,55 +82,53 @@ private:
     o__ "// edge dev\n";
     std::string trans;
     std::string stable;
-    std::string trans2;
-    if(_dir==1){
+    if(_dir==0){
+    }else if(_dir==1){
        trans = "1";
-       trans2 = "2";
        stable = "3";
     }else{
        trans = "2";
-       trans2 = "1";
        stable = "0";
     }
-    o__ "bool " << label() + "__tr_advance(int i) {\n";
-    o____ "auto l = prechecked_cast<LOGIC_NODE const*>(n_(i).n_());\n";
+    o__ "bool " << label() + "now{false};\n";
+    o__ "bool " << label() + "__tr_advance(va::LNR const& ll) {\n";
+    o____ "auto l = prechecked_cast<LOGIC_NODE const*>(ll.ptr());\n";
     o____ "assert(l);\n";
-    o____ "bool ret1 = _sim->_time0 == l->last_change_time();\n";
-    o____ "bool ret2 = _sim->_time0 == l->final_time();\n";
-    o____ "ret1 = ret1 && (l->lv() == " + trans + " || l->lv() == " +stable+ ");\n";
-    o____ "ret2 = ret2 && l->lv() == " + trans + ";\n";
-    o____ "if(ret1){\n";
-    o____ "}else if(ret2){\n";
-    o____ "}\n";
-    o____ "bool ret = ret1 || ret2;\n";
-    o____ "if(ret){ \n";
+    o____ "trace2(\"DBG\", l->final_time(), _sim->_time0);\n";
+    o____ "bool is_final = l->final_time() == _sim->_time0;\n";
+    o____ "bool is_lct   = l->last_change_time() == _sim->_time0;\n";
+    if(_dir){
+      o____ label() + "now = is_final && (l->lv() == " << trans <<
+                                       "||l->lv() == " << stable << ");\n";
+      o____ label() + "now |= is_lct && (l->lv() == " << stable << ");\n";
+    }else{
+      o____ label() + "now = is_final;\n";
+      o____ label() + "now |= is_lct && (l->lv() == " << 0 << ");\n";
+      o____ label() + "now |= is_lct && (l->lv() == " << 3 << ");\n";
+    }
+    o____ "if(" << label() << "now){\n";
     o______ "q_eval();\n"; // hack?
     o____ "}else{\n";
     o____ "}\n";
-    o____ "return false; // ret;\n";
-    o__ "}\n";
-    o__ "bool " << label() + "__tr_eval(int i) {\n";
+//    o____ "return " << label() + "now;\n";
     o____ "return false;\n";
     o__ "}\n";
-    o__ "bool " << label() + "__tr_accept(int i) {\n";
-    o____ "return " << label() + "__is_evt(i);\n";
+    o__ "bool " << label() + "__tr_eval(va::LNR const&) {\n";
+    o____ "return false;\n";
     o__ "}\n";
-    o__ "bool " << label() + "__is_evt(int i) {\n";
-    o____ "auto l = prechecked_cast<LOGIC_NODE const*>(n_(i).n_());\n";
-    o____ "assert(l);\n";
-    o____ "bool ret1 = _sim->_time0 == l->last_change_time();\n";
-    o____ "bool ret2 = _sim->_time0 == l->final_time();\n";
-    o____ "ret1 = ret1 && (l->lv() == " + trans2 + " || l->lv() == " +stable+ ");\n";
-    o____ "ret2 = ret2 && l->lv() == " + trans + ";\n";
-    o____ "if(ret1){\n";
-    o____ "}else if(ret2){\n";
-    o____ "}\n";
-    o____ "return ret1 || ret2;\n";
+    o__ "bool " << label() + "__tr_accept(va::LNR const&) {\n";
+    o____ "bool r = " << label() + "now;\n";
+    o____ label() + "now = false;\n";
+    o____ "return r;\n";
     o__ "}\n";
-    o__ "bool " << label() + "__tr_regress(int) { untested();\n";
-    o____ "incomplete(); return true;\n";
+    o__ "bool " << label() + "__is_evt(va::LNR const&) {\n";
+    o____ "return " << label() + "now;\n";
     o__ "}\n";
-    o__ "bool " << label() + "__tr_review(int i) {\n";
+    o__ "bool " << label() + "__tr_regress(va::LNR const&) {\n";
+    o____ label() + "now = false;\n";
+    o____ "return true;\n";
+    o__ "}\n";
+    o__ "bool " << label() + "__tr_review(va::LNR const& i) {\n";
     o____ "if(" << label() + "__is_evt(i)) {\n";
     o______ "q_accept();\n"; // hack? only needed if there is an event.
     o____ "}else{\n";
@@ -142,8 +140,10 @@ private:
     o__ "// edge common\n";
   }
 };
+EDG any(0);
 EDG pos(1);
 EDG neg(-1);
+DISPATCHER<FUNCTION>::INSTALL d_any(&function_dispatcher, "edge", &any);
 DISPATCHER<FUNCTION>::INSTALL d_pos(&function_dispatcher, "posedge", &pos);
 DISPATCHER<FUNCTION>::INSTALL d_neg(&function_dispatcher, "negedge", &neg);
 /*--------------------------------------------------------------------------*/

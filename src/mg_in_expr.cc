@@ -467,6 +467,24 @@ Block* Expression_::scope()
   }
 }
 /*--------------------------------------------------------------------------*/
+bool Expression_::is_literal() const
+{
+  if(size() == 0) { untested();
+    return true;
+  }else if(size() == 1) {
+    auto b = begin();
+    if(dynamic_cast<Token_PAR_REF*>(*b)){
+      return false;
+    }else if(dynamic_cast<Token_CONSTANT*>(*b)){
+      return true;
+    }else{
+      trace1("not literal", (*b)->name());
+    }
+  }else{ untested();
+  }
+  return false;
+}
+/*--------------------------------------------------------------------------*/
 bool Expression_::is_constant() const
 {
   if(size() > 1) {

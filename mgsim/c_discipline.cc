@@ -29,13 +29,6 @@
 namespace {
 /*--------------------------------------------------------------------------*/
 class DISCIPLINE : public NODE_TYPE {
-  enum domain_type {
-    dom_unknown = 0,
-    dom_mixed = 1,
-    dom_continuous = 2,
-    dom_discrete = 3
-  };
-  domain_type _domain{dom_unknown};
   std::string _potential;
   std::string _flow;
 public:
@@ -48,9 +41,8 @@ public:
 //  std::string dev_type()const override {return short_label();}
 
 public:
-  void set_continuous() {_domain = dom_continuous;}
-  void set_mixed()     {_domain = dom_mixed;}
-  void set_discrete()   { _domain = dom_discrete;}
+  void set_continuous() {set_analog();}
+  void set_discrete()   {set_digital();}
 //  bool is_continuous()const override {return _domain == dom_continuous;}
 //  bool is_mixed()const override      {return _domain == dom_mixed;}
 //  bool is_discrete()const override   {untested(); return _domain == dom_discrete;}
@@ -67,11 +59,9 @@ public:
     }
   }
   std::string param_value(int i)const override {
-    static std::string d[4] = {"default", "hybrid", "continuous", "discrete"};
+    static std::string d[4] = {"default", "continuous", "discrete", "hybrid"};
     switch(i){
-    case 0:
-      assert(_domain < 4);
-      return d[_domain];
+    case 0: return d[domain()];
     case 1: return _potential;
     case 2: return _flow;
     default: unreachable(); return "???";
@@ -79,7 +69,7 @@ public:
   }
   bool param_is_printable(int i)const override {
     switch(i){
-    case 0: return _domain;
+    case 0: return domain();
     case 1: return _potential.size();
     case 2: return _flow.size();
     default: unreachable(); return false;
@@ -88,12 +78,12 @@ public:
   int set_param_by_name(std::string n, std::string v)override {
     if(n=="domain"){
       if(v=="discrete"){
-	_domain = dom_discrete;
+	set_digital();
       }else if(v=="continuous"){
-	_domain = dom_continuous;
+	set_analog();
       }else{ untested();
 	error(bWARNING, "invalid domain " + v);
-	_domain = dom_unknown;
+	unset_domain();
       }
       return 0;
     }else if(n=="potential"){
@@ -107,6 +97,7 @@ public:
     }
   }
   void clear();
+  NODE* deflate()override { return new LOGIC_NODE; }
 private:
   int user_number()const override   { return INVALID_NODE;}
 private:
@@ -216,7 +207,9 @@ public:
       std::string sep;
       for(DISPATCHER<NODE>::const_iterator
 	  i = node_dispatcher.begin(); i != node_dispatcher.end(); ++i) {
-	if (i->second) {
+	auto t = dynamic_cast<NODE_TYPE const*>(i->second);
+	if (!t){
+	}else if (t && t->domain()) {
 	  choices += sep + i->first;
 	  sep = " ";
 	}else{

@@ -87,14 +87,17 @@ public:
   void set_type(Data_Type const& a) {_type = a;}
   void set_local( bool x=true ) {_is_local = x;}
   bool is_local()const {return _is_local;}
-  void set_given( bool x=true ) {_is_given = x;}
+  void set_given( bool x=true ) {untested(); _is_given = x;}
   bool is_given()const {return _is_given;}
+  bool is_literal()const;
+  bool has_range()const {return _value_range_list.size(); }
   void add_alias(Aliasparam const*);
   ValueRangeList const& value_range_list()const { return _value_range_list; }
   std::list<Aliasparam const*> const& aliases()const {return _aliases;}
   void resolve();
   Base const* value()const override;
   ConstantMinTypMaxExpression const& default_val()const 	{return _default_val;}
+  bool is_printable() { untested(); return !is_local() || !is_literal() || has_range(); }
 };
 /*--------------------------------------------------------------------------*/
 class Parameter_2_List : public LiSt<Parameter_2, '\0', ',', ';'> {
@@ -361,6 +364,7 @@ public: //filters may need this..
   Node* new_node(std::string const& p) override;
   Branch_Ref new_branch(Node*, Node*) override;
   void set_to_ground(Node const*);
+  void set_reg(Node const*);
 public:
   Branch_Ref new_filter(Node*);
   Base /*const*/ * new_href(std::string const&n);

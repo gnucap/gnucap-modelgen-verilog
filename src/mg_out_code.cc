@@ -171,5 +171,13 @@ void OUT_CODE::make_one_local_var(std::ostream& o, Variable_Decl const& V) const
   }
 }
 /*--------------------------------------------------------------------------*/
+void OUT_CODE::make_system_task(std::ostream& o, System_Task const& s) const
+{
+  o__ "{\n";
+  make_cc_expression(o, s.expression());
+  o << "\n";
+  o__ "}\n";
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

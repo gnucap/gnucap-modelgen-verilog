@@ -34,6 +34,7 @@ module comp (inp, inn, clk, outp, outn, vdd, vss);
   always @(posedge(clk)) state = (V(inp)-V(inn)+vos > meta)
                                - (V(inp)-V(inn)+vos < -meta) ;
   always @(negedge(clk)) state = 0;
+  always @(negedge(clk)) state = 0;
 
   analog begin
 

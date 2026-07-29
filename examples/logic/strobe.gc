@@ -1,0 +1,20 @@
+load mgsim
+load vams/vpulse.so
+load ./strobe.so
+verilog
+
+`include logic
+
+module dd(edg, apulse);
+	ground gnd;
+   logic pulse;
+	vpulse #(.val0(0), .val1(3), .rise(1p), .fall(1p), .width(1n), .td(1n)) v1(apulse, gnd);
+   nand #(.delay(17)) i1(.out(p1), .in1(pulse));
+	rise r1(edg, pulse, p1);
+	c_a_d #(.model("logic")) dd(.out(pulse), .in(apulse))
+endmodule
+
+dd d1(edg, apulse);
+
+print tran l(edg) v(edg) v(apulse) iter(0)
+tran 100n

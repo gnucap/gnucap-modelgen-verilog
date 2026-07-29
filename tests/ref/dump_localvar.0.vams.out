@@ -3,12 +3,14 @@ module test(p, n);
   electrical p, n;
   parameter real a =  2.0;
   localparam integer two_a = (a * 2);
+  localparam integer five = 5;
+  localparam integer six = 5 from [4:7];
 
   analog begin : main
     real b;
     real c, d;
     b = two_a;
-    c = 0;
+    c = 5;
     d = 0;
     I(p, n) <+ ((b + c) + d);
     begin : second

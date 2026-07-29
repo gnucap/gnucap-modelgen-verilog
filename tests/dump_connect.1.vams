@@ -2,6 +2,10 @@
 `pragma modelgen nodump-nature
 `pragma modelgen nodump-discipline
 
+discipline ddiscrete;
+  domain discrete;
+enddiscipline
+
 connectmodule elect_to_logic(el,cm);
   input el;
   output cm;

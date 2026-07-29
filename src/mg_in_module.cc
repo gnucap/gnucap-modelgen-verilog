@@ -349,19 +349,31 @@ void Parameter_2_List::parse(CS& file)
   }
 }
 /*--------------------------------------------------------------------------*/
+bool Parameter_2::is_literal() const
+{
+  return _default_val.is_literal();
+}
+/*--------------------------------------------------------------------------*/
 void Parameter_2_List::dump(std::ostream& o)const
 {
-  print_attributes(o, this);
-
   if(is_local()){
-    o__ "localparam";
+    for(auto& i : *this) {
+      if(1 || i->is_printable()){
+	print_attributes(o, this);
+	o__ "localparam";
+	o << " " << _type << " ";
+	i->dump(o);
+	o << ";\n";
+      }else{
+      }
+    }
   }else{
+    print_attributes(o, this);
     o__ "parameter";
+    o << " " << _type << " ";
+    LiSt<Parameter_2, '\0', ',', ';'>::dump(o);
+    o << "\n";
   }
-  // "specparam" ...
-  o << " " << _type << " ";
-  LiSt<Parameter_2, '\0', ',', ';'>::dump(o);
-  o << "\n";
 }
 /*--------------------------------------------------------------------------*/
 void Variable_Stmt::dump(std::ostream& o)const
@@ -535,15 +547,6 @@ void Net_Declarations::dump(std::ostream& o) const
 //   Collection<Port_Discipline_List>::dump(out);
 // }
 /*--------------------------------------------------------------------------*/
-// 3.6.4 Ground declaration
-// Each ground declaration is associated with an already declared net of continuous discipline. The node asso-
-// ciated with the net will be the global reference node in the circuit. The net must be assigned a continuous
-// discipline to be declared ground.
-void Net_Decl_List_Ground::parse(CS& f)
-{
-  return Net_Decl_List::parse_n_<Net_Identifier_Ground>(f);
-}
-/*--------------------------------------------------------------------------*/
 void Port_3::set_discipline(Discipline const* d, Module* owner)
 {
   owner->node(_node)->set_discipline(d);
@@ -616,7 +619,7 @@ void Port_3::dump(std::ostream& out)const
 -	| {attribute_instance}  analog_construct
 + module_or_generate_item_declaration ::=
 +	  net_declaration
--	| reg_declaration
++	| reg_declaration
 -	| integer_declaration
 +	| real_declaration
 -	| time_declaration
@@ -1512,6 +1515,30 @@ Branch_Ref Module::new_filter(Node* x)
 void Circuit::push_back(Element_2 /*const?*/ * f)
 {
   _element_list.push_back(f);
+}
+/*--------------------------------------------------------------------------*/
+void Module::set_to_ground(Node const* n)
+{
+  trace1("stc", n->number());
+  assert(_circuit);
+  if(n->number()){
+    assert(*(_circuit->nodes().begin() + n->number()) == n);
+    (*(_circuit->nodes().begin() + n->number()))->set_to_ground(this);
+  }else{
+    // already ground
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Module::set_reg(Node const* n)
+{
+  trace1("stc", n->number());
+  assert(_circuit);
+  if(n->number()){
+    assert(*(_circuit->nodes().begin() + n->number()) == n);
+    (*(_circuit->nodes().begin() + n->number()))->set_reg(this);
+  }else{
+    // already ground
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

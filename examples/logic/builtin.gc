@@ -1,0 +1,19 @@
+load mgsim
+load vams/vpulse.so
+verilog
+
+`include logic
+
+module rise(out, in);
+  input in;
+  output out;
+  inv #17 i1(p1, in);
+  and #17 i2(out, p1, in);
+endmodule
+
+ground gnd;
+vpulse #(.val0(0), .val1(3), .width(1n), .td(1n)) v1(pulse, gnd);
+rise r1(edg, pulse);
+
+print tran v(pulse) l(edg) v(edg)
+tran 10n

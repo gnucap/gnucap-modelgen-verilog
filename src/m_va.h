@@ -1007,7 +1007,45 @@ inline LOGICVAL to_logic_(int i)
   }
 }
 /*--------------------------------------------------------------------------*/
+class LNR {
+  const node_t& _ln;
+public:
+  explicit LNR(node_t const& ln) : _ln(ln) { };
+  operator int()const { return lptr()->lv_future(); }
+  LOGIC_NODE const* lptr()const {
+    LOGIC_NODE const* ln = prechecked_cast<LOGIC_NODE const*>(_ln.operator->());
+    assert(ln);
+    return ln;
+  }
+  NODE const* ptr()const { return _ln.operator->(); }
+  bool is_evt()const {incomplete(); return false;}
+  bool is_connected()const{
+    return _ln.e_() != INVALID_NODE;
+  }
+};
+/*--------------------------------------------------------------------------*/
+void accept_node_value(node_t& n, bool lv, double delay)
+{
+  node_l& nl = reinterpret_cast<node_l&>(n);
+  nl->set_mode(moDIGITAL); // assert?..
+  delay += 1e-20; // HACK
+
+  LOGICVAL lvl(lv?lvSTABLE1:lvSTABLE0);
+  if(nl->lv().is_unknown()){
+    nl->set_event(delay, lvl);
+  }else if(nl->lv_future() != lv){
+    nl->set_event(delay, lvl);
+  }else if(nl->final_time() > CKT_BASE::_sim->_time0){ untested();
+    // (hack)
+    nl->set_event(delay, lvl);
+  }else{ untested();
+  }
+    // nl->propagate();
+    // nl->set_quality(qGOOD);
+    // nl->improve_quality();
 }
+/*--------------------------------------------------------------------------*/
+} // va
 /*--------------------------------------------------------------------------*/
 LOGICVAL operator& (LOGICVAL const& a, LOGICVAL const& b)
 {

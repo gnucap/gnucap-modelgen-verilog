@@ -9,12 +9,16 @@
 >>>>>connectrules foo;
 >>>>>list
 discipline disc1;
+  domain discrete;
 enddiscipline;
 discipline disc2;
+  domain discrete;
 enddiscipline;
 discipline disc2;
+  domain discrete;
 enddiscipline;
 discipline disc3;
+  domain discrete;
 enddiscipline;
 module cm0 (.out(out),.in(in));
   disc1 in;
@@ -43,12 +47,16 @@ endmodule // foo
 
 >>>>>`disciplines
 discipline disc1;
+  domain discrete;
 enddiscipline
 discipline disc2;
+  domain discrete;
 enddiscipline
 discipline disc2:0;
+  domain discrete;
 enddiscipline
 discipline disc3;
+  domain discrete;
 enddiscipline
 discipline electrical;
 enddiscipline
@@ -59,10 +67,13 @@ enddiscipline
 >>>>>delete disc2
 >>>>>`disciplines
 discipline disc1;
+  domain discrete;
 enddiscipline
 discipline disc2;
+  domain discrete;
 enddiscipline
 discipline disc3;
+  domain discrete;
 enddiscipline
 discipline electrical;
 enddiscipline
@@ -73,8 +84,10 @@ enddiscipline
 >>>>>delete disc2
 >>>>>`disciplines
 discipline disc1;
+  domain discrete;
 enddiscipline
 discipline disc3;
+  domain discrete;
 enddiscipline
 discipline electrical;
 enddiscipline

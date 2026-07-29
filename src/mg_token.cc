@@ -772,6 +772,9 @@ void Token_FUNCTION::stack_op(Expression* e) const
   }else if (E->is_empty()){ untested();
     incomplete();
     E->push_back(new Token_CALL(*this, const_deps.clone()));
+  }else if(dynamic_cast<const Token_VAR_REF*>(E->back())) {
+    // kludge. something with analog functions.
+    E->push_back(new Token_FUNCTION(*this, const_deps.clone()));
   }else if(!dynamic_cast<const Token_PARLIST*>(E->back())) {
     incomplete();
     E->push_back(new Token_FUNCTION(*this, const_deps.clone()));
@@ -1164,6 +1167,8 @@ RDeps const& Token_VAR_REF::rdeps() const
   }else if(auto it=dynamic_cast<Assignment const*>(_item)){
     return it->rdeps();
   }else if(dynamic_cast<Analog_Function const*>(_item)){ untested();
+  }else if(dynamic_cast<TData const*>(_item)){
+    // dump_mosfet0..
   }else{
     unreachable();
   }

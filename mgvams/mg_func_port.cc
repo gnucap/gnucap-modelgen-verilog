@@ -51,12 +51,11 @@ private:
     throw Exception("invalid");
   }
   std::string code_name()const override{
-    return "d->node_is_connected";
+    return "d->node_is_connected_";
   }
   void make_cc_dev(std::ostream& o)const override {
-    o__ "bool node_is_connected(int i)const override {\n";
-    o____ "trace2(\"conn\", i, n_(i).e_());\n";
-    o____ "return n_(i).e_() != INVALID_NODE;\n";
+    o__ "bool node_is_connected_(va::LNR const& i)const {\n";
+    o____ "return i.is_connected();\n";
     o__ "}\n";
   }
   Data_Type const* return_type()const override {

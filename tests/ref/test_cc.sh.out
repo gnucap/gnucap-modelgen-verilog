@@ -1019,7 +1019,45 @@ inline LOGICVAL to_logic_(int i)
   }
 }
 /*--------------------------------------------------------------------------*/
+class LNR {
+  const node_t& _ln;
+public:
+  explicit LNR(node_t const& ln) : _ln(ln) { };
+  operator int()const { return lptr()->lv_future(); }
+  LOGIC_NODE const* lptr()const {
+    LOGIC_NODE const* ln = prechecked_cast<LOGIC_NODE const*>(_ln.operator->());
+    assert(ln);
+    return ln;
+  }
+  NODE const* ptr()const { return _ln.operator->(); }
+  bool is_evt()const {incomplete(); return false;}
+  bool is_connected()const{
+    return _ln.e_() != INVALID_NODE;
+  }
+};
+/*--------------------------------------------------------------------------*/
+void accept_node_value(node_t& n, bool lv, double delay)
+{
+  node_l& nl = reinterpret_cast<node_l&>(n);
+  nl->set_mode(moDIGITAL); // assert?..
+  delay += 1e-20; // HACK
+
+  LOGICVAL lvl(lv?lvSTABLE1:lvSTABLE0);
+  if(nl->lv().is_unknown()){
+    nl->set_event(delay, lvl);
+  }else if(nl->lv_future() != lv){
+    nl->set_event(delay, lvl);
+  }else if(nl->final_time() > CKT_BASE::_sim->_time0){ untested();
+    // (hack)
+    nl->set_event(delay, lvl);
+  }else{ untested();
+  }
+    // nl->propagate();
+    // nl->set_quality(qGOOD);
+    // nl->improve_quality();
 }
+/*--------------------------------------------------------------------------*/
+} // va
 /*--------------------------------------------------------------------------*/
 LOGICVAL operator& (LOGICVAL const& a, LOGICVAL const& b)
 {
@@ -1246,7 +1284,14 @@ static _COMMON_VASRC_thermal _C_V_thermal(CC_STATIC);
 class CDISC_thermal : public NODE_TYPE {
   explicit CDISC_thermal(CDISC_thermal const& p ) : NODE_TYPE(p) {}
 public:
-  explicit CDISC_thermal() : NODE_TYPE("thermal") {}
+  explicit CDISC_thermal() : NODE_TYPE() {
+    set_label("thermal");
+    set_analog();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override {untested();
     return new CDISC_thermal(*this);
   }
@@ -1281,7 +1326,14 @@ static _COMMON_VASRC_electrical _C_V_electrical(CC_STATIC);
 class CDISC_electrical : public NODE_TYPE {
   explicit CDISC_electrical(CDISC_electrical const& p ) : NODE_TYPE(p) {}
 public:
-  explicit CDISC_electrical() : NODE_TYPE("electrical") {}
+  explicit CDISC_electrical() : NODE_TYPE() {
+    set_label("electrical");
+    set_analog();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override {untested();
     return new CDISC_electrical(*this);
   }
@@ -1316,7 +1368,14 @@ static _COMMON_VASRC_magnetic _C_V_magnetic(CC_STATIC);
 class CDISC_magnetic : public NODE_TYPE {
   explicit CDISC_magnetic(CDISC_magnetic const& p ) : NODE_TYPE(p) {}
 public:
-  explicit CDISC_magnetic() : NODE_TYPE("magnetic") {}
+  explicit CDISC_magnetic() : NODE_TYPE() {
+    set_label("magnetic");
+    set_analog();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override {untested();
     return new CDISC_magnetic(*this);
   }
@@ -1351,7 +1410,14 @@ static _COMMON_VASRC_rotational_omega _C_V_rotational_omega(CC_STATIC);
 class CDISC_rotational_omega : public NODE_TYPE {
   explicit CDISC_rotational_omega(CDISC_rotational_omega const& p ) : NODE_TYPE(p) {}
 public:
-  explicit CDISC_rotational_omega() : NODE_TYPE("rotational_omega") {}
+  explicit CDISC_rotational_omega() : NODE_TYPE() {
+    set_label("rotational_omega");
+    set_analog();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override {untested();
     return new CDISC_rotational_omega(*this);
   }
@@ -1363,7 +1429,14 @@ public:
 class DDISC_logic : public NODE_TYPE {
   explicit DDISC_logic(DDISC_logic const& p ) : NODE_TYPE(p) {}
 public:
-  explicit DDISC_logic() : NODE_TYPE("logic") {}
+  explicit DDISC_logic() : NODE_TYPE() {
+    set_label("logic");
+    set_digital();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override{untested();
     return new DDISC_logic(*this);
   }
@@ -2059,6 +2132,27 @@ bool MOD_resistor::tr_needs_eval()const
   }
 };
 /*--------------------------------------------------------------------------*/
+bool MOD_resistor::do_tr()
+{
+  trace2("resistor::do_tr", long_label(), _sim->iteration_number());
+  clear_branch_contributions();
+  read_probes();
+  COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
+  assert(c);
+  set_converged();
+  c->tr_eval_analog(this);
+  set_branch_contributions();
+  assert(subckt());
+  set_converged(subckt()->do_tr() && converged());
+  return converged();
+}
+/*--------------------------------------------------------------------------*/
+inline void MOD_resistor::clear_branch_contributions()
+{
+    _value_b_p_n = 0.;
+    _st_b_p_n.clear();
+}
+/*--------------------------------------------------------------------------*/
 #if 0
 // tr_eval_branch _b_white_noise_1_p_
 static EVAL__b_white_noise_1_p__ Eval_(white_noise_1_p)(CC_STATIC);
@@ -2245,21 +2339,6 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
 }
 /*--------------------------------------------------------------------------*/
 #endif
-bool MOD_resistor::do_tr()
-{
-  trace2("resistor::do_tr", long_label(), _sim->iteration_number());
-  clear_branch_contributions();
-  read_probes();
-  COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
-  assert(c);
-  set_converged();
-  c->tr_eval_analog(this);
-  set_branch_contributions();
-  assert(subckt());
-  set_converged(subckt()->do_tr() && converged());
-  return converged();
-}
-/*--------------------------------------------------------------------------*/
 typedef MOD_resistor MOD__;
 inline void MOD_resistor::zero_filter_readout()
 {
@@ -2285,12 +2364,6 @@ inline void MOD_resistor::set_branch_contributions()
       }
     }
   // flow src (p, n)
-}
-/*--------------------------------------------------------------------------*/
-inline void MOD_resistor::clear_branch_contributions()
-{
-    _value_b_p_n = 0.;
-    _st_b_p_n.clear();
 }
 /*--------------------------------------------------------------------------*/
 typedef MOD_resistor::ddouble ddouble;
@@ -3596,6 +3669,27 @@ bool MOD_resistor::tr_needs_eval()const
   }
 };
 /*--------------------------------------------------------------------------*/
+bool MOD_resistor::do_tr()
+{
+  trace2("resistor::do_tr", long_label(), _sim->iteration_number());
+  clear_branch_contributions();
+  read_probes();
+  COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
+  assert(c);
+  set_converged();
+  c->tr_eval_analog(this);
+  set_branch_contributions();
+  assert(subckt());
+  set_converged(subckt()->do_tr() && converged());
+  return converged();
+}
+/*--------------------------------------------------------------------------*/
+inline void MOD_resistor::clear_branch_contributions()
+{
+    _value_b_p_n = 0.;
+    _st_b_p_n.clear();
+}
+/*--------------------------------------------------------------------------*/
 #if 0
 // tr_eval_branch _b_white_noise_0_p_
 static EVAL__b_white_noise_0_p__ Eval_(white_noise_0_p)(CC_STATIC);
@@ -3938,21 +4032,6 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
 }
 /*--------------------------------------------------------------------------*/
 #endif
-bool MOD_resistor::do_tr()
-{
-  trace2("resistor::do_tr", long_label(), _sim->iteration_number());
-  clear_branch_contributions();
-  read_probes();
-  COMMON_resistor const* c = prechecked_cast<COMMON_resistor const*>(common());
-  assert(c);
-  set_converged();
-  c->tr_eval_analog(this);
-  set_branch_contributions();
-  assert(subckt());
-  set_converged(subckt()->do_tr() && converged());
-  return converged();
-}
-/*--------------------------------------------------------------------------*/
 typedef MOD_resistor MOD__;
 inline void MOD_resistor::zero_filter_readout()
 {
@@ -3978,12 +4057,6 @@ inline void MOD_resistor::set_branch_contributions()
       }
     }
   // flow src (p, n)
-}
-/*--------------------------------------------------------------------------*/
-inline void MOD_resistor::clear_branch_contributions()
-{
-    _value_b_p_n = 0.;
-    _st_b_p_n.clear();
 }
 /*--------------------------------------------------------------------------*/
 typedef MOD_resistor::ddouble ddouble;
@@ -5948,7 +6021,45 @@ inline LOGICVAL to_logic_(int i)
   }
 }
 /*--------------------------------------------------------------------------*/
+class LNR {
+  const node_t& _ln;
+public:
+  explicit LNR(node_t const& ln) : _ln(ln) { };
+  operator int()const { return lptr()->lv_future(); }
+  LOGIC_NODE const* lptr()const {
+    LOGIC_NODE const* ln = prechecked_cast<LOGIC_NODE const*>(_ln.operator->());
+    assert(ln);
+    return ln;
+  }
+  NODE const* ptr()const { return _ln.operator->(); }
+  bool is_evt()const {incomplete(); return false;}
+  bool is_connected()const{
+    return _ln.e_() != INVALID_NODE;
+  }
+};
+/*--------------------------------------------------------------------------*/
+void accept_node_value(node_t& n, bool lv, double delay)
+{
+  node_l& nl = reinterpret_cast<node_l&>(n);
+  nl->set_mode(moDIGITAL); // assert?..
+  delay += 1e-20; // HACK
+
+  LOGICVAL lvl(lv?lvSTABLE1:lvSTABLE0);
+  if(nl->lv().is_unknown()){
+    nl->set_event(delay, lvl);
+  }else if(nl->lv_future() != lv){
+    nl->set_event(delay, lvl);
+  }else if(nl->final_time() > CKT_BASE::_sim->_time0){ untested();
+    // (hack)
+    nl->set_event(delay, lvl);
+  }else{ untested();
+  }
+    // nl->propagate();
+    // nl->set_quality(qGOOD);
+    // nl->improve_quality();
 }
+/*--------------------------------------------------------------------------*/
+} // va
 /*--------------------------------------------------------------------------*/
 LOGICVAL operator& (LOGICVAL const& a, LOGICVAL const& b)
 {
@@ -6175,7 +6286,14 @@ static _COMMON_VASRC_thermal _C_V_thermal(CC_STATIC);
 class CDISC_thermal : public NODE_TYPE {
   explicit CDISC_thermal(CDISC_thermal const& p ) : NODE_TYPE(p) {}
 public:
-  explicit CDISC_thermal() : NODE_TYPE("thermal") {}
+  explicit CDISC_thermal() : NODE_TYPE() {
+    set_label("thermal");
+    set_analog();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override {untested();
     return new CDISC_thermal(*this);
   }
@@ -6210,7 +6328,14 @@ static _COMMON_VASRC_electrical _C_V_electrical(CC_STATIC);
 class CDISC_electrical : public NODE_TYPE {
   explicit CDISC_electrical(CDISC_electrical const& p ) : NODE_TYPE(p) {}
 public:
-  explicit CDISC_electrical() : NODE_TYPE("electrical") {}
+  explicit CDISC_electrical() : NODE_TYPE() {
+    set_label("electrical");
+    set_analog();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override {untested();
     return new CDISC_electrical(*this);
   }
@@ -6245,7 +6370,14 @@ static _COMMON_VASRC_magnetic _C_V_magnetic(CC_STATIC);
 class CDISC_magnetic : public NODE_TYPE {
   explicit CDISC_magnetic(CDISC_magnetic const& p ) : NODE_TYPE(p) {}
 public:
-  explicit CDISC_magnetic() : NODE_TYPE("magnetic") {}
+  explicit CDISC_magnetic() : NODE_TYPE() {
+    set_label("magnetic");
+    set_analog();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override {untested();
     return new CDISC_magnetic(*this);
   }
@@ -6280,7 +6412,14 @@ static _COMMON_VASRC_rotational_omega _C_V_rotational_omega(CC_STATIC);
 class CDISC_rotational_omega : public NODE_TYPE {
   explicit CDISC_rotational_omega(CDISC_rotational_omega const& p ) : NODE_TYPE(p) {}
 public:
-  explicit CDISC_rotational_omega() : NODE_TYPE("rotational_omega") {}
+  explicit CDISC_rotational_omega() : NODE_TYPE() {
+    set_label("rotational_omega");
+    set_analog();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override {untested();
     return new CDISC_rotational_omega(*this);
   }
@@ -6292,7 +6431,14 @@ public:
 class DDISC_logic : public NODE_TYPE {
   explicit DDISC_logic(DDISC_logic const& p ) : NODE_TYPE(p) {}
 public:
-  explicit DDISC_logic() : NODE_TYPE("logic") {}
+  explicit DDISC_logic() : NODE_TYPE() {
+    set_label("logic");
+    set_digital();
+    if(node_dispatcher[short_label()]){
+    }else{
+      install();
+    }
+  }
   NODE_TYPE* clone()const override{untested();
     return new DDISC_logic(*this);
   }
@@ -6929,6 +7075,27 @@ bool MOD_capacitor::tr_needs_eval()const
   }
 };
 /*--------------------------------------------------------------------------*/
+bool MOD_capacitor::do_tr()
+{
+  trace2("capacitor::do_tr", long_label(), _sim->iteration_number());
+  clear_branch_contributions();
+  read_probes();
+  COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
+  assert(c);
+  set_converged();
+  c->tr_eval_analog(this);
+  set_branch_contributions();
+  assert(subckt());
+  set_converged(subckt()->do_tr() && converged());
+  return converged();
+}
+/*--------------------------------------------------------------------------*/
+inline void MOD_capacitor::clear_branch_contributions()
+{
+    _value_b_p_n = 0.;
+    _st_b_p_n.clear();
+}
+/*--------------------------------------------------------------------------*/
 #if 0
 // tr_eval_branch _b_ddt_1_p_
 static EVAL__b_ddt_1_p__ Eval_(ddt_1_p)(CC_STATIC);
@@ -6977,21 +7144,6 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
 }
 /*--------------------------------------------------------------------------*/
 #endif
-bool MOD_capacitor::do_tr()
-{
-  trace2("capacitor::do_tr", long_label(), _sim->iteration_number());
-  clear_branch_contributions();
-  read_probes();
-  COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
-  assert(c);
-  set_converged();
-  c->tr_eval_analog(this);
-  set_branch_contributions();
-  assert(subckt());
-  set_converged(subckt()->do_tr() && converged());
-  return converged();
-}
-/*--------------------------------------------------------------------------*/
 typedef MOD_capacitor MOD__;
 inline void MOD_capacitor::zero_filter_readout()
 {
@@ -7011,12 +7163,6 @@ inline void MOD_capacitor::set_branch_contributions()
       }
     }
   // flow src (p, n)
-}
-/*--------------------------------------------------------------------------*/
-inline void MOD_capacitor::clear_branch_contributions()
-{
-    _value_b_p_n = 0.;
-    _st_b_p_n.clear();
 }
 /*--------------------------------------------------------------------------*/
 typedef MOD_capacitor::ddouble ddouble;
@@ -8157,6 +8303,28 @@ bool MOD_capacitor::tr_needs_eval()const
   }
 };
 /*--------------------------------------------------------------------------*/
+bool MOD_capacitor::do_tr()
+{
+  trace2("capacitor::do_tr", long_label(), _sim->iteration_number());
+  clear_branch_contributions();
+  read_probes();
+  COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
+  assert(c);
+  set_converged();
+  c->tr_eval_analog(this);
+  set_branch_contributions();
+  assert(subckt());
+  set_converged(subckt()->do_tr() && converged());
+  return converged();
+}
+/*--------------------------------------------------------------------------*/
+inline void MOD_capacitor::clear_branch_contributions()
+{
+    _pot_b_p_n = false;
+    _value_b_p_n = 0.;
+    _st_b_p_n.clear();
+}
+/*--------------------------------------------------------------------------*/
 #if 0
 // tr_eval_branch _b_ddt_2_p_
 static EVAL__b_ddt_2_p__ Eval_(ddt_2_p)(CC_STATIC);
@@ -8205,21 +8373,6 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
 }
 /*--------------------------------------------------------------------------*/
 #endif
-bool MOD_capacitor::do_tr()
-{
-  trace2("capacitor::do_tr", long_label(), _sim->iteration_number());
-  clear_branch_contributions();
-  read_probes();
-  COMMON_capacitor const* c = prechecked_cast<COMMON_capacitor const*>(common());
-  assert(c);
-  set_converged();
-  c->tr_eval_analog(this);
-  set_branch_contributions();
-  assert(subckt());
-  set_converged(subckt()->do_tr() && converged());
-  return converged();
-}
-/*--------------------------------------------------------------------------*/
 typedef MOD_capacitor MOD__;
 inline void MOD_capacitor::zero_filter_readout()
 {
@@ -8246,13 +8399,6 @@ inline void MOD_capacitor::set_branch_contributions()
   }else{
     unset_pot_source(_b_p_n); // AA
   }
-}
-/*--------------------------------------------------------------------------*/
-inline void MOD_capacitor::clear_branch_contributions()
-{
-    _pot_b_p_n = false;
-    _value_b_p_n = 0.;
-    _st_b_p_n.clear();
 }
 /*--------------------------------------------------------------------------*/
 typedef MOD_capacitor::ddouble ddouble;

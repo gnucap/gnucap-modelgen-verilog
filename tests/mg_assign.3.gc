@@ -1,0 +1,45 @@
+attach ./modelgen_2.so
+load vams/vpulse.so
+// options method=euler
+// options trtol=1
+
+verilog
+
+`modelgen test_assign_3
+module clock(out, en);
+  output out;
+  input en;
+  logic out, en;
+  assign #15 out = !(out & en);
+endmodule
+module latch(q, r, s)
+	input r, s;
+	output q;
+	logic q, r, s;
+	assign #2 q = r & ( ( q & r & s ) | !s );
+endmodule
+`endmodelgen
+
+list
+
+!make test_assign_3.so > /dev/null
+attach ./test_assign_3.so
+
+clock #() c1(clk, en);
+vpulse #(.val0(0), .val1(5)) en1(en, \0 );
+
+vpulse #(.val0(0), .val1(5), .width(.25n), .td(.5n), .period(.3n)) er(r, \0 );
+vpulse #(.val0(0), .val1(5), .width(.25n), .td(40p), .period(.3n)) es(s, \0 );
+latch l1(q, r, s);
+
+// kludge
+.model logic logic delay=10p
+
+print op v(nodes) l(nodes)
+op
+
+print tran l(nodes) v(nodes)
+print tran l(nodes) v(en) v(q r s)
+
+tran 2n basic trace=a
+status notime

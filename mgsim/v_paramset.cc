@@ -25,6 +25,7 @@
 #include <e_node.h>
 #include <e_paramlist.h>
 #include <e_hsparam.h>
+#include <e_node_type.h>
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
@@ -147,7 +148,7 @@ private:
 
 private:
   void precalc_first() override;
-  void build_sckt(COMPONENT*);
+  void expand_first()override;
   void expand()override;
   CARD* deflate()override;
   void map_nodes()override { untested(); /*no-op*/ }
@@ -571,11 +572,54 @@ CARD* PARAMSET::deflate()
   return deflated;
 } // PARAMSET::deflate
 /*--------------------------------------------------------------------------*/
+void PARAMSET::expand_first()
+{
+  assert(is_device());
+  BASE_SUBCKT::expand_first();
+  trace2("PARAMSET::expand_first", long_label(), net_nodes());
+  assert(common());
+  auto proto = prechecked_cast<COMPONENT const*>(_parent);
+  // assert(proto->owner() == nullptr);
+  assert(proto);
+  assert(proto->scope());
+  assert(proto->subckt());
+  assert(_parent->_dev);
+
+  // renew_subckt(_parent, ... ) dev=sckt()->..?
+  CARD* d = _parent->_dev->clone_instance();
+  assert(d);
+  auto dev = prechecked_cast<COMPONENT*>(d);
+  assert(dev);
+
+  dev->set_owner(this);
+  if(net_nodes() == dev->net_nodes()){
+  }else if(net_nodes()){
+    static std::string dummy;
+    trace2("dummynode", long_label(), net_nodes());
+
+    // make sure the nodes are allocated within dev.
+    dev->set_port_by_index(net_nodes()-1, dummy);
+  }else{ untested();
+  }
+  assert(net_nodes() == dev->net_nodes());
+  for(int i = 0; i < net_nodes(); ++i) {
+    NODE* n = dev->n_(i).n_();
+    if(dynamic_cast<NODE_TYPE const*>(n)){ untested();
+      n_(i).set_type(n); untested();
+    }else if(n){ untested();
+    }else{
+    }
+  }
+  subckt()->push_back(d);
+}
+/*--------------------------------------------------------------------------*/
 void PARAMSET::expand()
 {
-  if(!is_device()){ untested();
-    // not a device, not expandable.
-  }else{
+  assert(is_device());
+  if(subckt()->size()==1) {
+    CARD* b = *subckt()->begin();
+    COMPONENT* dev = prechecked_cast<COMPONENT*>(b);
+    assert(dev);
     BASE_SUBCKT::expand();
     trace2("PARAMSET::expand", long_label(), net_nodes());
     assert(common());
@@ -602,32 +646,11 @@ void PARAMSET::expand()
 
     subckt()->attach_params(&(c->_params), scope());
 
-    // renew_subckt(_parent, ... ) dev=sckt()->..?
-    CARD* d = _parent->_dev->clone_instance();
-    assert(d);
-    auto dev = prechecked_cast<COMPONENT*>(d);
-    assert(dev);
-
-#if 1
-    dev->set_owner(this);
-    if(net_nodes() == dev->net_nodes()){
-    }else if(net_nodes()){
-      static std::string dummy;
-      trace2("dummynode", long_label(), net_nodes());
-
-      // make sure the nodes are allocated within dev.
-      dev->set_port_by_index(net_nodes()-1, dummy);
-    }else{ untested();
-    }
-    assert(net_nodes() == dev->net_nodes());
-#endif
-
     trace4("PARAMSET::expand sp0", long_label(), net_nodes(), dev->net_nodes(), typeid(*dev).name());
 
     dev->set_parameters("_", this, dev->mutable_common(),
 		     /*Value*/ 0., /*states*/ 0, NULL,
 		     net_nodes(), _n);
-    subckt()->push_back(d);
     assert(dev->owner() == this);
 
     {
@@ -662,7 +685,6 @@ void PARAMSET::expand()
     }
 
     assert(subckt()->size()==1);
-    assert(dev==d);
 
     if(0){ untested();
       // cannot deflate yet
@@ -690,6 +712,8 @@ void PARAMSET::expand()
       // TODO: seems to be the wrong place. see mg_bug.1.gc
       throw Exception("invalid prototype for " + long_label());
     }
+  }else{
+    unreachable();
   }
 } // expand
 /*--------------------------------------------------------------------------*/

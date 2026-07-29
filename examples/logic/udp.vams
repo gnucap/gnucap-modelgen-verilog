@@ -1,0 +1,26 @@
+
+discipline logic
+  domain discrete;
+enddiscipline
+
+primitive myand (y, a, b);
+  output out;
+  input in0;
+  input in1;
+  table
+   0 0: 0;
+   1 0: 0;
+   0 1: 0;
+   1 1: 1;
+  endtable
+endprimitive;
+
+module rise(out, in);
+  logic in;
+  logic out;
+  input in;
+  output out;
+  inv #(.delay(17)) i1(p1, in);
+  myand #(.delay(17)) i2(out, p1, in);
+endmodule
+

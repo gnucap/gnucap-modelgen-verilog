@@ -103,14 +103,12 @@ static void make_cc_eval(std::ostream& o, const Primitive& p)
   o__ "assert(incount < " << p.net_nodes() << ");\n";
   o__ "std::bitset<" << p.net_nodes() - 1 << "> in0, in1, inx;\n";
   o__ "for(int i=0; i<incount; ++i){\n";
-  o____ "if(p[i]->lv() == lvSTABLE0) {\n";
-  o______ "in0[i] = 1;\n";
-  o____ "}else if(p[i]->lv() == lvSTABLE1) {\n";
-  o______ "in1[i] = 1;\n";
-  o____ "}else if(p[i]->lv() == lvUNKNOWN) {\n";
+  o____ "if(p[i]->lv().is_unknown()) {\n";
   o______ "inx[i] = 1;\n";
+  o____ "}else if(p[i]->lv_future()) {\n";
+  o______ "in1[i] = 1;\n";
   o____ "}else{\n";
-  o______ "incomplete();\n";
+  o______ "in0[i] = 1;\n";
   o____ "}\n";
   o__ "}\n";
 

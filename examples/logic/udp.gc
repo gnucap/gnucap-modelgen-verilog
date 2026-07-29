@@ -1,0 +1,14 @@
+load mgsim
+load vams/vpulse.so
+load ./udp.so
+options nowarn
+verilog
+
+`include logic
+
+ground gnd;
+vpulse #(.val0(0), .val1(3), .width(1n), .td(1n)) v1(pulse, gnd);
+rise r1(edg, pulse);
+
+print tran v(pulse) l(edg) v(edg)
+tran 10n

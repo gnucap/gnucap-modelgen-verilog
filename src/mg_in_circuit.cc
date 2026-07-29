@@ -170,6 +170,11 @@ void Net_Declarations::parse(CS& f)
 
     d = m;
 
+  }else if(f.umatch("reg ")){
+    auto m = new Net_Decl_List_Reg();
+    m->set_owner(owner());
+    f >> *m;
+    d = m;
   }else if(f.umatch("ground ")){
     auto m = new Net_Decl_List_Ground();
     m->set_owner(owner());
@@ -193,9 +198,49 @@ void Net_Declarations::parse(CS& f)
   }
 }
 /*--------------------------------------------------------------------------*/
+// 3.6.4 Ground declaration
+// Each ground declaration is associated with an already declared net of continuous discipline. The node asso-
+// ciated with the net will be the global reference node in the circuit. The net must be assigned a continuous
+// discipline to be declared ground.
+void Net_Decl_List_Ground::parse(CS& f)
+{
+  return Net_Decl_List::parse_n_<Net_Identifier_Ground>(f);
+}
+/*--------------------------------------------------------------------------*/
 void Net_Decl_List_Ground::dump(std::ostream& o) const
 {
   o__ "ground ";
+  Net_Decl_List::dump(o);
+  o << "\n";
+}
+/*--------------------------------------------------------------------------*/
+void Net_Decl_Reg::parse(CS& f)
+{
+  assert(owner());
+  Net_Identifier::parse(f);
+  Module* mod = prechecked_cast<Module*>(owner());
+  assert(mod);
+  Node_Ref const& nn = owner()->node(name());
+  if(nn) {
+    set_node(mod->node(nn));
+  }else{ untested();
+    throw Exception_CS_("ground: need previously declared net", f);
+  }
+
+  Module* m = prechecked_cast<Module*>(owner());
+  assert(m);
+  assert(node());
+  m->set_reg(node());
+}
+/*--------------------------------------------------------------------------*/
+void Net_Decl_List_Reg::parse(CS& f)
+{
+  return Net_Decl_List::parse_n_<Net_Decl_Reg>(f);
+}
+/*--------------------------------------------------------------------------*/
+void Net_Decl_List_Reg::dump(std::ostream& o) const
+{
+  o__ "reg ";
   Net_Decl_List::dump(o);
   o << "\n";
 }
@@ -218,7 +263,7 @@ void Net_Decl_Dir::parse(CS& f)
   Net_Identifier::parse(f);
 
   assert(owner());
-  incomplete();
+  // incomplete(); but not in use yet.
 //  set_dir(owner()->set_dir(name()));
 }
 /*--------------------------------------------------------------------------*/

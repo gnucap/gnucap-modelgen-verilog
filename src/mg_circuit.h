@@ -73,6 +73,11 @@ public:
    void parse(CS& f)override;
 };
 /*--------------------------------------------------------------------------*/
+class Net_Decl_Reg : public Net_Identifier {
+public:
+   void parse(CS& f)override;
+};
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class Port_1 : public Base {
   std::string _name;
@@ -512,6 +517,20 @@ public: //TODO
 inline Circuit::Circuit()
 {
 }
+/*--------------------------------------------------------------------------*/
+class Net_Decl_List_Ground : public Net_Decl_List {
+public:
+  explicit Net_Decl_List_Ground() : Net_Decl_List() {}
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+};
+/*--------------------------------------------------------------------------*/
+class Net_Decl_List_Reg : public Net_Decl_List {
+public:
+  explicit Net_Decl_List_Reg() : Net_Decl_List() {}
+  void parse(CS& f)override;
+  void dump(std::ostream& f)const override;
+};
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

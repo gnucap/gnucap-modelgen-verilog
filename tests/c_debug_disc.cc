@@ -28,6 +28,7 @@
 #include "u_nodemap.h"
 #include "u_sim_data.h"
 #include "e_usernode.h"
+#include "e_node_type.h"
 #include <iostream>
 #include <string>
 /*--------------------------------------------------------------------------*/
@@ -37,7 +38,8 @@ class CMD_DISCIPLINES : public CMD {
     outset(cmd, &o);
 
     for(std::pair<std::string, CKT_BASE*> dd : node_dispatcher) {
-      if(dd.second){
+      auto t = dynamic_cast<NODE_TYPE const*>(dd.second);
+      if(t && t->domain()){
 	auto n = prechecked_cast<NODE const*>(dd.second);
 	assert(n);
 	o << "discipline " << dd.first << ";\n";

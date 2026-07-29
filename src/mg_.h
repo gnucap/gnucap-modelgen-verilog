@@ -222,12 +222,6 @@ public:
   void set_discipline(Discipline const* d){_disc = d;}
 };
 /*--------------------------------------------------------------------------*/
-class Net_Decl_List_Ground : public Net_Decl_List {
-public:
-  void parse(CS& f)override;
-  void dump(std::ostream& f)const override;
-};
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class Arg : public Base {
   String_Arg _identifier;
@@ -331,6 +325,7 @@ class Node : public Base {
   mutable int _use{0};
   std::vector<Element_2 const*> _fanout;
   Token_NODE* _token{nullptr};
+  bool _is_reg{false};
 public:
 //  explicit Node(int n) : _number(n){ assert(!n); _next=this; }
   explicit Node(CS&) { untested(); unreachable();}
@@ -351,6 +346,7 @@ public:
   void set_discipline(Discipline const* d) {_discipline = d;}
 
   void set_to_ground(Module*);
+  void set_reg(Module*);
   void set_to(Node*);
   void set_to(Node const* n, std::string condition) {
     assert(!_short_to);
@@ -361,6 +357,7 @@ public:
   Discipline const* discipline() const{  return _discipline; }
   Nature const* nature() const{ untested(); return _nature; }
 public:
+  bool is_reg()const;
   bool is_used()const;
   void inc_use()const { untested();++_use;}
   void dec_use()const { untested();assert(_use); --_use;}

@@ -1,0 +1,5 @@
+// logic kluge.
+// will be replaced by disciplines and connectrules
+
+.model logic logic delay=1p vmax=3
+`default_discipline logic

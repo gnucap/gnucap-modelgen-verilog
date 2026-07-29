@@ -52,11 +52,11 @@ public:
   explicit	DEV_LOGIC(const DEV_LOGIC& p);
 		~DEV_LOGIC()		{--_count;}
 private: // override virtuals
-  char	   id_letter()const override	{return 'U';}
-  std::string value_name()const override{return "";}
-  bool	      print_type_in_spice()const override{return true;}
+  char	   id_letter()const override	{ untested();return 'U';}
+  std::string value_name()const override{ untested();return "";}
+  bool	      print_type_in_spice()const override{ untested();return true;}
   std::string dev_type()const override{assert(has_common()); return common()->name();}
-  int	   tail_size()const override {return 2;}
+  int	   tail_size()const override { untested();return 2;}
   int	   max_nodes()const override {return PORTS_PER_GATE;}
   int	   min_nodes()const override {return BEGIN_IN+1;}
   int	   matrix_nodes()const override	{ untested();return 2;}
@@ -239,9 +239,9 @@ void DEV_LOGIC::tr_begin()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_restore()
-{untested();
+{
   ELEMENT::tr_restore();
-  if (!subckt()) {untested();
+  if (!subckt()) {
     _gatemode = moDIGITAL;
   }else{untested();
     _gatemode = (OPT::mode==moMIXED) ? moANALOG : OPT::mode;
@@ -350,7 +350,7 @@ bool DEV_LOGIC::tr_needs_eval()const
   case moMIXED:   unreachable(); break;
   case moDIGITAL:
     //assert(!is_q_for_eval());
-    if (_sim->analysis_is_restore()) {untested();
+    if (_sim->analysis_is_restore()) {
     }else if (_sim->analysis_is_static()) {
     }else{
     }
@@ -378,7 +378,7 @@ void DEV_LOGIC::tr_queue_eval()
 bool DEV_LOGIC::tr_eval_digital()
 {
   assert(_gatemode == moDIGITAL);
-  if (_sim->analysis_is_restore()) {untested();
+  if (_sim->analysis_is_restore()) {
   }else if (_sim->analysis_is_static()) {
   }else{
   }
@@ -534,7 +534,7 @@ void DEV_LOGIC::tr_accept()
     }else{
     }
     assert(_gatemode == moDIGITAL);
-    if (_sim->analysis_is_restore()) {untested();
+    if (_sim->analysis_is_restore()) {
     }else if (_sim->analysis_is_static()) {
     }else{
     }

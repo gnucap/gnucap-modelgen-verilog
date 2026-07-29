@@ -1,0 +1,8 @@
+verilog
+
+module test(a,b,c,d);
+  electrical a,b,c,d;
+  inout a,b,c,d;
+endmodule
+
+list

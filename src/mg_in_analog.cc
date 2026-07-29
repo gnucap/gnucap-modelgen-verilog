@@ -856,7 +856,7 @@ void AnalogSwitchStmt::parse(CS& f)
     }
   }
   if(!have_default()){
-    incomplete();
+    // incomplete(); but not here. see above.
   }else{
   }
   //sb->add_block(&_body); // re-use var_ref?

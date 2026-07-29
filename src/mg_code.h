@@ -338,6 +338,7 @@ public:
   void parse(CS& f)override;
   void dump(std::ostream& o)const override;
   Base const* value() const;
+  bool is_literal()const{ return _e.is_literal(); }
 };
 /*--------------------------------------------------------------------------*/
 class Sensitivities;

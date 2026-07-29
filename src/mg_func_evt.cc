@@ -261,7 +261,7 @@ private:
     o______ "(void)enable;\n";
     o______ "(void)expr_tol;\n";
     o______ "_in[0] = input;\n";
-    o______ "return false;\n"; // ?
+    o______ "return false; // ?\n"; // ?
     o____ "}\n";
     o____ "bool precalc(" << args(o) << ") {\n";
     o______ "(void)d;\n";

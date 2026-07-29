@@ -25,6 +25,7 @@
 #include "c_comand.h"
 #include "e_subckt.h"
 #include "e_node_type.h"
+#include "e_model.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -42,6 +43,11 @@ namespace {
 */
 /*--------------------------------------------------------------------------*/
 class CMD_CONNECTRULES : public CMD {
+  class CR_ENV : public MODEL_SUBCKT {
+  public:
+    explicit CR_ENV(COMPONENT* c) : MODEL_SUBCKT(c) {}
+  };
+
   void do_it(CS& cmd, CARD_LIST* Scope)override {
     BASE_SUBCKT* new_cr = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("connectrules"));
     assert(new_cr);
@@ -51,16 +57,16 @@ class CMD_CONNECTRULES : public CMD {
     assert(!new_cr->is_device());
     try {
       parse_connectrules(cmd, new_cr);
-      Scope->push_back(new_cr);
+      Scope->push_back(new CR_ENV(new_cr));
       OPT::connect_rules = new_cr;
-    }catch(Exception const& e) { untested();
+    }catch(Exception const& e) {
       cmd.warn(bDANGER, e.message());
-      for (;;) { untested();
+      for (;;) {
 	cmd.getline("verilog-connect>");
 
-	if (cmd >> "endconnectrules ") { untested();
+	if (cmd >> "endconnectrules ") {
 	  break;
-	}else{ untested();
+	}else{
 	}
       }
       delete new_cr;
@@ -225,7 +231,7 @@ void CMD_CONNECTRULES::parse_connectrules(CS& cmd, BASE_SUBCKT* cr) const
     cmd.getline("cr>");
   }
   if(cmd >> "endconnectrules "){
-  }else{ untested();
+  }else{
     throw Exception_CS("expecting endconnectrules", cmd);
   }
 }
