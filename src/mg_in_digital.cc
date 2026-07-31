@@ -214,111 +214,10 @@ static Base* parse_stmt_or_null(CS& file, Block* scope)
   return ret;
 }
 /*--------------------------------------------------------------------------*/
-static Base* parse_stmt(CS& file, Block* owner)
+Base* DigitalSeqBlock::parse_stmt_or_null(CS& f, Block* b) const
 {
-  size_t here = file.cursor();
-  Base* a = parse_stmt_or_null(file, owner);
-  if(file.stuck(&here)) { untested();
-    delete a;
-    trace1("what?", file.tail().substr(0,20));
-    throw Exception_CS_("what's this?", file);
-    file.reset_fail(here);
-    return nullptr;
-  }else{
-    return a;
-  }
+  return ::parse_stmt_or_null(f, b);
 }
-/*--------------------------------------------------------------------------*/
-void DigitalConditionalStmt::parse(CS& f)
-{ untested();
-  assert(owner());
-  //_cond.set_owner(owner());
-  _cond.set_owner(this);
-  _body.set_owner(this);
-  assert(!_body.is_always());
-  assert(!_body.is_never());
-  _false_part.set_owner(this);
-
-  if(f >> "(" >> _cond >> ")"){ untested();
-  }else{ untested();
-    throw Exception_CS_("expecting conditional", f);
-  }
-
-  { untested();
-    if(is_never()) { untested();
-      _body.set_never();
-      _false_part.set_never();
-    }else if(_cond.is_true()) { untested();
-      if(is_always()) { untested();
-	_body.set_always();
-      }else{ untested();
-      }
-      _false_part.set_never();
-    }else if(_cond.is_false()) { untested();
-      if(is_always()) { untested();
-	_false_part.set_always();
-      }else{ untested();
-      }
-      _body.set_never();
-    }else{ untested();
-    }
-
-    if(f >> _body){ untested();
-    }else{ untested();
-      throw Exception_CS_("expecting statement", f);
-    }
-    size_t here = f.cursor();
-    if(f >> "else "){ untested();
-      f >> _false_part;
-    }else{ untested();
-      f.reset(here);
-    }
-  }
-}
-/*--------------------------------------------------------------------------*/
-void DigitalConditionalStmt::dump(std::ostream& o) const
-{ untested();
-  bool omit_true = !options().dump_unreachable() && _cond.is_false();
-  bool omit_false = !options().dump_unreachable() && _cond.is_true();
-  bool omit_cond = omit_true || omit_false;
-
-  if(omit_cond) { untested();
-  }else{ untested();
-    o__ "if (" << _cond << ") ";
-  }
-
-  if(omit_true) { untested();
-  }else if(omit_cond){ untested();
-    o__ "";
-    _body.dump(o);
-  }else{ untested();
-    _body.dump(o);
-  }
-
-  if(omit_false){ untested();
-  }else if(_false_part){ untested();
-    if(omit_true){ untested();
-    }else{ untested();
-      o__ "else ";
-    }
-    if(omit_cond){ untested();
-      o__ "";
-    }else{ untested();
-    }
-    _false_part.dump(o);
-  }else{ untested();
-  }
-}
-/*--------------------------------------------------------------------------*/
-bool DigitalConditionalStmt::is_used_in(Base const* b) const
-{ untested();
-  if (_cond.is_used_in(b)){ untested();
-    return true;
-  }else{ untested();
-    return CtrlStmt::is_used_in(b);
-  }
-}
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void DigitalCtrlStmt::parse(CS& f)
 { untested();
@@ -725,60 +624,6 @@ void DigitalSeqStmt::parse(CS& f)
 void DigitalSeqStmt::submit_variable_access(Variable_Access& va) const
 { untested();
   va &= block().variable_access();
-}
-/*--------------------------------------------------------------------------*/
-void DigitalSeqBlock::parse(CS& f)
-{
-  assert(owner());
-  bool begin = f >> "begin ";
-  if(begin){
-    // DigitalSeqBlock::parse(f); // _variables...
-    SeqBlock::parse(f); // _variables...
-  }else{
-  }
-  if(dynamic_cast<Module const*>(owner())) { untested();
-    set_always();
-  }else if(dynamic_cast<Module const*>(scope())) {
-    set_always();
-  }else if(auto sb = dynamic_cast<SeqBlock*>(scope())) {
-    sb->add_block(this); // re-use var_ref?
-  }else if(dynamic_cast<Statement const*>(owner())) { untested();
-  }else{ untested();
-    assert(0);
-    unreachable();
-  }
-  for (;begin;) {
-    trace1("DigitalSeqBlock::parse loop", f.tail().substr(0,20));
-    if(f >> "end "){
-      trace0("DigitalSeqBlock::parse, end");
-      if(f.peek() == ';') { untested();
-	f.warn(bWARNING, "stray semicolon\n");
-	f.skip();
-      }else{
-      }
-      break;
-    }else{
-    }
-    Base* s = parse_stmt(f, this);
-    if(!s){ untested();
-      throw Exception_CS_("bad digital block", f);
-    }else{
-      push_back(s);
-    }
-  }
-  if(!begin){
-    Base* b = parse_stmt_or_null(f, this);
-    if(!f) {
-      assert(!b);
-    }else if(b){
-      push_back(b);
-    }else{ untested();
-      delete b;
-    }
-  }else{
-  }
-
-  variable_access().collect(this);
 }
 /*--------------------------------------------------------------------------*/
 #if 1

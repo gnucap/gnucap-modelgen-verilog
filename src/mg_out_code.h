@@ -24,12 +24,13 @@
 /*--------------------------------------------------------------------------*/
 #include "mg_expression.h"
 #include "mg_out.h"
-#include "mg_out_code.h"
 /*--------------------------------------------------------------------------*/
 class Variable_Decl;
 class Token_VAR_REF;
 class System_Task;
 class Expression;
+class ConditionalStmt;
+class SeqBlock;
 /*--------------------------------------------------------------------------*/
 class OUT_CODE {
   virtual bool is_dynamic()const {return false;}
@@ -44,6 +45,8 @@ protected:
   std::string make_cc_expression(std::ostream& o, Expression const& e, bool=false)const {
     return ::make_cc_expression(o, e, !is_precalc(), ctx());
   }
+  void make_cond(std::ostream& o, ConditionalStmt const& s)const;
+  virtual void make_seq_block(std::ostream& o, SeqBlock const& s)const = 0;
 private:
   virtual std::string ctx()const = 0;
 }; // OUT_CODE

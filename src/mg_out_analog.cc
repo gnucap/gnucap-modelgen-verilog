@@ -96,7 +96,7 @@ private:
   void make_for        (std::ostream& o, AnalogForStmt const& s)const;
   void make_while      (std::ostream& o, AnalogWhileStmt const& s)const;
   void make_seq        (std::ostream& o, AnalogSeqStmt const& s)const;
-  void make_ctrl       (std::ostream& o, AnalogSeqBlock const& s)const;
+  void make_ctrl       (std::ostream& o, SeqBlock const& s)const;
   void make_assignment (std::ostream& o, Assignment const& a)const;
   void make_contrib    (std::ostream& o, Contribution const& C)const;
   void make_evt        (std::ostream& o, AnalogEvtCtlStmt const& s)const;
@@ -107,7 +107,7 @@ private:
 private:
   void make_block_variables(std::ostream& o, Variable_Stmt const&)const;
   void make_real_variable  (std::ostream& o, Token_VAR_DECL const&)const;
-  void make_seq_block      (std::ostream& o, AnalogSeqBlock const&)const;
+  void make_seq_block      (std::ostream& o, SeqBlock const&)const override;
 }; // OUT_ANALOG
 /*--------------------------------------------------------------------------*/
 static void make_int_variable(std::ostream& o, Token_VAR_DECL const& v)
@@ -680,6 +680,7 @@ void OUT_ANALOG::make_initial(std::ostream& o, AnalogInitialStmt const& s) const
   }
 }
 /*--------------------------------------------------------------------------*/
+// DUP
 void OUT_ANALOG::make_cond(std::ostream& o, AnalogConditionalStmt const& s) const
 {
   o__ "{\n";
@@ -719,7 +720,7 @@ void OUT_ANALOG::make_cond(std::ostream& o, AnalogConditionalStmt const& s) cons
   o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
-static void make_cond_expressions(std::ostream& o, AnalogConstExpressionList const&l)
+static void make_cond_expressions(std::ostream& o, ConstExpressionList const&l)
 {
   std::string paren="";
   for(auto e : l){
@@ -792,7 +793,8 @@ void OUT_ANALOG::make_switch(std::ostream& o, AnalogSwitchStmt const& s) const
   o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_ctrl(std::ostream& o, AnalogSeqBlock const& s) const
+//DUP
+void OUT_ANALOG::make_ctrl(std::ostream& o, SeqBlock const& s) const
 {
   make_seq_block(o, s);
 }
@@ -802,7 +804,7 @@ void OUT_ANALOG::make_seq(std::ostream& o, AnalogSeqStmt const& s) const
   return make_seq_block(o, s.block());
 }
 /*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_seq_block(std::ostream& o, AnalogSeqBlock const& s) const
+void OUT_ANALOG::make_seq_block(std::ostream& o, SeqBlock const& s) const
 {
   if(s.has_identifier()) {
     o__ "{ // : " << s.identifier() << "\n";

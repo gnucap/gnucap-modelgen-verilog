@@ -56,8 +56,6 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class DigitalSeqBlock : public SeqBlock {
-protected: // BUG?
-  TData _deps;
 public:
   explicit DigitalSeqBlock() : SeqBlock((Block*)nullptr) {}
   explicit DigitalSeqBlock(CS& cmd, Statement* owner) : SeqBlock(owner) { untested();
@@ -65,24 +63,12 @@ public:
     parse(cmd);
   }
 public:
-  void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
-  SeqBlock const& block()const {
-    return *this;
-  }
-public: // sensitivities?
-//  void set_never() { untested(); _block.set_never(); }
-//  void set_always() { untested(); _block.set_always(); }
-//  bool is_never()const { untested();return _block.is_never() ;}
-//  bool is_reachable()const { untested();return _block.is_reachable() ;}
-//  bool is_always()const { untested();return _block.is_always() ;}
-//  void set_sens(Base* s) { untested();_block.set_sens(s);}
-//  void clear_vars();
-
-  TData const& deps(){ return _deps;};
-  TData const& deps()const { return _deps;};
+  SeqBlock const& block()const { return *this; }
   operator bool()const{ return size() || identifier() !=""; }
   void set_owner(Statement* owner);
+protected:
+  Base* parse_stmt_or_null(CS& file, Block* scope)const override;
 }; // DigitalSeqBlock
 /*--------------------------------------------------------------------------*/
 class DigitalSeqStmt : public DigitalStmt {
@@ -184,6 +170,8 @@ public:
   bool is_used_in(Base const* b)const override;
   void submit_variable_access(Variable_Access& va)const override;
   // TODO bool propagate_rdep(Base const*) override; // block unused tags.
+private:
+  SeqBlock* make_block()const override {return new DigitalSeqBlock();}
 }; // DigitalEvtCtlStmt
 typedef Collection<DigitalEvtCtlStmt> Digital_Events;
 /*--------------------------------------------------------------------------*/
@@ -292,29 +280,20 @@ public:
 }; // DigitalSwitchStmt
 #endif
 /*--------------------------------------------------------------------------*/
-class DigitalConditionalStmt : public DigitalCtrlStmt {
-  DigitalConstExpression _cond; // Const?
-  DigitalSeqBlock _false_part;
+class DigitalConditionalStmt : public ConditionalStmt {
 public:
-  explicit DigitalConditionalStmt(Block* o, CS& file) { untested();
+  explicit DigitalConditionalStmt(Block* o, CS& f)
+    : ConditionalStmt() {
     set_owner(o);
-    parse(file);
+    parse(f);
   }
-/*--------------------------------------------------------------------------*/
-  ~DigitalConditionalStmt(){ untested(); }
-public:
-  void parse(CS& file) override;
-  void dump(std::ostream& o)const override;
-  DigitalConstExpression const& conditional() const{ untested();return _cond;}
-  const DigitalSeqBlock& true_part() const{ untested(); return _body; }
-  const DigitalSeqBlock& false_part() const{ untested(); return _false_part; }
-  bool is_used_in(Base const*)const override;
-  bool update()override { untested();
-    bool ret = _false_part.update();
-    return DigitalCtrlStmt::update() || ret;
+  ~DigitalConditionalStmt() {}
+private:
+  SeqBlock* make_block()const override {return new DigitalSeqBlock();}
+  void new_block() override {
+    CtrlStmt::new_block();
+    _false_part = make_block();
   }
-
-  TData const& deps()const override{ return _cond.data(); } // ?
 }; // DigitalConditionalStmt
 /*--------------------------------------------------------------------------*/
 class DigitalWhileStmt : public DigitalCtrlStmt {
@@ -334,6 +313,8 @@ public:
   virtual Base const& tail() const{ untested(); return _cond; }
 private:
   bool update()override;
+private:
+  SeqBlock* make_block()const override {return new DigitalSeqBlock();}
 };
 /*--------------------------------------------------------------------------*/
 class DigitalForStmt : public DigitalWhileStmt {

@@ -171,6 +171,45 @@ void OUT_CODE::make_one_local_var(std::ostream& o, Variable_Decl const& V) const
   }
 }
 /*--------------------------------------------------------------------------*/
+void OUT_CODE::make_cond(std::ostream& o, ConditionalStmt const& s) const
+{
+  o__ "{\n";
+  if(s.conditional().is_true()) {
+    if(s.true_part()) {
+      indent y;
+      make_seq_block(o, s.true_part());
+    }else{ untested();
+    }
+  }else if(s.conditional().is_false()){
+    if(s.false_part()) {
+      indent y;
+      make_seq_block(o, s.false_part());
+    }else{
+    }
+  }else{
+    indent x;
+    std::string name = make_cc_expression(o, s.conditional());
+    o__ "if ("<<name<<") {\n";
+    if(s.true_part()) {
+      indent y;
+      make_seq_block(o, s.true_part());
+    }else{
+    }
+    o__ "}";
+    if(s.false_part()) {
+      o << "else {\n";
+      {
+	indent y;
+	make_seq_block(o, s.false_part());
+      }
+      o__ "}\n";
+    }else{
+    }
+    o << "\n";
+  }
+  o__ "}\n";
+}
+/*--------------------------------------------------------------------------*/
 void OUT_CODE::make_system_task(std::ostream& o, System_Task const& s) const
 {
   o__ "{\n";

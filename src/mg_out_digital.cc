@@ -79,7 +79,7 @@ private:
 //  void make_for        (std::ostream& o, ForStmt const& s)const;
 //  void make_while      (std::ostream& o, WhileStmt const& s)const;
 //  void make_seq        (std::ostream& o, SeqStmt const& s)const;
-  void make_ctrl       (std::ostream& o, SeqBlock const& s)const;
+  //void make_ctrl       (std::ostream& o, SeqBlock const& s)const override;
   void make_assignment (std::ostream& o, Assignment const& a)const;
   void make_evt        (std::ostream& o, DigitalEvtCtlStmt const& s)const;
 //  void make_loop       (std::ostream& o, WhileStmt const& s) const;
@@ -89,7 +89,7 @@ private:
 private:
   void make_block_variables(std::ostream& o, Variable_Stmt const&)const;
   void make_real_variable  (std::ostream& o, Token_VAR_DECL const&)const;
-  void make_seq_block      (std::ostream& o, SeqBlock const&)const;
+  void make_seq_block      (std::ostream& o, SeqBlock const&)const override;
 private:
   std::string make_cc_expression(std::ostream& o, Expression const& e, bool=false)const {
     return ::make_cc_expression(o, e, _mode!=modePRECALC, ctx());
@@ -304,10 +304,10 @@ void OUT_DIGITAL::make_load_variables(std::ostream& o, const Module& m) const
   make_load_block_variables(o, m.variables());
 }
 /*--------------------------------------------------------------------------*/
-void OUT_DIGITAL::make_ctrl(std::ostream& o, SeqBlock const& s) const
-{
-  make_seq_block(o, s);
-}
+// void OUT_DIGITAL::make_ctrl(std::ostream& o, SeqBlock const& s) const
+// {
+//   make_seq_block(o, s);
+// }
 /*--------------------------------------------------------------------------*/
 void OUT_DIGITAL::make_evt(std::ostream& o, DigitalEvtCtlStmt const& s) const
 {
@@ -318,7 +318,7 @@ void OUT_DIGITAL::make_evt(std::ostream& o, DigitalEvtCtlStmt const& s) const
     o__ "if ("<<name<<") {\n";
     {
       indent y;
-      make_ctrl(o, s.code());
+      make_seq_block(o, s.code());
     }
     o__ "}else{\n";
     o__ "}\n";
@@ -342,9 +342,9 @@ void OUT_DIGITAL::make_stmt(std::ostream& o, Statement const& ab) const
   }else if(auto assign=dynamic_cast<Assignment const*>(&ab)) { untested();
     // incomplete.
     make_assignment(o, *assign);
-#if 0 // later
   }else if(auto cs=dynamic_cast<ConditionalStmt const*>(&ab)) { untested();
     make_cond(o, *cs);
+#if 0 // later
   }else if(auto ss=dynamic_cast<SwitchStmt const*>(&ab)) { untested();
     make_switch(o, *ss);
   }else if(auto ww=dynamic_cast<ForStmt const*>(&ab)) { untested();
@@ -363,10 +363,8 @@ void OUT_DIGITAL::make_stmt(std::ostream& o, Statement const& ab) const
     }else{ untested();
       o__ "// omit initial\n";
     }
-  }else if(auto ct = dynamic_cast<CtrlStmt const*>(&ab)){ untested();
-    (void)ct;
-    incomplete();
-//    make_ctrl(o, ct->body());
+  }else if(auto ct = dynamic_cast<DigitalCtrlStmt const*>(&ab)){ untested();
+    make_seq_block(o, ct->body());
   }else if(auto t=dynamic_cast<System_Task const*>(&ab)) {
     make_system_task(o, *t);
   }else if(dynamic_cast<DigitalSeqStmt const*>(&ab)) { untested();

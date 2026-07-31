@@ -30,6 +30,34 @@
 #include "mg_storage.h"
 #include "mg_.h" // Node BUG
 /*--------------------------------------------------------------------------*/
+#if 1
+void Expression__::parse(CS& file)
+{
+  trace1("AnalogExpression::parse", file.tail().substr(0,100));
+
+  {
+    Expression rhs(file);
+    file >> ","; // LiSt??
+    assert(owner());
+    // Expression_::set_owner(scope());
+    //
+    {
+    resolve_symbols(rhs);
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool Expression__::is_true() const
+{
+  return ::is_true(expression());
+}
+/*--------------------------------------------------------------------------*/
+bool Expression__::is_false() const
+{
+  return ::is_false(expression());
+}
+#endif
+/*--------------------------------------------------------------------------*/
 bool Statement::set_used_in(Base const* b)
 {
   return _rdeps.insert(b).second;
@@ -456,7 +484,7 @@ void SwitchBlock::parse(CS&)
 { untested();
 }
 /*--------------------------------------------------------------------------*/
-void SeqBlock::parse(CS& f)
+void SeqBlock::parse_seq(CS& f)
 {
   _variables.set_owner(this);
   if(f >> ":"){
@@ -567,7 +595,7 @@ bool SwitchBlock::update()
   if(is_reachable()){
 //      if(auto s = dynamic_cast<Statement*>(i)){ untested();
 //	ret += s->update();
-//	trace1("AnalogSeqBlock::update var", ret);
+//	trace1("SeqBlock::update var", ret);
 //      }else{ untested();
 //	unreachable(); // comment? later..
 //      }
@@ -666,6 +694,58 @@ SeqBlock::~SeqBlock()
  //  delete _variables;
   delete_variable_access();
 }
+/*--------------------------------------------------------------------------*/
+void SeqBlock::parse(CS& f)
+{
+  assert(owner());
+  bool begin = f >> "begin ";
+  if(begin){
+    // f.reset(here);
+    parse_seq(f); // _variables
+  }else{
+  }
+  if(is_ctx_initial()){
+  }else if(dynamic_cast<Module const*>(owner())) { untested();
+    unreachable();
+    set_always();
+  }else if(dynamic_cast<Module const*>(scope())) {
+    set_always();
+  }else if(prechecked_cast<SeqBlock*>(scope())) {
+  }else if(prechecked_cast<Statement const*>(owner())) {
+  }else{ untested();
+    unreachable();
+  }
+  while (begin) {
+    if(f >> "end "){
+      if(f.peek() == ';') {
+	f.warn(bWARNING, "stray semicolon\n");
+	f.skip();
+      }else{
+      }
+      break;
+    }else{
+    }
+    Base* s = parse_stmt(f, this);
+    if(!s){
+      throw Exception_CS_("bad analog block", f);
+    }else{
+      push_back(s);
+    }
+  }
+  if(!begin){
+    Base* b = parse_stmt_or_null(f, this);
+    if(!f) {
+      assert(!b);
+    }else if(b){
+      push_back(b);
+    }else{
+      delete b;
+    }
+  }else{
+  }
+
+  variable_access().collect(this);
+} // SeqBlock::parse
 /*--------------------------------------------------------------------------*/
 // void Lhs_Ref::parse()
 static Token_VAR_REF* parse_variable(CS& f, Block* o)
@@ -1198,6 +1278,182 @@ bool System_Task::update()
 void System_Task::submit_variable_access(Variable_Access& va) const
 {
   expression().submit_variable_xs(va);
+}
+/*--------------------------------------------------------------------------*/
+Base* SeqBlock::parse_stmt(CS& file, Block* owner) const
+{
+  size_t here = file.cursor();
+  Base* a = parse_stmt_or_null(file, owner);
+  if(file.stuck(&here)) {
+    delete a;
+    trace1("what?", file.tail().substr(0,20));
+    throw Exception_CS_("what's this?", file);
+    file.reset_fail(here);
+    return nullptr;
+  }else{
+    return a;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void SeqBlock::init_context(Statement* s)
+{
+  // reachability here?
+  if(s->is_ctx_event()){
+    set_ctx_event();
+  }else if(s->is_ctx_function()){
+    set_ctx_function();
+  }else{
+  }
+  if(s->is_ctx_initial()){
+    set_ctx_initial();
+  }else{
+  }
+  if(s->is_ctx_final()){
+    set_ctx_final();
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+void CtrlStmt::parse(CS& f)
+{
+  assert(_block);
+  _block->set_owner(this);
+  f >> *_block;
+  scope()->add_block(_block);
+}
+/*--------------------------------------------------------------------------*/
+void CtrlStmt::dump(std::ostream& o) const
+{
+  if(!*_block){
+    o << ";\n";
+  }else{
+    o << " ";
+    _block->dump(o);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void CtrlStmt::submit_variable_access(Variable_Access& va) const
+{
+  va &= _block->variable_access();
+}
+/*--------------------------------------------------------------------------*/
+void ConditionalStmt::parse(CS& f)
+{
+  new_block();
+  assert(owner());
+  //_cond.set_owner(owner());
+  _cond.set_owner(this);
+  body().set_owner(this);
+  assert(!body().is_always());
+  assert(!body().is_never());
+  false_part().set_owner(this); // !!!
+
+  if(f >> "(" >> _cond >> ")"){
+  }else{ untested();
+    throw Exception_CS_("expecting conditional", f);
+  }
+
+  {
+    if(is_never()) {
+      body().set_never();
+      false_part().set_never();
+    }else if(_cond.is_true()) {
+      if(is_always()) {
+	body().set_always();
+      }else{
+      }
+      false_part().set_never();
+    }else if(_cond.is_false()) {
+      if(is_always()) {
+	false_part().set_always();
+      }else{
+      }
+      body().set_never();
+    }else{
+    }
+
+    if(f >> body()){
+      scope()->add_block(&body());
+    }else{
+      throw Exception_CS_("expecting statement", f);
+    }
+    size_t here = f.cursor();
+    if(f >> "else "){
+      f >> false_part();
+      scope()->add_block(&false_part());
+    }else{
+      f.reset(here);
+    }
+  }
+} // ConditionalStmt::parse
+/*--------------------------------------------------------------------------*/
+void ConditionalStmt::dump(std::ostream& o) const
+{
+  bool omit_true = !options().dump_unreachable() && _cond.is_false();
+  bool omit_false = !options().dump_unreachable() && _cond.is_true();
+  bool omit_cond = omit_true || omit_false;
+
+  if(omit_cond) {
+  }else{
+    o__ "if (" << _cond << ") ";
+  }
+
+  if(omit_true) {
+  }else if(omit_cond){
+    o__ "";
+    body().dump(o);
+  }else{
+    body().dump(o);
+  }
+
+  if(omit_false){
+  }else if(false_part()){
+    if(omit_true){
+    }else{
+      o__ "else ";
+    }
+    if(omit_cond){
+      o__ "";
+    }else{
+    }
+    false_part().dump(o);
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+void ConditionalStmt::submit_variable_access(Variable_Access& va) const
+{
+  cond().submit_variable_xs(va);
+//  trace2("AnalogConditionalStmt::submit_variable_access",
+//      false_part().is_reachable(), true_part().is_reachable());
+
+  if(false_part().is_reachable() && true_part().is_reachable()) {
+    Variable_Access a = false_part().variable_access() | true_part().variable_access();
+    va &= a;
+  }else{
+    if(true_part().is_reachable()) {
+      va &= true_part().variable_access();
+    }else if(false_part().is_reachable()) {
+      va &= false_part().variable_access();
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool ConditionalStmt::is_used_in(Base const* b) const
+{
+  if (_cond.is_used_in(b)){ untested();
+    return true;
+  }else{
+    return CtrlStmt::is_used_in(b);
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool ConditionalStmt::update()
+{
+  bool ret = false_part().update();
+  _cond.update(&rdeps());
+  return CtrlStmt::update() || ret;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

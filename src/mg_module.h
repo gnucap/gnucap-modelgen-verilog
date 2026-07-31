@@ -87,7 +87,7 @@ public:
   void set_type(Data_Type const& a) {_type = a;}
   void set_local( bool x=true ) {_is_local = x;}
   bool is_local()const {return _is_local;}
-  void set_given( bool x=true ) {untested(); _is_given = x;}
+  void set_given( bool x=true ) { _is_given = x;}
   bool is_given()const {return _is_given;}
   bool is_literal()const;
   bool has_range()const {return _value_range_list.size(); }
