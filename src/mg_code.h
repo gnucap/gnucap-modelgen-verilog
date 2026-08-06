@@ -600,6 +600,50 @@ protected:
   SeqBlock& body() { assert(_block); return *_block; }
 }; // ConditionalStmt
 /*--------------------------------------------------------------------------*/
+class WhileStmt : public CtrlStmt {
+protected:
+  Expression__ _cond; // -> AnalogCtrlStmt?
+  explicit WhileStmt() { }
+  explicit WhileStmt(CS& file, Block* o);
+  ~WhileStmt() { }
+public:
+  void parse(CS& file) override;
+  void dump(std::ostream& o)const override;
+  Expression__ const& conditional()const {return _cond;}
+  SeqBlock const& body()const {assert(_block); return *_block;}
+  bool has_body()const {return body();}
+  virtual bool has_tail() const{ return false; }
+  virtual Base const& tail() const{ untested(); return _cond; }
+private:
+  bool update()override;
+protected:
+  SeqBlock& body() {assert(_block); return *_block;}
+  void submit_variable_access(Variable_Access& va)const override;
+private:
+  TData const& deps()const override { return _deps;}; // ?
+};
+/*--------------------------------------------------------------------------*/
+class ForStmt : public WhileStmt {
+  Assignment* _init{nullptr};
+  Assignment* _tail{nullptr};
+protected:
+  explicit ForStmt(CS& file, Block* o);
+  explicit ForStmt() : WhileStmt() {}
+  void parse(CS& file) override;
+  void dump(std::ostream& o)const override;
+public:
+  bool has_init()const{ return _init; }
+  bool has_tail()const override{ return _tail; }
+  Assignment const& init()const{ assert(_init); return *_init; }
+  Assignment const& tail()const override{ assert(_tail); return *_tail; }
+private:
+  Assignment& init() { assert(_init); return *_init; }
+  Assignment& tail_() { assert(_tail); return *_tail; }
+private:
+  bool update()override;
+  void submit_variable_access(Variable_Access& va)const override;
+};
+/*--------------------------------------------------------------------------*/
 // SystemTaskCall
 class System_Task : public Statement {
   Expression_ _e; // Analog?

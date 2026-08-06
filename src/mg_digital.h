@@ -296,50 +296,21 @@ private:
   }
 }; // DigitalConditionalStmt
 /*--------------------------------------------------------------------------*/
-class DigitalWhileStmt : public DigitalCtrlStmt {
-protected:
-  DigitalExpression _cond; // -> DigitalCtrlStmt?
-  explicit DigitalWhileStmt() { untested(); }
+class DigitalWhileStmt : public WhileStmt {
 public:
+  explicit DigitalWhileStmt() : WhileStmt() {}
   explicit DigitalWhileStmt(CS& file, Block* o);
-  ~DigitalWhileStmt() { untested(); }
-public:
-  void parse(CS& file) override;
-  void dump(std::ostream& o)const override;
-  DigitalExpression const& conditional()const { untested();return _cond;}
-  bool has_body() const{ untested(); return _body; }
-  const Base& body() const{ untested();assert(_body); return _body; }
-  virtual bool has_tail() const{ untested(); return false; }
-  virtual Base const& tail() const{ untested(); return _cond; }
-private:
-  bool update()override;
+  ~DigitalWhileStmt() { }
 private:
   SeqBlock* make_block()const override {return new DigitalSeqBlock();}
 };
 /*--------------------------------------------------------------------------*/
-class DigitalForStmt : public DigitalWhileStmt {
-  Assignment* _init{nullptr};
-  Assignment* _tail{nullptr};
+class DigitalForStmt : public ForStmt {
 public:
-  explicit DigitalForStmt(CS& file, Block* o) : DigitalWhileStmt() { untested();
-    set_owner(o);
-    parse(file);
-  }
-
-  void parse(CS& file) override;
-  void dump(std::ostream& o)const override;
-
-  bool has_init()const{ untested(); return _init; }
-  Assignment const& init()const{ untested(); assert(_init); return *_init; }
-
-  bool has_tail()const override{ untested(); return _tail; }
-  Assignment const& tail()const override{ untested(); assert(_tail); return *_tail; }
+  explicit DigitalForStmt(CS& f, Block* o);
+  ~DigitalForStmt() {}
 private:
-  Assignment& init() { assert(_init); return *_init; }
-  Assignment& tail_() { assert(_tail); return *_tail; }
-private:
-  bool update()override;
-  void submit_variable_access(Variable_Access&)const override {incomplete();}
+  SeqBlock* make_block()const override {return new DigitalSeqBlock();}
 };
 /*--------------------------------------------------------------------------*/
 // just AssignStatement?
@@ -347,6 +318,10 @@ class DigitalProceduralAssignment : public DigitalStmt {
   Assignment _a;
   TData _deps;
 public:
+  // explicit DigitalProceduralAssignment(Block* o) { untested();
+  //   set_owner(o);
+  //   _a.set_owner(o);
+  // }
   explicit DigitalProceduralAssignment(CS&, Block*);
 private:
   void submit_variable_access(Variable_Access& va)const override {
@@ -359,6 +334,7 @@ public:
   bool is_used_in(Base const*b)const override;
   Statement* deep_copy(Base* no)const override;
   bool propagate_rdeps(RDeps const& r)override;
+  bool propagate_rdep(Base const*);
 private:
   bool update()override;
   TData const& deps()const override {return _deps;};

@@ -904,7 +904,7 @@ std::string make_cc_expression(std::ostream& o, Expression const& e, bool dynami
   }else{
   }
   if(ctx == "af"){
-  }else if(ctx == "logic"){ untested();
+  }else if(ctx == "logic"){
     // no deps-> use ddouble..
   }else if(!dynamic && ctx!="precalc"){
   }else if(auto ex = dynamic_cast<Expression_ const*>(&e)){

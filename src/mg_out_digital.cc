@@ -58,6 +58,7 @@ public:
   bool is_tr_eval()const override { untested(); return _mode==modeTR_EVAL; }
   bool is_tr_restore()const override { return _mode==modeTR_RESTORE; }
   bool is_tr_accept()const override { return _mode==modeTR_ACCEPT; }
+  bool is_tr_regress()const override { return _mode==modeTR_REGRESS; }
   bool is_tr_initial()const  { return _mode==modeTR_INITIAL; }
   bool is_tr_begin()const  { return _mode==modeTR_BEGIN; }
   bool is_tr_review()const  { untested(); return _mode==modeTR_REVIEW; }
@@ -80,9 +81,9 @@ private:
 //  void make_while      (std::ostream& o, WhileStmt const& s)const;
 //  void make_seq        (std::ostream& o, SeqStmt const& s)const;
   //void make_ctrl       (std::ostream& o, SeqBlock const& s)const override;
-  void make_assignment (std::ostream& o, Assignment const& a)const;
+  void make_assignment (std::ostream& o, Assignment const& a)const override;
   void make_evt        (std::ostream& o, DigitalEvtCtlStmt const& s)const;
-//  void make_loop       (std::ostream& o, WhileStmt const& s) const;
+  void make_loop       (std::ostream& o, WhileStmt const& s) const;
   void make_task       (std::ostream& o, System_Task const& s)const;
   void make_variable   (std::ostream& o, Token_VAR_REF const& v)const;
   void make_variable   (std::ostream& o, Variable_Decl const& v)const;
@@ -141,9 +142,9 @@ void make_tr_regress_digital(std::ostream& o, const Module& m)
   o__ "}\n";
 #endif
 
-  OUT_DIGITAL oo(OUT_DIGITAL::modeTR_REGRESS, &tr_advance_tag);
-  oo.make_load_variables(o, m);
-  oo.make_list(o, m);
+//   OUT_DIGITAL oo(OUT_DIGITAL::modeTR_REGRESS, &tr_advance_tag);
+//   oo.make_load_variables(o, m);
+//   oo.make_list(o, m);
   o << "} // tr_regress_analog\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -342,16 +343,16 @@ void OUT_DIGITAL::make_stmt(std::ostream& o, Statement const& ab) const
   }else if(auto assign=dynamic_cast<Assignment const*>(&ab)) { untested();
     // incomplete.
     make_assignment(o, *assign);
-  }else if(auto cs=dynamic_cast<ConditionalStmt const*>(&ab)) { untested();
+  }else if(auto cs=dynamic_cast<ConditionalStmt const*>(&ab)) {
     make_cond(o, *cs);
 #if 0 // later
   }else if(auto ss=dynamic_cast<SwitchStmt const*>(&ab)) { untested();
     make_switch(o, *ss);
+#endif
   }else if(auto ww=dynamic_cast<ForStmt const*>(&ab)) { untested();
     make_for(o, *ww);
   }else if(auto aws=dynamic_cast<WhileStmt const*>(&ab)) { untested();
     make_while(o, *aws);
-#endif
   }else if(auto ev=dynamic_cast<DigitalEvtCtlStmt const*>(&ab)) {
     make_evt(o, *ev);
     //throw Exception("analogevtctl unsupported");
@@ -406,24 +407,26 @@ void OUT_DIGITAL::make_assignment(std::ostream& o, Assignment const& a) const
       && _mode!=modePRECALC
       && _mode!=modeTR_INITIAL) { untested();
     o__ "// " << lhsname << " is common\n";
-  }else if(!is_tr_accept()){
-    o__ "// ! accept.. " << lhsname << "\n";
   }else if(dynamic_cast<Token_NODE const*>(&a.lhs())){
-     if(is_cc_ref(&e)){
-     }else{ untested();
-     }
-     std::stringstream bin; // HACK.
-     o__ "bool rhs;\n";
-     o__ "{ // rhs eval\n";
-     {
-       indent rhsindent;
-       auto rhsname = make_cc_expression(o, e);
-       o__ "rhs = " << rhsname << ";\n";
-     }
-     o__ "} // rhs eval\n";
-     o__ "_LOGICVAL lv = rhs?lvSTABLE1:lvSTABLE0;\n";
-     o__ "va::accept_node_value(d->n_(" << lhsname << "), lv, 0.);\n";
-  }else{
+    if(is_tr_accept()) {
+       if(is_cc_ref(&e)){
+       }else{ untested();
+       }
+       o__ "bool rhs;\n";
+       o__ "{ // rhs eval\n";
+       {
+	 indent rhsindent;
+	 auto rhsname = make_cc_expression(o, e);
+	 o__ "rhs = " << rhsname << ";\n";
+       }
+       o__ "} // rhs eval\n";
+       o__ "_LOGICVAL lv = rhs?lvSTABLE1:lvSTABLE0;\n";
+       o__ "va::accept_node_value(d->n_(" << lhsname << "), lv, 0.);\n";
+    }else if(is_tr_regress()) {
+      o__ "incomplete();\n";
+    }else{
+    }
+  }else if(is_tr_accept() || is_tr_advance() || is_tr_regress()) { //  || is_tr_regress()) {
     indent x;
     auto rhsname = make_cc_expression(o, e);
 //    if(e.is_ref()){ untested();
@@ -431,6 +434,10 @@ void OUT_DIGITAL::make_assignment(std::ostream& o, Assignment const& a) const
 //    }else
     if(is_tr_accept()){
       o__ lhsname << " = " << rhsname << "; // (accept)\n";
+    }else if(is_tr_advance()){
+      o__ lhsname << " = " << rhsname << "; // (advance)\n";
+    }else if(is_tr_regress()){
+      o__ lhsname << " = " << rhsname << "; // (regress)\n";
     }else if(a.is_int()){ untested();
       o__ lhsname << " = int(" << rhsname << "); // (int*)\n";
     }else if(within_af(&a)){ untested();
@@ -444,6 +451,8 @@ void OUT_DIGITAL::make_assignment(std::ostream& o, Assignment const& a) const
     }else{ untested();
       unreachable();
     }
+  }else{
+    o__ "// ! accept.. " << lhsname << "\n";
   }
   o__ "}\n";
 }

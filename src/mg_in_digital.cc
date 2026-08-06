@@ -42,7 +42,7 @@ static Base* parse_initial(CS& file, Block* o)
 #endif
 /*--------------------------------------------------------------------------*/
 static Base* parse_cond(CS& file, Block* o)
-{ untested();
+{
   return new DigitalConditionalStmt(o, file);
 }
 /*--------------------------------------------------------------------------*/
@@ -253,42 +253,7 @@ DigitalWhileStmt::DigitalWhileStmt(CS& file, Block* o)
   parse(file);
 }
 /*--------------------------------------------------------------------------*/
-bool DigitalWhileStmt::update()
-{ untested();
-  bool ret = false;
-  while(true){ untested();
-    trace0("DigitalWhileStmt::update");
-    _body.clear_vars();
-    if (_body.update()){ untested();
-      ret = true;
-    }else{ untested();
-      break;
-    }
-  }
-  return // propagate_rdeps(_rdeps) ||
-     CtrlStmt::update() || ret;
-}
-/*--------------------------------------------------------------------------*/
-void DigitalWhileStmt::parse(CS& file)
-{ untested();
-  //_cond.set_owner(scope());
-  _cond.set_owner(this);
-  file >> "(" >> _cond >> ")";
-  if(file >> ";"){ untested();
-  }else{ untested();
-    _body.set_owner(this);
-    file >> _body;
-  }
-
-  update();
-}
-/*--------------------------------------------------------------------------*/
-void DigitalWhileStmt::dump(std::ostream& o)const
-{ untested();
-  o__ "while (" << _cond << ")";
-  DigitalCtrlStmt::dump(o);
-}
-/*--------------------------------------------------------------------------*/
+#if 0
 static Assignment* parse_assignment_or_null(CS& f, Statement* owner)
 { untested();
   auto a = new Assignment(f, owner);
@@ -299,54 +264,7 @@ static Assignment* parse_assignment_or_null(CS& f, Statement* owner)
   }
   return a;
 }
-/*--------------------------------------------------------------------------*/
-bool DigitalForStmt::update()
-{ untested();
-  trace0("DigitalForStatement::update");
-  bool ret = false;
-
-  while(true){
-    if ( has_init() && init().update() ){ untested();
-      ret = true;
-    }else if (_body.update()){
-      ret = true;
-    }else if ( has_tail() && tail_().update() ) { untested();
-      ret = true;
-    }else{
-      break;
-    }
-  }
-  return // propagate_rdeps(_rdeps) ||
-     CtrlStmt::update() || ret;
-}
-/*--------------------------------------------------------------------------*/
-void DigitalForStmt::parse(CS& f)
-{ untested();
-  assert(owner());
-  _cond.set_owner(owner());
-  f >> "(";
-  Assignment* init = parse_assignment_or_null(f, this);
-  _init = init;
-  if(!f){ untested();
-    delete _init;
-    _init = nullptr;
-  }else{ untested();
-  }
-  f >> ";";
-  f >> _cond;
-  f >> ";";
-
-  _tail = parse_assignment_or_null(f, this);
-
-  f >> ")";
-  if(f >> ";"){ untested();
-  }else{ untested();
-    _body.set_owner(this); // needed?
-    f >> _body;
-  }
-
-  update();
-}
+#endif
 /*--------------------------------------------------------------------------*/
 bool DigitalProceduralAssignment::update()
 {
@@ -356,8 +274,11 @@ bool DigitalProceduralAssignment::update()
   }else{
     RDeps r(rdeps());
     assert(r.size()==rdeps().size());
+  // TODO copy from _rdeps to _a._rdeps..?
     ret = _a.update(&r);
-    assert(r.size()==rdeps().size());
+    if(r.size()==rdeps().size()){
+    }else{
+    }
     ret |= merge_rdeps(r); // into Statement
   }
 
@@ -366,26 +287,11 @@ bool DigitalProceduralAssignment::update()
   if(is_state_var()){
     ret |= propagate_rdep(&tr_advance_tag);
     ret |= propagate_rdep(&tr_accept_tag);
-  }else{ untested();
+  }else{
   }
+
   return DigitalStmt::update() || ret;
-} // DigitalProceduralAssignment::update()
-/*--------------------------------------------------------------------------*/
-void DigitalForStmt::dump(std::ostream& o)const
-{ untested();
-  o__ "for (" ;
-  if(has_init()){ untested();
-    o << init();
-  }else{ untested();
-  }
-  o << "; " << _cond << "; ";
-  if(has_tail()){ untested();
-    o << tail();
-  }else{ untested();
-  }
-  o << ")";
-  DigitalCtrlStmt::dump(o);
-}
+} // AnalogProceduralAssignment::update()
 /*--------------------------------------------------------------------------*/
 #if 0 // code?
 void CaseGen::calc_reach(Expression const& ctrl)
@@ -1455,6 +1361,11 @@ DigitalStmt::~DigitalStmt()
 {
 }
 /*--------------------------------------------------------------------------*/
+bool DigitalProceduralAssignment::propagate_rdep(Base const* incoming)
+{
+  return Statement::propagate_rdep(incoming);
+}
+/*--------------------------------------------------------------------------*/
 bool DigitalProceduralAssignment::propagate_rdeps(RDeps const& r)
 {
   assert(owner());
@@ -1467,6 +1378,13 @@ bool DigitalProceduralAssignment::propagate_rdeps(RDeps const& r)
     ret |= propagate_rdep(n);
   }
   return ret;
+}
+/*--------------------------------------------------------------------------*/
+DigitalForStmt::DigitalForStmt(CS& f, Block* o) : ForStmt()
+{
+  options().disable_optimize_common(); // for now.
+  set_owner(o);
+  parse(f);
 }
 /*--------------------------------------------------------------------------*/
 #if 0
@@ -1560,5 +1478,6 @@ void always_setup_storage(Base* b, Variable_Access& va)
   assert(a);
   return a->setup_storage(va);
 }
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

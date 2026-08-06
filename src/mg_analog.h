@@ -478,47 +478,21 @@ private:
   }
 }; // AnalogConditionalStmt
 /*--------------------------------------------------------------------------*/
-class AnalogWhileStmt : public AnalogCtrlStmt {
-protected:
-  Expression__ _cond; // -> AnalogCtrlStmt?
-  explicit AnalogWhileStmt() { }
+class AnalogWhileStmt : public WhileStmt {
 public:
-  explicit AnalogWhileStmt(CS& file, Block* o);
-  ~AnalogWhileStmt() { }
-public:
-  void parse(CS& file) override;
-  void dump(std::ostream& o)const override;
-  Expression__ const& conditional()const {return _cond;}
-  bool has_body()const {return body();}
-  virtual bool has_tail() const{ return false; }
-  virtual Base const& tail() const{ untested(); return _cond; }
-private:
-  bool update()override;
-protected:
-  void submit_variable_access(Variable_Access& va)const override;
+  explicit AnalogWhileStmt() : WhileStmt() {}
+  explicit AnalogWhileStmt(CS& f, Block* o);
+  ~AnalogWhileStmt() { delete _block; _block = nullptr; }
 private:
   SeqBlock* make_block()const override {return new AnalogSeqBlock();}
 };
 /*--------------------------------------------------------------------------*/
-class AnalogForStmt : public AnalogWhileStmt {
-  Assignment* _init{nullptr};
-  Assignment* _tail{nullptr};
+class AnalogForStmt : public ForStmt {
 public:
-  explicit AnalogForStmt(CS& file, Block* o);
-
-  void parse(CS& file) override;
-  void dump(std::ostream& o)const override;
-
-  bool has_init()const{ return _init; }
-  bool has_tail()const override{ return _tail; }
-  Assignment const& init()const{ assert(_init); return *_init; }
-  Assignment const& tail()const override{ assert(_tail); return *_tail; }
+  explicit AnalogForStmt(CS& f, Block* o);
+  ~AnalogForStmt() {}
 private:
-  Assignment& init() { assert(_init); return *_init; }
-  Assignment& tail_() { assert(_tail); return *_tail; }
-private:
-  bool update()override;
-  void submit_variable_access(Variable_Access& va)const override;
+  SeqBlock* make_block()const override {return new AnalogSeqBlock();}
 };
 /*--------------------------------------------------------------------------*/
 // just AssignStatement?

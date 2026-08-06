@@ -1,12 +1,13 @@
 attach ./modelgen_2.so
 load vams/vpulse.so
-load vams/vsine.so
+options method=euler
+options trtol=1
 
 verilog
 
-`modelgen test_logic_cond0
+`modelgen test_logic_4
 module test(a, b);
-	electrical a;
+	logic a;
 	logic b;
 	input b;
 	inout a;
@@ -14,28 +15,31 @@ module test(a, b);
 	(*desc="cnt"*) integer cnt;
 	(*desc="st"*) real st = 0;
 	always @(posedge(b)) begin
-		cnt = cnt + 1;
-		if(V(a) > 0) cnt = cnt + 100;
+		if(a) cnt = cnt + 1;
 	end
 endmodule
 
 list
 
-!make test_logic_cond0.so > /dev/null
-attach ./test_logic_cond0.so
+!make test_logic_4.so > /dev/null
+attach ./test_logic_4.so
 
-test #() dut(\1 , clk );
+test #() dut(en , clk );
+resistor #(.r(1k)) dut(\1 ,\2 );
+capacitor #(.c(5f)) dut(\2 , gnd);
+
 
 ground gnd
-vsine #(.ampl(-1) .freq(1e9)) vv(\1 , gnd);
 vpulse #(.val0(0) .val1(5) .width(100p) .period(200p)) v1(aclk, gnd);
+vpulse #(.val0(0) .val1(5), .td(.5n)) v1(aen, gnd);
 nand #(20) n1(clk, aclk);
+and #(20) n1(en, aen);
 
 .model logic logic delay=1p rise=10p fall=15p
 
 list
 
-print tran v(1) l(clk) cnt(dut)
-tran 1n basic
+print tran l(clk) l(en) cnt(dut) iter(0)
+tran 1n .1n basic
 status notime
 end

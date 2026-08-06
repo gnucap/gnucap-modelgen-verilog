@@ -210,6 +210,48 @@ void OUT_CODE::make_cond(std::ostream& o, ConditionalStmt const& s) const
   o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
+void OUT_CODE::make_while(std::ostream& o, WhileStmt const& s) const
+{
+  o__ "while(true) {\n";
+  {
+    indent x;
+    std::string name = make_cc_expression(o, s.conditional());
+    o__ "if ("<<name<<") {\n";
+    if(s.has_body()) {
+      indent y;
+      if(auto bb = dynamic_cast<SeqBlock const*>(&s.body())){
+	make_seq_block(o, *bb);
+      }else{ untested();
+	assert(0);
+      }
+    }else{ untested();
+    }
+
+    if(s.has_tail()){
+      if(auto bb = dynamic_cast<Assignment const*>(&s.tail())){
+	make_assignment(o, *bb);
+      }else{ untested();
+	assert(0);
+      }
+    }else{
+    }
+
+    o__ "}else{\n";
+    o____ "break;\n";
+    o__ "}\n";
+  }
+  o__ "}\n";
+}
+/*--------------------------------------------------------------------------*/
+void OUT_CODE::make_for(std::ostream& o, ForStmt const& s) const
+{
+  if(s.has_init()){
+    make_assignment(o, s.init());
+  }else{ untested();
+  }
+  make_while(o, s);
+}
+/*--------------------------------------------------------------------------*/
 void OUT_CODE::make_system_task(std::ostream& o, System_Task const& s) const
 {
   o__ "{\n";

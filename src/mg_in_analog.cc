@@ -333,11 +333,11 @@ bool AnalogInitialStmt::update()
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-AnalogForStmt::AnalogForStmt(CS& file, Block* o) : AnalogWhileStmt()
+AnalogForStmt::AnalogForStmt(CS& f, Block* o) : ForStmt()
 {
   options().disable_optimize_common(); // for now.
   set_owner(o);
-  parse(file);
+  parse(f);
 }
 /*--------------------------------------------------------------------------*/
 AnalogWhileStmt::AnalogWhileStmt(CS& file, Block* o)
@@ -347,25 +347,6 @@ AnalogWhileStmt::AnalogWhileStmt(CS& file, Block* o)
   parse(file);
 }
 /*--------------------------------------------------------------------------*/
-bool AnalogWhileStmt::update()
-{
-  bool ret = false;
-  while(true){
-    trace0("AnalogWhileStmt::update");
-    body().clear_vars();
-    if (body().update()){
-      ret = true;
-      trace1("AnalogWhileStmt::update1", ret);
-    }else{
-      break;
-    }
-  }
-  _cond.update(&rdeps()); // CtrlStmt?
-  return // propagate_rdeps(_rdeps) ||
-     CtrlStmt::update() || ret;
-}
-/*--------------------------------------------------------------------------*/
-// duplicate?
 bool AnalogSwitchStmt::update()
 {
   bool ret = false;
@@ -381,51 +362,6 @@ bool AnalogSwitchStmt::update()
      CtrlStmt::update() || ret; // bypass ctrlStmt?
 }
 /*--------------------------------------------------------------------------*/
-void AnalogWhileStmt::parse(CS& file)
-{
-  new_block();
-  //_cond.set_owner(scope());
-  _cond.set_owner(this);
-  file >> "(" >> _cond >> ")";
-  if(_cond.is_true()) {
-    if(is_always()) {
-      body().set_always();
-    }else{ untested();
-    }
-  }else{
-  }
-  if(file >> ";"){
-  }else{
-    body().set_owner(this);
-    file >> body();
-    scope()->add_block(&body());
-  }
-
-  update();
-}
-/*--------------------------------------------------------------------------*/
-void AnalogWhileStmt::dump(std::ostream& o)const
-{
-  o__ "while (" << _cond << ")";
-  AnalogCtrlStmt::dump(o);
-}
-/*--------------------------------------------------------------------------*/
-void AnalogWhileStmt::submit_variable_access(Variable_Access& va) const
-{
-  conditional().submit_variable_xs(va);
-  Variable_Access a = body().variable_access();
-
-  if(body().is_always()) {
-    va &= a;
-    va &= a;
-  }else if(body().is_reachable()) {
-    Variable_Access b;
-    va &= a | b;
-    va &= a;
-  }else{ untested();
-  }
-}
-/*--------------------------------------------------------------------------*/
 static Assignment* parse_assignment_or_null(CS& f, Statement* owner)
 {
   auto a = new Assignment(f, owner);
@@ -437,7 +373,7 @@ static Assignment* parse_assignment_or_null(CS& f, Statement* owner)
   return a;
 }
 /*--------------------------------------------------------------------------*/
-bool AnalogForStmt::update()
+bool ForStmt::update()
 {
   trace0("AnalogForStatement::update");
   bool ret = false;
@@ -457,7 +393,7 @@ bool AnalogForStmt::update()
      CtrlStmt::update() || ret;
 }
 /*--------------------------------------------------------------------------*/
-void AnalogForStmt::parse(CS& f)
+void ForStmt::parse(CS& f)
 {
   new_block();
   assert(owner());
@@ -485,15 +421,15 @@ void AnalogForStmt::parse(CS& f)
   }
 
   update();
-} // AnalogForStmt::parse
+} // ForStmt::parse
 /*--------------------------------------------------------------------------*/
-void AnalogForStmt::submit_variable_access(Variable_Access& va) const
+void ForStmt::submit_variable_access(Variable_Access& va) const
 {
   if(has_init()){
     init().submit_variable_access(va);
   }else{
   }
-  AnalogWhileStmt::submit_variable_access(va);
+  WhileStmt::submit_variable_access(va);
   if(has_tail()){
     tail().submit_variable_access(va);
   }else{
@@ -527,7 +463,7 @@ bool AnalogProceduralAssignment::update()
   return AnalogStmt::update() || ret;
 } // AnalogProceduralAssignment::update()
 /*--------------------------------------------------------------------------*/
-void AnalogForStmt::dump(std::ostream& o)const
+void ForStmt::dump(std::ostream& o)const
 {
   o__ "for (" ;
   if(has_init()){
@@ -540,7 +476,7 @@ void AnalogForStmt::dump(std::ostream& o)const
   }else{
   }
   o << ")";
-  AnalogCtrlStmt::dump(o);
+  CtrlStmt::dump(o);
 }
 /*--------------------------------------------------------------------------*/
 void CaseGen::calc_reach(Expression const& ctrl)

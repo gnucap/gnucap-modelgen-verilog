@@ -1180,10 +1180,75 @@ bool Statement::propagate_rdeps(RDeps const& r)
 /*--------------------------------------------------------------------------*/
 CtrlStmt::~CtrlStmt()
 {
+  delete _block;
+  _block = nullptr;
 }
 /*--------------------------------------------------------------------------*/
 bool InitialStmt::is_used_in(Base const*) const {incomplete(); return true;}
 bool InitialStmt::update() {incomplete(); return true;};
+/*--------------------------------------------------------------------------*/
+bool WhileStmt::update()
+{
+  bool ret = false;
+  while(true){
+    trace0("WhileStmt::update");
+    body().clear_vars();
+    if (body().update()){
+      ret = true;
+      trace1("WhileStmt::update1", ret);
+    }else{
+      break;
+    }
+  }
+  _cond.update(&rdeps()); // CtrlStmt?
+  return // propagate_rdeps(_rdeps) ||
+     CtrlStmt::update() || ret;
+}
+/*--------------------------------------------------------------------------*/
+void WhileStmt::parse(CS& file)
+{
+  new_block();
+  //_cond.set_owner(scope());
+  _cond.set_owner(this);
+  file >> "(" >> _cond >> ")";
+  if(_cond.is_true()) {
+    if(is_always()) {
+      body().set_always();
+    }else{ untested();
+    }
+  }else{
+  }
+  if(file >> ";"){
+  }else{
+    body().set_owner(this);
+    file >> body();
+    scope()->add_block(&body());
+  }
+
+  update();
+}
+/*--------------------------------------------------------------------------*/
+void WhileStmt::dump(std::ostream& o)const
+{
+  o__ "while (" << _cond << ")";
+  CtrlStmt::dump(o);
+}
+/*--------------------------------------------------------------------------*/
+void WhileStmt::submit_variable_access(Variable_Access& va) const
+{
+  conditional().submit_variable_xs(va);
+  Variable_Access a = body().variable_access();
+
+  if(body().is_always()) {
+    va &= a;
+    va &= a;
+  }else if(body().is_reachable()) {
+    Variable_Access b;
+    va &= a | b;
+    va &= a;
+  }else{ untested();
+  }
+}
 /*--------------------------------------------------------------------------*/
 System_Task::System_Task(CS& f, Block* o) : Statement()
 {

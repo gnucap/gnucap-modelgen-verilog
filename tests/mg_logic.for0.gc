@@ -4,25 +4,28 @@ load vams/vsine.so
 
 verilog
 
-`modelgen test_logic_cond0
+`modelgen test_logic_for0
 module test(a, b);
 	electrical a;
 	logic b;
 	input b;
 	inout a;
+	integer j;
 
 	(*desc="cnt"*) integer cnt;
 	(*desc="st"*) real st = 0;
 	always @(posedge(b)) begin
-		cnt = cnt + 1;
-		if(V(a) > 0) cnt = cnt + 100;
+		for(j=0; j<2; j=j+1) begin
+			cnt = cnt + 1;
+		   if(V(a) > 0) cnt = cnt + 100;
+		end
 	end
 endmodule
 
 list
 
-!make test_logic_cond0.so > /dev/null
-attach ./test_logic_cond0.so
+!make test_logic_for0.so > /dev/null
+attach ./test_logic_for0.so
 
 test #() dut(\1 , clk );
 
