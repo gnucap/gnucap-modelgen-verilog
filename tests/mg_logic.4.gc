@@ -31,7 +31,7 @@ capacitor #(.c(5f)) dut(\2 , gnd);
 
 ground gnd
 vpulse #(.val0(0) .val1(5) .width(100p) .period(200p)) v1(aclk, gnd);
-vpulse #(.val0(0) .val1(5), .td(.5n)) v1(aen, gnd);
+vpulse #(.val0(0) .val1(5), .td(.49n)) v1(aen, gnd);
 nand #(20) n1(clk, aclk);
 and #(20) n1(en, aen);
 

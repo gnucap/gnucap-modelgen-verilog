@@ -3,7 +3,7 @@ resistor #(.r(1k)) dut (\1 , \2 );
 capacitor #(.c(5f)) dut (\2 , gnd);
 ground gnd
 vpulse #(.val0(0),.val1(5),.width(100p),.period(200p)) v1 (aclk, gnd);
-vpulse #(.val0(0),.val1(5),.td(.5n)) v1 (aen, gnd);
+vpulse #(.val0(0),.val1(5),.td(.49n)) v1 (aen, gnd);
 nand #(20) n1 (clk, aclk);
 and #(20) n1 (en, aen);
 paramset logic logic;
@@ -18,14 +18,14 @@ n1: can't find subckt: logicand1, forcing digital
  200.E-12   3.         0.         0.         21.       
  300.E-12   0.         0.         0.         18.       
  400.E-12   3.         0.         0.         21.       
- 500.E-12   0.         0.         0.         18.       
- 600.E-12   3.         3.         1.         21.       
+ 500.E-12   0.         1.         0.         24.       
+ 600.E-12   3.         3.         1.         24.       
  700.E-12   0.         3.         1.         18.       
  800.E-12   3.         3.         2.         21.       
  900.E-12   0.         3.         2.         18.       
  1.E-9      3.         3.         3.         21.       
 Gnucap   System status
-iterations: op=0, dc=0, tran=198, fourier=0, total=270
-transient timesteps: accepted=67, rejected=5, total=72
+iterations: op=0, dc=0, tran=207, fourier=0, total=281
+transient timesteps: accepted=70, rejected=4, total=74
 nodes: user=6, subckt=0, model=4, total=10
 dctran density=17.0%, ac density=17.0%

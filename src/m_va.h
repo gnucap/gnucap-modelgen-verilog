@@ -1011,7 +1011,17 @@ class LNR {
   const node_t& _ln;
 public:
   explicit LNR(node_t const& ln) : _ln(ln) { };
-  operator int()const { return lptr()->lv_future(); }
+  operator int()const {
+    if(lptr()->last_change_time() != CKT_BASE::_sim->_time0){
+      return lptr()->lv_future();
+    }else if(lptr()->lv().is_falling()) {
+      return true;
+    }else if(lptr()->lv().is_rising()) {
+      return false;
+    }else{
+      return lptr()->lv_future();
+    }
+  }
   LOGIC_NODE const* lptr()const {
     LOGIC_NODE const* ln = prechecked_cast<LOGIC_NODE const*>(_ln.operator->());
     assert(ln);
