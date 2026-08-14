@@ -1007,6 +1007,41 @@ inline LOGICVAL to_logic_(int i)
   }
 }
 /*--------------------------------------------------------------------------*/
+// from vvp_bit4_t. partial, ported to c++, need work and separate header.
+enum bitXZ {
+  b4_0 = 0,
+  b4_1 = 1,
+  b4_X = 3,
+  b4_Z = 2
+};
+/*--------------------------------------------------------------------------*/
+class VALOGIC {
+  bitXZ _b4;
+public:
+  explicit VALOGIC(bitXZ const& b) : _b4(b) {}
+  VALOGIC z2x()const { untested();
+    return VALOGIC((bitXZ) ( (int)_b4 | ((int)_b4 >> 1) ));
+  }
+  operator bool()const { return _b4 == b4_1; }
+  friend VALOGIC operator|(VALOGIC const& a, VALOGIC const& b);
+  friend VALOGIC operator&(VALOGIC const& a, VALOGIC const& b);
+};
+/*--------------------------------------------------------------------------*/
+VALOGIC operator | (VALOGIC const& a, VALOGIC const& b) {
+  if (a._b4 == b4_1 || b._b4 == b4_1) {
+    return VALOGIC(b4_1);
+  }else{
+    return VALOGIC(bitXZ((int)a._b4 | (int)b._b4));
+  }
+}
+VALOGIC operator & (VALOGIC const& a, VALOGIC const& b) {
+  if (a._b4 == b4_0 || b._b4 == b4_0) {
+    return VALOGIC(b4_0);
+  }else{
+    return VALOGIC(bitXZ((int)a._b4 | (int)b._b4));
+  }
+}
+/*--------------------------------------------------------------------------*/
 class LNR {
   const node_t& _ln;
 public:
@@ -1022,6 +1057,36 @@ public:
       return lptr()->lv_future();
     }
   }
+  LOGICVAL lv_now()const{
+    if(lptr()->is_unknown()){ untested();
+      return lvUNKNOWN;
+    }else if(*this == 1){ untested();
+      return lvSTABLE1;
+    }else{ untested();
+      return lvSTABLE0;
+    }
+  }
+  VALOGIC operator==(LNR const& o)const { untested();
+    if(lv_now() == lvUNKNOWN || o.lv_now() == lvUNKNOWN){
+      return VALOGIC(b4_X);
+    }else if(  (lv_now() == lvSTABLE0 && o.lv_now() == lvSTABLE0)
+	||(lv_now() == lvSTABLE1 && o.lv_now() == lvSTABLE1)){
+      return VALOGIC(b4_1);
+    }else{
+      return VALOGIC(b4_0);
+    }
+  }
+  VALOGIC operator!=(LNR const& o)const { untested();
+    if(lv_now() == lvUNKNOWN || o.lv_now() == lvUNKNOWN){
+      return VALOGIC(b4_X);
+    }else if(  (lv_now() == lvSTABLE0 && o.lv_now() == lvSTABLE1)
+	||(lv_now() == lvSTABLE1 && o.lv_now() == lvSTABLE0)){
+      return VALOGIC(b4_1);
+    }else{
+      return VALOGIC(b4_0);
+    }
+  }
+// private:
   LOGIC_NODE const* lptr()const {
     LOGIC_NODE const* ln = prechecked_cast<LOGIC_NODE const*>(_ln.operator->());
     assert(ln);
