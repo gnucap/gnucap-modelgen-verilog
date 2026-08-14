@@ -1061,6 +1061,7 @@ static void make_module_new_local_nodes(std::ostream& o, Module const& m)
     }else if(nn->is_used()){
       o__ "// internal " << nn->name() << " : " << nn->number() << "\n";
       make_module_new_local_node(o, *nn);
+    }else if(nn->is_reg()){
     }else{
       o__ "// unused " << nn->name() << " : " << nn->number() << "\n";
       o__ "n_(n_" << nn->name() << ").set_to_ground(nullptr);\n"; // for now.
@@ -1101,6 +1102,10 @@ static void make_module_allocate_nodes(std::ostream& o, Module const& m)
     assert(nn);
     if(nn->number() == 0) {
     }else if(nn->number() < n){
+    }else if(nn->is_reg()){
+      o__ "n_(n_" << nn->name() << ").set_type(OPT::default_logic); // reg\n";
+      o__ "n_(n_" << nn->name() << ").set_used();\n";
+      o__ "n_(n_" << nn->name() << ").allocate(3);\n";
     }else if(nn->is_used()){
       o__ "n_(n_" << nn->name() << ").set_used();\n";
       o__ "n_(n_" << nn->name() << ").allocate(3);\n";
