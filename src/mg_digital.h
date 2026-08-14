@@ -123,7 +123,7 @@ public:
   DigitalSeqBlock const& body()const { return _body; }
 private:
   TData const& deps()const override { return _deps;}; // ?
-  RDeps const& rdeps()const override { untested(); return _rdeps;};
+  RDeps const& rdeps()const override { return _rdeps;};
   void submit_variable_access(Variable_Access&)const override;
 protected:
   bool update()override { untested();

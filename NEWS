@@ -2,6 +2,12 @@ NEWS for modelgen-verilog.
 
 This file summarizes new features and important changes between snapshots.
 
+2026****-dev
+============
+- conditionals, loops in digital blocks
+- initial blocks
+- various logic bugfixes
+
 20260729-dev
 ============
 - fix parameter initialisers in interpreted paramset

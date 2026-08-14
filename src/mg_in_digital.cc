@@ -960,7 +960,7 @@ bool DigitalEvtCtlStmt::is_used_in(Base const* b)const
 
   if( _ctrl.is_used_in(b)){
     return true;
-  }else{ untested();
+  }else{
     return DigitalCtrlStmt::is_used_in(b);
   }
 }
@@ -1356,7 +1356,7 @@ void Assign::dump(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 bool DigitalProceduralAssignment::is_used_in(Base const*b)const
 {
-  if (b == &tr_begin_tag){ untested();
+  if (b == &tr_begin_tag){
     return true;
   }else if (_a.is_used_in(b)) { untested();
     return true;
@@ -1453,7 +1453,7 @@ void Always::setup_storage(Variable_Access& va) const
 {
 //  SeqBlock::variable_access().collect(this);
   for(Statement* bb : _list){
-    if(dynamic_cast<InitialStmt const*>(bb)){ untested();
+    if(dynamic_cast<InitialStmt const*>(bb)){
       incomplete(); // later
       bb->submit_variable_access(va);
     }else if(prechecked_cast<AlwaysConstruct const*>(bb)){
@@ -1466,7 +1466,7 @@ void Always::setup_storage(Variable_Access& va) const
   for(Statement* bb : _list){
     if(dynamic_cast<AlwaysConstruct const*>(bb)){
       bb->submit_variable_access(va);
-    }else if(prechecked_cast<InitialStmt const*>(bb)){ untested();
+    }else if(prechecked_cast<InitialStmt const*>(bb)){
     }else{ untested();
       incomplete();
     }

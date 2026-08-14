@@ -1060,9 +1060,9 @@ public:
   LOGICVAL lv_now()const{
     if(lptr()->is_unknown()){ untested();
       return lvUNKNOWN;
-    }else if(*this == 1){ untested();
+    }else if(*this == 1){
       return lvSTABLE1;
-    }else{ untested();
+    }else{
       return lvSTABLE0;
     }
   }

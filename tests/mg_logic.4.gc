@@ -11,11 +11,21 @@ module test(a, b);
 	logic b;
 	input b;
 	inout a;
+	logic c;
+	reg c;
+	logic d;
+	reg d;
+
+	initial c = 0;
+	initial d = 1;
 
 	(*desc="cnt"*) integer cnt;
 	(*desc="st"*) real st = 0;
 	always @(posedge(b)) begin
-		if(a) cnt = cnt + 1;
+		if(a == b) cnt = cnt + 2;
+		if(b == a) cnt = cnt - 1;
+		if(b == c) cnt = cnt + 1;
+		if(!(b == d)) cnt = cnt + 5;
 	end
 endmodule
 

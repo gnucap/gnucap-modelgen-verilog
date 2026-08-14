@@ -276,7 +276,7 @@ void OUT_DIGITAL::make_construct(std::ostream& o, AlwaysConstruct const& ab) con
 /*--------------------------------------------------------------------------*/
 void OUT_DIGITAL::make_list(std::ostream& o, const Module& m) const
 {
-  if(is_tr_initial() || is_tr_begin() ){ untested();
+  if(is_tr_initial() || is_tr_begin() ){
 	 o__ "//initial digital list\n";
     o__ "MOD_" << m.identifier() << " const* p = m;\n";
     o__ "MOD_" << m.identifier() << "* d = m;\n";
@@ -295,16 +295,16 @@ void OUT_DIGITAL::make_list(std::ostream& o, const Module& m) const
 
   for(auto const& bb : always_list(m)){
     assert(bb);
-    if(_src && !bb->is_used_in(_src)){ untested();
+    if(_src && !bb->is_used_in(_src)){
       o__ "// omit2 " << typeid(*bb).name() << "\n";
-    }else if(auto in = dynamic_cast<InitialStmt const*>(bb)){ untested();
+    }else if(auto in = dynamic_cast<InitialStmt const*>(bb)){
       o__ "// InitialStmt\n";
-      if(is_tr_initial()){ untested();
+      if(is_tr_initial()){
 	make_stmt(o, *in);
-      }else{ untested();
+      }else{
 	o__ "// omit InitialStmt\n";
       }
-    }else if(is_tr_initial()){ untested();
+    }else if(is_tr_initial()){
       o__ "// is_tr_initial\n";
     }else if(auto ab = dynamic_cast<AlwaysConstruct const*>(bb)){
       o__ "{ // AlwaysConstruct\n";
@@ -393,8 +393,8 @@ void OUT_DIGITAL::make_stmt(std::ostream& o, Statement const& ab) const
   }else if(auto ev=dynamic_cast<DigitalEvtCtlStmt const*>(&ab)) {
     make_evt(o, *ev);
     //throw Exception("analogevtctl unsupported");
-  }else if(auto is=dynamic_cast<InitialStmt const*>(&ab)) { untested();
-    if(is_tr_initial()){ untested();
+  }else if(auto is=dynamic_cast<InitialStmt const*>(&ab)) {
+    if(is_tr_initial()){
       make_initial(o, *is);
     }else{ untested();
       o__ "// omit initial\n";

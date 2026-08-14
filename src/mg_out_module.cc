@@ -520,7 +520,7 @@ static void make_tr_begin(std::ostream& o, const Module& m)
     o__ "c->tr_begin_analog(this);\n"; // call from COMMON::tr_begin?
   }else{
   }
-  if(m.has_tr_begin_digital()) { untested();
+  if(m.has_tr_begin_digital()) {
     o__ "mc->tr_initial_digital(this);\n"; // call from COMMON::tr_begin?
     o__ "c->tr_begin_digital(this);\n"; // call from COMMON::tr_begin?
   }else{
