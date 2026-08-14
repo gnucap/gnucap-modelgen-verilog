@@ -317,6 +317,8 @@ public:
   void set_tr_accept_analog () { set_tr_accept (mm_ANALOG);}
   void set_tr_advance_analog() { set_tr_advance(mm_ANALOG);}
   void set_final_analog()      { untested(); set_final(mm_ANALOG);}
+
+  void set_tr_begin_digital  () { set_tr_begin(mm_DIGITAL);}
 private:
   void import_flags(FUNCTION_ const*);
   void set_pid  (iface_id_t p, mode_mask_t m=mm_ANALOG) {_has_pid[p] = (mode_mask_t)(_has_pid[p] | m);}

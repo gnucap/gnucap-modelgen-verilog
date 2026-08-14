@@ -70,7 +70,7 @@ public:
 			      || _mode==modeTR_REVIEW ; } // || ...?
   bool is_precalc()const override { return _mode==modePRECALC; }
   bool is_probe()const   { untested(); return _mode==modePROBE; }
-  bool is_tr_initial()const  { return _mode==modeTR_INITIAL; }
+  bool is_tr_initial()const override { return _mode==modeTR_INITIAL; }
   bool is_tr_begin()const  { return _mode==modeTR_BEGIN; }
   bool is_tr_review()const  { untested(); return _mode==modeTR_REVIEW; }
   bool is_tr_accept()const override { return _mode==modeTR_ACCEPT; }
@@ -635,6 +635,7 @@ void OUT_ANALOG::make_for(std::ostream& o, AnalogForStmt const& s) const
 }
 #endif
 /*--------------------------------------------------------------------------*/
+//DUP
 void OUT_ANALOG::make_initial(std::ostream& o, AnalogInitialStmt const& s) const
 {
   if(is_tr_initial()) {

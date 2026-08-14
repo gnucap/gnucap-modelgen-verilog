@@ -350,7 +350,7 @@ void Parameter_2_List::parse(CS& file)
 }
 /*--------------------------------------------------------------------------*/
 bool Parameter_2::is_literal() const
-{
+{ untested();
   return _default_val.is_literal();
 }
 /*--------------------------------------------------------------------------*/
@@ -364,7 +364,7 @@ void Parameter_2_List::dump(std::ostream& o)const
 	o << " " << _type << " ";
 	i->dump(o);
 	o << ";\n";
-      }else{
+      }else{ untested();
       }
     }
   }else{
@@ -763,6 +763,7 @@ void Module::parse_body(CS& f)
       || ((f >> "assign ") && (f >> *_assign))
       || ((f >> "analog ") && f >> *_analog)
       || ((f >> "always ") && f >> *_always)
+      || ((f >> "initial ") && f >> *_always)
       || ((f >> "endmodule ") && (end = true))
       // subdevice instances. can't use reserved keywords.
       || ((f >> "paramset ") && (reserved = true))
@@ -877,15 +878,15 @@ void Module::dump(std::ostream& o)const
   }else{
   }
   // dump_port_directions(o);
-  if(_circuit->input().size()){
+  if(_circuit->input().size()){ untested();
     o__ "input " << circuit()->input() << "\n";
   }else{
   }
-  if(_circuit->output().size()){
+  if(_circuit->output().size()){ untested();
     o__ "output " << circuit()->output() << "\n";
   }else{
   }
-  if(_circuit->inout().size()){
+  if(_circuit->inout().size()){ untested();
     o__ "inout " << circuit()->inout() << "\n";
   }else{
   }
@@ -1066,7 +1067,7 @@ bool Module::new_var_ref(Base* what)
   std::string p;
   if(auto A = dynamic_cast<Aliasparam const*>(what)){ untested();
     p = A->name();
-  }else if(auto nn = dynamic_cast<Node const*>(what)){
+  }else if(auto nn = dynamic_cast<Node const*>(what)){ untested();
     p = nn->name();
   }else if(P){
     p = P->name();
@@ -1296,7 +1297,7 @@ static Token* new_event_token(int na, FUNCTION_ const* func, Module* m)
 #if 1
   {
     fcl->set_label(code_name);
-//    if(int(na) <= f->max_args()) {
+//    if(int(na) <= f->max_args()) { untested();
 //    }else{ untested();
 //      incomplete();
 //      throw Exception_Too_Many(na, f->max_args(), 0);
@@ -1461,18 +1462,18 @@ bool Module::has_submodule() const
 }
 /*--------------------------------------------------------------------------*/
 // bool Module::has_assign() const
-// {
+// { untested();
 //   return _assign->size();
 // }
 /*--------------------------------------------------------------------------*/
 bool Module::has_states() const
-{
+{ untested();
   incomplete();
   return true;
 }
 /*--------------------------------------------------------------------------*/
 bool Module::has_constants() const
-{
+{ untested();
   // possible false positives
   return variables().size();
 }
@@ -1536,7 +1537,7 @@ void Module::set_reg(Node const* n)
   if(n->number()){
     assert(*(_circuit->nodes().begin() + n->number()) == n);
     (*(_circuit->nodes().begin() + n->number()))->set_reg(this);
-  }else{
+  }else{ untested();
     // already ground
   }
 }

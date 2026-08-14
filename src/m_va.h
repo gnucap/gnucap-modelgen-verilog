@@ -1055,6 +1055,15 @@ void accept_node_value(node_t& n, bool lv, double delay)
     // nl->improve_quality();
 }
 /*--------------------------------------------------------------------------*/
+void initial_node_value(node_t& n, bool lv)
+{
+  node_l& nl = reinterpret_cast<node_l&>(n);
+  nl->set_mode(moDIGITAL); // assert?..
+
+  LOGICVAL lvl(lv?lvSTABLE1:lvSTABLE0);
+  nl->force_initial_value(lvl);
+}
+/*--------------------------------------------------------------------------*/
 } // va
 /*--------------------------------------------------------------------------*/
 LOGICVAL operator& (LOGICVAL const& a, LOGICVAL const& b)

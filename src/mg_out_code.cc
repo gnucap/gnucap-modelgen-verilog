@@ -171,6 +171,16 @@ void OUT_CODE::make_one_local_var(std::ostream& o, Variable_Decl const& V) const
   }
 }
 /*--------------------------------------------------------------------------*/
+void OUT_CODE::make_initial(std::ostream& o, InitialStmt const& s) const
+{
+  if(is_tr_initial()) {
+    o__ "{ // initial statement\n";
+    make_seq_block(o, s.block());
+    o__ "}\n";
+  }else{ untested();
+  }
+}
+/*--------------------------------------------------------------------------*/
 void OUT_CODE::make_cond(std::ostream& o, ConditionalStmt const& s) const
 {
   o__ "{\n";

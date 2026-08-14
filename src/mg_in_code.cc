@@ -654,9 +654,9 @@ bool SeqBlock::update()
 }
 /*--------------------------------------------------------------------------*/
 void SeqBlock::merge_sens(Sensitivities const& s)
-{
+{ untested();
   if(_sens){ untested();
-  }else{
+  }else{ untested();
     _sens = new Sensitivities;
   }
   _sens->merge(s);
@@ -893,7 +893,7 @@ Token_VAR_REF const* Assignment::decl_token() const
     // something af?
   }else if(dynamic_cast<Token_VAR_REF const*>(_lhsref)) {
     // something af?
-  }else{
+  }else{ untested();
     assert(0);
     unreachable();
     // return _token;
@@ -1184,8 +1184,37 @@ CtrlStmt::~CtrlStmt()
   _block = nullptr;
 }
 /*--------------------------------------------------------------------------*/
-bool InitialStmt::is_used_in(Base const*) const {incomplete(); return true;}
-bool InitialStmt::update() {incomplete(); return true;};
+void InitialStmt::parse(CS& f)
+{
+  new_block();
+
+  assert(owner());
+  assert(_block);
+  _block->set_owner(this);
+  _block->set_ctx_initial();
+  assert(_block->is_ctx_initial());
+
+  if(f >> *_block){
+    scope()->add_block(_block); //?
+  }else{ untested();
+    throw Exception_CS_("expecting statement", f);
+  }
+  assert(_block->is_ctx_initial());
+}
+/*--------------------------------------------------------------------------*/
+void InitialStmt::dump(std::ostream& o) const
+{
+  o__ "initial ";
+  assert(_block);
+  _block->dump(o);
+}
+/*--------------------------------------------------------------------------*/
+bool InitialStmt::update()
+{
+  bool ret = CtrlStmt::update();
+  ret |= propagate_rdep(&tr_begin_tag);
+  return ret;
+}
 /*--------------------------------------------------------------------------*/
 bool WhileStmt::update()
 {
@@ -1373,7 +1402,7 @@ void SeqBlock::init_context(Statement* s)
     set_ctx_initial();
   }else{
   }
-  if(s->is_ctx_final()){
+  if(s->is_ctx_final()){ untested();
     set_ctx_final();
   }else{
   }

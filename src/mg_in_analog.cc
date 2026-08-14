@@ -294,6 +294,7 @@ Base* AnalogSeqBlock::parse_stmt_or_null(CS& f, Block* b)const
   return ::parse_stmt_or_null(f, b);
 }
 /*--------------------------------------------------------------------------*/
+///DUP
 void AnalogInitialStmt::parse(CS& f)
 {
   new_block();

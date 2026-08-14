@@ -277,7 +277,7 @@ bool DigitalProceduralAssignment::update()
   // TODO copy from _rdeps to _a._rdeps..?
     ret = _a.update(&r);
     if(r.size()==rdeps().size()){
-    }else{
+    }else{ untested();
     }
     ret |= merge_rdeps(r); // into Statement
   }
@@ -287,7 +287,7 @@ bool DigitalProceduralAssignment::update()
   if(is_state_var()){
     ret |= propagate_rdep(&tr_advance_tag);
     ret |= propagate_rdep(&tr_accept_tag);
-  }else{
+  }else{ untested();
   }
 
   return DigitalStmt::update() || ret;
@@ -899,7 +899,7 @@ void DigitalEvtCtlStmt::parse(CS& file)
   }
   assert(owner());
   _body.set_ctx_event();
-  if(_ctrl.is_final()){
+  if(_ctrl.is_final()){ untested();
     _body.set_ctx_final();
   }else{
   }
@@ -1011,7 +1011,7 @@ void DigitalEvtExpression::parse(CS& file)
   assert(owner());
   // Expression_::set_owner(scope());
 
-  while(file >> "or" || file >> ","){
+  while(file >> "or" || file >> ","){ untested();
     file >> rhs;
     // TODO:
     // if(dynamic_cast<EVENT_FUNCTION const*>(rhs.back()){ untested();
@@ -1194,14 +1194,24 @@ void Always::push_back(Base* ab)
 {
   if(auto c = dynamic_cast<AlwaysConstruct*>(ab)){
     _list.push_back(c);
-  }else{ untested();
+  }else if(auto i = dynamic_cast<DigitalInitialStmt*>(ab)){
+    _list.push_back(i);
+  }else{
     unreachable();
   }
 }
 /*--------------------------------------------------------------------------*/
 void Always::parse(CS& f)
 {
-  if(1||f >> "always "){
+  if (f.last_match() == "initial "){
+    Module* m = to_module(owner());
+    assert(m);
+    m->set_tr_begin_digital();
+    DigitalInitialStmt* is = new DigitalInitialStmt(owner(), f);
+    is->set_owner(owner());
+    is->update(); // here??
+    push_back(is);
+  }else if(1||f >> "always "){
     assert(owner());
     AlwaysConstruct* ab = new AlwaysConstruct();
 

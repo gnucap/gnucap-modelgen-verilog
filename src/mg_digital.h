@@ -107,7 +107,7 @@ public:
   void push_back(Statement*);
   bool is_used_in(Base const*)const override; // BUG?
 };
-typedef Collection<AlwaysConstruct> AlwaysList; // needed?
+typedef Collection<Statement> DigitalList; // needed?
 /*--------------------------------------------------------------------------*/
 // just CtrlStmt?
 class DigitalCtrlStmt : public CtrlStmt {
@@ -176,7 +176,7 @@ private:
 typedef Collection<DigitalEvtCtlStmt> Digital_Events;
 /*--------------------------------------------------------------------------*/
 class Always : public Owned_Base {
-  AlwaysList _list;
+  DigitalList _list;
   Probe_Map* _probes{nullptr};
   Digital_Events _events;
 public:
@@ -186,8 +186,8 @@ public:
   void dump(std::ostream& o)const override;
 
   bool has_block() const;
-  AlwaysList const& list()const { return _list; }
-  AlwaysList const& blocks()const { return _list; }
+  DigitalList const& list()const { return _list; }
+  DigitalList const& blocks()const { return _list; }
   Digital_Events const& events()const { untested(); return _events; }
   void push_back(Base*);
   void setup_storage(Variable_Access& va)const;
@@ -200,7 +200,7 @@ inline Always const& always(Module const& m)
   return *a;
 }
 /*--------------------------------------------------------------------------*/
-inline AlwaysList const& always_list(Module const& m)
+inline DigitalList const& always_list(Module const& m)
 {
   return always(m).list();
 }
@@ -225,6 +225,17 @@ public:
   String_Arg key() const{ untested();return String_Arg("ACE");}
 };
 typedef LiSt<DigitalConstExpression, '\0', ',', ':'> DigitalConstExpressionList;
+/*--------------------------------------------------------------------------*/
+class DigitalInitialStmt : public InitialStmt {
+public:
+  explicit DigitalInitialStmt(Block* o, CS& file) : InitialStmt() {
+    set_owner(o);
+    parse(file);
+  }
+  ~DigitalInitialStmt(){ }
+private:
+  SeqBlock* make_block()const override {return new DigitalSeqBlock();}
+}; // InitialStmt
 /*--------------------------------------------------------------------------*/
 #if 0
 class CaseGen : public DigitalCtrlStmt {
@@ -337,7 +348,7 @@ public:
   bool propagate_rdep(Base const*);
 private:
   bool update()override;
-  TData const& deps()const override {return _deps;};
+  TData const& deps()const override {return _deps;}; //?
 public: // dump_annotate
   TData const& data()const {return _a.data();};
   bool has_sensitivities()const {

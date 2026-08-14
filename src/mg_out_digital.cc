@@ -42,7 +42,7 @@ public:
   Base const* _src{nullptr};
   std::string ctx()const override {
     char const* names[modeNUM] = { //
-      "precalc", "tr_eval", "initial", "tr_begin", "tr_restore",
+      "precalc", "tr_eval", "tr_initial", "tr_begin", "tr_restore",
       "tr_advance", "tr_regress", "tr_review", "tr_accept", "finish"
     };
     return names[_mode];
@@ -59,10 +59,10 @@ public:
   bool is_tr_restore()const override { return _mode==modeTR_RESTORE; }
   bool is_tr_accept()const override { return _mode==modeTR_ACCEPT; }
   bool is_tr_regress()const override { return _mode==modeTR_REGRESS; }
-  bool is_tr_initial()const  { return _mode==modeTR_INITIAL; }
+  bool is_tr_initial()const override { return _mode==modeTR_INITIAL; }
   bool is_tr_begin()const  { return _mode==modeTR_BEGIN; }
   bool is_tr_review()const  { untested(); return _mode==modeTR_REVIEW; }
-  bool is_tr_advance()const  { untested(); return _mode==modeTR_ADVANCE; }
+  bool is_tr_advance()const  { return _mode==modeTR_ADVANCE; }
   bool is_final()const  { untested(); return _mode==modeFINAL; }
 public:
   void make_list(std::ostream& o, const Module& m)const;
@@ -74,7 +74,7 @@ private:
   void make_stmt       (std::ostream& o, Statement const& a)const;
   void make_block      (std::ostream& o, Block const& s)const;
 private:
-  void make_initial    (std::ostream& o, InitialStmt const& s)const;
+//  void make_initial    (std::ostream& o, InitialStmt const& s)const;
 //  void make_cond       (std::ostream& o, ConditionalStmt const& s)const;
 //  void make_switch     (std::ostream& o, SwitchStmt const& s)const;
 //  void make_for        (std::ostream& o, ForStmt const& s)const;
@@ -150,6 +150,35 @@ void make_tr_regress_digital(std::ostream& o, const Module& m)
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_cc_common_tr(std::ostream& o, const Module& m, OUT_DIGITAL::mode mode, Base const* dep)
+{
+  OUT_DIGITAL oo(mode, dep);
+//  o << "typedef double ddouble;\n"; // wreal?
+  o << "inline void COMMON_" << m.identifier() <<
+    "::" << oo.ctx() << "_digital(MOD_" << m.identifier() << "* m)";
+  if(oo.is_tr_initial()){
+  }else{
+    o << "const";
+  }
+  o<< "\n{\n";
+ // o__ "trace1(\"" << m.identifier() <<"::tr_begin_analog\", d);\n";
+ o__ "trace1(\"" << m.identifier() <<"::"<<oo.ctx()<<"_digital\", m->long_label());\n";
+
+  oo.make_load_variables(o, m);
+  oo.make_list(o, m);
+
+  // yikes. state is shared.
+//  if(oo.is_tr_initial()){
+//    o__ "m->_v_1 = m->_v_;\n";
+//  }else if(oo.is_tr_begin()) {
+//    o__ "// m->_v_1 = m->_v_;\n";
+//  }else{
+//  }
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
 static void make_cc_common_tr_eval(std::ostream& o, const Module& m)
 {
   o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
@@ -189,6 +218,14 @@ void make_cc_digital(std::ostream& o, const Module& m)
   make_cc_common_tr_eval(o, m);
   make_cc_common_tr_review(o, m);
   // make_cc_common_precalc(o, m);
+  if(m.has_tr_begin_digital()){
+    o__ "// tr_initial ...\n";
+    make_cc_common_tr(o, m, OUT_DIGITAL::modeTR_INITIAL, &tr_begin_tag);
+    o__ "// tr_begin ...\n";
+    make_cc_common_tr(o, m, OUT_DIGITAL::modeTR_BEGIN, &tr_begin_tag);
+  }else{
+    o__ "// !has_tr_begin_digital\n";
+  }
 }
 /*--------------------------------------------------------------------------*/
 void OUT_DIGITAL::make_block(std::ostream& o, Block const& ab) const
@@ -349,7 +386,7 @@ void OUT_DIGITAL::make_stmt(std::ostream& o, Statement const& ab) const
   }else if(auto ss=dynamic_cast<SwitchStmt const*>(&ab)) { untested();
     make_switch(o, *ss);
 #endif
-  }else if(auto ww=dynamic_cast<ForStmt const*>(&ab)) { untested();
+  }else if(auto ww=dynamic_cast<ForStmt const*>(&ab)) {
     make_for(o, *ww);
   }else if(auto aws=dynamic_cast<WhileStmt const*>(&ab)) { untested();
     make_while(o, *aws);
@@ -358,9 +395,7 @@ void OUT_DIGITAL::make_stmt(std::ostream& o, Statement const& ab) const
     //throw Exception("analogevtctl unsupported");
   }else if(auto is=dynamic_cast<InitialStmt const*>(&ab)) { untested();
     if(is_tr_initial()){ untested();
-      (void)is;
-      incomplete();
-      // make_initial(o, *is);
+      make_initial(o, *is);
     }else{ untested();
       o__ "// omit initial\n";
     }
@@ -408,7 +443,7 @@ void OUT_DIGITAL::make_assignment(std::ostream& o, Assignment const& a) const
       && _mode!=modeTR_INITIAL) { untested();
     o__ "// " << lhsname << " is common\n";
   }else if(dynamic_cast<Token_NODE const*>(&a.lhs())){
-    if(is_tr_accept()) {
+    if(is_tr_accept() || is_tr_initial()) {
        if(is_cc_ref(&e)){
        }else{ untested();
        }
@@ -420,8 +455,12 @@ void OUT_DIGITAL::make_assignment(std::ostream& o, Assignment const& a) const
 	 o__ "rhs = " << rhsname << ";\n";
        }
        o__ "} // rhs eval\n";
-       o__ "_LOGICVAL lv = rhs?lvSTABLE1:lvSTABLE0;\n";
+       o__ "_LOGICVAL lv = rhs?lvSTABLE1:lvSTABLE0;\n"; // VALOGIC..
+      if(is_tr_accept()) {
        o__ "va::accept_node_value(d->n_(" << lhsname << "), lv, 0.);\n";
+      }else if(is_tr_initial()) {
+       o__ "va::initial_node_value(d->n_(" << lhsname << "), lv);\n";
+      }
     }else if(is_tr_regress()) {
       o__ "incomplete();\n";
     }else{

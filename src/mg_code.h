@@ -538,12 +538,16 @@ protected:
   void parse(CS& f)override;
   void dump(std::ostream&)const override;
 
-  virtual TData const& deps()const = 0;
+//  virtual TData const& deps()const = 0;
+  virtual TData const& deps()const {return _deps;}; // why virtual?
   bool update()override {
     bool ret = _block && _block->update();
     return Statement::update() || ret;
   }
+public:
+  SeqBlock const& block()const {assert(_block); return *_block; }
 
+protected:
   void submit_variable_access(Variable_Access&)const override;
   virtual void new_block() {_block = make_block();}
 private:
@@ -552,15 +556,16 @@ private:
 /*--------------------------------------------------------------------------*/
 class InitialStmt : public CtrlStmt {
 public:
-  explicit InitialStmt(Block* o, CS& file) {
+  explicit InitialStmt() : CtrlStmt() { }
+  explicit InitialStmt(Block* o, CS& file) { untested();
+    incomplete();
     set_owner(o);
     parse(file);
   }
   ~InitialStmt(){ }
 public:
-  void parse(CS&) override {incomplete();}
-  void dump(std::ostream&)const override {incomplete();}
-  bool is_used_in(Base const*)const override;
+  void parse(CS&) override;
+  void dump(std::ostream&)const override;
   bool update()override;
 
  // TData const& deps()const override // AnalogCtrlStmt

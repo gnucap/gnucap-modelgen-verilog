@@ -379,6 +379,10 @@ static void make_common(std::ostream& o, const Module& m)
   }
   if(m.has_tr_begin_digital()){
     o__ "void tr_begin_digital(MOD_" << m.identifier() << "*)const;\n";
+    o__ "void tr_initial_digital(MOD_" << m.identifier() << "*);\n";
+  }else{
+  }
+  if(m.has_tr_begin_digital()) {
   }else{
   }
   if(m.has_tr_eval_digital()){
