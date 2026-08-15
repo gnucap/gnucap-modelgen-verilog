@@ -190,12 +190,12 @@ public:
   ~AnalogCtrlStmt(){ delete _block; _block = nullptr; }
 // void parse(CS& cmd)override; // CtrlStmt
 // void dump(std::ostream&)const override; // CtrlStmt
-  AnalogSeqBlock const& body()const {
+  SeqBlock const& body()const { untested();
     auto r = prechecked_cast<AnalogSeqBlock const*>(_block);
     assert(r);
     return *r;
   }
-  AnalogSeqBlock& body() {
+  SeqBlock& body() { untested();
     auto r = prechecked_cast<AnalogSeqBlock*>(_block);
     assert(r);
     return *r;
@@ -288,7 +288,7 @@ public:
   void parse(CS&)override;
   void dump(std::ostream&)const override;
   Expression_ const& cond()const { return _ctrl; } // override?
-  const AnalogSeqBlock& code()const { return body(); }
+  const SeqBlock& code()const { return body(); }
   bool update()override;
 
   bool is_used_in(Base const* b)const override;
@@ -412,7 +412,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class AnalogInitialStmt : public AnalogCtrlStmt /*InitialStmt*/ {
+class AnalogInitialStmt : public InitialStmt {
 public:
   explicit AnalogInitialStmt(Block* o, CS& file) {
     set_owner(o);
@@ -421,9 +421,10 @@ public:
   ~AnalogInitialStmt(){ }
 public:
   void parse(CS& file) override;
-  void dump(std::ostream& o)const override;
-  bool is_used_in(Base const*)const override; // needed?
-  bool update()override;
+//  void dump(std::ostream& o)const override;
+ //  bool is_used_in(Base const*)const override; // needed?
+  // bool update()override;
+  SeqBlock* make_block()const override {return new AnalogSeqBlock();}
 
  // TData const& deps()const override // AnalogCtrlStmt
 }; // AnalogInitialStmt

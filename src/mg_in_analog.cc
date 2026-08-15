@@ -297,15 +297,17 @@ Base* AnalogSeqBlock::parse_stmt_or_null(CS& f, Block* b)const
 ///DUP
 void AnalogInitialStmt::parse(CS& f)
 {
+  return InitialStmt::parse(f);
+#if 0
   new_block();
 
   assert(owner());
   Module* m = to_module(owner());
   assert(m);
   m->set_tr_begin_analog();
-  body().set_owner(this);
-  body().set_ctx_initial();
-  assert(body().is_ctx_initial());
+  block().set_owner(this);
+  block().set_ctx_initial();
+  assert(block().is_ctx_initial());
 
   if(f >> body()){
     scope()->add_block(&body()); //?
@@ -313,25 +315,18 @@ void AnalogInitialStmt::parse(CS& f)
     throw Exception_CS_("expecting statement", f);
   }
   assert(body().is_ctx_initial());
+#endif
 }
 /*--------------------------------------------------------------------------*/
-void AnalogInitialStmt::dump(std::ostream& o) const
-{
-  o__ "initial ";
-  body().dump(o);
-}
-/*--------------------------------------------------------------------------*/
-bool AnalogInitialStmt::is_used_in(Base const* b) const
-{
-  return CtrlStmt::is_used_in(b);
-}
-/*--------------------------------------------------------------------------*/
+#if 0
 bool AnalogInitialStmt::update()
 {
-  bool ret = AnalogCtrlStmt::update();
-  ret |= propagate_rdep(&tr_begin_tag);
-  return ret;
+  return InitialStmt::update();
+//  bool ret = AnalogCtrlStmt::update();
+//  ret |= propagate_rdep(&tr_begin_tag);
+//  return ret;
 }
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 AnalogForStmt::AnalogForStmt(CS& f, Block* o) : ForStmt()
@@ -2441,6 +2436,9 @@ void Analog::parse(CS& f)
     _functions.set_owner(owner());
     f >> _functions;
   }else if(f >> "initial "){
+    Module* m = to_module(owner());
+    assert(m);
+    m->set_tr_begin_analog();
     AnalogInitialStmt* is = new AnalogInitialStmt(owner(), f);
     is->set_owner(owner());
     is->update(); // here??

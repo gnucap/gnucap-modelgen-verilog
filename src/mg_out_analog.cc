@@ -91,13 +91,12 @@ private:
 private:
   void make_af_args    (std::ostream& o, const Analog_Function& f)const;
   void make_af_body    (std::ostream& o, const Analog_Function& f)const;
-  void make_initial    (std::ostream& o, AnalogInitialStmt const& s)const;
-  void make_cond       (std::ostream& o, AnalogConditionalStmt const& s)const;
+//  void make_initial    (std::ostream& o, AnalogInitialStmt const& s)const;
+//  void make_cond       (std::ostream& o, AnalogConditionalStmt const& s)const;
   void make_switch     (std::ostream& o, AnalogSwitchStmt const& s)const;
 //  void make_for        (std::ostream& o, ForStmt const& s)const;
 //  void make_while      (std::ostream& o, WhileStmt const& s)const;
   void make_seq        (std::ostream& o, AnalogSeqStmt const& s)const;
-  void make_ctrl       (std::ostream& o, SeqBlock const& s)const;
   void make_assignment (std::ostream& o, Assignment const& a)const override;
   void make_contrib    (std::ostream& o, Contribution const& C)const;
   void make_evt        (std::ostream& o, AnalogEvtCtlStmt const& s)const;
@@ -456,7 +455,7 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
   }else if(auto assign=dynamic_cast<Assignment const*>(&ab)) { untested();
     // incomplete.
     make_assignment(o, *assign);
-  }else if(auto cs=dynamic_cast<AnalogConditionalStmt const*>(&ab)) {
+  }else if(auto cs=dynamic_cast<ConditionalStmt const*>(&ab)) {
     make_cond(o, *cs);
   }else if(auto ss=dynamic_cast<AnalogSwitchStmt const*>(&ab)) {
     make_switch(o, *ss);
@@ -474,7 +473,7 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
       o__ "// omit initial\n";
     }
   }else if(auto ct = dynamic_cast<AnalogCtrlStmt const*>(&ab)){
-    make_ctrl(o, ct->body());
+    make_seq_block(o, ct->body());
   }else if(auto t=dynamic_cast<System_Task const*>(&ab)) {
     make_system_task(o, *t);
   }else if(auto ass=dynamic_cast<AnalogSeqStmt const*>(&ab)) {
@@ -614,74 +613,11 @@ void OUT_ANALOG::make_evt(std::ostream& o, AnalogEvtCtlStmt const& s) const
     o__ "if ("<<name<<") {\n";
     {
       indent y;
-      make_ctrl(o, s.code());
+      make_seq_block(o, s.code());
     }
     o__ "}else{\n";
     o__ "}\n";
 
-    o << "\n";
-  }
-  o__ "}\n";
-}
-/*--------------------------------------------------------------------------*/
-#if 0
-void OUT_ANALOG::make_for(std::ostream& o, AnalogForStmt const& s) const
-{
-  if(s.has_init()){
-    make_assignment(o, s.init());
-  }else{ untested();
-  }
-  make_loop(o, s);
-}
-#endif
-/*--------------------------------------------------------------------------*/
-//DUP
-void OUT_ANALOG::make_initial(std::ostream& o, AnalogInitialStmt const& s) const
-{
-  if(is_tr_initial()) {
-    o__ "{ // initial statement\n";
-    make_ctrl(o, s.body());
-    o__ "}\n";
-  }else{ untested();
-  }
-}
-/*--------------------------------------------------------------------------*/
-// DUP
-void OUT_ANALOG::make_cond(std::ostream& o, AnalogConditionalStmt const& s) const
-{
-  return OUT_CODE::make_cond(o, s);
-  o__ "{\n";
-  if(s.conditional().is_true()) {
-    if(s.true_part()) {
-      indent y;
-      make_ctrl(o, s.true_part());
-    }else{ untested();
-    }
-  }else if(s.conditional().is_false()){
-    if(s.false_part()) {
-      indent y;
-      make_ctrl(o, s.false_part());
-    }else{
-    }
-  }else{
-    indent x;
-    std::string name = make_cc_expression(o, s.conditional());
-    o__ "if ("<<name<<") {\n";
-    if(s.true_part()) {
-      indent y;
-      make_ctrl(o, s.true_part());
-    }else{
-    }
-    o__ "}";
-    if(s.false_part()) {
-      o << "else {\n";
-      {
-	indent y;
-	make_ctrl(o, s.false_part());
-      }
-      o__ "}\n";
-    }else{
-    }
     o << "\n";
   }
   o__ "}\n";
@@ -758,12 +694,6 @@ void OUT_ANALOG::make_switch(std::ostream& o, AnalogSwitchStmt const& s) const
     o__ "}\n";
   }
   o__ "}\n";
-}
-/*--------------------------------------------------------------------------*/
-//DUP
-void OUT_ANALOG::make_ctrl(std::ostream& o, SeqBlock const& s) const
-{
-  make_seq_block(o, s);
 }
 /*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_seq(std::ostream& o, AnalogSeqStmt const& s) const
