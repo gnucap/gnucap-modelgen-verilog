@@ -1231,14 +1231,18 @@ bool Token_VAR_REF::propagate_deps(Token_VAR_REF const& from)
 /*--------------------------------------------------------------------------*/
 Block const* Token_VAR_REF::scope() const
 {
+  assert(!dynamic_cast<Block*>(_item));
+
   // TODO //
-  if(auto b=dynamic_cast<Block*>(_item)){ untested();
-    return b;
-  }else if(auto it=dynamic_cast<Owned_Base*>(_item)){
+  if(auto it=dynamic_cast<Owned_Base*>(_item)){
     return it->scope();
   }else if(auto ex=dynamic_cast<Expression_*>(_item)){
     return ex->scope();
+  }else if(dynamic_cast<Node const*>(_item)){
+    // .. incomplete();
+    return nullptr;
   }else{
+    incomplete();
     return nullptr;
     unreachable();
     auto p = prechecked_cast<Variable_Decl*>(_item);
@@ -1372,11 +1376,6 @@ void Token_ARGUMENT::stack_op(Expression* e) const
     auto nn = new Token_VAR_REF(*this, nd);
     e->push_back(nn);
   }
-}
-/*--------------------------------------------------------------------------*/
-Token_VAR_REF* Token_VAR_REF::clone()const
-{
-  return new Token_VAR_REF(*this);
 }
 /*--------------------------------------------------------------------------*/
 std::string Token_NODE::code_name() const

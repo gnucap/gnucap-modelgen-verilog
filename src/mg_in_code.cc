@@ -755,15 +755,11 @@ static Token_VAR_REF* parse_variable(CS& f, Block* o)
   f >> what;
   trace1("parse_variable", what);
   Base* b = o->lookup(what);
-  if(dynamic_cast<Node*>(b)) { untested();
-    incomplete();
-    return nullptr;
-  }else if(auto v = dynamic_cast<Token_VAR_REF*>(b)) {
-    // assert(v->data()); no. unreachable?
-    return v;
-  }else if(auto n = dynamic_cast<Token_NODE*>(b)) { untested();
-    // assert(v->data()); no. unreachable?
+  assert(!dynamic_cast<Node*>(b));
+  if(auto n = dynamic_cast<Token_NODE*>(b)) { untested();
     return n;
+  }else if(auto v = dynamic_cast<Token_VAR_REF*>(b)) {
+    return v;
   }else if (b) { untested();
     unreachable();
     f.reset_fail(here);
@@ -833,7 +829,7 @@ void Assignment::parse(CS& f)
     }
     {
       assert(_token->data());
-      assert(_token->scope());
+      assert(_token->scope() || _token == _lhsref);
       trace2("Assignment::parse prop?", _token->name(), data().size());
       trace1("Assignment::parse prop2", typeid(_lhsref).name());
       _lhsref->propagate_deps(*_token);
@@ -844,7 +840,7 @@ void Assignment::parse(CS& f)
     assert(scope());
     scope()->new_var_ref(_token);
     if(auto sb = dynamic_cast<SeqBlock*>(scope())) {
-      assert(_token->item() == this); // push _token instead?
+      assert(_token->item() == this || _lhsref == _token); // push _token instead?
       // sb->access_assign(this);
       assert(_lhsref);
       if(1){
@@ -1019,9 +1015,16 @@ bool Assignment::store_deps(TData const& d)
       // _token_data = d.clone(); // new TData();
       _token_data = new TData();
       _token_data->set_type(_lhsref->type());
-      _token = new Token_VAR_REF(_lhsref->name(), this, _token_data);
+      // TODO: rearrange Token_NODE.
+      if(dynamic_cast<Token_NODE const*>(_lhsref)){ untested();
+	_token = _lhsref;
+      }else if(dynamic_cast<Token_ARGUMENT const*>(_lhsref)){ untested();
+	_token = new Token_ARGUMENT(_lhsref->name(), this, _token_data);
+      }else{ untested();
+	_token = new Token_VAR_REF(_lhsref->name(), this, _token_data);
+      }
       assert(_token->data());
-      assert(_token->scope());
+      assert(_token->scope() || _token == _lhsref);
     }
 
     trace1("Assignment::store_deps", _token_data->type());
@@ -1115,7 +1118,10 @@ Assignment::~Assignment()
     }
   }else{
   }
-  delete _token;
+  if(_token == _lhsref) {
+  }else{
+    delete _token;
+  }
   _token = nullptr;
 }
 /*--------------------------------------------------------------------------*/

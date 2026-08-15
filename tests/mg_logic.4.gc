@@ -24,7 +24,8 @@ module test(a, b);
 	always @(posedge(b)) begin
 		if(a == b) cnt = cnt + 2;
 		if(b == a) cnt = cnt - 1;
-		if(b == c) cnt = cnt + 1;
+		d = 1;
+		if(b == c) cnt = cnt + d;
 		if(!(b == d)) cnt = cnt + 5;
 	end
 endmodule

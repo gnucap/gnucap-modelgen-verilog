@@ -394,7 +394,8 @@ public:
 protected:
   Token_VAR_REF(Token_VAR_REF const*p, Base* owner);
 public:
-  Token_VAR_REF* clone()const override;
+  Token_VAR_REF* clone()const override { return new Token_VAR_REF(*this); }
+/*--------------------------------------------------------------------------*/
 public:
   void stack_op(Expression* e)const override;
   Base const* operator->() const{ return _item; }
@@ -430,6 +431,8 @@ public:
     : Token_VAR_REF(s.name(), p) { }
   explicit Token_NODE(std::string const& s, Base* p)
     : Token_VAR_REF(s, p) { }
+  explicit Token_NODE(std::string Name, Base* item, Base const* data)
+    : Token_VAR_REF(Name, item, data) { }
 
   Token_NODE* clone()const override { return new Token_NODE(*this); }
 
