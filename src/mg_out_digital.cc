@@ -102,8 +102,20 @@ void make_tr_advance_digital(std::ostream& o, const Module& m)
   o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
   o << "inline void COMMON_" << m.identifier() <<
     "::tr_advance_digital(MOD_" << m.identifier() << "* m) const\n{\n";
-  // o << "eval_t mode = m_TR_ADVANCE;\n";
-  // o << "(void)mode;\n";
+
+  for(auto n : m.circuit()->nodes()){
+    if(n->is_reg()){
+      o__ "{\n";
+      o____ "node_l& nl = reinterpret_cast<node_l&>(m->n_(MOD::n_" << n->name() << "));\n";
+      o____ "if (!nl->in_transit()) { untested();\n";
+      o____ "}else if (CKT_BASE::_sim->_time0 >= nl->final_time()) { untested();\n";
+      o______ "nl->propagate();\n";
+      o____ "}else{ untested();\n";
+      o____ "}\n";
+      o__ "}\n\n";
+    }else{
+    }
+  }
 
   OUT_DIGITAL oo(OUT_DIGITAL::modeTR_ADVANCE, &tr_advance_tag);
   oo.make_load_variables(o, m);
@@ -141,6 +153,22 @@ void make_tr_regress_digital(std::ostream& o, const Module& m)
   o__ "}else{\n";
   o__ "}\n";
 #endif
+
+  for(auto n : m.circuit()->nodes()){
+    if(n->is_reg()){
+      o__ "{\n";
+      o____ "node_l& nl = reinterpret_cast<node_l&>(m->n_(MOD::n_" << n->name() << "));\n";
+      o____ "if (nl->last_change_time() > m->_sim->_time0) { untested();\n";
+      o______ "nl->unpropagate();\n";
+      o______ "assert(_sim->_time0 < nl->final_time());\n";
+      o____ "}else if (m->_sim->_time0 >= nl->final_time()) { untested();\n";
+      o______ "nl->propagate();\n";
+      o____ "}else{ untested();\n";
+      o____ "}\n";
+      o__ "}\n\n";
+    }else{
+    }
+  }
 
 //   OUT_DIGITAL oo(OUT_DIGITAL::modeTR_REGRESS, &tr_advance_tag);
 //   oo.make_load_variables(o, m);
