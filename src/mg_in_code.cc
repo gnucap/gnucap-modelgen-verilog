@@ -1020,7 +1020,7 @@ bool Assignment::store_deps(TData const& d)
 	_token = _lhsref;
       }else if(dynamic_cast<Token_ARGUMENT const*>(_lhsref)){ untested();
 	_token = new Token_ARGUMENT(_lhsref->name(), this, _token_data);
-      }else{ untested();
+      }else{
 	_token = new Token_VAR_REF(_lhsref->name(), this, _token_data);
       }
       assert(_token->data());

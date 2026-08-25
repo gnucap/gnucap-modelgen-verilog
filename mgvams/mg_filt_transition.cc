@@ -23,7 +23,6 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"
-#include "mg_out.h"
 #include "mg_analog.h"
 #include "mg_token.h"
 #include <globals.h>
@@ -42,9 +41,6 @@ static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
     size_t k = 2;
 
     for(auto const& v : deps.ddeps()) {
-      // char sign = f.reversed()?'-':'+';
-      o__ "// dep " << code_name(v) << "\n";
-      // if(f->branch() == v->branch()){ untested(); }
       if(branch(v)->is_short()){ untested();
       }else{
 	o__ "assert(" << "t0[d" << code_name(v) << "] == t0[d" << code_name(v) << "]" << ");\n";
@@ -58,25 +54,10 @@ static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
   }
 }
 /*--------------------------------------------------------------------------*/
-#if 0
-class Token_TRANSITION : public Token_CALL {
-public:
-  explicit Token_TRANSITION(const std::string Name, FUNCTION_ const* f)
-    : Token_CALL(Name, f) {}
-private:
-  explicit Token_TRANSITION(const Token_TRANSITION& P, Base const* data, Expression_ const* e = nullptr)
-    : Token_CALL(P, data, e) {} // , _item(P._item) {}
-  Token* clone()const override {untested(); return new Token_TRANSITION(*this);}
-
-  void stack_op(Expression* e)const override;
-  Branch* branch() const{unreachable(); return nullptr;}
-};
-#endif
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 const int NUM_ARGS = 5;
 /*--------------------------------------------------------------------------*/
-class TRANSITION : public MGVAMS_FILTER /* FUNCTION_ */ {
+/*--------------------------------------------------------------------------*/
+class TRANSITION : public MGVAMS_FILTER {
   Probe const* _prb{nullptr};
 public: // HACK
   mutable Branch const* _output{nullptr};
@@ -86,16 +67,14 @@ public: // HACK
   }
   explicit TRANSITION(TRANSITION const& p) : MGVAMS_FILTER(p) {
   }
-  ~TRANSITION(){
-//    delete _prb; belongs to _m
-  }
+  ~TRANSITION(){ }
   virtual TRANSITION* clone()const override {
     return new TRANSITION(*this);
   }
 protected:
-  int max_args()const override {untested(); return 4;}
-  bool port_hack()const override {untested(); return false;}
-  bool is_analog_filter()const override {untested(); return true;}
+  int max_args()const override {return NUM_ARGS;}
+  bool port_hack()const override {return false;}
+  bool is_analog_filter()const override {return true;}
   std::string eval_name()const override {
     if(_m){
       std::string id = _m->identifier().to_string();
@@ -105,17 +84,12 @@ protected:
       return "missing_m??";
     }
   }
-//  void set_code_name(std::string x){
-//    _code_name = x;
-//  }
 protected:
   std::string code_name()const override {
     return "_b_" + short_label();
   }
 public:
-  Token* new_token(Module&, size_t)const override { untested();
-    return nullptr;
-  }
+  Token* new_token(Module&, size_t)const override { return nullptr; }
 
   void make_cc_common(std::ostream& o)const override{
     o << "public:\n";
@@ -132,7 +106,7 @@ public:
   }
 
   void make_cc_dev(std::ostream& o)const override{
-    indent x;
+    indent x(2);
     o__ "ddouble " << code_name() << "(ddouble t0";
       assert(num_args());
       assert(num_args() <= NUM_ARGS);
@@ -158,7 +132,7 @@ public:
       o << ", double t" << n;
     }
     o << ")\n{\n";
-    indent x;
+    indent x(2);
     for(int n=1; n < int(num_args()); ++n){
       o__ "(void)t" << n << ";\n";
     }
@@ -263,20 +237,7 @@ public:
     unreachable();
     return "transition";
   }
-//  void stack_op(Expression*)const override {
-//    throw Exception("invalid");
-//  }
-  Probe const* prb()const {return _prb;}
-#if 0
-  void set_n_to_gnd()const {
-    assert(_m);
-    _m->set_to_ground(_br->n());
-  }
-  void set_p_to_gnd()const { untested();
-    assert(_m);
-    _m->set_to_ground(_br->p());
-  }
-#endif
+  Probe const* prb()const { untested();return _prb;}
 private:
   Branch const* output()const override;
   Node_Ref p()const override;

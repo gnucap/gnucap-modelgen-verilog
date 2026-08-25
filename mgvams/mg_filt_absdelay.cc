@@ -42,9 +42,6 @@ static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
     size_t k = 2;
 
     for(auto const& v : deps.ddeps()) {
-      // char sign = f.reversed()?'-':'+';
-      o__ "// dep " << probe(v)->code_name() << "\n";
-      // if(f->branch() == v->branch()){ untested(); }
       if(branch(v)->is_short()){ untested();
       }else{
 	o__ "assert(" << "t0[d" << probe(v)->code_name() << "] == t0[d" << probe(v)->code_name() << "]" << ");\n";
@@ -58,23 +55,10 @@ static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
   }
 }
 /*--------------------------------------------------------------------------*/
-#if 0
-class Token_ABSDELAY : public Token_CALL {
-public:
-  explicit Token_ABSDELAY(const std::string Name, FUNCTION_ const* f)
-    : Token_CALL(Name, f) { untested();}
-private:
-  explicit Token_ABSDELAY(const Token_ABSDELAY& P, Base const* data, Expression_ const* e = nullptr)
-    : Token_CALL(P, data, e) { untested();} // , _item(P._item) {}
-  Token* clone()const override {untested(); return new Token_ABSDELAY(*this);}
-
-  void stack_op(Expression* e)const override;
-  Branch* branch() const;
-};
-#endif
+const int NUM_ARGS = 3;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class ABSDELAY : public MGVAMS_FILTER /* FUNCTION_ */ {
+class ABSDELAY : public MGVAMS_FILTER {
   Probe const* _prb{nullptr};
 public: // HACK
   mutable Branch const* _output{nullptr};
@@ -84,14 +68,12 @@ public: // HACK
   }
   explicit ABSDELAY(ABSDELAY const& p) : MGVAMS_FILTER(p) {
   }
-  ~ABSDELAY(){
-//    delete _prb; belongs to _m
-  }
+  ~ABSDELAY(){ }
   ABSDELAY* clone()const override {
     return new ABSDELAY(*this);
   }
 protected:
-  int max_args()const override { return 3;}
+  int max_args()const override {return NUM_ARGS;}
   bool port_hack()const override {return false;}
   bool is_analog_filter()const override {return true;}
   std::string eval_name()const override {
@@ -108,9 +90,7 @@ protected:
     return "_b_" + short_label();
   }
 public:
-  Token* new_token(Module&, size_t)const override {
-    return nullptr;
-  }
+  Token* new_token(Module&, size_t)const override { return nullptr; }
 
   void make_cc_common(std::ostream& o)const override{
     o << "public:\n";
@@ -130,16 +110,15 @@ public:
     indent x(2);
     o__ "ddouble " << code_name() << "(ddouble t0";
       assert(num_args());
-      assert(num_args() < 4);
+      assert(num_args() <= NUM_ARGS);
       for(int n=1; n < int(num_args()); ++n){
 	o << ", double t" << n;
       }
-
     o << "); // (d)\n";
     o__ "bool _short"+code_name()+"()const {return " << bool(_output) << ";}\n";
     o__ "ddouble " << code_name() << "__precalc(ddouble const&";
       assert(num_args());
-      assert(num_args() < 4);
+      assert(num_args() <= NUM_ARGS);
       for(int n=1; n < int(num_args()); ++n){
 	o << ", double t" << n;
       }
@@ -154,9 +133,9 @@ public:
       o << ", double t" << n;
     }
     o << ")\n{\n";
-    indent xx(2);
+    indent x(2);
     for(int n=1; n < int(num_args()); ++n){
-      o__ "(void) " << "t" << n << ";\n";
+      o__ "(void)t" << n << ";\n";
     }
     o__ "MOD_" << id << "* d = this;\n";
     o__ "typedef MOD_" << id << " MOD;\n";
@@ -190,7 +169,7 @@ public:
 //    std::string id = m.identifier().to_string();
     o << "ddouble MOD_" << id << "::" << code_name() << "__precalc(ddouble const&";
     assert(num_args());
-    assert(num_args() < 4);
+    assert(num_args() <= NUM_ARGS);
     if(num_args()>1){
       o << ", double delay=1";
     }else{ untested();
@@ -229,8 +208,6 @@ public:
     return "absdelay";
   }
   Probe const* prb()const { untested();return _prb;}
-  void set_n_to_gnd__()const override { untested(); assert(_m); return MGVAMS_FILTER::set_n_to_gnd(_m); }
-  void set_p_to_gnd__()const override { untested(); assert(_m); return MGVAMS_FILTER::set_p_to_gnd(_m); }
 private:
   Branch const* output()const override;
   Node_Ref p()const override;
@@ -239,14 +216,6 @@ private: // setup
   Branch* branch()const override { untested(); return _br; }
 } absdel;
 DISPATCHER<FUNCTION>::INSTALL d0(&function_dispatcher, "absdelay", &absdel);
-/*--------------------------------------------------------------------------*/
-/// Branch* Token_ABSDELAY::branch() const
-/// { untested();
-///   auto func = prechecked_cast<ABSDELAY const*>(f());
-///   assert( func);
-///   assert( func->_br);
-///   return func->_br;
-/// }
 /*--------------------------------------------------------------------------*/
 Branch const* ABSDELAY::output() const
 {

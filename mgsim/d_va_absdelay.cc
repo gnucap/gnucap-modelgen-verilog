@@ -76,7 +76,7 @@ public:
   PARAMETER<double> _fall;
   std::string name()const override {return "va_transition";}
 public:
-  ~COMMON_TRANSITION();
+  // ~COMMON_TRANSITION() {}
   COMMON_TRANSITION(int x) : COMMON_DELAY(x) {}
   COMMON_TRANSITION(COMMON_TRANSITION const& x)
    : COMMON_DELAY(x)
@@ -98,7 +98,6 @@ class DELAY : public ELEMENT {
   node_t* _nN{nullptr};
 public:
   WAVE _forward;
-  std::deque<std::pair<double, double>> _wave;
   double _out0;
   double _out1;
   COMPLEX _y12;
@@ -194,13 +193,6 @@ public: // params
 		      COMMON_COMPONENT* Common, double Value,
 		      int state_count, double state[],
 		      int node_count, const node_t nodes[])override;
-private: // node list
-  enum {
-    n_out0,
-    n_out1,
-    n_in0,
-    n_in1,
-  };
 }; // DELAY
 /*--------------------------------------------------------------------------*/
 DELAY delay(&cdel);
@@ -345,8 +337,6 @@ void DELAY::tr_regress()
   _out0 = _y[0].f0;
 }
 /*--------------------------------------------------------------------------*/
-// typedef DELAY::ddouble ddouble;
-/*--------------------------------------------------------------------------*/
 void DELAY::tr_begin()
 {
   ELEMENT::tr_begin();
@@ -487,26 +477,6 @@ void DELAY::expand()
     trace1("expand nmn alreay there?", input_idx());
   }
 
-  if (_sim->is_first_expand()) {
-    int n_inputs = _n_ports - 1;
-    if(_ctrl_in) {
-      std::string input_dev_type = "va_fpoly_g";
-      std::vector<node_t> nodes(2*_n_ports);
-
-      node_t gnd;
-      gnd.set_to_ground(nullptr);
-      nodes[0] = n_(input_idx());
-      nodes[1] = gnd;
-      for(int k=2; k<2*n_inputs + 2; ++k){
-	nodes[k] = n_(k);
-      }
-    }else{
-      // _input = this;
-    }
-  }else{ untested();
-  }
-
-
   assert(!is_constant());
 } //expand
 /*--------------------------------------------------------------------------*/
@@ -554,7 +524,6 @@ void DELAY::set_parameters(const std::string& Label, CARD *Owner,
  //   _n_ports = n_nodes/2; // sets num_nodes() = _n_ports*2
     if(net_nodes()+int_nodes()>NODES_PER_BRANCH) {
       _nN = new node_t[net_nodes()+int_nodes()];
-      trace4("allocnodes", net_nodes(), nodes, int_nodes(), n_nodes);
     }else{
     }
   }else{untested();
@@ -774,10 +743,6 @@ void COMMON_ABSDELAY::tr_advance(COMPONENT* c) const
   }
 }
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-COMMON_TRANSITION::~COMMON_TRANSITION()
-{
-}
 /*--------------------------------------------------------------------------*/
 void COMMON_TRANSITION::precalc_last(const PARAM_LIST* par_scope)
 {

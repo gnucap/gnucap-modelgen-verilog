@@ -190,12 +190,12 @@ public:
   ~AnalogCtrlStmt(){ delete _block; _block = nullptr; }
 // void parse(CS& cmd)override; // CtrlStmt
 // void dump(std::ostream&)const override; // CtrlStmt
-  SeqBlock const& body()const { untested();
+  SeqBlock const& body()const {
     auto r = prechecked_cast<AnalogSeqBlock const*>(_block);
     assert(r);
     return *r;
   }
-  SeqBlock& body() { untested();
+  SeqBlock& body() {
     auto r = prechecked_cast<AnalogSeqBlock*>(_block);
     assert(r);
     return *r;
