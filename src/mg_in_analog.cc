@@ -1624,7 +1624,7 @@ void AnalogFunctionArgs::set_deps(Block::map const& m)
       }catch(std::out_of_range const&){
       }
       trace3("AFA::update", t->name(), t->is_output(), l);
-      if(dynamic_cast<Token_ARGUMENT const*>(l)){ untested();
+      if(dynamic_cast<Token_ARGUMENT const*>(l)){
 	trace1("AFA::update arg", t->name());
       }else if(dynamic_cast<Token_VAR_DECL const*>(l)){ untested();
 	trace1("AFA::update decl", t->name());
@@ -2177,6 +2177,10 @@ int Branch::num_states() const
     }else{
       ++k;
     }
+  }
+  if(auto f = dynamic_cast<MGVAMS_FILTER const*>(_ctrl)){
+    k += f->num_values();
+  }else{
   }
   return k;
 }

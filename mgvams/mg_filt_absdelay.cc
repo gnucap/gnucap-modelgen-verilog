@@ -213,7 +213,7 @@ private:
   Node_Ref p()const override;
   Node_Ref n()const override;
 private: // setup
-  Branch* branch()const override { untested(); return _br; }
+  Branch* branch()const override { return _br; }
 } absdel;
 DISPATCHER<FUNCTION>::INSTALL d0(&function_dispatcher, "absdelay", &absdel);
 /*--------------------------------------------------------------------------*/

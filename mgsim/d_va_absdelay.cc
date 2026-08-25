@@ -109,8 +109,10 @@ public:
   double _fall{0.}; // TODO _ctrl_in ..
 private:
   double* _ctrl_in{NULL};
-  ELEMENT* _input{NULL}; // needed in ac
+//   ELEMENT* _input{NULL}; // needed in ac (not now? not yet?)
   double _old_output{0.};
+public:
+  double* _delay_arg{NULL};
 private: // construct
   explicit DELAY(DELAY const&);
 public:
@@ -121,7 +123,7 @@ public:
     }else{
       // it is part of a base class
     }
-    delete (CARD*)_input;
+//    delete (CARD*)_input;
   }
   CARD* clone()const override;
   std::string dev_type()const override{assert(has_common()); return common()->name();}
@@ -430,10 +432,12 @@ DELAY::DELAY(DELAY const&p) : ELEMENT(p), _nN(_nodes)
 void DELAY::precalc_first()
 {
   ELEMENT::precalc_first();
+#if 0
   if(_input){ untested();
     _input->precalc_first();
   }else{
   }
+#endif
 }
 /*--------------------------------------------------------------------------*/
 int DELAY::is_valid()const
@@ -519,7 +523,11 @@ void DELAY::set_parameters(const std::string& Label, CARD *Owner,
   attach_common(cc);
 
   if (first_time) {
-    assert(n_states - 1 - n_nodes/2 == 0); // for now.
+    if(n_states - 1 - n_nodes/2 == 1){
+      _delay_arg = _ctrl_in + n_states - 1;
+    }else if(n_states - 1 - n_nodes/2 == 0){
+    }else{ untested();
+    }
 //    _current_port_names.resize(n_states - 1 - n_nodes/2);
  //   _n_ports = n_nodes/2; // sets num_nodes() = _n_ports*2
     if(net_nodes()+int_nodes()>NODES_PER_BRANCH) {
@@ -587,10 +595,12 @@ void DELAY::map_nodes()
   trace3("DELAY::map_nodes", input_idx(), int_nodes(), ext_nodes());
   ELEMENT::map_nodes();
 
+#if 0
   if(_input){ untested();
     _input->map_nodes();
   }else{
   }
+#endif
 }
 /*--------------------------------------------------------------------------*/
 void DELAY::ac_load()
@@ -667,8 +677,7 @@ TIME_PAIR DELAY::tr_review()
   const COMMON_ABSDELAY* c=dynamic_cast<const COMMON_ABSDELAY*>(common());
   if(c){
     q_accept();
-    // incomplete();
-    _time_by.min_event(_sim->_time0 + c->_delay);
+    _time_by.min_event(_sim->_time0 + c->_delay); // needed? (hard event?)
   }else{
     DELAY* e = this;
     if(e->tr_involts() != e->_old_input){
@@ -771,13 +780,18 @@ void COMMON_TRANSITION::tr_accept(COMPONENT* c) const
 {
   DELAY* e = prechecked_cast<DELAY*>(c);
   assert(e);
+  double del = _delay;
+  if(e->_delay_arg){
+    del = *e->_delay_arg;
+  }else{
+  }
 
   if(_sim->analysis_is_tran_static()){
     if(e->tr_involts() != e->_old_input){
       e->_forward.initialize().push(0., e->_out0);
       assert(e->_rise);
       assert(e->_fall);
-      e->_forward.new_transition(_sim->_time0+_delay, e->_rise, e->_fall, e->tr_involts());
+      e->_forward.new_transition(_sim->_time0+del, e->_rise, e->_fall, e->tr_involts());
       e->_old_input = e->tr_involts();
       double pending = e->_forward.cleanup(0);
       if(pending < NEVER){
@@ -792,7 +806,7 @@ void COMMON_TRANSITION::tr_accept(COMPONENT* c) const
       trace4("COMMON_TRANSITION::accept nt", _sim->_time0, e->tr_involts(), e->_rise, e->_fall);
       assert(e->_rise);
       assert(e->_fall);
-      e->_forward.new_transition(_sim->_time0+_delay, e->_rise, e->_fall, e->tr_involts());
+      e->_forward.new_transition(_sim->_time0+del, e->_rise, e->_fall, e->tr_involts());
       e->_old_input = e->tr_involts();
     }else{
     }

@@ -31,7 +31,7 @@
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
-static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
+static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps, bool delay_arg)
 {
 
   {
@@ -45,11 +45,16 @@ static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
       }else{
 	o__ "assert(" << "t0[d" << code_name(v) << "] == t0[d" << code_name(v) << "]" << ");\n";
 	o__ "// assert(!d->" << state << "[" << k << "]);\n";
-	o__ "d->" << state << "[" //  << k << "]"
+	o__ "d->" << state << "["
 	  << "MOD::" << state << "_::dep" << code_name(v) << "] "
 	  " = " << sign << " " << "t0[d" << code_name(v) << "]; // (4)\n";
 	++k;
       }
+    }
+    if(delay_arg){
+      o__ "d->" << state << "[" << k << "] = " << sign << " " << "t1; //delay_arg\n";
+      ++k;
+    }else{ untested();
     }
   }
 }
@@ -73,6 +78,7 @@ public: // HACK
   }
 protected:
   int max_args()const override {return NUM_ARGS;}
+  int num_values()const override { return has_delay_arg();}
   bool port_hack()const override {return false;}
   bool is_analog_filter()const override {return true;}
   std::string eval_name()const override {
@@ -84,6 +90,8 @@ protected:
       return "missing_m??";
     }
   }
+private:
+  bool has_delay_arg()const {return num_args()>1;}
 protected:
   std::string code_name()const override {
     return "_b_" + short_label();
@@ -139,7 +147,7 @@ public:
     o__ "MOD_" << id << "* d = this;\n";
     o__ "typedef MOD_" << id << " MOD;\n";
     std::string state = "_st" + cn;
-    make_cc_tmp(o, state, _br->deps());
+    make_cc_tmp(o, state, _br->deps(), has_delay_arg());
 
     if(_output){ untested();
       o__ "// subdevice\n";

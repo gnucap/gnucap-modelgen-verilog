@@ -9,6 +9,7 @@ class Filter : public Element_2 {
   Branch_Ref _branch;
   Probe const* _prb=nullptr;
   int _num_states{0};
+  int _num_values{0};
 public:
   explicit Filter(std::string const& name);
   explicit Filter() : Element_2() { untested(); new_deps(); }
@@ -17,11 +18,10 @@ public:
   void dump(std::ostream&)const override { untested();unreachable();}
 
   void set_num_states(int s) {_num_states = s; }
+  void set_num_values(int s) {_num_values = s; }
 //  void set_output(Branch_Ref const& x);
 //  Branch_Ref const& branch() const{ untested(); return _branch; }
-  std::string name() const {
-    return _name;
-  }
+  std::string name() const { return _name; }
   std::string branch_code_name() const { untested();
     assert(_branch);
     return _branch->code_name();
@@ -30,14 +30,13 @@ public:
   std::string code_name()const override;
   TData const& deps()const { untested(); assert(_deps); return *_deps; }
 
-  int num_states()const override;
+  int num_states()const override { return int(_num_states); }
+  int num_values()const { return int(_num_values); }
   int net_nodes()const override;
   std::string state()const override;
   std::string short_label()const override;
 //  Probe const* prb() const;
-  bool has_branch() const {
-    return _branch;
-  }
+  bool has_branch() const { return _branch; }
   void set_deps(TData const&);
 private:
   TData& deps() { untested(); assert(_deps); return *_deps; }

@@ -756,7 +756,7 @@ static Token_VAR_REF* parse_variable(CS& f, Block* o)
   trace1("parse_variable", what);
   Base* b = o->lookup(what);
   assert(!dynamic_cast<Node*>(b));
-  if(auto n = dynamic_cast<Token_NODE*>(b)) { untested();
+  if(auto n = dynamic_cast<Token_NODE*>(b)) {
     return n;
   }else if(auto v = dynamic_cast<Token_VAR_REF*>(b)) {
     return v;
@@ -1016,9 +1016,9 @@ bool Assignment::store_deps(TData const& d)
       _token_data = new TData();
       _token_data->set_type(_lhsref->type());
       // TODO: rearrange Token_NODE.
-      if(dynamic_cast<Token_NODE const*>(_lhsref)){ untested();
+      if(dynamic_cast<Token_NODE const*>(_lhsref)){
 	_token = _lhsref;
-      }else if(dynamic_cast<Token_ARGUMENT const*>(_lhsref)){ untested();
+      }else if(dynamic_cast<Token_ARGUMENT const*>(_lhsref)){
 	_token = new Token_ARGUMENT(_lhsref->name(), this, _token_data);
       }else{
 	_token = new Token_VAR_REF(_lhsref->name(), this, _token_data);

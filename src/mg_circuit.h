@@ -154,6 +154,7 @@ public:
   virtual std::string state()const	{return _state;}
   virtual int	     net_nodes()const	{return int(ports().size());}
   virtual int	     num_states()const	{ untested();unreachable(); return 0;}
+  virtual int	     num_args()const	{ untested(); return 0;}
   virtual bool is_used()const {return true;} // incomplete.
   virtual bool is_used_in_branch()const {return true;} // incomplete.
   virtual std::string const& port_name(int)const {
@@ -438,7 +439,7 @@ public:
   const_reverse_iterator rbegin() const{ untested(); return _nodes.rbegin(); }
   const_reverse_iterator rend() const{ untested(); return _nodes.rend(); }
   const_iterator begin() const{ return _nodes.begin(); }
-  const_iterator end() const{ untested(); return _nodes.end(); }
+  const_iterator end() const{ return _nodes.end(); }
   size_t size() const{ return _map.size(); }
 //   size_t how_many() const{ untested(); return _nodes.size() - 1; }
   Node* new_node(std::string const&, Block* owner);

@@ -211,11 +211,6 @@ std::string Filter::code_name()const
   return "_f_" + _name; // name()?
 }
 /*--------------------------------------------------------------------------*/
-int Filter::num_states() const
-{
-  return int(_num_states);
-}
-/*--------------------------------------------------------------------------*/
 // BUG: delegate to branch
 int Filter::net_nodes() const
 {

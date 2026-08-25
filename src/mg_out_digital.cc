@@ -473,7 +473,7 @@ void OUT_DIGITAL::make_assignment(std::ostream& o, Assignment const& a) const
   }else if(dynamic_cast<Token_NODE const*>(&a.lhs())){
     if(is_tr_accept() || is_tr_initial()) {
        if(is_cc_ref(&e)){
-       }else{ untested();
+       }else{
        }
        o__ "bool rhs;\n";
        o__ "{ // rhs eval\n";

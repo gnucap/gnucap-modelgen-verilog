@@ -1324,7 +1324,9 @@ static Token* new_filter_token(int na, FUNCTION_ const* func, Module* m)
   std::string filter_code_name = f->label() + "_" + std::to_string(n_filters++);
 
   FUNCTION* fc = f->clone();
+  assert(fc);
   auto fcl = prechecked_cast<MGVAMS_FILTER*>(fc);
+  assert(fcl);
 
 #if 1
   {
@@ -1354,7 +1356,7 @@ static Token* new_filter_token(int na, FUNCTION_ const* func, Module* m)
 
     br->set_filter(fcl); // needed?
     assert(m->circuit());
-    m->new_filter();
+    m->new_filter(); // inc_filter?
 
     if(f->eval_name()!=""){
       br->set_eval(fcl->eval_name());
@@ -1401,6 +1403,7 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args_)
     import_flags(f);
     t = new_event_token(num_args, f, this);
   }else if(f && f->is_analog_filter()) {
+    assert(prechecked_cast<MGVAMS_FILTER const*>(f));
     import_flags(f);
     t = new_filter_token(num_args, f, this);
   }else if(f){

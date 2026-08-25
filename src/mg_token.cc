@@ -1361,7 +1361,7 @@ void Token_ARGUMENT::stack_op(Expression* e) const
   Base const* r = _var;
   assert(r!=this);
   TData const* more = nullptr;
-  if(!r){ untested();
+  if(!r){
     unreachable();
   }else if(auto x = dynamic_cast<Token_VAR_REF const*>(r)){
     more = &x->deps();

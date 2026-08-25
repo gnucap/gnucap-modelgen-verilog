@@ -409,7 +409,7 @@ public:
 class Filter_output : public Token_PROBE {
 public:
   explicit Filter_output(std::string const& name, Branch const* b, TData* tdata)
-    : Token_PROBE(name, b, tdata) {}
+    : Token_PROBE(name, b, tdata) { untested(); }
 
   Probe const* probe()const {incomplete(); return nullptr;}
   std::string val_string()const override { untested();
