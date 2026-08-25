@@ -9,13 +9,13 @@ module test_state(a, c);
 
   analog   initial begin // i
     // vv : 0
-    vv = init; // s1 r3{abx}
+    vv = init; // s1 r4{abx}
   end
 
   analog begin // always
     // vv : 0
     V(a, c) <+ transition(vv); // [V(transition_0_p)] r2{x}
-    vv = (vv + 1); // s3 r3{abx}
+    vv = (vv + 1); // s3 r4{abx}
   end
 
 endmodule

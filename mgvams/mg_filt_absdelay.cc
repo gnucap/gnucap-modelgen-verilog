@@ -77,10 +77,7 @@ private:
 class ABSDELAY : public MGVAMS_FILTER /* FUNCTION_ */ {
   Probe const* _prb{nullptr};
 public: // HACK
- // Branch* _br{nullptr};
   mutable Branch const* _output{nullptr};
-//  Node_Ref _p;
-//  Node_Ref _n;
 
   explicit ABSDELAY() : MGVAMS_FILTER() {
     set_label("absdelay");
@@ -90,6 +87,10 @@ public: // HACK
   ~ABSDELAY(){
 //    delete _prb; belongs to _m
   }
+  ABSDELAY* clone()const override {
+    return new ABSDELAY(*this);
+  }
+protected:
   int max_args()const override { return 3;}
   bool port_hack()const override {return false;}
   bool is_analog_filter()const override {return true;}
@@ -102,62 +103,13 @@ public: // HACK
       return "missing_m??";
     }
   }
-  virtual ABSDELAY* clone()const override {
-    return new ABSDELAY(*this);
-  }
 protected:
-  //void set_code_name(std::string x){ untested();
-  //  _code_name = x;
-  //}
-  //std::string code_name()const override{ untested();
-  //  return _code_name;
-  //}
   std::string code_name()const override {
     return "_b_" + short_label();
   }
 public:
-  // Token* new_token(Expression_ const* e) ...
-  // Module* m = e->owner()...
   Token* new_token(Module&, size_t)const override {
     return nullptr;
-#if 0
-    assert(na != size_t(-1));
-
-    std::string filter_code_name = label() + "_" + std::to_string(n_filters++);
-
-    ABSDELAY* cl = clone();
-    { untested();
-      cl->set_label(filter_code_name); // label()); // "_b_" + filter_code_name);
-      cl->set_code_name("_b_" + filter_code_name);
-      assert(na<6);
-      cl->set_num_args(na);
-      cl->_m = &m;
-      m.push_back(cl);
-    }
-
-    Node* np = m.new_node(filter_code_name + "_p");
-    Node* nn = m.new_node(filter_code_name + "_n"); // &mg_ground_node
-    np->set_to(&Node_Map::mg_ground_node, "_short_b_"+filter_code_name+"()");
-
-    cl->_p = np;
-    cl->_n = nn;
-    { untested();
-      Branch* br = m.new_branch(np, &Node_Map::mg_ground_node);
-//      br->set_source();
-      assert(br);
-      assert(const_cast<Branch const*>(br)->owner());
-      Branch_Ref prb(br);
-      cl->_br = br;
-
-      cl->_prb = m.new_probe("potential", prb);
-      br->set_filter(cl);
-      std::string id = m.identifier().to_string();
-      br->set_eval("COMMON_" + id + "::_common_b_" + filter_code_name);
-      m.new_filter();
-    }
-
-    return new Token_ABSDELAY(label(), cl);
-#endif
   }
 
   void make_cc_common(std::ostream& o)const override{
@@ -277,20 +229,14 @@ public:
     return "absdelay";
   }
   Probe const* prb()const { untested();return _prb;}
-  void set_n_to_gnd__()const override { untested();
-    assert(_m);
-    return MGVAMS_FILTER::set_n_to_gnd(_m);
-  }
-  void set_p_to_gnd__()const override { untested();
-    assert(_m);
-    return MGVAMS_FILTER::set_p_to_gnd(_m);
-  }
+  void set_n_to_gnd__()const override { untested(); assert(_m); return MGVAMS_FILTER::set_n_to_gnd(_m); }
+  void set_p_to_gnd__()const override { untested(); assert(_m); return MGVAMS_FILTER::set_p_to_gnd(_m); }
 private:
   Branch const* output()const override;
   Node_Ref p()const override;
   Node_Ref n()const override;
 private: // setup
-  Branch* branch()const override { return _br; }
+  Branch* branch()const override { untested(); return _br; }
 } absdel;
 DISPATCHER<FUNCTION>::INSTALL d0(&function_dispatcher, "absdelay", &absdel);
 /*--------------------------------------------------------------------------*/
@@ -301,74 +247,6 @@ DISPATCHER<FUNCTION>::INSTALL d0(&function_dispatcher, "absdelay", &absdel);
 ///   assert( func->_br);
 ///   return func->_br;
 /// }
-/*--------------------------------------------------------------------------*/
-#if 0
-static Expression_* clone_args(Base const* e)
-{ untested();
-  if(auto e_ = dynamic_cast<Expression_ const*>(e)) { untested();
-    return e_->clone();
-  }else{ untested();
-    unreachable();
-    return nullptr;
-  }
-}
-/*--------------------------------------------------------------------------*/
-void Token_ABSDELAY::stack_op(Expression* e)const
-{ untested();
-  assert(e);
-  Token_CALL::stack_op(e);
-	
-  assert(!e->is_empty());
-  auto cc = prechecked_cast<Token_CALL const*>(e->back());
-  assert(cc);
-  assert(cc->args());
-  trace1("Token_ABSDELAY::stack_op", cc->args()->size());
-  e->pop_back();
-
-  auto func = prechecked_cast<ABSDELAY const*>(f());
-  assert(func);
-
-  if(cc->args()->size() < 1){ untested();
-    throw Exception("syntax error, need delay");
-  }else{ untested();
-  }
-
-  if(auto dd = prechecked_cast<TData const*>(cc->data())) { untested();
-    // cc->args()[0]->data?
-    assert(dd);
-
-    branch()->deps().clear();
-    branch()->deps() = *dd; // HACK
-    if(1){ untested();
-      func->set_n_to_gnd();
-    }else if(0 /*sth linear*/){ untested();
-      // somehow set loss=0 and output ports to target.
-    }else{ untested();
-    }
-
-    auto d = new TData;
-    trace1("xdt output dep", func->prb()->code_name());
-    d->insert(Dep(func->prb(), Dep::_LINEAR)); // BUG?
-    auto N = new Token_ABSDELAY(*this, d, clone_args(cc->args()));
-    assert(N->data());
-    assert(dynamic_cast<TData const*>(N->data()));
-    e->push_back(N);
-    assert(f()==N->f());
-    delete(cc);
-  }else if(!e->size()) { untested();
-    unreachable();
-  }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) { untested();
-    auto d = new TData;
-    d->insert(Dep(func->prb())); // BUG?
-    auto N = new Token_ABSDELAY(*this, d);
-    assert(N->data());
-    assert(dynamic_cast<TData const*>(N->data()));
-    e->push_back(N);
-  }else{ untested();
-    unreachable();
-  }
-};
-#endif
 /*--------------------------------------------------------------------------*/
 Branch const* ABSDELAY::output() const
 {
