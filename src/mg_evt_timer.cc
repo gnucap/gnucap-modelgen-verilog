@@ -307,7 +307,15 @@ private:
     o______ "}else{\n";
     o______ "}\n";
     o______ "assert(is_q(_req_evt) || _sim->_time0 == 0);\n";
-    o______ "return true;\n";
+    o______ "if(_sim->analysis_is_static()) { untested();\n";
+    o________ "return true;\n";
+    o______ "}else if(_sim->_time0 < _req_evt){ untested();\n";
+    o________ "return false;\n";
+    o______ "}else if(_sim->_time0 <= _req_evt + 1.01*_sim->_dtmin) { untested();\n";
+    o________ "return true;\n";
+    o______ "}else{\n";
+    o________ "return false;\n";
+    o______ "}\n";
     o____ "}\n";
     /*----------------------------------------------------------------------*/
     // compute time of next event from timer args and previous
