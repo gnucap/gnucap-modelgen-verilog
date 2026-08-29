@@ -961,6 +961,9 @@ extern NODE ground_node;
 /*--------------------------------------------------------------------------*/
 namespace va {
 /*--------------------------------------------------------------------------*/
+typedef PARAMETER<double> Pdbl;
+typedef PARAMETER<int> Pint;
+/*--------------------------------------------------------------------------*/
 inline double PORT_FLOW(int i, BASE_SUBCKT const* m)
 {
   incomplete();
@@ -1028,7 +1031,20 @@ public:
   }
   operator bool()const { return _b4 == b4_1; }
   bool to_bool()const { return _b4 == b4_1; }
+  bool is_unknown()const { return _b4 == b4_X; }
+  int raw_int()const { return _b4; }
   VALOGIC& operator=(bitXZ b) { _b4 = b; return *this; }
+  int operator+(int b) const { return b + to_bool(); }
+  double operator+(double b) const { return b + to_bool(); }
+  //VALOGIC const operator==(VALOGIC b) const {
+  //  return VALOGIC::operator==(b);
+  //}
+  VALOGIC const operator==(int b) const {
+    return *this == VALOGIC(b?b4_1:b4_0);
+  }
+  VALOGIC const operator==(bool b) const {
+    return *this == VALOGIC(b?b4_1:b4_0);
+  }
   VALOGIC operator==(VALOGIC const& o)const {
     bitXZ ret;
     if(_b4 == b4_0 && o._b4 == b4_0){ untested();
@@ -1049,7 +1065,13 @@ public:
   friend VALOGIC operator&(VALOGIC const& a, VALOGIC const& b);
 protected:
   void assign(bool b) { _b4 = b?b4_1:b4_0;}
-};
+}; // VALOGIC
+/*--------------------------------------------------------------------------*/
+int operator+(int a, VALOGIC const& b) { return b + a; }
+int operator*(int a, VALOGIC const& b) { return b * a; }
+/*--------------------------------------------------------------------------*/
+double operator+(Pdbl const& a, VALOGIC const& b) { return b + double(a); }
+double operator*(Pdbl const& a, VALOGIC const& b) { return b * double(a); }
 /*--------------------------------------------------------------------------*/
 VALOGIC operator | (VALOGIC const& a, VALOGIC const& b)
 {
@@ -1093,13 +1115,15 @@ inline VALOGIC::VALOGIC(node_t const& n) : _b4(b4_0)
 /*--------------------------------------------------------------------------*/
 class LNR : public VALOGIC {
   typedef VALOGIC base;
-  typedef PARAMETER<double> Pdbl;
-  typedef PARAMETER<int> Pint;
   node_t& _ln;
   bool _set{false};
 public:
-  explicit LNR(node_t& ln) : VALOGIC(ln),_ln(ln) {
-  };
+  explicit LNR(node_t& ln) : VALOGIC(ln), _ln(ln) { };
+  base& operator=(LNR const& t){
+    _set = true;
+    base::operator=(t);
+    return *this;
+  }
   base& operator=(int const& t){
     _set = true;
     base::operator=(t?b4_1:b4_0);
@@ -1110,15 +1134,14 @@ public:
   base& operator=(Pdbl const& t)  { operator=(int(t)); return *this; }
   base& operator=(Pint const& t)  { operator=(int(t)); return *this; }
 
-  VALOGIC const operator==(VALOGIC b) const {
-    return VALOGIC::operator==(b);
+  double lv_future()const{ untested();
+    return lptr()->lv_future();
   }
-  VALOGIC operator==(int const& o)const { untested();
-    return operator==(bool(o));
+  double final_time()const{ untested();
+    return lptr()->final_time();
   }
-  VALOGIC operator==(double const& o)const { untested();
-    return operator==(bool(o));
-  }
+  operator int()const { return to_bool(); }
+  operator double()const { return to_bool(); }
 // private:
   LOGIC_NODE const* lptr()const {
     LOGIC_NODE const* ln = prechecked_cast<LOGIC_NODE const*>(_ln.operator->());
