@@ -2153,6 +2153,7 @@ void COMMON_resistor::tr_begin(COMPONENT* c) const
 /*--------------------------------------------------------------------------*/
 inline void COMMON_resistor::init_assign(MOD_resistor* m) const
 {
+  (void)m;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -3002,8 +3003,12 @@ void MOD_resistor::expand()
   subckt()->expand_();
   n_(p_p).set_used();
   n_(p_p).allocate(3); // no-op unless floating
+    n_(p_p).set_input();
+    n_(p_p).set_output();
   n_(p_n).set_used();
   n_(p_n).allocate(3); // no-op unless floating
+    n_(p_n).set_input();
+    n_(p_n).set_output();
   n_(n_p).set_used();
   n_(n_p).allocate(3);
   n_(n_n).set_used();
@@ -3701,6 +3706,7 @@ void COMMON_resistor::tr_begin(COMPONENT* c) const
 /*--------------------------------------------------------------------------*/
 inline void COMMON_resistor::init_assign(MOD_resistor* m) const
 {
+  (void)m;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -5031,8 +5037,12 @@ void MOD_resistor::expand()
   subckt()->expand_();
   n_(p_p).set_used();
   n_(p_p).allocate(3); // no-op unless floating
+    n_(p_p).set_input();
+    n_(p_p).set_output();
   n_(p_n).set_used();
   n_(p_n).allocate(3); // no-op unless floating
+    n_(p_n).set_input();
+    n_(p_n).set_output();
   n_(n_p).set_used();
   n_(n_p).allocate(3);
   n_(n_n).set_used();
@@ -7213,6 +7223,7 @@ void COMMON_capacitor::tr_begin(COMPONENT* c) const
 /*--------------------------------------------------------------------------*/
 inline void COMMON_capacitor::init_assign(MOD_capacitor* m) const
 {
+  (void)m;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -7797,8 +7808,12 @@ void MOD_capacitor::expand()
   subckt()->expand_();
   n_(p_p).set_used();
   n_(p_p).allocate(3); // no-op unless floating
+    n_(p_p).set_input();
+    n_(p_p).set_output();
   n_(p_n).set_used();
   n_(p_n).allocate(3); // no-op unless floating
+    n_(p_n).set_input();
+    n_(p_n).set_output();
   n_(n_p).set_used();
   n_(n_p).allocate(3);
   n_(n_n).set_used();
@@ -8471,6 +8486,7 @@ void COMMON_capacitor::tr_begin(COMPONENT* c) const
 /*--------------------------------------------------------------------------*/
 inline void COMMON_capacitor::init_assign(MOD_capacitor* m) const
 {
+  (void)m;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -9124,8 +9140,12 @@ void MOD_capacitor::expand()
   subckt()->expand_();
   n_(p_p).set_used();
   n_(p_p).allocate(3); // no-op unless floating
+    n_(p_p).set_input();
+    n_(p_p).set_output();
   n_(p_n).set_used();
   n_(p_n).allocate(3); // no-op unless floating
+    n_(p_n).set_input();
+    n_(p_n).set_output();
   n_(n_p).set_used();
   n_(n_p).allocate(3);
   n_(n_n).set_used();

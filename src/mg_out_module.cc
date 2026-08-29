@@ -1107,16 +1107,14 @@ static void make_module_allocate_nodes(std::ostream& o, Module const& m)
 //    o____ p->code_name() << ", // " << p->node_number() << "\n";
     o__ "n_(" << p->code_name() << ").set_used();\n"; // mg_port.0
     o__ "n_(" << p->code_name() << ").allocate(3); // no-op unless floating\n";
-//    if(p->node()){
-////      o____ p->node()->code_name() << " = " << p->code_name() << ",\n";
-//    }else{
-//    }
-//    if(p->node_number()!=-1){
-//      o << "// is node number " << p->node_number() << "\n";
-//      isport[p->node_number()] = n;
-//    }else{
-//    }
-//    ++n;
+    if(p->is_input()) {
+      o____ "n_(" << p->code_name() << ").set_input();\n"; //why?
+    }else{
+    }
+    if(p->is_output()) {
+      o____ "n_(" << p->code_name() << ").set_output();\n"; //why?
+    }else{
+    }
   }
   for (int n=1; n<=int(m.circuit()->nodes().size()); ++n) {
     Node const* nn = m.circuit()->nodes()[n];
@@ -1362,6 +1360,26 @@ static void make_module_expand_last(std::ostream& o, Module const& m)
   o__ "assert(cc);\n";
   o__ "cc->expand_last(this);\n";
   o__ "attach_common(cc);\n";
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_module_make_fanout(std::ostream& o, Module const& m)
+{
+  make_tag(o);
+  String_Arg const& mid = m.identifier();
+  o << "void MOD_" << mid << "::make_fanout()\n{\n";
+  o__ "COMPONENT::make_fanout();\n"; // skip base_subckt?
+  o__ "for (int ii = 0;  ii < net_nodes();  ++ii) {\n";
+  o____ "assert(ii<2);\n";
+  o____ "if (n_(ii).is_grounded()) { untested();\n";
+  o____ "}else if (!n_(ii).is_input()) {\n";
+  o____ "}else if (auto l = dynamic_cast<LOGIC_NODE*>(n_(ii).operator->())) { untested();\n";
+  o____ "}else{ untested();\n";
+  o____ "}\n";
+  o__ "}\n";
+
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -1631,6 +1649,10 @@ void make_cc_module(std::ostream& o, const Module& m)
   make_module_expand(o, m);
   if(m.has_expand_last()){
     make_module_expand_last(o, m);
+  }else{
+  }
+  if(m.is_connectmodule()){
+    make_module_make_fanout(o, m);
   }else{
   }
   make_module_precalc_last(o, m);

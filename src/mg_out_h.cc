@@ -781,6 +781,10 @@ static void make_module(std::ostream& o, const Module& m)
     o__ "void expand_last()override;\n";
   }else{
   }
+  if(m.is_connectmodule()){
+    o__ "void make_fanout()override;\n";
+  }else{
+  }
   o__ "void precalc_last()override;\n";
   o__ "void zero_filter_readout();\n";
   o__ "//void    map_nodes();         //BASE_SUBCKT\n";
