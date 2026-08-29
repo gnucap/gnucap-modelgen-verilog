@@ -549,6 +549,10 @@ void Net_Declarations::dump(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 void Port_3::set_discipline(Discipline const* d, Module* owner)
 {
+  if(!d){
+  }else if(d->is_discrete()){
+  }else{
+  }
   owner->node(_node)->set_discipline(d);
 }
 /*--------------------------------------------------------------------------*/

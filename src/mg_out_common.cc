@@ -1029,6 +1029,12 @@ static void make_common_init_assign(std::ostream& o, const Module& m)
 void make_cc_common(std::ostream& o , const Module& m)
 {
   make_tag(o);
+
+  if(m.has_analog_block() || m.has_always_block()){
+    o << "typedef MOD_" << m.identifier() << " MOD__; // here?\n";
+  }else{
+  }
+
   make_common_default_constructor(o, m);
   make_common_copy_constructor(o, m);
   make_common_destructor(o, m);

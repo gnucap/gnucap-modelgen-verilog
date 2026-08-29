@@ -89,6 +89,7 @@ private:
   void make_variable   (std::ostream& o, Token_VAR_REF const& v)const;
   void make_variable   (std::ostream& o, Variable_Decl const& v)const;
 private:
+  void make_node_refs(std::ostream& o, const Module& m)const;
   void make_block_variables(std::ostream& o, Variable_Stmt const&)const;
   void make_real_variable  (std::ostream& o, Token_VAR_DECL const&)const;
   void make_seq_block      (std::ostream& o, SeqBlock const&)const override;
@@ -98,6 +99,12 @@ private:
   }
 }; // OUT_DIGITAL
 /*--------------------------------------------------------------------------*/
+static void make_one_node_load(std::ostream& o, Node const& V)
+{
+  o__ "const va::LNR _v_" << V.code_name() <<
+      "(m->n_(MOD__::" << V.code_name() << ")); // load\n";
+}
+/*--------------------------------------------------------------------------*/
 void make_tr_advance_digital(std::ostream& o, const Module& m)
 {
   o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
@@ -106,6 +113,7 @@ void make_tr_advance_digital(std::ostream& o, const Module& m)
 
   for(auto n : m.circuit()->nodes()){
     if(n->is_reg()){
+      assert(n->is_discrete());
       o__ "{\n";
       o____ "node_l& nl = reinterpret_cast<node_l&>(m->n_(MOD::n_" << n->name() << "));\n";
       o____ "if (!nl->in_transit()) {\n";
@@ -116,14 +124,44 @@ void make_tr_advance_digital(std::ostream& o, const Module& m)
       o__ "}\n\n";
     }else{
     }
+#if 0
+    if(n->is_discrete()) {
+      done in make_load_variables
+      make_one_node_load(o, *n);
+    }else{
+      o__ "// not discrete " << n->name() << "\n";
+      assert(n->is_ground() || n->discipline() || n->short_to());
+    }
+#endif
   }
 
   OUT_DIGITAL oo(OUT_DIGITAL::modeTR_ADVANCE, &tr_advance_tag);
+  o__ "// load variables\n";
   oo.make_load_variables(o, m);
+  o__ "// /load variables\n";
   oo.make_list(o, m);
   o << "} // tr_advance_digital\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_node_loads(std::ostream& o, const Module& m)
+{
+  for(auto const& n : m.circuit()->nodes()){
+    assert(n);
+    if(n->is_reg()){
+      make_one_node_load(o, *n);
+    }else if(n->is_discrete()) {
+      make_one_node_load(o, *n);
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+static void make_one_node_proxy(std::ostream& o, Node const& V)
+{
+  o__ "va::LNR _v_" << V.code_name() <<
+      "(m->n_(MOD__::" << V.code_name() << ")); // proxy\n";
 }
 /*--------------------------------------------------------------------------*/
 void make_tr_accept_digital(std::ostream& o, const Module& m)
@@ -137,6 +175,14 @@ void make_tr_accept_digital(std::ostream& o, const Module& m)
   OUT_DIGITAL oo(OUT_DIGITAL::modeTR_ACCEPT, &tr_accept_tag);
   oo.make_load_variables(o, m);
   oo.make_list(o, m);
+
+  for(auto const& n : m.circuit()->nodes()){
+    if(n->is_reg()){
+      o__ "_v_n_" << n->name() << ".accept();\n";
+    }else{
+    }
+  }
+
   o << "} // tr_accept_digital\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -167,6 +213,10 @@ void make_tr_regress_digital(std::ostream& o, const Module& m)
       o____ "}else{\n";
       o____ "}\n";
       o__ "}\n\n";
+    }else{
+    }
+    if(n->is_discrete()) {
+      make_one_node_load(o, *n);
     }else{
     }
   }
@@ -218,7 +268,7 @@ static void make_cc_common_tr_eval(std::ostream& o, const Module& m)
   OUT_DIGITAL oo(OUT_DIGITAL::modeTR_EVAL);
 
   oo.make_load_variables(o, m);
-  oo.make_list(o, m);
+//  oo.make_list(o, m);
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -368,9 +418,30 @@ void OUT_DIGITAL::make_load_block_variables(std::ostream& o, const
   }
 }
 /*--------------------------------------------------------------------------*/
+void OUT_DIGITAL::make_node_refs(std::ostream& o, const Module& m) const
+{
+  if(is_tr_accept()) {
+    // special case..
+    for(auto const& n : m.circuit()->nodes()){
+      assert(n);
+      if(n->is_reg()){
+	make_one_node_proxy(o, *n);
+      }else if(n->is_discrete()){
+	make_one_node_load(o, *n);
+      }else{
+	o__ "// not discrete " << n->name() << "\n";
+      }
+    }
+  }else{
+    return make_node_loads(o, m);
+  }
+}
+/*--------------------------------------------------------------------------*/
 void OUT_DIGITAL::make_load_variables(std::ostream& o, const Module& m) const
 {
   make_load_block_variables(o, m.variables());
+
+    make_node_refs(o, m);
 }
 /*--------------------------------------------------------------------------*/
 // void OUT_DIGITAL::make_ctrl(std::ostream& o, SeqBlock const& s) const
@@ -484,11 +555,15 @@ void OUT_DIGITAL::make_assignment(std::ostream& o, Assignment const& a) const
 	 indent rhsindent;
 	 auto rhsname = make_cc_expression(o, e);
 	 o__ "rhs = " << rhsname << ";\n";
+	 if(is_tr_accept()) {
+	   o__ "_v_n_" + a.lhs().name() << " = " << rhsname << "; // (accept)\n";
+	 }else{
+	 }
        }
        o__ "} // rhs eval\n";
        o__ "_LOGICVAL lv = rhs?lvSTABLE1:lvSTABLE0;\n"; // VALOGIC..
       if(is_tr_accept()) {
-       o__ "va::accept_node_value(d->n_(" << lhsname << "), lv, 0.);\n";
+       o__ "// va::accept_node_value(d->n_(" << lhsname << "), lv, 0.);\n";
       }else if(is_tr_initial()) {
        o__ "va::initial_node_value(d->n_(" << lhsname << "), lv);\n";
       }

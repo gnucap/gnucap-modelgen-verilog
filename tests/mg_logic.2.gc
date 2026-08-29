@@ -14,7 +14,7 @@ module trans (t, clk);
   input clk;
   output t;
 
-  electrical t
+  electrical t;
   logic clk;
 
   (*desc=""*) integer st1 = 0;

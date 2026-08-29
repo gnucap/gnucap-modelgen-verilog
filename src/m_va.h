@@ -957,6 +957,8 @@ public:
    virtual double read_filter()const { untested();unreachable(); return 0;}
 };
 /*--------------------------------------------------------------------------*/
+extern NODE ground_node;
+/*--------------------------------------------------------------------------*/
 namespace va {
 /*--------------------------------------------------------------------------*/
 inline double PORT_FLOW(int i, BASE_SUBCKT const* m)
@@ -1018,23 +1020,48 @@ enum bitXZ {
 class VALOGIC {
   bitXZ _b4;
 public:
+  explicit VALOGIC(node_t const&);
   explicit VALOGIC(bitXZ const& b) : _b4(b) {}
+  explicit VALOGIC(bool const& b) : _b4(b?b4_1:b4_0) {}
   VALOGIC z2x()const { untested();
     return VALOGIC((bitXZ) ( (int)_b4 | ((int)_b4 >> 1) ));
   }
   operator bool()const { return _b4 == b4_1; }
+  bool to_bool()const { return _b4 == b4_1; }
+  VALOGIC& operator=(bitXZ b) { _b4 = b; return *this; }
+  VALOGIC operator==(VALOGIC const& o)const {
+    bitXZ ret;
+    if(_b4 == b4_0 && o._b4 == b4_0){ untested();
+      ret = b4_1;
+    }else if(_b4 == b4_1 && o._b4 == b4_1){
+      ret = b4_1;
+    }else if(_b4 == b4_1 && o._b4 == b4_0){
+      ret = b4_0;
+    }else if(_b4 == b4_0 && o._b4 == b4_1){
+      ret = b4_0;
+    }else{ untested();
+      // incomplete?
+      ret = b4_X;
+    }
+    return VALOGIC(ret);
+  }
   friend VALOGIC operator|(VALOGIC const& a, VALOGIC const& b);
   friend VALOGIC operator&(VALOGIC const& a, VALOGIC const& b);
+protected:
+  void assign(bool b) { _b4 = b?b4_1:b4_0;}
 };
 /*--------------------------------------------------------------------------*/
-VALOGIC operator | (VALOGIC const& a, VALOGIC const& b) {
+VALOGIC operator | (VALOGIC const& a, VALOGIC const& b)
+{
   if (a._b4 == b4_1 || b._b4 == b4_1) {
     return VALOGIC(b4_1);
   }else{
     return VALOGIC(bitXZ((int)a._b4 | (int)b._b4));
   }
 }
-VALOGIC operator & (VALOGIC const& a, VALOGIC const& b) {
+/*--------------------------------------------------------------------------*/
+VALOGIC operator & (VALOGIC const& a, VALOGIC const& b)
+{
   if (a._b4 == b4_0 || b._b4 == b4_0) {
     return VALOGIC(b4_0);
   }else{
@@ -1042,49 +1069,55 @@ VALOGIC operator & (VALOGIC const& a, VALOGIC const& b) {
   }
 }
 /*--------------------------------------------------------------------------*/
-class LNR {
-  const node_t& _ln;
+inline VALOGIC::VALOGIC(node_t const& n) : _b4(b4_0)
+{
+  if(n.n_() == &ground_node){
+    _b4 = b4_0; // incomplete();
+  }else{
+    LOGIC_NODE const* ln = prechecked_cast<LOGIC_NODE const*>(n.operator->());
+    assert(ln);
+
+    if(ln->lv().is_unknown()) {
+      _b4 = b4_X;
+    }else if(ln->last_change_time() != CKT_BASE::_sim->_time0){
+      assign(ln->lv_future());
+    }else if(ln->lv().is_falling()) {
+      _b4 = b4_1;
+    }else if(ln->lv().is_rising()) {
+      _b4 = b4_0;
+    }else{
+      assign(ln->lv_future());
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+class LNR : public VALOGIC {
+  typedef VALOGIC base;
+  typedef PARAMETER<double> Pdbl;
+  typedef PARAMETER<int> Pint;
+  node_t& _ln;
+  bool _set{false};
 public:
-  explicit LNR(node_t const& ln) : _ln(ln) { };
-  operator int()const {
-    if(lptr()->last_change_time() != CKT_BASE::_sim->_time0){
-      return lptr()->lv_future();
-    }else if(lptr()->lv().is_falling()) {
-      return true;
-    }else if(lptr()->lv().is_rising()) {
-      return false;
-    }else{
-      return lptr()->lv_future();
-    }
+  explicit LNR(node_t& ln) : VALOGIC(ln),_ln(ln) {
+  };
+  base& operator=(int const& t){
+    _set = true;
+    base::operator=(t?b4_1:b4_0);
+    trace2("LNR assign", t, to_bool());
+    return *this;
   }
-  LOGICVAL lv_now()const{
-    if(lptr()->is_unknown()){ untested();
-      return lvUNKNOWN;
-    }else if(*this == 1){
-      return lvSTABLE1;
-    }else{
-      return lvSTABLE0;
-    }
+  base& operator=(double const& t){ operator=(int(t)); return *this; }
+  base& operator=(Pdbl const& t)  { operator=(int(t)); return *this; }
+  base& operator=(Pint const& t)  { operator=(int(t)); return *this; }
+
+  VALOGIC const operator==(VALOGIC b) const {
+    return VALOGIC::operator==(b);
   }
-  VALOGIC operator==(LNR const& o)const {
-    if(lv_now() == lvUNKNOWN || o.lv_now() == lvUNKNOWN){
-      return VALOGIC(b4_X);
-    }else if(  (lv_now() == lvSTABLE0 && o.lv_now() == lvSTABLE0)
-	||(lv_now() == lvSTABLE1 && o.lv_now() == lvSTABLE1)){
-      return VALOGIC(b4_1);
-    }else{
-      return VALOGIC(b4_0);
-    }
+  VALOGIC operator==(int const& o)const { untested();
+    return operator==(bool(o));
   }
-  VALOGIC operator!=(LNR const& o)const { untested();
-    if(lv_now() == lvUNKNOWN || o.lv_now() == lvUNKNOWN){
-      return VALOGIC(b4_X);
-    }else if(  (lv_now() == lvSTABLE0 && o.lv_now() == lvSTABLE1)
-	||(lv_now() == lvSTABLE1 && o.lv_now() == lvSTABLE0)){
-      return VALOGIC(b4_1);
-    }else{
-      return VALOGIC(b4_0);
-    }
+  VALOGIC operator==(double const& o)const { untested();
+    return operator==(bool(o));
   }
 // private:
   LOGIC_NODE const* lptr()const {
@@ -1097,27 +1130,35 @@ public:
   bool is_connected()const{
     return _ln.e_() != INVALID_NODE;
   }
+
+  void accept();
 };
 /*--------------------------------------------------------------------------*/
-void accept_node_value(node_t& n, bool lv, double delay)
+inline void LNR::accept()
 {
-  node_l& nl = reinterpret_cast<node_l&>(n);
-  nl->set_mode(moDIGITAL); // assert?..
-  delay += 1e-20; // HACK
+  if(_set){
+    assert(prechecked_cast<LOGIC_NODE*>(_ln.n_()));
+    node_l& nl = reinterpret_cast<node_l&>(_ln);
+    nl->set_mode(moDIGITAL); // assert?..
+    double delay = 1e-20; // hack, incomplete.
 
-  LOGICVAL lvl(lv?lvSTABLE1:lvSTABLE0);
-  if(nl->lv().is_unknown()){
-    nl->set_event(delay, lvl);
-  }else if(nl->lv_future() != lv){
-    nl->set_event(delay, lvl);
-  }else if(nl->final_time() > CKT_BASE::_sim->_time0){
-    // (hack)
-    nl->set_event(delay, lvl);
-  }else{ untested();
-  }
+    // BUG. cast to bool.
+    bool lv = to_bool();
+    LOGICVAL lvl(lv?lvSTABLE1:lvSTABLE0);
+    if(nl->lv().is_unknown()){
+      nl->set_event(delay, lvl);
+    }else if(nl->lv_future() != lv){
+      nl->set_event(delay, lvl);
+    }else if(nl->final_time() > CKT_BASE::_sim->_time0){
+      // (hack, needed?)
+      nl->set_event(delay, lvl);
+    }else{ untested();
+    }
     // nl->propagate();
     // nl->set_quality(qGOOD);
     // nl->improve_quality();
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void initial_node_value(node_t& n, bool lv)

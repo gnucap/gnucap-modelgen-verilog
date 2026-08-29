@@ -15,7 +15,7 @@ module comp (inp, inn, clk, outp, outn, vdd, vss);
   input inp, inn, clk, vdd, vss;
   output outp, outn;
 
-  electrical inp, inn
+  electrical inp, inn;
   logic clk;
   electrical outp, outn;
   electrical vdd, vss;

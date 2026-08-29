@@ -164,7 +164,7 @@ void Net_Declarations::parse(CS& f)
 
     m->set_owner(owner());
     f >> *m;
-    for(auto i : *m){
+    for(Net_Identifier* i : *m){
       i->set_discipline(*ii, mod);
     }
 

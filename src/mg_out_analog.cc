@@ -105,6 +105,7 @@ private:
   void make_variable   (std::ostream& o, Token_VAR_REF const& v)const;
   void make_variable   (std::ostream& o, Variable_Decl const& v)const;
 private:
+  void make_node_refs(std::ostream& o, const Module& m)const;
   void make_block_variables(std::ostream& o, Variable_Stmt const&)const;
   void make_real_variable  (std::ostream& o, Token_VAR_DECL const&)const;
   void make_seq_block      (std::ostream& o, SeqBlock const&)const override;
@@ -998,8 +999,20 @@ void OUT_ANALOG::make_load_block_variables(std::ostream& o, const
   }
 }
 /*--------------------------------------------------------------------------*/
+void OUT_ANALOG::make_node_refs(std::ostream& o, const Module& m) const
+{
+  for(Node const* n : m.circuit()->nodes()){
+    if(n->name().size()){
+      o__ "node_t const& _v_" << n->code_name() <<
+	"(m->n_(MOD__::" << n->code_name() << ")); // ref " << n->code_name().size() << "\n";
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_load_variables(std::ostream& o, const Module& m) const
 {
+  make_node_refs(o, m);
   make_load_block_variables(o, m.variables());
 }
 /*--------------------------------------------------------------------------*/
@@ -1130,7 +1143,8 @@ static void make_cc_common_tr_eval(std::ostream& o, const Module& m)
 {
   o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
   o << "inline void COMMON_" << m.identifier() <<
-    "::tr_eval_analog(MOD_" << m.identifier() << "* d) const\n{\n";
+    "::tr_eval_analog(MOD_" << m.identifier() << "* m) const\n{\n";
+  o__ "auto& d = m;\n";
   o__ "trace1(\"" << m.identifier() <<"::tr_eval_analog\", d->long_label());\n";
 
   OUT_ANALOG oo(OUT_ANALOG::modeDYNAMIC);
@@ -1228,7 +1242,6 @@ static void make_cc_final_analog(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 void make_cc_analog(std::ostream& o, const Module& m)
 {
-  o << "typedef MOD_" << m.identifier() << " MOD__;\n"; // here?
   make_cc_zero_filter_readout(o, m);
   make_cc_set_branch_contributions(o, m);
 //  make_cc_ac_begin(o, m);
