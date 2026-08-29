@@ -63,7 +63,7 @@ private:
     }else{
     }
     for(int i=1; i<int(num_args()); ++i) {
-      o____  ", T" << i;
+      o____  ", T" << i << " const&";
       if(names){
        o << " a" << i;
       }else{
