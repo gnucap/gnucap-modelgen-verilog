@@ -1134,10 +1134,10 @@ public:
   base& operator=(Pdbl const& t)  { operator=(int(t)); return *this; }
   base& operator=(Pint const& t)  { operator=(int(t)); return *this; }
 
-  double lv_future()const{ untested();
+  double lv_future()const {
     return lptr()->lv_future();
   }
-  double final_time()const{ untested();
+  double final_time()const {
     return lptr()->final_time();
   }
   operator int()const { return to_bool(); }

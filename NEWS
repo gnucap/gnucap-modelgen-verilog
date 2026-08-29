@@ -8,6 +8,7 @@ This file summarizes new features and important changes between snapshots.
 - initial blocks
 - various logic bugfixes
 - parameter dependent delays in continuous assign
+- driver functions
 - ..
 
 20260729-dev

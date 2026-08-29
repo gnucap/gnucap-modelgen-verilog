@@ -1,0 +1,54 @@
+attach ./modelgen_2.so
+// options trace
+
+verilog
+
+`modelgen test_driver0
+module clock(ck, en);
+	logic ck, en;
+	inout ck, en;
+	reg en;
+   parameter integer n = 200;
+	real m;
+
+	initial en = 0;
+
+	always @(timer(1n)) begin
+		m = n;
+		en = 1;
+		$strobe("go %g", m);
+	end
+	assign #n ck = !(ck & en);
+endmodule
+connectmodule drvtest(i, trig);
+  input i;
+  input trig;
+  logic i;
+  logic trig;
+  real s, d;
+  always @(edge(trig)) begin
+    s = $driver_next_state(i,0);
+    d = $driver_delay(i,0) * 1;
+	 $strobe("drv at %g next %g delay %g", $abstime, s, d);
+  end
+endconnectmodule
+`endmodelgen
+
+list
+
+!make test_driver0.so > /dev/null
+attach ./test_driver0.so
+
+ground gnd;
+clock #(.n(100)) t1(ck);
+clock #(.n(55)) t(tt);
+inv #(.model("logic"), .delay(60)) i1(ii, ck);
+drvtest a1 (.trig(tt), .i(ii));
+
+.model logic logic delay=1p rise=10p fall=10p
+
+print tran l(ck) l(ii) iter(0)
+tran 60n
+
+
+status notime
