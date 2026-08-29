@@ -103,6 +103,16 @@ std::string New_Port::code_name() const
   return "p_" + name();
 }
 /*--------------------------------------------------------------------------*/
+bool Port_3::is_input() const
+{ untested();
+  return _node.is_input();
+}
+/*--------------------------------------------------------------------------*/
+bool Port_3::is_output() const
+{ untested();
+  return _node.is_output();
+}
+/*--------------------------------------------------------------------------*/
 class Wire : public Discipline{
 public:
   explicit Wire() : Discipline("wire") {}
@@ -125,6 +135,7 @@ Net_Decl_List_Dir::Net_Decl_List_Dir(char what): Net_Decl_List()
     unreachable();
   }
 }
+/*--------------------------------------------------------------------------*/
 void Net_Declarations::parse(CS& f)
 {
   assert(owner()); // Module
@@ -181,7 +192,6 @@ void Net_Declarations::parse(CS& f)
     f >> *m;
     d = m;
   }else if(f.umatch("inout |input |output ")) {
-    trace2("Net_Declarations::parse-", f.last_match(), f.tail().substr(0,20));
     auto m = new Net_Decl_List_Dir(f.last_match()[2]);
     m->set_owner(owner());
     f >> *m;
@@ -247,7 +257,27 @@ void Net_Decl_List_Reg::dump(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 void Net_Decl_List_Dir::parse(CS& f)
 {
-  return Net_Decl_List::parse_n_<Net_Decl_Dir>(f);
+  Net_Decl_List::parse_n_<Net_Decl_Dir>(f);
+  Module* mod = prechecked_cast<Module*>(owner());
+  assert(mod);
+
+  for(auto const& i : *this) { untested();
+    Node_Ref nn = i->node();
+    switch(_dir){
+    case 0:
+      break;
+    case 1: untested();
+      mod->set_input(nn);
+      break;
+    case 2: untested();
+      mod->set_output(nn);
+      break;
+    case 3: untested();
+      mod->set_input(nn);
+      mod->set_output(nn);
+      break;
+    }
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Net_Decl_List_Dir::dump(std::ostream& o) const
@@ -263,6 +293,14 @@ void Net_Decl_Dir::parse(CS& f)
   Net_Identifier::parse(f);
 
   assert(owner());
+
+  Module* mod = prechecked_cast<Module*>(owner());
+  assert(mod);
+
+  Node_Ref const& nn = mod->new_node(name());
+  assert(nn);
+  set_node(mod->node(nn));
+
   // incomplete(); but not in use yet.
 //  set_dir(owner()->set_dir(name()));
 }

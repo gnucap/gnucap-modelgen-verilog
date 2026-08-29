@@ -1050,6 +1050,18 @@ static void make_module_set_ports(std::ostream& o, Module const& m)
       o____ "n_(" << pp->code_name() << ").set_used(); // reg\n";
     }else{
     }
+    if(pp->node()->is_used()){
+      if(pp->is_input()) {
+	o____ "n_(" << pp->code_name() << ").set_input();\n";
+      }else{
+      }
+      if(pp->is_output()) {
+	o____ "n_(" << pp->code_name() << ").set_output();\n";
+      }else{
+      }
+    }else{
+      o____ "// n_(" << pp->code_name() << "). not used\n";
+    }
   }
 }
 /*--------------------------------------------------------------------------*/

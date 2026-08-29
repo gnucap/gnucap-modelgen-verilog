@@ -1521,6 +1521,32 @@ void Circuit::push_back(Element_2 /*const?*/ * f)
   _element_list.push_back(f);
 }
 /*--------------------------------------------------------------------------*/
+void Module::set_input(Node const* n)
+{
+  assert(_circuit);
+  if(n->number()){
+    assert(*(_circuit->nodes().begin() + n->number()) == n);
+    auto p = _circuit->ports().begin();
+    std::advance(p, n->number()-1);
+    (*p)->set_input();
+  }else{
+    // already ground
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Module::set_output(Node const* n)
+{
+  trace1("stc", n->number());
+  assert(_circuit);
+  if(n->number()){
+    auto p = _circuit->ports().begin();
+    std::advance(p, n->number()-1);
+    (*p)->set_output();
+  }else{
+    // already ground
+  }
+}
+/*--------------------------------------------------------------------------*/
 void Module::set_to_ground(Node const* n)
 {
   trace1("stc", n->number());

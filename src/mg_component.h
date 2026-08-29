@@ -49,6 +49,10 @@ public:
   Node_Ref const& node()const {return _node;}
   void set_node(Node*n){_node = n;}
   void set_discipline(Discipline const* d, Module* owner);
+  void set_input() {_node.set_input();}
+  void set_output() {_node.set_output();}
+  bool is_input()const;
+  bool is_output()const;
 };
 /*--------------------------------------------------------------------------*/
 // TODO: Port_Base?

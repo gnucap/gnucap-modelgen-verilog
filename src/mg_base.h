@@ -401,6 +401,12 @@ public:
 class Node;
 class Module;
 class Node_Ref { // Token?
+  enum dir_t {
+    dir_none = 0,
+    dir_in   = 1,
+    dir_out  = 2,
+    dir_io   = 3
+  } _dir{dir_none};
   Node* _node{nullptr};
 public:
   explicit Node_Ref() {}
@@ -411,6 +417,8 @@ public:
   Node* mutable_node() const{
     return _node;
   }
+  void set_input() {untested();  _dir = dir_t(_dir | dir_in); }
+  void set_output() {untested();  _dir = dir_t(_dir | dir_out); }
 private:
   friend class Module;
   Node* mutable_node(Module&) const{
@@ -418,6 +426,9 @@ private:
     // assert(_node owned by m);
     return _node;
   }
+public:
+  bool is_input()const { return _dir & dir_in; }
+  bool is_output()const { return _dir & dir_out; }
 };
 /*--------------------------------------------------------------------------*/
 //really? used in Block

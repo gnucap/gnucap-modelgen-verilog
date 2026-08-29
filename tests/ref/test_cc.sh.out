@@ -2907,9 +2907,13 @@ void MOD_resistor::expand_first()
       // port p p_p 1
       va::set_type(n_(n_p), "electrical");
       build_union(&n_(p_p), &n_(n_p));
+      n_(p_p).set_input();
+      n_(p_p).set_output();
       // port n p_n 2
       va::set_type(n_(n_n), "electrical");
       build_union(&n_(p_n), &n_(n_n));
+      n_(p_n).set_input();
+      n_(p_n).set_output();
 } // expand_first
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
@@ -4932,9 +4936,13 @@ void MOD_resistor::expand_first()
       // port p p_p 1
       va::set_type(n_(n_p), "electrical");
       build_union(&n_(p_p), &n_(n_p));
+      n_(p_p).set_input();
+      n_(p_p).set_output();
       // port n p_n 2
       va::set_type(n_(n_n), "electrical");
       build_union(&n_(p_n), &n_(n_n));
+      n_(p_n).set_input();
+      n_(p_n).set_output();
 } // expand_first
 /*--------------------------------------------------------------------------*/
 void MOD_resistor::expand()
@@ -7694,9 +7702,13 @@ void MOD_capacitor::expand_first()
       // port p p_p 1
       va::set_type(n_(n_p), "electrical");
       build_union(&n_(p_p), &n_(n_p));
+      n_(p_p).set_input();
+      n_(p_p).set_output();
       // port n p_n 2
       va::set_type(n_(n_n), "electrical");
       build_union(&n_(p_n), &n_(n_n));
+      n_(p_n).set_input();
+      n_(p_n).set_output();
 } // expand_first
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
@@ -9017,9 +9029,13 @@ void MOD_capacitor::expand_first()
       // port p p_p 1
       va::set_type(n_(n_p), "electrical");
       build_union(&n_(p_p), &n_(n_p));
+      n_(p_p).set_input();
+      n_(p_p).set_output();
       // port n p_n 2
       va::set_type(n_(n_n), "electrical");
       build_union(&n_(p_n), &n_(n_n));
+      n_(p_n).set_input();
+      n_(p_n).set_output();
 } // expand_first
 /*--------------------------------------------------------------------------*/
 void MOD_capacitor::expand()
