@@ -180,6 +180,7 @@ private: // verilog input data
   Owned_Base* _assign{nullptr};
   Circuit* _circuit{nullptr};
   Hierarchical_Refs* _hrefs{nullptr};
+  bool _is_connectmodule{false};
 //  Block _module_body;
 protected:
   Variable_List_Collection _variables;
@@ -220,12 +221,15 @@ protected:
   bool has_proto()const {return _proto;}
   Module const& proto()const {assert(_proto); return *_proto;}
   void set_description(std::string const& d) {_description = d;}
+  void set_connectmodule() {_is_connectmodule = true;}
 public:
   std::string const& description()const {return _description;}
 protected:
   void dump_parameters(std::ostream& f)const;
   void dump_variables(std::ostream& f)const;
 public: // TODO
+  bool is_module()const {return !_is_connectmodule;}
+  bool is_connectmodule()const {return _is_connectmodule;}
 
   const Parameter_List_Collection& parameters()const	{return _parameters;}
   const Aliasparam_Collection& aliasparam()const	{return _aliasparam;}

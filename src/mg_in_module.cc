@@ -685,6 +685,11 @@ net_declaration ::=
 */
 void Module::parse(CS& f)
 {
+  trace1("Module::parse", f.last_match());
+  if(f.last_match()[0] == 'c'){
+    set_connectmodule();
+  }else{
+  }
   assert(_circuit);
   _circuit->set_owner(this);
   File* o = prechecked_cast<File*>(owner());
@@ -764,10 +769,12 @@ void Module::parse_body(CS& f)
       || ((f >> "analog ") && f >> *_analog)
       || ((f >> "always ") && f >> *_always)
       || ((f >> "initial ") && f >> *_always)
-      || ((f >> "endmodule ") && (end = true))
+      || (is_module() && (f >> "endmodule ") && (end = true))
+      || (is_connectmodule() && (f >> "endconnectmodule ") && (end = true))
       // subdevice instances. can't use reserved keywords.
       || ((f >> "paramset ") && (reserved = true))
       || ((f >> "module ") && (reserved = true))
+      || ((f >> "connectmodule ") && (reserved = true))
       || (f >> _circuit->element_list())	// module_instantiation
       ;
     if (attr.has_attributes(tag_t(&f))) { untested();
@@ -775,7 +782,7 @@ void Module::parse_body(CS& f)
 	   + attr.attributes(tag_t(&f))->string(tag_t(nullptr)));
     }else{
     }
-    trace2("endloop", end, f.last_match());
+    trace3("endloop", end, f.last_match(), is_connectmodule());
     if (reserved){
       f.reset(here);
       throw Exception_CS_("not allowed here: " + f.last_match(), f);
@@ -1524,13 +1531,13 @@ void Circuit::push_back(Element_2 /*const?*/ * f)
 void Module::set_input(Node const* n)
 {
   assert(_circuit);
-  if(!n->number()){
-  }else if(n->number() <= int(_circuit->ports().size()));
+  if(!n->number()){ untested();
+  }else if(n->number() <= int(_circuit->ports().size())){
     assert(*(_circuit->nodes().begin() + n->number()) == n);
     auto p = _circuit->ports().begin();
     std::advance(p, n->number()-1);
     (*p)->set_input();
-  }else{ untested();
+  }else{
     throw Exception("Not a port: " + n->name());
   }
 }
@@ -1538,8 +1545,8 @@ void Module::set_input(Node const* n)
 void Module::set_output(Node const* n)
 {
   assert(_circuit);
-  if(!n->number()){
-  }else if(n->number() <= int(_circuit->ports().size()));
+  if(!n->number()){ untested();
+  }else if(n->number() <= int(_circuit->ports().size())){
     assert(*(_circuit->nodes().begin() + n->number()) == n);
     auto p = _circuit->ports().begin();
     std::advance(p, n->number()-1);

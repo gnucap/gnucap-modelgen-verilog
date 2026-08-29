@@ -5,7 +5,7 @@ attach ./modelgen_0.so
 verilog
 
 `modelgen
-module test_nop2(np, n);
+module test_nop2(p, n);
 	electrical p, n;
 	inout p, n;
 	analog begin

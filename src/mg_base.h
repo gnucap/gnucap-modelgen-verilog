@@ -417,8 +417,8 @@ public:
   Node* mutable_node() const{
     return _node;
   }
-  void set_input() {untested();  _dir = dir_t(_dir | dir_in); }
-  void set_output() {untested();  _dir = dir_t(_dir | dir_out); }
+  void set_input() {  _dir = dir_t(_dir | dir_in); }
+  void set_output() {  _dir = dir_t(_dir | dir_out); }
 private:
   friend class Module;
   Node* mutable_node(Module&) const{

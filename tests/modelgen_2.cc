@@ -75,14 +75,16 @@ public:
       }
     }
 
-    while (cmd >> "module"){
+    while (cmd >> "module " || cmd >> "connectmodule "){
+      std::string which = cmd.last_match();
+      trace1("module?", which);
       module_content += cmd.fullstring();
       for (;;) {
 	cmd.get_line("verilog-module>");
 	trace1("content", cmd.fullstring());
 
 	module_content += cmd.fullstring();
-	if (cmd >> "endmodule ") {
+	if (cmd >> "end" + which + " ") {
 	  cmd.get_line("verilog-module>");
 	  break;
 	}else{

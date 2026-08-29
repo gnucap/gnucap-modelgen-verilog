@@ -104,12 +104,12 @@ std::string New_Port::code_name() const
 }
 /*--------------------------------------------------------------------------*/
 bool Port_3::is_input() const
-{ untested();
+{
   return _node.is_input();
 }
 /*--------------------------------------------------------------------------*/
 bool Port_3::is_output() const
-{ untested();
+{
   return _node.is_output();
 }
 /*--------------------------------------------------------------------------*/
@@ -233,7 +233,7 @@ void Net_Decl_Reg::parse(CS& f)
   Node_Ref const& nn = owner()->node(name());
   if(nn) {
     set_node(mod->node(nn));
-  }else{ untested();
+  }else{
     throw Exception_CS_("ground: need previously declared net", f);
   }
 
@@ -261,18 +261,18 @@ void Net_Decl_List_Dir::parse(CS& f)
   Module* mod = prechecked_cast<Module*>(owner());
   assert(mod);
 
-  for(auto const& i : *this) { untested();
+  for(auto const& i : *this) {
     Node_Ref nn = i->node();
     switch(_dir){
     case 0:
       break;
-    case 1: untested();
+    case 1:
       mod->set_input(nn);
       break;
-    case 2: untested();
+    case 2:
       mod->set_output(nn);
       break;
-    case 3: untested();
+    case 3:
       mod->set_input(nn);
       mod->set_output(nn);
       break;
