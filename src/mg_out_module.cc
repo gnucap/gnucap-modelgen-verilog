@@ -205,7 +205,7 @@ static void make_set_parameters(std::ostream& o, const Element_2& e, std::string
   }else{ untested();
     o << ", 0, nullptr";
   }
-  o << ", " << e.net_nodes() << ", nodes);\n";
+  o << ", " << e.net_nodes() << ", nodes); // set\n";
 }
 /*--------------------------------------------------------------------------*/
 static void map_subdev_nodes(std::ostream& o, const Element_2& e)
@@ -231,7 +231,7 @@ static void map_subdev_nodes(std::ostream& o, const Element_2& e)
       comma = ",";
     }
   }
-  {
+  { // make_set_parameters DUP?
     o << "};\n";
     std::string value = e.value();
     if(value == ""){
@@ -245,8 +245,12 @@ static void map_subdev_nodes(std::ostream& o, const Element_2& e)
       o << ", const_cast<COMPONENT*>(" << e.code_name() << ")->mutable_common()";
     }
     o << ", " << value;
-    o << ", 0, nullptr";
-    o << ", " << e.net_nodes() << ", nodes);\n";
+    if (e.state() != "") {
+      o << ", /*states:*/" << e.num_states() << ", " << e.state() << ".ptr()";
+    }else{
+      o << ", 0, nullptr";
+    }
+    o << ", " << e.net_nodes() << ", nodes); // map\n";
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -525,6 +529,11 @@ static void make_tr_begin(std::ostream& o, const Module& m)
     o__ "c->tr_begin_digital(this);\n"; // call from COMMON::tr_begin?
   }else{
   }
+  if(m.has_assign()) {
+    o__ "c->init_assign(this);\n";
+  }else{
+  }
+
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -1263,6 +1272,7 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   o__ "(void)c;\n";
 
   if(m.has_analog_block()){
+    // tr_begin??
     o__ "zero_filter_readout();\n";
   }else{
   }

@@ -10,6 +10,7 @@ module test(ck, en);
 	logic ck, en, c;
 	inout ck, en;
 	reg en;
+   parameter integer n = 200;
 
 	initial en = 0;
 
@@ -17,7 +18,7 @@ module test(ck, en);
 		en = 1;
 		$strobe("go");
 	end
-	assign #200 ck = !(ck & en);
+	assign #n ck = !(ck & en);
 endmodule
 
 list

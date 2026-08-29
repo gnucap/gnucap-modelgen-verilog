@@ -612,5 +612,14 @@ bool Branch::has_pot_source() const
   return _has_pot_src; //  || _has_flow_probe;
 }
 /*--------------------------------------------------------------------------*/
+#if 0
+void Element_2::set_param(std::string const& name, Expression_ const& value)
+{
+  assert(owner());
+  Parameter_3* p = new Parameter_3;
+  p->set_default(value);
+  _list_of_parameter_assignments.push_back(p);
+}
+#endif
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

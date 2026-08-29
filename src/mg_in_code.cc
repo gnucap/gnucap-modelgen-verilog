@@ -830,11 +830,11 @@ void Assignment::parse(CS& f)
     {
       assert(_token->data());
       assert(_token->scope() || _token == _lhsref);
-      trace2("Assignment::parse prop?", _token->name(), data().size());
+      trace1("Assignment::parse prop?", _token->name());
       trace1("Assignment::parse prop2", typeid(_lhsref).name());
       _lhsref->propagate_deps(*_token);
       assert(_lhsref->name() == _token->name());
-      trace2("parsedone", _token->name(), data().size());
+      trace1("parsedone", _token->name());
     }
     assert(_token);
     assert(scope());
@@ -1106,7 +1106,7 @@ Assignment::~Assignment()
 {
   if(options().optimize_unused() && !scope()->is_reachable()) {
   }else if(_token_data){
-    trace3("~Assignment", _token->name(), this, data().ddeps().size());
+    trace2("~Assignment", _token->name(), this);
     try{
 //      for(Dep d : data().ddeps()) { untested();
 //	(*d)->unset_used_in(this);

@@ -1574,6 +1574,7 @@ private:
 public:
   void tr_eval_analog(MOD_resistor*)const;
   void tr_begin(COMPONENT*)const;
+  void init_assign(MOD_resistor*)const;
   void tr_advance_analog(MOD_resistor*)const;
   void tr_regress_analog(MOD_resistor*)const;
   void precalc_analog(MOD_resistor*);
@@ -2148,6 +2149,10 @@ void COMMON_resistor::tr_begin(COMPONENT* c) const
 {
   auto d = prechecked_cast<MOD_resistor*>(c);
   (void)d;
+}
+/*--------------------------------------------------------------------------*/
+inline void COMMON_resistor::init_assign(MOD_resistor* m) const
+{
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2786,6 +2791,7 @@ inline void MOD_resistor::tr_begin()
   auto mc = prechecked_cast<COMMON_resistor*>(mutable_common());
   assert(mc);
   _v_1 = _v_;
+  c->init_assign(this);
 }
 /*--------------------------------------------------------------------------*/
 inline void MOD_resistor::dc_advance()
@@ -2946,7 +2952,7 @@ void MOD_resistor::expand()
     }
       {
         node_t nodes[] = {node_t(n_p), node_t(n_n)}; // nodes
-        _b_white_noise_1_p_->set_parameters("_b_white_noise_1_p_", this, _b_white_noise_1_p_->mutable_common(), 0., /*states:*/2, _st_b_white_noise_1_p_.ptr(), 2, nodes);
+        _b_white_noise_1_p_->set_parameters("_b_white_noise_1_p_", this, _b_white_noise_1_p_->mutable_common(), 0., /*states:*/2, _st_b_white_noise_1_p_.ptr(), 2, nodes); // set
         if(auto e = dynamic_cast<ELEMENT*>(_b_white_noise_1_p_)){
           e->_loss0 = 0.;
           e->_loss1 = 0.;
@@ -2972,7 +2978,7 @@ void MOD_resistor::expand()
     }
       {
         node_t nodes[] = {node_t(n_p), node_t(n_n)}; // nodes
-        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/2, _st_b_p_n.ptr(), 2, nodes);
+        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/2, _st_b_p_n.ptr(), 2, nodes); // set
       }
     }
 
@@ -3108,6 +3114,7 @@ private:
 public:
   void tr_eval_analog(MOD_resistor*)const;
   void tr_begin(COMPONENT*)const;
+  void init_assign(MOD_resistor*)const;
   void tr_advance_analog(MOD_resistor*)const;
   void tr_regress_analog(MOD_resistor*)const;
   void precalc_analog(MOD_resistor*);
@@ -3686,6 +3693,10 @@ void COMMON_resistor::tr_begin(COMPONENT* c) const
 {
   auto d = prechecked_cast<MOD_resistor*>(c);
   (void)d;
+}
+/*--------------------------------------------------------------------------*/
+inline void COMMON_resistor::init_assign(MOD_resistor* m) const
+{
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -4774,6 +4785,7 @@ inline void MOD_resistor::tr_begin()
   auto mc = prechecked_cast<COMMON_resistor*>(mutable_common());
   assert(mc);
   _v_1 = _v_;
+  c->init_assign(this);
 }
 /*--------------------------------------------------------------------------*/
 inline void MOD_resistor::dc_advance()
@@ -4965,7 +4977,7 @@ void MOD_resistor::expand()
     }
       {
         node_t nodes[] = {node_t(n_p), node_t(n_n)}; // nodes
-        _b_white_noise_0_p_->set_parameters("_b_white_noise_0_p_", this, _b_white_noise_0_p_->mutable_common(), 0., /*states:*/2, _st_b_white_noise_0_p_.ptr(), 2, nodes);
+        _b_white_noise_0_p_->set_parameters("_b_white_noise_0_p_", this, _b_white_noise_0_p_->mutable_common(), 0., /*states:*/2, _st_b_white_noise_0_p_.ptr(), 2, nodes); // set
         if(auto e = dynamic_cast<ELEMENT*>(_b_white_noise_0_p_)){
           e->_loss0 = 0.;
           e->_loss1 = 0.;
@@ -4991,7 +5003,7 @@ void MOD_resistor::expand()
     }
       {
         node_t nodes[] = {node_t(n_p), node_t(n_n)}; // nodes
-        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/2, _st_b_p_n.ptr(), 2, nodes);
+        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/2, _st_b_p_n.ptr(), 2, nodes); // set
       }
     }
 
@@ -6659,6 +6671,8 @@ private:
   void precalc_last(const PARAM_LIST*)override;
 public:
   void tr_eval_analog(MOD_capacitor*)const;
+  void tr_begin(COMPONENT*)const;
+  void init_assign(MOD_capacitor*)const;
   void tr_review_analog(MOD_capacitor*)const;
   void tr_accept_analog(MOD_capacitor*)const;
   void tr_advance_analog(MOD_capacitor*)const;
@@ -6827,6 +6841,7 @@ private: // overrides
   //void    tr_restore();        //BASE_SUBCKT
   void    tr_load()override{ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
   TIME_PAIR  tr_review()override;
+  void tr_begin()override;
   void tr_accept()override;
   void q_accept() { _accept = 1; }
   void tr_advance()override;
@@ -7182,6 +7197,16 @@ void COMMON_capacitor::precalc_last(const PARAM_LIST* par_scope)
   COMMON_COMPONENT::precalc_last(par_scope);
 }
 /*--------------------------------------------------------------------------*/
+void COMMON_capacitor::tr_begin(COMPONENT* c) const
+{
+  auto d = prechecked_cast<MOD_capacitor*>(c);
+  (void)d;
+}
+/*--------------------------------------------------------------------------*/
+inline void COMMON_capacitor::init_assign(MOD_capacitor* m) const
+{
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 COMMON_capacitor& Default_capacitor()
 {
@@ -7502,6 +7527,19 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
   }
 } // tr_regress_analog
 /*--------------------------------------------------------------------------*/
+inline void MOD_capacitor::tr_begin()
+{
+  BASE_SUBCKT::tr_begin();
+  _v_ = state_();
+  auto c = prechecked_cast<COMMON_capacitor const*>(common());
+  assert(c);
+  c->tr_begin(this);
+  auto mc = prechecked_cast<COMMON_capacitor*>(mutable_common());
+  assert(mc);
+  _v_1 = _v_;
+  c->init_assign(this);
+}
+/*--------------------------------------------------------------------------*/
 inline TIME_PAIR MOD_capacitor::tr_review()
 {
   if(_sim->_phase == p_RESTORE) {
@@ -7701,7 +7739,7 @@ void MOD_capacitor::expand()
     }
       {
         node_t nodes[] = {node_t(n_p), node_t(n_n), node_t(n_p), node_t(n_n)}; // nodes
-        _b_ddt_1_p_->set_parameters("_b_ddt_1_p_", this, _b_ddt_1_p_->mutable_common(), 0., /*states:*/3, _st_b_ddt_1_p_.ptr(), 4, nodes);
+        _b_ddt_1_p_->set_parameters("_b_ddt_1_p_", this, _b_ddt_1_p_->mutable_common(), 0., /*states:*/3, _st_b_ddt_1_p_.ptr(), 4, nodes); // set
         if(auto e = dynamic_cast<ELEMENT*>(_b_ddt_1_p_)){
           e->_loss0 = 0.;
           e->_loss1 = 0.;
@@ -7727,7 +7765,7 @@ void MOD_capacitor::expand()
     }
       {
         node_t nodes[] = {node_t(n_p), node_t(n_n)}; // nodes
-        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/2, _st_b_p_n.ptr(), 2, nodes);
+        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/2, _st_b_p_n.ptr(), 2, nodes); // set
       }
     }
 
@@ -7854,6 +7892,8 @@ private:
   void precalc_last(const PARAM_LIST*)override;
 public:
   void tr_eval_analog(MOD_capacitor*)const;
+  void tr_begin(COMPONENT*)const;
+  void init_assign(MOD_capacitor*)const;
   void tr_review_analog(MOD_capacitor*)const;
   void tr_accept_analog(MOD_capacitor*)const;
   void tr_advance_analog(MOD_capacitor*)const;
@@ -8030,6 +8070,7 @@ private: // overrides
   //void    tr_restore();        //BASE_SUBCKT
   void    tr_load()override{ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
   TIME_PAIR  tr_review()override;
+  void tr_begin()override;
   void tr_accept()override;
   void q_accept() { _accept = 1; }
   void tr_advance()override;
@@ -8408,6 +8449,16 @@ void COMMON_capacitor::precalc_last(const PARAM_LIST* par_scope)
   { // init common constants
   };
   COMMON_COMPONENT::precalc_last(par_scope);
+}
+/*--------------------------------------------------------------------------*/
+void COMMON_capacitor::tr_begin(COMPONENT* c) const
+{
+  auto d = prechecked_cast<MOD_capacitor*>(c);
+  (void)d;
+}
+/*--------------------------------------------------------------------------*/
+inline void COMMON_capacitor::init_assign(MOD_capacitor* m) const
+{
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -8799,6 +8850,19 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
   }
 } // tr_regress_analog
 /*--------------------------------------------------------------------------*/
+inline void MOD_capacitor::tr_begin()
+{
+  BASE_SUBCKT::tr_begin();
+  _v_ = state_();
+  auto c = prechecked_cast<COMMON_capacitor const*>(common());
+  assert(c);
+  c->tr_begin(this);
+  auto mc = prechecked_cast<COMMON_capacitor*>(mutable_common());
+  assert(mc);
+  _v_1 = _v_;
+  c->init_assign(this);
+}
+/*--------------------------------------------------------------------------*/
 inline TIME_PAIR MOD_capacitor::tr_review()
 {
   if(_sim->_phase == p_RESTORE) {
@@ -8998,7 +9062,7 @@ void MOD_capacitor::expand()
     }
       {
         node_t nodes[] = {node_t(n_ddt_2_p), gnd, node_t(n_p), node_t(n_n)}; // nodes
-        _b_ddt_2_p_->set_parameters("_b_ddt_2_p_", this, _b_ddt_2_p_->mutable_common(), 0., /*states:*/3, _st_b_ddt_2_p_.ptr(), 4, nodes);
+        _b_ddt_2_p_->set_parameters("_b_ddt_2_p_", this, _b_ddt_2_p_->mutable_common(), 0., /*states:*/3, _st_b_ddt_2_p_.ptr(), 4, nodes); // set
       }
     }
   // branch (p, n)
@@ -9019,7 +9083,7 @@ void MOD_capacitor::expand()
     }
       {
         node_t nodes[] = {node_t(n_p), node_t(n_n), node_t(n_ddt_2_p), gnd}; // nodes
-        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/3, _st_b_p_n.ptr(), 4, nodes);
+        _b_p_n->set_parameters("_b_p_n", this, &_C_V_electrical, 0., /*states:*/3, _st_b_p_n.ptr(), 4, nodes); // set
       }
     }
 

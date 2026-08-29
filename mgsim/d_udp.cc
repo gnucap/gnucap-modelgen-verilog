@@ -36,6 +36,7 @@
 namespace {
 /*--------------------------------------------------------------------------*/
 class DEV_LOGIC : public ELEMENT {
+  double* _delay{nullptr};
 public:
   enum {OUTNODE=0,BEGIN_IN=1}; //node labels
   enum {PORTS_PER_GATE = 10};
@@ -151,7 +152,7 @@ DEV_LOGIC::DEV_LOGIC(const DEV_LOGIC& p)
  */
 void DEV_LOGIC::set_parameters(const std::string& Label, CARD *Owner,
 			       COMMON_COMPONENT *Common, double Value,
-			       int , double [],
+			       int num_states, double States[],
 			       int node_count, const node_t Nodes[])
 {
   set_label(Label);
@@ -170,6 +171,10 @@ void DEV_LOGIC::set_parameters(const std::string& Label, CARD *Owner,
   if(node_count){
     std::copy_n(Nodes, node_count, (node_t*)&n_(0));
   }else{itested();
+  }
+  if(num_states == 1){
+    _delay = States;
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -570,7 +575,13 @@ void DEV_LOGIC::tr_accept()
 	assert(future_state.lv_old() == future_state.lv_future());
 	if (n_(OUTNODE)->lv() == lvUNKNOWN
 	    || future_state.lv_future() != n_(OUTNODE)->lv_future()) {
-	  n_(OUTNODE)->set_event(c->_real_delay, future_state);
+	  double dly;
+	  if(_delay){
+	    dly = m->delay * *_delay;
+	  }else{
+	    dly = c->_real_delay;
+	  }
+	  n_(OUTNODE)->set_event(dly, future_state);
 	  //assert(future_state == n_(OUTNODE).lv_future());
 	  if (_lastchangenode == OUTNODE) {untested();
 	    unreachable();

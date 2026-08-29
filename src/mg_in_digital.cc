@@ -1297,8 +1297,10 @@ void ContinuousAssign::push_back(NetAssignment* n)
 void ContinuousAssign::dump(std::ostream& o)const
 {
   o__ "assign ";
-  if(_delay!=-1){
-    o << "#" << _delay << " ";
+  if(_delay.size()){
+    o << "#";
+    _delay.dump(o);
+    o << " ";
   }else{
   }
   std::string sep;

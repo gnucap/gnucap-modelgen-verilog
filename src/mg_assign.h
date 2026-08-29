@@ -58,24 +58,31 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class ContinuousAssign : public Block {
-  int _delay{-1};
+  Expression_ _delay;
+  int _id{0};
+  Base const* _one{nullptr};
 public:
-  ContinuousAssign(){
-  }
-  ~ContinuousAssign(){
-  }
+  ContinuousAssign(): _id(++_count) {}
+  ~ContinuousAssign(){ }
 private:
 //  void new_block();
 //  Block const* block_or_null() const{ untested(); return _block; }
 //  Block* block(){ untested(); return _block; }
 
 public:
+  Expression_ const& delay()const {return _delay;}
   void parse(CS& cmd)override;
   void dump(std::ostream& o)const override;
   void push_back(NetAssignment*);
   void push_back(Statement*);
   bool has_delay()const;
   std::string delay_string()const;
+  std::string code_name()const {return "_assign_" + to_string(_id);}
+  void set(Base const* o) {_one = o;}
+  Base const* one()const {return _one;}
+  std::string state()const;
+private:
+  static int _count;
 };
 /*--------------------------------------------------------------------------*/
 class Module;

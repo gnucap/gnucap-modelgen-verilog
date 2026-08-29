@@ -1066,7 +1066,7 @@ public:
       return lvSTABLE0;
     }
   }
-  VALOGIC operator==(LNR const& o)const { untested();
+  VALOGIC operator==(LNR const& o)const {
     if(lv_now() == lvUNKNOWN || o.lv_now() == lvUNKNOWN){
       return VALOGIC(b4_X);
     }else if(  (lv_now() == lvSTABLE0 && o.lv_now() == lvSTABLE0)
@@ -1110,7 +1110,7 @@ void accept_node_value(node_t& n, bool lv, double delay)
     nl->set_event(delay, lvl);
   }else if(nl->lv_future() != lv){
     nl->set_event(delay, lvl);
-  }else if(nl->final_time() > CKT_BASE::_sim->_time0){ untested();
+  }else if(nl->final_time() > CKT_BASE::_sim->_time0){
     // (hack)
     nl->set_event(delay, lvl);
   }else{ untested();

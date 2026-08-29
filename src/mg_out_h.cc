@@ -382,7 +382,8 @@ static void make_common(std::ostream& o, const Module& m)
     o__ "void tr_initial_digital(MOD_" << m.identifier() << "*);\n";
   }else{
   }
-  if(m.has_tr_begin_digital()) {
+  if(m.has_assign()) {
+    o__ "void init_assign(MOD_" << m.identifier() << "*)const;\n";
   }else{
   }
   if(m.has_tr_eval_digital()){
@@ -484,24 +485,19 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
     o__ "// not a branch...\n";
     return;
   }
-  Branch const& br = *bb;
-  trace2("states", br.code_name(), br.deps().ddeps().size());
-  o << "public: // states, " << br.code_name() << ";\n"; //  << br.deps().size()<<";\n";
-  if(br.has_pot_source()){
-    o__ "bool _pot" << br.code_name() << ";\n";
+  o << "public: // states, " << elt.code_name() << ";\n"; //  << br.deps().size()<<";\n";
+  if(bb && bb->has_pot_source()){
+    o__ "bool _pot" << elt.code_name() << ";\n";
 //    for(auto n : br.names()){ untested();
 //      o__ "bool _pot_br_" << n << ";\n";
 //    }
   }else{
   }
-  o__ "double _value" << br.code_name() << ";\n";
-  size_t k = br.num_states();
-  o__ "struct {\n"; // _state" << br.code_name();
-  o____ "double _s[" << k << "]; // (s)\n";
-  o____ "double* ptr() {return _s;}\n";
-  o____ "double& operator[](int k) {return _s[k];}\n";
-  o____ "void clear(){std::fill_n(_s+1, " << k-1 << ", 0.);}\n";
-  o__ "}_st" << br.code_name() << ";\n";
+  if(bb){
+    o__ "double _value" << elt.code_name() << ";\n";
+  }else{
+  }
+  make_one_element_state(o, elt);
 
 //  for(auto n : br.names()){ untested();
 //    o__ "double _value_br_" << n << ";\n";
@@ -509,10 +505,13 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
 //    o__ "[" << k << "];\n";
 //  }
 
-  o__ "struct _st" << br.code_name() << "_ {\n";
+  if(bb){
+  o__ "struct _st" << elt.code_name() << "_ {\n";
   o____ "enum { ";
   std::string comma = "";
   o____ "VALUE, SELF";
+
+  Branch const& br = *bb;
   for(Dep const& d : br.ddeps()){
 //      o << "/* found " << d->code_name() << "*/";
     Branch const* bbb = ::branch(d);
@@ -539,6 +538,8 @@ static void make_module_one_branch_state(std::ostream& o, Element_2 const& elt)
   }
   o____ "};\n";
   o__ "} _dep" << br.code_name() << ";\n";
+  }else{
+  }
 
 }
 /*--------------------------------------------------------------------------*/
@@ -602,6 +603,16 @@ static void make_node_decl(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 static void make_branch_states(std::ostream& o, const Module& m)
 {
+  auto a = prechecked_cast<Assign const*>(&m.assigns());
+  assert(a);
+  for(auto x : a->list()){
+    {
+      o__ "// elt? " << x->code_name() << "\n";
+      // assert(dynamic_cast<NetAssign>(x));
+      assert(x->one());
+      make_one_element_state(o, *x->one());
+    }
+  }
   for(auto x : m.circuit()->branches()){
     assert(x);
     if(x->has_element()){

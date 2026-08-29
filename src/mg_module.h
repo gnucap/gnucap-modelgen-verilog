@@ -244,7 +244,7 @@ public: // TODO
   bool has_states()const;
   bool has_constants()const;
   bool has_events()const    { return _has_pid[if_SET_EVENT];}
-  bool has_tr_begin()const  { return _has_pid[if_TR_BEGIN]   || times(); }
+  bool has_tr_begin()const  { return _has_pid[if_TR_BEGIN]   || times() || has_assign(); }
   bool has_tr_restore()const{ return _has_pid[if_TR_RESTORE] || times(); }
   bool has_tr_review()const { return _has_pid[if_TR_REVIEW]  || has_analysis(); }
   bool has_tr_accept()const { return _has_pid[if_TR_ACCEPT]  || has_analysis(); }
@@ -300,7 +300,7 @@ public:
   bool has_submodule()const;
   bool has_analog_block()const;
   bool has_always_block()const;
-  bool has_assign()const;
+  bool has_assign()const {return _assign;}
 
   void set_set_event (mode_mask_t m=mm_YES) {set_pid(if_SET_EVENT, m);}
   void set_ac_begin  (mode_mask_t m=mm_YES) { untested();set_pid(if_AC_BEGIN, m);}

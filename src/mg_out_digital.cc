@@ -22,6 +22,7 @@
 #include "mg_out_code.h"
 #include "mg_digital.h"
 #include "mg_options.h"
+#include "mg_assign.h"
 #include <typeinfo>
 /*--------------------------------------------------------------------------*/
 class OUT_DIGITAL : OUT_CODE {
@@ -107,10 +108,10 @@ void make_tr_advance_digital(std::ostream& o, const Module& m)
     if(n->is_reg()){
       o__ "{\n";
       o____ "node_l& nl = reinterpret_cast<node_l&>(m->n_(MOD::n_" << n->name() << "));\n";
-      o____ "if (!nl->in_transit()) { untested();\n";
-      o____ "}else if (CKT_BASE::_sim->_time0 >= nl->final_time()) { untested();\n";
+      o____ "if (!nl->in_transit()) {\n";
+      o____ "}else if (CKT_BASE::_sim->_time0 >= nl->final_time()) {\n";
       o______ "nl->propagate();\n";
-      o____ "}else{ untested();\n";
+      o____ "}else{\n";
       o____ "}\n";
       o__ "}\n\n";
     }else{
@@ -158,12 +159,12 @@ void make_tr_regress_digital(std::ostream& o, const Module& m)
     if(n->is_reg()){
       o__ "{\n";
       o____ "node_l& nl = reinterpret_cast<node_l&>(m->n_(MOD::n_" << n->name() << "));\n";
-      o____ "if (nl->last_change_time() > m->_sim->_time0) { untested();\n";
+      o____ "if (nl->last_change_time() > m->_sim->_time0) {\n";
       o______ "nl->unpropagate();\n";
       o______ "assert(_sim->_time0 < nl->final_time());\n";
       o____ "}else if (m->_sim->_time0 >= nl->final_time()) { untested();\n";
       o______ "nl->propagate();\n";
-      o____ "}else{ untested();\n";
+      o____ "}else{\n";
       o____ "}\n";
       o__ "}\n\n";
     }else{
@@ -251,6 +252,8 @@ void make_cc_digital(std::ostream& o, const Module& m)
     make_cc_common_tr(o, m, OUT_DIGITAL::modeTR_INITIAL, &tr_begin_tag);
     o__ "// tr_begin ...\n";
     make_cc_common_tr(o, m, OUT_DIGITAL::modeTR_BEGIN, &tr_begin_tag);
+    // o__ "// assign..\n";
+    // make_common_init_assign(o, m);
   }else{
     o__ "// !has_tr_begin_digital\n";
   }

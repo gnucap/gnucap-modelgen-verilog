@@ -235,5 +235,22 @@ void make_copy_construct_parameter_list(std::ostream& out,
   }
 }
 /*--------------------------------------------------------------------------*/
+void make_one_element_state(std::ostream& o, Base const& b)
+{
+  auto const & elt = prechecked_cast<Element_2 const&>(b);
+//  auto const & br = prechecked_cast<Branch const&>(b);
+  size_t k = elt.num_states();
+  if(k) {
+    o__ "struct {\n"; // _state" << br.code_name();
+    o____ "double _s[" << k << "]; // (s)\n";
+    o____ "double* ptr() {return _s;}\n";
+    o____ "double& operator[](int k) {return _s[k];}\n";
+    o____ "void clear(){std::fill_n(_s+1, " << k-1 << ", 0.);}\n";
+    o__ "}" << elt.state() << ";\n";
+  }else{
+    o__ "//empty " << elt.state() << ";\n";
+  }
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

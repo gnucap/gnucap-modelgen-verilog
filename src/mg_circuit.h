@@ -123,6 +123,7 @@ class Element_2 : public Owned_Base {
   std::string _reverse;
   std::string _state;
 //  Block* _owner{nullptr};
+  Element_2(Element_2 const&) = delete;
 public:
   void parse(CS&) override;
   void dump(std::ostream& f)const override;
@@ -141,6 +142,7 @@ public:
   virtual Discipline const* discipline()const {return nullptr;}
   const Parameter_3_List&
 		     list_of_parameter_assignments()const {return _list_of_parameter_assignments;}
+//  void set_param(std::string const& name, Expression_ const& value);
   const Port_Connection_List& ports()const	  {return _list_of_port_connections;}
   virtual std::string instance_name()const  { untested();return _name_of_module_instance;}
   void set_label(std::string const& l) {_name_of_module_instance = l;}
