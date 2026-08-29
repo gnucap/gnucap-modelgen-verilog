@@ -1524,26 +1524,28 @@ void Circuit::push_back(Element_2 /*const?*/ * f)
 void Module::set_input(Node const* n)
 {
   assert(_circuit);
-  if(n->number()){
+  if(!n->number()){
+  }else if(n->number() <= int(_circuit->ports().size()));
     assert(*(_circuit->nodes().begin() + n->number()) == n);
     auto p = _circuit->ports().begin();
     std::advance(p, n->number()-1);
     (*p)->set_input();
-  }else{
-    // already ground
+  }else{ untested();
+    throw Exception("Not a port: " + n->name());
   }
 }
 /*--------------------------------------------------------------------------*/
 void Module::set_output(Node const* n)
 {
-  trace1("stc", n->number());
   assert(_circuit);
-  if(n->number()){
+  if(!n->number()){
+  }else if(n->number() <= int(_circuit->ports().size()));
+    assert(*(_circuit->nodes().begin() + n->number()) == n);
     auto p = _circuit->ports().begin();
     std::advance(p, n->number()-1);
     (*p)->set_output();
-  }else{
-    // already ground
+  }else{ untested();
+    throw Exception("Not a port: " + n->name());
   }
 }
 /*--------------------------------------------------------------------------*/
