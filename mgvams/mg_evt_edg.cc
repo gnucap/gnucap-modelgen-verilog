@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * Verilog-AMS timer
+ * Verilog-AMS edge events
  */
 /*--------------------------------------------------------------------------*/
 #include "f__.cc"
@@ -31,6 +31,7 @@ namespace {
 class EDG : public MGVAMS_EVENT {
   enum dir{
     dNeg = -1,
+    dAny = 0,
     dPos = 1
   }_dir;
   std::string _code_name;
@@ -39,7 +40,8 @@ protected:
   EDG(EDG const& e) : MGVAMS_EVENT(e), _dir(e._dir) { }
 public:
   explicit EDG(int d) : MGVAMS_EVENT(), _dir(dir(d)) {
-    set_label((d == 1)?"posedge":"negedge");
+    std::string label[3]{"negedge", "edge", "posedge"};
+    set_label(label[d+1]);
   }
   ~EDG(){ }
   virtual EDG* clone()const override { return new EDG(*this);}
@@ -94,7 +96,6 @@ private:
     o__ "bool " << label() + "__tr_advance(va::LNR const& ll) {\n";
     o____ "auto l = prechecked_cast<LOGIC_NODE const*>(ll.ptr());\n";
     o____ "assert(l);\n";
-    o____ "trace2(\"DBG\", l->final_time(), _sim->_time0);\n";
     o____ "bool is_final = l->final_time() == _sim->_time0;\n";
     o____ "bool is_lct   = l->last_change_time() == _sim->_time0;\n";
     if(_dir){
@@ -113,6 +114,17 @@ private:
 //    o____ "return " << label() + "now;\n";
     o____ "return false;\n";
     o__ "}\n";
+    o__ "bool " << label() + "__precalc(va::LNR const&) {\n";
+    o____ "return false;\n";
+    o__ "}\n";
+    o__ "bool " << label() + "__tr_begin(va::LNR const&) {\n";
+    o____ "incomplete();\n";
+    o____ "return false;\n";
+    o__ "}\n";
+    o__ "bool " << label() + "__tr_restore(va::LNR const&) {\n";
+    o____ "incomplete();\n";
+    o____ "return false;\n";
+    o__ "}\n";
     o__ "bool " << label() + "__tr_eval(va::LNR const&) {\n";
     o____ "return false;\n";
     o__ "}\n";
@@ -124,9 +136,12 @@ private:
     o__ "bool " << label() + "__is_evt(va::LNR const&) {\n";
     o____ "return " << label() + "now;\n";
     o__ "}\n";
-    o__ "bool " << label() + "__tr_regress(va::LNR const&) {\n";
-    o____ label() + "now = false;\n";
-    o____ "return true;\n";
+    o__ "bool " << label() + "__tr_regress(va::LNR const& n) {\n";
+    o____ "if( " << label() + "__tr_advance(n)) {untested();\n";
+    o______ "return true;\n";
+    o____ "}else{ untested();\n";
+    o______ "return false;\n";
+    o____ "}\n";
     o__ "}\n";
     o__ "bool " << label() + "__tr_review(va::LNR const& i) {\n";
     o____ "if(" << label() + "__is_evt(i)) {\n";
