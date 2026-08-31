@@ -103,6 +103,16 @@ std::string New_Port::code_name() const
   return "p_" + name();
 }
 /*--------------------------------------------------------------------------*/
+bool Port_3::is_input() const
+{
+  return _node.is_input();
+}
+/*--------------------------------------------------------------------------*/
+bool Port_3::is_output() const
+{
+  return _node.is_output();
+}
+/*--------------------------------------------------------------------------*/
 class Wire : public Discipline{
 public:
   explicit Wire() : Discipline("wire") {}
@@ -125,6 +135,7 @@ Net_Decl_List_Dir::Net_Decl_List_Dir(char what): Net_Decl_List()
     unreachable();
   }
 }
+/*--------------------------------------------------------------------------*/
 void Net_Declarations::parse(CS& f)
 {
   assert(owner()); // Module
@@ -153,7 +164,7 @@ void Net_Declarations::parse(CS& f)
 
     m->set_owner(owner());
     f >> *m;
-    for(auto i : *m){
+    for(Net_Identifier* i : *m){
       i->set_discipline(*ii, mod);
     }
 
@@ -181,7 +192,6 @@ void Net_Declarations::parse(CS& f)
     f >> *m;
     d = m;
   }else if(f.umatch("inout |input |output ")) {
-    trace2("Net_Declarations::parse-", f.last_match(), f.tail().substr(0,20));
     auto m = new Net_Decl_List_Dir(f.last_match()[2]);
     m->set_owner(owner());
     f >> *m;
@@ -223,7 +233,7 @@ void Net_Decl_Reg::parse(CS& f)
   Node_Ref const& nn = owner()->node(name());
   if(nn) {
     set_node(mod->node(nn));
-  }else{ untested();
+  }else{
     throw Exception_CS_("ground: need previously declared net", f);
   }
 
@@ -247,7 +257,27 @@ void Net_Decl_List_Reg::dump(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 void Net_Decl_List_Dir::parse(CS& f)
 {
-  return Net_Decl_List::parse_n_<Net_Decl_Dir>(f);
+  Net_Decl_List::parse_n_<Net_Decl_Dir>(f);
+  Module* mod = prechecked_cast<Module*>(owner());
+  assert(mod);
+
+  for(auto const& i : *this) {
+    Node_Ref nn = i->node();
+    switch(_dir){
+    case 0:
+      break;
+    case 1:
+      mod->set_input(nn);
+      break;
+    case 2:
+      mod->set_output(nn);
+      break;
+    case 3:
+      mod->set_input(nn);
+      mod->set_output(nn);
+      break;
+    }
+  }
 }
 /*--------------------------------------------------------------------------*/
 void Net_Decl_List_Dir::dump(std::ostream& o) const
@@ -263,6 +293,14 @@ void Net_Decl_Dir::parse(CS& f)
   Net_Identifier::parse(f);
 
   assert(owner());
+
+  Module* mod = prechecked_cast<Module*>(owner());
+  assert(mod);
+
+  Node_Ref const& nn = mod->new_node(name());
+  assert(nn);
+  set_node(mod->node(nn));
+
   // incomplete(); but not in use yet.
 //  set_dir(owner()->set_dir(name()));
 }
@@ -409,7 +447,7 @@ public:
 class Filter_output : public Token_PROBE {
 public:
   explicit Filter_output(std::string const& name, Branch const* b, TData* tdata)
-    : Token_PROBE(name, b, tdata) {}
+    : Token_PROBE(name, b, tdata) { untested(); }
 
   Probe const* probe()const {incomplete(); return nullptr;}
   std::string val_string()const override { untested();
@@ -612,5 +650,14 @@ bool Branch::has_pot_source() const
   return _has_pot_src; //  || _has_flow_probe;
 }
 /*--------------------------------------------------------------------------*/
+#if 0
+void Element_2::set_param(std::string const& name, Expression_ const& value)
+{
+  assert(owner());
+  Parameter_3* p = new Parameter_3;
+  p->set_default(value);
+  _list_of_parameter_assignments.push_back(p);
+}
+#endif
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

@@ -171,6 +171,97 @@ void OUT_CODE::make_one_local_var(std::ostream& o, Variable_Decl const& V) const
   }
 }
 /*--------------------------------------------------------------------------*/
+void OUT_CODE::make_initial(std::ostream& o, InitialStmt const& s) const
+{
+  if(is_tr_initial()) {
+    o__ "{ // initial statement\n";
+    make_seq_block(o, s.block());
+    o__ "}\n";
+  }else{ untested();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void OUT_CODE::make_cond(std::ostream& o, ConditionalStmt const& s) const
+{
+  o__ "{\n";
+  if(s.conditional().is_true()) {
+    if(s.true_part()) {
+      indent y;
+      make_seq_block(o, s.true_part());
+    }else{ untested();
+    }
+  }else if(s.conditional().is_false()){
+    if(s.false_part()) {
+      indent y;
+      make_seq_block(o, s.false_part());
+    }else{
+    }
+  }else{
+    indent x;
+    std::string name = make_cc_expression(o, s.conditional());
+    o__ "if ("<<name<<") {\n";
+    if(s.true_part()) {
+      indent y;
+      make_seq_block(o, s.true_part());
+    }else{
+    }
+    o__ "}";
+    if(s.false_part()) {
+      o << "else {\n";
+      {
+	indent y;
+	make_seq_block(o, s.false_part());
+      }
+      o__ "}\n";
+    }else{
+    }
+    o << "\n";
+  }
+  o__ "}\n";
+}
+/*--------------------------------------------------------------------------*/
+void OUT_CODE::make_while(std::ostream& o, WhileStmt const& s) const
+{
+  o__ "while(true) {\n";
+  {
+    indent x;
+    std::string name = make_cc_expression(o, s.conditional());
+    o__ "if ("<<name<<") {\n";
+    if(s.has_body()) {
+      indent y;
+      if(auto bb = dynamic_cast<SeqBlock const*>(&s.body())){
+	make_seq_block(o, *bb);
+      }else{ untested();
+	assert(0);
+      }
+    }else{ untested();
+    }
+
+    if(s.has_tail()){
+      if(auto bb = dynamic_cast<Assignment const*>(&s.tail())){
+	make_assignment(o, *bb);
+      }else{ untested();
+	assert(0);
+      }
+    }else{
+    }
+
+    o__ "}else{\n";
+    o____ "break;\n";
+    o__ "}\n";
+  }
+  o__ "}\n";
+}
+/*--------------------------------------------------------------------------*/
+void OUT_CODE::make_for(std::ostream& o, ForStmt const& s) const
+{
+  if(s.has_init()){
+    make_assignment(o, s.init());
+  }else{ untested();
+  }
+  make_while(o, s);
+}
+/*--------------------------------------------------------------------------*/
 void OUT_CODE::make_system_task(std::ostream& o, System_Task const& s) const
 {
   o__ "{\n";

@@ -1,0 +1,3230 @@
+i1: can't find subckt: logicinv1, forcing digital
+#Time       l(ck)      l(ii)      iter(0)   
+ 0.         3.         0.         3.        
+ 500.p      3.         0.         2.        
+go 55
+go 100
+ 1.n        3.         0.         2.        
+ 1.001n     2.         0.         2.        
+drv at 1.056e-09 next 0 delay -1
+ 1.056n     2.         0.         3.        
+ 1.101n     1.         1.         3.        
+drv at 1.111e-09 next 1 delay 50
+ 1.111n     1.         1.         3.        
+ 1.161n     1.         3.         3.        
+drv at 1.166e-09 next 1 delay -1
+ 1.166n     1.         3.         3.        
+ 1.201n     2.         2.         3.        
+drv at 1.221e-09 next 0 delay 40
+ 1.221n     2.         2.         3.        
+ 1.261n     2.         0.         3.        
+drv at 1.276e-09 next 0 delay -1
+ 1.276n     2.         0.         3.        
+ 1.301n     1.         1.         3.        
+drv at 1.331e-09 next 1 delay 30
+ 1.331n     1.         1.         3.        
+ 1.361n     1.         3.         3.        
+drv at 1.386e-09 next 1 delay -1
+ 1.386n     1.         3.         3.        
+ 1.401n     2.         2.         3.        
+drv at 1.441e-09 next 0 delay 20
+ 1.441n     2.         2.         3.        
+ 1.461n     2.         0.         3.        
+drv at 1.496e-09 next 0 delay -1
+ 1.496n     2.         0.         3.        
+ 1.501n     1.         1.         3.        
+drv at 1.551e-09 next 1 delay 10
+ 1.551n     1.         1.         3.        
+ 1.561n     1.         3.         3.        
+ 1.601n     2.         2.         3.        
+drv at 1.606e-09 next 0 delay 55
+ 1.606n     2.         2.         3.        
+drv at 1.661e-09 next 0 delay -1
+ 1.661n     2.         0.         3.        
+ 1.701n     1.         1.         3.        
+drv at 1.716e-09 next 1 delay 45
+ 1.716n     1.         1.         3.        
+ 1.761n     1.         3.         3.        
+drv at 1.771e-09 next 1 delay -1
+ 1.771n     1.         3.         3.        
+ 1.801n     2.         2.         3.        
+drv at 1.826e-09 next 0 delay 35
+ 1.826n     2.         2.         3.        
+ 1.861n     2.         0.         3.        
+drv at 1.881e-09 next 0 delay -1
+ 1.881n     2.         0.         3.        
+ 1.901n     1.         1.         3.        
+drv at 1.936e-09 next 1 delay 25
+ 1.936n     1.         1.         3.        
+ 1.961n     1.         3.         3.        
+drv at 1.991e-09 next 1 delay -1
+ 1.991n     1.         3.         3.        
+ 2.001n     2.         2.         3.        
+drv at 2.046e-09 next 0 delay 15
+ 2.046n     2.         2.         3.        
+ 2.061n     2.         0.         3.        
+drv at 2.101e-09 next 0 delay -1
+ 2.101n     1.         1.         3.        
+drv at 2.156e-09 next 1 delay 5
+ 2.156n     1.         1.         3.        
+ 2.161n     1.         3.         3.        
+ 2.201n     2.         2.         3.        
+drv at 2.211e-09 next 0 delay 50
+ 2.211n     2.         2.         3.        
+ 2.261n     2.         0.         3.        
+drv at 2.266e-09 next 0 delay -1
+ 2.266n     2.         0.         3.        
+ 2.301n     1.         1.         3.        
+drv at 2.321e-09 next 1 delay 40
+ 2.321n     1.         1.         3.        
+ 2.361n     1.         3.         3.        
+drv at 2.376e-09 next 1 delay -1
+ 2.376n     1.         3.         3.        
+ 2.401n     2.         2.         3.        
+drv at 2.431e-09 next 0 delay 30
+ 2.431n     2.         2.         3.        
+ 2.461n     2.         0.         3.        
+drv at 2.486e-09 next 0 delay -1
+ 2.486n     2.         0.         3.        
+ 2.501n     1.         1.         3.        
+drv at 2.541e-09 next 1 delay 20
+ 2.541n     1.         1.         3.        
+ 2.561n     1.         3.         3.        
+drv at 2.596e-09 next 1 delay -1
+ 2.596n     1.         3.         3.        
+ 2.601n     2.         2.         3.        
+drv at 2.651e-09 next 0 delay 10
+ 2.651n     2.         2.         3.        
+ 2.661n     2.         0.         3.        
+ 2.701n     1.         1.         3.        
+drv at 2.706e-09 next 1 delay 55
+ 2.706n     1.         1.         3.        
+drv at 2.761e-09 next 1 delay -1
+ 2.761n     1.         3.         3.        
+ 2.801n     2.         2.         3.        
+drv at 2.816e-09 next 0 delay 45
+ 2.816n     2.         2.         3.        
+ 2.861n     2.         0.         3.        
+drv at 2.871e-09 next 0 delay -1
+ 2.871n     2.         0.         3.        
+ 2.901n     1.         1.         3.        
+drv at 2.926e-09 next 1 delay 35
+ 2.926n     1.         1.         3.        
+ 2.961n     1.         3.         3.        
+drv at 2.981e-09 next 1 delay -1
+ 2.981n     1.         3.         3.        
+ 3.001n     2.         2.         3.        
+drv at 3.036e-09 next 0 delay 25
+ 3.036n     2.         2.         3.        
+ 3.061n     2.         0.         3.        
+drv at 3.091e-09 next 0 delay -1
+ 3.091n     2.         0.         3.        
+ 3.101n     1.         1.         3.        
+drv at 3.146e-09 next 1 delay 15
+ 3.146n     1.         1.         3.        
+ 3.161n     1.         3.         3.        
+drv at 3.201e-09 next 1 delay -1
+ 3.201n     2.         2.         3.        
+drv at 3.256e-09 next 0 delay 5
+ 3.256n     2.         2.         3.        
+ 3.261n     2.         0.         3.        
+ 3.301n     1.         1.         3.        
+drv at 3.311e-09 next 1 delay 50
+ 3.311n     1.         1.         3.        
+ 3.361n     1.         3.         3.        
+drv at 3.366e-09 next 1 delay -1
+ 3.366n     1.         3.         3.        
+ 3.401n     2.         2.         3.        
+drv at 3.421e-09 next 0 delay 40
+ 3.421n     2.         2.         3.        
+ 3.461n     2.         0.         3.        
+drv at 3.476e-09 next 0 delay -1
+ 3.476n     2.         0.         3.        
+ 3.501n     1.         1.         3.        
+drv at 3.531e-09 next 1 delay 30
+ 3.531n     1.         1.         3.        
+ 3.561n     1.         3.         3.        
+drv at 3.586e-09 next 1 delay -1
+ 3.586n     1.         3.         3.        
+ 3.601n     2.         2.         3.        
+drv at 3.641e-09 next 0 delay 20
+ 3.641n     2.         2.         3.        
+ 3.661n     2.         0.         3.        
+drv at 3.696e-09 next 0 delay -1
+ 3.696n     2.         0.         3.        
+ 3.701n     1.         1.         3.        
+drv at 3.751e-09 next 1 delay 10
+ 3.751n     1.         1.         3.        
+ 3.761n     1.         3.         3.        
+ 3.801n     2.         2.         3.        
+drv at 3.806e-09 next 0 delay 55
+ 3.806n     2.         2.         3.        
+drv at 3.861e-09 next 0 delay -1
+ 3.861n     2.         0.         3.        
+ 3.901n     1.         1.         3.        
+drv at 3.916e-09 next 1 delay 45
+ 3.916n     1.         1.         3.        
+ 3.961n     1.         3.         3.        
+drv at 3.971e-09 next 1 delay -1
+ 3.971n     1.         3.         3.        
+ 4.001n     2.         2.         3.        
+drv at 4.026e-09 next 0 delay 35
+ 4.026n     2.         2.         3.        
+ 4.061n     2.         0.         3.        
+drv at 4.081e-09 next 0 delay -1
+ 4.081n     2.         0.         3.        
+ 4.101n     1.         1.         3.        
+drv at 4.136e-09 next 1 delay 25
+ 4.136n     1.         1.         3.        
+ 4.161n     1.         3.         3.        
+drv at 4.191e-09 next 1 delay -1
+ 4.191n     1.         3.         3.        
+ 4.201n     2.         2.         3.        
+drv at 4.246e-09 next 0 delay 15
+ 4.246n     2.         2.         3.        
+ 4.261n     2.         0.         3.        
+drv at 4.301e-09 next 0 delay -1
+ 4.301n     1.         1.         3.        
+drv at 4.356e-09 next 1 delay 5
+ 4.356n     1.         1.         3.        
+ 4.361n     1.         3.         3.        
+ 4.401n     2.         2.         3.        
+drv at 4.411e-09 next 0 delay 50
+ 4.411n     2.         2.         3.        
+ 4.461n     2.         0.         3.        
+drv at 4.466e-09 next 0 delay -1
+ 4.466n     2.         0.         3.        
+ 4.501n     1.         1.         3.        
+drv at 4.521e-09 next 1 delay 40
+ 4.521n     1.         1.         3.        
+ 4.561n     1.         3.         3.        
+drv at 4.576e-09 next 1 delay -1
+ 4.576n     1.         3.         3.        
+ 4.601n     2.         2.         3.        
+drv at 4.631e-09 next 0 delay 30
+ 4.631n     2.         2.         3.        
+ 4.661n     2.         0.         3.        
+drv at 4.686e-09 next 0 delay -1
+ 4.686n     2.         0.         3.        
+ 4.701n     1.         1.         3.        
+drv at 4.741e-09 next 1 delay 20
+ 4.741n     1.         1.         3.        
+ 4.761n     1.         3.         3.        
+drv at 4.796e-09 next 1 delay -1
+ 4.796n     1.         3.         3.        
+ 4.801n     2.         2.         3.        
+drv at 4.851e-09 next 0 delay 10
+ 4.851n     2.         2.         3.        
+ 4.861n     2.         0.         3.        
+ 4.901n     1.         1.         3.        
+drv at 4.906e-09 next 1 delay 55
+ 4.906n     1.         1.         3.        
+drv at 4.961e-09 next 1 delay -1
+ 4.961n     1.         3.         3.        
+ 5.001n     2.         2.         3.        
+drv at 5.016e-09 next 0 delay 45
+ 5.016n     2.         2.         3.        
+ 5.061n     2.         0.         3.        
+drv at 5.071e-09 next 0 delay -1
+ 5.071n     2.         0.         3.        
+ 5.101n     1.         1.         3.        
+drv at 5.126e-09 next 1 delay 35
+ 5.126n     1.         1.         3.        
+ 5.161n     1.         3.         3.        
+drv at 5.181e-09 next 1 delay -1
+ 5.181n     1.         3.         3.        
+ 5.201n     2.         2.         3.        
+drv at 5.236e-09 next 0 delay 25
+ 5.236n     2.         2.         3.        
+ 5.261n     2.         0.         3.        
+drv at 5.291e-09 next 0 delay -1
+ 5.291n     2.         0.         3.        
+ 5.301n     1.         1.         3.        
+drv at 5.346e-09 next 1 delay 15
+ 5.346n     1.         1.         3.        
+ 5.361n     1.         3.         3.        
+drv at 5.401e-09 next 1 delay -1
+ 5.401n     2.         2.         3.        
+drv at 5.456e-09 next 0 delay 5
+ 5.456n     2.         2.         3.        
+ 5.461n     2.         0.         3.        
+ 5.501n     1.         1.         3.        
+drv at 5.511e-09 next 1 delay 50
+ 5.511n     1.         1.         3.        
+ 5.561n     1.         3.         3.        
+drv at 5.566e-09 next 1 delay -1
+ 5.566n     1.         3.         3.        
+ 5.601n     2.         2.         3.        
+drv at 5.621e-09 next 0 delay 40
+ 5.621n     2.         2.         3.        
+ 5.661n     2.         0.         3.        
+drv at 5.676e-09 next 0 delay -1
+ 5.676n     2.         0.         3.        
+ 5.701n     1.         1.         3.        
+drv at 5.731e-09 next 1 delay 30
+ 5.731n     1.         1.         3.        
+ 5.761n     1.         3.         3.        
+drv at 5.786e-09 next 1 delay -1
+ 5.786n     1.         3.         3.        
+ 5.801n     2.         2.         3.        
+drv at 5.841e-09 next 0 delay 20
+ 5.841n     2.         2.         3.        
+ 5.861n     2.         0.         3.        
+drv at 5.896e-09 next 0 delay -1
+ 5.896n     2.         0.         3.        
+ 5.901n     1.         1.         3.        
+drv at 5.951e-09 next 1 delay 10
+ 5.951n     1.         1.         3.        
+ 5.961n     1.         3.         3.        
+ 6.001n     2.         2.         3.        
+drv at 6.006e-09 next 0 delay 55
+ 6.006n     2.         2.         3.        
+drv at 6.061e-09 next 0 delay -1
+ 6.061n     2.         0.         3.        
+ 6.101n     1.         1.         3.        
+drv at 6.116e-09 next 1 delay 45
+ 6.116n     1.         1.         3.        
+ 6.161n     1.         3.         3.        
+drv at 6.171e-09 next 1 delay -1
+ 6.171n     1.         3.         3.        
+ 6.201n     2.         2.         3.        
+drv at 6.226e-09 next 0 delay 35
+ 6.226n     2.         2.         3.        
+ 6.261n     2.         0.         3.        
+drv at 6.281e-09 next 0 delay -1
+ 6.281n     2.         0.         3.        
+ 6.301n     1.         1.         3.        
+drv at 6.336e-09 next 1 delay 25
+ 6.336n     1.         1.         3.        
+ 6.361n     1.         3.         3.        
+drv at 6.391e-09 next 1 delay -1
+ 6.391n     1.         3.         3.        
+ 6.401n     2.         2.         3.        
+drv at 6.446e-09 next 0 delay 15
+ 6.446n     2.         2.         3.        
+ 6.461n     2.         0.         3.        
+drv at 6.501e-09 next 0 delay -1
+ 6.501n     1.         1.         3.        
+drv at 6.556e-09 next 1 delay 5
+ 6.556n     1.         1.         3.        
+ 6.561n     1.         3.         3.        
+ 6.601n     2.         2.         3.        
+drv at 6.611e-09 next 0 delay 50
+ 6.611n     2.         2.         3.        
+ 6.661n     2.         0.         3.        
+drv at 6.666e-09 next 0 delay -1
+ 6.666n     2.         0.         3.        
+ 6.701n     1.         1.         3.        
+drv at 6.721e-09 next 1 delay 40
+ 6.721n     1.         1.         3.        
+ 6.761n     1.         3.         3.        
+drv at 6.776e-09 next 1 delay -1
+ 6.776n     1.         3.         3.        
+ 6.801n     2.         2.         3.        
+drv at 6.831e-09 next 0 delay 30
+ 6.831n     2.         2.         3.        
+ 6.861n     2.         0.         3.        
+drv at 6.886e-09 next 0 delay -1
+ 6.886n     2.         0.         3.        
+ 6.901n     1.         1.         3.        
+drv at 6.941e-09 next 1 delay 20
+ 6.941n     1.         1.         3.        
+ 6.961n     1.         3.         3.        
+drv at 6.996e-09 next 1 delay -1
+ 6.996n     1.         3.         3.        
+ 7.001n     2.         2.         3.        
+drv at 7.051e-09 next 0 delay 10
+ 7.051n     2.         2.         3.        
+ 7.061n     2.         0.         3.        
+ 7.101n     1.         1.         3.        
+drv at 7.106e-09 next 1 delay 55
+ 7.106n     1.         1.         3.        
+drv at 7.161e-09 next 1 delay -1
+ 7.161n     1.         3.         3.        
+ 7.201n     2.         2.         3.        
+drv at 7.216e-09 next 0 delay 45
+ 7.216n     2.         2.         3.        
+ 7.261n     2.         0.         3.        
+drv at 7.271e-09 next 0 delay -1
+ 7.271n     2.         0.         3.        
+ 7.301n     1.         1.         3.        
+drv at 7.326e-09 next 1 delay 35
+ 7.326n     1.         1.         3.        
+ 7.361n     1.         3.         3.        
+drv at 7.381e-09 next 1 delay -1
+ 7.381n     1.         3.         3.        
+ 7.401n     2.         2.         3.        
+drv at 7.436e-09 next 0 delay 25
+ 7.436n     2.         2.         3.        
+ 7.461n     2.         0.         3.        
+drv at 7.491e-09 next 0 delay -1
+ 7.491n     2.         0.         3.        
+ 7.501n     1.         1.         3.        
+drv at 7.546e-09 next 1 delay 15
+ 7.546n     1.         1.         3.        
+ 7.561n     1.         3.         3.        
+drv at 7.601e-09 next 1 delay -1
+ 7.601n     2.         2.         3.        
+drv at 7.656e-09 next 0 delay 5
+ 7.656n     2.         2.         3.        
+ 7.661n     2.         0.         3.        
+ 7.701n     1.         1.         3.        
+drv at 7.711e-09 next 1 delay 50
+ 7.711n     1.         1.         3.        
+ 7.761n     1.         3.         3.        
+drv at 7.766e-09 next 1 delay -1
+ 7.766n     1.         3.         3.        
+ 7.801n     2.         2.         3.        
+drv at 7.821e-09 next 0 delay 40
+ 7.821n     2.         2.         3.        
+ 7.861n     2.         0.         3.        
+drv at 7.876e-09 next 0 delay -1
+ 7.876n     2.         0.         3.        
+ 7.901n     1.         1.         3.        
+drv at 7.931e-09 next 1 delay 30
+ 7.931n     1.         1.         3.        
+ 7.961n     1.         3.         3.        
+drv at 7.986e-09 next 1 delay -1
+ 7.986n     1.         3.         3.        
+ 8.001n     2.         2.         3.        
+drv at 8.041e-09 next 0 delay 20
+ 8.041n     2.         2.         3.        
+ 8.061n     2.         0.         3.        
+drv at 8.096e-09 next 0 delay -1
+ 8.096n     2.         0.         3.        
+ 8.101n     1.         1.         3.        
+drv at 8.151e-09 next 1 delay 10
+ 8.151n     1.         1.         3.        
+ 8.161n     1.         3.         3.        
+ 8.201n     2.         2.         3.        
+drv at 8.206e-09 next 0 delay 55
+ 8.206n     2.         2.         3.        
+drv at 8.261e-09 next 0 delay -1
+ 8.261n     2.         0.         3.        
+ 8.301n     1.         1.         3.        
+drv at 8.316e-09 next 1 delay 45
+ 8.316n     1.         1.         3.        
+ 8.361n     1.         3.         3.        
+drv at 8.371e-09 next 1 delay -1
+ 8.371n     1.         3.         3.        
+ 8.401n     2.         2.         3.        
+drv at 8.426e-09 next 0 delay 35
+ 8.426n     2.         2.         3.        
+ 8.461n     2.         0.         3.        
+drv at 8.481e-09 next 0 delay -1
+ 8.481n     2.         0.         3.        
+ 8.501n     1.         1.         3.        
+drv at 8.536e-09 next 1 delay 25
+ 8.536n     1.         1.         3.        
+ 8.561n     1.         3.         3.        
+drv at 8.591e-09 next 1 delay -1
+ 8.591n     1.         3.         3.        
+ 8.601n     2.         2.         3.        
+drv at 8.646e-09 next 0 delay 15
+ 8.646n     2.         2.         3.        
+ 8.661n     2.         0.         3.        
+drv at 8.701e-09 next 0 delay -1
+ 8.701n     1.         1.         3.        
+drv at 8.756e-09 next 1 delay 5
+ 8.756n     1.         1.         3.        
+ 8.761n     1.         3.         3.        
+ 8.801n     2.         2.         3.        
+drv at 8.811e-09 next 0 delay 50
+ 8.811n     2.         2.         3.        
+ 8.861n     2.         0.         3.        
+drv at 8.866e-09 next 0 delay -1
+ 8.866n     2.         0.         3.        
+ 8.901n     1.         1.         3.        
+drv at 8.921e-09 next 1 delay 40
+ 8.921n     1.         1.         3.        
+ 8.961n     1.         3.         3.        
+drv at 8.976e-09 next 1 delay -1
+ 8.976n     1.         3.         3.        
+ 9.001n     2.         2.         3.        
+drv at 9.031e-09 next 0 delay 30
+ 9.031n     2.         2.         3.        
+ 9.061n     2.         0.         3.        
+drv at 9.086e-09 next 0 delay -1
+ 9.086n     2.         0.         3.        
+ 9.101n     1.         1.         3.        
+drv at 9.141e-09 next 1 delay 20
+ 9.141n     1.         1.         3.        
+ 9.161n     1.         3.         3.        
+drv at 9.196e-09 next 1 delay -1
+ 9.196n     1.         3.         3.        
+ 9.201n     2.         2.         3.        
+drv at 9.251e-09 next 0 delay 10
+ 9.251n     2.         2.         3.        
+ 9.261n     2.         0.         3.        
+ 9.301n     1.         1.         3.        
+drv at 9.306e-09 next 1 delay 55
+ 9.306n     1.         1.         3.        
+drv at 9.361e-09 next 1 delay -1
+ 9.361n     1.         3.         3.        
+ 9.401n     2.         2.         3.        
+drv at 9.416e-09 next 0 delay 45
+ 9.416n     2.         2.         3.        
+ 9.461n     2.         0.         3.        
+drv at 9.471e-09 next 0 delay -1
+ 9.471n     2.         0.         3.        
+ 9.501n     1.         1.         3.        
+drv at 9.526e-09 next 1 delay 35
+ 9.526n     1.         1.         3.        
+ 9.561n     1.         3.         3.        
+drv at 9.581e-09 next 1 delay -1
+ 9.581n     1.         3.         3.        
+ 9.601n     2.         2.         3.        
+drv at 9.636e-09 next 0 delay 25
+ 9.636n     2.         2.         3.        
+ 9.661n     2.         0.         3.        
+drv at 9.691e-09 next 0 delay -1
+ 9.691n     2.         0.         3.        
+ 9.701n     1.         1.         3.        
+drv at 9.746e-09 next 1 delay 15
+ 9.746n     1.         1.         3.        
+ 9.761n     1.         3.         3.        
+drv at 9.801e-09 next 1 delay -1
+ 9.801n     2.         2.         3.        
+drv at 9.856e-09 next 0 delay 5
+ 9.856n     2.         2.         3.        
+ 9.861n     2.         0.         3.        
+ 9.901n     1.         1.         3.        
+drv at 9.911e-09 next 1 delay 50
+ 9.911n     1.         1.         3.        
+ 9.961n     1.         3.         3.        
+drv at 9.966e-09 next 1 delay -1
+ 9.966n     1.         3.         3.        
+ 10.001n    2.         2.         3.        
+drv at 1.0021e-08 next 0 delay 40
+ 10.021n    2.         2.         3.        
+ 10.061n    2.         0.         3.        
+drv at 1.0076e-08 next 0 delay -1
+ 10.076n    2.         0.         3.        
+ 10.101n    1.         1.         3.        
+drv at 1.0131e-08 next 1 delay 30
+ 10.131n    1.         1.         3.        
+ 10.161n    1.         3.         3.        
+drv at 1.0186e-08 next 1 delay -1
+ 10.186n    1.         3.         3.        
+ 10.201n    2.         2.         3.        
+drv at 1.0241e-08 next 0 delay 20
+ 10.241n    2.         2.         3.        
+ 10.261n    2.         0.         3.        
+drv at 1.0296e-08 next 0 delay -1
+ 10.296n    2.         0.         3.        
+ 10.301n    1.         1.         3.        
+drv at 1.0351e-08 next 1 delay 10
+ 10.351n    1.         1.         3.        
+ 10.361n    1.         3.         3.        
+ 10.401n    2.         2.         3.        
+drv at 1.0406e-08 next 0 delay 55
+ 10.406n    2.         2.         3.        
+drv at 1.0461e-08 next 0 delay -1
+ 10.461n    2.         0.         3.        
+ 10.501n    1.         1.         3.        
+drv at 1.0516e-08 next 1 delay 45
+ 10.516n    1.         1.         3.        
+ 10.561n    1.         3.         3.        
+drv at 1.0571e-08 next 1 delay -1
+ 10.571n    1.         3.         3.        
+ 10.601n    2.         2.         3.        
+drv at 1.0626e-08 next 0 delay 35
+ 10.626n    2.         2.         3.        
+ 10.661n    2.         0.         3.        
+drv at 1.0681e-08 next 0 delay -1
+ 10.681n    2.         0.         3.        
+ 10.701n    1.         1.         3.        
+drv at 1.0736e-08 next 1 delay 25
+ 10.736n    1.         1.         3.        
+ 10.761n    1.         3.         3.        
+drv at 1.0791e-08 next 1 delay -1
+ 10.791n    1.         3.         3.        
+ 10.801n    2.         2.         3.        
+drv at 1.0846e-08 next 0 delay 15
+ 10.846n    2.         2.         3.        
+ 10.861n    2.         0.         3.        
+drv at 1.0901e-08 next 0 delay -1
+ 10.901n    1.         1.         3.        
+drv at 1.0956e-08 next 1 delay 5
+ 10.956n    1.         1.         3.        
+ 10.961n    1.         3.         3.        
+ 11.001n    2.         2.         3.        
+drv at 1.1011e-08 next 0 delay 50
+ 11.011n    2.         2.         3.        
+ 11.061n    2.         0.         3.        
+drv at 1.1066e-08 next 0 delay -1
+ 11.066n    2.         0.         3.        
+ 11.101n    1.         1.         3.        
+drv at 1.1121e-08 next 1 delay 40
+ 11.121n    1.         1.         3.        
+ 11.161n    1.         3.         3.        
+drv at 1.1176e-08 next 1 delay -1
+ 11.176n    1.         3.         3.        
+ 11.201n    2.         2.         3.        
+drv at 1.1231e-08 next 0 delay 30
+ 11.231n    2.         2.         3.        
+ 11.261n    2.         0.         3.        
+drv at 1.1286e-08 next 0 delay -1
+ 11.286n    2.         0.         3.        
+ 11.301n    1.         1.         3.        
+drv at 1.1341e-08 next 1 delay 20
+ 11.341n    1.         1.         3.        
+ 11.361n    1.         3.         3.        
+drv at 1.1396e-08 next 1 delay -1
+ 11.396n    1.         3.         3.        
+ 11.401n    2.         2.         3.        
+drv at 1.1451e-08 next 0 delay 10
+ 11.451n    2.         2.         3.        
+ 11.461n    2.         0.         3.        
+ 11.501n    1.         1.         3.        
+drv at 1.1506e-08 next 1 delay 55
+ 11.506n    1.         1.         3.        
+drv at 1.1561e-08 next 1 delay -1
+ 11.561n    1.         3.         3.        
+ 11.601n    2.         2.         3.        
+drv at 1.1616e-08 next 0 delay 45
+ 11.616n    2.         2.         3.        
+ 11.661n    2.         0.         3.        
+drv at 1.1671e-08 next 0 delay -1
+ 11.671n    2.         0.         3.        
+ 11.701n    1.         1.         3.        
+drv at 1.1726e-08 next 1 delay 35
+ 11.726n    1.         1.         3.        
+ 11.761n    1.         3.         3.        
+drv at 1.1781e-08 next 1 delay -1
+ 11.781n    1.         3.         3.        
+ 11.801n    2.         2.         3.        
+drv at 1.1836e-08 next 0 delay 25
+ 11.836n    2.         2.         3.        
+ 11.861n    2.         0.         3.        
+drv at 1.1891e-08 next 0 delay -1
+ 11.891n    2.         0.         3.        
+ 11.901n    1.         1.         3.        
+drv at 1.1946e-08 next 1 delay 15
+ 11.946n    1.         1.         3.        
+ 11.961n    1.         3.         3.        
+drv at 1.2001e-08 next 1 delay -1
+ 12.001n    2.         2.         3.        
+drv at 1.2056e-08 next 0 delay 5
+ 12.056n    2.         2.         3.        
+ 12.061n    2.         0.         3.        
+ 12.101n    1.         1.         3.        
+drv at 1.2111e-08 next 1 delay 50
+ 12.111n    1.         1.         3.        
+ 12.161n    1.         3.         3.        
+drv at 1.2166e-08 next 1 delay -1
+ 12.166n    1.         3.         3.        
+ 12.201n    2.         2.         3.        
+drv at 1.2221e-08 next 0 delay 40
+ 12.221n    2.         2.         3.        
+ 12.261n    2.         0.         3.        
+drv at 1.2276e-08 next 0 delay -1
+ 12.276n    2.         0.         3.        
+ 12.301n    1.         1.         3.        
+drv at 1.2331e-08 next 1 delay 30
+ 12.331n    1.         1.         3.        
+ 12.361n    1.         3.         3.        
+drv at 1.2386e-08 next 1 delay -1
+ 12.386n    1.         3.         3.        
+ 12.401n    2.         2.         3.        
+drv at 1.2441e-08 next 0 delay 20
+ 12.441n    2.         2.         3.        
+ 12.461n    2.         0.         3.        
+drv at 1.2496e-08 next 0 delay -1
+ 12.496n    2.         0.         3.        
+ 12.501n    1.         1.         3.        
+drv at 1.2551e-08 next 1 delay 10
+ 12.551n    1.         1.         3.        
+ 12.561n    1.         3.         3.        
+ 12.601n    2.         2.         3.        
+drv at 1.2606e-08 next 0 delay 55
+ 12.606n    2.         2.         3.        
+drv at 1.2661e-08 next 0 delay -1
+ 12.661n    2.         0.         3.        
+ 12.701n    1.         1.         3.        
+drv at 1.2716e-08 next 1 delay 45
+ 12.716n    1.         1.         3.        
+ 12.761n    1.         3.         3.        
+drv at 1.2771e-08 next 1 delay -1
+ 12.771n    1.         3.         3.        
+ 12.801n    2.         2.         3.        
+drv at 1.2826e-08 next 0 delay 35
+ 12.826n    2.         2.         3.        
+ 12.861n    2.         0.         3.        
+drv at 1.2881e-08 next 0 delay -1
+ 12.881n    2.         0.         3.        
+ 12.901n    1.         1.         3.        
+drv at 1.2936e-08 next 1 delay 25
+ 12.936n    1.         1.         3.        
+ 12.961n    1.         3.         3.        
+drv at 1.2991e-08 next 1 delay -1
+ 12.991n    1.         3.         3.        
+ 13.001n    2.         2.         3.        
+drv at 1.3046e-08 next 0 delay 15
+ 13.046n    2.         2.         3.        
+ 13.061n    2.         0.         3.        
+drv at 1.3101e-08 next 0 delay -1
+ 13.101n    1.         1.         3.        
+drv at 1.3156e-08 next 1 delay 5
+ 13.156n    1.         1.         3.        
+ 13.161n    1.         3.         3.        
+ 13.201n    2.         2.         3.        
+drv at 1.3211e-08 next 0 delay 50
+ 13.211n    2.         2.         3.        
+ 13.261n    2.         0.         3.        
+drv at 1.3266e-08 next 0 delay -1
+ 13.266n    2.         0.         3.        
+ 13.301n    1.         1.         3.        
+drv at 1.3321e-08 next 1 delay 40
+ 13.321n    1.         1.         3.        
+ 13.361n    1.         3.         3.        
+drv at 1.3376e-08 next 1 delay -1
+ 13.376n    1.         3.         3.        
+ 13.401n    2.         2.         3.        
+drv at 1.3431e-08 next 0 delay 30
+ 13.431n    2.         2.         3.        
+ 13.461n    2.         0.         3.        
+drv at 1.3486e-08 next 0 delay -1
+ 13.486n    2.         0.         3.        
+ 13.501n    1.         1.         3.        
+drv at 1.3541e-08 next 1 delay 20
+ 13.541n    1.         1.         3.        
+ 13.561n    1.         3.         3.        
+drv at 1.3596e-08 next 1 delay -1
+ 13.596n    1.         3.         3.        
+ 13.601n    2.         2.         3.        
+drv at 1.3651e-08 next 0 delay 10
+ 13.651n    2.         2.         3.        
+ 13.661n    2.         0.         3.        
+ 13.701n    1.         1.         3.        
+drv at 1.3706e-08 next 1 delay 55
+ 13.706n    1.         1.         3.        
+drv at 1.3761e-08 next 1 delay -1
+ 13.761n    1.         3.         3.        
+ 13.801n    2.         2.         3.        
+drv at 1.3816e-08 next 0 delay 45
+ 13.816n    2.         2.         3.        
+ 13.861n    2.         0.         3.        
+drv at 1.3871e-08 next 0 delay -1
+ 13.871n    2.         0.         3.        
+ 13.901n    1.         1.         3.        
+drv at 1.3926e-08 next 1 delay 35
+ 13.926n    1.         1.         3.        
+ 13.961n    1.         3.         3.        
+drv at 1.3981e-08 next 1 delay -1
+ 13.981n    1.         3.         3.        
+ 14.001n    2.         2.         3.        
+drv at 1.4036e-08 next 0 delay 25
+ 14.036n    2.         2.         3.        
+ 14.061n    2.         0.         3.        
+drv at 1.4091e-08 next 0 delay -1
+ 14.091n    2.         0.         3.        
+ 14.101n    1.         1.         3.        
+drv at 1.4146e-08 next 1 delay 15
+ 14.146n    1.         1.         3.        
+ 14.161n    1.         3.         3.        
+drv at 1.4201e-08 next 1 delay -1
+ 14.201n    2.         2.         3.        
+drv at 1.4256e-08 next 0 delay 5
+ 14.256n    2.         2.         3.        
+ 14.261n    2.         0.         3.        
+ 14.301n    1.         1.         3.        
+drv at 1.4311e-08 next 1 delay 50
+ 14.311n    1.         1.         3.        
+ 14.361n    1.         3.         3.        
+drv at 1.4366e-08 next 1 delay -1
+ 14.366n    1.         3.         3.        
+ 14.401n    2.         2.         3.        
+drv at 1.4421e-08 next 0 delay 40
+ 14.421n    2.         2.         3.        
+ 14.461n    2.         0.         3.        
+drv at 1.4476e-08 next 0 delay -1
+ 14.476n    2.         0.         3.        
+ 14.501n    1.         1.         3.        
+drv at 1.4531e-08 next 1 delay 30
+ 14.531n    1.         1.         3.        
+ 14.561n    1.         3.         3.        
+drv at 1.4586e-08 next 1 delay -1
+ 14.586n    1.         3.         3.        
+ 14.601n    2.         2.         3.        
+drv at 1.4641e-08 next 0 delay 20
+ 14.641n    2.         2.         3.        
+ 14.661n    2.         0.         3.        
+drv at 1.4696e-08 next 0 delay -1
+ 14.696n    2.         0.         3.        
+ 14.701n    1.         1.         3.        
+drv at 1.4751e-08 next 1 delay 10
+ 14.751n    1.         1.         3.        
+ 14.761n    1.         3.         3.        
+ 14.801n    2.         2.         3.        
+drv at 1.4806e-08 next 0 delay 55
+ 14.806n    2.         2.         3.        
+drv at 1.4861e-08 next 0 delay -1
+ 14.861n    2.         0.         3.        
+ 14.901n    1.         1.         3.        
+drv at 1.4916e-08 next 1 delay 45
+ 14.916n    1.         1.         3.        
+ 14.961n    1.         3.         3.        
+drv at 1.4971e-08 next 1 delay -1
+ 14.971n    1.         3.         3.        
+ 15.001n    2.         2.         3.        
+drv at 1.5026e-08 next 0 delay 35
+ 15.026n    2.         2.         3.        
+ 15.061n    2.         0.         3.        
+drv at 1.5081e-08 next 0 delay -1
+ 15.081n    2.         0.         3.        
+ 15.101n    1.         1.         3.        
+drv at 1.5136e-08 next 1 delay 25
+ 15.136n    1.         1.         3.        
+ 15.161n    1.         3.         3.        
+drv at 1.5191e-08 next 1 delay -1
+ 15.191n    1.         3.         3.        
+ 15.201n    2.         2.         3.        
+drv at 1.5246e-08 next 0 delay 15
+ 15.246n    2.         2.         3.        
+ 15.261n    2.         0.         3.        
+drv at 1.5301e-08 next 0 delay -1
+ 15.301n    1.         1.         3.        
+drv at 1.5356e-08 next 1 delay 5
+ 15.356n    1.         1.         3.        
+ 15.361n    1.         3.         3.        
+ 15.401n    2.         2.         3.        
+drv at 1.5411e-08 next 0 delay 50
+ 15.411n    2.         2.         3.        
+ 15.461n    2.         0.         3.        
+drv at 1.5466e-08 next 0 delay -1
+ 15.466n    2.         0.         3.        
+ 15.501n    1.         1.         3.        
+drv at 1.5521e-08 next 1 delay 40
+ 15.521n    1.         1.         3.        
+ 15.561n    1.         3.         3.        
+drv at 1.5576e-08 next 1 delay -1
+ 15.576n    1.         3.         3.        
+ 15.601n    2.         2.         3.        
+drv at 1.5631e-08 next 0 delay 30
+ 15.631n    2.         2.         3.        
+ 15.661n    2.         0.         3.        
+drv at 1.5686e-08 next 0 delay -1
+ 15.686n    2.         0.         3.        
+ 15.701n    1.         1.         3.        
+drv at 1.5741e-08 next 1 delay 20
+ 15.741n    1.         1.         3.        
+ 15.761n    1.         3.         3.        
+drv at 1.5796e-08 next 1 delay -1
+ 15.796n    1.         3.         3.        
+ 15.801n    2.         2.         3.        
+drv at 1.5851e-08 next 0 delay 10
+ 15.851n    2.         2.         3.        
+ 15.861n    2.         0.         3.        
+ 15.901n    1.         1.         3.        
+drv at 1.5906e-08 next 1 delay 55
+ 15.906n    1.         1.         3.        
+drv at 1.5961e-08 next 1 delay -1
+ 15.961n    1.         3.         3.        
+ 16.001n    2.         2.         3.        
+drv at 1.6016e-08 next 0 delay 45
+ 16.016n    2.         2.         3.        
+ 16.061n    2.         0.         3.        
+drv at 1.6071e-08 next 0 delay -1
+ 16.071n    2.         0.         3.        
+ 16.101n    1.         1.         3.        
+drv at 1.6126e-08 next 1 delay 35
+ 16.126n    1.         1.         3.        
+ 16.161n    1.         3.         3.        
+drv at 1.6181e-08 next 1 delay -1
+ 16.181n    1.         3.         3.        
+ 16.201n    2.         2.         3.        
+drv at 1.6236e-08 next 0 delay 25
+ 16.236n    2.         2.         3.        
+ 16.261n    2.         0.         3.        
+drv at 1.6291e-08 next 0 delay -1
+ 16.291n    2.         0.         3.        
+ 16.301n    1.         1.         3.        
+drv at 1.6346e-08 next 1 delay 15
+ 16.346n    1.         1.         3.        
+ 16.361n    1.         3.         3.        
+drv at 1.6401e-08 next 1 delay -1
+ 16.401n    2.         2.         3.        
+drv at 1.6456e-08 next 0 delay 5
+ 16.456n    2.         2.         3.        
+ 16.461n    2.         0.         3.        
+ 16.501n    1.         1.         3.        
+drv at 1.6511e-08 next 1 delay 50
+ 16.511n    1.         1.         3.        
+ 16.561n    1.         3.         3.        
+drv at 1.6566e-08 next 1 delay -1
+ 16.566n    1.         3.         3.        
+ 16.601n    2.         2.         3.        
+drv at 1.6621e-08 next 0 delay 40
+ 16.621n    2.         2.         3.        
+ 16.661n    2.         0.         3.        
+drv at 1.6676e-08 next 0 delay -1
+ 16.676n    2.         0.         3.        
+ 16.701n    1.         1.         3.        
+drv at 1.6731e-08 next 1 delay 30
+ 16.731n    1.         1.         3.        
+ 16.761n    1.         3.         3.        
+drv at 1.6786e-08 next 1 delay -1
+ 16.786n    1.         3.         3.        
+ 16.801n    2.         2.         3.        
+drv at 1.6841e-08 next 0 delay 20
+ 16.841n    2.         2.         3.        
+ 16.861n    2.         0.         3.        
+drv at 1.6896e-08 next 0 delay -1
+ 16.896n    2.         0.         3.        
+ 16.901n    1.         1.         3.        
+drv at 1.6951e-08 next 1 delay 10
+ 16.951n    1.         1.         3.        
+ 16.961n    1.         3.         3.        
+ 17.001n    2.         2.         3.        
+drv at 1.7006e-08 next 0 delay 55
+ 17.006n    2.         2.         3.        
+drv at 1.7061e-08 next 0 delay -1
+ 17.061n    2.         0.         3.        
+ 17.101n    1.         1.         3.        
+drv at 1.7116e-08 next 1 delay 45
+ 17.116n    1.         1.         3.        
+ 17.161n    1.         3.         3.        
+drv at 1.7171e-08 next 1 delay -1
+ 17.171n    1.         3.         3.        
+ 17.201n    2.         2.         3.        
+drv at 1.7226e-08 next 0 delay 35
+ 17.226n    2.         2.         3.        
+ 17.261n    2.         0.         3.        
+drv at 1.7281e-08 next 0 delay -1
+ 17.281n    2.         0.         3.        
+ 17.301n    1.         1.         3.        
+drv at 1.7336e-08 next 1 delay 25
+ 17.336n    1.         1.         3.        
+ 17.361n    1.         3.         3.        
+drv at 1.7391e-08 next 1 delay -1
+ 17.391n    1.         3.         3.        
+ 17.401n    2.         2.         3.        
+drv at 1.7446e-08 next 0 delay 15
+ 17.446n    2.         2.         3.        
+ 17.461n    2.         0.         3.        
+drv at 1.7501e-08 next 0 delay -1
+ 17.501n    1.         1.         3.        
+drv at 1.7556e-08 next 1 delay 5
+ 17.556n    1.         1.         3.        
+ 17.561n    1.         3.         3.        
+ 17.601n    2.         2.         3.        
+drv at 1.7611e-08 next 0 delay 50
+ 17.611n    2.         2.         3.        
+ 17.661n    2.         0.         3.        
+drv at 1.7666e-08 next 0 delay -1
+ 17.666n    2.         0.         3.        
+ 17.701n    1.         1.         3.        
+drv at 1.7721e-08 next 1 delay 40
+ 17.721n    1.         1.         3.        
+ 17.761n    1.         3.         3.        
+drv at 1.7776e-08 next 1 delay -1
+ 17.776n    1.         3.         3.        
+ 17.801n    2.         2.         3.        
+drv at 1.7831e-08 next 0 delay 30
+ 17.831n    2.         2.         3.        
+ 17.861n    2.         0.         3.        
+drv at 1.7886e-08 next 0 delay -1
+ 17.886n    2.         0.         3.        
+ 17.901n    1.         1.         3.        
+drv at 1.7941e-08 next 1 delay 20
+ 17.941n    1.         1.         3.        
+ 17.961n    1.         3.         3.        
+drv at 1.7996e-08 next 1 delay -1
+ 17.996n    1.         3.         3.        
+ 18.001n    2.         2.         3.        
+drv at 1.8051e-08 next 0 delay 10
+ 18.051n    2.         2.         3.        
+ 18.061n    2.         0.         3.        
+ 18.101n    1.         1.         3.        
+drv at 1.8106e-08 next 1 delay 55
+ 18.106n    1.         1.         3.        
+drv at 1.8161e-08 next 1 delay -1
+ 18.161n    1.         3.         3.        
+ 18.201n    2.         2.         3.        
+drv at 1.8216e-08 next 0 delay 45
+ 18.216n    2.         2.         3.        
+ 18.261n    2.         0.         3.        
+drv at 1.8271e-08 next 0 delay -1
+ 18.271n    2.         0.         3.        
+ 18.301n    1.         1.         3.        
+drv at 1.8326e-08 next 1 delay 35
+ 18.326n    1.         1.         3.        
+ 18.361n    1.         3.         3.        
+drv at 1.8381e-08 next 1 delay -1
+ 18.381n    1.         3.         3.        
+ 18.401n    2.         2.         3.        
+drv at 1.8436e-08 next 0 delay 25
+ 18.436n    2.         2.         3.        
+ 18.461n    2.         0.         3.        
+drv at 1.8491e-08 next 0 delay -1
+ 18.491n    2.         0.         3.        
+ 18.501n    1.         1.         3.        
+drv at 1.8546e-08 next 1 delay 15
+ 18.546n    1.         1.         3.        
+ 18.561n    1.         3.         3.        
+drv at 1.8601e-08 next 1 delay -1
+ 18.601n    2.         2.         3.        
+drv at 1.8656e-08 next 0 delay 5
+ 18.656n    2.         2.         3.        
+ 18.661n    2.         0.         3.        
+ 18.701n    1.         1.         3.        
+drv at 1.8711e-08 next 1 delay 50
+ 18.711n    1.         1.         3.        
+ 18.761n    1.         3.         3.        
+drv at 1.8766e-08 next 1 delay -1
+ 18.766n    1.         3.         3.        
+ 18.801n    2.         2.         3.        
+drv at 1.8821e-08 next 0 delay 40
+ 18.821n    2.         2.         3.        
+ 18.861n    2.         0.         3.        
+drv at 1.8876e-08 next 0 delay -1
+ 18.876n    2.         0.         3.        
+ 18.901n    1.         1.         3.        
+drv at 1.8931e-08 next 1 delay 30
+ 18.931n    1.         1.         3.        
+ 18.961n    1.         3.         3.        
+drv at 1.8986e-08 next 1 delay -1
+ 18.986n    1.         3.         3.        
+ 19.001n    2.         2.         3.        
+drv at 1.9041e-08 next 0 delay 20
+ 19.041n    2.         2.         3.        
+ 19.061n    2.         0.         3.        
+drv at 1.9096e-08 next 0 delay -1
+ 19.096n    2.         0.         3.        
+ 19.101n    1.         1.         3.        
+drv at 1.9151e-08 next 1 delay 10
+ 19.151n    1.         1.         3.        
+ 19.161n    1.         3.         3.        
+ 19.201n    2.         2.         3.        
+drv at 1.9206e-08 next 0 delay 55
+ 19.206n    2.         2.         3.        
+drv at 1.9261e-08 next 0 delay -1
+ 19.261n    2.         0.         3.        
+ 19.301n    1.         1.         3.        
+drv at 1.9316e-08 next 1 delay 45
+ 19.316n    1.         1.         3.        
+ 19.361n    1.         3.         3.        
+drv at 1.9371e-08 next 1 delay -1
+ 19.371n    1.         3.         3.        
+ 19.401n    2.         2.         3.        
+drv at 1.9426e-08 next 0 delay 35
+ 19.426n    2.         2.         3.        
+ 19.461n    2.         0.         3.        
+drv at 1.9481e-08 next 0 delay -1
+ 19.481n    2.         0.         3.        
+ 19.501n    1.         1.         3.        
+drv at 1.9536e-08 next 1 delay 25
+ 19.536n    1.         1.         3.        
+ 19.561n    1.         3.         3.        
+drv at 1.9591e-08 next 1 delay -1
+ 19.591n    1.         3.         3.        
+ 19.601n    2.         2.         3.        
+drv at 1.9646e-08 next 0 delay 15
+ 19.646n    2.         2.         3.        
+ 19.661n    2.         0.         3.        
+drv at 1.9701e-08 next 0 delay -1
+ 19.701n    1.         1.         3.        
+drv at 1.9756e-08 next 1 delay 5
+ 19.756n    1.         1.         3.        
+ 19.761n    1.         3.         3.        
+ 19.801n    2.         2.         3.        
+drv at 1.9811e-08 next 0 delay 50
+ 19.811n    2.         2.         3.        
+ 19.861n    2.         0.         3.        
+drv at 1.9866e-08 next 0 delay -1
+ 19.866n    2.         0.         3.        
+ 19.901n    1.         1.         3.        
+drv at 1.9921e-08 next 1 delay 40
+ 19.921n    1.         1.         3.        
+ 19.961n    1.         3.         3.        
+drv at 1.9976e-08 next 1 delay -1
+ 19.976n    1.         3.         3.        
+ 20.001n    2.         2.         3.        
+drv at 2.0031e-08 next 0 delay 30
+ 20.031n    2.         2.         3.        
+ 20.061n    2.         0.         3.        
+drv at 2.0086e-08 next 0 delay -1
+ 20.086n    2.         0.         3.        
+ 20.101n    1.         1.         3.        
+drv at 2.0141e-08 next 1 delay 20
+ 20.141n    1.         1.         3.        
+ 20.161n    1.         3.         3.        
+drv at 2.0196e-08 next 1 delay -1
+ 20.196n    1.         3.         3.        
+ 20.201n    2.         2.         3.        
+drv at 2.0251e-08 next 0 delay 10
+ 20.251n    2.         2.         3.        
+ 20.261n    2.         0.         3.        
+ 20.301n    1.         1.         3.        
+drv at 2.0306e-08 next 1 delay 55
+ 20.306n    1.         1.         3.        
+drv at 2.0361e-08 next 1 delay -1
+ 20.361n    1.         3.         3.        
+ 20.401n    2.         2.         3.        
+drv at 2.0416e-08 next 0 delay 45
+ 20.416n    2.         2.         3.        
+ 20.461n    2.         0.         3.        
+drv at 2.0471e-08 next 0 delay -1
+ 20.471n    2.         0.         3.        
+ 20.501n    1.         1.         3.        
+drv at 2.0526e-08 next 1 delay 35
+ 20.526n    1.         1.         3.        
+ 20.561n    1.         3.         3.        
+drv at 2.0581e-08 next 1 delay -1
+ 20.581n    1.         3.         3.        
+ 20.601n    2.         2.         3.        
+drv at 2.0636e-08 next 0 delay 25
+ 20.636n    2.         2.         3.        
+ 20.661n    2.         0.         3.        
+drv at 2.0691e-08 next 0 delay -1
+ 20.691n    2.         0.         3.        
+ 20.701n    1.         1.         3.        
+drv at 2.0746e-08 next 1 delay 15
+ 20.746n    1.         1.         3.        
+ 20.761n    1.         3.         3.        
+drv at 2.0801e-08 next 1 delay -1
+ 20.801n    2.         2.         3.        
+drv at 2.0856e-08 next 0 delay 5
+ 20.856n    2.         2.         3.        
+ 20.861n    2.         0.         3.        
+ 20.901n    1.         1.         3.        
+drv at 2.0911e-08 next 1 delay 50
+ 20.911n    1.         1.         3.        
+ 20.961n    1.         3.         3.        
+drv at 2.0966e-08 next 1 delay -1
+ 20.966n    1.         3.         3.        
+ 21.001n    2.         2.         3.        
+drv at 2.1021e-08 next 0 delay 40
+ 21.021n    2.         2.         3.        
+ 21.061n    2.         0.         3.        
+drv at 2.1076e-08 next 0 delay -1
+ 21.076n    2.         0.         3.        
+ 21.101n    1.         1.         3.        
+drv at 2.1131e-08 next 1 delay 30
+ 21.131n    1.         1.         3.        
+ 21.161n    1.         3.         3.        
+drv at 2.1186e-08 next 1 delay -1
+ 21.186n    1.         3.         3.        
+ 21.201n    2.         2.         3.        
+drv at 2.1241e-08 next 0 delay 20
+ 21.241n    2.         2.         3.        
+ 21.261n    2.         0.         3.        
+drv at 2.1296e-08 next 0 delay -1
+ 21.296n    2.         0.         3.        
+ 21.301n    1.         1.         3.        
+drv at 2.1351e-08 next 1 delay 10
+ 21.351n    1.         1.         3.        
+ 21.361n    1.         3.         3.        
+ 21.401n    2.         2.         3.        
+drv at 2.1406e-08 next 0 delay 55
+ 21.406n    2.         2.         3.        
+drv at 2.1461e-08 next 0 delay -1
+ 21.461n    2.         0.         3.        
+ 21.501n    1.         1.         3.        
+drv at 2.1516e-08 next 1 delay 45
+ 21.516n    1.         1.         3.        
+ 21.561n    1.         3.         3.        
+drv at 2.1571e-08 next 1 delay -1
+ 21.571n    1.         3.         3.        
+ 21.601n    2.         2.         3.        
+drv at 2.1626e-08 next 0 delay 35
+ 21.626n    2.         2.         3.        
+ 21.661n    2.         0.         3.        
+drv at 2.1681e-08 next 0 delay -1
+ 21.681n    2.         0.         3.        
+ 21.701n    1.         1.         3.        
+drv at 2.1736e-08 next 1 delay 25
+ 21.736n    1.         1.         3.        
+ 21.761n    1.         3.         3.        
+drv at 2.1791e-08 next 1 delay -1
+ 21.791n    1.         3.         3.        
+ 21.801n    2.         2.         3.        
+drv at 2.1846e-08 next 0 delay 15
+ 21.846n    2.         2.         3.        
+ 21.861n    2.         0.         3.        
+drv at 2.1901e-08 next 0 delay -1
+ 21.901n    1.         1.         3.        
+drv at 2.1956e-08 next 1 delay 5
+ 21.956n    1.         1.         3.        
+ 21.961n    1.         3.         3.        
+ 22.001n    2.         2.         3.        
+drv at 2.2011e-08 next 0 delay 50
+ 22.011n    2.         2.         3.        
+ 22.061n    2.         0.         3.        
+drv at 2.2066e-08 next 0 delay -1
+ 22.066n    2.         0.         3.        
+ 22.101n    1.         1.         3.        
+drv at 2.2121e-08 next 1 delay 40
+ 22.121n    1.         1.         3.        
+ 22.161n    1.         3.         3.        
+drv at 2.2176e-08 next 1 delay -1
+ 22.176n    1.         3.         3.        
+ 22.201n    2.         2.         3.        
+drv at 2.2231e-08 next 0 delay 30
+ 22.231n    2.         2.         3.        
+ 22.261n    2.         0.         3.        
+drv at 2.2286e-08 next 0 delay -1
+ 22.286n    2.         0.         3.        
+ 22.301n    1.         1.         3.        
+drv at 2.2341e-08 next 1 delay 20
+ 22.341n    1.         1.         3.        
+ 22.361n    1.         3.         3.        
+drv at 2.2396e-08 next 1 delay -1
+ 22.396n    1.         3.         3.        
+ 22.401n    2.         2.         3.        
+drv at 2.2451e-08 next 0 delay 10
+ 22.451n    2.         2.         3.        
+ 22.461n    2.         0.         3.        
+ 22.501n    1.         1.         3.        
+drv at 2.2506e-08 next 1 delay 55
+ 22.506n    1.         1.         3.        
+drv at 2.2561e-08 next 1 delay -1
+ 22.561n    1.         3.         3.        
+ 22.601n    2.         2.         3.        
+drv at 2.2616e-08 next 0 delay 45
+ 22.616n    2.         2.         3.        
+ 22.661n    2.         0.         3.        
+drv at 2.2671e-08 next 0 delay -1
+ 22.671n    2.         0.         3.        
+ 22.701n    1.         1.         3.        
+drv at 2.2726e-08 next 1 delay 35
+ 22.726n    1.         1.         3.        
+ 22.761n    1.         3.         3.        
+drv at 2.2781e-08 next 1 delay -1
+ 22.781n    1.         3.         3.        
+ 22.801n    2.         2.         3.        
+drv at 2.2836e-08 next 0 delay 25
+ 22.836n    2.         2.         3.        
+ 22.861n    2.         0.         3.        
+drv at 2.2891e-08 next 0 delay -1
+ 22.891n    2.         0.         3.        
+ 22.901n    1.         1.         3.        
+drv at 2.2946e-08 next 1 delay 15
+ 22.946n    1.         1.         3.        
+ 22.961n    1.         3.         3.        
+drv at 2.3001e-08 next 1 delay -1
+ 23.001n    2.         2.         3.        
+drv at 2.3056e-08 next 0 delay 5
+ 23.056n    2.         2.         3.        
+ 23.061n    2.         0.         3.        
+ 23.101n    1.         1.         3.        
+drv at 2.3111e-08 next 1 delay 50
+ 23.111n    1.         1.         3.        
+ 23.161n    1.         3.         3.        
+drv at 2.3166e-08 next 1 delay -1
+ 23.166n    1.         3.         3.        
+ 23.201n    2.         2.         3.        
+drv at 2.3221e-08 next 0 delay 40
+ 23.221n    2.         2.         3.        
+ 23.261n    2.         0.         3.        
+drv at 2.3276e-08 next 0 delay -1
+ 23.276n    2.         0.         3.        
+ 23.301n    1.         1.         3.        
+drv at 2.3331e-08 next 1 delay 30
+ 23.331n    1.         1.         3.        
+ 23.361n    1.         3.         3.        
+drv at 2.3386e-08 next 1 delay -1
+ 23.386n    1.         3.         3.        
+ 23.401n    2.         2.         3.        
+drv at 2.3441e-08 next 0 delay 20
+ 23.441n    2.         2.         3.        
+ 23.461n    2.         0.         3.        
+drv at 2.3496e-08 next 0 delay -1
+ 23.496n    2.         0.         3.        
+ 23.501n    1.         1.         3.        
+drv at 2.3551e-08 next 1 delay 10
+ 23.551n    1.         1.         3.        
+ 23.561n    1.         3.         3.        
+ 23.601n    2.         2.         3.        
+drv at 2.3606e-08 next 0 delay 55
+ 23.606n    2.         2.         3.        
+drv at 2.3661e-08 next 0 delay -1
+ 23.661n    2.         0.         3.        
+ 23.701n    1.         1.         3.        
+drv at 2.3716e-08 next 1 delay 45
+ 23.716n    1.         1.         3.        
+ 23.761n    1.         3.         3.        
+drv at 2.3771e-08 next 1 delay -1
+ 23.771n    1.         3.         3.        
+ 23.801n    2.         2.         3.        
+drv at 2.3826e-08 next 0 delay 35
+ 23.826n    2.         2.         3.        
+ 23.861n    2.         0.         3.        
+drv at 2.3881e-08 next 0 delay -1
+ 23.881n    2.         0.         3.        
+ 23.901n    1.         1.         3.        
+drv at 2.3936e-08 next 1 delay 25
+ 23.936n    1.         1.         3.        
+ 23.961n    1.         3.         3.        
+drv at 2.3991e-08 next 1 delay -1
+ 23.991n    1.         3.         3.        
+ 24.001n    2.         2.         3.        
+drv at 2.4046e-08 next 0 delay 15
+ 24.046n    2.         2.         3.        
+ 24.061n    2.         0.         3.        
+drv at 2.4101e-08 next 0 delay -1
+ 24.101n    1.         1.         3.        
+drv at 2.4156e-08 next 1 delay 5
+ 24.156n    1.         1.         3.        
+ 24.161n    1.         3.         3.        
+ 24.201n    2.         2.         3.        
+drv at 2.4211e-08 next 0 delay 50
+ 24.211n    2.         2.         3.        
+ 24.261n    2.         0.         3.        
+drv at 2.4266e-08 next 0 delay -1
+ 24.266n    2.         0.         3.        
+ 24.301n    1.         1.         3.        
+drv at 2.4321e-08 next 1 delay 40
+ 24.321n    1.         1.         3.        
+ 24.361n    1.         3.         3.        
+drv at 2.4376e-08 next 1 delay -1
+ 24.376n    1.         3.         3.        
+ 24.401n    2.         2.         3.        
+drv at 2.4431e-08 next 0 delay 30
+ 24.431n    2.         2.         3.        
+ 24.461n    2.         0.         3.        
+drv at 2.4486e-08 next 0 delay -1
+ 24.486n    2.         0.         3.        
+ 24.501n    1.         1.         3.        
+drv at 2.4541e-08 next 1 delay 20
+ 24.541n    1.         1.         3.        
+ 24.561n    1.         3.         3.        
+drv at 2.4596e-08 next 1 delay -1
+ 24.596n    1.         3.         3.        
+ 24.601n    2.         2.         3.        
+drv at 2.4651e-08 next 0 delay 10
+ 24.651n    2.         2.         3.        
+ 24.661n    2.         0.         3.        
+ 24.701n    1.         1.         3.        
+drv at 2.4706e-08 next 1 delay 55
+ 24.706n    1.         1.         3.        
+drv at 2.4761e-08 next 1 delay -1
+ 24.761n    1.         3.         3.        
+ 24.801n    2.         2.         3.        
+drv at 2.4816e-08 next 0 delay 45
+ 24.816n    2.         2.         3.        
+ 24.861n    2.         0.         3.        
+drv at 2.4871e-08 next 0 delay -1
+ 24.871n    2.         0.         3.        
+ 24.901n    1.         1.         3.        
+drv at 2.4926e-08 next 1 delay 35
+ 24.926n    1.         1.         3.        
+ 24.961n    1.         3.         3.        
+drv at 2.4981e-08 next 1 delay -1
+ 24.981n    1.         3.         3.        
+ 25.001n    2.         2.         3.        
+drv at 2.5036e-08 next 0 delay 25
+ 25.036n    2.         2.         3.        
+ 25.061n    2.         0.         3.        
+drv at 2.5091e-08 next 0 delay -1
+ 25.091n    2.         0.         3.        
+ 25.101n    1.         1.         3.        
+drv at 2.5146e-08 next 1 delay 15
+ 25.146n    1.         1.         3.        
+ 25.161n    1.         3.         3.        
+drv at 2.5201e-08 next 1 delay -1
+ 25.201n    2.         2.         3.        
+drv at 2.5256e-08 next 0 delay 5
+ 25.256n    2.         2.         3.        
+ 25.261n    2.         0.         3.        
+ 25.301n    1.         1.         3.        
+drv at 2.5311e-08 next 1 delay 50
+ 25.311n    1.         1.         3.        
+ 25.361n    1.         3.         3.        
+drv at 2.5366e-08 next 1 delay -1
+ 25.366n    1.         3.         3.        
+ 25.401n    2.         2.         3.        
+drv at 2.5421e-08 next 0 delay 40
+ 25.421n    2.         2.         3.        
+ 25.461n    2.         0.         3.        
+drv at 2.5476e-08 next 0 delay -1
+ 25.476n    2.         0.         3.        
+ 25.501n    1.         1.         3.        
+drv at 2.5531e-08 next 1 delay 30
+ 25.531n    1.         1.         3.        
+ 25.561n    1.         3.         3.        
+drv at 2.5586e-08 next 1 delay -1
+ 25.586n    1.         3.         3.        
+ 25.601n    2.         2.         3.        
+drv at 2.5641e-08 next 0 delay 20
+ 25.641n    2.         2.         3.        
+ 25.661n    2.         0.         3.        
+drv at 2.5696e-08 next 0 delay -1
+ 25.696n    2.         0.         3.        
+ 25.701n    1.         1.         3.        
+drv at 2.5751e-08 next 1 delay 10
+ 25.751n    1.         1.         3.        
+ 25.761n    1.         3.         3.        
+ 25.801n    2.         2.         3.        
+drv at 2.5806e-08 next 0 delay 55
+ 25.806n    2.         2.         3.        
+drv at 2.5861e-08 next 0 delay -1
+ 25.861n    2.         0.         3.        
+ 25.901n    1.         1.         3.        
+drv at 2.5916e-08 next 1 delay 45
+ 25.916n    1.         1.         3.        
+ 25.961n    1.         3.         3.        
+drv at 2.5971e-08 next 1 delay -1
+ 25.971n    1.         3.         3.        
+ 26.001n    2.         2.         3.        
+drv at 2.6026e-08 next 0 delay 35
+ 26.026n    2.         2.         3.        
+ 26.061n    2.         0.         3.        
+drv at 2.6081e-08 next 0 delay -1
+ 26.081n    2.         0.         3.        
+ 26.101n    1.         1.         3.        
+drv at 2.6136e-08 next 1 delay 25
+ 26.136n    1.         1.         3.        
+ 26.161n    1.         3.         3.        
+drv at 2.6191e-08 next 1 delay -1
+ 26.191n    1.         3.         3.        
+ 26.201n    2.         2.         3.        
+drv at 2.6246e-08 next 0 delay 15
+ 26.246n    2.         2.         3.        
+ 26.261n    2.         0.         3.        
+drv at 2.6301e-08 next 0 delay -1
+ 26.301n    1.         1.         3.        
+drv at 2.6356e-08 next 1 delay 5
+ 26.356n    1.         1.         3.        
+ 26.361n    1.         3.         3.        
+ 26.401n    2.         2.         3.        
+drv at 2.6411e-08 next 0 delay 50
+ 26.411n    2.         2.         3.        
+ 26.461n    2.         0.         3.        
+drv at 2.6466e-08 next 0 delay -1
+ 26.466n    2.         0.         3.        
+ 26.501n    1.         1.         3.        
+drv at 2.6521e-08 next 1 delay 40
+ 26.521n    1.         1.         3.        
+ 26.561n    1.         3.         3.        
+drv at 2.6576e-08 next 1 delay -1
+ 26.576n    1.         3.         3.        
+ 26.601n    2.         2.         3.        
+drv at 2.6631e-08 next 0 delay 30
+ 26.631n    2.         2.         3.        
+ 26.661n    2.         0.         3.        
+drv at 2.6686e-08 next 0 delay -1
+ 26.686n    2.         0.         3.        
+ 26.701n    1.         1.         3.        
+drv at 2.6741e-08 next 1 delay 20
+ 26.741n    1.         1.         3.        
+ 26.761n    1.         3.         3.        
+drv at 2.6796e-08 next 1 delay -1
+ 26.796n    1.         3.         3.        
+ 26.801n    2.         2.         3.        
+drv at 2.6851e-08 next 0 delay 10
+ 26.851n    2.         2.         3.        
+ 26.861n    2.         0.         3.        
+ 26.901n    1.         1.         3.        
+drv at 2.6906e-08 next 1 delay 55
+ 26.906n    1.         1.         3.        
+drv at 2.6961e-08 next 1 delay -1
+ 26.961n    1.         3.         3.        
+ 27.001n    2.         2.         3.        
+drv at 2.7016e-08 next 0 delay 45
+ 27.016n    2.         2.         3.        
+ 27.061n    2.         0.         3.        
+drv at 2.7071e-08 next 0 delay -1
+ 27.071n    2.         0.         3.        
+ 27.101n    1.         1.         3.        
+drv at 2.7126e-08 next 1 delay 35
+ 27.126n    1.         1.         3.        
+ 27.161n    1.         3.         3.        
+drv at 2.7181e-08 next 1 delay -1
+ 27.181n    1.         3.         3.        
+ 27.201n    2.         2.         3.        
+drv at 2.7236e-08 next 0 delay 25
+ 27.236n    2.         2.         3.        
+ 27.261n    2.         0.         3.        
+drv at 2.7291e-08 next 0 delay -1
+ 27.291n    2.         0.         3.        
+ 27.301n    1.         1.         3.        
+drv at 2.7346e-08 next 1 delay 15
+ 27.346n    1.         1.         3.        
+ 27.361n    1.         3.         3.        
+drv at 2.7401e-08 next 1 delay -1
+ 27.401n    2.         2.         3.        
+drv at 2.7456e-08 next 0 delay 5
+ 27.456n    2.         2.         3.        
+ 27.461n    2.         0.         3.        
+ 27.501n    1.         1.         3.        
+drv at 2.7511e-08 next 1 delay 50
+ 27.511n    1.         1.         3.        
+ 27.561n    1.         3.         3.        
+drv at 2.7566e-08 next 1 delay -1
+ 27.566n    1.         3.         3.        
+ 27.601n    2.         2.         3.        
+drv at 2.7621e-08 next 0 delay 40
+ 27.621n    2.         2.         3.        
+ 27.661n    2.         0.         3.        
+drv at 2.7676e-08 next 0 delay -1
+ 27.676n    2.         0.         3.        
+ 27.701n    1.         1.         3.        
+drv at 2.7731e-08 next 1 delay 30
+ 27.731n    1.         1.         3.        
+ 27.761n    1.         3.         3.        
+drv at 2.7786e-08 next 1 delay -1
+ 27.786n    1.         3.         3.        
+ 27.801n    2.         2.         3.        
+drv at 2.7841e-08 next 0 delay 20
+ 27.841n    2.         2.         3.        
+ 27.861n    2.         0.         3.        
+drv at 2.7896e-08 next 0 delay -1
+ 27.896n    2.         0.         3.        
+ 27.901n    1.         1.         3.        
+drv at 2.7951e-08 next 1 delay 10
+ 27.951n    1.         1.         3.        
+ 27.961n    1.         3.         3.        
+ 28.001n    2.         2.         3.        
+drv at 2.8006e-08 next 0 delay 55
+ 28.006n    2.         2.         3.        
+drv at 2.8061e-08 next 0 delay -1
+ 28.061n    2.         0.         3.        
+ 28.101n    1.         1.         3.        
+drv at 2.8116e-08 next 1 delay 45
+ 28.116n    1.         1.         3.        
+ 28.161n    1.         3.         3.        
+drv at 2.8171e-08 next 1 delay -1
+ 28.171n    1.         3.         3.        
+ 28.201n    2.         2.         3.        
+drv at 2.8226e-08 next 0 delay 35
+ 28.226n    2.         2.         3.        
+ 28.261n    2.         0.         3.        
+drv at 2.8281e-08 next 0 delay -1
+ 28.281n    2.         0.         3.        
+ 28.301n    1.         1.         3.        
+drv at 2.8336e-08 next 1 delay 25
+ 28.336n    1.         1.         3.        
+ 28.361n    1.         3.         3.        
+drv at 2.8391e-08 next 1 delay -1
+ 28.391n    1.         3.         3.        
+ 28.401n    2.         2.         3.        
+drv at 2.8446e-08 next 0 delay 15
+ 28.446n    2.         2.         3.        
+ 28.461n    2.         0.         3.        
+drv at 2.8501e-08 next 0 delay -1
+ 28.501n    1.         1.         3.        
+drv at 2.8556e-08 next 1 delay 5
+ 28.556n    1.         1.         3.        
+ 28.561n    1.         3.         3.        
+ 28.601n    2.         2.         3.        
+drv at 2.8611e-08 next 0 delay 50
+ 28.611n    2.         2.         3.        
+ 28.661n    2.         0.         3.        
+drv at 2.8666e-08 next 0 delay -1
+ 28.666n    2.         0.         3.        
+ 28.701n    1.         1.         3.        
+drv at 2.8721e-08 next 1 delay 40
+ 28.721n    1.         1.         3.        
+ 28.761n    1.         3.         3.        
+drv at 2.8776e-08 next 1 delay -1
+ 28.776n    1.         3.         3.        
+ 28.801n    2.         2.         3.        
+drv at 2.8831e-08 next 0 delay 30
+ 28.831n    2.         2.         3.        
+ 28.861n    2.         0.         3.        
+drv at 2.8886e-08 next 0 delay -1
+ 28.886n    2.         0.         3.        
+ 28.901n    1.         1.         3.        
+drv at 2.8941e-08 next 1 delay 20
+ 28.941n    1.         1.         3.        
+ 28.961n    1.         3.         3.        
+drv at 2.8996e-08 next 1 delay -1
+ 28.996n    1.         3.         3.        
+ 29.001n    2.         2.         3.        
+drv at 2.9051e-08 next 0 delay 10
+ 29.051n    2.         2.         3.        
+ 29.061n    2.         0.         3.        
+ 29.101n    1.         1.         3.        
+drv at 2.9106e-08 next 1 delay 55
+ 29.106n    1.         1.         3.        
+drv at 2.9161e-08 next 1 delay -1
+ 29.161n    1.         3.         3.        
+ 29.201n    2.         2.         3.        
+drv at 2.9216e-08 next 0 delay 45
+ 29.216n    2.         2.         3.        
+ 29.261n    2.         0.         3.        
+drv at 2.9271e-08 next 0 delay -1
+ 29.271n    2.         0.         3.        
+ 29.301n    1.         1.         3.        
+drv at 2.9326e-08 next 1 delay 35
+ 29.326n    1.         1.         3.        
+ 29.361n    1.         3.         3.        
+drv at 2.9381e-08 next 1 delay -1
+ 29.381n    1.         3.         3.        
+ 29.401n    2.         2.         3.        
+drv at 2.9436e-08 next 0 delay 25
+ 29.436n    2.         2.         3.        
+ 29.461n    2.         0.         3.        
+drv at 2.9491e-08 next 0 delay -1
+ 29.491n    2.         0.         3.        
+ 29.501n    1.         1.         3.        
+drv at 2.9546e-08 next 1 delay 15
+ 29.546n    1.         1.         3.        
+ 29.561n    1.         3.         3.        
+drv at 2.9601e-08 next 1 delay -1
+ 29.601n    2.         2.         3.        
+drv at 2.9656e-08 next 0 delay 5
+ 29.656n    2.         2.         3.        
+ 29.661n    2.         0.         3.        
+ 29.701n    1.         1.         3.        
+drv at 2.9711e-08 next 1 delay 50
+ 29.711n    1.         1.         3.        
+ 29.761n    1.         3.         3.        
+drv at 2.9766e-08 next 1 delay -1
+ 29.766n    1.         3.         3.        
+ 29.801n    2.         2.         3.        
+drv at 2.9821e-08 next 0 delay 40
+ 29.821n    2.         2.         3.        
+ 29.861n    2.         0.         3.        
+drv at 2.9876e-08 next 0 delay -1
+ 29.876n    2.         0.         3.        
+ 29.901n    1.         1.         3.        
+drv at 2.9931e-08 next 1 delay 30
+ 29.931n    1.         1.         3.        
+ 29.961n    1.         3.         3.        
+drv at 2.9986e-08 next 1 delay -1
+ 29.986n    1.         3.         3.        
+ 30.001n    2.         2.         3.        
+drv at 3.0041e-08 next 0 delay 20
+ 30.041n    2.         2.         3.        
+ 30.061n    2.         0.         3.        
+drv at 3.0096e-08 next 0 delay -1
+ 30.096n    2.         0.         3.        
+ 30.101n    1.         1.         3.        
+drv at 3.0151e-08 next 1 delay 10
+ 30.151n    1.         1.         3.        
+ 30.161n    1.         3.         3.        
+ 30.201n    2.         2.         3.        
+drv at 3.0206e-08 next 0 delay 55
+ 30.206n    2.         2.         3.        
+drv at 3.0261e-08 next 0 delay -1
+ 30.261n    2.         0.         3.        
+ 30.301n    1.         1.         3.        
+drv at 3.0316e-08 next 1 delay 45
+ 30.316n    1.         1.         3.        
+ 30.361n    1.         3.         3.        
+drv at 3.0371e-08 next 1 delay -1
+ 30.371n    1.         3.         3.        
+ 30.401n    2.         2.         3.        
+drv at 3.0426e-08 next 0 delay 35
+ 30.426n    2.         2.         3.        
+ 30.461n    2.         0.         3.        
+drv at 3.0481e-08 next 0 delay -1
+ 30.481n    2.         0.         3.        
+ 30.501n    1.         1.         3.        
+drv at 3.0536e-08 next 1 delay 25
+ 30.536n    1.         1.         3.        
+ 30.561n    1.         3.         3.        
+drv at 3.0591e-08 next 1 delay -1
+ 30.591n    1.         3.         3.        
+ 30.601n    2.         2.         3.        
+drv at 3.0646e-08 next 0 delay 15
+ 30.646n    2.         2.         3.        
+ 30.661n    2.         0.         3.        
+drv at 3.0701e-08 next 0 delay -1
+ 30.701n    1.         1.         3.        
+drv at 3.0756e-08 next 1 delay 5
+ 30.756n    1.         1.         3.        
+ 30.761n    1.         3.         3.        
+ 30.801n    2.         2.         3.        
+drv at 3.0811e-08 next 0 delay 50
+ 30.811n    2.         2.         3.        
+ 30.861n    2.         0.         3.        
+drv at 3.0866e-08 next 0 delay -1
+ 30.866n    2.         0.         3.        
+ 30.901n    1.         1.         3.        
+drv at 3.0921e-08 next 1 delay 40
+ 30.921n    1.         1.         3.        
+ 30.961n    1.         3.         3.        
+drv at 3.0976e-08 next 1 delay -1
+ 30.976n    1.         3.         3.        
+ 31.001n    2.         2.         3.        
+drv at 3.1031e-08 next 0 delay 30
+ 31.031n    2.         2.         3.        
+ 31.061n    2.         0.         3.        
+drv at 3.1086e-08 next 0 delay -1
+ 31.086n    2.         0.         3.        
+ 31.101n    1.         1.         3.        
+drv at 3.1141e-08 next 1 delay 20
+ 31.141n    1.         1.         3.        
+ 31.161n    1.         3.         3.        
+drv at 3.1196e-08 next 1 delay -1
+ 31.196n    1.         3.         3.        
+ 31.201n    2.         2.         3.        
+drv at 3.1251e-08 next 0 delay 10
+ 31.251n    2.         2.         3.        
+ 31.261n    2.         0.         3.        
+ 31.301n    1.         1.         3.        
+drv at 3.1306e-08 next 1 delay 55
+ 31.306n    1.         1.         3.        
+drv at 3.1361e-08 next 1 delay -1
+ 31.361n    1.         3.         3.        
+ 31.401n    2.         2.         3.        
+drv at 3.1416e-08 next 0 delay 45
+ 31.416n    2.         2.         3.        
+ 31.461n    2.         0.         3.        
+drv at 3.1471e-08 next 0 delay -1
+ 31.471n    2.         0.         3.        
+ 31.501n    1.         1.         3.        
+drv at 3.1526e-08 next 1 delay 35
+ 31.526n    1.         1.         3.        
+ 31.561n    1.         3.         3.        
+drv at 3.1581e-08 next 1 delay -1
+ 31.581n    1.         3.         3.        
+ 31.601n    2.         2.         3.        
+drv at 3.1636e-08 next 0 delay 25
+ 31.636n    2.         2.         3.        
+ 31.661n    2.         0.         3.        
+drv at 3.1691e-08 next 0 delay -1
+ 31.691n    2.         0.         3.        
+ 31.701n    1.         1.         3.        
+drv at 3.1746e-08 next 1 delay 15
+ 31.746n    1.         1.         3.        
+ 31.761n    1.         3.         3.        
+drv at 3.1801e-08 next 1 delay -1
+ 31.801n    2.         2.         3.        
+drv at 3.1856e-08 next 0 delay 5
+ 31.856n    2.         2.         3.        
+ 31.861n    2.         0.         3.        
+ 31.901n    1.         1.         3.        
+drv at 3.1911e-08 next 1 delay 50
+ 31.911n    1.         1.         3.        
+ 31.961n    1.         3.         3.        
+drv at 3.1966e-08 next 1 delay -1
+ 31.966n    1.         3.         3.        
+ 32.001n    2.         2.         3.        
+drv at 3.2021e-08 next 0 delay 40
+ 32.021n    2.         2.         3.        
+ 32.061n    2.         0.         3.        
+drv at 3.2076e-08 next 0 delay -1
+ 32.076n    2.         0.         3.        
+ 32.101n    1.         1.         3.        
+drv at 3.2131e-08 next 1 delay 30
+ 32.131n    1.         1.         3.        
+ 32.161n    1.         3.         3.        
+drv at 3.2186e-08 next 1 delay -1
+ 32.186n    1.         3.         3.        
+ 32.201n    2.         2.         3.        
+drv at 3.2241e-08 next 0 delay 20
+ 32.241n    2.         2.         3.        
+ 32.261n    2.         0.         3.        
+drv at 3.2296e-08 next 0 delay -1
+ 32.296n    2.         0.         3.        
+ 32.301n    1.         1.         3.        
+drv at 3.2351e-08 next 1 delay 10
+ 32.351n    1.         1.         3.        
+ 32.361n    1.         3.         3.        
+ 32.401n    2.         2.         3.        
+drv at 3.2406e-08 next 0 delay 55
+ 32.406n    2.         2.         3.        
+drv at 3.2461e-08 next 0 delay -1
+ 32.461n    2.         0.         3.        
+ 32.501n    1.         1.         3.        
+drv at 3.2516e-08 next 1 delay 45
+ 32.516n    1.         1.         3.        
+ 32.561n    1.         3.         3.        
+drv at 3.2571e-08 next 1 delay -1
+ 32.571n    1.         3.         3.        
+ 32.601n    2.         2.         3.        
+drv at 3.2626e-08 next 0 delay 35
+ 32.626n    2.         2.         3.        
+ 32.661n    2.         0.         3.        
+drv at 3.2681e-08 next 0 delay -1
+ 32.681n    2.         0.         3.        
+ 32.701n    1.         1.         3.        
+drv at 3.2736e-08 next 1 delay 25
+ 32.736n    1.         1.         3.        
+ 32.761n    1.         3.         3.        
+drv at 3.2791e-08 next 1 delay -1
+ 32.791n    1.         3.         3.        
+ 32.801n    2.         2.         3.        
+drv at 3.2846e-08 next 0 delay 15
+ 32.846n    2.         2.         3.        
+ 32.861n    2.         0.         3.        
+drv at 3.2901e-08 next 0 delay -1
+ 32.901n    1.         1.         3.        
+drv at 3.2956e-08 next 1 delay 5
+ 32.956n    1.         1.         3.        
+ 32.961n    1.         3.         3.        
+ 33.001n    2.         2.         3.        
+drv at 3.3011e-08 next 0 delay 50
+ 33.011n    2.         2.         3.        
+ 33.061n    2.         0.         3.        
+drv at 3.3066e-08 next 0 delay -1
+ 33.066n    2.         0.         3.        
+ 33.101n    1.         1.         3.        
+drv at 3.3121e-08 next 1 delay 40
+ 33.121n    1.         1.         3.        
+ 33.161n    1.         3.         3.        
+drv at 3.3176e-08 next 1 delay -1
+ 33.176n    1.         3.         3.        
+ 33.201n    2.         2.         3.        
+drv at 3.3231e-08 next 0 delay 30
+ 33.231n    2.         2.         3.        
+ 33.261n    2.         0.         3.        
+drv at 3.3286e-08 next 0 delay -1
+ 33.286n    2.         0.         3.        
+ 33.301n    1.         1.         3.        
+drv at 3.3341e-08 next 1 delay 20
+ 33.341n    1.         1.         3.        
+ 33.361n    1.         3.         3.        
+drv at 3.3396e-08 next 1 delay -1
+ 33.396n    1.         3.         3.        
+ 33.401n    2.         2.         3.        
+drv at 3.3451e-08 next 0 delay 10
+ 33.451n    2.         2.         3.        
+ 33.461n    2.         0.         3.        
+ 33.501n    1.         1.         3.        
+drv at 3.3506e-08 next 1 delay 55
+ 33.506n    1.         1.         3.        
+drv at 3.3561e-08 next 1 delay -1
+ 33.561n    1.         3.         3.        
+ 33.601n    2.         2.         3.        
+drv at 3.3616e-08 next 0 delay 45
+ 33.616n    2.         2.         3.        
+ 33.661n    2.         0.         3.        
+drv at 3.3671e-08 next 0 delay -1
+ 33.671n    2.         0.         3.        
+ 33.701n    1.         1.         3.        
+drv at 3.3726e-08 next 1 delay 35
+ 33.726n    1.         1.         3.        
+ 33.761n    1.         3.         3.        
+drv at 3.3781e-08 next 1 delay -1
+ 33.781n    1.         3.         3.        
+ 33.801n    2.         2.         3.        
+drv at 3.3836e-08 next 0 delay 25
+ 33.836n    2.         2.         3.        
+ 33.861n    2.         0.         3.        
+drv at 3.3891e-08 next 0 delay -1
+ 33.891n    2.         0.         3.        
+ 33.901n    1.         1.         3.        
+drv at 3.3946e-08 next 1 delay 15
+ 33.946n    1.         1.         3.        
+ 33.961n    1.         3.         3.        
+drv at 3.4001e-08 next 1 delay -1
+ 34.001n    2.         2.         3.        
+drv at 3.4056e-08 next 0 delay 5
+ 34.056n    2.         2.         3.        
+ 34.061n    2.         0.         3.        
+ 34.101n    1.         1.         3.        
+drv at 3.4111e-08 next 1 delay 50
+ 34.111n    1.         1.         3.        
+ 34.161n    1.         3.         3.        
+drv at 3.4166e-08 next 1 delay -1
+ 34.166n    1.         3.         3.        
+ 34.201n    2.         2.         3.        
+drv at 3.4221e-08 next 0 delay 40
+ 34.221n    2.         2.         3.        
+ 34.261n    2.         0.         3.        
+drv at 3.4276e-08 next 0 delay -1
+ 34.276n    2.         0.         3.        
+ 34.301n    1.         1.         3.        
+drv at 3.4331e-08 next 1 delay 30
+ 34.331n    1.         1.         3.        
+ 34.361n    1.         3.         3.        
+drv at 3.4386e-08 next 1 delay -1
+ 34.386n    1.         3.         3.        
+ 34.401n    2.         2.         3.        
+drv at 3.4441e-08 next 0 delay 20
+ 34.441n    2.         2.         3.        
+ 34.461n    2.         0.         3.        
+drv at 3.4496e-08 next 0 delay -1
+ 34.496n    2.         0.         3.        
+ 34.501n    1.         1.         3.        
+drv at 3.4551e-08 next 1 delay 10
+ 34.551n    1.         1.         3.        
+ 34.561n    1.         3.         3.        
+ 34.601n    2.         2.         3.        
+drv at 3.4606e-08 next 0 delay 55
+ 34.606n    2.         2.         3.        
+drv at 3.4661e-08 next 0 delay -1
+ 34.661n    2.         0.         3.        
+ 34.701n    1.         1.         3.        
+drv at 3.4716e-08 next 1 delay 45
+ 34.716n    1.         1.         3.        
+ 34.761n    1.         3.         3.        
+drv at 3.4771e-08 next 1 delay -1
+ 34.771n    1.         3.         3.        
+ 34.801n    2.         2.         3.        
+drv at 3.4826e-08 next 0 delay 35
+ 34.826n    2.         2.         3.        
+ 34.861n    2.         0.         3.        
+drv at 3.4881e-08 next 0 delay -1
+ 34.881n    2.         0.         3.        
+ 34.901n    1.         1.         3.        
+drv at 3.4936e-08 next 1 delay 25
+ 34.936n    1.         1.         3.        
+ 34.961n    1.         3.         3.        
+drv at 3.4991e-08 next 1 delay -1
+ 34.991n    1.         3.         3.        
+ 35.001n    2.         2.         3.        
+drv at 3.5046e-08 next 0 delay 15
+ 35.046n    2.         2.         3.        
+ 35.061n    2.         0.         3.        
+drv at 3.5101e-08 next 0 delay -1
+ 35.101n    1.         1.         3.        
+drv at 3.5156e-08 next 1 delay 5
+ 35.156n    1.         1.         3.        
+ 35.161n    1.         3.         3.        
+ 35.201n    2.         2.         3.        
+drv at 3.5211e-08 next 0 delay 50
+ 35.211n    2.         2.         3.        
+ 35.261n    2.         0.         3.        
+drv at 3.5266e-08 next 0 delay -1
+ 35.266n    2.         0.         3.        
+ 35.301n    1.         1.         3.        
+drv at 3.5321e-08 next 1 delay 40
+ 35.321n    1.         1.         3.        
+ 35.361n    1.         3.         3.        
+drv at 3.5376e-08 next 1 delay -1
+ 35.376n    1.         3.         3.        
+ 35.401n    2.         2.         3.        
+drv at 3.5431e-08 next 0 delay 30
+ 35.431n    2.         2.         3.        
+ 35.461n    2.         0.         3.        
+drv at 3.5486e-08 next 0 delay -1
+ 35.486n    2.         0.         3.        
+ 35.501n    1.         1.         3.        
+drv at 3.5541e-08 next 1 delay 20
+ 35.541n    1.         1.         3.        
+ 35.561n    1.         3.         3.        
+drv at 3.5596e-08 next 1 delay -1
+ 35.596n    1.         3.         3.        
+ 35.601n    2.         2.         3.        
+drv at 3.5651e-08 next 0 delay 10
+ 35.651n    2.         2.         3.        
+ 35.661n    2.         0.         3.        
+ 35.701n    1.         1.         3.        
+drv at 3.5706e-08 next 1 delay 55
+ 35.706n    1.         1.         3.        
+drv at 3.5761e-08 next 1 delay -1
+ 35.761n    1.         3.         3.        
+ 35.801n    2.         2.         3.        
+drv at 3.5816e-08 next 0 delay 45
+ 35.816n    2.         2.         3.        
+ 35.861n    2.         0.         3.        
+drv at 3.5871e-08 next 0 delay -1
+ 35.871n    2.         0.         3.        
+ 35.901n    1.         1.         3.        
+drv at 3.5926e-08 next 1 delay 35
+ 35.926n    1.         1.         3.        
+ 35.961n    1.         3.         3.        
+drv at 3.5981e-08 next 1 delay -1
+ 35.981n    1.         3.         3.        
+ 36.001n    2.         2.         3.        
+drv at 3.6036e-08 next 0 delay 25
+ 36.036n    2.         2.         3.        
+ 36.061n    2.         0.         3.        
+drv at 3.6091e-08 next 0 delay -1
+ 36.091n    2.         0.         3.        
+ 36.101n    1.         1.         3.        
+drv at 3.6146e-08 next 1 delay 15
+ 36.146n    1.         1.         3.        
+ 36.161n    1.         3.         3.        
+drv at 3.6201e-08 next 1 delay -1
+ 36.201n    2.         2.         3.        
+drv at 3.6256e-08 next 0 delay 5
+ 36.256n    2.         2.         3.        
+ 36.261n    2.         0.         3.        
+ 36.301n    1.         1.         3.        
+drv at 3.6311e-08 next 1 delay 50
+ 36.311n    1.         1.         3.        
+ 36.361n    1.         3.         3.        
+drv at 3.6366e-08 next 1 delay -1
+ 36.366n    1.         3.         3.        
+ 36.401n    2.         2.         3.        
+drv at 3.6421e-08 next 0 delay 40
+ 36.421n    2.         2.         3.        
+ 36.461n    2.         0.         3.        
+drv at 3.6476e-08 next 0 delay -1
+ 36.476n    2.         0.         3.        
+ 36.501n    1.         1.         3.        
+drv at 3.6531e-08 next 1 delay 30
+ 36.531n    1.         1.         3.        
+ 36.561n    1.         3.         3.        
+drv at 3.6586e-08 next 1 delay -1
+ 36.586n    1.         3.         3.        
+ 36.601n    2.         2.         3.        
+drv at 3.6641e-08 next 0 delay 20
+ 36.641n    2.         2.         3.        
+ 36.661n    2.         0.         3.        
+drv at 3.6696e-08 next 0 delay -1
+ 36.696n    2.         0.         3.        
+ 36.701n    1.         1.         3.        
+drv at 3.6751e-08 next 1 delay 10
+ 36.751n    1.         1.         3.        
+ 36.761n    1.         3.         3.        
+ 36.801n    2.         2.         3.        
+drv at 3.6806e-08 next 0 delay 55
+ 36.806n    2.         2.         3.        
+drv at 3.6861e-08 next 0 delay -1
+ 36.861n    2.         0.         3.        
+ 36.901n    1.         1.         3.        
+drv at 3.6916e-08 next 1 delay 45
+ 36.916n    1.         1.         3.        
+ 36.961n    1.         3.         3.        
+drv at 3.6971e-08 next 1 delay -1
+ 36.971n    1.         3.         3.        
+ 37.001n    2.         2.         3.        
+drv at 3.7026e-08 next 0 delay 35
+ 37.026n    2.         2.         3.        
+ 37.061n    2.         0.         3.        
+drv at 3.7081e-08 next 0 delay -1
+ 37.081n    2.         0.         3.        
+ 37.101n    1.         1.         3.        
+drv at 3.7136e-08 next 1 delay 25
+ 37.136n    1.         1.         3.        
+ 37.161n    1.         3.         3.        
+drv at 3.7191e-08 next 1 delay -1
+ 37.191n    1.         3.         3.        
+ 37.201n    2.         2.         3.        
+drv at 3.7246e-08 next 0 delay 15
+ 37.246n    2.         2.         3.        
+ 37.261n    2.         0.         3.        
+drv at 3.7301e-08 next 0 delay -1
+ 37.301n    1.         1.         3.        
+drv at 3.7356e-08 next 1 delay 5
+ 37.356n    1.         1.         3.        
+ 37.361n    1.         3.         3.        
+ 37.401n    2.         2.         3.        
+drv at 3.7411e-08 next 0 delay 50
+ 37.411n    2.         2.         3.        
+ 37.461n    2.         0.         3.        
+drv at 3.7466e-08 next 0 delay -1
+ 37.466n    2.         0.         3.        
+ 37.501n    1.         1.         3.        
+drv at 3.7521e-08 next 1 delay 40
+ 37.521n    1.         1.         3.        
+ 37.561n    1.         3.         3.        
+drv at 3.7576e-08 next 1 delay -1
+ 37.576n    1.         3.         3.        
+ 37.601n    2.         2.         3.        
+drv at 3.7631e-08 next 0 delay 30
+ 37.631n    2.         2.         3.        
+ 37.661n    2.         0.         3.        
+drv at 3.7686e-08 next 0 delay -1
+ 37.686n    2.         0.         3.        
+ 37.701n    1.         1.         3.        
+drv at 3.7741e-08 next 1 delay 20
+ 37.741n    1.         1.         3.        
+ 37.761n    1.         3.         3.        
+drv at 3.7796e-08 next 1 delay -1
+ 37.796n    1.         3.         3.        
+ 37.801n    2.         2.         3.        
+drv at 3.7851e-08 next 0 delay 10
+ 37.851n    2.         2.         3.        
+ 37.861n    2.         0.         3.        
+ 37.901n    1.         1.         3.        
+drv at 3.7906e-08 next 1 delay 55
+ 37.906n    1.         1.         3.        
+drv at 3.7961e-08 next 1 delay -1
+ 37.961n    1.         3.         3.        
+ 38.001n    2.         2.         3.        
+drv at 3.8016e-08 next 0 delay 45
+ 38.016n    2.         2.         3.        
+ 38.061n    2.         0.         3.        
+drv at 3.8071e-08 next 0 delay -1
+ 38.071n    2.         0.         3.        
+ 38.101n    1.         1.         3.        
+drv at 3.8126e-08 next 1 delay 35
+ 38.126n    1.         1.         3.        
+ 38.161n    1.         3.         3.        
+drv at 3.8181e-08 next 1 delay -1
+ 38.181n    1.         3.         3.        
+ 38.201n    2.         2.         3.        
+drv at 3.8236e-08 next 0 delay 25
+ 38.236n    2.         2.         3.        
+ 38.261n    2.         0.         3.        
+drv at 3.8291e-08 next 0 delay -1
+ 38.291n    2.         0.         3.        
+ 38.301n    1.         1.         3.        
+drv at 3.8346e-08 next 1 delay 15
+ 38.346n    1.         1.         3.        
+ 38.361n    1.         3.         3.        
+drv at 3.8401e-08 next 1 delay -1
+ 38.401n    2.         2.         3.        
+drv at 3.8456e-08 next 0 delay 5
+ 38.456n    2.         2.         3.        
+ 38.461n    2.         0.         3.        
+ 38.501n    1.         1.         3.        
+drv at 3.8511e-08 next 1 delay 50
+ 38.511n    1.         1.         3.        
+ 38.561n    1.         3.         3.        
+drv at 3.8566e-08 next 1 delay -1
+ 38.566n    1.         3.         3.        
+ 38.601n    2.         2.         3.        
+drv at 3.8621e-08 next 0 delay 40
+ 38.621n    2.         2.         3.        
+ 38.661n    2.         0.         3.        
+drv at 3.8676e-08 next 0 delay -1
+ 38.676n    2.         0.         3.        
+ 38.701n    1.         1.         3.        
+drv at 3.8731e-08 next 1 delay 30
+ 38.731n    1.         1.         3.        
+ 38.761n    1.         3.         3.        
+drv at 3.8786e-08 next 1 delay -1
+ 38.786n    1.         3.         3.        
+ 38.801n    2.         2.         3.        
+drv at 3.8841e-08 next 0 delay 20
+ 38.841n    2.         2.         3.        
+ 38.861n    2.         0.         3.        
+drv at 3.8896e-08 next 0 delay -1
+ 38.896n    2.         0.         3.        
+ 38.901n    1.         1.         3.        
+drv at 3.8951e-08 next 1 delay 10
+ 38.951n    1.         1.         3.        
+ 38.961n    1.         3.         3.        
+ 39.001n    2.         2.         3.        
+drv at 3.9006e-08 next 0 delay 55
+ 39.006n    2.         2.         3.        
+drv at 3.9061e-08 next 0 delay -1
+ 39.061n    2.         0.         3.        
+ 39.101n    1.         1.         3.        
+drv at 3.9116e-08 next 1 delay 45
+ 39.116n    1.         1.         3.        
+ 39.161n    1.         3.         3.        
+drv at 3.9171e-08 next 1 delay -1
+ 39.171n    1.         3.         3.        
+ 39.201n    2.         2.         3.        
+drv at 3.9226e-08 next 0 delay 35
+ 39.226n    2.         2.         3.        
+ 39.261n    2.         0.         3.        
+drv at 3.9281e-08 next 0 delay -1
+ 39.281n    2.         0.         3.        
+ 39.301n    1.         1.         3.        
+drv at 3.9336e-08 next 1 delay 25
+ 39.336n    1.         1.         3.        
+ 39.361n    1.         3.         3.        
+drv at 3.9391e-08 next 1 delay -1
+ 39.391n    1.         3.         3.        
+ 39.401n    2.         2.         3.        
+drv at 3.9446e-08 next 0 delay 15
+ 39.446n    2.         2.         3.        
+ 39.461n    2.         0.         3.        
+drv at 3.9501e-08 next 0 delay -1
+ 39.501n    1.         1.         3.        
+drv at 3.9556e-08 next 1 delay 5
+ 39.556n    1.         1.         3.        
+ 39.561n    1.         3.         3.        
+ 39.601n    2.         2.         3.        
+drv at 3.9611e-08 next 0 delay 50
+ 39.611n    2.         2.         3.        
+ 39.661n    2.         0.         3.        
+drv at 3.9666e-08 next 0 delay -1
+ 39.666n    2.         0.         3.        
+ 39.701n    1.         1.         3.        
+drv at 3.9721e-08 next 1 delay 40
+ 39.721n    1.         1.         3.        
+ 39.761n    1.         3.         3.        
+drv at 3.9776e-08 next 1 delay -1
+ 39.776n    1.         3.         3.        
+ 39.801n    2.         2.         3.        
+drv at 3.9831e-08 next 0 delay 30
+ 39.831n    2.         2.         3.        
+ 39.861n    2.         0.         3.        
+drv at 3.9886e-08 next 0 delay -1
+ 39.886n    2.         0.         3.        
+ 39.901n    1.         1.         3.        
+drv at 3.9941e-08 next 1 delay 20
+ 39.941n    1.         1.         3.        
+ 39.961n    1.         3.         3.        
+drv at 3.9996e-08 next 1 delay -1
+ 39.996n    1.         3.         3.        
+ 40.001n    2.         2.         3.        
+drv at 4.0051e-08 next 0 delay 10
+ 40.051n    2.         2.         3.        
+ 40.061n    2.         0.         3.        
+ 40.101n    1.         1.         3.        
+drv at 4.0106e-08 next 1 delay 55
+ 40.106n    1.         1.         3.        
+drv at 4.0161e-08 next 1 delay -1
+ 40.161n    1.         3.         3.        
+ 40.201n    2.         2.         3.        
+drv at 4.0216e-08 next 0 delay 45
+ 40.216n    2.         2.         3.        
+ 40.261n    2.         0.         3.        
+drv at 4.0271e-08 next 0 delay -1
+ 40.271n    2.         0.         3.        
+ 40.301n    1.         1.         3.        
+drv at 4.0326e-08 next 1 delay 35
+ 40.326n    1.         1.         3.        
+ 40.361n    1.         3.         3.        
+drv at 4.0381e-08 next 1 delay -1
+ 40.381n    1.         3.         3.        
+ 40.401n    2.         2.         3.        
+drv at 4.0436e-08 next 0 delay 25
+ 40.436n    2.         2.         3.        
+ 40.461n    2.         0.         3.        
+drv at 4.0491e-08 next 0 delay -1
+ 40.491n    2.         0.         3.        
+ 40.501n    1.         1.         3.        
+drv at 4.0546e-08 next 1 delay 15
+ 40.546n    1.         1.         3.        
+ 40.561n    1.         3.         3.        
+drv at 4.0601e-08 next 1 delay -1
+ 40.601n    2.         2.         3.        
+drv at 4.0656e-08 next 0 delay 5
+ 40.656n    2.         2.         3.        
+ 40.661n    2.         0.         3.        
+ 40.701n    1.         1.         3.        
+drv at 4.0711e-08 next 1 delay 50
+ 40.711n    1.         1.         3.        
+ 40.761n    1.         3.         3.        
+drv at 4.0766e-08 next 1 delay -1
+ 40.766n    1.         3.         3.        
+ 40.801n    2.         2.         3.        
+drv at 4.0821e-08 next 0 delay 40
+ 40.821n    2.         2.         3.        
+ 40.861n    2.         0.         3.        
+drv at 4.0876e-08 next 0 delay -1
+ 40.876n    2.         0.         3.        
+ 40.901n    1.         1.         3.        
+drv at 4.0931e-08 next 1 delay 30
+ 40.931n    1.         1.         3.        
+ 40.961n    1.         3.         3.        
+drv at 4.0986e-08 next 1 delay -1
+ 40.986n    1.         3.         3.        
+ 41.001n    2.         2.         3.        
+drv at 4.1041e-08 next 0 delay 20
+ 41.041n    2.         2.         3.        
+ 41.061n    2.         0.         3.        
+drv at 4.1096e-08 next 0 delay -1
+ 41.096n    2.         0.         3.        
+ 41.101n    1.         1.         3.        
+drv at 4.1151e-08 next 1 delay 10
+ 41.151n    1.         1.         3.        
+ 41.161n    1.         3.         3.        
+ 41.201n    2.         2.         3.        
+drv at 4.1206e-08 next 0 delay 55
+ 41.206n    2.         2.         3.        
+drv at 4.1261e-08 next 0 delay -1
+ 41.261n    2.         0.         3.        
+ 41.301n    1.         1.         3.        
+drv at 4.1316e-08 next 1 delay 45
+ 41.316n    1.         1.         3.        
+ 41.361n    1.         3.         3.        
+drv at 4.1371e-08 next 1 delay -1
+ 41.371n    1.         3.         3.        
+ 41.401n    2.         2.         3.        
+drv at 4.1426e-08 next 0 delay 35
+ 41.426n    2.         2.         3.        
+ 41.461n    2.         0.         3.        
+drv at 4.1481e-08 next 0 delay -1
+ 41.481n    2.         0.         3.        
+ 41.501n    1.         1.         3.        
+drv at 4.1536e-08 next 1 delay 25
+ 41.536n    1.         1.         3.        
+ 41.561n    1.         3.         3.        
+drv at 4.1591e-08 next 1 delay -1
+ 41.591n    1.         3.         3.        
+ 41.601n    2.         2.         3.        
+drv at 4.1646e-08 next 0 delay 15
+ 41.646n    2.         2.         3.        
+ 41.661n    2.         0.         3.        
+drv at 4.1701e-08 next 0 delay -1
+ 41.701n    1.         1.         3.        
+drv at 4.1756e-08 next 1 delay 5
+ 41.756n    1.         1.         3.        
+ 41.761n    1.         3.         3.        
+ 41.801n    2.         2.         3.        
+drv at 4.1811e-08 next 0 delay 50
+ 41.811n    2.         2.         3.        
+ 41.861n    2.         0.         3.        
+drv at 4.1866e-08 next 0 delay -1
+ 41.866n    2.         0.         3.        
+ 41.901n    1.         1.         3.        
+drv at 4.1921e-08 next 1 delay 40
+ 41.921n    1.         1.         3.        
+ 41.961n    1.         3.         3.        
+drv at 4.1976e-08 next 1 delay -1
+ 41.976n    1.         3.         3.        
+ 42.001n    2.         2.         3.        
+drv at 4.2031e-08 next 0 delay 30
+ 42.031n    2.         2.         3.        
+ 42.061n    2.         0.         3.        
+drv at 4.2086e-08 next 0 delay -1
+ 42.086n    2.         0.         3.        
+ 42.101n    1.         1.         3.        
+drv at 4.2141e-08 next 1 delay 20
+ 42.141n    1.         1.         3.        
+ 42.161n    1.         3.         3.        
+drv at 4.2196e-08 next 1 delay -1
+ 42.196n    1.         3.         3.        
+ 42.201n    2.         2.         3.        
+drv at 4.2251e-08 next 0 delay 10
+ 42.251n    2.         2.         3.        
+ 42.261n    2.         0.         3.        
+ 42.301n    1.         1.         3.        
+drv at 4.2306e-08 next 1 delay 55
+ 42.306n    1.         1.         3.        
+drv at 4.2361e-08 next 1 delay -1
+ 42.361n    1.         3.         3.        
+ 42.401n    2.         2.         3.        
+drv at 4.2416e-08 next 0 delay 45
+ 42.416n    2.         2.         3.        
+ 42.461n    2.         0.         3.        
+drv at 4.2471e-08 next 0 delay -1
+ 42.471n    2.         0.         3.        
+ 42.501n    1.         1.         3.        
+drv at 4.2526e-08 next 1 delay 35
+ 42.526n    1.         1.         3.        
+ 42.561n    1.         3.         3.        
+drv at 4.2581e-08 next 1 delay -1
+ 42.581n    1.         3.         3.        
+ 42.601n    2.         2.         3.        
+drv at 4.2636e-08 next 0 delay 25
+ 42.636n    2.         2.         3.        
+ 42.661n    2.         0.         3.        
+drv at 4.2691e-08 next 0 delay -1
+ 42.691n    2.         0.         3.        
+ 42.701n    1.         1.         3.        
+drv at 4.2746e-08 next 1 delay 15
+ 42.746n    1.         1.         3.        
+ 42.761n    1.         3.         3.        
+drv at 4.2801e-08 next 1 delay -1
+ 42.801n    2.         2.         3.        
+drv at 4.2856e-08 next 0 delay 5
+ 42.856n    2.         2.         3.        
+ 42.861n    2.         0.         3.        
+ 42.901n    1.         1.         3.        
+drv at 4.2911e-08 next 1 delay 50
+ 42.911n    1.         1.         3.        
+ 42.961n    1.         3.         3.        
+drv at 4.2966e-08 next 1 delay -1
+ 42.966n    1.         3.         3.        
+ 43.001n    2.         2.         3.        
+drv at 4.3021e-08 next 0 delay 40
+ 43.021n    2.         2.         3.        
+ 43.061n    2.         0.         3.        
+drv at 4.3076e-08 next 0 delay -1
+ 43.076n    2.         0.         3.        
+ 43.101n    1.         1.         3.        
+drv at 4.3131e-08 next 1 delay 30
+ 43.131n    1.         1.         3.        
+ 43.161n    1.         3.         3.        
+drv at 4.3186e-08 next 1 delay -1
+ 43.186n    1.         3.         3.        
+ 43.201n    2.         2.         3.        
+drv at 4.3241e-08 next 0 delay 20
+ 43.241n    2.         2.         3.        
+ 43.261n    2.         0.         3.        
+drv at 4.3296e-08 next 0 delay -1
+ 43.296n    2.         0.         3.        
+ 43.301n    1.         1.         3.        
+drv at 4.3351e-08 next 1 delay 10
+ 43.351n    1.         1.         3.        
+ 43.361n    1.         3.         3.        
+ 43.401n    2.         2.         3.        
+drv at 4.3406e-08 next 0 delay 55
+ 43.406n    2.         2.         3.        
+drv at 4.3461e-08 next 0 delay -1
+ 43.461n    2.         0.         3.        
+ 43.501n    1.         1.         3.        
+drv at 4.3516e-08 next 1 delay 45
+ 43.516n    1.         1.         3.        
+ 43.561n    1.         3.         3.        
+drv at 4.3571e-08 next 1 delay -1
+ 43.571n    1.         3.         3.        
+ 43.601n    2.         2.         3.        
+drv at 4.3626e-08 next 0 delay 35
+ 43.626n    2.         2.         3.        
+ 43.661n    2.         0.         3.        
+drv at 4.3681e-08 next 0 delay -1
+ 43.681n    2.         0.         3.        
+ 43.701n    1.         1.         3.        
+drv at 4.3736e-08 next 1 delay 25
+ 43.736n    1.         1.         3.        
+ 43.761n    1.         3.         3.        
+drv at 4.3791e-08 next 1 delay -1
+ 43.791n    1.         3.         3.        
+ 43.801n    2.         2.         3.        
+drv at 4.3846e-08 next 0 delay 15
+ 43.846n    2.         2.         3.        
+ 43.861n    2.         0.         3.        
+drv at 4.3901e-08 next 0 delay -1
+ 43.901n    1.         1.         3.        
+drv at 4.3956e-08 next 1 delay 5
+ 43.956n    1.         1.         3.        
+ 43.961n    1.         3.         3.        
+ 44.001n    2.         2.         3.        
+drv at 4.4011e-08 next 0 delay 50
+ 44.011n    2.         2.         3.        
+ 44.061n    2.         0.         3.        
+drv at 4.4066e-08 next 0 delay -1
+ 44.066n    2.         0.         3.        
+ 44.101n    1.         1.         3.        
+drv at 4.4121e-08 next 1 delay 40
+ 44.121n    1.         1.         3.        
+ 44.161n    1.         3.         3.        
+drv at 4.4176e-08 next 1 delay -1
+ 44.176n    1.         3.         3.        
+ 44.201n    2.         2.         3.        
+drv at 4.4231e-08 next 0 delay 30
+ 44.231n    2.         2.         3.        
+ 44.261n    2.         0.         3.        
+drv at 4.4286e-08 next 0 delay -1
+ 44.286n    2.         0.         3.        
+ 44.301n    1.         1.         3.        
+drv at 4.4341e-08 next 1 delay 20
+ 44.341n    1.         1.         3.        
+ 44.361n    1.         3.         3.        
+drv at 4.4396e-08 next 1 delay -1
+ 44.396n    1.         3.         3.        
+ 44.401n    2.         2.         3.        
+drv at 4.4451e-08 next 0 delay 10
+ 44.451n    2.         2.         3.        
+ 44.461n    2.         0.         3.        
+ 44.501n    1.         1.         3.        
+drv at 4.4506e-08 next 1 delay 55
+ 44.506n    1.         1.         3.        
+drv at 4.4561e-08 next 1 delay -1
+ 44.561n    1.         3.         3.        
+ 44.601n    2.         2.         3.        
+drv at 4.4616e-08 next 0 delay 45
+ 44.616n    2.         2.         3.        
+ 44.661n    2.         0.         3.        
+drv at 4.4671e-08 next 0 delay -1
+ 44.671n    2.         0.         3.        
+ 44.701n    1.         1.         3.        
+drv at 4.4726e-08 next 1 delay 35
+ 44.726n    1.         1.         3.        
+ 44.761n    1.         3.         3.        
+drv at 4.4781e-08 next 1 delay -1
+ 44.781n    1.         3.         3.        
+ 44.801n    2.         2.         3.        
+drv at 4.4836e-08 next 0 delay 25
+ 44.836n    2.         2.         3.        
+ 44.861n    2.         0.         3.        
+drv at 4.4891e-08 next 0 delay -1
+ 44.891n    2.         0.         3.        
+ 44.901n    1.         1.         3.        
+drv at 4.4946e-08 next 1 delay 15
+ 44.946n    1.         1.         3.        
+ 44.961n    1.         3.         3.        
+drv at 4.5001e-08 next 1 delay -1
+ 45.001n    2.         2.         3.        
+drv at 4.5056e-08 next 0 delay 5
+ 45.056n    2.         2.         3.        
+ 45.061n    2.         0.         3.        
+ 45.101n    1.         1.         3.        
+drv at 4.5111e-08 next 1 delay 50
+ 45.111n    1.         1.         3.        
+ 45.161n    1.         3.         3.        
+drv at 4.5166e-08 next 1 delay -1
+ 45.166n    1.         3.         3.        
+ 45.201n    2.         2.         3.        
+drv at 4.5221e-08 next 0 delay 40
+ 45.221n    2.         2.         3.        
+ 45.261n    2.         0.         3.        
+drv at 4.5276e-08 next 0 delay -1
+ 45.276n    2.         0.         3.        
+ 45.301n    1.         1.         3.        
+drv at 4.5331e-08 next 1 delay 30
+ 45.331n    1.         1.         3.        
+ 45.361n    1.         3.         3.        
+drv at 4.5386e-08 next 1 delay -1
+ 45.386n    1.         3.         3.        
+ 45.401n    2.         2.         3.        
+drv at 4.5441e-08 next 0 delay 20
+ 45.441n    2.         2.         3.        
+ 45.461n    2.         0.         3.        
+drv at 4.5496e-08 next 0 delay -1
+ 45.496n    2.         0.         3.        
+ 45.501n    1.         1.         3.        
+drv at 4.5551e-08 next 1 delay 10
+ 45.551n    1.         1.         3.        
+ 45.561n    1.         3.         3.        
+ 45.601n    2.         2.         3.        
+drv at 4.5606e-08 next 0 delay 55
+ 45.606n    2.         2.         3.        
+drv at 4.5661e-08 next 0 delay -1
+ 45.661n    2.         0.         3.        
+ 45.701n    1.         1.         3.        
+drv at 4.5716e-08 next 1 delay 45
+ 45.716n    1.         1.         3.        
+ 45.761n    1.         3.         3.        
+drv at 4.5771e-08 next 1 delay -1
+ 45.771n    1.         3.         3.        
+ 45.801n    2.         2.         3.        
+drv at 4.5826e-08 next 0 delay 35
+ 45.826n    2.         2.         3.        
+ 45.861n    2.         0.         3.        
+drv at 4.5881e-08 next 0 delay -1
+ 45.881n    2.         0.         3.        
+ 45.901n    1.         1.         3.        
+drv at 4.5936e-08 next 1 delay 25
+ 45.936n    1.         1.         3.        
+ 45.961n    1.         3.         3.        
+drv at 4.5991e-08 next 1 delay -1
+ 45.991n    1.         3.         3.        
+ 46.001n    2.         2.         3.        
+drv at 4.6046e-08 next 0 delay 15
+ 46.046n    2.         2.         3.        
+ 46.061n    2.         0.         3.        
+drv at 4.6101e-08 next 0 delay -1
+ 46.101n    1.         1.         3.        
+drv at 4.6156e-08 next 1 delay 5
+ 46.156n    1.         1.         3.        
+ 46.161n    1.         3.         3.        
+ 46.201n    2.         2.         3.        
+drv at 4.6211e-08 next 0 delay 50
+ 46.211n    2.         2.         3.        
+ 46.261n    2.         0.         3.        
+drv at 4.6266e-08 next 0 delay -1
+ 46.266n    2.         0.         3.        
+ 46.301n    1.         1.         3.        
+drv at 4.6321e-08 next 1 delay 40
+ 46.321n    1.         1.         3.        
+ 46.361n    1.         3.         3.        
+drv at 4.6376e-08 next 1 delay -1
+ 46.376n    1.         3.         3.        
+ 46.401n    2.         2.         3.        
+drv at 4.6431e-08 next 0 delay 30
+ 46.431n    2.         2.         3.        
+ 46.461n    2.         0.         3.        
+drv at 4.6486e-08 next 0 delay -1
+ 46.486n    2.         0.         3.        
+ 46.501n    1.         1.         3.        
+drv at 4.6541e-08 next 1 delay 20
+ 46.541n    1.         1.         3.        
+ 46.561n    1.         3.         3.        
+drv at 4.6596e-08 next 1 delay -1
+ 46.596n    1.         3.         3.        
+ 46.601n    2.         2.         3.        
+drv at 4.6651e-08 next 0 delay 10
+ 46.651n    2.         2.         3.        
+ 46.661n    2.         0.         3.        
+ 46.701n    1.         1.         3.        
+drv at 4.6706e-08 next 1 delay 55
+ 46.706n    1.         1.         3.        
+drv at 4.6761e-08 next 1 delay -1
+ 46.761n    1.         3.         3.        
+ 46.801n    2.         2.         3.        
+drv at 4.6816e-08 next 0 delay 45
+ 46.816n    2.         2.         3.        
+ 46.861n    2.         0.         3.        
+drv at 4.6871e-08 next 0 delay -1
+ 46.871n    2.         0.         3.        
+ 46.901n    1.         1.         3.        
+drv at 4.6926e-08 next 1 delay 35
+ 46.926n    1.         1.         3.        
+ 46.961n    1.         3.         3.        
+drv at 4.6981e-08 next 1 delay -1
+ 46.981n    1.         3.         3.        
+ 47.001n    2.         2.         3.        
+drv at 4.7036e-08 next 0 delay 25
+ 47.036n    2.         2.         3.        
+ 47.061n    2.         0.         3.        
+drv at 4.7091e-08 next 0 delay -1
+ 47.091n    2.         0.         3.        
+ 47.101n    1.         1.         3.        
+drv at 4.7146e-08 next 1 delay 15
+ 47.146n    1.         1.         3.        
+ 47.161n    1.         3.         3.        
+drv at 4.7201e-08 next 1 delay -1
+ 47.201n    2.         2.         3.        
+drv at 4.7256e-08 next 0 delay 5
+ 47.256n    2.         2.         3.        
+ 47.261n    2.         0.         3.        
+ 47.301n    1.         1.         3.        
+drv at 4.7311e-08 next 1 delay 50
+ 47.311n    1.         1.         3.        
+ 47.361n    1.         3.         3.        
+drv at 4.7366e-08 next 1 delay -1
+ 47.366n    1.         3.         3.        
+ 47.401n    2.         2.         3.        
+drv at 4.7421e-08 next 0 delay 40
+ 47.421n    2.         2.         3.        
+ 47.461n    2.         0.         3.        
+drv at 4.7476e-08 next 0 delay -1
+ 47.476n    2.         0.         3.        
+ 47.501n    1.         1.         3.        
+drv at 4.7531e-08 next 1 delay 30
+ 47.531n    1.         1.         3.        
+ 47.561n    1.         3.         3.        
+drv at 4.7586e-08 next 1 delay -1
+ 47.586n    1.         3.         3.        
+ 47.601n    2.         2.         3.        
+drv at 4.7641e-08 next 0 delay 20
+ 47.641n    2.         2.         3.        
+ 47.661n    2.         0.         3.        
+drv at 4.7696e-08 next 0 delay -1
+ 47.696n    2.         0.         3.        
+ 47.701n    1.         1.         3.        
+drv at 4.7751e-08 next 1 delay 10
+ 47.751n    1.         1.         3.        
+ 47.761n    1.         3.         3.        
+ 47.801n    2.         2.         3.        
+drv at 4.7806e-08 next 0 delay 55
+ 47.806n    2.         2.         3.        
+drv at 4.7861e-08 next 0 delay -1
+ 47.861n    2.         0.         3.        
+ 47.901n    1.         1.         3.        
+drv at 4.7916e-08 next 1 delay 45
+ 47.916n    1.         1.         3.        
+ 47.961n    1.         3.         3.        
+drv at 4.7971e-08 next 1 delay -1
+ 47.971n    1.         3.         3.        
+ 48.001n    2.         2.         3.        
+drv at 4.8026e-08 next 0 delay 35
+ 48.026n    2.         2.         3.        
+ 48.061n    2.         0.         3.        
+drv at 4.8081e-08 next 0 delay -1
+ 48.081n    2.         0.         3.        
+ 48.101n    1.         1.         3.        
+drv at 4.8136e-08 next 1 delay 25
+ 48.136n    1.         1.         3.        
+ 48.161n    1.         3.         3.        
+drv at 4.8191e-08 next 1 delay -1
+ 48.191n    1.         3.         3.        
+ 48.201n    2.         2.         3.        
+drv at 4.8246e-08 next 0 delay 15
+ 48.246n    2.         2.         3.        
+ 48.261n    2.         0.         3.        
+drv at 4.8301e-08 next 0 delay -1
+ 48.301n    1.         1.         3.        
+drv at 4.8356e-08 next 1 delay 5
+ 48.356n    1.         1.         3.        
+ 48.361n    1.         3.         3.        
+ 48.401n    2.         2.         3.        
+drv at 4.8411e-08 next 0 delay 50
+ 48.411n    2.         2.         3.        
+ 48.461n    2.         0.         3.        
+drv at 4.8466e-08 next 0 delay -1
+ 48.466n    2.         0.         3.        
+ 48.501n    1.         1.         3.        
+drv at 4.8521e-08 next 1 delay 40
+ 48.521n    1.         1.         3.        
+ 48.561n    1.         3.         3.        
+drv at 4.8576e-08 next 1 delay -1
+ 48.576n    1.         3.         3.        
+ 48.601n    2.         2.         3.        
+drv at 4.8631e-08 next 0 delay 30
+ 48.631n    2.         2.         3.        
+ 48.661n    2.         0.         3.        
+drv at 4.8686e-08 next 0 delay -1
+ 48.686n    2.         0.         3.        
+ 48.701n    1.         1.         3.        
+drv at 4.8741e-08 next 1 delay 20
+ 48.741n    1.         1.         3.        
+ 48.761n    1.         3.         3.        
+drv at 4.8796e-08 next 1 delay -1
+ 48.796n    1.         3.         3.        
+ 48.801n    2.         2.         3.        
+drv at 4.8851e-08 next 0 delay 10
+ 48.851n    2.         2.         3.        
+ 48.861n    2.         0.         3.        
+ 48.901n    1.         1.         3.        
+drv at 4.8906e-08 next 1 delay 55
+ 48.906n    1.         1.         3.        
+drv at 4.8961e-08 next 1 delay -1
+ 48.961n    1.         3.         3.        
+ 49.001n    2.         2.         3.        
+drv at 4.9016e-08 next 0 delay 45
+ 49.016n    2.         2.         3.        
+ 49.061n    2.         0.         3.        
+drv at 4.9071e-08 next 0 delay -1
+ 49.071n    2.         0.         3.        
+ 49.101n    1.         1.         3.        
+drv at 4.9126e-08 next 1 delay 35
+ 49.126n    1.         1.         3.        
+ 49.161n    1.         3.         3.        
+drv at 4.9181e-08 next 1 delay -1
+ 49.181n    1.         3.         3.        
+ 49.201n    2.         2.         3.        
+drv at 4.9236e-08 next 0 delay 25
+ 49.236n    2.         2.         3.        
+ 49.261n    2.         0.         3.        
+drv at 4.9291e-08 next 0 delay -1
+ 49.291n    2.         0.         3.        
+ 49.301n    1.         1.         3.        
+drv at 4.9346e-08 next 1 delay 15
+ 49.346n    1.         1.         3.        
+ 49.361n    1.         3.         3.        
+drv at 4.9401e-08 next 1 delay -1
+ 49.401n    2.         2.         3.        
+drv at 4.9456e-08 next 0 delay 5
+ 49.456n    2.         2.         3.        
+ 49.461n    2.         0.         3.        
+ 49.501n    1.         1.         3.        
+drv at 4.9511e-08 next 1 delay 50
+ 49.511n    1.         1.         3.        
+ 49.561n    1.         3.         3.        
+drv at 4.9566e-08 next 1 delay -1
+ 49.566n    1.         3.         3.        
+ 49.601n    2.         2.         3.        
+drv at 4.9621e-08 next 0 delay 40
+ 49.621n    2.         2.         3.        
+ 49.661n    2.         0.         3.        
+drv at 4.9676e-08 next 0 delay -1
+ 49.676n    2.         0.         3.        
+ 49.701n    1.         1.         3.        
+drv at 4.9731e-08 next 1 delay 30
+ 49.731n    1.         1.         3.        
+ 49.761n    1.         3.         3.        
+drv at 4.9786e-08 next 1 delay -1
+ 49.786n    1.         3.         3.        
+ 49.801n    2.         2.         3.        
+drv at 4.9841e-08 next 0 delay 20
+ 49.841n    2.         2.         3.        
+ 49.861n    2.         0.         3.        
+drv at 4.9896e-08 next 0 delay -1
+ 49.896n    2.         0.         3.        
+ 49.901n    1.         1.         3.        
+drv at 4.9951e-08 next 1 delay 10
+ 49.951n    1.         1.         3.        
+ 49.961n    1.         3.         3.        
+ 50.001n    2.         2.         3.        
+drv at 5.0006e-08 next 0 delay 55
+ 50.006n    2.         2.         3.        
+drv at 5.0061e-08 next 0 delay -1
+ 50.061n    2.         0.         3.        
+ 50.101n    1.         1.         3.        
+drv at 5.0116e-08 next 1 delay 45
+ 50.116n    1.         1.         3.        
+ 50.161n    1.         3.         3.        
+drv at 5.0171e-08 next 1 delay -1
+ 50.171n    1.         3.         3.        
+ 50.201n    2.         2.         3.        
+drv at 5.0226e-08 next 0 delay 35
+ 50.226n    2.         2.         3.        
+ 50.261n    2.         0.         3.        
+drv at 5.0281e-08 next 0 delay -1
+ 50.281n    2.         0.         3.        
+ 50.301n    1.         1.         3.        
+drv at 5.0336e-08 next 1 delay 25
+ 50.336n    1.         1.         3.        
+ 50.361n    1.         3.         3.        
+drv at 5.0391e-08 next 1 delay -1
+ 50.391n    1.         3.         3.        
+ 50.401n    2.         2.         3.        
+drv at 5.0446e-08 next 0 delay 15
+ 50.446n    2.         2.         3.        
+ 50.461n    2.         0.         3.        
+drv at 5.0501e-08 next 0 delay -1
+ 50.501n    1.         1.         3.        
+drv at 5.0556e-08 next 1 delay 5
+ 50.556n    1.         1.         3.        
+ 50.561n    1.         3.         3.        
+ 50.601n    2.         2.         3.        
+drv at 5.0611e-08 next 0 delay 50
+ 50.611n    2.         2.         3.        
+ 50.661n    2.         0.         3.        
+drv at 5.0666e-08 next 0 delay -1
+ 50.666n    2.         0.         3.        
+ 50.701n    1.         1.         3.        
+drv at 5.0721e-08 next 1 delay 40
+ 50.721n    1.         1.         3.        
+ 50.761n    1.         3.         3.        
+drv at 5.0776e-08 next 1 delay -1
+ 50.776n    1.         3.         3.        
+ 50.801n    2.         2.         3.        
+drv at 5.0831e-08 next 0 delay 30
+ 50.831n    2.         2.         3.        
+ 50.861n    2.         0.         3.        
+drv at 5.0886e-08 next 0 delay -1
+ 50.886n    2.         0.         3.        
+ 50.901n    1.         1.         3.        
+drv at 5.0941e-08 next 1 delay 20
+ 50.941n    1.         1.         3.        
+ 50.961n    1.         3.         3.        
+drv at 5.0996e-08 next 1 delay -1
+ 50.996n    1.         3.         3.        
+ 51.001n    2.         2.         3.        
+drv at 5.1051e-08 next 0 delay 10
+ 51.051n    2.         2.         3.        
+ 51.061n    2.         0.         3.        
+ 51.101n    1.         1.         3.        
+drv at 5.1106e-08 next 1 delay 55
+ 51.106n    1.         1.         3.        
+drv at 5.1161e-08 next 1 delay -1
+ 51.161n    1.         3.         3.        
+ 51.201n    2.         2.         3.        
+drv at 5.1216e-08 next 0 delay 45
+ 51.216n    2.         2.         3.        
+ 51.261n    2.         0.         3.        
+drv at 5.1271e-08 next 0 delay -1
+ 51.271n    2.         0.         3.        
+ 51.301n    1.         1.         3.        
+drv at 5.1326e-08 next 1 delay 35
+ 51.326n    1.         1.         3.        
+ 51.361n    1.         3.         3.        
+drv at 5.1381e-08 next 1 delay -1
+ 51.381n    1.         3.         3.        
+ 51.401n    2.         2.         3.        
+drv at 5.1436e-08 next 0 delay 25
+ 51.436n    2.         2.         3.        
+ 51.461n    2.         0.         3.        
+drv at 5.1491e-08 next 0 delay -1
+ 51.491n    2.         0.         3.        
+ 51.501n    1.         1.         3.        
+drv at 5.1546e-08 next 1 delay 15
+ 51.546n    1.         1.         3.        
+ 51.561n    1.         3.         3.        
+drv at 5.1601e-08 next 1 delay -1
+ 51.601n    2.         2.         3.        
+drv at 5.1656e-08 next 0 delay 5
+ 51.656n    2.         2.         3.        
+ 51.661n    2.         0.         3.        
+ 51.701n    1.         1.         3.        
+drv at 5.1711e-08 next 1 delay 50
+ 51.711n    1.         1.         3.        
+ 51.761n    1.         3.         3.        
+drv at 5.1766e-08 next 1 delay -1
+ 51.766n    1.         3.         3.        
+ 51.801n    2.         2.         3.        
+drv at 5.1821e-08 next 0 delay 40
+ 51.821n    2.         2.         3.        
+ 51.861n    2.         0.         3.        
+drv at 5.1876e-08 next 0 delay -1
+ 51.876n    2.         0.         3.        
+ 51.901n    1.         1.         3.        
+drv at 5.1931e-08 next 1 delay 30
+ 51.931n    1.         1.         3.        
+ 51.961n    1.         3.         3.        
+drv at 5.1986e-08 next 1 delay -1
+ 51.986n    1.         3.         3.        
+ 52.001n    2.         2.         3.        
+drv at 5.2041e-08 next 0 delay 20
+ 52.041n    2.         2.         3.        
+ 52.061n    2.         0.         3.        
+drv at 5.2096e-08 next 0 delay -1
+ 52.096n    2.         0.         3.        
+ 52.101n    1.         1.         3.        
+drv at 5.2151e-08 next 1 delay 10
+ 52.151n    1.         1.         3.        
+ 52.161n    1.         3.         3.        
+ 52.201n    2.         2.         3.        
+drv at 5.2206e-08 next 0 delay 55
+ 52.206n    2.         2.         3.        
+drv at 5.2261e-08 next 0 delay -1
+ 52.261n    2.         0.         3.        
+ 52.301n    1.         1.         3.        
+drv at 5.2316e-08 next 1 delay 45
+ 52.316n    1.         1.         3.        
+ 52.361n    1.         3.         3.        
+drv at 5.2371e-08 next 1 delay -1
+ 52.371n    1.         3.         3.        
+ 52.401n    2.         2.         3.        
+drv at 5.2426e-08 next 0 delay 35
+ 52.426n    2.         2.         3.        
+ 52.461n    2.         0.         3.        
+drv at 5.2481e-08 next 0 delay -1
+ 52.481n    2.         0.         3.        
+ 52.501n    1.         1.         3.        
+drv at 5.2536e-08 next 1 delay 25
+ 52.536n    1.         1.         3.        
+ 52.561n    1.         3.         3.        
+drv at 5.2591e-08 next 1 delay -1
+ 52.591n    1.         3.         3.        
+ 52.601n    2.         2.         3.        
+drv at 5.2646e-08 next 0 delay 15
+ 52.646n    2.         2.         3.        
+ 52.661n    2.         0.         3.        
+drv at 5.2701e-08 next 0 delay -1
+ 52.701n    1.         1.         3.        
+drv at 5.2756e-08 next 1 delay 5
+ 52.756n    1.         1.         3.        
+ 52.761n    1.         3.         3.        
+ 52.801n    2.         2.         3.        
+drv at 5.2811e-08 next 0 delay 50
+ 52.811n    2.         2.         3.        
+ 52.861n    2.         0.         3.        
+drv at 5.2866e-08 next 0 delay -1
+ 52.866n    2.         0.         3.        
+ 52.901n    1.         1.         3.        
+drv at 5.2921e-08 next 1 delay 40
+ 52.921n    1.         1.         3.        
+ 52.961n    1.         3.         3.        
+drv at 5.2976e-08 next 1 delay -1
+ 52.976n    1.         3.         3.        
+ 53.001n    2.         2.         3.        
+drv at 5.3031e-08 next 0 delay 30
+ 53.031n    2.         2.         3.        
+ 53.061n    2.         0.         3.        
+drv at 5.3086e-08 next 0 delay -1
+ 53.086n    2.         0.         3.        
+ 53.101n    1.         1.         3.        
+drv at 5.3141e-08 next 1 delay 20
+ 53.141n    1.         1.         3.        
+ 53.161n    1.         3.         3.        
+drv at 5.3196e-08 next 1 delay -1
+ 53.196n    1.         3.         3.        
+ 53.201n    2.         2.         3.        
+drv at 5.3251e-08 next 0 delay 10
+ 53.251n    2.         2.         3.        
+ 53.261n    2.         0.         3.        
+ 53.301n    1.         1.         3.        
+drv at 5.3306e-08 next 1 delay 55
+ 53.306n    1.         1.         3.        
+drv at 5.3361e-08 next 1 delay -1
+ 53.361n    1.         3.         3.        
+ 53.401n    2.         2.         3.        
+drv at 5.3416e-08 next 0 delay 45
+ 53.416n    2.         2.         3.        
+ 53.461n    2.         0.         3.        
+drv at 5.3471e-08 next 0 delay -1
+ 53.471n    2.         0.         3.        
+ 53.501n    1.         1.         3.        
+drv at 5.3526e-08 next 1 delay 35
+ 53.526n    1.         1.         3.        
+ 53.561n    1.         3.         3.        
+drv at 5.3581e-08 next 1 delay -1
+ 53.581n    1.         3.         3.        
+ 53.601n    2.         2.         3.        
+drv at 5.3636e-08 next 0 delay 25
+ 53.636n    2.         2.         3.        
+ 53.661n    2.         0.         3.        
+drv at 5.3691e-08 next 0 delay -1
+ 53.691n    2.         0.         3.        
+ 53.701n    1.         1.         3.        
+drv at 5.3746e-08 next 1 delay 15
+ 53.746n    1.         1.         3.        
+ 53.761n    1.         3.         3.        
+drv at 5.3801e-08 next 1 delay -1
+ 53.801n    2.         2.         3.        
+drv at 5.3856e-08 next 0 delay 5
+ 53.856n    2.         2.         3.        
+ 53.861n    2.         0.         3.        
+ 53.901n    1.         1.         3.        
+drv at 5.3911e-08 next 1 delay 50
+ 53.911n    1.         1.         3.        
+ 53.961n    1.         3.         3.        
+drv at 5.3966e-08 next 1 delay -1
+ 53.966n    1.         3.         3.        
+ 54.001n    2.         2.         3.        
+drv at 5.4021e-08 next 0 delay 40
+ 54.021n    2.         2.         3.        
+ 54.061n    2.         0.         3.        
+drv at 5.4076e-08 next 0 delay -1
+ 54.076n    2.         0.         3.        
+ 54.101n    1.         1.         3.        
+drv at 5.4131e-08 next 1 delay 30
+ 54.131n    1.         1.         3.        
+ 54.161n    1.         3.         3.        
+drv at 5.4186e-08 next 1 delay -1
+ 54.186n    1.         3.         3.        
+ 54.201n    2.         2.         3.        
+drv at 5.4241e-08 next 0 delay 20
+ 54.241n    2.         2.         3.        
+ 54.261n    2.         0.         3.        
+drv at 5.4296e-08 next 0 delay -1
+ 54.296n    2.         0.         3.        
+ 54.301n    1.         1.         3.        
+drv at 5.4351e-08 next 1 delay 10
+ 54.351n    1.         1.         3.        
+ 54.361n    1.         3.         3.        
+ 54.401n    2.         2.         3.        
+drv at 5.4406e-08 next 0 delay 55
+ 54.406n    2.         2.         3.        
+drv at 5.4461e-08 next 0 delay -1
+ 54.461n    2.         0.         3.        
+ 54.501n    1.         1.         3.        
+drv at 5.4516e-08 next 1 delay 45
+ 54.516n    1.         1.         3.        
+ 54.561n    1.         3.         3.        
+drv at 5.4571e-08 next 1 delay -1
+ 54.571n    1.         3.         3.        
+ 54.601n    2.         2.         3.        
+drv at 5.4626e-08 next 0 delay 35
+ 54.626n    2.         2.         3.        
+ 54.661n    2.         0.         3.        
+drv at 5.4681e-08 next 0 delay -1
+ 54.681n    2.         0.         3.        
+ 54.701n    1.         1.         3.        
+drv at 5.4736e-08 next 1 delay 25
+ 54.736n    1.         1.         3.        
+ 54.761n    1.         3.         3.        
+drv at 5.4791e-08 next 1 delay -1
+ 54.791n    1.         3.         3.        
+ 54.801n    2.         2.         3.        
+drv at 5.4846e-08 next 0 delay 15
+ 54.846n    2.         2.         3.        
+ 54.861n    2.         0.         3.        
+drv at 5.4901e-08 next 0 delay -1
+ 54.901n    1.         1.         3.        
+drv at 5.4956e-08 next 1 delay 5
+ 54.956n    1.         1.         3.        
+ 54.961n    1.         3.         3.        
+ 55.001n    2.         2.         3.        
+drv at 5.5011e-08 next 0 delay 50
+ 55.011n    2.         2.         3.        
+ 55.061n    2.         0.         3.        
+drv at 5.5066e-08 next 0 delay -1
+ 55.066n    2.         0.         3.        
+ 55.101n    1.         1.         3.        
+drv at 5.5121e-08 next 1 delay 40
+ 55.121n    1.         1.         3.        
+ 55.161n    1.         3.         3.        
+drv at 5.5176e-08 next 1 delay -1
+ 55.176n    1.         3.         3.        
+ 55.201n    2.         2.         3.        
+drv at 5.5231e-08 next 0 delay 30
+ 55.231n    2.         2.         3.        
+ 55.261n    2.         0.         3.        
+drv at 5.5286e-08 next 0 delay -1
+ 55.286n    2.         0.         3.        
+ 55.301n    1.         1.         3.        
+drv at 5.5341e-08 next 1 delay 20
+ 55.341n    1.         1.         3.        
+ 55.361n    1.         3.         3.        
+drv at 5.5396e-08 next 1 delay -1
+ 55.396n    1.         3.         3.        
+ 55.401n    2.         2.         3.        
+drv at 5.5451e-08 next 0 delay 10
+ 55.451n    2.         2.         3.        
+ 55.461n    2.         0.         3.        
+ 55.501n    1.         1.         3.        
+drv at 5.5506e-08 next 1 delay 55
+ 55.506n    1.         1.         3.        
+drv at 5.5561e-08 next 1 delay -1
+ 55.561n    1.         3.         3.        
+ 55.601n    2.         2.         3.        
+drv at 5.5616e-08 next 0 delay 45
+ 55.616n    2.         2.         3.        
+ 55.661n    2.         0.         3.        
+drv at 5.5671e-08 next 0 delay -1
+ 55.671n    2.         0.         3.        
+ 55.701n    1.         1.         3.        
+drv at 5.5726e-08 next 1 delay 35
+ 55.726n    1.         1.         3.        
+ 55.761n    1.         3.         3.        
+drv at 5.5781e-08 next 1 delay -1
+ 55.781n    1.         3.         3.        
+ 55.801n    2.         2.         3.        
+drv at 5.5836e-08 next 0 delay 25
+ 55.836n    2.         2.         3.        
+ 55.861n    2.         0.         3.        
+drv at 5.5891e-08 next 0 delay -1
+ 55.891n    2.         0.         3.        
+ 55.901n    1.         1.         3.        
+drv at 5.5946e-08 next 1 delay 15
+ 55.946n    1.         1.         3.        
+ 55.961n    1.         3.         3.        
+drv at 5.6001e-08 next 1 delay -1
+ 56.001n    2.         2.         3.        
+drv at 5.6056e-08 next 0 delay 5
+ 56.056n    2.         2.         3.        
+ 56.061n    2.         0.         3.        
+ 56.101n    1.         1.         3.        
+drv at 5.6111e-08 next 1 delay 50
+ 56.111n    1.         1.         3.        
+ 56.161n    1.         3.         3.        
+drv at 5.6166e-08 next 1 delay -1
+ 56.166n    1.         3.         3.        
+ 56.201n    2.         2.         3.        
+drv at 5.6221e-08 next 0 delay 40
+ 56.221n    2.         2.         3.        
+ 56.261n    2.         0.         3.        
+drv at 5.6276e-08 next 0 delay -1
+ 56.276n    2.         0.         3.        
+ 56.301n    1.         1.         3.        
+drv at 5.6331e-08 next 1 delay 30
+ 56.331n    1.         1.         3.        
+ 56.361n    1.         3.         3.        
+drv at 5.6386e-08 next 1 delay -1
+ 56.386n    1.         3.         3.        
+ 56.401n    2.         2.         3.        
+drv at 5.6441e-08 next 0 delay 20
+ 56.441n    2.         2.         3.        
+ 56.461n    2.         0.         3.        
+drv at 5.6496e-08 next 0 delay -1
+ 56.496n    2.         0.         3.        
+ 56.501n    1.         1.         3.        
+drv at 5.6551e-08 next 1 delay 10
+ 56.551n    1.         1.         3.        
+ 56.561n    1.         3.         3.        
+ 56.601n    2.         2.         3.        
+drv at 5.6606e-08 next 0 delay 55
+ 56.606n    2.         2.         3.        
+drv at 5.6661e-08 next 0 delay -1
+ 56.661n    2.         0.         3.        
+ 56.701n    1.         1.         3.        
+drv at 5.6716e-08 next 1 delay 45
+ 56.716n    1.         1.         3.        
+ 56.761n    1.         3.         3.        
+drv at 5.6771e-08 next 1 delay -1
+ 56.771n    1.         3.         3.        
+ 56.801n    2.         2.         3.        
+drv at 5.6826e-08 next 0 delay 35
+ 56.826n    2.         2.         3.        
+ 56.861n    2.         0.         3.        
+drv at 5.6881e-08 next 0 delay -1
+ 56.881n    2.         0.         3.        
+ 56.901n    1.         1.         3.        
+drv at 5.6936e-08 next 1 delay 25
+ 56.936n    1.         1.         3.        
+ 56.961n    1.         3.         3.        
+drv at 5.6991e-08 next 1 delay -1
+ 56.991n    1.         3.         3.        
+ 57.001n    2.         2.         3.        
+drv at 5.7046e-08 next 0 delay 15
+ 57.046n    2.         2.         3.        
+ 57.061n    2.         0.         3.        
+drv at 5.7101e-08 next 0 delay -1
+ 57.101n    1.         1.         3.        
+drv at 5.7156e-08 next 1 delay 5
+ 57.156n    1.         1.         3.        
+ 57.161n    1.         3.         3.        
+ 57.201n    2.         2.         3.        
+drv at 5.7211e-08 next 0 delay 50
+ 57.211n    2.         2.         3.        
+ 57.261n    2.         0.         3.        
+drv at 5.7266e-08 next 0 delay -1
+ 57.266n    2.         0.         3.        
+ 57.301n    1.         1.         3.        
+drv at 5.7321e-08 next 1 delay 40
+ 57.321n    1.         1.         3.        
+ 57.361n    1.         3.         3.        
+drv at 5.7376e-08 next 1 delay -1
+ 57.376n    1.         3.         3.        
+ 57.401n    2.         2.         3.        
+drv at 5.7431e-08 next 0 delay 30
+ 57.431n    2.         2.         3.        
+ 57.461n    2.         0.         3.        
+drv at 5.7486e-08 next 0 delay -1
+ 57.486n    2.         0.         3.        
+ 57.501n    1.         1.         3.        
+drv at 5.7541e-08 next 1 delay 20
+ 57.541n    1.         1.         3.        
+ 57.561n    1.         3.         3.        
+drv at 5.7596e-08 next 1 delay -1
+ 57.596n    1.         3.         3.        
+ 57.601n    2.         2.         3.        
+drv at 5.7651e-08 next 0 delay 10
+ 57.651n    2.         2.         3.        
+ 57.661n    2.         0.         3.        
+ 57.701n    1.         1.         3.        
+drv at 5.7706e-08 next 1 delay 55
+ 57.706n    1.         1.         3.        
+drv at 5.7761e-08 next 1 delay -1
+ 57.761n    1.         3.         3.        
+ 57.801n    2.         2.         3.        
+drv at 5.7816e-08 next 0 delay 45
+ 57.816n    2.         2.         3.        
+ 57.861n    2.         0.         3.        
+drv at 5.7871e-08 next 0 delay -1
+ 57.871n    2.         0.         3.        
+ 57.901n    1.         1.         3.        
+drv at 5.7926e-08 next 1 delay 35
+ 57.926n    1.         1.         3.        
+ 57.961n    1.         3.         3.        
+drv at 5.7981e-08 next 1 delay -1
+ 57.981n    1.         3.         3.        
+ 58.001n    2.         2.         3.        
+drv at 5.8036e-08 next 0 delay 25
+ 58.036n    2.         2.         3.        
+ 58.061n    2.         0.         3.        
+drv at 5.8091e-08 next 0 delay -1
+ 58.091n    2.         0.         3.        
+ 58.101n    1.         1.         3.        
+drv at 5.8146e-08 next 1 delay 15
+ 58.146n    1.         1.         3.        
+ 58.161n    1.         3.         3.        
+drv at 5.8201e-08 next 1 delay -1
+ 58.201n    2.         2.         3.        
+drv at 5.8256e-08 next 0 delay 5
+ 58.256n    2.         2.         3.        
+ 58.261n    2.         0.         3.        
+ 58.301n    1.         1.         3.        
+drv at 5.8311e-08 next 1 delay 50
+ 58.311n    1.         1.         3.        
+ 58.361n    1.         3.         3.        
+drv at 5.8366e-08 next 1 delay -1
+ 58.366n    1.         3.         3.        
+ 58.401n    2.         2.         3.        
+drv at 5.8421e-08 next 0 delay 40
+ 58.421n    2.         2.         3.        
+ 58.461n    2.         0.         3.        
+drv at 5.8476e-08 next 0 delay -1
+ 58.476n    2.         0.         3.        
+ 58.501n    1.         1.         3.        
+drv at 5.8531e-08 next 1 delay 30
+ 58.531n    1.         1.         3.        
+ 58.561n    1.         3.         3.        
+drv at 5.8586e-08 next 1 delay -1
+ 58.586n    1.         3.         3.        
+ 58.601n    2.         2.         3.        
+drv at 5.8641e-08 next 0 delay 20
+ 58.641n    2.         2.         3.        
+ 58.661n    2.         0.         3.        
+drv at 5.8696e-08 next 0 delay -1
+ 58.696n    2.         0.         3.        
+ 58.701n    1.         1.         3.        
+drv at 5.8751e-08 next 1 delay 10
+ 58.751n    1.         1.         3.        
+ 58.761n    1.         3.         3.        
+ 58.801n    2.         2.         3.        
+drv at 5.8806e-08 next 0 delay 55
+ 58.806n    2.         2.         3.        
+drv at 5.8861e-08 next 0 delay -1
+ 58.861n    2.         0.         3.        
+ 58.901n    1.         1.         3.        
+drv at 5.8916e-08 next 1 delay 45
+ 58.916n    1.         1.         3.        
+ 58.961n    1.         3.         3.        
+drv at 5.8971e-08 next 1 delay -1
+ 58.971n    1.         3.         3.        
+ 59.001n    2.         2.         3.        
+drv at 5.9026e-08 next 0 delay 35
+ 59.026n    2.         2.         3.        
+ 59.061n    2.         0.         3.        
+drv at 5.9081e-08 next 0 delay -1
+ 59.081n    2.         0.         3.        
+ 59.101n    1.         1.         3.        
+drv at 5.9136e-08 next 1 delay 25
+ 59.136n    1.         1.         3.        
+ 59.161n    1.         3.         3.        
+drv at 5.9191e-08 next 1 delay -1
+ 59.191n    1.         3.         3.        
+ 59.201n    2.         2.         3.        
+drv at 5.9246e-08 next 0 delay 15
+ 59.246n    2.         2.         3.        
+ 59.261n    2.         0.         3.        
+drv at 5.9301e-08 next 0 delay -1
+ 59.301n    1.         1.         3.        
+drv at 5.9356e-08 next 1 delay 5
+ 59.356n    1.         1.         3.        
+ 59.361n    1.         3.         3.        
+ 59.401n    2.         2.         3.        
+drv at 5.9411e-08 next 0 delay 50
+ 59.411n    2.         2.         3.        
+ 59.461n    2.         0.         3.        
+drv at 5.9466e-08 next 0 delay -1
+ 59.466n    2.         0.         3.        
+ 59.501n    1.         1.         3.        
+drv at 5.9521e-08 next 1 delay 40
+ 59.521n    1.         1.         3.        
+ 59.561n    1.         3.         3.        
+drv at 5.9576e-08 next 1 delay -1
+ 59.576n    1.         3.         3.        
+ 59.601n    2.         2.         3.        
+drv at 5.9631e-08 next 0 delay 30
+ 59.631n    2.         2.         3.        
+ 59.661n    2.         0.         3.        
+drv at 5.9686e-08 next 0 delay -1
+ 59.686n    2.         0.         3.        
+ 59.701n    1.         1.         3.        
+drv at 5.9741e-08 next 1 delay 20
+ 59.741n    1.         1.         3.        
+ 59.761n    1.         3.         3.        
+drv at 5.9796e-08 next 1 delay -1
+ 59.796n    1.         3.         3.        
+ 59.801n    2.         2.         3.        
+drv at 5.9851e-08 next 0 delay 10
+ 59.851n    2.         2.         3.        
+ 59.861n    2.         0.         3.        
+ 59.901n    1.         1.         3.        
+drv at 5.9906e-08 next 1 delay 55
+ 59.906n    1.         1.         3.        
+drv at 5.9961e-08 next 1 delay -1
+ 59.961n    1.         3.         3.        
+ 60.n       1.         3.         3.        
+ 60.001n    2.         2.         3.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=6444, fourier=0, total=8593
+transient timesteps: accepted=2149, rejected=0, total=2149
+nodes: user=3, subckt=0, model=4, total=7
+dctran density=14.3%, ac density=14.3%

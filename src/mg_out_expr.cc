@@ -372,7 +372,8 @@ public:
   }
   void new_literal(std::ostream& o, Token_CONSTANT const& c);
   void new_rhs(Token_NODE const* v){
-    new_ref("va::LNR(d->n_(MOD::n_" + v->code_name() + "))");
+    new_ref("_v_n_" + v->code_name() + "/*logic node*/");
+    // new_ref("va::LNR(d->n_(MOD::n_" + v->code_name() + "))");
   }
   void new_rhs(Token_VAR_REF const* v){
     // TODO: linear?
@@ -904,7 +905,7 @@ std::string make_cc_expression(std::ostream& o, Expression const& e, bool dynami
   }else{
   }
   if(ctx == "af"){
-  }else if(ctx == "logic"){ untested();
+  }else if(ctx == "logic"){
     // no deps-> use ddouble..
   }else if(!dynamic && ctx!="precalc"){
   }else if(auto ex = dynamic_cast<Expression_ const*>(&e)){

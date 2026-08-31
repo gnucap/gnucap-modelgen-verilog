@@ -5,7 +5,7 @@
 `pragma modelgen nodump-discipline
 `pragma modelgen nodump-unreachable
 
-module test_opt3(np, n);
+module test_opt3(p, n);
    electrical p, n;
    inout p, n;
    analog begin

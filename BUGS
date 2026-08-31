@@ -1,5 +1,5 @@
 == limitations and work in progress
-- rise, fall, delay in $transition are constant.
+- rise, fall in $transition are constant.
 - delay in $absdelay is a constant.
 - filter contribution to potential, uses internal node.
 - ac needs operating point, even if linear:

@@ -87,7 +87,7 @@ public:
   void set_type(Data_Type const& a) {_type = a;}
   void set_local( bool x=true ) {_is_local = x;}
   bool is_local()const {return _is_local;}
-  void set_given( bool x=true ) {untested(); _is_given = x;}
+  void set_given( bool x=true ) { _is_given = x;}
   bool is_given()const {return _is_given;}
   bool is_literal()const;
   bool has_range()const {return _value_range_list.size(); }
@@ -180,6 +180,7 @@ private: // verilog input data
   Owned_Base* _assign{nullptr};
   Circuit* _circuit{nullptr};
   Hierarchical_Refs* _hrefs{nullptr};
+  bool _is_connectmodule{false};
 //  Block _module_body;
 protected:
   Variable_List_Collection _variables;
@@ -220,12 +221,15 @@ protected:
   bool has_proto()const {return _proto;}
   Module const& proto()const {assert(_proto); return *_proto;}
   void set_description(std::string const& d) {_description = d;}
+  void set_connectmodule() {_is_connectmodule = true;}
 public:
   std::string const& description()const {return _description;}
 protected:
   void dump_parameters(std::ostream& f)const;
   void dump_variables(std::ostream& f)const;
 public: // TODO
+  bool is_module()const {return !_is_connectmodule;}
+  bool is_connectmodule()const {return _is_connectmodule;}
 
   const Parameter_List_Collection& parameters()const	{return _parameters;}
   const Aliasparam_Collection& aliasparam()const	{return _aliasparam;}
@@ -244,7 +248,7 @@ public: // TODO
   bool has_states()const;
   bool has_constants()const;
   bool has_events()const    { return _has_pid[if_SET_EVENT];}
-  bool has_tr_begin()const  { return _has_pid[if_TR_BEGIN]   || times(); }
+  bool has_tr_begin()const  { return _has_pid[if_TR_BEGIN]   || times() || has_assign(); }
   bool has_tr_restore()const{ return _has_pid[if_TR_RESTORE] || times(); }
   bool has_tr_review()const { return _has_pid[if_TR_REVIEW]  || has_analysis(); }
   bool has_tr_accept()const { return _has_pid[if_TR_ACCEPT]  || has_analysis(); }
@@ -300,7 +304,7 @@ public:
   bool has_submodule()const;
   bool has_analog_block()const;
   bool has_always_block()const;
-  bool has_assign()const;
+  bool has_assign()const {return _assign;}
 
   void set_set_event (mode_mask_t m=mm_YES) {set_pid(if_SET_EVENT, m);}
   void set_ac_begin  (mode_mask_t m=mm_YES) { untested();set_pid(if_AC_BEGIN, m);}
@@ -317,6 +321,8 @@ public:
   void set_tr_accept_analog () { set_tr_accept (mm_ANALOG);}
   void set_tr_advance_analog() { set_tr_advance(mm_ANALOG);}
   void set_final_analog()      { untested(); set_final(mm_ANALOG);}
+
+  void set_tr_begin_digital  () { set_tr_begin(mm_DIGITAL);}
 private:
   void import_flags(FUNCTION_ const*);
   void set_pid  (iface_id_t p, mode_mask_t m=mm_ANALOG) {_has_pid[p] = (mode_mask_t)(_has_pid[p] | m);}
@@ -363,8 +369,12 @@ public:
 public: //filters may need this..
   Node* new_node(std::string const& p) override;
   Branch_Ref new_branch(Node*, Node*) override;
+public: // net declaration. todo n_ sth.
   void set_to_ground(Node const*);
   void set_reg(Node const*);
+  void set_input(Node const*);
+  void set_output(Node const*);
+  void set_inout(Node const*);
 public:
   Branch_Ref new_filter(Node*);
   Base /*const*/ * new_href(std::string const&n);

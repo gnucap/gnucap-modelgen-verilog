@@ -512,7 +512,7 @@ DEV_DOT* LANG_VERILOG::parse_command(CS& cmd, DEV_DOT* x)
     }
     trace1("PCOMM", cmd.tail());
     cc->cmdproc(cmd);
-    if (cmd >> ',') { untested();
+    if (cmd >> ',') {
       // there will be another just like this one
       extended = true;
     }else{

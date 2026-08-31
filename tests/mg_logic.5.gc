@@ -1,0 +1,39 @@
+attach ./modelgen_2.so
+load vams/vpulse.so
+options method=euler
+options trtol=1
+
+verilog
+
+`modelgen test_logic_5
+module test(ck, en);
+	logic ck, en, c;
+	inout ck, en;
+	reg en;
+   parameter integer n = 200;
+
+	initial en = 0;
+
+	always @(timer(1n)) begin
+		en = 1;
+		$strobe("go");
+	end
+	assign #n ck = !(ck & en);
+endmodule
+
+list
+
+!make test_logic_5.so > /dev/null
+attach ./test_logic_5.so
+
+.model logic logic delay=1p rise=20p fall=20p
+
+test t1(ck, en);
+nand #(.delay(100)) n1(aa, ck, en);
+
+list
+
+print tran l(nodes) l(n1) fi(en)
+tran 2n basic trace=a
+status notime
+end

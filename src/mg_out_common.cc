@@ -24,6 +24,7 @@
 #include "mg_.h" // TODO
 #include "mg_options.h"
 #include "mg_href.h"
+#include "mg_lib.h"
 #include <numeric>
 /*--------------------------------------------------------------------------*/
 static void make_common_default_constructor(std::ostream& o, const Module& d)
@@ -746,7 +747,11 @@ static void make_eval_subdevice_parameters(std::ostream& o , const Element_2& e)
 static void make_eval_netlist_parameters(std::ostream& o , const Module& m)
 {
   for(auto i : m.circuit()->element_list()){
-    make_eval_subdevice_parameters(o, *i);
+    if(i->state().size()){
+    o__ "// eval " << i->short_label() << " " << i->state() << "\n";
+    }else{
+      make_eval_subdevice_parameters(o, *i);
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1005,10 +1010,31 @@ static void make_common_precalc_last(std::ostream& o , const Module& m)
 void make_tr_advance_digital(std::ostream&, const Module&);
 void make_tr_regress_digital(std::ostream&, const Module&);
 void make_tr_accept_digital(std::ostream&, const Module&);
+void make_init_assign(std::ostream& o, const Module& m); // out_assign.cc?
+/*--------------------------------------------------------------------------*/
+static void make_common_init_assign(std::ostream& o, const Module& m)
+{
+  o << "inline void COMMON_" << m.identifier() <<
+    "::init_assign(MOD_" << m.identifier() << "* m) const\n{\n";
+  {
+    o__ "(void)m;\n";
+    indent x;
+    make_init_assign(o, m);
+  }
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
 /*--------------------------------------------------------------------------*/
 void make_cc_common(std::ostream& o , const Module& m)
 {
   make_tag(o);
+
+  if(m.has_analog_block() || m.has_always_block()){
+    o << "typedef MOD_" << m.identifier() << " MOD__; // here?\n";
+  }else{
+  }
+
   make_common_default_constructor(o, m);
   make_common_copy_constructor(o, m);
   make_common_destructor(o, m);
@@ -1036,6 +1062,12 @@ void make_cc_common(std::ostream& o , const Module& m)
   if(m.has_tr_begin()){
     make_common_tr_begin(o, m);
   }else{
+    o__ "// no tr_begin\n";
+  }
+  if(m.has_assign()){
+    make_common_init_assign(o, m);
+  }else{
+    o__ "// no assign\n";
   }
   if(m.has_final()){
     make_common_final(o, m);

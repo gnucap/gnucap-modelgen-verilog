@@ -14,16 +14,20 @@ module trans (t, clk);
   input clk;
   output t;
 
-  electrical t
+  electrical t;
   logic clk;
 
-  integer state = 0;
+  (*desc=""*) integer st1 = 0;
+  (*desc=""*) integer st2 = 0;
 
-  always @(edge(clk)) state = clk;
+  always @(edge(clk)) st1 = clk;
 
   analog begin
-    V(t) <+ transition(state, 1n, 1n);
+    V(t) <+ transition(st1, 1n, 1n);
   end
+
+  always @(posedge(clk)) st2 = 1;
+  always @(negedge(clk)) st2 = 0;
 endmodule
 `endmodelgen
 
@@ -40,6 +44,6 @@ clock #() c1(clk, en);
 
 .model logic logic delay=1p rise=10p fall=10p
 
-print tran v(t) l(clk) iter(0)
+print tran st1(u1) st2(u1) v(t) l(clk) iter(0)
 tran 44n
 tran 44n 48n .1n

@@ -54,6 +54,9 @@ private:
     return "d->node_is_connected_";
   }
   void make_cc_dev(std::ostream& o)const override {
+    o__ "bool node_is_connected_(node_t const& i)const {\n";
+    o____ "return i.e_() != INVALID_NODE;\n";
+    o__ "}\n";
     o__ "bool node_is_connected_(va::LNR const& i)const {\n";
     o____ "return i.is_connected();\n";
     o__ "}\n";

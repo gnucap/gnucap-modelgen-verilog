@@ -1,0 +1,56 @@
+attach ./modelgen_2.so
+load vams/vpulse.so
+options method=euler
+options trtol=1
+
+verilog
+
+`modelgen test_logic_4
+module test(a, b);
+	logic a;
+	logic b;
+	input b;
+	inout a;
+	logic c;
+	reg c;
+	logic d;
+	reg d;
+
+	initial c = 0;
+	initial d = 1;
+
+	(*desc="cnt"*) integer cnt;
+	(*desc="st"*) real st = 0;
+	always @(posedge(b)) begin
+		if(a == b) cnt = cnt + 2;
+		if(b == a) cnt = cnt - 1;
+		d = 1;
+		if(b == c) cnt = cnt + d;
+		if(!(b == d)) cnt = cnt + 5;
+	end
+endmodule
+
+list
+
+!make test_logic_4.so > /dev/null
+attach ./test_logic_4.so
+
+test #() dut(en , clk );
+resistor #(.r(1k)) dut(\1 ,\2 );
+capacitor #(.c(5f)) dut(\2 , gnd);
+
+
+ground gnd
+vpulse #(.val0(0) .val1(5) .width(100p) .period(200p)) v1(aclk, gnd);
+vpulse #(.val0(0) .val1(5), .td(.49n)) v1(aen, gnd);
+nand #(20) n1(clk, aclk);
+and #(20) n1(en, aen);
+
+.model logic logic delay=1p rise=10p fall=15p
+
+list
+
+print tran l(clk) l(en) cnt(dut) iter(0)
+tran 1n .1n basic
+status notime
+end

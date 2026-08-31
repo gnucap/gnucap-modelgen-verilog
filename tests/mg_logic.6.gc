@@ -1,0 +1,56 @@
+attach ./modelgen_2.so
+load vams/vpulse.so
+options method=euler
+options trtol=1
+
+verilog
+
+`modelgen test_logic_6
+module clock(clk, en);
+   output clk;
+   input en;
+   reg clk;
+   logic en, clk;
+   parameter real cycle = 1.0e-10;
+   parameter real delay = cycle/2;
+   parameter real duty = 50.0;
+   parameter real step = duty*cycle/100.0;
+
+   initial begin
+      clk = 0;
+   end
+
+   always @(timer(delay, cycle)) begin
+      if (en) begin
+         clk = !clk;
+      end else begin
+         clk = 0;
+      end
+   end
+   always @(timer(delay+step, cycle)) begin
+      if (en) begin
+         clk = !clk;
+      end else begin
+         clk = 0;
+      end
+   end
+endmodule
+`endmodelgen
+
+list
+
+!make test_logic_6.so > /dev/null
+attach ./test_logic_6.so
+
+ground gnd;
+
+.model logic logic delay=1p rise=10p fall=10p vmax=1.0 vmin=0.0 thh=0.75 thl=0.25
+clock #() clock_source(clk,en);
+c_d_a #(.model("logic")) c1(clk_probe_v,clk);
+vsource #(.dc(1)) ven(en_, gnd);
+c_a_d #(.model("logic")) c2(en, en_);
+
+print tran v(en) l(en) l(clk) v(clk_probe_v) iter(0)
+tran 4n
+status notime
+end

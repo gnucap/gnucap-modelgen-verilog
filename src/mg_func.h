@@ -178,6 +178,7 @@ public: // bug
 public: // XDT refactor
   virtual bool port_hack()const {return true;} // TODO
   virtual int max_args()const { untested();assert(0); return 0; }
+  virtual int num_values()const { return 0; }
   virtual Branch* branch__() const {return _br;}
   virtual void set_n_to_gnd__()const { untested();assert(0);}
   virtual void set_p_to_gnd__()const { untested();assert(0);}

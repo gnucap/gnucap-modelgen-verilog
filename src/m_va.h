@@ -957,7 +957,12 @@ public:
    virtual double read_filter()const { untested();unreachable(); return 0;}
 };
 /*--------------------------------------------------------------------------*/
+extern NODE ground_node;
+/*--------------------------------------------------------------------------*/
 namespace va {
+/*--------------------------------------------------------------------------*/
+typedef PARAMETER<double> Pdbl;
+typedef PARAMETER<int> Pint;
 /*--------------------------------------------------------------------------*/
 inline double PORT_FLOW(int i, BASE_SUBCKT const* m)
 {
@@ -1007,11 +1012,137 @@ inline LOGICVAL to_logic_(int i)
   }
 }
 /*--------------------------------------------------------------------------*/
-class LNR {
-  const node_t& _ln;
+// from vvp_bit4_t. partial, ported to c++, need work and separate header.
+enum bitXZ {
+  b4_0 = 0,
+  b4_1 = 1,
+  b4_X = 3,
+  b4_Z = 2
+};
+/*--------------------------------------------------------------------------*/
+class VALOGIC {
+  bitXZ _b4;
 public:
-  explicit LNR(node_t const& ln) : _ln(ln) { };
-  operator int()const { return lptr()->lv_future(); }
+  explicit VALOGIC(node_t const&);
+  explicit VALOGIC(bitXZ const& b) : _b4(b) {}
+  explicit VALOGIC(bool const& b) : _b4(b?b4_1:b4_0) {}
+  VALOGIC z2x()const { untested();
+    return VALOGIC((bitXZ) ( (int)_b4 | ((int)_b4 >> 1) ));
+  }
+  operator bool()const { return _b4 == b4_1; }
+  bool to_bool()const { return _b4 == b4_1; }
+  bool is_unknown()const { return _b4 == b4_X; }
+  int raw_int()const { return _b4; }
+  VALOGIC& operator=(bitXZ b) { _b4 = b; return *this; }
+  int operator+(int b) const { return b + to_bool(); }
+  double operator+(double b) const { return b + to_bool(); }
+  //VALOGIC const operator==(VALOGIC b) const {
+  //  return VALOGIC::operator==(b);
+  //}
+  VALOGIC const operator==(int b) const {
+    return *this == VALOGIC(b?b4_1:b4_0);
+  }
+  VALOGIC const operator==(bool b) const {
+    return *this == VALOGIC(b?b4_1:b4_0);
+  }
+  VALOGIC operator==(VALOGIC const& o)const {
+    bitXZ ret;
+    if(_b4 == b4_0 && o._b4 == b4_0){ untested();
+      ret = b4_1;
+    }else if(_b4 == b4_1 && o._b4 == b4_1){
+      ret = b4_1;
+    }else if(_b4 == b4_1 && o._b4 == b4_0){
+      ret = b4_0;
+    }else if(_b4 == b4_0 && o._b4 == b4_1){
+      ret = b4_0;
+    }else{ untested();
+      // incomplete?
+      ret = b4_X;
+    }
+    return VALOGIC(ret);
+  }
+  friend VALOGIC operator|(VALOGIC const& a, VALOGIC const& b);
+  friend VALOGIC operator&(VALOGIC const& a, VALOGIC const& b);
+protected:
+  void assign(bool b) { _b4 = b?b4_1:b4_0;}
+}; // VALOGIC
+/*--------------------------------------------------------------------------*/
+int operator+(int a, VALOGIC const& b) { return b + a; }
+int operator*(int a, VALOGIC const& b) { return b * a; }
+/*--------------------------------------------------------------------------*/
+double operator+(Pdbl const& a, VALOGIC const& b) { return b + double(a); }
+double operator*(Pdbl const& a, VALOGIC const& b) { return b * double(a); }
+/*--------------------------------------------------------------------------*/
+VALOGIC operator | (VALOGIC const& a, VALOGIC const& b)
+{
+  if (a._b4 == b4_1 || b._b4 == b4_1) {
+    return VALOGIC(b4_1);
+  }else{
+    return VALOGIC(bitXZ((int)a._b4 | (int)b._b4));
+  }
+}
+/*--------------------------------------------------------------------------*/
+VALOGIC operator & (VALOGIC const& a, VALOGIC const& b)
+{
+  if (a._b4 == b4_0 || b._b4 == b4_0) {
+    return VALOGIC(b4_0);
+  }else{
+    return VALOGIC(bitXZ((int)a._b4 | (int)b._b4));
+  }
+}
+/*--------------------------------------------------------------------------*/
+inline VALOGIC::VALOGIC(node_t const& n) : _b4(b4_0)
+{
+  if(n.n_() == &ground_node){
+    _b4 = b4_0; // incomplete();
+  }else{
+    LOGIC_NODE const* ln = prechecked_cast<LOGIC_NODE const*>(n.operator->());
+    assert(ln);
+
+    if(ln->lv().is_unknown()) {
+      _b4 = b4_X;
+    }else if(ln->last_change_time() != CKT_BASE::_sim->_time0){
+      assign(ln->lv_future());
+    }else if(ln->lv().is_falling()) {
+      _b4 = b4_1;
+    }else if(ln->lv().is_rising()) {
+      _b4 = b4_0;
+    }else{
+      assign(ln->lv_future());
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+class LNR : public VALOGIC {
+  typedef VALOGIC base;
+  node_t& _ln;
+  bool _set{false};
+public:
+  explicit LNR(node_t& ln) : VALOGIC(ln), _ln(ln) { };
+  base& operator=(LNR const& t){
+    _set = true;
+    base::operator=(t);
+    return *this;
+  }
+  base& operator=(int const& t){
+    _set = true;
+    base::operator=(t?b4_1:b4_0);
+    trace2("LNR assign", t, to_bool());
+    return *this;
+  }
+  base& operator=(double const& t){ operator=(int(t)); return *this; }
+  base& operator=(Pdbl const& t)  { operator=(int(t)); return *this; }
+  base& operator=(Pint const& t)  { operator=(int(t)); return *this; }
+
+  double lv_future()const {
+    return lptr()->lv_future();
+  }
+  double final_time()const {
+    return lptr()->final_time();
+  }
+  operator int()const { return to_bool(); }
+  operator double()const { return to_bool(); }
+// private:
   LOGIC_NODE const* lptr()const {
     LOGIC_NODE const* ln = prechecked_cast<LOGIC_NODE const*>(_ln.operator->());
     assert(ln);
@@ -1022,27 +1153,44 @@ public:
   bool is_connected()const{
     return _ln.e_() != INVALID_NODE;
   }
+
+  void accept();
 };
 /*--------------------------------------------------------------------------*/
-void accept_node_value(node_t& n, bool lv, double delay)
+inline void LNR::accept()
 {
-  node_l& nl = reinterpret_cast<node_l&>(n);
-  nl->set_mode(moDIGITAL); // assert?..
-  delay += 1e-20; // HACK
+  if(_set){
+    assert(prechecked_cast<LOGIC_NODE*>(_ln.n_()));
+    node_l& nl = reinterpret_cast<node_l&>(_ln);
+    nl->set_mode(moDIGITAL); // assert?..
+    double delay = 1e-20; // hack, incomplete.
 
-  LOGICVAL lvl(lv?lvSTABLE1:lvSTABLE0);
-  if(nl->lv().is_unknown()){
-    nl->set_event(delay, lvl);
-  }else if(nl->lv_future() != lv){
-    nl->set_event(delay, lvl);
-  }else if(nl->final_time() > CKT_BASE::_sim->_time0){ untested();
-    // (hack)
-    nl->set_event(delay, lvl);
-  }else{ untested();
-  }
+    // BUG. cast to bool.
+    bool lv = to_bool();
+    LOGICVAL lvl(lv?lvSTABLE1:lvSTABLE0);
+    if(nl->lv().is_unknown()){
+      nl->set_event(delay, lvl);
+    }else if(nl->lv_future() != lv){
+      nl->set_event(delay, lvl);
+    }else if(nl->final_time() > CKT_BASE::_sim->_time0){
+      // (hack, needed?)
+      nl->set_event(delay, lvl);
+    }else{ untested();
+    }
     // nl->propagate();
     // nl->set_quality(qGOOD);
     // nl->improve_quality();
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+void initial_node_value(node_t& n, bool lv)
+{
+  node_l& nl = reinterpret_cast<node_l&>(n);
+  nl->set_mode(moDIGITAL); // assert?..
+
+  LOGICVAL lvl(lv?lvSTABLE1:lvSTABLE0);
+  nl->force_initial_value(lvl);
 }
 /*--------------------------------------------------------------------------*/
 } // va

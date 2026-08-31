@@ -4,7 +4,7 @@
 `pragma modelgen nodump-nature
 `pragma modelgen nodump-discipline
 
-module test_dep5(np, n);
+module test_dep5(p, n);
    electrical p, n;
    inout p, n;
    analog begin : main

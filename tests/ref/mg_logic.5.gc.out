@@ -1,0 +1,29 @@
+paramset logic logic;
+ .delay=1p; .vmax=NA( 5.); .vmin=NA( 0.); .unknown=NA( 2.5); .rise=20p; .fall=20p; .rs=NA( 100.); .rw=NA( 1.G); .thh=NA( 0.75); .thl=NA( 0.25); .mr=NA( 5.); .mf=NA( 5.); .over=NA( 0.1); .tnom=NA( 27.);
+endparamset
+
+test #() t1 (ck, en);
+nand #(.delay(100)) n1 (aa, ck, en);
+n1: can't find subckt: logicnand2, forcing digital
+#Time       l(aa)      l(ck)      l(en)      l(n1)      fi(en)    
+ 0.         3.         3.         0.         3.         Inf       
+ 20.E-12    3.         3.         0.         3.         Inf       
+go
+ 1.E-9      3.         3.         1.         3.         1.001E-9  
+ 1.001E-9   2.         2.         3.         2.         Inf       
+ 1.101E-9   0.         2.         3.         0.         Inf       
+ 1.201E-9   1.         1.         3.         1.         Inf       
+ 1.301E-9   3.         1.         3.         3.         Inf       
+ 1.401E-9   2.         2.         3.         2.         Inf       
+ 1.501E-9   0.         2.         3.         0.         Inf       
+ 1.601E-9   1.         1.         3.         1.         Inf       
+ 1.701E-9   3.         1.         3.         3.         Inf       
+ 1.801E-9   2.         2.         3.         2.         Inf       
+ 1.901E-9   0.         2.         3.         0.         Inf       
+ 2.E-9      0.         2.         3.         0.         Inf       
+ 2.001E-9   1.         1.         3.         1.         Inf       
+Gnucap   System status
+iterations: op=0, dc=0, tran=42, fourier=0, total=57
+transient timesteps: accepted=15, rejected=0, total=15
+nodes: user=3, subckt=0, model=0, total=3
+dctran density=33.3%, ac density=33.3%

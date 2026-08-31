@@ -205,7 +205,7 @@ static void make_set_parameters(std::ostream& o, const Element_2& e, std::string
   }else{ untested();
     o << ", 0, nullptr";
   }
-  o << ", " << e.net_nodes() << ", nodes);\n";
+  o << ", " << e.net_nodes() << ", nodes); // set\n";
 }
 /*--------------------------------------------------------------------------*/
 static void map_subdev_nodes(std::ostream& o, const Element_2& e)
@@ -231,7 +231,7 @@ static void map_subdev_nodes(std::ostream& o, const Element_2& e)
       comma = ",";
     }
   }
-  {
+  { // make_set_parameters DUP?
     o << "};\n";
     std::string value = e.value();
     if(value == ""){
@@ -245,8 +245,12 @@ static void map_subdev_nodes(std::ostream& o, const Element_2& e)
       o << ", const_cast<COMPONENT*>(" << e.code_name() << ")->mutable_common()";
     }
     o << ", " << value;
-    o << ", 0, nullptr";
-    o << ", " << e.net_nodes() << ", nodes);\n";
+    if (e.state() != "") {
+      o << ", /*states:*/" << e.num_states() << ", " << e.state() << ".ptr()";
+    }else{
+      o << ", 0, nullptr";
+    }
+    o << ", " << e.net_nodes() << ", nodes); // map\n";
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -520,11 +524,16 @@ static void make_tr_begin(std::ostream& o, const Module& m)
     o__ "c->tr_begin_analog(this);\n"; // call from COMMON::tr_begin?
   }else{
   }
-  if(m.has_tr_begin_digital()) { untested();
+  if(m.has_tr_begin_digital()) {
     o__ "mc->tr_initial_digital(this);\n"; // call from COMMON::tr_begin?
     o__ "c->tr_begin_digital(this);\n"; // call from COMMON::tr_begin?
   }else{
   }
+  if(m.has_assign()) {
+    o__ "c->init_assign(this);\n";
+  }else{
+  }
+
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -1041,6 +1050,18 @@ static void make_module_set_ports(std::ostream& o, Module const& m)
       o____ "n_(" << pp->code_name() << ").set_used(); // reg\n";
     }else{
     }
+    if(pp->node()->is_used()){
+      if(pp->is_input()) {
+	o____ "n_(" << pp->code_name() << ").set_input();\n";
+      }else{
+      }
+      if(pp->is_output()) {
+	o____ "n_(" << pp->code_name() << ").set_output();\n";
+      }else{
+      }
+    }else{
+      o____ "// n_(" << pp->code_name() << "). not used\n";
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1061,6 +1082,7 @@ static void make_module_new_local_nodes(std::ostream& o, Module const& m)
     }else if(nn->is_used()){
       o__ "// internal " << nn->name() << " : " << nn->number() << "\n";
       make_module_new_local_node(o, *nn);
+    }else if(nn->is_reg()){
     }else{
       o__ "// unused " << nn->name() << " : " << nn->number() << "\n";
       o__ "n_(n_" << nn->name() << ").set_to_ground(nullptr);\n"; // for now.
@@ -1085,22 +1107,24 @@ static void make_module_allocate_nodes(std::ostream& o, Module const& m)
 //    o____ p->code_name() << ", // " << p->node_number() << "\n";
     o__ "n_(" << p->code_name() << ").set_used();\n"; // mg_port.0
     o__ "n_(" << p->code_name() << ").allocate(3); // no-op unless floating\n";
-//    if(p->node()){
-////      o____ p->node()->code_name() << " = " << p->code_name() << ",\n";
-//    }else{
-//    }
-//    if(p->node_number()!=-1){
-//      o << "// is node number " << p->node_number() << "\n";
-//      isport[p->node_number()] = n;
-//    }else{
-//    }
-//    ++n;
+    if(p->is_input()) {
+      o____ "n_(" << p->code_name() << ").set_input();\n"; //why?
+    }else{
+    }
+    if(p->is_output()) {
+      o____ "n_(" << p->code_name() << ").set_output();\n"; //why?
+    }else{
+    }
   }
   for (int n=1; n<=int(m.circuit()->nodes().size()); ++n) {
     Node const* nn = m.circuit()->nodes()[n];
     assert(nn);
     if(nn->number() == 0) {
     }else if(nn->number() < n){
+    }else if(nn->is_reg()){
+      o__ "n_(n_" << nn->name() << ").set_type(OPT::default_logic); // reg\n";
+      o__ "n_(n_" << nn->name() << ").set_used();\n";
+      o__ "n_(n_" << nn->name() << ").allocate(3);\n";
     }else if(nn->is_used()){
       o__ "n_(n_" << nn->name() << ").set_used();\n";
       o__ "n_(n_" << nn->name() << ").allocate(3);\n";
@@ -1258,6 +1282,7 @@ static void make_module_precalc_last(std::ostream& o, Module const& m)
   o__ "(void)c;\n";
 
   if(m.has_analog_block()){
+    // tr_begin??
     o__ "zero_filter_readout();\n";
   }else{
   }
@@ -1335,6 +1360,26 @@ static void make_module_expand_last(std::ostream& o, Module const& m)
   o__ "assert(cc);\n";
   o__ "cc->expand_last(this);\n";
   o__ "attach_common(cc);\n";
+  o << "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_module_make_fanout(std::ostream& o, Module const& m)
+{
+  make_tag(o);
+  String_Arg const& mid = m.identifier();
+  o << "void MOD_" << mid << "::make_fanout()\n{\n";
+  o__ "COMPONENT::make_fanout();\n"; // skip base_subckt?
+  o__ "for (int ii = 0;  ii < net_nodes();  ++ii) {\n";
+  o____ "assert(ii<2);\n";
+  o____ "if (n_(ii).is_grounded()) { untested();\n";
+  o____ "}else if (!n_(ii).is_input()) {\n";
+  o____ "}else if (auto l = dynamic_cast<LOGIC_NODE*>(n_(ii).operator->())) {\n";
+  o____ "}else{ untested();\n";
+  o____ "}\n";
+  o__ "}\n";
+
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -1604,6 +1649,10 @@ void make_cc_module(std::ostream& o, const Module& m)
   make_module_expand(o, m);
   if(m.has_expand_last()){
     make_module_expand_last(o, m);
+  }else{
+  }
+  if(m.is_connectmodule()){
+    make_module_make_fanout(o, m);
   }else{
   }
   make_module_precalc_last(o, m);

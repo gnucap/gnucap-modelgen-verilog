@@ -103,5 +103,27 @@ void make_assign_expand(std::ostream& , Module const& m)
   }
 }
 /*--------------------------------------------------------------------------*/
+void make_init_assign(std::ostream& o, const Module& m)
+{
+  auto a = prechecked_cast<Assign const*>(&m.assigns());
+  assert(a);
+  for(auto e : a->list()) {
+    if(e->has_delay()) {
+//    if(e->state().size()){
+      o__ "// " << e->code_name() << "\n";
+      o__ "{ // init param expression \n";
+      std::string t0;
+      {
+	indent x;
+	t0 = make_cc_expression(o, e->delay(), false, "adjust");
+	o__ "m->" << e->state() << "[0] = " << t0 << ";\n";
+      }
+      o__ "}\n";
+    }else{
+      o__ "// no delay: " << e->code_name() << "\n";
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

@@ -23,15 +23,15 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "mg_func.h"
-#include "mg_out.h"
 #include "mg_analog.h"
 #include "mg_token.h"
 #include <globals.h>
 #include <u_parameter.h>
+#include "f__.cc"
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
-static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
+static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps, bool delay_arg)
 {
 
   {
@@ -41,134 +41,89 @@ static void make_cc_tmp(std::ostream& o, std::string state, TData const& deps)
     size_t k = 2;
 
     for(auto const& v : deps.ddeps()) {
-      // char sign = f.reversed()?'-':'+';
-      o__ "// dep " << code_name(v) << "\n";
-      // if(f->branch() == v->branch()){ untested(); }
       if(branch(v)->is_short()){ untested();
       }else{
 	o__ "assert(" << "t0[d" << code_name(v) << "] == t0[d" << code_name(v) << "]" << ");\n";
 	o__ "// assert(!d->" << state << "[" << k << "]);\n";
-	o__ "d->" << state << "[" //  << k << "]"
+	o__ "d->" << state << "["
 	  << "MOD::" << state << "_::dep" << code_name(v) << "] "
 	  " = " << sign << " " << "t0[d" << code_name(v) << "]; // (4)\n";
 	++k;
       }
     }
+    if(delay_arg){
+      o__ "d->" << state << "[" << k << "] = " << sign << " " << "t1; //delay_arg\n";
+      ++k;
+    }else{ untested();
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
-static int n_filters;
-/*--------------------------------------------------------------------------*/
-class Token_TRANSITION : public Token_CALL {
-public:
-  explicit Token_TRANSITION(const std::string Name, FUNCTION_ const* f)
-    : Token_CALL(Name, f) {}
-private:
-  explicit Token_TRANSITION(const Token_TRANSITION& P, Base const* data, Expression_ const* e = nullptr)
-    : Token_CALL(P, data, e) {} // , _item(P._item) {}
-  Token* clone()const override {untested(); return new Token_TRANSITION(*this);}
-
-  void stack_op(Expression* e)const override;
-  Branch* branch() const;
-};
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 const int NUM_ARGS = 5;
 /*--------------------------------------------------------------------------*/
-class TRANSITION : public MGVAMS_FILTER /* FUNCTION_ */ {
-  Module* _m{nullptr};
+/*--------------------------------------------------------------------------*/
+class TRANSITION : public MGVAMS_FILTER {
   Probe const* _prb{nullptr};
-  std::string _code_name;
 public: // HACK
-  Branch* _br{nullptr};
   mutable Branch const* _output{nullptr};
-  Node_Ref _p;
-  Node_Ref _n;
 
   explicit TRANSITION() : MGVAMS_FILTER() {
     set_label("transition");
   }
   explicit TRANSITION(TRANSITION const& p) : MGVAMS_FILTER(p) {
   }
-  ~TRANSITION(){
-//    delete _prb; belongs to _m
-  }
+  ~TRANSITION(){ }
   virtual TRANSITION* clone()const override {
     return new TRANSITION(*this);
   }
 protected:
-  void set_code_name(std::string x){
-    _code_name = x;
+  int max_args()const override {return NUM_ARGS;}
+  int num_values()const override { return has_delay_arg();}
+  bool port_hack()const override {return false;}
+  bool is_analog_filter()const override {return true;}
+  std::string eval_name()const override {
+    if(_m){
+      std::string id = _m->identifier().to_string();
+      return "COMMON_" + id + "::_common" + code_name();
+    }else{
+      // unreachable();
+      return "missing_m??";
+    }
   }
-  std::string code_name()const override{
-    return _code_name;
+private:
+  bool has_delay_arg()const {return num_args()>1;}
+protected:
+  std::string code_name()const override {
+    return "_b_" + short_label();
   }
 public:
-  // Token* new_token(Expression_ const* e) ...
-  // Module* m = e->owner()...
-  Token* new_token(Module& m, size_t na)const override {
-    assert(na != size_t(-1));
-
-    std::string filter_code_name = label() + "_" + std::to_string(n_filters++);
-
-    TRANSITION* cl = clone();
-    {
-      cl->set_label(filter_code_name); // label()); // "_b_" + filter_code_name);
-      cl->set_code_name("_b_" + filter_code_name);
-      assert(na<6);
-      cl->set_num_args(na);
-      cl->_m = &m;
-      m.push_back(cl);
-    }
-
-    Node* np = m.new_node(filter_code_name + "_p");
-    Node* nn = &Node_Map::mg_ground_node;
-    np->set_to(&Node_Map::mg_ground_node, "_short_b_"+filter_code_name+"()");
-
-    cl->_p = np;
-    cl->_n = nn;
-    {
-      Branch* br = m.new_filter(np);
-//      br->set_source();
-      assert(br);
-      assert(const_cast<Branch const*>(br)->owner());
-      Branch_Ref prb(br);
-      cl->_br = br;
-
-      cl->_prb = m.new_probe("potential", prb);
-      br->set_filter(cl);
-      std::string id = m.identifier().to_string();
-      br->set_eval("COMMON_" + id + "::_common_b_" + filter_code_name);
-      m.new_filter();
-    }
-
-    return new Token_TRANSITION(label(), cl);
-  }
+  Token* new_token(Module&, size_t)const override { return nullptr; }
 
   void make_cc_common(std::ostream& o)const override{
     o << "public:\n";
-    o__ "class common" << _code_name <<": public COMMON_FILT {\n";
+    o__ "class common" << code_name() <<": public COMMON_FILT {\n";
     o____ "COMMON_COMPONENT* clone()const override{unreachable(); return nullptr;}\n";
     o__ "public:\n";
-    o____ "common" << _code_name <<"(int i=CC_STATIC) : COMMON_FILT(i) {}\n";
+    o____ "common" << code_name() <<"(int i=CC_STATIC) : COMMON_FILT(i) {}\n";
     o__ "public:\n";
     o__ "private:\n";
     o____ "std::string name()const override {return \"transition_name\";}\n";
     o__ "};\n";
-    o__ "static common" << _code_name
-      << " _common" << _code_name << ";\n";
+    o__ "static common" << code_name()
+      << " _common" << code_name() << ";\n";
   }
 
   void make_cc_dev(std::ostream& o)const override{
-    o__ "ddouble " << _code_name << "(ddouble t0";
+    indent x(2);
+    o__ "ddouble " << code_name() << "(ddouble t0";
       assert(num_args());
       assert(num_args() <= NUM_ARGS);
       for(int n=1; n < int(num_args()); ++n){
 	o << ", double t" << n;
       }
     o << "); // (d)\n";
-    o__ "bool _short"+_code_name+"()const {return " << bool(_output) << ";}\n";
-    o__ "ddouble " << _code_name << "__precalc(ddouble const&";
+    o__ "bool _short"+code_name()+"()const {return " << bool(_output) << ";}\n";
+    o__ "ddouble " << code_name() << "__precalc(ddouble const&";
       assert(num_args());
       assert(num_args() <= NUM_ARGS);
       for(int n=1; n < int(num_args()); ++n){
@@ -180,18 +135,19 @@ public:
   void make_cc_impl(std::ostream&o)const override {
     std::string cn = _br->code_name();
     std::string id = _m->identifier().to_string();
-    o << "MOD_"<< id <<"::ddouble MOD_" << id << "::" << _code_name << "(ddouble t0";
+    o << "MOD_"<< id <<"::ddouble MOD_" << id << "::" << code_name() << "(ddouble t0";
     for(int n=1; n < int(num_args()); ++n){
       o << ", double t" << n;
     }
     o << ")\n{\n";
+    indent x(2);
     for(int n=1; n < int(num_args()); ++n){
       o__ "(void)t" << n << ";\n";
     }
     o__ "MOD_" << id << "* d = this;\n";
     o__ "typedef MOD_" << id << " MOD;\n";
     std::string state = "_st" + cn;
-    make_cc_tmp(o, state, _br->deps());
+    make_cc_tmp(o, state, _br->deps(), has_delay_arg());
 
     if(_output){ untested();
       o__ "// subdevice\n";
@@ -213,12 +169,12 @@ public:
     o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
-    o << "COMMON_" + id + "::common" << _code_name
-      << " COMMON_" + id + "::_common" << _code_name << ";\n"
+    o << "COMMON_" + id + "::common" << code_name()
+      << " COMMON_" + id + "::_common" << code_name() << ";\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 //    std::string id = m.identifier().to_string();
-    o << "ddouble MOD_" << id << "::" << _code_name << "__precalc(ddouble const&";
+    o << "ddouble MOD_" << id << "::" << code_name() << "__precalc(ddouble const&";
     assert(num_args());
     assert(num_args() <= NUM_ARGS);
 
@@ -289,18 +245,7 @@ public:
     unreachable();
     return "transition";
   }
-  void stack_op(Expression*)const override {
-    throw Exception("invalid");
-  }
-  Probe const* prb()const {return _prb;}
-  void set_n_to_gnd()const {
-    assert(_m);
-    _m->set_to_ground(_br->n());
-  }
-  void set_p_to_gnd()const { untested();
-    assert(_m);
-    _m->set_to_ground(_br->p());
-  }
+  Probe const* prb()const { untested();return _prb;}
 private:
   Branch const* output()const override;
   Node_Ref p()const override;
@@ -309,84 +254,6 @@ private: // setup
   Branch* branch()const override { return _br; }
 } trans;
 DISPATCHER<FUNCTION>::INSTALL d0(&function_dispatcher, "transition", &trans);
-/*--------------------------------------------------------------------------*/
-Branch* Token_TRANSITION::branch() const
-{
-  auto func = prechecked_cast<TRANSITION const*>(f());
-  assert( func);
-  assert( func->_br);
-  return func->_br;
-}
-/*--------------------------------------------------------------------------*/
-static Expression_* clone_args(Base const* e)
-{
-  if(auto e_ = dynamic_cast<Expression_ const*>(e)) {
-    return e_->clone();
-  }else{ untested();
-    unreachable();
-    return nullptr;
-  }
-}
-/*--------------------------------------------------------------------------*/
-void Token_TRANSITION::stack_op(Expression* e)const
-{
-  assert(e);
-  Token_CALL::stack_op(e);
-	
-  assert(!e->is_empty());
-  auto cc = prechecked_cast<Token_CALL const*>(e->back());
-  assert(cc);
-  assert(cc->args());
-  trace1("Token_TRANSITION::stack_op", cc->args()->size());
-  e->pop_back();
-
-  auto func = prechecked_cast<TRANSITION const*>(f());
-  assert(func);
-
-  if(cc->args()->size() < 1){ untested();
-    throw Exception("syntax error, need delay");
-  }else{
-  }
-
-  if(auto dd = prechecked_cast<TData const*>(cc->data())) {
-    // cc->args()[0]->data?
-    assert(dd);
-    for(Dep const& i : dd->ddeps()) {
-      trace1("xdt arg deps", ::code_name(i));
-    }
-
-    branch()->deps().clear();
-    branch()->deps() = *dd; // HACK
-    if(1){
-      func->set_n_to_gnd();
-    }else if(0 /*sth linear*/){ untested();
-      // somehow set loss=0 and output ports to target.
-    }else{ untested();
-    }
-
-    auto d = new TData;
-    assert(func->prb()->branch() == branch());
-    d->ddeps().insert(Dep(branch()->potential_dep(), func->prb(), Dep::_LINEAR)); // BUG?
-    auto N = new Token_TRANSITION(*this, d, clone_args(cc->args()));
-    assert(N->data());
-    assert(dynamic_cast<TData const*>(N->data()));
-    e->push_back(N);
-    assert(f()==N->f());
-    delete(cc);
-  }else if(!e->size()) { untested();
-    unreachable();
-  }else if ( dynamic_cast<Token_PARLIST_ const*>(e->back())) { untested();
-    unreachable();
-//    auto d = new TData;
-//    d->ddeps().insert(Dep(branch()->potential_dep(), branch(), func->prb())); // BUG?
-//    auto N = new Token_TRANSITION(*this, d);
-//    assert(N->data());
-//    assert(dynamic_cast<TData const*>(N->data()));
-//    e->push_back(N);
-  }else{ untested();
-    unreachable();
-  }
-};
 /*--------------------------------------------------------------------------*/
 Branch const* TRANSITION::output() const
 {
@@ -400,12 +267,12 @@ Branch const* TRANSITION::output() const
 #if 1
 Node_Ref TRANSITION::p() const
 {
-  return _p;
+  return _br->p();
 }
 /*--------------------------------------------------------------------------*/
 Node_Ref TRANSITION::n() const
 {
-  return _n;
+  return _br->n();
 }
 #endif
 /*--------------------------------------------------------------------------*/

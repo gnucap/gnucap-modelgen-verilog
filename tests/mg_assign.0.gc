@@ -9,13 +9,14 @@ discipline ldisc;
   domain discrete;
 enddiscipline;
 module test_assign0(in, a, b);
+  parameter integer zero = 0;
   input in;
   output a;
   output b;
   electrical foo;
   ldisc a;
   assign a = !in;
-  assign #100 b = !in;
+  assign #(zero + 100) b = !in;
 endmodule
 `endmodelgen
 

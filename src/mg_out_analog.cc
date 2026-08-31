@@ -70,10 +70,11 @@ public:
 			      || _mode==modeTR_REVIEW ; } // || ...?
   bool is_precalc()const override { return _mode==modePRECALC; }
   bool is_probe()const   { untested(); return _mode==modePROBE; }
-  bool is_tr_initial()const  { return _mode==modeTR_INITIAL; }
+  bool is_tr_initial()const override { return _mode==modeTR_INITIAL; }
   bool is_tr_begin()const  { return _mode==modeTR_BEGIN; }
   bool is_tr_review()const  { untested(); return _mode==modeTR_REVIEW; }
   bool is_tr_accept()const override { return _mode==modeTR_ACCEPT; }
+  bool is_tr_regress()const override { return _mode==modeTR_REGRESS; }
   bool is_tr_advance()const  { untested(); return _mode==modeTR_ADVANCE; }
   bool is_tr_restore()const override { return _mode==modeTR_RESTORE; }
   bool is_final()const  { return _mode==modeFINAL; }
@@ -90,24 +91,24 @@ private:
 private:
   void make_af_args    (std::ostream& o, const Analog_Function& f)const;
   void make_af_body    (std::ostream& o, const Analog_Function& f)const;
-  void make_initial    (std::ostream& o, AnalogInitialStmt const& s)const;
-  void make_cond       (std::ostream& o, AnalogConditionalStmt const& s)const;
+//  void make_initial    (std::ostream& o, AnalogInitialStmt const& s)const;
+//  void make_cond       (std::ostream& o, AnalogConditionalStmt const& s)const;
   void make_switch     (std::ostream& o, AnalogSwitchStmt const& s)const;
-  void make_for        (std::ostream& o, AnalogForStmt const& s)const;
-  void make_while      (std::ostream& o, AnalogWhileStmt const& s)const;
+//  void make_for        (std::ostream& o, ForStmt const& s)const;
+//  void make_while      (std::ostream& o, WhileStmt const& s)const;
   void make_seq        (std::ostream& o, AnalogSeqStmt const& s)const;
-  void make_ctrl       (std::ostream& o, AnalogSeqBlock const& s)const;
-  void make_assignment (std::ostream& o, Assignment const& a)const;
+  void make_assignment (std::ostream& o, Assignment const& a)const override;
   void make_contrib    (std::ostream& o, Contribution const& C)const;
   void make_evt        (std::ostream& o, AnalogEvtCtlStmt const& s)const;
-  void make_loop       (std::ostream& o, AnalogWhileStmt const& s) const;
+//  void make_loop       (std::ostream& o, WhileStmt const& s) const;
   void make_task       (std::ostream& o, System_Task const& s)const;
   void make_variable   (std::ostream& o, Token_VAR_REF const& v)const;
   void make_variable   (std::ostream& o, Variable_Decl const& v)const;
 private:
+  void make_node_refs(std::ostream& o, const Module& m)const;
   void make_block_variables(std::ostream& o, Variable_Stmt const&)const;
   void make_real_variable  (std::ostream& o, Token_VAR_DECL const&)const;
-  void make_seq_block      (std::ostream& o, AnalogSeqBlock const&)const;
+  void make_seq_block      (std::ostream& o, SeqBlock const&)const override;
 }; // OUT_ANALOG
 /*--------------------------------------------------------------------------*/
 static void make_int_variable(std::ostream& o, Token_VAR_DECL const& v)
@@ -455,13 +456,13 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
   }else if(auto assign=dynamic_cast<Assignment const*>(&ab)) { untested();
     // incomplete.
     make_assignment(o, *assign);
-  }else if(auto cs=dynamic_cast<AnalogConditionalStmt const*>(&ab)) {
+  }else if(auto cs=dynamic_cast<ConditionalStmt const*>(&ab)) {
     make_cond(o, *cs);
   }else if(auto ss=dynamic_cast<AnalogSwitchStmt const*>(&ab)) {
     make_switch(o, *ss);
-  }else if(auto ww=dynamic_cast<AnalogForStmt const*>(&ab)) {
+  }else if(auto ww=dynamic_cast<ForStmt const*>(&ab)) {
     make_for(o, *ww);
-  }else if(auto aws=dynamic_cast<AnalogWhileStmt const*>(&ab)) {
+  }else if(auto aws=dynamic_cast<WhileStmt const*>(&ab)) {
     make_while(o, *aws);
   }else if(auto ev=dynamic_cast<AnalogEvtCtlStmt const*>(&ab)) {
     make_evt(o, *ev);
@@ -473,7 +474,7 @@ void OUT_ANALOG::make_stmt(std::ostream& o, Statement const& ab) const
       o__ "// omit initial\n";
     }
   }else if(auto ct = dynamic_cast<AnalogCtrlStmt const*>(&ab)){
-    make_ctrl(o, ct->body());
+    make_seq_block(o, ct->body());
   }else if(auto t=dynamic_cast<System_Task const*>(&ab)) {
     make_system_task(o, *t);
   }else if(auto ass=dynamic_cast<AnalogSeqStmt const*>(&ab)) {
@@ -613,7 +614,7 @@ void OUT_ANALOG::make_evt(std::ostream& o, AnalogEvtCtlStmt const& s) const
     o__ "if ("<<name<<") {\n";
     {
       indent y;
-      make_ctrl(o, s.code());
+      make_seq_block(o, s.code());
     }
     o__ "}else{\n";
     o__ "}\n";
@@ -623,103 +624,7 @@ void OUT_ANALOG::make_evt(std::ostream& o, AnalogEvtCtlStmt const& s) const
   o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_loop(std::ostream& o, AnalogWhileStmt const& s) const
-{
-  o__ "while(true) {\n";
-  {
-    indent x;
-    std::string name = make_cc_expression(o, s.conditional());
-    o__ "if ("<<name<<") {\n";
-    if(s.has_body()) {
-      indent y;
-      if(auto bb = dynamic_cast<AnalogSeqBlock const*>(&s.body())){
-	make_ctrl(o, *bb);
-      }else{ untested();
-	assert(0);
-      }
-    }else{ untested();
-    }
-
-    if(s.has_tail()){
-      if(auto bb = dynamic_cast<Assignment const*>(&s.tail())){
-	make_assignment(o, *bb);
-      }else{ untested();
-	assert(0);
-      }
-    }else{
-    }
-
-    o__ "}else{\n";
-    o____ "break;\n";
-    o__ "}\n";
-  }
-  o__ "}\n";
-}
-/*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_while(std::ostream& o, AnalogWhileStmt const& s) const
-{
-  make_loop(o, s);
-}
-/*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_for(std::ostream& o, AnalogForStmt const& s) const
-{
-  if(s.has_init()){
-    make_assignment(o, s.init());
-  }else{ untested();
-  }
-  make_loop(o, s);
-}
-/*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_initial(std::ostream& o, AnalogInitialStmt const& s) const
-{
-  if(is_tr_initial()) {
-    o__ "{ // initial statement\n";
-    make_ctrl(o, s.body());
-    o__ "}\n";
-  }else{ untested();
-  }
-}
-/*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_cond(std::ostream& o, AnalogConditionalStmt const& s) const
-{
-  o__ "{\n";
-  if(s.conditional().is_true()) {
-    if(s.true_part()) {
-      indent y;
-      make_ctrl(o, s.true_part());
-    }else{ untested();
-    }
-  }else if(s.conditional().is_false()){
-    if(s.false_part()) {
-      indent y;
-      make_ctrl(o, s.false_part());
-    }else{
-    }
-  }else{
-    indent x;
-    std::string name = make_cc_expression(o, s.conditional());
-    o__ "if ("<<name<<") {\n";
-    if(s.true_part()) {
-      indent y;
-      make_ctrl(o, s.true_part());
-    }else{
-    }
-    o__ "}";
-    if(s.false_part()) {
-      o << "else {\n";
-      {
-	indent y;
-	make_ctrl(o, s.false_part());
-      }
-      o__ "}\n";
-    }else{
-    }
-    o << "\n";
-  }
-  o__ "}\n";
-}
-/*--------------------------------------------------------------------------*/
-static void make_cond_expressions(std::ostream& o, AnalogConstExpressionList const&l)
+static void make_cond_expressions(std::ostream& o, ConstExpressionList const&l)
 {
   std::string paren="";
   for(auto e : l){
@@ -792,17 +697,12 @@ void OUT_ANALOG::make_switch(std::ostream& o, AnalogSwitchStmt const& s) const
   o__ "}\n";
 }
 /*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_ctrl(std::ostream& o, AnalogSeqBlock const& s) const
-{
-  make_seq_block(o, s);
-}
-/*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_seq(std::ostream& o, AnalogSeqStmt const& s) const
 {
   return make_seq_block(o, s.block());
 }
 /*--------------------------------------------------------------------------*/
-void OUT_ANALOG::make_seq_block(std::ostream& o, AnalogSeqBlock const& s) const
+void OUT_ANALOG::make_seq_block(std::ostream& o, SeqBlock const& s) const
 {
   if(s.has_identifier()) {
     o__ "{ // : " << s.identifier() << "\n";
@@ -1099,8 +999,20 @@ void OUT_ANALOG::make_load_block_variables(std::ostream& o, const
   }
 }
 /*--------------------------------------------------------------------------*/
+void OUT_ANALOG::make_node_refs(std::ostream& o, const Module& m) const
+{
+  for(Node const* n : m.circuit()->nodes()){
+    if(n->name().size()){
+      o__ "node_t const& _v_" << n->code_name() <<
+	"(m->n_(MOD__::" << n->code_name() << ")); // ref " << n->code_name().size() << "\n";
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 void OUT_ANALOG::make_load_variables(std::ostream& o, const Module& m) const
 {
+  make_node_refs(o, m);
   make_load_block_variables(o, m.variables());
 }
 /*--------------------------------------------------------------------------*/
@@ -1231,7 +1143,8 @@ static void make_cc_common_tr_eval(std::ostream& o, const Module& m)
 {
   o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
   o << "inline void COMMON_" << m.identifier() <<
-    "::tr_eval_analog(MOD_" << m.identifier() << "* d) const\n{\n";
+    "::tr_eval_analog(MOD_" << m.identifier() << "* m) const\n{\n";
+  o__ "auto& d = m;\n";
   o__ "trace1(\"" << m.identifier() <<"::tr_eval_analog\", d->long_label());\n";
 
   OUT_ANALOG oo(OUT_ANALOG::modeDYNAMIC);
@@ -1329,7 +1242,6 @@ static void make_cc_final_analog(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 void make_cc_analog(std::ostream& o, const Module& m)
 {
-  o << "typedef MOD_" << m.identifier() << " MOD__;\n"; // here?
   make_cc_zero_filter_readout(o, m);
   make_cc_set_branch_contributions(o, m);
 //  make_cc_ac_begin(o, m);

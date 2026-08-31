@@ -1,0 +1,38 @@
+attach ./modelgen_2.so
+attach ../vams/vsine.so
+
+// produce garbage. This is probably intended by the standard.
+// "When applied to waveforms which vary smoothly, the simulation results
+// are generally unsatisfactory"
+
+verilog
+
+`modelgen test_trans_td0
+module test(p, n);
+	(* desc="" *) real ll1;
+	electrical p, n;
+	analog begin
+		ll1 = transition(V(p,n), $abstime/2, .1, .1);
+	end
+endmodule
+`endmodelgen
+
+!make test_trans_td0.so > /dev/null
+attach ./test_trans_td0.so
+
+verilog
+parameter r=1
+parameter v=0
+
+test       #() dut(\1 ,\0 );
+vsine #(.dc(v), .ampl(1 )) v1 (\1 , \0      );
+
+list
+
+print tran v(1) ll1(dut) control(0) iter(0)
+tran 1 trace=n basic
+
+tran 0 1 .2 trace=n basic
+
+status notime
+end

@@ -22,6 +22,7 @@
 #include "mg_out_code.h"
 #include "mg_digital.h"
 #include "mg_options.h"
+#include "mg_assign.h"
 #include <typeinfo>
 /*--------------------------------------------------------------------------*/
 class OUT_DIGITAL : OUT_CODE {
@@ -42,7 +43,7 @@ public:
   Base const* _src{nullptr};
   std::string ctx()const override {
     char const* names[modeNUM] = { //
-      "precalc", "tr_eval", "initial", "tr_begin", "tr_restore",
+      "precalc", "tr_eval", "tr_initial", "tr_begin", "tr_restore",
       "tr_advance", "tr_regress", "tr_review", "tr_accept", "finish"
     };
     return names[_mode];
@@ -58,10 +59,11 @@ public:
   bool is_tr_eval()const override { untested(); return _mode==modeTR_EVAL; }
   bool is_tr_restore()const override { return _mode==modeTR_RESTORE; }
   bool is_tr_accept()const override { return _mode==modeTR_ACCEPT; }
-  bool is_tr_initial()const  { return _mode==modeTR_INITIAL; }
+  bool is_tr_regress()const override { return _mode==modeTR_REGRESS; }
+  bool is_tr_initial()const override { return _mode==modeTR_INITIAL; }
   bool is_tr_begin()const  { return _mode==modeTR_BEGIN; }
   bool is_tr_review()const  { untested(); return _mode==modeTR_REVIEW; }
-  bool is_tr_advance()const  { untested(); return _mode==modeTR_ADVANCE; }
+  bool is_tr_advance()const  { return _mode==modeTR_ADVANCE; }
   bool is_final()const  { untested(); return _mode==modeFINAL; }
 public:
   void make_list(std::ostream& o, const Module& m)const;
@@ -73,43 +75,93 @@ private:
   void make_stmt       (std::ostream& o, Statement const& a)const;
   void make_block      (std::ostream& o, Block const& s)const;
 private:
-  void make_initial    (std::ostream& o, InitialStmt const& s)const;
+//  void make_initial    (std::ostream& o, InitialStmt const& s)const;
 //  void make_cond       (std::ostream& o, ConditionalStmt const& s)const;
 //  void make_switch     (std::ostream& o, SwitchStmt const& s)const;
 //  void make_for        (std::ostream& o, ForStmt const& s)const;
 //  void make_while      (std::ostream& o, WhileStmt const& s)const;
 //  void make_seq        (std::ostream& o, SeqStmt const& s)const;
-  void make_ctrl       (std::ostream& o, SeqBlock const& s)const;
-  void make_assignment (std::ostream& o, Assignment const& a)const;
+  //void make_ctrl       (std::ostream& o, SeqBlock const& s)const override;
+  void make_assignment (std::ostream& o, Assignment const& a)const override;
   void make_evt        (std::ostream& o, DigitalEvtCtlStmt const& s)const;
-//  void make_loop       (std::ostream& o, WhileStmt const& s) const;
+  void make_loop       (std::ostream& o, WhileStmt const& s) const;
   void make_task       (std::ostream& o, System_Task const& s)const;
   void make_variable   (std::ostream& o, Token_VAR_REF const& v)const;
   void make_variable   (std::ostream& o, Variable_Decl const& v)const;
 private:
+  void make_node_refs(std::ostream& o, const Module& m)const;
   void make_block_variables(std::ostream& o, Variable_Stmt const&)const;
   void make_real_variable  (std::ostream& o, Token_VAR_DECL const&)const;
-  void make_seq_block      (std::ostream& o, SeqBlock const&)const;
+  void make_seq_block      (std::ostream& o, SeqBlock const&)const override;
 private:
   std::string make_cc_expression(std::ostream& o, Expression const& e, bool=false)const {
     return ::make_cc_expression(o, e, _mode!=modePRECALC, ctx());
   }
 }; // OUT_DIGITAL
 /*--------------------------------------------------------------------------*/
+static void make_one_node_load(std::ostream& o, Node const& V)
+{
+  o__ "const va::LNR _v_" << V.code_name() <<
+      "(m->n_(MOD__::" << V.code_name() << ")); // load\n";
+}
+/*--------------------------------------------------------------------------*/
 void make_tr_advance_digital(std::ostream& o, const Module& m)
 {
   o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
   o << "inline void COMMON_" << m.identifier() <<
     "::tr_advance_digital(MOD_" << m.identifier() << "* m) const\n{\n";
-  // o << "eval_t mode = m_TR_ADVANCE;\n";
-  // o << "(void)mode;\n";
+
+  for(auto n : m.circuit()->nodes()){
+    if(n->is_reg()){
+      assert(n->is_discrete());
+      o__ "{\n";
+      o____ "node_l& nl = reinterpret_cast<node_l&>(m->n_(MOD::n_" << n->name() << "));\n";
+      o____ "if (!nl->in_transit()) {\n";
+      o____ "}else if (CKT_BASE::_sim->_time0 >= nl->final_time()) {\n";
+      o______ "nl->propagate();\n";
+      o____ "}else{\n";
+      o____ "}\n";
+      o__ "}\n\n";
+    }else{
+    }
+#if 0
+    if(n->is_discrete()) {
+      done in make_load_variables
+      make_one_node_load(o, *n);
+    }else{
+      o__ "// not discrete " << n->name() << "\n";
+      assert(n->is_ground() || n->discipline() || n->short_to());
+    }
+#endif
+  }
 
   OUT_DIGITAL oo(OUT_DIGITAL::modeTR_ADVANCE, &tr_advance_tag);
+  o__ "// load variables\n";
   oo.make_load_variables(o, m);
+  o__ "// /load variables\n";
   oo.make_list(o, m);
   o << "} // tr_advance_digital\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_node_loads(std::ostream& o, const Module& m)
+{
+  for(auto const& n : m.circuit()->nodes()){
+    assert(n);
+    if(n->is_reg()){
+      make_one_node_load(o, *n);
+    }else if(n->is_discrete()) {
+      make_one_node_load(o, *n);
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+static void make_one_node_proxy(std::ostream& o, Node const& V)
+{
+  o__ "va::LNR _v_" << V.code_name() <<
+      "(m->n_(MOD__::" << V.code_name() << ")); // proxy\n";
 }
 /*--------------------------------------------------------------------------*/
 void make_tr_accept_digital(std::ostream& o, const Module& m)
@@ -123,6 +175,14 @@ void make_tr_accept_digital(std::ostream& o, const Module& m)
   OUT_DIGITAL oo(OUT_DIGITAL::modeTR_ACCEPT, &tr_accept_tag);
   oo.make_load_variables(o, m);
   oo.make_list(o, m);
+
+  for(auto const& n : m.circuit()->nodes()){
+    if(n->is_reg()){
+      o__ "_v_n_" << n->name() << ".accept();\n";
+    }else{
+    }
+  }
+
   o << "} // tr_accept_digital\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -141,10 +201,59 @@ void make_tr_regress_digital(std::ostream& o, const Module& m)
   o__ "}\n";
 #endif
 
-  OUT_DIGITAL oo(OUT_DIGITAL::modeTR_REGRESS, &tr_advance_tag);
+  for(auto n : m.circuit()->nodes()){
+    if(n->is_reg()){
+      o__ "{\n";
+      o____ "node_l& nl = reinterpret_cast<node_l&>(m->n_(MOD::n_" << n->name() << "));\n";
+      o____ "if (nl->last_change_time() > m->_sim->_time0) {\n";
+      o______ "nl->unpropagate();\n";
+      o______ "assert(_sim->_time0 < nl->final_time());\n";
+      o____ "}else if (m->_sim->_time0 >= nl->final_time()) { untested();\n";
+      o______ "nl->propagate();\n";
+      o____ "}else{\n";
+      o____ "}\n";
+      o__ "}\n\n";
+    }else{
+    }
+    if(n->is_discrete()) {
+      make_one_node_load(o, *n);
+    }else{
+    }
+  }
+
+//   OUT_DIGITAL oo(OUT_DIGITAL::modeTR_REGRESS, &tr_advance_tag);
+//   oo.make_load_variables(o, m);
+//   oo.make_list(o, m);
+  o << "} // tr_regress_analog\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+}
+/*--------------------------------------------------------------------------*/
+static void make_cc_common_tr(std::ostream& o, const Module& m, OUT_DIGITAL::mode mode, Base const* dep)
+{
+  OUT_DIGITAL oo(mode, dep);
+//  o << "typedef double ddouble;\n"; // wreal?
+  o << "inline void COMMON_" << m.identifier() <<
+    "::" << oo.ctx() << "_digital(MOD_" << m.identifier() << "* m)";
+  if(oo.is_tr_initial()){
+  }else{
+    o << "const";
+  }
+  o<< "\n{\n";
+ // o__ "trace1(\"" << m.identifier() <<"::tr_begin_analog\", d);\n";
+ o__ "trace1(\"" << m.identifier() <<"::"<<oo.ctx()<<"_digital\", m->long_label());\n";
+
   oo.make_load_variables(o, m);
   oo.make_list(o, m);
-  o << "} // tr_regress_analog\n"
+
+  // yikes. state is shared.
+//  if(oo.is_tr_initial()){
+//    o__ "m->_v_1 = m->_v_;\n";
+//  }else if(oo.is_tr_begin()) {
+//    o__ "// m->_v_1 = m->_v_;\n";
+//  }else{
+//  }
+  o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }
@@ -159,7 +268,7 @@ static void make_cc_common_tr_eval(std::ostream& o, const Module& m)
   OUT_DIGITAL oo(OUT_DIGITAL::modeTR_EVAL);
 
   oo.make_load_variables(o, m);
-  oo.make_list(o, m);
+//  oo.make_list(o, m);
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -188,6 +297,16 @@ void make_cc_digital(std::ostream& o, const Module& m)
   make_cc_common_tr_eval(o, m);
   make_cc_common_tr_review(o, m);
   // make_cc_common_precalc(o, m);
+  if(m.has_tr_begin_digital()){
+    o__ "// tr_initial ...\n";
+    make_cc_common_tr(o, m, OUT_DIGITAL::modeTR_INITIAL, &tr_begin_tag);
+    o__ "// tr_begin ...\n";
+    make_cc_common_tr(o, m, OUT_DIGITAL::modeTR_BEGIN, &tr_begin_tag);
+    // o__ "// assign..\n";
+    // make_common_init_assign(o, m);
+  }else{
+    o__ "// !has_tr_begin_digital\n";
+  }
 }
 /*--------------------------------------------------------------------------*/
 void OUT_DIGITAL::make_block(std::ostream& o, Block const& ab) const
@@ -238,7 +357,7 @@ void OUT_DIGITAL::make_construct(std::ostream& o, AlwaysConstruct const& ab) con
 /*--------------------------------------------------------------------------*/
 void OUT_DIGITAL::make_list(std::ostream& o, const Module& m) const
 {
-  if(is_tr_initial() || is_tr_begin() ){ untested();
+  if(is_tr_initial() || is_tr_begin() ){
 	 o__ "//initial digital list\n";
     o__ "MOD_" << m.identifier() << " const* p = m;\n";
     o__ "MOD_" << m.identifier() << "* d = m;\n";
@@ -257,16 +376,16 @@ void OUT_DIGITAL::make_list(std::ostream& o, const Module& m) const
 
   for(auto const& bb : always_list(m)){
     assert(bb);
-    if(_src && !bb->is_used_in(_src)){ untested();
+    if(_src && !bb->is_used_in(_src)){
       o__ "// omit2 " << typeid(*bb).name() << "\n";
-    }else if(auto in = dynamic_cast<InitialStmt const*>(bb)){ untested();
+    }else if(auto in = dynamic_cast<InitialStmt const*>(bb)){
       o__ "// InitialStmt\n";
-      if(is_tr_initial()){ untested();
+      if(is_tr_initial()){
 	make_stmt(o, *in);
-      }else{ untested();
+      }else{
 	o__ "// omit InitialStmt\n";
       }
-    }else if(is_tr_initial()){ untested();
+    }else if(is_tr_initial()){
       o__ "// is_tr_initial\n";
     }else if(auto ab = dynamic_cast<AlwaysConstruct const*>(bb)){
       o__ "{ // AlwaysConstruct\n";
@@ -299,15 +418,36 @@ void OUT_DIGITAL::make_load_block_variables(std::ostream& o, const
   }
 }
 /*--------------------------------------------------------------------------*/
+void OUT_DIGITAL::make_node_refs(std::ostream& o, const Module& m) const
+{
+  if(is_tr_accept()) {
+    // special case..
+    for(auto const& n : m.circuit()->nodes()){
+      assert(n);
+      if(n->is_reg()){
+	make_one_node_proxy(o, *n);
+      }else if(n->is_discrete()){
+	make_one_node_load(o, *n);
+      }else{
+	o__ "// not discrete " << n->name() << "\n";
+      }
+    }
+  }else{
+    return make_node_loads(o, m);
+  }
+}
+/*--------------------------------------------------------------------------*/
 void OUT_DIGITAL::make_load_variables(std::ostream& o, const Module& m) const
 {
   make_load_block_variables(o, m.variables());
+
+    make_node_refs(o, m);
 }
 /*--------------------------------------------------------------------------*/
-void OUT_DIGITAL::make_ctrl(std::ostream& o, SeqBlock const& s) const
-{
-  make_seq_block(o, s);
-}
+// void OUT_DIGITAL::make_ctrl(std::ostream& o, SeqBlock const& s) const
+// {
+//   make_seq_block(o, s);
+// }
 /*--------------------------------------------------------------------------*/
 void OUT_DIGITAL::make_evt(std::ostream& o, DigitalEvtCtlStmt const& s) const
 {
@@ -318,7 +458,7 @@ void OUT_DIGITAL::make_evt(std::ostream& o, DigitalEvtCtlStmt const& s) const
     o__ "if ("<<name<<") {\n";
     {
       indent y;
-      make_ctrl(o, s.code());
+      make_seq_block(o, s.code());
     }
     o__ "}else{\n";
     o__ "}\n";
@@ -342,31 +482,27 @@ void OUT_DIGITAL::make_stmt(std::ostream& o, Statement const& ab) const
   }else if(auto assign=dynamic_cast<Assignment const*>(&ab)) { untested();
     // incomplete.
     make_assignment(o, *assign);
-#if 0 // later
-  }else if(auto cs=dynamic_cast<ConditionalStmt const*>(&ab)) { untested();
+  }else if(auto cs=dynamic_cast<ConditionalStmt const*>(&ab)) {
     make_cond(o, *cs);
+#if 0 // later
   }else if(auto ss=dynamic_cast<SwitchStmt const*>(&ab)) { untested();
     make_switch(o, *ss);
-  }else if(auto ww=dynamic_cast<ForStmt const*>(&ab)) { untested();
+#endif
+  }else if(auto ww=dynamic_cast<ForStmt const*>(&ab)) {
     make_for(o, *ww);
   }else if(auto aws=dynamic_cast<WhileStmt const*>(&ab)) { untested();
     make_while(o, *aws);
-#endif
   }else if(auto ev=dynamic_cast<DigitalEvtCtlStmt const*>(&ab)) {
     make_evt(o, *ev);
     //throw Exception("analogevtctl unsupported");
-  }else if(auto is=dynamic_cast<InitialStmt const*>(&ab)) { untested();
-    if(is_tr_initial()){ untested();
-      (void)is;
-      incomplete();
-      // make_initial(o, *is);
+  }else if(auto is=dynamic_cast<InitialStmt const*>(&ab)) {
+    if(is_tr_initial()){
+      make_initial(o, *is);
     }else{ untested();
       o__ "// omit initial\n";
     }
-  }else if(auto ct = dynamic_cast<CtrlStmt const*>(&ab)){ untested();
-    (void)ct;
-    incomplete();
-//    make_ctrl(o, ct->body());
+  }else if(auto ct = dynamic_cast<DigitalCtrlStmt const*>(&ab)){ untested();
+    make_seq_block(o, ct->body());
   }else if(auto t=dynamic_cast<System_Task const*>(&ab)) {
     make_system_task(o, *t);
   }else if(dynamic_cast<DigitalSeqStmt const*>(&ab)) { untested();
@@ -408,24 +544,34 @@ void OUT_DIGITAL::make_assignment(std::ostream& o, Assignment const& a) const
       && _mode!=modePRECALC
       && _mode!=modeTR_INITIAL) { untested();
     o__ "// " << lhsname << " is common\n";
-  }else if(!is_tr_accept()){
-    o__ "// ! accept.. " << lhsname << "\n";
   }else if(dynamic_cast<Token_NODE const*>(&a.lhs())){
-     if(is_cc_ref(&e)){
-     }else{ untested();
-     }
-     std::stringstream bin; // HACK.
-     o__ "bool rhs;\n";
-     o__ "{ // rhs eval\n";
-     {
-       indent rhsindent;
-       auto rhsname = make_cc_expression(o, e);
-       o__ "rhs = " << rhsname << ";\n";
-     }
-     o__ "} // rhs eval\n";
-     o__ "_LOGICVAL lv = rhs?lvSTABLE1:lvSTABLE0;\n";
-     o__ "va::accept_node_value(d->n_(" << lhsname << "), lv, 0.);\n";
-  }else{
+    if(is_tr_accept() || is_tr_initial()) {
+       if(is_cc_ref(&e)){
+       }else{
+       }
+       o__ "bool rhs;\n";
+       o__ "{ // rhs eval\n";
+       {
+	 indent rhsindent;
+	 auto rhsname = make_cc_expression(o, e);
+	 o__ "rhs = " << rhsname << ";\n";
+	 if(is_tr_accept()) {
+	   o__ "_v_n_" + a.lhs().name() << " = " << rhsname << "; // (accept)\n";
+	 }else{
+	 }
+       }
+       o__ "} // rhs eval\n";
+       o__ "_LOGICVAL lv = rhs?lvSTABLE1:lvSTABLE0;\n"; // VALOGIC..
+      if(is_tr_accept()) {
+       o__ "// va::accept_node_value(d->n_(" << lhsname << "), lv, 0.);\n";
+      }else if(is_tr_initial()) {
+       o__ "va::initial_node_value(d->n_(" << lhsname << "), lv);\n";
+      }
+    }else if(is_tr_regress()) {
+      o__ "incomplete();\n";
+    }else{
+    }
+  }else if(is_tr_accept() || is_tr_advance() || is_tr_regress()) { //  || is_tr_regress()) {
     indent x;
     auto rhsname = make_cc_expression(o, e);
 //    if(e.is_ref()){ untested();
@@ -433,6 +579,10 @@ void OUT_DIGITAL::make_assignment(std::ostream& o, Assignment const& a) const
 //    }else
     if(is_tr_accept()){
       o__ lhsname << " = " << rhsname << "; // (accept)\n";
+    }else if(is_tr_advance()){
+      o__ lhsname << " = " << rhsname << "; // (advance)\n";
+    }else if(is_tr_regress()){
+      o__ lhsname << " = " << rhsname << "; // (regress)\n";
     }else if(a.is_int()){ untested();
       o__ lhsname << " = int(" << rhsname << "); // (int*)\n";
     }else if(within_af(&a)){ untested();
@@ -446,6 +596,8 @@ void OUT_DIGITAL::make_assignment(std::ostream& o, Assignment const& a) const
     }else{ untested();
       unreachable();
     }
+  }else{
+    o__ "// ! accept.. " << lhsname << "\n";
   }
   o__ "}\n";
 }

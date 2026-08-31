@@ -9,7 +9,9 @@ TARGET = \
   mg_filt_xdt.so \
   mg_filt_noise.so \
   mg_filt_absdelay.so \
+  mg_filt_transition.so \
   mg_func_analysis.so \
+  mg_func_driver.so \
   mg_func_math.so \
   mg_func_pf.so \
   mg_func_port.so \

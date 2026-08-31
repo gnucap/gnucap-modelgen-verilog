@@ -350,7 +350,7 @@ void Parameter_2_List::parse(CS& file)
 }
 /*--------------------------------------------------------------------------*/
 bool Parameter_2::is_literal() const
-{
+{ untested();
   return _default_val.is_literal();
 }
 /*--------------------------------------------------------------------------*/
@@ -364,7 +364,7 @@ void Parameter_2_List::dump(std::ostream& o)const
 	o << " " << _type << " ";
 	i->dump(o);
 	o << ";\n";
-      }else{
+      }else{ untested();
       }
     }
   }else{
@@ -549,6 +549,10 @@ void Net_Declarations::dump(std::ostream& o) const
 /*--------------------------------------------------------------------------*/
 void Port_3::set_discipline(Discipline const* d, Module* owner)
 {
+  if(!d){
+  }else if(d->is_discrete()){
+  }else{
+  }
   owner->node(_node)->set_discipline(d);
 }
 /*--------------------------------------------------------------------------*/
@@ -685,6 +689,11 @@ net_declaration ::=
 */
 void Module::parse(CS& f)
 {
+  trace1("Module::parse", f.last_match());
+  if(f.last_match()[0] == 'c'){
+    set_connectmodule();
+  }else{
+  }
   assert(_circuit);
   _circuit->set_owner(this);
   File* o = prechecked_cast<File*>(owner());
@@ -763,10 +772,13 @@ void Module::parse_body(CS& f)
       || ((f >> "assign ") && (f >> *_assign))
       || ((f >> "analog ") && f >> *_analog)
       || ((f >> "always ") && f >> *_always)
-      || ((f >> "endmodule ") && (end = true))
+      || ((f >> "initial ") && f >> *_always)
+      || (is_module() && (f >> "endmodule ") && (end = true))
+      || (is_connectmodule() && (f >> "endconnectmodule ") && (end = true))
       // subdevice instances. can't use reserved keywords.
       || ((f >> "paramset ") && (reserved = true))
       || ((f >> "module ") && (reserved = true))
+      || ((f >> "connectmodule ") && (reserved = true))
       || (f >> _circuit->element_list())	// module_instantiation
       ;
     if (attr.has_attributes(tag_t(&f))) { untested();
@@ -774,7 +786,7 @@ void Module::parse_body(CS& f)
 	   + attr.attributes(tag_t(&f))->string(tag_t(nullptr)));
     }else{
     }
-    trace2("endloop", end, f.last_match());
+    trace3("endloop", end, f.last_match(), is_connectmodule());
     if (reserved){
       f.reset(here);
       throw Exception_CS_("not allowed here: " + f.last_match(), f);
@@ -877,15 +889,15 @@ void Module::dump(std::ostream& o)const
   }else{
   }
   // dump_port_directions(o);
-  if(_circuit->input().size()){
+  if(_circuit->input().size()){ untested();
     o__ "input " << circuit()->input() << "\n";
   }else{
   }
-  if(_circuit->output().size()){
+  if(_circuit->output().size()){ untested();
     o__ "output " << circuit()->output() << "\n";
   }else{
   }
-  if(_circuit->inout().size()){
+  if(_circuit->inout().size()){ untested();
     o__ "inout " << circuit()->inout() << "\n";
   }else{
   }
@@ -1066,7 +1078,7 @@ bool Module::new_var_ref(Base* what)
   std::string p;
   if(auto A = dynamic_cast<Aliasparam const*>(what)){ untested();
     p = A->name();
-  }else if(auto nn = dynamic_cast<Node const*>(what)){
+  }else if(auto nn = dynamic_cast<Node const*>(what)){ untested();
     p = nn->name();
   }else if(P){
     p = P->name();
@@ -1296,7 +1308,7 @@ static Token* new_event_token(int na, FUNCTION_ const* func, Module* m)
 #if 1
   {
     fcl->set_label(code_name);
-//    if(int(na) <= f->max_args()) {
+//    if(int(na) <= f->max_args()) { untested();
 //    }else{ untested();
 //      incomplete();
 //      throw Exception_Too_Many(na, f->max_args(), 0);
@@ -1323,7 +1335,9 @@ static Token* new_filter_token(int na, FUNCTION_ const* func, Module* m)
   std::string filter_code_name = f->label() + "_" + std::to_string(n_filters++);
 
   FUNCTION* fc = f->clone();
+  assert(fc);
   auto fcl = prechecked_cast<MGVAMS_FILTER*>(fc);
+  assert(fcl);
 
 #if 1
   {
@@ -1353,7 +1367,7 @@ static Token* new_filter_token(int na, FUNCTION_ const* func, Module* m)
 
     br->set_filter(fcl); // needed?
     assert(m->circuit());
-    m->new_filter();
+    m->new_filter(); // inc_filter?
 
     if(f->eval_name()!=""){
       br->set_eval(fcl->eval_name());
@@ -1400,6 +1414,7 @@ Token* Module::new_token(FUNCTION const* f_, size_t num_args_)
     import_flags(f);
     t = new_event_token(num_args, f, this);
   }else if(f && f->is_analog_filter()) {
+    assert(prechecked_cast<MGVAMS_FILTER const*>(f));
     import_flags(f);
     t = new_filter_token(num_args, f, this);
   }else if(f){
@@ -1461,18 +1476,18 @@ bool Module::has_submodule() const
 }
 /*--------------------------------------------------------------------------*/
 // bool Module::has_assign() const
-// {
+// { untested();
 //   return _assign->size();
 // }
 /*--------------------------------------------------------------------------*/
 bool Module::has_states() const
-{
+{ untested();
   incomplete();
   return true;
 }
 /*--------------------------------------------------------------------------*/
 bool Module::has_constants() const
-{
+{ untested();
   // possible false positives
   return variables().size();
 }
@@ -1517,6 +1532,34 @@ void Circuit::push_back(Element_2 /*const?*/ * f)
   _element_list.push_back(f);
 }
 /*--------------------------------------------------------------------------*/
+void Module::set_input(Node const* n)
+{
+  assert(_circuit);
+  if(!n->number()){ untested();
+  }else if(n->number() <= int(_circuit->ports().size())){
+    assert(*(_circuit->nodes().begin() + n->number()) == n);
+    auto p = _circuit->ports().begin();
+    std::advance(p, n->number()-1);
+    (*p)->set_input();
+  }else{
+    throw Exception("Not a port: " + n->name());
+  }
+}
+/*--------------------------------------------------------------------------*/
+void Module::set_output(Node const* n)
+{
+  assert(_circuit);
+  if(!n->number()){ untested();
+  }else if(n->number() <= int(_circuit->ports().size())){
+    assert(*(_circuit->nodes().begin() + n->number()) == n);
+    auto p = _circuit->ports().begin();
+    std::advance(p, n->number()-1);
+    (*p)->set_output();
+  }else{ untested();
+    throw Exception("Not a port: " + n->name());
+  }
+}
+/*--------------------------------------------------------------------------*/
 void Module::set_to_ground(Node const* n)
 {
   trace1("stc", n->number());
@@ -1536,7 +1579,7 @@ void Module::set_reg(Node const* n)
   if(n->number()){
     assert(*(_circuit->nodes().begin() + n->number()) == n);
     (*(_circuit->nodes().begin() + n->number()))->set_reg(this);
-  }else{
+  }else{ untested();
     // already ground
   }
 }

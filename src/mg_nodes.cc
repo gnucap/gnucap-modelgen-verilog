@@ -28,7 +28,7 @@ Node Node_Map::mg_ground_node("", 0);
 void Node::new_token(std::string const& name)
 {
   assert(!_token);
-  _token = new Token_NODE(name, this);
+  _token = new Token_NODE(name, this, new TData());
 }
 /*--------------------------------------------------------------------------*/
 Node* Node_Map::new_node(std::string const& p, Block* owner)

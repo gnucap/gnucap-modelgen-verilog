@@ -24,16 +24,23 @@
 /*--------------------------------------------------------------------------*/
 #include "mg_expression.h"
 #include "mg_out.h"
-#include "mg_out_code.h"
 /*--------------------------------------------------------------------------*/
 class Variable_Decl;
 class Token_VAR_REF;
 class System_Task;
 class Expression;
+class ConditionalStmt;
+class InitialStmt;
+class Assignment;
+class ForStmt;
+class WhileStmt;
+class SeqBlock;
 /*--------------------------------------------------------------------------*/
 class OUT_CODE {
   virtual bool is_dynamic()const {return false;}
   virtual bool is_tr_accept()const = 0;
+  virtual bool is_tr_regress()const = 0;
+  virtual bool is_tr_initial()const = 0;
   virtual bool is_precalc()const = 0;
   virtual bool is_tr_restore()const = 0;
   virtual bool is_tr_eval()const {return is_dynamic();}
@@ -44,6 +51,12 @@ protected:
   std::string make_cc_expression(std::ostream& o, Expression const& e, bool=false)const {
     return ::make_cc_expression(o, e, !is_precalc(), ctx());
   }
+  void make_cond(std::ostream& o, ConditionalStmt const& s)const;
+  void make_initial(std::ostream& o, InitialStmt const& s)const;
+  void make_for(std::ostream& o, ForStmt const& s)const;
+  void make_while(std::ostream& o, WhileStmt const& s)const;
+  virtual void make_seq_block(std::ostream& o, SeqBlock const& s)const = 0;
+  virtual void make_assignment (std::ostream& o, Assignment const& a)const = 0;
 private:
   virtual std::string ctx()const = 0;
 }; // OUT_CODE

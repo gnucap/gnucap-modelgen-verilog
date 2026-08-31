@@ -123,6 +123,7 @@ class Element_2 : public Owned_Base {
   std::string _reverse;
   std::string _state;
 //  Block* _owner{nullptr};
+  Element_2(Element_2 const&) = delete;
 public:
   void parse(CS&) override;
   void dump(std::ostream& f)const override;
@@ -141,6 +142,7 @@ public:
   virtual Discipline const* discipline()const {return nullptr;}
   const Parameter_3_List&
 		     list_of_parameter_assignments()const {return _list_of_parameter_assignments;}
+//  void set_param(std::string const& name, Expression_ const& value);
   const Port_Connection_List& ports()const	  {return _list_of_port_connections;}
   virtual std::string instance_name()const  { untested();return _name_of_module_instance;}
   void set_label(std::string const& l) {_name_of_module_instance = l;}
@@ -154,6 +156,7 @@ public:
   virtual std::string state()const	{return _state;}
   virtual int	     net_nodes()const	{return int(ports().size());}
   virtual int	     num_states()const	{ untested();unreachable(); return 0;}
+  virtual int	     num_args()const	{ untested(); return 0;}
   virtual bool is_used()const {return true;} // incomplete.
   virtual bool is_used_in_branch()const {return true;} // incomplete.
   virtual std::string const& port_name(int)const {
@@ -438,7 +441,7 @@ public:
   const_reverse_iterator rbegin() const{ untested(); return _nodes.rbegin(); }
   const_reverse_iterator rend() const{ untested(); return _nodes.rend(); }
   const_iterator begin() const{ return _nodes.begin(); }
-  const_iterator end() const{ untested(); return _nodes.end(); }
+  const_iterator end() const{ return _nodes.end(); }
   size_t size() const{ return _map.size(); }
 //   size_t how_many() const{ untested(); return _nodes.size() - 1; }
   Node* new_node(std::string const&, Block* owner);

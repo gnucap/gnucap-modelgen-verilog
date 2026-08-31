@@ -27,6 +27,37 @@
 #include "mg_expression.h"
 #include "mg_type.h"
 /*--------------------------------------------------------------------------*/
+// just Expression_?
+class Expression__ : public Expression_ {
+public:
+  explicit Expression__() : Expression_() {}
+  ~Expression__() {}
+  void parse(CS& file) override;
+//  void dump(std::ostream& o)const override;
+//  Block* owner() { untested();return Owned_Base::owner();}
+  Expression const& expression() const{ return *this;}
+  bool is_true() const;
+  bool is_false() const;
+//  bool has_sensitivities()const { untested(); return !_sens.empty(); }
+};
+/*--------------------------------------------------------------------------*/
+class ConstExpression_ : public Expression__ {
+public:
+//  void parse(CS& file) override;
+//  void dump(std::ostream& o)const override;
+  String_Arg key() const{ untested();return String_Arg("ACE");}
+};
+/*--------------------------------------------------------------------------*/
+class ConstExpressionList : public LiSt<ConstExpression_, '\0', ',', ':'> {
+public:
+  void submit_variable_use(Variable_Access& va)const {
+    for(ConstExpression_ const* i : *this){
+      assert(i);
+      i->submit_variable_xs(va);
+    }
+  }
+};
+/*--------------------------------------------------------------------------*/
 template<class A>
 void dump_annotate(std::ostream& o, A const& a)
 {
@@ -356,7 +387,8 @@ class SeqBlock : public Block {
   };
   int _ctx{0};
   Variable_Access* _variable_access{nullptr};
-public:
+  TData _deps;
+protected:
   explicit SeqBlock(Base const* owner) : Block() {
     new_variable_access();
     (void)owner;
@@ -370,7 +402,10 @@ public:
       _ctx = ctx_unknown;
     }
   }
+public:
   ~SeqBlock();
+  operator bool()const {return size() || identifier() !="";}
+  SeqBlock const& block()const { return *this; }
 
 public:
   void set_owner(Statement* s) {
@@ -382,12 +417,19 @@ public:
   void parse_identifier(CS& f);
   bool has_identifier()const {return _identifier != "";}
 
+  TData const& deps(){ return _deps;};
+  TData const& deps()const { return _deps;};
+
   Variable_Access& variable_access() {
     assert(_variable_access); return *_variable_access;
   }
   Variable_Access const& variable_access()const {
     assert(_variable_access); return *_variable_access;
   }
+protected:
+  void parse_seq(CS&);
+  Base* parse_stmt(CS& f, Block*)const;
+  virtual Base* parse_stmt_or_null(CS& file, Block* scope)const = 0;
 private:
   void new_variable_access();
   void delete_variable_access();
@@ -430,23 +472,7 @@ public:
   void set_ctx_final() { _ctx |= ctx_final; }
 private:
 protected: // bug
-  void init_context(Statement* s) {
-    // reachability here?
-    if(s->is_ctx_event()){
-      set_ctx_event();
-    }else if(s->is_ctx_function()){
-      set_ctx_function();
-    }else{
-    }
-    if(s->is_ctx_initial()){
-      set_ctx_initial();
-    }else{
-    }
-    if(s->is_ctx_final()){
-      set_ctx_final();
-    }else{
-    }
-  }
+  void init_context(Statement* s);
 public:
   Base* lookup(std::string const& k, bool recurse=true)override;
 }; // SeqBlock
@@ -503,27 +529,125 @@ inline bool Statement::is_used_in(Base const* b) const
 /*--------------------------------------------------------------------------*/
 class CtrlStmt : public Statement {
 protected:
+  SeqBlock* _block{nullptr};
+  TData _deps; // here?
+protected:
   explicit CtrlStmt() : Statement() {}
   ~CtrlStmt();
 
-  virtual TData const& deps()const = 0;
+  void parse(CS& f)override;
+  void dump(std::ostream&)const override;
+
+//  virtual TData const& deps()const = 0;
+  virtual TData const& deps()const {return _deps;}; // why virtual?
+  bool update()override {
+    bool ret = _block && _block->update();
+    return Statement::update() || ret;
+  }
+public:
+  SeqBlock const& block()const {assert(_block); return *_block; }
+
+protected:
+  void submit_variable_access(Variable_Access&)const override;
+  virtual void new_block() {_block = make_block();}
+private:
+  virtual SeqBlock* make_block()const = 0;
 };
 /*--------------------------------------------------------------------------*/
 class InitialStmt : public CtrlStmt {
 public:
-  explicit InitialStmt(Block* o, CS& file) {
+  explicit InitialStmt() : CtrlStmt() { }
+  explicit InitialStmt(Block* o, CS& file) { untested();
+    incomplete();
     set_owner(o);
     parse(file);
   }
   ~InitialStmt(){ }
 public:
-  void parse(CS&) override {incomplete();}
-  void dump(std::ostream&)const override {incomplete();}
-  bool is_used_in(Base const*)const override;
+  void parse(CS&) override;
+  void dump(std::ostream&)const override;
   bool update()override;
 
  // TData const& deps()const override // AnalogCtrlStmt
 }; // AnalogInitialStmt
+/*--------------------------------------------------------------------------*/
+class ConditionalStmt : public CtrlStmt {
+  ConstExpression_ _cond; // Const?
+protected:
+  SeqBlock* _false_part{nullptr};
+  explicit ConditionalStmt() : CtrlStmt() {}
+public:
+  explicit ConditionalStmt(Block* o, CS& file) : CtrlStmt() {
+    unreachable();
+    set_owner(o);
+    parse(file);
+  }
+  ~ConditionalStmt(){
+    delete _block; _block = nullptr;
+    delete _false_part; _false_part = nullptr;
+  }
+private:
+  ConstExpression_ const& cond()const {return _cond;}
+  void submit_variable_access(Variable_Access&)const override;
+  SeqBlock& false_part() { assert(_false_part); return *_false_part;}
+public:
+  void parse(CS& file) override;
+  void dump(std::ostream& o)const override;
+  ConstExpression_ const& conditional() const{return _cond;}
+  const SeqBlock& true_part()const { return body(); }
+  const SeqBlock& false_part()const { assert(_false_part); return *_false_part; }
+  bool is_used_in(Base const*)const override;
+  bool update()override;
+
+  TData const& deps()const override{ return _cond.data(); } // ?
+protected:
+  SeqBlock const& body()const { assert(_block); return *_block; }
+  SeqBlock& body() { assert(_block); return *_block; }
+}; // ConditionalStmt
+/*--------------------------------------------------------------------------*/
+class WhileStmt : public CtrlStmt {
+protected:
+  Expression__ _cond; // -> AnalogCtrlStmt?
+  explicit WhileStmt() { }
+  explicit WhileStmt(CS& file, Block* o);
+  ~WhileStmt() { }
+public:
+  void parse(CS& file) override;
+  void dump(std::ostream& o)const override;
+  Expression__ const& conditional()const {return _cond;}
+  SeqBlock const& body()const {assert(_block); return *_block;}
+  bool has_body()const {return body();}
+  virtual bool has_tail() const{ return false; }
+  virtual Base const& tail() const{ untested(); return _cond; }
+private:
+  bool update()override;
+protected:
+  SeqBlock& body() {assert(_block); return *_block;}
+  void submit_variable_access(Variable_Access& va)const override;
+private:
+  TData const& deps()const override { return _deps;}; // ?
+};
+/*--------------------------------------------------------------------------*/
+class ForStmt : public WhileStmt {
+  Assignment* _init{nullptr};
+  Assignment* _tail{nullptr};
+protected:
+  explicit ForStmt(CS& file, Block* o);
+  explicit ForStmt() : WhileStmt() {}
+  void parse(CS& file) override;
+  void dump(std::ostream& o)const override;
+public:
+  bool has_init()const{ return _init; }
+  bool has_tail()const override{ return _tail; }
+  Assignment const& init()const{ assert(_init); return *_init; }
+  Assignment const& tail()const override{ assert(_tail); return *_tail; }
+private:
+  Assignment& init() { assert(_init); return *_init; }
+  Assignment& tail_() { assert(_tail); return *_tail; }
+private:
+  bool update()override;
+  void submit_variable_access(Variable_Access& va)const override;
+};
 /*--------------------------------------------------------------------------*/
 // SystemTaskCall
 class System_Task : public Statement {
