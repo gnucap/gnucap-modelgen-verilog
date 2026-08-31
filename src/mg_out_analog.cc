@@ -1002,7 +1002,10 @@ void OUT_ANALOG::make_load_block_variables(std::ostream& o, const
 void OUT_ANALOG::make_node_refs(std::ostream& o, const Module& m) const
 {
   for(Node const* n : m.circuit()->nodes()){
-    if(n->name().size()){
+    if(n->is_discrete()) {
+      o__ "const va::LNR _v_" << n->code_name() <<
+	"(m->n_(MOD__::" << n->code_name() << ")); // load\n";
+    }else if(n->name().size()){
       o__ "node_t const& _v_" << n->code_name() <<
 	"(m->n_(MOD__::" << n->code_name() << ")); // ref " << n->code_name().size() << "\n";
     }else{

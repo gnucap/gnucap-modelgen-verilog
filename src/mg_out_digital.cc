@@ -101,8 +101,17 @@ private:
 /*--------------------------------------------------------------------------*/
 static void make_one_node_load(std::ostream& o, Node const& V)
 {
-  o__ "const va::LNR _v_" << V.code_name() <<
+  if(V.is_used()) {
+    assert(V.is_discrete());
+    o__ "const va::LNR _v_" << V.code_name() <<
       "(m->n_(MOD__::" << V.code_name() << ")); // load\n";
+  }else{
+    o__ "if(m->n_(MOD__::" << V.code_name() << ").n_() == &ground_node){\n";
+    o____ "incomplete();\n";
+    o__ "}\n";
+    o__ "const va::LNR _v_" << V.code_name() <<
+      "(m->n_(MOD__::" << V.code_name() << ")); // load. unused?\n";
+  }
 }
 /*--------------------------------------------------------------------------*/
 void make_tr_advance_digital(std::ostream& o, const Module& m)
@@ -116,10 +125,12 @@ void make_tr_advance_digital(std::ostream& o, const Module& m)
       assert(n->is_discrete());
       o__ "{\n";
       o____ "node_l& nl = reinterpret_cast<node_l&>(m->n_(MOD::n_" << n->name() << "));\n";
-      o____ "if (!nl->in_transit()) {\n";
-      o____ "}else if (CKT_BASE::_sim->_time0 >= nl->final_time()) {\n";
-      o______ "nl->propagate();\n";
-      o____ "}else{\n";
+      o____ "if (nl->in_transit()) {\n";
+      o______ "m->q_eval();\n";
+      o______ "if (CKT_BASE::_sim->_time0 >= nl->final_time()) {\n";
+      o________ "nl->propagate();\n";
+      o______ "}else{\n";
+      o______ "}\n";
       o____ "}\n";
       o__ "}\n\n";
     }else{
@@ -147,11 +158,13 @@ void make_tr_advance_digital(std::ostream& o, const Module& m)
 /*--------------------------------------------------------------------------*/
 static void make_node_loads(std::ostream& o, const Module& m)
 {
-  for(auto const& n : m.circuit()->nodes()){
+  for(Node const* n : m.circuit()->nodes()){
     assert(n);
     if(n->is_reg()){
+      assert(!n->is_ground());
       make_one_node_load(o, *n);
     }else if(n->is_discrete()) {
+      assert(!n->is_ground());
       make_one_node_load(o, *n);
     }else{
     }
@@ -204,6 +217,7 @@ void make_tr_regress_digital(std::ostream& o, const Module& m)
   for(auto n : m.circuit()->nodes()){
     if(n->is_reg()){
       o__ "{\n";
+      o____ "m->q_eval();\n";
       o____ "node_l& nl = reinterpret_cast<node_l&>(m->n_(MOD::n_" << n->name() << "));\n";
       o____ "if (nl->last_change_time() > m->_sim->_time0) {\n";
       o______ "nl->unpropagate();\n";
@@ -215,16 +229,12 @@ void make_tr_regress_digital(std::ostream& o, const Module& m)
       o__ "}\n\n";
     }else{
     }
-    if(n->is_discrete()) {
-      make_one_node_load(o, *n);
-    }else{
-    }
   }
 
-//   OUT_DIGITAL oo(OUT_DIGITAL::modeTR_REGRESS, &tr_advance_tag);
-//   oo.make_load_variables(o, m);
+  OUT_DIGITAL oo(OUT_DIGITAL::modeTR_REGRESS, &tr_advance_tag);
+  oo.make_load_variables(o, m);
 //   oo.make_list(o, m);
-  o << "} // tr_regress_analog\n"
+  o << "} // tr_regress_digital\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
 }

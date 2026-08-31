@@ -475,7 +475,7 @@ static void make_do_tr(std::ostream& o, const Module& m)
   // if has_analog
   o__ "set_converged();\n";
   if(m.has_tr_eval_digital()) {
-    o__ "c->tr_eval_digital(this);\n";
+    o__ "c->tr_eval_digital(this);\n"; // do in advance?
   }else{
   }
   // if(has_eval_analog) ...
@@ -1377,7 +1377,7 @@ static void make_module_make_fanout(std::ostream& o, Module const& m)
   o____ "}else if (!n_(ii).is_input()) {\n";
   o____ "}else if (auto l = dynamic_cast<LOGIC_NODE*>(n_(ii).operator->())) {\n";
   o______ "l->set_cm_hack();\n";
-  o____ "}else{ untested();\n";
+  o____ "}else{\n";
   o____ "}\n";
   o__ "}\n";
 

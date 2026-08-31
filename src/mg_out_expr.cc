@@ -727,7 +727,7 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
     if (auto n = dynamic_cast<const Token_NODE*>(*i)) {
       if(_ctx != "logic") {
 	vars().new_rhs(n);
-      }else{
+      }else{ untested();
 	Token_VAR_REF const* r = n;
 	vars().new_rhs(r);
       }

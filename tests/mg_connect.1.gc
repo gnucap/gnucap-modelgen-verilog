@@ -1,0 +1,80 @@
+attach ./modelgen_2.so
+load vams/vpulse.so
+load vams/vsine.so
+load ./reject.so
+
+// options trace
+
+verilog
+
+`modelgen test_connect_1
+module ad (out, in);
+  input in;
+  output out;
+  reg out;
+
+  electrical in;
+  logic out;
+
+  always @(cross(V(in) - 2.501, 1)) out = 1;
+  always @(cross(V(in) - 2.499, -1)) out = 0;
+endmodule
+connectmodule another_d2a(i, o);
+  parameter real vdd = 1.0;
+  parameter real slewrate = 1e9/2.;
+    (*_state="yes", desc="outval"*) real out_val;
+    (*_state="yes", desc="start_delay"*) real start_delay;
+  input i;
+  output o;
+  electrical o;
+  logic i;
+  logic qd_val;
+  reg qd_val;
+  reg nw_val;
+integer nw_val_;
+  logic nw_val;
+  real et;
+  initial nw_val = 0;
+  always @(driver_update(i)) begin
+    nw_val = $driver_next_state(i,0);
+    nw_val_ = $driver_next_state(i,0);
+    $strobe("driver next state at %g %g", $abstime, nw_val);
+    if (qd_val == nw_val_) begin
+    end else begin
+      et = $driver_real_delay(i,0);
+      qd_val = nw_val;
+    end
+  end
+  analog begin : tt
+    @(negedge(qd_val)) begin
+       out_val = qd_val;
+    end
+    @(posedge(qd_val)) begin
+       out_val = vdd * qd_val;
+    end
+    @(edge(qd_val)) begin
+		start_delay = et - (vdd/2)/slewrate;
+    end
+    V(o) <+ transition(out_val,start_delay,vdd/slewrate);
+  end
+endconnectmodule
+`endmodelgen
+
+list
+
+!make test_connect_1.so > /dev/null
+attach ./test_connect_1.so
+
+ground gnd;
+vsine #(.ampl(2.5), .phase(3.1415/2), .offset(2.5), .freq(.5e8)) v1(wave, gnd);
+ad #() u1(ck, wave);
+inv #(.model("logic"), .delay(5000)) i1(ii, ck);
+another_d2a a1 (.o(aii), .i(ii));
+
+.model logic logic delay=1p rise=10p fall=10p
+
+print tran v(wave) l(ck) l(ii) out_val(a1) v(aii) lastchange(ii) control(0) iter(0)
+tran 60n basic trace=n
+
+
+status notime
