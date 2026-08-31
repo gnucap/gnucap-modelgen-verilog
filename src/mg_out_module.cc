@@ -1376,6 +1376,7 @@ static void make_module_make_fanout(std::ostream& o, Module const& m)
   o____ "if (n_(ii).is_grounded()) { untested();\n";
   o____ "}else if (!n_(ii).is_input()) {\n";
   o____ "}else if (auto l = dynamic_cast<LOGIC_NODE*>(n_(ii).operator->())) {\n";
+  o______ "l->set_cm_hack();\n";
   o____ "}else{ untested();\n";
   o____ "}\n";
   o__ "}\n";
