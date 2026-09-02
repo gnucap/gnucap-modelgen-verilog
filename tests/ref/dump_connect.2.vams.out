@@ -1,0 +1,38 @@
+module another_d2a(i, o);
+  input i;
+  output o;
+  electrical o;
+  reg qd_val, nw_val;
+  parameter real vdd =  1.0;
+  parameter real slewrate =  2.0e+9;
+
+  real et;
+  real start_delay;
+
+  endmodule #() ();
+  analog begin
+    @(edge(qd_val)) begin
+      start_delay = (et - ((vdd / 2) / slewrate));
+    end
+    V(o) <+ (vdd * transition(qd_val, start_delay, (vdd / slewrate)));
+  end
+
+  always begin
+    @(driver_update(i)) begin
+      nw_val = $driver_next_state(i, 0);
+      if ((nw_val == qd_val)) begin
+      end
+      else begin
+        et = ($driver_delay(i, 0) *  1.0e-9);
+        qd_val = nw_val;
+      end
+    end
+  end
+
+endmodule
+
+
+
+:47:
+
+^ ? premature EOF (module)

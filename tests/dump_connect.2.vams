@@ -2,6 +2,12 @@
 `pragma modelgen nodump-nature
 `pragma modelgen nodump-discipline
 
+`ifdef __VAMS_GNUCAP__
+`define edge(a) edge(a)
+`else
+`define edge(a) a
+`endif
+
 connectmodule another_d2a(i, o);
   parameter real vdd = 1.0;
   parameter real slewrate = 2.0/1e-9; // V/s
@@ -24,7 +30,10 @@ connectmodule another_d2a(i, o);
     end
   end
   analog begin
-    @(qd_val) start_delay = et - (vdd/2)/slewrate;
+    @(`edge(qd_val)) begin
+      start_delay = et - (vdd/2)/slewrate;
+    end
     V(o) <+ vdd * transition(qd_val,start_delay,vdd/slewrate);
   end
 endmodule
+
