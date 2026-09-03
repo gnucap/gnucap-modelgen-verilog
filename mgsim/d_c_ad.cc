@@ -247,6 +247,17 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
       case lvRISING: untested(); break; //n->dont_set_quality("begin stable 1");	break;
       case lvFALLING: untested(); n->set_quality(qBAD); break; // untested();n->set_bad_quality("rising to stable 0");	break;
       case lvSTABLE1: break; // n->dont_set_quality("continuing stable 1");	break;
+      case lv0Z: untested(); // fall-through
+      case lv0X: untested(); // fall-through
+      case lv1Z: untested(); // fall-through
+      case lv1X: untested(); // fall-through
+      case lvZ0: untested(); // fall-through
+      case lvX0: untested(); // fall-through
+      case lvZ1: untested(); // fall-through
+      case lvX1: untested(); // fall-through
+      case lvZZ: untested(); // fall-through
+      case lvZX: untested(); // fall-through
+      case lvXZ: untested(); // fall-through
       case lvUNKNOWN: n->set_quality(qGOOD);		break;
       }
       n->set_lv(lvSTABLE1);
@@ -256,6 +267,17 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
       case lvRISING: untested(); n->set_quality(qBAD); break; // untested();n->set_bad_quality("rising to stable 0");	break;
       case lvFALLING: untested(); break; // n->dont_set_quality("begin stable 0");	break;
       case lvSTABLE1: break; // n->dont_set_quality("stable 1 to stable 0");	break;
+      case lv0Z: untested(); // fall-through
+      case lv0X: untested(); // fall-through
+      case lv1Z: untested(); // fall-through
+      case lv1X: untested(); // fall-through
+      case lvZ0: untested(); // fall-through
+      case lvX0: untested(); // fall-through
+      case lvZ1: untested(); // fall-through
+      case lvX1: untested(); // fall-through
+      case lvZZ: untested(); // fall-through
+      case lvZX: untested(); // fall-through
+      case lvXZ: untested(); // fall-through
       case lvUNKNOWN: n->set_quality(qGOOD); break;
       }
       n->set_lv(lvSTABLE0);
@@ -267,6 +289,8 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
 	case lvSTABLE0:
 	 //  n->dont_set_quality("begin good rise");
 	  break;
+	case lvZ1: untested(); // fall-through
+        case lvX1: untested(); // fall-through
 	case lvRISING:
 	  if (diff < dt/(process()->mr * process()->rise)) { untested();
 	    n->set_quality(qBAD);
@@ -274,12 +298,21 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
 	    // n->dont_set_quality("continuing good rise");
 	  }
 	  break;
+	case lvZ0: untested(); // fall-through
+        case lvX0: untested(); // fall-through
 	case lvFALLING:untested();
 	  n->set_quality(qBAD); // //( "positive glitch in fall");
 	  break;
 	case lvSTABLE1:untested();
 	  n->set_quality(qBAD); // //( "negative glitch in 1");
 	  break;
+	case lv0Z: untested(); // fall-through
+        case lv0X: untested(); // fall-through
+        case lv1Z: untested(); // fall-through
+        case lv1X: untested(); // fall-through
+        case lvZZ: untested(); // fall-through
+        case lvZX: untested(); // fall-through
+        case lvXZ: untested(); // fall-through
 	case lvUNKNOWN: untested();
 	  n->set_quality(qBAD); //( "initial rise");
 	  break;
@@ -290,9 +323,13 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
 	case lvSTABLE0:untested();
 	  n->set_quality(qBAD); // "positive glitch in 0");
 	  break;
+	case lvZ1: untested(); // fall-through
+        case lvX1: untested(); // fall-through
 	case lvRISING: untested();
 	  n->set_quality(qBAD); // "negative glitch in rise");
 	  break;
+	case lvZ0: untested(); // fall-through
+        case lvX0: untested(); // fall-through
 	case lvFALLING:
 	  if (-diff < dt/(process()->mf * process()->fall)) { untested();
 	    n->set_quality(qBAD); // ("slow fall");
@@ -303,6 +340,13 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
 	case lvSTABLE1:
 	  // n->dont_set_quality("begin good fall");
 	  break;
+	case lv0Z: untested(); // fall-through
+        case lv0X: untested(); // fall-through
+        case lv1Z: untested(); // fall-through
+        case lv1X: untested(); // fall-through
+        case lvZZ: untested(); // fall-through
+        case lvZX: untested(); // fall-through
+        case lvXZ: untested(); // fall-through
 	case lvUNKNOWN:untested();
 	  n->set_quality(qBAD); // ("initial fall");
 	  break;

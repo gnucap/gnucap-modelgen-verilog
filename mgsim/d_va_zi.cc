@@ -880,7 +880,7 @@ TIME_PAIR ZFILTER::tr_review()
     // we missed it.. retry? bug in scheduler?
    _time_by.min_event(_pending_event);
   }
-  trace4("ZFILTER::tr_review", long_label(), _sim->_time0, _time_by._event, _time_by._error_estimate);
+  trace4("ZFILTER::tr_review", long_label(), _sim->_time0, _time_by.event(), _time_by.dt_estimate());
   return _time_by;
 }
 /*--------------------------------------------------------------------------*/

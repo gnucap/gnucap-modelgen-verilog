@@ -560,8 +560,19 @@ void DEV_LOGIC::tr_accept()
 	assert(future_state != lvUNKNOWN);
 	switch (future_state) {
 	case lvSTABLE0:	/*nothing*/		break;
+	case lvZ1: untested(); // fall-through
+	case lvX1: untested(); // fall-through
 	case lvRISING:  future_state=lvSTABLE0;	break;
+	case lvZ0: untested(); // fall-through
+	case lvX0: untested(); // fall-through
 	case lvFALLING: future_state=lvSTABLE1;	break;
+        case lv0Z: untested(); // fall-through
+        case lv0X: untested(); // fall-through
+        case lv1Z: untested(); // fall-through
+        case lv1X: untested(); // fall-through
+        case lvZZ: untested(); // fall-through
+        case lvZX: untested(); // fall-through
+        case lvXZ: untested(); // fall-through
 	case lvSTABLE1:	/*nothing*/		break;
 	case lvUNKNOWN: unreachable();		break;
 	}

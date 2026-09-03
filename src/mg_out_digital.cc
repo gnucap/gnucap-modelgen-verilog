@@ -294,7 +294,7 @@ static void make_cc_common_tr_review(std::ostream& o, const Module& m)
   oo.make_load_variables(o, m);
   oo.make_list(o, m);
 
-  o__ "trace1(\"review analog2\", m->_time_by._event);\n";
+  o__ "trace1(\"review digital\", m->_time_by.event());\n";
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";

@@ -1164,14 +1164,14 @@ static void make_cc_common_tr_review(std::ostream& o, const Module& m)
   o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
   o << "inline void COMMON_" << m.identifier() <<
     "::tr_review_analog(MOD_" << m.identifier() << "* m) const\n{\n";
-  o__ "trace1(\"review analog1\", m->_time_by._event);\n";
+  o__ "trace1(\"review analog1\", m->_time_by.event());\n";
 //  o << "eval_t mode = m_TR_REVIEW;\n";
 
   OUT_ANALOG oo(OUT_ANALOG::modeTR_REVIEW, &tr_review_tag);
   oo.make_load_variables(o, m);
   oo.make_analog_list(o, m);
 
-  o__ "trace1(\"review analog2\", m->_time_by._event);\n";
+  o__ "trace1(\"review analog2\", m->_time_by.event());\n";
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";

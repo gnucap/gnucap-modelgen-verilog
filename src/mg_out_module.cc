@@ -731,7 +731,6 @@ static void make_tr_review(std::ostream& o, const Module& m)
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
-  o__ "trace1(\"review0\", _time_by._event);\n";
   if(m.has_analog_block()){
     o__ "c->tr_review_analog(this);\n";
   }else{
@@ -751,7 +750,6 @@ static void make_tr_review(std::ostream& o, const Module& m)
     o__ "}\n";
   }
 
-  o__ "trace3(\"review done\", long_label(), _sim->_time0, _time_by._event);\n";
   o__ "return _time_by;\n";
   o << "}\n"
     "/*--------------------------------------"
