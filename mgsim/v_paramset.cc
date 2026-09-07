@@ -690,7 +690,6 @@ void PARAMSET::expand()
       // cannot deflate yet
       subckt()->expand();
     }else{
-      dev->precalc_first();
       dev->expand_first();
       dev->expand();
       if(dynamic_cast<PARAMSET*>(dev)){

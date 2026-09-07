@@ -46,7 +46,6 @@ assuming double in 1
 assuming double in x
 assuming double in ((r + s) + x)
 assuming double in ((r + s) + x)
-assuming double in ((r + s) + x)
 print dc v(nodes) i(m.v) y(m.*) y(m.R1.*)
                                   ^ ? no match
 >>>>>dc
