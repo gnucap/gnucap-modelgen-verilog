@@ -53,10 +53,13 @@ static void make_header(std::ostream& o, const File& in,
     "#include <e_va.h>\n";
 #else
   o <<
-#include "m_va.raw"
+#include "e_va.raw"
      ;
   o <<
-#include "e_va.raw"
+#include "l_va.raw"
+     ;
+  o <<
+#include "m_va.raw"
      ;
 #endif
   if(options().gen_discipline()){

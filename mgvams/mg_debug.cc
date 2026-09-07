@@ -72,7 +72,7 @@ protected:
     }else{
       o______ "char const* cs = a0.c_str();\n";
     }
-    o______ "fprintf(stdout, cs";
+    o______ "va::fprintf(stdout, cs"; // l_va.h
     for(size_t i=1; i<num_args(); ++i) {
       o << ", plain_value(a" << i << ")";
     }

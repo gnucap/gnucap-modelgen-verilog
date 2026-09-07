@@ -101,7 +101,7 @@ mg_token.cc \
 m_tokens.cc
 #------------------------------------------------------------------------
 RAW_HDRS = mg_.h mg_out.h
-INSTALL_HDRS = m_va.h e_va.h
+INSTALL_HDRS = e_va.h l_va.h m_va.h
 #------------------------------------------------------------------------
 RAW_OTHER = MakeList
 #------------------------------------------------------------------------
@@ -138,7 +138,7 @@ DISTCLEANFILES = $(CLEANFILES) config.h
 MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 #------------------------------------------------------------------------
 #------------------------------------------------------------------------
-EMBED_HEADERS = e_va.raw m_va.raw
+EMBED_HEADERS = e_va.raw l_va.raw m_va.raw
 #------------------------------------------------------------------------
 # BUG: Make.depend?
 mg_out_root.o: ${EMBED_HEADERS}
