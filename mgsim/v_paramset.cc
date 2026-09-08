@@ -123,9 +123,9 @@ private:
   }
   int min_nodes()const override{
     assert(_dev);
-    if(auto c = prechecked_cast<COMPONENT const*>(_dev)){
+    if(auto c = dynamic_cast<COMPONENT const*>(_dev)){
       return c->min_nodes();
-    }else if(auto m = prechecked_cast<MODEL_CARD const*>(_dev)){
+    }else if(auto m = dynamic_cast<MODEL_CARD const*>(_dev)){
       auto cp = prechecked_cast<COMPONENT const*>(m->component_proto());
       assert(cp);
       return cp->min_nodes();
@@ -136,9 +136,9 @@ private:
   }
   int max_nodes()const override{
     assert(_dev);
-    if(auto c = prechecked_cast<COMPONENT const*>(_dev)){
+    if(auto c = dynamic_cast<COMPONENT const*>(_dev)){
       return c->max_nodes();
-    }else if(auto m = prechecked_cast<MODEL_CARD const*>(_dev)){
+    }else if(auto m = dynamic_cast<MODEL_CARD const*>(_dev)){
       auto cp = prechecked_cast<COMPONENT const*>(m->component_proto());
       assert(cp);
       return cp->max_nodes();
@@ -725,9 +725,9 @@ void PARAMSET::expand()
 /*--------------------------------------------------------------------------*/
 std::string PARAMSET::port_name(int i)const
 {
-  if(auto c = prechecked_cast<COMPONENT const*>(_dev)){
+  if(auto c = dynamic_cast<COMPONENT const*>(_dev)){
     return c->port_name(i);
-  }else if(auto m = prechecked_cast<MODEL_CARD const*>(_dev)){
+  }else if(auto m = dynamic_cast<MODEL_CARD const*>(_dev)){
     auto cp = prechecked_cast<COMPONENT const*>(m->component_proto());
     assert(cp);
     return cp->port_name(i);
