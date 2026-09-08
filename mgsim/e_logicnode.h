@@ -125,7 +125,7 @@ public:
   }
 
 public: // action, used by logic
-  void	      set_event(double delay, LOGICVAL v);
+  void	      set_event(double delay, LOGICVAL v,CARD*c=nullptr);
   void	      force_initial_value(LOGICVAL v);
   void	      propagate();
   void	      unpropagate();
