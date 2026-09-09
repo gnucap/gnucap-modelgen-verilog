@@ -475,7 +475,7 @@ static void make_do_tr(std::ostream& o, const Module& m)
   // if has_analog
   o__ "set_converged();\n";
   if(m.has_tr_eval_digital()) {
-    o__ "c->tr_eval_digital(this);\n";
+    o__ "c->tr_eval_digital(this);\n"; // do in advance?
   }else{
   }
   // if(has_eval_analog) ...
@@ -731,7 +731,6 @@ static void make_tr_review(std::ostream& o, const Module& m)
   o__ "COMMON_" << m.identifier() << " const* c = "
     "prechecked_cast<COMMON_" << m.identifier() << " const*>(common());\n";
   o__ "assert(c);\n";
-  o__ "trace1(\"review0\", _time_by._event);\n";
   if(m.has_analog_block()){
     o__ "c->tr_review_analog(this);\n";
   }else{
@@ -751,7 +750,6 @@ static void make_tr_review(std::ostream& o, const Module& m)
     o__ "}\n";
   }
 
-  o__ "trace3(\"review done\", long_label(), _sim->_time0, _time_by._event);\n";
   o__ "return _time_by;\n";
   o << "}\n"
     "/*--------------------------------------"
@@ -1376,7 +1374,8 @@ static void make_module_make_fanout(std::ostream& o, Module const& m)
   o____ "if (n_(ii).is_grounded()) { untested();\n";
   o____ "}else if (!n_(ii).is_input()) {\n";
   o____ "}else if (auto l = dynamic_cast<LOGIC_NODE*>(n_(ii).operator->())) {\n";
-  o____ "}else{ untested();\n";
+  o______ "l->set_cm_hack();\n";
+  o____ "}else{\n";
   o____ "}\n";
   o__ "}\n";
 

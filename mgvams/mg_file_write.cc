@@ -147,7 +147,7 @@ public: //overrides
     }else{
     }
     o______ "if(fd & (1<<31)){\n";
-    o________ "dprintf(fd ^ (1<<31), a1.c_str()";
+    o________ "va::dprintf(fd ^ (1<<31), a1.c_str()"; // l_va.h
     for(int i=2; i<int(num_args()); ++i) {
       o << ", plain_value(a" << i << ")";
     }
@@ -155,7 +155,7 @@ public: //overrides
     o______ "}else{\n";
     o________ "for(int i=1; i<31; ++i) {\n";
     o__________ "if(fd & (1<<i)){\n";
-    o__________ "  dprintf(i, a1.c_str()";
+    o__________ "  va::dprintf(i, a1.c_str()"; // l_va.h
     for(int i=2; i<int(num_args()); ++i) {
       o << ", plain_value(a" << i << ")";
     }

@@ -81,7 +81,7 @@ private:
     o______ "}else{untested();\n";
     o______ "}\n";
     o____ "}\n";
-    o____ "void "<<n<<"tr_accept(int i=0)const {\n";
+    o____ "void "<<n<<"tr_accept(int i=0) {\n";
     o______ "if(i>=0){\n";
     o________ "_sim->new_event(_sim->_time0 + _sim->_dtmin, this);\n";
     o______ "}else{ untested();\n";

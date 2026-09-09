@@ -1,4 +1,5 @@
 /*                        -*- C++ -*-
+ * Copyright (C) 2026 Arnout Engelen
  * Copyright (C) 2023 Felix Salfelder
  * Author: Felix Salfelder
  *
@@ -19,55 +20,39 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * Verilog-AMS builtin functions
  */
+
+#ifndef GNUCAP_L_VA_H
+#define GNUCAP_L_VA_H
 /*--------------------------------------------------------------------------*/
-#include "mg_func.h"
-#include "mg_.h"
-#include "mg_out.h"
-#include "mg_token.h"
-#include <globals.h>
-#include <u_parameter.h>
+#include <stdarg.h>
+#include <stdio.h>
 /*--------------------------------------------------------------------------*/
-namespace{
+namespace va {
 /*--------------------------------------------------------------------------*/
-class FINISH_TASK : public MGVAMS_TASK {
-public:
-  explicit FINISH_TASK() : MGVAMS_TASK(){
-    set_label("t_finish");
-  }
-private:
-  std::string eval(CS& cmd, const PARAM_LIST*)const override{ untested();
-    return "$finish" + cmd.fullstring();
-  }
-  MGVAMS_TASK* clone()const override{ untested();
-    return new FINISH_TASK(*this);
-  }
-  Token* new_token(Module& m, size_t na)const override{
-    m.install(this);
-    m.set_tr_advance();
-    Token_CALL* t = new Token_CALL("$finish", this);
-    t->set_num_args(na); // still needed?
-    return t;
-  }
-  void make_cc_dev(std::ostream& o)const override {
-    o__ "void t_finish(int n=1){\n";
-    o____ "(void)n;\n";
-    o____ "throw Exception(\"finish\");\n";
-    o__ "}\n";
-    o__ "void t_finish(double x){return t_finish(int(x));}\n";
-    o__ "void t_finish__precalc(int n=1){\n";
-    o____ "(void)n;\n";
-    o__ "}\n";
-    o__ "void t_finish__precalc(double x){return t_finish(int(x));}\n";
-  }
-  std::string code_name()const override{
-    return label();
-  }
-} finish;
-DISPATCHER<FUNCTION>::INSTALL d_finish(&function_dispatcher, "$finish", &finish);
-/*--------------------------------------------------------------------------*/
+/* Verilog has conversion specifiers that C (POSIX?) does not have.
+ * This would be the place to implement them. Until then just call fprintf.
+ */
+int fprintf(FILE *stream, const char *format, ...)
+{
+  va_list args;
+  va_start(args, format);
+  int ret = ::vfprintf(stream, format, args);
+  va_end(args);
+  return ret;
 }
 /*--------------------------------------------------------------------------*/
+int dprintf(int fd, const char *format, ...)
+{
+  va_list args;
+  va_start(args, format);
+  int ret = ::vdprintf(fd, format, args);
+  va_end(args);
+  return ret;
+}
 /*--------------------------------------------------------------------------*/
-// vim:ts=8:sw=2:noet
+} // namespace
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+#endif
+// vim:ts=8:sw=2:noet:

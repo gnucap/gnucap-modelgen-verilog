@@ -1,0 +1,48 @@
+attach ./modelgen_2.so
+load vams/vpulse.so
+load vams/vsine.so
+
+verilog
+
+// BUG: e2l has to be "module"
+`modelgen test_connect_2
+module e2l(el, cm);
+    input el;
+    output cm;
+    reg cm;
+    logic cm;
+    electrical el;
+
+    always @(cross(V(el) - 0.85, +1)) cm = 1;
+    always @(cross(V(el) - 0.25, -1)) cm = 0;
+endmodule
+`endmodelgen
+
+!make test_connect_2.so > /dev/null
+attach ./test_connect_2.so
+
+verilog
+
+module test(in, out, clk, nclk);
+    inout in, out;
+    output clk, nclk;
+    logic clk;
+    logic nclk;
+    ground gnd;
+    electrical vdd, vss, out, in;
+    electrical clk_drive, nclk_drive;
+    electrical net1, net2, net3, net4, net5, nCK_e, CK_e;
+
+    vpulse #(.val0(0.0), .val1(1.2), .rise(10p), .fall(10p), .width(25n), .period(50n)) ps(clk_drive, gnd);
+    vpulse #(.val0(1.2), .val1(0.0), .rise(10p), .fall(10p), .width(25n), .period(50n)) ns(nclk_drive, gnd);
+    e2l clk_converter(clk_drive, clk);
+    e2l nclk_converter(nclk_drive, nclk);
+endmodule
+
+test #() t(in, out, clk, nclk);
+
+print tran v(t.ps) v(t.ns)
+tran 100n trace n
+
+
+status notime

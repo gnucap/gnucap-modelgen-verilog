@@ -233,7 +233,11 @@ TIME_PAIR DEV_DDT::tr_review()
     // Backward Euler, no step control, take it as it comes
   }else{
     double timestep = tr_review_trunc_error(_y);
-    _time_by.min_error_estimate(tr_review_check_and_convert(timestep));
+    if(tr_review_check(timestep)){
+    }else{
+      _time_by.set_nok();
+    }
+    _time_by.min_dt_estimate(timestep);
   }
 
       // time_future = _time[1] + timestep;
@@ -305,7 +309,11 @@ TIME_PAIR DEV_IDT::tr_review()
     // Backward Euler, no step control, take it as it comes
   }else{
     double timestep = tr_review_trunc_error(_i);
-    _time_by.min_error_estimate(tr_review_check_and_convert(timestep));
+    if(tr_review_check(timestep)){
+    }else{
+      _time_by.set_nok();
+    }
+    _time_by.min_dt_estimate(timestep);
   }
   return _time_by;
 }

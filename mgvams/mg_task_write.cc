@@ -162,7 +162,7 @@ public: //overrides
       o______ "a0 += \"" << end() << "\";\n";
     }else{
     }
-    o______ "fprintf(stdout, a0.c_str()";
+    o______ "va::fprintf(stdout, a0.c_str()"; // l_va.h
     for(size_t i=1; i<num_args(); ++i) {
       o << ", plain_value(a" << i << ")";
     }

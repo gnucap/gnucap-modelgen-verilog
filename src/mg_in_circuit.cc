@@ -230,17 +230,9 @@ void Net_Decl_Reg::parse(CS& f)
   Net_Identifier::parse(f);
   Module* mod = prechecked_cast<Module*>(owner());
   assert(mod);
-  Node_Ref const& nn = owner()->node(name());
-  if(nn) {
-    set_node(mod->node(nn));
-  }else{
-    throw Exception_CS_("ground: need previously declared net", f);
-  }
-
-  Module* m = prechecked_cast<Module*>(owner());
-  assert(m);
+  set_node(owner()->new_node(name()));
   assert(node());
-  m->set_reg(node());
+  mod->set_reg(node());
 }
 /*--------------------------------------------------------------------------*/
 void Net_Decl_List_Reg::parse(CS& f)

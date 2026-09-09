@@ -1002,7 +1002,10 @@ void OUT_ANALOG::make_load_block_variables(std::ostream& o, const
 void OUT_ANALOG::make_node_refs(std::ostream& o, const Module& m) const
 {
   for(Node const* n : m.circuit()->nodes()){
-    if(n->name().size()){
+    if(n->is_discrete()) {
+      o__ "const va::LNR _v_" << n->code_name() <<
+	"(m->n_(MOD__::" << n->code_name() << ")); // load\n";
+    }else if(n->name().size()){
       o__ "node_t const& _v_" << n->code_name() <<
 	"(m->n_(MOD__::" << n->code_name() << ")); // ref " << n->code_name().size() << "\n";
     }else{
@@ -1161,14 +1164,14 @@ static void make_cc_common_tr_review(std::ostream& o, const Module& m)
   o << "typedef MOD_" << m.identifier() << "::ddouble ddouble;\n";
   o << "inline void COMMON_" << m.identifier() <<
     "::tr_review_analog(MOD_" << m.identifier() << "* m) const\n{\n";
-  o__ "trace1(\"review analog1\", m->_time_by._event);\n";
+  o__ "trace1(\"review analog1\", m->_time_by.event());\n";
 //  o << "eval_t mode = m_TR_REVIEW;\n";
 
   OUT_ANALOG oo(OUT_ANALOG::modeTR_REVIEW, &tr_review_tag);
   oo.make_load_variables(o, m);
   oo.make_analog_list(o, m);
 
-  o__ "trace1(\"review analog2\", m->_time_by._event);\n";
+  o__ "trace1(\"review analog2\", m->_time_by.event());\n";
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";

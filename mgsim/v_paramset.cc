@@ -20,7 +20,7 @@
  */
 #include <globals.h>
 #include <u_lang.h>
-#include <e_model.h>
+#include <e_model.h> // BUG
 #include <e_subckt.h>
 #include <e_node.h>
 #include <e_paramlist.h>
@@ -75,7 +75,7 @@ class PARAMSET : public BASE_SUBCKT {
   node_t* _n{nullptr};
 private: // partly redudant
   PARAMSET const* _parent{nullptr}; // use _dev?
-  COMPONENT const* _dev{nullptr}; // owned by paramset instance.
+  CARD const* _dev{nullptr}; // TODO: remove, use subckt
   int _node_capacity;
 public:
   PARAMSET();
@@ -119,29 +119,31 @@ private:
 //  }
 
   int net_nodes()const override {
-    if(_dev){
-      // trace3("PARAMSET::net_nodes", _dev->long_label(), _dev->net_nodes(), _dev->max_nodes());
-      return _net_nodes; // dev->net_nodes(); // problem with chain
-      return _dev->net_nodes(); // problem with bjt
-    }else{
-      return BASE_SUBCKT::net_nodes();
-    }
+    return _net_nodes;
   }
   int min_nodes()const override{
-    if(_dev){
-      return _dev->min_nodes();
+    assert(_dev);
+    if(auto c = dynamic_cast<COMPONENT const*>(_dev)){
+      return c->min_nodes();
+    }else if(auto m = dynamic_cast<MODEL_CARD const*>(_dev)){
+      auto cp = prechecked_cast<COMPONENT const*>(m->component_proto());
+      assert(cp);
+      return cp->min_nodes();
     }else{ untested();
-      assert(_parent);
-      return _parent->min_nodes();
+      unreachable();
+      return 0;
     }
   }
   int max_nodes()const override{
-    if(_dev){
-      return _dev->max_nodes();
-    }else if(_parent){ untested();
-      return _parent->max_nodes();
+    assert(_dev);
+    if(auto c = dynamic_cast<COMPONENT const*>(_dev)){
+      return c->max_nodes();
+    }else if(auto m = dynamic_cast<MODEL_CARD const*>(_dev)){
+      auto cp = prechecked_cast<COMPONENT const*>(m->component_proto());
+      assert(cp);
+      return cp->max_nodes();
     }else{ untested();
-      incomplete();
+      unreachable();
       return 0;
     }
   }
@@ -151,23 +153,23 @@ private:
   void expand_first()override;
   void expand()override;
   CARD* deflate()override;
-  void map_nodes()override { untested(); /*no-op*/ }
+#if 0
 private: // no ops for top level
-  void precalc_last() override { untested(); assert(!is_device());}
-  void tr_begin() override{ untested(); assert(!is_device());}
-  void ac_begin() override{ untested(); assert(!is_device());}
-  void tr_load() override{ untested(); assert(!is_device());}
-  bool tr_needs_eval()const override{ untested(); assert(!is_device()); return false;}
-  void tr_queue_eval()override{ untested(); assert(!is_device());}
-  void tr_accept() override{ untested(); assert(!is_device());}
-  double tr_probe_num(const std::string&)const override{untested(); return NOT_VALID;}
-  void tr_advance() override{ untested(); assert(!is_device());}
-  void dc_advance() override{ untested(); assert(!is_device());}
-  bool do_tr() override{ untested(); assert(!is_device()); return true;}
-  void do_ac() override{ untested(); assert(!is_device());}
-  void ac_load() override{ untested(); assert(!is_device());}
-private:
-  COMPONENT const* prepare_dev(CARD const* proto);
+  void map_nodes()override { untested(); unreachable(); /*no-op*/ }
+  void precalc_last() override { untested(); unreachable(); assert(!is_device());}
+  void tr_begin() override{ untested(); unreachable(); assert(!is_device());}
+  void ac_begin() override{ untested(); unreachable(); assert(!is_device());}
+  void tr_load() override{ untested(); unreachable(); assert(!is_device());}
+  bool tr_needs_eval()const override{ untested(); unreachable(); assert(!is_device()); return false;}
+  void tr_queue_eval()override{ untested(); unreachable(); assert(!is_device());}
+  void tr_accept() override{ untested(); unreachable(); assert(!is_device());}
+  double tr_probe_num(const std::string&)const override{ untested();unreachable(); return NOT_VALID;}
+  void tr_advance() override{ untested(); unreachable(); assert(!is_device());}
+  void dc_advance() override{ untested(); unreachable(); assert(!is_device());}
+  bool do_tr() override{ untested(); unreachable(); assert(!is_device()); return true;}
+  void do_ac() override{ untested(); unreachable(); assert(!is_device());}
+  void ac_load() override{ untested(); unreachable(); assert(!is_device());}
+#endif
 private: // base class?
   void grow_nodes(int);
 }ps;
@@ -264,7 +266,7 @@ int PARAMSET::is_valid() const
       delete res;
       return a;
     }
-  }else{ untested();
+  }else{
     trace1("PARAMSET::invalid?", long_label());
     return false;
   }
@@ -329,32 +331,6 @@ int PARAMSET::set_param_by_name(std::string Name, std::string Value)
 
 }
 /*--------------------------------------------------------------------------*/
-COMPONENT const* PARAMSET::prepare_dev(CARD const* proto)
-{
-  auto dev = dynamic_cast<COMPONENT const*>(proto);
-
-#if 0
-  // this does not work, proto could be a paramset.
-  CARD* cl = proto->clone_instance(); // BUG: clone
-  auto dev = prechecked_cast<COMPONENT const*>(proto);
-  subckt()->push_back(dev);
-  dev->set_owner(this);
-  for(int i=0; i<dev->max_nodes(); ++i){ untested();
-    std::string pn = dev->port_name(i);
-    trace3("PARAMSET::prepare_dev", long_label(), i, pn);
-
-    dev->set_port_by_index(i, pn);
-  }
-#endif
-
-  if(dev){
-  }else if(auto m = dynamic_cast<MODEL_CARD const*>(proto)) {
-    dev = prechecked_cast<COMPONENT const*>(m->component_proto());
-    assert(dev);
-  }
-  return dev;
-}
-/*--------------------------------------------------------------------------*/
 void PARAMSET::precalc_first()
 {
  // assert(scope());
@@ -369,7 +345,10 @@ void PARAMSET::precalc_first()
       throw Exception_No_Match(base_name); // cmd.warn(bDANGER, here, "paramset: no match");
     }else{
     }
-    _dev = prepare_dev(p);
+    if(dynamic_cast<MODEL_CARD const*>(p)) {
+    }else{
+    }
+    _dev = p;
   }
 
   if(!_dev){ untested();
@@ -395,10 +374,10 @@ void PARAMSET::precalc_first()
 
     subckt()->precalc_first();
   }else if(_parent){
+    trace3("PARAMSET::pf no subckt", long_label(), is_valid(), mfactor());
   }else{ untested();
   }
 
-  trace3("PARAMSET::pf done", long_label(), is_valid(), mfactor());
 
   assert(!is_constant()); /* because I have more work to do */
 } // precalc_first
@@ -567,7 +546,7 @@ CARD* PARAMSET::deflate()
   }else{ untested();
   }
 
-  deflated->precalc_first();
+//  deflated->precalc_first();
 
   return deflated;
 } // PARAMSET::deflate
@@ -648,10 +627,37 @@ void PARAMSET::expand()
 
     trace4("PARAMSET::expand sp0", long_label(), net_nodes(), dev->net_nodes(), typeid(*dev).name());
 
-    dev->set_parameters("_", this, dev->mutable_common(),
-		     /*Value*/ 0., /*states*/ 0, NULL,
+    COMMON_COMPONENT* cc = dev->mutable_common();
+    bool flag = false;
+    if(0){
+    }else if(auto m = dynamic_cast<MODEL_CARD const*>(_parent->_dev)) {
+      if(dynamic_cast<PARAMSET const*>(m->component_proto())) {
+      }else{
+	// d->set_owner(this);
+	// d->precalc_first();
+	trace4("PARAMSET::expand modelhack.", long_label(), net_nodes(), dev->net_nodes(), typeid(*dev).name());
+	// bypass spice-style find_model
+	assert(dev->common());
+	cc = dev->common()->clone();
+	cc->attach(m);
+//	cc->set_modelname("");
+
+	flag = true;
+      }
+    }
+
+    dev->set_parameters("_", this, cc, /*Value*/ 0., /*states*/ 0, NULL,
 		     net_nodes(), _n);
     assert(dev->owner() == this);
+
+    if(0 && flag){
+	trace4("PARAMSET::expand postset.", long_label(), net_nodes(), dev->net_nodes(), typeid(*dev).name());
+	dev->precalc_first(); // breaks nodes
+	dev->expand_first(); // breaks nodes
+	//cur->attach_common(cc);
+	//assert(cur->common() == cc);
+    }else{
+    }
 
     {
       auto cp = prechecked_cast<COMMON_PARAMLIST const*>(proto->common());
@@ -690,8 +696,8 @@ void PARAMSET::expand()
       // cannot deflate yet
       subckt()->expand();
     }else{
-      dev->precalc_first();
       dev->expand_first();
+      trace1("PARAMSET::expand sub", dev->long_label());
       dev->expand();
       if(dynamic_cast<PARAMSET*>(dev)){
       }else{
@@ -712,15 +718,23 @@ void PARAMSET::expand()
       // TODO: seems to be the wrong place. see mg_bug.1.gc
       throw Exception("invalid prototype for " + long_label());
     }
-  }else{
+  }else{ untested();
     unreachable();
   }
 } // expand
 /*--------------------------------------------------------------------------*/
 std::string PARAMSET::port_name(int i)const
 {
-  assert(_dev);
-  return _dev->port_name(i);
+  if(auto c = dynamic_cast<COMPONENT const*>(_dev)){
+    return c->port_name(i);
+  }else if(auto m = dynamic_cast<MODEL_CARD const*>(_dev)){
+    auto cp = prechecked_cast<COMPONENT const*>(m->component_proto());
+    assert(cp);
+    return cp->port_name(i);
+  }else{ untested();
+    unreachable();
+    return "??";
+  }
 }
 /*--------------------------------------------------------------------------*/
 } // namespace

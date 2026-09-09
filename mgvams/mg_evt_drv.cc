@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * Verilog-AMS edge events
+ * Verilog-AMS addition of a new pending value
  */
 /*--------------------------------------------------------------------------*/
 #include "f__.cc"
@@ -28,23 +28,17 @@
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-class EDG : public MGVAMS_EVENT {
-  enum dir{
-    dNeg = -1,
-    dAny = 0,
-    dPos = 1
-  }_dir;
+class DRV_UPD : public MGVAMS_EVENT {
   std::string _code_name;
 protected:
   Module* _m{nullptr};
-  EDG(EDG const& e) : MGVAMS_EVENT(e), _dir(e._dir) { }
+  DRV_UPD(DRV_UPD const& e) : MGVAMS_EVENT(e) { }
 public:
-  explicit EDG(int d) : MGVAMS_EVENT(), _dir(dir(d)) {
-    std::string label[3]{"negedge", "edge", "posedge"};
-    set_label(label[d+1]);
+  explicit DRV_UPD() : MGVAMS_EVENT() {
+    set_label("driver_update");
   }
-  ~EDG(){ }
-  virtual EDG* clone()const override { return new EDG(*this);}
+  ~DRV_UPD(){ }
+  virtual DRV_UPD* clone()const override { return new DRV_UPD(*this);}
 private:
   bool static_code()const override {return false;}
   bool is_common()const override { untested();return true;}
@@ -81,69 +75,66 @@ private:
 //   }
   void make_cc_dev(std::ostream& o)const override {
     indent x;
-    o__ "// edge dev\n";
-    std::string trans;
-    std::string stable;
-    if(_dir==0){
-    }else if(_dir==1){
-       trans = "1";
-       stable = "3";
-    }else{
-       trans = "2";
-       stable = "0";
-    }
+    o__ "double " << label() + "update{NEVER};\n";
+    o__ "bool " << label() + "transit{false};\n";
     o__ "bool " << label() + "now{false};\n";
     o__ "bool " << label() + "__tr_advance(va::LNR const& ll) {\n";
     o____ "auto l = prechecked_cast<LOGIC_NODE const*>(ll.ptr());\n";
     o____ "assert(l);\n";
-    o____ "bool is_final = l->final_time() == _sim->_time0;\n";
-    o____ "bool is_lct   = l->last_change_time() == _sim->_time0;\n";
-    if(_dir){
-      o____ label() + "now = is_final && (l->lv() == " << trans <<
-                                       "||l->lv() == " << stable << ");\n";
-      o____ label() + "now |= is_lct && (l->lv() == " << stable << ");\n";
-    }else{
-      o____ label() + "now = is_final;\n";
-      o____ label() + "now |= is_lct && (l->lv() == " << 0 << ");\n";
-      o____ label() + "now |= is_lct && (l->lv() == " << 3 << ");\n";
-    }
-    o____ "if(" << label() << "now){\n";
+    o____ "bool now = _sim->_time0 == l->last_change_time();\n";
+    o____ "double larel = l->last_change_time() - _sim->_time0;\n";
+    o____ "trace3(\"ADV\", _sim->_time0, larel, l->final_time());\n";
+    o____ label() + "now = now;\n";
+    o____ "if(now){ \n";
     o______ "q_eval();\n"; // hack?
     o____ "}else{\n";
     o____ "}\n";
-//    o____ "return " << label() + "now;\n";
-    o____ "return false;\n";
-    o__ "}\n";
-    o__ "bool " << label() + "__precalc(va::LNR const&) {\n";
-    o____ "return false;\n";
-    o__ "}\n";
-    o__ "bool " << label() + "__tr_begin(va::LNR const&) {\n";
-    o____ "incomplete();\n";
-    o____ "return false;\n";
-    o__ "}\n";
-    o__ "bool " << label() + "__tr_restore(va::LNR const&) {\n";
-    o____ "incomplete();\n";
-    o____ "return false;\n";
+    o____ "return now;\n";
     o__ "}\n";
     o__ "bool " << label() + "__tr_eval(va::LNR const&) {\n";
     o____ "return false;\n";
     o__ "}\n";
-    o__ "bool " << label() + "__tr_accept(va::LNR const&) {\n";
-    o____ "bool r = " << label() + "now;\n";
-    o____ label() + "now = false;\n";
-    o____ "return r;\n";
+    o__ "bool " << label() + "__tr_accept(va::LNR const& i) {\n";
+    o____ "auto l = prechecked_cast<LOGIC_NODE const*>(i.ptr());\n";
+    o____ "trace4(\"acc transit?\", _sim->_time0, l->last_change_time(), l->final_time(), l->in_transit());\n";
+    o____ "bool now = _sim->_time0 == l->last_change_time();\n";
+    o____ "if(_sim->_time0 == l->final_time()){\n";
+    o______ "trace2(\"acc update?\", _sim->_time0, l->final_time());\n";
+    o____ "}else{\n";
+    o____ "}\n";
+    o____ "bool r = false;\n";
+    o____ "if(" << label() + "update == _sim->_time0) {\n";
+    o______ "r = true;\n";
+    o______ label() + "update = NEVER;\n";
+    o____ "}else{\n";
+    o____ "}\n";
+    o____ "return now && l->in_transit();\n";
     o__ "}\n";
     o__ "bool " << label() + "__is_evt(va::LNR const&) {\n";
-    o____ "return " << label() + "now;\n";
+    o____ "bool r = " << label() + "now;\n";
+    o____ "return r;\n";
     o__ "}\n";
-    o__ "bool " << label() + "__tr_regress(va::LNR const& n) {\n";
-    o____ "if( " << label() + "__tr_advance(n)) {untested();\n";
-    o______ "return true;\n";
-    o____ "}else{\n";
-    o______ "return false;\n";
-    o____ "}\n";
+    o__ "bool " << label() + "__tr_regress(va::LNR const&) { untested();\n";
+    o____ "incomplete(); return true;\n";
     o__ "}\n";
     o__ "bool " << label() + "__tr_review(va::LNR const& i) {\n";
+    o____ "auto l = prechecked_cast<LOGIC_NODE const*>(i.ptr());\n";
+    //o____ "bool now = _sim->_time0 == l->last_change_time();\n";
+    o____ label() << "transit = l->in_transit();\n";
+    o____ "double larel = l->last_change_time() - _sim->_time0;\n";
+    o____ "trace4(\"rev transit?\", _sim->_time0, l->final_time(), larel, l->in_transit());\n";
+    o____ "if(l->final_time() == NEVER){\n";
+    o____ "}else if(l->last_change_time() == _sim->_time0 && _sim->_time0 < l->final_time()){untested();\n";
+    o____ "}else if(l->last_change_time() < _sim->_time0 && _sim->_time0 < l->final_time()){\n";
+    o______ "// stray event\n";
+    o______ "trace2(\"rev update?\", _sim->_time0, l->last_change_time());\n";
+    o______ "q_accept();\n"; // hack? only needed if there is an event.
+    o____ "}else if(!" << label() << "transit) {\n";
+    o____ "}else if(_sim->_time0 == l->last_change_time()){\n";
+    o______ "trace1(\"in transit\", _sim->_time0);\n";
+    o______ "q_accept();\n"; // hack? only needed if there is an event.
+    o____ "}else{\n";
+    o____ "}\n";
     o____ "if(" << label() + "__is_evt(i)) {\n";
     o______ "q_accept();\n"; // hack? only needed if there is an event.
     o____ "}else{\n";
@@ -154,13 +145,8 @@ private:
   void make_cc_common(std::ostream& o)const override {
     o__ "// edge common\n";
   }
-};
-EDG any(0);
-EDG pos(1);
-EDG neg(-1);
-DISPATCHER<FUNCTION>::INSTALL d_any(&function_dispatcher, "edge", &any);
-DISPATCHER<FUNCTION>::INSTALL d_pos(&function_dispatcher, "posedge", &pos);
-DISPATCHER<FUNCTION>::INSTALL d_neg(&function_dispatcher, "negedge", &neg);
+}e0;
+DISPATCHER<FUNCTION>::INSTALL d0(&function_dispatcher, "driver_update", &e0);
 /*--------------------------------------------------------------------------*/
 } // namespace
 /*--------------------------------------------------------------------------*/

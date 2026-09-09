@@ -353,7 +353,7 @@ void DEV_TRANSLINE::tr_advance()
   _ir0 = _reflect.v_out(_sim->_time0).f0/c->real_z0;
 }
 void DEV_TRANSLINE::tr_regress()
-{ untested();
+{
   ELEMENT::tr_regress();
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
@@ -430,7 +430,11 @@ TIME_PAIR DEV_TRANSLINE::tr_review()
   q_accept();
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
-  return TIME_PAIR(_sim->_time0 + c->real_td, NEVER); // ok to miss the spikes, for now
+  if(c->real_td) { untested();
+    return TIME_PAIR(_sim->_time0 + c->real_td, NEVER); // ok to miss the spikes, for now
+  }else{
+    return TIME_PAIR(_sim->_time0 + _sim->_dtmin, NEVER); // really?
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* after this step is all done, determine the reflections and send them on.

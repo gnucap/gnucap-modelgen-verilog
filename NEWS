@@ -9,6 +9,8 @@ This file summarizes new features and important changes between snapshots.
 - various logic bugfixes
 - parameter dependent delays in continuous assign
 - driver functions
+- fix format-security warnings (#23)
+- fix timing bug in $bound_step
 - ..
 
 20260729-dev

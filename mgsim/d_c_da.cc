@@ -216,11 +216,15 @@ double DEV_D_A::to_analog(node_l& n, MODEL_LOGIC const* f)
   switch (n->lv()) {
   case lvSTABLE0:
     return process()->vmin;
+  case lvZ1: untested(); // fall-through
+  case lvX1: untested(); // fall-through
   case lvRISING:
     start = process()->vmin;
     end = process()->vmax;
     risefall = process()->rise;
     break;
+  case lvZ0: untested(); // fall-through
+  case lvX0: untested(); // fall-through
   case lvFALLING:
     start = process()->vmax;
     end = process()->vmin;
@@ -228,6 +232,13 @@ double DEV_D_A::to_analog(node_l& n, MODEL_LOGIC const* f)
     break;
   case lvSTABLE1:
     return process()->vmax;
+  case lv0Z: untested(); // fall-through
+  case lv0X: untested(); // fall-through
+  case lv1Z: untested(); // fall-through
+  case lv1X: untested(); // fall-through
+  case lvZZ: untested(); // fall-through
+  case lvZX: untested(); // fall-through
+  case lvXZ: untested(); // fall-through
   case lvUNKNOWN:
     return process()->unknown;
   }

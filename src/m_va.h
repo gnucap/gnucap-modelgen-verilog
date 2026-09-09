@@ -1047,7 +1047,7 @@ public:
   }
   VALOGIC operator==(VALOGIC const& o)const {
     bitXZ ret;
-    if(_b4 == b4_0 && o._b4 == b4_0){ untested();
+    if(_b4 == b4_0 && o._b4 == b4_0){
       ret = b4_1;
     }else if(_b4 == b4_1 && o._b4 == b4_1){
       ret = b4_1;
@@ -1055,7 +1055,7 @@ public:
       ret = b4_0;
     }else if(_b4 == b4_0 && o._b4 == b4_1){
       ret = b4_0;
-    }else{ untested();
+    }else{
       // incomplete?
       ret = b4_X;
     }
