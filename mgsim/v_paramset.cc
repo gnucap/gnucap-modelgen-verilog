@@ -322,7 +322,7 @@ int PARAMSET::set_param_by_name(std::string Name, std::string Value)
     PARAM_LIST::iterator p = c->_params.find(Name);
     if(p != c->_params.end()){
       return BASE_SUBCKT::set_param_by_name(Name,Value);
-    }else{ untested();
+    }else{
       throw Exception_No_Match(Name);
     }
   }else{ untested();
@@ -714,7 +714,7 @@ void PARAMSET::expand()
     }
 
     if(dev->is_valid()){
-    }else{ untested();
+    }else{
       // TODO: seems to be the wrong place. see mg_bug.1.gc
       throw Exception("invalid prototype for " + long_label());
     }

@@ -773,7 +773,7 @@ void Module::parse_body(CS& f)
       || ((f >> "analog ") && f >> *_analog)
       || ((f >> "always ") && f >> *_always)
       || ((f >> "initial ") && f >> *_always)
-      || (is_module() && (f >> "endmodule ") && (end = true))
+      || ((f >> "endmodule ") && (end = true))
       || (is_connectmodule() && (f >> "endconnectmodule ") && (end = true))
       // subdevice instances. can't use reserved keywords.
       || ((f >> "paramset ") && (reserved = true))

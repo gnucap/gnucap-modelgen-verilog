@@ -9,7 +9,6 @@ module another_d2a(i, o);
   real et;
   real start_delay;
 
-  endmodule #() ();
   analog begin
     @(edge(qd_val)) begin
       start_delay = (et - ((vdd / 2) / slewrate));
@@ -33,6 +32,3 @@ endmodule
 
 
 
-:47:
-
-^ ? premature EOF (module)
