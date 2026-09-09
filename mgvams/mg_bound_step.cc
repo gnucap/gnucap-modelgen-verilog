@@ -60,7 +60,7 @@ private:
     o__ "void " << "_f_bound_step_tr_eval(double) {\n";
     o__ "}\n";
     o__ "void " << "_f_bound_step_tr_review(double d) {\n";
-    o____ "_time_by.min_dt_estimate(d);\n";
+    o____ "_time_by.min_event(_sim->_time0 + d);\n";
     o__ "}\n";
     o__ "void " << "_f_bound_step_precalc(double)const{}\n";
   }
