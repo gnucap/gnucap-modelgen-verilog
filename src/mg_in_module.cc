@@ -792,7 +792,7 @@ void Module::parse_body(CS& f)
       throw Exception_CS_("not allowed here: " + f.last_match(), f);
     }else if (end){
       break;
-    }else if (!f.more()) { untested();
+    }else if (!f.more()) {
       f.warn(0, "premature EOF (module)");
       break;
     }else if (f.stuck(&here)) {
