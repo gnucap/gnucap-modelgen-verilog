@@ -114,6 +114,8 @@ bool VAPOT::do_tr_con_chk_and_q()
 bool VAPOT::do_tr()
 {
   assert(_values);
+  // TODO? switch.
+  _y->f0 = _values[0];
 
   if(!_loss0){
     _m0 = CPOLY1(0., _values[0], _values[1]);

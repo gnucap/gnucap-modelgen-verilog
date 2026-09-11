@@ -15,13 +15,14 @@ vsine #(.freq(1e6),.ampl(2),.samples(9)) vin (\1 , \0 );
 zero cross     5.00002e-07 -2.51327e-05
  500.E-9   -25.133E-6  0.         3.         1.         0.        
  500.E-9   -50.265E-6  0.         3.         0.         0.        
- 611.12E-9 -1.2856     0.         3.         0.         0.        
- 722.23E-9 -1.9696     0.         3.         0.         0.        
- 833.34E-9 -1.732      0.         3.         0.         0.        
- 944.45E-9 -0.684      0.         3.         0.         0.        
+ 526.32E-9 -0.32924    0.         3.         0.         0.        
+ 637.43E-9 -1.5202     0.         3.         0.         0.        
+ 748.54E-9 -1.9999     0.         3.         0.         0.        
+ 859.65E-9 -1.5438     0.         3.         0.         0.        
+ 970.76E-9 -0.36533    0.         3.         0.         0.        
  1.E-6     -2.E-15     0.         3.         0.         0.        
 Gnucap   System status
-iterations: op=0, dc=3, tran=56, fourier=0, total=78
-transient timesteps: accepted=16, rejected=3, total=19
+iterations: op=0, dc=3, tran=59, fourier=0, total=82
+transient timesteps: accepted=17, rejected=3, total=20
 nodes: user=2, subckt=0, model=1, total=3
 dctran density=55.6%, ac density=55.6%

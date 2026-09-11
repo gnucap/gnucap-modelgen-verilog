@@ -12,21 +12,21 @@ resistor #(1) r (\3 , \0 );
 vsine #(.mag(1),.dc(v),.ampl(1)) v1 (\1 , \0 );
 #Time       v(1)       v(3)       i(dut._b_laplace_np_0_p_.out)
  0.         0.         0.         0.        
- 0.1        0.58779    0.0019592  0.0019592 
+ 0.1        0.58779    0.0019584  0.0019584 
  0.2        0.95106    0.013963   0.013963  
- 0.3        0.95106    0.040069   0.040069  
+ 0.3        0.95106    0.04007    0.04007   
  0.4        0.58779    0.077057   0.077057  
  0.5        0.         0.11596    0.11596   
  0.6       -0.58779    0.14558    0.14558   
  0.7       -0.95106    0.15696    0.15696   
  0.8       -0.95106    0.14702    0.14702   
- 0.9       -0.58779    0.11988    0.11988   
- 1.         0.         0.085483   0.085483  
+ 0.9       -0.58779    0.11989    0.11989   
+ 1.         0.         0.085485   0.085485  
 #Freq       v(1)       vp(3)      vm(3)     
  2.         1.        -170.84     0.012664  
  4.         1.        -175.44     0.0031663 
 Gnucap   System status
-iterations: op=0, dc=0, tran=242, fourier=0, total=313
-transient timesteps: accepted=64, rejected=5, total=69
+iterations: op=0, dc=0, tran=235, fourier=0, total=305
+transient timesteps: accepted=64, rejected=4, total=68
 nodes: user=2, subckt=0, model=4, total=6
 dctran density=50.0%, ac density=33.3%

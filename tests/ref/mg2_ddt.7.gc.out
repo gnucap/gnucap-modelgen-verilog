@@ -3,9 +3,11 @@ test_ddt7 #() dut(\1 ,\0 ,3,\0 );
 #Time       v(1)       v(3)       iter(0)   
  0.         0.         0.         3.        
  0.01       0.031395   0.         3.        
- 0.26       0.49901    0.         3.        
- 0.51      -0.031395   0.         3.        
- 0.76      -0.49901    0.         3.        
+ 0.02       0.062667   0.         3.        
+ 0.27       0.49606    0.         3.        
+ 0.4525     0.14702    0.         3.        
+ 0.635     -0.37506    0.         3.        
+ 0.8175    -0.4557     0.         3.        
  1.         0.         0.         3.        
 #Freq       vm(1)      vm(3)      vp(1)      vp(3)     
 open circuit: internal node 3
@@ -19,7 +21,7 @@ open circuit: internal node 3
 open circuit: internal node 3
  16.        0.5        0.         0.         0.        
 Gnucap   System status
-iterations: op=0, dc=0, tran=18, fourier=0, total=29
-transient timesteps: accepted=6, rejected=0, total=6
+iterations: op=0, dc=0, tran=24, fourier=0, total=37
+transient timesteps: accepted=8, rejected=0, total=8
 nodes: user=2, subckt=0, model=2, total=4
 dctran density=56.2%, ac density=56.2%
