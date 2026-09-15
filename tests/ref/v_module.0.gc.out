@@ -25,6 +25,7 @@ module main (.\1 (\1 ),.b(\2 ));
   isource #(1) i1 (\0 , \1 );
 endmodule // main
 
+op
 main #() m (.\1 (\1 ),.b(\0 ));
 #           v(m.r1)    v(1)      
  27.        1.         1.        
@@ -40,7 +41,9 @@ module main (.\1 (\1 ),.b(\2 ));
   isource #(1) i1 (\0 , \1 );
 endmodule // main
 
+op
 main #() m (.\1 (\1 ),.b(\0 ));
+op
 module main (.\1 (\1 ),.b(\2 ));
   ground \0 ;
   electrical \1 ;
@@ -53,6 +56,8 @@ module main (.\1 (\1 ),.b(\2 ));
   isource #(1) i1 (\0 , \1 );
 endmodule // main
 
+op
+op
 main #() m (.b(\1 ));
 #           v(m.r1)    v(1)      
  27.        1.         1.        
@@ -68,7 +73,10 @@ module main (.\1 (\1 ),.b(\2 ));
   isource #(1) i1 (\0 , \1 );
 endmodule // main
 
+op
+op
 main #() m (.b(\1 ));
+op
 #           v(m.r1)    v(1)      
  27.        1.         1.        
 Gnucap   System status

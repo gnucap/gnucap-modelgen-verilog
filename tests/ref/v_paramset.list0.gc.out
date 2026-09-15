@@ -18,6 +18,7 @@ ground g;
 vsource #(.dc(4)) v1 (.p(p),.n(g));
 parameter x=3;
 vsource #(.dc(((\x    * 3) + 3))) v1 (.p(p),.n(g));
+dc
 Gnucap   System status
 iterations: op=0, dc=2, tran=0, fourier=0, total=2
 transient timesteps: accepted=0, rejected=0, total=0

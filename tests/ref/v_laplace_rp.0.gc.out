@@ -30,6 +30,7 @@ resistor #(.r(1.)) r1 (.p(ref1),.n(\0 ));
 resistor #(.r(1.)) r2 (.p(ref2),.n(\0 ));
 resistor #(.r(1.)) r3 (.p(ref3),.n(\0 ));
 resistor #(.r(1.)) r4 (.p(ref4),.n(\0 ));
+dc
 #Time       v(in)      v(out1)    v(out2)    v(out3)    v(out4)    v(ref1)    v(ref2)    v(ref3)    v(ref4)   
  0.         0.         0.         0.         0.         0.         0.         0.         0.         0.        
  89.E-9     559.2E-9   100.E-15   0.         50.E-15    100.E-15   100.E-15   0.         50.E-15    100.E-15  
