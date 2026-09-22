@@ -22,7 +22,7 @@ time2   8
 time3   9
  9.         2.         2.        
 time2   10
- 10.        2.         1.        
+ 10.        2.         1.2       
 Gnucap   System status
 iterations: op=0, dc=2, tran=18, fourier=0, total=29
 transient timesteps: accepted=9, rejected=0, total=9
