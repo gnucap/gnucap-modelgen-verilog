@@ -1,0 +1,44 @@
+Logic models in Verilog-AMS
+
+== builtin primitives
+
+Gnucap provices logic primitives inherited from Verilog-95.
+
+$ gnucap builtin.gc
+
+== user defined primitives (UDP)
+
+Logic primitives may be instanciated in compiled modules. In addition, user
+defined primitives are supported.
+
+$ gnucap-mg-vams --cc udp.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o udp.so
+$ gnucap udp.gc
+
+== continuous assignment
+
+Similar to UDP instances, continuous assignments may drive nets. A continuous
+assignment modelled in terms of an expression that depends on net values.
+
+$ gnucap-mg-vams --cc latch.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o latch.so
+$ gnucap latch.gc
+
+== procedural assignment
+
+(not implemented)
+
+== cross and edge events
+
+Device behaviour may be modelled in terms of crossing (analog) or edge
+(digital) events. Events may trigger assignments that change device state.
+(Note the "edge" (nonstandard) event syntax.)
+
+$ gnucap-mg-vams --cc event.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o event.so
+$ gnucap event.gc
+
+== event driven tasks
+
+Events may also control the execution of tasks. There are builtin tasks (such
+as $strobe), but tasks are really plugins and can be anything.
+
+$ gnucap-mg-vams --cc strobe.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o strobe.so
+$ gnucap strobe.gc
