@@ -101,6 +101,9 @@ void make_discrete_discipline(std::ostream& o, Discipline const& d)
   o__ "NODE_TYPE* clone()const override{untested();\n";
   o____ "return new " << cn << "(*this);\n";
   o__ "}\n";
+  o__ "NODE* deflate()override {incomplete(); untested();\n";
+  o____ "return new LOGIC_NODE();\n"; // TODO
+  o__ "}\n";
   o << "}ddisc_"<< ++num << ";\n";
   o << "/*--------------------------------------"
        "------------------------------------*/\n";

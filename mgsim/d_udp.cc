@@ -64,6 +64,7 @@ private: // override virtuals
   int	   net_nodes()const override {return _net_nodes;}
   CARD*	   clone()const override {return new DEV_LOGIC(*this);}
   void	   precalc_first()override {ELEMENT::precalc_first(); if (subckt()) {subckt()->precalc_first();}}
+  void	   expand_first()override;
   void	   expand()override;
   void	   precalc_last() override;
   //void   map_nodes();
@@ -187,16 +188,16 @@ void DEV_LOGIC::precalc_last()
   }
 }
 /*--------------------------------------------------------------------------*/
-void DEV_LOGIC::expand()
+void DEV_LOGIC::expand_first()
 {
-  ELEMENT::expand();
+  ELEMENT::expand_first();
   attach_model();
 
   const COMMON_LOGIC* c = prechecked_cast<const COMMON_LOGIC*>(common());
   assert(c);
 
   const MODEL_LOGIC* m = dynamic_cast<const MODEL_LOGIC*>(c->model());
-  if (!m) { untested();
+  if (!m) {
     throw Exception_Model_Type_Mismatch(long_label(), c->modelname(), "logic family (LOGIC)");
   }else{
   }
@@ -205,17 +206,49 @@ void DEV_LOGIC::expand()
   try {
     const CARD* model = find_looking_out(subckt_name);
     
-    if(!dynamic_cast<const BASE_SUBCKT*>(model)) {untested();
-      error(((!_sim->is_first_expand()) ? (bLOG) : (bDEBUG)),
-	    long_label() + ": " + subckt_name + " is not a subckt, forcing digital\n");
+    if(auto ms = dynamic_cast<const MODEL_SUBCKT*>(model)) {
+      auto s = prechecked_cast<const BASE_SUBCKT*>(ms->component_proto());
+      assert(s);
+      _gatemode = OPT::mode;
+      renew_subckt(s, nullptr/*&(c->_params)*/);
+    }else if(auto sss = dynamic_cast<const BASE_SUBCKT*>(model)) { untested();
+      // reachable from spice
+      _gatemode = OPT::mode;
+      renew_subckt(sss, nullptr/*&(c->_params)*/);
     }else{ untested();
-      _gatemode = OPT::mode;    
-      renew_subckt(model, nullptr/*&(c->_params)*/);    
-      subckt()->expand();
+      error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)),
+	    long_label() + ": " + subckt_name + " is not a subckt, forcing digital\n");
     }
   }catch (Exception_Cant_Find&) {
-    error(((!_sim->is_first_expand()) ? (bLOG) : (bDEBUG)),
-	  long_label() + ": |can't find subckt: " + subckt_name + ", forcing digital\n");
+    error(((!_sim->is_first_expand()) ? (bLOG) : (bDEBUG)), 
+	  long_label() + ": can't find subckt: " + subckt_name + ", forcing digital\n");
+  }
+
+  static NODE* hybrid = node_dispatcher["hybrid"];
+  NODE const* logic = hybrid;
+  if(!subckt()) {
+    logic = OPT::default_logic;
+  }else{ untested();
+    unreachable();
+  }
+
+  assert(logic);
+  n_(0).set_type(logic);
+  n_(0).set_output();
+  n_(0).set_used();
+  for (int ii = 1;  ii < net_nodes();  ++ii) {
+    _nodes[ii].set_type(logic);
+    _nodes[ii].set_input();
+    _nodes[ii].set_used();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void DEV_LOGIC::expand()
+{
+  ELEMENT::expand();
+  if(subckt()){
+    subckt()->expand_();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/

@@ -10,6 +10,7 @@ module clock(out, en);
   output out;
   input en;
   logic out, en;
+  reg out;
   assign #15 out = !(out & en);
 endmodule
 `endmodelgen

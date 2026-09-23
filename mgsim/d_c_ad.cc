@@ -57,6 +57,7 @@ private: // override virtuals
 
   CARD*	   clone()const override	{return new DEV_A_D(*this);}
   void	   precalc_first()override	{ELEMENT::precalc_first();}
+  void	   expand_first()override;
   void	   expand()override;
   void	   precalc_last() override	{ELEMENT::precalc_last();}
   void	   tr_iwant_matrix()override	{}
@@ -126,6 +127,16 @@ DEV_A_D::DEV_A_D(const DEV_A_D& p)
     assert(_nodes[ii] == p._nodes[ii]);
   }
   ++_count;
+}
+/*--------------------------------------------------------------------------*/
+void DEV_A_D::expand_first()
+{
+  NODE const* logic = OPT::default_logic;
+  assert(logic);
+
+  n_(0).set_type(logic);
+  n_(0).set_output();
+  n_(0).set_used();
 }
 /*--------------------------------------------------------------------------*/
 void DEV_A_D::expand()

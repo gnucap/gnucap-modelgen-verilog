@@ -1646,6 +1646,9 @@ public:
   NODE_TYPE* clone()const override{untested();
     return new DDISC_logic(*this);
   }
+  NODE* deflate()override {incomplete(); untested();
+    return new LOGIC_NODE();
+  }
 }ddisc_1;
 /*--------------------------------------------------------------------------*/
 }
@@ -6909,6 +6912,9 @@ public:
   }
   NODE_TYPE* clone()const override{untested();
     return new DDISC_logic(*this);
+  }
+  NODE* deflate()override {incomplete(); untested();
+    return new LOGIC_NODE();
   }
 }ddisc_1;
 /*--------------------------------------------------------------------------*/

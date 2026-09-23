@@ -13,6 +13,7 @@ module test_assign0(in, a, b);
   input in;
   output a;
   output b;
+  reg b;
   electrical foo;
   ldisc a;
   assign a = !in;

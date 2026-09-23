@@ -9,6 +9,7 @@ verilog
 `modelgen test_logic_0a
 module clock(out, en);
   output out;
+  reg out;
   input en;
   logic out, en;
   assign #5000 out = !(out & en);
