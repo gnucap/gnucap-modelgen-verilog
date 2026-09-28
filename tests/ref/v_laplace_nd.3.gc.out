@@ -83,7 +83,7 @@ resistor #(1) r1 (\3 , \0 );
  10.        1.         1.         1.         1.         0.         0.         0.         0.        
  100.       1.         1.         1.         1.         0.         0.         0.         0.        
 Gnucap   System status
-iterations: op=0, dc=0, tran=256, fourier=0, total=337
+iterations: op=0, dc=0, tran=247, fourier=0, total=328
 transient timesteps: accepted=69, rejected=7, total=76
 nodes: user=4, subckt=0, model=10, total=14
 dctran density=37.2%, ac density=15.3%

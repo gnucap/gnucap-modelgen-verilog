@@ -41,7 +41,7 @@ dctran density=9.6%, ac density=9.6%
  1.n        5.         0.         5.         4.5801     5.         4.2964     5.         4.        
  1.1n       5.         0.25       5.         4.5538     5.         4.2521     5.         18.       
  1.2n       5.         0.5        5.         4.5237     5.         4.2012     5.         4.        
- 1.3n       5.         0.75       5.         4.4887     5.         4.1419     4.9981     4.        
+ 1.3n       5.         0.75       5.         4.4887     5.         4.1419     4.9981     5.        
  1.4n       5.         1.         4.9995     4.434      4.9995     4.0717     4.9304     36.       
  1.5n       5.         1.25       4.9971     4.3459     4.9971     3.9865     4.7661     4.        
  1.6n       5.         1.5        4.9912     4.2105     4.9912     3.8801     4.5051     5.        
@@ -80,7 +80,7 @@ dctran density=9.6%, ac density=9.6%
  4.9n       5.         5.         0.65656    8.021p     0.65656    58.p       0.70357    4.        
  5.n        5.         5.         0.59027    8.021p     0.59027    58.p       0.70357    4.        
 Gnucap   System status
-iterations: op=10, dc=155, tran=350, fourier=0, total=594
+iterations: op=10, dc=155, tran=351, fourier=0, total=595
 transient timesteps: accepted=75, rejected=4, total=79
 nodes: user=7, subckt=0, model=112, total=119
 dctran density=9.6%, ac density=9.6%
