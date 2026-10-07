@@ -58,7 +58,7 @@ private: // override virtuals
   void	   precalc_last() override	{ELEMENT::precalc_last();}
   void	   tr_iwant_matrix()override	{}
   void	   tr_begin()override		{ELEMENT::tr_begin();}
-  void	   tr_restore()override		{untested();ELEMENT::tr_restore();}
+  void	   tr_restore()override		{ELEMENT::tr_restore();}
   void	   dc_advance()override;
   void	   tr_advance()override;
   void	   tr_regress()override;
@@ -76,7 +76,7 @@ private: // override virtuals
   //double tr_input_limited()const	//ELEMENT
   //double tr_amps()const		//ELEMENT
   double   tr_probe_num(const std::string& what)const override
-					{untested(); return n_(OUTNODE)->tr_probe_num(what);}
+					{return ELEMENT::n_(OUTNODE)->tr_probe_num(what);}
 
   void	   ac_iwant_matrix()override	{}
   void	   ac_begin()override
@@ -257,7 +257,7 @@ double DEV_D_A::to_analog(node_l& n, MODEL_LOGIC const* f)
 /*--------------------------------------------------------------------------*/
 bool DEV_D_A::do_tr()
 {
-  if (_sim->analysis_is_restore()) {untested();
+  if (_sim->analysis_is_restore()) {
   }else if (_sim->analysis_is_static()) {
   }else{
   }

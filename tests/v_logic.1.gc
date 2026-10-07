@@ -44,5 +44,7 @@ list
 
 print tran v(clk) v(c0) v(c1) iter(0)
 tran 1n
+print tran v(clk) v(c0) v(c1) l(i2.d2) v(i2.d1) iter(0)
+tran 1.1n
 
 status notime

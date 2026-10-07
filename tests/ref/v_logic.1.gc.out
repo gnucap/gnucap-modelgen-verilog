@@ -119,8 +119,17 @@ i2.n1: can't find subckt: logicslownand1, forcing digital
  906.p      0.         0.         5.         2.        
  922.p      0.         5.         5.         3.        
  1.n        0.         5.         5.         3.        
+#Time       v(clk)     v(c0)      v(c1)      l(i2.d2)   v(i2.d1)   iter(0)   
+ 1.n        0.         5.         5.         0.         5.         2.        
+ 1.001n     5.         5.         5.         3.         5.         3.        
+ 1.002n     5.         5.         5.         3.         5.         3.        
+ 1.003n     5.         5.         0.         3.         5.         3.        
+ 1.004n     5.         5.         0.         3.         5.         2.        
+ 1.005n     5.         5.         0.         3.         5.         2.        
+ 1.021n     5.         0.         0.         3.         0.         3.        
+ 1.1n       5.         0.         0.         3.         0.         3.        
 Gnucap   System status
-iterations: op=0, dc=0, tran=195, fourier=0, total=266
-transient timesteps: accepted=71, rejected=0, total=71
+iterations: op=0, dc=0, tran=21, fourier=0, total=295
+transient timesteps: accepted=79, rejected=0, total=79
 nodes: user=5, subckt=4, model=2, total=11
 dctran density=14.9%, ac density=14.9%

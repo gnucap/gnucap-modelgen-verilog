@@ -80,7 +80,7 @@ private: // override virtuals
   //double tr_input_limited()const	//ELEMENT
   //double tr_amps()const		//ELEMENT
   double   tr_probe_num(const std::string& what)const override
-					{untested(); return n_(OUTNODE)->tr_probe_num(what);}
+					{ return n_(OUTNODE)->tr_probe_num(what);}
 
   void	   ac_iwant_matrix()override	{}
   void	   ac_begin()override
@@ -225,7 +225,7 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
   // set_process(f);
 
   if (1||/*n->is_analog() && */  n->d_iter() < n->a_iter()) {
-    if (_sim->analysis_is_restore()) {untested();
+    if (_sim->analysis_is_restore()) {
     }else if (_sim->analysis_is_static()) {
     }else{
     }
