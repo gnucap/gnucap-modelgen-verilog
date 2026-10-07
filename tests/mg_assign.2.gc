@@ -1,5 +1,6 @@
 attach ./modelgen_2.so
 load vams/vpulse.so
+load logic
 // options method=euler
 // options trtol=1
 

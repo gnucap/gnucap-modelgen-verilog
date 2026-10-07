@@ -72,13 +72,19 @@ prep: ${SYMLINKS}
 	# @[ ! -s "${TARGETDIR}" ]
 	-mkdir -p ${TARGETDIR}
 
+S = [[:space:]]
+HIDE_STRINGS = ^stashing${S}as \
+    already${S}installed \
+    already${S}loaded \
+    ^make
+
 ${mg_out}: ${TARGETDIR}/mg%.gc.out: prep
-	-@${ENV} ${GNUCAP} ${GNUCAP_ARGS} ${MG_ARGS} < ${srcdir}/mg$*.gc |tail -n +12 | \
-		grep -v '^stashing\ as' | grep -v 'already\ installed' | grep -v ^make > $@
+	-@${ENV} ${GNUCAP} ${GNUCAP_ARGS} ${MG_ARGS} < ${srcdir}/mg$*.gc |tail -n +12 \
+		${HIDE_STRINGS:%=| grep -v '%'} > $@
 
 ${gc_out}: ${TARGETDIR}/%.gc.out: prep
-	-@${ENV} ${GNUCAP} ${GNUCAP_ARGS} < ${srcdir}/$*.gc |tail -n +12 | \
-		grep -v '^stashing\ as' | grep -v 'already\ installed' | grep -v ^make > $@
+	-@${ENV} ${GNUCAP} ${GNUCAP_ARGS} < ${srcdir}/$*.gc |tail -n +12 \
+		${HIDE_STRINGS:%=| grep -v '%'} > $@
 
 ${pp_out}: ${TARGETDIR}/%.vapp.out: prep
 	@[ x${srcdir} = x. ] || ln -sf ${srcdir}/$*.vapp;

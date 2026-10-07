@@ -159,7 +159,7 @@ void DEV_LOGIC::set_parameters(const std::string& Label, CARD *Owner,
   set_label(Label);
   set_owner(Owner);
   if(Value==0.){
-  }else if(Common){
+  }else if(Common){ untested();
     Common = Common->clone();
     Common->set_param_by_name("delay", to_string(Value));
   }else{ untested();
@@ -197,7 +197,7 @@ void DEV_LOGIC::expand_first()
   assert(c);
 
   const MODEL_LOGIC* m = dynamic_cast<const MODEL_LOGIC*>(c->model());
-  if (!m) {
+  if (!m) { untested();
     throw Exception_Model_Type_Mismatch(long_label(), c->modelname(), "logic family (LOGIC)");
   }else{
   }
@@ -206,7 +206,7 @@ void DEV_LOGIC::expand_first()
   try {
     const CARD* model = find_looking_out(subckt_name);
     
-    if(auto ms = dynamic_cast<const MODEL_SUBCKT*>(model)) {
+    if(auto ms = dynamic_cast<const MODEL_SUBCKT*>(model)) { untested();
       auto s = prechecked_cast<const BASE_SUBCKT*>(ms->component_proto());
       assert(s);
       _gatemode = OPT::mode;
@@ -246,7 +246,7 @@ void DEV_LOGIC::expand_first()
 void DEV_LOGIC::expand()
 {
   ELEMENT::expand();
-  if(subckt()){
+  if(subckt()){ untested();
     subckt()->expand_();
   }else{
   }

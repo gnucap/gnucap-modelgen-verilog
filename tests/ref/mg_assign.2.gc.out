@@ -1,3 +1,5 @@
+load logic 
+c1._na0_v_out: can't find subckt: logic_na0_v_out2, forcing digital
 #           v(clk)     v(en)      l(clk)     l(en)     
  27.        5.         0.         3.         0.01      
 #Time       l(clk)     l(en)      v(en)     

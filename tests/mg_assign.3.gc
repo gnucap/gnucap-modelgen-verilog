@@ -1,5 +1,6 @@
 attach ./modelgen_2.so
 load vams/vpulse.so
+load logic
 // options method=euler
 // options trtol=1
 
@@ -28,7 +29,8 @@ list
 attach ./test_assign_3.so
 
 clock #() c1(clk, en);
-vpulse #(.val0(0), .val1(5)) en1(en, \0 );
+vpulse #(.val0(0), .val1(5)) en1(en_, \0 );
+c_a_d #(.model("logic")) ad1(en, en_);
 
 vpulse #(.val0(0), .val1(5), .width(.25n), .td(.5n), .period(.3n)) er(r, \0 );
 vpulse #(.val0(0), .val1(5), .width(.25n), .td(40p), .period(.3n)) es(s, \0 );
@@ -37,11 +39,10 @@ latch l1(q, r, s);
 // kludge
 .model logic logic delay=10p
 
-print op v(nodes) l(nodes)
+print op v(clk) v(en_) v(q) v(r) v(s) l(clk) l(en) l(q) l(r) l(s)
 op
 
-print tran l(nodes) v(nodes)
-print tran l(nodes) v(en) v(q r s)
+print tran l(clk) l(en) l(q) l(r) l(s) v(en) v(q) v(r) v(s)
 
 tran 2n basic trace=a
 status notime
