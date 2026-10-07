@@ -580,17 +580,31 @@ void PARAMSET::expand_first()
     dev->set_port_by_index(net_nodes()-1, dummy);
   }else{ untested();
   }
+  COMMON_COMPONENT* cc = dev->mutable_common();
+
+  dev->set_parameters("_", this, cc, /*Value*/ 0., /*states*/ 0, NULL,
+      net_nodes(), _n);
+  dev->precalc_first();
+  dev->expand_first();
+
   assert(net_nodes() == dev->net_nodes());
   for(int i = 0; i < net_nodes(); ++i) {
     NODE* n = dev->n_(i).n_();
-    if(dynamic_cast<NODE_TYPE const*>(n)){ untested();
-      n_(i).set_type(n); untested();
+    if(dynamic_cast<NODE_TYPE const*>(n)){
+      trace3("paramset. got nodes type", long_label(), i, n->short_label());
+      n_(i).set_type(n);
     }else if(n){ untested();
+    }else{
+    }
+    if(dev->n_(i).is_used()) {
+      n_(i).set_used();
+//    }else if(dynamic_cast<PARAMSET*>(dev)){ untested();
+//      n_(i).set_used();
     }else{
     }
   }
   subckt()->push_back(d);
-}
+} // expand_first
 /*--------------------------------------------------------------------------*/
 void PARAMSET::expand()
 {
@@ -628,9 +642,7 @@ void PARAMSET::expand()
     trace4("PARAMSET::expand sp0", long_label(), net_nodes(), dev->net_nodes(), typeid(*dev).name());
 
     COMMON_COMPONENT* cc = dev->mutable_common();
-    bool flag = false;
-    if(0){
-    }else if(auto m = dynamic_cast<MODEL_CARD const*>(_parent->_dev)) {
+    if(auto m = dynamic_cast<MODEL_CARD const*>(_parent->_dev)) {
       if(dynamic_cast<PARAMSET const*>(m->component_proto())) {
       }else{
 	// d->set_owner(this);
@@ -640,24 +652,13 @@ void PARAMSET::expand()
 	assert(dev->common());
 	cc = dev->common()->clone();
 	cc->attach(m);
-//	cc->set_modelname("");
-
-	flag = true;
       }
+    }else{
     }
 
     dev->set_parameters("_", this, cc, /*Value*/ 0., /*states*/ 0, NULL,
 		     net_nodes(), _n);
     assert(dev->owner() == this);
-
-    if(0 && flag){
-	trace4("PARAMSET::expand postset.", long_label(), net_nodes(), dev->net_nodes(), typeid(*dev).name());
-	dev->precalc_first(); // breaks nodes
-	dev->expand_first(); // breaks nodes
-	//cur->attach_common(cc);
-	//assert(cur->common() == cc);
-    }else{
-    }
 
     {
       auto cp = prechecked_cast<COMMON_PARAMLIST const*>(proto->common());
@@ -696,7 +697,6 @@ void PARAMSET::expand()
       // cannot deflate yet
       subckt()->expand();
     }else{
-      dev->expand_first();
       trace1("PARAMSET::expand sub", dev->long_label());
       dev->expand();
       if(dynamic_cast<PARAMSET*>(dev)){

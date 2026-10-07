@@ -5,7 +5,12 @@ options trace
 module modwrong(A b)
 endmodule
 
-module mod(a b)
+module mod(a, b);
+  electrical a;
+  electrical b;
+
+  inout a;
+  input b;
 endmodule
 
 paramset bob mod;
@@ -14,11 +19,16 @@ endparamset;
 paramset bob modwrong;
 endparamset;
 
-module main(1,\2 , \3 , \4 )
-  bob b1 (.a(1) .b(2));
+module main(\1 , \2 , \3 , \4 )
+  inout \1 ;
+  inout \2 ;
+  inout \3 ;
+  inout \4 ;
+  electrical \1 , \2 , \3 , \4 ;
+  bob b1 (.a(\1 ), .b(\2 ));
 endmodule
 
-main m(\1 ,2,3,\0 );
+main m(\1 , \2 , \3 , \0 );
 
 list
 op
