@@ -35,12 +35,13 @@ spice
 .verilog
 
 test #() t(y, s, a, b)
+c_d_a #(.model("logic")) cy(y_, y);
 
 list
 
-print op v(nodes)
+print op v(a)       v(b)       v(s)       v(y_)
 op
 
-print tran v(nodes)
+print tran v(a)       v(b)       v(s)       v(y_)
 tran 2 .2 trace n
 status notime

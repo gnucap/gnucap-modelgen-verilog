@@ -11,9 +11,10 @@ paramset logic logic;
 endparamset
 
 test #() t (y, s, a, b);
-#           v(a)       v(b)       v(s)       v(y)      
+c_d_a #(.model("logic")) cy (y_, y);
+#           v(a)       v(b)       v(s)       v(y_)     
  27.        0.         0.         0.         0.        
-#Time       v(a)       v(b)       v(s)       v(y)      
+#Time       v(a)       v(b)       v(s)       v(y_)     
  0.         0.         0.         0.         0.        
  0.2        5.         5.         5.         5.        
  0.4        0.         5.         5.         5.        
@@ -28,5 +29,5 @@ test #() t (y, s, a, b);
 Gnucap   System status
 iterations: op=3, dc=0, tran=254, fourier=0, total=361
 transient timesteps: accepted=80, rejected=24, total=104
-nodes: user=4, subckt=0, model=6, total=10
-dctran density=22.0%, ac density=22.0%
+nodes: user=5, subckt=0, model=6, total=11
+dctran density=21.5%, ac density=21.5%

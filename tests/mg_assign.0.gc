@@ -34,13 +34,17 @@ endmodule
 
 .model logic logic
 
-test #() t(a, b, c)
+test #() t(a_, b_, c)
+c_d_a #(.model("logic")) ca(a, a_);
+c_d_a #(.model("logic")) cb(b, b_);
+
 
 list
 
-print op v(nodes)
+print op     v(a)       v(b)       v(c)
 op
 
-print tran v(nodes) l(nodes)
+print tran v(a)       v(b)       v(c)       l(a_)       l(b_)       l(c)
+
 tran .5u trace n
 status notime
