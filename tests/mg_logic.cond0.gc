@@ -29,7 +29,7 @@ test #() dut(\1 , clk );
 ground gnd
 vsine #(.ampl(-1) .freq(1e9)) vv(\1 , gnd);
 vpulse #(.val0(0) .val1(5) .width(100p) .period(200p)) v1(aclk, gnd);
-nand #(20) n1(clk, aclk);
+nand #(.delay(20), .model("logic")) n1(clk, aclk);
 
 .model logic logic delay=1p rise=10p fall=15p
 

@@ -1854,6 +1854,7 @@ private: // overrides
   node_t& n_(int i)const override {
     assert(_nodes); assert(i>=0); assert(!i || i<_n_total); return _nodes[i];
   }
+  node_l& l_(int i)const {return reinterpret_cast<node_l&>(n_(i));}
 private: // impl
 /* ========== */
 public: // instance vars
@@ -3416,6 +3417,7 @@ private: // overrides
   node_t& n_(int i)const override {
     assert(_nodes); assert(i>=0); assert(!i || i<_n_total); return _nodes[i];
   }
+  node_l& l_(int i)const {return reinterpret_cast<node_l&>(n_(i));}
 private: // impl
 /* ========== */
 public: // instance vars
@@ -7160,6 +7162,7 @@ private: // overrides
   node_t& n_(int i)const override {
     assert(_nodes); assert(i>=0); assert(!i || i<_n_total); return _nodes[i];
   }
+  node_l& l_(int i)const {return reinterpret_cast<node_l&>(n_(i));}
 private: // impl
 /* ========== */
 public: // instance vars
@@ -8415,6 +8418,7 @@ private: // overrides
   node_t& n_(int i)const override {
     assert(_nodes); assert(i>=0); assert(!i || i<_n_total); return _nodes[i];
   }
+  node_l& l_(int i)const {return reinterpret_cast<node_l&>(n_(i));}
 private: // impl
 /* ========== */
 public: // instance vars

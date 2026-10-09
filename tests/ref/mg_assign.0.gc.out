@@ -1,3 +1,4 @@
+load logic 
 module test (.a(a),.b(b),.c(c));
   ground \0 ;
   vpulse #(.val0(0),.val1(5),.width(.2u),.period(.5u)) v1 (c, \0 );
@@ -11,6 +12,8 @@ endparamset
 test #() t (a_, b_, c);
 c_d_a #(.model("logic")) ca (a, a_);
 c_d_a #(.model("logic")) cb (b, b_);
+t.b._na0_v_a: can't find subckt: logic_na0_v_a1, forcing digital
+t.b._na1_v_b: can't find subckt: logic_na1_v_b1, forcing digital
 #           v(a)       v(b)       v(c)      
  27.        5.         5.         0.        
 #Time       v(a)       v(b)       v(c)       l(a_)      l(b_)      l(c)      

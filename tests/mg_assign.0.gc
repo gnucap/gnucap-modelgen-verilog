@@ -1,6 +1,7 @@
 attach ./modelgen_2.so
 attach vams/resistor.so
 attach vams/vpulse.so
+load logic
 
 options nopicky
 
