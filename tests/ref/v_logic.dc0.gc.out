@@ -1,0 +1,27 @@
+module logicnand1 (.a(a),.b(b));
+endmodule // logicnand1
+
+nand #(1) n1 (n_1, n_0);
+nand #(1) n2 (n_2, n_1);
+nand #(1) n3 (n_3, n_2);
+nand #(1) n4 (n_4, n_3);
+nand #(1) n5 (out_, n_4);
+c_d_a #(.model("logic")) d1 (out, out_);
+c_a_d #(.model("logic")) d2 (n_0, clk);
+ground gnd;
+vpulse #(.val0(0),.val1(5),.width(100p),.period(200p)) v1 (clk, gnd);
+// band aid: legacy logic model..
+paramset logic logic;
+ .delay=1p; .vmax=NA( 5.); .vmin=NA( 0.); .unknown=NA( 2.5); .rise=1p; .fall=1p; .rs=NA( 100.); .rw=NA( 1.G); .thh=NA( 0.75); .thl=NA( 0.25); .mr=NA( 5.); .mf=NA( 5.); .over=NA( 0.1); .tnom=NA( 27.);
+endparamset
+
+#           l(n_0)     l(n_1)     l(n_2)     l(n_3)     l(n_4)     iter(0)   
+ 0.         15.21      15.2       15.2       15.2       15.2       0.        
+-1.         0.01       3.         0.         3.         0.         1.        
+-2.         0.01       3.         0.         3.         0.         2.        
+ 0.         0.01       3.         0.         3.         0.         3.        
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=3
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=8, subckt=0, model=2, total=10
+dctran density=11.0%, ac density=11.0%

@@ -1,0 +1,29 @@
+verilog
+load ../vams
+
+`options mode=digital
+
+module logicnand1(a,b);
+endmodule
+
+nand #(1) n1(n_1, n_0);
+nand #(1) n2(n_2, n_1);
+nand #(1) n3(n_3, n_2);
+nand #(1) n4(n_4, n_3);
+nand #(1) n5(out_, n_4);
+
+c_d_a #(.model("logic") d1(out, out_);
+c_a_d #(.model("logic") d2(n_0, clk);
+
+ground gnd;
+vpulse #(.val0(0) .val1(5) .width(100p) .period(200p)) v1(clk, gnd);
+
+// band aid: legacy logic model..
+.model logic logic delay=1p rise=1p fall=1p
+
+list
+
+print dc l(n_*) iter(0)
+dc trace i
+
+status notime
