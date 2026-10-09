@@ -1,6 +1,7 @@
-vpulse #(.val0(0),.val1(5),.td(2e-12)) en1 (en, \0 );
+vpulse #(.val0(0),.val1(5),.td(2e-12)) en1 (en_, \0 );
 edgtest #() dut (a, clk);
 clock #() c1 (clk, en);
+c_a_d #(.model("logic")) ad1 (en, en_);
 ground gnd
 paramset logic logic;
  .delay=1p; .vmax=NA( 5.); .vmin=NA( 0.); .unknown=NA( 2.5); .rise=10p; .fall=10p; .rs=NA( 100.); .rw=NA( 1.G); .thh=NA( 0.75); .thl=NA( 0.25); .mr=NA( 5.); .mf=NA( 5.); .over=NA( 0.1); .tnom=NA( 27.);
@@ -33,5 +34,5 @@ endparamset
 Gnucap   System status
 iterations: op=0, dc=0, tran=70, fourier=0, total=96
 transient timesteps: accepted=23, rejected=3, total=26
-nodes: user=3, subckt=0, model=4, total=7
-dctran density=28.6%, ac density=28.6%
+nodes: user=4, subckt=0, model=4, total=8
+dctran density=26.6%, ac density=26.6%

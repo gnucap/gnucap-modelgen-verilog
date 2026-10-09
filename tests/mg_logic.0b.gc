@@ -32,9 +32,10 @@ endmodule
 !make test_logic_0b.so > /dev/null
 attach ./test_logic_0b.so
 
-vpulse #(.val0(0), .val1(5), .td(2e-12)) en1(en, \0 );
+vpulse #(.val0(0), .val1(5), .td(2e-12)) en1(en_, \0 );
 clock #() c1(clk, en);
 edgtest #() dut(a , clk );
+c_a_d #(.model("logic")) ad1(en, en_);
 
 ground gnd
 
