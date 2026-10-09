@@ -312,6 +312,8 @@ void DEV_LOGIC::dc_advance()
     }
     break;
   }
+
+  q_accept();
 }
 /*--------------------------------------------------------------------------*/
 /* tr_advance: the first to run on a new time step.
@@ -346,6 +348,8 @@ void DEV_LOGIC::tr_advance()
     }
     break;
   }
+
+  q_accept();
 }
 void DEV_LOGIC::tr_regress()
 {
@@ -375,6 +379,8 @@ void DEV_LOGIC::tr_regress()
     }
     break;
   }
+
+  q_accept();
 }
 /*--------------------------------------------------------------------------*/
 /* tr_needs_eval
@@ -496,7 +502,7 @@ TIME_PAIR DEV_LOGIC::tr_review()
 {
   // not calling ELEMENT::tr_review();
 
-  q_accept();
+  // q_accept();
   //digital mode queues events explicitly in tr_accept
 
   switch (_gatemode) {
