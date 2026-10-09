@@ -1,6 +1,7 @@
 
 load ./modelgen_1.so
 load vams/vpulse.so
+load logic
 
 `modelgen test_myand1
 module test_myand1

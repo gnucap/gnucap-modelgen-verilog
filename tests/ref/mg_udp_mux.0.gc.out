@@ -1,3 +1,4 @@
+load logic 
 module test (.y(y),.s(s),.a(a),.b(b));
   ground \0 ;
   vpulse #(.val0(0),.val1(5),.width(.25),.period(.5)) v1 (a, \0 );
@@ -12,6 +13,7 @@ endparamset
 
 test #() t (y, s, a, b);
 c_d_a #(.model("logic")) cy (y_, y);
+t.b: can't find subckt: logicmymux03, forcing digital
 #           v(a)       v(b)       v(s)       v(y_)     
  27.        0.         0.         0.         0.        
 #Time       v(a)       v(b)       v(s)       v(y_)     
