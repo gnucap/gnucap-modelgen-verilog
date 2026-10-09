@@ -625,7 +625,7 @@ void DEV_LOGIC::tr_accept()
 	  }else{
 	    dly = c->_real_delay;
 	  }
-	  n_(OUTNODE)->set_event(dly, future_state);
+	  n_(OUTNODE)->set_event(dly, future_state, this);
 	  //assert(future_state == n_(OUTNODE).lv_future());
 	  if (_lastchangenode == OUTNODE) {untested();
 	    unreachable();

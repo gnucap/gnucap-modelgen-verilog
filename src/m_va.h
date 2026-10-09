@@ -1154,11 +1154,12 @@ public:
     return _ln.e_() != INVALID_NODE;
   }
 
-  void accept();
+  void accept(CARD* d=nullptr);
 };
 /*--------------------------------------------------------------------------*/
-inline void LNR::accept()
+inline void LNR::accept(CARD* d)
 {
+  if(!d){incomplete();}
   if(_set){
     assert(prechecked_cast<LOGIC_NODE*>(_ln.n_()));
     node_l& nl = reinterpret_cast<node_l&>(_ln);
@@ -1169,12 +1170,12 @@ inline void LNR::accept()
     bool lv = to_bool();
     LOGICVAL lvl(lv?lvSTABLE1:lvSTABLE0);
     if(nl->lv().is_unknown()){
-      nl->set_event(delay, lvl);
+      nl->set_event(delay, lvl, d);
     }else if(nl->lv_future() != lv){
-      nl->set_event(delay, lvl);
+      nl->set_event(delay, lvl, d);
     }else if(nl->final_time() > CKT_BASE::_sim->_time0){
       // (hack, needed?)
-      nl->set_event(delay, lvl);
+      nl->set_event(delay, lvl, d);
     }else{ untested();
     }
     // nl->propagate();

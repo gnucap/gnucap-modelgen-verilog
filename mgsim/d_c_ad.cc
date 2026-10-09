@@ -399,12 +399,12 @@ void DEV_A_D::tr_accept()
   LOGICVAL future_state = n_(OUTNODE)->lv();
   if(future_state == oldstate) {
   }else if(future_state == lvSTABLE1){
-    n_(OUTNODE)->set_event(1e-20, lvSTABLE1);
+    n_(OUTNODE)->set_event(_sim->_dtmin, lv11, this);
     n_(OUTNODE)->set_quality(qGOOD);
     n_(OUTNODE)->set_d_iter();
     n_(OUTNODE)->set_mode(moDIGITAL);
   }else if(future_state == lvSTABLE0){
-    n_(OUTNODE)->set_event(1e-20, lvSTABLE0);
+    n_(OUTNODE)->set_event(_sim->_dtmin, lv00, this);
     n_(OUTNODE)->set_quality(qGOOD);
     n_(OUTNODE)->set_d_iter();
     n_(OUTNODE)->set_mode(moDIGITAL);
