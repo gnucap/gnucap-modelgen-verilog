@@ -534,6 +534,19 @@ static void make_tr_begin(std::ostream& o, const Module& m)
   }else{
   }
 
+  for (int n=1; n<=int(m.circuit()->nodes().size()); ++n) {
+    Node const* nn = m.circuit()->nodes()[n];
+    assert(nn);
+    if(nn->number() == 0) {
+    }else if(nn->number() < n){
+    }else if(nn->is_reg()){
+      // for some reason, legacy nodes must start at analog.
+      o__ "l_(n_" << nn->name() << ")->set_mode(moDIGITAL);\n";
+    }else if(nn->is_used()){
+    }else{
+    }
+  }
+
   o << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";

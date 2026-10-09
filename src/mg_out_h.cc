@@ -872,6 +872,7 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "node_t& n_(int i)const override {\n";
   o____ "assert(_nodes); assert(i>=0); assert(!i || i<_n_total); return _nodes[i];\n";
   o__ "}\n";
+  o__ "node_l& l_(int i)const {return reinterpret_cast<node_l&>(n_(i));}\n";
   o << "private: // impl\n";
   o << "/* ========== */\n";
 
