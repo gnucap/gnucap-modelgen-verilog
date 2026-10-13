@@ -59,6 +59,7 @@ private: // override virtuals
   void	   precalc_first()override	{ELEMENT::precalc_first();}
   void	   expand_first()override;
   void	   expand()override;
+  void	   map_nodes()override;
   void	   precalc_last() override	{ELEMENT::precalc_last();}
   void	   tr_iwant_matrix()override	{}
   void	   tr_begin()override;
@@ -153,6 +154,12 @@ void DEV_A_D::expand()
     throw Exception_Model_Type_Mismatch(long_label(), c->modelname(), "logic family (LOGIC)");
   }else{
   }
+}
+/*--------------------------------------------------------------------------*/
+void DEV_A_D::map_nodes()
+{
+  ELEMENT::map_nodes();
+  n_(OUTNODE)->set_mode(moDIGITAL);
 }
 /*--------------------------------------------------------------------------*/
 void DEV_A_D::tr_begin()

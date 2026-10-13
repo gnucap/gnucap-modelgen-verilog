@@ -1828,7 +1828,7 @@ private: // overrides
   void expand()override;
   void precalc_last()override;
   void zero_filter_readout();
-  //void    map_nodes();         //BASE_SUBCKT
+  void map_nodes()override;
   //void    tr_restore();        //BASE_SUBCKT
   void    tr_load()override{ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
   void tr_begin()override;
@@ -3215,6 +3215,10 @@ ddouble MOD_resistor::_b_white_noise_1__precalc(ddouble, std::string what) {
   ret[d_potential_b_white_noise_1_p_] = -1.;
   return ret;
 }
+void MOD_resistor::map_nodes()
+{
+  BASE_SUBCKT::map_nodes();
+}
 } // n0
 /*--------------------------------------------------------------------------*/
 namespace n1{
@@ -3391,7 +3395,7 @@ private: // overrides
   void expand()override;
   void precalc_last()override;
   void zero_filter_readout();
-  //void    map_nodes();         //BASE_SUBCKT
+  void map_nodes()override;
   //void    tr_restore();        //BASE_SUBCKT
   void    tr_load()override{ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
   void tr_begin()override;
@@ -5262,6 +5266,10 @@ ddouble MOD_resistor::_b_white_noise_0__precalc(ddouble, std::string what) {
   l->set_param_by_name("name", what);
   ret[d_potential_b_white_noise_0_p_] = -1.;
   return ret;
+}
+void MOD_resistor::map_nodes()
+{
+  BASE_SUBCKT::map_nodes();
 }
 } // n1
 /*--------------------------------------------------------------------------*/
@@ -7135,7 +7143,7 @@ private: // overrides
   void expand()override;
   void precalc_last()override;
   void zero_filter_readout();
-  //void    map_nodes();         //BASE_SUBCKT
+  void map_nodes()override;
   //void    tr_restore();        //BASE_SUBCKT
   void    tr_load()override{ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
   TIME_PAIR  tr_review()override;
@@ -8170,6 +8178,10 @@ MOD_capacitor::ddouble MOD_capacitor::_b_ddt_1(ddouble t0)
   return t0;
 }
 /*--------------------------------------------------------------------------*/
+void MOD_capacitor::map_nodes()
+{
+  BASE_SUBCKT::map_nodes();
+}
 } // n0
 /*--------------------------------------------------------------------------*/
 namespace n1{
@@ -8391,7 +8403,7 @@ private: // overrides
   void expand()override;
   void precalc_last()override;
   void zero_filter_readout();
-  //void    map_nodes();         //BASE_SUBCKT
+  void map_nodes()override;
   //void    tr_restore();        //BASE_SUBCKT
   void    tr_load()override{ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
   TIME_PAIR  tr_review()override;
@@ -9524,6 +9536,10 @@ MOD_capacitor::ddouble MOD_capacitor::_b_ddt_2(ddouble t0)
   return t0;
 }
 /*--------------------------------------------------------------------------*/
+void MOD_capacitor::map_nodes()
+{
+  BASE_SUBCKT::map_nodes();
+}
 } // n1
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

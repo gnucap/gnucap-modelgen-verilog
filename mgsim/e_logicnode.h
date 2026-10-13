@@ -76,7 +76,7 @@ public: // simple calculated data access (rvalues)
   bool	 lv_future()const	{return lv().lv_future();}
   bool	 is_unknown()const	{return lv().is_unknown();}
   bool	 in_transit()const	{return final_time() < NEVER;}
-private:
+public:
   bool	 is_digital()const override {return _mode == moDIGITAL;}
 public:
   bool	 is_analog()const	{return _mode == moANALOG;}
@@ -152,13 +152,7 @@ struct node_l : node_t {
   LOGIC_NODE const* operator->()const { return &data(); }
 private:
   LOGIC_NODE& data() const {
-    if(n_()->m_()==0) {
-      // tmp hack.
-      // think of it as an autoinserted connect module
-      // mimics traditional behaviour but probably wrong.
-      static LOGIC_NODE lg(0);
-      return lg;
-    }else{
+    {
       auto n = prechecked_cast<LOGIC_NODE const*>(n_());
       assert(n);
       return *const_cast<LOGIC_NODE*>(n);

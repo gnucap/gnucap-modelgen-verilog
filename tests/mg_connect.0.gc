@@ -4,7 +4,7 @@ load vams/vsine.so
 
 verilog
 
-`modelgen test_connect_0
+`modelgen test_connect_0_
 module ad (out, in);
   input in;
   output out;

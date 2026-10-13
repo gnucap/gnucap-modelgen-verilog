@@ -1623,6 +1623,26 @@ static void make_module_set_param_by_name(std::ostream& o, const Module& m)
     "/*--------------------------------------------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
+static void make_map_nodes(std::ostream& o, const Module& m)
+{
+  make_tag(o);
+  String_Arg const& mid = m.identifier();
+  o << "void MOD_" << mid << "::map_nodes()\n{\n";
+  o__ baseclass(m) << "::map_nodes();\n";
+  for (int n=1; n<=int(m.circuit()->nodes().size()); ++n) {
+    Node const* nn = m.circuit()->nodes()[n];
+    assert(nn);
+    if(nn->number() == 0) {
+    }else if(nn->number() < n){
+    }else if(nn->is_reg()){
+      o__ "l_(n_" << nn->name() << ")->set_mode(moDIGITAL);\n";
+    }else if(nn->is_used()){
+    }else{
+    }
+  }
+  o << "}\n";
+}
+/*--------------------------------------------------------------------------*/
 void make_cc_module(std::ostream& o, const Module& m)
 {
   make_tag(o);
@@ -1670,6 +1690,7 @@ void make_cc_module(std::ostream& o, const Module& m)
   make_module_precalc_last(o, m);
   make_cc_func(o, m);
   make_assign_eval(o, m);
+  make_map_nodes(o, m);
 //  make_module_probe(o, m);
 //  make_module_aux(o, m);
   if(m.has_submodule()) {

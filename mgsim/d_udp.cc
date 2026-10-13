@@ -66,6 +66,11 @@ private: // override virtuals
   void	   precalc_first()override {ELEMENT::precalc_first(); if (subckt()) {subckt()->precalc_first();}}
   void	   expand_first()override;
   void	   expand()override;
+  void map_nodes()override {
+    ELEMENT::map_nodes();
+    n_(OUTNODE)->set_mode(moDIGITAL);
+  }
+/*--------------------------------------------------------------------------*/
   void	   precalc_last() override;
   //void   map_nodes();
 
@@ -357,9 +362,8 @@ void DEV_LOGIC::expand_first()
 	  long_label() + ": can't find subckt: " + subckt_name + ", forcing digital\n");
   }
 
-  static NODE* hybrid = node_dispatcher["hybrid"];
-  NODE const* logic = hybrid;
-  if(!subckt()) {
+  static NODE const* logic = node_dispatcher["wire"];
+  if(OPT::default_logic) {
     logic = OPT::default_logic;
   }else{
     unreachable();
@@ -397,6 +401,13 @@ void DEV_LOGIC::tr_iwant_matrix()
 void DEV_LOGIC::tr_begin()
 {
   ELEMENT::tr_begin();
+  for (int ii = 1;  ii < net_nodes();  ++ii) {
+    if(!_nodes[ii]->is_digital()){
+      throw Exception(long_label() + " ." + port_name(ii) // + "(" + port_value(ii) + ")
+	  + ": need discrete net. use connect modules or legacy logic.");
+    }else{
+    }
+  }
   if (!subckt()) {
     _gatemode = moDIGITAL;
     n_(OUTNODE)->set_mode(_gatemode);

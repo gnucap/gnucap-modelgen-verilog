@@ -1,0 +1,14 @@
+ground gnd;
+vpulse #(.val0(0),.val1(5),.width(100p),.period(200p)) v1 (clk, gnd);
+nand #(1) n1 (out_, clk);
+paramset logic logic;
+ .delay=1p; .vmax=NA( 5.); .vmin=NA( 0.); .unknown=NA( 2.5); .rise=10p; .fall=15p; .rs=NA( 100.); .rw=NA( 1.G); .thh=NA( 0.75); .thl=NA( 0.25); .mr=NA( 5.); .mf=NA( 5.); .over=NA( 0.1); .tnom=NA( 27.);
+endparamset
+
+#          
+n1 .in1: need discrete net. use connect modules or legacy logic.
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=0, total=1
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, subckt=0, model=2, total=4
+dctran density=37.5%, ac density=37.5%
