@@ -4,7 +4,6 @@ endparamset
 
 test #() t1 (ck, en);
 nand #(.delay(100)) n1 (aa, ck, en);
-n1: can't find subckt: logicnand2, forcing digital
 #Time       l(aa)      l(ck)      l(en)      l(n1)      fi(en)    
  0.         3.         3.         0.         3.         Inf       
  20.E-12    3.         3.         0.         3.         Inf       

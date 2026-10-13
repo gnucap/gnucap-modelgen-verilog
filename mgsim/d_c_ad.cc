@@ -408,11 +408,11 @@ void DEV_A_D::tr_accept()
   LOGICVAL out = n_(OUTNODE)->lv();
   to_logic(n_(OUTNODE), m, n_(INNODE));
   LOGICVAL future_state = n_(OUTNODE)->lv();
-  if(future_state == out) { untested();
-  }else if ((_sim->analysis_is_static() || _sim->analysis_is_restore())) { untested();
+  if(future_state == out) {
+  }else if ((_sim->analysis_is_static() || _sim->analysis_is_restore())) {
     switch (future_state) {
-    case lv00: untested(); break;
-    case lv11: untested(); break;
+    case lv00: break;
+    case lv11: break;
     case lvZZ: untested(); break;
     case lvXX: untested(); break;
     case lvX0: untested(); // fall through
@@ -432,7 +432,7 @@ void DEV_A_D::tr_accept()
     n_(OUTNODE)->set_mode(moDIGITAL);
     n_(OUTNODE)->force_initial_value(future_state);
     n_(OUTNODE)->store_old_lv();
-  }else if(future_state == lv11){ untested();
+  }else if(future_state == lv11){
     n_(OUTNODE)->set_event(_sim->_dtmin, lv11, this);
     n_(OUTNODE)->set_quality(qGOOD);
     n_(OUTNODE)->set_d_iter();

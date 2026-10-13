@@ -45,8 +45,6 @@ r1: ambiguous resistor: "vams resistor, plain"
 r2: ambiguous resistor: "vams resistor, plain"
 r1: ambiguous resistor: "vams resistor, plain"
 r1: ambiguous resistor: "vams resistor, plain"
-i1.n1: can't find subckt: logicfastnand1, forcing digital
-i2.n1: can't find subckt: logicslownand1, forcing digital
 #Time       v(clk)     v(c0)      v(c1)      iter(0)   
  0.         0.         5.         5.         3.        
  1.p        5.         5.         5.         3.        

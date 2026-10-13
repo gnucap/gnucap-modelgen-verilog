@@ -1006,10 +1006,10 @@ void INSTANCE::expand_sift()
       gval = dval;
       assert(gotit);
       *j = nullptr;
-    }else if(eff_param_count(d) > eff_param_count(gotit)){ untested();
+    }else if(eff_param_count(d) > eff_param_count(gotit)){
       if(desc.size()){ untested();
 	error(bLOG, long_label() + " rejecting candidate, more params: \"" + desc + "\".\n");
-      }else{ untested();
+      }else{
 	error(bLOG, long_label() + " tie break: " + param_count_string(gotit) + " vs. " +
 	    param_count_string(d) + "\n");
       }
