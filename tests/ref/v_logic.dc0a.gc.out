@@ -19,10 +19,12 @@ endparamset
 #           v(clk)     l(n_0)     l(n_1)     l(n_2)     l(n_3)     l(n_4)     iter(0)   
  0.         0.         15.21      15.2       15.2       15.2       15.2       0.        
 -1.         5.         0.01       3.         0.         3.         0.         1.        
--2.         5.         0.01       3.         0.         3.         0.         2.        
- 0.         5.         3.         3.         0.         3.         0.         3.        
+-2.         5.         3.         3.         0.         3.         0.         2.        
+-3.         5.         3.         0.         3.         0.         3.         3.        
+-4.         5.         3.         0.         3.         0.         3.         4.        
+ 0.         5.         3.         0.         3.         0.         3.         5.        
 Gnucap   System status
-iterations: op=0, dc=3, tran=0, fourier=0, total=3
+iterations: op=0, dc=5, tran=0, fourier=0, total=5
 transient timesteps: accepted=0, rejected=0, total=0
 nodes: user=9, subckt=0, model=2, total=11
 dctran density=12.4%, ac density=12.4%

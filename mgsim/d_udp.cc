@@ -182,7 +182,7 @@ void DEV_LOGIC::set_parameters(const std::string& Label, CARD *Owner,
 void DEV_LOGIC::precalc_last()
 {
   ELEMENT::precalc_last();
-  if (subckt()) { untested();
+  if (subckt()) {
     subckt()->precalc_last();
   }else{
   }
@@ -206,7 +206,7 @@ void DEV_LOGIC::expand_first()
   try {
     const CARD* model = find_looking_out(subckt_name);
     
-    if(auto ms = dynamic_cast<const MODEL_SUBCKT*>(model)) { untested();
+    if(auto ms = dynamic_cast<const MODEL_SUBCKT*>(model)) {
       auto s = prechecked_cast<const BASE_SUBCKT*>(ms->component_proto());
       assert(s);
       _gatemode = OPT::mode;
@@ -228,7 +228,7 @@ void DEV_LOGIC::expand_first()
   NODE const* logic = hybrid;
   if(!subckt()) {
     logic = OPT::default_logic;
-  }else{ untested();
+  }else{
     unreachable();
   }
 
@@ -246,7 +246,7 @@ void DEV_LOGIC::expand_first()
 void DEV_LOGIC::expand()
 {
   ELEMENT::expand();
-  if(subckt()){ untested();
+  if(subckt()){
     subckt()->expand_();
   }else{
   }
@@ -254,7 +254,7 @@ void DEV_LOGIC::expand()
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_iwant_matrix()
 {
-  if (subckt()) { untested();
+  if (subckt()) {
     subckt()->tr_iwant_matrix();
   }else{
   }
@@ -268,7 +268,7 @@ void DEV_LOGIC::tr_begin()
     _gatemode = moDIGITAL;
     n_(OUTNODE)->set_mode(_gatemode);
     _oldgatemode = _gatemode;
-  }else{ untested();
+  }else{
     _gatemode = (OPT::mode==moMIXED) ? moANALOG : OPT::mode;
     n_(OUTNODE)->set_mode(_gatemode);
     _oldgatemode = _gatemode;
@@ -426,9 +426,9 @@ bool DEV_LOGIC::tr_eval_digital()
   }else if (_sim->analysis_is_static()) {
   }else{
   }
-  if (_sim->analysis_is_static() || _sim->analysis_is_restore()) {
+  if (_sim->analysis_is_static() || _sim->analysis_is_restore()) { untested();
     tr_accept();
-  }else{
+  }else{ untested();
     assert(_sim->analysis_is_tran_dynamic());
   }
   
@@ -539,7 +539,7 @@ void DEV_LOGIC::tr_accept()
     
     for (int ii = BEGIN_IN;  ii < net_nodes();  ++ii) {
       n_(ii)->to_logic(m);
-      if (n_(ii)->quality() < _quality) { untested();
+      if (n_(ii)->quality() < _quality) {
 	_quality = n_(ii)->quality();
 	_failuremode = n_(ii)->failure_mode();
       }else{
@@ -652,7 +652,7 @@ void DEV_LOGIC::tr_accept()
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::ac_iwant_matrix()
 {
-  if (subckt()) { untested();
+  if (subckt()) {
     subckt()->ac_iwant_matrix();
   }else{
   }

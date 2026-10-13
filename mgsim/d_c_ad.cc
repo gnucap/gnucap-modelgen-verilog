@@ -180,12 +180,22 @@ void DEV_A_D::tr_regress()
 bool DEV_A_D::tr_needs_eval()const
 {
   assert(!is_q_for_eval());
-  return false;
+  return (_sim->analysis_is_static() || _sim->analysis_is_restore());
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_A_D::do_tr()
-{  
-  return converged();
+{
+  if (_sim->analysis_is_restore()) {
+  }else if (_sim->analysis_is_static()) {
+  }else{ untested();
+  }
+  if (_sim->analysis_is_static() || _sim->analysis_is_restore()) {
+    tr_accept();
+  }else{ untested();
+    assert(_sim->analysis_is_tran_dynamic());
+  }
+
+  return true;
 }
 /*--------------------------------------------------------------------------*/
 void DEV_A_D::tr_load()
@@ -232,7 +242,7 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
     if (_sim->analysis_is_static() || _sim->analysis_is_restore()) {
       n->set_last_change_time(0);
       n->store_old_last_change_time();
-      n->set_lv(lvUNKNOWN);
+      n->set_lv(lvXX);
     }else{
     }
     double dt = _sim->_time0 - n->last_change_time();
@@ -254,10 +264,10 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
     double sv = input / process()->range;	/* new scaled voltage */
     if (sv >= process()->th1) {		/* logic 1 */
       switch (n->lv()) {
-      case lvSTABLE0: break; // n->dont_set_quality("stable 0 to stable 1");	break;
+      case lv00: break; // n->dont_set_quality("stable 0 to stable 1");	break;
       case lvRISING: untested(); break; //n->dont_set_quality("begin stable 1");	break;
       case lvFALLING: untested(); n->set_quality(qBAD); break; // untested();n->set_bad_quality("rising to stable 0");	break;
-      case lvSTABLE1: break; // n->dont_set_quality("continuing stable 1");	break;
+      case lv11: break; // n->dont_set_quality("continuing stable 1");	break;
       case lv0Z: untested(); // fall-through
       case lv0X: untested(); // fall-through
       case lv1Z: untested(); // fall-through
@@ -271,7 +281,7 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
       case lvXZ: untested(); // fall-through
       case lvUNKNOWN: n->set_quality(qGOOD);		break;
       }
-      n->set_lv(lvSTABLE1);
+      n->set_lv(lv11);
     }else if (sv <= process()->th0) {	/* logic 0 */
       switch (n->lv()) {
       case lvSTABLE0: break; // n->dont_set_quality("continuing stable 0");	break;
@@ -384,6 +394,7 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
   }else{ untested();
   }
 }
+/*--------------------------------------------------------------------------*/
 /* tr_accept: This runs after everything has passed "review".
  * It sets up and queues transitions, and sometimes determines logic states.
  */
@@ -394,16 +405,39 @@ void DEV_A_D::tr_accept()
   const MODEL_LOGIC* m = prechecked_cast<const MODEL_LOGIC*>(c->model());
   assert(m);
 
-  LOGICVAL oldstate = n_(OUTNODE)->lv();
+  LOGICVAL out = n_(OUTNODE)->lv();
   to_logic(n_(OUTNODE), m, n_(INNODE));
   LOGICVAL future_state = n_(OUTNODE)->lv();
-  if(future_state == oldstate) {
-  }else if(future_state == lvSTABLE1){
+  if(future_state == out) { untested();
+  }else if ((_sim->analysis_is_static() || _sim->analysis_is_restore())) { untested();
+    switch (future_state) {
+    case lv00: untested(); break;
+    case lv11: untested(); break;
+    case lvZZ: untested(); break;
+    case lvXX: untested(); break;
+    case lvX0: untested(); // fall through
+    case lv10: untested(); // fall through
+    case lvZ0: untested(); future_state=lv00; break;
+    case lvX1: untested(); // fall through
+    case lv01: untested(); // fall through
+    case lvZ1: untested(); future_state=lv11; break;
+    case lvXZ: untested(); // fall through
+    case lv0Z: untested(); // fall through
+    case lv1Z: untested(); future_state=lvZZ; break;
+    case lv0X: untested(); // fall through
+    case lv1X: untested(); // fall through
+    case lvZX: untested(); future_state=lvXX; break;
+    }
+    n_(OUTNODE)->set_lv(lvXX);
+    n_(OUTNODE)->set_mode(moDIGITAL);
+    n_(OUTNODE)->force_initial_value(future_state);
+    n_(OUTNODE)->store_old_lv();
+  }else if(future_state == lv11){ untested();
     n_(OUTNODE)->set_event(_sim->_dtmin, lv11, this);
     n_(OUTNODE)->set_quality(qGOOD);
     n_(OUTNODE)->set_d_iter();
     n_(OUTNODE)->set_mode(moDIGITAL);
-  }else if(future_state == lvSTABLE0){
+  }else if(future_state == lv00){
     n_(OUTNODE)->set_event(_sim->_dtmin, lv00, this);
     n_(OUTNODE)->set_quality(qGOOD);
     n_(OUTNODE)->set_d_iter();
