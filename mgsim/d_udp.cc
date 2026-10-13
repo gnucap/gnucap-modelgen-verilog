@@ -344,7 +344,7 @@ void DEV_LOGIC::expand_first()
       assert(s);
       _gatemode = OPT::mode;
       renew_subckt(s, nullptr/*&(c->_params)*/);
-    }else if(auto sss = dynamic_cast<const BASE_SUBCKT*>(model)) { untested();
+    }else if(auto sss = dynamic_cast<const BASE_SUBCKT*>(model)) {
       // reachable from spice
       _gatemode = OPT::mode;
       renew_subckt(sss, nullptr/*&(c->_params)*/);
@@ -668,6 +668,7 @@ void DEV_LOGIC::accept(SIM_PHASE Ph)
   /* side effect --- generate digital values for analog nodes */
   assert(PORTS_PER_GATE == max_nodes());
   {
+    assert(!n_(OUTNODE)->is_analog());
     n_(OUTNODE)->to_logic(m);
     _quality = n_(OUTNODE)->quality();  /* the worst quality on this device */
     _failuremode = n_(OUTNODE)->failure_mode();    /* what is wrong with it? */
@@ -677,7 +678,9 @@ void DEV_LOGIC::accept(SIM_PHASE Ph)
     trace2(n_(OUTNODE)->failure_mode().c_str(), OUTNODE, n_(OUTNODE)->quality());
     
     for (int ii = BEGIN_IN;  ii < net_nodes();  ++ii) {
-      n_(ii)->to_logic(m);
+      trace2("tracc", long_label(), ii);
+      assert(!n_(ii)->is_analog());
+      // n_(ii)->to_logic(m);
       if (n_(ii)->quality() < _quality) {
 	_quality = n_(ii)->quality();
 	_failuremode = n_(ii)->failure_mode();
