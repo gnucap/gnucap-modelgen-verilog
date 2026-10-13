@@ -1,8 +1,24 @@
 Logic models in Verilog-AMS
 
+== compatibility note
+
+Gnucap originally supports multiarchitecture nodes and logic primitives.
+Verilog-AMS logic primitives are purely discrete.
+
+Both "mgsim" (here) and "logic" (from main package) provide those primitives.
+Devices compiled with modelgen-verilog use the one that has been loaded last
+to drive udp and assign.
+
+When instanciating built in primitives, a "model" parameter may be used to
+disambiguate, following the ordinary overloading rules.
+
+or #(17) u1(y1, a, b);                        // "standard" primitive
+or #(.delay(17)) u2(y2, a, b);                // "standard" primitive
+or #(.delay(17), .model("sth")) u3(y3, a, b); // original primitive
+
 == builtin primitives
 
-Gnucap provices logic primitives inherited from Verilog-95.
+Gnucap provides logic primitives inherited from Verilog-95.
 
 $ gnucap builtin.gc
 
