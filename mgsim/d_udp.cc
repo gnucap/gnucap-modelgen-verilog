@@ -581,6 +581,7 @@ bool DEV_LOGIC::tr_eval_digital()
   assert(c);
   const MODEL_LOGIC* m = prechecked_cast<const MODEL_LOGIC*>(c->model());
   assert(m);
+#if 0
   _y[0].x = 0.;
   _y[0].f1 = n_(OUTNODE)->to_analog(m);
   _y[0].f0 = 0.;
@@ -590,6 +591,11 @@ bool DEV_LOGIC::tr_eval_digital()
   set_converged(conv_check());
   store_values();
   q_load();
+#else
+  _y[0].f1 = n_(OUTNODE)->lv();
+  set_converged(_y1.f1 == _y[0].f1);
+  _y1.f1 = _y[0].f1;
+#endif
   
   return converged();
 }
@@ -835,15 +841,15 @@ XPROBE DEV_LOGIC::ac_probe_ext(const std::string& what)const
 bool DEV_LOGIC::want_analog()const
 {
   return false;
-  return subckt() &&
-    ((OPT::mode == moANALOG) || (OPT::mode == moMIXED && _quality != qGOOD));
+//  return subckt() &&
+//    ((OPT::mode == moANALOG) || (OPT::mode == moMIXED && _quality != qGOOD));
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_LOGIC::want_digital()const
 {
   return true;
-  return !subckt() ||
-    ((OPT::mode == moDIGITAL) || (OPT::mode == moMIXED && _quality == qGOOD));
+//  return !subckt() ||
+//    ((OPT::mode == moDIGITAL) || (OPT::mode == moMIXED && _quality == qGOOD));
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
