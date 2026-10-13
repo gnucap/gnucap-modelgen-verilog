@@ -82,6 +82,7 @@ private: // override virtuals
   void	   tr_unload()override;
   TIME_PAIR tr_review()override;
   void	   tr_accept()override;
+  void	   accept(SIM_PHASE);
   double   tr_involts()const override	{ untested();unreachable(); return 0;}
   //double tr_input()const		//ELEMENT
   double   tr_involts_limited()const override { untested();unreachable(); return 0;}
@@ -427,7 +428,7 @@ bool DEV_LOGIC::tr_eval_digital()
   }else{
   }
   if (_sim->analysis_is_static() || _sim->analysis_is_restore()) { untested();
-    tr_accept();
+    accept(p_INIT_DC);
   }else{ untested();
     assert(_sim->analysis_is_tran_dynamic());
   }
@@ -519,6 +520,11 @@ TIME_PAIR DEV_LOGIC::tr_review()
  */
 void DEV_LOGIC::tr_accept()
 {
+  accept(p_TRAN);
+}
+/*--------------------------------------------------------------------------*/
+void DEV_LOGIC::accept(SIM_PHASE Ph)
+{
   assert(_gatemode == moDIGITAL || _gatemode == moANALOG);
   const COMMON_LOGIC* c = prechecked_cast<const COMMON_LOGIC*>(common());
   assert(c);
@@ -588,13 +594,15 @@ void DEV_LOGIC::tr_accept()
 	|| _sim->analysis_is_restore()) {
       LOGICVAL future_state = c->logic_eval(&n_(BEGIN_IN), net_nodes()-BEGIN_IN);
       //		         ^^^^^^^^^^
-      if ((n_(OUTNODE)->is_unknown()) &&
-	  (_sim->analysis_is_static() || _sim->analysis_is_restore())) {
+      if ((n_(OUTNODE)->is_unknown() || Ph == p_INIT_DC) &&
+	  _sim->analysis_is_static()) {
 	n_(OUTNODE)->force_initial_value(future_state);
 	n_(OUTNODE)->store_old_lv();
 	/* This happens when initial DC is digital.
-	 * Answers could be wrong if order in netlist is reversed 
 	 */
+      }else if (n_(OUTNODE)->is_unknown() && _sim->analysis_is_restore()) { untested();
+	n_(OUTNODE)->force_initial_value(future_state);
+	n_(OUTNODE)->store_old_lv();
       }else if (future_state != n_(OUTNODE)->lv()) {
 	assert(future_state != lvUNKNOWN);
 	switch (future_state) {
