@@ -165,6 +165,7 @@ void DEV_A_D::tr_begin()
 void DEV_A_D::dc_advance()
 {
   ELEMENT::dc_advance();
+  q_accept();
 }
 /*--------------------------------------------------------------------------*/
 /* tr_advance: the first to run on a new time step.
@@ -173,11 +174,13 @@ void DEV_A_D::dc_advance()
 void DEV_A_D::tr_advance()
 {
   ELEMENT::tr_advance();
+  q_accept();
 }
 /*--------------------------------------------------------------------------*/
 void DEV_A_D::tr_regress()
 {
   ELEMENT::tr_regress();
+  q_accept();
 }
 /*--------------------------------------------------------------------------*/
 /* tr_needs_eval
@@ -216,7 +219,7 @@ void DEV_A_D::tr_unload()
 TIME_PAIR DEV_A_D::tr_review()
 {
   // not calling ELEMENT::tr_review();
-  q_accept();
+  // q_accept();
   //digital mode queues events explicitly in tr_accept
   _time_by.reset();
   return _time_by;
