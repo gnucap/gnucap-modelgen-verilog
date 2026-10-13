@@ -686,7 +686,7 @@ void DEV_LOGIC::accept(SIM_PHASE Ph)
   assert(PORTS_PER_GATE == max_nodes());
   {
     assert(!n_(OUTNODE)->is_analog());
-    n_(OUTNODE)->to_logic(m);
+    // n_(OUTNODE)->to_logic(m);
     _quality = n_(OUTNODE)->quality();  /* the worst quality on this device */
     _failuremode = n_(OUTNODE)->failure_mode();    /* what is wrong with it? */
     _lastchangenode = OUTNODE;		/* which node changed most recently */
