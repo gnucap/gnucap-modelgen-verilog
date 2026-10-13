@@ -32,7 +32,7 @@ endparamset
  15.016E-9  1.         0.         0.        
  20.E-9     1.         0.         0.        
 Gnucap   System status
-iterations: op=0, dc=0, tran=70, fourier=0, total=96
+iterations: op=0, dc=0, tran=71, fourier=0, total=97
 transient timesteps: accepted=23, rejected=3, total=26
 nodes: user=4, subckt=0, model=4, total=8
 dctran density=23.4%, ac density=23.4%

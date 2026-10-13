@@ -61,7 +61,7 @@ private: // override virtuals
   void	   expand()override;
   void	   precalc_last() override	{ELEMENT::precalc_last();}
   void	   tr_iwant_matrix()override	{}
-  void	   tr_begin()override		{ELEMENT::tr_begin();}
+  void	   tr_begin()override;
   void	   tr_restore()override		{ELEMENT::tr_restore();}
   void	   dc_advance()override;
   void	   tr_advance()override;
@@ -153,6 +153,13 @@ void DEV_A_D::expand()
     throw Exception_Model_Type_Mismatch(long_label(), c->modelname(), "logic family (LOGIC)");
   }else{
   }
+}
+/*--------------------------------------------------------------------------*/
+void DEV_A_D::tr_begin()
+{
+  ELEMENT::tr_begin();
+  n_(OUTNODE)->set_quality(qGOOD);
+  n_(OUTNODE)->set_mode(moDIGITAL);
 }
 /*--------------------------------------------------------------------------*/
 void DEV_A_D::dc_advance()
@@ -266,7 +273,7 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
       switch (n->lv()) {
       case lv00: break; // n->dont_set_quality("stable 0 to stable 1");	break;
       case lvRISING: untested(); break; //n->dont_set_quality("begin stable 1");	break;
-      case lvFALLING: untested(); n->set_quality(qBAD); break; // untested();n->set_bad_quality("rising to stable 0");	break;
+      case lvFALLING: untested(); /* n->set_quality(qBAD); */ break; // untested();n->set_bad_quality("rising to stable 0");	break;
       case lv11: break; // n->dont_set_quality("continuing stable 1");	break;
       case lv0Z: untested(); // fall-through
       case lv0X: untested(); // fall-through
@@ -279,13 +286,13 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
       case lvZZ: untested(); // fall-through
       case lvZX: untested(); // fall-through
       case lvXZ: untested(); // fall-through
-      case lvUNKNOWN: n->set_quality(qGOOD);		break;
+      case lvUNKNOWN: /* n->set_quality(qGOOD); */		break;
       }
       n->set_lv(lv11);
     }else if (sv <= process()->th0) {	/* logic 0 */
       switch (n->lv()) {
       case lvSTABLE0: break; // n->dont_set_quality("continuing stable 0");	break;
-      case lvRISING: untested(); n->set_quality(qBAD); break; // untested();n->set_bad_quality("rising to stable 0");	break;
+      case lvRISING: untested(); /* n->set_quality(qBAD); */ break; // untested();n->set_bad_quality("rising to stable 0");	break;
       case lvFALLING: untested(); break; // n->dont_set_quality("begin stable 0");	break;
       case lvSTABLE1: break; // n->dont_set_quality("stable 1 to stable 0");	break;
       case lv0Z: untested(); // fall-through
@@ -299,7 +306,7 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
       case lvZZ: untested(); // fall-through
       case lvZX: untested(); // fall-through
       case lvXZ: untested(); // fall-through
-      case lvUNKNOWN: n->set_quality(qGOOD); break;
+      case lvUNKNOWN: /* n->set_quality(qGOOD); */ break;
       }
       n->set_lv(lvSTABLE0);
     }else{				/* transition region */
@@ -313,19 +320,21 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
 	case lvZ1: untested(); // fall-through
         case lvX1: untested(); // fall-through
 	case lvRISING:
+#if 0
 	  if (diff < dt/(process()->mr * process()->rise)) { untested();
 	    n->set_quality(qBAD);
 	  }else{
 	    // n->dont_set_quality("continuing good rise");
 	  }
+#endif
 	  break;
 	case lvZ0: untested(); // fall-through
         case lvX0: untested(); // fall-through
 	case lvFALLING:untested();
-	  n->set_quality(qBAD); // //( "positive glitch in fall");
+	  /* n->set_quality(qBAD); */
 	  break;
 	case lvSTABLE1:untested();
-	  n->set_quality(qBAD); // //( "negative glitch in 1");
+	  /* n->set_quality(qBAD); */
 	  break;
 	case lv0Z: untested(); // fall-through
         case lv0X: untested(); // fall-through
@@ -335,25 +344,25 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
         case lvZX: untested(); // fall-through
         case lvXZ: untested(); // fall-through
 	case lvUNKNOWN: untested();
-	  n->set_quality(qBAD); //( "initial rise");
+	  /* n->set_quality(qBAD); */
 	  break;
 	}
 	n->set_lv(lvRISING);
       }else if (diff < 0) {	/* falling */
 	switch (n->lv()) {
 	case lvSTABLE0:untested();
-	  n->set_quality(qBAD); // "positive glitch in 0");
+	  /* n->set_quality(qBAD); */
 	  break;
 	case lvZ1: untested(); // fall-through
         case lvX1: untested(); // fall-through
 	case lvRISING: untested();
-	  n->set_quality(qBAD); // "negative glitch in rise");
+	  /* n->set_quality(qBAD); */
 	  break;
 	case lvZ0: untested(); // fall-through
         case lvX0: untested(); // fall-through
 	case lvFALLING:
 	  if (-diff < dt/(process()->mf * process()->fall)) { untested();
-	    n->set_quality(qBAD); // ("slow fall");
+	    /* n->set_quality(qBAD); */
 	  }else{
 	    // n->dont_set_quality("continuing good fall");
 	  }
@@ -369,16 +378,17 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
         case lvZX: untested(); // fall-through
         case lvXZ: untested(); // fall-through
 	case lvUNKNOWN:untested();
-	  n->set_quality(qBAD); // ("initial fall");
+	    /* n->set_quality(qBAD); */
 	  break;
 	}
 	n->set_lv(lvFALLING);
       }else{untested();			/* hanging up in transition */
 	error(bDANGER, "inflection???\n");
-	n->set_quality(qBAD); // "in transition but no change");
+	    /* n->set_quality(qBAD); */
 	/* state (rise/fall)  unchanged */
       }
     }
+#if 0
     if (sv > 1.+process()->over || sv < -process()->over) { untested(); /* out of range */
       n->set_quality(qBAD); // "out of range");
     }
@@ -388,6 +398,7 @@ void DEV_A_D::to_logic(node_l& n, MODEL_LOGIC const* f, node_t& in)
 				/* A good transition is defined as */
 				/* entering a stable state from    */
 				/* a transition state.		   */
+#endif
     n->set_d_iter();
     n->set_last_change_time();
 //    trace3(_failure_mode.c_str(), _lastchange, _quality, _lv);
@@ -434,12 +445,12 @@ void DEV_A_D::tr_accept()
     n_(OUTNODE)->store_old_lv();
   }else if(future_state == lv11){
     n_(OUTNODE)->set_event(_sim->_dtmin, lv11, this);
-    n_(OUTNODE)->set_quality(qGOOD);
+    /* n_(OUTNODE)->set_quality(qGOOD); */
     n_(OUTNODE)->set_d_iter();
     n_(OUTNODE)->set_mode(moDIGITAL);
   }else if(future_state == lv00){
     n_(OUTNODE)->set_event(_sim->_dtmin, lv00, this);
-    n_(OUTNODE)->set_quality(qGOOD);
+    /* n_(OUTNODE)->set_quality(qGOOD); */
     n_(OUTNODE)->set_d_iter();
     n_(OUTNODE)->set_mode(moDIGITAL);
   }else{ untested();

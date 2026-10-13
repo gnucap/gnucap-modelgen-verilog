@@ -250,8 +250,8 @@ public:
 DEV_LOGIC::DEV_LOGIC(COMMON_COMPONENT* c)
   :ELEMENT(c),
    _lastchangenode(0),
-   _quality(qGOOD),
-   _failuremode("ok"),
+//   _quality(qGOOD),
+//   _failuremode("ok"),
    _oldgatemode(moUNKNOWN),
    _gatemode(moUNKNOWN)   
 {
@@ -261,8 +261,8 @@ DEV_LOGIC::DEV_LOGIC(COMMON_COMPONENT* c)
 DEV_LOGIC::DEV_LOGIC(const DEV_LOGIC& p)
   :ELEMENT(p),
    _lastchangenode(0),
-   _quality(qGOOD),
-   _failuremode("ok"),
+//   _quality(qGOOD),
+//   _failuremode("ok"),
    _oldgatemode(moUNKNOWN),
    _gatemode(moUNKNOWN)   
 {
@@ -407,6 +407,7 @@ void DEV_LOGIC::tr_begin()
     _oldgatemode = _gatemode;
     subckt()->tr_begin();
   }
+  n_(OUTNODE)->set_quality(qGOOD);
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_restore()
@@ -819,12 +820,14 @@ XPROBE DEV_LOGIC::ac_probe_ext(const std::string& what)const
 /*--------------------------------------------------------------------------*/
 bool DEV_LOGIC::want_analog()const
 {
+  return false;
   return subckt() &&
     ((OPT::mode == moANALOG) || (OPT::mode == moMIXED && _quality != qGOOD));
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_LOGIC::want_digital()const
 {
+  return true;
   return !subckt() ||
     ((OPT::mode == moDIGITAL) || (OPT::mode == moMIXED && _quality == qGOOD));
 }

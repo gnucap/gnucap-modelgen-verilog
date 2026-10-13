@@ -118,7 +118,7 @@ r1: ambiguous resistor: "vams resistor, plain"
  922.p      0.         5.         5.        
  1.n        0.         5.         5.        
 Gnucap   System status
-iterations: op=0, dc=0, tran=195, fourier=0, total=266
+iterations: op=0, dc=0, tran=196, fourier=0, total=267
 transient timesteps: accepted=71, rejected=0, total=71
 nodes: user=5, subckt=0, model=2, total=7
 dctran density=28.6%, ac density=28.6%

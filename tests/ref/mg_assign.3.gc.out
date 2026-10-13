@@ -2,9 +2,9 @@ load logic
 c1._na0_v_out: can't find subckt: logic_na0_v_out2, forcing digital
 l1._na1_v_q: can't find subckt: logic_na1_v_q3, forcing digital
 #           v(clk)     v(en_)     v(q)       v(r)       v(s)       l(clk)     l(en)      l(q)       l(r)       l(s)      
- 27.        5.         0.         0.         0.         0.         3.         0.01       0.         0.01       0.01      
+ 27.        5.         0.         0.         0.         0.         3.         0.         0.         0.01       0.01      
 #Time       l(clk)     l(en)      l(q)       l(r)       l(s)       v(en)      v(q)       v(r)       v(s)      
- 0.         3.         0.01       0.         0.01       0.01       0.         0.         0.         0.        
+ 0.         3.         0.         0.         0.01       0.01       0.         0.         0.         0.        
  1.E-12     2.         3.         0.         0.01       0.01       0.         0.         0.         0.        
  2.E-12     2.         3.         0.         0.01       0.01       0.         0.         0.         0.        
  3.E-12     2.         3.         0.         0.01       0.01       0.         0.         0.         0.        
@@ -168,7 +168,7 @@ l1._na1_v_q: can't find subckt: logic_na1_v_q3, forcing digital
  1.971E-9   1.         3.         0.         0.01       3.01       0.         0.         0.         5.        
  2.E-9      1.         3.         0.         0.01       3.01       0.         0.         0.         5.        
 Gnucap   System status
-iterations: op=3, dc=0, tran=472, fourier=0, total=644
+iterations: op=4, dc=0, tran=472, fourier=0, total=645
 transient timesteps: accepted=163, rejected=6, total=169
 nodes: user=6, subckt=0, model=6, total=12
 dctran density=18.8%, ac density=18.8%

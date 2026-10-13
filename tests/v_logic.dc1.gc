@@ -23,7 +23,7 @@ vpulse #(.val0(0) .val1(5) .width(100p) .period(200p)) v1(clk, gnd);
 
 list
 
-print dc l(n_*) iter(0)
+print dc v(clk) l(n_*) iter(0)
 dc trace i
 
 status notime

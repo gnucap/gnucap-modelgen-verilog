@@ -16,12 +16,13 @@ paramset logic logic;
 endparamset
 
 #           l(n_0)     l(n_1)     l(n_2)     l(n_3)     l(n_4)     iter(0)   
- 0.         15.21      15.2       15.2       15.2       15.2       0.        
--1.         0.01       3.         0.         3.         0.         1.        
--2.         0.01       3.         0.         3.         0.         2.        
- 0.         0.01       3.         0.         3.         0.         3.        
+ 0.         15.        15.        15.        15.        15.        0.        
+-1.         0.         15.        15.        15.        15.        1.        
+-2.         0.         3.         0.         3.         0.         2.        
+-3.         0.         3.         0.         3.         0.         3.        
+ 0.         0.         3.         0.         3.         0.         4.        
 Gnucap   System status
-iterations: op=0, dc=3, tran=0, fourier=0, total=3
+iterations: op=0, dc=4, tran=0, fourier=0, total=4
 transient timesteps: accepted=0, rejected=0, total=0
 nodes: user=8, subckt=0, model=2, total=10
 dctran density=11.0%, ac density=11.0%
