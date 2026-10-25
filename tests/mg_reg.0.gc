@@ -1,0 +1,13 @@
+load ./modelgen_2.so
+`modelgen test_reg0
+module discrete (clk);
+    parameter real cycle = 20n;
+    output clk;
+    reg clk;
+    initial clk = 0;
+endmodule
+`endmodelgen
+
+!make test_reg0.so >/dev/null
+test_reg0 r(c);
+list

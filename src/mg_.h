@@ -363,7 +363,10 @@ public:
   void dec_use()const { untested();assert(_use); --_use;}
   void connect(Element_2 const*);
   bool is_ground() const{ return !_number; }
-  bool is_discrete() const{ return _discipline && _discipline->is_discrete(); }
+  bool is_discrete() const{
+    return (_discipline && _discipline->is_discrete()) ||
+    (!_discipline && is_reg());
+  }
 private:
   void new_token(std::string const& name);
 }; // Node
