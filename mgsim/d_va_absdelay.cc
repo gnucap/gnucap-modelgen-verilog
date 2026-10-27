@@ -51,7 +51,7 @@ public:
 class COMMON_ABSDELAY : public COMMON_DELAY {
 public:
   PARAMETER<double> _maxdelay{0.};
-  std::string name()const override {return "va_delay";}
+  std::string name()const override { untested();return "va_delay";}
 public:
   ~COMMON_ABSDELAY();
   COMMON_ABSDELAY(int x) : COMMON_DELAY(x) {}
@@ -76,7 +76,7 @@ public:
   PARAMETER<double> _fall;
   std::string name()const override {return "va_transition";}
 public:
-  // ~COMMON_TRANSITION() {}
+  // ~COMMON_TRANSITION() { untested();}
   COMMON_TRANSITION(int x) : COMMON_DELAY(x) {}
   COMMON_TRANSITION(COMMON_TRANSITION const& x)
    : COMMON_DELAY(x)
@@ -226,7 +226,7 @@ int COMMON_ABSDELAY::set_param_by_name(std::string Name, std::string Value)
 {
   if(Name == "delay"){
     _delay = Value;
-  }else if(Name == "maxdelay"){
+  }else if(Name == "maxdelay"){ untested();
     _maxdelay = Value;
   }else{ untested();
     COMMON_COMPONENT::set_param_by_name(Name, Value);
@@ -337,6 +337,7 @@ void DELAY::tr_regress()
   ELEMENT::tr_regress();
   _y[0] = _forward.v_out(_sim->_time0);
   _out0 = _y[0].f0;
+  assert(_out0 == _out0);
 }
 /*--------------------------------------------------------------------------*/
 void DELAY::tr_begin()
@@ -394,6 +395,7 @@ inline void DELAY::dc_advance()
   const COMMON_ABSDELAY* c = dynamic_cast<const COMMON_ABSDELAY*>(common());
   if(c){
     _out0 = _forward.v_out(_sim->_time0).f0;
+    assert(_out0 == _out0);
   }else{
   }
 //   _y[0].f1 = tr_involts();
@@ -408,7 +410,7 @@ inline void DELAY::dc_advance()
 }
 /*--------------------------------------------------------------------------*/
 std::string DELAY::port_name(int i)const
-{
+{ untested();
   assert(i >= 0);
   assert(i < max_nodes());
   static std::string names[] = {"out0", "out1", "in0", "in1" };
@@ -435,7 +437,7 @@ void DELAY::precalc_first()
 #if 0
   if(_input){ untested();
     _input->precalc_first();
-  }else{
+  }else{ untested();
   }
 #endif
 }
@@ -598,7 +600,7 @@ void DELAY::map_nodes()
 #if 0
   if(_input){ untested();
     _input->map_nodes();
-  }else{
+  }else{ untested();
   }
 #endif
 }
@@ -618,7 +620,7 @@ void DELAY::ac_load()
     for (int i=2; i<=_n_ports; ++i) {
       ac_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), _values[i] * _acg);
     }
-  }else{
+  }else{ untested();
     trace2("acload", _acg, mfactor());
     ac_load_active();
   }

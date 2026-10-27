@@ -302,7 +302,7 @@ STORAGE_TYPE::set_t STORAGE_TYPE::set_t::operator|(STORAGE_TYPE::set_t const& o)
   int os = o._s;
   if(s == s_event){
     return *this;
-  }else if(os == s_event) { untested();
+  }else if(os == s_event) {
     return o;
   }else if(s > os){
     std::swap(s, os);
