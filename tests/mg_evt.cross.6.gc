@@ -1,0 +1,33 @@
+attach ./modelgen_2.so
+attach ../vams/vsine.so
+
+verilog
+
+`modelgen test_cross6
+module test(p, n);
+	electrical p, n;
+	parameter real x = .8414709848078965;
+
+	analog begin
+		@(cross(V(p,n)-x, 0)) begin
+			$strobe("cross time 1+%g value=%g", $abstime-1, V(p)-x);
+		end
+	end
+endmodule
+
+list
+
+!make test_cross6.so > /dev/null
+attach ./test_cross6.so
+
+ground g;
+parameter real pi = 3.14159265358979323844;
+vsine #(.freq(1./2./pi)) v1(p, g);
+test #() dut(p, g);
+
+options trtol=1
+print tran v(p)
+tran {pi/2.} trace n
+
+status notime
+end

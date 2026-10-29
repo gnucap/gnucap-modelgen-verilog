@@ -134,6 +134,13 @@ static void make_tr_needs_eval(std::ostream& o, const Module& m)
       }
     }
   }
+  if(m.times()){ untested();
+    // TODO. check if actually used.
+    o__ "if(_time_by.event() < NEVER) {\n";
+    o____ "return true;\n";
+    o__ "}else";
+  }else{ untested();
+  }
   o << "{\n";
   o____ "return false;\n";
   o__ "}\n";
