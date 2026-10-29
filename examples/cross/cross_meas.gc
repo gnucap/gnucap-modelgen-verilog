@@ -1,0 +1,40 @@
+load mgsim
+load vams/vsine.so
+verilog
+
+ground g;
+parameter real pi = 3.14159265358979323844;
+vsine #(.freq(1./2./pi)) v1(p, g);
+
+parameter real x = .8414709848078965;
+
+print tran v(p)
+store tran v(p)
+tran {pi/2.}
+measure c0 = cross(probe="v(p)" cross=x)
+// here's the error
+eval c0 - 1.
+
+// try to get a smaller error by reducing tolerance
+options trtol=1
+tran 0 {pi/2.} > /dev/null
+measure c1 = cross(probe="v(p)" cross=x)
+eval c1 - 1.
+
+// try to get a smaller error by reducing tolerance further
+options trtol=.1
+tran 0 {pi/2.} > /dev/null
+measure c2 = cross(probe="v(p)" cross=x)
+eval c2 - 1.
+
+// now do it the spice way. Manual step control every tenth of a second.
+tran 0 {pi/2.} .1 > /dev/null
+measure c3 = cross(probe="v(p)" cross=x)
+// great. the error is gone!
+eval c3 - 1.
+
+// Was is a fluke? yes. Set a manual step sth. 1s is not an integer multiple
+tran 0 {pi/2.} .08 > /dev/null
+measure c4 = cross(probe="v(p)" cross=x)
+// oh no.
+eval c4 - 1.

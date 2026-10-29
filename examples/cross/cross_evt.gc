@@ -1,0 +1,21 @@
+load mgsim
+load ./cross_evt.so
+load vams
+verilog
+
+// options noincmode
+// options nobypass
+options numdgt 20
+
+ground g;
+parameter real pi = 3.14159265358979323844;
+vsine #(.freq(1./2./pi)) v1(p, g);
+
+parameter real x = .8414709848078965;
+cross_evt #(.th(x)) c(p, g);
+
+options trtol=1
+print tran v(p)
+tran {pi/2.} trace n
+
+status notime
