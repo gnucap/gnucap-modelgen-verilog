@@ -31,7 +31,7 @@
 #include "u_xprobe.h"
 #include "e_logic.h"
 #include "e_elemnt.h"
-#include "e_logicnode.h"
+#include "e_logicnode__.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -412,6 +412,8 @@ void DEV_LOGIC::tr_begin()
   }
 #if 1
   n_(OUTNODE)->set_mode(moDIGITAL);
+  n_(OUTNODE)->tr_begin();
+  n_(OUTNODE)->set_mode(moDIGITAL);
 #else
   if (!subckt()) {
     _gatemode = moDIGITAL;
@@ -423,8 +425,8 @@ void DEV_LOGIC::tr_begin()
     _oldgatemode = _gatemode;
     subckt()->tr_begin();
   }
-#endif
   n_(OUTNODE)->set_quality(qGOOD);
+#endif
 }
 /*--------------------------------------------------------------------------*/
 #if 0
@@ -608,7 +610,7 @@ bool DEV_LOGIC::tr_eval_digital()
   const MODEL_LOGIC* m = prechecked_cast<const MODEL_LOGIC*>(c->model());
   assert(m);
   _y[0].x = 0.;
-  _y[0].f1 = n_(OUTNODE)->to_analog(m);
+  _y[0].f1 = n_(OUTNODE)->lv() == lv11; // n_(OUTNODE)->to_analog(m);
   _y[0].f0 = 0.;
   _m0.x = 0.;
   _m0.c1 = 1./m->rs;
@@ -725,7 +727,6 @@ void DEV_LOGIC::accept(SIM_PHASE Ph)
     _lastchangenode = OUTNODE;		/* which node changed most recently */
     int lastchangeiter=n_(OUTNODE)->d_iter();/* iteration # when it changed */
     trace0(long_label().c_str());
-    trace2(n_(OUTNODE)->failure_mode().c_str(), OUTNODE, n_(OUTNODE)->quality());
     
     for (int ii = BEGIN_IN;  ii < net_nodes();  ++ii) {
       trace2("tracc", long_label(), ii);

@@ -168,7 +168,7 @@ l1._na1_v_q: can't find subckt: logic_na1_v_q3, forcing digital
  1.971E-9   1.         3.         0.         0.01       3.01       0.         0.         0.         5.        
  2.E-9      1.         3.         0.         0.01       3.01       0.         0.         0.         5.        
 Gnucap   System status
-iterations: op=4, dc=0, tran=472, fourier=0, total=645
+iterations: op=4, dc=0, tran=473, fourier=0, total=646
 transient timesteps: accepted=163, rejected=6, total=169
 nodes: user=6, subckt=0, model=6, total=12
 dctran density=18.8%, ac density=18.8%

@@ -97,7 +97,11 @@ public:
     }
   }
   void clear();
-  NODE* deflate()override { return new LOGIC_NODE; }
+  NODE* deflate()override {
+    static NODE* l = node_dispatcher["__logic"];
+    assert(l);
+    return prechecked_cast<NODE*>(l->clone());
+  }
 private:
   int user_number()const override   { return INVALID_NODE;}
 private:

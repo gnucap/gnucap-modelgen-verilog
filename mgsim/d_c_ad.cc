@@ -26,7 +26,7 @@
  */
 //testing=none
 #include "globals.h"
-#include "e_logicnode.h"
+#include "e_logicnode__.h"
 #include "e_subckt.h"
 #include "e_logicmod.h"
 #include "e_logic.h"
@@ -165,7 +165,9 @@ void DEV_A_D::map_nodes()
 void DEV_A_D::tr_begin()
 {
   ELEMENT::tr_begin();
-  n_(OUTNODE)->set_quality(qGOOD);
+//  n_(OUTNODE)->set_quality(qGOOD);
+  n_(OUTNODE)->set_mode(moDIGITAL);
+  n_(OUTNODE)->tr_begin();
   n_(OUTNODE)->set_mode(moDIGITAL);
 }
 /*--------------------------------------------------------------------------*/

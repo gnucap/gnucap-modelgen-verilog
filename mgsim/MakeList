@@ -21,6 +21,7 @@ TARGET = \
   d_vapot_br.so \
   d_vapot.so \
   d_vasw.so \
+  e_logicnode__.so \
   lang_verilog.so \
   lang_spice.so \
   v_instance.so \

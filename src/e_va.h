@@ -141,6 +141,39 @@ void map_sckt_nodes(CARD_LIST* l, node_t* nodes)
   }
 }
 /*--------------------------------------------------------------------------*/
+class INTERFACE LOGIC_NODE : public LOGIC_NODE_BASE {
+private: // inhibited
+  explicit LOGIC_NODE(const LOGIC_NODE&) : LOGIC_NODE_BASE(){incomplete();unreachable();}
+public: // general use
+  explicit LOGIC_NODE(std::string const& s) : LOGIC_NODE_BASE(s) {}
+  explicit LOGIC_NODE(int i=-1) : LOGIC_NODE_BASE(i) {}
+	   ~LOGIC_NODE() {}
+public:
+  bool just_reached_stable()const;
+};
+/*--------------------------------------------------------------------------*/
+struct node_l : node_t {
+  LOGIC_NODE*       operator->()      { return &data(); }
+  LOGIC_NODE const* operator->()const { return &data(); }
+private:
+  LOGIC_NODE& data() const {
+#if 0
+    if(n_()->m_()==0) {
+      // tmp hack.
+      // think of it as an autoinserted connect module
+      // mimics traditional behaviour but probably wrong.
+      static LOGIC_NODE lg(0);
+      return lg;
+    }else
+#endif
+    {
+      auto n = prechecked_cast<LOGIC_NODE const*>(n_());
+      assert(n);
+      return *const_cast<LOGIC_NODE*>(n);
+    }
+  }
+};
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:

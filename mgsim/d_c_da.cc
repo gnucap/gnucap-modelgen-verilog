@@ -24,7 +24,7 @@
  */
 //testing=none
 #include "globals.h"
-#include "e_logicnode.h"
+#include "e_logicnode__.h"
 #include "e_logicmod.h"
 #include "e_logic.h"
 #include "u_xprobe.h"
