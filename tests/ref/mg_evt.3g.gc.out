@@ -10,7 +10,7 @@ time0 1 0
 time0 2 1
  2.         1.         1.         3.         2.        
 time0 3 0
- 3.         0.         0.         3.         1.        
+ 3.         0.         0.         3.         1.2       
 #           v(1)       state(dut0) iter(0)   
 time0 0 1
  0.         0.         1.         3.        
@@ -24,7 +24,7 @@ time0 1 0
 time0 2 1
  2.         1.         1.         3.         2.        
 time0 3 0
- 3.         0.         0.         3.         1.        
+ 3.         0.         0.         3.         1.2       
 Gnucap   System status
 iterations: op=0, dc=3, tran=14, fourier=0, total=42
 transient timesteps: accepted=10, rejected=0, total=10

@@ -1,5 +1,6 @@
 attach ./modelgen_2.so
 load vams/vpulse.so
+load logic
 // options method=euler
 // options trtol=1
 
@@ -10,6 +11,7 @@ module clock(out, en);
   output out;
   input en;
   logic out, en;
+  reg out;
   assign #15 out = !(out & en);
 endmodule
 `endmodelgen

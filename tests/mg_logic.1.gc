@@ -68,11 +68,12 @@ ground gnd;
 vsource #(.dc(1.2)) VDD_SRC(vdd, gnd);
 vsource #(.dc(0.6)) VINN_SRC(inn, gnd);
 
-vpulse #(.val0(0), .val1(5), .td(5n+2e-12)) en1(en, gnd);
+vpulse #(.val0(0), .val1(5), .td(5n+2e-12)) en1(en_, gnd);
 // vpulse #(.val0(0.45), .val1(0.75), .rise(120e-9)) V1 (inp, gnd);
 
 comp #(.vos(0.), .tdelay(200e-12), .trise(20.0e-12), .meta(100.0e-9)) u1(inp, inn, clk, outp, outn, vdd, gnd);
 clock #() c1(clk, en);
+c_a_d #(.model("logic")) ad1(en, en_);
 
 vpulse #(.dc(0.0), .val0(0.0), .val1(1.2), .td(2.0e-12), .rise(10.0e-12), .fall(10.0e-12), .width(5.0e-9), .period(10.0e-9)) VCLK_SRC(clka, gnd);
 

@@ -1,0 +1,15 @@
+verilog
+load ../vams
+
+
+ground gnd;
+vpulse #(.val0(0) .val1(5) .width(100p) .period(200p)) v1(clk, gnd);
+nand #(1) n1(out_, clk);
+
+.model logic logic delay=1p rise=10p fall=15p
+
+list
+
+op
+
+status notime

@@ -843,9 +843,18 @@ std::string OUT_EXPRESSION::make_cc_expression_(std::ostream& o, Expression cons
       vars().pop();
       new_variable(o, *i);
 
-      auto op = (*i)->name()[0];
-      if(op == '-' || op == '!' || op == '+') {
+      std::string opname = (*i)->name();
+      auto op = opname[0];
+      if(op == '-' || op == '!' || op == '+' || op == '|' || op == '&') {
 	o__ vars().code_name() << " = " << op << arg1 << ";\n";
+      }else if(opname == "~"){ itested();
+	o__ vars().code_name() << " = " << opname << arg1 << ";\n";
+      }else if(opname == "~&"){ untested();
+	incomplete();
+	o__ vars().code_name() << " = " << opname << arg1 << ";\n";
+      }else if(op == '^'){ untested();
+	incomplete();
+	o__ vars().code_name() << " = " << opname << arg1 << ";\n";
       }else{ untested();
 	incomplete();
 	unreachable();

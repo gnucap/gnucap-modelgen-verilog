@@ -1,6 +1,7 @@
 
 load ./modelgen_1.so
 load vams/vpulse.so
+load logic
 
 `modelgen test_mybuf0
 module test_mybuf0
@@ -30,12 +31,13 @@ spice
 .verilog
 
 test #() t(a, b)
+c_d_a #(.model("logic")) cy(a_, a);
 
 list
 
-print op v(nodes)
+print op v(a)  v(b)
 op
 
-print tran v(nodes) l(nodes)
+print tran v(a_)  v(b)  l(a)  l(b)
 tran 1 trace n
 status notime

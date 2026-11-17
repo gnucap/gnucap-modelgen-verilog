@@ -1,0 +1,23 @@
+#Time       v(p)      
+ 0.         0.        
+ 4.7124n    4.7124n   
+ 6.2832n    6.2832n   
+ 0.84147    0.74562   
+ 0.94964    0.81321   
+ 0.99488    0.83869   
+ 0.99981    0.84137   
+ 1.         0.84147   
+ 1.         0.84147   
+cross time 1+2.5642e-09 value=1.38544e-09
+ 1.         0.84147   
+ 1.         0.84147   
+ 1.0008     0.84191   
+ 1.0016     0.84235   
+ 1.0097     0.84665   
+ 1.2902     0.9609    
+ 1.5708     1.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=69, fourier=0, total=94
+transient timesteps: accepted=16, rejected=9, total=25
+nodes: user=1, subckt=0, model=1, total=2
+dctran density=75.0%, ac density=75.0%

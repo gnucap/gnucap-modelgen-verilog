@@ -6,6 +6,8 @@ test_idtac0 #() d0(\1 , 2, 3, 4, \0 );
                               ^ ? invalid identifier
 #          
  0.        
+dc // BUG?
+       ^ ? what's this?
 #Freq       vm(1)      vm(2)      vm(3)      vm(4)      vp(1)      vp(2)      vp(3)      vp(4)     
  0.15916    1.         0.99997    0.99997    0.99997    0.         90.        90.        90.       
 #Freq       vm(1)      vm(2)      vm(3)      vm(4)      vp(1)      vp(2)      vp(3)      vp(4)     

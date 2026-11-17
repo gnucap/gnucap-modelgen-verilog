@@ -21,7 +21,7 @@ vsine #(.mag(1),.dc(v),.ampl(1)) v1 (\1 , \0 );
  2.         1.         0.         1.        
  4.         1.         0.         1.        
 Gnucap   System status
-iterations: op=0, dc=0, tran=46, fourier=0, total=60
-transient timesteps: accepted=12, rejected=0, total=12
+iterations: op=0, dc=0, tran=49, fourier=0, total=64
+transient timesteps: accepted=13, rejected=0, total=13
 nodes: user=2, subckt=0, model=3, total=5
 dctran density=52.0%, ac density=40.0%

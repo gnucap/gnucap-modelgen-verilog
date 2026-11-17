@@ -1,0 +1,2 @@
+test_reg0 r(c); 
+^ ? what's this?

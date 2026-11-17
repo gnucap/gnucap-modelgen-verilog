@@ -35,14 +35,18 @@ private:
 public:
   typedef std::deque<DPAIR>::iterator iterator;
   typedef std::deque<DPAIR>::const_iterator const_iterator;
+  typedef std::deque<DPAIR>::reverse_iterator reverse_iterator;
+  typedef std::deque<DPAIR>::const_reverse_iterator const_reverse_iterator;
 
   explicit WAVE(double d=0);
   explicit WAVE(const WAVE&);
-	  ~WAVE() {}
+	  ~WAVE() { untested();}
   WAVE&	   set_delay(double d);
   WAVE&	   initialize();
   WAVE&	   push(double t, double v);
-  FPOLY1   v_out(double t)const;
+  FPOLY1   v_out(double t, int order=1)const;
+  double   latest()const;
+  double   latest_time()const;
   double   v_reflect(double t, double v_total)const;
   WAVE&	   operator+=(const WAVE& x);
   WAVE&	   operator+=(double x);
@@ -50,6 +54,8 @@ public:
   WAVE&	   operator*=(double x);
   const_iterator begin()const { untested();return _w.begin();}
   const_iterator end()const { untested();return _w.end();}
+  const_reverse_iterator rbegin()const { untested();return _w.rbegin();}
+  const_reverse_iterator rend()const { untested();return _w.rend();}
   size_t size()const {return _w.size();}
   double delay()const {return _delay;}
 
@@ -121,9 +127,9 @@ inline WAVE& WAVE::set_delay(double d)
 // v_out: return the value at the "output" end
 // args: t = the time now
 //
-inline FPOLY1 WAVE::v_out(double t)const
+inline FPOLY1 WAVE::v_out(double t, int order)const
 {
-  return interpolate(_w.begin(), _w.end(), t, 0., 0.);
+  return interpolate(_w.begin(), _w.end(), t, 0., 0., order);
 }
 /*--------------------------------------------------------------------------*/
 // reflect: calculate a reflection
@@ -235,8 +241,9 @@ inline void WAVE::new_transition(double start, double rt, double ft, double new_
     vcur = old_pair.second;
   }else{
     DPAIR oo[2] = { _w.back(), old_pair };
-    FPOLY1 v_int = interpolate(oo, oo+2, start, 0., 0.);
+    FPOLY1 v_int = interpolate(oo, oo+2, start, 0., 0., 1);
     vcur = v_int.f0;
+    assert(vcur == vcur);
     // old_slope = v_int.f1?
   }
   for(auto w : _w){
@@ -345,7 +352,11 @@ inline void WAVE::new_transition(double start, double rt, double ft, double new_
 
   assert(_w.back().first != start+new_tt);
 
-  _w.push_back(DPAIR(start+new_tt, new_fv));
+  if(new_tt == NEVER){
+//    _w.push_back(DPAIR(0., new_fv));
+  }else{
+    _w.push_back(DPAIR(start+new_tt, new_fv));
+  }
 
   for(auto w : _w){
     trace2("nt done", w.first, w.second);

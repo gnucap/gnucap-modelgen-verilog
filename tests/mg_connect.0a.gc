@@ -1,0 +1,61 @@
+attach ./modelgen_2.so
+load vams/vpulse.so
+load vams/vsine.so
+
+verilog
+
+`modelgen test_connect_0a
+module ad (out, in);
+  input in;
+  output out;
+  reg out;
+
+  electrical in;
+  logic out;
+
+  initial out = 0;
+
+  always @(cross(V(in) - 2.5, 1)) out = 1;
+  always @(cross(V(in) - 2.5, -1)) out = 0;
+endmodule
+connectmodule aa(in, out);
+  input in;
+  output out;
+  logic in;
+  electrical out;
+  always @(driver_update(in)) begin
+    $strobe("driver_update %g", $abstime());
+  end
+endconnectmodule
+`endmodelgen
+
+list
+
+!make test_connect_0a.so > /dev/null
+attach ./test_connect_0a.so
+
+ground gnd;
+vsine #(.ampl(2.5), .offset(2.5), .freq(1e9)) v1(wave, gnd);
+
+module tt(wave, ii);
+  input wave;
+  electrical wave;
+  output ii;
+  logic ii;
+
+  ad #() u1(ck, wave);
+  inv #(.model("logic"), .delay(100)) i1(ii, jj);
+  or #(.model("logic"), .delay(50)) i1(jj, ck);
+  aa #() a1 (.out(d), .in(ii));
+endmodule
+
+ tt t1(wave, ii);
+
+.model logic logic delay=1p rise=10p fall=10p
+
+print tran v(wave) l(ck) iter(0) l(ii) fi(ii) lastchange(ii) control(0) iter(0)
+tran 3n
+// 10p
+// > AA.out
+
+status notime

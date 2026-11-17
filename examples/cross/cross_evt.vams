@@ -1,0 +1,30 @@
+
+nature current
+  access = I;
+  units = "A";
+  abstol = 1e-12; // OPT::abstol
+endnature
+
+// Electrical potential
+nature voltage
+  access = V;
+  units = "V";
+  abstol = 1e-6; // OPT::vntol
+endnature
+
+// Electrical discipline
+discipline electrical
+  potential voltage;
+  flow current;
+enddiscipline
+
+module cross_evt(p, n)
+	parameter real th = 1.;
+	electrical p, n;
+
+	analog begin
+		@(cross(V(p,n)-th, 0)) begin
+			$strobe("cross time 1+%g value=%g", $abstime-1, V(p)-th);
+		end
+	end
+endmodule

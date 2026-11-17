@@ -279,7 +279,14 @@ void COMMON_TRANSLINE::precalc_last(const PARAM_LIST* Scope)
   G.e_val(_default_G, Scope);
   C.e_val(_default_C, Scope);
 
-  // incomplete. how about transient?
+  { // real_td
+    if (L.has_hard_value() && C.has_hard_value()) {
+      real_td = len * sqrt(L * C);
+    }else{untested();
+      assert(real_td == NOT_INPUT);
+      error(bDANGER, "can't determine length\n");
+    }
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -430,10 +437,11 @@ TIME_PAIR DEV_TRANSLINE::tr_review()
   q_accept();
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
-  if(c->real_td) { untested();
-    return TIME_PAIR(_sim->_time0 + c->real_td, NEVER); // ok to miss the spikes, for now
-  }else{
-    return TIME_PAIR(_sim->_time0 + _sim->_dtmin, NEVER); // really?
+  if(c->real_td) {
+    return TIME_PAIR(c->real_td, NEVER); // ok to miss the spikes, for now
+  }else{untested();
+    incomplete();
+    return TIME_PAIR(_sim->_dtmin, NEVER); // really?
   }
 }
 /*--------------------------------------------------------------------------*/

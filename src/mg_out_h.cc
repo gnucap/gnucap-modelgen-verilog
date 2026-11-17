@@ -787,7 +787,7 @@ static void make_module(std::ostream& o, const Module& m)
   }
   o__ "void precalc_last()override;\n";
   o__ "void zero_filter_readout();\n";
-  o__ "//void    map_nodes();         //BASE_SUBCKT\n";
+  o__ "void map_nodes()override;\n";
   o__ "//void    tr_restore();        //BASE_SUBCKT\n";
   o__ "void    tr_load()override{ trace1(\"tr_load\", long_label());BASE_SUBCKT::tr_load();}\n";
 
@@ -872,6 +872,7 @@ static void make_module(std::ostream& o, const Module& m)
   o__ "node_t& n_(int i)const override {\n";
   o____ "assert(_nodes); assert(i>=0); assert(!i || i<_n_total); return _nodes[i];\n";
   o__ "}\n";
+  o__ "node_l& l_(int i)const {return reinterpret_cast<node_l&>(n_(i));}\n";
   o << "private: // impl\n";
   o << "/* ========== */\n";
 

@@ -1,23 +1,20 @@
 >>>>>module modwrong(A b)
->>>>>module mod(a b)
+>>>>>module mod(a, b);
 >>>>>paramset bob mod;
 >>>>>paramset bob modwrong;
->>>>>module main(1,\2 , \3 , \4 )
-module main(1,\2 , \3 , \4 )
-            ^ ? invalid identifier
-  bob b1 (.a(1) .b(2));
-             ^ ? invalid identifier
-  bob b1 (.a(1) .b(2));
-                   ^ ? invalid identifier
-main m(\1 ,2,3,\0 );
-           ^ ? invalid identifier
-main m(\1 ,2,3,\0 );
-             ^ ? invalid identifier
+>>>>>module main(\1 , \2 , \3 , \4 )
+>>>>>  electrical \1 , \2 , \3 , \4 ;
+>>>>>  electrical \1 , \2 , \3 , \4 ;
+>>>>>  electrical \1 , \2 , \3 , \4 ;
 >>>>>list
 module modwrong (.A(A),.b(b));
 endmodule // modwrong
 
 module mod (.a(a),.b(b));
+  electrical a;
+  electrical b;
+  inout a;
+  input b;
 endmodule // mod
 
 paramset bob mod;
@@ -29,6 +26,14 @@ paramset bob modwrong;
 endparamset
 
 module main (.\1 (\1 ),.\2 (\2 ),.\3 (\3 ),.\4 (\4 ));
+  inout \1 ;
+  inout \2 ;
+  inout \3 ;
+  inout \4 ;
+  electrical \1 ;
+  electrical \2 ;
+  electrical \3 ;
+  electrical \4 ;
   bob #() b1 (.a(\1 ),.b(\2 ));
 endmodule // main
 
@@ -45,5 +50,5 @@ m.b1 is "bob from top level"
 Gnucap   System status
 iterations: op=2, dc=0, tran=0, fourier=0, total=2
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=2, subckt=0, model=0, total=2
-dctran density=50.0%, ac density=50.0%
+nodes: user=0, subckt=0, model=0, total=0
+dctran density=0.0%, ac density=0.0%

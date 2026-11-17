@@ -14,7 +14,9 @@ parameter T = {3.141592 / 4.}
 // H(z) = 1/ (z * z * (1-z)) = 1/(zz-zzz)
 va_zi_zp #(.pr0(0.),.zr0(0.),.T(T*.5),.tau(T*.1)) b (\0 , out2, in, \0 );
 vsine #(.ampl(1),.freq(1/2/3.1415)) v1 (in, \0 );
+tran 5 basic
 //
+ac .05 0.2 * 1.1
 Gnucap   System status
 iterations: op=0, dc=0, tran=0, fourier=0, total=2
 transient timesteps: accepted=0, rejected=0, total=0

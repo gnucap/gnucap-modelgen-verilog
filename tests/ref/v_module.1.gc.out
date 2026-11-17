@@ -36,6 +36,7 @@ cs2 ( 1 4 2 3 )  vccs  =1/R
 .ends main1
 m ( A B gnd gnd )  main0  R=.34
 m ( C D gnd gnd )  main1  R=.34
+.op 
 .ground gnd 
 R1 ( 1 A )  500.
 V1 ( 1 0 ) sin offset=NA( 0.) amplitude= 1. frequency= 1.K delay=NA( 0.) damping=NA( 0.)  AC  1.

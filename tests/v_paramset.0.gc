@@ -21,11 +21,11 @@ list
 print dc v(nodes)
 dc
 print tran v(nodes)
-tr 1
-tr 1
+tran 1
+tran 1
 
 options nobypass
 
 print tran v(nodes)
-tr 2
+tran 2
 status notime

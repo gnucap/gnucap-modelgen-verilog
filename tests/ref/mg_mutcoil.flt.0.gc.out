@@ -38,6 +38,9 @@ r1b ( 3 h ) 75
 *// missing ac_stim. use spice pulse for now
 *// vpulse #(.mag(1), .val0(0), .val1(1), .td(.002), .rise(.002), .fall(.002), .width(.002)) v1(\1 , \0 );
 v1 ( 1 g ) pulse iv= 0. pv= 1. delay= 0.002 rise= 0.002 fall= 0.002 width= 0.002 period= 0.01  AC  1.
+.op 
+.ac dec 2 .1 1k 
+.tran .001 .01 0 .0001 
 Gnucap   System status
 iterations: op=3, dc=0, tran=430, fourier=0, total=560
 transient timesteps: accepted=115, rejected=3, total=118

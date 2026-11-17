@@ -58,6 +58,7 @@ m ( n 0 )  main
 V1 ( n 0 )  DC v  AC  1.
 V2 ( n2 0 )  DC v  AC  1.
 D1 ( n2 0 )  dd NA( 1.)
+.dc v -1 0.65 .05 
 >>>>>.status notime 
 Gnucap   System status
 iterations: op=0, dc=168, tran=0, fourier=0, total=168

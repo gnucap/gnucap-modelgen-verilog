@@ -2,6 +2,7 @@
 
 See README files in subdirectories.
 
+cross  - signal crossings and cross events
 io     - file io, get the data out
 logic  - logic modelling etc.
 rc     - build and simulate rc lowpass variants

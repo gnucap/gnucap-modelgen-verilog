@@ -1370,11 +1370,12 @@ public:
     return _ln.e_() != INVALID_NODE;
   }
 
-  void accept();
+  void accept(CARD* d=nullptr);
 };
 /*--------------------------------------------------------------------------*/
-inline void LNR::accept()
+inline void LNR::accept(CARD* d)
 {
+  if(!d){incomplete();}
   if(_set){
     assert(prechecked_cast<LOGIC_NODE*>(_ln.n_()));
     node_l& nl = reinterpret_cast<node_l&>(_ln);
@@ -1385,12 +1386,12 @@ inline void LNR::accept()
     bool lv = to_bool();
     LOGICVAL lvl(lv?lvSTABLE1:lvSTABLE0);
     if(nl->lv().is_unknown()){
-      nl->set_event(delay, lvl);
+      nl->set_event(delay, lvl, d);
     }else if(nl->lv_future() != lv){
-      nl->set_event(delay, lvl);
+      nl->set_event(delay, lvl, d);
     }else if(nl->final_time() > CKT_BASE::_sim->_time0){
       // (hack, needed?)
-      nl->set_event(delay, lvl);
+      nl->set_event(delay, lvl, d);
     }else{ untested();
     }
     // nl->propagate();
@@ -1646,6 +1647,9 @@ public:
   NODE_TYPE* clone()const override{untested();
     return new DDISC_logic(*this);
   }
+  NODE* deflate()override {incomplete(); untested();
+    return new LOGIC_NODE();
+  }
 }ddisc_1;
 /*--------------------------------------------------------------------------*/
 }
@@ -1824,7 +1828,7 @@ private: // overrides
   void expand()override;
   void precalc_last()override;
   void zero_filter_readout();
-  //void    map_nodes();         //BASE_SUBCKT
+  void map_nodes()override;
   //void    tr_restore();        //BASE_SUBCKT
   void    tr_load()override{ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
   void tr_begin()override;
@@ -1850,6 +1854,7 @@ private: // overrides
   node_t& n_(int i)const override {
     assert(_nodes); assert(i>=0); assert(!i || i<_n_total); return _nodes[i];
   }
+  node_l& l_(int i)const {return reinterpret_cast<node_l&>(n_(i));}
 private: // impl
 /* ========== */
 public: // instance vars
@@ -3210,6 +3215,10 @@ ddouble MOD_resistor::_b_white_noise_1__precalc(ddouble, std::string what) {
   ret[d_potential_b_white_noise_1_p_] = -1.;
   return ret;
 }
+void MOD_resistor::map_nodes()
+{
+  BASE_SUBCKT::map_nodes();
+}
 } // n0
 /*--------------------------------------------------------------------------*/
 namespace n1{
@@ -3386,7 +3395,7 @@ private: // overrides
   void expand()override;
   void precalc_last()override;
   void zero_filter_readout();
-  //void    map_nodes();         //BASE_SUBCKT
+  void map_nodes()override;
   //void    tr_restore();        //BASE_SUBCKT
   void    tr_load()override{ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
   void tr_begin()override;
@@ -3412,6 +3421,7 @@ private: // overrides
   node_t& n_(int i)const override {
     assert(_nodes); assert(i>=0); assert(!i || i<_n_total); return _nodes[i];
   }
+  node_l& l_(int i)const {return reinterpret_cast<node_l&>(n_(i));}
 private: // impl
 /* ========== */
 public: // instance vars
@@ -5257,6 +5267,10 @@ ddouble MOD_resistor::_b_white_noise_0__precalc(ddouble, std::string what) {
   ret[d_potential_b_white_noise_0_p_] = -1.;
   return ret;
 }
+void MOD_resistor::map_nodes()
+{
+  BASE_SUBCKT::map_nodes();
+}
 } // n1
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -6634,11 +6648,12 @@ public:
     return _ln.e_() != INVALID_NODE;
   }
 
-  void accept();
+  void accept(CARD* d=nullptr);
 };
 /*--------------------------------------------------------------------------*/
-inline void LNR::accept()
+inline void LNR::accept(CARD* d)
 {
+  if(!d){incomplete();}
   if(_set){
     assert(prechecked_cast<LOGIC_NODE*>(_ln.n_()));
     node_l& nl = reinterpret_cast<node_l&>(_ln);
@@ -6649,12 +6664,12 @@ inline void LNR::accept()
     bool lv = to_bool();
     LOGICVAL lvl(lv?lvSTABLE1:lvSTABLE0);
     if(nl->lv().is_unknown()){
-      nl->set_event(delay, lvl);
+      nl->set_event(delay, lvl, d);
     }else if(nl->lv_future() != lv){
-      nl->set_event(delay, lvl);
+      nl->set_event(delay, lvl, d);
     }else if(nl->final_time() > CKT_BASE::_sim->_time0){
       // (hack, needed?)
-      nl->set_event(delay, lvl);
+      nl->set_event(delay, lvl, d);
     }else{ untested();
     }
     // nl->propagate();
@@ -6910,6 +6925,9 @@ public:
   NODE_TYPE* clone()const override{untested();
     return new DDISC_logic(*this);
   }
+  NODE* deflate()override {incomplete(); untested();
+    return new LOGIC_NODE();
+  }
 }ddisc_1;
 /*--------------------------------------------------------------------------*/
 }
@@ -7125,7 +7143,7 @@ private: // overrides
   void expand()override;
   void precalc_last()override;
   void zero_filter_readout();
-  //void    map_nodes();         //BASE_SUBCKT
+  void map_nodes()override;
   //void    tr_restore();        //BASE_SUBCKT
   void    tr_load()override{ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
   TIME_PAIR  tr_review()override;
@@ -7152,6 +7170,7 @@ private: // overrides
   node_t& n_(int i)const override {
     assert(_nodes); assert(i>=0); assert(!i || i<_n_total); return _nodes[i];
   }
+  node_l& l_(int i)const {return reinterpret_cast<node_l&>(n_(i));}
 private: // impl
 /* ========== */
 public: // instance vars
@@ -8159,6 +8178,10 @@ MOD_capacitor::ddouble MOD_capacitor::_b_ddt_1(ddouble t0)
   return t0;
 }
 /*--------------------------------------------------------------------------*/
+void MOD_capacitor::map_nodes()
+{
+  BASE_SUBCKT::map_nodes();
+}
 } // n0
 /*--------------------------------------------------------------------------*/
 namespace n1{
@@ -8380,7 +8403,7 @@ private: // overrides
   void expand()override;
   void precalc_last()override;
   void zero_filter_readout();
-  //void    map_nodes();         //BASE_SUBCKT
+  void map_nodes()override;
   //void    tr_restore();        //BASE_SUBCKT
   void    tr_load()override{ trace1("tr_load", long_label());BASE_SUBCKT::tr_load();}
   TIME_PAIR  tr_review()override;
@@ -8407,6 +8430,7 @@ private: // overrides
   node_t& n_(int i)const override {
     assert(_nodes); assert(i>=0); assert(!i || i<_n_total); return _nodes[i];
   }
+  node_l& l_(int i)const {return reinterpret_cast<node_l&>(n_(i));}
 private: // impl
 /* ========== */
 public: // instance vars
@@ -9512,6 +9536,10 @@ MOD_capacitor::ddouble MOD_capacitor::_b_ddt_2(ddouble t0)
   return t0;
 }
 /*--------------------------------------------------------------------------*/
+void MOD_capacitor::map_nodes()
+{
+  BASE_SUBCKT::map_nodes();
+}
 } // n1
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

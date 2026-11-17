@@ -10,19 +10,19 @@ reject #(.time(2)) r ();
  1.75       1.5        4.         17.       
  2.         2.         2.         2.        
  2.5        2.5        2.         2.        
- 3.         3.         2.         1.        
+ 3.         3.         2.         1.2       
 #Time       t(dut0)    iter(0)    control(0)
  0.         0.         2.         1.        
  0.1        0.         4.         1.        
  0.2        0.         2.         1.        
  0.3        0.         2.         1.        
  0.4        0.         2.         1.        
- 0.5        0.5        2.         1.        
+ 0.5        0.5        2.         1.2       
  0.6        0.5        2.         1.        
  0.7        0.5        2.         1.        
  0.8        0.5        2.         1.        
  0.9        0.5        2.         1.        
- 1.         1.         2.         1.        
+ 1.         1.         2.         1.2       
 Gnucap   System status
 iterations: op=0, dc=0, tran=24, fourier=0, total=66
 transient timesteps: accepted=21, rejected=1, total=22

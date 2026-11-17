@@ -78,6 +78,8 @@ vsine #(.freq(1),.ampl(1)) v1 (.p(in),.n(\0 ));
 resistor #(.r(1)) r1 (.p(\1 ),.n(\0 ));
 resistor #(.r(1)) r1 (.p(\2 ),.n(\0 ));
 resistor #(.r(1)) r1 (.p(\3 ),.n(\0 ));
+tran 1 basic
+ac .01 100 * 10
 Gnucap   System status
 iterations: op=0, dc=0, tran=183, fourier=0, total=249
 transient timesteps: accepted=57, rejected=4, total=61
@@ -195,3 +197,5 @@ r1 2 2 0
 r1 2 2 0
 0 8
 1 0
+tran
+ac

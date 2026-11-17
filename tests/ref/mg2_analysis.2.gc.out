@@ -6,11 +6,16 @@ resistor #(.r(1)) c1 (\1 , \0 );
 #Time       v(1)       iter(0)   
  0.         0.99999    3.        
  0.01       0.99009    3.        
- 0.0925     0.91164    3.        
- 0.395      0.6721     3.        
- 1.         0.35992    3.        
+ 0.01       0.99009    6.        
+ 0.01       0.99009    2.        
+ 0.010001   0.99009    2.        
+ 0.01001    0.99008    2.        
+ 0.05501    0.94651    3.        
+ 0.37001    0.68893    3.        
+ 0.685      0.50145    3.        
+ 1.         0.36498    3.        
 Gnucap   System status
-iterations: op=0, dc=3, tran=15, fourier=0, total=23
-transient timesteps: accepted=5, rejected=0, total=5
+iterations: op=0, dc=3, tran=30, fourier=0, total=44
+transient timesteps: accepted=10, rejected=1, total=11
 nodes: user=1, subckt=0, model=1, total=2
 dctran density=100.0%, ac density=100.0%

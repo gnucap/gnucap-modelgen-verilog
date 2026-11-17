@@ -1,0 +1,35 @@
+How to measure the time of a signal crossing a threshold.
+
+We set up a toy example. The symbol t is time [s] and f(t) = sin(time/s)V.
+So, we have f(0) = 0, and f(1s) about x=.8414709848078965V. We want to find the
+argument of f where it crosses x, which we already know it 1s.
+
+In this example, we set up a sine shaped voltage source and simulate a
+transient.
+
+== Post processing approach
+
+We can simulate a sine wave, record it and then find the crossing in the
+data. Finding such crossings can be done with the "measure" command.
+
+$ gnucap cross_meas.gc
+[ various times related to the crossing ]
+
+See comments in cross_meas.gc. TL;DR; it does not produce satisfying figures.
+Don't expect this to work reliably in more complicated circuits.
+
+== Event approach
+
+Now use a "cross event". A cross event is an event at a specific time related
+to a signal crossing. Here it is set to be the time when the signal crosses
+the threshold from above, x = sin(1.).
+
+$ gnucap-mg-vams --cc cross_evt.vams | g++ -xc++ `gnucap-conf --cppflags` -fPIC -shared - -o cross_evt.so
+$ gnucap cross_evt.gc
+[ crossing reported at about 1. + 2.5e-09 ]
+
+== Higher order post processing
+
+This is an exercise. Add an option to "measure .. cross" to select the
+interpolation order ("measure .. at" already has it"). Compute a better
+crossing time. Quantify the improvement, consider the added complexity.

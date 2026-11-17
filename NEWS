@@ -11,6 +11,7 @@ This file summarizes new features and important changes between snapshots.
 - driver functions
 - fix format-security warnings (#23)
 - fix timing bug in $bound_step
+- fix dt_estimate in switch branch
 - ..
 
 20260729-dev

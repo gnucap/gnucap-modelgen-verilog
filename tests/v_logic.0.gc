@@ -12,14 +12,14 @@ enddiscipline
 module invfast(out, in);
 	inout out, in;
 	electrical out, in;
-	nand #(1) n1(out, in);
+	nand #(.delay(1), .model("")) n1(out, in);
 endmodule
 
 `default_discipline logicslow
 module invslow(out, in);
 	inout out, in;
 	electrical out, in;
-	nand #(20) n1(out, in);
+	nand #(.delay(20), .model("")) n1(out, in);
 endmodule
 
 ground gnd;
