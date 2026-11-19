@@ -1,5 +1,5 @@
 #           v(vdd)     v(inp)     v(inn)     v(clk)     v(outp)    v(outn)   
- 27.        1.2        0.45       0.6        0.         0.         1.2       
+ 27.        1.2        0.45       0.6        ??         0.         1.2       
 #Time       v(inp)     v(inn)     l(clk)     v(outp)    v(outn)    iter(0)    control(0)
  0.         0.45       0.6        0.         0.         1.2        5.         1.        
  2.p        0.45       0.6        0.         0.         1.2        3.         2.        

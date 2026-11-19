@@ -3226,5 +3226,5 @@ drv at 5.9961e-08 next 1 delay -1
 Gnucap   System status
 iterations: op=0, dc=0, tran=6444, fourier=0, total=8593
 transient timesteps: accepted=2149, rejected=0, total=2149
-nodes: user=3, subckt=0, model=4, total=7
-dctran density=14.3%, ac density=14.3%
+nodes: user=0, subckt=0, model=0, total=0
+dctran density=0.0%, ac density=0.0%

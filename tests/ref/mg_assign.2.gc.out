@@ -1,7 +1,7 @@
 load logic 
 c1._na0_v_out: can't find subckt: logic_na0_v_out2, forcing digital
 #           v(clk)     v(en)      l(clk)     l(en)     
- 27.        5.         0.         3.         0.01      
+ 27.        ??         0.         3.         0.01      
 #Time       l(clk)     l(en)      v(en)     
  0.         3.         0.01       0.        
  1.p        2.         3.01       5.        
@@ -26,5 +26,5 @@ c1._na0_v_out: can't find subckt: logic_na0_v_out2, forcing digital
 Gnucap   System status
 iterations: op=3, dc=0, tran=57, fourier=0, total=80
 transient timesteps: accepted=20, rejected=0, total=20
-nodes: user=2, subckt=0, model=2, total=4
-dctran density=31.2%, ac density=31.2%
+nodes: user=1, subckt=0, model=2, total=3
+dctran density=44.4%, ac density=44.4%

@@ -19,13 +19,13 @@ n1: can't find subckt: logicand1, forcing digital
  300.E-12   0.         0.         0.         18.       
  400.E-12   3.         0.         0.         23.       
  500.E-12   0.         1.         0.         24.       
- 600.E-12   3.         3.         1.         26.       
+ 600.E-12   3.         3.         1.         23.       
  700.E-12   0.         3.         1.         18.       
  800.E-12   3.         3.         2.         23.       
  900.E-12   0.         3.         2.         18.       
  1.E-9      3.         3.         3.         23.       
 Gnucap   System status
-iterations: op=0, dc=0, tran=217, fourier=0, total=296
+iterations: op=0, dc=0, tran=214, fourier=0, total=293
 transient timesteps: accepted=75, rejected=4, total=79
-nodes: user=6, subckt=0, model=6, total=12
-dctran density=16.0%, ac density=16.0%
+nodes: user=4, subckt=0, model=4, total=8
+dctran density=23.4%, ac density=23.4%

@@ -15,7 +15,7 @@ i1: can't find subckt: logicinv1, forcing digital
  5.003E-9   2.5025     11.2       15.        0.         0.         0.         7.         2.        
 driver next state at 5.004e-09 1
  5.004E-9   2.5033     3.2        9.         0.         0.         5.004E-9   2.         2.        
- 5.005E-9   2.504      3.2        9.         0.         0.         5.004E-9   2.         3.        
+ 5.005E-9   2.504      3.2        9.         0.         0.         5.004E-9   2.         2.        
  10.004E-9  5.         3.2        0.         0.         0.         10.004E-9  2.         3.        
  14.995E-9  2.5038     3.2        0.         0.         0.         10.004E-9  17.        6.        
  14.999E-9  2.5007     3.2        0.         0.         0.         10.004E-9  17.        5.        
@@ -70,7 +70,7 @@ driver next state at 5.5004e-08 1
  59.006E-9  0.12087    0.2        1.         1.         500.E-6    55.004E-9  2.         3.        
  60.E-9     2.6827E-9  0.2        1.         1.         0.4975     55.004E-9  1.         3.        
 Gnucap   System status
-iterations: op=0, dc=0, tran=188, fourier=0, total=259
+iterations: op=0, dc=0, tran=187, fourier=0, total=258
 transient timesteps: accepted=61, rejected=10, total=71
-nodes: user=4, subckt=0, model=5, total=9
-dctran density=21.0%, ac density=21.0%
+nodes: user=2, subckt=0, model=3, total=5
+dctran density=36.0%, ac density=36.0%

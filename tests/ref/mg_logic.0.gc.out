@@ -151,7 +151,7 @@ pa
  986.E-12   3.         1.2        1.1786     1.2        5.        
  1.E-9      3.         1.2        1.1944     1.2        5.        
 Gnucap   System status
-iterations: op=0, dc=0, tran=417, fourier=0, total=566
+iterations: op=0, dc=0, tran=413, fourier=0, total=562
 transient timesteps: accepted=135, rejected=14, total=149
-nodes: user=4, subckt=0, model=4, total=8
-dctran density=26.6%, ac density=26.6%
+nodes: user=3, subckt=0, model=4, total=7
+dctran density=28.6%, ac density=28.6%
