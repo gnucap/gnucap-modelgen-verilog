@@ -927,9 +927,10 @@ void LAPLACE::expand()
   for(int jj = num_s; jj; ) {
     --jj;
   //  if (!(state_node(jj).n_())) { untested();
-    state_node(jj).set_type(OPT::default_logic);
-  state_node(jj).set_used();
-  state_node(jj).allocate(3); // no-op unless floating
+    static NODE* electrical = node_dispatcher["electrical"];
+    state_node(jj).set_type(electrical);
+    state_node(jj).set_used();
+    state_node(jj).allocate(3); // no-op unless floating
 //      state_node(jj).new_model_node("." + long_label() + ".s" + to_string(jj), this);
   //  }else{ untested();
 	//n_(n_s].new_model_node("s." + long_label(), this);
