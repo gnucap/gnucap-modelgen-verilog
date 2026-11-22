@@ -158,6 +158,7 @@ void OUT_CODE::make_one_local_var(std::ostream& o, Variable_Decl const& V) const
   assert(V.code_name().size());
   o << V.code_name();
   o << "; // local_var\n";
+  o << "(void)" << V.code_name() << ";\n";
 
   if(V.rhs().is_empty()){
   }else if(V.is_state_var()){ untested();

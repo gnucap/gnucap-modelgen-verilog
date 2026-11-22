@@ -2622,8 +2622,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* m) const
   auto& d = m;
   trace1("resistor::tr_eval_analog", d->long_label());
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_white_noise_1_p(m->n_(MOD__::n_white_noise_1_p)); // ref 17
+  (void) _v_n_white_noise_1_p;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
   class _V___i : public ddouble {
@@ -2775,8 +2778,11 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
 {
 //OUT_ANALOG precalc
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_white_noise_1_p(m->n_(MOD__::n_white_noise_1_p)); // ref 17
+  (void) _v_n_white_noise_1_p;
   ddouble _v___i(m->_v_.___i); // precalc 1068
   (void) _v___i;
   MOD_resistor const* p = m;
@@ -2857,8 +2863,11 @@ typedef MOD_resistor::ddouble ddouble;
 inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
 {
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_white_noise_1_p(m->n_(MOD__::n_white_noise_1_p)); // ref 17
+  (void) _v_n_white_noise_1_p;
   double& _v___i(m->_v_.___i); // (1068)
   (void) _v___i;
   MOD_resistor const* p = m;
@@ -2910,8 +2919,11 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
   }else{
   }
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_white_noise_1_p(m->n_(MOD__::n_white_noise_1_p)); // ref 17
+  (void) _v_n_white_noise_1_p;
   double& _v___i(m->_v_.___i); // (1068)
   (void) _v___i;
   MOD_resistor const* p = m;
@@ -4031,6 +4043,7 @@ void EVAL__b_white_noise_0_p__::tr_eval(ELEMENT* d)const
       }
     }_v_dt(d);
     double /*?*/ _v_g; // local_var
+(void)_v_g;
 #pragma GCC diagnostic pop
       {
         //int, incomplete, $param_given
@@ -4170,6 +4183,7 @@ void EVAL__b_p_n_::tr_eval(ELEMENT* d)const
       }
     }_v_dt(d);
     double /*?*/ _v_g; // local_var
+(void)_v_g;
 #pragma GCC diagnostic pop
       {
         //int, incomplete, $param_given
@@ -4348,8 +4362,11 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* m) const
   auto& d = m;
   trace1("resistor::tr_eval_analog", d->long_label());
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_white_noise_0_p(m->n_(MOD__::n_white_noise_0_p)); // ref 17
+  (void) _v_n_white_noise_0_p;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
   class _V_i : public ddouble {
@@ -4434,6 +4451,7 @@ inline void COMMON_resistor::tr_eval_analog(MOD_resistor* m) const
       }
     }_v_dt(d);
     double /*?*/ _v_g; // local_var
+(void)_v_g;
 #pragma GCC diagnostic pop
       {
         //int, incomplete, $param_given
@@ -4583,8 +4601,11 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
 {
 //OUT_ANALOG precalc
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_white_noise_0_p(m->n_(MOD__::n_white_noise_0_p)); // ref 17
+  (void) _v_n_white_noise_0_p;
   ddouble _v_i(m->_v_._i); // precalc 1068
   (void) _v_i;
   MOD_resistor const* p = m;
@@ -4600,6 +4621,7 @@ inline void COMMON_resistor::precalc_analog(MOD_resistor* m)
     ddouble _v_dt(m->_v_._main._dt); // precalc 1068
     (void) _v_dt;
     double /*?*/ _v_g; // local_var
+(void)_v_g;
       {
         //int, incomplete, $param_given
         /*361, 1*/double f0;
@@ -4744,8 +4766,11 @@ typedef MOD_resistor::ddouble ddouble;
 inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
 {
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_white_noise_0_p(m->n_(MOD__::n_white_noise_0_p)); // ref 17
+  (void) _v_n_white_noise_0_p;
   double& _v_i(m->_v_._i); // (1068)
   (void) _v_i;
   MOD_resistor const* p = m;
@@ -4761,6 +4786,7 @@ inline void COMMON_resistor::tr_advance_analog(MOD_resistor* m) const
     double& _v_dt(m->_v_._main._dt); // (1068)
     (void) _v_dt;
     double /*?*/ _v_g; // local_var
+(void)_v_g;
       {
         //int, incomplete, $param_given
         /*361, 1*/double f0;
@@ -4864,8 +4890,11 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
   }else{
   }
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_white_noise_0_p(m->n_(MOD__::n_white_noise_0_p)); // ref 17
+  (void) _v_n_white_noise_0_p;
   double& _v_i(m->_v_._i); // (1068)
   (void) _v_i;
   MOD_resistor const* p = m;
@@ -4881,6 +4910,7 @@ inline void COMMON_resistor::tr_regress_analog(MOD_resistor* m) const
     double& _v_dt(m->_v_._main._dt); // (1068)
     (void) _v_dt;
     double /*?*/ _v_g; // local_var
+(void)_v_g;
       {
         //int, incomplete, $param_given
         /*361, 1*/double f0;
@@ -7738,8 +7768,11 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* m) const
   auto& d = m;
   trace1("capacitor::tr_eval_analog", d->long_label());
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_ddt_1_p(m->n_(MOD__::n_ddt_1_p)); // ref 9
+  (void) _v_n_ddt_1_p;
   MOD_capacitor const* p = d;
   (void)p;
   assert(p);
@@ -7786,8 +7819,11 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
 {
 //OUT_ANALOG precalc
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_ddt_1_p(m->n_(MOD__::n_ddt_1_p)); // ref 9
+  (void) _v_n_ddt_1_p;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -7836,8 +7872,11 @@ inline void COMMON_capacitor::tr_review_analog(MOD_capacitor* m) const
 {
   trace1("review analog1", m->_time_by.event());
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_ddt_1_p(m->n_(MOD__::n_ddt_1_p)); // ref 9
+  (void) _v_n_ddt_1_p;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -7857,8 +7896,11 @@ inline void COMMON_capacitor::tr_review_analog(MOD_capacitor* m) const
 inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 {
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_ddt_1_p(m->n_(MOD__::n_ddt_1_p)); // ref 9
+  (void) _v_n_ddt_1_p;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -7878,8 +7920,11 @@ typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
 {
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_ddt_1_p(m->n_(MOD__::n_ddt_1_p)); // ref 9
+  (void) _v_n_ddt_1_p;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -7903,8 +7948,11 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
   }else{
   }
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_ddt_1_p(m->n_(MOD__::n_ddt_1_p)); // ref 9
+  (void) _v_n_ddt_1_p;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -9031,8 +9079,11 @@ inline void COMMON_capacitor::tr_eval_analog(MOD_capacitor* m) const
   auto& d = m;
   trace1("capacitor::tr_eval_analog", d->long_label());
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_ddt_2_p(m->n_(MOD__::n_ddt_2_p)); // ref 9
+  (void) _v_n_ddt_2_p;
   MOD_capacitor const* p = d;
   (void)p;
   assert(p);
@@ -9116,8 +9167,11 @@ inline void COMMON_capacitor::precalc_analog(MOD_capacitor* m)
 {
 //OUT_ANALOG precalc
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_ddt_2_p(m->n_(MOD__::n_ddt_2_p)); // ref 9
+  (void) _v_n_ddt_2_p;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -9190,8 +9244,11 @@ inline void COMMON_capacitor::tr_review_analog(MOD_capacitor* m) const
 {
   trace1("review analog1", m->_time_by.event());
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_ddt_2_p(m->n_(MOD__::n_ddt_2_p)); // ref 9
+  (void) _v_n_ddt_2_p;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -9211,8 +9268,11 @@ inline void COMMON_capacitor::tr_review_analog(MOD_capacitor* m) const
 inline void COMMON_capacitor::tr_accept_analog(MOD_capacitor* m) const
 {
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_ddt_2_p(m->n_(MOD__::n_ddt_2_p)); // ref 9
+  (void) _v_n_ddt_2_p;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -9232,8 +9292,11 @@ typedef MOD_capacitor::ddouble ddouble;
 inline void COMMON_capacitor::tr_advance_analog(MOD_capacitor* m) const
 {
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_ddt_2_p(m->n_(MOD__::n_ddt_2_p)); // ref 9
+  (void) _v_n_ddt_2_p;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;
@@ -9257,8 +9320,11 @@ inline void COMMON_capacitor::tr_regress_analog(MOD_capacitor* m) const
   }else{
   }
   node_t const& _v_n_p(m->n_(MOD__::n_p)); // ref 3
+  (void) _v_n_p;
   node_t const& _v_n_n(m->n_(MOD__::n_n)); // ref 3
+  (void) _v_n_n;
   node_t const& _v_n_ddt_2_p(m->n_(MOD__::n_ddt_2_p)); // ref 9
+  (void) _v_n_ddt_2_p;
   MOD_capacitor const* p = m;
   MOD_capacitor* d = m;
   (void)p;

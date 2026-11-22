@@ -233,7 +233,13 @@ void OUT_ANALOG::make_assignment(std::ostream& o, Assignment const& a) const
   }else if(is_cc_ref(&e)){
     std::stringstream bin; // HACK.
     auto rhsname = make_cc_expression(bin, e);
-    o__ lhsname << " = " << rhsname << ";\n";
+    o__ lhsname << " = ";
+    if(a.is_int()){
+      o << a.type() << "(" << rhsname << ")";
+    }else{
+      o << rhsname;
+    }
+    o << ";\n";
   }else{
     indent x;
     auto rhsname = make_cc_expression(o, e);
@@ -1008,6 +1014,7 @@ void OUT_ANALOG::make_node_refs(std::ostream& o, const Module& m) const
     }else if(n->name().size()){
       o__ "node_t const& _v_" << n->code_name() <<
 	"(m->n_(MOD__::" << n->code_name() << ")); // ref " << n->code_name().size() << "\n";
+      o__ "(void) _v_" << n->code_name() << ";\n";
     }else{
     }
   }
