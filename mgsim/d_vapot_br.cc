@@ -45,7 +45,7 @@ protected: // override virtual
   void	   tr_load_ones();
   void	   ac_load_ones();
   void	   tr_begin()override{
-    _loss0 = 1./OPT::shortckt;
+    _loss0 = 1.;
     _one0 = 1.;
     _one1 = 1.;
   }
@@ -205,35 +205,41 @@ inline void VA_BREQN::tr_unload_ones()
 /*--------------------------------------------------------------------------*/
 inline void VA_BREQN::tr_load_ones()
 {
-  double d = dampdiff(&_one0, _one1);
+  double d = dampdiff(&_loss0, _loss1);
+  assert(d==1 || d==0);
   if (d != 0.) {
-    if(is_vs()){
-      trace4("BREQN::tr_load_ones vs", long_label(), _one0, _one1, d);
-      // like tr_load inode, but use branch index.
-      _sim->_aa.load_couple(n_(OUT1).m_(), n_(BR()).m_(), -d);
-      _sim->_aa.load_couple(n_(OUT2).m_(), n_(BR()).m_(),  d);
-    }else{
-      trace4("BREQN::tr_load_ones cs", long_label(), _one0, _one1, d);
-      _sim->_aa.load_asymmetric(n_(OUT1).m_(), n_(OUT2).m_(), n_(BR()).m_(), 0,  d);
-      _sim->_aa.load_diagonal_point(n_(BR()).m_(), d);
-    }
+    trace4("BREQN::tr_load_ones vs", long_label(), _one0, _one1, d);
+    // like tr_load inode, but use branch index.
+    _sim->_aa.load_couple(n_(OUT1).m_(), n_(BR()).m_(), -d);
+    _sim->_aa.load_couple(n_(OUT2).m_(), n_(BR()).m_(),  d);
   }else{
   }
-  _one1 = _one0;
+
+  double d1 = dampdiff(&_one0, _one1);
+  if(d1 != 0.){
+    _sim->_aa.load_asymmetric(n_(OUT1).m_(), n_(OUT2).m_(), n_(BR()).m_(), 0,  d1);
+    _sim->_aa.load_diagonal_point(n_(BR()).m_(), d1);
+  }else{
+  }
+
+  _one1 = _one0; // needed? dampdiff.
+  _loss1 = _loss0; // needed? dampdiff.
 }
 /*--------------------------------------------------------------------------*/
 void VA_BREQN::tr_load()
 {
   node_t gnd(&ground_node);
-  if(_loss0 != _loss1){
-      std::swap(_loss1, _loss0);
-      tr_unload_ones();
-      std::swap(_loss1, _loss0);
-      _one0 = 1;
-      _loss1 = _loss0;
+
+  if(_loss0){
+    _one0 = 0;
   }else{
+    _one0 = 1;
   }
+
   tr_load_ones();
+  _loss1 = _loss0;
+
+  assert(_loss1 == _loss0);
 
   int vv = 1;
   trace2("VA_BREQN::tr_load vs", is_vs(),_values[0]);
