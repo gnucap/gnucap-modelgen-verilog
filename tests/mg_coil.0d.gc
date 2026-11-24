@@ -31,6 +31,7 @@ load ./test_coil0d.so
 module main(\1 , \2 , ref)
   parameter p=1;
   test_coil0d #(.l(p)) l1(\1 , \2 );
+// inductor #(.l(p)) l1(\1 , \2 );
   resistor  #(.r(p)) r2(\2 , ref);
 endmodule
 

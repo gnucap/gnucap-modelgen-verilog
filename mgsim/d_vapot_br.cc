@@ -76,7 +76,7 @@ protected: // override virtual
   }
 
   bool has_iv_probe()const override{return false;}
-  bool has_inode()const override{return true;}
+  bool has_inode()const override { return true;}
   void expand()override;
  // void expand_last()override{assert(0);}
 
@@ -180,7 +180,8 @@ bool VA_BREQN::do_tr()
     trace2("loss", _values[0], _values[1]);
     _m0.x = 0.;
     _m0.c0 = -_loss0 * _values[0]; // -> rhs
-    _m0.c1 = 0; // -_loss0 * _values[1];
+    _m0.c1 = -_loss0 * _values[1]; // BUG? .. inode?
+    _m0.c1 = 0;
   }else{
     // current source.
     if(_values[0] || _values[1]){ untested();
@@ -247,11 +248,22 @@ void VA_BREQN::tr_load()
   if(!_n_current_inputs){
   }else if(_n_current_inputs == 1){
     if(p0_is_cc()){
+      if(_loss0){
+      }else{ untested();
+      }
       vv = 2;
       if(_values[1]){
-	incomplete();
       }else{
       }
+      
+      // load m0.c1 with negative sign as in coil/c_model.
+      // do it with a hack, for now.
+//      _m0.c1 = - _values[1];
+      _values[1] *= -1;
+      _old_values[1] *= -1;
+      tr_load_diagonal_point(n_(BR()), &_values[1], &_old_values[1]);
+      _values[1] *= -1;
+      _old_values[1] *= -1;
     }else{
       vv = 1; // really?
     }

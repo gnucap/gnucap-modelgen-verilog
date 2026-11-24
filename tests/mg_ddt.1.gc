@@ -1,0 +1,33 @@
+attach ./modelgen_2.so
+attach ../vams/vpulse.so
+
+verilog
+options noincmode
+
+`modelgen test_mgddt1_
+module motor(p, n, s);
+    parameter real j = 0.004;
+    parameter real d = 0.1;
+    parameter real r = 5.0;
+    parameter real l = 0.02;
+    inout p, n, s;
+    electrical p, n, s;
+
+    analog begin
+        V(p,n) <+ 4.5*V(s) + 5*I(p,n) + l*ddt(I(p,n));
+        I(s) <+ 6.2*I(p,n) - d*V(s) - j*ddt(V(s));
+    end
+endmodule
+`endmodelgen
+
+
+!make test_mgddt1.so > /dev/null
+attach ./test_mgddt1.so
+ground gnd;
+
+vpulse #(.val1(1), .rise(50m), .fall(10m), .width(50m)) source(p,gnd);
+motor dut(p, gnd, s);
+
+print tran v(p) v(s) i(source) iter(0) control(0)
+tran 200m basic
+status notime

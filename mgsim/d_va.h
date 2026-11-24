@@ -217,10 +217,10 @@ void DEV_CPOLY_G::expand_current_port(int i, std::string const& input_label)
   }else if (input->subckt()) {untested();
     throw Exception(long_label() + ": " + input_label
 		    + " has a subckt, cannot be used as current probe");
-  }else if (input->has_inode()) {untested();
+  }else if (input->has_inode()) {itested();
     n_(in1) = input->n_(input->ext_nodes());
     n_(in2).set_to_ground(nullptr);
-    assert(n_(in2).n_() == &ground_node);
+    assert(n_(in2).is_grounded());
   }else if (input->has_iv_probe()) {
     n_(in1) = input->n_(OUT1);
     n_(in2) = input->n_(OUT2);
