@@ -1791,6 +1791,7 @@ private: // node list
     n_p = 0, // .. connected to port
     n_n = 1, // .. connected to port
     n_white_noise_1_p = 2 /* used: 0 */,
+    _n_matrix_nodes = 3,
     I_b_white_noise_1_p_ = 3,
     I_b_p_n = 4,
     _n_total = 5
@@ -1880,7 +1881,7 @@ private: // overrides
   std::string dev_type()const override {return "resistor";}
   int max_nodes()const override {return 2;}
   int min_nodes()const override {return 0;}
-  int int_nodes()const override    {return 1;}
+  int int_nodes()const override    {return  _n_matrix_nodes - 2;}
   std::string value_name()const override {itested(); return "";}
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
@@ -3369,6 +3370,7 @@ private: // node list
     n_p = 0, // .. connected to port
     n_n = 1, // .. connected to port
     n_white_noise_0_p = 2 /* used: 0 */,
+    _n_matrix_nodes = 3,
     I_b_white_noise_0_p_ = 3,
     I_b_p_n = 4,
     _n_total = 5
@@ -3459,7 +3461,7 @@ private: // overrides
   std::string dev_type()const override {return "resistor";}
   int max_nodes()const override {return 2;}
   int min_nodes()const override {return 0;}
-  int int_nodes()const override    {return 1;}
+  int int_nodes()const override    {return  _n_matrix_nodes - 2;}
   std::string value_name()const override {itested(); return "";}
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
@@ -7134,6 +7136,7 @@ private: // node list
     n_p = 0, // .. connected to port
     n_n = 1, // .. connected to port
     n_ddt_1_p = 2 /* used: 0 */,
+    _n_matrix_nodes = 3,
     I_b_ddt_1_p_ = 3,
     I_b_p_n = 4,
     _n_total = 5
@@ -7259,7 +7262,7 @@ private: // overrides
   std::string dev_type()const override {return "capacitor";}
   int max_nodes()const override {return 2;}
   int min_nodes()const override {return 0;}
-  int int_nodes()const override    {return 1;}
+  int int_nodes()const override    {return  _n_matrix_nodes - 2;}
   std::string value_name()const override {itested(); return "";}
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;
@@ -8405,6 +8408,7 @@ private: // node list
     n_p = 0, // .. connected to port
     n_n = 1, // .. connected to port
     n_ddt_2_p = 2 /* used: 1 */,
+    _n_matrix_nodes = 3,
     I_b_ddt_2_p_ = 3,
     I_b_p_n = 4,
     _n_total = 5
@@ -8537,7 +8541,7 @@ private: // overrides
   std::string dev_type()const override {return "capacitor";}
   int max_nodes()const override {return 2;}
   int min_nodes()const override {return 0;}
-  int int_nodes()const override    {return 1;}
+  int int_nodes()const override    {return  _n_matrix_nodes - 2;}
   std::string value_name()const override {itested(); return "";}
   bool print_type_in_spice()const override {itested(); return false;}
   std::string port_name(int i)const override;

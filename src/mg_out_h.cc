@@ -596,6 +596,7 @@ static void make_node_decl(std::ostream& o, const Module& m)
       ++n;
     }
   }
+  o____ "_n_matrix_nodes = " << n << ",\n";
   n = make_current_node_decl(o, m, n);
   o____ "_n_total = " << n << "\n";
   o__ "};\n";
@@ -865,7 +866,7 @@ static void make_module(std::ostream& o, const Module& m)
  // o__ "int net_nodes()const override {return "<< m.circuit()->ports().size() <<";}\n";
   o__ "int min_nodes()const override {return 0;}\n";
   o__ "int int_nodes()const override    {return "
-      << m.circuit()->nodes().size() - m.circuit()->ports().size() << ";}\n";
+      << " _n_matrix_nodes - " << m.circuit()->ports().size() << ";}\n";
   o__ "std::string value_name()const override {itested(); return \"\";}\n";
   o__ "bool print_type_in_spice()const override {itested(); return false;}\n";
   o__ "std::string port_name(int i)const override;\n";

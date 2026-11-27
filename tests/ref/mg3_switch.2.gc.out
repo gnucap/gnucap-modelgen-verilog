@@ -8,17 +8,15 @@ dctran density=100.0%, ac density=100.0%
 name   ...
 have 2 nodes. model: 0 sckt: 0
 
-c1 2 2 1
+c1 2 2 0
 0 2
 1 1
-2 -1
  c1._b_P_PI 2 2 0
  0 2
  1 1
-c0 2 2 1
+c0 2 2 0
 0 2
 1 0
-2 -1
  c0._b_P_PI 2 2 0
  0 2
  1 0
