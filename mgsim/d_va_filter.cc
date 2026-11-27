@@ -37,16 +37,16 @@ namespace {
 /*--------------------------------------------------------------------------*/
 FPOLY1 integrate(const FPOLY1* q, const FPOLY1* i, double* time,
 		     METHOD method, double dt)
-{ untested();
-  if (time[1] == 0) { untested();
+{
+  if (time[1] == 0) {
     method = mEULER;	// Bogus current in previous step.  Force Euler.
-  }else{ untested();
+  }else{
   }
 
-  if( CKT_BASE::_sim->analysis_is_static() ) { untested();
+  if( CKT_BASE::_sim->analysis_is_static() ) {
     assert(time[0] == 0.);
     return FPOLY1(q[0].x, 0., 0.);
-  } else { untested();
+  } else {
     assert (!CKT_BASE::_sim->analysis_is_ac());
     trace3("integrate", dt, q[0].x,  i[0].x);
 
@@ -79,20 +79,20 @@ FPOLY1 integrate(const FPOLY1* q, const FPOLY1* i, double* time,
 }
 /*--------------------------------------------------------------------------*/
 double tr_l_to_g(double l, double g, double const* time, METHOD method_a, double dt )
-{ untested();
-  if (CKT_BASE::_sim->analysis_is_static()) { untested();
+{
+  if (CKT_BASE::_sim->analysis_is_static()) {
     assert(time[0] == 0.);
     return 0.;
   }else if (CKT_BASE::_sim->analysis_is_restore()) {itested();
     assert(time[0] > 0);
     return g;
     // no change, fake
-  }else{ untested();
+  }else{
     assert(CKT_BASE::_sim->analysis_is_tran_dynamic());
     METHOD method;
-    if (time[1] == 0) { untested();
+    if (time[1] == 0) {
       method = mEULER; // Bogus current in previous step.  Force Euler.
-    }else{ untested();
+    }else{
       method = method_a;
     }
     g = dt * l;
@@ -249,7 +249,7 @@ bool DEV_CPOLY_CAP::tr_needs_eval()const
 {
   /*assert(!is_q_for_eval());*/
 
-  if(_loss0 == 0.){ untested();
+  if(_loss0 == 0.){
     // more work to do...
     return true;
   }else{
@@ -262,24 +262,24 @@ class DEV_IDT : public DEV_CPOLY_CAP {
   bool _reset{false};
 private:
   explicit DEV_IDT(const DEV_IDT& p)
-    :DEV_CPOLY_CAP(p) { untested();}
+    :DEV_CPOLY_CAP(p) {}
 public:
   explicit DEV_IDT() :DEV_CPOLY_CAP() {}
 private: // override virtual
   char	   id_letter()const override	{ untested();unreachable(); return '\0';}
   std::string dev_type()const override	{ untested();unreachable(); return "idt";}
-  CARD*	   clone()const override	{ untested();return new DEV_IDT(*this);}
+  CARD*	   clone()const override	{return new DEV_IDT(*this);}
   bool	   do_tr()override;
-  double   tr_amps()const override      { untested(); return DEV_CPOLY_CAP::tr_amps(); }
+  double   tr_amps()const override      { return DEV_CPOLY_CAP::tr_amps(); }
 /*--------------------------------------------------------------------------*/
   void	   tr_begin()override;
   void	   tr_advance()override;
   void	   ac_load()override;
   TIME_PAIR tr_review()override;
 public:
-  void set_param_by_index(int i, std::string& v, int j)override { untested();
+  void set_param_by_index(int i, std::string& v, int j)override {
     trace2("DEV_IDT reset", long_label(), _sim->_time0);
-    if(i==123456){ untested();
+    if(i==123456){
       // BUG. need node_p or something to pass signals.
       _reset = j;
     }else{ untested();
@@ -291,26 +291,26 @@ DISPATCHER<CARD>::INSTALL
   d1(&device_dispatcher, "va_idt|__va_idt", &p1);
 /*--------------------------------------------------------------------------*/
 void DEV_IDT::ac_load()
-{ untested();
+{
  // do_ac.
   _acout = 1./_sim->_jomega;
-  if(_loss0) { untested();
+  if(_loss0) {
     _acout *= - _loss0;
-  }else{ untested();
+  }else{
   }
 		   //
   DEV_CPOLY_CAP::ac_load();
 }
 /*--------------------------------------------------------------------------*/
 TIME_PAIR DEV_IDT::tr_review()
-{ untested();
+{
   COMPONENT::tr_review(); // skip ELEMENT
-  if (_method_a == mEULER) { untested();
+  if (_method_a == mEULER) {
     // Backward Euler, no step control, take it as it comes
-  }else{ untested();
+  }else{
     double timestep = tr_review_trunc_error(_i);
-    if(tr_review_check(timestep)){ untested();
-    }else{ untested();
+    if(tr_review_check(timestep)){
+    }else{
       _time_by.set_nok();
     }
     _time_by.min_dt_estimate(timestep);
@@ -359,7 +359,7 @@ DEV_CPOLY_CAP::~DEV_CPOLY_CAP()
   delete [] _vy1;
   delete [] _vi0;
   delete [] _vi1;
-  if (net_nodes() > NODES_PER_BRANCH) { untested();
+  if (net_nodes() > NODES_PER_BRANCH) {
     delete [] _nN;
   }else{
     // it is part of a base class
@@ -454,7 +454,7 @@ bool DEV_DDT::do_tr()
     assert(_loss0 == 1); // for now.
     _vi0[0] = - _loss0 * _i[0].f0;
     _vi0[1] = - _loss0 * _i[0].f1;
-  }else{ untested();
+  }else{
     _vi0[0] = _i[0].f0;
     _vi0[1] = _i[0].f1;
   }
@@ -464,10 +464,10 @@ bool DEV_DDT::do_tr()
   
   if(_sim->_v0){
     int i = 2;
-    for (; i<=_n_ports - int(_input.size()); ++i) { untested();
-      if(_loss0){ untested();
+    for (; i<=_n_ports - int(_input.size()); ++i) {
+      if(_loss0){
 	_vi0[i] = -_loss0 * tr_c_to_g(_vy0[i], _vi0[i]);
-      }else{ untested();
+      }else{
 	_vi0[i] = tr_c_to_g(_vy0[i], _vi0[i]);
       }
 
@@ -483,7 +483,7 @@ bool DEV_DDT::do_tr()
     // current port input
     for (; int(i)<=_n_ports; ++i) {
       int k = i - int(_n_ports - _input.size() + 1);
-      if(_input[k]->has_iv_probe()){ untested();
+      if(_input[k]->has_iv_probe()){
 	q = true;
 	continue;
       }else if(_input[k]->has_inode()){
@@ -499,7 +499,7 @@ bool DEV_DDT::do_tr()
       // _m0.c1  = _y[0].f1 * (_input->_loss0 + _input->_m0.c1);
 //      double scale = _input[k]->_loss0 + _input[k]->_m0.c1 ;
       double scale = 1 + _input[k]->_m0.c1 ;
-      if(_input[k]->_m0.c0){ untested();
+      if(_input[k]->_m0.c0){
       }else{
       }
       if(_input[k]->_m0.c1){ untested();
@@ -539,7 +539,7 @@ bool DEV_DDT::do_tr()
   }else{
   }
 
-  if (q){ untested();
+  if (q){
     _sim->_late_evalq.push_back(this);
   }else{
     trace4("trampsdbg", _sim->_time0, tramps1, tr_amps(), _i[0].f0);
@@ -549,14 +549,14 @@ bool DEV_DDT::do_tr()
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_DDT::do_tr_last()
-{ untested();
-  if(_sim->_v0){ untested();
+{
+  if(_sim->_v0){
     int i = _n_ports - int(_input.size()) + 1;
 
     // current port input
-    for (; int(i)<=_n_ports; ++i) { untested();
+    for (; int(i)<=_n_ports; ++i) {
       int k = int(i)-int(_n_ports - _input.size() + 1);
-      if(_input[k]->has_iv_probe()){ untested();
+      if(_input[k]->has_iv_probe()){
       }else{ untested();
 	continue;
       }
@@ -564,14 +564,14 @@ bool DEV_DDT::do_tr_last()
       // _m0.c1  = _y[0].f1 * (_input->_loss0 + _input->_m0.c1);
       double scale = _input[k]->_loss0 + _input[k]->_m0.c1 ;
       if(_input[k]->_m0.c1){ untested();
-      }else{ untested();
+      }else{
       }
-      if(_input[k]->_loss0){ untested();
+      if(_input[k]->_loss0){
       }else{ untested();
       }
 
      // _vi0[i] = tr_c_to_g(scale*_vy0[i], _vi0[i]);
-      if(_loss0){ untested();
+      if(_loss0){
 	_vi0[i] = -_loss0 * scale * tr_c_to_g(_vy0[i], _vi0[i]);
       }else{ untested();
 	_vi0[i] = scale * tr_c_to_g(_vy0[i], _vi0[i]);
@@ -580,7 +580,7 @@ bool DEV_DDT::do_tr_last()
       _vi0[0] -= volts_limited(n_(2*i-2),n_(2*i-1)) * _vi0[i];
     }
 
-    for (int ii=0; ii<=_n_ports; ++ii) { untested();
+    for (int ii=0; ii<=_n_ports; ++ii) {
       assert(_vi0[ii] == _vi0[ii]);
     }
   }else{ untested();
@@ -590,17 +590,17 @@ bool DEV_DDT::do_tr_last()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_IDT::tr_begin()
-{ untested();
+{
   DEV_CPOLY_CAP::tr_begin();
 }
 /*--------------------------------------------------------------------------*/
 void DEV_IDT::tr_advance()
-{ untested();
+{
   trace3("DEV_IDT::tr_advance", long_label(), _sim->_time0, _reset);
-  if(_reset){ untested();
+  if(_reset){
     _reset = false;
     _i[0] = _i[1] = FPOLY1(0., 0., 0.);
-  }else{ untested();
+  }else{
   }
 
   STORAGE::tr_advance();
@@ -633,10 +633,10 @@ void DEV_IDT::tr_advance()
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_IDT::do_tr()
-{ untested();
+{
   assert((_time[0] == 0) || (_vy0[0] == _vy0[0]));
 
-  if(_sim->_v0){ untested();
+  if(_sim->_v0){
     _y[0].x = tr_outvolts();
   }else{ untested();
     _y[0].x = 0.;
@@ -653,30 +653,30 @@ bool DEV_IDT::do_tr()
 
   assert(_vi0[0] == _vi0[0]);
   
-  if(_sim->_v0){ untested();
-    for (int i=2; i<=_n_ports; ++i) { untested();
+  if(_sim->_v0){
+    for (int i=2; i<=_n_ports; ++i) {
       _vi0[i] = tr_l_to_g(_vy0[i], _vi0[i], _time, _method_a, _dt);
       _vi0[0] -= volts_limited(n_(2*i-2),n_(2*i-1)) * _vi0[i];
 
       assert(_vi0[i] == _vi0[i]);
       assert(_vi0[0] == _vi0[0]);
     }
-    for (int i=0; i<=_n_ports; ++i) { untested();
+    for (int i=0; i<=_n_ports; ++i) {
       assert(_vi0[i] == _vi0[i]);
     }
   }else{ untested();
   }
 
-  if(_loss0){ untested();
+  if(_loss0){
    // _vi0[0] *= - _loss0;
    // _vi0[1] *= - _loss0;
-  }else{ untested();
+  }else{
   }
-  if(_loss0){ untested();
-    for (int i=0; i<=_n_ports; ++i) { untested();
+  if(_loss0){
+    for (int i=0; i<=_n_ports; ++i) {
       _vi0[i] *= -_loss0;
     }
-  }else{ untested();
+  }else{
   }
 
   //trace4("idttramp", oldtramps, tr_amps(), n_(0).v0(), n_(1).v0());
@@ -685,7 +685,7 @@ bool DEV_IDT::do_tr()
 //  _vi0[0] = 0;
 //  _vi0[1] = 0;
 				 //
-  if( CKT_BASE::_sim->analysis_is_static() ) { untested();
+  if( CKT_BASE::_sim->analysis_is_static() ) {
     if(_vi0[0]){ untested();
 //      incomplete(); // TODO: MOD_*::tr_begin?
       _vi0[0] = 0.;
@@ -694,7 +694,7 @@ bool DEV_IDT::do_tr()
 //      incomplete(); // TODO: MOD_*::tr_begin?
       _vi0[1] = 0.;
     }
-  }else{ untested();
+  }else{
   }
 
   _m0 = CPOLY1(0., _vi0[0], 0.); // _vi0[1]);
@@ -749,7 +749,7 @@ double DEV_CPOLY_CAP::tr_amps() const
     // a voltage source. tr_amps abuse, return the filter output...
     assert(_loss0 == 1.); // for now.
     amps = -amps;
-  }else{ untested();
+  }else{
   }
 
   trace3("DEV_CPOLY_CAP::tr_amps", long_label(), _sim->_time0, amps);
@@ -777,7 +777,7 @@ void DEV_DDT::ac_load()
   _acout = _sim->_jomega;
   if(_loss0) {
     _acout *= - _loss0;
-  }else{ untested();
+  }else{
   }
 
   trace6("CAP::ac_load", long_label(), _vy0[0], _vy0[1], _loss0, _loss1, _acg);
@@ -818,13 +818,13 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
     _vi0 = new double[n_states];
     _vi1 = new double[n_states];
 
-    if (net_nodes() > NODES_PER_BRANCH) { untested();
+    if (net_nodes() > NODES_PER_BRANCH) {
       // allocate a bigger node list
       _nN = new node_t[matrix_nodes()];
     }else{
       // use the default node list, already set
     }      
-  }else{ untested();
+  }else{
     assert(_n_ports == n_states-1);
     assert(_vy1);
     assert(_vi0);
@@ -840,7 +840,7 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
   trace4("set_parameters", n_nodes, net_nodes(), _n_ports, _vy0[1]);
   notstd::copy_n(nodes, n_nodes, _nN);
   assert(ext_nodes() == _n_ports * 2);
-  if(n_(0).is_short_to(n_(1))){ untested();
+  if(n_(0).is_short_to(n_(1))){
   }else{
     _vy0[1] = 1.; // mfactor hack.
     _vy1[1] = 1.; // mfactor hack.
@@ -848,16 +848,16 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
 }
 /*--------------------------------------------------------------------------*/
 double DEV_CPOLY_CAP::tr_probe_num(const std::string& x)const
-{ untested();
+{
   if (Umatch(x, "loss ")) { untested();
     return _loss0;
   }else if (Umatch(x, "conv ")) { untested();
     return converged();
-  }else if (Umatch(x, "st0 ")) { untested();
+  }else if (Umatch(x, "st0 ")) {
     return _vy0[0];
   }else if (Umatch(x, "v0 ")) { untested();
     return n_(0).v0();
-  }else{ untested();
+  }else{
     return STORAGE::tr_probe_num(x);
   }
 }
@@ -875,7 +875,7 @@ void DEV_CPOLY_CAP::precalc_last()
   }
 
   if(_vy0[1]){
-  }else{ untested();
+  }else{
   }
   c->set_mfactor(_vy0[1]); // HACK
   attach_common(c);
@@ -889,7 +889,7 @@ void DEV_CPOLY_CAP::expand()
   STORAGE::expand();
   if(_n_current_inputs){
     q_expand_last();
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -937,7 +937,7 @@ void DEV_CPOLY_CAP::expand_current_port(int i, std::string const& input_label)
   }else if (input->has_inode()) {
     n_(in1) = input->n_(input->ext_nodes());
     n_(in2).set_to_ground(nullptr);
-  }else if (input->has_iv_probe()) { untested();
+  }else if (input->has_iv_probe()) {
     n_(in1) = input->n_(OUT1);
     n_(in2) = input->n_(OUT2);
   }else{ untested();

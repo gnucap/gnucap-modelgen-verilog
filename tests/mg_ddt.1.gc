@@ -4,7 +4,7 @@ attach ../vams/vpulse.so
 verilog
 options noincmode
 
-`modelgen test_mgddt1_
+`modelgen test_mgddt1
 module motor(p, n, s);
     parameter real j = 0.004;
     parameter real d = 0.1;
